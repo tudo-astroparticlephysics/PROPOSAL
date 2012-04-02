@@ -1,0 +1,12 @@
+	# media definition file (mmc version 1.2 and up)
+	# include with -mediadef=[this file].
+	# use the following syntax:
+	# all        det vcut ecut conti rho medium
+	# sphere z r det vcut ecut conti rho medium
+	# spheres assume Earth radius of 6371300 m,
+	# bedrock elevation 24 m, ice surface at 2834 m,
+	# detector center 1940 m below the ice surface.
+	all                  0 0.05 5.e2 1 0.673 Air
+	sphere  1940 6374134 0 0.05 5.e2 1 0.825 Ice
+	sphere  1740 6373934 1 0.05 5.e2 1 1.0   Ice
+	sphere  -870 6371324 0 0.05 5.e2 1 1.0   Standard Rock
