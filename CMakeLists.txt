@@ -1,8 +1,0 @@
-i3_project( PROPOSAL)
-
-cmake_minimum_required(VERSION 2.6)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/../lib)
-set( CMAKE_CXX_FLAGS "-O3 " )
-
-ADD_SUBDIRECTORY( src )
-ADD_SUBDIRECTORY( doc )
