@@ -38,7 +38,12 @@ i3_add_library(PROPOSAL
 	private/PROPOSAL/MpairStochastic.cxx
 	private/PROPOSAL/Amanda.cxx
 	private/PROPOSAL/FunctionInt2.cxx
+
+	private/PROPOSAL-icetray/I3PropagatorServicePROPOSAL.cxx
+	private/PROPOSAL-icetray/I3PropagatorPROPOSAL.cxx
+
 	USE_TOOLS boost
+	USE_PROJECTS icetray dataclasses sim-services simclasses   
 	)
 
 
