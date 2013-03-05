@@ -72,9 +72,6 @@ void I3PropagatorPROPOSAL::Configure(){
   GetParameter ("mode", fPropagatorPROPOSALmode);
   log_info("PROPOSAL propagation/generation mode set to %d", fPropagatorPROPOSALmode);
 
-  //I3JavaVM& jvmService = GetService<I3JavaVM>("I3JavaVM");
-  //env = jvmService.GetEnv();
-
   GetParameter ("rerr", fStderr);
   char rerr[1000]="\0";
   strcat(rerr, fStderr.c_str());
@@ -96,7 +93,7 @@ void I3PropagatorPROPOSAL::Configure(){
   const string I3_BUILD(getenv("I3_BUILD"));
   string options;
   options = "-romb=5 -raw -user -sdec -time -lpm -bs=1 -ph=3 -bb=2 -sh=2 ";
-  options += "-frho -tdir="+I3_BUILD+"/PROPOSAL-icetray/resources/tables ";
+  options += "-frho -tdir="+I3_BUILD+"/PROPOSAL/resources/tables ";
 
   if(fPropagatorPROPOSALmode==3) options+="-prop ";
 
@@ -114,14 +111,14 @@ void I3PropagatorPROPOSAL::Configure(){
       s<<" -stau="<<exoticMass_/I3Units::GeV;
     }
     options += s.str();
-    options += " -mediadef="+I3_BUILD+"/PROPOSAL-icetray/resources/mediadef-exotics ";
+    options += " -mediadef="+I3_BUILD+"/PROPOSAL/resources/mediadef-exotics ";
   }else{
     //don't track constant energy loss for very massive particles
     //but we do want to for everything else.
     options += " -cont ";
     if (mediadefName_ == "") {
        // default
-       options += " -mediadef="+I3_BUILD+"/PROPOSAL-icetray/resources/mediadef ";
+       options += " -mediadef="+I3_BUILD+"/PROPOSAL/resources/mediadef ";
     } else {
        // user-defined media file. Put it under I3_BUILD
        if (mediadefPath_ == "") mediadefPath_ = I3_BUILD;
@@ -151,21 +148,7 @@ void I3PropagatorPROPOSAL::DAQ(I3FramePtr frame){
   // saying where we are
   log_debug("Entering I3PropagatorPROPOSAL::DAQ()");
   I3MMCTrackListPtr mmcTrackList(new I3MMCTrackList);
-
-  if(flag==2){
-    I3MCTreePtr mctree(new I3MCTree());
-    createNext();
-
-    I3Particle primary;
-    primary.SetShape(I3Particle::Primary);
-    I3MCTree::iterator iter = mctree->set_head(primary);
-
-    eventOut(mctree,iter,mmcTrackList);
-    endProp();
-
-    frame->Put(primaryTreeName_, mctree); //This is the "standard" place for MC Particles
-
-  }else{//not flag==2
+  
     //The primary tree
     I3MCTreeConstPtr primtree = I3MCTreeUtils::Get(frame,primaryTreeName_);
 
@@ -250,7 +233,6 @@ void I3PropagatorPROPOSAL::DAQ(I3FramePtr frame){
 
       frame->Put(primaryTreeName_, proptree);
     }
-  }// if option is not 2, read events from frame
 
   frame->Put(PROPOSALInfoName_,mmcTrackList);
 
@@ -386,54 +368,15 @@ void I3PropagatorPROPOSAL::FillMMCTrackList(I3MMCTrackListPtr t,I3Particle& p,PR
 }
 
 void
-I3PropagatorPROPOSAL::setStderr(char *filename){
-
-//  jclass Output;
-
-//  Output = env->FindClass("mmc/Output");
-//  if (Output == 0) {
-//    if (env->ExceptionOccurred()) {
-//      env->ExceptionDescribe();
-//    }
-//    log_fatal("cannot find the mmc Output class\n");
-//  }
-
-//  jmethodID mid = env->GetStaticMethodID(Output, "setStderr", "(Ljava/lang/String;)Z");
-//  if (mid == 0) {
-//    log_fatal("cannot find the setStderr method\n");
-//  }
-
-//  jstring jstr = env->NewStringUTF(filename);
-//  if (jstr == 0) {
-//    log_fatal("Out of memory\n");
-//  }
-
-//  env->CallStaticBooleanMethod(Output, mid, jstr);
-//  env->DeleteLocalRef(jstr);
-
-//  {
-//    ostringstream o;
-//    o << "Stderr redirected to the file " << filename;
-//    log_info("%s", o.str().c_str());
-//  }
-
-}
-
+I3PropagatorPROPOSAL::setStderr(char *filename){}
 
 void
 I3PropagatorPROPOSAL::initPROPOSAL(string options, int iflag){
 
   flag=iflag;
 
-  if (flag == 1) {
-
-      amanda = new Amanda();
-      amanda->setup(options);
-  }
-  else{
-      atmFlux = new AtmFlux();
-      atmFlux->setup(options);
-  }
+  amanda = new Amanda();
+  amanda->setup(options);
 
   log_info("PROPOSAL initialized");
 }
@@ -462,24 +405,9 @@ I3PropagatorPROPOSAL::propagate(string name,
 
   // propagate the particle
 
-  if (flag == 1) {
-
-      aobj = amanda->propagate(particle);
-  }
-  else{
-      aobj = atmFlux->propagate(particle);
-  }
-
+  aobj = amanda->propagate(particle);
 
 }
-
-void
-I3PropagatorPROPOSAL::createNext(){
-
-  aobj = atmFlux->createNext();
-
-}
-
 
 void
 I3PropagatorPROPOSAL::endProp(){

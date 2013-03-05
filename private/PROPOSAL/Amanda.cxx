@@ -605,8 +605,6 @@ vector<PROPOSALParticle *> Amanda::propagate(PROPOSALParticle *p)
         I3p.resize(1);
         I3p.at(0)   =   new PROPOSALParticle();
     }
-   if(p->Elost>0||pI->Elost>0)
-        cout<<"Amanda 609: p->Elost="<<p->Elost<<"\t pI->Elost="<<pI->Elost<<endl;
 
     return I3p;
 }

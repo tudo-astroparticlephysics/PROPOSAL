@@ -19,14 +19,11 @@
 #include "PROPOSAL/Amanda.h"
 #include "PROPOSAL/PROPOSALParticle.h"
 #include "PROPOSAL/Output.h"
-#include "generation/gen/AtmFlux.h"
-
 
 class I3Particle;
 class PROPOSALParticle;
 class Output;
 class Amanda;
-class AtmFlux;
 
 /**
  * @version $Id: I3PropagatorPROPOSAL.h 77049 2011-06-21 19:45:18Z olivas $
@@ -151,10 +148,6 @@ class I3PropagatorPROPOSAL : public I3Module{
          double,
          double,
          double);
-  /**
-   * createNext is called when flag=2 to generate and propagate new particle
-   */
-  void createNext();
 
   /**
    * called when done with the processed event to release resources
@@ -181,7 +174,6 @@ class I3PropagatorPROPOSAL : public I3Module{
 
   Amanda* amanda;
   PROPOSALParticle* particle;
-  AtmFlux* atmFlux;
   std::vector<PROPOSALParticle*> aobj;
   int flag;
 };

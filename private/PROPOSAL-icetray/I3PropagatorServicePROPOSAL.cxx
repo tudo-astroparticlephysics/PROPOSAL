@@ -57,34 +57,8 @@ I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(const string& mmcOpts,
 //  env_->DeleteLocalRef(jstr); <-----JavaStuff
  // Output::setStderr(stderr);
 
-  PROP =false;
-  /**
-   * Get a reference to the AMANDA class
-   */
-  pos = mmcOpts.find("-prop");
-  if(pos != string::npos)
-  {
-      PROP=true;
-      //Create two propagators: one for taus one for muons
-      //muonPropagator = new Amanda();
-      //tauPropagator = new Amanda();
-      testFlux = new AtmFlux();
-      testFlux->setup(mmcOpts);
-      //muonPropagator->setup(mmcOpts);
-      
-      //stringstream mmcOptstau;
-      //mmcOptstau<<mmcOpts<<"-tau";
-      //tauPropagator->setup(mmcOptstau.str());
-      //cout<<"tauPropagator \t"<<tauPropagator<<endl;
-      //cout<<"muonPropagator \t"<<muonPropagator<<endl;
-
-  }
-  else
-  {
-      amanda = new Amanda();
-      amanda->setup(mmcOpts);
-  }
-  
+  amanda = new Amanda();
+  amanda->setup(mmcOpts);
 
 
   log_info("PROPOSAL initialized");
@@ -220,8 +194,7 @@ I3PropagatorServicePROPOSAL::propagate( I3Particle& p, vector<I3Particle>& daugh
   if (particle == 0) Fatal("Error calling the Particle constructor\n");
 
   vector<PROPOSALParticle*> aobj_l;
-  if(PROP) aobj_l = testFlux->propagate(particle);
-  else aobj_l = amanda->propagate(particle);
+  aobj_l = amanda->propagate(particle);
 
   if (&aobj_l == NULL) {
 
@@ -255,27 +228,18 @@ I3PropagatorServicePROPOSAL::propagate( I3Particle& p, vector<I3Particle>& daugh
   }
 
   //get the propagated length of the particle
-  if(!PROP){
-  	double length = particle->r;
-  	p.SetLength( length * I3Units::cm );
-  	log_trace(" length = %f cm ", length );
-  }
-//  I3MMCTrackPtr mmcTrack = GenerateMMCTrack(particle);
-//  if(mmcTrack){ 
-//    mmcTrack->SetParticle( p );
-//  }
+  double length = particle->r;
+  p.SetLength( length * I3Units::cm );
+  log_trace(" length = %f cm ", length );
 
   int nParticles =  aobj_l.size();
   log_trace("nParticles = %d", nParticles);
   
   I3MMCTrackPtr mmcTrack;
-  if(!PROP){
-    log_trace("javaClass_ == AMANDA");
-    mmcTrack = GenerateMMCTrack(particle);
-    if(mmcTrack){ 
+  log_trace("javaClass_ == AMANDA");
+  mmcTrack = GenerateMMCTrack(particle);
+  if(mmcTrack)
       mmcTrack->SetParticle( p );
-    }
-  }
 
   for(int i=0; i < nParticles; i++){
 
@@ -309,22 +273,9 @@ I3PropagatorServicePROPOSAL::propagate( I3Particle& p, vector<I3Particle>& daugh
     new_particle.SetThetaPhi(theta,phi);
     new_particle.SetEnergy(e);
 
-    if( PROP && !mmcTrack &&
-	new_particle.GetType() == p.GetType() ){
-      // we've found the propagated original particle
-      // so we're NOT going to add it to the daughter list
-      // but we do want to update the length
-      p.SetLength( l );
-      log_trace("Attempting to get the MMC track info from a daughter.");
-      mmcTrack = GenerateMMCTrack(aobj_l.at(i));
-      if(mmcTrack){ 
-	mmcTrack->SetParticle( p );
-      }      
-    }else{
-      // this is not the particle you're looking for
-      // move along...and add it to the daughter list
-      daughters.push_back(new_particle);
-    }
+    // this is not the particle you're looking for
+    // move along...and add it to the daughter list
+    daughters.push_back(new_particle);
 
     //we're done with eobj
     delete aobj_l.at(i);

@@ -16,30 +16,11 @@
 #include "PROPOSAL/Amanda.h"
 #include "PROPOSAL/PROPOSALParticle.h"
 #include "PROPOSAL/Output.h"
-#include "generation/gen/AtmFlux.h"
-
-
-
-/* <<------- JavaStuff
-
-class jobject_;
-typedef class _jobject * jobject;
-class jclass_;
-typedef class _jclass * jclass;
-class JNIEnv_;
-typedef struct JNIEnv_ JNIEnv;
-
-class I3JavaVM;
-
-
-  <<------- JavaStuff   */
-
 
 class I3Particle; 
 class PROPOSALParticle;
 class Output;
 class Amanda;
-class AtmFlux;
 /**
  * @version $Id: I3PropagatorService.h 68823 2010-11-22 15:14:19Z dima $
  *
@@ -70,9 +51,6 @@ class I3PropagatorServicePROPOSAL : public I3PropagatorServiceBase {
   Amanda *amanda;
   Amanda *muonPropagator;
   Amanda *tauPropagator;
-  AtmFlux *testFlux;
-
-  bool PROP;
 
   double stauMass_;
 
@@ -100,14 +78,6 @@ class I3PropagatorServicePROPOSAL : public I3PropagatorServiceBase {
 
   void Fatal(const char* msg);
 
-/* <<------- JavaStuff
-
-  JNIEnv* env_;
-  jclass amandaJClass_;
-  jclass particleJClass_;
-  jobject amandaJObject_;
-
- <<------- JavaStuff */
 };
 
 I3_POINTER_TYPEDEFS(I3PropagatorServicePROPOSAL);

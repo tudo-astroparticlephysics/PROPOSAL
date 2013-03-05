@@ -52,5 +52,3 @@ i3_test_executable(PROPOSALtest
 	USE_PROJECTS PROPOSAL
 )
 
-# disable this for now
-# add_subdirectory(private/generation)
