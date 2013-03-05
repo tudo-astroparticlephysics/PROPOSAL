@@ -180,7 +180,7 @@ public:
      * \param   v   relative energy loss
      * \returnPhotonuclear::photoN with different v
      */
-
+    using CrossSections::functionInt;
     double functionInt(double e, double v);
 
 //----------------------------------------------------------------------------//

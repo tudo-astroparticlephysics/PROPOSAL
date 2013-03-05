@@ -705,11 +705,11 @@ double Integral::integrateWithSubstitution(double min, double max, FunctionOfx *
     else if(powerOfSubstitution<0)
     {
         if(max<0 && min<0){
-            this->min=- pow(-max, 1/powerOfSubstitution);
-            this->max=- pow(-min, 1/powerOfSubstitution);
+            this->min = -pow(-max, 1/powerOfSubstitution);
+            this->max = -pow(-min, 1/powerOfSubstitution);
         }
         else if(min<0){
-            this->min=- pow(-min, 1/powerOfSubstitution);
+            this->min = -pow(-min, 1/powerOfSubstitution);
             this->max=0;
             aux=-aux;
         }

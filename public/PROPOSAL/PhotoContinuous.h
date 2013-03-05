@@ -79,7 +79,7 @@ public:
      * \param   e   sets particle to energy e
      * \return  dE/dx
      */
-
+    using Photonuclear::functionInt;
     double functionInt(double e);
 
 //----------------------------------------------------------------------------//

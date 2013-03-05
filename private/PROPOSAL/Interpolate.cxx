@@ -31,6 +31,8 @@
 
 using namespace std;
 
+const double Interpolate::bigNumber   =   -300;
+const double Interpolate::aBigNumber  =   -299;
 
 //----------------------------------------------------------------------------//
 

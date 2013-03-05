@@ -58,8 +58,8 @@ PROPOSALParticle::PROPOSALParticle()
 ,tc     (0)
 ,Ec     (0)
 ,Elost  (0)
-,jt (false)
 ,df (false)
+,jt (false)
 {
 }
 
@@ -105,8 +105,8 @@ PROPOSALParticle::PROPOSALParticle(Propagate *pr, string name)
 ,tc     (0)
 ,Ec     (0)
 ,Elost  (0)
-,jt (false)
 ,df (false)
+,jt (false)
 {
     if(StartsWith(name,"tau"))
     {
@@ -234,8 +234,8 @@ PROPOSALParticle::PROPOSALParticle(int Igen, int Gens, string Name, double X, do
 ,tc     (0)
 ,Ec     (0)
 ,Elost  (0)
-,jt (false)
 ,df (false)
+,jt (false)
 {
     initByName(Name);
     setEnergy(E);
@@ -306,8 +306,8 @@ PROPOSALParticle::PROPOSALParticle(int Igen, int Gens, string Name, double X, do
     ,tc     (0)
     ,Ec     (0)
     ,Elost  (0)
-    ,jt (false)
     ,df (false)
+    ,jt (false)
 {
     initByName(Name);
     setEnergy(E);
@@ -357,8 +357,8 @@ PROPOSALParticle::PROPOSALParticle(string aname, double X, double Y, double Z, d
 ,tc     (0)
 ,Ec     (0)
 ,Elost  (0)
-,jt (false)
 ,df (false)
+,jt (false)
 {
     initByName(aname);
     setEnergy(E);

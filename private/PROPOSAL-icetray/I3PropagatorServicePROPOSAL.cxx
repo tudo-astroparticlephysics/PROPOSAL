@@ -122,14 +122,7 @@ string I3PropagatorServicePROPOSAL::GenerateMMCName(const I3Particle& p){
     s<<"stau="<<stauMass_/I3Units::GeV;
     name=s.str();
   }
-  //Choose the right propagator
-  //if(PROP){
-  //  if(p.GetType()==I3Particle::MuPlus||p.GetType()==I3Particle::MuMinus)
-  //      amanda=muonPropagator;
-  //  if(p.GetType()==I3Particle::TauMinus||p.GetType()==I3Particle::TauPlus)
-  //      amanda=tauPropagator;
-  //}
-  //cout<<"amanda \t"<<amanda<<endl;
+
   return name;
 }
 
@@ -246,8 +239,6 @@ I3PropagatorServicePROPOSAL::propagate( I3Particle& p, vector<I3Particle>& daugh
     
     //in mmc the particle relationships are stored
     int type = aobj_l.at(i)->type;
-    int parentID = aobj_l.at(i)->igen;
-    int particleID = aobj_l.at(i)->gens;
     double x = aobj_l.at(i)->x * I3Units::cm;
     double y = aobj_l.at(i)->y * I3Units::cm;
     double z = aobj_l.at(i)->z * I3Units::cm;

@@ -85,8 +85,8 @@ private:
 
 protected:
 
-    const static double bigNumber   =   -300;
-    const static double aBigNumber  =   -299;
+    const static double bigNumber;
+    const static double aBigNumber;
 
 
     //------------------------------------------------------------------------//

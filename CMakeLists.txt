@@ -40,11 +40,12 @@ i3_add_library(PROPOSAL
 	private/PROPOSAL/FunctionInt2.cxx
 
 	private/PROPOSAL-icetray/I3PropagatorServicePROPOSAL.cxx
-	private/PROPOSAL-icetray/I3PropagatorPROPOSAL.cxx
-
+        
 	USE_TOOLS boost
 	USE_PROJECTS icetray dataclasses sim-services simclasses   
 	)
+
+set_target_properties(PROPOSAL PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror")
 
 i3_add_pybindings(PROPOSAL
         private/PROPOSAL-icetray/pybindings.cxx

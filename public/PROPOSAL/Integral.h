@@ -48,12 +48,11 @@ class Integral: public MathModel{
 
 private:
 
-    double  max, min;
-    double  precision;
     int     maxSteps;
     int     romberg;
+    double  precision;
+    double  max, min;
 
-    double  powerOfSubstitution;
 
     double  integralValue;
     double  integralError;
@@ -67,15 +66,14 @@ private:
     FunctionOfx *function2use;
 
     int     romberg4refine;		// set to 2 in constructor
-
+    double  powerOfSubstitution;
+    bool    randomDo;			// set to false in Constructor
+    bool    useLog;			// set to false in Constructor
     double  randomNumber;
     double  randomX;
-
     bool    reverse;			// set to false in Constructor
     double  reverseX;
     double  savedResult;
-    bool    randomDo;			// set to false in Constructor
-    bool    useLog;			// set to false in Constructor
 
     //------------------------------------------------------------------------//
 

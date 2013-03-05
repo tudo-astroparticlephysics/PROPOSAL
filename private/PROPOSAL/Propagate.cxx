@@ -148,8 +148,8 @@ double Propagate::propagateTo(double r, double e)
     while(flag)
     {
 
-        rndd    =-  log(RandomDouble());
-        rndi    =-  log(RandomDouble());
+        rndd    = -log(RandomDouble());
+        rndi    = -log(RandomDouble());
 
         if(DEBUG)
         {

@@ -78,6 +78,7 @@ protected:
     * \param    v   relative energy loss
     * \return   ???
     */
+    using CrossSections::functionInt;
     double functionInt(double e, double v);
 //----------------------------------------------------------------------------//
 

@@ -7,6 +7,7 @@
  */
 
 #include <vector>
+#include <boost/shared_ptr.hpp>
 #include <icetray/I3Logging.h>
 #include <simclasses/I3MMCTrack.h>
 #include <boost/utility.hpp>
@@ -31,7 +32,7 @@ class Amanda;
 class I3PropagatorServicePROPOSAL : public I3PropagatorServiceBase {
  public:
  
-  shared_ptr<I3MMCTrack> Propagate(I3Particle& p, std::vector<I3Particle>& daughters);
+  boost::shared_ptr<I3MMCTrack> Propagate(I3Particle& p, std::vector<I3Particle>& daughters);
  
   SET_LOGGER("I3PropagatorService");
 
@@ -74,7 +75,7 @@ class I3PropagatorServicePROPOSAL : public I3PropagatorServiceBase {
   /**
    * propagate is called when flag=[1/3] to propagate given particle
    */
-  shared_ptr<I3MMCTrack> propagate(I3Particle& p, std::vector<I3Particle>& daughters);
+  boost::shared_ptr<I3MMCTrack> propagate(I3Particle& p, std::vector<I3Particle>& daughters);
 
   void Fatal(const char* msg);
 

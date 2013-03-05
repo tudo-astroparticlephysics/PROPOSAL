@@ -74,7 +74,7 @@ public:
     /*!
     1d parametrization - interface to Interpolate
     */
-
+    using Epairproduction::functionInt;
     double functionInt(double e);
 //----------------------------------------------------------------------------//
 
