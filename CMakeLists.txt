@@ -46,6 +46,10 @@ i3_add_library(PROPOSAL
 	USE_PROJECTS icetray dataclasses sim-services simclasses   
 	)
 
+i3_add_pybindings(PROPOSAL
+        private/PROPOSAL-icetray/pybindings.cxx
+        USE_PROJECTS PROPOSAL
+)
 
 i3_test_executable(PROPOSALtest 
 	private/test/PROPOSAL.cxx
