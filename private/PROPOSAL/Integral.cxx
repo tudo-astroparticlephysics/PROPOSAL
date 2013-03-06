@@ -50,9 +50,9 @@ Integral::Integral()
         precision   =   1.e-6;
     }
 
-    this->romberg   =   romberg;
-    this->maxSteps  =   maxSteps;
-    this->precision =   precision;
+    // this->romberg   =   romberg;
+    // this->maxSteps  =   maxSteps;
+    // this->precision =   precision;
 
     iX.resize(maxSteps);
     iY.resize(maxSteps);
