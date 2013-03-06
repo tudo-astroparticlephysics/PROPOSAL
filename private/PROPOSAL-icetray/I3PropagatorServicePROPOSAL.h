@@ -32,8 +32,8 @@ class Amanda;
 class I3PropagatorServicePROPOSAL : public I3PropagatorService {
  public:
  
-  // virtual boost::shared_ptr<I3MMCTrack> Propagate(I3Particle& p, std::vector<I3Particle>& daughters);
   virtual std::vector<I3Particle> Propagate(I3Particle& p, I3FramePtr frame);
+
   virtual void SetRandomNumberGenerator(I3RandomServicePtr random);
 
   SET_LOGGER("I3PropagatorService");
