@@ -102,20 +102,20 @@ std::vector<I3Particle> I3PropagatorServicePROPOSAL::Propagate(I3Particle& p, I3
   I3MMCTrackPtr mmcTrack = propagate(p, daughters);
 
   if ((frame) && (mmcTrack)) {
-    I3MMCTrackListConstPtr origMMCList = frame->Get<I3MMCTrackListConstPtr>("I3MMCTrackList");
+    I3MMCTrackListConstPtr origMMCList = frame->Get<I3MMCTrackListConstPtr>("MMCTrackList");
 
     I3MMCTrackListPtr newMMCList;
     if (origMMCList) {
       // copy-construct a new list and delete the original one from the frame
       newMMCList = I3MMCTrackListPtr(new I3MMCTrackList(*origMMCList));
-      frame->Delete("I3MMCTrackList");
+      frame->Delete("MMCTrackList");
     } else {
       newMMCList = I3MMCTrackListPtr(new I3MMCTrackList);
     }
 
     newMMCList->push_back(*mmcTrack);
 
-    frame->Put("I3MMCTrackList", newMMCList);
+    frame->Put("MMCTrackList", newMMCList);
   }
 
   return daughters;
