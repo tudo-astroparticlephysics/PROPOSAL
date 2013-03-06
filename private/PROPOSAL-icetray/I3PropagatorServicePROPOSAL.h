@@ -1,5 +1,5 @@
-#ifndef I3PROPAGATORSERVICE_H
-#define I3PROPAGATORSERVICE_H
+#ifndef I3PROPAGATORSERVICEPROPOSAL_H
+#define I3PROPAGATORSERVICEPROPOSAL_H
 /**
  * class: I3PropagatorServicePROPOSAL
  *
@@ -12,7 +12,7 @@
 #include <simclasses/I3MMCTrack.h>
 #include <boost/utility.hpp>
 #include <icetray/I3PointerTypedefs.h>
-#include <sim-services/I3PropagatorServiceBase.h>
+#include <sim-services/I3PropagatorService.h>
 
 #include "PROPOSAL/Amanda.h"
 #include "PROPOSAL/PROPOSALParticle.h"
@@ -29,11 +29,13 @@ class Amanda;
  *
  * @author olivas
  */
-class I3PropagatorServicePROPOSAL : public I3PropagatorServiceBase {
+class I3PropagatorServicePROPOSAL : public I3PropagatorService {
  public:
  
-  boost::shared_ptr<I3MMCTrack> Propagate(I3Particle& p, std::vector<I3Particle>& daughters);
- 
+  // virtual boost::shared_ptr<I3MMCTrack> Propagate(I3Particle& p, std::vector<I3Particle>& daughters);
+  virtual std::vector<I3Particle> Propagate(I3Particle& p, I3FramePtr frame);
+  virtual void SetRandomNumberGenerator(I3RandomServicePtr random);
+
   SET_LOGGER("I3PropagatorService");
 
   /**
@@ -83,4 +85,4 @@ class I3PropagatorServicePROPOSAL : public I3PropagatorServiceBase {
 
 I3_POINTER_TYPEDEFS(I3PropagatorServicePROPOSAL);
 
-#endif //I3PROPAGATORSERVICE_H
+#endif //I3PROPAGATORSERVICEPROPOSAL_H

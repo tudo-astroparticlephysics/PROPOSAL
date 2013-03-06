@@ -10,7 +10,7 @@ I3_PYTHON_MODULE(PROPOSAL)
 	import("icecube.sim_services");
 	
 	class_<I3PropagatorServicePROPOSAL, shared_ptr<I3PropagatorServicePROPOSAL>,
-	    bases<I3PropagatorServiceBase>, boost::noncopyable>(
+	    bases<I3PropagatorService>, boost::noncopyable>(
 	    "I3PropagatorServicePROPOSAL", init<  const std::string& , optional<bool> > () )
           .def("propagate", &I3PropagatorServicePROPOSAL::Propagate)
 	;

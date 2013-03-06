@@ -42,7 +42,7 @@ i3_add_library(PROPOSAL
 	private/PROPOSAL-icetray/I3PropagatorServicePROPOSAL.cxx
         
 	USE_TOOLS boost
-	USE_PROJECTS icetray dataclasses sim-services simclasses   
+	USE_PROJECTS icetray dataclasses sim-services simclasses phys-services
 	)
 
 set_target_properties(PROPOSAL PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror")

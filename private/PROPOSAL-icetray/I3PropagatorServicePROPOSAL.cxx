@@ -65,19 +65,27 @@ I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(const string& mmcOpts,
 
 }
 
+
+void I3PropagatorServicePROPOSAL::SetRandomNumberGenerator(I3RandomServicePtr random)
+{
+  // TODO: Jakob needs to use the RNG being set with this function (if one is being provided)
+}
+
 /**
  *
  */
-I3MMCTrackPtr I3PropagatorServicePROPOSAL::Propagate(I3Particle& p, vector<I3Particle>& daughters){
+std::vector<I3Particle> I3PropagatorServicePROPOSAL::Propagate(I3Particle& p, I3FramePtr frame){
   // saying where we are
   log_debug("Entering I3PropagatorServicePROPOSAL::Propagate()");
+  
+  vector<I3Particle> daughters;
 
   log_trace("location type = %d",p.GetLocationType());
-  if(p.GetLocationType()!=I3Particle::InIce) return I3MMCTrackPtr();
+  if(p.GetLocationType()!=I3Particle::InIce) return std::vector<I3Particle>();
 
   if((p.GetType()==I3Particle::NuE)||(p.GetType()==I3Particle::NuEBar)||
      (p.GetType()==I3Particle::NuMu)||(p.GetType()==I3Particle::NuMuBar)||
-     (p.GetType()==I3Particle::NuTau)||(p.GetType()==I3Particle::NuTauBar)) return I3MMCTrackPtr();
+     (p.GetType()==I3Particle::NuTau)||(p.GetType()==I3Particle::NuTauBar)) return std::vector<I3Particle>();
 
   log_trace("particle to propagate:\n"
 	    "type/energy[GeV]/posx[m]/posy[m]/posz[m]/theta[deg]/phi[deg]/length[m]\n"
@@ -92,7 +100,25 @@ I3MMCTrackPtr I3PropagatorServicePROPOSAL::Propagate(I3Particle& p, vector<I3Par
 	    p.GetLength()/I3Units::m);
   
   I3MMCTrackPtr mmcTrack = propagate(p, daughters);
-  return mmcTrack;
+
+  if ((frame) && (mmcTrack)) {
+    I3MMCTrackListConstPtr origMMCList = frame->Get<I3MMCTrackListConstPtr>("I3MMCTrackList");
+
+    I3MMCTrackListPtr newMMCList;
+    if (origMMCList) {
+      // copy-construct a new list and delete the original one from the frame
+      newMMCList = I3MMCTrackListPtr(new I3MMCTrackList(*origMMCList));
+      frame->Delete("I3MMCTrackList");
+    } else {
+      newMMCList = I3MMCTrackListPtr(new I3MMCTrackList);
+    }
+
+    newMMCList->push_back(*mmcTrack);
+
+    frame->Put("I3MMCTrackList", newMMCList);
+  }
+
+  return daughters;
 }
 
 string I3PropagatorServicePROPOSAL::GenerateMMCName(const I3Particle& p){
