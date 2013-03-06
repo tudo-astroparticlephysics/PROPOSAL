@@ -47,7 +47,7 @@ class I3PropagatorServicePROPOSAL : public I3PropagatorService {
   /**
    *Destroys an instance of this class
    */
-  ~I3PropagatorServicePROPOSAL(){};
+  virtual ~I3PropagatorServicePROPOSAL();
 
  private:
 

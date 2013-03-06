@@ -1718,3 +1718,10 @@ void Propagate::set_rho(double newRho)
 {
     rho         =   newRho;
 }
+
+void Propagate::SetRandomNumberGenerator(boost::function<double ()> &f)
+{
+	MathModel::SetRandomNumberGenerator(f);
+	cros->SetRandomNumberGenerator(f);
+}
+

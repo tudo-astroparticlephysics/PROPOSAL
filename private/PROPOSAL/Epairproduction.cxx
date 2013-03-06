@@ -270,7 +270,11 @@ double Epairproduction::functionInt(double e, double v)
     return ePair(v, cros->get_component());
 }
 
-
-
+void Epairproduction::SetRandomNumberGenerator(boost::function<double ()> &f)
+{
+	MathModel::SetRandomNumberGenerator(f);
+	get_Continuous()->SetRandomNumberGenerator(f);
+	get_Stochastic()->SetRandomNumberGenerator(f);
+}
 
 

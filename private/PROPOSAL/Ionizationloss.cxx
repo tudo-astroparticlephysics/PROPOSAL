@@ -125,3 +125,9 @@ IonizStochastic* Ionizationloss::get_Stochastic()
     return stochastic_;
 }
 
+void Ionizationloss::SetRandomNumberGenerator(boost::function<double ()> &f)
+{
+	MathModel::SetRandomNumberGenerator(f);
+	get_Continuous()->SetRandomNumberGenerator(f);
+	get_Stochastic()->SetRandomNumberGenerator(f);
+}

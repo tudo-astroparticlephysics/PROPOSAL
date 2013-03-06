@@ -633,3 +633,10 @@ void Photonuclear::set_shadow(int newshadow)
 {
     shadow  =   newshadow;
 }
+
+void Photonuclear::SetRandomNumberGenerator(boost::function<double ()> &f)
+{
+	MathModel::SetRandomNumberGenerator(f);
+	get_Continuous()->SetRandomNumberGenerator(f);
+	get_Stochastic()->SetRandomNumberGenerator(f);
+}

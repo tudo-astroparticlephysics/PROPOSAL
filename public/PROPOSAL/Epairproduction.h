@@ -150,6 +150,8 @@ public:
     {
         return stochastic_;
     }
+    
+    virtual void SetRandomNumberGenerator(boost::function<double ()> &);
 
 //----------------------------------------------------------------------------//
     //Setter

@@ -18,6 +18,7 @@
 #include "PROPOSAL/PROPOSALParticle.h"
 #include "PROPOSAL/Output.h"
 #include <sstream>
+#include <boost/bind.hpp>
 
 #include <boost/foreach.hpp>
 using namespace std;
@@ -42,21 +43,6 @@ I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(const string& mmcOpts,
     stauMass_ = atof(mass.c_str());
   }
 
-  
-  /**
-   * Configure MMC
-   */
-
-
-  string stderr = "/dev/null";
-  if(debugMMC_)
-    stderr = "";
- // if (&stderr == NULL) Fatal("Could not create the stderr string.\n");
-
-//  env_->CallStaticBooleanMethod(Output, mid, jstr);
-//  env_->DeleteLocalRef(jstr); <-----JavaStuff
- // Output::setStderr(stderr);
-
   amanda = new Amanda();
   amanda->setup(mmcOpts);
 
@@ -65,10 +51,15 @@ I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(const string& mmcOpts,
 
 }
 
-
 void I3PropagatorServicePROPOSAL::SetRandomNumberGenerator(I3RandomServicePtr random)
 {
-  // TODO: Jakob needs to use the RNG being set with this function (if one is being provided)
+	boost::function<double ()> f = boost::bind(&I3RandomService::Uniform, random, 0, 1);
+	amanda->SetRandomNumberGenerator(f);
+}
+
+I3PropagatorServicePROPOSAL::~I3PropagatorServicePROPOSAL()
+{
+	delete amanda;
 }
 
 /**

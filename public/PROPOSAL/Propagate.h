@@ -360,7 +360,8 @@ public:
     void set_pint(bool newPint);
 
     void set_rho(double newRho);
-
+    
+    virtual void SetRandomNumberGenerator(boost::function<double ()> &);
 
 };
 

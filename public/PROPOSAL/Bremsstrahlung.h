@@ -236,6 +236,8 @@ public:
     void set_xo(double xo);
     void set_lorenz(bool lorenz);
     void set_lorenzCut(double lorenzCut);
+    
+    virtual void SetRandomNumberGenerator(boost::function<double ()> &);
 
 //----------------------------------------------------------------------------//
 

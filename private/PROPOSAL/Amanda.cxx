@@ -1521,6 +1521,13 @@ bool Amanda::setp(deque<string> args)
             p1.at(i)    =   new Propagate(med[i], ecut[0][i], vcut[0][i], muta, frho?1:rho[i]);
             p2.at(i)    =   new Propagate(med[i], ecut[1][i], vcut[1][i], muta, frho?1:rho[i]);
             p3.at(i)    =   new Propagate(med[i], -1.0, -1.0, muta, frho?1:rho[i]);
+            if (SEED) {
+                options<<"HI  random number generator seed is set at ";
+                options<<seed<<"\n";
+                p1[i]->set_seed(seed);
+                p2[i]->set_seed(seed);
+                p3[i]->set_seed(seed);
+            }
 
             // To enable stopped muon decay
             if(Output::RecDec)
@@ -2430,5 +2437,15 @@ double Amanda::prop(double x, double y, double z, double th, double phi, double 
     }
 
     return l;
+}
+
+void Amanda::SetRandomNumberGenerator(boost::function<double ()> &f)
+{
+	for (int i=0; i < medianum; i++) {
+		p1[i]->SetRandomNumberGenerator(f);
+		p2[i]->SetRandomNumberGenerator(f);
+		p3[i]->SetRandomNumberGenerator(f);
+	}
+	MathModel::SetRandomNumberGenerator(f);
 }
 

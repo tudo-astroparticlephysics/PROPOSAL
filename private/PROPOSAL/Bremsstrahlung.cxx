@@ -542,3 +542,11 @@ void Bremsstrahlung::set_lorenzCut(double lorenzCut)
     lorenzCut_  =   lorenzCut;
 }
 
+void Bremsstrahlung::SetRandomNumberGenerator(boost::function<double ()> &f)
+{
+	MathModel::SetRandomNumberGenerator(f);
+	get_Continuous()->SetRandomNumberGenerator(f);
+	get_Stochastic()->SetRandomNumberGenerator(f);
+}
+
+

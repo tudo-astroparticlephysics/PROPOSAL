@@ -15,7 +15,7 @@
  */
 class Output;
 
-class Amanda
+class Amanda : MathModel
 {
 
     private:
@@ -374,7 +374,7 @@ public:
 
      double prop(double x, double y, double z, double th, double phi, double l, double e, double t);
 
-
+     virtual void SetRandomNumberGenerator(boost::function<double ()> &);
 
 
 };

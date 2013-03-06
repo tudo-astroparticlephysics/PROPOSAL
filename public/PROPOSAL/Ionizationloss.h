@@ -128,6 +128,8 @@ public:
     {
         return vUp;
     }
+    
+    virtual void SetRandomNumberGenerator(boost::function<double ()> &);
 
 
 };

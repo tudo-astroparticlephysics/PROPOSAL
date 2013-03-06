@@ -235,6 +235,8 @@ public:
     void set_bb(int newbb);
 
     void set_shadow(int newshadow);
+    
+    virtual void SetRandomNumberGenerator(boost::function<double ()> &);
 
 };
 

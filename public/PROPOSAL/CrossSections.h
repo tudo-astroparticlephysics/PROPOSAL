@@ -26,9 +26,6 @@ class Ionizationloss;
 class Epairproduction;
 class Bremsstrahlung;
 class Photonuclear;
-class Mpairproduction;
-
-
 
 class CrossSections: public PhysicsModel
 {
@@ -42,7 +39,7 @@ protected:
     Ionizationloss *ionization_;
     Epairproduction *epairproduction_;
     Decay *decay_;
-    Mpairproduction *mpairproduction_;
+    // Mpairproduction *mpairproduction_;
     Output *o;
 
     int component_;		// Set to 0 in Constructor
@@ -175,7 +172,6 @@ public:
     Bremsstrahlung* get_bremsstrahlung();
     Photonuclear* get_photonuclear();
     Epairproduction* get_epairproduction();
-    Mpairproduction* get_mpairproduction();
 
     int get_component()
     {
@@ -300,6 +296,8 @@ public:
     void set_interpolateJdf(Interpolate *interpolateJdf);
     void set_jt(bool jt);
     void set_lpm(bool lpm);
+    
+    virtual void SetRandomNumberGenerator(boost::function<double ()> &);
 
 //----------------------------------------------------------------------------//
 
