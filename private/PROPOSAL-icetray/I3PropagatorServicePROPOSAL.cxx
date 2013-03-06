@@ -19,36 +19,90 @@
 #include "PROPOSAL/Output.h"
 #include <sstream>
 #include <boost/bind.hpp>
+#include <boost/filesystem.hpp>
 
 #include <boost/foreach.hpp>
 using namespace std;
 
 class Output;
 
-// constructor
-I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(const string& mmcOpts,
-                                                        bool debugMMC ):
-  stauMass_(NAN),
-  debugMMC_(debugMMC),
-  opts_(mmcOpts)
+I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(std::string mediadef, std::string tabledir,
+    double cylinderRadius, double cylinderHeight, I3Particle::ParticleType type, double particleMass,
+    BremsstrahlungParametrization bs, PhotonuclearParametrizationFamily ph, PhotonuclearParametrization bb,
+    ShadowingParametrization sh) : particleMass_(particleMass)
 {
+	std::ostringstream mmcOpts;
+	// Some options that no one should change:
+	// romb: order-5 Rombert interpolation
+	// raw: save interpolation tables in binary format
+	// user: write "user" fields (entry/center/exit positions, energies, times for I3MMCTrack)
+	// sdec: enable stopped muon decay
+	// time: enable exact time calculation
+	// lpm: enable Landau-Pomeranchuk-Migdal supression of EM cross-sections
+	// frho: enable "smart" density factor handling
+	// cont: enable continuous randomization for realistic energy loss at high vcut
+	mmcOpts << "-romb=5 -raw -user -sdec -time -lpm- frho -cont";
+	mmcOpts << " -bs=" << bs << " -ph=" << ph << " -bb=" << bb << " -sh=" << sh;
+	mmcOpts << " -radius=" << cylinderRadius << " -height=" << cylinderHeight;
+	switch (type) {
+		case I3Particle::MuMinus:
+		case I3Particle::MuPlus:
+			break;
+		case I3Particle::TauMinus:
+		case I3Particle::TauPlus:
+			mmcOpts << " -tau";
+			break;
+		case I3Particle::STauMinus:
+		case I3Particle::STauPlus:
+			if (!std::isfinite(particleMass))
+				log_fatal("You asked for staus of non-finite mass %f", particleMass_);
+			mmcOpts << " -stau=" << particleMass_;
+			break;
+		case I3Particle::Monopole:
+			if (!std::isfinite(particleMass))
+				log_fatal("You asked for monopoles of non-finite mass %f", particleMass_);
+			mmcOpts << " -monopole=" << particleMass_;
+			break;
+		default:
+			I3Particle dummy;
+			dummy.SetType(type);
+			log_fatal("I don't know how to propagate %s", dummy.GetTypeString().c_str());
+	}
+	if (mediadef.empty())
+		mediadef = GetDefaultMediaDef();
+	if (tabledir.empty())
+		tabledir = GetDefaultTableDir();
+	
+	namespace fs = boost::filesystem;
+	if (!fs::exists(mediadef))
+		log_fatal("The mediadef file '%s' can't be read!", mediadef.c_str());
+	if (!fs::is_directory(tabledir))
+		log_fatal("The table directory '%s' doesn't exist!", tabledir.c_str());
+	mmcOpts << " -mediadef=" << mediadef << " -tabledir=" << tabledir;
+	mmcOpts << " ";
+	
+	log_info("Amanda option string: '%s'", mmcOpts.str().c_str());
+	
+	amanda = new Amanda();
+	amanda->setup(mmcOpts.str());
+}
 
-  //parse the opts for the stau mass
-  size_t pos = mmcOpts.find("-stau"); 
-  if(pos != string::npos){
-    //propagating the stau and need to set the mass
-    size_t begin = mmcOpts.find("=",pos) + 1;
-    size_t end = mmcOpts.find(" ", begin);
-    string mass = mmcOpts.substr(begin,end);
-    stauMass_ = atof(mass.c_str());
-  }
+std::string I3PropagatorServicePROPOSAL::GetDefaultMediaDef()
+{
+	const char *I3_BUILD = getenv("I3_BUILD");
+	if (!I3_BUILD)
+		log_fatal("$I3_BUILD is not set!");
+	std::string s(I3_BUILD);
+	return s + "/PROPOSAL/resources/mediadef";
+}
 
-  amanda = new Amanda();
-  amanda->setup(mmcOpts);
-
-
-  log_info("PROPOSAL initialized");
-
+std::string I3PropagatorServicePROPOSAL::GetDefaultTableDir()
+{
+	const char *I3_BUILD = getenv("I3_BUILD");
+	if (!I3_BUILD)
+		log_fatal("$I3_BUILD is not set!");
+	std::string s(I3_BUILD);
+	return s + "/PROPOSAL/resources/tabledir";
 }
 
 void I3PropagatorServicePROPOSAL::SetRandomNumberGenerator(I3RandomServicePtr random)
@@ -136,7 +190,7 @@ string I3PropagatorServicePROPOSAL::GenerateMMCName(const I3Particle& p){
   else if(p.GetType()==I3Particle::STauPlus ||
 	  p.GetType()==I3Particle::STauMinus){
     stringstream s;
-    s<<"stau="<<stauMass_/I3Units::GeV;
+    s<<"stau="<<particleMass_/I3Units::GeV;
     name=s.str();
   }
 
@@ -181,7 +235,6 @@ I3MMCTrackPtr I3PropagatorServicePROPOSAL::GenerateMMCTrack(PROPOSALParticle* pa
 I3MMCTrackPtr
 I3PropagatorServicePROPOSAL::propagate( I3Particle& p, vector<I3Particle>& daughters){
 
-  //cout<<"propagate starts"<<endl;
   /**
    * Natural units of MMC is cm, deg, MeV, and s.
    * Therefore we need to convert explicitly to 
@@ -197,45 +250,11 @@ I3PropagatorServicePROPOSAL::propagate( I3Particle& p, vector<I3Particle>& daugh
   
   string mmcName = GenerateMMCName(p);	
   log_debug("MMC name of particle to propagate: %s",mmcName.c_str());
-
-
-
+  
   PROPOSALParticle* particle = new PROPOSALParticle(mmcName, x_0, y_0, z_0, theta_0, phi_0, e_0, t_0);
-  if (particle == 0) Fatal("Error calling the Particle constructor\n");
+  if (particle == 0) log_fatal("Error calling the Particle constructor");
 
-  vector<PROPOSALParticle*> aobj_l;
-  aobj_l = amanda->propagate(particle);
-
-  if (&aobj_l == NULL) {
-
-    /**
-     * If this flag flips for whatever reason this could cause mmc to fail propagation.
-     */
-
-    log_error(" Output.I3flag = %d", Output::I3flag );
-
-    log_error("This is the properties of the particle to propagate.");
-    log_error("   On the C++ side: ");
-    log_error("      name = %s", mmcName.c_str() );
-    log_error("      x = %f.3 cm", x_0 );
-    log_error("      y = %f.3 cm ", y_0 );
-    log_error("      z = %f.3 cm ", z_0 );
-    log_error("      theta =%f.3 deg", theta_0 );
-    log_error("      phi = %f.3 deg", phi_0 );
-    log_error("      E = %f.3 MeV", e_0 );
-    log_error("      t = %f.3 s", t_0 );
-    log_error("   On the PROPOSAL side: ");
-    log_error("      type = %d", particle->type);
-    log_error("      x = %f.3 cm", particle->x );
-    log_error("      y = %f.3 cm ", particle->y );
-    log_error("      z = %f.3 cm ", particle->z );
-    log_error("      theta =%f.3 deg",particle->theta);
-    log_error("      phi = %f.3 deg", particle->phi);
-    log_error("      E = %f.3 MeV", particle->e);
-    log_error("      t = %f.3 s", particle->t);
-
-    Fatal("cannot run the propagate method\n");
-  }
+  vector<PROPOSALParticle*> aobj_l = amanda->propagate(particle);
 
   //get the propagated length of the particle
   double length = particle->r;
@@ -294,7 +313,3 @@ I3PropagatorServicePROPOSAL::propagate( I3Particle& p, vector<I3Particle>& daugh
   return mmcTrack;
 }
 
-void I3PropagatorServicePROPOSAL::Fatal(const char* msg){
-  log_error("mmcOpts = %s", opts_.c_str());
-  log_fatal("%s",msg);
-}

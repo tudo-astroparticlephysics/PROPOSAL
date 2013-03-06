@@ -30,7 +30,49 @@ class Amanda;
  * @author olivas
  */
 class I3PropagatorServicePROPOSAL : public I3PropagatorService {
- public:
+public:
+	 
+	/** @brief Parametrization of the bremsstrahlung cross-section 
+	 *
+	 * See references in the <a href="http://arxiv.org/abs/hep-ph/0407075">MMC paper</a>.
+	 */
+	enum BremsstrahlungParametrization {
+		KelnerKokoulinPetrukhin = 1, // default
+		PetrukhinShestakov = 2,
+		AndreevBerzrukovBugaev = 3,
+		CompleteScreeningCase = 4,
+	};
+	
+	/** @brief General type of the photonuclear cross-section parametrization
+	 *
+	 * See references in the <a href="http://arxiv.org/abs/hep-ph/0407075">MMC paper</a>.
+	 */
+	enum PhotonuclearParametrizationFamily {
+		BezrukovBugaevSoft = 1, /// BB parametrization, nonperturbative component only
+		BezrukovBugaevHard = 2, /// BB parametrization, both components
+		AbramowiczLevinLevyMaor = 3, // default
+		ButkevichMikheyev = 4
+	};
+	
+	/** @brief Specific edition of the photonuclear cross-section parametrization
+	 *
+	 * See references in the <a href="http://arxiv.org/abs/hep-ph/0407075">MMC paper</a>.
+	 */
+	enum PhotonuclearParametrization {
+		AbramowiczLevinLevyMaor91 = 1,
+		AbramowiczLevinLevyMaor97 = 2, // default
+		BezrukovBugaev = 3,
+		ZEUS = 4	
+	};
+	
+	/** @brief Parametrization of nuclear shadowing 
+	 *
+	 * See references in the <a href="http://arxiv.org/abs/hep-ph/0407075">MMC paper</a>.
+	 */
+	enum ShadowingParametrization {
+		Dutta = 1,
+		Butkevich = 2 // default
+	};
  
   virtual std::vector<I3Particle> Propagate(I3Particle& p, I3FramePtr frame);
 
@@ -38,12 +80,33 @@ class I3PropagatorServicePROPOSAL : public I3PropagatorService {
 
   SET_LOGGER("I3PropagatorService");
 
-  /**
-   * Builds an instance of this class
-   * @param ctx the context with which this module's built
+  /** 
+   * @param mediadef[in] Path the the media definition file. If unspecified, this will
+   *                     default to $I3_BUILD/PROPOSAL/resources/mediadef
+   * @param tabledir[in] Path to a directory in which to store interpolation
+   *                     constants for cross-section integrals. If unspecified, this will
+   *                     default to $I3_BUILD/PROPOSAL/resources/tables/
+   * @param cylinderRadius[in] Radius of the target volume in meters
+   * @param cylinderHeight[in] Full height of the target volume in meters
+   * @param type[in] Type of particle to propagate.
+   * @param particleMass[in] Mass of the propagated particle in GeV. This is
+   *                         only used if type is something exotic.
+   * @param bs[in] Parametrization of the bremsstrahlung cross-section to use
+   * @param ph[in] Family of photonuclear cross-section parametrization to use
+   * @param bb[in] Specific edition of the photonuclear cross-section parametrization to use
+   * @param sh[in] Nuclear shadowing parametrization to use.
+   *
+   * The choice of parametrizations is discussed in <a href="http://arxiv.org/abs/hep-ph/0407075">MMC paper</a>.
    */
-  I3PropagatorServicePROPOSAL( const std::string&, bool debugMMC = false);
+  I3PropagatorServicePROPOSAL(std::string mediadef="", std::string tabledir="",
+      double cylinderRadius=800*I3Units::m, double cylinderHeight=1600*I3Units::m, I3Particle::ParticleType type=I3Particle::MuMinus,
+      double particleMass=NAN, BremsstrahlungParametrization bs=KelnerKokoulinPetrukhin,
+      PhotonuclearParametrizationFamily ph=AbramowiczLevinLevyMaor, PhotonuclearParametrization bb=AbramowiczLevinLevyMaor97,
+      ShadowingParametrization sh=Butkevich);
 
+
+  static std::string GetDefaultMediaDef();
+  static std::string GetDefaultTableDir();
   /**
    *Destroys an instance of this class
    */
@@ -55,11 +118,7 @@ class I3PropagatorServicePROPOSAL : public I3PropagatorService {
   Amanda *muonPropagator;
   Amanda *tauPropagator;
 
-  double stauMass_;
-
-  bool debugMMC_;
-
-  std::string opts_;
+  double particleMass_;
 
   // default, assignment, and copy constructor declared private
   I3PropagatorServicePROPOSAL();
@@ -78,8 +137,6 @@ class I3PropagatorServicePROPOSAL : public I3PropagatorService {
    * propagate is called when flag=[1/3] to propagate given particle
    */
   boost::shared_ptr<I3MMCTrack> propagate(I3Particle& p, std::vector<I3Particle>& daughters);
-
-  void Fatal(const char* msg);
 
 };
 
