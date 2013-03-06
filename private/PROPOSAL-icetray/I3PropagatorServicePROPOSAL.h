@@ -3,7 +3,7 @@
 /**
  * class: I3PropagatorServicePROPOSAL
  *
- * (c) 2003 IceCube Collaboration
+ * (c) 2013 IceCube Collaboration
  */
 
 #include <vector>
@@ -107,17 +107,11 @@ public:
 
   static std::string GetDefaultMediaDef();
   static std::string GetDefaultTableDir();
-  /**
-   *Destroys an instance of this class
-   */
   virtual ~I3PropagatorServicePROPOSAL();
 
  private:
 
   Amanda *amanda;
-  Amanda *muonPropagator;
-  Amanda *tauPropagator;
-
   double particleMass_;
 
   // default, assignment, and copy constructor declared private
@@ -133,9 +127,6 @@ public:
    */
   boost::shared_ptr<I3MMCTrack> GenerateMMCTrack(PROPOSALParticle* particle);
 
-  /**
-   * propagate is called when flag=[1/3] to propagate given particle
-   */
   boost::shared_ptr<I3MMCTrack> propagate(I3Particle& p, std::vector<I3Particle>& daughters);
 
 };

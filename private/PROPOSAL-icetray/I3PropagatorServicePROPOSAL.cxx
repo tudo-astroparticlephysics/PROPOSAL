@@ -41,7 +41,7 @@ I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(std::string mediadef, s
 	// lpm: enable Landau-Pomeranchuk-Migdal supression of EM cross-sections
 	// frho: enable "smart" density factor handling
 	// cont: enable continuous randomization for realistic energy loss at high vcut
-	mmcOpts << "-romb=5 -raw -user -sdec -time -lpm- frho -cont";
+	mmcOpts << "-romb=5 -raw -user -sdec -time -lpm -frho -cont";
 	mmcOpts << " -bs=" << bs << " -ph=" << ph << " -bb=" << bb << " -sh=" << sh;
 	mmcOpts << " -radius=" << cylinderRadius << " -height=" << cylinderHeight;
 	switch (type) {
@@ -78,7 +78,7 @@ I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(std::string mediadef, s
 		log_fatal("The mediadef file '%s' can't be read!", mediadef.c_str());
 	if (!fs::is_directory(tabledir))
 		log_fatal("The table directory '%s' doesn't exist!", tabledir.c_str());
-	mmcOpts << " -mediadef=" << mediadef << " -tabledir=" << tabledir;
+	mmcOpts << " -mediadef=" << mediadef << " -tdir=" << tabledir;
 	mmcOpts << " ";
 	
 	log_info("Amanda option string: '%s'", mmcOpts.str().c_str());
@@ -102,7 +102,7 @@ std::string I3PropagatorServicePROPOSAL::GetDefaultTableDir()
 	if (!I3_BUILD)
 		log_fatal("$I3_BUILD is not set!");
 	std::string s(I3_BUILD);
-	return s + "/PROPOSAL/resources/tabledir";
+	return s + "/PROPOSAL/resources/tables";
 }
 
 void I3PropagatorServicePROPOSAL::SetRandomNumberGenerator(I3RandomServicePtr random)
