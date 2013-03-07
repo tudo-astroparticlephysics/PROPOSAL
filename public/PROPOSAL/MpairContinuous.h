@@ -31,7 +31,7 @@ protected:
      * \param   e   energy
      * \return  dE/dx for particle energy e
      */
-    using MpairContinuous::functionInt;
+    using Mpairproduction::functionInt;
     double functionInt(double e);
 
 //----------------------------------------------------------------------------//
