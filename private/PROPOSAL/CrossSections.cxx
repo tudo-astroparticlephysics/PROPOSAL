@@ -375,14 +375,4 @@ void CrossSections::set_lpm(bool lpm)
     lpm_    =   lpm;
 }
 
-void CrossSections::SetRandomNumberGenerator(boost::function<double ()> &f)
-{
-	MathModel::SetRandomNumberGenerator(f);
-	bremsstrahlung_->SetRandomNumberGenerator(f);
-	photonuclear_->SetRandomNumberGenerator(f);
-	ionization_->SetRandomNumberGenerator(f);
-	epairproduction_->SetRandomNumberGenerator(f);
-	decay_->SetRandomNumberGenerator(f);
-}
-
 

@@ -297,8 +297,6 @@ public:
     void set_jt(bool jt);
     void set_lpm(bool lpm);
     
-    virtual void SetRandomNumberGenerator(boost::function<double ()> &);
-
 //----------------------------------------------------------------------------//
 
     // destructors
