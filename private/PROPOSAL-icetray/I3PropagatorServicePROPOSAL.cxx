@@ -284,8 +284,8 @@ I3PropagatorServicePROPOSAL::propagate( I3Particle& p, vector<I3Particle>& daugh
     double e = aobj_l.at(i)->e * I3Units::MeV;
     double l = aobj_l.at(i)->l * I3Units::cm;
 
-    log_trace("MMC DEBUG SEC  \n    parent=%d pid=%d type=%d pos=(%g,%g,%g) ang=(%g,%g)  e=%g t=%g  l=%g", 
-	      parentID, particleID, type, x, y, z, theta, phi, e, t, l);
+    log_trace("MMC DEBUG SEC  \n    type=%d pos=(%g,%g,%g) ang=(%g,%g)  e=%g t=%g  l=%g", 
+	      type, x, y, z, theta, phi, e, t, l);
 
     //this should be a stochastic
     I3Particle new_particle;
