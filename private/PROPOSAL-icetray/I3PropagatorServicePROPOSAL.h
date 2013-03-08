@@ -108,14 +108,24 @@ public:
   static std::string GetDefaultMediaDef();
   static std::string GetDefaultTableDir();
   virtual ~I3PropagatorServicePROPOSAL();
+  
+  void SetTearDownPerCall(bool f) { tearDownPerCall_ = f; }
 
  private:
 
   Amanda *amanda;
   double particleMass_;
+  
+  /** @brief Tear down and re-initialize the propagator on every call to Propagate().
+   * This is used for tests that ensure that propagation results do not depend
+   * on event-to-event state.
+   */
+  bool tearDownPerCall_;
+  std::string mmcOpts_;
+  I3RandomServicePtr rng_;
 
   // default, assignment, and copy constructor declared private
-  I3PropagatorServicePROPOSAL();
+  // I3PropagatorServicePROPOSAL();
   I3PropagatorServicePROPOSAL(const I3PropagatorServicePROPOSAL&);
   I3PropagatorServicePROPOSAL& operator=(const I3PropagatorServicePROPOSAL&);
 

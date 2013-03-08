@@ -54,6 +54,7 @@ double MathModel::RandomDouble(){
 }
 
 double MathModel::DefaultRandomDouble(){
+    // throw std::runtime_error("Don't call me *ever*!");
     boost::uniform_real<> dist(0, 1);
     boost::variate_generator<boost::mt19937&, boost::uniform_real<> > die(*default_rng_, dist);
     double x = die();

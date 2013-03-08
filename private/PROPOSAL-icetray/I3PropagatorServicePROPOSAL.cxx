@@ -85,6 +85,9 @@ I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(std::string mediadef, s
 	
 	amanda = new Amanda();
 	amanda->setup(mmcOpts.str());
+	
+	mmcOpts_ = mmcOpts.str();
+	tearDownPerCall_ = false;
 }
 
 std::string I3PropagatorServicePROPOSAL::GetDefaultMediaDef()
@@ -107,6 +110,7 @@ std::string I3PropagatorServicePROPOSAL::GetDefaultTableDir()
 
 void I3PropagatorServicePROPOSAL::SetRandomNumberGenerator(I3RandomServicePtr random)
 {
+	rng_ = random;
 	boost::function<double ()> f = boost::bind(&I3RandomService::Uniform, random, 0, 1);
 	amanda->SetRandomNumberGenerator(f);
 }
@@ -144,6 +148,13 @@ std::vector<I3Particle> I3PropagatorServicePROPOSAL::Propagate(I3Particle& p, I3
 	    p.GetAzimuth ()/I3Units::deg,
 	    p.GetLength()/I3Units::m);
   
+	if (tearDownPerCall_) {
+	    delete amanda;
+	    amanda = new Amanda();
+	    amanda->setup(mmcOpts_);
+	    boost::function<double ()> f = boost::bind(&I3RandomService::Uniform, rng_, 0, 1);
+	    amanda->SetRandomNumberGenerator(f);
+	}
   I3MMCTrackPtr mmcTrack = propagate(p, daughters);
 
   if ((frame) && (mmcTrack)) {

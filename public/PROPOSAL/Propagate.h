@@ -61,6 +61,7 @@ protected:
 
     StandardNormal *StandardN;
     std::vector<Integral *> integral_;
+
     bool pint;
     double decayS, ionizS, bremsS, epairS, photoS, totalS;
 

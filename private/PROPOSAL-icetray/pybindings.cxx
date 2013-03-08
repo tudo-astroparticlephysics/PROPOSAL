@@ -63,6 +63,7 @@ I3_PYTHON_MODULE(PROPOSAL)
 	     ":param photonuclearParametrization: Specific edition of the photonuclear cross-section parametrization to use\n"
 	     ":param nuclearShadowingParametrization: Nuclear shadowing parametrization to use\n"))
 	    .def("propagate", &I3PropagatorServicePROPOSAL::Propagate)
+	    .def("set_tear_down_per_call", &I3PropagatorServicePROPOSAL::SetTearDownPerCall)
 	;
 
 }

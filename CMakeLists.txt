@@ -40,6 +40,7 @@ i3_add_library(PROPOSAL
 	private/PROPOSAL/FunctionInt2.cxx
 
 	private/PROPOSAL-icetray/I3PropagatorServicePROPOSAL.cxx
+	private/PROPOSAL-icetray/SimplePropagator.cxx
         
 	USE_TOOLS boost
 	USE_PROJECTS icetray dataclasses sim-services simclasses phys-services
@@ -52,8 +53,10 @@ i3_add_pybindings(PROPOSAL
         USE_PROJECTS PROPOSAL
 )
 
-i3_test_executable(PROPOSALtest 
-	private/test/PROPOSAL.cxx
-	USE_PROJECTS PROPOSAL
+i3_test_executable(test 
+	private/PROPOSAL-icetray/test/main.cxx
+	private/PROPOSAL-icetray/test/Repeatability.cxx
+        USE_TOOLS boost gsl
+	USE_PROJECTS PROPOSAL icetray dataclasses phys-services
 )
 
