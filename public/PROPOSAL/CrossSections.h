@@ -8,6 +8,11 @@
 #ifndef CrossSections_H
 #define CrossSections_H
 
+#include<vector>
+#include "Integral.h"
+
+
+
 /*! \class CrossSections CrossSections.h "CrossSections.h"
     \brief This is a pure virtual class
  */
@@ -20,8 +25,11 @@ class CrossSections
 protected:
 
     CrossSections();
+    vector<Integral*> integrals_;
+
 
 public:
+
 
     // Memberfunctions
 
