@@ -10,6 +10,9 @@ include_directories("${PROJECT_SOURCE_DIR}/public")
 
 add_library(PROPOSAL
 	private/PROPOSAL/CrossSections.cxx
+        private/PROPOSAL/Integral.cxx
+        private/PROPOSAL/methods.cxx
+
 
 	)
 
