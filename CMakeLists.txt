@@ -12,7 +12,8 @@ add_library(PROPOSAL
 	private/PROPOSAL/CrossSections.cxx
         private/PROPOSAL/Integral.cxx
         private/PROPOSAL/methods.cxx
-
+        private/PROPOSAL/PhysicsModel.cxx
+        private/PROPOSAL/MathModel.cxx
 
 	)
 

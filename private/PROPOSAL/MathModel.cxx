@@ -1,0 +1,69 @@
+/*! \file   MathModel.cxx
+*   \brief  Source file for the used MathModels in PROPOSAL.
+*
+*   For more details see the class documentation.
+
+*   \author Jan-Hendrik Koehne
+*/
+
+
+#include "PROPOSAL/MathModel.h"
+#include "iostream"
+
+#include "boost/bind.hpp"
+#include "boost/generator_iterator.hpp"
+
+//----------------------------------------------------------------------------//
+
+boost::mt19937* MathModel::default_rng_ = new boost::mt19937();
+
+MathModel::MathModel()
+{
+	rng_ = &MathModel::DefaultRandomDouble;
+}
+
+MathModel::MathModel(const MathModel &model)
+{
+	*this = model;
+}
+
+MathModel& MathModel::operator=(const MathModel &model)
+{
+	if (model.rng_)
+		rng_ = model.rng_;
+	else
+		rng_ = &DefaultRandomDouble;
+	
+	return *this;
+}
+
+MathModel::~MathModel() {}
+
+//----------------------------------------------------------------------------//
+
+void MathModel::set_seed(int seed)
+{
+    boost::mt19937::result_type s = static_cast<boost::mt19937::result_type>(seed);
+    default_rng_->seed(s);
+}
+
+//----------------------------------------------------------------------------//
+
+double MathModel::RandomDouble(){
+	return rng_();
+}
+
+double MathModel::DefaultRandomDouble(){
+    // throw std::runtime_error("Don't call me *ever*!");
+    boost::uniform_real<> dist(0, 1);
+    boost::variate_generator<boost::mt19937&, boost::uniform_real<> > die(*default_rng_, dist);
+    double x = die();
+    return x;
+}
+
+//----------------------------------------------------------------------------//
+
+void MathModel::SetRandomNumberGenerator(boost::function<double ()> &f){
+	if (f)
+		rng_ = f;
+}
