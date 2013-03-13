@@ -2,32 +2,47 @@
 #include "PROPOSAL/Constants.h"
 
 
-CrossSections::CrossSections(){
-    elow_=0;                //!< lower bound of parameterizations
-    nlow_=ME;               //!< maximal number of parametrization points
-    ebig_=BIGENERGY;        //!< upper bound of parameterizations
+CrossSections::CrossSections()
+    :vMax_(0)
+    ,vUp_ (0)
+    ,vMin_(0)
+    ,ebig_(BIGENERGY)
+    ,doContinuousInterpolation_(false)
+    ,doStochasticInterpolation_(false)
+    ,multiplier_(1.)
 
+{
 
-    // Interpolation flags
-    doContinuousInterpolation_ = false;
-    doStochasticInterpolation_ = false;
-
-    //CrossSection multiplier
-    multiplier_ = 1.;
 }
 
-void CrossSections::SetParameterizationLimits(double elow,
-                                              double nlow,
-                                              double ebig){
+//----------------------------------------------------------------------------//
 
-    elow_=elow;
-    nlow_=nlow;
+void CrossSections::SetParameterizationLimit(double ebig){
     ebig_=ebig;
 }
 
+//----------------------------------------------------------------------------//
+
 void CrossSections::SetMultiplier(double multiplier){
-
     multiplier_=multiplier;
-
 }
 
+//----------------------------------------------------------------------------//
+
+void CrossSections::SetVMin(double vMin){
+    vMin_=vMin;
+}
+
+//----------------------------------------------------------------------------//
+
+void CrossSections::SetVMax(double vMax){
+    vMax_=vMax;
+}
+
+//----------------------------------------------------------------------------//
+
+void CrossSections::SetVUp(double vUp){
+    vUp_=vUp;
+}
+
+//----------------------------------------------------------------------------//

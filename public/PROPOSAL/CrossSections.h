@@ -25,11 +25,12 @@ class CrossSections
 
 protected:
 
-    // bounds of parameterizations
-    double elow_;
-    double nlow_;
-    double ebig_;
+    //bounds of integration
+    double vMax_;   //!< upper bound of integration
+    double vUp_;    //!< lower bound of integration
+    double vMin_;   //!< lowest physical possible bound of integration
 
+    double ebig_;   //!< upper bound of parameterizations
 
     // Interpolation flags
     bool doContinuousInterpolation_;
@@ -85,9 +86,7 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    void SetParameterizationLimits(double elow=0.,
-                                   double nlow=ME,
-                                   double ebig=BIGENERGY);
+    void SetParameterizationLimit(double ebig=BIGENERGY);
     
 //----------------------------------------------------------------------------//
 
@@ -95,24 +94,21 @@ public:
 
     void SetMultiplier(double multiplier=1.);
 
+//----------------------------------------------------------------------------//
+
+    void SetVMin(double vMin=0);
+
+//----------------------------------------------------------------------------//
+
+    void SetVMax(double vMax=0);
+
+//----------------------------------------------------------------------------//
+
+    void SetVUp(double vUp=0);
 
 //----------------------------------------------------------------------------//
 
     // Getter
-
-    double GetElow() const
-    {
-        return elow_;
-    }
-
-//----------------------------------------------------------------------------//
-
-    double GetNlow() const
-    {
-        return nlow_;
-    }
-
-//----------------------------------------------------------------------------//
 
     double GetEbig() const
     {
@@ -124,6 +120,27 @@ public:
     double GetMultiplier() const
     {
         return multiplier_;
+    }
+
+//----------------------------------------------------------------------------//
+
+    double GetVMax() const
+    {
+        return vMax_;
+    }
+
+//----------------------------------------------------------------------------//
+
+    double GetVMin() const
+    {
+        return vMin_;
+    }
+
+//----------------------------------------------------------------------------//
+
+    double GetVUp() const
+    {
+        return vUp_;
     }
 
 //----------------------------------------------------------------------------//
