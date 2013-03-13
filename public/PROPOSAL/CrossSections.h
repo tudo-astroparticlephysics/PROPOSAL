@@ -25,37 +25,55 @@ class CrossSections
 
 protected:
 
-    CrossSections();
+
+    // bounds of parameterizations
 
 
 public:
 
+    CrossSections();
+
+
+    double elow_;
+    double nlow_;
+    double ebig_;
 
     // Memberfunctions
 
 //----------------------------------------------------------------------------//
 
-    virtual void SetIntegralLimits() const = 0;
+    virtual void SetIntegralLimits() = 0;
 
 //----------------------------------------------------------------------------//
 
-    virtual double CalculatedEdx() const = 0;
+    virtual double CalculatedEdx() = 0;
 
 //----------------------------------------------------------------------------//
 
-    virtual double CalculatedNdx() const = 0;
+    virtual double CalculatedNdx() = 0;
 
 
 //----------------------------------------------------------------------------//
 
-    virtual double CalculatedNdx(double rnd) const = 0;
+    virtual double CalculatedNdx(double rnd) = 0;
 
 //----------------------------------------------------------------------------//
 
-    virtual double CalculateStochasticLoss() const = 0;
+    virtual double CalculateStochasticLoss() = 0;
 
 //----------------------------------------------------------------------------//
 
+    virtual void EnableStochasticInerpolation() = 0;
+
+//----------------------------------------------------------------------------//
+
+    virtual void EnableContinuousInerpolation() = 0;
+
+//----------------------------------------------------------------------------//
+
+    void SetParameterizationLimits(double elow=0.,
+                                   double nlow=ME,
+                                   double ebig=BIGENERGY);
 
 //----------------------------------------------------------------------------//
 
@@ -68,7 +86,7 @@ public:
     // destructors
 
     ///@brief Crush this CrossSections.
-    virtual ~CrossSections();
+    virtual ~CrossSections(){}
 
 
 };

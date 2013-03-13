@@ -3,7 +3,7 @@
 class Medium;
 class PROPOSALParticle;
 
-class Bremsstrahlung: protected CrossSections
+class Bremsstrahlung: public CrossSections
 {
 protected:
 
@@ -31,6 +31,14 @@ protected:
 
 
 public:
+//----------------------------------------------------------------------------//
+
+    Bremsstrahlung();
+    Bremsstrahlung(const Bremsstrahlung&);
+    Bremsstrahlung& operator=(const Bremsstrahlung&);
+
+//----------------------------------------------------------------------------//
+
     void SetIntegralLimits();
 
 //----------------------------------------------------------------------------//
@@ -59,5 +67,8 @@ public:
     void EnableContinuousInerpolation();
 
 //----------------------------------------------------------------------------//
+
+
+    ~Bremsstrahlung(){}
 
 };

@@ -1,5 +1,22 @@
 #include "PROPOSAL/Bremsstrahlung.h"
 
+Bremsstrahlung::Bremsstrahlung(){
+
+}
+//----------------------------------------------------------------------------//
+
+Bremsstrahlung::Bremsstrahlung(const Bremsstrahlung &model)
+{
+    *this = model;
+}
+//----------------------------------------------------------------------------//
+
+Bremsstrahlung& Bremsstrahlung::operator=(const Bremsstrahlung &model){
+    return *this;
+}
+
+//----------------------------------------------------------------------------//
+
 void Bremsstrahlung::SetIntegralLimits(){
 }
 
@@ -33,3 +50,4 @@ void Bremsstrahlung::EnableStochasticInerpolation(){
 void Bremsstrahlung::EnableContinuousInerpolation(){
     doContinuousInterpolation_=true;
 }
+

@@ -44,6 +44,8 @@
  * @author Dmitry Chirkin
  */
 
+#include "PROPOSAL/Constants.h"
+
 class Integral: public MathModel{
 
 private:

@@ -1,4 +1,5 @@
 #include <iostream>
+#include "PROPOSAL/Bremsstrahlung.h"
 
 using namespace std;
 
@@ -33,6 +34,16 @@ int main(){
     cout << "--------------------------" << endl;
     cout << "integral x*x: "        << integrate(min,max,N,X2)      << endl;
     cout << "integral 3*x + 2: "    << integrate(min,max,N,_3X_2)   << endl;
+
+
+    Bremsstrahlung *brems = new Bremsstrahlung();
+    brems->SetParameterizationLimits(1.,23.,234.);
+    cout<<brems->nlow_<<endl;
+    cout<<brems->elow_<<endl;
+    cout<<brems->ebig_<<endl;
+
+
+
     return 0;
 }
 
