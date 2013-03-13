@@ -60,6 +60,19 @@ Integral::Integral()
 
 //----------------------------------------------------------------------------//
 
+
+Integral::Integral(const Integral &integral)
+{
+    *this = integral;
+}
+//----------------------------------------------------------------------------//
+
+Integral& Integral::operator=(const Integral &integral){
+    return *this;
+}
+
+//----------------------------------------------------------------------------//
+
 Integral::Integral(int  romberg, int maxSteps, double precision)
 :max        (1)
 ,min        (0)
