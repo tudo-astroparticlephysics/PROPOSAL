@@ -1205,7 +1205,7 @@ double Integral::integrateWithLogSubstitution(double min, double max, FunctionOf
 
 
 ////TOMASZ ---------------------
-/*
+
 double Integral::Function(double x)
 {
     double result, t;
@@ -2280,4 +2280,4 @@ double Integral::IntegrateWithLogSubstitution(double min, double max, double (*i
 
     return aux*RombergIntegrateOpened();
 }
-*/
+
