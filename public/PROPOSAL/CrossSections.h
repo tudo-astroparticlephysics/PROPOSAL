@@ -35,6 +35,9 @@ protected:
     bool doContinuousInterpolation_;
     bool doStochasticInterpolation_;
 
+    //CrossSection multiplier
+    double multiplier_;
+
 public:
 
     //Constructor
@@ -88,32 +91,46 @@ public:
     
 //----------------------------------------------------------------------------//
 
-    // destructor
+    // Setter
 
-    virtual ~CrossSections(){}
+    void SetMultiplier(double multiplier=1.);
+
 
 //----------------------------------------------------------------------------//
 
     // Getter
 
-    double Get_elow() const
+    double GetElow() const
     {
         return elow_;
     }
 
 //----------------------------------------------------------------------------//
 
-    double Get_nlow() const
+    double GetNlow() const
     {
         return nlow_;
     }
 
 //----------------------------------------------------------------------------//
 
-    double Get_ebig() const
+    double GetEbig() const
     {
         return ebig_;
     }
+
+//----------------------------------------------------------------------------//
+
+    double GetMultiplier() const
+    {
+        return multiplier_;
+    }
+
+//----------------------------------------------------------------------------//
+
+    // destructor
+
+    virtual ~CrossSections(){}
 
 };
 

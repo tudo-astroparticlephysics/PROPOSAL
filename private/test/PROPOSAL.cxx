@@ -38,9 +38,9 @@ int main(){
 
     CrossSections *brems = new Bremsstrahlung();
     brems->SetParameterizationLimits(1.,23.,234.);
-    cout<<brems->Get_nlow()<<endl;
-    cout<<brems->Get_elow()<<endl;
-    cout<<brems->Get_ebig()<<endl;
+    cout<<brems->GetNlow()<<endl;
+    cout<<brems->GetElow()<<endl;
+    cout<<brems->GetEbig()<<endl;
 
 
 

@@ -11,6 +11,9 @@ CrossSections::CrossSections(){
     // Interpolation flags
     doContinuousInterpolation_ = false;
     doStochasticInterpolation_ = false;
+
+    //CrossSection multiplier
+    multiplier_ = 1.;
 }
 
 void CrossSections::SetParameterizationLimits(double elow,
@@ -21,3 +24,10 @@ void CrossSections::SetParameterizationLimits(double elow,
     nlow_=nlow;
     ebig_=ebig;
 }
+
+void CrossSections::SetMultiplier(double multiplier){
+
+    multiplier_=multiplier;
+
+}
+
