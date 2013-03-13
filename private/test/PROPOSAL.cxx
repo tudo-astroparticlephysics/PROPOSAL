@@ -38,9 +38,9 @@ int main(){
 
     Bremsstrahlung *brems = new Bremsstrahlung();
     brems->SetParameterizationLimits(1.,23.,234.);
-    cout<<brems->nlow_<<endl;
-    cout<<brems->elow_<<endl;
-    cout<<brems->ebig_<<endl;
+    cout<<brems->Get_nlow()<<endl;
+    cout<<brems->Get_elow()<<endl;
+    cout<<brems->Get_ebig()<<endl;
 
 
 

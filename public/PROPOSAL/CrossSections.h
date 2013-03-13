@@ -27,20 +27,18 @@ protected:
 
 
     // bounds of parameterizations
-
-
-public:
-
-    CrossSections();
-
-
     double elow_;
     double nlow_;
     double ebig_;
 
-    // Memberfunctions
+public:
+
+    //Constructor
+    CrossSections();
 
 //----------------------------------------------------------------------------//
+
+    // Memberfunctions
 
     virtual void SetIntegralLimits() = 0;
 
@@ -83,22 +81,35 @@ public:
     void SetParameterizationLimits(double elow=0.,
                                    double nlow=ME,
                                    double ebig=BIGENERGY);
-
-//----------------------------------------------------------------------------//
-
-
-
-    // Setter
-
-
     
 //----------------------------------------------------------------------------//
 
-    // destructors
+    // destructor
 
-    ///@brief Crush this CrossSections.
     virtual ~CrossSections(){}
 
+//----------------------------------------------------------------------------//
+
+    // Getter
+
+    double Get_elow() const
+    {
+        return elow_;
+    }
+
+//----------------------------------------------------------------------------//
+
+    double Get_nlow() const
+    {
+        return nlow_;
+    }
+
+//----------------------------------------------------------------------------//
+
+    double Get_ebig() const
+    {
+        return ebig_;
+    }
 
 };
 
