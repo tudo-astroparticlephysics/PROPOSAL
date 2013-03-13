@@ -31,7 +31,7 @@ bool StartsWith(const std::string& text,const std::string& token)
 
 //----------------------------------------------------------------------------//
 
-bool endsWith(const std::string& text,const std::string& token)
+bool EndsWith(const std::string& text,const std::string& token)
 {
 	return (text.compare(text.length()-1,token.length(),token) ==0);
 }
@@ -39,7 +39,7 @@ bool endsWith(const std::string& text,const std::string& token)
 //----------------------------------------------------------------------------//
 // round a given double to the closest int
 
-int roundValue(double val)
+int RoundValue(double val)
 {
     bool minus      =   false;
     int valRound    =   0;
@@ -64,7 +64,7 @@ int roundValue(double val)
 //----------------------------------------------------------------------------//
 // Compares strings case-insensitive
 
-bool equalsIgnoreCase(std::string s1, std::string s2)
+bool EqualsIgnoreCase(std::string s1, std::string s2)
 {
     if(s1.length()==s2.length())
     {
@@ -110,7 +110,7 @@ bool equalsIgnoreCase(std::string s1, std::string s2)
 }
 //----------------------------------------------------------------------------//
 
-string toLowerCase(string toConvert)
+string ToLowerCase(string toConvert)
 {
     string buffer;
 
@@ -125,7 +125,7 @@ string toLowerCase(string toConvert)
 
 //----------------------------------------------------------------------------//
 
-string replaceAll(string toConvert, const char oldChar, const char newChar)
+string ReplaceAll(string toConvert, const char oldChar, const char newChar)
 {
     string buffer="";
 
@@ -148,7 +148,7 @@ string replaceAll(string toConvert, const char oldChar, const char newChar)
 
 // returns a random Double
 
-double old_RandomDouble()
+double Old_RandomDouble()
 {
 	double result;
 
@@ -160,7 +160,7 @@ double old_RandomDouble()
 
 //----------------------------------------------------------------------------//
 
-deque<string>* splitString(string args, string Delimiters)
+deque<string>* SplitString(string args, string Delimiters)
 {
 
     deque<string> *Tokens   =   new deque<string>;
@@ -187,7 +187,7 @@ deque<string>* splitString(string args, string Delimiters)
 
 //----------------------------------------------------------------------------//
 
-string nextToken(deque<string> *Tokens)
+string NextToken(deque<string> *Tokens)
 {
     string next;
     next    =   Tokens->front();
@@ -199,7 +199,7 @@ string nextToken(deque<string> *Tokens)
 
 //----------------------------------------------------------------------------//
 
-bool compare(string name1, string name2 , bool output)
+bool Compare(string name1, string name2 , bool output)
 {
     ifstream file;
     ifstream file2;

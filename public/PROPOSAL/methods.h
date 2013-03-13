@@ -22,39 +22,39 @@ bool StartsWith(const std::string& text,const std::string& token);
 
 //----------------------------------------------------------------------------//
 
-bool endsWith(const std::string& text,const std::string& token);
+bool EndsWith(const std::string& text,const std::string& token);
 
 //----------------------------------------------------------------------------//
 
-int roundValue(double val);
+int RoundValue(double val);
 
 //----------------------------------------------------------------------------//
 
-std::deque<std::string>* splitString(std::string args, std::string Delimiters);
+std::deque<std::string>* SplitString(std::string args, std::string Delimiters);
 
 //----------------------------------------------------------------------------//
 
-bool equalsIgnoreCase(std::string s1, std::string s2);
+bool EqualsIgnoreCase(std::string s1, std::string s2);
 
 //----------------------------------------------------------------------------//
 
-std::string toLowerCase(std::string toConvert);
+std::string ToLowerCase(std::string toConvert);
 
 //----------------------------------------------------------------------------//
 
-std::string replaceAll(std::string toConvert, char oldChar, char newChar);
+std::string ReplaceAll(std::string toConvert, char oldChar, char newChar);
 
 //----------------------------------------------------------------------------//
 
-double old_RandomDouble();
+double Old_RandomDouble();
 
 //----------------------------------------------------------------------------//
 
-bool compare(std::string name1, std::string name2 , bool output);
+bool Compare(std::string name1, std::string name2 , bool output);
 
 //----------------------------------------------------------------------------//
 
-std::string nextToken(std::deque<std::string> *Tokens);
+std::string NextToken(std::deque<std::string> *Tokens);
 
 //----------------------------------------------------------------------------//
 

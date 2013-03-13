@@ -9,6 +9,7 @@
 
 
 #include "PROPOSAL/PhysicsModel.h"
+#include "PROPOSAL/Constants.h"
 
 double PhysicsModel::ebig_;
 double PhysicsModel::elow_;
