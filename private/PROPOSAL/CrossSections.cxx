@@ -10,14 +10,14 @@ CrossSections::CrossSections()
     ,doContinuousInterpolation_(false)
     ,doStochasticInterpolation_(false)
     ,multiplier_(1.)
-
+    ,parametrization_(1)
 {
 
 }
 
 //----------------------------------------------------------------------------//
 
-void CrossSections::SetParameterizationLimit(double ebig){
+void CrossSections::SetParametrizationLimit(double ebig){
     ebig_=ebig;
 }
 
@@ -43,6 +43,12 @@ void CrossSections::SetVMax(double vMax){
 
 void CrossSections::SetVUp(double vUp){
     vUp_=vUp;
+}
+
+//----------------------------------------------------------------------------//
+
+void CrossSections::SetParametrization(int parametrization){
+    parametrization_=parametrization;
 }
 
 //----------------------------------------------------------------------------//

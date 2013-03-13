@@ -39,6 +39,8 @@ protected:
     //CrossSection multiplier
     double multiplier_;
 
+    int parametrization_;
+
 public:
 
     //Constructor
@@ -86,7 +88,7 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    void SetParameterizationLimit(double ebig=BIGENERGY);
+    void SetParametrizationLimit(double ebig=BIGENERGY);
     
 //----------------------------------------------------------------------------//
 
@@ -108,6 +110,9 @@ public:
 
 //----------------------------------------------------------------------------//
 
+    void SetParametrization(int parametrization=1);
+
+//----------------------------------------------------------------------------//
     // Getter
 
     double GetEbig() const
@@ -141,6 +146,13 @@ public:
     double GetVUp() const
     {
         return vUp_;
+    }
+
+//----------------------------------------------------------------------------//
+
+    double GetParametrization() const
+    {
+        return parametrization_;
     }
 
 //----------------------------------------------------------------------------//

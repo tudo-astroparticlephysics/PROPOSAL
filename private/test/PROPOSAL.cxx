@@ -37,7 +37,7 @@ int main(){
 
 
     Bremsstrahlung *brems = new Bremsstrahlung();
-    brems->SetParameterizationLimit(1.);
+    brems->SetParametrizationLimit(1.);
 
     Integral* Int = new Integral();
     cout << "IntegralKlasse x*x: " << Int->IntegrateClosed(0,3,X2) << endl;
