@@ -26,7 +26,6 @@ class CrossSections
 protected:
 
     CrossSections();
-    std::vector<Integral*>   integrals_;
 
 
 public:

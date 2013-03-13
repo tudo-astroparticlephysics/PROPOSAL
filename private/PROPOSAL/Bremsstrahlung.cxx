@@ -23,4 +23,13 @@ double Bremsstrahlung::CalculatedNdx(double rnd){
 double Bremsstrahlung::CalculateStochasticLoss(){
     return 0;
 }
+//----------------------------------------------------------------------------//
 
+void Bremsstrahlung::EnableStochasticInerpolation(){
+    doStochasticInterpolation_=true;
+}
+//----------------------------------------------------------------------------//
+
+void Bremsstrahlung::EnableContinuousInerpolation(){
+    doContinuousInterpolation_=true;
+}

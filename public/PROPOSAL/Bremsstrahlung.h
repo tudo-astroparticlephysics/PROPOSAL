@@ -7,21 +7,29 @@ class Bremsstrahlung: protected CrossSections
 {
 protected:
 
-    double vMax_;			// Set to 0 in Constructor
-    double vUp_;			// Set to 0 in Constructor
-    double vMin_;			// Set to 0 in Constructor
+    //Integrallimits
+    double vMax_;
+    double vUp_;
+    double vMin_;
 
-    int form_;			// Set to 1 in Constrcutor - Switches the parametrization which is used.
+    //Parametrization
+    int form_;
 
-    bool init_;		// set to true in Constructor
+    bool init_;
     double eLpm_;
     double xo_;
 
-    bool lorenz_;		// Set to false in constructor
+    bool lorenz_;
     double lorenzCut_;  	/// in [MeV] // - set to 1.e6 in Constructor
 
-    PROPOSALParticle*   particle_;  //Tomasz
-    Medium*             medium_;    //Tomasz
+    PROPOSALParticle*   particle_;
+    Medium*             medium_;
+
+    // Interpolation flags
+    bool doContinuousInterpolation_;
+    bool doStochasticInterpolation_;
+
+
 public:
     void SetIntegralLimits();
 
@@ -41,4 +49,15 @@ public:
 //----------------------------------------------------------------------------//
 
     double CalculateStochasticLoss();
+
+//----------------------------------------------------------------------------//
+
+    void EnableStochasticInerpolation();
+
+//----------------------------------------------------------------------------//
+
+    void EnableContinuousInerpolation();
+
+//----------------------------------------------------------------------------//
+
 };
