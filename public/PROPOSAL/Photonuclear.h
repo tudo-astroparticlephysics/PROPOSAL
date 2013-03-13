@@ -1,37 +1,17 @@
 #include "CrossSections.h"
 
-class Medium;
-class PROPOSALParticle;
 
-class Bremsstrahlung: public CrossSections
+class Photonuclear: public CrossSections
 {
 protected:
-
-    //Integrallimits
-    double vMax_;
-    double vUp_;
-    double vMin_;
-
-    //Parametrization
-    int form_;
-
-    bool init_;
-    double eLpm_;
-    double xo_;
-
-    bool lorenz_;
-    double lorenzCut_;  	/// in [MeV] // - set to 1.e6 in Constructor
-
-    PROPOSALParticle*   particle_;
-    Medium*             medium_;
 
 
 public:
 //----------------------------------------------------------------------------//
 
-    Bremsstrahlung();
-    Bremsstrahlung(const Bremsstrahlung&);
-    Bremsstrahlung& operator=(const Bremsstrahlung&);
+    Photonuclear();
+    Photonuclear(const Photonuclear&);
+    Photonuclear& operator=(const Photonuclear&);
 
 //----------------------------------------------------------------------------//
 
@@ -72,6 +52,6 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    ~Bremsstrahlung(){}
+    ~Photonuclear(){}
 
 };

@@ -1,65 +1,65 @@
-#include "PROPOSAL/Bremsstrahlung.h"
+#include "PROPOSAL/Epairproduction.h"
 
-Bremsstrahlung::Bremsstrahlung(){
+Epairproduction::Epairproduction(){
 
 }
 //----------------------------------------------------------------------------//
 
-Bremsstrahlung::Bremsstrahlung(const Bremsstrahlung &brems)
+Epairproduction::Epairproduction(const Epairproduction &epair)
 {
-    *this = brems;
+    *this = epair;
 }
 //----------------------------------------------------------------------------//
 
-Bremsstrahlung& Bremsstrahlung::operator=(const Bremsstrahlung &brems){
+Epairproduction& Epairproduction::operator=(const Epairproduction &epair){
     return *this;
 }
 
 //----------------------------------------------------------------------------//
 
-void Bremsstrahlung::SetIntegralLimits(){
+void Epairproduction::SetIntegralLimits(){
 }
 
 //----------------------------------------------------------------------------//
 
-double Bremsstrahlung::CalculatedEdx(){
+double Epairproduction::CalculatedEdx(){
     return 0;
 }
 //----------------------------------------------------------------------------//
 
-double Bremsstrahlung::CalculatedNdx(){
+double Epairproduction::CalculatedNdx(){
     return 0;
 }
 //----------------------------------------------------------------------------//
 
-double Bremsstrahlung::CalculatedNdx(double rnd){
+double Epairproduction::CalculatedNdx(double rnd){
     return 0;
 }
 //----------------------------------------------------------------------------//
 
-double Bremsstrahlung::CalculateStochasticLoss(){
+double Epairproduction::CalculateStochasticLoss(){
     return 0;
 }
 //----------------------------------------------------------------------------//
 
-void Bremsstrahlung::EnableStochasticInerpolation(){
+void Epairproduction::EnableStochasticInerpolation(){
     doStochasticInterpolation_=true;
 }
 //----------------------------------------------------------------------------//
 
-void Bremsstrahlung::EnableContinuousInerpolation(){
+void Epairproduction::EnableContinuousInerpolation(){
     doContinuousInterpolation_=true;
 }
 
 //----------------------------------------------------------------------------//
 
-double Bremsstrahlung::FunctionToContinuousIntegral(double variable){
+double Epairproduction::FunctionToContinuousIntegral(double variable){
     return 0;
 }
 
 //----------------------------------------------------------------------------//
 
-double Bremsstrahlung::FunctionToStochasticalIntegral(double variable){
+double Epairproduction::FunctionToStochasticalIntegral(double variable){
     return 0;
 }
 //----------------------------------------------------------------------------//

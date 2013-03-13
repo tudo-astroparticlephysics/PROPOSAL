@@ -1,65 +1,65 @@
-#include "PROPOSAL/Bremsstrahlung.h"
+#include "PROPOSAL/Decay.h"
 
-Bremsstrahlung::Bremsstrahlung(){
+Decay::Decay(){
 
 }
 //----------------------------------------------------------------------------//
 
-Bremsstrahlung::Bremsstrahlung(const Bremsstrahlung &brems)
+Decay::Decay(const Decay &decay)
 {
-    *this = brems;
+    *this = decay;
 }
 //----------------------------------------------------------------------------//
 
-Bremsstrahlung& Bremsstrahlung::operator=(const Bremsstrahlung &brems){
+Decay& Decay::operator=(const Decay &decay){
     return *this;
 }
 
 //----------------------------------------------------------------------------//
 
-void Bremsstrahlung::SetIntegralLimits(){
+void Decay::SetIntegralLimits(){
 }
 
 //----------------------------------------------------------------------------//
 
-double Bremsstrahlung::CalculatedEdx(){
+double Decay::CalculatedEdx(){
     return 0;
 }
 //----------------------------------------------------------------------------//
 
-double Bremsstrahlung::CalculatedNdx(){
+double Decay::CalculatedNdx(){
     return 0;
 }
 //----------------------------------------------------------------------------//
 
-double Bremsstrahlung::CalculatedNdx(double rnd){
+double Decay::CalculatedNdx(double rnd){
     return 0;
 }
 //----------------------------------------------------------------------------//
 
-double Bremsstrahlung::CalculateStochasticLoss(){
+double Decay::CalculateStochasticLoss(){
     return 0;
 }
 //----------------------------------------------------------------------------//
 
-void Bremsstrahlung::EnableStochasticInerpolation(){
+void Decay::EnableStochasticInerpolation(){
     doStochasticInterpolation_=true;
 }
 //----------------------------------------------------------------------------//
 
-void Bremsstrahlung::EnableContinuousInerpolation(){
+void Decay::EnableContinuousInerpolation(){
     doContinuousInterpolation_=true;
 }
 
 //----------------------------------------------------------------------------//
 
-double Bremsstrahlung::FunctionToContinuousIntegral(double variable){
+double Decay::FunctionToContinuousIntegral(double variable){
     return 0;
 }
 
 //----------------------------------------------------------------------------//
 
-double Bremsstrahlung::FunctionToStochasticalIntegral(double variable){
+double Decay::FunctionToStochasticalIntegral(double variable){
     return 0;
 }
 //----------------------------------------------------------------------------//

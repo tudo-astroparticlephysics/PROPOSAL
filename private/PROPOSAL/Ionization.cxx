@@ -1,65 +1,65 @@
-#include "PROPOSAL/Bremsstrahlung.h"
+#include "PROPOSAL/Ionization.h"
 
-Bremsstrahlung::Bremsstrahlung(){
+Ionization::Ionization(){
 
 }
 //----------------------------------------------------------------------------//
 
-Bremsstrahlung::Bremsstrahlung(const Bremsstrahlung &brems)
+Ionization::Ionization(const Ionization &ioniz)
 {
-    *this = brems;
+    *this = ioniz;
 }
 //----------------------------------------------------------------------------//
 
-Bremsstrahlung& Bremsstrahlung::operator=(const Bremsstrahlung &brems){
+Ionization& Ionization::operator=(const Ionization &ioniz){
     return *this;
 }
 
 //----------------------------------------------------------------------------//
 
-void Bremsstrahlung::SetIntegralLimits(){
+void Ionization::SetIntegralLimits(){
 }
 
 //----------------------------------------------------------------------------//
 
-double Bremsstrahlung::CalculatedEdx(){
+double Ionization::CalculatedEdx(){
     return 0;
 }
 //----------------------------------------------------------------------------//
 
-double Bremsstrahlung::CalculatedNdx(){
+double Ionization::CalculatedNdx(){
     return 0;
 }
 //----------------------------------------------------------------------------//
 
-double Bremsstrahlung::CalculatedNdx(double rnd){
+double Ionization::CalculatedNdx(double rnd){
     return 0;
 }
 //----------------------------------------------------------------------------//
 
-double Bremsstrahlung::CalculateStochasticLoss(){
+double Ionization::CalculateStochasticLoss(){
     return 0;
 }
 //----------------------------------------------------------------------------//
 
-void Bremsstrahlung::EnableStochasticInerpolation(){
+void Ionization::EnableStochasticInerpolation(){
     doStochasticInterpolation_=true;
 }
 //----------------------------------------------------------------------------//
 
-void Bremsstrahlung::EnableContinuousInerpolation(){
+void Ionization::EnableContinuousInerpolation(){
     doContinuousInterpolation_=true;
 }
 
 //----------------------------------------------------------------------------//
 
-double Bremsstrahlung::FunctionToContinuousIntegral(double variable){
+double Ionization::FunctionToContinuousIntegral(double variable){
     return 0;
 }
 
 //----------------------------------------------------------------------------//
 
-double Bremsstrahlung::FunctionToStochasticalIntegral(double variable){
+double Ionization::FunctionToStochasticalIntegral(double variable){
     return 0;
 }
 //----------------------------------------------------------------------------//

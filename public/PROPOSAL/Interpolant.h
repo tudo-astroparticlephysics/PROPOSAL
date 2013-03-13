@@ -37,7 +37,7 @@
  * @author Dmitry Chirkin
  */
 
-class Interpolant: public MathModel,  public FunctionInt{ /// implements FunctionInt{
+class Interpolant: public FunctionInt{ /// implements FunctionInt{
 
 private:
     int     romberg, rombergY;

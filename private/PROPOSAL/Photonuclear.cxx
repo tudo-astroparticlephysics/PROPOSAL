@@ -1,65 +1,65 @@
-#include "PROPOSAL/Bremsstrahlung.h"
+#include "PROPOSAL/Photonuclear.h"
 
-Bremsstrahlung::Bremsstrahlung(){
+Photonuclear::Photonuclear(){
 
 }
 //----------------------------------------------------------------------------//
 
-Bremsstrahlung::Bremsstrahlung(const Bremsstrahlung &brems)
+Photonuclear::Photonuclear(const Photonuclear &photo)
 {
-    *this = brems;
+    *this = photo;
 }
 //----------------------------------------------------------------------------//
 
-Bremsstrahlung& Bremsstrahlung::operator=(const Bremsstrahlung &brems){
+Photonuclear& Photonuclear::operator=(const Photonuclear &photo){
     return *this;
 }
 
 //----------------------------------------------------------------------------//
 
-void Bremsstrahlung::SetIntegralLimits(){
+void Photonuclear::SetIntegralLimits(){
 }
 
 //----------------------------------------------------------------------------//
 
-double Bremsstrahlung::CalculatedEdx(){
+double Photonuclear::CalculatedEdx(){
     return 0;
 }
 //----------------------------------------------------------------------------//
 
-double Bremsstrahlung::CalculatedNdx(){
+double Photonuclear::CalculatedNdx(){
     return 0;
 }
 //----------------------------------------------------------------------------//
 
-double Bremsstrahlung::CalculatedNdx(double rnd){
+double Photonuclear::CalculatedNdx(double rnd){
     return 0;
 }
 //----------------------------------------------------------------------------//
 
-double Bremsstrahlung::CalculateStochasticLoss(){
+double Photonuclear::CalculateStochasticLoss(){
     return 0;
 }
 //----------------------------------------------------------------------------//
 
-void Bremsstrahlung::EnableStochasticInerpolation(){
+void Photonuclear::EnableStochasticInerpolation(){
     doStochasticInterpolation_=true;
 }
 //----------------------------------------------------------------------------//
 
-void Bremsstrahlung::EnableContinuousInerpolation(){
+void Photonuclear::EnableContinuousInerpolation(){
     doContinuousInterpolation_=true;
 }
 
 //----------------------------------------------------------------------------//
 
-double Bremsstrahlung::FunctionToContinuousIntegral(double variable){
+double Photonuclear::FunctionToContinuousIntegral(double variable){
     return 0;
 }
 
 //----------------------------------------------------------------------------//
 
-double Bremsstrahlung::FunctionToStochasticalIntegral(double variable){
+double Photonuclear::FunctionToStochasticalIntegral(double variable){
     return 0;
 }
 //----------------------------------------------------------------------------//

@@ -25,11 +25,15 @@ class CrossSections
 
 protected:
 
-
     // bounds of parameterizations
     double elow_;
     double nlow_;
     double ebig_;
+
+
+    // Interpolation flags
+    bool doContinuousInterpolation_;
+    bool doStochasticInterpolation_;
 
 public:
 

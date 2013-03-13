@@ -6,6 +6,11 @@ CrossSections::CrossSections(){
     elow_=0;                //!< lower bound of parameterizations
     nlow_=ME;               //!< maximal number of parametrization points
     ebig_=BIGENERGY;        //!< upper bound of parameterizations
+
+
+    // Interpolation flags
+    doContinuousInterpolation_ = false;
+    doStochasticInterpolation_ = false;
 }
 
 void CrossSections::SetParameterizationLimits(double elow,

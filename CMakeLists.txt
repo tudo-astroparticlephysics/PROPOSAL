@@ -19,6 +19,10 @@ add_library(PROPOSAL
         private/PROPOSAL/Interpolant.cxx
         private/PROPOSAL/Bremsstrahlung.cxx
         private/PROPOSAL/CrossSections.cxx
+        private/PROPOSAL/Decay.cxx
+        private/PROPOSAL/Epairproduction.cxx
+        private/PROPOSAL/Ionization.cxx
+        private/PROPOSAL/Photonuclear.cxx
 	)
 
 set_target_properties(PROPOSAL PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror")

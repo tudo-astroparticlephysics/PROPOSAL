@@ -36,7 +36,7 @@ int main(){
     cout << "integral 3*x + 2: "    << integrate(min,max,N,_3X_2)   << endl;
 
 
-    Bremsstrahlung *brems = new Bremsstrahlung();
+    CrossSections *brems = new Bremsstrahlung();
     brems->SetParameterizationLimits(1.,23.,234.);
     cout<<brems->Get_nlow()<<endl;
     cout<<brems->Get_elow()<<endl;
