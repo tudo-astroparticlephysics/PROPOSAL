@@ -10,7 +10,6 @@
 #ifndef INTEGRAL_H_
 #define INTEGRAL_H_
 
-#include "PROPOSAL/FunctionOfx.h"
 #include <vector>
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/methods.h"
@@ -63,7 +62,6 @@ private:
     std::vector<double> c;
     std::vector<double> d;
 
-    FunctionOfx *function2use;
     double (*integrand_)(double);
 
 
