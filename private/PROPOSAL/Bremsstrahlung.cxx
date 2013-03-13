@@ -51,3 +51,15 @@ void Bremsstrahlung::EnableContinuousInerpolation(){
     doContinuousInterpolation_=true;
 }
 
+//----------------------------------------------------------------------------//
+
+double Bremsstrahlung::FunctionToContinuousIntegral(double integrand){
+    return 0;
+}
+
+//----------------------------------------------------------------------------//
+
+double Bremsstrahlung::FunctionToStochasticalIntegral(double integrand){
+    return 0;
+}
+//----------------------------------------------------------------------------//

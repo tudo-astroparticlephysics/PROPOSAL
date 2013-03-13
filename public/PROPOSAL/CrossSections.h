@@ -71,11 +71,22 @@ public:
 
 //----------------------------------------------------------------------------//
 
+    virtual double FunctionToContinuousIntegral(double integrand) = 0;
+
+//----------------------------------------------------------------------------//
+
+    virtual double FunctionToStochasticalIntegral(double integrand) = 0;
+
+
+//----------------------------------------------------------------------------//
+
     void SetParameterizationLimits(double elow=0.,
                                    double nlow=ME,
                                    double ebig=BIGENERGY);
 
 //----------------------------------------------------------------------------//
+
+
 
     // Setter
 

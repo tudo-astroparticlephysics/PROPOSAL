@@ -68,6 +68,13 @@ public:
 
 //----------------------------------------------------------------------------//
 
+    double FunctionToContinuousIntegral(double integrand);
+
+//----------------------------------------------------------------------------//
+
+    double FunctionToStochasticalIntegral(double integrand);
+
+//----------------------------------------------------------------------------//
 
     ~Bremsstrahlung(){}
 
