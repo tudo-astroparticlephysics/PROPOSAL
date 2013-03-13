@@ -15,7 +15,7 @@ add_library(PROPOSAL
         private/PROPOSAL/MathModel.cxx
         private/PROPOSAL/Output.cxx
         private/PROPOSAL/Interpolant.cxx
-
+        private/PROPOSAL/Bremsstrahlung.cxx
 	)
 
 set_target_properties(PROPOSAL PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror")

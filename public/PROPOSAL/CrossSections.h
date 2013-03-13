@@ -8,7 +8,7 @@
 #ifndef CrossSections_H
 #define CrossSections_H
 
-#include<vector>
+#include <vector>
 #include "Integral.h"
 
 
@@ -18,6 +18,7 @@
  */
 
 
+
 class CrossSections
 {
 
@@ -25,7 +26,7 @@ class CrossSections
 protected:
 
     CrossSections();
-    vector<Integral*> integrals_;
+    std::vector<Integral*>   integrals_;
 
 
 public:
@@ -39,16 +40,16 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    virtual double DEdx() const = 0;
+    virtual double CalculatedEdx() const = 0;
 
 //----------------------------------------------------------------------------//
 
-    virtual double DNdx() const = 0;
+    virtual double CalculatedNdx() const = 0;
 
 
 //----------------------------------------------------------------------------//
 
-    virtual double DNdx(double rnd) const = 0;
+    virtual double CalculatedNdx(double rnd) const = 0;
 
 //----------------------------------------------------------------------------//
 
