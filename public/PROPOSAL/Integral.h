@@ -13,7 +13,8 @@
 #include "PROPOSAL/FunctionOfx.h"
 #include <vector>
 #include "PROPOSAL/MathModel.h"
-
+#include "PROPOSAL/Constants.h"
+#include "PROPOSAL/methods.h"
 // #include "Output.h"
 
 /**
@@ -44,9 +45,7 @@
  * @author Dmitry Chirkin
  */
 
-#include "PROPOSAL/Constants.h"
-
-class Integral: public MathModel{
+class Integral{
 
 private:
 
@@ -66,6 +65,8 @@ private:
     std::vector<double> d;
 
     FunctionOfx *function2use;
+    double (*integrand_)(double);
+
 
     int     romberg4refine;		// set to 2 in constructor
     double  powerOfSubstitution;
@@ -344,6 +345,251 @@ public:
         std::cerr << "Integral::set_funtion2use is depricated and might even be buggy. \n better make use of Integral::integrateOpened(...) to set the function to use, and its range...\n";
         this->function2use = function;
     }
-};
 
-#endif /* INTEGRAL_H_ */
+////TOMASZ ---------------------
+
+    /*!
+     * table of substitutions
+     * \param   x
+     * \return  function value
+     */
+//    double Function(double x);
+
+    //------------------------------------------------------------------------//
+
+    /*!
+     * returns corrected integral by composite trapezoid rule for
+     * closed intervals, n=1, 2, 4, 8, ...
+     * \f[return= \frac{1}{2}[oldSum+resultSum \cdot stepSize]\f]
+     * formula depends on:
+     * \f[ \int_a^b f(x)dx=\frac{b-a}{n} [\frac{f(a)+f(b)}{2}
+     * + \sum_{k=1}^{n-1}f(a+k\frac{b- a}{n})] \f]
+     *
+     * \param   n         Number of sampling points
+     * \param   oldSum    Old integration result
+     * \return  Integration Result
+     */
+//    double Trapezoid(int n, double oldSum);
+
+    //------------------------------------------------------------------------//
+
+    /*!
+     * returns corrected integral by composite trapezoid
+     * rule for opened intervals, n=1, 3, 9, ...
+     * \f[ return= \frac{1}{3} oldSum +resultSum \cdot stepSize; \f]
+     * formula depends on:
+     * \f[ \int_a^b f(x)dx=\frac{b-a}{n} \sum_{i=1}^{n}f(a+k\frac{b-a}{n}(\frac{2i-1}{2})) \f]
+     *
+     * \param   n           Number of sampling points
+     * \param   oldSum      Old integration result
+     * \return  Integration Result
+     */
+//   double Trapezoid3(int n, double oldSum);
+
+    //------------------------------------------------------------------------//
+
+    /*!
+     * returns corrected integral by opened trapezoid rule, n=1, 3, 9, ...
+     * and computes the approximation to the value of the x(rand)
+     *
+     * \param   n           Number of sampling points
+     * \param   oldSum      Old integration result
+     * \return  Integration result
+     */
+//    double Trapezoid3S(int n, double oldSum, int stepNumber);
+
+    //------------------------------------------------------------------------//
+
+    /*!
+     * finds f(x) for f: iY[i]=f(iX[i]), i=start, ..., start+romberg
+     *
+     * \param   start   Starting point of the interpolation
+     * \param   x       Searched function value for f(x)
+     * \return  Interpolated result for f(x)
+     */
+//    void Interpolate(int start, double x);
+
+//    //------------------------------------------------------------------------//
+
+    /*!
+     * finds integral for closed intervals calculates integral value
+     * using trapezoid, k is number of steps;
+     *
+     * \return  Integration result
+     */
+//    double RombergIntegrateClosed();
+
+    //------------------------------------------------------------------------//
+
+    /*!
+     * finds integral for opened intervals, using trapezoid3;
+     *
+     * \return  Integration result
+     */
+//    double RombergIntegrateOpened();
+
+    //------------------------------------------------------------------------//
+
+    /*!
+     * finds integral for opened intervals analog to rombergIntegrateOpened;
+     * precision of the result is evaluated with respect
+     * to the value provided in the argument
+     *
+     * \param   bigValue    integration error has to be < bigValue*precision
+     * \return  Integration result
+     */
+//    double RombergIntegrateOpened(double bigValue);
+
+/*!
+ * finds integral for closed intervals depending on rombergIntegrateClosed;
+ * \f[ return=aux \cdot rombergClosed \f]
+ * with \f$ aux=1 \f$ or \f$ aux=-1\f$, depends on
+ * the integration limits (\f$min<max\f$ or \f$min>max\f$)
+ *
+ * \param   min             lower integration limit
+ * \param   max             upper integration limit
+ * \param   function2use    integrand
+ * \return  Integration result
+ */
+//  double IntegrateClosed(double min, double max, double (*integrand)(double));
+
+//------------------------------------------------------------------------//
+
+/*!
+ * finds integral for opened intervals;
+ * analog to integrateClosed, depending on rombergIntegrateOpened
+ *
+ * \param   min             lower integration limit
+ * \param   max             upper integration limit
+ * \param   function2use    integrand
+ * \return  Integration result
+ */
+//  double IntegrateOpened(double min, double max, double (*integrand)(double));
+
+//------------------------------------------------------------------------//
+
+/*!
+ * finds integral for opened intervals
+ * and computes the value of the x(rand)
+ *
+ * \param   min             lower integration limit
+ * \param   max             upper integration limit
+ * \param   function2use    integrand
+ * \param   randomRatio     Random Ratio in which the old sum is weighted
+ * \return  Integration result
+ */
+//  double IntegrateOpened(double min, double max, double (*integrand)(double), double randomRatio);
+
+//------------------------------------------------------------------------//
+
+/*!
+ * finds integral for opened intervals using substitution x -&gt; 1/x^(powerOfSubstitution)
+ *
+ * \param   min                 lower integration limit
+ * \param   max                 upper integration limit
+ * \param   function2use        integrand
+ * \param   powerOfSubstitution x' = 1/x^(powerOfSubstitution)
+ * \return  Integration result
+ */
+
+//  double IntegrateWithSubstitution(double min, double max, double (*integrand)(double), double powerOfSubstitution);
+
+//------------------------------------------------------------------------//
+
+/*!
+ * finds integral for opened intervals using substitution x -&gt; 1/x^(powerOfSubstitution)
+ * and computes the value of the x(rand)
+ *
+ * \param   min             lower integration limit
+ * \param   max             upper integration limit
+ * \param   function2use    integrand
+ * \param   powerOfSubstitution x' = 1/x^(powerOfSubstitution)
+ * \param   randomRatio     Random Ratio in which the old sum is weighted
+ * \return  Integration result
+ */
+
+//  double IntegrateWithSubstitution(double min, double max, double (*integrand)(double), double powerOfSubstitution, double randomRatio);
+
+//------------------------------------------------------------------------//
+
+/*!
+ * using Newton's method refines the value of the upper limit
+ * that results in the ratio of integrals equal to randomNumber:
+ *
+ * \f$ \int_{low}^y f(x) dx = \int_{low}^{hi} f(x) dx * rnd \f$
+ *
+ * \param   result  \f$\int_{low}^{hi} f(x) dx\f$
+ * \return	y
+ */
+
+//  void RefineUpperLimit(double result);
+
+//------------------------------------------------------------------------//
+
+/*!
+ * refines and returns the value of the upper limit x(rand)
+ *
+ * \return UpperLimit of Integral
+ */
+
+//  double GetUpperLimit();
+
+//------------------------------------------------------------------------//
+
+/*!
+ * finds integral for opened intervals using log substitution; \f$ x=\ln(x)\f$
+ *
+ * \param   min             lower integration limit
+ * \param   max             upper integration limit
+ * \param   function2use    integrand
+ * \return  Integration result
+ */
+
+//  double IntegrateWithLog(double min, double max, double (*integrand)(double));
+
+//------------------------------------------------------------------------//
+
+/*!
+ * finds integral for opened intervals
+ * and computes the value of the x(rand)
+ *
+ * \param   min             lower integration limit
+ * \param   max             upper integration limit
+ * \param   function2use    integrand
+ * \param   randomRatio     Random Ratio in which the old sum is weighted
+ * \return  Integration result
+ */
+
+//  double IntegrateWithLog(double min, double max, double (*integrand)(double), double randomRatio);
+
+//------------------------------------------------------------------------//
+
+/*!
+ * finds integral for opened intervals using substitution x -&gt; 1/log(x)^(powerOfSubstitution)
+ *
+ * \param   min             lower integration limit
+ * \param   max             upper integration limit
+ * \param   function2use    integrand
+ * \param   powerOfSubstitution x' = 1/log(x)^(powerOfSubstitution)
+ * \return  Integration result
+ */
+
+//  double IntegrateWithLogSubstitution(double min, double max, double (*integrand)(double), double powerOfSubstitution);
+
+// Getters
+
+// double Get_maxSteps ()
+//{
+//    return maxSteps;
+//}
+
+// Setters
+
+//void Set_Function(double (*integrand)(double))
+//{
+//    std::cerr << "Integral::set_funtion2use is depricated and might even be buggy. \n better make use of Integral::integrateOpened(...) to set the function to use, and its range...\n";
+//    this->integrand_ = integrand;
+//}
+
+};
+#endif /*INTEGRAL_H_ */

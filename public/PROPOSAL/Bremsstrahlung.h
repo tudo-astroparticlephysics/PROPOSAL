@@ -1,3 +1,4 @@
+#include <vector>
 #include "CrossSections.h"
 
 class Medium;
@@ -25,6 +26,8 @@ protected:
     PROPOSALParticle*   particle_;
     Medium*             medium_;
 
+
+    std::vector<Integral*>   integrals_;
 
 public:
 //----------------------------------------------------------------------------//

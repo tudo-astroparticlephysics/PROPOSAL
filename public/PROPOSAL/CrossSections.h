@@ -8,7 +8,7 @@
 #ifndef CrossSections_H
 #define CrossSections_H
 
-#include <vector>
+
 #include "Integral.h"
 
 
