@@ -1,6 +1,6 @@
 #include <iostream>
 #include "PROPOSAL/Bremsstrahlung.h"
-
+#include "PROPOSAL/Integral.h"
 using namespace std;
 
 double integrate(double min, double max, int N, double (*func)(double) ){
@@ -36,16 +36,14 @@ int main(){
     cout << "integral 3*x + 2: "    << integrate(min,max,N,_3X_2)   << endl;
 
 
-    CrossSections *brems = new Bremsstrahlung();
+    Bremsstrahlung *brems = new Bremsstrahlung();
     brems->SetParameterizationLimits(1.,23.,234.);
-    cout<<brems->GetNlow()<<endl;
-    cout<<brems->GetElow()<<endl;
-    cout<<brems->GetEbig()<<endl;
 
-
-
+    Integral* Int = new Integral();
+    cout << "IntegralKlasse x*x: " << Int->IntegrateClosed(0,3,X2) << endl;
     return 0;
 }
+
 
 
 
