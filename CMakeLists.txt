@@ -14,7 +14,6 @@ include_directories("${PROJECT_SOURCE_DIR}/public")
 add_library(PROPOSAL
         private/PROPOSAL/Integral.cxx
         private/PROPOSAL/methods.cxx
-        private/PROPOSAL/PhysicsModel.cxx
         private/PROPOSAL/MathModel.cxx
         private/PROPOSAL/Output.cxx
         private/PROPOSAL/Interpolant.cxx
