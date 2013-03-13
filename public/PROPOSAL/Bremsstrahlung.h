@@ -8,14 +8,6 @@ class Bremsstrahlung: public CrossSections
 {
 protected:
 
-    //Integrallimits
-    double vMax_;
-    double vUp_;
-    double vMin_;
-
-    //Parametrization
-    int form_;
-
     bool init_;
     double eLpm_;
     double xo_;

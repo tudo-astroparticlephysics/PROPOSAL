@@ -2,7 +2,7 @@
  * CrossSections.h
  *
  *  Created on: 2013.03.12
- *      Author: koehne
+ *      Author: Jan-Hendrik Köhne
  */
 
 #ifndef CrossSections_H
