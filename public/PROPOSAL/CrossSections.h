@@ -71,11 +71,11 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    virtual double FunctionToContinuousIntegral(double integrand) = 0;
+    virtual double FunctionToContinuousIntegral(double variable) = 0;
 
 //----------------------------------------------------------------------------//
 
-    virtual double FunctionToStochasticalIntegral(double integrand) = 0;
+    virtual double FunctionToStochasticalIntegral(double variable) = 0;
 
 
 //----------------------------------------------------------------------------//

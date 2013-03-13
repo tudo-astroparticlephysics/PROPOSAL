@@ -68,11 +68,11 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    double FunctionToContinuousIntegral(double integrand);
+    double FunctionToContinuousIntegral(double variable);
 
 //----------------------------------------------------------------------------//
 
-    double FunctionToStochasticalIntegral(double integrand);
+    double FunctionToStochasticalIntegral(double variable);
 
 //----------------------------------------------------------------------------//
 
