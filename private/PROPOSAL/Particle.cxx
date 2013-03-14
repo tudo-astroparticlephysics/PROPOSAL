@@ -3,7 +3,7 @@
 *
 *   For more details see the class documentation.
 *
-*   \date   21.06.2010
+*   \date   2013.03.14
 *   \author Jan-Hendrik Köhne
 */
 
@@ -13,52 +13,50 @@
 #include <stdlib.h>
 #include "PROPOSAL/Particle.h"
 #include "PROPOSAL/methods.h"
-
+#include "PROPOSAL/Constants.h"
 
 
 using namespace std;
 
 Particle::Particle()
-:r  (0)
-,x  (0)
-,y  (0)
-,z  (0)
-,t  (0)
-,theta  (0)
-,phi    (0)
-,costh  (1.)
-,sinth  (0)
-,cosph  (1.)
-,sinph  (0.)
-,p  (0)
-,p2 (0)
-,e  (0)
-,m  (MMU)
-,l  (LMU)
-,c  (1)
-,name   ("mu")
-,low    (m)
-,type   (1)
-,igen   (0)
-,gens    (1)
-,xi     (0)
-,yi     (0)
-,zi     (0)
-,ti     (0)
-,Ei     (0)
-,xf     (0)
-,yf     (0)
-,zf     (0)
-,tf     (0)
-,Ef     (0)
-,xc     (0)
-,yc     (0)
-,zc     (0)
-,tc     (0)
-,Ec     (0)
-,Elost  (0)
-,df (false)
-,jt (false)
+    :propagation_distance_  (0)
+    ,x_                     (0)
+    ,y_                     (0)
+    ,z_                     (0)
+    ,t_                     (0)
+    ,theta_                 (0)
+    ,phi_                   (0)
+    ,costh_                 (1.)
+    ,sinth_                 (0)
+    ,cosph_                 (1.)
+    ,sinph_                 (0.)
+    ,momentum_              (0)
+    ,square_momentum_       (0)
+    ,energy_                (0)
+    ,mass_                  (MMU)
+    ,lifetime_              (LMU)
+    ,charge_                (1)
+    ,name_                  ("mu")
+    ,low_                   (mass_)
+    ,type_                  (1)
+    ,parent_particle_id_    (0)
+    ,particle_id_           (1)
+    ,xi_                    (0)
+    ,yi_                    (0)
+    ,zi_                    (0)
+    ,ti_                    (0)
+    ,ei_                    (0)
+    ,xf_                    (0)
+    ,yf_                    (0)
+    ,zf_                    (0)
+    ,tf_                    (0)
+    ,ef_                    (0)
+    ,xc_                    (0)
+    ,yc_                    (0)
+    ,zc_                    (0)
+    ,tc_                    (0)
+    ,ec_                    (0)
+    ,elost_                 (0)
 {
 }
 
@@ -66,82 +64,77 @@ Particle::Particle()
 
 
 
-Particle::Particle(int Igen,
-                   int Gens,
-                   string Name,
-                   double X,
-                   double Y,
-                   double Z,
-                   double Theta,
-                   double Phi,
-                   double E,
-                   double T,
-                   double R,
-                   Particle *P)
-:r  (R)
-,x  (0)
-,y  (0)
-,z  (0)
-,t  (0)
-,theta  (0)
-,phi    (0)
-,costh  (1.)
-,sinth  (0)
-,cosph  (1.)
-,sinph  (0.)
-,p  (0)
-,p2 (0)
-,e  (0)
-,m  (MMU)
-,l  (LMU)
-,c  (1)
-,name   ("mu")
-,low    (m)
-,type   (1)
-,igen   (Igen)
-,gens   (Gens)
-,xi     (0)
-,yi     (0)
-,zi     (0)
-,ti     (0)
-,Ei     (0)
-,xf     (0)
-,yf     (0)
-,zf     (0)
-,tf     (0)
-,Ef     (0)
-,xc     (0)
-,yc     (0)
-,zc     (0)
-,tc     (0)
-,Ec     (0)
-,Elost  (0)
-,df (false)
-,jt (false)
+Particle::Particle(int parent_particle_id,
+                   int particle_id,
+                   string name,
+                   double x,
+                   double y,
+                   double z,
+                   double theta,
+                   double phi,
+                   double energy,
+                   double t,
+                   double prop_dist,
+                   Particle *p)
+
+    :propagation_distance_  (prop_dist)
+    ,x_                     (x)
+    ,y_                     (y)
+    ,z_                     (z)
+    ,t_                     (t)
+    ,theta_                 (theta)
+    ,phi_                   (phi)
+    ,momentum_              (0)
+    ,square_momentum_       (0)
+    ,energy_                (0)
+    ,mass_                  (MMU)
+    ,lifetime_              (LMU)
+    ,charge_                (1)
+    ,name_                  ("mu")
+    ,low_                   (mass_)
+    ,type_                  (1)
+    ,parent_particle_id_    (parent_particle_id)
+    ,particle_id_           (particle_id)
+    ,xi_                    (0)
+    ,yi_                    (0)
+    ,zi_                    (0)
+    ,ti_                    (0)
+    ,ei_                    (0)
+    ,xf_                    (0)
+    ,yf_                    (0)
+    ,zf_                    (0)
+    ,tf_                    (0)
+    ,ef_                    (0)
+    ,xc_                    (0)
+    ,yc_                    (0)
+    ,zc_                    (0)
+    ,tc_                    (0)
+    ,ec_                    (0)
+    ,elost_                 (0)
 {
-    initByName(Name);
-    setEnergy(E);
-    location(Name, T, X, Y, Z, Theta, Phi);
+    InitByName(name);
+    SetEnergy(energy);
+    Location(t, x, y, t, theta, phi);
 
 
-    if(P!=NULL)
+    if(p!=NULL)
     {
-        xi      =   P->xi;
-        yi      =   P->yi;
-        zi      =   P->zi;
-        ti      =   P->ti;
-        Ei      =   P->Ei;
-        xf      =   P->xf;
-        yf      =   P->yf;
-        zf      =   P->zf;
-        tf      =   P->tf;
-        Ef      =   P->Ef;
-        xc      =   P->xc;
-        yc      =   P->yc;
-        zc      =   P->zc;
-        tc      =   P->tc;
-        Ec      =   P->Ec;
-        Elost   =   P->Elost;
+        xi_      =   p->GetXi();
+        yi_      =   p->GetYi();
+        zi_      =   p->GetZi();
+        ti_      =   p->GetTi();
+        ei_      =   p->GetEi();
+        xf_      =   p->GetXf();
+        yf_      =   p->GetYf();
+        zf_      =   p->GetZf();
+        tf_      =   p->GetTf();
+        ef_      =   p->GetEf();
+        xc_      =   p->GetXc();
+        yc_      =   p->GetYc();
+        zc_      =   p->GetZc();
+        tc_      =   p->GetTc();
+        ec_      =   p->GetEc();
+        elost_   =   p->GetElost();
     }
 }
 
@@ -149,287 +142,277 @@ Particle::Particle(int Igen,
 //----------------------------------------------------------------------------//
 
 
-Particle::Particle(int Igen,
-                   int Gens,
-                   string Name,
-                   double X,
-                   double Y,
-                   double Z,
-                   double Theta,
-                   double Phi,
-                   double E,
-                   double T,
-                   double R)
-    :r  (R)
-    ,x  (0)
-    ,y  (0)
-    ,z  (0)
-    ,t  (0)
-    ,theta  (0)
-    ,phi    (0)
-    ,costh  (1.)
-    ,sinth  (0)
-    ,cosph  (1.)
-    ,sinph  (0.)
-    ,p  (0)
-    ,p2 (0)
-    ,e  (0)
-    ,m  (MMU)
-    ,l  (LMU)
-    ,c  (1)
-    ,name   ("mu")
-    ,low    (m)
-    ,type   (1)
-    ,igen   (Igen)
-    ,gens   (Gens)
-    ,xi     (0)
-    ,yi     (0)
-    ,zi     (0)
-    ,ti     (0)
-    ,Ei     (0)
-    ,xf     (0)
-    ,yf     (0)
-    ,zf     (0)
-    ,tf     (0)
-    ,Ef     (0)
-    ,xc     (0)
-    ,yc     (0)
-    ,zc     (0)
-    ,tc     (0)
-    ,Ec     (0)
-    ,Elost  (0)
-    ,df (false)
-    ,jt (false)
+Particle::Particle(int parent_particle_id,
+                   int particle_id,
+                   string name,
+                   double x,
+                   double y,
+                   double z,
+                   double theta,
+                   double phi,
+                   double energy,
+                   double t,
+                   double prop_dist)
+
+    :propagation_distance_  (prop_dist)
+    ,x_                     (x)
+    ,y_                     (y)
+    ,z_                     (z)
+    ,t_                     (t)
+    ,theta_                 (theta)
+    ,phi_                   (phi)
+    ,momentum_              (0)
+    ,square_momentum_       (0)
+    ,energy_                (energy)
+    ,mass_                  (MMU)
+    ,lifetime_              (LMU)
+    ,charge_                (1)
+    ,name_                  ("mu")
+    ,low_                   (mass_)
+    ,type_                  (1)
+    ,parent_particle_id_    (parent_particle_id)
+    ,particle_id_           (particle_id)
+    ,xi_                    (0)
+    ,yi_                    (0)
+    ,zi_                    (0)
+    ,ti_                    (0)
+    ,ei_                    (0)
+    ,xf_                    (0)
+    ,yf_                    (0)
+    ,zf_                    (0)
+    ,tf_                    (0)
+    ,ef_                    (0)
+    ,xc_                    (0)
+    ,yc_                    (0)
+    ,zc_                    (0)
+    ,tc_                    (0)
+    ,ec_                    (0)
+    ,elost_                 (0)
+
 {
-    initByName(Name);
-    setEnergy(E);
-    location(Name, T, X, Y, Z, Theta, Phi);
+    InitByName(name);
+    SetEnergy(energy);
+    Location(t, x, y, z, theta, phi);
 }
 
 
 //----------------------------------------------------------------------------------------------------//
 
 
-Particle::Particle(string aname,
-                   double X,
-                   double Y,
-                   double Z,
-                   double Theta,
-                   double Phi,
-                   double E,
-                   double T)
-:r  (0)
-,x  (0)
-,y  (0)
-,z  (0)
-,t  (0)
-,theta  (0)
-,phi    (0)
-,costh  (1.)
-,sinth  (0)
-,cosph  (1.)
-,sinph  (0.)
-,p  (0)
-,p2 (0)
-,e  (0)
-,m  (MMU)
-,l  (LMU)
-,c  (1)
-,name   ("mu")
-,low    (m)
-,type   (1)
-,igen   (0)
-,gens   (1)
-,xi     (0)
-,yi     (0)
-,zi     (0)
-,ti     (0)
-,Ei     (0)
-,xf     (0)
-,yf     (0)
-,zf     (0)
-,tf     (0)
-,Ef     (0)
-,xc     (0)
-,yc     (0)
-,zc     (0)
-,tc     (0)
-,Ec     (0)
-,Elost  (0)
-,df (false)
-,jt (false)
+Particle::Particle(string name,
+                   double x,
+                   double y,
+                   double z,
+                   double theta,
+                   double phi,
+                   double energy,
+                   double t)
+
+    :propagation_distance_  (0)
+    ,x_                     (x)
+    ,y_                     (y)
+    ,z_                     (z)
+    ,t_                     (t)
+    ,theta_                 (theta)
+    ,phi_                   (phi)
+    ,momentum_              (0)
+    ,square_momentum_       (0)
+    ,energy_                (energy)
+    ,mass_                  (MMU)
+    ,lifetime_              (LMU)
+    ,charge_                (1)
+    ,name_                  ("mu")
+    ,low_                   (mass_)
+    ,type_                  (1)
+    ,parent_particle_id_    (0)
+    ,particle_id_           (1)
+    ,xi_                    (0)
+    ,yi_                    (0)
+    ,zi_                    (0)
+    ,ti_                    (0)
+    ,ei_                    (0)
+    ,xf_                    (0)
+    ,yf_                    (0)
+    ,zf_                    (0)
+    ,tf_                    (0)
+    ,ef_                    (0)
+    ,xc_                    (0)
+    ,yc_                    (0)
+    ,zc_                    (0)
+    ,tc_                    (0)
+    ,ec_                    (0)
+    ,elost_                 (0)
 {
-    initByName(aname);
-    setEnergy(E);
-    location(aname, T, X, Y, Z, Theta, Phi);
+    InitByName(name);
+    SetEnergy(energy);
+    Location(t, x, y, z, theta, phi);
 }
 
 //----------------------------------------------------------------------------//
 
-void Particle::initByName(std::string aname){
+void Particle::InitByName(std::string aname){
+
     string name=aname.length()==0?"?":aname[0]=='a'?aname.substr(1):aname;
 
     if(name.compare("tau")==0 || name.compare("tau-")==0 || name.compare("tau+")==0)
     {
         if(name.compare("tau+")==0)
         {
-            type    =   -33;
+            type_    =   -33;
         }
         else
         {
-            type    =   -34;
+            type_    =   -34;
         }
 
-        m   =   MTAU;
-        l   =   LTAU;
+        mass_       =   MTAU;
+        lifetime_   =   LTAU;
     }
     else if(name.compare("mu")==0 || name.compare("mu-")==0 || name.compare("mu+")==0)
     {
         if(name.compare("mu+")==0)
         {
-            type    =   -5;
+            type_    =   -5;
         }
         else
         {
-            type    =   -6;
+            type_    =   -6;
         }
 
-        m   =   MMU;
-        l   =   LMU;
+        mass_       =   MMU;
+        lifetime_   =   LMU;
     }
     else if(StartsWith(name,"stau") )
     {
         if((int)(name.find("stau+"))!=-1)
         {
-            type    =   -9131;
+            type_    =   -9131;
         }
         else
         {
-            type    =   -9132;
+            type_    =   -9132;
         }
 
         try
         {
-            m   =   strtod(name.substr(5).c_str(),NULL)*1.e3;
+            mass_   =   strtod(name.substr(5).c_str(),NULL)*1.e3;
         }
         catch(exception &e)
         {
-            m   =   0;
+            mass_   =   0;
         }
 
-        if(m<=0)
+        if(mass_<=0)
         {
-            m   =   MSTAU;
+            mass_   =   MSTAU;
         }
 
-        l   =   LSTAU;
+        lifetime_   =   LSTAU;
     }
     else if(name.compare("e")==0 || name.compare("e-")==0 || name.compare("e+")==0)
     {
         if(name.compare("e+")==0)
         {
-            type    =   -2;
+            type_    =   -2;
         }
         else
         {
-            type    =   -3;
+            type_    =   -3;
         }
 
-        m   =   ME;
-        l   =   -1;
+        mass_       =   ME;
+        lifetime_   =   -1;
     }
     else if((int)(name.find("nu_"))!=-1)
     {
         if(name.compare("nu_e")==0)
         {
-            type    =   -201;
+            type_    =   -201;
         }
         else if(name.compare("~nu_e")==0)
         {
-            type    =   -204;
+            type_    =   -204;
         }
         else if(name.compare("nu_mu")==0)
         {
-            type    =   -202;
+            type_    =   -202;
         }
         else if(name.compare("~nu_mu")==0)
         {
-            type    =   -205;
+            type_    =   -205;
         }
         else if(name.compare("nu_tau")==0)
         {
-            type    =   -203;
+            type_    =   -203;
         }
         else if(name.compare("~nu_tau")==0)
         {
-            type    =   -206;
+            type_    =   -206;
         }
 
-        m   =   0;
-        l   =   -1;
+        mass_       =    0;
+        lifetime_   =   -1;
     }
     else
     {
         if(name.compare("delta")==0)
         {
-            type    =   -1002;
+            type_    =   -1002;
         }
         else if(name.compare("brems")==0)
         {
-            type    =   -1001;
+            type_    =   -1001;
         }
         else if(name.compare("munu")==0)
         {
-            type    =   -1004;
+            type_    =   -1004;
         }
         else if(name.compare("epair")==0)
         {
-            type    =   -1003;
+            type_    =   -1003;
         }
         else if(name.compare("hadr")==0)
         {
-            type    =   -1006;
+            type_    =   -1006;
         }
         else if(name.compare("conti")==0)
         {
-            type    =   -1111;
+            type_    =   -1111;
         }
         else
         {
-            type    =   0;
+            type_    =   0;
         }
 
-        m   =   0;
-        l   =   0;
+        mass_       =   0;
+        lifetime_   =   0;
     }
-
-    low =   m;
+    name_   =   name;
+    low_    =   mass_;
 }
 
 //----------------------------------------------------------------------------//
 
-void Particle::location(string name,
-                        double time,
+void Particle::Location(double time,
                         double x,
                         double y,
                         double z,
                         double theta,
                         double phi)
 {
-    this->name  =   name;
-    r           =   0;
-    t           =   time;
-    this->x     =   x;
-    this->y     =   y;
-    this->z     =   z;
-    this->theta =   theta;
-    this->phi   =   phi;
-    theta       *=  (PI/180);
-    phi         *=  (PI/180);
-    costh       =   cos(theta);
-    sinth       =   sin(theta);
-    cosph       =   cos(phi);
-    sinph       =   sin(phi);
+    //propagation_distance_ = 0; <--- seems to be wrong
+    t_           =   time;
+    x_           =   x;
+    y_           =   y;
+    z_           =   z;
+    theta_       =   theta;
+    phi_         =   phi;
+    theta_       *=  (PI/180);   //<--deg or rad??
+    phi_         *=  (PI/180);   //<--deg or rad??
+    costh_       =   cos(theta);
+    sinth_       =   sin(theta);
+    cosph_       =   cos(phi);
+    sinph_       =   sin(phi);
 }
 
 //----------------------------------------------------------------------------//
@@ -471,8 +454,8 @@ void Particle::SetT(double t)
 //----------------------------------------------------------------------------//
 void Particle::SetTheta(double theta)
 {
-    theta_ = theta;
-    theta_ *=  (PI/180);
+    theta_  =   theta;
+    theta_ *=   (PI/180);
 
     costh_  =   cos(theta);
     sinth_  =   sin(theta);
@@ -481,11 +464,11 @@ void Particle::SetTheta(double theta)
 //----------------------------------------------------------------------------//
 void Particle::SetPhi(double phi)
 {
-    phi_ = phi;
-    phi  *=  (PI/180);
+    phi_   =    phi;
+    phi_  *=    (PI/180);
 
-    cosph =   cos(phi);
-    sinph =   sin(phi);
+    cosph_ =    cos(phi);
+    sinph_ =    sin(phi);
 }
 //----------------------------------------------------------------------------//
 void Particle::SetMomentum(double momentum)

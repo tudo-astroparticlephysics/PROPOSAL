@@ -96,31 +96,31 @@ public:
      *
      * This function ist mostly used to store particle information.
      *
-     * \param igen      parent particle id
-     * \param gens      particle id
-     * \param name      particle type
-     * \param x         x-coordinate
-     * \param y         y-coordinate
-     * \param z         z-coordinate
-     * \param theta     theta angle
-     * \param phi       phi angle
-     * \param e         particle energy
-     * \param t         particle time
-     * \param r         flight distance
-     * \param *p        source particle
+     * \param parent_particle_id      parent particle id
+     * \param particle_id             particle id
+     * \param name                    particle name
+     * \param x                       x-coordinate
+     * \param y                       y-coordinate
+     * \param z                       z-coordinate
+     * \param theta                   theta angle
+     * \param phi                     phi angle
+     * \param energy                  particle energy
+     * \param t                       particle time
+     * \param prop_dist               flight distance
+     * \param *p                      source particle
      */
 
-    Particle(int igen,
-             int gens,
+    Particle(int parent_particle_id,
+             int particle_id,
              std::string name,
              double x,
              double y,
              double z,
              double theta,
              double phi,
-             double e,
+             double energy,
              double t,
-             double r,
+             double prop_dist,
              Particle *p);
 
 //----------------------------------------------------------------------------//
@@ -129,29 +129,29 @@ public:
      *
      * This function ist mostly used to store particle information.
      *
-     * \param igen      parent particle id
-     * \param gens      particle id
-     * \param name      particle type
-     * \param x         x-coordinate
-     * \param y         y-coordinate
-     * \param z         z-coordinate
-     * \param theta     theta angle
-     * \param phi       phi angle
-     * \param e         particle energy
-     * \param t         particle time
-     * \param r         flight distance
+     * \param parent_particle_id      parent particle id
+     * \param particle_id             particle id
+     * \param name                    particle name
+     * \param x                       x-coordinate
+     * \param y                       y-coordinate
+     * \param z                       z-coordinate
+     * \param theta                   theta angle
+     * \param phi                     phi angle
+     * \param energy                  particle energy
+     * \param t                       particle time
+     * \param prop_dist               flight distance
      */
-    Particle(int igen,
-             int gens,
+    Particle(int parent_particle_id,
+             int particle_id,
              std::string name,
              double x,
              double y,
              double z,
              double theta,
              double phi,
-             double e,
+             double energy,
              double t,
-             double r);
+             double prop_dist);
 
 //----------------------------------------------------------------------------//
     /*!
@@ -159,22 +159,22 @@ public:
      *
      * This function ist mostly used to store particle information.
      *
-     * \param aname     particle type
+     * \param aname     particle name
      * \param x         x-coordinate
      * \param y         y-coordinate
      * \param z         z-coordinate
      * \param theta     theta angle
      * \param phi       phi angle
-     * \param e         particle energy
+     * \param energy    particle energy
      * \param t         particle time
      */
-    Particle(std::string aname,
+    Particle(std::string name,
              double x,
              double y,
              double z,
              double theta,
              double phi,
-             double e,
+             double energy,
              double t);
 
 //----------------------------------------------------------------------------//

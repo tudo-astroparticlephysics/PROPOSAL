@@ -9,7 +9,7 @@ class FunctionInt
 
 public:
 
-    virtual double functionInt(double x) {return x;}
+    virtual double functionInt(double x) const = 0;
 
 //----------------------------------------------------------------------------//
 

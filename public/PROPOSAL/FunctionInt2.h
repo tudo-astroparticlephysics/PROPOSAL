@@ -9,10 +9,7 @@ class FunctionInt2
 {
 public:
 //----------------------------------------------------------------------------//
-    virtual double functionInt(double x1, double x2)
-    {
-        return x1;
-    }
+    virtual double functionInt(double x1, double x2) const = 0;
 //----------------------------------------------------------------------------//
 
     virtual ~FunctionInt2(){}

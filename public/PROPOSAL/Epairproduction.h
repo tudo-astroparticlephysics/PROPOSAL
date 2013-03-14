@@ -24,7 +24,6 @@ public:
 
     double CalculatedNdx();
 
-
 //----------------------------------------------------------------------------//
 
     double CalculatedNdx(double rnd);

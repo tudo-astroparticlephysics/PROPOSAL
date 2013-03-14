@@ -11,7 +11,8 @@
 
 #include "PROPOSAL/MathModel.h"
 #include "PROPOSAL/Constants.h"
-
+#include "PROPOSAL/Particle.h"
+#include "PROPOSAL/Medium.h"
 
 
 
@@ -26,6 +27,9 @@ class CrossSections : public MathModel
 
 
 protected:
+
+    Particle*   particle_;
+    Medium*     medium_;
 
     //bounds of integration
     double vMax_;   //!< upper bound of integration
@@ -50,6 +54,9 @@ public:
 
 //----------------------------------------------------------------------------//
 
+    CrossSections(Particle* particle, Medium* medium);
+
+//----------------------------------------------------------------------------//
     // Memberfunctions
 
     virtual void SetIntegralLimits() = 0;
@@ -97,6 +104,14 @@ public:
     // Setter
 
     void SetMultiplier(double multiplier=1.);
+
+//----------------------------------------------------------------------------//
+
+    void SetParticle(Particle *particle);
+
+//----------------------------------------------------------------------------//
+
+    void SetMedium(Medium *medium);
 
 //----------------------------------------------------------------------------//
 

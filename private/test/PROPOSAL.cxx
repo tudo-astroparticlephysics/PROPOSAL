@@ -37,14 +37,32 @@ int main(){
     cout << "integral x*x: "        << integrate(min,max,N,X2)      << endl;
     cout << "integral 3*x + 2: "    << integrate(min,max,N,_3X_2)   << endl;
 
-
+    Medium *med = new Medium("ice",1.);
+    Particle *particle = new Particle("mu",1.,1.,1,.20,20,1e5,10);
     Bremsstrahlung *brems = new Bremsstrahlung();
+    brems->SetMedium(med);
+
+    cout<<"__________________________________________________________"<<endl;
+    cout<<"Check ElasticBremsstrahlungCrossSection!!!!!!!!!!!!"<<endl;
+    cout<<"(former Bremsstrahlung::Sel(double int))"<<endl;
+    cout<<"differs for brems->SetParametrization(1) <--- KKP"<<endl;
+    cout<<"__________________________________________________________"<<endl;
+    for(int i = 0 ; i < 10 ; i++){
+        brems->SetParametrization(1);
+        particle->SetEnergy(pow(10,i));
+        brems->SetParticle(particle);
+        cout<<brems->ElasticBremsstrahlungCrossSection(0.4,1)<<endl;
+
+
+    }
+
+
     brems->SetParametrizationLimit(1.);
 
     Integral* Int = new Integral();
-    cout << "IntegralKlasse x*x: " << Int->IntegrateClosed(0,3,X2) << endl;
+//    cout << "IntegralKlasse x*x: " << Int->IntegrateClosed(0,3,X2) << endl;
 
-    Medium *med = new Medium("antares water",1.);
+
     return 0;
 }
 
