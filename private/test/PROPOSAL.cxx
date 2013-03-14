@@ -1,6 +1,8 @@
 #include <iostream>
 #include "PROPOSAL/Bremsstrahlung.h"
 #include "PROPOSAL/Integral.h"
+#include "PROPOSAL/Medium.h"
+
 using namespace std;
 
 double integrate(double min, double max, int N, double (*func)(double) ){
@@ -41,6 +43,8 @@ int main(){
 
     Integral* Int = new Integral();
     cout << "IntegralKlasse x*x: " << Int->IntegrateClosed(0,3,X2) << endl;
+
+    Medium *med = new Medium("antares water",1.);
     return 0;
 }
 
