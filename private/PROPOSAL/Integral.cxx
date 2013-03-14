@@ -20,42 +20,42 @@ using namespace std;
 //----------------------------------------------------------------------------------------------------//
 
 Integral::Integral()
-:maxSteps   (20)
-,romberg    (5)
-,precision  (1.e-6)
-,max        (1)
-,min        (0)
-,romberg4refine         (2)
-,powerOfSubstitution    (0)
-,randomDo   (false)
-,useLog     (false)
-,reverse    (false)
+:maxSteps_   (20)
+,romberg_    (5)
+,precision_  (1.e-6)
+,max_        (1)
+,min_        (0)
+,romberg4refine_         (2)
+,powerOfSubstitution_    (0)
+,randomDo_   (false)
+,useLog_     (false)
+,reverse_    (false)
 {
     int aux;
-    if(romberg<=0)
+    if(romberg_<=0)
     {
-        printf("Warning (in Integral/Integral/0): romberg = %i must be > 0, setting to 1",romberg);
-        romberg     =   1;
+        printf("Warning (in Integral/Integral/0): romberg = %i must be > 0, setting to 1",romberg_);
+        romberg_     =   1;
     }
 
-    if(maxSteps<=0)
+    if(maxSteps_<=0)
     {
-        printf("Warning (in Integral/Integral/1): maxSteps = %i must be > 0, setting to 1", maxSteps);
-        maxSteps    =   1;
+        printf("Warning (in Integral/Integral/1): maxSteps = %i must be > 0, setting to 1", maxSteps_);
+        maxSteps_    =   1;
     }
 
-    if(precision<=0)
+    if(precision_<=0)
     {
-        printf("Warning (in Integral/Integral/2): precision = %f must be > 0, setting to 1.e-6",precision);
-        precision   =   1.e-6;
+        printf("Warning (in Integral/Integral/2): precision = %f must be > 0, setting to 1.e-6",precision_);
+        precision_   =   1.e-6;
     }
 
-    iX.resize(maxSteps);
-    iY.resize(maxSteps);
+    iX_.resize(maxSteps_);
+    iY_.resize(maxSteps_);
 
-    aux=std::max(romberg, romberg4refine);
-    c.resize(aux);
-    d.resize(aux);
+    aux=std::max(romberg_, romberg4refine_);
+    c_.resize(aux);
+    d_.resize(aux);
 }
 
 //----------------------------------------------------------------------------//
@@ -74,13 +74,13 @@ Integral& Integral::operator=(const Integral &integral){
 //----------------------------------------------------------------------------//
 
 Integral::Integral(int  romberg, int maxSteps, double precision)
-:max        (1)
-,min        (0)
-,romberg4refine         (2)
-,powerOfSubstitution    (0)
-,randomDo   (false)
-,useLog     (false)
-,reverse    (false)
+:max_        (1)
+,min_        (0)
+,romberg4refine_         (2)
+,powerOfSubstitution_    (0)
+,randomDo_   (false)
+,useLog_     (false)
+,reverse_    (false)
 {
     int aux;
     if(romberg<=0)
@@ -101,16 +101,16 @@ Integral::Integral(int  romberg, int maxSteps, double precision)
         precision   =   1.e-6;
     }
 
-    this->romberg   =   romberg;
-    this->maxSteps  =   maxSteps;
-    this->precision =   precision;
+    this->romberg_   =   romberg;
+    this->maxSteps_  =   maxSteps;
+    this->precision_ =   precision;
 
-    iX.resize(maxSteps);
-    iY.resize(maxSteps);
+    iX_.resize(maxSteps_);
+    iY_.resize(maxSteps_);
 
-    aux=std::max(romberg, romberg4refine);
-    c.resize(aux);
-    d.resize(aux);
+    aux=std::max(romberg_, romberg4refine_);
+    c_.resize(aux);
+    d_.resize(aux);
 }
 
 //----------------------------------------------------------------------------//
@@ -119,28 +119,28 @@ Integral::Integral(int  romberg, int maxSteps, double precision)
 double Integral::Function(double x)
 {
     double result, t;
-    if(reverse)
+    if(reverse_)
     {
-        x       =   reverseX - x;
+        x       =   reverseX_ - x;
     }
 
-    if(powerOfSubstitution==0)
+    if(powerOfSubstitution_==0)
     {
         t       =   x;
         result  =   1;
     }
-    else if(powerOfSubstitution>0)
+    else if(powerOfSubstitution_>0)
     {
-        t       =   pow(x, -powerOfSubstitution);
-        result  =   powerOfSubstitution*(t/x);
+        t       =   pow(x, -powerOfSubstitution_);
+        result  =   powerOfSubstitution_*(t/x);
     }
     else
     {
-        t       =   -pow(-x, powerOfSubstitution);
-        result  =   -powerOfSubstitution*(t/x);
+        t       =   -pow(-x, powerOfSubstitution_);
+        result  =   -powerOfSubstitution_*(t/x);
     }
 
-    if(useLog)
+    if(useLog_)
     {
         t       =   exp(t);
         result  *=  t;
@@ -158,14 +158,14 @@ double Integral::Trapezoid(int n, double oldSum)
 
     if(n==1)
     {
-        return (Function(max)+Function(min))*(max-min)/2;
+        return (Function(max_)+Function(min_))*(max_-min_)/2;
     }
 
     n           /=  2;
-    stepSize    =   (max-min)/n;
+    stepSize    =   (max_-min_)/n;
     resultSum   =   0;
 
-    for(xStep=min+stepSize/2 ; xStep<max ; xStep+=stepSize)
+    for(xStep=min_+stepSize/2 ; xStep<max_ ; xStep+=stepSize)
     {
         resultSum   +=  Function(xStep);
     }
@@ -180,13 +180,13 @@ double Integral::Trapezoid3(int n, double oldSum){
 
     if(n==1)
     {
-        return (max-min)*Function((max+min)/2);
+        return (max_-min_)*Function((max_+min_)/2);
     }
 
-    stepSize    =   (max-min)/n;
+    stepSize    =   (max_-min_)/n;
     resultSum   =   0;
 
-    for(xStep=min+stepSize/2 ; xStep<max ; xStep+=stepSize)
+    for(xStep=min_+stepSize/2 ; xStep<max_ ; xStep+=stepSize)
     {
         resultSum   +=  Function(xStep);
         xStep       +=  2*stepSize;
@@ -207,19 +207,19 @@ double Integral::Trapezoid3S(int n, double oldSum, int stepNumber)
 
     if(n==1)
     {
-        return (max-min)*Function((max+min)/2);
+        return (max_-min_)*Function((max_+min_)/2);
     }
 
-    stepSize    =   (max-min)/n;
-    if(stepNumber>=romberg-1)
+    stepSize    =   (max_-min_)/n;
+    if(stepNumber>=romberg_-1)
     {
-        if(randomNumber>=0)
+        if(randomNumber_>=0)
         {
-            smallSum    =   randomNumber*oldSum/(1.5*stepSize);
+            smallSum    =   randomNumber_*oldSum/(1.5*stepSize);
         }
         else
         {
-            smallSum    =-  randomNumber/(1.5*stepSize);
+            smallSum    =-  randomNumber_/(1.5*stepSize);
             if(oldSum<0)
             {
                 smallSum    *=  -1;
@@ -228,13 +228,13 @@ double Integral::Trapezoid3S(int n, double oldSum, int stepNumber)
     }
     resultSum   =   0;
     flag        =   false;
-    for(xStep=min+stepSize/2 ; xStep<max ; xStep+=stepSize)
+    for(xStep=min_+stepSize/2 ; xStep<max_ ; xStep+=stepSize)
     {
         resultSum   +=  functionValue1=Function(xStep);
         xStep       +=  2*stepSize;
         resultSum   +=  functionValue2=Function(xStep);
 
-        if(!flag) if(stepNumber>=romberg-1) if((resultSum>=smallSum && smallSum>0) || (resultSum<=smallSum && smallSum<0)){
+        if(!flag) if(stepNumber>=romberg_-1) if((resultSum>=smallSum && smallSum>0) || (resultSum<=smallSum && smallSum<0)){
                 functionSum         =   functionValue1+functionValue2;
 
                 sumDifference       =   (smallSum-(resultSum-functionSum));
@@ -246,7 +246,7 @@ double Integral::Trapezoid3S(int n, double oldSum, int stepNumber)
                 bEq     =   (functionValue2 - 5*functionValue1)/2;
                 bEq2    =   bEq*bEq;
 
-                if(fabs(aEq*sumDifference)<precision*bEq2)
+                if(fabs(aEq*sumDifference)<precision_*bEq2)
                 {
                     approX  =   sumDifference*2/functionSum;
                 }
@@ -279,13 +279,13 @@ double Integral::Trapezoid3S(int n, double oldSum, int stepNumber)
         }
     }
 
-    if(stepNumber>=romberg-1)
+    if(stepNumber>=romberg_-1)
     {
             if(!flag)
             {
-                approX  =   max;
+                approX  =   max_;
             }
-            randomX =   approX;
+            randomX_ =   approX;
     }
 
     return oldSum/3+resultSum*stepSize;
@@ -301,31 +301,31 @@ void Integral::Interpolate(int start, double x)
     double aux, aux2, dx1, dx2;
 
     num =   0;
-    aux =   fabs(x-iX[start+0]);
+    aux =   fabs(x-iX_[start+0]);
 
-    for(i=0 ; i<romberg ; i++)
+    for(i=0 ; i<romberg_ ; i++)
     {
-        aux2    =   fabs(x-iX[start+i]);
+        aux2    =   fabs(x-iX_[start+i]);
         if(aux2<aux)
         {
             num =   i;
             aux =   aux2;
         }
-        c[i]    =   iY[start+i];
-        d[i]    =   iY[start+i];
+        c_[i]    =   iY_[start+i];
+        d_[i]    =   iY_[start+i];
     }
 
     if(num==0)
     {
         dd=true;
     }
-    else if(num==romberg-1)
+    else if(num==romberg_-1)
     {
         dd=false;
     }
     else
     {
-        if(fabs(x-iX[start+num-1]) > fabs(x-iX[start+num+1]))
+        if(fabs(x-iX_[start+num-1]) > fabs(x-iX_[start+num+1]))
         {
             dd=true;
         }
@@ -335,27 +335,27 @@ void Integral::Interpolate(int start, double x)
         }
     }
 
-    result  =   iY[start+num];
-    for(k=1 ; k<romberg ; k++)
+    result  =   iY_[start+num];
+    for(k=1 ; k<romberg_ ; k++)
     {
-        for(i=0 ; i<romberg-k ; i++)
+        for(i=0 ; i<romberg_-k ; i++)
         {
-            dx1     =   iX[start+i]-x;
-            dx2     =   iX[start+i+k]-x;
+            dx1     =   iX_[start+i]-x;
+            dx2     =   iX_[start+i+k]-x;
 
-            aux     =   c[i+1] - d[i];
+            aux     =   c_[i+1] - d_[i];
             aux2    =   dx1 - dx2;
 
             if(aux2!=0)
             {
                 aux     =   aux/aux2;
-                c[i]    =   dx1*aux;
-                d[i]    =   dx2*aux;
+                c_[i]    =   dx1*aux;
+                d_[i]    =   dx2*aux;
             }
             else
             {
-                c[i]    =   0;
-                d[i]    =   0;
+                c_[i]    =   0;
+                d_[i]    =   0;
             }
         }
 
@@ -364,27 +364,27 @@ void Integral::Interpolate(int start, double x)
             dd  =   true;
         }
 
-        if(num==romberg-k)
+        if(num==romberg_-k)
         {
             dd  =   false;
         }
 
         if(dd)
         {
-            error   =   c[num];
+            error   =   c_[num];
         }
         else
         {
             num--;
-            error   =   d[num];
+            error   =   d_[num];
         }
 
         dd      =   !dd;
         result  +=  error;
     }
 
-    integralError   =   error;
-    integralValue   =   result;
+    integralError_   =   error;
+    integralValue_   =   result;
 }
 
 //----------------------------------------------------------------------------//
@@ -398,25 +398,25 @@ double Integral::RombergIntegrateClosed()
     value   =   0;
     result  =   0;
 
-    for(int i=0 ; i<maxSteps ; i++)
+    for(int i=0 ; i<maxSteps_ ; i++)
     {
         result  =   Trapezoid(k, result);
-        iX[i]   =   n;
-        iY[i]   =   result;
+        iX_[i]   =   n;
+        iY_[i]   =   result;
 
-        if(i>=romberg-1)
+        if(i>=romberg_-1)
         {
-            Interpolate(i-(romberg-1), 0);
+            Interpolate(i-(romberg_-1), 0);
 
-            error   =   integralError;
-            value   =   integralValue;
+            error   =   integralError_;
+            value   =   integralValue_;
 
             if(value!=0)
             {
                 error   /=  value;
             }
 
-            if(fabs(error)<precision)
+            if(fabs(error)<precision_)
             {
                 return value;
             }
@@ -426,7 +426,7 @@ double Integral::RombergIntegrateClosed()
         n   =   n/4;
     }
 
-    printf("Warning (in Integral/rombergIntegrateClosed): Precision %f has not been reached after %i steps \n", precision, maxSteps);
+    printf("Warning (in Integral/rombergIntegrateClosed): Precision %f has not been reached after %i steps \n", precision_, maxSteps_);
     return value;
 }
 
@@ -443,19 +443,19 @@ double Integral::RombergIntegrateOpened()
     value   =   0;
     result  =   0;
 
-    for(i=0 ; i<maxSteps ; i++)
+    for(i=0 ; i<maxSteps_ ; i++)
     {
-        if(randomNumber==0 || randomNumber==1)
+        if(randomNumber_==0 || randomNumber_==1)
         {
             result  =   Trapezoid3(k, result);
 
-            if(randomNumber==0)
+            if(randomNumber_==0)
             {
-                randomX=min;
+                randomX_=min_;
             }
             else
             {
-                randomX=max;
+                randomX_=max_;
             }
         }
         else
@@ -463,20 +463,20 @@ double Integral::RombergIntegrateOpened()
             result=Trapezoid3S(k, result, i);
         }
 
-        iX[i]   =   n;
-        iY[i]   =   result;
-        if(i>=romberg-1)
+        iX_[i]   =   n;
+        iY_[i]   =   result;
+        if(i>=romberg_-1)
         {
-            Interpolate(i-(romberg-1), 0);
-            error=integralError;
-            value=integralValue;
+            Interpolate(i-(romberg_-1), 0);
+            error=integralError_;
+            value=integralValue_;
 
             if(value!=0)
             {
                 error/=value;
             }
 
-            if(fabs(error)<precision)
+            if(fabs(error)<precision_)
             {
                 return value;
             }
@@ -486,7 +486,7 @@ double Integral::RombergIntegrateOpened()
         n   /=  9;
     }
 
-    printf("Warning (in Integral/rombergIntegrateOpened/0): Precision %f has not been reached after %i steps \n", precision, maxSteps);
+    printf("Warning (in Integral/rombergIntegrateOpened/0): Precision %f has not been reached after %i steps \n", precision_, maxSteps_);
     return value;
 }
 
@@ -503,20 +503,20 @@ double Integral::RombergIntegrateOpened(double bigValue)
     value   =   0;
     result  =   0;
 
-    for(i=0 ; i<maxSteps ; i++)
+    for(i=0 ; i<maxSteps_ ; i++)
     {
         result  =   Trapezoid3(k, result);
-        iX[i]   =   n;
-        iY[i]   =   result;
-        if(i>=romberg-1)
+        iX_[i]   =   n;
+        iY_[i]   =   result;
+        if(i>=romberg_-1)
         {
-            Interpolate(i-(romberg-1), 0);
+            Interpolate(i-(romberg_-1), 0);
 
-            error   =   integralError;
-            value   =   integralValue;
+            error   =   integralError_;
+            value   =   integralValue_;
             error   /=  bigValue;
 
-            if(fabs(error)<precision)
+            if(fabs(error)<precision_)
             {
                 return value;
             }
@@ -525,7 +525,7 @@ double Integral::RombergIntegrateOpened(double bigValue)
         n   /=  9;
     }
 
-    printf("Warning (in Integral/rombergIntegrateOpened/1): Precision %f has not been reached after %i steps \n", precision, maxSteps);
+    printf("Warning (in Integral/rombergIntegrateOpened/1): Precision %f has not been reached after %i steps \n", precision_, maxSteps_);
     return value;
 }
 
@@ -535,8 +535,8 @@ double Integral::IntegrateClosed(double min, double max, boost::function<double 
 {
     double aux;
 
-    reverse =   false;
-    useLog  =   false;
+    reverse_ =   false;
+    useLog_  =   false;
 
     if(fabs(max-min)<=fabs(min)*COMPUTER_PRECISION)
     {
@@ -552,11 +552,11 @@ double Integral::IntegrateClosed(double min, double max, boost::function<double 
         aux=1;
     }
 
-    this->min           =   min;
-    this->max           =   max;
+    this->min_           =   min;
+    this->max_           =   max;
     integrand_          =   integrand;
-    powerOfSubstitution =   0;
-    randomDo            =   false;
+    powerOfSubstitution_ =   0;
+    randomDo_            =   false;
 
     return aux*RombergIntegrateClosed();
 }
@@ -567,8 +567,8 @@ double Integral::IntegrateOpened(double min, double max, boost::function<double 
 {
     double aux;
 
-    reverse =   false;
-    useLog  =   false;
+    reverse_ =   false;
+    useLog_  =   false;
 
     if(fabs(max-min)<=fabs(min)*COMPUTER_PRECISION)
     {
@@ -584,12 +584,12 @@ double Integral::IntegrateOpened(double min, double max, boost::function<double 
         aux=1;
     }
 
-    this->min           =   min;
-    this->max           =   max;
+    this->min_           =   min;
+    this->max_           =   max;
     this->integrand_    =   integrand;
-    powerOfSubstitution =   0;
-    randomNumber        =   0;
-    randomDo            =   false;
+    powerOfSubstitution_ =   0;
+    randomNumber_        =   0;
+    randomDo_            =   false;
 
     return aux*RombergIntegrateOpened();
 }
@@ -600,62 +600,62 @@ double Integral::IntegrateOpened(double min, double max, boost::function<double 
 {
     double aux, result;
 
-    reverse =   false;
-    useLog  =   false;
+    reverse_ =   false;
+    useLog_  =   false;
 
     if(fabs(max-min)<=fabs(min)*COMPUTER_PRECISION)
     {
-        this->min   =   min;
-        this->max   =   max;
-        randomDo    =   true;
+        this->min_   =   min;
+        this->max_   =   max;
+        randomDo_    =   true;
         return 0;
     }
     else if(min>max)
     {
         SWAP(min,max,double);
         aux     =   -1;
-        reverse =   !reverse;
+        reverse_ =   !reverse_;
     }
     else
     {
         aux     =   1;
     }
 
-    this->min   =   min;
-    this->max   =   max;
+    this->min_   =   min;
+    this->max_   =   max;
 
-    if(reverse)
+    if(reverse_)
     {
-        reverseX    =   this->min + this->max;
+        reverseX_    =   this->min_ + this->max_;
     }
 
     this->integrand_    =   integrand;
-    powerOfSubstitution =   0;
+    powerOfSubstitution_ =   0;
 
     if(randomRatio>1)
     {
         randomRatio =   1;
     }
 
-    randomNumber    =   randomRatio;
+    randomNumber_    =   randomRatio;
     result          =   RombergIntegrateOpened();
 
-    if(randomNumber<0)
+    if(randomNumber_<0)
     {
-        randomNumber    /=  -fabs(result);
+        randomNumber_    /=  -fabs(result);
 
-        if(randomNumber>1)
+        if(randomNumber_>1)
         {
-            randomNumber=1;
+            randomNumber_=1;
         }
 
-        if(randomNumber<0)
+        if(randomNumber_<0)
         {
-            randomNumber=0;
+            randomNumber_=0;
         }
     }
-    savedResult =   result;
-    randomDo    =   true;
+    savedResult_ =   result;
+    randomDo_    =   true;
 
     return aux*result;
 }
@@ -666,8 +666,8 @@ double Integral::IntegrateWithSubstitution(double min, double max, boost::functi
 {
     double aux;
 
-    reverse =   false;
-    useLog  =   false;
+    reverse_ =   false;
+    useLog_  =   false;
 
     if(fabs(max-min)<=fabs(min)*COMPUTER_PRECISION)
     {
@@ -687,13 +687,13 @@ double Integral::IntegrateWithSubstitution(double min, double max, boost::functi
     {
         if(max>0 && min>0)
         {
-            this->min   =   pow(max, -1/powerOfSubstitution);
-            this->max   =   pow(min, -1/powerOfSubstitution);
+            this->min_   =   pow(max, -1/powerOfSubstitution);
+            this->max_   =   pow(min, -1/powerOfSubstitution);
         }
         else if(max>0)
         {
-            this->min   =   0;
-            this->max   =   pow(max, -1/powerOfSubstitution);
+            this->min_   =   0;
+            this->max_   =   pow(max, -1/powerOfSubstitution);
             aux         =   -aux;
         }
         else
@@ -704,12 +704,12 @@ double Integral::IntegrateWithSubstitution(double min, double max, boost::functi
     else if(powerOfSubstitution<0)
     {
         if(max<0 && min<0){
-            this->min = -pow(-max, 1/powerOfSubstitution);
-            this->max = -pow(-min, 1/powerOfSubstitution);
+            this->min_ = -pow(-max, 1/powerOfSubstitution);
+            this->max_ = -pow(-min, 1/powerOfSubstitution);
         }
         else if(min<0){
-            this->min = -pow(-min, 1/powerOfSubstitution);
-            this->max=0;
+            this->min_ = -pow(-min, 1/powerOfSubstitution);
+            this->max_=0;
             aux=-aux;
         }
         else
@@ -719,14 +719,14 @@ double Integral::IntegrateWithSubstitution(double min, double max, boost::functi
     }
     else
     {
-            this->min   =   min;
-            this->max   =   max;
+            this->min_   =   min;
+            this->max_   =   max;
     }
 
     this->integrand_            =   integrand;
-    this->powerOfSubstitution   =   powerOfSubstitution;
-    randomNumber                =   0;
-    randomDo                    =   false;
+    this->powerOfSubstitution_   =   powerOfSubstitution;
+    randomNumber_                =   0;
+    randomDo_                    =   false;
 
     return aux*RombergIntegrateOpened();
 }
@@ -737,21 +737,21 @@ double Integral::IntegrateWithSubstitution(double min, double max, boost::functi
 {
     double aux, result;
 
-    reverse =   false;
-    useLog  =   false;
+    reverse_ =   false;
+    useLog_  =   false;
 
     if(fabs(max-min)<=fabs(min)*COMPUTER_PRECISION)
     {
-        this->min   =   min;
-        this->max   =   max;
-        randomDo    =   true;
+        this->min_   =   min;
+        this->max_   =   max;
+        randomDo_    =   true;
         return 0;
     }
     else if(min>max)
     {
         SWAP(min,max,double);
         aux     =   -1;
-        reverse =   !reverse;
+        reverse_ =   !reverse_;
     }
     else
     {
@@ -762,14 +762,14 @@ double Integral::IntegrateWithSubstitution(double min, double max, boost::functi
     {
         if(max>0 && min>0)
         {
-            this->min   =   pow(max, -1/powerOfSubstitution);
-            this->max   =   pow(min, -1/powerOfSubstitution);
-            reverse     =   !reverse;
+            this->min_   =   pow(max, -1/powerOfSubstitution);
+            this->max_   =   pow(min, -1/powerOfSubstitution);
+            reverse_     =   !reverse_;
         }
         else if(max>0)
         {
-            this->min   =   0;
-            this->max   =   pow(max, -1/powerOfSubstitution);
+            this->min_   =   0;
+            this->max_   =   pow(max, -1/powerOfSubstitution);
             aux         =   -aux;
         }
         else
@@ -781,14 +781,14 @@ double Integral::IntegrateWithSubstitution(double min, double max, boost::functi
     {
         if(max<0 && min<0)
         {
-            this->min   =   -pow(-max, 1/powerOfSubstitution);
-            this->max   =   -pow(-min, 1/powerOfSubstitution);
-            reverse     =   !reverse;
+            this->min_   =   -pow(-max, 1/powerOfSubstitution);
+            this->max_   =   -pow(-min, 1/powerOfSubstitution);
+            reverse_     =   !reverse_;
         }
         else if(min<0)
         {
-            this->min   =   -pow(-min, 1/powerOfSubstitution);
-            this->max   =   0;
+            this->min_   =   -pow(-min, 1/powerOfSubstitution);
+            this->max_   =   0;
             aux         =   -aux;
         }
         else
@@ -798,43 +798,43 @@ double Integral::IntegrateWithSubstitution(double min, double max, boost::functi
     }
     else
     {
-            this->min   =   min;
-            this->max   =   max;
+            this->min_   =   min;
+            this->max_   =   max;
     }
 
-    if(reverse)
+    if(reverse_)
     {
-        reverseX    =   this->min + this->max;
+        reverseX_    =   this->min_ + this->max_;
     }
 
     this->integrand_            =   integrand;
-    this->powerOfSubstitution   =   powerOfSubstitution;
+    this->powerOfSubstitution_   =   powerOfSubstitution;
 
     if(randomRatio>1)
     {
         randomRatio =   1;
     }
 
-    randomNumber    =   randomRatio;
+    randomNumber_    =   randomRatio;
     result          =   RombergIntegrateOpened();
 
-    if(randomNumber<0)
+    if(randomNumber_<0)
     {
-            randomNumber    /=  -fabs(result);
+            randomNumber_    /=  -fabs(result);
 
-            if(randomNumber>1)
+            if(randomNumber_>1)
             {
-                randomNumber    =   1;
+                randomNumber_    =   1;
             }
 
-            if(randomNumber<0)
+            if(randomNumber_<0)
             {
-                randomNumber    =   0;
+                randomNumber_    =   0;
             }
     }
 
-    savedResult =   result;
-    randomDo    =   true;
+    savedResult_ =   result;
+    randomDo_    =   true;
 
     return aux*result;
 }
@@ -848,15 +848,15 @@ void Integral::RefineUpperLimit(double result)
     double deltaX, deltaOld, currentX, aux;
     double xlow, xhi, flow, fhi;
 
-    if(randomNumber==0 || randomNumber==1)
+    if(randomNumber_==0 || randomNumber_==1)
     {
         return;
     }
 
-    xlow    =   min;
-    xhi     =   max;
-    flow    =   -randomNumber*result;
-    fhi     =   (1-randomNumber)*result;
+    xlow    =   min_;
+    xhi     =   max_;
+    flow    =   -randomNumber_*result;
+    fhi     =   (1-randomNumber_)*result;
 
     if(flow*fhi>0)
     {
@@ -870,27 +870,27 @@ void Integral::RefineUpperLimit(double result)
             SWAP(flow,fhi,double);
     }
 
-    deltaX      =   max-min;
-    deltaOld    =   max-min;
+    deltaX      =   max_-min_;
+    deltaOld    =   max_-min_;
 
-    if(randomX<min || randomX>max)
+    if(randomX_<min_ || randomX_>max_)
     {
-        randomX =   (min + max)/2;
+        randomX_ =   (min_ + max_)/2;
     }
 
-    currentX        =   randomX;
-    rombergStore    =   romberg;
-    minStore        =   min;
-    maxStore        =   max;
-    max             =   randomX;
+    currentX        =   randomX_;
+    rombergStore    =   romberg_;
+    minStore        =   min_;
+    maxStore        =   max_;
+    max_             =   randomX_;
 
-    functionValue   =   RombergIntegrateOpened(result) - randomNumber*result;
+    functionValue   =   RombergIntegrateOpened(result) - randomNumber_*result;
 
-    romberg =   romberg4refine;
+    romberg_ =   romberg4refine_;
     f       =   functionValue;
     df      =   Function(currentX);
 
-    for(i=0 ; i<maxSteps ; i++)
+    for(i=0 ; i<maxSteps_ ; i++)
     {
         if(f<0)
         {
@@ -929,25 +929,25 @@ void Integral::RefineUpperLimit(double result)
 
         if(df==0)
         {
-            if(fabs(deltaX)<precision*(maxStore-minStore))
+            if(fabs(deltaX)<precision_*(maxStore-minStore))
             {
                 break;
             }
         }
         else
         {
-            if(fabs(df*deltaX)<precision*fabs(result))
+            if(fabs(df*deltaX)<precision_*fabs(result))
             {
                 break;
             }
         }
 
-        min =   randomX;
-        max =   currentX;
+        min_ =   randomX_;
+        max_ =   currentX;
 
-        if(min>max)
+        if(min_>max_)
         {
-            SWAP(min,max,double);
+            SWAP(min_,max_,double);
             aux=-1;
         }
         else
@@ -959,50 +959,50 @@ void Integral::RefineUpperLimit(double result)
         df  =   Function(currentX);
     }
 
-    if(i==maxSteps)
+    if(i==maxSteps_)
     {
-        printf("Warning (in Integral/refineUpperLimit): Precision %f has not been reached after %i steps \n", precision, maxSteps);
+        printf("Warning (in Integral/refineUpperLimit): Precision %f has not been reached after %i steps \n", precision_, maxSteps_);
     }
 
-    randomX =   currentX;
-    romberg =   rombergStore;
-    min     =   minStore;
-    max     =   maxStore;
+    randomX_ =   currentX;
+    romberg_ =   rombergStore;
+    min_     =   minStore;
+    max_     =   maxStore;
 }
 
 //----------------------------------------------------------------------------//
 
 double Integral::GetUpperLimit()
 {
-    if(randomDo)
+    if(randomDo_)
     {
-            if(fabs(max-min)<=fabs(min)*COMPUTER_PRECISION)
+            if(fabs(max_-min_)<=fabs(min_)*COMPUTER_PRECISION)
             {
-                return min;
+                return min_;
             }
 
-            RefineUpperLimit(savedResult);
+            RefineUpperLimit(savedResult_);
 
-            if(reverse)
+            if(reverse_)
             {
-                randomX =   reverseX - randomX;
+                randomX_ =   reverseX_ - randomX_;
             }
 
-            if(powerOfSubstitution>0)
+            if(powerOfSubstitution_>0)
             {
-                randomX =   pow(randomX, -powerOfSubstitution);
+                randomX_ =   pow(randomX_, -powerOfSubstitution_);
             }
-            else if(powerOfSubstitution<0)
+            else if(powerOfSubstitution_<0)
             {
-                randomX =   -pow(-randomX, powerOfSubstitution);
-            }
-
-            if(useLog)
-            {
-                randomX =   exp(randomX);
+                randomX_ =   -pow(-randomX_, powerOfSubstitution_);
             }
 
-            return randomX;
+            if(useLog_)
+            {
+                randomX_ =   exp(randomX_);
+            }
+
+            return randomX_;
     }
     else{
         printf("Error (in Integral/getUpperLimit): no previous call to upper limit functions was made");
@@ -1016,8 +1016,8 @@ double Integral::IntegrateWithLog(double min, double max, boost::function<double
 {
     double aux;
 
-    reverse =   false;
-    useLog  =   true;
+    reverse_ =   false;
+    useLog_  =   true;
 
     if(fabs(max-min)<=fabs(min)*COMPUTER_PRECISION)
     {
@@ -1033,12 +1033,12 @@ double Integral::IntegrateWithLog(double min, double max, boost::function<double
         aux=1;
     }
 
-    this->min           =   log(min);
-    this->max           =   log(max);
+    this->min_           =   log(min);
+    this->max_           =   log(max);
     this->integrand_    =   integrand;
-    powerOfSubstitution =   0;
-    randomNumber        =   0;
-    randomDo            =   false;
+    powerOfSubstitution_ =   0;
+    randomNumber_        =   0;
+    randomDo_            =   false;
 
     return aux*RombergIntegrateOpened();
 }
@@ -1049,14 +1049,14 @@ double Integral::IntegrateWithLog(double min, double max, boost::function<double
 {
     double aux, result;
 
-    reverse =   false;
-    useLog  =   true;
+    reverse_ =   false;
+    useLog_  =   true;
 
     if(fabs(max-min)<=fabs(min)*COMPUTER_PRECISION)
     {
-        this->min   =   min;
-        this->max   =   max;
-        randomDo    =   true;
+        this->min_   =   min;
+        this->max_   =   max;
+        randomDo_    =   true;
 
         return 0;
     }
@@ -1064,49 +1064,49 @@ double Integral::IntegrateWithLog(double min, double max, boost::function<double
     {
         SWAP(min,max,double);
         aux     =   -1;
-        reverse =   !reverse;
+        reverse_ =   !reverse_;
     }
     else
     {
         aux=1;
     }
 
-    this->min   =   log(min);
-    this->max   =   log(max);
+    this->min_   =   log(min);
+    this->max_   =   log(max);
 
-    if(reverse)
+    if(reverse_)
     {
-        reverseX    =   this->min + this->max;
+        reverseX_    =   this->min_ + this->max_;
     }
 
     this->integrand_    =   integrand;
-    powerOfSubstitution =   0;
+    powerOfSubstitution_ =   0;
 
     if(randomRatio>1)
     {
         randomRatio=1;
     }
 
-    randomNumber        =   randomRatio;
+    randomNumber_        =   randomRatio;
     result              =   RombergIntegrateOpened();
 
-    if(randomNumber<0)
+    if(randomNumber_<0)
     {
-        randomNumber        /=  -fabs(result);
+        randomNumber_        /=  -fabs(result);
 
-        if(randomNumber>1)
+        if(randomNumber_>1)
         {
-            randomNumber    =   1;
+            randomNumber_    =   1;
         }
 
-        if(randomNumber<0)
+        if(randomNumber_<0)
         {
-            randomNumber    =   0;
+            randomNumber_    =   0;
         }
     }
 
-    savedResult =   result;
-    randomDo    =   true;
+    savedResult_ =   result;
+    randomDo_    =   true;
 
     return aux*result;
 }
@@ -1117,8 +1117,8 @@ double Integral::IntegrateWithLogSubstitution(double min, double max, boost::fun
 {
     double aux;
 
-    reverse =   false;
-    useLog  =   true;
+    reverse_ =   false;
+    useLog_  =   true;
 
     if(fabs(max-min)<=fabs(min)*COMPUTER_PRECISION)
     {
@@ -1143,12 +1143,12 @@ double Integral::IntegrateWithLogSubstitution(double min, double max, boost::fun
     {
         if(max>1 && min>1)
         {
-            this->min   =   pow( log(max), -1/powerOfSubstitution);
-            this->max   =   pow( log(min), -1/powerOfSubstitution);
+            this->min_   =   pow( log(max), -1/powerOfSubstitution);
+            this->max_   =   pow( log(min), -1/powerOfSubstitution);
         }
         else if(max>1){
-            this->min   =   0;
-            this->max   =   pow( log(max), -1/powerOfSubstitution);
+            this->min_   =   0;
+            this->max_   =   pow( log(max), -1/powerOfSubstitution);
             aux         =   -aux;
         }
         else
@@ -1160,13 +1160,13 @@ double Integral::IntegrateWithLogSubstitution(double min, double max, boost::fun
     {
         if(max<1 && min<1)
         {
-            this->min   =   -pow(- log(max), 1/powerOfSubstitution);
-            this->max   =   -pow(- log(min), 1/powerOfSubstitution);
+            this->min_   =   -pow(- log(max), 1/powerOfSubstitution);
+            this->max_   =   -pow(- log(min), 1/powerOfSubstitution);
         }
         else if(min<1)
         {
-            this->min   =   -pow(- log(min), 1/powerOfSubstitution);
-            this->max   =   0;
+            this->min_   =   -pow(- log(min), 1/powerOfSubstitution);
+            this->max_   =   0;
             aux         =   -aux;
         }
         else
@@ -1176,14 +1176,14 @@ double Integral::IntegrateWithLogSubstitution(double min, double max, boost::fun
     }
     else
     {
-        this->min   =   log(min);
-        this->max   =   log(max);
+        this->min_   =   log(min);
+        this->max_   =   log(max);
     }
 
     this->integrand_            =   integrand;
-    this->powerOfSubstitution   =   powerOfSubstitution;
-    randomNumber                =   0;
-    randomDo                    =   false;
+    this->powerOfSubstitution_   =   powerOfSubstitution;
+    randomNumber_                =   0;
+    randomDo_                    =   false;
 
     return aux*RombergIntegrateOpened();
 }

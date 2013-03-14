@@ -12,6 +12,8 @@
 
 #include <vector>
 #include <string>
+#include <boost/bind.hpp>
+#include <boost/function.hpp>
 
 class Medium
 {
@@ -387,7 +389,6 @@ public:
 
     ///@brief Crush this Medium.
     ~Medium();
-
 
 };
 

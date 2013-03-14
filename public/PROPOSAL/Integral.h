@@ -48,33 +48,33 @@ class Integral{
 
 private:
 
-    int     maxSteps;
-    int     romberg;
-    double  precision;
-    double  max, min;
+    int     maxSteps_;
+    int     romberg_;
+    double  precision_;
+    double  max_, min_;
 
 
-    double  integralValue;
-    double  integralError;
+    double  integralValue_;
+    double  integralError_;
 
-    std::vector<double> iX;
-    std::vector<double> iY;
+    std::vector<double> iX_;
+    std::vector<double> iY_;
 
-    std::vector<double> c;
-    std::vector<double> d;
+    std::vector<double> c_;
+    std::vector<double> d_;
 
     boost::function<double (double)> integrand_;
 
 
-    int     romberg4refine;		// set to 2 in constructor
-    double  powerOfSubstitution;
-    bool    randomDo;			// set to false in Constructor
-    bool    useLog;			// set to false in Constructor
-    double  randomNumber;
-    double  randomX;
-    bool    reverse;			// set to false in Constructor
-    double  reverseX;
-    double  savedResult;
+    int     romberg4refine_;		// set to 2 in constructor
+    double  powerOfSubstitution_;
+    bool    randomDo_;			// set to false in Constructor
+    bool    useLog_;			// set to false in Constructor
+    double  randomNumber_;
+    double  randomX_;
+    bool    reverse_;			// set to false in Constructor
+    double  reverseX_;
+    double  savedResult_;
 
     //------------------------------------------------------------------------//
 
@@ -336,7 +336,7 @@ public:
 
     double Get_maxSteps ()
     {
-        return maxSteps;
+        return maxSteps_;
     }
 
 // Setters

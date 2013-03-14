@@ -26,7 +26,7 @@ int main(){
     cout.precision(16);
     cout << "baslsadkadsadasdh" << endl;
     double min, max;
-    min = 0;
+    min = 1;
     max = 3;
     int N = 10000000;
     cout << "min: " << min << endl;

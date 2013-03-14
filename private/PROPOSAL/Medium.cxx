@@ -127,7 +127,7 @@ void Medium::Inita(int i)
 }
 
 //----------------------------------------------------------------------------//
-
+typedef double (*pointer_to_func)(double);
 
 void Medium::Initr()
 {
@@ -168,7 +168,6 @@ void Medium::Initr()
     {
         mN_.resize(numCompontents_);
         Integral *integral = new Integral(IROMB, IMAXS, IPREC);
-
         for(i=0; i<numCompontents_; i++)
         {
             if(nucCharge_.at(i)!=1)
