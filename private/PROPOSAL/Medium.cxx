@@ -7,10 +7,11 @@
 *   \author Jan-Hendrik Koehne
 */
 
-
-#include "PROPOSAL/Medium.h"
 #include <cmath>
+#include "PROPOSAL/Medium.h"
 #include "PROPOSAL/methods.h"
+#include "PROPOSAL/Integral.h"
+
 
 using namespace std;
 
@@ -37,7 +38,7 @@ Medium::~Medium(){}
 //----------------------------------------------------------------------------//
 
 
-Medium::Medium(string w, double ecut, double vcut, double rho)
+Medium::Medium(string w, double rho)
 {
     name_   =   w;
 
@@ -51,70 +52,67 @@ Medium::Medium(string w, double ecut, double vcut, double rho)
         this->rho_  =   1;
     }
 
-    if(equalsIgnoreCase(w,"water"))
+    if(EqualsIgnoreCase(w,"water"))
     {
-        initWater();
+        InitWater();
     }
-    else if(equalsIgnoreCase(w,"ice"))
+    else if(EqualsIgnoreCase(w,"ice"))
     {
-        initIce();
+        InitIce();
     }
-    else if(equalsIgnoreCase(w,"salt"))
+    else if(EqualsIgnoreCase(w,"salt"))
     {
-        initSalt();
+        InitSalt();
     }
-    else if(equalsIgnoreCase(w,"standard rock"))
+    else if(EqualsIgnoreCase(w,"standard rock"))
     {
-        initStandardrock();
+        InitStandardrock();
     }
-    else if(equalsIgnoreCase(w,"frejus rock"))
+    else if(EqualsIgnoreCase(w,"frejus rock"))
     {
-        initFrejusrock();
+        InitFrejusrock();
     }
-    else if(equalsIgnoreCase(w,"iron"))
+    else if(EqualsIgnoreCase(w,"iron"))
     {
-        initIron();
+        InitIron();
     }
-    else if(equalsIgnoreCase(w,"hydrogen"))
+    else if(EqualsIgnoreCase(w,"hydrogen"))
     {
-        initHydrogen();
+        InitHydrogen();
     }
-    else if(equalsIgnoreCase(w,"lead"))
+    else if(EqualsIgnoreCase(w,"lead"))
     {
-        initLead();
+        InitLead();
     }
-    else if(equalsIgnoreCase(w,"uranium"))
+    else if(EqualsIgnoreCase(w,"uranium"))
     {
-        initUranium();
+        InitUranium();
     }
-    else if(equalsIgnoreCase(w,"air"))
+    else if(EqualsIgnoreCase(w,"air"))
     {
-        initAir();
+        InitAir();
     }
-    else if(equalsIgnoreCase(w,"mineral oil"))
+    else if(EqualsIgnoreCase(w,"mineral oil"))
     {
-        initParaffin();
+        InitParaffin();
     }
-    else if(equalsIgnoreCase(w,"antares water"))
+    else if(EqualsIgnoreCase(w,"antares water"))
     {
-        initAntaresWater();
+        InitAntaresWater();
     }
     else
     {
         printf("Warning (in Medium/Medium): unknown medium: defaulting to water");
         name_   =   "water";
-        initWater();
+        InitWater();
     }
 
-    this->ecut_ =   ecut;
-    this->vcut_ =   vcut;
-    vCut_       =   1.;
 }
 
 
 //----------------------------------------------------------------------------//
 
-void Medium::inita(int i)
+void Medium::Inita(int i)
 {
     numCompontents_ =   i;
 
@@ -124,13 +122,13 @@ void Medium::inita(int i)
     logConstant_.resize(numCompontents_);
     bPrime_.resize(numCompontents_);
     M_.resize(numCompontents_);
-    E_.resize(numCompontents_);
+    elementName_.resize(numCompontents_);
 }
 
 //----------------------------------------------------------------------------//
 
 
-void Medium::initr()
+void Medium::Initr()
 {
     int i;
     bool flag       =   false;
@@ -139,7 +137,7 @@ void Medium::initr()
     double aux3     =   0;
     massDensity_    *=  this->rho_;
 
-    for(i=0; i<numCompontents_; i++)
+    for(i = 0 ; i < numCompontents_ ; i++)
     {
         aux1                +=  atomInMolecule_.at(i)*nucCharge_.at(i);
         aux2                +=  atomInMolecule_.at(i)*atomicNum_.at(i);
@@ -147,7 +145,8 @@ void Medium::initr()
         SetLogConstant(i);
         SetBPrime(i);
 
-        M_.at(i)            =   (nucCharge_.at(i)*MP + (atomicNum_.at(i) - nucCharge_.at(i))*MN)/atomicNum_.at(i);
+        M_.at(i)            =   (nucCharge_.at(i)*MP + (atomicNum_.at(i) - nucCharge_.at(i))*MN)
+                                /atomicNum_.at(i);
         aux3                +=  atomInMolecule_.at(i)*atomicNum_.at(i)*M_.at(i);
 
         if(nucCharge_.at(i)!=1)
@@ -163,12 +162,11 @@ void Medium::initr()
     MM_             =   aux3/aux2;
     C1_             =   2*LOG10;
     r_              =   1.31;                   // only for ice - change if needed (sea water: 1.35)
-    ecut_           =   ME/sqrt(1-1/(r_*r_));   // in order to emit Cerenkov photons
 
     if(flag)
     {
         mN_.resize(numCompontents_);
-        Integral *integral_ = new Integral(IROMB, IMAXS, IPREC);
+        Integral *integral = new Integral(IROMB, IMAXS, IPREC);
 
         for(i=0; i<numCompontents_; i++)
         {
@@ -176,9 +174,13 @@ void Medium::initr()
             {
                 r0_         =   pow(atomicNum_.at(i), 1./3);
                 r0_         =   1.12*r0_ - 0.86/r0_;
-                mN_.at(i)   =   1 - 4*PI*0.17*integral_->integrateWithSubstitution(r0_ , -1.0, this , 2.0)/atomicNum_.at(i);
+                mN_.at(i)   =   1 - 4*PI*0.17*integral->IntegrateWithSubstitution(r0_ , -1.0, FunctionToIntegral , 2.0)
+                                /atomicNum_.at(i);
             }
         }
+
+        delete integral;
+
     }
 }
 
@@ -186,18 +188,18 @@ void Medium::initr()
 
 void Medium::SetLogConstant(int i)
 {
-    int z   =   roundValue(nucCharge_.at(i));
+    int z   =   RoundValue(nucCharge_.at(i));
     switch(z)
     {
-        case 1: logConstant_.at(i) =  202.4;
-        case 2: logConstant_.at(i) =  151.9;
-        case 3: logConstant_.at(i) =  159.9;
-        case 4: logConstant_.at(i) =  172.3;
-        case 5: logConstant_.at(i) =  177.9;
-        case 6: logConstant_.at(i) =  178.3;
-        case 7: logConstant_.at(i) =  176.6;
-        case 8: logConstant_.at(i) =  173.4;
-        case 9: logConstant_.at(i) =  170.0;
+        case 1: logConstant_.at(i)  =  202.4;
+        case 2: logConstant_.at(i)  =  151.9;
+        case 3: logConstant_.at(i)  =  159.9;
+        case 4: logConstant_.at(i)  =  172.3;
+        case 5: logConstant_.at(i)  =  177.9;
+        case 6: logConstant_.at(i)  =  178.3;
+        case 7: logConstant_.at(i)  =  176.6;
+        case 8: logConstant_.at(i)  =  173.4;
+        case 9: logConstant_.at(i)  =  170.0;
         case 10: logConstant_.at(i) =  165.8;
         case 11: logConstant_.at(i) =  165.8;
         case 12: logConstant_.at(i) =  167.1;
@@ -229,7 +231,7 @@ void Medium::SetLogConstant(int i)
 
 void Medium::SetBPrime(int i)
 {
-    int z   =   roundValue(nucCharge_.at(i));
+    int z   =   RoundValue(nucCharge_.at(i));
     switch(z)
     {
         case 1: bPrime_.at(i)  =  446;
@@ -243,12 +245,12 @@ void Medium::SetBPrime(int i)
 * initialize water
 */
 
-void Medium::initWater()
+void Medium::InitWater()
 {
-    inita(2);
+    Inita(2);
 
-    E_.at(0)                =   "H";
-    E_.at(1)                =   "O";
+    elementName_.at(0)                =   "H";
+    elementName_.at(1)                =   "O";
     nucCharge_.at(0)        =   1; // H
     nucCharge_.at(1)        =   8; // O
     atomicNum_.at(0)        =   1.00794;
@@ -264,7 +266,7 @@ void Medium::initWater()
     d0_                     =   0;
     massDensity_            =   1.000;
 
-    initr();
+    Initr();
 }
 
 //----------------------------------------------------------------------------//
@@ -273,12 +275,12 @@ void Medium::initWater()
 * initialize ice
 */
 
-void Medium::initIce()
+void Medium::InitIce()
 {
-    inita(2);
+    Inita(2);
 
-    E_.at(0)                =   "H";
-    E_.at(1)                =   "O";
+    elementName_.at(0)      =   "H";
+    elementName_.at(1)      =   "O";
     nucCharge_.at(0)        =   1; // H
     nucCharge_.at(1)        =   8; // O
     atomicNum_.at(0)        =   1.00794;
@@ -294,7 +296,7 @@ void Medium::initIce()
     d0_                     =   0;
     massDensity_            =   0.917;
 
-    initr();
+    Initr();
 }
 
 //----------------------------------------------------------------------------//
@@ -303,12 +305,12 @@ void Medium::initIce()
 * initialize salt (added by Ped)
 */
 
-void Medium::initSalt()
+void Medium::InitSalt()
 {
-    inita(2);
+    Inita(2);
 
-    E_.at(0)                =   "Na";
-    E_.at(1)                =   "Cl";
+    elementName_.at(0)      =   "Na";
+    elementName_.at(1)      =   "Cl";
     nucCharge_.at(0)        =   11;
     nucCharge_.at(1)        =   17;
     atomicNum_.at(0)        =   22.98977;
@@ -332,7 +334,7 @@ void Medium::initSalt()
     d0_                     =   0;
     massDensity_            =   2.323; // Solid halite density
 
-    initr();
+    Initr();
 }
 
 //----------------------------------------------------------------------------//
@@ -341,13 +343,13 @@ void Medium::initSalt()
 * initialize standard rock
 */
 
-void Medium::initStandardrock()
+void Medium::InitStandardrock()
 {
-    inita(1);
+    Inita(1);
     // Ionization potential and density corrections
     // are close to those of calcium carbonate
 
-    E_.at(0)                =   "Standard Rock";
+    elementName_.at(0)      =   "Standard Rock";
     nucCharge_.at(0)        =   11;
     atomicNum_.at(0)        =   22;
     atomInMolecule_.at(0)   =   1;
@@ -360,7 +362,7 @@ void Medium::initStandardrock()
     d0_                     =   0;
     massDensity_            =   2.650;
 
-    initr();
+    Initr();
 }
 
 //----------------------------------------------------------------------------//
@@ -369,11 +371,11 @@ void Medium::initStandardrock()
 * initialize Frejus rock
 */
 
-void Medium::initFrejusrock()
+void Medium::InitFrejusrock()
 {
-    inita(1);
+    Inita(1);
 
-    E_.at(0)                =   "Frejus Rock";
+    elementName_.at(0)      =   "Frejus Rock";
     nucCharge_.at(0)        =   10.12;
     atomicNum_.at(0)        =   20.34;
     atomInMolecule_.at(0)   =   1;
@@ -386,7 +388,7 @@ void Medium::initFrejusrock()
     d0_                     =   0;
     massDensity_            =   2.740;
 
-    initr();
+    Initr();
 }
 
 
@@ -396,11 +398,11 @@ void Medium::initFrejusrock()
 * initialize iron
 */
 
-void Medium::initIron()
+void Medium::InitIron()
 {
-    inita(1);
+    Inita(1);
 
-    E_.at(0)                =   "Fe";
+    elementName_.at(0)      =   "Fe";
     nucCharge_.at(0)        =   26;
     atomicNum_.at(0)        =   55.845;
     atomInMolecule_.at(0)   =   1;
@@ -413,7 +415,7 @@ void Medium::initIron()
     d0_                     =   0.12;
     massDensity_            =   7.874;
 
-    initr();
+    Initr();
 }
 
 //----------------------------------------------------------------------------//
@@ -422,11 +424,11 @@ void Medium::initIron()
 * initialize hydrogen
 */
 
-void Medium::initHydrogen()
+void Medium::InitHydrogen()
 {
-    inita(1);
+    Inita(1);
 
-    E_.at(0)                =   "H";
+    elementName_.at(0)      =   "H";
     nucCharge_.at(0)        =   1;
     atomicNum_.at(0)        =   1.00794;
     atomInMolecule_.at(0)   =   1;
@@ -439,7 +441,7 @@ void Medium::initHydrogen()
     d0_                     =   0;
     massDensity_            =   0.07080;
 
-    initr();
+    Initr();
 }
 
 //----------------------------------------------------------------------------------------------------//
@@ -448,11 +450,11 @@ void Medium::initHydrogen()
 * initialize lead
 */
 
-void Medium::initLead()
+void Medium::InitLead()
 {
-    inita(1);
+    Inita(1);
 
-    E_.at(0)                =   "Pb";
+    elementName_.at(0)      =   "Pb";
     nucCharge_.at(0)        =   82;
     atomicNum_.at(0)        =   207.2;
     atomInMolecule_.at(0)   =   1;
@@ -465,7 +467,7 @@ void Medium::initLead()
     d0_                     =   0.14;
     massDensity_            =   11.350;
 
-    initr();
+    Initr();
 }
 
 //----------------------------------------------------------------------------//
@@ -474,11 +476,11 @@ void Medium::initLead()
 * initialize uranium
 */
 
-void Medium::initUranium()
+void Medium::InitUranium()
 {
-    inita(1);
+    Inita(1);
 
-    E_.at(0)                =   "U";
+    elementName_.at(0)      =   "U";
     nucCharge_.at(0)        =   92;
     atomicNum_.at(0)        =   238.0289;
     atomInMolecule_.at(0)   =   1;
@@ -491,7 +493,7 @@ void Medium::initUranium()
     d0_                     =   0.14;
     massDensity_            =   18.950;
 
-    initr();
+    Initr();
 }
 
 //----------------------------------------------------------------------------//
@@ -500,18 +502,18 @@ void Medium::initUranium()
 * initialize air
 */
 
-void Medium::initAir()
+void Medium::InitAir()
 {
     const double fr1        =   2*78.1;
     const double fr2        =   2*21.0;
     const double fr3        =   0.9;
     const double fra        =   fr1+fr2+fr3;
 
-    inita(3);
+    Inita(3);
 
-    E_.at(0)                =   "N";
-    E_.at(1)                =   "O";
-    E_.at(2)                =   "Ar";
+    elementName_.at(0)      =   "N";
+    elementName_.at(1)      =   "O";
+    elementName_.at(2)      =   "Ar";
     nucCharge_.at(0)        =   7; // N
     nucCharge_.at(1)        =   8; // O
     nucCharge_.at(2)        =   18; // Ar
@@ -530,7 +532,7 @@ void Medium::initAir()
     d0_                     =   0;
     massDensity_            =   1.205e-3; // dry, 1 atm
 
-    initr();
+    Initr();
 }
 
 //----------------------------------------------------------------------------//
@@ -539,12 +541,12 @@ void Medium::initAir()
 * initialize mineral oil or paraffin CH3(CH2)~23CH3 (added by Ped)
 */
 
-void Medium::initParaffin()
+void Medium::InitParaffin()
 {
-    inita(2);
+    Inita(2);
 
-    E_.at(0)                =   "C";
-    E_.at(1)                =   "H";
+    elementName_.at(0)      =   "C";
+    elementName_.at(1)      =   "H";
     nucCharge_.at(0)        =   6; // C
     nucCharge_.at(1)        =   1; // H
     atomicNum_.at(0)        =   12.0011;
@@ -560,7 +562,7 @@ void Medium::initParaffin()
     d0_                     =   0;
     massDensity_            =   0.93;
 
-    initr();
+    Initr();
 }
 
 //----------------------------------------------------------------------------//
@@ -579,22 +581,22 @@ void Medium::initParaffin()
 *==========================================================================
 */
 
-void Medium::initAntaresWater()
+void Medium::InitAntaresWater()
 {
     // added by Claudine Colnard,
     // Institute Nikhef, The Netherlands,
     // ANTARES collaboration.
 
-    inita(8);
+    Inita(8);
 
-    E_.at(0)                =   "H";
-    E_.at(1)                =   "O";
-    E_.at(2)                =   "Na";
-    E_.at(3)                =   "K";
-    E_.at(4)                =   "Mg";
-    E_.at(5)                =   "Ca";
-    E_.at(6)                =   "Cl";
-    E_.at(7)                =   "S";
+    elementName_.at(0)      =   "H";
+    elementName_.at(1)      =   "O";
+    elementName_.at(2)      =   "Na";
+    elementName_.at(3)      =   "K";
+    elementName_.at(4)      =   "Mg";
+    elementName_.at(5)      =   "Ca";
+    elementName_.at(6)      =   "Cl";
+    elementName_.at(7)      =   "S";
     nucCharge_.at(0)        =   1;      // H
     nucCharge_.at(1)        =   8;      // O
     nucCharge_.at(2)        =   11;     // Na
@@ -640,54 +642,12 @@ void Medium::initAntaresWater()
     // surface D = 0 m (1.0291 g/cm^3) and middle of
     // detector D = 2126 m (1.0391 g/cm^3)
 
-    initr();
+    Initr();
 }
 
 //----------------------------------------------------------------------------//
 
-
-double Medium::vCut(double E)
-{
-    double aux;
-
-    aux =   ecut_/E;
-
-    if(ecut_>0)
-    {
-        if(vcut_>0 && vcut_<=1)
-        {
-            if(aux<vcut_)
-            {
-                vCut_   =   aux;
-            }
-            else
-            {
-                vCut_   =   vcut_;
-            }
-        }
-        else
-        {
-            vCut_   =   aux;
-        }
-    }
-    else
-    {
-        if(vcut_>0 && vcut_<=1)
-        {
-            vCut_   =   vcut_;
-        }
-        else
-        {
-            vCut_   =   1.;
-        }
-    }
-
-    return vCut_;
-}
-
-//----------------------------------------------------------------------------//
-
-double Medium::function(double r)
+double Medium::FunctionToIntegral(double r)
 {
     const double a  =   0.54;
 
@@ -779,10 +739,6 @@ double Medium::function(double r)
 //----------------------------------------------------------------------------//
     void Medium::SetName(std::string name){
         name_ = name;
-    }
-//----------------------------------------------------------------------------//
-    void Medium::SetIntegral(Integral integral){
-        integral_ = integral;
     }
 //----------------------------------------------------------------------------//
     void Medium::SetMN(std::vector<double> mN){

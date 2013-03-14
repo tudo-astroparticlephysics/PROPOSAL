@@ -23,6 +23,7 @@ add_library(PROPOSAL
         private/PROPOSAL/Epairproduction.cxx
         private/PROPOSAL/Ionization.cxx
         private/PROPOSAL/Photonuclear.cxx
+        private/PROPOSAL/Medium.cxx
 	)
 
 set_target_properties(PROPOSAL PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror")

@@ -40,7 +40,7 @@ int main(){
     brems->SetParametrizationLimit(1.);
 
     Integral* Int = new Integral();
-    cout << "IntegralKlasse x*x: " << Int->IntegrateClosed(0,3,X2) << endl;
+    cout << "IntegralKlasse x*x: " << Int->IntegrateWithLogSubstitution(0,3,X2,2.0) << endl;
     return 0;
 }
 

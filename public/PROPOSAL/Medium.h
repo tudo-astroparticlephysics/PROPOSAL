@@ -12,11 +12,8 @@
 
 #include <vector>
 #include <string>
-#include "PROPOSAL/Integral.h"
 
-#include "PhysicsModel.h"
-
-class Medium: public PhysicsModel
+class Medium
 {
 
 protected:
@@ -47,7 +44,6 @@ protected:
     double vcut_;                       	///< relative cutoff energy
     double vCut_;                       	///< relative cutoff energy - call setCut(E) to set this
 
-    Integral integral_;                 	// Needed for calculation of the
     std::vector<double> mN_;                ///< Woods-Saxon potential factor
     double MM_;                         	///< average all-component nucleon weight
     double sumNucleons_;                	///< sum of nucleons of all nuclei
@@ -91,7 +87,6 @@ protected:
      */
 
     void Initr();
-
 
 //----------------------------------------------------------------------------//
     /*!
@@ -219,148 +214,147 @@ public:
     {
         return numCompontents_;
     }
+//----------------------------------------------------------------------------//
 
     std::vector<double> GetNucCharge() const
     {
         return nucCharge_;
     }
+ //----------------------------------------------------------------------------//
 
     std::vector<double> GetAtomicNum() const
     {
         return atomicNum_;
     }
+//----------------------------------------------------------------------------//
 
     std::vector<double> GetAtomInMolecule() const
     {
         return atomInMolecule_;
     }
+//----------------------------------------------------------------------------//
 
     double GetSumCharge() const
     {
         return sumCharge_;
     }
-
+//----------------------------------------------------------------------------//
     double GetZA() const
     {
         return ZA_;
     }
-
+//----------------------------------------------------------------------------//
     double GetI() const
     {
         return I_;
     }
-
+//----------------------------------------------------------------------------//
     double GetC1() const
     {
         return C1_;
     }
-
+//----------------------------------------------------------------------------//
     double GetC() const
     {
         return C_;
     }
-
+//----------------------------------------------------------------------------//
     double GetA() const
     {
         return a_;
     }
-
+//----------------------------------------------------------------------------//
     double GetM() const
     {
         return m_;
     }
-
+//----------------------------------------------------------------------------//
     double GetX0() const
     {
         return X0_;
     }
-
+//----------------------------------------------------------------------------//
     double GetX1() const
     {
         return X1_;
     }
-
+//----------------------------------------------------------------------------//
     double GetD0() const
     {
         return d0_;
     }
-
+//----------------------------------------------------------------------------//
     double GetR() const
     {
         return r_;
     }
-
+//----------------------------------------------------------------------------//
     std::vector<double> GetLogConstant() const
     {
         return logConstant_;
     }
-
+//----------------------------------------------------------------------------//
     std::vector<double> GetBPrime() const
     {
         return bPrime_;
     }
-
+//----------------------------------------------------------------------------//
     double GetRho() const
     {
         return rho_;
     }
-
+//----------------------------------------------------------------------------//
     double GetMassDensity() const
     {
         return massDensity_;
     }
-
+//----------------------------------------------------------------------------//
     double GetMolDensity() const
     {
         return molDensity_;
     }
-
+//----------------------------------------------------------------------------//
     std::vector<double> GetAverageNucleonWeight() const
     {
         return M_;
     }
-
+//----------------------------------------------------------------------------//
     std::vector<std::string> GetElementName() const
     {
         return elementName_;
     }
-
+//----------------------------------------------------------------------------//
     std::string GetElementName(int i) const
     {
         return elementName_.at(i);
     }
-
+//----------------------------------------------------------------------------//
     std::string GetName() const
     {
         return name_;
     }
-
-    Integral get_integral() const
-    {
-        return integral_;
-    }
-
+//----------------------------------------------------------------------------//
     std::vector<double> GetMN() const
     {
         return mN_;
     }
-
+//----------------------------------------------------------------------------//
     double GetMM() const
     {
         return MM_;
     }
-
+//----------------------------------------------------------------------------//
     double GetSumNucleons() const
     {
         return sumNucleons_;
     }
-
+//----------------------------------------------------------------------------//
     double GetR0() const
     {
         return r0_;
     }
-
 //----------------------------------------------------------------------------//
+
     // Setter
     void SetNumCompontents(int numCompontents);
     void SetNucCharge(std::vector<double> nucCharge);
@@ -383,7 +377,6 @@ public:
     void SetAverageNucleonWeight(std::vector<double> M);
     void SetElementName(std::vector<std::string> E);
     void SetName(std::string name);
-    void SetIntegral(Integral integral);
     void SetMN(std::vector<double> mN);
     void SetMM(double MM);
     void SetSumNucleons(double sumNucleons);
