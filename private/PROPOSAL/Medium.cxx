@@ -11,6 +11,7 @@
 #include "PROPOSAL/Medium.h"
 #include "PROPOSAL/methods.h"
 #include "PROPOSAL/Integral.h"
+#include "boost/bind.hpp"
 
 
 using namespace std;
@@ -174,7 +175,7 @@ void Medium::Initr()
             {
                 r0_         =   pow(atomicNum_.at(i), 1./3);
                 r0_         =   1.12*r0_ - 0.86/r0_;
-                mN_.at(i)   =   1 - 4*PI*0.17*integral->IntegrateWithSubstitution(r0_ , -1.0, FunctionToIntegral , 2.0)
+                mN_.at(i)   =   1 - 4*PI*0.17*integral->IntegrateWithSubstitution(r0_ , -1.0, boost::bind(&Medium::FunctionToIntegral, this, _1) , 2.0)
                                 /atomicNum_.at(i);
             }
         }

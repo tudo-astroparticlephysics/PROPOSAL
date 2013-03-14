@@ -531,7 +531,7 @@ double Integral::RombergIntegrateOpened(double bigValue)
 
 //----------------------------------------------------------------------------------------------------//
 
-double Integral::IntegrateClosed(double min, double max, double (*integrand)(double))
+double Integral::IntegrateClosed(double min, double max, boost::function<double (double)> integrand)
 {
     double aux;
 
@@ -563,7 +563,7 @@ double Integral::IntegrateClosed(double min, double max, double (*integrand)(dou
 
 //----------------------------------------------------------------------------------------------------//
 
-double Integral::IntegrateOpened(double min, double max, double (*integrand)(double))
+double Integral::IntegrateOpened(double min, double max, boost::function<double (double)> integrand)
 {
     double aux;
 
@@ -596,7 +596,7 @@ double Integral::IntegrateOpened(double min, double max, double (*integrand)(dou
 
 //----------------------------------------------------------------------------//
 
-double Integral::IntegrateOpened(double min, double max, double (*integrand)(double), double randomRatio)
+double Integral::IntegrateOpened(double min, double max, boost::function<double (double)> integrand, double randomRatio)
 {
     double aux, result;
 
@@ -662,7 +662,7 @@ double Integral::IntegrateOpened(double min, double max, double (*integrand)(dou
 
 //----------------------------------------------------------------------------------------------------//
 
-double Integral::IntegrateWithSubstitution(double min, double max, double (*integrand)(double), double powerOfSubstitution)
+double Integral::IntegrateWithSubstitution(double min, double max, boost::function<double (double)> integrand, double powerOfSubstitution)
 {
     double aux;
 
@@ -733,7 +733,7 @@ double Integral::IntegrateWithSubstitution(double min, double max, double (*inte
 
 //----------------------------------------------------------------------------//
 
-double Integral::IntegrateWithSubstitution(double min, double max, double (*integrand)(double), double powerOfSubstitution, double randomRatio)
+double Integral::IntegrateWithSubstitution(double min, double max, boost::function<double (double)> integrand, double powerOfSubstitution, double randomRatio)
 {
     double aux, result;
 
@@ -1012,7 +1012,7 @@ double Integral::GetUpperLimit()
 
 //----------------------------------------------------------------------------------------------------//
 
-double Integral::IntegrateWithLog(double min, double max, double (*integrand)(double))
+double Integral::IntegrateWithLog(double min, double max, boost::function<double (double)> integrand)
 {
     double aux;
 
@@ -1045,7 +1045,7 @@ double Integral::IntegrateWithLog(double min, double max, double (*integrand)(do
 
 //----------------------------------------------------------------------------------------------------//
 
-double Integral::IntegrateWithLog(double min, double max, double (*integrand)(double), double randomRatio)
+double Integral::IntegrateWithLog(double min, double max, boost::function<double (double)> integrand, double randomRatio)
 {
     double aux, result;
 
@@ -1113,7 +1113,7 @@ double Integral::IntegrateWithLog(double min, double max, double (*integrand)(do
 
 //----------------------------------------------------------------------------//
 
-double Integral::IntegrateWithLogSubstitution(double min, double max, double (*integrand)(double), double powerOfSubstitution)
+double Integral::IntegrateWithLogSubstitution(double min, double max, boost::function<double (double)> integrand, double powerOfSubstitution)
 {
     double aux;
 

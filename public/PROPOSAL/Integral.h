@@ -13,6 +13,7 @@
 #include <vector>
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/methods.h"
+#include "boost/function.hpp"
 // #include "Output.h"
 
 /**
@@ -62,7 +63,7 @@ private:
     std::vector<double> c;
     std::vector<double> d;
 
-    double (*integrand_)(double);
+    boost::function<double (double)> integrand_;
 
 
     int     romberg4refine;		// set to 2 in constructor
@@ -206,7 +207,7 @@ public:
  * \param   function2use    integrand
  * \return  Integration result
  */
-    double IntegrateClosed(double min, double max, double (*integrand)(double));
+    double IntegrateClosed(double min, double max, boost::function<double (double)> integrand);
 
 //------------------------------------------------------------------------//
 
@@ -219,7 +220,7 @@ public:
  * \param   function2use    integrand
  * \return  Integration result
  */
-    double IntegrateOpened(double min, double max, double (*integrand)(double));
+    double IntegrateOpened(double min, double max, boost::function<double (double)> integrand);
 
 //------------------------------------------------------------------------//
 
@@ -233,7 +234,7 @@ public:
  * \param   randomRatio     Random Ratio in which the old sum is weighted
  * \return  Integration result
  */
-    double IntegrateOpened(double min, double max, double (*integrand)(double), double randomRatio);
+    double IntegrateOpened(double min, double max, boost::function<double (double)> integrand, double randomRatio);
 
 //------------------------------------------------------------------------//
 
@@ -247,7 +248,7 @@ public:
  * \return  Integration result
  */
 
-    double IntegrateWithSubstitution(double min, double max, double (*integrand)(double), double powerOfSubstitution);
+    double IntegrateWithSubstitution(double min, double max, boost::function<double (double)> integrand, double powerOfSubstitution);
 
 //------------------------------------------------------------------------//
 
@@ -263,7 +264,7 @@ public:
  * \return  Integration result
  */
 
-    double IntegrateWithSubstitution(double min, double max, double (*integrand)(double), double powerOfSubstitution, double randomRatio);
+    double IntegrateWithSubstitution(double min, double max, boost::function<double (double)> integrand, double powerOfSubstitution, double randomRatio);
 
 //------------------------------------------------------------------------//
 
@@ -300,7 +301,7 @@ public:
  * \return  Integration result
  */
 
-    double IntegrateWithLog(double min, double max, double (*integrand)(double));
+    double IntegrateWithLog(double min, double max, boost::function<double (double)> integrand);
 
 //------------------------------------------------------------------------//
 
@@ -315,7 +316,7 @@ public:
  * \return  Integration result
  */
 
-    double IntegrateWithLog(double min, double max, double (*integrand)(double), double randomRatio);
+    double IntegrateWithLog(double min, double max, boost::function<double (double)> integrand, double randomRatio);
 
 //------------------------------------------------------------------------//
 
@@ -329,7 +330,7 @@ public:
  * \return  Integration result
  */
 
-    double IntegrateWithLogSubstitution(double min, double max, double (*integrand)(double), double powerOfSubstitution);
+    double IntegrateWithLogSubstitution(double min, double max, boost::function<double (double)> integrand, double powerOfSubstitution);
 
 // Getters
 
@@ -340,7 +341,7 @@ public:
 
 // Setters
 
-    void Set_Function(double (*integrand)(double))
+    void Set_Function(boost::function<double (double)> integrand)
     {
         std::cerr << "Integral::set_funtion2use is depricated and might even be buggy. \n better make use of Integral::integrateOpened(...) to set the function to use, and its range...\n";
         this->integrand_ = integrand;
