@@ -9,7 +9,9 @@
 #define CrossSections_H
 
 
-#include "Integral.h"
+#include "PROPOSAL/MathModel.h"
+#include "PROPOSAL/Constants.h"
+
 
 
 
@@ -19,7 +21,7 @@
 
 
 
-class CrossSections
+class CrossSections : public MathModel
 {
 
 
