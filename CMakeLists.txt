@@ -2,8 +2,17 @@ cmake_minimum_required(VERSION 2.6)
 
 #FIND_LIBRARY(LOG4CPLUS_LIB NAMES log4cplus HINTS $LD_LIBRARY_PATH)
 #MESSAGE(STATUS "log4cplus lib path: ${LOG4CPLUS_LIB}")
-
 project( PROPOSAL)
+
+IF(DEFINED ENV{GTEST_PATH})
+  enable_testing()
+  add_subdirectory($ENV{GTEST_PATH} ${CMAKE_CURRENT_BINARY_DIR}/gtestbin)
+  set(DoTesting true)
+ELSE()
+  message("GTEST_PATH is not defined.  To build testsuite you have tu set GTEST_PATH to gtest root directory")
+ENDIF()
+
+
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -31,11 +40,16 @@ add_library(PROPOSAL
 
 set_target_properties(PROPOSAL PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror")
 
-
-
 add_executable(PROPOSALtest
         private/test/PROPOSAL.cxx
-
 )
 
 target_link_libraries(PROPOSALtest PROPOSAL)
+
+IF(DoTesting)
+  add_executable(UnitTest
+	  Test/Integral_TEST.cxx
+  )
+  target_link_libraries(UnitTest PROPOSAL gtest gtest_main)
+  add_test(UnitTests bin/UnitTest)
+ENDIF()
