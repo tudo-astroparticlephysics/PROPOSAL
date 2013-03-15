@@ -6,10 +6,12 @@ project( PROPOSAL)
 
 IF(DEFINED ENV{GTEST_PATH})
   enable_testing()
+  #1. Path
+  #2. Path where the binarys will be copied to
   add_subdirectory($ENV{GTEST_PATH} ${CMAKE_CURRENT_BINARY_DIR}/gtestbin)
   set(DoTesting true)
 ELSE()
-  message("GTEST_PATH is not defined.  To build testsuite you have tu set GTEST_PATH to gtest root directory")
+  message("GTEST_PATH is not defined.  To build testsuite you have to set GTEST_PATH to gtest root directory")
 ENDIF()
 
 
