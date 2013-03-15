@@ -12,12 +12,15 @@ CrossSections::CrossSections()
     ,multiplier_(1.)
     ,parametrization_(1)
 {
-    particle_ = new Particle();
-    medium_   = new Medium();
+    particle_       = new Particle();
+    medium_         = new Medium();
+    cut_settings_   = new EnergyCutSettings();
 }
 //----------------------------------------------------------------------------//
 
-CrossSections::CrossSections(Particle* particle, Medium* medium)
+CrossSections::CrossSections(Particle* particle,
+                             Medium* medium,
+                             EnergyCutSettings* cut_settings)
     :vMax_(0)
     ,vUp_ (0)
     ,vMin_(0)
@@ -27,8 +30,9 @@ CrossSections::CrossSections(Particle* particle, Medium* medium)
     ,multiplier_(1.)
     ,parametrization_(1)
 {
-    particle_ = particle;
-    medium_   = medium;
+    particle_       = particle;
+    medium_         = medium;
+    cut_settings_   = cut_settings;
 }
 //----------------------------------------------------------------------------//
 

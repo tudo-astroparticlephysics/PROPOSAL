@@ -17,7 +17,7 @@ Ionization& Ionization::operator=(const Ionization &ioniz){
 
 //----------------------------------------------------------------------------//
 
-void Ionization::SetIntegralLimits(){
+void Ionization::SetIntegralLimits(int component){
 }
 
 //----------------------------------------------------------------------------//

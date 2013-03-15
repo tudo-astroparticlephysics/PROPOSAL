@@ -44,10 +44,10 @@ int main(){
 
 
     for(int i = 0 ; i < 13 ; i++){
-        brems->SetParametrization(4);
+        brems->SetParametrization(1);
         particle->SetEnergy(pow(10,i));
         brems->SetParticle(particle);
-        cout<<brems->ElasticBremsstrahlungCrossSection(0.5,0)<<endl;
+        cout<<brems->CalculatedEdx()<<endl;
 
 
     }

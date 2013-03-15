@@ -25,6 +25,7 @@ add_library(PROPOSAL
         private/PROPOSAL/Photonuclear.cxx
         private/PROPOSAL/Medium.cxx
         private/PROPOSAL/Particle.cxx
+        private/PROPOSAL/EnergyCutSettings.cxx
 	)
 
 set_target_properties(PROPOSAL PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror")

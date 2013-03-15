@@ -14,9 +14,9 @@ private:
 
     bool        lorenz_;
     double      lorenzCut_;  	/// in [MeV] // - set to 1.e6 in Constructor
+    int         component_;
 
-
-    std::vector<Integral*>   integrals_;
+    Integral*   integral_;
 
 //----------------------------------------------------------------------------//
     //Memberfunctions
@@ -64,7 +64,7 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    void SetIntegralLimits();
+    void SetIntegralLimits(int component);
 
 //----------------------------------------------------------------------------//
 

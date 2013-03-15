@@ -17,7 +17,7 @@ Photonuclear& Photonuclear::operator=(const Photonuclear &photo){
 
 //----------------------------------------------------------------------------//
 
-void Photonuclear::SetIntegralLimits(){
+void Photonuclear::SetIntegralLimits(int component){
 }
 
 //----------------------------------------------------------------------------//

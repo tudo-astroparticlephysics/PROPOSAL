@@ -13,6 +13,8 @@
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Particle.h"
 #include "PROPOSAL/Medium.h"
+#include "PROPOSAL/EnergyCutSettings.h"
+
 
 
 
@@ -30,6 +32,8 @@ protected:
 
     Particle*   particle_;
     Medium*     medium_;
+    EnergyCutSettings* cut_settings_;
+
 
     //bounds of integration
     double vMax_;   //!< upper bound of integration
@@ -54,12 +58,12 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    CrossSections(Particle* particle, Medium* medium);
+    CrossSections(Particle* particle, Medium* medium, EnergyCutSettings* cut_settings);
 
 //----------------------------------------------------------------------------//
     // Memberfunctions
 
-    virtual void SetIntegralLimits() = 0;
+    virtual void SetIntegralLimits(int component) = 0;
 
 //----------------------------------------------------------------------------//
 

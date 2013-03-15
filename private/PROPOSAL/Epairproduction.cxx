@@ -17,7 +17,7 @@ Epairproduction& Epairproduction::operator=(const Epairproduction &epair){
 
 //----------------------------------------------------------------------------//
 
-void Epairproduction::SetIntegralLimits(){
+void Epairproduction::SetIntegralLimits(int component){
 }
 
 //----------------------------------------------------------------------------//

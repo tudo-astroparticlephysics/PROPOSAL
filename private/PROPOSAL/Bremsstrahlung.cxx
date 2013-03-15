@@ -2,11 +2,12 @@
 #include "PROPOSAL/Constants.h"
 #include <iostream>
 #include <cmath>
+#include <algorithm>
 
 using namespace std;
 
 Bremsstrahlung::Bremsstrahlung(){
-
+    integral_ = new Integral(IROMB, IMAXS, IPREC);
 }
 //----------------------------------------------------------------------------//
 
@@ -22,13 +23,49 @@ Bremsstrahlung& Bremsstrahlung::operator=(const Bremsstrahlung &brems){
 
 //----------------------------------------------------------------------------//
 
-void Bremsstrahlung::SetIntegralLimits(){
+void Bremsstrahlung::SetIntegralLimits(int component){
+
+    vMax_   =   1 - (3./4)*SQRTE*(particle_->GetMass()/particle_->GetEnergy())
+                *pow((medium_->GetNucCharge().at(component)) , 1./3);
+
+    if(vMax_<0)
+    {
+        vMax_   =   0;
+    }
+
+    if(lorenz_)
+    {
+        vMax_   =   min(vMax_, lorenzCut_/(particle_->GetEnergy()));
+    }
+
+    vMax_   =   min(vMax_, (1-(particle_->GetMass()/particle_->GetEnergy())));
+    vUp_    =   min(vMax_, cut_settings_->GetCut( particle_->GetEnergy()));
 }
 
 //----------------------------------------------------------------------------//
 
 double Bremsstrahlung::CalculatedEdx(){
-    return 0;
+
+    double sum  =   0;
+
+    if(multiplier_<=0)
+    {
+        return 0;
+    }
+
+    if(doContinuousInterpolation_)
+    {
+        //return max(interpolateJ_->interpolate(particle_->get_energy()), 0.0);
+    }
+
+    for(int i=0; i<(medium_->GetNumCompontents()); i++)
+    {
+        component_ = i;
+        SetIntegralLimits(component_);
+        sum +=  integral_->IntegrateOpened(0, vUp_, boost::bind(&Bremsstrahlung::FunctionToContinuousIntegral, this, _1));
+    }
+
+    return multiplier_*particle_->GetEnergy()*sum;
 }
 //----------------------------------------------------------------------------//
 
@@ -59,7 +96,8 @@ void Bremsstrahlung::EnableContinuousInerpolation(){
 //----------------------------------------------------------------------------//
 
 double Bremsstrahlung::FunctionToContinuousIntegral(double variable){
-    return 0;
+    return variable*ElasticBremsstrahlungCrossSection(variable, component_);
+
 }
 
 //----------------------------------------------------------------------------//
