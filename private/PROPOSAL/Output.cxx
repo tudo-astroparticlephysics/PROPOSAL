@@ -18,6 +18,7 @@
 bool Output::inf            =   false;
 bool Output::outf           =   false;
 bool Output::raw            =   false;
+int Output::OUTNUM          =   13;
 std::fstream Output::ReadWrite;
 
 using namespace std;

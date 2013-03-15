@@ -2,7 +2,7 @@
 #include "PROPOSAL/Bremsstrahlung.h"
 #include "PROPOSAL/Integral.h"
 #include "PROPOSAL/Medium.h"
-
+#include "PROPOSAL/Interpolant.h"
 using namespace std;
 
 double integrate(double min, double max, int N, double (*func)(double) ){
@@ -49,9 +49,9 @@ int main(){
         brems->SetParametrization(1);
         particle->SetEnergy(pow(10,i));
         brems->SetParticle(particle);
-        cout<<brems->CalculatedEdx()<<endl;
-
-
+                cout << "i: " << i << endl;
+        //cout<<brems->CalculatedEdx()<<endl;
+                        cout << "i: " << i << endl;
     }
 
 
@@ -59,6 +59,23 @@ int main(){
 
     Integral* Int = new Integral();
 //    cout << "IntegralKlasse x*x: " << Int->IntegrateClosed(0,3,X2) << endl;
+    bool testInterpolant = true;
+    if(testInterpolant){
+        int max = 100;
+        double xmin = 0;
+        double xmax = 20;
+        int romberg = 5;
+        bool rational = false;
+        bool relative = false;
+        bool isLog = false;
+        int rombergY = 5;
+        bool rationalY = false;
+        bool relativeY = false;
+        bool logSubst = false;
+        Interpolant* Pol = new Interpolant(max, xmin, xmax, X2, romberg, rational, relative, isLog, rombergY, rationalY, relativeY, logSubst);
+        double SearchX = 3;
+        cout << "Interpolating f(" << SearchX << "): " << Pol->interpolate(3) << endl;
+    }
 
 
     return 0;

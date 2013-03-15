@@ -16,6 +16,8 @@
 #include "PROPOSAL/MathModel.h"
 #include "PROPOSAL/FunctionInt2.h"
 #include "PROPOSAL/FunctionInt.h"
+#include <boost/bind.hpp>
+#include <boost/function.hpp>
 #include "Output.h"
 
 
@@ -37,7 +39,7 @@
  * @author Dmitry Chirkin
  */
 
-class Interpolant: public FunctionInt{ /// implements FunctionInt{
+class Interpolant{ /// implements FunctionInt{
 
 private:
     int     romberg, rombergY;
@@ -49,7 +51,9 @@ private:
     double  xmin, xmax, step;
     bool    rational, relative;
 
-    FunctionInt2*   function2int;
+    //FunctionInt2*   function2int;
+    boost::function<double (double)> function1d_;
+    boost::function<double (double,double)> function2d_;
     Interpolant*    Interpolant_;
 
     int     row, starti;
@@ -117,7 +121,7 @@ public:
     * \param   logSubst     substitute f(x) = log(f(x))?
     * \return
     */
-    Interpolant(int max, double xmin, double xmax, FunctionInt *function2int,
+    Interpolant(int max, double xmin, double xmax, boost::function<double (double)> function1d,
                 int romberg, bool rational, bool relative, bool isLog,
                 int rombergY, bool rationalY, bool relativeY, bool logSubst);
 
@@ -146,7 +150,7 @@ public:
     * \param   logSubst     substitute f(x1,x2) = log(f(x1,x2))?
     * \return
     */
-    Interpolant(int max1, double x1min, double x1max, int max2, double x2min, double x2max, FunctionInt2 *function2int,
+    Interpolant(int max1, double x1min, double x1max, int max2, double x2min, double x2max,  boost::function<double (double,double)> function2d,
                 int romberg1, bool rational1, bool relative1, bool isLog1,
                 int romberg2, bool rational2, bool relative2, bool isLog2,
                 int rombergY, bool rationalY, bool relativeY, bool logSubst);
@@ -267,6 +271,9 @@ public:
 
     double findLimit(double x1, double y);
 
+    //------------------------------------------------------------------------//
+
+    double Get2dFunctionFixedY(double x); //TOMSASZ
     //------------------------------------------------------------------------//
 
     /**
