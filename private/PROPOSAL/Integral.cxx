@@ -445,6 +445,7 @@ double Integral::RombergIntegrateOpened()
 
     for(i=0 ; i<maxSteps_ ; i++)
     {
+
         if(randomNumber_==0 || randomNumber_==1)
         {
             result  =   Trapezoid3(k, result);
@@ -586,7 +587,7 @@ double Integral::IntegrateOpened(double min, double max, boost::function<double 
 
     this->min_           =   min;
     this->max_           =   max;
-    this->integrand_    =   integrand;
+    this->integrand_     =   integrand;
     powerOfSubstitution_ =   0;
     randomNumber_        =   0;
     randomDo_            =   false;

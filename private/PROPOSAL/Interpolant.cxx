@@ -52,8 +52,8 @@ Interpolant::Interpolant(int max, double xmin, double xmax, boost::function<doub
     int     i;
     double  aux, xaux;
 
+
     function1d_     = function1d;
-    function2d_     = NULL;
 
     aux     =   this->xmin+step/2;
 
@@ -84,7 +84,7 @@ Interpolant::Interpolant(int max, double xmin, double xmax, boost::function<doub
                 xaux    =   aux;
             }
 
-            iY[i]=function1d(xaux);
+            iY[i]=function1d_(xaux);
 
             if(logSubst)
             {
@@ -119,8 +119,9 @@ Interpolant::Interpolant(int max1, double x1min, double x1max, int max2, double 
     int     i;
     double  aux;
 
-    function1d_     = NULL;
-    function2d_     = function2d_;
+
+    function2d_     = function2d;
+    function1d_     = boost::bind(&Interpolant::Get2dFunctionFixedY, this, _1);
 
     Interpolant_ = (Interpolant *)calloc(max,sizeof(Interpolant));
 
@@ -129,9 +130,10 @@ Interpolant::Interpolant(int max1, double x1min, double x1max, int max2, double 
         iX[i]   =   aux;
         row     =   i;
 
-        Interpolant_[i]     =   Interpolant(max1, x1min, x1max, boost::bind(&Interpolant::Get2dFunctionFixedY, this, _1),
+        Interpolant_[i]     =   Interpolant(max1, x1min, x1max, function1d_,
                                        romberg1, rational1, relative1, isLog1,
                                        rombergY, rationalY, relativeY, logSubst);
+
         Interpolant_[i].self=false;
     }
 
