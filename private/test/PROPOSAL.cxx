@@ -42,16 +42,12 @@ int main(){
     Bremsstrahlung *brems = new Bremsstrahlung();
     brems->SetMedium(med);
 
-    cout<<"__________________________________________________________"<<endl;
-    cout<<"Check ElasticBremsstrahlungCrossSection!!!!!!!!!!!!"<<endl;
-    cout<<"(former Bremsstrahlung::Sel(double int))"<<endl;
-    cout<<"differs for brems->SetParametrization(1) <--- KKP"<<endl;
-    cout<<"__________________________________________________________"<<endl;
-    for(int i = 0 ; i < 10 ; i++){
-        brems->SetParametrization(1);
+
+    for(int i = 0 ; i < 13 ; i++){
+        brems->SetParametrization(4);
         particle->SetEnergy(pow(10,i));
         brems->SetParticle(particle);
-        cout<<brems->ElasticBremsstrahlungCrossSection(0.4,1)<<endl;
+        cout<<brems->ElasticBremsstrahlungCrossSection(0.5,0)<<endl;
 
 
     }

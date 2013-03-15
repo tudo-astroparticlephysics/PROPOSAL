@@ -1,6 +1,9 @@
 #include "PROPOSAL/Bremsstrahlung.h"
 #include "PROPOSAL/Constants.h"
+#include <iostream>
 #include <cmath>
+
+using namespace std;
 
 Bremsstrahlung::Bremsstrahlung(){
 
@@ -68,7 +71,6 @@ double Bremsstrahlung::FunctionToStochasticalIntegral(double variable){
 
 double Bremsstrahlung::KelnerKakoulinPetrukhinParametrization(double v, int i)
 {
-
     double Z3       =   0;
     double result   =   0;
     double Dn       =   0;

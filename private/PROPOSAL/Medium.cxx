@@ -45,12 +45,12 @@ Medium::Medium(string w, double rho)
 
     if (rho > 0 )
     {
-        this->rho_  =   rho;
+        rho_  =   rho;
     }
 
     else
     {
-        this->rho_  =   1;
+        rho_  =   1;
     }
 
     if(EqualsIgnoreCase(w,"water"))
@@ -191,38 +191,38 @@ void Medium::SetLogConstant(int i)
     int z   =   RoundValue(nucCharge_.at(i));
     switch(z)
     {
-        case 1: logConstant_.at(i)  =  202.4;
-        case 2: logConstant_.at(i)  =  151.9;
-        case 3: logConstant_.at(i)  =  159.9;
-        case 4: logConstant_.at(i)  =  172.3;
-        case 5: logConstant_.at(i)  =  177.9;
-        case 6: logConstant_.at(i)  =  178.3;
-        case 7: logConstant_.at(i)  =  176.6;
-        case 8: logConstant_.at(i)  =  173.4;
-        case 9: logConstant_.at(i)  =  170.0;
-        case 10: logConstant_.at(i) =  165.8;
-        case 11: logConstant_.at(i) =  165.8;
-        case 12: logConstant_.at(i) =  167.1;
-        case 13: logConstant_.at(i) =  169.1;
-        case 14: logConstant_.at(i) =  170.8;
-        case 15: logConstant_.at(i) =  172.2;
-        case 16: logConstant_.at(i) =  173.4;
-        case 17: logConstant_.at(i) =  174.3;
-        case 18: logConstant_.at(i) =  174.8;
-        case 19: logConstant_.at(i) =  175.1;
-        case 20: logConstant_.at(i) =  175.6;
-        case 21: logConstant_.at(i) =  176.2;
-        case 22: logConstant_.at(i) =  176.8;
-        case 26: logConstant_.at(i) =  175.8;
-        case 29: logConstant_.at(i) =  173.1;
-        case 32: logConstant_.at(i) =  173.0;
-        case 35: logConstant_.at(i) =  173.5;
-        case 42: logConstant_.at(i) =  175.9;
-        case 50: logConstant_.at(i) =  177.4;
-        case 53: logConstant_.at(i) =  178.6;
-        case 74: logConstant_.at(i) =  177.6;
-        case 82: logConstant_.at(i) =  178.0;
-        case 92: logConstant_.at(i) =  179.8;
+        case 1: logConstant_.at(i)  =  202.4; break;
+        case 2: logConstant_.at(i)  =  151.9; break;
+        case 3: logConstant_.at(i)  =  159.9; break;
+        case 4: logConstant_.at(i)  =  172.3; break;
+        case 5: logConstant_.at(i)  =  177.9; break;
+        case 6: logConstant_.at(i)  =  178.3; break;
+        case 7: logConstant_.at(i)  =  176.6; break;
+        case 8: logConstant_.at(i)  =  173.4; break;
+        case 9: logConstant_.at(i)  =  170.0; break;
+        case 10: logConstant_.at(i) =  165.8; break;
+        case 11: logConstant_.at(i) =  165.8; break;
+        case 12: logConstant_.at(i) =  167.1; break;
+        case 13: logConstant_.at(i) =  169.1; break;
+        case 14: logConstant_.at(i) =  170.8; break;
+        case 15: logConstant_.at(i) =  172.2; break;
+        case 16: logConstant_.at(i) =  173.4; break;
+        case 17: logConstant_.at(i) =  174.3; break;
+        case 18: logConstant_.at(i) =  174.8; break;
+        case 19: logConstant_.at(i) =  175.1; break;
+        case 20: logConstant_.at(i) =  175.6; break;
+        case 21: logConstant_.at(i) =  176.2; break;
+        case 22: logConstant_.at(i) =  176.8; break;
+        case 26: logConstant_.at(i) =  175.8; break;
+        case 29: logConstant_.at(i) =  173.1; break;
+        case 32: logConstant_.at(i) =  173.0; break;
+        case 35: logConstant_.at(i) =  173.5; break;
+        case 42: logConstant_.at(i) =  175.9; break;
+        case 50: logConstant_.at(i) =  177.4; break;
+        case 53: logConstant_.at(i) =  178.6; break;
+        case 74: logConstant_.at(i) =  177.6; break;
+        case 82: logConstant_.at(i) =  178.0; break;
+        case 92: logConstant_.at(i) =  179.8; break;
         default: logConstant_.at(i) =  182.7;
     }
 }
@@ -234,7 +234,7 @@ void Medium::SetBPrime(int i)
     int z   =   RoundValue(nucCharge_.at(i));
     switch(z)
     {
-        case 1: bPrime_.at(i)  =  446;
+        case 1: bPrime_.at(i)  =  446; break;
         default: bPrime_.at(i) =  1429;
     }
 }
