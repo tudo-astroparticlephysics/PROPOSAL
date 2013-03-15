@@ -82,3 +82,7 @@ void CrossSections::SetMedium(Medium *medium){
     medium_ = medium;
 }
 //----------------------------------------------------------------------------//
+
+void CrossSections::SetEnergyCutSettings(EnergyCutSettings *cuts){
+    cut_settings_ = cuts;
+}

@@ -13,7 +13,7 @@ private:
     double      xo_;
 
     bool        lorenz_;
-    double      lorenzCut_;  	/// in [MeV] // - set to 1.e6 in Constructor
+    double      lorenz_cut_;  	/// in [MeV] // - set to 1.e6 in Constructor
     int         component_;
 
     Integral*   integral_;
@@ -121,6 +121,25 @@ public:
     double ElasticBremsstrahlungCrossSection(double v, int i);
 
 //----------------------------------------------------------------------------//
+    //Getter
+
+    bool GetLorenz() const
+    {
+        return lorenz_;
+    }
+
+//----------------------------------------------------------------------------//
+    double GetLorenzCut() const
+    {
+        return lorenz_cut_;
+    }
+//----------------------------------------------------------------------------//
+    //Setter
+
+    void SetLorenz(bool lorenz);
+    void SetLorenzCut(double lorenz_cut);
+//----------------------------------------------------------------------------//
+
     ~Bremsstrahlung(){}
 
 };

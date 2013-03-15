@@ -44,6 +44,8 @@ int main(){
 
 
     for(int i = 0 ; i < 13 ; i++){
+        brems->GetEnergyCutSettings()->SetEcut(-1.);
+        brems->GetEnergyCutSettings()->SetVcut(1.);
         brems->SetParametrization(1);
         particle->SetEnergy(pow(10,i));
         brems->SetParticle(particle);

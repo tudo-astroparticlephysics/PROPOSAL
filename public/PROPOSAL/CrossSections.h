@@ -134,6 +134,9 @@ public:
     void SetParametrization(int parametrization=1);
 
 //----------------------------------------------------------------------------//
+    void SetEnergyCutSettings(EnergyCutSettings *cuts);
+
+//----------------------------------------------------------------------------//
     // Getter
 
     double GetEbig() const
@@ -177,7 +180,12 @@ public:
     }
 
 //----------------------------------------------------------------------------//
+    EnergyCutSettings* GetEnergyCutSettings() const
+    {
+        return cut_settings_;
+    }
 
+//----------------------------------------------------------------------------//
     // destructor
 
     virtual ~CrossSections(){}

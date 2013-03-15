@@ -68,7 +68,6 @@ double EnergyCutSettings::GetCut(double energy){
             vCut   =   1.;
         }
     }
-
     return vCut;
 }
 

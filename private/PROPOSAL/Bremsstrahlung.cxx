@@ -6,8 +6,14 @@
 
 using namespace std;
 
-Bremsstrahlung::Bremsstrahlung(){
-    integral_ = new Integral(IROMB, IMAXS, IPREC);
+Bremsstrahlung::Bremsstrahlung()
+    :lorenz_(false)
+    ,lorenz_cut_(1.e6)
+
+
+{
+    integral_   = new Integral(IROMB, IMAXS, IPREC);
+
 }
 //----------------------------------------------------------------------------//
 
@@ -35,7 +41,7 @@ void Bremsstrahlung::SetIntegralLimits(int component){
 
     if(lorenz_)
     {
-        vMax_   =   min(vMax_, lorenzCut_/(particle_->GetEnergy()));
+        vMax_   =   min(vMax_, lorenz_cut_/(particle_->GetEnergy()));
     }
 
     vMax_   =   min(vMax_, (1-(particle_->GetMass()/particle_->GetEnergy())));
@@ -376,3 +382,14 @@ double Bremsstrahlung::ElasticBremsstrahlungCrossSection(double v, int i){
 
     return medium_->GetMolDensity()*medium_->GetAtomInMolecule().at(i)*pow(c2 , 2)*aux;
 }
+
+//----------------------------------------------------------------------------//
+void Bremsstrahlung::SetLorenz(bool lorenz){
+    lorenz_ = lorenz;
+}
+//----------------------------------------------------------------------------//
+void Bremsstrahlung::SetLorenzCut(double lorenz_cut){
+    lorenz_cut_ = lorenz_cut;
+
+}
+//----------------------------------------------------------------------------//
