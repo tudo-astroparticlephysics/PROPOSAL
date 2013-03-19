@@ -34,7 +34,6 @@ add_library(PROPOSAL
         private/PROPOSAL/methods.cxx
         private/PROPOSAL/MathModel.cxx
         private/PROPOSAL/Output.cxx
-        #private/PROPOSAL/Interpolant.cxx
         private/PROPOSAL/Bremsstrahlung.cxx
         private/PROPOSAL/CrossSections.cxx
         private/PROPOSAL/Decay.cxx
@@ -56,9 +55,12 @@ add_executable(PROPOSALtest
 target_link_libraries(PROPOSALtest PROPOSAL)
 
 IF(DoTesting)
-  add_executable(UnitTest_Integral
-	  Test/Integral_TEST.cxx
-  )
+  add_executable(UnitTest_Integral Test/Integral_TEST.cxx)
+  add_executable(UnitTest_Interpolant Test/Interpolant_TEST.cxx)
+
   target_link_libraries(UnitTest_Integral PROPOSAL gtest gtest_main)
+  target_link_libraries(UnitTest_Interpolant PROPOSAL gtest gtest_main)
+
   add_test(UnitTest_Integral bin/UnitTest_Integral)
+  add_test(UnitTest_Interpolant bin/UnitTest_Interpolant)
 ENDIF()
