@@ -56,9 +56,9 @@ add_executable(PROPOSALtest
 target_link_libraries(PROPOSALtest PROPOSAL)
 
 IF(DoTesting)
-  add_executable(UnitTest
+  add_executable(UnitTest_Integral
 	  Test/Integral_TEST.cxx
   )
-  target_link_libraries(UnitTest PROPOSAL gtest gtest_main)
-  add_test(UnitTests bin/UnitTest)
+  target_link_libraries(UnitTest_Integral PROPOSAL gtest gtest_main)
+  add_test(UnitTest_Integral bin/UnitTest_Integral)
 ENDIF()
