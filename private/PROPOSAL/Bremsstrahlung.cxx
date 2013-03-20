@@ -32,6 +32,8 @@ Bremsstrahlung& Bremsstrahlung::operator=(const Bremsstrahlung &brems){
 
 void Bremsstrahlung::SetIntegralLimits(int component){
 
+    component_ = component;
+
     vMax_   =   1 - (3./4)*SQRTE*(particle_->GetMass()/particle_->GetEnergy())
                 *pow((medium_->GetNucCharge().at(component_)) , 1./3);
 
@@ -67,7 +69,6 @@ double Bremsstrahlung::CalculatedEdx(){
 
     for(int i=0; i<(medium_->GetNumCompontents()); i++)
     {
-        component_ = i;
         SetIntegralLimits(component_);
         sum +=  integral_->IntegrateOpened(0, vUp_, boost::bind(&Bremsstrahlung::FunctionToContinuousIntegral, this, _1));
     }
