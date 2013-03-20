@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 #include "PROPOSAL/Integral.h"
 #include "math.h"
+#include <iostream>
 
 double Testfkt(double r){
   return r*r;
@@ -31,16 +32,14 @@ TEST(IntegralValue, EqualBorders) {
 TEST(IntegralValue, SmallError) {
     Integral* Int = new Integral();
 
-    EXPECT_TRUE(  relErr(   Int->IntegrateClosed(0,3,Testexp),exp(3)-1
-                            ,1.e-6) //Later GetPrecision();
-                );
+    ASSERT_NEAR(   Int->IntegrateClosed(0,3,Testexp),exp(3)-1
+                            ,(exp(3)-1)*1.e-6);
 
     delete Int;
 }
 
 TEST(IntegralValue, FloatEqual) {
     Integral* Int = new Integral();
-
     //Last 4 digits can differ. relError<1E-4
     ASSERT_FLOAT_EQ(Int->IntegrateClosed(0,3,Testexp),exp(3)-1);
 
@@ -56,7 +55,7 @@ TEST(IntegralValue, MultiplePrecisions) {
     for(double precision = 1E-5; precision>1E-16;precision/=10){
 
         Integral* Int = new Integral(5,20,precision);
-        for(int i=1000;i>0;i--)CalcIntegral = i* Int->IntegrateClosed(xmin,xmax,Testexp);
+        CalcIntegral = Int->IntegrateClosed(xmin,xmax,Testexp);
 
         ASSERT_NEAR(CalcIntegral,ExactIntegral, ExactIntegral*precision);
 
@@ -64,9 +63,60 @@ TEST(IntegralValue, MultiplePrecisions) {
     }
 }
 
-TEST(IntegralValue, HasToFail) {
-    EXPECT_TRUE(false);
+TEST(IntegralValue, IntegrateWithSubstitution) {
+    double xmin=2,xmax=4;
+    double  ExactIntegral=exp(xmax)-exp(xmin);
+    double  CalcIntegral=0;
+
+    double precision = 1E-5;
+    for(double precision = 1E-5; precision>1E-11;precision/=10){
+
+        Integral* Int = new Integral(5,20,precision);
+        CalcIntegral = Int->IntegrateWithSubstitution(xmin,xmax,Testexp,2.);
+
+        ASSERT_NEAR(CalcIntegral,ExactIntegral, ExactIntegral*precision);
+
+        delete Int;
+    }
 }
+
+TEST(IntegralValue, IntegrateWithLog) {
+    double xmin=2,xmax=4;
+    double  ExactIntegral=exp(xmax)-exp(xmin);
+    double  CalcIntegral=0;
+
+    double precision = 1E-5;
+    for(double precision = 1E-5; precision>1E-11;precision/=10){
+
+        Integral* Int = new Integral(5,20,precision);
+        CalcIntegral = Int->IntegrateWithLog(xmin,xmax,Testexp);
+
+        ASSERT_NEAR(CalcIntegral,ExactIntegral, ExactIntegral*precision);
+
+        delete Int;
+    }
+}
+
+TEST(IntegralValue, IntegrateWithLogSubstitution) {
+    double xmin=2,xmax=4;
+    double  ExactIntegral=exp(xmax)-exp(xmin);
+    double  CalcIntegral=0;
+
+    double precision = 1E-5;
+    for(double precision = 1E-5; precision>1E-6;precision/=10){
+
+        Integral* Int = new Integral(5,20,precision);
+        CalcIntegral = Int->IntegrateWithLogSubstitution(xmin,xmax,Testexp,2.);
+
+        ASSERT_NEAR(CalcIntegral,ExactIntegral, ExactIntegral*precision);
+
+        delete Int;
+    }
+}
+
+//TEST(IntegralValue, HasToFail) {
+//    EXPECT_TRUE(false);
+//}
 
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);

@@ -42,35 +42,35 @@
 class Interpolant{ /// implements FunctionInt{
 
 private:
-    int     romberg, rombergY;
-    double  *iX;
-    double  *iY;
-    double  *c;
-    double  *d;
-    int     max;
-    double  xmin, xmax, step;
-    bool    rational, relative;
+    int     romberg_, rombergY_;
+    double  *iX_;
+    double  *iY_;
+    double  *c_;
+    double  *d_;
+    int     max_;
+    double  xmin_, xmax_, step_;
+    bool    rational_, relative_;
 
     //FunctionInt2*   function2int;
     boost::function<double (double)> function1d_;
     boost::function<double (double,double)> function2d_;
     Interpolant*    Interpolant_;
 
-    int     row, starti;
-    bool    rationalY, relativeY;
+    int     row_, starti_;
+    bool    rationalY_, relativeY_;
 
-    bool    reverse, self, flag;		// Self is setted to true in constructor
-    bool    isLog, logSubst;
+    bool    reverse_, self_, flag_;		// Self is setted to true in constructor
+    bool    isLog_, logSubst_;
 
-    double  precision, worstX;
-    double  precision2, worstX2;
-    double  precisionY, worstY;
+    double  precision_, worstX_;
+    double  precision2_, worstX2_;
+    double  precisionY_, worstY_;
 
-    bool    fast;			// Is setted to true in constructor
+    bool    fast_;			// Is setted to true in constructor
 
-    double  x_save, y_save;	// Is setted to 1 and 0 in constructor
+    double  x_save_, y_save_;	// Is setted to 1 and 0 in constructor
 
-    Output  *output;
+    Output  *output_;
 
     /*!
     * interpolates f(x) based on the values iY[i]=f(iX[i]) in the romberg-vicinity of x
@@ -87,8 +87,8 @@ private:
 
 protected:
 
-    const static double bigNumber;
-    const static double aBigNumber;
+    const static double bigNumber_;
+    const static double aBigNumber_;
 
 
     //------------------------------------------------------------------------//
@@ -139,15 +139,15 @@ public:
     * \param   romberg1     Order of interpolation f(x,a)
     * \param   rational1    interpolate with rational function?
     * \param   relative1    save error relative to the function value?
-    * \param   isLog1       substitute x1 = log(x2)?
+    * \param   isLog1       substitute x1 = log(x2)
     * \param   romberg2     Order of interpolation for f(a,x)
     * \param   rational2    interpolate with rational function?
     * \param   relative2    save error relative to the function value?
-    * \param   isLog2       substitute x2 = log(x2)?
+    * \param   isLog2       substitute x2 = log(x2)
     * \param   rombergY     Order of interpolation for inverse interpolation(Find Limit)
     * \param   rationalY    interpolate with rational function?
-    * \param   relativeY    save error relative to the interpolated x-value?
-    * \param   logSubst     substitute f(x1,x2) = log(f(x1,x2))?
+    * \param   relativeY    save error relative to the interpolated x-value
+    * \param   logSubst     substitute f(x1,x2) = log(f(x1,x2))
     * \return
     */
     Interpolant(int max1, double x1min, double x1max, int max2, double x2min, double x2max,  boost::function<double (double,double)> function2d,
@@ -167,7 +167,7 @@ public:
     * \param   x    vector of x values.
     * \param   xmin vector of f(x) values
     * \param   romberg      Order of interpolation
-    * \param   rational     ???
+    * \param   rational     interpolate with rational function
     * \param   relative     save error relative to the function value?
     * \return
     */
@@ -184,13 +184,13 @@ public:
     * \param   xmin         lower limit of the interpolation table
     * \param   xmax         upper limit of the interpolation table
     * \param   romberg      order of interpolation
-    * \param   rational     interpolate with rational function?
-    * \param   relative     save error relative to the function value?
-    * \param   isLog        substitute x = log(x)?
+    * \param   rational     interpolate with rational function
+    * \param   relative     save error relative to the function value
+    * \param   isLog        substitute x = log(x)
     * \param   rombergY     order of interpolation for inverse interpolation(Find Limit)
-    * \param   rationalY    interpolate with rational function?
-    * \param   relativeY    save error relative to the interpolated x-value?
-    * \param   logSubst     substitute f(x) = log(f(x))?
+    * \param   rationalY    interpolate with rational function
+    * \param   relativeY    save error relative to the interpolated x-value
+    * \param   logSubst     substitute f(x) = log(f(x))
     * \return
     */
     void InitInterpolant(int max, double xmin, double xmax,
@@ -332,7 +332,7 @@ public:
     */
     int get_max()
     {
-        return max;
+        return max_;
     }
 };
 
