@@ -28,7 +28,7 @@ TEST(Bremsstrahlung , Test_of_dEdx ) {
     while(in.good())
     {
         in>>para>>ecut>>vcut>>lpm>>energy>>med>>particleName>>dEdx;
-        //if(lpm!=0)continue;
+        cout<<"bla"<<endl;
         Medium *medium = new Medium(med,1.);
         brems->GetEnergyCutSettings()->SetEcut(ecut);
         brems->GetEnergyCutSettings()->SetVcut(vcut);

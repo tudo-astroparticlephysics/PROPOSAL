@@ -69,6 +69,7 @@ double Bremsstrahlung::CalculatedEdx(){
 
     for(int i=0; i<(medium_->GetNumCompontents()); i++)
     {
+        component_ = i;
         SetIntegralLimits(component_);
         sum +=  integral_->IntegrateOpened(0, vUp_, boost::bind(&Bremsstrahlung::FunctionToContinuousIntegral, this, _1));
     }
