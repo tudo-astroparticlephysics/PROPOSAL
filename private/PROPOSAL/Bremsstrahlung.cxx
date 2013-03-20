@@ -11,6 +11,7 @@ Bremsstrahlung::Bremsstrahlung()
     ,lorenz_cut_(1.e6)
 
 
+
 {
     integral_   = new Integral(IROMB, IMAXS, IPREC);
 
@@ -32,7 +33,7 @@ Bremsstrahlung& Bremsstrahlung::operator=(const Bremsstrahlung &brems){
 void Bremsstrahlung::SetIntegralLimits(int component){
 
     vMax_   =   1 - (3./4)*SQRTE*(particle_->GetMass()/particle_->GetEnergy())
-                *pow((medium_->GetNucCharge().at(component)) , 1./3);
+                *pow((medium_->GetNucCharge().at(component_)) , 1./3);
 
     if(vMax_<0)
     {
@@ -76,6 +77,30 @@ double Bremsstrahlung::CalculatedEdx(){
 //----------------------------------------------------------------------------//
 
 double Bremsstrahlung::CalculatedNdx(){
+
+//    if((cros->get_cb())<=0)
+//    {
+//        return 0;
+//    }
+
+//    sum_    =   0;
+
+//    for(int i=0; i<(medium_->get_numCompontents()); i++)
+//    {
+
+//        if(jt_)
+//        {
+//            sum_    +=  max((interpolateJo_[i]).interpolate(particle_->get_energy()), 0.0);
+//        }
+//        else
+//        {
+//            setEnergy(i);
+//            sum_    +=  VectorOfIntegral_.at(i)->integrateWithLog(vUp_, vMax_, this);
+//        }
+
+//    }
+
+//    return sum_;
     return 0;
 }
 //----------------------------------------------------------------------------//
@@ -102,14 +127,15 @@ void Bremsstrahlung::EnableContinuousInerpolation(){
 //----------------------------------------------------------------------------//
 
 double Bremsstrahlung::FunctionToContinuousIntegral(double variable){
-    return variable*ElasticBremsstrahlungCrossSection(variable, component_);
+    return variable * ElasticBremsstrahlungCrossSection(variable, component_);
 
 }
 
 //----------------------------------------------------------------------------//
 
 double Bremsstrahlung::FunctionToStochasticalIntegral(double variable){
-    return 0;
+    return multiplier_ * ElasticBremsstrahlungCrossSection(variable, component_);
+
 }
 //----------------------------------------------------------------------------//
 
@@ -131,7 +157,7 @@ double Bremsstrahlung::KelnerKakoulinPetrukhinParametrization(double v, int i)
     da      =   log(1 + ME/(d*SQRTE*s1));
     Dn      =   1.54*pow((medium_->GetAtomicNum()).at(i), 0.27);
     s1      =   ME*Dn/((particle_->GetMass())*s1);
-    dn      =   log(Dn/(1 + d*(Dn*SQRTE - 2)/(particle_->GetMass())));
+    dn      =   log(Dn/(1 + d*(Dn*SQRTE - 2)/particle_->GetMass()));
     maxV    =   ME*(particle_->GetEnergy() - particle_->GetMass())
                 /((particle_->GetEnergy())
                   *(particle_->GetEnergy() - particle_->GetMomentum() + ME));
@@ -333,12 +359,12 @@ double Bremsstrahlung::CompleteScreeningCase(double v, int i)
 double Bremsstrahlung::ElasticBremsstrahlungCrossSection(double v, int i){
 
     double aux      =   0;
-//    double Z3       =   0;
+    double Z3       =   0;
     double result   =   0;
-//    double Dn       =   0;
-//    double s1       =   0;
+    double Dn       =   0;
+    double s1       =   0;
 
-    //Z3  =   pow((medium_->GetNucCharge()).at(i), -1./3);
+    Z3  =   pow((medium_->GetNucCharge()).at(i), -1./3);
 
     switch(parametrization_)
     {
@@ -367,21 +393,114 @@ double Bremsstrahlung::ElasticBremsstrahlungCrossSection(double v, int i){
     aux =   2*(medium_->GetNucCharge()).at(i)*(ME/particle_->GetMass())*RE;
     aux *=  (ALPHA/v)*aux*result;
 
-//    if(cros->get_lpm())
-//    {
-//        if(form_!=1)
-//        {
-//            s1  =   (medium_->GetLogConstant()).at(i)*Z3;
-//            Dn  =   1.54*pow((medium_->GetAtomicNum()).at(i) , 0.27);
-//            s1  =   ME*Dn/((particle_->GetMass())*s1);
-//        }
-//        aux *=  lpm(v,s1);
-//    }
+    if(lpm_effect_enabled_)
+    {
+        if(parametrization_!=1)
+        {
+            s1  =   (medium_->GetLogConstant()).at(i)*Z3;
+            Dn  =   1.54*pow((medium_->GetAtomicNum()).at(i) , 0.27);
+            s1  =   ME*Dn/((particle_->GetMass())*s1);
+        }
+        aux *=  lpm(v,s1);
+    }
 
     double c2   =   pow(particle_->GetCharge() , 2);
 
     return medium_->GetMolDensity()*medium_->GetAtomInMolecule().at(i)*pow(c2 , 2)*aux;
 }
+
+//----------------------------------------------------------------------------//
+
+double Bremsstrahlung::lpm(double v, double s1)
+{
+
+    double sum      =   0;
+    double e        =   particle_->GetEnergy();
+    double eLpm;
+
+
+    if(init_lpm_effect_)
+    {
+        init_lpm_effect_    =   false;
+
+        particle_->SetEnergy(BIGENERGY);
+
+        for(int i=0; i < medium_->GetNumCompontents(); i++)
+        {
+            SetIntegralLimits(i);
+            sum +=  integral_->IntegrateOpened(0, vUp_, boost::bind(&Bremsstrahlung::FunctionToContinuousIntegral, this, _1))
+                    + integral_->IntegrateWithLog(vUp_, vMax_, boost::bind(&Bremsstrahlung::FunctionToContinuousIntegral, this, _1));
+        }
+
+        //double c2   =   pow(particle_->GetCharge() , 2);
+        //xo_         =   pow(c2,2)/sum;
+        eLpm        =   ALPHA*(particle_->GetMass());
+        eLpm        *=  eLpm/(4*PI*ME*RE*sum);
+
+        particle_->SetEnergy(e);
+        SetIntegralLimits(0);
+
+    }
+    double G, fi, xi, sp, h, s, s2, s3, ps, Gamma;
+
+    const double fi1    =   1.54954;
+    const double G1     =   0.710390;
+    const double G2     =   0.904912;
+    s1                  *=  s1*SQRT2;
+    sp                  =   sqrt(eLpm*v/(8*(particle_->GetEnergy())*(1-v)));
+    h                   =   log(sp)/log(s1);
+
+    if(sp < s1)
+    {
+        xi  =   2;
+    }
+    else if(sp < 1)
+    {
+        xi  =   1 + h - 0.08*(1 - h)*(1 - (1-h)*(1 - h))/log(s1);
+    }
+    else
+    {
+        xi  =   1;
+    }
+
+    s       =   sp/sqrt(xi);
+    Gamma   =   RE*ME/(ALPHA*(particle_->GetMass())*v);
+    Gamma   =   1 +4*PI*(medium_->GetMolDensity())*(medium_->GetSumCharge())*RE*pow(Gamma,2);
+    s       *=  Gamma;
+    s2      =   pow(s,2);
+    s3      =   pow(s,3);
+
+    if(s < fi1)
+    {
+        fi  =   1-exp(-6*s*(1 + (3-PI)*s) + s3/(0.623 + 0.796*s + 0.658*s2));
+    }
+    else
+    {
+        fi  =   1 - 0.012/pow(s2 , 2);
+    }
+
+    if(s < G1)
+    {
+        ps  =   1 - exp(-4*s - 8*s2/(1 + 3.936*s + 4.97*s2 - 0.05*s3 + 7.50*pow(s2 , 2)));
+        G   =   3*ps - 2*fi;
+    }
+    else if (s < G2)
+    {
+        G   =   36*s2/(36*s2 + 1);
+    }
+    else
+    {
+        G   =   1 - 0.022/pow(s2 , 2);
+    }
+
+    return ((xi/3)*((v*v)*G/(Gamma*Gamma) + 2*(1 + (1-v)*(1-v))*fi/Gamma))/((4./3)*(1-v) + v*v);
+
+}
+
+
+
+
+
 
 //----------------------------------------------------------------------------//
 void Bremsstrahlung::SetLorenz(bool lorenz){
@@ -390,6 +509,5 @@ void Bremsstrahlung::SetLorenz(bool lorenz){
 //----------------------------------------------------------------------------//
 void Bremsstrahlung::SetLorenzCut(double lorenz_cut){
     lorenz_cut_ = lorenz_cut;
-
 }
-//----------------------------------------------------------------------------//
+

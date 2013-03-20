@@ -422,6 +422,9 @@ void Particle::Location(double time,
 void Particle::SetEnergy(double e)
 {
     energy_             =   e;
+
+    if(energy_ < mass_) energy_ = mass_;
+
     square_momentum_    =   e*e-mass_*mass_;
     momentum_           =   sqrt(max(square_momentum_,0.0));
 }

@@ -11,10 +11,12 @@ CrossSections::CrossSections()
     ,doStochasticInterpolation_(false)
     ,multiplier_(1.)
     ,parametrization_(1)
+    ,lpm_effect_enabled_(false)
+    ,init_lpm_effect_(true)
 {
     particle_       = new Particle();
     medium_         = new Medium();
-    cut_settings_   = new EnergyCutSettings();
+    cut_settings_   = new EnergyCutSettings(-1,-1);
 }
 //----------------------------------------------------------------------------//
 
@@ -85,4 +87,8 @@ void CrossSections::SetMedium(Medium *medium){
 
 void CrossSections::SetEnergyCutSettings(EnergyCutSettings *cuts){
     cut_settings_ = cuts;
+}
+//----------------------------------------------------------------------------//
+void CrossSections::EnableLpmEffect(bool lpm_effect_enabled){
+    lpm_effect_enabled_ = lpm_effect_enabled;
 }

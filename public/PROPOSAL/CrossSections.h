@@ -51,6 +51,9 @@ protected:
 
     int parametrization_;
 
+    bool        lpm_effect_enabled_;
+    bool        init_lpm_effect_;
+
 public:
 
     //Constructor
@@ -186,6 +189,11 @@ public:
     }
 
 //----------------------------------------------------------------------------//
+
+    void EnableLpmEffect(bool lpm_effect_enabled);
+
+//----------------------------------------------------------------------------//
+
     // destructor
 
     virtual ~CrossSections(){}

@@ -21,6 +21,9 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
+configure_file(${PROJECT_SOURCE_DIR}/Test/Brems_dEdx.txt ${PROPOSAL_BINARY_DIR}/bin/Brems_dEdx.txt COPYONLY)
+
+
 SET(DEBUG OFF)
 option (DEBUG "DEBUG" OFF)
 if(DEBUG)
@@ -57,10 +60,13 @@ target_link_libraries(PROPOSALtest PROPOSAL)
 IF(DoTesting)
   add_executable(UnitTest_Integral Test/Integral_TEST.cxx)
   add_executable(UnitTest_Interpolant Test/Interpolant_TEST.cxx)
+  add_executable(UnitTest_Bremsstrahlung Test/Bremsstrahlung_TEST.cxx)
 
   target_link_libraries(UnitTest_Integral PROPOSAL gtest gtest_main)
   target_link_libraries(UnitTest_Interpolant PROPOSAL gtest gtest_main)
+  target_link_libraries(UnitTest_Bremsstrahlung PROPOSAL gtest gtest_main)
 
   add_test(UnitTest_Integral bin/UnitTest_Integral)
   add_test(UnitTest_Interpolant bin/UnitTest_Interpolant)
+  add_test(UnitTest_Bremsstrahlung bin/UnitTest_Bremsstrahlung)
 ENDIF()

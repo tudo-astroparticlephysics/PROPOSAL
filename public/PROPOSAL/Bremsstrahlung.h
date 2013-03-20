@@ -8,13 +8,9 @@ class Bremsstrahlung: public CrossSections
 {
 private:
 
-    bool        init_;
-    double      eLpm_;
-    double      xo_;
-
-    bool        lorenz_;
+    bool        lorenz_;        /// enable lorenz cut
     double      lorenz_cut_;  	/// in [MeV] // - set to 1.e6 in Constructor
-    int         component_;
+    int         component_;     /// nucleon in the medium on which the bremsstahlung occur
 
     Integral*   integral_;
 
@@ -47,13 +43,28 @@ private:
     */
     double PetrukhinShestakovParametrization(double v, int i);
 
-    //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
     /*!
     \param v relativ energy loss
     \param i the nucleon in the medium on which the bremsstahlung occur
     \return Calculates \f$ a_{1} \f$ see function Sel in this class
     */
     double CompleteScreeningCase(double v, int i);
+
+//----------------------------------------------------------------------------//
+
+    /*!
+    Landau Pomeranchuk Migdal effect and dielectric suppression evaluation
+    lpm is evaluated:
+    \f[ lpm= return=\frac{x_i}{3}\Big[v^2\frac{G(s)}{\gamma^2}+
+    2(1+(1-v)^2)\frac{\Phi(s)}{\gamma}\Big] \f]
+    \param v relativ energy loss
+    \param s1
+    \return the lpm correction factor
+    */
+
+    double lpm(double v, double s1);
+
 
 public:
 //----------------------------------------------------------------------------//
