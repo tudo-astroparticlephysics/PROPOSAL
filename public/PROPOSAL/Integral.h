@@ -332,11 +332,18 @@ public:
 
     double IntegrateWithLogSubstitution(double min, double max, boost::function<double (double)> integrand, double powerOfSubstitution);
 
+    void Reset();
+
 // Getters
 
     double Get_maxSteps ()
     {
         return maxSteps_;
+    }
+
+    double GetUseLog () const
+    {
+        return useLog_;
     }
 
 // Setters

@@ -45,13 +45,13 @@ int main(){
     Particle *particle = new Particle("mu",1.,1.,1,.20,20,1e5,10);
     Bremsstrahlung *brems = new Bremsstrahlung();
     brems->SetMedium(med);
-
+    brems->EnableLpmEffect(true);
 
     for(int i = 3 ; i < 13 ; i++){
         brems->SetParametrization(1);
         particle->SetEnergy(pow(10.,i));
         brems->SetParticle(particle);
-        cout<<brems->CalculatedEdx()<<endl;
+        cout<<brems->ElasticBremsstrahlungCrossSection(0.2,0)<<endl;
     }
 
     ifstream in;

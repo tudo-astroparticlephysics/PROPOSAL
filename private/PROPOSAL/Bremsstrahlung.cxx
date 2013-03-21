@@ -9,12 +9,8 @@ using namespace std;
 Bremsstrahlung::Bremsstrahlung()
     :lorenz_(false)
     ,lorenz_cut_(1.e6)
-
-
-
 {
     integral_   = new Integral(IROMB, IMAXS, IPREC);
-
 }
 //----------------------------------------------------------------------------//
 
@@ -69,8 +65,7 @@ double Bremsstrahlung::CalculatedEdx(){
 
     for(int i=0; i<(medium_->GetNumCompontents()); i++)
     {
-        component_ = i;
-        SetIntegralLimits(component_);
+        SetIntegralLimits(i);
         sum +=  integral_->IntegrateOpened(0, vUp_, boost::bind(&Bremsstrahlung::FunctionToContinuousIntegral, this, _1));
     }
 
@@ -366,6 +361,7 @@ double Bremsstrahlung::ElasticBremsstrahlungCrossSection(double v, int i){
     double Dn       =   0;
     double s1       =   0;
 
+
     Z3  =   pow((medium_->GetNucCharge()).at(i), -1./3);
 
     switch(parametrization_)
@@ -395,6 +391,7 @@ double Bremsstrahlung::ElasticBremsstrahlungCrossSection(double v, int i){
     aux =   2*(medium_->GetNucCharge()).at(i)*(ME/particle_->GetMass())*RE;
     aux *=  (ALPHA/v)*aux*result;
 
+
     if(lpm_effect_enabled_)
     {
         if(parametrization_!=1)
@@ -415,29 +412,26 @@ double Bremsstrahlung::ElasticBremsstrahlungCrossSection(double v, int i){
 
 double Bremsstrahlung::lpm(double v, double s1)
 {
-
-    double sum      =   0;
-    double e        =   particle_->GetEnergy();
-    double eLpm;
-
+    cout.precision(16);
 
     if(init_lpm_effect_)
     {
+        double sum      =   0;
+        double e        =   particle_->GetEnergy();
         init_lpm_effect_    =   false;
-
         particle_->SetEnergy(BIGENERGY);
 
         for(int i=0; i < medium_->GetNumCompontents(); i++)
         {
             SetIntegralLimits(i);
-            sum +=  integral_->IntegrateOpened(0, vUp_, boost::bind(&Bremsstrahlung::FunctionToContinuousIntegral, this, _1))
+            sum +=  integral_->IntegrateOpened(0, vUp_, boost::bind(&Bremsstrahlung::FunctionToContinuousIntegral, this, _1));
                     + integral_->IntegrateWithLog(vUp_, vMax_, boost::bind(&Bremsstrahlung::FunctionToContinuousIntegral, this, _1));
         }
-
+        integral_->Reset();
         //double c2   =   pow(particle_->GetCharge() , 2);
         //xo_         =   pow(c2,2)/sum;
-        eLpm        =   ALPHA*(particle_->GetMass());
-        eLpm        *=  eLpm/(4*PI*ME*RE*sum);
+        eLpm_        =   ALPHA*(particle_->GetMass());
+        eLpm_        *=  eLpm_/(4*PI*ME*RE*sum);
 
         particle_->SetEnergy(e);
         SetIntegralLimits(0);
@@ -449,7 +443,7 @@ double Bremsstrahlung::lpm(double v, double s1)
     const double G1     =   0.710390;
     const double G2     =   0.904912;
     s1                  *=  s1*SQRT2;
-    sp                  =   sqrt(eLpm*v/(8*(particle_->GetEnergy())*(1-v)));
+    sp                  =   sqrt(eLpm_*v/(8*(particle_->GetEnergy())*(1-v)));
     h                   =   log(sp)/log(s1);
 
     if(sp < s1)
@@ -494,14 +488,11 @@ double Bremsstrahlung::lpm(double v, double s1)
     {
         G   =   1 - 0.022/pow(s2 , 2);
     }
+//cout<<((xi/3)*((v*v)*G/(Gamma*Gamma) + 2*(1 + (1-v)*(1-v))*fi/Gamma))/((4./3)*(1-v) + v*v)<<endl;
 
     return ((xi/3)*((v*v)*G/(Gamma*Gamma) + 2*(1 + (1-v)*(1-v))*fi/Gamma))/((4./3)*(1-v) + v*v);
 
 }
-
-
-
-
 
 
 //----------------------------------------------------------------------------//

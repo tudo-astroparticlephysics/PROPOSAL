@@ -145,7 +145,7 @@ double Integral::Function(double x)
         t       =   exp(t);
         result  *=  t;
     }
-
+   // cout<<useLog_<<"\t ttttttttttttttttttttt    "<<t<<endl;
     result  *=  integrand_(t);
     return result;
 }
@@ -471,6 +471,7 @@ double Integral::RombergIntegrateOpened()
             Interpolate(i-(romberg_-1), 0);
             error=integralError_;
             value=integralValue_;
+//cout<<"step = "<<i<<"\t value = "<<value<<"\t error = "<<error<<"rnd = "<<randomNumber_<<endl;
 
             if(value!=0)
             {
@@ -516,7 +517,6 @@ double Integral::RombergIntegrateOpened(double bigValue)
             error   =   integralError_;
             value   =   integralValue_;
             error   /=  bigValue;
-
             if(fabs(error)<precision_)
             {
                 return value;
@@ -1189,3 +1189,9 @@ double Integral::IntegrateWithLogSubstitution(double min, double max, boost::fun
     return aux*RombergIntegrateOpened();
 }
 
+void Integral::Reset()
+{
+    useLog_   = false;
+    //reverse_  = false;
+    //randomDo_ = false;
+}

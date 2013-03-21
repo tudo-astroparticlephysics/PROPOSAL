@@ -14,6 +14,8 @@ private:
 
     Integral*   integral_;
 
+    double      eLpm_;
+
 //----------------------------------------------------------------------------//
     //Memberfunctions
 
