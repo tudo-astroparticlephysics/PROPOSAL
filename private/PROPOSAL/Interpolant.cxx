@@ -25,6 +25,7 @@
  */
 
 #include "PROPOSAL/Interpolant.h"
+#include "PROPOSAL/methods.h"
 #include <algorithm>
 
 
@@ -174,7 +175,7 @@ void Interpolant::InitInterpolant(int max, double xmin, double xmax,
                                   int romberg, bool rational, bool relative, bool isLog,
                                   int rombergY, bool rationalY, bool relativeY, bool logSubst)
 {
-    double aux;
+    //double aux;
 
     self_   =    true;
     fast_   =    true;
@@ -208,9 +209,7 @@ void Interpolant::InitInterpolant(int max, double xmin, double xmax,
     }
     else if(xmin>xmax)
     {
-        aux     =   xmin;
-        xmin    =   xmax;
-        xmax    =   aux;
+        SWAP(xmin,xmax,double);
     }
 
     if(romberg<=0)
@@ -718,10 +717,9 @@ double Interpolant::interpolate(double x, int start)
 
 double Interpolant::findLimit(double y)
 {
-    int         i, j, m, start, auxdir, auxR;
+    int         i, j, m, start, auxdir;
     bool        dir, rat, rel;
-    double      result, aux;
-    double*     ii;
+    double      result;
 
     rat     =   false;
     reverse_ =   false;
@@ -749,27 +747,19 @@ double Interpolant::findLimit(double y)
         }
     }
 
-    ii  =   iX_;
-    iX_  =   iY_;
-    iY_  =   ii;
+    SWAP(iX_,iY_, double*);
 
     if(!fast_)
     {
-        aux         =   precision_;
-        precision_   =   precisionY_;
-        precisionY_  =   aux;
-
-        aux         =   worstX_;
-        worstX_      =   worstY_;
-        worstY_      =   aux;
+        SWAP(precision_,precisionY_,double);
+        SWAP(worstX_,worstY_,double);
 
         rat         =   rational_;
         rational_    =   rationalY_;
     }
 
-    auxR        =   romberg_;
-    romberg_     =   rombergY_;
-    rombergY_    =   auxR;
+    SWAP(romberg_,rombergY_,double);
+
     rel         =   relative_;
     relative_    =   relativeY_;
 
@@ -803,26 +793,19 @@ double Interpolant::findLimit(double y)
     }
 
     result  =   interpolate(y, start);
-    ii      =   iX_;
-    iX_      =   iY_;
-    iY_      =   ii;
+
+    SWAP(iX_,iY_,double*);
 
     if(!fast_)
     {
-        aux         =   precision_;
-        precision_   =   precisionY_;
-        precisionY_  =   aux;
-
-        aux         =   worstX_;
-        worstX_      =   worstY_;
-        worstY_      =   aux;
+        SWAP(precision_,precisionY_,double);
+        SWAP(worstX_,worstY_,double);
 
         rational_    =   rat;
     }
 
-    auxR        =   romberg_;
-    romberg_     =   rombergY_;
-    rombergY_    =   auxR;
+    SWAP(romberg_,rombergY_,double);
+
     relative_    =   rel;
 
     if(result<xmin_)

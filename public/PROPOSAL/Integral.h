@@ -336,6 +336,10 @@ public:
 
 // Getters
 
+    int Get_romberg(){
+        return romberg_;
+    }
+
     double Get_maxSteps ()
     {
         return maxSteps_;

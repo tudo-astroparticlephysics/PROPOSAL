@@ -442,10 +442,10 @@ double Integral::RombergIntegrateOpened()
     n       =   1;
     value   =   0;
     result  =   0;
-
+    cout << "start integral!"<< endl;
     for(i=0 ; i<maxSteps_ ; i++)
     {
-
+        cout << "Steps: " << i << endl;
         if(randomNumber_==0 || randomNumber_==1)
         {
             result  =   Trapezoid3(k, result);
