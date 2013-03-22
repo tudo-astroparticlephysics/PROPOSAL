@@ -44,6 +44,7 @@ Bremsstrahlung::Bremsstrahlung(Particle* particle,
     multiplier_                 = 1.;
     parametrization_            = 1;
     lpm_effect_enabled_         = false;
+    init_lpm_effect_            = true;
     component_                  = 0;
 
     integral_   = new Integral(IROMB, IMAXS, IPREC);

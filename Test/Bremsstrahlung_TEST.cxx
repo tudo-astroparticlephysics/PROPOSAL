@@ -41,7 +41,7 @@ TEST(Bremsstrahlung , Test_of_dEdx ) {
         brems->SetParametrization(para);
         brems->EnableLpmEffect(lpm);
         dEdx_new=brems->CalculatedEdx();
-        cout<<dEdx_new<<"\t"<<particle->GetMass()<<endl;
+        cout<<dEdx_new<<"\t"<<particle->GetMass()<<"\t"<<brems->GetVMax()<<"\t"<<brems->GetVMin()<<"\t"<<brems->GetVUp()<<endl;
         //ASSERT_NEAR(dEdx_new, dEdx, 5e-1*dEdx);
 
         delete brems;
