@@ -29,76 +29,55 @@ double _3X_2(double x){
 }
 
 int main(){
-    cout.precision(16);
-    cout << "baslsadkadsadasdh" << endl;
-    double min, max;
-    min = 1;
-    max = 3;
-    int N = 10000000;
-    cout << "min: " << min << endl;
-    cout << "max: " << max << endl;
-    cout << "--------------------------" << endl;
-    cout << "integral x*x: "        << integrate(min,max,N,X2)      << endl;
-    cout << "integral 3*x + 2: "    << integrate(min,max,N,_3X_2)   << endl;
-
-    Medium *med = new Medium("ice",1.);
-    Particle *particle = new Particle("mu",1.,1.,1,.20,20,1e5,10);
-    Bremsstrahlung *brems = new Bremsstrahlung();
-    brems->SetMedium(med);
-    brems->EnableLpmEffect(true);
-    brems->GetEnergyCutSettings()->SetEcut(-1);
-    brems->GetEnergyCutSettings()->SetVcut(-1);
-
-    for(int i = 3 ; i < 13 ; i++){
-        brems->SetParametrization(1);
-        particle->SetEnergy(pow(10.,i));
-        brems->SetParticle(particle);
-        cout<<brems->lpm(0.8,0.)<<endl;
-    }
 
     ifstream in;
-    in.open("Brems_dEdx.txt");
-    string aps;
-    in>>aps;
-    cout<<aps<<endl;
-    brems->SetParametrizationLimit(1.);
+    in.open("bin/Brems_dEdx.txt");
 
-    Integral* Int = new Integral();
-//    cout << "IntegralKlasse x*x: " << Int->IntegrateClosed(0,3,X2) << endl;
-    bool testInterpolant = true;
-    if(testInterpolant){
-        int max = 100;
-        double xmin = 0;
-        double xmax = 20;
-        int romberg = 5;
-        bool rational = false;
-        bool relative = false;
-        bool isLog = false;
-        int rombergY = 5;
-        bool rationalY = false;
-        bool relativeY = false;
-        bool logSubst = false;
-        Interpolant* Pol1 = new Interpolant(max, xmin, xmax, X2, romberg, rational, relative, isLog, rombergY, rationalY, relativeY, logSubst);
-        double SearchX = 3;
-        cout << "Interpolating f(" << SearchX << "): " << Pol1->interpolate(3) << endl;
+    char firstLine[256];
+    in.getline(firstLine,256);
+    double dEdx_new;
+    double energy;
+    double dEdx;
+    double ecut;
+    double vcut;
+    string med;
+    string particleName;
+    bool lpm;
+    int para;
+
+    cout.precision(16);
 
 
-                int max2 = 100;
-        double x2min = 0;
-        double x2max = 20;
-        int romberg2 = 5;
-        bool rational2 = false;
-        bool relative2 = false;
-        bool isLog2 = false;
+    while(in.good())
+    {
+        in>>para>>ecut>>vcut>>lpm>>energy>>med>>particleName>>dEdx;
+        cout<<para<<"\t"<<ecut<<"\t"<<vcut<<"\t"<<lpm<<"\t"<<energy<<"\t"<<med<<"\t"<<particleName<<"\t"<<dEdx<<"\t";
 
-                Interpolant* Pol2 = new Interpolant(max,  xmin, xmax, max2, x2min, x2max, X_YY,
-                                                    romberg, rational, relative, isLog,
-                                                    romberg2, rational2, relative2, isLog2,
-                                                    rombergY, rationalY, relativeY, logSubst);
+        Medium *medium = new Medium(med,1.);
+        Particle *particle = new Particle(particleName,1.,1.,1,.20,20,1e5,10);
+        particle->SetEnergy(energy);
+        EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
 
-                cout << "x+y*y (2,3): " <<  Pol2->interpolate(2.,3.) << endl;
+        CrossSections *brems = new Bremsstrahlung(particle, medium, cuts);
+
+
+        brems->SetParametrization(para);
+        brems->EnableLpmEffect(lpm);
+        if(para==1 && ecut==500 && vcut == -1 && lpm ==true){
+            para = para*para;
+        }
+        dEdx_new=brems->CalculatedEdx();
+        cout<<dEdx_new<<"\t"<<particle->GetMass()<<"\t"<<brems->GetVMax()<<"\t"<<brems->GetVMin()<<"\t"<<brems->GetVUp()<<endl;
+        //ASSERT_NEAR(dEdx_new, dEdx, 5e-1*dEdx);
+
+        delete cuts;
+        delete medium;
+        delete particle;
+        delete brems;
+
+
+
     }
-
 
     return 0;
 }

@@ -95,7 +95,9 @@ double Bremsstrahlung::CalculatedEdx(){
     for(int i=0; i<(medium_->GetNumCompontents()); i++)
     {
         SetIntegralLimits(i);
-        sum +=  integral_->IntegrateOpened(0, vUp_, boost::bind(&Bremsstrahlung::FunctionToContinuousIntegral, this, _1));
+        Integral* integral_temp = new Integral(IROMB,IMAXS,IPREC);
+        sum +=  integral_temp->IntegrateOpened(0, vUp_, boost::bind(&Bremsstrahlung::FunctionToContinuousIntegral, this, _1));
+        delete integral_temp;
     }
 
     return multiplier_*particle_->GetEnergy()*sum;
@@ -449,10 +451,11 @@ double Bremsstrahlung::lpm(double v, double s1)
 
         for(int i=0; i < medium_->GetNumCompontents(); i++)
         {
-            integral_->Reset();
+            //integral_->Reset();
 
             SetIntegralLimits(i);
-
+            cout << "vUp_: " << vUp_ << endl;
+            cout << "vMax_: " << vMax_ << endl;
             sum +=  integral_->IntegrateOpened(0, vUp_, boost::bind(&Bremsstrahlung::FunctionToContinuousIntegral, this, _1));
             sum += integral_->IntegrateWithLog(vUp_, vMax_, boost::bind(&Bremsstrahlung::FunctionToContinuousIntegral, this, _1));
         }
@@ -519,7 +522,6 @@ double Bremsstrahlung::lpm(double v, double s1)
     }
 //cout<<((xi/3)*((v*v)*G/(Gamma*Gamma) + 2*(1 + (1-v)*(1-v))*fi/Gamma))/((4./3)*(1-v) + v*v)<<endl;
     return ((xi/3)*((v*v)*G/(Gamma*Gamma) + 2*(1 + (1-v)*(1-v))*fi/Gamma))/((4./3)*(1-v) + v*v);
-
 }
 
 
