@@ -46,12 +46,14 @@ int main(){
     Bremsstrahlung *brems = new Bremsstrahlung();
     brems->SetMedium(med);
     brems->EnableLpmEffect(true);
+    brems->GetEnergyCutSettings()->SetEcut(-1);
+    brems->GetEnergyCutSettings()->SetVcut(-1);
 
     for(int i = 3 ; i < 13 ; i++){
         brems->SetParametrization(1);
         particle->SetEnergy(pow(10.,i));
         brems->SetParticle(particle);
-        cout<<brems->ElasticBremsstrahlungCrossSection(0.2,0)<<endl;
+        cout<<brems->lpm(0.2,0.)<<endl;
     }
 
     ifstream in;

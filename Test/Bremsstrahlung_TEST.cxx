@@ -22,12 +22,12 @@ TEST(Bremsstrahlung , Test_of_dEdx ) {
     string particleName;
     bool lpm;
     int para;
-
     CrossSections *brems = new Bremsstrahlung();
-
     while(in.good())
     {
         in>>para>>ecut>>vcut>>lpm>>energy>>med>>particleName>>dEdx;
+        cout<<para<<"\t"<<ecut<<"\t"<<vcut<<"\t"<<lpm<<"\t"<<energy<<"\t"<<med<<"\t"<<particleName<<"\t"<<dEdx<<"\t"<<endl;
+
         Medium *medium = new Medium(med,1.);
         brems->GetEnergyCutSettings()->SetEcut(ecut);
         brems->GetEnergyCutSettings()->SetVcut(vcut);
@@ -37,8 +37,7 @@ TEST(Bremsstrahlung , Test_of_dEdx ) {
         Particle *particle = new Particle(particleName,1.,1.,1,.20,20,1e5,10);
         particle->SetEnergy(energy);
         brems->SetParticle(particle);
-        cout<<lpm<<"\t"<<brems->CalculatedEdx()<<"\t\t"<< dEdx<<endl;
-        //ASSERT_FLOAT_EQ(brems->CalculatedEdx(), dEdx);
+        ASSERT_FLOAT_EQ(brems->CalculatedEdx(), dEdx);
         delete medium;
         delete particle;
 

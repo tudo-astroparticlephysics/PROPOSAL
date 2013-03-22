@@ -336,7 +336,7 @@ public:
 
 // Getters
 
-    int Get_romberg(){
+    int GetRomberg(){
         return romberg_;
     }
 

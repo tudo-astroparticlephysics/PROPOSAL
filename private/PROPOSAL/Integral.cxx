@@ -145,7 +145,6 @@ double Integral::Function(double x)
         t       =   exp(t);
         result  *=  t;
     }
-   // cout<<useLog_<<"\t ttttttttttttttttttttt    "<<t<<endl;
     result  *=  integrand_(t);
     return result;
 }
@@ -442,10 +441,8 @@ double Integral::RombergIntegrateOpened()
     n       =   1;
     value   =   0;
     result  =   0;
-    cout << "start integral!"<< endl;
     for(i=0 ; i<maxSteps_ ; i++)
     {
-        cout << "Steps: " << i << endl;
         if(randomNumber_==0 || randomNumber_==1)
         {
             result  =   Trapezoid3(k, result);
@@ -471,7 +468,6 @@ double Integral::RombergIntegrateOpened()
             Interpolate(i-(romberg_-1), 0);
             error=integralError_;
             value=integralValue_;
-//cout<<"step = "<<i<<"\t value = "<<value<<"\t error = "<<error<<"rnd = "<<randomNumber_<<endl;
 
             if(value!=0)
             {
