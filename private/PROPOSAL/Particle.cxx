@@ -221,7 +221,7 @@ Particle::Particle(string name,
     ,mass_                  (MMU)
     ,lifetime_              (LMU)
     ,charge_                (1)
-    ,name_                  ("mu")
+    ,name_                  (name)
     ,low_                   (mass_)
     ,type_                  (1)
     ,parent_particle_id_    (0)

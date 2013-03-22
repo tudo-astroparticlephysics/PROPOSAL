@@ -7,8 +7,7 @@
 using namespace std;
 
 Bremsstrahlung::Bremsstrahlung()
-    :lorenz_(false)
-    ,lorenz_cut_(1.e6)
+
 {
     integral_   = new Integral(IROMB, IMAXS, IPREC);
 }
@@ -25,6 +24,34 @@ Bremsstrahlung& Bremsstrahlung::operator=(const Bremsstrahlung &brems){
 }
 
 //----------------------------------------------------------------------------//
+
+Bremsstrahlung::Bremsstrahlung(Particle* particle,
+                             Medium* medium,
+                             EnergyCutSettings* cut_settings)
+    :lorenz_(false)
+    ,lorenz_cut_(1.e6)
+    ,eLpm_(0)
+{
+    particle_                   = particle;
+    medium_                     = medium;
+    cut_settings_               = cut_settings;
+    vMax_                       = 0;
+    vUp_                        = 0;
+    vMin_                       = 0;
+    ebig_                       = BIGENERGY;
+    doContinuousInterpolation_  = false;
+    doStochasticInterpolation_  = false;
+    multiplier_                 = 1.;
+    parametrization_            = 1;
+    lpm_effect_enabled_         = false;
+    component_                  = 0;
+
+    integral_   = new Integral(IROMB, IMAXS, IPREC);
+
+}
+
+//----------------------------------------------------------------------------//
+
 
 void Bremsstrahlung::SetIntegralLimits(int component){
 
@@ -391,7 +418,6 @@ double Bremsstrahlung::ElasticBremsstrahlungCrossSection(double v, int i){
     aux =   2*(medium_->GetNucCharge()).at(i)*(ME/particle_->GetMass())*RE;
     aux *=  (ALPHA/v)*aux*result;
 
-
     if(lpm_effect_enabled_)
     {
         if(parametrization_!=1)
@@ -490,7 +516,7 @@ double Bremsstrahlung::lpm(double v, double s1)
     {
         G   =   1 - 0.022/pow(s2 , 2);
     }
-
+//cout<<((xi/3)*((v*v)*G/(Gamma*Gamma) + 2*(1 + (1-v)*(1-v))*fi/Gamma))/((4./3)*(1-v) + v*v)<<endl;
     return ((xi/3)*((v*v)*G/(Gamma*Gamma) + 2*(1 + (1-v)*(1-v))*fi/Gamma))/((4./3)*(1-v) + v*v);
 
 }

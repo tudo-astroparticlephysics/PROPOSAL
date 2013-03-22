@@ -53,7 +53,7 @@ int main(){
         brems->SetParametrization(1);
         particle->SetEnergy(pow(10.,i));
         brems->SetParticle(particle);
-        cout<<brems->lpm(0.2,0.)<<endl;
+        cout<<brems->lpm(0.8,0.)<<endl;
     }
 
     ifstream in;

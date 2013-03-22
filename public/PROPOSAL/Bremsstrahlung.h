@@ -16,6 +16,8 @@ private:
 
     double      eLpm_;
 
+
+
 //----------------------------------------------------------------------------//
     //Memberfunctions
 
@@ -75,6 +77,7 @@ public:
     Bremsstrahlung();
     Bremsstrahlung(const Bremsstrahlung&);
     Bremsstrahlung& operator=(const Bremsstrahlung&);
+    Bremsstrahlung(Particle* particle, Medium* medium, EnergyCutSettings* cut_settings);
 
 //----------------------------------------------------------------------------//
 
