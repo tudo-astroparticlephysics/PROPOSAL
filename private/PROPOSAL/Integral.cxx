@@ -446,6 +446,10 @@ double Integral::RombergIntegrateOpened()
         if(randomNumber_==0 || randomNumber_==1)
         {
             result  =   Trapezoid3(k, result);
+            if(result != result){
+                printf("Warning (in Integral/rombergIntegrateOpened/0): Function Value of is nan. Return 0");
+                return 0;
+            }
 
             if(randomNumber_==0)
             {

@@ -1,10 +1,11 @@
 #include "gtest/gtest.h"
+#include <limits.h>
 #include "PROPOSAL/Integral.h"
 #include "math.h"
 #include <iostream>
 
 double Testfkt(double r){
-  return r*r;
+  return exp(r);
 }
 
 double Testexp(double r){
@@ -17,7 +18,10 @@ bool relErr(double Is, double HasToBe, double RelError){
 
 TEST(IntegralValue , Zero_to_Three_of_xx ) {
     Integral* Int = new Integral();
-    EXPECT_EQ(Int->IntegrateClosed(0,3,Testfkt),9);
+    std::cout.precision(16);
+    std::cout << Int->IntegrateClosed(0,3,Testfkt) << std::endl;
+    std::cout << exp(3)-1 << std::endl;
+    ASSERT_NEAR(Int->IntegrateClosed(0,3,Testfkt),exp(3)-1 , (exp(3)-1)*1E-6);
     delete Int;
 }
 

@@ -391,7 +391,6 @@ double Bremsstrahlung::ElasticBremsstrahlungCrossSection(double v, int i){
     double Dn       =   0;
     double s1       =   0;
 
-
     Z3  =   pow((medium_->GetNucCharge()).at(i), -1./3);
 
     switch(parametrization_)
@@ -449,16 +448,20 @@ double Bremsstrahlung::lpm(double v, double s1)
         init_lpm_effect_    =   false;
         particle_->SetEnergy(BIGENERGY);
 
+        cout << "Medium NumComponent: " << medium_->GetNumCompontents() << endl;
         for(int i=0; i < medium_->GetNumCompontents(); i++)
         {
-            //integral_->Reset();
+            integral_->Reset();
 
             SetIntegralLimits(i);
-            cout << "vUp_: " << vUp_ << endl;
-            cout << "vMax_: " << vMax_ << endl;
-            sum +=  integral_->IntegrateOpened(0, vUp_, boost::bind(&Bremsstrahlung::FunctionToContinuousIntegral, this, _1));
-            sum += integral_->IntegrateWithLog(vUp_, vMax_, boost::bind(&Bremsstrahlung::FunctionToContinuousIntegral, this, _1));
+
+            //sum +=  integral_->IntegrateOpened(0, vUp_, boost::bind(&Bremsstrahlung::FunctionToContinuousIntegral, this, _1));
+                    integral_->Reset();
+           // sum +=  integral_->IntegrateWithLog(vUp_, vMax_, boost::bind(&Bremsstrahlung::FunctionToContinuousIntegral, this, _1));
+                    sum += FunctionToContinuousIntegral(vUp_/2.);
         }
+        //sum = vMax_;
+        cout << "SUM: " << sum << endl;
         integral_->Reset();
 
         eLpm_        =   ALPHA*(particle_->GetMass());
@@ -520,6 +523,7 @@ double Bremsstrahlung::lpm(double v, double s1)
     {
         G   =   1 - 0.022/pow(s2 , 2);
     }
+
 //cout<<((xi/3)*((v*v)*G/(Gamma*Gamma) + 2*(1 + (1-v)*(1-v))*fi/Gamma))/((4./3)*(1-v) + v*v)<<endl;
     return ((xi/3)*((v*v)*G/(Gamma*Gamma) + 2*(1 + (1-v)*(1-v))*fi/Gamma))/((4./3)*(1-v) + v*v);
 }
