@@ -43,7 +43,7 @@ TEST(Bremsstrahlung , Test_of_dEdx ) {
         brems->EnableLpmEffect(lpm);
 
         dEdx_new=brems->CalculatedEdx();
-        ASSERT_NEAR(dEdx_new, dEdx, 1e-15*dEdx);
+        ASSERT_NEAR(dEdx_new, dEdx, 1e-14*dEdx);
 
         delete cuts;
         delete medium;

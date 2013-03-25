@@ -7,6 +7,7 @@ using namespace std;
 
 Epairproduction::Epairproduction()
     :reverse_(false)
+    ,eLpm_(0)
 {
     integral_             = new Integral(IROMB, IMAXS, IPREC);
     integral_for_dEdx_    = new Integral(IROMB, IMAXS, IPREC);
@@ -29,6 +30,7 @@ Epairproduction::Epairproduction(Particle* particle,
                              Medium* medium,
                              EnergyCutSettings* cut_settings)
     :reverse_(false)
+    ,eLpm_(0)
 {
     particle_                   = particle;
     medium_                     = medium;
@@ -298,7 +300,6 @@ double Epairproduction::FunctionToIntegral(double r){
 double Epairproduction::lpm(double r2, double b, double x)
 {
 
-    double eLpm;
 
     if(init_lpm_effect_)
     {
@@ -307,17 +308,19 @@ double Epairproduction::lpm(double r2, double b, double x)
 
         for(int i=0; i<medium_->GetNumCompontents(); i++)
         {
-            sum +=  medium_->GetNucCharge().at(i)*medium_->GetNucCharge().at(i)*log(3.25*medium_->GetLogConstant().at(i)*pow(medium_->GetNucCharge().at(i), -1./3));
+            sum +=  medium_->GetNucCharge().at(i)*medium_->GetNucCharge().at(i)
+                    *log(3.25*medium_->GetLogConstant().at(i)*pow(medium_->GetNucCharge().at(i), -1./3));
         }
 
-        eLpm    =   particle_->GetMass()/(ME*RE);
-        eLpm    *=  (eLpm*eLpm)*ALPHA*particle_->GetMass()/(2*PI*medium_->GetMolDensity()*particle_->GetCharge()*particle_->GetCharge()*sum);
+        eLpm_    =   particle_->GetMass()/(ME*RE);
+        eLpm_    *=  (eLpm_*eLpm_)*ALPHA*particle_->GetMass()
+                /(2*PI*medium_->GetMolDensity()*particle_->GetCharge()*particle_->GetCharge()*sum);
     }
 
     double A, B, C, D, E, s;
     double s2, s36, s6, d1, d2, atan_, log1, log2;
 
-    s       =   sqrt(eLpm/(particle_->GetEnergy()*v_*(1 - r2)))/4;
+    s       =   sqrt(eLpm_/(particle_->GetEnergy()*v_*(1 - r2)))/4;
     s6      =   6*s;
     atan_   =   s6*(x + 1);
 
@@ -339,7 +342,8 @@ double Epairproduction::lpm(double r2, double b, double x)
     D       =   d1-d1*d1*x*log2;
     E       =   -s6*atan_;
 
-    return ((1 + b)*(A + (1 + r2)*B) + b*(C + (1 + r2)*D) + (1 - r2)*E)/(((2 + r2)*(1 +b ) + x*(3 + r2))*log(1 +1 /x) + (1 - r2 - b)/(1 + x) - (3 + r2));
+    return ((1 + b)*(A + (1 + r2)*B) + b*(C + (1 + r2)*D) + (1 - r2)*E)
+            /(((2 + r2)*(1 +b ) + x*(3 + r2))*log(1 +1 /x) + (1 - r2 - b)/(1 + x) - (3 + r2));
 
 
 }

@@ -36,11 +36,10 @@ TEST(Epairproduction , Test_of_dEdx ) {
 
         CrossSections *epair = new Epairproduction(particle, medium, cuts);
 
-        if(lpm)continue;
         epair->EnableLpmEffect(lpm);
 
         dEdx_new=epair->CalculatedEdx();
-        ASSERT_NEAR(dEdx_new, dEdx, 1e-15*dEdx);
+        ASSERT_NEAR(dEdx_new, dEdx, 1e-14*dEdx);
 
         delete cuts;
         delete medium;
