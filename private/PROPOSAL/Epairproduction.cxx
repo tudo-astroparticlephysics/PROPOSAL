@@ -7,7 +7,8 @@ using namespace std;
 
 Epairproduction::Epairproduction()
 {
-    integral_   = new Integral(IROMB, IMAXS, IPREC);
+    integral_             = new Integral(IROMB, IMAXS, IPREC);
+    integral_for_dEdx_    = new Integral(IROMB, IMAXS, IPREC);
 }
 //----------------------------------------------------------------------------//
 
@@ -22,6 +23,33 @@ Epairproduction& Epairproduction::operator=(const Epairproduction &epair){
 }
 
 //----------------------------------------------------------------------------//
+
+Epairproduction::Epairproduction(Particle* particle,
+                             Medium* medium,
+                             EnergyCutSettings* cut_settings)
+{
+    particle_                   = particle;
+    medium_                     = medium;
+    cut_settings_               = cut_settings;
+    vMax_                       = 0;
+    vUp_                        = 0;
+    vMin_                       = 0;
+    ebig_                       = BIGENERGY;
+    doContinuousInterpolation_  = false;
+    doStochasticInterpolation_  = false;
+    multiplier_                 = 1.;
+    parametrization_            = 1;
+    lpm_effect_enabled_         = false;
+    init_lpm_effect_            = true;
+    component_                  = 0;
+
+    integral_             = new Integral(IROMB, IMAXS, IPREC);
+    integral_for_dEdx_    = new Integral(IROMB, IMAXS, IPREC);
+
+}
+
+//----------------------------------------------------------------------------//
+
 
 void Epairproduction::SetIntegralLimits(int component){
 
@@ -53,7 +81,68 @@ void Epairproduction::SetIntegralLimits(int component){
 //----------------------------------------------------------------------------//
 
 double Epairproduction::CalculatedEdx(){
-    return 0;
+    if(multiplier_<=0)
+    {
+        return 0;
+    }
+
+//    if(jt_)
+//    {
+//        return max(interpolateJ_->interpolate(particle_->e), 0.0);
+//    }
+
+
+    double sum  =   0;
+
+    for(int i=0; i<medium_->GetNumCompontents(); i++)
+    {
+        SetIntegralLimits(i);
+        double r1   =   0.8;
+        double rUp  =   vUp_*(1-HALF_PRECISION);
+        bool rflag  =   false;
+
+        if(r1<rUp)
+        {
+            if(2*FunctionToContinuousIntegral(r1)<FunctionToContinuousIntegral(rUp))
+            {
+                rflag   =   true;
+            }
+        }
+
+        if(rflag)
+        {
+            if(r1>vUp_)
+            {
+                r1  =   vUp_;
+            }
+
+            if(r1<vMin_)
+            {
+                r1  =   vMin_;
+            }
+
+            sum         +=  integral_for_dEdx_->IntegrateWithLog(vMin_, r1, boost::bind(&Epairproduction::FunctionToContinuousIntegral, this, _1));
+            reverse_    =   true;
+            double r2   =   max(1-vUp_, COMPUTER_PRECISION);
+
+            if(r2>1-r1)
+            {
+                r2  =   1-r1;
+            }
+
+            sum         +=  integral_for_dEdx_->IntegrateOpened(1-vUp_, r2, boost::bind(&Epairproduction::FunctionToContinuousIntegral, this, _1))
+                        +   integral_for_dEdx_->IntegrateWithLog(r2, 1-r1, boost::bind(&Epairproduction::FunctionToContinuousIntegral, this, _1));
+
+            reverse_    =   false;
+        }
+
+        else
+        {
+            sum +=  integral_for_dEdx_->IntegrateWithLog(vMin_, vUp_, boost::bind(&Epairproduction::FunctionToContinuousIntegral, this, _1));
+        }
+    }
+
+    return multiplier_*particle_->GetEnergy()*sum;
 }
 //----------------------------------------------------------------------------//
 
@@ -84,7 +173,13 @@ void Epairproduction::EnableContinuousInerpolation(){
 //----------------------------------------------------------------------------//
 
 double Epairproduction::FunctionToContinuousIntegral(double variable){
-    return 0;
+
+    if(reverse_)
+    {
+        variable   =   1-variable;
+    }
+
+    return variable*EPair(variable, component_);
 }
 
 //----------------------------------------------------------------------------//
@@ -248,7 +343,7 @@ double Epairproduction::lpm(double r2, double b, double x)
 
 //----------------------------------------------------------------------------//
 
-double Epairproduction::ePair(double v, int component)
+double Epairproduction::EPair(double v, int component)
 {
 
 //    if(jt_)

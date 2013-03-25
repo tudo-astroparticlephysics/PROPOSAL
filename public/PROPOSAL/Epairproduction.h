@@ -8,9 +8,12 @@ protected:
 
     int component_;
     double v_;
-
+    bool reverse_;
 
     Integral*   integral_;
+    Integral*   integral_for_dEdx_;
+
+
 
 public:
 //----------------------------------------------------------------------------//
@@ -18,6 +21,7 @@ public:
     Epairproduction();
     Epairproduction(const Epairproduction&);
     Epairproduction& operator=(const Epairproduction&);
+    Epairproduction(Particle* particle, Medium* medium, EnergyCutSettings* cut_settings);
 
 //----------------------------------------------------------------------------//
 
@@ -88,7 +92,7 @@ public:
     \sqrt{1-\frac{4m_e}{E_p v}}\Big(1-\frac{6m_p^2}{E_p^2(1-v)}\Big)\f$
     */
 
-    double ePair(double v, int component);
+    double EPair(double v, int component);
 
 //----------------------------------------------------------------------------//
 
