@@ -55,23 +55,23 @@ private:
     */
     double CompleteScreeningCase(double v, int i);
 
+//----------------------------------------------------------------------------//
 
+    /*!
+    Landau Pomeranchuk Migdal effect and dielectric suppression evaluation
+    lpm is evaluated:
+    \f[ lpm= return=\frac{x_i}{3}\Big[v^2\frac{G(s)}{\gamma^2}+
+    2(1+(1-v)^2)\frac{\Phi(s)}{\gamma}\Big] \f]
+    \param v relativ energy loss
+    \param s1
+    \return the lpm correction factor
+    */
+
+    double lpm(double v, double s1);
 
 
 public:
-    //----------------------------------------------------------------------------//
 
-        /*!
-        Landau Pomeranchuk Migdal effect and dielectric suppression evaluation
-        lpm is evaluated:
-        \f[ lpm= return=\frac{x_i}{3}\Big[v^2\frac{G(s)}{\gamma^2}+
-        2(1+(1-v)^2)\frac{\Phi(s)}{\gamma}\Big] \f]
-        \param v relativ energy loss
-        \param s1
-        \return the lpm correction factor
-        */
-
-        double lpm(double v, double s1);
 //----------------------------------------------------------------------------//
 
     Bremsstrahlung();
