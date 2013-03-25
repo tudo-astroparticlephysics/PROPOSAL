@@ -52,6 +52,11 @@ protected:
 
 //----------------------------------------------------------------------------//
 
+    /*!
+    pair production energy losses - interface to Integral;
+    \f[ return= v\cdot e_{Pair}(v, components)\f]
+    */
+
     double FunctionToContinuousIntegral(double variable);
 
 //----------------------------------------------------------------------------//
@@ -59,6 +64,14 @@ protected:
     double FunctionToStochasticalIntegral(double variable);
 
 //----------------------------------------------------------------------------//
+
+    /*!
+    Set the component of the primary;
+    sets the parameters \f$v_{Min}=4 \frac{m_e}{E_p}\f$,
+    \f$v_{Max}= max(-\frac{3}{4}\sqrt{e}\frac{m_p}{E_p}Z^{\frac{1}{3}},
+    1-6\Big(\frac{m_p}{E_P}\Big)^2, 1-\frac{m_p}{E_p} )\f$
+    and \f$v_{Up}=max( v_{max} , v_{Cut}(E_p))\f$
+    */
 
     void SetIntegralLimits(int component);
 
@@ -74,6 +87,13 @@ public:
     Epairproduction(Particle* particle, Medium* medium, EnergyCutSettings* cut_settings);
 
 //----------------------------------------------------------------------------//
+
+    /*!
+    contribution of pair production to -dE/dx,
+    \f[\frac{dE}{dx}=return= multiplier \cdot E_p \sum_{numC}
+    \int_{v_{Min}}^{v_{Up}} v e_{Pair}(v, components) dv\f]
+    \return [E/cm]
+    */
 
     double CalculatedEdx();
 
