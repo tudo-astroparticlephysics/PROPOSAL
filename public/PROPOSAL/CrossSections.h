@@ -54,19 +54,31 @@ protected:
     bool        lpm_effect_enabled_;
     bool        init_lpm_effect_;
 
+
+//----------------------------------------------------------------------------//
+
+    virtual void SetIntegralLimits(int component) = 0;
+
+//----------------------------------------------------------------------------//
+
+    virtual double FunctionToContinuousIntegral(double variable) = 0;
+
+//----------------------------------------------------------------------------//
+
+    virtual double FunctionToStochasticalIntegral(double variable) = 0;
+
+//----------------------------------------------------------------------------//
+
 public:
 
     //Constructor
     CrossSections();
-
 //----------------------------------------------------------------------------//
 
     CrossSections(Particle* particle, Medium* medium, EnergyCutSettings* cut_settings);
 
-//----------------------------------------------------------------------------//
     // Memberfunctions
 
-    virtual void SetIntegralLimits(int component) = 0;
 
 //----------------------------------------------------------------------------//
 
@@ -92,15 +104,6 @@ public:
 //----------------------------------------------------------------------------//
 
     virtual void EnableContinuousInerpolation() = 0;
-
-//----------------------------------------------------------------------------//
-
-    virtual double FunctionToContinuousIntegral(double variable) = 0;
-
-//----------------------------------------------------------------------------//
-
-    virtual double FunctionToStochasticalIntegral(double variable) = 0;
-
 
 //----------------------------------------------------------------------------//
 

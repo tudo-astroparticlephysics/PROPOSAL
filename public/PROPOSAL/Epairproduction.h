@@ -15,52 +15,6 @@ protected:
     Integral*   integral_;
     Integral*   integral_for_dEdx_;
 
-
-
-public:
-//----------------------------------------------------------------------------//
-
-    Epairproduction();
-    Epairproduction(const Epairproduction&);
-    Epairproduction& operator=(const Epairproduction&);
-    Epairproduction(Particle* particle, Medium* medium, EnergyCutSettings* cut_settings);
-
-//----------------------------------------------------------------------------//
-
-    void SetIntegralLimits(int component);
-
-//----------------------------------------------------------------------------//
-
-    double CalculatedEdx();
-
-//----------------------------------------------------------------------------//
-
-    double CalculatedNdx();
-
-//----------------------------------------------------------------------------//
-
-    double CalculatedNdx(double rnd);
-
-//----------------------------------------------------------------------------//
-
-    double CalculateStochasticLoss();
-
-//----------------------------------------------------------------------------//
-
-    void EnableStochasticInerpolation();
-
-//----------------------------------------------------------------------------//
-
-    void EnableContinuousInerpolation();
-
-//----------------------------------------------------------------------------//
-
-    double FunctionToContinuousIntegral(double variable);
-
-//----------------------------------------------------------------------------//
-
-    double FunctionToStochasticalIntegral(double variable);
-
 //----------------------------------------------------------------------------//
 
     /*!
@@ -97,6 +51,56 @@ public:
     double EPair(double v, int component);
 
 //----------------------------------------------------------------------------//
+
+    double FunctionToContinuousIntegral(double variable);
+
+//----------------------------------------------------------------------------//
+
+    double FunctionToStochasticalIntegral(double variable);
+
+//----------------------------------------------------------------------------//
+
+    void SetIntegralLimits(int component);
+
+//----------------------------------------------------------------------------//
+
+public:
+
+//----------------------------------------------------------------------------//
+
+    Epairproduction();
+    Epairproduction(const Epairproduction&);
+    Epairproduction& operator=(const Epairproduction&);
+    Epairproduction(Particle* particle, Medium* medium, EnergyCutSettings* cut_settings);
+
+//----------------------------------------------------------------------------//
+
+    double CalculatedEdx();
+
+//----------------------------------------------------------------------------//
+
+    double CalculatedNdx();
+
+//----------------------------------------------------------------------------//
+
+    double CalculatedNdx(double rnd);
+
+//----------------------------------------------------------------------------//
+
+    double CalculateStochasticLoss();
+
+//----------------------------------------------------------------------------//
+
+    void EnableStochasticInerpolation();
+
+//----------------------------------------------------------------------------//
+
+    void EnableContinuousInerpolation();
+
+//----------------------------------------------------------------------------//
+
+
+
 
     //Setter
 

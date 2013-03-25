@@ -57,56 +57,17 @@ private:
 
 //----------------------------------------------------------------------------//
 
-    /*!
-    Landau Pomeranchuk Migdal effect and dielectric suppression evaluation
-    lpm is evaluated:
-    \f[ lpm= return=\frac{x_i}{3}\Big[v^2\frac{G(s)}{\gamma^2}+
-    2(1+(1-v)^2)\frac{\Phi(s)}{\gamma}\Big] \f]
-    \param v relativ energy loss
-    \param s1
-    \return the lpm correction factor
-    */
+/*!
+Landau Pomeranchuk Migdal effect and dielectric suppression evaluation
+lpm is evaluated:
+\f[ lpm= return=\frac{x_i}{3}\Big[v^2\frac{G(s)}{\gamma^2}+
+2(1+(1-v)^2)\frac{\Phi(s)}{\gamma}\Big] \f]
+\param v relativ energy loss
+\param s1
+\return the lpm correction factor
+*/
 
-    double lpm(double v, double s1);
-
-
-public:
-
-//----------------------------------------------------------------------------//
-
-    Bremsstrahlung();
-    Bremsstrahlung(const Bremsstrahlung&);
-    Bremsstrahlung& operator=(const Bremsstrahlung&);
-    Bremsstrahlung(Particle* particle, Medium* medium, EnergyCutSettings* cut_settings);
-
-//----------------------------------------------------------------------------//
-
-    void SetIntegralLimits(int component);
-
-//----------------------------------------------------------------------------//
-
-    double CalculatedEdx();
-
-//----------------------------------------------------------------------------//
-
-    double CalculatedNdx();
-
-
-//----------------------------------------------------------------------------//
-
-    double CalculatedNdx(double rnd);
-
-//----------------------------------------------------------------------------//
-
-    double CalculateStochasticLoss();
-
-//----------------------------------------------------------------------------//
-
-    void EnableStochasticInerpolation();
-
-//----------------------------------------------------------------------------//
-
-    void EnableContinuousInerpolation();
+double lpm(double v, double s1);
 
 //----------------------------------------------------------------------------//
 
@@ -138,6 +99,48 @@ public:
     double ElasticBremsstrahlungCrossSection(double v, int i);
 
 //----------------------------------------------------------------------------//
+
+    void SetIntegralLimits(int component);
+
+//----------------------------------------------------------------------------//
+
+public:
+
+//----------------------------------------------------------------------------//
+
+    Bremsstrahlung();
+    Bremsstrahlung(const Bremsstrahlung&);
+    Bremsstrahlung& operator=(const Bremsstrahlung&);
+    Bremsstrahlung(Particle* particle, Medium* medium, EnergyCutSettings* cut_settings);
+
+
+//----------------------------------------------------------------------------//
+
+    double CalculatedEdx();
+
+//----------------------------------------------------------------------------//
+
+    double CalculatedNdx();
+
+
+//----------------------------------------------------------------------------//
+
+    double CalculatedNdx(double rnd);
+
+//----------------------------------------------------------------------------//
+
+    double CalculateStochasticLoss();
+
+//----------------------------------------------------------------------------//
+
+    void EnableStochasticInerpolation();
+
+//----------------------------------------------------------------------------//
+
+    void EnableContinuousInerpolation();
+
+//----------------------------------------------------------------------------//
+
     //Getter
 
     bool GetLorenz() const
