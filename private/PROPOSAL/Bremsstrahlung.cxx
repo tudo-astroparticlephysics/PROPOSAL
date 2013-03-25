@@ -11,12 +11,14 @@ Bremsstrahlung::Bremsstrahlung()
 {
     integral_   = new Integral(IROMB, IMAXS, IPREC);
 }
+
 //----------------------------------------------------------------------------//
 
 Bremsstrahlung::Bremsstrahlung(const Bremsstrahlung &brems)
 {
     *this = brems;
 }
+
 //----------------------------------------------------------------------------//
 
 Bremsstrahlung& Bremsstrahlung::operator=(const Bremsstrahlung &brems){
