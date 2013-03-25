@@ -6,6 +6,7 @@
 using namespace std;
 
 Epairproduction::Epairproduction()
+    :reverse_(false)
 {
     integral_             = new Integral(IROMB, IMAXS, IPREC);
     integral_for_dEdx_    = new Integral(IROMB, IMAXS, IPREC);
@@ -27,6 +28,7 @@ Epairproduction& Epairproduction::operator=(const Epairproduction &epair){
 Epairproduction::Epairproduction(Particle* particle,
                              Medium* medium,
                              EnergyCutSettings* cut_settings)
+    :reverse_(false)
 {
     particle_                   = particle;
     medium_                     = medium;
@@ -42,6 +44,7 @@ Epairproduction::Epairproduction(Particle* particle,
     lpm_effect_enabled_         = false;
     init_lpm_effect_            = true;
     component_                  = 0;
+
 
     integral_             = new Integral(IROMB, IMAXS, IPREC);
     integral_for_dEdx_    = new Integral(IROMB, IMAXS, IPREC);

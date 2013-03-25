@@ -9,6 +9,8 @@ protected:
     int component_;
     double v_;
     bool reverse_;
+    double eLpm_;
+
 
     Integral*   integral_;
     Integral*   integral_for_dEdx_;
