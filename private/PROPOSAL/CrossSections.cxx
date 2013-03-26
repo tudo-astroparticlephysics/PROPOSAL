@@ -92,3 +92,17 @@ void CrossSections::SetEnergyCutSettings(EnergyCutSettings *cuts){
 void CrossSections::EnableLpmEffect(bool lpm_effect_enabled){
     lpm_effect_enabled_ = lpm_effect_enabled;
 }
+
+//----------------------------------------------------------------------------//
+
+void CrossSections::SetBb(int newbb)
+{
+    bb_  =   newbb;
+}
+
+//----------------------------------------------------------------------------//
+
+void CrossSections::SetShadow(int newshadow)
+{
+    shadow_  =   newshadow;
+}

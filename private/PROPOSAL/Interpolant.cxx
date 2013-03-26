@@ -426,7 +426,7 @@ double Interpolant::interpolate(double x1, double x2)
 
 //----------------------------------------------------------------------------//
 
-double Interpolant::interpolateArray(double x)
+double Interpolant::InterpolateArray(double x)
 {
     int     i, j, m, start, auxdir;
     bool    dir;

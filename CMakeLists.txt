@@ -109,6 +109,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 configure_file(${PROJECT_SOURCE_DIR}/Test/Brems_dEdx.txt ${PROPOSAL_BINARY_DIR}/bin/Brems_dEdx.txt COPYONLY)
 configure_file(${PROJECT_SOURCE_DIR}/Test/Epair_dEdx.txt ${PROPOSAL_BINARY_DIR}/bin/Epair_dEdx.txt COPYONLY)
 configure_file(${PROJECT_SOURCE_DIR}/Test/Ioniz_dEdx.txt ${PROPOSAL_BINARY_DIR}/bin/Ioniz_dEdx.txt COPYONLY)
+configure_file(${PROJECT_SOURCE_DIR}/Test/Photo_dEdx.txt ${PROPOSAL_BINARY_DIR}/bin/Photo_dEdx.txt COPYONLY)
 
 
 SET(DEBUG OFF)
@@ -150,17 +151,20 @@ IF(DoTesting)
   add_executable(UnitTest_Bremsstrahlung Test/Bremsstrahlung_TEST.cxx)
   add_executable(UnitTest_Epairproduction Test/Epairproduction_TEST.cxx)
   add_executable(UnitTest_Ionization Test/Ionization_TEST.cxx)
+  add_executable(UnitTest_Photonuclear Test/Photonuclear_TEST.cxx)
 
   target_link_libraries(UnitTest_Integral PROPOSAL gtest gtest_main)
   target_link_libraries(UnitTest_Interpolant PROPOSAL gtest gtest_main)
   target_link_libraries(UnitTest_Bremsstrahlung PROPOSAL gtest gtest_main)
   target_link_libraries(UnitTest_Epairproduction PROPOSAL gtest gtest_main)
   target_link_libraries(UnitTest_Ionization PROPOSAL gtest gtest_main)
+  target_link_libraries(UnitTest_Photonuclear PROPOSAL gtest gtest_main)
 
   add_test(UnitTest_Integral bin/UnitTest_Integral)
   add_test(UnitTest_Interpolant bin/UnitTest_Interpolant)
   add_test(UnitTest_Bremsstrahlung bin/UnitTest_Bremsstrahlung)
   add_test(UnitTest_Epairproduction bin/UnitTest_Epairproduction)
   add_test(UnitTest_Ionization bin/UnitTest_Ionization)
+  add_test(UnitTest_Photonuclear bin/UnitTest_Photonuclear)
 
 ENDIF()

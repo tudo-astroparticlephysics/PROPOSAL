@@ -54,7 +54,8 @@ protected:
     bool        lpm_effect_enabled_;
     bool        init_lpm_effect_;
 
-
+    int         shadow_;
+    int         bb_;
 //----------------------------------------------------------------------------//
 
     virtual void SetIntegralLimits(int component) = 0;
@@ -207,6 +208,12 @@ public:
 
     void EnableLpmEffect(bool lpm_effect_enabled);
 
+//----------------------------------------------------------------------------//
+
+    void SetBb(int newbb);
+//----------------------------------------------------------------------------//
+
+    void SetShadow(int newshadow);
 //----------------------------------------------------------------------------//
 
     // destructor

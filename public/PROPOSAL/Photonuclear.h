@@ -1,9 +1,24 @@
 #include "CrossSections.h"
-
+#include "PROPOSAL/Integral.h"
+#include "PROPOSAL/Interpolant.h"
+#include <vector>
 
 class Photonuclear: public CrossSections
 {
 protected:
+
+    int         component_;     /// nucleon in the medium on which the bremsstahlung occur
+    bool        init_measured_;
+    bool        init_hardbb_;
+    int         hmax_;
+    double      v_;
+
+    Integral*   integral_;
+    Integral*   integral_for_dEdx_;
+
+    Interpolant* interpolant_measured_;
+    std::vector<Interpolant*> interpolant_hardBB_;
+
 
     // form=1 and bb=1 Kokoulin
     // form=2 and bb=1 Kokoulin + hard component

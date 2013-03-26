@@ -240,7 +240,7 @@ public:
     * \return   interpolated value f(x)
     */
 
-    double interpolateArray(double x);
+    double InterpolateArray(double x);
 
     //------------------------------------------------------------------------//
 
