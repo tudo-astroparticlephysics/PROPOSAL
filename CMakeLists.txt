@@ -42,65 +42,17 @@ MARK_AS_ADVANCED(
 #################################################################
 #################           GTest       #########################
 #################################################################
-#IF(DEFINED ENV{GTEST_PATH})
-#  enable_testing()
-#  #1. Path
-#  #2. Path where the binarys will be copied to
-#  add_subdirectory($ENV{GTEST_PATH} ${CMAKE_CURRENT_BINARY_DIR}/gtestbin)
-#  set(DoTesting true)
-#  MESSAGE(STATUS "Found gtest-path")
-#ELSE()
-#    message("GTEST_PATH is not defined.  To build testsuite you have to set GTEST_PATH to gtest root directory")
-#    message("Remember to add gtest/include to C_INCLUDE_PATH and CPP_INCLUDE_PATH")
-#ENDIF()
-
-FIND_PATH(GTEST_INCLUDE_DIR gtest/gtest.h
-  PATHS
-    "$ENV{GTEST_PATH}/include"
-    /usr/local/include
-    /usr/include
-)
-
-FIND_PATH(GTEST_LIB_GTEST libgtest.a
-  PATHS
-    "$ENV{GTEST_PATH}/lib/.libs"
-    /usr/local/lib
-    /usr/lib
-)
-
-FIND_PATH(GTEST_LIB_GTESTMAIN libgtest_main.a
-  PATHS
-    "$ENV{GTEST_PATH}/lib/.libs"
-    /usr/local/lib
-    /usr/lib
-)
-
-message("GTEST_LIB_GTEST: " ${GTEST_LIB_GTEST})
-SET(GTEST_FOUND 0)
-IF(GTEST_INCLUDE_DIR)
-  IF(GTEST_LIB_GTESTMAIN)
-    IF(GTEST_LIB_GTEST)
-        SET(GTEST_FOUND 1)
-        MESSAGE(STATUS "Found gtest")
-        add_library(gtest_main IMPORTED SHARED)
-        set_property(TARGET gtest_main PROPERTY
-                        IMPORTED_LOCATION ${GTEST_LIB_GTEST}/libgtest_main.a)
-
-        add_library(gtest IMPORTED SHARED)
-        set_property(TARGET gtest PROPERTY
-                        IMPORTED_LOCATION ${GTEST_LIB_GTEST}/libgtest.a)
-        enable_testing()
-        set(DoTesting true)
-    ENDIF(GTEST_LIB_GTEST)
-  ENDIF(GTEST_LIB_GTESTMAIN)
-ENDIF(GTEST_INCLUDE_DIR)
-
-
-MARK_AS_ADVANCED(
-  GTEST_INCLUDE_DIR
-  GTEST_LIBRARIES
-)
-
+IF(DEFINED ENV{GTEST_PATH})
+  enable_testing()
+  #1. Path
+  #2. Path where the binarys will be copied to
+  add_subdirectory($ENV{GTEST_PATH} ${CMAKE_CURRENT_BINARY_DIR}/gtestbin)
+  set(DoTesting true)
+  MESSAGE(STATUS "Found gtest-path")
+ELSE()
+    message("GTEST_PATH is not defined.  To build testsuite you have to set GTEST_PATH to gtest root directory")
+    message("Remember to add gtest/include to C_INCLUDE_PATH and CPP_INCLUDE_PATH")
+ENDIF()
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
