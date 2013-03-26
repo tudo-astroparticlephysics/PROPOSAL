@@ -63,3 +63,41 @@ double Photonuclear::FunctionToStochasticalIntegral(double variable){
     return 0;
 }
 //----------------------------------------------------------------------------//
+
+
+double Photonuclear::PhotoN(double v, int i){
+    return 0;
+}
+
+//----------------------------------------------------------------------------//
+
+
+void Photonuclear::SetMeasured(){
+
+}
+
+//----------------------------------------------------------------------------//
+
+double Photonuclear::MeasuredSgN(double e){
+    return 0;
+}
+
+//----------------------------------------------------------------------------//
+
+void Photonuclear::EnableHardBB(){
+
+}
+
+//----------------------------------------------------------------------------//
+
+double Photonuclear::HardBB(double e, double v){
+    return 0;
+}
+
+//----------------------------------------------------------------------------//
+
+double Photonuclear::FunctionToIntegral(double Q2){
+    return 0;
+}
+
+//----------------------------------------------------------------------------//
