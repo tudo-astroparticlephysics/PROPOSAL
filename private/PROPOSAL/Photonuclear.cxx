@@ -241,6 +241,7 @@ double Photonuclear::PhotoN(double v, int i)
             {
                 aux +=  medium_->GetAtomicNum().at(i)*1.e-30*HardBB(particle_->GetEnergy(), v);
             }
+
         }
 
         return medium_->GetMolDensity()*medium_->GetAtomInMolecule().at(i)*particle_->GetCharge()*particle_->GetCharge()*aux;
@@ -404,7 +405,6 @@ double Photonuclear::HardBB(double e, double v){
 
         sum +=  aux*interpolant_hardBB_.at(i)->InterpolateArray(loe);
     }
-
     return sum/v;
 
 }

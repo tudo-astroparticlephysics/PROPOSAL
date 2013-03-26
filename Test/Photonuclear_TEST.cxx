@@ -31,6 +31,7 @@ TEST(Photonuclear , Test_of_dEdx ) {
 
     while(in.good())
     {
+
         in>>para>>bb>>shadow>>ecut>>vcut>>energy>>med>>particleName>>dEdx;
 
         Medium *medium = new Medium(med,1.);

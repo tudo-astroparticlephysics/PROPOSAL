@@ -112,7 +112,31 @@ Particle::Particle(int parent_particle_id,
     ,ec_                    (0)
     ,elost_                 (0)
 {
-    InitByName(name);
+    if(StartsWith(name,"tau"))
+    {
+        name_        =   "tau";
+        type_        =   2;
+        mass_        =   MTAU;
+        lifetime_    =   LTAU;
+    }
+    else if(StartsWith(name,"e"))
+    {
+        name_        =   "e";
+        type_        =   3;
+        mass_        =   ME;
+        lifetime_    =   -1;
+    }
+    else if(StartsWith(name,"mu"))
+    {
+        name_        =   "mu";
+        type_        =   1;
+        mass_        =   MMU;
+        lifetime_    =   LMU;
+    }
+    else
+    {
+        InitByName(name);
+    }
     SetEnergy(energy);
     Location(t, x, y, t, theta, phi);
 
@@ -190,7 +214,31 @@ Particle::Particle(int parent_particle_id,
     ,elost_                 (0)
 
 {
-    InitByName(name);
+    if(StartsWith(name,"tau"))
+    {
+        name_        =   "tau";
+        type_        =   2;
+        mass_        =   MTAU;
+        lifetime_    =   LTAU;
+    }
+    else if(StartsWith(name,"e"))
+    {
+        name_        =   "e";
+        type_        =   3;
+        mass_        =   ME;
+        lifetime_    =   -1;
+    }
+    else if(StartsWith(name,"mu"))
+    {
+        name_        =   "mu";
+        type_        =   1;
+        mass_        =   MMU;
+        lifetime_    =   LMU;
+    }
+    else
+    {
+        InitByName(name);
+    }
     SetEnergy(energy);
     Location(t, x, y, z, theta, phi);
 }
@@ -243,7 +291,31 @@ Particle::Particle(string name,
     ,ec_                    (0)
     ,elost_                 (0)
 {
-    InitByName(name);
+    if(StartsWith(name,"tau"))
+    {
+        name_        =   "tau";
+        type_        =   2;
+        mass_        =   MTAU;
+        lifetime_    =   LTAU;
+    }
+    else if(StartsWith(name,"e"))
+    {
+        name_        =   "e";
+        type_        =   3;
+        mass_        =   ME;
+        lifetime_    =   -1;
+    }
+    else if(StartsWith(name,"mu"))
+    {
+        name_        =   "mu";
+        type_        =   1;
+        mass_        =   MMU;
+        lifetime_    =   LMU;
+    }
+    else
+    {
+        InitByName(name);
+    }
     SetEnergy(energy);
     Location(t, x, y, z, theta, phi);
 }

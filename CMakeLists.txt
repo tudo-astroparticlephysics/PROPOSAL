@@ -12,32 +12,32 @@ project( PROPOSAL)
 #################################################################
 #################           log4cpp     #########################
 #################################################################
-FIND_PATH(LOG4CPP_INCLUDE_DIR log4cpp/Category.hh
-  PATHS
-    "$ENV{LOG4CPP}/include"
-    /usr/local/include
-    /usr/include
-)
+#FIND_PATH(LOG4CPP_INCLUDE_DIR log4cpp/Category.hh
+#  PATHS
+#    "$ENV{LOG4CPP}/include"
+#    /usr/local/include
+#    /usr/include
+#)
+#
+#FIND_LIBRARY(LOG4CPP_LIBRARIES log4cpp
+#  PATHS
+#    "$ENV{LOG4CPP}/lib"
+#    /usr/local/lib
+#    /usr/lib
+#)
+#
+#SET(LOG4CPP_FOUND 0)
+#IF(LOG4CPP_INCLUDE_DIR)
+#  IF(LOG4CPP_LIBRARIES)
+#    SET(LOG4CPP_FOUND 1)
+#    MESSAGE(STATUS "Found Log4CPP")
+#  ENDIF(LOG4CPP_LIBRARIES)
+#ENDIF(LOG4CPP_INCLUDE_DIR)
 
-FIND_LIBRARY(LOG4CPP_LIBRARIES log4cpp
-  PATHS
-    "$ENV{LOG4CPP}/lib"
-    /usr/local/lib
-    /usr/lib
-)
-
-SET(LOG4CPP_FOUND 0)
-IF(LOG4CPP_INCLUDE_DIR)
-  IF(LOG4CPP_LIBRARIES)
-    SET(LOG4CPP_FOUND 1)
-    MESSAGE(STATUS "Found Log4CPP")
-  ENDIF(LOG4CPP_LIBRARIES)
-ENDIF(LOG4CPP_INCLUDE_DIR)
-
-MARK_AS_ADVANCED(
-  LOG4CPP_INCLUDE_DIR
-  LOG4CPP_LIBRARIES
-)
+#MARK_AS_ADVANCED(
+#  LOG4CPP_INCLUDE_DIR
+#  LOG4CPP_LIBRARIES
+#)
 
 #################################################################
 #################           GTest       #########################
