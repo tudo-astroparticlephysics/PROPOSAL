@@ -4,15 +4,54 @@ cmake_minimum_required(VERSION 2.6)
 #MESSAGE(STATUS "log4cplus lib path: ${LOG4CPLUS_LIB}")
 project( PROPOSAL)
 
+# This module defines
+# LOG4CPP_INCLUDE_DIR, where to find ptlib.h, etc.
+# LOG4CPP_LIBRARIES, the libraries to link against to use pwlib.
+# LOG4CPP_FOUND, If false, don't try to use pwlib.
+
+#################################################################
+#################           log4cpp     #########################
+#################################################################
+FIND_PATH(LOG4CPP_INCLUDE_DIR log4cpp/Category.hh
+  PATHS
+    "$ENV{LOG4CPP}/include"
+    /usr/local/include
+    /usr/include
+)
+
+FIND_LIBRARY(LOG4CPP_LIBRARIES log4cpp
+  PATHS
+    "$ENV{LOG4CPP}/lib"
+    /usr/local/lib
+    /usr/lib
+)
+
+SET(LOG4CPP_FOUND 0)
+IF(LOG4CPP_INCLUDE_DIR)
+  IF(LOG4CPP_LIBRARIES)
+    SET(LOG4CPP_FOUND 1)
+    MESSAGE(STATUS "Found Log4CPP")
+  ENDIF(LOG4CPP_LIBRARIES)
+ENDIF(LOG4CPP_INCLUDE_DIR)
+
+MARK_AS_ADVANCED(
+  LOG4CPP_INCLUDE_DIR
+  LOG4CPP_LIBRARIES
+)
+
+#################################################################
+#################           GTest       #########################
+#################################################################
 IF(DEFINED ENV{GTEST_PATH})
   enable_testing()
   #1. Path
   #2. Path where the binarys will be copied to
   add_subdirectory($ENV{GTEST_PATH} ${CMAKE_CURRENT_BINARY_DIR}/gtestbin)
   set(DoTesting true)
-  message("GTEST_PATH is set. Remember to add gtest/include to C_INCLUDE_PATH and CPP_INCLUDE_PATH")
+  MESSAGE(STATUS "Found gtest-path")
 ELSE()
-  message("GTEST_PATH is not defined.  To build testsuite you have to set GTEST_PATH to gtest root directory")
+    message("GTEST_PATH is not defined.  To build testsuite you have to set GTEST_PATH to gtest root directory")
+    message("GTEST_PATH is set. Remember to add gtest/include to C_INCLUDE_PATH and CPP_INCLUDE_PATH")
 ENDIF()
 
 
