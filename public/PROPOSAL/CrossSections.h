@@ -56,6 +56,8 @@ protected:
 
     int         shadow_;
     int         bb_;
+
+    int         order_of_interpolation_;
 //----------------------------------------------------------------------------//
 
     virtual void SetIntegralLimits(int component) = 0;

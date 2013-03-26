@@ -1,6 +1,7 @@
 #include <vector>
 #include "CrossSections.h"
 #include "PROPOSAL/Integral.h"
+#include "PROPOSAL/Interpolant.h"
 #include "PROPOSAL/Medium.h"
 #include "PROPOSAL/Particle.h"
 
@@ -13,6 +14,7 @@ private:
     int         component_;     /// nucleon in the medium on which the bremsstahlung occur
 
     Integral*   integral_;
+    Interpolant* interpolateJ_;
 
     double      eLpm_;
 
@@ -140,6 +142,8 @@ public:
     void EnableContinuousInerpolation();
 
 //----------------------------------------------------------------------------//
+
+    double FunctionToBuildInterpolant(double energy);
 
     //Getter
 

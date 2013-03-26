@@ -91,7 +91,8 @@ double Bremsstrahlung::CalculatedEdx(){
 
     if(doContinuousInterpolation_)
     {
-        //return max(interpolateJ_->interpolate(particle_->get_energy()), 0.0);
+        cout << "INTERPOLATING!" << endl;
+        return max(interpolateJ_->interpolate(particle_->GetEnergy()), 0.0);
     }
 
     for(int i=0; i<(medium_->GetNumCompontents()); i++)
@@ -149,7 +150,11 @@ void Bremsstrahlung::EnableStochasticInerpolation(){
 //----------------------------------------------------------------------------//
 
 void Bremsstrahlung::EnableContinuousInerpolation(){
+    cout << "BUILDING!" << endl;
+    double energy = particle_->GetEnergy();
+    interpolateJ_ = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, boost::bind(&Bremsstrahlung::FunctionToBuildInterpolant, this, _1), order_of_interpolation_, true, false, true, order_of_interpolation_, false, false, true);
     doContinuousInterpolation_=true;
+    particle_->SetEnergy(energy);
 }
 
 //----------------------------------------------------------------------------//
@@ -523,6 +528,11 @@ double Bremsstrahlung::lpm(double v, double s1)
     }
 
     return ((xi/3)*((v*v)*G/(Gamma*Gamma) + 2*(1 + (1-v)*(1-v))*fi/Gamma))/((4./3)*(1-v) + v*v);
+}
+
+double Bremsstrahlung::FunctionToBuildInterpolant(double energy){
+    particle_->SetEnergy(energy);
+    return CalculatedEdx();
 }
 
 
