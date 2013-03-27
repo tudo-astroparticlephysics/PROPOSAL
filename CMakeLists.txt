@@ -59,6 +59,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 configure_file(${PROJECT_SOURCE_DIR}/Test/Brems_dEdx.txt ${PROPOSAL_BINARY_DIR}/bin/Brems_dEdx.txt COPYONLY)
+configure_file(${PROJECT_SOURCE_DIR}/Test/Brems_dNdx.txt ${PROPOSAL_BINARY_DIR}/bin/Brems_dNdx.txt COPYONLY)
 configure_file(${PROJECT_SOURCE_DIR}/Test/Epair_dEdx.txt ${PROPOSAL_BINARY_DIR}/bin/Epair_dEdx.txt COPYONLY)
 configure_file(${PROJECT_SOURCE_DIR}/Test/Ioniz_dEdx.txt ${PROPOSAL_BINARY_DIR}/bin/Ioniz_dEdx.txt COPYONLY)
 configure_file(${PROJECT_SOURCE_DIR}/Test/Photo_dEdx.txt ${PROPOSAL_BINARY_DIR}/bin/Photo_dEdx.txt COPYONLY)
