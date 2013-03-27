@@ -107,29 +107,30 @@ double Bremsstrahlung::CalculatedEdx(){
 
 double Bremsstrahlung::CalculatedNdx(){
 
-//    if((cros->get_cb())<=0)
-//    {
-//        return 0;
-//    }
+    double sum;
+    if(multiplier_<=0)
+    {
+        return 0;
+    }
 
-//    sum_    =   0;
+    sum    =   0;
 
-//    for(int i=0; i<(medium_->get_numCompontents()); i++)
-//    {
+    for(int i=0; i<(medium_->GetNumCompontents()); i++)
+    {
 
-//        if(jt_)
-//        {
-//            sum_    +=  max((interpolateJo_[i]).interpolate(particle_->get_energy()), 0.0);
-//        }
-//        else
-//        {
-//            setEnergy(i);
-//            sum_    +=  VectorOfIntegral_.at(i)->integrateWithLog(vUp_, vMax_, this);
-//        }
+        if(doContinuousInterpolation_)
+        {
+            //sum    +=  max((interpolateJo_[i]).interpolate(particle_->GetEnergy()), 0.0);
+        }
+        else
+        {
+            SetIntegralLimits(i);
+            sum    +=  integral_->IntegrateWithLog(vUp_, vMax_, boost::bind(&Bremsstrahlung::FunctionToStochasticalIntegral, this, _1));
+        }
 
-//    }
+    }
 
-//    return sum_;
+    return sum;
     return 0;
 }
 //----------------------------------------------------------------------------//

@@ -5,7 +5,53 @@
 #include <string>
 
 using namespace std;
+TEST(Bremsstrahlung , Test_of_dNdx ) {
 
+    ifstream in;
+    in.open("bin/Brems_dNdx.txt");
+
+    char firstLine[256];
+    in.getline(firstLine,256);
+    double dNdx;
+    double dNdx_new;
+    double energy;
+    double ecut;
+    double vcut;
+    string med;
+    string particleName;
+    bool lpm;
+    int para;
+
+    cout.precision(16);
+
+
+    while(in.good())
+    {
+        in>>para>>ecut>>vcut>>lpm>>energy>>med>>particleName>>dNdx;
+
+        Medium *medium = new Medium(med,1.);
+        Particle *particle = new Particle(particleName,1.,1.,1,.20,20,1e5,10);
+        particle->SetEnergy(energy);
+        EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
+
+        CrossSections *brems = new Bremsstrahlung(particle, medium, cuts);
+
+
+        brems->SetParametrization(para);
+        brems->EnableLpmEffect(lpm);
+
+        dNdx_new=brems->CalculatedNdx();
+        ASSERT_NEAR(dNdx_new, dNdx, 1e-8*dNdx);
+
+        delete cuts;
+        delete medium;
+        delete particle;
+        delete brems;
+
+
+
+    }
+}
 
 TEST(Bremsstrahlung , Test_of_dEdx ) {
 
@@ -43,7 +89,7 @@ TEST(Bremsstrahlung , Test_of_dEdx ) {
         brems->EnableLpmEffect(lpm);
 
         dEdx_new=brems->CalculatedEdx();
-        ASSERT_NEAR(dEdx_new, dEdx, 1e-14*dEdx);
+        ASSERT_NEAR(dEdx_new, dEdx, 1e-8*dEdx);
 
         delete cuts;
         delete medium;
@@ -89,12 +135,13 @@ TEST(Bremsstrahlung , Test_of_dEdx_Interpolat ) {
 
         brems->SetParametrization(para);
         brems->EnableLpmEffect(lpm);
-
+        if(!med.compare("uranium"))continue;
                 cout << para << "\t" << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << med << "\t" << particleName<< "\t" << dEdx << endl;
         brems->EnableContinuousInerpolation();
         dEdx_new=brems->CalculatedEdx();
 
-
+        cout << "Lit: " << dEdx << endl;
+        cout << "Int: " << dEdx_new << endl;
         if(!med.compare("uranium")){
             precision = precisionUran;
         }
