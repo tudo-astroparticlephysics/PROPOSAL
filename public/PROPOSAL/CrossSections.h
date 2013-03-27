@@ -57,6 +57,9 @@ protected:
     int         shadow_;
     int         bb_;
 
+    bool        shadow_effect_;
+    bool        hard_component_;
+
     int         order_of_interpolation_;
 //----------------------------------------------------------------------------//
 
@@ -218,6 +221,11 @@ public:
     void SetShadow(int newshadow);
 //----------------------------------------------------------------------------//
 
+    void SetHardComponent(bool newhard);
+//----------------------------------------------------------------------------//
+
+    void SetShadow(bool newshadow);
+//----------------------------------------------------------------------------//
     // destructor
 
     virtual ~CrossSections(){}

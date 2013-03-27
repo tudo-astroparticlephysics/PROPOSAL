@@ -19,6 +19,13 @@ protected:
     Interpolant* interpolant_measured_;
     std::vector<Interpolant*> interpolant_hardBB_;
 
+    double KokoulinParametrization(double v, int i);
+    double RhodeParametrization(double v, int i);
+    double BezrukovBugaevParametrization(double v, int i);
+    double ZeusParametrization(double v, int i);
+    double ALLM91Parametrization(double v, int i);
+    double ALLM97Parametrization(double v, int i);
+    double ButkevichMikhailovParametrization(double v, int i);
 
     // form=1 and bb=1 Kokoulin
     // form=2 and bb=1 Kokoulin + hard component
