@@ -73,8 +73,9 @@ TEST(Bremsstrahlung , Test_of_dEdx_Interpolat ) {
     int para;
 
     cout.precision(16);
-
-
+    double precision;
+    double precisionOld = 1E-3;
+    double precisionUran = 5E-2;
     while(in.good())
     {
         in>>para>>ecut>>vcut>>lpm>>energy>>med>>particleName>>dEdx;
@@ -94,7 +95,13 @@ TEST(Bremsstrahlung , Test_of_dEdx_Interpolat ) {
         dEdx_new=brems->CalculatedEdx();
 
 
-        ASSERT_NEAR(dEdx_new, dEdx, 1e-3*dEdx);
+        if(!med.compare("uranium")){
+            precision = precisionUran;
+        }
+        else{
+            precision = precisionOld;
+        }
+        ASSERT_NEAR(dEdx_new, dEdx, precision*dEdx);
 
         delete cuts;
         delete medium;
