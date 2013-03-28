@@ -16,6 +16,8 @@ private:
     Integral*   integral_;
     Interpolant* interpolateJ_;
 
+    Interpolant** interpolateJo_; //Stochastic dNdx()
+
     double      eLpm_;
 
 
@@ -143,7 +145,11 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    double FunctionToBuildInterpolant(double energy);
+    double FunctionToBuildContinuousInterpolant(double energy);
+
+//----------------------------------------------------------------------------//
+
+    double FunctionToBuildStochasticInterpolant(double energy);
 
     //Getter
 

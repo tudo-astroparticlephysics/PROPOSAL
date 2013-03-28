@@ -146,14 +146,23 @@ double Bremsstrahlung::CalculateStochasticLoss(){
 //----------------------------------------------------------------------------//
 
 void Bremsstrahlung::EnableStochasticInerpolation(){
+    if(doStochasticInterpolation_)return;
+
+    double energy = particle_->GetEnergy();
+    interpolateJo_ = new Interpolant*[medium_->GetNumCompontents()];
+    for(int i=0; i<(medium_->GetNumCompontents()); i++)
+    {
+        interpolateJo_[i] = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, boost::bind(&Bremsstrahlung::FunctionToBuildStochasticInterpolant, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, true, false, false);
+    }
+    particle_->SetEnergy(energy);
+
     doStochasticInterpolation_=true;
 }
 //----------------------------------------------------------------------------//
 
 void Bremsstrahlung::EnableContinuousInerpolation(){
-  //  cout << "BUILDING!" << endl;
     double energy = particle_->GetEnergy();
-    interpolateJ_ = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, boost::bind(&Bremsstrahlung::FunctionToBuildInterpolant, this, _1), order_of_interpolation_, true, false, true, order_of_interpolation_, false, false, true);
+    interpolateJ_ = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, boost::bind(&Bremsstrahlung::FunctionToBuildContinuousInterpolant, this, _1), order_of_interpolation_, true, false, true, order_of_interpolation_, false, false, true);
     doContinuousInterpolation_=true;
     particle_->SetEnergy(energy);
 }
@@ -531,11 +540,15 @@ double Bremsstrahlung::lpm(double v, double s1)
     return ((xi/3)*((v*v)*G/(Gamma*Gamma) + 2*(1 + (1-v)*(1-v))*fi/Gamma))/((4./3)*(1-v) + v*v);
 }
 
-double Bremsstrahlung::FunctionToBuildInterpolant(double energy){
+double Bremsstrahlung::FunctionToBuildContinuousInterpolant(double energy){
     particle_->SetEnergy(energy);
     return CalculatedEdx();
 }
 
+double Bremsstrahlung::FunctionToBuildStochasticInterpolant(double energy){
+    particle_->SetEnergy(energy);
+    return CalculatedNdx();
+}
 
 //----------------------------------------------------------------------------//
 void Bremsstrahlung::SetLorenz(bool lorenz){

@@ -5,6 +5,67 @@
 #include <string>
 
 using namespace std;
+
+TEST(Bremsstrahlung , Test_of_dNdx_Interpolant ) {
+
+    ifstream in;
+    in.open("bin/Brems_dNdx.txt");
+
+    char firstLine[256];
+    in.getline(firstLine,256);
+    double dNdx;
+    double dNdx_new;
+    double energy;
+    double ecut;
+    double vcut;
+    string med;
+    string particleName;
+    bool lpm;
+    int para;
+
+    cout.precision(16);
+
+    int k=30;
+
+    while(in.good())
+    {
+        in>>para>>ecut>>vcut>>lpm>>energy>>med>>particleName>>dNdx;
+
+        Medium *medium = new Medium(med,1.);
+        Particle *particle = new Particle(particleName,1.,1.,1,.20,20,1e5,10);
+        particle->SetEnergy(energy);
+        EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
+
+        CrossSections *brems = new Bremsstrahlung(particle, medium, cuts);
+
+
+        brems->SetParametrization(para);
+        brems->EnableLpmEffect(lpm);
+        brems->EnableStochasticInerpolation();
+        dNdx_new=brems->CalculatedNdx();
+
+        ASSERT_NEAR(dNdx_new, dNdx, 1e-3*dNdx);
+
+        cout << char(39+k);
+        printf("\n");
+        printf("\b");
+
+        cout.flush();
+        k--;
+        if(k==0){
+            cout << endl;
+            k=30;
+        }
+        delete cuts;
+        delete medium;
+        delete particle;
+        delete brems;
+
+
+
+    }
+}
+
 TEST(Bremsstrahlung , Test_of_dNdx ) {
 
     ifstream in;
@@ -41,7 +102,7 @@ TEST(Bremsstrahlung , Test_of_dNdx ) {
         brems->EnableLpmEffect(lpm);
 
         dNdx_new=brems->CalculatedNdx();
-        ASSERT_NEAR(dNdx_new, dNdx, 1e-8*dNdx);
+        ASSERT_NEAR(dNdx_new, dNdx, 1e-6*dNdx);
 
         delete cuts;
         delete medium;
@@ -104,8 +165,8 @@ TEST(Bremsstrahlung , Test_of_dEdx ) {
 TEST(Bremsstrahlung , Test_of_dEdx_Interpolat ) {
 
     ifstream in;
+    //in.open("bin/Brems_dEdx_interpolate.txt");
     in.open("bin/Brems_dEdx.txt");
-
     char firstLine[256];
     in.getline(firstLine,256);
     double dEdx_new;
@@ -140,8 +201,6 @@ TEST(Bremsstrahlung , Test_of_dEdx_Interpolat ) {
         brems->EnableContinuousInerpolation();
         dEdx_new=brems->CalculatedEdx();
 
-        cout << "Lit: " << dEdx << endl;
-        cout << "Int: " << dEdx_new << endl;
         if(!med.compare("uranium")){
             precision = precisionUran;
         }
