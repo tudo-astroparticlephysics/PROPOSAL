@@ -41,9 +41,21 @@ TEST(Photonuclear , Test_of_dEdx ) {
 
         CrossSections *photo = new Photonuclear(particle, medium, cuts);
 
+        if(bb==1&&para<3)photo->SetParametrization(1);
+        if(bb==2&&para<3)photo->SetParametrization(2);
+        if(bb==3&&para<3)photo->SetParametrization(3);
+        if(bb==4&&para<3)photo->SetParametrization(4);
+        if(bb==1&&para==3)photo->SetParametrization(5);
+        if(bb==2&&para==3)photo->SetParametrization(6);
+        if(bb==1&&para==4)photo->SetParametrization(7);
 
-        photo->SetParametrization(para);
-        photo->SetBb(bb);
+
+
+        if(para==2)photo->SetHardComponent(true);
+        else photo->SetHardComponent(false);
+
+
+
         photo->SetShadow(shadow);
 
         dEdx_new=photo->CalculatedEdx();

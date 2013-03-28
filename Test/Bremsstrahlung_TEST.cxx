@@ -136,7 +136,7 @@ TEST(Bremsstrahlung , Test_of_dEdx_Interpolat ) {
         brems->SetParametrization(para);
         brems->EnableLpmEffect(lpm);
         if(!med.compare("uranium"))continue;
-                cout << para << "\t" << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << med << "\t" << particleName<< "\t" << dEdx << endl;
+         //       cout << para << "\t" << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << med << "\t" << particleName<< "\t" << dEdx << endl;
         brems->EnableContinuousInerpolation();
         dEdx_new=brems->CalculatedEdx();
 

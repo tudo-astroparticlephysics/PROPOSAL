@@ -153,136 +153,27 @@ double Photonuclear::PhotoN(double v, int i)
 {
     switch(parametrization_)
     {
-    case 1:
-    case 2:
-    {
+        case 1: return KokoulinParametrization(v, i);
 
-        double nu, sgn, aux, aum, k, G, t;
+        case 2: return RhodeParametrization(v, i);
 
-        const double m1 =   0.54;
-        const double m2 =   1.80;
-        nu              =   v*particle_->GetEnergy();
-        nu              *=  1.e-3;
+        case 3: return BezrukovBugaevParametrization(v, i);
 
+        case 4: return ZeusParametrization(v, i);
 
-        switch(bb_)
-        {
-        case 1:
-        case 2:
+        case 5: return ALLM91Parametrization(v, i);
 
-            if(nu<=200.)
-            {
-                if(bb_==2)
-                {
+        case 6: return ALLM97Parametrization(v, i);
 
-                    sgn =   MeasuredSgN(nu);
-
-                }
-                else
-                {
-
-                    if(nu<=17.)
-                    {
-                        sgn =   96.1+82./sqrt(nu);
-                    }
-                    else
-                    {
-                        aux =   log(0.0213*nu);
-                        sgn =   114.3 + 1.647*aux*aux;
-                    }
-                }
-            }
-            else
-            {
-                sgn =   49.2 + 11.1*log(nu) + 151.8/sqrt(nu);
-            }
-
-            break;
-
-        case 3:  // Bezrukov and Bugaev (BB) parametrization
-            aux =   log(0.0213*nu);
-            sgn =   114.3 + 1.647*aux*aux;
-            break;
-
-        case 4:  // ZEUS parametrization
+        case 7: return ButkevichMikhailovParametrization(v, i);
 
         default:
-            aux =   nu*2.e-3*medium_->GetAverageNucleonWeight().at(i);
-            sgn =   63.5*pow(aux, 0.097) + 145*pow(aux , -0.5);
-        }
-
-        k   =   1 - 2/v + 2/(v*v);
-
-        if(medium_->GetNucCharge().at(i)==1)
-        {
-            G   =   1;
-        }
-        else
-        {
-            aux =   0.00282*pow(medium_->GetAtomicNum().at(i), 1./3)*sgn;
-            G   =   (3/aux)*(0.5 + ((1 + aux)*exp(-aux) - 1)/(aux*aux));
-        }
-
-        G       *=  3;
-        aux     =   v*particle_->GetMass()*1.e-3;
-        t       =   aux*aux/(1-v);
-        sgn     *=  1.e-30;
-        aum     =   particle_->GetMass()*1.e-3;
-        aum     *=  aum;
-        aux     =   2*aum/t;
-        aux     =   G*((k + 4*aum/m1)*log(1 + m1/t) - (k*m1)/(m1 + t) - aux) +
-                    ((k + 2*aum/m2)*log(1 + m2/t) - aux) + 0.25*aux*((G*(m1 - 4*t))/(m1 + t) + (m2/t)*log(1 + t/m2));
-
-        aux     *=  ALPHA/(8*PI)*medium_->GetAtomicNum().at(i)*sgn*v;
-
-        if(parametrization_==2)
-        {
-            if(particle_->GetType()==1 || particle_->GetType()==2)
-            {
-                aux +=  medium_->GetAtomicNum().at(i)*1.e-30*HardBB(particle_->GetEnergy(), v);
-            }
-
-        }
-
-        return medium_->GetMolDensity()*medium_->GetAtomInMolecule().at(i)*particle_->GetCharge()*particle_->GetCharge()*aux;
-    }
-    case 3:
-    case 4:
-    default:
-    {
-//        if(jt_)
-//        {
-//            SetIntegralLimits(i);
-//            if(v>=vUp)
-//            {
-//                return max(interpolateJ_[i].interpolate(particle_->e, log(v/vUp)/log(vMax/vUp)), 0.0);
-//            }
-//        }
-
-        double aux, min, max;
-
-        component_ =   i;
-        v_         =   v;
-        min        =   particle_->GetMass()*v;
-        min        *=  min/(1-v);
-
-        if(particle_->GetMass() < MPI)
-        {
-            aux     =   particle_->GetMass()*particle_->GetMass()/particle_->GetEnergy();
-            min     -=  (aux*aux)/(2*(1-v));
-        }
-
-        max =   2*medium_->GetAverageNucleonWeight().at(i)*particle_->GetEnergy()*(v-vMin_);
-
-        //  if(form==4) max=Math.min(max, 5.5e6);  // as requested in Butkevich and Mikheyev
-        if(min>max)
-        {
+            cout<<"Prameterization "<<parametrization_ <<" is not supported!"<<endl;
+            cout<<"Be careful 0 is returned"<<endl;
             return 0;
-        }
 
-        return medium_->GetMolDensity()*medium_->GetAtomInMolecule().at(i)*particle_->GetCharge()*particle_->GetCharge()*integral_->IntegrateWithLog(min, max, boost::bind(&Photonuclear::FunctionToIntegral, this, _1));
     }
-    }
+
 }
 
 //----------------------------------------------------------------------------//
@@ -411,7 +302,429 @@ double Photonuclear::HardBB(double e, double v){
 
 //----------------------------------------------------------------------------//
 
-double Photonuclear::FunctionToIntegral(double Q2){
+double Photonuclear::KokoulinParametrization(double v, int i){
+
+    double nu, sgn, aux, aum, k, G, t;
+
+    const double m1 =   0.54;
+    const double m2 =   1.80;
+    nu              =   v*particle_->GetEnergy();
+    nu              *=  1.e-3;
+
+    if(nu<=200.)
+    {
+        if(nu<=17.)
+        {
+            sgn =   96.1+82./sqrt(nu);
+        }
+        else
+        {
+            aux =   log(0.0213*nu);
+            sgn =   114.3 + 1.647*aux*aux;
+        }
+    }
+    else
+    {
+        sgn =   49.2 + 11.1*log(nu) + 151.8/sqrt(nu);
+    }
+
+
+    k   =   1 - 2/v + 2/(v*v);
+
+    if(medium_->GetNucCharge().at(i)==1)
+    {
+        G   =   1;
+    }
+    else
+    {
+        aux =   0.00282*pow(medium_->GetAtomicNum().at(i), 1./3)*sgn;
+        G   =   (3/aux)*(0.5 + ((1 + aux)*exp(-aux) - 1)/(aux*aux));
+    }
+
+    G       *=  3;
+    aux     =   v*particle_->GetMass()*1.e-3;
+    t       =   aux*aux/(1-v);
+    sgn     *=  1.e-30;
+    aum     =   particle_->GetMass()*1.e-3;
+    aum     *=  aum;
+    aux     =   2*aum/t;
+    aux     =   G*((k + 4*aum/m1)*log(1 + m1/t) - (k*m1)/(m1 + t) - aux) +
+                ((k + 2*aum/m2)*log(1 + m2/t) - aux) + 0.25*aux*((G*(m1 - 4*t))/(m1 + t) + (m2/t)*log(1 + t/m2));
+
+    aux     *=  ALPHA/(8*PI)*medium_->GetAtomicNum().at(i)*sgn*v;
+
+    if(hard_component_)
+    {
+        if(particle_->GetType()==1 || particle_->GetType()==2)
+        {
+            aux +=  medium_->GetAtomicNum().at(i)*1.e-30*HardBB(particle_->GetEnergy(), v);
+        }
+
+    }
+
+    return medium_->GetMolDensity()*medium_->GetAtomInMolecule().at(i)*particle_->GetCharge()*particle_->GetCharge()*aux;
+
+}
+
+//----------------------------------------------------------------------------//
+
+double Photonuclear::RhodeParametrization(double v, int i){
+
+
+    double nu, sgn, aux, aum, k, G, t;
+
+    const double m1 =   0.54;
+    const double m2 =   1.80;
+    nu              =   v*particle_->GetEnergy();
+    nu              *=  1.e-3;
+
+    if(nu<=200.)
+    {
+        sgn =   MeasuredSgN(nu);
+    }
+    else
+    {
+        sgn =   49.2 + 11.1*log(nu) + 151.8/sqrt(nu);
+    }
+
+
+    k   =   1 - 2/v + 2/(v*v);
+
+    if(medium_->GetNucCharge().at(i)==1)
+    {
+        G   =   1;
+    }
+    else
+    {
+        aux =   0.00282*pow(medium_->GetAtomicNum().at(i), 1./3)*sgn;
+        G   =   (3/aux)*(0.5 + ((1 + aux)*exp(-aux) - 1)/(aux*aux));
+    }
+
+    G       *=  3;
+    aux     =   v*particle_->GetMass()*1.e-3;
+    t       =   aux*aux/(1-v);
+    sgn     *=  1.e-30;
+    aum     =   particle_->GetMass()*1.e-3;
+    aum     *=  aum;
+    aux     =   2*aum/t;
+    aux     =   G*((k + 4*aum/m1)*log(1 + m1/t) - (k*m1)/(m1 + t) - aux) +
+                ((k + 2*aum/m2)*log(1 + m2/t) - aux) + 0.25*aux*((G*(m1 - 4*t))/(m1 + t) + (m2/t)*log(1 + t/m2));
+
+    aux     *=  ALPHA/(8*PI)*medium_->GetAtomicNum().at(i)*sgn*v;
+
+    if(hard_component_)
+    {
+        if(particle_->GetType()==1 || particle_->GetType()==2)
+        {
+            aux +=  medium_->GetAtomicNum().at(i)*1.e-30*HardBB(particle_->GetEnergy(), v);
+        }
+
+    }
+
+    return medium_->GetMolDensity()*medium_->GetAtomInMolecule().at(i)*particle_->GetCharge()*particle_->GetCharge()*aux;
+
+}
+
+//----------------------------------------------------------------------------//
+
+
+double Photonuclear::BezrukovBugaevParametrization(double v, int i){
+
+    double nu, sgn, aux, aum, k, G, t;
+
+    const double m1 =   0.54;
+    const double m2 =   1.80;
+    nu              =   v*particle_->GetEnergy();
+    nu              *=  1.e-3;
+
+
+    aux =   log(0.0213*nu);
+    sgn =   114.3 + 1.647*aux*aux;
+
+    k   =   1 - 2/v + 2/(v*v);
+
+    if(medium_->GetNucCharge().at(i)==1)
+    {
+        G   =   1;
+    }
+    else
+    {
+        aux =   0.00282*pow(medium_->GetAtomicNum().at(i), 1./3)*sgn;
+        G   =   (3/aux)*(0.5 + ((1 + aux)*exp(-aux) - 1)/(aux*aux));
+    }
+
+    G       *=  3;
+    aux     =   v*particle_->GetMass()*1.e-3;
+    t       =   aux*aux/(1-v);
+    sgn     *=  1.e-30;
+    aum     =   particle_->GetMass()*1.e-3;
+    aum     *=  aum;
+    aux     =   2*aum/t;
+    aux     =   G*((k + 4*aum/m1)*log(1 + m1/t) - (k*m1)/(m1 + t) - aux) +
+                ((k + 2*aum/m2)*log(1 + m2/t) - aux) + 0.25*aux*((G*(m1 - 4*t))/(m1 + t) + (m2/t)*log(1 + t/m2));
+
+    aux     *=  ALPHA/(8*PI)*medium_->GetAtomicNum().at(i)*sgn*v;
+
+    if(hard_component_)
+    {
+        if(particle_->GetType()==1 || particle_->GetType()==2)
+        {
+            aux +=  medium_->GetAtomicNum().at(i)*1.e-30*HardBB(particle_->GetEnergy(), v);
+        }
+
+    }
+
+    return medium_->GetMolDensity()*medium_->GetAtomInMolecule().at(i)*particle_->GetCharge()*particle_->GetCharge()*aux;
+
+}
+
+
+//----------------------------------------------------------------------------//
+
+
+double Photonuclear::ZeusParametrization(double v, int i){
+
+    double nu, sgn, aux, aum, k, G, t;
+
+    const double m1 =   0.54;
+    const double m2 =   1.80;
+    nu              =   v*particle_->GetEnergy();
+    nu              *=  1.e-3;
+
+    aux =   nu*2.e-3*medium_->GetAverageNucleonWeight().at(i);
+    sgn =   63.5*pow(aux, 0.097) + 145*pow(aux , -0.5);
+
+
+    k   =   1 - 2/v + 2/(v*v);
+
+    if(medium_->GetNucCharge().at(i)==1)
+    {
+        G   =   1;
+    }
+    else
+    {
+        aux =   0.00282*pow(medium_->GetAtomicNum().at(i), 1./3)*sgn;
+        G   =   (3/aux)*(0.5 + ((1 + aux)*exp(-aux) - 1)/(aux*aux));
+    }
+
+    G       *=  3;
+    aux     =   v*particle_->GetMass()*1.e-3;
+    t       =   aux*aux/(1-v);
+    sgn     *=  1.e-30;
+    aum     =   particle_->GetMass()*1.e-3;
+    aum     *=  aum;
+    aux     =   2*aum/t;
+    aux     =   G*((k + 4*aum/m1)*log(1 + m1/t) - (k*m1)/(m1 + t) - aux) +
+                ((k + 2*aum/m2)*log(1 + m2/t) - aux) + 0.25*aux*((G*(m1 - 4*t))/(m1 + t) + (m2/t)*log(1 + t/m2));
+
+    aux     *=  ALPHA/(8*PI)*medium_->GetAtomicNum().at(i)*sgn*v;
+
+    if(hard_component_)
+    {
+        if(particle_->GetType()==1 || particle_->GetType()==2)
+        {
+            aux +=  medium_->GetAtomicNum().at(i)*1.e-30*HardBB(particle_->GetEnergy(), v);
+        }
+
+    }
+
+    return medium_->GetMolDensity()*medium_->GetAtomInMolecule().at(i)*particle_->GetCharge()*particle_->GetCharge()*aux;
+
+}
+
+//----------------------------------------------------------------------------//
+
+
+double Photonuclear::ALLM91Parametrization(double v, int i){
+
+//    if(jt_)
+//    {
+//        SetIntegralLimits(i);
+//        if(v>=vUp)
+//        {
+//            return max(interpolateJ_[i].interpolate(particle_->e, log(v/vUp)/log(vMax/vUp)), 0.0);
+//        }
+//    }
+
+    double aux, min, max;
+
+    component_ =   i;
+    v_         =   v;
+    min        =   particle_->GetMass()*v;
+    min        *=  min/(1-v);
+
+    if(particle_->GetMass() < MPI)
+    {
+        aux     =   particle_->GetMass()*particle_->GetMass()/particle_->GetEnergy();
+        min     -=  (aux*aux)/(2*(1-v));
+    }
+
+    max =   2*medium_->GetAverageNucleonWeight().at(i)*particle_->GetEnergy()*(v-vMin_);
+
+    //  if(form==4) max=Math.min(max, 5.5e6);  // as requested in Butkevich and Mikheyev
+    if(min > max)
+    {
+        return 0;
+    }
+
+    return medium_->GetMolDensity()*medium_->GetAtomInMolecule().at(i)*particle_->GetCharge()*particle_->GetCharge()*integral_->IntegrateWithLog(min, max, boost::bind(&Photonuclear::FunctionToIntegralALLM91, this, _1));
+
+}
+
+//----------------------------------------------------------------------------//
+
+
+double Photonuclear::ALLM97Parametrization(double v, int i){
+//    if(jt_)
+//    {
+//        SetIntegralLimits(i);
+//        if(v>=vUp)
+//        {
+//            return max(interpolateJ_[i].interpolate(particle_->e, log(v/vUp)/log(vMax/vUp)), 0.0);
+//        }
+//    }
+
+    double aux, min, max;
+
+    component_ =   i;
+    v_         =   v;
+    min        =   particle_->GetMass()*v;
+    min        *=  min/(1-v);
+
+    if(particle_->GetMass() < MPI)
+    {
+        aux     =   particle_->GetMass()*particle_->GetMass()/particle_->GetEnergy();
+        min     -=  (aux*aux)/(2*(1-v));
+    }
+
+    max =   2*medium_->GetAverageNucleonWeight().at(i)*particle_->GetEnergy()*(v-vMin_);
+
+    //  if(form==4) max=Math.min(max, 5.5e6);  // as requested in Butkevich and Mikheyev
+    if(min>max)
+    {
+        return 0;
+    }
+
+    return medium_->GetMolDensity()*medium_->GetAtomInMolecule().at(i)*particle_->GetCharge()*particle_->GetCharge()*integral_->IntegrateWithLog(min, max, boost::bind(&Photonuclear::FunctionToIntegralALLM97, this, _1));
+
+}
+
+//----------------------------------------------------------------------------//
+
+
+double Photonuclear::ButkevichMikhailovParametrization(double v, int i){
+
+//    if(jt_)
+//    {
+//        SetIntegralLimits(i);
+//        if(v>=vUp)
+//        {
+//            return max(interpolateJ_[i].interpolate(particle_->e, log(v/vUp)/log(vMax/vUp)), 0.0);
+//        }
+//    }
+
+    double aux, min, max;
+
+    component_ =   i;
+    v_         =   v;
+    min        =   particle_->GetMass()*v;
+    min        *=  min/(1-v);
+
+    if(particle_->GetMass() < MPI)
+    {
+        aux     =   particle_->GetMass()*particle_->GetMass()/particle_->GetEnergy();
+        min     -=  (aux*aux)/(2*(1-v));
+    }
+
+    max =   2*medium_->GetAverageNucleonWeight().at(i)*particle_->GetEnergy()*(v-vMin_);
+
+    //  if(form==4) max=Math.min(max, 5.5e6);  // as requested in Butkevich and Mikheyev
+    if(min>max)
+    {
+        return 0;
+    }
+
+    return medium_->GetMolDensity()*medium_->GetAtomInMolecule().at(i)*particle_->GetCharge()*particle_->GetCharge()*integral_->IntegrateWithLog(min, max, boost::bind(&Photonuclear::FunctionToIntegralButMik, this, _1));
+
+}
+
+//----------------------------------------------------------------------------//
+
+
+double Photonuclear::ShadowEffect(double x , double nu){
+    double G , aux;
+
+    if(shadow_ == 1)
+    {
+        if(x<0.0014)
+        {
+            G   =   pow(medium_->GetAtomicNum().at(component_), -0.1);
+        }
+        else if(x<0.04)
+        {
+            G   =   pow(medium_->GetAtomicNum().at(component_), 0.069*log(x)/LOG10+0.097);
+        }
+        else
+        {
+            G   =   1;
+        }
+    }
+    else if (shadow_ == 2)
+    {
+        if(x>0.3)
+        {
+            const double Mb =   0.437;
+            const double la =   0.5;
+            const double x2 =   0.278;
+
+            double mb, Aosc, mu, au, ac;
+
+            mb      =   Mb*medium_->GetMN().at(component_);
+            au      =   1/(1 - x);
+            ac      =   1/(1 - x2);
+            mu      =   MPI/medium_->GetAverageNucleonWeight().at(component_);
+            Aosc    =   (1 - la*x)*((au - ac)-mu*(au*au - ac*ac));
+            G       =   1 - mb*Aosc;
+        }
+        else
+        {
+            const double M1 =   0.129;
+            const double M2 =   0.456;
+            const double M3 =   0.553;
+
+            double m1, m2, m3, x0, sgn;
+
+            m1  =   M1*medium_->GetMN().at(component_);
+            m2  =   M2*medium_->GetMN().at(component_);
+            m3  =   M3*medium_->GetMN().at(component_);
+            nu  *=  1.e-3;
+            sgn =   112.2*(0.609*pow(nu, 0.0988) + 1.037*pow(nu, -0.5944));
+            aux =   0.00282*pow(medium_->GetAtomicNum().at(component_), 1./3)*sgn;
+            G   =   (3/aux)*(0.5 + ((1 + aux)*exp(-aux)-1)/(aux*aux));
+            G   =   0.75*G + 0.25;
+            x0  =   pow(G/(1+m2), 1/m1);
+
+            if(x>=x0)
+            {
+                G   =   pow(x, m1)*(1+m2)*(1-m3*x);
+            }
+        }
+    }
+    else
+    {
+        cout<<"shadow_ must be 1 or 2, other values are not supported!"<<endl;
+        cout<<"Be careful shadow effect factor is set to 1!"<<endl;
+
+        G   =   1.;
+    }
+
+    return G;
+}
+
+//----------------------------------------------------------------------------//
+
+
+double Photonuclear::FunctionToIntegralALLM91(double Q2){
 
     double x, aux, nu, G, F2, R2;
 
@@ -422,215 +735,88 @@ double Photonuclear::FunctionToIntegral(double Q2){
     {
         G   =   1;
     }
-    else switch(shadow_)
-        {
-        case 1:
-        {
-            if(x<0.0014)
-            {
-                G   =   pow(medium_->GetAtomicNum().at(component_), -0.1);
-            }
-            else if(x<0.04)
-            {
-                G   =   pow(medium_->GetAtomicNum().at(component_), 0.069*log(x)/LOG10+0.097);
-            }
-            else
-            {
-                G   =   1;
-            }
+    else G = ShadowEffect(x , nu);
 
-            break;
 
-        }
-        case 2:
-        default:
-        {
-            if(x>0.3)
-            {
-                const double Mb =   0.437;
-                const double la =   0.5;
-                const double x2 =   0.278;
+    double P, W2;
 
-                double mb, Aosc, mu, au, ac;
+    aux =   x*x;
+    P   =   1 - 1.85*x + 2.45*aux - 2.35*aux*x + aux*aux;
+    G   *=  (medium_->GetNucCharge().at(component_) + (medium_->GetAtomicNum().at(component_) - medium_->GetNucCharge().at(component_))*P);
+    W2  =   medium_->GetAverageNucleonWeight().at(component_)*medium_->GetAverageNucleonWeight().at(component_)
+            - Q2 + 2*medium_->GetAverageNucleonWeight().at(component_)*particle_->GetEnergy()*v_;
 
-                mb      =   Mb*medium_->GetMN().at(component_);
-                au      =   1/(1 - x);
-                ac      =   1/(1 - x2);
-                mu      =   MPI/medium_->GetAverageNucleonWeight().at(component_);
-                Aosc    =   (1 - la*x)*((au - ac)-mu*(au*au - ac*ac));
-                G       =   1 - mb*Aosc;
-            }
-            else
-            {
-                const double M1 =   0.129;
-                const double M2 =   0.456;
-                const double M3 =   0.553;
+    double cp1, cp2, cp3, cr1, cr2, cr3, ap1, ap2, ap3, ar1, ar2, ar3;
+    double bp1, bp2, bp3, br1, br2, br3, m2o, m2r, L2, m2p, Q2o;
 
-                double m1, m2, m3, x0, sgn;
 
-                m1  =   M1*medium_->GetMN().at(component_);
-                m2  =   M2*medium_->GetMN().at(component_);
-                m3  =   M3*medium_->GetMN().at(component_);
-                nu  *=  1.e-3;
-                sgn =   112.2*(0.609*pow(nu, 0.0988) + 1.037*pow(nu, -0.5944));
-                aux =   0.00282*pow(medium_->GetAtomicNum().at(component_), 1./3)*sgn;
-                G   =   (3/aux)*(0.5 + ((1 + aux)*exp(-aux)-1)/(aux*aux));
-                G   =   0.75*G + 0.25;
-                x0  =   pow(G/(1+m2), 1/m1);
+    cp1     =   0.26550;
+    cp2     =   0.04856;
+    cp3     =   1.04682;
+    cr1     =   0.67639;
+    cr2     =   0.49027;
+    cr3     =   2.66275;
+    ap1     =   -0.04503;
+    ap2     =   -0.36407;
+    ap3     =   8.17091;
+    ar1     =   0.60408;
+    ar2     =   0.17353;
+    ar3     =   1.61812;
+    bp1     =   0.49222;
+    bp2     =   0.52116;
+    bp3     =   3.55115;
+    br1     =   1.26066;
+    br2     =   1.83624;
+    br3     =   0.81141;
+    m2o     =   0.30508;
+    m2r     =   0.20623;
+    L2      =   0.06527;
+    m2p     =   10.67564;
+    Q2o     =   0.27799;
 
-                if(x>=x0)
-                {
-                    G   =   pow(x, m1)*(1+m2)*(1-m3*x);
-                }
-            }
-        }
-        }
 
-    switch(parametrization_)
+    // GeV -> MeV conversion
+    m2o     *=  1e6;
+    m2r     *=  1e6;
+    L2      *=  1e6;
+    m2p     *=  1e6;
+    Q2o     *=  1e6;
+
+    // these values are corrected according to the file f2allm.f from Halina Abramowicz
+    bp1     *=  bp1;
+    bp2     *=  bp2;
+    br1     *=  br1;
+    br2     *=  br2;
+    Q2o     +=  L2;
+
+    const double R  =   0;
+
+    double cr, ar, cp, ap, br, bp, t;
+
+    t   =   log(log((Q2 + Q2o)/L2)/log(Q2o/L2));
+
+    if(t<0)
     {
-    case 3:  // Abramowicz, Levin, Levy, and Maor parametrization
-    {
-        double P, W2;
-
-        aux =   x*x;
-        P   =   1 - 1.85*x + 2.45*aux - 2.35*aux*x + aux*aux;
-        G   *=  (medium_->GetNucCharge().at(component_) + (medium_->GetAtomicNum().at(component_) - medium_->GetNucCharge().at(component_))*P);
-        W2  =   medium_->GetAverageNucleonWeight().at(component_)*medium_->GetAverageNucleonWeight().at(component_)
-                - Q2 + 2*medium_->GetAverageNucleonWeight().at(component_)*particle_->GetEnergy()*v_;
-
-        double cp1, cp2, cp3, cr1, cr2, cr3, ap1, ap2, ap3, ar1, ar2, ar3;
-        double bp1, bp2, bp3, br1, br2, br3, m2o, m2r, L2, m2p, Q2o;
-
-        switch(bb_)
-        {
-        case 1:  // ALLM91
-            cp1     =   0.26550;
-            cp2     =   0.04856;
-            cp3     =   1.04682;
-            cr1     =   0.67639;
-            cr2     =   0.49027;
-            cr3     =   2.66275;
-            ap1     =   -0.04503;
-            ap2     =   -0.36407;
-            ap3     =   8.17091;
-            ar1     =   0.60408;
-            ar2     =   0.17353;
-            ar3     =   1.61812;
-            bp1     =   0.49222;
-            bp2     =   0.52116;
-            bp3     =   3.55115;
-            br1     =   1.26066;
-            br2     =   1.83624;
-            br3     =   0.81141;
-            m2o     =   0.30508;
-            m2r     =   0.20623;
-            L2      =   0.06527;
-            m2p     =   10.67564;
-            Q2o     =   0.27799;
-            break;
-        case 2:  // ALLM97
-        default:
-            cp1     =   0.28067;
-            cp2     =   0.22291;
-            cp3     =   2.1979;
-            cr1     =   0.80107;
-            cr2     =   0.97307;
-            cr3     =   3.4942;
-            ap1     =   -0.0808;
-            ap2     =   -0.44812;
-            ap3     =   1.1709;
-            ar1     =   0.58400;
-            ar2     =   0.37888;
-            ar3     =   2.6063;
-            bp1     =   0.60243;
-            bp2     =   1.3754;
-            bp3     =   1.8439;
-            br1     =   0.10711;
-            br2     =   1.9386;
-            br3     =   0.49338;
-            m2o     =   0.31985;
-            m2r     =   0.15052;
-            L2      =   0.06527;
-            m2p     =   49.457;
-            Q2o     =   0.46017;
-        }
-
-        // GeV -> MeV conversion
-        m2o     *=  1e6;
-        m2r     *=  1e6;
-        L2      *=  1e6;
-        m2p     *=  1e6;
-        Q2o     *=  1e6;
-
-        // these values are corrected according to the file f2allm.f from Halina Abramowicz
-        bp1     *=  bp1;
-        bp2     *=  bp2;
-        br1     *=  br1;
-        br2     *=  br2;
-        Q2o     +=  L2;
-
-        const double R  =   0;
-
-        double cr, ar, cp, ap, br, bp, t;
-
-        t   =   log(log((Q2 + Q2o)/L2)/log(Q2o/L2));
-
-        if(t<0)
-        {
-            t=0;
-        }
-
-        cr  =   cr1 + cr2*pow(t, cr3);
-        ar  =   ar1 + ar2*pow(t, ar3);
-        cp  =   cp1 + (cp1 - cp2)*(1/(1 + pow(t, cp3)) - 1);
-        ap  =   ap1 + (ap1 - ap2)*(1/(1 + pow(t, ap3)) - 1);
-        br  =   br1 + br2*pow(t, br3);
-        bp  =   bp1 + bp2*pow(t, bp3);
-
-        double xp, xr, F2p, F2r;
-
-        xp  =   (Q2 + m2p)/(Q2 + m2p + W2 - medium_->GetAverageNucleonWeight().at(component_)*medium_->GetAverageNucleonWeight().at(component_));
-        xr  =   (Q2 + m2r)/(Q2 + m2r + W2 - medium_->GetAverageNucleonWeight().at(component_)*medium_->GetAverageNucleonWeight().at(component_));
-        F2p =   cp*pow(xp, ap)*pow(1 - x, bp);
-        F2r =   cr*pow(xr, ar)*pow(1 - x, br);
-        F2  =   (Q2/(Q2 + m2o))*(F2p + F2r)*G;
-        R2  =   (2*(1 + R));
-
-        break;
+        t=0;
     }
-    case 4:  // Butkevich and Mikheyev parametrization
-    default:
-    {
-        const double a  =   0.2513e6;
-        const double b  =   0.6186e6;
-        const double c  =   3.0292e6;
-        const double d  =   1.4817e6;
-        const double d0 =   0.0988;
-        const double ar =   0.4056;
-        const double t  =   1.8152;
-        const double As =   0.12;
-        const double Bu =   1.2437;
-        const double Bd =   0.1853;
-        const double R  =   0.25;
 
-        double F2p, F2n, FSp, FNp, FSn, FNn, n, dl, xUv, xDv;
+    cr  =   cr1 + cr2*pow(t, cr3);
+    ar  =   ar1 + ar2*pow(t, ar3);
+    cp  =   cp1 + (cp1 - cp2)*(1/(1 + pow(t, cp3)) - 1);
+    ap  =   ap1 + (ap1 - ap2)*(1/(1 + pow(t, ap3)) - 1);
+    br  =   br1 + br2*pow(t, br3);
+    bp  =   bp1 + bp2*pow(t, bp3);
 
-        n   =   1.5*(1 + Q2/(Q2 + c));
-        dl  =   d0*(1 + 2*Q2/(Q2 + d));
-        aux =   As*pow(x, -dl)*pow(Q2/(Q2 + a), 1 + dl);
-        FSp =   aux*pow(1 - x, n + 4);
-        FSn =   aux*pow(1 - x, n + t);
-        aux =   pow(x, 1 - ar)*pow(1 - x, n)*pow(Q2/(Q2 + b), ar);
-        xUv =   Bu*aux;
-        xDv =   Bd*aux*(1 - x);
-        FNp =   xUv + xDv;
-        FNn =   xUv/4 + xDv*4;
-        F2p =   FSp + FNp;
-        F2n =   FSn + FNn;
-        F2  =   G*(medium_->GetNucCharge().at(component_)*F2p + (medium_->GetAtomicNum().at(component_) - medium_->GetNucCharge().at(component_))*F2n);
-        R2  =   (2*(1 + R));
-    }
-    }
+    double xp, xr, F2p, F2r;
+
+    xp  =   (Q2 + m2p)/(Q2 + m2p + W2 - medium_->GetAverageNucleonWeight().at(component_)*medium_->GetAverageNucleonWeight().at(component_));
+    xr  =   (Q2 + m2r)/(Q2 + m2r + W2 - medium_->GetAverageNucleonWeight().at(component_)*medium_->GetAverageNucleonWeight().at(component_));
+    F2p =   cp*pow(xp, ap)*pow(1 - x, bp);
+    F2r =   cr*pow(xr, ar)*pow(1 - x, br);
+    F2  =   (Q2/(Q2 + m2o))*(F2p + F2r)*G;
+    R2  =   (2*(1 + R));
+
+
 
     aux =   ME*RE/Q2;
     aux *=  aux*(1 - v_ - medium_->GetAverageNucleonWeight().at(component_)*x*v_/(2*particle_->GetEnergy()) +
@@ -642,3 +828,156 @@ double Photonuclear::FunctionToIntegral(double Q2){
 
 //----------------------------------------------------------------------------//
 
+
+double Photonuclear::FunctionToIntegralALLM97(double Q2){
+
+    double x, aux, nu, G, F2, R2;
+
+    nu  =   v_*particle_->GetEnergy();
+    x   =   Q2/(2*medium_->GetAverageNucleonWeight().at(component_)*nu);
+
+    if(medium_->GetNucCharge().at(component_)==1)
+    {
+        G   =   1;
+    }
+    else G = ShadowEffect(x , nu);
+
+    double P, W2;
+
+    aux =   x*x;
+    P   =   1 - 1.85*x + 2.45*aux - 2.35*aux*x + aux*aux;
+    G   *=  (medium_->GetNucCharge().at(component_) + (medium_->GetAtomicNum().at(component_) - medium_->GetNucCharge().at(component_))*P);
+    W2  =   medium_->GetAverageNucleonWeight().at(component_)*medium_->GetAverageNucleonWeight().at(component_)
+            - Q2 + 2*medium_->GetAverageNucleonWeight().at(component_)*particle_->GetEnergy()*v_;
+
+    double cp1, cp2, cp3, cr1, cr2, cr3, ap1, ap2, ap3, ar1, ar2, ar3;
+    double bp1, bp2, bp3, br1, br2, br3, m2o, m2r, L2, m2p, Q2o;
+
+
+    cp1     =   0.28067;
+    cp2     =   0.22291;
+    cp3     =   2.1979;
+    cr1     =   0.80107;
+    cr2     =   0.97307;
+    cr3     =   3.4942;
+    ap1     =   -0.0808;
+    ap2     =   -0.44812;
+    ap3     =   1.1709;
+    ar1     =   0.58400;
+    ar2     =   0.37888;
+    ar3     =   2.6063;
+    bp1     =   0.60243;
+    bp2     =   1.3754;
+    bp3     =   1.8439;
+    br1     =   0.10711;
+    br2     =   1.9386;
+    br3     =   0.49338;
+    m2o     =   0.31985;
+    m2r     =   0.15052;
+    L2      =   0.06527;
+    m2p     =   49.457;
+    Q2o     =   0.46017;
+
+
+    // GeV -> MeV conversion
+    m2o     *=  1e6;
+    m2r     *=  1e6;
+    L2      *=  1e6;
+    m2p     *=  1e6;
+    Q2o     *=  1e6;
+
+    // these values are corrected according to the file f2allm.f from Halina Abramowicz
+    bp1     *=  bp1;
+    bp2     *=  bp2;
+    br1     *=  br1;
+    br2     *=  br2;
+    Q2o     +=  L2;
+
+    const double R  =   0;
+
+    double cr, ar, cp, ap, br, bp, t;
+
+    t   =   log(log((Q2 + Q2o)/L2)/log(Q2o/L2));
+
+    if(t<0)
+    {
+        t=0;
+    }
+
+    cr  =   cr1 + cr2*pow(t, cr3);
+    ar  =   ar1 + ar2*pow(t, ar3);
+    cp  =   cp1 + (cp1 - cp2)*(1/(1 + pow(t, cp3)) - 1);
+    ap  =   ap1 + (ap1 - ap2)*(1/(1 + pow(t, ap3)) - 1);
+    br  =   br1 + br2*pow(t, br3);
+    bp  =   bp1 + bp2*pow(t, bp3);
+
+    double xp, xr, F2p, F2r;
+
+    xp  =   (Q2 + m2p)/(Q2 + m2p + W2 - medium_->GetAverageNucleonWeight().at(component_)*medium_->GetAverageNucleonWeight().at(component_));
+    xr  =   (Q2 + m2r)/(Q2 + m2r + W2 - medium_->GetAverageNucleonWeight().at(component_)*medium_->GetAverageNucleonWeight().at(component_));
+    F2p =   cp*pow(xp, ap)*pow(1 - x, bp);
+    F2r =   cr*pow(xr, ar)*pow(1 - x, br);
+    F2  =   (Q2/(Q2 + m2o))*(F2p + F2r)*G;
+    R2  =   (2*(1 + R));
+
+    aux =   ME*RE/Q2;
+    aux *=  aux*(1 - v_ - medium_->GetAverageNucleonWeight().at(component_)*x*v_/(2*particle_->GetEnergy()) +
+                 (1 - 2*particle_->GetMass()*particle_->GetMass()/Q2)
+                 *v_*v_*(1 + 4*medium_->GetAverageNucleonWeight().at(component_)*medium_->GetAverageNucleonWeight().at(component_)*x*x/Q2)/R2);
+
+    return (4*PI*F2/v_)*aux;
+}
+
+//----------------------------------------------------------------------------//
+
+
+double Photonuclear::FunctionToIntegralButMik(double Q2){
+
+    double x, aux, nu, G, F2, R2;
+
+    nu  =   v_*particle_->GetEnergy();
+    x   =   Q2/(2*medium_->GetAverageNucleonWeight().at(component_)*nu);
+
+    if(medium_->GetNucCharge().at(component_)==1)
+    {
+        G   =   1;
+    }
+    else G = ShadowEffect(x , nu);
+
+    const double a  =   0.2513e6;
+    const double b  =   0.6186e6;
+    const double c  =   3.0292e6;
+    const double d  =   1.4817e6;
+    const double d0 =   0.0988;
+    const double ar =   0.4056;
+    const double t  =   1.8152;
+    const double As =   0.12;
+    const double Bu =   1.2437;
+    const double Bd =   0.1853;
+    const double R  =   0.25;
+
+    double F2p, F2n, FSp, FNp, FSn, FNn, n, dl, xUv, xDv;
+
+    n   =   1.5*(1 + Q2/(Q2 + c));
+    dl  =   d0*(1 + 2*Q2/(Q2 + d));
+    aux =   As*pow(x, -dl)*pow(Q2/(Q2 + a), 1 + dl);
+    FSp =   aux*pow(1 - x, n + 4);
+    FSn =   aux*pow(1 - x, n + t);
+    aux =   pow(x, 1 - ar)*pow(1 - x, n)*pow(Q2/(Q2 + b), ar);
+    xUv =   Bu*aux;
+    xDv =   Bd*aux*(1 - x);
+    FNp =   xUv + xDv;
+    FNn =   xUv/4 + xDv*4;
+    F2p =   FSp + FNp;
+    F2n =   FSn + FNn;
+    F2  =   G*(medium_->GetNucCharge().at(component_)*F2p + (medium_->GetAtomicNum().at(component_) - medium_->GetNucCharge().at(component_))*F2n);
+    R2  =   (2*(1 + R));
+
+
+    aux =   ME*RE/Q2;
+    aux *=  aux*(1 - v_ - medium_->GetAverageNucleonWeight().at(component_)*x*v_/(2*particle_->GetEnergy()) +
+                 (1 - 2*particle_->GetMass()*particle_->GetMass()/Q2)
+                 *v_*v_*(1 + 4*medium_->GetAverageNucleonWeight().at(component_)*medium_->GetAverageNucleonWeight().at(component_)*x*x/Q2)/R2);
+
+    return (4*PI*F2/v_)*aux;
+}

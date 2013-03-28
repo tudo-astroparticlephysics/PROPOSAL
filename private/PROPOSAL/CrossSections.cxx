@@ -13,6 +13,7 @@ CrossSections::CrossSections()
     ,parametrization_(1)
     ,lpm_effect_enabled_(false)
     ,init_lpm_effect_(true)
+    ,hard_component_(true)
     ,order_of_interpolation_(5)
 {
     particle_       = new Particle();
@@ -32,6 +33,7 @@ CrossSections::CrossSections(Particle* particle,
     ,doStochasticInterpolation_(false)
     ,multiplier_(1.)
     ,parametrization_(1)
+    ,hard_component_(true)
     ,order_of_interpolation_(5)
 {
     particle_       = particle;
@@ -108,3 +110,13 @@ void CrossSections::SetShadow(int newshadow)
 {
     shadow_  =   newshadow;
 }
+
+//----------------------------------------------------------------------------//
+
+void CrossSections::SetHardComponent(bool newhard)
+{
+    hard_component_  =   newhard;
+}
+
+//----------------------------------------------------------------------------//
+

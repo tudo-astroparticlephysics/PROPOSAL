@@ -91,7 +91,7 @@ double Bremsstrahlung::CalculatedEdx(){
 
     if(doContinuousInterpolation_)
     {
-        cout << "INTERPOLATING!" << endl;
+//        cout << "INTERPOLATING!" << endl;
         return max(interpolateJ_->interpolate(particle_->GetEnergy()), 0.0);
     }
 
@@ -151,7 +151,7 @@ void Bremsstrahlung::EnableStochasticInerpolation(){
 //----------------------------------------------------------------------------//
 
 void Bremsstrahlung::EnableContinuousInerpolation(){
-    cout << "BUILDING!" << endl;
+  //  cout << "BUILDING!" << endl;
     double energy = particle_->GetEnergy();
     interpolateJ_ = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, boost::bind(&Bremsstrahlung::FunctionToBuildInterpolant, this, _1), order_of_interpolation_, true, false, true, order_of_interpolation_, false, false, true);
     doContinuousInterpolation_=true;

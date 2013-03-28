@@ -57,7 +57,6 @@ protected:
     int         shadow_;
     int         bb_;
 
-    bool        shadow_effect_;
     bool        hard_component_;
 
     int         order_of_interpolation_;
@@ -146,6 +145,7 @@ public:
     void SetParametrization(int parametrization=1);
 
 //----------------------------------------------------------------------------//
+
     void SetEnergyCutSettings(EnergyCutSettings *cuts);
 
 //----------------------------------------------------------------------------//

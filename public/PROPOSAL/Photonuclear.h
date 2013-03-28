@@ -27,17 +27,34 @@ protected:
     double ALLM97Parametrization(double v, int i);
     double ButkevichMikhailovParametrization(double v, int i);
 
-    // form=1 and bb=1 Kokoulin
-    // form=2 and bb=1 Kokoulin + hard component
-    // form=1 and bb=2 Rhode
-    // form=2 and bb=2 Rhode + hard component
-    // form=1 and bb=3 Bezrukov/Bugaev
-    // form=2 and bb=3 Bezrukov/Bugaev + hard component
-    // form=1 and bb=4 Zeus
-    // form=2 and bb=4 Zeus + hard component
-    // form=3 and bb=1 ALLM 91
-    // form=3 and bb=2 ALLM 97
-    // form=4 and bb=1 Butkevich/Mikhailov
+    double ShadowEffect(double x , double nu);
+
+
+//----------------------------------------------------------------------------//
+
+    /*!
+     * parametrized photonuclear cross section - interface to Integral
+     *
+     * \param   Q2  square of the 4-momentum
+     * \return  function value
+     */
+
+    double FunctionToIntegralALLM91(double Q2);
+    double FunctionToIntegralALLM97(double Q2);
+    double FunctionToIntegralButMik(double Q2);
+
+
+    // Now: parametrization_ = 1,hard_component_= false / Former: form=1 and bb=1 Kokoulin
+    // Now: parametrization_ = 1,hard_component_= true  / Former: form=2 and bb=1 Kokoulin + hard component
+    // Now: parametrization_ = 2,hard_component_= false / Former: form=1 and bb=2 Rhode
+    // Now: parametrization_ = 2,hard_component_= true  / Former: form=2 and bb=2 Rhode + hard component
+    // Now: parametrization_ = 3,hard_component_= false / Former: form=1 and bb=3 Bezrukov/Bugaev
+    // Now: parametrization_ = 3,hard_component_= true  / Former: form=2 and bb=3 Bezrukov/Bugaev + hard component
+    // Now: parametrization_ = 4,hard_component_= false / Former: form=1 and bb=4 Zeus
+    // Now: parametrization_ = 4,hard_component_= true  / Former: form=2 and bb=4 Zeus + hard component
+    // Now: parametrization_ = 5,shadow_ = 1 or = 2     / Former: form=3 and bb=1 ALLM 91
+    // Now: parametrization_ = 6,shadow_ = 1 or = 2     / Former: form=3 and bb=2 ALLM 97
+    // Now: parametrization_ = 7,shadow_ = 1 or = 2     / Former: form=4 and bb=1 Butkevich/Mikhailov
 //----------------------------------------------------------------------------//
 
     /*!
@@ -129,17 +146,6 @@ protected:
      */
 
     double HardBB(double e, double v);
-
-//----------------------------------------------------------------------------//
-
-    /*!
-     * parametrized photonuclear cross section - interface to Integral
-     *
-     * \param   Q2  square of the 4-momentum
-     * \return  function value
-     */
-
-    double FunctionToIntegral(double Q2);
 
 //----------------------------------------------------------------------------//
 
