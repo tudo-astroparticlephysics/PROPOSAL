@@ -185,6 +185,6 @@ public:
     void SetLorenzCut(double lorenz_cut);
 //----------------------------------------------------------------------------//
 
-    ~Bremsstrahlung(){}
+    ~Bremsstrahlung();
 
 };

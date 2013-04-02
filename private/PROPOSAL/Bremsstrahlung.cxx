@@ -634,7 +634,7 @@ void Bremsstrahlung::SetLorenzCut(double lorenz_cut){
 //----------------------------------------------------------------------------//
 
 
-~Bremsstrahlung::Bremsstrahlung()
+Bremsstrahlung::~Bremsstrahlung()
 {
     DisableDNdxInterpolation();
     DisableDEdxInterpolation();
