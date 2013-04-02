@@ -137,6 +137,19 @@ void Photonuclear::EnableDEdxInterpolation(){
 
 //----------------------------------------------------------------------------//
 
+void Photonuclear::DisableDNdxInterpolation(){
+    do_dndx_Interpolation_  =   false;
+}
+
+//----------------------------------------------------------------------------//
+
+void Photonuclear::DisableDEdxInterpolation(){
+    do_dedx_Interpolation_  =   false;
+}
+
+
+//----------------------------------------------------------------------------//
+
 double Photonuclear::FunctionToContinuousIntegral(double variable){
     return variable*PhotoN(variable, component_);
 }

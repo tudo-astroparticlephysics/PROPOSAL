@@ -118,7 +118,7 @@ double Bremsstrahlung::CalculatedNdx(){
     for(int i=0; i<(medium_->GetNumCompontents()); i++)
     {
 
-        if(do_dedx_Interpolation_)
+        if(do_dndx_Interpolation_)
         {
             sum    +=  max( dndx_interpolant_.at(i)->interpolate(particle_->GetEnergy()) ,  0.0);
         }
@@ -131,7 +131,6 @@ double Bremsstrahlung::CalculatedNdx(){
     }
 
     return sum;
-    return 0;
 }
 //----------------------------------------------------------------------------//
 
@@ -160,11 +159,34 @@ void Bremsstrahlung::EnableDNdxInterpolation(){
 }
 //----------------------------------------------------------------------------//
 
-void Bremsstrahlung::EnableDEdxInterpolation(){
+void Bremsstrahlung::EnableDEdxInterpolation()
+{
     double energy = particle_->GetEnergy();
     dedx_interpolant_ = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, boost::bind(&Bremsstrahlung::FunctionToBuildDEdxInterpolant, this, _1), order_of_interpolation_, true, false, true, order_of_interpolation_, false, false, true);
     do_dedx_Interpolation_=true;
     particle_->SetEnergy(energy);
+}
+
+//----------------------------------------------------------------------------//
+
+
+void Bremsstrahlung::DisableDNdxInterpolation()
+{
+    for(uint i = 0 ; i < dndx_interpolant_.size() ; i++ ){
+        delete dndx_interpolant_.at(i);
+    }
+    dndx_interpolant_.clear();
+
+    do_dndx_Interpolation_  =   false;
+
+}
+
+//----------------------------------------------------------------------------//
+
+void Bremsstrahlung::DisableDEdxInterpolation()
+{
+    delete dedx_interpolant_;
+    do_dedx_Interpolation_  =   false;
 }
 
 //----------------------------------------------------------------------------//

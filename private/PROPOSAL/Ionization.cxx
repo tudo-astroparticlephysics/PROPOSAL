@@ -135,6 +135,19 @@ void Ionization::EnableDEdxInterpolation(){
 
 //----------------------------------------------------------------------------//
 
+void Ionization::DisableDNdxInterpolation(){
+    do_dndx_Interpolation_  =   false;
+}
+
+//----------------------------------------------------------------------------//
+
+void Ionization::DisableDEdxInterpolation(){
+    do_dedx_Interpolation_  =   false;
+}
+
+
+//----------------------------------------------------------------------------//
+
 double Ionization::FunctionToContinuousIntegral(double variable){
     return variable*D2Ndvdx(variable)*InelCorrection(variable);
 }

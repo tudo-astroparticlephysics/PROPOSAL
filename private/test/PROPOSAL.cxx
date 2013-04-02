@@ -47,38 +47,63 @@ int main(){
 
     cout.precision(16);
 
+    Medium *medium = new Medium("ice",1.);
+    Particle *particle = new Particle("mu",1.,1.,1,.20,20,1e5,10);
+    particle->SetEnergy(1e13);
+    EnergyCutSettings *cuts = new EnergyCutSettings(-1,-1);
+    CrossSections *brems = new Bremsstrahlung(particle, medium, cuts);
 
-    while(in.good())
-    {
-        in>>para>>ecut>>vcut>>lpm>>energy>>med>>particleName>>dEdx;
-        cout<<para<<"\t"<<ecut<<"\t"<<vcut<<"\t"<<lpm<<"\t"<<energy<<"\t"<<med<<"\t"<<particleName<<"\t"<<dEdx<<"\t";
+    cout<<"dEdx:"<<endl;
+    brems->EnableDEdxInterpolation();
+    cout<<brems->CalculatedEdx()<<endl;
 
-        Medium *medium = new Medium(med,1.);
-        Particle *particle = new Particle(particleName,1.,1.,1,.20,20,1e5,10);
-        particle->SetEnergy(energy);
-        EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
+    brems->DisableDEdxInterpolation();
+    cout<<brems->CalculatedEdx()<<endl;
 
-        CrossSections *brems = new Bremsstrahlung(particle, medium, cuts);
+    brems->EnableDEdxInterpolation();
+    cout<<brems->CalculatedEdx()<<endl;
+
+    cout<<"dNdx:"<<endl;
+    brems->EnableDNdxInterpolation();
+    cout<<brems->CalculatedNdx()<<endl;
+
+    brems->DisableDNdxInterpolation();
+    cout<<brems->CalculatedNdx()<<endl;
+
+    brems->EnableDNdxInterpolation();
+    cout<<brems->CalculatedNdx()<<endl;
+
+//    while(in.good())
+//    {
+//        in>>para>>ecut>>vcut>>lpm>>energy>>med>>particleName>>dEdx;
+//        cout<<para<<"\t"<<ecut<<"\t"<<vcut<<"\t"<<lpm<<"\t"<<energy<<"\t"<<med<<"\t"<<particleName<<"\t"<<dEdx<<"\t";
+
+//        Medium *medium = new Medium(med,1.);
+//        Particle *particle = new Particle(particleName,1.,1.,1,.20,20,1e5,10);
+//        particle->SetEnergy(energy);
+//        EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
+
+//        CrossSections *brems = new Bremsstrahlung(particle, medium, cuts);
 
 
-        brems->SetParametrization(para);
-        brems->EnableLpmEffect(lpm);
-        brems->EnableDEdxInterpolation();
-        if(para==1 && ecut==500 && vcut == -1 && lpm ==true){
-            para = para*para;
-        }
-        dEdx_new=brems->CalculatedEdx();
-        cout<<dEdx_new<<"\t"<<particle->GetMass()<<"\t"<<brems->GetVMax()<<"\t"<<brems->GetVMin()<<"\t"<<brems->GetVUp()<<endl;
-        //ASSERT_NEAR(dEdx_new, dEdx, 5e-1*dEdx);
+//        brems->SetParametrization(para);
+//        brems->EnableLpmEffect(lpm);
+//        brems->EnableDEdxInterpolation();
+//        if(para==1 && ecut==500 && vcut == -1 && lpm ==true){
+//            para = para*para;
+//        }
+//        dEdx_new=brems->CalculatedEdx();
+//        cout<<dEdx_new<<"\t"<<particle->GetMass()<<"\t"<<brems->GetVMax()<<"\t"<<brems->GetVMin()<<"\t"<<brems->GetVUp()<<endl;
+//        //ASSERT_NEAR(dEdx_new, dEdx, 5e-1*dEdx);
 
-        delete cuts;
-        delete medium;
-        delete particle;
-        delete brems;
+//        delete cuts;
+//        delete medium;
+//        delete particle;
+//        delete brems;
 
 
 
-    }
+//    }
 
     return 0;
 }

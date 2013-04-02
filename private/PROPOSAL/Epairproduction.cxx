@@ -177,6 +177,19 @@ void Epairproduction::EnableDEdxInterpolation(){
 
 //----------------------------------------------------------------------------//
 
+
+void Epairproduction::DisableDNdxInterpolation(){
+    do_dndx_Interpolation_  =   false;
+}
+
+//----------------------------------------------------------------------------//
+
+void Epairproduction::DisableDEdxInterpolation(){
+    do_dedx_Interpolation_  =   false;
+}
+
+//----------------------------------------------------------------------------//
+
 double Epairproduction::FunctionToContinuousIntegral(double variable){
 
     if(reverse_)
