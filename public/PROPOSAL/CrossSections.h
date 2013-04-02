@@ -43,8 +43,8 @@ protected:
     double ebig_;   //!< upper bound of parameterizations
 
     // Interpolation flags
-    bool doContinuousInterpolation_;
-    bool doStochasticInterpolation_;
+    bool do_dedx_Interpolation_;
+    bool do_dndx_Interpolation_;
 
     //CrossSection multiplier
     double multiplier_;
@@ -104,11 +104,11 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    virtual void EnableStochasticInerpolation() = 0;
+    virtual void EnableDNdxInterpolation() = 0;
 
 //----------------------------------------------------------------------------//
 
-    virtual void EnableContinuousInerpolation() = 0;
+    virtual void EnableDEdxInterpolation() = 0;
 
 //----------------------------------------------------------------------------//
 

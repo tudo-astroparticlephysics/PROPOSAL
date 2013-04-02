@@ -41,8 +41,8 @@ Bremsstrahlung::Bremsstrahlung(Particle* particle,
     vUp_                        = 0;
     vMin_                       = 0;
     ebig_                       = BIGENERGY;
-    doContinuousInterpolation_  = false;
-    doStochasticInterpolation_  = false;
+    do_dedx_Interpolation_  = false;
+    do_dndx_Interpolation_  = false;
     multiplier_                 = 1.;
     parametrization_            = 1;
     lpm_effect_enabled_         = false;
@@ -89,7 +89,7 @@ double Bremsstrahlung::CalculatedEdx(){
         return 0;
     }
 
-    if(doContinuousInterpolation_)
+    if(do_dedx_Interpolation_)
     {
 //        cout << "INTERPOLATING!" << endl;
         return max(dedx_interpolant_->interpolate(particle_->GetEnergy()), 0.0);
@@ -118,7 +118,7 @@ double Bremsstrahlung::CalculatedNdx(){
     for(int i=0; i<(medium_->GetNumCompontents()); i++)
     {
 
-        if(doContinuousInterpolation_)
+        if(do_dedx_Interpolation_)
         {
             sum    +=  max( dndx_interpolant_.at(i)->interpolate(particle_->GetEnergy()) ,  0.0);
         }
@@ -145,8 +145,8 @@ double Bremsstrahlung::CalculateStochasticLoss(){
 }
 //----------------------------------------------------------------------------//
 
-void Bremsstrahlung::EnableStochasticInerpolation(){
-    if(doStochasticInterpolation_)return;
+void Bremsstrahlung::EnableDNdxInterpolation(){
+    if(do_dndx_Interpolation_)return;
 
     double energy = particle_->GetEnergy();
     dndx_interpolant_.resize( medium_->GetNumCompontents() );
@@ -156,14 +156,14 @@ void Bremsstrahlung::EnableStochasticInerpolation(){
     }
     particle_->SetEnergy(energy);
 
-    doStochasticInterpolation_=true;
+    do_dndx_Interpolation_=true;
 }
 //----------------------------------------------------------------------------//
 
-void Bremsstrahlung::EnableContinuousInerpolation(){
+void Bremsstrahlung::EnableDEdxInterpolation(){
     double energy = particle_->GetEnergy();
     dedx_interpolant_ = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, boost::bind(&Bremsstrahlung::FunctionToBuildDEdxInterpolant, this, _1), order_of_interpolation_, true, false, true, order_of_interpolation_, false, false, true);
-    doContinuousInterpolation_=true;
+    do_dedx_Interpolation_=true;
     particle_->SetEnergy(energy);
 }
 

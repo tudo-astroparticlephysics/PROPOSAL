@@ -35,8 +35,8 @@ Ionization::Ionization(Particle* particle,
     vUp_                        = 0;
     vMin_                       = 0;
     ebig_                       = BIGENERGY;
-    doContinuousInterpolation_  = false;
-    doStochasticInterpolation_  = false;
+    do_dedx_Interpolation_      = false;
+    do_dndx_Interpolation_  = false;
     multiplier_                 = 1.;
 
 
@@ -124,13 +124,13 @@ double Ionization::CalculateStochasticLoss(){
 }
 //----------------------------------------------------------------------------//
 
-void Ionization::EnableStochasticInerpolation(){
-    doStochasticInterpolation_=true;
+void Ionization::EnableDNdxInterpolation(){
+    do_dndx_Interpolation_=true;
 }
 //----------------------------------------------------------------------------//
 
-void Ionization::EnableContinuousInerpolation(){
-    doContinuousInterpolation_=true;
+void Ionization::EnableDEdxInterpolation(){
+    do_dedx_Interpolation_=true;
 }
 
 //----------------------------------------------------------------------------//

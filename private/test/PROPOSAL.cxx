@@ -63,7 +63,7 @@ int main(){
 
         brems->SetParametrization(para);
         brems->EnableLpmEffect(lpm);
-        brems->EnableContinuousInerpolation();
+        brems->EnableDEdxInterpolation();
         if(para==1 && ecut==500 && vcut == -1 && lpm ==true){
             para = para*para;
         }

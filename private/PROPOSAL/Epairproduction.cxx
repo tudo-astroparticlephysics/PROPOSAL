@@ -39,8 +39,8 @@ Epairproduction::Epairproduction(Particle* particle,
     vUp_                        = 0;
     vMin_                       = 0;
     ebig_                       = BIGENERGY;
-    doContinuousInterpolation_  = false;
-    doStochasticInterpolation_  = false;
+    do_dedx_Interpolation_      = false;
+    do_dndx_Interpolation_  = false;
     multiplier_                 = 1.;
     parametrization_            = 1;
     lpm_effect_enabled_         = false;
@@ -166,13 +166,13 @@ double Epairproduction::CalculateStochasticLoss(){
 }
 //----------------------------------------------------------------------------//
 
-void Epairproduction::EnableStochasticInerpolation(){
-    doStochasticInterpolation_=true;
+void Epairproduction::EnableDNdxInterpolation(){
+    do_dndx_Interpolation_=true;
 }
 //----------------------------------------------------------------------------//
 
-void Epairproduction::EnableContinuousInerpolation(){
-    doContinuousInterpolation_=true;
+void Epairproduction::EnableDEdxInterpolation(){
+    do_dedx_Interpolation_=true;
 }
 
 //----------------------------------------------------------------------------//

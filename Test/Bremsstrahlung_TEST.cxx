@@ -41,7 +41,7 @@ TEST(Bremsstrahlung , Test_of_dNdx_Interpolant ) {
 
         brems->SetParametrization(para);
         brems->EnableLpmEffect(lpm);
-        brems->EnableStochasticInerpolation();
+        brems->EnableDNdxInterpolation();
         dNdx_new=brems->CalculatedNdx();
 
         ASSERT_NEAR(dNdx_new, dNdx, 1e-3*dNdx);
@@ -198,7 +198,7 @@ TEST(Bremsstrahlung , Test_of_dEdx_Interpolat ) {
         brems->EnableLpmEffect(lpm);
         if(!med.compare("uranium"))continue;
          //       cout << para << "\t" << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << med << "\t" << particleName<< "\t" << dEdx << endl;
-        brems->EnableContinuousInerpolation();
+        brems->EnableDEdxInterpolation();
         dEdx_new=brems->CalculatedEdx();
 
         if(!med.compare("uranium")){

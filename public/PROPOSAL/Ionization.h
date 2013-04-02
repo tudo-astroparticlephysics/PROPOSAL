@@ -134,11 +134,11 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    void EnableStochasticInerpolation();
+    void EnableDNdxInterpolation();
 
 //----------------------------------------------------------------------------//
 
-    void EnableContinuousInerpolation();
+    void EnableDEdxInterpolation();
 
 //----------------------------------------------------------------------------//
 

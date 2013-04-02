@@ -42,13 +42,13 @@ double Decay::CalculateStochasticLoss(){
 }
 //----------------------------------------------------------------------------//
 
-void Decay::EnableStochasticInerpolation(){
-    doStochasticInterpolation_=true;
+void Decay::EnableDNdxInterpolation(){
+    do_dndx_Interpolation_=true;
 }
 //----------------------------------------------------------------------------//
 
-void Decay::EnableContinuousInerpolation(){
-    doContinuousInterpolation_=true;
+void Decay::EnableDEdxInterpolation(){
+    do_dedx_Interpolation_=true;
 }
 
 //----------------------------------------------------------------------------//

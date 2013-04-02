@@ -126,13 +126,13 @@ double Photonuclear::CalculateStochasticLoss(){
 }
 //----------------------------------------------------------------------------//
 
-void Photonuclear::EnableStochasticInerpolation(){
-    doStochasticInterpolation_=true;
+void Photonuclear::EnableDNdxInterpolation(){
+    do_dndx_Interpolation_=true;
 }
 //----------------------------------------------------------------------------//
 
-void Photonuclear::EnableContinuousInerpolation(){
-    doContinuousInterpolation_=true;
+void Photonuclear::EnableDEdxInterpolation(){
+    do_dedx_Interpolation_=true;
 }
 
 //----------------------------------------------------------------------------//
