@@ -9,7 +9,14 @@ using namespace std;
 Bremsstrahlung::Bremsstrahlung()
 
 {
-    integral_   = new Integral(IROMB, IMAXS, IPREC);
+    dedx_integral_   = new Integral(IROMB, IMAXS, IPREC);
+
+    dndx_integral_.resize(medium_->GetNumCompontents());
+
+    for(int i =0; i<(medium_->GetNumCompontents()); i++)
+    {
+            dndx_integral_.at(i) =   new Integral(IROMB, IMAXS, IPREC);
+    }
 }
 
 //----------------------------------------------------------------------------//
@@ -49,7 +56,14 @@ Bremsstrahlung::Bremsstrahlung(Particle* particle,
     init_lpm_effect_            = true;
     component_                  = 0;
 
-    integral_   = new Integral(IROMB, IMAXS, IPREC);
+    dedx_integral_   = new Integral(IROMB, IMAXS, IPREC);
+
+    dndx_integral_.resize(medium_->GetNumCompontents());
+
+    for(int i =0; i<(medium_->GetNumCompontents()); i++)
+    {
+            dndx_integral_.at(i) =   new Integral(IROMB, IMAXS, IPREC);
+    }
 
 }
 
@@ -98,7 +112,7 @@ double Bremsstrahlung::CalculatedEdx(){
     for(int i=0; i<(medium_->GetNumCompontents()); i++)
     {
         SetIntegralLimits(i);
-        sum +=  integral_->IntegrateOpened(0, vUp_, boost::bind(&Bremsstrahlung::FunctionToContinuousIntegral, this, _1));
+        sum +=  dedx_integral_->IntegrateOpened(0, vUp_, boost::bind(&Bremsstrahlung::FunctionToDEdxIntegral, this, _1));
     }
 
     return multiplier_*particle_->GetEnergy()*sum;
@@ -120,12 +134,12 @@ double Bremsstrahlung::CalculatedNdx(){
 
         if(do_dndx_Interpolation_)
         {
-            sum    +=  max( dndx_interpolant_.at(i)->interpolate(particle_->GetEnergy()) ,  0.0);
+            sum    +=  max( dndx_interpolant_1d_.at(i)->interpolate(particle_->GetEnergy()) ,  0.0);
         }
         else
         {
             SetIntegralLimits(i);
-            sum    +=  integral_->IntegrateWithLog(vUp_, vMax_, boost::bind(&Bremsstrahlung::FunctionToStochasticalIntegral, this, _1));
+            sum    +=  dndx_integral_.at(i)->IntegrateWithLog(vUp_, vMax_, boost::bind(&Bremsstrahlung::FunctionToDNdxIntegral, this, _1));
         }
 
     }
@@ -148,10 +162,14 @@ void Bremsstrahlung::EnableDNdxInterpolation(){
     if(do_dndx_Interpolation_)return;
 
     double energy = particle_->GetEnergy();
-    dndx_interpolant_.resize( medium_->GetNumCompontents() );
+    dndx_interpolant_1d_.resize( medium_->GetNumCompontents() );
+    dndx_interpolant_2d_.resize( medium_->GetNumCompontents() );
     for(int i=0; i<(medium_->GetNumCompontents()); i++)
     {
-        dndx_interpolant_.at(i) = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, boost::bind(&Bremsstrahlung::FunctionToBuildDNdxInterpolant, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, true, false, false);
+        component_ = i;
+        dndx_interpolant_2d_.at(i) = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY,  NUM1, 0, 1, boost::bind(&Bremsstrahlung::FunctionToBuildDNdxInterpolant2D, this, _1 , _2), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false, order_of_interpolation_, true, false, false);
+        dndx_interpolant_1d_.at(i) = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, boost::bind(&Bremsstrahlung::FunctionToBuildDNdxInterpolant, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, true, false, false);
+
     }
     particle_->SetEnergy(energy);
 
@@ -172,10 +190,16 @@ void Bremsstrahlung::EnableDEdxInterpolation()
 
 void Bremsstrahlung::DisableDNdxInterpolation()
 {
-    for(unsigned int i = 0 ; i < dndx_interpolant_.size() ; i++ ){
-        delete dndx_interpolant_.at(i);
+    for(unsigned int i = 0 ; i < dndx_interpolant_1d_.size() ; i++ ){
+        delete dndx_interpolant_1d_.at(i);
     }
-    dndx_interpolant_.clear();
+
+    for(unsigned int i = 0 ; i < dndx_interpolant_2d_.size() ; i++ ){
+        delete dndx_interpolant_2d_.at(i);
+    }
+
+    dndx_interpolant_1d_.clear();
+    dndx_interpolant_2d_.clear();
 
     do_dndx_Interpolation_  =   false;
 
@@ -191,13 +215,13 @@ void Bremsstrahlung::DisableDEdxInterpolation()
 
 //----------------------------------------------------------------------------//
 
-double Bremsstrahlung::FunctionToContinuousIntegral(double variable){
+double Bremsstrahlung::FunctionToDEdxIntegral(double variable){
     return variable * ElasticBremsstrahlungCrossSection(variable, component_);
 }
 
 //----------------------------------------------------------------------------//
 
-double Bremsstrahlung::FunctionToStochasticalIntegral(double variable){
+double Bremsstrahlung::FunctionToDNdxIntegral(double variable){
     return multiplier_ * ElasticBremsstrahlungCrossSection(variable, component_);
 
 }
@@ -492,8 +516,8 @@ double Bremsstrahlung::lpm(double v, double s1)
 
            SetIntegralLimits(i);
 
-           sum +=  integral_temp->IntegrateOpened(0, vUp_, boost::bind(&Bremsstrahlung::FunctionToContinuousIntegral, this, _1));
-           sum +=  integral_temp->IntegrateWithLog(vUp_, vMax_, boost::bind(&Bremsstrahlung::FunctionToContinuousIntegral, this, _1));
+           sum +=  integral_temp->IntegrateOpened(0, vUp_, boost::bind(&Bremsstrahlung::FunctionToDEdxIntegral, this, _1));
+           sum +=  integral_temp->IntegrateWithLog(vUp_, vMax_, boost::bind(&Bremsstrahlung::FunctionToDEdxIntegral, this, _1));
         }
 
         eLpm_        =   ALPHA*(particle_->GetMass());
@@ -562,17 +586,43 @@ double Bremsstrahlung::lpm(double v, double s1)
     return ((xi/3)*((v*v)*G/(Gamma*Gamma) + 2*(1 + (1-v)*(1-v))*fi/Gamma))/((4./3)*(1-v) + v*v);
 }
 
+//----------------------------------------------------------------------------//
+
 double Bremsstrahlung::FunctionToBuildDEdxInterpolant(double energy){
     particle_->SetEnergy(energy);
     return CalculatedEdx();
 }
 
-double Bremsstrahlung::FunctionToBuildDNdxInterpolant(double energy){
+
+//----------------------------------------------------------------------------//
+
+
+double Bremsstrahlung::FunctionToBuildDNdxInterpolant(double energy)
+{
+    return dndx_interpolant_2d_.at(component_)->interpolate(energy, 1.);
+}
+
+
+//----------------------------------------------------------------------------//
+
+
+double Bremsstrahlung::FunctionToBuildDNdxInterpolant2D(double energy , double v)
+{
     particle_->SetEnergy(energy);
-    return CalculatedNdx();
+    SetIntegralLimits(component_);
+
+    if(vUp_==vMax_)
+    {
+        return 0;
+    }
+
+    v   =   vUp_*exp(v*log(vMax_/vUp_));
+
+    return dndx_integral_.at(component_)->IntegrateWithLog(vUp_, v, boost::bind(&Bremsstrahlung::FunctionToDNdxIntegral, this, _1));
 }
 
 //----------------------------------------------------------------------------//
+
 void Bremsstrahlung::SetLorenz(bool lorenz){
     lorenz_ = lorenz;
 }
@@ -581,3 +631,18 @@ void Bremsstrahlung::SetLorenzCut(double lorenz_cut){
     lorenz_cut_ = lorenz_cut;
 }
 
+//----------------------------------------------------------------------------//
+
+
+~Bremsstrahlung::Bremsstrahlung()
+{
+    DisableDNdxInterpolation();
+    DisableDEdxInterpolation();
+    delete dedx_integral_;
+
+    for(unsigned int i = 0 ; i < dndx_integral_.size() ; i++ ){
+        delete dndx_integral.at(i);
+    }
+
+    dndx_integral_.clear();
+}

@@ -57,11 +57,11 @@ protected:
     \f[ return= v\cdot e_{Pair}(v, components)\f]
     */
 
-    double FunctionToContinuousIntegral(double variable);
+    double FunctionToDEdxIntegral(double variable);
 
 //----------------------------------------------------------------------------//
 
-    double FunctionToStochasticalIntegral(double variable);
+    double FunctionToDNdxIntegral(double variable);
 
 //----------------------------------------------------------------------------//
 

@@ -108,7 +108,7 @@ double Epairproduction::CalculatedEdx(){
 
         if(r1<rUp)
         {
-            if(2*FunctionToContinuousIntegral(r1)<FunctionToContinuousIntegral(rUp))
+            if(2*FunctionToDEdxIntegral(r1)<FunctionToDEdxIntegral(rUp))
             {
                 rflag   =   true;
             }
@@ -126,7 +126,7 @@ double Epairproduction::CalculatedEdx(){
                 r1  =   vMin_;
             }
 
-            sum         +=  integral_for_dEdx_->IntegrateWithLog(vMin_, r1, boost::bind(&Epairproduction::FunctionToContinuousIntegral, this, _1));
+            sum         +=  integral_for_dEdx_->IntegrateWithLog(vMin_, r1, boost::bind(&Epairproduction::FunctionToDEdxIntegral, this, _1));
             reverse_    =   true;
             double r2   =   max(1-vUp_, COMPUTER_PRECISION);
 
@@ -135,15 +135,15 @@ double Epairproduction::CalculatedEdx(){
                 r2  =   1-r1;
             }
 
-            sum         +=  integral_for_dEdx_->IntegrateOpened(1-vUp_, r2, boost::bind(&Epairproduction::FunctionToContinuousIntegral, this, _1))
-                        +   integral_for_dEdx_->IntegrateWithLog(r2, 1-r1, boost::bind(&Epairproduction::FunctionToContinuousIntegral, this, _1));
+            sum         +=  integral_for_dEdx_->IntegrateOpened(1-vUp_, r2, boost::bind(&Epairproduction::FunctionToDEdxIntegral, this, _1))
+                        +   integral_for_dEdx_->IntegrateWithLog(r2, 1-r1, boost::bind(&Epairproduction::FunctionToDEdxIntegral, this, _1));
 
             reverse_    =   false;
         }
 
         else
         {
-            sum +=  integral_for_dEdx_->IntegrateWithLog(vMin_, vUp_, boost::bind(&Epairproduction::FunctionToContinuousIntegral, this, _1));
+            sum +=  integral_for_dEdx_->IntegrateWithLog(vMin_, vUp_, boost::bind(&Epairproduction::FunctionToDEdxIntegral, this, _1));
         }
     }
 
@@ -190,7 +190,7 @@ void Epairproduction::DisableDEdxInterpolation(){
 
 //----------------------------------------------------------------------------//
 
-double Epairproduction::FunctionToContinuousIntegral(double variable){
+double Epairproduction::FunctionToDEdxIntegral(double variable){
 
     if(reverse_)
     {
@@ -202,7 +202,7 @@ double Epairproduction::FunctionToContinuousIntegral(double variable){
 
 //----------------------------------------------------------------------------//
 
-double Epairproduction::FunctionToStochasticalIntegral(double variable){
+double Epairproduction::FunctionToDNdxIntegral(double variable){
     return 0;
 }
 //----------------------------------------------------------------------------//

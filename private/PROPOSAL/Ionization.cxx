@@ -105,7 +105,7 @@ double Ionization::CalculatedEdx(){
         result=0;
     }
     return multiplier_*(medium_->GetMassDensity()*result
-                        + particle_->GetEnergy()*(integral_->IntegrateWithLog(vMin_, vUp_, boost::bind(&Ionization::FunctionToContinuousIntegral, this, _1))));
+                        + particle_->GetEnergy()*(integral_->IntegrateWithLog(vMin_, vUp_, boost::bind(&Ionization::FunctionToDEdxIntegral, this, _1))));
 }
 //----------------------------------------------------------------------------//
 
@@ -148,13 +148,13 @@ void Ionization::DisableDEdxInterpolation(){
 
 //----------------------------------------------------------------------------//
 
-double Ionization::FunctionToContinuousIntegral(double variable){
+double Ionization::FunctionToDEdxIntegral(double variable){
     return variable*D2Ndvdx(variable)*InelCorrection(variable);
 }
 
 //----------------------------------------------------------------------------//
 
-double Ionization::FunctionToStochasticalIntegral(double variable){
+double Ionization::FunctionToDNdxIntegral(double variable){
     return 0;
 }
 

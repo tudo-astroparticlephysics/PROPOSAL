@@ -53,13 +53,13 @@ void Decay::EnableDEdxInterpolation(){
 
 //----------------------------------------------------------------------------//
 
-double Decay::FunctionToContinuousIntegral(double variable){
+double Decay::FunctionToDEdxIntegral(double variable){
     return 0;
 }
 
 //----------------------------------------------------------------------------//
 
-double Decay::FunctionToStochasticalIntegral(double variable){
+double Decay::FunctionToDNdxIntegral(double variable){
     return 0;
 }
 //----------------------------------------------------------------------------//

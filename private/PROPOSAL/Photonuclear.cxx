@@ -104,7 +104,7 @@ double Photonuclear::CalculatedEdx()
     for(int i=0; i < medium_->GetNumCompontents(); i++)
     {
         SetIntegralLimits(i);
-        sum +=  integral_for_dEdx_->IntegrateWithLog(vMin_, vUp_, boost::bind(&Photonuclear::FunctionToContinuousIntegral, this, _1));
+        sum +=  integral_for_dEdx_->IntegrateWithLog(vMin_, vUp_, boost::bind(&Photonuclear::FunctionToDEdxIntegral, this, _1));
     }
 
     return multiplier_*particle_->GetEnergy()*sum;
@@ -150,13 +150,13 @@ void Photonuclear::DisableDEdxInterpolation(){
 
 //----------------------------------------------------------------------------//
 
-double Photonuclear::FunctionToContinuousIntegral(double variable){
+double Photonuclear::FunctionToDEdxIntegral(double variable){
     return variable*PhotoN(variable, component_);
 }
 
 //----------------------------------------------------------------------------//
 
-double Photonuclear::FunctionToStochasticalIntegral(double variable){
+double Photonuclear::FunctionToDNdxIntegral(double variable){
     return 0;
 }
 //----------------------------------------------------------------------------//

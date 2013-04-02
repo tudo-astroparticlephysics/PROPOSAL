@@ -47,10 +47,10 @@ int main(){
 
     cout.precision(16);
 
-    Medium *medium = new Medium("ice",1.);
+    Medium *medium = new Medium("antares water",1.);
     Particle *particle = new Particle("mu",1.,1.,1,.20,20,1e5,10);
-    particle->SetEnergy(1e13);
-    EnergyCutSettings *cuts = new EnergyCutSettings(-1,-1);
+    particle->SetEnergy(1e6);
+    EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
     CrossSections *brems = new Bremsstrahlung(particle, medium, cuts);
 
     cout<<"dEdx:"<<endl;
@@ -63,12 +63,16 @@ int main(){
     brems->EnableDEdxInterpolation();
     cout<<brems->CalculatedEdx()<<endl;
 
+    double gna;
+    double gna2;
     cout<<"dNdx:"<<endl;
     brems->EnableDNdxInterpolation();
-    cout<<brems->CalculatedNdx()<<endl;
+    gna=brems->CalculatedNdx();
 
     brems->DisableDNdxInterpolation();
-    cout<<brems->CalculatedNdx()<<endl;
+    gna2=brems->CalculatedNdx();
+
+    cout<<gna/gna2<<endl;
 
     brems->EnableDNdxInterpolation();
     cout<<brems->CalculatedNdx()<<endl;

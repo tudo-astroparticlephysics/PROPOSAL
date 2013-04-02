@@ -13,10 +13,12 @@ private:
     double      lorenz_cut_;  	/// in [MeV] // - set to 1.e6 in Constructor
     int         component_;     /// nucleon in the medium on which the bremsstahlung occur
 
-    Integral*   integral_;
+    Integral*   dedx_integral_;
     Interpolant* dedx_interpolant_;
 
-    std::vector<Interpolant*> dndx_interpolant_; //Stochastic dNdx()
+    std::vector<Integral*>    dndx_integral_;
+    std::vector<Interpolant*> dndx_interpolant_1d_; //Stochastic dNdx()
+    std::vector<Interpolant*> dndx_interpolant_2d_; //Stochastic dNdx()
 
     double      eLpm_;
 
@@ -75,11 +77,11 @@ private:
 
 //----------------------------------------------------------------------------//
 
-    double FunctionToContinuousIntegral(double variable);
+    double FunctionToDEdxIntegral(double variable);
 
 //----------------------------------------------------------------------------//
 
-    double FunctionToStochasticalIntegral(double variable);
+    double FunctionToDNdxIntegral(double variable);
 
 //----------------------------------------------------------------------------//
 
@@ -158,6 +160,11 @@ public:
 //----------------------------------------------------------------------------//
 
     double FunctionToBuildDNdxInterpolant(double energy);
+
+//----------------------------------------------------------------------------//
+
+    double FunctionToBuildDNdxInterpolant2D(double energy , double v);
+
 
     //Getter
 

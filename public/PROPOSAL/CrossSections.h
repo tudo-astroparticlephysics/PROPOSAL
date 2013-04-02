@@ -66,11 +66,11 @@ protected:
 
 //----------------------------------------------------------------------------//
 
-    virtual double FunctionToContinuousIntegral(double variable) = 0;
+    virtual double FunctionToDEdxIntegral(double variable) = 0;
 
 //----------------------------------------------------------------------------//
 
-    virtual double FunctionToStochasticalIntegral(double variable) = 0;
+    virtual double FunctionToDNdxIntegral(double variable) = 0;
 
 //----------------------------------------------------------------------------//
 
