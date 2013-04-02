@@ -172,7 +172,7 @@ void Bremsstrahlung::EnableDEdxInterpolation()
 
 void Bremsstrahlung::DisableDNdxInterpolation()
 {
-    for(uint i = 0 ; i < dndx_interpolant_.size() ; i++ ){
+    for(unsigned int i = 0 ; i < dndx_interpolant_.size() ; i++ ){
         delete dndx_interpolant_.at(i);
     }
     dndx_interpolant_.clear();
