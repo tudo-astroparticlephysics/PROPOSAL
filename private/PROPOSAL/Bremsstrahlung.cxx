@@ -641,7 +641,7 @@ Bremsstrahlung::~Bremsstrahlung()
     delete dedx_integral_;
 
     for(unsigned int i = 0 ; i < dndx_integral_.size() ; i++ ){
-        delete dndx_integral.at(i);
+        delete dndx_integral_.at(i);
     }
 
     dndx_integral_.clear();
