@@ -92,7 +92,7 @@ double Bremsstrahlung::CalculatedEdx(){
     if(doContinuousInterpolation_)
     {
 //        cout << "INTERPOLATING!" << endl;
-        return max(interpolateJ_->interpolate(particle_->GetEnergy()), 0.0);
+        return max(dedx_interpolant_->interpolate(particle_->GetEnergy()), 0.0);
     }
 
     for(int i=0; i<(medium_->GetNumCompontents()); i++)
@@ -120,7 +120,7 @@ double Bremsstrahlung::CalculatedNdx(){
 
         if(doContinuousInterpolation_)
         {
-            //sum    +=  max((interpolateJo_[i]).interpolate(particle_->GetEnergy()), 0.0);
+            sum    +=  max( dndx_interpolant_.at(i)->interpolate(particle_->GetEnergy()) ,  0.0);
         }
         else
         {
@@ -149,10 +149,10 @@ void Bremsstrahlung::EnableStochasticInerpolation(){
     if(doStochasticInterpolation_)return;
 
     double energy = particle_->GetEnergy();
-    interpolateJo_ = new Interpolant*[medium_->GetNumCompontents()];
+    dndx_interpolant_.resize( medium_->GetNumCompontents() );
     for(int i=0; i<(medium_->GetNumCompontents()); i++)
     {
-        interpolateJo_[i] = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, boost::bind(&Bremsstrahlung::FunctionToBuildStochasticInterpolant, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, true, false, false);
+        dndx_interpolant_.at(i) = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, boost::bind(&Bremsstrahlung::FunctionToBuildDNdxInterpolant, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, true, false, false);
     }
     particle_->SetEnergy(energy);
 
@@ -162,7 +162,7 @@ void Bremsstrahlung::EnableStochasticInerpolation(){
 
 void Bremsstrahlung::EnableContinuousInerpolation(){
     double energy = particle_->GetEnergy();
-    interpolateJ_ = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, boost::bind(&Bremsstrahlung::FunctionToBuildContinuousInterpolant, this, _1), order_of_interpolation_, true, false, true, order_of_interpolation_, false, false, true);
+    dedx_interpolant_ = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, boost::bind(&Bremsstrahlung::FunctionToBuildDEdxInterpolant, this, _1), order_of_interpolation_, true, false, true, order_of_interpolation_, false, false, true);
     doContinuousInterpolation_=true;
     particle_->SetEnergy(energy);
 }
@@ -540,12 +540,12 @@ double Bremsstrahlung::lpm(double v, double s1)
     return ((xi/3)*((v*v)*G/(Gamma*Gamma) + 2*(1 + (1-v)*(1-v))*fi/Gamma))/((4./3)*(1-v) + v*v);
 }
 
-double Bremsstrahlung::FunctionToBuildContinuousInterpolant(double energy){
+double Bremsstrahlung::FunctionToBuildDEdxInterpolant(double energy){
     particle_->SetEnergy(energy);
     return CalculatedEdx();
 }
 
-double Bremsstrahlung::FunctionToBuildStochasticInterpolant(double energy){
+double Bremsstrahlung::FunctionToBuildDNdxInterpolant(double energy){
     particle_->SetEnergy(energy);
     return CalculatedNdx();
 }

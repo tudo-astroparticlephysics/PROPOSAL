@@ -14,9 +14,9 @@ private:
     int         component_;     /// nucleon in the medium on which the bremsstahlung occur
 
     Integral*   integral_;
-    Interpolant* interpolateJ_;
+    Interpolant* dedx_interpolant_;
 
-    Interpolant** interpolateJo_; //Stochastic dNdx()
+    std::vector<Interpolant*> dndx_interpolant_; //Stochastic dNdx()
 
     double      eLpm_;
 
@@ -61,17 +61,17 @@ private:
 
 //----------------------------------------------------------------------------//
 
-/*!
-Landau Pomeranchuk Migdal effect and dielectric suppression evaluation
-lpm is evaluated:
-\f[ lpm= return=\frac{x_i}{3}\Big[v^2\frac{G(s)}{\gamma^2}+
-2(1+(1-v)^2)\frac{\Phi(s)}{\gamma}\Big] \f]
-\param v relativ energy loss
-\param s1
-\return the lpm correction factor
-*/
+    /*!
+    Landau Pomeranchuk Migdal effect and dielectric suppression evaluation
+    lpm is evaluated:
+    \f[ lpm= return=\frac{x_i}{3}\Big[v^2\frac{G(s)}{\gamma^2}+
+    2(1+(1-v)^2)\frac{\Phi(s)}{\gamma}\Big] \f]
+    \param v relativ energy loss
+    \param s1
+    \return the lpm correction factor
+    */
 
-double lpm(double v, double s1);
+    double lpm(double v, double s1);
 
 //----------------------------------------------------------------------------//
 
@@ -145,11 +145,11 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    double FunctionToBuildContinuousInterpolant(double energy);
+    double FunctionToBuildDEdxInterpolant(double energy);
 
 //----------------------------------------------------------------------------//
 
-    double FunctionToBuildStochasticInterpolant(double energy);
+    double FunctionToBuildDNdxInterpolant(double energy);
 
     //Getter
 
