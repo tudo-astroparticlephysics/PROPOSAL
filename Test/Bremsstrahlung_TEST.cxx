@@ -6,13 +6,15 @@
 
 using namespace std;
 
+
 TEST(Bremsstrahlung , Test_of_dNdx_Interpolant ) {
 
     ifstream in;
-    in.open("bin/Brems_dNdx.txt");
+    in.open("bin/Brems_dNdx_interpol.txt");
 
     char firstLine[256];
     in.getline(firstLine,256);
+
     double dNdx;
     double dNdx_new;
     double energy;
@@ -26,11 +28,9 @@ TEST(Bremsstrahlung , Test_of_dNdx_Interpolant ) {
     cout.precision(16);
 
     int k=30;
-
     while(in.good())
     {
         in>>para>>ecut>>vcut>>lpm>>energy>>med>>particleName>>dNdx;
-
         Medium *medium = new Medium(med,1.);
         Particle *particle = new Particle(particleName,1.,1.,1,.20,20,1e5,10);
         particle->SetEnergy(energy);
@@ -38,24 +38,12 @@ TEST(Bremsstrahlung , Test_of_dNdx_Interpolant ) {
 
         CrossSections *brems = new Bremsstrahlung(particle, medium, cuts);
 
-
         brems->SetParametrization(para);
         brems->EnableLpmEffect(lpm);
         brems->EnableDNdxInterpolation();
         dNdx_new=brems->CalculatedNdx();
+        ASSERT_NEAR(dNdx_new, dNdx, 1e-5*dNdx);
 
-        ASSERT_NEAR(dNdx_new, dNdx, 1e-3*dNdx);
-
-        cout << char(39+k);
-        printf("\n");
-        printf("\b");
-
-        cout.flush();
-        k--;
-        if(k==0){
-            cout << endl;
-            k=30;
-        }
         delete cuts;
         delete medium;
         delete particle;

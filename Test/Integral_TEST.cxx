@@ -18,9 +18,6 @@ bool relErr(double Is, double HasToBe, double RelError){
 
 TEST(IntegralValue , Zero_to_Three_of_xx ) {
     Integral* Int = new Integral();
-    std::cout.precision(16);
-    std::cout << Int->IntegrateClosed(0,3,Testfkt) << std::endl;
-    std::cout << exp(3)-1 << std::endl;
     ASSERT_NEAR(Int->IntegrateClosed(0,3,Testfkt),exp(3)-1 , (exp(3)-1)*1E-6);
     delete Int;
 }

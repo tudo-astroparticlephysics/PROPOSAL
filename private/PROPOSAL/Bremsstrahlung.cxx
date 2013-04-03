@@ -105,7 +105,6 @@ double Bremsstrahlung::CalculatedEdx(){
 
     if(do_dedx_Interpolation_)
     {
-//        cout << "INTERPOLATING!" << endl;
         return max(dedx_interpolant_->interpolate(particle_->GetEnergy()), 0.0);
     }
 
@@ -190,6 +189,7 @@ void Bremsstrahlung::EnableDEdxInterpolation()
 
 void Bremsstrahlung::DisableDNdxInterpolation()
 {
+
     for(unsigned int i = 0 ; i < dndx_interpolant_1d_.size() ; i++ ){
         delete dndx_interpolant_1d_.at(i);
     }
@@ -198,8 +198,8 @@ void Bremsstrahlung::DisableDNdxInterpolation()
         delete dndx_interpolant_2d_.at(i);
     }
 
-    dndx_interpolant_1d_.clear();
-    dndx_interpolant_2d_.clear();
+    //dndx_interpolant_1d_.clear();
+    //dndx_interpolant_2d_.clear();
 
     do_dndx_Interpolation_  =   false;
 
@@ -637,12 +637,13 @@ void Bremsstrahlung::SetLorenzCut(double lorenz_cut){
 Bremsstrahlung::~Bremsstrahlung()
 {
     DisableDNdxInterpolation();
-    DisableDEdxInterpolation();
+ //   DisableDEdxInterpolation();
     delete dedx_integral_;
-
+/*
     for(unsigned int i = 0 ; i < dndx_integral_.size() ; i++ ){
         delete dndx_integral_.at(i);
     }
-
+*/
     dndx_integral_.clear();
 }
+

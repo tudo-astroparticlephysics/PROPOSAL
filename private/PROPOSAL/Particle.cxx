@@ -220,6 +220,7 @@ Particle::Particle(int parent_particle_id,
         type_        =   2;
         mass_        =   MTAU;
         lifetime_    =   LTAU;
+        low_         =  mass_;
     }
     else if(StartsWith(name,"e"))
     {
@@ -227,6 +228,7 @@ Particle::Particle(int parent_particle_id,
         type_        =   3;
         mass_        =   ME;
         lifetime_    =   -1;
+        low_         =   mass_;
     }
     else if(StartsWith(name,"mu"))
     {
@@ -234,6 +236,7 @@ Particle::Particle(int parent_particle_id,
         type_        =   1;
         mass_        =   MMU;
         lifetime_    =   LMU;
+        low_         =   mass_;
     }
     else
     {
@@ -297,6 +300,7 @@ Particle::Particle(string name,
         type_        =   2;
         mass_        =   MTAU;
         lifetime_    =   LTAU;
+        low_         =   mass_;
     }
     else if(StartsWith(name,"e"))
     {
@@ -304,6 +308,7 @@ Particle::Particle(string name,
         type_        =   3;
         mass_        =   ME;
         lifetime_    =   -1;
+        low_         =   mass_;
     }
     else if(StartsWith(name,"mu"))
     {
@@ -311,6 +316,7 @@ Particle::Particle(string name,
         type_        =   1;
         mass_        =   MMU;
         lifetime_    =   LMU;
+        low_         =   mass_;
     }
     else
     {
