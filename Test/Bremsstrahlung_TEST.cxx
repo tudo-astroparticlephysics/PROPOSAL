@@ -27,8 +27,7 @@ TEST(Bremsstrahlung , Test_of_dNdx_Interpolant ) {
 
     cout.precision(16);
     double energy_old=1E30;
-    int k=30;
-   //CrossSections *brems = new Bremsstrahlung();
+        CrossSections *brems = new Bremsstrahlung();
     while(in.good())
     {
         in>>para>>ecut>>vcut>>lpm>>energy>>med>>particleName>>dNdx;
@@ -36,12 +35,23 @@ TEST(Bremsstrahlung , Test_of_dNdx_Interpolant ) {
         Particle *particle = new Particle(particleName,1.,1.,1,.20,20,1e5,10);
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
-        CrossSections *brems = new Bremsstrahlung(particle, medium, cuts);
 
-        brems->SetParametrization(para);
-        brems->EnableLpmEffect(lpm);
+        bool ASDASD  = energy_old > energy;
+        if(ASDASD) cout << "aksfasfklsafklabf" << endl;
+        cout << brems << endl;
+        if(energy_old > energy){
+            delete brems;
+            brems = NULL;
+            cout << brems << endl;
+            brems = new Bremsstrahlung(particle, medium, cuts);
+            cout << brems << endl;
+            brems->SetParametrization(para);
+            brems->EnableLpmEffect(lpm);
+            brems->EnableDNdxInterpolation();
+        }
+
+
         cout << para << "\t" << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << med << "\t" << particleName<< "\t" << dNdx << endl;
-        brems->EnableDNdxInterpolation();
         dNdx_new=brems->CalculatedNdx();
         if(dNdx!=0)cout << fabs(dNdx_new -dNdx)/dNdx << endl;
         ASSERT_NEAR(dNdx_new, dNdx, 1e-2*dNdx);
@@ -49,8 +59,9 @@ TEST(Bremsstrahlung , Test_of_dNdx_Interpolant ) {
         delete cuts;
         delete medium;
         delete particle;
-        delete brems;
 
+        energy_old = energy;
+        //delete brems;
     }
 }
 

@@ -9,7 +9,8 @@ using namespace std;
 Bremsstrahlung::Bremsstrahlung()
 
 {
-    dedx_integral_   = new Integral(IROMB, IMAXS, IPREC);
+    dedx_integral_   =  new Integral(IROMB, IMAXS, IPREC);
+    dedx_interpolant_=  NULL;
 
     dndx_integral_.resize(medium_->GetNumCompontents());
 
@@ -17,6 +18,8 @@ Bremsstrahlung::Bremsstrahlung()
     {
             dndx_integral_.at(i) =   new Integral(IROMB, IMAXS, IPREC);
     }
+    do_dedx_Interpolation_  = false;
+    do_dndx_Interpolation_  = false;
 }
 
 //----------------------------------------------------------------------------//
@@ -57,7 +60,7 @@ Bremsstrahlung::Bremsstrahlung(Particle* particle,
     component_                  = 0;
 
     dedx_integral_   = new Integral(IROMB, IMAXS, IPREC);
-
+    dedx_interpolant_=  NULL;
     dndx_integral_.resize(medium_->GetNumCompontents());
 
     for(int i =0; i<(medium_->GetNumCompontents()); i++)
@@ -191,15 +194,15 @@ void Bremsstrahlung::DisableDNdxInterpolation()
 {
 
     for(unsigned int i = 0 ; i < dndx_interpolant_1d_.size() ; i++ ){
-        delete dndx_interpolant_1d_.at(i);
+        delete dndx_interpolant_1d_[i];
     }
 
     for(unsigned int i = 0 ; i < dndx_interpolant_2d_.size() ; i++ ){
-        delete dndx_interpolant_2d_.at(i);
+        delete dndx_interpolant_2d_[i];
     }
 
-    //dndx_interpolant_1d_.clear();
-    //dndx_interpolant_2d_.clear();
+    dndx_interpolant_1d_.clear();
+    dndx_interpolant_2d_.clear();
 
     do_dndx_Interpolation_  =   false;
 
@@ -637,13 +640,13 @@ void Bremsstrahlung::SetLorenzCut(double lorenz_cut){
 Bremsstrahlung::~Bremsstrahlung()
 {
     DisableDNdxInterpolation();
- //   DisableDEdxInterpolation();
+    DisableDEdxInterpolation();
+
     delete dedx_integral_;
-/*
     for(unsigned int i = 0 ; i < dndx_integral_.size() ; i++ ){
-        delete dndx_integral_.at(i);
+        delete dndx_integral_[i];
     }
-*/
+
     dndx_integral_.clear();
 }
 
