@@ -18,11 +18,27 @@ using namespace std;
 
 //----------------------------------------------------------------------------//
 
-Medium::Medium(){}
+Medium::Medium()
+    :nucCharge_()
+    ,atomicNum_()
+    ,atomInMolecule_()
+    ,logConstant_()
+    ,bPrime_()
+    ,M_()
+    ,elementName_()
+    ,mN_(){}
 
 //----------------------------------------------------------------------------//
 
 Medium::Medium(const Medium &medium)
+    :nucCharge_()
+    ,atomicNum_()
+    ,atomInMolecule_()
+    ,logConstant_()
+    ,bPrime_()
+    ,M_()
+    ,elementName_()
+    ,mN_()
 {
     *this = medium;
 }
@@ -40,6 +56,14 @@ Medium::~Medium(){}
 
 
 Medium::Medium(string w, double rho)
+    :nucCharge_()
+    ,atomicNum_()
+    ,atomInMolecule_()
+    ,logConstant_()
+    ,bPrime_()
+    ,M_()
+    ,elementName_()
+    ,mN_()
 {
     name_   =   w;
 

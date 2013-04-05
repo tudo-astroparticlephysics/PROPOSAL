@@ -90,8 +90,6 @@ public:
     Integral(const Integral&);
     Integral& operator=(const Integral&);
 
-    // virtual ~Integral();
-
     //------------------------------------------------------------------------//
 
     /*!
@@ -332,7 +330,19 @@ public:
 
     double IntegrateWithLogSubstitution(double min, double max, boost::function<double (double)> integrand, double powerOfSubstitution);
 
+//------------------------------------------------------------------------//
+
+/*!
+ * Resets some integral parameters from last integration
+ */
+
     void Reset();
+
+//------------------------------------------------------------------------//
+/*!
+ * Destructor
+ */
+    ~Integral();
 
 // Getters
 

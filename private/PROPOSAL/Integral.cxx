@@ -25,6 +25,10 @@ Integral::Integral()
 ,precision_  (1.e-6)
 ,max_        (1)
 ,min_        (0)
+,iX_()
+,iY_()
+,c_()
+,d_()
 ,romberg4refine_         (2)
 ,powerOfSubstitution_    (0)
 ,randomDo_   (false)
@@ -76,6 +80,10 @@ Integral& Integral::operator=(const Integral &integral){
 Integral::Integral(int  romberg, int maxSteps, double precision)
 :max_        (1)
 ,min_        (0)
+,iX_()
+,iY_()
+,c_()
+,d_()
 ,romberg4refine_         (2)
 ,powerOfSubstitution_    (0)
 ,randomDo_   (false)
@@ -1205,4 +1213,9 @@ void Integral::Reset()
     useLog_   = false;
     //reverse_  = false;
     //randomDo_ = false;
+}
+
+Integral::~Integral()
+{
+
 }

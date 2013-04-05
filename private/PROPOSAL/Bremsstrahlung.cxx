@@ -7,7 +7,9 @@
 using namespace std;
 
 Bremsstrahlung::Bremsstrahlung()
-
+    :dndx_integral_()
+    ,dndx_interpolant_1d_()
+    ,dndx_interpolant_2d_()
 {
     dedx_integral_   =  new Integral(IROMB, IMAXS, IPREC);
     dedx_interpolant_=  NULL;
@@ -42,7 +44,11 @@ Bremsstrahlung::Bremsstrahlung(Particle* particle,
                              EnergyCutSettings* cut_settings)
     :lorenz_(false)
     ,lorenz_cut_(1.e6)
+    ,dndx_integral_()
+    ,dndx_interpolant_1d_()
+    ,dndx_interpolant_2d_()
     ,eLpm_(0)
+
 {
     particle_                   = particle;
     medium_                     = medium;

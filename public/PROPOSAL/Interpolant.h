@@ -51,10 +51,9 @@ private:
     double  xmin_, xmax_, step_;
     bool    rational_, relative_;
 
-    //FunctionInt2*   function2int;
     boost::function<double (double)> function1d_;
     boost::function<double (double,double)> function2d_;
-    Interpolant*    Interpolant_;
+    std::vector<Interpolant*> Interpolant_;
 
     int     row_, starti_;
     bool    rationalY_, relativeY_;
@@ -320,10 +319,12 @@ public:
     *
     * \return   Interpolant object;
     */
-    Interpolant* get_Interpolant()
+    std::vector<Interpolant*> get_Interpolant()
     {
         return Interpolant_;
     }
+
+    //------------------------------------------------------------------------//
 
     /**
     * Getter for max.
@@ -334,6 +335,13 @@ public:
     {
         return max_;
     }
+
+    //------------------------------------------------------------------------//
+    /*!
+    * Destructor
+    */
+
+    ~Interpolant();
 };
 
 #endif /* INTERPOLANT_H_ */

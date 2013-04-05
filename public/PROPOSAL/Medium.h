@@ -222,6 +222,7 @@ public:
     {
         return nucCharge_;
     }
+
  //----------------------------------------------------------------------------//
 
     std::vector<double> GetAtomicNum() const
