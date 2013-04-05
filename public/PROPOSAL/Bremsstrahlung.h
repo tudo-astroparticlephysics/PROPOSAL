@@ -183,6 +183,8 @@ public:
 
     void SetLorenz(bool lorenz);
     void SetLorenzCut(double lorenz_cut);
+
+
 //----------------------------------------------------------------------------//
 
     ~Bremsstrahlung();
