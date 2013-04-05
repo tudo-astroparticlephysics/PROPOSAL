@@ -64,13 +64,13 @@ Interpolant::Interpolant(int max, double xmin, double xmax, boost::function<doub
 
     for(i=0; i<max_; i++)
     {
-        iX_[i]   =   aux;
+        iX_.at(i)   =   aux;
 
         if(Output::inf)
         {
             try
             {
-                iY_[i]   =   Output::read();
+                iY_.at(i)   =   Output::read();
             }
             catch(int a)
             {
@@ -89,18 +89,18 @@ Interpolant::Interpolant(int max, double xmin, double xmax, boost::function<doub
                 xaux    =   aux;
             }
 
-            iY_[i]=function1d_(xaux);
+            iY_.at(i)=function1d_(xaux);
 
             if(logSubst_)
             {
-                iY_[i]=log(iY_[i]);
+                iY_.at(i)=log(iY_.at(i));
             }
 
         }
 
         if(output_->outf)
         {
-            output_->write(iY_[i]);
+            output_->write(iY_.at(i));
         }
 
         aux +=  step_;
@@ -136,14 +136,14 @@ Interpolant::Interpolant(int max1, double x1min, double x1max, int max2, double 
 
     for(i=0,aux=xmin_+step_/2 ; i<max_ ; i++,aux+=step_)
     {
-        iX_[i]   =   aux;
+        iX_.at(i)   =   aux;
         row_     =   i;
 
-        Interpolant_[i]     =  new Interpolant(max1, x1min, x1max, function1d_,
+        Interpolant_.at(i)     =  new Interpolant(max1, x1min, x1max, function1d_,
                                        romberg1, rational1, relative1, isLog1,
                                        rombergY, rationalY, relativeY, logSubst_);
 
-        Interpolant_[i]->self_=false;
+        Interpolant_.at(i)->self_=false;
     }
 
     precision2_  =   0;
@@ -172,12 +172,12 @@ Interpolant::Interpolant(vector<double> x, vector<double> y, int romberg, bool r
 
     for(int i=0 ; i<(int)x.size() ; i++)
     {
-        iX_[i]=x.at(i);
+        iX_.at(i)=x.at(i);
     }
 
     for(int i =0; i<(int)y.size(); i++)
     {
-        iY_[i]=y.at(i);
+        iY_.at(i)=y.at(i);
     }
 }
 
@@ -278,15 +278,15 @@ void Interpolant::InitInterpolant(int max, double xmin, double xmax,
     this->rombergY_  =   rombergY;
 
 
-    iX_  =   (double *)calloc(max,sizeof(double));
-    iY_  =   (double *)calloc(max,sizeof(double));
+    iX_.resize(max);
+    iY_.resize(max);
 
     step_=   (this->xmax_-this->xmin_)/max;
 
     int VectorMax_ = std::max(romberg, rombergY);
 
-    c_   =   (double *)calloc(VectorMax_,sizeof(double));
-    d_   =   (double *)calloc(VectorMax_,sizeof(double));
+    c_.resize(VectorMax_);
+    d_.resize(VectorMax_);
 
     precision_       =   0;
     this->isLog_     =   isLog;
@@ -303,11 +303,11 @@ double Interpolant::Get2dFunctionFixedY(double x)
 {
     if(isLog_)
     {
-        return function2d_(x, std::exp(iX_[row_]));
+        return function2d_(x, std::exp(iX_.at(row_)));
     }
     else
     {
-        return function2d_(x, iX_[row_]);
+        return function2d_(x, iX_.at(row_));
     }
 }
 
@@ -402,7 +402,7 @@ double Interpolant::interpolate(double x1, double x2)
 
     for(i=start ; i<start+romberg_ ; i++)
     {
-        iY_[i]   =   Interpolant_[i]->interpolate(x1);
+        iY_.at(i)   =   Interpolant_.at(i)->interpolate(x1);
     }
 
     if(!fast_)
@@ -411,10 +411,10 @@ double Interpolant::interpolate(double x1, double x2)
 
         for(i=start ; i<start+romberg_ ; i++)
         {
-            if(Interpolant_[i]->precision_>aux)
+            if(Interpolant_.at(i)->precision_>aux)
             {
-                aux     =   Interpolant_[i]->precision_;
-                aux2    =   Interpolant_[i]->worstX_;
+                aux     =   Interpolant_.at(i)->precision_;
+                aux2    =   Interpolant_.at(i)->worstX_;
             }
         }
 
@@ -445,13 +445,13 @@ double Interpolant::InterpolateArray(double x)
     reverse_ =   false;
     i       =   0;
     j       =   max_-1;
-    dir     =   iX_[max_-1]>iX_[0];
+    dir     =   iX_.at(max_-1)>iX_.at(0);
 
     while(j-i > 1)
     {
         m=(i+j)/2;
 
-        if((x>iX_[m])==dir)
+        if((x>iX_.at(m))==dir)
         {
             i=m;
         }
@@ -463,7 +463,7 @@ double Interpolant::InterpolateArray(double x)
 
     if(i+1 < max_)
     {
-        if(((x-iX_[i])<(iX_[i+1]-x))==dir)
+        if(((x-iX_.at(i))<(iX_.at(i+1)-x))==dir)
         {
             auxdir=0;
         }
@@ -510,7 +510,7 @@ double Interpolant::interpolate(double x, int start)
         {
             for(i=0 ; i<romberg_ ; i++)
             {
-                if(iY_[start+i]==bigNumber_)
+                if(iY_.at(start+i)==bigNumber_)
                 {
                     doLog   =   true;
                     break;
@@ -523,40 +523,40 @@ double Interpolant::interpolate(double x, int start)
     {
         num =   starti_ - start;
 
-        if(x==iX_[starti_])
+        if(x==iX_.at(starti_))
         {
-            return iY_[starti_];
+            return iY_.at(starti_);
         }
 
         if(doLog)
         {
             for(i=0; i<romberg_; i++)
             {
-                c_[i]    =   exp(iY_[start+i]);
-                d_[i]    =   c_[i];
+                c_.at(i)    =   exp(iY_.at(start+i));
+                d_.at(i)    =   c_.at(i);
             }
         }
         else
         {
             for(i=0; i<romberg_; i++)
             {
-                c_[i]    =   iY_[start+i];
-                d_[i]    =   c_[i];
+                c_.at(i)    =   iY_.at(start+i);
+                d_.at(i)    =   c_.at(i);
             }
         }
     }
     else
     {
         num =   0;
-        aux =   fabs(x-iX_[start+0]);
+        aux =   fabs(x-iX_.at(start+0));
 
         for(i=0 ; i<romberg_ ; i++)
         {
-            aux2    =   fabs(x-iX_[start+i]);
+            aux2    =   fabs(x-iX_.at(start+i));
 
             if(aux2==0)
             {
-                return iY_[start+i];
+                return iY_.at(start+i);
             }
 
             if(aux2<aux)
@@ -567,13 +567,13 @@ double Interpolant::interpolate(double x, int start)
 
             if(doLog)
             {
-                c_[i]    =   exp(iY_[start+i]);
-                d_[i]    =   c_[i];
+                c_.at(i)    =   exp(iY_.at(start+i));
+                d_.at(i)    =   c_.at(i);
             }
             else
             {
-                c_[i]    =   iY_[start+i];
-                d_[i]    =   c_[i];
+                c_.at(i)    =   iY_.at(start+i);
+                d_.at(i)    =   c_.at(i);
             }
         }
     }
@@ -589,8 +589,8 @@ double Interpolant::interpolate(double x, int start)
     else
     {
         k       =   start+num;
-        aux     =   iX_[k-1];
-        aux2    =   iX_[k+1];
+        aux     =   iX_.at(k-1);
+        aux2    =   iX_.at(k+1);
 
         if(fast_)
         {
@@ -616,7 +616,7 @@ double Interpolant::interpolate(double x, int start)
         }
     }
 
-    result  =   iY_[start+num];
+    result  =   iY_.at(start+num);
 
     if(doLog)
     {
@@ -629,40 +629,40 @@ double Interpolant::interpolate(double x, int start)
         {
             if(rational_)
             {
-                aux     =   c_[i+1] - d_[i];
-                dx2     =   iX_[start+i+k] - x;
-                dx1     =   d_[i]*(iX_[start+i] - x)/dx2;
-                aux2    =   dx1 - c_[i+1];
+                aux     =   c_.at(i+1) - d_.at(i);
+                dx2     =   iX_.at(start+i+k) - x;
+                dx1     =   d_.at(i)*(iX_.at(start+i) - x)/dx2;
+                aux2    =   dx1 - c_.at(i+1);
 
                 if(aux2!=0)
                 {
                     aux     =   aux/aux2;
-                    d_[i]    =   c_[i+1]*aux;
-                    c_[i]    =   dx1*aux;
+                    d_.at(i)    =   c_.at(i+1)*aux;
+                    c_.at(i)    =   dx1*aux;
                 }
                 else
                 {
-                    c_[i]    =   0;
-                    d_[i]    =   0;
+                    c_.at(i)    =   0;
+                    d_.at(i)    =   0;
                 }
             }
             else
             {
-                dx1     =   iX_[start+i] - x;
-                dx2     =   iX_[start+i+k] - x;
-                aux     =   c_[i+1] - d_[i];
+                dx1     =   iX_.at(start+i) - x;
+                dx2     =   iX_.at(start+i+k) - x;
+                aux     =   c_.at(i+1) - d_.at(i);
                 aux2    =   dx1 - dx2;
 
                 if(aux2!=0)
                 {
                     aux     =   aux/aux2;
-                    c_[i]    =   dx1*aux;
-                    d_[i]    =   dx2*aux;
+                    c_.at(i)    =   dx1*aux;
+                    d_.at(i)    =   dx2*aux;
                 }
                 else
                 {
-                    c_[i]    =   0;
-                    d_[i]    =   0;
+                    c_.at(i)    =   0;
+                    d_.at(i)    =   0;
                 }
             }
         }
@@ -679,12 +679,12 @@ double Interpolant::interpolate(double x, int start)
 
         if(dd)
         {
-            error   =   c_[num];
+            error   =   c_.at(num);
         }
         else
         {
             num--;
-            error   =   d_[num];
+            error   =   d_.at(num);
         }
 
         dd      =   !dd;
@@ -742,13 +742,13 @@ double Interpolant::findLimit(double y)
 
     i   =   0;
     j   =   max_ - 1;
-    dir =   iY_[max_-1]>iY_[0];
+    dir =   iY_.at(max_-1)>iY_.at(0);
 
     while(j-i > 1)
     {
         m   =   (i+j)/2;
 
-        if((y>iY_[m])==dir)
+        if((y>iY_.at(m))==dir)
         {
             i   =   m;
         }
@@ -758,8 +758,7 @@ double Interpolant::findLimit(double y)
         }
     }
 
-    SWAP(iX_,iY_, double*);
-
+    SWAP(iX_,iY_, vector<double>);
     if(!fast_)
     {
         SWAP(precision_,precisionY_,double);
@@ -776,7 +775,7 @@ double Interpolant::findLimit(double y)
 
     if(i+1 < max_)
     {
-        if(((y-iX_[i])<(iX_[i+1]-y))==dir)
+        if(((y-iX_.at(i))<(iX_.at(i+1)-y))==dir)
         {
             auxdir  =   0;
         }
@@ -805,7 +804,7 @@ double Interpolant::findLimit(double y)
 
     result  =   interpolate(y, start);
 
-    SWAP(iX_,iY_,double*);
+    SWAP(iX_,iY_, vector<double>);
 
     if(!fast_)
     {
@@ -843,7 +842,7 @@ double Interpolant::findLimit(double x1, double y)
     int         i, j, m, start, auxdir, auxR;
     bool        dir, rat, rel;
     double      result, aux, aux2=0;
-    double*     ii;
+
     rat     =   false;
     reverse_ =   false;
 
@@ -856,7 +855,7 @@ double Interpolant::findLimit(double x1, double y)
     {
         for(i=0 ; i<max_ ; i++)
         {
-            iY_[i]   =   Interpolant_[i]->interpolate(x1);
+            iY_.at(i)   =   Interpolant_.at(i)->interpolate(x1);
         }
     }
 
@@ -869,7 +868,7 @@ double Interpolant::findLimit(double x1, double y)
     }
     else
     {
-        dir =   iY_[max_-1]>iY_[0];
+        dir =   iY_.at(max_-1)>iY_.at(0);
     }
 
     while(j-i > 1)
@@ -882,7 +881,7 @@ double Interpolant::findLimit(double x1, double y)
         }
         else
         {
-            aux =   iY_[m];
+            aux =   iY_.at(m);
         }
 
         if((y>aux) == dir)
@@ -895,9 +894,7 @@ double Interpolant::findLimit(double x1, double y)
         }
     }
 
-    ii  =   iX_;
-    iX_  =   iY_;
-    iY_  =   ii;
+    SWAP(iX_,iY_, vector<double>);
 
     if(!fast_)
     {
@@ -921,7 +918,7 @@ double Interpolant::findLimit(double x1, double y)
 
     if(i+1<max_)
     {
-        if(((y-iX_[i])<(iX_[i+1]-y))==dir)
+        if(((y-iX_.at(i))<(iX_.at(i+1)-y))==dir)
         {
             auxdir  =   0;
         }
@@ -952,14 +949,13 @@ double Interpolant::findLimit(double x1, double y)
     {
         for(i=start ; i<start+romberg_ ; i++)
         {
-            iX_[i]   =   Interpolant_[i]->interpolate(x1);
+            iX_.at(i)   =   Interpolant_.at(i)->interpolate(x1);
         }
     }
 
     result  =   interpolate(y, start);
-    ii      =   iX_;
-    iX_      =   iY_;
-    iY_      =   ii;
+
+    SWAP(iX_,iY_, vector<double>);
 
     if(!fast_)
     {
@@ -994,10 +990,10 @@ double Interpolant::findLimit(double x1, double y)
 
         for(i=start ; i<start+romberg_ ; i++)
         {
-            if(Interpolant_[i]->precision_>aux)
+            if(Interpolant_.at(i)->precision_>aux)
             {
-                aux     =   Interpolant_[i]->precision_;
-                aux2    =   Interpolant_[i]->worstX_;
+                aux     =   Interpolant_.at(i)->precision_;
+                aux2    =   Interpolant_.at(i)->worstX_;
             }
         }
 
@@ -1062,14 +1058,14 @@ double Interpolant::slog(double x)
 }
 
 Interpolant::~Interpolant(){
-    delete []iX_;
-    delete []iY_;
-    delete []c_;
-    delete []d_;
+    iX_.clear();
+    iY_.clear();
+    c_.clear();
+    d_.clear();
 
     for (unsigned int i = 0; i < Interpolant_.size(); i++)
        {
-           delete Interpolant_[i];
+           delete Interpolant_.at(i);
        }
 
     Interpolant_.clear();

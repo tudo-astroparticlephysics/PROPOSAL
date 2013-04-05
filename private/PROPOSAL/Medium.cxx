@@ -50,7 +50,16 @@ Medium& Medium::operator=(const Medium &medium){
 
 //----------------------------------------------------------------------------//
 
-Medium::~Medium(){}
+Medium::~Medium(){
+    nucCharge_.clear();
+    atomicNum_.clear();
+    atomInMolecule_.clear();
+    logConstant_.clear();
+    bPrime_.clear();
+    M_.clear();
+    elementName_.clear();
+    mN_.clear();
+}
 
 //----------------------------------------------------------------------------//
 

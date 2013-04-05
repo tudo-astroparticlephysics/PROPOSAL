@@ -36,14 +36,21 @@ TEST(Bremsstrahlung , Test_of_dNdx_Interpolant ) {
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
 
-
-        CrossSections *brems = new Bremsstrahlung(particle, medium, cuts);
+       CrossSections *brems = new Bremsstrahlung(particle, medium, cuts);
         brems->SetParametrization(para);
         brems->EnableLpmEffect(lpm);
-        cout << para << "\t" << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << med << "\t" << particleName<< "\t" << dNdx << endl;
         brems->EnableDNdxInterpolation();
 
-
+        cout << para << "\t" << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << med << "\t" << particleName<< "\t" << dNdx << endl;
+ /*
+        if(energy_old > energy){
+            delete brems;
+            brems = new Bremsstrahlung(particle, medium, cuts);
+            brems->SetParametrization(para);
+            brems->EnableLpmEffect(lpm);
+            brems->EnableDNdxInterpolation();
+        }
+*/
         dNdx_new=brems->CalculatedNdx();
 
 
@@ -53,7 +60,7 @@ TEST(Bremsstrahlung , Test_of_dNdx_Interpolant ) {
         delete cuts;
         delete medium;
         delete particle;
-            delete brems;
+        delete brems;
         energy_old = energy;
     }
 }

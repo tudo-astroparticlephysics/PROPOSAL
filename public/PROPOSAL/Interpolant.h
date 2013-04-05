@@ -43,10 +43,13 @@ class Interpolant{ /// implements FunctionInt{
 
 private:
     int     romberg_, rombergY_;
-    double  *iX_;
-    double  *iY_;
-    double  *c_;
-    double  *d_;
+
+    std::vector<double> iX_;
+    std::vector<double> iY_;
+
+    std::vector<double> c_;
+    std::vector<double> d_;
+
     int     max_;
     double  xmin_, xmax_, step_;
     bool    rational_, relative_;
