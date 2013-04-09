@@ -13,10 +13,6 @@ TEST(Bremsstrahlung , Test_of_dNdx_Interpolant ) {
     ifstream in;
     in.open("bin/Brems_dNdx_interpol.txt");
 
-    ifstream inrnd;
-    inrnd.open("bin/rnd.txt");
-    double rnd;
-
     char firstLine[256];
     in.getline(firstLine,256);
 
@@ -32,7 +28,7 @@ TEST(Bremsstrahlung , Test_of_dNdx_Interpolant ) {
 
     cout.precision(16);
     double energy_old=-1;
-    CrossSections *brems = new Bremsstrahlung();
+
     bool first = true;
     while(in.good())
     {
@@ -44,22 +40,25 @@ TEST(Bremsstrahlung , Test_of_dNdx_Interpolant ) {
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
 
-        //inrnd>>rnd;
-        //cout << rnd << endl;
-        //if(rnd>0.01)continue;
        CrossSections *brems = new Bremsstrahlung(particle, medium, cuts);
         brems->SetParametrization(para);
         brems->EnableLpmEffect(lpm);
         brems->EnableDNdxInterpolation();
 
-        cout << para << "\t" << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << med << "\t" << particleName<< "\t" << dNdx << endl;
+        //cout << para << "\t" << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << med << "\t" << particleName<< "\t" << dNdx << endl;
+
+        if(dNdx!=0){
+            if(log10(fabs(dNdx_new -dNdx)/dNdx) > -3){
+                cout << para << "\t" << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << med << "\t" << particleName<< "\t" << dEdx << endl;
+                cout << fabs(dNdx_new -dNdx)/dNdx << endl;
+            }
+        }
 
         while(energy_old < energy){
             energy_old = energy;
             brems->GetParticle()->SetEnergy(energy);
             dNdx_new=brems->CalculatedNdx();
 
-            if(dNdx!=0)cout << fabs(dNdx_new -dNdx)/dNdx << endl;
             ASSERT_NEAR(dNdx_new, dNdx, 1*dNdx);
 
             in>>para>>ecut>>vcut>>lpm>>energy>>med>>particleName>>dNdx;
@@ -72,7 +71,6 @@ TEST(Bremsstrahlung , Test_of_dNdx_Interpolant ) {
         delete particle;
         delete brems;
     }
-    inrnd.close();
 }
 
 TEST(Bremsstrahlung , Test_of_dNdx ) {
@@ -178,8 +176,7 @@ TEST(Bremsstrahlung , Test_of_dEdx ) {
 TEST(Bremsstrahlung , Test_of_dEdx_Interpolant ) {
 
     ifstream in;
-    //in.open("bin/Brems_dEdx_interpol.txt");
-    in.open("bin/Brems_dEdx.txt");
+    in.open("bin/Brems_dEdx_interpol.txt");
     char firstLine[256];
     in.getline(firstLine,256);
     double dEdx_new;
@@ -196,9 +193,12 @@ TEST(Bremsstrahlung , Test_of_dEdx_Interpolant ) {
     double precision;
     double precisionOld = 1E-2;
     double precisionUran = 5E-2;
+    bool first=true;
+    double energy_old;
     while(in.good())
     {
-        in>>para>>ecut>>vcut>>lpm>>energy>>med>>particleName>>dEdx;
+        if(first)in>>para>>ecut>>vcut>>lpm>>energy>>med>>particleName>>dEdx;
+        first=false;
 
         Medium *medium = new Medium(med,1.);
         Particle *particle = new Particle(particleName,1.,1.,1,.20,20,1e5,10);
@@ -211,13 +211,8 @@ TEST(Bremsstrahlung , Test_of_dEdx_Interpolant ) {
         brems->EnableLpmEffect(lpm);
 
         brems->EnableDEdxInterpolation();
-        dEdx_new=brems->CalculatedEdx();
-        if(dEdx!=0){
-            if(log10(fabs(dEdx_new -dEdx)/dEdx) > -3){
-                cout << para << "\t" << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << med << "\t" << particleName<< "\t" << dEdx << endl;
-                cout << fabs(dEdx_new -dEdx)/dEdx << endl;
-            }
-        }
+
+
         if(!med.compare("uranium")){
             precision = precisionUran;
         }
@@ -225,8 +220,17 @@ TEST(Bremsstrahlung , Test_of_dEdx_Interpolant ) {
             precision = precisionOld;
         }
 
-        precision = 1;
-        ASSERT_NEAR(dEdx_new, dEdx, precision*dEdx);
+        while(energy_old < energy){
+            energy_old = energy;
+            brems->GetParticle()->SetEnergy(energy);
+            dEdx_new=brems->CalculatedEdx();
+
+            ASSERT_NEAR(dEdx_new, dEdx, precision*dEdx);
+
+            in>>para>>ecut>>vcut>>lpm>>energy>>med>>particleName>>dEdx_new;
+        }
+
+
 
         delete cuts;
         delete medium;
