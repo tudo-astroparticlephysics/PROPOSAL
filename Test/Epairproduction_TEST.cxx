@@ -39,7 +39,7 @@ TEST(Epairproduction , Test_of_dEdx ) {
         epair->EnableLpmEffect(lpm);
 
         dEdx_new=epair->CalculatedEdx();
-        ASSERT_NEAR(dEdx_new, dEdx, 1e-13*dEdx);
+        ASSERT_NEAR(dEdx_new, dEdx, 1e-5*dEdx);
 
         delete cuts;
         delete medium;

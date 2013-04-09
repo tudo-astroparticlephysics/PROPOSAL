@@ -59,7 +59,7 @@ TEST(Photonuclear , Test_of_dEdx ) {
         photo->SetShadow(shadow);
 
         dEdx_new=photo->CalculatedEdx();
-        ASSERT_NEAR(dEdx_new, dEdx, 1e-15*dEdx);
+        ASSERT_NEAR(dEdx_new, dEdx, 1e-6*dEdx);
 
         delete cuts;
         delete medium;

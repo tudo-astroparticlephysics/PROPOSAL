@@ -68,7 +68,7 @@ TEST(Bremsstrahlung , Test_of_dNdx ) {
         brems->EnableLpmEffect(lpm);
 
         dNdx_new=brems->CalculatedNdx();
-        ASSERT_NEAR(dNdx_new, dNdx, 1e-14*dNdx);
+        ASSERT_NEAR(dNdx_new, dNdx, 1e-7*dNdx);
 
         delete cuts;
         delete medium;
@@ -125,7 +125,7 @@ TEST(Bremsstrahlung , Test_of_dNdxrnd ) {
             brems->GetParticle()->SetEnergy(energy);
             dNdxrnd_new=brems->CalculatedNdx(Rand->rnd());
 
-            ASSERT_NEAR(dNdxrnd_new, dNdxrnd, 1E-6*dNdxrnd);
+            ASSERT_NEAR(dNdxrnd_new, dNdxrnd, 1E-7*dNdxrnd);
 
             in>>para>>ecut>>vcut>>lpm>>energy>>med>>particleName>>dNdxrnd;
         }
@@ -179,7 +179,7 @@ TEST(Bremsstrahlung , Test_of_dEdx ) {
 
         dEdx_new=brems->CalculatedEdx();
 
-        ASSERT_NEAR(dEdx_new, dEdx, 1e-8*dEdx);
+        ASSERT_NEAR(dEdx_new, dEdx, 1e-7*dEdx);
 
         delete cuts;
         delete medium;
@@ -294,23 +294,12 @@ TEST(Bremsstrahlung , Test_of_dNdx_Interpolant ) {
         brems->EnableLpmEffect(lpm);
         brems->EnableDNdxInterpolation();
 
-        //cout << para << "\t" << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << med << "\t" << particleName<< "\t" << dNdx << endl;
-
-
         while(energy_old < energy){
             energy_old = energy;
             brems->GetParticle()->SetEnergy(energy);
             dNdx_new=brems->CalculatedNdx();
 
-            //if(dNdx!=0){
-            //    if(log10(fabs(dNdx_new -dNdx)/dNdx) > -3){
-            //        cout << para << "\t" << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << med << "\t" << particleName<< "\t" << dNdx << endl;
-            //        cout << fabs(dNdx_new -dNdx)/dNdx << endl;
-            //    }
-            //}
-
-
-            ASSERT_NEAR(dNdx_new, dNdx, 1E-14*dNdx);
+            ASSERT_NEAR(dNdx_new, dNdx, 1E-8*dNdx);
 
             in>>para>>ecut>>vcut>>lpm>>energy>>med>>particleName>>dNdx;
         }
