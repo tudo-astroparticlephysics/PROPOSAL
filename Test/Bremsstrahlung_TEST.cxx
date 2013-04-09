@@ -6,7 +6,98 @@
 
 using namespace std;
 
+class RndFromFile{
+private:
+    double rnd_;
+    string Path_;
+    ifstream in_;
 
+public:
+    RndFromFile(string Path){
+        Path_ = Path;
+        in_.open(Path_.c_str());
+        in_>>rnd_;
+        if(in_.good())cout << "less than one rnd_number!" << endl;
+    }
+
+    double rnd(){
+        in_>>rnd_;
+        if(in_.good()){
+            in_.close();
+            in_.clear();
+            in_.open(Path_.c_str());
+            in_>>rnd_;
+        }
+        return rnd_;
+    }
+};
+
+TEST(Bremsstrahlung , Test_of_dNdxrnd ) {
+
+    ifstream in;
+    in.open("bin/Brems_dNdxrnd.txt");
+
+    char firstLine[256];
+    in.getline(firstLine,256);
+
+    double dNdxrnd;
+    double dNdxrnd_new;
+    double energy;
+    double ecut;
+    double vcut;
+    string med;
+    string particleName;
+    bool lpm;
+    int para;
+
+    cout.precision(16);
+    double energy_old=-1;
+
+    RndFromFile* Rand = new RndFromFile("bin/rnd.txt");
+
+    bool first = true;
+    while(in.good())
+    {
+        if(first)in>>para>>ecut>>vcut>>lpm>>energy>>med>>particleName>>dNdxrnd;
+        first=false;
+        energy_old = -1;
+        Medium *medium = new Medium(med,1.);
+        Particle *particle = new Particle(particleName,1.,1.,1,.20,20,1e5,10);
+        particle->SetEnergy(energy);
+        EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
+
+       CrossSections *brems = new Bremsstrahlung(particle, medium, cuts);
+        brems->SetParametrization(para);
+        brems->EnableLpmEffect(lpm);
+
+        //cout << para << "\t" << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << med << "\t" << particleName<< "\t" << dNdx << endl;
+
+        if(dNdxrnd!=0){
+            if(log10(fabs(dNdxrnd_new -dNdxrnd)/dNdxrnd) > -3){
+                cout << para << "\t" << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << med << "\t" << particleName<< "\t" << dNdxrnd << endl;
+                cout << fabs(dNdxrnd_new -dNdxrnd)/dNdxrnd << endl;
+            }
+        }
+
+        while(energy_old < energy){
+            energy_old = energy;
+            brems->GetParticle()->SetEnergy(energy);
+            dNdxrnd_new=brems->CalculatedNdx(Rand->rnd());
+
+            ASSERT_NEAR(dNdxrnd_new, dNdxrnd, 1*dNdxrnd);
+
+            in>>para>>ecut>>vcut>>lpm>>energy>>med>>particleName>>dNdxrnd;
+        }
+
+
+
+        delete cuts;
+        delete medium;
+        delete particle;
+        delete brems;
+    }
+    delete Rand;
+}
 
 TEST(Bremsstrahlung , Test_of_dNdx_Interpolant ) {
 
@@ -47,17 +138,18 @@ TEST(Bremsstrahlung , Test_of_dNdx_Interpolant ) {
 
         //cout << para << "\t" << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << med << "\t" << particleName<< "\t" << dNdx << endl;
 
-        if(dNdx!=0){
-            if(log10(fabs(dNdx_new -dNdx)/dNdx) > -3){
-                cout << para << "\t" << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << med << "\t" << particleName<< "\t" << dEdx << endl;
-                cout << fabs(dNdx_new -dNdx)/dNdx << endl;
-            }
-        }
 
         while(energy_old < energy){
             energy_old = energy;
             brems->GetParticle()->SetEnergy(energy);
             dNdx_new=brems->CalculatedNdx();
+
+            if(dNdx!=0){
+                if(log10(fabs(dNdx_new -dNdx)/dNdx) > -3){
+                    cout << para << "\t" << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << med << "\t" << particleName<< "\t" << dNdx << endl;
+                    cout << fabs(dNdx_new -dNdx)/dNdx << endl;
+                }
+            }
 
             ASSERT_NEAR(dNdx_new, dNdx, 1*dNdx);
 

@@ -65,7 +65,7 @@ configure_file(${PROJECT_SOURCE_DIR}/Test/Ioniz_dEdx.txt ${PROPOSAL_BINARY_DIR}/
 configure_file(${PROJECT_SOURCE_DIR}/Test/Photo_dEdx.txt ${PROPOSAL_BINARY_DIR}/bin/Photo_dEdx.txt COPYONLY)
 configure_file(${PROJECT_SOURCE_DIR}/Test/Brems_dEdx_interpol.txt ${PROPOSAL_BINARY_DIR}/bin/Brems_dEdx_interpol.txt COPYONLY)
 configure_file(${PROJECT_SOURCE_DIR}/Test/Brems_dNdx_interpol.txt ${PROPOSAL_BINARY_DIR}/bin/Brems_dNdx_interpol.txt COPYONLY)
-
+configure_file(${PROJECT_SOURCE_DIR}/Test/rnd.txt ${PROPOSAL_BINARY_DIR}/bin/rnd.txt COPYONLY)
 
 SET(DEBUG OFF)
 option (DEBUG "DEBUG" OFF)
