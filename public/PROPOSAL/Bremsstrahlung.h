@@ -22,6 +22,8 @@ private:
 
     double      eLpm_;
 
+    std::vector<double> prob_for_component_; //!< probability for each medium component to interact with the particle (formerly h_)
+
 
 
 //----------------------------------------------------------------------------//

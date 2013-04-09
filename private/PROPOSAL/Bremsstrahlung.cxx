@@ -10,6 +10,7 @@ Bremsstrahlung::Bremsstrahlung()
     :dndx_integral_()
     ,dndx_interpolant_1d_()
     ,dndx_interpolant_2d_()
+    ,prob_for_component_()
 {
     dedx_integral_   =  new Integral(IROMB, IMAXS, IPREC);
     dedx_interpolant_=  NULL;
@@ -48,6 +49,7 @@ Bremsstrahlung::Bremsstrahlung(Particle* particle,
     ,dndx_interpolant_1d_()
     ,dndx_interpolant_2d_()
     ,eLpm_(0)
+    ,prob_for_component_()
 
 {
     particle_                   = particle;
@@ -73,6 +75,8 @@ Bremsstrahlung::Bremsstrahlung(Particle* particle,
     {
             dndx_integral_.at(i) =   new Integral(IROMB, IMAXS, IPREC);
     }
+
+    prob_for_component_.resize(medium_->GetNumCompontents());
 
 }
 
@@ -157,7 +161,35 @@ double Bremsstrahlung::CalculatedNdx(){
 //----------------------------------------------------------------------------//
 
 double Bremsstrahlung::CalculatedNdx(double rnd){
-    return 0;
+
+    if(multiplier_<=0)
+    {
+        return 0;
+    }
+
+    if(do_dndx_Interpolation_)
+    {
+        //rnd_    =   rnd;
+    }
+
+    double sum    =   0; //SUM was local we will see if this is necessary
+
+    for(int i=0; i<(medium_->GetNumCompontents()); i++)
+    {
+        if(do_dndx_Interpolation_)
+        {
+            prob_for_component_.at(i)   =   max(dndx_interpolant_1d_.at(i)->interpolate(particle_->GetEnergy()) , 0.0);
+        }
+        else
+        {
+            SetIntegralLimits(i);
+            prob_for_component_.at(i)   =   dndx_integral_.at(i)->IntegrateWithLog(vUp_, vMax_, boost::bind(&Bremsstrahlung::FunctionToDNdxIntegral, this, _1), rnd);
+        }
+        sum    +=  prob_for_component_.at(i);
+    }
+
+    return sum;
+
 }
 //----------------------------------------------------------------------------//
 

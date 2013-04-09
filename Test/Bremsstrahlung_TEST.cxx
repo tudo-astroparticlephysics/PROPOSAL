@@ -17,7 +17,7 @@ public:
         Path_ = Path;
         in_.open(Path_.c_str());
         in_>>rnd_;
-        if(in_.good())cout << "less than one rnd_number!" << endl;
+        if(!in_.good())cout << "less than one rnd_number!" << endl;
     }
 
     double rnd(){
@@ -72,19 +72,21 @@ TEST(Bremsstrahlung , Test_of_dNdxrnd ) {
 
         //cout << para << "\t" << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << med << "\t" << particleName<< "\t" << dNdx << endl;
 
-        if(dNdxrnd!=0){
-            if(log10(fabs(dNdxrnd_new -dNdxrnd)/dNdxrnd) > -3){
-                cout << para << "\t" << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << med << "\t" << particleName<< "\t" << dNdxrnd << endl;
-                cout << fabs(dNdxrnd_new -dNdxrnd)/dNdxrnd << endl;
-            }
-        }
+
 
         while(energy_old < energy){
             energy_old = energy;
             brems->GetParticle()->SetEnergy(energy);
             dNdxrnd_new=brems->CalculatedNdx(Rand->rnd());
 
-            ASSERT_NEAR(dNdxrnd_new, dNdxrnd, 1*dNdxrnd);
+            if(dNdxrnd!=0){
+                if(log10(fabs(dNdxrnd_new -dNdxrnd)/dNdxrnd) > -3){
+                    cout << para << "\t" << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << med << "\t" << particleName<< "\t" << dNdxrnd << endl;
+                    cout << fabs(dNdxrnd_new -dNdxrnd)/dNdxrnd << endl;
+                }
+            }
+
+            ASSERT_NEAR(dNdxrnd_new, dNdxrnd, 1E-6*dNdxrnd);
 
             in>>para>>ecut>>vcut>>lpm>>energy>>med>>particleName>>dNdxrnd;
         }
