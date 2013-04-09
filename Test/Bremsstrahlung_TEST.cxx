@@ -191,6 +191,68 @@ TEST(Bremsstrahlung , Test_of_dEdx ) {
     }
 }
 
+TEST(Bremsstrahlung , Test_of_e ) {
+
+    ifstream in;
+    in.open("bin/Brems_e.txt");
+
+    char firstLine[256];
+    in.getline(firstLine,256);
+
+    double e;
+    double e_new;
+    double energy;
+    double ecut;
+    double vcut;
+    string med;
+    string particleName;
+    bool lpm;
+    int para;
+
+    cout.precision(16);
+    double energy_old=-1;
+
+    RndFromFile* Rand = new RndFromFile("bin/rnd.txt");
+    RndFromFile* Rand2 = new RndFromFile("bin/rnd.txt");
+    Rand2->rnd();
+    bool first = true;
+    while(in.good())
+    {
+        if(first)in>>para>>ecut>>vcut>>lpm>>energy>>med>>particleName>>e;
+        first=false;
+        energy_old = -1;
+        Medium *medium = new Medium(med,1.);
+        Particle *particle = new Particle(particleName,1.,1.,1,.20,20,1e5,10);
+        particle->SetEnergy(energy);
+        EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
+
+       CrossSections *brems = new Bremsstrahlung(particle, medium, cuts);
+        brems->SetParametrization(para);
+        brems->EnableLpmEffect(lpm);
+
+        //cout << para << "\t" << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << med << "\t" << particleName<< "\t" << dNdx << endl;
+
+        while(energy_old < energy){
+            energy_old = energy;
+            brems->GetParticle()->SetEnergy(energy);
+
+            e_new=brems->CalculateStochasticLoss(Rand->rnd(),Rand2->rnd());
+            ASSERT_NEAR(e_new, e, 1E-7*e);
+
+            in>>para>>ecut>>vcut>>lpm>>energy>>med>>particleName>>e;
+        }
+
+
+
+        delete cuts;
+        delete medium;
+        delete particle;
+        delete brems;
+    }
+    delete Rand2;
+    delete Rand;
+}
+
 TEST(Bremsstrahlung , Test_of_dEdx_Interpolant ) {
 
     ifstream in;

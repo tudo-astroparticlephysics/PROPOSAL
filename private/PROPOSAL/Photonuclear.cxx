@@ -126,6 +126,12 @@ double Photonuclear::CalculateStochasticLoss(){
 }
 //----------------------------------------------------------------------------//
 
+double Photonuclear::CalculateStochasticLoss(double rnd1, double rnd2){
+    return 0;
+}
+
+//----------------------------------------------------------------------------//
+
 void Photonuclear::EnableDNdxInterpolation(){
     do_dndx_Interpolation_=true;
 }

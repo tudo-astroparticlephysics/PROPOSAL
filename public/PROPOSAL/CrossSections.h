@@ -104,6 +104,10 @@ public:
 
 //----------------------------------------------------------------------------//
 
+    virtual double CalculateStochasticLoss(double rnd1, double rnd2) = 0; //function for testing the stochastic losses
+
+//----------------------------------------------------------------------------//
+
     virtual void EnableDNdxInterpolation() = 0;
 
 //----------------------------------------------------------------------------//

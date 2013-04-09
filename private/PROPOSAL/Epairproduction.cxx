@@ -166,6 +166,12 @@ double Epairproduction::CalculateStochasticLoss(){
 }
 //----------------------------------------------------------------------------//
 
+double Epairproduction::CalculateStochasticLoss(double rnd1, double rnd2){
+    return 0;
+}
+
+//----------------------------------------------------------------------------//
+
 void Epairproduction::EnableDNdxInterpolation(){
     do_dndx_Interpolation_=true;
 }

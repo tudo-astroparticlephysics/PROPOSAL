@@ -122,6 +122,13 @@ double Ionization::CalculatedNdx(double rnd){
 double Ionization::CalculateStochasticLoss(){
     return 0;
 }
+
+//----------------------------------------------------------------------------//
+
+double Ionization::CalculateStochasticLoss(double rnd1, double rnd2){
+    return 0;
+}
+
 //----------------------------------------------------------------------------//
 
 void Ionization::EnableDNdxInterpolation(){
