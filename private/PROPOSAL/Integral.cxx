@@ -500,7 +500,7 @@ double Integral::RombergIntegrateOpened()
     return value;
 }
 
-//----------------------------------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
 
 double Integral::RombergIntegrateOpened(double bigValue)
 {
@@ -538,20 +538,16 @@ double Integral::RombergIntegrateOpened(double bigValue)
     return value;
 }
 
-//----------------------------------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
 
-double Integral::IntegrateClosed(double min, double max, boost::function<double (double)> integrand)
+double Integral::InitIntegralOpenedAndClosed(double min, double max, boost::function<double (double)> integrand)
 {
     double aux;
 
     reverse_ =   false;
     useLog_  =   false;
 
-    if(fabs(max-min)<=fabs(min)*COMPUTER_PRECISION)
-    {
-        return 0;
-    }
-    else if(min>max)
+    if(min>max)
     {
         SWAP(min,max,double);
         aux =   -1;
@@ -563,10 +559,23 @@ double Integral::IntegrateClosed(double min, double max, boost::function<double 
 
     this->min_           =   min;
     this->max_           =   max;
-    integrand_          =   integrand;
+    integrand_           =   integrand;
     powerOfSubstitution_ =   0;
     randomDo_            =   false;
 
+    return aux;
+}
+
+//----------------------------------------------------------------------------//
+double Integral::IntegrateClosed(double min, double max, boost::function<double (double)> integrand)
+{
+    double aux;
+    aux = InitIntegralOpenedAndClosed(min, max, integrand);
+
+    if(fabs(max_-min_)<=fabs(min_)*COMPUTER_PRECISION)
+    {
+        return 0;
+    }
     return aux*RombergIntegrateClosed();
 }
 
@@ -575,30 +584,12 @@ double Integral::IntegrateClosed(double min, double max, boost::function<double 
 double Integral::IntegrateOpened(double min, double max, boost::function<double (double)> integrand)
 {
     double aux;
+    aux = InitIntegralOpenedAndClosed(min, max, integrand);
 
-    reverse_ =   false;
-    useLog_  =   false;
-
-    if(fabs(max-min)<=fabs(min)*COMPUTER_PRECISION)
+    if(fabs(max_-min_)<=fabs(min_)*COMPUTER_PRECISION)
     {
         return 0;
     }
-    else if(min>max)
-    {
-        SWAP(min,max,double);
-        aux =   -1;
-    }
-    else
-    {
-        aux=1;
-    }
-
-    this->min_           =   min;
-    this->max_           =   max;
-    this->integrand_     =   integrand;
-    powerOfSubstitution_ =   0;
-    randomNumber_        =   0;
-    randomDo_            =   false;
 
     return aux*RombergIntegrateOpened();
 }
@@ -676,18 +667,14 @@ double Integral::IntegrateOpened(double min, double max, boost::function<double 
 
 //----------------------------------------------------------------------------------------------------//
 
-double Integral::IntegrateWithSubstitution(double min, double max, boost::function<double (double)> integrand, double powerOfSubstitution)
+double Integral::InitIntegralWithSubstitution(double min, double max, boost::function<double (double)> integrand, double powerOfSubstitution)
 {
     double aux;
 
     reverse_ =   false;
     useLog_  =   false;
 
-    if(fabs(max-min)<=fabs(min)*COMPUTER_PRECISION)
-    {
-        return 0;
-    }
-    else if(min>max)
+    if(min>max)
     {
         SWAP(min,max,double);
         aux =   -1;
@@ -737,10 +724,27 @@ double Integral::IntegrateWithSubstitution(double min, double max, boost::functi
             this->max_   =   max;
     }
 
-    this->integrand_            =   integrand;
+    this->integrand_             =   integrand;
     this->powerOfSubstitution_   =   powerOfSubstitution;
     randomNumber_                =   0;
     randomDo_                    =   false;
+
+    return aux;
+
+}
+
+
+double Integral::IntegrateWithSubstitution(double min, double max, boost::function<double (double)> integrand, double powerOfSubstitution)
+{
+    double aux;
+
+    aux = InitIntegralWithSubstitution(min , max , integrand ,powerOfSubstitution);
+
+    if(fabs(max_-min_)<=fabs(min_)*COMPUTER_PRECISION)
+    {
+        return 0;
+    }
+
 
     return aux*RombergIntegrateOpened();
 }
@@ -1026,20 +1030,14 @@ double Integral::GetUpperLimit()
 
 //----------------------------------------------------------------------------------------------------//
 
-double Integral::IntegrateWithLog(double min, double max, boost::function<double (double)> integrand)
+double Integral::InitIntegralWithLog(double min, double max, boost::function<double (double)> integrand)
 {
     double aux;
-    bool old_reverse = reverse_;
-    bool old_useLog = useLog_;
 
     reverse_ =   false;
     useLog_  =   true;
 
-    if(fabs(max-min)<=fabs(min)*COMPUTER_PRECISION)
-    {
-        return 0;
-    }
-    else if(min>max)
+    if(min>max)
     {
         SWAP(min,max,double);
         aux =   -1;
@@ -1056,11 +1054,26 @@ double Integral::IntegrateWithLog(double min, double max, boost::function<double
     randomNumber_        =   0;
     randomDo_            =   false;
 
-    aux *= RombergIntegrateOpened();
-    reverse_ = old_reverse;
-    useLog_ = old_useLog ;
-
     return aux;
+
+}
+
+//----------------------------------------------------------------------------//
+
+double Integral::IntegrateWithLog(double min, double max, boost::function<double (double)> integrand)
+{
+
+    double aux;
+
+    aux =InitIntegralWithLog(min, max, integrand);
+
+    if(fabs(max_-min_)<=fabs(min_)*COMPUTER_PRECISION)
+    {
+        return 0;
+    }
+
+    return aux* RombergIntegrateOpened();
+
 }
 
 //----------------------------------------------------------------------------------------------------//
@@ -1133,17 +1146,12 @@ double Integral::IntegrateWithLog(double min, double max, boost::function<double
 
 //----------------------------------------------------------------------------//
 
-double Integral::IntegrateWithLogSubstitution(double min, double max, boost::function<double (double)> integrand, double powerOfSubstitution)
+double Integral::InitIntegralWithLogSubstitution(double min, double max, boost::function<double (double)> integrand, double powerOfSubstitution)
 {
     double aux;
 
     reverse_ =   false;
     useLog_  =   true;
-
-    if(fabs(max-min)<=fabs(min)*COMPUTER_PRECISION)
-    {
-        return 0;
-    }
 
     if(min<0 || max<0)
     {
@@ -1200,13 +1208,90 @@ double Integral::IntegrateWithLogSubstitution(double min, double max, boost::fun
         this->max_   =   log(max);
     }
 
-    this->integrand_            =   integrand;
+    this->integrand_             =   integrand;
     this->powerOfSubstitution_   =   powerOfSubstitution;
     randomNumber_                =   0;
     randomDo_                    =   false;
 
+    return aux;
+}
+
+//----------------------------------------------------------------------------//
+
+
+double Integral::IntegrateWithLogSubstitution(double min, double max, boost::function<double (double)> integrand, double powerOfSubstitution)
+{
+
+    double aux;
+
+    aux = InitIntegralWithLogSubstitution(min, max, integrand, powerOfSubstitution);
+
+    if(fabs(max_-min_)<=fabs(min_)*COMPUTER_PRECISION)
+    {
+        return 0;
+    }
+
     return aux*RombergIntegrateOpened();
 }
+
+//----------------------------------------------------------------------------//
+
+double Integral::Integrate(double min, double max, boost::function<double (double)> integrand, int method, double powerOfSubstitution)
+{
+
+    switch (method)
+    {
+        case 1: return IntegrateClosed(min,max,integrand);
+        case 2: return IntegrateOpened(min,max,integrand);
+        case 3: return IntegrateWithSubstitution(min,max,integrand,powerOfSubstitution);
+        case 4: return IntegrateWithLog(min,max,integrand);
+        case 5: return IntegrateWithLogSubstitution(min,max,integrand,powerOfSubstitution);
+        default: cout <<"Unknown integration method! 0 is returned"<<endl; return 0;
+
+    }
+
+
+}
+
+//----------------------------------------------------------------------------//
+
+
+double Integral::GetUpperLimit(double min, double max, double integral_value , double rnadomRatio, boost::function<double (double)> integrand)
+{
+
+    this->integrand_    =   integrand;
+
+
+        if(fabs(max_-min_)<=fabs(min_)*COMPUTER_PRECISION)
+        {
+            return min_;
+        }
+
+        RefineUpperLimit(integral_value);
+
+        if(reverse_)
+        {
+            randomX_ =   reverseX_ - randomX_;
+        }
+
+        if(powerOfSubstitution_>0)
+        {
+            randomX_ =   pow(randomX_, -powerOfSubstitution_);
+        }
+        else if(powerOfSubstitution_<0)
+        {
+            randomX_ =   -pow(-randomX_, powerOfSubstitution_);
+        }
+
+        if(useLog_)
+        {
+            randomX_ =   exp(randomX_);
+        }
+
+        return randomX_;
+
+}
+
 
 void Integral::Reset()
 {

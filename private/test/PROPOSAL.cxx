@@ -28,7 +28,47 @@ double _3X_2(double x){
     return 3*x + 2;
 }
 
+
+double dNdx_dNdxRnd(double rnd, double energy){
+
+    double dNdxRnd;
+    double dNdx;
+
+    Medium *medium = new Medium("antares water",1.);
+    Particle *particle = new Particle("mu",1.,1.,1,.20,20,1e5,10);
+    particle->SetEnergy(energy);
+    EnergyCutSettings *cuts = new EnergyCutSettings(500.,0.1);
+
+    CrossSections *brems = new Bremsstrahlung(particle, medium, cuts);
+
+    brems->SetParametrization(1.);
+
+    dNdx=brems->CalculatedNdx();
+    dNdxRnd=brems->CalculatedNdx(rnd);
+    cout<<"dNdx\t"<<dNdx<<"\t"<<"dNdxRnd\t "<<dNdxRnd<<"\t";
+
+    return dNdx-dNdxRnd;
+
+}
+
+
 int main(){
+
+    double energy1;
+    double rnd;
+    double diff;
+
+    for(int i =1; i<11;i++)
+    {
+        for(int j =0; j<10;j++)
+        {
+            rnd =1./i;
+            energy1 = 120 * pow(10.,j);
+            diff=dNdx_dNdxRnd(rnd,energy1);
+            cout<< "rnd:\t"<<rnd<<"\t energy:\t"<<energy1<<"\t dNdx-dNdx(rnd):\t"<<diff<<endl;
+        }
+
+    }
 
     ifstream in;
     in.open("bin/Brems_dEdx.txt");

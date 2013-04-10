@@ -105,7 +105,7 @@ double Ionization::CalculatedEdx(){
         result=0;
     }
     return multiplier_*(medium_->GetMassDensity()*result
-                        + particle_->GetEnergy()*(integral_->IntegrateWithLog(vMin_, vUp_, boost::bind(&Ionization::FunctionToDEdxIntegral, this, _1))));
+                        + particle_->GetEnergy()*(integral_->Integrate(vMin_, vUp_, boost::bind(&Ionization::FunctionToDEdxIntegral, this, _1),4)));
 }
 //----------------------------------------------------------------------------//
 

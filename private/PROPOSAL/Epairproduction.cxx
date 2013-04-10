@@ -126,7 +126,7 @@ double Epairproduction::CalculatedEdx(){
                 r1  =   vMin_;
             }
 
-            sum         +=  integral_for_dEdx_->IntegrateWithLog(vMin_, r1, boost::bind(&Epairproduction::FunctionToDEdxIntegral, this, _1));
+            sum         +=  integral_for_dEdx_->Integrate(vMin_, r1, boost::bind(&Epairproduction::FunctionToDEdxIntegral, this, _1),4);
             reverse_    =   true;
             double r2   =   max(1-vUp_, COMPUTER_PRECISION);
 
@@ -135,15 +135,15 @@ double Epairproduction::CalculatedEdx(){
                 r2  =   1-r1;
             }
 
-            sum         +=  integral_for_dEdx_->IntegrateOpened(1-vUp_, r2, boost::bind(&Epairproduction::FunctionToDEdxIntegral, this, _1))
-                        +   integral_for_dEdx_->IntegrateWithLog(r2, 1-r1, boost::bind(&Epairproduction::FunctionToDEdxIntegral, this, _1));
+            sum         +=  integral_for_dEdx_->Integrate(1-vUp_, r2, boost::bind(&Epairproduction::FunctionToDEdxIntegral, this, _1),2)
+                        +   integral_for_dEdx_->Integrate(r2, 1-r1, boost::bind(&Epairproduction::FunctionToDEdxIntegral, this, _1),4);
 
             reverse_    =   false;
         }
 
         else
         {
-            sum +=  integral_for_dEdx_->IntegrateWithLog(vMin_, vUp_, boost::bind(&Epairproduction::FunctionToDEdxIntegral, this, _1));
+            sum +=  integral_for_dEdx_->Integrate(vMin_, vUp_, boost::bind(&Epairproduction::FunctionToDEdxIntegral, this, _1),4);
         }
     }
 
@@ -402,8 +402,8 @@ double Epairproduction::EPair(double v, int component)
 
     return medium_->GetMolDensity()*medium_->GetAtomInMolecule().at(component_)
            *particle_->GetCharge()*particle_->GetCharge()
-           *(integral_->IntegrateOpened(1 - rMax, aux, boost::bind(&Epairproduction::FunctionToIntegral, this, _1))
-                + integral_->IntegrateWithLog(aux, 1,  boost::bind(&Epairproduction::FunctionToIntegral, this, _1)));
+           *(integral_->Integrate(1 - rMax, aux, boost::bind(&Epairproduction::FunctionToIntegral, this, _1),2)
+                + integral_->Integrate(aux, 1,  boost::bind(&Epairproduction::FunctionToIntegral, this, _1),4));
 
 }
 

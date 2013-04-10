@@ -18,14 +18,14 @@ bool relErr(double Is, double HasToBe, double RelError){
 
 TEST(IntegralValue , Zero_to_Three_of_xx ) {
     Integral* Int = new Integral();
-    ASSERT_NEAR(Int->IntegrateClosed(0,3,Testfkt),exp(3)-1 , (exp(3)-1)*1E-6);
+    ASSERT_NEAR(Int->Integrate(0,3,Testfkt,1),exp(3)-1 , (exp(3)-1)*1E-6);
     delete Int;
 }
 
 TEST(IntegralValue, EqualBorders) {
     Integral* Int = new Integral();
 
-    EXPECT_EQ(Int->IntegrateClosed(3,3,Testfkt),0);
+    EXPECT_EQ(Int->Integrate(3,3,Testfkt,1),0);
 
     delete Int;
 }
@@ -33,7 +33,7 @@ TEST(IntegralValue, EqualBorders) {
 TEST(IntegralValue, SmallError) {
     Integral* Int = new Integral();
 
-    ASSERT_NEAR(   Int->IntegrateClosed(0,3,Testexp),exp(3)-1
+    ASSERT_NEAR(   Int->Integrate(0,3,Testexp,1),exp(3)-1
                             ,(exp(3)-1)*1.e-6);
 
     delete Int;
@@ -42,7 +42,7 @@ TEST(IntegralValue, SmallError) {
 TEST(IntegralValue, FloatEqual) {
     Integral* Int = new Integral();
     //Last 4 digits can differ. relError<1E-4
-    ASSERT_FLOAT_EQ(Int->IntegrateClosed(0,3,Testexp),exp(3)-1);
+    ASSERT_FLOAT_EQ(Int->Integrate(0,3,Testexp,1),exp(3)-1);
 
     delete Int;
 }
@@ -56,7 +56,7 @@ TEST(IntegralValue, MultiplePrecisions) {
     for(double precision = 1E-5; precision>1E-16;precision/=10){
 
         Integral* Int = new Integral(5,20,precision);
-        CalcIntegral = Int->IntegrateClosed(xmin,xmax,Testexp);
+        CalcIntegral = Int->Integrate(xmin,xmax,Testexp,1);
 
         ASSERT_NEAR(CalcIntegral,ExactIntegral, ExactIntegral*precision);
 
@@ -73,7 +73,7 @@ TEST(IntegralValue, IntegrateWithSubstitution) {
     for(double precision = 1E-5; precision>1E-11;precision/=10){
 
         Integral* Int = new Integral(5,20,precision);
-        CalcIntegral = Int->IntegrateWithSubstitution(xmin,xmax,Testexp,2.);
+        CalcIntegral = Int->Integrate(xmin,xmax,Testexp,3,2.);
 
         ASSERT_NEAR(CalcIntegral,ExactIntegral, ExactIntegral*precision);
 
@@ -90,7 +90,7 @@ TEST(IntegralValue, IntegrateWithLog) {
     for(double precision = 1E-5; precision>1E-11;precision/=10){
 
         Integral* Int = new Integral(5,20,precision);
-        CalcIntegral = Int->IntegrateWithLog(xmin,xmax,Testexp);
+        CalcIntegral = Int->Integrate(xmin,xmax,Testexp,4);
 
         ASSERT_NEAR(CalcIntegral,ExactIntegral, ExactIntegral*precision);
 
@@ -107,7 +107,7 @@ TEST(IntegralValue, IntegrateWithLogSubstitution) {
     for(double precision = 1E-5; precision>1E-6;precision/=10){
 
         Integral* Int = new Integral(5,20,precision);
-        CalcIntegral = Int->IntegrateWithLogSubstitution(xmin,xmax,Testexp,2.);
+        CalcIntegral = Int->Integrate(xmin,xmax,Testexp,5,2.);
 
         ASSERT_NEAR(CalcIntegral,ExactIntegral, ExactIntegral*precision);
 

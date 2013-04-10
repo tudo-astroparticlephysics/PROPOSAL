@@ -104,7 +104,7 @@ double Photonuclear::CalculatedEdx()
     for(int i=0; i < medium_->GetNumCompontents(); i++)
     {
         SetIntegralLimits(i);
-        sum +=  integral_for_dEdx_->IntegrateWithLog(vMin_, vUp_, boost::bind(&Photonuclear::FunctionToDEdxIntegral, this, _1));
+        sum +=  integral_for_dEdx_->Integrate(vMin_, vUp_, boost::bind(&Photonuclear::FunctionToDEdxIntegral, this, _1),4);
     }
 
     return multiplier_*particle_->GetEnergy()*sum;
@@ -586,7 +586,7 @@ double Photonuclear::ALLM91Parametrization(double v, int i){
         return 0;
     }
 
-    return medium_->GetMolDensity()*medium_->GetAtomInMolecule().at(i)*particle_->GetCharge()*particle_->GetCharge()*integral_->IntegrateWithLog(min, max, boost::bind(&Photonuclear::FunctionToIntegralALLM91, this, _1));
+    return medium_->GetMolDensity()*medium_->GetAtomInMolecule().at(i)*particle_->GetCharge()*particle_->GetCharge()*integral_->Integrate(min, max, boost::bind(&Photonuclear::FunctionToIntegralALLM91, this, _1),4);
 
 }
 
@@ -624,7 +624,7 @@ double Photonuclear::ALLM97Parametrization(double v, int i){
         return 0;
     }
 
-    return medium_->GetMolDensity()*medium_->GetAtomInMolecule().at(i)*particle_->GetCharge()*particle_->GetCharge()*integral_->IntegrateWithLog(min, max, boost::bind(&Photonuclear::FunctionToIntegralALLM97, this, _1));
+    return medium_->GetMolDensity()*medium_->GetAtomInMolecule().at(i)*particle_->GetCharge()*particle_->GetCharge()*integral_->Integrate(min, max, boost::bind(&Photonuclear::FunctionToIntegralALLM97, this, _1),4);
 
 }
 
@@ -663,7 +663,7 @@ double Photonuclear::ButkevichMikhailovParametrization(double v, int i){
         return 0;
     }
 
-    return medium_->GetMolDensity()*medium_->GetAtomInMolecule().at(i)*particle_->GetCharge()*particle_->GetCharge()*integral_->IntegrateWithLog(min, max, boost::bind(&Photonuclear::FunctionToIntegralButMik, this, _1));
+    return medium_->GetMolDensity()*medium_->GetAtomInMolecule().at(i)*particle_->GetCharge()*particle_->GetCharge()*integral_->Integrate(min, max, boost::bind(&Photonuclear::FunctionToIntegralButMik, this, _1),4);
 
 }
 
