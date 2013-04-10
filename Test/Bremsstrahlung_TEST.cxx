@@ -22,7 +22,7 @@ public:
 
     double rnd(){
         in_>>rnd_;
-        if(in_.good()){
+        if(!in_.good()){
             in_.close();
             in_.clear();
             in_.open(Path_.c_str());
