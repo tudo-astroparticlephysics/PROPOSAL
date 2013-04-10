@@ -1,4 +1,4 @@
-ecut	vcut	energy	medium	particle	dEdx
+para	ecut	vcut	lpm	energy	medium	particle	dEdx
 -1	-1	10000	ice	mu	2.283452040886065
 -1	-1	100000	ice	mu	2.558129731836575
 -1	-1	1000000	ice	mu	2.797985604776362
