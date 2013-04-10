@@ -839,11 +839,10 @@ double Interpolant::findLimit(double y)
 
 double Interpolant::findLimit(double x1, double y)
 {
-    int         i, j, m, start, auxdir, auxR;
-    bool        dir, rat, rel;
+    int         i, j, m, start, auxdir;
+    bool        dir;
     double      result, aux, aux2=0;
 
-    rat     =   false;
     reverse_ =   false;
 
     if(logSubst_)
@@ -898,23 +897,13 @@ double Interpolant::findLimit(double x1, double y)
 
     if(!fast_)
     {
-        aux         =   precision_;
-        precision_   =   precisionY_;
-        precisionY_  =   aux;
-
-        aux         =   worstX_;
-        worstX_      =   worstY_;
-        worstY_      =   aux;
-
-        rat         =   rational_;
-        rational_    =   rationalY_;
+        SWAP(precision_, precisionY_, double);
+        SWAP(worstX_,worstY_,double);
+        SWAP(rational_,rationalY_,double);
     }
 
-    auxR        =   romberg_;
-    romberg_     =   rombergY_;
-    rombergY_    =   auxR;
-    rel         =   relative_;
-    relative_    =   relativeY_;
+    SWAP(romberg_, rombergY_,double);
+    SWAP(relative_,relativeY_,double);
 
     if(i+1<max_)
     {
@@ -959,21 +948,13 @@ double Interpolant::findLimit(double x1, double y)
 
     if(!fast_)
     {
-        aux         =   precision_;
-        precision_   =   precisionY_;
-        precisionY_  =   aux;
-
-        aux         =   worstX_;
-        worstX_      =   worstY_;
-        worstY_      =   aux;
-
-        rational_    =   rat;
+        SWAP(precision_, precisionY_, double);
+        SWAP(worstX_,worstY_,double);
+        SWAP(rational_,rationalY_,double);
     }
 
-    auxR        =   romberg_;
-    romberg_     =   rombergY_;
-    rombergY_    =   auxR;
-    relative_    =   rel;
+    SWAP(romberg_, rombergY_,double);
+    SWAP(relative_,relativeY_,double);
 
     if(result<xmin_)
     {
