@@ -68,6 +68,10 @@ configure_file(${PROJECT_SOURCE_DIR}/Test/Brems_e.txt ${PROPOSAL_BINARY_DIR}/bin
 configure_file(${PROJECT_SOURCE_DIR}/Test/Brems_e_interpol.txt ${PROPOSAL_BINARY_DIR}/bin/Brems_e_interpol.txt COPYONLY)
 
 configure_file(${PROJECT_SOURCE_DIR}/Test/Epair_dEdx.txt ${PROPOSAL_BINARY_DIR}/bin/Epair_dEdx.txt COPYONLY)
+configure_file(${PROJECT_SOURCE_DIR}/Test/Epair_dNdx.txt ${PROPOSAL_BINARY_DIR}/bin/Epair_dNdx.txt COPYONLY)
+configure_file(${PROJECT_SOURCE_DIR}/Test/Epair_dNdxrnd.txt ${PROPOSAL_BINARY_DIR}/bin/Epair_dNdxrnd.txt COPYONLY)
+configure_file(${PROJECT_SOURCE_DIR}/Test/Epair_e.txt ${PROPOSAL_BINARY_DIR}/bin/Epair_e.txt COPYONLY)
+
 configure_file(${PROJECT_SOURCE_DIR}/Test/Ioniz_dEdx.txt ${PROPOSAL_BINARY_DIR}/bin/Ioniz_dEdx.txt COPYONLY)
 
 configure_file(${PROJECT_SOURCE_DIR}/Test/Photo_dEdx.txt ${PROPOSAL_BINARY_DIR}/bin/Photo_dEdx.txt COPYONLY)
