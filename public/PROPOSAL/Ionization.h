@@ -12,6 +12,8 @@ protected:
     Integral*   integral_;
     Interpolant* dedx_interpolant_;
 
+    Interpolant* dndx_interpolant_1d_;
+    Interpolant* dndx_interpolant_2d_;
 //----------------------------------------------------------------------------//
 
     /*!
@@ -147,6 +149,14 @@ public:
 //----------------------------------------------------------------------------//
 
     double FunctionToBuildDEdxInterpolant(double energy);
+
+//----------------------------------------------------------------------------//
+
+    double FunctionToBuildDNdxInterpolant(double energy);
+
+//----------------------------------------------------------------------------//
+
+    double FunctionToBuildDNdxInterpolant2D(double energy , double v);
 
 //----------------------------------------------------------------------------//
 

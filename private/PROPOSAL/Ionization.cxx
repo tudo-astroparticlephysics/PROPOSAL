@@ -110,7 +110,19 @@ double Ionization::CalculatedEdx(){
 //----------------------------------------------------------------------------//
 
 double Ionization::CalculatedNdx(){
-    return 0;
+    if(multiplier_<=0)
+    {
+        return 0;
+    }
+
+    if(do_dndx_Interpolation_)
+    {
+        return max(dndx_interpolant_1d_->interpolate(particle_->GetEnergy()), 0.);
+    }
+    else{
+        SetIntegralLimits(0);
+        return integral_->Integrate(vUp_,vMax_,boost::bind(&Ionization::FunctionToDNdxIntegral, this, _1),3,1);
+    }
 }
 //----------------------------------------------------------------------------//
 
@@ -132,7 +144,13 @@ double Ionization::CalculateStochasticLoss(double rnd1, double rnd2){
 //----------------------------------------------------------------------------//
 
 void Ionization::EnableDNdxInterpolation(){
+    double energy = particle_->GetEnergy();
+
+    dndx_interpolant_2d_ = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, NUM1, 0, 1, boost::bind(&Ionization::FunctionToBuildDNdxInterpolant2D, this, _1, _2),order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false, order_of_interpolation_, true, false, false);
+    dndx_interpolant_1d_ = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, boost::bind(&Ionization::FunctionToBuildDNdxInterpolant, this, _1),order_of_interpolation_, false, false, true, order_of_interpolation_, true, false, false);
+
     do_dndx_Interpolation_=true;
+    particle_->SetEnergy(energy);
 }
 //----------------------------------------------------------------------------//
 
@@ -165,7 +183,7 @@ double Ionization::FunctionToDEdxIntegral(double variable){
 //----------------------------------------------------------------------------//
 
 double Ionization::FunctionToDNdxIntegral(double variable){
-    return 0;
+    return multiplier_ * D2Ndvdx(variable) * (1+InelCorrection(variable));
 }
 
 //----------------------------------------------------------------------------//
@@ -230,3 +248,23 @@ double Ionization::FunctionToBuildDEdxInterpolant(double energy)
     particle_->SetEnergy(energy);
     return CalculatedEdx();
 }
+//----------------------------------------------------------------------------//
+
+double Ionization::FunctionToBuildDNdxInterpolant(double energy){
+    return dndx_interpolant_2d_->interpolate(energy, 1.0);
+}
+
+
+
+double Ionization::FunctionToBuildDNdxInterpolant2D(double energy , double v){
+    particle_->SetEnergy(energy);
+    SetIntegralLimits(0);
+
+    if(vUp_==vMax_){
+        return 0;
+    }
+    v=vUp_*exp(v*log(vMax_/vUp_));
+
+    return integral_->Integrate(vUp_,vMax_,boost::bind(&Ionization::FunctionToDNdxIntegral, this, _1),3,1);
+}
+
