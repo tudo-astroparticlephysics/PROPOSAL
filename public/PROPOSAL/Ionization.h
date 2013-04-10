@@ -1,6 +1,6 @@
 #include "PROPOSAL/CrossSections.h"
 #include "PROPOSAL/Integral.h"
-
+#include "PROPOSAL/Interpolant.h"
 
 class Ionization: public CrossSections
 {
@@ -10,7 +10,7 @@ protected:
     double gamma_;
 
     Integral*   integral_;
-
+    Interpolant* dedx_interpolant_;
 
 //----------------------------------------------------------------------------//
 
@@ -146,6 +146,10 @@ public:
 
 //----------------------------------------------------------------------------//
 
+    double FunctionToBuildDEdxInterpolant(double energy);
+
+//----------------------------------------------------------------------------//
+
     void DisableDNdxInterpolation();
 
 //----------------------------------------------------------------------------//
@@ -153,6 +157,7 @@ public:
     void DisableDEdxInterpolation();
 
 //----------------------------------------------------------------------------//
+
 
     ~Ionization(){}
 

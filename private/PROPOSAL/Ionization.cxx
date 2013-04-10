@@ -80,10 +80,10 @@ double Ionization::CalculatedEdx(){
         return 0;
     }
 
-//    if(jt_)
-//    {
-//        return max(interpolateJ_->interpolate(particle_->e), 0.);
-//    }
+    if(do_dedx_Interpolation_)
+    {
+        return max(dedx_interpolant_->interpolate(particle_->GetEnergy()), 0.);
+    }
 
     double result, aux;
 
@@ -137,7 +137,10 @@ void Ionization::EnableDNdxInterpolation(){
 //----------------------------------------------------------------------------//
 
 void Ionization::EnableDEdxInterpolation(){
+    double energy = particle_->GetEnergy();
+    dedx_interpolant_ = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, boost::bind(&Ionization::FunctionToBuildDEdxInterpolant, this, _1), order_of_interpolation_, true, false, true, order_of_interpolation_, false, false, true);
     do_dedx_Interpolation_=true;
+    particle_->SetEnergy(energy);
 }
 
 //----------------------------------------------------------------------------//
@@ -221,3 +224,9 @@ double Ionization::InelCorrection(double v)
     return (ALPHA/(2*PI))*result;
 }
 //----------------------------------------------------------------------------//
+
+double Ionization::FunctionToBuildDEdxInterpolant(double energy)
+{
+    particle_->SetEnergy(energy);
+    return CalculatedEdx();
+}
