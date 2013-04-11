@@ -163,6 +163,34 @@ TEST(_2D_Interpol , Simple_Test_of_X_YY_EXPX ) {
     delete Pol2;
 }
 
+TEST(_2D_Interpol , Save_To_File ) {
+    Interpolant* Pol2 = new Interpolant(max,  xmin, xmax, max2, x2min, x2max, X_YY,
+                                        romberg, rational, relative, isLog,
+                                        romberg2, rational2, relative2, isLog2,
+                                        rombergY, rationalY, relativeY, logSubst);
+
+    ASSERT_TRUE(Pol2->Save(".2DInterpol-Test.txt") );
+
+    delete Pol2;
+}
+
+TEST(_2D_Interpol , Load_From_File ) {
+    Interpolant* Pol2 = new Interpolant();
+    Pol2->Load(".2DInterpol-Test.txt");
+
+    double SearchX = 7;
+    double SearchY = 11;
+    double precision = 1E-6;
+
+    double PolValue = Pol2->interpolate(SearchX,SearchY);
+    double RealValue = X_YY(SearchX,SearchY);
+
+    ASSERT_NEAR(PolValue, RealValue, RealValue*precision );
+
+    delete Pol2;
+}
+
+
 TEST(_2D_Interpol , rational1_On ) {
     Interpolant* Pol2 = new Interpolant(max,  xmin, xmax, max2, x2min, x2max, X_YY,
                                         romberg, !rational, relative, isLog,

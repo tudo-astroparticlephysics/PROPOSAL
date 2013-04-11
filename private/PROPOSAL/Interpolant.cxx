@@ -1028,7 +1028,14 @@ bool Interpolant::Save(ofstream& out){
 
     if(D2)
     {
+        out << max_ << "\t" << xmin_ << "\t" << xmax_ << endl;
+        out << romberg_ << "\t" << rational_ << "\t" << relative_ << "\t" << isLog_ << endl;
+        out << rombergY_ << "\t" << rationalY_ << "\t" << relativeY_ << "\t" << logSubst_ << endl;
 
+        for(int i =0; i<max_ ;i++){
+            out << iX_.at(i) << endl;
+            Interpolant_.at(i)->Save(out);
+        }
     }
     else
     {
