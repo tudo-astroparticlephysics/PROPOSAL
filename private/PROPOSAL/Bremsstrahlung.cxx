@@ -200,9 +200,9 @@ double Bremsstrahlung::CalculateStochasticLoss(double rnd1, double rnd2){
     double rand;
     double rsum;
 
-    double rnd_ = rnd1;
-    double sum_ = this->CalculatedNdx(rnd1);
-    rand    =   rnd2*sum_;
+    //double rnd_ = rnd1;
+    double sum = this->CalculatedNdx(rnd1);
+    rand    =   rnd2*sum;
     rsum    =   0;
 
     for(int i=0; i<(medium_->GetNumCompontents()); i++)
@@ -220,12 +220,12 @@ double Bremsstrahlung::CalculateStochasticLoss(double rnd1, double rnd2){
                     return (particle_->GetEnergy())*vUp_;
                 }
 
-                return (particle_->GetEnergy())*(vUp_*exp(dndx_interpolant_2d_.at(i)->findLimit((particle_->GetEnergy()), (rnd_)*prob_for_component_.at(i))*log(vMax_/vUp_)));
+                return (particle_->GetEnergy())*(vUp_*exp(dndx_interpolant_2d_.at(i)->findLimit((particle_->GetEnergy()), (rnd1)*prob_for_component_.at(i))*log(vMax_/vUp_)));
             }
 
             else
             {
-                SetIntegralLimits(i);
+                component_ = i;
                 return (particle_->GetEnergy())*dndx_integral_.at(i)->GetUpperLimit();
             }
 
@@ -260,7 +260,8 @@ void Bremsstrahlung::EnableDNdxInterpolation(){
 void Bremsstrahlung::EnableDEdxInterpolation()
 {
     double energy = particle_->GetEnergy();
-    dedx_interpolant_ = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, boost::bind(&Bremsstrahlung::FunctionToBuildDEdxInterpolant, this, _1), order_of_interpolation_, true, false, true, order_of_interpolation_, false, false, true);
+    dedx_interpolant_ = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, boost::bind(&Bremsstrahlung::FunctionToBuildDEdxInterpolant, this, _1),
+                                        order_of_interpolation_, true, false, true, order_of_interpolation_, false, false, true); //changed from ...,false,false,false)
     do_dedx_Interpolation_=true;
     particle_->SetEnergy(energy);
 }

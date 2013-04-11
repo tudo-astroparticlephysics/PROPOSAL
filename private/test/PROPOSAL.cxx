@@ -3,6 +3,8 @@
 #include "PROPOSAL/Integral.h"
 #include "PROPOSAL/Medium.h"
 #include "PROPOSAL/Interpolant.h"
+#include "PROPOSAL/Ionization.h"
+
 using namespace std;
 
 double integrate(double min, double max, int N, double (*func)(double) ){
@@ -58,23 +60,9 @@ int main(){
     double rnd;
     double diff;
 
-    for(int i =1; i<11;i++)
-    {
-        for(int j =0; j<10;j++)
-        {
-            rnd =1./i;
-            energy1 = 120 * pow(10.,j);
-            diff=dNdx_dNdxRnd(rnd,energy1);
-            cout<< "rnd:\t"<<rnd<<"\t energy:\t"<<energy1<<"\t dNdx-dNdx(rnd):\t"<<diff<<endl;
-        }
-
-    }
-
-    ifstream in;
-    in.open("bin/Brems_dEdx.txt");
 
     char firstLine[256];
-    in.getline(firstLine,256);
+
     double dEdx_new;
     double energy;
     double dEdx;
@@ -87,67 +75,28 @@ int main(){
 
     cout.precision(16);
 
-    Medium *medium = new Medium("antares water",1.);
+    Medium *medium = new Medium("ice",1.);
     Particle *particle = new Particle("mu",1.,1.,1,.20,20,1e5,10);
-    particle->SetEnergy(1e6);
+    particle->SetEnergy(10000);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
+
     CrossSections *brems = new Bremsstrahlung(particle, medium, cuts);
+    brems->SetParametrization(1);
+    brems->EnableLpmEffect(0);
 
-    cout<<"dEdx:"<<endl;
-    brems->EnableDEdxInterpolation();
-    cout<<brems->CalculatedEdx()<<endl;
+    double rnd1= 0.9655968558508899;
+    double rnd2= 0.0596232083626091;
 
-    brems->DisableDEdxInterpolation();
-    cout<<brems->CalculatedEdx()<<endl;
-
-    brems->EnableDEdxInterpolation();
-    cout<<brems->CalculatedEdx()<<endl;
-
-    double gna;
-    double gna2;
-    cout<<"dNdx:"<<endl;
+    double gna = brems->CalculateStochasticLoss(rnd1,rnd2);
     brems->EnableDNdxInterpolation();
-    gna=brems->CalculatedNdx();
+    double gna2 = brems->CalculateStochasticLoss(rnd1,rnd2);
 
-    brems->DisableDNdxInterpolation();
-    gna2=brems->CalculatedNdx();
-
+    cout << "should be: " << 9262.664586574878 << endl;
+    cout << "brems(" << rnd1 << "," << rnd2 << "): " << gna << endl;
+    cout << "Interpol: " << gna2 << endl;
     cout<<gna/gna2<<endl;
 
-    brems->EnableDNdxInterpolation();
-    cout<<brems->CalculatedNdx()<<endl;
 
-//    while(in.good())
-//    {
-//        in>>para>>ecut>>vcut>>lpm>>energy>>med>>particleName>>dEdx;
-//        cout<<para<<"\t"<<ecut<<"\t"<<vcut<<"\t"<<lpm<<"\t"<<energy<<"\t"<<med<<"\t"<<particleName<<"\t"<<dEdx<<"\t";
-
-//        Medium *medium = new Medium(med,1.);
-//        Particle *particle = new Particle(particleName,1.,1.,1,.20,20,1e5,10);
-//        particle->SetEnergy(energy);
-//        EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
-
-//        CrossSections *brems = new Bremsstrahlung(particle, medium, cuts);
-
-
-//        brems->SetParametrization(para);
-//        brems->EnableLpmEffect(lpm);
-//        brems->EnableDEdxInterpolation();
-//        if(para==1 && ecut==500 && vcut == -1 && lpm ==true){
-//            para = para*para;
-//        }
-//        dEdx_new=brems->CalculatedEdx();
-//        cout<<dEdx_new<<"\t"<<particle->GetMass()<<"\t"<<brems->GetVMax()<<"\t"<<brems->GetVMin()<<"\t"<<brems->GetVUp()<<endl;
-//        //ASSERT_NEAR(dEdx_new, dEdx, 5e-1*dEdx);
-
-//        delete cuts;
-//        delete medium;
-//        delete particle;
-//        delete brems;
-
-
-
-//    }
 
     return 0;
 }

@@ -206,8 +206,6 @@ TEST(Ionization , Test_of_e ) {
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
         CrossSections *ioniz = new Ionization(particle, medium, cuts);
 
-        //ioniz->EnableDEdxInterpolation();
-
         while(energy_old < energy)
         {
             energy_old = energy;
@@ -407,7 +405,7 @@ TEST(Ionization , Test_of_e_interpol ) {
 
     cout.precision(16);
 
-    double precision = 1E-5;
+    double precision = 1E-2;
 
     RndFromFile* Rand = new RndFromFile("bin/rnd.txt");
     RndFromFile* Rand2 = new RndFromFile("bin/rnd.txt");
@@ -438,8 +436,14 @@ TEST(Ionization , Test_of_e_interpol ) {
             rnd2 = Rand2->rnd();
 
             ioniz->GetParticle()->SetEnergy(energy);
+
             e_new=ioniz->CalculateStochasticLoss(rnd1,rnd2);
 
+            if(e!=0)if(log10(fabs(1-e_new/e))>-3){
+                cout<< "\t" << ecut<< "\t" << vcut << "\t" << energy<< "\t" << med<< "\t" << particleName<<endl;
+                cout << log10(fabs(1-e_new/e)) << endl;
+            }
+            //cout << "rnd1: " << rnd1 << "\t rnd2: " << rnd2 << endl;
             ASSERT_NEAR(e_new, e, precision*e);
 
             in>>ecut>>vcut>>energy>>med>>particleName>>e;

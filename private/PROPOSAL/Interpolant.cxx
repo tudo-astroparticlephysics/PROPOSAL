@@ -863,7 +863,7 @@ double Interpolant::findLimit(double x1, double y)
 
     if(flag_)
     {
-        dir =   Interpolant_[max_-1]->interpolate(x1)>Interpolant_[0]->interpolate(x1);
+        dir =   Interpolant_.at(max_-1)->interpolate(x1) > Interpolant_.at(0)->interpolate(x1);
     }
     else
     {
@@ -876,7 +876,7 @@ double Interpolant::findLimit(double x1, double y)
 
         if(flag_)
         {
-            aux =   Interpolant_[m]->interpolate(x1);
+            aux =   Interpolant_.at(m)->interpolate(x1);
         }
         else
         {
