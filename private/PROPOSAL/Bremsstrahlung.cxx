@@ -232,6 +232,15 @@ double Bremsstrahlung::CalculateStochasticLoss(double rnd1, double rnd2){
         }
     }
 
+    //TOMASZ sometime everything is fine, just the probability for interaction is zero
+    bool prob_for_all_comp_is_zero=true;
+    for(int i=0; i<(medium_->GetNumCompontents()); i++)
+    {
+        SetIntegralLimits(i);
+        if(vUp_!=vMax_)prob_for_all_comp_is_zero=false;
+    }
+    if(prob_for_all_comp_is_zero)return 0;
+
     cout<<"Error (in BremsStochastic/e): sum was not initialized correctly" << endl;
     cout<<"ecut: " << cut_settings_->GetEcut() << "\t vcut: " <<  cut_settings_->GetVcut() << "\t energy: " << particle_->GetEnergy() << "\t type: " << particle_->GetName() << endl;
     return 0;
