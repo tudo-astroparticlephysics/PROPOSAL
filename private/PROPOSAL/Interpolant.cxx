@@ -36,7 +36,17 @@ const double Interpolant::aBigNumber_  =   -299;
 
 //----------------------------------------------------------------------------//
 
-Interpolant::Interpolant() { }
+Interpolant::Interpolant()
+:iX_()
+,iY_()
+,c_()
+,d_()
+,function1d_(NULL)
+,function2d_(NULL)
+,self_   (true)
+,fast_   (true)
+,x_save_ (1)
+,y_save_ (0) { }
 
 //----------------------------------------------------------------------------//
 
@@ -47,6 +57,8 @@ Interpolant::Interpolant(int max, double xmin, double xmax, boost::function<doub
 ,iY_()
 ,c_()
 ,d_()
+,function1d_(NULL)
+,function2d_(NULL)
 ,self_   (true)
 ,fast_   (true)
 ,x_save_ (1)
@@ -118,6 +130,8 @@ Interpolant::Interpolant(int max1, double x1min, double x1max, int max2, double 
 ,iY_()
 ,c_()
 ,d_()
+,function1d_(NULL)
+,function2d_(NULL)
 ,self_   (true)
 ,fast_   (true)
 ,x_save_ (1)
@@ -156,6 +170,8 @@ Interpolant::Interpolant(vector<double> x, vector<double> y, int romberg, bool r
 ,iY_()
 ,c_()
 ,d_()
+,function1d_(NULL)
+,function2d_(NULL)
 ,self_   (true)
 ,fast_   (true)
 ,x_save_ (1)
@@ -991,6 +1007,81 @@ double Interpolant::findLimit(double x1, double y)
     }
 
     return result;
+}
+
+bool Interpolant::Save(string Path){
+    ofstream out;
+    out.open(Path.c_str());
+    out.precision(16);
+
+    Save(out);
+
+    out.close();
+    return 1;
+}
+
+bool Interpolant::Save(ofstream& out){
+    bool D2 = false;
+    if(function2d_ != NULL)D2 = true;
+
+    out << D2 << endl;
+
+    if(D2)
+    {
+
+    }
+    else
+    {
+        out << max_ << "\t" << xmin_ << "\t" << xmax_ << endl;
+        out << romberg_ << "\t" << rational_ << "\t" << relative_ << "\t" << isLog_ << endl;
+        out << rombergY_ << "\t" << rationalY_ << "\t" << relativeY_ << "\t" << logSubst_ << endl;
+
+        for(int i =0; i<max_ ;i++){
+            out << iX_.at(i) << "\t" << iY_.at(i) << endl;
+        }
+    }
+    return 1;
+}
+
+bool Interpolant::Load(std::string Path){
+    ifstream in;
+    in.open(Path.c_str());
+
+    Load(in);
+
+    in.close();
+    return 1;
+}
+
+bool Interpolant::Load(ifstream& in){
+    bool D2 = false;
+    if(function2d_ != NULL)D2 = true;
+
+    in >> D2 ;
+    int max;
+    double xmin, xmax;
+    int romberg, rombergY;
+    bool rational,rationalY,relative,relativeY,isLog, logSubst;
+
+    if(D2)
+    {
+
+    }
+    else
+    {
+        function2d_ = NULL;
+        in >> max >> xmin >> xmax;
+        in >> romberg >> rational >> relative >> isLog ;
+        in >> rombergY >> rationalY >> relativeY >> logSubst ;
+
+        InitInterpolant(max, xmin, xmax,
+                        romberg, rational, relative, isLog,
+                        rombergY,rationalY, relativeY, logSubst);
+        for(int i =0; i<max_ ;i++){
+            in >> iX_.at(i) >> iY_.at(i) ;
+        }
+    }
+    return 1;
 }
 
 //----------------------------------------------------------------------------//

@@ -279,6 +279,30 @@ public:
     //------------------------------------------------------------------------//
 
     /**
+    * Saves an interpolation table from file
+    *
+    * \param    Path/ofstream
+    * \return   true if successfull
+    */
+
+    bool Save(std::string Path);
+    bool Save(std::ofstream &out);
+
+    //------------------------------------------------------------------------//
+
+    /**
+    * Loads an interpolation table from file
+    *
+    * \param    Path/ifstream
+    * \return   true if successfull
+    */
+
+    bool Load(std::string Path);
+    bool Load(std::ifstream &in);
+
+    //------------------------------------------------------------------------//
+
+    /**
     * Exp(x) with CutOff.
     *
     * if x > exp(aBigNumber): exp(x) \n

@@ -42,6 +42,29 @@ TEST(_1D_Interpol , Simple_Test_of_XX_EXPX ) {
     delete Pol1;
 }
 
+
+TEST(_1D_Interpol , Save_To_File ) {
+    Interpolant* Pol1 = new Interpolant(max, xmin, xmax, X2, romberg, rational, relative, isLog, rombergY, rationalY, relativeY, logSubst);
+
+    ASSERT_TRUE(Pol1->Save(".TestSaveInterpol.txt"));
+
+    delete Pol1;
+}
+
+TEST(_1D_Interpol , Load_From_File ) {
+    Interpolant* Pol1 = new Interpolant();
+    Pol1->Load(".TestSaveInterpol.txt");
+    double SearchX = 5;
+    double precision = 1E-5;
+
+    double PolValue = Pol1->interpolate(SearchX);
+    double RealValue = X2(SearchX);
+
+    ASSERT_NEAR(PolValue, RealValue, RealValue*precision );
+
+    delete Pol1;
+}
+
 TEST(_1D_Interpol , Rational_On ) {
     Interpolant* Pol1 = new Interpolant(max, xmin, xmax, X2, romberg, true, relative, isLog, rombergY, rationalY, relativeY, logSubst);
     double SearchX = 5;
