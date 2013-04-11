@@ -455,7 +455,7 @@ double Integral::RombergIntegrateOpened()
         {
             result  =   Trapezoid3(k, result);
             if(result != result){
-                printf("Warning (in Integral/rombergIntegrateOpened/0): Function Value of is nan. Return 0");
+                printf("Warning (in Integral/rombergIntegrateOpened/0): Function Value of is nan. Return 0 \n");
                 return 0;
             }
 

@@ -1,6 +1,6 @@
 #include "PROPOSAL/CrossSections.h"
 #include "PROPOSAL/Integral.h"
-
+#include "PROPOSAL/Interpolant.h"
 
 class Epairproduction: public CrossSections
 {
@@ -14,6 +14,14 @@ protected:
 
     Integral*   integral_;
     Integral*   integral_for_dEdx_;
+
+    Interpolant* dedx_interpolant_;
+
+    std::vector<Integral*>    dndx_integral_;
+    std::vector<Interpolant*> dndx_interpolant_1d_; //Stochastic dNdx()
+    std::vector<Interpolant*> dndx_interpolant_2d_; //Stochastic dNdx()
+
+    std::vector<double> prob_for_component_; //!< probability for each medium component to interact with the particle (formerly H_)
 
 //----------------------------------------------------------------------------//
 
@@ -131,11 +139,21 @@ public:
 
 //----------------------------------------------------------------------------//
 
+    double FunctionToBuildDEdxInterpolant(double energy);
+
+//----------------------------------------------------------------------------//
+    double FunctionToBuildDNdxInterpolant1D(double energy);
+
+//----------------------------------------------------------------------------//
+    double FunctionToBuildDNdxInterpolant2D(double energy, double v);
+
+//----------------------------------------------------------------------------//
+
 
 
     //Setter
 
 
-    ~Epairproduction(){}
+    ~Epairproduction();
 
 };

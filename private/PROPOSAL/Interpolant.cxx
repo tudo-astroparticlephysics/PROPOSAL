@@ -1061,10 +1061,9 @@ bool Interpolant::Load(std::string Path){
 }
 
 bool Interpolant::Load(ifstream& in){
-    bool D2 = false;
-    if(function2d_ != NULL)D2 = true;
-
+    bool D2;
     in >> D2 ;
+
     int max;
     double xmin, xmax;
     int romberg, rombergY;
@@ -1072,11 +1071,6 @@ bool Interpolant::Load(ifstream& in){
 
     if(D2)
     {
-
-    }
-    else
-    {
-        function2d_ = NULL;
         in >> max >> xmin >> xmax;
         in >> romberg >> rational >> relative >> isLog ;
         in >> rombergY >> rationalY >> relativeY >> logSubst ;
@@ -1084,6 +1078,28 @@ bool Interpolant::Load(ifstream& in){
         InitInterpolant(max, xmin, xmax,
                         romberg, rational, relative, isLog,
                         rombergY,rationalY, relativeY, logSubst);
+
+        Interpolant_.resize(max_);
+
+        for(int i =0; i<max_ ;i++){
+            in >> iX_.at(i);
+
+            Interpolant_.at(i) = new Interpolant();
+            Interpolant_.at(i)->Load(in);
+            Interpolant_.at(i)->self_ =false;
+        }
+
+    }
+    else
+    {
+        in >> max >> xmin >> xmax;
+        in >> romberg >> rational >> relative >> isLog ;
+        in >> rombergY >> rationalY >> relativeY >> logSubst ;
+
+        InitInterpolant(max, xmin, xmax,
+                        romberg, rational, relative, isLog,
+                        rombergY,rationalY, relativeY, logSubst);
+
         for(int i =0; i<max_ ;i++){
             in >> iX_.at(i) >> iY_.at(i) ;
         }

@@ -1,6 +1,8 @@
 #include "gtest/gtest.h"
 #include "PROPOSAL/Interpolant.h"
 #include "math.h"
+#include "string.h"
+#include "stdio.h"
 
 double X2(double x){
     return x*x*exp(x);
@@ -29,6 +31,9 @@ bool rational2 = false;
 bool relative2 = false;
 bool isLog2 = false;
 
+std::string File1DTest = "Interpol1D_Save.txt";
+std::string File2DTest = "Interpol2D_Save.txt";
+
 TEST(_1D_Interpol , Simple_Test_of_XX_EXPX ) {
     Interpolant* Pol1 = new Interpolant(max, xmin, xmax, X2, romberg, rational, relative, isLog, rombergY, rationalY, relativeY, logSubst);
     double SearchX = 5;
@@ -46,14 +51,14 @@ TEST(_1D_Interpol , Simple_Test_of_XX_EXPX ) {
 TEST(_1D_Interpol , Save_To_File ) {
     Interpolant* Pol1 = new Interpolant(max, xmin, xmax, X2, romberg, rational, relative, isLog, rombergY, rationalY, relativeY, logSubst);
 
-    ASSERT_TRUE(Pol1->Save(".TestSaveInterpol.txt"));
+    ASSERT_TRUE(Pol1->Save(File1DTest));
 
     delete Pol1;
 }
 
 TEST(_1D_Interpol , Load_From_File ) {
     Interpolant* Pol1 = new Interpolant();
-    Pol1->Load(".TestSaveInterpol.txt");
+    Pol1->Load(File1DTest);
     double SearchX = 5;
     double precision = 1E-5;
 
@@ -169,14 +174,14 @@ TEST(_2D_Interpol , Save_To_File ) {
                                         romberg2, rational2, relative2, isLog2,
                                         rombergY, rationalY, relativeY, logSubst);
 
-    ASSERT_TRUE(Pol2->Save(".2DInterpol-Test.txt") );
+    ASSERT_TRUE(Pol2->Save(File2DTest) );
 
     delete Pol2;
 }
 
 TEST(_2D_Interpol , Load_From_File ) {
     Interpolant* Pol2 = new Interpolant();
-    Pol2->Load(".2DInterpol-Test.txt");
+    Pol2->Load(File2DTest);
 
     double SearchX = 7;
     double SearchY = 11;
@@ -373,5 +378,10 @@ TEST(_2D_Interpol , All_On ) {
 
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
+    int ret = RUN_ALL_TESTS();
+
+    //Clean the mess
+    std::remove (File1DTest.c_str());
+    std::remove (File2DTest.c_str());
+    return ret;
 }
