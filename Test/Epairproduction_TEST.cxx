@@ -33,7 +33,7 @@ public:
 };
 
 TEST(Epairproduction , Test_of_dEdx ) {
-    return;
+    //return;
     ifstream in;
     in.open("bin/Epair_dEdx.txt");
 
@@ -74,7 +74,7 @@ TEST(Epairproduction , Test_of_dEdx ) {
 }
 
 TEST(Epairproduction , Test_of_dEdx_interpol ) {
-    //return;
+    return;
     ifstream in;
     in.open("bin/Epair_dEdx_interpol.txt");
 
@@ -89,7 +89,7 @@ TEST(Epairproduction , Test_of_dEdx_interpol ) {
     string particleName;
     bool lpm;
 
-    double precision = 1E-2;
+    double precision = 1E-5;
 
     double energy_old;
     bool first = true;
@@ -129,9 +129,71 @@ TEST(Epairproduction , Test_of_dEdx_interpol ) {
 }
 
 TEST(Epairproduction , Test_of_dNdx ) {
-    return;
+    //return;
     ifstream in;
     in.open("bin/Epair_dNdx.txt");
+
+    char firstLine[256];
+    in.getline(firstLine,256);
+    double dNdx_new;
+    double energy;
+    double dNdx;
+    double ecut;
+    double vcut;
+    string med;
+    string particleName;
+    bool lpm;
+
+    double precision = 1E-6;
+
+    double energy_old;
+    bool first = true;
+    while(in.good())
+    {
+        if(first)in>>ecut>>vcut>>lpm>>energy>>med>>particleName>>dNdx;
+        first = false;
+        energy_old = -1;
+
+        Medium *medium = new Medium(med,1.);
+        Particle *particle = new Particle(particleName,1.,1.,1,.20,20,1e5,10);
+        particle->SetEnergy(energy);
+        EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
+
+        CrossSections *epair = new Epairproduction(particle, medium, cuts);
+
+        epair->EnableLpmEffect(lpm);
+        //epair->EnableDNdxInterpolation();
+
+
+        while(energy_old < energy)
+        {
+            energy_old = energy;
+
+            epair->GetParticle()->SetEnergy(energy);
+            dNdx_new=epair->CalculatedNdx();
+
+            if(dNdx!=0)
+                if(log10(fabs(1-dNdx_new/dNdx))>-13)
+                {
+                    cout <<ecut << "\t" << vcut<< "\t" << lpm<< "\t" << energy<< "\t" << med<< "\t" << particleName << endl;
+                    cout << energy << "\t" << log10(fabs(1-dNdx_new/dNdx)) << endl;
+                }
+            ASSERT_NEAR(dNdx_new, dNdx, precision*dNdx);
+
+            in>>ecut>>vcut>>lpm>>energy>>med>>particleName>>dNdx;
+        }
+
+        delete cuts;
+        delete medium;
+        delete particle;
+        delete epair;
+    }
+}
+
+TEST(Epairproduction , Test_of_dNdx_interpol ) {
+    //return;
+    ifstream in;
+    in.open("bin/Epair_dNdx_interpol.txt");
 
     char firstLine[256];
     in.getline(firstLine,256);
@@ -162,68 +224,6 @@ TEST(Epairproduction , Test_of_dNdx ) {
         CrossSections *epair = new Epairproduction(particle, medium, cuts);
 
         epair->EnableLpmEffect(lpm);
-        //epair->EnableDNdxInterpolation();
-
-
-        while(energy_old < energy)
-        {
-            energy_old = energy;
-
-            epair->GetParticle()->SetEnergy(energy);
-            dNdx_new=epair->CalculatedNdx();
-
-            if(dNdx!=0)
-                if(log10(fabs(1-dNdx_new/dNdx))>-6)
-                {
-                    cout <<ecut << "\t" << vcut<< "\t" << lpm<< "\t" << energy<< "\t" << med<< "\t" << particleName << endl;
-                    cout << energy << "\t" << log10(fabs(1-dNdx_new/dNdx)) << endl;
-                }
-            ASSERT_NEAR(dNdx_new, dNdx, precision*dNdx);
-
-            in>>ecut>>vcut>>lpm>>energy>>med>>particleName>>dNdx;
-        }
-
-        delete cuts;
-        delete medium;
-        delete particle;
-        delete epair;
-    }
-}
-
-TEST(Epairproduction , Test_of_dNdx_interpol ) {
-    //return;
-    ifstream in;
-    in.open("bin/Epair_dNdx.txt");
-
-    char firstLine[256];
-    in.getline(firstLine,256);
-    double dNdx_new;
-    double energy;
-    double dNdx;
-    double ecut;
-    double vcut;
-    string med;
-    string particleName;
-    bool lpm;
-
-    double precision = 1E-3;
-
-    double energy_old;
-    bool first = true;
-    while(in.good())
-    {
-        if(first)in>>ecut>>vcut>>lpm>>energy>>med>>particleName>>dNdx;
-        first = false;
-        energy_old = -1;
-
-        Medium *medium = new Medium(med,1.);
-        Particle *particle = new Particle(particleName,1.,1.,1,.20,20,1e5,10);
-        particle->SetEnergy(energy);
-        EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
-
-        CrossSections *epair = new Epairproduction(particle, medium, cuts);
-
-        epair->EnableLpmEffect(lpm);
         epair->EnableDNdxInterpolation();
 
         while(energy_old < energy)
@@ -234,7 +234,7 @@ TEST(Epairproduction , Test_of_dNdx_interpol ) {
             dNdx_new=epair->CalculatedNdx();
 
             if(dNdx!=0)
-                if(log10(fabs(1-dNdx_new/dNdx))>-6)
+                if(log10(fabs(1-dNdx_new/dNdx))>-8)
                 {
                     cout <<ecut << "\t" << vcut<< "\t" << lpm<< "\t" << energy<< "\t" << med<< "\t" << particleName << endl;
                     cout << energy << "\t" << log10(fabs(1-dNdx_new/dNdx)) << endl;

@@ -60,8 +60,7 @@ Epairproduction::Epairproduction(Particle* particle,
     integral_for_dEdx_    = new Integral(IROMB, IMAXS, IPREC);
 
     dndx_integral_.resize(medium_->GetNumCompontents());
-    dndx_interpolant_1d_.resize(medium_->GetNumCompontents());
-    dndx_interpolant_2d_.resize(medium_->GetNumCompontents());
+
 
     for(int i =0 ; i<medium_->GetNumCompontents();i++){
         dndx_integral_.at(i) = new Integral(IROMB, IMAXS, IPREC);
@@ -235,14 +234,16 @@ void Epairproduction::EnableDNdxInterpolation(){
     if(do_dndx_Interpolation_)return;
 
     double energy = particle_->GetEnergy();
-    dndx_interpolant_2d_.resize( medium_->GetNumCompontents() );
-
+    dndx_interpolant_1d_.resize(medium_->GetNumCompontents());
+    dndx_interpolant_2d_.resize(medium_->GetNumCompontents());
     for(int i=0; i<(medium_->GetNumCompontents()); i++)
     {
         component_ = i;
+        //cros->get_epairproduction()->get_Stochastic()->interpolateJ_[i]     =   Interpolate(NUM1, e_low, e_hi, NUM1, 0, 1, cros->get_epairproduction()->stochastic_, g, false, false, true, g, false, false, false, g, true, false, false);
         //cros->get_epairproduction()->get_Stochastic()->interpolateJo_[i]    =   Interpolate(NUM1, e_low, e_hi, cros->get_epairproduction()->stochastic_, g, false, false, true, g, true, false, false);
-        dndx_interpolant_2d_.at(i) = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY,  NUM1, 0, 1, boost::bind(&Epairproduction::FunctionToBuildDNdxInterpolant2D, this, _1 , _2), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false, order_of_interpolation_, false, false, false);
-        dndx_interpolant_1d_.at(i) =  new Interpolant(NUM1, particle_->GetLow(), BIGENERGY,  boost::bind(&Epairproduction::FunctionToBuildDNdxInterpolant1D, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, true, false, false);
+
+        dndx_interpolant_2d_.at(i) =    new Interpolant(NUM1, particle_->GetLow(), BIGENERGY,  NUM1, 0, 1, boost::bind(&Epairproduction::FunctionToBuildDNdxInterpolant2D, this, _1 , _2), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false, order_of_interpolation_, true, false, false);
+        dndx_interpolant_1d_.at(i) =    new Interpolant(NUM1, particle_->GetLow(), BIGENERGY,  boost::bind(&Epairproduction::FunctionToBuildDNdxInterpolant1D, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, true, false, false);
     }
     particle_->SetEnergy(energy);
 
@@ -454,7 +455,6 @@ double Epairproduction::lpm(double r2, double b, double x)
 
 double Epairproduction::EPair(double v, int component)
 {
-/*
     if(do_dndx_Interpolation_)
     {
         SetIntegralLimits(component);
@@ -464,7 +464,7 @@ double Epairproduction::EPair(double v, int component)
             return max(dndx_interpolant_2d_.at(component)->interpolate(particle_->GetEnergy(), log(v/vUp_)/log(vMax_/vUp_)), 0.0);
         }
     }
-*/
+
     double rMax, aux, aux2;
 
     component_  =   component;
@@ -505,7 +505,7 @@ double Epairproduction::FunctionToBuildDNdxInterpolant2D(double energy, double v
 
     v   =   vUp_*exp(v*log(vMax_/vUp_));
 
-    return EPair(v, component_);
+    return dndx_integral_.at(component_)->Integrate(vUp_,vMax_, boost::bind(&Epairproduction::FunctionToDNdxIntegral, this, _1),4);
 }
 
 double Epairproduction::FunctionToBuildDEdxInterpolant(double energy){

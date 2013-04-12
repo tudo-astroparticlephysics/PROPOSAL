@@ -4,6 +4,7 @@
 #include "PROPOSAL/Medium.h"
 #include "PROPOSAL/Interpolant.h"
 #include "PROPOSAL/Ionization.h"
+#include "PROPOSAL/Epairproduction.h"
 
 using namespace std;
 
@@ -66,33 +67,33 @@ int main(){
     double dEdx_new;
     double energy;
     double dEdx;
-    double ecut;
-    double vcut;
-    string med;
-    string particleName;
-    bool lpm;
+    double ecut = 500;
+    double vcut = 0.05;
+    string med = "uranium";
+    string particleName = "mu";
+    bool lpm = 1;
     int para;
 
     cout.precision(16);
 
-    Medium *medium = new Medium("ice",1.);
-    Particle *particle = new Particle("mu",1.,1.,1,.20,20,1e5,10);
-    particle->SetEnergy(10000);
-    EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
+    Medium *medium = new Medium(med,1.);
+    Particle *particle = new Particle(particleName,1.,1.,1,.20,20,1e5,10);
+    particle->SetEnergy(1000000000);
+    EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
 
-    CrossSections *brems = new Bremsstrahlung(particle, medium, cuts);
-    brems->SetParametrization(1);
-    brems->EnableLpmEffect(0);
+    CrossSections *epair= new Epairproduction(particle, medium, cuts);
+    epair->EnableLpmEffect(lpm);
 
     double rnd1= 0.9655968558508899;
     double rnd2= 0.0596232083626091;
 
-    double gna = brems->CalculateStochasticLoss(rnd1,rnd2);
-    brems->EnableDNdxInterpolation();
-    double gna2 = brems->CalculateStochasticLoss(rnd1,rnd2);
+    double gna = epair->CalculatedNdx();
+    epair->EnableDNdxInterpolation();
+    double gna2 = epair->CalculatedNdx();
 
-    cout << "should be: " << 9262.664586574878 << endl;
-    cout << "brems(" << rnd1 << "," << rnd2 << "): " << gna << endl;
+    //500	0.05	1	1000000000	uranium	mu	0.5993613808886989
+    cout << "should be: " << 0.5993613808886989 << endl;
+    cout << "dNdx(): " << gna << endl;
     cout << "Interpol: " << gna2 << endl;
     cout<<gna/gna2<<endl;
 
