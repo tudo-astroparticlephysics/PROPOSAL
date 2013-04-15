@@ -57,28 +57,31 @@ double dNdx_dNdxRnd(double rnd, double energy){
 
 int main(){
 
-    double energy1;
-    double rnd;
-    double diff;
-
 
     char firstLine[256];
 
     double dEdx_new;
-    double energy;
     double dEdx;
     double ecut = 500;
-    double vcut = 0.05;
+    double vcut = -1;
     string med = "uranium";
     string particleName = "mu";
-    bool lpm = 1;
+    bool lpm = 0;
     int para;
 
     cout.precision(16);
 
+
+    particleName = "mu";
+    ecut = 500;
+    vcut = -1;
+    med = "ice";
+    lpm = 0;
+    double energy = 1E4;
+
     Medium *medium = new Medium(med,1.);
     Particle *particle = new Particle(particleName,1.,1.,1,.20,20,1e5,10);
-    particle->SetEnergy(1000000000);
+    particle->SetEnergy(energy);
     EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
 
     CrossSections *epair= new Epairproduction(particle, medium, cuts);
@@ -87,15 +90,19 @@ int main(){
     double rnd1= 0.9655968558508899;
     double rnd2= 0.0596232083626091;
 
-    double gna = epair->CalculatedNdx();
-    epair->EnableDNdxInterpolation();
-    double gna2 = epair->CalculatedNdx();
+    cout << "should be: " << 5.105934174938547e-07 << endl;
 
-    //500	0.05	1	1000000000	uranium	mu	0.5993613808886989
-    cout << "should be: " << 0.5993613808886989 << endl;
+    double gna = epair->CalculatedNdx(rnd1);
     cout << "dNdx(): " << gna << endl;
+
+    epair->EnableDNdxInterpolation();
+    double gna2 = epair->CalculatedNdx(rnd1);
     cout << "Interpol: " << gna2 << endl;
     cout<<gna/gna2<<endl;
+
+
+
+
 
 
 

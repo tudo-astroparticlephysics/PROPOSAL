@@ -203,12 +203,12 @@ double Epairproduction::CalculatedNdx(double rnd){
     for(int i=0; i<medium_->GetNumCompontents(); i++){
         if(do_dndx_Interpolation_)
         {
-            prob_for_component_.at(i) += max(dndx_interpolant_1d_.at(i)->interpolate(particle_->GetEnergy()), 0.0);
+            prob_for_component_.at(i) = max(dndx_interpolant_1d_.at(i)->interpolate(particle_->GetEnergy()), 0.0);
         }
         else
         {
             SetIntegralLimits(i);
-            prob_for_component_.at(i) += dndx_integral_.at(i)->IntegrateWithLog(vUp_,vMax_, boost::bind(&Epairproduction::FunctionToDNdxIntegral, this, _1),rnd);
+            prob_for_component_.at(i) = dndx_integral_.at(i)->IntegrateWithLog(vUp_,vMax_, boost::bind(&Epairproduction::FunctionToDNdxIntegral, this, _1),rnd);
         }
 
         sum += prob_for_component_.at(i);

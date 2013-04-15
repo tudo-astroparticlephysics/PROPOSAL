@@ -33,7 +33,7 @@ public:
 };
 
 TEST(Epairproduction , Test_of_dEdx ) {
-    //return;
+    return;
     ifstream in;
     in.open("bin/Epair_dEdx.txt");
 
@@ -129,7 +129,7 @@ TEST(Epairproduction , Test_of_dEdx_interpol ) {
 }
 
 TEST(Epairproduction , Test_of_dNdx ) {
-    //return;
+    return;
     ifstream in;
     in.open("bin/Epair_dNdx.txt");
 
@@ -191,7 +191,7 @@ TEST(Epairproduction , Test_of_dNdx ) {
 }
 
 TEST(Epairproduction , Test_of_dNdx_interpol ) {
-    //return;
+    return;
     ifstream in;
     in.open("bin/Epair_dNdx_interpol.txt");
 
@@ -252,7 +252,7 @@ TEST(Epairproduction , Test_of_dNdx_interpol ) {
 }
 
 TEST(Epairproduction , Test_of_dNdxrnd ) {
-    //return;
+    return;
     ifstream in;
     in.open("bin/Epair_dNdxrnd.txt");
 
@@ -267,7 +267,7 @@ TEST(Epairproduction , Test_of_dNdxrnd ) {
     string particleName;
     bool lpm;
 
-    double precision = 1E-1;
+    double precision = 1E-6;
 
     double energy_old;
     bool first = true;
@@ -297,12 +297,15 @@ TEST(Epairproduction , Test_of_dNdxrnd ) {
             epair->GetParticle()->SetEnergy(energy);
             dNdxrnd_new=epair->CalculatedNdx(Rand->rnd());
 
-            if(dNdxrnd!=0)
-                if(log10(fabs(1-dNdxrnd_new/dNdxrnd))>-6)
+            /*
+            if(dNdxrnd!=0){
+                if(log10(fabs(1-dNdxrnd_new/dNdxrnd))>-14)
                 {
                     cout <<ecut << "\t" << vcut<< "\t" << lpm<< "\t" << energy<< "\t" << med<< "\t" << particleName << endl;
                     cout << energy << "\t" << log10(fabs(1-dNdxrnd_new/dNdxrnd)) << endl;
                 }
+            }
+            */
             ASSERT_NEAR(dNdxrnd_new, dNdxrnd, precision*dNdxrnd);
 
             in>>ecut>>vcut>>lpm>>energy>>med>>particleName>>dNdxrnd;
@@ -315,6 +318,75 @@ TEST(Epairproduction , Test_of_dNdxrnd ) {
     }
     delete Rand;
 }
+
+TEST(Epairproduction , Test_of_dNdxrnd_interpol ) {
+    //return;
+    ifstream in;
+    in.open("bin/Epair_dNdxrnd_interpol.txt");
+
+    char firstLine[256];
+    in.getline(firstLine,256);
+    double dNdxrnd_new;
+    double energy;
+    double dNdxrnd;
+    double ecut;
+    double vcut;
+    string med;
+    string particleName;
+    bool lpm;
+
+    double precision = 1E-2;
+
+    double energy_old;
+    bool first = true;
+    RndFromFile* Rand = new RndFromFile("bin/rnd.txt");
+
+    while(in.good())
+    {
+        if(first)in>>ecut>>vcut>>lpm>>energy>>med>>particleName>>dNdxrnd;
+        first = false;
+        energy_old = -1;
+
+        Medium *medium = new Medium(med,1.);
+        Particle *particle = new Particle(particleName,1.,1.,1,.20,20,1e5,10);
+        particle->SetEnergy(energy);
+        EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
+
+        CrossSections *epair = new Epairproduction(particle, medium, cuts);
+
+        epair->EnableLpmEffect(lpm);
+        epair->EnableDNdxInterpolation();
+
+
+        while(energy_old < energy)
+        {
+            energy_old = energy;
+
+            epair->GetParticle()->SetEnergy(energy);
+            dNdxrnd_new=epair->CalculatedNdx(Rand->rnd());
+
+
+            if(dNdxrnd!=0){
+                if(log10(fabs(1-dNdxrnd_new/dNdxrnd))>-6)
+                {
+                    cout <<ecut << "\t" << vcut<< "\t" << lpm<< "\t" << energy<< "\t" << med<< "\t" << particleName << endl;
+                    cout << energy << "\t" << log10(fabs(1-dNdxrnd_new/dNdxrnd)) << endl;
+                }
+            }
+
+            ASSERT_NEAR(dNdxrnd_new, dNdxrnd, precision*dNdxrnd);
+
+            in>>ecut>>vcut>>lpm>>energy>>med>>particleName>>dNdxrnd;
+        }
+
+        delete cuts;
+        delete medium;
+        delete particle;
+        delete epair;
+    }
+    delete Rand;
+}
+
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
