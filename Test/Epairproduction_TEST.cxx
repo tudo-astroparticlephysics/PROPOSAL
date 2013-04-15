@@ -320,7 +320,7 @@ TEST(Epairproduction , Test_of_dNdxrnd ) {
 }
 
 TEST(Epairproduction , Test_of_dNdxrnd_interpol ) {
-    //return;
+    return;
     ifstream in;
     in.open("bin/Epair_dNdxrnd_interpol.txt");
 
@@ -386,6 +386,157 @@ TEST(Epairproduction , Test_of_dNdxrnd_interpol ) {
     }
     delete Rand;
 }
+
+TEST(Epairproduction , Test_of_e ) {
+    return;
+    ifstream in;
+    in.open("bin/Epair_e.txt");
+
+    char firstLine[256];
+    in.getline(firstLine,256);
+    double e_new;
+    double energy;
+    double e;
+    double ecut;
+    double vcut;
+    string med;
+    string particleName;
+    bool lpm;
+
+    double precision = 1E-6;
+
+    double energy_old;
+    bool first = true;
+    RndFromFile* Rand = new RndFromFile("bin/rnd.txt");
+    RndFromFile* Rand2 = new RndFromFile("bin/rnd.txt");
+    Rand2->rnd();
+    double rnd1,rnd2;
+    while(in.good())
+    {
+        if(first)in>>ecut>>vcut>>lpm>>energy>>med>>particleName>>e;
+        first = false;
+        energy_old = -1;
+
+        Medium *medium = new Medium(med,1.);
+        Particle *particle = new Particle(particleName,1.,1.,1,.20,20,1e5,10);
+        particle->SetEnergy(energy);
+        EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
+
+        CrossSections *epair = new Epairproduction(particle, medium, cuts);
+
+        epair->EnableLpmEffect(lpm);
+
+
+        while(energy_old < energy)
+        {
+            energy_old = energy;
+
+            rnd1 = Rand->rnd();
+            rnd2 = Rand2->rnd();
+
+            epair->GetParticle()->SetEnergy(energy);
+            e_new=epair->CalculateStochasticLoss(rnd1,rnd2);
+
+/*
+            if(e!=0){
+                if(log10(fabs(1-e_new/e))>-8)
+                {
+                    cout <<ecut << "\t" << vcut<< "\t" << lpm<< "\t" << energy<< "\t" << med<< "\t" << particleName << endl;
+                    cout << energy << "\t" << log10(fabs(1-e_new/e)) << endl;
+                }
+            }
+*/
+            ASSERT_NEAR(e_new, e, precision*e);
+
+            in>>ecut>>vcut>>lpm>>energy>>med>>particleName>>e;
+        }
+
+        delete cuts;
+        delete medium;
+        delete particle;
+        delete epair;
+    }
+    delete Rand;
+    delete Rand2;
+}
+
+TEST(Epairproduction , Test_of_e_interpol ) {
+    //return;
+    ifstream in;
+    in.open("bin/Epair_e_interpol.txt");
+
+    char firstLine[256];
+    in.getline(firstLine,256);
+    double e_new;
+    double energy;
+    double e;
+    double ecut;
+    double vcut;
+    string med;
+    string particleName;
+    bool lpm;
+
+    double precision = 1E-2;
+
+    double energy_old;
+    bool first = true;
+    RndFromFile* Rand = new RndFromFile("bin/rnd.txt");
+    RndFromFile* Rand2 = new RndFromFile("bin/rnd.txt");
+    Rand2->rnd();
+    double rnd1,rnd2;
+    while(in.good())
+    {
+        if(first)in>>ecut>>vcut>>lpm>>energy>>med>>particleName>>e;
+        first = false;
+        energy_old = -1;
+
+        Medium *medium = new Medium(med,1.);
+        Particle *particle = new Particle(particleName,1.,1.,1,.20,20,1e5,10);
+        particle->SetEnergy(energy);
+        EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
+
+        CrossSections *epair = new Epairproduction(particle, medium, cuts);
+
+        epair->EnableLpmEffect(lpm);
+        cout <<ecut << "\t" << vcut<< "\t" << lpm<< "\t" << energy<< "\t" << med<< "\t" << particleName << endl;
+        epair->EnableDNdxInterpolation();
+        cout << "Interpolation table build!" << endl;
+
+
+        while(energy_old < energy)
+        {
+            energy_old = energy;
+
+            rnd1 = Rand->rnd();
+            rnd2 = Rand2->rnd();
+
+            epair->GetParticle()->SetEnergy(energy);
+            e_new=epair->CalculateStochasticLoss(rnd1,rnd2);
+
+
+            if(e!=0){
+                if(log10(fabs(1-e_new/e))>-14)
+                {
+                    cout <<ecut << "\t" << vcut<< "\t" << lpm<< "\t" << energy<< "\t" << med<< "\t" << particleName << endl;
+                    cout << energy << "\t" << log10(fabs(1-e_new/e)) << endl;
+                }
+            }
+
+            ASSERT_NEAR(e_new, e, precision*e);
+
+            in>>ecut>>vcut>>lpm>>energy>>med>>particleName>>e;
+        }
+
+        delete cuts;
+        delete medium;
+        delete particle;
+        delete epair;
+    }
+    delete Rand;
+    delete Rand2;
+}
+
+
 
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
