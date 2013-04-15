@@ -90,13 +90,14 @@ int main(){
     double rnd1= 0.9655968558508899;
     double rnd2= 0.0596232083626091;
 
-    cout << "should be: " << 5.105934174938547e-07 << endl;
+    cout << "should be: " << 2192.996821337525 << endl;
+    double gna = epair->CalculateStochasticLoss(rnd1,rnd2);
+    cout << "e: " << gna << endl;
 
-    double gna = epair->CalculatedNdx(rnd1);
-    cout << "dNdx(): " << gna << endl;
-
+    cout << "Interpolating..." << endl;
     epair->EnableDNdxInterpolation();
-    double gna2 = epair->CalculatedNdx(rnd1);
+    cout << "should be: " << 2190.419541590142 << endl;
+    double gna2 = epair->CalculateStochasticLoss(rnd1,rnd2);
     cout << "Interpol: " << gna2 << endl;
     cout<<gna/gna2<<endl;
 

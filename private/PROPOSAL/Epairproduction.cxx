@@ -225,6 +225,7 @@ double Epairproduction::CalculateStochasticLoss(){
 //----------------------------------------------------------------------------//
 
 double Epairproduction::CalculateStochasticLoss(double rnd1, double rnd2){
+
     double rand;
     double rsum;
 
@@ -256,7 +257,6 @@ double Epairproduction::CalculateStochasticLoss(double rnd1, double rnd2){
                 component_ = i;
                 return (particle_->GetEnergy())*dndx_integral_.at(i)->GetUpperLimit();
             }
-
         }
     }
 
@@ -269,8 +269,8 @@ double Epairproduction::CalculateStochasticLoss(double rnd1, double rnd2){
     }
     if(prob_for_all_comp_is_zero)return 0;
 
-    cout<<"Error (in BremsStochastic/e): sum was not initialized correctly" << endl;
-    cout<<"ecut: " << cut_settings_->GetEcut() << "\t vcut: " <<  cut_settings_->GetVcut() << "\t energy: " << particle_->GetEnergy() << "\t type: " << particle_->GetName() << endl;
+    cerr<<"Error (in BremsStochastic/e): sum was not initialized correctly" << endl;
+    cerr<<"ecut: " << cut_settings_->GetEcut() << "\t vcut: " <<  cut_settings_->GetVcut() << "\t energy: " << particle_->GetEnergy() << "\t type: " << particle_->GetName() << endl;
     return 0;
 }
 
@@ -285,9 +285,6 @@ void Epairproduction::EnableDNdxInterpolation(){
     for(int i=0; i<(medium_->GetNumCompontents()); i++)
     {
         component_ = i;
-        //cros->get_epairproduction()->get_Stochastic()->interpolateJ_[i]     =   Interpolate(NUM1, e_low, e_hi, NUM1, 0, 1, cros->get_epairproduction()->stochastic_, g, false, false, true, g, false, false, false, g, true, false, false);
-        //cros->get_epairproduction()->get_Stochastic()->interpolateJo_[i]    =   Interpolate(NUM1, e_low, e_hi, cros->get_epairproduction()->stochastic_, g, false, false, true, g, true, false, false);
-
         dndx_interpolant_2d_.at(i) =    new Interpolant(NUM1, particle_->GetLow(), BIGENERGY,  NUM1, 0, 1, boost::bind(&Epairproduction::FunctionToBuildDNdxInterpolant2D, this, _1 , _2), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false, order_of_interpolation_, true, false, false);
         dndx_interpolant_1d_.at(i) =    new Interpolant(NUM1, particle_->GetLow(), BIGENERGY,  boost::bind(&Epairproduction::FunctionToBuildDNdxInterpolant1D, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, true, false, false);
     }
@@ -301,8 +298,6 @@ void Epairproduction::EnableDEdxInterpolation(){
     if(do_dedx_Interpolation_)return;
 
     double energy = particle_->GetEnergy();
-
-                //cros->get_epairproduction()->get_Continuous()->interpolateJ_    =   new Interpolate(NUM1, e_low, e_hi, cros->get_epairproduction()->continuous_, g, true, false, true, g, false, false, false);
 
     dedx_interpolant_ = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, boost::bind(&Epairproduction::FunctionToBuildDEdxInterpolant, this, _1), order_of_interpolation_, true, false, true, order_of_interpolation_, false, false, false);
 
@@ -501,6 +496,7 @@ double Epairproduction::lpm(double r2, double b, double x)
 
 double Epairproduction::EPair(double v, int component)
 {
+
     if(do_dndx_Interpolation_)
     {
         SetIntegralLimits(component);
@@ -546,12 +542,12 @@ double Epairproduction::FunctionToBuildDNdxInterpolant2D(double energy, double v
 
     if(vUp_==vMax_)
     {
-    return 0;
+    return 0.;
     }
 
     v   =   vUp_*exp(v*log(vMax_/vUp_));
 
-    return dndx_integral_.at(component_)->Integrate(vUp_,vMax_, boost::bind(&Epairproduction::FunctionToDNdxIntegral, this, _1),4);
+    return dndx_integral_.at(component_)->Integrate(vUp_,v, boost::bind(&Epairproduction::FunctionToDNdxIntegral, this, _1),4);
 }
 
 double Epairproduction::FunctionToBuildDEdxInterpolant(double energy){

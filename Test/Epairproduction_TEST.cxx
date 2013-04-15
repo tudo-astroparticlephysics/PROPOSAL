@@ -498,10 +498,7 @@ TEST(Epairproduction , Test_of_e_interpol ) {
         CrossSections *epair = new Epairproduction(particle, medium, cuts);
 
         epair->EnableLpmEffect(lpm);
-        cout <<ecut << "\t" << vcut<< "\t" << lpm<< "\t" << energy<< "\t" << med<< "\t" << particleName << endl;
         epair->EnableDNdxInterpolation();
-        cout << "Interpolation table build!" << endl;
-
 
         while(energy_old < energy)
         {
