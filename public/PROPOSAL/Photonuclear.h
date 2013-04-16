@@ -15,6 +15,7 @@ protected:
 
     Integral*   integral_;
     Integral*   integral_for_dEdx_;
+    Interpolant* dedx_interpolant_; //formerly interpolateJ_
 
     Interpolant* interpolant_measured_;
     std::vector<Interpolant*> interpolant_hardBB_;
@@ -186,6 +187,10 @@ public:
 //----------------------------------------------------------------------------//
 
     void EnableDEdxInterpolation();
+
+//----------------------------------------------------------------------------//
+
+    double FunctionToBuildDEdxInterpolant(double energy);
 
 //----------------------------------------------------------------------------//
 
