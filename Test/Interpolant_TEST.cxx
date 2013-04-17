@@ -181,7 +181,7 @@ TEST(_2D_Interpol , Save_To_File ) {
 
 TEST(_2D_Interpol , Load_From_File ) {
     Interpolant* Pol2 = new Interpolant();
-    sleep 10;
+    sleep(10);
     Pol2->Load(File2DTest);
 
     double SearchX = 7;

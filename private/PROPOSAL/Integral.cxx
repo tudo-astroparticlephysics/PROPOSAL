@@ -33,7 +33,9 @@ Integral::Integral()
 ,powerOfSubstitution_    (0)
 ,randomDo_   (false)
 ,useLog_     (false)
+,randomX_(0)
 ,reverse_    (false)
+,savedResult_(0)
 {
     int aux;
     if(romberg_<=0)
@@ -88,7 +90,9 @@ Integral::Integral(int  romberg, int maxSteps, double precision)
 ,powerOfSubstitution_    (0)
 ,randomDo_   (false)
 ,useLog_     (false)
+,randomX_(0)
 ,reverse_    (false)
+,savedResult_(0)
 {
     int aux;
     if(romberg<=0)
@@ -294,7 +298,6 @@ double Integral::Trapezoid3S(int n, double oldSum, int stepNumber)
             }
             randomX_ =   approX;
     }
-
     return oldSum/3+resultSum*stepSize;
 }
 
@@ -866,10 +869,10 @@ void Integral::RefineUpperLimit(double result)
     double deltaX, deltaOld, currentX, aux;
     double xlow, xhi, flow, fhi;
 
-    if(randomNumber_==0 || randomNumber_==1)
-    {
-        return;
-    }
+//    if(randomNumber_==0 || randomNumber_==1)
+//    {
+//        return;
+//    }
 
     xlow    =   min_;
     xhi     =   max_;
@@ -992,38 +995,39 @@ void Integral::RefineUpperLimit(double result)
 
 double Integral::GetUpperLimit()
 {
+
     if(randomDo_)
     {
-            if(fabs(max_-min_)<=fabs(min_)*COMPUTER_PRECISION)
-            {
-                return min_;
-            }
+        if(fabs(max_-min_)<=fabs(min_)*COMPUTER_PRECISION)
+        {
+            return min_;
+        }
 
-            RefineUpperLimit(savedResult_);
+        RefineUpperLimit(savedResult_);
 
-            if(reverse_)
-            {
-                randomX_ =   reverseX_ - randomX_;
-            }
+        if(reverse_)
+        {
+            randomX_ =   reverseX_ - randomX_;
+        }
 
-            if(powerOfSubstitution_>0)
-            {
-                randomX_ =   pow(randomX_, -powerOfSubstitution_);
-            }
-            else if(powerOfSubstitution_<0)
-            {
-                randomX_ =   -pow(-randomX_, powerOfSubstitution_);
-            }
+        if(powerOfSubstitution_>0)
+        {
+            randomX_ =   pow(randomX_, -powerOfSubstitution_);
+        }
+        else if(powerOfSubstitution_<0)
+        {
+            randomX_ =   -pow(-randomX_, powerOfSubstitution_);
+        }
 
-            if(useLog_)
-            {
-                randomX_ =   exp(randomX_);
-            }
+        if(useLog_)
+        {
+            randomX_ =   exp(randomX_);
+        }
 
-            return randomX_;
+        return randomX_;
     }
     else{
-        printf("Error (in Integral/getUpperLimit): no previous call to upper limit functions was made");
+        printf("Error (in Integral/getUpperLimit): no previous call to upper limit functions was made\n");
         return 0;
     }
 }
@@ -1041,6 +1045,7 @@ double Integral::InitIntegralWithLog(double min, double max, boost::function<dou
     {
         SWAP(min,max,double);
         aux =   -1;
+
     }
     else
     {
@@ -1140,7 +1145,6 @@ double Integral::IntegrateWithLog(double min, double max, boost::function<double
 
     savedResult_ =   result;
     randomDo_    =   true;
-
     return aux*result;
 }
 
@@ -1256,42 +1260,72 @@ double Integral::Integrate(double min, double max, boost::function<double (doubl
 //----------------------------------------------------------------------------//
 
 
-double Integral::GetUpperLimit(double min, double max, double integral_value , double rnadomRatio, boost::function<double (double)> integrand)
+double Integral::GetUpperLimit(double min, double max, double integral_value , double randomRatio, boost::function<double (double)> integrand, int method, double powerOfSubstitution)
 {
 
-    this->integrand_    =   integrand;
+    double aux=1;
+    switch (method)
+    {
+        case 1: aux = InitIntegralOpenedAndClosed(min,max,integrand);break;
+        case 2: aux = InitIntegralOpenedAndClosed(min,max,integrand);break;
+        case 3: aux = InitIntegralWithSubstitution(min,max,integrand,powerOfSubstitution);break;
+        case 4: aux = InitIntegralWithLog(min,max,integrand);break;
+        case 5: aux = InitIntegralWithLogSubstitution(min,max,integrand,powerOfSubstitution);break;
+        default: cout <<"Unknown integration method! 0 is returned"<<endl; return 0;
+
+    }
+    if(randomRatio>1)
+    {
+        randomRatio=1;
+    }
 
 
-        if(fabs(max_-min_)<=fabs(min_)*COMPUTER_PRECISION)
+    randomNumber_        =   randomRatio;
+    if(randomNumber_<0)
+    {
+        randomNumber_        /=  -fabs(aux*integral_value);
+
+        if(randomNumber_>1)
         {
-            return min_;
+            randomNumber_    =   1;
         }
 
-        RefineUpperLimit(integral_value);
-
-        if(reverse_)
+        if(randomNumber_<0)
         {
-            randomX_ =   reverseX_ - randomX_;
+            randomNumber_    =   0;
         }
+    }
 
-        if(powerOfSubstitution_>0)
-        {
-            randomX_ =   pow(randomX_, -powerOfSubstitution_);
-        }
-        else if(powerOfSubstitution_<0)
-        {
-            randomX_ =   -pow(-randomX_, powerOfSubstitution_);
-        }
+    if(fabs(max_-min_)<=fabs(min_)*COMPUTER_PRECISION)
+    {
+        return min_;
+    }
 
-        if(useLog_)
-        {
-            randomX_ =   exp(randomX_);
-        }
+    RefineUpperLimit(aux*integral_value);
 
-        return randomX_;
+    if(reverse_)
+    {
+        randomX_ =   reverseX_ - randomX_;
+    }
+
+    if(powerOfSubstitution_>0)
+    {
+        randomX_ =   pow(randomX_, -powerOfSubstitution_);
+    }
+    else if(powerOfSubstitution_<0)
+    {
+        randomX_ =   -pow(-randomX_, powerOfSubstitution_);
+    }
+
+    if(useLog_)
+    {
+        randomX_ =   exp(randomX_);
+    }
+
+    return randomX_;
 
 }
-
+//----------------------------------------------------------------------------//
 
 void Integral::Reset()
 {

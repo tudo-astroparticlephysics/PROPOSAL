@@ -363,7 +363,7 @@ public:
      * \return UpperLimit of Integral
      */
 
-    double GetUpperLimit(double min, double max, double integral_value , double rnadomRatio, boost::function<double (double)> integrand);
+    double GetUpperLimit(double min, double max, double integral_value , double rnadomRatio, boost::function<double (double)> integrand, int mehtod, double powerOfSubstitution=0);
 
 //----------------------------------------------------------------------------//
     /*!
@@ -400,21 +400,36 @@ public:
     ~Integral();
 
 // Getters
-
-    int GetRomberg(){
+//----------------------------------------------------------------------------//
+    int GetRomberg()const
+    {
         return romberg_;
     }
-
-    double Get_maxSteps ()
+//----------------------------------------------------------------------------//
+    double Get_maxSteps()const
     {
         return maxSteps_;
     }
-
+//----------------------------------------------------------------------------//
     double GetUseLog () const
     {
         return useLog_;
     }
-
+//----------------------------------------------------------------------------//
+    double GetRandomX () const
+    {
+        return randomX_;
+    }
+//----------------------------------------------------------------------------//
+    double GetMin () const
+    {
+        return min_;
+    }
+//----------------------------------------------------------------------------//
+    double GetMax () const
+    {
+        return max_;
+    }
 // Setters
 
     void Set_Function(boost::function<double (double)> integrand)
