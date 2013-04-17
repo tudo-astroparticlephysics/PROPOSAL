@@ -184,6 +184,47 @@ double Ionization::CalculateStochasticLoss(double rnd1, double rnd2){
 
 //----------------------------------------------------------------------------//
 
+double Ionization::CalculateStochasticLossNew(double rnd1, double rnd2){
+    double rand, rsum;
+
+    double sum = this->CalculatedNdx();
+
+    rand=medium_->GetSumCharge()*rnd2;
+    rsum=0;
+
+    Integral* get_upper_integral = new Integral(IROMB, IMAXS, IPREC);
+
+
+    for(int i=0; i<medium_->GetNumCompontents(); i++){
+        rsum+=medium_->GetAtomInMolecule().at(i)* medium_->GetNucCharge().at(i);
+
+        if(rsum>rand){
+
+            if(do_dndx_Interpolation_)
+            {
+                SetIntegralLimits(0);
+                if(vUp_==vMax_){
+                    return particle_->GetEnergy()*vUp_;
+                }
+                return particle_->GetEnergy()*(vUp_*exp(dndx_interpolant_2d_->findLimit(particle_->GetEnergy(), rnd1*sum)*log(vMax_/vUp_)));
+            }
+            else
+            {
+                cout<<"GETRANDOMX::::::::::: "<<integral_->GetRandomX()<<endl;
+                get_upper_integral->SetRandomX( integral_->GetRandomX());
+                SetIntegralLimits(0);
+                return particle_->GetEnergy()*get_upper_integral->GetUpperLimit(vUp_,vMax_,sum, rnd1,boost::bind(&Ionization::FunctionToDNdxIntegral, this, _1),3,1);
+            }
+        }
+    }
+
+    cerr<<"Error (in IonizStochastic/e): m.totZ was not initialized correctly"<<endl;
+        return 0;
+}
+
+//----------------------------------------------------------------------------//
+
+
 void Ionization::EnableDNdxInterpolation(){
     double energy = particle_->GetEnergy();
 

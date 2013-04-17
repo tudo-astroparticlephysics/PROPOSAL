@@ -15,10 +15,16 @@ protected:
 
     Integral*   integral_;
     Integral*   integral_for_dEdx_;
+    std::vector<Integral*>    dndx_integral_;
+
     Interpolant* dedx_interpolant_; //formerly interpolateJ_
 
     Interpolant* interpolant_measured_;
     std::vector<Interpolant*> interpolant_hardBB_;
+    std::vector<Interpolant*> dndx_interpolant_1d_; //Stochastic dNdx()
+    std::vector<Interpolant*> dndx_interpolant_2d_; //Stochastic dNdx()
+
+    std::vector<double> prob_for_component_; //!< probability for each medium component to interact with the particle (formerly H_)
 
     double KokoulinParametrization(double v, int i);
     double RhodeParametrization(double v, int i);
@@ -202,6 +208,12 @@ public:
 
 //----------------------------------------------------------------------------//
 
+    double FunctionToBuildDNdxInterpolant1D(double energy);
+
+//----------------------------------------------------------------------------//
+    double FunctionToBuildDNdxInterpolant2D(double energy, double v);
+
+//----------------------------------------------------------------------------//
     ~Photonuclear(){}
 
 };

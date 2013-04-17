@@ -262,6 +262,7 @@ double Bremsstrahlung::CalculateStochasticLossNew(double rnd1, double rnd2){
     double sum = this->CalculatedNdx();
     rand    =   rnd2*sum;
     rsum    =   0;
+    cout<<"POINTER-----------------"<<get_upper_integral<<endl;
 
     for(int i=0; i<(medium_->GetNumCompontents()); i++)
     {

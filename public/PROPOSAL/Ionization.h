@@ -28,7 +28,6 @@ protected:
     void SetIntegralLimits(int component);
 
 //----------------------------------------------------------------------------//
-
     /*!
      * \brief inelastic electron bremsstrahlung correction to
      * dEdx - Interface to Integral:
@@ -137,6 +136,10 @@ public:
 //----------------------------------------------------------------------------//
 
     double CalculateStochasticLoss(double rnd1, double rnd2);
+
+//----------------------------------------------------------------------------//
+
+    double CalculateStochasticLossNew(double rnd1, double rnd2);
 
 //----------------------------------------------------------------------------//
 

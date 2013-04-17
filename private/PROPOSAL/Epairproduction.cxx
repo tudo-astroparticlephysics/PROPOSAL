@@ -269,7 +269,7 @@ double Epairproduction::CalculateStochasticLoss(double rnd1, double rnd2){
     }
     if(prob_for_all_comp_is_zero)return 0;
 
-    cerr<<"Error (in BremsStochastic/e): sum was not initialized correctly" << endl;
+    cerr<<"Error (in Epairproduction/e): sum was not initialized correctly" << endl;
     cerr<<"ecut: " << cut_settings_->GetEcut() << "\t vcut: " <<  cut_settings_->GetVcut() << "\t energy: " << particle_->GetEnergy() << "\t type: " << particle_->GetName() << endl;
     return 0;
 }

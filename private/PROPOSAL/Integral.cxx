@@ -298,6 +298,7 @@ double Integral::Trapezoid3S(int n, double oldSum, int stepNumber)
             }
             randomX_ =   approX;
     }
+    cout<<"APPROX:::::: "<<approX<<endl;
     return oldSum/3+resultSum*stepSize;
 }
 
@@ -898,7 +899,7 @@ void Integral::RefineUpperLimit(double result)
     {
         randomX_ =   (min_ + max_)/2;
     }
-
+    cout<<"IN REFINE:::::RANDOMXXXXXXXXXXXXXXXXXXX "<<randomX_<<endl;
     currentX        =   randomX_;
     rombergStore    =   romberg_;
     minStore        =   min_;
@@ -1009,6 +1010,7 @@ double Integral::GetUpperLimit()
         {
             randomX_ =   reverseX_ - randomX_;
         }
+        cout<<"ALT:::::RANDOMXXXXXXXXXXXXXXXXX = "<<randomX_<<endl;
 
         if(powerOfSubstitution_>0)
         {
@@ -1307,7 +1309,7 @@ double Integral::GetUpperLimit(double min, double max, double integral_value , d
     {
         randomX_ =   reverseX_ - randomX_;
     }
-
+    cout<<"NEU:::::RANDOMXXXXXXXXXXXXXXXXX = "<<randomX_<<endl;
     if(powerOfSubstitution_>0)
     {
         randomX_ =   pow(randomX_, -powerOfSubstitution_);
@@ -1332,6 +1334,11 @@ void Integral::Reset()
     useLog_   = false;
     //reverse_  = false;
     //randomDo_ = false;
+}
+//----------------------------------------------------------------------------//
+void Integral::SetRandomX(double rand){
+    randomX_ =rand;
+
 }
 
 Integral::~Integral()

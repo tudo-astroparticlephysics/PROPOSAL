@@ -119,30 +119,35 @@ int main(){
 
     double neu;
     double alt;
-Bremsstrahlung *brems= new Bremsstrahlung(particle, medium, cuts);
-for(int k =0; k<1000;k++)
-{
-for( int i =1; i<11;i++)
-{
-     for(int j =1; j<11;j++)
-     {
-         energy=120 * pow(10,k/100.);
-         brems->GetParticle()->SetEnergy(energy);
-        rnd1=1./i;
-        rnd2 =1./j;
 
-        brems->CalculatedNdx(rnd1);
-        neu=brems->CalculateStochasticLossNew(rnd1, rnd2);
 
-        alt=brems->CalculateStochasticLoss(rnd1, rnd2);
-        if(fabs((alt-neu)/alt)>1e-5)
-        cout<<rnd1<<"\t"<<rnd2<<"--\t "<<alt<<"\t "<<neu<<"\t"<<(alt-neu)/alt<<"\t--"<<endl;
-        //cout<<alt<<endl;
-        //cout<<neu<<endl;
+    //Bremsstrahlung *brems= new Bremsstrahlung(particle, medium, cuts);
+    Ionization *brems = new Ionization(particle, medium, cuts);
 
-     }
-}
-}
+
+    for(int k =0; k<1000;k++)
+    {
+    for( int i =1; i<11;i++)
+    {
+         for(int j =1; j<11;j++)
+         {
+            energy=120 * pow(10,k/100.);
+            brems->GetParticle()->SetEnergy(energy);
+            rnd1=1./i;
+            rnd2 =1./j;
+
+            //brems->CalculatedNdx(rnd1);
+            neu=brems->CalculateStochasticLossNew(rnd1, rnd2);
+
+            alt=brems->CalculateStochasticLoss(rnd1, rnd2);
+            if(fabs((alt-neu)/alt)>1e-5)
+            cout<<rnd1<<"\t"<<rnd2<<"--\t "<<alt<<"\t "<<neu<<"\t"<<(alt-neu)/alt<<"\t--"<<endl;
+            //cout<<alt<<endl;
+            //cout<<neu<<endl;
+
+         }
+    }
+    }
 
 
 

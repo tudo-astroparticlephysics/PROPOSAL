@@ -8,6 +8,11 @@ Photonuclear::Photonuclear()
     ,init_hardbb_(true)
     ,hmax_(8)
     ,v_(0)
+    ,dndx_integral_()
+    ,interpolant_hardBB_()
+    ,dndx_interpolant_1d_()
+    ,dndx_interpolant_2d_()
+    ,prob_for_component_()
 {
     shadow_ =   1;
     bb_     =   1;
@@ -36,6 +41,11 @@ Photonuclear::Photonuclear(Particle* particle,
     ,init_hardbb_(true)
     ,hmax_(8)
     ,v_(0)
+    ,dndx_integral_()
+    ,interpolant_hardBB_()
+    ,dndx_interpolant_1d_()
+    ,dndx_interpolant_2d_()
+    ,prob_for_component_()
 {
     particle_                   = particle;
     medium_                     = medium;
@@ -112,12 +122,61 @@ double Photonuclear::CalculatedEdx()
 //----------------------------------------------------------------------------//
 
 double Photonuclear::CalculatedNdx(){
-    return 0;
+
+
+    if(multiplier_<=0)
+    {
+        return 0;
+    }
+
+    double sum    =   0;
+
+    for(int i=0; i<medium_->GetNumCompontents(); i++)
+    {
+
+        if(do_dndx_Interpolation_)
+        {
+            sum    +=  max(dndx_interpolant_1d_.at(i)->interpolate(particle_->GetEnergy()), 0.0);
+        }
+        else
+        {
+            SetIntegralLimits(i);
+            sum    +=  dndx_integral_.at(i)->Integrate(vUp_, vMax_, boost::bind(&Photonuclear::FunctionToDNdxIntegral, this, _1),4);
+        }
+    }
+
+    return sum;
+
 }
 //----------------------------------------------------------------------------//
 
 double Photonuclear::CalculatedNdx(double rnd){
-    return 0;
+
+    if(multiplier_<=0)
+    {
+        return 0.;
+    }
+
+
+    double sum    =   0;
+
+    for(int i=0; i<medium_->GetNumCompontents(); i++)
+    {
+
+        if(do_dndx_Interpolation_)
+        {
+            prob_for_component_.at(i) = max(dndx_interpolant_1d_.at(i)->interpolate(particle_->GetEnergy()), 0.0);
+        }
+        else
+        {
+            SetIntegralLimits(i);
+            prob_for_component_.at(i) = dndx_integral_.at(i)->IntegrateWithLog(vUp_,vMax_, boost::bind(&Photonuclear::FunctionToDNdxIntegral, this, _1),rnd);
+        }
+
+        sum    +=  prob_for_component_.at(i);
+    }
+
+    return sum;
 }
 //----------------------------------------------------------------------------//
 
@@ -127,13 +186,73 @@ double Photonuclear::CalculateStochasticLoss(){
 //----------------------------------------------------------------------------//
 
 double Photonuclear::CalculateStochasticLoss(double rnd1, double rnd2){
+
+    double rand;
+    double rsum;
+
+    //double rnd_ = rnd1;
+    double sum = this->CalculatedNdx(rnd1);
+    rand    =   rnd2*sum;
+    rsum    =   0;
+
+
+    for(int i=0; i<(medium_->GetNumCompontents()); i++)
+    {
+        rsum    += prob_for_component_.at(i);
+        if(rsum > rand)
+        {
+            if(do_dndx_Interpolation_)
+            {
+                SetIntegralLimits(i);
+
+                if(vUp_==vMax_)
+                {
+                    return (particle_->GetEnergy())*vUp_;
+                }
+
+                return particle_->GetEnergy()*(vUp_*exp(dndx_interpolant_2d_.at(i)->findLimit((particle_->GetEnergy()), (rnd1)*prob_for_component_.at(i))*log(vMax_/vUp_)));
+
+            }
+            else
+            {
+                component_ = i;
+                return (particle_->GetEnergy())*dndx_integral_.at(i)->GetUpperLimit();
+
+            }
+        }
+    }
+    bool prob_for_all_comp_is_zero=true;
+    for(int i=0; i<(medium_->GetNumCompontents()); i++)
+    {
+        SetIntegralLimits(i);
+        if(vUp_!=vMax_)prob_for_all_comp_is_zero=false;
+    }
+    if(prob_for_all_comp_is_zero)return 0;
+
+    cerr<<"Error (in Photonuclear/e): sum was not initialized correctly";
+    cerr<<"ecut: " << cut_settings_->GetEcut() << "\t vcut: " <<  cut_settings_->GetVcut() << "\t energy: " << particle_->GetEnergy() << "\t type: " << particle_->GetName() << endl;
     return 0;
 }
 
 //----------------------------------------------------------------------------//
 
 void Photonuclear::EnableDNdxInterpolation(){
+
+    if(do_dndx_Interpolation_)return;
+
+    double energy = particle_->GetEnergy();
+    dndx_interpolant_1d_.resize(medium_->GetNumCompontents());
+    dndx_interpolant_2d_.resize(medium_->GetNumCompontents());
+    for(int i=0; i<(medium_->GetNumCompontents()); i++)
+    {
+        component_ = i;
+        dndx_interpolant_2d_.at(i) =    new Interpolant(NUM1, particle_->GetLow(), BIGENERGY,  NUM1, 0, 1, boost::bind(&Photonuclear::FunctionToBuildDNdxInterpolant2D, this, _1 , _2), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false, order_of_interpolation_, true, false, false);
+        dndx_interpolant_1d_.at(i) =    new Interpolant(NUM1, particle_->GetLow(), BIGENERGY,  boost::bind(&Photonuclear::FunctionToBuildDNdxInterpolant1D, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, true, false, false);
+    }
+    particle_->SetEnergy(energy);
+
     do_dndx_Interpolation_=true;
+
 }
 //----------------------------------------------------------------------------//
 
@@ -168,7 +287,7 @@ double Photonuclear::FunctionToDEdxIntegral(double variable){
 //----------------------------------------------------------------------------//
 
 double Photonuclear::FunctionToDNdxIntegral(double variable){
-    return 0;
+    return multiplier_*PhotoN(variable, component_);
 }
 //----------------------------------------------------------------------------//
 
@@ -1011,3 +1130,27 @@ double Photonuclear::FunctionToBuildDEdxInterpolant(double energy)
     particle_->SetEnergy(energy);
     return CalculatedEdx();
 }
+
+//----------------------------------------------------------------------------//
+
+double Photonuclear::FunctionToBuildDNdxInterpolant1D(double energy){
+    return dndx_interpolant_2d_.at(component_)->interpolate(energy, 1.);
+
+}
+
+//----------------------------------------------------------------------------//
+double Photonuclear::FunctionToBuildDNdxInterpolant2D(double energy, double v){
+
+    particle_->SetEnergy(energy);
+    SetIntegralLimits(component_);
+    if(vUp_==vMax_)
+    {
+        return 0;
+    }
+
+    v   =   vUp_*exp(v*log(vMax_/vUp_));
+
+    return dndx_integral_.at(component_)->Integrate(vUp_, v, boost::bind(&Photonuclear::FunctionToDNdxIntegral, this, _1) ,4);
+}
+
+//----------------------------------------------------------------------------//

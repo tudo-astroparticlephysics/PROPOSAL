@@ -391,7 +391,7 @@ public:
 
     void Reset();
 
-
+    void SetRandomX(double rand);
 
 
 /*!
