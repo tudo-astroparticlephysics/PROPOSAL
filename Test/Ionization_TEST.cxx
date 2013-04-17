@@ -440,10 +440,10 @@ TEST(Ionization , Test_of_e_interpol ) {
             e_new=ioniz->CalculateStochasticLoss(rnd1,rnd2);
 
             if(e!=0)if(log10(fabs(1-e_new/e))>-3){
-                cout<< "\t" << ecut<< "\t" << vcut << "\t" << energy<< "\t" << med<< "\t" << particleName<<endl;
-                cout << log10(fabs(1-e_new/e)) << endl;
+//                cout<< "\t" << ecut<< "\t" << vcut << "\t" << energy<< "\t" << med<< "\t" << particleName<<endl;
+//                cout << log10(fabs(1-e_new/e)) << endl;
             }
-            //cout << "rnd1: " << rnd1 << "\t rnd2: " << rnd2 << endl;
+
             ASSERT_NEAR(e_new, e, precision*e);
 
             in>>ecut>>vcut>>energy>>med>>particleName>>e;
