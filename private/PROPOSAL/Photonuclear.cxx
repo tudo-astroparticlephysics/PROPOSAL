@@ -19,6 +19,14 @@ Photonuclear::Photonuclear()
 
     integral_             = new Integral(IROMB, IMAXS, IPREC);
     integral_for_dEdx_    = new Integral(IROMB, IMAXS, IPREC);
+
+    dndx_integral_.resize(medium_->GetNumCompontents());
+
+    for(int i =0 ; i<medium_->GetNumCompontents();i++){
+        dndx_integral_.at(i) = new Integral(IROMB, IMAXS, IPREC);
+    }
+
+    prob_for_component_.resize(medium_->GetNumCompontents());
 }
 //----------------------------------------------------------------------------//
 
@@ -57,6 +65,14 @@ Photonuclear::Photonuclear(Particle* particle,
 
     integral_             = new Integral(IROMB, IMAXS, IPREC);
     integral_for_dEdx_    = new Integral(IROMB, IMAXS, IPREC);
+
+    dndx_integral_.resize(medium_->GetNumCompontents());
+
+    for(int i =0 ; i<medium_->GetNumCompontents();i++){
+        dndx_integral_.at(i) = new Integral(IROMB, IMAXS, IPREC);
+    }
+
+    prob_for_component_.resize(medium_->GetNumCompontents());
 
 }
 

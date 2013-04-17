@@ -136,12 +136,12 @@ IF(DoTesting)
   execute_process(COMMAND  tar -xvf ${PROJECT_SOURCE_DIR}/Test/TestFiles.tar.Z -C ${PROPOSAL_BINARY_DIR}/bin/
                     OUTPUT_VARIABLE _output OUTPUT_STRIP_TRAILING_WHITESPACE)
 
+  add_executable(UnitTest_Photonuclear Test/Photonuclear_TEST.cxx)
   add_executable(UnitTest_Integral Test/Integral_TEST.cxx)
   add_executable(UnitTest_Interpolant Test/Interpolant_TEST.cxx)
   add_executable(UnitTest_Bremsstrahlung Test/Bremsstrahlung_TEST.cxx)
   add_executable(UnitTest_Epairproduction Test/Epairproduction_TEST.cxx)
   add_executable(UnitTest_Ionization Test/Ionization_TEST.cxx)
-  add_executable(UnitTest_Photonuclear Test/Photonuclear_TEST.cxx)
 
   target_link_libraries(UnitTest_Integral PROPOSAL gtest gtest_main)
   target_link_libraries(UnitTest_Interpolant PROPOSAL gtest gtest_main)
@@ -150,11 +150,11 @@ IF(DoTesting)
   target_link_libraries(UnitTest_Ionization PROPOSAL gtest gtest_main)
   target_link_libraries(UnitTest_Photonuclear PROPOSAL gtest gtest_main)
 
+  add_test(UnitTest_Photonuclear bin/UnitTest_Photonuclear)
   add_test(UnitTest_Integral bin/UnitTest_Integral)
   add_test(UnitTest_Interpolant bin/UnitTest_Interpolant)
   add_test(UnitTest_Bremsstrahlung bin/UnitTest_Bremsstrahlung)
   add_test(UnitTest_Epairproduction bin/UnitTest_Epairproduction)
   add_test(UnitTest_Ionization bin/UnitTest_Ionization)
-  add_test(UnitTest_Photonuclear bin/UnitTest_Photonuclear)
 
 ENDIF()

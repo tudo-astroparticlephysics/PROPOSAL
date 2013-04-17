@@ -140,7 +140,7 @@ int main(){
             neu=brems->CalculateStochasticLossNew(rnd1, rnd2);
 
             alt=brems->CalculateStochasticLoss(rnd1, rnd2);
-            if(fabs((alt-neu)/alt)>1e-5)
+            if(alt==alt && fabs((alt-neu)/alt)>1e-5)
             cout<<rnd1<<"\t"<<rnd2<<"--\t "<<alt<<"\t "<<neu<<"\t"<<(alt-neu)/alt<<"\t--"<<endl;
             //cout<<alt<<endl;
             //cout<<neu<<endl;
