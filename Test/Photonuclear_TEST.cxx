@@ -309,7 +309,7 @@ TEST(Photonuclear , Test_of_dEdx ) {
         in>>para>>bb>>shadow>>ecut>>vcut>>energy>>med>>particleName>>dEdx;
         energy_old = -1;
         i++;
-        if(i%100==0)cout<< i<<endl;
+        if(i%10==0)cout<< i<<endl;
         while(energy_old < energy)
         {
             energy_old = energy;
@@ -356,7 +356,7 @@ TEST(Photonuclear , Test_of_dEdx_interpol ) {
 
 
         i++;
-        if(i%100==0)cout<< i<<endl;
+        if(i%10==0)cout<< i<<endl;
 
         CombOfPhoto.at(i)->EnableDEdxInterpolation();
         while(energy_old < energy)
@@ -405,7 +405,7 @@ TEST(Photonuclear , Test_of_dNdx_interpol ) {
         energy_old = -1;
 
         i++;
-        if(i%100==0)cout<< i<<endl;
+        if(i%10==0)cout<< i<<endl;
 
         CombOfPhoto.at(i)->EnableDNdxInterpolation();
 
@@ -462,7 +462,7 @@ TEST(Photonuclear , Test_of_dNdxrnd_interpol ) {
         energy_old = -1;
 
         i++;
-        if(i%100==0)cout<< i<<endl;
+        if(i%10==0)cout<< i<<endl;
 
         CombOfPhoto.at(i)->EnableDNdxInterpolation();
         while(energy_old < energy)
@@ -523,7 +523,7 @@ TEST(Photonuclear , Test_of_e_interpol ) {
         energy_old = -1;
 
         i++;
-        if(i%100==0)cout<< i<<endl;
+        if(i%10==0)cout<< i<<endl;
 
         CombOfPhoto.at(i)->EnableDNdxInterpolation();
 
