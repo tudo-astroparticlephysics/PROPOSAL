@@ -35,7 +35,10 @@ public:
 TEST(StandardNormal , StandardNormalRandomNumber ) {
 
     ifstream in;
-    in.open("bin/StandardNormal.txt");
+    in.open("bin/TestFiles/StandardNormal.txt");
+
+    char firstLine[256];
+    in.getline(firstLine,256);
 
     double rnd;
     double average;
@@ -49,14 +52,14 @@ TEST(StandardNormal , StandardNormalRandomNumber ) {
     cout.precision(16);
 
     StandardNormal *normal = new StandardNormal(IROMB, IMAXS, IPREC);
-    RndFromFile* Rand = new RndFromFile("bin/rnd.txt");
+    RndFromFile* Rand = new RndFromFile("bin/TestFiles/rnd.txt");
 
     while(in.good())
     {
         rnd = Rand->rnd();
 
         in>>cutoff>>average>>sigma>>xmin>>xmax>>StandardNormalRnd;
-
+cout<<StandardNormalRnd<<endl;
         StandardNormalRnd_new = normal->StandardNormalRandomNumber(rnd,average,sigma,xmin,xmax,cutoff);
 
         ASSERT_NEAR(StandardNormalRnd_new, StandardNormalRnd, 1e-7*StandardNormalRnd);
@@ -67,7 +70,10 @@ TEST(StandardNormal , StandardNormalRandomNumber ) {
 TEST(StandardNormal , StandardNormalRandomNumber_interpol ) {
 
     ifstream in;
-    in.open("bin/StandardNormal_interpol.txt");
+    in.open("bin/TestFiles/StandardNormal_interpol.txt");
+
+    char firstLine[256];
+    in.getline(firstLine,256);
 
     double rnd;
     double average;
@@ -82,7 +88,7 @@ TEST(StandardNormal , StandardNormalRandomNumber_interpol ) {
 
     StandardNormal *normal = new StandardNormal(IROMB, IMAXS, IPREC);
     normal->EnableInterpolation();
-    RndFromFile* Rand = new RndFromFile("bin/rnd.txt");
+    RndFromFile* Rand = new RndFromFile("bin/TestFiles/rnd.txt");
 
     while(in.good())
     {

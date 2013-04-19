@@ -35,7 +35,7 @@ public:
 TEST(Ionization , Test_of_dEdx ) {
 
     ifstream in;
-    in.open("bin/Ioniz_dEdx.txt");
+    in.open("bin/TestFiles/Ioniz_dEdx.txt");
 
     char firstLine[256];
     in.getline(firstLine,256);
@@ -74,7 +74,7 @@ TEST(Ionization , Test_of_dEdx ) {
 TEST(Ionization , Test_of_dNdx ) {
 
     ifstream in;
-    in.open("bin/Ioniz_dNdx.txt");
+    in.open("bin/TestFiles/Ioniz_dNdx.txt");
 
     char firstLine[256];
     in.getline(firstLine,256);
@@ -114,7 +114,7 @@ TEST(Ionization , Test_of_dNdx ) {
 TEST(Ionization , Test_of_dNdxrnd ) {
 
     ifstream in;
-    in.open("bin/Ioniz_dNdxrnd.txt");
+    in.open("bin/TestFiles/Ioniz_dNdxrnd.txt");
 
     char firstLine[256];
     in.getline(firstLine,256);
@@ -132,7 +132,7 @@ TEST(Ionization , Test_of_dNdxrnd ) {
     cout.precision(16);
     double energy_old=-1;
 
-    RndFromFile* Rand = new RndFromFile("bin/rnd.txt");
+    RndFromFile* Rand = new RndFromFile("bin/TestFiles/rnd.txt");
 
     bool first = true;
     while(in.good())
@@ -170,7 +170,7 @@ TEST(Ionization , Test_of_dNdxrnd ) {
 TEST(Ionization , Test_of_e ) {
 
     ifstream in;
-    in.open("bin/Ioniz_e.txt");
+    in.open("bin/TestFiles/Ioniz_e.txt");
 
     char firstLine[256];
     in.getline(firstLine,256);
@@ -186,8 +186,8 @@ TEST(Ionization , Test_of_e ) {
 
     double precision = 1E-8;
 
-    RndFromFile* Rand = new RndFromFile("bin/rnd.txt");
-    RndFromFile* Rand2 = new RndFromFile("bin/rnd.txt");
+    RndFromFile* Rand = new RndFromFile("bin/TestFiles/rnd.txt");
+    RndFromFile* Rand2 = new RndFromFile("bin/TestFiles/rnd.txt");
     Rand2->rnd();
 
     double rnd1,rnd2;
@@ -229,7 +229,7 @@ TEST(Ionization , Test_of_e ) {
 TEST(Ionization , Test_of_dEdx_Interpolant ) {
 
     ifstream in;
-    in.open("bin/Ioniz_dEdx_interpol.txt");
+    in.open("bin/TestFiles/Ioniz_dEdx_interpol.txt");
 
     char firstLine[256];
     in.getline(firstLine,256);
@@ -282,7 +282,7 @@ TEST(Ionization , Test_of_dEdx_Interpolant ) {
 TEST(Ionization , Test_of_dNdx_Interpolant ) {
 
     ifstream in;
-    in.open("bin/Ioniz_dNdx_interpol.txt");
+    in.open("bin/TestFiles/Ioniz_dNdx_interpol.txt");
 
     char firstLine[256];
     in.getline(firstLine,256);
@@ -335,7 +335,7 @@ TEST(Ionization , Test_of_dNdx_Interpolant ) {
 TEST(Ionization , Test_of_dNdxrnd_interpol ) {
 
     ifstream in;
-    in.open("bin/Ioniz_dNdxrnd_interpol.txt");
+    in.open("bin/TestFiles/Ioniz_dNdxrnd_interpol.txt");
 
     char firstLine[256];
     in.getline(firstLine,256);
@@ -351,7 +351,7 @@ TEST(Ionization , Test_of_dNdxrnd_interpol ) {
     cout.precision(16);
     double energy_old=-1;
 
-    RndFromFile* Rand = new RndFromFile("bin/rnd.txt");
+    RndFromFile* Rand = new RndFromFile("bin/TestFiles/rnd.txt");
 
     bool first = true;
     while(in.good())
@@ -391,7 +391,7 @@ TEST(Ionization , Test_of_dNdxrnd_interpol ) {
 TEST(Ionization , Test_of_e_interpol ) {
 
     ifstream in;
-    in.open("bin/Ioniz_e_interpol.txt");
+    in.open("bin/TestFiles/Ioniz_e_interpol.txt");
 
     char firstLine[256];
     in.getline(firstLine,256);
@@ -407,8 +407,8 @@ TEST(Ionization , Test_of_e_interpol ) {
 
     double precision = 1E-2;
 
-    RndFromFile* Rand = new RndFromFile("bin/rnd.txt");
-    RndFromFile* Rand2 = new RndFromFile("bin/rnd.txt");
+    RndFromFile* Rand = new RndFromFile("bin/TestFiles/rnd.txt");
+    RndFromFile* Rand2 = new RndFromFile("bin/TestFiles/rnd.txt");
     Rand2->rnd();
 
     double rnd1,rnd2;

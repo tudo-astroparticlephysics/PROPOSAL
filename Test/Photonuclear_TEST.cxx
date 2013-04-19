@@ -45,7 +45,7 @@ std::vector<CrossSections*>         CombOfPhoto;
 
 TEST(Photonuclear , Set_Up ) {
     ifstream in;
-    in.open("bin/Photo_dEdx.txt");
+    in.open("bin/TestFiles/Photo_dEdx.txt");
 
     char firstLine[256];
     in.getline(firstLine,256);
@@ -104,7 +104,7 @@ TEST(Photonuclear , Set_Up ) {
 
 TEST(Photonuclear , Test_of_e ) {
     ifstream in;
-    in.open("bin/Photo_e.txt");
+    in.open("bin/TestFiles/Photo_e.txt");
 
     char firstLine[256];
     in.getline(firstLine,256);
@@ -122,8 +122,8 @@ TEST(Photonuclear , Test_of_e ) {
 
     double energy_old;
     bool first = true;
-    RndFromFile* Rand = new RndFromFile("bin/rnd.txt");
-    RndFromFile* Rand2 = new RndFromFile("bin/rnd.txt");
+    RndFromFile* Rand = new RndFromFile("bin/TestFiles/rnd.txt");
+    RndFromFile* Rand2 = new RndFromFile("bin/TestFiles/rnd.txt");
     Rand2->rnd();
     double rnd1,rnd2;
     int i = -1;
@@ -171,7 +171,7 @@ TEST(Photonuclear , Test_of_e ) {
 
 TEST(Photonuclear , Test_of_dNdxrnd ) {
     ifstream in;
-    in.open("bin/Photo_dNdxrnd.txt");
+    in.open("bin/TestFiles/Photo_dNdxrnd.txt");
 
     char firstLine[256];
     in.getline(firstLine,256);
@@ -189,7 +189,7 @@ TEST(Photonuclear , Test_of_dNdxrnd ) {
 
     double energy_old;
     bool first = true;
-    RndFromFile* Rand = new RndFromFile("bin/rnd.txt");
+    RndFromFile* Rand = new RndFromFile("bin/TestFiles/rnd.txt");
 
     int i=-1;
     while(in.good())
@@ -230,7 +230,7 @@ TEST(Photonuclear , Test_of_dNdxrnd ) {
 
 TEST(Photonuclear , Test_of_dNdx ) {
     ifstream in;
-    in.open("bin/Photo_dNdx.txt");
+    in.open("bin/TestFiles/Photo_dNdx.txt");
 
     char firstLine[256];
     in.getline(firstLine,256);
@@ -285,7 +285,7 @@ TEST(Photonuclear , Test_of_dNdx ) {
 
 TEST(Photonuclear , Test_of_dEdx ) {
     ifstream in;
-    in.open("bin/Photo_dEdx.txt");
+    in.open("bin/TestFiles/Photo_dEdx.txt");
 
     char firstLine[256];
     in.getline(firstLine,256);
@@ -329,7 +329,7 @@ TEST(Photonuclear , Test_of_dEdx ) {
 
 TEST(Photonuclear , Test_of_dEdx_interpol ) {
     ifstream in;
-    in.open("bin/Photo_dEdx_interpol.txt");
+    in.open("bin/TestFiles/Photo_dEdx_interpol.txt");
 
     char firstLine[256];
     in.getline(firstLine,256);
@@ -378,7 +378,7 @@ TEST(Photonuclear , Test_of_dEdx_interpol ) {
 TEST(Photonuclear , Test_of_dNdx_interpol ) {
     //return;
     ifstream in;
-    in.open("bin/Photo_dNdx_interpol.txt");
+    in.open("bin/TestFiles/Photo_dNdx_interpol.txt");
 
     char firstLine[256];
     in.getline(firstLine,256);
@@ -434,7 +434,7 @@ TEST(Photonuclear , Test_of_dNdx_interpol ) {
 
 TEST(Photonuclear , Test_of_dNdxrnd_interpol ) {
     ifstream in;
-    in.open("bin/Photo_dNdxrnd_interpol.txt");
+    in.open("bin/TestFiles/Photo_dNdxrnd_interpol.txt");
 
     char firstLine[256];
     in.getline(firstLine,256);
@@ -452,7 +452,7 @@ TEST(Photonuclear , Test_of_dNdxrnd_interpol ) {
 
     double energy_old;
     bool first = true;
-    RndFromFile* Rand = new RndFromFile("bin/rnd.txt");
+    RndFromFile* Rand = new RndFromFile("bin/TestFiles/rnd.txt");
 
     int i=-1;
     while(in.good())
@@ -493,7 +493,7 @@ TEST(Photonuclear , Test_of_dNdxrnd_interpol ) {
 
 TEST(Photonuclear , Test_of_e_interpol ) {
     ifstream in;
-    in.open("bin/Photo_e_interpol.txt");
+    in.open("bin/TestFiles/Photo_e_interpol.txt");
 
     char firstLine[256];
     in.getline(firstLine,256);
@@ -511,8 +511,8 @@ TEST(Photonuclear , Test_of_e_interpol ) {
 
     double energy_old;
     bool first = true;
-    RndFromFile* Rand = new RndFromFile("bin/rnd.txt");
-    RndFromFile* Rand2 = new RndFromFile("bin/rnd.txt");
+    RndFromFile* Rand = new RndFromFile("bin/TestFiles/rnd.txt");
+    RndFromFile* Rand2 = new RndFromFile("bin/TestFiles/rnd.txt");
     Rand2->rnd();
     double rnd1,rnd2;
     int i=-1;

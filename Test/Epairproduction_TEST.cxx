@@ -39,7 +39,7 @@ std::vector<CrossSections*>         CombOfEpair;
 
 TEST(Epairproduction , Set_Up ) {
     ifstream in;
-    in.open("bin/Epair_dEdx.txt");
+    in.open("bin/TestFiles/Epair_dEdx.txt");
 
     char firstLine[256];
     in.getline(firstLine,256);
@@ -81,7 +81,7 @@ TEST(Epairproduction , Set_Up ) {
 
 TEST(Epairproduction , Test_of_dEdx ) {
     ifstream in;
-    in.open("bin/Epair_dEdx.txt");
+    in.open("bin/TestFiles/Epair_dEdx.txt");
 
     char firstLine[256];
     in.getline(firstLine,256);
@@ -119,7 +119,7 @@ TEST(Epairproduction , Test_of_dEdx ) {
 
 TEST(Epairproduction , Test_of_dNdx ) {
     ifstream in;
-    in.open("bin/Epair_dNdx.txt");
+    in.open("bin/TestFiles/Epair_dNdx.txt");
 
     char firstLine[256];
     in.getline(firstLine,256);
@@ -169,7 +169,7 @@ TEST(Epairproduction , Test_of_dNdx ) {
 
 TEST(Epairproduction , Test_of_dNdxrnd ) {
     ifstream in;
-    in.open("bin/Epair_dNdxrnd.txt");
+    in.open("bin/TestFiles/Epair_dNdxrnd.txt");
 
     char firstLine[256];
     in.getline(firstLine,256);
@@ -186,7 +186,7 @@ TEST(Epairproduction , Test_of_dNdxrnd ) {
 
     double energy_old;
     bool first = true;
-    RndFromFile* Rand = new RndFromFile("bin/rnd.txt");
+    RndFromFile* Rand = new RndFromFile("bin/TestFiles/rnd.txt");
 
     int i=-1;
     while(in.good())
@@ -223,7 +223,7 @@ TEST(Epairproduction , Test_of_dNdxrnd ) {
 
 TEST(Epairproduction , Test_of_e ) {
     ifstream in;
-    in.open("bin/Epair_e.txt");
+    in.open("bin/TestFiles/Epair_e.txt");
 
     char firstLine[256];
     in.getline(firstLine,256);
@@ -240,8 +240,8 @@ TEST(Epairproduction , Test_of_e ) {
 
     double energy_old;
     bool first = true;
-    RndFromFile* Rand = new RndFromFile("bin/rnd.txt");
-    RndFromFile* Rand2 = new RndFromFile("bin/rnd.txt");
+    RndFromFile* Rand = new RndFromFile("bin/TestFiles/rnd.txt");
+    RndFromFile* Rand2 = new RndFromFile("bin/TestFiles/rnd.txt");
     Rand2->rnd();
     double rnd1,rnd2;
     int i = -1;
@@ -285,7 +285,7 @@ TEST(Epairproduction , Test_of_e ) {
 
 TEST(Epairproduction , Test_of_dEdx_interpol ) {
     ifstream in;
-    in.open("bin/Epair_dEdx_interpol.txt");
+    in.open("bin/TestFiles/Epair_dEdx_interpol.txt");
 
     char firstLine[256];
     in.getline(firstLine,256);
@@ -329,7 +329,7 @@ TEST(Epairproduction , Test_of_dEdx_interpol ) {
 TEST(Epairproduction , Test_of_dNdx_interpol ) {
     //return;
     ifstream in;
-    in.open("bin/Epair_dNdx_interpol.txt");
+    in.open("bin/TestFiles/Epair_dNdx_interpol.txt");
 
     char firstLine[256];
     in.getline(firstLine,256);
@@ -380,7 +380,7 @@ TEST(Epairproduction , Test_of_dNdx_interpol ) {
 
 TEST(Epairproduction , Test_of_dNdxrnd_interpol ) {
     ifstream in;
-    in.open("bin/Epair_dNdxrnd_interpol.txt");
+    in.open("bin/TestFiles/Epair_dNdxrnd_interpol.txt");
 
     char firstLine[256];
     in.getline(firstLine,256);
@@ -397,7 +397,7 @@ TEST(Epairproduction , Test_of_dNdxrnd_interpol ) {
 
     double energy_old;
     bool first = true;
-    RndFromFile* Rand = new RndFromFile("bin/rnd.txt");
+    RndFromFile* Rand = new RndFromFile("bin/TestFiles/rnd.txt");
 
     int i=-1;
     while(in.good())
@@ -434,7 +434,7 @@ TEST(Epairproduction , Test_of_dNdxrnd_interpol ) {
 
 TEST(Epairproduction , Test_of_e_interpol ) {
     ifstream in;
-    in.open("bin/Epair_e_interpol.txt");
+    in.open("bin/TestFiles/Epair_e_interpol.txt");
 
     char firstLine[256];
     in.getline(firstLine,256);
@@ -451,8 +451,8 @@ TEST(Epairproduction , Test_of_e_interpol ) {
 
     double energy_old;
     bool first = true;
-    RndFromFile* Rand = new RndFromFile("bin/rnd.txt");
-    RndFromFile* Rand2 = new RndFromFile("bin/rnd.txt");
+    RndFromFile* Rand = new RndFromFile("bin/TestFiles/rnd.txt");
+    RndFromFile* Rand2 = new RndFromFile("bin/TestFiles/rnd.txt");
     Rand2->rnd();
     double rnd1,rnd2;
     int i=-1;

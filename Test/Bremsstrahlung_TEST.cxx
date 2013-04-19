@@ -36,7 +36,7 @@ public:
 TEST(Bremsstrahlung , Test_of_dEdx ) {
 
     ifstream in;
-    in.open("bin/Brems_dEdx.txt");
+    in.open("bin/TestFiles/Brems_dEdx.txt");
 
     char firstLine[256];
     in.getline(firstLine,256);
@@ -84,7 +84,7 @@ TEST(Bremsstrahlung , Test_of_dEdx ) {
 TEST(Bremsstrahlung , Test_of_dNdx ) {
 
     ifstream in;
-    in.open("bin/Brems_dNdx.txt");
+    in.open("bin/TestFiles/Brems_dNdx.txt");
 
     char firstLine[256];
     in.getline(firstLine,256);
@@ -132,7 +132,7 @@ TEST(Bremsstrahlung , Test_of_dNdx ) {
 TEST(Bremsstrahlung , Test_of_dNdxrnd ) {
 
     ifstream in;
-    in.open("bin/Brems_dNdxrnd.txt");
+    in.open("bin/TestFiles/Brems_dNdxrnd.txt");
 
     char firstLine[256];
     in.getline(firstLine,256);
@@ -150,7 +150,7 @@ TEST(Bremsstrahlung , Test_of_dNdxrnd ) {
     cout.precision(16);
     double energy_old=-1;
 
-    RndFromFile* Rand = new RndFromFile("bin/rnd.txt");
+    RndFromFile* Rand = new RndFromFile("bin/TestFiles/rnd.txt");
 
     bool first = true;
     while(in.good())
@@ -194,7 +194,7 @@ TEST(Bremsstrahlung , Test_of_dNdxrnd ) {
 TEST(Bremsstrahlung , Test_of_e ) {
 
     ifstream in;
-    in.open("bin/Brems_e.txt");
+    in.open("bin/TestFiles/Brems_e.txt");
 
     char firstLine[256];
     in.getline(firstLine,256);
@@ -212,8 +212,8 @@ TEST(Bremsstrahlung , Test_of_e ) {
     cout.precision(16);
     double energy_old=-1;
 
-    RndFromFile* Rand = new RndFromFile("bin/rnd.txt");
-    RndFromFile* Rand2 = new RndFromFile("bin/rnd.txt");
+    RndFromFile* Rand = new RndFromFile("bin/TestFiles/rnd.txt");
+    RndFromFile* Rand2 = new RndFromFile("bin/TestFiles/rnd.txt");
     Rand2->rnd();
 
     double rnd1, rnd2;
@@ -260,7 +260,7 @@ TEST(Bremsstrahlung , Test_of_e ) {
 TEST(Bremsstrahlung , Test_of_dEdx_Interpolant ) {
 
     ifstream in;
-    in.open("bin/Brems_dEdx_interpol.txt");
+    in.open("bin/TestFiles/Brems_dEdx_interpol.txt");
     char firstLine[256];
     in.getline(firstLine,256);
     double dEdx_new;
@@ -326,7 +326,7 @@ TEST(Bremsstrahlung , Test_of_dEdx_Interpolant ) {
 
 TEST(Bremsstrahlung , Test_of_dNdx_Interpolant ) {
     ifstream in;
-    in.open("bin/Brems_dNdx_interpol.txt");
+    in.open("bin/TestFiles/Brems_dNdx_interpol.txt");
 
     char firstLine[256];
     in.getline(firstLine,256);
@@ -382,7 +382,7 @@ TEST(Bremsstrahlung , Test_of_dNdx_Interpolant ) {
 TEST(Bremsstrahlung , Test_of_e_interpol ) {
 return;
     ifstream in;
-    in.open("bin/Brems_e_interpol.txt");
+    in.open("bin/TestFiles/Brems_e_interpol.txt");
 
     char firstLine[256];
     in.getline(firstLine,256);
@@ -401,8 +401,8 @@ return;
     double energy_old=-1;
     double precision = 1E-5;
     double precision_old = precision;
-    RndFromFile* Rand = new RndFromFile("bin/rnd.txt");
-    RndFromFile* Rand2 = new RndFromFile("bin/rnd.txt");
+    RndFromFile* Rand = new RndFromFile("bin/TestFiles/rnd.txt");
+    RndFromFile* Rand2 = new RndFromFile("bin/TestFiles/rnd.txt");
     Rand2->rnd();
 
     double rnd1,rnd2;
