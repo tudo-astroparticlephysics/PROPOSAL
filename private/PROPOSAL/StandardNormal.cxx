@@ -33,7 +33,8 @@ StandardNormal::StandardNormal(const StandardNormal &standard_normal)
 }
 //----------------------------------------------------------------------------//
 
-StandardNormal& StandardNormal::operator=(const StandardNormal &standard_normal){
+StandardNormal& StandardNormal::operator=(const StandardNormal &standard_normal)
+{
     return *this;
 }
 

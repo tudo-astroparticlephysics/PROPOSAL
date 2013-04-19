@@ -34,10 +34,39 @@ protected:
     double      norm_;
     int         order_of_interpolation_;
 //----------------------------------------------------------------------------//
+    //Memberfunctions
+    /**
+     * \brief class initializer
+     *
+     * \param   romberg     order of interpolation and integration
+     * \param   maxSteps    number of sampling points
+     * \param   precision   integration precision
+     */
 
+    void Init(int romberg, int maxSteps, double precision);
+
+//----------------------------------------------------------------------------//
+    /**
+     * \breif evaluates the integrated probability
+     *
+     * \param   x   wanted value
+     * \return  integrated probability
+     */
+
+    double IntegratedProbability(double x);
+//----------------------------------------------------------------------------//
+    /**
+     * evaluates the standard normal random number
+     *
+     * \param   x   wanted value
+     * \return  standard normal random number
+     */
+
+    double StandardNormalRandomNumber(double x);
+
+//----------------------------------------------------------------------------//
 
 public:
-
 
 //----------------------------------------------------------------------------//
     //Constructors
@@ -62,39 +91,6 @@ public:
     StandardNormal(int romberg, int maxSteps, double precision);
 //----------------------------------------------------------------------------//
     //Memberfunctions
-    /**
-     * \brief class initializer
-     *
-     * \param   romberg     order of interpolation and integration
-     * \param   maxSteps    number of sampling points
-     * \param   precision   integration precision
-     */
-
-    void Init(int romberg, int maxSteps, double precision);
-
-//----------------------------------------------------------------------------//
-    /**
-     * \breif evaluates the integrated probability
-     *
-     * \param   x   wanted value
-     * \return  integrated probability
-     */
-
-//    double sndpr(double x);
-    double IntegratedProbability(double x);
-
-//----------------------------------------------------------------------------//
-    /**
-     * evaluates the standard normal random number
-     *
-     * \param   x   wanted value
-     * \return  standard normal random number
-     */
-
-//    double sndrn(double x);
-    double StandardNormalRandomNumber(double x);
-
-//----------------------------------------------------------------------------//
     /**
      * evaluates the standard normal random number
      *
