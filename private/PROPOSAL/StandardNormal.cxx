@@ -143,6 +143,7 @@ double StandardNormal::StandardNormalRandomNumber(double rnd, double average, do
         if(cutoff)
         {
             x   =   rnd;
+            cout<<x<<endl;
         }
         else
         {
