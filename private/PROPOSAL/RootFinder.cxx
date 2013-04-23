@@ -1,28 +1,40 @@
 /*
- * FindRoot.cxx
+ * RootFinder.cxx
  *
- *  Created on: 24.06.2010
+ *  Created on: 23.04.2013
  *      Author: koehne
  */
 
-
-#include<iostream>
-#include "PROPOSAL/FindRoot.h"
-#include <stdio.h>
-
+#include "PROPOSAL/RootFinder.h"
+#include "stdio.h"
+#include <cmath>
 
 using namespace std;
 
 
-FindRoot::FindRoot()
+RootFinder::RootFinder()
+    :maxSteps_(20)
+    ,precision_(1e-6)
 {
-    _maxSteps=20;
-    _precision=1e-6;
+
 }
 
 //----------------------------------------------------------------------------//
 
-FindRoot::FindRoot(int maxSteps,double precision)
+RootFinder::RootFinder(const RootFinder &rootfinder)
+{
+    *this = rootfinder;
+}
+
+//----------------------------------------------------------------------------//
+
+RootFinder& RootFinder::operator=(const RootFinder &rootfinder){
+    return *this;
+}
+
+//----------------------------------------------------------------------------//
+
+RootFinder::RootFinder(int maxSteps, double precision)
 {
     if(maxSteps<=0)
     {
@@ -36,28 +48,14 @@ FindRoot::FindRoot(int maxSteps,double precision)
         precision   =   1.e-6;
     }
 
-    this->_maxSteps     =   maxSteps;
-    this->_precision    =   precision;
+    maxSteps_     =   maxSteps;
+    precision_    =   precision;
 
 }
 
 //----------------------------------------------------------------------------//
 
-FindRoot::~FindRoot(){}
-
-
-double FindRoot::FindRoot::function(double x)
-{
-    return function2use->function(x);
-}
-
-//----------------------------------------------------------------------------//
-
-double FindRoot::dFunction(double x)
-{
-    return function2use->dFunction(x);
-}
-
+RootFinder::~RootFinder(){}
 
 //----------------------------------------------------------------------------//
 
@@ -66,13 +64,18 @@ double FindRoot::dFunction(double x)
 * Starting value of x is determined by 0&lt;=startX&lt;=1
 */
 
-double FindRoot::findRoot(double min, double max, double startX, DFunctionOfx *function2use, double rightSide)
+double RootFinder::FindRoot(double min,
+                            double max,
+                            double startX,
+                            boost::function<double (double)> function,
+                            boost::function<double (double)> differentiated_function,
+                            double rightSide)
 {
+
     int i;
     double deltaX, deltaOld, currentX, aux;
     double f, df, fmin, fmax, result, xdiff;
 
-    this->function2use  =   function2use;
 
     fmin    =   function(min)-rightSide;
     fmax    =   function(max)-rightSide;
@@ -89,7 +92,7 @@ double FindRoot::findRoot(double min, double max, double startX, DFunctionOfx *f
 
     if(fmin*fmax>0)
     {
-        printf("Error (in FindRoot/FindRoot): Root must be bracketed");
+        printf("Error (in RootFinder/RootFinder): Root must be bracketed");
         return min;
     }
 
@@ -114,9 +117,9 @@ double FindRoot::findRoot(double min, double max, double startX, DFunctionOfx *f
 
     currentX    =   min*(1 - startX) + max*startX;
     f           =   function(currentX) - rightSide;
-    df          =   dFunction(currentX);
+    df          =   differentiated_function(currentX);
 
-    for(i=0; i<_maxSteps; i++)
+    for(i=0; i<maxSteps_; i++)
     {
 
         //cerr<<"x = "<<currentX<<" f = "<<f<<" dx = "<<(max - min)<<" df = "<<(f/df)<<endl;
@@ -157,22 +160,22 @@ double FindRoot::findRoot(double min, double max, double startX, DFunctionOfx *f
             }
         }
 
-        if(fabs(f) < _precision*result)
+        if(fabs(f) < precision_*result)
         {
             break;
         }
 
         f   =   function(currentX)-rightSide;
-        df  =   dFunction(currentX);
+        df  =   differentiated_function(currentX);
     }
 
-    // cerr<<"Number of steps in FindRoot was "<<i<<endl;
-    // Combine this with "your program" | " awk '/Number of steps in FindRoot/ {a[$(NF)]++} END {for(i in a) print i, a[i]}' |
+    // cerr<<"Number of steps in RootFinder was "<<i<<endl;
+    // Combine this with "your program" | " awk '/Number of steps in RootFinder/ {a[$(NF)]++} END {for(i in a) print i, a[i]}' |
     // sort -n | awk '{a+=$1*$2; b+=$2; print} END {print "Average is ", a/b}' " to optimize the settings
 
-    if(i==_maxSteps)
+    if(i==maxSteps_)
     {
-        cerr<<"Warning (in FindRoot/findRoot): Precision"<<_precision<<" has not been reached after " << _maxSteps<<" steps"<<endl;
+        cerr<<"Warning (in RootFinder/RootFinder): Precision"<<precision_<<" has not been reached after " << maxSteps_<<" steps"<<endl;
     }
 
     return currentX;

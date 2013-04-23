@@ -2,8 +2,6 @@
  * Original comment of the Java class by Dmitry Chirkin:
  * This class provides routines for calculating roots by
  * the combination of the Newton-Raphson method and bisection.
- * Include the function to be integrated in a class that implements
- * the interface FunctionOfx (defined below).
  * Methods contained here are based on the Numerical Recipes
  * (W. H. Press et al.).
  *
@@ -11,54 +9,45 @@
  * Ported to C++ Jan-Hendrik Köhne
  */
 
-#ifndef FINDROOT_H
-#define FINDROOT_H
+#ifndef ROOTFINDER_H
+#define ROOTFINDER_H
 
 #include "boost/function.hpp"
 
-class FindRoot
+class RootFinder
 {
 private:
 
-    double  _precision;
-    int     _maxSteps;
+    int     maxSteps_;
+    double  precision_;
 
-    boost::function<double (double)> function_;
-    boost::function<double (double)> differentiated_function_;
-
-//----------------------------------------------------------------------------//
-    //Memberfunctions
-
-    double function(double x);
-
-//----------------------------------------------------------------------------//
-
-    double dFunction(double x);
-
-//----------------------------------------------------------------------------//
 
 public:
 
     //Constructors
 
-    FindRoot();
-    FindRoot(const FindRoot&);
-    FindRoot& operator=(const FindRoot&);
-	FindRoot(int maxSteps, double precision);
+    RootFinder();
+    RootFinder(const RootFinder&);
+    RootFinder& operator=(const RootFinder&);
+    RootFinder(int maxSteps, double precision);
 
 //----------------------------------------------------------------------------//
     //Destructor
 
-    ~FindRoot();
+    ~RootFinder();
 //----------------------------------------------------------------------------//
     //Memberfunctions
 
-	double findRoot(double min, double max, double startX, DFunctionOfx *function2use, double rightSide);
-
+    double FindRoot(double min,
+                    double max,
+                    double startX,
+                    boost::function<double (double)> function,
+                    boost::function<double (double)> differentiated_function,
+                    double rightSide);
 
   
 
 
 };
 
-#endif // _FINDROOT_H
+#endif // _ROOTFINDER_H

@@ -14,8 +14,6 @@
 #include <cmath>
 
 #include "PROPOSAL/MathModel.h"
-#include "PROPOSAL/FunctionInt2.h"
-#include "PROPOSAL/FunctionInt.h"
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
 #include "Output.h"
