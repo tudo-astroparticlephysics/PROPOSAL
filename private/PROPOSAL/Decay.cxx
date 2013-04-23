@@ -17,7 +17,7 @@ Decay& Decay::operator=(const Decay &decay){
 
 //----------------------------------------------------------------------------//
 
-void Decay::SetIntegralLimits(){
+void Decay::SetIntegralLimits(int component){
 }
 
 //----------------------------------------------------------------------------//
