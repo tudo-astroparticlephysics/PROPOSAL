@@ -603,8 +603,6 @@ double Integral::IntegrateOpened(double min, double max, boost::function<double 
 {
     double aux, result;
 
-  //  bool old_reverse = reverse_;
-  // bool old_useLog = useLog_;
     reverse_ =   false;
     useLog_  =   false;
 
@@ -662,8 +660,6 @@ double Integral::IntegrateOpened(double min, double max, boost::function<double 
     savedResult_ =   result;
     randomDo_    =   true;
 
- //   reverse_ = old_reverse;
-  //  useLog_ = old_useLog ;
 
     return aux*result;
 }
