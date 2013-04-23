@@ -154,11 +154,11 @@ IF(DoTesting)
   target_link_libraries(UnitTest_Photonuclear PROPOSAL gtest gtest_main)
 
   add_test(UnitTest_StandardNormal bin/UnitTest_StandardNormal)
-  add_test(UnitTest_Photonuclear bin/UnitTest_Photonuclear)
   add_test(UnitTest_Integral bin/UnitTest_Integral)
   add_test(UnitTest_Interpolant bin/UnitTest_Interpolant)
+  add_test(UnitTest_Ionization bin/UnitTest_Ionization)
   add_test(UnitTest_Bremsstrahlung bin/UnitTest_Bremsstrahlung)
   add_test(UnitTest_Epairproduction bin/UnitTest_Epairproduction)
-  add_test(UnitTest_Ionization bin/UnitTest_Ionization)
+  add_test(UnitTest_Photonuclear bin/UnitTest_Photonuclear)
 
 ENDIF()

@@ -102,7 +102,6 @@ double StandardNormal::StandardNormalRandomNumber(double x)
     {
         return interpolant_->findLimit(x);
     }
-
     if(x<=val1_)
     {
         integral_->IntegrateWithSubstitution(1 , -1, boost::bind(&StandardNormal::FunctionToIntegral, this, _1), -2, -x);
@@ -124,7 +123,6 @@ double StandardNormal::StandardNormalRandomNumber(double x)
 
 double StandardNormal::StandardNormalRandomNumber(double rnd, double average, double sigma, double xmin, double xmax, bool cutoff)
 {
-
     double x, xl, xh;
 
     if(xmax<xmin)
@@ -143,7 +141,6 @@ double StandardNormal::StandardNormalRandomNumber(double rnd, double average, do
         if(cutoff)
         {
             x   =   rnd;
-            cout<<x<<endl;
         }
         else
         {

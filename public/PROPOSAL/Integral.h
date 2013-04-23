@@ -383,7 +383,7 @@ public:
 
     double Integrate(double min, double max, boost::function<double (double)> integrand, int method, double powerOfSubstitution=0);
 
-//----------------------------------------------------------------------------//
+ //----------------------------------------------------------------------------//
 
     /*!
      * Resets some integral parameters from last integration
@@ -391,7 +391,11 @@ public:
 
     void Reset();
 
+//----------------------------------------------------------------------------//
+
     void SetRandomX(double rand);
+
+//----------------------------------------------------------------------------//
 
 
 /*!
