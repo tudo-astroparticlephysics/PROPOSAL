@@ -36,11 +36,7 @@
  * does not change sign on the integration interval. Otherwise, the resulting x(rand) is less predictable. In any
  * case, an approximation to x(rand) is found during evaluation of the original integral, and then refined by the
  * combination of the Newton-Raphson method and bisection.
- * <pre>
- * interface FunctionOfx{
- *     double function(double x);
- * }
- * </pre>
+ *
  * @author Dmitry Chirkin
  */
 
