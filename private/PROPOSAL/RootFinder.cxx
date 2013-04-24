@@ -8,6 +8,7 @@
 #include "PROPOSAL/RootFinder.h"
 #include "stdio.h"
 #include <cmath>
+#include <iostream>
 
 using namespace std;
 
