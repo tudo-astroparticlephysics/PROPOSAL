@@ -2,7 +2,7 @@ find_package(Doxygen)
 if(DOXYGEN_FOUND)
 
 SET( DOXYGEN_SOURCE_DIR
-${CMAKE_CURRENT_SOURCE_DIR}/../public/PROPOSAL
+${CMAKE_CURRENT_SOURCE_DIR}/../
 
 )
 
