@@ -127,3 +127,5 @@ IF(DoTesting)
   add_test(UnitTest_Photonuclear bin/UnitTest_Photonuclear)
 
 ENDIF()
+
+ADD_SUBDIRECTORY( doc )
