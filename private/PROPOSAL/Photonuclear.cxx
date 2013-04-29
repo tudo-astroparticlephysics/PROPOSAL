@@ -15,7 +15,6 @@ Photonuclear::Photonuclear()
     ,prob_for_component_()
 {
     shadow_ =   1;
-    bb_     =   1;
 
     integral_             = new Integral(IROMB, IMAXS, IPREC);
     integral_for_dEdx_    = new Integral(IROMB, IMAXS, IPREC);
@@ -60,8 +59,7 @@ Photonuclear::Photonuclear(Particle* particle,
     cut_settings_               = cut_settings;
     component_                  = 0;
     multiplier_                 = 1.;
-    shadow_ =   1;
-    bb_     =   1;
+    shadow_                     = 1;
 
     integral_             = new Integral(IROMB, IMAXS, IPREC);
     integral_for_dEdx_    = new Integral(IROMB, IMAXS, IPREC);

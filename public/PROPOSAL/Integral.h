@@ -381,6 +381,10 @@ public:
 
  //----------------------------------------------------------------------------//
 
+    void swap(Integral &integral);
+
+ //----------------------------------------------------------------------------//
+
     /*!
      * Resets some integral parameters from last integration
      */
@@ -406,7 +410,7 @@ public:
         return romberg_;
     }
 //----------------------------------------------------------------------------//
-    double Get_maxSteps()const
+    int GetMaxSteps()const
     {
         return maxSteps_;
     }
@@ -430,6 +434,32 @@ public:
     {
         return max_;
     }
+//----------------------------------------------------------------------------//
+    std::vector<double> GetIX () const
+    {
+        return iX_;
+    }
+//----------------------------------------------------------------------------//
+    std::vector<double> GetIY () const
+    {
+        return iY_;
+    }
+//----------------------------------------------------------------------------//
+    std::vector<double> GetC () const
+    {
+        return c_;
+    }
+//----------------------------------------------------------------------------//
+    std::vector<double> GetD () const
+    {
+        return d_;
+    }
+//----------------------------------------------------------------------------//
+    boost::function<double (double)> GetIntegrand() const
+    {
+        return integrand_;
+    }
+//----------------------------------------------------------------------------//
 // Setters
 
     void Set_Function(boost::function<double (double)> integrand)

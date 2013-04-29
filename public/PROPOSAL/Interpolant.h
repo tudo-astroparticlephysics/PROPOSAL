@@ -70,7 +70,7 @@ private:
 
     double  x_save_, y_save_;	// Is setted to 1 and 0 in constructor
 
-    Output  *output_;
+    //Output  *output_;
 
     /*!
     * interpolates f(x) based on the values iY[i]=f(iX[i]) in the romberg-vicinity of x

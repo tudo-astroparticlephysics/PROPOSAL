@@ -68,12 +68,38 @@ Integral::Integral()
 
 
 Integral::Integral(const Integral &integral)
+    :maxSteps_(integral.maxSteps_)
+    ,romberg_(integral.romberg_)
+    ,precision_(integral.precision_)
+    ,max_(integral.max_)
+    ,min_(integral.min_)
+    ,integralValue_(integral.integralValue_)
+    ,integralError_(integral.integralError_)
+    ,iX_(integral.iX_)
+    ,iY_(integral.iY_)
+    ,c_(integral.c_)
+    ,d_(integral.d_)
+    ,romberg4refine_(integral.romberg4refine_)
+    ,powerOfSubstitution_(integral.powerOfSubstitution_)
+    ,randomDo_(integral.randomDo_)
+    ,useLog_(integral.useLog_)
+    ,randomNumber_(integral.randomNumber_)
+    ,randomX_(integral.randomX_)
+    ,reverse_(integral.reverse_)
+    ,reverseX_(integral.reverseX_)
+    ,savedResult_(integral.savedResult_)
 {
-    *this = integral;
+    integrand_ = boost::ref(integral.integrand_);
 }
 //----------------------------------------------------------------------------//
 
-Integral& Integral::operator=(const Integral &integral){
+Integral& Integral::operator=(const Integral &integral)
+{
+    if (this != &integral)
+    {
+      Integral tmp(integral);
+      swap(tmp);
+    }
     return *this;
 }
 
@@ -1321,6 +1347,41 @@ double Integral::GetUpperLimit(double min, double max, double integral_value , d
 }
 //----------------------------------------------------------------------------//
 
+void Integral::swap(Integral &integral){
+
+    using std::swap;
+
+    swap(maxSteps_,integral.maxSteps_);
+    swap(romberg_,integral.romberg_);
+    swap(precision_,integral.precision_);
+    swap(max_,integral.max_);
+    swap(min_,integral.min_);
+
+
+    swap(integralValue_,integral.integralValue_);
+    swap(integralError_,integral.integralError_);
+
+    iX_.swap(integral.iX_);
+    iY_.swap(integral.iY_);
+
+    c_.swap(integral.c_);
+    d_.swap(integral.d_);
+
+    integrand_ = boost::ref(integral.integrand_);
+
+
+    swap(romberg4refine_,integral.romberg4refine_);
+    swap(powerOfSubstitution_,integral.powerOfSubstitution_);
+    swap(randomDo_,integral.randomDo_);
+    swap(useLog_,integral.useLog_);
+    swap(randomNumber_,integral.randomNumber_);
+    swap(randomX_,integral.randomX_);
+    swap(reverse_,integral.reverse_);
+    swap(reverseX_,integral.reverseX_);
+    swap(savedResult_,integral.savedResult_);
+}
+
+//----------------------------------------------------------------------------//
 void Integral::Reset()
 {
     useLog_   = false;

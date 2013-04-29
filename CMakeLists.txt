@@ -83,10 +83,11 @@ add_library(PROPOSAL
 	private/PROPOSAL/Interpolant.cxx
         private/PROPOSAL/StandardNormal.cxx
         private/PROPOSAL/RootFinder.cxx
+     #   private/PROPOSAL/ProcessCollection.cxx
 
 	)
 
-set_target_properties(PROPOSAL PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror")
+set_target_properties(PROPOSAL PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror")# -Wextra -pedantic")
 
 add_executable(PROPOSALtest
         private/test/PROPOSAL.cxx

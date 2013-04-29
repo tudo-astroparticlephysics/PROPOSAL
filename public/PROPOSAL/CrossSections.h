@@ -55,7 +55,6 @@ protected:
     bool        init_lpm_effect_;
 
     int         shadow_;
-    int         bb_;
 
     bool        hard_component_;
 
@@ -225,9 +224,6 @@ public:
 
     void EnableLpmEffect(bool lpm_effect_enabled);
 
-//----------------------------------------------------------------------------//
-
-    void SetBb(int newbb);
 //----------------------------------------------------------------------------//
 
     void SetShadow(int newshadow);

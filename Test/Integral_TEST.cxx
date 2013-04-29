@@ -16,6 +16,94 @@ bool relErr(double Is, double HasToBe, double RelError){
     return fabs((Is - HasToBe)/HasToBe)<RelError;
 }
 
+TEST(Assignment , Copyconstructor ) {
+    Integral A;
+    Integral B =A;
+
+    EXPECT_EQ(A.GetMaxSteps() , B.GetMaxSteps());
+    EXPECT_EQ(A.GetRomberg()  , B.GetRomberg());
+    EXPECT_EQ(A.GetIX().size(), B.GetIX().size());
+    EXPECT_EQ(A.GetIY().size(), B.GetIY().size());
+    EXPECT_EQ(A.GetC().size() , B.GetC().size());
+    EXPECT_EQ(A.GetD().size() , B.GetD().size());
+
+    for(int i =0; i < A.GetIX().size(); i++){
+        EXPECT_EQ(A.GetIX().at(i), B.GetIX().at(i));
+    }
+    for(int i =0; i < A.GetIY().size(); i++){
+        EXPECT_EQ(A.GetIY().at(i), B.GetIY().at(i));
+    }
+    for(int i =0; i < A.GetC().size(); i++){
+        EXPECT_EQ(A.GetC().at(i), B.GetC().at(i));
+    }
+    for(int i =0; i < A.GetD().size(); i++){
+        EXPECT_EQ(A.GetD().at(i), B.GetD().at(i));
+    }
+
+}
+
+TEST(Assignment , Copyconstructor2 ) {
+    Integral A;
+    Integral B(A);
+
+    EXPECT_EQ(A.GetMaxSteps() , B.GetMaxSteps());
+    EXPECT_EQ(A.GetRomberg()  , B.GetRomberg());
+    EXPECT_EQ(A.GetIX().size(), B.GetIX().size());
+    EXPECT_EQ(A.GetIY().size(), B.GetIY().size());
+    EXPECT_EQ(A.GetC().size() , B.GetC().size());
+    EXPECT_EQ(A.GetD().size() , B.GetD().size());
+
+    for(int i =0; i < A.GetIX().size(); i++){
+        EXPECT_EQ(A.GetIX().at(i), B.GetIX().at(i));
+    }
+    for(int i =0; i < A.GetIY().size(); i++){
+        EXPECT_EQ(A.GetIY().at(i), B.GetIY().at(i));
+    }
+    for(int i =0; i < A.GetC().size(); i++){
+        EXPECT_EQ(A.GetC().at(i), B.GetC().at(i));
+    }
+    for(int i =0; i < A.GetD().size(); i++){
+        EXPECT_EQ(A.GetD().at(i), B.GetD().at(i));
+    }
+}
+
+
+
+TEST(Assignment , Operator ) {
+    Integral A;
+    A.Integrate(0,3,Testfkt,1);
+    Integral B(8,40,1e-9);
+
+    EXPECT_NE(A.GetMaxSteps() , B.GetMaxSteps());
+    EXPECT_NE(A.GetRomberg()  , B.GetRomberg());
+    EXPECT_NE(A.GetIX().size(), B.GetIX().size());
+    EXPECT_NE(A.GetIY().size(), B.GetIY().size());
+    EXPECT_NE(A.GetC().size() , B.GetC().size());
+    EXPECT_NE(A.GetD().size() , B.GetD().size());
+
+    B=A;
+
+    EXPECT_EQ(A.GetMaxSteps() , B.GetMaxSteps());
+    EXPECT_EQ(A.GetRomberg()  , B.GetRomberg());
+    EXPECT_EQ(A.GetIX().size(), B.GetIX().size());
+    EXPECT_EQ(A.GetIY().size(), B.GetIY().size());
+    EXPECT_EQ(A.GetC().size() , B.GetC().size());
+    EXPECT_EQ(A.GetD().size() , B.GetD().size());
+
+    for(int i =0; i < A.GetIX().size(); i++){
+        EXPECT_EQ(A.GetIX().at(i), B.GetIX().at(i));
+    }
+    for(int i =0; i < A.GetIY().size(); i++){
+        EXPECT_EQ(A.GetIY().at(i), B.GetIY().at(i));
+    }
+    for(int i =0; i < A.GetC().size(); i++){
+        EXPECT_EQ(A.GetC().at(i), B.GetC().at(i));
+    }
+    for(int i =0; i < A.GetD().size(); i++){
+        EXPECT_EQ(A.GetD().at(i), B.GetD().at(i));
+    }
+}
+
 TEST(IntegralValue , Zero_to_Three_of_xx ) {
     Integral* Int = new Integral();
     ASSERT_NEAR(Int->Integrate(0,3,Testfkt,1),exp(3)-1 , (exp(3)-1)*1E-6);

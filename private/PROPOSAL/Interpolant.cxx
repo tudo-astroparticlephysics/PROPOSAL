@@ -78,19 +78,19 @@ Interpolant::Interpolant(int max, double xmin, double xmax, boost::function<doub
     {
         iX_.at(i)   =   aux;
 
-        if(Output::inf)
-        {
-            try
-            {
-                iY_.at(i)   =   Output::read();
-            }
-            catch(int a)
-            {
-                throw 0;
-            }
-        }
-        else
-        {
+//        if(Output::inf)
+//        {
+//            try
+//            {
+//                iY_.at(i)   =   Output::read();
+//            }
+//            catch(int a)
+//            {
+//                throw 0;
+//            }
+//        }
+//        else
+//        {
 
             if(isLog_)
             {
@@ -108,12 +108,12 @@ Interpolant::Interpolant(int max, double xmin, double xmax, boost::function<doub
                 iY_.at(i)=log(iY_.at(i));
             }
 
-        }
+//        }
 
-        if(output_->outf)
-        {
-            output_->write(iY_.at(i));
-        }
+//        if(output_->outf)
+//        {
+//            output_->write(iY_.at(i));
+//        }
 
         aux +=  step_;
     }

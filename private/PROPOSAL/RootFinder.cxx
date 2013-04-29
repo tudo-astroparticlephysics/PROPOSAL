@@ -93,8 +93,8 @@ double RootFinder::FindRoot(double min,
 
     if(fmin*fmax>0)
     {
-        printf("Error (in RootFinder/RootFinder): Root must be bracketed");
-        return min;
+        printf("Warning (in RootFinder/RootFinder): Root must be bracketed\n");
+        //return min;
     }
 
     if(fmin>0)
@@ -122,9 +122,6 @@ double RootFinder::FindRoot(double min,
 
     for(i=0; i<maxSteps_; i++)
     {
-
-        //cerr<<"x = "<<currentX<<" f = "<<f<<" dx = "<<(max - min)<<" df = "<<(f/df)<<endl;
-
         if(f<0)
         {
             min     =   currentX;

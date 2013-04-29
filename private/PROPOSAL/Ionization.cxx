@@ -36,7 +36,7 @@ Ionization::Ionization(Particle* particle,
     vMin_                       = 0;
     ebig_                       = BIGENERGY;
     do_dedx_Interpolation_      = false;
-    do_dndx_Interpolation_  = false;
+    do_dndx_Interpolation_      = false;
     multiplier_                 = 1.;
 
 
@@ -53,7 +53,7 @@ void Ionization::SetIntegralLimits(int component){
     beta_    =   particle_->GetMomentum()/particle_->GetEnergy();
     gamma_   =   particle_->GetEnergy()/particle_->GetMass();
     vMin_    =   (1.e-6*medium_->GetI())/particle_->GetEnergy();
-    aux     =   ME/particle_->GetMass();
+    aux      =   ME/particle_->GetMass();
     vMax_    =   2*ME*(gamma_*gamma_-1)/((1 + 2*gamma_*aux + aux*aux)*particle_->GetEnergy());
     vMax_    =   min(vMax_, 1. - particle_->GetMass()/particle_->GetEnergy());
 
