@@ -186,6 +186,10 @@ public:
     Medium();
     Medium(const Medium&);
     Medium& operator=(const Medium&);
+    bool operator==(const Medium &medium) const;
+    bool operator!=(const Medium &medium) const;
+
+
 //----------------------------------------------------------------------------//
 
     /*!

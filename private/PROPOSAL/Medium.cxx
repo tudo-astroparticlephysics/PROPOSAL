@@ -19,14 +19,40 @@ using namespace std;
 //----------------------------------------------------------------------------//
 
 Medium::Medium()
-    :nucCharge_()
-    ,atomicNum_()
-    ,atomInMolecule_()
-    ,logConstant_()
-    ,bPrime_()
-    ,M_()
-    ,elementName_()
-    ,mN_(){}
+    :numCompontents_    (0)
+    ,nucCharge_         ()
+    ,atomicNum_         ()
+    ,atomInMolecule_    ()
+    ,sumCharge_         (0)
+    ,ZA_                (0)
+    ,I_                 (0)
+    ,C1_                (0)
+    ,C_                 (0)
+    ,a_                 (0)
+    ,m_                 (0)
+    ,X0_                (0)
+    ,X1_                (0)
+    ,d0_                (0)
+    ,r_                 (0)
+    ,logConstant_       ()
+    ,bPrime_            ()
+    ,rho_               (1.)
+    ,massDensity_       (0)
+    ,molDensity_        (0)
+    ,M_                 ()
+    ,elementName_       ()
+    ,name_              ("water")
+    ,ecut_              (0)
+    ,vcut_              (0)
+    ,vCut_              (0)
+    ,mN_                ()
+    ,MM_                (0)
+    ,sumNucleons_       (0)
+    ,r0_                (0)
+{
+    cerr<<"Warning (in Medium/Medium): Standard constructor called: defaulting to water"<<endl;
+    InitWater();
+}
 
 //----------------------------------------------------------------------------//
 
@@ -67,8 +93,98 @@ Medium::Medium(const Medium &medium)
 //----------------------------------------------------------------------------//
 
 Medium& Medium::operator=(const Medium &medium){
+    if (this != &medium)
+    {
+      Medium tmp(medium);
+      swap(tmp);
+    }
     return *this;
 }
+
+//----------------------------------------------------------------------------//
+bool Medium::operator==(const Medium &medium) const
+{
+    if( numCompontents_   != medium.numCompontents_)return false;
+    if( sumCharge_        != medium.sumCharge_)     return false;
+    if( ZA_               != medium.ZA_)            return false;
+    if( I_                != medium.I_)             return false;
+    if( C1_               != medium.C1_)            return false;
+    if( C_                != medium.C_)             return false;
+    if( a_                != medium.a_)             return false;
+    if( m_                != medium.m_)             return false;
+    if( X0_               != medium.X0_)            return false;
+    if( X1_               != medium.X1_)            return false;
+    if( d0_               != medium.d0_)            return false;
+    if( r_                != medium.r_)             return false;
+    if( rho_              != medium.rho_)           return false;
+    if( massDensity_      != medium.massDensity_)   return false;
+    if( molDensity_       != medium.molDensity_)    return false;
+    if( ecut_             != medium.ecut_)          return false;
+    if( vcut_             != medium.vcut_)          return false;
+    if( vCut_             != medium.vCut_)          return false;
+    if( MM_               != medium.MM_)            return false;
+    if( sumNucleons_      != medium.sumNucleons_)   return false;
+    if( r0_               != medium.r0_)            return false;
+
+    if( M_.size()               != medium.M_.size() )               return false;
+    if( logConstant_.size()     != medium.logConstant_.size() )     return false;
+    if( bPrime_.size()          != medium.bPrime_.size() )          return false;
+    if( mN_.size()              != medium.mN_.size() )              return false;
+    if( nucCharge_.size()       != medium.nucCharge_.size() )       return false;
+    if( atomicNum_.size()       != medium.atomicNum_.size() )       return false;
+    if( atomInMolecule_.size()  != medium.atomInMolecule_.size() )  return false;
+    if( elementName_.size()     != medium.elementName_.size() )     return false;
+
+    if( name_.compare( medium.name_) != 0 ) return false;
+    for(unsigned int i =    0; i < M_.size(); i++)
+    {
+        if(M_.at(i)             !=  medium.M_.at(i))            return false;
+    }
+
+    for(unsigned int i =    0; i < logConstant_.size(); i++)
+    {
+        if(logConstant_.at(i)   !=  medium.logConstant_.at(i))  return false;
+    }
+
+    for(unsigned int i =    0; i < bPrime_.size(); i++)
+    {
+        if(bPrime_.at(i)        !=  medium.bPrime_.at(i))       return false;
+    }
+
+    for(unsigned int i =    0; i < mN_.size(); i++)
+    {
+        if(mN_.at(i)            !=  medium.mN_.at(i))           return false;
+    }
+
+    for(unsigned int i =    0; i < nucCharge_.size(); i++)
+    {
+        if(nucCharge_.at(i)     !=  medium.nucCharge_.at(i))    return false;
+    }
+
+    for(unsigned int i =    0; i < atomicNum_.size(); i++)
+    {
+        if(atomicNum_.at(i)     !=  medium.atomicNum_.at(i))    return false;
+    }
+
+    for(unsigned int i =    0; i < atomInMolecule_.size(); i++)
+    {
+        if(atomInMolecule_.at(i)!=  medium.atomInMolecule_.at(i))   return false;
+    }
+
+    for(unsigned int i =    0; i < elementName_.size(); i++)
+    {
+        if(elementName_.at(i).compare( medium.elementName_.at(i))!=0)return false;
+    }
+    //else
+    return true;
+
+}
+//----------------------------------------------------------------------------//
+
+bool Medium::operator!=(const Medium &medium) const {
+  return !(*this == medium);
+}
+
 
 //----------------------------------------------------------------------------//
 
@@ -87,14 +203,34 @@ Medium::~Medium(){
 
 
 Medium::Medium(string w, double rho)
-    :nucCharge_()
-    ,atomicNum_()
-    ,atomInMolecule_()
-    ,logConstant_()
-    ,bPrime_()
-    ,M_()
-    ,elementName_()
-    ,mN_()
+    :numCompontents_    (0)
+    ,nucCharge_         ()
+    ,atomicNum_         ()
+    ,atomInMolecule_    ()
+    ,sumCharge_         (0)
+    ,ZA_                (0)
+    ,I_                 (0)
+    ,C1_                (0)
+    ,C_                 (0)
+    ,a_                 (0)
+    ,m_                 (0)
+    ,X0_                (0)
+    ,X1_                (0)
+    ,d0_                (0)
+    ,r_                 (0)
+    ,logConstant_       ()
+    ,bPrime_            ()
+    ,massDensity_       (0)
+    ,molDensity_        (0)
+    ,M_                 ()
+    ,elementName_       ()
+    ,ecut_              (0)
+    ,vcut_              (0)
+    ,vCut_              (0)
+    ,mN_                ()
+    ,MM_                (0)
+    ,sumNucleons_       (0)
+    ,r0_                (0)
 {
     name_   =   w;
 
