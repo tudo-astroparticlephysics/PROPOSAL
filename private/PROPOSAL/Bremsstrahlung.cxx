@@ -73,7 +73,8 @@ Bremsstrahlung& Bremsstrahlung::operator=(const Bremsstrahlung &brems){
 Bremsstrahlung::Bremsstrahlung(Particle* particle,
                              Medium* medium,
                              EnergyCutSettings* cut_settings)
-    :lorenz_(false)
+    :CrossSections(particle, medium, cut_settings)
+    ,lorenz_(false)
     ,lorenz_cut_(1.e6)
     ,dndx_integral_()
     ,dndx_interpolant_1d_()

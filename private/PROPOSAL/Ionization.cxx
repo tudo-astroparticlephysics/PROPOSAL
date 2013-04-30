@@ -25,7 +25,8 @@ Ionization& Ionization::operator=(const Ionization &ioniz){
 Ionization::Ionization(Particle* particle,
                              Medium* medium,
                              EnergyCutSettings* cut_settings)
-    :beta_(0)
+    :CrossSections(particle, medium, cut_settings)
+    ,beta_(0)
     ,gamma_(0)
 {
     particle_                   = particle;

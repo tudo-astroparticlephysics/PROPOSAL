@@ -25,8 +25,6 @@ TEST(Comparison , Comparison_not_equal ) {
     Medium* F = new Medium("water",1);
     EXPECT_TRUE(*E!=*F);
 
-
-
 }
 
 TEST(Assignment , Copyconstructor ) {

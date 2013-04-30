@@ -58,11 +58,55 @@ Particle::Particle()
     ,ec_                    (0)
     ,elost_                 (0)
 {
+    SetEnergy( energy_ );
 }
 
 //----------------------------------------------------------------------------//
 
+Particle::Particle(const Particle& particle)
+    :propagation_distance_  (particle.propagation_distance_)
+    ,x_                     (particle.x_)
+    ,y_                     (particle.y_)
+    ,z_                     (particle.z_)
+    ,t_                     (particle.t_)
+    ,theta_                 (particle.theta_)
+    ,phi_                   (particle.phi_)
+    ,costh_                 (particle.costh_)
+    ,sinth_                 (particle.sinth_)
+    ,cosph_                 (particle.cosph_)
+    ,sinph_                 (particle.sinph_)
+    ,momentum_              (particle.momentum_)
+    ,square_momentum_       (particle.square_momentum_)
+    ,energy_                (particle.energy_)
+    ,mass_                  (particle.mass_)
+    ,lifetime_              (particle.lifetime_)
+    ,charge_                (particle.charge_)
+    ,name_                  (particle.name_)
+    ,low_                   (particle.low_)
+    ,type_                  (particle.type_)
+    ,parent_particle_id_    (particle.parent_particle_id_)
+    ,particle_id_           (particle.particle_id_)
+    ,xi_                    (particle.xi_)
+    ,yi_                    (particle.yi_)
+    ,zi_                    (particle.zi_)
+    ,ti_                    (particle.ti_)
+    ,ei_                    (particle.ei_)
+    ,xf_                    (particle.xf_)
+    ,yf_                    (particle.yf_)
+    ,zf_                    (particle.zf_)
+    ,tf_                    (particle.tf_)
+    ,ef_                    (particle.ef_)
+    ,xc_                    (particle.xc_)
+    ,yc_                    (particle.yc_)
+    ,zc_                    (particle.zc_)
+    ,tc_                    (particle.tc_)
+    ,ec_                    (particle.ec_)
+    ,elost_                 (particle.elost_)
+{
 
+}
+
+//----------------------------------------------------------------------------//
 
 Particle::Particle(int parent_particle_id,
                    int particle_id,
@@ -328,6 +372,70 @@ Particle::Particle(string name,
 
 //----------------------------------------------------------------------------//
 
+Particle& Particle::operator=(const Particle &particle){
+    if (this != &particle)
+    {
+      Particle tmp(particle);
+      swap(tmp);
+    }
+    return *this;
+}
+
+//----------------------------------------------------------------------------//
+bool Particle::operator==(const Particle &particle) const
+{
+    if(  propagation_distance_  != particle.propagation_distance_)  return false;
+    if(  x_                     != particle.x_)                     return false;
+    if(  y_                     != particle.y_)                     return false;
+    if(  z_                     != particle.z_)                     return false;
+    if(  t_                     != particle.t_)                     return false;
+    if(  theta_                 != particle.theta_)                 return false;
+    if(  phi_                   != particle.phi_)                   return false;
+    if(  costh_                 != particle.costh_)                 return false;
+    if(  sinth_                 != particle.sinth_)                 return false;
+    if(  cosph_                 != particle.cosph_)                 return false;
+    if(  sinph_                 != particle.sinph_)                 return false;
+    if(  momentum_              != particle.momentum_)              return false;
+    if(  square_momentum_       != particle.square_momentum_)       return false;
+    if(  energy_                != particle.energy_)                return false;
+    if(  mass_                  != particle.mass_)                  return false;
+    if(  lifetime_              != particle.lifetime_)              return false;
+    if(  charge_                != particle.charge_)                return false;
+    if(  low_                   != particle.low_)                   return false;
+    if(  type_                  != particle.type_)                  return false;
+    if(  parent_particle_id_    != particle.parent_particle_id_)    return false;
+    if(  particle_id_           != particle.particle_id_)           return false;
+    if(  xi_                    != particle.xi_)                    return false;
+    if(  yi_                    != particle.yi_)                    return false;
+    if(  zi_                    != particle.zi_)                    return false;
+    if(  ti_                    != particle.ti_)                    return false;
+    if(  ei_                    != particle.ei_)                    return false;
+    if(  xf_                    != particle.xf_)                    return false;
+    if(  yf_                    != particle.yf_)                    return false;
+    if(  zf_                    != particle.zf_)                    return false;
+    if(  tf_                    != particle.tf_)                    return false;
+    if(  ef_                    != particle.ef_)                    return false;
+    if(  xc_                    != particle.xc_)                    return false;
+    if(  yc_                    != particle.yc_)                    return false;
+    if(  zc_                    != particle.zc_)                    return false;
+    if(  tc_                    != particle.tc_)                    return false;
+    if(  ec_                    != particle.ec_)                    return false;
+    if(  elost_                 != particle.elost_)                 return false;
+
+    if(  name_.compare(particle.name_) != 0)        return false;
+
+    //else
+    return true;
+
+}
+//----------------------------------------------------------------------------//
+
+bool Particle::operator!=(const Particle &particle) const {
+  return !(*this == particle);
+}
+
+//----------------------------------------------------------------------------//
+
 void Particle::InitByName(std::string aname){
 
     string name=aname.length()==0?"?":aname[0]=='a'?aname.substr(1):aname;
@@ -493,6 +601,53 @@ void Particle::Location(double time,
     sinph_       =   sin(phi);
 }
 
+//----------------------------------------------------------------------------//
+void Particle::swap(Particle &particle)
+{
+    using std::swap;
+
+    swap( propagation_distance_  , particle.propagation_distance_);
+    swap( x_                     , particle.x_);
+    swap( y_                     , particle.y_);
+    swap( z_                     , particle.z_);
+    swap( t_                     , particle.t_);
+    swap( theta_                 , particle.theta_);
+    swap( phi_                   , particle.phi_);
+    swap( costh_                 , particle.costh_);
+    swap( sinth_                 , particle.sinth_);
+    swap( cosph_                 , particle.cosph_);
+    swap( sinph_                 , particle.sinph_);
+    swap( momentum_              , particle.momentum_);
+    swap( square_momentum_       , particle.square_momentum_);
+    swap( energy_                , particle.energy_);
+    swap( mass_                  , particle.mass_);
+    swap( lifetime_              , particle.lifetime_);
+    swap( charge_                , particle.charge_);
+    swap( low_                   , particle.low_);
+    swap( type_                  , particle.type_);
+    swap( parent_particle_id_    , particle.parent_particle_id_);
+    swap( particle_id_           , particle.particle_id_);
+    swap( xi_                    , particle.xi_);
+    swap( yi_                    , particle.yi_);
+    swap( zi_                    , particle.zi_);
+    swap( ti_                    , particle.ti_);
+    swap( ei_                    , particle.ei_);
+    swap( xf_                    , particle.xf_);
+    swap( yf_                    , particle.yf_);
+    swap( zf_                    , particle.zf_);
+    swap( tf_                    , particle.tf_);
+    swap( ef_                    , particle.ef_);
+    swap( xc_                    , particle.xc_);
+    swap( yc_                    , particle.yc_);
+    swap( zc_                    , particle.zc_);
+    swap( tc_                    , particle.tc_);
+    swap( ec_                    , particle.ec_);
+    swap( elost_                 , particle.elost_);
+
+    name_.swap(particle.name_);
+
+
+}
 //----------------------------------------------------------------------------//
 
 //Setter

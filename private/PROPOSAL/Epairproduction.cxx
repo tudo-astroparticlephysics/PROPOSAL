@@ -33,7 +33,8 @@ Epairproduction& Epairproduction::operator=(const Epairproduction &epair){
 Epairproduction::Epairproduction(Particle* particle,
                              Medium* medium,
                              EnergyCutSettings* cut_settings)
-    :reverse_(false)
+    :CrossSections(particle, medium, cut_settings)
+    ,reverse_(false)
     ,eLpm_(0)
     ,dndx_integral_()
     ,dndx_interpolant_1d_()
@@ -48,7 +49,7 @@ Epairproduction::Epairproduction(Particle* particle,
     vMin_                       = 0;
     ebig_                       = BIGENERGY;
     do_dedx_Interpolation_      = false;
-    do_dndx_Interpolation_  = false;
+    do_dndx_Interpolation_      = false;
     multiplier_                 = 1.;
     parametrization_            = 1;
     lpm_effect_enabled_         = false;

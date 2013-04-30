@@ -89,6 +89,8 @@ public:
 
     Particle(const Particle&);
     Particle& operator=(const Particle&);
+    bool operator==(const Particle &particle) const;
+    bool operator!=(const Particle &particle) const;
 //----------------------------------------------------------------------------//
 
     /*!
@@ -210,6 +212,9 @@ public:
                   double theta,
                   double phi);
 
+//----------------------------------------------------------------------------//
+
+    void swap(Particle &particle);
 
 //----------------------------------------------------------------------------//
 

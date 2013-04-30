@@ -44,7 +44,8 @@ Photonuclear& Photonuclear::operator=(const Photonuclear &photo){
 Photonuclear::Photonuclear(Particle* particle,
                              Medium* medium,
                              EnergyCutSettings* cut_settings)
-    :init_measured_(true)
+    :CrossSections(particle, medium, cut_settings)
+    ,init_measured_(true)
     ,init_hardbb_(true)
     ,hmax_(8)
     ,v_(0)
