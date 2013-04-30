@@ -32,6 +32,93 @@ public:
     }
 };
 
+//TEST(Assignment , Copyconstructor ) {
+
+//    Medium *medium_a = new Medium("air",1.);
+//    Particle *particle_a = new Particle("mu",1.,1.,1,.20,20,1e5,10);
+//    particle_a->SetEnergy(1e6);
+//    EnergyCutSettings *cuts_a = new EnergyCutSettings(500.,0.05);
+//    Bremsstrahlung *A = new Bremsstrahlung(particle_a, medium_a, cuts_a);
+
+//    A->SetParametrization(2);
+//    A->EnableLpmEffect(true);
+
+
+//    Medium *medium_b = new Medium("air",1.);
+//    Particle *particle_b = new Particle("mu",1.,1.,1,.20,20,1e5,10);
+//    particle_b->SetEnergy(1e6);
+//    EnergyCutSettings *cuts_b = new EnergyCutSettings(500.,0.05);
+//    Bremsstrahlung *B = new Bremsstrahlung(particle_b, medium_b, cuts_b);
+
+//    B->SetParametrization(2);
+//    B->EnableLpmEffect(true);
+
+
+//    dEdx_new=A->CalculatedEdx();
+
+//}
+
+//TEST(Assignment , Copyconstructor2 ) {
+//    Integral A;
+//    Integral B(A);
+
+//    EXPECT_EQ(A.GetMaxSteps() , B.GetMaxSteps());
+//    EXPECT_EQ(A.GetRomberg()  , B.GetRomberg());
+//    EXPECT_EQ(A.GetIX().size(), B.GetIX().size());
+//    EXPECT_EQ(A.GetIY().size(), B.GetIY().size());
+//    EXPECT_EQ(A.GetC().size() , B.GetC().size());
+//    EXPECT_EQ(A.GetD().size() , B.GetD().size());
+
+//    for(int i =0; i < A.GetIX().size(); i++){
+//        EXPECT_EQ(A.GetIX().at(i), B.GetIX().at(i));
+//    }
+//    for(int i =0; i < A.GetIY().size(); i++){
+//        EXPECT_EQ(A.GetIY().at(i), B.GetIY().at(i));
+//    }
+//    for(int i =0; i < A.GetC().size(); i++){
+//        EXPECT_EQ(A.GetC().at(i), B.GetC().at(i));
+//    }
+//    for(int i =0; i < A.GetD().size(); i++){
+//        EXPECT_EQ(A.GetD().at(i), B.GetD().at(i));
+//    }
+//}
+
+
+
+//TEST(Assignment , Operator ) {
+//    Integral A;
+//    A.Integrate(0,3,Testfkt,1);
+//    Integral B(8,40,1e-9);
+
+//    EXPECT_NE(A.GetMaxSteps() , B.GetMaxSteps());
+//    EXPECT_NE(A.GetRomberg()  , B.GetRomberg());
+//    EXPECT_NE(A.GetIX().size(), B.GetIX().size());
+//    EXPECT_NE(A.GetIY().size(), B.GetIY().size());
+//    EXPECT_NE(A.GetC().size() , B.GetC().size());
+//    EXPECT_NE(A.GetD().size() , B.GetD().size());
+
+//    B=A;
+
+//    EXPECT_EQ(A.GetMaxSteps() , B.GetMaxSteps());
+//    EXPECT_EQ(A.GetRomberg()  , B.GetRomberg());
+//    EXPECT_EQ(A.GetIX().size(), B.GetIX().size());
+//    EXPECT_EQ(A.GetIY().size(), B.GetIY().size());
+//    EXPECT_EQ(A.GetC().size() , B.GetC().size());
+//    EXPECT_EQ(A.GetD().size() , B.GetD().size());
+
+//    for(int i =0; i < A.GetIX().size(); i++){
+//        EXPECT_EQ(A.GetIX().at(i), B.GetIX().at(i));
+//    }
+//    for(int i =0; i < A.GetIY().size(); i++){
+//        EXPECT_EQ(A.GetIY().at(i), B.GetIY().at(i));
+//    }
+//    for(int i =0; i < A.GetC().size(); i++){
+//        EXPECT_EQ(A.GetC().at(i), B.GetC().at(i));
+//    }
+//    for(int i =0; i < A.GetD().size(); i++){
+//        EXPECT_EQ(A.GetD().at(i), B.GetD().at(i));
+//    }
+//}
 
 TEST(Bremsstrahlung , Test_of_dEdx ) {
 

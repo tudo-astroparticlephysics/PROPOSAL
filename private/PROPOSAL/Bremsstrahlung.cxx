@@ -28,13 +28,43 @@ Bremsstrahlung::Bremsstrahlung()
 //----------------------------------------------------------------------------//
 
 Bremsstrahlung::Bremsstrahlung(const Bremsstrahlung &brems)
+    :CrossSections(brems)
+    ,lorenz_(brems.lorenz_)
+    ,lorenz_cut_(brems.lorenz_cut_)
+    ,component_(brems.component_)
+    ,dedx_integral_(new Integral(*brems.dedx_integral_))
+    ,dedx_interpolant_(new Interpolant(*brems.dedx_interpolant_))
+    ,eLpm_(brems.eLpm_)
+    ,prob_for_component_(brems.prob_for_component_)
 {
-    *this = brems;
+    dndx_integral_.resize(brems.dndx_integral_.size());
+    dndx_interpolant_1d_.resize(brems.dndx_interpolant_1d_.size());
+    dndx_interpolant_2d_.resize(brems.dndx_interpolant_2d_.size());
+
+    for(unsigned int i =0; i<brems.dndx_integral_.size(); i++)
+    {
+        dndx_integral_.at(i) = new Integral( *brems.dndx_integral_.at(i) );
+    }
+    for(unsigned int i =0; i<brems.dndx_interpolant_1d_.size(); i++)
+    {
+        dndx_interpolant_1d_.at(i) = new Interpolant( *brems.dndx_interpolant_1d_.at(i) );
+    }
+    for(unsigned int i =0; i<brems.dndx_interpolant_2d_.size(); i++)
+    {
+        dndx_interpolant_2d_.at(i) = new Interpolant( *brems.dndx_interpolant_2d_.at(i) );
+    }
 }
 
 //----------------------------------------------------------------------------//
 
 Bremsstrahlung& Bremsstrahlung::operator=(const Bremsstrahlung &brems){
+
+    if (this != &brems)
+    {
+      this->CrossSections::operator=(brems);
+      Bremsstrahlung tmp(brems);
+      swap(tmp);
+    }
     return *this;
 }
 
@@ -784,6 +814,37 @@ void Bremsstrahlung::SetLorenzCut(double lorenz_cut){
 
 //----------------------------------------------------------------------------//
 
+void Bremsstrahlung::swap(Bremsstrahlung &brems)
+{
+    using std::swap;
+
+    swap(lorenz_,brems.lorenz_);
+    swap(lorenz_cut_,brems.lorenz_cut_);
+    swap(component_,brems.component_);
+    dedx_integral_= new Integral(*brems.dedx_integral_);
+    dedx_interpolant_=new Interpolant(*brems.dedx_interpolant_);
+    swap(eLpm_,brems.eLpm_);
+    prob_for_component_.swap(brems.prob_for_component_);
+
+    dndx_integral_.resize(brems.dndx_integral_.size());
+    dndx_interpolant_1d_.resize(brems.dndx_interpolant_1d_.size());
+    dndx_interpolant_2d_.resize(brems.dndx_interpolant_2d_.size());
+
+    for(unsigned int i =0; i<brems.dndx_integral_.size(); i++)
+    {
+        dndx_integral_.at(i) = new Integral( *brems.dndx_integral_.at(i) );
+    }
+    for(unsigned int i =0; i<brems.dndx_interpolant_1d_.size(); i++)
+    {
+        dndx_interpolant_1d_.at(i) = new Interpolant( *brems.dndx_interpolant_1d_.at(i) );
+    }
+    for(unsigned int i =0; i<brems.dndx_interpolant_2d_.size(); i++)
+    {
+        dndx_interpolant_2d_.at(i) = new Interpolant( *brems.dndx_interpolant_2d_.at(i) );
+    }
+}
+
+//----------------------------------------------------------------------------//
 
 Bremsstrahlung::~Bremsstrahlung()
 {

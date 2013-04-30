@@ -20,22 +20,26 @@ using namespace std;
 //----------------------------------------------------------------------------------------------------//
 
 Integral::Integral()
-:maxSteps_   (20)
-,romberg_    (5)
-,precision_  (1.e-6)
-,max_        (1)
-,min_        (0)
-,iX_()
-,iY_()
-,c_()
-,d_()
-,romberg4refine_         (2)
-,powerOfSubstitution_    (0)
-,randomDo_   (false)
-,useLog_     (false)
-,randomX_(0)
-,reverse_    (false)
-,savedResult_(0)
+    :maxSteps_   (20)
+    ,romberg_    (5)
+    ,precision_  (1.e-6)
+    ,max_        (1)
+    ,min_        (0)
+    ,integralValue_(0)
+    ,integralError_(0)
+    ,iX_()
+    ,iY_()
+    ,c_()
+    ,d_()
+    ,romberg4refine_(2)
+    ,powerOfSubstitution_(0)
+    ,randomDo_(false)
+    ,useLog_(false)
+    ,randomNumber_(0)
+    ,randomX_(0)
+    ,reverse_(false)
+    ,reverseX_(0)
+    ,savedResult_(0)
 {
     int aux;
     if(romberg_<=0)
@@ -105,20 +109,67 @@ Integral& Integral::operator=(const Integral &integral)
 
 //----------------------------------------------------------------------------//
 
+bool Integral::operator==(const Integral &integral) const
+{
+   // if(integrand_ != integral.integrand_) return false;
+    if(iX_.size() !=integral.iX_.size()) return false;
+    if(iY_.size() !=integral.iY_.size()) return false;
+    if(c_.size() !=integral.c_.size()) return false;
+    if(d_.size() !=integral.d_.size()) return false;
+
+
+    for(unsigned int i =0; i < iX_.size(); i++){
+        if(iX_.at(i) != integral.iX_.at(i)) return false;
+    }
+    for(unsigned int i =0; i < iY_.size(); i++){
+        if(iY_.at(i) != integral.iY_.at(i)) return false;
+    }
+    for(unsigned int i =0; i < c_.size(); i++){
+        if(c_.at(i) != integral.c_.at(i)) return false;
+    }
+    for(unsigned int i =0; i < d_.size(); i++){
+        if(d_.at(i) != integral.d_.at(i)) return false;
+    }
+    if(maxSteps_ != integral.maxSteps_) return false;
+    if(romberg_ != integral.romberg_) return false;
+    if(precision_!= integral.precision_) return false;
+    if(max_ != integral.max_) return false;
+    if(min_ != integral.min_) return false;
+    if(integralValue_ != integral.integralValue_) return false;
+    if(integralError_ != integral.integralError_) return false;
+    if(romberg4refine_ != integral.romberg4refine_) return false;
+    if(powerOfSubstitution_ != integral.powerOfSubstitution_) return false;
+    if(randomDo_ != integral.randomDo_) return false;
+    if(useLog_ != integral.useLog_) return false;
+    if(randomNumber_ != integral.randomNumber_) return false;
+    if(randomX_ != integral.randomX_) return false;
+    if(reverse_ != integral.reverse_) return false;
+    if(reverseX_ != integral.reverseX_) return false;
+    if(savedResult_ != integral.savedResult_) return false;
+    else return true;
+
+}
+
+//----------------------------------------------------------------------------//
+
 Integral::Integral(int  romberg, int maxSteps, double precision)
-:max_        (1)
-,min_        (0)
-,iX_()
-,iY_()
-,c_()
-,d_()
-,romberg4refine_         (2)
-,powerOfSubstitution_    (0)
-,randomDo_   (false)
-,useLog_     (false)
-,randomX_(0)
-,reverse_    (false)
-,savedResult_(0)
+    :max_          (1)
+    ,min_          (0)
+    ,integralValue_(0)
+    ,integralError_(0)
+    ,iX_()
+    ,iY_()
+    ,c_()
+    ,d_()
+    ,romberg4refine_(2)
+    ,powerOfSubstitution_(0)
+    ,randomDo_(false)
+    ,useLog_(false)
+    ,randomNumber_(0)
+    ,randomX_(0)
+    ,reverse_(false)
+    ,reverseX_(0)
+    ,savedResult_(0)
 {
     int aux;
     if(romberg<=0)

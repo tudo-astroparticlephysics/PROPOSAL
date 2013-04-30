@@ -16,6 +16,14 @@ bool relErr(double Is, double HasToBe, double RelError){
     return fabs((Is - HasToBe)/HasToBe)<RelError;
 }
 
+TEST(Assignment , Comparison_equal ) {
+    Integral A;
+    Integral B;
+    EXPECT_TRUE(A==B);
+
+}
+
+
 TEST(Assignment , Copyconstructor ) {
     Integral A;
     Integral B =A;

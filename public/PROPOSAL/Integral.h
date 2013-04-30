@@ -285,6 +285,7 @@ public:
 
     Integral(const Integral&);
     Integral& operator=(const Integral&);
+    bool operator==(const Integral &integral) const ;
 
 //----------------------------------------------------------------------------//
 
