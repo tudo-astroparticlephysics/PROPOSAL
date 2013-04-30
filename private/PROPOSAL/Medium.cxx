@@ -31,16 +31,38 @@ Medium::Medium()
 //----------------------------------------------------------------------------//
 
 Medium::Medium(const Medium &medium)
-    :nucCharge_()
-    ,atomicNum_()
-    ,atomInMolecule_()
-    ,logConstant_()
-    ,bPrime_()
-    ,M_()
-    ,elementName_()
-    ,mN_()
+    :numCompontents_    (medium.numCompontents_)
+    ,nucCharge_         (medium.nucCharge_ )
+    ,atomicNum_         (medium.atomicNum_ )
+    ,atomInMolecule_    (medium.atomInMolecule_ )
+    ,sumCharge_         (medium.sumCharge_)
+    ,ZA_                (medium.ZA_)
+    ,I_                 (medium.I_)
+    ,C1_                (medium.C1_)
+    ,C_                 (medium.C_)
+    ,a_                 (medium.a_)
+    ,m_                 (medium.m_)
+    ,X0_                (medium.X0_)
+    ,X1_                (medium.X1_)
+    ,d0_                (medium.d0_)
+    ,r_                 (medium.r_)
+    ,logConstant_       (medium.logConstant_ )
+    ,bPrime_            (medium.bPrime_ )
+    ,rho_               (medium.rho_)
+    ,massDensity_       (medium.massDensity_)
+    ,molDensity_        (medium.molDensity_)
+    ,M_                 (medium.M_ )
+    ,elementName_       (medium.elementName_ )
+    ,name_              (medium.name_ )
+    ,ecut_              (medium.ecut_)
+    ,vcut_              (medium.vcut_)
+    ,vCut_              (medium.vCut_)
+    ,mN_                (medium.mN_ )
+    ,MM_                (medium.MM_)
+    ,sumNucleons_       (medium.sumNucleons_)
+    ,r0_                (medium.r0_)
 {
-    *this = medium;
+
 }
 //----------------------------------------------------------------------------//
 
@@ -686,6 +708,46 @@ double Medium::FunctionToIntegral(double r)
 
     return r*r/(1+exp((r-r0_)/a));
 }
+//----------------------------------------------------------------------------//
+
+void Medium::swap(Medium &medium)
+{
+    using std::swap;
+
+    swap( numCompontents_   , medium.numCompontents_);
+    swap( sumCharge_        , medium.sumCharge_);
+    swap( ZA_               , medium.ZA_);
+    swap( I_                , medium.I_);
+    swap( C1_               , medium.C1_);
+    swap( C_                , medium.C_);
+    swap( a_                , medium.a_);
+    swap( m_                , medium.m_);
+    swap( X0_               , medium.X0_);
+    swap( X1_               , medium.X1_);
+    swap( d0_               , medium.d0_);
+    swap( r_                , medium.r_);
+    swap( rho_              , medium.rho_);
+    swap( massDensity_      , medium.massDensity_);
+    swap( molDensity_       , medium.molDensity_);
+    swap( ecut_             , medium.ecut_);
+    swap( vcut_             , medium.vcut_);
+    swap( vCut_             , medium.vCut_);
+    swap( MM_               , medium.MM_);
+    swap( sumNucleons_      , medium.sumNucleons_);
+    swap( r0_               , medium.r0_);
+
+    M_.swap( medium.M_ );
+    elementName_.swap( medium.elementName_ );
+    logConstant_.swap( medium.logConstant_ );
+    bPrime_.swap( medium.bPrime_ );
+    mN_.swap( medium.mN_ );
+    nucCharge_.swap( medium.nucCharge_ );
+    atomicNum_.swap( medium.atomicNum_ );
+    atomInMolecule_.swap( medium.atomInMolecule_ );
+    name_.swap( medium.name_ );
+
+}
+
 
 //----------------------------------------------------------------------------//
     // Setter
