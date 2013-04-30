@@ -55,9 +55,6 @@ Photonuclear::Photonuclear(Particle* particle,
     ,dndx_interpolant_2d_()
     ,prob_for_component_()
 {
-    particle_                   = particle;
-    medium_                     = medium;
-    cut_settings_               = cut_settings;
     component_                  = 0;
     multiplier_                 = 1.;
     shadow_                     = 1;

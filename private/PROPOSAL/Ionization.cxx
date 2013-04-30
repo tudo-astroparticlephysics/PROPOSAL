@@ -29,9 +29,6 @@ Ionization::Ionization(Particle* particle,
     ,beta_(0)
     ,gamma_(0)
 {
-    particle_                   = particle;
-    medium_                     = medium;
-    cut_settings_               = cut_settings;
     vMax_                       = 0;
     vUp_                        = 0;
     vMin_                       = 0;

@@ -41,9 +41,6 @@ Epairproduction::Epairproduction(Particle* particle,
     ,dndx_interpolant_2d_()
     ,prob_for_component_()
 {
-    particle_                   = particle;
-    medium_                     = medium;
-    cut_settings_               = cut_settings;
     vMax_                       = 0;
     vUp_                        = 0;
     vMin_                       = 0;
