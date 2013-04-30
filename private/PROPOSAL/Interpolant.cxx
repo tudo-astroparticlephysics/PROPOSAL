@@ -1165,3 +1165,152 @@ Interpolant::~Interpolant(){
 
     Interpolant_.clear();
 }
+
+//------------------------------------------------------------------------//
+//------------------------          Setter               -----------------//
+//------------------------------------------------------------------------//
+void Interpolant::SetRombergY(int rombergY)
+{
+    rombergY_ = rombergY;
+}
+
+void Interpolant::SetRomberg(int romberg)
+{
+    romberg_ = romberg;
+}
+
+void Interpolant::SetIX(const std::vector<double> &iX)
+{
+    iX_ = iX;
+}
+
+void Interpolant::SetIY(const std::vector<double> &iY)
+{
+    iY_ = iY;
+}
+
+void Interpolant::SetC(const std::vector<double> &c)
+{
+    c_ = c;
+}
+
+void Interpolant::SetD(const std::vector<double> &d)
+{
+    d_ = d;
+}
+
+void Interpolant::SetMax(int max)
+{
+    max_ = max;
+}
+
+void Interpolant::SetXmin(double xmin)
+{
+    xmin_ = xmin;
+}
+
+void Interpolant::SetXmax(double xmax)
+{
+    xmax_ = xmax;
+}
+
+void Interpolant::SetStep(double step)
+{
+    step_ = step;
+}
+
+void Interpolant::SetRelative(bool relative)
+{
+    relative_ = relative;
+}
+
+void Interpolant::SetRational(bool rational)
+{
+    rational_ = rational;
+}
+
+void Interpolant::SetRow(int row)
+{
+    row_ = row;
+}
+
+void Interpolant::SetStarti(int starti)
+{
+    starti_ = starti;
+}
+
+void Interpolant::SetRationalY(bool rationalY)
+{
+    rationalY_ = rationalY;
+}
+
+void Interpolant::SetRelativeY(bool relativeY)
+{
+    relativeY_ = relativeY;
+}
+
+void Interpolant::SetSelf(bool self)
+{
+    self_ = self;
+}
+
+void Interpolant::SetFlag(bool flag)
+{
+    flag_ = flag;
+}
+
+void Interpolant::SetReverse(bool reverse)
+{
+    reverse_ = reverse;
+}
+
+void Interpolant::SetIsLog(bool isLog)
+{
+    isLog_ = isLog;
+}
+
+void Interpolant::SetLogSubst(bool logSubst)
+{
+    logSubst_ = logSubst;
+}
+
+void Interpolant::SetPrecision(double precision)
+{
+    precision_ = precision;
+}
+
+void Interpolant::SetWorstX(double worstX)
+{
+    worstX_ = worstX;
+}
+
+void Interpolant::SetWorstX2(double worstX2)
+{
+    worstX2_ = worstX2;
+}
+
+void Interpolant::SetWorstY(double worstY)
+{
+    worstY_ = worstY;
+}
+
+void Interpolant::SetPrecisionY(double precisionY)
+{
+    precisionY_ = precisionY;
+}
+
+void Interpolant::SetFast(bool fast)
+{
+    fast_ = fast;
+}
+
+void Interpolant::SetX_save(double x_save)
+{
+    x_save_ = x_save;
+}
+
+void Interpolant::SetY_save(double y_save)
+{
+    y_save_ = y_save;
+}
+

@@ -54,7 +54,7 @@ private:
 
     boost::function<double (double)> function1d_;
     boost::function<double (double,double)> function2d_;
-    std::vector<Interpolant*> Interpolant_;
+    std::vector<Interpolant *> Interpolant_;
 
     int     row_, starti_;
     bool    rationalY_, relativeY_;
@@ -338,30 +338,196 @@ public:
     double slog(double x);
 
     //------------------------------------------------------------------------//
-
+    //------------------------------------------------------------------------//
+    //------------------------------------------------------------------------//
+    //------------------------------------------------------------------------//
     /**
     * Getter for Interpolant object.
     *
     * \return   Interpolant object;
     */
-    std::vector<Interpolant*> get_Interpolant()
+    std::vector<Interpolant*> GetInterpolant()
     {
         return Interpolant_;
     }
 
     //------------------------------------------------------------------------//
 
-    /**
-    * Getter for max.
-    *
-    * \return   the number of sampling points;
-    */
-    int get_max()
+    int GetRombergY() const
+    {
+        return rombergY_;
+    }
+
+    int GetRomberg() const
+    {
+        return romberg_;
+    }
+
+    std::vector<double> GetIX() const
+    {
+        return iX_;
+    }
+
+    std::vector<double> GetIY() const
+    {
+        return iY_;
+    }
+
+    std::vector<double> GetC() const
+    {
+        return c_;
+    }
+
+    std::vector<double> GetD() const
+    {
+        return d_;
+    }
+
+    int GetMax() const
     {
         return max_;
     }
 
+    double GetXmin() const
+    {
+        return xmin_;
+    }
+
+    double GetXmax() const
+    {
+        return xmax_;
+    }
+
+    double GetStep() const
+    {
+        return step_;
+    }
+
+    bool GetRelative() const
+    {
+        return relative_;
+    }
+
+    bool GetRational() const
+    {
+        return rational_;
+    }
+
+    int GetRow() const
+    {
+        return row_;
+    }
+
+    int GetStarti() const
+    {
+        return starti_;
+    }
+
+    bool GetRationalY() const
+    {
+        return rationalY_;
+    }
+
+    bool GetRelativeY() const
+    {
+        return relativeY_;
+    }
+
+    bool GetSelf() const
+    {
+        return self_;
+    }
+
+    bool GetFlag() const
+    {
+        return flag_;
+    }
+
+    bool GetReverse() const
+    {
+        return reverse_;
+    }
+
+    bool GetIsLog() const
+    {
+        return isLog_;
+    }
+
+    bool GetLogSubst() const
+    {
+        return logSubst_;
+    }
+
+    double GetPrecision() const
+    {
+        return precision_;
+    }
+
+    double GetWorstX() const
+    {
+        return worstX_;
+    }
+
+    double GetWorstX2() const
+    {
+        return worstX2_;
+    }
+
+    double GetWorstY() const
+    {
+        return worstY_;
+    }
+
+    double GetPrecisionY() const
+    {
+        return precisionY_;
+    }
+
+    bool GetFast() const
+    {
+        return fast_;
+    }
+
+    double GetX_save() const
+    {
+        return x_save_;
+    }
+
+    double GetY_save() const
+    {
+        return y_save_;
+    }
+
     //------------------------------------------------------------------------//
+    void SetRombergY(int rombergY);
+    void SetRomberg(int romberg);
+    void SetIX(const std::vector<double> &iX);
+    void SetIY(const std::vector<double> &iY);
+    void SetC(const std::vector<double> &c);
+    void SetD(const std::vector<double> &d);
+    void SetMax(int max);
+    void SetXmin(double xmin);
+    void SetXmax(double xmax);
+    void SetStep(double step);
+    void SetRelative(bool relative);
+    void SetRational(bool rational);
+    void SetRow(int row);
+    void SetStarti(int starti);
+    void SetRationalY(bool rationalY);
+    void SetRelativeY(bool relativeY);
+    void SetSelf(bool self);
+    void SetFlag(bool flag);
+    void SetReverse(bool reverse);
+    void SetIsLog(bool isLog);
+    void SetLogSubst(bool logSubst);
+    void SetPrecision(double precision);
+    void SetWorstX(double worstX);
+    void SetWorstX2(double worstX2);
+    void SetWorstY(double worstY);
+    void SetPrecisionY(double precisionY);
+    void SetFast(bool fast);
+    void SetX_save(double x_save);
+    void SetY_save(double y_save);
     /*!
     * Destructor
     */
