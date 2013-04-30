@@ -66,14 +66,14 @@ ProcessCollection::ProcessCollection(Particle *particle, Medium *medium, EnergyC
 
 double ProcessCollection::FunctionToBuildInterpolant(double energy)
 {
-    return integral_->Integrate(e, particle_->GetLow(), boost::bind(&ProcessCollection::FunctionToIntegral, this, _1),4);
+    return integral_->Integrate(energy, particle_->GetLow(), boost::bind(&ProcessCollection::FunctionToIntegral, this, _1),4);
 }
 
 //----------------------------------------------------------------------------//
 
 double ProcessCollection::FunctionToBuildInterpolantDiff(double energy)
 {
-    return FunctionToIntegral(e);
+    return FunctionToIntegral(energy);
 }
 
 
@@ -93,7 +93,7 @@ double ProcessCollection::FunctionToIntegral(double energy)
         cout<<" * "<<particle_->GetEnergy();
     }
 
-    for(int i =0;i<crosssections_.size();i++)
+    for(unsigned int i =0;i<crosssections_.size();i++)
     {
         aux     =   crosssections_.at(i)->CalculatedEdx();
         result  +=  aux;
@@ -176,8 +176,8 @@ void ProcessCollection::EnableInterpolation()
 
     double energy = particle_->GetEnergy();
 
-    interpolant_        =   new Interpolate(NUM3, particle_->GetLow(), BIGENERGY, boost::bind(&ProcessCollection::FunctionToBuildInterpolant, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
-    interpolant_diff_   =   new Interpolate(NUM3, particle_->GetLow(), BIGENERGY, boost::bind(&ProcessCollection::FunctionToBuildInterpolantDiff, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
+    interpolant_        =   new Interpolant(NUM3, particle_->GetLow(), BIGENERGY, boost::bind(&ProcessCollection::FunctionToBuildInterpolant, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
+    interpolant_diff_   =   new Interpolant(NUM3, particle_->GetLow(), BIGENERGY, boost::bind(&ProcessCollection::FunctionToBuildInterpolantDiff, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
 
     particle_->SetEnergy(energy);
 
@@ -197,7 +197,7 @@ void ProcessCollection::DisableInterpolation()
 void ProcessCollection::EnableLpmEffect()
 {
     lpm_effect_enabled_ =true;
-    for(int i=0;i<crosssections_.size();i++){
+    for(unsigned int i=0;i<crosssections_.size();i++){
         crosssections_.at(i)->EnableLpmEffect(lpm_effect_enabled_);
     }
 }
@@ -207,7 +207,7 @@ void ProcessCollection::EnableLpmEffect()
 void ProcessCollection::DisableLpmEffect()
 {
     lpm_effect_enabled_ =false;
-    for(int i=0;i<crosssections_.size();i++){
+    for(unsigned int i=0;i<crosssections_.size();i++){
         crosssections_.at(i)->EnableLpmEffect(lpm_effect_enabled_);
     }
 }

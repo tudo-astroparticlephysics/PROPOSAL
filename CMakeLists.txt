@@ -112,7 +112,6 @@ IF(DoTesting)
   add_executable(UnitTest_Particle Test/Particle_TEST.cxx)
   add_executable(UnitTest_EnergyCutSettings Test/EnergyCutSettings_TEST.cxx)
 
-
   target_link_libraries(UnitTest_StandardNormal PROPOSAL gtest gtest_main)
   target_link_libraries(UnitTest_Integral PROPOSAL gtest gtest_main)
   target_link_libraries(UnitTest_Interpolant PROPOSAL gtest gtest_main)

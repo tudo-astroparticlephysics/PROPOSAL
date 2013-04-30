@@ -46,7 +46,7 @@ protected:
     Integral*           integral_;
     EnergyCutSettings*  cut_settings_;
 
-    vector<CrossSections*> crosssections_;
+    std::vector<CrossSections*> crosssections_;
 
 
 
