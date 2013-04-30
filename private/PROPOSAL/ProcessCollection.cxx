@@ -7,7 +7,8 @@
 
 #include "PROPOSAL/ProcessCollection.h"
 #include <cmath>
-
+#include "boost/function.hpp"
+#include "boost/bind.hpp"
 
 
 using namespace std;
@@ -134,7 +135,7 @@ double ProcessCollection::GetDx(double ei, double ef, double dist)
     }
     else
     {
-        return integral_->IntegrateWithLog(ei, ef, this, -dist);
+        return integral_->IntegrateWithLog(ei, ef, boost::bind(&ProcessCollection::FunctionToIntegral, this, _1), -dist);
     }
 
 }
