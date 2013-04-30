@@ -40,8 +40,10 @@ public:
 
     EnergyCutSettings();
     EnergyCutSettings(const EnergyCutSettings&);
-    EnergyCutSettings& operator=(const EnergyCutSettings&);
+    EnergyCutSettings& operator=(const EnergyCutSettings& energyCutSettings);
     EnergyCutSettings(double ecut, double vcut);
+    bool operator==(const EnergyCutSettings &energyCutSettings) const;
+    bool operator!=(const EnergyCutSettings &energyCutSettings) const;
 
 //----------------------------------------------------------------------------//
 
@@ -59,6 +61,9 @@ public:
 
 //----------------------------------------------------------------------------//
 
+    void swap(EnergyCutSettings &energyCutSettings);
+
+ //----------------------------------------------------------------------------//
     //Getter
 
     double GetEcut() const

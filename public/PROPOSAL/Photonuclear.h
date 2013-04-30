@@ -26,6 +26,9 @@ protected:
 
     std::vector<double> prob_for_component_; //!< probability for each medium component to interact with the particle (formerly H_)
 
+
+//----------------------------------------------------------------------------//
+
     double KokoulinParametrization(double v, int i);
     double RhodeParametrization(double v, int i);
     double BezrukovBugaevParametrization(double v, int i);
