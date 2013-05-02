@@ -54,6 +54,26 @@ TEST(Assignment , Operator ) {
     EXPECT_TRUE(A==B);
 }
 
+TEST(Assignment , Swap ) {
+    Medium A;
+    Medium B;
+    EXPECT_TRUE(A==B);
+    Medium* C = new Medium("antares water",0.3);
+    Medium* D = new Medium("antares water",0.3);
+    EXPECT_TRUE(*C==*D);
+    Medium* E = new Medium("water",1.);
+    EXPECT_TRUE(A==*E);
+
+    A.swap(*C);
+    EXPECT_TRUE(A==*D);
+    EXPECT_TRUE(B==*C);
+    A.swap(*C);
+    C->swap(*E);
+    EXPECT_TRUE(A==*C);
+
+
+}
+
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();

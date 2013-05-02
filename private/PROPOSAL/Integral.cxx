@@ -134,7 +134,7 @@ bool Integral::operator==(const Integral &integral) const
     {
         if(d_.at(i)     !=  integral.d_.at(i))  return false;
     }
-    if(maxSteps_        != integral.maxSteps_)     return false;
+    if(maxSteps_        != integral.maxSteps_)      return false;
     if(romberg_         != integral.romberg_)       return false;
     if(precision_       != integral.precision_)     return false;
     if(max_             != integral.max_)           return false;

@@ -94,6 +94,11 @@ protected:
 
 public:
 
+
+    Interpolant(const Interpolant&);
+    Interpolant& operator=(const Interpolant&);
+    bool operator==(const Interpolant &interpolant) const;
+    bool operator!=(const Interpolant &interpolant) const;
     /*!
     * Default Constructor.
     * Default Constructor, which does nothing.
@@ -274,6 +279,9 @@ public:
     double Get2dFunctionFixedY(double x); //TOMSASZ
     //------------------------------------------------------------------------//
 
+    void swap(Interpolant &interpolant);
+
+ //----------------------------------------------------------------------------//
     /**
     * Saves an interpolation table from file
     *

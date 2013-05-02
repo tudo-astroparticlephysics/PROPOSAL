@@ -34,6 +34,139 @@ bool isLog2 = false;
 std::string File1DTest = "Interpol1D_Save.txt";
 std::string File2DTest = "Interpol2D_Save.txt";
 
+
+TEST(Comparison , Comparison_equal ) {
+
+    double SearchX =5;
+    double PolValue;
+    Interpolant A;
+    Interpolant B;
+    EXPECT_TRUE(A==B);
+    Interpolant* C = new Interpolant(max, xmin, xmax, X2, romberg, rational, relative, isLog, rombergY, rationalY, relativeY, logSubst);
+    Interpolant* D = new Interpolant(max, xmin, xmax, X2, romberg, rational, relative, isLog, rombergY, rationalY, relativeY, logSubst);
+    EXPECT_TRUE(*C==*D);
+    PolValue = C->interpolate(SearchX);
+    PolValue = D->interpolate(SearchX);
+    EXPECT_TRUE(*C==*D);
+
+    Interpolant* E = new Interpolant(max,  xmin, xmax, max2, x2min, x2max, X_YY,
+                                        romberg, rational, relative, isLog,
+                                        romberg2, rational2, relative2, isLog2,
+                                        rombergY, rationalY, relativeY, logSubst);
+    Interpolant* F = new Interpolant(max,  xmin, xmax, max2, x2min, x2max, X_YY,
+                                        romberg, rational, relative, isLog,
+                                        romberg2, rational2, relative2, isLog2,
+                                        rombergY, rationalY, relativeY, logSubst);
+
+    EXPECT_TRUE(*E==*F);
+
+    SearchX = 7;
+    double SearchY = 11;
+
+    PolValue= E->interpolate(SearchX,SearchY);
+    PolValue= F->interpolate(SearchX,SearchY);
+
+    EXPECT_TRUE(*E==*F);
+}
+
+TEST(Comparison , Comparison_not_equal ) {
+
+    double SearchX =5;
+    double PolValue;
+    Interpolant A;
+
+    Interpolant* B = new Interpolant(max, xmin, xmax, X2, romberg, rational, relative, isLog, rombergY, rationalY, relativeY, logSubst);
+    Interpolant* C = new Interpolant(max, xmin, xmax, X2, romberg, rational, relative, isLog, rombergY, rationalY, relativeY, logSubst);
+
+    PolValue = C->interpolate(SearchX);
+
+    Interpolant* D = new Interpolant(max,  xmin, xmax, max2, x2min, x2max, X_YY,
+                                        romberg, rational, relative, isLog,
+                                        romberg2, rational2, relative2, isLog2,
+                                        rombergY, rationalY, relativeY, false);
+
+    Interpolant* E = new Interpolant(max,  xmin, xmax, max2, x2min, x2max, X_YY,
+                                        romberg, rational, relative, isLog,
+                                        romberg2, rational2, relative2, isLog2,
+                                        rombergY, rationalY, relativeY, true);
+
+    EXPECT_TRUE(A!=*B);
+    EXPECT_TRUE(*B!=*C);
+    EXPECT_TRUE(*D!=*E);
+
+
+}
+
+TEST(Assignment , Copyconstructor ) {
+    Interpolant A;
+    Interpolant B =A;
+
+    EXPECT_TRUE(A==B);
+
+}
+
+TEST(Assignment , Copyconstructor2 ) {
+    Interpolant A(max, xmin, xmax, X2, romberg, rational, relative, isLog, rombergY, rationalY, relativeY, logSubst);
+    Interpolant B(A);
+
+    EXPECT_TRUE(A==B);
+
+    Interpolant* C = new Interpolant(max,  xmin, xmax, max2, x2min, x2max, X_YY,
+                                        romberg, rational, relative, isLog,
+                                        romberg2, rational2, relative2, isLog2,
+                                        rombergY, rationalY, relativeY, true);
+    Interpolant D(*C);
+
+    EXPECT_TRUE(*C==D);
+
+
+}
+
+TEST(Assignment , Operator ) {
+    Interpolant A(max, xmin, xmax, X2, romberg, rational, relative, isLog, rombergY, rationalY, relativeY, logSubst);
+    Interpolant B;
+
+    EXPECT_TRUE(A!=B);
+
+    B=A;
+
+    EXPECT_TRUE(A==B);
+}
+
+
+TEST(Assignment , Swap ) {
+    Interpolant A(max, xmin, xmax, X2, romberg, rational, relative, isLog, rombergY, rationalY, relativeY, logSubst);
+    Interpolant B;
+    Interpolant* C = new Interpolant(max,  xmin, xmax, max2, x2min, x2max, X_YY,
+                                        romberg, rational, relative, isLog,
+                                        romberg2, rational2, relative2, isLog2,
+                                        rombergY, rationalY, relativeY, true);
+    Interpolant D(max, xmin, xmax, X2, romberg, rational, relative, isLog, rombergY, rationalY, relativeY, logSubst);
+    Interpolant E;
+    Interpolant* F = new Interpolant(max,  xmin, xmax, max2, x2min, x2max, X_YY,
+                                        romberg, rational, relative, isLog,
+                                        romberg2, rational2, relative2, isLog2,
+                                        rombergY, rationalY, relativeY, true);
+    EXPECT_TRUE(A==D);
+    EXPECT_TRUE(B==E);
+    EXPECT_TRUE(*C==*F);
+
+    D.swap(E);
+    //E.swap(*F);
+
+    EXPECT_TRUE(A==E);
+    EXPECT_TRUE(B==D);
+
+    D.swap(E);
+    D.swap(*F);
+
+    EXPECT_TRUE(*C==D);
+
+
+
+}
+
+
 TEST(_1D_Interpol , Simple_Test_of_XX_EXPX ) {
     Interpolant* Pol1 = new Interpolant(max, xmin, xmax, X2, romberg, rational, relative, isLog, rombergY, rationalY, relativeY, logSubst);
     double SearchX = 5;

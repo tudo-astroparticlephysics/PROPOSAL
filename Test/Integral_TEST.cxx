@@ -73,6 +73,24 @@ TEST(Assignment , Operator ) {
     EXPECT_TRUE(A==B);
 }
 
+TEST(Assignment , Swap ) {
+    Integral A;
+    Integral B;
+    EXPECT_TRUE(A==B);
+    Integral* C = new Integral(5,20,1e-5);
+    Integral* D = new Integral(5,20,1e-5);
+    EXPECT_TRUE(*C==*D);
+    C->Integrate(0,3,Testfkt,1);
+    D->Integrate(0,3,Testfkt,1);
+    EXPECT_TRUE(*C==*D);
+
+    A.swap(*C);
+    EXPECT_TRUE(A==*D);
+    EXPECT_TRUE(*C==B);
+
+
+}
+
 TEST(IntegralValue , Zero_to_Three_of_xx ) {
     Integral* Int = new Integral();
     ASSERT_NEAR(Int->Integrate(0,3,Testfkt,1),exp(3)-1 , (exp(3)-1)*1E-6);

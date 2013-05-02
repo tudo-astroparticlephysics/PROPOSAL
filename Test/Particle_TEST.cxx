@@ -62,6 +62,25 @@ TEST(Assignment , Operator ) {
     EXPECT_TRUE(A==B);
 }
 
+TEST(Assignment , Swap ) {
+    Particle A;
+    Particle B;
+    EXPECT_TRUE(A==B);
+    Particle* C = new Particle("tau",1.,1.,1,20,20,1e5,10);
+    Particle* D = new Particle("tau",1.,1.,1,20,20,1e5,10);
+    C->SetEnergy(1e6);
+    D->SetEnergy(1e6);
+    EXPECT_TRUE(*C==*D);
+    Particle* E = new Particle("mu",0,0,0,0,0,0,0);
+    EXPECT_TRUE(A==*E);
+    D->swap(A);
+    EXPECT_TRUE(*C==A);
+    EXPECT_TRUE(*D==B);
+    D->swap(*E);
+    EXPECT_TRUE(B==*D);
+
+}
+
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();

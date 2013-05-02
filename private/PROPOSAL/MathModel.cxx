@@ -9,7 +9,6 @@
 
 #include "PROPOSAL/MathModel.h"
 #include "iostream"
-
 #include "boost/bind.hpp"
 #include "boost/generator_iterator.hpp"
 
