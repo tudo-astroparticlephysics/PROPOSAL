@@ -96,7 +96,6 @@ CrossSections::CrossSections(const CrossSections& crossSections)
 
 bool CrossSections::operator==(const CrossSections &crossSections) const
 {
-
     if( vMax_                     != crossSections.vMax_ )                  return false;
     if( vUp_                      != crossSections.vUp_ )                   return false;
     if( vMin_                     != crossSections.vMin_ )                  return false;

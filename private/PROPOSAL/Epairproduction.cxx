@@ -6,30 +6,112 @@
 using namespace std;
 
 Epairproduction::Epairproduction()
-    :reverse_(false)
-    ,eLpm_(0)
-    ,dndx_integral_()
-    ,dndx_interpolant_1d_()
-    ,dndx_interpolant_2d_()
-    ,prob_for_component_()
+    :component_             ( 0 )
+    ,v_                     ( 0 )
+    ,reverse_               ( false )
+    ,eLpm_                  ( 0 )
+    ,dndx_integral_         ( )
+    ,dndx_interpolant_1d_   ( )
+    ,dndx_interpolant_2d_   ( )
+    ,prob_for_component_    ( )
 {
     integral_             = new Integral(IROMB, IMAXS, IPREC);
     integral_for_dEdx_    = new Integral(IROMB, IMAXS, IPREC);
+    dedx_interpolant_     = new Interpolant();
 }
+
+
 //----------------------------------------------------------------------------//
 
 Epairproduction::Epairproduction(const Epairproduction &epair)
+    :CrossSections                      ( epair )
+    ,component_                         ( epair.component_ )
+    ,v_                                 ( epair.v_ )
+    ,reverse_                           ( epair.reverse_ )
+    ,eLpm_                              ( epair.eLpm_)
+    ,integral_                          ( new Integral(*epair.integral_) )
+    ,integral_for_dEdx_                 ( new Integral(*epair.integral_for_dEdx_) )
+    ,dedx_interpolant_                  ( new Interpolant(*epair.dedx_interpolant_) )
+    ,prob_for_component_                ( epair.prob_for_component_)
 {
-    *this = epair;
+    dndx_integral_.resize( epair.dndx_integral_.size() );
+    dndx_interpolant_1d_.resize( epair.dndx_interpolant_1d_.size() );
+    dndx_interpolant_2d_.resize( epair.dndx_interpolant_2d_.size() );
+
+    for(unsigned int i =0; i<epair.dndx_integral_.size(); i++)
+    {
+        dndx_integral_.at(i) = new Integral( *epair.dndx_integral_.at(i) );
+    }
+    for(unsigned int i =0; i<epair.dndx_interpolant_1d_.size(); i++)
+    {
+        dndx_interpolant_1d_.at(i) = new Interpolant( *epair.dndx_interpolant_1d_.at(i) );
+    }
+    for(unsigned int i =0; i<epair.dndx_interpolant_2d_.size(); i++)
+    {
+        dndx_interpolant_2d_.at(i) = new Interpolant( *epair.dndx_interpolant_2d_.at(i) );
+    }
 }
+
 //----------------------------------------------------------------------------//
 
 Epairproduction& Epairproduction::operator=(const Epairproduction &epair){
+
+    if (this != &epair)
+    {
+      Epairproduction tmp(epair);
+      swap(tmp);
+    }
     return *this;
+
 }
 
 //----------------------------------------------------------------------------//
 
+bool Epairproduction::operator==(const Epairproduction &epair) const
+{
+    if( this->CrossSections::operator !=(epair) )                           return false;
+    if( component_                  !=  epair.component_)                   return false;
+    if( v_                          !=  epair.v_)                           return false;
+    if( reverse_                    !=  epair.reverse_)                     return false;
+    if( eLpm_                       !=  epair.eLpm_)                        return false;
+    if( *integral_                  != *epair.integral_)                    return false;
+    if( *integral_for_dEdx_         != *epair.integral_for_dEdx_)           return false;
+    if( *dedx_interpolant_          != *epair.dedx_interpolant_)            return false;
+    if( prob_for_component_.size()  !=  epair.prob_for_component_.size())   return false;
+    if( dndx_integral_.size()       !=  epair.dndx_integral_.size())        return false;
+    if( dndx_interpolant_1d_.size() !=  epair.dndx_interpolant_1d_.size())  return false;
+    if( dndx_interpolant_2d_.size() !=  epair.dndx_interpolant_2d_.size())  return false;
+
+    for(unsigned int i =0; i<epair.dndx_integral_.size(); i++)
+    {
+        if( *dndx_integral_.at(i)       != *epair.dndx_integral_.at(i) )        return false;
+    }
+    for(unsigned int i =0; i<epair.dndx_interpolant_1d_.size(); i++)
+    {
+        if( *dndx_interpolant_1d_.at(i) != *epair.dndx_interpolant_1d_.at(i) )  return false;
+    }
+    for(unsigned int i =0; i<epair.dndx_interpolant_2d_.size(); i++)
+    {
+        if( *dndx_interpolant_2d_.at(i) != *epair.dndx_interpolant_2d_.at(i) )  return false;
+    }
+    for(unsigned int i =0; i<epair.prob_for_component_.size(); i++)
+    {
+        if( prob_for_component_.at(i) != epair.prob_for_component_.at(i) )      return false;
+    }
+    //else
+    return true;
+
+}
+
+//----------------------------------------------------------------------------//
+
+bool Epairproduction::operator!=(const Epairproduction &epair) const
+{
+    return !(*this == epair);
+
+}
+
+//----------------------------------------------------------------------------//
 Epairproduction::Epairproduction(Particle* particle,
                              Medium* medium,
                              EnergyCutSettings* cut_settings)
@@ -65,8 +147,35 @@ Epairproduction::Epairproduction(Particle* particle,
     }
 
     prob_for_component_.resize(medium_->GetNumCompontents());
+    dedx_interpolant_     = new Interpolant();
+
 }
 
+//----------------------------------------------------------------------------//
+
+void Epairproduction::swap(Epairproduction &epair)
+{
+    using std::swap;
+
+    this->CrossSections::swap(epair);
+
+    swap(component_,epair.component_);
+    swap(v_,epair.v_);
+    swap(reverse_,epair.reverse_);
+    swap(eLpm_,epair.eLpm_);
+
+    integral_for_dEdx_->swap(*epair.integral_for_dEdx_);
+    integral_->swap(*epair.integral_);
+    dedx_interpolant_->swap(*epair.dedx_interpolant_);
+
+    prob_for_component_.swap(epair.prob_for_component_);
+    dndx_integral_.swap(epair.dndx_integral_);
+    dndx_interpolant_1d_.swap(epair.dndx_interpolant_1d_);
+    dndx_interpolant_2d_.swap(epair.dndx_interpolant_2d_);
+
+
+
+}
 //----------------------------------------------------------------------------//
 
 

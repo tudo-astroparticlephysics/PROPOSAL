@@ -166,10 +166,14 @@ public:
     Photonuclear();
     Photonuclear(const Photonuclear&);
     Photonuclear& operator=(const Photonuclear&);
+    bool operator==(const Photonuclear &photo) const;
+    bool operator!=(const Photonuclear &photo) const;
     Photonuclear(Particle* particle, Medium* medium, EnergyCutSettings* cut_settings);
 
+//----------------------------------------------------------------------------//
+    void swap(Photonuclear &photo);
 
-
+//----------------------------------------------------------------------------//
     double CalculatedEdx();
 
 //----------------------------------------------------------------------------//

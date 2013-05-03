@@ -4,15 +4,16 @@
 using namespace std;
 
 Photonuclear::Photonuclear()
-    :init_measured_(true)
-    ,init_hardbb_(true)
-    ,hmax_(8)
-    ,v_(0)
-    ,dndx_integral_()
-    ,interpolant_hardBB_()
-    ,dndx_interpolant_1d_()
-    ,dndx_interpolant_2d_()
-    ,prob_for_component_()
+    :component_             ( 0 )
+    ,init_measured_         ( true )
+    ,init_hardbb_           ( true )
+    ,hmax_                  ( 8 )
+    ,v_                     ( 0 )
+    ,dndx_integral_         ( )
+    ,interpolant_hardBB_    ( )
+    ,dndx_interpolant_1d_   ( )
+    ,dndx_interpolant_2d_   ( )
+    ,prob_for_component_    ( )
 {
     shadow_ =   1;
 
@@ -26,36 +27,132 @@ Photonuclear::Photonuclear()
     }
 
     prob_for_component_.resize(medium_->GetNumCompontents());
+    dedx_interpolant_     = new Interpolant();
+    interpolant_measured_ = new Interpolant();
 }
+//----------------------------------------------------------------------------//
+
 //----------------------------------------------------------------------------//
 
 Photonuclear::Photonuclear(const Photonuclear &photo)
+    :CrossSections                      ( photo )
+    ,component_                         ( photo.component_ )
+    ,init_measured_                     ( photo.init_measured_ )
+    ,init_hardbb_                       ( photo.init_hardbb_ )
+    ,hmax_                              ( photo.hmax_ )
+    ,v_                                 ( photo.v_ )
+    ,integral_                          ( new Integral(*photo.integral_) )
+    ,integral_for_dEdx_                 ( new Integral(*photo.integral_for_dEdx_) )
+    ,dedx_interpolant_                  ( new Interpolant(*photo.dedx_interpolant_) )
+    ,interpolant_measured_              ( new Interpolant(*photo.interpolant_measured_) )
+    ,prob_for_component_                ( photo.prob_for_component_ )
 {
-    *this = photo;
+    dndx_integral_.resize( photo.dndx_integral_.size() );
+    dndx_interpolant_1d_.resize( photo.dndx_interpolant_1d_.size() );
+    dndx_interpolant_2d_.resize( photo.dndx_interpolant_2d_.size() );
+    interpolant_hardBB_.resize( photo.interpolant_hardBB_.size() );
+
+    for(unsigned int i =0; i<photo.dndx_integral_.size(); i++)
+    {
+        dndx_integral_.at(i) = new Integral( *photo.dndx_integral_.at(i) );
+    }
+    for(unsigned int i =0; i<photo.dndx_interpolant_1d_.size(); i++)
+    {
+        dndx_interpolant_1d_.at(i) = new Interpolant( *photo.dndx_interpolant_1d_.at(i) );
+    }
+    for(unsigned int i =0; i<photo.dndx_interpolant_2d_.size(); i++)
+    {
+        dndx_interpolant_2d_.at(i) = new Interpolant( *photo.dndx_interpolant_2d_.at(i) );
+    }
+    for(unsigned int i =0; i<photo.interpolant_hardBB_.size(); i++)
+    {
+        interpolant_hardBB_.at(i) = new Interpolant( *photo.interpolant_hardBB_.at(i) );
+    }
+
 }
+
 //----------------------------------------------------------------------------//
 
 Photonuclear& Photonuclear::operator=(const Photonuclear &photo){
+
+    if (this != &photo)
+    {
+      Photonuclear tmp(photo);
+      swap(tmp);
+    }
     return *this;
 }
 
+//----------------------------------------------------------------------------//
+
+bool Photonuclear::operator==(const Photonuclear &photo) const
+{
+    if( this->CrossSections::operator !=(photo) )                           return false;
+
+    if( component_                  !=  photo.component_)                   return false;
+    if( hmax_                       !=  photo.hmax_)                        return false;
+    if( v_                          !=  photo.v_)                           return false;
+    if( init_hardbb_                !=  photo.init_hardbb_)                 return false;
+    if( init_measured_              !=  photo.init_measured_)               return false;
+    if( *integral_                  != *photo.integral_)                    return false;
+    if( *integral_for_dEdx_         != *photo.integral_for_dEdx_)           return false;
+    if( *dedx_interpolant_          != *photo.dedx_interpolant_)            return false;
+    if( prob_for_component_.size()  !=  photo.prob_for_component_.size())   return false;
+    if( dndx_integral_.size()       !=  photo.dndx_integral_.size())        return false;
+    if( dndx_interpolant_1d_.size() !=  photo.dndx_interpolant_1d_.size())  return false;
+    if( dndx_interpolant_2d_.size() !=  photo.dndx_interpolant_2d_.size())  return false;
+    if( interpolant_hardBB_.size()  !=  photo.interpolant_hardBB_.size())   return false;
+    if( *interpolant_measured_      !=  *photo.interpolant_measured_)        return false;
+    for(unsigned int i =0; i<photo.dndx_integral_.size(); i++)
+    {
+        if( *dndx_integral_.at(i)       != *photo.dndx_integral_.at(i) )        return false;
+    }
+    for(unsigned int i =0; i<photo.dndx_interpolant_1d_.size(); i++)
+    {
+        if( *dndx_interpolant_1d_.at(i) != *photo.dndx_interpolant_1d_.at(i) )  return false;
+    }
+    for(unsigned int i =0; i<photo.dndx_interpolant_2d_.size(); i++)
+    {
+        if( *dndx_interpolant_2d_.at(i) != *photo.dndx_interpolant_2d_.at(i) )  return false;
+    }
+    for(unsigned int i =0; i<photo.prob_for_component_.size(); i++)
+    {
+        if( prob_for_component_.at(i) != photo.prob_for_component_.at(i) )      return false;
+    }
+    for(unsigned int i =0; i<photo.interpolant_hardBB_.size(); i++)
+    {
+        if( *interpolant_hardBB_.at(i) != *photo.interpolant_hardBB_.at(i) )  return false;
+    }
+
+    //else
+    return true;
+
+}
+
+//----------------------------------------------------------------------------//
+
+bool Photonuclear::operator!=(const Photonuclear &photo) const
+{
+    return !(*this == photo);
+
+}
 //----------------------------------------------------------------------------//
 
 Photonuclear::Photonuclear(Particle* particle,
                              Medium* medium,
                              EnergyCutSettings* cut_settings)
     :CrossSections(particle, medium, cut_settings)
-    ,init_measured_(true)
-    ,init_hardbb_(true)
-    ,hmax_(8)
-    ,v_(0)
-    ,dndx_integral_()
-    ,interpolant_hardBB_()
-    ,dndx_interpolant_1d_()
-    ,dndx_interpolant_2d_()
-    ,prob_for_component_()
+    ,component_             ( 0 )
+    ,init_measured_         ( true )
+    ,init_hardbb_           ( true )
+    ,hmax_                  ( 8 )
+    ,v_                     ( 0 )
+    ,dndx_integral_         ( )
+    ,interpolant_hardBB_    ( )
+    ,dndx_interpolant_1d_   ( )
+    ,dndx_interpolant_2d_   ( )
+    ,prob_for_component_    ( )
 {
-    component_                  = 0;
     multiplier_                 = 1.;
     shadow_                     = 1;
 
@@ -69,9 +166,38 @@ Photonuclear::Photonuclear(Particle* particle,
     }
 
     prob_for_component_.resize(medium_->GetNumCompontents());
+    dedx_interpolant_     = new Interpolant();
+    interpolant_measured_ = new Interpolant();
+
 
 }
+//----------------------------------------------------------------------------//
 
+void Photonuclear::swap(Photonuclear &photo)
+{
+    using std::swap;
+
+    this->CrossSections::swap(photo);
+
+    swap(component_,photo.component_);
+    swap(init_measured_,photo.init_measured_);
+    swap(init_hardbb_,photo.init_hardbb_);
+    swap(hmax_,photo.hmax_);
+    swap(v_,photo.v_);
+
+    integral_for_dEdx_->swap(*photo.integral_for_dEdx_);
+    integral_->swap(*photo.integral_);
+    dedx_interpolant_->swap(*photo.dedx_interpolant_);
+    interpolant_measured_->swap(*photo.interpolant_measured_);
+
+    prob_for_component_.swap(photo.prob_for_component_);
+    dndx_integral_.swap(photo.dndx_integral_);
+    dndx_interpolant_1d_.swap(photo.dndx_interpolant_1d_);
+    dndx_interpolant_2d_.swap(photo.dndx_interpolant_2d_);
+    interpolant_hardBB_.swap(photo.interpolant_hardBB_);
+
+
+}
 //----------------------------------------------------------------------------//
 
 void Photonuclear::SetIntegralLimits(int component){

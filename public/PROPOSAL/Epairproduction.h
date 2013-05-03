@@ -91,6 +91,8 @@ public:
 
     Epairproduction();
     Epairproduction(const Epairproduction&);
+    bool operator==(const Epairproduction &epair) const;
+    bool operator!=(const Epairproduction &epair) const;
     Epairproduction& operator=(const Epairproduction&);
     Epairproduction(Particle* particle, Medium* medium, EnergyCutSettings* cut_settings);
 
@@ -148,8 +150,9 @@ public:
     double FunctionToBuildDNdxInterpolant2D(double energy, double v);
 
 //----------------------------------------------------------------------------//
+    void swap(Epairproduction &epair);
 
-
+//--------------------------------------------------------------------------- //
 
     //Setter
 
