@@ -132,7 +132,6 @@ IF(DoTesting)
   add_test(UnitTest_EnergyCutSettings bin/UnitTest_EnergyCutSettings)
   add_test(UnitTest_Interpolant bin/UnitTest_Interpolant)
   add_test(UnitTest_Epairproduction bin/UnitTest_Epairproduction)
-
   add_test(UnitTest_Ionization bin/UnitTest_Ionization)
   add_test(UnitTest_Bremsstrahlung bin/UnitTest_Bremsstrahlung)
   add_test(UnitTest_Photonuclear bin/UnitTest_Photonuclear)

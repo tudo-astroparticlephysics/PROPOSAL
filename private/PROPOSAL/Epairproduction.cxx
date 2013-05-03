@@ -116,12 +116,13 @@ Epairproduction::Epairproduction(Particle* particle,
                              Medium* medium,
                              EnergyCutSettings* cut_settings)
     :CrossSections(particle, medium, cut_settings)
-    ,reverse_(false)
-    ,eLpm_(0)
-    ,dndx_integral_()
-    ,dndx_interpolant_1d_()
-    ,dndx_interpolant_2d_()
-    ,prob_for_component_()
+    ,v_                     ( 0 )
+    ,reverse_               ( false )
+    ,eLpm_                  ( 0 )
+    ,dndx_integral_         ( )
+    ,dndx_interpolant_1d_   ( )
+    ,dndx_interpolant_2d_   ( )
+    ,prob_for_component_    ( )
 {
     vMax_                       = 0;
     vUp_                        = 0;
