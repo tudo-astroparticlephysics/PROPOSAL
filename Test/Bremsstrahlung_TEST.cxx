@@ -32,93 +32,138 @@ public:
     }
 };
 
-//TEST(Assignment , Copyconstructor ) {
+TEST(Comparison , Comparison_equal ) {
 
-//    Medium *medium_a = new Medium("air",1.);
-//    Particle *particle_a = new Particle("mu",1.,1.,1,.20,20,1e5,10);
-//    particle_a->SetEnergy(1e6);
-//    EnergyCutSettings *cuts_a = new EnergyCutSettings(500.,0.05);
-//    Bremsstrahlung *A = new Bremsstrahlung(particle_a, medium_a, cuts_a);
+    double dEdx;
+    Medium *medium = new Medium("air",1.);
+    Particle *particle = new Particle("mu",1.,1.,1,.20,20,1e5,10);
+    EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
+    Bremsstrahlung *A = new Bremsstrahlung(particle, medium, cuts);
+    Bremsstrahlung *B = new Bremsstrahlung(particle, medium, cuts);
+    EXPECT_TRUE(*A==*B);
 
-//    A->SetParametrization(2);
-//    A->EnableLpmEffect(true);
+    Bremsstrahlung *C = new Bremsstrahlung();
+    Bremsstrahlung *D = new Bremsstrahlung();
+
+    EXPECT_TRUE(*C==*D);
+
+    A->GetParticle()->SetEnergy(1e6);
+    B->GetParticle()->SetEnergy(1e6);
+    EXPECT_TRUE(*A==*B);
+
+    dEdx = A->CalculatedNdx();
+    dEdx = B->CalculatedNdx();
+    EXPECT_TRUE(*A==*B);
+    A->EnableDEdxInterpolation();
+    A->EnableDNdxInterpolation();
+    B->EnableDEdxInterpolation();
+    B->EnableDNdxInterpolation();
+
+    EXPECT_TRUE(*A==*B);
+}
+
+TEST(Comparison , Comparison_not_equal ) {
+    double dEdx;
+    Medium *medium = new Medium("air",1.);
+    Medium *medium2 = new Medium("water",1.);
+    Particle *particle = new Particle("mu",1.,1.,1,20,20,1e5,10);
+    Particle *particle2 = new Particle("tau",1.,1.,1,20,20,1e5,10);
+    EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
+    Bremsstrahlung *A = new Bremsstrahlung(particle, medium, cuts);
+    Bremsstrahlung *B = new Bremsstrahlung(particle, medium2, cuts);
+    Bremsstrahlung *C = new Bremsstrahlung(particle2, medium, cuts);
+    Bremsstrahlung *D = new Bremsstrahlung(particle2, medium2, cuts);
+    Bremsstrahlung *E = new Bremsstrahlung(particle2, medium2, cuts);
+
+    EXPECT_TRUE(*A!=*B);
+    EXPECT_TRUE(*C!=*D);
+    EXPECT_TRUE(*B!=*D);
+    EXPECT_TRUE(*D==*E);
+
+    E->SetParticle(particle);
+    EXPECT_TRUE(*D!=*E);
+    D->SetParticle(particle);
+    EXPECT_TRUE(*D==*E);
+    D->SetParametrization(6);
+    EXPECT_TRUE(*D!=*E);
 
 
-//    Medium *medium_b = new Medium("air",1.);
-//    Particle *particle_b = new Particle("mu",1.,1.,1,.20,20,1e5,10);
-//    particle_b->SetEnergy(1e6);
-//    EnergyCutSettings *cuts_b = new EnergyCutSettings(500.,0.05);
-//    Bremsstrahlung *B = new Bremsstrahlung(particle_b, medium_b, cuts_b);
+}
 
-//    B->SetParametrization(2);
-//    B->EnableLpmEffect(true);
+TEST(Assignment , Copyconstructor ) {
+    Bremsstrahlung A;
+    Bremsstrahlung B =A;
+
+    EXPECT_TRUE(A==B);
+
+}
+
+TEST(Assignment , Copyconstructor2 ) {
+    Medium *medium = new Medium("air",1.);
+    Particle *particle = new Particle("mu",1.,1.,1,.20,20,1e5,10);
+    EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
+
+    Bremsstrahlung A(particle, medium, cuts);
+    Bremsstrahlung B(A);
+
+    EXPECT_TRUE(A==B);
+
+}
+
+TEST(Assignment , Operator ) {
+    Medium *medium = new Medium("air",1.);
+    Particle *particle = new Particle("mu",1.,1.,1,.20,20,1e5,10);
+    EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
+    Bremsstrahlung A(particle, medium, cuts);
+    Bremsstrahlung B(particle, medium, cuts);
+    A.SetParametrization(6);
+
+    EXPECT_TRUE(A!=B);
+
+    B=A;
+
+    EXPECT_TRUE(A==B);
+
+    Medium *medium2 = new Medium("water",1.);
+    Particle *particle2 = new Particle("tau",1.,1.,1,.20,20,1e5,10);
+    EnergyCutSettings *cuts2 = new EnergyCutSettings(200,-1);
+    Bremsstrahlung *C = new Bremsstrahlung(particle2, medium2, cuts2);
+    EXPECT_TRUE(A!=*C);
+
+    A=*C;
+
+    EXPECT_TRUE(A==*C);
+
+}
+
+TEST(Assignment , Swap ) {
+    Medium *medium = new Medium("air",1.);
+    Medium *medium2 = new Medium("air",1.);
+    Particle *particle = new Particle("mu",1.,1.,1,.20,20,1e5,10);
+    Particle *particle2 = new Particle("mu",1.,1.,1,.20,20,1e5,10);
+    EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
+    EnergyCutSettings *cuts2 = new EnergyCutSettings(500,-1);
+    Bremsstrahlung A(particle, medium, cuts);
+    Bremsstrahlung B(particle2, medium2, cuts2);
+    EXPECT_TRUE(A==B);
+
+    Medium *medium3 = new Medium("water",1.);
+    Medium *medium4 = new Medium("water",1.);
+    Particle *particle3 = new Particle("tau",1.,1.,1,.20,20,1e5,10);
+    Particle *particle4 = new Particle("tau",1.,1.,1,.20,20,1e5,10);
+    EnergyCutSettings *cuts3 = new EnergyCutSettings(200,-1);
+    EnergyCutSettings *cuts4 = new EnergyCutSettings(200,-1);
+    Bremsstrahlung *C = new Bremsstrahlung(particle3, medium3, cuts3);
+    Bremsstrahlung *D = new Bremsstrahlung(particle4, medium4, cuts4);
+    EXPECT_TRUE(*C==*D);
+
+    A.swap(*C);
+
+    EXPECT_TRUE(A==*D);
+    EXPECT_TRUE(*C==B);
 
 
-//    dEdx_new=A->CalculatedEdx();
-
-//}
-
-//TEST(Assignment , Copyconstructor2 ) {
-//    Integral A;
-//    Integral B(A);
-
-//    EXPECT_EQ(A.GetMaxSteps() , B.GetMaxSteps());
-//    EXPECT_EQ(A.GetRomberg()  , B.GetRomberg());
-//    EXPECT_EQ(A.GetIX().size(), B.GetIX().size());
-//    EXPECT_EQ(A.GetIY().size(), B.GetIY().size());
-//    EXPECT_EQ(A.GetC().size() , B.GetC().size());
-//    EXPECT_EQ(A.GetD().size() , B.GetD().size());
-
-//    for(int i =0; i < A.GetIX().size(); i++){
-//        EXPECT_EQ(A.GetIX().at(i), B.GetIX().at(i));
-//    }
-//    for(int i =0; i < A.GetIY().size(); i++){
-//        EXPECT_EQ(A.GetIY().at(i), B.GetIY().at(i));
-//    }
-//    for(int i =0; i < A.GetC().size(); i++){
-//        EXPECT_EQ(A.GetC().at(i), B.GetC().at(i));
-//    }
-//    for(int i =0; i < A.GetD().size(); i++){
-//        EXPECT_EQ(A.GetD().at(i), B.GetD().at(i));
-//    }
-//}
-
-
-
-//TEST(Assignment , Operator ) {
-//    Integral A;
-//    A.Integrate(0,3,Testfkt,1);
-//    Integral B(8,40,1e-9);
-
-//    EXPECT_NE(A.GetMaxSteps() , B.GetMaxSteps());
-//    EXPECT_NE(A.GetRomberg()  , B.GetRomberg());
-//    EXPECT_NE(A.GetIX().size(), B.GetIX().size());
-//    EXPECT_NE(A.GetIY().size(), B.GetIY().size());
-//    EXPECT_NE(A.GetC().size() , B.GetC().size());
-//    EXPECT_NE(A.GetD().size() , B.GetD().size());
-
-//    B=A;
-
-//    EXPECT_EQ(A.GetMaxSteps() , B.GetMaxSteps());
-//    EXPECT_EQ(A.GetRomberg()  , B.GetRomberg());
-//    EXPECT_EQ(A.GetIX().size(), B.GetIX().size());
-//    EXPECT_EQ(A.GetIY().size(), B.GetIY().size());
-//    EXPECT_EQ(A.GetC().size() , B.GetC().size());
-//    EXPECT_EQ(A.GetD().size() , B.GetD().size());
-
-//    for(int i =0; i < A.GetIX().size(); i++){
-//        EXPECT_EQ(A.GetIX().at(i), B.GetIX().at(i));
-//    }
-//    for(int i =0; i < A.GetIY().size(); i++){
-//        EXPECT_EQ(A.GetIY().at(i), B.GetIY().at(i));
-//    }
-//    for(int i =0; i < A.GetC().size(); i++){
-//        EXPECT_EQ(A.GetC().at(i), B.GetC().at(i));
-//    }
-//    for(int i =0; i < A.GetD().size(); i++){
-//        EXPECT_EQ(A.GetD().at(i), B.GetD().at(i));
-//    }
-//}
+}
 
 TEST(Bremsstrahlung , Test_of_dEdx ) {
 

@@ -32,6 +32,139 @@ public:
     }
 };
 
+TEST(Comparison , Comparison_equal ) {
+
+    double dEdx;
+    Medium *medium = new Medium("air",1.);
+    Particle *particle = new Particle("mu",1.,1.,1,.20,20,1e5,10);
+    EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
+    Ionization *A = new Ionization(particle, medium, cuts);
+    Ionization *B = new Ionization(particle, medium, cuts);
+    EXPECT_TRUE(*A==*B);
+
+    Ionization *C = new Ionization();
+    Ionization *D = new Ionization();
+
+    EXPECT_TRUE(*C==*D);
+
+    A->GetParticle()->SetEnergy(1e6);
+    B->GetParticle()->SetEnergy(1e6);
+    EXPECT_TRUE(*A==*B);
+
+    dEdx = A->CalculatedNdx();
+    dEdx = B->CalculatedNdx();
+    EXPECT_TRUE(*A==*B);
+    A->EnableDEdxInterpolation();
+    A->EnableDNdxInterpolation();
+    B->EnableDEdxInterpolation();
+    B->EnableDNdxInterpolation();
+
+    EXPECT_TRUE(*A==*B);
+}
+
+TEST(Comparison , Comparison_not_equal ) {
+    double dEdx;
+    Medium *medium = new Medium("air",1.);
+    Medium *medium2 = new Medium("water",1.);
+    Particle *particle = new Particle("mu",1.,1.,1,20,20,1e5,10);
+    Particle *particle2 = new Particle("tau",1.,1.,1,20,20,1e5,10);
+    EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
+    Ionization *A = new Ionization(particle, medium, cuts);
+    Ionization *B = new Ionization(particle, medium2, cuts);
+    Ionization *C = new Ionization(particle2, medium, cuts);
+    Ionization *D = new Ionization(particle2, medium2, cuts);
+    Ionization *E = new Ionization(particle2, medium2, cuts);
+
+    EXPECT_TRUE(*A!=*B);
+    EXPECT_TRUE(*C!=*D);
+    EXPECT_TRUE(*B!=*D);
+    EXPECT_TRUE(*D==*E);
+
+    E->SetParticle(particle);
+    EXPECT_TRUE(*D!=*E);
+    D->SetParticle(particle);
+    EXPECT_TRUE(*D==*E);
+    D->SetParametrization(6);
+    EXPECT_TRUE(*D!=*E);
+
+
+}
+
+TEST(Assignment , Copyconstructor ) {
+    Ionization A;
+    Ionization B =A;
+
+    EXPECT_TRUE(A==B);
+
+}
+
+TEST(Assignment , Copyconstructor2 ) {
+    Medium *medium = new Medium("air",1.);
+    Particle *particle = new Particle("mu",1.,1.,1,.20,20,1e5,10);
+    EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
+
+    Ionization A(particle, medium, cuts);
+    Ionization B(A);
+
+    EXPECT_TRUE(A==B);
+
+}
+
+TEST(Assignment , Operator ) {
+    Medium *medium = new Medium("air",1.);
+    Particle *particle = new Particle("mu",1.,1.,1,.20,20,1e5,10);
+    EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
+    Ionization A(particle, medium, cuts);
+    Ionization B(particle, medium, cuts);
+    A.SetParametrization(6);
+
+    EXPECT_TRUE(A!=B);
+
+    B=A;
+
+    EXPECT_TRUE(A==B);
+
+    Medium *medium2 = new Medium("water",1.);
+    Particle *particle2 = new Particle("tau",1.,1.,1,.20,20,1e5,10);
+    EnergyCutSettings *cuts2 = new EnergyCutSettings(200,-1);
+    Ionization *C = new Ionization(particle2, medium2, cuts2);
+    EXPECT_TRUE(A!=*C);
+
+    A=*C;
+
+    EXPECT_TRUE(A==*C);
+
+}
+
+TEST(Assignment , Swap ) {
+    Medium *medium = new Medium("air",1.);
+    Medium *medium2 = new Medium("air",1.);
+    Particle *particle = new Particle("mu",1.,1.,1,.20,20,1e5,10);
+    Particle *particle2 = new Particle("mu",1.,1.,1,.20,20,1e5,10);
+    EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
+    EnergyCutSettings *cuts2 = new EnergyCutSettings(500,-1);
+    Ionization A(particle, medium, cuts);
+    Ionization B(particle2, medium2, cuts2);
+    EXPECT_TRUE(A==B);
+
+    Medium *medium3 = new Medium("water",1.);
+    Medium *medium4 = new Medium("water",1.);
+    Particle *particle3 = new Particle("tau",1.,1.,1,.20,20,1e5,10);
+    Particle *particle4 = new Particle("tau",1.,1.,1,.20,20,1e5,10);
+    EnergyCutSettings *cuts3 = new EnergyCutSettings(200,-1);
+    EnergyCutSettings *cuts4 = new EnergyCutSettings(200,-1);
+    Ionization *C = new Ionization(particle3, medium3, cuts3);
+    Ionization *D = new Ionization(particle4, medium4, cuts4);
+    EXPECT_TRUE(*C==*D);
+
+    A.swap(*C);
+
+    EXPECT_TRUE(A==*D);
+    EXPECT_TRUE(*C==B);
+
+
+}
+
 TEST(Ionization , Test_of_dEdx ) {
 
     ifstream in;

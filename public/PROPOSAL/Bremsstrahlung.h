@@ -111,16 +111,16 @@ private:
     void SetIntegralLimits(int component);
 
 //----------------------------------------------------------------------------//
-    void swap(Bremsstrahlung &brems);
 
-//---------------------------------------------------------------------------
 public:
 
 //----------------------------------------------------------------------------//
 
     Bremsstrahlung();
     Bremsstrahlung(const Bremsstrahlung&);
-    Bremsstrahlung& operator=(const Bremsstrahlung&);
+    Bremsstrahlung& operator=(const Bremsstrahlung& brems);
+    bool operator==(const Bremsstrahlung &brems) const;
+    bool operator!=(const Bremsstrahlung &brems) const;
     Bremsstrahlung(Particle* particle, Medium* medium, EnergyCutSettings* cut_settings);
 
 
@@ -177,7 +177,10 @@ public:
 
     double FunctionToBuildDNdxInterpolant2D(double energy , double v);
 
+//----------------------------------------------------------------------------//
+    void swap(Bremsstrahlung &brems);
 
+//--------------------------------------------------------------------------- //
     //Getter
 
     bool GetLorenz() const

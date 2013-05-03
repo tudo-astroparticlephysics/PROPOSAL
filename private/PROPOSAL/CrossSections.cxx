@@ -2,19 +2,20 @@
 #include "PROPOSAL/Constants.h"
 
 
-CrossSections::CrossSections()
-    :vMax_(0)
-    ,vUp_ (0)
-    ,vMin_(0)
-    ,ebig_(BIGENERGY)
-    ,do_dedx_Interpolation_(false)
-    ,do_dndx_Interpolation_(false)
-    ,multiplier_(1.)
-    ,parametrization_(1)
-    ,lpm_effect_enabled_(false)
-    ,init_lpm_effect_(true)
-    ,hard_component_(true)
-    ,order_of_interpolation_(5)
+CrossSections::CrossSections( )
+    :vMax_                  ( 0 )
+    ,vUp_                   ( 0 )
+    ,vMin_                  ( 0 )
+    ,ebig_                  ( BIGENERGY )
+    ,do_dedx_Interpolation_ ( false )
+    ,do_dndx_Interpolation_ ( false )
+    ,multiplier_            ( 1. )
+    ,parametrization_       ( 1 )
+    ,lpm_effect_enabled_    ( false )
+    ,init_lpm_effect_       ( true )
+    ,shadow_                ( 1 )
+    ,hard_component_        ( true )
+    ,order_of_interpolation_( 5 )
 {
     particle_       = new Particle();
     medium_         = new Medium();
@@ -25,21 +26,130 @@ CrossSections::CrossSections()
 CrossSections::CrossSections(Particle* particle,
                              Medium* medium,
                              EnergyCutSettings* cut_settings)
-    :vMax_(0)
-    ,vUp_ (0)
-    ,vMin_(0)
-    ,ebig_(BIGENERGY)
-    ,do_dedx_Interpolation_(false)
-    ,do_dndx_Interpolation_(false)
-    ,multiplier_(1.)
-    ,parametrization_(1)
-    ,hard_component_(true)
-    ,order_of_interpolation_(5)
+    :vMax_                  ( 0 )
+    ,vUp_                   ( 0 )
+    ,vMin_                  ( 0 )
+    ,ebig_                  ( BIGENERGY )
+    ,do_dedx_Interpolation_ ( false )
+    ,do_dndx_Interpolation_ ( false )
+    ,multiplier_            ( 1. )
+    ,parametrization_       ( 1 )
+    ,lpm_effect_enabled_    ( false )
+    ,init_lpm_effect_       ( true )
+    ,shadow_                ( 1 )
+    ,hard_component_        ( true )
+    ,order_of_interpolation_( 5 )
 {
     particle_       = particle;
     medium_         = medium;
     cut_settings_   = cut_settings;
 }
+
+//----------------------------------------------------------------------------//
+
+CrossSections::CrossSections(const CrossSections& crossSections)
+    :vMax_                     ( crossSections.vMax_ )
+    ,vUp_                      ( crossSections.vUp_ )
+    ,vMin_                     ( crossSections.vMin_ )
+    ,ebig_                     ( crossSections.ebig_ )
+    ,do_dedx_Interpolation_    ( crossSections.do_dedx_Interpolation_ )
+    ,do_dndx_Interpolation_    ( crossSections.do_dndx_Interpolation_ )
+    ,multiplier_               ( crossSections.multiplier_ )
+    ,parametrization_          ( crossSections.parametrization_ )
+    ,lpm_effect_enabled_       ( crossSections.lpm_effect_enabled_ )
+    ,init_lpm_effect_          ( crossSections.init_lpm_effect_ )
+    ,shadow_                   ( crossSections.shadow_ )
+    ,hard_component_           ( crossSections.hard_component_ )
+    ,order_of_interpolation_   ( crossSections.order_of_interpolation_ )
+{
+    particle_                 = new Particle( *crossSections.particle_ );
+    medium_                   = new Medium( *crossSections.medium_ );
+    cut_settings_             = new EnergyCutSettings( *crossSections.cut_settings_ );
+}
+
+//----------------------------------------------------------------------------//
+
+//CrossSections& CrossSections::operator=(const CrossSections &crossSections){
+
+//    if (this != &crossSections)
+//    {
+//        vMax_                     = crossSections.vMax_;
+//        vUp_                      = crossSections.vUp_;
+//        vMin_                     = crossSections.vMin_;
+//        ebig_                     = crossSections.ebig_;
+//        do_dedx_Interpolation_    = crossSections.do_dedx_Interpolation_;
+//        do_dndx_Interpolation_    = crossSections.do_dndx_Interpolation_;
+//        multiplier_               = crossSections.multiplier_;
+//        parametrization_          = crossSections.parametrization_;
+//        lpm_effect_enabled_       = crossSections.lpm_effect_enabled_;
+//        init_lpm_effect_          = crossSections.init_lpm_effect_;
+//        shadow_                   = crossSections.shadow_;
+//        hard_component_           = crossSections.hard_component_;
+//        order_of_interpolation_   = crossSections.order_of_interpolation_;
+//        *cut_settings_            = *crossSections.cut_settings_;
+//        *particle_                = *crossSections.particle_;
+//        *medium_                  = *crossSections.medium_;
+//    }
+//    return *this;
+//}
+//----------------------------------------------------------------------------//
+
+bool CrossSections::operator==(const CrossSections &crossSections) const
+{
+
+    if( vMax_                     != crossSections.vMax_ )                  return false;
+    if( vUp_                      != crossSections.vUp_ )                   return false;
+    if( vMin_                     != crossSections.vMin_ )                  return false;
+    if( ebig_                     != crossSections.ebig_ )                  return false;
+    if( do_dedx_Interpolation_    != crossSections.do_dedx_Interpolation_ ) return false;
+    if( do_dndx_Interpolation_    != crossSections.do_dndx_Interpolation_ ) return false;
+    if( multiplier_               != crossSections.multiplier_ )            return false;
+    if( parametrization_          != crossSections.parametrization_ )       return false;
+    if( lpm_effect_enabled_       != crossSections.lpm_effect_enabled_ )    return false;
+    if( init_lpm_effect_          != crossSections.init_lpm_effect_ )       return false;
+    if( shadow_                   != crossSections.shadow_ )                return false;
+    if( hard_component_           != crossSections.hard_component_ )        return false;
+    if( order_of_interpolation_   != crossSections.order_of_interpolation_ )return false;
+    if( *cut_settings_            != *crossSections.cut_settings_ )         return false;
+    if( *particle_                != *crossSections.particle_ )             return false;
+    if( *medium_                  != *crossSections.medium_ )               return false;
+
+
+    //else
+    return true;
+}
+
+//----------------------------------------------------------------------------//
+
+bool CrossSections::operator!=(const CrossSections &crossSections) const
+{
+    return !(*this == crossSections);
+}
+//----------------------------------------------------------------------------//
+
+void CrossSections::swap(CrossSections &crossSections)
+{
+    using std::swap;
+
+    swap( vMax_                     , crossSections.vMax_ );
+    swap( vUp_                      , crossSections.vUp_ );
+    swap( vMin_                     , crossSections.vMin_ );
+    swap( ebig_                     , crossSections.ebig_ );
+    swap( do_dedx_Interpolation_    , crossSections.do_dedx_Interpolation_ );
+    swap( do_dndx_Interpolation_    , crossSections.do_dndx_Interpolation_ );
+    swap( multiplier_               , crossSections.multiplier_ );
+    swap( parametrization_          , crossSections.parametrization_ );
+    swap( lpm_effect_enabled_       , crossSections.lpm_effect_enabled_ );
+    swap( init_lpm_effect_          , crossSections.init_lpm_effect_ );
+    swap( shadow_                   , crossSections.shadow_ );
+    swap( hard_component_           , crossSections.hard_component_ );
+    swap( order_of_interpolation_   , crossSections.order_of_interpolation_ );
+
+    cut_settings_->swap(*crossSections.cut_settings_);
+    particle_->swap(*crossSections.particle_);
+    medium_->swap(*crossSections.medium_);
+}
+
 //----------------------------------------------------------------------------//
 
 void CrossSections::SetParametrizationLimit(double ebig){

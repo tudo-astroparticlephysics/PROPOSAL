@@ -3,21 +3,81 @@
 
 using namespace std;
 
-Ionization::Ionization(){
+Ionization::Ionization()
+    :beta_                  ( 0 )
+    ,gamma_                 ( 0 )
+    ,integral_              (  )
 
+{
+    dedx_interpolant_      = new Interpolant();
+    dndx_interpolant_1d_   = new Interpolant();
+    dndx_interpolant_2d_   = new Interpolant();
+    integral_              = new Integral();
 }
 //----------------------------------------------------------------------------//
 
 Ionization::Ionization(const Ionization &ioniz)
-    :beta_(0)
-    ,gamma_(0)
+    :CrossSections          ( ioniz  )
+    ,beta_                  ( ioniz.beta_ )
+    ,gamma_                 ( ioniz.gamma_ )
+    ,integral_              ( new Integral(*ioniz.integral_) )
+    ,dedx_interpolant_      ( new Interpolant(*ioniz.dedx_interpolant_) )
+    ,dndx_interpolant_1d_   ( new Interpolant(*ioniz.dndx_interpolant_1d_) )
+    ,dndx_interpolant_2d_   ( new Interpolant(*ioniz.dndx_interpolant_2d_) )
 {
-    *this = ioniz;
 }
 //----------------------------------------------------------------------------//
 
-Ionization& Ionization::operator=(const Ionization &ioniz){
+Ionization& Ionization::operator=(const Ionization &ioniz)
+{
+    if (this != &ioniz)
+    {
+      Ionization tmp(ioniz);
+      swap(tmp);
+    }
     return *this;
+}
+//----------------------------------------------------------------------------//
+
+bool Ionization::operator==(const Ionization &ioniz) const
+{
+    if( this->CrossSections::operator !=(ioniz) )               return false;
+
+    if( beta_                   !=  ioniz.beta_)                return false;
+    if( gamma_                  !=  ioniz.gamma_)               return false;
+    if( *integral_              != *ioniz.integral_)            return false;
+    if( *dedx_interpolant_      != *ioniz.dedx_interpolant_)    return false;
+    if( *dndx_interpolant_1d_   != *ioniz.dndx_interpolant_1d_) return false;
+    if( *dndx_interpolant_2d_   != *ioniz.dndx_interpolant_2d_) return false;
+
+    //else
+    return true;
+
+}
+
+//----------------------------------------------------------------------------//
+
+void Ionization::swap(Ionization &ioniz)
+{
+    using std::swap;
+
+    this->CrossSections::swap(ioniz);
+
+    swap( beta_ , ioniz.beta_);
+    swap( gamma_, ioniz.gamma_);
+    integral_->swap( *ioniz.integral_);
+    dedx_interpolant_->swap( *ioniz.dedx_interpolant_);
+    dndx_interpolant_1d_->swap( *ioniz.dndx_interpolant_1d_);
+    dndx_interpolant_2d_->swap( *ioniz.dndx_interpolant_2d_);
+
+
+}
+
+//----------------------------------------------------------------------------//
+
+bool Ionization::operator!=(const Ionization &ioniz) const
+{
+    return !(*this == ioniz);
 }
 
 //----------------------------------------------------------------------------//
@@ -38,7 +98,10 @@ Ionization::Ionization(Particle* particle,
     multiplier_                 = 1.;
 
 
-    integral_   = new Integral(IROMB, IMAXS, IPREC);
+    integral_              = new Integral(IROMB, IMAXS, IPREC);
+    dedx_interpolant_      = new Interpolant();
+    dndx_interpolant_1d_   = new Interpolant();
+    dndx_interpolant_2d_   = new Interpolant();
 
 }
 

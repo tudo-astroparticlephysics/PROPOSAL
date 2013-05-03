@@ -7,24 +7,24 @@ using namespace std;
 //----------------------------------------------------------------------------//
 
 EnergyCutSettings::EnergyCutSettings()
-    :ecut_(500.)
-    ,vcut_(0.05)
+    :ecut_  ( 500. )
+    ,vcut_  ( 0.05 )
 {
 
 }
 //----------------------------------------------------------------------------//
 
 EnergyCutSettings::EnergyCutSettings(const EnergyCutSettings &cuts)
-    :ecut_(cuts.ecut_)
-    ,vcut_(cuts.vcut_)
+    :ecut_  ( cuts.ecut_ )
+    ,vcut_  ( cuts.vcut_ )
 {
 
 }
 //----------------------------------------------------------------------------//
 
 EnergyCutSettings::EnergyCutSettings(double ecut, double vcut)
-    :ecut_(ecut)
-    ,vcut_(vcut)
+    :ecut_  ( ecut )
+    ,vcut_  ( vcut )
 {
 
 }
@@ -40,10 +40,10 @@ EnergyCutSettings& EnergyCutSettings::operator=(const EnergyCutSettings &energyC
 }
 
 //----------------------------------------------------------------------------//
-bool EnergyCutSettings::operator==(const EnergyCutSettings &nergyCutSettings) const
+bool EnergyCutSettings::operator==(const EnergyCutSettings &energyCutSettings) const
 {
-    if( ecut_   != nergyCutSettings.ecut_)  return false;
-    if( vcut_   != nergyCutSettings.vcut_)  return false;
+    if( ecut_   != energyCutSettings.ecut_)  return false;
+    if( vcut_   != energyCutSettings.vcut_)  return false;
 
     //else
     return true;

@@ -37,40 +37,39 @@ const double Interpolant::aBigNumber_  =   -299;
 //----------------------------------------------------------------------------//
 
 Interpolant::Interpolant()
-
-:romberg_      ( 1. )
-,rombergY_     ( 1. )
-,iX_           ( )
-,iY_           ( )
-,c_            ( )
-,d_            ( )
-,max_          ( 1. )
-,xmin_         ( 1. )
-,xmax_         ( 1. )
-,step_         ( 0 )
-,rational_     ( false )
-,relative_     ( false )
-,function1d_   ( NULL )
-,function2d_   ( NULL )
-,Interpolant_  ( )
-,row_          ( 0 )
-,starti_       ( 0 )
-,rationalY_    ( false )
-,relativeY_    ( false )
-,reverse_      ( false )
-,self_         ( true )
-,flag_         ( false )
-,isLog_        ( false )
-,logSubst_     ( false )
-,precision_    ( 0 )
-,worstX_       ( 0 )
-,precision2_   ( 0 )
-,worstX2_      ( 0 )
-,precisionY_   ( 0 )
-,worstY_       ( 0 )
-,fast_         ( true )
-,x_save_       ( 0 )
-,y_save_       ( 0 )
+    :romberg_      ( 1. )
+    ,rombergY_     ( 1. )
+    ,iX_           ( )
+    ,iY_           ( )
+    ,c_            ( )
+    ,d_            ( )
+    ,max_          ( 1. )
+    ,xmin_         ( 1. )
+    ,xmax_         ( 1. )
+    ,step_         ( 0 )
+    ,rational_     ( false )
+    ,relative_     ( false )
+    ,function1d_   ( NULL )
+    ,function2d_   ( NULL )
+    ,Interpolant_  ( )
+    ,row_          ( 0 )
+    ,starti_       ( 0 )
+    ,rationalY_    ( false )
+    ,relativeY_    ( false )
+    ,reverse_      ( false )
+    ,self_         ( true )
+    ,flag_         ( false )
+    ,isLog_        ( false )
+    ,logSubst_     ( false )
+    ,precision_    ( 0 )
+    ,worstX_       ( 0 )
+    ,precision2_   ( 0 )
+    ,worstX2_      ( 0 )
+    ,precisionY_   ( 0 )
+    ,worstY_       ( 0 )
+    ,fast_         ( true )
+    ,x_save_       ( 0 )
+    ,y_save_       ( 0 )
 {
 
 }
@@ -1438,8 +1437,6 @@ void Interpolant::swap(Interpolant &interpolant){
 
     c_.swap( interpolant.c_ );
     d_.swap( interpolant.d_ );
-
-    Interpolant_.resize(interpolant.Interpolant_.size());
 
     Interpolant_.swap(interpolant.Interpolant_);
 

@@ -80,8 +80,16 @@ public:
 //----------------------------------------------------------------------------//
 
     CrossSections(Particle* particle, Medium* medium, EnergyCutSettings* cut_settings);
+    CrossSections(const CrossSections& crossSections);
+    bool operator==(const CrossSections &crossSections) const;
+    bool operator!=(const CrossSections &crossSections) const;
+   // CrossSections& operator=(const CrossSections &crossSections);
+
+
+//----------------------------------------------------------------------------//
 
     // Memberfunctions
+    void swap(CrossSections &crossSections);
 
 
 //----------------------------------------------------------------------------//
