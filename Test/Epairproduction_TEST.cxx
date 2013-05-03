@@ -54,11 +54,11 @@ TEST(Comparison , Comparison_equal ) {
     dEdx = B->CalculatedNdx();
     EXPECT_TRUE(*A==*B);
 
-//    A->EnableDEdxInterpolation();
-//    A->EnableDNdxInterpolation();
+    A->EnableDEdxInterpolation();
+    A->EnableDNdxInterpolation();
 
-//    B->EnableDEdxInterpolation();
-//    B->EnableDNdxInterpolation();
+    B->EnableDEdxInterpolation();
+    B->EnableDNdxInterpolation();
 
     EXPECT_TRUE(*A==*B);
 }
