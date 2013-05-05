@@ -136,13 +136,42 @@ public:
     void DisableInterpolation();
 
 //----------------------------------------------------------------------------//
-    // Getter
 
+	bool GetDoInterpolation() const {
+		return do_interpolation_;
+	}
 
-//----------------------------------------------------------------------------//
-    // Setter
+	Integral* GetIntegral() const {
+		return integral_;
+	}
 
+	Interpolant* GetInterpolant() const {
+		return interpolant_;
+	}
 
+	double GetNorm() const {
+		return norm_;
+	}
+
+	int GetOrderOfInterpolation() const {
+		return order_of_interpolation_;
+	}
+
+	double GetVal1() const {
+		return val1_;
+	}
+
+	double GetVal2() const {
+		return val2_;
+	}
+
+	void SetDoInterpolation(bool doInterpolation);
+	void SetIntegral(Integral* integral);
+	void SetInterpolant(Interpolant* interpolant);
+	void SetNorm(double norm);
+	void SetOrderOfInterpolation(int orderOfInterpolation);
+	void SetVal1(double val1);
+	void SetVal2(double val2);
 };
 
 

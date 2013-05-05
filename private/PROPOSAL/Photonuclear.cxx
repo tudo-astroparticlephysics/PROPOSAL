@@ -244,7 +244,7 @@ double Photonuclear::CalculatedEdx()
 
     if(do_dedx_Interpolation_)
     {
-        return max(dedx_interpolant_->interpolate(particle_->GetEnergy()), 0.0);
+        return max(dedx_interpolant_->Interpolate(particle_->GetEnergy()), 0.0);
     }
 
     double sum  =   0;
@@ -274,7 +274,7 @@ double Photonuclear::CalculatedNdx(){
 
         if(do_dndx_Interpolation_)
         {
-            sum    +=  max(dndx_interpolant_1d_.at(i)->interpolate(particle_->GetEnergy()), 0.0);
+            sum    +=  max(dndx_interpolant_1d_.at(i)->Interpolate(particle_->GetEnergy()), 0.0);
         }
         else
         {
@@ -303,7 +303,7 @@ double Photonuclear::CalculatedNdx(double rnd){
 
         if(do_dndx_Interpolation_)
         {
-            prob_for_component_.at(i) = max(dndx_interpolant_1d_.at(i)->interpolate(particle_->GetEnergy()), 0.0);
+            prob_for_component_.at(i) = max(dndx_interpolant_1d_.at(i)->Interpolate(particle_->GetEnergy()), 0.0);
         }
         else
         {
@@ -348,7 +348,7 @@ double Photonuclear::CalculateStochasticLoss(double rnd1, double rnd2){
                     return (particle_->GetEnergy())*vUp_;
                 }
 
-                return particle_->GetEnergy()*(vUp_*exp(dndx_interpolant_2d_.at(i)->findLimit((particle_->GetEnergy()), (rnd1)*prob_for_component_.at(i))*log(vMax_/vUp_)));
+                return particle_->GetEnergy()*(vUp_*exp(dndx_interpolant_2d_.at(i)->FindLimit((particle_->GetEnergy()), (rnd1)*prob_for_component_.at(i))*log(vMax_/vUp_)));
 
             }
             else
@@ -823,7 +823,7 @@ double Photonuclear::ALLM91Parametrization(double v, int i){
 //        SetIntegralLimits(i);
 //        if(v>=vUp)
 //        {
-//            return max(interpolateJ_[i].interpolate(particle_->e, log(v/vUp)/log(vMax/vUp)), 0.0);
+//            return max(InterpolateJ_[i].interpolate(particle_->e, log(v/vUp)/log(vMax/vUp)), 0.0);
 //        }
 //    }
 
@@ -1272,7 +1272,7 @@ double Photonuclear::FunctionToBuildDEdxInterpolant(double energy)
 //----------------------------------------------------------------------------//
 
 double Photonuclear::FunctionToBuildDNdxInterpolant1D(double energy){
-    return dndx_interpolant_2d_.at(component_)->interpolate(energy, 1.);
+    return dndx_interpolant_2d_.at(component_)->Interpolate(energy, 1.);
 
 }
 

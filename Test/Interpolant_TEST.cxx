@@ -45,8 +45,8 @@ TEST(Comparison , Comparison_equal ) {
     Interpolant* C = new Interpolant(max, xmin, xmax, X2, romberg, rational, relative, isLog, rombergY, rationalY, relativeY, logSubst);
     Interpolant* D = new Interpolant(max, xmin, xmax, X2, romberg, rational, relative, isLog, rombergY, rationalY, relativeY, logSubst);
     EXPECT_TRUE(*C==*D);
-    PolValue = C->interpolate(SearchX);
-    PolValue = D->interpolate(SearchX);
+    PolValue = C->Interpolate(SearchX);
+    PolValue = D->Interpolate(SearchX);
     EXPECT_TRUE(*C==*D);
 
     Interpolant* E = new Interpolant(max,  xmin, xmax, max2, x2min, x2max, X_YY,
@@ -63,8 +63,8 @@ TEST(Comparison , Comparison_equal ) {
     SearchX = 7;
     double SearchY = 11;
 
-    PolValue= E->interpolate(SearchX,SearchY);
-    PolValue= F->interpolate(SearchX,SearchY);
+    PolValue= E->Interpolate(SearchX,SearchY);
+    PolValue= F->Interpolate(SearchX,SearchY);
 
     EXPECT_TRUE(*E==*F);
 }
@@ -78,7 +78,7 @@ TEST(Comparison , Comparison_not_equal ) {
     Interpolant* B = new Interpolant(max, xmin, xmax, X2, romberg, rational, relative, isLog, rombergY, rationalY, relativeY, logSubst);
     Interpolant* C = new Interpolant(max, xmin, xmax, X2, romberg, rational, relative, isLog, rombergY, rationalY, relativeY, logSubst);
 
-    PolValue = C->interpolate(SearchX);
+    PolValue = C->Interpolate(SearchX);
 
     Interpolant* D = new Interpolant(max,  xmin, xmax, max2, x2min, x2max, X_YY,
                                         romberg, rational, relative, isLog,
@@ -172,7 +172,7 @@ TEST(_1D_Interpol , Simple_Test_of_XX_EXPX ) {
     double SearchX = 5;
     double precision = 1E-5;
 
-    double PolValue = Pol1->interpolate(SearchX);
+    double PolValue = Pol1->Interpolate(SearchX);
     double RealValue = X2(SearchX);
 
     ASSERT_NEAR(PolValue, RealValue, RealValue*precision );
@@ -195,7 +195,7 @@ TEST(_1D_Interpol , Load_From_File ) {
     double SearchX = 5;
     double precision = 1E-5;
 
-    double PolValue = Pol1->interpolate(SearchX);
+    double PolValue = Pol1->Interpolate(SearchX);
     double RealValue = X2(SearchX);
 
     ASSERT_NEAR(PolValue, RealValue, RealValue*precision );
@@ -208,12 +208,12 @@ TEST(_1D_Interpol , Rational_On ) {
     double SearchX = 5;
     double precision = 1E-5;
 
-    double PolValue = Pol1->interpolate(SearchX);
+    double PolValue = Pol1->Interpolate(SearchX);
     double RealValue = X2(SearchX);
 
     ASSERT_NEAR(PolValue, RealValue, RealValue*precision );
 
-    PolValue = Pol1->findLimit(RealValue);
+    PolValue = Pol1->FindLimit(RealValue);
     ASSERT_NEAR(PolValue, SearchX, SearchX*precision );
 
     delete Pol1;
@@ -224,12 +224,12 @@ TEST(_1D_Interpol , isLog_On ) {
     double SearchX = 5;
     double precision = 1E-5;
 
-    double PolValue = Pol1->interpolate(SearchX);
+    double PolValue = Pol1->Interpolate(SearchX);
     double RealValue = X2(SearchX);
 
     ASSERT_NEAR(PolValue, RealValue, RealValue*precision );
 
-    PolValue = Pol1->findLimit(RealValue);
+    PolValue = Pol1->FindLimit(RealValue);
     ASSERT_NEAR(PolValue, SearchX, SearchX*precision );
 
     delete Pol1;
@@ -240,12 +240,12 @@ TEST(_1D_Interpol , RationalY_On ) {
     double SearchX = 5;
     double precision = 1E-4;
 
-    double PolValue = Pol1->interpolate(SearchX);
+    double PolValue = Pol1->Interpolate(SearchX);
     double RealValue = X2(SearchX);
 
     ASSERT_NEAR(PolValue, RealValue, RealValue*precision );
 
-    PolValue = Pol1->findLimit(RealValue);
+    PolValue = Pol1->FindLimit(RealValue);
     ASSERT_NEAR(PolValue, SearchX, SearchX*precision );
 
     delete Pol1;
@@ -256,12 +256,12 @@ TEST(_1D_Interpol , logSubst_On ) {
     double SearchX = 5;
     double precision = 1E-5;
 
-    double PolValue = Pol1->interpolate(SearchX);
+    double PolValue = Pol1->Interpolate(SearchX);
     double RealValue = X2(SearchX);
 
     ASSERT_NEAR(PolValue, RealValue, RealValue*precision );
 
-    PolValue = Pol1->findLimit(RealValue);
+    PolValue = Pol1->FindLimit(RealValue);
     ASSERT_NEAR(PolValue, SearchX, SearchX*precision );
 
     delete Pol1;
@@ -272,12 +272,12 @@ TEST(_1D_Interpol , All_On ) {
     double SearchX = 5;
     double precision = 1E-5;
 
-    double PolValue = Pol1->interpolate(SearchX);
+    double PolValue = Pol1->Interpolate(SearchX);
     double RealValue = X2(SearchX);
 
     ASSERT_NEAR(PolValue, RealValue, RealValue*precision );
 
-    PolValue = Pol1->findLimit(RealValue);
+    PolValue = Pol1->FindLimit(RealValue);
     ASSERT_NEAR(PolValue, SearchX, SearchX*precision );
 
     delete Pol1;
@@ -293,7 +293,7 @@ TEST(_2D_Interpol , Simple_Test_of_X_YY_EXPX ) {
     double SearchY = 11;
     double precision = 1E-6;
 
-    double PolValue = Pol2->interpolate(SearchX,SearchY);
+    double PolValue = Pol2->Interpolate(SearchX,SearchY);
     double RealValue = X_YY(SearchX,SearchY);
 
     ASSERT_NEAR(PolValue, RealValue, RealValue*precision );
@@ -321,7 +321,7 @@ TEST(_2D_Interpol , Load_From_File ) {
     double SearchY = 11;
     double precision = 1E-6;
 
-    double PolValue = Pol2->interpolate(SearchX,SearchY);
+    double PolValue = Pol2->Interpolate(SearchX,SearchY);
     double RealValue = X_YY(SearchX,SearchY);
 
     ASSERT_NEAR(PolValue, RealValue, RealValue*precision );
@@ -339,12 +339,12 @@ TEST(_2D_Interpol , rational1_On ) {
     double SearchY = 11;
     double precision = 1E-6;
 
-    double PolValue = Pol2->interpolate(SearchX,SearchY);
+    double PolValue = Pol2->Interpolate(SearchX,SearchY);
     double RealValue = X_YY(SearchX,SearchY);
 
     ASSERT_NEAR(PolValue, RealValue, RealValue*precision );
 
-    PolValue = Pol2->findLimit(SearchX,RealValue);
+    PolValue = Pol2->FindLimit(SearchX,RealValue);
     ASSERT_NEAR(PolValue, SearchY, SearchY*precision );
 
     delete Pol2;
@@ -359,12 +359,12 @@ TEST(_2D_Interpol , rational2_On ) {
     double SearchY = 11;
     double precision = 1E-6;
 
-    double PolValue = Pol2->interpolate(SearchX,SearchY);
+    double PolValue = Pol2->Interpolate(SearchX,SearchY);
     double RealValue = X_YY(SearchX,SearchY);
 
     ASSERT_NEAR(PolValue, RealValue, RealValue*precision );
 
-    PolValue = Pol2->findLimit(SearchX,RealValue);
+    PolValue = Pol2->FindLimit(SearchX,RealValue);
     ASSERT_NEAR(PolValue, SearchY, SearchY*precision );
 
     delete Pol2;
@@ -379,12 +379,12 @@ TEST(_2D_Interpol , rational12_On ) {
     double SearchY = 11;
     double precision = 1E-6;
 
-    double PolValue = Pol2->interpolate(SearchX,SearchY);
+    double PolValue = Pol2->Interpolate(SearchX,SearchY);
     double RealValue = X_YY(SearchX,SearchY);
 
     ASSERT_NEAR(PolValue, RealValue, RealValue*precision );
 
-    PolValue = Pol2->findLimit(SearchX,RealValue);
+    PolValue = Pol2->FindLimit(SearchX,RealValue);
     ASSERT_NEAR(PolValue, SearchY, SearchY*precision );
 
     delete Pol2;
@@ -399,12 +399,12 @@ TEST(_2D_Interpol , isLog1_On ) {
     double SearchY = 11;
     double precision = 1E-6;
 
-    double PolValue = Pol2->interpolate(SearchX,SearchY);
+    double PolValue = Pol2->Interpolate(SearchX,SearchY);
     double RealValue = X_YY(SearchX,SearchY);
 
     ASSERT_NEAR(PolValue, RealValue, RealValue*precision );
 
-    PolValue = Pol2->findLimit(SearchX,RealValue);
+    PolValue = Pol2->FindLimit(SearchX,RealValue);
     ASSERT_NEAR(PolValue, SearchY, SearchY*precision );
 
     delete Pol2;
@@ -419,12 +419,12 @@ TEST(_2D_Interpol , isLog2_On ) {
     double SearchY = 11;
     double precision = 1E-6;
 
-    double PolValue = Pol2->interpolate(SearchX,SearchY);
+    double PolValue = Pol2->Interpolate(SearchX,SearchY);
     double RealValue = X_YY(SearchX,SearchY);
 
     ASSERT_NEAR(PolValue, RealValue, RealValue*precision );
 
-    PolValue = Pol2->findLimit(SearchX,RealValue);
+    PolValue = Pol2->FindLimit(SearchX,RealValue);
     ASSERT_NEAR(PolValue, SearchY, SearchY*precision );
 
     delete Pol2;
@@ -439,12 +439,12 @@ TEST(_2D_Interpol , isLog12_On ) {
     double SearchY = 11;
     double precision = 1E-6;
 
-    double PolValue = Pol2->interpolate(SearchX,SearchY);
+    double PolValue = Pol2->Interpolate(SearchX,SearchY);
     double RealValue = X_YY(SearchX,SearchY);
 
     ASSERT_NEAR(PolValue, RealValue, RealValue*precision );
 
-    PolValue = Pol2->findLimit(SearchX,RealValue);
+    PolValue = Pol2->FindLimit(SearchX,RealValue);
     ASSERT_NEAR(PolValue, SearchY, SearchY*precision );
 
     delete Pol2;
@@ -459,12 +459,12 @@ TEST(_2D_Interpol , rationalY_On ) {
     double SearchY = 11;
     double precision = 1E-6;
 
-    double PolValue = Pol2->interpolate(SearchX,SearchY);
+    double PolValue = Pol2->Interpolate(SearchX,SearchY);
     double RealValue = X_YY(SearchX,SearchY);
 
     ASSERT_NEAR(PolValue, RealValue, RealValue*precision );
 
-    PolValue = Pol2->findLimit(SearchX,RealValue);
+    PolValue = Pol2->FindLimit(SearchX,RealValue);
     ASSERT_NEAR(PolValue, SearchY, SearchY*precision );
 
     delete Pol2;
@@ -479,12 +479,12 @@ TEST(_2D_Interpol , logSubst_On ) {
     double SearchY = 11;
     double precision = 1E-6;
 
-    double PolValue = Pol2->interpolate(SearchX,SearchY);
+    double PolValue = Pol2->Interpolate(SearchX,SearchY);
     double RealValue = X_YY(SearchX,SearchY);
 
     ASSERT_NEAR(PolValue, RealValue, RealValue*precision );
 
-    PolValue = Pol2->findLimit(SearchX,RealValue);
+    PolValue = Pol2->FindLimit(SearchX,RealValue);
     ASSERT_NEAR(PolValue, SearchY, SearchY*precision );
 
     delete Pol2;
@@ -499,12 +499,12 @@ TEST(_2D_Interpol , All_On ) {
     double SearchY = 11;
     double precision = 1E-6;
 
-    double PolValue = Pol2->interpolate(SearchX,SearchY);
+    double PolValue = Pol2->Interpolate(SearchX,SearchY);
     double RealValue = X_YY(SearchX,SearchY);
 
     ASSERT_NEAR(PolValue, RealValue, RealValue*precision );
 
-    PolValue = Pol2->findLimit(SearchX,RealValue);
+    PolValue = Pol2->FindLimit(SearchX,RealValue);
     ASSERT_NEAR(PolValue, SearchY, SearchY*precision );
 
     delete Pol2;

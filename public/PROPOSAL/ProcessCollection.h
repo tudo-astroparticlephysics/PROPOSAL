@@ -145,53 +145,72 @@ public:
     void DisableLpmEffect();
 
 //----------------------------------------------------------------------------//
-    // Getter
-
-
-//----------------------------------------------------------------------------//
-    Particle* GetParticle() const
-    {
-        return particle_;
-    }
-
-//----------------------------------------------------------------------------//
-    Medium* GetMedium() const
-    {
-        return medium_;
-    }
-
-//----------------------------------------------------------------------------//
-    Integral* Getintegral() const
-    {
-        return integral_;
-    }
-
-//----------------------------------------------------------------------------//
-    Interpolant* GetInterpolant() const
-    {
-        return interpolant_;
-    }
-
-//----------------------------------------------------------------------------//
-    Interpolant* GetInterpolantDiff() const
-    {
-        return interpolant_diff_;
-    }
-
-//----------------------------------------------------------------------------//
-
-    // Setter
-
-    void SetDebug();
-
-//----------------------------------------------------------------------------//
 
     // destructors
 
     ///@brief Crush this CrossSections.
     virtual ~ProcessCollection();
 
+	std::vector<CrossSections*> GetCrosssections() const {
+		return crosssections_;
+	}
 
+	EnergyCutSettings* GetCutSettings() const {
+		return cut_settings_;
+	}
+
+	bool GetDebug() const {
+		return debug_;
+	}
+
+	bool GetDoInterpolation() const {
+		return do_interpolation_;
+	}
+
+	double GetIni() const {
+		return ini_;
+	}
+
+	Integral* GetIntegral() const {
+		return integral_;
+	}
+
+	Interpolant* GetInterpolant() const {
+		return interpolant_;
+	}
+
+	Interpolant* GetInterpolantDiff() const {
+		return interpolant_diff_;
+	}
+
+	bool GetLpmEffectEnabled() const {
+		return lpm_effect_enabled_;
+	}
+
+	Medium* GetMedium() const {
+		return medium_;
+	}
+
+	int GetOrderOfInterpolation() const {
+		return order_of_interpolation_;
+	}
+
+	Particle* GetParticle() const {
+		return particle_;
+	}
+
+	void SetCrosssections(std::vector<CrossSections*> crosssections);
+	void SetCutSettings(EnergyCutSettings* cutSettings);
+	void SetDebug(bool debug);
+	void SetDoInterpolation(bool doInterpolation);
+	void SetIni(double ini);
+	void SetIntegral(Integral* integral);
+	void SetInterpolant(Interpolant* interpolant);
+	void SetInterpolantDiff(Interpolant* interpolantDiff);
+	void SetLpmEffectEnabled(bool lpmEffectEnabled);
+	void SetMedium(Medium* medium);
+	void SetOrderOfInterpolation(int orderOfInterpolation);
+	void SetParticle(Particle* particle);
 };
 
 

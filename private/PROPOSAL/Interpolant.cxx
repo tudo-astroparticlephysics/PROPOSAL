@@ -282,7 +282,7 @@ Interpolant::Interpolant(int max, double xmin, double xmax, boost::function<doub
 
             if(logSubst_)
             {
-                iY_.at(i)=log(iY_.at(i));
+                iY_.at(i)=Log(iY_.at(i));
             }
 
 //        }
@@ -552,14 +552,14 @@ double Interpolant::Get2dFunctionFixedY(double x)
 
 //----------------------------------------------------------------------------//
 
-double Interpolant::interpolate(double x)
+double Interpolant::Interpolate(double x)
 {
     int     start;
     double  result, aux;
 
     if(isLog_)
     {
-        x=slog(x);
+        x=Slog(x);
     }
 
     reverse_ =   true;
@@ -587,13 +587,13 @@ double Interpolant::interpolate(double x)
     {
         start   =   max_ - romberg_;
     }
-    result  =   interpolate(x, start);
+    result  =   Interpolate(x, start);
 
     if(logSubst_)
     {
         if(self_)
         {
-            result  =   exp(result);
+            result  =   Exp(result);
         }
     }
 
@@ -602,7 +602,7 @@ double Interpolant::interpolate(double x)
 
 //----------------------------------------------------------------------------//
 
-double Interpolant::interpolate(double x1, double x2)
+double Interpolant::Interpolate(double x1, double x2)
 {
     int     i, start;
     double  aux, aux2=0, result;
@@ -641,7 +641,7 @@ double Interpolant::interpolate(double x1, double x2)
 
     for(i=start ; i<start+romberg_ ; i++)
     {
-        iY_.at(i)   =   Interpolant_.at(i)->interpolate(x1);
+        iY_.at(i)   =   Interpolant_.at(i)->Interpolate(x1);
     }
 
     if(!fast_)
@@ -664,11 +664,11 @@ double Interpolant::interpolate(double x1, double x2)
         }
     }
 
-    result  =   interpolate(x2, start);
+    result  =   Interpolate(x2, start);
 
     if(logSubst_)
     {
-        result  =   exp(result);
+        result  =   Exp(result);
     }
 
     return result;
@@ -729,12 +729,12 @@ double Interpolant::InterpolateArray(double x)
         start   =   max_-romberg_;
     }
 
-    return interpolate(x, start);
+    return Interpolate(x, start);
 }
 
 //----------------------------------------------------------------------------//
 
-double Interpolant::interpolate(double x, int start)
+double Interpolant::Interpolate(double x, int start)
 {
     int     num, i, k;
     bool    dd, doLog;
@@ -771,7 +771,7 @@ double Interpolant::interpolate(double x, int start)
         {
             for(i=0; i<romberg_; i++)
             {
-                c_.at(i)    =   exp(iY_.at(start+i));
+                c_.at(i)    =   Exp(iY_.at(start+i));
                 d_.at(i)    =   c_.at(i);
             }
         }
@@ -806,7 +806,7 @@ double Interpolant::interpolate(double x, int start)
 
             if(doLog)
             {
-                c_.at(i)    =   exp(iY_.at(start+i));
+                c_.at(i)    =   Exp(iY_.at(start+i));
                 d_.at(i)    =   c_.at(i);
             }
             else
@@ -859,7 +859,7 @@ double Interpolant::interpolate(double x, int start)
 
     if(doLog)
     {
-        result  =   exp(result);
+        result  =   Exp(result);
     }
 
     for(k=1 ; k<romberg_ ; k++)
@@ -957,7 +957,7 @@ double Interpolant::interpolate(double x, int start)
 
     if(doLog)
     {
-        result  =   log(result);
+        result  =   Log(result);
     }
 
     return result;
@@ -965,7 +965,7 @@ double Interpolant::interpolate(double x, int start)
 
 //----------------------------------------------------------------------------//
 
-double Interpolant::findLimit(double y)
+double Interpolant::FindLimit(double y)
 {
     int         i, j, m, start, auxdir;
     bool        dir, rat, rel;
@@ -976,7 +976,7 @@ double Interpolant::findLimit(double y)
 
     if(logSubst_)
     {
-        y   =   log(y);
+        y   =   Log(y);
     }
 
     i   =   0;
@@ -1041,7 +1041,7 @@ double Interpolant::findLimit(double y)
         start   =   max_ - romberg_;
     }
 
-    result  =   interpolate(y, start);
+    result  =   Interpolate(y, start);
 
     SWAP(iX_,iY_, vector<double>);
 
@@ -1068,7 +1068,7 @@ double Interpolant::findLimit(double y)
 
     if(isLog_)
     {
-        result  =   exp(result);
+        result  =   Exp(result);
     }
 
     return result;
@@ -1076,7 +1076,7 @@ double Interpolant::findLimit(double y)
 
 //----------------------------------------------------------------------------//
 
-double Interpolant::findLimit(double x1, double y)
+double Interpolant::FindLimit(double x1, double y)
 {
     int         i, j, m, start, auxdir;
     bool        dir;
@@ -1086,14 +1086,14 @@ double Interpolant::findLimit(double x1, double y)
 
     if(logSubst_)
     {
-        y   =   log(y);
+        y   =   Log(y);
     }
 
     if(!flag_)
     {
         for(i=0 ; i<max_ ; i++)
         {
-            iY_.at(i)   =   Interpolant_.at(i)->interpolate(x1);
+            iY_.at(i)   =   Interpolant_.at(i)->Interpolate(x1);
         }
     }
 
@@ -1102,7 +1102,7 @@ double Interpolant::findLimit(double x1, double y)
 
     if(flag_)
     {
-        dir =   Interpolant_.at(max_-1)->interpolate(x1) > Interpolant_.at(0)->interpolate(x1);
+        dir =   Interpolant_.at(max_-1)->Interpolate(x1) > Interpolant_.at(0)->Interpolate(x1);
     }
     else
     {
@@ -1115,7 +1115,7 @@ double Interpolant::findLimit(double x1, double y)
 
         if(flag_)
         {
-            aux =   Interpolant_.at(m)->interpolate(x1);
+            aux =   Interpolant_.at(m)->Interpolate(x1);
         }
         else
         {
@@ -1177,11 +1177,11 @@ double Interpolant::findLimit(double x1, double y)
     {
         for(i=start ; i<start+romberg_ ; i++)
         {
-            iX_.at(i)   =   Interpolant_.at(i)->interpolate(x1);
+            iX_.at(i)   =   Interpolant_.at(i)->Interpolate(x1);
         }
     }
 
-    result  =   interpolate(y, start);
+    result  =   Interpolate(y, start);
 
     SWAP(iX_,iY_, vector<double>);
 
@@ -1340,7 +1340,7 @@ bool Interpolant::Load(ifstream& in){
 
 //----------------------------------------------------------------------------//
 
-double Interpolant::exp(double x)
+double Interpolant::Exp(double x)
 {
     if(x<=aBigNumber_)
     {
@@ -1354,7 +1354,7 @@ double Interpolant::exp(double x)
 
 //----------------------------------------------------------------------------//
 
-double Interpolant::log(double x)
+double Interpolant::Log(double x)
 {
     if(x<=0)
     {
@@ -1368,7 +1368,7 @@ double Interpolant::log(double x)
 
 //----------------------------------------------------------------------------//
 
-double Interpolant::slog(double x)
+double Interpolant::Slog(double x)
 {
     if(x == x_save_)
     {

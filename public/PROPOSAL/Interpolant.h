@@ -77,7 +77,7 @@ private:
     * \param   start    start position of the sampling points for interpolation
     * \return  Interpolation result
     */
-    double interpolate(double x, int start);
+    double Interpolate(double x, int start);
 
     //------------------------------------------------------------------------//
 
@@ -209,7 +209,7 @@ public:
     * \return   Function value f(x)
     */
 
-    double functionInt(double x);
+    double FunctionInt(double x);
 
     //------------------------------------------------------------------------//
 
@@ -220,7 +220,7 @@ public:
     * \return   interpolated value f(x)
     */
 
-    double interpolate(double x);
+    double Interpolate(double x);
 
     //------------------------------------------------------------------------//
 
@@ -232,7 +232,7 @@ public:
     * \return   interpolated value f(x1,x2)
     */
 
-    double interpolate(double x1, double x2);
+    double Interpolate(double x1, double x2);
 
     //------------------------------------------------------------------------//
 
@@ -258,7 +258,7 @@ public:
     * \return   interpolated value x(y);
     */
 
-    double findLimit(double y);
+    double FindLimit(double y);
 
     //------------------------------------------------------------------------//
 
@@ -272,7 +272,7 @@ public:
     * \return   interpolated value x(y);
     */
 
-    double findLimit(double x1, double y);
+    double FindLimit(double x1, double y);
 
     //------------------------------------------------------------------------//
 
@@ -316,7 +316,7 @@ public:
     * \return   exp(x) OR 0;
     */
 
-    double exp(double x);
+    double Exp(double x);
 
     //------------------------------------------------------------------------//
 
@@ -330,7 +330,7 @@ public:
     * \return   log(x) OR bigNumber;
     */
 
-    double log(double x);
+    double Log(double x);
 
     //------------------------------------------------------------------------//
 
@@ -341,7 +341,7 @@ public:
     * \return   log(x) OR y_save;
     */
 
-    double slog(double x);
+    double Slog(double x);
 
     //------------------------------------------------------------------------//
     //------------------------------------------------------------------------//

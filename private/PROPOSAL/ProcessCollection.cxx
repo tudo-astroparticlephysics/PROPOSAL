@@ -119,8 +119,8 @@ double ProcessCollection::GetDx(double ei, double ef, double dist)
         {
             double aux;
 
-            ini_    =   interpolant_->interpolate(ei);
-            aux     =   ini_ - interpolant_->interpolate(ef);
+            ini_    =   interpolant_->Interpolate(ei);
+            aux     =   ini_ - interpolant_->Interpolate(ef);
 
             if(fabs(aux) > fabs(ini_)*HALF_PRECISION)
             {
@@ -130,7 +130,7 @@ double ProcessCollection::GetDx(double ei, double ef, double dist)
         }
 
         ini_    =   0;
-        return max((interpolant_diff_->interpolate((ei + ef)/2))*(ef - ei), 0.0);
+        return max((interpolant_diff_->Interpolate((ei + ef)/2))*(ef - ei), 0.0);
 
     }
     else
@@ -150,7 +150,7 @@ double ProcessCollection::GetEf(double ei, double dist)
         if(ini_ != 0)
         {
             double aux;
-            aux     =   interpolant_->findLimit(ini_-dist);
+            aux     =   interpolant_->FindLimit(ini_-dist);
 
             if(fabs(aux) > fabs(ei)*HALF_PRECISION)
             {
@@ -158,7 +158,7 @@ double ProcessCollection::GetEf(double ei, double dist)
             }
         }
 
-        return min( max(ei+dist/interpolant_diff_->interpolate(ei + dist/(2*interpolant_diff_->interpolate(ei))), particle_->GetLow()), ei);
+        return min( max(ei+dist/interpolant_diff_->Interpolate(ei + dist/(2*interpolant_diff_->Interpolate(ei))), particle_->GetLow()), ei);
     }
     else
     {
@@ -211,6 +211,56 @@ void ProcessCollection::DisableLpmEffect()
     for(unsigned int i=0;i<crosssections_.size();i++){
         crosssections_.at(i)->EnableLpmEffect(lpm_effect_enabled_);
     }
+}
+
+void ProcessCollection::SetCrosssections(
+		std::vector<CrossSections*> crosssections) {
+	crosssections_ = crosssections;
+}
+
+void ProcessCollection::SetCutSettings(EnergyCutSettings* cutSettings) {
+	cut_settings_ = cutSettings;
+}
+
+void ProcessCollection::SetDebug(bool debug) {
+	debug_ = debug;
+}
+
+void ProcessCollection::SetDoInterpolation(bool doInterpolation) {
+	do_interpolation_ = doInterpolation;
+}
+
+void ProcessCollection::SetIni(double ini) {
+	ini_ = ini;
+}
+
+void ProcessCollection::SetIntegral(Integral* integral) {
+	integral_ = integral;
+}
+
+void ProcessCollection::SetInterpolant(Interpolant* interpolant) {
+	interpolant_ = interpolant;
+}
+
+void ProcessCollection::SetInterpolantDiff(
+		Interpolant* interpolantDiff) {
+	interpolant_diff_ = interpolantDiff;
+}
+
+void ProcessCollection::SetLpmEffectEnabled(bool lpmEffectEnabled) {
+	lpm_effect_enabled_ = lpmEffectEnabled;
+}
+
+void ProcessCollection::SetMedium(Medium* medium) {
+	medium_ = medium;
+}
+
+void ProcessCollection::SetOrderOfInterpolation(int orderOfInterpolation) {
+	order_of_interpolation_ = orderOfInterpolation;
+}
+
+void ProcessCollection::SetParticle(Particle* particle) {
+	particle_ = particle;
 }
 
 //----------------------------------------------------------------------------//

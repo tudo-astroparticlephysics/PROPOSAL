@@ -199,7 +199,7 @@ double Bremsstrahlung::CalculatedEdx(){
 
     if(do_dedx_Interpolation_)
     {
-        return max(dedx_interpolant_->interpolate(particle_->GetEnergy()), 0.0);
+        return max(dedx_interpolant_->Interpolate(particle_->GetEnergy()), 0.0);
     }
 
     for(int i=0; i<(medium_->GetNumCompontents()); i++)
@@ -227,7 +227,7 @@ double Bremsstrahlung::CalculatedNdx(){
 
         if(do_dndx_Interpolation_)
         {
-            prob_for_component_.at(i)    =  max( dndx_interpolant_1d_.at(i)->interpolate(particle_->GetEnergy()) ,  0.0);
+            prob_for_component_.at(i)    =  max( dndx_interpolant_1d_.at(i)->Interpolate(particle_->GetEnergy()) ,  0.0);
         }
         else
         {
@@ -261,7 +261,7 @@ double Bremsstrahlung::CalculatedNdx(double rnd){
     {
         if(do_dndx_Interpolation_)
         {
-            prob_for_component_.at(i)   =   max(dndx_interpolant_1d_.at(i)->interpolate(particle_->GetEnergy()) , 0.0);
+            prob_for_component_.at(i)   =   max(dndx_interpolant_1d_.at(i)->Interpolate(particle_->GetEnergy()) , 0.0);
         }
         else
         {
@@ -304,7 +304,7 @@ double Bremsstrahlung::CalculateStochasticLoss(double rnd1, double rnd2){
                     return (particle_->GetEnergy())*vUp_;
                 }
 
-                return (particle_->GetEnergy())*(vUp_*exp(dndx_interpolant_2d_.at(i)->findLimit((particle_->GetEnergy()), (rnd1)*prob_for_component_.at(i))*log(vMax_/vUp_)));
+                return (particle_->GetEnergy())*(vUp_*exp(dndx_interpolant_2d_.at(i)->FindLimit((particle_->GetEnergy()), (rnd1)*prob_for_component_.at(i))*log(vMax_/vUp_)));
             }
 
             else
@@ -360,7 +360,7 @@ double Bremsstrahlung::CalculateStochasticLossNew(double rnd1, double rnd2){
                     return (particle_->GetEnergy())*vUp_;
                 }
 
-                return (particle_->GetEnergy())*(vUp_*exp(dndx_interpolant_2d_.at(i)->findLimit((particle_->GetEnergy()), (rnd1)*prob_for_component_.at(i))*log(vMax_/vUp_)));
+                return (particle_->GetEnergy())*(vUp_*exp(dndx_interpolant_2d_.at(i)->FindLimit((particle_->GetEnergy()), (rnd1)*prob_for_component_.at(i))*log(vMax_/vUp_)));
             }
 
             else
@@ -831,7 +831,7 @@ double Bremsstrahlung::FunctionToBuildDEdxInterpolant(double energy){
 
 double Bremsstrahlung::FunctionToBuildDNdxInterpolant(double energy)
 {
-    return dndx_interpolant_2d_.at(component_)->interpolate(energy, 1.);
+    return dndx_interpolant_2d_.at(component_)->Interpolate(energy, 1.);
 }
 
 

@@ -77,7 +77,7 @@ double StandardNormal::IntegratedProbability(double x)
 
     if(do_interpolation_)
     {
-        return min(max(interpolant_->interpolate(x), 0.0), 1.0);
+        return min(max(interpolant_->Interpolate(x), 0.0), 1.0);
     }
 
     if(x<=-1)
@@ -100,7 +100,7 @@ double StandardNormal::StandardNormalRandomNumber(double x)
 {
     if(do_interpolation_)
     {
-        return interpolant_->findLimit(x);
+        return interpolant_->FindLimit(x);
     }
     if(x<=val1_)
     {
@@ -189,6 +189,35 @@ void StandardNormal::EnableInterpolation()
     interpolant_    =   new Interpolant(NUM2, -5, 5, boost::bind(&StandardNormal::FunctionToBuildInterpolant, this, _1), order_of_interpolation_, true, false, false, order_of_interpolation_, true, false, false);
     do_interpolation_=true;
 }
+
+void StandardNormal::SetDoInterpolation(bool doInterpolation) {
+	do_interpolation_ = doInterpolation;
+}
+
+void StandardNormal::SetIntegral(Integral* integral) {
+	integral_ = integral;
+}
+
+void StandardNormal::SetInterpolant(Interpolant* interpolant) {
+	interpolant_ = interpolant;
+}
+
+void StandardNormal::SetNorm(double norm) {
+	norm_ = norm;
+}
+
+void StandardNormal::SetOrderOfInterpolation(int orderOfInterpolation) {
+	order_of_interpolation_ = orderOfInterpolation;
+}
+
+void StandardNormal::SetVal1(double val1) {
+	val1_ = val1;
+}
+
+void StandardNormal::SetVal2(double val2) {
+	val2_ = val2;
+}
+
 //----------------------------------------------------------------------------//
 
 void StandardNormal::DisableInterpolation()

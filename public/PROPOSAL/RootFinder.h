@@ -45,9 +45,16 @@ public:
                     boost::function<double (double)> differentiated_function,
                     double rightSide);
 
-  
+	int GetMaxSteps() const {
+		return maxSteps_;
+	}
 
+	double GetPrecision() const {
+		return precision_;
+	}
 
+	void SetMaxSteps(int maxSteps);
+	void SetPrecision(double precision);
 };
 
 #endif // _ROOTFINDER_H

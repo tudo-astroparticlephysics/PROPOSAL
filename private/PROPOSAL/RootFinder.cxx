@@ -54,6 +54,14 @@ RootFinder::RootFinder(int maxSteps, double precision)
 
 }
 
+void RootFinder::SetMaxSteps(int maxSteps) {
+	maxSteps_ = maxSteps;
+}
+
+void RootFinder::SetPrecision(double precision) {
+	precision_ = precision;
+}
+
 //----------------------------------------------------------------------------//
 
 RootFinder::~RootFinder(){}

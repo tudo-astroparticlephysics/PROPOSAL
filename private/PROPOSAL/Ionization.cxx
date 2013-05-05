@@ -143,7 +143,7 @@ double Ionization::CalculatedEdx(){
 
     if(do_dedx_Interpolation_)
     {
-        return max(dedx_interpolant_->interpolate(particle_->GetEnergy()), 0.);
+        return max(dedx_interpolant_->Interpolate(particle_->GetEnergy()), 0.);
     }
 
     double result, aux;
@@ -178,7 +178,7 @@ double Ionization::CalculatedNdx(){
 
     if(do_dndx_Interpolation_)
     {
-        return max(dndx_interpolant_1d_->interpolate(particle_->GetEnergy()), 0.);
+        return max(dndx_interpolant_1d_->Interpolate(particle_->GetEnergy()), 0.);
     }
     else{
         SetIntegralLimits(0);
@@ -195,7 +195,7 @@ double Ionization::CalculatedNdx(double rnd){
 
     if(do_dndx_Interpolation_)
     {
-        return max(dndx_interpolant_1d_->interpolate(particle_->GetEnergy()), 0.);
+        return max(dndx_interpolant_1d_->Interpolate(particle_->GetEnergy()), 0.);
     }
     else
     {
@@ -230,7 +230,7 @@ double Ionization::CalculateStochasticLoss(double rnd1, double rnd2){
                 if(vUp_==vMax_){
                     return particle_->GetEnergy()*vUp_;
                 }
-                return particle_->GetEnergy()*(vUp_*exp(dndx_interpolant_2d_->findLimit(particle_->GetEnergy(), rnd1*sum)*log(vMax_/vUp_)));
+                return particle_->GetEnergy()*(vUp_*exp(dndx_interpolant_2d_->FindLimit(particle_->GetEnergy(), rnd1*sum)*log(vMax_/vUp_)));
             }
             else
             {
@@ -267,7 +267,7 @@ double Ionization::CalculateStochasticLossNew(double rnd1, double rnd2){
                 if(vUp_==vMax_){
                     return particle_->GetEnergy()*vUp_;
                 }
-                return particle_->GetEnergy()*(vUp_*exp(dndx_interpolant_2d_->findLimit(particle_->GetEnergy(), rnd1*sum)*log(vMax_/vUp_)));
+                return particle_->GetEnergy()*(vUp_*exp(dndx_interpolant_2d_->FindLimit(particle_->GetEnergy(), rnd1*sum)*log(vMax_/vUp_)));
             }
             else
             {
@@ -418,7 +418,7 @@ double Ionization::FunctionToBuildDEdxInterpolant(double energy)
 //----------------------------------------------------------------------------//
 
 double Ionization::FunctionToBuildDNdxInterpolant(double energy){
-    return dndx_interpolant_2d_->interpolate(energy, 1.0);
+    return dndx_interpolant_2d_->Interpolate(energy, 1.0);
 }
 
 
