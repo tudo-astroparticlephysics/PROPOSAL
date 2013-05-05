@@ -1451,9 +1451,89 @@ void Integral::Reset()
     //randomDo_ = false;
 }
 //----------------------------------------------------------------------------//
-void Integral::SetRandomX(double rand){
-    randomX_ =rand;
 
+void Integral::SetC(std::vector<double> c) {
+	c_ = c;
+}
+
+void Integral::SetD(std::vector<double> d) {
+	d_ = d;
+}
+
+void Integral::SetIntegralError(double integralError) {
+	integralError_ = integralError;
+}
+
+void Integral::SetIntegralValue(double integralValue) {
+	integralValue_ = integralValue;
+}
+
+void Integral::SetIntegrand(boost::function<double(double)> integrand) {
+	integrand_ = integrand;
+}
+
+void Integral::SetX(std::vector<double> x) {
+	iX_ = x;
+}
+
+void Integral::SetY(std::vector<double> y) {
+	iY_ = y;
+}
+
+void Integral::SetMax(double max) {
+	max_ = max;
+}
+
+void Integral::SetMaxSteps(int maxSteps) {
+	maxSteps_ = maxSteps;
+}
+
+void Integral::SetMin(double min) {
+	min_ = min;
+}
+
+void Integral::SetPowerOfSubstitution(double powerOfSubstitution) {
+	powerOfSubstitution_ = powerOfSubstitution;
+}
+
+void Integral::SetPrecision(double precision) {
+	precision_ = precision;
+}
+
+void Integral::SetRandomDo(bool randomDo) {
+	randomDo_ = randomDo;
+}
+
+void Integral::SetRandomNumber(double randomNumber) {
+	randomNumber_ = randomNumber;
+}
+
+void Integral::SetRandomX(double randomX) {
+	randomX_ = randomX;
+}
+
+void Integral::SetReverse(bool reverse) {
+	reverse_ = reverse;
+}
+
+void Integral::SetReverseX(double reverseX) {
+	reverseX_ = reverseX;
+}
+
+void Integral::SetRomberg(int romberg) {
+	romberg_ = romberg;
+}
+
+void Integral::SetRomberg4refine(int romberg4refine) {
+	romberg4refine_ = romberg4refine;
+}
+
+void Integral::SetSavedResult(double savedResult) {
+	savedResult_ = savedResult;
+}
+
+void Integral::SetUseLog(bool useLog) {
+	useLog_ = useLog;
 }
 
 Integral::~Integral()

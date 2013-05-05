@@ -853,15 +853,7 @@ double Bremsstrahlung::FunctionToBuildDNdxInterpolant2D(double energy , double v
     return dndx_integral_.at(component_)->Integrate(vUp_, v, boost::bind(&Bremsstrahlung::FunctionToDNdxIntegral, this, _1),4);
 }
 
-//----------------------------------------------------------------------------//
 
-void Bremsstrahlung::SetLorenz(bool lorenz){
-    lorenz_ = lorenz;
-}
-//----------------------------------------------------------------------------//
-void Bremsstrahlung::SetLorenzCut(double lorenz_cut){
-    lorenz_cut_ = lorenz_cut;
-}
 
 //----------------------------------------------------------------------------//
 
@@ -883,8 +875,49 @@ void Bremsstrahlung::swap(Bremsstrahlung &brems)
     dndx_interpolant_1d_.swap(brems.dndx_interpolant_1d_);
     dndx_interpolant_2d_.swap(brems.dndx_interpolant_2d_);
 
+}
 
+//----------------------------------------------------------------------------//
+void Bremsstrahlung::SetComponent(int component) {
+	component_ = component;
+}
 
+void Bremsstrahlung::SetDedxIntegral(Integral* dedxIntegral) {
+	dedx_integral_ = dedxIntegral;
+}
+
+void Bremsstrahlung::SetDedxInterpolant(Interpolant* dedxInterpolant) {
+	dedx_interpolant_ = dedxInterpolant;
+}
+
+void Bremsstrahlung::SetDndxIntegral(std::vector<Integral*> dndxIntegral) {
+	dndx_integral_ = dndxIntegral;
+}
+
+void Bremsstrahlung::SetDndxInterpolant1d(
+		std::vector<Interpolant*> dndxInterpolant1d) {
+	dndx_interpolant_1d_ = dndxInterpolant1d;
+}
+
+void Bremsstrahlung::SetDndxInterpolant2d(
+		std::vector<Interpolant*> dndxInterpolant2d) {
+	dndx_interpolant_2d_ = dndxInterpolant2d;
+}
+
+void Bremsstrahlung::SetLpm(double lpm) {
+	eLpm_ = lpm;
+}
+
+void Bremsstrahlung::SetLorenz(bool lorenz) {
+	lorenz_ = lorenz;
+}
+
+void Bremsstrahlung::SetLorenzCut(double lorenzCut) {
+	lorenz_cut_ = lorenzCut;
+}
+
+void Bremsstrahlung::SetProbForComponent(std::vector<double> probForComponent) {
+	prob_for_component_ = probForComponent;
 }
 
 //----------------------------------------------------------------------------//

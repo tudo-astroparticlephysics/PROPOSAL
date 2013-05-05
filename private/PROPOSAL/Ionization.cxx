@@ -310,6 +310,30 @@ void Ionization::DisableDNdxInterpolation(){
     do_dndx_Interpolation_  =   false;
 }
 
+void Ionization::SetBeta(double beta) {
+	beta_ = beta;
+}
+
+void Ionization::SetDedxInterpolant(Interpolant* dedxInterpolant) {
+	dedx_interpolant_ = dedxInterpolant;
+}
+
+void Ionization::SetDndxInterpolant1d(Interpolant* dndxInterpolant1d) {
+	dndx_interpolant_1d_ = dndxInterpolant1d;
+}
+
+void Ionization::SetDndxInterpolant2d(Interpolant* dndxInterpolant2d) {
+	dndx_interpolant_2d_ = dndxInterpolant2d;
+}
+
+void Ionization::SetGamma(double gamma) {
+	gamma_ = gamma;
+}
+
+void Ionization::SetIntegral(Integral* integral) {
+	integral_ = integral;
+}
+
 //----------------------------------------------------------------------------//
 
 void Ionization::DisableDEdxInterpolation(){

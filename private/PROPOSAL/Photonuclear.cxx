@@ -1276,6 +1276,66 @@ double Photonuclear::FunctionToBuildDNdxInterpolant1D(double energy){
 
 }
 
+void Photonuclear::SetComponent(int component) {
+	component_ = component;
+}
+
+void Photonuclear::SetDedxInterpolant(Interpolant* dedxInterpolant) {
+	dedx_interpolant_ = dedxInterpolant;
+}
+
+void Photonuclear::SetDndxIntegral(std::vector<Integral*> dndxIntegral) {
+	dndx_integral_ = dndxIntegral;
+}
+
+void Photonuclear::SetDndxInterpolant1d(
+		std::vector<Interpolant*> dndxInterpolant1d) {
+	dndx_interpolant_1d_ = dndxInterpolant1d;
+}
+
+void Photonuclear::SetDndxInterpolant2d(
+		std::vector<Interpolant*> dndxInterpolant2d) {
+	dndx_interpolant_2d_ = dndxInterpolant2d;
+}
+
+void Photonuclear::SetHmax(int hmax) {
+	hmax_ = hmax;
+}
+
+void Photonuclear::SetInitHardbb(bool initHardbb) {
+	init_hardbb_ = initHardbb;
+}
+
+void Photonuclear::SetInitMeasured(bool initMeasured) {
+	init_measured_ = initMeasured;
+}
+
+void Photonuclear::SetIntegral(Integral* integral) {
+	integral_ = integral;
+}
+
+void Photonuclear::SetIntegralForDEdx(Integral* integralForDEdx) {
+	integral_for_dEdx_ = integralForDEdx;
+}
+
+void Photonuclear::SetInterpolantHardBb(
+		std::vector<Interpolant*> interpolantHardBb) {
+	interpolant_hardBB_ = interpolantHardBb;
+}
+
+void Photonuclear::SetInterpolantMeasured(
+		Interpolant* interpolantMeasured) {
+	interpolant_measured_ = interpolantMeasured;
+}
+
+void Photonuclear::SetProbForComponent(std::vector<double> probForComponent) {
+	prob_for_component_ = probForComponent;
+}
+
+void Photonuclear::SetV(double v) {
+	v_ = v;
+}
+
 //----------------------------------------------------------------------------//
 double Photonuclear::FunctionToBuildDNdxInterpolant2D(double energy, double v){
 

@@ -663,6 +663,53 @@ double Epairproduction::FunctionToBuildDEdxInterpolant(double energy){
     return CalculatedEdx();
 }
 
+void Epairproduction::SetComponent(int component) {
+	component_ = component;
+}
+
+void Epairproduction::SetDedxInterpolant(Interpolant* dedxInterpolant) {
+	dedx_interpolant_ = dedxInterpolant;
+}
+
+void Epairproduction::SetDndxIntegral(std::vector<Integral*> dndxIntegral) {
+	dndx_integral_ = dndxIntegral;
+}
+
+void Epairproduction::SetDndxInterpolant1d(
+		std::vector<Interpolant*> dndxInterpolant1d) {
+	dndx_interpolant_1d_ = dndxInterpolant1d;
+}
+
+void Epairproduction::SetDndxInterpolant2d(
+		std::vector<Interpolant*> dndxInterpolant2d) {
+	dndx_interpolant_2d_ = dndxInterpolant2d;
+}
+
+void Epairproduction::SetLpm(double lpm) {
+	eLpm_ = lpm;
+}
+
+void Epairproduction::SetIntegral(Integral* integral) {
+	integral_ = integral;
+}
+
+void Epairproduction::SetIntegralForDEdx(Integral* integralForDEdx) {
+	integral_for_dEdx_ = integralForDEdx;
+}
+
+void Epairproduction::SetProbForComponent(
+		std::vector<double> probForComponent) {
+	prob_for_component_ = probForComponent;
+}
+
+void Epairproduction::SetReverse(bool reverse) {
+	reverse_ = reverse;
+}
+
+void Epairproduction::SetV(double v) {
+	v_ = v;
+}
+
 Epairproduction::~Epairproduction()
 {
     delete integral_for_dEdx_;
