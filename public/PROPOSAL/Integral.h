@@ -393,12 +393,22 @@ public:
 
     void Reset();
 
-//----------------------------------------------------------------------------//
 
-    void SetRandomX(double rand);
 
 //----------------------------------------------------------------------------//
+    //----------------------------------------------------------------------------//
+        boost::function<double (double)> GetIntegrand() const
+        {
+            return integrand_;
+        }
+    //----------------------------------------------------------------------------//
+    // Setters
 
+        void Set_Function(boost::function<double (double)> integrand)
+        {
+            std::cerr << "Integral::set_funtion2use is depricated and might even be buggy. \n better make use of Integral::integrateOpened(...) to set the function to use, and its range...\n";
+            this->integrand_ = integrand;
+        }
 
 /*!
  * Destructor
@@ -406,69 +416,107 @@ public:
     ~Integral();
 
 // Getters
-//----------------------------------------------------------------------------//
-    int GetRomberg()const
-    {
-        return romberg_;
-    }
-//----------------------------------------------------------------------------//
-    int GetMaxSteps()const
-    {
-        return maxSteps_;
-    }
-//----------------------------------------------------------------------------//
-    double GetUseLog () const
-    {
-        return useLog_;
-    }
-//----------------------------------------------------------------------------//
-    double GetRandomX () const
-    {
-        return randomX_;
-    }
-//----------------------------------------------------------------------------//
-    double GetMin () const
-    {
-        return min_;
-    }
-//----------------------------------------------------------------------------//
-    double GetMax () const
-    {
-        return max_;
-    }
-//----------------------------------------------------------------------------//
-    std::vector<double> GetIX () const
-    {
-        return iX_;
-    }
-//----------------------------------------------------------------------------//
-    std::vector<double> GetIY () const
-    {
-        return iY_;
-    }
-//----------------------------------------------------------------------------//
-    std::vector<double> GetC () const
-    {
-        return c_;
-    }
-//----------------------------------------------------------------------------//
-    std::vector<double> GetD () const
-    {
-        return d_;
-    }
-//----------------------------------------------------------------------------//
-    boost::function<double (double)> GetIntegrand() const
-    {
-        return integrand_;
-    }
-//----------------------------------------------------------------------------//
-// Setters
 
-    void Set_Function(boost::function<double (double)> integrand)
-    {
-        std::cerr << "Integral::set_funtion2use is depricated and might even be buggy. \n better make use of Integral::integrateOpened(...) to set the function to use, and its range...\n";
-        this->integrand_ = integrand;
-    }
+	std::vector<double> GetC() const {
+		return c_;
+	}
 
+	std::vector<double> GetD() const {
+		return d_;
+	}
+
+	double GetIntegralError() const {
+		return integralError_;
+	}
+
+	double GetIntegralValue() const {
+		return integralValue_;
+	}
+
+	std::vector<double> GetX() const {
+		return iX_;
+	}
+
+	std::vector<double> GetY() const {
+		return iY_;
+	}
+
+	double GetMax() const {
+		return max_;
+	}
+
+	int GetMaxSteps() const {
+		return maxSteps_;
+	}
+
+	double GetMin() const {
+		return min_;
+	}
+
+	double GetPowerOfSubstitution() const {
+		return powerOfSubstitution_;
+	}
+
+	double GetPrecision() const {
+		return precision_;
+	}
+
+	bool GetRandomDo() const {
+		return randomDo_;
+	}
+
+	double GetRandomNumber() const {
+		return randomNumber_;
+	}
+
+	double GetRandomX() const {
+		return randomX_;
+	}
+
+	bool GetReverse() const {
+		return reverse_;
+	}
+
+	double GetReverseX() const {
+		return reverseX_;
+	}
+
+	int GetRomberg() const {
+		return romberg_;
+	}
+
+	int GetRomberg4refine() const {
+		return romberg4refine_;
+	}
+
+	double GetSavedResult() const {
+		return savedResult_;
+	}
+
+	bool GetUseLog() const {
+		return useLog_;
+	}
+
+	void SetC(std::vector<double> c);
+	void SetD(std::vector<double> d);
+	void SetIntegralError(double integralError);
+	void SetIntegralValue(double integralValue);
+	void SetIntegrand(boost::function<double(double)> integrand);
+	void SetX(std::vector<double> x);
+	void SetY(std::vector<double> y);
+	void SetMax(double max);
+	void SetMaxSteps(int maxSteps);
+	void SetMin(double min);
+	void SetPowerOfSubstitution(double powerOfSubstitution);
+	void SetPrecision(double precision);
+	void SetRandomDo(bool randomDo);
+	void SetRandomNumber(double randomNumber);
+	void SetRandomX(double randomX);
+	void SetReverse(bool reverse);
+	void SetReverseX(double reverseX);
+	void SetRomberg(int romberg);
+	void SetRomberg4refine(int romberg4refine);
+	void SetSavedResult(double savedResult);
+	void SetUseLog(bool useLog);
 };
 #endif /*INTEGRAL_H_ */

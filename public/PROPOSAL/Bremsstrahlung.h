@@ -181,27 +181,57 @@ public:
     void swap(Bremsstrahlung &brems);
 
 //--------------------------------------------------------------------------- //
-    //Getter
-
-    bool GetLorenz() const
-    {
-        return lorenz_;
-    }
-
-//----------------------------------------------------------------------------//
-    double GetLorenzCut() const
-    {
-        return lorenz_cut_;
-    }
-//----------------------------------------------------------------------------//
-    //Setter
-
-    void SetLorenz(bool lorenz);
-    void SetLorenzCut(double lorenz_cut);
-
-
-//----------------------------------------------------------------------------//
 
     ~Bremsstrahlung();
 
+	int GetComponent() const {
+		return component_;
+	}
+
+	Integral* GetDedxIntegral() const {
+		return dedx_integral_;
+	}
+
+	Interpolant* GetDedxInterpolant() const {
+		return dedx_interpolant_;
+	}
+
+	std::vector<Integral*> GetDndxIntegral() const {
+		return dndx_integral_;
+	}
+
+	std::vector<Interpolant*> GetDndxInterpolant1d() const {
+		return dndx_interpolant_1d_;
+	}
+
+	std::vector<Interpolant*> GetDndxInterpolant2d() const {
+		return dndx_interpolant_2d_;
+	}
+
+	double GetLpm() const {
+		return eLpm_;
+	}
+
+	bool GetLorenz() const {
+		return lorenz_;
+	}
+
+	double GetLorenzCut() const {
+		return lorenz_cut_;
+	}
+
+	std::vector<double> GetProbForComponent() const {
+		return prob_for_component_;
+	}
+
+	void SetComponent(int component);
+	void SetDedxIntegral(Integral* dedxIntegral);
+	void SetDedxInterpolant(Interpolant* dedxInterpolant);
+	void SetDndxIntegral(std::vector<Integral*> dndxIntegral);
+	void SetDndxInterpolant1d(std::vector<Interpolant*> dndxInterpolant1d);
+	void SetDndxInterpolant2d(std::vector<Interpolant*> dndxInterpolant2d);
+	void SetLpm(double lpm);
+	void SetLorenz(bool lorenz);
+	void SetLorenzCut(double lorenzCut);
+	void SetProbForComponent(std::vector<double> probForComponent);
 };

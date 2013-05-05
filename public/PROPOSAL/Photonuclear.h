@@ -223,4 +223,74 @@ public:
 //----------------------------------------------------------------------------//
     ~Photonuclear(){}
 
+	int GetComponent() const {
+		return component_;
+	}
+
+	Interpolant* GetDedxInterpolant() const {
+		return dedx_interpolant_;
+	}
+
+	std::vector<Integral*> GetDndxIntegral() const {
+		return dndx_integral_;
+	}
+
+	std::vector<Interpolant*> GetDndxInterpolant1d() const {
+		return dndx_interpolant_1d_;
+	}
+
+	std::vector<Interpolant*> GetDndxInterpolant2d() const {
+		return dndx_interpolant_2d_;
+	}
+
+	int GetHmax() const {
+		return hmax_;
+	}
+
+	bool GetInitHardbb() const {
+		return init_hardbb_;
+	}
+
+	bool GetInitMeasured() const {
+		return init_measured_;
+	}
+
+	Integral* GetIntegral() const {
+		return integral_;
+	}
+
+	Integral* GetIntegralForDEdx() const {
+		return integral_for_dEdx_;
+	}
+
+	std::vector<Interpolant*> GetInterpolantHardBb() const {
+		return interpolant_hardBB_;
+	}
+
+	Interpolant* GetInterpolantMeasured() const {
+		return interpolant_measured_;
+	}
+
+	std::vector<double> GetProbForComponent() const {
+		return prob_for_component_;
+	}
+
+	double GetV() const {
+		return v_;
+	}
+
+	void SetComponent(int component);
+	void SetDedxInterpolant(Interpolant* dedxInterpolant);
+	void SetDndxIntegral(std::vector<Integral*> dndxIntegral);
+	void SetDndxInterpolant1d(std::vector<Interpolant*> dndxInterpolant1d);
+	void SetDndxInterpolant2d(std::vector<Interpolant*> dndxInterpolant2d);
+	void SetHmax(int hmax);
+	void SetInitHardbb(bool initHardbb);
+	void SetInitMeasured(bool initMeasured);
+	void SetIntegral(Integral* integral);
+	void SetIntegralForDEdx(Integral* integralForDEdx);
+	void SetInterpolantHardBb(std::vector<Interpolant*> interpolantHardBb);
+	void SetInterpolantMeasured(Interpolant* interpolantMeasured);
+	void SetProbForComponent(std::vector<double> probForComponent);
+	void SetV(double v);
 };
