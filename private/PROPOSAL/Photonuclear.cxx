@@ -29,10 +29,9 @@ Photonuclear::Photonuclear()
     }
 
     prob_for_component_.resize(medium_->GetNumCompontents());
-    dedx_interpolant_     = new Interpolant();
-    interpolant_measured_ = new Interpolant();
+    dedx_interpolant_     = NULL;
+    interpolant_measured_ = NULL;
 }
-//----------------------------------------------------------------------------//
 
 //----------------------------------------------------------------------------//
 
@@ -45,10 +44,27 @@ Photonuclear::Photonuclear(const Photonuclear &photo)
     ,v_                                 ( photo.v_ )
     ,integral_                          ( new Integral(*photo.integral_) )
     ,integral_for_dEdx_                 ( new Integral(*photo.integral_for_dEdx_) )
-    ,dedx_interpolant_                  ( new Interpolant(*photo.dedx_interpolant_) )
-    ,interpolant_measured_              ( new Interpolant(*photo.interpolant_measured_) )
     ,prob_for_component_                ( photo.prob_for_component_ )
 {
+
+    if(photo.dedx_interpolant_ != NULL)
+    {
+        dedx_interpolant_ = new Interpolant(*photo.dedx_interpolant_) ;
+    }
+    else
+    {
+        dedx_interpolant_ = NULL;
+    }
+
+    if(photo.interpolant_measured_ != NULL)
+    {
+        interpolant_measured_ = new Interpolant(*photo.interpolant_measured_) ;
+    }
+    else
+    {
+        interpolant_measured_ = NULL;
+    }
+
     dndx_integral_.resize( photo.dndx_integral_.size() );
     dndx_interpolant_1d_.resize( photo.dndx_interpolant_1d_.size() );
     dndx_interpolant_2d_.resize( photo.dndx_interpolant_2d_.size() );
@@ -98,13 +114,11 @@ bool Photonuclear::operator==(const Photonuclear &photo) const
     if( init_measured_              !=  photo.init_measured_)               return false;
     if( *integral_                  != *photo.integral_)                    return false;
     if( *integral_for_dEdx_         != *photo.integral_for_dEdx_)           return false;
-    if( *dedx_interpolant_          != *photo.dedx_interpolant_)            return false;
     if( prob_for_component_.size()  !=  photo.prob_for_component_.size())   return false;
     if( dndx_integral_.size()       !=  photo.dndx_integral_.size())        return false;
     if( dndx_interpolant_1d_.size() !=  photo.dndx_interpolant_1d_.size())  return false;
     if( dndx_interpolant_2d_.size() !=  photo.dndx_interpolant_2d_.size())  return false;
     if( interpolant_hardBB_.size()  !=  photo.interpolant_hardBB_.size())   return false;
-    if( *interpolant_measured_      !=  *photo.interpolant_measured_)       return false;
 
     for(unsigned int i =0; i<photo.dndx_integral_.size(); i++)
     {
@@ -124,8 +138,20 @@ bool Photonuclear::operator==(const Photonuclear &photo) const
     }
     for(unsigned int i =0; i<photo.interpolant_hardBB_.size(); i++)
     {
-        if( *interpolant_hardBB_.at(i) != *photo.interpolant_hardBB_.at(i) )  return false;
+        if( *interpolant_hardBB_.at(i) != *photo.interpolant_hardBB_.at(i) )    return false;
     }
+
+    if( dedx_interpolant_ != NULL && photo.dedx_interpolant_ != NULL)
+    {
+        if( *dedx_interpolant_   != *photo.dedx_interpolant_)                   return false;
+    }
+    else if( dedx_interpolant_ != photo.dedx_interpolant_)                      return false;
+
+    if( interpolant_measured_ != NULL && photo.interpolant_measured_ != NULL)
+    {
+        if( *interpolant_measured_   != *photo.interpolant_measured_)           return false;
+    }
+    else if( interpolant_measured_ != photo.interpolant_measured_)              return false;
 
     //else
     return true;
@@ -172,8 +198,8 @@ Photonuclear::Photonuclear(Particle* particle,
     }
 
     prob_for_component_.resize(medium_->GetNumCompontents());
-    dedx_interpolant_     = new Interpolant();
-    interpolant_measured_ = new Interpolant();
+    dedx_interpolant_     = NULL;
+    interpolant_measured_ = NULL;
 
 
 }
@@ -193,14 +219,43 @@ void Photonuclear::swap(Photonuclear &photo)
 
     integral_for_dEdx_->swap(*photo.integral_for_dEdx_);
     integral_->swap(*photo.integral_);
-    dedx_interpolant_->swap(*photo.dedx_interpolant_);
-    interpolant_measured_->swap(*photo.interpolant_measured_);
 
     prob_for_component_.swap(photo.prob_for_component_);
     dndx_integral_.swap(photo.dndx_integral_);
     dndx_interpolant_1d_.swap(photo.dndx_interpolant_1d_);
     dndx_interpolant_2d_.swap(photo.dndx_interpolant_2d_);
     interpolant_hardBB_.swap(photo.interpolant_hardBB_);
+
+    if( dedx_interpolant_ != NULL && photo.dedx_interpolant_ != NULL)
+    {
+        dedx_interpolant_->swap(*photo.dedx_interpolant_);
+    }
+    else if( dedx_interpolant_ == NULL && photo.dedx_interpolant_ != NULL)
+    {
+        dedx_interpolant_ = new Interpolant(*photo.dedx_interpolant_);
+        photo.dedx_interpolant_ = NULL;
+    }
+    else if( dedx_interpolant_ != NULL && photo.dedx_interpolant_ == NULL)
+    {
+        photo.dedx_interpolant_ = new Interpolant(*dedx_interpolant_);
+        dedx_interpolant_ = NULL;
+    }
+
+
+    if( interpolant_measured_ != NULL && photo.interpolant_measured_ != NULL)
+    {
+        interpolant_measured_->swap(*photo.interpolant_measured_);
+    }
+    else if( interpolant_measured_ == NULL && photo.interpolant_measured_ != NULL)
+    {
+        interpolant_measured_ = new Interpolant(*photo.interpolant_measured_);
+        photo.interpolant_measured_ = NULL;
+    }
+    else if( interpolant_measured_ != NULL && photo.interpolant_measured_ == NULL)
+    {
+        photo.interpolant_measured_ = new Interpolant(*interpolant_measured_);
+        interpolant_measured_ = NULL;
+    }
 
 
 }

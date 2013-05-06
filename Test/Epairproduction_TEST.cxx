@@ -41,7 +41,6 @@ TEST(Comparison , Comparison_equal ) {
     Epairproduction *A = new Epairproduction(particle, medium, cuts);
     Epairproduction *B = new Epairproduction(particle, medium, cuts);
     EXPECT_TRUE(*A==*B);
-
     Epairproduction *C = new Epairproduction();
     Epairproduction *D = new Epairproduction();
     EXPECT_TRUE(*C==*D);
@@ -146,6 +145,8 @@ TEST(Assignment , Swap ) {
     EnergyCutSettings *cuts2 = new EnergyCutSettings(500,-1);
     Epairproduction A(particle, medium, cuts);
     Epairproduction B(particle2, medium2, cuts2);
+    A.EnableDEdxInterpolation();
+    B.EnableDEdxInterpolation();
     EXPECT_TRUE(A==B);
 
     Medium *medium3 = new Medium("water",1.);

@@ -10,9 +10,9 @@ Ionization::Ionization()
 {
     name_                  = "Ionization";
 
-    dedx_interpolant_      = new Interpolant();
-    dndx_interpolant_1d_   = new Interpolant();
-    dndx_interpolant_2d_   = new Interpolant();
+    dedx_interpolant_      = NULL;
+    dndx_interpolant_1d_   = NULL;
+    dndx_interpolant_2d_   = NULL;
     integral_              = new Integral();
 }
 //----------------------------------------------------------------------------//
@@ -22,11 +22,33 @@ Ionization::Ionization(const Ionization &ioniz)
     ,beta_                  ( ioniz.beta_ )
     ,gamma_                 ( ioniz.gamma_ )
     ,integral_              ( new Integral(*ioniz.integral_) )
-    ,dedx_interpolant_      ( new Interpolant(*ioniz.dedx_interpolant_) )
-    ,dndx_interpolant_1d_   ( new Interpolant(*ioniz.dndx_interpolant_1d_) )
-    ,dndx_interpolant_2d_   ( new Interpolant(*ioniz.dndx_interpolant_2d_) )
-
 {
+    if(ioniz.dedx_interpolant_ != NULL)
+    {
+        dedx_interpolant_ = new Interpolant(*ioniz.dedx_interpolant_) ;
+    }
+    else
+    {
+        dedx_interpolant_ = NULL;
+    }
+
+    if(ioniz.dndx_interpolant_1d_ != NULL)
+    {
+        dndx_interpolant_1d_ = new Interpolant(*ioniz.dndx_interpolant_1d_) ;
+    }
+    else
+    {
+        dndx_interpolant_1d_ = NULL;
+    }
+
+    if(ioniz.dndx_interpolant_2d_ != NULL)
+    {
+        dndx_interpolant_2d_ = new Interpolant(*ioniz.dndx_interpolant_2d_) ;
+    }
+    else
+    {
+        dndx_interpolant_2d_ = NULL;
+    }
 }
 //----------------------------------------------------------------------------//
 
@@ -48,9 +70,24 @@ bool Ionization::operator==(const Ionization &ioniz) const
     if( beta_                   !=  ioniz.beta_)                return false;
     if( gamma_                  !=  ioniz.gamma_)               return false;
     if( *integral_              != *ioniz.integral_)            return false;
-    if( *dedx_interpolant_      != *ioniz.dedx_interpolant_)    return false;
-    if( *dndx_interpolant_1d_   != *ioniz.dndx_interpolant_1d_) return false;
-    if( *dndx_interpolant_2d_   != *ioniz.dndx_interpolant_2d_) return false;
+
+    if( dedx_interpolant_ != NULL && ioniz.dedx_interpolant_ != NULL)
+    {
+        if( *dedx_interpolant_          != *ioniz.dedx_interpolant_)        return false;
+    }
+    else if( dedx_interpolant_ != ioniz.dedx_interpolant_)                  return false;
+
+    if( dndx_interpolant_1d_ != NULL && ioniz.dndx_interpolant_1d_ != NULL)
+    {
+        if( *dndx_interpolant_1d_   != *ioniz.dndx_interpolant_1d_)         return false;
+    }
+    else if( dndx_interpolant_1d_ != ioniz.dndx_interpolant_1d_)            return false;
+
+    if( dndx_interpolant_2d_ != NULL && ioniz.dndx_interpolant_2d_ != NULL)
+    {
+        if( *dndx_interpolant_2d_   != *ioniz.dndx_interpolant_2d_)         return false;
+    }
+    else if( dndx_interpolant_2d_ != ioniz.dndx_interpolant_2d_)            return false;
 
 
     //else
@@ -69,9 +106,53 @@ void Ionization::swap(Ionization &ioniz)
     swap( beta_ , ioniz.beta_);
     swap( gamma_, ioniz.gamma_);
     integral_->swap( *ioniz.integral_);
-    dedx_interpolant_->swap( *ioniz.dedx_interpolant_);
-    dndx_interpolant_1d_->swap( *ioniz.dndx_interpolant_1d_);
-    dndx_interpolant_2d_->swap( *ioniz.dndx_interpolant_2d_);
+
+    if( dedx_interpolant_ != NULL && ioniz.dedx_interpolant_ != NULL)
+    {
+        dedx_interpolant_->swap(*ioniz.dedx_interpolant_);
+    }
+    else if( dedx_interpolant_ == NULL && ioniz.dedx_interpolant_ != NULL)
+    {
+        dedx_interpolant_ = new Interpolant(*ioniz.dedx_interpolant_);
+        ioniz.dedx_interpolant_ = NULL;
+    }
+    else if( dedx_interpolant_ != NULL && ioniz.dedx_interpolant_ == NULL)
+    {
+        ioniz.dedx_interpolant_ = new Interpolant(*dedx_interpolant_);
+        dedx_interpolant_ = NULL;
+    }
+
+
+    if( dndx_interpolant_1d_ != NULL && ioniz.dndx_interpolant_1d_ != NULL)
+    {
+        dndx_interpolant_1d_->swap(*ioniz.dndx_interpolant_1d_);
+    }
+    else if( dndx_interpolant_1d_ == NULL && ioniz.dndx_interpolant_1d_ != NULL)
+    {
+        dndx_interpolant_1d_ = new Interpolant(*ioniz.dndx_interpolant_1d_);
+        ioniz.dndx_interpolant_1d_ = NULL;
+    }
+    else if( dndx_interpolant_1d_ != NULL && ioniz.dndx_interpolant_1d_ == NULL)
+    {
+        ioniz.dndx_interpolant_1d_ = new Interpolant(*dndx_interpolant_1d_);
+        dndx_interpolant_1d_ = NULL;
+    }
+
+
+    if( dndx_interpolant_2d_ != NULL && ioniz.dndx_interpolant_2d_ != NULL)
+    {
+        dndx_interpolant_2d_->swap(*ioniz.dndx_interpolant_2d_);
+    }
+    else if( dndx_interpolant_2d_ == NULL && ioniz.dndx_interpolant_2d_ != NULL)
+    {
+        dndx_interpolant_2d_ = new Interpolant(*ioniz.dndx_interpolant_2d_);
+        ioniz.dndx_interpolant_2d_ = NULL;
+    }
+    else if( dndx_interpolant_2d_ != NULL && ioniz.dndx_interpolant_2d_ == NULL)
+    {
+        ioniz.dndx_interpolant_2d_ = new Interpolant(*dndx_interpolant_2d_);
+        dndx_interpolant_2d_ = NULL;
+    }
 
 
 }
@@ -103,9 +184,9 @@ Ionization::Ionization(Particle* particle,
 
 
     integral_              = new Integral(IROMB, IMAXS, IPREC);
-    dedx_interpolant_      = new Interpolant();
-    dndx_interpolant_1d_   = new Interpolant();
-    dndx_interpolant_2d_   = new Interpolant();
+    dedx_interpolant_      = NULL;
+    dndx_interpolant_1d_   = NULL;
+    dndx_interpolant_2d_   = NULL;
 
 }
 

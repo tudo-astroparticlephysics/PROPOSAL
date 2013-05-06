@@ -121,7 +121,6 @@ TEST(Assignment , Operator ) {
     Photonuclear A(particle, medium, cuts);
     Photonuclear B(particle, medium, cuts);
     A.SetParametrization(6);
-
     EXPECT_TRUE(A!=B);
 
     B=A;
@@ -149,6 +148,12 @@ TEST(Assignment , Swap ) {
     EnergyCutSettings *cuts2 = new EnergyCutSettings(500,-1);
     Photonuclear A(particle, medium, cuts);
     Photonuclear B(particle2, medium2, cuts2);
+    A.SetParametrization(2);
+    B.SetParametrization(2);
+    A.EnableDEdxInterpolation();
+    B.EnableDEdxInterpolation();
+    A.EnableDNdxInterpolation();
+    B.EnableDNdxInterpolation();
     EXPECT_TRUE(A==B);
 
     Medium *medium3 = new Medium("water",1.);

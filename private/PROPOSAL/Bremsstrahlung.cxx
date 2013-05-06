@@ -18,7 +18,7 @@ Bremsstrahlung::Bremsstrahlung( )
     ,prob_for_component_    ( )
 {
     dedx_integral_   =  new Integral(IROMB, IMAXS, IPREC);
-    dedx_interpolant_=  new Interpolant();
+    dedx_interpolant_= NULL;
 
     dndx_integral_.resize(medium_->GetNumCompontents());
 
@@ -40,10 +40,19 @@ Bremsstrahlung::Bremsstrahlung(const Bremsstrahlung &brems)
     ,lorenz_cut_                        ( brems.lorenz_cut_ )
     ,component_                         ( brems.component_ )
     ,dedx_integral_                     ( new Integral(*brems.dedx_integral_) )
-    ,dedx_interpolant_                  ( new Interpolant(*brems.dedx_interpolant_) )
     ,eLpm_                              ( brems.eLpm_)
     ,prob_for_component_                ( brems.prob_for_component_)
 {
+    if(brems.dedx_interpolant_ != NULL)
+    {
+        dedx_interpolant_ = new Interpolant(*brems.dedx_interpolant_) ;
+    }
+    else
+    {
+        dedx_interpolant_ = NULL;
+    }
+
+
     dndx_integral_.resize( brems.dndx_integral_.size() );
     dndx_interpolant_1d_.resize( brems.dndx_interpolant_1d_.size() );
     dndx_interpolant_2d_.resize( brems.dndx_interpolant_2d_.size() );
@@ -85,7 +94,6 @@ bool Bremsstrahlung::operator==(const Bremsstrahlung &brems) const
     if( component_                  !=  brems.component_)                   return false;
     if( eLpm_                       !=  brems.eLpm_)                        return false;
     if( *dedx_integral_             != *brems.dedx_integral_)               return false;
-    if( *dedx_interpolant_          != *brems.dedx_interpolant_)            return false;
     if( prob_for_component_.size()  !=  brems.prob_for_component_.size())   return false;
     if( dndx_integral_.size()       !=  brems.dndx_integral_.size())        return false;
     if( dndx_interpolant_1d_.size() !=  brems.dndx_interpolant_1d_.size())  return false;
@@ -107,6 +115,13 @@ bool Bremsstrahlung::operator==(const Bremsstrahlung &brems) const
     {
         if( prob_for_component_.at(i) != brems.prob_for_component_.at(i) )      return false;
     }
+
+    if( dedx_interpolant_ != NULL && brems.dedx_interpolant_ != NULL)
+    {
+        if( *dedx_interpolant_          != *brems.dedx_interpolant_)            return false;
+    }
+    else if( dedx_interpolant_ != brems.dedx_interpolant_)                      return false;
+
     //else
     return true;
 
@@ -148,7 +163,7 @@ Bremsstrahlung::Bremsstrahlung(Particle* particle,
     component_                  = 0;
 
     dedx_integral_   =  new Integral(IROMB, IMAXS, IPREC);
-    dedx_interpolant_=  new Interpolant();
+    dedx_interpolant_=  NULL;
 
     dndx_integral_.resize( medium_->GetNumCompontents() );
 
@@ -870,7 +885,22 @@ void Bremsstrahlung::swap(Bremsstrahlung &brems)
     swap(lorenz_cut_,brems.lorenz_cut_);
     swap(component_,brems.component_);
     dedx_integral_->swap(*brems.dedx_integral_);
-    dedx_interpolant_->swap(*brems.dedx_interpolant_);
+
+    if( dedx_interpolant_ != NULL && brems.dedx_interpolant_ != NULL)
+    {
+        dedx_interpolant_->swap(*brems.dedx_interpolant_);
+    }
+    else if( dedx_interpolant_ == NULL && brems.dedx_interpolant_ != NULL)
+    {
+        dedx_interpolant_ = new Interpolant(*brems.dedx_interpolant_);
+        brems.dedx_interpolant_ = NULL;
+    }
+    else if( dedx_interpolant_ != NULL && brems.dedx_interpolant_ == NULL)
+    {
+        brems.dedx_interpolant_ = new Interpolant(*dedx_interpolant_);
+        dedx_interpolant_ = NULL;
+    }
+
     swap(eLpm_,brems.eLpm_);
 
     prob_for_component_.swap(brems.prob_for_component_);

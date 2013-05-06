@@ -17,7 +17,7 @@ Epairproduction::Epairproduction()
 {
     integral_             = new Integral(IROMB, IMAXS, IPREC);
     integral_for_dEdx_    = new Integral(IROMB, IMAXS, IPREC);
-    dedx_interpolant_     = new Interpolant();
+    dedx_interpolant_     = NULL;
     name_                 = "Epairproduction";
 
 }
@@ -33,10 +33,18 @@ Epairproduction::Epairproduction(const Epairproduction &epair)
     ,eLpm_                              ( epair.eLpm_)
     ,integral_                          ( new Integral(*epair.integral_) )
     ,integral_for_dEdx_                 ( new Integral(*epair.integral_for_dEdx_) )
-    ,dedx_interpolant_                  ( new Interpolant(*epair.dedx_interpolant_) )
     ,prob_for_component_                ( epair.prob_for_component_)
 
 {    
+    if(epair.dedx_interpolant_ != NULL)
+    {
+        dedx_interpolant_ = new Interpolant(*epair.dedx_interpolant_) ;
+    }
+    else
+    {
+        dedx_interpolant_ = NULL;
+    }
+
     dndx_integral_.resize( epair.dndx_integral_.size() );
     dndx_interpolant_1d_.resize( epair.dndx_interpolant_1d_.size() );
     dndx_interpolant_2d_.resize( epair.dndx_interpolant_2d_.size() );
@@ -79,7 +87,6 @@ bool Epairproduction::operator==(const Epairproduction &epair) const
     if( eLpm_                       !=  epair.eLpm_)                        return false;
     if( *integral_                  != *epair.integral_)                    return false;
     if( *integral_for_dEdx_         != *epair.integral_for_dEdx_)           return false;
-    if( *dedx_interpolant_          != *epair.dedx_interpolant_)            return false;
     if( prob_for_component_.size()  !=  epair.prob_for_component_.size())   return false;
     if( dndx_integral_.size()       !=  epair.dndx_integral_.size())        return false;
     if( dndx_interpolant_1d_.size() !=  epair.dndx_interpolant_1d_.size())  return false;
@@ -102,6 +109,13 @@ bool Epairproduction::operator==(const Epairproduction &epair) const
     {
         if( prob_for_component_.at(i) != epair.prob_for_component_.at(i) )      return false;
     }
+
+    if( dedx_interpolant_ != NULL && epair.dedx_interpolant_ != NULL)
+    {
+        if( *dedx_interpolant_ != *epair.dedx_interpolant_)                     return false;
+    }
+    else if( dedx_interpolant_ != epair.dedx_interpolant_)                      return false;
+
     //else
     return true;
 
@@ -153,7 +167,7 @@ Epairproduction::Epairproduction(Particle* particle,
     }
 
     prob_for_component_.resize(medium_->GetNumCompontents());
-    dedx_interpolant_     = new Interpolant();
+    dedx_interpolant_     = NULL;
 
 }
 
@@ -172,7 +186,21 @@ void Epairproduction::swap(Epairproduction &epair)
 
     integral_for_dEdx_->swap(*epair.integral_for_dEdx_);
     integral_->swap(*epair.integral_);
-    dedx_interpolant_->swap(*epair.dedx_interpolant_);
+
+    if( dedx_interpolant_ != NULL && epair.dedx_interpolant_ != NULL)
+    {
+        dedx_interpolant_->swap(*epair.dedx_interpolant_);
+    }
+    else if( dedx_interpolant_ == NULL && epair.dedx_interpolant_ != NULL)
+    {
+        dedx_interpolant_ = new Interpolant(*epair.dedx_interpolant_);
+        epair.dedx_interpolant_ = NULL;
+    }
+    else if( dedx_interpolant_ != NULL && epair.dedx_interpolant_ == NULL)
+    {
+        epair.dedx_interpolant_ = new Interpolant(*dedx_interpolant_);
+        dedx_interpolant_ = NULL;
+    }
 
     prob_for_component_.swap(epair.prob_for_component_);
     dndx_integral_.swap(epair.dndx_integral_);

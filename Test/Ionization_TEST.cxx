@@ -145,6 +145,10 @@ TEST(Assignment , Swap ) {
     EnergyCutSettings *cuts2 = new EnergyCutSettings(500,-1);
     Ionization A(particle, medium, cuts);
     Ionization B(particle2, medium2, cuts2);
+    A.EnableDEdxInterpolation();
+    B.EnableDEdxInterpolation();
+    A.EnableDNdxInterpolation();
+    B.EnableDNdxInterpolation();
     EXPECT_TRUE(A==B);
 
     Medium *medium3 = new Medium("water",1.);
