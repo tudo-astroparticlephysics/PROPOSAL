@@ -246,7 +246,7 @@ double ProcessCollection::FunctionToIntegral(double energy)
 //----------------------------------------------------------------------------//
 
 
-double ProcessCollection::GetDx(double ei, double ef, double dist)
+double ProcessCollection::GetDisplacement(double ei, double ef, double dist)
 {
     if(do_interpolation_)
     {

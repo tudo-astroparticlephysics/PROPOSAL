@@ -99,7 +99,7 @@ public:
     \param ef upper integration limit (final energy)
     \param dist ???
     */
-    double GetDx(double ei, double ef, double dist);
+    double GetDisplacement(double ei, double ef, double dist);
 
 //----------------------------------------------------------------------------//
 
