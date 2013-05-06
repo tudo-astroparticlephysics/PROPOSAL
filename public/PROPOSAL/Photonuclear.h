@@ -279,6 +279,8 @@ public:
 		return v_;
 	}
 
+
+
 	void SetComponent(int component);
 	void SetDedxInterpolant(Interpolant* dedxInterpolant);
 	void SetDndxIntegral(std::vector<Integral*> dndxIntegral);

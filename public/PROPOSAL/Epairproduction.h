@@ -23,6 +23,7 @@ protected:
 
     std::vector<double> prob_for_component_; //!< probability for each medium component to interact with the particle (formerly H_)
 
+
 //----------------------------------------------------------------------------//
 
     /*!
@@ -202,6 +203,7 @@ public:
 	double GetV() const {
 		return v_;
 	}
+
 
 	void SetComponent(int component);
 	void SetDedxInterpolant(Interpolant* dedxInterpolant);

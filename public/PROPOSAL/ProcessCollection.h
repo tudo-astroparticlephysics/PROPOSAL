@@ -59,8 +59,10 @@ public:
     // constructors
 
     ProcessCollection();
-    ProcessCollection(const ProcessCollection&);
-    ProcessCollection& operator=(const ProcessCollection&);
+    ProcessCollection(const ProcessCollection& collection);
+    ProcessCollection& operator=(const ProcessCollection& collection);
+    bool operator==(const ProcessCollection &collection) const;
+    bool operator!=(const ProcessCollection &collection) const;
 //----------------------------------------------------------------------------//
 
     /// @brief  initializes all cross sections,
@@ -70,6 +72,10 @@ public:
 //----------------------------------------------------------------------------//
 
     // Memberfunctions
+    void swap(ProcessCollection &collection);
+
+//----------------------------------------------------------------------------//
+
 
     /*!
     * function for range calculation for given energy - interface to Integral;

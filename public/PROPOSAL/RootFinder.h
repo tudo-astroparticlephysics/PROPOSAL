@@ -29,6 +29,8 @@ public:
     RootFinder();
     RootFinder(const RootFinder&);
     RootFinder& operator=(const RootFinder&);
+    bool operator==(const RootFinder &finder) const;
+    bool operator!=(const RootFinder &finder) const;
     RootFinder(int maxSteps, double precision);
 
 //----------------------------------------------------------------------------//
@@ -45,14 +47,18 @@ public:
                     boost::function<double (double)> differentiated_function,
                     double rightSide);
 
+//----------------------------------------------------------------------------//
+
+    void swap(RootFinder &finder);
+//----------------------------------------------------------------------------//
 	int GetMaxSteps() const {
 		return maxSteps_;
 	}
-
+//----------------------------------------------------------------------------//
 	double GetPrecision() const {
 		return precision_;
 	}
-
+//----------------------------------------------------------------------------//
 	void SetMaxSteps(int maxSteps);
 	void SetPrecision(double precision);
 };

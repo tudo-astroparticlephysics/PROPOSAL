@@ -28,6 +28,8 @@ Bremsstrahlung::Bremsstrahlung( )
     }
     do_dedx_Interpolation_  = false;
     do_dndx_Interpolation_  = false;
+    name_                   = "Bremsstrahlung";
+
 }
 
 //----------------------------------------------------------------------------//
@@ -88,6 +90,7 @@ bool Bremsstrahlung::operator==(const Bremsstrahlung &brems) const
     if( dndx_integral_.size()       !=  brems.dndx_integral_.size())        return false;
     if( dndx_interpolant_1d_.size() !=  brems.dndx_interpolant_1d_.size())  return false;
     if( dndx_interpolant_2d_.size() !=  brems.dndx_interpolant_2d_.size())  return false;
+
     for(unsigned int i =0; i<brems.dndx_integral_.size(); i++)
     {
         if( *dndx_integral_.at(i)       != *brems.dndx_integral_.at(i) )        return false;
@@ -130,8 +133,8 @@ Bremsstrahlung::Bremsstrahlung(Particle* particle,
     ,dndx_interpolant_2d_   ( )
     ,eLpm_                  ( 0 )
     ,prob_for_component_    ( )
-
 {
+    name_                       = "Bremsstrahlung";
     vMax_                       = 0;
     vUp_                        = 0;
     vMin_                       = 0;

@@ -14,25 +14,45 @@ using namespace std;
 
 
 RootFinder::RootFinder()
-    :maxSteps_(20)
-    ,precision_(1e-6)
+    :maxSteps_  ( 20 )
+    ,precision_ ( 1e-6 )
 {
 
 }
 
 //----------------------------------------------------------------------------//
 
-RootFinder::RootFinder(const RootFinder &rootfinder)
+RootFinder::RootFinder(const RootFinder &finder)
+    :maxSteps_  ( finder.maxSteps_ )
+    ,precision_ ( finder.precision_ )
 {
-    *this = rootfinder;
+
 }
 
 //----------------------------------------------------------------------------//
 
-RootFinder& RootFinder::operator=(const RootFinder &rootfinder){
+RootFinder& RootFinder::operator=(const RootFinder &finder){
+    if (this != &finder)
+    {
+      RootFinder tmp(finder);
+      swap(tmp);
+    }
     return *this;
 }
+//----------------------------------------------------------------------------//
+bool RootFinder::operator==(const RootFinder &finder) const
+{
+    if (maxSteps_  != finder.maxSteps_ )    return false;
+    if (precision_ != finder.precision_ )   return false;
 
+    //else
+    return true;
+}
+//----------------------------------------------------------------------------//
+bool RootFinder::operator!=(const RootFinder &finder) const
+{
+    return !(*this == finder);
+}
 //----------------------------------------------------------------------------//
 
 RootFinder::RootFinder(int maxSteps, double precision)
@@ -53,15 +73,23 @@ RootFinder::RootFinder(int maxSteps, double precision)
     precision_    =   precision;
 
 }
-
+//----------------------------------------------------------------------------//
 void RootFinder::SetMaxSteps(int maxSteps) {
 	maxSteps_ = maxSteps;
 }
-
+//----------------------------------------------------------------------------//
 void RootFinder::SetPrecision(double precision) {
 	precision_ = precision;
 }
+//----------------------------------------------------------------------------//
+void RootFinder::swap(RootFinder &finder)
+{
+    using std::swap;
 
+    swap( maxSteps_ , finder.maxSteps_ );
+    swap( precision_, finder.precision_ );
+
+}
 //----------------------------------------------------------------------------//
 
 RootFinder::~RootFinder(){}

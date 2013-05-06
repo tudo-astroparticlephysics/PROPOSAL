@@ -396,19 +396,19 @@ public:
 
 
 //----------------------------------------------------------------------------//
-    //----------------------------------------------------------------------------//
-        boost::function<double (double)> GetIntegrand() const
-        {
-            return integrand_;
-        }
-    //----------------------------------------------------------------------------//
-    // Setters
 
-        void Set_Function(boost::function<double (double)> integrand)
-        {
-            std::cerr << "Integral::set_funtion2use is depricated and might even be buggy. \n better make use of Integral::integrateOpened(...) to set the function to use, and its range...\n";
-            this->integrand_ = integrand;
-        }
+    boost::function<double (double)> GetIntegrand() const
+    {
+        return integrand_;
+    }
+//----------------------------------------------------------------------------//
+// Setters
+
+    void Set_Function(boost::function<double (double)> integrand)
+    {
+        std::cerr << "Integral::set_funtion2use is depricated and might even be buggy. \n better make use of Integral::integrateOpened(...) to set the function to use, and its range...\n";
+        this->integrand_ = integrand;
+    }
 
 /*!
  * Destructor

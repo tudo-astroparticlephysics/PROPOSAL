@@ -14,7 +14,7 @@
 #include "PROPOSAL/Particle.h"
 #include "PROPOSAL/Medium.h"
 #include "PROPOSAL/EnergyCutSettings.h"
-
+#include <string>
 
 
 
@@ -29,6 +29,8 @@ class CrossSections : public MathModel
 
 
 protected:
+
+    std::string name_;
 
     Particle*   particle_;
     Medium*     medium_;
@@ -137,6 +139,7 @@ public:
 
     // Setter
 
+//----------------------------------------------------------------------------//
     void SetMultiplier(double multiplier=1.);
 
 //----------------------------------------------------------------------------//
@@ -169,6 +172,10 @@ public:
 
 //----------------------------------------------------------------------------//
     // Getter
+    std::string GetName() const
+    {
+        return name_;
+    }
 
     double GetEbig() const
     {

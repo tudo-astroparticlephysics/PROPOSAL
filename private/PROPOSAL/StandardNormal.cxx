@@ -15,39 +15,86 @@ using namespace std;
 
 
 StandardNormal::StandardNormal()
-    :val1_(0)
-    ,val2_(0)
-    ,do_interpolation_(false)
-    ,norm_(1/sqrt(2*PI))
-    ,order_of_interpolation_(5)
+    :val1_                  ( 0 )
+    ,val2_                  ( 0 )
+    ,do_interpolation_      ( false )
+    ,norm_                  ( 1/sqrt(2*PI) )
+    ,order_of_interpolation_( 5 )
 
 {
     Init(5,20,1.e-6 );
+    interpolant_ = new Interpolant();
 }
 
 //----------------------------------------------------------------------------//
 
-StandardNormal::StandardNormal(const StandardNormal &standard_normal)
+StandardNormal::StandardNormal(const StandardNormal &normal)
+    :integral_               ( new Integral(*normal.integral_) )
+    ,interpolant_            ( new Interpolant(*normal.interpolant_) )
+    ,val1_                   ( normal.val1_ )
+    ,val2_                   ( normal.val2_ )
+    ,do_interpolation_       ( normal.do_interpolation_ )
+    ,norm_                   ( normal.norm_ )
+    ,order_of_interpolation_ ( normal.order_of_interpolation_ )
+
 {
-    *this = standard_normal;
+
 }
 //----------------------------------------------------------------------------//
 
-StandardNormal& StandardNormal::operator=(const StandardNormal &standard_normal)
-{
+StandardNormal& StandardNormal::operator=(const StandardNormal &normal){
+    if (this != &normal)
+    {
+      StandardNormal tmp(normal);
+      swap(tmp);
+    }
     return *this;
+}
+//----------------------------------------------------------------------------//
+bool StandardNormal::operator==(const StandardNormal &normal) const
+{
+    if (val1_                   != normal.val1_ )                   return false;
+    if (val2_                   != normal.val2_ )                   return false;
+    if (do_interpolation_       != normal.do_interpolation_ )       return false;
+    if (norm_                   != normal.norm_ )                   return false;
+    if (order_of_interpolation_ != normal.order_of_interpolation_ ) return false;
+    if (*integral_              != *normal.integral_ )              return false;
+    if (*interpolant_           != *normal.interpolant_ )           return false;
+
+    //else
+    return true;
+}
+//----------------------------------------------------------------------------//
+bool StandardNormal::operator!=(const StandardNormal &normal) const
+{
+    return !(*this == normal);
+}
+//----------------------------------------------------------------------------//
+void StandardNormal::swap(StandardNormal &normal)
+{
+    using std::swap;
+
+    swap(val1_                   , normal.val1_ );
+    swap(val2_                   , normal.val2_ );
+    swap(do_interpolation_       , normal.do_interpolation_ );
+    swap(norm_                   , normal.norm_ );
+    swap(order_of_interpolation_ , normal.order_of_interpolation_ );
+    swap(integral_               , normal.integral_ );
+    swap(interpolant_            , normal.interpolant_ );
 }
 
 //----------------------------------------------------------------------------//
 
 StandardNormal::StandardNormal(int romberg, int maxSteps, double precision)
-    :val1_(0)
-    ,val2_(0)
-    ,do_interpolation_(false)
-    ,norm_(1/sqrt(2*PI))
-    ,order_of_interpolation_(5)
+    :val1_                  ( 0 )
+    ,val2_                  ( 0 )
+    ,do_interpolation_      ( false )
+    ,norm_                  ( 1/sqrt(2*PI) )
+    ,order_of_interpolation_( 5 )
 {
     Init(romberg, maxSteps, precision);
+    interpolant_ = new Interpolant();
+
 }
 
 //----------------------------------------------------------------------------//

@@ -78,6 +78,8 @@ public:
     StandardNormal();
     StandardNormal(const StandardNormal&);
     StandardNormal& operator=(const StandardNormal&);
+    bool operator==(const StandardNormal &normal) const;
+    bool operator!=(const StandardNormal &normal) const;
 
 //----------------------------------------------------------------------------//
     /**
@@ -91,6 +93,9 @@ public:
     StandardNormal(int romberg, int maxSteps, double precision);
 //----------------------------------------------------------------------------//
     //Memberfunctions
+
+    void swap(StandardNormal &normal);
+//----------------------------------------------------------------------------//
     /**
      * evaluates the standard normal random number
      *

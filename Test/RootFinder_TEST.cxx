@@ -36,6 +36,77 @@ double DiffPolynom3(double r){
     return -2*r;
 }
 
+
+TEST(Comparison , Comparison_equal ) {
+    RootFinder A;
+    RootFinder B;
+    EXPECT_TRUE(A==B);
+    RootFinder* C = new RootFinder(10,1e-3);
+    RootFinder* D = new RootFinder(10,1e-3);
+    EXPECT_TRUE(*C==*D);
+    RootFinder* E = new RootFinder(20,1e-6);
+    EXPECT_TRUE(A==*E);
+
+}
+
+TEST(Comparison , Comparison_not_equal ) {
+    RootFinder A;
+    RootFinder B(10,1e-3);
+    EXPECT_TRUE(A!=B);
+    RootFinder* C = new RootFinder(10,1e-3);
+    RootFinder* D = new RootFinder(20,0.3);
+    EXPECT_TRUE(*C!=*D);
+    RootFinder* E = new RootFinder(10,1e-3);
+    EXPECT_TRUE(*C==*E);
+    E->SetMaxSteps(20);
+    EXPECT_TRUE(*C!=*E);
+
+
+}
+
+TEST(Assignment , Copyconstructor ) {
+    RootFinder A;
+    RootFinder B =A;
+
+    EXPECT_TRUE(A==B);
+
+}
+
+TEST(Assignment , Copyconstructor2 ) {
+    RootFinder A(10,1e-3);
+    RootFinder B(A);
+
+    EXPECT_TRUE(A==B);
+
+}
+
+TEST(Assignment , Operator ) {
+    RootFinder A;
+    RootFinder B(10,0.4);
+
+    EXPECT_TRUE(A!=B);
+
+    B=A;
+
+    EXPECT_TRUE(A==B);
+}
+
+TEST(Assignment , Swap ) {
+    RootFinder A;
+    RootFinder B;
+    EXPECT_TRUE(A==B);
+    RootFinder* C = new RootFinder(5,0.3);
+    RootFinder* D = new RootFinder(5,0.3);
+    EXPECT_TRUE(*C==*D);
+
+    A.swap(*C);
+    EXPECT_TRUE(A==*D);
+    EXPECT_TRUE(B==*C);
+
+
+}
+
+
 TEST(RootFinder , e_to_x_minus_e ) {
     RootFinder *finder = new RootFinder();
     ASSERT_NEAR(finder->FindRoot(-2,2,1, Exp, DiffExp,0.0) ,0, 1E-10);

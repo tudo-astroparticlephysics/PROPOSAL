@@ -14,6 +14,7 @@ protected:
 
     Interpolant* dndx_interpolant_1d_;
     Interpolant* dndx_interpolant_2d_;
+
 //----------------------------------------------------------------------------//
 
     /*!
@@ -200,6 +201,8 @@ public:
 	const Integral* GetIntegral() const {
 		return integral_;
 	}
+
+
 
 	void SetBeta(double beta);
 	void SetDedxInterpolant(Interpolant* dedxInterpolant);

@@ -17,24 +17,156 @@ using namespace std;
 //constructors
 
 ProcessCollection::ProcessCollection()
-    :order_of_interpolation_(5)
-    ,do_interpolation_(false)
-    ,lpm_effect_enabled_(false)
-    ,ini_(0)
-    ,debug_(false)
+    :order_of_interpolation_    ( 5 )
+    ,do_interpolation_          ( false )
+    ,lpm_effect_enabled_        ( false )
+    ,ini_                       ( 0 )
+    ,debug_                     ( false )
+    ,crosssections_             ( )
 {
+
+    interpolant_        = new Interpolant();
+    interpolant_diff_   = new Interpolant();
+    particle_           = new Particle();
+    medium_             = new Medium();
+    integral_           = new Integral();
+    cut_settings_       = new EnergyCutSettings();
 
 }
 //----------------------------------------------------------------------------//
 
-ProcessCollection::ProcessCollection(const ProcessCollection &processcollection)
+ProcessCollection::ProcessCollection(const ProcessCollection &collection)
+    :order_of_interpolation_    ( collection.order_of_interpolation_ )
+    ,do_interpolation_          ( collection.do_interpolation_ )
+    ,lpm_effect_enabled_        ( collection.lpm_effect_enabled_ )
+    ,ini_                       ( collection.ini_ )
+    ,debug_                     ( collection.debug_ )
+    ,interpolant_               ( new Interpolant (*collection.interpolant_) )
+    ,interpolant_diff_          ( new Interpolant (*collection.interpolant_diff_) )
+    ,particle_                  ( new Particle(*collection.particle_) )
+    ,medium_                    ( new Medium( *collection.medium_) )
+    ,integral_                  ( new Integral(*collection.integral_) )
+    ,cut_settings_              ( new EnergyCutSettings(*collection.cut_settings_) )
 {
-    *this = processcollection;
+    crosssections_.resize(collection.crosssections_.size());
+
+    for(unsigned int i =0; i<collection.crosssections_.size(); i++)
+    {
+        if(collection.crosssections_.at(i)->GetName().compare("Bremsstrahlung")==0)
+        {
+            crosssections_.at(i) = new Bremsstrahlung( *(Bremsstrahlung*)collection.crosssections_.at(i) );
+        }
+        else if(collection.crosssections_.at(i)->GetName().compare("Ionization")==0)
+        {
+            crosssections_.at(i) = new Ionization( *(Ionization*)collection.crosssections_.at(i) );
+        }
+        else if(collection.crosssections_.at(i)->GetName().compare("Epairproduction")==0)
+        {
+            crosssections_.at(i) = new Epairproduction( *(Epairproduction*)collection.crosssections_.at(i) );
+        }
+        else if(collection.crosssections_.at(i)->GetName().compare("Photonuclear")==0)
+        {
+            crosssections_.at(i) = new Photonuclear( *(Photonuclear*)collection.crosssections_.at(i) );
+        }
+        else
+        {
+            cout<<"In copy constructor of ProcessCollection: Error: Unknown crossSection"<<endl;
+            exit(1);
+        }
+    }
+
 }
 //----------------------------------------------------------------------------//
 
-ProcessCollection& ProcessCollection::operator=(const ProcessCollection &processcollection){
+ProcessCollection& ProcessCollection::operator=(const ProcessCollection &collection){
+    if (this != &collection)
+    {
+      ProcessCollection tmp(collection);
+      swap(tmp);
+    }
     return *this;
+}
+//----------------------------------------------------------------------------//
+bool ProcessCollection::operator==(const ProcessCollection &collection) const
+{
+    if( order_of_interpolation_    != collection.order_of_interpolation_ )  return false;
+    if( do_interpolation_          != collection.do_interpolation_ )        return false;
+    if( lpm_effect_enabled_        != collection.lpm_effect_enabled_ )      return false;
+    if( ini_                       != collection.ini_ )                     return false;
+    if( debug_                     != collection.debug_ )                   return false;
+    if( *interpolant_              != *collection.interpolant_ )            return false;
+    if( *interpolant_diff_         != *collection.interpolant_diff_ )       return false;
+    if( *particle_                 != *collection.particle_ )               return false;
+    if( *medium_                   != *collection.medium_ )                 return false;
+    if( *integral_                 != *collection.integral_ )               return false;
+    if( *cut_settings_             != *collection.cut_settings_ )           return false;
+
+    if( crosssections_.size()      != collection.crosssections_.size() )    return false;
+
+    for(unsigned int i =0; i<collection.crosssections_.size(); i++)
+    {
+        if(collection.crosssections_.at(i)->GetName().compare("Bremsstrahlung")==0)
+        {
+            if( *(Bremsstrahlung*)crosssections_.at(i) !=  *(Bremsstrahlung*)collection.crosssections_.at(i) ) return false;
+        }
+        else if(collection.crosssections_.at(i)->GetName().compare("Ionization")==0)
+        {
+            if( *(Ionization*)crosssections_.at(i) != *(Ionization*)collection.crosssections_.at(i) ) return false;
+
+        }
+        else if(collection.crosssections_.at(i)->GetName().compare("Epairproduction")==0)
+        {
+            if( *(Epairproduction*)crosssections_.at(i) !=  *(Epairproduction*)collection.crosssections_.at(i) ) return false;
+        }
+        else if(collection.crosssections_.at(i)->GetName().compare("Photonuclear")==0)
+        {
+            if( *(Photonuclear*)crosssections_.at(i) !=  *(Photonuclear*)collection.crosssections_.at(i) )  return false;
+        }
+        else
+        {
+            cout<<"In copy constructor of ProcessCollection: Error: Unknown crossSection"<<endl;
+            exit(1);
+        }
+    }
+
+    //else
+    return true;
+}
+//----------------------------------------------------------------------------//
+bool ProcessCollection::operator!=(const ProcessCollection &collection) const
+{
+    return !(*this == collection);
+}
+//----------------------------------------------------------------------------//
+void ProcessCollection::swap(ProcessCollection &collection)
+{
+    using std::swap;
+
+    swap( order_of_interpolation_    , collection.order_of_interpolation_ );
+    swap( do_interpolation_          , collection.do_interpolation_ );
+    swap( lpm_effect_enabled_        , collection.lpm_effect_enabled_ );
+    swap( ini_                       , collection.ini_ );
+    swap( debug_                     , collection.debug_ );
+
+    interpolant_->swap( *collection.interpolant_ );
+    interpolant_diff_->swap( *collection.interpolant_diff_ );
+    particle_->swap( *collection.particle_ );
+    medium_->swap( *collection.medium_ );
+    integral_->swap( *collection.integral_ );
+    cut_settings_->swap( *collection.cut_settings_ );
+    crosssections_.swap(collection.crosssections_);
+
+    for(unsigned int i = 0 ; i < crosssections_.size() ; i++)
+    {
+        crosssections_.at(i)->SetParticle(particle_);
+        crosssections_.at(i)->SetMedium(medium_);
+        crosssections_.at(i)->SetEnergyCutSettings(cut_settings_);
+
+        collection.crosssections_.at(i)->SetParticle(collection.GetParticle());
+        collection.crosssections_.at(i)->SetMedium(collection.GetMedium());
+        collection.crosssections_.at(i)->SetEnergyCutSettings(collection.GetCutSettings());
+    }
+
 }
 
 //----------------------------------------------------------------------------//
@@ -54,10 +186,13 @@ ProcessCollection::ProcessCollection(Particle *particle, Medium *medium, EnergyC
     integral_       =   new Integral(IROMB, IMAXS, IPREC2);
 
     crosssections_.resize(4);
-    crosssections_.at(1) = new Ionization(particle_, medium_, cut_settings_);
-    crosssections_.at(2) = new Bremsstrahlung(particle_, medium_, cut_settings_);
-    crosssections_.at(3) = new Photonuclear(particle_, medium_, cut_settings_);
-    crosssections_.at(4) = new Epairproduction(particle_, medium_, cut_settings_);
+    crosssections_.at(0) = new Ionization(particle_, medium_, cut_settings_);
+    crosssections_.at(1) = new Bremsstrahlung(particle_, medium_, cut_settings_);
+    crosssections_.at(2) = new Photonuclear(particle_, medium_, cut_settings_);
+    crosssections_.at(3) = new Epairproduction(particle_, medium_, cut_settings_);
+
+    interpolant_        = new Interpolant();
+    interpolant_diff_   = new Interpolant();
 
 }
 

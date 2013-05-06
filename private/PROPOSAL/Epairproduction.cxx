@@ -18,6 +18,8 @@ Epairproduction::Epairproduction()
     integral_             = new Integral(IROMB, IMAXS, IPREC);
     integral_for_dEdx_    = new Integral(IROMB, IMAXS, IPREC);
     dedx_interpolant_     = new Interpolant();
+    name_                 = "Epairproduction";
+
 }
 
 
@@ -33,7 +35,8 @@ Epairproduction::Epairproduction(const Epairproduction &epair)
     ,integral_for_dEdx_                 ( new Integral(*epair.integral_for_dEdx_) )
     ,dedx_interpolant_                  ( new Interpolant(*epair.dedx_interpolant_) )
     ,prob_for_component_                ( epair.prob_for_component_)
-{
+
+{    
     dndx_integral_.resize( epair.dndx_integral_.size() );
     dndx_interpolant_1d_.resize( epair.dndx_interpolant_1d_.size() );
     dndx_interpolant_2d_.resize( epair.dndx_interpolant_2d_.size() );
@@ -82,6 +85,7 @@ bool Epairproduction::operator==(const Epairproduction &epair) const
     if( dndx_interpolant_1d_.size() !=  epair.dndx_interpolant_1d_.size())  return false;
     if( dndx_interpolant_2d_.size() !=  epair.dndx_interpolant_2d_.size())  return false;
 
+
     for(unsigned int i =0; i<epair.dndx_integral_.size(); i++)
     {
         if( *dndx_integral_.at(i)       != *epair.dndx_integral_.at(i) )        return false;
@@ -124,6 +128,7 @@ Epairproduction::Epairproduction(Particle* particle,
     ,dndx_interpolant_2d_   ( )
     ,prob_for_component_    ( )
 {
+    name_                       = "Epairproduction";
     vMax_                       = 0;
     vUp_                        = 0;
     vMin_                       = 0;

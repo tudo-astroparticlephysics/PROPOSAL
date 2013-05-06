@@ -7,8 +7,9 @@ Ionization::Ionization()
     :beta_                  ( 0 )
     ,gamma_                 ( 0 )
     ,integral_              (  )
-
 {
+    name_                  = "Ionization";
+
     dedx_interpolant_      = new Interpolant();
     dndx_interpolant_1d_   = new Interpolant();
     dndx_interpolant_2d_   = new Interpolant();
@@ -24,6 +25,7 @@ Ionization::Ionization(const Ionization &ioniz)
     ,dedx_interpolant_      ( new Interpolant(*ioniz.dedx_interpolant_) )
     ,dndx_interpolant_1d_   ( new Interpolant(*ioniz.dndx_interpolant_1d_) )
     ,dndx_interpolant_2d_   ( new Interpolant(*ioniz.dndx_interpolant_2d_) )
+
 {
 }
 //----------------------------------------------------------------------------//
@@ -49,6 +51,7 @@ bool Ionization::operator==(const Ionization &ioniz) const
     if( *dedx_interpolant_      != *ioniz.dedx_interpolant_)    return false;
     if( *dndx_interpolant_1d_   != *ioniz.dndx_interpolant_1d_) return false;
     if( *dndx_interpolant_2d_   != *ioniz.dndx_interpolant_2d_) return false;
+
 
     //else
     return true;
@@ -86,9 +89,10 @@ Ionization::Ionization(Particle* particle,
                              Medium* medium,
                              EnergyCutSettings* cut_settings)
     :CrossSections(particle, medium, cut_settings)
-    ,beta_(0)
-    ,gamma_(0)
+    ,beta_  ( 0 )
+    ,gamma_ ( 0 )
 {
+    name_                       = "Ionization";
     vMax_                       = 0;
     vUp_                        = 0;
     vMin_                       = 0;

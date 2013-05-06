@@ -32,6 +32,76 @@ public:
 };
 
 
+TEST(Comparison , Comparison_equal ) {
+    StandardNormal A;
+    StandardNormal B;
+    EXPECT_TRUE(A==B);
+    StandardNormal* C = new StandardNormal(4,19,1e-3);
+    StandardNormal* D = new StandardNormal(4,19,1e-3);
+    EXPECT_TRUE(*C==*D);
+    StandardNormal* E = new StandardNormal(5,20,1e-6);
+    EXPECT_TRUE(A==*E);
+
+}
+
+TEST(Comparison , Comparison_not_equal ) {
+    StandardNormal A;
+    StandardNormal B(4,19,1e-3);
+    EXPECT_TRUE(A!=B);
+    StandardNormal* C = new StandardNormal(4,19,1e-3);
+    StandardNormal* D = new StandardNormal(4,12,1e-3);
+    EXPECT_TRUE(*C!=*D);
+    StandardNormal* E = new StandardNormal(5,20,1e-6);
+    EXPECT_TRUE(A==*E);
+    E->SetVal1(0.7);
+    EXPECT_TRUE(A!=*E);
+
+
+}
+
+TEST(Assignment , Copyconstructor ) {
+    StandardNormal A;
+    StandardNormal B =A;
+
+    EXPECT_TRUE(A==B);
+
+}
+
+TEST(Assignment , Copyconstructor2 ) {
+    StandardNormal A(10,30,1e-3);
+    StandardNormal B(A);
+
+    EXPECT_TRUE(A==B);
+
+}
+
+TEST(Assignment , Operator ) {
+    StandardNormal A;
+    StandardNormal B(5,10,0.4);
+
+    EXPECT_TRUE(A!=B);
+
+    B=A;
+
+    EXPECT_TRUE(A==B);
+}
+
+TEST(Assignment , Swap ) {
+    StandardNormal A;
+    StandardNormal B;
+    EXPECT_TRUE(A==B);
+    StandardNormal* C = new StandardNormal(5,20,0.3);
+    StandardNormal* D = new StandardNormal(5,20,0.3);
+    EXPECT_TRUE(*C==*D);
+
+    A.swap(*C);
+    EXPECT_TRUE(A==*D);
+    EXPECT_TRUE(B==*C);
+
+
+}
+
+
 TEST(StandardNormal , StandardNormalRandomNumber ) {
 
     ifstream in;

@@ -14,7 +14,9 @@ Photonuclear::Photonuclear()
     ,dndx_interpolant_1d_   ( )
     ,dndx_interpolant_2d_   ( )
     ,prob_for_component_    ( )
+
 {
+    name_   =   "Photonuclear";
     shadow_ =   1;
 
     integral_             = new Integral(IROMB, IMAXS, IPREC);
@@ -102,7 +104,8 @@ bool Photonuclear::operator==(const Photonuclear &photo) const
     if( dndx_interpolant_1d_.size() !=  photo.dndx_interpolant_1d_.size())  return false;
     if( dndx_interpolant_2d_.size() !=  photo.dndx_interpolant_2d_.size())  return false;
     if( interpolant_hardBB_.size()  !=  photo.interpolant_hardBB_.size())   return false;
-    if( *interpolant_measured_      !=  *photo.interpolant_measured_)        return false;
+    if( *interpolant_measured_      !=  *photo.interpolant_measured_)       return false;
+
     for(unsigned int i =0; i<photo.dndx_integral_.size(); i++)
     {
         if( *dndx_integral_.at(i)       != *photo.dndx_integral_.at(i) )        return false;
@@ -152,9 +155,12 @@ Photonuclear::Photonuclear(Particle* particle,
     ,dndx_interpolant_1d_   ( )
     ,dndx_interpolant_2d_   ( )
     ,prob_for_component_    ( )
+
+
 {
-    multiplier_                 = 1.;
-    shadow_                     = 1;
+    name_       = "Photonuclear";
+    multiplier_ = 1.;
+    shadow_     = 1;
 
     integral_             = new Integral(IROMB, IMAXS, IPREC);
     integral_for_dEdx_    = new Integral(IROMB, IMAXS, IPREC);

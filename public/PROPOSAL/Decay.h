@@ -10,7 +10,10 @@ public:
 
     Decay();
     Decay(const Decay&);
-    Decay& operator=(const Decay&);
+    Decay& operator=(const Decay& decay);
+    Decay(Particle* particle, Medium* medium, EnergyCutSettings* cut_settings);
+    bool operator==(const Decay &decay) const;
+    bool operator!=(const Decay &decay) const;
 
 //----------------------------------------------------------------------------//
 
@@ -33,6 +36,9 @@ public:
 
     double CalculateStochasticLoss();
 
+//----------------------------------------------------------------------------//
+
+    double CalculateStochasticLoss(double rnd1, double rnd2);
 //----------------------------------------------------------------------------//
 
     void EnableDNdxInterpolation();
@@ -59,6 +65,13 @@ public:
 
 //----------------------------------------------------------------------------//
 
+    void swap(Decay &decay);
+
+//----------------------------------------------------------------------------//
     ~Decay(){}
+
+    //Getter
+//----------------------------------------------------------------------------//
+
 
 };

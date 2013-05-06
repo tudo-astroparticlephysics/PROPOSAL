@@ -224,6 +224,8 @@ public:
 		return prob_for_component_;
 	}
 
+//----------------------------------------------------------------------------//
+
 	void SetComponent(int component);
 	void SetDedxIntegral(Integral* dedxIntegral);
 	void SetDedxInterpolant(Interpolant* dedxInterpolant);

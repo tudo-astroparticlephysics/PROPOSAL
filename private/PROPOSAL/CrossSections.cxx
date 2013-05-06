@@ -48,7 +48,8 @@ CrossSections::CrossSections(Particle* particle,
 //----------------------------------------------------------------------------//
 
 CrossSections::CrossSections(const CrossSections& crossSections)
-    :vMax_                     ( crossSections.vMax_ )
+    :name_                     ( crossSections.name_ )
+    ,vMax_                     ( crossSections.vMax_ )
     ,vUp_                      ( crossSections.vUp_ )
     ,vMin_                     ( crossSections.vMin_ )
     ,ebig_                     ( crossSections.ebig_ )
@@ -112,6 +113,7 @@ bool CrossSections::operator==(const CrossSections &crossSections) const
     if( *cut_settings_            != *crossSections.cut_settings_ )         return false;
     if( *particle_                != *crossSections.particle_ )             return false;
     if( *medium_                  != *crossSections.medium_ )               return false;
+    if( name_.compare(crossSections.name_) != 0 )                           return false;
 
 
     //else

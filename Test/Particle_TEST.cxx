@@ -13,6 +13,12 @@ TEST(Comparison , Comparison_equal ) {
     EXPECT_TRUE(*C==*D);
     Particle* E = new Particle("mu",0,0,0,0,0,0,0);
     EXPECT_TRUE(A==*E);
+    Particle F(1,2,"mu",0.,0.,0.,0.,0.,1e5,0.,5,E);
+    Particle G(1,2,"mu",0.,0.,0.,0.,0.,1e5,0.,5,E);
+    EXPECT_TRUE(F==G);
+    Particle H(1,2,"mu",0.,0.,0.,0.,0.,1e5,0.,5);
+    Particle I(1,2,"mu",0.,0.,0.,0.,0.,1e5,0.,5);
+    EXPECT_TRUE(H==I);
 
 }
 
