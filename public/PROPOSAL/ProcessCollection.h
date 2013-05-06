@@ -39,6 +39,18 @@ protected:
     double      ini_;
     bool        debug_;
 
+    /*!
+     * \brief indicates if the interpolated function is increasing or decreasing.
+     *
+     * True  =   Interpolated function is increasing. \n
+     * False =   Interpolated function is decreasing. BigLow is set to f(x_min)
+     *           and the interpolation points that are saved are BigLow-f(x).
+    */
+    bool up_;
+
+    std::vector<double> bigLow_;               //!< See the describtion of the variable up.
+    std::vector<double> storeDif_;             //!< Stores the interpolated values for farther calculations
+
     Interpolant*        interpolant_;
     Interpolant*        interpolant_diff_;
     Particle*           particle_;
@@ -47,8 +59,12 @@ protected:
     EnergyCutSettings*  cut_settings_;
 
     std::vector<CrossSections*> crosssections_;
-
-
+    Integral* prop_decay_;
+    Integral* prop_interaction_;
+    Interpolant *interpol_prop_decay_;           //!< Interpolate object of the Integral of the function FunctionToPropIntegralDecay
+    Interpolant *interpol_prop_decay_diff_;      //!< Interpolate object of the function FunctionToPropIntegralDecay
+    Interpolant *interpol_prop_interaction_;     //!< Interpolate object of the Integral of the function FunctionToPropIntegralInteraction
+    Interpolant *interpol_prop_interaction_diff_;//!< Interpolate object of the function FunctionToPropIntegralInteraction
 
 public:
 
@@ -99,10 +115,31 @@ public:
     \param ef upper integration limit (final energy)
     \param dist ???
     */
-    double GetDisplacement(double ei, double ef, double dist);
+    double CalculateDisplacement(double ei, double ef, double dist);
 
 //----------------------------------------------------------------------------//
+    /**
+     * function for energy range calculation - interface to Integral
+     * For decay
+     *
+     *  \param  energy particle energy
+     *  \return Returns the probability [1/MeV]
+     */
 
+    double FunctionToPropIntegralDecay(double energy);
+
+//----------------------------------------------------------------------------//
+    /**
+     * function for energy range calculation - interface to Integral
+     * For Interaction
+     *
+     *  \param  energy particle energy
+     *  \return Returns the probability [1/MeV]
+     */
+
+    double FunctionToPropIntegralInteraction(double energy);
+
+//----------------------------------------------------------------------------//
     /*!
     final energy, corresponding to the given value of displacement dist;
     returns \f$e_f\f$ which fullfills
@@ -114,10 +151,22 @@ public:
     \param dist value of displacement
     */
 
-    double GetEf(double ei, double dist);
+    double CalculateFinalEnergy(double ei, double dist);
 
 //----------------------------------------------------------------------------//
 
+    /**
+     * Calculates the value of the tracking integral
+     *
+     *  \param  initial_energy          initial energy
+     *  \param  rnd                     random number which is used for the calculation
+     *  \param  particle_interaction    particle interaction? (false = decay)
+     *  \return value of the tracking integral [ 1 ]
+     */
+
+    double CalculateTrackingIntegal(double initial_energy, double rnd, bool particle_interaction);
+
+//----------------------------------------------------------------------------//
     /*!
     1d parametrization ;
     \f[return= \int_{e}^{e_{low}} f(E) dE \f] with \f$
@@ -134,6 +183,19 @@ public:
     \param e energy [MeV]
     */
     double FunctionToBuildInterpolantDiff(double energy);
+
+//----------------------------------------------------------------------------//
+
+    double InterpolPropDecay(double energy);
+
+//----------------------------------------------------------------------------//
+    double InterpolPropDecayDiff(double energy);
+
+//----------------------------------------------------------------------------//
+    double InterpolPropInteraction(double energy);
+
+//----------------------------------------------------------------------------//
+    double InterpolPropInteractionDiff(double energy);
 
 //----------------------------------------------------------------------------//
     void EnableInterpolation();

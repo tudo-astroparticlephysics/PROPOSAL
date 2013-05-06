@@ -32,7 +32,7 @@ class Propagator :public MathModel
 {
 private:
     bool debug_;
-    bool particle_interaction_;
+    bool particle_interaction_;     //!< particle interaction? (false = decay)
     double rho_;                    //!< multiplicative medium density correction factor ????????????????????????????????????
     bool do_weighting_;             //!< Do weigthing? Set as false in constructor
     double weighting_order_;        //!< Re-weighting order. Set to 0 in constructor
