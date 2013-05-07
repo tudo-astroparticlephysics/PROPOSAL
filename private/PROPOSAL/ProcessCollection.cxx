@@ -271,7 +271,7 @@ void ProcessCollection::swap(ProcessCollection &collection)
 
     storeDif_.swap(collection.storeDif_);
     bigLow_.swap(collection.bigLow_);
-
+    cout<<"11111111111111"<<endl;
     for(unsigned int i = 0 ; i < crosssections_.size() ; i++)
     {
         crosssections_.at(i)->SetParticle(particle_);
@@ -282,7 +282,7 @@ void ProcessCollection::swap(ProcessCollection &collection)
         collection.crosssections_.at(i)->SetMedium(collection.GetMedium());
         collection.crosssections_.at(i)->SetEnergyCutSettings(collection.GetCutSettings());
     }
-
+    cout<<"222222222222222"<<endl;
     if( interpolant_ != NULL && collection.interpolant_ != NULL)
     {
         interpolant_->swap(*collection.interpolant_);
@@ -656,6 +656,9 @@ void ProcessCollection::EnableInterpolation()
 {
     if(do_interpolation_)return;
 
+    EnableDEdxInterpolation();
+    EnableDNdxInterpolation();
+
     double energy = particle_->GetEnergy();
 
     interpolant_        =   new Interpolant(NUM3, particle_->GetLow(), BIGENERGY, boost::bind(&ProcessCollection::FunctionToBuildInterpolant, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
@@ -683,6 +686,30 @@ void ProcessCollection::EnableInterpolation()
 
     do_interpolation_=true;
 
+}
+
+//----------------------------------------------------------------------------//
+
+void ProcessCollection::EnableDEdxInterpolation()
+{
+    for(unsigned int i =0 ; i < crosssections_.size() ; i++)
+    {
+        crosssections_.at(i)->EnableDEdxInterpolation();
+        cout<<"dEdx for "<<crosssections_.at(i)->GetName()<<" interpolated"<<endl;
+
+    }
+}
+
+//----------------------------------------------------------------------------//
+
+void ProcessCollection::EnableDNdxInterpolation()
+{
+    for(unsigned int i =0 ; i < crosssections_.size() ; i++)
+    {
+        crosssections_.at(i)->EnableDNdxInterpolation();
+        cout<<"dNdx for "<<crosssections_.at(i)->GetName()<<" interpolated"<<endl;
+
+    }
 }
 
 //----------------------------------------------------------------------------//

@@ -9,15 +9,21 @@ using namespace std;
 TEST(Comparison , Comparison_equal ) {
     double dNdx;
 
-    Medium *medium = new Medium("air",1.);
+    Medium *medium = new Medium("hydrogen",1.);
     Particle *particle = new Particle("mu",1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
     ProcessCollection *A = new ProcessCollection(particle, medium, cuts);
     ProcessCollection *B = new ProcessCollection(particle, medium, cuts);
+    A->EnableInterpolation();
+    B->EnableInterpolation();
     EXPECT_TRUE(*A==*B);
 
     ProcessCollection *C = new ProcessCollection();
     ProcessCollection *D = new ProcessCollection();
+
+    EXPECT_TRUE(*C==*D);
+
+
 
     EXPECT_TRUE(*C==*D);
 
@@ -106,7 +112,7 @@ TEST(Assignment , Operator ) {
 }
 
 TEST(Assignment , Swap ) {
-    Medium *medium = new Medium("air",1.);
+    Medium *medium = new Medium("hydrogen",1.);
     Medium *medium2 = new Medium("air",1.);
     Particle *particle = new Particle("mu",1.,1.,1,.20,20,1e5,10);
     Particle *particle2 = new Particle("mu",1.,1.,1,.20,20,1e5,10);
@@ -114,6 +120,9 @@ TEST(Assignment , Swap ) {
     EnergyCutSettings *cuts2 = new EnergyCutSettings(500,-1);
     ProcessCollection A(particle, medium, cuts);
     ProcessCollection B(particle2, medium2, cuts2);
+
+    A.EnableInterpolation();
+    B.EnableInterpolation();
     EXPECT_TRUE(A==B);
 
     Medium *medium3 = new Medium("water",1.);
