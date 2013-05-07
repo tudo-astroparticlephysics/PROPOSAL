@@ -113,7 +113,7 @@ TEST(Assignment , Operator ) {
 
 TEST(Assignment , Swap ) {
     Medium *medium = new Medium("hydrogen",1.);
-    Medium *medium2 = new Medium("air",1.);
+    Medium *medium2 = new Medium("hydrogen",1.);
     Particle *particle = new Particle("mu",1.,1.,1,.20,20,1e5,10);
     Particle *particle2 = new Particle("mu",1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);

@@ -12,6 +12,7 @@ protected:
     bool        init_hardbb_;
     int         hmax_;
     double      v_;
+    bool        do_photo_interpolation_;
 
     Integral*   integral_;
     Integral*   integral_for_dEdx_;
@@ -23,6 +24,7 @@ protected:
     std::vector<Interpolant*> interpolant_hardBB_;
     std::vector<Interpolant*> dndx_interpolant_1d_; //Stochastic dNdx()
     std::vector<Interpolant*> dndx_interpolant_2d_; //Stochastic dNdx()
+    std::vector<Interpolant*> photo_interpolant_;  //!< Interpolates function used by dNdx and dEdx
 
     std::vector<double> prob_for_component_; //!< probability for each medium component to interact with the particle (formerly H_)
 
@@ -203,10 +205,17 @@ public:
 
 //----------------------------------------------------------------------------//
 
+    void EnablePhotoInterpolation();
+
+//----------------------------------------------------------------------------//
+
     double FunctionToBuildDEdxInterpolant(double energy);
 
 //----------------------------------------------------------------------------//
 
+    double FunctionToBuildPhotoInterpolant(double energy , double v);
+
+//----------------------------------------------------------------------------//
     void DisableDNdxInterpolation();
 
 //----------------------------------------------------------------------------//

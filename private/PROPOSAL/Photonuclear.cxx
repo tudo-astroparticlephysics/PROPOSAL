@@ -9,10 +9,12 @@ Photonuclear::Photonuclear()
     ,init_hardbb_           ( true )
     ,hmax_                  ( 8 )
     ,v_                     ( 0 )
+    ,do_photo_interpolation_( false )
     ,dndx_integral_         ( )
     ,interpolant_hardBB_    ( )
     ,dndx_interpolant_1d_   ( )
     ,dndx_interpolant_2d_   ( )
+    ,photo_interpolant_     ( )
     ,prob_for_component_    ( )
 
 {
@@ -42,6 +44,7 @@ Photonuclear::Photonuclear(const Photonuclear &photo)
     ,init_hardbb_                       ( photo.init_hardbb_ )
     ,hmax_                              ( photo.hmax_ )
     ,v_                                 ( photo.v_ )
+    ,do_photo_interpolation_            ( photo.do_photo_interpolation_ )
     ,integral_                          ( new Integral(*photo.integral_) )
     ,integral_for_dEdx_                 ( new Integral(*photo.integral_for_dEdx_) )
     ,prob_for_component_                ( photo.prob_for_component_ )
@@ -69,6 +72,7 @@ Photonuclear::Photonuclear(const Photonuclear &photo)
     dndx_interpolant_1d_.resize( photo.dndx_interpolant_1d_.size() );
     dndx_interpolant_2d_.resize( photo.dndx_interpolant_2d_.size() );
     interpolant_hardBB_.resize( photo.interpolant_hardBB_.size() );
+    photo_interpolant_.resize( photo.photo_interpolant_.size() );
 
     for(unsigned int i =0; i<photo.dndx_integral_.size(); i++)
     {
@@ -86,7 +90,10 @@ Photonuclear::Photonuclear(const Photonuclear &photo)
     {
         interpolant_hardBB_.at(i) = new Interpolant( *photo.interpolant_hardBB_.at(i) );
     }
-
+    for(unsigned int i =0; i<photo.photo_interpolant_.size(); i++)
+    {
+        photo_interpolant_.at(i) = new Interpolant( *photo.photo_interpolant_.at(i) );
+    }
 }
 
 //----------------------------------------------------------------------------//
@@ -110,6 +117,7 @@ bool Photonuclear::operator==(const Photonuclear &photo) const
     if( component_                  !=  photo.component_)                   return false;
     if( hmax_                       !=  photo.hmax_)                        return false;
     if( v_                          !=  photo.v_)                           return false;
+    if( do_photo_interpolation_     !=  photo.do_photo_interpolation_ )     return false;
     if( init_hardbb_                !=  photo.init_hardbb_)                 return false;
     if( init_measured_              !=  photo.init_measured_)               return false;
     if( *integral_                  != *photo.integral_)                    return false;
@@ -119,6 +127,8 @@ bool Photonuclear::operator==(const Photonuclear &photo) const
     if( dndx_interpolant_1d_.size() !=  photo.dndx_interpolant_1d_.size())  return false;
     if( dndx_interpolant_2d_.size() !=  photo.dndx_interpolant_2d_.size())  return false;
     if( interpolant_hardBB_.size()  !=  photo.interpolant_hardBB_.size())   return false;
+    if( photo_interpolant_.size()   !=  photo.photo_interpolant_.size())    return false;
+
 
     for(unsigned int i =0; i<photo.dndx_integral_.size(); i++)
     {
@@ -139,6 +149,10 @@ bool Photonuclear::operator==(const Photonuclear &photo) const
     for(unsigned int i =0; i<photo.interpolant_hardBB_.size(); i++)
     {
         if( *interpolant_hardBB_.at(i) != *photo.interpolant_hardBB_.at(i) )    return false;
+    }
+    for(unsigned int i =0; i<photo.photo_interpolant_.size(); i++)
+    {
+        if( *photo_interpolant_.at(i) != *photo.photo_interpolant_.at(i) )      return false;
     }
 
     if( dedx_interpolant_ != NULL && photo.dedx_interpolant_ != NULL)
@@ -176,10 +190,12 @@ Photonuclear::Photonuclear(Particle* particle,
     ,init_hardbb_           ( true )
     ,hmax_                  ( 8 )
     ,v_                     ( 0 )
+    ,do_photo_interpolation_( false )
     ,dndx_integral_         ( )
     ,interpolant_hardBB_    ( )
     ,dndx_interpolant_1d_   ( )
     ,dndx_interpolant_2d_   ( )
+    ,photo_interpolant_     ( )
     ,prob_for_component_    ( )
 
 
@@ -216,6 +232,7 @@ void Photonuclear::swap(Photonuclear &photo)
     swap(init_hardbb_,photo.init_hardbb_);
     swap(hmax_,photo.hmax_);
     swap(v_,photo.v_);
+    swap(do_photo_interpolation_, photo.do_photo_interpolation_);
 
     integral_for_dEdx_->swap(*photo.integral_for_dEdx_);
     integral_->swap(*photo.integral_);
@@ -225,6 +242,7 @@ void Photonuclear::swap(Photonuclear &photo)
     dndx_interpolant_1d_.swap(photo.dndx_interpolant_1d_);
     dndx_interpolant_2d_.swap(photo.dndx_interpolant_2d_);
     interpolant_hardBB_.swap(photo.interpolant_hardBB_);
+    photo_interpolant_.swap(photo.photo_interpolant_);
 
     if( dedx_interpolant_ != NULL && photo.dedx_interpolant_ != NULL)
     {
@@ -439,6 +457,8 @@ void Photonuclear::EnableDNdxInterpolation(){
 
     if(do_dndx_Interpolation_)return;
 
+    EnablePhotoInterpolation();
+
     double energy = particle_->GetEnergy();
     dndx_interpolant_1d_.resize(medium_->GetNumCompontents());
     dndx_interpolant_2d_.resize(medium_->GetNumCompontents());
@@ -457,11 +477,36 @@ void Photonuclear::EnableDNdxInterpolation(){
 
 void Photonuclear::EnableDEdxInterpolation()
 {
+    if(do_dedx_Interpolation_)return;
+
+    EnablePhotoInterpolation();
     double energy = particle_->GetEnergy();
     dedx_interpolant_ = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, boost::bind(&Photonuclear::FunctionToBuildDEdxInterpolant, this, _1),
                                         order_of_interpolation_, true, false, true, order_of_interpolation_, false, false, false);
     do_dedx_Interpolation_=true;
     particle_->SetEnergy(energy);
+}
+
+//----------------------------------------------------------------------------//
+
+void Photonuclear::EnablePhotoInterpolation()
+{
+    if(do_photo_interpolation_)return;
+
+    double energy = particle_->GetEnergy();
+
+    photo_interpolant_.resize( medium_->GetNumCompontents() );
+
+    for(int i=0; i<medium_->GetNumCompontents(); i++)
+    {
+        component_ = i;
+        photo_interpolant_.at(i)  = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, NUM1, 0., 1., boost::bind(&Photonuclear::FunctionToBuildPhotoInterpolant, this, _1, _2), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false, order_of_interpolation_, false, false, false);
+
+    }
+
+    do_photo_interpolation_ = true;
+    particle_->SetEnergy(energy);
+
 }
 
 //----------------------------------------------------------------------------//
@@ -879,14 +924,14 @@ double Photonuclear::ZeusParametrization(double v, int i){
 
 double Photonuclear::ALLM91Parametrization(double v, int i){
 
-//    if(jt_)
-//    {
-//        SetIntegralLimits(i);
-//        if(v>=vUp)
-//        {
-//            return max(InterpolateJ_[i].interpolate(particle_->e, log(v/vUp)/log(vMax/vUp)), 0.0);
-//        }
-//    }
+    if(do_photo_interpolation_)
+    {
+        SetIntegralLimits(i);
+        if(v >= vUp_)
+        {
+            return max(photo_interpolant_.at(i)->Interpolate(particle_->GetEnergy(), log(v/vUp_)/log(vMax_/vUp_)), 0.0);
+        }
+    }
 
     double aux, min, max;
 
@@ -917,14 +962,14 @@ double Photonuclear::ALLM91Parametrization(double v, int i){
 
 
 double Photonuclear::ALLM97Parametrization(double v, int i){
-//    if(jt_)
-//    {
-//        SetIntegralLimits(i);
-//        if(v>=vUp)
-//        {
-//            return max(interpolateJ_[i].interpolate(particle_->e, log(v/vUp)/log(vMax/vUp)), 0.0);
-//        }
-//    }
+    if(do_photo_interpolation_)
+    {
+        SetIntegralLimits(i);
+        if(v >= vUp_)
+        {
+            return max(photo_interpolant_.at(i)->Interpolate(particle_->GetEnergy(), log(v/vUp_)/log(vMax_/vUp_)), 0.0);
+        }
+    }
 
     double aux, min, max;
 
@@ -956,14 +1001,14 @@ double Photonuclear::ALLM97Parametrization(double v, int i){
 
 double Photonuclear::ButkevichMikhailovParametrization(double v, int i){
 
-//    if(jt_)
-//    {
-//        SetIntegralLimits(i);
-//        if(v>=vUp)
-//        {
-//            return max(interpolateJ_[i].interpolate(particle_->e, log(v/vUp)/log(vMax/vUp)), 0.0);
-//        }
-//    }
+    if(do_photo_interpolation_)
+    {
+        SetIntegralLimits(i);
+        if(v >= vUp_)
+        {
+            return max(photo_interpolant_.at(i)->Interpolate(particle_->GetEnergy(), log(v/vUp_)/log(vMax_/vUp_)), 0.0);
+        }
+    }
 
     double aux, min, max;
 
@@ -1336,6 +1381,42 @@ double Photonuclear::FunctionToBuildDNdxInterpolant1D(double energy){
     return dndx_interpolant_2d_.at(component_)->Interpolate(energy, 1.);
 
 }
+//----------------------------------------------------------------------------//
+
+double Photonuclear::FunctionToBuildDNdxInterpolant2D(double energy, double v){
+
+    particle_->SetEnergy(energy);
+    SetIntegralLimits(component_);
+    if(vUp_==vMax_)
+    {
+        return 0;
+    }
+
+    v   =   vUp_*exp(v*log(vMax_/vUp_));
+
+    return dndx_integral_.at(component_)->Integrate(vUp_, v, boost::bind(&Photonuclear::FunctionToDNdxIntegral, this, _1) ,4);
+}
+
+//----------------------------------------------------------------------------//
+
+double Photonuclear::FunctionToBuildPhotoInterpolant(double energy, double v)
+{
+    particle_->SetEnergy(energy);
+    SetIntegralLimits(component_);
+
+    if(vUp_==vMax_)
+    {
+        return 0;
+    }
+
+    v   =   vUp_*exp(v*log(vMax_/vUp_));
+
+    return PhotoN(v, component_);
+}
+
+//----------------------------------------------------------------------------//
+
+//Setter
 
 void Photonuclear::SetComponent(int component) {
 	component_ = component;
@@ -1398,18 +1479,4 @@ void Photonuclear::SetV(double v) {
 }
 
 //----------------------------------------------------------------------------//
-double Photonuclear::FunctionToBuildDNdxInterpolant2D(double energy, double v){
 
-    particle_->SetEnergy(energy);
-    SetIntegralLimits(component_);
-    if(vUp_==vMax_)
-    {
-        return 0;
-    }
-
-    v   =   vUp_*exp(v*log(vMax_/vUp_));
-
-    return dndx_integral_.at(component_)->Integrate(vUp_, v, boost::bind(&Photonuclear::FunctionToDNdxIntegral, this, _1) ,4);
-}
-
-//----------------------------------------------------------------------------//

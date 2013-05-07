@@ -14,7 +14,7 @@
 using namespace std;
 
 
-//constructors
+//Standard constructor
 
 ProcessCollection::ProcessCollection()
     :order_of_interpolation_    ( 5 )
@@ -41,8 +41,12 @@ ProcessCollection::ProcessCollection()
     interpol_prop_interaction_      = NULL;
     interpol_prop_interaction_diff_ = NULL;
 }
+
+
+//----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
+//Copyconstructor
 ProcessCollection::ProcessCollection(const ProcessCollection &collection)
     :order_of_interpolation_    ( collection.order_of_interpolation_ )
     ,do_interpolation_          ( collection.do_interpolation_ )
@@ -140,7 +144,12 @@ ProcessCollection::ProcessCollection(const ProcessCollection &collection)
         interpol_prop_interaction_diff_ = NULL;
     }
 }
+
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
 
 ProcessCollection& ProcessCollection::operator=(const ProcessCollection &collection){
     if (this != &collection)
@@ -150,7 +159,12 @@ ProcessCollection& ProcessCollection::operator=(const ProcessCollection &collect
     }
     return *this;
 }
+
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
 bool ProcessCollection::operator==(const ProcessCollection &collection) const
 {
     if( order_of_interpolation_    != collection.order_of_interpolation_ )  return false;
@@ -245,12 +259,22 @@ bool ProcessCollection::operator==(const ProcessCollection &collection) const
     //else
     return true;
 }
+
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
 bool ProcessCollection::operator!=(const ProcessCollection &collection) const
 {
     return !(*this == collection);
 }
+
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
 void ProcessCollection::swap(ProcessCollection &collection)
 {
     using std::swap;
@@ -271,7 +295,6 @@ void ProcessCollection::swap(ProcessCollection &collection)
 
     storeDif_.swap(collection.storeDif_);
     bigLow_.swap(collection.bigLow_);
-    cout<<"11111111111111"<<endl;
     for(unsigned int i = 0 ; i < crosssections_.size() ; i++)
     {
         crosssections_.at(i)->SetParticle(particle_);
@@ -282,7 +305,7 @@ void ProcessCollection::swap(ProcessCollection &collection)
         collection.crosssections_.at(i)->SetMedium(collection.GetMedium());
         collection.crosssections_.at(i)->SetEnergyCutSettings(collection.GetCutSettings());
     }
-    cout<<"222222222222222"<<endl;
+
     if( interpolant_ != NULL && collection.interpolant_ != NULL)
     {
         interpolant_->swap(*collection.interpolant_);
@@ -374,7 +397,11 @@ void ProcessCollection::swap(ProcessCollection &collection)
     }
 }
 
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
 
 ProcessCollection::ProcessCollection(Particle *particle, Medium *medium, EnergyCutSettings* cut_settings)
     :order_of_interpolation_    ( 5 )
@@ -412,14 +439,23 @@ ProcessCollection::ProcessCollection(Particle *particle, Medium *medium, EnergyC
 
 //Memberfunctions
 
+
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
 
 double ProcessCollection::FunctionToBuildInterpolant(double energy)
 {
     return integral_->Integrate(energy, particle_->GetLow(), boost::bind(&ProcessCollection::FunctionToIntegral, this, _1),4);
 }
 
+
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 double ProcessCollection::FunctionToBuildInterpolantDiff(double energy)
 {
@@ -428,6 +464,63 @@ double ProcessCollection::FunctionToBuildInterpolantDiff(double energy)
 
 
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+double ProcessCollection::InterpolPropDecay(double energy)
+{
+    if(up_)
+    {
+        return prop_decay_->Integrate(energy, particle_->GetLow(), boost::bind(&ProcessCollection::FunctionToPropIntegralDecay, this, _1),4);
+    }
+    else
+    {
+        return -prop_decay_->Integrate(energy, BIGENERGY, boost::bind(&ProcessCollection::FunctionToPropIntegralDecay, this, _1),4);
+    }
+}
+
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+double ProcessCollection::InterpolPropDecayDiff(double energy)
+{
+    return FunctionToPropIntegralDecay(energy);
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+
+double ProcessCollection::InterpolPropInteraction(double energy)
+{
+    if(up_)
+    {
+        return prop_interaction_->Integrate(energy, particle_->GetLow(), boost::bind(&ProcessCollection::FunctionToPropIntegralInteraction, this, _1),4);
+    }
+    else
+    {
+        return -prop_interaction_->Integrate(energy, BIGENERGY, boost::bind(&ProcessCollection::FunctionToPropIntegralInteraction, this, _1),4);
+    }
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+double ProcessCollection::InterpolPropInteractionDiff(double energy)
+{
+    return FunctionToPropIntegralInteraction(energy);
+}
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 double ProcessCollection::FunctionToIntegral(double energy)
 {
@@ -459,45 +552,8 @@ double ProcessCollection::FunctionToIntegral(double energy)
 
 
 //----------------------------------------------------------------------------//
-
-    double ProcessCollection::InterpolPropDecay(double energy)
-    {
-        if(up_)
-        {
-            return prop_decay_->Integrate(energy, particle_->GetLow(), boost::bind(&ProcessCollection::FunctionToPropIntegralDecay, this, _1),4);
-        }
-        else
-        {
-            return -prop_decay_->Integrate(energy, BIGENERGY, boost::bind(&ProcessCollection::FunctionToPropIntegralDecay, this, _1),4);
-        }
-    }
-
 //----------------------------------------------------------------------------//
-    double ProcessCollection::InterpolPropDecayDiff(double energy)
-    {
-        return FunctionToPropIntegralDecay(energy);
-    }
 
-//----------------------------------------------------------------------------//
-    double ProcessCollection::InterpolPropInteraction(double energy)
-    {
-        if(up_)
-        {
-            return prop_interaction_->Integrate(energy, particle_->GetLow(), boost::bind(&ProcessCollection::FunctionToPropIntegralInteraction, this, _1),4);
-        }
-        else
-        {
-            return -prop_interaction_->Integrate(energy, BIGENERGY, boost::bind(&ProcessCollection::FunctionToPropIntegralInteraction, this, _1),4);
-        }
-    }
-
-//----------------------------------------------------------------------------//
-    double ProcessCollection::InterpolPropInteractionDiff(double energy)
-    {
-        return FunctionToPropIntegralInteraction(energy);
-    }
-
-//----------------------------------------------------------------------------//
 
 double ProcessCollection::CalculateDisplacement(double ei, double ef, double dist)
 {
@@ -528,7 +584,10 @@ double ProcessCollection::CalculateDisplacement(double ei, double ef, double dis
 
 }
 
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 double ProcessCollection::CalculateTrackingIntegal(double initial_energy, double rnd, bool particle_interaction)
 {
@@ -581,7 +640,12 @@ double ProcessCollection::CalculateTrackingIntegal(double initial_energy, double
     }
 }
 
+
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
 
 double ProcessCollection::CalculateFinalEnergy(double ei, double dist)
 {
@@ -607,7 +671,12 @@ double ProcessCollection::CalculateFinalEnergy(double ei, double dist)
     }
 
 }
+
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
 
 double ProcessCollection::FunctionToPropIntegralDecay(double energy)
 {
@@ -626,7 +695,12 @@ double ProcessCollection::FunctionToPropIntegralDecay(double energy)
     return aux*decay;
 }
 
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+
 double ProcessCollection::FunctionToPropIntegralInteraction(double energy)
 {
     double aux;
@@ -650,7 +724,10 @@ double ProcessCollection::FunctionToPropIntegralInteraction(double energy)
 
 }
 
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 void ProcessCollection::EnableInterpolation()
 {
@@ -688,7 +765,11 @@ void ProcessCollection::EnableInterpolation()
 
 }
 
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
 
 void ProcessCollection::EnableDEdxInterpolation()
 {
@@ -700,7 +781,11 @@ void ProcessCollection::EnableDEdxInterpolation()
     }
 }
 
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
 
 void ProcessCollection::EnableDNdxInterpolation()
 {
@@ -712,15 +797,53 @@ void ProcessCollection::EnableDNdxInterpolation()
     }
 }
 
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+void ProcessCollection::DisableDEdxInterpolation()
+{
+    for(unsigned int i =0 ; i < crosssections_.size() ; i++)
+    {
+        crosssections_.at(i)->DisableDEdxInterpolation();
+        cout<<"Interpolation for dEdx for "<<crosssections_.at(i)->GetName()<<" disabled"<<endl;
+
+    }
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+
+void ProcessCollection::DisableDNdxInterpolation()
+{
+    for(unsigned int i =0 ; i < crosssections_.size() ; i++)
+    {
+        crosssections_.at(i)->DisableDNdxInterpolation();
+        cout<<"Interpolation fordNdx for "<<crosssections_.at(i)->GetName()<<" disbaled"<<endl;
+
+    }
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 void ProcessCollection::DisableInterpolation()
 {
     do_interpolation_  =   false;
-
+    DisableDEdxInterpolation();
+    DisableDNdxInterpolation();
 }
 
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 void ProcessCollection::EnableLpmEffect()
 {
@@ -730,7 +853,10 @@ void ProcessCollection::EnableLpmEffect()
     }
 }
 
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 void ProcessCollection::DisableLpmEffect()
 {
@@ -739,6 +865,11 @@ void ProcessCollection::DisableLpmEffect()
         crosssections_.at(i)->EnableLpmEffect(lpm_effect_enabled_);
     }
 }
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//Setter
 
 void ProcessCollection::SetCrosssections(
 		std::vector<CrossSections*> crosssections) {
@@ -792,7 +923,7 @@ void ProcessCollection::SetParticle(Particle* particle) {
 
 //----------------------------------------------------------------------------//
 
-//Setter
+
 
 
 //----------------------------------------------------------------------------//

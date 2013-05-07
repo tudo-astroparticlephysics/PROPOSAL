@@ -197,18 +197,46 @@ public:
 //----------------------------------------------------------------------------//
     double InterpolPropInteractionDiff(double energy);
 
-//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//   
+    /**
+     * Enables the Interpolation including dEdx and dNdx for
+     * every crosssection in vector crosssections_
+     */
     void EnableInterpolation();
 
 //----------------------------------------------------------------------------//
-
+    /**
+     * Enables the dEdx Interpolation for every crosssection in vector
+     * crosssections_
+     */
     void EnableDEdxInterpolation();
 
 //----------------------------------------------------------------------------//
-
+    /**
+     * Enables the dNdx Interpolation for every crosssection in vector
+     * crosssections_
+     */
     void EnableDNdxInterpolation();
 
 //----------------------------------------------------------------------------//
+    /**
+     * Disables the dEdx Interpolation for every crosssection in vector
+     * crosssections_
+     */
+    void DisableDEdxInterpolation();
+
+//----------------------------------------------------------------------------//
+    /**
+     * Disables the dNdx Interpolation for every crosssection in vector
+     * crosssections_
+     */
+    void DisableDNdxInterpolation();
+
+//----------------------------------------------------------------------------//
+    /**
+     * Disables the Interpolation including dEdx and dNdx for
+     * every crosssection in vector crosssections_
+     */
     void DisableInterpolation();
 
 //----------------------------------------------------------------------------//
