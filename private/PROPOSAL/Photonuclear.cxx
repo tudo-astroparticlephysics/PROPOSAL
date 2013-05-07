@@ -520,7 +520,11 @@ void Photonuclear::DisableDNdxInterpolation(){
 void Photonuclear::DisableDEdxInterpolation(){
     do_dedx_Interpolation_  =   false;
 }
+//----------------------------------------------------------------------------//
 
+void Photonuclear::DisablePhotoInterpolation(){
+    do_photo_interpolation_  =   false;
+}
 
 //----------------------------------------------------------------------------//
 

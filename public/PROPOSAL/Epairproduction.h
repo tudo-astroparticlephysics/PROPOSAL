@@ -10,6 +10,7 @@ protected:
     double v_;
     bool reverse_;
     double eLpm_;
+    bool do_epair_interpolation_;
 
 
     Integral*   integral_;
@@ -20,6 +21,8 @@ protected:
     std::vector<Integral*>    dndx_integral_;
     std::vector<Interpolant*> dndx_interpolant_1d_; //Stochastic dNdx()
     std::vector<Interpolant*> dndx_interpolant_2d_; //Stochastic dNdx()
+    std::vector<Interpolant*> epair_interpolant_;  //!< Interpolates function used by dNdx and dEdx
+
 
     std::vector<double> prob_for_component_; //!< probability for each medium component to interact with the particle (formerly H_)
 
@@ -134,6 +137,10 @@ public:
 
 //----------------------------------------------------------------------------//
 
+    void EnableEpairInterpolation();
+
+//----------------------------------------------------------------------------//
+
     void DisableDNdxInterpolation();
 
 //----------------------------------------------------------------------------//
@@ -141,7 +148,13 @@ public:
     void DisableDEdxInterpolation();
 
 //----------------------------------------------------------------------------//
+    void DisableEpairInterpolation();
 
+//----------------------------------------------------------------------------//
+
+    double FunctionToBuildEpairInterpolant(double energy , double v);
+
+//----------------------------------------------------------------------------//
     double FunctionToBuildDEdxInterpolant(double energy);
 
 //----------------------------------------------------------------------------//

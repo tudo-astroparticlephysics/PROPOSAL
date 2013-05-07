@@ -10,9 +10,11 @@ Epairproduction::Epairproduction()
     ,v_                     ( 0 )
     ,reverse_               ( false )
     ,eLpm_                  ( 0 )
+    ,do_epair_interpolation_( false )
     ,dndx_integral_         ( )
     ,dndx_interpolant_1d_   ( )
     ,dndx_interpolant_2d_   ( )
+    ,epair_interpolant_     ( )
     ,prob_for_component_    ( )
 {
     integral_             = new Integral(IROMB, IMAXS, IPREC);
@@ -31,6 +33,7 @@ Epairproduction::Epairproduction(const Epairproduction &epair)
     ,v_                                 ( epair.v_ )
     ,reverse_                           ( epair.reverse_ )
     ,eLpm_                              ( epair.eLpm_)
+    ,do_epair_interpolation_            ( epair.do_epair_interpolation_ )
     ,integral_                          ( new Integral(*epair.integral_) )
     ,integral_for_dEdx_                 ( new Integral(*epair.integral_for_dEdx_) )
     ,prob_for_component_                ( epair.prob_for_component_)
@@ -48,6 +51,7 @@ Epairproduction::Epairproduction(const Epairproduction &epair)
     dndx_integral_.resize( epair.dndx_integral_.size() );
     dndx_interpolant_1d_.resize( epair.dndx_interpolant_1d_.size() );
     dndx_interpolant_2d_.resize( epair.dndx_interpolant_2d_.size() );
+    epair_interpolant_.resize( epair.epair_interpolant_.size() );
 
     for(unsigned int i =0; i<epair.dndx_integral_.size(); i++)
     {
@@ -60,6 +64,10 @@ Epairproduction::Epairproduction(const Epairproduction &epair)
     for(unsigned int i =0; i<epair.dndx_interpolant_2d_.size(); i++)
     {
         dndx_interpolant_2d_.at(i) = new Interpolant( *epair.dndx_interpolant_2d_.at(i) );
+    }
+    for(unsigned int i =0; i<epair.epair_interpolant_.size(); i++)
+    {
+        epair_interpolant_.at(i) = new Interpolant( *epair.epair_interpolant_.at(i) );
     }
 }
 
@@ -85,12 +93,14 @@ bool Epairproduction::operator==(const Epairproduction &epair) const
     if( v_                          !=  epair.v_)                           return false;
     if( reverse_                    !=  epair.reverse_)                     return false;
     if( eLpm_                       !=  epair.eLpm_)                        return false;
+    if( do_epair_interpolation_     !=  epair.do_epair_interpolation_ )     return false;
     if( *integral_                  != *epair.integral_)                    return false;
     if( *integral_for_dEdx_         != *epair.integral_for_dEdx_)           return false;
     if( prob_for_component_.size()  !=  epair.prob_for_component_.size())   return false;
     if( dndx_integral_.size()       !=  epair.dndx_integral_.size())        return false;
     if( dndx_interpolant_1d_.size() !=  epair.dndx_interpolant_1d_.size())  return false;
     if( dndx_interpolant_2d_.size() !=  epair.dndx_interpolant_2d_.size())  return false;
+    if( epair_interpolant_.size()   !=  epair.epair_interpolant_.size())    return false;
 
 
     for(unsigned int i =0; i<epair.dndx_integral_.size(); i++)
@@ -108,6 +118,10 @@ bool Epairproduction::operator==(const Epairproduction &epair) const
     for(unsigned int i =0; i<epair.prob_for_component_.size(); i++)
     {
         if( prob_for_component_.at(i) != epair.prob_for_component_.at(i) )      return false;
+    }
+    for(unsigned int i =0; i<epair.epair_interpolant_.size(); i++)
+    {
+        if( *epair_interpolant_.at(i) != *epair.epair_interpolant_.at(i) )      return false;
     }
 
     if( dedx_interpolant_ != NULL && epair.dedx_interpolant_ != NULL)
@@ -137,9 +151,11 @@ Epairproduction::Epairproduction(Particle* particle,
     ,v_                     ( 0 )
     ,reverse_               ( false )
     ,eLpm_                  ( 0 )
+    ,do_epair_interpolation_( false )
     ,dndx_integral_         ( )
     ,dndx_interpolant_1d_   ( )
     ,dndx_interpolant_2d_   ( )
+    ,epair_interpolant_     ( )
     ,prob_for_component_    ( )
 {
     name_                       = "Epairproduction";
@@ -183,7 +199,7 @@ void Epairproduction::swap(Epairproduction &epair)
     swap(v_,epair.v_);
     swap(reverse_,epair.reverse_);
     swap(eLpm_,epair.eLpm_);
-
+    swap(do_epair_interpolation_,epair.do_epair_interpolation_);
     integral_for_dEdx_->swap(*epair.integral_for_dEdx_);
     integral_->swap(*epair.integral_);
 
@@ -206,8 +222,7 @@ void Epairproduction::swap(Epairproduction &epair)
     dndx_integral_.swap(epair.dndx_integral_);
     dndx_interpolant_1d_.swap(epair.dndx_interpolant_1d_);
     dndx_interpolant_2d_.swap(epair.dndx_interpolant_2d_);
-
-
+    epair_interpolant_.swap(epair.epair_interpolant_);
 
 }
 //----------------------------------------------------------------------------//
@@ -417,8 +432,11 @@ double Epairproduction::CalculateStochasticLoss(double rnd1, double rnd2){
 
 //----------------------------------------------------------------------------//
 
-void Epairproduction::EnableDNdxInterpolation(){
+void Epairproduction::EnableDNdxInterpolation()
+{
     if(do_dndx_Interpolation_)return;
+
+    EnableEpairInterpolation();
 
     double energy = particle_->GetEnergy();
     dndx_interpolant_1d_.resize(medium_->GetNumCompontents());
@@ -435,8 +453,11 @@ void Epairproduction::EnableDNdxInterpolation(){
 }
 //----------------------------------------------------------------------------//
 
-void Epairproduction::EnableDEdxInterpolation(){
+void Epairproduction::EnableDEdxInterpolation()
+{
     if(do_dedx_Interpolation_)return;
+
+    EnableEpairInterpolation();
 
     double energy = particle_->GetEnergy();
 
@@ -449,6 +470,26 @@ void Epairproduction::EnableDEdxInterpolation(){
 
 //----------------------------------------------------------------------------//
 
+void Epairproduction::EnableEpairInterpolation()
+{
+    if(do_epair_interpolation_)return;
+
+    double energy = particle_->GetEnergy();
+
+    epair_interpolant_.resize( medium_->GetNumCompontents() );
+
+    for(int i=0; i < medium_->GetNumCompontents(); i++)
+    {
+        component_ = i;
+        epair_interpolant_.at(i)   = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, NUM1, 0., 1.,boost::bind(&Epairproduction::FunctionToBuildEpairInterpolant, this, _1 , _2) , order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false, order_of_interpolation_, false, false, false);
+    }
+
+    particle_->SetEnergy(energy);
+
+    do_epair_interpolation_=true;
+}
+
+//----------------------------------------------------------------------------//
 
 void Epairproduction::DisableDNdxInterpolation(){
     do_dndx_Interpolation_  =   false;
@@ -458,6 +499,12 @@ void Epairproduction::DisableDNdxInterpolation(){
 
 void Epairproduction::DisableDEdxInterpolation(){
     do_dedx_Interpolation_  =   false;
+}
+
+//----------------------------------------------------------------------------//
+
+void Epairproduction::DisableEpairInterpolation(){
+    do_epair_interpolation_  =   false;
 }
 
 //----------------------------------------------------------------------------//
@@ -638,13 +685,13 @@ double Epairproduction::lpm(double r2, double b, double x)
 double Epairproduction::EPair(double v, int component)
 {
 
-    if(do_dndx_Interpolation_)
+    if(do_epair_interpolation_)
     {
         SetIntegralLimits(component);
 
         if(v>=vUp_)
         {
-            return max(dndx_interpolant_2d_.at(component)->Interpolate(particle_->GetEnergy(), log(v/vUp_)/log(vMax_/vUp_)), 0.0);
+            return max(epair_interpolant_.at(component)->Interpolate(particle_->GetEnergy(), log(v/vUp_)/log(vMax_/vUp_)), 0.0);
         }
     }
 
@@ -673,9 +720,13 @@ double Epairproduction::EPair(double v, int component)
 
 }
 
+//----------------------------------------------------------------------------//
+
 double Epairproduction::FunctionToBuildDNdxInterpolant1D(double energy){
     return dndx_interpolant_2d_.at(component_)->Interpolate(energy,1.);
 }
+
+//----------------------------------------------------------------------------//
 
 double Epairproduction::FunctionToBuildDNdxInterpolant2D(double energy, double v){
     particle_->SetEnergy(energy);
@@ -691,10 +742,32 @@ double Epairproduction::FunctionToBuildDNdxInterpolant2D(double energy, double v
     return dndx_integral_.at(component_)->Integrate(vUp_,v, boost::bind(&Epairproduction::FunctionToDNdxIntegral, this, _1),4);
 }
 
+//----------------------------------------------------------------------------//
+
 double Epairproduction::FunctionToBuildDEdxInterpolant(double energy){
     particle_->SetEnergy(energy);
     return CalculatedEdx();
 }
+
+//----------------------------------------------------------------------------//
+
+double Epairproduction::FunctionToBuildEpairInterpolant(double energy , double v)
+{
+    particle_->SetEnergy(energy);
+    SetIntegralLimits(component_);
+
+    if(vUp_==vMax_)
+    {
+    return 0;
+    }
+
+    v   =   vUp_*exp(v*log(vMax_/vUp_));
+
+    return EPair(v, component_);
+}
+
+//----------------------------------------------------------------------------//
+//Setter
 
 void Epairproduction::SetComponent(int component) {
 	component_ = component;
