@@ -238,7 +238,7 @@ double Bremsstrahlung::CalculatedNdx(){
         return 0;
     }
 
-    sum    =   0;
+    sum_of_rates_    =   0;
 
     for(int i=0; i<(medium_->GetNumCompontents()); i++)
     {
@@ -257,7 +257,7 @@ double Bremsstrahlung::CalculatedNdx(){
 
     }
 
-    return sum;
+    return sum_of_rates_;
 }
 //----------------------------------------------------------------------------//
 

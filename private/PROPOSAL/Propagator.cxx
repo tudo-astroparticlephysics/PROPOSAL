@@ -101,7 +101,7 @@ double Propagator::Propagate(double distance, double energy)
     }
 
 
-    if(energy <= particle_->GetEnergy() || distance==0)
+    if(energy <= particle_->GetLow() || distance==0)
     {
         flag    =   false;
     }
@@ -115,13 +115,11 @@ double Propagator::Propagate(double distance, double energy)
 
         cerr<<"\nPropagating "<<particle_->GetName()<<" of energy "<<ei<<" MeV to a distance of "<<distance<<" cm"<<endl;
     }
-
     while(flag)
     {
 
         rndd    =-  log(RandomDouble());
         rndi    =-  log(RandomDouble());
-
         if(debug_)
         {
             cerr<<"1. solving the tracking integral ...  rndd = "<<rndd<<"  rndi = "<<rndi<<" ...  "<<endl;
@@ -133,7 +131,6 @@ double Propagator::Propagate(double distance, double energy)
         }
         else
         {
-
             rnddMin =   collection_->CalculateTrackingIntegal(ei, rndd, false)/rho_;
         }
 
@@ -181,9 +178,8 @@ double Propagator::Propagate(double distance, double energy)
         {
             cerr<<"efi = "<<efi<<" MeV ...  "<<endl;
         }
-
         particle_interaction_    =   (efi > efd);
-
+        cout<<efi<<"\t"<<efd<<"\t";
         if(particle_interaction_)
         {
             ef  =   efi;
@@ -227,7 +223,6 @@ double Propagator::Propagate(double distance, double energy)
             }
 
             ef  =   collection_->CalculateFinalEnergy(ei, rho_*displacement);
-
             if(debug_)
             {
                 cerr<<"lost "<<ei - ef<<" MeV  ef = "<<ef<<" MeV"<<endl;
@@ -238,6 +233,7 @@ double Propagator::Propagate(double distance, double energy)
                 cerr<<"5. calculating the local time ...  "<<endl;
             }
         }
+        cout<<ef<<endl;
 
 //        if(recc)
 //        {
@@ -281,8 +277,7 @@ double Propagator::Propagate(double distance, double energy)
         }
 
         energy_loss = collection_->MakeStochasticLoss(particle_interaction_ , ef);
-cout<<energy_loss<<endl;
-
+        if(energy_loss<0)cout<<"UUUU"<<endl;
         if(ef <= particle_->GetLow())
         {
 

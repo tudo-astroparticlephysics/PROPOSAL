@@ -504,14 +504,7 @@ double ProcessCollection::FunctionToBuildInterpolantDiff(double energy)
 
 double ProcessCollection::InterpolPropDecay(double energy)
 {
-    if(up_)
-    {
-        return prop_decay_->Integrate(energy, particle_->GetLow(), boost::bind(&ProcessCollection::FunctionToPropIntegralDecay, this, _1),4);
-    }
-    else
-    {
-        return -prop_decay_->Integrate(energy, BIGENERGY, boost::bind(&ProcessCollection::FunctionToPropIntegralDecay, this, _1),4);
-    }
+    return -prop_decay_->Integrate(energy, BIGENERGY, boost::bind(&ProcessCollection::FunctionToPropIntegralDecay, this, _1),4);
 }
 
 
@@ -636,7 +629,6 @@ double ProcessCollection::CalculateTrackingIntegal(double initial_energy, double
         {
             storeDif_.at(0) =   interpol_prop_decay_->Interpolate(initial_energy);
         }
-
 
         if(up_&&particle_interaction)
         {
@@ -887,7 +879,7 @@ double ProcessCollection::MakeStochasticLoss(bool particle_interaction, double c
             if(rates_sum > total_rate_weighted)
             {
                 energy_loss     =   crosssections_.at(i)->CalculateStochasticLoss(rnd2,rnd3);
-                cout<<crosssections_.at(i)->GetName()<<"\t";
+                //cout<<crosssections_.at(i)->GetName()<<"\t";
                 break;
             }
         }
@@ -967,7 +959,7 @@ double ProcessCollection::FunctionToPropIntegralInteraction(double energy)
         {
             cerr<<" \t "<<rate;
         }
-        total_rate *= rate;
+        total_rate += rate;
 
     }
     return aux*total_rate;
@@ -1010,7 +1002,6 @@ void ProcessCollection::EnableInterpolation()
 
     bigLow_.at(0)=interpol_prop_decay_->Interpolate(particle_->GetLow());
     bigLow_.at(1)=interpol_prop_interaction_->Interpolate(particle_->GetLow());
-
     do_interpolation_=true;
 
 }
