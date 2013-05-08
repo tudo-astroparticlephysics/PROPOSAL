@@ -1,3 +1,7 @@
+#ifndef Photonuclear_H
+#define Photonuclear_H
+
+
 #include "CrossSections.h"
 #include "PROPOSAL/Integral.h"
 #include "PROPOSAL/Interpolant.h"
@@ -305,3 +309,5 @@ public:
 	void SetProbForComponent(std::vector<double> probForComponent);
 	void SetV(double v);
 };
+
+#endif //Photonuclear_H

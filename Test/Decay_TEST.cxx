@@ -3,6 +3,8 @@
 #include "PROPOSAL/CrossSections.h"
 #include <iostream>
 
+using namespace std;
+
 class RndFromFile{
 private:
     double rnd_;
@@ -158,9 +160,9 @@ TEST(Decay , decay ) {
 
         Decay* dec  = new Decay(particle);
 
-        decay_new=dec->Decay();
+        decay_new = dec->MakeDecay();
 
-        ASSERT_NEAR(decay_new, decay, 1e-7*decay);
+        ASSERT_NEAR(decay_new, decay, 1e-14*decay);
 
         delete particle;
         delete dec;
@@ -183,6 +185,15 @@ TEST(Decay , ProductEnergy ) {
 
     cout.precision(16);
 
+    RndFromFile* Rand1 = new RndFromFile("bin/TestFiles/rnd.txt");
+    double rnd1;
+
+    RndFromFile* Rand2 = new RndFromFile("bin/TestFiles/rnd.txt");
+    double rnd2 = Rand2->rnd();
+
+    RndFromFile* Rand3 = new RndFromFile("bin/TestFiles/rnd.txt");
+    double rnd3= Rand3->rnd();
+    rnd3= Rand3->rnd();
 
     while(in.good())
     {
@@ -191,11 +202,15 @@ TEST(Decay , ProductEnergy ) {
         Particle *particle = new Particle(particleName,1.,1.,1,.20,20,1e5,10);
         particle->SetEnergy(energy);
 
+        rnd1= Rand1->rnd();
+        rnd2= Rand2->rnd();
+        rnd3= Rand3->rnd();
+
         Decay* dec  = new Decay(particle);
 
-        product_energy_new=dec->Decay();
+        product_energy_new = dec->CalculateProductEnergy(rnd1,rnd2,rnd3);
 
-        ASSERT_NEAR(product_energy_new, product_energy, 1e-7*product_energy);
+        ASSERT_NEAR(product_energy_new, product_energy, 1e-14*product_energy);
 
         delete particle;
         delete dec;

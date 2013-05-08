@@ -1,3 +1,6 @@
+#ifndef Epairproduction_H
+#define Epairproduction_H
+
 #include "PROPOSAL/CrossSections.h"
 #include "PROPOSAL/Integral.h"
 #include "PROPOSAL/Interpolant.h"
@@ -229,3 +232,5 @@ public:
 	void SetReverse(bool reverse);
 	void SetV(double v);
 };
+
+#endif //Epairproduction_H

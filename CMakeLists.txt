@@ -84,7 +84,7 @@ add_library(PROPOSAL
         private/PROPOSAL/StandardNormal.cxx
         private/PROPOSAL/RootFinder.cxx
         private/PROPOSAL/ProcessCollection.cxx
-#        private/PROPOSAL/Propagator.cxx
+        private/PROPOSAL/Propagator.cxx
 
 	)
 

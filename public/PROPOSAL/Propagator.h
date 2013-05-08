@@ -34,12 +34,6 @@ private:
     bool debug_;
     bool particle_interaction_;     //!< particle interaction? (false = decay)
     double rho_;                    //!< multiplicative medium density correction factor ????????????????????????????????????
-    bool do_weighting_;             //!< Do weigthing? Set as false in constructor
-    double weighting_order_;        //!< Re-weighting order. Set to 0 in constructor
-    double weighting_starts_at_;    //!< Distance at which re-weighting starts. Set to 0 in constructor
-    std::vector<double> rates_;
-    double total_rate_;
-
 
     Particle* particle_;
     ProcessCollection *collection_;
@@ -77,6 +71,12 @@ public:
 
     void swap(Propagator &propagator);
 //----------------------------------------------------------------------------//
+    void InitDefaultCollection();
+
+    ProcessCollection* GetCollection() const
+    {
+        return collection_;
+    }
 
 };
 

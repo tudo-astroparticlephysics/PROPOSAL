@@ -262,7 +262,6 @@ double Bremsstrahlung::CalculatedNdx(){
 //----------------------------------------------------------------------------//
 
 double Bremsstrahlung::CalculatedNdx(double rnd){
-
     if(multiplier_<=0)
     {
         return 0;
@@ -272,6 +271,7 @@ double Bremsstrahlung::CalculatedNdx(double rnd){
     {
         //rnd_    =   rnd;
     }
+    sum_of_rates_ = 0;
 
     for(int i=0; i<(medium_->GetNumCompontents()); i++)
     {
@@ -305,6 +305,7 @@ double Bremsstrahlung::CalculateStochasticLoss(double rnd)
     for(int i=0; i<(medium_->GetNumCompontents()); i++)
     {
         rsum    += prob_for_component_.at(i);
+
         if(rsum > rand)
         {
 
@@ -357,10 +358,10 @@ double Bremsstrahlung::CalculateStochasticLoss(double rnd1, double rnd2){
     double sum = this->CalculatedNdx(rnd1);
     rand    =   rnd2*sum;
     rsum    =   0;
-
     for(int i=0; i<(medium_->GetNumCompontents()); i++)
     {
         rsum    += prob_for_component_.at(i);
+
         if(rsum > rand)
         {
 

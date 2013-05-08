@@ -17,12 +17,9 @@ Propagator::Propagator()
     :debug_                 ( false )
     ,particle_interaction_  ( false )
     ,rho_                   ( 1. )
-    ,rates_                 ( )
-    ,total_rate_            ( 0 )
-    ,particle_              ( )
-    ,collection_            ( )
 {
-
+    particle_              = new Particle("mu",0,0,0,0,0,1e6,0);
+    InitDefaultCollection();
 }
 //----------------------------------------------------------------------------//
 
@@ -30,11 +27,6 @@ Propagator::Propagator(const Propagator &propagator)
     :debug_                 ( propagator.debug_ )
     ,particle_interaction_  ( propagator.particle_interaction_ )
     ,rho_                   ( propagator.rho_ )
-    ,do_weighting_          ( propagator.do_weighting_ )
-    ,weighting_order_       ( propagator.weighting_order_ )
-    ,weighting_starts_at_   ( propagator.weighting_starts_at_ )
-    ,rates_                 ( propagator.rates_ )
-    ,total_rate_            ( propagator.total_rate_ )
     ,particle_              ( propagator.particle_ )
     ,collection_            ( new ProcessCollection(*propagator.collection_) )
 {
@@ -59,18 +51,6 @@ bool Propagator::operator==(const Propagator &propagator) const
     if( particle_interaction_   != propagator.particle_interaction_ )   return false;
     if( rho_                    != propagator.rho_ )                    return false;
     if( *collection_            != *propagator.collection_ )            return false;
-    if( do_weighting_           != propagator.do_weighting_ )           return false;
-    if( weighting_order_        != propagator.weighting_order_ )        return false;
-    if( weighting_starts_at_    != propagator.weighting_starts_at_ )    return false;
-    if( rates_.size()           != propagator.rates_.size() )           return false;
-    if( total_rate_             != propagator.total_rate_ )             return false;
-
-    for( unsigned int i = 0; i < propagator.rates_.size(); i++)
-    {
-        if( rates_.at(i)        != propagator.rates_.at(i) )            return false;
-    }
-
-
     //else
     return true;
 }
@@ -89,24 +69,28 @@ void Propagator::swap(Propagator &propagator)
     swap( debug_                 ,   propagator.debug_);
     swap( particle_interaction_  ,   propagator.particle_interaction_);
     swap( rho_                   ,   propagator.rho_ );
-    swap( do_weighting_          ,   propagator.do_weighting_ );
-    swap( weighting_order_       ,   propagator.weighting_order_ );
-    swap( weighting_starts_at_   ,   propagator.weighting_starts_at_ );
-    swap( total_rate_            ,   propagator.total_rate_ );
-
-    rates_.swap(propagator.rates_);
     particle_->swap( *propagator.particle_ );
     collection_->swap( *propagator.collection_ );
 
 }
 //----------------------------------------------------------------------------//
 
+void Propagator::InitDefaultCollection()
+{
+    Medium* med             = new Medium("ice",1.);
+    EnergyCutSettings* cuts = new EnergyCutSettings(500,-1);
+    collection_             = new ProcessCollection(particle_ , med, cuts);
+
+}
+
+//----------------------------------------------------------------------------//
 double Propagator::Propagate(double distance, double energy)
 {
     //int wint;
     bool  flag;
     double ei, ef=0, efd, displacement, efi;//, aux=0;
-    double rndd, rndi,rnddMin , rnd2, rnd3,  rndiMin, rnd1, rndTot;
+    double energy_loss;
+    double rndd, rndi,rnddMin , rndiMin;
 
     ei  =   energy;
     ef  =   ei;
@@ -176,7 +160,7 @@ double Propagator::Propagate(double distance, double energy)
         }
         else
         {
-            efd =   collection_->CalculateFinalEnergy(ei, rndd*rho, false);
+            efd =   collection_->CalculateFinalEnergy(ei, rndd*rho_, false);
         }
 
         if(debug_)
@@ -242,7 +226,7 @@ double Propagator::Propagate(double distance, double energy)
                 cerr<<"4. getting the const energy ...  "<<endl;
             }
 
-            ef  =   collection_->GetEf(ei, rho_*displacement);
+            ef  =   collection_->CalculateFinalEnergy(ei, rho_*displacement);
 
             if(debug_)
             {
@@ -296,146 +280,18 @@ double Propagator::Propagate(double distance, double energy)
             cerr<<"5. choosing the cross section ..."<<endl;
         }
 
-        rnd2    =   RandomDouble();
-        rnd3    =   RandomDouble();
+        energy_loss = collection_->MakeStochasticLoss(particle_interaction_ , ef);
+cout<<energy_loss<<endl;
 
-        particle_->SetEnergy( ef );
-
-        if(particle_interaction_)
+        if(ef <= particle_->GetLow())
         {
-            rnd1    =   RandomDouble();
 
-            if(do_weighting_)
-            {
-                if(particle_->GetPropagationDistance() > weighting_starts_at_)
-                {
-                    double exp      =   abs(weighting_order_);
-                    double power    =   pow(rnd2, exp);
+            break;
+        }
 
-                    if(weighting_order_>0)
-                    {
-                        rnd2    =   1 - power*rnd2;
-                    }
-                    else
-                    {
-                        rnd2    =   power*rnd2;
-                    }
+        ei  =   ef;
 
-                    weighting_order_        =   (1 + exp)*power;
-                    weighting_starts_at_    =   particle_->GetPropagationDistance();
-                    do_weighting_           =   false;
-                }
-            }
-
-            rates_.resize(collection_->GetCrosssections().size());
-
-            for(unsigned int i = 0 ; i < collection_->GetCrosssections().size(); i++)
-            {
-                rates_.at(i) =      collection_->GetCrosssections().at(i)->CalculatedNdx( rnd2 );
-                total_rate_ +=  rates_.at(i);
-            }
-
-            rndTot = total_rate_*rnd1;
-
-            for(unsigned int i = 0 ; i < rates_.size(); i++)
-            {
-                if(rates_.at(i) > rndTot)
-                {
-                    aux     =   collection_->GetCrosssections().at(i)->e(rnd3);
-                    ef      -=  aux;
-                    wint    =   2;
-                }
-            }
-
-//            if(debug_)
-//            {
-//                decayS  =   cros->get_decay()->decay();
-//            }
-
-
-//            if(debug_)
-//            {
-//                cerr<<" . rnd1 = "<<o->f(rnd1)<<" rnd2 = "<<o->f(rnd2)<<
-//                    " rnd3 = "<<o->f(rnd3)<<" decay = "<<o->f(decayS)<<endl;
-//            }
-
-//            if(debug_)
-//            {
-//                cerr<<" . ioniz = "<<o->f(ionizS)<<" brems = "<<o->f(bremsS)<<
-//                    " photo = "<<o->f(photoS)<<" epair = "<<o->f(epairS);
-//            }
-
-//            for(unsigned int i = 0 ; i < rates_.size(); i++)
-
-//            if(rates_.at(i)>rndTot)
-//            {
-
-//                aux     =   collection_->GetCrosssections().at(i)->
-//                ef      -=  aux;
-//                wint    =   2;
-//            }
-//            else if(ionizS+bremsS>rndTot)
-//            {
-//                aux     =   cros->get_bremsstrahlung()->get_Stochastic()->e(rnd3);
-//                ef      -=  aux;
-//                wint    =   3;
-//            }
-//            else if(ionizS+bremsS+photoS>rndTot)
-//            {
-//                aux     =   cros->get_photonuclear()->get_Stochastic()->e(rnd3);
-//                ef      -=  aux;
-//                wint    =   4;
-//            }
-//            else if(ionizS+bremsS+photoS+epairS>rndTot)
-//            {
-//                aux     =   cros->get_epairproduction()->stochastic_->e(rnd3);
-//                ef      -=  aux;
-//                wint    =   5;
-//            }
-//            else  // due to the parameterization of the cross section cutoffs
-//            {
-//                ei  =   ef;
-//                continue;
-//            }
-
-//        }
-
-//        else
-//        {
-//            if(particle_->type==2)
-//            {
-//                aux     =   cros->get_decay()->e(rnd2, rnd3, RandomDouble(), o);
-//                ef      =   0;
-//                wint    =   1;
-//            }
-//            else
-//            {
-//                aux     =   cros->get_decay()->e(rnd2, rnd3, 0.5, o);
-//                ef      =   0;
-//                wint    =   1;
-//            }
-//        }
-
-//        if(wint==1)
-//        {
-//            o->output(wint, cros->get_decay()->get_out(), aux, ef);
-//        }
-//        else
-//        {
-//            o->output(wint, medium_->get_E(cros->get_component()), aux, ef);
-//        }
-
-
-
-//        if(ef<=particle_->low)
-//        {
-
-//            break;
-//        }
-
-//        ei  =   ef;
-
-//    }
+    }
 
 //    if(sdec)
 //    {
@@ -460,31 +316,31 @@ double Propagator::Propagate(double distance, double energy)
 //        }
 //    }
 
-//    particle_->setEnergy(ef);  // to remember const state of the particle
+    particle_->SetEnergy(ef);  // to remember const state of the particle
 //    o->HIST =   -1;            // to make sure user resets particle properties
 
-//    if(particle_->r==r)
-//    {
-//        if(debug_)
-//        {
-//            cerr<<"PROPOSALParticle reached the border with energy ef = "<<o->f(ef)<<" MeV";
-//        }
+    if(particle_->GetPropagationDistance()==distance)
+    {
+        if(debug_)
+        {
+            cerr<<"PROPOSALParticle reached the border with energy ef = "<<ef<<" MeV";
+        }
 
-//        return ef;
-//    }
-//    else
-//    {
-//        if(debug_)
-//        {
-//            if(particle_->l<0)
-//            {
-//                cerr<<"PROPOSALParticle stopped at rf = "<<o->f(particle_->r)<<" cm";
-//            }
-//            else
-//            {
-//                cerr<<"PROPOSALParticle disappeared at rf = "<<o->f(particle_->r)<<" cm";
-//            }
-//        }
+        return ef;
+    }
+    else
+    {
+        if(debug_)
+        {
+            if(particle_->GetLifetime()<0)
+            {
+                cerr<<"PROPOSALParticle stopped at rf = "<<particle_->GetPropagationDistance()<<" cm";
+            }
+            else
+            {
+                cerr<<"PROPOSALParticle disappeared at rf = "<<particle_->GetPropagationDistance()<<" cm";
+            }
+        }
 
         return -particle_->GetPropagationDistance();
     }

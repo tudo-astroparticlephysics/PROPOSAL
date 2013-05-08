@@ -1,3 +1,6 @@
+#ifndef Bremsstrahlung_H
+#define Bremsstrahlung_H
+
 #include <vector>
 #include "CrossSections.h"
 #include "PROPOSAL/Integral.h"
@@ -237,3 +240,5 @@ public:
 	void SetLorenzCut(double lorenzCut);
 	void SetProbForComponent(std::vector<double> probForComponent);
 };
+
+#endif //Bremsstrahlung_H

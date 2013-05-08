@@ -105,7 +105,7 @@ double Decay::MakeDecay()
 
 //----------------------------------------------------------------------------//
 
-double Decay::ProductEnergy( double ernd, double arnd, double srnd )
+double Decay::CalculateProductEnergy( double ernd, double arnd, double srnd )
 {
     if(particle_->GetLifetime()<0)
     {

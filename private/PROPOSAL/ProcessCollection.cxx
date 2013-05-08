@@ -9,6 +9,7 @@
 #include <cmath>
 #include "boost/function.hpp"
 #include "boost/bind.hpp"
+#include "PROPOSAL/MathModel.h"
 
 
 using namespace std;
@@ -39,6 +40,8 @@ ProcessCollection::ProcessCollection()
     cut_settings_                   = new EnergyCutSettings();
     prop_decay_                     = new Integral();
     prop_interaction_               = new Integral();
+    decay_                          = new Decay();
+
     interpol_prop_decay_            = NULL;
     interpol_prop_decay_diff_       = NULL;
     interpol_prop_interaction_      = NULL;
@@ -67,6 +70,7 @@ ProcessCollection::ProcessCollection(const ProcessCollection &collection)
     ,medium_                    ( new Medium( *collection.medium_) )
     ,integral_                  ( new Integral(*collection.integral_) )
     ,cut_settings_              ( new EnergyCutSettings(*collection.cut_settings_) )
+    ,decay_                     ( new Decay(*collection.decay_) )
     ,prop_decay_                ( new Integral(*collection.prop_decay_) )
     ,prop_interaction_          ( new Integral(*collection.prop_interaction_) )
 {
@@ -189,6 +193,7 @@ bool ProcessCollection::operator==(const ProcessCollection &collection) const
     if( do_weighting_              != collection.do_weighting_ )            return false;
     if( weighting_order_           != collection.weighting_order_ )         return false;
     if( weighting_starts_at_       != collection.weighting_starts_at_ )     return false;
+    if( *decay_                    != *collection.decay_ )                  return false;
 
     if( crosssections_.size()      != collection.crosssections_.size() )    return false;
     if( bigLow_.size()             != collection.bigLow_.size() )           return false;
@@ -213,7 +218,6 @@ bool ProcessCollection::operator==(const ProcessCollection &collection) const
         else if(collection.crosssections_.at(i)->GetName().compare("Ionization")==0)
         {
             if( *(Ionization*)crosssections_.at(i) != *(Ionization*)collection.crosssections_.at(i) ) return false;
-
         }
         else if(collection.crosssections_.at(i)->GetName().compare("Epairproduction")==0)
         {
@@ -289,6 +293,15 @@ void ProcessCollection::swap(ProcessCollection &collection)
 {
     using std::swap;
 
+    Particle tmp_particle1(*collection.particle_);
+    Particle tmp_particle2(*particle_);
+
+    EnergyCutSettings tmp_cuts1(*collection.cut_settings_);
+    EnergyCutSettings tmp_cuts2(*cut_settings_);
+
+    Medium tmp_medium1(*collection.medium_);
+    Medium tmp_medium2(*medium_);
+
     swap( order_of_interpolation_    , collection.order_of_interpolation_ );
     swap( do_interpolation_          , collection.do_interpolation_ );
     swap( lpm_effect_enabled_        , collection.lpm_effect_enabled_ );
@@ -298,26 +311,30 @@ void ProcessCollection::swap(ProcessCollection &collection)
     swap( do_weighting_              , collection.do_weighting_ );
     swap( weighting_order_           , collection.weighting_order_ );
     swap( weighting_starts_at_       , collection.weighting_starts_at_ );
-    particle_->swap( *collection.particle_ );
+    particle_->swap( *collection.particle_ );       //particle pointer swap
     medium_->swap( *collection.medium_ );
     integral_->swap( *collection.integral_ );
     cut_settings_->swap( *collection.cut_settings_ );
-    crosssections_.swap(collection.crosssections_);
+    crosssections_.swap(collection.crosssections_); //particle pointer swap
     prop_decay_->swap( *collection.prop_decay_ );
     prop_interaction_->swap( *collection.prop_interaction_ );
+    decay_->swap(*collection.decay_);               //particle pointer swap
 
     storeDif_.swap(collection.storeDif_);
     bigLow_.swap(collection.bigLow_);
-    for(unsigned int i = 0 ; i < crosssections_.size() ; i++)
-    {
-        crosssections_.at(i)->SetParticle(particle_);
-        crosssections_.at(i)->SetMedium(medium_);
-        crosssections_.at(i)->SetEnergyCutSettings(cut_settings_);
 
-        collection.crosssections_.at(i)->SetParticle(collection.GetParticle());
-        collection.crosssections_.at(i)->SetMedium(collection.GetMedium());
-        collection.crosssections_.at(i)->SetEnergyCutSettings(collection.GetCutSettings());
-    }
+    // Set pointers again (to many swapping above....)
+    SetParticle( new Particle(tmp_particle1) );
+    collection.SetParticle( new Particle(tmp_particle2) );
+
+    SetMedium( new Medium(tmp_medium1) );
+    collection.SetMedium( new Medium(tmp_medium2) );
+
+
+    SetCutSettings(  new EnergyCutSettings(tmp_cuts1) );
+    collection.SetCutSettings( new EnergyCutSettings(tmp_cuts2) );
+
+
 
     if( interpolant_ != NULL && collection.interpolant_ != NULL)
     {
@@ -422,6 +439,9 @@ ProcessCollection::ProcessCollection(Particle *particle, Medium *medium, EnergyC
     ,lpm_effect_enabled_        ( false )
     ,ini_                       ( 0 )
     ,debug_                     ( false )
+    ,do_weighting_              ( false )
+    ,weighting_order_           ( 0 )
+    ,weighting_starts_at_       ( 0 )
     ,up_                        ( false )
     ,bigLow_                    ( 2,0 )
     ,storeDif_                  ( 2,0 )
@@ -440,6 +460,8 @@ ProcessCollection::ProcessCollection(Particle *particle, Medium *medium, EnergyC
     crosssections_.at(1) = new Bremsstrahlung(particle_, medium_, cut_settings_);
     crosssections_.at(2) = new Photonuclear(particle_, medium_, cut_settings_);
     crosssections_.at(3) = new Epairproduction(particle_, medium_, cut_settings_);
+
+    decay_               = new Decay(particle_);
 
     interpolant_                    = NULL;
     interpolant_diff_               = NULL;
@@ -791,110 +813,113 @@ double ProcessCollection::CalculateFinalEnergy(double ei, double rnd, bool parti
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-
-double ProcessCollection::MakeStochasticLoss(bool particle_interaction)
+double ProcessCollection::MakeStochasticLoss(bool particle_interaction, double current_energy)
 {
-//    double rnd1    =   MathModel::RandomDouble();
-//    double rnd2    =   MathModel::RandomDouble();
-//    double rnd3    =   MathModel::RandomDouble();
+    double rnd1    =   MathModel::RandomDouble();
+    double rnd2    =   MathModel::RandomDouble();
+    double rnd3    =   MathModel::RandomDouble();
+    double      total_rate          = 0;
+    double      total_rate_weighted = 0;
+    double      decayS              = 0;
+    double      rates_sum           = 0;
+    double      energy_loss         = 0;
 
-//    double      total_rate          = 0;
-//    double      total_rate_weighted = 0;
-//    double      decayS              = 0;
-//    double      rates_sum           = 0;
+    std::vector<double> rates;
 
-//    std::vector<double> rates_;
+    rates.resize( crosssections_.size() );
 
+    particle_->SetEnergy(current_energy);
 
-//    rates_.resize( crosssections_.size() );
+    if(particle_interaction)
+    {
+        if(do_weighting_)
+        {
+            if(particle_->GetPropagationDistance() > weighting_starts_at_)
+            {
+                double exp      =   abs(weighting_order_);
+                double power    =   pow(rnd2, exp);
 
-//    particle_->setEnergy(ef);
+                if(weighting_order_>0)
+                {
+                    rnd2    =   1 - power*rnd2;
+                }
+                else
+                {
+                    rnd2    =   power*rnd2;
+                }
 
-//    if(particle_interaction)
-//    {
-//        if(do_weighting_)
-//        {
-//            if(particle_->GetPropagationDistance() > weighting_starts_at_)
-//            {
-//                double exp      =   abs(weighting_order_);
-//                double power    =   pow(rnd2, exp);
+                weighting_order_        =   (1 + exp)*power;
+                weighting_starts_at_    =   particle_->GetPropagationDistance();
+                do_weighting_           =   false;
+            }
+        }
 
-//                if(weighting_order_>0)
-//                {
-//                    rnd2    =   1 - power*rnd2;
-//                }
-//                else
-//                {
-//                    rnd2    =   power*rnd2;
-//                }
+        if(debug_)
+        {
+            decayS  =   decay_->MakeDecay();
+        }
 
-//                weighting_order_        =   (1 + exp)*power;
-//                weighting_starts_at_    =   particle_->GetPropagationDistance();
-//                do_weighting_           =   false;
-//            }
-//        }
+        for(unsigned int i = 0 ; i < GetCrosssections().size(); i++)
+        {
+            rates.at(i) =  crosssections_.at(i)->CalculatedNdx( rnd2 );
+            total_rate  +=  rates.at(i);
+            if(debug_)
+            {
+                cerr<<"\t"<<crosssections_.at(i)->GetName()<<" = "<<rates.at(i);
+            }
 
-//        if(debug_)
-//        {
-//           // decayS  =   cros->get_decay()->decay();
-//        }
-
-//        for(unsigned int i = 0 ; i < collection_->GetCrosssections().size(); i++)
-//        {
-//            rates_.at(i) =  crosssections_.at(i)->CalculatedNdx( rnd2 );
-//            total_rate  +=  rates_.at(i);
-
-//            if(debug_)
-//            {
-//                cerr<<"\t"<<crosssections_.at(i)->GetName()<<" = "<<rates_.at(i);
-//            }
-
-//        }
-
-//        total_rate_weighted = total_rate_*rnd1;
-
-//        if(debug_)
-//        {
-//            cerr<<" . rnd1 = "<<rnd1<<" rnd2 = "<<rnd2<<
-//                " rnd3 = "<<rnd3<<" decay = "<<decayS<<endl;
-//        }
+        }
 
 
-//        for(unsigned int i = 0 ; i < rates_.size(); i++)
-//        {
-//            rates_sum   += rates_.at(i);
+        total_rate_weighted = total_rate*rnd1;
 
-//            if(rates_sum > total_rate_weighted)
-//            {
-//                aux     =   crosssections_.at(i)->CalculateStochasticLoss(rnd3);
-//            }
-//        }
+        if(debug_)
+        {
+            cerr<<" . rnd1 = "<<rnd1<<" rnd2 = "<<rnd2<<
+                " rnd3 = "<<rnd3<<" decay = "<<decayS<<endl;
+        }
+
+
+        for(unsigned int i = 0 ; i < rates.size(); i++)
+        {
+            rates_sum   += rates.at(i);
+
+            if(rates_sum > total_rate_weighted)
+            {
+                energy_loss     =   crosssections_.at(i)->CalculateStochasticLoss(rnd2,rnd3);
+                cout<<crosssections_.at(i)->GetName()<<"\t";
+                break;
+            }
+        }
 
 //        else  // due to the parameterization of the cross section cutoffs
 //        {
 //            ei  =   ef;
 //            continue;
 //        }
+        current_energy -= energy_loss;
+    }
 
-//    }
+    else
+    {
+        if(particle_->GetType() ==2)
+        {
+            //aux     =   decay_->CalculateProductEnergy(rnd2, rnd3, MathModel::RandomDouble());
+            current_energy      =   0;
+   //         wint    =   1;
+        }
+        else
+        {
+            //aux     =   decay_->CalculateProductEnergy(rnd2, rnd3, 0.5);
+            current_energy      =   0;
+     //       wint    =   1;
+        }
+    }
 
-//    else
-//    {
-//        if(particle_->type==2)
-//        {
-//            aux     =   cros->get_decay()->CalculateStochasticLoss(rnd2, rnd3, MathModel::RandomDouble(), o);
-//            ef      =   0;
-//            wint    =   1;
-//        }
-//        else
-//        {
-//            aux     =   cros->get_decay()->CalculateStochasticLoss(rnd2, rnd3, 0.5, o);
-//            ef      =   0;
-//            wint    =   1;
-//        }
-//    }
+    particle_->SetEnergy(current_energy);
 
-    return 0;
+    return energy_loss;
+
 }
 
 
@@ -910,7 +935,7 @@ double ProcessCollection::FunctionToPropIntegralDecay(double energy)
 
     aux =   FunctionToIntegral(energy);
 
-    decay  =   1.;//cros->get_decay()->decay();
+    decay  =   decay_->MakeDecay();
 
     if(debug_)
     {
@@ -1102,7 +1127,11 @@ void ProcessCollection::SetCrosssections(
 }
 
 void ProcessCollection::SetCutSettings(EnergyCutSettings* cutSettings) {
-	cut_settings_ = cutSettings;
+    cut_settings_ = cutSettings;
+    for(unsigned int i = 0 ; i < crosssections_.size() ; i++)
+    {
+        crosssections_.at(i)->SetEnergyCutSettings(cut_settings_);
+    }
 }
 
 void ProcessCollection::SetDebug(bool debug) {
@@ -1135,7 +1164,11 @@ void ProcessCollection::SetLpmEffectEnabled(bool lpmEffectEnabled) {
 }
 
 void ProcessCollection::SetMedium(Medium* medium) {
-	medium_ = medium;
+    medium_ = medium;
+    for(unsigned int i = 0 ; i < crosssections_.size() ; i++)
+    {
+        crosssections_.at(i)->SetMedium(medium_);
+    }
 }
 
 void ProcessCollection::SetOrderOfInterpolation(int orderOfInterpolation) {
@@ -1143,7 +1176,12 @@ void ProcessCollection::SetOrderOfInterpolation(int orderOfInterpolation) {
 }
 
 void ProcessCollection::SetParticle(Particle* particle) {
-	particle_ = particle;
+    particle_ = particle;
+    decay_->SetParticle(particle);
+    for(unsigned int i = 0 ; i < crosssections_.size() ; i++)
+    {
+        crosssections_.at(i)->SetParticle(particle);
+    }
 }
 
 //----------------------------------------------------------------------------//

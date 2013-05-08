@@ -60,6 +60,7 @@ TEST(Comparison , Comparison_not_equal ) {
     D->SetParticle(particle);
     EXPECT_TRUE(*D==*E);
     D->GetCrosssections().at(2)->SetParametrization(6);
+
     EXPECT_TRUE(*D!=*E);
 
 

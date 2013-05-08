@@ -62,7 +62,7 @@ public:
     * energy of the electron that results from the muon decay
     */
 
-    double ProductEnergy( double ernd, double arnd, double srnd );
+    double CalculateProductEnergy( double ernd, double arnd, double srnd );
 
 //----------------------------------------------------------------------------//
 

@@ -28,7 +28,7 @@
     \brief initializes all cross sections and keeps references to them
  */
 
-class ProcessCollection
+class ProcessCollection : public MathModel
 {
 
 protected:
@@ -64,6 +64,7 @@ protected:
     EnergyCutSettings*  cut_settings_;
 
     std::vector<CrossSections*> crosssections_;
+    Decay* decay_;
     Integral* prop_decay_;
     Integral* prop_interaction_;
     Interpolant *interpol_prop_decay_;           //!< Interpolate object of the Integral of the function FunctionToPropIntegralDecay
@@ -264,7 +265,7 @@ public:
      *  \param  particle_interaction    particle interaction? (false = decay)
      *  \return energy loss [MeV]
      */
-    double MakeStochasticLoss(bool particle_interaction);
+    double MakeStochasticLoss(bool particle_interaction, double current_energy);
 
 //----------------------------------------------------------------------------//
 

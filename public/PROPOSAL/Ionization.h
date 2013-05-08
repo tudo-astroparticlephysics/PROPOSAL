@@ -1,3 +1,6 @@
+#ifndef Ionization_H
+#define Ionization_H
+
 #include "PROPOSAL/CrossSections.h"
 #include "PROPOSAL/Integral.h"
 #include "PROPOSAL/Interpolant.h"
@@ -210,3 +213,5 @@ public:
 	void SetGamma(double gamma);
 	void SetIntegral(Integral* integral);
 };
+
+#endif //Ionization_H
