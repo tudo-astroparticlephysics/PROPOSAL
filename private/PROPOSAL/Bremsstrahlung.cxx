@@ -273,8 +273,6 @@ double Bremsstrahlung::CalculatedNdx(double rnd){
         //rnd_    =   rnd;
     }
 
-    double sum    =   0; //SUM was local we will see if this is necessary
-
     for(int i=0; i<(medium_->GetNumCompontents()); i++)
     {
         if(do_dndx_Interpolation_)
@@ -286,17 +284,70 @@ double Bremsstrahlung::CalculatedNdx(double rnd){
             SetIntegralLimits(i);
             prob_for_component_.at(i)   =   dndx_integral_.at(i)->IntegrateWithLog(vUp_, vMax_, boost::bind(&Bremsstrahlung::FunctionToDNdxIntegral, this, _1), rnd);
         }
-        sum    +=  prob_for_component_.at(i);
+        sum_of_rates_    +=  prob_for_component_.at(i);
 
     }
 
-    return sum;
+    return sum_of_rates_;
 
 }
 //----------------------------------------------------------------------------//
-double Bremsstrahlung::CalculateStochasticLoss(){
+
+double Bremsstrahlung::CalculateStochasticLoss(double rnd)
+{
+
+    double rand;
+    double rsum;
+
+    rand    =   rnd*sum_of_rates_;
+    rsum    =   0;
+
+    for(int i=0; i<(medium_->GetNumCompontents()); i++)
+    {
+        rsum    += prob_for_component_.at(i);
+        if(rsum > rand)
+        {
+
+            if(do_dndx_Interpolation_)
+            {
+                    SetIntegralLimits(i);
+
+                if(vUp_==vMax_)
+                {
+                    return (particle_->GetEnergy())*vUp_;
+                }
+
+                return (particle_->GetEnergy())*(vUp_*exp(dndx_interpolant_2d_.at(i)->FindLimit((particle_->GetEnergy()), (rnd)*prob_for_component_.at(i))*log(vMax_/vUp_)));
+            }
+
+            else
+            {
+                component_ = i;
+
+                return (particle_->GetEnergy())*dndx_integral_.at(i)->GetUpperLimit();
+
+            }
+        }
+    }
+
+    //TOMASZ sometime everything is fine, just the probability for interaction is zero
+    bool prob_for_all_comp_is_zero=true;
+    for(int i=0; i<(medium_->GetNumCompontents()); i++)
+    {
+        SetIntegralLimits(i);
+        if(vUp_!=vMax_)prob_for_all_comp_is_zero=false;
+    }
+    if(prob_for_all_comp_is_zero)return 0;
+
+    cout<<"Error (in BremsStochastic/e): sum was not initialized correctly" << endl;
+    cout<<"ecut: " << cut_settings_->GetEcut() << "\t vcut: " <<  cut_settings_->GetVcut() << "\t energy: " << particle_->GetEnergy() << "\t type: " << particle_->GetName() << endl;
     return 0;
+
 }
+
+
+//----------------------------------------------------------------------------//
+
 
 double Bremsstrahlung::CalculateStochasticLoss(double rnd1, double rnd2){
     double rand;

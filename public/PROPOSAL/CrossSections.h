@@ -61,6 +61,7 @@ protected:
     bool        hard_component_;
 
     int         order_of_interpolation_;
+    double      sum_of_rates_;
 //----------------------------------------------------------------------------//
 
     virtual void SetIntegralLimits(int component) = 0;
@@ -109,7 +110,7 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    virtual double CalculateStochasticLoss() = 0;
+    virtual double CalculateStochasticLoss(double rnd1) = 0;
 
 //----------------------------------------------------------------------------//
 

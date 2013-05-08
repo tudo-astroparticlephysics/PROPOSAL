@@ -22,6 +22,9 @@ ProcessCollection::ProcessCollection()
     ,lpm_effect_enabled_        ( false )
     ,ini_                       ( 0 )
     ,debug_                     ( false )
+    ,do_weighting_              ( false )
+    ,weighting_order_           ( 0 )
+    ,weighting_starts_at_       ( 0 )
     ,up_                        ( false )
     ,bigLow_                    ( 2,0 )
     ,storeDif_                  ( 2,0 )
@@ -40,6 +43,7 @@ ProcessCollection::ProcessCollection()
     interpol_prop_decay_diff_       = NULL;
     interpol_prop_interaction_      = NULL;
     interpol_prop_interaction_diff_ = NULL;
+
 }
 
 
@@ -53,6 +57,9 @@ ProcessCollection::ProcessCollection(const ProcessCollection &collection)
     ,lpm_effect_enabled_        ( collection.lpm_effect_enabled_ )
     ,ini_                       ( collection.ini_ )
     ,debug_                     ( collection.debug_ )
+    ,do_weighting_              ( collection.do_weighting_ )
+    ,weighting_order_           ( collection.weighting_order_ )
+    ,weighting_starts_at_       ( collection.weighting_starts_at_ )
     ,up_                        ( collection.up_)
     ,bigLow_                    ( collection.bigLow_ )
     ,storeDif_                  ( collection.storeDif_ )
@@ -179,6 +186,9 @@ bool ProcessCollection::operator==(const ProcessCollection &collection) const
     if( *prop_decay_               != *collection.prop_decay_ )             return false;
     if( *prop_interaction_         != *collection.prop_interaction_ )       return false;
     if( up_                        != collection.up_)                       return false;
+    if( do_weighting_              != collection.do_weighting_ )            return false;
+    if( weighting_order_           != collection.weighting_order_ )         return false;
+    if( weighting_starts_at_       != collection.weighting_starts_at_ )     return false;
 
     if( crosssections_.size()      != collection.crosssections_.size() )    return false;
     if( bigLow_.size()             != collection.bigLow_.size() )           return false;
@@ -285,6 +295,9 @@ void ProcessCollection::swap(ProcessCollection &collection)
     swap( ini_                       , collection.ini_ );
     swap( debug_                     , collection.debug_ );
     swap( up_                        , collection.up_ );
+    swap( do_weighting_              , collection.do_weighting_ );
+    swap( weighting_order_           , collection.weighting_order_ );
+    swap( weighting_starts_at_       , collection.weighting_starts_at_ );
     particle_->swap( *collection.particle_ );
     medium_->swap( *collection.medium_ );
     integral_->swap( *collection.integral_ );
@@ -670,6 +683,218 @@ double ProcessCollection::CalculateFinalEnergy(double ei, double dist)
         return integral_->GetUpperLimit();
     }
 
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+double ProcessCollection::CalculateFinalEnergy(double ei, double rnd, bool particle_interaction)
+{
+    if( do_interpolation_ )
+    {
+        if( particle_interaction )
+        {
+            if( abs(rnd) > abs(storeDif_.at(1))*HALF_PRECISION)
+            {
+                double aux;
+
+                if(up_&&particle_interaction)
+                {
+                    if(particle_interaction)
+                    {
+                        aux =   interpol_prop_interaction_->FindLimit(storeDif_.at(1)-rnd);
+                    }
+                    else
+                    {
+                        aux =   interpol_prop_decay_->FindLimit(storeDif_.at(1)-rnd);
+                    }
+                }
+                else
+                {
+                    if(particle_interaction)
+                    {
+                        aux =   interpol_prop_interaction_->FindLimit(storeDif_.at(1)+rnd);
+                    }
+                    else
+                    {
+                        aux =   interpol_prop_decay_->FindLimit(storeDif_.at(0)+rnd);
+                    }
+                }
+
+                if(abs(ei-aux) > abs(ei)*HALF_PRECISION)
+                {
+                    return min(max(aux, particle_->GetLow()), ei);
+                }
+            }
+        }
+        else
+        {
+            if(abs(rnd) > abs(storeDif_.at(0))*HALF_PRECISION)
+            {
+                double aux;
+
+                if(up_&&particle_interaction)
+                {
+                    if(particle_interaction)
+                    {
+                        aux =   interpol_prop_interaction_->FindLimit(storeDif_.at(1)-rnd);
+                    }
+                    else
+                    {
+                        aux =   interpol_prop_decay_->FindLimit(storeDif_.at(0)-rnd);
+                    }
+                }
+                else
+                {
+                    if(particle_interaction)
+                    {
+                        aux =   interpol_prop_interaction_->FindLimit(storeDif_.at(1)+rnd);
+                    }
+                    else
+                    {
+                        aux =   interpol_prop_decay_->FindLimit(storeDif_.at(0)+rnd);
+                    }
+                }
+
+                if(abs(ei-aux) > abs(ei)*HALF_PRECISION)
+                {
+                    return min(max(aux, particle_->GetLow()), ei);
+                }
+            }
+        }
+
+        if(particle_interaction)
+        {
+            return min(max(ei + rnd/interpol_prop_interaction_diff_->Interpolate(ei + rnd/(2*interpol_prop_interaction_diff_->Interpolate(ei))), particle_->GetLow()), ei);
+        }
+        else
+        {
+            return min(max(ei + rnd/interpol_prop_decay_diff_->Interpolate(ei + rnd/(2*interpol_prop_decay_diff_->Interpolate(ei))), particle_->GetLow()), ei);
+        }
+    }
+    else
+    {
+        if(particle_interaction)
+        {
+            return prop_interaction_->GetUpperLimit();
+        }
+        else
+        {
+            return prop_decay_->GetUpperLimit();
+        }
+
+    }
+}
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+double ProcessCollection::MakeStochasticLoss(bool particle_interaction)
+{
+//    double rnd1    =   MathModel::RandomDouble();
+//    double rnd2    =   MathModel::RandomDouble();
+//    double rnd3    =   MathModel::RandomDouble();
+
+//    double      total_rate          = 0;
+//    double      total_rate_weighted = 0;
+//    double      decayS              = 0;
+//    double      rates_sum           = 0;
+
+//    std::vector<double> rates_;
+
+
+//    rates_.resize( crosssections_.size() );
+
+//    particle_->setEnergy(ef);
+
+//    if(particle_interaction)
+//    {
+//        if(do_weighting_)
+//        {
+//            if(particle_->GetPropagationDistance() > weighting_starts_at_)
+//            {
+//                double exp      =   abs(weighting_order_);
+//                double power    =   pow(rnd2, exp);
+
+//                if(weighting_order_>0)
+//                {
+//                    rnd2    =   1 - power*rnd2;
+//                }
+//                else
+//                {
+//                    rnd2    =   power*rnd2;
+//                }
+
+//                weighting_order_        =   (1 + exp)*power;
+//                weighting_starts_at_    =   particle_->GetPropagationDistance();
+//                do_weighting_           =   false;
+//            }
+//        }
+
+//        if(debug_)
+//        {
+//           // decayS  =   cros->get_decay()->decay();
+//        }
+
+//        for(unsigned int i = 0 ; i < collection_->GetCrosssections().size(); i++)
+//        {
+//            rates_.at(i) =  crosssections_.at(i)->CalculatedNdx( rnd2 );
+//            total_rate  +=  rates_.at(i);
+
+//            if(debug_)
+//            {
+//                cerr<<"\t"<<crosssections_.at(i)->GetName()<<" = "<<rates_.at(i);
+//            }
+
+//        }
+
+//        total_rate_weighted = total_rate_*rnd1;
+
+//        if(debug_)
+//        {
+//            cerr<<" . rnd1 = "<<rnd1<<" rnd2 = "<<rnd2<<
+//                " rnd3 = "<<rnd3<<" decay = "<<decayS<<endl;
+//        }
+
+
+//        for(unsigned int i = 0 ; i < rates_.size(); i++)
+//        {
+//            rates_sum   += rates_.at(i);
+
+//            if(rates_sum > total_rate_weighted)
+//            {
+//                aux     =   crosssections_.at(i)->CalculateStochasticLoss(rnd3);
+//            }
+//        }
+
+//        else  // due to the parameterization of the cross section cutoffs
+//        {
+//            ei  =   ef;
+//            continue;
+//        }
+
+//    }
+
+//    else
+//    {
+//        if(particle_->type==2)
+//        {
+//            aux     =   cros->get_decay()->CalculateStochasticLoss(rnd2, rnd3, MathModel::RandomDouble(), o);
+//            ef      =   0;
+//            wint    =   1;
+//        }
+//        else
+//        {
+//            aux     =   cros->get_decay()->CalculateStochasticLoss(rnd2, rnd3, 0.5, o);
+//            ef      =   0;
+//            wint    =   1;
+//        }
+//    }
+
+    return 0;
 }
 
 

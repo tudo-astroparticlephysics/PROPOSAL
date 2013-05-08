@@ -38,6 +38,11 @@ protected:
     bool        lpm_effect_enabled_;
     double      ini_;
     bool        debug_;
+    bool        do_weighting_;           //!< Do weigthing? Set as false in constructor
+    double      weighting_order_;        //!< Re-weighting order. Set to 0 in constructor
+    double      weighting_starts_at_;    //!< Distance at which re-weighting starts. Set to 0 in constructor
+
+
 
     /*!
      * \brief indicates if the interpolated function is increasing or decreasing.
@@ -156,6 +161,19 @@ public:
 //----------------------------------------------------------------------------//
 
     /**
+     * final energy, corresponding to the given value rnd of the
+     * tracking integral
+     *
+     *  \param  ei                      initial energy
+     *  \param  rnd                     random number which is used for the calculation
+     *  \param  particle_interaction    particle interaction? (false = decay)
+     *  \return final energy due to continous energy losses [MeV]
+     */
+
+    double CalculateFinalEnergy(double ei, double rnd, bool particle_interaction);
+
+//----------------------------------------------------------------------------//
+    /**
      * Calculates the value of the tracking integral
      *
      *  \param  initial_energy          initial energy
@@ -240,6 +258,15 @@ public:
     void DisableInterpolation();
 
 //----------------------------------------------------------------------------//
+    /**
+     *  Makes Stochastic Energyloss
+     *
+     *  \param  particle_interaction    particle interaction? (false = decay)
+     *  \return energy loss [MeV]
+     */
+    double MakeStochasticLoss(bool particle_interaction);
+
+//----------------------------------------------------------------------------//
 
     void EnableLpmEffect();
 
@@ -253,6 +280,9 @@ public:
 
     ///@brief Crush this CrossSections.
     virtual ~ProcessCollection();
+
+//----------------------------------------------------------------------------//
+    //Getter
 
 	std::vector<CrossSections*> GetCrosssections() const {
 		return crosssections_;
@@ -301,6 +331,8 @@ public:
 	Particle* GetParticle() const {
 		return particle_;
 	}
+//----------------------------------------------------------------------------//
+    //Setter
 
 	void SetCrosssections(std::vector<CrossSections*> crosssections);
 	void SetCutSettings(EnergyCutSettings* cutSettings);

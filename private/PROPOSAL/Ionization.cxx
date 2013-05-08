@@ -263,11 +263,11 @@ double Ionization::CalculatedNdx(){
 
     if(do_dndx_Interpolation_)
     {
-        return max(dndx_interpolant_1d_->Interpolate(particle_->GetEnergy()), 0.);
+        return sum_of_rates_ = max(dndx_interpolant_1d_->Interpolate(particle_->GetEnergy()), 0.);
     }
     else{
         SetIntegralLimits(0);
-        return integral_->Integrate(vUp_,vMax_,boost::bind(&Ionization::FunctionToDNdxIntegral, this, _1),3,1);
+        return sum_of_rates_ = integral_->Integrate(vUp_,vMax_,boost::bind(&Ionization::FunctionToDNdxIntegral, this, _1),3,1);
     }
 }
 //----------------------------------------------------------------------------//
@@ -280,18 +280,45 @@ double Ionization::CalculatedNdx(double rnd){
 
     if(do_dndx_Interpolation_)
     {
-        return max(dndx_interpolant_1d_->Interpolate(particle_->GetEnergy()), 0.);
+        return sum_of_rates_ = max(dndx_interpolant_1d_->Interpolate(particle_->GetEnergy()), 0.);
     }
     else
     {
         SetIntegralLimits(0);
-        return integral_->IntegrateWithSubstitution(vUp_,vMax_,boost::bind(&Ionization::FunctionToDNdxIntegral, this, _1),1,rnd);
+        return sum_of_rates_ = integral_->IntegrateWithSubstitution(vUp_,vMax_,boost::bind(&Ionization::FunctionToDNdxIntegral, this, _1),1,rnd);
     }
 }
 //----------------------------------------------------------------------------//
 
-double Ionization::CalculateStochasticLoss(){
-    return 0;
+double Ionization::CalculateStochasticLoss(double rnd)
+{
+    double rand, rsum;
+
+    rand=medium_->GetSumCharge()*rnd;
+    rsum=0;
+
+    for(int i=0; i<medium_->GetNumCompontents(); i++){
+        rsum+=medium_->GetAtomInMolecule().at(i)* medium_->GetNucCharge().at(i);
+
+        if(rsum>rand){
+
+            if(do_dndx_Interpolation_)
+            {
+                SetIntegralLimits(0);
+                if(vUp_==vMax_){
+                    return particle_->GetEnergy()*vUp_;
+                }
+                return particle_->GetEnergy()*(vUp_*exp(dndx_interpolant_2d_->FindLimit(particle_->GetEnergy(), rnd*sum_of_rates_)*log(vMax_/vUp_)));
+            }
+            else
+            {
+                return particle_->GetEnergy()*integral_->GetUpperLimit();
+            }
+        }
+    }
+
+    cerr<<"Error (in IonizStochastic/e): m.totZ was not initialized correctly"<<endl;
+        return 0;
 }
 
 //----------------------------------------------------------------------------//

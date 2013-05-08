@@ -3,13 +3,37 @@
 #include "PROPOSAL/CrossSections.h"
 #include <iostream>
 
+class RndFromFile{
+private:
+    double rnd_;
+    string Path_;
+    ifstream in_;
+
+public:
+    RndFromFile(string Path){
+        Path_ = Path;
+        in_.open(Path_.c_str());
+        in_>>rnd_;
+        if(!in_.good())cout << "less than one rnd_number!" << endl;
+    }
+
+    double rnd(){
+        in_>>rnd_;
+        if(!in_.good()){
+            in_.close();
+            in_.clear();
+            in_.open(Path_.c_str());
+            in_>>rnd_;
+        }
+        return rnd_;
+    }
+};
+
 TEST(Comparison , Comparison_equal ) {
 
-    Medium *medium = new Medium("air",1.);
     Particle *particle = new Particle("mu",1.,1.,1,.20,20,1e5,10);
-    EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
-    Decay *A = new Decay(particle, medium, cuts);
-    Decay *B = new Decay(particle, medium, cuts);
+    Decay *A = new Decay(particle);
+    Decay *B = new Decay(particle);
     EXPECT_TRUE(*A==*B);
 
     Decay *C = new Decay();
@@ -25,33 +49,22 @@ TEST(Comparison , Comparison_equal ) {
 
 TEST(Comparison , Comparison_not_equal ) {
 
-    Medium *medium = new Medium("air",1.);
-    Medium *medium2 = new Medium("water",1.);
     Particle *particle = new Particle("mu",1.,1.,1,20,20,1e5,10);
     Particle *particle2 = new Particle("tau",1.,1.,1,20,20,1e5,10);
-    EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
-    Decay *A = new Decay(particle, medium, cuts);
-    Decay *B = new Decay(particle, medium2, cuts);
-    Decay *C = new Decay(particle2, medium, cuts);
-    Decay *D = new Decay(particle2, medium2, cuts);
-    Decay *E = new Decay();
+    Decay *A = new Decay(particle);
+    Decay *B = new Decay(particle2);
 
     EXPECT_TRUE(*A!=*B);
-    EXPECT_TRUE(*C!=*D);
-    EXPECT_TRUE(*B!=*D);
-    EXPECT_TRUE(*D!=*E);
+    A->SetParticle(particle2);
+    EXPECT_TRUE(*A==*B);
 
-    E->SetParticle(particle2);
-    EXPECT_TRUE(*D!=*E);
+    A->SetMultiplier(1.2);
+    EXPECT_TRUE(*A!=*B);
+    B->SetMultiplier(1.2);
 
-    E->SetMedium(medium2);
-    EXPECT_TRUE(*D!=*E);
-
-    E->SetEnergyCutSettings(cuts);
-    EXPECT_TRUE(*D==*E);
-
-
-
+    EXPECT_TRUE(*A==*B);
+    A->GetRootFinder()->SetMaxSteps(5);
+    EXPECT_TRUE(*A!=*B);
 }
 
 TEST(Assignment , Copyconstructor ) {
@@ -62,11 +75,9 @@ TEST(Assignment , Copyconstructor ) {
 }
 
 TEST(Assignment , Copyconstructor2 ) {
-    Medium *medium = new Medium("air",1.);
     Particle *particle = new Particle("mu",1.,1.,1,.20,20,1e5,10);
-    EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
 
-    Decay A(particle, medium, cuts);
+    Decay A(particle);
     Decay B(A);
 
     EXPECT_TRUE(A==B);
@@ -74,12 +85,10 @@ TEST(Assignment , Copyconstructor2 ) {
 }
 
 TEST(Assignment , Operator ) {
-    Medium *medium = new Medium("air",1.);
     Particle *particle = new Particle("mu",1.,1.,1,.20,20,1e5,10);
     Particle *particle2 = new Particle("tau",1.,1.,1,.20,20,1e5,10);
-    EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
-    Decay A(particle, medium, cuts);
-    Decay B(particle2, medium, cuts);
+    Decay A(particle);
+    Decay B(particle2);
 
     EXPECT_TRUE(A!=B);
 
@@ -87,10 +96,8 @@ TEST(Assignment , Operator ) {
 
     EXPECT_TRUE(A==B);
 
-    Medium *medium2 = new Medium("water",1.);
     Particle *particle3 = new Particle("tau",1.,1.,1,.20,20,1e5,10);
-    EnergyCutSettings *cuts2 = new EnergyCutSettings(200,-1);
-    Decay *C = new Decay(particle3, medium2, cuts2);
+    Decay *C = new Decay(particle3);
     EXPECT_TRUE(A!=*C);
 
     A=*C;
@@ -100,24 +107,22 @@ TEST(Assignment , Operator ) {
 }
 
 TEST(Assignment , Swap ) {
-    Medium *medium = new Medium("air",1.);
-    Medium *medium2 = new Medium("air",1.);
+
     Particle *particle = new Particle("mu",1.,1.,1,.20,20,1e5,10);
     Particle *particle2 = new Particle("mu",1.,1.,1,.20,20,1e5,10);
-    EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
-    EnergyCutSettings *cuts2 = new EnergyCutSettings(500,-1);
-    Decay A(particle, medium, cuts);
-    Decay B(particle2, medium2, cuts2);
+
+    Decay A(particle);
+    Decay B(particle2);
     EXPECT_TRUE(A==B);
 
-    Medium *medium3 = new Medium("water",1.);
-    Medium *medium4 = new Medium("water",1.);
     Particle *particle3 = new Particle("tau",1.,1.,1,.20,20,1e5,10);
     Particle *particle4 = new Particle("tau",1.,1.,1,.20,20,1e5,10);
-    EnergyCutSettings *cuts3 = new EnergyCutSettings(200,-1);
-    EnergyCutSettings *cuts4 = new EnergyCutSettings(200,-1);
-    Decay *C = new Decay(particle3, medium3, cuts3);
-    Decay *D = new Decay(particle4, medium4, cuts4);
+
+    Decay *C = new Decay(particle3);
+    Decay *D = new Decay(particle4);
+    C->GetRootFinder()->SetMaxSteps(5);
+    D->GetRootFinder()->SetMaxSteps(5);
+
     EXPECT_TRUE(*C==*D);
 
     A.swap(*C);
@@ -126,6 +131,75 @@ TEST(Assignment , Swap ) {
     EXPECT_TRUE(*C==B);
 
 
+}
+
+TEST(Decay , decay ) {
+
+    ifstream in;
+    in.open("bin/TestFiles/Decay_decay.txt");
+
+    char firstLine[256];
+    in.getline(firstLine,256);
+
+    double energy;
+    double decay;
+    double decay_new;
+    string particleName;
+
+    cout.precision(16);
+
+
+    while(in.good())
+    {
+        in>>particleName>>energy>>decay;
+
+        Particle *particle = new Particle(particleName,1.,1.,1,.20,20,1e5,10);
+        particle->SetEnergy(energy);
+
+        Decay* dec  = new Decay(particle);
+
+        decay_new=dec->Decay();
+
+        ASSERT_NEAR(decay_new, decay, 1e-7*decay);
+
+        delete particle;
+        delete dec;
+    }
+}
+
+
+TEST(Decay , ProductEnergy ) {
+
+    ifstream in;
+    in.open("bin/TestFiles/Decay_ProductEnergy.txt");
+
+    char firstLine[256];
+    in.getline(firstLine,256);
+
+    double energy;
+    double product_energy;
+    double product_energy_new;
+    string particleName;
+
+    cout.precision(16);
+
+
+    while(in.good())
+    {
+        in>>particleName>>energy>>product_energy;
+
+        Particle *particle = new Particle(particleName,1.,1.,1,.20,20,1e5,10);
+        particle->SetEnergy(energy);
+
+        Decay* dec  = new Decay(particle);
+
+        product_energy_new=dec->Decay();
+
+        ASSERT_NEAR(product_energy_new, product_energy, 1e-7*product_energy);
+
+        delete particle;
+        delete dec;
+    }
 }
 
 int main(int argc, char **argv) {

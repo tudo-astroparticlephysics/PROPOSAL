@@ -17,9 +17,6 @@ Propagator::Propagator()
     :debug_                 ( false )
     ,particle_interaction_  ( false )
     ,rho_                   ( 1. )
-    ,do_weighting_          ( false )
-    ,weighting_order_       ( 0 )
-    ,weighting_starts_at_   ( 0 )
     ,rates_                 ( )
     ,total_rate_            ( 0 )
     ,particle_              ( )
@@ -150,18 +147,18 @@ double Propagator::Propagate(double distance, double energy)
         {
             rnddMin =   0;
         }
-//        else
-//        {
+        else
+        {
 
-//            rnddMin =   getpr(ei, rndd, false)/rho;
-//        }
+            rnddMin =   collection_->CalculateTrackingIntegal(ei, rndd, false)/rho_;
+        }
 
         if(debug_)
         {
             cerr<<" \t \t \t rnddMin = "<<rnddMin<<" (d)  "<<endl;
         }
 
-//        rndiMin =   getpr(ei, rndi, true);
+        rndiMin =   collection_->CalculateTrackingIntegal(ei, rndi, true);
 
         if(debug_)
         {
@@ -177,10 +174,10 @@ double Propagator::Propagate(double distance, double energy)
         {
             efd =   particle_->GetLow();
         }
-//        else
-//        {
-//            efd =   getef(ei, rndd*rho, false);
-//        }
+        else
+        {
+            efd =   collection_->CalculateFinalEnergy(ei, rndd*rho, false);
+        }
 
         if(debug_)
         {
@@ -191,10 +188,10 @@ double Propagator::Propagate(double distance, double energy)
         {
             efi =   particle_->GetLow();
         }
-//        else
-//        {
-//            efi =   getef(ei, rndi, true);
-//        }
+        else
+        {
+            efi =   collection_->CalculateFinalEnergy(ei, rndi, true);
+        }
 
         if(debug_)
         {
@@ -222,7 +219,7 @@ double Propagator::Propagate(double distance, double energy)
             cerr<<"3. calculating the displacement ...  "<<endl;
         }
 
-        displacement  =   collection_->GetDisplacement(ei, ef, rho_*(distance - particle_->GetPropagationDistance())) / rho_;
+        displacement  =   collection_->CalculateDisplacement(ei, ef, rho_*(distance - particle_->GetPropagationDistance())) / rho_;
 
         if(debug_)
         {
@@ -339,6 +336,16 @@ double Propagator::Propagate(double distance, double energy)
             }
 
             rndTot = total_rate_*rnd1;
+
+            for(unsigned int i = 0 ; i < rates_.size(); i++)
+            {
+                if(rates_.at(i) > rndTot)
+                {
+                    aux     =   collection_->GetCrosssections().at(i)->e(rnd3);
+                    ef      -=  aux;
+                    wint    =   2;
+                }
+            }
 
 //            if(debug_)
 //            {

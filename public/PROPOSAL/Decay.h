@@ -1,77 +1,124 @@
-#include "CrossSections.h"
+/*
+ * Decay.h
+ *
+ *  Created on: 07.05.2013
+ *      Author: koehne
+ */
 
-class Decay: public CrossSections
+#ifndef DECAY_H_
+#define DECAY_H_
+
+#include "PROPOSAL/RootFinder.h"
+#include "PROPOSAL/Particle.h"
+
+
+/*! \class  Decay  Decay.h " Decay.h"
+   \brief class contains functions necessary for the calculation of decay
+ */
+
+
+class Decay
 {
+
 protected:
 
+    RootFinder* root_finder_;
+    Particle* particle_;
+    std::string out_;
 
-public:
+    bool store_neutrinos_;
+    double multiplier_;
+
 //----------------------------------------------------------------------------//
+public:
+
+
+    //Constructor
+    /**
+    * creates internal references to p and m
+    */
 
     Decay();
+    Decay(Particle* particle);
     Decay(const Decay&);
     Decay& operator=(const Decay& decay);
-    Decay(Particle* particle, Medium* medium, EnergyCutSettings* cut_settings);
     bool operator==(const Decay &decay) const;
     bool operator!=(const Decay &decay) const;
-
 //----------------------------------------------------------------------------//
-
-    void SetIntegralLimits(int component);
-
-//----------------------------------------------------------------------------//
-
-    double CalculatedEdx();
-
-//----------------------------------------------------------------------------//
-
-    double CalculatedNdx();
-
-
-//----------------------------------------------------------------------------//
-
-    double CalculatedNdx(double rnd);
-
-//----------------------------------------------------------------------------//
-
-    double CalculateStochasticLoss();
-
-//----------------------------------------------------------------------------//
-
-    double CalculateStochasticLoss(double rnd1, double rnd2);
-//----------------------------------------------------------------------------//
-
-    void EnableDNdxInterpolation();
-
-//----------------------------------------------------------------------------//
-
-    void EnableDEdxInterpolation();
-
-//----------------------------------------------------------------------------//
-
-    void DisableDNdxInterpolation();
-
-//----------------------------------------------------------------------------//
-
-    void DisableDEdxInterpolation();
-
-//----------------------------------------------------------------------------//
-
-    double FunctionToDEdxIntegral(double variable);
-
-//----------------------------------------------------------------------------//
-
-    double FunctionToDNdxIntegral(double variable);
-
-//----------------------------------------------------------------------------//
+    //Memberfunctions
 
     void swap(Decay &decay);
-
-//----------------------------------------------------------------------------//
-    ~Decay(){}
-
-    //Getter
 //----------------------------------------------------------------------------//
 
+    /**
+    * this cross section describes decay
+    */
 
+    double MakeDecay();
+
+//----------------------------------------------------------------------------//
+
+    /**
+    * energy of the electron that results from the muon decay
+    */
+
+    double ProductEnergy( double ernd, double arnd, double srnd );
+
+//----------------------------------------------------------------------------//
+
+    /**
+    * function for electron energy calculation - interface to FindRoot
+    */
+
+    double Function(double x);
+
+//----------------------------------------------------------------------------//
+
+    /**
+    * function for electron energy calculation - interface to FindRoot
+    */
+
+    double DifferentiatedFunction(double x);
+
+//----------------------------------------------------------------------------//
+
+    // Getter
+    std::string GetOut() const
+    {
+        return out_;
+    }
+
+    RootFinder* GetRootFinder() const
+    {
+        return root_finder_;
+    }
+
+    Particle* GetParticle() const
+    {
+        return particle_;
+    }
+
+    bool GetStoreNeutrinos() const
+    {
+        return store_neutrinos_;
+    }
+
+    double GetMultiplier() const
+    {
+        return multiplier_;
+    }
+//----------------------------------------------------------------------------//
+    //Setter
+    void SetOut(std::string out);
+
+    void SetRootFinder(RootFinder *root_finder);
+
+    void SetParticle(Particle* particle);
+
+    void SetStoreNeutrinos(bool store_neutrinos);
+
+    void SetMultiplier(double multiplier);
 };
+
+
+#endif /* DECAY_H_ */

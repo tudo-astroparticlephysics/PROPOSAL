@@ -16,6 +16,7 @@ CrossSections::CrossSections( )
     ,shadow_                ( 1 )
     ,hard_component_        ( true )
     ,order_of_interpolation_( 5 )
+    ,sum_of_rates_          ( 0 )
 {
     particle_       = new Particle();
     medium_         = new Medium();
@@ -39,6 +40,7 @@ CrossSections::CrossSections(Particle* particle,
     ,shadow_                ( 1 )
     ,hard_component_        ( true )
     ,order_of_interpolation_( 5 )
+    ,sum_of_rates_          ( 0 )
 {
     particle_       = particle;
     medium_         = medium;
@@ -62,6 +64,7 @@ CrossSections::CrossSections(const CrossSections& crossSections)
     ,shadow_                   ( crossSections.shadow_ )
     ,hard_component_           ( crossSections.hard_component_ )
     ,order_of_interpolation_   ( crossSections.order_of_interpolation_ )
+    ,sum_of_rates_             ( crossSections.sum_of_rates_ )
 {
     particle_                 = new Particle( *crossSections.particle_ );
     medium_                   = new Medium( *crossSections.medium_ );
@@ -113,7 +116,9 @@ bool CrossSections::operator==(const CrossSections &crossSections) const
     if( *cut_settings_            != *crossSections.cut_settings_ )         return false;
     if( *particle_                != *crossSections.particle_ )             return false;
     if( *medium_                  != *crossSections.medium_ )               return false;
+    if( sum_of_rates_             != crossSections.sum_of_rates_ )          return false;
     if( name_.compare(crossSections.name_) != 0 )                           return false;
+
 
 
     //else
@@ -145,6 +150,7 @@ void CrossSections::swap(CrossSections &crossSections)
     swap( shadow_                   , crossSections.shadow_ );
     swap( hard_component_           , crossSections.hard_component_ );
     swap( order_of_interpolation_   , crossSections.order_of_interpolation_ );
+    swap( sum_of_rates_             , crossSections.sum_of_rates_ );
 
     cut_settings_->swap(*crossSections.cut_settings_);
     particle_->swap(*crossSections.particle_);

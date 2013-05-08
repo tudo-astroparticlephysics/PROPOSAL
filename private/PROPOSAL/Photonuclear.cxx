@@ -346,23 +346,23 @@ double Photonuclear::CalculatedNdx(){
         return 0;
     }
 
-    double sum    =   0;
+    sum_of_rates_    =   0;
 
     for(int i=0; i<medium_->GetNumCompontents(); i++)
     {
 
         if(do_dndx_Interpolation_)
         {
-            sum    +=  max(dndx_interpolant_1d_.at(i)->Interpolate(particle_->GetEnergy()), 0.0);
+            sum_of_rates_    +=  max(dndx_interpolant_1d_.at(i)->Interpolate(particle_->GetEnergy()), 0.0);
         }
         else
         {
             SetIntegralLimits(i);
-            sum    +=  dndx_integral_.at(i)->Integrate(vUp_, vMax_, boost::bind(&Photonuclear::FunctionToDNdxIntegral, this, _1),4);
+            sum_of_rates_    +=  dndx_integral_.at(i)->Integrate(vUp_, vMax_, boost::bind(&Photonuclear::FunctionToDNdxIntegral, this, _1),4);
         }
     }
 
-    return sum;
+    return sum_of_rates_;
 
 }
 //----------------------------------------------------------------------------//
@@ -375,7 +375,7 @@ double Photonuclear::CalculatedNdx(double rnd){
     }
 
 
-    double sum    =   0;
+    sum_of_rates_   =   0;
 
     for(int i=0; i<medium_->GetNumCompontents(); i++)
     {
@@ -390,14 +390,57 @@ double Photonuclear::CalculatedNdx(double rnd){
             prob_for_component_.at(i) = dndx_integral_.at(i)->IntegrateWithLog(vUp_,vMax_, boost::bind(&Photonuclear::FunctionToDNdxIntegral, this, _1),rnd);
         }
 
-        sum    +=  prob_for_component_.at(i);
+        sum_of_rates_    +=  prob_for_component_.at(i);
     }
 
-    return sum;
+    return sum_of_rates_;
 }
 //----------------------------------------------------------------------------//
 
-double Photonuclear::CalculateStochasticLoss(){
+double Photonuclear::CalculateStochasticLoss(double rnd)
+{
+    double rand;
+    double rsum;
+
+    rand    =   rnd*sum_of_rates_;
+    rsum    =   0;
+
+
+    for(int i=0; i<(medium_->GetNumCompontents()); i++)
+    {
+        rsum    += prob_for_component_.at(i);
+        if(rsum > rand)
+        {
+            if(do_dndx_Interpolation_)
+            {
+                SetIntegralLimits(i);
+
+                if(vUp_==vMax_)
+                {
+                    return (particle_->GetEnergy())*vUp_;
+                }
+
+                return particle_->GetEnergy()*(vUp_*exp(dndx_interpolant_2d_.at(i)->FindLimit((particle_->GetEnergy()), (rnd)*prob_for_component_.at(i))*log(vMax_/vUp_)));
+
+            }
+            else
+            {
+                component_ = i;
+                return (particle_->GetEnergy())*dndx_integral_.at(i)->GetUpperLimit();
+
+            }
+        }
+    }
+    bool prob_for_all_comp_is_zero=true;
+    for(int i=0; i<(medium_->GetNumCompontents()); i++)
+    {
+        SetIntegralLimits(i);
+        if(vUp_!=vMax_)prob_for_all_comp_is_zero=false;
+    }
+    if(prob_for_all_comp_is_zero)return 0;
+
+    cerr<<"Error (in Photonuclear/e): sum was not initialized correctly";
+    cerr<<"ecut: " << cut_settings_->GetEcut() << "\t vcut: " <<  cut_settings_->GetVcut() << "\t energy: " << particle_->GetEnergy() << "\t type: " << particle_->GetName() << endl;
     return 0;
 }
 //----------------------------------------------------------------------------//
