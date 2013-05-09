@@ -78,29 +78,8 @@ protected:
     Interpolant *interpol_time_particle_;
     Interpolant *interpol_time_particle_diff_;
 
-public:
 
-
-
-//----------------------------------------------------------------------------//
-
-    // constructors
-
-    ProcessCollection();
-    ProcessCollection(const ProcessCollection& collection);
-    ProcessCollection& operator=(const ProcessCollection& collection);
-    bool operator==(const ProcessCollection &collection) const;
-    bool operator!=(const ProcessCollection &collection) const;
-//----------------------------------------------------------------------------//
-
-    /// @brief  initializes all cross sections,
-
-    ProcessCollection(Particle *particle, Medium *medium, EnergyCutSettings* cut_settings);
-
-//----------------------------------------------------------------------------//
-
-    // Memberfunctions
-    void swap(ProcessCollection &collection);
+    //Memeberfunctions
 
 //----------------------------------------------------------------------------//
     /*!
@@ -123,6 +102,90 @@ public:
     double FunctionToIntegral(double energy);
 
 //----------------------------------------------------------------------------//
+    /**
+     * function for energy range calculation - interface to Integral
+     * For decay
+     *
+     *  \param  energy particle energy
+     *  \return Returns the probability [1/MeV]
+     */
+
+    double FunctionToPropIntegralDecay(double energy);
+
+//----------------------------------------------------------------------------//
+
+    /**
+     * function for energy range calculation - interface to Integral
+     * For Interaction
+     *
+     *  \param  energy particle energy
+     *  \return Returns the probability [1/MeV]
+     */
+
+    double FunctionToPropIntegralInteraction(double energy);
+
+//----------------------------------------------------------------------------//
+    /*!
+    1d parametrization ;
+    \f[return= \int_{e}^{e_{low}} f(E) dE \f] with \f$
+    e_{low} \f$ energy below which the particle is lost
+    \param e energy [MeV]
+    */
+    double FunctionToBuildInterpolant(double energy);
+
+//----------------------------------------------------------------------------//
+
+    /*!
+    1d parametrization ;
+    \f[return=function(e)\f];
+    \param e energy [MeV]
+    */
+    double FunctionToBuildInterpolantDiff(double energy);
+
+//----------------------------------------------------------------------------//
+
+    double InterpolPropDecay(double energy);
+
+//----------------------------------------------------------------------------//
+    double InterpolPropDecayDiff(double energy);
+
+//----------------------------------------------------------------------------//
+    double InterpolPropInteraction(double energy);
+
+//----------------------------------------------------------------------------//
+    double InterpolPropInteractionDiff(double energy);
+
+//----------------------------------------------------------------------------//
+    double InterpolTimeParticle(double energy);
+
+//----------------------------------------------------------------------------//
+    double InterpolTimeParticleDiff(double energy);
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+public:
+
+    // constructors
+
+    ProcessCollection();
+    ProcessCollection(const ProcessCollection& collection);
+    ProcessCollection& operator=(const ProcessCollection& collection);
+    bool operator==(const ProcessCollection &collection) const;
+    bool operator!=(const ProcessCollection &collection) const;
+//----------------------------------------------------------------------------//
+
+    /// @brief  initializes all cross sections,
+
+    ProcessCollection(Particle *particle, Medium *medium, EnergyCutSettings* cut_settings);
+
+//----------------------------------------------------------------------------//
+
+    // Memberfunctions
+    void swap(ProcessCollection &collection);
+
+//----------------------------------------------------------------------------//
 
     /*!
     returns the value of the distance integral from ei to ef;
@@ -137,28 +200,7 @@ public:
     double CalculateDisplacement(double ei, double ef, double dist);
 
 //----------------------------------------------------------------------------//
-    /**
-     * function for energy range calculation - interface to Integral
-     * For decay
-     *
-     *  \param  energy particle energy
-     *  \return Returns the probability [1/MeV]
-     */
 
-    double FunctionToPropIntegralDecay(double energy);
-
-//----------------------------------------------------------------------------//
-    /**
-     * function for energy range calculation - interface to Integral
-     * For Interaction
-     *
-     *  \param  energy particle energy
-     *  \return Returns the probability [1/MeV]
-     */
-
-    double FunctionToPropIntegralInteraction(double energy);
-
-//----------------------------------------------------------------------------//
     /*!
     final energy, corresponding to the given value of displacement dist;
     returns \f$e_f\f$ which fullfills
@@ -224,41 +266,14 @@ public:
     void AdvanceParticle(double dr, double ei, double ef);
 
 //----------------------------------------------------------------------------//
-    /*!
-    1d parametrization ;
-    \f[return= \int_{e}^{e_{low}} f(E) dE \f] with \f$
-    e_{low} \f$ energy below which the particle is lost
-    \param e energy [MeV]
-    */
-    double FunctionToBuildInterpolant(double energy);
 
-//----------------------------------------------------------------------------//
-
-    /*!
-    1d parametrization ;
-    \f[return=function(e)\f];
-    \param e energy [MeV]
-    */
-    double FunctionToBuildInterpolantDiff(double energy);
-
-//----------------------------------------------------------------------------//
-
-    double InterpolPropDecay(double energy);
-
-//----------------------------------------------------------------------------//
-    double InterpolPropDecayDiff(double energy);
-
-//----------------------------------------------------------------------------//
-    double InterpolPropInteraction(double energy);
-
-//----------------------------------------------------------------------------//
-    double InterpolPropInteractionDiff(double energy);
-
-//----------------------------------------------------------------------------//
-    double InterpolTimeParticle(double energy);
-
-//----------------------------------------------------------------------------//
-    double InterpolTimeParticleDiff(double energy);
+    /**
+     *  Makes Stochastic Energyloss
+     *
+     *  \param  particle_interaction    particle interaction? (false = decay)
+     *  \return energy loss [MeV]
+     */
+    double MakeStochasticLoss(bool particle_interaction, double current_energy);
 
 //----------------------------------------------------------------------------//
 
@@ -315,16 +330,6 @@ public:
      * Disables the Interpolation for advancing the particle
      */
     void DisableParticleTimeInterpolation();
-//----------------------------------------------------------------------------//
-
-    /**
-     *  Makes Stochastic Energyloss
-     *
-     *  \param  particle_interaction    particle interaction? (false = decay)
-     *  \return energy loss [MeV]
-     */
-    double MakeStochasticLoss(bool particle_interaction, double current_energy);
-
 //----------------------------------------------------------------------------//
 
     void EnableLpmEffect();
