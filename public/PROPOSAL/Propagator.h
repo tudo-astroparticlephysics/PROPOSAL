@@ -26,6 +26,7 @@
 #include "PROPOSAL/Particle.h"
 #include "PROPOSAL/MathModel.h"
 #include "PROPOSAL/ProcessCollection.h"
+#include <utility>
 
 
 class Propagator :public MathModel
@@ -66,17 +67,43 @@ public:
      *  \return energy at distance r OR -(track length)
      */
 
-    double Propagate(double distance, double energy);
+    double Propagate(double distance);
+
 //----------------------------------------------------------------------------//
 
     void swap(Propagator &propagator);
+
 //----------------------------------------------------------------------------//
+
     void InitDefaultCollection();
+
+//----------------------------------------------------------------------------//
+
+    /**
+     * Calculates the contiuous loss till the first stochastic loss happend
+     * Also caluclate the energy if the particle decay
+     * These to energys can be compared to decide if a decay or particle interaction
+     * happens
+     *
+     *  \param  initial_energy   initial energy
+     *  \return pair.first final energy befor first interaction pair.second decay
+     */
+    std::pair<double,double> CalculateEnergyTillStochastic( double initial_energy );
+
+//----------------------------------------------------------------------------//
 
     ProcessCollection* GetCollection() const
     {
         return collection_;
     }
+
+//----------------------------------------------------------------------------//
+    Particle* GetParticle() const
+    {
+        return particle_;
+    }
+
+
 
 };
 

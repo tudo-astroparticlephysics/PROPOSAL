@@ -85,27 +85,74 @@ void Propagator::InitDefaultCollection()
 }
 
 //----------------------------------------------------------------------------//
-double Propagator::Propagate(double distance, double energy)
+
+std::pair<double,double> Propagator::CalculateEnergyTillStochastic( double initial_energy )
 {
-    //int wint;
-    bool  flag;
-    double ei, ef=0, efd, displacement, efi;//, aux=0;
-    double rndd, rndi,rnddMin , rndiMin;
+    double rndd    =-  log(RandomDouble());
+    double rndi    =-  log(RandomDouble());
+
+    double rndiMin = 0;
+    double rnddMin = 0;
+
+    pair<double,double> final;
+
+    //solving the tracking integral
+    if(particle_->GetLifetime() < 0)
+    {
+        rnddMin =   0;
+    }
+    else
+    {
+        rnddMin =   collection_->CalculateTrackingIntegal(initial_energy, rndd, false)/rho_;
+    }
+
+    rndiMin =   collection_->CalculateTrackingIntegal(initial_energy, rndi, true);
+
+    //evaluating the energy loss
+    if(rndd >= rnddMin || rnddMin<=0)
+    {
+        final.second =   particle_->GetLow();
+    }
+    else
+    {
+        final.second =   collection_->CalculateFinalEnergy( initial_energy, rndd*rho_, false );
+    }
+
+    if(rndi >= rndiMin || rndiMin <= 0)
+    {
+        final.first =   particle_->GetLow();
+    }
+    else
+    {
+        final.first =   collection_->CalculateFinalEnergy( initial_energy, rndi, true );
+    }
+
+    return final;
+}
+
+//----------------------------------------------------------------------------//
+double Propagator::Propagate( double distance )
+{
+    bool    flag;
+    double  displacement;
+
+    double  initial_energy  =   particle_->GetEnergy();
+    double  final_energy    =   particle_->GetEnergy();
 
     pair<double,string> decay;
     pair<double,string> energy_loss;
 
+    //first: final energy befor first interaction second: decay
+    //first and second are compared to decide if interaction happens or decay
+    pair<double,double> energy_till_stochastic_;
 
-    ei  =   energy;
-    ef  =   ei;
 
     if(distance < 0)
     {
         distance   =   0;
     }
 
-
-    if(energy <= particle_->GetLow() || distance==0)
+    if(initial_energy <= particle_->GetLow() || distance==0)
     {
         flag    =   false;
     }
@@ -114,141 +161,41 @@ double Propagator::Propagate(double distance, double energy)
         flag    =   true;
     }
 
-    if(debug_)
-    {
-
-        cerr<<"\nPropagating "<<particle_->GetName()<<" of energy "<<ei<<" MeV to a distance of "<<distance<<" cm"<<endl;
-    }
     while(flag)
     {
+        energy_till_stochastic_ = CalculateEnergyTillStochastic( initial_energy );
 
-        rndd    =-  log(RandomDouble());
-        rndi    =-  log(RandomDouble());
-        if(debug_)
+        if(energy_till_stochastic_.first > energy_till_stochastic_.second)
         {
-            cerr<<"1. solving the tracking integral ...  rndd = "<<rndd<<"  rndi = "<<rndi<<" ...  "<<endl;
-        }
-
-        if(particle_->GetLifetime() < 0)
-        {
-            rnddMin =   0;
+            particle_interaction_   =   true;
+            final_energy            =   energy_till_stochastic_.first;
         }
         else
         {
-            rnddMin =   collection_->CalculateTrackingIntegal(ei, rndd, false)/rho_;
-        }
+            particle_interaction_   =   false;
+            final_energy            =   energy_till_stochastic_.second;
 
-        if(debug_)
-        {
-            cerr<<" \t \t \t rnddMin = "<<rnddMin<<" (d)  "<<endl;
         }
+        cout<<"efi "<<energy_till_stochastic_.first<<"\t"<<energy_till_stochastic_.second<<"\t";
 
-        rndiMin =   collection_->CalculateTrackingIntegal(ei, rndi, true);
+        cout<<final_energy<<"\t";
 
-        if(debug_)
-        {
-            cerr<<"rndiMin = "<<rndiMin<<" (i)"<<endl;
-        }
+        //Calculate the displacement according to initial energy initial_energy and final_energy
+        displacement  =   collection_->CalculateDisplacement(initial_energy, final_energy, rho_*(distance - particle_->GetPropagatedDistance())) / rho_;
 
-        if(debug_)
-        {
-            cerr<<"2. evaluating the energy loss ...  "<<endl;
-        }
-
-        if(rndd >= rnddMin || rnddMin<=0)
-        {
-            efd =   particle_->GetLow();
-        }
-        else
-        {
-            efd =   collection_->CalculateFinalEnergy(ei, rndd*rho_, false);
-        }
-
-        if(debug_)
-        {
-            cerr<<"efd = "<<efd<<" MeV  "<<endl;
-        }
-
-        if(rndi >= rndiMin || rndiMin <= 0)
-        {
-            efi =   particle_->GetLow();
-        }
-        else
-        {
-            efi =   collection_->CalculateFinalEnergy(ei, rndi, true);
-        }
-
-        if(debug_)
-        {
-            cerr<<"efi = "<<efi<<" MeV ...  "<<endl;
-        }
-        particle_interaction_    =   (efi > efd);
-        cout<<efi<<"\t"<<efd<<"\t";
-        if(particle_interaction_)
-        {
-            ef  =   efi;
-        }
-        else
-        {
-            ef  =   efd;
-        }
-        cout<<ef<<"\t";
-        if(debug_)
-        {
-            cerr<<" \t \t \t lost "<<ei-ef<<" MeV  ef = "<<ef<<" MeV"<<endl;
-        }
-
-        if(debug_)
-        {
-            cerr<<"3. calculating the displacement ...  "<<endl;
-        }
-
-        displacement  =   collection_->CalculateDisplacement(ei, ef, rho_*(distance - particle_->GetPropagatedDistance())) / rho_;
-
-        if(debug_)
-        {
-            cerr<<"displacement = "<<displacement<<" cm"<<endl;
-        }
-
-        if( displacement < distance - particle_->GetPropagatedDistance() )
-        {
-            if(debug_)
-            {
-                cerr<<"4. calculating the local time ...  "<<endl;
-            }
-        }
-        else
+        // The first interaction or decay happens behind the distance we want to propagate
+        // So we calculate the final energy using only continuous losses
+        if( displacement > distance - particle_->GetPropagatedDistance() )
         {
             displacement  =   distance - particle_->GetPropagatedDistance();
 
-            if(debug_)
-            {
-                cerr<<"4. getting the const energy ...  "<<endl;
-            }
+            final_energy  =   collection_->CalculateFinalEnergy(initial_energy, rho_*displacement);
 
-            ef  =   collection_->CalculateFinalEnergy(ei, rho_*displacement);
-            if(debug_)
-            {
-                cerr<<"lost "<<ei - ef<<" MeV  ef = "<<ef<<" MeV"<<endl;
-            }
-
-            if(debug_)
-            {
-                cerr<<"5. calculating the local time ...  "<<endl;
-            }
         }
 
-//        if(recc)
-//        {
-//            o->output(0, "a"+particle_->name, ei, displacement);
-//        }
-
-        collection_->AdvanceParticle(displacement, ei, ef);
-
-        if(debug_)
-        {
-            cerr<<"t = "<<particle_->GetT()<<" s"<<endl;
-        }
+        //Advance the Particle according to the displacement
+        //Initial energy and final energy are needed if Molier Scattering is enabled
+        collection_->AdvanceParticle(displacement, initial_energy, final_energy);
 
         if(abs(distance - particle_->GetPropagatedDistance()) < abs(distance)*COMPUTER_PRECISION)
         {
@@ -264,44 +211,41 @@ double Propagator::Propagate(double distance, double energy)
 
 //        }
 
-//        if(recc)
-//        {
-//            o->output(0, "conti", ei-ef, -displacement);
-//        }
-
-        if( ef == particle_->GetLow() || particle_->GetPropagatedDistance() == distance)
+        // Lower limit of particle energy is reached or
+        // or complete particle is propagated the whole distance
+        if( final_energy == particle_->GetLow() || particle_->GetPropagatedDistance() == distance)
         {
             break;
         }
 
-        if(debug_)
-        {
-            cerr<<"5. choosing the cross section ..."<<endl;
-        }
-
-        particle_->SetEnergy(ef);
-
+        //Set the particle energy to the current energy before making
+        //stochatic losses or decay
+        particle_->SetEnergy( final_energy );
 
         if(particle_interaction_)
         {
-            energy_loss = collection_->MakeStochasticLoss();
-            ef-=energy_loss.first;
+            energy_loss     =   collection_->MakeStochasticLoss();
+            final_energy    -=  energy_loss.first;
+
             cout<<energy_loss.first<<"\t"<<energy_loss.second<<endl;
         }
         else
         {
-            decay = collection_->MakeDecay();
-            ef = 0;
+            decay           =   collection_->MakeDecay();
+            final_energy    =   0;
+
             cout<<decay.first<<"\t"<<decay.second<<endl;
         }
 
-        if(ef <= particle_->GetLow())
+        //break if the lower limit of particle energy is reached
+        if(final_energy <= particle_->GetLow())
         {
 
             break;
         }
 
-        ei  =   ef;
+        //Next round: update the inital energy
+        initial_energy  =   final_energy;
 
     }
 
@@ -328,34 +272,19 @@ double Propagator::Propagate(double distance, double energy)
 //        }
 //    }
 
-    particle_->SetEnergy(ef);  // to remember const state of the particle
-//    o->HIST =   -1;            // to make sure user resets particle properties
+    particle_->SetEnergy(final_energy);
 
+    //Particle reached the border, final energy is returned
     if(particle_->GetPropagatedDistance()==distance)
     {
-        if(debug_)
-        {
-            cerr<<"PROPOSALParticle reached the border with energy ef = "<<ef<<" MeV";
-        }
-
-        return ef;
+        return final_energy;
     }
+    //The particle stopped/decayed, the propageted distance is return with a minus sign
     else
     {
-        if(debug_)
-        {
-            if(particle_->GetLifetime()<0)
-            {
-                cerr<<"PROPOSALParticle stopped at rf = "<<particle_->GetPropagatedDistance()<<" cm";
-            }
-            else
-            {
-                cerr<<"PROPOSALParticle disappeared at rf = "<<particle_->GetPropagatedDistance()<<" cm";
-            }
-        }
-
         return -particle_->GetPropagatedDistance();
     }
+    //Should never be here
     return 0;
 }
 
