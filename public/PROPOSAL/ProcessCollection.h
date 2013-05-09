@@ -41,7 +41,8 @@ protected:
     bool        do_weighting_;           //!< Do weigthing? Set as false in constructor
     double      weighting_order_;        //!< Re-weighting order. Set to 0 in constructor
     double      weighting_starts_at_;    //!< Distance at which re-weighting starts. Set to 0 in constructor
-
+    bool        do_time_interpolation_;  //!< If true, CalculateParticleTime is interpolated
+    bool        do_exact_time_calulation_;
 
 
     /*!
@@ -63,6 +64,8 @@ protected:
     Integral*           integral_;
     EnergyCutSettings*  cut_settings_;
 
+    Integral*           time_particle_;
+
     std::vector<CrossSections*> crosssections_;
     Decay* decay_;
     Integral* prop_decay_;
@@ -71,6 +74,9 @@ protected:
     Interpolant *interpol_prop_decay_diff_;      //!< Interpolate object of the function FunctionToPropIntegralDecay
     Interpolant *interpol_prop_interaction_;     //!< Interpolate object of the Integral of the function FunctionToPropIntegralInteraction
     Interpolant *interpol_prop_interaction_diff_;//!< Interpolate object of the function FunctionToPropIntegralInteraction
+
+    Interpolant *interpol_time_particle_;
+    Interpolant *interpol_time_particle_diff_;
 
 public:
 
@@ -97,7 +103,14 @@ public:
     void swap(ProcessCollection &collection);
 
 //----------------------------------------------------------------------------//
+    /*!
+    * function for time delta calculation - interface to Integral
+    *
+    */
 
+    double FunctionToTimeIntegral(double E);
+
+//----------------------------------------------------------------------------//
 
     /*!
     * function for range calculation for given energy - interface to Integral;
@@ -187,6 +200,31 @@ public:
 
 //----------------------------------------------------------------------------//
     /*!
+    * time delta, corresponding to the given propagation distance
+    *
+    * \param    ei  initial energy
+    * \param    ef  final energy
+    * \return   time delta
+    */
+
+    double CalculateParticleTime(double ei, double ef);
+
+//----------------------------------------------------------------------------//
+
+    /*!
+    * advances the particle by the given distance
+    * Sets the x,y and z coordinates of particle_
+    * and its time and propagation distance
+    *
+    * \param    dr  flight distance
+    * \param    ei  initial energy
+    * \param    ef  final energy
+    */
+
+    void AdvanceParticle(double dr, double ei, double ef);
+
+//----------------------------------------------------------------------------//
+    /*!
     1d parametrization ;
     \f[return= \int_{e}^{e_{low}} f(E) dE \f] with \f$
     e_{low} \f$ energy below which the particle is lost
@@ -216,14 +254,27 @@ public:
 //----------------------------------------------------------------------------//
     double InterpolPropInteractionDiff(double energy);
 
-//----------------------------------------------------------------------------//   
+//----------------------------------------------------------------------------//
+    double InterpolTimeParticle(double energy);
+
+//----------------------------------------------------------------------------//
+    double InterpolTimeParticleDiff(double energy);
+
+//----------------------------------------------------------------------------//
+
     /**
      * Enables the Interpolation including dEdx and dNdx for
      * every crosssection in vector crosssections_
      */
     void EnableInterpolation();
-
 //----------------------------------------------------------------------------//
+
+    /**
+     * Enables the Interpolation for advancing the particle
+     */
+    void EnableParticleTimeInterpolation();
+//----------------------------------------------------------------------------//
+
     /**
      * Enables the dEdx Interpolation for every crosssection in vector
      * crosssections_
@@ -259,6 +310,13 @@ public:
     void DisableInterpolation();
 
 //----------------------------------------------------------------------------//
+
+    /**
+     * Disables the Interpolation for advancing the particle
+     */
+    void DisableParticleTimeInterpolation();
+//----------------------------------------------------------------------------//
+
     /**
      *  Makes Stochastic Energyloss
      *
