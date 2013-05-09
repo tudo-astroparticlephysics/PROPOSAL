@@ -160,8 +160,8 @@ int main(){
 
     Propagator* pr = new Propagator();
     pr->GetCollection()->EnableInterpolation();
-    for(int i =0;i<100;i++){
-        cout<<pr->Propagate(1e5,1e5)<<endl;
+    for(int i =0;i<1;i++){
+        cout<<pr->Propagate(1e4 ,1e3)<<endl;
         //  pr->Propagate(1e5,1e5);
       //  cout<<pr->GetCollection()->MakeStochasticLoss(true,1e4)<<endl;
     }

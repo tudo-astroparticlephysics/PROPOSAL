@@ -19,7 +19,7 @@
 using namespace std;
 
 Particle::Particle( )
-    :propagation_distance_  ( 0 )
+    :propagated_distance_   ( 0 )
     ,x_                     ( 0 )
     ,y_                     ( 0 )
     ,z_                     ( 0 )
@@ -64,7 +64,7 @@ Particle::Particle( )
 //----------------------------------------------------------------------------//
 
 Particle::Particle(const Particle& particle)
-    :propagation_distance_  ( particle.propagation_distance_ )
+    :propagated_distance_   ( particle.propagated_distance_ )
     ,x_                     ( particle.x_ )
     ,y_                     ( particle.y_ )
     ,z_                     ( particle.z_ )
@@ -121,7 +121,7 @@ Particle::Particle(int parent_particle_id,
                    double prop_dist,
                    Particle *p)
 
-    :propagation_distance_  ( prop_dist )
+    :propagated_distance_   ( prop_dist )
     ,x_                     ( x )
     ,y_                     ( y )
     ,z_                     ( z )
@@ -222,7 +222,7 @@ Particle::Particle(int parent_particle_id,
                    double t,
                    double prop_dist)
 
-    :propagation_distance_  ( prop_dist )
+    :propagated_distance_   ( prop_dist )
     ,x_                     ( x )
     ,y_                     ( y )
     ,z_                     ( z )
@@ -303,7 +303,7 @@ Particle::Particle(string name,
                    double energy,
                    double t)
 
-    :propagation_distance_  ( 0 )
+    :propagated_distance_   ( 0 )
     ,x_                     ( x )
     ,y_                     ( y )
     ,z_                     ( z )
@@ -384,7 +384,7 @@ Particle& Particle::operator=(const Particle &particle){
 //----------------------------------------------------------------------------//
 bool Particle::operator==(const Particle &particle) const
 {
-    if(  propagation_distance_  != particle.propagation_distance_)  return false;
+    if(  propagated_distance_   != particle.propagated_distance_)   return false;
     if(  x_                     != particle.x_)                     return false;
     if(  y_                     != particle.y_)                     return false;
     if(  z_                     != particle.z_)                     return false;
@@ -586,7 +586,7 @@ void Particle::Location(double time,
                         double theta,
                         double phi)
 {
-    //propagation_distance_ = 0; <--- seems to be wrong
+    //propagated_distance_ = 0; <--- seems to be wrong
     t_           =   time;
     x_           =   x;
     y_           =   y;
@@ -606,7 +606,7 @@ void Particle::swap(Particle &particle)
 {
     using std::swap;
 
-    swap( propagation_distance_  , particle.propagation_distance_);
+    swap( propagated_distance_   , particle.propagated_distance_);
     swap( x_                     , particle.x_);
     swap( y_                     , particle.y_);
     swap( z_                     , particle.z_);
@@ -663,9 +663,9 @@ void Particle::SetEnergy(double e)
 }
 
 //----------------------------------------------------------------------------//
-void Particle::SetPropagationDistance(double prop_dist)
+void Particle::SetPropagatedDistance(double prop_dist)
 {
-    propagation_distance_ = prop_dist;
+    propagated_distance_ = prop_dist;
 }
 //----------------------------------------------------------------------------//
 void Particle::SetX(double x)

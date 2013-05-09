@@ -8,6 +8,7 @@
 #include "PROPOSAL/Propagator.h"
 #include "PROPOSAL/Constants.h"
 #include <cmath>
+#include <utility>
 
 
 using namespace std;
@@ -89,8 +90,11 @@ double Propagator::Propagate(double distance, double energy)
     //int wint;
     bool  flag;
     double ei, ef=0, efd, displacement, efi;//, aux=0;
-    double energy_loss;
     double rndd, rndi,rnddMin , rndiMin;
+
+    pair<double,string> decay;
+    pair<double,string> energy_loss;
+
 
     ei  =   energy;
     ef  =   ei;
@@ -188,7 +192,7 @@ double Propagator::Propagate(double distance, double energy)
         {
             ef  =   efd;
         }
-
+        cout<<ef<<"\t";
         if(debug_)
         {
             cerr<<" \t \t \t lost "<<ei-ef<<" MeV  ef = "<<ef<<" MeV"<<endl;
@@ -199,14 +203,14 @@ double Propagator::Propagate(double distance, double energy)
             cerr<<"3. calculating the displacement ...  "<<endl;
         }
 
-        displacement  =   collection_->CalculateDisplacement(ei, ef, rho_*(distance - particle_->GetPropagationDistance())) / rho_;
+        displacement  =   collection_->CalculateDisplacement(ei, ef, rho_*(distance - particle_->GetPropagatedDistance())) / rho_;
 
         if(debug_)
         {
             cerr<<"displacement = "<<displacement<<" cm"<<endl;
         }
 
-        if( displacement < distance - particle_->GetPropagationDistance() )
+        if( displacement < distance - particle_->GetPropagatedDistance() )
         {
             if(debug_)
             {
@@ -215,7 +219,7 @@ double Propagator::Propagate(double distance, double energy)
         }
         else
         {
-            displacement  =   distance - particle_->GetPropagationDistance();
+            displacement  =   distance - particle_->GetPropagatedDistance();
 
             if(debug_)
             {
@@ -233,23 +237,22 @@ double Propagator::Propagate(double distance, double energy)
                 cerr<<"5. calculating the local time ...  "<<endl;
             }
         }
-        cout<<ef<<endl;
 
 //        if(recc)
 //        {
 //            o->output(0, "a"+particle_->name, ei, displacement);
 //        }
 
-//        particle_->advance(displacement, ei, ef);
+        collection_->AdvanceParticle(displacement, ei, ef);
 
         if(debug_)
         {
             cerr<<"t = "<<particle_->GetT()<<" s"<<endl;
         }
 
-        if(abs(distance - particle_->GetPropagationDistance()) < abs(distance)*COMPUTER_PRECISION)
+        if(abs(distance - particle_->GetPropagatedDistance()) < abs(distance)*COMPUTER_PRECISION)
         {
-            particle_->SetPropagationDistance( distance );  // computer precision control
+            particle_->SetPropagatedDistance( distance );  // computer precision control
         }
 
 //        if(contiCorr)
@@ -266,7 +269,7 @@ double Propagator::Propagate(double distance, double energy)
 //            o->output(0, "conti", ei-ef, -displacement);
 //        }
 
-        if( ef == particle_->GetLow() || particle_->GetPropagationDistance() == distance)
+        if( ef == particle_->GetLow() || particle_->GetPropagatedDistance() == distance)
         {
             break;
         }
@@ -276,8 +279,22 @@ double Propagator::Propagate(double distance, double energy)
             cerr<<"5. choosing the cross section ..."<<endl;
         }
 
-        energy_loss = collection_->MakeStochasticLoss(particle_interaction_ , ef);
-        if(energy_loss<0)cout<<"UUUU"<<endl;
+        particle_->SetEnergy(ef);
+
+
+        if(particle_interaction_)
+        {
+            energy_loss = collection_->MakeStochasticLoss();
+            ef-=energy_loss.first;
+            cout<<energy_loss.first<<"\t"<<energy_loss.second<<endl;
+        }
+        else
+        {
+            decay = collection_->MakeDecay();
+            ef = 0;
+            cout<<decay.first<<"\t"<<decay.second<<endl;
+        }
+
         if(ef <= particle_->GetLow())
         {
 
@@ -314,7 +331,7 @@ double Propagator::Propagate(double distance, double energy)
     particle_->SetEnergy(ef);  // to remember const state of the particle
 //    o->HIST =   -1;            // to make sure user resets particle properties
 
-    if(particle_->GetPropagationDistance()==distance)
+    if(particle_->GetPropagatedDistance()==distance)
     {
         if(debug_)
         {
@@ -329,15 +346,15 @@ double Propagator::Propagate(double distance, double energy)
         {
             if(particle_->GetLifetime()<0)
             {
-                cerr<<"PROPOSALParticle stopped at rf = "<<particle_->GetPropagationDistance()<<" cm";
+                cerr<<"PROPOSALParticle stopped at rf = "<<particle_->GetPropagatedDistance()<<" cm";
             }
             else
             {
-                cerr<<"PROPOSALParticle disappeared at rf = "<<particle_->GetPropagationDistance()<<" cm";
+                cerr<<"PROPOSALParticle disappeared at rf = "<<particle_->GetPropagatedDistance()<<" cm";
             }
         }
 
-        return -particle_->GetPropagationDistance();
+        return -particle_->GetPropagatedDistance();
     }
     return 0;
 }

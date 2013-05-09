@@ -26,7 +26,7 @@ class Particle
 
 private:
 
-    double propagation_distance_;//!< propagation distance [cm]
+    double propagated_distance_; //!< propagation distance [cm]
     double x_;                   //!< x-coordinate [cm]
     double y_;                   //!< y-coordinate [cm]
     double z_;                   //!< z-coordinate [cm]
@@ -221,7 +221,7 @@ public:
     //Setter
 
     void SetEnergy(double e);
-    void SetPropagationDistance(double prop_dist);
+    void SetPropagatedDistance(double prop_dist);
     void SetX(double x);
     void SetY(double y);
     void SetZ(double z);
@@ -263,7 +263,7 @@ public:
 
     double GetEnergy() const{return energy_;}
 //----------------------------------------------------------------------------//
-    double GetPropagationDistance() const{return propagation_distance_;}
+    double GetPropagatedDistance() const{return propagated_distance_;}
 //----------------------------------------------------------------------------//
     double GetX() const{return x_;}
 //----------------------------------------------------------------------------//

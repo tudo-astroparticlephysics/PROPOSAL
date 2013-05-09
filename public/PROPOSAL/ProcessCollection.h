@@ -21,6 +21,7 @@
 #include "PROPOSAL/EnergyCutSettings.h"
 #include "PROPOSAL/Interpolant.h"
 #include <vector>
+#include <utility>
 
 
 
@@ -43,6 +44,7 @@ protected:
     double      weighting_starts_at_;    //!< Distance at which re-weighting starts. Set to 0 in constructor
     bool        do_time_interpolation_;  //!< If true, CalculateParticleTime is interpolated
     bool        do_exact_time_calulation_;
+    double      density_correction_;     //!< density correction factor
 
 
     /*!
@@ -270,13 +272,20 @@ public:
     /**
      *  Makes Stochastic Energyloss
      *
-     *  \param  particle_interaction    particle interaction? (false = decay)
-     *  \return energy loss [MeV]
+     *  \return pair of energy loss [MeV] and kind of interaction
      */
-    double MakeStochasticLoss(bool particle_interaction, double current_energy);
+    std::pair<double,std::string> MakeStochasticLoss();
 
 //----------------------------------------------------------------------------//
 
+    /**
+     *  Makes Decay
+     *
+     *  \return pair of product energy [MeV] and kind of product
+     */
+    std::pair<double,std::string> MakeDecay();
+
+//----------------------------------------------------------------------------//
     /**
      * Enables the Interpolation including dEdx and dNdx for
      * every crosssection in vector crosssections_
