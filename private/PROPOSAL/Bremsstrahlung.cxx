@@ -232,7 +232,7 @@ double Bremsstrahlung::CalculatedEdx(){
 
 double Bremsstrahlung::CalculatedNdx(){
 
-    double sum;
+    double sum=0.0;
     if(multiplier_<=0)
     {
         return 0;
