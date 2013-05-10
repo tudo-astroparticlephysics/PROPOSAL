@@ -23,76 +23,6 @@ using namespace std;
 
 
 
-double ProcessCollection::CalculateParticleTime(double ei, double ef)
-{
-    if(do_time_interpolation_)
-    {
-        if(abs(ei-ef) > abs(ei)*HALF_PRECISION)
-        {
-            double aux  =   interpol_time_particle_->Interpolate(ei);
-            double aux2 =   aux - interpol_time_particle_->Interpolate(ef);
-
-            if(abs(aux2) > abs(aux)*HALF_PRECISION)
-            {
-                return aux2;
-            }
-        }
-
-        return interpol_time_particle_diff_->Interpolate( (ei+ef)/2 )*(ef-ei);
-    }
-    else
-    {
-        return time_particle_->Integrate(ei, ef, boost::bind(&ProcessCollection::FunctionToTimeIntegral, this, _1),4);
-    }
-}
-
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-void ProcessCollection::AdvanceParticle(double dr, double ei, double ef)
-{
-
-    double dist = particle_->GetPropagatedDistance();
-    double time = particle_->GetT();
-    double x    = particle_->GetX();
-    double y    = particle_->GetY();
-    double z    = particle_->GetZ();
-
-    dist   +=  dr;
-
-    if(do_exact_time_calulation_)
-    {
-        time   +=  CalculateParticleTime(ei, ef)/density_correction_;
-    }
-    else
-    {
-        time   +=  dr/SPEED;
-    }
-
-
-//    if(propagate_->get_molieScat())
-//    Implement the Molie Scattering here see PROPOSALParticle::advance of old version
-
-//    else
-//    {
-    x   +=  particle_->GetSinTheta() * particle_->GetCosPhi() * dr;
-    y   +=  particle_->GetSinTheta() * particle_->GetSinPhi() * dr;
-    z   +=  particle_->GetCosTheta() * dr;
-
-    particle_->SetPropagatedDistance(dist);
-    particle_->SetT(time);
-    particle_->SetX(x);
-    particle_->SetY(y);
-    particle_->SetZ(z);
-
-}
-
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
 
 double ProcessCollection::CalculateDisplacement(double ei, double ef, double dist)
 {
@@ -467,8 +397,6 @@ void ProcessCollection::EnableInterpolation()
 
     particle_->SetEnergy(energy);
 
-    EnableParticleTimeInterpolation();
-
     do_interpolation_=true;
 
 }
@@ -503,40 +431,6 @@ void ProcessCollection::EnableDNdxInterpolation()
         cout<<"dNdx for "<<crosssections_.at(i)->GetName()<<" interpolated"<<endl;
 
     }
-}
-
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-void ProcessCollection::EnableParticleTimeInterpolation()
-{
-    if(do_time_interpolation_)return;
-
-    double energy = particle_->GetEnergy();
-
-    interpol_time_particle_         =   new Interpolant(NUM3, particle_->GetLow(), BIGENERGY, boost::bind(&ProcessCollection::InterpolTimeParticle, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
-    interpol_time_particle_diff_    =   new Interpolant(NUM3, particle_->GetLow(), BIGENERGY, boost::bind(&ProcessCollection::InterpolTimeParticleDiff, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
-
-    particle_->SetEnergy(energy);
-    do_time_interpolation_ =true;
-}
-
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-void ProcessCollection::DisableParticleTimeInterpolation()
-{
-    delete interpol_time_particle_;
-    delete interpol_time_particle_diff_;
-
-    interpol_time_particle_         = NULL;
-    interpol_time_particle_diff_    = NULL;
-
-    do_time_interpolation_ =false;
 }
 
 
@@ -633,9 +527,6 @@ ProcessCollection::ProcessCollection()
     ,do_weighting_              ( false )
     ,weighting_order_           ( 0 )
     ,weighting_starts_at_       ( 0 )
-    ,do_time_interpolation_     ( false )
-    ,do_exact_time_calulation_  ( false )
-    ,density_correction_        ( 1. )
     ,up_                        ( false )
     ,bigLow_                    ( 2,0 )
     ,storeDif_                  ( 2,0 )
@@ -651,14 +542,11 @@ ProcessCollection::ProcessCollection()
     prop_decay_                     = new Integral();
     prop_interaction_               = new Integral();
     decay_                          = new Decay();
-    time_particle_                  = new Integral();
 
     interpol_prop_decay_            = NULL;
     interpol_prop_decay_diff_       = NULL;
     interpol_prop_interaction_      = NULL;
     interpol_prop_interaction_diff_ = NULL;
-    interpol_time_particle_         = NULL;
-    interpol_time_particle_diff_    = NULL;
 
 }
 
@@ -677,9 +565,6 @@ ProcessCollection::ProcessCollection(const ProcessCollection &collection)
     ,do_weighting_              ( collection.do_weighting_ )
     ,weighting_order_           ( collection.weighting_order_ )
     ,weighting_starts_at_       ( collection.weighting_starts_at_ )
-    ,do_time_interpolation_     ( collection.do_time_interpolation_ )
-    ,do_exact_time_calulation_  ( collection.do_exact_time_calulation_ )
-    ,density_correction_        ( collection.density_correction_ )
     ,up_                        ( collection.up_)
     ,bigLow_                    ( collection.bigLow_ )
     ,storeDif_                  ( collection.storeDif_ )
@@ -687,7 +572,6 @@ ProcessCollection::ProcessCollection(const ProcessCollection &collection)
     ,medium_                    ( new Medium( *collection.medium_) )
     ,integral_                  ( new Integral(*collection.integral_) )
     ,cut_settings_              ( new EnergyCutSettings(*collection.cut_settings_) )
-    ,time_particle_             ( new Integral(*collection.time_particle_) )
     ,decay_                     ( new Decay(*collection.decay_) )
     ,prop_decay_                ( new Integral(*collection.prop_decay_) )
     ,prop_interaction_          ( new Integral(*collection.prop_interaction_) )
@@ -773,23 +657,6 @@ ProcessCollection::ProcessCollection(const ProcessCollection &collection)
         interpol_prop_interaction_diff_ = NULL;
     }
 
-    if(collection.interpol_time_particle_ != NULL)
-    {
-        interpol_time_particle_ = new Interpolant(*collection.interpol_time_particle_) ;
-    }
-    else
-    {
-        interpol_time_particle_ = NULL;
-    }
-
-    if(collection.interpol_time_particle_diff_ != NULL)
-    {
-        interpol_time_particle_diff_ = new Interpolant(*collection.interpol_time_particle_diff_) ;
-    }
-    else
-    {
-        interpol_time_particle_diff_ = NULL;
-    }
 }
 
 
@@ -806,9 +673,6 @@ ProcessCollection::ProcessCollection(Particle *particle, Medium *medium, EnergyC
     ,do_weighting_              ( false )
     ,weighting_order_           ( 0 )
     ,weighting_starts_at_       ( 0 )
-    ,do_time_interpolation_     ( false )
-    ,do_exact_time_calulation_  ( false )
-    ,density_correction_        ( 1. )
     ,up_                        ( false )
     ,bigLow_                    ( 2,0 )
     ,storeDif_                  ( 2,0 )
@@ -821,7 +685,6 @@ ProcessCollection::ProcessCollection(Particle *particle, Medium *medium, EnergyC
     integral_           =   new Integral(IROMB, IMAXS, IPREC2);
     prop_decay_         =   new Integral(IROMB, IMAXS, IPREC2);
     prop_interaction_   =   new Integral(IROMB, IMAXS, IPREC2);
-    time_particle_      =   new Integral(IROMB, IMAXS, IPREC2);
 
     crosssections_.resize(4);
     crosssections_.at(0) = new Ionization(particle_, medium_, cut_settings_);
@@ -837,8 +700,7 @@ ProcessCollection::ProcessCollection(Particle *particle, Medium *medium, EnergyC
     interpol_prop_decay_diff_       = NULL;
     interpol_prop_interaction_      = NULL;
     interpol_prop_interaction_diff_ = NULL;
-    interpol_time_particle_         = NULL;
-    interpol_time_particle_diff_    = NULL;
+
 
 
 }
@@ -878,16 +740,12 @@ bool ProcessCollection::operator==(const ProcessCollection &collection) const
     if( *medium_                   != *collection.medium_ )                 return false;
     if( *integral_                 != *collection.integral_ )               return false;
     if( *cut_settings_             != *collection.cut_settings_ )           return false;
-    if( *time_particle_            != *collection.time_particle_ )          return false;
     if( *prop_decay_               != *collection.prop_decay_ )             return false;
     if( *prop_interaction_         != *collection.prop_interaction_ )       return false;
     if( up_                        != collection.up_)                       return false;
     if( do_weighting_              != collection.do_weighting_ )            return false;
     if( weighting_order_           != collection.weighting_order_ )         return false;
     if( weighting_starts_at_       != collection.weighting_starts_at_ )     return false;
-    if( do_time_interpolation_     != collection.do_time_interpolation_ )   return false;
-    if( do_exact_time_calulation_  != collection.do_exact_time_calulation_ )return false;
-    if( density_correction_        != collection.density_correction_ )      return false;
     if( *decay_                    != *collection.decay_ )                  return false;
 
     if( crosssections_.size()      != collection.crosssections_.size() )    return false;
@@ -965,17 +823,7 @@ bool ProcessCollection::operator==(const ProcessCollection &collection) const
     }
     else if( interpol_prop_interaction_diff_ != collection.interpol_prop_interaction_diff_)     return false;
 
-    if( interpol_time_particle_diff_ != NULL && collection.interpol_time_particle_diff_ != NULL)
-    {
-        if( *interpol_time_particle_diff_   != *collection.interpol_time_particle_diff_)        return false;
-    }
-    else if( interpol_time_particle_diff_ != collection.interpol_time_particle_diff_)           return false;
 
-    if( interpol_time_particle_ != NULL && collection.interpol_time_particle_ != NULL)
-    {
-        if( *interpol_time_particle_   != *collection.interpol_time_particle_)                  return false;
-    }
-    else if( interpol_time_particle_ != collection.interpol_time_particle_)                     return false;
     //else
     return true;
 }
@@ -1017,9 +865,6 @@ void ProcessCollection::swap(ProcessCollection &collection)
     swap( do_weighting_              , collection.do_weighting_ );
     swap( weighting_order_           , collection.weighting_order_ );
     swap( weighting_starts_at_       , collection.weighting_starts_at_ );
-    swap( do_time_interpolation_     , collection.do_time_interpolation_ );
-    swap( do_exact_time_calulation_  , collection.do_exact_time_calulation_ );
-    swap( density_correction_        , collection.density_correction_ );
 
     particle_->swap( *collection.particle_ );       //particle pointer swap
     medium_->swap( *collection.medium_ );
@@ -1029,7 +874,6 @@ void ProcessCollection::swap(ProcessCollection &collection)
     prop_decay_->swap( *collection.prop_decay_ );
     prop_interaction_->swap( *collection.prop_interaction_ );
     decay_->swap(*collection.decay_);               //particle pointer swap
-    time_particle_->swap(*collection.time_particle_ );
 
     storeDif_.swap(collection.storeDif_);
     bigLow_.swap(collection.bigLow_);
@@ -1137,38 +981,7 @@ void ProcessCollection::swap(ProcessCollection &collection)
         interpol_prop_interaction_diff_ = NULL;
     }
 
-    if( interpol_time_particle_ != NULL && collection.interpol_time_particle_ != NULL)
-    {
-        interpol_time_particle_->swap(*collection.interpol_time_particle_);
-    }
-    else if( interpol_time_particle_ == NULL && collection.interpol_time_particle_ != NULL)
-    {
-        interpol_time_particle_ = new Interpolant(*collection.interpol_time_particle_);
-        collection.interpol_time_particle_ = NULL;
-    }
-    else if( interpol_time_particle_ != NULL && collection.interpol_time_particle_ == NULL)
-    {
-        collection.interpol_time_particle_ = new Interpolant(*interpol_time_particle_);
-        interpol_time_particle_ = NULL;
-    }
-
-    if( interpol_time_particle_diff_ != NULL && collection.interpol_time_particle_diff_ != NULL)
-    {
-        interpol_time_particle_diff_->swap(*collection.interpol_time_particle_diff_);
-    }
-    else if( interpol_time_particle_diff_ == NULL && collection.interpol_time_particle_diff_ != NULL)
-    {
-        interpol_time_particle_diff_ = new Interpolant(*collection.interpol_time_particle_diff_);
-        collection.interpol_time_particle_diff_ = NULL;
-    }
-    else if( interpol_time_particle_diff_ != NULL && collection.interpol_time_particle_diff_ == NULL)
-    {
-        collection.interpol_time_particle_diff_ = new Interpolant(*interpol_time_particle_diff_);
-        interpol_time_particle_diff_ = NULL;
-    }
 }
-
-
 
 
 
@@ -1246,22 +1059,7 @@ double ProcessCollection::InterpolPropInteractionDiff(double energy)
 }
 
 
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-double ProcessCollection::InterpolTimeParticle(double energy)
-{
-    return FunctionToTimeIntegral(energy);
-}
 
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-double ProcessCollection::InterpolTimeParticleDiff(double energy)
-{
-    return time_particle_->Integrate(energy, particle_->GetLow(), boost::bind(&ProcessCollection::FunctionToTimeIntegral, this, _1),4);
-}
 
 
 
@@ -1353,20 +1151,6 @@ double ProcessCollection::FunctionToIntegral(double energy)
 }
 
 
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-
-double ProcessCollection::FunctionToTimeIntegral(double energy)
-{
-    double aux;
-
-    aux     =   FunctionToIntegral(energy);
-    aux     *=  particle_->GetEnergy()/(particle_->GetMomentum()*SPEED);
-
-    return aux;
-}
 
 
 

@@ -32,15 +32,37 @@
 class Propagator :public MathModel
 {
 private:
+    int  order_of_interpolation_;
     bool debug_;
     bool particle_interaction_;     //!< particle interaction? (false = decay)
-    double rho_;                    //!< multiplicative medium density correction factor ????????????????????????????????????
+    double density_correction_;     //!< density correction factor
+    bool do_time_interpolation_;    //!< If true, CalculateParticleTime is interpolated
+    bool do_exact_time_calulation_;
+
 
     Particle* particle_;
     ProcessCollection *collection_;
 
+    Interpolant* interpol_time_particle_;
+    Interpolant* interpol_time_particle_diff_;
+
+    Integral*    time_particle_;
 
 
+//----------------------------------------------------------------------------//
+    /*!
+    * function for time delta calculation - interface to Integral
+    *
+    */
+
+    double FunctionToTimeIntegral(double E);
+
+//----------------------------------------------------------------------------//
+
+    double InterpolTimeParticle(double energy);
+
+//----------------------------------------------------------------------------//
+    double InterpolTimeParticleDiff(double energy);
 
 public:
 
@@ -71,6 +93,30 @@ public:
 
 //----------------------------------------------------------------------------//
 
+    /*!
+    * advances the particle by the given distance
+    * Sets the x,y and z coordinates of particle_
+    * and its time and propagation distance
+    *
+    * \param    dr  flight distance
+    * \param    ei  initial energy
+    * \param    ef  final energy
+    */
+
+    void AdvanceParticle(double dr, double ei, double ef);
+
+//----------------------------------------------------------------------------//
+    /*!
+    * time delta, corresponding to the given propagation distance
+    *
+    * \param    ei  initial energy
+    * \param    ef  final energy
+    * \return   time delta
+    */
+
+    double CalculateParticleTime(double ei, double ef);
+
+//----------------------------------------------------------------------------//
     void swap(Propagator &propagator);
 
 //----------------------------------------------------------------------------//
@@ -79,16 +125,35 @@ public:
 
 //----------------------------------------------------------------------------//
 
+    void EnableInterpolation();
+
+//----------------------------------------------------------------------------//
+
+    /**
+     * Disables the Interpolation for calculation the exact particle time
+     */
+    void DisableParticleTimeInterpolation();
+//----------------------------------------------------------------------------//
+
+    /**
+     * Enables the Interpolation for calculation the exact particle time
+     */
+    void EnableParticleTimeInterpolation();
+//----------------------------------------------------------------------------//
+
     /**
      * Calculates the contiuous loss till the first stochastic loss happend
-     * Also caluclate the energy if the particle decay
+     * and subtract it from initial energy
+     * Also caluclate the energy at which the particle decay
      * These to energys can be compared to decide if a decay or particle interaction
      * happens
      *
      *  \param  initial_energy   initial energy
-     *  \return pair.first final energy befor first interaction pair.second decay
+     *  \return pair.first final energy befor first interaction pair.second decay energy at which the
+     *          particle decay
      */
     std::pair<double,double> CalculateEnergyTillStochastic( double initial_energy );
+
 
 //----------------------------------------------------------------------------//
 

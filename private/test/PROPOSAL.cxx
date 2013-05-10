@@ -157,12 +157,13 @@ using namespace std;
 //}
 
 int main(){
-
+    double pr_result;
     Propagator* pr = new Propagator();
-    pr->GetCollection()->EnableInterpolation();
+    pr->EnableInterpolation();
     for(int i =0;i<1;i++){
         pr->GetParticle()->SetEnergy(1e8);
-        cout<<pr->Propagate(1e4)<<endl;
+        pr_result=pr->Propagate(1e4);
+        cout<<" --------\t"<<pr_result<<"\t"<<pr->GetParticle()->GetEnergy()<<"\t"<<pr->GetParticle()->GetT()<<endl;
         //  pr->Propagate(1e5,1e5);
       //  cout<<pr->GetCollection()->MakeStochasticLoss(true,1e4)<<endl;
     }
