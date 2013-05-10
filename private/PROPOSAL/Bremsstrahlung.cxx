@@ -232,7 +232,6 @@ double Bremsstrahlung::CalculatedEdx(){
 
 double Bremsstrahlung::CalculatedNdx(){
 
-    double sum=0.0;
     if(multiplier_<=0)
     {
         return 0;
@@ -252,7 +251,7 @@ double Bremsstrahlung::CalculatedNdx(){
             SetIntegralLimits(i);
             prob_for_component_.at(i)    =  dndx_integral_.at(i)->Integrate(vUp_, vMax_, boost::bind(&Bremsstrahlung::FunctionToDNdxIntegral, this, _1),4);
         }
-        sum    +=  prob_for_component_.at(i);
+        sum_of_rates_    +=  prob_for_component_.at(i);
 
 
     }
