@@ -5,6 +5,9 @@
 
 using namespace std;
 
+namespace po	= boost::program_options;
+
+
 Epairproduction::Epairproduction()
     :component_             ( 0 )
     ,v_                     ( 0 )
@@ -808,6 +811,22 @@ double Epairproduction::FunctionToBuildEpairInterpolant(double energy , double v
     v   =   vUp_*exp(v*log(vMax_/vUp_));
 
     return EPair(v, component_);
+}
+
+//----------------------------------------------------------------------------//
+
+
+boost::program_options::options_description Epairproduction::CreateOptions()
+{
+    po::options_description epairproduction("Epairproduction options");
+    epairproduction.add_options()
+        ("epairproduction.lpm",              po::value<bool>(&lpm_effect_enabled_)->implicit_value(false),     "Enables   Landau-Pomeranchuk-Migdal supression")
+        ("epairproduction.interpol_dedx",    po::value<bool>(&do_dedx_Interpolation_)->implicit_value(false),  "Enables interpolation for dEdx")
+        ("epairproduction.interpol_dndx",    po::value<bool>(&do_dndx_Interpolation_)->implicit_value(false),  "Enables interpolation for dNdx")
+        ("epairproduction.multiplier",       po::value<double>(&multiplier_)->default_value(1.),               "modify the cross section by this factor")
+        ("epairproduction.interpol_order",   po::value<int>(&order_of_interpolation_)->default_value(5),       "number of interpolation points");
+
+   return epairproduction;
 }
 
 //----------------------------------------------------------------------------//

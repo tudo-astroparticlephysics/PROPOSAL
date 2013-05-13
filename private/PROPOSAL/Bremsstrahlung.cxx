@@ -3,8 +3,12 @@
 #include <iostream>
 #include <cmath>
 #include <algorithm>
+#include <boost/program_options.hpp>
 
 using namespace std;
+
+namespace po	= boost::program_options;
+
 
 Bremsstrahlung::Bremsstrahlung( )
     :CrossSections          ( )
@@ -922,6 +926,26 @@ double Bremsstrahlung::FunctionToBuildDNdxInterpolant2D(double energy , double v
     return dndx_integral_.at(component_)->Integrate(vUp_, v, boost::bind(&Bremsstrahlung::FunctionToDNdxIntegral, this, _1),4);
 }
 
+
+
+//----------------------------------------------------------------------------//
+
+
+boost::program_options::options_description Bremsstrahlung::CreateOptions()
+{
+    po::options_description bremsstrahlung("Bremsstrahlung options");
+    bremsstrahlung.add_options()
+        ("bremsstrahlung.lorenz",           po::value<bool>(&lorenz_)->implicit_value(false),                 "enable lorenz cut")
+        ("bremsstrahlung.lorenzCut",        po::value<double>(&lorenz_cut_)->default_value(1e6),              "lorenz cut in MeV")
+        ("bremsstrahlung.para",             po::value<int>(&parametrization_)->default_value(1),              "1 = Kelner-Kakoulin-Petrukhin \n2 = Andreev-Bezrukov-Bugaev \n3 = Petrukhin-Shestakov \n4 = Complete Screening Case")
+        ("bremsstrahlung.lpm",              po::value<bool>(&lpm_effect_enabled_)->implicit_value(false),     "Enables   Landau-Pomeranchuk-Migdal supression")
+        ("bremsstrahlung.interpol_dedx",    po::value<bool>(&do_dedx_Interpolation_)->implicit_value(false),  "Enables interpolation for dEdx")
+        ("bremsstrahlung.interpol_dndx",    po::value<bool>(&do_dndx_Interpolation_)->implicit_value(false),  "Enables interpolation for dNdx")
+        ("bremsstrahlung.multiplier",       po::value<double>(&multiplier_)->default_value(1.),               "modify the cross section by this factor")
+        ("bremsstrahlung.interpol_order",   po::value<int>(&order_of_interpolation_)->default_value(5),       "number of interpolation points");
+
+   return bremsstrahlung;
+}
 
 
 //----------------------------------------------------------------------------//

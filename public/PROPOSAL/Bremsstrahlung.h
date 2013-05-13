@@ -185,6 +185,8 @@ public:
 
 //--------------------------------------------------------------------------- //
 
+    boost::program_options::options_description CreateOptions();
+
     ~Bremsstrahlung();
 
 	int GetComponent() const {

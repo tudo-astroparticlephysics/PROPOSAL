@@ -3,6 +3,9 @@
 
 using namespace std;
 
+namespace po	= boost::program_options;
+
+
 Photonuclear::Photonuclear()
     :component_             ( 0 )
     ,init_measured_         ( true )
@@ -1459,6 +1462,23 @@ double Photonuclear::FunctionToBuildPhotoInterpolant(double energy, double v)
     v   =   vUp_*exp(v*log(vMax_/vUp_));
 
     return PhotoN(v, component_);
+}
+
+//----------------------------------------------------------------------------//
+
+boost::program_options::options_description Photonuclear::CreateOptions()
+{
+    po::options_description photonuclear("Photonuclear options");
+    photonuclear.add_options()
+        ("photonuclear.para",             po::value<int>(&parametrization_)->default_value(1),              "1 = Kakoulin \n2 = Rhode \n3 = Bezrukov-Bugaev \n4 = Zeus \n5 = ALLM 91 \n6 = ALLM 97 \n7 = Butkevich-Mikhailov")
+        ("photonuclear.hard_component",   po::value<bool>(&hard_component_)->implicit_value(false),         "Enables hard component, only valid for parametrisation 1-4")
+        ("photonuclear.shadow",           po::value<int>(&shadow_)->default_value(0),                       "Nuclear structure function: dutt/butk\n, only valid for parametrisation 5-7")
+        ("photonuclear.interpol_dedx",    po::value<bool>(&do_dedx_Interpolation_)->implicit_value(false),  "Enables interpolation for dEdx")
+        ("photonuclear.interpol_dndx",    po::value<bool>(&do_dndx_Interpolation_)->implicit_value(false),  "Enables interpolation for dNdx")
+        ("photonuclear.multiplier",       po::value<double>(&multiplier_)->default_value(1.),               "modify the cross section by this factor")
+        ("photonuclear.interpol_order",   po::value<int>(&order_of_interpolation_)->default_value(5),       "number of interpolation points");
+
+   return photonuclear;
 }
 
 //----------------------------------------------------------------------------//

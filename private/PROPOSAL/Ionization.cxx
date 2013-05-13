@@ -3,6 +3,9 @@
 
 using namespace std;
 
+namespace po	= boost::program_options;
+
+
 Ionization::Ionization()
     :beta_                  ( 0 )
     ,gamma_                 ( 0 )
@@ -533,7 +536,7 @@ double Ionization::FunctionToBuildDNdxInterpolant(double energy){
     return dndx_interpolant_2d_->Interpolate(energy, 1.0);
 }
 
-
+//----------------------------------------------------------------------------//
 
 double Ionization::FunctionToBuildDNdxInterpolant2D(double energy , double v){
     particle_->SetEnergy(energy);
@@ -547,3 +550,17 @@ double Ionization::FunctionToBuildDNdxInterpolant2D(double energy , double v){
     return integral_->Integrate(vUp_, v,boost::bind(&Ionization::FunctionToDNdxIntegral, this, _1),3,1);
 }
 
+//----------------------------------------------------------------------------//
+
+boost::program_options::options_description Ionization::CreateOptions()
+{
+    po::options_description ionization("Ionization options");
+    ionization.add_options()
+        ("ionization.lpm",              po::value<bool>(&lpm_effect_enabled_)->implicit_value(false),     "Enables   Landau-Pomeranchuk-Migdal supression")
+        ("ionization.interpol_dedx",    po::value<bool>(&do_dedx_Interpolation_)->implicit_value(false),  "Enables interpolation for dEdx")
+        ("ionization.interpol_dndx",    po::value<bool>(&do_dndx_Interpolation_)->implicit_value(false),  "Enables interpolation for dNdx")
+        ("ionization.multiplier",       po::value<double>(&multiplier_)->default_value(1.),               "modify the cross section by this factor")
+        ("ionization.interpol_order",   po::value<int>(&order_of_interpolation_)->default_value(5),       "number of interpolation points");
+
+   return ionization;
+}

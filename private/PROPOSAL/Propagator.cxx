@@ -9,9 +9,11 @@
 #include "PROPOSAL/Constants.h"
 #include <cmath>
 #include <utility>
-
+#include <boost/program_options.hpp>
 
 using namespace std;
+
+namespace po	= boost::program_options;
 
 
 Propagator::Propagator()
@@ -21,8 +23,6 @@ Propagator::Propagator()
     ,density_correction_        ( 1. )
     ,do_time_interpolation_     ( false )
     ,do_exact_time_calulation_  ( false )
-
-
 {
     particle_              = new Particle("mu",0,0,0,0,0,1e6,0);
     time_particle_         = new Integral();
@@ -44,7 +44,6 @@ Propagator::Propagator(const Propagator &propagator)
     ,particle_                  ( propagator.particle_ )
     ,collection_                ( new ProcessCollection(*propagator.collection_) )
     ,time_particle_             ( new Integral(*propagator.time_particle_) )
-
 
 {
     if(propagator.interpol_time_particle_ != NULL)
@@ -495,6 +494,42 @@ void Propagator::EnableParticleTimeInterpolation()
     do_time_interpolation_ =true;
 }
 
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+void Propagator::Setup(int argc, char** argv)
+{
+    po::options_description all("All options");
+    all.add_options()
+        ("help,h",		"shows this message")
+        ("version,v",	"shows the version of the program");
+
+    for(unsigned int i =0 ; i < collection_->GetCrosssections().size(); i++)
+    {
+        all.add(collection_->GetCrosssections().at(i)->CreateOptions());
+    }
+
+    //parse cmd line
+    po::variables_map vm;
+    po::store( po::command_line_parser(argc, argv).options(all).run(), vm);
+
+    //print help message if wanted
+    if(vm.count("help")) {
+        std::cout<< all;
+        exit(1);
+    }
+    //notifies globalVar
+    try {
+        //set the variables
+        vm.notify();
+    }
+    catch (po::invalid_command_line_syntax &e) {
+        std::cerr<<"Error: "<<e.what()<<"\n";
+        exit(1);
+    }
+}
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//

@@ -234,6 +234,11 @@ public:
     double FunctionToBuildDNdxInterpolant2D(double energy, double v);
 
 //----------------------------------------------------------------------------//
+
+    boost::program_options::options_description CreateOptions();
+
+//----------------------------------------------------------------------------//
+
     ~Photonuclear(){}
 
 	int GetComponent() const {

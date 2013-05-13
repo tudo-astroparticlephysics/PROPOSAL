@@ -4,6 +4,8 @@ cmake_minimum_required(VERSION 2.6)
 #MESSAGE(STATUS "log4cplus lib path: ${LOG4CPLUS_LIB}")
 project( PROPOSAL)
 
+FIND_PACKAGE( Boost COMPONENTS program_options REQUIRED )
+
 # This module defines
 # LOG4CPP_INCLUDE_DIR, where to find ptlib.h, etc.
 # LOG4CPP_LIBRARIES, the libraries to link against to use pwlib.
@@ -64,7 +66,7 @@ if(DEBUG)
         set( CMAKE_CXX_FLAGS "-g -pg -O0" )
 endif()
 
-include_directories("${PROJECT_SOURCE_DIR}/public" ${GTEST_INCLUDE_DIR} ${LOG4CPP_INCLUDE_DIR})
+include_directories("${PROJECT_SOURCE_DIR}/public" ${GTEST_INCLUDE_DIR} ${LOG4CPP_INCLUDE_DIR} ${Boost_INCLUDE_DIR})
 
 add_library(PROPOSAL
         private/PROPOSAL/Integral.cxx
@@ -89,6 +91,8 @@ add_library(PROPOSAL
 	)
 
 set_target_properties(PROPOSAL PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -O2 -Wall -Werror")# -Wextra -pedantic")
+
+target_link_libraries(PROPOSAL ${Boost_LIBRARIES})
 
 add_executable(PROPOSALtest
         private/test/PROPOSAL.cxx

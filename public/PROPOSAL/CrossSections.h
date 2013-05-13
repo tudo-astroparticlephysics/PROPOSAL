@@ -15,6 +15,7 @@
 #include "PROPOSAL/Medium.h"
 #include "PROPOSAL/EnergyCutSettings.h"
 #include <string>
+#include <boost/program_options.hpp>
 
 
 
@@ -51,7 +52,7 @@ protected:
     //CrossSection multiplier
     double multiplier_;
 
-    int parametrization_;
+    int         parametrization_;
 
     bool        lpm_effect_enabled_;
     bool        init_lpm_effect_;
@@ -170,6 +171,10 @@ public:
 //----------------------------------------------------------------------------//
 
     void SetEnergyCutSettings(EnergyCutSettings *cuts);
+
+//----------------------------------------------------------------------------//
+
+    virtual boost::program_options::options_description CreateOptions() = 0;
 
 //----------------------------------------------------------------------------//
     // Getter

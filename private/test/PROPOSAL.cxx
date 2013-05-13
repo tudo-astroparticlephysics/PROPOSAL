@@ -156,9 +156,11 @@ using namespace std;
 //    return 0;
 //}
 
-int main(){
+int main(int argc, char** argv){
     double pr_result;
     Propagator* pr = new Propagator();
+    pr->Setup(argc, argv);
+    cout<<pr->GetCollection()->GetCrosssections().at(1)->GetMultiplier()<<endl;
     pr->EnableInterpolation();
     for(int i =0;i<1;i++){
         pr->GetParticle()->SetEnergy(1e8);
