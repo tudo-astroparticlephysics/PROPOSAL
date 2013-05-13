@@ -136,7 +136,7 @@ TEST(StandardNormal , StandardNormalRandomNumber ) {
 
         abs_StandardNormalRnd=fabs(StandardNormalRnd);
 
-        ASSERT_NEAR(StandardNormalRnd_new, StandardNormalRnd,1e-14*abs_StandardNormalRnd);
+        ASSERT_NEAR(StandardNormalRnd_new, StandardNormalRnd,1e-13*abs_StandardNormalRnd);
 
     }
 }
