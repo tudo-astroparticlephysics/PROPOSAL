@@ -499,17 +499,43 @@ void Propagator::EnableParticleTimeInterpolation()
 //----------------------------------------------------------------------------//
 
 
-void Propagator::Setup(int argc, char** argv)
+boost::program_options::options_description Propagator::CreateOptions()
 {
-    po::options_description all("All options");
-    all.add_options()
+
+    po::options_description general("General options");
+    general.add_options()
         ("help,h",		"shows this message")
         ("version,v",	"shows the version of the program");
+
+
+    po::options_description propagator("Propagator options");
+    propagator.add_options()
+        ("propagator.interpol_time",        po::value<bool>(&do_time_interpolation_)->implicit_value(false),    "Enables interpolation for particle time calculation")
+        ("propagator.exact_time",           po::value<bool>(&do_exact_time_calulation_)->implicit_value(false), "Do exact particle time calculations")
+        ("propagator.density_correction",   po::value<double>(&density_correction_)->default_value(1),          "Density correction factor")
+        ("propagator.interpol_order",       po::value<int>(&order_of_interpolation_)->default_value(5),         "number of interpolation points");
+
+
+    po::options_description all("All options");
+        all.add(general);
+        all.add(propagator);
 
     for(unsigned int i =0 ; i < collection_->GetCrosssections().size(); i++)
     {
         all.add(collection_->GetCrosssections().at(i)->CreateOptions());
     }
+
+    return all;
+
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+void Propagator::Setup(int argc, char** argv)
+{
+    po::options_description all = CreateOptions();
 
     //parse cmd line
     po::variables_map vm;

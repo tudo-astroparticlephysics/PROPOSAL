@@ -556,7 +556,6 @@ boost::program_options::options_description Ionization::CreateOptions()
 {
     po::options_description ionization("Ionization options");
     ionization.add_options()
-        ("ionization.lpm",              po::value<bool>(&lpm_effect_enabled_)->implicit_value(false),     "Enables   Landau-Pomeranchuk-Migdal supression")
         ("ionization.interpol_dedx",    po::value<bool>(&do_dedx_Interpolation_)->implicit_value(false),  "Enables interpolation for dEdx")
         ("ionization.interpol_dndx",    po::value<bool>(&do_dndx_Interpolation_)->implicit_value(false),  "Enables interpolation for dNdx")
         ("ionization.multiplier",       po::value<double>(&multiplier_)->default_value(1.),               "modify the cross section by this factor")

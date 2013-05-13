@@ -8,6 +8,7 @@
 #include "PROPOSAL/Medium.h"
 #include "PROPOSAL/Particle.h"
 
+
 class Bremsstrahlung: public CrossSections
 {
 private:

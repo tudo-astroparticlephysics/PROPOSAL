@@ -27,6 +27,7 @@
 #include "PROPOSAL/MathModel.h"
 #include "PROPOSAL/ProcessCollection.h"
 #include <utility>
+#include <boost/program_options.hpp>
 
 
 class Propagator :public MathModel
@@ -154,10 +155,13 @@ public:
      */
     std::pair<double,double> CalculateEnergyTillStochastic( double initial_energy );
 
-
 //----------------------------------------------------------------------------//
 
     void Setup(int argc, char** argv);
+
+//----------------------------------------------------------------------------//
+
+    boost::program_options::options_description CreateOptions();
 
 //----------------------------------------------------------------------------//
 
