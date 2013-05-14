@@ -72,7 +72,6 @@ add_library(PROPOSAL
         private/PROPOSAL/Integral.cxx
         private/PROPOSAL/methods.cxx
         private/PROPOSAL/MathModel.cxx
-        #private/PROPOSAL/Output.cxx
         private/PROPOSAL/Bremsstrahlung.cxx
         private/PROPOSAL/CrossSections.cxx
         private/PROPOSAL/Decay.cxx

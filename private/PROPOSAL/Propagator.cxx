@@ -407,6 +407,8 @@ boost::program_options::options_description Propagator::CreateOptions()
 
 void Propagator::Setup(int argc, char** argv)
 {
+    vector <string> test = po::split_unix("a b c");
+    cout<<test.at(2)<<endl;
     po::options_description all = CreateOptions();
 
     //parse cmd line
@@ -416,7 +418,7 @@ void Propagator::Setup(int argc, char** argv)
     //print help message if wanted
     if(vm.count("help")) {
         std::cout<< all;
-        exit(1);
+        exit(0);
     }
     //notifies globalVar
     try {
