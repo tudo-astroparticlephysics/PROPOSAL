@@ -34,7 +34,607 @@ using namespace std;
 const double Interpolant::bigNumber_   =   -300;
 const double Interpolant::aBigNumber_  =   -299;
 
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//-------------------------public member functions----------------------------//
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+double Interpolant::Interpolate(double x)
+{
+    int     start;
+    double  result, aux;
+
+    if(isLog_)
+    {
+        x=Slog(x);
+    }
+
+    reverse_ =   true;
+    aux     =   (x - xmin_)/step_;
+    starti_  =   (int)aux;
+
+    if(starti_<0)
+    {
+        starti_  =   0;
+    }
+
+    if(starti_>=max_)
+    {
+        starti_  =   max_-1;
+    }
+
+    start   =   (int)(aux - 0.5*(romberg_-1));
+
+    if(start<0)
+    {
+        start   =   0;
+    }
+
+    if(start+romberg_>max_ || start>max_)
+    {
+        start   =   max_ - romberg_;
+    }
+    result  =   Interpolate(x, start);
+
+    if(logSubst_)
+    {
+        if(self_)
+        {
+            result  =   Exp(result);
+        }
+    }
+
+    return result;
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+double Interpolant::Interpolate(double x1, double x2)
+{
+    int     i, start;
+    double  aux, aux2=0, result;
+
+    if(isLog_)
+    {
+        x2  =   std::log(x2);
+    }
+
+    reverse_ =   true;
+
+    aux     =   (x2 - xmin_)/step_;
+    starti_  =   (int)aux;
+
+    if(starti_<0)
+    {
+        starti_  =   0;
+    }
+
+    if(starti_>=max_)
+    {
+        starti_  =   max_ - 1;
+    }
+
+    start   =   (int)(aux-0.5*(romberg_-1));
+
+    if(start<0)
+    {
+        start   =   0;
+    }
+
+    if(start+romberg_>max_ || start>max_)
+    {
+        start   =   max_ - romberg_;
+    }
+
+    for(i=start ; i<start+romberg_ ; i++)
+    {
+        iY_.at(i)   =   Interpolant_.at(i)->Interpolate(x1);
+    }
+
+    if(!fast_)
+    {
+        aux =   0;
+
+        for(i=start ; i<start+romberg_ ; i++)
+        {
+            if(Interpolant_.at(i)->precision_>aux)
+            {
+                aux     =   Interpolant_.at(i)->precision_;
+                aux2    =   Interpolant_.at(i)->worstX_;
+            }
+        }
+
+        if(aux>precision2_)
+        {
+            precision2_  =   aux;
+            worstX2_     =   aux2;
+        }
+    }
+
+    result  =   Interpolate(x2, start);
+
+    if(logSubst_)
+    {
+        result  =   Exp(result);
+    }
+
+    return result;
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+double Interpolant::InterpolateArray(double x)
+{
+    int     i, j, m, start, auxdir;
+    bool    dir;
+
+    reverse_ =   false;
+    i       =   0;
+    j       =   max_-1;
+    dir     =   iX_.at(max_-1)>iX_.at(0);
+
+    while(j-i > 1)
+    {
+        m=(i+j)/2;
+
+        if((x>iX_.at(m))==dir)
+        {
+            i=m;
+        }
+        else
+        {
+            j=m;
+        }
+    }
+
+    if(i+1 < max_)
+    {
+        if(((x-iX_.at(i))<(iX_.at(i+1)-x))==dir)
+        {
+            auxdir=0;
+        }
+        else
+        {
+            auxdir=1;
+        }
+    }
+    else
+    {
+        auxdir=0;
+    }
+
+    starti_  =   i+auxdir;
+    start   =   i-(int)(0.5*(romberg_-1-auxdir));
+
+    if(start<0)
+    {
+        start   =   0;
+    }
+
+    if(start+romberg_>max_ || start>max_)
+    {
+        start   =   max_-romberg_;
+    }
+
+    return Interpolate(x, start);
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+double Interpolant::FindLimit(double y)
+{
+    int         i, j, m, start, auxdir;
+    bool        dir, rat, rel;
+    double      result;
+
+    rat     =   false;
+    reverse_ =   false;
+
+    if(logSubst_)
+    {
+        y   =   Log(y);
+    }
+
+    i   =   0;
+    j   =   max_ - 1;
+    dir =   iY_.at(max_-1)>iY_.at(0);
+
+    while(j-i > 1)
+    {
+        m   =   (i+j)/2;
+
+        if((y>iY_.at(m))==dir)
+        {
+            i   =   m;
+        }
+        else
+        {
+            j   =   m;
+        }
+    }
+
+    SWAP(iX_,iY_, vector<double>);
+    if(!fast_)
+    {
+        SWAP(precision_,precisionY_,double);
+        SWAP(worstX_,worstY_,double);
+
+        rat         =   rational_;
+        rational_    =   rationalY_;
+    }
+
+    SWAP(romberg_,rombergY_,double);
+
+    rel         =   relative_;
+    relative_    =   relativeY_;
+
+    if(i+1 < max_)
+    {
+        if(((y-iX_.at(i))<(iX_.at(i+1)-y))==dir)
+        {
+            auxdir  =   0;
+        }
+        else
+        {
+            auxdir  =   1;
+        }
+    }
+    else
+    {
+        auxdir  =   0;
+    }
+
+    starti_  =   i + auxdir;
+    start   =   i - (int)(0.5*(romberg_-1-auxdir));
+
+    if(start<0)
+    {
+        start   =   0;
+    }
+
+    if(start+romberg_>max_ || start>max_)
+    {
+        start   =   max_ - romberg_;
+    }
+
+    result  =   Interpolate(y, start);
+
+    SWAP(iX_,iY_, vector<double>);
+
+    if(!fast_)
+    {
+        SWAP(precision_,precisionY_,double);
+        SWAP(worstX_,worstY_,double);
+
+        rational_    =   rat;
+    }
+
+    SWAP(romberg_,rombergY_,double);
+
+    relative_    =   rel;
+
+    if(result<xmin_)
+    {
+        result  =   xmin_;
+    }
+    else if(result>xmax_)
+    {
+        result  =   xmax_;
+    }
+
+    if(isLog_)
+    {
+        result  =   Exp(result);
+    }
+
+    return result;
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+double Interpolant::FindLimit(double x1, double y)
+{
+    int         i, j, m, start, auxdir;
+    bool        dir;
+    double      result, aux, aux2=0;
+
+    reverse_ =   false;
+
+    if(logSubst_)
+    {
+        y   =   Log(y);
+    }
+
+    if(!flag_)
+    {
+        for(i=0 ; i<max_ ; i++)
+        {
+            iY_.at(i)   =   Interpolant_.at(i)->Interpolate(x1);
+        }
+    }
+
+    i   =   0;
+    j   =   max_-1;
+
+    if(flag_)
+    {
+        dir =   Interpolant_.at(max_-1)->Interpolate(x1) > Interpolant_.at(0)->Interpolate(x1);
+    }
+    else
+    {
+        dir =   iY_.at(max_-1)>iY_.at(0);
+    }
+
+    while(j-i > 1)
+    {
+        m=(i+j)/2;
+
+        if(flag_)
+        {
+            aux =   Interpolant_.at(m)->Interpolate(x1);
+        }
+        else
+        {
+            aux =   iY_.at(m);
+        }
+
+        if((y>aux) == dir)
+        {
+            i   =   m;
+        }
+        else
+        {
+            j   =   m;
+        }
+    }
+
+    SWAP(iX_,iY_, vector<double>);
+
+    if(!fast_)
+    {
+        SWAP(precision_, precisionY_, double);
+        SWAP(worstX_,worstY_,double);
+        SWAP(rational_,rationalY_,double);
+    }
+
+    SWAP(romberg_, rombergY_,double);
+    SWAP(relative_,relativeY_,double);
+
+    if(i+1<max_)
+    {
+        if(((y-iX_.at(i))<(iX_.at(i+1)-y))==dir)
+        {
+            auxdir  =   0;
+        }
+        else
+        {
+            auxdir  =   1;
+        }
+    }
+    else
+    {
+        auxdir  =   0;
+    }
+
+    starti_  =   i + auxdir;
+    start   =   i - (int)(0.5*(romberg_-1-auxdir));
+
+    if(start<0)
+    {
+        start   =   0;
+    }
+
+    if(start+romberg_>max_ || start>max_)
+    {
+        start   =   max_ - romberg_;
+    }
+
+    if(flag_)
+    {
+        for(i=start ; i<start+romberg_ ; i++)
+        {
+            iX_.at(i)   =   Interpolant_.at(i)->Interpolate(x1);
+        }
+    }
+
+    result  =   Interpolate(y, start);
+
+    SWAP(iX_,iY_, vector<double>);
+
+    if(!fast_)
+    {
+        SWAP(precision_, precisionY_, double);
+        SWAP(worstX_,worstY_,double);
+        SWAP(rational_,rationalY_,double);
+    }
+
+    SWAP(romberg_, rombergY_,double);
+    SWAP(relative_,relativeY_,double);
+
+    if(result<xmin_)
+    {
+        result  =   xmin_;
+    }
+    else if(result>xmax_)
+    {
+        result  =   xmax_;
+    }
+
+    if(!fast_)
+    {
+        aux=0;
+
+        for(i=start ; i<start+romberg_ ; i++)
+        {
+            if(Interpolant_.at(i)->precision_>aux)
+            {
+                aux     =   Interpolant_.at(i)->precision_;
+                aux2    =   Interpolant_.at(i)->worstX_;
+            }
+        }
+
+        if(aux>precision2_)
+        {
+            precision2_  =   aux;
+            worstX2_     =   aux2;
+        }
+    }
+
+    if(isLog_)
+    {
+        result  =   std::exp(result);
+    }
+
+    return result;
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//--------------------------------Save and Load-------------------------------//
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+bool Interpolant::Save(string Path)
+{
+    ofstream out;
+    out.open(Path.c_str());
+    out.precision(16);
+
+    Save(out);
+
+    out.close();
+    return 1;
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+bool Interpolant::Save(ofstream& out)
+{
+    bool D2 = false;
+    if(function2d_ != NULL)D2 = true;
+
+    out << D2 << endl;
+
+    if(D2)
+    {
+        out << max_ << "\t" << xmin_ << "\t" << xmax_ << endl;
+        out << romberg_ << "\t" << rational_ << "\t" << relative_ << "\t" << isLog_ << endl;
+        out << rombergY_ << "\t" << rationalY_ << "\t" << relativeY_ << "\t" << logSubst_ << endl;
+
+        for(int i =0; i<max_ ;i++){
+            out << iX_.at(i) << endl;
+            Interpolant_.at(i)->Save(out);
+        }
+    }
+    else
+    {
+        out << max_ << "\t" << xmin_ << "\t" << xmax_ << endl;
+        out << romberg_ << "\t" << rational_ << "\t" << relative_ << "\t" << isLog_ << endl;
+        out << rombergY_ << "\t" << rationalY_ << "\t" << relativeY_ << "\t" << logSubst_ << endl;
+
+        for(int i =0; i<max_ ;i++){
+            out << iX_.at(i) << "\t" << iY_.at(i) << endl;
+        }
+    }
+    return 1;
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+bool Interpolant::Load(std::string Path)
+{
+    ifstream in;
+    in.open(Path.c_str());
+
+    Load(in);
+
+    in.close();
+    return 1;
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+bool Interpolant::Load(ifstream& in)
+{
+    bool D2;
+    in >> D2 ;
+
+    int max;
+    double xmin, xmax;
+    int romberg, rombergY;
+    bool rational,rationalY,relative,relativeY,isLog, logSubst;
+
+    if(D2)
+    {
+        in >> max >> xmin >> xmax;
+        in >> romberg >> rational >> relative >> isLog ;
+        in >> rombergY >> rationalY >> relativeY >> logSubst ;
+
+        InitInterpolant(max, xmin, xmax,
+                        romberg, rational, relative, isLog,
+                        rombergY,rationalY, relativeY, logSubst);
+
+        Interpolant_.resize(max_);
+
+        for(int i =0; i<max_ ;i++){
+            in >> iX_.at(i);
+
+            Interpolant_.at(i) = new Interpolant();
+            Interpolant_.at(i)->Load(in);
+            Interpolant_.at(i)->self_ =false;
+        }
+
+    }
+    else
+    {
+        in >> max >> xmin >> xmax;
+        in >> romberg >> rational >> relative >> isLog ;
+        in >> rombergY >> rationalY >> relativeY >> logSubst ;
+
+        InitInterpolant(max, xmin, xmax,
+                        romberg, rational, relative, isLog,
+                        rombergY,rationalY, relativeY, logSubst);
+
+        for(int i =0; i<max_ ;i++){
+            in >> iX_.at(i) >> iY_.at(i) ;
+        }
+    }
+    return 1;
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//--------------------------------constructors--------------------------------//
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 Interpolant::Interpolant()
     :romberg_      ( 1. )
@@ -76,18 +676,8 @@ Interpolant::Interpolant()
 
 
 //----------------------------------------------------------------------------//
-
-Interpolant& Interpolant::operator=(const Interpolant &interpolant)
-{
-    if (this != &interpolant)
-    {
-      Interpolant tmp(interpolant);
-      swap(tmp);
-    }
-    return *this;
-}
-
 //----------------------------------------------------------------------------//
+
 
 Interpolant::Interpolant(const Interpolant &interpolant)
     :romberg_      ( interpolant.romberg_ )
@@ -132,77 +722,11 @@ Interpolant::Interpolant(const Interpolant &interpolant)
     function1d_ = boost::ref(interpolant.function1d_);;
     function2d_ = boost::ref(interpolant.function2d_);;
 }
-//----------------------------------------------------------------------------//
-
-bool Interpolant::operator==(const Interpolant &interpolant) const
-{
-    if( romberg_      != interpolant.romberg_ )     return false;
-    if( rombergY_     != interpolant.rombergY_ )    return false;
-    if( max_          != interpolant.max_ )         return false;
-    if( xmin_         != interpolant.xmin_ )        return false;
-    if( xmax_         != interpolant.xmax_ )        return false;
-    if( step_         != interpolant.step_ )        return false;
-    if( rational_     != interpolant.rational_ )    return false;
-    if( relative_     != interpolant.relative_ )    return false;
-    if( row_          != interpolant.row_ )         return false;
-    if( starti_       != interpolant.starti_ )      return false;
-    if( rationalY_    != interpolant.rationalY_ )   return false;
-    if( relativeY_    != interpolant.relativeY_ )   return false;
-    if( reverse_      != interpolant.reverse_ )     return false;
-    if( self_         != interpolant.self_ )        return false;
-    if( flag_         != interpolant.flag_ )        return false;
-    if( isLog_        != interpolant.isLog_ )       return false;
-    if( logSubst_     != interpolant.logSubst_ )    return false;
-    if( precision_    != interpolant.precision_ )   return false;
-    if( worstX_       != interpolant.worstX_ )      return false;
-    if( precision2_   != interpolant.precision2_ )  return false;
-    if( worstX2_      != interpolant.worstX2_ )     return false;
-    if( precisionY_   != interpolant.precisionY_ )  return false;
-    if( worstY_       != interpolant.worstY_ )      return false;
-    if( fast_         != interpolant.fast_ )        return false;
-    if( x_save_       != interpolant.x_save_ )      return false;
-    if( y_save_       != interpolant.y_save_ )      return false;
-
-    if(iX_.size()   !=  interpolant.iX_.size())     return false;
-    if(iY_.size()   !=  interpolant.iY_.size())     return false;
-    if(c_.size()    !=  interpolant.c_.size())      return false;
-    if(d_.size()    !=  interpolant.d_.size())      return false;
-
-    if(Interpolant_.size() != interpolant.Interpolant_.size()) return false;
-
-    for(unsigned int i = 0; i < iX_.size(); i++)
-    {
-        if(iX_.at(i)    !=  interpolant.iX_.at(i))  return false;
-    }
-    for(unsigned int i = 0; i < iY_.size(); i++)
-    {
-        if(iY_.at(i)    !=  interpolant.iY_.at(i))  return false;
-    }
-    for(unsigned int i = 0; i < c_.size(); i++)
-    {
-        if(c_.at(i)     !=  interpolant.c_.at(i))   return false;
-    }
-    for(unsigned int i =    0; i < d_.size(); i++)
-    {
-        if(d_.at(i)     !=  interpolant.d_.at(i))   return false;
-    }
-    for(unsigned int i = 0 ; i < interpolant.Interpolant_.size() ; i++)
-    {
-        if( *Interpolant_.at(i) != *interpolant.Interpolant_.at(i)) return false;
-
-    }
-    //else
-    return true;
-
-}
-//----------------------------------------------------------------------------//
-
-bool Interpolant::operator!=(const Interpolant &interpolant) const {
-  return !(*this == interpolant);
-}
 
 
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 Interpolant::Interpolant(int max, double xmin, double xmax, boost::function<double (double)> function1d,
                          int romberg, bool rational, bool relative, bool isLog,
@@ -255,49 +779,31 @@ Interpolant::Interpolant(int max, double xmin, double xmax, boost::function<doub
     {
         iX_.at(i)   =   aux;
 
-//        if(Output::inf)
-//        {
-//            try
-//            {
-//                iY_.at(i)   =   Output::read();
-//            }
-//            catch(int a)
-//            {
-//                throw 0;
-//            }
-//        }
-//        else
-//        {
+        if(isLog_)
+        {
+            xaux    =   std::exp(aux);
+        }
+        else
+        {
+            xaux    =   aux;
+        }
 
-            if(isLog_)
-            {
-                xaux    =   std::exp(aux);
-            }
-            else
-            {
-                xaux    =   aux;
-            }
+        iY_.at(i)=function1d_(xaux);
 
-            iY_.at(i)=function1d_(xaux);
-
-            if(logSubst_)
-            {
-                iY_.at(i)=Log(iY_.at(i));
-            }
-
-//        }
-
-//        if(output_->outf)
-//        {
-//            output_->write(iY_.at(i));
-//        }
+        if(logSubst_)
+        {
+            iY_.at(i)=Log(iY_.at(i));
+        }
 
         aux +=  step_;
     }
 
 }
 
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 Interpolant::Interpolant(int max1, double x1min, double x1max, int max2, double x2min, double x2max, boost::function<double (double,double)> function2d,
                          int romberg1, bool rational1, bool relative1, bool isLog1,
@@ -363,7 +869,10 @@ Interpolant::Interpolant(int max1, double x1min, double x1max, int max2, double 
     precision2_  =   0;
 }
 
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 Interpolant::Interpolant(vector<double> x, vector<double> y, int romberg, bool rational, bool relative)
     :romberg_      ( 1. )
@@ -420,13 +929,159 @@ Interpolant::Interpolant(vector<double> x, vector<double> y, int romberg, bool r
     }
 }
 
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//-------------------------operators and swap function------------------------//
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+Interpolant& Interpolant::operator=(const Interpolant &interpolant)
+{
+    if (this != &interpolant)
+    {
+      Interpolant tmp(interpolant);
+      swap(tmp);
+    }
+    return *this;
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+bool Interpolant::operator==(const Interpolant &interpolant) const
+{
+    if( romberg_      != interpolant.romberg_ )     return false;
+    if( rombergY_     != interpolant.rombergY_ )    return false;
+    if( max_          != interpolant.max_ )         return false;
+    if( xmin_         != interpolant.xmin_ )        return false;
+    if( xmax_         != interpolant.xmax_ )        return false;
+    if( step_         != interpolant.step_ )        return false;
+    if( rational_     != interpolant.rational_ )    return false;
+    if( relative_     != interpolant.relative_ )    return false;
+    if( row_          != interpolant.row_ )         return false;
+    if( starti_       != interpolant.starti_ )      return false;
+    if( rationalY_    != interpolant.rationalY_ )   return false;
+    if( relativeY_    != interpolant.relativeY_ )   return false;
+    if( reverse_      != interpolant.reverse_ )     return false;
+    if( self_         != interpolant.self_ )        return false;
+    if( flag_         != interpolant.flag_ )        return false;
+    if( isLog_        != interpolant.isLog_ )       return false;
+    if( logSubst_     != interpolant.logSubst_ )    return false;
+    if( precision_    != interpolant.precision_ )   return false;
+    if( worstX_       != interpolant.worstX_ )      return false;
+    if( precision2_   != interpolant.precision2_ )  return false;
+    if( worstX2_      != interpolant.worstX2_ )     return false;
+    if( precisionY_   != interpolant.precisionY_ )  return false;
+    if( worstY_       != interpolant.worstY_ )      return false;
+    if( fast_         != interpolant.fast_ )        return false;
+    if( x_save_       != interpolant.x_save_ )      return false;
+    if( y_save_       != interpolant.y_save_ )      return false;
+
+    if(iX_.size()   !=  interpolant.iX_.size())     return false;
+    if(iY_.size()   !=  interpolant.iY_.size())     return false;
+    if(c_.size()    !=  interpolant.c_.size())      return false;
+    if(d_.size()    !=  interpolant.d_.size())      return false;
+
+    if(Interpolant_.size() != interpolant.Interpolant_.size()) return false;
+
+    for(unsigned int i = 0; i < iX_.size(); i++)
+    {
+        if(iX_.at(i)    !=  interpolant.iX_.at(i))  return false;
+    }
+    for(unsigned int i = 0; i < iY_.size(); i++)
+    {
+        if(iY_.at(i)    !=  interpolant.iY_.at(i))  return false;
+    }
+    for(unsigned int i = 0; i < c_.size(); i++)
+    {
+        if(c_.at(i)     !=  interpolant.c_.at(i))   return false;
+    }
+    for(unsigned int i =    0; i < d_.size(); i++)
+    {
+        if(d_.at(i)     !=  interpolant.d_.at(i))   return false;
+    }
+    for(unsigned int i = 0 ; i < interpolant.Interpolant_.size() ; i++)
+    {
+        if( *Interpolant_.at(i) != *interpolant.Interpolant_.at(i)) return false;
+
+    }
+    //else
+    return true;
+
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+bool Interpolant::operator!=(const Interpolant &interpolant) const
+{
+  return !(*this == interpolant);
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+void Interpolant::swap(Interpolant &interpolant){
+
+    using std::swap;
+
+    swap( romberg_      , interpolant.romberg_ );
+    swap( rombergY_     , interpolant.rombergY_ );
+    swap( max_          , interpolant.max_ );
+    swap( xmin_         , interpolant.xmin_ );
+    swap( xmax_         , interpolant.xmax_ );
+    swap( step_         , interpolant.step_ );
+    swap( rational_     , interpolant.rational_ );
+    swap( relative_     , interpolant.relative_ );
+    swap( row_          , interpolant.row_ );
+    swap( starti_       , interpolant.starti_ );
+    swap( rationalY_    , interpolant.rationalY_ );
+    swap( relativeY_    , interpolant.relativeY_ );
+    swap( reverse_      , interpolant.reverse_ );
+    swap( self_         , interpolant.self_ );
+    swap( flag_         , interpolant.flag_ );
+    swap( isLog_        , interpolant.isLog_ );
+    swap( logSubst_     , interpolant.logSubst_ );
+    swap( precision_    , interpolant.precision_ );
+    swap( worstX_       , interpolant.worstX_ );
+    swap( precision2_   , interpolant.precision2_ );
+    swap( worstX2_      , interpolant.worstX2_ );
+    swap( precisionY_   , interpolant.precisionY_ );
+    swap( worstY_       , interpolant.worstY_ );
+    swap( fast_         , interpolant.fast_ );
+    swap( x_save_       , interpolant.x_save_ );
+    swap( y_save_       , interpolant.y_save_ );
+
+    iX_.swap( interpolant.iX_ );
+    iY_.swap( interpolant.iY_ );
+
+    c_.swap( interpolant.c_ );
+    d_.swap( interpolant.d_ );
+
+    Interpolant_.swap(interpolant.Interpolant_);
+
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//------------------------private member functions----------------------------//
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 void Interpolant::InitInterpolant(int max, double xmin, double xmax,
                                   int romberg, bool rational, bool relative, bool isLog,
                                   int rombergY, bool rationalY, bool relativeY, bool logSubst)
 {
-    //double aux;
 
     self_   =    true;
     fast_   =    true;
@@ -536,7 +1191,10 @@ void Interpolant::InitInterpolant(int max, double xmin, double xmax,
     this->relativeY_ =   relativeY;
 }
 
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 double Interpolant::Get2dFunctionFixedY(double x)
 {
@@ -550,189 +1208,10 @@ double Interpolant::Get2dFunctionFixedY(double x)
     }
 }
 
-//----------------------------------------------------------------------------//
-
-double Interpolant::Interpolate(double x)
-{
-    int     start;
-    double  result, aux;
-
-    if(isLog_)
-    {
-        x=Slog(x);
-    }
-
-    reverse_ =   true;
-    aux     =   (x - xmin_)/step_;
-    starti_  =   (int)aux;
-
-    if(starti_<0)
-    {
-        starti_  =   0;
-    }
-
-    if(starti_>=max_)
-    {
-        starti_  =   max_-1;
-    }
-
-    start   =   (int)(aux - 0.5*(romberg_-1));
-
-    if(start<0)
-    {
-        start   =   0;
-    }
-
-    if(start+romberg_>max_ || start>max_)
-    {
-        start   =   max_ - romberg_;
-    }
-    result  =   Interpolate(x, start);
-
-    if(logSubst_)
-    {
-        if(self_)
-        {
-            result  =   Exp(result);
-        }
-    }
-
-    return result;
-}
 
 //----------------------------------------------------------------------------//
-
-double Interpolant::Interpolate(double x1, double x2)
-{
-    int     i, start;
-    double  aux, aux2=0, result;
-
-    if(isLog_)
-    {
-        x2  =   std::log(x2);
-    }
-
-    reverse_ =   true;
-
-    aux     =   (x2 - xmin_)/step_;
-    starti_  =   (int)aux;
-
-    if(starti_<0)
-    {
-        starti_  =   0;
-    }
-
-    if(starti_>=max_)
-    {
-        starti_  =   max_ - 1;
-    }
-
-    start   =   (int)(aux-0.5*(romberg_-1));
-
-    if(start<0)
-    {
-        start   =   0;
-    }
-
-    if(start+romberg_>max_ || start>max_)
-    {
-        start   =   max_ - romberg_;
-    }
-
-    for(i=start ; i<start+romberg_ ; i++)
-    {
-        iY_.at(i)   =   Interpolant_.at(i)->Interpolate(x1);
-    }
-
-    if(!fast_)
-    {
-        aux =   0;
-
-        for(i=start ; i<start+romberg_ ; i++)
-        {
-            if(Interpolant_.at(i)->precision_>aux)
-            {
-                aux     =   Interpolant_.at(i)->precision_;
-                aux2    =   Interpolant_.at(i)->worstX_;
-            }
-        }
-
-        if(aux>precision2_)
-        {
-            precision2_  =   aux;
-            worstX2_     =   aux2;
-        }
-    }
-
-    result  =   Interpolate(x2, start);
-
-    if(logSubst_)
-    {
-        result  =   Exp(result);
-    }
-
-    return result;
-}
-
 //----------------------------------------------------------------------------//
 
-double Interpolant::InterpolateArray(double x)
-{
-    int     i, j, m, start, auxdir;
-    bool    dir;
-
-    reverse_ =   false;
-    i       =   0;
-    j       =   max_-1;
-    dir     =   iX_.at(max_-1)>iX_.at(0);
-
-    while(j-i > 1)
-    {
-        m=(i+j)/2;
-
-        if((x>iX_.at(m))==dir)
-        {
-            i=m;
-        }
-        else
-        {
-            j=m;
-        }
-    }
-
-    if(i+1 < max_)
-    {
-        if(((x-iX_.at(i))<(iX_.at(i+1)-x))==dir)
-        {
-            auxdir=0;
-        }
-        else
-        {
-            auxdir=1;
-        }
-    }
-    else
-    {
-        auxdir=0;
-    }
-
-    starti_  =   i+auxdir;
-    start   =   i-(int)(0.5*(romberg_-1-auxdir));
-
-    if(start<0)
-    {
-        start   =   0;
-    }
-
-    if(start+romberg_>max_ || start>max_)
-    {
-        start   =   max_-romberg_;
-    }
-
-    return Interpolate(x, start);
-}
-
-//----------------------------------------------------------------------------//
 
 double Interpolant::Interpolate(double x, int start)
 {
@@ -963,382 +1442,10 @@ double Interpolant::Interpolate(double x, int start)
     return result;
 }
 
-//----------------------------------------------------------------------------//
-
-double Interpolant::FindLimit(double y)
-{
-    int         i, j, m, start, auxdir;
-    bool        dir, rat, rel;
-    double      result;
-
-    rat     =   false;
-    reverse_ =   false;
-
-    if(logSubst_)
-    {
-        y   =   Log(y);
-    }
-
-    i   =   0;
-    j   =   max_ - 1;
-    dir =   iY_.at(max_-1)>iY_.at(0);
-
-    while(j-i > 1)
-    {
-        m   =   (i+j)/2;
-
-        if((y>iY_.at(m))==dir)
-        {
-            i   =   m;
-        }
-        else
-        {
-            j   =   m;
-        }
-    }
-
-    SWAP(iX_,iY_, vector<double>);
-    if(!fast_)
-    {
-        SWAP(precision_,precisionY_,double);
-        SWAP(worstX_,worstY_,double);
-
-        rat         =   rational_;
-        rational_    =   rationalY_;
-    }
-
-    SWAP(romberg_,rombergY_,double);
-
-    rel         =   relative_;
-    relative_    =   relativeY_;
-
-    if(i+1 < max_)
-    {
-        if(((y-iX_.at(i))<(iX_.at(i+1)-y))==dir)
-        {
-            auxdir  =   0;
-        }
-        else
-        {
-            auxdir  =   1;
-        }
-    }
-    else
-    {
-        auxdir  =   0;
-    }
-
-    starti_  =   i + auxdir;
-    start   =   i - (int)(0.5*(romberg_-1-auxdir));
-
-    if(start<0)
-    {
-        start   =   0;
-    }
-
-    if(start+romberg_>max_ || start>max_)
-    {
-        start   =   max_ - romberg_;
-    }
-
-    result  =   Interpolate(y, start);
-
-    SWAP(iX_,iY_, vector<double>);
-
-    if(!fast_)
-    {
-        SWAP(precision_,precisionY_,double);
-        SWAP(worstX_,worstY_,double);
-
-        rational_    =   rat;
-    }
-
-    SWAP(romberg_,rombergY_,double);
-
-    relative_    =   rel;
-
-    if(result<xmin_)
-    {
-        result  =   xmin_;
-    }
-    else if(result>xmax_)
-    {
-        result  =   xmax_;
-    }
-
-    if(isLog_)
-    {
-        result  =   Exp(result);
-    }
-
-    return result;
-}
 
 //----------------------------------------------------------------------------//
-
-double Interpolant::FindLimit(double x1, double y)
-{
-    int         i, j, m, start, auxdir;
-    bool        dir;
-    double      result, aux, aux2=0;
-
-    reverse_ =   false;
-
-    if(logSubst_)
-    {
-        y   =   Log(y);
-    }
-
-    if(!flag_)
-    {
-        for(i=0 ; i<max_ ; i++)
-        {
-            iY_.at(i)   =   Interpolant_.at(i)->Interpolate(x1);
-        }
-    }
-
-    i   =   0;
-    j   =   max_-1;
-
-    if(flag_)
-    {
-        dir =   Interpolant_.at(max_-1)->Interpolate(x1) > Interpolant_.at(0)->Interpolate(x1);
-    }
-    else
-    {
-        dir =   iY_.at(max_-1)>iY_.at(0);
-    }
-
-    while(j-i > 1)
-    {
-        m=(i+j)/2;
-
-        if(flag_)
-        {
-            aux =   Interpolant_.at(m)->Interpolate(x1);
-        }
-        else
-        {
-            aux =   iY_.at(m);
-        }
-
-        if((y>aux) == dir)
-        {
-            i   =   m;
-        }
-        else
-        {
-            j   =   m;
-        }
-    }
-
-    SWAP(iX_,iY_, vector<double>);
-
-    if(!fast_)
-    {
-        SWAP(precision_, precisionY_, double);
-        SWAP(worstX_,worstY_,double);
-        SWAP(rational_,rationalY_,double);
-    }
-
-    SWAP(romberg_, rombergY_,double);
-    SWAP(relative_,relativeY_,double);
-
-    if(i+1<max_)
-    {
-        if(((y-iX_.at(i))<(iX_.at(i+1)-y))==dir)
-        {
-            auxdir  =   0;
-        }
-        else
-        {
-            auxdir  =   1;
-        }
-    }
-    else
-    {
-        auxdir  =   0;
-    }
-
-    starti_  =   i + auxdir;
-    start   =   i - (int)(0.5*(romberg_-1-auxdir));
-
-    if(start<0)
-    {
-        start   =   0;
-    }
-
-    if(start+romberg_>max_ || start>max_)
-    {
-        start   =   max_ - romberg_;
-    }
-
-    if(flag_)
-    {
-        for(i=start ; i<start+romberg_ ; i++)
-        {
-            iX_.at(i)   =   Interpolant_.at(i)->Interpolate(x1);
-        }
-    }
-
-    result  =   Interpolate(y, start);
-
-    SWAP(iX_,iY_, vector<double>);
-
-    if(!fast_)
-    {
-        SWAP(precision_, precisionY_, double);
-        SWAP(worstX_,worstY_,double);
-        SWAP(rational_,rationalY_,double);
-    }
-
-    SWAP(romberg_, rombergY_,double);
-    SWAP(relative_,relativeY_,double);
-
-    if(result<xmin_)
-    {
-        result  =   xmin_;
-    }
-    else if(result>xmax_)
-    {
-        result  =   xmax_;
-    }
-
-    if(!fast_)
-    {
-        aux=0;
-
-        for(i=start ; i<start+romberg_ ; i++)
-        {
-            if(Interpolant_.at(i)->precision_>aux)
-            {
-                aux     =   Interpolant_.at(i)->precision_;
-                aux2    =   Interpolant_.at(i)->worstX_;
-            }
-        }
-
-        if(aux>precision2_)
-        {
-            precision2_  =   aux;
-            worstX2_     =   aux2;
-        }
-    }
-
-    if(isLog_)
-    {
-        result  =   std::exp(result);
-    }
-
-    return result;
-}
-
 //----------------------------------------------------------------------------//
 
-bool Interpolant::Save(string Path){
-    ofstream out;
-    out.open(Path.c_str());
-    out.precision(16);
-
-    Save(out);
-
-    out.close();
-    return 1;
-}
-
-//----------------------------------------------------------------------------//
-
-bool Interpolant::Save(ofstream& out){
-    bool D2 = false;
-    if(function2d_ != NULL)D2 = true;
-
-    out << D2 << endl;
-
-    if(D2)
-    {
-        out << max_ << "\t" << xmin_ << "\t" << xmax_ << endl;
-        out << romberg_ << "\t" << rational_ << "\t" << relative_ << "\t" << isLog_ << endl;
-        out << rombergY_ << "\t" << rationalY_ << "\t" << relativeY_ << "\t" << logSubst_ << endl;
-
-        for(int i =0; i<max_ ;i++){
-            out << iX_.at(i) << endl;
-            Interpolant_.at(i)->Save(out);
-        }
-    }
-    else
-    {
-        out << max_ << "\t" << xmin_ << "\t" << xmax_ << endl;
-        out << romberg_ << "\t" << rational_ << "\t" << relative_ << "\t" << isLog_ << endl;
-        out << rombergY_ << "\t" << rationalY_ << "\t" << relativeY_ << "\t" << logSubst_ << endl;
-
-        for(int i =0; i<max_ ;i++){
-            out << iX_.at(i) << "\t" << iY_.at(i) << endl;
-        }
-    }
-    return 1;
-}
-
-//----------------------------------------------------------------------------//
-
-bool Interpolant::Load(std::string Path){
-    ifstream in;
-    in.open(Path.c_str());
-
-    Load(in);
-
-    in.close();
-    return 1;
-}
-
-//----------------------------------------------------------------------------//
-
-bool Interpolant::Load(ifstream& in){
-    bool D2;
-    in >> D2 ;
-
-    int max;
-    double xmin, xmax;
-    int romberg, rombergY;
-    bool rational,rationalY,relative,relativeY,isLog, logSubst;
-
-    if(D2)
-    {
-        in >> max >> xmin >> xmax;
-        in >> romberg >> rational >> relative >> isLog ;
-        in >> rombergY >> rationalY >> relativeY >> logSubst ;
-
-        InitInterpolant(max, xmin, xmax,
-                        romberg, rational, relative, isLog,
-                        rombergY,rationalY, relativeY, logSubst);
-
-        Interpolant_.resize(max_);
-
-        for(int i =0; i<max_ ;i++){
-            in >> iX_.at(i);
-
-            Interpolant_.at(i) = new Interpolant();
-            Interpolant_.at(i)->Load(in);
-            Interpolant_.at(i)->self_ =false;
-        }
-
-    }
-    else
-    {
-        in >> max >> xmin >> xmax;
-        in >> romberg >> rational >> relative >> isLog ;
-        in >> rombergY >> rationalY >> relativeY >> logSubst ;
-
-        InitInterpolant(max, xmin, xmax,
-                        romberg, rational, relative, isLog,
-                        rombergY,rationalY, relativeY, logSubst);
-
-        for(int i =0; i<max_ ;i++){
-            in >> iX_.at(i) >> iY_.at(i) ;
-        }
-    }
-    return 1;
-}
-
-//----------------------------------------------------------------------------//
 
 double Interpolant::Exp(double x)
 {
@@ -1352,7 +1459,10 @@ double Interpolant::Exp(double x)
     }
 }
 
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 double Interpolant::Log(double x)
 {
@@ -1366,7 +1476,10 @@ double Interpolant::Log(double x)
     }
 }
 
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 double Interpolant::Slog(double x)
 {
@@ -1383,9 +1496,140 @@ double Interpolant::Slog(double x)
     }
 }
 
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//---------------------------------Setter-------------------------------------//
+//----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-Interpolant::~Interpolant(){
+
+void Interpolant::SetRombergY(int rombergY){
+    rombergY_ = rombergY;
+}
+
+void Interpolant::SetRomberg(int romberg){
+    romberg_ = romberg;
+}
+
+void Interpolant::SetIX(const std::vector<double> &iX){
+    iX_ = iX;
+}
+
+void Interpolant::SetIY(const std::vector<double> &iY){
+    iY_ = iY;
+}
+
+void Interpolant::SetC(const std::vector<double> &c){
+    c_ = c;
+}
+
+void Interpolant::SetD(const std::vector<double> &d){
+    d_ = d;
+}
+
+void Interpolant::SetMax(int max){
+    max_ = max;
+}
+
+void Interpolant::SetXmin(double xmin){
+    xmin_ = xmin;
+}
+
+void Interpolant::SetXmax(double xmax){
+    xmax_ = xmax;
+}
+
+void Interpolant::SetStep(double step){
+    step_ = step;
+}
+
+void Interpolant::SetRelative(bool relative){
+    relative_ = relative;
+}
+
+void Interpolant::SetRational(bool rational){
+    rational_ = rational;
+}
+
+void Interpolant::SetRow(int row){
+    row_ = row;
+}
+
+void Interpolant::SetStarti(int starti){
+    starti_ = starti;
+}
+
+void Interpolant::SetRationalY(bool rationalY){
+    rationalY_ = rationalY;
+}
+
+void Interpolant::SetRelativeY(bool relativeY){
+    relativeY_ = relativeY;
+}
+
+void Interpolant::SetSelf(bool self){
+    self_ = self;
+}
+
+void Interpolant::SetFlag(bool flag){
+    flag_ = flag;
+}
+
+void Interpolant::SetReverse(bool reverse){
+    reverse_ = reverse;
+}
+
+void Interpolant::SetIsLog(bool isLog){
+    isLog_ = isLog;
+}
+
+void Interpolant::SetLogSubst(bool logSubst){
+    logSubst_ = logSubst;
+}
+
+void Interpolant::SetPrecision(double precision){
+    precision_ = precision;
+}
+
+void Interpolant::SetWorstX(double worstX){
+    worstX_ = worstX;
+}
+
+void Interpolant::SetWorstX2(double worstX2){
+    worstX2_ = worstX2;
+}
+
+void Interpolant::SetWorstY(double worstY){
+    worstY_ = worstY;
+}
+
+void Interpolant::SetPrecisionY(double precisionY){
+    precisionY_ = precisionY;
+}
+
+void Interpolant::SetFast(bool fast){
+    fast_ = fast;
+}
+
+void Interpolant::SetX_save(double x_save){
+    x_save_ = x_save;
+}
+
+void Interpolant::SetY_save(double y_save){
+    y_save_ = y_save;
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//---------------------------------Destructor---------------------------------//
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+Interpolant::~Interpolant()
+{
     iX_.clear();
     iY_.clear();
     c_.clear();
@@ -1398,198 +1642,3 @@ Interpolant::~Interpolant(){
 
     Interpolant_.clear();
 }
-
-//----------------------------------------------------------------------------//
-
-void Interpolant::swap(Interpolant &interpolant){
-
-    using std::swap;
-
-    swap( romberg_      , interpolant.romberg_ );
-    swap( rombergY_     , interpolant.rombergY_ );
-    swap( max_          , interpolant.max_ );
-    swap( xmin_         , interpolant.xmin_ );
-    swap( xmax_         , interpolant.xmax_ );
-    swap( step_         , interpolant.step_ );
-    swap( rational_     , interpolant.rational_ );
-    swap( relative_     , interpolant.relative_ );
-    swap( row_          , interpolant.row_ );
-    swap( starti_       , interpolant.starti_ );
-    swap( rationalY_    , interpolant.rationalY_ );
-    swap( relativeY_    , interpolant.relativeY_ );
-    swap( reverse_      , interpolant.reverse_ );
-    swap( self_         , interpolant.self_ );
-    swap( flag_         , interpolant.flag_ );
-    swap( isLog_        , interpolant.isLog_ );
-    swap( logSubst_     , interpolant.logSubst_ );
-    swap( precision_    , interpolant.precision_ );
-    swap( worstX_       , interpolant.worstX_ );
-    swap( precision2_   , interpolant.precision2_ );
-    swap( worstX2_      , interpolant.worstX2_ );
-    swap( precisionY_   , interpolant.precisionY_ );
-    swap( worstY_       , interpolant.worstY_ );
-    swap( fast_         , interpolant.fast_ );
-    swap( x_save_       , interpolant.x_save_ );
-    swap( y_save_       , interpolant.y_save_ );
-
-    iX_.swap( interpolant.iX_ );
-    iY_.swap( interpolant.iY_ );
-
-    c_.swap( interpolant.c_ );
-    d_.swap( interpolant.d_ );
-
-    Interpolant_.swap(interpolant.Interpolant_);
-
-}
-
-//----------------------------------------------------------------------------//
-
-
-//------------------------------------------------------------------------//
-//------------------------          Setter               -----------------//
-//------------------------------------------------------------------------//
-void Interpolant::SetRombergY(int rombergY)
-{
-    rombergY_ = rombergY;
-}
-
-void Interpolant::SetRomberg(int romberg)
-{
-    romberg_ = romberg;
-}
-
-void Interpolant::SetIX(const std::vector<double> &iX)
-{
-    iX_ = iX;
-}
-
-void Interpolant::SetIY(const std::vector<double> &iY)
-{
-    iY_ = iY;
-}
-
-void Interpolant::SetC(const std::vector<double> &c)
-{
-    c_ = c;
-}
-
-void Interpolant::SetD(const std::vector<double> &d)
-{
-    d_ = d;
-}
-
-void Interpolant::SetMax(int max)
-{
-    max_ = max;
-}
-
-void Interpolant::SetXmin(double xmin)
-{
-    xmin_ = xmin;
-}
-
-void Interpolant::SetXmax(double xmax)
-{
-    xmax_ = xmax;
-}
-
-void Interpolant::SetStep(double step)
-{
-    step_ = step;
-}
-
-void Interpolant::SetRelative(bool relative)
-{
-    relative_ = relative;
-}
-
-void Interpolant::SetRational(bool rational)
-{
-    rational_ = rational;
-}
-
-void Interpolant::SetRow(int row)
-{
-    row_ = row;
-}
-
-void Interpolant::SetStarti(int starti)
-{
-    starti_ = starti;
-}
-
-void Interpolant::SetRationalY(bool rationalY)
-{
-    rationalY_ = rationalY;
-}
-
-void Interpolant::SetRelativeY(bool relativeY)
-{
-    relativeY_ = relativeY;
-}
-
-void Interpolant::SetSelf(bool self)
-{
-    self_ = self;
-}
-
-void Interpolant::SetFlag(bool flag)
-{
-    flag_ = flag;
-}
-
-void Interpolant::SetReverse(bool reverse)
-{
-    reverse_ = reverse;
-}
-
-void Interpolant::SetIsLog(bool isLog)
-{
-    isLog_ = isLog;
-}
-
-void Interpolant::SetLogSubst(bool logSubst)
-{
-    logSubst_ = logSubst;
-}
-
-void Interpolant::SetPrecision(double precision)
-{
-    precision_ = precision;
-}
-
-void Interpolant::SetWorstX(double worstX)
-{
-    worstX_ = worstX;
-}
-
-void Interpolant::SetWorstX2(double worstX2)
-{
-    worstX2_ = worstX2;
-}
-
-void Interpolant::SetWorstY(double worstY)
-{
-    worstY_ = worstY;
-}
-
-void Interpolant::SetPrecisionY(double precisionY)
-{
-    precisionY_ = precisionY;
-}
-
-void Interpolant::SetFast(bool fast)
-{
-    fast_ = fast;
-}
-
-void Interpolant::SetX_save(double x_save)
-{
-    x_save_ = x_save;
-}
-
-void Interpolant::SetY_save(double y_save)
-{
-    y_save_ = y_save;
-}
-

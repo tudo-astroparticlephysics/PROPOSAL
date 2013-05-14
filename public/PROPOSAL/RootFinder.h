@@ -36,6 +36,11 @@ public:
 //----------------------------------------------------------------------------//
     //Memberfunctions
 
+    /**
+    * returns the value of the root bracketed between min and max.
+    * Starting value of x is determined by 0&lt;=startX&lt;=1
+    */
+
     double FindRoot(double min,
                     double max,
                     double startX,

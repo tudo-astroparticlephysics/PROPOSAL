@@ -22,8 +22,6 @@ using namespace std;
 //----------------------------------------------------------------------------//
 
 
-
-
 double ProcessCollection::CalculateDisplacement(double ei, double ef, double dist)
 {
     if(do_interpolation_)
@@ -355,7 +353,6 @@ pair<double,string> ProcessCollection::MakeDecay()
 }
 
 
-
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 //--------------------Enable and Disable interpolation------------------------//
@@ -476,7 +473,6 @@ void ProcessCollection::DisableInterpolation()
 }
 
 
-
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 //------------------------------lpm effect------------------------------------//
@@ -506,15 +502,12 @@ void ProcessCollection::DisableLpmEffect()
     }
 }
 
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 //--------------------------------constructors--------------------------------//
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
-
 
 
 //Standard constructor
@@ -706,8 +699,6 @@ ProcessCollection::ProcessCollection(Particle *particle, Medium *medium, EnergyC
 }
 
 
-
-
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 //-------------------------operators and swap function------------------------//
@@ -715,7 +706,8 @@ ProcessCollection::ProcessCollection(Particle *particle, Medium *medium, EnergyC
 //----------------------------------------------------------------------------//
 
 
-ProcessCollection& ProcessCollection::operator=(const ProcessCollection &collection){
+ProcessCollection& ProcessCollection::operator=(const ProcessCollection &collection)
+{
     if (this != &collection)
     {
       ProcessCollection tmp(collection);
@@ -984,8 +976,6 @@ void ProcessCollection::swap(ProcessCollection &collection)
 }
 
 
-
-
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 //-------------------------Functions to interpolate---------------------------//
@@ -1020,7 +1010,6 @@ double ProcessCollection::InterpolPropDecay(double energy)
 }
 
 
-
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
@@ -1033,7 +1022,6 @@ double ProcessCollection::InterpolPropDecayDiff(double energy)
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
-
 
 
 double ProcessCollection::InterpolPropInteraction(double energy)
@@ -1057,11 +1045,6 @@ double ProcessCollection::InterpolPropInteractionDiff(double energy)
 {
     return FunctionToPropIntegralInteraction(energy);
 }
-
-
-
-
-
 
 
 //----------------------------------------------------------------------------//
@@ -1091,7 +1074,6 @@ double ProcessCollection::FunctionToPropIntegralDecay(double energy)
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
-
 
 
 double ProcessCollection::FunctionToPropIntegralInteraction(double energy)
@@ -1151,14 +1133,52 @@ double ProcessCollection::FunctionToIntegral(double energy)
 }
 
 
-
-
-
-
-
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 //---------------------------------Setter-------------------------------------//
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+void ProcessCollection::SetCutSettings(EnergyCutSettings* cutSettings)
+{
+    cut_settings_ = cutSettings;
+    for(unsigned int i = 0 ; i < crosssections_.size() ; i++)
+    {
+        crosssections_.at(i)->SetEnergyCutSettings(cut_settings_);
+    }
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+void ProcessCollection::SetMedium(Medium* medium)
+{
+    medium_ = medium;
+    for(unsigned int i = 0 ; i < crosssections_.size() ; i++)
+    {
+        crosssections_.at(i)->SetMedium(medium_);
+    }
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+void ProcessCollection::SetParticle(Particle* particle)
+{
+    particle_ = particle;
+    decay_->SetParticle(particle);
+    for(unsigned int i = 0 ; i < crosssections_.size() ; i++)
+    {
+        crosssections_.at(i)->SetParticle(particle);
+    }
+}
+
+
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
@@ -1168,88 +1188,45 @@ void ProcessCollection::SetCrosssections(
     crosssections_ = crosssections;
 }
 
-//----------------------------------------------------------------------------//
-
-void ProcessCollection::SetCutSettings(EnergyCutSettings* cutSettings) {
-    cut_settings_ = cutSettings;
-    for(unsigned int i = 0 ; i < crosssections_.size() ; i++)
-    {
-        crosssections_.at(i)->SetEnergyCutSettings(cut_settings_);
-    }
-}
-
-//----------------------------------------------------------------------------//
-
 void ProcessCollection::SetDebug(bool debug) {
     debug_ = debug;
 }
-
-//----------------------------------------------------------------------------//
 
 void ProcessCollection::SetDoInterpolation(bool doInterpolation) {
     do_interpolation_ = doInterpolation;
 }
 
-//----------------------------------------------------------------------------//
-
 void ProcessCollection::SetIni(double ini) {
     ini_ = ini;
 }
-
-//----------------------------------------------------------------------------//
 
 void ProcessCollection::SetIntegral(Integral* integral) {
     integral_ = integral;
 }
 
-//----------------------------------------------------------------------------//
-
 void ProcessCollection::SetInterpolant(Interpolant* interpolant) {
     interpolant_ = interpolant;
 }
-
-//----------------------------------------------------------------------------//
 
 void ProcessCollection::SetInterpolantDiff(
         Interpolant* interpolantDiff) {
     interpolant_diff_ = interpolantDiff;
 }
 
-//----------------------------------------------------------------------------//
-
 void ProcessCollection::SetLpmEffectEnabled(bool lpmEffectEnabled) {
     lpm_effect_enabled_ = lpmEffectEnabled;
 }
-
-//----------------------------------------------------------------------------//
-
-void ProcessCollection::SetMedium(Medium* medium) {
-    medium_ = medium;
-    for(unsigned int i = 0 ; i < crosssections_.size() ; i++)
-    {
-        crosssections_.at(i)->SetMedium(medium_);
-    }
-}
-
-//----------------------------------------------------------------------------//
 
 void ProcessCollection::SetOrderOfInterpolation(int orderOfInterpolation) {
     order_of_interpolation_ = orderOfInterpolation;
 }
 
-//----------------------------------------------------------------------------//
-
-void ProcessCollection::SetParticle(Particle* particle) {
-    particle_ = particle;
-    decay_->SetParticle(particle);
-    for(unsigned int i = 0 ; i < crosssections_.size() ; i++)
-    {
-        crosssections_.at(i)->SetParticle(particle);
-    }
-}
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
-//destructors
+//---------------------------------Destructor---------------------------------//
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 ProcessCollection::~ProcessCollection(){}

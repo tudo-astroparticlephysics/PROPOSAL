@@ -2,6 +2,13 @@
 #include "PROPOSAL/Constants.h"
 
 
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//--------------------------------constructors--------------------------------//
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
 CrossSections::CrossSections( )
     :vMax_                  ( 0 )
     ,vUp_                   ( 0 )
@@ -20,7 +27,11 @@ CrossSections::CrossSections( )
     medium_         = new Medium();
     cut_settings_   = new EnergyCutSettings(-1,-1);
 }
+
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 CrossSections::CrossSections(Particle* particle,
                              Medium* medium,
@@ -43,7 +54,10 @@ CrossSections::CrossSections(Particle* particle,
     cut_settings_   = cut_settings;
 }
 
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 CrossSections::CrossSections(const CrossSections& crossSections)
     :name_                     ( crossSections.name_ )
@@ -65,32 +79,13 @@ CrossSections::CrossSections(const CrossSections& crossSections)
     cut_settings_             = new EnergyCutSettings( *crossSections.cut_settings_ );
 }
 
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//-------------------------operators and swap function------------------------//
+//----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-//CrossSections& CrossSections::operator=(const CrossSections &crossSections){
-
-//    if (this != &crossSections)
-//    {
-//        vMax_                     = crossSections.vMax_;
-//        vUp_                      = crossSections.vUp_;
-//        vMin_                     = crossSections.vMin_;
-//        ebig_                     = crossSections.ebig_;
-//        do_dedx_Interpolation_    = crossSections.do_dedx_Interpolation_;
-//        do_dndx_Interpolation_    = crossSections.do_dndx_Interpolation_;
-//        multiplier_               = crossSections.multiplier_;
-//        parametrization_          = crossSections.parametrization_;
-//        lpm_effect_enabled_       = crossSections.lpm_effect_enabled_;
-//        init_lpm_effect_          = crossSections.init_lpm_effect_;
-//        shadow_                   = crossSections.shadow_;
-//        hard_component_           = crossSections.hard_component_;
-//        order_of_interpolation_   = crossSections.order_of_interpolation_;
-//        *cut_settings_            = *crossSections.cut_settings_;
-//        *particle_                = *crossSections.particle_;
-//        *medium_                  = *crossSections.medium_;
-//    }
-//    return *this;
-//}
-//----------------------------------------------------------------------------//
 
 bool CrossSections::operator==(const CrossSections &crossSections) const
 {
@@ -117,13 +112,20 @@ bool CrossSections::operator==(const CrossSections &crossSections) const
     return true;
 }
 
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 bool CrossSections::operator!=(const CrossSections &crossSections) const
 {
     return !(*this == crossSections);
 }
+
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 void CrossSections::swap(CrossSections &crossSections)
 {
@@ -147,63 +149,52 @@ void CrossSections::swap(CrossSections &crossSections)
     medium_->swap(*crossSections.medium_);
 }
 
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//---------------------------------Setter-------------------------------------//
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 void CrossSections::SetParametrizationLimit(double ebig){
     ebig_ = ebig;
 }
 
-//----------------------------------------------------------------------------//
-
 void CrossSections::SetMultiplier(double multiplier){
     multiplier_ = multiplier;
 }
-
-//----------------------------------------------------------------------------//
 
 void CrossSections::SetVMin(double vMin){
     vMin_ = vMin;
 }
 
-//----------------------------------------------------------------------------//
-
 void CrossSections::SetVMax(double vMax){
     vMax_ = vMax;
 }
-
-//----------------------------------------------------------------------------//
 
 void CrossSections::SetVUp(double vUp){
     vUp_ = vUp;
 }
 
-//----------------------------------------------------------------------------//
-
 void CrossSections::SetParametrization(int parametrization){
     parametrization_ = parametrization;
 }
-
-//----------------------------------------------------------------------------//
 
 void CrossSections::SetParticle(Particle *particle){
     particle_ = particle;
 }
 
-//----------------------------------------------------------------------------//
-
 void CrossSections::SetMedium(Medium *medium){
     medium_ = medium;
 }
-//----------------------------------------------------------------------------//
 
 void CrossSections::SetEnergyCutSettings(EnergyCutSettings *cuts){
     cut_settings_ = cuts;
 }
-//----------------------------------------------------------------------------//
+
 void CrossSections::EnableLpmEffect(bool lpm_effect_enabled){
     lpm_effect_enabled_ = lpm_effect_enabled;
 }
 
-
-//----------------------------------------------------------------------------//
 

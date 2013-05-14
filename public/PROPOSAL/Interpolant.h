@@ -39,6 +39,10 @@
 class Interpolant{ /// implements FunctionInt{
 
 private:
+
+    const static double bigNumber_;
+    const static double aBigNumber_;
+
     int     romberg_, rombergY_;
 
     std::vector<double> iX_;
@@ -69,6 +73,9 @@ private:
 
     double  x_save_, y_save_;	// Is setted to 1 and 0 in constructor
 
+//----------------------------------------------------------------------------//
+//Memberfunctions
+
     /*!
     * interpolates f(x) based on the values iY[i]=f(iX[i]) in the romberg-vicinity of x
     *
@@ -80,16 +87,83 @@ private:
 
 //----------------------------------------------------------------------------//
 
+    /**
+    * Exp(x) with CutOff.
+    *
+    * if x > exp(aBigNumber): exp(x) \n
+    * else: 0
+    *
+    * \param    x
+    * \return   exp(x) OR 0;
+    */
 
-
-protected:
-
-    const static double bigNumber_;
-    const static double aBigNumber_;
-
+    double Exp(double x);
 
 //----------------------------------------------------------------------------//
 
+    /**
+    * Log if not zero.
+    *
+    * if x > 0: log(x) \n
+    * else: bigNumber
+    *
+    * \param    x
+    * \return   log(x) OR bigNumber;
+    */
+
+    double Log(double x);
+
+//----------------------------------------------------------------------------//
+
+    /**
+    * Log it again.
+    *
+    * \param    x
+    * \return   log(x) OR y_save;
+    */
+
+    double Slog(double x);
+
+//----------------------------------------------------------------------------//
+
+    double Get2dFunctionFixedY(double x); //TOMSASZ
+
+//----------------------------------------------------------------------------//
+
+    /**
+    * Auxiliary class initializer.
+    *
+    * Initializes class for the 1-dimensional function.
+    *
+    * \param   max          number of sampling points
+    * \param   xmin         lower limit of the interpolation table
+    * \param   xmax         upper limit of the interpolation table
+    * \param   romberg      order of interpolation
+    * \param   rational     interpolate with rational function
+    * \param   relative     save error relative to the function value
+    * \param   isLog        substitute x = log(x)
+    * \param   rombergY     order of interpolation for inverse interpolation(Find Limit)
+    * \param   rationalY    interpolate with rational function
+    * \param   relativeY    save error relative to the interpolated x-value
+    * \param   logSubst     substitute f(x) = log(f(x))
+    * \return
+    */
+    void InitInterpolant(int max, double xmin, double xmax,
+                         int romberg, bool rational, bool relative, bool isLog,
+                         int rombergY, bool rationalY, bool relativeY, bool logSubst);
+
+//----------------------------------------------------------------------------//
+
+    /**
+    * Defines a function for every row.
+    *
+    * \param    x
+    * \return   Function value f(x)
+    */
+
+    double FunctionInt(double x);
+
+//----------------------------------------------------------------------------//
 
 public:
 
@@ -178,41 +252,6 @@ public:
 //----------------------------------------------------------------------------//
 
     /**
-    * Auxiliary class initializer.
-    *
-    * Initializes class for the 1-dimensional function.
-    *
-    * \param   max          number of sampling points
-    * \param   xmin         lower limit of the interpolation table
-    * \param   xmax         upper limit of the interpolation table
-    * \param   romberg      order of interpolation
-    * \param   rational     interpolate with rational function
-    * \param   relative     save error relative to the function value
-    * \param   isLog        substitute x = log(x)
-    * \param   rombergY     order of interpolation for inverse interpolation(Find Limit)
-    * \param   rationalY    interpolate with rational function
-    * \param   relativeY    save error relative to the interpolated x-value
-    * \param   logSubst     substitute f(x) = log(f(x))
-    * \return
-    */
-    void InitInterpolant(int max, double xmin, double xmax,
-                         int romberg, bool rational, bool relative, bool isLog,
-                         int rombergY, bool rationalY, bool relativeY, bool logSubst);
-
-//----------------------------------------------------------------------------//
-
-    /**
-    * Defines a function for every row.
-    *
-    * \param    x
-    * \return   Function value f(x)
-    */
-
-    double FunctionInt(double x);
-
-//----------------------------------------------------------------------------//
-
-    /**
     * Interpolates f(x) for 1d function
     *
     * \param    x
@@ -275,9 +314,6 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    double Get2dFunctionFixedY(double x); //TOMSASZ
-//----------------------------------------------------------------------------//
-
     void swap(Interpolant &interpolant);
 
 //----------------------------------------------------------------------------//
@@ -303,44 +339,6 @@ public:
     bool Load(std::string Path);
     bool Load(std::ifstream &in);
 
-//----------------------------------------------------------------------------//
-
-    /**
-    * Exp(x) with CutOff.
-    *
-    * if x > exp(aBigNumber): exp(x) \n
-    * else: 0
-    *
-    * \param    x
-    * \return   exp(x) OR 0;
-    */
-
-    double Exp(double x);
-
-//----------------------------------------------------------------------------//
-
-    /**
-    * Log if not zero.
-    *
-    * if x > 0: log(x) \n
-    * else: bigNumber
-    *
-    * \param    x
-    * \return   log(x) OR bigNumber;
-    */
-
-    double Log(double x);
-
-//----------------------------------------------------------------------------//
-
-    /**
-    * Log it again.
-    *
-    * \param    x
-    * \return   log(x) OR y_save;
-    */
-
-    double Slog(double x);
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//

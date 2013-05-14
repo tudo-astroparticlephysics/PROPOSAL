@@ -12,94 +12,11 @@
 
 using namespace std;
 
-
-RootFinder::RootFinder()
-    :maxSteps_  ( 20 )
-    ,precision_ ( 1e-6 )
-{
-
-}
-
 //----------------------------------------------------------------------------//
-
-RootFinder::RootFinder(const RootFinder &finder)
-    :maxSteps_  ( finder.maxSteps_ )
-    ,precision_ ( finder.precision_ )
-{
-
-}
-
 //----------------------------------------------------------------------------//
-
-RootFinder& RootFinder::operator=(const RootFinder &finder){
-    if (this != &finder)
-    {
-      RootFinder tmp(finder);
-      swap(tmp);
-    }
-    return *this;
-}
+//-------------------------public member functions----------------------------//
 //----------------------------------------------------------------------------//
-bool RootFinder::operator==(const RootFinder &finder) const
-{
-    if (maxSteps_  != finder.maxSteps_ )    return false;
-    if (precision_ != finder.precision_ )   return false;
-
-    //else
-    return true;
-}
 //----------------------------------------------------------------------------//
-bool RootFinder::operator!=(const RootFinder &finder) const
-{
-    return !(*this == finder);
-}
-//----------------------------------------------------------------------------//
-
-RootFinder::RootFinder(int maxSteps, double precision)
-{
-    if(maxSteps<=0)
-    {
-        printf("Warning (in Integral/Integral/1): maxSteps = %d, must be >0, setting to 1",maxSteps);
-        maxSteps    =   1;
-    }
-
-    if(precision<=0)
-    {
-        printf("Warning (in Integral/Integral/2): precision = %f must be > 0, setting to 1.e-6",precision);
-        precision   =   1.e-6;
-    }
-
-    maxSteps_     =   maxSteps;
-    precision_    =   precision;
-
-}
-//----------------------------------------------------------------------------//
-void RootFinder::SetMaxSteps(int maxSteps) {
-	maxSteps_ = maxSteps;
-}
-//----------------------------------------------------------------------------//
-void RootFinder::SetPrecision(double precision) {
-	precision_ = precision;
-}
-//----------------------------------------------------------------------------//
-void RootFinder::swap(RootFinder &finder)
-{
-    using std::swap;
-
-    swap( maxSteps_ , finder.maxSteps_ );
-    swap( precision_, finder.precision_ );
-
-}
-//----------------------------------------------------------------------------//
-
-RootFinder::~RootFinder(){}
-
-//----------------------------------------------------------------------------//
-
-/**
-* returns the value of the root bracketed between min and max.
-* Starting value of x is determined by 0&lt;=startX&lt;=1
-*/
 
 double RootFinder::FindRoot(double min,
                             double max,
@@ -216,4 +133,134 @@ double RootFinder::FindRoot(double min,
 }
 
 
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//--------------------------------constructors--------------------------------//
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
 
+
+RootFinder::RootFinder()
+    :maxSteps_  ( 20 )
+    ,precision_ ( 1e-6 )
+{
+
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+RootFinder::RootFinder(const RootFinder &finder)
+    :maxSteps_  ( finder.maxSteps_ )
+    ,precision_ ( finder.precision_ )
+{
+
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+RootFinder::RootFinder(int maxSteps, double precision)
+{
+    if(maxSteps<=0)
+    {
+        printf("Warning (in Integral/Integral/1): maxSteps = %d, must be >0, setting to 1",maxSteps);
+        maxSteps    =   1;
+    }
+
+    if(precision<=0)
+    {
+        printf("Warning (in Integral/Integral/2): precision = %f must be > 0, setting to 1.e-6",precision);
+        precision   =   1.e-6;
+    }
+
+    maxSteps_     =   maxSteps;
+    precision_    =   precision;
+
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//-------------------------operators and swap function------------------------//
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+RootFinder& RootFinder::operator=(const RootFinder &finder)
+{
+    if (this != &finder)
+    {
+      RootFinder tmp(finder);
+      swap(tmp);
+    }
+    return *this;
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+bool RootFinder::operator==(const RootFinder &finder) const
+{
+    if (maxSteps_  != finder.maxSteps_ )    return false;
+    if (precision_ != finder.precision_ )   return false;
+
+    //else
+    return true;
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+bool RootFinder::operator!=(const RootFinder &finder) const
+{
+    return !(*this == finder);
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+void RootFinder::swap(RootFinder &finder)
+{
+    using std::swap;
+
+    swap( maxSteps_ , finder.maxSteps_ );
+    swap( precision_, finder.precision_ );
+
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//---------------------------------Setter-------------------------------------//
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+void RootFinder::SetMaxSteps(int maxSteps) {
+    maxSteps_ = maxSteps;
+}
+
+void RootFinder::SetPrecision(double precision) {
+    precision_ = precision;
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//---------------------------------Destructor---------------------------------//
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+RootFinder::~RootFinder(){}

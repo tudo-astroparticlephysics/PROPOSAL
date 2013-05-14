@@ -5,6 +5,372 @@ using namespace std;
 
 namespace po	= boost::program_options;
 
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//-------------------------public member functions----------------------------//
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+double Photonuclear::CalculatedEdx()
+{
+    if(multiplier_<=0)
+    {
+        return 0;
+    }
+
+    if(do_dedx_Interpolation_)
+    {
+        return max(dedx_interpolant_->Interpolate(particle_->GetEnergy()), 0.0);
+    }
+
+    double sum  =   0;
+
+    for(int i=0; i < medium_->GetNumCompontents(); i++)
+    {
+        SetIntegralLimits(i);
+        sum +=  integral_for_dEdx_->Integrate(vMin_, vUp_, boost::bind(&Photonuclear::FunctionToDEdxIntegral, this, _1),4);
+    }
+
+    return multiplier_*particle_->GetEnergy()*sum;
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+double Photonuclear::CalculatedNdx()
+{
+    if(multiplier_<=0)
+    {
+        return 0;
+    }
+
+    sum_of_rates_    =   0;
+
+    for(int i=0; i<medium_->GetNumCompontents(); i++)
+    {
+
+        if(do_dndx_Interpolation_)
+        {
+            sum_of_rates_    +=  max(dndx_interpolant_1d_.at(i)->Interpolate(particle_->GetEnergy()), 0.0);
+        }
+        else
+        {
+            SetIntegralLimits(i);
+            sum_of_rates_    +=  dndx_integral_.at(i)->Integrate(vUp_, vMax_, boost::bind(&Photonuclear::FunctionToDNdxIntegral, this, _1),4);
+        }
+    }
+
+    return sum_of_rates_;
+
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+double Photonuclear::CalculatedNdx(double rnd)
+{
+    if(multiplier_<=0)
+    {
+        return 0.;
+    }
+
+
+    sum_of_rates_   =   0;
+
+    for(int i=0; i<medium_->GetNumCompontents(); i++)
+    {
+
+        if(do_dndx_Interpolation_)
+        {
+            prob_for_component_.at(i) = max(dndx_interpolant_1d_.at(i)->Interpolate(particle_->GetEnergy()), 0.0);
+        }
+        else
+        {
+            SetIntegralLimits(i);
+            prob_for_component_.at(i) = dndx_integral_.at(i)->IntegrateWithLog(vUp_,vMax_, boost::bind(&Photonuclear::FunctionToDNdxIntegral, this, _1),rnd);
+        }
+
+        sum_of_rates_    +=  prob_for_component_.at(i);
+    }
+
+    return sum_of_rates_;
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+double Photonuclear::CalculateStochasticLoss(double rnd)
+{
+    double rand;
+    double rsum;
+
+    rand    =   rnd*sum_of_rates_;
+    rsum    =   0;
+
+
+    for(int i=0; i<(medium_->GetNumCompontents()); i++)
+    {
+        rsum    += prob_for_component_.at(i);
+        if(rsum > rand)
+        {
+            if(do_dndx_Interpolation_)
+            {
+                SetIntegralLimits(i);
+
+                if(vUp_==vMax_)
+                {
+                    return (particle_->GetEnergy())*vUp_;
+                }
+
+                return particle_->GetEnergy()*(vUp_*exp(dndx_interpolant_2d_.at(i)->FindLimit((particle_->GetEnergy()), (rnd)*prob_for_component_.at(i))*log(vMax_/vUp_)));
+
+            }
+            else
+            {
+                component_ = i;
+                return (particle_->GetEnergy())*dndx_integral_.at(i)->GetUpperLimit();
+
+            }
+        }
+    }
+    bool prob_for_all_comp_is_zero=true;
+    for(int i=0; i<(medium_->GetNumCompontents()); i++)
+    {
+        SetIntegralLimits(i);
+        if(vUp_!=vMax_)prob_for_all_comp_is_zero=false;
+    }
+    if(prob_for_all_comp_is_zero)return 0;
+
+    cerr<<"Error (in Photonuclear/e): sum was not initialized correctly";
+    cerr<<"ecut: " << cut_settings_->GetEcut() << "\t vcut: " <<  cut_settings_->GetVcut() << "\t energy: " << particle_->GetEnergy() << "\t type: " << particle_->GetName() << endl;
+    return 0;
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+double Photonuclear::CalculateStochasticLoss(double rnd1, double rnd2)
+{
+    double rand;
+    double rsum;
+
+    //double rnd_ = rnd1;
+    double sum = this->CalculatedNdx(rnd1);
+    rand    =   rnd2*sum;
+    rsum    =   0;
+
+
+    for(int i=0; i<(medium_->GetNumCompontents()); i++)
+    {
+        rsum    += prob_for_component_.at(i);
+        if(rsum > rand)
+        {
+            if(do_dndx_Interpolation_)
+            {
+                SetIntegralLimits(i);
+
+                if(vUp_==vMax_)
+                {
+                    return (particle_->GetEnergy())*vUp_;
+                }
+
+                return particle_->GetEnergy()*(vUp_*exp(dndx_interpolant_2d_.at(i)->FindLimit((particle_->GetEnergy()), (rnd1)*prob_for_component_.at(i))*log(vMax_/vUp_)));
+
+            }
+            else
+            {
+                component_ = i;
+                return (particle_->GetEnergy())*dndx_integral_.at(i)->GetUpperLimit();
+
+            }
+        }
+    }
+    bool prob_for_all_comp_is_zero=true;
+    for(int i=0; i<(medium_->GetNumCompontents()); i++)
+    {
+        SetIntegralLimits(i);
+        if(vUp_!=vMax_)prob_for_all_comp_is_zero=false;
+    }
+    if(prob_for_all_comp_is_zero)return 0;
+
+    cerr<<"Error (in Photonuclear/e): sum was not initialized correctly";
+    cerr<<"ecut: " << cut_settings_->GetEcut() << "\t vcut: " <<  cut_settings_->GetVcut() << "\t energy: " << particle_->GetEnergy() << "\t type: " << particle_->GetName() << endl;
+    return 0;
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//-----------------------Enable and disable interpolation---------------------//
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+void Photonuclear::EnableDNdxInterpolation()
+{
+    if(do_dndx_Interpolation_)return;
+
+    EnablePhotoInterpolation();
+
+    double energy = particle_->GetEnergy();
+    dndx_interpolant_1d_.resize(medium_->GetNumCompontents());
+    dndx_interpolant_2d_.resize(medium_->GetNumCompontents());
+    for(int i=0; i<(medium_->GetNumCompontents()); i++)
+    {
+        component_ = i;
+        dndx_interpolant_2d_.at(i) =    new Interpolant(NUM1, particle_->GetLow(), BIGENERGY,  NUM1, 0, 1, boost::bind(&Photonuclear::FunctionToBuildDNdxInterpolant2D, this, _1 , _2), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false, order_of_interpolation_, true, false, false);
+        dndx_interpolant_1d_.at(i) =    new Interpolant(NUM1, particle_->GetLow(), BIGENERGY,  boost::bind(&Photonuclear::FunctionToBuildDNdxInterpolant1D, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, true, false, false);
+    }
+    particle_->SetEnergy(energy);
+
+    do_dndx_Interpolation_=true;
+
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+void Photonuclear::EnableDEdxInterpolation()
+{
+    if(do_dedx_Interpolation_)return;
+
+    EnablePhotoInterpolation();
+    double energy = particle_->GetEnergy();
+    dedx_interpolant_ = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, boost::bind(&Photonuclear::FunctionToBuildDEdxInterpolant, this, _1),
+                                        order_of_interpolation_, true, false, true, order_of_interpolation_, false, false, false);
+    do_dedx_Interpolation_=true;
+    particle_->SetEnergy(energy);
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+void Photonuclear::EnablePhotoInterpolation()
+{
+    if(do_photo_interpolation_)return;
+
+    double energy = particle_->GetEnergy();
+
+    photo_interpolant_.resize( medium_->GetNumCompontents() );
+
+    for(int i=0; i<medium_->GetNumCompontents(); i++)
+    {
+        component_ = i;
+        photo_interpolant_.at(i)  = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, NUM1, 0., 1., boost::bind(&Photonuclear::FunctionToBuildPhotoInterpolant, this, _1, _2), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false, order_of_interpolation_, false, false, false);
+
+    }
+
+    do_photo_interpolation_ = true;
+    particle_->SetEnergy(energy);
+
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+void Photonuclear::DisableDNdxInterpolation()
+{
+    do_dndx_Interpolation_  =   false;
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+void Photonuclear::DisableDEdxInterpolation()
+{
+    do_dedx_Interpolation_  =   false;
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+void Photonuclear::DisablePhotoInterpolation()
+{
+    do_photo_interpolation_  =   false;
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//--------------------------Set and validate options--------------------------//
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+boost::program_options::options_description Photonuclear::CreateOptions()
+{
+    po::options_description photonuclear("Photonuclear options");
+    photonuclear.add_options()
+        ("photonuclear.para",             po::value<int>(&parametrization_)->default_value(1),              "1 = Kakoulin \n2 = Rhode \n3 = Bezrukov-Bugaev \n4 = Zeus \n5 = ALLM 91 \n6 = ALLM 97 \n7 = Butkevich-Mikhailov")
+        ("photonuclear.hard_component",   po::value<bool>(&hard_component_)->implicit_value(false),         "Enables hard component, only valid for parametrisation 1-4")
+        ("photonuclear.shadow",           po::value<int>(&shadow_)->default_value(1),                       "Nuclear structure function: dutt/butk\n, only valid for parametrisation 5-7")
+        ("photonuclear.interpol_dedx",    po::value<bool>(&do_dedx_Interpolation_)->implicit_value(false),  "Enables interpolation for dEdx")
+        ("photonuclear.interpol_dndx",    po::value<bool>(&do_dndx_Interpolation_)->implicit_value(false),  "Enables interpolation for dNdx")
+        ("photonuclear.multiplier",       po::value<double>(&multiplier_)->default_value(1.),               "modify the cross section by this factor")
+        ("photonuclear.interpol_order",   po::value<int>(&order_of_interpolation_)->default_value(5),       "number of interpolation points");
+
+   return photonuclear;
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+void Photonuclear::ValidateOptions()
+{
+    if(order_of_interpolation_ < 2)
+    {
+        order_of_interpolation_ = 5;
+        cerr<<"Photonuclear: Order of Interpolation is not a vaild number. Must be > 2.\t"<<"Set to 5"<<endl;
+    }
+    if(order_of_interpolation_ > 6)
+    {
+        cerr<<"Photonuclear: Order of Interpolation is set to "<<order_of_interpolation_
+            <<".\t Note a order of interpolation > 6 will slow down the program"<<endl;
+    }
+    if(parametrization_ < 1 || parametrization_ >7)
+    {
+        parametrization_ = 1;
+        cerr<<"Photonuclear: Parametrization is not a vaild number. Must be 1-7.\tSet parametrization to 1"<<endl;
+    }
+    if(parametrization_ > 4 && hard_component_==true)
+    {
+        cerr<<"Photonuclear: Enable the hard component has only an effect for parametrization > 4"<<endl;
+    }
+    if(shadow_ != 1 && shadow_ != 2)
+    {
+        cerr<<"Photonuclear: Shadow must be 1 or 2.\tSet to 1"<<endl;
+        shadow_ = 1;
+    }
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//--------------------------------constructors--------------------------------//
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 Photonuclear::Photonuclear()
     :component_             ( 0 )
@@ -40,7 +406,10 @@ Photonuclear::Photonuclear()
     interpolant_measured_ = NULL;
 }
 
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 Photonuclear::Photonuclear(const Photonuclear &photo)
     :CrossSections                      ( photo )
@@ -103,9 +472,62 @@ Photonuclear::Photonuclear(const Photonuclear &photo)
     }
 }
 
+
+//----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-Photonuclear& Photonuclear::operator=(const Photonuclear &photo){
+
+Photonuclear::Photonuclear(Particle* particle,
+                             Medium* medium,
+                             EnergyCutSettings* cut_settings)
+    :CrossSections(particle, medium, cut_settings)
+    ,component_             ( 0 )
+    ,init_measured_         ( true )
+    ,init_hardbb_           ( true )
+    ,hmax_                  ( 8 )
+    ,v_                     ( 0 )
+    ,do_photo_interpolation_( false )
+    ,shadow_                ( 1 )
+    ,hard_component_        ( true )
+    ,dndx_integral_         ( )
+    ,interpolant_hardBB_    ( )
+    ,dndx_interpolant_1d_   ( )
+    ,dndx_interpolant_2d_   ( )
+    ,photo_interpolant_     ( )
+    ,prob_for_component_    ( )
+
+
+{
+    name_       = "Photonuclear";
+    multiplier_ = 1.;
+    shadow_     = 1;
+
+    integral_             = new Integral(IROMB, IMAXS, IPREC);
+    integral_for_dEdx_    = new Integral(IROMB, IMAXS, IPREC);
+
+    dndx_integral_.resize(medium_->GetNumCompontents());
+
+    for(int i =0 ; i<medium_->GetNumCompontents();i++){
+        dndx_integral_.at(i) = new Integral(IROMB, IMAXS, IPREC);
+    }
+
+    prob_for_component_.resize(medium_->GetNumCompontents());
+    dedx_interpolant_     = NULL;
+    interpolant_measured_ = NULL;
+
+
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//-------------------------operators and swap function------------------------//
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+Photonuclear& Photonuclear::operator=(const Photonuclear &photo)
+{
 
     if (this != &photo)
     {
@@ -115,7 +537,10 @@ Photonuclear& Photonuclear::operator=(const Photonuclear &photo){
     return *this;
 }
 
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 bool Photonuclear::operator==(const Photonuclear &photo) const
 {
@@ -181,56 +606,20 @@ bool Photonuclear::operator==(const Photonuclear &photo) const
 
 }
 
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 bool Photonuclear::operator!=(const Photonuclear &photo) const
 {
     return !(*this == photo);
-
 }
+
+
+//----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-Photonuclear::Photonuclear(Particle* particle,
-                             Medium* medium,
-                             EnergyCutSettings* cut_settings)
-    :CrossSections(particle, medium, cut_settings)
-    ,component_             ( 0 )
-    ,init_measured_         ( true )
-    ,init_hardbb_           ( true )
-    ,hmax_                  ( 8 )
-    ,v_                     ( 0 )
-    ,do_photo_interpolation_( false )
-    ,shadow_                ( 1 )
-    ,hard_component_        ( true )
-    ,dndx_integral_         ( )
-    ,interpolant_hardBB_    ( )
-    ,dndx_interpolant_1d_   ( )
-    ,dndx_interpolant_2d_   ( )
-    ,photo_interpolant_     ( )
-    ,prob_for_component_    ( )
-
-
-{
-    name_       = "Photonuclear";
-    multiplier_ = 1.;
-    shadow_     = 1;
-
-    integral_             = new Integral(IROMB, IMAXS, IPREC);
-    integral_for_dEdx_    = new Integral(IROMB, IMAXS, IPREC);
-
-    dndx_integral_.resize(medium_->GetNumCompontents());
-
-    for(int i =0 ; i<medium_->GetNumCompontents();i++){
-        dndx_integral_.at(i) = new Integral(IROMB, IMAXS, IPREC);
-    }
-
-    prob_for_component_.resize(medium_->GetNumCompontents());
-    dedx_interpolant_     = NULL;
-    interpolant_measured_ = NULL;
-
-
-}
-//----------------------------------------------------------------------------//
 
 void Photonuclear::swap(Photonuclear &photo)
 {
@@ -290,467 +679,17 @@ void Photonuclear::swap(Photonuclear &photo)
 
 
 }
-//----------------------------------------------------------------------------//
 
-void Photonuclear::SetIntegralLimits(int component){
-
-    double aux;
-
-    component_ = component;
-    vMin_    =   (MPI + (MPI*MPI)/(2*medium_->GetAverageNucleonWeight().at(component_)))/particle_->GetEnergy();
-
-    if(particle_->GetMass() < MPI)
-    {
-        aux     =   particle_->GetMass()/medium_->GetAverageNucleonWeight().at(component_);
-        vMax_    =   1 - medium_->GetAverageNucleonWeight().at(component_)*(1 + aux*aux)/(2*particle_->GetEnergy());
-    }
-    else
-    {
-        vMax_    =   1;
-    }
-
-    vMax_    =   min(vMax_, 1-particle_->GetMass()/particle_->GetEnergy());
-
-    if(vMax_ < vMin_)
-    {
-        vMax_    =   vMin_;
-    }
-
-    vUp_     =   min(vMax_, cut_settings_->GetCut(particle_->GetEnergy()));
-
-    if(vUp_ < vMin_)
-    {
-        vUp_ =   vMin_;
-    }
-
-}
 
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//----------------------------Parametrizations--------------------------------//
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
 
-double Photonuclear::CalculatedEdx()
+
+double Photonuclear::KokoulinParametrization(double v, int i)
 {
-    if(multiplier_<=0)
-    {
-        return 0;
-    }
-
-    if(do_dedx_Interpolation_)
-    {
-        return max(dedx_interpolant_->Interpolate(particle_->GetEnergy()), 0.0);
-    }
-
-    double sum  =   0;
-
-    for(int i=0; i < medium_->GetNumCompontents(); i++)
-    {
-        SetIntegralLimits(i);
-        sum +=  integral_for_dEdx_->Integrate(vMin_, vUp_, boost::bind(&Photonuclear::FunctionToDEdxIntegral, this, _1),4);
-    }
-
-    return multiplier_*particle_->GetEnergy()*sum;
-}
-//----------------------------------------------------------------------------//
-
-double Photonuclear::CalculatedNdx(){
-
-
-    if(multiplier_<=0)
-    {
-        return 0;
-    }
-
-    sum_of_rates_    =   0;
-
-    for(int i=0; i<medium_->GetNumCompontents(); i++)
-    {
-
-        if(do_dndx_Interpolation_)
-        {
-            sum_of_rates_    +=  max(dndx_interpolant_1d_.at(i)->Interpolate(particle_->GetEnergy()), 0.0);
-        }
-        else
-        {
-            SetIntegralLimits(i);
-            sum_of_rates_    +=  dndx_integral_.at(i)->Integrate(vUp_, vMax_, boost::bind(&Photonuclear::FunctionToDNdxIntegral, this, _1),4);
-        }
-    }
-
-    return sum_of_rates_;
-
-}
-//----------------------------------------------------------------------------//
-
-double Photonuclear::CalculatedNdx(double rnd){
-
-    if(multiplier_<=0)
-    {
-        return 0.;
-    }
-
-
-    sum_of_rates_   =   0;
-
-    for(int i=0; i<medium_->GetNumCompontents(); i++)
-    {
-
-        if(do_dndx_Interpolation_)
-        {
-            prob_for_component_.at(i) = max(dndx_interpolant_1d_.at(i)->Interpolate(particle_->GetEnergy()), 0.0);
-        }
-        else
-        {
-            SetIntegralLimits(i);
-            prob_for_component_.at(i) = dndx_integral_.at(i)->IntegrateWithLog(vUp_,vMax_, boost::bind(&Photonuclear::FunctionToDNdxIntegral, this, _1),rnd);
-        }
-
-        sum_of_rates_    +=  prob_for_component_.at(i);
-    }
-
-    return sum_of_rates_;
-}
-//----------------------------------------------------------------------------//
-
-double Photonuclear::CalculateStochasticLoss(double rnd)
-{
-    double rand;
-    double rsum;
-
-    rand    =   rnd*sum_of_rates_;
-    rsum    =   0;
-
-
-    for(int i=0; i<(medium_->GetNumCompontents()); i++)
-    {
-        rsum    += prob_for_component_.at(i);
-        if(rsum > rand)
-        {
-            if(do_dndx_Interpolation_)
-            {
-                SetIntegralLimits(i);
-
-                if(vUp_==vMax_)
-                {
-                    return (particle_->GetEnergy())*vUp_;
-                }
-
-                return particle_->GetEnergy()*(vUp_*exp(dndx_interpolant_2d_.at(i)->FindLimit((particle_->GetEnergy()), (rnd)*prob_for_component_.at(i))*log(vMax_/vUp_)));
-
-            }
-            else
-            {
-                component_ = i;
-                return (particle_->GetEnergy())*dndx_integral_.at(i)->GetUpperLimit();
-
-            }
-        }
-    }
-    bool prob_for_all_comp_is_zero=true;
-    for(int i=0; i<(medium_->GetNumCompontents()); i++)
-    {
-        SetIntegralLimits(i);
-        if(vUp_!=vMax_)prob_for_all_comp_is_zero=false;
-    }
-    if(prob_for_all_comp_is_zero)return 0;
-
-    cerr<<"Error (in Photonuclear/e): sum was not initialized correctly";
-    cerr<<"ecut: " << cut_settings_->GetEcut() << "\t vcut: " <<  cut_settings_->GetVcut() << "\t energy: " << particle_->GetEnergy() << "\t type: " << particle_->GetName() << endl;
-    return 0;
-}
-//----------------------------------------------------------------------------//
-
-double Photonuclear::CalculateStochasticLoss(double rnd1, double rnd2){
-
-    double rand;
-    double rsum;
-
-    //double rnd_ = rnd1;
-    double sum = this->CalculatedNdx(rnd1);
-    rand    =   rnd2*sum;
-    rsum    =   0;
-
-
-    for(int i=0; i<(medium_->GetNumCompontents()); i++)
-    {
-        rsum    += prob_for_component_.at(i);
-        if(rsum > rand)
-        {
-            if(do_dndx_Interpolation_)
-            {
-                SetIntegralLimits(i);
-
-                if(vUp_==vMax_)
-                {
-                    return (particle_->GetEnergy())*vUp_;
-                }
-
-                return particle_->GetEnergy()*(vUp_*exp(dndx_interpolant_2d_.at(i)->FindLimit((particle_->GetEnergy()), (rnd1)*prob_for_component_.at(i))*log(vMax_/vUp_)));
-
-            }
-            else
-            {
-                component_ = i;
-                return (particle_->GetEnergy())*dndx_integral_.at(i)->GetUpperLimit();
-
-            }
-        }
-    }
-    bool prob_for_all_comp_is_zero=true;
-    for(int i=0; i<(medium_->GetNumCompontents()); i++)
-    {
-        SetIntegralLimits(i);
-        if(vUp_!=vMax_)prob_for_all_comp_is_zero=false;
-    }
-    if(prob_for_all_comp_is_zero)return 0;
-
-    cerr<<"Error (in Photonuclear/e): sum was not initialized correctly";
-    cerr<<"ecut: " << cut_settings_->GetEcut() << "\t vcut: " <<  cut_settings_->GetVcut() << "\t energy: " << particle_->GetEnergy() << "\t type: " << particle_->GetName() << endl;
-    return 0;
-}
-
-//----------------------------------------------------------------------------//
-
-void Photonuclear::EnableDNdxInterpolation(){
-
-    if(do_dndx_Interpolation_)return;
-
-    EnablePhotoInterpolation();
-
-    double energy = particle_->GetEnergy();
-    dndx_interpolant_1d_.resize(medium_->GetNumCompontents());
-    dndx_interpolant_2d_.resize(medium_->GetNumCompontents());
-    for(int i=0; i<(medium_->GetNumCompontents()); i++)
-    {
-        component_ = i;
-        dndx_interpolant_2d_.at(i) =    new Interpolant(NUM1, particle_->GetLow(), BIGENERGY,  NUM1, 0, 1, boost::bind(&Photonuclear::FunctionToBuildDNdxInterpolant2D, this, _1 , _2), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false, order_of_interpolation_, true, false, false);
-        dndx_interpolant_1d_.at(i) =    new Interpolant(NUM1, particle_->GetLow(), BIGENERGY,  boost::bind(&Photonuclear::FunctionToBuildDNdxInterpolant1D, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, true, false, false);
-    }
-    particle_->SetEnergy(energy);
-
-    do_dndx_Interpolation_=true;
-
-}
-//----------------------------------------------------------------------------//
-
-void Photonuclear::EnableDEdxInterpolation()
-{
-    if(do_dedx_Interpolation_)return;
-
-    EnablePhotoInterpolation();
-    double energy = particle_->GetEnergy();
-    dedx_interpolant_ = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, boost::bind(&Photonuclear::FunctionToBuildDEdxInterpolant, this, _1),
-                                        order_of_interpolation_, true, false, true, order_of_interpolation_, false, false, false);
-    do_dedx_Interpolation_=true;
-    particle_->SetEnergy(energy);
-}
-
-//----------------------------------------------------------------------------//
-
-void Photonuclear::EnablePhotoInterpolation()
-{
-    if(do_photo_interpolation_)return;
-
-    double energy = particle_->GetEnergy();
-
-    photo_interpolant_.resize( medium_->GetNumCompontents() );
-
-    for(int i=0; i<medium_->GetNumCompontents(); i++)
-    {
-        component_ = i;
-        photo_interpolant_.at(i)  = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, NUM1, 0., 1., boost::bind(&Photonuclear::FunctionToBuildPhotoInterpolant, this, _1, _2), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false, order_of_interpolation_, false, false, false);
-
-    }
-
-    do_photo_interpolation_ = true;
-    particle_->SetEnergy(energy);
-
-}
-
-//----------------------------------------------------------------------------//
-
-void Photonuclear::DisableDNdxInterpolation(){
-    do_dndx_Interpolation_  =   false;
-}
-
-//----------------------------------------------------------------------------//
-
-void Photonuclear::DisableDEdxInterpolation(){
-    do_dedx_Interpolation_  =   false;
-}
-//----------------------------------------------------------------------------//
-
-void Photonuclear::DisablePhotoInterpolation(){
-    do_photo_interpolation_  =   false;
-}
-
-//----------------------------------------------------------------------------//
-
-double Photonuclear::FunctionToDEdxIntegral(double variable){
-    return variable*PhotoN(variable, component_);
-}
-
-//----------------------------------------------------------------------------//
-
-double Photonuclear::FunctionToDNdxIntegral(double variable){
-    return multiplier_*PhotoN(variable, component_);
-}
-//----------------------------------------------------------------------------//
-
-
-double Photonuclear::PhotoN(double v, int i)
-{
-    switch(parametrization_)
-    {
-        case 1: return KokoulinParametrization(v, i);
-
-        case 2: return RhodeParametrization(v, i);
-
-        case 3: return BezrukovBugaevParametrization(v, i);
-
-        case 4: return ZeusParametrization(v, i);
-
-        case 5: return ALLM91Parametrization(v, i);
-
-        case 6: return ALLM97Parametrization(v, i);
-
-        case 7: return ButkevichMikhailovParametrization(v, i);
-
-        default:
-            cout<<"Prameterization "<<parametrization_ <<" is not supported!"<<endl;
-            cout<<"Be careful 0 is returned"<<endl;
-            return 0;
-
-    }
-
-}
-
-//----------------------------------------------------------------------------//
-
-
-void Photonuclear::SetMeasured(){
-
-    if(init_measured_)
-    {
-        init_measured_=false;
-
-        double x_aux[]  =   {0, 0.1, 0.144544, 0.20893, 0.301995,
-                            0.436516, 0.630957, 0.912011, 1.31826, 1.90546,
-                            2.75423, 3.98107, 5.7544, 8.31764, 12.0226,
-                            17.378, 25.1189, 36.3078, 52.4807, 75.8577,
-                            109.648, 158.489, 229.087, 331.131, 478.63,
-                            691.831, 1000, 1445.44, 2089.3, 3019.95,
-                            4365.16, 6309.58, 9120.12, 13182.6, 19054.6,
-                            27542.3, 39810.8, 57544, 83176.4, 120226,
-                            173780, 251188, 363078, 524807, 758576,
-                            1.09648e+06, 1.58489e+06, 2.29086e+06, 3.3113e+06, 4.78628e+06,
-                            6.91828e+06, 9.99996e+06};
-
-        double y_aux[]  =   {0, 0.0666667, 0.0963626, 159.74, 508.103,
-                            215.77, 236.403, 201.919, 151.381, 145.407,
-                            132.096, 128.546, 125.046, 121.863, 119.16,
-                            117.022, 115.496, 114.607, 114.368, 114.786,
-                            115.864, 117.606, 120.011, 123.08, 126.815,
-                            131.214, 136.278, 142.007, 148.401, 155.46,
-                            163.185, 171.574, 180.628, 190.348, 200.732,
-                            211.782, 223.497, 235.876, 248.921, 262.631,
-                            277.006, 292.046, 307.751, 324.121, 341.157,
-                            358.857, 377.222, 396.253, 415.948, 436.309,
-                            457.334, 479.025};
-
-        vector<double> x(x_aux, x_aux + sizeof(x_aux) / sizeof(double) );
-        vector<double> y(y_aux, y_aux + sizeof(y_aux) / sizeof(double) );
-
-        interpolant_measured_   =   new Interpolant(x, y, 4, false, false);
-    }
-
-}
-
-//----------------------------------------------------------------------------//
-
-double Photonuclear::MeasuredSgN(double e){
-    SetMeasured();
-    return interpolant_measured_->InterpolateArray(e);
-}
-
-//----------------------------------------------------------------------------//
-
-void Photonuclear::EnableHardBB(){
-    if(init_hardbb_)
-    {
-        init_hardbb_           =   false;
-        double x_aux[]  =   {3, 4, 5, 6, 7, 8, 9};
-
-
-        double y_aux[][56][7]=
-        {
-            {
-                {7.174409e-4, 1.7132e-3, 4.082304e-3, 8.628455e-3, 0.01244159, 0.02204591, 0.03228755},
-                {-0.2436045, -0.5756682, -1.553973, -3.251305, -5.976818, -9.495636, -13.92918},
-                {-0.2942209, -0.68615, -2.004218, -3.999623, -6.855045, -10.05705, -14.37232},
-                {-0.1658391, -0.3825223, -1.207777, -2.33175, -3.88775, -5.636636, -8.418409},
-                {-0.05227727, -0.1196482, -0.4033373, -0.7614046, -1.270677, -1.883845, -2.948277},
-                {-9.328318e-3, -0.02124577, -0.07555636, -0.1402496, -0.2370768, -0.3614146, -0.5819409},
-                {-8.751909e-4, -1.987841e-3, -7.399682e-3, -0.01354059, -0.02325118, -0.03629659, -0.059275},
-                {-3.343145e-5, -7.584046e-5, -2.943396e-4, -5.3155e-4, -9.265136e-4, -1.473118e-3, -2.419946e-3}
-            },
-            {
-                {-1.269205e-4, -2.843877e-4, -5.761546e-4, -1.195445e-3, -1.317386e-3, -9.689228e-15, -6.4595e-15},
-                {-0.01563032, -0.03589573, -0.07768545, -0.157375, -0.2720009, -0.4186136, -0.8045046},
-                {0.04693954, 0.1162945, 0.3064255, 0.7041273, 1.440518, 2.533355, 3.217832},
-                {0.05338546, 0.130975, 0.3410341, 0.7529364, 1.425927, 2.284968, 2.5487},
-                {0.02240132, 0.05496, 0.144945, 0.3119032, 0.5576727, 0.8360727, 0.8085682},
-                {4.658909e-3, 0.01146659, 0.03090286, 0.06514455, 0.1109868, 0.1589677, 0.1344223},
-                {4.822364e-4, 1.193018e-3, 3.302773e-3, 6.843364e-3, 0.011191, 0.015614, 0.01173827},
-                {1.9837e-5, 4.940182e-5, 1.409573e-4, 2.877909e-4, 4.544877e-4, 6.280818e-4, 4.281932e-4}
-            }
-        };
-
-        interpolant_hardBB_.resize(hmax_);
-
-        for(int i=0; i < hmax_; i++)
-        {
-            vector<double> x(x_aux, x_aux + sizeof(x_aux) / sizeof(double) );
-            vector<double> y(y_aux[particle_->GetType()-1][i], y_aux[particle_->GetType()-1][i] + sizeof(y_aux[particle_->GetType()-1][i]) / sizeof(double) );
-
-            interpolant_hardBB_.at(i)    =   new Interpolant(x, y, 4, false, false) ;
-        }
-    }
-}
-
-//----------------------------------------------------------------------------//
-
-double Photonuclear::HardBB(double e, double v){
-
-    EnableHardBB();
-
-    if(e<1.e5 || v<1.e-7)
-    {
-        return 0;
-    }
-
-    double aux, sum, lov, loe;
-
-    sum =   0;
-    aux =   1;
-    lov =   log(v)/LOG10;
-    loe =   log(e)/LOG10-3;
-
-    for(int i=0; i < hmax_; i++)
-    {
-        if(i>0)
-        {
-            aux *=  lov;
-        }
-
-        sum +=  aux*interpolant_hardBB_.at(i)->InterpolateArray(loe);
-    }
-    return sum/v;
-
-}
-
-//----------------------------------------------------------------------------//
-
-double Photonuclear::KokoulinParametrization(double v, int i){
-
     double nu, sgn, aux, aum, k, G, t;
 
     const double m1 =   0.54;
@@ -813,11 +752,13 @@ double Photonuclear::KokoulinParametrization(double v, int i){
 
 }
 
+
+//----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-double Photonuclear::RhodeParametrization(double v, int i){
 
-
+double Photonuclear::RhodeParametrization(double v, int i)
+{
     double nu, sgn, aux, aum, k, G, t;
 
     const double m1 =   0.54;
@@ -872,11 +813,13 @@ double Photonuclear::RhodeParametrization(double v, int i){
 
 }
 
+
+//----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
 
-double Photonuclear::BezrukovBugaevParametrization(double v, int i){
-
+double Photonuclear::BezrukovBugaevParametrization(double v, int i)
+{
     double nu, sgn, aux, aum, k, G, t;
 
     const double m1 =   0.54;
@@ -927,10 +870,11 @@ double Photonuclear::BezrukovBugaevParametrization(double v, int i){
 
 
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
 
 
-double Photonuclear::ZeusParametrization(double v, int i){
-
+double Photonuclear::ZeusParametrization(double v, int i)
+{
     double nu, sgn, aux, aum, k, G, t;
 
     const double m1 =   0.54;
@@ -979,11 +923,13 @@ double Photonuclear::ZeusParametrization(double v, int i){
 
 }
 
+
+//----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
 
-double Photonuclear::ALLM91Parametrization(double v, int i){
-
+double Photonuclear::ALLM91Parametrization(double v, int i)
+{
     if(do_photo_interpolation_)
     {
         SetIntegralLimits(i);
@@ -1018,10 +964,13 @@ double Photonuclear::ALLM91Parametrization(double v, int i){
 
 }
 
+
+//----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
 
-double Photonuclear::ALLM97Parametrization(double v, int i){
+double Photonuclear::ALLM97Parametrization(double v, int i)
+{
     if(do_photo_interpolation_)
     {
         SetIntegralLimits(i);
@@ -1056,11 +1005,13 @@ double Photonuclear::ALLM97Parametrization(double v, int i){
 
 }
 
+
+//----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
 
-double Photonuclear::ButkevichMikhailovParametrization(double v, int i){
-
+double Photonuclear::ButkevichMikhailovParametrization(double v, int i)
+{
     if(do_photo_interpolation_)
     {
         SetIntegralLimits(i);
@@ -1095,10 +1046,224 @@ double Photonuclear::ButkevichMikhailovParametrization(double v, int i){
 
 }
 
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//----------------------Cross section / limit / private-----------------------//
+//----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
 
-double Photonuclear::ShadowEffect(double x , double nu){
+void Photonuclear::SetIntegralLimits(int component)
+{
+
+    double aux;
+
+    component_ = component;
+    vMin_    =   (MPI + (MPI*MPI)/(2*medium_->GetAverageNucleonWeight().at(component_)))/particle_->GetEnergy();
+
+    if(particle_->GetMass() < MPI)
+    {
+        aux     =   particle_->GetMass()/medium_->GetAverageNucleonWeight().at(component_);
+        vMax_    =   1 - medium_->GetAverageNucleonWeight().at(component_)*(1 + aux*aux)/(2*particle_->GetEnergy());
+    }
+    else
+    {
+        vMax_    =   1;
+    }
+
+    vMax_    =   min(vMax_, 1-particle_->GetMass()/particle_->GetEnergy());
+
+    if(vMax_ < vMin_)
+    {
+        vMax_    =   vMin_;
+    }
+
+    vUp_     =   min(vMax_, cut_settings_->GetCut(particle_->GetEnergy()));
+
+    if(vUp_ < vMin_)
+    {
+        vUp_ =   vMin_;
+    }
+
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+double Photonuclear::PhotoN(double v, int i)
+{
+    switch(parametrization_)
+    {
+        case 1: return KokoulinParametrization(v, i);
+
+        case 2: return RhodeParametrization(v, i);
+
+        case 3: return BezrukovBugaevParametrization(v, i);
+
+        case 4: return ZeusParametrization(v, i);
+
+        case 5: return ALLM91Parametrization(v, i);
+
+        case 6: return ALLM97Parametrization(v, i);
+
+        case 7: return ButkevichMikhailovParametrization(v, i);
+
+        default:
+            cout<<"Prameterization "<<parametrization_ <<" is not supported!"<<endl;
+            cout<<"Be careful 0 is returned"<<endl;
+            return 0;
+
+    }
+
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+void Photonuclear::SetMeasured()
+{
+    if(init_measured_)
+    {
+        init_measured_=false;
+
+        double x_aux[]  =   {0, 0.1, 0.144544, 0.20893, 0.301995,
+                            0.436516, 0.630957, 0.912011, 1.31826, 1.90546,
+                            2.75423, 3.98107, 5.7544, 8.31764, 12.0226,
+                            17.378, 25.1189, 36.3078, 52.4807, 75.8577,
+                            109.648, 158.489, 229.087, 331.131, 478.63,
+                            691.831, 1000, 1445.44, 2089.3, 3019.95,
+                            4365.16, 6309.58, 9120.12, 13182.6, 19054.6,
+                            27542.3, 39810.8, 57544, 83176.4, 120226,
+                            173780, 251188, 363078, 524807, 758576,
+                            1.09648e+06, 1.58489e+06, 2.29086e+06, 3.3113e+06, 4.78628e+06,
+                            6.91828e+06, 9.99996e+06};
+
+        double y_aux[]  =   {0, 0.0666667, 0.0963626, 159.74, 508.103,
+                            215.77, 236.403, 201.919, 151.381, 145.407,
+                            132.096, 128.546, 125.046, 121.863, 119.16,
+                            117.022, 115.496, 114.607, 114.368, 114.786,
+                            115.864, 117.606, 120.011, 123.08, 126.815,
+                            131.214, 136.278, 142.007, 148.401, 155.46,
+                            163.185, 171.574, 180.628, 190.348, 200.732,
+                            211.782, 223.497, 235.876, 248.921, 262.631,
+                            277.006, 292.046, 307.751, 324.121, 341.157,
+                            358.857, 377.222, 396.253, 415.948, 436.309,
+                            457.334, 479.025};
+
+        vector<double> x(x_aux, x_aux + sizeof(x_aux) / sizeof(double) );
+        vector<double> y(y_aux, y_aux + sizeof(y_aux) / sizeof(double) );
+
+        interpolant_measured_   =   new Interpolant(x, y, 4, false, false);
+    }
+
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+double Photonuclear::MeasuredSgN(double e)
+{
+    SetMeasured();
+    return interpolant_measured_->InterpolateArray(e);
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+void Photonuclear::EnableHardBB()
+{
+    if(init_hardbb_)
+    {
+        init_hardbb_           =   false;
+        double x_aux[]  =   {3, 4, 5, 6, 7, 8, 9};
+
+
+        double y_aux[][56][7]=
+        {
+            {
+                {7.174409e-4, 1.7132e-3, 4.082304e-3, 8.628455e-3, 0.01244159, 0.02204591, 0.03228755},
+                {-0.2436045, -0.5756682, -1.553973, -3.251305, -5.976818, -9.495636, -13.92918},
+                {-0.2942209, -0.68615, -2.004218, -3.999623, -6.855045, -10.05705, -14.37232},
+                {-0.1658391, -0.3825223, -1.207777, -2.33175, -3.88775, -5.636636, -8.418409},
+                {-0.05227727, -0.1196482, -0.4033373, -0.7614046, -1.270677, -1.883845, -2.948277},
+                {-9.328318e-3, -0.02124577, -0.07555636, -0.1402496, -0.2370768, -0.3614146, -0.5819409},
+                {-8.751909e-4, -1.987841e-3, -7.399682e-3, -0.01354059, -0.02325118, -0.03629659, -0.059275},
+                {-3.343145e-5, -7.584046e-5, -2.943396e-4, -5.3155e-4, -9.265136e-4, -1.473118e-3, -2.419946e-3}
+            },
+            {
+                {-1.269205e-4, -2.843877e-4, -5.761546e-4, -1.195445e-3, -1.317386e-3, -9.689228e-15, -6.4595e-15},
+                {-0.01563032, -0.03589573, -0.07768545, -0.157375, -0.2720009, -0.4186136, -0.8045046},
+                {0.04693954, 0.1162945, 0.3064255, 0.7041273, 1.440518, 2.533355, 3.217832},
+                {0.05338546, 0.130975, 0.3410341, 0.7529364, 1.425927, 2.284968, 2.5487},
+                {0.02240132, 0.05496, 0.144945, 0.3119032, 0.5576727, 0.8360727, 0.8085682},
+                {4.658909e-3, 0.01146659, 0.03090286, 0.06514455, 0.1109868, 0.1589677, 0.1344223},
+                {4.822364e-4, 1.193018e-3, 3.302773e-3, 6.843364e-3, 0.011191, 0.015614, 0.01173827},
+                {1.9837e-5, 4.940182e-5, 1.409573e-4, 2.877909e-4, 4.544877e-4, 6.280818e-4, 4.281932e-4}
+            }
+        };
+
+        interpolant_hardBB_.resize(hmax_);
+
+        for(int i=0; i < hmax_; i++)
+        {
+            vector<double> x(x_aux, x_aux + sizeof(x_aux) / sizeof(double) );
+            vector<double> y(y_aux[particle_->GetType()-1][i], y_aux[particle_->GetType()-1][i] + sizeof(y_aux[particle_->GetType()-1][i]) / sizeof(double) );
+
+            interpolant_hardBB_.at(i)    =   new Interpolant(x, y, 4, false, false) ;
+        }
+    }
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+double Photonuclear::HardBB(double e, double v)
+{
+    EnableHardBB();
+
+    if(e<1.e5 || v<1.e-7)
+    {
+        return 0;
+    }
+
+    double aux, sum, lov, loe;
+
+    sum =   0;
+    aux =   1;
+    lov =   log(v)/LOG10;
+    loe =   log(e)/LOG10-3;
+
+    for(int i=0; i < hmax_; i++)
+    {
+        if(i>0)
+        {
+            aux *=  lov;
+        }
+
+        sum +=  aux*interpolant_hardBB_.at(i)->InterpolateArray(loe);
+    }
+    return sum/v;
+
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+double Photonuclear::ShadowEffect(double x , double nu)
+{
     double G , aux;
 
     if(shadow_ == 1)
@@ -1168,11 +1333,100 @@ double Photonuclear::ShadowEffect(double x , double nu){
     return G;
 }
 
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//-------------------------Functions to interpolate---------------------------//
+//----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
 
-double Photonuclear::FunctionToIntegralALLM91(double Q2){
+double Photonuclear::FunctionToBuildDEdxInterpolant(double energy)
+{
+    particle_->SetEnergy(energy);
+    return CalculatedEdx();
+}
 
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+double Photonuclear::FunctionToBuildDNdxInterpolant1D(double energy)
+{
+    return dndx_interpolant_2d_.at(component_)->Interpolate(energy, 1.);
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+double Photonuclear::FunctionToBuildDNdxInterpolant2D(double energy, double v)
+{
+
+    particle_->SetEnergy(energy);
+    SetIntegralLimits(component_);
+    if(vUp_==vMax_)
+    {
+        return 0;
+    }
+
+    v   =   vUp_*exp(v*log(vMax_/vUp_));
+
+    return dndx_integral_.at(component_)->Integrate(vUp_, v, boost::bind(&Photonuclear::FunctionToDNdxIntegral, this, _1) ,4);
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+double Photonuclear::FunctionToBuildPhotoInterpolant(double energy, double v)
+{
+    particle_->SetEnergy(energy);
+    SetIntegralLimits(component_);
+
+    if(vUp_==vMax_)
+    {
+        return 0;
+    }
+
+    v   =   vUp_*exp(v*log(vMax_/vUp_));
+
+    return PhotoN(v, component_);
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//--------------------------Functions to integrate----------------------------//
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+double Photonuclear::FunctionToDEdxIntegral(double variable)
+{
+    return variable*PhotoN(variable, component_);
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+double Photonuclear::FunctionToDNdxIntegral(double variable)
+{
+    return multiplier_*PhotoN(variable, component_);
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+double Photonuclear::FunctionToIntegralALLM91(double Q2)
+{
     double x, aux, nu, G, F2, R2;
 
     nu  =   v_*particle_->GetEnergy();
@@ -1273,11 +1527,13 @@ double Photonuclear::FunctionToIntegralALLM91(double Q2){
     return (4*PI*F2/v_)*aux;
 }
 
+
+//----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
 
-double Photonuclear::FunctionToIntegralALLM97(double Q2){
-
+double Photonuclear::FunctionToIntegralALLM97(double Q2)
+{
     double x, aux, nu, G, F2, R2;
 
     nu  =   v_*particle_->GetEnergy();
@@ -1375,11 +1631,14 @@ double Photonuclear::FunctionToIntegralALLM97(double Q2){
     return (4*PI*F2/v_)*aux;
 }
 
+
+//----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
 
-double Photonuclear::FunctionToIntegralButMik(double Q2){
 
+double Photonuclear::FunctionToIntegralButMik(double Q2)
+{
     double x, aux, nu, G, F2, R2;
 
     nu  =   v_*particle_->GetEnergy();
@@ -1429,101 +1688,13 @@ double Photonuclear::FunctionToIntegralButMik(double Q2){
     return (4*PI*F2/v_)*aux;
 }
 
-double Photonuclear::FunctionToBuildDEdxInterpolant(double energy)
-{
-    particle_->SetEnergy(energy);
-    return CalculatedEdx();
-}
 
 //----------------------------------------------------------------------------//
-
-double Photonuclear::FunctionToBuildDNdxInterpolant1D(double energy){
-    return dndx_interpolant_2d_.at(component_)->Interpolate(energy, 1.);
-
-}
+//----------------------------------------------------------------------------//
+//---------------------------------Setter-------------------------------------//
+//----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-double Photonuclear::FunctionToBuildDNdxInterpolant2D(double energy, double v){
-
-    particle_->SetEnergy(energy);
-    SetIntegralLimits(component_);
-    if(vUp_==vMax_)
-    {
-        return 0;
-    }
-
-    v   =   vUp_*exp(v*log(vMax_/vUp_));
-
-    return dndx_integral_.at(component_)->Integrate(vUp_, v, boost::bind(&Photonuclear::FunctionToDNdxIntegral, this, _1) ,4);
-}
-
-//----------------------------------------------------------------------------//
-
-double Photonuclear::FunctionToBuildPhotoInterpolant(double energy, double v)
-{
-    particle_->SetEnergy(energy);
-    SetIntegralLimits(component_);
-
-    if(vUp_==vMax_)
-    {
-        return 0;
-    }
-
-    v   =   vUp_*exp(v*log(vMax_/vUp_));
-
-    return PhotoN(v, component_);
-}
-
-//----------------------------------------------------------------------------//
-
-boost::program_options::options_description Photonuclear::CreateOptions()
-{
-    po::options_description photonuclear("Photonuclear options");
-    photonuclear.add_options()
-        ("photonuclear.para",             po::value<int>(&parametrization_)->default_value(1),              "1 = Kakoulin \n2 = Rhode \n3 = Bezrukov-Bugaev \n4 = Zeus \n5 = ALLM 91 \n6 = ALLM 97 \n7 = Butkevich-Mikhailov")
-        ("photonuclear.hard_component",   po::value<bool>(&hard_component_)->implicit_value(false),         "Enables hard component, only valid for parametrisation 1-4")
-        ("photonuclear.shadow",           po::value<int>(&shadow_)->default_value(1),                       "Nuclear structure function: dutt/butk\n, only valid for parametrisation 5-7")
-        ("photonuclear.interpol_dedx",    po::value<bool>(&do_dedx_Interpolation_)->implicit_value(false),  "Enables interpolation for dEdx")
-        ("photonuclear.interpol_dndx",    po::value<bool>(&do_dndx_Interpolation_)->implicit_value(false),  "Enables interpolation for dNdx")
-        ("photonuclear.multiplier",       po::value<double>(&multiplier_)->default_value(1.),               "modify the cross section by this factor")
-        ("photonuclear.interpol_order",   po::value<int>(&order_of_interpolation_)->default_value(5),       "number of interpolation points");
-
-   return photonuclear;
-}
-
-//----------------------------------------------------------------------------//
-
-void Photonuclear::ValidateOptions()
-{
-    if(order_of_interpolation_ < 2)
-    {
-        order_of_interpolation_ = 5;
-        cerr<<"Photonuclear: Order of Interpolation is not a vaild number. Must be > 2.\t"<<"Set to 5"<<endl;
-    }
-    if(order_of_interpolation_ > 6)
-    {
-        cerr<<"Photonuclear: Order of Interpolation is set to "<<order_of_interpolation_
-            <<".\t Note a order of interpolation > 6 will slow down the program"<<endl;
-    }
-    if(parametrization_ < 1 || parametrization_ >7)
-    {
-        parametrization_ = 1;
-        cerr<<"Photonuclear: Parametrization is not a vaild number. Must be 1-7.\tSet parametrization to 1"<<endl;
-    }
-    if(parametrization_ > 4 && hard_component_==true)
-    {
-        cerr<<"Photonuclear: Enable the hard component has only an effect for parametrization > 4"<<endl;
-    }
-    if(shadow_ != 1 && shadow_ != 2)
-    {
-        cerr<<"Photonuclear: Shadow must be 1 or 2.\tSet to 1"<<endl;
-        shadow_ = 1;
-    }
-}
-
-//----------------------------------------------------------------------------//
-
-//Setter
 
 void Photonuclear::SetComponent(int component) {
 	component_ = component;
@@ -1592,7 +1763,3 @@ void Photonuclear::SetShadow(int shadow){
 void Photonuclear::SetHardComponent(bool hard){
     hard_component_  =   hard;
 }
-
-
-//----------------------------------------------------------------------------//
-

@@ -15,162 +15,12 @@ using namespace std;
 
 namespace po	= boost::program_options;
 
-
-Propagator::Propagator()
-    :order_of_interpolation_    ( 5 )
-    ,debug_                     ( false )
-    ,particle_interaction_      ( false )
-    ,density_correction_        ( 1. )
-    ,do_time_interpolation_     ( false )
-    ,do_exact_time_calulation_  ( false )
-{
-    particle_              = new Particle("mu",0,0,0,0,0,1e6,0);
-    time_particle_         = new Integral();
-
-    interpol_time_particle_         = NULL;
-    interpol_time_particle_diff_    = NULL;
-
-    InitDefaultCollection();
-}
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//-------------------------public member functions----------------------------//
+//----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-Propagator::Propagator(const Propagator &propagator)
-    :order_of_interpolation_    ( propagator.order_of_interpolation_ )
-    ,debug_                     ( propagator.debug_ )
-    ,particle_interaction_      ( propagator.particle_interaction_ )
-    ,density_correction_        ( propagator.density_correction_ )
-    ,do_time_interpolation_     ( propagator.do_time_interpolation_ )
-    ,do_exact_time_calulation_  ( propagator.do_exact_time_calulation_ )
-    ,particle_                  ( propagator.particle_ )
-    ,collection_                ( new ProcessCollection(*propagator.collection_) )
-    ,time_particle_             ( new Integral(*propagator.time_particle_) )
-
-{
-    if(propagator.interpol_time_particle_ != NULL)
-    {
-        interpol_time_particle_ = new Interpolant(*propagator.interpol_time_particle_) ;
-    }
-    else
-    {
-        interpol_time_particle_ = NULL;
-    }
-
-    if(propagator.interpol_time_particle_diff_ != NULL)
-    {
-        interpol_time_particle_diff_ = new Interpolant(*propagator.interpol_time_particle_diff_) ;
-    }
-    else
-    {
-        interpol_time_particle_diff_ = NULL;
-    }
-}
-
-//----------------------------------------------------------------------------//
-
-Propagator& Propagator::operator=(const Propagator &propagator){
-    if (this != &propagator)
-    {
-      Propagator tmp(propagator);
-      swap(tmp);
-    }
-    return *this;
-}
-//----------------------------------------------------------------------------//
-bool Propagator::operator==(const Propagator &propagator) const
-{
-    if( order_of_interpolation_   != propagator.order_of_interpolation_ ) return false;
-    if( debug_                    != propagator.debug_ )                  return false;
-    if( particle_                 != propagator.particle_ )               return false;
-    if( particle_interaction_     != propagator.particle_interaction_ )   return false;
-    if( density_correction_       != propagator.density_correction_ )     return false;
-    if( do_time_interpolation_    != propagator.do_time_interpolation_ )  return false;
-    if( do_exact_time_calulation_ != propagator.do_exact_time_calulation_ )return false;
-
-    if( *collection_              != *propagator.collection_ )            return false;
-    if( *time_particle_           != *propagator.time_particle_ )         return false;
-
-    if( interpol_time_particle_diff_ != NULL && propagator.interpol_time_particle_diff_ != NULL)
-    {
-        if( *interpol_time_particle_diff_   != *propagator.interpol_time_particle_diff_)        return false;
-    }
-    else if( interpol_time_particle_diff_ != propagator.interpol_time_particle_diff_)           return false;
-
-    if( interpol_time_particle_ != NULL && propagator.interpol_time_particle_ != NULL)
-    {
-        if( *interpol_time_particle_   != *propagator.interpol_time_particle_)                  return false;
-    }
-    else if( interpol_time_particle_ != propagator.interpol_time_particle_)                     return false;
-
-    //else
-    return true;
-}
-//----------------------------------------------------------------------------//
-bool Propagator::operator!=(const Propagator &propagator) const
-{
-    return !(*this == propagator);
-}
-
-
-//----------------------------------------------------------------------------//
-void Propagator::swap(Propagator &propagator)
-{
-    using std::swap;
-
-    swap( order_of_interpolation_   ,   propagator.order_of_interpolation_ );
-    swap( debug_                    ,   propagator.debug_);
-    swap( particle_interaction_     ,   propagator.particle_interaction_);
-    swap( density_correction_       ,   propagator.density_correction_ );
-    swap( do_time_interpolation_    ,   propagator.do_time_interpolation_ );
-    swap( do_exact_time_calulation_ ,   propagator.do_exact_time_calulation_ );
-
-
-    particle_->swap( *propagator.particle_ );
-    collection_->swap( *propagator.collection_ );
-    time_particle_->swap(*propagator.time_particle_ );
-
-    if( interpol_time_particle_ != NULL && propagator.interpol_time_particle_ != NULL)
-    {
-        interpol_time_particle_->swap(*propagator.interpol_time_particle_);
-    }
-    else if( interpol_time_particle_ == NULL && propagator.interpol_time_particle_ != NULL)
-    {
-        interpol_time_particle_ = new Interpolant(*propagator.interpol_time_particle_);
-        propagator.interpol_time_particle_ = NULL;
-    }
-    else if( interpol_time_particle_ != NULL && propagator.interpol_time_particle_ == NULL)
-    {
-        propagator.interpol_time_particle_ = new Interpolant(*interpol_time_particle_);
-        interpol_time_particle_ = NULL;
-    }
-
-    if( interpol_time_particle_diff_ != NULL && propagator.interpol_time_particle_diff_ != NULL)
-    {
-        interpol_time_particle_diff_->swap(*propagator.interpol_time_particle_diff_);
-    }
-    else if( interpol_time_particle_diff_ == NULL && propagator.interpol_time_particle_diff_ != NULL)
-    {
-        interpol_time_particle_diff_ = new Interpolant(*propagator.interpol_time_particle_diff_);
-        propagator.interpol_time_particle_diff_ = NULL;
-    }
-    else if( interpol_time_particle_diff_ != NULL && propagator.interpol_time_particle_diff_ == NULL)
-    {
-        propagator.interpol_time_particle_diff_ = new Interpolant(*interpol_time_particle_diff_);
-        interpol_time_particle_diff_ = NULL;
-    }
-
-
-}
-//----------------------------------------------------------------------------//
-
-void Propagator::InitDefaultCollection()
-{
-    Medium* med             = new Medium("ice",1.);
-    EnergyCutSettings* cuts = new EnergyCutSettings(500,-1);
-    collection_             = new ProcessCollection(particle_ , med, cuts);
-
-}
-
-//----------------------------------------------------------------------------//
 
 std::pair<double,double> Propagator::CalculateEnergyTillStochastic( double initial_energy )
 {
@@ -216,7 +66,11 @@ std::pair<double,double> Propagator::CalculateEnergyTillStochastic( double initi
     return final;
 }
 
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
 double Propagator::Propagate( double distance )
 {
     bool    flag;
@@ -378,7 +232,10 @@ double Propagator::Propagate( double distance )
     return 0;
 }
 
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 double Propagator::CalculateParticleTime(double ei, double ef)
 {
@@ -449,37 +306,10 @@ void Propagator::AdvanceParticle(double dr, double ei, double ef)
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
-double Propagator::InterpolTimeParticle(double energy)
-{
-    return FunctionToTimeIntegral(energy);
-}
-
-
+//-----------------------Enable and disable interpolation---------------------//
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-
-double Propagator::InterpolTimeParticleDiff(double energy)
-{
-    return time_particle_->Integrate(energy, particle_->GetLow(), boost::bind(&Propagator::FunctionToTimeIntegral, this, _1),4);
-}
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-
-double Propagator::FunctionToTimeIntegral(double energy)
-{
-    double aux;
-
-    aux     =   collection_->FunctionToIntegral(energy);
-    aux     *=  particle_->GetEnergy()/(particle_->GetMomentum()*SPEED);
-    return aux;
-}
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
 
 void Propagator::EnableParticleTimeInterpolation()
 {
@@ -495,6 +325,47 @@ void Propagator::EnableParticleTimeInterpolation()
 }
 
 
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+void Propagator::DisableParticleTimeInterpolation()
+{
+    delete interpol_time_particle_;
+    delete interpol_time_particle_diff_;
+
+    interpol_time_particle_         = NULL;
+    interpol_time_particle_diff_    = NULL;
+
+    do_time_interpolation_ =false;
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+void Propagator::EnableInterpolation()
+{
+    collection_->EnableInterpolation();
+    EnableParticleTimeInterpolation();
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+void Propagator::DisableInterpolation()
+{
+    collection_->DisableInterpolation();
+    DisableParticleTimeInterpolation();
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//--------------------------Set and validate options--------------------------//
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
@@ -533,6 +404,7 @@ boost::program_options::options_description Propagator::CreateOptions()
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
+
 void Propagator::Setup(int argc, char** argv)
 {
     po::options_description all = CreateOptions();
@@ -562,33 +434,254 @@ void Propagator::Setup(int argc, char** argv)
     }
 }
 
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//--------------------------------constructors--------------------------------//
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
 
-void Propagator::DisableParticleTimeInterpolation()
+Propagator::Propagator()
+    :order_of_interpolation_    ( 5 )
+    ,debug_                     ( false )
+    ,particle_interaction_      ( false )
+    ,density_correction_        ( 1. )
+    ,do_time_interpolation_     ( false )
+    ,do_exact_time_calulation_  ( false )
 {
-    delete interpol_time_particle_;
-    delete interpol_time_particle_diff_;
+    particle_              = new Particle("mu",0,0,0,0,0,1e6,0);
+    time_particle_         = new Integral();
 
     interpol_time_particle_         = NULL;
     interpol_time_particle_diff_    = NULL;
 
-    do_time_interpolation_ =false;
+    InitDefaultCollection();
 }
 
+
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-void Propagator::EnableInterpolation()
+
+Propagator::Propagator(const Propagator &propagator)
+    :order_of_interpolation_    ( propagator.order_of_interpolation_ )
+    ,debug_                     ( propagator.debug_ )
+    ,particle_interaction_      ( propagator.particle_interaction_ )
+    ,density_correction_        ( propagator.density_correction_ )
+    ,do_time_interpolation_     ( propagator.do_time_interpolation_ )
+    ,do_exact_time_calulation_  ( propagator.do_exact_time_calulation_ )
+    ,particle_                  ( propagator.particle_ )
+    ,collection_                ( new ProcessCollection(*propagator.collection_) )
+    ,time_particle_             ( new Integral(*propagator.time_particle_) )
+
 {
+    if(propagator.interpol_time_particle_ != NULL)
+    {
+        interpol_time_particle_ = new Interpolant(*propagator.interpol_time_particle_) ;
+    }
+    else
+    {
+        interpol_time_particle_ = NULL;
+    }
 
-    collection_->EnableInterpolation();
-    EnableParticleTimeInterpolation();
+    if(propagator.interpol_time_particle_diff_ != NULL)
+    {
+        interpol_time_particle_diff_ = new Interpolant(*propagator.interpol_time_particle_diff_) ;
+    }
+    else
+    {
+        interpol_time_particle_diff_ = NULL;
+    }
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//-------------------------operators and swap function------------------------//
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+Propagator& Propagator::operator=(const Propagator &propagator)
+{
+    if (this != &propagator)
+    {
+      Propagator tmp(propagator);
+      swap(tmp);
+    }
+    return *this;
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+bool Propagator::operator==(const Propagator &propagator) const
+{
+    if( order_of_interpolation_   != propagator.order_of_interpolation_ ) return false;
+    if( debug_                    != propagator.debug_ )                  return false;
+    if( particle_                 != propagator.particle_ )               return false;
+    if( particle_interaction_     != propagator.particle_interaction_ )   return false;
+    if( density_correction_       != propagator.density_correction_ )     return false;
+    if( do_time_interpolation_    != propagator.do_time_interpolation_ )  return false;
+    if( do_exact_time_calulation_ != propagator.do_exact_time_calulation_ )return false;
+
+    if( *collection_              != *propagator.collection_ )            return false;
+    if( *time_particle_           != *propagator.time_particle_ )         return false;
+
+    if( interpol_time_particle_diff_ != NULL && propagator.interpol_time_particle_diff_ != NULL)
+    {
+        if( *interpol_time_particle_diff_   != *propagator.interpol_time_particle_diff_)        return false;
+    }
+    else if( interpol_time_particle_diff_ != propagator.interpol_time_particle_diff_)           return false;
+
+    if( interpol_time_particle_ != NULL && propagator.interpol_time_particle_ != NULL)
+    {
+        if( *interpol_time_particle_   != *propagator.interpol_time_particle_)                  return false;
+    }
+    else if( interpol_time_particle_ != propagator.interpol_time_particle_)                     return false;
+
+    //else
+    return true;
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+bool Propagator::operator!=(const Propagator &propagator) const
+{
+    return !(*this == propagator);
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+void Propagator::swap(Propagator &propagator)
+{
+    using std::swap;
+
+    swap( order_of_interpolation_   ,   propagator.order_of_interpolation_ );
+    swap( debug_                    ,   propagator.debug_);
+    swap( particle_interaction_     ,   propagator.particle_interaction_);
+    swap( density_correction_       ,   propagator.density_correction_ );
+    swap( do_time_interpolation_    ,   propagator.do_time_interpolation_ );
+    swap( do_exact_time_calulation_ ,   propagator.do_exact_time_calulation_ );
+
+
+    particle_->swap( *propagator.particle_ );
+    collection_->swap( *propagator.collection_ );
+    time_particle_->swap(*propagator.time_particle_ );
+
+    if( interpol_time_particle_ != NULL && propagator.interpol_time_particle_ != NULL)
+    {
+        interpol_time_particle_->swap(*propagator.interpol_time_particle_);
+    }
+    else if( interpol_time_particle_ == NULL && propagator.interpol_time_particle_ != NULL)
+    {
+        interpol_time_particle_ = new Interpolant(*propagator.interpol_time_particle_);
+        propagator.interpol_time_particle_ = NULL;
+    }
+    else if( interpol_time_particle_ != NULL && propagator.interpol_time_particle_ == NULL)
+    {
+        propagator.interpol_time_particle_ = new Interpolant(*interpol_time_particle_);
+        interpol_time_particle_ = NULL;
+    }
+
+    if( interpol_time_particle_diff_ != NULL && propagator.interpol_time_particle_diff_ != NULL)
+    {
+        interpol_time_particle_diff_->swap(*propagator.interpol_time_particle_diff_);
+    }
+    else if( interpol_time_particle_diff_ == NULL && propagator.interpol_time_particle_diff_ != NULL)
+    {
+        interpol_time_particle_diff_ = new Interpolant(*propagator.interpol_time_particle_diff_);
+        propagator.interpol_time_particle_diff_ = NULL;
+    }
+    else if( interpol_time_particle_diff_ != NULL && propagator.interpol_time_particle_diff_ == NULL)
+    {
+        propagator.interpol_time_particle_diff_ = new Interpolant(*interpol_time_particle_diff_);
+        interpol_time_particle_diff_ = NULL;
+    }
+
 
 }
 
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//------------------------private member functions----------------------------//
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+void Propagator::InitDefaultCollection()
+{
+    Medium* med             = new Medium("ice",1.);
+    EnergyCutSettings* cuts = new EnergyCutSettings(500,-1);
+    collection_             = new ProcessCollection(particle_ , med, cuts);
+
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//-------------------------Functions to interpolate---------------------------//
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+double Propagator::InterpolTimeParticle(double energy)
+{
+    return FunctionToTimeIntegral(energy);
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+double Propagator::InterpolTimeParticleDiff(double energy)
+{
+    return time_particle_->Integrate(energy, particle_->GetLow(), boost::bind(&Propagator::FunctionToTimeIntegral, this, _1),4);
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//--------------------------Functions to integrate----------------------------//
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+double Propagator::FunctionToTimeIntegral(double energy)
+{
+    double aux;
+
+    aux     =   collection_->FunctionToIntegral(energy);
+    aux     *=  particle_->GetEnergy()/(particle_->GetMomentum()*SPEED);
+    return aux;
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//---------------------------------Setter-------------------------------------//
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//---------------------------------Destructor---------------------------------//
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 Propagator::~Propagator(){}
 
 

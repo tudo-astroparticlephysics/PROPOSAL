@@ -9,208 +9,15 @@ using namespace std;
 
 namespace po	= boost::program_options;
 
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//-------------------------public member functions----------------------------//
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
 
-Bremsstrahlung::Bremsstrahlung( )
-    :CrossSections          ( )
-    ,lorenz_                ( false )
-    ,lorenz_cut_            ( 1e6 )
-    ,component_             ( 0 )
-    ,dndx_integral_         ( )
-    ,dndx_interpolant_1d_   ( )
-    ,dndx_interpolant_2d_   ( )
-    ,eLpm_                  ( 0 )
-    ,prob_for_component_    ( )
+
+double Bremsstrahlung::CalculatedEdx()
 {
-    dedx_integral_   =  new Integral(IROMB, IMAXS, IPREC);
-    dedx_interpolant_= NULL;
-
-    dndx_integral_.resize(medium_->GetNumCompontents());
-
-    for(int i =0; i<(medium_->GetNumCompontents()); i++)
-    {
-            dndx_integral_.at(i) =   new Integral(IROMB, IMAXS, IPREC);
-    }
-    do_dedx_Interpolation_  = false;
-    do_dndx_Interpolation_  = false;
-    name_                   = "Bremsstrahlung";
-
-}
-
-//----------------------------------------------------------------------------//
-
-Bremsstrahlung::Bremsstrahlung(const Bremsstrahlung &brems)
-    :CrossSections                      ( brems )
-    ,lorenz_                            ( brems.lorenz_ )
-    ,lorenz_cut_                        ( brems.lorenz_cut_ )
-    ,component_                         ( brems.component_ )
-    ,dedx_integral_                     ( new Integral(*brems.dedx_integral_) )
-    ,eLpm_                              ( brems.eLpm_)
-    ,prob_for_component_                ( brems.prob_for_component_)
-{
-    if(brems.dedx_interpolant_ != NULL)
-    {
-        dedx_interpolant_ = new Interpolant(*brems.dedx_interpolant_) ;
-    }
-    else
-    {
-        dedx_interpolant_ = NULL;
-    }
-
-
-    dndx_integral_.resize( brems.dndx_integral_.size() );
-    dndx_interpolant_1d_.resize( brems.dndx_interpolant_1d_.size() );
-    dndx_interpolant_2d_.resize( brems.dndx_interpolant_2d_.size() );
-
-    for(unsigned int i =0; i<brems.dndx_integral_.size(); i++)
-    {
-        dndx_integral_.at(i) = new Integral( *brems.dndx_integral_.at(i) );
-    }
-    for(unsigned int i =0; i<brems.dndx_interpolant_1d_.size(); i++)
-    {
-        dndx_interpolant_1d_.at(i) = new Interpolant( *brems.dndx_interpolant_1d_.at(i) );
-    }
-    for(unsigned int i =0; i<brems.dndx_interpolant_2d_.size(); i++)
-    {
-        dndx_interpolant_2d_.at(i) = new Interpolant( *brems.dndx_interpolant_2d_.at(i) );
-    }
-}
-
-//----------------------------------------------------------------------------//
-
-Bremsstrahlung& Bremsstrahlung::operator=(const Bremsstrahlung &brems){
-
-    if (this != &brems)
-    {
-      Bremsstrahlung tmp(brems);
-      swap(tmp);
-    }
-    return *this;
-}
-
-//----------------------------------------------------------------------------//
-
-bool Bremsstrahlung::operator==(const Bremsstrahlung &brems) const
-{
-    if( this->CrossSections::operator !=(brems) )                           return false;
-
-    if( lorenz_                     !=  brems.lorenz_)                      return false;
-    if( lorenz_cut_                 !=  brems.lorenz_cut_)                  return false;
-    if( component_                  !=  brems.component_)                   return false;
-    if( eLpm_                       !=  brems.eLpm_)                        return false;
-    if( *dedx_integral_             != *brems.dedx_integral_)               return false;
-    if( prob_for_component_.size()  !=  brems.prob_for_component_.size())   return false;
-    if( dndx_integral_.size()       !=  brems.dndx_integral_.size())        return false;
-    if( dndx_interpolant_1d_.size() !=  brems.dndx_interpolant_1d_.size())  return false;
-    if( dndx_interpolant_2d_.size() !=  brems.dndx_interpolant_2d_.size())  return false;
-
-    for(unsigned int i =0; i<brems.dndx_integral_.size(); i++)
-    {
-        if( *dndx_integral_.at(i)       != *brems.dndx_integral_.at(i) )        return false;
-    }
-    for(unsigned int i =0; i<brems.dndx_interpolant_1d_.size(); i++)
-    {
-        if( *dndx_interpolant_1d_.at(i) != *brems.dndx_interpolant_1d_.at(i) )  return false;
-    }
-    for(unsigned int i =0; i<brems.dndx_interpolant_2d_.size(); i++)
-    {
-        if( *dndx_interpolant_2d_.at(i) != *brems.dndx_interpolant_2d_.at(i) )  return false;
-    }
-    for(unsigned int i =0; i<brems.prob_for_component_.size(); i++)
-    {
-        if( prob_for_component_.at(i) != brems.prob_for_component_.at(i) )      return false;
-    }
-
-    if( dedx_interpolant_ != NULL && brems.dedx_interpolant_ != NULL)
-    {
-        if( *dedx_interpolant_          != *brems.dedx_interpolant_)            return false;
-    }
-    else if( dedx_interpolant_ != brems.dedx_interpolant_)                      return false;
-
-    //else
-    return true;
-
-}
-
-//----------------------------------------------------------------------------//
-
-bool Bremsstrahlung::operator!=(const Bremsstrahlung &bremsstrahlung) const
-{
-    return !(*this == bremsstrahlung);
-
-}
-
-//----------------------------------------------------------------------------//
-
-Bremsstrahlung::Bremsstrahlung(Particle* particle,
-                             Medium* medium,
-                             EnergyCutSettings* cut_settings)
-    :CrossSections          ( particle, medium, cut_settings )
-    ,lorenz_                ( false )
-    ,lorenz_cut_            ( 1.e6 )
-    ,dndx_integral_         ( )
-    ,dndx_interpolant_1d_   ( )
-    ,dndx_interpolant_2d_   ( )
-    ,eLpm_                  ( 0 )
-    ,prob_for_component_    ( )
-{
-    name_                       = "Bremsstrahlung";
-    vMax_                       = 0;
-    vUp_                        = 0;
-    vMin_                       = 0;
-    ebig_                       = BIGENERGY;
-    do_dedx_Interpolation_      = false;
-    do_dndx_Interpolation_      = false;
-    multiplier_                 = 1.;
-    parametrization_            = 1;
-    lpm_effect_enabled_         = false;
-    init_lpm_effect_            = true;
-    component_                  = 0;
-
-    dedx_integral_   =  new Integral(IROMB, IMAXS, IPREC);
-    dedx_interpolant_=  NULL;
-
-    dndx_integral_.resize( medium_->GetNumCompontents() );
-
-    for(int i =0; i<(medium_->GetNumCompontents()); i++)
-    {
-            dndx_integral_.at(i) =   new Integral(IROMB, IMAXS, IPREC);
-    }
-
-    prob_for_component_.resize(medium_->GetNumCompontents());
-
-    do_dedx_Interpolation_  = false;
-    do_dndx_Interpolation_  = false;
-
-}
-
-//----------------------------------------------------------------------------//
-
-
-void Bremsstrahlung::SetIntegralLimits(int component){
-
-    component_ = component;
-
-    vMax_   =   1 - (3./4)*SQRTE*(particle_->GetMass()/particle_->GetEnergy())
-                *pow((medium_->GetNucCharge().at(component_)) , 1./3);
-
-    if(vMax_<0)
-    {
-        vMax_   =   0;
-    }
-
-    if(lorenz_)
-    {
-        vMax_   =   min(vMax_, lorenz_cut_/(particle_->GetEnergy()));
-    }
-
-    vMax_   =   min(vMax_, (1-(particle_->GetMass()/particle_->GetEnergy())));
-    vUp_    =   min(vMax_, cut_settings_->GetCut( particle_->GetEnergy()));
-
-}
-
-//----------------------------------------------------------------------------//
-
-double Bremsstrahlung::CalculatedEdx(){
 
     double sum  =   0;
 
@@ -232,9 +39,14 @@ double Bremsstrahlung::CalculatedEdx(){
 
     return multiplier_*particle_->GetEnergy()*sum;
 }
+
+
+//----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-double Bremsstrahlung::CalculatedNdx(){
+
+double Bremsstrahlung::CalculatedNdx()
+{
 
     if(multiplier_<=0)
     {
@@ -262,9 +74,14 @@ double Bremsstrahlung::CalculatedNdx(){
 
     return sum_of_rates_;
 }
+
+
+//----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-double Bremsstrahlung::CalculatedNdx(double rnd){
+
+double Bremsstrahlung::CalculatedNdx(double rnd)
+{
     if(multiplier_<=0)
     {
         return 0;
@@ -294,7 +111,11 @@ double Bremsstrahlung::CalculatedNdx(double rnd){
     return sum_of_rates_;
 
 }
+
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 double Bremsstrahlung::CalculateStochasticLoss(double rnd)
 {
@@ -351,9 +172,11 @@ double Bremsstrahlung::CalculateStochasticLoss(double rnd)
 
 
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
 
 
-double Bremsstrahlung::CalculateStochasticLoss(double rnd1, double rnd2){
+double Bremsstrahlung::CalculateStochasticLoss(double rnd1, double rnd2)
+{
     double rand;
     double rsum;
 
@@ -403,65 +226,17 @@ double Bremsstrahlung::CalculateStochasticLoss(double rnd1, double rnd2){
     cout<<"ecut: " << cut_settings_->GetEcut() << "\t vcut: " <<  cut_settings_->GetVcut() << "\t energy: " << particle_->GetEnergy() << "\t type: " << particle_->GetName() << endl;
     return 0;
 }
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//-----------------------Enable and disable interpolation---------------------//
+//----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
 
-double Bremsstrahlung::CalculateStochasticLossNew(double rnd1, double rnd2){
-    double rand;
-    double rsum;
-
-
-    Integral* get_upper_integral = new Integral(IROMB, IMAXS, IPREC);
-
-    double sum = this->CalculatedNdx();
-    rand    =   rnd2*sum;
-    rsum    =   0;
-    cout<<"POINTER-----------------"<<get_upper_integral<<endl;
-
-    for(int i=0; i<(medium_->GetNumCompontents()); i++)
-    {
-        rsum    += prob_for_component_.at(i);
-        if(rsum > rand)
-        {
-
-            if(do_dndx_Interpolation_)
-            {
-                    SetIntegralLimits(i);
-
-                if(vUp_==vMax_)
-                {
-                    return (particle_->GetEnergy())*vUp_;
-                }
-
-                return (particle_->GetEnergy())*(vUp_*exp(dndx_interpolant_2d_.at(i)->FindLimit((particle_->GetEnergy()), (rnd1)*prob_for_component_.at(i))*log(vMax_/vUp_)));
-            }
-
-            else
-            {
-                component_ = i;
-                SetIntegralLimits(i);
-                return (particle_->GetEnergy())*get_upper_integral->GetUpperLimit(vUp_, vMax_,prob_for_component_.at(i), rnd1, boost::bind(&Bremsstrahlung::FunctionToDNdxIntegral, this, _1),4);
-
-            }
-        }
-    }
-
-    //TOMASZ sometime everything is fine, just the probability for interaction is zero
-    bool prob_for_all_comp_is_zero=true;
-    for(int i=0; i<(medium_->GetNumCompontents()); i++)
-    {
-        SetIntegralLimits(i);
-        if(vUp_!=vMax_)prob_for_all_comp_is_zero=false;
-    }
-    if(prob_for_all_comp_is_zero)return 0;
-
-    cout<<"Error (in BremsStochastic/e): sum was not initialized correctly" << endl;
-    cout<<"ecut: " << cut_settings_->GetEcut() << "\t vcut: " <<  cut_settings_->GetVcut() << "\t energy: " << particle_->GetEnergy() << "\t type: " << particle_->GetName() << endl;
-    return 0;
-}
-//----------------------------------------------------------------------------//
-
-void Bremsstrahlung::EnableDNdxInterpolation(){
+void Bremsstrahlung::EnableDNdxInterpolation()
+{
     if(do_dndx_Interpolation_)return;
 
     double energy = particle_->GetEnergy();
@@ -478,7 +253,11 @@ void Bremsstrahlung::EnableDNdxInterpolation(){
 
     do_dndx_Interpolation_=true;
 }
+
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 void Bremsstrahlung::EnableDEdxInterpolation()
 {
@@ -489,6 +268,8 @@ void Bremsstrahlung::EnableDEdxInterpolation()
     particle_->SetEnergy(energy);
 }
 
+
+//----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
 
@@ -510,7 +291,10 @@ void Bremsstrahlung::DisableDNdxInterpolation()
 
 }
 
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 void Bremsstrahlung::DisableDEdxInterpolation()
 {
@@ -518,19 +302,301 @@ void Bremsstrahlung::DisableDEdxInterpolation()
     do_dedx_Interpolation_  =   false;
 }
 
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//--------------------------Set and validate options--------------------------//
+//----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-double Bremsstrahlung::FunctionToDEdxIntegral(double variable){
-    return variable * ElasticBremsstrahlungCrossSection(variable, component_);
+
+boost::program_options::options_description Bremsstrahlung::CreateOptions()
+{
+    po::options_description bremsstrahlung("Bremsstrahlung options");
+    bremsstrahlung.add_options()
+        ("bremsstrahlung.lorenz",           po::value<bool>(&lorenz_)->implicit_value(false),                 "enable lorenz cut")
+        ("bremsstrahlung.lorenzCut",        po::value<double>(&lorenz_cut_)->default_value(1e6),              "lorenz cut in MeV")
+        ("bremsstrahlung.para",             po::value<int>(&parametrization_)->default_value(1),              "1 = Kelner-Kakoulin-Petrukhin \n2 = Andreev-Bezrukov-Bugaev \n3 = Petrukhin-Shestakov \n4 = Complete Screening Case")
+        ("bremsstrahlung.lpm",              po::value<bool>(&lpm_effect_enabled_)->implicit_value(false),     "Enables   Landau-Pomeranchuk-Migdal supression")
+        ("bremsstrahlung.interpol_dedx",    po::value<bool>(&do_dedx_Interpolation_)->implicit_value(false),  "Enables interpolation for dEdx")
+        ("bremsstrahlung.interpol_dndx",    po::value<bool>(&do_dndx_Interpolation_)->implicit_value(false),  "Enables interpolation for dNdx")
+        ("bremsstrahlung.multiplier",       po::value<double>(&multiplier_)->default_value(1.),               "modify the cross section by this factor")
+        ("bremsstrahlung.interpol_order",   po::value<int>(&order_of_interpolation_)->default_value(5),       "number of interpolation points");
+
+   return bremsstrahlung;
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+void Bremsstrahlung::ValidateOptions()
+{
+    if(parametrization_ < 1 || parametrization_ > 4)
+    {
+        parametrization_ = 1;
+        cerr<<"Bremsstrahlung: Parametrization is not a vaild number.  Must be 1-4. Set parametrization to 1"<<endl;
+    }
+    if(order_of_interpolation_ < 2)
+    {
+        order_of_interpolation_ = 5;
+        cerr<<"Bremsstrahlung: Order of Interpolation is not a vaild number\t"<<"Set to 5"<<endl;
+    }
+    if(order_of_interpolation_ > 6)
+    {
+        cerr<<"Bremsstrahlung: Order of Interpolation is set to "<<order_of_interpolation_
+            <<".\t Note a order of interpolation > 6 will slow down the program"<<endl;
+    }
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//--------------------------------constructors--------------------------------//
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+Bremsstrahlung::Bremsstrahlung( )
+    :CrossSections          ( )
+    ,lorenz_                ( false )
+    ,lorenz_cut_            ( 1e6 )
+    ,component_             ( 0 )
+    ,dndx_integral_         ( )
+    ,dndx_interpolant_1d_   ( )
+    ,dndx_interpolant_2d_   ( )
+    ,eLpm_                  ( 0 )
+    ,prob_for_component_    ( )
+{
+    dedx_integral_   =  new Integral(IROMB, IMAXS, IPREC);
+    dedx_interpolant_= NULL;
+
+    dndx_integral_.resize(medium_->GetNumCompontents());
+
+    for(int i =0; i<(medium_->GetNumCompontents()); i++)
+    {
+            dndx_integral_.at(i) =   new Integral(IROMB, IMAXS, IPREC);
+    }
+    do_dedx_Interpolation_  = false;
+    do_dndx_Interpolation_  = false;
+    name_                   = "Bremsstrahlung";
+
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//Copyconstructor
+
+Bremsstrahlung::Bremsstrahlung(const Bremsstrahlung &brems)
+    :CrossSections                      ( brems )
+    ,lorenz_                            ( brems.lorenz_ )
+    ,lorenz_cut_                        ( brems.lorenz_cut_ )
+    ,component_                         ( brems.component_ )
+    ,dedx_integral_                     ( new Integral(*brems.dedx_integral_) )
+    ,eLpm_                              ( brems.eLpm_)
+    ,prob_for_component_                ( brems.prob_for_component_)
+{
+    if(brems.dedx_interpolant_ != NULL)
+    {
+        dedx_interpolant_ = new Interpolant(*brems.dedx_interpolant_) ;
+    }
+    else
+    {
+        dedx_interpolant_ = NULL;
+    }
+
+
+    dndx_integral_.resize( brems.dndx_integral_.size() );
+    dndx_interpolant_1d_.resize( brems.dndx_interpolant_1d_.size() );
+    dndx_interpolant_2d_.resize( brems.dndx_interpolant_2d_.size() );
+
+    for(unsigned int i =0; i<brems.dndx_integral_.size(); i++)
+    {
+        dndx_integral_.at(i) = new Integral( *brems.dndx_integral_.at(i) );
+    }
+    for(unsigned int i =0; i<brems.dndx_interpolant_1d_.size(); i++)
+    {
+        dndx_interpolant_1d_.at(i) = new Interpolant( *brems.dndx_interpolant_1d_.at(i) );
+    }
+    for(unsigned int i =0; i<brems.dndx_interpolant_2d_.size(); i++)
+    {
+        dndx_interpolant_2d_.at(i) = new Interpolant( *brems.dndx_interpolant_2d_.at(i) );
+    }
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+Bremsstrahlung::Bremsstrahlung(Particle* particle,
+                             Medium* medium,
+                             EnergyCutSettings* cut_settings)
+    :CrossSections          ( particle, medium, cut_settings )
+    ,lorenz_                ( false )
+    ,lorenz_cut_            ( 1.e6 )
+    ,dndx_integral_         ( )
+    ,dndx_interpolant_1d_   ( )
+    ,dndx_interpolant_2d_   ( )
+    ,eLpm_                  ( 0 )
+    ,prob_for_component_    ( )
+{
+    name_                       = "Bremsstrahlung";
+    vMax_                       = 0;
+    vUp_                        = 0;
+    vMin_                       = 0;
+    ebig_                       = BIGENERGY;
+    do_dedx_Interpolation_      = false;
+    do_dndx_Interpolation_      = false;
+    multiplier_                 = 1.;
+    parametrization_            = 1;
+    lpm_effect_enabled_         = false;
+    init_lpm_effect_            = true;
+    component_                  = 0;
+
+    dedx_integral_   =  new Integral(IROMB, IMAXS, IPREC);
+    dedx_interpolant_=  NULL;
+
+    dndx_integral_.resize( medium_->GetNumCompontents() );
+
+    for(int i =0; i<(medium_->GetNumCompontents()); i++)
+    {
+            dndx_integral_.at(i) =   new Integral(IROMB, IMAXS, IPREC);
+    }
+
+    prob_for_component_.resize(medium_->GetNumCompontents());
+
+    do_dedx_Interpolation_  = false;
+    do_dndx_Interpolation_  = false;
+
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//-------------------------operators and swap function------------------------//
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+Bremsstrahlung& Bremsstrahlung::operator=(const Bremsstrahlung &brems)
+{
+
+    if (this != &brems)
+    {
+      Bremsstrahlung tmp(brems);
+      swap(tmp);
+    }
+    return *this;
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+
+bool Bremsstrahlung::operator==(const Bremsstrahlung &brems) const
+{
+    if( this->CrossSections::operator !=(brems) )                           return false;
+
+    if( lorenz_                     !=  brems.lorenz_)                      return false;
+    if( lorenz_cut_                 !=  brems.lorenz_cut_)                  return false;
+    if( component_                  !=  brems.component_)                   return false;
+    if( eLpm_                       !=  brems.eLpm_)                        return false;
+    if( *dedx_integral_             != *brems.dedx_integral_)               return false;
+    if( prob_for_component_.size()  !=  brems.prob_for_component_.size())   return false;
+    if( dndx_integral_.size()       !=  brems.dndx_integral_.size())        return false;
+    if( dndx_interpolant_1d_.size() !=  brems.dndx_interpolant_1d_.size())  return false;
+    if( dndx_interpolant_2d_.size() !=  brems.dndx_interpolant_2d_.size())  return false;
+
+    for(unsigned int i =0; i<brems.dndx_integral_.size(); i++)
+    {
+        if( *dndx_integral_.at(i)       != *brems.dndx_integral_.at(i) )        return false;
+    }
+    for(unsigned int i =0; i<brems.dndx_interpolant_1d_.size(); i++)
+    {
+        if( *dndx_interpolant_1d_.at(i) != *brems.dndx_interpolant_1d_.at(i) )  return false;
+    }
+    for(unsigned int i =0; i<brems.dndx_interpolant_2d_.size(); i++)
+    {
+        if( *dndx_interpolant_2d_.at(i) != *brems.dndx_interpolant_2d_.at(i) )  return false;
+    }
+    for(unsigned int i =0; i<brems.prob_for_component_.size(); i++)
+    {
+        if( prob_for_component_.at(i) != brems.prob_for_component_.at(i) )      return false;
+    }
+
+    if( dedx_interpolant_ != NULL && brems.dedx_interpolant_ != NULL)
+    {
+        if( *dedx_interpolant_          != *brems.dedx_interpolant_)            return false;
+    }
+    else if( dedx_interpolant_ != brems.dedx_interpolant_)                      return false;
+
+    //else
+    return true;
+
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+bool Bremsstrahlung::operator!=(const Bremsstrahlung &bremsstrahlung) const
+{
+    return !(*this == bremsstrahlung);
+
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+void Bremsstrahlung::swap(Bremsstrahlung &brems)
+{
+    using std::swap;
+
+    this->CrossSections::swap(brems);
+
+    swap(lorenz_,brems.lorenz_);
+    swap(lorenz_cut_,brems.lorenz_cut_);
+    swap(component_,brems.component_);
+    dedx_integral_->swap(*brems.dedx_integral_);
+
+    if( dedx_interpolant_ != NULL && brems.dedx_interpolant_ != NULL)
+    {
+        dedx_interpolant_->swap(*brems.dedx_interpolant_);
+    }
+    else if( dedx_interpolant_ == NULL && brems.dedx_interpolant_ != NULL)
+    {
+        dedx_interpolant_ = new Interpolant(*brems.dedx_interpolant_);
+        brems.dedx_interpolant_ = NULL;
+    }
+    else if( dedx_interpolant_ != NULL && brems.dedx_interpolant_ == NULL)
+    {
+        brems.dedx_interpolant_ = new Interpolant(*dedx_interpolant_);
+        dedx_interpolant_ = NULL;
+    }
+
+    swap(eLpm_,brems.eLpm_);
+
+    prob_for_component_.swap(brems.prob_for_component_);
+    dndx_integral_.swap(brems.dndx_integral_);
+    dndx_interpolant_1d_.swap(brems.dndx_interpolant_1d_);
+    dndx_interpolant_2d_.swap(brems.dndx_interpolant_2d_);
+
 }
 
 //----------------------------------------------------------------------------//
-
-double Bremsstrahlung::FunctionToDNdxIntegral(double variable){
-    return multiplier_ * ElasticBremsstrahlungCrossSection(variable, component_);
-
-}
 //----------------------------------------------------------------------------//
+//----------------------------Parametrizations--------------------------------//
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 double Bremsstrahlung::KelnerKakoulinPetrukhinParametrization(double v, int i)
 {
@@ -584,8 +650,9 @@ double Bremsstrahlung::KelnerKakoulinPetrukhinParametrization(double v, int i)
 
 }
 
-//----------------------------------------------------------------------------//
 
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
 
 
 double Bremsstrahlung::AndreevBezrukovBugaevParametrization(double v, int i)
@@ -656,6 +723,7 @@ double Bremsstrahlung::AndreevBezrukovBugaevParametrization(double v, int i)
 
 
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
 
 
 double Bremsstrahlung::PetrukhinShestakovParametrization(double v, int i)
@@ -684,8 +752,9 @@ double Bremsstrahlung::PetrukhinShestakovParametrization(double v, int i)
 
 }
 
-//----------------------------------------------------------------------------//
 
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
 
 
 double Bremsstrahlung::CompleteScreeningCase(double v, int i)
@@ -747,9 +816,16 @@ double Bremsstrahlung::CompleteScreeningCase(double v, int i)
 
 }
 
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//----------------------Cross section /lpm / limit----------------------------//
+//----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-double Bremsstrahlung::ElasticBremsstrahlungCrossSection(double v, int i){
+
+double Bremsstrahlung::ElasticBremsstrahlungCrossSection(double v, int i)
+{
 
     double aux      =   0;
     double Z3       =   0;
@@ -802,7 +878,10 @@ double Bremsstrahlung::ElasticBremsstrahlungCrossSection(double v, int i){
     return medium_->GetMolDensity()*medium_->GetAtomInMolecule().at(i)*pow(c2 , 2)*aux;
 }
 
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 double Bremsstrahlung::lpm(double v, double s1)
 {
@@ -891,14 +970,39 @@ double Bremsstrahlung::lpm(double v, double s1)
     return ((xi/3)*((v*v)*G/(Gamma*Gamma) + 2*(1 + (1-v)*(1-v))*fi/Gamma))/((4./3)*(1-v) + v*v);
 }
 
+
+//----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-double Bremsstrahlung::FunctionToBuildDEdxInterpolant(double energy){
-    particle_->SetEnergy(energy);
-    return CalculatedEdx();
+
+void Bremsstrahlung::SetIntegralLimits(int component)
+{
+
+    component_ = component;
+
+    vMax_   =   1 - (3./4)*SQRTE*(particle_->GetMass()/particle_->GetEnergy())
+                *pow((medium_->GetNucCharge().at(component_)) , 1./3);
+
+    if(vMax_<0)
+    {
+        vMax_   =   0;
+    }
+
+    if(lorenz_)
+    {
+        vMax_   =   min(vMax_, lorenz_cut_/(particle_->GetEnergy()));
+    }
+
+    vMax_   =   min(vMax_, (1-(particle_->GetMass()/particle_->GetEnergy())));
+    vUp_    =   min(vMax_, cut_settings_->GetCut( particle_->GetEnergy()));
+
 }
 
 
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//-------------------------Functions to interpolate---------------------------//
+//----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
 
@@ -908,6 +1012,7 @@ double Bremsstrahlung::FunctionToBuildDNdxInterpolant(double energy)
 }
 
 
+//----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
 
@@ -927,129 +1032,97 @@ double Bremsstrahlung::FunctionToBuildDNdxInterpolant2D(double energy , double v
 }
 
 
-
+//----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
 
-boost::program_options::options_description Bremsstrahlung::CreateOptions()
+double Bremsstrahlung::FunctionToBuildDEdxInterpolant(double energy)
 {
-    po::options_description bremsstrahlung("Bremsstrahlung options");
-    bremsstrahlung.add_options()
-        ("bremsstrahlung.lorenz",           po::value<bool>(&lorenz_)->implicit_value(false),                 "enable lorenz cut")
-        ("bremsstrahlung.lorenzCut",        po::value<double>(&lorenz_cut_)->default_value(1e6),              "lorenz cut in MeV")
-        ("bremsstrahlung.para",             po::value<int>(&parametrization_)->default_value(1),              "1 = Kelner-Kakoulin-Petrukhin \n2 = Andreev-Bezrukov-Bugaev \n3 = Petrukhin-Shestakov \n4 = Complete Screening Case")
-        ("bremsstrahlung.lpm",              po::value<bool>(&lpm_effect_enabled_)->implicit_value(false),     "Enables   Landau-Pomeranchuk-Migdal supression")
-        ("bremsstrahlung.interpol_dedx",    po::value<bool>(&do_dedx_Interpolation_)->implicit_value(false),  "Enables interpolation for dEdx")
-        ("bremsstrahlung.interpol_dndx",    po::value<bool>(&do_dndx_Interpolation_)->implicit_value(false),  "Enables interpolation for dNdx")
-        ("bremsstrahlung.multiplier",       po::value<double>(&multiplier_)->default_value(1.),               "modify the cross section by this factor")
-        ("bremsstrahlung.interpol_order",   po::value<int>(&order_of_interpolation_)->default_value(5),       "number of interpolation points");
-
-   return bremsstrahlung;
-}
-//----------------------------------------------------------------------------//
-
-void Bremsstrahlung::ValidateOptions()
-{
-    if(parametrization_ < 1 || parametrization_ > 4)
-    {
-        parametrization_ = 1;
-        cerr<<"Bremsstrahlung: Parametrization is not a vaild number.  Must be 1-4. Set parametrization to 1"<<endl;
-    }
-    if(order_of_interpolation_ < 2)
-    {
-        order_of_interpolation_ = 5;
-        cerr<<"Bremsstrahlung: Order of Interpolation is not a vaild number\t"<<"Set to 5"<<endl;
-    }
-    if(order_of_interpolation_ > 6)
-    {
-        cerr<<"Bremsstrahlung: Order of Interpolation is set to "<<order_of_interpolation_
-            <<".\t Note a order of interpolation > 6 will slow down the program"<<endl;
-    }
+    particle_->SetEnergy(energy);
+    return CalculatedEdx();
 }
 
 
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//--------------------------Functions to integrate----------------------------//
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
 
 
-void Bremsstrahlung::swap(Bremsstrahlung &brems)
+double Bremsstrahlung::FunctionToDEdxIntegral(double variable)
 {
-    using std::swap;
+    return variable * ElasticBremsstrahlungCrossSection(variable, component_);
+}
 
-    this->CrossSections::swap(brems);
 
-    swap(lorenz_,brems.lorenz_);
-    swap(lorenz_cut_,brems.lorenz_cut_);
-    swap(component_,brems.component_);
-    dedx_integral_->swap(*brems.dedx_integral_);
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
 
-    if( dedx_interpolant_ != NULL && brems.dedx_interpolant_ != NULL)
-    {
-        dedx_interpolant_->swap(*brems.dedx_interpolant_);
-    }
-    else if( dedx_interpolant_ == NULL && brems.dedx_interpolant_ != NULL)
-    {
-        dedx_interpolant_ = new Interpolant(*brems.dedx_interpolant_);
-        brems.dedx_interpolant_ = NULL;
-    }
-    else if( dedx_interpolant_ != NULL && brems.dedx_interpolant_ == NULL)
-    {
-        brems.dedx_interpolant_ = new Interpolant(*dedx_interpolant_);
-        dedx_interpolant_ = NULL;
-    }
 
-    swap(eLpm_,brems.eLpm_);
-
-    prob_for_component_.swap(brems.prob_for_component_);
-    dndx_integral_.swap(brems.dndx_integral_);
-    dndx_interpolant_1d_.swap(brems.dndx_interpolant_1d_);
-    dndx_interpolant_2d_.swap(brems.dndx_interpolant_2d_);
+double Bremsstrahlung::FunctionToDNdxIntegral(double variable)
+{
+    return multiplier_ * ElasticBremsstrahlungCrossSection(variable, component_);
 
 }
 
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//---------------------------------Setter-------------------------------------//
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
 void Bremsstrahlung::SetComponent(int component) {
-	component_ = component;
+    component_ = component;
 }
 
 void Bremsstrahlung::SetDedxIntegral(Integral* dedxIntegral) {
-	dedx_integral_ = dedxIntegral;
+    dedx_integral_ = dedxIntegral;
 }
 
 void Bremsstrahlung::SetDedxInterpolant(Interpolant* dedxInterpolant) {
-	dedx_interpolant_ = dedxInterpolant;
+    dedx_interpolant_ = dedxInterpolant;
 }
 
 void Bremsstrahlung::SetDndxIntegral(std::vector<Integral*> dndxIntegral) {
-	dndx_integral_ = dndxIntegral;
+    dndx_integral_ = dndxIntegral;
 }
 
 void Bremsstrahlung::SetDndxInterpolant1d(
-		std::vector<Interpolant*> dndxInterpolant1d) {
-	dndx_interpolant_1d_ = dndxInterpolant1d;
+        std::vector<Interpolant*> dndxInterpolant1d) {
+    dndx_interpolant_1d_ = dndxInterpolant1d;
 }
 
 void Bremsstrahlung::SetDndxInterpolant2d(
-		std::vector<Interpolant*> dndxInterpolant2d) {
-	dndx_interpolant_2d_ = dndxInterpolant2d;
+        std::vector<Interpolant*> dndxInterpolant2d) {
+    dndx_interpolant_2d_ = dndxInterpolant2d;
 }
 
 void Bremsstrahlung::SetLpm(double lpm) {
-	eLpm_ = lpm;
+    eLpm_ = lpm;
 }
 
 void Bremsstrahlung::SetLorenz(bool lorenz) {
-	lorenz_ = lorenz;
+    lorenz_ = lorenz;
 }
 
 void Bremsstrahlung::SetLorenzCut(double lorenzCut) {
-	lorenz_cut_ = lorenzCut;
+    lorenz_cut_ = lorenzCut;
 }
 
 void Bremsstrahlung::SetProbForComponent(std::vector<double> probForComponent) {
-	prob_for_component_ = probForComponent;
+    prob_for_component_ = probForComponent;
 }
 
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//---------------------------------Destructor---------------------------------//
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 Bremsstrahlung::~Bremsstrahlung()
 {

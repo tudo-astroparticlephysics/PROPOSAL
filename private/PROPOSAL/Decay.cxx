@@ -14,83 +14,13 @@
 
 using namespace std;
 
-Decay::Decay()
-    :out_               ( )
-    ,store_neutrinos_   ( false )
-    ,multiplier_        ( 1 )
-{
-    root_finder_    =   new RootFinder(IMAXS, IPREC);
-    particle_       =   new Particle();
-}
 
 //----------------------------------------------------------------------------//
-
-Decay::Decay(Particle* particle)
-    :particle_          ( particle )
-    ,out_               ( )
-    ,store_neutrinos_   ( false )
-    ,multiplier_        ( 1 )
-{
-    root_finder_    =   new RootFinder(IMAXS, IPREC);
-
-}
-
 //----------------------------------------------------------------------------//
-Decay::Decay(const Decay &decay)
-    :root_finder_       ( new RootFinder(*decay.root_finder_) )
-    ,particle_          ( new Particle(*decay.particle_) )
-    ,out_               ( decay.out_)
-    ,store_neutrinos_   ( decay.store_neutrinos_ )
-    ,multiplier_        ( decay.multiplier_ )
-{
-
-}
-
+//-------------------------public member functions----------------------------//
+//----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-Decay& Decay::operator=(const Decay &decay){
-    if (this != &decay)
-    {
-      Decay tmp(decay);
-      swap(tmp);
-    }
-    return *this;
-}
-//----------------------------------------------------------------------------//
-bool Decay::operator==(const Decay &decay) const
-{
-    if( *particle_          != *decay.particle_ )       return false;
-    if( store_neutrinos_    != decay.store_neutrinos_ ) return false;
-    if( multiplier_         != decay.multiplier_ )      return false;
-    if( *root_finder_       != *decay.root_finder_ )    return false;
-
-    if( out_.compare( decay.out_)!=0)                   return false;
-
-    //else
-    return true;
-}
-
-//----------------------------------------------------------------------------//
-bool Decay::operator!=(const Decay &decay) const
-{
-    return !(*this == decay);
-}
-
-//----------------------------------------------------------------------------//
-
-void Decay::swap(Decay &decay)
-{
-    using std::swap;
-
-    swap( store_neutrinos_  ,   decay.store_neutrinos_ );
-    swap( multiplier_       ,   decay.multiplier_ );
-
-    particle_->swap( *decay.particle_ );
-    root_finder_->swap( *decay.root_finder_ );
-    out_.swap(decay.out_);
-
-}
-//----------------------------------------------------------------------------//
 
 double Decay::MakeDecay()
 {
@@ -103,7 +33,10 @@ double Decay::MakeDecay()
     return multiplier_/max((particle_->GetMomentum()/particle_->GetMass())*particle_->GetLifetime()*SPEED, XRES);
 }
 
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 double Decay::CalculateProductEnergy( double ernd, double arnd, double srnd )
 {
@@ -314,7 +247,124 @@ double Decay::CalculateProductEnergy( double ernd, double arnd, double srnd )
     return el * (particle_->GetEnergy()/particle_->GetMass()) + pl * (particle_->GetMomentum()/particle_->GetMass()) * (2*arnd - 1);
 }
 
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//--------------------------------constructors--------------------------------//
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+Decay::Decay()
+    :out_               ( )
+    ,store_neutrinos_   ( false )
+    ,multiplier_        ( 1 )
+{
+    root_finder_    =   new RootFinder(IMAXS, IPREC);
+    particle_       =   new Particle();
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+Decay::Decay(Particle* particle)
+    :particle_          ( particle )
+    ,out_               ( )
+    ,store_neutrinos_   ( false )
+    ,multiplier_        ( 1 )
+{
+    root_finder_    =   new RootFinder(IMAXS, IPREC);
+
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+Decay::Decay(const Decay &decay)
+    :root_finder_       ( new RootFinder(*decay.root_finder_) )
+    ,particle_          ( new Particle(*decay.particle_) )
+    ,out_               ( decay.out_)
+    ,store_neutrinos_   ( decay.store_neutrinos_ )
+    ,multiplier_        ( decay.multiplier_ )
+{
+
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//-------------------------operators and swap function------------------------//
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+Decay& Decay::operator=(const Decay &decay)
+{
+    if (this != &decay)
+    {
+      Decay tmp(decay);
+      swap(tmp);
+    }
+    return *this;
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+bool Decay::operator==(const Decay &decay) const
+{
+    if( *particle_          != *decay.particle_ )       return false;
+    if( store_neutrinos_    != decay.store_neutrinos_ ) return false;
+    if( multiplier_         != decay.multiplier_ )      return false;
+    if( *root_finder_       != *decay.root_finder_ )    return false;
+
+    if( out_.compare( decay.out_)!=0)                   return false;
+
+    //else
+    return true;
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+bool Decay::operator!=(const Decay &decay) const
+{
+    return !(*this == decay);
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+void Decay::swap(Decay &decay)
+{
+    using std::swap;
+
+    swap( store_neutrinos_  ,   decay.store_neutrinos_ );
+    swap( multiplier_       ,   decay.multiplier_ );
+
+    particle_->swap( *decay.particle_ );
+    root_finder_->swap( *decay.root_finder_ );
+    out_.swap(decay.out_);
+
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//-------------------------Functions to Rootfinder----------------------------//
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 double Decay::Function(double x)
 {
@@ -323,31 +373,40 @@ double Decay::Function(double x)
     return  x*x2 - x2*x2/2;
 }
 
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 double Decay::DifferentiatedFunction(double x)
 {
     return (3 - 2*x) * x*x;
 }
 
+
 //----------------------------------------------------------------------------//
-    //Setter
-    void Decay::SetOut(std::string out){
-        out_    =   out;
-    }
+//----------------------------------------------------------------------------//
+//---------------------------------Setter-------------------------------------//
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
 
-    void Decay::SetRootFinder(RootFinder *root_finder){
-        root_finder_    =   root_finder;
-    }
 
-    void Decay::SetParticle(Particle* particle){
-        particle_   =   particle;
-    }
+void Decay::SetOut(std::string out){
+    out_    =   out;
+}
 
-    void Decay::SetStoreNeutrinos(bool store_neutrinos){
-        store_neutrinos_    =   store_neutrinos;
-    }
+void Decay::SetRootFinder(RootFinder *root_finder){
+    root_finder_    =   root_finder;
+}
 
-    void Decay::SetMultiplier(double multiplier){
-        multiplier_ =   multiplier;
-    }
+void Decay::SetParticle(Particle* particle){
+    particle_   =   particle;
+}
+
+void Decay::SetStoreNeutrinos(bool store_neutrinos){
+    store_neutrinos_    =   store_neutrinos;
+}
+
+void Decay::SetMultiplier(double multiplier){
+    multiplier_ =   multiplier;
+}

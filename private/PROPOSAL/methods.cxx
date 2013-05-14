@@ -30,13 +30,19 @@ bool StartsWith(const std::string& text,const std::string& token)
 }
 
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 bool EndsWith(const std::string& text,const std::string& token)
 {
 	return (text.compare(text.length()-1,token.length(),token) ==0);
 }
 
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
 // round a given double to the closest int
 
 int RoundValue(double val)
@@ -61,7 +67,11 @@ int RoundValue(double val)
     return valRound;
 }
 
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
 // Compares strings case-insensitive
 
 bool EqualsIgnoreCase(std::string s1, std::string s2)
@@ -108,7 +118,12 @@ bool EqualsIgnoreCase(std::string s1, std::string s2)
         return false;
     }
 }
+
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
 
 string ToLowerCase(string toConvert)
 {
@@ -123,7 +138,10 @@ string ToLowerCase(string toConvert)
     return buffer;
 }
 
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 string ReplaceAll(string toConvert, const char oldChar, const char newChar)
 {
@@ -144,7 +162,10 @@ string ReplaceAll(string toConvert, const char oldChar, const char newChar)
     return buffer;
 }
 
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 // returns a random Double
 
@@ -158,7 +179,10 @@ double Old_RandomDouble()
 	return result;
 }
 
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 deque<string>* SplitString(string args, string Delimiters)
 {
@@ -185,7 +209,10 @@ deque<string>* SplitString(string args, string Delimiters)
     return Tokens;
 }
 
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 string NextToken(deque<string> *Tokens)
 {
@@ -197,7 +224,10 @@ string NextToken(deque<string> *Tokens)
 
 }
 
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 bool Compare(string name1, string name2 , bool output)
 {

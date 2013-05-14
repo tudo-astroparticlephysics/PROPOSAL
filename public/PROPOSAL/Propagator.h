@@ -127,6 +127,10 @@ public:
 
 //----------------------------------------------------------------------------//
 
+    void DisableInterpolation();
+
+//----------------------------------------------------------------------------//
+
     /**
      * Disables the Interpolation for calculation the exact particle time
      */

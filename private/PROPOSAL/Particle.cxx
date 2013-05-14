@@ -18,6 +18,13 @@
 
 using namespace std;
 
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//--------------------------------constructors--------------------------------//
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
 Particle::Particle( )
     :propagated_distance_   ( 0 )
     ,x_                     ( 0 )
@@ -61,7 +68,10 @@ Particle::Particle( )
     SetEnergy( energy_ );
 }
 
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 Particle::Particle(const Particle& particle)
     :propagated_distance_   ( particle.propagated_distance_ )
@@ -106,7 +116,10 @@ Particle::Particle(const Particle& particle)
 
 }
 
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 Particle::Particle(int parent_particle_id,
                    int particle_id,
@@ -208,6 +221,7 @@ Particle::Particle(int parent_particle_id,
 
 
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
 
 
 Particle::Particle(int parent_particle_id,
@@ -291,7 +305,8 @@ Particle::Particle(int parent_particle_id,
 }
 
 
-//----------------------------------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
 
 
 Particle::Particle(string name,
@@ -370,7 +385,13 @@ Particle::Particle(string name,
     Location(t, x, y, z, theta, phi);
 }
 
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//-------------------------operators and swap function------------------------//
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 Particle& Particle::operator=(const Particle &particle){
     if (this != &particle)
@@ -381,7 +402,11 @@ Particle& Particle::operator=(const Particle &particle){
     return *this;
 }
 
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
 bool Particle::operator==(const Particle &particle) const
 {
     if(  propagated_distance_   != particle.propagated_distance_)   return false;
@@ -428,13 +453,75 @@ bool Particle::operator==(const Particle &particle) const
     return true;
 
 }
+
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 bool Particle::operator!=(const Particle &particle) const {
   return !(*this == particle);
 }
 
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+void Particle::swap(Particle &particle)
+{
+    using std::swap;
+
+    swap( propagated_distance_   , particle.propagated_distance_);
+    swap( x_                     , particle.x_);
+    swap( y_                     , particle.y_);
+    swap( z_                     , particle.z_);
+    swap( t_                     , particle.t_);
+    swap( theta_                 , particle.theta_);
+    swap( phi_                   , particle.phi_);
+    swap( costh_                 , particle.costh_);
+    swap( sinth_                 , particle.sinth_);
+    swap( cosph_                 , particle.cosph_);
+    swap( sinph_                 , particle.sinph_);
+    swap( momentum_              , particle.momentum_);
+    swap( square_momentum_       , particle.square_momentum_);
+    swap( energy_                , particle.energy_);
+    swap( mass_                  , particle.mass_);
+    swap( lifetime_              , particle.lifetime_);
+    swap( charge_                , particle.charge_);
+    swap( low_                   , particle.low_);
+    swap( type_                  , particle.type_);
+    swap( parent_particle_id_    , particle.parent_particle_id_);
+    swap( particle_id_           , particle.particle_id_);
+    swap( xi_                    , particle.xi_);
+    swap( yi_                    , particle.yi_);
+    swap( zi_                    , particle.zi_);
+    swap( ti_                    , particle.ti_);
+    swap( ei_                    , particle.ei_);
+    swap( xf_                    , particle.xf_);
+    swap( yf_                    , particle.yf_);
+    swap( zf_                    , particle.zf_);
+    swap( tf_                    , particle.tf_);
+    swap( ef_                    , particle.ef_);
+    swap( xc_                    , particle.xc_);
+    swap( yc_                    , particle.yc_);
+    swap( zc_                    , particle.zc_);
+    swap( tc_                    , particle.tc_);
+    swap( ec_                    , particle.ec_);
+    swap( elost_                 , particle.elost_);
+
+    name_.swap(particle.name_);
+
+
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//------------------------private member functions----------------------------//
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 void Particle::InitByName(std::string aname){
 
@@ -577,7 +664,10 @@ void Particle::InitByName(std::string aname){
     low_    =   mass_;
 }
 
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 void Particle::Location(double time,
                         double x,
@@ -601,56 +691,13 @@ void Particle::Location(double time,
     sinph_       =   sin(phi);
 }
 
+
 //----------------------------------------------------------------------------//
-void Particle::swap(Particle &particle)
-{
-    using std::swap;
-
-    swap( propagated_distance_   , particle.propagated_distance_);
-    swap( x_                     , particle.x_);
-    swap( y_                     , particle.y_);
-    swap( z_                     , particle.z_);
-    swap( t_                     , particle.t_);
-    swap( theta_                 , particle.theta_);
-    swap( phi_                   , particle.phi_);
-    swap( costh_                 , particle.costh_);
-    swap( sinth_                 , particle.sinth_);
-    swap( cosph_                 , particle.cosph_);
-    swap( sinph_                 , particle.sinph_);
-    swap( momentum_              , particle.momentum_);
-    swap( square_momentum_       , particle.square_momentum_);
-    swap( energy_                , particle.energy_);
-    swap( mass_                  , particle.mass_);
-    swap( lifetime_              , particle.lifetime_);
-    swap( charge_                , particle.charge_);
-    swap( low_                   , particle.low_);
-    swap( type_                  , particle.type_);
-    swap( parent_particle_id_    , particle.parent_particle_id_);
-    swap( particle_id_           , particle.particle_id_);
-    swap( xi_                    , particle.xi_);
-    swap( yi_                    , particle.yi_);
-    swap( zi_                    , particle.zi_);
-    swap( ti_                    , particle.ti_);
-    swap( ei_                    , particle.ei_);
-    swap( xf_                    , particle.xf_);
-    swap( yf_                    , particle.yf_);
-    swap( zf_                    , particle.zf_);
-    swap( tf_                    , particle.tf_);
-    swap( ef_                    , particle.ef_);
-    swap( xc_                    , particle.xc_);
-    swap( yc_                    , particle.yc_);
-    swap( zc_                    , particle.zc_);
-    swap( tc_                    , particle.tc_);
-    swap( ec_                    , particle.ec_);
-    swap( elost_                 , particle.elost_);
-
-    name_.swap(particle.name_);
-
-
-}
+//----------------------------------------------------------------------------//
+//---------------------------------Setter-------------------------------------//
+//----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-//Setter
 
 void Particle::SetEnergy(double e)
 {
@@ -663,31 +710,9 @@ void Particle::SetEnergy(double e)
 }
 
 //----------------------------------------------------------------------------//
-void Particle::SetPropagatedDistance(double prop_dist)
-{
-    propagated_distance_ = prop_dist;
-}
 //----------------------------------------------------------------------------//
-void Particle::SetX(double x)
-{
-    x_ = x;
-}
-//----------------------------------------------------------------------------//
-void Particle::SetY(double y)
-{
-    y_ = y;
-}
-//----------------------------------------------------------------------------//
-void Particle::SetZ(double z)
-{
-    z_ = z;
-}
-//----------------------------------------------------------------------------//
-void Particle::SetT(double t)
-{
-    t_ = t;
-}
-//----------------------------------------------------------------------------//
+
+
 void Particle::SetTheta(double theta)
 {
     theta_  =   theta;
@@ -697,7 +722,12 @@ void Particle::SetTheta(double theta)
     sinth_  =   sin(theta);
 
 }
+
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
 void Particle::SetPhi(double phi)
 {
     phi_   =    phi;
@@ -706,131 +736,137 @@ void Particle::SetPhi(double phi)
     cosph_ =    cos(phi);
     sinph_ =    sin(phi);
 }
+
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
 void Particle::SetMomentum(double momentum)
 {
     momentum_           =   momentum;
     square_momentum_    =   momentum_*momentum_;
     energy_             =   sqrt(square_momentum_ + mass_*mass_);
 }
+
+
 //----------------------------------------------------------------------------//
-void Particle::SetMass(double mass)
-{
+//----------------------------------------------------------------------------//
+
+
+void Particle::SetPropagatedDistance(double prop_dist){
+    propagated_distance_ = prop_dist;
+}
+
+void Particle::SetX(double x){
+    x_ = x;
+}
+
+void Particle::SetY(double y){
+    y_ = y;
+}
+
+void Particle::SetZ(double z){
+    z_ = z;
+}
+
+void Particle::SetT(double t){
+    t_ = t;
+}
+
+void Particle::SetMass(double mass){
     mass_ = mass;
 }
-//----------------------------------------------------------------------------//
-void Particle::SetLifetime(double lifetime)
-{
+
+void Particle::SetLifetime(double lifetime){
     lifetime_ = lifetime;
 }
-//----------------------------------------------------------------------------//
-void Particle::SetCharge(double charge)
-{
+
+void Particle::SetCharge(double charge){
     charge_ = charge;
 }
-//----------------------------------------------------------------------------//
-void Particle::SetName(std::string name)
-{
+
+void Particle::SetName(std::string name){
     name_ = name;
 }
-//----------------------------------------------------------------------------//
-void Particle::SetLow(double low)
-{
+
+void Particle::SetLow(double low){
     low_ = low;
 }
-//----------------------------------------------------------------------------//
-void Particle::SetType(int type)
-{
+
+void Particle::SetType(int type){
     type_ = type;
 }
-//----------------------------------------------------------------------------//
-void Particle::SetParentParticleId(int parent_particle_id)
-{
+
+void Particle::SetParentParticleId(int parent_particle_id){
     parent_particle_id_ = parent_particle_id;
 }
-//----------------------------------------------------------------------------//
-void Particle::SetParticleId(int particle_id)
-{
+
+void Particle::SetParticleId(int particle_id){
     particle_id_ = particle_id;
 }
-//----------------------------------------------------------------------------//
-void Particle::SetXi(double xi)
-{
+
+void Particle::SetXi(double xi){
     xi_ = xi;
 }
-//----------------------------------------------------------------------------//
-void Particle::SetYi(double yi)
-{
+
+void Particle::SetYi(double yi){
     yi_ = yi;
 }
-//----------------------------------------------------------------------------//
-void Particle::SetZi(double zi)
-{
+
+void Particle::SetZi(double zi){
     zi_ = zi;
 }
-//----------------------------------------------------------------------------//
-void Particle::SetTi(double ti)
-{
+
+void Particle::SetTi(double ti){
     ti_ = ti;
 }
-//----------------------------------------------------------------------------//
-void Particle::SetEi(double ei)
-{
+
+void Particle::SetEi(double ei){
     ei_ = ei;
 }
-//----------------------------------------------------------------------------//
-void Particle::SetXf(double xf)
-{
+
+void Particle::SetXf(double xf){
     xf_ = xf;
 }
-//----------------------------------------------------------------------------//
-void Particle::SetYf(double yf)
-{
+
+void Particle::SetYf(double yf){
     yf_ = yf;
 }
-//----------------------------------------------------------------------------//
-void Particle::SetZf(double zf)
-{
+
+void Particle::SetZf(double zf){
     zf_ = zf;
 }
-//----------------------------------------------------------------------------//
-void Particle::SetTf(double tf)
-{
+
+void Particle::SetTf(double tf){
     tf_ = tf;
 }
-//----------------------------------------------------------------------------//
-void Particle::SetEf(double ef)
-{
+
+void Particle::SetEf(double ef){
     ef_ = ef;
 }
-//----------------------------------------------------------------------------//
-void Particle::SetXc(double xc)
-{
+
+void Particle::SetXc(double xc){
     xc_ = xc;
 }
-//----------------------------------------------------------------------------//
-void Particle::SetYc(double yc)
-{
+
+void Particle::SetYc(double yc){
     yc_ = yc;
 }
-//----------------------------------------------------------------------------//
-void Particle::SetZc(double zc)
-{
+
+void Particle::SetZc(double zc){
     zc_ = zc;
 }
-//----------------------------------------------------------------------------//
-void Particle::SetTc(double tc)
-{
+
+void Particle::SetTc(double tc){
     tc_ = tc;
 }
-//----------------------------------------------------------------------------//
-void Particle::SetEc(double ec)
-{
+
+void Particle::SetEc(double ec){
     ec_ = ec;
 }
-//----------------------------------------------------------------------------//
-void Particle::SetElost(double elost)
-{
+
+void Particle::SetElost(double elost){
     elost_ = elost;
 }
 

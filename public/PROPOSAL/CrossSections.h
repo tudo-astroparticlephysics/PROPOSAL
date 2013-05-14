@@ -83,7 +83,6 @@ public:
     CrossSections(const CrossSections& crossSections);
     bool operator==(const CrossSections &crossSections) const;
     bool operator!=(const CrossSections &crossSections) const;
-   // CrossSections& operator=(const CrossSections &crossSections);
 
 
 //----------------------------------------------------------------------------//
@@ -100,7 +99,6 @@ public:
 
     virtual double CalculatedNdx() = 0;
 
-
 //----------------------------------------------------------------------------//
 
     virtual double CalculatedNdx(double rnd) = 0;
@@ -111,7 +109,7 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    virtual double CalculateStochasticLoss(double rnd1, double rnd2) = 0; //function for testing the stochastic losses
+    virtual double CalculateStochasticLoss(double rnd1, double rnd2) = 0;
 
 //----------------------------------------------------------------------------//
 

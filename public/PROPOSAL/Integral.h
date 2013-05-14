@@ -354,16 +354,6 @@ public:
 
 //----------------------------------------------------------------------------//
 
-
-    /*!
-     * refines and returns the value of the upper limit x(rand)
-     *
-     * \return UpperLimit of Integral
-     */
-
-    double GetUpperLimit(double min, double max, double integral_value , double rnadomRatio, boost::function<double (double)> integrand, int mehtod, double powerOfSubstitution=0);
-
-//----------------------------------------------------------------------------//
     /*!
      * finds integral: choose the in integration method with the last parameter
      *   method = 1: IntegrateClosed
@@ -386,16 +376,6 @@ public:
     void swap(Integral &integral);
 
  //----------------------------------------------------------------------------//
-
-    /*!
-     * Resets some integral parameters from last integration
-     */
-
-    void Reset();
-
-
-
-//----------------------------------------------------------------------------//
 
     boost::function<double (double)> GetIntegrand() const
     {

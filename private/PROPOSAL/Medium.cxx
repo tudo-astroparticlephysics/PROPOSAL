@@ -17,6 +17,11 @@
 using namespace std;
 
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//--------------------------------constructors--------------------------------//
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 Medium::Medium()
     :numCompontents_    (0)
@@ -54,7 +59,10 @@ Medium::Medium()
     InitWater();
 }
 
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 Medium::Medium(const Medium &medium)
     :numCompontents_    (medium.numCompontents_)
@@ -90,115 +98,9 @@ Medium::Medium(const Medium &medium)
 {
 
 }
-//----------------------------------------------------------------------------//
-
-Medium& Medium::operator=(const Medium &medium){
-    if (this != &medium)
-    {
-      Medium tmp(medium);
-      swap(tmp);
-    }
-    return *this;
-}
-
-//----------------------------------------------------------------------------//
-bool Medium::operator==(const Medium &medium) const
-{
-    if( numCompontents_   != medium.numCompontents_)return false;
-    if( sumCharge_        != medium.sumCharge_)     return false;
-    if( ZA_               != medium.ZA_)            return false;
-    if( I_                != medium.I_)             return false;
-    if( C1_               != medium.C1_)            return false;
-    if( C_                != medium.C_)             return false;
-    if( a_                != medium.a_)             return false;
-    if( m_                != medium.m_)             return false;
-    if( X0_               != medium.X0_)            return false;
-    if( X1_               != medium.X1_)            return false;
-    if( d0_               != medium.d0_)            return false;
-    if( r_                != medium.r_)             return false;
-    if( rho_              != medium.rho_)           return false;
-    if( massDensity_      != medium.massDensity_)   return false;
-    if( molDensity_       != medium.molDensity_)    return false;
-    if( ecut_             != medium.ecut_)          return false;
-    if( vcut_             != medium.vcut_)          return false;
-    if( vCut_             != medium.vCut_)          return false;
-    if( MM_               != medium.MM_)            return false;
-    if( sumNucleons_      != medium.sumNucleons_)   return false;
-    if( r0_               != medium.r0_)            return false;
-
-    if( M_.size()               != medium.M_.size() )               return false;
-    if( logConstant_.size()     != medium.logConstant_.size() )     return false;
-    if( bPrime_.size()          != medium.bPrime_.size() )          return false;
-    if( mN_.size()              != medium.mN_.size() )              return false;
-    if( nucCharge_.size()       != medium.nucCharge_.size() )       return false;
-    if( atomicNum_.size()       != medium.atomicNum_.size() )       return false;
-    if( atomInMolecule_.size()  != medium.atomInMolecule_.size() )  return false;
-    if( elementName_.size()     != medium.elementName_.size() )     return false;
-
-    if( name_.compare( medium.name_) != 0 ) return false;
-    for(unsigned int i =    0; i < M_.size(); i++)
-    {
-        if(M_.at(i)             !=  medium.M_.at(i))            return false;
-    }
-
-    for(unsigned int i =    0; i < logConstant_.size(); i++)
-    {
-        if(logConstant_.at(i)   !=  medium.logConstant_.at(i))  return false;
-    }
-
-    for(unsigned int i =    0; i < bPrime_.size(); i++)
-    {
-        if(bPrime_.at(i)        !=  medium.bPrime_.at(i))       return false;
-    }
-
-    for(unsigned int i =    0; i < mN_.size(); i++)
-    {
-        if(mN_.at(i)            !=  medium.mN_.at(i))           return false;
-    }
-
-    for(unsigned int i =    0; i < nucCharge_.size(); i++)
-    {
-        if(nucCharge_.at(i)     !=  medium.nucCharge_.at(i))    return false;
-    }
-
-    for(unsigned int i =    0; i < atomicNum_.size(); i++)
-    {
-        if(atomicNum_.at(i)     !=  medium.atomicNum_.at(i))    return false;
-    }
-
-    for(unsigned int i =    0; i < atomInMolecule_.size(); i++)
-    {
-        if(atomInMolecule_.at(i)!=  medium.atomInMolecule_.at(i))   return false;
-    }
-
-    for(unsigned int i =    0; i < elementName_.size(); i++)
-    {
-        if(elementName_.at(i).compare( medium.elementName_.at(i))!=0)return false;
-    }
-    //else
-    return true;
-
-}
-//----------------------------------------------------------------------------//
-
-bool Medium::operator!=(const Medium &medium) const {
-  return !(*this == medium);
-}
 
 
 //----------------------------------------------------------------------------//
-
-Medium::~Medium(){
-    nucCharge_.clear();
-    atomicNum_.clear();
-    atomInMolecule_.clear();
-    logConstant_.clear();
-    bPrime_.clear();
-    M_.clear();
-    elementName_.clear();
-    mN_.clear();
-}
-
 //----------------------------------------------------------------------------//
 
 
@@ -303,6 +205,165 @@ Medium::Medium(string w, double rho)
 
 
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//-------------------------operators and swap function------------------------//
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+Medium& Medium::operator=(const Medium &medium)
+{
+    if (this != &medium)
+    {
+      Medium tmp(medium);
+      swap(tmp);
+    }
+    return *this;
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+bool Medium::operator==(const Medium &medium) const
+{
+    if( numCompontents_   != medium.numCompontents_)return false;
+    if( sumCharge_        != medium.sumCharge_)     return false;
+    if( ZA_               != medium.ZA_)            return false;
+    if( I_                != medium.I_)             return false;
+    if( C1_               != medium.C1_)            return false;
+    if( C_                != medium.C_)             return false;
+    if( a_                != medium.a_)             return false;
+    if( m_                != medium.m_)             return false;
+    if( X0_               != medium.X0_)            return false;
+    if( X1_               != medium.X1_)            return false;
+    if( d0_               != medium.d0_)            return false;
+    if( r_                != medium.r_)             return false;
+    if( rho_              != medium.rho_)           return false;
+    if( massDensity_      != medium.massDensity_)   return false;
+    if( molDensity_       != medium.molDensity_)    return false;
+    if( ecut_             != medium.ecut_)          return false;
+    if( vcut_             != medium.vcut_)          return false;
+    if( vCut_             != medium.vCut_)          return false;
+    if( MM_               != medium.MM_)            return false;
+    if( sumNucleons_      != medium.sumNucleons_)   return false;
+    if( r0_               != medium.r0_)            return false;
+
+    if( M_.size()               != medium.M_.size() )               return false;
+    if( logConstant_.size()     != medium.logConstant_.size() )     return false;
+    if( bPrime_.size()          != medium.bPrime_.size() )          return false;
+    if( mN_.size()              != medium.mN_.size() )              return false;
+    if( nucCharge_.size()       != medium.nucCharge_.size() )       return false;
+    if( atomicNum_.size()       != medium.atomicNum_.size() )       return false;
+    if( atomInMolecule_.size()  != medium.atomInMolecule_.size() )  return false;
+    if( elementName_.size()     != medium.elementName_.size() )     return false;
+
+    if( name_.compare( medium.name_) != 0 ) return false;
+    for(unsigned int i =    0; i < M_.size(); i++)
+    {
+        if(M_.at(i)             !=  medium.M_.at(i))            return false;
+    }
+
+    for(unsigned int i =    0; i < logConstant_.size(); i++)
+    {
+        if(logConstant_.at(i)   !=  medium.logConstant_.at(i))  return false;
+    }
+
+    for(unsigned int i =    0; i < bPrime_.size(); i++)
+    {
+        if(bPrime_.at(i)        !=  medium.bPrime_.at(i))       return false;
+    }
+
+    for(unsigned int i =    0; i < mN_.size(); i++)
+    {
+        if(mN_.at(i)            !=  medium.mN_.at(i))           return false;
+    }
+
+    for(unsigned int i =    0; i < nucCharge_.size(); i++)
+    {
+        if(nucCharge_.at(i)     !=  medium.nucCharge_.at(i))    return false;
+    }
+
+    for(unsigned int i =    0; i < atomicNum_.size(); i++)
+    {
+        if(atomicNum_.at(i)     !=  medium.atomicNum_.at(i))    return false;
+    }
+
+    for(unsigned int i =    0; i < atomInMolecule_.size(); i++)
+    {
+        if(atomInMolecule_.at(i)!=  medium.atomInMolecule_.at(i))   return false;
+    }
+
+    for(unsigned int i =    0; i < elementName_.size(); i++)
+    {
+        if(elementName_.at(i).compare( medium.elementName_.at(i))!=0)return false;
+    }
+    //else
+    return true;
+
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+bool Medium::operator!=(const Medium &medium) const
+{
+  return !(*this == medium);
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+void Medium::swap(Medium &medium)
+{
+    using std::swap;
+
+    swap( numCompontents_   , medium.numCompontents_);
+    swap( sumCharge_        , medium.sumCharge_);
+    swap( ZA_               , medium.ZA_);
+    swap( I_                , medium.I_);
+    swap( C1_               , medium.C1_);
+    swap( C_                , medium.C_);
+    swap( a_                , medium.a_);
+    swap( m_                , medium.m_);
+    swap( X0_               , medium.X0_);
+    swap( X1_               , medium.X1_);
+    swap( d0_               , medium.d0_);
+    swap( r_                , medium.r_);
+    swap( rho_              , medium.rho_);
+    swap( massDensity_      , medium.massDensity_);
+    swap( molDensity_       , medium.molDensity_);
+    swap( ecut_             , medium.ecut_);
+    swap( vcut_             , medium.vcut_);
+    swap( vCut_             , medium.vCut_);
+    swap( MM_               , medium.MM_);
+    swap( sumNucleons_      , medium.sumNucleons_);
+    swap( r0_               , medium.r0_);
+
+    M_.swap( medium.M_ );
+    elementName_.swap( medium.elementName_ );
+    logConstant_.swap( medium.logConstant_ );
+    bPrime_.swap( medium.bPrime_ );
+    mN_.swap( medium.mN_ );
+    nucCharge_.swap( medium.nucCharge_ );
+    atomicNum_.swap( medium.atomicNum_ );
+    atomInMolecule_.swap( medium.atomInMolecule_ );
+    name_.swap( medium.name_ );
+
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//------------------------private member functions----------------------------//
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 void Medium::Inita(int i)
 {
@@ -317,8 +378,10 @@ void Medium::Inita(int i)
     elementName_.resize(numCompontents_);
 }
 
+
 //----------------------------------------------------------------------------//
-typedef double (*pointer_to_func)(double);
+//----------------------------------------------------------------------------//
+
 
 void Medium::Initr()
 {
@@ -375,7 +438,10 @@ void Medium::Initr()
     }
 }
 
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 void Medium::SetLogConstant(int i)
 {
@@ -418,7 +484,10 @@ void Medium::SetLogConstant(int i)
     }
 }
 
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 void Medium::SetBPrime(int i)
 {
@@ -430,7 +499,13 @@ void Medium::SetBPrime(int i)
     }
 }
 
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//---------------------------------init Media---------------------------------//
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 /*
 * initialize water
@@ -460,7 +535,10 @@ void Medium::InitWater()
     Initr();
 }
 
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 /*
 * initialize ice
@@ -490,7 +568,10 @@ void Medium::InitIce()
     Initr();
 }
 
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 /*
 * initialize salt (added by Ped)
@@ -528,7 +609,10 @@ void Medium::InitSalt()
     Initr();
 }
 
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 /*
 * initialize standard rock
@@ -556,7 +640,10 @@ void Medium::InitStandardrock()
     Initr();
 }
 
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 /*
 * initialize Frejus rock
@@ -584,6 +671,8 @@ void Medium::InitFrejusrock()
 
 
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 /*
 * initialize iron
@@ -609,7 +698,10 @@ void Medium::InitIron()
     Initr();
 }
 
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 /*
 * initialize hydrogen
@@ -635,7 +727,10 @@ void Medium::InitHydrogen()
     Initr();
 }
 
+
+//----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------------------------------//
+
 
 /*
 * initialize lead
@@ -661,7 +756,10 @@ void Medium::InitLead()
     Initr();
 }
 
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 /*
 * initialize uranium
@@ -687,7 +785,10 @@ void Medium::InitUranium()
     Initr();
 }
 
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 /*
 * initialize air
@@ -726,7 +827,10 @@ void Medium::InitAir()
     Initr();
 }
 
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 /*
 * initialize mineral oil or paraffin CH3(CH2)~23CH3 (added by Ped)
@@ -756,7 +860,10 @@ void Medium::InitParaffin()
     Initr();
 }
 
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 /*
 * initialize ANTARES water
@@ -836,7 +943,13 @@ void Medium::InitAntaresWater()
     Initr();
 }
 
+
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//--------------------------Functions to integrate----------------------------//
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 double Medium::FunctionToIntegral(double r)
 {
@@ -844,149 +957,130 @@ double Medium::FunctionToIntegral(double r)
 
     return r*r/(1+exp((r-r0_)/a));
 }
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//---------------------------------Setter-------------------------------------//
+//----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-void Medium::swap(Medium &medium)
-{
-    using std::swap;
 
-    swap( numCompontents_   , medium.numCompontents_);
-    swap( sumCharge_        , medium.sumCharge_);
-    swap( ZA_               , medium.ZA_);
-    swap( I_                , medium.I_);
-    swap( C1_               , medium.C1_);
-    swap( C_                , medium.C_);
-    swap( a_                , medium.a_);
-    swap( m_                , medium.m_);
-    swap( X0_               , medium.X0_);
-    swap( X1_               , medium.X1_);
-    swap( d0_               , medium.d0_);
-    swap( r_                , medium.r_);
-    swap( rho_              , medium.rho_);
-    swap( massDensity_      , medium.massDensity_);
-    swap( molDensity_       , medium.molDensity_);
-    swap( ecut_             , medium.ecut_);
-    swap( vcut_             , medium.vcut_);
-    swap( vCut_             , medium.vCut_);
-    swap( MM_               , medium.MM_);
-    swap( sumNucleons_      , medium.sumNucleons_);
-    swap( r0_               , medium.r0_);
-
-    M_.swap( medium.M_ );
-    elementName_.swap( medium.elementName_ );
-    logConstant_.swap( medium.logConstant_ );
-    bPrime_.swap( medium.bPrime_ );
-    mN_.swap( medium.mN_ );
-    nucCharge_.swap( medium.nucCharge_ );
-    atomicNum_.swap( medium.atomicNum_ );
-    atomInMolecule_.swap( medium.atomInMolecule_ );
-    name_.swap( medium.name_ );
-
+void Medium::SetNumCompontents(int numCompontents){
+    numCompontents_ = numCompontents;
 }
 
+void Medium::SetNucCharge(std::vector<double> nucCharge){
+    nucCharge_ = nucCharge;
+}
+
+void Medium::SetAtomicNum(std::vector<double> atomicNum){
+    atomicNum_ = atomicNum;
+}
+
+void Medium::SetAtomInMolecule(std::vector<double> atomInMolecule){
+    atomInMolecule_ = atomInMolecule;
+}
+
+void Medium::SetSumCharge(double sumCharge){
+    sumCharge_ = sumCharge;
+}
+
+void Medium::SetZA(double ZA){
+    ZA_ = ZA;
+}
+
+void Medium::SetI(double I){
+    I_ = I;
+}
+
+void Medium::SetC1(double C1){
+    C1_ = C1;
+}
+
+void Medium::SetC(double C){
+    C_ = C;
+}
+
+void Medium::SetA(double a){
+    a_ = a;
+}
+
+void Medium::SetM(double m){
+    m_ = m;
+}
+
+void Medium::SetX0(double X0){
+    X0_ = X0;
+}
+
+void Medium::SetX1(double X1){
+    X1_ = X1;
+}
+
+void Medium::SetD0(double d0){
+    d0_ = d0;
+}
+
+void Medium::SetR(double r){
+    r_ = r;
+}
+
+void Medium::SetRho(double rho){
+    rho_ = rho;
+}
+
+void Medium::SetMassDensity(double massDensity){
+    massDensity_ = massDensity;
+}
+
+void Medium::SetMolDensity(double molDensity){
+    molDensity_ = molDensity;
+}
+
+void Medium::SetAverageNucleonWeight(std::vector<double> M){
+    M_ = M;
+}
+
+void Medium::SetElementName(std::vector<std::string> E){
+    elementName_ = E;
+}
+
+void Medium::SetName(std::string name){
+    name_ = name;
+}
+
+void Medium::SetMN(std::vector<double> mN){
+    mN_ = mN;
+}
+
+void Medium::SetMM(double MM){
+    MM_ = MM;
+}
+
+void Medium::SetSumNucleons(double sumNucleons){
+    sumNucleons_ = sumNucleons;
+}
+
+void Medium::SetR0(double r0){
+    r0_ = r0;
+}
 
 //----------------------------------------------------------------------------//
-    // Setter
-
-    void Medium::SetNumCompontents(int numCompontents){
-        numCompontents_ = numCompontents;
-    }
 //----------------------------------------------------------------------------//
-    void Medium::SetNucCharge(std::vector<double> nucCharge){
-        nucCharge_ = nucCharge;
-    }
+//---------------------------------Destructor---------------------------------//
 //----------------------------------------------------------------------------//
-    void Medium::SetAtomicNum(std::vector<double> atomicNum){
-        atomicNum_ = atomicNum;
-    }
-//----------------------------------------------------------------------------//
-    void Medium::SetAtomInMolecule(std::vector<double> atomInMolecule){
-        atomInMolecule_ = atomInMolecule;
-    }
-//----------------------------------------------------------------------------//
-    void Medium::SetSumCharge(double sumCharge){
-        sumCharge_ = sumCharge;
-    }
-//----------------------------------------------------------------------------//
-    void Medium::SetZA(double ZA){
-        ZA_ = ZA;
-    }
-//----------------------------------------------------------------------------//
-    void Medium::SetI(double I){
-        I_ = I;
-    }
-//----------------------------------------------------------------------------//
-    void Medium::SetC1(double C1){
-        C1_ = C1;
-    }
-//----------------------------------------------------------------------------//
-    void Medium::SetC(double C){
-        C_ = C;
-    }
-//----------------------------------------------------------------------------//
-    void Medium::SetA(double a){
-        a_ = a;
-    }
-//----------------------------------------------------------------------------//
-    void Medium::SetM(double m){
-        m_ = m;
-    }
-//----------------------------------------------------------------------------//
-    void Medium::SetX0(double X0){
-        X0_ = X0;
-    }
-//----------------------------------------------------------------------------//
-    void Medium::SetX1(double X1){
-        X1_ = X1;
-    }
-//----------------------------------------------------------------------------//
-    void Medium::SetD0(double d0){
-        d0_ = d0;
-    }
-//----------------------------------------------------------------------------//
-    void Medium::SetR(double r){
-        r_ = r;
-    }
-//----------------------------------------------------------------------------//
-    void Medium::SetRho(double rho){
-        rho_ = rho;
-    }
-//----------------------------------------------------------------------------//
-    void Medium::SetMassDensity(double massDensity){
-        massDensity_ = massDensity;
-    }
-//----------------------------------------------------------------------------//
-    void Medium::SetMolDensity(double molDensity){
-        molDensity_ = molDensity;
-    }
-//----------------------------------------------------------------------------//
-    void Medium::SetAverageNucleonWeight(std::vector<double> M){
-        M_ = M;
-    }
-//----------------------------------------------------------------------------//
-    void Medium::SetElementName(std::vector<std::string> E){
-        elementName_ = E;
-    }
-//----------------------------------------------------------------------------//
-    void Medium::SetName(std::string name){
-        name_ = name;
-    }
-//----------------------------------------------------------------------------//
-    void Medium::SetMN(std::vector<double> mN){
-        mN_ = mN;
-    }
-//----------------------------------------------------------------------------//
-    void Medium::SetMM(double MM){
-        MM_ = MM;
-    }
-//----------------------------------------------------------------------------//
-    void Medium::SetSumNucleons(double sumNucleons){
-        sumNucleons_ = sumNucleons;
-    }
-//----------------------------------------------------------------------------//
-    void Medium::SetR0(double r0){
-        r0_ = r0;
-    }
-
 //----------------------------------------------------------------------------//
 
+
+Medium::~Medium()
+{
+    nucCharge_.clear();
+    atomicNum_.clear();
+    atomInMolecule_.clear();
+    logConstant_.clear();
+    bPrime_.clear();
+    M_.clear();
+    elementName_.clear();
+    mN_.clear();
+}
