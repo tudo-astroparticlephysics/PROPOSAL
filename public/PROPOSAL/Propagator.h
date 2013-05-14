@@ -75,9 +75,6 @@ public:
     bool operator!=(const Propagator &propagator) const;
 
 //----------------------------------------------------------------------------//
-    //Destructor
-    ~Propagator();
-//----------------------------------------------------------------------------//
     //Memberfunctions
     /**
      * Propagates the particle of initial energy e to the distance r.
@@ -164,6 +161,7 @@ public:
     boost::program_options::options_description CreateOptions();
 
 //----------------------------------------------------------------------------//
+    //Getter
 
     ProcessCollection* GetCollection() const
     {
@@ -176,7 +174,9 @@ public:
         return particle_;
     }
 
-
+ //----------------------------------------------------------------------------//
+    //Destructor
+    ~Propagator();
 
 };
 

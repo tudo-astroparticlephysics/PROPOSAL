@@ -24,8 +24,8 @@ class StandardNormal
 {
 
 protected:
-    Integral    *integral_;
-    Interpolant *interpolant_;
+    Integral*       integral_;
+    Interpolant*    interpolant_;
 
     double      val1_;
     double      val2_;
@@ -33,6 +33,7 @@ protected:
     bool        do_interpolation_;
     double      norm_;
     int         order_of_interpolation_;
+
 //----------------------------------------------------------------------------//
     //Memberfunctions
     /**
@@ -63,6 +64,28 @@ protected:
      */
 
     double StandardNormalRandomNumber(double x);
+
+//----------------------------------------------------------------------------//
+
+    /**
+     * \brief function describes standard normal distribution - interface to Integral
+     *
+     * \param   x   x-value
+     * \return  normalized standard normal distribution with sigma = 1
+     */
+
+    double FunctionToIntegral(double x);
+
+//----------------------------------------------------------------------------//
+
+    /**
+     * 1d parametrization - interface to Interpolate
+     *
+     * \param   x   x-value
+     * \return  return the standard normal distribution value of x
+     */
+
+    double FunctionToBuildInterpolant(double x);
 
 //----------------------------------------------------------------------------//
 
@@ -108,29 +131,7 @@ public:
      * \return  standard normal random number
      */
 
-//    double sndrn(double rnd, double average, double sigma, double xmin, double xmax, bool cutoff);
     double StandardNormalRandomNumber(double rnd, double average, double sigma, double xmin, double xmax, bool cutoff);
-
-//----------------------------------------------------------------------------//
-    /**
-     * \brief function describes standard normal distribution - interface to Integral
-     *
-     * \param   x   x-value
-     * \return  normalized standard normal distribution with sigma = 1
-     */
-
-    double FunctionToIntegral(double x);
-
-//----------------------------------------------------------------------------//
-
-    /**
-     * 1d parametrization - interface to Interpolate
-     *
-     * \param   x   x-value
-     * \return  return the standard normal distribution value of x
-     */
-
-    double FunctionToBuildInterpolant(double x);
 
 //----------------------------------------------------------------------------//
 
@@ -141,7 +142,7 @@ public:
     void DisableInterpolation();
 
 //----------------------------------------------------------------------------//
-
+    //Getter
 	bool GetDoInterpolation() const {
 		return do_interpolation_;
 	}
@@ -169,7 +170,8 @@ public:
 	double GetVal2() const {
 		return val2_;
 	}
-
+//----------------------------------------------------------------------------//
+    //Setter
 	void SetDoInterpolation(bool doInterpolation);
 	void SetIntegral(Integral* integral);
 	void SetInterpolant(Interpolant* interpolant);

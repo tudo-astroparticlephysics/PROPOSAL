@@ -13,8 +13,6 @@ CrossSections::CrossSections( )
     ,parametrization_       ( 1 )
     ,lpm_effect_enabled_    ( false )
     ,init_lpm_effect_       ( true )
-    ,shadow_                ( 1 )
-    ,hard_component_        ( true )
     ,order_of_interpolation_( 5 )
     ,sum_of_rates_          ( 0 )
 {
@@ -37,8 +35,6 @@ CrossSections::CrossSections(Particle* particle,
     ,parametrization_       ( 1 )
     ,lpm_effect_enabled_    ( false )
     ,init_lpm_effect_       ( true )
-    ,shadow_                ( 1 )
-    ,hard_component_        ( true )
     ,order_of_interpolation_( 5 )
     ,sum_of_rates_          ( 0 )
 {
@@ -61,8 +57,6 @@ CrossSections::CrossSections(const CrossSections& crossSections)
     ,parametrization_          ( crossSections.parametrization_ )
     ,lpm_effect_enabled_       ( crossSections.lpm_effect_enabled_ )
     ,init_lpm_effect_          ( crossSections.init_lpm_effect_ )
-    ,shadow_                   ( crossSections.shadow_ )
-    ,hard_component_           ( crossSections.hard_component_ )
     ,order_of_interpolation_   ( crossSections.order_of_interpolation_ )
     ,sum_of_rates_             ( crossSections.sum_of_rates_ )
 {
@@ -110,8 +104,6 @@ bool CrossSections::operator==(const CrossSections &crossSections) const
     if( parametrization_          != crossSections.parametrization_ )       return false;
     if( lpm_effect_enabled_       != crossSections.lpm_effect_enabled_ )    return false;
     if( init_lpm_effect_          != crossSections.init_lpm_effect_ )       return false;
-    if( shadow_                   != crossSections.shadow_ )                return false;
-    if( hard_component_           != crossSections.hard_component_ )        return false;
     if( order_of_interpolation_   != crossSections.order_of_interpolation_ )return false;
     if( *cut_settings_            != *crossSections.cut_settings_ )         return false;
     if( *particle_                != *crossSections.particle_ )             return false;
@@ -147,8 +139,6 @@ void CrossSections::swap(CrossSections &crossSections)
     swap( parametrization_          , crossSections.parametrization_ );
     swap( lpm_effect_enabled_       , crossSections.lpm_effect_enabled_ );
     swap( init_lpm_effect_          , crossSections.init_lpm_effect_ );
-    swap( shadow_                   , crossSections.shadow_ );
-    swap( hard_component_           , crossSections.hard_component_ );
     swap( order_of_interpolation_   , crossSections.order_of_interpolation_ );
     swap( sum_of_rates_             , crossSections.sum_of_rates_ );
 
@@ -214,19 +204,6 @@ void CrossSections::EnableLpmEffect(bool lpm_effect_enabled){
     lpm_effect_enabled_ = lpm_effect_enabled;
 }
 
-//----------------------------------------------------------------------------//
-
-void CrossSections::SetShadow(int newshadow)
-{
-    shadow_  =   newshadow;
-}
-
-//----------------------------------------------------------------------------//
-
-void CrossSections::SetHardComponent(bool newhard)
-{
-    hard_component_  =   newhard;
-}
 
 //----------------------------------------------------------------------------//
 

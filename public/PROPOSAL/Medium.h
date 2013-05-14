@@ -179,6 +179,18 @@ protected:
     void InitAntaresWater();
 //----------------------------------------------------------------------------//
 
+
+    /*!
+     * Woods-Saxon potential calculation - function to integrate
+     *
+     * \param   r
+     * \return  value of the Woods-Saxon potential
+     */
+
+    double FunctionToIntegral(double r);
+
+//----------------------------------------------------------------------------//
+
 public:
 
     // constructors
@@ -201,18 +213,6 @@ public:
 
 
     Medium(std::string w, double rho);
-
-//----------------------------------------------------------------------------//
-
-
-    /*!
-     * Woods-Saxon potential calculation - function to integrate
-     *
-     * \param   r
-     * \return  value of the Woods-Saxon potential
-     */
-
-    double FunctionToIntegral(double r);
 
 //----------------------------------------------------------------------------//
 

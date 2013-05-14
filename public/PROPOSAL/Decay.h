@@ -23,11 +23,27 @@ class Decay
 protected:
 
     RootFinder* root_finder_;
-    Particle* particle_;
+    Particle*   particle_;
     std::string out_;
 
-    bool store_neutrinos_;
-    double multiplier_;
+    bool        store_neutrinos_;
+    double      multiplier_;
+
+//----------------------------------------------------------------------------//
+
+    /**
+    * function for electron energy calculation - interface to FindRoot
+    */
+
+    double Function(double x);
+
+//----------------------------------------------------------------------------//
+
+    /**
+    * function for electron energy calculation - interface to FindRoot
+    */
+
+    double DifferentiatedFunction(double x);
 
 //----------------------------------------------------------------------------//
 public:
@@ -64,21 +80,6 @@ public:
 
     double CalculateProductEnergy( double ernd, double arnd, double srnd );
 
-//----------------------------------------------------------------------------//
-
-    /**
-    * function for electron energy calculation - interface to FindRoot
-    */
-
-    double Function(double x);
-
-//----------------------------------------------------------------------------//
-
-    /**
-    * function for electron energy calculation - interface to FindRoot
-    */
-
-    double DifferentiatedFunction(double x);
 
 //----------------------------------------------------------------------------//
 

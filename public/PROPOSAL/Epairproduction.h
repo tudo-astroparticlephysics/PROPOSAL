@@ -89,6 +89,19 @@ protected:
     */
 
     void SetIntegralLimits(int component);
+//----------------------------------------------------------------------------//
+
+    double FunctionToBuildEpairInterpolant(double energy , double v);
+
+//----------------------------------------------------------------------------//
+    double FunctionToBuildDEdxInterpolant(double energy);
+
+//----------------------------------------------------------------------------//
+    double FunctionToBuildDNdxInterpolant1D(double energy);
+
+//----------------------------------------------------------------------------//
+    double FunctionToBuildDNdxInterpolant2D(double energy, double v);
+
 
 //----------------------------------------------------------------------------//
 
@@ -154,28 +167,16 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    double FunctionToBuildEpairInterpolant(double energy , double v);
-
-//----------------------------------------------------------------------------//
-    double FunctionToBuildDEdxInterpolant(double energy);
-
-//----------------------------------------------------------------------------//
-    double FunctionToBuildDNdxInterpolant1D(double energy);
-
-//----------------------------------------------------------------------------//
-    double FunctionToBuildDNdxInterpolant2D(double energy, double v);
-
-//----------------------------------------------------------------------------//
     void swap(Epairproduction &epair);
 
 //--------------------------------------------------------------------------- //
-
     boost::program_options::options_description CreateOptions();
 
-    //Setter
+//----------------------------------------------------------------------------//
+    void ValidateOptions();
 
-
-    ~Epairproduction();
+//----------------------------------------------------------------------------//
+    //Getter
 
 	int GetComponent() const {
 		return component_;
@@ -220,7 +221,8 @@ public:
 	double GetV() const {
 		return v_;
 	}
-
+//----------------------------------------------------------------------------//
+    //Setter
 
 	void SetComponent(int component);
 	void SetDedxInterpolant(Interpolant* dedxInterpolant);
@@ -233,6 +235,11 @@ public:
 	void SetProbForComponent(std::vector<double> probForComponent);
 	void SetReverse(bool reverse);
 	void SetV(double v);
+
+//----------------------------------------------------------------------------//
+    //Destructor
+    ~Epairproduction();
+
 };
 
 #endif //Epairproduction_H

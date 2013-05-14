@@ -563,3 +563,19 @@ boost::program_options::options_description Ionization::CreateOptions()
 
    return ionization;
 }
+
+//----------------------------------------------------------------------------//
+
+void Ionization::ValidateOptions()
+{
+    if(order_of_interpolation_ < 2)
+    {
+        order_of_interpolation_ = 5;
+        cerr<<"Ionization: Order of Interpolation is not a vaild number\t"<<"Set to 5"<<endl;
+    }
+    if(order_of_interpolation_ > 6)
+    {
+        cerr<<"Ionization: Order of Interpolation is set to "<<order_of_interpolation_
+            <<".\t Note a order of interpolation > 6 will slow down the program"<<endl;
+    }
+}

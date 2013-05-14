@@ -178,7 +178,7 @@ TEST(Assignment , Swap ) {
 std::vector<Medium*>                CombOfMedium;
 std::vector<Particle*>              CombOfParticle;
 std::vector<EnergyCutSettings*>     CombOfEnergyCutSettings;
-std::vector<CrossSections*>         CombOfPhoto;
+std::vector<Photonuclear*>          CombOfPhoto;
 
 //----------------------------------------------------------------------------//
 

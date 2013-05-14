@@ -13,6 +13,8 @@ Photonuclear::Photonuclear()
     ,hmax_                  ( 8 )
     ,v_                     ( 0 )
     ,do_photo_interpolation_( false )
+    ,shadow_                ( 1 )
+    ,hard_component_        ( true )
     ,dndx_integral_         ( )
     ,interpolant_hardBB_    ( )
     ,dndx_interpolant_1d_   ( )
@@ -48,6 +50,8 @@ Photonuclear::Photonuclear(const Photonuclear &photo)
     ,hmax_                              ( photo.hmax_ )
     ,v_                                 ( photo.v_ )
     ,do_photo_interpolation_            ( photo.do_photo_interpolation_ )
+    ,shadow_                            ( photo.shadow_ )
+    ,hard_component_                    ( photo.hard_component_ )
     ,integral_                          ( new Integral(*photo.integral_) )
     ,integral_for_dEdx_                 ( new Integral(*photo.integral_for_dEdx_) )
     ,prob_for_component_                ( photo.prob_for_component_ )
@@ -121,6 +125,8 @@ bool Photonuclear::operator==(const Photonuclear &photo) const
     if( hmax_                       !=  photo.hmax_)                        return false;
     if( v_                          !=  photo.v_)                           return false;
     if( do_photo_interpolation_     !=  photo.do_photo_interpolation_ )     return false;
+    if( shadow_                     !=  photo.shadow_ )                     return false;
+    if( hard_component_             !=  photo.hard_component_ )             return false;
     if( init_hardbb_                !=  photo.init_hardbb_)                 return false;
     if( init_measured_              !=  photo.init_measured_)               return false;
     if( *integral_                  != *photo.integral_)                    return false;
@@ -194,6 +200,8 @@ Photonuclear::Photonuclear(Particle* particle,
     ,hmax_                  ( 8 )
     ,v_                     ( 0 )
     ,do_photo_interpolation_( false )
+    ,shadow_                ( 1 )
+    ,hard_component_        ( true )
     ,dndx_integral_         ( )
     ,interpolant_hardBB_    ( )
     ,dndx_interpolant_1d_   ( )
@@ -236,6 +244,8 @@ void Photonuclear::swap(Photonuclear &photo)
     swap(hmax_,photo.hmax_);
     swap(v_,photo.v_);
     swap(do_photo_interpolation_, photo.do_photo_interpolation_);
+    swap(shadow_ , photo.shadow_ );
+    swap(hard_component_ , photo.hard_component_ );
 
     integral_for_dEdx_->swap(*photo.integral_for_dEdx_);
     integral_->swap(*photo.integral_);
@@ -1472,13 +1482,43 @@ boost::program_options::options_description Photonuclear::CreateOptions()
     photonuclear.add_options()
         ("photonuclear.para",             po::value<int>(&parametrization_)->default_value(1),              "1 = Kakoulin \n2 = Rhode \n3 = Bezrukov-Bugaev \n4 = Zeus \n5 = ALLM 91 \n6 = ALLM 97 \n7 = Butkevich-Mikhailov")
         ("photonuclear.hard_component",   po::value<bool>(&hard_component_)->implicit_value(false),         "Enables hard component, only valid for parametrisation 1-4")
-        ("photonuclear.shadow",           po::value<int>(&shadow_)->default_value(0),                       "Nuclear structure function: dutt/butk\n, only valid for parametrisation 5-7")
+        ("photonuclear.shadow",           po::value<int>(&shadow_)->default_value(1),                       "Nuclear structure function: dutt/butk\n, only valid for parametrisation 5-7")
         ("photonuclear.interpol_dedx",    po::value<bool>(&do_dedx_Interpolation_)->implicit_value(false),  "Enables interpolation for dEdx")
         ("photonuclear.interpol_dndx",    po::value<bool>(&do_dndx_Interpolation_)->implicit_value(false),  "Enables interpolation for dNdx")
         ("photonuclear.multiplier",       po::value<double>(&multiplier_)->default_value(1.),               "modify the cross section by this factor")
         ("photonuclear.interpol_order",   po::value<int>(&order_of_interpolation_)->default_value(5),       "number of interpolation points");
 
    return photonuclear;
+}
+
+//----------------------------------------------------------------------------//
+
+void Photonuclear::ValidateOptions()
+{
+    if(order_of_interpolation_ < 2)
+    {
+        order_of_interpolation_ = 5;
+        cerr<<"Photonuclear: Order of Interpolation is not a vaild number. Must be > 2.\t"<<"Set to 5"<<endl;
+    }
+    if(order_of_interpolation_ > 6)
+    {
+        cerr<<"Photonuclear: Order of Interpolation is set to "<<order_of_interpolation_
+            <<".\t Note a order of interpolation > 6 will slow down the program"<<endl;
+    }
+    if(parametrization_ < 1 || parametrization_ >7)
+    {
+        parametrization_ = 1;
+        cerr<<"Photonuclear: Parametrization is not a vaild number. Must be 1-7.\tSet parametrization to 1"<<endl;
+    }
+    if(parametrization_ > 4 && hard_component_==true)
+    {
+        cerr<<"Photonuclear: Enable the hard component has only an effect for parametrization > 4"<<endl;
+    }
+    if(shadow_ != 1 && shadow_ != 2)
+    {
+        cerr<<"Photonuclear: Shadow must be 1 or 2.\tSet to 1"<<endl;
+        shadow_ = 1;
+    }
 }
 
 //----------------------------------------------------------------------------//
@@ -1544,6 +1584,15 @@ void Photonuclear::SetProbForComponent(std::vector<double> probForComponent) {
 void Photonuclear::SetV(double v) {
 	v_ = v;
 }
+
+void Photonuclear::SetShadow(int shadow){
+    shadow_  =   shadow;
+}
+
+void Photonuclear::SetHardComponent(bool hard){
+    hard_component_  =   hard;
+}
+
 
 //----------------------------------------------------------------------------//
 

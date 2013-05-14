@@ -555,6 +555,11 @@ void Propagator::Setup(int argc, char** argv)
         std::cerr<<"Error: "<<e.what()<<"\n";
         exit(1);
     }
+
+    for(unsigned int i = 0 ; i < collection_->GetCrosssections().size() ; i++)
+    {
+        collection_->GetCrosssections().at(i)->ValidateOptions();
+    }
 }
 
 //----------------------------------------------------------------------------//

@@ -57,10 +57,6 @@ protected:
     bool        lpm_effect_enabled_;
     bool        init_lpm_effect_;
 
-    int         shadow_;
-
-    bool        hard_component_;
-
     int         order_of_interpolation_;
     double      sum_of_rates_;
 //----------------------------------------------------------------------------//
@@ -177,12 +173,15 @@ public:
     virtual boost::program_options::options_description CreateOptions() = 0;
 
 //----------------------------------------------------------------------------//
+    virtual void ValidateOptions() = 0;
+
+//----------------------------------------------------------------------------//
     // Getter
     std::string GetName() const
     {
         return name_;
     }
-
+//----------------------------------------------------------------------------//
     double GetEbig() const
     {
         return ebig_;
@@ -250,11 +249,6 @@ public:
     void SetShadow(int newshadow);
 //----------------------------------------------------------------------------//
 
-    void SetHardComponent(bool newhard);
-//----------------------------------------------------------------------------//
-
-    void SetShadow(bool newshadow);
-//----------------------------------------------------------------------------//
     // destructor
 
     virtual ~CrossSections(){}

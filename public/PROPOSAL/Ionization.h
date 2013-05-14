@@ -95,6 +95,17 @@ protected:
 
 //----------------------------------------------------------------------------//
 
+    double FunctionToBuildDEdxInterpolant(double energy);
+
+//----------------------------------------------------------------------------//
+
+    double FunctionToBuildDNdxInterpolant(double energy);
+
+//----------------------------------------------------------------------------//
+
+    double FunctionToBuildDNdxInterpolant2D(double energy , double v);
+
+//----------------------------------------------------------------------------//
 public:
 
 //----------------------------------------------------------------------------//
@@ -157,18 +168,6 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    double FunctionToBuildDEdxInterpolant(double energy);
-
-//----------------------------------------------------------------------------//
-
-    double FunctionToBuildDNdxInterpolant(double energy);
-
-//----------------------------------------------------------------------------//
-
-    double FunctionToBuildDNdxInterpolant2D(double energy , double v);
-
-//----------------------------------------------------------------------------//
-
     void DisableDNdxInterpolation();
 
 //----------------------------------------------------------------------------//
@@ -179,8 +178,12 @@ public:
 
     boost::program_options::options_description CreateOptions();
 
+//----------------------------------------------------------------------------//
 
-    ~Ionization(){}
+    void ValidateOptions();
+
+//----------------------------------------------------------------------------//
+    //Getter
 
 	double GetBeta() const {
 		return beta_;
@@ -206,7 +209,8 @@ public:
 		return integral_;
 	}
 
-
+//----------------------------------------------------------------------------//
+    //Setter
 
 	void SetBeta(double beta);
 	void SetDedxInterpolant(Interpolant* dedxInterpolant);
@@ -214,6 +218,11 @@ public:
 	void SetDndxInterpolant2d(Interpolant* dndxInterpolant2d);
 	void SetGamma(double gamma);
 	void SetIntegral(Integral* integral);
+
+//----------------------------------------------------------------------------//
+    //Destructor
+    ~Ionization(){}
+
 };
 
 #endif //Ionization_H

@@ -34,10 +34,6 @@ public:
     RootFinder(int maxSteps, double precision);
 
 //----------------------------------------------------------------------------//
-    //Destructor
-
-    ~RootFinder();
-//----------------------------------------------------------------------------//
     //Memberfunctions
 
     double FindRoot(double min,
@@ -50,7 +46,9 @@ public:
 //----------------------------------------------------------------------------//
 
     void swap(RootFinder &finder);
+
 //----------------------------------------------------------------------------//
+    //Getter
 	int GetMaxSteps() const {
 		return maxSteps_;
 	}
@@ -59,8 +57,13 @@ public:
 		return precision_;
 	}
 //----------------------------------------------------------------------------//
+    //Setter
 	void SetMaxSteps(int maxSteps);
 	void SetPrecision(double precision);
+
+//----------------------------------------------------------------------------//
+    //Destructor
+    ~RootFinder();
 };
 
 #endif // _ROOTFINDER_H
