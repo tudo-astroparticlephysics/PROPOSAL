@@ -403,10 +403,10 @@ TEST(Epairproduction , Test_of_e ) {
 
 
             if(e!=0){
-                if(log10(fabs(1-e_new/e))>-8)
+                if(log10(fabs(1-e_new/e))>-14)
                 {
-//                    cout <<ecut << "\t" << vcut<< "\t" << lpm<< "\t" << energy<< "\t" << med<< "\t" << particleName << endl;
-//                    cout << energy << "\t" << log10(fabs(1-e_new/e)) << endl;
+                    //cout <<ecut << "\t" << vcut<< "\t" << lpm<< "\t" << energy<< "\t" << med<< "\t" << particleName << endl;
+                    //cout << energy << "\t" << log10(fabs(1-e_new/e)) << endl;
                 }
             }
 
@@ -463,7 +463,6 @@ TEST(Epairproduction , Test_of_dEdx_interpol ) {
 }
 
 TEST(Epairproduction , Test_of_dNdx_interpol ) {
-    //return;
     ifstream in;
     in.open("bin/TestFiles/Epair_dNdx_interpol.txt");
 
@@ -503,8 +502,8 @@ TEST(Epairproduction , Test_of_dNdx_interpol ) {
             if(dNdx!=0)
                 if(log10(fabs(1-dNdx_new/dNdx))>-8)
                 {
-//                    cout <<ecut << "\t" << vcut<< "\t" << lpm<< "\t" << energy<< "\t" << med<< "\t" << particleName << endl;
-//                    cout << energy << "\t" << log10(fabs(1-dNdx_new/dNdx)) << endl;
+                    //cout <<ecut << "\t" << vcut<< "\t" << lpm<< "\t" << energy<< "\t" << med<< "\t" << particleName << endl;
+                    //cout << energy << "\t" << log10(fabs(1-dNdx_new/dNdx)) << endl;
                 }
 
             ASSERT_NEAR(dNdx_new, dNdx, precision*dNdx);
@@ -584,7 +583,7 @@ TEST(Epairproduction , Test_of_e_interpol ) {
     bool lpm;
 
     double precision = 1E-2;
-
+    double precision_old=precision;
     double energy_old;
     bool first = true;
     RndFromFile* Rand = new RndFromFile("bin/TestFiles/rnd.txt");
@@ -599,24 +598,30 @@ TEST(Epairproduction , Test_of_e_interpol ) {
         energy_old = -1;
 
         i++;
+        CombOfEpair.at(i)->EnableDEdxInterpolation();
         CombOfEpair.at(i)->EnableDNdxInterpolation();
 
         while(energy_old < energy)
         {
+            precision=precision_old;
             energy_old = energy;
 
             rnd1 = Rand->rnd();
             rnd2 = Rand2->rnd();
+
+            //The Cross section for such high energy is just extrapolated and
+            //therefore pretty unceartain.
+            if(!particleName.compare("e") && energy > 1E12)precision = 1E-1;
 
             CombOfEpair.at(i)->GetParticle()->SetEnergy(energy);
             e_new=CombOfEpair.at(i)->CalculateStochasticLoss(rnd1,rnd2);
 
 
             if(e!=0){
-                if(log10(fabs(1-e_new/e))>-14)
+                if(log10(fabs(1-e_new/e))>-3)
                 {
-//                    cout <<ecut << "\t" << vcut<< "\t" << lpm<< "\t" << energy<< "\t" << med<< "\t" << particleName << endl;
-//                    cout << energy << "\t" << log10(fabs(1-e_new/e)) << endl;
+                    //cout <<ecut << "\t" << vcut<< "\t" << lpm<< "\t" << energy<< "\t" << med<< "\t" << particleName << endl;
+                    //cout << energy << "\t" << log10(fabs(1-e_new/e)) << endl;
                 }
             }
 
