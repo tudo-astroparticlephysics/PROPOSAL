@@ -97,10 +97,6 @@ protected:
 
 //----------------------------------------------------------------------------//
 
-    double FunctionToDNdxIntegral(double variable);
-
-//----------------------------------------------------------------------------//
-
     /*!
      * this is what the photonuclear interaction cross section is equal to,
      * there are different cases in which the cross section
@@ -234,6 +230,10 @@ public:
 
 //----------------------------------------------------------------------------//
     void DisablePhotoInterpolation();
+
+//----------------------------------------------------------------------------//
+
+    double FunctionToDNdxIntegral(double variable);
 
 //----------------------------------------------------------------------------//
 

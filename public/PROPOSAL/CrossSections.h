@@ -69,10 +69,6 @@ protected:
 
 //----------------------------------------------------------------------------//
 
-    virtual double FunctionToDNdxIntegral(double variable) = 0;
-
-//----------------------------------------------------------------------------//
-
 public:
 
     //Constructor
@@ -131,6 +127,10 @@ public:
 
     void SetParametrizationLimit(double ebig=BIGENERGY);
     
+//----------------------------------------------------------------------------//
+
+    virtual double FunctionToDNdxIntegral(double variable) = 0;
+
 //----------------------------------------------------------------------------//
 
     // Setter

@@ -87,10 +87,6 @@ private:
 
 //----------------------------------------------------------------------------//
 
-    double FunctionToDNdxIntegral(double variable);
-
-//----------------------------------------------------------------------------//
-
     /*!
     this is what the Elastic Bremsstrahlung Cross Section (EBCS) is equal to
     units are [1/cm] since the multiplication by No*n is done here.
@@ -174,6 +170,10 @@ public:
 //----------------------------------------------------------------------------//
 
     void DisableDEdxInterpolation();
+
+//----------------------------------------------------------------------------//
+
+    double FunctionToDNdxIntegral(double variable);
 
 //----------------------------------------------------------------------------//
 

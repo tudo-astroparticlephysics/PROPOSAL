@@ -76,10 +76,6 @@ protected:
 
 //----------------------------------------------------------------------------//
 
-    double FunctionToDNdxIntegral(double variable);
-
-//----------------------------------------------------------------------------//
-
     /*!
     Set the component of the primary;
     sets the parameters \f$v_{Min}=4 \frac{m_e}{E_p}\f$,
@@ -163,7 +159,12 @@ public:
     void DisableDEdxInterpolation();
 
 //----------------------------------------------------------------------------//
+
     void DisableEpairInterpolation();
+
+//----------------------------------------------------------------------------//
+
+    double FunctionToDNdxIntegral(double variable);
 
 //----------------------------------------------------------------------------//
 
