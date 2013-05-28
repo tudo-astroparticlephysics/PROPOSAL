@@ -86,7 +86,7 @@ add_library(PROPOSAL
         private/PROPOSAL/RootFinder.cxx
         private/PROPOSAL/ProcessCollection.cxx
         private/PROPOSAL/Propagator.cxx
-
+        private/PROPOSAL/ContinuousRandomization.cxx
 	)
 
 set_target_properties(PROPOSAL PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -O2 -Wall -Werror")# -Wextra -pedantic")
