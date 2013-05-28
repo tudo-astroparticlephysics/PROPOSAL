@@ -39,7 +39,7 @@ protected:
     bool        lpm_effect_enabled_;
     double      ini_;
     bool        debug_;
-    bool        do_weighting_;           //!< Do weigthing? Set as false in constructor
+    bool        do_weighting_;           //!< Do weigthing? Set to false in constructor
     double      weighting_order_;        //!< Re-weighting order. Set to 0 in constructor
     double      weighting_starts_at_;    //!< Distance at which re-weighting starts. Set to 0 in constructor
 
@@ -68,10 +68,10 @@ protected:
     Decay* decay_;
     Integral* prop_decay_;
     Integral* prop_interaction_;
-    Interpolant *interpol_prop_decay_;           //!< Interpolate object of the Integral of the function FunctionToPropIntegralDecay
-    Interpolant *interpol_prop_decay_diff_;      //!< Interpolate object of the function FunctionToPropIntegralDecay
-    Interpolant *interpol_prop_interaction_;     //!< Interpolate object of the Integral of the function FunctionToPropIntegralInteraction
-    Interpolant *interpol_prop_interaction_diff_;//!< Interpolate object of the function FunctionToPropIntegralInteraction
+    Interpolant *interpol_prop_decay_;           //!< Interpolant object of the Integral of the function FunctionToPropIntegralDecay
+    Interpolant *interpol_prop_decay_diff_;      //!< Interpolant object of the function FunctionToPropIntegralDecay
+    Interpolant *interpol_prop_interaction_;     //!< Interpolant object of the Integral of the function FunctionToPropIntegralInteraction
+    Interpolant *interpol_prop_interaction_diff_;//!< Interpolant object of the function FunctionToPropIntegralInteraction
 
 
 
