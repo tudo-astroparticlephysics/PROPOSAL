@@ -394,6 +394,12 @@ void ProcessCollection::EnableInterpolation()
 
     particle_->SetEnergy(energy);
 
+    if(do_continuous_randomization)
+    {
+        randomizer_->EnableDE2dxInterpolation();
+        randomizer_->EnableDE2deInterpolation();
+    }
+
     do_interpolation_=true;
 
 }
@@ -475,7 +481,7 @@ void ProcessCollection::DisableInterpolation()
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
-//------------------------------lpm effect------------------------------------//
+//-------------------------lpm effect /randomization--------------------------//
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
@@ -505,6 +511,29 @@ void ProcessCollection::DisableLpmEffect()
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
+
+
+void ProcessCollection::EnableContinuousRandomization()
+{
+    randomizer_ =   new ContinuousRandomization(particle_,medium_,crosssections_);
+    do_continuous_randomization     =   true;
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+void ProcessCollection::DisableContinuousRandomization()
+{
+    delete  randomizer_;
+    randomizer_ =   NULL;
+    do_continuous_randomization     =   false;
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
 //--------------------------------constructors--------------------------------//
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
@@ -520,6 +549,7 @@ ProcessCollection::ProcessCollection()
     ,do_weighting_              ( false )
     ,weighting_order_           ( 0 )
     ,weighting_starts_at_       ( 0 )
+    ,do_continuous_randomization( false )
     ,up_                        ( false )
     ,bigLow_                    ( 2,0 )
     ,storeDif_                  ( 2,0 )
@@ -540,6 +570,7 @@ ProcessCollection::ProcessCollection()
     interpol_prop_decay_diff_       = NULL;
     interpol_prop_interaction_      = NULL;
     interpol_prop_interaction_diff_ = NULL;
+    randomizer_                     = NULL;
 
 }
 
@@ -558,6 +589,7 @@ ProcessCollection::ProcessCollection(const ProcessCollection &collection)
     ,do_weighting_              ( collection.do_weighting_ )
     ,weighting_order_           ( collection.weighting_order_ )
     ,weighting_starts_at_       ( collection.weighting_starts_at_ )
+    ,do_continuous_randomization( collection.do_continuous_randomization)
     ,up_                        ( collection.up_)
     ,bigLow_                    ( collection.bigLow_ )
     ,storeDif_                  ( collection.storeDif_ )
@@ -650,6 +682,15 @@ ProcessCollection::ProcessCollection(const ProcessCollection &collection)
         interpol_prop_interaction_diff_ = NULL;
     }
 
+    if(collection.randomizer_ != NULL)
+    {
+        randomizer_ = new ContinuousRandomization(*collection.randomizer_) ;
+    }
+    else
+    {
+        randomizer_ = NULL;
+    }
+
 }
 
 
@@ -666,6 +707,7 @@ ProcessCollection::ProcessCollection(Particle *particle, Medium *medium, EnergyC
     ,do_weighting_              ( false )
     ,weighting_order_           ( 0 )
     ,weighting_starts_at_       ( 0 )
+    ,do_continuous_randomization( false )
     ,up_                        ( false )
     ,bigLow_                    ( 2,0 )
     ,storeDif_                  ( 2,0 )
@@ -693,8 +735,7 @@ ProcessCollection::ProcessCollection(Particle *particle, Medium *medium, EnergyC
     interpol_prop_decay_diff_       = NULL;
     interpol_prop_interaction_      = NULL;
     interpol_prop_interaction_diff_ = NULL;
-
-
+    randomizer_                     = NULL;
 
 }
 
@@ -738,6 +779,8 @@ bool ProcessCollection::operator==(const ProcessCollection &collection) const
     if( do_weighting_              != collection.do_weighting_ )            return false;
     if( weighting_order_           != collection.weighting_order_ )         return false;
     if( weighting_starts_at_       != collection.weighting_starts_at_ )     return false;
+    if( do_continuous_randomization!= collection.do_continuous_randomization)return false;
+
     if( *decay_                    != *collection.decay_ )                  return false;
 
     if( crosssections_.size()      != collection.crosssections_.size() )    return false;
@@ -816,6 +859,12 @@ bool ProcessCollection::operator==(const ProcessCollection &collection) const
     else if( interpol_prop_interaction_diff_ != collection.interpol_prop_interaction_diff_)     return false;
 
 
+    if( randomizer_ != NULL && collection.randomizer_ != NULL)
+    {
+        if( *randomizer_   != *collection.randomizer_)                                        return false;
+    }
+    else if( randomizer_ != collection.randomizer_)                                           return false;
+
     //else
     return true;
 }
@@ -848,6 +897,9 @@ void ProcessCollection::swap(ProcessCollection &collection)
     Medium tmp_medium1(*collection.medium_);
     Medium tmp_medium2(*medium_);
 
+    vector<CrossSections*> tmp_cross1(collection.crosssections_);
+    vector<CrossSections*> tmp_cross2(crosssections_);
+
     swap( order_of_interpolation_    , collection.order_of_interpolation_ );
     swap( do_interpolation_          , collection.do_interpolation_ );
     swap( lpm_effect_enabled_        , collection.lpm_effect_enabled_ );
@@ -857,6 +909,7 @@ void ProcessCollection::swap(ProcessCollection &collection)
     swap( do_weighting_              , collection.do_weighting_ );
     swap( weighting_order_           , collection.weighting_order_ );
     swap( weighting_starts_at_       , collection.weighting_starts_at_ );
+    swap( do_continuous_randomization, collection.do_continuous_randomization );
 
     particle_->swap( *collection.particle_ );       //particle pointer swap
     medium_->swap( *collection.medium_ );
@@ -870,6 +923,21 @@ void ProcessCollection::swap(ProcessCollection &collection)
     storeDif_.swap(collection.storeDif_);
     bigLow_.swap(collection.bigLow_);
 
+    if( randomizer_ != NULL && collection.randomizer_ != NULL)
+    {
+        randomizer_->swap(*collection.randomizer_);
+    }
+    else if( randomizer_ == NULL && collection.randomizer_ != NULL)
+    {
+        randomizer_ = new ContinuousRandomization(*collection.randomizer_);
+        collection.randomizer_ = NULL;
+    }
+    else if( randomizer_ != NULL && collection.randomizer_ == NULL)
+    {
+        collection.randomizer_ = new ContinuousRandomization(*randomizer_);
+        randomizer_ = NULL;
+    }
+
     // Set pointers again (to many swapping above....)
     SetParticle( new Particle(tmp_particle1) );
     collection.SetParticle( new Particle(tmp_particle2) );
@@ -877,11 +945,11 @@ void ProcessCollection::swap(ProcessCollection &collection)
     SetMedium( new Medium(tmp_medium1) );
     collection.SetMedium( new Medium(tmp_medium2) );
 
-
     SetCutSettings(  new EnergyCutSettings(tmp_cuts1) );
     collection.SetCutSettings( new EnergyCutSettings(tmp_cuts2) );
 
-
+    SetCrosssections(  tmp_cross1 );
+    collection.SetCrosssections(  tmp_cross2 );
 
     if( interpolant_ != NULL && collection.interpolant_ != NULL)
     {
@@ -1161,6 +1229,10 @@ void ProcessCollection::SetMedium(Medium* medium)
     {
         crosssections_.at(i)->SetMedium(medium_);
     }
+    if(do_continuous_randomization)
+    {
+        randomizer_->SetMedium(medium_);
+    }
 }
 
 
@@ -1176,6 +1248,10 @@ void ProcessCollection::SetParticle(Particle* particle)
     {
         crosssections_.at(i)->SetParticle(particle);
     }
+    if(do_continuous_randomization)
+    {
+        randomizer_->SetParticle(particle_);
+    }
 }
 
 
@@ -1186,6 +1262,10 @@ void ProcessCollection::SetParticle(Particle* particle)
 void ProcessCollection::SetCrosssections(
         std::vector<CrossSections*> crosssections) {
     crosssections_ = crosssections;
+    if(do_continuous_randomization)
+    {
+        randomizer_->SetCrosssections(crosssections);
+    }
 }
 
 void ProcessCollection::SetDebug(bool debug) {

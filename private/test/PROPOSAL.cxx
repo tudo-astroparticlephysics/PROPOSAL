@@ -159,18 +159,17 @@ using namespace std;
 
 int main(int argc, char** argv){
 
-    Medium *medium = new Medium("hydrogen",1.);
+    Medium *medium = new Medium("air",1.);
     Particle *particle = new Particle("mu",1.,1.,1,.20,20,1e5,10);
-    EnergyCutSettings *cut_settings = new EnergyCutSettings(500,-1);
+    EnergyCutSettings *cut_settings = new EnergyCutSettings(500,0.05);
 
     vector<CrossSections*> crosssections;
 
     crosssections.resize(4);
     crosssections.at(0) = new Ionization(particle, medium, cut_settings);
-    crosssections.at(1) = new Bremsstrahlung(particle, medium, cut_settings);
-    crosssections.at(2) = new Photonuclear(particle, medium, cut_settings);
-    crosssections.at(3) = new Epairproduction(particle, medium, cut_settings);
-
+    crosssections.at(1) = new Photonuclear(particle, medium, cut_settings);
+    crosssections.at(2) = new Epairproduction(particle, medium, cut_settings);
+    crosssections.at(3) = new Bremsstrahlung(particle, medium, cut_settings);
     ContinuousRandomization *A = new ContinuousRandomization(particle, medium, crosssections);
 
     for(unsigned int i=0 ; i<crosssections.size();i++)
@@ -183,10 +182,10 @@ int main(int argc, char** argv){
     A->EnableDE2dxInterpolation();
     cout<<"cront x \t"<<endl;
     A->EnableDE2deInterpolation();
-    cout<<"cront x \t"<<endl;
+    cout<<"cront e \t"<<endl;
 
     particle->SetEnergy(1e6);
-    cout<<A->Randomize(particle->GetEnergy(),3e5,0.5)<<endl;
+    cout<<A->Randomize(particle->GetEnergy(),3e5,0.9)<<endl;
 //    double pr_result;
 //    Propagator* pr = new Propagator();
 //    pr->Setup(argc, argv);

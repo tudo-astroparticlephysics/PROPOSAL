@@ -424,7 +424,6 @@ double ContinuousRandomization::DE2dx()
             {
                 min =   cross_sections_.at(i)->GetVMin();
             }
-
             sum +=  dE2dx_integral_->Integrate (min, cross_sections_.at(i)->GetVUp(), boost::bind(&ContinuousRandomization::FunctionToDE2dxIntegral, this, _1) ,2);
 
             if(cross_sections_.at(i)->GetName().compare("Ionization")==0)
@@ -511,7 +510,7 @@ double ContinuousRandomization::FunctionToBuildDE2deInterplantDiff(double energy
 
 double ContinuousRandomization::FunctionToDE2dxIntegral(double v)
 {
-    return cross_sections_.at(which_cross_)->FunctionToDNdxIntegral(v);
+    return v*v*cross_sections_.at(which_cross_)->FunctionToDNdxIntegral(v);
 }
 
 
@@ -533,7 +532,6 @@ double ContinuousRandomization::FunctionToDE2deIntegral(double energy)
         aux     =   cross_sections_.at(i)->CalculatedEdx();
         result  +=  aux;
     }
-
     return -1/result*DE2dx();
 }
 

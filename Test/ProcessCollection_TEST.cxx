@@ -121,7 +121,8 @@ TEST(Assignment , Swap ) {
     EnergyCutSettings *cuts2 = new EnergyCutSettings(500,-1);
     ProcessCollection A(particle, medium, cuts);
     ProcessCollection B(particle2, medium2, cuts2);
-
+    A.EnableContinuousRandomization();
+    B.EnableContinuousRandomization();
     A.EnableInterpolation();
     B.EnableInterpolation();
     EXPECT_TRUE(A==B);

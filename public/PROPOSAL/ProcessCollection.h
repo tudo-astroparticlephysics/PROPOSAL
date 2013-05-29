@@ -22,6 +22,7 @@
 #include "PROPOSAL/Interpolant.h"
 #include <vector>
 #include <utility>
+#include "PROPOSAL/ContinuousRandomization.h"
 
 
 
@@ -43,6 +44,7 @@ protected:
     double      weighting_order_;        //!< Re-weighting order. Set to 0 in constructor
     double      weighting_starts_at_;    //!< Distance at which re-weighting starts. Set to 0 in constructor
 
+    bool        do_continuous_randomization; //!< Enables the randomization of continuous energy losses
 
     /*!
      * \brief indicates if the interpolated function is increasing or decreasing.
@@ -73,7 +75,7 @@ protected:
     Interpolant *interpol_prop_interaction_;     //!< Interpolant object of the Integral of the function FunctionToPropIntegralInteraction
     Interpolant *interpol_prop_interaction_diff_;//!< Interpolant object of the function FunctionToPropIntegralInteraction
 
-
+    ContinuousRandomization *randomizer_;
 
 
     //Memeberfunctions
@@ -280,6 +282,13 @@ public:
 
 //----------------------------------------------------------------------------//
 
+    void EnableContinuousRandomization();
+
+//----------------------------------------------------------------------------//
+
+    void DisableContinuousRandomization();
+
+//----------------------------------------------------------------------------//
     /*!
     * function for range calculation for given energy - interface to Integral;
     * \f[f(E) =- \frac{1}{ \frac{dE}{dx}\big|_{Ioniz} +\frac{dE}{dx}\big|
