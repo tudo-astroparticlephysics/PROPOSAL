@@ -344,7 +344,7 @@ pair<double,string> ProcessCollection::MakeDecay()
     }
     else
     {
-        decay.second    =   decay_->CalculateProductEnergy(rnd2, rnd3, 0.5);
+        decay.first     =   decay_->CalculateProductEnergy(rnd2, rnd3, 0.5);
         decay.second    =   decay_->GetOut();
 
     }
