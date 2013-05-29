@@ -6,6 +6,7 @@
 #include "PROPOSAL/Ionization.h"
 #include "PROPOSAL/Epairproduction.h"
 #include "PROPOSAL/Propagator.h"
+#include "PROPOSAL/ContinuousRandomization.h"
 
 using namespace std;
 
@@ -157,16 +158,45 @@ using namespace std;
 //}
 
 int main(int argc, char** argv){
-    double pr_result;
-    Propagator* pr = new Propagator();
-    pr->Setup(argc, argv);
-    cout<<pr->GetCollection()->GetCrosssections().at(1)->GetMultiplier()<<endl;
-    pr->EnableInterpolation();
-    for(int i =0;i<1;i++){
-        pr->GetParticle()->SetEnergy(1e8);
-        pr_result=pr->Propagate(1e4);
-        cout<<" --------\t"<<pr_result<<"\t"<<pr->GetParticle()->GetEnergy()<<"\t"<<pr->GetParticle()->GetT()<<endl;
-        //  pr->Propagate(1e5,1e5);
-      //  cout<<pr->GetCollection()->MakeStochasticLoss(true,1e4)<<endl;
+
+    Medium *medium = new Medium("hydrogen",1.);
+    Particle *particle = new Particle("mu",1.,1.,1,.20,20,1e5,10);
+    EnergyCutSettings *cut_settings = new EnergyCutSettings(500,-1);
+
+    vector<CrossSections*> crosssections;
+
+    crosssections.resize(4);
+    crosssections.at(0) = new Ionization(particle, medium, cut_settings);
+    crosssections.at(1) = new Bremsstrahlung(particle, medium, cut_settings);
+    crosssections.at(2) = new Photonuclear(particle, medium, cut_settings);
+    crosssections.at(3) = new Epairproduction(particle, medium, cut_settings);
+
+    ContinuousRandomization *A = new ContinuousRandomization(particle, medium, crosssections);
+
+    for(unsigned int i=0 ; i<crosssections.size();i++)
+    {
+        crosssections.at(i)->EnableDEdxInterpolation();
+        crosssections.at(i)->EnableDNdxInterpolation();
+        cout<<"cross\t"<<i<<endl;
     }
+
+    A->EnableDE2dxInterpolation();
+    cout<<"cront x \t"<<endl;
+    A->EnableDE2deInterpolation();
+    cout<<"cront x \t"<<endl;
+
+    particle->SetEnergy(1e6);
+    cout<<A->Randomize(particle->GetEnergy(),3e5,0.5)<<endl;
+//    double pr_result;
+//    Propagator* pr = new Propagator();
+//    pr->Setup(argc, argv);
+//    cout<<pr->GetCollection()->GetCrosssections().at(1)->GetMultiplier()<<endl;
+//    pr->EnableInterpolation();
+//    for(int i =0;i<1;i++){
+//        pr->GetParticle()->SetEnergy(1e8);
+//        pr_result=pr->Propagate(1e4);
+//        cout<<" --------\t"<<pr_result<<"\t"<<pr->GetParticle()->GetEnergy()<<"\t"<<pr->GetParticle()->GetT()<<endl;
+//        //  pr->Propagate(1e5,1e5);
+//      //  cout<<pr->GetCollection()->MakeStochasticLoss(true,1e4)<<endl;
+//    }
 }

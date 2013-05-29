@@ -55,6 +55,7 @@ private:
     double DE2de( double ei, double ef );
 
     int which_cross_;
+    int order_of_interpolation_;
 
 
 public:
@@ -63,7 +64,7 @@ public:
     // Constructors
 
     ContinuousRandomization();
-    ContinuousRandomization(Particle* particle, Medium* medium, std::vector<CrossSections*> cross_sections_);
+    ContinuousRandomization(Particle* particle, Medium* medium, std::vector<CrossSections*> cross_sections);
     ContinuousRandomization(const ContinuousRandomization&);
     ContinuousRandomization& operator=(const ContinuousRandomization& continuous_randomization);
     bool operator==(const ContinuousRandomization &continuous_randomization) const;
@@ -73,10 +74,27 @@ public:
 
     //Memberfunction
 
+    double Randomize(double initial_energy, double final_energy, double rnd);
 
 //----------------------------------------------------------------------------//
 
     void swap(ContinuousRandomization &continuous_randomization);
+
+//----------------------------------------------------------------------------//
+
+    void EnableDE2dxInterpolation();
+
+//----------------------------------------------------------------------------//
+
+    void EnableDE2deInterpolation();
+
+//----------------------------------------------------------------------------//
+
+    void DisableDE2dxInterpolation();
+
+//----------------------------------------------------------------------------//
+
+    void DisableDE2deInterpolation();
 
 //----------------------------------------------------------------------------//
     //Getter
@@ -92,6 +110,11 @@ public:
         return medium_;
     }
 
+//----------------------------------------------------------------------------//
+
+    std::vector<CrossSections*> GetCrosssections() const {
+        return cross_sections_;
+    }
 
 //----------------------------------------------------------------------------//
     //Setter
@@ -105,6 +128,8 @@ public:
 //----------------------------------------------------------------------------//
 
     void SetCrosssections(std::vector<CrossSections*> crosssections);
+
+
 };
 
 #endif /* CONTINUOUSRANDOMIZATION_H_ */

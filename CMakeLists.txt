@@ -117,6 +117,8 @@ IF(DoTesting)
   add_executable(UnitTest_EnergyCutSettings Test/EnergyCutSettings_TEST.cxx)
   add_executable(UnitTest_Decay Test/Decay_TEST.cxx)
   add_executable(UnitTest_ProcessCollection Test/ProcessCollection_TEST.cxx)
+  add_executable(UnitTest_ContinuousRandomization Test/ContinuousRandomization_TEST.cxx)
+
 
   target_link_libraries(UnitTest_StandardNormal PROPOSAL gtest gtest_main)
   target_link_libraries(UnitTest_Integral PROPOSAL gtest gtest_main)
@@ -131,7 +133,9 @@ IF(DoTesting)
   target_link_libraries(UnitTest_EnergyCutSettings PROPOSAL gtest gtest_main)
   target_link_libraries(UnitTest_Decay PROPOSAL gtest gtest_main)
   target_link_libraries(UnitTest_ProcessCollection PROPOSAL gtest gtest_main)
+  target_link_libraries(UnitTest_ContinuousRandomization PROPOSAL gtest gtest_main)
 
+  add_test(UnitTest_ContinuousRandomization bin/UnitTest_ContinuousRandomization)
   add_test(UnitTest_ProcessCollection bin/UnitTest_ProcessCollection)
   add_test(UnitTest_Decay bin/UnitTest_Decay)
   add_test(UnitTest_RootFinder bin/UnitTest_RootFinder)
