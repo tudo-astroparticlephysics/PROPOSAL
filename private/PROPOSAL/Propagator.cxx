@@ -146,14 +146,15 @@ double Propagator::Propagate( double distance )
             particle_->SetPropagatedDistance( distance );  // computer precision control
         }
 
-//        if(contiCorr)
-//        {
-//            if(ef!= particle_->low)
-//            {
-//                ef  =   StandardN->sndrn(RandomDouble(), ef, sqrt(E2Loss_->e2le->dE2de(ei, ef)), particle_->low, ei, false);
-//            }
+        //Randomize the continuous energy loss if this option is enabled
+        if( collection_->GetDoRandomization() )
+        {
+            if(final_energy != particle_->GetLow())
+            {
+                final_energy  = collection_->Randomize( initial_energy, final_energy );
+            }
 
-//        }
+        }
 
         // Lower limit of particle energy is reached or
         // or complete particle is propagated the whole distance

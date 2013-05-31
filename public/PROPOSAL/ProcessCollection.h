@@ -213,6 +213,16 @@ public:
     double CalculateTrackingIntegal(double initial_energy, double rnd, bool particle_interaction);
 
 //----------------------------------------------------------------------------//
+    /**
+     * randomize the continuous energy loss
+     *
+     *  \param  initial_energy          initial energy
+     *  \param  final_energy            final energy
+     */
+
+    double Randomize(double initial_energy, double final_energy);
+
+//----------------------------------------------------------------------------//
 
     /**
      *  Makes Stochastic Energyloss
@@ -324,6 +334,10 @@ public:
 	bool GetDoInterpolation() const {
 		return do_interpolation_;
 	}
+
+    bool GetDoRandomization() const {
+        return do_continuous_randomization;
+    }
 
 	double GetIni() const {
 		return ini_;
