@@ -39,6 +39,7 @@ double ContinuousRandomization::Randomize(double initial_energy, double final_en
 void ContinuousRandomization::EnableDE2dxInterpolation()
 {
     if(do_dE2dx_Interpolation_)return;
+    standard_normal_->EnableInterpolation();
 
     double energy = particle_->GetEnergy();
     dE2dx_interpolant_    =   new Interpolant(NUM2, particle_->GetLow(), BIGENERGY, boost::bind(&ContinuousRandomization::FunctionToBuildDE2dxInterplant, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
@@ -56,6 +57,7 @@ void ContinuousRandomization::EnableDE2dxInterpolation()
 void ContinuousRandomization::EnableDE2deInterpolation()
 {
     if(do_dE2de_Interpolation_)return;
+    standard_normal_->EnableInterpolation();
 
     double energy = particle_->GetEnergy();
 
