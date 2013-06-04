@@ -487,7 +487,7 @@ Photonuclear::Photonuclear(Particle* particle,
     ,hmax_                  ( 8 )
     ,v_                     ( 0 )
     ,do_photo_interpolation_( false )
-    ,shadow_                ( 1 )
+    ,shadow_                ( 2 )
     ,hard_component_        ( false )
     ,dndx_integral_         ( )
     ,interpolant_hardBB_    ( )

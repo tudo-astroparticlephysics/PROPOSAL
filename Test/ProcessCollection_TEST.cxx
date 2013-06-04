@@ -6,6 +6,141 @@
 
 using namespace std;
 
+
+
+
+int CalcDev(int N, int ni)
+{
+    double p = (1.0*ni) / N;
+    return (1 + (int)(sqrt(N*p*(1-p))) );
+}
+
+TEST(ProcessCollection , Stochasticity)
+{
+    ifstream in;
+    in.open("bin/TestFiles/ProcColl_Stoch.txt");
+
+    char firstLine[256];
+    in.getline(firstLine,256);
+
+    double e;
+    double e_new;
+    double energy;
+    double ecut;
+    double vcut;
+    string med;
+    string particleName;
+    bool lpm;
+    int para;
+
+    cout.precision(16);
+    double energy_old=-1;
+
+    vector<string> XSecNames;
+
+    XSecNames.push_back("Bremsstrahlung");
+    XSecNames.push_back("Epairproduction");
+    XSecNames.push_back("Photonuclear");
+    XSecNames.push_back("Ionization");
+
+    bool first = true;
+    int NumberOfEvents, IonizEvents,BremsEvents,PhotoEvents,EpairEvents;
+    int NewIonizEvents,NewBremsEvents,NewPhotoEvents,NewEpairEvents;
+    int DevIonizEvents,DevBremsEvents,DevPhotoEvents,DevEpairEvents;
+    int foundXSecAt;
+    while(in.good())
+    {
+        if(first)in>>ecut>>vcut>>lpm>>energy>>med>>particleName>> IonizEvents >> BremsEvents >> PhotoEvents >> EpairEvents;
+        first=false;
+
+        NumberOfEvents = IonizEvents+BremsEvents+PhotoEvents+EpairEvents;
+        cout << "NumberOfEvents: " << NumberOfEvents << endl;
+        energy_old = -1;
+        Medium *medium = new Medium(med,1.);
+        Particle *particle = new Particle(particleName,1.,1.,1,.20,20,1e5,10);
+        particle->SetEnergy(energy);
+        EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
+
+        ProcessCollection* ProcColl = new ProcessCollection(particle, medium, cuts);
+        for(unsigned int gna = 0; gna < ProcColl->GetCrosssections().size() ; gna++)
+        {
+            if(ProcColl->GetCrosssections().at(gna)->GetName().compare("Bremsstrahlung") == 0)
+            {
+                ProcColl->GetCrosssections().at(gna)->SetParametrization(1);
+            }
+            if(ProcColl->GetCrosssections().at(gna)->GetName().compare("Photonuclear") == 0)
+            {
+                ProcColl->GetCrosssections().at(gna)->SetParametrization(6);
+                //ProcColl->GetCrosssections().at(gna)->SetShadow(2);
+            }
+        }
+        ProcColl->EnableInterpolation();
+        //cout << para << "\t" << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << med << "\t" << particleName<< "\t" << e << endl;
+
+        pair<double,string> LossReturn;
+        LossReturn.first = 1.0;
+        LossReturn.second = "lskflad";
+        while(energy_old < energy){
+            energy_old = energy;
+
+            NewIonizEvents=0;
+            NewBremsEvents=0;
+            NewPhotoEvents=0;
+            NewEpairEvents=0;
+
+            if(NumberOfEvents!=0)
+            {
+            for(int i = 0; i< NumberOfEvents ; i++)
+            {
+                ProcColl->GetParticle()->SetEnergy(energy);
+                LossReturn = ProcColl->MakeStochasticLoss();
+                foundXSecAt = 0;
+                while(foundXSecAt < XSecNames.size())
+                {
+                    if(LossReturn.second.compare(XSecNames.at(foundXSecAt)) == 0)break;
+                    foundXSecAt++;
+                }
+
+                switch (foundXSecAt) {
+                case 0:
+                    NewBremsEvents++;
+                    break;
+                case 1:
+                    NewEpairEvents++;
+                    break;
+                case 2:
+                    NewPhotoEvents++;
+                    break;
+                case 3:
+                    NewIonizEvents++;
+                    break;
+                default:
+                    break;
+                }
+            }
+            cout << NewBremsEvents << "\t" << NewEpairEvents << "\t" << NewPhotoEvents << "\t" << NewIonizEvents << endl;
+            cout << BremsEvents << "\t" << EpairEvents << "\t" << PhotoEvents << "\t" << IonizEvents << endl;
+            DevBremsEvents = CalcDev(NumberOfEvents,NewBremsEvents);
+            DevEpairEvents = CalcDev(NumberOfEvents,NewEpairEvents);
+            DevPhotoEvents = CalcDev(NumberOfEvents,NewPhotoEvents);
+            DevIonizEvents = CalcDev(NumberOfEvents,NewIonizEvents);
+
+
+//            ASSERT_NEAR(BremsEvents, NewBremsEvents, 3*DevBremsEvents);
+//            ASSERT_NEAR(EpairEvents, NewEpairEvents, 3*DevEpairEvents);
+//            ASSERT_NEAR(PhotoEvents, NewPhotoEvents, 3*DevPhotoEvents);
+//            ASSERT_NEAR(IonizEvents, NewIonizEvents, 3*DevIonizEvents);
+            }
+            in>>ecut>>vcut>>lpm>>energy>>med>>particleName>> IonizEvents >> BremsEvents >> PhotoEvents >> EpairEvents;
+        }
+
+        delete cuts;
+        delete medium;
+        delete particle;
+        delete ProcColl;
+    }
+}
+
 TEST(Comparison , Comparison_equal ) {
     double dNdx;
 

@@ -247,6 +247,7 @@ double ProcessCollection::CalculateFinalEnergy(double ei, double rnd, bool parti
 pair<double,string> ProcessCollection::MakeStochasticLoss()
 {
     double rnd1                =    MathModel::RandomDouble();
+    rnd1                =    MathModel::RandomDouble();
     double rnd2                =    MathModel::RandomDouble();
     double rnd3                =    MathModel::RandomDouble();
     double total_rate          =    0;
@@ -262,6 +263,7 @@ pair<double,string> ProcessCollection::MakeStochasticLoss()
 
     if(do_weighting_)
     {
+        cout << "weighting!" << endl; //Tomasz
         if(particle_->GetPropagatedDistance() > weighting_starts_at_)
         {
             double exp      =   abs(weighting_order_);
