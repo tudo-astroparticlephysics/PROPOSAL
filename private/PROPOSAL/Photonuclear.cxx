@@ -390,7 +390,6 @@ Photonuclear::Photonuclear()
 
 {
     name_   =   "Photonuclear";
-    shadow_ =   1;
 
     integral_             = new Integral(IROMB, IMAXS, IPREC);
     integral_for_dEdx_    = new Integral(IROMB, IMAXS, IPREC);
@@ -500,7 +499,6 @@ Photonuclear::Photonuclear(Particle* particle,
 {
     name_       = "Photonuclear";
     multiplier_ = 1.;
-    shadow_     = 1;
 
     integral_             = new Integral(IROMB, IMAXS, IPREC);
     integral_for_dEdx_    = new Integral(IROMB, IMAXS, IPREC);

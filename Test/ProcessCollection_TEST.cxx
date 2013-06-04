@@ -102,12 +102,10 @@ TEST(ProcessCollection , Stochasticity)
                 //ProcColl->GetCrosssections().at(gna)->SetShadow(2);
             }
         }
-        ProcColl->EnableInterpolation();
-        //cout << para << "\t" << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << med << "\t" << particleName<< "\t" << e << endl;
+        if(NumberOfEvents!=0)ProcColl->EnableInterpolation();
+        cout << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << med << "\t" << particleName <<  endl;
 
         pair<double,string> LossReturn;
-        LossReturn.first = 1.0;
-        LossReturn.second = "lskflad";
         while(energy_old < energy){
             energy_old = energy;
 
@@ -146,18 +144,33 @@ TEST(ProcessCollection , Stochasticity)
                     break;
                 }
             }
-            cout << NewBremsEvents << "\t" << NewEpairEvents << "\t" << NewPhotoEvents << "\t" << NewIonizEvents << endl;
-            cout << BremsEvents << "\t" << EpairEvents << "\t" << PhotoEvents << "\t" << IonizEvents << endl;
+
             DevBremsEvents = CalcDev(NumberOfEvents,NewBremsEvents);
             DevEpairEvents = CalcDev(NumberOfEvents,NewEpairEvents);
             DevPhotoEvents = CalcDev(NumberOfEvents,NewPhotoEvents);
             DevIonizEvents = CalcDev(NumberOfEvents,NewIonizEvents);
 
+            DevBremsEvents += CalcDev(NumberOfEvents,BremsEvents);
+            DevEpairEvents += CalcDev(NumberOfEvents,EpairEvents);
+            DevPhotoEvents += CalcDev(NumberOfEvents,PhotoEvents);
+            DevIonizEvents += CalcDev(NumberOfEvents,IonizEvents);
 
-            ASSERT_NEAR(BremsEvents, NewBremsEvents, 4*DevBremsEvents);
-            ASSERT_NEAR(EpairEvents, NewEpairEvents, 4*DevEpairEvents);
-            ASSERT_NEAR(PhotoEvents, NewPhotoEvents, 4*DevPhotoEvents);
-            ASSERT_NEAR(IonizEvents, NewIonizEvents, 4*DevIonizEvents);
+            int NSigmaPruf = 1000;
+            int NSigmaCout = 3;
+
+            if(         fabs(BremsEvents-NewBremsEvents) > NSigmaCout*DevBremsEvents
+                    ||  fabs(EpairEvents-NewEpairEvents) > NSigmaCout*DevEpairEvents
+                    ||  fabs(PhotoEvents-NewPhotoEvents) > NSigmaCout*DevPhotoEvents
+                    ||  fabs(IonizEvents-NewIonizEvents) > NSigmaCout*DevIonizEvents)
+            {
+                cout << NewBremsEvents << "\t" << NewEpairEvents << "\t" << NewPhotoEvents << "\t" << NewIonizEvents << endl;
+                cout << BremsEvents << "\t" << EpairEvents << "\t" << PhotoEvents << "\t" << IonizEvents << endl;
+            }
+
+            ASSERT_NEAR(BremsEvents, NewBremsEvents, NSigmaPruf*DevBremsEvents);
+            ASSERT_NEAR(EpairEvents, NewEpairEvents, NSigmaPruf*DevEpairEvents);
+            ASSERT_NEAR(PhotoEvents, NewPhotoEvents, NSigmaPruf*DevPhotoEvents);
+            ASSERT_NEAR(IonizEvents, NewIonizEvents, NSigmaPruf*DevIonizEvents);
             }
             in>>ecut>>vcut>>lpm>>energy>>med>>particleName>> IonizEvents >> BremsEvents >> PhotoEvents >> EpairEvents;
         }
