@@ -1080,6 +1080,11 @@ double Bremsstrahlung::FunctionToDNdxIntegral(double variable)
 void Bremsstrahlung::SetParametrization(int parametrization)
 {
     parametrization_ = parametrization;
+    if(parametrization > 4)
+    {
+        cerr<<"Warning: Parametrization not supported. Set to 1 (icecube default)"<<endl;
+        parametrization_    =   1;
+    }
 
     if(do_dedx_Interpolation_)
     {
