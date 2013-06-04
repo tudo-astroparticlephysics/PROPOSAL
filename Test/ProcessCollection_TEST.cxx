@@ -103,7 +103,7 @@ TEST(ProcessCollection , Stochasticity)
             }
         }
         if(NumberOfEvents!=0)ProcColl->EnableInterpolation();
-        cout << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << med << "\t" << particleName <<  endl;
+//        cout << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << med << "\t" << particleName <<  endl;
 
         pair<double,string> LossReturn;
         while(energy_old < energy){
@@ -156,7 +156,7 @@ TEST(ProcessCollection , Stochasticity)
             DevIonizEvents += CalcDev(NumberOfEvents,IonizEvents);
 
             int NSigmaPruf = 3;
-            int NSigmaCout = 1;
+//            int NSigmaCout = 1;
 
 //            if(         fabs(BremsEvents-NewBremsEvents) > NSigmaCout*DevBremsEvents
 //                    ||  fabs(EpairEvents-NewEpairEvents) > NSigmaCout*DevEpairEvents
