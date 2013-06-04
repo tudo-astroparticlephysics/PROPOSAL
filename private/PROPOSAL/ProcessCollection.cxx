@@ -246,10 +246,14 @@ double ProcessCollection::CalculateFinalEnergy(double ei, double rnd, bool parti
 
 pair<double,string> ProcessCollection::MakeStochasticLoss()
 {
-    double rnd1                =    MathModel::RandomDouble();
-    rnd1                =    MathModel::RandomDouble();
-    double rnd2                =    MathModel::RandomDouble();
-    double rnd3                =    MathModel::RandomDouble();
+    return this->MakeStochasticLoss(MathModel::RandomDouble(),MathModel::RandomDouble(),MathModel::RandomDouble());
+}
+
+pair<double,string> ProcessCollection::MakeStochasticLoss(double Rnd1,double Rnd2, double Rnd3)
+{
+    double rnd1                =    Rnd1;
+    double rnd2                =    Rnd2;
+    double rnd3                =    Rnd3;
     double total_rate          =    0;
     double total_rate_weighted =    0;
     double decayS              =    0;
@@ -263,7 +267,6 @@ pair<double,string> ProcessCollection::MakeStochasticLoss()
 
     if(do_weighting_)
     {
-        cout << "weighting!" << endl; //Tomasz
         if(particle_->GetPropagatedDistance() > weighting_starts_at_)
         {
             double exp      =   abs(weighting_order_);
@@ -325,7 +328,6 @@ pair<double,string> ProcessCollection::MakeStochasticLoss()
     return energy_loss;
 
 }
-
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
