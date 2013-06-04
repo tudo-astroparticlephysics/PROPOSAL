@@ -155,17 +155,17 @@ TEST(ProcessCollection , Stochasticity)
             DevPhotoEvents += CalcDev(NumberOfEvents,PhotoEvents);
             DevIonizEvents += CalcDev(NumberOfEvents,IonizEvents);
 
-            int NSigmaPruf = 1000;
-            int NSigmaCout = 3;
+            int NSigmaPruf = 3;
+            int NSigmaCout = 1;
 
-            if(         fabs(BremsEvents-NewBremsEvents) > NSigmaCout*DevBremsEvents
-                    ||  fabs(EpairEvents-NewEpairEvents) > NSigmaCout*DevEpairEvents
-                    ||  fabs(PhotoEvents-NewPhotoEvents) > NSigmaCout*DevPhotoEvents
-                    ||  fabs(IonizEvents-NewIonizEvents) > NSigmaCout*DevIonizEvents)
-            {
-                cout << NewBremsEvents << "\t" << NewEpairEvents << "\t" << NewPhotoEvents << "\t" << NewIonizEvents << endl;
-                cout << BremsEvents << "\t" << EpairEvents << "\t" << PhotoEvents << "\t" << IonizEvents << endl;
-            }
+//            if(         fabs(BremsEvents-NewBremsEvents) > NSigmaCout*DevBremsEvents
+//                    ||  fabs(EpairEvents-NewEpairEvents) > NSigmaCout*DevEpairEvents
+//                    ||  fabs(PhotoEvents-NewPhotoEvents) > NSigmaCout*DevPhotoEvents
+//                    ||  fabs(IonizEvents-NewIonizEvents) > NSigmaCout*DevIonizEvents)
+//            {
+//                cout << NewBremsEvents << "\t" << NewEpairEvents << "\t" << NewPhotoEvents << "\t" << NewIonizEvents << endl;
+//                cout << BremsEvents << "\t" << EpairEvents << "\t" << PhotoEvents << "\t" << IonizEvents << endl;
+//            }
 
             ASSERT_NEAR(BremsEvents, NewBremsEvents, NSigmaPruf*DevBremsEvents);
             ASSERT_NEAR(EpairEvents, NewEpairEvents, NSigmaPruf*DevEpairEvents);
