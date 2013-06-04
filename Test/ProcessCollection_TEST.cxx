@@ -7,7 +7,31 @@
 using namespace std;
 
 
+class RndFromFile{
+private:
+    double rnd_;
+    string Path_;
+    ifstream in_;
 
+public:
+    RndFromFile(string Path){
+        Path_ = Path;
+        in_.open(Path_.c_str());
+        in_>>rnd_;
+        if(!in_.good())cout << "less than one rnd_number!" << endl;
+    }
+
+    double rnd(){
+        in_>>rnd_;
+        if(!in_.good()){
+            in_.close();
+            in_.clear();
+            in_.open(Path_.c_str());
+            in_>>rnd_;
+        }
+        return rnd_;
+    }
+};
 
 int CalcDev(int N, int ni)
 {
@@ -48,6 +72,10 @@ TEST(ProcessCollection , Stochasticity)
     int NewIonizEvents,NewBremsEvents,NewPhotoEvents,NewEpairEvents;
     int DevIonizEvents,DevBremsEvents,DevPhotoEvents,DevEpairEvents;
     int foundXSecAt;
+
+    RndFromFile* Rand = new RndFromFile("bin/TestFiles/rnd.txt");
+    RndFromFile* Rand2 = new RndFromFile("bin/TestFiles/rnd.txt");
+    Rand2->rnd();
     while(in.good())
     {
         if(first)in>>ecut>>vcut>>lpm>>energy>>med>>particleName>> IonizEvents >> BremsEvents >> PhotoEvents >> EpairEvents;
@@ -126,10 +154,10 @@ TEST(ProcessCollection , Stochasticity)
             DevIonizEvents = CalcDev(NumberOfEvents,NewIonizEvents);
 
 
-//            ASSERT_NEAR(BremsEvents, NewBremsEvents, 3*DevBremsEvents);
-//            ASSERT_NEAR(EpairEvents, NewEpairEvents, 3*DevEpairEvents);
-//            ASSERT_NEAR(PhotoEvents, NewPhotoEvents, 3*DevPhotoEvents);
-//            ASSERT_NEAR(IonizEvents, NewIonizEvents, 3*DevIonizEvents);
+            ASSERT_NEAR(BremsEvents, NewBremsEvents, 4*DevBremsEvents);
+            ASSERT_NEAR(EpairEvents, NewEpairEvents, 4*DevEpairEvents);
+            ASSERT_NEAR(PhotoEvents, NewPhotoEvents, 4*DevPhotoEvents);
+            ASSERT_NEAR(IonizEvents, NewIonizEvents, 4*DevIonizEvents);
             }
             in>>ecut>>vcut>>lpm>>energy>>med>>particleName>> IonizEvents >> BremsEvents >> PhotoEvents >> EpairEvents;
         }
