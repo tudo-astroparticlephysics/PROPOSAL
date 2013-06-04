@@ -98,8 +98,7 @@ TEST(ProcessCollection , Stochasticity)
             }
             if(ProcColl->GetCrosssections().at(gna)->GetName().compare("Photonuclear") == 0)
             {
-                ProcColl->GetCrosssections().at(gna)->SetParametrization(6);
-                //ProcColl->GetCrosssections().at(gna)->SetShadow(2);
+                ProcColl->GetCrosssections().at(gna)->SetParametrization(12);
             }
         }
         if(NumberOfEvents!=0)ProcColl->EnableInterpolation();
