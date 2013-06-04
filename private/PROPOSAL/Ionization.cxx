@@ -207,6 +207,11 @@ void Ionization::EnableDEdxInterpolation()
 
 void Ionization::DisableDNdxInterpolation()
 {
+    delete dndx_interpolant_1d_;
+    delete dndx_interpolant_2d_;
+
+    dndx_interpolant_1d_    =   NULL;
+    dndx_interpolant_2d_    =   NULL;
     do_dndx_Interpolation_  =   false;
 }
 
@@ -217,6 +222,9 @@ void Ionization::DisableDNdxInterpolation()
 
 void Ionization::DisableDEdxInterpolation()
 {
+    delete dedx_interpolant_;
+
+    dedx_interpolant_       =   NULL;
     do_dedx_Interpolation_  =   false;
 }
 

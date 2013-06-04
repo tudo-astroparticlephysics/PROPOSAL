@@ -285,6 +285,19 @@ void Photonuclear::EnablePhotoInterpolation()
 
 void Photonuclear::DisableDNdxInterpolation()
 {
+    for(unsigned int i = 0 ; i < dndx_interpolant_1d_.size() ; i++ )
+    {
+        delete dndx_interpolant_1d_.at(i);
+    }
+
+    for(unsigned int i = 0 ; i < dndx_interpolant_2d_.size() ; i++ )
+    {
+        delete dndx_interpolant_2d_.at(i);
+    }
+
+    dndx_interpolant_1d_.clear();
+    dndx_interpolant_2d_.clear();
+
     do_dndx_Interpolation_  =   false;
 }
 
@@ -295,6 +308,8 @@ void Photonuclear::DisableDNdxInterpolation()
 
 void Photonuclear::DisableDEdxInterpolation()
 {
+    delete dedx_interpolant_;
+    dedx_interpolant_   = NULL;
     do_dedx_Interpolation_  =   false;
 }
 
@@ -305,6 +320,11 @@ void Photonuclear::DisableDEdxInterpolation()
 
 void Photonuclear::DisablePhotoInterpolation()
 {
+    for(unsigned int i=0; i < photo_interpolant_.size(); i++)
+    {
+        delete photo_interpolant_.at(i);
+    }
+    photo_interpolant_.clear();
     do_photo_interpolation_  =   false;
 }
 
@@ -1793,7 +1813,28 @@ void Photonuclear::SetParametrization(int parametrization)
         parametrization_    =   7;
         shadow_             =   2;
     }
+    else
+    {
+        cerr<<"Warning: Parametrization not supported. Set to 12 (icecube default)"<<endl;
+        parametrization_    =   6;
+        shadow_             =   2;
+    }
 
+
+    if(do_dedx_Interpolation_)
+    {
+        cerr<<"Warning: dEdx-interpolation enabled before choosing the parametrization."<<endl;
+        cerr<<"Rebuilding the tables"<<endl;
+        DisableDEdxInterpolation();
+        EnableDEdxInterpolation();
+    }
+    if(do_dndx_Interpolation_)
+    {
+        cerr<<"Warning: dNdx-interpolation enabled before choosing the parametrization."<<endl;
+        cerr<<"Rebuilding the tables"<<endl;
+        DisableDNdxInterpolation();
+        EnableDNdxInterpolation();
+    }
 }
 
 void Photonuclear::SetComponent(int component) {

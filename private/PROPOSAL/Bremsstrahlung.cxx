@@ -276,12 +276,14 @@ void Bremsstrahlung::EnableDEdxInterpolation()
 void Bremsstrahlung::DisableDNdxInterpolation()
 {
 
-    for(unsigned int i = 0 ; i < dndx_interpolant_1d_.size() ; i++ ){
-        delete dndx_interpolant_1d_[i];
+    for(unsigned int i = 0 ; i < dndx_interpolant_1d_.size() ; i++ )
+    {
+        delete dndx_interpolant_1d_.at(i);
     }
 
-    for(unsigned int i = 0 ; i < dndx_interpolant_2d_.size() ; i++ ){
-        delete dndx_interpolant_2d_[i];
+    for(unsigned int i = 0 ; i < dndx_interpolant_2d_.size() ; i++ )
+    {
+        delete dndx_interpolant_2d_.at(i);
     }
 
     dndx_interpolant_1d_.clear();
@@ -299,6 +301,7 @@ void Bremsstrahlung::DisableDNdxInterpolation()
 void Bremsstrahlung::DisableDEdxInterpolation()
 {
     delete dedx_interpolant_;
+    dedx_interpolant_   = NULL;
     do_dedx_Interpolation_  =   false;
 }
 
@@ -1074,8 +1077,24 @@ double Bremsstrahlung::FunctionToDNdxIntegral(double variable)
 //----------------------------------------------------------------------------//
 
 
-void Bremsstrahlung::SetParametrization(int parametrization){
+void Bremsstrahlung::SetParametrization(int parametrization)
+{
     parametrization_ = parametrization;
+
+    if(do_dedx_Interpolation_)
+    {
+        cerr<<"Warning: dEdx-interpolation enabled before choosing the parametrization."<<endl;
+        cerr<<"Rebuilding the tables"<<endl;
+        DisableDEdxInterpolation();
+        EnableDEdxInterpolation();
+    }
+    if(do_dndx_Interpolation_)
+    {
+        cerr<<"Warning: dNdx-interpolation enabled before choosing the parametrization."<<endl;
+        cerr<<"Rebuilding the tables"<<endl;
+        DisableDNdxInterpolation();
+        EnableDNdxInterpolation();
+    }
 }
 
 void Bremsstrahlung::SetComponent(int component) {

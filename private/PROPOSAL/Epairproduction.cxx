@@ -331,6 +331,20 @@ void Epairproduction::EnableEpairInterpolation()
 
 void Epairproduction::DisableDNdxInterpolation()
 {
+
+    for(unsigned int i = 0 ; i < dndx_interpolant_1d_.size() ; i++ )
+    {
+        delete dndx_interpolant_1d_.at(i);
+    }
+
+    for(unsigned int i = 0 ; i < dndx_interpolant_2d_.size() ; i++ )
+    {
+        delete dndx_interpolant_2d_.at(i);
+    }
+
+    dndx_interpolant_1d_.clear();
+    dndx_interpolant_2d_.clear();
+
     do_dndx_Interpolation_  =   false;
 }
 
@@ -339,6 +353,8 @@ void Epairproduction::DisableDNdxInterpolation()
 
 void Epairproduction::DisableDEdxInterpolation()
 {
+    delete dedx_interpolant_;
+    dedx_interpolant_   =   NULL;
     do_dedx_Interpolation_  =   false;
 }
 
@@ -347,6 +363,11 @@ void Epairproduction::DisableDEdxInterpolation()
 
 void Epairproduction::DisableEpairInterpolation()
 {
+    for(unsigned int i=0; i < epair_interpolant_.size(); i++)
+    {
+        delete epair_interpolant_.at(i);
+    }
+    epair_interpolant_.clear();
     do_epair_interpolation_  =   false;
 }
 
