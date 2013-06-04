@@ -231,6 +231,7 @@ public:
      */
     std::pair<double,std::string> MakeStochasticLoss();
 
+    std::pair<double,std::string> MakeStochasticLoss(double Rnd1,double Rnd2, double Rnd3);
 //----------------------------------------------------------------------------//
 
     /**
