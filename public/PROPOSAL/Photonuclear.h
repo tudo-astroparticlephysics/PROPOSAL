@@ -36,18 +36,20 @@ protected:
 
 
 //----------------------------------------------------------------------------//
-
-    // Now: parametrization_ = 1,hard_component_= false / Former: form=1 and bb=1 Kokoulin
-    // Now: parametrization_ = 1,hard_component_= true  / Former: form=2 and bb=1 Kokoulin + hard component
-    // Now: parametrization_ = 2,hard_component_= false / Former: form=1 and bb=2 Rhode
-    // Now: parametrization_ = 2,hard_component_= true  / Former: form=2 and bb=2 Rhode + hard component
-    // Now: parametrization_ = 3,hard_component_= false / Former: form=1 and bb=3 Bezrukov/Bugaev
-    // Now: parametrization_ = 3,hard_component_= true  / Former: form=2 and bb=3 Bezrukov/Bugaev + hard component
-    // Now: parametrization_ = 4,hard_component_= false / Former: form=1 and bb=4 Zeus
-    // Now: parametrization_ = 4,hard_component_= true  / Former: form=2 and bb=4 Zeus + hard component
-    // Now: parametrization_ = 5,shadow_ = 1 or = 2     / Former: form=3 and bb=1 ALLM 91
-    // Now: parametrization_ = 6,shadow_ = 1 or = 2     / Former: form=3 and bb=2 ALLM 97
-    // Now: parametrization_ = 7,shadow_ = 1 or = 2     / Former: form=4 and bb=1 Butkevich/Mikhailov
+    // Now: parametrization_ = 1,  Former: form=1 and bb=1 Kokoulin
+    // Now: parametrization_ = 2,  Former: form=2 and bb=1 Kokoulin + hard component
+    // Now: parametrization_ = 3,  Former: form=1 and bb=2 Rhode
+    // Now: parametrization_ = 4,  Former: form=2 and bb=2 Rhode + hard component
+    // Now: parametrization_ = 5,  Former: form=1 and bb=3 Bezrukov/Bugaev
+    // Now: parametrization_ = 6,  Former: form=2 and bb=3 Bezrukov/Bugaev + hard component
+    // Now: parametrization_ = 7,  Former: form=1 and bb=4 Zeus
+    // Now: parametrization_ = 8,  Former: form=2 and bb=4 Zeus + hard component
+    // Now: parametrization_ = 9,  Former: form=3 and bb=1 shadow=1 ALLM 91
+    // Now: parametrization_ = 10, Former: form=3 and bb=1 shadow=2 ALLM 91
+    // Now: parametrization_ = 11, Former: form=3 and bb=2 shadow=1 ALLM 97
+    // Now: parametrization_ = 12, Former: form=3 and bb=2 shadow=2 ALLM 97
+    // Now: parametrization_ = 13, Former: form=4 and bb=1 shadow=1 Butkevich/Mikhailov
+    // Now: parametrization_ = 14, Former: form=4 and bb=1 shadow=2 Butkevich/Mikhailov
 
     double KokoulinParametrization(double v, int i);
     double RhodeParametrization(double v, int i);
@@ -311,7 +313,7 @@ public:
     }
 //----------------------------------------------------------------------------//
     //Setter
-
+    void SetParametrization(int parametrization=1);
 	void SetComponent(int component);
 	void SetDedxInterpolant(Interpolant* dedxInterpolant);
 	void SetDndxIntegral(std::vector<Integral*> dndxIntegral);

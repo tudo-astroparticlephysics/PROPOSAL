@@ -160,7 +160,7 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    void SetParametrization(int parametrization=1);
+    virtual void SetParametrization(int parametrization=1) = 0;
 
 //----------------------------------------------------------------------------//
 

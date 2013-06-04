@@ -177,10 +177,6 @@ void CrossSections::SetVUp(double vUp){
     vUp_ = vUp;
 }
 
-void CrossSections::SetParametrization(int parametrization){
-    parametrization_ = parametrization;
-}
-
 void CrossSections::SetParticle(Particle *particle){
     particle_ = particle;
 }

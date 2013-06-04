@@ -1692,7 +1692,109 @@ double Photonuclear::FunctionToIntegralButMik(double Q2)
 //---------------------------------Setter-------------------------------------//
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
+void Photonuclear::SetParametrization(int parametrization)
+{
+    // Now: parametrization_ = 1,  Former: form=1 and bb=1 Kokoulin
+    // Now: parametrization_ = 2,  Former: form=2 and bb=1 Kokoulin + hard component
+    // Now: parametrization_ = 3,  Former: form=1 and bb=2 Rhode
+    // Now: parametrization_ = 4,  Former: form=2 and bb=2 Rhode + hard component
+    // Now: parametrization_ = 5,  Former: form=1 and bb=3 Bezrukov/Bugaev
+    // Now: parametrization_ = 6,  Former: form=2 and bb=3 Bezrukov/Bugaev + hard component
+    // Now: parametrization_ = 7,  Former: form=1 and bb=4 Zeus
+    // Now: parametrization_ = 8,  Former: form=2 and bb=4 Zeus + hard component
+    // Now: parametrization_ = 9,  Former: form=3 and bb=1 shadow=1 ALLM 91
+    // Now: parametrization_ = 10, Former: form=3 and bb=1 shadow=2 ALLM 91
+    // Now: parametrization_ = 11, Former: form=3 and bb=2 shadow=1 ALLM 97
+    // Now: parametrization_ = 12, Former: form=3 and bb=2 shadow=2 ALLM 97
+    // Now: parametrization_ = 13, Former: form=4 and bb=1 shadow=1 Butkevich/Mikhailov
+    // Now: parametrization_ = 14, Former: form=4 and bb=1 shadow=2 Butkevich/Mikhailov
 
+    //Kokoulin
+    if(parametrization==1)
+    {
+        parametrization_    =   1;
+        hard_component_     =   false;
+    }
+    //Kokoulin + hard component
+    if(parametrization==2)
+    {
+        parametrization_    =   1;
+        hard_component_     =   true;
+    }
+    //Rhode
+    if(parametrization==3)
+    {
+        parametrization_    =   2;
+        hard_component_     =   false;
+    }
+    //Rhode + hard component
+    if(parametrization==4)
+    {
+        parametrization_    =   2;
+        hard_component_     =   true;
+    }
+    //Bezrukov/Bugaev
+    if(parametrization==5)
+    {
+        parametrization_    =   3;
+        hard_component_     =   false;
+    }
+    //Bezrukov/Bugaev + hard component
+    if(parametrization==6)
+    {
+        parametrization_    =   3;
+        hard_component_     =   true;
+    }
+    //Zeus
+    if(parametrization==7)
+    {
+        parametrization_    =   4;
+        hard_component_     =   false;
+    }
+    //Zeus + hard component
+    if(parametrization==8)
+    {
+        parametrization_    =   4;
+        hard_component_     =   true;
+    }
+    //ALLM 91 shadow 1
+    if(parametrization==9)
+    {
+        parametrization_    =   5;
+        shadow_             =   1;
+    }
+    //ALLM 91 shadow 2
+    if(parametrization==10)
+    {
+        parametrization_    =   5;
+        shadow_             =   2;
+    }
+    //ALLM 97 shadow 1
+    if(parametrization==11)
+    {
+        parametrization_    =   6;
+        shadow_             =   1;
+    }
+    //ALLM 97 shadow 2
+    if(parametrization==12)
+    {
+        parametrization_    =   6;
+        shadow_             =   2;
+    }
+    //Butkevich/Mikhailov shadow 1
+    if(parametrization==13)
+    {
+        parametrization_    =   7;
+        shadow_             =   1;
+    }
+    //Butkevich/Mikhailov shadow 2
+    if(parametrization==14)
+    {
+        parametrization_    =   7;
+        shadow_             =   2;
+    }
+
+}
 
 void Photonuclear::SetComponent(int component) {
 	component_ = component;

@@ -979,6 +979,10 @@ double Epairproduction::FunctionToIntegral(double r)
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
+void Epairproduction::SetParametrization(int parametrization){
+    parametrization_ = parametrization;
+    cerr<<"Warning: This has no effect. Till now only one parametrization for Epairproduction implemented"<<endl;
+}
 
 void Epairproduction::SetComponent(int component) {
 	component_ = component;

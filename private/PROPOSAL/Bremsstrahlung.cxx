@@ -1074,6 +1074,10 @@ double Bremsstrahlung::FunctionToDNdxIntegral(double variable)
 //----------------------------------------------------------------------------//
 
 
+void Bremsstrahlung::SetParametrization(int parametrization){
+    parametrization_ = parametrization;
+}
+
 void Bremsstrahlung::SetComponent(int component) {
     component_ = component;
 }

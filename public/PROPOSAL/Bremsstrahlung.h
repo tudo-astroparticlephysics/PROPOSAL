@@ -231,7 +231,7 @@ public:
 	}
 
 //----------------------------------------------------------------------------//
-
+    void SetParametrization(int parametrization=1);
 	void SetComponent(int component);
 	void SetDedxIntegral(Integral* dedxIntegral);
 	void SetDedxInterpolant(Interpolant* dedxInterpolant);

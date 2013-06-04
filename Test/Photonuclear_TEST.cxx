@@ -215,21 +215,35 @@ TEST(Photonuclear , Set_Up ) {
         CombOfEnergyCutSettings.push_back(new EnergyCutSettings(ecut,vcut));
         CombOfPhoto.push_back(new Photonuclear(CombOfParticle.at(i), CombOfMedium.at(i), CombOfEnergyCutSettings.at(i)));
 
+        // Now: parametrization_ = 1,  Former: form=1 and bb=1 Kokoulin
+        // Now: parametrization_ = 2,  Former: form=2 and bb=1 Kokoulin + hard component
+        // Now: parametrization_ = 3,  Former: form=1 and bb=2 Rhode
+        // Now: parametrization_ = 4,  Former: form=2 and bb=2 Rhode + hard component
+        // Now: parametrization_ = 5,  Former: form=1 and bb=3 Bezrukov/Bugaev
+        // Now: parametrization_ = 6,  Former: form=2 and bb=3 Bezrukov/Bugaev + hard component
+        // Now: parametrization_ = 7,  Former: form=1 and bb=4 Zeus
+        // Now: parametrization_ = 8,  Former: form=2 and bb=4 Zeus + hard component
+        // Now: parametrization_ = 9,  Former: form=3 and bb=1 shadow=1 ALLM 91
+        // Now: parametrization_ = 10, Former: form=3 and bb=1 shadow=2 ALLM 91
+        // Now: parametrization_ = 11, Former: form=3 and bb=2 shadow=1 ALLM 97
+        // Now: parametrization_ = 12, Former: form=3 and bb=2 shadow=2 ALLM 97
+        // Now: parametrization_ = 13, Former: form=4 and bb=1 shadow=1 Butkevich/Mikhailov
+        // Now: parametrization_ = 14, Former: form=4 and bb=1 shadow=2 Butkevich/Mikhailov
 
-        if(bb==1&&para<3)CombOfPhoto.at(i)->SetParametrization(1);
-        if(bb==2&&para<3)CombOfPhoto.at(i)->SetParametrization(2);
-        if(bb==3&&para<3)CombOfPhoto.at(i)->SetParametrization(3);
-        if(bb==4&&para<3)CombOfPhoto.at(i)->SetParametrization(4);
-        if(bb==1&&para==3)CombOfPhoto.at(i)->SetParametrization(5);
-        if(bb==2&&para==3)CombOfPhoto.at(i)->SetParametrization(6);
-        if(bb==1&&para==4)CombOfPhoto.at(i)->SetParametrization(7);
-
-
-        if(para==2)CombOfPhoto.at(i)->SetHardComponent(true);
-        else CombOfPhoto.at(i)->SetHardComponent(false);
-
-        CombOfPhoto.at(i)->SetShadow(shadow);
-
+        if(bb==1&&para==1)CombOfPhoto.at(i)->SetParametrization(1);
+        if(bb==1&&para==2)CombOfPhoto.at(i)->SetParametrization(2);
+        if(bb==2&&para==1)CombOfPhoto.at(i)->SetParametrization(3);
+        if(bb==2&&para==2)CombOfPhoto.at(i)->SetParametrization(4);
+        if(bb==3&&para==1)CombOfPhoto.at(i)->SetParametrization(5);
+        if(bb==3&&para==2)CombOfPhoto.at(i)->SetParametrization(6);
+        if(bb==4&&para==1)CombOfPhoto.at(i)->SetParametrization(7);
+        if(bb==4&&para==2)CombOfPhoto.at(i)->SetParametrization(8);
+        if(bb==1&&para==3&&shadow==1)CombOfPhoto.at(i)->SetParametrization(9);
+        if(bb==1&&para==3&&shadow==2)CombOfPhoto.at(i)->SetParametrization(10);
+        if(bb==2&&para==3&&shadow==1)CombOfPhoto.at(i)->SetParametrization(11);
+        if(bb==2&&para==3&&shadow==2)CombOfPhoto.at(i)->SetParametrization(12);
+        if(bb==1&&para==4&&shadow==1)CombOfPhoto.at(i)->SetParametrization(13);
+        if(bb==1&&para==4&&shadow==2)CombOfPhoto.at(i)->SetParametrization(14);
 
         while(energy_old < energy)
         {

@@ -644,6 +644,10 @@ double Ionization::FunctionToDNdxIntegral(double variable)
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
+void Ionization::SetParametrization(int parametrization){
+    parametrization_ = parametrization;
+    cerr<<"Warning: This has no effect. Till now only one parametrization for Ionization implemented"<<endl;
+}
 
 void Ionization::SetBeta(double beta) {
     beta_ = beta;
