@@ -411,7 +411,6 @@ TEST(ContinuousRandomization , Randomize_interpol ) {
 
             randomized_energy_new = cont->Randomize(initial_energy,final_energy,rnd);
 
-            cout<<randomized_energy<<"\t"<<randomized_energy_new<<"\t"<<randomized_energy_new-randomized_energy<<"\t"<<1e-3*randomized_energy<<endl;
             ASSERT_NEAR(randomized_energy_new, randomized_energy, 1e-1*randomized_energy);
 
             in>>rnd>>particleName>>med>>ecut>>vcut>>initial_energy>>final_energy>>randomized_energy;
