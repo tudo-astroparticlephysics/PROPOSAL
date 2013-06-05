@@ -340,9 +340,7 @@ boost::program_options::options_description Photonuclear::CreateOptions()
 {
     po::options_description photonuclear("Photonuclear options");
     photonuclear.add_options()
-        ("photonuclear.para",             po::value<int>(&parametrization_)->default_value(1),              "1 = Kakoulin \n2 = Rhode \n3 = Bezrukov-Bugaev \n4 = Zeus \n5 = ALLM 91 \n6 = ALLM 97 \n7 = Butkevich-Mikhailov")
-        ("photonuclear.hard_component",   po::value<bool>(&hard_component_)->implicit_value(false),         "Enables hard component, only valid for parametrisation 1-4")
-        ("photonuclear.shadow",           po::value<int>(&shadow_)->default_value(1),                       "Nuclear structure function: dutt/butk\n, only valid for parametrisation 5-7")
+        ("photonuclear.para",             po::value<int>()->notifier(boost::bind(&Photonuclear::SetParametrization, this, _1)),              "1 = Kakoulin \n2 = Rhode \n3 = Bezrukov-Bugaev \n4 = Zeus \n5 = ALLM 91 \n6 = ALLM 97 \n7 = Butkevich-Mikhailov")
         ("photonuclear.interpol_dedx",    po::value<bool>(&do_dedx_Interpolation_)->implicit_value(false),  "Enables interpolation for dEdx")
         ("photonuclear.interpol_dndx",    po::value<bool>(&do_dndx_Interpolation_)->implicit_value(false),  "Enables interpolation for dNdx")
         ("photonuclear.multiplier",       po::value<double>(&multiplier_)->default_value(1.),               "modify the cross section by this factor")
@@ -368,20 +366,12 @@ void Photonuclear::ValidateOptions()
         cerr<<"Photonuclear: Order of Interpolation is set to "<<order_of_interpolation_
             <<".\t Note a order of interpolation > 6 will slow down the program"<<endl;
     }
-    if(parametrization_ < 1 || parametrization_ >7)
+    if(parametrization_ < 1 || parametrization_ >14)
     {
-        parametrization_ = 1;
-        cerr<<"Photonuclear: Parametrization is not a vaild number. Must be 1-7.\tSet parametrization to 1"<<endl;
+        SetParametrization(12);
+        cerr<<"Photonuclear: Parametrization is not a vaild number. Must be 1-14.\tSet parametrization to 12 (icecube default)"<<endl;
     }
-    if(parametrization_ > 4 && hard_component_==true)
-    {
-        cerr<<"Photonuclear: Enable the hard component has only an effect for parametrization > 4"<<endl;
-    }
-    if(shadow_ != 1 && shadow_ != 2)
-    {
-        cerr<<"Photonuclear: Shadow must be 1 or 2.\tSet to 1"<<endl;
-        shadow_ = 1;
-    }
+
 }
 
 
@@ -401,6 +391,7 @@ Photonuclear::Photonuclear()
     ,do_photo_interpolation_( false )
     ,shadow_                ( 1 )
     ,hard_component_        ( false )
+    ,parametrization_family_( 1 )
     ,dndx_integral_         ( )
     ,interpolant_hardBB_    ( )
     ,dndx_interpolant_1d_   ( )
@@ -440,6 +431,7 @@ Photonuclear::Photonuclear(const Photonuclear &photo)
     ,do_photo_interpolation_            ( photo.do_photo_interpolation_ )
     ,shadow_                            ( photo.shadow_ )
     ,hard_component_                    ( photo.hard_component_ )
+    ,parametrization_family_            ( photo.parametrization_family_ )
     ,integral_                          ( new Integral(*photo.integral_) )
     ,integral_for_dEdx_                 ( new Integral(*photo.integral_for_dEdx_) )
     ,prob_for_component_                ( photo.prob_for_component_ )
@@ -508,6 +500,7 @@ Photonuclear::Photonuclear(Particle* particle,
     ,do_photo_interpolation_( false )
     ,shadow_                ( 2 )
     ,hard_component_        ( false )
+    ,parametrization_family_( 1 )
     ,dndx_integral_         ( )
     ,interpolant_hardBB_    ( )
     ,dndx_interpolant_1d_   ( )
@@ -570,6 +563,7 @@ bool Photonuclear::operator==(const Photonuclear &photo) const
     if( do_photo_interpolation_     !=  photo.do_photo_interpolation_ )     return false;
     if( shadow_                     !=  photo.shadow_ )                     return false;
     if( hard_component_             !=  photo.hard_component_ )             return false;
+    if( parametrization_family_     !=  photo.parametrization_family_ )     return false;
     if( init_hardbb_                !=  photo.init_hardbb_)                 return false;
     if( init_measured_              !=  photo.init_measured_)               return false;
     if( *integral_                  != *photo.integral_)                    return false;
@@ -653,6 +647,7 @@ void Photonuclear::swap(Photonuclear &photo)
     swap(do_photo_interpolation_, photo.do_photo_interpolation_);
     swap(shadow_ , photo.shadow_ );
     swap(hard_component_ , photo.hard_component_ );
+    swap(parametrization_family_    ,photo.parametrization_family_ );
 
     integral_for_dEdx_->swap(*photo.integral_for_dEdx_);
     integral_->swap(*photo.integral_);
@@ -1113,7 +1108,7 @@ void Photonuclear::SetIntegralLimits(int component)
 
 double Photonuclear::PhotoN(double v, int i)
 {
-    switch(parametrization_)
+    switch(parametrization_family_)
     {
         case 1: return KokoulinParametrization(v, i);
 
@@ -1130,7 +1125,7 @@ double Photonuclear::PhotoN(double v, int i)
         case 7: return ButkevichMikhailovParametrization(v, i);
 
         default:
-            cout<<"Prameterization "<<parametrization_ <<" is not supported!"<<endl;
+            cout<<"parametrization_family_ "<<parametrization_family_ <<" is not supported!"<<endl;
             cout<<"Be careful 0 is returned"<<endl;
             return 0;
 
@@ -1729,108 +1724,90 @@ void Photonuclear::SetParametrization(int parametrization)
     // Now: parametrization_ = 13, Former: form=4 and bb=1 shadow=1 Butkevich/Mikhailov
     // Now: parametrization_ = 14, Former: form=4 and bb=1 shadow=2 Butkevich/Mikhailov
 
-    //Kokoulin
-    if(parametrization==1)
+    parametrization_    =   parametrization;
+
+    switch(parametrization)
     {
-        parametrization_    =   1;
-        hard_component_     =   false;
-    }
-    //Kokoulin + hard component
-    if(parametrization==2)
-    {
-        parametrization_    =   1;
-        hard_component_     =   true;
-    }
-    //Rhode
-    if(parametrization==3)
-    {
-        parametrization_    =   2;
-        hard_component_     =   false;
-    }
-    //Rhode + hard component
-    if(parametrization==4)
-    {
-        parametrization_    =   2;
-        hard_component_     =   true;
-    }
-    //Bezrukov/Bugaev
-    if(parametrization==5)
-    {
-        parametrization_    =   3;
-        hard_component_     =   false;
-    }
-    //Bezrukov/Bugaev + hard component
-    if(parametrization==6)
-    {
-        parametrization_    =   3;
-        hard_component_     =   true;
-    }
-    //Zeus
-    if(parametrization==7)
-    {
-        parametrization_    =   4;
-        hard_component_     =   false;
-    }
-    //Zeus + hard component
-    if(parametrization==8)
-    {
-        parametrization_    =   4;
-        hard_component_     =   true;
-    }
-    //ALLM 91 shadow 1
-    if(parametrization==9)
-    {
-        parametrization_    =   5;
-        shadow_             =   1;
-    }
-    //ALLM 91 shadow 2
-    if(parametrization==10)
-    {
-        parametrization_    =   5;
-        shadow_             =   2;
-    }
-    //ALLM 97 shadow 1
-    if(parametrization==11)
-    {
-        parametrization_    =   6;
-        shadow_             =   1;
-    }
-    //ALLM 97 shadow 2
-    if(parametrization==12)
-    {
-        parametrization_    =   6;
-        shadow_             =   2;
-    }
-    //Butkevich/Mikhailov shadow 1
-    if(parametrization==13)
-    {
-        parametrization_    =   7;
-        shadow_             =   1;
-    }
-    //Butkevich/Mikhailov shadow 2
-    if(parametrization==14)
-    {
-        parametrization_    =   7;
-        shadow_             =   2;
-    }
-    else
-    {
-        cerr<<"Warning: Parametrization not supported. Set to 12 (icecube default)"<<endl;
-        parametrization_    =   6;
-        shadow_             =   2;
+        case 1:     //Kokoulin
+            parametrization_family_ =   1;
+            hard_component_         =   false;
+            break;
+        case 2:     //Kokoulin + hard component
+            parametrization_family_ =   1;
+            hard_component_         =   true;
+            break;
+        case 3:     //Rhode
+            parametrization_family_ =   2;
+            hard_component_         =   false;
+            break;
+        case 4:     //Rhode + hard component
+            parametrization_family_ =   2;
+            hard_component_         =   true;
+            break;
+        case 5:     //Bezrukov/Bugaev
+            parametrization_family_ =   3;
+            hard_component_         =   false;
+            break;
+        case 6:     //Bezrukov/Bugaev + hard component
+            parametrization_family_ =   3;
+            hard_component_         =   true;
+            break;
+        case 7:     //Zeus
+            parametrization_family_ =   4;
+            hard_component_         =   false;
+            break;
+        case 8:     //Zeus + hard component
+            parametrization_family_ =   4;
+            hard_component_         =   true;
+            break;
+        case 9:     //ALLM 91 shadow 1
+            parametrization_family_ =   5;
+            shadow_                 =   1;
+            break;
+        case 10:    //ALLM 91 shadow 2
+            parametrization_family_ =   5;
+            shadow_                 =   2;
+            break;
+        case 11:    //ALLM 97 shadow 1
+            parametrization_family_ =   6;
+            shadow_                 =   1;
+            break;
+        case 12:    //ALLM 97 shadow 2
+            parametrization_family_ =   6;
+            shadow_                 =   2;
+            break;
+        case 13:    //Butkevich/Mikhailov shadow 1
+            parametrization_family_ =   7;
+            shadow_                 =   1;
+            break;
+        case 14:    //Butkevich/Mikhailov shadow 2
+            parametrization_family_ =   7;
+            shadow_                 =   2;
+            break;
+        default:
+            cerr<<"Warning: Parametrization not supported. Set to 12 (icecube default)"<<endl;
+            parametrization_family_ =   6;
+            shadow_                 =   2;
     }
 
+    if(do_photo_interpolation_)
+    {
+        cerr<<"Warning: photo-interpolation enabled before choosing the parametrization (Photonuclear)."<<endl;
+        cerr<<"Rebuilding the tables"<<endl;
+        DisablePhotoInterpolation();
+        EnablePhotoInterpolation();
+    }
 
     if(do_dedx_Interpolation_)
     {
-        cerr<<"Warning: dEdx-interpolation enabled before choosing the parametrization."<<endl;
+        cerr<<"Warning: dEdx-interpolation enabled before choosing the parametrization (Photonuclear)."<<endl;
         cerr<<"Rebuilding the tables"<<endl;
         DisableDEdxInterpolation();
         EnableDEdxInterpolation();
     }
     if(do_dndx_Interpolation_)
     {
-        cerr<<"Warning: dNdx-interpolation enabled before choosing the parametrization."<<endl;
+        cerr<<"Warning: dNdx-interpolation enabled before choosing the parametrization (Photonuclear)."<<endl;
         cerr<<"Rebuilding the tables"<<endl;
         DisableDNdxInterpolation();
         EnableDNdxInterpolation();

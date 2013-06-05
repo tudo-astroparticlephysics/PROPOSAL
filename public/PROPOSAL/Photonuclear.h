@@ -19,6 +19,7 @@ protected:
     bool        do_photo_interpolation_;   
     int         shadow_;
     bool        hard_component_;
+    int         parametrization_family_;
 
     Integral*   integral_;
     Integral*   integral_for_dEdx_;

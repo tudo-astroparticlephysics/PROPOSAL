@@ -63,7 +63,7 @@ TEST(Comparison , Comparison_equal ) {
 }
 
 TEST(Comparison , Comparison_not_equal ) {
-    double dEdx;
+
     Medium *medium = new Medium("air",1.);
     Medium *medium2 = new Medium("water",1.);
     Particle *particle = new Particle("mu",1.,1.,1,20,20,1e5,10);
@@ -84,8 +84,6 @@ TEST(Comparison , Comparison_not_equal ) {
     EXPECT_TRUE(*D!=*E);
     D->SetParticle(particle);
     EXPECT_TRUE(*D==*E);
-    D->SetParametrization(6);
-    EXPECT_TRUE(*D!=*E);
 
 
 }
