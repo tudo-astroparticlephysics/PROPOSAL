@@ -41,6 +41,7 @@ private:
     bool do_exact_time_calulation_;
 
 
+
     Particle* particle_;
     ProcessCollection *collection_;
 

@@ -9,6 +9,7 @@
 #define GEOMETRY_H
 
 #include "PROPOSAL/Particle.h"
+#include <string>
 
 class Geometry
 {
@@ -24,6 +25,8 @@ private:
     double x_;              //!< width of box in x-direction
     double y_;              //!< width of box in y-direction
     double z_;              //!< height of box/cylinder
+
+    std::string object_;    //!< "box" , "cylinder" , "sphere" (sphere and cylinder might be hollow)
 
 
 
@@ -47,6 +50,19 @@ public:
     double DistanceToBorder(Particle* particle);
 
 //----------------------------------------------------------------------------//
+
+    void InitBox(double x0, double y0, double z0, double x, double y, double z);
+
+//----------------------------------------------------------------------------//
+
+    void InitSphere(double x0, double y0, double z0, double radius, double inner_radius);
+
+//----------------------------------------------------------------------------//
+
+    void InitCylinder(double x0, double y0, double z0, double radius, double inner_radius, double z);
+
+//----------------------------------------------------------------------------//
+
     void swap(Geometry &geometry);
 
 //----------------------------------------------------------------------------//
@@ -83,6 +99,10 @@ public:
         return radius_;
     }
 
+    std::string GetObject() const {
+        return object_;
+    }
+
 //----------------------------------------------------------------------------//
     //Setter
     void SetX0(double x0);
@@ -93,6 +113,8 @@ public:
     void SetZ(double z);
     void SetInnerRadius(double inner_radius_);
     void SetRadius(double radius);
+    void SetObject(std::string object);
+
 //----------------------------------------------------------------------------//
     //Destructor
     ~Geometry();

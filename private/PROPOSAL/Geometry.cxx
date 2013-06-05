@@ -1,12 +1,12 @@
 /*
- * RootFinder.cxx
+ * Geometry.cxx
  *
  *  Created on: 05.06.2013
  *      Author: koehne
  */
 
 #include "PROPOSAL/Geometry.h"
-
+#include <iostream>
 
 using namespace std;
 
@@ -17,9 +17,79 @@ using namespace std;
 //----------------------------------------------------------------------------//
 
 
+void Geometry::InitBox(double x0, double y0, double z0, double x, double y, double z)
+{
+    x0_     =   x0;
+    y0_     =   y0;
+    z0_     =   z0;
+
+    x_      =   x;
+    y_      =   y;
+    z_      =   z;
+
+    object_ =   "box";
+}
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+void Geometry::InitSphere(double x0, double y0, double z0, double radius, double inner_radius)
+{
+    x0_     =   x0;
+    y0_     =   y0;
+    z0_     =   z0;
+
+    radius_         =   radius;
+    inner_radius_   =   inner_radius;
+
+    object_ =   "sphere";
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+void Geometry::InitCylinder(double x0, double y0, double z0, double radius, double inner_radius, double z)
+{
+    x0_     =   x0;
+    y0_     =   y0;
+    z0_     =   z0;
+
+    radius_         =   radius;
+    inner_radius_   =   inner_radius;
+
+    z_      =   z;
+
+    object_ =   "cylinder";
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
 bool Geometry::IsParticleInside(Particle* particle)
 {
     bool is_inside  =   false;
+
+    if( object_.compare("box")==0 )
+    {
+
+    }
+    else if( object_.compare("cylinder")==0 )
+    {
+
+    }
+    else if( object_.compare("sphere")==0 )
+    {
+
+    }
+    else
+    {
+        cerr<<"Error: In Geometry::IsParticleInside object name must be box/shpere/cylinder"<<endl;
+    }
     return is_inside;
 }
 
@@ -51,6 +121,7 @@ Geometry::Geometry()
     ,x_             ( 0 )
     ,y_             ( 0 )
     ,z_             ( 0 )
+    ,object_        ( "sqhere" )
 {
 
 }
@@ -69,6 +140,7 @@ Geometry::Geometry(const Geometry &geometry)
     ,x_             ( geometry.x_ )
     ,y_             ( geometry.y_ )
     ,z_             ( geometry.z_ )
+    ,object_        ( geometry.object_ )
 {
 
 }
@@ -112,6 +184,8 @@ bool Geometry::operator==(const Geometry &geometry) const
     if( y_             != geometry.y_ )             return false;
     if( z_             != geometry.z_ )             return false;
 
+    if( object_.compare(geometry.object_)!= 0 )     return false;
+
     //else
     return true;
 }
@@ -144,6 +218,7 @@ void Geometry::swap(Geometry &geometry)
     swap( y_             , geometry.y_ );
     swap( z_             , geometry.z_ );
 
+    object_.swap( geometry.object_ );
 }
 
 
@@ -184,6 +259,10 @@ void Geometry::SetInnerRadius(double inner_radius_) {
 
 void Geometry::SetRadius(double radius) {
     radius_ =   radius;
+}
+
+void Geometry::SetObject(string object) {
+    object_ =   object;
 }
 
 //----------------------------------------------------------------------------//
