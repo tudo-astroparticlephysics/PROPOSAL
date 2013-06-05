@@ -7,6 +7,7 @@
 
 #include "PROPOSAL/Geometry.h"
 #include <iostream>
+#include <cmath>
 
 using namespace std;
 
@@ -74,16 +75,61 @@ bool Geometry::IsParticleInside(Particle* particle)
 {
     bool is_inside  =   false;
 
+    double dist     =   0;
+
     if( object_.compare("box")==0 )
     {
+        double upper_x =   x0_ + 0.5*x_;
+        double lower_x =   x0_ - 0.5*x_;
+
+        double upper_y =   y0_ + 0.5*y_;
+        double lower_y =   y0_ - 0.5*y_;
+
+        double upper_z =   z0_ + 0.5*z_;
+        double lower_z =   z0_ - 0.5*z_;
+
+        //Figure out what happens if x/y/z == upper/lower...
+        if(    particle->GetX() < upper_x
+            && particle->GetX() > lower_x
+            && particle->GetY() < upper_y
+            && particle->GetY() > lower_y
+            && particle->GetZ() < upper_z
+            && particle->GetZ() > lower_z   )
+        {
+            is_inside   =   true;
+        }
 
     }
     else if( object_.compare("cylinder")==0 )
     {
+        dist =    pow( (particle->GetX() -x0_) , 2.)
+                + pow( (particle->GetY() -y0_) , 2.);
 
+        double upper    =   z0_ + 0.5*z_;
+        double lower    =   z0_ - 0.5*z_;
+
+        //Figure out what happens if dist == radius/inner_radius z == upper/lower...
+        if(    particle->GetZ() < upper
+            && particle->GetZ() > lower
+            && dist             < radius_
+            && dist             > inner_radius_  )
+        {
+            is_inside   =   true;
+        }
     }
     else if( object_.compare("sphere")==0 )
     {
+        dist =    pow( (particle->GetX() -x0_) , 2.)
+                + pow( (particle->GetY() -y0_) , 2.)
+                + pow( (particle->GetZ() -z0_) , 2.);
+
+        dist =  sqrt(dist);
+
+        //Figure out what happens if dist == radius/inner_radius...
+        if( dist < radius_ && dist > inner_radius_)
+        {
+            is_inside   =   true;
+        }
 
     }
     else
