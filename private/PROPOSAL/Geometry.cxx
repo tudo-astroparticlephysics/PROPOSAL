@@ -146,7 +146,17 @@ bool Geometry::IsParticleInside(Particle* particle)
 
 double Geometry::DistanceToBorder(Particle* particle)
 {
+    if( !IsParticleInside(particle) ) return 0;
+
     double distance =   0;
+
+    if( object_.compare("sphere")==0 )
+    {
+        distance    =   DistanceToBorderSphere(particle);
+
+    }
+
+
     return distance;
 }
 
@@ -265,6 +275,262 @@ void Geometry::swap(Geometry &geometry)
     swap( z_             , geometry.z_ );
 
     object_.swap( geometry.object_ );
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//-------------------------private member functions---------------------------//
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+double Geometry::DistanceToBorderSphere(Particle* particle)
+{
+    // Calculate intersection of particle trajectory and the sphere
+    // sphere (x1 + x0)^2 + (x2 + y0)^2 + (x3 + z0)^2 = radius^2
+    // straight line (particle trajectory) g = vec(x,y,z) + t * dir_vec( cosph *sinth, sinph *sinth , costh)
+    // Insert and transform leads to C * t^2 + B * t + A = 0
+    // length of direction vector =1 => C = 1
+    // We are only interested in postive values of t
+    // ( we want to find the intersection in direction of the particle trajectory)
+
+    double A,B,t1,t2,t;
+    double dir_vec_x = particle->GetCosPhi()*particle->GetSinTheta();
+    double dir_vec_y = particle->GetSinPhi()*particle->GetSinTheta();
+    double dir_vec_z = particle->GetCosTheta();
+
+    double distance =   0;
+
+
+    A   =    pow( (particle->GetX() - x0_),2 )
+           + pow( (particle->GetY() - y0_),2 )
+           + pow( (particle->GetZ() - z0_),2 )
+           - pow( radius_, 2 );
+
+    B   =   2*(   (particle->GetX() - x0_)*dir_vec_x
+                + (particle->GetY() - y0_)*dir_vec_y
+                + (particle->GetZ() - z0_)*dir_vec_z );
+
+    t1  =   -1*B/2 + sqrt( pow(B/2 ,2) - A );
+    t2  =   -1*B/2 - sqrt( pow(B/2 ,2) - A );
+
+    if(t1 > 0)
+        t   =   t1;
+    else
+        t   =   t2;
+
+    // t is the mupltiple of the direction vector we have to propagate untill the
+    // border is reached.
+    // But this sqhere might be hollow and we have to check if the inner border is
+    // reached before.
+    // So we caluculate the intersection with the inner sphere.
+
+    if(inner_radius_ > 0)
+    {
+        double determinant;
+
+        A   =    pow( (particle->GetX() - x0_),2 )
+               + pow( (particle->GetY() - y0_),2 )
+               + pow( (particle->GetZ() - z0_),2 )
+               - pow( inner_radius_, 2 );
+
+        B   =   2*(   (particle->GetX() - x0_)*dir_vec_x
+                    + (particle->GetY() - y0_)*dir_vec_y
+                    + (particle->GetZ() - z0_)*dir_vec_z );
+
+        determinant = pow(B/2 ,2) - A;
+
+        if( determinant > 0) // determinant == 0 (boundery point) is ignored
+        {
+            t1  =   -1*B/2 + sqrt( determinant );
+            t2  =   -1*B/2 - sqrt( determinant );
+
+            // Ok we have a intersection with the inner sphere
+            // Now we have to find the closest
+            if( t1 != 0 && t1 < t)
+            {
+                t   =   t1;
+            }
+            if( t2 != 0 && t2 < t)
+            {
+                t   =   t2;
+            }
+        }
+    }
+
+    //Cause length of direction vector is 1 distance is t
+
+    distance    =   t;
+
+    return distance;
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+double Geometry::DistanceToBorderBox(Particle* particle)
+{
+    // Calculate intersection of particle trajectory and the box
+    // Surface of the box is defined by six planes:
+    // E1: x1   =   x0_ + 0.5*x
+    // E2: x1   =   x0_ - 0.5*x
+    // E3: x2   =   y0_ + 0.5*y
+    // E4: x2   =   y0_ - 0.5*y
+    // E5: x3   =   z0_ + 0.5*z
+    // E6: x3   =   z0_ - 0.5*z
+    // straight line (particle trajectory) g = vec(x,y,z) + t * dir_vec( cosph *sinth, sinph *sinth , costh)
+    // We are only interested in postive values of t
+    // ( we want to find the intersection in direction of the particle trajectory)
+
+    double dir_vec_x = particle->GetCosPhi()*particle->GetSinTheta();
+    double dir_vec_y = particle->GetSinPhi()*particle->GetSinTheta();
+    double dir_vec_z = particle->GetCosTheta();
+
+    double distance =   0;
+    double t;
+    double intersection_x;
+    double intersection_y;
+    double intersection_z;
+
+    //intersection with E1
+    if( dir_vec_x != 0) // if dir_vec == 0 particle trajectory is parallel to E1
+    {
+        t   =  ( x0_ + 0.5*x_ - particle->GetX() ) / dir_vec_x;
+
+        if( t>0 ) // Interection is in particle trajectory direction
+        {
+            //Check if intersection is inside the box borders
+            intersection_y  =   particle->GetY() + t * dir_vec_y;
+            intersection_z  =   particle->GetZ() + t * dir_vec_z;
+            if( intersection_y >= (y0_ - 0.5*y_) &&
+                intersection_y <= (y0_ + 0.5*y_) &&
+                intersection_z >= (z0_ - 0.5*z_) &&
+                intersection_z <= (z0_ + 0.5*z_)    )
+            {
+                distance    =   t;
+                return  distance;
+            }
+
+        }
+    }
+
+    //intersection with E2
+    if( dir_vec_x != 0) // if dir_vec == 0 particle trajectory is parallel to E2
+    {
+        t   =  ( x0_ - 0.5*x_ - particle->GetX() ) / dir_vec_x;
+
+        if( t>0 ) // Interection is in particle trajectory direction
+        {
+            //Check if intersection is inside the box borders
+            intersection_y  =   particle->GetY() + t * dir_vec_y;
+            intersection_z  =   particle->GetZ() + t * dir_vec_z;
+            if( intersection_y >= (y0_ - 0.5*y_) &&
+                intersection_y <= (y0_ + 0.5*y_) &&
+                intersection_z >= (z0_ - 0.5*z_) &&
+                intersection_z <= (z0_ + 0.5*z_)    )
+            {
+                distance    =   t;
+                return  distance;
+            }
+
+        }
+    }
+
+    //intersection with E3
+    if( dir_vec_y != 0) // if dir_vec == 0 particle trajectory is parallel to E3
+    {
+        t   =  ( y0_ + 0.5*y_ - particle->GetY() ) / dir_vec_y;
+
+        if( t>0 ) // Interection is in particle trajectory direction
+        {
+            //Check if intersection is inside the box borders
+            intersection_x  =   particle->GetX() + t * dir_vec_x;
+            intersection_z  =   particle->GetZ() + t * dir_vec_z;
+            if( intersection_x >= (x0_ - 0.5*x_) &&
+                intersection_x <= (x0_ + 0.5*x_) &&
+                intersection_z >= (z0_ - 0.5*z_) &&
+                intersection_z <= (z0_ + 0.5*z_)    )
+            {
+                distance    =   t;
+                return  distance;
+            }
+
+        }
+    }
+
+    //intersection with E4
+    if( dir_vec_y != 0) // if dir_vec == 0 particle trajectory is parallel to E4
+    {
+        t   =  ( y0_ - 0.5*y_ - particle->GetY() ) / dir_vec_y;
+
+        if( t>0 ) // Interection is in particle trajectory direction
+        {
+            //Check if intersection is inside the box borders
+            intersection_x  =   particle->GetX() + t * dir_vec_x;
+            intersection_z  =   particle->GetZ() + t * dir_vec_z;
+            if( intersection_x >= (x0_ - 0.5*x_) &&
+                intersection_x <= (x0_ + 0.5*x_) &&
+                intersection_z >= (z0_ - 0.5*z_) &&
+                intersection_z <= (z0_ + 0.5*z_)    )
+            {
+                distance    =   t;
+                return  distance;
+            }
+
+        }
+    }
+
+    //intersection with E5
+    if( dir_vec_z != 0) // if dir_vec == 0 particle trajectory is parallel to E5
+    {
+        t   =  ( z0_ + 0.5*z_ - particle->GetZ() ) / dir_vec_z;
+
+        if( t>0 ) // Interection is in particle trajectory direction
+        {
+            //Check if intersection is inside the box borders
+            intersection_x  =   particle->GetX() + t * dir_vec_x;
+            intersection_y  =   particle->GetY() + t * dir_vec_y;
+            if( intersection_x >= (x0_ - 0.5*x_) &&
+                intersection_x <= (x0_ + 0.5*x_) &&
+                intersection_y >= (y0_ - 0.5*y_) &&
+                intersection_y <= (y0_ + 0.5*y_)    )
+            {
+                distance    =   t;
+                return  distance;
+            }
+
+        }
+    }
+
+    //intersection with E6
+    if( dir_vec_z != 0) // if dir_vec == 0 particle trajectory is parallel to E6
+    {
+        t   =  ( z0_ - 0.5*z_ - particle->GetZ() ) / dir_vec_z;
+
+        if( t>0 ) // Interection is in particle trajectory direction
+        {
+            //Check if intersection is inside the box borders
+            intersection_x  =   particle->GetX() + t * dir_vec_x;
+            intersection_y  =   particle->GetY() + t * dir_vec_y;
+            if( intersection_x >= (x0_ - 0.5*x_) &&
+                intersection_x <= (x0_ + 0.5*x_) &&
+                intersection_y >= (y0_ - 0.5*y_) &&
+                intersection_y <= (y0_ + 0.5*y_)    )
+            {
+                distance    =   t;
+                return  distance;
+            }
+
+        }
+    }
+
+    cerr<<"In Geometry::DistanceToBorderBox(Particle*) this point should nerver be reached..."<<endl;
+    cerr<<"-1 is returned"<<endl;
+
+    return -1;
 }
 
 

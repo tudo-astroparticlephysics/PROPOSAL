@@ -1125,8 +1125,8 @@ double Photonuclear::PhotoN(double v, int i)
         case 7: return ButkevichMikhailovParametrization(v, i);
 
         default:
-            cout<<"parametrization_family_ "<<parametrization_family_ <<" is not supported!"<<endl;
-            cout<<"Be careful 0 is returned"<<endl;
+            cerr<<"parametrization_family_ "<<parametrization_family_ <<" is not supported!"<<endl;
+            cerr<<"Be careful 0 is returned"<<endl;
             return 0;
 
     }

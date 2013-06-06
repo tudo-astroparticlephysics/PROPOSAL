@@ -28,7 +28,26 @@ private:
 
     std::string object_;    //!< "box" , "cylinder" , "sphere" (sphere and cylinder might be hollow)
 
+//----------------------------------------------------------------------------//
+    /*!
+     * This fucntion calculates the distance of the particle position
+     * to the border of the sphere (hollow sphere)
+     * in direction of the particle trajectory.
+     * Note: This function is made to find the distance which the particle must be propagated
+     * INSIDE this geometry. So be sure that the particle is inside this geometry before
+     * calling this function ( use IsParticleInside(Particle*) )
+     */
+    double DistanceToBorderSphere(Particle* particle);
 
+//----------------------------------------------------------------------------//
+    /*!
+     * This fucntion calculates the distance of the particle position
+     * to the border of the box in direction of the particle trajectory.
+     * Note: This function is made to find the distance which the particle must be propagated
+     * INSIDE this geometry. So be sure that the particle is inside this geometry before
+     * calling this function ( use IsParticleInside(Particle*) )
+     */
+    double DistanceToBorderBox(Particle* particle);
 
 public:
 
