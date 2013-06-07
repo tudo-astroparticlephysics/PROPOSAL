@@ -167,7 +167,21 @@ double Geometry::DistanceToBorder(Particle* particle)
         distance    =   DistanceToBorderSphere(particle);
 
     }
+    else if( object_.compare("box")==0 )
+    {
+        distance    =   DistanceToBorderBox(particle);
 
+    }
+    else if( object_.compare("cylinder")==0 )
+    {
+        distance    =   DistanceToBorderCylinder(particle);
+
+    }
+    else
+    {
+        cerr<<"Warning: geometry type is not recognized! -1 is returned"<<endl;
+        return -1;
+    }
 
     return distance;
 }
