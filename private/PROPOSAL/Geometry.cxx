@@ -8,6 +8,7 @@
 #include "PROPOSAL/Geometry.h"
 #include <iostream>
 #include <cmath>
+#include <algorithm>
 
 using namespace std;
 
@@ -44,6 +45,11 @@ void Geometry::InitSphere(double x0, double y0, double z0, double radius, double
     radius_         =   radius;
     inner_radius_   =   inner_radius;
 
+    if(inner_radius > radius_)
+    {
+        cerr<<"Warning: Inner radius is greater then radius (will be swaped)"<<endl;
+        std::swap( inner_radius_ ,radius_ );
+    }
     object_ =   "sphere";
 }
 
@@ -60,6 +66,12 @@ void Geometry::InitCylinder(double x0, double y0, double z0, double radius, doub
 
     radius_         =   radius;
     inner_radius_   =   inner_radius;
+
+    if(inner_radius > radius_)
+    {
+        cerr<<"Warning: Inner radius is greater then radius (will be swaped)"<<endl;
+        std::swap( inner_radius_ ,radius_ );
+    }
 
     z_      =   z;
 
@@ -528,6 +540,147 @@ double Geometry::DistanceToBorderBox(Particle* particle)
     }
 
     cerr<<"In Geometry::DistanceToBorderBox(Particle*) this point should nerver be reached..."<<endl;
+    cerr<<"-1 is returned"<<endl;
+
+    return -1;
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+double Geometry::DistanceToBorderCylinder(Particle* particle)
+{
+    // Calculate intersection of particle trajectory and the cylinder
+    // cylinder barrel (x1 + x0)^2 + (x2 + y0)^2  = radius^2 [ z0_-0.5*z_ < particle->z <z0_ - 0.5*z_ ]
+    // top/bottom surface:
+    // E1: x3   =   z0_ + 0.5*z
+    // E2: x3   =   z0_ - 0.5*z
+    // straight line (particle trajectory) g = vec(x,y,z) + t * dir_vec( cosph *sinth, sinph *sinth , costh)
+    // Insert and transform leads to C * t^2 + B * t + A = 0
+    // length of direction vector =1 => C = 1
+    // We are only interested in postive values of t
+    // ( we want to find the intersection in direction of the particle trajectory)
+
+    double A,B,t1,t2,t;
+    double dir_vec_x = particle->GetCosPhi()*particle->GetSinTheta();
+    double dir_vec_y = particle->GetSinPhi()*particle->GetSinTheta();
+    double dir_vec_z = particle->GetCosTheta();
+
+    double intersection_z;
+
+    double distance =   0;
+
+    if(!(dir_vec_x  == 0 && dir_vec_y == 0)) //Otherwise the particle trajectory is parallel to cylinder barrel
+    {
+        A   =    pow( (particle->GetX() - x0_),2 )
+               + pow( (particle->GetY() - y0_),2 )
+               - pow( radius_, 2 );
+
+        B   =   2*(   (particle->GetX() - x0_)*dir_vec_x
+                    + (particle->GetY() - y0_)*dir_vec_y );
+
+        t1  =   -1*B/2 + sqrt( pow(B/2 ,2) - A );
+        t2  =   -1*B/2 - sqrt( pow(B/2 ,2) - A );
+
+        if(t1 > 0)
+            t   =   t1;
+        else
+            t   =   t2;
+
+        // t is the mupltiple of the direction vector we have to propagate
+        // untill the border is reached.
+        // But this cylinder might be hollow and we have to check if the inner border is
+        // reached before.
+        // So we caluculate the intersection with the inner sphere.
+
+        if(inner_radius_ > 0)
+        {
+            double determinant;
+
+            A   =    pow( (particle->GetX() - x0_),2 )
+                   + pow( (particle->GetY() - y0_),2 )
+                   - pow( radius_, 2 );
+
+            B   =   2*(   (particle->GetX() - x0_)*dir_vec_x
+                        + (particle->GetY() - y0_)*dir_vec_y );
+
+            determinant = pow(B/2 ,2) - A;
+
+            if( determinant > 0) // determinant == 0 (boundery point) is ignored
+            {
+                t1  =   -1*B/2 + sqrt( determinant );
+                t2  =   -1*B/2 - sqrt( determinant );
+
+                // Ok we have a intersection with the inner sphere
+                // Now we have to find the closest
+                if( t1 != 0 && t1 < t)
+                {
+                    t   =   t1;
+                }
+                if( t2 != 0 && t2 < t)
+                {
+                    t   =   t2;
+                }
+            }
+        }
+
+        // Ok, now we know the multiple of the direction vector we have to propagte
+        // untill the cylinder barrel is reached. But in z-direction this migth be outside
+        // the cylinder border ( intersection with top or bottom surface )
+
+        intersection_z  =   particle->GetZ() + t * dir_vec_z;
+
+        // is inside the borders
+        if( intersection_z > z0_ - 0.5*z_ &&
+            intersection_z < z0_ - 0.5*z_    )
+        {
+            distance    =   t;     // Cause length of direction vector is 1 distance is t
+            return distance;
+        }
+
+    }
+
+    // When this point is reached ther must be an intersection with top or bottom surface
+
+    //intersection with E1
+    if( dir_vec_z != 0) // if dir_vec == 0 particle trajectory is parallel to E1 (Should not happen)
+    {
+        t   =  ( z0_ + 0.5*z_ - particle->GetZ() ) / dir_vec_z;
+
+        if( t>0 ) // Interection is in particle trajectory direction
+        {
+            // We don't have to check for cylinder borders
+            // cause if this intersection would not be inside the cylinder top or bottom surface
+            // we found the intersection before when searching the intersection
+            // with the cylinder barrel (the same is true for inner_radius > 0)
+
+            distance    =   t;
+            return  distance;
+
+        }
+    }
+
+    //intersection with E2
+    if( dir_vec_z != 0) // if dir_vec == 0 particle trajectory is parallel to E1 (Should not happen)
+    {
+        t   =  ( z0_ - 0.5*z_ - particle->GetZ() ) / dir_vec_z;
+
+        if( t>0 ) // Interection is in particle trajectory direction
+        {
+            // We don't have to check for cylinder borders
+            // cause if this intersection would not be inside the cylinder top or bottom surface
+            // we found the intersection before when searching the intersection
+            // with the cylinder barrel (the same is true for inner_radius > 0)
+
+            distance    =   t;
+            return  distance;
+
+        }
+    }
+
+    cerr<<"In Geometry::DistanceToBorderCylinder(Particle*) this point should nerver be reached..."<<endl;
     cerr<<"-1 is returned"<<endl;
 
     return -1;
