@@ -345,7 +345,7 @@ TEST(ProcessCollection , TrackingIntegral)
     in.getline(firstLine,256);
     if(!in.good())
     {
-        cerr << "File ProcColl_Disp.txt not found!" << endl;
+        cerr << "File ProcColl_Tracking.txt not found!" << endl;
         EXPECT_TRUE(false);
     }
     double energy;
@@ -363,6 +363,10 @@ TEST(ProcessCollection , TrackingIntegral)
     double tracking,tracking_new,rnd=0.1;
     ProcessCollection* ProcColl;
     bool particle_interaction;
+
+    //RelError is mostly better than 1E-2.
+    //It differs just 1.8E-3 for electrons in air and
+    //in most cases is in the order of the integration precision 1E-6.
     double RelError = 1E-2;
     while(in.good())
     {
@@ -404,14 +408,103 @@ TEST(ProcessCollection , TrackingIntegral)
             ProcColl->GetParticle()->SetEnergy(energy);
             tracking_new = ProcColl->CalculateTrackingIntegal(energy,rndtmp,particle_interaction);
 
-            if(fabs(1-tracking_new/tracking) > 1E-5)
-            {
-                cout << ecut << "\t" << vcut << "\t" << lpm << "\t" << med << "\t" << particleName << "\t" << particle_interaction << "\t" << energy << "\t" << tracking << endl;
-                cout << dx << "\t" << dx_new << "\t" << fabs(1-tracking_new/tracking)  << endl;
-            }
-            ASSERT_NEAR(tracking, tracking_new, RelError*dx_new);
+//            if(fabs(1-tracking_new/tracking) > 1E-5)
+//            {
+//                cout << ecut << "\t" << vcut << "\t" << lpm << "\t" << med << "\t" << particleName << "\t" << particle_interaction << "\t" << energy << "\t" << tracking << endl;
+//                cout << tracking << "\t" << tracking_new << "\t" << fabs(1-tracking_new/tracking)  << endl;
+//            }
+            ASSERT_NEAR(tracking, tracking_new, RelError*tracking_new);
 
             in>>ecut>>vcut>>lpm>>med>>particleName>> particle_interaction >> energy>>tracking;
+        }
+
+        delete cuts;
+        delete medium;
+        delete particle;
+    }
+}
+
+TEST(ProcessCollection , FinalEnergyDist)
+{
+    ifstream in;
+    in.open("bin/TestFiles/ProcColl_FinalEnergyDist.txt");
+
+    char firstLine[256];
+    in.getline(firstLine,256);
+    if(!in.good())
+    {
+        cerr << "File ProcColl_FinalEnergyDist.txt not found!" << endl;
+        EXPECT_TRUE(false);
+    }
+    double energy;
+    double ecut;
+    double vcut;
+    string med;
+    string particleName;
+    bool lpm;
+
+    cout.precision(16);
+    double energy_old=-1;
+
+    bool first = true;
+
+    double finalenergy,finalenergy_new,rnd=0.1;
+    double dist;
+    ProcessCollection* ProcColl;
+
+
+    //RelError is mostly better than 1E-2.
+    //It differs just 1.8E-3 for electrons in air and
+    //in most cases is in the order of the integration precision 1E-6.
+    double RelError = 1E-2;
+    while(in.good())
+    {
+        if(first)in>>ecut>>vcut>>lpm>>med>>particleName>> dist >> energy>>finalenergy;
+        first=false;
+
+        energy_old = -1;
+        Medium *medium = new Medium(med,1.);
+        Particle *particle = new Particle(particleName,1.,1.,1,.20,20,1e5,10);
+        particle->SetEnergy(energy);
+        EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
+
+        int i=0;
+        //cout << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << med << "\t" << particleName <<  endl;
+        while(i< CombOfProcColl.size())
+        {
+            if(         !particle->GetName().compare(CombOfParticle.at(i)->GetName())
+                    &&  !medium->GetName().compare(CombOfMedium.at(i)->GetName())
+                    &&  *cuts == *CombOfEnergyCutSettings.at(i))
+                break;
+            i++;
+        }
+
+        if(i<CombOfProcColl.size())
+        {
+            ProcColl = CombOfProcColl.at(i);
+            //cout << "found cross Section!" << endl;
+            //cout << CombOfEnergyCutSettings.at(i)->GetEcut() << "\t" << CombOfEnergyCutSettings.at(i)->GetVcut() << "\t" << CombOfMedium.at(i)->GetName() << "\t" << CombOfParticle.at(i)->GetName() << endl;
+        }
+        else
+        {
+            ProcColl = new ProcessCollection(particle, medium, cuts);
+        }
+
+
+        while(energy_old < energy){
+            energy_old = energy;
+
+            ProcColl->GetParticle()->SetEnergy(energy);
+            finalenergy_new = ProcColl->CalculateFinalEnergy(energy, dist);
+
+            if(fabs(1-finalenergy_new/finalenergy) > 1E-5)
+            {
+                cout << ecut << "\t" << vcut << "\t" << lpm << "\t" << med << "\t" << particleName << "\t" << dist << "\t" << energy << "\t" << finalenergy << endl;
+                cout << finalenergy << "\t" << finalenergy_new << "\t" << fabs(1-finalenergy_new/finalenergy)  << endl;
+            }
+            ASSERT_NEAR(finalenergy, finalenergy_new, RelError*finalenergy_new);
+
+            in>>ecut>>vcut>>lpm>>med>>particleName>> dist >> energy>>finalenergy;
         }
 
         delete cuts;
