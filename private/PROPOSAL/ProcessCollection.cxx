@@ -110,10 +110,9 @@ double ProcessCollection::CalculateTrackingIntegal(double initial_energy, double
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-
+//Formerly: double CrossSections::getef(double ei, double dist)
 double ProcessCollection::CalculateFinalEnergy(double ei, double dist)
 {
-
     if(do_interpolation_)
     {
         if(ini_ != 0)

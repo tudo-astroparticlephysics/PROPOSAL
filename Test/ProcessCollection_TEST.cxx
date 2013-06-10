@@ -491,7 +491,8 @@ TEST(ProcessCollection , FinalEnergyDist)
         }
 
 
-        while(energy_old < energy){
+        while(energy_old < energy)
+        {
             energy_old = energy;
 
             ProcColl->GetParticle()->SetEnergy(energy);
