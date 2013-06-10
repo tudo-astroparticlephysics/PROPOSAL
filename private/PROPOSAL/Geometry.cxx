@@ -641,12 +641,12 @@ pair<double,double> Geometry::DistanceToBorderBox(Particle* particle)
         distance.first  =   -1;
         distance.second =   -1;
     }
-    if( dist.size() == 1 )  // Particle is inside the box and we have one intersection in direction of the particle trajectory
+    else if( dist.size() == 1 )  // Particle is inside the box and we have one intersection in direction of the particle trajectory
     {
         distance.first  =   dist.at(0);
         distance.second =   -1;
     }
-    if( dist.size() ==2 )   // Particle is outside and the box is infront of the particle trajectory ( two intersections). Chose closest
+    else if( dist.size() ==2 )   // Particle is outside and the box is infront of the particle trajectory ( two intersections). Chose closest
     {
         distance.first  =   dist.at(0);
         distance.second =   dist.at(1);
