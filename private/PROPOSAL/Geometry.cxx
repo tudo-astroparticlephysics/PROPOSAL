@@ -9,6 +9,7 @@
 #include <iostream>
 #include <cmath>
 #include <algorithm>
+#include <vector>
 
 using namespace std;
 
@@ -95,68 +96,75 @@ bool Geometry::IsParticleInside(Particle* particle)
 {
     bool is_inside  =   false;
 
-    double dist     =   0;
+    pair<double,double> dist =   DistanceToBorder(particle);
 
-    if( object_.compare("box")==0 )
+    if(dist.first > 0 && dist.second < 0)
     {
-        double upper_x =   x0_ + 0.5*x_;
-        double lower_x =   x0_ - 0.5*x_;
-
-        double upper_y =   y0_ + 0.5*y_;
-        double lower_y =   y0_ - 0.5*y_;
-
-        double upper_z =   z0_ + 0.5*z_;
-        double lower_z =   z0_ - 0.5*z_;
-
-        //Figure out what happens if x/y/z == upper/lower...
-        if(    particle->GetX() < upper_x
-            && particle->GetX() > lower_x
-            && particle->GetY() < upper_y
-            && particle->GetY() > lower_y
-            && particle->GetZ() < upper_z
-            && particle->GetZ() > lower_z   )
-        {
-            is_inside   =   true;
-        }
-
-    }
-    else if( object_.compare("cylinder")==0 )
-    {
-        dist =    pow( (particle->GetX() -x0_) , 2.)
-                + pow( (particle->GetY() -y0_) , 2.);
-
-        double upper    =   z0_ + 0.5*z_;
-        double lower    =   z0_ - 0.5*z_;
-
-        //Figure out what happens if dist == radius/inner_radius z == upper/lower...
-        if(    particle->GetZ() < upper
-            && particle->GetZ() > lower
-            && dist             < radius_
-            && dist             > inner_radius_  )
-        {
-            is_inside   =   true;
-        }
-    }
-    else if( object_.compare("sphere")==0 )
-    {
-        dist =    pow( (particle->GetX() -x0_) , 2.)
-                + pow( (particle->GetY() -y0_) , 2.)
-                + pow( (particle->GetZ() -z0_) , 2.);
-
-        dist =  sqrt(dist);
-
-        //Figure out what happens if dist == radius/inner_radius...
-        if( dist < radius_ && dist > inner_radius_)
-        {
-            is_inside   =   true;
-        }
-
-    }
-    else
-    {
-        cerr<<"Error: In Geometry::IsParticleInside object name must be box/shpere/cylinder"<<endl;
+        is_inside   =   true;
     }
     return is_inside;
+
+
+//    if( object_.compare("box")==0 )
+//    {
+//        double upper_x =   x0_ + 0.5*x_;
+//        double lower_x =   x0_ - 0.5*x_;
+
+//        double upper_y =   y0_ + 0.5*y_;
+//        double lower_y =   y0_ - 0.5*y_;
+
+//        double upper_z =   z0_ + 0.5*z_;
+//        double lower_z =   z0_ - 0.5*z_;
+
+//        //Figure out what happens if x/y/z == upper/lower...
+//        if(    particle->GetX() < upper_x
+//            && particle->GetX() > lower_x
+//            && particle->GetY() < upper_y
+//            && particle->GetY() > lower_y
+//            && particle->GetZ() < upper_z
+//            && particle->GetZ() > lower_z   )
+//        {
+//            is_inside   =   true;
+//        }
+
+//    }
+//    else if( object_.compare("cylinder")==0 )
+//    {
+//        dist =    pow( (particle->GetX() -x0_) , 2.)
+//                + pow( (particle->GetY() -y0_) , 2.);
+
+//        double upper    =   z0_ + 0.5*z_;
+//        double lower    =   z0_ - 0.5*z_;
+
+//        //Figure out what happens if dist == radius/inner_radius z == upper/lower...
+//        if(    particle->GetZ() < upper
+//            && particle->GetZ() > lower
+//            && dist             < radius_
+//            && dist             > inner_radius_  )
+//        {
+//            is_inside   =   true;
+//        }
+//    }
+//    else if( object_.compare("sphere")==0 )
+//    {
+//        dist =    pow( (particle->GetX() -x0_) , 2.)
+//                + pow( (particle->GetY() -y0_) , 2.)
+//                + pow( (particle->GetZ() -z0_) , 2.);
+
+//        dist =  sqrt(dist);
+
+//        //Figure out what happens if dist == radius/inner_radius...
+//        if( dist < radius_ && dist > inner_radius_)
+//        {
+//            is_inside   =   true;
+//        }
+
+//    }
+//    else
+//    {
+//        cerr<<"Error: In Geometry::IsParticleInside object name must be box/shpere/cylinder"<<endl;
+//    }
+//    return is_inside;
 }
 
 
@@ -164,11 +172,11 @@ bool Geometry::IsParticleInside(Particle* particle)
 //----------------------------------------------------------------------------//
 
 
-double Geometry::DistanceToBorder(Particle* particle)
+pair<double,double> Geometry::DistanceToBorder(Particle* particle)
 {
-    if( !IsParticleInside(particle) ) return 0;
+    //if( !IsParticleInside(particle) ) return 0;
 
-    double distance =   0;
+    pair<double,double> distance;
 
     if( object_.compare("sphere")==0 )
     {
@@ -180,16 +188,16 @@ double Geometry::DistanceToBorder(Particle* particle)
         distance    =   DistanceToBorderBox(particle);
 
     }
-    else if( object_.compare("cylinder")==0 )
-    {
-        distance    =   DistanceToBorderCylinder(particle);
+//    else if( object_.compare("cylinder")==0 )
+//    {
+//        distance    =   DistanceToBorderCylinder(particle);
 
-    }
-    else
-    {
-        cerr<<"Warning: geometry type is not recognized! -1 is returned"<<endl;
-        return -1;
-    }
+//    }
+//    else
+//    {
+//        cerr<<"Warning: geometry type is not recognized! -1 is returned"<<endl;
+//        return -1;
+//    }
 
     return distance;
 }
@@ -319,7 +327,7 @@ void Geometry::swap(Geometry &geometry)
 //----------------------------------------------------------------------------//
 
 
-double Geometry::DistanceToBorderSphere(Particle* particle)
+pair<double,double> Geometry::DistanceToBorderSphere(Particle* particle)
 {
     // Calculate intersection of particle trajectory and the sphere
     // sphere (x1 + x0)^2 + (x2 + y0)^2 + (x3 + z0)^2 = radius^2
@@ -329,13 +337,14 @@ double Geometry::DistanceToBorderSphere(Particle* particle)
     // We are only interested in postive values of t
     // ( we want to find the intersection in direction of the particle trajectory)
 
-    double A,B,t1,t2,t;
+    double A,B,t1,t2;
     double dir_vec_x = particle->GetCosPhi()*particle->GetSinTheta();
     double dir_vec_y = particle->GetSinPhi()*particle->GetSinTheta();
     double dir_vec_z = particle->GetCosTheta();
 
-    double distance =   0;
+    pair<double,double> distance ;
 
+    double determinant;
 
     A   =    pow( (particle->GetX() - x0_),2 )
            + pow( (particle->GetY() - y0_),2 )
@@ -346,24 +355,58 @@ double Geometry::DistanceToBorderSphere(Particle* particle)
                 + (particle->GetY() - y0_)*dir_vec_y
                 + (particle->GetZ() - z0_)*dir_vec_z );
 
-    t1  =   -1*B/2 + sqrt( pow(B/2 ,2) - A );
-    t2  =   -1*B/2 - sqrt( pow(B/2 ,2) - A );
+    determinant =   pow(B/2 ,2) - A;
 
-    if(t1 > 0)
-        t   =   t1;
-    else
-        t   =   t2;
+    if( determinant > 0) // determinant == 0 (boundery point) is ignored
+    {
+        t1  =   -1*B/2 + sqrt( determinant );
+        t2  =   -1*B/2 - sqrt( determinant );
 
-    // t is the mupltiple of the direction vector we have to propagate untill the
-    // border is reached.
-    // But this sqhere might be hollow and we have to check if the inner border is
+        // (-1/-1) sphere is behind particle or particle is on border but moving outside
+        // ( dist_1 / dist_2 ) sphere is infront of the particle
+        // ( dist_1 / -1 ) particle is inside the sphere or on border and moving inside
+        if(t1 <= 0)
+            distance.first  =   -1;
+
+        else
+            distance.first  =   t1;
+
+        if(t2 <= 0)
+            distance.second =   -1;
+
+        else
+            distance.second =   t2;
+
+        // distance.first should be the smaller one
+        if( distance.first < 0)
+            std::swap(distance.first , distance.second);
+        if( distance.first > 0 && distance.second > 0 )
+        {
+            if( distance.second < distance.first)
+            {
+                std::swap(distance.first , distance.second);
+            }
+        }
+
+
+    }
+    else    // particle trajectory does not have an intersection with the sphere
+    {
+        distance.first  =   -1;
+        distance.second =   -1;
+    }
+
+    // No intersection so we don't have to check the distance to the inner sphere
+    // if there is any
+    if(distance.first < 0 && distance.second < 0)
+        return distance;
+
+    // This sqhere might be hollow and we have to check if the inner border is
     // reached before.
     // So we caluculate the intersection with the inner sphere.
 
     if(inner_radius_ > 0)
     {
-        double determinant;
-
         A   =    pow( (particle->GetX() - x0_),2 )
                + pow( (particle->GetY() - y0_),2 )
                + pow( (particle->GetZ() - z0_),2 )
@@ -380,22 +423,58 @@ double Geometry::DistanceToBorderSphere(Particle* particle)
             t1  =   -1*B/2 + sqrt( determinant );
             t2  =   -1*B/2 - sqrt( determinant );
 
-            // Ok we have a intersection with the inner sphere
-            // Now we have to find the closest
-            if( t1 != 0 && t1 < t)
+            // Ok we have an intersection with the inner sphere
+
+            // If distance.first and distance.second are positive this means
+            // the sphere is infornt of the particle. So the first distance
+            // ( intersection with the outer border) does not change
+            // but the second distance has to be updated (intersection with the inner border)
+            if(distance.first > 0 && distance.second > 0)
             {
-                t   =   t1;
+                if( t1 > 0 )
+                {
+                    if( t1 < distance.second )
+                        distance.second =   t1;
+
+                }
+                if( t2 > 0 )
+                {
+                    if( t2 < distance.second )
+                        distance.second =   t2;
+
+                }
             }
-            if( t2 != 0 && t2 < t)
+            else  // The particle is inside the outer sphere
             {
-                t   =   t2;
+                //The particle is inside the inner sphere
+                // which means outside the geometry
+                if((t1 > 0 && t2 < 0) || (t2 > 0 && t1 < 0))
+                {
+                    distance.first  =   -1;
+                }
+                // Now we have to check if the particle is on the border of
+                // the inner sphere
+                if(t1 == 0 )
+                {
+                    // The particle is moving into the inner sphere
+                    if( t2 > 0 )
+                    {
+                        distance.first  =   -1;
+                    }
+                    // if not we don't have to update distance.first
+                }
+                if(t2 == 0 )
+                {
+                    // The particle is moving into the inner sphere
+                    if( t1 > 0 )
+                    {
+                        distance.first  =   -1;
+                    }
+                    // if not we don't have to update distance.first
+                }
             }
         }
     }
-
-    //Cause length of direction vector is 1 distance is t
-
-    distance    =   t;
 
     return distance;
 }
@@ -405,7 +484,7 @@ double Geometry::DistanceToBorderSphere(Particle* particle)
 //----------------------------------------------------------------------------//
 
 
-double Geometry::DistanceToBorderBox(Particle* particle)
+pair<double,double> Geometry::DistanceToBorderBox(Particle* particle)
 {
     // Calculate intersection of particle trajectory and the box
     // Surface of the box is defined by six planes:
@@ -423,11 +502,13 @@ double Geometry::DistanceToBorderBox(Particle* particle)
     double dir_vec_y = particle->GetSinPhi()*particle->GetSinTheta();
     double dir_vec_z = particle->GetCosTheta();
 
-    double distance =   0;
+    pair<double,double> distance;
     double t;
     double intersection_x;
     double intersection_y;
     double intersection_z;
+
+    vector<double> dist;
 
     //intersection with E1
     if( dir_vec_x != 0) // if dir_vec == 0 particle trajectory is parallel to E1
@@ -444,8 +525,7 @@ double Geometry::DistanceToBorderBox(Particle* particle)
                 intersection_z >= (z0_ - 0.5*z_) &&
                 intersection_z <= (z0_ + 0.5*z_)    )
             {
-                distance    =   t;
-                return  distance;
+                dist.push_back( t );
             }
 
         }
@@ -466,8 +546,7 @@ double Geometry::DistanceToBorderBox(Particle* particle)
                 intersection_z >= (z0_ - 0.5*z_) &&
                 intersection_z <= (z0_ + 0.5*z_)    )
             {
-                distance    =   t;
-                return  distance;
+                dist.push_back( t );
             }
 
         }
@@ -488,8 +567,7 @@ double Geometry::DistanceToBorderBox(Particle* particle)
                 intersection_z >= (z0_ - 0.5*z_) &&
                 intersection_z <= (z0_ + 0.5*z_)    )
             {
-                distance    =   t;
-                return  distance;
+                dist.push_back( t );
             }
 
         }
@@ -510,8 +588,7 @@ double Geometry::DistanceToBorderBox(Particle* particle)
                 intersection_z >= (z0_ - 0.5*z_) &&
                 intersection_z <= (z0_ + 0.5*z_)    )
             {
-                distance    =   t;
-                return  distance;
+                dist.push_back( t );
             }
 
         }
@@ -532,8 +609,7 @@ double Geometry::DistanceToBorderBox(Particle* particle)
                 intersection_y >= (y0_ - 0.5*y_) &&
                 intersection_y <= (y0_ + 0.5*y_)    )
             {
-                distance    =   t;
-                return  distance;
+                dist.push_back( t );
             }
 
         }
@@ -554,17 +630,42 @@ double Geometry::DistanceToBorderBox(Particle* particle)
                 intersection_y >= (y0_ - 0.5*y_) &&
                 intersection_y <= (y0_ + 0.5*y_)    )
             {
-                distance    =   t;
-                return  distance;
+                dist.push_back( t );
             }
 
         }
     }
 
-    cerr<<"In Geometry::DistanceToBorderBox(Particle*) this point should nerver be reached..."<<endl;
-    cerr<<"-1 is returned"<<endl;
+    if( dist.size() < 1 )   // No intersection with the box
+    {
+        distance.first  =   -1;
+        distance.second =   -1;
+    }
+    if( dist.size() == 1 )  // Particle is inside the box and we have one intersection in direction of the particle trajectory
+    {
+        distance.first  =   dist.at(0);
+        distance.second =   -1;
+    }
+    if( dist.size() ==2 )   // Particle is outside and the box is infront of the particle trajectory ( two intersections). Chose closest
+    {
+        distance.first  =   dist.at(0);
+        distance.second =   dist.at(1);
+        if( distance.second <   distance.first)
+        {
+            std::swap(distance.first , distance.second);
+        }
 
-    return -1;
+    }
+    else
+    {
+        cerr<<"In Geometry::DistanceToBorderCylinder(Particle*) this point should nerver be reached..."<<endl;
+        cerr<<"(-1/-1) is returned"<<endl;
+
+        distance.first  =   -1;
+        distance.second =   -1;
+    }
+
+    return distance;
 }
 
 

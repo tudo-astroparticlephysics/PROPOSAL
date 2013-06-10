@@ -10,6 +10,7 @@
 
 #include "PROPOSAL/Particle.h"
 #include <string>
+#include <utility>
 
 class Geometry
 {
@@ -33,21 +34,23 @@ private:
      * This function calculates the distance of the particle position
      * to the border of the sphere (hollow sphere)
      * in direction of the particle trajectory.
-     * Note: This function is made to find the distance which the particle must be propagated
-     * INSIDE this geometry. So be sure that the particle is inside this geometry before
-     * calling this function ( use IsParticleInside(Particle*) )
+     * If the particle trajectory does not have an intersection with the sphere
+     * (-1 /-1) is returned
+     * If the particle trajectory has two intersections (dist_1 /dist_2) is returned
+     * If the particle has one intersection (dist_1 /-1) is returned
      */
-    double DistanceToBorderSphere(Particle* particle);
+    std::pair<double,double> DistanceToBorderSphere(Particle* particle);
 
 //----------------------------------------------------------------------------//
     /*!
      * This function calculates the distance of the particle position
      * to the border of the box in direction of the particle trajectory.
-     * Note: This function is made to find the distance which the particle must be propagated
-     * INSIDE this geometry. So be sure that the particle is inside this geometry before
-     * calling this function ( use IsParticleInside(Particle*) )
+     * If the particle trajectory does not have an intersection with the box
+     * (-1 /-1) is returned
+     * If the particle trajectory has two intersections (dist_1 /dist_2) is returned
+     * If the particle has one intersection (dist_1 /-1) is returned
      */
-    double DistanceToBorderBox(Particle* particle);
+    std::pair<double,double> DistanceToBorderBox(Particle* particle);
 
 //----------------------------------------------------------------------------//
     /*!
@@ -76,7 +79,7 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    double DistanceToBorder(Particle* particle);
+    std::pair<double,double> DistanceToBorder(Particle* particle);
 
 //----------------------------------------------------------------------------//
 
