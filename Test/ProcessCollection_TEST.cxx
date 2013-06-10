@@ -33,6 +33,71 @@ public:
     }
 };
 
+std::vector<Medium*>                CombOfMedium;
+std::vector<Particle*>              CombOfParticle;
+std::vector<EnergyCutSettings*>     CombOfEnergyCutSettings;
+std::vector<ProcessCollection*>         CombOfProcColl;
+
+TEST(Epairproduction , Set_Up ) {
+    ifstream in;
+    in.open("bin/TestFiles/ProcColl_Stoch.txt");
+
+    char firstLine[256];
+    in.getline(firstLine,256);
+
+    double e;
+    double e_new;
+    double energy;
+    double ecut;
+    double vcut;
+    string med;
+    string particleName;
+    bool lpm;
+    int para;
+
+    cout.precision(16);
+    double energy_old=-1;
+
+
+    bool first = true;
+    int NumberOfEvents, IonizEvents,BremsEvents,PhotoEvents,EpairEvents;
+    int i = -1;
+    while(in.good())
+    {
+        if(first)in>>ecut>>vcut>>lpm>>energy>>med>>particleName>> IonizEvents >> BremsEvents >> PhotoEvents >> EpairEvents;
+        first=false;
+        energy_old = -1;
+
+        i++;
+        CombOfMedium.push_back(new Medium(med,1.));
+        CombOfParticle.push_back(new Particle(particleName,1.,1.,1,.20,20,1e5,10));
+        CombOfParticle.at(i)->SetEnergy(energy);
+        CombOfEnergyCutSettings.push_back(new EnergyCutSettings(ecut,vcut));
+        CombOfProcColl.push_back(new ProcessCollection(CombOfParticle.at(i), CombOfMedium.at(i), CombOfEnergyCutSettings.at(i)));
+
+        for(unsigned int gna = 0; gna <CombOfProcColl.at(i)->GetCrosssections().size() ; gna++)
+        {
+            if(CombOfProcColl.at(i)->GetCrosssections().at(gna)->GetName().compare("Bremsstrahlung") == 0)
+            {
+                CombOfProcColl.at(i)->GetCrosssections().at(gna)->SetParametrization(1);
+            }
+            if(CombOfProcColl.at(i)->GetCrosssections().at(gna)->GetName().compare("Photonuclear") == 0)
+            {
+                CombOfProcColl.at(i)->GetCrosssections().at(gna)->SetParametrization(12);
+            }
+        }
+
+        CombOfProcColl.at(i)->EnableInterpolation();
+        cout << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << med << "\t" << particleName <<  endl;
+        while(energy_old < energy)
+        {
+            energy_old = energy;
+            in>>ecut>>vcut>>lpm>>energy>>med>>particleName>> IonizEvents >> BremsEvents >> PhotoEvents >> EpairEvents;
+        }
+    }
+}
+
+
 int CalcDev(int N, int ni)
 {
     double p = (1.0*ni) / N;
@@ -76,33 +141,41 @@ TEST(ProcessCollection , Stochasticity)
     RndFromFile* Rand = new RndFromFile("bin/TestFiles/rnd.txt");
     RndFromFile* Rand2 = new RndFromFile("bin/TestFiles/rnd.txt");
     Rand2->rnd();
+            ProcessCollection* ProcColl;
     while(in.good())
     {
         if(first)in>>ecut>>vcut>>lpm>>energy>>med>>particleName>> IonizEvents >> BremsEvents >> PhotoEvents >> EpairEvents;
         first=false;
 
         NumberOfEvents = IonizEvents+BremsEvents+PhotoEvents+EpairEvents;
-        cout << "NumberOfEvents: " << NumberOfEvents << endl;
         energy_old = -1;
+
         Medium *medium = new Medium(med,1.);
         Particle *particle = new Particle(particleName,1.,1.,1,.20,20,1e5,10);
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
 
-        ProcessCollection* ProcColl = new ProcessCollection(particle, medium, cuts);
-        for(unsigned int gna = 0; gna < ProcColl->GetCrosssections().size() ; gna++)
+        int i=0;
+        //cout << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << med << "\t" << particleName <<  endl;
+        while(i< CombOfProcColl.size())
         {
-            if(ProcColl->GetCrosssections().at(gna)->GetName().compare("Bremsstrahlung") == 0)
-            {
-                ProcColl->GetCrosssections().at(gna)->SetParametrization(1);
-            }
-            if(ProcColl->GetCrosssections().at(gna)->GetName().compare("Photonuclear") == 0)
-            {
-                ProcColl->GetCrosssections().at(gna)->SetParametrization(12);
-            }
+            if(         !particle->GetName().compare(CombOfParticle.at(i)->GetName())
+                    &&  !medium->GetName().compare(CombOfMedium.at(i)->GetName())
+                    &&  *cuts == *CombOfEnergyCutSettings.at(i))
+                break;
+            i++;
         }
-        if(NumberOfEvents!=0)ProcColl->EnableInterpolation();
-//        cout << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << med << "\t" << particleName <<  endl;
+
+        if(i<CombOfProcColl.size())
+        {
+            ProcColl = CombOfProcColl.at(i);
+            //cout << "found cross Section!" << endl;
+            //cout << CombOfEnergyCutSettings.at(i)->GetEcut() << "\t" << CombOfEnergyCutSettings.at(i)->GetVcut() << "\t" << CombOfMedium.at(i)->GetName() << "\t" << CombOfParticle.at(i)->GetName() << endl;
+        }
+        else
+        {
+            ProcColl = new ProcessCollection(particle, medium, cuts);
+        }
 
         pair<double,string> LossReturn;
         while(energy_old < energy){
@@ -177,7 +250,84 @@ TEST(ProcessCollection , Stochasticity)
         delete cuts;
         delete medium;
         delete particle;
-        delete ProcColl;
+    }
+}
+
+TEST(ProcessCollection , Displacement)
+{
+    ifstream in;
+    in.open("bin/TestFiles/ProcColl_Disp.txt");
+
+    char firstLine[256];
+    in.getline(firstLine,256);
+
+    double energy;
+    double ecut;
+    double vcut;
+    string med;
+    string particleName;
+    bool lpm;
+
+    cout.precision(16);
+    double energy_old=-1;
+
+    bool first = true;
+
+    double ef,dx,dx_new,dist=1;
+    ProcessCollection* ProcColl;
+    double RelError = 1E-2;
+    while(in.good())
+    {
+        if(first)in>>ecut>>vcut>>lpm>>med>>particleName>>energy>>ef>>dx;
+        first=false;
+
+        energy_old = -1;
+        Medium *medium = new Medium(med,1.);
+        Particle *particle = new Particle(particleName,1.,1.,1,.20,20,1e5,10);
+        particle->SetEnergy(energy);
+        EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
+
+        int i=0;
+        //cout << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << med << "\t" << particleName <<  endl;
+        while(i< CombOfProcColl.size())
+        {
+            if(         !particle->GetName().compare(CombOfParticle.at(i)->GetName())
+                    &&  !medium->GetName().compare(CombOfMedium.at(i)->GetName())
+                    &&  *cuts == *CombOfEnergyCutSettings.at(i))
+                break;
+            i++;
+        }
+
+        if(i<CombOfProcColl.size())
+        {
+            ProcColl = CombOfProcColl.at(i);
+            //cout << "found cross Section!" << endl;
+            //cout << CombOfEnergyCutSettings.at(i)->GetEcut() << "\t" << CombOfEnergyCutSettings.at(i)->GetVcut() << "\t" << CombOfMedium.at(i)->GetName() << "\t" << CombOfParticle.at(i)->GetName() << endl;
+        }
+        else
+        {
+            ProcColl = new ProcessCollection(particle, medium, cuts);
+        }
+
+        while(energy_old < energy){
+            energy_old = energy;
+
+            ProcColl->GetParticle()->SetEnergy(energy);
+            dx_new = ProcColl->CalculateDisplacement(energy,ef,dist);
+
+            if(fabs(1-dx_new/dx) > 1E-6)
+            {
+                cout << ecut << "\t" << vcut << "\t" << lpm << "\t" << med << "\t" << particleName << "\t" << energy << "\t" << ef << "\t" << dx << endl;
+                cout << dx << "\t" << dx_new << fabs(1-dx_new/dx) << endl;
+            }
+            ASSERT_NEAR(dx, dx_new, RelError*dx_new);
+
+            in>>ecut>>vcut>>lpm>>med>>particleName>>energy>>ef>>dx;
+        }
+
+        delete cuts;
+        delete medium;
+        delete particle;
     }
 }
 

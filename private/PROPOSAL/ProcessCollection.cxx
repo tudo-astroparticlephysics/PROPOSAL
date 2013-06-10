@@ -21,7 +21,7 @@ using namespace std;
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-
+//Formerly: double CrossSections::getdx(double ei, double ef, double dist)
 double ProcessCollection::CalculateDisplacement(double ei, double ef, double dist)
 {
     if(do_interpolation_)
