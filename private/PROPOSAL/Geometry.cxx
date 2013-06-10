@@ -50,6 +50,10 @@ void Geometry::InitSphere(double x0, double y0, double z0, double radius, double
         cerr<<"Warning: Inner radius is greater then radius (will be swaped)"<<endl;
         std::swap( inner_radius_ ,radius_ );
     }
+    if(inner_radius == radius_)
+    {
+        cerr<<"Warning: Inner radius == radius (Volume is 0)"<<endl;
+    }
     object_ =   "sphere";
 }
 
@@ -71,6 +75,10 @@ void Geometry::InitCylinder(double x0, double y0, double z0, double radius, doub
     {
         cerr<<"Warning: Inner radius is greater then radius (will be swaped)"<<endl;
         std::swap( inner_radius_ ,radius_ );
+    }
+    if(inner_radius == radius_)
+    {
+        cerr<<"Warning: Inner radius == radius (Volume is 0)"<<endl;
     }
 
     z_      =   z;
@@ -195,15 +203,15 @@ double Geometry::DistanceToBorder(Particle* particle)
 
 
 Geometry::Geometry()
-    :x0_            ( 0 )
-    ,y0_            ( 0 )
-    ,z0_            ( 0 )
-    ,inner_radius_  ( 0 )
-    ,radius_        ( 0 )
-    ,x_             ( 0 )
-    ,y_             ( 0 )
-    ,z_             ( 0 )
-    ,object_        ( "sqhere" )
+    :x0_            ( 0. )
+    ,y0_            ( 0. )
+    ,z0_            ( 0. )
+    ,inner_radius_  ( 0. )
+    ,radius_        ( 0. )
+    ,x_             ( 0. )
+    ,y_             ( 0. )
+    ,z_             ( 0. )
+    ,object_        ( "sphere" )
 {
 
 }

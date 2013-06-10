@@ -114,7 +114,7 @@ TEST(Assignment , Operator ) {
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
     Bremsstrahlung A(particle, medium, cuts);
     Bremsstrahlung B(particle, medium, cuts);
-    A.SetParametrization(6);
+    A.SetParametrization(3);
 
     EXPECT_TRUE(A!=B);
 

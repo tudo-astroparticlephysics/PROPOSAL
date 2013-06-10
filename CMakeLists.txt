@@ -119,6 +119,7 @@ IF(DoTesting)
   add_executable(UnitTest_Decay Test/Decay_TEST.cxx)
   add_executable(UnitTest_ProcessCollection Test/ProcessCollection_TEST.cxx)
   add_executable(UnitTest_ContinuousRandomization Test/ContinuousRandomization_TEST.cxx)
+  add_executable(UnitTest_Geometry Test/Geometry_TEST.cxx)
 
 
   target_link_libraries(UnitTest_StandardNormal PROPOSAL gtest gtest_main)
@@ -135,6 +136,8 @@ IF(DoTesting)
   target_link_libraries(UnitTest_Decay PROPOSAL gtest gtest_main)
   target_link_libraries(UnitTest_ProcessCollection PROPOSAL gtest gtest_main)
   target_link_libraries(UnitTest_ContinuousRandomization PROPOSAL gtest gtest_main)
+  target_link_libraries(UnitTest_Geometry PROPOSAL gtest gtest_main)
+
 
   add_test(UnitTest_ContinuousRandomization bin/UnitTest_ContinuousRandomization)
   add_test(UnitTest_ProcessCollection bin/UnitTest_ProcessCollection)
@@ -150,6 +153,7 @@ IF(DoTesting)
   add_test(UnitTest_Ionization bin/UnitTest_Ionization)
   add_test(UnitTest_Bremsstrahlung bin/UnitTest_Bremsstrahlung)
   add_test(UnitTest_Photonuclear bin/UnitTest_Photonuclear)
+  add_test(UnitTest_Geometry bin/UnitTest_Geometry)
 
 ENDIF()
 
