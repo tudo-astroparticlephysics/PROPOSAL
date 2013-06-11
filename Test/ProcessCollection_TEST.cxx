@@ -262,7 +262,7 @@ TEST(ProcessCollection , Displacement)
     in.getline(firstLine,256);
     if(!in.good())
     {
-        cerr << "File ProcColl_Disp.txt not found!" << endl;
+        cerr << "File ProcColl_Disps.txt not found!!" << endl;
         EXPECT_TRUE(false);
     }
     double energy;
@@ -450,13 +450,14 @@ TEST(ProcessCollection , FinalEnergyDist)
 
     double finalenergy,finalenergy_new,rnd=0.1;
     double dist;
+    double ef;
     ProcessCollection* ProcColl;
 
 
     double RelError = 1E-3;
     while(in.good())
     {
-        if(first)in>>ecut>>vcut>>lpm>>med>>particleName>> dist >> energy>>finalenergy;
+        if(first)in>>ecut>>vcut>>lpm>>med>>particleName>> dist >> energy>> ef >> finalenergy;
         first=false;
 
         energy_old = -1;
@@ -493,7 +494,7 @@ TEST(ProcessCollection , FinalEnergyDist)
             energy_old = energy;
 
             ProcColl->GetParticle()->SetEnergy(energy);
-            ProcColl->CalculateDisplacement(energy,energy/2,dist);
+            ProcColl->CalculateDisplacement(energy,ef,dist);
             finalenergy_new = ProcColl->CalculateFinalEnergy(energy, dist);
 
             if(fabs(1-finalenergy_new/finalenergy) > 1E-5)
@@ -503,7 +504,7 @@ TEST(ProcessCollection , FinalEnergyDist)
             }
             ASSERT_NEAR(finalenergy, finalenergy_new, RelError*finalenergy_new);
 
-            in>>ecut>>vcut>>lpm>>med>>particleName>> dist >> energy>>finalenergy;
+            in>>ecut>>vcut>>lpm>>med>>particleName>> dist >> energy>>ef>>finalenergy;
         }
 
         delete cuts;
