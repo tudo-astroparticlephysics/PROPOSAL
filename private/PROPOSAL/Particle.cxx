@@ -683,8 +683,8 @@ void Particle::Location(double time,
     z_           =   z;
     theta_       =   theta;
     phi_         =   phi;
-    theta_       *=  (PI/180);   //<--deg or rad??
-    phi_         *=  (PI/180);   //<--deg or rad??
+    theta_       *=  (PI/180);
+    phi_         *=  (PI/180);
     costh_       =   cos(theta_);
     sinth_       =   sin(theta_);
     cosph_       =   cos(phi_);

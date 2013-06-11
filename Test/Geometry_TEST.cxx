@@ -5,6 +5,7 @@
 #include <cmath>
 #include "PROPOSAL/Particle.h"
 #include "PROPOSAL/MathModel.h"
+#include "PROPOSAL/Constants.h"
 
 using namespace std;
 
@@ -120,8 +121,8 @@ TEST(IsInside , Box ) {
     double volumia_ratio =0;
 
     MathModel M;
-    int number_particles = 1e5;
-    int number_volumina  = 1e2;
+    int number_particles = 1e6;
+    int number_volumina  = 1e1;
 
 
 
@@ -349,132 +350,324 @@ TEST(IsInside , Box ) {
 }
 
 
-//TEST(IsInside , Cylinder ) {
-//    Geometry A;
+TEST(IsInside , Cylinder ) {
+    Geometry A;
 
-//    double x        =   0;
-//    double y        =   0;
-//    double z        =   0;
-//    double theta    =   90;
-//    double phi      =   0;
+    double x        =   0;
+    double y        =   0;
+    double z        =   0;
+    double theta    =   0;
+    double phi      =   0;
 
-//    double rnd_x;
-//    double rnd_y;
-//    double rnd_z;
+    double rnd_x;
+    double rnd_y;
+    double rnd_z;
 
-//    double radius       =   10;
-//    double inner_radius =   0;
-//    double hight        =   10;
+    double rnd_x0;
+    double rnd_y0;
+    double rnd_z0;
 
-//    double x0   =   0;
-//    double y0   =   0;
-//    double z0   =   0;
+    double rnd_theta;
+    double rnd_phi;
+    double rnd_inner_radius;
+
+    double radius       =   10;
+    double inner_radius =   0;
+    double height       =   10;
+
+    double big_width_x  =   4*radius;
+    double big_width_y  =   4*radius;
+    double big_height   =   4*height;
+
+    double x0   =   0;
+    double y0   =   0;
+    double z0   =   0;
+
+    Particle * particle = new Particle("mu",x,y,z,theta,phi,0,0);
+    int is_inside  =0;
+    int is_outside =0;
+
+    double volumia_ratio =0;
+
+    MathModel M;
+    int number_particles = 1e6;
+    int number_volumina  = 1e1;
+
+    for(int i = 0; i<number_volumina; i++)
+    {
+
+        // Chose the origin of the box-geometry
+        // This box should be inside the big box in which the particle
+        // will be located
+        rnd_x0  = M.RandomDouble();
+        rnd_y0  = M.RandomDouble();
+        rnd_z0  = M.RandomDouble();
+
+        x0   =   ( 2 * rnd_x  - 1)* ( 0.5 * big_width_x - radius );
+        y0   =   ( 2 * rnd_y  - 1)* ( 0.5 * big_width_y - radius );
+        z0   =   ( 2 * rnd_z  - 1)* 0.5 *( big_height  - height  );
+
+        rnd_inner_radius    = M.RandomDouble();
+
+        inner_radius    = radius*rnd_inner_radius;
+
+        A.InitCylinder(x0,y0,z0,radius,inner_radius,height);
+
+        volumia_ratio = height*PI*( pow(radius,2) - pow(inner_radius,2) )
+                /( big_width_x*big_width_y*big_height);
+
+        for(int j = 0; j<number_particles; j++)
+        {
+
+            // Chose particle location and angle
+            rnd_x   = M.RandomDouble();
+            rnd_y   = M.RandomDouble();
+            rnd_z   = M.RandomDouble();
+
+            rnd_theta   = M.RandomDouble();
+            rnd_phi     = M.RandomDouble();
+
+            theta   = rnd_theta*180;
+            phi     = rnd_phi*360;
+
+            x   =   ( 2 * rnd_x  - 1)* 0.5 * big_width_x;
+            y   =   ( 2 * rnd_y  - 1)* 0.5 * big_width_y;
+            z   =   ( 2 * rnd_z  - 1)* 0.5 * big_height;
+
+            particle->SetX(x);
+            particle->SetY(y);
+            particle->SetZ(z);
+            particle->SetTheta(theta);
+            particle->SetPhi(phi);
+
+            // if this constraints are true the particle is inside the box geometry
+            if( sqrt( pow( (x-x0),2 ) + pow( (y-y0),2 ) ) < radius &&
+                sqrt( pow( (x-x0),2 ) + pow( (y-y0),2 ) ) > inner_radius &&
+                z > z0 - 0.5*height  &&
+                z < z0 + 0.5*height )
+            {
+
+                is_inside++;
+                EXPECT_TRUE(A.IsParticleInside(particle));
+            }
+            else
+            {
+                is_outside++;
+                EXPECT_FALSE(A.IsParticleInside(particle));
+            }
+        }
+        cout << is_inside<<"\t"<<is_outside<<"\t"<<volumia_ratio*number_particles<<endl;
+        //ASSERT_NEAR(1.*is_inside ,volumia_ratio*number_particles , 3*sqrt(volumia_ratio*number_particles) );
+        is_inside   = 0;
+        is_outside  = 0;
+    }
+}
+
+TEST(IsInside , Sphere ) {
+    double x        =   0;
+    double y        =   0;
+    double z        =   0;
+    double theta    =   0;
+    double phi      =   0;
+
+    double rnd_x;
+    double rnd_y;
+    double rnd_z;
+
+    double rnd_x0;
+    double rnd_y0;
+    double rnd_z0;
+    double rnd_inner_radius;
+
+    double rnd_theta;
+    double rnd_phi;
+
+    double radius       =   10;
+    double inner_radius =   0;
+
+    double big_width_x  =   4*radius;
+    double big_width_y  =   4*radius;
+    double big_height   =   4*radius;
+
+    double x0   =   0;
+    double y0   =   0;
+    double z0   =   0;
+
+    Particle * particle = new Particle("mu",x,y,z,theta,phi,0,0);
+    int is_inside  =0;
+    int is_outside =0;
+
+    double volumia_ratio =0;
+
+    MathModel M;
+    int number_particles = 1e6;
+    int number_volumina  = 1e1;
+
+    Geometry A;
+
+    for(int i = 0; i<number_volumina; i++)
+    {
+        // Chose the origin of the box-geometry
+        // This box should be inside the big box in which the particle
+        // will be located
+        rnd_x0  = M.RandomDouble();
+        rnd_y0  = M.RandomDouble();
+        rnd_z0  = M.RandomDouble();
+
+        rnd_inner_radius    = M.RandomDouble();
+
+        x0   =   ( 2 * rnd_x  - 1)* ( 0.5 * big_width_x - radius );
+        y0   =   ( 2 * rnd_y  - 1)* ( 0.5 * big_width_y - radius );
+        z0   =   ( 2 * rnd_z  - 1)* ( 0.5 * big_height  - radius );
+
+        inner_radius    = radius*rnd_inner_radius;
+
+        A.InitSphere(x0,y0,z0,radius,inner_radius);
+
+        volumia_ratio = (4./3.*PI* ( pow(radius ,3)  - pow(inner_radius ,3) ) )
+                        /( big_width_x*big_width_y*big_height);
+
+        for(int j = 0; j<number_particles; j++)
+        {
+
+            // Chose particle location and angle
+            rnd_x   = M.RandomDouble();
+            rnd_y   = M.RandomDouble();
+            rnd_z   = M.RandomDouble();
+
+            rnd_theta   = M.RandomDouble();
+            rnd_phi     = M.RandomDouble();
+
+            theta   = rnd_theta*180;
+            phi     = rnd_phi*360;
+
+            x   =   ( 2 * rnd_x  - 1)* 0.5 * big_width_x;
+            y   =   ( 2 * rnd_y  - 1)* 0.5 * big_width_y;
+            z   =   ( 2 * rnd_z  - 1)* 0.5 * big_height;
+
+            particle->SetX(x);
+            particle->SetY(y);
+            particle->SetZ(z);
+            particle->SetTheta(theta);
+            particle->SetPhi(phi);
+
+            if( sqrt( pow( (x-x0),2 ) + pow( (y-y0),2 ) + pow( (z-z0),2 ) ) < radius &&
+                sqrt( pow( (x-x0),2 ) + pow( (y-y0),2 ) + pow( (z-z0),2 ) ) > inner_radius )
+
+            {
+                is_inside++;
+                EXPECT_TRUE(A.IsParticleInside(particle));
+            }
+            else
+            {
+                is_outside++;
+                EXPECT_FALSE(A.IsParticleInside(particle));
+            }
+        }
+        ASSERT_NEAR(1.*is_inside ,volumia_ratio*number_particles , 3*sqrt(volumia_ratio*number_particles) );
+        is_inside   = 0;
+        is_outside  = 0;
+    }
+
+    // Test borders
+    A.InitSphere(0,0,0,radius,0);
+
+    z=0;
+    particle->SetZ(z);
+
+    double cos;
+    double dir_vec_x;
+    double dir_vec_y;
+    double dir_vec_z;
+
+    int excluded =0 ;
+    for(int i = 0; i<1e4; i++)
+    {
+        rnd_x = M.RandomDouble();
+
+        x   =   radius * rnd_x;
+        y   =   radius *sqrt(1 - rnd_x*rnd_x);
 
 
-//    A.InitCylinder(x0,y0,z0,radius,inner_radius,hight);
+        particle->SetX(x);
+        particle->SetY(y);
 
-//    Particle * particle = new Particle("mu",x,y,z,theta,phi,0,0);
+        rnd_theta   = M.RandomDouble();
+        rnd_phi     = M.RandomDouble();
 
-//    int counter =0;
-//    int counter2 =0;
+        theta   = rnd_theta*180;
+        phi     = rnd_phi*360;
+        particle->SetTheta(theta);
+        particle->SetPhi(phi);
 
-//    MathModel M;
-//    M.set_seed(3838);
+        dir_vec_x = particle->GetCosPhi()*particle->GetSinTheta();
+        dir_vec_y = particle->GetSinPhi()*particle->GetSinTheta();
+        dir_vec_z = particle->GetCosTheta();
 
-//    for(int i = 0; i<1e7; i++)
-//    {
-//        rnd_x   = M.RandomDouble();
-//        rnd_y   = M.RandomDouble();
-//        rnd_z   = M.RandomDouble();
+        //cosine of angle between direction vector and position vector
+        cos = (-x * dir_vec_x -y*dir_vec_y - z* dir_vec_z) / radius;
 
-//        rnd_x   = M.RandomDouble();
-//        rnd_y   = M.RandomDouble();
-//        rnd_z   = M.RandomDouble();
+        // Computer precision controll
+        if(x*x+y*y -radius*radius ==0 )
+        {
+            if(cos < 1 && cos > 0)
+                EXPECT_TRUE(A.IsParticleInside(particle));
+            else
+                EXPECT_FALSE(A.IsParticleInside(particle));
+        }
+        else
+            excluded++;
+    }
 
-//        x   =   ( 2 * rnd_x  - 1)*radius;
-//        y   =   ( 2 * rnd_y  - 1)*radius;
-//        z   =   ( 2 * rnd_z  - 1)*hight;
 
-//        particle->SetX(x);
-//        particle->SetY(y);
-//        particle->SetZ(z);
+    // Test inner border
+    inner_radius    =   5;
+    A.InitSphere(0,0,0,radius,inner_radius);
 
-////        if(A.IsParticleInside(particle))counter++;
-////        else counter2++;
-//        if( sqrt( x*x + y*y) < radius &&
-//            sqrt( x*x + y*y) > inner_radius &&
-//            z > z0 - 0.5*hight  &&
-//            z < z0 + 0.5*hight )
-//        {
-//            counter++;
-//            EXPECT_TRUE(A.IsParticleInside(particle));
-//        }
-//        else
-//        {
-//            counter2++;
-//            EXPECT_FALSE(A.IsParticleInside(particle));
-//        }
+    z=0;
+    particle->SetZ(z);
 
-//    }
-//    cout<<counter<<"\t"<<counter2<<endl;
-//}
+    excluded=0;
 
-//TEST(IsInside , Sphere ) {
-//    Geometry A;
+    for(int i = 0; i<1e4; i++)
+    {
+        rnd_x = M.RandomDouble();
 
-//    double x        =   0;
-//    double y        =   0;
-//    double z        =   0;
-//    double theta    =   0;
-//    double phi      =   0;
+        x   =   inner_radius * rnd_x;
+        y   =   inner_radius *sqrt(1 - rnd_x*rnd_x);
 
-//    double rnd_x;
-//    double rnd_y;
-//    double rnd_z;
 
-//    double radius       =   60;
-//    double inner_radius =   0;
+        particle->SetX(x);
+        particle->SetY(y);
 
-//    A.InitSphere(0.,0.,0.,radius,inner_radius);
+        rnd_theta   = M.RandomDouble();
+        rnd_phi     = M.RandomDouble();
 
-//    Particle * particle = new Particle("mu",x,y,z,theta,phi,0,0);
-//    int counter =0;
-//    int counter2 =0;
+        theta   = rnd_theta*180;
+        phi     = rnd_phi*360;
+        particle->SetTheta(theta);
+        particle->SetPhi(phi);
 
-//    MathModel M;
+        dir_vec_x = particle->GetCosPhi()*particle->GetSinTheta();
+        dir_vec_y = particle->GetSinPhi()*particle->GetSinTheta();
+        dir_vec_z = particle->GetCosTheta();
 
-//    for(int i = 0; i<10000000; i++)
-//    {
-//        rnd_x   = M.RandomDouble();
-//        rnd_y   = M.RandomDouble();
-//        rnd_z   = M.RandomDouble();
+        //cosine of angle between direction vector and position vector
+        cos = (-x * dir_vec_x -y*dir_vec_y - z* dir_vec_z) / radius;
 
-//        rnd_x   = M.RandomDouble();
-//        rnd_y   = M.RandomDouble();
-//        rnd_z   = M.RandomDouble();
+        // Computer precision controll
+        if(x*x+y*y -inner_radius*inner_radius ==0 )
+        {
+            if(cos < 1 && cos > 0)
+                EXPECT_FALSE(A.IsParticleInside(particle));
+            else
+                EXPECT_TRUE(A.IsParticleInside(particle));
 
-//        x   =   ( 2 * rnd_x  - 1)*radius;
-//        y   =   ( 2 * rnd_y  - 1)*radius;
-//        z   =   ( 2 * rnd_z  - 1)*radius;
-
-//        particle->SetX(x);
-//        particle->SetY(y);
-//        particle->SetZ(z);
-
-//        if( sqrt( x*x + y*y + z*z) < radius && sqrt( x*x + y*y + z*z) > inner_radius)
-//        {
-//            counter++;
-//            EXPECT_TRUE(A.IsParticleInside(particle));
-//        }
-//        else
-//        {
-//            counter2++;
-//            EXPECT_FALSE(A.IsParticleInside(particle));
-//        }
-
-//    }
-//    cout<<counter<<"\t"<<counter2<<endl;
-//}
+        }
+        else
+            excluded++;
+    }
+}
 
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);

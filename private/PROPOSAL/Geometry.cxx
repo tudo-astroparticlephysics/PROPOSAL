@@ -768,6 +768,7 @@ pair<double,double> Geometry::DistanceToBorderCylinder(Particle* particle)
             {
                 intersection_x  =   particle->GetX() + t * dir_vec_x;
                 intersection_y  =   particle->GetY() + t * dir_vec_y;
+
                 if(sqrt( pow( (intersection_x -x0_) ,2) + pow( (intersection_y - y0_) ,2 ) ) < radius_ )
                 {
                     dist.push_back( t );
@@ -776,7 +777,7 @@ pair<double,double> Geometry::DistanceToBorderCylinder(Particle* particle)
         }
 
         //intersection with E2
-        if( dir_vec_z != 0) // if dir_vec == 0 particle trajectory is parallel to E1 (Should not happen)
+        if( dir_vec_z != 0) // if dir_vec == 0 particle trajectory is parallel to E2 (Should not happen)
         {
             t   =  ( z0_ - 0.5*z_ - particle->GetZ() ) / dir_vec_z;
 
@@ -784,8 +785,10 @@ pair<double,double> Geometry::DistanceToBorderCylinder(Particle* particle)
             {
                 intersection_x  =   particle->GetX() + t * dir_vec_x;
                 intersection_y  =   particle->GetY() + t * dir_vec_y;
+
                 if(sqrt( pow( (intersection_x - x0_) ,2) + pow( (intersection_y - y0_) ,2 ) ) < radius_ )
                 {
+
                     dist.push_back( t );
                 }
             }
@@ -816,8 +819,11 @@ pair<double,double> Geometry::DistanceToBorderCylinder(Particle* particle)
 
     }
     else
-    {
-        cerr<<"Warning: In DistanceToBorderCylinder(Particle* particle) this point should never be reached"<<endl;
+    {/*
+        cout<<dist.size()<<endl;
+        for(unsigned int i= 0;i<dist.size();i++ )
+            cout<<dist.at(i)<<endl;
+        cerr<<"Warning: In DistanceToBorderCylinder(Particle* particle) this point should never be reached"<<endl;*/
     }
     // This cylinder might be hollow and we have to check if the inner border is
     // reached before.
