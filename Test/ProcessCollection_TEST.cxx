@@ -453,10 +453,7 @@ TEST(ProcessCollection , FinalEnergyDist)
     ProcessCollection* ProcColl;
 
 
-    //RelError is mostly better than 1E-2.
-    //It differs just 1.8E-3 for electrons in air and
-    //in most cases is in the order of the integration precision 1E-6.
-    double RelError = 1E-2;
+    double RelError = 1E-3;
     while(in.good())
     {
         if(first)in>>ecut>>vcut>>lpm>>med>>particleName>> dist >> energy>>finalenergy;
@@ -496,6 +493,7 @@ TEST(ProcessCollection , FinalEnergyDist)
             energy_old = energy;
 
             ProcColl->GetParticle()->SetEnergy(energy);
+            ProcColl->CalculateDisplacement(energy,energy/2,dist);
             finalenergy_new = ProcColl->CalculateFinalEnergy(energy, dist);
 
             if(fabs(1-finalenergy_new/finalenergy) > 1E-5)
@@ -506,6 +504,185 @@ TEST(ProcessCollection , FinalEnergyDist)
             ASSERT_NEAR(finalenergy, finalenergy_new, RelError*finalenergy_new);
 
             in>>ecut>>vcut>>lpm>>med>>particleName>> dist >> energy>>finalenergy;
+        }
+
+        delete cuts;
+        delete medium;
+        delete particle;
+    }
+}
+
+
+TEST(ProcessCollection , FinalEnergyParticleInteraction)
+{
+    ifstream in;
+    in.open("bin/TestFiles/ProcColl_FinalEnergyParticleInteraction.txt");
+
+    char firstLine[256];
+    in.getline(firstLine,256);
+    if(!in.good())
+    {
+        cerr << "File ProcColl_FinalEnergyParticleInteraction.txt not found!" << endl;
+        EXPECT_TRUE(false);
+    }
+    double energy;
+    double ecut;
+    double vcut;
+    string med;
+    string particleName;
+    bool lpm;
+
+    cout.precision(16);
+    double energy_old=-1;
+
+    bool first = true;
+
+    double FinalEnergy,FinalEnergy_new,rnd;
+    ProcessCollection* ProcColl;
+    bool particle_interaction;
+
+    //RelError is mostly better than 1E-2.
+    //It differs just 1.8E-3 for electrons in air and
+    //in most cases is in the order of the integration precision 1E-6.
+    double RelError = 1E-2;
+    while(in.good())
+    {
+        if(first)in>>ecut>>vcut>>lpm>>med>>particleName>> energy>> particle_interaction >> rnd >> FinalEnergy;
+        first=false;
+
+        energy_old = -1;
+        Medium *medium = new Medium(med,1.);
+        Particle *particle = new Particle(particleName,1.,1.,1,.20,20,1e5,10);
+        particle->SetEnergy(energy);
+        EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
+
+        int i=0;
+        //cout << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << med << "\t" << particleName <<  endl;
+        while(i< CombOfProcColl.size())
+        {
+            if(         !particle->GetName().compare(CombOfParticle.at(i)->GetName())
+                    &&  !medium->GetName().compare(CombOfMedium.at(i)->GetName())
+                    &&  *cuts == *CombOfEnergyCutSettings.at(i))
+                break;
+            i++;
+        }
+
+        if(i<CombOfProcColl.size())
+        {
+            ProcColl = CombOfProcColl.at(i);
+            //cout << "found cross Section!" << endl;
+            //cout << CombOfEnergyCutSettings.at(i)->GetEcut() << "\t" << CombOfEnergyCutSettings.at(i)->GetVcut() << "\t" << CombOfMedium.at(i)->GetName() << "\t" << CombOfParticle.at(i)->GetName() << endl;
+        }
+        else
+        {
+            ProcColl = new ProcessCollection(particle, medium, cuts);
+            ProcColl->EnableInterpolation();
+        }
+
+        while(energy_old < energy){
+            energy_old = energy;
+
+            ProcColl->GetParticle()->SetEnergy(energy);
+            FinalEnergy_new = ProcColl->CalculateTrackingIntegal(energy,rnd,particle_interaction);
+            FinalEnergy_new = ProcColl->CalculateFinalEnergy(energy,rnd,particle_interaction);
+
+            if(fabs(1-FinalEnergy_new/FinalEnergy) > 1E-5)
+            {
+                cout << ecut << "\t" << vcut << "\t" << lpm << "\t" << med << "\t" << particleName << "\t" << particle_interaction << "\t" << rnd << "\t" << energy << "\t" << FinalEnergy << endl;
+                cout << FinalEnergy << "\t" << FinalEnergy_new << "\t" << fabs(1-FinalEnergy_new/FinalEnergy)  << endl;
+            }
+            ASSERT_NEAR(FinalEnergy, FinalEnergy_new, RelError*FinalEnergy_new);
+
+            in>>ecut>>vcut>>lpm>>med>>particleName>> energy>> particle_interaction >> rnd >> FinalEnergy;
+        }
+
+        delete cuts;
+        delete medium;
+        delete particle;
+    }
+}
+
+TEST(ProcessCollection , MakeDecay)
+{
+    ifstream in;
+    in.open("bin/TestFiles/ProcColl_MakeDecay.txt");
+
+    char firstLine[256];
+    in.getline(firstLine,256);
+    if(!in.good())
+    {
+        cerr << "File ProcColl_MakeDecay.txt not found!" << endl;
+        EXPECT_TRUE(false);
+    }
+    double energy;
+    double ecut;
+    double vcut;
+    string med;
+    string particleName;
+    bool lpm;
+
+    cout.precision(16);
+    double energy_old=-1;
+
+    bool first = true;
+
+    pair<double,string> Decay_new;
+    pair<double,string> Decay_old;
+
+    ProcessCollection* ProcColl;
+
+    double RelError = 1E-2;
+    double rnd1,rnd2,rnd3;
+    while(in.good())
+    {
+        if(first)in>>ecut>>vcut>>lpm>>med>>particleName>> rnd1>>rnd2>>rnd3 >> energy>> Decay_old.first >> Decay_old.second;
+        first=false;
+
+        energy_old = -1;
+        Medium *medium = new Medium(med,1.);
+        Particle *particle = new Particle(particleName,1.,1.,1,.20,20,1e5,10);
+        particle->SetEnergy(energy);
+        EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
+
+        int i=0;
+        //cout << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << med << "\t" << particleName <<  endl;
+        while(i< CombOfProcColl.size())
+        {
+            if(         !particle->GetName().compare(CombOfParticle.at(i)->GetName())
+                    &&  !medium->GetName().compare(CombOfMedium.at(i)->GetName())
+                    &&  *cuts == *CombOfEnergyCutSettings.at(i))
+                break;
+            i++;
+        }
+
+        if(i<CombOfProcColl.size())
+        {
+            ProcColl = CombOfProcColl.at(i);
+            //cout << "found cross Section!" << endl;
+            //cout << CombOfEnergyCutSettings.at(i)->GetEcut() << "\t" << CombOfEnergyCutSettings.at(i)->GetVcut() << "\t" << CombOfMedium.at(i)->GetName() << "\t" << CombOfParticle.at(i)->GetName() << endl;
+        }
+        else
+        {
+            ProcColl = new ProcessCollection(particle, medium, cuts);
+        }
+
+        while(energy_old <= energy){
+            energy_old = energy;
+
+            ProcColl->GetParticle()->SetEnergy(energy);
+            Decay_new = ProcColl->MakeDecay(rnd1,rnd2,rnd3);
+
+            if(fabs(1-Decay_old.first/Decay_new.first) > 1E-5)
+            {
+                cout << ecut << "\t" << vcut << "\t" << lpm << "\t" << med << "\t" << particleName << "\t" << rnd1 << "\t" << rnd2 <<"\t" << rnd3 << "\t" << energy << "\t" <<  Decay_old.first << "\t" << Decay_old.second << endl;
+                cout << rnd1 << "\t" << rnd2 << "\t" << rnd3 << endl;
+                cout << Decay_old.first << "\t" << Decay_new.first << "\t" << fabs(1-Decay_old.first/Decay_new.first)  << endl;
+            }
+
+            ASSERT_NEAR(Decay_new.first, Decay_old.first, RelError*Decay_new.first);
+            ASSERT_FALSE(   Decay_old.second.compare(   Decay_new.second    )    );
+
+            in>>ecut>>vcut>>lpm>>med>>particleName>> rnd1>>rnd2>>rnd3 >> energy>> Decay_old.first >> Decay_old.second;
         }
 
         delete cuts;

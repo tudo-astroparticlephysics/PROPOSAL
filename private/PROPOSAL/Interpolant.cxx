@@ -1490,7 +1490,7 @@ double Interpolant::Slog(double x)
     else
     {
         x_save_  =   x;
-        y_save_  =   log(x_save_);
+        y_save_  =   Log(x_save_);
 
         return y_save_;
     }

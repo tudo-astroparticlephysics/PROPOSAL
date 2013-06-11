@@ -231,7 +231,7 @@ public:
      */
     std::pair<double,std::string> MakeStochasticLoss();
 
-    std::pair<double,std::string> MakeStochasticLoss(double Rnd1,double Rnd2, double Rnd3);
+    std::pair<double,std::string> MakeStochasticLoss(double rnd1,double rnd2, double rnd3);
 //----------------------------------------------------------------------------//
 
     /**
@@ -241,6 +241,7 @@ public:
      */
     std::pair<double,std::string> MakeDecay();
 
+    std::pair<double,std::string> MakeDecay(double rnd1,double rnd2, double rnd3);
 //----------------------------------------------------------------------------//
     /**
      * Enables the Interpolation including dEdx and dNdx for

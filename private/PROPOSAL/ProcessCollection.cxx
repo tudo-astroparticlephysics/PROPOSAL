@@ -139,7 +139,7 @@ double ProcessCollection::CalculateFinalEnergy(double ei, double dist)
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-
+//Formerly: double Propagate::getef(double ei, double rnd, bool pint)
 double ProcessCollection::CalculateFinalEnergy(double ei, double rnd, bool particle_interaction)
 {
     if( do_interpolation_ )
@@ -158,7 +158,7 @@ double ProcessCollection::CalculateFinalEnergy(double ei, double rnd, bool parti
                     }
                     else
                     {
-                        aux =   interpol_prop_decay_->FindLimit(storeDif_.at(1)-rnd);
+                        aux =   interpol_prop_decay_->FindLimit(storeDif_.at(0)-rnd);
                     }
                 }
                 else
@@ -172,7 +172,6 @@ double ProcessCollection::CalculateFinalEnergy(double ei, double rnd, bool parti
                         aux =   interpol_prop_decay_->FindLimit(storeDif_.at(0)+rnd);
                     }
                 }
-
                 if(abs(ei-aux) > abs(ei)*HALF_PRECISION)
                 {
                     return min(max(aux, particle_->GetLow()), ei);
@@ -205,6 +204,7 @@ double ProcessCollection::CalculateFinalEnergy(double ei, double rnd, bool parti
                     else
                     {
                         aux =   interpol_prop_decay_->FindLimit(storeDif_.at(0)+rnd);
+                        cout << "aux: " << aux << endl;
                     }
                 }
 
@@ -248,11 +248,8 @@ pair<double,string> ProcessCollection::MakeStochasticLoss()
     return this->MakeStochasticLoss(MathModel::RandomDouble(),MathModel::RandomDouble(),MathModel::RandomDouble());
 }
 
-pair<double,string> ProcessCollection::MakeStochasticLoss(double Rnd1,double Rnd2, double Rnd3)
+pair<double,string> ProcessCollection::MakeStochasticLoss(double rnd1,double rnd2, double rnd3)
 {
-    double rnd1                =    Rnd1;
-    double rnd2                =    Rnd2;
-    double rnd3                =    Rnd3;
     double total_rate          =    0;
     double total_rate_weighted =    0;
     double decayS              =    0;
@@ -331,26 +328,25 @@ pair<double,string> ProcessCollection::MakeStochasticLoss(double Rnd1,double Rnd
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-
 pair<double,string> ProcessCollection::MakeDecay()
 {
-    double rnd1    =   MathModel::RandomDouble();
-    double rnd2    =   MathModel::RandomDouble();
-    double rnd3    =   MathModel::RandomDouble();
+    return MakeDecay(MathModel::RandomDouble(),MathModel::RandomDouble(),MathModel::RandomDouble());
+}
 
+pair<double,string> ProcessCollection::MakeDecay(double rnd1,double rnd2, double rnd3)
+{
     pair<double,string> decay;
 
     if(particle_->GetType() ==2)
     {
         decay.first     =   decay_->CalculateProductEnergy(rnd1, rnd2, rnd3);
-        decay.second    =   decay_->GetOut();
     }
     else
     {
         decay.first     =   decay_->CalculateProductEnergy(rnd2, rnd3, 0.5);
-        decay.second    =   decay_->GetOut();
-
     }
+
+    decay.second    =   decay_->GetOut();
 
     return decay;
 }

@@ -159,43 +159,19 @@ using namespace std;
 
 int main(int argc, char** argv){
 
-    Medium *medium = new Medium("air",1.);
+    Medium *medium = new Medium("uranium",1.);
     Particle *particle = new Particle("mu",1.,1.,1,.20,20,1e5,10);
-    EnergyCutSettings *cut_settings = new EnergyCutSettings(500,0.05);
+    double energy = 100000000000000;
+    particle->SetEnergy(100000000000000);
+    EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
 
-    vector<CrossSections*> crosssections;
+    ProcessCollection* ProcColl = new ProcessCollection(particle, medium, cuts);
+    ProcColl->EnableInterpolation();
 
-    crosssections.resize(4);
-    crosssections.at(0) = new Ionization(particle, medium, cut_settings);
-    crosssections.at(1) = new Photonuclear(particle, medium, cut_settings);
-    crosssections.at(2) = new Epairproduction(particle, medium, cut_settings);
-    crosssections.at(3) = new Bremsstrahlung(particle, medium, cut_settings);
-    ContinuousRandomization *A = new ContinuousRandomization(particle, medium, crosssections);
-
-    for(unsigned int i=0 ; i<crosssections.size();i++)
-    {
-        crosssections.at(i)->EnableDEdxInterpolation();
-        crosssections.at(i)->EnableDNdxInterpolation();
-        cout<<"cross\t"<<i<<endl;
-    }
-
-    A->EnableDE2dxInterpolation();
-    cout<<"cront x \t"<<endl;
-    A->EnableDE2deInterpolation();
-    cout<<"cront e \t"<<endl;
-
-    particle->SetEnergy(1e6);
-    cout<<A->Randomize(particle->GetEnergy(),3e5,0.9)<<endl;
-//    double pr_result;
-//    Propagator* pr = new Propagator();
-//    pr->Setup(argc, argv);
-//    cout<<pr->GetCollection()->GetCrosssections().at(1)->GetMultiplier()<<endl;
-//    pr->EnableInterpolation();
-//    for(int i =0;i<1;i++){
-//        pr->GetParticle()->SetEnergy(1e8);
-//        pr_result=pr->Propagate(1e4);
-//        cout<<" --------\t"<<pr_result<<"\t"<<pr->GetParticle()->GetEnergy()<<"\t"<<pr->GetParticle()->GetT()<<endl;
-//        //  pr->Propagate(1e5,1e5);
-//      //  cout<<pr->GetCollection()->MakeStochasticLoss(true,1e4)<<endl;
-//    }
+    double FinalEnergy_new,rnd=0.3978801863268018;
+    bool particle_interaction = false;
+    FinalEnergy_new = ProcColl->CalculateTrackingIntegal(energy,rnd,particle_interaction);
+    cout << "Tracking: " << FinalEnergy_new << endl;
+    FinalEnergy_new = ProcColl->CalculateFinalEnergy(energy,rnd,particle_interaction);
+    cout << "FinalEnergy: " << FinalEnergy_new << endl;
 }

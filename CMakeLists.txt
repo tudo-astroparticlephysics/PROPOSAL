@@ -103,7 +103,7 @@ target_link_libraries(PROPOSALtest PROPOSAL)
 IF(DoTesting)
   execute_process(COMMAND mkdir ${PROPOSAL_BINARY_DIR}/bin/ OUTPUT_VARIABLE _output OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-  #create tar directory with "tar -czvf TestFiles.tar.Z TestFiles/" in Test directory
+  #create tar directory with "tar -czvf TestFiles.tar.Z TestFiles/" and put it in Test directory
   execute_process(COMMAND  tar -xvf ${PROJECT_SOURCE_DIR}/Test/TestFiles.tar.Z -C ${PROPOSAL_BINARY_DIR}/bin/
                     OUTPUT_VARIABLE _output OUTPUT_STRIP_TRAILING_WHITESPACE)
 
