@@ -713,12 +713,17 @@ pair<double,double> Geometry::DistanceToBorderCylinder(Particle* particle)
 
     if(!(dir_vec_x  == 0 && dir_vec_y == 0)) //Otherwise the particle trajectory is parallel to cylinder barrel
     {
+
         A   =    pow( (particle->GetX() - x0_),2 )
                + pow( (particle->GetY() - y0_),2 )
                - pow( radius_, 2 );
 
         B   =   2*(   (particle->GetX() - x0_)*dir_vec_x
                     + (particle->GetY() - y0_)*dir_vec_y );
+
+        B /= dir_vec_x*dir_vec_x + dir_vec_y*dir_vec_y;
+        A /= dir_vec_x*dir_vec_x + dir_vec_y*dir_vec_y;
+
 
         determinant =   pow(B/2 ,2) - A;
 
@@ -763,7 +768,6 @@ pair<double,double> Geometry::DistanceToBorderCylinder(Particle* particle)
         if( dir_vec_z != 0) // if dir_vec == 0 particle trajectory is parallel to E1 (Should not happen)
         {
             t   =  ( z0_ + 0.5*z_ - particle->GetZ() ) / dir_vec_z;
-
             if( t>0 ) // Interection is in particle trajectory direction
             {
                 intersection_x  =   particle->GetX() + t * dir_vec_x;
@@ -780,7 +784,6 @@ pair<double,double> Geometry::DistanceToBorderCylinder(Particle* particle)
         if( dir_vec_z != 0) // if dir_vec == 0 particle trajectory is parallel to E2 (Should not happen)
         {
             t   =  ( z0_ - 0.5*z_ - particle->GetZ() ) / dir_vec_z;
-
             if( t>0 ) // Interection is in particle trajectory direction
             {
                 intersection_x  =   particle->GetX() + t * dir_vec_x;
@@ -788,7 +791,6 @@ pair<double,double> Geometry::DistanceToBorderCylinder(Particle* particle)
 
                 if(sqrt( pow( (intersection_x - x0_) ,2) + pow( (intersection_y - y0_) ,2 ) ) < radius_ )
                 {
-
                     dist.push_back( t );
                 }
             }
