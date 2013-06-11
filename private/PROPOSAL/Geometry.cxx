@@ -100,6 +100,7 @@ bool Geometry::IsParticleInside(Particle* particle)
 
     if(dist.first > 0 && dist.second < 0)
     {
+        //cout<<dist.first<<"\t"<<dist.second<<endl;
         is_inside   =   true;
     }
     return is_inside;
@@ -188,11 +189,11 @@ pair<double,double> Geometry::DistanceToBorder(Particle* particle)
         distance    =   DistanceToBorderBox(particle);
 
     }
-//    else if( object_.compare("cylinder")==0 )
-//    {
-//        distance    =   DistanceToBorderCylinder(particle);
+    else if( object_.compare("cylinder")==0 )
+    {
+        distance    =   DistanceToBorderCylinder(particle);
 
-//    }
+    }
 //    else
 //    {
 //        cerr<<"Warning: geometry type is not recognized! -1 is returned"<<endl;
@@ -446,6 +447,15 @@ pair<double,double> Geometry::DistanceToBorderSphere(Particle* particle)
             }
             else  // The particle is inside the outer sphere
             {
+                //The inner cylinder is infront of the particle trajectory
+                //distance.first has to be updated
+                if(t1 > 0 && t2 > 0)
+                {
+                    if(t1<t2)
+                        distance.first  =   t1;
+                    else
+                        distance.first  =   t2;
+                }
                 //The particle is inside the inner sphere
                 // which means outside the geometry
                 if((t1 > 0 && t2 < 0) || (t2 > 0 && t1 < 0))
@@ -646,7 +656,7 @@ pair<double,double> Geometry::DistanceToBorderBox(Particle* particle)
         distance.first  =   dist.at(0);
         distance.second =   -1;
     }
-    else if( dist.size() ==2 )   // Particle is outside and the box is infront of the particle trajectory ( two intersections). Chose closest
+    else if( dist.size() ==2 )   // Particle is outside and the box is infront of the particle trajectory ( two intersections).
     {
         distance.first  =   dist.at(0);
         distance.second =   dist.at(1);
@@ -658,7 +668,7 @@ pair<double,double> Geometry::DistanceToBorderBox(Particle* particle)
     }
     else
     {
-        cerr<<"In Geometry::DistanceToBorderCylinder(Particle*) this point should nerver be reached..."<<endl;
+        cerr<<"In Geometry::DistanceToBorderBox(Particle*) this point should nerver be reached..."<<endl;
         cerr<<"(-1/-1) is returned"<<endl;
 
         distance.first  =   -1;
@@ -673,7 +683,7 @@ pair<double,double> Geometry::DistanceToBorderBox(Particle* particle)
 //----------------------------------------------------------------------------//
 
 
-double Geometry::DistanceToBorderCylinder(Particle* particle)
+pair<double,double> Geometry::DistanceToBorderCylinder(Particle* particle)
 {
     // Calculate intersection of particle trajectory and the cylinder
     // cylinder barrel (x1 + x0)^2 + (x2 + y0)^2  = radius^2 [ z0_-0.5*z_ < particle->z <z0_ - 0.5*z_ ]
@@ -691,9 +701,15 @@ double Geometry::DistanceToBorderCylinder(Particle* particle)
     double dir_vec_y = particle->GetSinPhi()*particle->GetSinTheta();
     double dir_vec_z = particle->GetCosTheta();
 
+    double determinant;
+
+    double intersection_x;
+    double intersection_y;
     double intersection_z;
 
-    double distance =   0;
+    vector<double> dist;
+
+    pair<double,double> distance;
 
     if(!(dir_vec_x  == 0 && dir_vec_y == 0)) //Otherwise the particle trajectory is parallel to cylinder barrel
     {
@@ -704,27 +720,117 @@ double Geometry::DistanceToBorderCylinder(Particle* particle)
         B   =   2*(   (particle->GetX() - x0_)*dir_vec_x
                     + (particle->GetY() - y0_)*dir_vec_y );
 
-        t1  =   -1*B/2 + sqrt( pow(B/2 ,2) - A );
-        t2  =   -1*B/2 - sqrt( pow(B/2 ,2) - A );
+        determinant =   pow(B/2 ,2) - A;
 
-        if(t1 > 0)
-            t   =   t1;
-        else
-            t   =   t2;
-
-        // t is the mupltiple of the direction vector we have to propagate
-        // untill the border is reached.
-        // But this cylinder might be hollow and we have to check if the inner border is
-        // reached before.
-        // So we caluculate the intersection with the inner sphere.
-
-        if(inner_radius_ > 0)
+        if( determinant > 0) // determinant == 0 (boundery point) is ignored
         {
-            double determinant;
+            t1  =   -1*B/2 + sqrt( determinant );
+            t2  =   -1*B/2 - sqrt( determinant );
+
+            // (-1/-1) cylinder is behind particle or particle is on border but moving outside
+            // ( dist_1 / dist_2 ) cylinder is infront of the particle
+            // ( dist_1 / -1 ) particle is inside the cylinder or on border and moving inside
+            if(t1 > 0)
+            {
+                intersection_z  =   particle->GetZ() + t1 * dir_vec_z;
+                // is inside the borders
+                if( intersection_z > z0_ - 0.5*z_ &&
+                    intersection_z < z0_ + 0.5*z_    )
+                {
+                    dist.push_back(t1);     // Cause length of direction vector is 1 distance is t1
+                }
+
+            }
+
+            if(t2 > 0)
+            {
+                intersection_z  =   particle->GetZ() + t2 * dir_vec_z;
+                // is inside the borders
+                if( intersection_z > z0_ - 0.5*z_ &&
+                    intersection_z < z0_ + 0.5*z_    )
+                {
+                    dist.push_back(t2);      // Cause length of direction vector is 1 distance is t2
+                }
+            }
+        }
+    }
+
+    // if we have found already to intersections we don't have to check for intersections
+    // with top or bottom surface
+    if( dist.size() < 2 )
+    {
+        //intersection with E1
+        if( dir_vec_z != 0) // if dir_vec == 0 particle trajectory is parallel to E1 (Should not happen)
+        {
+            t   =  ( z0_ + 0.5*z_ - particle->GetZ() ) / dir_vec_z;
+
+            if( t>0 ) // Interection is in particle trajectory direction
+            {
+                intersection_x  =   particle->GetX() + t * dir_vec_x;
+                intersection_y  =   particle->GetY() + t * dir_vec_y;
+                if(sqrt( pow( (intersection_x -x0_) ,2) + pow( (intersection_y - y0_) ,2 ) ) < radius_ )
+                {
+                    dist.push_back( t );
+                }
+            }
+        }
+
+        //intersection with E2
+        if( dir_vec_z != 0) // if dir_vec == 0 particle trajectory is parallel to E1 (Should not happen)
+        {
+            t   =  ( z0_ - 0.5*z_ - particle->GetZ() ) / dir_vec_z;
+
+            if( t>0 ) // Interection is in particle trajectory direction
+            {
+                intersection_x  =   particle->GetX() + t * dir_vec_x;
+                intersection_y  =   particle->GetY() + t * dir_vec_y;
+                if(sqrt( pow( (intersection_x - x0_) ,2) + pow( (intersection_y - y0_) ,2 ) ) < radius_ )
+                {
+                    dist.push_back( t );
+                }
+            }
+        }
+    }
+    // No intersection with the cylinder ( and then of course no with the inner)
+    if(dist.size() < 1)
+    {
+        distance.first  =   -1;
+        distance.second =   -1;
+        return distance;
+    }
+    else if(dist.size() == 1)   //particle is inside the cylinder
+    {
+        distance.first =    dist.at(0);
+        distance.second=    -1;
+
+    }
+    else if(dist.size() == 2)   //cylinder is infront of the particle
+    {
+        distance.first =    dist.at(0);
+        distance.second=    dist.at(1);
+
+        if(distance.second < distance.first)
+        {
+            std::swap(distance.first , distance.second);
+        }
+
+    }
+    else
+    {
+        cerr<<"Warning: In DistanceToBorderCylinder(Particle* particle) this point should never be reached"<<endl;
+    }
+    // This cylinder might be hollow and we have to check if the inner border is
+    // reached before.
+    // So we caluculate the intersection with the inner cylinder.
+
+    if(inner_radius_ > 0)
+    {
+        if(!(dir_vec_x  == 0 && dir_vec_y == 0))
+        {
 
             A   =    pow( (particle->GetX() - x0_),2 )
                    + pow( (particle->GetY() - y0_),2 )
-                   - pow( radius_, 2 );
+                   - pow( inner_radius_, 2 );
 
             B   =   2*(   (particle->GetX() - x0_)*dir_vec_x
                         + (particle->GetY() - y0_)*dir_vec_y );
@@ -736,77 +842,106 @@ double Geometry::DistanceToBorderCylinder(Particle* particle)
                 t1  =   -1*B/2 + sqrt( determinant );
                 t2  =   -1*B/2 - sqrt( determinant );
 
-                // Ok we have a intersection with the inner sphere
-                // Now we have to find the closest
-                if( t1 != 0 && t1 < t)
+                // Ok we have a intersection with the inner cylinder
+
+                // If distance.first and distance.second are positive this means
+                // the cylinder is infornt of the particle. So the first distance
+                // ( intersection with the outer border) does not change
+                // but the second distance has to be updated (intersection with the inner border)
+                if(distance.first > 0 && distance.second > 0)
                 {
-                    t   =   t1;
+                    if(t1 > 0)
+                    {
+                        intersection_z  =   particle->GetZ() + t1 * dir_vec_z;
+                        // is inside the borders
+                        if( intersection_z > z0_ - 0.5*z_ &&
+                            intersection_z < z0_ - 0.5*z_    )
+                        {
+                            if( t1 < distance.second )
+                                distance.second =   t1;
+                        }
+
+                    }
+
+                    if(t2 > 0)
+                    {
+                        intersection_z  =   particle->GetZ() + t2 * dir_vec_z;
+                        // is inside the borders
+                        if( intersection_z > z0_ - 0.5*z_ &&
+                            intersection_z < z0_ - 0.5*z_    )
+                        {
+                            if( t2 < distance.second )
+                                distance.second =   t2;
+                        }
+
+                    }
                 }
-                if( t2 != 0 && t2 < t)
+                else  // The particle is inside the outer cylinder
                 {
-                    t   =   t2;
+                    //The inner cylinder is infront of the particle trajectory
+                    //distance.first has to be updated
+                    if(t1 > 0 && t2 > 0)
+                    {
+                        if(t1<t2)
+                            distance.first  =   t1;
+                        else
+                            distance.first  =   t2;
+                    }
+                    //The particle is inside the inner cylinder
+                    // which means outside the geometry
+                    if((t1 > 0 && t2 < 0) || (t2 > 0 && t1 < 0))
+                    {
+                        distance.first  =   -1;
+                    }
+                    // Now we have to check if the particle is on the border of
+                    // the inner sphere
+                    if(t1 == 0 )
+                    {
+                        // The particle is moving into the inner sphere
+                        if( t2 > 0 )
+                        {
+                            distance.first  =   -1;
+                        }
+                        // if not we don't have to update distance.first
+                    }
+                    if(t2 == 0 )
+                    {
+                        // The particle is moving into the inner sphere
+                        if( t1 > 0 )
+                        {
+                            distance.first  =   -1;
+                        }
+                        // if not we don't have to update distance.first
+                    }
+
                 }
             }
         }
-
-        // Ok, now we know the multiple of the direction vector we have to propagte
-        // untill the cylinder barrel is reached. But in z-direction this migth be outside
-        // the cylinder border ( intersection with top or bottom surface )
-
-        intersection_z  =   particle->GetZ() + t * dir_vec_z;
-
-        // is inside the borders
-        if( intersection_z > z0_ - 0.5*z_ &&
-            intersection_z < z0_ - 0.5*z_    )
+        else        // the particle trajectory is parallel to the cylinder barrel
         {
-            distance    =   t;     // Cause length of direction vector is 1 distance is t
-            return distance;
-        }
+            //intersection with E1
+            if( dir_vec_z != 0) // if dir_vec == 0 particle trajectory is parallel to E1 (Should not happen)
+            {
+                t   =  ( z0_ + 0.5*z_ - particle->GetZ() ) / dir_vec_z;
 
-    }
+                if( t>0 ) // Interection is in particle trajectory direction
+                {
+                    intersection_x  =   particle->GetX() + t * dir_vec_x;
+                    intersection_y  =   particle->GetY() + t * dir_vec_y;
 
-    // When this point is reached ther must be an intersection with top or bottom surface
-
-    //intersection with E1
-    if( dir_vec_z != 0) // if dir_vec == 0 particle trajectory is parallel to E1 (Should not happen)
-    {
-        t   =  ( z0_ + 0.5*z_ - particle->GetZ() ) / dir_vec_z;
-
-        if( t>0 ) // Interection is in particle trajectory direction
-        {
-            // We don't have to check for cylinder borders
-            // cause if this intersection would not be inside the cylinder top or bottom surface
-            // we found the intersection before when searching the intersection
-            // with the cylinder barrel (the same is true for inner_radius > 0)
-
-            distance    =   t;
-            return  distance;
-
+                    if(sqrt( pow( (intersection_x -x0_) ,2) + pow( (intersection_y - y0_) ,2 ) ) < inner_radius_ )
+                    {
+                        // The particle is moving parallel to the cylinder barrel
+                        // through the hollow part which is not part of the geometry
+                        distance.first  =   -1;
+                        distance.second =   -1;
+                    }
+                }
+            }
         }
     }
 
-    //intersection with E2
-    if( dir_vec_z != 0) // if dir_vec == 0 particle trajectory is parallel to E1 (Should not happen)
-    {
-        t   =  ( z0_ - 0.5*z_ - particle->GetZ() ) / dir_vec_z;
-
-        if( t>0 ) // Interection is in particle trajectory direction
-        {
-            // We don't have to check for cylinder borders
-            // cause if this intersection would not be inside the cylinder top or bottom surface
-            // we found the intersection before when searching the intersection
-            // with the cylinder barrel (the same is true for inner_radius > 0)
-
-            distance    =   t;
-            return  distance;
-
-        }
-    }
-
-    cerr<<"In Geometry::DistanceToBorderCylinder(Particle*) this point should nerver be reached..."<<endl;
-    cerr<<"-1 is returned"<<endl;
-
-    return -1;
+    return distance;
 }
 
 

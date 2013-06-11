@@ -56,11 +56,12 @@ private:
     /*!
      * This fucntion calculates the distance of the particle position
      * to the border of the cylinder in direction of the particle trajectory.
-     * Note: This function is made to find the distance which the particle must be propagated
-     * INSIDE this geometry. So be sure that the particle is inside this geometry before
-     * calling this function ( use IsParticleInside(Particle*) )
+     * If the particle trajectory does not have an intersection with the cylinder
+     * (-1 /-1) is returned
+     * If the particle trajectory has two intersections (dist_1 /dist_2) is returned
+     * If the particle has one intersection (dist_1 /-1) is returned
      */
-    double DistanceToBorderCylinder(Particle* particle);
+    std::pair<double,double> DistanceToBorderCylinder(Particle* particle);
 
 public:
 

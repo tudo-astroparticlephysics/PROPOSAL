@@ -685,10 +685,10 @@ void Particle::Location(double time,
     phi_         =   phi;
     theta_       *=  (PI/180);   //<--deg or rad??
     phi_         *=  (PI/180);   //<--deg or rad??
-    costh_       =   cos(theta);
-    sinth_       =   sin(theta);
-    cosph_       =   cos(phi);
-    sinph_       =   sin(phi);
+    costh_       =   cos(theta_);
+    sinth_       =   sin(theta_);
+    cosph_       =   cos(phi_);
+    sinph_       =   sin(phi_);
 }
 
 
@@ -718,8 +718,8 @@ void Particle::SetTheta(double theta)
     theta_  =   theta;
     theta_ *=   (PI/180);
 
-    costh_  =   cos(theta);
-    sinth_  =   sin(theta);
+    costh_  =   cos(theta_);
+    sinth_  =   sin(theta_);
 
 }
 
@@ -733,8 +733,8 @@ void Particle::SetPhi(double phi)
     phi_   =    phi;
     phi_  *=    (PI/180);
 
-    cosph_ =    cos(phi);
-    sinph_ =    sin(phi);
+    cosph_ =    cos(phi_);
+    sinph_ =    sin(phi_);
 }
 
 
