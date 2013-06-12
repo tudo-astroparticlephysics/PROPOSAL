@@ -42,7 +42,7 @@ std::vector<ProcessCollection*>         CombOfProcColl;
 
 
 
-TEST(Epairproduction , Set_Up ) {
+TEST(ProcessCollection , Set_Up ) {
     ifstream in;
     in.open("bin/TestFiles/ProcColl_Stoch.txt");
 
@@ -577,7 +577,6 @@ TEST(ProcessCollection , MakeDecay)
         if(i<CombOfProcColl.size())
         {
             ProcColl = CombOfProcColl.at(i);
-            cout << "found cross Section!" << endl;
             //cout << CombOfEnergyCutSettings.at(i)->GetEcut() << "\t" << CombOfEnergyCutSettings.at(i)->GetVcut() << "\t" << CombOfMedium.at(i)->GetName() << "\t" << CombOfParticle.at(i)->GetName() << endl;
         }
         else
@@ -845,6 +844,7 @@ TEST(Assignment , Swap ) {
 }
 
 int main(int argc, char **argv) {
+
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }
