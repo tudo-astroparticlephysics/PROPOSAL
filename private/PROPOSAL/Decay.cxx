@@ -42,6 +42,7 @@ double Decay::CalculateProductEnergy( double ernd, double arnd, double srnd )
 {
     if(particle_->GetLifetime()<0)
     {
+        out_ = "none";
         return 0;
     }
     double emax, x0, f0, el, lm, pl;

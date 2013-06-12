@@ -204,7 +204,6 @@ double ProcessCollection::CalculateFinalEnergy(double ei, double rnd, bool parti
                     else
                     {
                         aux =   interpol_prop_decay_->FindLimit(storeDif_.at(0)+rnd);
-                        cout << "aux: " << aux << endl;
                     }
                 }
 

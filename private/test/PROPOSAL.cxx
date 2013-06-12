@@ -7,6 +7,7 @@
 #include "PROPOSAL/Epairproduction.h"
 #include "PROPOSAL/Propagator.h"
 #include "PROPOSAL/ContinuousRandomization.h"
+#include "PROPOSAL/Geometry.h"
 
 using namespace std;
 
@@ -159,19 +160,23 @@ using namespace std;
 
 int main(int argc, char** argv){
 
-    Medium *medium = new Medium("uranium",1.);
-    Particle *particle = new Particle("mu",1.,1.,1,.20,20,1e5,10);
-    double energy = 100000000000000;
-    particle->SetEnergy(100000000000000);
-    EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
+    double x,y,z,theta,phi;
+    x = -15.8385;
+    y = -8.7836;
+    z = -3.99414;
+    theta = 157.057;
+    phi = 317.619;
+    Particle * particle = new Particle("mu",x,y,z,theta,phi,0,0);
+    Geometry A;
 
-    ProcessCollection* ProcColl = new ProcessCollection(particle, medium, cuts);
-    ProcColl->EnableInterpolation();
+    double x0,y0,z0,radius,inner_radius,height;
+    x0=-4.23397;
+    y0=-5.88271;
+    z0=-14.7617;
+    radius = 10;
+    inner_radius = 6.72594;
+    height = 10;
+    A.InitCylinder(x0,y0,z0,radius,inner_radius,height);
+    A.IsParticleInside(particle);
 
-    double FinalEnergy_new,rnd=0.3978801863268018;
-    bool particle_interaction = false;
-    FinalEnergy_new = ProcColl->CalculateTrackingIntegal(energy,rnd,particle_interaction);
-    cout << "Tracking: " << FinalEnergy_new << endl;
-    FinalEnergy_new = ProcColl->CalculateFinalEnergy(energy,rnd,particle_interaction);
-    cout << "FinalEnergy: " << FinalEnergy_new << endl;
 }
