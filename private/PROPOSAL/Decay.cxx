@@ -56,7 +56,7 @@ double Decay::CalculateProductEnergy( double ernd, double arnd, double srnd )
         const double brel   =   0.1783+brmu;    // ratio: tau- ---> electron + anti-electron +nu-tau
         const double brpi   =   0.1109+brel;    // ratio: tau- ---> pi- + nu-tau
         const double br2p   =   0.2540+brpi;    // ratio: tau- ---> pi- + pi0 + nu-tau
-        const double br3p   =   0.1826+br2p;    // ratio: tau- ---> ???
+        const double br3p   =   0.1826+br2p;    // ratio: tau- ---> pi- + pi0 + pi0 + nutau and pi- + pi+ + pi- + nu-tau
 
         if( srnd<brmu )
         {
