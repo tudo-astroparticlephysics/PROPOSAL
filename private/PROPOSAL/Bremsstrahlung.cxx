@@ -227,6 +227,48 @@ double Bremsstrahlung::CalculateStochasticLoss(double rnd1, double rnd2)
     return 0;
 }
 
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+//formerlly in setlpm
+double Bremsstrahlung::CalculateScatteringX0()
+{
+    double X0;
+    Integral* integral_temp = new Integral(IROMB,IMAXS,IPREC);
+
+    bool store_lpm_effect_enabled = lpm_effect_enabled_;
+    lpm_effect_enabled_ = false;
+
+    double sum      =   0;
+    double e        =   particle_->GetEnergy();
+
+    bool store_init_lpm_effect_ = init_lpm_effect_;
+    init_lpm_effect_    =   false;
+    particle_->SetEnergy(BIGENERGY);
+
+    for(int i=0; i < medium_->GetNumCompontents(); i++)
+    {
+
+       SetIntegralLimits(i);
+
+       sum +=  integral_temp->Integrate(0, vUp_, boost::bind(&Bremsstrahlung::FunctionToDEdxIntegral, this, _1),2);
+       sum +=  integral_temp->Integrate(vUp_, vMax_, boost::bind(&Bremsstrahlung::FunctionToDEdxIntegral, this, _1),4);
+    }
+
+//    eLpm_        =   ALPHA*(particle_->GetMass());
+//    eLpm_        *=  eLpm_/(4*PI*ME*RE*sum);
+
+    //restore everything
+    particle_->SetEnergy(e);
+    SetIntegralLimits(0);
+    lpm_effect_enabled_ = store_lpm_effect_enabled;
+    init_lpm_effect_ = store_init_lpm_effect_;
+    delete integral_temp;
+
+    X0  =   pow(particle_->GetCharge() , 2);
+    X0  =   pow(X0,2)/sum;
+    return X0;
+}
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
