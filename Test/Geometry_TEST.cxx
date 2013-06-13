@@ -1200,6 +1200,286 @@ TEST(DistanceTo , Cylinder ) {
     }
 }
 
+
+TEST(DistanceTo , Box ) {
+    double x        =   0;
+    double y        =   0;
+    double z        =   0;
+    double theta    =   0;
+    double phi      =   0;
+
+    double width    =   10;
+    double height   =   width;
+
+    double rnd_phi;
+    double rnd_theta;
+
+
+    double dist;
+    double dist1;
+    double dist2;
+
+    pair<double,double> distance;
+
+    Particle * particle = new Particle("mu",x,y,z,theta,phi,0,0);
+
+
+    MathModel M;
+    int number_particles = 1e5;
+
+    Geometry A;
+    cout.precision(16);
+
+    for(int j = 0; j<number_particles; j++)
+    {
+        rnd_phi =   M.RandomDouble();
+
+        A.InitBox(0,0,0,width,width,height);
+
+        phi     =   rnd_phi*2*PI;
+        theta   =   0.5*PI;
+
+
+        // Chose particle location and angle
+
+
+        theta   = 180/PI*theta;
+        phi     = 180/PI*phi;
+
+        particle->SetX(x);
+        particle->SetY(y);
+        particle->SetZ(z);
+        particle->SetTheta(theta);
+        particle->SetPhi(phi);
+
+        distance    =   A.DistanceToBorder(particle);
+
+        if( phi < 45)
+        {
+            dist = 0.5*width/cos(phi/180*PI);
+            EXPECT_EQ( distance.second, -1.);
+            ASSERT_NEAR(distance.first, dist,1e-8*(dist));
+        }
+        else if( phi < 90)
+        {
+            phi = 90 - phi;
+            dist = 0.5*width/cos(phi/180*PI);
+            EXPECT_EQ( distance.second, -1.);
+            ASSERT_NEAR(distance.first, dist,1e-8*(dist));
+        }
+        else if( phi < 135)
+        {
+            phi = phi - 90;
+            dist = 0.5*width/cos(phi/180*PI);
+            EXPECT_EQ( distance.second, -1.);
+            ASSERT_NEAR(distance.first, dist,1e-8*(dist));
+        }
+        else if( phi < 180)
+        {
+            phi = 180 - phi;
+            dist = 0.5*width/cos(phi/180*PI);
+            EXPECT_EQ( distance.second, -1.);
+            ASSERT_NEAR(distance.first, dist,1e-8*(dist));
+        }
+        else if( phi < 225)
+        {
+            phi = phi - 180;
+            dist = 0.5*width/cos(phi/180*PI);
+            EXPECT_EQ( distance.second, -1.);
+            ASSERT_NEAR(distance.first, dist,1e-8*(dist));
+        }
+        else if( phi < 270)
+        {
+            phi = 270 - phi;
+            dist = 0.5*width/cos(phi/180*PI);
+            EXPECT_EQ( distance.second, -1.);
+            ASSERT_NEAR(distance.first, dist,1e-8*(dist));
+        }
+        else if( phi < 315)
+        {
+            phi = phi -270;
+            dist = 0.5*width/cos(phi/180*PI);
+            EXPECT_EQ( distance.second, -1.);
+            ASSERT_NEAR(distance.first, dist,1e-8*(dist));
+        }
+        else if( phi < 360)
+        {
+            phi = 360 - phi;
+            dist = 0.5*width/cos(phi/180*PI);
+            EXPECT_EQ( distance.second, -1.);
+            ASSERT_NEAR(distance.first, dist,1e-8*(dist));
+        }
+
+    }
+    for(int i = 0; i < number_particles;i++)
+    {
+        rnd_phi =   M.RandomDouble();
+
+        phi     =   rnd_phi*0.5*PI;
+        theta   =   0.5*PI;
+
+
+        // Chose particle location and angle
+
+        theta   = 180/PI*theta;
+        phi     = 180/PI*phi;
+
+        x= -1*width;
+        y=0;
+        z=0;
+
+        particle->SetX(x);
+        particle->SetY(y);
+        particle->SetZ(z);
+        particle->SetTheta(theta);
+        particle->SetPhi(phi);
+
+        phi =   phi/180*PI;
+        distance    =   A.DistanceToBorder(particle);
+
+        //                       ________________           z|
+        //                      |               |            |
+        //                      |               |            |_____
+        //                      |               |                  x
+        //     x----------------*---------------*--------->
+        //                      |               |
+        //                      |               |
+        //                      |               |
+        //                      |_______________|
+
+        if( phi < atan(0.5*width/(0.5*width-x)) )
+        {
+            dist1   =   (-x-0.5*width)/cos(phi);
+            dist2   =   (0.5*width-x)/cos(phi);
+            ASSERT_NEAR(distance.first, dist1,1e-8*(dist1));
+            ASSERT_NEAR(distance.second, dist2,1e-8*(dist2));
+
+        }
+        //
+        //                          ^
+        //                         /                        z|
+        //                       _*_____________             |
+        //                      |/              |            |_____
+        //                      *               |                  x
+        //                     /|               |
+        //                    / |               |
+        //                   /  |               |
+        //                  x   |               |
+        //                      |               |
+        //                      |_______________|
+
+        else if( phi < atan(width*0.5/(-x -0.5*width)))
+        {
+            dist1   =   (-x-0.5*width)/cos(phi);
+            dist2   =   0.5*width/sin(phi);
+            ASSERT_NEAR(distance.first, dist1,1e-8*(dist1));
+            ASSERT_NEAR(distance.second, dist2,1e-8*(dist2));
+
+        }
+        //                       ^
+        //                      /
+        //                     / _______________
+        //                    / |               |  z|
+        //                   /  |               |   |
+        //                  /   |               |   |_____
+        //                 /    |               |        x
+        //                /     |               |
+        //               x      |               |
+        //                      |               |
+        //                      |_______________|
+
+        else
+        {
+            EXPECT_EQ(distance.first,-1);
+            EXPECT_EQ(distance.second,-1);
+        }
+    }
+
+    //and one test for z surfaces
+    for(int i = 0; i < number_particles;i++)
+    {
+        rnd_theta =   M.RandomDouble();
+
+        phi     =   0;
+        theta   =   rnd_theta*0.5*PI;;
+
+
+        // Chose particle location and angle
+
+        theta   = 180/PI*theta;
+        phi     = 180/PI*phi;
+
+        x=0;
+        y=0;
+        z=-1*height;
+
+        particle->SetX(x);
+        particle->SetY(y);
+        particle->SetZ(z);
+        particle->SetTheta(theta);
+        particle->SetPhi(phi);
+
+        theta =   theta/180*PI;
+        distance    =   A.DistanceToBorder(particle);
+
+        //                       ________________       x|
+        //                      |               |        |
+        //                      |               |        |_____
+        //                      |               |              z
+        //     x----------------*---------------*--------->
+        //                      |               |
+        //                      |               |
+        //                      |               |
+        //                      |_______________|
+
+        if( theta < atan(0.5*height/(0.5*height-z)) )
+        {
+            dist1   =   (-z-0.5*height)/cos(theta);
+            dist2   =   (0.5*height-z)/cos(theta);
+            ASSERT_NEAR(distance.first, dist1,1e-8*(dist1));
+            ASSERT_NEAR(distance.second, dist2,1e-8*(dist2));
+
+        }
+        //
+        //                          ^
+        //                         /                    x|
+        //                       _*_____________         |
+        //                      |/              |        |_____
+        //                      *               |             z
+        //                     /|               |
+        //                    / |               |
+        //                   /  |               |
+        //                  x   |               |
+        //                      |               |
+        //                      |_______________|
+
+        else if( theta < atan(height*0.5/(-z -0.5*height)))
+        {
+            dist1   =   (-z-0.5*height)/cos(theta);
+            dist2   =   0.5*height/sin(theta);
+            ASSERT_NEAR(distance.first, dist1,1e-8*(dist1));
+            ASSERT_NEAR(distance.second, dist2,1e-8*(dist2));
+        }
+        //                       ^
+        //                      /
+        //                     / _______________        x|
+        //                    / |               |        |
+        //                   /  |               |        |_____
+        //                  /   |               |             z
+        //                 /    |               |
+        //                /     |               |
+        //               x      |               |
+        //                      |               |
+        //                      |_______________|
+
+        else
+        {
+            EXPECT_EQ(distance.first,-1);
+            EXPECT_EQ(distance.second,-1);
+        }
+    }
+}
+
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
