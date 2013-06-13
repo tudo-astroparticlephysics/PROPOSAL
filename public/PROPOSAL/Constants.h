@@ -34,11 +34,11 @@
 #endif
 
 #ifndef COMPUTER_PRECISION
-    #define COMPUTER_PRECISION 1.e-10
+    #define COMPUTER_PRECISION 1.e-14
 #endif
 
 #ifndef HALF_PRECISION
-    #define HALF_PRECISION 1.e-5 //std::sqrt(computerPrecision);
+    #define HALF_PRECISION 1.e-7 //std::sqrt(computerPrecision);
 #endif
 
 #ifndef ALPHA // fine structure constant

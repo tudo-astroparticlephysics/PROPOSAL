@@ -396,16 +396,20 @@ TEST(IsInside , Cylinder ) {
     for(int i = 0; i<number_volumina; i++)
     {
 
-        // Chose the origin of the box-geometry
-        // This box should be inside the big box in which the particle
+        // Chose the origin of the cylinder-geometry
+        // This cylinder should be inside the big box in which the particle
         // will be located
         rnd_x0  = M.RandomDouble();
         rnd_y0  = M.RandomDouble();
         rnd_z0  = M.RandomDouble();
 
-        x0   =   ( 2 * rnd_x  - 1)* ( 0.5 * big_width_x - radius );
-        y0   =   ( 2 * rnd_y  - 1)* ( 0.5 * big_width_y - radius );
-        z0   =   ( 2 * rnd_z  - 1)* 0.5 *( big_height  - height  );
+        x0   =   ( 2 * rnd_x0  - 1)* ( 0.5 * big_width_x - radius );
+        y0   =   ( 2 * rnd_y0  - 1)* ( 0.5 * big_width_y - radius );
+        z0   =   ( 2 * rnd_z0  - 1)* 0.5 *( big_height  - height  );
+
+        x0   =   0;
+        y0   =   0;
+        z0   =   0;
 
         rnd_inner_radius    = M.RandomDouble();
 
@@ -415,7 +419,6 @@ TEST(IsInside , Cylinder ) {
 
         volumia_ratio = height*PI*( pow(radius,2) - pow(inner_radius,2) )
                 /( big_width_x*big_width_y*big_height);
-
         for(int j = 0; j<number_particles; j++)
         {
 
@@ -440,7 +443,7 @@ TEST(IsInside , Cylinder ) {
             particle->SetTheta(theta);
             particle->SetPhi(phi);
 
-            // if this constraints are true the particle is inside the box geometry
+            // if this constraints are true the particle is inside the cylinder geometry
             if( sqrt( pow( (x-x0),2 ) + pow( (y-y0),2 ) ) < radius &&
                 sqrt( pow( (x-x0),2 ) + pow( (y-y0),2 ) ) > inner_radius &&
                 z > z0 - 0.5*height  &&
@@ -448,6 +451,7 @@ TEST(IsInside , Cylinder ) {
             {
 
                 is_inside++;
+
                 EXPECT_TRUE(A.IsParticleInside(particle));
             }
             else
@@ -456,11 +460,151 @@ TEST(IsInside , Cylinder ) {
                 EXPECT_FALSE(A.IsParticleInside(particle));
             }
         }
-        cout << is_inside<<"\t"<<is_outside<<"\t"<<volumia_ratio*number_particles<<endl;
-        //ASSERT_NEAR(1.*is_inside ,volumia_ratio*number_particles , 3*sqrt(volumia_ratio*number_particles) );
+        ASSERT_NEAR(1.*is_inside ,volumia_ratio*number_particles , 3*sqrt(volumia_ratio*number_particles) );
         is_inside   = 0;
         is_outside  = 0;
     }
+
+    // Test borders
+    A.InitSphere(0,0,0,radius,0);
+
+    z=0;
+    particle->SetZ(z);
+
+    double cos;
+    double dir_vec_x;
+    double dir_vec_y;
+    double dir_vec_z;
+
+    int excluded =0 ;
+    for(int i = 0; i<1e4; i++)
+    {
+        rnd_x = M.RandomDouble();
+
+        x   =   radius * rnd_x;
+        y   =   radius *sqrt(1 - rnd_x*rnd_x);
+
+
+        particle->SetX(x);
+        particle->SetY(y);
+
+        rnd_theta   = M.RandomDouble();
+        rnd_phi     = M.RandomDouble();
+
+        theta   = rnd_theta*180;
+        phi     = rnd_phi*360;
+        particle->SetTheta(theta);
+        particle->SetPhi(phi);
+
+        dir_vec_x = particle->GetCosPhi()*particle->GetSinTheta();
+        dir_vec_y = particle->GetSinPhi()*particle->GetSinTheta();
+        dir_vec_z = particle->GetCosTheta();
+
+        //cosine of angle between direction vector and position vector
+        cos = (-x * dir_vec_x -y*dir_vec_y - z* dir_vec_z) / radius;
+
+        if(cos < 1 && cos > 0)
+            EXPECT_TRUE(A.IsParticleInside(particle));
+        else
+            EXPECT_FALSE(A.IsParticleInside(particle));
+
+    }
+
+    // Particle is on the top surface.
+    // Theta 0° - 90° means particle is moving outside
+    // This should be treated as outside
+    // Theta 90° - 180° means particle is moving inside (should be treated as inside)
+    // The value of phi does not matter
+    particle->SetX(0);
+    particle->SetY(0);
+    particle->SetZ(0.5*height);
+    A.InitCylinder(0,0,0,radius,0,height);
+
+    for(int i = 0; i<1e4; i++)
+    {
+        rnd_theta   = M.RandomDouble();
+        rnd_phi     = M.RandomDouble();
+
+        theta   = rnd_theta*180;
+        phi     = rnd_phi*360;
+        particle->SetTheta(theta);
+        particle->SetPhi(phi);
+        // Computer precision controll
+        if(x*x+y*y -inner_radius*inner_radius ==0 )
+        {
+            if(theta < 90)
+                EXPECT_FALSE(A.IsParticleInside(particle));
+            if(theta > 90)
+                EXPECT_TRUE(A.IsParticleInside(particle));
+        }
+
+    }
+
+    //Make this test for every surface of the box
+
+    // bottom
+    particle->SetX(0);
+    particle->SetY(0);
+    particle->SetZ(-0.5*height);
+    for(int i = 0; i<1e4; i++)
+    {
+        rnd_theta   = M.RandomDouble();
+        rnd_phi     = M.RandomDouble();
+
+        theta   = rnd_theta*180;
+        phi     = rnd_phi*360;
+        particle->SetTheta(theta);
+        particle->SetPhi(phi);
+
+        if(theta > 90)
+            EXPECT_FALSE(A.IsParticleInside(particle));
+        if(theta < 90)
+            EXPECT_TRUE(A.IsParticleInside(particle));
+
+    }
+
+    // Test inner border
+    inner_radius    =   5;
+    A.InitCylinder(0,0,0,radius,inner_radius,height);
+
+    z=0;
+    particle->SetZ(z);
+
+    excluded=0;
+
+    for(int i = 0; i<1e4; i++)
+    {
+        rnd_x = M.RandomDouble();
+
+        x   =   inner_radius * rnd_x;
+        y   =   inner_radius *sqrt(1 - rnd_x*rnd_x);
+
+
+        particle->SetX(x);
+        particle->SetY(y);
+
+        rnd_theta   = M.RandomDouble();
+        rnd_phi     = M.RandomDouble();
+
+        theta   = rnd_theta*180;
+        phi     = rnd_phi*360;
+        particle->SetTheta(theta);
+        particle->SetPhi(phi);
+
+        dir_vec_x = particle->GetCosPhi()*particle->GetSinTheta();
+        dir_vec_y = particle->GetSinPhi()*particle->GetSinTheta();
+        dir_vec_z = particle->GetCosTheta();
+
+        //cosine of angle between direction vector and position vector
+        cos = (-x * dir_vec_x -y*dir_vec_y - z* dir_vec_z) / radius;
+
+        if(cos < 1 && cos > 0)
+            EXPECT_FALSE(A.IsParticleInside(particle));
+        else
+            EXPECT_TRUE(A.IsParticleInside(particle));
+
+    }
+
 }
 
 TEST(IsInside , Sphere ) {
@@ -607,16 +751,11 @@ TEST(IsInside , Sphere ) {
         //cosine of angle between direction vector and position vector
         cos = (-x * dir_vec_x -y*dir_vec_y - z* dir_vec_z) / radius;
 
-        // Computer precision controll
-        if(x*x+y*y -radius*radius ==0 )
-        {
-            if(cos < 1 && cos > 0)
-                EXPECT_TRUE(A.IsParticleInside(particle));
-            else
-                EXPECT_FALSE(A.IsParticleInside(particle));
-        }
+        if(cos < 1 && cos > 0)
+            EXPECT_TRUE(A.IsParticleInside(particle));
         else
-            excluded++;
+            EXPECT_FALSE(A.IsParticleInside(particle));
+
     }
 
 
@@ -655,17 +794,409 @@ TEST(IsInside , Sphere ) {
         //cosine of angle between direction vector and position vector
         cos = (-x * dir_vec_x -y*dir_vec_y - z* dir_vec_z) / radius;
 
-        // Computer precision controll
-        if(x*x+y*y -inner_radius*inner_radius ==0 )
-        {
-            if(cos < 1 && cos > 0)
-                EXPECT_FALSE(A.IsParticleInside(particle));
-            else
-                EXPECT_TRUE(A.IsParticleInside(particle));
-
-        }
+        if(cos < 1 && cos > 0)
+            EXPECT_FALSE(A.IsParticleInside(particle));
         else
-            excluded++;
+            EXPECT_TRUE(A.IsParticleInside(particle));
+
+    }
+}
+
+
+
+TEST(DistanceTo , Sphere ) {
+    double x        =   0;
+    double y        =   0;
+    double z        =   0;
+    double theta    =   0;
+    double phi      =   0;
+
+    double radius           =   10;
+    double inner_radius     =   0;
+    double particle_radius  =   0;
+
+    double rnd_phi;
+    double rnd_theta;
+    double rnd_inner_radius;
+
+
+    pair<double,double> distance;
+
+    Particle * particle = new Particle("mu",x,y,z,theta,phi,0,0);
+
+
+    MathModel M;
+    int number_particles = 1e5;
+
+    Geometry A;
+    cout.precision(16);
+
+    for(int i = 0; i < 11 ; i++)
+    {
+
+        particle_radius = 2. + i*2.;
+
+        for(int j = 0; j<number_particles; j++)
+        {
+
+            rnd_inner_radius    = M.RandomDouble();
+            inner_radius        = radius*rnd_inner_radius;
+
+            A.InitSphere(0,0,0,radius,inner_radius);
+
+            rnd_phi             = M.RandomDouble();
+            rnd_theta           = M.RandomDouble();
+
+            phi     =   rnd_phi*2*PI;
+            theta   =   rnd_theta*PI;
+
+
+            // Chose particle location and angle
+
+            x   =   -1*particle_radius*cos(phi)*sin(theta);
+            y   =   -1*particle_radius*sin(phi)*sin(theta);
+            z   =   -1*particle_radius*cos(theta);
+
+            theta   = 180/PI*theta;
+            phi     = 180/PI*phi;
+
+
+            particle->SetX(x);
+            particle->SetY(y);
+            particle->SetZ(z);
+            particle->SetTheta(theta);
+            particle->SetPhi(phi);
+
+            distance    =   A.DistanceToBorder(particle);
+
+            if(particle_radius < radius && particle_radius > inner_radius)
+            {
+                EXPECT_EQ( distance.second, -1.);
+                ASSERT_NEAR(distance.first, particle_radius-inner_radius,1e-8*(particle_radius-inner_radius));
+            }
+            if(particle_radius <= inner_radius)
+            {
+                ASSERT_NEAR(distance.first, particle_radius+inner_radius,1e-8*(particle_radius+inner_radius));
+                ASSERT_NEAR(distance.second, particle_radius+radius,1e-8*(particle_radius+radius));
+            }
+            if(particle_radius > radius)
+            {
+                ASSERT_NEAR(distance.first, particle_radius-radius,1e-8*(particle_radius-radius));
+                ASSERT_NEAR(distance.second, particle_radius-inner_radius,1e-8*(particle_radius-inner_radius));
+            }
+            if(particle_radius == radius)
+            {
+                EXPECT_EQ(distance.second, -1.);
+                ASSERT_NEAR(distance.first, particle_radius-inner_radius,1e-8*(particle_radius-inner_radius));
+            }
+
+            if(particle_radius >= radius)
+            {
+                x   = -1*x;
+                y   = -1*y;
+                z   = -1*z;
+                particle->SetX(x);
+                particle->SetY(y);
+                particle->SetZ(z);
+
+                //Now the particle is moving away from the sphere so we expect no intersection
+                distance    =   A.DistanceToBorder(particle);
+                EXPECT_EQ(distance.first, -1.);
+                EXPECT_EQ(distance.second, -1.);
+
+
+            }
+            if(particle_radius > 20)
+            {
+
+                theta   = PI/180*theta;
+                phi     = PI/180*phi;
+
+                x   =   -1*inner_radius*cos(phi)*sin(theta);
+                y   =   -1*inner_radius*sin(phi)*sin(theta);
+                z   =   -1*inner_radius*cos(theta);
+
+                theta   = 180/PI*theta;
+                phi     = 180/PI*phi;
+
+                particle->SetX(x);
+                particle->SetY(y);
+                particle->SetZ(z);
+                particle->SetTheta(theta);
+                particle->SetPhi(phi);
+
+                distance    =   A.DistanceToBorder(particle);
+                ASSERT_NEAR(distance.first, 2*inner_radius,1e-8*(2*inner_radius));
+                ASSERT_NEAR(distance.second, inner_radius+radius,1e-8*(inner_radius + radius));
+
+            }
+        }
+    }
+}
+
+
+TEST(DistanceTo , Cylinder ) {
+    double x        =   0;
+    double y        =   0;
+    double z        =   0;
+    double theta    =   0;
+    double phi      =   0;
+
+    double height           =   10;
+    double radius           =   10;
+    double inner_radius     =   0;
+    double particle_radius  =   0;
+
+    double rnd_phi;
+    double rnd_inner_radius;
+
+
+    pair<double,double> distance;
+
+    Particle * particle = new Particle("mu",x,y,z,theta,phi,0,0);
+
+
+    MathModel M;
+    int number_particles = 1e5;
+
+    Geometry A;
+    cout.precision(16);
+
+    for(int i = 0; i < 10 ; i++)
+    {
+
+        particle_radius = 2. + i*2.;
+
+        for(int j = 0; j<number_particles; j++)
+        {
+
+            rnd_inner_radius    = M.RandomDouble();
+            inner_radius        = radius*rnd_inner_radius;
+
+            A.InitCylinder(0,0,0,radius,inner_radius,height);
+
+            rnd_phi             = M.RandomDouble();
+
+            phi     =   rnd_phi*2*PI;
+            theta   =   0.5*PI;
+
+
+            // Chose particle location and angle
+
+            x   =   -1*particle_radius*cos(phi)*sin(theta);
+            y   =   -1*particle_radius*sin(phi)*sin(theta);
+            z   =   -1*0.5*height*cos(theta);
+
+            theta   = 180/PI*theta;
+            phi     = 180/PI*phi;
+
+            //if(phi<0)phi=360+phi;
+
+            particle->SetX(x);
+            particle->SetY(y);
+            particle->SetZ(z);
+            particle->SetTheta(theta);
+            particle->SetPhi(phi);
+
+            distance    =   A.DistanceToBorder(particle);
+
+            if(particle_radius < radius && particle_radius > inner_radius)
+            {
+                EXPECT_EQ( distance.second, -1.);
+                ASSERT_NEAR(distance.first, particle_radius-inner_radius,1e-8*(particle_radius-inner_radius));
+            }
+            if(particle_radius <= inner_radius)
+            {
+                ASSERT_NEAR(distance.first, particle_radius+inner_radius,1e-8*(particle_radius+inner_radius));
+                ASSERT_NEAR(distance.second, particle_radius+radius,1e-8*(particle_radius+radius));
+            }
+            if(particle_radius > radius)
+            {
+                ASSERT_NEAR(distance.first, particle_radius-radius,1e-8*(particle_radius-radius));
+                ASSERT_NEAR(distance.second, particle_radius-inner_radius,1e-8*(particle_radius-inner_radius));
+            }
+            if(particle_radius == radius)
+            {
+               // cout<<"TEST "<<distance.first<<"\t"<<distance.second<<"\t"<<inner_radius<<endl;
+                EXPECT_EQ(distance.second, -1);
+                ASSERT_NEAR(distance.first, particle_radius-inner_radius,1e-8*(particle_radius-inner_radius));
+            }
+
+            if(particle_radius >= radius)
+            {
+                x   = -1*x;
+                y   = -1*y;
+                z   = -1*z;
+                particle->SetX(x);
+                particle->SetY(y);
+                particle->SetZ(z);
+
+                //Now the particle is moving away from the sphere so we expect no intersection
+                distance    =   A.DistanceToBorder(particle);
+                EXPECT_EQ(distance.first, -1.);
+                EXPECT_EQ(distance.second, -1.);
+
+
+            }
+            if(particle_radius > 20)
+            {
+                particle_radius =   inner_radius;
+
+                x   =   -1*particle_radius*cos(phi)*sin(theta);
+                y   =   -1*particle_radius*sin(phi)*sin(theta);
+                z   =   -1*particle_radius*cos(theta);
+
+                particle->SetX(x);
+                particle->SetY(y);
+                particle->SetZ(z);
+                particle->SetTheta(theta);
+                particle->SetPhi(phi);
+
+                distance    =   A.DistanceToBorder(particle);
+                ASSERT_NEAR(distance.first, 2*inner_radius,1e-8*(2*inner_radius));
+                ASSERT_NEAR(distance.second, inner_radius+radius,1e-8*(inner_radius + radius));
+
+            }
+        }
+    }
+
+    //One test for inner_radius =0
+    inner_radius    =   0;
+    A.InitCylinder(0,0,0,radius,inner_radius,height);
+
+    // Chose particle location and angle
+
+    x   =   0;
+    y   =   0;
+    z   =   height +10;
+
+    particle->SetX(x);
+    particle->SetY(y);
+    particle->SetZ(z);
+    particle->SetTheta(180);
+    particle->SetPhi(0);
+
+    distance    =   A.DistanceToBorder(particle);
+
+    ASSERT_NEAR(distance.first,z-0.5*height,1e-8*(z-0.5*height));
+    ASSERT_NEAR(distance.second,z+0.5*height,1e-8*(z+0.5*height));
+
+    double rnd_alpha;
+    double alpha;
+
+    inner_radius    =   6;
+    A.InitCylinder(0,0,0,radius,inner_radius,height);
+
+    for(int j = 0; j<number_particles; j++)
+    {
+
+        rnd_alpha = M.RandomDouble();
+
+        rnd_phi   = M.RandomDouble();
+
+        alpha   =   0.3*PI*rnd_alpha;
+
+
+        // Chose particle location and angle
+
+        x   =   0;
+        y   =   0;
+        z   =   height +0.5*height;
+
+        phi     = 360*rnd_phi;
+        theta   = 180 - 180/PI*alpha;
+
+        particle->SetX(x);
+        particle->SetY(y);
+        particle->SetZ(z);
+        particle->SetTheta(theta);
+        particle->SetPhi(phi);
+
+        double dist1 = inner_radius/sin(alpha);
+        double dist2 = radius/sin(alpha);
+
+        distance    =   A.DistanceToBorder(particle);
+
+        //  case 1 throught inner cylinder => no intersection
+        //  ___  x    ___
+        // |   | |   |   |
+        // |   | |   |   |
+        // |   | |   |   |
+        // |   | |   |   |
+        // |   | |   |   |
+        // |___| |   |___|
+        //       |
+        if( alpha < atan(inner_radius/(z+0.5*height)) )
+        {
+            EXPECT_EQ(distance.first,-1);
+            EXPECT_EQ(distance.second,-1);
+        }
+        //  case 2 first inner cylinder then bottom surface
+        //  ___  x      ___
+        // |   |  \    |   |
+        // |   |   \   |   |
+        // |   |    \  |   |
+        // |   |     \ |   |
+        // |   |      *|   |
+        // |___|       |\ _|
+        //               *
+
+        else if( alpha < atan(radius/(z+0.5*height)) )
+        {
+            dist2 = (z+0.5*height)/cos(alpha);
+            ASSERT_NEAR(distance.first,dist1,1e-8*(dist1));
+            ASSERT_NEAR(distance.second,dist2,1e-8*(dist2));
+        }
+        //  case 3 first inner cylinder then outer cylinder
+        //  ___     x   ___
+        // |   |     \ |   |
+        // |   |      \|   |
+        // |   |       *   |
+        // |   |       |\  |
+        // |   |       | \ |
+        // |   |       |  \|
+        // |   |       |   *
+        // |___|       |___|\
+        //
+
+        else if( alpha < atan(inner_radius/height) )
+        {
+            ASSERT_NEAR(distance.first,dist1,1e-8*(dist1));
+            ASSERT_NEAR(distance.second,dist2,1e-8*(dist2));
+        }
+        //  case 4 first upper surface then outer cylinder
+        //            x
+        //             \
+        //  ___         \__
+        // |   |       | * |
+        // |   |       |  \|
+        // |   |       |   *
+        // |   |       |   |\
+        // |   |       |   |
+        // |   |       |   |
+        // |___|       |___|
+        //
+        else if(alpha < atan(radius/height))
+        {
+            dist1 = height/cos(alpha);
+            ASSERT_NEAR(distance.first,dist1,1e-8*(dist1));
+            ASSERT_NEAR(distance.second,dist2,1e-8*(dist2));
+        }
+        //  case 5  no intersection
+        //      x_____________
+        //  ___      ___
+        // |   |    |   |
+        // |   |    |   |
+        // |   |    |   |
+        // |   |    |   |
+        // |   |    |   |
+        // |___|    |___|
+        //
+        else
+        {
+            EXPECT_EQ(distance.first,-1);
+            EXPECT_EQ(distance.second,-1);
+        }
     }
 }
 

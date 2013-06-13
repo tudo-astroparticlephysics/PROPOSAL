@@ -38,6 +38,12 @@ private:
      * (-1 /-1) is returned
      * If the particle trajectory has two intersections (dist_1 /dist_2) is returned
      * If the particle has one intersection (dist_1 /-1) is returned
+     * (one intersection means one intersection in direction of the particle trajectory
+     * and one in the opposite direction. Cause we are not intersted in this one. it is set to -1)
+     * Note: If the particle is on the spheres border this is not treated as an intersection
+     * A particle on the spheres border which moves inside has one intersection,
+     * a particle on the spheres border which moves outside has no intersection.
+     * Distances smaller then HALF_PRECISION (1e-7) are also set to -1
      */
     std::pair<double,double> DistanceToBorderSphere(Particle* particle);
 
@@ -49,17 +55,29 @@ private:
      * (-1 /-1) is returned
      * If the particle trajectory has two intersections (dist_1 /dist_2) is returned
      * If the particle has one intersection (dist_1 /-1) is returned
+     * (one intersection means one intersection in direction of the particle trajectory
+     * and one in the opposite direction. Cause we are not intersted in this one. it is set to -1)
+     * Note: If the particle is on the box' border this is not treated as an intersection
+     * A particle on the box' border which moves inside has one intersection,
+     * a particle on the box' border which moves outside has no intersection.
+     * Distances smaller then HALF_PRECISION (1e-7) are also set to -1
      */
     std::pair<double,double> DistanceToBorderBox(Particle* particle);
 
 //----------------------------------------------------------------------------//
     /*!
-     * This fucntion calculates the distance of the particle position
+     * This function calculates the distance of the particle position
      * to the border of the cylinder in direction of the particle trajectory.
      * If the particle trajectory does not have an intersection with the cylinder
      * (-1 /-1) is returned
      * If the particle trajectory has two intersections (dist_1 /dist_2) is returned
      * If the particle has one intersection (dist_1 /-1) is returned
+     * (one intersection means one intersection in direction of the particle trajectory
+     * and one in the opposite direction. Cause we are not intersted in this one. it is set to -1)
+     * Note: If the particle is on the cylinders border this is not treated as an intersection
+     * A particle on the cylinders border which moves inside has one intersection,
+     * a particle on the cylinders border which moves outside has no intersection.
+     * Distances smaller then HALF_PRECISION (1e-7) are also set to -1
      */
     std::pair<double,double> DistanceToBorderCylinder(Particle* particle);
 
