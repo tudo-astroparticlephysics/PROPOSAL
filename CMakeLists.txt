@@ -88,6 +88,7 @@ add_library(PROPOSAL
         private/PROPOSAL/Propagator.cxx
         private/PROPOSAL/ContinuousRandomization.cxx
         private/PROPOSAL/Geometry.cxx
+        private/PROPOSAL/Scattering.cxx
 	)
 
 set_target_properties(PROPOSAL PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -O2 -Wall -Werror")# -Wextra -pedantic")
