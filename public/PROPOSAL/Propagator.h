@@ -28,6 +28,7 @@
 #include "PROPOSAL/ProcessCollection.h"
 #include <utility>
 #include <boost/program_options.hpp>
+#include "PROPOSAL/Geometry.h"
 
 
 class Propagator :public MathModel
@@ -36,11 +37,10 @@ private:
     int  order_of_interpolation_;
     bool debug_;
     bool particle_interaction_;     //!< particle interaction? (false = decay)
-    double density_correction_;     //!< density correction factor
     bool do_time_interpolation_;    //!< If true, CalculateParticleTime is interpolated
     bool do_exact_time_calulation_;
 
-
+    std::vector<ProcessCollection*> collections_;
 
     Particle* particle_;
     ProcessCollection *collection_;
@@ -49,6 +49,8 @@ private:
     Interpolant* interpol_time_particle_diff_;
 
     Integral*    time_particle_;
+
+    Geometry*    detector_;
 
 
 //----------------------------------------------------------------------------//
@@ -65,6 +67,13 @@ private:
 
 //----------------------------------------------------------------------------//
     double InterpolTimeParticleDiff(double energy);
+
+//----------------------------------------------------------------------------//
+    /*!
+    * Initalize a geomtry. Used when reading the values from config file
+    *
+    */
+    void InitGeometry(Geometry* geometry, std::deque<std::string>* token , std::string first_token);
 
 public:
 
@@ -132,6 +141,9 @@ public:
 
 //----------------------------------------------------------------------------//
 
+    void ReadConfigFile(std::string config_file);
+
+//----------------------------------------------------------------------------//
     /**
      * Disables the Interpolation for calculation the exact particle time
      */

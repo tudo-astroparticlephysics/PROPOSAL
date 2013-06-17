@@ -14,8 +14,31 @@
 #include <stdlib.h>
 #include "boost/random.hpp"
 #include "boost/generator_iterator.hpp"
+#include <sys/stat.h>
+
 
 using namespace std;
+
+
+
+bool FileExist(string path)
+{
+    struct stat dummy_stat_return_val;
+
+    if (stat(path.c_str(), &dummy_stat_return_val) != 0)
+    {
+        return false;
+    }
+    else
+    {
+        return true;
+    }
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
 
 // returns true if text starts with token, false otherwise
 
@@ -28,6 +51,7 @@ bool StartsWith(const std::string& text,const std::string& token)
     }
 	return (text.compare(0, token.length(), token) == 0);
 }
+
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//

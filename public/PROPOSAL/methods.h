@@ -16,7 +16,9 @@
 #include <vector>
 #include "deque"
 
+bool FileExist(std::string path);
 
+//----------------------------------------------------------------------------//
 
 bool StartsWith(const std::string& text,const std::string& token);
 

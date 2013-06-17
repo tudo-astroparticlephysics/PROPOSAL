@@ -403,7 +403,7 @@ void ProcessCollection::EnableInterpolation()
 
     particle_->SetEnergy(energy);
 
-    if(do_continuous_randomization)
+    if(do_continuous_randomization_)
     {
         randomizer_->EnableDE2dxInterpolation();
         randomizer_->EnableDE2deInterpolation();
@@ -525,7 +525,7 @@ void ProcessCollection::DisableLpmEffect()
 void ProcessCollection::EnableContinuousRandomization()
 {
     randomizer_ =   new ContinuousRandomization(particle_,medium_,crosssections_);
-    do_continuous_randomization     =   true;
+    do_continuous_randomization_     =   true;
 }
 
 
@@ -537,7 +537,7 @@ void ProcessCollection::DisableContinuousRandomization()
 {
     delete  randomizer_;
     randomizer_ =   NULL;
-    do_continuous_randomization     =   false;
+    do_continuous_randomization_     =   false;
 }
 
 
@@ -550,19 +550,20 @@ void ProcessCollection::DisableContinuousRandomization()
 
 //Standard constructor
 ProcessCollection::ProcessCollection()
-    :order_of_interpolation_    ( 5 )
-    ,do_interpolation_          ( false )
-    ,lpm_effect_enabled_        ( false )
-    ,ini_                       ( 0 )
-    ,debug_                     ( false )
-    ,do_weighting_              ( false )
-    ,weighting_order_           ( 0 )
-    ,weighting_starts_at_       ( 0 )
-    ,do_continuous_randomization( false )
-    ,up_                        ( false )
-    ,bigLow_                    ( 2,0 )
-    ,storeDif_                  ( 2,0 )
-    ,crosssections_             ( )
+    :order_of_interpolation_     ( 5 )
+    ,do_interpolation_           ( false )
+    ,lpm_effect_enabled_         ( false )
+    ,ini_                        ( 0 )
+    ,debug_                      ( false )
+    ,do_weighting_               ( false )
+    ,weighting_order_            ( 0 )
+    ,weighting_starts_at_        ( 0 )
+    ,do_continuous_randomization_( false )
+    ,location_                   ( 0 )
+    ,up_                         ( false )
+    ,bigLow_                     ( 2,0 )
+    ,storeDif_                   ( 2,0 )
+    ,crosssections_              ( )
 {
 
     interpolant_                    = NULL;
@@ -580,6 +581,7 @@ ProcessCollection::ProcessCollection()
     interpol_prop_interaction_      = NULL;
     interpol_prop_interaction_diff_ = NULL;
     randomizer_                     = NULL;
+    geometry_                       = NULL;
 
 }
 
@@ -590,25 +592,26 @@ ProcessCollection::ProcessCollection()
 
 //Copyconstructor
 ProcessCollection::ProcessCollection(const ProcessCollection &collection)
-    :order_of_interpolation_    ( collection.order_of_interpolation_ )
-    ,do_interpolation_          ( collection.do_interpolation_ )
-    ,lpm_effect_enabled_        ( collection.lpm_effect_enabled_ )
-    ,ini_                       ( collection.ini_ )
-    ,debug_                     ( collection.debug_ )
-    ,do_weighting_              ( collection.do_weighting_ )
-    ,weighting_order_           ( collection.weighting_order_ )
-    ,weighting_starts_at_       ( collection.weighting_starts_at_ )
-    ,do_continuous_randomization( collection.do_continuous_randomization)
-    ,up_                        ( collection.up_)
-    ,bigLow_                    ( collection.bigLow_ )
-    ,storeDif_                  ( collection.storeDif_ )
-    ,particle_                  ( new Particle(*collection.particle_) )
-    ,medium_                    ( new Medium( *collection.medium_) )
-    ,integral_                  ( new Integral(*collection.integral_) )
-    ,cut_settings_              ( new EnergyCutSettings(*collection.cut_settings_) )
-    ,decay_                     ( new Decay(*collection.decay_) )
-    ,prop_decay_                ( new Integral(*collection.prop_decay_) )
-    ,prop_interaction_          ( new Integral(*collection.prop_interaction_) )
+    :order_of_interpolation_     ( collection.order_of_interpolation_ )
+    ,do_interpolation_           ( collection.do_interpolation_ )
+    ,lpm_effect_enabled_         ( collection.lpm_effect_enabled_ )
+    ,ini_                        ( collection.ini_ )
+    ,debug_                      ( collection.debug_ )
+    ,do_weighting_               ( collection.do_weighting_ )
+    ,weighting_order_            ( collection.weighting_order_ )
+    ,weighting_starts_at_        ( collection.weighting_starts_at_ )
+    ,do_continuous_randomization_( collection.do_continuous_randomization_ )
+    ,location_                   ( collection.location_ )
+    ,up_                         ( collection.up_)
+    ,bigLow_                     ( collection.bigLow_ )
+    ,storeDif_                   ( collection.storeDif_ )
+    ,particle_                   ( new Particle(*collection.particle_) )
+    ,medium_                     ( new Medium( *collection.medium_) )
+    ,integral_                   ( new Integral(*collection.integral_) )
+    ,cut_settings_               ( new EnergyCutSettings(*collection.cut_settings_) )
+    ,decay_                      ( new Decay(*collection.decay_) )
+    ,prop_decay_                 ( new Integral(*collection.prop_decay_) )
+    ,prop_interaction_           ( new Integral(*collection.prop_interaction_) )
 {
     crosssections_.resize(collection.crosssections_.size());
 
@@ -700,6 +703,14 @@ ProcessCollection::ProcessCollection(const ProcessCollection &collection)
         randomizer_ = NULL;
     }
 
+    if(collection.geometry_ != NULL)
+    {
+        geometry_ = new Geometry(*collection.geometry_) ;
+    }
+    else
+    {
+        geometry_ = NULL;
+    }
 }
 
 
@@ -708,18 +719,19 @@ ProcessCollection::ProcessCollection(const ProcessCollection &collection)
 
 
 ProcessCollection::ProcessCollection(Particle *particle, Medium *medium, EnergyCutSettings* cut_settings)
-    :order_of_interpolation_    ( 5 )
-    ,do_interpolation_          ( false )
-    ,lpm_effect_enabled_        ( false )
-    ,ini_                       ( 0 )
-    ,debug_                     ( false )
-    ,do_weighting_              ( false )
-    ,weighting_order_           ( 0 )
-    ,weighting_starts_at_       ( 0 )
-    ,do_continuous_randomization( false )
-    ,up_                        ( false )
-    ,bigLow_                    ( 2,0 )
-    ,storeDif_                  ( 2,0 )
+    :order_of_interpolation_     ( 5 )
+    ,do_interpolation_           ( false )
+    ,lpm_effect_enabled_         ( false )
+    ,ini_                        ( 0 )
+    ,debug_                      ( false )
+    ,do_weighting_               ( false )
+    ,weighting_order_            ( 0 )
+    ,weighting_starts_at_        ( 0 )
+    ,do_continuous_randomization_( false )
+    ,location_                   ( 0 )
+    ,up_                         ( false )
+    ,bigLow_                     ( 2,0 )
+    ,storeDif_                   ( 2,0 )
 {
 
     particle_           =   particle;
@@ -745,6 +757,7 @@ ProcessCollection::ProcessCollection(Particle *particle, Medium *medium, EnergyC
     interpol_prop_interaction_      = NULL;
     interpol_prop_interaction_diff_ = NULL;
     randomizer_                     = NULL;
+    geometry_                       = NULL;
 
 }
 
@@ -773,28 +786,29 @@ ProcessCollection& ProcessCollection::operator=(const ProcessCollection &collect
 
 bool ProcessCollection::operator==(const ProcessCollection &collection) const
 {
-    if( order_of_interpolation_    != collection.order_of_interpolation_ )  return false;
-    if( do_interpolation_          != collection.do_interpolation_ )        return false;
-    if( lpm_effect_enabled_        != collection.lpm_effect_enabled_ )      return false;
-    if( ini_                       != collection.ini_ )                     return false;
-    if( debug_                     != collection.debug_ )                   return false;
-    if( *particle_                 != *collection.particle_ )               return false;
-    if( *medium_                   != *collection.medium_ )                 return false;
-    if( *integral_                 != *collection.integral_ )               return false;
-    if( *cut_settings_             != *collection.cut_settings_ )           return false;
-    if( *prop_decay_               != *collection.prop_decay_ )             return false;
-    if( *prop_interaction_         != *collection.prop_interaction_ )       return false;
-    if( up_                        != collection.up_)                       return false;
-    if( do_weighting_              != collection.do_weighting_ )            return false;
-    if( weighting_order_           != collection.weighting_order_ )         return false;
-    if( weighting_starts_at_       != collection.weighting_starts_at_ )     return false;
-    if( do_continuous_randomization!= collection.do_continuous_randomization)return false;
+    if( order_of_interpolation_     != collection.order_of_interpolation_ )  return false;
+    if( do_interpolation_           != collection.do_interpolation_ )        return false;
+    if( lpm_effect_enabled_         != collection.lpm_effect_enabled_ )      return false;
+    if( ini_                        != collection.ini_ )                     return false;
+    if( debug_                      != collection.debug_ )                   return false;
+    if( *particle_                  != *collection.particle_ )               return false;
+    if( *medium_                    != *collection.medium_ )                 return false;
+    if( *integral_                  != *collection.integral_ )               return false;
+    if( *cut_settings_              != *collection.cut_settings_ )           return false;
+    if( *prop_decay_                != *collection.prop_decay_ )             return false;
+    if( *prop_interaction_          != *collection.prop_interaction_ )       return false;
+    if( up_                         != collection.up_)                       return false;
+    if( do_weighting_               != collection.do_weighting_ )            return false;
+    if( weighting_order_            != collection.weighting_order_ )         return false;
+    if( weighting_starts_at_        != collection.weighting_starts_at_ )     return false;
+    if( do_continuous_randomization_!= collection.do_continuous_randomization_ )return false;
+    if( location_                   != collection.location_ )                return false;
 
-    if( *decay_                    != *collection.decay_ )                  return false;
+    if( *decay_                     != *collection.decay_ )                  return false;
 
-    if( crosssections_.size()      != collection.crosssections_.size() )    return false;
-    if( bigLow_.size()             != collection.bigLow_.size() )           return false;
-    if( storeDif_.size()           != collection.storeDif_.size() )         return false;
+    if( crosssections_.size()       != collection.crosssections_.size() )    return false;
+    if( bigLow_.size()              != collection.bigLow_.size() )           return false;
+    if( storeDif_.size()            != collection.storeDif_.size() )         return false;
 
     for(unsigned int i =0; i<collection.bigLow_.size(); i++)
     {
@@ -874,6 +888,13 @@ bool ProcessCollection::operator==(const ProcessCollection &collection) const
     }
     else if( randomizer_ != collection.randomizer_)                                           return false;
 
+
+    if( geometry_ != NULL && collection.geometry_ != NULL)
+    {
+        if( *geometry_   != *collection.geometry_)                                        return false;
+    }
+    else if( geometry_ != collection.geometry_)                                           return false;
+
     //else
     return true;
 }
@@ -909,16 +930,17 @@ void ProcessCollection::swap(ProcessCollection &collection)
     vector<CrossSections*> tmp_cross1(collection.crosssections_);
     vector<CrossSections*> tmp_cross2(crosssections_);
 
-    swap( order_of_interpolation_    , collection.order_of_interpolation_ );
-    swap( do_interpolation_          , collection.do_interpolation_ );
-    swap( lpm_effect_enabled_        , collection.lpm_effect_enabled_ );
-    swap( ini_                       , collection.ini_ );
-    swap( debug_                     , collection.debug_ );
-    swap( up_                        , collection.up_ );
-    swap( do_weighting_              , collection.do_weighting_ );
-    swap( weighting_order_           , collection.weighting_order_ );
-    swap( weighting_starts_at_       , collection.weighting_starts_at_ );
-    swap( do_continuous_randomization, collection.do_continuous_randomization );
+    swap( order_of_interpolation_     , collection.order_of_interpolation_ );
+    swap( do_interpolation_           , collection.do_interpolation_ );
+    swap( lpm_effect_enabled_         , collection.lpm_effect_enabled_ );
+    swap( ini_                        , collection.ini_ );
+    swap( debug_                      , collection.debug_ );
+    swap( up_                         , collection.up_ );
+    swap( do_weighting_               , collection.do_weighting_ );
+    swap( weighting_order_            , collection.weighting_order_ );
+    swap( weighting_starts_at_        , collection.weighting_starts_at_ );
+    swap( do_continuous_randomization_, collection.do_continuous_randomization_ );
+    swap( location_                   , collection.location_ );
 
     particle_->swap( *collection.particle_ );       //particle pointer swap
     medium_->swap( *collection.medium_ );
@@ -946,6 +968,23 @@ void ProcessCollection::swap(ProcessCollection &collection)
         collection.randomizer_ = new ContinuousRandomization(*randomizer_);
         randomizer_ = NULL;
     }
+
+
+    if( geometry_ != NULL && collection.geometry_ != NULL)
+    {
+        geometry_->swap(*collection.geometry_);
+    }
+    else if( geometry_ == NULL && collection.geometry_ != NULL)
+    {
+        geometry_ = new Geometry(*collection.geometry_);
+        collection.geometry_ = NULL;
+    }
+    else if( geometry_ != NULL && collection.geometry_ == NULL)
+    {
+        collection.geometry_ = new Geometry(*geometry_);
+        geometry_ = NULL;
+    }
+
 
     // Set pointers again (to many swapping above....)
     SetParticle( new Particle(tmp_particle1) );
@@ -1238,7 +1277,7 @@ void ProcessCollection::SetMedium(Medium* medium)
     {
         crosssections_.at(i)->SetMedium(medium_);
     }
-    if(do_continuous_randomization)
+    if(do_continuous_randomization_)
     {
         randomizer_->SetMedium(medium_);
     }
@@ -1257,7 +1296,7 @@ void ProcessCollection::SetParticle(Particle* particle)
     {
         crosssections_.at(i)->SetParticle(particle);
     }
-    if(do_continuous_randomization)
+    if(do_continuous_randomization_)
     {
         randomizer_->SetParticle(particle_);
     }
@@ -1271,7 +1310,7 @@ void ProcessCollection::SetParticle(Particle* particle)
 void ProcessCollection::SetCrosssections(
         std::vector<CrossSections*> crosssections) {
     crosssections_ = crosssections;
-    if(do_continuous_randomization)
+    if(do_continuous_randomization_)
     {
         randomizer_->SetCrosssections(crosssections);
     }
@@ -1310,6 +1349,26 @@ void ProcessCollection::SetOrderOfInterpolation(int orderOfInterpolation) {
     order_of_interpolation_ = orderOfInterpolation;
 }
 
+void ProcessCollection::SetLocation(int location)
+{
+    if(location<0 || location > 2)
+    {
+        cerr<<"Warning: Invalid location! Must be 0,1,2 (infront, inside, behind). Set to 0!"<<endl;
+        location_   =   0;
+    }
+    else
+    {
+        location_   =   location;
+    }
+}
+
+void ProcessCollection::SetGeometry(Geometry *geometry){
+    geometry_   =   geometry;
+}
+
+void ProcessCollection::SetDensityCorrection(double density_correction){
+    density_correction_ =   density_correction;
+}
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//

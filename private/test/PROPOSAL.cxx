@@ -160,23 +160,25 @@ using namespace std;
 
 int main(int argc, char** argv){
 
-    double x,y,z,theta,phi;
-    x = -15.8385;
-    y = -8.7836;
-    z = -3.99414;
-    theta = 157.057;
-    phi = 317.619;
-    Particle * particle = new Particle("mu",x,y,z,theta,phi,0,0);
-    Geometry A;
+//    double x,y,z,theta,phi;
+//    x = -15.8385;
+//    y = -8.7836;
+//    z = -3.99414;
+//    theta = 157.057;
+//    phi = 317.619;
+//    Particle * particle = new Particle("mu",x,y,z,theta,phi,0,0);
+//    Geometry A;
 
-    double x0,y0,z0,radius,inner_radius,height;
-    x0=-4.23397;
-    y0=-5.88271;
-    z0=-14.7617;
-    radius = 10;
-    inner_radius = 6.72594;
-    height = 10;
-    A.InitCylinder(x0,y0,z0,radius,inner_radius,height);
-    A.IsParticleInside(particle);
+//    double x0,y0,z0,radius,inner_radius,height;
+//    x0=-4.23397;
+//    y0=-5.88271;
+//    z0=-14.7617;
+//    radius = 10;
+//    inner_radius = 6.72594;
+//    height = 10;
+//    A.InitCylinder(x0,y0,z0,radius,inner_radius,height);
+//    A.IsParticleInside(particle);
 
+    Propagator *pr = new Propagator();
+//    pr->ReadConfigFile("/home/koehne/PROPOSAL_restructure/restructure_Mar_11_2013/resources/configuration");
 }

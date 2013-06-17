@@ -23,6 +23,7 @@
 #include <vector>
 #include <utility>
 #include "PROPOSAL/ContinuousRandomization.h"
+#include "PROPOSAL/Geometry.h"
 
 
 
@@ -44,7 +45,12 @@ protected:
     double      weighting_order_;        //!< Re-weighting order. Set to 0 in constructor
     double      weighting_starts_at_;    //!< Distance at which re-weighting starts. Set to 0 in constructor
 
-    bool        do_continuous_randomization; //!< Enables the randomization of continuous energy losses
+    bool        do_continuous_randomization_; //!< Enables the randomization of continuous energy losses
+    int         location_;      //!< 0 = infront of the detector, 1 = inside the detector, 2 = behind the detector
+
+    double      density_correction_;     //!< density correction factor
+
+    Geometry*   geometry_;
 
     /*!
      * \brief indicates if the interpolated function is increasing or decreasing.
@@ -321,6 +327,10 @@ public:
 //----------------------------------------------------------------------------//
     //Getter
 
+    int GetLocation() const {
+        return location_;
+    }
+
 	std::vector<CrossSections*> GetCrosssections() const {
 		return crosssections_;
 	}
@@ -338,7 +348,7 @@ public:
 	}
 
     bool GetDoRandomization() const {
-        return do_continuous_randomization;
+        return do_continuous_randomization_;
     }
 
 	double GetIni() const {
@@ -372,6 +382,14 @@ public:
 	Particle* GetParticle() const {
 		return particle_;
 	}
+
+    Geometry* GetGeometry() const {
+        return geometry_;
+    }
+
+    double GetDensityCorrection() const {
+        return density_correction_;
+    }
 //----------------------------------------------------------------------------//
     //Setter
 
@@ -387,6 +405,9 @@ public:
 	void SetMedium(Medium* medium);
 	void SetOrderOfInterpolation(int orderOfInterpolation);
 	void SetParticle(Particle* particle);
+    void SetLocation(int location);
+    void SetGeometry(Geometry* geometry);
+    void SetDensityCorrection(double density_correction);
 };
 
 

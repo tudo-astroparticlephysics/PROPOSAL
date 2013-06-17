@@ -180,7 +180,18 @@ public:
              double t);
 
 //----------------------------------------------------------------------------//
+    /*!
+     * \brief Create particle with properties
+     *
+     * This constructor is used to create a Particle only by name.
+     * For example whne a ProcessCollection is created no other informations as
+     * mass, lifetime etc. are needed and no infos about energy or location are necessary
+     *
+     * \param name     particle name
+     */
+    Particle(std::string name);
 
+//----------------------------------------------------------------------------//
     /*!
      * initialize particle by its name
      *

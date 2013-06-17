@@ -19,6 +19,10 @@ TEST(Comparison , Comparison_equal ) {
     Particle H(1,2,"mu",0.,0.,0.,0.,0.,1e5,0.,5);
     Particle I(1,2,"mu",0.,0.,0.,0.,0.,1e5,0.,5);
     EXPECT_TRUE(H==I);
+    Particle* J = new Particle("mu");
+    Particle* K = new Particle("mu");
+    EXPECT_TRUE(*J==*K);
+
 
 }
 

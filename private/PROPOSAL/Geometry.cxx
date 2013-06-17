@@ -73,12 +73,12 @@ void Geometry::InitCylinder(double x0, double y0, double z0, double radius, doub
     radius_         =   radius;
     inner_radius_   =   inner_radius;
 
-    if(inner_radius > radius_)
+    if(inner_radius_ > radius_)
     {
         cerr<<"Warning: Inner radius is greater then radius (will be swaped)"<<endl;
         std::swap( inner_radius_ ,radius_ );
     }
-    if(inner_radius == radius_)
+    if(inner_radius_ == radius_)
     {
         cerr<<"Warning: Inner radius == radius (Volume is 0)"<<endl;
     }

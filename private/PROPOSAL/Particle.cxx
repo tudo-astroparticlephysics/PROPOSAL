@@ -388,6 +388,77 @@ Particle::Particle(string name,
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
+
+
+Particle::Particle(string name)
+    :propagated_distance_   ( 0 )
+    ,x_                     ( 0 )
+    ,y_                     ( 0 )
+    ,z_                     ( 0 )
+    ,t_                     ( 0 )
+    ,theta_                 ( 0 )
+    ,phi_                   ( 0 )
+    ,momentum_              ( 0 )
+    ,square_momentum_       ( 0 )
+    ,energy_                ( 0 )
+    ,mass_                  ( MMU )
+    ,lifetime_              ( LMU )
+    ,charge_                ( 1 )
+    ,name_                  ( name )
+    ,low_                   ( mass_ )
+    ,type_                  ( 1 )
+    ,parent_particle_id_    ( 0 )
+    ,particle_id_           ( 1 )
+    ,xi_                    ( 0 )
+    ,yi_                    ( 0 )
+    ,zi_                    ( 0 )
+    ,ti_                    ( 0 )
+    ,ei_                    ( 0 )
+    ,xf_                    ( 0 )
+    ,yf_                    ( 0 )
+    ,zf_                    ( 0 )
+    ,tf_                    ( 0 )
+    ,ef_                    ( 0 )
+    ,xc_                    ( 0 )
+    ,yc_                    ( 0 )
+    ,zc_                    ( 0 )
+    ,tc_                    ( 0 )
+    ,ec_                    ( 0 )
+    ,elost_                 ( 0 )
+{
+    if(StartsWith(name,"tau"))
+    {
+        name_        =   "tau";
+        type_        =   2;
+        mass_        =   MTAU;
+        lifetime_    =   LTAU;
+        low_         =   mass_;
+    }
+    else if(StartsWith(name,"e"))
+    {
+        name_        =   "e";
+        type_        =   3;
+        mass_        =   ME;
+        lifetime_    =   -1;
+        low_         =   mass_;
+    }
+    else if(StartsWith(name,"mu"))
+    {
+        name_        =   "mu";
+        type_        =   1;
+        mass_        =   MMU;
+        lifetime_    =   LMU;
+        low_         =   mass_;
+    }
+    else
+    {
+        InitByName(name);
+    }
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
 //-------------------------operators and swap function------------------------//
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
