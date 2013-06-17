@@ -108,6 +108,7 @@ IF(DoTesting)
   execute_process(COMMAND  tar -xvf ${PROJECT_SOURCE_DIR}/Test/TestFiles.tar.Z -C ${PROPOSAL_BINARY_DIR}/bin/
                     OUTPUT_VARIABLE _output OUTPUT_STRIP_TRAILING_WHITESPACE)
 
+  add_executable(UnitTest_Scattering Test/Scattering_TEST.cxx)
   add_executable(UnitTest_StandardNormal Test/StandardNormal_Test.cxx)
   add_executable(UnitTest_Photonuclear Test/Photonuclear_TEST.cxx)
   add_executable(UnitTest_Integral Test/Integral_TEST.cxx)
@@ -124,7 +125,7 @@ IF(DoTesting)
   add_executable(UnitTest_ContinuousRandomization Test/ContinuousRandomization_TEST.cxx)
   add_executable(UnitTest_Geometry Test/Geometry_TEST.cxx)
 
-
+  target_link_libraries(UnitTest_Scattering PROPOSAL gtest gtest_main)
   target_link_libraries(UnitTest_StandardNormal PROPOSAL gtest gtest_main)
   target_link_libraries(UnitTest_Integral PROPOSAL gtest gtest_main)
   target_link_libraries(UnitTest_Interpolant PROPOSAL gtest gtest_main)
@@ -141,7 +142,7 @@ IF(DoTesting)
   target_link_libraries(UnitTest_ContinuousRandomization PROPOSAL gtest gtest_main)
   target_link_libraries(UnitTest_Geometry PROPOSAL gtest gtest_main)
 
-
+  add_test(UnitTest_Scattering bin/UnitTest_Scattering)
   add_test(UnitTest_ContinuousRandomization bin/UnitTest_ContinuousRandomization)
   add_test(UnitTest_ProcessCollection bin/UnitTest_ProcessCollection)
   add_test(UnitTest_Decay bin/UnitTest_Decay)

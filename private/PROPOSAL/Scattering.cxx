@@ -27,8 +27,66 @@ using namespace std;
 
 Scattering::Scattering( )
 {
+    particle_ = new Particle("mu",0,0,0,0,0,0,0);
+    crosssections_.push_back(new Ionization());
+    crosssections_.push_back(new Bremsstrahlung());
+    crosssections_.push_back(new Photonuclear());
+    crosssections_.push_back(new Epairproduction());
+    for(unsigned int i =0;i<crosssections_.size();i++)
+    {
+        crosssections_.at(i)->SetParticle(particle_);
+    }
 
+    order_of_interpolation_ = 5;
+
+    for(unsigned int i =0;i<crosssections_.size();i++)
+    {
+        if( crosssections_.at(i)->GetName().compare("Bremsstrahlung") ==0){
+            Bremsstrahlung* tmp = (Bremsstrahlung*)crosssections_.at(i);
+            x0_ = tmp->CalculateScatteringX0();
+        }
+    }
+
+    integral_ = new Integral();
 }
+
+//double Scattering::cutoff   =   1;
+
+
+Scattering::Scattering(std::vector<CrossSections*> crosssections)
+{
+    crosssections_  =   crosssections;
+    particle_       =   crosssections_.at(0)->GetParticle();
+    integral_       =   new Integral(IROMB, IMAXS, IPREC2);
+
+    do_interpolation_ = false;
+
+    for(unsigned int i =0;i<crosssections_.size();i++)
+    {
+        if( crosssections_.at(i)->GetName().compare("Bremsstrahlung") ==0){
+            Bremsstrahlung* tmp = (Bremsstrahlung*)crosssections_.at(i);
+            x0_ = tmp->CalculateScatteringX0();
+        }
+    }
+
+    order_of_interpolation_ = 5;
+}
+
+Scattering::Scattering(const Scattering &scattering)
+{
+    if(scattering.interpolant_ != NULL)
+    {
+        interpolant_ = new Interpolant(*scattering.interpolant_) ;
+    }
+    else
+    {
+        interpolant_ = NULL;
+    }
+
+
+    integral_ = new Integral(* scattering.integral_);
+    x0_ = scattering.x0_;
+};
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
@@ -168,7 +226,118 @@ void Scattering::swap(Scattering &scattering)
 //----------------------------------------------------------------------------//
 
 
+/*! \file   Scattering.cxx
+*   \brief  Source file for the scattering routines.
+*
+*   For more details see the class documentation.
+*
+*   \date   29.06.2010
+*   \author Jan-Hendrik Koehne
+*/
 
+
+
+//----------------------------------------------------------------------------//
+
+
+double Scattering::FunctionToIntegral(double energy)
+{
+    double aux, aux2;
+    double result;
+
+    //Same Implentation as in double ProcessCollection::FunctionToIntegral(double energy)
+    //It was reimplemented to avoid building a ProcessCollecion Object to calculate or
+    //test the scattering class.
+    particle_->SetEnergy(energy);
+    result  =    0;
+
+    for(unsigned int i =0;i<crosssections_.size();i++)
+    {
+        aux     =   crosssections_.at(i)->CalculatedEdx();
+        result  +=  aux;
+    }
+
+    aux = -1/result;
+    //End of the reimplementation
+
+    aux2    =   RY*particle_->GetEnergy() / (particle_->GetMomentum() *particle_->GetMomentum());
+    aux     *=  aux2*aux2;
+
+    return aux;
+}
+
+//----------------------------------------------------------------------------//
+
+double Scattering::CalculateTheta0(double dr, double ei, double ef)
+{
+
+    double aux=-1;
+    double cutoff=1;
+    if(do_interpolation_)
+    {
+        if(fabs(ei-ef)>fabs(ei)*HALF_PRECISION)
+        {
+            aux         =   interpolant_->Interpolate(ei);
+            double aux2 =   aux - interpolant_->Interpolate(ef);
+
+            if(fabs(aux2)>fabs(aux)*HALF_PRECISION)
+            {
+                aux =   aux2;
+            }
+            else
+            {
+                aux =   interpolant_diff_->Interpolate((ei+ef)/2)*(ef-ei);
+            }
+        }
+        else
+        {
+            aux =   interpolant_diff_->Interpolate((ei+ef)/2)*(ef-ei);
+        }
+    }
+    else
+    {
+        aux = integral_->Integrate(ei, ef, boost::bind(&Scattering::FunctionToIntegral, this, _1),4);
+    }
+
+    aux =   sqrt(max(aux, 0.0)/x0_) *particle_->GetCharge();
+    aux *=  max(1 + 0.038*log(dr/x0_), 0.0);
+
+
+    return min(aux, cutoff);
+}
+
+
+//----------------------------------------------------------------------------//
+
+double Scattering::FunctionToBuildInterpolant(double energy)
+{
+        return integral_->Integrate(energy, BIGENERGY, boost::bind(&Scattering::FunctionToIntegral, this, _1),4);
+}
+
+void Scattering::EnableInterpolation()
+{
+    interpolant_ = new Interpolant(NUM2,particle_->GetLow() , BIGENERGY ,boost::bind(&Scattering::FunctionToBuildInterpolant, this, _1), order_of_interpolation_ , false, false, true, order_of_interpolation_, false, false, false );
+    interpolant_diff_ = new Interpolant(NUM2,particle_->GetLow() , BIGENERGY ,boost::bind(&Scattering::FunctionToIntegral, this, _1), order_of_interpolation_ , false, false, true, order_of_interpolation_, false, false, false );
+
+    do_interpolation_ = true;
+}
+
+/*
+//----------------------------------------------------------------------------//
+
+// Setter
+
+void Scattering::set_jt(bool newJT)
+{
+    jt  =   newJT;
+}
+
+void Scattering::set_df(bool newDF)
+{
+    df  =   newDF;
+}
+
+*/
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
