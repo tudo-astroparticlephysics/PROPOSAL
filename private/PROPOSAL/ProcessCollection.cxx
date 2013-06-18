@@ -560,6 +560,7 @@ ProcessCollection::ProcessCollection()
     ,weighting_starts_at_        ( 0 )
     ,do_continuous_randomization_( false )
     ,location_                   ( 0 )
+    ,density_correction_         ( 1. )
     ,up_                         ( false )
     ,bigLow_                     ( 2,0 )
     ,storeDif_                   ( 2,0 )
@@ -602,6 +603,7 @@ ProcessCollection::ProcessCollection(const ProcessCollection &collection)
     ,weighting_starts_at_        ( collection.weighting_starts_at_ )
     ,do_continuous_randomization_( collection.do_continuous_randomization_ )
     ,location_                   ( collection.location_ )
+    ,density_correction_         ( collection.density_correction_ )
     ,up_                         ( collection.up_)
     ,bigLow_                     ( collection.bigLow_ )
     ,storeDif_                   ( collection.storeDif_ )
@@ -729,6 +731,7 @@ ProcessCollection::ProcessCollection(Particle *particle, Medium *medium, EnergyC
     ,weighting_starts_at_        ( 0 )
     ,do_continuous_randomization_( false )
     ,location_                   ( 0 )
+    ,density_correction_         ( 1. )
     ,up_                         ( false )
     ,bigLow_                     ( 2,0 )
     ,storeDif_                   ( 2,0 )
@@ -803,6 +806,7 @@ bool ProcessCollection::operator==(const ProcessCollection &collection) const
     if( weighting_starts_at_        != collection.weighting_starts_at_ )     return false;
     if( do_continuous_randomization_!= collection.do_continuous_randomization_ )return false;
     if( location_                   != collection.location_ )                return false;
+    if( density_correction_         != collection.density_correction_ )      return false;
 
     if( *decay_                     != *collection.decay_ )                  return false;
 
@@ -941,6 +945,7 @@ void ProcessCollection::swap(ProcessCollection &collection)
     swap( weighting_starts_at_        , collection.weighting_starts_at_ );
     swap( do_continuous_randomization_, collection.do_continuous_randomization_ );
     swap( location_                   , collection.location_ );
+    swap( density_correction_         , collection.density_correction_ );
 
     particle_->swap( *collection.particle_ );       //particle pointer swap
     medium_->swap( *collection.medium_ );
