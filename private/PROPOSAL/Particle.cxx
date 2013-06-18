@@ -454,6 +454,8 @@ Particle::Particle(string name)
     {
         InitByName(name);
     }
+    SetEnergy(0);
+    Location(0, 0, 0, 0, 0, 0);
 }
 
 
