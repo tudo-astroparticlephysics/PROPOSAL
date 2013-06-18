@@ -215,11 +215,11 @@ double Photonuclear::CalculateStochasticLoss(double rnd1, double rnd2)
 //----------------------------------------------------------------------------//
 
 
-void Photonuclear::EnableDNdxInterpolation()
+void Photonuclear::EnableDNdxInterpolation(std::string path)
 {
     if(do_dndx_Interpolation_)return;
 
-    EnablePhotoInterpolation();
+    EnablePhotoInterpolation(path);
 
     double energy = particle_->GetEnergy();
     dndx_interpolant_1d_.resize(medium_->GetNumCompontents());
@@ -241,11 +241,11 @@ void Photonuclear::EnableDNdxInterpolation()
 //----------------------------------------------------------------------------//
 
 
-void Photonuclear::EnableDEdxInterpolation()
+void Photonuclear::EnableDEdxInterpolation(std::string path)
 {
     if(do_dedx_Interpolation_)return;
 
-    EnablePhotoInterpolation();
+    EnablePhotoInterpolation(path);
     double energy = particle_->GetEnergy();
     dedx_interpolant_ = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, boost::bind(&Photonuclear::FunctionToBuildDEdxInterpolant, this, _1),
                                         order_of_interpolation_, true, false, true, order_of_interpolation_, false, false, false);
@@ -258,7 +258,7 @@ void Photonuclear::EnableDEdxInterpolation()
 //----------------------------------------------------------------------------//
 
 
-void Photonuclear::EnablePhotoInterpolation()
+void Photonuclear::EnablePhotoInterpolation(std::string path)
 {
     if(do_photo_interpolation_)return;
 

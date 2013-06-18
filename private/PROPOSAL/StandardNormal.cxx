@@ -100,7 +100,7 @@ double StandardNormal::StandardNormalRandomNumber(double rnd, double average, do
 //----------------------------------------------------------------------------//
 
 
-void StandardNormal::EnableInterpolation()
+void StandardNormal::EnableInterpolation(std::string path)
 {
     interpolant_    =   new Interpolant(NUM2, -5, 5, boost::bind(&StandardNormal::FunctionToBuildInterpolant, this, _1), order_of_interpolation_, true, false, false, order_of_interpolation_, true, false, false);
     do_interpolation_=true;

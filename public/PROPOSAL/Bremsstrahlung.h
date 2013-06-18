@@ -161,11 +161,11 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    void EnableDNdxInterpolation();
+    void EnableDNdxInterpolation(std::string path ="");
 
 //----------------------------------------------------------------------------//
 
-    void EnableDEdxInterpolation();
+    void EnableDEdxInterpolation(std::string path ="");
 
 //----------------------------------------------------------------------------//
 

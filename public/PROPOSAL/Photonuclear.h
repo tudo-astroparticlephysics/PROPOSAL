@@ -211,15 +211,15 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    void EnableDNdxInterpolation();
+    void EnableDNdxInterpolation(std::string path ="");
 
 //----------------------------------------------------------------------------//
 
-    void EnableDEdxInterpolation();
+    void EnableDEdxInterpolation(std::string path ="");
 
 //----------------------------------------------------------------------------//
 
-    void EnablePhotoInterpolation();
+    void EnablePhotoInterpolation(std::string path ="");
 
 //----------------------------------------------------------------------------//
 

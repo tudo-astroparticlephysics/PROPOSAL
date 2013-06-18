@@ -87,7 +87,7 @@ global
     photo_multiplier    2
     ioniz_multiplier    3
     epair_multiplier    4
-    path_to_tables      /home/koehne/tables
+    path_to_tables      /home/koehne/PROPOSAL_restructure/buildrestructure_Mar_11_2013/uaaaaah
     ecut_inside         500
     ecut_infront       222
     ecut_behind        1999.2
@@ -134,15 +134,6 @@ global
 #       keyword Mediumname  density_correction_factor   (if density_correction_factor is not given, it is assumed as 1)
 #
 # you can specify as many sectors as you like/need
-
-sector
-    sphere  0   0   0   10  0
-
-    inside  2     0.1  1
-    infront 3    0.01  1
-    behind  4    0.001  1
-
-    medium Ice 1.
 
 sector
     sphere  0   0   0   10  0

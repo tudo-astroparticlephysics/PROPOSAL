@@ -260,11 +260,11 @@ double Epairproduction::CalculateStochasticLoss(double rnd1, double rnd2)
 //----------------------------------------------------------------------------//
 
 
-void Epairproduction::EnableDNdxInterpolation()
+void Epairproduction::EnableDNdxInterpolation(std::string path)
 {
     if(do_dndx_Interpolation_)return;
 
-    EnableEpairInterpolation();
+    EnableEpairInterpolation(path);
 
     double energy = particle_->GetEnergy();
     dndx_interpolant_1d_.resize(medium_->GetNumCompontents());
@@ -285,11 +285,11 @@ void Epairproduction::EnableDNdxInterpolation()
 //----------------------------------------------------------------------------//
 
 
-void Epairproduction::EnableDEdxInterpolation()
+void Epairproduction::EnableDEdxInterpolation(std::string path)
 {
     if(do_dedx_Interpolation_)return;
 
-    EnableEpairInterpolation();
+    EnableEpairInterpolation(path);
 
     double energy = particle_->GetEnergy();
 
@@ -305,7 +305,7 @@ void Epairproduction::EnableDEdxInterpolation()
 //----------------------------------------------------------------------------//
 
 
-void Epairproduction::EnableEpairInterpolation()
+void Epairproduction::EnableEpairInterpolation(std::string path)
 {
     if(do_epair_interpolation_)return;
 

@@ -105,11 +105,11 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    virtual void EnableDNdxInterpolation() = 0;
+    virtual void EnableDNdxInterpolation(std::string path ="") = 0;
 
 //----------------------------------------------------------------------------//
 
-    virtual void EnableDEdxInterpolation() = 0;
+    virtual void EnableDEdxInterpolation(std::string path ="") = 0;
 
 //----------------------------------------------------------------------------//
 

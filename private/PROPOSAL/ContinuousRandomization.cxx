@@ -36,7 +36,7 @@ double ContinuousRandomization::Randomize(double initial_energy, double final_en
 //----------------------------------------------------------------------------//
 
 
-void ContinuousRandomization::EnableDE2dxInterpolation()
+void ContinuousRandomization::EnableDE2dxInterpolation(std::string path)
 {
     if(do_dE2dx_Interpolation_)return;
     standard_normal_->EnableInterpolation();
@@ -54,7 +54,7 @@ void ContinuousRandomization::EnableDE2dxInterpolation()
 //----------------------------------------------------------------------------//
 
 
-void ContinuousRandomization::EnableDE2deInterpolation()
+void ContinuousRandomization::EnableDE2deInterpolation(std::string path)
 {
     if(do_dE2de_Interpolation_)return;
     standard_normal_->EnableInterpolation();

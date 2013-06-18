@@ -107,6 +107,13 @@ private:
     * 3 for electrons inside/behind/infront
     */
     void InitProcessCollections(std::ifstream &file);
+
+//----------------------------------------------------------------------------//
+    /*!
+     *  Apply options which are read from configuration file to ProcessCollections
+    */
+    void ApplyOptions();
+
 public:
 
     //Constructors
@@ -165,7 +172,7 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    void EnableInterpolation();
+    void EnableInterpolation(std::string path ="");
 
 //----------------------------------------------------------------------------//
 
@@ -185,7 +192,7 @@ public:
     /**
      * Enables the Interpolation for calculation the exact particle time
      */
-    void EnableParticleTimeInterpolation();
+    void EnableParticleTimeInterpolation(std::string path);
 //----------------------------------------------------------------------------//
 
     /**

@@ -45,10 +45,11 @@ protected:
     double      weighting_order_;        //!< Re-weighting order. Set to 0 in constructor
     double      weighting_starts_at_;    //!< Distance at which re-weighting starts. Set to 0 in constructor
 
-    bool        do_continuous_randomization_; //!< Enables the randomization of continuous energy losses
-    int         location_;      //!< 0 = infront of the detector, 1 = inside the detector, 2 = behind the detector
+    bool        enable_randomization_;        //!< if true continuous randomization will be enabled (to remember if randomization should be enable when cross sections are initalized)
+    bool        do_continuous_randomization_; //!< if true randomization of continuous energy losses is enabled
+    int         location_;                    //!< 0 = infront of the detector, 1 = inside the detector, 2 = behind the detector
 
-    double      density_correction_;     //!< density correction factor
+    double      density_correction_;          //!< density correction factor
 
     Geometry*   geometry_;
 
@@ -253,21 +254,21 @@ public:
      * Enables the Interpolation including dEdx and dNdx for
      * every crosssection in vector crosssections_
      */
-    void EnableInterpolation();
+    void EnableInterpolation(std::string path ="");
 //----------------------------------------------------------------------------//
 
     /**
      * Enables the dEdx Interpolation for every crosssection in vector
      * crosssections_
      */
-    void EnableDEdxInterpolation();
+    void EnableDEdxInterpolation(std::string path ="");
 
 //----------------------------------------------------------------------------//
     /**
      * Enables the dNdx Interpolation for every crosssection in vector
      * crosssections_
      */
-    void EnableDNdxInterpolation();
+    void EnableDNdxInterpolation(std::string path ="");
 
 //----------------------------------------------------------------------------//
     /**
@@ -371,6 +372,14 @@ public:
 		return lpm_effect_enabled_;
 	}
 
+    bool GetContinuousRandomization() const {
+        return do_continuous_randomization_;
+    }
+
+    bool GetEnableRandomization() const {
+        return enable_randomization_;
+    }
+
 	Medium* GetMedium() const {
 		return medium_;
 	}
@@ -408,6 +417,8 @@ public:
     void SetLocation(int location);
     void SetGeometry(Geometry* geometry);
     void SetDensityCorrection(double density_correction);
+    void SetEnableRandomization(bool enable_randomization);
+
 };
 
 

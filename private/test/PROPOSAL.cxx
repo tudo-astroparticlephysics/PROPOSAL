@@ -185,6 +185,7 @@ int main(int argc, char** argv){
     {
         cout<<"coll "<<pr->GetCollections().at(i)->GetParticle()->GetName()<<"\t";
         cout<<pr->GetCollections().at(i)->GetMedium()->GetName()<<"\t";
+        cout<<pr->GetCollections().at(i)->GetGeometry()->GetObject()<<"\t";
         cout<<pr->GetCollections().at(i)->GetCutSettings()->GetVcut()<<endl;
 
     }

@@ -176,7 +176,7 @@ double Ionization::CalculateStochasticLoss(double rnd1, double rnd2)
 //----------------------------------------------------------------------------//
 
 
-void Ionization::EnableDNdxInterpolation()
+void Ionization::EnableDNdxInterpolation(std::string path)
 {
     double energy = particle_->GetEnergy();
 
@@ -192,7 +192,7 @@ void Ionization::EnableDNdxInterpolation()
 //----------------------------------------------------------------------------//
 
 
-void Ionization::EnableDEdxInterpolation()
+void Ionization::EnableDEdxInterpolation(std::string path)
 {
     double energy = particle_->GetEnergy();
     dedx_interpolant_ = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, boost::bind(&Ionization::FunctionToBuildDEdxInterpolant, this, _1), order_of_interpolation_, true, false, true, order_of_interpolation_, false, false, true);

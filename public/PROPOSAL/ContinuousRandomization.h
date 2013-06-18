@@ -82,11 +82,11 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    void EnableDE2dxInterpolation();
+    void EnableDE2dxInterpolation(std::string path ="");
 
 //----------------------------------------------------------------------------//
 
-    void EnableDE2deInterpolation();
+    void EnableDE2deInterpolation(std::string path ="");
 
 //----------------------------------------------------------------------------//
 

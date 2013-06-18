@@ -369,12 +369,12 @@ double ProcessCollection::Randomize(double initial_energy, double final_energy)
 //----------------------------------------------------------------------------//
 
 
-void ProcessCollection::EnableInterpolation()
+void ProcessCollection::EnableInterpolation(std::string path)
 {
     if(do_interpolation_)return;
 
-    EnableDEdxInterpolation();
-    EnableDNdxInterpolation();
+    EnableDEdxInterpolation(path);
+    EnableDNdxInterpolation(path);
 
     double energy = particle_->GetEnergy();
 
@@ -405,8 +405,8 @@ void ProcessCollection::EnableInterpolation()
 
     if(do_continuous_randomization_)
     {
-        randomizer_->EnableDE2dxInterpolation();
-        randomizer_->EnableDE2deInterpolation();
+        randomizer_->EnableDE2dxInterpolation(path);
+        randomizer_->EnableDE2deInterpolation(path);
     }
 
     do_interpolation_=true;
@@ -419,11 +419,11 @@ void ProcessCollection::EnableInterpolation()
 
 
 
-void ProcessCollection::EnableDEdxInterpolation()
+void ProcessCollection::EnableDEdxInterpolation(std::string path)
 {
     for(unsigned int i =0 ; i < crosssections_.size() ; i++)
     {
-        crosssections_.at(i)->EnableDEdxInterpolation();
+        crosssections_.at(i)->EnableDEdxInterpolation(path);
         cout<<"dEdx for "<<crosssections_.at(i)->GetName()<<" interpolated"<<endl;
 
     }
@@ -435,11 +435,11 @@ void ProcessCollection::EnableDEdxInterpolation()
 
 
 
-void ProcessCollection::EnableDNdxInterpolation()
+void ProcessCollection::EnableDNdxInterpolation(std::string path)
 {
     for(unsigned int i =0 ; i < crosssections_.size() ; i++)
     {
-        crosssections_.at(i)->EnableDNdxInterpolation();
+        crosssections_.at(i)->EnableDNdxInterpolation(path);
         cout<<"dNdx for "<<crosssections_.at(i)->GetName()<<" interpolated"<<endl;
 
     }
@@ -558,6 +558,7 @@ ProcessCollection::ProcessCollection()
     ,do_weighting_               ( false )
     ,weighting_order_            ( 0 )
     ,weighting_starts_at_        ( 0 )
+    ,enable_randomization_       ( false )
     ,do_continuous_randomization_( false )
     ,location_                   ( 0 )
     ,density_correction_         ( 1. )
@@ -601,6 +602,7 @@ ProcessCollection::ProcessCollection(const ProcessCollection &collection)
     ,do_weighting_               ( collection.do_weighting_ )
     ,weighting_order_            ( collection.weighting_order_ )
     ,weighting_starts_at_        ( collection.weighting_starts_at_ )
+    ,enable_randomization_       ( collection.enable_randomization_ )
     ,do_continuous_randomization_( collection.do_continuous_randomization_ )
     ,location_                   ( collection.location_ )
     ,density_correction_         ( collection.density_correction_ )
@@ -729,6 +731,7 @@ ProcessCollection::ProcessCollection(Particle *particle, Medium *medium, EnergyC
     ,do_weighting_               ( false )
     ,weighting_order_            ( 0 )
     ,weighting_starts_at_        ( 0 )
+    ,enable_randomization_       ( false )
     ,do_continuous_randomization_( false )
     ,location_                   ( 0 )
     ,density_correction_         ( 1. )
@@ -804,6 +807,7 @@ bool ProcessCollection::operator==(const ProcessCollection &collection) const
     if( do_weighting_               != collection.do_weighting_ )            return false;
     if( weighting_order_            != collection.weighting_order_ )         return false;
     if( weighting_starts_at_        != collection.weighting_starts_at_ )     return false;
+    if( enable_randomization_       != collection.enable_randomization_ )    return false;
     if( do_continuous_randomization_!= collection.do_continuous_randomization_ )return false;
     if( location_                   != collection.location_ )                return false;
     if( density_correction_         != collection.density_correction_ )      return false;
@@ -944,6 +948,7 @@ void ProcessCollection::swap(ProcessCollection &collection)
     swap( weighting_order_            , collection.weighting_order_ );
     swap( weighting_starts_at_        , collection.weighting_starts_at_ );
     swap( do_continuous_randomization_, collection.do_continuous_randomization_ );
+    swap( enable_randomization_       , collection.enable_randomization_ );
     swap( location_                   , collection.location_ );
     swap( density_correction_         , collection.density_correction_ );
 
@@ -1373,6 +1378,10 @@ void ProcessCollection::SetGeometry(Geometry *geometry){
 
 void ProcessCollection::SetDensityCorrection(double density_correction){
     density_correction_ =   density_correction;
+}
+
+void ProcessCollection::SetEnableRandomization(bool enable_randomization){
+    enable_randomization_ =   enable_randomization;
 }
 
 //----------------------------------------------------------------------------//

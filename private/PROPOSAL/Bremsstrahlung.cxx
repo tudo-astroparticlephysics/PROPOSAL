@@ -4,6 +4,7 @@
 #include <cmath>
 #include <algorithm>
 #include <boost/program_options.hpp>
+#include <sstream>
 
 using namespace std;
 
@@ -277,21 +278,98 @@ double Bremsstrahlung::CalculateScatteringX0()
 //----------------------------------------------------------------------------//
 
 
-void Bremsstrahlung::EnableDNdxInterpolation()
+void Bremsstrahlung::EnableDNdxInterpolation(std::string path)
 {
     if(do_dndx_Interpolation_)return;
 
-    double energy = particle_->GetEnergy();
-    dndx_interpolant_1d_.resize( medium_->GetNumCompontents() );
-    dndx_interpolant_2d_.resize( medium_->GetNumCompontents() );
-    for(int i=0; i<(medium_->GetNumCompontents()); i++)
+    if(!path.empty())
     {
-        component_ = i;
-        dndx_interpolant_2d_.at(i) = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY,  NUM1, 0, 1, boost::bind(&Bremsstrahlung::FunctionToBuildDNdxInterpolant2D, this, _1 , _2), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false, order_of_interpolation_, true, false, false);
-        dndx_interpolant_1d_.at(i) = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, boost::bind(&Bremsstrahlung::FunctionToBuildDNdxInterpolant, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, true, false, false);
+        stringstream filename;
+        stringstream filename_1d;
+        stringstream filename_2d;
+        filename<<path<<"/Brems_dNdx_particle_"<<particle_->GetName()
+                <<"_para_"<<parametrization_
+                <<"_med_"<<medium_->GetName()
+                <<"_ecut_"<<cut_settings_->GetEcut()
+                <<"_vcut_"<<cut_settings_->GetVcut()
+                <<"_lpm_"<<lpm_effect_enabled_;
+        filename_1d<<filename.str()<<"_1d";
+        filename_2d<<filename.str()<<"_2d";
 
+        dndx_interpolant_1d_.resize( medium_->GetNumCompontents() );
+        dndx_interpolant_2d_.resize( medium_->GetNumCompontents() );
+
+        if( FileExist(filename_1d.str()) && FileExist(filename_2d.str()))
+        {
+            cerr<<"Info: Bremsstrahlungs parametrisation tables (dNdx) will be read from file:"<<endl;
+            cerr<<"\t1d:\t"<<filename_1d.str()<<endl;
+            cerr<<"\t2d:\t"<<filename_2d.str()<<endl;
+            ifstream input_1d;
+            ifstream input_2d;
+
+            input_1d.open(filename_1d.str().c_str());
+            input_2d.open(filename_2d.str().c_str());
+
+            for(int i=0; i<(medium_->GetNumCompontents()); i++)
+            {
+                component_ = i;
+                dndx_interpolant_2d_.at(i) = new Interpolant();
+                dndx_interpolant_1d_.at(i) = new Interpolant();
+
+                dndx_interpolant_2d_.at(i)->Load(input_2d);
+                dndx_interpolant_1d_.at(i)->Load(input_1d);
+
+            }
+            input_1d.close();
+            input_2d.close();
+        }
+        else
+        {
+            cerr<<"Info: Bremsstrahlungs parametrisation tables (dNdx) will be safed to file:"<<endl;
+            cerr<<"\t1d:\t"<<filename_1d.str()<<endl;
+            cerr<<"\t2d:\t"<<filename_2d.str()<<endl;
+            ofstream output_1d;
+            ofstream output_2d;
+
+            output_1d.open(filename_1d.str().c_str());
+            output_2d.open(filename_2d.str().c_str());
+
+            output_1d.precision(16);
+            output_2d.precision(16);
+
+            double energy = particle_->GetEnergy();
+
+            for(int i=0; i<(medium_->GetNumCompontents()); i++)
+            {
+                component_ = i;
+
+                dndx_interpolant_2d_.at(i) = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY,  NUM1, 0, 1, boost::bind(&Bremsstrahlung::FunctionToBuildDNdxInterpolant2D, this, _1 , _2), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false, order_of_interpolation_, true, false, false);
+                dndx_interpolant_1d_.at(i) = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, boost::bind(&Bremsstrahlung::FunctionToBuildDNdxInterpolant, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, true, false, false);
+
+                dndx_interpolant_2d_.at(i)->Save(output_2d);
+                dndx_interpolant_1d_.at(i)->Save(output_1d);
+
+            }
+            particle_->SetEnergy(energy);
+
+            output_1d.close();
+            output_2d.close();
+        }
     }
-    particle_->SetEnergy(energy);
+    else
+    {
+        double energy = particle_->GetEnergy();
+        dndx_interpolant_1d_.resize( medium_->GetNumCompontents() );
+        dndx_interpolant_2d_.resize( medium_->GetNumCompontents() );
+        for(int i=0; i<(medium_->GetNumCompontents()); i++)
+        {
+            component_ = i;
+            dndx_interpolant_2d_.at(i) = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY,  NUM1, 0, 1, boost::bind(&Bremsstrahlung::FunctionToBuildDNdxInterpolant2D, this, _1 , _2), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false, order_of_interpolation_, true, false, false);
+            dndx_interpolant_1d_.at(i) = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, boost::bind(&Bremsstrahlung::FunctionToBuildDNdxInterpolant, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, true, false, false);
+
+        }
+        particle_->SetEnergy(energy);
+    }
 
     do_dndx_Interpolation_=true;
 }
@@ -301,7 +379,7 @@ void Bremsstrahlung::EnableDNdxInterpolation()
 //----------------------------------------------------------------------------//
 
 
-void Bremsstrahlung::EnableDEdxInterpolation()
+void Bremsstrahlung::EnableDEdxInterpolation(std::string path)
 {
     double energy = particle_->GetEnergy();
     dedx_interpolant_ = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, boost::bind(&Bremsstrahlung::FunctionToBuildDEdxInterpolant, this, _1),

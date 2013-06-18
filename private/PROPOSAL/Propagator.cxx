@@ -639,13 +639,8 @@ void Propagator::ReadConfigFile(string config_file)
             continue;
         }
     }
-    cout<<photo_<<"\t"<<brems_<<"\t"<<seed_<<"\t"<<brems_multiplier_<<"\t"<<photo_multiplier_<<"\t"<<ioniz_multiplier_<<"\t"<<epair_multiplier_<<endl;
-    cout<<lpm_<<"\t"<<moliere_<<"\t"<<do_exact_time_calulation_<<"\t"<<integrate_<<"\t"<<path_to_tables_<<endl;
-    cout<<global_ecut_inside_<<"\t"<<global_ecut_infront_<<"\t"<<global_ecut_behind_<<endl;
-    cout<<global_vcut_inside_<<"\t"<<global_vcut_infront_<<"\t"<<global_vcut_behind_<<endl;
-    cout<<global_cont_inside_<<"\t"<<global_cont_infront_<<"\t"<<global_cont_behind_<<endl;
 
-
+    ApplyOptions();
 }
 
 
@@ -656,7 +651,7 @@ void Propagator::ReadConfigFile(string config_file)
 //----------------------------------------------------------------------------//
 
 
-void Propagator::EnableParticleTimeInterpolation()
+void Propagator::EnableParticleTimeInterpolation(std::string path)
 {
     if(do_time_interpolation_)return;
 
@@ -690,10 +685,10 @@ void Propagator::DisableParticleTimeInterpolation()
 //----------------------------------------------------------------------------//
 
 
-void Propagator::EnableInterpolation()
+void Propagator::EnableInterpolation(std::string path)
 {
-    collection_->EnableInterpolation();
-    EnableParticleTimeInterpolation();
+    collection_->EnableInterpolation(path);
+    EnableParticleTimeInterpolation(path);
 }
 
 
@@ -1254,61 +1249,152 @@ void Propagator::InitProcessCollections(ifstream &file)
             EnergyCutSettings *infront;
             EnergyCutSettings *behind;
 
+            ProcessCollection* mu_inside;
+            ProcessCollection* tau_inside;
+            ProcessCollection* e_inside;
+
+            ProcessCollection* mu_infront;
+            ProcessCollection* tau_infront;
+            ProcessCollection* e_infront;
+
+            ProcessCollection* mu_behind;
+            ProcessCollection* tau_behind;
+            ProcessCollection* e_behind;
+
             if(found_inside_cuts)
             {
                 inside = new EnergyCutSettings(ecut_inside,vcut_inside);
+
+                mu_inside   = new ProcessCollection(new Particle(*mu),new Medium(*med),new EnergyCutSettings(*inside));
+                tau_inside  = new ProcessCollection(new Particle(*tau),new Medium(*med),new EnergyCutSettings(*inside));
+                e_inside    = new ProcessCollection(new Particle(*e),new Medium(*med),new EnergyCutSettings(*inside));
+
+                mu_inside->SetEnableRandomization(cont_inside);
+                mu_inside->SetLocation(1);
+
+                tau_inside->SetEnableRandomization(cont_inside);
+                tau_inside->SetLocation(1);
+
+                e_inside->SetEnableRandomization(cont_inside);
+                e_inside->SetLocation(1);
             }
             else
             {
                 inside = new EnergyCutSettings(global_ecut_inside_,global_vcut_inside_);
+
+                mu_inside   = new ProcessCollection(new Particle(*mu),new Medium(*med),new EnergyCutSettings(*inside));
+                tau_inside  = new ProcessCollection(new Particle(*tau),new Medium(*med),new EnergyCutSettings(*inside));
+                e_inside    = new ProcessCollection(new Particle(*e),new Medium(*med),new EnergyCutSettings(*inside));
+
+                mu_inside->SetEnableRandomization(global_cont_inside_);
+                mu_inside->SetLocation(1);
+
+                tau_inside->SetEnableRandomization(global_cont_inside_);
+                tau_inside->SetLocation(1);
+
+                e_inside->SetEnableRandomization(global_cont_inside_);
+                e_inside->SetLocation(1);
             }
 
             if(found_infront_cuts)
             {
                 infront = new EnergyCutSettings(ecut_infront,vcut_infront);
+
+                mu_infront   = new ProcessCollection(new Particle(*mu),new Medium(*med),new EnergyCutSettings(*infront));
+                tau_infront  = new ProcessCollection(new Particle(*tau),new Medium(*med),new EnergyCutSettings(*infront));
+                e_infront    = new ProcessCollection(new Particle(*e),new Medium(*med),new EnergyCutSettings(*infront));
+
+                mu_infront->SetEnableRandomization(cont_infront);
+                mu_infront->SetLocation(0);
+
+                tau_infront->SetEnableRandomization(cont_infront);
+                tau_infront->SetLocation(0);
+
+                e_infront->SetEnableRandomization(cont_infront);
+                e_infront->SetLocation(0);
             }
             else
             {
                 infront = new EnergyCutSettings(global_ecut_infront_,global_vcut_infront_);
+
+                mu_infront   = new ProcessCollection(new Particle(*mu),new Medium(*med),new EnergyCutSettings(*infront));
+                tau_infront  = new ProcessCollection(new Particle(*tau),new Medium(*med),new EnergyCutSettings(*infront));
+                e_infront    = new ProcessCollection(new Particle(*e),new Medium(*med),new EnergyCutSettings(*infront));
+
+                mu_infront->SetEnableRandomization(global_cont_infront_);
+                mu_infront->SetLocation(0);
+
+                tau_infront->SetEnableRandomization(global_cont_infront_);
+                tau_infront->SetLocation(0);
+
+                e_infront->SetEnableRandomization(global_cont_infront_);
+                e_infront->SetLocation(0);
             }
 
-            if(found_inside_cuts)
+            if(found_behind_cuts)
             {
                 behind = new EnergyCutSettings(ecut_behind,vcut_behind);
+
+                mu_behind   = new ProcessCollection(new Particle(*mu),new Medium(*med),new EnergyCutSettings(*behind));
+                tau_behind  = new ProcessCollection(new Particle(*tau),new Medium(*med),new EnergyCutSettings(*behind));
+                e_behind    = new ProcessCollection(new Particle(*e),new Medium(*med),new EnergyCutSettings(*behind));
+
+                mu_behind->SetEnableRandomization(cont_behind);
+                mu_behind->SetLocation(2);
+
+                tau_behind->SetEnableRandomization(cont_behind);
+                tau_behind->SetLocation(2);
+
+                e_behind->SetEnableRandomization(cont_behind);
+                e_behind->SetLocation(2);
             }
             else
             {
                 behind = new EnergyCutSettings(global_ecut_behind_,global_vcut_behind_);
+
+                mu_behind   = new ProcessCollection(new Particle(*mu),new Medium(*med),new EnergyCutSettings(*behind));
+                tau_behind  = new ProcessCollection(new Particle(*tau),new Medium(*med),new EnergyCutSettings(*behind));
+                e_behind    = new ProcessCollection(new Particle(*e),new Medium(*med),new EnergyCutSettings(*behind));
+
+                mu_behind->SetEnableRandomization(global_cont_behind_);
+                mu_behind->SetLocation(2);
+
+                tau_behind->SetEnableRandomization(global_cont_behind_);
+                tau_behind->SetLocation(2);
+
+                e_behind->SetEnableRandomization(global_cont_behind_);
+                e_behind->SetLocation(2);
             }
+
 
             int former_size =collections_.size();
 
-            collections_.push_back( new ProcessCollection(new Particle(*mu),new Medium(*med),new EnergyCutSettings(*infront)) );
-            collections_.push_back( new ProcessCollection(new Particle(*mu),new Medium(*med),new EnergyCutSettings(*inside)) );
-            collections_.push_back( new ProcessCollection(new Particle(*mu),new Medium(*med),new EnergyCutSettings(*behind)) );
+            collections_.push_back( mu_infront );
+            collections_.push_back( mu_inside );
+            collections_.push_back( mu_behind );
 
-            collections_.push_back( new ProcessCollection(new Particle(*tau),new Medium(*med),new EnergyCutSettings(*infront)) );
-            collections_.push_back( new ProcessCollection(new Particle(*tau),new Medium(*med),new EnergyCutSettings(*inside)) );
-            collections_.push_back( new ProcessCollection(new Particle(*tau),new Medium(*med),new EnergyCutSettings(*behind)) );
+            collections_.push_back( tau_infront );
+            collections_.push_back( tau_inside );
+            collections_.push_back( tau_behind );
 
-            collections_.push_back( new ProcessCollection(new Particle(*e),new Medium(*med),new EnergyCutSettings(*infront)) );
-            collections_.push_back( new ProcessCollection(new Particle(*e),new Medium(*med),new EnergyCutSettings(*inside)) );
-            collections_.push_back( new ProcessCollection(new Particle(*e),new Medium(*med),new EnergyCutSettings(*behind)) );
+            collections_.push_back( e_infront );
+            collections_.push_back( e_inside );
+            collections_.push_back( e_behind );
 
             for(unsigned int i = former_size ;i<collections_.size(); i++)
             {
                 collections_.at(i)->SetGeometry(geometry);
                 collections_.at(i)->SetDensityCorrection(density_correction);
             }
-            delete med;
 
+            delete med;
             delete mu;
             delete tau;
             delete e;
-
             delete inside;
             delete infront;
             delete behind;
+
             break;
         }
         else
@@ -1459,7 +1545,7 @@ void Propagator::InitGeometry(Geometry* geometry, std::deque<std::string>* token
         cout<<origin_x<<"\t"<<origin_y<<"\t"<<origin_z<<"\t"<<radius<<"\t"<<inner_radius<<"\t"<<height<<endl;
 
     }
-    if(ToLowerCase(taux).compare("sphere")==0)
+    else if(ToLowerCase(taux).compare("sphere")==0)
     {
         double radius;
         double inner_radius =   0;
@@ -1668,6 +1754,56 @@ void Propagator::InitGeometry(Geometry* geometry, std::deque<std::string>* token
     }
 
 }
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+void Propagator::ApplyOptions()
+{
+    for(unsigned int j = 0 ; j < collections_.size() ; j++)
+    {
+        for(unsigned int i =0; i<collections_.at(j)->GetCrosssections().size(); i++)
+        {
+            if(collections_.at(j)->GetCrosssections().at(i)->GetName().compare("Bremsstrahlung")==0)
+            {
+                collections_.at(j)->GetCrosssections().at(i)->SetParametrization(brems_);
+                collections_.at(j)->GetCrosssections().at(i)->SetMultiplier(brems_multiplier_);
+                collections_.at(j)->GetCrosssections().at(i)->EnableLpmEffect(lpm_);
+                collections_.at(j)->GetCrosssections().at(i)->EnableDNdxInterpolation(path_to_tables_);
+
+            }
+            else if(collections_.at(j)->GetCrosssections().at(i)->GetName().compare("Ionization")==0)
+            {
+                collections_.at(j)->GetCrosssections().at(i)->SetMultiplier(ioniz_multiplier_);
+            }
+            else if(collections_.at(j)->GetCrosssections().at(i)->GetName().compare("Epairproduction")==0)
+            {
+                collections_.at(j)->GetCrosssections().at(i)->SetMultiplier(epair_multiplier_);
+                collections_.at(j)->GetCrosssections().at(i)->EnableLpmEffect(lpm_);
+            }
+            else if(collections_.at(j)->GetCrosssections().at(i)->GetName().compare("Photonuclear")==0)
+            {
+                collections_.at(j)->GetCrosssections().at(i)->SetParametrization(photo_);
+                collections_.at(j)->GetCrosssections().at(i)->SetMultiplier(photo_multiplier_);
+            }
+
+        }
+        if(moliere_)
+        {
+            //collections_.at(j)->EnableMoliereScattering();
+        }
+//        if(!integrate_)
+//        {
+//            collections_.at(j)->EnableInterpolation();
+//            //path_to_tables_
+//            EnableInterpolation();
+//        }
+    }
+
+}
+
 
 
 //----------------------------------------------------------------------------//

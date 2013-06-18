@@ -140,15 +140,15 @@ public:
     double CalculateStochasticLoss(double rnd1);
 
 //----------------------------------------------------------------------------//
-    void EnableDNdxInterpolation();
+    void EnableDNdxInterpolation(std::string path ="");
 
 //----------------------------------------------------------------------------//
 
-    void EnableDEdxInterpolation();
+    void EnableDEdxInterpolation(std::string path ="");
 
 //----------------------------------------------------------------------------//
 
-    void EnableEpairInterpolation();
+    void EnableEpairInterpolation(std::string path ="");
 
 //----------------------------------------------------------------------------//
 
