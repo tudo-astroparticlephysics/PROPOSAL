@@ -99,7 +99,7 @@ global
     cont_behind         0
 
 # keyword sector must be followed by these lines
-# first: geometry information (this must be the first line
+# first: geometry information (this must be the first line)
 #       sphere      origin_x origin_y origin_z      radius  inner_radius
 #       (at least the radius must be specified .If origin or inner radius are not given they are set to 0)
 #       sphere      radius                          <--- this is allowed
@@ -138,9 +138,18 @@ global
 sector
     sphere  0   0   0   10  0
 
-    inside  500     -1  0
-    infront -1   0.001  1
-    behind  -1      -1  0
+    inside  2     0.1  1
+    infront 3    0.01  1
+    behind  4    0.001  1
+
+    medium Ice 1.
+
+sector
+    sphere  0   0   0   10  0
+
+    inside  2     0.1  1
+    infront 3    0.01  1
+    behind  4    0.001  1
 
     medium Ice 1.
 

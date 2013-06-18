@@ -315,27 +315,7 @@ void Propagator::ReadConfigFile(string config_file)
     bool found_detector         =   false;
 
     //global
-    int seed                    =   1;
-    int brems                   =   1;
-    int photo                   =   12;
-    bool lpm                    =   false;
-    bool moliere                =   false;
-    bool exact_time             =   false;
-    bool integrate              =   false;
-    double brems_multiplier     =   1;
-    double photo_multiplier     =   1;
-    double ioniz_multiplier     =   1;
-    double epair_multiplier     =   1;
-    string path_to_tables       =   "";
-    double global_ecut_inside   =   500;
-    double global_ecut_infront  =  -1;
-    double global_ecut_behind   =  -1;
-    double global_vcut_inside   =  -1;
-    double global_vcut_infront  =   0.001;
-    double global_vcut_behind   =  -1;
-    double global_cont_inside   =   false;
-    double global_cont_infront  =   true;
-    double global_cont_behind   =   false;
+
 
 
     if(!FileExist(config_file))
@@ -385,11 +365,11 @@ void Propagator::ReadConfigFile(string config_file)
             taux    =   NextToken(token);
 
             try {
-                seed = boost::lexical_cast<int>(taux);
+                seed_ = boost::lexical_cast<int>(taux);
             }
             catch(boost::bad_lexical_cast&) {
                 cout<<"Warning: The seed must be an integer! Set to 1"<<endl;
-                seed = 1;
+                seed_ = 1;
             }
         }
         // bremsstrahlungs parametrization
@@ -398,11 +378,11 @@ void Propagator::ReadConfigFile(string config_file)
             taux    =   NextToken(token);
 
             try {
-                brems = boost::lexical_cast<int>(taux);
+                brems_ = boost::lexical_cast<int>(taux);
             }
             catch(boost::bad_lexical_cast&) {
                 cout<<"Warning: The bremsstrahlungs parametrization indentifier must be an integer! Set to 1"<<endl;
-                brems = 1;
+                brems_ = 1;
             }
         }
         // photonuclear parametrization
@@ -411,11 +391,11 @@ void Propagator::ReadConfigFile(string config_file)
             taux    =   NextToken(token);
 
             try {
-                photo = boost::lexical_cast<int>(taux);
+                photo_ = boost::lexical_cast<int>(taux);
             }
             catch(boost::bad_lexical_cast&) {
                 cout<<"Warning: The photonuclear parametrization indentifier must be an integer! Set to 12"<<endl;
-                photo = 12;
+                photo_ = 12;
             }
         }
         // bremsstahlungs mulitpiler
@@ -424,11 +404,11 @@ void Propagator::ReadConfigFile(string config_file)
             taux    =   NextToken(token);
 
             try {
-                brems_multiplier  = boost::lexical_cast<double>(taux);
+                brems_multiplier_  = boost::lexical_cast<double>(taux);
             }
             catch(boost::bad_lexical_cast&) {
                 cout<<"Warning: The bremsstrahlungs multiplier must be a double! Set to 1."<<endl;
-                brems_multiplier = 1.;
+                brems_multiplier_ = 1.;
             }
         }
         // photonuclear multiplier
@@ -437,11 +417,11 @@ void Propagator::ReadConfigFile(string config_file)
             taux    =   NextToken(token);
 
             try {
-                photo_multiplier  = boost::lexical_cast<double>(taux);
+                photo_multiplier_  = boost::lexical_cast<double>(taux);
             }
             catch(boost::bad_lexical_cast&) {
                 cout<<"Warning: The photonuclear multiplier must be a double! Set to 1."<<endl;
-                photo_multiplier = 1.;
+                photo_multiplier_ = 1.;
             }
         }
         // epairproduction multiplier
@@ -450,11 +430,11 @@ void Propagator::ReadConfigFile(string config_file)
             taux    =   NextToken(token);
 
             try {
-                epair_multiplier  = boost::lexical_cast<double>(taux);
+                epair_multiplier_  = boost::lexical_cast<double>(taux);
             }
             catch(boost::bad_lexical_cast&) {
                 cout<<"Warning: The epairproduction multiplier must be a double! Set to 1."<<endl;
-                epair_multiplier = 1.;
+                epair_multiplier_ = 1.;
             }
         }
         // ionization multiplier
@@ -463,11 +443,11 @@ void Propagator::ReadConfigFile(string config_file)
             taux    =   NextToken(token);
 
             try {
-                ioniz_multiplier  = boost::lexical_cast<double>(taux);
+                ioniz_multiplier_  = boost::lexical_cast<double>(taux);
             }
             catch(boost::bad_lexical_cast&) {
                 cout<<"Warning: The ionization multiplier must be a double! Set to 1."<<endl;
-                ioniz_multiplier = 1.;
+                ioniz_multiplier_ = 1.;
             }
         }
         // global ecut inside the detector
@@ -476,11 +456,11 @@ void Propagator::ReadConfigFile(string config_file)
             taux    =   NextToken(token);
 
             try {
-                global_ecut_inside  = boost::lexical_cast<double>(taux);
+                global_ecut_inside_  = boost::lexical_cast<double>(taux);
             }
             catch(boost::bad_lexical_cast&) {
                 cout<<"Warning: The ecut for inside the detector must be a double! Set to 500."<<endl;
-                global_ecut_inside = 500.;
+                global_ecut_inside_ = 500.;
             }
         }
         // global ecut behind the detector
@@ -489,11 +469,11 @@ void Propagator::ReadConfigFile(string config_file)
             taux    =   NextToken(token);
 
             try {
-                global_ecut_behind  = boost::lexical_cast<double>(taux);
+                global_ecut_behind_  = boost::lexical_cast<double>(taux);
             }
             catch(boost::bad_lexical_cast&) {
                 cout<<"Warning: The ecut for behind the detector must be a double! Set to -1."<<endl;
-                global_ecut_behind = -1.;
+                global_ecut_behind_ = -1.;
             }
         }
         // global ecut infront of the detector
@@ -502,11 +482,11 @@ void Propagator::ReadConfigFile(string config_file)
             taux    =   NextToken(token);
 
             try {
-                global_ecut_infront  = boost::lexical_cast<double>(taux);
+                global_ecut_infront_  = boost::lexical_cast<double>(taux);
             }
             catch(boost::bad_lexical_cast&) {
                 cout<<"Warning: The ecut for infront of the detector must be a double! Set to -1."<<endl;
-                global_ecut_infront = -1.;
+                global_ecut_infront_ = -1.;
             }
         }
         // global vcut inside the detector
@@ -515,11 +495,11 @@ void Propagator::ReadConfigFile(string config_file)
             taux    =   NextToken(token);
 
             try {
-                global_vcut_inside  = boost::lexical_cast<double>(taux);
+                global_vcut_inside_  = boost::lexical_cast<double>(taux);
             }
             catch(boost::bad_lexical_cast&) {
                 cout<<"Warning: The vcut for inside the detector must be a double! Set to -1."<<endl;
-                global_vcut_inside = -1.;
+                global_vcut_inside_ = -1.;
             }
         }
         // global vcut behind the detector
@@ -528,11 +508,11 @@ void Propagator::ReadConfigFile(string config_file)
             taux    =   NextToken(token);
 
             try {
-                global_vcut_behind  = boost::lexical_cast<double>(taux);
+                global_vcut_behind_  = boost::lexical_cast<double>(taux);
             }
             catch(boost::bad_lexical_cast&) {
                 cout<<"Warning: The vcut for behind the detector must be a double! Set to -1."<<endl;
-                global_vcut_behind = -1.;
+                global_vcut_behind_ = -1.;
             }
         }
         // global vcut infront of the detector
@@ -541,11 +521,11 @@ void Propagator::ReadConfigFile(string config_file)
             taux    =   NextToken(token);
 
             try {
-                global_vcut_infront  = boost::lexical_cast<double>(taux);
+                global_vcut_infront_  = boost::lexical_cast<double>(taux);
             }
             catch(boost::bad_lexical_cast&) {
                 cout<<"Warning: The vcut for infront of the detector must be a double! Set to 0.001"<<endl;
-                global_vcut_infront = 0.001;
+                global_vcut_infront_ = 0.001;
             }
         }
         // global continuous randominzation inside the detector
@@ -554,11 +534,11 @@ void Propagator::ReadConfigFile(string config_file)
             taux    =   NextToken(token);
 
             try {
-                global_cont_inside  = boost::lexical_cast<bool>(taux);
+                global_cont_inside_  = boost::lexical_cast<bool>(taux);
             }
             catch(boost::bad_lexical_cast&) {
                 cout<<"Warning: cont for inside the detector must be a bool! Set to false"<<endl;
-                global_cont_inside = false;
+                global_cont_inside_ = false;
             }
         }
         // global continuous randominzation behind the detector
@@ -567,11 +547,11 @@ void Propagator::ReadConfigFile(string config_file)
             taux    =   NextToken(token);
 
             try {
-                global_cont_behind  = boost::lexical_cast<bool>(taux);
+                global_cont_behind_  = boost::lexical_cast<bool>(taux);
             }
             catch(boost::bad_lexical_cast&) {
                 cout<<"Warning: cont for behind the detector must be a double! Set to false."<<endl;
-                global_vcut_behind = false;
+                global_vcut_behind_ = false;
             }
         }
         // global continuous randominzation infront of the detector
@@ -580,38 +560,38 @@ void Propagator::ReadConfigFile(string config_file)
             taux    =   NextToken(token);
 
             try {
-                global_cont_infront  = boost::lexical_cast<bool>(taux);
+                global_cont_infront_  = boost::lexical_cast<bool>(taux);
             }
             catch(boost::bad_lexical_cast&) {
                 cout<<"Warning: cont for infront of the detector must be a double! Set to true"<<endl;
-                global_vcut_infront = true;
+                global_vcut_infront_ = true;
             }
         }
         // lpm effect
         else if(ToLowerCase(taux).compare("lpm")==0)
         {
-            lpm =   true;
+            lpm_ =   true;
         }
         // moliere scattering
         else if(ToLowerCase(taux).compare("moliere")==0)
         {
-            moliere =   true;
+            moliere_ =   true;
         }
         // exact location time
         else if(ToLowerCase(taux).compare("exact_time")==0)
         {
-            exact_time =   true;
+            do_exact_time_calulation_ =   true;
         }
         // do not interpolate: intergrate everything
         else if(ToLowerCase(taux).compare("integrate")==0)
         {
-            integrate =   true;
+            integrate_ =   true;
         }
         // path to interpolation tables
         else if(ToLowerCase(taux).compare("path_to_tables")==0)
         {
             taux    =   NextToken(token);
-            path_to_tables =   taux;
+            path_to_tables_ =   taux;
         }
 
         //Builing the detector geometry
@@ -626,7 +606,7 @@ void Propagator::ReadConfigFile(string config_file)
             found_detector  =   true;
 
             //find the first not empty line not starting with #
-            while(1)
+            while(file.good())
             {
                 file.getline(buf,256);
                 str_buf =   string(buf);
@@ -647,186 +627,11 @@ void Propagator::ReadConfigFile(string config_file)
 
         }
 
-        // unrecognized options
+        // a sector consists of geometry, a medium and cut settings
+        // here the ProccessCollections are initialized
         else if(ToLowerCase(taux).compare("sector")==0)
         {
-            double ecut_inside;
-            double ecut_infront;
-            double ecut_behind;
-
-            double vcut_inside;
-            double vcut_infront;
-            double vcut_behind;
-
-            bool cont_inside    =   false;
-            bool cont_infront   =   false;
-            bool cont_behind    =   false;
-
-            bool found_inside_cuts  =   false;
-            bool found_behind_cuts  =   false;
-            bool found_infront_cuts =   false;
-
-
-            while(1)
-            {
-                file.getline(buf,256);
-                str_buf =   string(buf);
-                token   =   SplitString(str_buf," \t");
-                if(!token->empty())
-                {
-                    taux =   NextToken(token);
-                    if(taux.at(0)!='#')
-                    {
-                        break;
-                    }
-                }
-            }
-
-            Geometry *geometry  = new Geometry();
-            InitGeometry(geometry,token,taux);
-
-            while(1)
-            {
-                file.getline(buf,256);
-                str_buf =   string(buf);
-                token   =   SplitString(str_buf," \t");
-                if(token->empty())
-                {
-                    continue;
-                }
-                taux =   NextToken(token);
-
-                if(taux.at(0)=='#')
-                {
-                    continue;
-                }
-
-                else if(ToLowerCase(taux).compare("inside"))
-                {
-                    if(token->size()==3)
-                    {
-                        taux    =   NextToken(token);
-                        try {
-                            ecut_inside  = boost::lexical_cast<double>(taux);
-                        }
-                        catch(boost::bad_lexical_cast&) {
-                            cout<<"Warning: ecut for inside of the detector must be a double! Set to 500."<<endl;
-                            ecut_inside = 500;
-                        }
-
-                        taux    =   NextToken(token);
-                        try {
-                            vcut_inside  = boost::lexical_cast<double>(taux);
-                        }
-                        catch(boost::bad_lexical_cast&) {
-                            cout<<"Warning: vcut for inside of the detector must be a double! Set to -1."<<endl;
-                            vcut_inside = -1;
-                        }
-
-                        taux    =   NextToken(token);
-                        try {
-                            cont_inside  = boost::lexical_cast<bool>(taux);
-                        }
-                        catch(boost::bad_lexical_cast&) {
-                            cout<<"Warning: cont for inside of the detector must be a bool! Set to false."<<endl;
-                            cont_inside = false;
-                        }
-
-                        found_inside_cuts = true;
-
-                    }
-                    else
-                    {
-                        cerr<<"Warning: Expect 3 parameters afer keyword inside! Set inside cut settings to global cut settings"<<endl;
-                    }
-                }
-                else if(ToLowerCase(taux).compare("infront"))
-                {
-                    if(token->size()==3)
-                    {
-                        taux    =   NextToken(token);
-                        try {
-                            ecut_infront  = boost::lexical_cast<double>(taux);
-                        }
-                        catch(boost::bad_lexical_cast&) {
-                            cout<<"Warning: ecut for infront of the detector must be a double! Set to -1."<<endl;
-                            ecut_infront = -1;
-                        }
-
-                        taux    =   NextToken(token);
-                        try {
-                            vcut_infront  = boost::lexical_cast<double>(taux);
-                        }
-                        catch(boost::bad_lexical_cast&) {
-                            cout<<"Warning: vcut for infront of the detector must be a double! Set to 0.001."<<endl;
-                            vcut_infront = 0.001;
-                        }
-
-                        taux    =   NextToken(token);
-                        try {
-                            cont_infront  = boost::lexical_cast<bool>(taux);
-                        }
-                        catch(boost::bad_lexical_cast&) {
-                            cout<<"Warning: cont for infront of the detector must be a bool! Set to true."<<endl;
-                            cont_infront = true;
-                        }
-
-                        found_infront_cuts = true;
-
-                    }
-                    else
-                    {
-                        cerr<<"Warning: Expect 3 parameters afer keyword infront! Set inside cut settings to global cut settings"<<endl;
-                    }
-                }
-                else if(ToLowerCase(taux).compare("behind"))
-                {
-                    if(token->size()==3)
-                    {
-                        taux    =   NextToken(token);
-                        try {
-                            ecut_behind  = boost::lexical_cast<double>(taux);
-                        }
-                        catch(boost::bad_lexical_cast&) {
-                            cout<<"Warning: ecut for behind of the detector must be a double! Set to -1."<<endl;
-                            ecut_behind = -1;
-                        }
-
-                        taux    =   NextToken(token);
-                        try {
-                            vcut_behind  = boost::lexical_cast<double>(taux);
-                        }
-                        catch(boost::bad_lexical_cast&) {
-                            cout<<"Warning: vcut for behind of the detector must be a double! Set to -1."<<endl;
-                            vcut_behind = -1;
-                        }
-
-                        taux    =   NextToken(token);
-                        try {
-                            cont_behind  = boost::lexical_cast<bool>(taux);
-                        }
-                        catch(boost::bad_lexical_cast&) {
-                            cout<<"Warning: cont for behind of the detector must be a bool! Set to false."<<endl;
-                            cont_behind = false;
-                        }
-                        found_behind_cuts = true;
-
-                    }
-                    else
-                    {
-                        cerr<<"Warning: Expect 3 parameters afer keyword behind! Set inside cut settings to global cut settings"<<endl;
-                    }
-                }
-                else if(ToLowerCase(taux).compare("medium"))
-                {
-                    break;
-                }
-            }
-            cout<<ecut_inside<<"\t"<<ecut_infront<<"\t"<<ecut_behind<<endl;
-            cout<<vcut_inside<<"\t"<<vcut_infront<<"\t"<<vcut_behind<<endl;
-            cout<<cont_inside<<"\t"<<cont_infront<<"\t"<<cont_behind<<endl;
-            cout<<found_inside_cuts<<"\t"<<found_behind_cuts<<"\t"<<found_infront_cuts<<endl;
-
+            InitProcessCollections(file);
         }
         else
         {
@@ -834,11 +639,11 @@ void Propagator::ReadConfigFile(string config_file)
             continue;
         }
     }
-    cout<<photo<<"\t"<<brems<<"\t"<<seed<<"\t"<<brems_multiplier<<"\t"<<photo_multiplier<<"\t"<<ioniz_multiplier<<"\t"<<epair_multiplier<<endl;
-    cout<<lpm<<"\t"<<moliere<<"\t"<<exact_time<<"\t"<<integrate<<"\t"<<path_to_tables<<endl;
-    cout<<global_ecut_inside<<"\t"<<global_ecut_infront<<"\t"<<global_ecut_behind<<endl;
-    cout<<global_vcut_inside<<"\t"<<global_vcut_infront<<"\t"<<global_vcut_behind<<endl;
-    cout<<global_cont_inside<<"\t"<<global_cont_infront<<"\t"<<global_cont_behind<<endl;
+    cout<<photo_<<"\t"<<brems_<<"\t"<<seed_<<"\t"<<brems_multiplier_<<"\t"<<photo_multiplier_<<"\t"<<ioniz_multiplier_<<"\t"<<epair_multiplier_<<endl;
+    cout<<lpm_<<"\t"<<moliere_<<"\t"<<do_exact_time_calulation_<<"\t"<<integrate_<<"\t"<<path_to_tables_<<endl;
+    cout<<global_ecut_inside_<<"\t"<<global_ecut_infront_<<"\t"<<global_ecut_behind_<<endl;
+    cout<<global_vcut_inside_<<"\t"<<global_vcut_infront_<<"\t"<<global_vcut_behind_<<endl;
+    cout<<global_cont_inside_<<"\t"<<global_cont_infront_<<"\t"<<global_cont_behind_<<endl;
 
 
 }
@@ -988,7 +793,27 @@ Propagator::Propagator()
     ,debug_                     ( false )
     ,particle_interaction_      ( false )
     ,do_time_interpolation_     ( false )
+    ,seed_                      ( 1 )
+    ,brems_                     ( 1 )
+    ,photo_                     ( 12 )
+    ,lpm_                       ( false )
+    ,moliere_                   ( false )
     ,do_exact_time_calulation_  ( false )
+    ,integrate_                 ( false )
+    ,brems_multiplier_          ( 1 )
+    ,photo_multiplier_          ( 1 )
+    ,ioniz_multiplier_          ( 1 )
+    ,epair_multiplier_          ( 1 )
+    ,global_ecut_inside_        ( 500 )
+    ,global_ecut_infront_       ( -1 )
+    ,global_ecut_behind_        ( -1 )
+    ,global_vcut_inside_        ( -1 )
+    ,global_vcut_infront_       ( 0.001 )
+    ,global_vcut_behind_        ( -1 )
+    ,global_cont_inside_        ( false )
+    ,global_cont_infront_       ( true )
+    ,global_cont_behind_        ( false )
+    ,path_to_tables_            ( "" )
 {
     particle_              = new Particle("mu",0,0,0,0,0,1e6,0);
     time_particle_         = new Integral();
@@ -1009,7 +834,27 @@ Propagator::Propagator(const Propagator &propagator)
     ,debug_                     ( propagator.debug_ )
     ,particle_interaction_      ( propagator.particle_interaction_ )
     ,do_time_interpolation_     ( propagator.do_time_interpolation_ )
+    ,seed_                      ( propagator.seed_ )
+    ,brems_                     ( propagator.brems_ )
+    ,photo_                     ( propagator.photo_ )
+    ,lpm_                       ( propagator.lpm_ )
+    ,moliere_                   ( propagator.moliere_ )
     ,do_exact_time_calulation_  ( propagator.do_exact_time_calulation_ )
+    ,integrate_                 ( propagator.integrate_ )
+    ,brems_multiplier_          ( propagator.brems_multiplier_ )
+    ,photo_multiplier_          ( propagator.photo_multiplier_ )
+    ,ioniz_multiplier_          ( propagator.ioniz_multiplier_ )
+    ,epair_multiplier_          ( propagator.epair_multiplier_ )
+    ,global_ecut_inside_        ( propagator.global_ecut_inside_ )
+    ,global_ecut_infront_       ( propagator.global_ecut_infront_ )
+    ,global_ecut_behind_        ( propagator.global_ecut_behind_ )
+    ,global_vcut_inside_        ( propagator.global_vcut_inside_ )
+    ,global_vcut_infront_       ( propagator.global_vcut_infront_ )
+    ,global_vcut_behind_        ( propagator.global_vcut_behind_ )
+    ,global_cont_inside_        ( propagator.global_cont_inside_ )
+    ,global_cont_infront_       ( propagator.global_cont_infront_ )
+    ,global_cont_behind_        ( propagator.global_cont_behind_ )
+    ,path_to_tables_            ( propagator.path_to_tables_ )
     ,particle_                  ( propagator.particle_ )
     ,collection_                ( new ProcessCollection(*propagator.collection_) )
     ,time_particle_             ( new Integral(*propagator.time_particle_) )
@@ -1064,10 +909,30 @@ bool Propagator::operator==(const Propagator &propagator) const
     if( particle_                 != propagator.particle_ )               return false;
     if( particle_interaction_     != propagator.particle_interaction_ )   return false;
     if( do_time_interpolation_    != propagator.do_time_interpolation_ )  return false;
+    if( seed_                     != propagator.seed_ )                   return false;
+    if( brems_                    != propagator.brems_ )                  return false;
+    if( photo_                    != propagator.photo_ )                  return false;
+    if( lpm_                      != propagator.lpm_ )                    return false;
+    if( moliere_                  != propagator.moliere_ )                return false;
     if( do_exact_time_calulation_ != propagator.do_exact_time_calulation_ )return false;
-
+    if( integrate_                != propagator.integrate_ )              return false;
+    if( brems_multiplier_         != propagator.brems_multiplier_ )       return false;
+    if( photo_multiplier_         != propagator.photo_multiplier_ )       return false;
+    if( ioniz_multiplier_         != propagator.ioniz_multiplier_ )       return false;
+    if( epair_multiplier_         != propagator.epair_multiplier_ )       return false;
+    if( global_ecut_inside_       != propagator.global_ecut_inside_ )     return false;
+    if( global_ecut_infront_      != propagator.global_ecut_infront_ )    return false;
+    if( global_ecut_behind_       != propagator.global_ecut_behind_ )     return false;
+    if( global_vcut_inside_       != propagator.global_vcut_inside_ )     return false;
+    if( global_vcut_infront_      != propagator.global_vcut_infront_ )    return false;
+    if( global_vcut_behind_       != propagator.global_vcut_behind_ )     return false;
+    if( global_cont_inside_       != propagator.global_cont_inside_ )     return false;
+    if( global_cont_infront_      != propagator.global_cont_infront_ )    return false;
+    if( global_cont_behind_       != propagator.global_cont_behind_ )     return false;
     if( *collection_              != *propagator.collection_ )            return false;
     if( *time_particle_           != *propagator.time_particle_ )         return false;
+
+    if( path_to_tables_.compare( propagator.path_to_tables_ )!=0 )        return false;
 
     if( interpol_time_particle_diff_ != NULL && propagator.interpol_time_particle_diff_ != NULL)
     {
@@ -1108,8 +973,28 @@ void Propagator::swap(Propagator &propagator)
     swap( debug_                    ,   propagator.debug_);
     swap( particle_interaction_     ,   propagator.particle_interaction_);
     swap( do_time_interpolation_    ,   propagator.do_time_interpolation_ );
+    swap( seed_                     ,   propagator.seed_ );
+    swap( brems_                    ,   propagator.brems_ );
+    swap( photo_                    ,   propagator.photo_ );
+    swap( lpm_                      ,   propagator.lpm_ );
+    swap( moliere_                  ,   propagator.moliere_ );
     swap( do_exact_time_calulation_ ,   propagator.do_exact_time_calulation_ );
+    swap( integrate_                ,   propagator.integrate_ );
+    swap( brems_multiplier_         ,   propagator.brems_multiplier_ );
+    swap( photo_multiplier_         ,   propagator.photo_multiplier_ );
+    swap( ioniz_multiplier_         ,   propagator.ioniz_multiplier_ );
+    swap( epair_multiplier_         ,   propagator.epair_multiplier_ );
+    swap( global_ecut_inside_       ,   propagator.global_ecut_inside_ );
+    swap( global_ecut_infront_      ,   propagator.global_ecut_infront_ );
+    swap( global_ecut_behind_       ,   propagator.global_ecut_behind_ );
+    swap( global_vcut_inside_       ,   propagator.global_vcut_inside_ );
+    swap( global_vcut_infront_      ,   propagator.global_vcut_infront_ );
+    swap( global_vcut_behind_       ,   propagator.global_vcut_behind_ );
+    swap( global_cont_inside_       ,   propagator.global_cont_inside_ );
+    swap( global_cont_infront_      ,   propagator.global_cont_infront_ );
+    swap( global_cont_behind_       ,   propagator.global_cont_behind_ );
 
+    path_to_tables_.swap( propagator.path_to_tables_ );
 
     particle_->swap( *propagator.particle_ );
     collection_->swap( *propagator.collection_ );
@@ -1162,6 +1047,280 @@ void Propagator::InitDefaultCollection()
     EnergyCutSettings* cuts = new EnergyCutSettings(500,-1);
     collection_             = new ProcessCollection(particle_ , med, cuts);
 
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+void Propagator::InitProcessCollections(ifstream &file)
+{
+
+    char buf[256];
+    string str_buf;
+    deque<string> *token = new deque<string>();
+    string taux;
+
+    cerr<<"Reading sector informations"<<endl;
+    double ecut_inside  = -1;
+    double ecut_infront = -1;
+    double ecut_behind  = -1;
+
+    double vcut_inside  = -1;
+    double vcut_infront = -1;
+    double vcut_behind  = -1;
+
+    bool cont_inside    =   false;
+    bool cont_infront   =   false;
+    bool cont_behind    =   false;
+
+    bool found_inside_cuts  =   false;
+    bool found_behind_cuts  =   false;
+    bool found_infront_cuts =   false;
+
+
+    while(file.good())
+    {
+        file.getline(buf,256);
+        str_buf =   string(buf);
+        token   =   SplitString(str_buf," \t");
+        if(!token->empty())
+        {
+            taux =   NextToken(token);
+            if(taux.at(0)!='#')
+            {
+                break;
+            }
+        }
+    }
+    Geometry *geometry  = new Geometry();
+    InitGeometry(geometry,token,taux);
+
+    while(file.good())
+    {
+        file.getline(buf,256);
+        str_buf =   string(buf);
+        token   =   SplitString(str_buf," \t");
+        if(token->empty())
+        {
+            continue;
+        }
+        taux =   NextToken(token);
+
+        if(taux.at(0)=='#')
+        {
+            continue;
+        }
+
+        if(ToLowerCase(taux).compare("inside")==0)
+        {
+            if(token->size()==3)
+            {
+                taux    =   NextToken(token);
+                try {
+                    ecut_inside  = boost::lexical_cast<double>(taux);
+                }
+                catch(boost::bad_lexical_cast&) {
+                    cout<<"Warning: ecut for inside of the detector must be a double! Set to 500."<<endl;
+                    ecut_inside = 500;
+                }
+
+                taux    =   NextToken(token);
+                try {
+                    vcut_inside  = boost::lexical_cast<double>(taux);
+                }
+                catch(boost::bad_lexical_cast&) {
+                    cout<<"Warning: vcut for inside of the detector must be a double! Set to -1."<<endl;
+                    vcut_inside = -1;
+                }
+
+                taux    =   NextToken(token);
+                try {
+                    cont_inside  = boost::lexical_cast<bool>(taux);
+                }
+                catch(boost::bad_lexical_cast&) {
+                    cout<<"Warning: cont for inside of the detector must be a bool! Set to false."<<endl;
+                    cont_inside = false;
+                }
+
+                found_inside_cuts = true;
+
+            }
+            else
+            {
+                cerr<<"Warning: Expect 3 parameters afer keyword inside! Set inside cut settings to global cut settings"<<endl;
+            }
+        }
+        else if(ToLowerCase(taux).compare("infront")==0)
+        {
+            if(token->size()==3)
+            {
+                taux    =   NextToken(token);
+                try {
+                    ecut_infront  = boost::lexical_cast<double>(taux);
+                }
+                catch(boost::bad_lexical_cast&) {
+                    cout<<"Warning: ecut for infront of the detector must be a double! Set to -1."<<endl;
+                    ecut_infront = -1;
+                }
+
+                taux    =   NextToken(token);
+                try {
+                    vcut_infront  = boost::lexical_cast<double>(taux);
+                }
+                catch(boost::bad_lexical_cast&) {
+                    cout<<"Warning: vcut for infront of the detector must be a double! Set to 0.001."<<endl;
+                    vcut_infront = 0.001;
+                }
+
+                taux    =   NextToken(token);
+                try {
+                    cont_infront  = boost::lexical_cast<bool>(taux);
+                }
+                catch(boost::bad_lexical_cast&) {
+                    cout<<"Warning: cont for infront of the detector must be a bool! Set to true."<<endl;
+                    cont_infront = true;
+                }
+
+                found_infront_cuts = true;
+
+            }
+            else
+            {
+                cerr<<"Warning: Expect 3 parameters afer keyword infront! Set inside cut settings to global cut settings"<<endl;
+            }
+        }
+        else if(ToLowerCase(taux).compare("behind")==0)
+        {
+            if(token->size()==3)
+            {
+                taux    =   NextToken(token);
+                try {
+                    ecut_behind  = boost::lexical_cast<double>(taux);
+                }
+                catch(boost::bad_lexical_cast&) {
+                    cout<<"Warning: ecut for behind of the detector must be a double! Set to -1."<<endl;
+                    ecut_behind = -1;
+                }
+
+                taux    =   NextToken(token);
+                try {
+                    vcut_behind  = boost::lexical_cast<double>(taux);
+                }
+                catch(boost::bad_lexical_cast&) {
+                    cout<<"Warning: vcut for behind of the detector must be a double! Set to -1."<<endl;
+                    vcut_behind = -1;
+                }
+
+                taux    =   NextToken(token);
+                try {
+                    cont_behind  = boost::lexical_cast<bool>(taux);
+                }
+                catch(boost::bad_lexical_cast&) {
+                    cout<<"Warning: cont for behind of the detector must be a bool! Set to false."<<endl;
+                    cont_behind = false;
+                }
+                found_behind_cuts = true;
+
+            }
+            else
+            {
+                cerr<<"Warning: Expect 3 parameters afer keyword behind! Set inside cut settings to global cut settings"<<endl;
+            }
+        }
+        else if(ToLowerCase(taux).compare("medium")==0)
+        {
+            string name     =   NextToken(token);
+
+            double density_correction;
+
+            taux    =   NextToken(token);
+            try {
+                density_correction  = boost::lexical_cast<double>(taux);
+            }
+            catch(boost::bad_lexical_cast&) {
+                cout<<"Warning: density correction factor must be a double! Set to 1."<<endl;
+                density_correction = 1;
+            }
+
+            Medium *med     =   new Medium(name,density_correction);
+
+            Particle *mu    =   new Particle("mu");
+            Particle *tau   =   new Particle("tau");
+            Particle *e     =   new Particle("e");
+
+            EnergyCutSettings *inside;
+            EnergyCutSettings *infront;
+            EnergyCutSettings *behind;
+
+            if(found_inside_cuts)
+            {
+                inside = new EnergyCutSettings(ecut_inside,vcut_inside);
+            }
+            else
+            {
+                inside = new EnergyCutSettings(global_ecut_inside_,global_vcut_inside_);
+            }
+
+            if(found_infront_cuts)
+            {
+                infront = new EnergyCutSettings(ecut_infront,vcut_infront);
+            }
+            else
+            {
+                infront = new EnergyCutSettings(global_ecut_infront_,global_vcut_infront_);
+            }
+
+            if(found_inside_cuts)
+            {
+                behind = new EnergyCutSettings(ecut_behind,vcut_behind);
+            }
+            else
+            {
+                behind = new EnergyCutSettings(global_ecut_behind_,global_vcut_behind_);
+            }
+
+            int former_size =collections_.size();
+
+            collections_.push_back( new ProcessCollection(new Particle(*mu),new Medium(*med),new EnergyCutSettings(*infront)) );
+            collections_.push_back( new ProcessCollection(new Particle(*mu),new Medium(*med),new EnergyCutSettings(*inside)) );
+            collections_.push_back( new ProcessCollection(new Particle(*mu),new Medium(*med),new EnergyCutSettings(*behind)) );
+
+            collections_.push_back( new ProcessCollection(new Particle(*tau),new Medium(*med),new EnergyCutSettings(*infront)) );
+            collections_.push_back( new ProcessCollection(new Particle(*tau),new Medium(*med),new EnergyCutSettings(*inside)) );
+            collections_.push_back( new ProcessCollection(new Particle(*tau),new Medium(*med),new EnergyCutSettings(*behind)) );
+
+            collections_.push_back( new ProcessCollection(new Particle(*e),new Medium(*med),new EnergyCutSettings(*infront)) );
+            collections_.push_back( new ProcessCollection(new Particle(*e),new Medium(*med),new EnergyCutSettings(*inside)) );
+            collections_.push_back( new ProcessCollection(new Particle(*e),new Medium(*med),new EnergyCutSettings(*behind)) );
+
+            for(unsigned int i = former_size ;i<collections_.size(); i++)
+            {
+                collections_.at(i)->SetGeometry(geometry);
+                collections_.at(i)->SetDensityCorrection(density_correction);
+            }
+            delete med;
+
+            delete mu;
+            delete tau;
+            delete e;
+
+            delete inside;
+            delete infront;
+            delete behind;
+            break;
+        }
+        else
+        {
+            cerr<<"Error! Last line in a sector segment must start with ’medium’!Exit"<<endl;
+            exit(1);
+        }
+    }
+    cout<<ecut_inside<<"\t"<<ecut_infront<<"\t"<<ecut_behind<<endl;
+    cout<<vcut_inside<<"\t"<<vcut_infront<<"\t"<<vcut_behind<<endl;
+    cout<<cont_inside<<"\t"<<cont_infront<<"\t"<<cont_behind<<endl;
+    cout<<found_inside_cuts<<"\t"<<found_behind_cuts<<"\t"<<found_infront_cuts<<endl;
 }
 
 

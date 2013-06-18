@@ -180,5 +180,12 @@ int main(int argc, char** argv){
 //    A.IsParticleInside(particle);
 
     Propagator *pr = new Propagator();
-//    pr->ReadConfigFile("/home/koehne/PROPOSAL_restructure/restructure_Mar_11_2013/resources/configuration");
+    pr->ReadConfigFile("/home/koehne/PROPOSAL_restructure/restructure_Mar_11_2013/resources/configuration");
+    for(unsigned int i =0; i< pr->GetCollections().size();i++)
+    {
+        cout<<"coll "<<pr->GetCollections().at(i)->GetParticle()->GetName()<<"\t";
+        cout<<pr->GetCollections().at(i)->GetMedium()->GetName()<<"\t";
+        cout<<pr->GetCollections().at(i)->GetCutSettings()->GetVcut()<<endl;
+
+    }
 }

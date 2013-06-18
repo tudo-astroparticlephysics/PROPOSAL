@@ -38,7 +38,31 @@ private:
     bool debug_;
     bool particle_interaction_;     //!< particle interaction? (false = decay)
     bool do_time_interpolation_;    //!< If true, CalculateParticleTime is interpolated
-    bool do_exact_time_calulation_;
+
+
+    int     seed_;                      //!< seed of the random number generator
+    int     brems_;                     //!< Bremsstrahlungs parametrization
+    int     photo_;                     //!< Photonuclear parametrization
+    bool    lpm_;                       //!< Landau-Pomeranchuk-Migdal supression of EM cross-sections enabled if true
+    bool    moliere_;                   //!< Moliere scattering enabled if true
+    bool    do_exact_time_calulation_;  //!< exact local time calculation enabled if true
+    bool    integrate_;                 //!< if true nothing will be interpolated
+    double  brems_multiplier_;          //!< multiplier to in- or decrease the Bremsstrahlung cross-sections
+    double  photo_multiplier_;          //!< multiplier to in- or decrease the Photonucler cross-sections
+    double  ioniz_multiplier_;          //!< multiplier to in- or decrease the Ionization cross-sections
+    double  epair_multiplier_;          //!< multiplier to in- or decrease the Epairproduction cross-sections
+    double  global_ecut_inside_;        //!< ecut for inside the detector (it's used when not specified explicit for a sector in congiguration file)
+    double  global_ecut_infront_;       //!< ecut for infront of the detector (it's used when not specified explicit for a sector in congiguration file)
+    double  global_ecut_behind_;        //!< ecut for behind the detector (it's used when not specified explicit for a sector in congiguration file)
+    double  global_vcut_inside_;        //!< vcut for inside the detector (it's used when not specified explicit for a sector in congiguration file)
+    double  global_vcut_infront_;       //!< ecut for infront of the detector (it's used when not specified explicit for a sector in congiguration file)
+    double  global_vcut_behind_;        //!< ecut for behind the detector (it's used when not specified explicit for a sector in congiguration file)
+    double  global_cont_inside_;        //!< continuous randominzation flag for inside the detector (it's used when not specified explicit for a sector in congiguration file)
+    double  global_cont_infront_;       //!< continuous randominzation flag for infront of the detector (it's used when not specified explicit for a sector in congiguration file)
+    double  global_cont_behind_;        //!< continuous randominzation flag for behind the detector (it's used when not specified explicit for a sector in congiguration file)
+
+    std::string path_to_tables_;        //!< path to interpolation tables (if not empty tables are stored)
+
 
     std::vector<ProcessCollection*> collections_;
 
@@ -74,7 +98,15 @@ private:
     *
     */
     void InitGeometry(Geometry* geometry, std::deque<std::string>* token , std::string first_token);
-
+//----------------------------------------------------------------------------//
+    /*!
+    * Init ProcessCollection from configuration file. When keyword sector is found in configuration
+    * file this function is called and inits ProcessCollections:
+    * 3 for muons inside/behind/infront
+    * 3 for taus inside/behind/infront
+    * 3 for electrons inside/behind/infront
+    */
+    void InitProcessCollections(std::ifstream &file);
 public:
 
     //Constructors
@@ -183,6 +215,12 @@ public:
     ProcessCollection* GetCollection() const
     {
         return collection_;
+    }
+//----------------------------------------------------------------------------//
+
+    std::vector<ProcessCollection*> GetCollections() const
+    {
+        return collections_;
     }
 
 //----------------------------------------------------------------------------//
