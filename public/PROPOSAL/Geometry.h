@@ -162,7 +162,7 @@ public:
     void SetX(double x);
     void SetY(double y);
     void SetZ(double z);
-    void SetInnerRadius(double inner_radius_);
+    void SetInnerRadius(double inner_radius);
     void SetRadius(double radius);
     void SetObject(std::string object);
 
