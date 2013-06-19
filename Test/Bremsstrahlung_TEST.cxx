@@ -490,7 +490,7 @@ TEST(Bremsstrahlung , Test_of_dNdx_Interpolant ) {
        CrossSections *brems = new Bremsstrahlung(particle, medium, cuts);
         brems->SetParametrization(para);
         brems->EnableLpmEffect(lpm);
-        brems->EnableDNdxInterpolation("/home/koehne/PROPOSAL_restructure/buildrestructure_Mar_11_2013/uaaaaah");
+        brems->EnableDNdxInterpolation();
 
         while(energy_old < energy){
             energy_old = energy;

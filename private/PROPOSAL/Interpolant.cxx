@@ -517,6 +517,12 @@ bool Interpolant::Save(string Path)
     out.open(Path.c_str());
     out.precision(16);
 
+    if(!out.good())
+    {
+        cerr<<"Error: Can not open file "<< Path<<" for writing"<<endl;
+        return 0;
+    }
+
     Save(out);
 
     out.close();
@@ -530,6 +536,11 @@ bool Interpolant::Save(string Path)
 
 bool Interpolant::Save(ofstream& out)
 {
+    if(!out.good())
+    {
+        cerr<<"Error: Can not open file for writing"<<endl;
+        return 0;
+    }
     bool D2 = false;
     if(function2d_ != NULL)D2 = true;
 

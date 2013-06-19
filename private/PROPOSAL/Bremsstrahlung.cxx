@@ -282,16 +282,19 @@ void Bremsstrahlung::EnableDNdxInterpolation(std::string path)
 {
     if(do_dndx_Interpolation_)return;
 
+    bool storing_failed =   false;
+    bool reading_worked =   true;
+
     if(!path.empty())
     {
-        bool reading_worked =   true;
         stringstream filename;
         filename<<path<<"/Brems_dNdx_particle_"<<particle_->GetName()
                 <<"_para_"<<parametrization_
                 <<"_med_"<<medium_->GetName()
                 <<"_ecut_"<<cut_settings_->GetEcut()
                 <<"_vcut_"<<cut_settings_->GetVcut()
-                <<"_lpm_"<<lpm_effect_enabled_;
+                <<"_lpm_"<<lpm_effect_enabled_
+                <<"_multiplier_"<<multiplier_;
 
         dndx_interpolant_1d_.resize( medium_->GetNumCompontents() );
         dndx_interpolant_2d_.resize( medium_->GetNumCompontents() );
@@ -324,30 +327,40 @@ void Bremsstrahlung::EnableDNdxInterpolation(std::string path)
 
             cerr<<"Info: Bremsstrahlungs parametrisation tables (dNdx) will be saved to file:"<<endl;
             cerr<<"\t"<<filename.str()<<endl;
+
+            double energy = particle_->GetEnergy();
+
             ofstream output;
 
             output.open(filename.str().c_str());
-
-            output.precision(16);
-            double energy = particle_->GetEnergy();
-
-            for(int i=0; i<(medium_->GetNumCompontents()); i++)
+            if(output.good())
             {
-                component_ = i;
+                output.precision(16);
 
-                dndx_interpolant_2d_.at(i) = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY,  NUM1, 0, 1, boost::bind(&Bremsstrahlung::FunctionToBuildDNdxInterpolant2D, this, _1 , _2), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false, order_of_interpolation_, true, false, false);
-                dndx_interpolant_1d_.at(i) = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, boost::bind(&Bremsstrahlung::FunctionToBuildDNdxInterpolant, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, true, false, false);
+                for(int i=0; i<(medium_->GetNumCompontents()); i++)
+                {
+                    component_ = i;
 
-                dndx_interpolant_2d_.at(i)->Save(output);
-                dndx_interpolant_1d_.at(i)->Save(output);
+                    dndx_interpolant_2d_.at(i) = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY,  NUM1, 0, 1, boost::bind(&Bremsstrahlung::FunctionToBuildDNdxInterpolant2D, this, _1 , _2), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false, order_of_interpolation_, true, false, false);
+                    dndx_interpolant_1d_.at(i) = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, boost::bind(&Bremsstrahlung::FunctionToBuildDNdxInterpolant, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, true, false, false);
 
+                    dndx_interpolant_2d_.at(i)->Save(output);
+                    dndx_interpolant_1d_.at(i)->Save(output);
+
+                }
+            }
+            else
+            {
+                storing_failed  =   true;
+                cerr<<"Warning: Can not open file "<<filename.str()<<" for writing!"<<endl;
+                cerr<<"\t Table will not be stored!"<<endl;
             }
             particle_->SetEnergy(energy);
 
             output.close();
         }
     }
-    else
+    if(path.empty() || storing_failed)
     {
         double energy = particle_->GetEnergy();
         dndx_interpolant_1d_.resize( medium_->GetNumCompontents() );
@@ -372,11 +385,79 @@ void Bremsstrahlung::EnableDNdxInterpolation(std::string path)
 
 void Bremsstrahlung::EnableDEdxInterpolation(std::string path)
 {
-    double energy = particle_->GetEnergy();
-    dedx_interpolant_ = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, boost::bind(&Bremsstrahlung::FunctionToBuildDEdxInterpolant, this, _1),
-                                        order_of_interpolation_, true, false, true, order_of_interpolation_, false, false, true); //changed from ...,false,false,false)
+    if(do_dedx_Interpolation_)return;
+
+    bool reading_worked =   true;
+    bool storing_failed =   false;
+
+    if(!path.empty())
+    {
+        stringstream filename;
+        filename<<path<<"/Brems_dEdx_particle_"<<particle_->GetName()
+                <<"_para_"<<parametrization_
+                <<"_med_"<<medium_->GetName()
+                <<"_ecut_"<<cut_settings_->GetEcut()
+                <<"_vcut_"<<cut_settings_->GetVcut()
+                <<"_lpm_"<<lpm_effect_enabled_
+                <<"_multiplier_"<<multiplier_;
+
+        if( FileExist(filename.str()) )
+        {
+            cerr<<"Info: Bremsstrahlungs parametrisation tables (dEdx) will be read from file:"<<endl;
+            cerr<<"\t"<<filename.str()<<endl;
+            ifstream input;
+
+            input.open(filename.str().c_str());
+
+            dedx_interpolant_ = new Interpolant();
+            reading_worked = dedx_interpolant_->Load(input);
+
+            input.close();
+        }
+        if(!FileExist(filename.str()) || !reading_worked )
+        {
+            if(!reading_worked)
+            {
+                cerr<<"Info: file "<<filename.str()<<" is corrupted! Write is again!"<< endl;
+            }
+
+            cerr<<"Info: Bremsstrahlungs parametrisation tables (dEdx) will be saved to file:"<<endl;
+            cerr<<"\t"<<filename.str()<<endl;
+
+            double energy = particle_->GetEnergy();
+
+            ofstream output;
+            output.open(filename.str().c_str());
+
+            if(output.good())
+            {
+                output.precision(16);
+
+                dedx_interpolant_ = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, boost::bind(&Bremsstrahlung::FunctionToBuildDEdxInterpolant, this, _1),
+                                                    order_of_interpolation_, true, false, true, order_of_interpolation_, false, false, true); //changed from ...,false,false,false)
+                dedx_interpolant_->Save(output);
+            }
+            else
+            {
+                storing_failed  =   true;
+                cerr<<"Warning: Can not open file "<<filename.str()<<" for writing!"<<endl;
+                cerr<<"\t Table will not be stored!"<<endl;
+            }
+            particle_->SetEnergy(energy);
+
+            output.close();
+        }
+    }
+    if(path.empty() || storing_failed)
+    {
+        double energy = particle_->GetEnergy();
+        dedx_interpolant_ = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, boost::bind(&Bremsstrahlung::FunctionToBuildDEdxInterpolant, this, _1),
+                                            order_of_interpolation_, true, false, true, order_of_interpolation_, false, false, true); //changed from ...,false,false,false)
+
+        particle_->SetEnergy(energy);
+    }
+
     do_dedx_Interpolation_=true;
-    particle_->SetEnergy(energy);
 }
 
 

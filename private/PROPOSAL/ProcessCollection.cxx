@@ -376,12 +376,8 @@ void ProcessCollection::EnableInterpolation(std::string path)
     EnableDEdxInterpolation(path);
     EnableDNdxInterpolation(path);
 
-    double energy = particle_->GetEnergy();
-
-    interpolant_        =   new Interpolant(NUM3, particle_->GetLow(), BIGENERGY, boost::bind(&ProcessCollection::FunctionToBuildInterpolant, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
-    interpolant_diff_   =   new Interpolant(NUM3, particle_->GetLow(), BIGENERGY, boost::bind(&ProcessCollection::FunctionToBuildInterpolantDiff, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
-
-    particle_->SetEnergy(energy);
+    bool reading_worked =   true;
+    bool storing_failed =   false;
 
     if(abs(-prop_interaction_->Integrate(particle_->GetLow(), particle_->GetLow()*10, boost::bind(&ProcessCollection::FunctionToPropIntegralInteraction, this, _1),4))
             < abs(-prop_interaction_->Integrate(BIGENERGY, BIGENERGY/10, boost::bind(&ProcessCollection::FunctionToPropIntegralInteraction, this, _1),4)))
@@ -393,21 +389,156 @@ void ProcessCollection::EnableInterpolation(std::string path)
         up_  =   false;
     }
 
-    interpol_prop_decay_            =   new Interpolant(NUM3, particle_->GetLow(), BIGENERGY, boost::bind(&ProcessCollection::InterpolPropDecay, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
-    interpol_prop_decay_diff_       =   new Interpolant(NUM3, particle_->GetLow(), BIGENERGY, boost::bind(&ProcessCollection::InterpolPropDecayDiff, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
-    interpol_prop_interaction_      =   new Interpolant(NUM3, particle_->GetLow(), BIGENERGY, boost::bind(&ProcessCollection::InterpolPropInteraction, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
-    interpol_prop_interaction_diff_ =   new Interpolant(NUM3, particle_->GetLow(), BIGENERGY, boost::bind(&ProcessCollection::InterpolPropInteractionDiff, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
+    if(!path.empty())
+    {
+        stringstream filename;
+        filename<<path<<"/Collection_"<<particle_->GetName()
+               <<"_"<<medium_->GetName()
+               <<"_"<<cut_settings_->GetEcut()
+               <<"_"<<cut_settings_->GetVcut()
+               <<"_"<<density_correction_;
 
-    bigLow_.at(0)=interpol_prop_decay_->Interpolate(particle_->GetLow());
-    bigLow_.at(1)=interpol_prop_interaction_->Interpolate(particle_->GetLow());
+        for(unsigned int i =0; i<crosssections_.size(); i++)
+        {
+            if(crosssections_.at(i)->GetName().compare("Bremsstrahlung")==0)
+            {
+                filename << "_b_"
+                         << "_" << crosssections_.at(i)->GetParametrization()
+                         << "_" << crosssections_.at(i)->GetMultiplier()
+                         << "_" << crosssections_.at(i)->GetLpmEffectEnabled()
+                         << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetEcut()
+                         << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetVcut();
 
-    particle_->SetEnergy(energy);
+            }
+            else if(crosssections_.at(i)->GetName().compare("Ionization")==0)
+            {
+                filename << "_i_"
+                         << "_" << crosssections_.at(i)->GetMultiplier()
+                         << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetEcut()
+                         << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetVcut();
+            }
+            else if(crosssections_.at(i)->GetName().compare("Epairproduction")==0)
+            {
+                filename << "_e_"
+                         << "_" << crosssections_.at(i)->GetMultiplier()
+                         << "_" << crosssections_.at(i)->GetLpmEffectEnabled()
+                         << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetEcut()
+                         << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetVcut();
+            }
+            else if(crosssections_.at(i)->GetName().compare("Photonuclear")==0)
+            {
+                filename << "_p_"
+                         << "_" << crosssections_.at(i)->GetParametrization()
+                         << "_" << crosssections_.at(i)->GetMultiplier()
+                         << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetEcut()
+                         << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetVcut();
+            }
+
+        }
+
+        if( FileExist(filename.str()) )
+        {
+            cerr<<"Info: ProcessCollection parametrisation tables will be read from file:"<<endl;
+            cerr<<"\t"<<filename.str()<<endl;
+            ifstream input;
+
+            input.open(filename.str().c_str());
+
+            interpolant_        =   new Interpolant();
+            interpolant_diff_   =   new Interpolant();
+
+            reading_worked = interpolant_->Load(input);
+            reading_worked = interpolant_diff_->Load(input);
+
+
+            interpol_prop_decay_            =   new Interpolant();
+            interpol_prop_decay_diff_       =   new Interpolant();
+            interpol_prop_interaction_      =   new Interpolant();
+            interpol_prop_interaction_diff_ =   new Interpolant();
+
+            reading_worked = interpol_prop_decay_->Load(input);
+            reading_worked = interpol_prop_decay_diff_->Load(input);
+            reading_worked = interpol_prop_interaction_->Load(input);
+            reading_worked = interpol_prop_interaction_diff_->Load(input);
+
+            input.close();
+        }
+        if(!FileExist(filename.str()) || !reading_worked )
+        {
+            if(!reading_worked)
+            {
+                cerr<<"Info: file "<<filename.str()<<" is corrupted! Write is again!"<< endl;
+            }
+
+            cerr<<"Info: ProcessCollection parametrisation tables will be saved to file:"<<endl;
+            cerr<<"\t"<<filename.str()<<endl;
+
+            double energy = particle_->GetEnergy();
+
+            ofstream output;
+            output.open(filename.str().c_str());
+
+            if(output.good())
+            {
+                output.precision(16);
+
+                interpolant_        =   new Interpolant(NUM3, particle_->GetLow(), BIGENERGY, boost::bind(&ProcessCollection::FunctionToBuildInterpolant, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
+                interpolant_diff_   =   new Interpolant(NUM3, particle_->GetLow(), BIGENERGY, boost::bind(&ProcessCollection::FunctionToBuildInterpolantDiff, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
+
+                particle_->SetEnergy(energy);
+
+                interpol_prop_decay_            =   new Interpolant(NUM3, particle_->GetLow(), BIGENERGY, boost::bind(&ProcessCollection::InterpolPropDecay, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
+                interpol_prop_decay_diff_       =   new Interpolant(NUM3, particle_->GetLow(), BIGENERGY, boost::bind(&ProcessCollection::InterpolPropDecayDiff, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
+                interpol_prop_interaction_      =   new Interpolant(NUM3, particle_->GetLow(), BIGENERGY, boost::bind(&ProcessCollection::InterpolPropInteraction, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
+                interpol_prop_interaction_diff_ =   new Interpolant(NUM3, particle_->GetLow(), BIGENERGY, boost::bind(&ProcessCollection::InterpolPropInteractionDiff, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
+
+                particle_->SetEnergy(energy);
+
+                interpolant_->Save(output);
+                interpolant_diff_->Save(output);
+                interpol_prop_decay_->Save(output);
+                interpol_prop_decay_diff_->Save(output);
+                interpol_prop_interaction_->Save(output);
+                interpol_prop_interaction_diff_->Save(output);
+
+            }
+            else
+            {
+                storing_failed  =   true;
+                cerr<<"Warning: Can not open file "<<filename.str()<<" for writing!"<<endl;
+                cerr<<"\t Table will not be stored!"<<endl;
+            }
+            particle_->SetEnergy(energy);
+
+            output.close();
+        }
+    }
+    if(path.empty() || storing_failed)
+    {
+        double energy = particle_->GetEnergy();
+
+        interpolant_        =   new Interpolant(NUM3, particle_->GetLow(), BIGENERGY, boost::bind(&ProcessCollection::FunctionToBuildInterpolant, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
+        interpolant_diff_   =   new Interpolant(NUM3, particle_->GetLow(), BIGENERGY, boost::bind(&ProcessCollection::FunctionToBuildInterpolantDiff, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
+
+        particle_->SetEnergy(energy);
+
+        interpol_prop_decay_            =   new Interpolant(NUM3, particle_->GetLow(), BIGENERGY, boost::bind(&ProcessCollection::InterpolPropDecay, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
+        interpol_prop_decay_diff_       =   new Interpolant(NUM3, particle_->GetLow(), BIGENERGY, boost::bind(&ProcessCollection::InterpolPropDecayDiff, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
+        interpol_prop_interaction_      =   new Interpolant(NUM3, particle_->GetLow(), BIGENERGY, boost::bind(&ProcessCollection::InterpolPropInteraction, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
+        interpol_prop_interaction_diff_ =   new Interpolant(NUM3, particle_->GetLow(), BIGENERGY, boost::bind(&ProcessCollection::InterpolPropInteractionDiff, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
+
+        particle_->SetEnergy(energy);
+
+    }
 
     if(do_continuous_randomization_)
     {
         randomizer_->EnableDE2dxInterpolation(path);
         randomizer_->EnableDE2deInterpolation(path);
     }
+
+    bigLow_.at(0)=interpol_prop_decay_->Interpolate(particle_->GetLow());
+    bigLow_.at(1)=interpol_prop_interaction_->Interpolate(particle_->GetLow());
 
     do_interpolation_=true;
 
@@ -424,8 +555,7 @@ void ProcessCollection::EnableDEdxInterpolation(std::string path)
     for(unsigned int i =0 ; i < crosssections_.size() ; i++)
     {
         crosssections_.at(i)->EnableDEdxInterpolation(path);
-        cout<<"dEdx for "<<crosssections_.at(i)->GetName()<<" interpolated"<<endl;
-
+        //cout<<"dEdx for "<<crosssections_.at(i)->GetName()<<" interpolated"<<endl;
     }
 }
 
@@ -440,8 +570,7 @@ void ProcessCollection::EnableDNdxInterpolation(std::string path)
     for(unsigned int i =0 ; i < crosssections_.size() ; i++)
     {
         crosssections_.at(i)->EnableDNdxInterpolation(path);
-        cout<<"dNdx for "<<crosssections_.at(i)->GetName()<<" interpolated"<<endl;
-
+        //cout<<"dNdx for "<<crosssections_.at(i)->GetName()<<" interpolated"<<endl;
     }
 }
 
@@ -455,8 +584,7 @@ void ProcessCollection::DisableDEdxInterpolation()
     for(unsigned int i =0 ; i < crosssections_.size() ; i++)
     {
         crosssections_.at(i)->DisableDEdxInterpolation();
-        cout<<"Interpolation for dEdx for "<<crosssections_.at(i)->GetName()<<" disabled"<<endl;
-
+        //cout<<"Interpolation for dEdx for "<<crosssections_.at(i)->GetName()<<" disabled"<<endl;
     }
 }
 
@@ -470,8 +598,7 @@ void ProcessCollection::DisableDNdxInterpolation()
     for(unsigned int i =0 ; i < crosssections_.size() ; i++)
     {
         crosssections_.at(i)->DisableDNdxInterpolation();
-        cout<<"Interpolation fordNdx for "<<crosssections_.at(i)->GetName()<<" disbaled"<<endl;
-
+        //cout<<"Interpolation fordNdx for "<<crosssections_.at(i)->GetName()<<" disbaled"<<endl;
     }
 }
 

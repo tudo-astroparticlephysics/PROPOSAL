@@ -233,6 +233,12 @@ public:
     }
 
 //----------------------------------------------------------------------------//
+
+    bool GetLpmEffectEnabled() const
+    {
+        return lpm_effect_enabled_;
+    }
+//----------------------------------------------------------------------------//
     EnergyCutSettings* GetEnergyCutSettings() const
     {
         return cut_settings_;

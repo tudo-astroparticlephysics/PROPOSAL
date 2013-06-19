@@ -179,24 +179,66 @@ int main(int argc, char** argv){
 //    A.InitCylinder(x0,y0,z0,radius,inner_radius,height);
 //    A.IsParticleInside(particle);
 
-    Particle *mu = new Particle("mu");
-    Medium* med = new Medium("air",1);
-    EnergyCutSettings* cut = new EnergyCutSettings(100,-1);
-    Bremsstrahlung* br1 = new Bremsstrahlung(mu,med,cut);
-    br1->EnableDNdxInterpolation("/home/koehne/PROPOSAL_restructure/buildrestructure_Mar_11_2013/uaaaaah");
+//    Particle *mu = new Particle("mu");
+//    Medium* med = new Medium("air",1);
+//    EnergyCutSettings* cut = new EnergyCutSettings(100,-1);
+//    Bremsstrahlung* br1 = new Bremsstrahlung(mu,med,cut);
+//    br1->EnableDNdxInterpolation("/home/koehne/PROPOSAL_restructure/buildrestructure_Mar_11_2013/uaaaaah");
+//    br1->EnableDEdxInterpolation("/home/koehne/PROPOSAL_restructure/buildrestructure_Mar_11_2013/uaaaaah");
 
-    Bremsstrahlung* br2 = new Bremsstrahlung(mu,med,cut);
-    br2->EnableDNdxInterpolation("/home/koehne/PROPOSAL_restructure/buildrestructure_Mar_11_2013/uaaaaah");
+//    Bremsstrahlung* br2 = new Bremsstrahlung(mu,med,cut);
+//    br2->EnableDNdxInterpolation("/home/koehne/PROPOSAL_restructure/buildrestructure_Mar_11_2013/uaaaaah");
+//    br2->EnableDEdxInterpolation("/home/koehne/PROPOSAL_restructure/buildrestructure_Mar_11_2013/uaaaah");
+
+//    Particle *mu = new Particle("mu");
+//    Medium* med = new Medium("air",1);
+//    EnergyCutSettings* cut = new EnergyCutSettings(100,-1);
+//    Ionization* io1 = new Ionization(mu,med,cut);
+//    io1->EnableDNdxInterpolation("/home/koehne/PROPOSAL_restructure/buildrestructure_Mar_11_2013/uaaaaah");
+//    io1->EnableDEdxInterpolation("/home/koehne/PROPOSAL_restructure/buildrestructure_Mar_11_2013/uaaaaah");
+
+//    Ionization* io2 = new Ionization(mu,med,cut);
+//    io2->EnableDNdxInterpolation("/home/koehne/PROPOSAL_restructure/buildrestructure_Mar_11_2013/uaaaaah");
+//    io2->EnableDEdxInterpolation("/home/koehne/PROPOSAL_restructure/buildrestructure_Mar_11_2013/uaaaaah");
+
+//    Particle *mu = new Particle("mu");
+//    Medium* med = new Medium("air",1);
+//    EnergyCutSettings* cut = new EnergyCutSettings(100,-1);
+//    Epairproduction* ep1 = new Epairproduction(mu,med,cut);
+//    ep1->EnableDNdxInterpolation("/home/koehne/PROPOSAL_restructure/buildrestructure_Mar_11_2013/uaaaaah");
+//    ep1->EnableDEdxInterpolation("/home/koehne/PROPOSAL_restructure/buildrestructure_Mar_11_2013/uaaaaah");
+
+//    Epairproduction* ep2 = new Epairproduction(mu,med,cut);
+//    ep2->EnableDNdxInterpolation("/home/koehne/PROPOSAL_restructure/buildrestructure_Mar_11_2013/uaaaaah");
+//    ep2->EnableDEdxInterpolation("/home/koehne/PROPOSAL_restructure/buildrestructure_Mar_11_2013/uaaaaah");
 
 
-//    Propagator *pr = new Propagator();
-//    pr->ReadConfigFile("/home/koehne/PROPOSAL_restructure/restructure_Mar_11_2013/resources/configuration");
-//    for(unsigned int i =0; i< pr->GetCollections().size();i++)
-//    {
-//        cout<<"coll "<<pr->GetCollections().at(i)->GetParticle()->GetName()<<"\t";
-//        cout<<pr->GetCollections().at(i)->GetMedium()->GetName()<<"\t";
-//        cout<<pr->GetCollections().at(i)->GetGeometry()->GetObject()<<"\t";
-//        cout<<pr->GetCollections().at(i)->GetCutSettings()->GetVcut()<<endl;
 
-//    }
+//    Particle *mu = new Particle("mu");
+//    Medium* med = new Medium("air",1);
+//    EnergyCutSettings* cut = new EnergyCutSettings(100,0.001);
+//    Photonuclear* p1 = new Photonuclear(mu,med,cut);
+//    p1->EnableDNdxInterpolation("/home/koehne/PROPOSAL_restructure/buildrestructure_Mar_11_2013/uaaaaah");
+//    p1->EnableDEdxInterpolation("/home/koehne/PROPOSAL_restructure/buildrestructure_Mar_11_2013/uaaaaah");
+
+//    Photonuclear* p2 = new Photonuclear(mu,med,cut);
+//    p2->EnableDNdxInterpolation("/home/koehne/PROPOSAL_restructure/buildrestructure_Mar_11_2013/uaaaaah");
+//    p2->EnableDEdxInterpolation("/home/koehne/PROPOSAL_restructure/buildrestructure_Mar_11_2013/uaaaaah");
+
+//    Particle *mu = new Particle("mu");
+//    Medium* med = new Medium("air",1);
+//    EnergyCutSettings* cut = new EnergyCutSettings(100,0.001);
+//    ProcessCollection* p1 = new ProcessCollection(mu,med,cut);
+//    p1->EnableContinuousRandomization();
+//    p1->EnableInterpolation("/home/koehne/PROPOSAL_restructure/buildrestructure_Mar_11_2013/uaaaaah");
+
+//    ProcessCollection* p2 = new ProcessCollection(mu,med,cut);
+//    p2->EnableContinuousRandomization();
+//    p2->EnableInterpolation("/home/koehne/PROPOSAL_restructure/buildrestructure_Mar_11_2013/uaaaaah");
+
+
+
+    Propagator *pr = new Propagator();
+    pr->ReadConfigFile("/home/koehne/PROPOSAL_restructure/restructure_Mar_11_2013/resources/configuration");
+
 }

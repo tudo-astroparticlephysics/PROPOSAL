@@ -687,7 +687,12 @@ void Propagator::DisableParticleTimeInterpolation()
 
 void Propagator::EnableInterpolation(std::string path)
 {
-    collection_->EnableInterpolation(path);
+    if(collection_ != NULL)
+        collection_->EnableInterpolation(path);
+    for(unsigned int i = 0 ; i < collections_.size() ; i++)
+    {
+        collections_.at(i)->EnableInterpolation(path);
+    }
     EnableParticleTimeInterpolation(path);
 }
 
@@ -698,7 +703,12 @@ void Propagator::EnableInterpolation(std::string path)
 
 void Propagator::DisableInterpolation()
 {
-    collection_->DisableInterpolation();
+    if(collection_ != NULL)
+        collection_->DisableInterpolation();
+    for(unsigned int i = 0 ; i < collections_.size() ; i++)
+    {
+        collections_.at(i)->DisableInterpolation();
+    }
     DisableParticleTimeInterpolation();
 }
 
@@ -1771,7 +1781,6 @@ void Propagator::ApplyOptions()
                 collections_.at(j)->GetCrosssections().at(i)->SetParametrization(brems_);
                 collections_.at(j)->GetCrosssections().at(i)->SetMultiplier(brems_multiplier_);
                 collections_.at(j)->GetCrosssections().at(i)->EnableLpmEffect(lpm_);
-                collections_.at(j)->GetCrosssections().at(i)->EnableDNdxInterpolation(path_to_tables_);
 
             }
             else if(collections_.at(j)->GetCrosssections().at(i)->GetName().compare("Ionization")==0)
@@ -1800,12 +1809,11 @@ void Propagator::ApplyOptions()
         {
             //collections_.at(j)->EnableMoliereScattering();
         }
-        if(!integrate_)
-        {
-//            collections_.at(j)->EnableInterpolation(path_to_tables_);
-//            //path_to_tables_
-//            EnableInterpolation();
-        }
+
+    }
+    if(!integrate_)
+    {
+        EnableInterpolation(path_to_tables_);
     }
 
 }

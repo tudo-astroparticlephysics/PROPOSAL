@@ -144,6 +144,33 @@ sector
 
     medium Ice 1.
 
+sector
+    sphere  0   0   0   10  0
+
+    inside  2     0.1  1
+    infront 3    0.01  1
+    behind  4    0.001  1
+
+    medium Ice 1.
+
+sector
+    cylinder 10  10
+
+    inside  21     0.1  1
+    infront 32    0.01  1
+    behind  43    0.001  1
+
+    medium uranium 1.
+
+sector
+    cylinder 10  10
+
+    inside  21     0.1  1
+    infront 32    0.01  1
+    behind  43    0.001  1
+
+    medium uranium 1.
+
 # keyword detector must be followed by one line
 # geometry information
 #       sphere      origin_x origin_y origin_z      radius  inner_radius

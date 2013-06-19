@@ -221,16 +221,98 @@ void Photonuclear::EnableDNdxInterpolation(std::string path)
 
     EnablePhotoInterpolation(path);
 
-    double energy = particle_->GetEnergy();
-    dndx_interpolant_1d_.resize(medium_->GetNumCompontents());
-    dndx_interpolant_2d_.resize(medium_->GetNumCompontents());
-    for(int i=0; i<(medium_->GetNumCompontents()); i++)
+    bool storing_failed =   false;
+    bool reading_worked =   true;
+
+    if(!path.empty())
     {
-        component_ = i;
-        dndx_interpolant_2d_.at(i) =    new Interpolant(NUM1, particle_->GetLow(), BIGENERGY,  NUM1, 0, 1, boost::bind(&Photonuclear::FunctionToBuildDNdxInterpolant2D, this, _1 , _2), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false, order_of_interpolation_, true, false, false);
-        dndx_interpolant_1d_.at(i) =    new Interpolant(NUM1, particle_->GetLow(), BIGENERGY,  boost::bind(&Photonuclear::FunctionToBuildDNdxInterpolant1D, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, true, false, false);
+        stringstream filename;
+        filename<<path<<"/Photo_dNdx_particle_"<<particle_->GetName()
+                <<"_para_"<<parametrization_
+                <<"_med_"<<medium_->GetName()
+                <<"_ecut_"<<cut_settings_->GetEcut()
+                <<"_vcut_"<<cut_settings_->GetVcut()
+                <<"_multiplier_"<<multiplier_;
+
+        dndx_interpolant_2d_.resize(medium_->GetNumCompontents());
+        dndx_interpolant_1d_.resize(medium_->GetNumCompontents());
+
+        if( FileExist(filename.str()) )
+        {
+            cerr<<"Info: Photonuclear parametrisation tables (dNdx) will be read from file:"<<endl;
+            cerr<<"\t"<<filename.str()<<endl;
+            ifstream input;
+
+            input.open(filename.str().c_str());
+
+            for(int i=0; i<(medium_->GetNumCompontents()); i++)
+            {
+                component_ = i;
+                dndx_interpolant_2d_.at(i) = new Interpolant();
+                dndx_interpolant_1d_.at(i) = new Interpolant();
+                reading_worked = dndx_interpolant_2d_.at(i)->Load(input);
+                reading_worked = dndx_interpolant_1d_.at(i)->Load(input);
+
+            }
+            input.close();
+        }
+        if(!FileExist(filename.str()) || !reading_worked )
+        {
+            if(!reading_worked)
+            {
+                cerr<<"Info: file "<<filename.str()<<" is corrupted! Write is again!"<< endl;
+            }
+
+            cerr<<"Info: Photonuclear parametrisation tables (dNdx) will be saved to file:"<<endl;
+            cerr<<"\t"<<filename.str()<<endl;
+
+            double energy = particle_->GetEnergy();
+
+            ofstream output;
+
+            output.open(filename.str().c_str());
+            if(output.good())
+            {
+                output.precision(16);
+
+                for(int i=0; i<(medium_->GetNumCompontents()); i++)
+                {
+                    component_ = i;
+
+                    dndx_interpolant_2d_.at(i) =    new Interpolant(NUM1, particle_->GetLow(), BIGENERGY,  NUM1, 0, 1, boost::bind(&Photonuclear::FunctionToBuildDNdxInterpolant2D, this, _1 , _2), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false, order_of_interpolation_, true, false, false);
+                    dndx_interpolant_1d_.at(i) =    new Interpolant(NUM1, particle_->GetLow(), BIGENERGY,  boost::bind(&Photonuclear::FunctionToBuildDNdxInterpolant1D, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, true, false, false);
+
+                    dndx_interpolant_2d_.at(i)->Save(output);
+                    dndx_interpolant_1d_.at(i)->Save(output);
+
+                }
+            }
+            else
+            {
+                storing_failed  =   true;
+                cerr<<"Warning: Can not open file "<<filename.str()<<" for writing!"<<endl;
+                cerr<<"\t Table will not be stored!"<<endl;
+            }
+            particle_->SetEnergy(energy);
+
+            output.close();
+        }
     }
-    particle_->SetEnergy(energy);
+    if(path.empty() || storing_failed)
+    {
+        EnablePhotoInterpolation(path);
+
+        double energy = particle_->GetEnergy();
+        dndx_interpolant_1d_.resize(medium_->GetNumCompontents());
+        dndx_interpolant_2d_.resize(medium_->GetNumCompontents());
+        for(int i=0; i<(medium_->GetNumCompontents()); i++)
+        {
+            component_ = i;
+            dndx_interpolant_2d_.at(i) =    new Interpolant(NUM1, particle_->GetLow(), BIGENERGY,  NUM1, 0, 1, boost::bind(&Photonuclear::FunctionToBuildDNdxInterpolant2D, this, _1 , _2), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false, order_of_interpolation_, true, false, false);
+            dndx_interpolant_1d_.at(i) =    new Interpolant(NUM1, particle_->GetLow(), BIGENERGY,  boost::bind(&Photonuclear::FunctionToBuildDNdxInterpolant1D, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, true, false, false);
+        }
+        particle_->SetEnergy(energy);
+    }
 
     do_dndx_Interpolation_=true;
 
@@ -245,12 +327,77 @@ void Photonuclear::EnableDEdxInterpolation(std::string path)
 {
     if(do_dedx_Interpolation_)return;
 
-    EnablePhotoInterpolation(path);
-    double energy = particle_->GetEnergy();
-    dedx_interpolant_ = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, boost::bind(&Photonuclear::FunctionToBuildDEdxInterpolant, this, _1),
-                                        order_of_interpolation_, true, false, true, order_of_interpolation_, false, false, false);
+    bool reading_worked =   true;
+    bool storing_failed =   false;
+
+    if(!path.empty())
+    {
+        stringstream filename;
+        filename<<path<<"/Photo_dEdx_particle_"<<particle_->GetName()
+                <<"_para_"<<parametrization_
+                <<"_med_"<<medium_->GetName()
+                <<"_ecut_"<<cut_settings_->GetEcut()
+                <<"_vcut_"<<cut_settings_->GetVcut()
+                <<"_multiplier_"<<multiplier_;
+
+        if( FileExist(filename.str()) )
+        {
+            cerr<<"Info: Photonuclear parametrisation tables (dEdx) will be read from file:"<<endl;
+            cerr<<"\t"<<filename.str()<<endl;
+            ifstream input;
+
+            input.open(filename.str().c_str());
+
+            dedx_interpolant_ = new Interpolant();
+            reading_worked = dedx_interpolant_->Load(input);
+
+            input.close();
+        }
+        if(!FileExist(filename.str()) || !reading_worked )
+        {
+            if(!reading_worked)
+            {
+                cerr<<"Info: file "<<filename.str()<<" is corrupted! Write is again!"<< endl;
+            }
+
+            cerr<<"Info: Photonuclear parametrisation tables (dEdx) will be saved to file:"<<endl;
+            cerr<<"\t"<<filename.str()<<endl;
+
+            double energy = particle_->GetEnergy();
+
+            ofstream output;
+            output.open(filename.str().c_str());
+
+            if(output.good())
+            {
+                output.precision(16);
+
+                dedx_interpolant_ = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, boost::bind(&Photonuclear::FunctionToBuildDEdxInterpolant, this, _1),
+                                                    order_of_interpolation_, true, false, true, order_of_interpolation_, false, false, false);
+                dedx_interpolant_->Save(output);
+            }
+            else
+            {
+                storing_failed  =   true;
+                cerr<<"Warning: Can not open file "<<filename.str()<<" for writing!"<<endl;
+                cerr<<"\t Table will not be stored!"<<endl;
+            }
+            particle_->SetEnergy(energy);
+
+            output.close();
+        }
+    }
+    if(path.empty() || storing_failed)
+    {
+        EnablePhotoInterpolation(path);
+        double energy = particle_->GetEnergy();
+        dedx_interpolant_ = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, boost::bind(&Photonuclear::FunctionToBuildDEdxInterpolant, this, _1),
+                                            order_of_interpolation_, true, false, true, order_of_interpolation_, false, false, false);
+        particle_->SetEnergy(energy);
+
+    }
+
     do_dedx_Interpolation_=true;
-    particle_->SetEnergy(energy);
 }
 
 
@@ -262,20 +409,94 @@ void Photonuclear::EnablePhotoInterpolation(std::string path)
 {
     if(do_photo_interpolation_)return;
 
-    double energy = particle_->GetEnergy();
+    bool storing_failed =   false;
+    bool reading_worked =   true;
 
-    photo_interpolant_.resize( medium_->GetNumCompontents() );
-
-    for(int i=0; i<medium_->GetNumCompontents(); i++)
+    if(!path.empty())
     {
-        component_ = i;
-        photo_interpolant_.at(i)  = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, NUM1, 0., 1., boost::bind(&Photonuclear::FunctionToBuildPhotoInterpolant, this, _1, _2), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false, order_of_interpolation_, false, false, false);
+        stringstream filename;
+        filename<<path<<"/Photo_particle_"<<particle_->GetName()
+                <<"_para_"<<parametrization_
+                <<"_med_"<<medium_->GetName()
+                <<"_ecut_"<<cut_settings_->GetEcut()
+                <<"_vcut_"<<cut_settings_->GetVcut()
+                <<"_multiplier_"<<multiplier_;
 
+        photo_interpolant_.resize( medium_->GetNumCompontents() );
+
+        if( FileExist(filename.str()) )
+        {
+            cerr<<"Info: Photonuclear parametrisation tables will be read from file:"<<endl;
+            cerr<<"\t"<<filename.str()<<endl;
+            ifstream input;
+
+            input.open(filename.str().c_str());
+
+            for(int i=0; i<(medium_->GetNumCompontents()); i++)
+            {
+                component_ = i;
+                photo_interpolant_.at(i) = new Interpolant();
+                reading_worked = photo_interpolant_.at(i)->Load(input);
+
+            }
+            input.close();
+        }
+        if(!FileExist(filename.str()) || !reading_worked )
+        {
+            if(!reading_worked)
+            {
+                cerr<<"Info: file "<<filename.str()<<" is corrupted! Write is again!"<< endl;
+            }
+
+            cerr<<"Info: Photonuclear parametrisation tables will be saved to file:"<<endl;
+            cerr<<"\t"<<filename.str()<<endl;
+
+            double energy = particle_->GetEnergy();
+
+            ofstream output;
+
+            output.open(filename.str().c_str());
+            if(output.good())
+            {
+                output.precision(16);
+
+                for(int i=0; i<(medium_->GetNumCompontents()); i++)
+                {
+                    component_ = i;
+
+                    photo_interpolant_.at(i)  = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, NUM1, 0., 1., boost::bind(&Photonuclear::FunctionToBuildPhotoInterpolant, this, _1, _2), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false, order_of_interpolation_, false, false, false);
+
+                    photo_interpolant_.at(i)->Save(output);
+
+                }
+            }
+            else
+            {
+                storing_failed  =   true;
+                cerr<<"Warning: Can not open file "<<filename.str()<<" for writing!"<<endl;
+                cerr<<"\t Table will not be stored!"<<endl;
+            }
+            particle_->SetEnergy(energy);
+
+            output.close();
+        }
+    }
+    if(path.empty() || storing_failed)
+    {
+        double energy = particle_->GetEnergy();
+
+        photo_interpolant_.resize( medium_->GetNumCompontents() );
+
+        for(int i=0; i<medium_->GetNumCompontents(); i++)
+        {
+            component_ = i;
+            photo_interpolant_.at(i)  = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, NUM1, 0., 1., boost::bind(&Photonuclear::FunctionToBuildPhotoInterpolant, this, _1, _2), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false, order_of_interpolation_, false, false, false);
+
+        }
+        particle_->SetEnergy(energy);
     }
 
     do_photo_interpolation_ = true;
-    particle_->SetEnergy(energy);
-
 }
 
 

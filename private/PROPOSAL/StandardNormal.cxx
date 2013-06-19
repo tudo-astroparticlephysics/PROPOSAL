@@ -10,6 +10,7 @@
 
 #include "PROPOSAL/StandardNormal.h"
 #include <algorithm>
+#include <sstream>
 
 using namespace std;
 
@@ -102,7 +103,65 @@ double StandardNormal::StandardNormalRandomNumber(double rnd, double average, do
 
 void StandardNormal::EnableInterpolation(std::string path)
 {
-    interpolant_    =   new Interpolant(NUM2, -5, 5, boost::bind(&StandardNormal::FunctionToBuildInterpolant, this, _1), order_of_interpolation_, true, false, false, order_of_interpolation_, true, false, false);
+
+    if(do_interpolation_)return;
+
+    bool reading_worked =   true;
+    bool storing_failed =   false;
+
+    if(!path.empty())
+    {
+        stringstream filename;
+        filename<<path<<"/StandardNormal";
+
+        if( FileExist(filename.str()) )
+        {
+            cerr<<"Info: StandardNormal parametrisation tables will be read from file:"<<endl;
+            cerr<<"\t"<<filename.str()<<endl;
+            ifstream input;
+
+            input.open(filename.str().c_str());
+
+            interpolant_ = new Interpolant();
+            reading_worked = interpolant_->Load(input);
+
+            input.close();
+        }
+        if(!FileExist(filename.str()) || !reading_worked )
+        {
+            if(!reading_worked)
+            {
+                cerr<<"Info: file "<<filename.str()<<" is corrupted! Write is again!"<< endl;
+            }
+
+            cerr<<"Info: StandardNormal parametrisation tables will be saved to file:"<<endl;
+            cerr<<"\t"<<filename.str()<<endl;
+
+            ofstream output;
+            output.open(filename.str().c_str());
+
+            if(output.good())
+            {
+                output.precision(16);
+
+                interpolant_    =   new Interpolant(NUM2, -5, 5, boost::bind(&StandardNormal::FunctionToBuildInterpolant, this, _1), order_of_interpolation_, true, false, false, order_of_interpolation_, true, false, false);
+                interpolant_->Save(output);
+            }
+            else
+            {
+                storing_failed  =   true;
+                cerr<<"Warning: Can not open file "<<filename.str()<<" for writing!"<<endl;
+                cerr<<"\t Table will not be stored!"<<endl;
+            }
+
+            output.close();
+        }
+    }
+    if(path.empty() || storing_failed)
+    {
+        interpolant_    =   new Interpolant(NUM2, -5, 5, boost::bind(&StandardNormal::FunctionToBuildInterpolant, this, _1), order_of_interpolation_, true, false, false, order_of_interpolation_, true, false, false);
+    }
+
     do_interpolation_=true;
 }
 

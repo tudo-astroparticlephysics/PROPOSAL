@@ -39,12 +39,114 @@ double ContinuousRandomization::Randomize(double initial_energy, double final_en
 void ContinuousRandomization::EnableDE2dxInterpolation(std::string path)
 {
     if(do_dE2dx_Interpolation_)return;
-    standard_normal_->EnableInterpolation();
 
-    double energy = particle_->GetEnergy();
-    dE2dx_interpolant_    =   new Interpolant(NUM2, particle_->GetLow(), BIGENERGY, boost::bind(&ContinuousRandomization::FunctionToBuildDE2dxInterplant, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
+    bool reading_worked =   true;
+    bool storing_failed =   false;
 
-    particle_->SetEnergy(energy);
+    standard_normal_->EnableInterpolation(path);
+
+    if(!path.empty())
+    {
+        stringstream filename;
+        filename<<path<<"/Cont_dE2dx_"<<particle_->GetName()
+               <<"_"<<medium_->GetName();
+
+        for(unsigned int i =0; i<cross_sections_.size(); i++)
+        {
+            if(cross_sections_.at(i)->GetName().compare("Bremsstrahlung")==0)
+            {
+                filename << "_b_"
+                         << "_" << cross_sections_.at(i)->GetParametrization()
+                         << "_" << cross_sections_.at(i)->GetMultiplier()
+                         << "_" << cross_sections_.at(i)->GetLpmEffectEnabled()
+                         << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetEcut()
+                         << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetVcut();
+
+            }
+            else if(cross_sections_.at(i)->GetName().compare("Ionization")==0)
+            {
+                filename << "_i_"
+                         << "_" << cross_sections_.at(i)->GetMultiplier()
+                         << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetEcut()
+                         << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetVcut();
+            }
+            else if(cross_sections_.at(i)->GetName().compare("Epairproduction")==0)
+            {
+                filename << "_e_"
+                         << "_" << cross_sections_.at(i)->GetMultiplier()
+                         << "_" << cross_sections_.at(i)->GetLpmEffectEnabled()
+                         << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetEcut()
+                         << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetVcut();
+            }
+            else if(cross_sections_.at(i)->GetName().compare("Photonuclear")==0)
+            {
+                filename << "_p_"
+                         << "_" << cross_sections_.at(i)->GetParametrization()
+                         << "_" << cross_sections_.at(i)->GetMultiplier()
+                         << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetEcut()
+                         << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetVcut();
+            }
+
+        }
+
+        if( FileExist(filename.str()) )
+        {
+            cerr<<"Info: Continuous Randomization parametrisation tables (dE2dx) will be read from file:"<<endl;
+            cerr<<"\t"<<filename.str()<<endl;
+            ifstream input;
+
+            input.open(filename.str().c_str());
+
+            dE2dx_interpolant_ = new Interpolant();
+            reading_worked = dE2dx_interpolant_->Load(input);
+
+            input.close();
+        }
+        if(!FileExist(filename.str()) || !reading_worked )
+        {
+            if(!reading_worked)
+            {
+                cerr<<"Info: file "<<filename.str()<<" is corrupted! Write is again!"<< endl;
+            }
+
+            cerr<<"Info: Continuous Randomization parametrisation tables (dE2dx) will be saved to file:"<<endl;
+            cerr<<"\t"<<filename.str()<<endl;
+
+            double energy = particle_->GetEnergy();
+
+            ofstream output;
+            output.open(filename.str().c_str());
+
+            if(output.good())
+            {
+                output.precision(16);
+
+                double energy = particle_->GetEnergy();
+                dE2dx_interpolant_    =   new Interpolant(NUM2, particle_->GetLow(), BIGENERGY, boost::bind(&ContinuousRandomization::FunctionToBuildDE2dxInterplant, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
+
+                dE2dx_interpolant_->Save(output);
+                particle_->SetEnergy(energy);
+
+            }
+            else
+            {
+                storing_failed  =   true;
+                cerr<<"Warning: Can not open file "<<filename.str()<<" for writing!"<<endl;
+                cerr<<"\t Table will not be stored!"<<endl;
+            }
+            particle_->SetEnergy(energy);
+
+            output.close();
+        }
+    }
+    if(path.empty() || storing_failed)
+    {
+        double energy = particle_->GetEnergy();
+        dE2dx_interpolant_    =   new Interpolant(NUM2, particle_->GetLow(), BIGENERGY, boost::bind(&ContinuousRandomization::FunctionToBuildDE2dxInterplant, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
+
+        particle_->SetEnergy(energy);
+
+    }
 
     do_dE2dx_Interpolation_=true;
 }
@@ -57,15 +159,121 @@ void ContinuousRandomization::EnableDE2dxInterpolation(std::string path)
 void ContinuousRandomization::EnableDE2deInterpolation(std::string path)
 {
     if(do_dE2de_Interpolation_)return;
-    standard_normal_->EnableInterpolation();
 
-    double energy = particle_->GetEnergy();
+    bool reading_worked =   true;
+    bool storing_failed =   false;
 
-    dE2de_interpolant_       =   new Interpolant(NUM2, particle_->GetLow(), BIGENERGY, boost::bind(&ContinuousRandomization::FunctionToBuildDE2deInterplant, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
-    dE2de_interpolant_diff_  =   new Interpolant(NUM2, particle_->GetLow(), BIGENERGY, boost::bind(&ContinuousRandomization::FunctionToBuildDE2deInterplantDiff, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
+    standard_normal_->EnableInterpolation(path);
 
-    particle_->SetEnergy(energy);
+    if(!path.empty())
+    {
+        stringstream filename;
+        filename<<path<<"/Cont_dE2de_"<<particle_->GetName()
+               <<"_"<<medium_->GetName();
 
+        for(unsigned int i =0; i<cross_sections_.size(); i++)
+        {
+            if(cross_sections_.at(i)->GetName().compare("Bremsstrahlung")==0)
+            {
+                filename << "_b_"
+                         << "_" << cross_sections_.at(i)->GetParametrization()
+                         << "_" << cross_sections_.at(i)->GetMultiplier()
+                         << "_" << cross_sections_.at(i)->GetLpmEffectEnabled()
+                         << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetEcut()
+                         << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetVcut();
+
+            }
+            else if(cross_sections_.at(i)->GetName().compare("Ionization")==0)
+            {
+                filename << "_i_"
+                         << "_" << cross_sections_.at(i)->GetMultiplier()
+                         << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetEcut()
+                         << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetVcut();
+            }
+            else if(cross_sections_.at(i)->GetName().compare("Epairproduction")==0)
+            {
+                filename << "_e_"
+                         << "_" << cross_sections_.at(i)->GetMultiplier()
+                         << "_" << cross_sections_.at(i)->GetLpmEffectEnabled()
+                         << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetEcut()
+                         << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetVcut();
+            }
+            else if(cross_sections_.at(i)->GetName().compare("Photonuclear")==0)
+            {
+                filename << "_p_"
+                         << "_" << cross_sections_.at(i)->GetParametrization()
+                         << "_" << cross_sections_.at(i)->GetMultiplier()
+                         << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetEcut()
+                         << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetVcut();
+            }
+
+        }
+
+        if( FileExist(filename.str()) )
+        {
+            cerr<<"Info: Continuous Randomization parametrisation tables (dE2de) will be read from file:"<<endl;
+            cerr<<"\t"<<filename.str()<<endl;
+            ifstream input;
+
+            input.open(filename.str().c_str());
+
+            dE2de_interpolant_ = new Interpolant();
+            reading_worked = dE2de_interpolant_->Load(input);
+
+            dE2de_interpolant_diff_ = new Interpolant();
+            reading_worked = dE2de_interpolant_diff_->Load(input);
+
+            input.close();
+        }
+        if(!FileExist(filename.str()) || !reading_worked )
+        {
+            if(!reading_worked)
+            {
+                cerr<<"Info: file "<<filename.str()<<" is corrupted! Write is again!"<< endl;
+            }
+
+            cerr<<"Info: Continuous Randomization parametrisation tables (dE2de) will be saved to file:"<<endl;
+            cerr<<"\t"<<filename.str()<<endl;
+
+            double energy = particle_->GetEnergy();
+
+            ofstream output;
+            output.open(filename.str().c_str());
+
+            if(output.good())
+            {
+                output.precision(16);
+
+                double energy = particle_->GetEnergy();
+                dE2de_interpolant_       =   new Interpolant(NUM2, particle_->GetLow(), BIGENERGY, boost::bind(&ContinuousRandomization::FunctionToBuildDE2deInterplant, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
+                dE2de_interpolant_diff_  =   new Interpolant(NUM2, particle_->GetLow(), BIGENERGY, boost::bind(&ContinuousRandomization::FunctionToBuildDE2deInterplantDiff, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
+
+                dE2de_interpolant_->Save(output);
+                dE2de_interpolant_diff_->Save(output);
+                particle_->SetEnergy(energy);
+
+            }
+            else
+            {
+                storing_failed  =   true;
+                cerr<<"Warning: Can not open file "<<filename.str()<<" for writing!"<<endl;
+                cerr<<"\t Table will not be stored!"<<endl;
+            }
+            particle_->SetEnergy(energy);
+
+            output.close();
+        }
+    }
+    if(path.empty() || storing_failed)
+    {
+        double energy = particle_->GetEnergy();
+
+        dE2de_interpolant_       =   new Interpolant(NUM2, particle_->GetLow(), BIGENERGY, boost::bind(&ContinuousRandomization::FunctionToBuildDE2deInterplant, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
+        dE2de_interpolant_diff_  =   new Interpolant(NUM2, particle_->GetLow(), BIGENERGY, boost::bind(&ContinuousRandomization::FunctionToBuildDE2deInterplantDiff, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
+
+        particle_->SetEnergy(energy);
+
+    }
     do_dE2de_Interpolation_=true;
 }
 
