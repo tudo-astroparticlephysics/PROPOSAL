@@ -1790,16 +1790,22 @@ void Propagator::ApplyOptions()
             }
 
         }
+
+        if(collections_.at(j)->GetEnableRandomization())
+        {
+            collections_.at(j)->EnableContinuousRandomization();
+        }
+
         if(moliere_)
         {
             //collections_.at(j)->EnableMoliereScattering();
         }
-//        if(!integrate_)
-//        {
-//            collections_.at(j)->EnableInterpolation();
+        if(!integrate_)
+        {
+//            collections_.at(j)->EnableInterpolation(path_to_tables_);
 //            //path_to_tables_
 //            EnableInterpolation();
-//        }
+        }
     }
 
 }

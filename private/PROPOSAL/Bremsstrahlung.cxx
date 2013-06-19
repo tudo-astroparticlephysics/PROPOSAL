@@ -284,59 +284,51 @@ void Bremsstrahlung::EnableDNdxInterpolation(std::string path)
 
     if(!path.empty())
     {
+        bool reading_worked =   true;
         stringstream filename;
-        stringstream filename_1d;
-        stringstream filename_2d;
         filename<<path<<"/Brems_dNdx_particle_"<<particle_->GetName()
                 <<"_para_"<<parametrization_
                 <<"_med_"<<medium_->GetName()
                 <<"_ecut_"<<cut_settings_->GetEcut()
                 <<"_vcut_"<<cut_settings_->GetVcut()
                 <<"_lpm_"<<lpm_effect_enabled_;
-        filename_1d<<filename.str()<<"_1d";
-        filename_2d<<filename.str()<<"_2d";
 
         dndx_interpolant_1d_.resize( medium_->GetNumCompontents() );
         dndx_interpolant_2d_.resize( medium_->GetNumCompontents() );
 
-        if( FileExist(filename_1d.str()) && FileExist(filename_2d.str()))
+        if( FileExist(filename.str()) )
         {
             cerr<<"Info: Bremsstrahlungs parametrisation tables (dNdx) will be read from file:"<<endl;
-            cerr<<"\t1d:\t"<<filename_1d.str()<<endl;
-            cerr<<"\t2d:\t"<<filename_2d.str()<<endl;
-            ifstream input_1d;
-            ifstream input_2d;
+            cerr<<"\t"<<filename.str()<<endl;
+            ifstream input;
 
-            input_1d.open(filename_1d.str().c_str());
-            input_2d.open(filename_2d.str().c_str());
+            input.open(filename.str().c_str());
 
             for(int i=0; i<(medium_->GetNumCompontents()); i++)
             {
                 component_ = i;
                 dndx_interpolant_2d_.at(i) = new Interpolant();
                 dndx_interpolant_1d_.at(i) = new Interpolant();
-
-                dndx_interpolant_2d_.at(i)->Load(input_2d);
-                dndx_interpolant_1d_.at(i)->Load(input_1d);
+                reading_worked = dndx_interpolant_2d_.at(i)->Load(input);
+                reading_worked = dndx_interpolant_1d_.at(i)->Load(input);
 
             }
-            input_1d.close();
-            input_2d.close();
+            input.close();
         }
-        else
+        if(!FileExist(filename.str()) || !reading_worked )
         {
-            cerr<<"Info: Bremsstrahlungs parametrisation tables (dNdx) will be safed to file:"<<endl;
-            cerr<<"\t1d:\t"<<filename_1d.str()<<endl;
-            cerr<<"\t2d:\t"<<filename_2d.str()<<endl;
-            ofstream output_1d;
-            ofstream output_2d;
+            if(!reading_worked)
+            {
+                cerr<<"Info: file "<<filename.str()<<" is corrupted! Write is again!"<< endl;
+            }
 
-            output_1d.open(filename_1d.str().c_str());
-            output_2d.open(filename_2d.str().c_str());
+            cerr<<"Info: Bremsstrahlungs parametrisation tables (dNdx) will be saved to file:"<<endl;
+            cerr<<"\t"<<filename.str()<<endl;
+            ofstream output;
 
-            output_1d.precision(16);
-            output_2d.precision(16);
+            output.open(filename.str().c_str());
 
+            output.precision(16);
             double energy = particle_->GetEnergy();
 
             for(int i=0; i<(medium_->GetNumCompontents()); i++)
@@ -346,14 +338,13 @@ void Bremsstrahlung::EnableDNdxInterpolation(std::string path)
                 dndx_interpolant_2d_.at(i) = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY,  NUM1, 0, 1, boost::bind(&Bremsstrahlung::FunctionToBuildDNdxInterpolant2D, this, _1 , _2), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false, order_of_interpolation_, true, false, false);
                 dndx_interpolant_1d_.at(i) = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, boost::bind(&Bremsstrahlung::FunctionToBuildDNdxInterpolant, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, true, false, false);
 
-                dndx_interpolant_2d_.at(i)->Save(output_2d);
-                dndx_interpolant_1d_.at(i)->Save(output_1d);
+                dndx_interpolant_2d_.at(i)->Save(output);
+                dndx_interpolant_1d_.at(i)->Save(output);
 
             }
             particle_->SetEnergy(energy);
 
-            output_1d.close();
-            output_2d.close();
+            output.close();
         }
     }
     else

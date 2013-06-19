@@ -580,13 +580,14 @@ bool Interpolant::Save(ofstream& out)
 
 bool Interpolant::Load(std::string Path)
 {
+    bool success;
     ifstream in;
     in.open(Path.c_str());
 
-    Load(in);
+    success = Load(in);
 
     in.close();
-    return 1;
+    return success;
 }
 
 
@@ -606,6 +607,7 @@ bool Interpolant::Load(ifstream& in)
 
     if(D2)
     {
+        if(!in.good())return 0;
         in >> max >> xmin >> xmax;
         in >> romberg >> rational >> relative >> isLog ;
         in >> rombergY >> rationalY >> relativeY >> logSubst ;
@@ -618,7 +620,7 @@ bool Interpolant::Load(ifstream& in)
 
         for(int i =0; i<max_ ;i++){
             in >> iX_.at(i);
-
+            if(!in.good())return 0;
             Interpolant_.at(i) = new Interpolant();
             Interpolant_.at(i)->Load(in);
             Interpolant_.at(i)->self_ =false;
@@ -627,6 +629,7 @@ bool Interpolant::Load(ifstream& in)
     }
     else
     {
+        if(!in.good())return 0;
         in >> max >> xmin >> xmax;
         in >> romberg >> rational >> relative >> isLog ;
         in >> rombergY >> rationalY >> relativeY >> logSubst ;
@@ -637,6 +640,7 @@ bool Interpolant::Load(ifstream& in)
 
         for(int i =0; i<max_ ;i++){
             in >> iX_.at(i) >> iY_.at(i) ;
+            if(!in.good())return 0;
         }
     }
     return 1;

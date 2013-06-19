@@ -179,14 +179,24 @@ int main(int argc, char** argv){
 //    A.InitCylinder(x0,y0,z0,radius,inner_radius,height);
 //    A.IsParticleInside(particle);
 
-    Propagator *pr = new Propagator();
-    pr->ReadConfigFile("/home/koehne/PROPOSAL_restructure/restructure_Mar_11_2013/resources/configuration");
-    for(unsigned int i =0; i< pr->GetCollections().size();i++)
-    {
-        cout<<"coll "<<pr->GetCollections().at(i)->GetParticle()->GetName()<<"\t";
-        cout<<pr->GetCollections().at(i)->GetMedium()->GetName()<<"\t";
-        cout<<pr->GetCollections().at(i)->GetGeometry()->GetObject()<<"\t";
-        cout<<pr->GetCollections().at(i)->GetCutSettings()->GetVcut()<<endl;
+    Particle *mu = new Particle("mu");
+    Medium* med = new Medium("air",1);
+    EnergyCutSettings* cut = new EnergyCutSettings(100,-1);
+    Bremsstrahlung* br1 = new Bremsstrahlung(mu,med,cut);
+    br1->EnableDNdxInterpolation("/home/koehne/PROPOSAL_restructure/buildrestructure_Mar_11_2013/uaaaaah");
 
-    }
+    Bremsstrahlung* br2 = new Bremsstrahlung(mu,med,cut);
+    br2->EnableDNdxInterpolation("/home/koehne/PROPOSAL_restructure/buildrestructure_Mar_11_2013/uaaaaah");
+
+
+//    Propagator *pr = new Propagator();
+//    pr->ReadConfigFile("/home/koehne/PROPOSAL_restructure/restructure_Mar_11_2013/resources/configuration");
+//    for(unsigned int i =0; i< pr->GetCollections().size();i++)
+//    {
+//        cout<<"coll "<<pr->GetCollections().at(i)->GetParticle()->GetName()<<"\t";
+//        cout<<pr->GetCollections().at(i)->GetMedium()->GetName()<<"\t";
+//        cout<<pr->GetCollections().at(i)->GetGeometry()->GetObject()<<"\t";
+//        cout<<pr->GetCollections().at(i)->GetCutSettings()->GetVcut()<<endl;
+
+//    }
 }
