@@ -1172,8 +1172,8 @@ void Geometry::SetZ(double z) {
     z_ =   z;
 }
 
-void Geometry::SetInnerRadius(double inner_radius_) {
-    inner_radius_ =   inner_radius_;
+void Geometry::SetInnerRadius(double inner_radius) {
+    inner_radius_ =   inner_radius;
 }
 
 void Geometry::SetRadius(double radius) {
