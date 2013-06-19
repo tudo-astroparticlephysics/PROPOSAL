@@ -537,7 +537,14 @@ bool Interpolant::Save(ofstream& out)
 
     if(D2)
     {
-        out << max_ << "\t" << xmin_ << "\t" << xmax_ << endl;
+        if(isLog_)
+        {
+            out << max_ << "\t" << exp(xmin_) << "\t" << exp(xmax_) << endl;
+        }
+        else
+        {
+            out << max_ << "\t" << xmin_ << "\t" << xmax_ << endl;
+        }
         out << romberg_ << "\t" << rational_ << "\t" << relative_ << "\t" << isLog_ << endl;
         out << rombergY_ << "\t" << rationalY_ << "\t" << relativeY_ << "\t" << logSubst_ << endl;
 
@@ -548,7 +555,14 @@ bool Interpolant::Save(ofstream& out)
     }
     else
     {
-        out << max_ << "\t" << xmin_ << "\t" << xmax_ << endl;
+        if(isLog_)
+        {
+            out << max_ << "\t" << exp(xmin_) << "\t" << exp(xmax_) << endl;
+        }
+        else
+        {
+            out << max_ << "\t" << xmin_ << "\t" << xmax_ << endl;
+        }
         out << romberg_ << "\t" << rational_ << "\t" << relative_ << "\t" << isLog_ << endl;
         out << rombergY_ << "\t" << rationalY_ << "\t" << relativeY_ << "\t" << logSubst_ << endl;
 

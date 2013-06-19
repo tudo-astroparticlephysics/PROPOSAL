@@ -79,7 +79,7 @@ public:
 
     //Setter
 
-
+    void SetParticle(Particle* particle);
 
 //----------------------------------------------------------------------------//
     // Getter
