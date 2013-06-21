@@ -67,10 +67,11 @@ public:
 //----------------------------------------------------------------------------//
     // Memberfunctions
 
-    double CalculateTheta0(double dr, double ei, double ef);
-    double FunctionToIntegral(double energy);
-    double FunctionToBuildInterpolant(double energy);
+    double  CalculateTheta0(double dr, double ei, double ef);
+    double  FunctionToIntegral(double energy);
+    double  FunctionToBuildInterpolant(double energy);
     void    EnableInterpolation();
+    void    DisableInterpolation();
 //----------------------------------------------------------------------------//
 
     void swap(Scattering &scattering);
@@ -80,7 +81,7 @@ public:
     //Setter
 
     void SetParticle(Particle* particle);
-
+    void    SetCrossSections(std::vector<CrossSections*> crosssections);
 //----------------------------------------------------------------------------//
     // Getter
 

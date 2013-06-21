@@ -23,18 +23,6 @@ using namespace std;
 //--------------------------------constructors--------------------------------//
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
-/*
- *    double x0_; //Radiation Length
-    bool do_interpolation_;
-    int order_of_interpolation_;
-
-    Integral* integral_;
-    Interpolant* interpolant_;
-    Interpolant* interpolant_diff_;
-
-    Particle* particle_;
-    std::vector<CrossSections*> crosssections_;
-    */
 
 Scattering::Scattering( )
     :x0_(0)
@@ -339,10 +327,25 @@ void Scattering::EnableInterpolation()
     do_interpolation_ = true;
 }
 
+void Scattering::DisableInterpolation()
+{
+    delete interpolant_;
+    delete interpolant_diff_;
+
+    interpolant_ = NULL;
+    interpolant_diff_ = NULL;
+
+    do_interpolation_ = false;
+}
 
 //----------------------------------------------------------------------------//
 
-// Setter
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//---------------------------------Setter-------------------------------------//
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
 
 void Scattering::SetParticle(Particle* particle)
 {
@@ -358,15 +361,9 @@ void Scattering::SetParticle(Particle* particle)
 
 void Scattering::SetCrossSections(std::vector<CrossSections*> crosssections)
 {
-    crosssections_.clear();
     crosssections_ = crosssections;
 }
 
 
 
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-//---------------------------------Setter-------------------------------------//
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
 

@@ -108,29 +108,44 @@ TEST(Assignment , Swap ) {
 }
 
 TEST(Assignment , Copyconstructor ) {
-    /*
-    EnergyCutSettings A;
-    EnergyCutSettings B =A;
+    Scattering A;
+    Scattering B;
 
     EXPECT_TRUE(A==B);
-    */
-
 }
 
 TEST(Assignment , Copyconstructor2 ) {
-    /*
-    EnergyCutSettings A(5000,0.1);
-    EnergyCutSettings B(A);
+    EnergyCutSettings* cut = new EnergyCutSettings(100,0.01);
+    Medium* med = new Medium("uranium",1.);
+    Particle* particle2 = new Particle("tau",-1,0,3,0,2,0,0);
+
+    vector<CrossSections*> crosssections2;
+    crosssections2.push_back(new Ionization(particle2,med,cut));
+    crosssections2.push_back(new Bremsstrahlung(particle2,med,cut));
+    crosssections2.push_back(new Photonuclear(particle2,med,cut));
+    crosssections2.push_back(new Epairproduction(particle2,med,cut));
+
+    Scattering A(crosssections2);
+    Scattering B(A);
 
     EXPECT_TRUE(A==B);
-    */
+
 
 }
 
 TEST(Assignment , Operator ) {
-   /*
-    EnergyCutSettings A;
-    EnergyCutSettings B(200,0.01);
+    EnergyCutSettings* cut = new EnergyCutSettings(100,0.01);
+    Medium* med = new Medium("uranium",1.);
+    Particle* particle2 = new Particle("tau",-1,0,3,0,2,0,0);
+
+    vector<CrossSections*> crosssections2;
+    crosssections2.push_back(new Ionization(particle2,med,cut));
+    crosssections2.push_back(new Bremsstrahlung(particle2,med,cut));
+    crosssections2.push_back(new Photonuclear(particle2,med,cut));
+    crosssections2.push_back(new Epairproduction(particle2,med,cut));
+
+    Scattering A;
+    Scattering B(crosssections2);
 
     EXPECT_TRUE(A!=B);
 
@@ -138,14 +153,13 @@ TEST(Assignment , Operator ) {
 
     EXPECT_TRUE(A==B);
 
-    A.SetEcut(300);
+    A.SetCrossSections(crosssections2);
 
     EXPECT_TRUE(A!=B);
 
     B=A;
 
     EXPECT_TRUE(A==B);
-    */
 }
 
 
