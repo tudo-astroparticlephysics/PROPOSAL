@@ -14,6 +14,7 @@
 #include "PROPOSAL/Particle.h"
 #include "PROPOSAL/methods.h"
 #include "PROPOSAL/Constants.h"
+#include <iomanip>
 
 
 using namespace std;
@@ -534,6 +535,44 @@ bool Particle::operator==(const Particle &particle) const
 
 bool Particle::operator!=(const Particle &particle) const {
   return !(*this == particle);
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+ostream& operator<<(ostream& os, Particle const& particle)
+{
+    os<<"---------------------------Particle( "<<&particle<<" )---------------------------"<<endl;
+    os<<fixed<<setprecision(5);
+    os<<"\tname:\t\t\t\t\t"<<particle.name_<<endl;
+    os<<"\ttype:\t\t\t\t\t"<<particle.type_<<scientific<<endl;
+    os<<"\tmass [MeV]:\t\t\t\t"<<particle.mass_<<fixed<<endl;
+    os<<"\tcharge:\t\t\t\t\t"<<particle.charge_<<scientific<<endl;
+    os<<"\tlifetime [s]:\t\t\t\t"<<particle.lifetime_<<setprecision(8)<<endl;
+    os<<"\tmomentum [MeV]:\t\t\t\t"<<particle.momentum_<<endl;
+    os<<"\tenergy [MeV]: \t\t\t\t"<<particle.energy_<<fixed<<setprecision(5)<<endl;
+    os<<"\tx [cm]:\t\t\t\t\t"<<particle.x_<<endl;
+    os<<"\ty [cm]:\t\t\t\t\t"<<particle.y_<<endl;
+    os<<"\tz [cm]:\t\t\t\t\t"<<particle.z_<<endl;
+    os<<"\ttheta [deg]:\t\t\t\t"<<particle.theta_<<endl;
+    os<<"\tphi [deg]:\t\t\t\t"<<particle.phi_<<endl;
+    os<<"\tage [s]:\t\t\t\t"<<particle.t_<<endl;
+    os<<"\tparticle id:\t\t\t\t"<<particle.particle_id_<<endl;
+    os<<"\tparent particle id_:\t\t\t"<<particle.parent_particle_id_<<scientific<<endl;
+    os<<"\tenergy below paricle is lost [MeV]:\t"<<particle.low_<<fixed<<endl;
+    os<<"\tpropagated distance [cm]:\t\t"<<particle.propagated_distance_<<endl;
+    os<<"\tenergy lost in detector [GeV]:\t\t"<<particle.elost_<<endl;
+
+    os<<"\n\tDetector entry point: x [m] | y [m] | z [m] | time [s] | energy [GeV]"<<endl;
+    os<<"\t\t"<<particle.xi_<<"\t"<<particle.yi_<<"\t"<<particle.zi_<<"\t"<<particle.ti_<<"\t"<<particle.ei_<<endl;
+    os<<"\n\tDetector exit point: x [m] | y [m] | z [m] | time [s] | energy [GeV]"<<endl;
+    os<<"\t\t"<<particle.xf_<<"\t"<<particle.yf_<<"\t"<<particle.zf_<<"\t"<<particle.tf_<<"\t"<<particle.ef_<<endl;
+    os<<"\n\tPoint of closest approach: x [m] | y [m] | z [m] | time [s] | energy [GeV]"<<endl;
+    os<<"\t\t"<<particle.xc_<<"\t"<<particle.yc_<<"\t"<<particle.zc_<<"\t"<<particle.tc_<<"\t"<<particle.ec_<<endl;
+    os<<"--------------------------------------------------------------------------";
+    return os;
 }
 
 

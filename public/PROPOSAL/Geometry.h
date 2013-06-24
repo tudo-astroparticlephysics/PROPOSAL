@@ -11,6 +11,7 @@
 #include "PROPOSAL/Particle.h"
 #include <string>
 #include <utility>
+#include <iostream>
 
 class Geometry
 {
@@ -90,6 +91,7 @@ public:
     Geometry& operator=(const Geometry&);
     bool operator==(const Geometry &geometry) const;
     bool operator!=(const Geometry &geometry) const;
+    friend std::ostream& operator<<(std::ostream& os, Geometry const& geometry);
 
 //----------------------------------------------------------------------------//
     //Memberfunctions

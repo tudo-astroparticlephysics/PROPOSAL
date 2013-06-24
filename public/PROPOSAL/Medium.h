@@ -200,6 +200,7 @@ public:
     Medium& operator=(const Medium&);
     bool operator==(const Medium &medium) const;
     bool operator!=(const Medium &medium) const;
+    friend std::ostream& operator<<(std::ostream& os, Medium const& medium);
 
 
 //----------------------------------------------------------------------------//

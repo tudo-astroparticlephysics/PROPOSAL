@@ -236,19 +236,30 @@ int main(int argc, char** argv){
 //    p2->EnableContinuousRandomization();
 //    p2->EnableInterpolation("/home/koehne/PROPOSAL_restructure/buildrestructure_Mar_11_2013/uaaaaah");
 
+    Geometry *k = new Geometry();
+    k->InitBox(0,0,2,3,5,6);
+    cout <<*k<<endl;
 
-    Propagator *pr = new Propagator("resources/configuration");
-    Particle *p = new Particle("mu");
-    double x;
-    for(int i =0 ;i< 20; i++)
-    {
-        x=-2000 + 200*i;
-        p->SetTheta(90);
-        p->SetX(x);
-        cout<<x<<"\t";
-        pr->ChooseCurrentCollection(p);
+    EnergyCutSettings *cut = new EnergyCutSettings();
+    cout<<*cut<<endl;
+
+    Medium *med = new Medium("antares_water",1.003);
+    cout<<*med<<endl;
+
+    Particle *p = new Particle(12,13,"mu",1,2,3,30,43,1e6,0.6,0);
+    cout<<*p<<endl;
+//    Propagator *pr = new Propagator("resources/configuration");
+//    Particle *p = new Particle("mu");
+//    double x;
+//    for(int i =0 ;i< 20; i++)
+//    {
+//        x=-2000 + 200*i;
+//        p->SetTheta(90);
+//        p->SetX(x);
+//        cout<<x<<"\t";
+//        pr->ChooseCurrentCollection(p);
 
 
-    }
+//    }
 
 }

@@ -12,6 +12,7 @@
 #include "PROPOSAL/methods.h"
 #include "PROPOSAL/Integral.h"
 #include "boost/bind.hpp"
+#include <iomanip>
 
 
 using namespace std;
@@ -312,6 +313,40 @@ bool Medium::operator==(const Medium &medium) const
 bool Medium::operator!=(const Medium &medium) const
 {
   return !(*this == medium);
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+ostream& operator<<(ostream& os, Medium const& medium)
+{
+
+    os<<"--------------------Medium( "<<&medium<<" )--------------------"<<endl;
+    os<<medium.name_<<endl;
+    os<<"\tnumber of components:\t\t\t\t"<<medium.numCompontents_<<endl;
+    os<<"\tmass density [g/cm3]:\t\t\t\t"<<medium.massDensity_<<endl;
+    os<<"\tmolecule density [number/cm3]:\t\t\t"<<medium.molDensity_<<endl;
+    os<<"\t<Z/A>:\t\t\t\t\t\t"<<medium.ZA_<<endl;
+    os<<"\tsum of nucleons of all nuclei:\t\t\t"<<medium.sumNucleons_<<endl;
+    os<<"\tionization potential [eV]:\t\t\t"<<medium.I_<<endl;
+    os<<"\trefraction index:\t\t\t\t"<<medium.r_<<endl;
+    os<<"\taverage all-component nucleon weight [MeV]:\t"<<medium.MM_<<endl;
+    os<<"\tmultiplicative density correction factor:\t"<<medium.rho_<<endl;
+    os<<"\tsum of charges of all nuclei:\t\t\t"<<medium.sumCharge_<<endl;
+
+    os<<"\n# | Name | atomic number | number of atoms in a molecule | nucleus charge | average nucleon weight in a nucleus [MeV]\n"<<endl;
+
+    for(int i = 0; i<medium.numCompontents_; i++)
+    {
+        os<<fixed<<std::setprecision(6)<<"\t"<<i <<"\t"<<medium.elementName_.at(i)<<"\t"<<medium.atomicNum_.at(i)<<"\t"
+          <<medium.atomInMolecule_.at(i)<<"\t"<<medium.nucCharge_.at(i)<<"\t"
+          <<medium.M_.at(i)<<endl;
+    }
+
+    os<<"------------------------------------------------------------";
+    return os;
 }
 
 

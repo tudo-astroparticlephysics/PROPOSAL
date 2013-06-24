@@ -280,6 +280,32 @@ bool Geometry::operator!=(const Geometry &geometry) const
 //----------------------------------------------------------------------------//
 
 
+ostream& operator<<(ostream& os, Geometry const& geometry)
+{
+    os<<"--------Geometry( "<<&geometry<<" )--------"<<endl;
+    os<<geometry.object_<<endl;
+    os<<"Origin (x,y,z):\t"<<geometry.x0_<<"\t"<<geometry.y0_<<"\t"<<geometry.z0_<<endl;
+    if(geometry.object_.compare("sphere")==0)
+    {
+        os<<"Radius: "<<geometry.radius_<<"\tInner radius: "<<geometry.inner_radius_<<endl;
+    }
+    if(geometry.object_.compare("cylinder")==0)
+    {
+        os<<"Radius: "<<geometry.radius_<<"\tInnner radius: "<<geometry.inner_radius_<<" Height: "<<geometry.z_<<endl;
+    }
+    if(geometry.object_.compare("box")==0)
+    {
+        os<<"Width_x: "<<geometry.x_<<"\tWidth_y "<<geometry.y_<<"\tHeight: "<<geometry.z_<<endl;
+    }
+    os<<"------------------------------------";
+    return os;
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
 void Geometry::swap(Geometry &geometry)
 {
     using std::swap;

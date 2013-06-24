@@ -91,6 +91,8 @@ public:
     Particle& operator=(const Particle&);
     bool operator==(const Particle &particle) const;
     bool operator!=(const Particle &particle) const;
+    friend std::ostream& operator<<(std::ostream& os, Particle const& particle);
+
 //----------------------------------------------------------------------------//
 
     /*!

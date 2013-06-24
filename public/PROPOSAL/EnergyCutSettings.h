@@ -10,7 +10,7 @@
 #ifndef ENERGYCUTSETTINGS_H_
 #define ENERGYCUTSETTINGS_H_
 
-
+#include <iostream>
 
 
 /**
@@ -44,6 +44,7 @@ public:
     EnergyCutSettings(double ecut, double vcut);
     bool operator==(const EnergyCutSettings &energyCutSettings) const;
     bool operator!=(const EnergyCutSettings &energyCutSettings) const;
+    friend std::ostream& operator<<(std::ostream& os, EnergyCutSettings const& cut_settings);
 
 //----------------------------------------------------------------------------//
 
