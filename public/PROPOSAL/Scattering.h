@@ -12,8 +12,9 @@
 #define SCATTERING_H
 #include "vector"
 #include <string>
-#include "PROPOSAL/ProcessCollection.h"
 #include "PROPOSAL/Particle.h"
+#include "PROPOSAL/CrossSections.h"
+#include "PROPOSAL/StandardNormal.h"
 #include "PROPOSAL/Interpolant.h"
 #include "PROPOSAL/Integral.h"
 
@@ -72,7 +73,7 @@ public:
     void            Scatter(double dr, double ei, double ef);
     double          FunctionToIntegral(double energy);
     double          FunctionToBuildInterpolant(double energy);
-    void            EnableInterpolation();
+    void            EnableInterpolation(std::string path = "");
     void            DisableInterpolation();
 //----------------------------------------------------------------------------//
 

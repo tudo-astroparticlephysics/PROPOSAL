@@ -1,5 +1,9 @@
 #include "gtest/gtest.h"
 #include "PROPOSAL/Scattering.h"
+#include "PROPOSAL/Ionization.h"
+#include "PROPOSAL/Bremsstrahlung.h"
+#include "PROPOSAL/Epairproduction.h"
+#include "PROPOSAL/Photonuclear.h"
 #include <iostream>
 
 using namespace std;

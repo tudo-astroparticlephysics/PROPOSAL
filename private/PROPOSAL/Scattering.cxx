@@ -11,10 +11,13 @@
 #include <cmath>
 #include <algorithm>
 #include <stdlib.h>
-#include "PROPOSAL/Particle.h"
 #include "PROPOSAL/methods.h"
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Scattering.h"
+#include "PROPOSAL/Ionization.h"
+#include "PROPOSAL/Bremsstrahlung.h"
+#include "PROPOSAL/Epairproduction.h"
+#include "PROPOSAL/Photonuclear.h"
 
 using namespace std;
 
@@ -447,7 +450,7 @@ double Scattering::FunctionToBuildInterpolant(double energy)
         return integral_->Integrate(energy, BIGENERGY, boost::bind(&Scattering::FunctionToIntegral, this, _1),4);
 }
 
-void Scattering::EnableInterpolation()
+void Scattering::EnableInterpolation(string path)
 {
     for(unsigned int i = 0; i< crosssections_.size(); i++)
     {
@@ -468,12 +471,6 @@ void Scattering::DisableInterpolation()
 
     interpolant_ = NULL;
     interpolant_diff_ = NULL;
-
-    for(unsigned int i = 0; i< crosssections_.size(); i++)
-    {
-        crosssections_.at(i)->DisableDEdxInterpolation();
-        crosssections_.at(i)->DisableDNdxInterpolation();
-    }
 
     do_interpolation_ = false;
 }

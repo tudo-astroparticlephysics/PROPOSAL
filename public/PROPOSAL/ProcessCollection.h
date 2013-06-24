@@ -24,7 +24,7 @@
 #include <utility>
 #include "PROPOSAL/ContinuousRandomization.h"
 #include "PROPOSAL/Geometry.h"
-
+#include "PROPOSAL/Scattering.h"
 
 
 /*! \class ProcessCollection ProcessCollection.h "CrossSections.h"
@@ -47,6 +47,7 @@ protected:
 
     bool        enable_randomization_;        //!< if true continuous randomization will be enabled (to remember if randomization should be enable when cross sections are initalized)
     bool        do_continuous_randomization_; //!< if true randomization of continuous energy losses is enabled
+    bool        do_scattering_; //!< if true randomization of continuous energy losses is enabled
     int         location_;                    //!< 0 = infront of the detector, 1 = inside the detector, 2 = behind the detector
 
     double      density_correction_;          //!< density correction factor
@@ -87,6 +88,7 @@ protected:
     Interpolant *interpol_prop_interaction_diff_;//!< Interpolant object of the function FunctionToPropIntegralInteraction
 
     ContinuousRandomization *randomizer_;
+    Scattering* scattering_;
 
     Interpolant* interpol_time_particle_;
     Interpolant* interpol_time_particle_diff_;
@@ -355,6 +357,14 @@ public:
     void DisableContinuousRandomization();
 
 //----------------------------------------------------------------------------//
+
+    void EnableScattering();
+
+//----------------------------------------------------------------------------//
+
+    void DisableScattering();
+
+//----------------------------------------------------------------------------//
     /*!
     * function for range calculation for given energy - interface to Integral;
     * \f[f(E) =- \frac{1}{ \frac{dE}{dx}\big|_{Ioniz} +\frac{dE}{dx}\big|
@@ -399,6 +409,10 @@ public:
         return do_continuous_randomization_;
     }
 
+    bool GetDoScattering() const {
+        return do_scattering_;
+    }
+
 	double GetIni() const {
 		return ini_;
 	}
@@ -419,8 +433,12 @@ public:
 		return lpm_effect_enabled_;
 	}
 
-    bool GetContinuousRandomization() const {
-        return do_continuous_randomization_;
+    ContinuousRandomization* GetContinuousRandomization() const {
+        return randomizer_;
+    }
+
+    Scattering* GetScattering() const {
+        return scattering_;
     }
 
     bool GetEnableRandomization() const {

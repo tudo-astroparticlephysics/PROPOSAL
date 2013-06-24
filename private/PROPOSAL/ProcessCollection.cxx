@@ -574,6 +574,11 @@ void ProcessCollection::EnableInterpolation(std::string path)
         randomizer_->EnableDE2deInterpolation(path);
     }
 
+    if(do_scattering_)
+    {
+        scattering_->EnableInterpolation(path);
+    }
+
     bigLow_.at(0)=interpol_prop_decay_->Interpolate(particle_->GetLow());
     bigLow_.at(1)=interpol_prop_interaction_->Interpolate(particle_->GetLow());
 
@@ -836,8 +841,6 @@ void ProcessCollection::EnableContinuousRandomization()
     randomizer_ =   new ContinuousRandomization(particle_,medium_,crosssections_);
     do_continuous_randomization_     =   true;
 }
-
-
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
@@ -848,6 +851,31 @@ void ProcessCollection::DisableContinuousRandomization()
     randomizer_ =   NULL;
     do_continuous_randomization_     =   false;
 }
+
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+void ProcessCollection::DisableScattering()
+{
+    delete  scattering_;
+    scattering_         =   NULL;
+    do_scattering_      =   false;
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+void ProcessCollection::EnableScattering()
+{
+    scattering_         =   new Scattering(crosssections_);
+    do_scattering_      =   true;
+}
+
 
 
 //----------------------------------------------------------------------------//
@@ -898,7 +926,7 @@ ProcessCollection::ProcessCollection()
     interpol_prop_interaction_diff_ = NULL;
     randomizer_                     = NULL;
     geometry_                       = NULL;
-
+    scattering_                     = NULL;
 }
 
 
@@ -1041,6 +1069,15 @@ ProcessCollection::ProcessCollection(const ProcessCollection &collection)
     else
     {
         randomizer_ = NULL;
+    }
+
+    if(collection.scattering_ != NULL)
+    {
+        scattering_ = new Scattering(*collection.scattering_) ;
+    }
+    else
+    {
+        scattering_ = NULL;
     }
 
     if(collection.geometry_ != NULL)
@@ -1250,6 +1287,11 @@ bool ProcessCollection::operator==(const ProcessCollection &collection) const
     }
     else if( randomizer_ != collection.randomizer_)                                           return false;
 
+    if( scattering_ != NULL && collection.scattering_ != NULL)
+    {
+        if( *scattering_   != *collection.scattering_)                                        return false;
+    }
+    else if( scattering_ != collection.scattering_)                                           return false;
 
     if( geometry_ != NULL && collection.geometry_ != NULL)
     {
@@ -1338,6 +1380,20 @@ void ProcessCollection::swap(ProcessCollection &collection)
         randomizer_ = NULL;
     }
 
+    if( scattering_ != NULL && collection.scattering_ != NULL)
+    {
+        scattering_->swap(*collection.scattering_);
+    }
+    else if( scattering_ == NULL && collection.scattering_ != NULL)
+    {
+        scattering_ = new Scattering(*collection.scattering_);
+        collection.scattering_ = NULL;
+    }
+    else if( scattering_ != NULL && collection.scattering_ == NULL)
+    {
+        collection.scattering_ = new Scattering(*scattering_);
+        scattering_ = NULL;
+    }
 
     if( geometry_ != NULL && collection.geometry_ != NULL)
     {
