@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.8)
 
 #FIND_LIBRARY(LOG4CPLUS_LIB NAMES log4cplus HINTS $LD_LIBRARY_PATH)
 #MESSAGE(STATUS "log4cplus lib path: ${LOG4CPLUS_LIB}")
@@ -100,6 +100,8 @@ add_executable(PROPOSALtest
 )
 
 target_link_libraries(PROPOSALtest PROPOSAL)
+
+file(COPY ${CMAKE_SOURCE_DIR}/resources DESTINATION ${CMAKE_BINARY_DIR})
 
 IF(DoTesting)
   execute_process(COMMAND mkdir ${PROPOSAL_BINARY_DIR}/bin/ OUTPUT_VARIABLE _output OUTPUT_STRIP_TRAILING_WHITESPACE)
