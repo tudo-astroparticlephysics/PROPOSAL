@@ -101,13 +101,49 @@ bool Geometry::IsParticleInside(Particle* particle)
 
     if(dist.first > 0 && dist.second < 0)
     {
-        //cout<<dist.first<<"\t"<<dist.second<<endl;
         is_inside   =   true;
     }
     return is_inside;
 }
 
 
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+bool Geometry::IsParticleInfront(Particle* particle)
+{
+    bool is_infront  =   false;
+
+    pair<double,double> dist =   DistanceToBorder(particle);
+
+    if(dist.first > 0 && dist.second > 0)
+    {
+        is_infront   =   true;
+    }
+    return is_infront;
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+bool Geometry::IsParticleBehind(Particle* particle)
+{
+    bool is_behind  =   false;
+
+    pair<double,double> dist =   DistanceToBorder(particle);
+
+    if(dist.first < 0 && dist.second < 0)
+    {
+        is_behind   =   true;
+    }
+    return is_behind;
+}
+
+
+//----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
@@ -304,9 +340,9 @@ pair<double,double> Geometry::DistanceToBorderSphere(Particle* particle)
         t2  =   -1*B/2 - sqrt( determinant );
 
         //Computer precision controll
-        if(t1 > 0 && t1 < HALF_PRECISION)
+        if(t1 > 0 && t1 < GEOMETRY_PRECISION)
             t1  =   0;
-        if(t2 > 0 && t2 < HALF_PRECISION)
+        if(t2 > 0 && t2 < GEOMETRY_PRECISION)
             t2  =   0;
 
         // (-1/-1) sphere is behind particle or particle is on border but moving outside
@@ -371,9 +407,9 @@ pair<double,double> Geometry::DistanceToBorderSphere(Particle* particle)
             t2  =   -1*B/2 - sqrt( determinant );
 
             //Computer precision controll
-            if(t1 > 0 && t1 < HALF_PRECISION)
+            if(t1 > 0 && t1 < GEOMETRY_PRECISION)
                 t1  =   0;
-            if(t2 > 0 && t2 < HALF_PRECISION)
+            if(t2 > 0 && t2 < GEOMETRY_PRECISION)
                 t2  =   0;
 
             // Ok we have an intersection with the inner sphere
@@ -450,9 +486,9 @@ pair<double,double> Geometry::DistanceToBorderSphere(Particle* particle)
     // that a particle which is located on a gemoetry border is treated as inside
     // or outside
 
-    if( distance.first < HALF_PRECISION )
+    if( distance.first < GEOMETRY_PRECISION )
         distance.first  =   -1;
-    if( distance.second < HALF_PRECISION )
+    if( distance.second < GEOMETRY_PRECISION )
         distance.second  =   -1;
     if( distance.first < 0 )
         std::swap(distance.first ,distance.second);
@@ -497,7 +533,7 @@ pair<double,double> Geometry::DistanceToBorderBox(Particle* particle)
         t   =  ( x0_ + 0.5*x_ - particle->GetX() ) / dir_vec_x;
 
         //Computer precision controll
-        if(t > 0 && t < HALF_PRECISION)
+        if(t > 0 && t < GEOMETRY_PRECISION)
             t  =   0;
 
         if( t>0 ) // Interection is in particle trajectory direction
@@ -522,7 +558,7 @@ pair<double,double> Geometry::DistanceToBorderBox(Particle* particle)
         t   =  ( x0_ - 0.5*x_ - particle->GetX() ) / dir_vec_x;
 
         //Computer precision controll
-        if(t > 0 && t < HALF_PRECISION)
+        if(t > 0 && t < GEOMETRY_PRECISION)
             t  =   0;
 
         if( t>0 ) // Interection is in particle trajectory direction
@@ -547,7 +583,7 @@ pair<double,double> Geometry::DistanceToBorderBox(Particle* particle)
         t   =  ( y0_ + 0.5*y_ - particle->GetY() ) / dir_vec_y;
 
         //Computer precision controll
-        if(t > 0 && t < HALF_PRECISION)
+        if(t > 0 && t < GEOMETRY_PRECISION)
             t  =   0;
 
         if( t>0 ) // Interection is in particle trajectory direction
@@ -572,7 +608,7 @@ pair<double,double> Geometry::DistanceToBorderBox(Particle* particle)
         t   =  ( y0_ - 0.5*y_ - particle->GetY() ) / dir_vec_y;
 
         //Computer precision controll
-        if(t > 0 && t < HALF_PRECISION)
+        if(t > 0 && t < GEOMETRY_PRECISION)
             t  =   0;
 
         if( t>0 ) // Interection is in particle trajectory direction
@@ -597,7 +633,7 @@ pair<double,double> Geometry::DistanceToBorderBox(Particle* particle)
         t   =  ( z0_ + 0.5*z_ - particle->GetZ() ) / dir_vec_z;
 
         //Computer precision controll
-        if(t > 0 && t < HALF_PRECISION)
+        if(t > 0 && t < GEOMETRY_PRECISION)
             t  =   0;
 
         if( t>0 ) // Interection is in particle trajectory direction
@@ -622,7 +658,7 @@ pair<double,double> Geometry::DistanceToBorderBox(Particle* particle)
         t   =  ( z0_ - 0.5*z_ - particle->GetZ() ) / dir_vec_z;
 
         //Computer precision controll
-        if(t > 0 && t < HALF_PRECISION)
+        if(t > 0 && t < GEOMETRY_PRECISION)
             t  =   0;
 
         if( t>0 ) // Interection is in particle trajectory direction
@@ -674,9 +710,9 @@ pair<double,double> Geometry::DistanceToBorderBox(Particle* particle)
     // This is necessary cause due to numerical effects it meight be happen
     // that a particle which is located on a gemoetry border is treated as inside
     // or outside
-    if( distance.first < HALF_PRECISION )
+    if( distance.first < GEOMETRY_PRECISION )
         distance.first  =   -1;
-    if( distance.second < HALF_PRECISION )
+    if( distance.second < GEOMETRY_PRECISION )
         distance.second =   -1;
     if( distance.first < 0 )
         std::swap(distance.first ,distance.second);
@@ -744,9 +780,9 @@ pair<double,double> Geometry::DistanceToBorderCylinder(Particle* particle)
             t2  =   -1*B/2 - sqrt( determinant );
 
             //Computer precision controll
-            if(t1 > 0 && t1 < HALF_PRECISION)
+            if(t1 > 0 && t1 < GEOMETRY_PRECISION)
                 t1  =   0;
-            if(t2 > 0 && t2 < HALF_PRECISION)
+            if(t2 > 0 && t2 < GEOMETRY_PRECISION)
                 t2  =   0;
 
 
@@ -783,9 +819,8 @@ pair<double,double> Geometry::DistanceToBorderCylinder(Particle* particle)
         if( dir_vec_z != 0) // if dir_vec == 0 particle trajectory is parallel to E1 (Should not happen)
         {
             t   =  ( z0_ + 0.5*z_ - particle->GetZ() ) / dir_vec_z;
-
             //Computer precision controll
-            if(t > 0 && t < HALF_PRECISION)
+            if(t > 0 && t < GEOMETRY_PRECISION)
                 t  =   0;
 
             if( t>0 ) // Interection is in particle trajectory direction
@@ -793,8 +828,8 @@ pair<double,double> Geometry::DistanceToBorderCylinder(Particle* particle)
                 intersection_x  =   particle->GetX() + t * dir_vec_x;
                 intersection_y  =   particle->GetY() + t * dir_vec_y;
 
-                if( sqrt( pow( (intersection_x -x0_) ,2) + pow( (intersection_y - y0_) ,2 ) ) < radius_ &&
-                    sqrt( pow( (intersection_x -x0_) ,2) + pow( (intersection_y - y0_) ,2 ) ) > inner_radius_ )
+                if( sqrt( pow( (intersection_x -x0_) ,2) + pow( (intersection_y - y0_) ,2 ) ) <= radius_ &&
+                    sqrt( pow( (intersection_x -x0_) ,2) + pow( (intersection_y - y0_) ,2 ) ) >= inner_radius_ )
                 {
                     dist.push_back( t );
                 }
@@ -807,7 +842,7 @@ pair<double,double> Geometry::DistanceToBorderCylinder(Particle* particle)
             t   =  ( z0_ - 0.5*z_ - particle->GetZ() ) / dir_vec_z;
 
             //Computer precision controll
-            if(t > 0 && t < HALF_PRECISION)
+            if(t > 0 && t < GEOMETRY_PRECISION)
                 t  =   0;
 
             if( t>0 ) // Interection is in particle trajectory direction
@@ -815,8 +850,8 @@ pair<double,double> Geometry::DistanceToBorderCylinder(Particle* particle)
                 intersection_x  =   particle->GetX() + t * dir_vec_x;
                 intersection_y  =   particle->GetY() + t * dir_vec_y;
 
-                if(sqrt( pow( (intersection_x - x0_) ,2) + pow( (intersection_y - y0_) ,2 ) ) < radius_ &&
-                   sqrt( pow( (intersection_x - x0_) ,2) + pow( (intersection_y - y0_) ,2 ) ) > inner_radius_ )
+                if(sqrt( pow( (intersection_x - x0_) ,2) + pow( (intersection_y - y0_) ,2 ) ) <= radius_ &&
+                   sqrt( pow( (intersection_x - x0_) ,2) + pow( (intersection_y - y0_) ,2 ) ) >= inner_radius_ )
                 {
                     dist.push_back( t );
                 }
@@ -880,9 +915,9 @@ pair<double,double> Geometry::DistanceToBorderCylinder(Particle* particle)
                 t2  =   -1*B/2 - sqrt( determinant );
 
                 //Computer precision controll
-                if(t1 > 0 && t1 < HALF_PRECISION)
+                if(t1 > 0 && t1 < GEOMETRY_PRECISION)
                     t1  =   0;
-                if(t2 > 0 && t2 < HALF_PRECISION)
+                if(t2 > 0 && t2 < GEOMETRY_PRECISION)
                     t2  =   0;
 
                 // Ok we have a intersection with the inner cylinder
@@ -978,8 +1013,8 @@ pair<double,double> Geometry::DistanceToBorderCylinder(Particle* particle)
                         //
                         if( particle->GetZ() >= z0_ - 0.5*z_ &&
                             particle->GetZ() <= z0_ + 0.5*z_ &&
-                            sqrt( pow( (particle->GetX() - x0_) ,2) + pow( (particle->GetY() - y0_) ,2 ) ) <= radius_ + HALF_PRECISION &&
-                            sqrt( pow( (particle->GetX() - x0_) ,2) + pow( (particle->GetY() - y0_) ,2 ) ) >= inner_radius_ -HALF_PRECISION  )
+                            sqrt( pow( (particle->GetX() - x0_) ,2) + pow( (particle->GetY() - y0_) ,2 ) ) <= radius_ + GEOMETRY_PRECISION &&
+                            sqrt( pow( (particle->GetX() - x0_) ,2) + pow( (particle->GetY() - y0_) ,2 ) ) >= inner_radius_ -GEOMETRY_PRECISION  )
                         {
                             if( t1 < distance.first )
                             {
@@ -1130,9 +1165,9 @@ pair<double,double> Geometry::DistanceToBorderCylinder(Particle* particle)
     // that a particle which is located on a gemoetry border is treated as inside
     // or outside
 
-    if( distance.first < HALF_PRECISION )
+    if( distance.first < GEOMETRY_PRECISION )
         distance.first  =   -1;
-    if( distance.second < HALF_PRECISION )
+    if( distance.second < GEOMETRY_PRECISION )
         distance.second  =   -1;
     if( distance.first < 0 )
         std::swap(distance.first ,distance.second);

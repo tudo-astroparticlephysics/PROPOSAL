@@ -158,11 +158,11 @@ Medium::Medium(string w, double rho)
     {
         InitSalt();
     }
-    else if(EqualsIgnoreCase(w,"standard rock"))
+    else if(EqualsIgnoreCase(w,"standard_rock"))
     {
         InitStandardrock();
     }
-    else if(EqualsIgnoreCase(w,"frejus rock"))
+    else if(EqualsIgnoreCase(w,"frejus_rock"))
     {
         InitFrejusrock();
     }
@@ -186,11 +186,11 @@ Medium::Medium(string w, double rho)
     {
         InitAir();
     }
-    else if(EqualsIgnoreCase(w,"mineral oil"))
+    else if(EqualsIgnoreCase(w,"mineral_oil"))
     {
         InitParaffin();
     }
-    else if(EqualsIgnoreCase(w,"antares water"))
+    else if(EqualsIgnoreCase(w,"antares_water"))
     {
         InitAntaresWater();
     }
@@ -624,7 +624,7 @@ void Medium::InitStandardrock()
     // Ionization potential and density corrections
     // are close to those of calcium carbonate
 
-    elementName_.at(0)      =   "Standard Rock";
+    elementName_.at(0)      =   "Standard_Rock";
     nucCharge_.at(0)        =   11;
     atomicNum_.at(0)        =   22;
     atomInMolecule_.at(0)   =   1;
@@ -653,7 +653,7 @@ void Medium::InitFrejusrock()
 {
     Inita(1);
 
-    elementName_.at(0)      =   "Frejus Rock";
+    elementName_.at(0)      =   "Frejus_Rock";
     nucCharge_.at(0)        =   10.12;
     atomicNum_.at(0)        =   20.34;
     atomInMolecule_.at(0)   =   1;

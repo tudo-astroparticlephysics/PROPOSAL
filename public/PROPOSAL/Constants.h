@@ -41,6 +41,10 @@
     #define HALF_PRECISION 1.e-5 //std::sqrt(computerPrecision);
 #endif
 
+#ifndef GEOMETRY_PRECISION
+    #define GEOMETRY_PRECISION 1.e-9 //std::sqrt(computerPrecision);
+#endif
+
 #ifndef ALPHA // fine structure constant
     #define ALPHA 0.007297352533285885
 #endif

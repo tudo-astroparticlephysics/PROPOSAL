@@ -324,13 +324,21 @@ pair<double,string> ProcessCollection::MakeStochasticLoss(double rnd1,double rnd
 
 }
 
+
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
+
 
 pair<double,string> ProcessCollection::MakeDecay()
 {
     return MakeDecay(MathModel::RandomDouble(),MathModel::RandomDouble(),MathModel::RandomDouble());
 }
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
 
 pair<double,string> ProcessCollection::MakeDecay(double rnd1,double rnd2, double rnd3)
 {
@@ -348,6 +356,34 @@ pair<double,string> ProcessCollection::MakeDecay(double rnd1,double rnd2, double
     decay.second    =   decay_->GetOut();
 
     return decay;
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+double ProcessCollection::CalculateParticleTime(double ei, double ef)
+{
+    if(do_time_interpolation_)
+    {
+        if(abs(ei-ef) > abs(ei)*HALF_PRECISION)
+        {
+            double aux  =   interpol_time_particle_->Interpolate(ei);
+            double aux2 =   aux - interpol_time_particle_->Interpolate(ef);
+
+            if(abs(aux2) > abs(aux)*HALF_PRECISION)
+            {
+                return aux2;
+            }
+        }
+
+        return interpol_time_particle_diff_->Interpolate( (ei+ef)/2 )*(ef-ei);
+    }
+    else
+    {
+        return time_particle_->Integrate(ei, ef, boost::bind(&ProcessCollection::FunctionToTimeIntegral, this, _1),4);
+    }
 }
 
 
@@ -375,6 +411,7 @@ void ProcessCollection::EnableInterpolation(std::string path)
 
     EnableDEdxInterpolation(path);
     EnableDNdxInterpolation(path);
+    EnableParticleTimeInterpolation(path);
 
     bool reading_worked =   true;
     bool storing_failed =   false;
@@ -612,6 +649,151 @@ void ProcessCollection::DisableInterpolation()
     do_interpolation_  =   false;
     DisableDEdxInterpolation();
     DisableDNdxInterpolation();
+    DisableParticleTimeInterpolation();
+
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+void ProcessCollection::EnableParticleTimeInterpolation(std::string path)
+{
+
+    if(do_time_interpolation_)return;
+
+    bool reading_worked =   true;
+    bool storing_failed =   false;
+
+    if(!path.empty())
+    {
+        stringstream filename;
+        filename<<path<<"/Time_"<<particle_->GetName()
+               <<"_"<<medium_->GetName()
+               <<"_"<<cut_settings_->GetEcut()
+               <<"_"<<cut_settings_->GetVcut()
+               <<"_"<<density_correction_;
+
+        for(unsigned int i =0; i<crosssections_.size(); i++)
+        {
+            if(crosssections_.at(i)->GetName().compare("Bremsstrahlung")==0)
+            {
+                filename << "_b_"
+                         << "_" << crosssections_.at(i)->GetParametrization()
+                         << "_" << crosssections_.at(i)->GetMultiplier()
+                         << "_" << crosssections_.at(i)->GetLpmEffectEnabled()
+                         << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetEcut()
+                         << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetVcut();
+
+            }
+            else if(crosssections_.at(i)->GetName().compare("Ionization")==0)
+            {
+                filename << "_i_"
+                         << "_" << crosssections_.at(i)->GetMultiplier()
+                         << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetEcut()
+                         << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetVcut();
+            }
+            else if(crosssections_.at(i)->GetName().compare("Epairproduction")==0)
+            {
+                filename << "_e_"
+                         << "_" << crosssections_.at(i)->GetMultiplier()
+                         << "_" << crosssections_.at(i)->GetLpmEffectEnabled()
+                         << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetEcut()
+                         << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetVcut();
+            }
+            else if(crosssections_.at(i)->GetName().compare("Photonuclear")==0)
+            {
+                filename << "_p_"
+                         << "_" << crosssections_.at(i)->GetParametrization()
+                         << "_" << crosssections_.at(i)->GetMultiplier()
+                         << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetEcut()
+                         << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetVcut();
+            }
+
+        }
+
+        if( FileExist(filename.str()) )
+        {
+            cerr<<"Info: Particle time parametrisation tables will be read from file:"<<endl;
+            cerr<<"\t"<<filename.str()<<endl;
+            ifstream input;
+
+            input.open(filename.str().c_str());
+
+            interpol_time_particle_         = new Interpolant();
+            interpol_time_particle_diff_    = new Interpolant();
+
+            reading_worked = interpol_time_particle_->Load(input);
+            reading_worked = interpol_time_particle_diff_->Load(input);
+
+            input.close();
+        }
+        if(!FileExist(filename.str()) || !reading_worked )
+        {
+            if(!reading_worked)
+            {
+                cerr<<"Info: file "<<filename.str()<<" is corrupted! Write is again!"<< endl;
+            }
+
+            cerr<<"Info: Particle time parametrisation tables will be saved to file:"<<endl;
+            cerr<<"\t"<<filename.str()<<endl;
+
+            double energy = particle_->GetEnergy();
+
+            ofstream output;
+            output.open(filename.str().c_str());
+
+            if(output.good())
+            {
+                output.precision(16);
+
+                interpol_time_particle_         =   new Interpolant(NUM3, particle_->GetLow(), BIGENERGY, boost::bind(&ProcessCollection::InterpolTimeParticle, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
+                interpol_time_particle_diff_    =   new Interpolant(NUM3, particle_->GetLow(), BIGENERGY, boost::bind(&ProcessCollection::InterpolTimeParticleDiff, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
+
+                interpol_time_particle_->Save(output);
+                interpol_time_particle_diff_->Save(output);
+
+            }
+            else
+            {
+                storing_failed  =   true;
+                cerr<<"Warning: Can not open file "<<filename.str()<<" for writing!"<<endl;
+                cerr<<"\t Table will not be stored!"<<endl;
+            }
+            particle_->SetEnergy(energy);
+
+            output.close();
+        }
+    }
+    if(path.empty() || storing_failed)
+    {
+        double energy = particle_->GetEnergy();
+
+        interpol_time_particle_         =   new Interpolant(NUM3, particle_->GetLow(), BIGENERGY, boost::bind(&ProcessCollection::InterpolTimeParticle, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
+        interpol_time_particle_diff_    =   new Interpolant(NUM3, particle_->GetLow(), BIGENERGY, boost::bind(&ProcessCollection::InterpolTimeParticleDiff, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
+
+        particle_->SetEnergy(energy);
+    }
+
+    do_time_interpolation_ =true;
+
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+void ProcessCollection::DisableParticleTimeInterpolation()
+{
+    delete interpol_time_particle_;
+    delete interpol_time_particle_diff_;
+
+    interpol_time_particle_         = NULL;
+    interpol_time_particle_diff_    = NULL;
+
+    do_time_interpolation_ =false;
 }
 
 
@@ -689,6 +871,8 @@ ProcessCollection::ProcessCollection()
     ,do_continuous_randomization_( false )
     ,location_                   ( 0 )
     ,density_correction_         ( 1. )
+    ,do_time_interpolation_      ( false )
+    ,do_exact_time_calulation_   ( false )
     ,up_                         ( false )
     ,bigLow_                     ( 2,0 )
     ,storeDif_                   ( 2,0 )
@@ -704,7 +888,10 @@ ProcessCollection::ProcessCollection()
     prop_decay_                     = new Integral();
     prop_interaction_               = new Integral();
     decay_                          = new Decay();
+    time_particle_                  = new Integral();
 
+    interpol_time_particle_         = NULL;
+    interpol_time_particle_diff_    = NULL;
     interpol_prop_decay_            = NULL;
     interpol_prop_decay_diff_       = NULL;
     interpol_prop_interaction_      = NULL;
@@ -733,6 +920,8 @@ ProcessCollection::ProcessCollection(const ProcessCollection &collection)
     ,do_continuous_randomization_( collection.do_continuous_randomization_ )
     ,location_                   ( collection.location_ )
     ,density_correction_         ( collection.density_correction_ )
+    ,do_time_interpolation_      ( collection.do_time_interpolation_ )
+    ,do_exact_time_calulation_   ( collection.do_exact_time_calulation_ )
     ,up_                         ( collection.up_)
     ,bigLow_                     ( collection.bigLow_ )
     ,storeDif_                   ( collection.storeDif_ )
@@ -743,6 +932,8 @@ ProcessCollection::ProcessCollection(const ProcessCollection &collection)
     ,decay_                      ( new Decay(*collection.decay_) )
     ,prop_decay_                 ( new Integral(*collection.prop_decay_) )
     ,prop_interaction_           ( new Integral(*collection.prop_interaction_) )
+    ,time_particle_              ( new Integral(*collection.time_particle_) )
+
 {
     crosssections_.resize(collection.crosssections_.size());
 
@@ -825,6 +1016,24 @@ ProcessCollection::ProcessCollection(const ProcessCollection &collection)
         interpol_prop_interaction_diff_ = NULL;
     }
 
+    if(collection.interpol_time_particle_ != NULL)
+    {
+        interpol_time_particle_ = new Interpolant(*collection.interpol_time_particle_) ;
+    }
+    else
+    {
+        interpol_time_particle_ = NULL;
+    }
+
+    if(collection.interpol_time_particle_diff_ != NULL)
+    {
+        interpol_time_particle_diff_ = new Interpolant(*collection.interpol_time_particle_diff_) ;
+    }
+    else
+    {
+        interpol_time_particle_diff_ = NULL;
+    }
+
     if(collection.randomizer_ != NULL)
     {
         randomizer_ = new ContinuousRandomization(*collection.randomizer_) ;
@@ -862,6 +1071,8 @@ ProcessCollection::ProcessCollection(Particle *particle, Medium *medium, EnergyC
     ,do_continuous_randomization_( false )
     ,location_                   ( 0 )
     ,density_correction_         ( 1. )
+    ,do_time_interpolation_      ( false )
+    ,do_exact_time_calulation_   ( false )
     ,up_                         ( false )
     ,bigLow_                     ( 2,0 )
     ,storeDif_                   ( 2,0 )
@@ -882,6 +1093,7 @@ ProcessCollection::ProcessCollection(Particle *particle, Medium *medium, EnergyC
     crosssections_.at(3) = new Epairproduction(particle_, medium_, cut_settings_);
 
     decay_               = new Decay(particle_);
+    time_particle_       = new Integral(IROMB, IMAXS, IPREC2);
 
     interpolant_                    = NULL;
     interpolant_diff_               = NULL;
@@ -891,7 +1103,8 @@ ProcessCollection::ProcessCollection(Particle *particle, Medium *medium, EnergyC
     interpol_prop_interaction_diff_ = NULL;
     randomizer_                     = NULL;
     geometry_                       = NULL;
-
+    interpol_time_particle_         = NULL;
+    interpol_time_particle_diff_    = NULL;
 }
 
 
@@ -938,6 +1151,9 @@ bool ProcessCollection::operator==(const ProcessCollection &collection) const
     if( do_continuous_randomization_!= collection.do_continuous_randomization_ )return false;
     if( location_                   != collection.location_ )                return false;
     if( density_correction_         != collection.density_correction_ )      return false;
+    if( do_exact_time_calulation_   != collection.do_exact_time_calulation_ )return false;
+    if( do_time_interpolation_      != collection.do_time_interpolation_ )   return false;
+    if( *time_particle_             != *collection.time_particle_ )          return false;
 
     if( *decay_                     != *collection.decay_ )                  return false;
 
@@ -1016,6 +1232,17 @@ bool ProcessCollection::operator==(const ProcessCollection &collection) const
     }
     else if( interpol_prop_interaction_diff_ != collection.interpol_prop_interaction_diff_)     return false;
 
+    if( interpol_time_particle_diff_ != NULL && collection.interpol_time_particle_diff_ != NULL)
+    {
+        if( *interpol_time_particle_diff_   != *collection.interpol_time_particle_diff_)        return false;
+    }
+    else if( interpol_time_particle_diff_ != collection.interpol_time_particle_diff_)           return false;
+
+    if( interpol_time_particle_ != NULL && collection.interpol_time_particle_ != NULL)
+    {
+        if( *interpol_time_particle_   != *collection.interpol_time_particle_)                  return false;
+    }
+    else if( interpol_time_particle_ != collection.interpol_time_particle_)                     return false;
 
     if( randomizer_ != NULL && collection.randomizer_ != NULL)
     {
@@ -1078,6 +1305,9 @@ void ProcessCollection::swap(ProcessCollection &collection)
     swap( enable_randomization_       , collection.enable_randomization_ );
     swap( location_                   , collection.location_ );
     swap( density_correction_         , collection.density_correction_ );
+    swap( do_time_interpolation_      , collection.do_time_interpolation_ );
+    swap( do_exact_time_calulation_   , collection.do_exact_time_calulation_ );
+
 
     particle_->swap( *collection.particle_ );       //particle pointer swap
     medium_->swap( *collection.medium_ );
@@ -1087,6 +1317,8 @@ void ProcessCollection::swap(ProcessCollection &collection)
     prop_decay_->swap( *collection.prop_decay_ );
     prop_interaction_->swap( *collection.prop_interaction_ );
     decay_->swap(*collection.decay_);               //particle pointer swap
+
+    time_particle_->swap(*collection.time_particle_ );
 
     storeDif_.swap(collection.storeDif_);
     bigLow_.swap(collection.bigLow_);
@@ -1226,6 +1458,36 @@ void ProcessCollection::swap(ProcessCollection &collection)
         interpol_prop_interaction_diff_ = NULL;
     }
 
+    if( interpol_time_particle_ != NULL && collection.interpol_time_particle_ != NULL)
+    {
+        interpol_time_particle_->swap(*collection.interpol_time_particle_);
+    }
+    else if( interpol_time_particle_ == NULL && collection.interpol_time_particle_ != NULL)
+    {
+        interpol_time_particle_ = new Interpolant(*collection.interpol_time_particle_);
+        collection.interpol_time_particle_ = NULL;
+    }
+    else if( interpol_time_particle_ != NULL && collection.interpol_time_particle_ == NULL)
+    {
+        collection.interpol_time_particle_ = new Interpolant(*interpol_time_particle_);
+        interpol_time_particle_ = NULL;
+    }
+
+    if( interpol_time_particle_diff_ != NULL && collection.interpol_time_particle_diff_ != NULL)
+    {
+        interpol_time_particle_diff_->swap(*collection.interpol_time_particle_diff_);
+    }
+    else if( interpol_time_particle_diff_ == NULL && collection.interpol_time_particle_diff_ != NULL)
+    {
+        interpol_time_particle_diff_ = new Interpolant(*collection.interpol_time_particle_diff_);
+        collection.interpol_time_particle_diff_ = NULL;
+    }
+    else if( interpol_time_particle_diff_ != NULL && collection.interpol_time_particle_diff_ == NULL)
+    {
+        collection.interpol_time_particle_diff_ = new Interpolant(*interpol_time_particle_diff_);
+        interpol_time_particle_diff_ = NULL;
+    }
+
 }
 
 
@@ -1302,7 +1564,41 @@ double ProcessCollection::InterpolPropInteractionDiff(double energy)
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
+
+
+double ProcessCollection::InterpolTimeParticle(double energy)
+{
+    return FunctionToTimeIntegral(energy);
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+double ProcessCollection::InterpolTimeParticleDiff(double energy)
+{
+    return time_particle_->Integrate(energy, particle_->GetLow(), boost::bind(&ProcessCollection::FunctionToTimeIntegral, this, _1),4);
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
 //--------------------------Functions to integrate----------------------------//
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+double ProcessCollection::FunctionToTimeIntegral(double energy)
+{
+    double aux;
+
+    aux     =   FunctionToIntegral(energy);
+    aux     *=  particle_->GetEnergy()/(particle_->GetMomentum()*SPEED);
+    return aux;
+}
+
+
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 

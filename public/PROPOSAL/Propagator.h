@@ -37,8 +37,6 @@ private:
     int  order_of_interpolation_;
     bool debug_;
     bool particle_interaction_;     //!< particle interaction? (false = decay)
-    bool do_time_interpolation_;    //!< If true, CalculateParticleTime is interpolated
-
 
     int     seed_;                      //!< seed of the random number generator
     int     brems_;                     //!< Bremsstrahlungs parametrization
@@ -67,32 +65,13 @@ private:
     std::vector<ProcessCollection*> collections_;
 
     Particle* particle_;
-    ProcessCollection *collection_;
-
-    Interpolant* interpol_time_particle_;
-    Interpolant* interpol_time_particle_diff_;
-
-    Integral*    time_particle_;
+    ProcessCollection *current_collection_;
 
     Geometry*    detector_;
 
 
 //----------------------------------------------------------------------------//
-    /*!
-    * function for time delta calculation - interface to Integral
-    *
-    */
 
-    double FunctionToTimeIntegral(double E);
-
-//----------------------------------------------------------------------------//
-
-    double InterpolTimeParticle(double energy);
-
-//----------------------------------------------------------------------------//
-    double InterpolTimeParticleDiff(double energy);
-
-//----------------------------------------------------------------------------//
     /*!
     * Initalize a geomtry. Used when reading the values from config file
     *
@@ -118,6 +97,7 @@ public:
 
     //Constructors
     Propagator();
+    Propagator(std::string config_file);
     Propagator(const Propagator&);
     Propagator& operator=(const Propagator& propagator);
     bool operator==(const Propagator &propagator) const;
@@ -153,17 +133,7 @@ public:
     void AdvanceParticle(double dr, double ei, double ef);
 
 //----------------------------------------------------------------------------//
-    /*!
-    * time delta, corresponding to the given propagation distance
-    *
-    * \param    ei  initial energy
-    * \param    ef  final energy
-    * \return   time delta
-    */
 
-    double CalculateParticleTime(double ei, double ef);
-
-//----------------------------------------------------------------------------//
     void swap(Propagator &propagator);
 
 //----------------------------------------------------------------------------//
@@ -184,17 +154,12 @@ public:
 
 //----------------------------------------------------------------------------//
     /**
-     * Disables the Interpolation for calculation the exact particle time
+     * Choose the current collection by particle type and location.
      */
-    void DisableParticleTimeInterpolation();
-//----------------------------------------------------------------------------//
 
-    /**
-     * Enables the Interpolation for calculation the exact particle time
-     */
-    void EnableParticleTimeInterpolation(std::string path);
-//----------------------------------------------------------------------------//
+    void ChooseCurrentCollection(Particle* particle);
 
+//----------------------------------------------------------------------------//
     /**
      * Calculates the contiuous loss till the first stochastic loss happend
      * and subtract it from initial energy
@@ -219,9 +184,9 @@ public:
 //----------------------------------------------------------------------------//
     //Getter
 
-    ProcessCollection* GetCollection() const
+    ProcessCollection* GetCurrentCollection() const
     {
-        return collection_;
+        return current_collection_;
     }
 //----------------------------------------------------------------------------//
 

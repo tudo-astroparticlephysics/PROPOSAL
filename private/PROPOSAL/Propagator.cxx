@@ -40,10 +40,10 @@ std::pair<double,double> Propagator::CalculateEnergyTillStochastic( double initi
     }
     else
     {
-        rnddMin =   collection_->CalculateTrackingIntegal(initial_energy, rndd, false)/collection_->GetDensityCorrection();
+        rnddMin =   current_collection_->CalculateTrackingIntegal(initial_energy, rndd, false)/current_collection_->GetDensityCorrection();
     }
 
-    rndiMin =   collection_->CalculateTrackingIntegal(initial_energy, rndi, true);
+    rndiMin =   current_collection_->CalculateTrackingIntegal(initial_energy, rndi, true);
 
     //evaluating the energy loss
     if(rndd >= rnddMin || rnddMin<=0)
@@ -52,7 +52,7 @@ std::pair<double,double> Propagator::CalculateEnergyTillStochastic( double initi
     }
     else
     {
-        final.second =   collection_->CalculateFinalEnergy( initial_energy, rndd*collection_->GetDensityCorrection(), false );
+        final.second =   current_collection_->CalculateFinalEnergy( initial_energy, rndd*current_collection_->GetDensityCorrection(), false );
     }
 
     if(rndi >= rndiMin || rndiMin <= 0)
@@ -61,7 +61,7 @@ std::pair<double,double> Propagator::CalculateEnergyTillStochastic( double initi
     }
     else
     {
-        final.first =   collection_->CalculateFinalEnergy( initial_energy, rndi, true );
+        final.first =   current_collection_->CalculateFinalEnergy( initial_energy, rndi, true );
     }
 
     return final;
@@ -123,10 +123,10 @@ double Propagator::Propagate( double distance )
         cout<<final_energy<<"\t";
 
         //Calculate the displacement according to initial energy initial_energy and final_energy
-        displacement  =   collection_->CalculateDisplacement(
+        displacement  =   current_collection_->CalculateDisplacement(
                     initial_energy,
                     final_energy,
-                    collection_->GetDensityCorrection()*(distance - particle_->GetPropagatedDistance())) / collection_->GetDensityCorrection();
+                    current_collection_->GetDensityCorrection()*(distance - particle_->GetPropagatedDistance())) / current_collection_->GetDensityCorrection();
         cout<<particle_->GetT()<<"\t";
         // The first interaction or decay happens behind the distance we want to propagate
         // So we calculate the final energy using only continuous losses
@@ -134,7 +134,7 @@ double Propagator::Propagate( double distance )
         {
             displacement  =   distance - particle_->GetPropagatedDistance();
 
-            final_energy  =   collection_->CalculateFinalEnergy(initial_energy, collection_->GetDensityCorrection()*displacement);
+            final_energy  =   current_collection_->CalculateFinalEnergy(initial_energy, current_collection_->GetDensityCorrection()*displacement);
 
         }
 
@@ -148,11 +148,11 @@ double Propagator::Propagate( double distance )
         }
 
         //Randomize the continuous energy loss if this option is enabled
-        if( collection_->GetDoRandomization() )
+        if( current_collection_->GetDoRandomization() )
         {
             if(final_energy != particle_->GetLow())
             {
-                final_energy  = collection_->Randomize( initial_energy, final_energy );
+                final_energy  = current_collection_->Randomize( initial_energy, final_energy );
             }
 
         }
@@ -170,14 +170,14 @@ double Propagator::Propagate( double distance )
 
         if(particle_interaction_)
         {
-            energy_loss     =   collection_->MakeStochasticLoss();
+            energy_loss     =   current_collection_->MakeStochasticLoss();
             final_energy    -=  energy_loss.first;
 
             cout<<energy_loss.first<<"\t"<<energy_loss.second<<endl;
         }
         else
         {
-            decay           =   collection_->MakeDecay();
+            decay           =   current_collection_->MakeDecay();
             final_energy    =   0;
 
             cout<<decay.first<<"\t"<<decay.second<<endl;
@@ -239,34 +239,6 @@ double Propagator::Propagate( double distance )
 //----------------------------------------------------------------------------//
 
 
-double Propagator::CalculateParticleTime(double ei, double ef)
-{
-    if(do_time_interpolation_)
-    {
-        if(abs(ei-ef) > abs(ei)*HALF_PRECISION)
-        {
-            double aux  =   interpol_time_particle_->Interpolate(ei);
-            double aux2 =   aux - interpol_time_particle_->Interpolate(ef);
-
-            if(abs(aux2) > abs(aux)*HALF_PRECISION)
-            {
-                return aux2;
-            }
-        }
-
-        return interpol_time_particle_diff_->Interpolate( (ei+ef)/2 )*(ef-ei);
-    }
-    else
-    {
-        return time_particle_->Integrate(ei, ef, boost::bind(&Propagator::FunctionToTimeIntegral, this, _1),4);
-    }
-}
-
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
 void Propagator::AdvanceParticle(double dr, double ei, double ef)
 {
 
@@ -280,7 +252,7 @@ void Propagator::AdvanceParticle(double dr, double ei, double ef)
 
     if(do_exact_time_calulation_)
     {
-        time   +=  CalculateParticleTime(ei, ef)/collection_->GetDensityCorrection();
+        time   +=  current_collection_->CalculateParticleTime(ei, ef)/current_collection_->GetDensityCorrection();
     }
     else
     {
@@ -302,6 +274,72 @@ void Propagator::AdvanceParticle(double dr, double ei, double ef)
     particle_->SetX(x);
     particle_->SetY(y);
     particle_->SetZ(z);
+
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+void Propagator::ChooseCurrentCollection(Particle* particle)
+{
+    cout<<particle->GetX()<<"\t";
+
+    for(unsigned int i = 0 ; i < collections_.size() ; i++)
+    {
+        //cout<<collections_.at(i)->GetLocation()<<endl;
+        if(particle->GetName().compare(collections_.at(i)->GetParticle()->GetName())!=0 )
+            continue;
+//        cout<<detector_->GetObject()<<endl;
+//        cout<<detector_->GetX0()<<"\t"<<detector_->GetY0()<<"\t"<<detector_->GetZ0()<<"\t"<<detector_->GetRadius()<<"\t"<<detector_->GetZ()<<"\t"<<detector_->GetInnerRadius()<< endl;
+//        cout<<particle->GetX()<<"\t"<<particle->GetY()<<"\t"<<particle->GetZ()<<"\t"<<particle->GetTheta()<<"\t"<<particle->GetPhi()<< endl;
+
+        if(detector_->IsParticleInfront(particle))
+        {
+            if(collections_.at(i)->GetLocation() != 0)
+                continue;
+            else
+            {
+                if(collections_.at(i)->GetGeometry()->IsParticleInfront(particle))
+                {
+                    cout<<"Hallo0\t"<<i<<endl;
+                }
+            }
+        }
+
+        if(detector_->IsParticleInside(particle))
+        {
+            if(collections_.at(i)->GetLocation() != 1)
+                continue;
+            else
+            {
+                if(collections_.at(i)->GetGeometry()->IsParticleInside(particle))
+                {
+                    cout<<"Hallo1\t"<<i<<endl;
+                }
+            }
+
+        }
+
+        if(detector_->IsParticleBehind(particle))
+        {
+            if(collections_.at(i)->GetLocation() != 2)
+                continue;
+            else
+            {
+                if(collections_.at(i)->GetGeometry()->IsParticleBehind(particle))
+                {
+                    cout<<"Hallo2\t"<<i<<endl;
+                }
+            }
+
+        }
+
+    }
+    cout<<collections_.at(19)->GetMedium()->GetName()<<"\t"
+        <<collections_.at(19)->GetParticle()->GetName()<<"\t"
+        <<collections_.at(19)->GetLocation()<<endl;
 
 }
 
@@ -651,49 +689,24 @@ void Propagator::ReadConfigFile(string config_file)
 //----------------------------------------------------------------------------//
 
 
-void Propagator::EnableParticleTimeInterpolation(std::string path)
-{
-    if(do_time_interpolation_)return;
-
-    double energy = particle_->GetEnergy();
-
-    interpol_time_particle_         =   new Interpolant(NUM3, particle_->GetLow(), BIGENERGY, boost::bind(&Propagator::InterpolTimeParticle, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
-    interpol_time_particle_diff_    =   new Interpolant(NUM3, particle_->GetLow(), BIGENERGY, boost::bind(&Propagator::InterpolTimeParticleDiff, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
-
-    particle_->SetEnergy(energy);
-    do_time_interpolation_ =true;
-}
-
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-void Propagator::DisableParticleTimeInterpolation()
-{
-    delete interpol_time_particle_;
-    delete interpol_time_particle_diff_;
-
-    interpol_time_particle_         = NULL;
-    interpol_time_particle_diff_    = NULL;
-
-    do_time_interpolation_ =false;
-}
-
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
 void Propagator::EnableInterpolation(std::string path)
 {
-    if(collection_ != NULL)
-        collection_->EnableInterpolation(path);
+    if(current_collection_ != NULL)
+    {
+        current_collection_->EnableInterpolation(path);
+        if(do_exact_time_calulation_)
+        {
+            current_collection_->EnableParticleTimeInterpolation(path);
+        }
+    }
     for(unsigned int i = 0 ; i < collections_.size() ; i++)
     {
         collections_.at(i)->EnableInterpolation(path);
+        if(do_exact_time_calulation_)
+        {
+            collections_.at(i)->EnableParticleTimeInterpolation(path);
+        }
     }
-    EnableParticleTimeInterpolation(path);
 }
 
 
@@ -703,13 +716,22 @@ void Propagator::EnableInterpolation(std::string path)
 
 void Propagator::DisableInterpolation()
 {
-    if(collection_ != NULL)
-        collection_->DisableInterpolation();
+    if(current_collection_ != NULL)
+    {
+        current_collection_->DisableInterpolation();
+        if(do_exact_time_calulation_)
+        {
+            current_collection_->DisableParticleTimeInterpolation();
+        }
+    }
     for(unsigned int i = 0 ; i < collections_.size() ; i++)
     {
         collections_.at(i)->DisableInterpolation();
+        if(do_exact_time_calulation_)
+        {
+            collections_.at(i)->DisableParticleTimeInterpolation();
+        }
     }
-    DisableParticleTimeInterpolation();
 }
 
 
@@ -731,7 +753,6 @@ boost::program_options::options_description Propagator::CreateOptions()
 
     po::options_description propagator("Propagator options");
     propagator.add_options()
-        ("propagator.interpol_time",        po::value<bool>(&do_time_interpolation_)->implicit_value(false),    "Enables interpolation for particle time calculation")
         ("propagator.exact_time",           po::value<bool>(&do_exact_time_calulation_)->implicit_value(false), "Do exact particle time calculations")
         ("propagator.interpol_order",       po::value<int>(&order_of_interpolation_)->default_value(5),         "number of interpolation points");
 
@@ -740,9 +761,9 @@ boost::program_options::options_description Propagator::CreateOptions()
         all.add(general);
         all.add(propagator);
 
-    for(unsigned int i =0 ; i < collection_->GetCrosssections().size(); i++)
+    for(unsigned int i =0 ; i < current_collection_->GetCrosssections().size(); i++)
     {
-        all.add(collection_->GetCrosssections().at(i)->CreateOptions());
+        all.add(current_collection_->GetCrosssections().at(i)->CreateOptions());
     }
 
     return all;
@@ -779,9 +800,9 @@ void Propagator::Setup(int argc, char** argv)
         exit(1);
     }
 
-    for(unsigned int i = 0 ; i < collection_->GetCrosssections().size() ; i++)
+    for(unsigned int i = 0 ; i < current_collection_->GetCrosssections().size() ; i++)
     {
-        collection_->GetCrosssections().at(i)->ValidateOptions();
+        current_collection_->GetCrosssections().at(i)->ValidateOptions();
     }
 }
 
@@ -797,7 +818,6 @@ Propagator::Propagator()
     :order_of_interpolation_    ( 5 )
     ,debug_                     ( false )
     ,particle_interaction_      ( false )
-    ,do_time_interpolation_     ( false )
     ,seed_                      ( 1 )
     ,brems_                     ( 1 )
     ,photo_                     ( 12 )
@@ -820,13 +840,43 @@ Propagator::Propagator()
     ,global_cont_behind_        ( false )
     ,path_to_tables_            ( "" )
 {
-    particle_              = new Particle("mu",0,0,0,0,0,1e6,0);
-    time_particle_         = new Integral();
-
-    interpol_time_particle_         = NULL;
-    interpol_time_particle_diff_    = NULL;
+    particle_              = new Particle("mu");
 
     InitDefaultCollection();
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+Propagator::Propagator(string config_file)
+    :order_of_interpolation_    ( 5 )
+    ,debug_                     ( false )
+    ,particle_interaction_      ( false )
+    ,seed_                      ( 1 )
+    ,brems_                     ( 1 )
+    ,photo_                     ( 12 )
+    ,lpm_                       ( false )
+    ,moliere_                   ( false )
+    ,do_exact_time_calulation_  ( false )
+    ,integrate_                 ( false )
+    ,brems_multiplier_          ( 1 )
+    ,photo_multiplier_          ( 1 )
+    ,ioniz_multiplier_          ( 1 )
+    ,epair_multiplier_          ( 1 )
+    ,global_ecut_inside_        ( 500 )
+    ,global_ecut_infront_       ( -1 )
+    ,global_ecut_behind_        ( -1 )
+    ,global_vcut_inside_        ( -1 )
+    ,global_vcut_infront_       ( 0.001 )
+    ,global_vcut_behind_        ( -1 )
+    ,global_cont_inside_        ( false )
+    ,global_cont_infront_       ( true )
+    ,global_cont_behind_        ( false )
+    ,path_to_tables_            ( "" )
+{
+    ReadConfigFile(config_file);
 }
 
 
@@ -838,7 +888,6 @@ Propagator::Propagator(const Propagator &propagator)
     :order_of_interpolation_    ( propagator.order_of_interpolation_ )
     ,debug_                     ( propagator.debug_ )
     ,particle_interaction_      ( propagator.particle_interaction_ )
-    ,do_time_interpolation_     ( propagator.do_time_interpolation_ )
     ,seed_                      ( propagator.seed_ )
     ,brems_                     ( propagator.brems_ )
     ,photo_                     ( propagator.photo_ )
@@ -861,27 +910,10 @@ Propagator::Propagator(const Propagator &propagator)
     ,global_cont_behind_        ( propagator.global_cont_behind_ )
     ,path_to_tables_            ( propagator.path_to_tables_ )
     ,particle_                  ( propagator.particle_ )
-    ,collection_                ( new ProcessCollection(*propagator.collection_) )
-    ,time_particle_             ( new Integral(*propagator.time_particle_) )
+    ,current_collection_        ( new ProcessCollection(*propagator.current_collection_) )
 
 {
-    if(propagator.interpol_time_particle_ != NULL)
-    {
-        interpol_time_particle_ = new Interpolant(*propagator.interpol_time_particle_) ;
-    }
-    else
-    {
-        interpol_time_particle_ = NULL;
-    }
 
-    if(propagator.interpol_time_particle_diff_ != NULL)
-    {
-        interpol_time_particle_diff_ = new Interpolant(*propagator.interpol_time_particle_diff_) ;
-    }
-    else
-    {
-        interpol_time_particle_diff_ = NULL;
-    }
 }
 
 
@@ -913,7 +945,6 @@ bool Propagator::operator==(const Propagator &propagator) const
     if( debug_                    != propagator.debug_ )                  return false;
     if( particle_                 != propagator.particle_ )               return false;
     if( particle_interaction_     != propagator.particle_interaction_ )   return false;
-    if( do_time_interpolation_    != propagator.do_time_interpolation_ )  return false;
     if( seed_                     != propagator.seed_ )                   return false;
     if( brems_                    != propagator.brems_ )                  return false;
     if( photo_                    != propagator.photo_ )                  return false;
@@ -934,22 +965,9 @@ bool Propagator::operator==(const Propagator &propagator) const
     if( global_cont_inside_       != propagator.global_cont_inside_ )     return false;
     if( global_cont_infront_      != propagator.global_cont_infront_ )    return false;
     if( global_cont_behind_       != propagator.global_cont_behind_ )     return false;
-    if( *collection_              != *propagator.collection_ )            return false;
-    if( *time_particle_           != *propagator.time_particle_ )         return false;
+    if( *current_collection_      != *propagator.current_collection_ )    return false;
 
     if( path_to_tables_.compare( propagator.path_to_tables_ )!=0 )        return false;
-
-    if( interpol_time_particle_diff_ != NULL && propagator.interpol_time_particle_diff_ != NULL)
-    {
-        if( *interpol_time_particle_diff_   != *propagator.interpol_time_particle_diff_)        return false;
-    }
-    else if( interpol_time_particle_diff_ != propagator.interpol_time_particle_diff_)           return false;
-
-    if( interpol_time_particle_ != NULL && propagator.interpol_time_particle_ != NULL)
-    {
-        if( *interpol_time_particle_   != *propagator.interpol_time_particle_)                  return false;
-    }
-    else if( interpol_time_particle_ != propagator.interpol_time_particle_)                     return false;
 
     //else
     return true;
@@ -977,7 +995,6 @@ void Propagator::swap(Propagator &propagator)
     swap( order_of_interpolation_   ,   propagator.order_of_interpolation_ );
     swap( debug_                    ,   propagator.debug_);
     swap( particle_interaction_     ,   propagator.particle_interaction_);
-    swap( do_time_interpolation_    ,   propagator.do_time_interpolation_ );
     swap( seed_                     ,   propagator.seed_ );
     swap( brems_                    ,   propagator.brems_ );
     swap( photo_                    ,   propagator.photo_ );
@@ -1002,39 +1019,7 @@ void Propagator::swap(Propagator &propagator)
     path_to_tables_.swap( propagator.path_to_tables_ );
 
     particle_->swap( *propagator.particle_ );
-    collection_->swap( *propagator.collection_ );
-    time_particle_->swap(*propagator.time_particle_ );
-
-    if( interpol_time_particle_ != NULL && propagator.interpol_time_particle_ != NULL)
-    {
-        interpol_time_particle_->swap(*propagator.interpol_time_particle_);
-    }
-    else if( interpol_time_particle_ == NULL && propagator.interpol_time_particle_ != NULL)
-    {
-        interpol_time_particle_ = new Interpolant(*propagator.interpol_time_particle_);
-        propagator.interpol_time_particle_ = NULL;
-    }
-    else if( interpol_time_particle_ != NULL && propagator.interpol_time_particle_ == NULL)
-    {
-        propagator.interpol_time_particle_ = new Interpolant(*interpol_time_particle_);
-        interpol_time_particle_ = NULL;
-    }
-
-    if( interpol_time_particle_diff_ != NULL && propagator.interpol_time_particle_diff_ != NULL)
-    {
-        interpol_time_particle_diff_->swap(*propagator.interpol_time_particle_diff_);
-    }
-    else if( interpol_time_particle_diff_ == NULL && propagator.interpol_time_particle_diff_ != NULL)
-    {
-        interpol_time_particle_diff_ = new Interpolant(*propagator.interpol_time_particle_diff_);
-        propagator.interpol_time_particle_diff_ = NULL;
-    }
-    else if( interpol_time_particle_diff_ != NULL && propagator.interpol_time_particle_diff_ == NULL)
-    {
-        propagator.interpol_time_particle_diff_ = new Interpolant(*interpol_time_particle_diff_);
-        interpol_time_particle_diff_ = NULL;
-    }
-
+    current_collection_->swap( *propagator.current_collection_ );
 
 }
 
@@ -1050,7 +1035,7 @@ void Propagator::InitDefaultCollection()
 {
     Medium* med             = new Medium("ice",1.);
     EnergyCutSettings* cuts = new EnergyCutSettings(500,-1);
-    collection_             = new ProcessCollection(particle_ , med, cuts);
+    current_collection_     = new ProcessCollection(particle_ , med, cuts);
 
 }
 
@@ -1827,21 +1812,6 @@ void Propagator::ApplyOptions()
 //----------------------------------------------------------------------------//
 
 
-double Propagator::InterpolTimeParticle(double energy)
-{
-    return FunctionToTimeIntegral(energy);
-}
-
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-double Propagator::InterpolTimeParticleDiff(double energy)
-{
-    return time_particle_->Integrate(energy, particle_->GetLow(), boost::bind(&Propagator::FunctionToTimeIntegral, this, _1),4);
-}
-
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
@@ -1849,15 +1819,6 @@ double Propagator::InterpolTimeParticleDiff(double energy)
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-
-double Propagator::FunctionToTimeIntegral(double energy)
-{
-    double aux;
-
-    aux     =   collection_->FunctionToIntegral(energy);
-    aux     *=  particle_->GetEnergy()/(particle_->GetMomentum()*SPEED);
-    return aux;
-}
 
 
 //----------------------------------------------------------------------------//

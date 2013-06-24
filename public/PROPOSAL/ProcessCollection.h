@@ -51,6 +51,10 @@ protected:
 
     double      density_correction_;          //!< density correction factor
 
+    bool    do_time_interpolation_;     //!< If true, CalculateParticleTime is interpolated
+    bool    do_exact_time_calulation_;  //!< exact local time calculation enabled if true
+
+
     Geometry*   geometry_;
 
     /*!
@@ -84,6 +88,10 @@ protected:
 
     ContinuousRandomization *randomizer_;
 
+    Interpolant* interpol_time_particle_;
+    Interpolant* interpol_time_particle_diff_;
+
+    Integral*    time_particle_;
 
     //Memeberfunctions
 
@@ -110,6 +118,23 @@ protected:
     double FunctionToPropIntegralInteraction(double energy);
 
 //----------------------------------------------------------------------------//
+
+    /*!
+    * function for time delta calculation - interface to Integral
+    *
+    */
+
+    double FunctionToTimeIntegral(double E);
+
+//----------------------------------------------------------------------------//
+
+    double InterpolTimeParticle(double energy);
+
+//----------------------------------------------------------------------------//
+    double InterpolTimeParticleDiff(double energy);
+
+//----------------------------------------------------------------------------//
+
     /*!
     1d parametrization ;
     \f[return= \int_{e}^{e_{low}} f(E) dE \f] with \f$
@@ -163,6 +188,17 @@ public:
 
     // Memberfunctions
     void swap(ProcessCollection &collection);
+
+//----------------------------------------------------------------------------//
+    /*!
+    * time delta, corresponding to the given propagation distance
+    *
+    * \param    ei  initial energy
+    * \param    ef  final energy
+    * \return   time delta
+    */
+
+    double CalculateParticleTime(double ei, double ef);
 
 //----------------------------------------------------------------------------//
 
@@ -291,6 +327,17 @@ public:
      */
     void DisableInterpolation();
 
+//----------------------------------------------------------------------------//
+    /**
+     * Disables the Interpolation for calculation the exact particle time
+     */
+    void DisableParticleTimeInterpolation();
+//----------------------------------------------------------------------------//
+
+    /**
+     * Enables the Interpolation for calculation the exact particle time
+     */
+    void EnableParticleTimeInterpolation(std::string path);
 //----------------------------------------------------------------------------//
 
     void EnableLpmEffect();

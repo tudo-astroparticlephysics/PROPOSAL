@@ -87,7 +87,7 @@ global
     photo_multiplier    1
     ioniz_multiplier    1
     epair_multiplier    1
-    path_to_tables      /home/koehne/PROPOSAL_restructure/buildrestructure_Mar_11_2013/uaaaaah
+    path_to_tables      resources/tables
     ecut_inside         500
     ecut_infront       -1
     ecut_behind        -1
@@ -175,7 +175,7 @@ sector
     infront -1    0.05  1
     behind  -1      -1  0
 
-    medium  hydrogen 1.
+    medium  Standard_Rock 1.
 
 # keyword detector must be followed by one line
 # geometry information

@@ -237,8 +237,18 @@ int main(int argc, char** argv){
 //    p2->EnableInterpolation("/home/koehne/PROPOSAL_restructure/buildrestructure_Mar_11_2013/uaaaaah");
 
 
+    Propagator *pr = new Propagator("resources/configuration");
+    Particle *p = new Particle("mu");
+    double x;
+    for(int i =0 ;i< 20; i++)
+    {
+        x=-2000 + 200*i;
+        p->SetTheta(90);
+        p->SetX(x);
+        cout<<x<<"\t";
+        pr->ChooseCurrentCollection(p);
 
-    Propagator *pr = new Propagator();
-    pr->ReadConfigFile("/home/koehne/PROPOSAL_restructure/restructure_Mar_11_2013/resources/configuration");
+
+    }
 
 }
