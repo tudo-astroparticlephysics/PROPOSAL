@@ -77,23 +77,23 @@
 #       cont_behind      0      (default 0 (bool))
 
 global
-    seed                3
-    brems               3
-    photo               2
+    seed                1
+    brems               1
+    photo               12
     lpm
     moliere
     exact_time
     brems_multiplier    1
-    photo_multiplier    2
-    ioniz_multiplier    3
-    epair_multiplier    4
+    photo_multiplier    1
+    ioniz_multiplier    1
+    epair_multiplier    1
     path_to_tables      /home/koehne/PROPOSAL_restructure/buildrestructure_Mar_11_2013/uaaaaah
     ecut_inside         500
-    ecut_infront       222
-    ecut_behind        1999.2
-    vcut_inside        0.1
-    vcut_infront      0.01
-    vcut_behind        0.001
+    ecut_infront       -1
+    ecut_behind        -1
+    vcut_inside        -1
+    vcut_infront        0.05
+    vcut_behind        -1
     cont_inside         0
     cont_infront        1
     cont_behind         0
@@ -135,41 +135,47 @@ global
 #
 # you can specify as many sectors as you like/need
 
-sector
-    sphere  0   0   0   10  0
-
-    inside  2     0.1  1
-    infront 3    0.01  1
-    behind  4    0.001  1
-
-    medium Ice 1.
+# Earth center is 6372186 m below the detector center
+# first rock with 6371324 m radius (earth core)
+# second 2610 m ice with density correction factor 1.005
+# third 200 m ice with density correction factor 0.832
+# last air with density correction factor 0.673
 
 sector
-    sphere  0   0   0   10  0
+    sphere  0   0   -6372186   1000000000  6374134
 
-    inside  2     0.1  1
-    infront 3    0.01  1
-    behind  4    0.001  1
+    inside  500     -1  0
+    infront -1    0.05  1
+    behind  -1      -1  0
 
-    medium Ice 1.
-
-sector
-    cylinder 10  10
-
-    inside  21     0.1  1
-    infront 32    0.01  1
-    behind  43    0.001  1
-
-    medium uranium 1.
+    medium air 0.673
 
 sector
-    cylinder 10  10
+    sphere  0   0   -6372186   6374134  6373934
 
-    inside  21     0.1  1
-    infront 32    0.01  1
-    behind  43    0.001  1
+    inside  500     -1  0
+    infront -1    0.05  1
+    behind  -1      -1  0
 
-    medium uranium 1.
+    medium Ice 0.832
+
+sector
+    sphere  0   0   -6372186   6373934  6371324
+
+    inside  500     -1  0
+    infront -1    0.05  1
+    behind  -1      -1  0
+
+    medium Ice 1.005
+
+sector
+    sphere  0   0   -6372186   6371324  0
+
+    inside  500     -1  0
+    infront -1    0.05  1
+    behind  -1      -1  0
+
+    medium  hydrogen 1.
 
 # keyword detector must be followed by one line
 # geometry information
@@ -194,6 +200,6 @@ sector
 #       ( box + 3 or 6 values are expected )
 
 detector
-    box 2 43 3
+    cylinder 1200   1700
 
 
