@@ -163,6 +163,87 @@ TEST(Assignment , Operator ) {
 }
 
 
+TEST(Scattering , Theta0 ) {
+
+    ifstream in;
+    in.open("bin/TestFiles/Scattering_Theta0.txt");
+
+    char firstLine[256];
+    in.getline(firstLine,256);
+    double dEdx_new;
+    double energy;
+    double dEdx;
+    double ecut;
+    double vcut;
+    string med;
+    string particleName;
+    bool lpm;
+    int para;
+
+    cout.precision(16);
+
+    double dr,ef,Theta0,Theta0_new;
+    double energy_old=-1;
+    bool first = true;
+    while(in.good())
+    {
+        if(first)in>>ecut>>vcut>>lpm>>med>>particleName>>dr>>energy>>ef>>Theta0;
+        first=false;
+        energy_old = -1;
+
+        Medium *medium = new Medium(med,1.);
+        Particle *particle = new Particle(particleName,1.,1.,1,.20,20,1e5,10);
+        particle->SetEnergy(energy);
+        EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
+
+        std::vector<CrossSections*> vecOfProcColl;
+        CrossSections* ion = new Ionization(particle,medium,cuts);
+
+        CrossSections* brems = new Bremsstrahlung(particle,medium,cuts);
+        brems->SetParametrization(1);
+
+        CrossSections* epair = new Epairproduction(particle,medium,cuts);
+
+        CrossSections* photo = new Photonuclear(particle,medium,cuts);
+        photo->SetParametrization(12);
+
+
+        vecOfProcColl.push_back(ion);
+        vecOfProcColl.push_back(brems);
+        vecOfProcColl.push_back(epair);
+        vecOfProcColl.push_back(photo);
+
+        Scattering* scat = new Scattering(vecOfProcColl);
+        scat->EnableInterpolation();
+
+        cout << "scat interpolated!" << endl;
+
+        while(energy_old<=energy)
+        {
+            energy_old = energy;
+            scat->GetParticle()->SetEnergy(energy);
+            Theta0_new = scat->CalculateTheta0(dr,energy,ef);
+
+
+            if(fabs(Theta0 -  Theta0_new)>1e-4*Theta0)cout << med << "\t" << particleName << "\t" << ecut << "\t" << vcut << endl;
+
+            EXPECT_NEAR(Theta0, Theta0_new, 1e-2*Theta0);
+
+
+            in>>ecut>>vcut>>lpm>>med>>particleName>>dr>>energy>>ef>>Theta0;
+            if(in.good() == false)break;
+        }
+
+
+        vecOfProcColl.clear();
+        delete scat;
+        delete medium;
+        delete particle;
+        delete cuts;
+    }
+}
+
+
 
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);

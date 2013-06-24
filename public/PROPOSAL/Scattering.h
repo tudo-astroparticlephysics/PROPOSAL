@@ -24,7 +24,7 @@
   */
 
 
-class Scattering
+class Scattering : public MathModel
 {
 
 
@@ -40,6 +40,7 @@ private:
 
     Particle* particle_;
     std::vector<CrossSections*> crosssections_;
+    StandardNormal* standard_normal_;
 //----------------------------------------------------------------------------//
 
 public:
@@ -67,11 +68,12 @@ public:
 //----------------------------------------------------------------------------//
     // Memberfunctions
 
-    double  CalculateTheta0(double dr, double ei, double ef);
-    double  FunctionToIntegral(double energy);
-    double  FunctionToBuildInterpolant(double energy);
-    void    EnableInterpolation();
-    void    DisableInterpolation();
+    long    double  CalculateTheta0(double dr, double ei, double ef);
+    void            Scatter(double dr, double ei, double ef);
+    double          FunctionToIntegral(double energy);
+    double          FunctionToBuildInterpolant(double energy);
+    void            EnableInterpolation();
+    void            DisableInterpolation();
 //----------------------------------------------------------------------------//
 
     void swap(Scattering &scattering);
@@ -85,6 +87,10 @@ public:
 //----------------------------------------------------------------------------//
     // Getter
 
+    Particle* GetParticle()
+    {
+        return particle_;
+    }
 
 //----------------------------------------------------------------------------//
     // destructors

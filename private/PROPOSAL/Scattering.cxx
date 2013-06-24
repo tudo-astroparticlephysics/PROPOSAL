@@ -47,6 +47,7 @@ Scattering::Scattering( )
             x0_ = tmp->CalculateScatteringX0();
         }
     }
+    standard_normal_    =   new StandardNormal(IROMB, IMAXS, IPREC);
 }
 
 //double Scattering::cutoff   =   1;
@@ -70,6 +71,8 @@ Scattering::Scattering(std::vector<CrossSections*> crosssections)
             x0_ = tmp->CalculateScatteringX0();
         }
     }
+
+    standard_normal_    =   new StandardNormal(IROMB, IMAXS, IPREC);
 }
 
 Scattering::Scattering(const Scattering &scattering)
@@ -97,6 +100,7 @@ Scattering::Scattering(const Scattering &scattering)
     }
 
     integral_ = new Integral(* scattering.integral_);
+    standard_normal_ = new StandardNormal( *scattering.standard_normal_);
 };
 
 //----------------------------------------------------------------------------//
@@ -147,6 +151,11 @@ bool Scattering::operator==(const Scattering &scattering) const
             cout<<"In copy constructor of Scattering: Error: Unknown crossSection"<<endl;
             exit(1);
         }
+    }
+
+    if( standard_normal_ != NULL && scattering.standard_normal_ != NULL)
+    {
+        if( *standard_normal_   != *scattering.standard_normal_)                                        return false;
     }
 
     if( interpolant_ != NULL && scattering.interpolant_ != NULL)
@@ -221,6 +230,15 @@ void Scattering::swap(Scattering &scattering)
     }
 
     integral_->swap(*scattering.integral_);
+
+    if(scattering.standard_normal_ != NULL)
+    {
+        standard_normal_->swap(*scattering.standard_normal_) ;
+    }
+    else
+    {
+        standard_normal_ = NULL;
+    }
 }
 
 
@@ -273,7 +291,7 @@ double Scattering::FunctionToIntegral(double energy)
 
 //----------------------------------------------------------------------------//
 
-double Scattering::CalculateTheta0(double dr, double ei, double ef)
+long double Scattering::CalculateTheta0(double dr, double ei, double ef)
 {
 
     double aux=-1;
@@ -305,12 +323,122 @@ double Scattering::CalculateTheta0(double dr, double ei, double ef)
     }
 
     aux =   sqrt(max(aux, 0.0)/x0_) *particle_->GetCharge();
-    aux *=  max(1 + 0.038*log(dr/x0_), 0.0);
 
+    //TOMASZ IMPLENETATION
+    //This should be the correct result, but is way out of range
+    /*
+    double beta = sqrt(1 -  particle_->GetMass() * particle_->GetMass()/ (particle_->GetEnergy()*particle_->GetEnergy() ));
+    beta = (RY/(beta*particle_->GetMomentum())) * particle_->GetCharge() * sqrt(dr/x0_) ;
+    cout << "auxAlt: " << aux << endl;
+    cout << "auxNeu: " << beta << endl;
+    */
+    aux *=  max(1 + 0.038*log(dr/x0_), 0.0);
 
     return min(aux, cutoff);
 }
 
+void Scattering::Scatter(double dr, double ei, double ef)
+{
+    //    Implement the Molie Scattering here see PROPOSALParticle::advance of old version
+        long double Theta0, Theta_max,rnd1,rnd2,sx,tx,sy,ty,sz,tz,ax,ay,az;
+        double x,y,z;
+        Theta0     =   CalculateTheta0(dr, ei, ef);
+        Theta_max    =   1./SQRT2;
+
+
+        rnd1    =   (long double)standard_normal_-> StandardNormalRandomNumber(RandomDouble(), 0, Theta0, -Theta_max, Theta_max, false);
+        rnd2    =   (long double)standard_normal_-> StandardNormalRandomNumber(RandomDouble(), 0, Theta0, -Theta_max, Theta_max, false);
+        sx      =   (rnd1/SQRT3+rnd2)/2;
+        tx      =   rnd2;
+
+
+        rnd1    =   (long double)standard_normal_-> StandardNormalRandomNumber(RandomDouble(), 0, Theta0, -Theta_max, Theta_max, false);
+        rnd2    =   (long double)standard_normal_-> StandardNormalRandomNumber(RandomDouble(), 0, Theta0, -Theta_max, Theta_max, false);
+        sy      =   (rnd1/SQRT3+rnd2)/2;
+        ty      =   rnd2;
+
+
+        sz      =   sqrt(max(1.-(sx*sx+sy*sy), (long double)0.));
+        tz      =   sqrt(max(1.-(tx*tx+ty*ty), (long double)0.));
+
+
+        long double sinth, costh,sinph,cosph;
+        long double theta,phi;
+        sinth = (long double)particle_->GetSinTheta();
+        costh = (long double)particle_->GetCosTheta();
+        sinph = (long double)particle_->GetSinPhi();
+        cosph = (long double)particle_->GetCosPhi();
+        x   = particle_->GetX();
+        y   = particle_->GetY();
+        z   = particle_->GetZ();
+
+
+        ax      =   sinth*cosph*sz+costh*cosph*sx-sinph*sy;
+        ay      =   sinth*sinph*sz+costh*sinph*sx+cosph*sy;
+        az      =   costh*sz-sinth*sx;
+
+        x       +=  ax*dr;
+        y       +=  ay*dr;
+        z       +=  az*dr;
+
+
+        ax      =   sinth*cosph*tz+costh*cosph*tx-sinph*ty;
+        ay      =   sinth*sinph*tz+costh*sinph*tx+cosph*ty;
+        az      =   costh*tz-sinth*tx;
+
+
+
+        costh   =   az;
+        sinth   =   sqrt(max(1-costh*costh, (long double)0));
+
+        if(sinth!=0)
+        {
+            sinph   =   ay/sinth;
+            cosph   =   ax/sinth;
+        }
+
+        if(costh>1)
+        {
+            theta   =   acos(1)*180./PI;
+        }
+        else if(costh<-1)
+        {
+            theta   =   acos(-1)*180./PI;
+        }
+        else
+        {
+            theta   =   acos(costh)*180./PI;
+        }
+
+        if(cosph>1)
+        {
+            phi =   acos(1)*180./PI;
+        }
+        else if(cosph<-1)
+        {
+            phi =   acos(-1)*180./PI;
+        }
+        else
+        {
+            phi =   acos(cosph)*180./PI;
+        }
+
+        if(sinph<0)
+        {
+            phi =   360.-phi;
+        }
+
+        if(phi>=360)
+        {
+            phi -=  360.;
+        }
+
+        particle_->SetX(x);
+        particle_->SetY(y);
+        particle_->SetZ(z);
+        particle_->SetPhi(phi);
+        particle_->SetTheta(theta);
+}
 
 //----------------------------------------------------------------------------//
 
@@ -321,6 +449,12 @@ double Scattering::FunctionToBuildInterpolant(double energy)
 
 void Scattering::EnableInterpolation()
 {
+    for(unsigned int i = 0; i< crosssections_.size(); i++)
+    {
+        crosssections_.at(i)->EnableDEdxInterpolation();
+        crosssections_.at(i)->EnableDNdxInterpolation();
+    }
+
     interpolant_ = new Interpolant(NUM2,particle_->GetLow() , BIGENERGY ,boost::bind(&Scattering::FunctionToBuildInterpolant, this, _1), order_of_interpolation_ , false, false, true, order_of_interpolation_, false, false, false );
     interpolant_diff_ = new Interpolant(NUM2,particle_->GetLow() , BIGENERGY ,boost::bind(&Scattering::FunctionToIntegral, this, _1), order_of_interpolation_ , false, false, true, order_of_interpolation_, false, false, false );
 
@@ -334,6 +468,12 @@ void Scattering::DisableInterpolation()
 
     interpolant_ = NULL;
     interpolant_diff_ = NULL;
+
+    for(unsigned int i = 0; i< crosssections_.size(); i++)
+    {
+        crosssections_.at(i)->DisableDEdxInterpolation();
+        crosssections_.at(i)->DisableDNdxInterpolation();
+    }
 
     do_interpolation_ = false;
 }
