@@ -219,7 +219,7 @@ void Photonuclear::EnableDNdxInterpolation(std::string path, bool raw)
 {
     if(do_dndx_Interpolation_)return;
 
-    EnablePhotoInterpolation(path);
+    EnablePhotoInterpolation(path,raw);
 
     bool storing_failed =   false;
     bool reading_worked =   true;
@@ -345,6 +345,8 @@ void Photonuclear::EnableDEdxInterpolation(std::string path, bool raw)
 {
     if(do_dedx_Interpolation_)return;
 
+    EnablePhotoInterpolation(path,raw);
+
     bool reading_worked =   true;
     bool storing_failed =   false;
 
@@ -425,7 +427,6 @@ void Photonuclear::EnableDEdxInterpolation(std::string path, bool raw)
     }
     if(path.empty() || storing_failed)
     {
-        EnablePhotoInterpolation(path);
         double energy = particle_->GetEnergy();
         dedx_interpolant_ = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, boost::bind(&Photonuclear::FunctionToBuildDEdxInterpolant, this, _1),
                                             order_of_interpolation_, true, false, true, order_of_interpolation_, false, false, false);

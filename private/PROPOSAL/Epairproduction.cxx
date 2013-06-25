@@ -265,7 +265,7 @@ void Epairproduction::EnableDNdxInterpolation(std::string path, bool raw)
 
     if(do_dndx_Interpolation_)return;
 
-    EnableEpairInterpolation(path);
+    EnableEpairInterpolation(path,raw);
 
     bool storing_failed =   false;
     bool reading_worked =   true;
@@ -390,7 +390,7 @@ void Epairproduction::EnableDEdxInterpolation(std::string path, bool raw)
 
     if(do_dedx_Interpolation_)return;
 
-    EnableEpairInterpolation(path);
+    EnableEpairInterpolation(path,raw);
 
     bool reading_worked =   true;
     bool storing_failed =   false;

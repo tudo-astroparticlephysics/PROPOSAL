@@ -43,7 +43,7 @@ void ContinuousRandomization::EnableDE2dxInterpolation(std::string path, bool ra
     bool reading_worked =   true;
     bool storing_failed =   false;
 
-    standard_normal_->EnableInterpolation(path);
+    standard_normal_->EnableInterpolation(path,raw);
 
     if(!path.empty())
     {
@@ -179,7 +179,7 @@ void ContinuousRandomization::EnableDE2deInterpolation(std::string path, bool ra
     bool reading_worked =   true;
     bool storing_failed =   false;
 
-    standard_normal_->EnableInterpolation(path);
+    standard_normal_->EnableInterpolation(path,raw);
 
     if(!path.empty())
     {

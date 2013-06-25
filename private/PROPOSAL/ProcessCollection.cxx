@@ -597,6 +597,11 @@ void ProcessCollection::EnableInterpolation(std::string path, bool raw)
         randomizer_->EnableDE2deInterpolation(path,raw);
     }
 
+    if(do_exact_time_calulation_)
+    {
+        EnableParticleTimeInterpolation(path,raw);
+    }
+
     if(do_scattering_)
     {
         scattering_->EnableInterpolation(path);
@@ -915,6 +920,26 @@ void ProcessCollection::EnableScattering()
 {
     scattering_         =   new Scattering(crosssections_);
     do_scattering_      =   true;
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+void ProcessCollection::EnableExactTimeCalculation()
+{
+    do_exact_time_calulation_   =   true;
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+void ProcessCollection::DisableExactTimeCalculation()
+{
+    do_exact_time_calulation_   =   false;
 }
 
 

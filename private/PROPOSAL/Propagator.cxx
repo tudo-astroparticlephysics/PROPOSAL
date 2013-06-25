@@ -699,18 +699,10 @@ void Propagator::EnableInterpolation(std::string path, bool raw)
     if(current_collection_ != NULL)
     {
         current_collection_->EnableInterpolation(path,raw);
-        if(do_exact_time_calulation_)
-        {
-            current_collection_->EnableParticleTimeInterpolation(path,raw);
-        }
     }
     for(unsigned int i = 0 ; i < collections_.size() ; i++)
     {
         collections_.at(i)->EnableInterpolation(path,raw);
-        if(do_exact_time_calulation_)
-        {
-            collections_.at(i)->EnableParticleTimeInterpolation(path,raw);
-        }
     }
 }
 
@@ -724,18 +716,10 @@ void Propagator::DisableInterpolation()
     if(current_collection_ != NULL)
     {
         current_collection_->DisableInterpolation();
-        if(do_exact_time_calulation_)
-        {
-            current_collection_->DisableParticleTimeInterpolation();
-        }
     }
     for(unsigned int i = 0 ; i < collections_.size() ; i++)
     {
         collections_.at(i)->DisableInterpolation();
-        if(do_exact_time_calulation_)
-        {
-            collections_.at(i)->DisableParticleTimeInterpolation();
-        }
     }
 }
 
@@ -1803,6 +1787,10 @@ void Propagator::ApplyOptions()
         if(moliere_)
         {
             //collections_.at(j)->EnableMoliereScattering();
+        }
+        if(do_exact_time_calulation_)
+        {
+            collections_.at(j)->EnableExactTimeCalculation();
         }
 
     }

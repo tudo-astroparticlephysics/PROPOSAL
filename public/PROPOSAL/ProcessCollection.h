@@ -365,6 +365,14 @@ public:
     void DisableScattering();
 
 //----------------------------------------------------------------------------//
+
+    void EnableExactTimeCalculation();
+
+//----------------------------------------------------------------------------//
+
+    void DisableExactTimeCalculation();
+
+//----------------------------------------------------------------------------//
     /*!
     * function for range calculation for given energy - interface to Integral;
     * \f[f(E) =- \frac{1}{ \frac{dE}{dx}\big|_{Ioniz} +\frac{dE}{dx}\big|
