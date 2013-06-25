@@ -454,7 +454,7 @@ void Scattering::EnableInterpolation(string path)
 {
     if(do_interpolation_)return;
 
-    bool reading_worked=false, storing_failed=false;
+    bool reading_worked=true, storing_failed=false;
     if(!path.empty())
     {
         for(unsigned int i = 0; i< crosssections_.size(); i++)
@@ -546,8 +546,8 @@ void Scattering::EnableInterpolation(string path)
                 interpolant_ = new Interpolant(NUM2,particle_->GetLow() , BIGENERGY ,boost::bind(&Scattering::FunctionToBuildInterpolant, this, _1), order_of_interpolation_ , false, false, true, order_of_interpolation_, false, false, false );
                 interpolant_diff_ = new Interpolant(NUM2,particle_->GetLow() , BIGENERGY ,boost::bind(&Scattering::FunctionToIntegral, this, _1), order_of_interpolation_ , false, false, true, order_of_interpolation_, false, false, false );
 
-                interpolant_diff_->Save(output);
                 interpolant_->Save(output);
+                interpolant_diff_->Save(output);
             }
             else
             {

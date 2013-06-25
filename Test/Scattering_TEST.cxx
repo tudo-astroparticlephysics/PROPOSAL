@@ -224,7 +224,7 @@ TEST(Scattering , Theta0 ) {
         vecOfProcColl.push_back(photo);
 
         Scattering* scat = new Scattering(vecOfProcColl);
-        scat->EnableInterpolation();
+        scat->EnableInterpolation("/data/LocalApps/LocalFiles/tables");
 
         while(energy_old<=energy)
         {
