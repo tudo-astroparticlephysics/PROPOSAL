@@ -416,7 +416,7 @@ void ProcessCollection::EnableInterpolation(std::string path, bool raw)
 
     EnableDEdxInterpolation(path,raw);
     EnableDNdxInterpolation(path,raw);
-    EnableParticleTimeInterpolation(path,raw);
+
 
     bool reading_worked =   true;
     bool storing_failed =   false;
