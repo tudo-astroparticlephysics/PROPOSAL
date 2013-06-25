@@ -174,6 +174,12 @@ TEST(Scattering , Theta0 ) {
 
     char firstLine[256];
     in.getline(firstLine,256);
+    if(!in.good())
+    {
+        cerr << "File Scattering_Theta0.txt not found!!" << endl;
+        EXPECT_TRUE(false);
+    }
+
     double dEdx_new;
     double energy;
     double dEdx;
@@ -219,8 +225,6 @@ TEST(Scattering , Theta0 ) {
 
         Scattering* scat = new Scattering(vecOfProcColl);
         scat->EnableInterpolation();
-
-        cout << "scat interpolated!" << endl;
 
         while(energy_old<=energy)
         {

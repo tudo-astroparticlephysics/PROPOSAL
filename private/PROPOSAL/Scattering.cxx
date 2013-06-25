@@ -452,14 +452,130 @@ double Scattering::FunctionToBuildInterpolant(double energy)
 
 void Scattering::EnableInterpolation(string path)
 {
-    for(unsigned int i = 0; i< crosssections_.size(); i++)
+    if(do_interpolation_)return;
+
+    bool reading_worked=false, storing_failed=false;
+    if(!path.empty())
     {
-        crosssections_.at(i)->EnableDEdxInterpolation();
-        crosssections_.at(i)->EnableDNdxInterpolation();
+        for(unsigned int i = 0; i< crosssections_.size(); i++)
+        {
+            crosssections_.at(i)->EnableDEdxInterpolation(path);
+            crosssections_.at(i)->EnableDNdxInterpolation(path);
+        }
+
+        stringstream filename;
+        filename<<path<<"/Scattering_"<<particle_->GetName()
+               <<"_"<<crosssections_.at(0)->GetMedium()->GetName()
+               <<"_"<< crosssections_.at(0)->GetEnergyCutSettings()->GetEcut()
+               <<"_"<<crosssections_.at(0)->GetEnergyCutSettings()->GetVcut();
+
+        for(unsigned int i =0; i<crosssections_.size(); i++)
+        {
+            if(crosssections_.at(i)->GetName().compare("Bremsstrahlung")==0)
+            {
+                filename << "_b_"
+                         << "_" << crosssections_.at(i)->GetParametrization()
+                         << "_" << crosssections_.at(i)->GetMultiplier()
+                         << "_" << crosssections_.at(i)->GetLpmEffectEnabled()
+                         << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetEcut()
+                         << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetVcut();
+
+            }
+            else if(crosssections_.at(i)->GetName().compare("Ionization")==0)
+            {
+                filename << "_i_"
+                         << "_" << crosssections_.at(i)->GetMultiplier()
+                         << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetEcut()
+                         << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetVcut();
+            }
+            else if(crosssections_.at(i)->GetName().compare("Epairproduction")==0)
+            {
+                filename << "_e_"
+                         << "_" << crosssections_.at(i)->GetMultiplier()
+                         << "_" << crosssections_.at(i)->GetLpmEffectEnabled()
+                         << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetEcut()
+                         << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetVcut();
+            }
+            else if(crosssections_.at(i)->GetName().compare("Photonuclear")==0)
+            {
+                filename << "_p_"
+                         << "_" << crosssections_.at(i)->GetParametrization()
+                         << "_" << crosssections_.at(i)->GetMultiplier()
+                         << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetEcut()
+                         << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetVcut();
+            }
+
+        }
+
+
+        if( FileExist(filename.str()) )
+        {
+            cerr<<"Info: Scattering tables will be read from file:"<<endl;
+            cerr<<"\t"<<filename.str()<<endl;
+            ifstream input;
+
+            input.open(filename.str().c_str());
+
+            interpolant_ = new Interpolant();
+            interpolant_diff_ = new Interpolant();
+            reading_worked = interpolant_->Load(input);
+            reading_worked = reading_worked && interpolant_diff_->Load(input);
+
+            input.close();
+        }
+
+        if(!FileExist(filename.str()) || !reading_worked )
+        {
+            if(!reading_worked)
+            {
+                cerr<<"Info: file "<<filename.str()<<" is corrupted! Write is again!"<< endl;
+            }
+
+            cerr<<"Info: Scattering tables will be saved to file:"<<endl;
+            cerr<<"\t"<<filename.str()<<endl;
+
+            double energy = particle_->GetEnergy();
+
+            ofstream output;
+            output.open(filename.str().c_str());
+
+            if(output.good())
+            {
+                output.precision(16);
+
+                interpolant_ = new Interpolant(NUM2,particle_->GetLow() , BIGENERGY ,boost::bind(&Scattering::FunctionToBuildInterpolant, this, _1), order_of_interpolation_ , false, false, true, order_of_interpolation_, false, false, false );
+                interpolant_diff_ = new Interpolant(NUM2,particle_->GetLow() , BIGENERGY ,boost::bind(&Scattering::FunctionToIntegral, this, _1), order_of_interpolation_ , false, false, true, order_of_interpolation_, false, false, false );
+
+                interpolant_diff_->Save(output);
+                interpolant_->Save(output);
+            }
+            else
+            {
+                storing_failed  =   true;
+                cerr<<"Warning: Can not open file "<<filename.str()<<" for writing!"<<endl;
+                cerr<<"\t Table will not be stored!"<<endl;
+            }
+            particle_->SetEnergy(energy);
+
+            output.close();
+        }
+    }
+    if(path.empty() || storing_failed)
+    {
+        double energy = particle_->GetEnergy();
+
+        for(unsigned int i = 0; i< crosssections_.size(); i++)
+        {
+            crosssections_.at(i)->EnableDEdxInterpolation(path);
+            crosssections_.at(i)->EnableDNdxInterpolation(path);
+        }
+
+        interpolant_ = new Interpolant(NUM2,particle_->GetLow() , BIGENERGY ,boost::bind(&Scattering::FunctionToBuildInterpolant, this, _1), order_of_interpolation_ , false, false, true, order_of_interpolation_, false, false, false );
+        interpolant_diff_ = new Interpolant(NUM2,particle_->GetLow() , BIGENERGY ,boost::bind(&Scattering::FunctionToIntegral, this, _1), order_of_interpolation_ , false, false, true, order_of_interpolation_, false, false, false );
+
+        particle_->SetEnergy(energy);
     }
 
-    interpolant_ = new Interpolant(NUM2,particle_->GetLow() , BIGENERGY ,boost::bind(&Scattering::FunctionToBuildInterpolant, this, _1), order_of_interpolation_ , false, false, true, order_of_interpolation_, false, false, false );
-    interpolant_diff_ = new Interpolant(NUM2,particle_->GetLow() , BIGENERGY ,boost::bind(&Scattering::FunctionToIntegral, this, _1), order_of_interpolation_ , false, false, true, order_of_interpolation_, false, false, false );
 
     do_interpolation_ = true;
 }
