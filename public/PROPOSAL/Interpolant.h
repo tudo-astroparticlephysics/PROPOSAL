@@ -324,8 +324,8 @@ public:
     * \return   true if successfull
     */
 
-    bool Save(std::string Path);
-    bool Save(std::ofstream &out);
+    bool Save(std::string Path, bool raw = false);
+    bool Save(std::ofstream &out, bool raw = false);
 
 //----------------------------------------------------------------------------//
 
@@ -336,8 +336,8 @@ public:
     * \return   true if successfull
     */
 
-    bool Load(std::string Path);
-    bool Load(std::ifstream &in);
+    bool Load(std::string Path, bool raw = false);
+    bool Load(std::ifstream &in, bool raw = false);
 
 
 //----------------------------------------------------------------------------//

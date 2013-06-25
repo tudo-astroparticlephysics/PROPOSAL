@@ -27,6 +27,7 @@
 #include "PROPOSAL/Interpolant.h"
 #include "PROPOSAL/methods.h"
 #include <algorithm>
+#include <sstream>
 
 
 using namespace std;
@@ -511,19 +512,39 @@ double Interpolant::FindLimit(double x1, double y)
 //----------------------------------------------------------------------------//
 
 
-bool Interpolant::Save(string Path)
+bool Interpolant::Save(string Path, bool raw)
 {
     ofstream out;
-    out.open(Path.c_str());
-    out.precision(16);
 
-    if(!out.good())
+    if(!raw)
     {
-        cerr<<"Error: Can not open file "<< Path<<" for writing"<<endl;
-        return 0;
+        stringstream ss;
+        ss<<Path<<".txt";
+
+        out.open(ss.str().c_str());
+
+        out.precision(16);
+
+        if(!out.good())
+        {
+            cerr<<"Error: Can not open file "<< Path<<" for writing"<<endl;
+            return 0;
+        }
+    }
+    else
+    {
+
+        out.open(Path.c_str() , ios::binary);
+
+        if(!out.good())
+        {
+            cerr<<"Error: Can not open file "<< Path<<" for writing"<<endl;
+            return 0;
+        }
+
     }
 
-    Save(out);
+    Save(out, raw);
 
     out.close();
     return 1;
@@ -534,7 +555,7 @@ bool Interpolant::Save(string Path)
 //----------------------------------------------------------------------------//
 
 
-bool Interpolant::Save(ofstream& out)
+bool Interpolant::Save(ofstream& out, bool raw)
 {
     if(!out.good())
     {
@@ -544,41 +565,114 @@ bool Interpolant::Save(ofstream& out)
     bool D2 = false;
     if(function2d_ != NULL)D2 = true;
 
-    out << D2 << endl;
-
-    if(D2)
+    if(raw)
     {
-        if(isLog_)
+        out.write( reinterpret_cast<char*>( &D2 ), sizeof D2 );
+
+        if(D2)
         {
-            out << max_ << "\t" << exp(xmin_) << "\t" << exp(xmax_) << endl;
+            if(isLog_)
+            {
+                xmax_   =   exp(xmax_);
+                xmin_   =   exp(xmin_);
+
+                out.write( reinterpret_cast<char*>( &max_ ), sizeof max_);
+                out.write( reinterpret_cast<char*>( &xmin_ ), sizeof xmin_ );
+                out.write( reinterpret_cast<char*>( &xmax_ ), sizeof xmax_ );
+            }
+            else
+            {
+                out.write( reinterpret_cast<char*>( &max_ ), sizeof max_);
+                out.write( reinterpret_cast<char*>( &xmin_ ), sizeof xmin_ );
+                out.write( reinterpret_cast<char*>( &xmax_ ), sizeof xmax_ );
+            }
+            out.write( reinterpret_cast<char*>( &romberg_ ), sizeof romberg_);
+            out.write( reinterpret_cast<char*>( &rational_ ), sizeof rational_);
+            out.write( reinterpret_cast<char*>( &relative_ ), sizeof relative_);
+            out.write( reinterpret_cast<char*>( &isLog_ ), sizeof isLog_);
+            out.write( reinterpret_cast<char*>( &rombergY_ ), sizeof rombergY_);
+            out.write( reinterpret_cast<char*>( &rationalY_ ), sizeof rationalY_);
+            out.write( reinterpret_cast<char*>( &relativeY_ ), sizeof relativeY_);
+            out.write( reinterpret_cast<char*>( &logSubst_ ), sizeof logSubst_);
+
+            for(int i =0; i<max_ ;i++)
+            {
+                out.write( reinterpret_cast<char*>( &iX_.at(i) ), sizeof iX_.at(i));
+                Interpolant_.at(i)->Save(out,raw);
+            }
         }
         else
         {
-            out << max_ << "\t" << xmin_ << "\t" << xmax_ << endl;
-        }
-        out << romberg_ << "\t" << rational_ << "\t" << relative_ << "\t" << isLog_ << endl;
-        out << rombergY_ << "\t" << rationalY_ << "\t" << relativeY_ << "\t" << logSubst_ << endl;
+            if(isLog_)
+            {
+                xmax_   =   exp(xmax_);
+                xmin_   =   exp(xmin_);
 
-        for(int i =0; i<max_ ;i++){
-            out << iX_.at(i) << endl;
-            Interpolant_.at(i)->Save(out);
+                out.write( reinterpret_cast<char*>( &max_ ), sizeof max_);
+                out.write( reinterpret_cast<char*>( &xmin_ ), sizeof xmin_ );
+                out.write( reinterpret_cast<char*>( &xmax_ ), sizeof xmax_ );
+            }
+            else
+            {
+                out.write( reinterpret_cast<char*>( &max_ ), sizeof max_);
+                out.write( reinterpret_cast<char*>( &xmin_ ), sizeof xmin_ );
+                out.write( reinterpret_cast<char*>( &xmax_ ), sizeof xmax_ );
+            }
+
+            out.write( reinterpret_cast<char*>( &romberg_ ), sizeof romberg_);
+            out.write( reinterpret_cast<char*>( &rational_ ), sizeof rational_);
+            out.write( reinterpret_cast<char*>( &relative_ ), sizeof relative_);
+            out.write( reinterpret_cast<char*>( &isLog_ ), sizeof isLog_);
+            out.write( reinterpret_cast<char*>( &rombergY_ ), sizeof rombergY_);
+            out.write( reinterpret_cast<char*>( &rationalY_ ), sizeof rationalY_);
+            out.write( reinterpret_cast<char*>( &relativeY_ ), sizeof relativeY_);
+            out.write( reinterpret_cast<char*>( &logSubst_ ), sizeof logSubst_);
+
+            for(int i =0; i<max_ ;i++)
+            {
+                out.write( reinterpret_cast<char*>( &iX_.at(i) ), sizeof iX_.at(i));
+                out.write( reinterpret_cast<char*>( &iY_.at(i) ), sizeof iY_.at(i));
+            }
         }
     }
     else
     {
-        if(isLog_)
+        out << D2 << endl;
+
+        if(D2)
         {
-            out << max_ << "\t" << exp(xmin_) << "\t" << exp(xmax_) << endl;
+            if(isLog_)
+            {
+                out << max_ << "\t" << exp(xmin_) << "\t" << exp(xmax_) << endl;
+            }
+            else
+            {
+                out << max_ << "\t" << xmin_ << "\t" << xmax_ << endl;
+            }
+            out << romberg_ << "\t" << rational_ << "\t" << relative_ << "\t" << isLog_ << endl;
+            out << rombergY_ << "\t" << rationalY_ << "\t" << relativeY_ << "\t" << logSubst_ << endl;
+
+            for(int i =0; i<max_ ;i++){
+                out << iX_.at(i) << endl;
+                Interpolant_.at(i)->Save(out,raw);
+            }
         }
         else
         {
-            out << max_ << "\t" << xmin_ << "\t" << xmax_ << endl;
-        }
-        out << romberg_ << "\t" << rational_ << "\t" << relative_ << "\t" << isLog_ << endl;
-        out << rombergY_ << "\t" << rationalY_ << "\t" << relativeY_ << "\t" << logSubst_ << endl;
+            if(isLog_)
+            {
+                out << max_ << "\t" << exp(xmin_) << "\t" << exp(xmax_) << endl;
+            }
+            else
+            {
+                out << max_ << "\t" << xmin_ << "\t" << xmax_ << endl;
+            }
+            out << romberg_ << "\t" << rational_ << "\t" << relative_ << "\t" << isLog_ << endl;
+            out << rombergY_ << "\t" << rationalY_ << "\t" << relativeY_ << "\t" << logSubst_ << endl;
 
-        for(int i =0; i<max_ ;i++){
-            out << iX_.at(i) << "\t" << iY_.at(i) << endl;
+            for(int i =0; i<max_ ;i++){
+                out << iX_.at(i) << "\t" << iY_.at(i) << endl;
+            }
         }
     }
     return 1;
@@ -589,13 +683,25 @@ bool Interpolant::Save(ofstream& out)
 //----------------------------------------------------------------------------//
 
 
-bool Interpolant::Load(std::string Path)
+bool Interpolant::Load(std::string Path, bool raw)
 {
     bool success;
     ifstream in;
-    in.open(Path.c_str());
 
-    success = Load(in);
+    if(!raw)
+    {
+        stringstream ss;
+        ss<<Path<<".txt";
+
+        in.open(ss.str().c_str());
+    }
+    else
+    {
+        in.open(Path.c_str() ,ios::binary);
+
+    }
+
+    success = Load(in ,raw);
 
     in.close();
     return success;
@@ -606,52 +712,120 @@ bool Interpolant::Load(std::string Path)
 //----------------------------------------------------------------------------//
 
 
-bool Interpolant::Load(ifstream& in)
+bool Interpolant::Load(ifstream& in, bool raw)
 {
     bool D2;
-    in >> D2 ;
 
     int max;
     double xmin, xmax;
     int romberg, rombergY;
     bool rational,rationalY,relative,relativeY,isLog, logSubst;
 
-    if(D2)
+    if(raw)
     {
-        if(!in.good())return 0;
-        in >> max >> xmin >> xmax;
-        in >> romberg >> rational >> relative >> isLog ;
-        in >> rombergY >> rationalY >> relativeY >> logSubst ;
+        in.read( reinterpret_cast<char*>( &D2 ), sizeof D2 );
 
-        InitInterpolant(max, xmin, xmax,
-                        romberg, rational, relative, isLog,
-                        rombergY,rationalY, relativeY, logSubst);
-
-        Interpolant_.resize(max_);
-
-        for(int i =0; i<max_ ;i++){
-            in >> iX_.at(i);
+        if(D2)
+        {
             if(!in.good())return 0;
-            Interpolant_.at(i) = new Interpolant();
-            Interpolant_.at(i)->Load(in);
-            Interpolant_.at(i)->self_ =false;
-        }
 
+            in.read( reinterpret_cast<char*>( &max ), sizeof max );
+            in.read( reinterpret_cast<char*>( &xmin ), sizeof xmin );
+            in.read( reinterpret_cast<char*>( &xmax ), sizeof xmax );
+            in.read( reinterpret_cast<char*>( &romberg ), sizeof romberg );
+            in.read( reinterpret_cast<char*>( &rational ), sizeof rational );
+            in.read( reinterpret_cast<char*>( &relative ), sizeof relative );
+            in.read( reinterpret_cast<char*>( &isLog ), sizeof isLog );
+            in.read( reinterpret_cast<char*>( &rombergY ), sizeof rombergY );
+            in.read( reinterpret_cast<char*>( &rationalY ), sizeof rationalY );
+            in.read( reinterpret_cast<char*>( &relativeY ), sizeof relativeY );
+            in.read( reinterpret_cast<char*>( &logSubst ), sizeof logSubst );
+
+            InitInterpolant(max, xmin, xmax,
+                            romberg, rational, relative, isLog,
+                            rombergY,rationalY, relativeY, logSubst);
+
+            Interpolant_.resize(max_);
+
+            for(int i =0; i<max_ ;i++)
+            {
+                in.read( reinterpret_cast<char*>( &iX_.at(i) ), sizeof iX_.at(i) );
+
+                if(!in.good())return 0;
+                Interpolant_.at(i) = new Interpolant();
+                Interpolant_.at(i)->Load(in,raw);
+                Interpolant_.at(i)->self_ =false;
+            }
+
+        }
+        else
+        {
+            if(!in.good())return 0;
+            in.read( reinterpret_cast<char*>( &max ), sizeof max );
+            in.read( reinterpret_cast<char*>( &xmin ), sizeof xmin );
+            in.read( reinterpret_cast<char*>( &xmax ), sizeof xmax );
+            in.read( reinterpret_cast<char*>( &romberg ), sizeof romberg );
+            in.read( reinterpret_cast<char*>( &rational ), sizeof rational );
+            in.read( reinterpret_cast<char*>( &relative ), sizeof relative );
+            in.read( reinterpret_cast<char*>( &isLog ), sizeof isLog );
+            in.read( reinterpret_cast<char*>( &rombergY ), sizeof rombergY );
+            in.read( reinterpret_cast<char*>( &rationalY ), sizeof rationalY );
+            in.read( reinterpret_cast<char*>( &relativeY ), sizeof relativeY );
+            in.read( reinterpret_cast<char*>( &logSubst ), sizeof logSubst );
+
+            InitInterpolant(max, xmin, xmax,
+                            romberg, rational, relative, isLog,
+                            rombergY,rationalY, relativeY, logSubst);
+
+            for(int i =0; i<max_ ;i++)
+            {
+                in.read( reinterpret_cast<char*>( &iX_.at(i) ), sizeof iX_.at(i) );
+                in.read( reinterpret_cast<char*>( &iY_.at(i) ), sizeof iY_.at(i) );
+                if(!in.good())return 0;
+            }
+        }
     }
     else
     {
-        if(!in.good())return 0;
-        in >> max >> xmin >> xmax;
-        in >> romberg >> rational >> relative >> isLog ;
-        in >> rombergY >> rationalY >> relativeY >> logSubst ;
+        in >> D2 ;
 
-        InitInterpolant(max, xmin, xmax,
-                        romberg, rational, relative, isLog,
-                        rombergY,rationalY, relativeY, logSubst);
-
-        for(int i =0; i<max_ ;i++){
-            in >> iX_.at(i) >> iY_.at(i) ;
+        if(D2)
+        {
             if(!in.good())return 0;
+            in >> max >> xmin >> xmax;
+            in >> romberg >> rational >> relative >> isLog ;
+            in >> rombergY >> rationalY >> relativeY >> logSubst ;
+
+            InitInterpolant(max, xmin, xmax,
+                            romberg, rational, relative, isLog,
+                            rombergY,rationalY, relativeY, logSubst);
+
+            Interpolant_.resize(max_);
+
+            for(int i =0; i<max_ ;i++){
+                in >> iX_.at(i);
+                if(!in.good())return 0;
+                Interpolant_.at(i) = new Interpolant();
+                Interpolant_.at(i)->Load(in,raw);
+                Interpolant_.at(i)->self_ =false;
+            }
+
+        }
+        else
+        {
+            if(!in.good())return 0;
+            in >> max >> xmin >> xmax;
+            in >> romberg >> rational >> relative >> isLog ;
+            in >> rombergY >> rationalY >> relativeY >> logSubst ;
+
+            InitInterpolant(max, xmin, xmax,
+                            romberg, rational, relative, isLog,
+                            rombergY,rationalY, relativeY, logSubst);
+
+            for(int i =0; i<max_ ;i++){
+                in >> iX_.at(i) >> iY_.at(i) ;
+                if(!in.good())return 0;
+            }
         }
     }
     return 1;

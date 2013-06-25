@@ -260,7 +260,7 @@ double Epairproduction::CalculateStochasticLoss(double rnd1, double rnd2)
 //----------------------------------------------------------------------------//
 
 
-void Epairproduction::EnableDNdxInterpolation(std::string path)
+void Epairproduction::EnableDNdxInterpolation(std::string path, bool raw)
 {
 
     if(do_dndx_Interpolation_)return;
@@ -280,6 +280,9 @@ void Epairproduction::EnableDNdxInterpolation(std::string path)
                 <<"_lpm_"<<lpm_effect_enabled_
                 <<"_multiplier_"<<multiplier_;
 
+        if(!raw)
+            filename<<".txt";
+
         dndx_interpolant_1d_.resize(medium_->GetNumCompontents());
         dndx_interpolant_2d_.resize(medium_->GetNumCompontents());
 
@@ -289,15 +292,22 @@ void Epairproduction::EnableDNdxInterpolation(std::string path)
             cerr<<"\t"<<filename.str()<<endl;
             ifstream input;
 
-            input.open(filename.str().c_str());
+            if(raw)
+            {
+                input.open(filename.str().c_str(), ios::binary);
+            }
+            else
+            {
+                input.open(filename.str().c_str());
+            }
 
             for(int i=0; i<(medium_->GetNumCompontents()); i++)
             {
                 component_ = i;
                 dndx_interpolant_2d_.at(i) = new Interpolant();
                 dndx_interpolant_1d_.at(i) = new Interpolant();
-                reading_worked = dndx_interpolant_2d_.at(i)->Load(input);
-                reading_worked = dndx_interpolant_1d_.at(i)->Load(input);
+                reading_worked = dndx_interpolant_2d_.at(i)->Load(input,raw);
+                reading_worked = dndx_interpolant_1d_.at(i)->Load(input,raw);
 
             }
             input.close();
@@ -316,7 +326,15 @@ void Epairproduction::EnableDNdxInterpolation(std::string path)
 
             ofstream output;
 
-            output.open(filename.str().c_str());
+            if(raw)
+            {
+                output.open(filename.str().c_str(), ios::binary);
+            }
+            else
+            {
+                output.open(filename.str().c_str());
+            }
+
             if(output.good())
             {
                 output.precision(16);
@@ -328,8 +346,8 @@ void Epairproduction::EnableDNdxInterpolation(std::string path)
                     dndx_interpolant_2d_.at(i) =    new Interpolant(NUM1, particle_->GetLow(), BIGENERGY,  NUM1, 0, 1, boost::bind(&Epairproduction::FunctionToBuildDNdxInterpolant2D, this, _1 , _2), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false, order_of_interpolation_, true, false, false);
                     dndx_interpolant_1d_.at(i) =    new Interpolant(NUM1, particle_->GetLow(), BIGENERGY,  boost::bind(&Epairproduction::FunctionToBuildDNdxInterpolant1D, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, true, false, false);
 
-                    dndx_interpolant_2d_.at(i)->Save(output);
-                    dndx_interpolant_1d_.at(i)->Save(output);
+                    dndx_interpolant_2d_.at(i)->Save(output,raw);
+                    dndx_interpolant_1d_.at(i)->Save(output,raw);
 
                 }
             }
@@ -367,7 +385,7 @@ void Epairproduction::EnableDNdxInterpolation(std::string path)
 //----------------------------------------------------------------------------//
 
 
-void Epairproduction::EnableDEdxInterpolation(std::string path)
+void Epairproduction::EnableDEdxInterpolation(std::string path, bool raw)
 {
 
     if(do_dedx_Interpolation_)return;
@@ -387,16 +405,26 @@ void Epairproduction::EnableDEdxInterpolation(std::string path)
                 <<"_lpm_"<<lpm_effect_enabled_
                 <<"_multiplier_"<<multiplier_;
 
+        if(!raw)
+            filename<<".txt";
+
         if( FileExist(filename.str()) )
         {
             cerr<<"Info: Epairproduction parametrisation tables (dEdx) will be read from file:"<<endl;
             cerr<<"\t"<<filename.str()<<endl;
             ifstream input;
 
-            input.open(filename.str().c_str());
+            if(raw)
+            {
+                input.open(filename.str().c_str(), ios::binary);
+            }
+            else
+            {
+                input.open(filename.str().c_str());
+            }
 
             dedx_interpolant_ = new Interpolant();
-            reading_worked = dedx_interpolant_->Load(input);
+            reading_worked = dedx_interpolant_->Load(input,raw);
 
             input.close();
         }
@@ -413,7 +441,15 @@ void Epairproduction::EnableDEdxInterpolation(std::string path)
             double energy = particle_->GetEnergy();
 
             ofstream output;
-            output.open(filename.str().c_str());
+
+            if(raw)
+            {
+                output.open(filename.str().c_str(), ios::binary);
+            }
+            else
+            {
+                output.open(filename.str().c_str());
+            }
 
             if(output.good())
             {
@@ -421,7 +457,7 @@ void Epairproduction::EnableDEdxInterpolation(std::string path)
 
                 dedx_interpolant_ = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, boost::bind(&Epairproduction::FunctionToBuildDEdxInterpolant, this, _1), order_of_interpolation_, true, false, true, order_of_interpolation_, false, false, false);
 
-                dedx_interpolant_->Save(output);
+                dedx_interpolant_->Save(output,raw);
             }
             else
             {
@@ -452,7 +488,7 @@ void Epairproduction::EnableDEdxInterpolation(std::string path)
 //----------------------------------------------------------------------------//
 
 
-void Epairproduction::EnableEpairInterpolation(std::string path)
+void Epairproduction::EnableEpairInterpolation(std::string path, bool raw)
 {
 
     if(do_epair_interpolation_)return;
@@ -470,6 +506,9 @@ void Epairproduction::EnableEpairInterpolation(std::string path)
                 <<"_lpm_"<<lpm_effect_enabled_
                 <<"_multiplier_"<<multiplier_;
 
+        if(!raw)
+            filename<<".txt";
+
         epair_interpolant_.resize( medium_->GetNumCompontents() );
 
         if( FileExist(filename.str()) )
@@ -478,13 +517,20 @@ void Epairproduction::EnableEpairInterpolation(std::string path)
             cerr<<"\t"<<filename.str()<<endl;
             ifstream input;
 
-            input.open(filename.str().c_str());
+            if(raw)
+            {
+                input.open(filename.str().c_str(), ios::binary);
+            }
+            else
+            {
+                input.open(filename.str().c_str());
+            }
 
             for(int i=0; i<(medium_->GetNumCompontents()); i++)
             {
                 component_ = i;
                 epair_interpolant_.at(i) = new Interpolant();
-                reading_worked = epair_interpolant_.at(i)->Load(input);
+                reading_worked = epair_interpolant_.at(i)->Load(input,raw);
 
             }
             input.close();
@@ -503,7 +549,15 @@ void Epairproduction::EnableEpairInterpolation(std::string path)
 
             ofstream output;
 
-            output.open(filename.str().c_str());
+            if(raw)
+            {
+                output.open(filename.str().c_str(), ios::binary);
+            }
+            else
+            {
+                output.open(filename.str().c_str());
+            }
+
             if(output.good())
             {
                 output.precision(16);
@@ -514,7 +568,7 @@ void Epairproduction::EnableEpairInterpolation(std::string path)
 
                     epair_interpolant_.at(i)   = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, NUM1, 0., 1.,boost::bind(&Epairproduction::FunctionToBuildEpairInterpolant, this, _1 , _2) , order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false, order_of_interpolation_, false, false, false);
 
-                    epair_interpolant_.at(i)->Save(output);
+                    epair_interpolant_.at(i)->Save(output,raw);
 
                 }
             }

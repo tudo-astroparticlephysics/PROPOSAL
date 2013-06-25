@@ -58,6 +58,9 @@
 # Note: You need write permission
 #       path_to_tables      /path/to/tables
 #
+# Give the following keyword if you want to store tables in binary format
+#       raw
+#
 # You can give default values for the energy cut settings for inside, infront and behind the detector
 # and you can specify if the continous randomization option is enabled or not in these parts.
 # (ecut is an absolute value: ecut =500 means that every energy loss > 500 MeV is treated stochasticaly)
@@ -97,6 +100,7 @@ global
     cont_inside         0
     cont_infront        1
     cont_behind         0
+    raw
 
 # keyword sector must be followed by these lines
 # first: geometry information (this must be the first line)

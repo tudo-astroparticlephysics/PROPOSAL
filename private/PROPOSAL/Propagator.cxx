@@ -625,6 +625,11 @@ void Propagator::ReadConfigFile(string config_file)
         {
             integrate_ =   true;
         }
+        // save interpolation tables binary or not
+        else if(ToLowerCase(taux).compare("raw")==0)
+        {
+            raw_ =   true;
+        }
         // path to interpolation tables
         else if(ToLowerCase(taux).compare("path_to_tables")==0)
         {
@@ -689,22 +694,22 @@ void Propagator::ReadConfigFile(string config_file)
 //----------------------------------------------------------------------------//
 
 
-void Propagator::EnableInterpolation(std::string path)
+void Propagator::EnableInterpolation(std::string path, bool raw)
 {
     if(current_collection_ != NULL)
     {
-        current_collection_->EnableInterpolation(path);
+        current_collection_->EnableInterpolation(path,raw);
         if(do_exact_time_calulation_)
         {
-            current_collection_->EnableParticleTimeInterpolation(path);
+            current_collection_->EnableParticleTimeInterpolation(path,raw);
         }
     }
     for(unsigned int i = 0 ; i < collections_.size() ; i++)
     {
-        collections_.at(i)->EnableInterpolation(path);
+        collections_.at(i)->EnableInterpolation(path,raw);
         if(do_exact_time_calulation_)
         {
-            collections_.at(i)->EnableParticleTimeInterpolation(path);
+            collections_.at(i)->EnableParticleTimeInterpolation(path,raw);
         }
     }
 }
@@ -839,6 +844,7 @@ Propagator::Propagator()
     ,global_cont_infront_       ( true )
     ,global_cont_behind_        ( false )
     ,path_to_tables_            ( "" )
+    ,raw_                       ( false )
 {
     particle_              = new Particle("mu");
 
@@ -875,6 +881,7 @@ Propagator::Propagator(string config_file)
     ,global_cont_infront_       ( true )
     ,global_cont_behind_        ( false )
     ,path_to_tables_            ( "" )
+    ,raw_                       ( false )
 {
     ReadConfigFile(config_file);
 }
@@ -909,6 +916,7 @@ Propagator::Propagator(const Propagator &propagator)
     ,global_cont_infront_       ( propagator.global_cont_infront_ )
     ,global_cont_behind_        ( propagator.global_cont_behind_ )
     ,path_to_tables_            ( propagator.path_to_tables_ )
+    ,raw_                       ( propagator.raw_ )
     ,particle_                  ( propagator.particle_ )
     ,current_collection_        ( new ProcessCollection(*propagator.current_collection_) )
 
@@ -966,6 +974,7 @@ bool Propagator::operator==(const Propagator &propagator) const
     if( global_cont_infront_      != propagator.global_cont_infront_ )    return false;
     if( global_cont_behind_       != propagator.global_cont_behind_ )     return false;
     if( *current_collection_      != *propagator.current_collection_ )    return false;
+    if( raw_                      != propagator.raw_ )                    return false;
 
     if( path_to_tables_.compare( propagator.path_to_tables_ )!=0 )        return false;
 
@@ -1015,6 +1024,7 @@ void Propagator::swap(Propagator &propagator)
     swap( global_cont_inside_       ,   propagator.global_cont_inside_ );
     swap( global_cont_infront_      ,   propagator.global_cont_infront_ );
     swap( global_cont_behind_       ,   propagator.global_cont_behind_ );
+    swap( raw_                      ,   propagator.raw_ );
 
     path_to_tables_.swap( propagator.path_to_tables_ );
 
@@ -1798,7 +1808,7 @@ void Propagator::ApplyOptions()
     }
     if(!integrate_)
     {
-        EnableInterpolation(path_to_tables_);
+        EnableInterpolation(path_to_tables_, raw_);
     }
 
 }

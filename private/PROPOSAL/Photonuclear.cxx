@@ -215,7 +215,7 @@ double Photonuclear::CalculateStochasticLoss(double rnd1, double rnd2)
 //----------------------------------------------------------------------------//
 
 
-void Photonuclear::EnableDNdxInterpolation(std::string path)
+void Photonuclear::EnableDNdxInterpolation(std::string path, bool raw)
 {
     if(do_dndx_Interpolation_)return;
 
@@ -234,6 +234,9 @@ void Photonuclear::EnableDNdxInterpolation(std::string path)
                 <<"_vcut_"<<cut_settings_->GetVcut()
                 <<"_multiplier_"<<multiplier_;
 
+        if(!raw)
+            filename<<".txt";
+
         dndx_interpolant_2d_.resize(medium_->GetNumCompontents());
         dndx_interpolant_1d_.resize(medium_->GetNumCompontents());
 
@@ -243,15 +246,22 @@ void Photonuclear::EnableDNdxInterpolation(std::string path)
             cerr<<"\t"<<filename.str()<<endl;
             ifstream input;
 
-            input.open(filename.str().c_str());
+            if(raw)
+            {
+                input.open(filename.str().c_str(), ios::binary);
+            }
+            else
+            {
+                input.open(filename.str().c_str());
+            }
 
             for(int i=0; i<(medium_->GetNumCompontents()); i++)
             {
                 component_ = i;
                 dndx_interpolant_2d_.at(i) = new Interpolant();
                 dndx_interpolant_1d_.at(i) = new Interpolant();
-                reading_worked = dndx_interpolant_2d_.at(i)->Load(input);
-                reading_worked = dndx_interpolant_1d_.at(i)->Load(input);
+                reading_worked = dndx_interpolant_2d_.at(i)->Load(input, raw);
+                reading_worked = dndx_interpolant_1d_.at(i)->Load(input, raw);
 
             }
             input.close();
@@ -270,7 +280,15 @@ void Photonuclear::EnableDNdxInterpolation(std::string path)
 
             ofstream output;
 
-            output.open(filename.str().c_str());
+            if(raw)
+            {
+                output.open(filename.str().c_str(), ios::binary);
+            }
+            else
+            {
+                output.open(filename.str().c_str());
+            }
+
             if(output.good())
             {
                 output.precision(16);
@@ -282,8 +300,8 @@ void Photonuclear::EnableDNdxInterpolation(std::string path)
                     dndx_interpolant_2d_.at(i) =    new Interpolant(NUM1, particle_->GetLow(), BIGENERGY,  NUM1, 0, 1, boost::bind(&Photonuclear::FunctionToBuildDNdxInterpolant2D, this, _1 , _2), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false, order_of_interpolation_, true, false, false);
                     dndx_interpolant_1d_.at(i) =    new Interpolant(NUM1, particle_->GetLow(), BIGENERGY,  boost::bind(&Photonuclear::FunctionToBuildDNdxInterpolant1D, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, true, false, false);
 
-                    dndx_interpolant_2d_.at(i)->Save(output);
-                    dndx_interpolant_1d_.at(i)->Save(output);
+                    dndx_interpolant_2d_.at(i)->Save(output, raw);
+                    dndx_interpolant_1d_.at(i)->Save(output, raw);
 
                 }
             }
@@ -323,7 +341,7 @@ void Photonuclear::EnableDNdxInterpolation(std::string path)
 //----------------------------------------------------------------------------//
 
 
-void Photonuclear::EnableDEdxInterpolation(std::string path)
+void Photonuclear::EnableDEdxInterpolation(std::string path, bool raw)
 {
     if(do_dedx_Interpolation_)return;
 
@@ -340,16 +358,26 @@ void Photonuclear::EnableDEdxInterpolation(std::string path)
                 <<"_vcut_"<<cut_settings_->GetVcut()
                 <<"_multiplier_"<<multiplier_;
 
+        if(!raw)
+            filename<<".txt";
+
         if( FileExist(filename.str()) )
         {
             cerr<<"Info: Photonuclear parametrisation tables (dEdx) will be read from file:"<<endl;
             cerr<<"\t"<<filename.str()<<endl;
             ifstream input;
 
-            input.open(filename.str().c_str());
+            if(raw)
+            {
+                input.open(filename.str().c_str(), ios::binary);
+            }
+            else
+            {
+                input.open(filename.str().c_str());
+            }
 
             dedx_interpolant_ = new Interpolant();
-            reading_worked = dedx_interpolant_->Load(input);
+            reading_worked = dedx_interpolant_->Load(input, raw);
 
             input.close();
         }
@@ -366,7 +394,15 @@ void Photonuclear::EnableDEdxInterpolation(std::string path)
             double energy = particle_->GetEnergy();
 
             ofstream output;
-            output.open(filename.str().c_str());
+
+            if(raw)
+            {
+                output.open(filename.str().c_str(), ios::binary);
+            }
+            else
+            {
+                output.open(filename.str().c_str());
+            }
 
             if(output.good())
             {
@@ -374,7 +410,7 @@ void Photonuclear::EnableDEdxInterpolation(std::string path)
 
                 dedx_interpolant_ = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, boost::bind(&Photonuclear::FunctionToBuildDEdxInterpolant, this, _1),
                                                     order_of_interpolation_, true, false, true, order_of_interpolation_, false, false, false);
-                dedx_interpolant_->Save(output);
+                dedx_interpolant_->Save(output, raw);
             }
             else
             {
@@ -405,7 +441,7 @@ void Photonuclear::EnableDEdxInterpolation(std::string path)
 //----------------------------------------------------------------------------//
 
 
-void Photonuclear::EnablePhotoInterpolation(std::string path)
+void Photonuclear::EnablePhotoInterpolation(std::string path, bool raw)
 {
     if(do_photo_interpolation_)return;
 
@@ -422,6 +458,9 @@ void Photonuclear::EnablePhotoInterpolation(std::string path)
                 <<"_vcut_"<<cut_settings_->GetVcut()
                 <<"_multiplier_"<<multiplier_;
 
+        if(!raw)
+            filename<<".txt";
+
         photo_interpolant_.resize( medium_->GetNumCompontents() );
 
         if( FileExist(filename.str()) )
@@ -430,13 +469,20 @@ void Photonuclear::EnablePhotoInterpolation(std::string path)
             cerr<<"\t"<<filename.str()<<endl;
             ifstream input;
 
-            input.open(filename.str().c_str());
+            if(raw)
+            {
+                input.open(filename.str().c_str(), ios::binary);
+            }
+            else
+            {
+                input.open(filename.str().c_str());
+            }
 
             for(int i=0; i<(medium_->GetNumCompontents()); i++)
             {
                 component_ = i;
                 photo_interpolant_.at(i) = new Interpolant();
-                reading_worked = photo_interpolant_.at(i)->Load(input);
+                reading_worked = photo_interpolant_.at(i)->Load(input, raw);
 
             }
             input.close();
@@ -455,7 +501,15 @@ void Photonuclear::EnablePhotoInterpolation(std::string path)
 
             ofstream output;
 
-            output.open(filename.str().c_str());
+            if(raw)
+            {
+                output.open(filename.str().c_str(), ios::binary);
+            }
+            else
+            {
+                output.open(filename.str().c_str());
+            }
+
             if(output.good())
             {
                 output.precision(16);
@@ -466,7 +520,7 @@ void Photonuclear::EnablePhotoInterpolation(std::string path)
 
                     photo_interpolant_.at(i)  = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, NUM1, 0., 1., boost::bind(&Photonuclear::FunctionToBuildPhotoInterpolant, this, _1, _2), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false, order_of_interpolation_, false, false, false);
 
-                    photo_interpolant_.at(i)->Save(output);
+                    photo_interpolant_.at(i)->Save(output, raw);
 
                 }
             }

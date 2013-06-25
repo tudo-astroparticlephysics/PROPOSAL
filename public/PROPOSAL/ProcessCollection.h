@@ -292,21 +292,21 @@ public:
      * Enables the Interpolation including dEdx and dNdx for
      * every crosssection in vector crosssections_
      */
-    void EnableInterpolation(std::string path ="");
+    void EnableInterpolation(std::string path ="", bool raw=false);
 //----------------------------------------------------------------------------//
 
     /**
      * Enables the dEdx Interpolation for every crosssection in vector
      * crosssections_
      */
-    void EnableDEdxInterpolation(std::string path ="");
+    void EnableDEdxInterpolation(std::string path ="", bool raw=false);
 
 //----------------------------------------------------------------------------//
     /**
      * Enables the dNdx Interpolation for every crosssection in vector
      * crosssections_
      */
-    void EnableDNdxInterpolation(std::string path ="");
+    void EnableDNdxInterpolation(std::string path ="", bool raw=false);
 
 //----------------------------------------------------------------------------//
     /**
@@ -339,7 +339,7 @@ public:
     /**
      * Enables the Interpolation for calculation the exact particle time
      */
-    void EnableParticleTimeInterpolation(std::string path);
+    void EnableParticleTimeInterpolation(std::string path="", bool raw=false);
 //----------------------------------------------------------------------------//
 
     void EnableLpmEffect();

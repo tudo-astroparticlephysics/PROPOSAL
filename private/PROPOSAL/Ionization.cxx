@@ -176,7 +176,7 @@ double Ionization::CalculateStochasticLoss(double rnd1, double rnd2)
 //----------------------------------------------------------------------------//
 
 
-void Ionization::EnableDNdxInterpolation(std::string path)
+void Ionization::EnableDNdxInterpolation(std::string path, bool raw)
 {
 
     if(do_dndx_Interpolation_)return;
@@ -193,18 +193,28 @@ void Ionization::EnableDNdxInterpolation(std::string path)
                 <<"_vcut_"<<cut_settings_->GetVcut()
                 <<"_multiplier_"<<multiplier_;
 
+        if(!raw)
+            filename<<".txt";
+
         if( FileExist(filename.str()) )
         {
             cerr<<"Info: Ionization parametrisation tables (dNdx) will be read from file:"<<endl;
             cerr<<"\t"<<filename.str()<<endl;
             ifstream input;
 
-            input.open(filename.str().c_str());
+            if(raw)
+            {
+                input.open(filename.str().c_str(), ios::binary);
+            }
+            else
+            {
+                input.open(filename.str().c_str());
+            }
 
             dndx_interpolant_2d_ = new Interpolant();
             dndx_interpolant_1d_ = new Interpolant();
-            reading_worked = dndx_interpolant_2d_->Load(input);
-            reading_worked = dndx_interpolant_1d_->Load(input);
+            reading_worked = dndx_interpolant_2d_->Load(input, raw);
+            reading_worked = dndx_interpolant_1d_->Load(input, raw);
 
             input.close();
         }
@@ -221,7 +231,15 @@ void Ionization::EnableDNdxInterpolation(std::string path)
             double energy = particle_->GetEnergy();
 
             ofstream output;
-            output.open(filename.str().c_str());
+
+            if(raw)
+            {
+                output.open(filename.str().c_str(), ios::binary);
+            }
+            else
+            {
+                output.open(filename.str().c_str());
+            }
 
             if(output.good())
             {
@@ -230,8 +248,8 @@ void Ionization::EnableDNdxInterpolation(std::string path)
                 dndx_interpolant_2d_ = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, NUM1, 0, 1, boost::bind(&Ionization::FunctionToBuildDNdxInterpolant2D, this, _1, _2),order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false, order_of_interpolation_, true, false, false);
                 dndx_interpolant_1d_ = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, boost::bind(&Ionization::FunctionToBuildDNdxInterpolant, this, _1),order_of_interpolation_, false, false, true, order_of_interpolation_, true, false, false);
 
-                dndx_interpolant_2d_->Save(output);
-                dndx_interpolant_1d_->Save(output);
+                dndx_interpolant_2d_->Save(output, raw);
+                dndx_interpolant_1d_->Save(output, raw);
 
             }
             else
@@ -265,7 +283,7 @@ void Ionization::EnableDNdxInterpolation(std::string path)
 //----------------------------------------------------------------------------//
 
 
-void Ionization::EnableDEdxInterpolation(std::string path)
+void Ionization::EnableDEdxInterpolation(std::string path, bool raw)
 {
 
     if(do_dedx_Interpolation_)return;
@@ -282,16 +300,26 @@ void Ionization::EnableDEdxInterpolation(std::string path)
                 <<"_vcut_"<<cut_settings_->GetVcut()
                 <<"_multiplier_"<<multiplier_;
 
+        if(!raw)
+            filename<<".txt";
+
         if( FileExist(filename.str()) )
         {
             cerr<<"Info: Ionization parametrisation tables (dEdx) will be read from file:"<<endl;
             cerr<<"\t"<<filename.str()<<endl;
             ifstream input;
 
-            input.open(filename.str().c_str());
+            if(raw)
+            {
+                input.open(filename.str().c_str(), ios::binary);
+            }
+            else
+            {
+                input.open(filename.str().c_str());
+            }
 
             dedx_interpolant_ = new Interpolant();
-            reading_worked = dedx_interpolant_->Load(input);
+            reading_worked = dedx_interpolant_->Load(input, raw);
 
             input.close();
         }
@@ -308,14 +336,22 @@ void Ionization::EnableDEdxInterpolation(std::string path)
             double energy = particle_->GetEnergy();
 
             ofstream output;
-            output.open(filename.str().c_str());
+
+            if(raw)
+            {
+                output.open(filename.str().c_str(), ios::binary);
+            }
+            else
+            {
+                output.open(filename.str().c_str());
+            }
 
             if(output.good())
             {
                 output.precision(16);
 
                 dedx_interpolant_ = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, boost::bind(&Ionization::FunctionToBuildDEdxInterpolant, this, _1), order_of_interpolation_, true, false, true, order_of_interpolation_, false, false, true);
-                dedx_interpolant_->Save(output);
+                dedx_interpolant_->Save(output, raw);
             }
             else
             {

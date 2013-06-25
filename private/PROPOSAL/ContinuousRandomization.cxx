@@ -36,7 +36,7 @@ double ContinuousRandomization::Randomize(double initial_energy, double final_en
 //----------------------------------------------------------------------------//
 
 
-void ContinuousRandomization::EnableDE2dxInterpolation(std::string path)
+void ContinuousRandomization::EnableDE2dxInterpolation(std::string path, bool raw)
 {
     if(do_dE2dx_Interpolation_)return;
 
@@ -89,16 +89,26 @@ void ContinuousRandomization::EnableDE2dxInterpolation(std::string path)
 
         }
 
+        if(!raw)
+            filename<<".txt";
+
         if( FileExist(filename.str()) )
         {
             cerr<<"Info: Continuous Randomization parametrisation tables (dE2dx) will be read from file:"<<endl;
             cerr<<"\t"<<filename.str()<<endl;
             ifstream input;
 
-            input.open(filename.str().c_str());
+            if(raw)
+            {
+                input.open(filename.str().c_str(), ios::binary);
+            }
+            else
+            {
+                input.open(filename.str().c_str());
+            }
 
             dE2dx_interpolant_ = new Interpolant();
-            reading_worked = dE2dx_interpolant_->Load(input);
+            reading_worked = dE2dx_interpolant_->Load(input,raw);
 
             input.close();
         }
@@ -115,8 +125,14 @@ void ContinuousRandomization::EnableDE2dxInterpolation(std::string path)
             double energy = particle_->GetEnergy();
 
             ofstream output;
-            output.open(filename.str().c_str());
-
+            if(raw)
+            {
+                output.open(filename.str().c_str(), ios::binary);
+            }
+            else
+            {
+                output.open(filename.str().c_str());
+            }
             if(output.good())
             {
                 output.precision(16);
@@ -124,7 +140,7 @@ void ContinuousRandomization::EnableDE2dxInterpolation(std::string path)
                 double energy = particle_->GetEnergy();
                 dE2dx_interpolant_    =   new Interpolant(NUM2, particle_->GetLow(), BIGENERGY, boost::bind(&ContinuousRandomization::FunctionToBuildDE2dxInterplant, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
 
-                dE2dx_interpolant_->Save(output);
+                dE2dx_interpolant_->Save(output,raw);
                 particle_->SetEnergy(energy);
 
             }
@@ -156,7 +172,7 @@ void ContinuousRandomization::EnableDE2dxInterpolation(std::string path)
 //----------------------------------------------------------------------------//
 
 
-void ContinuousRandomization::EnableDE2deInterpolation(std::string path)
+void ContinuousRandomization::EnableDE2deInterpolation(std::string path, bool raw)
 {
     if(do_dE2de_Interpolation_)return;
 
@@ -209,19 +225,28 @@ void ContinuousRandomization::EnableDE2deInterpolation(std::string path)
 
         }
 
+        if(!raw)
+            filename<<".txt";
+
         if( FileExist(filename.str()) )
         {
             cerr<<"Info: Continuous Randomization parametrisation tables (dE2de) will be read from file:"<<endl;
             cerr<<"\t"<<filename.str()<<endl;
             ifstream input;
 
-            input.open(filename.str().c_str());
-
+            if(raw)
+            {
+                input.open(filename.str().c_str(), ios::binary);
+            }
+            else
+            {
+                input.open(filename.str().c_str());
+            }
             dE2de_interpolant_ = new Interpolant();
-            reading_worked = dE2de_interpolant_->Load(input);
+            reading_worked = dE2de_interpolant_->Load(input,raw);
 
             dE2de_interpolant_diff_ = new Interpolant();
-            reading_worked = dE2de_interpolant_diff_->Load(input);
+            reading_worked = dE2de_interpolant_diff_->Load(input,raw);
 
             input.close();
         }
@@ -238,8 +263,14 @@ void ContinuousRandomization::EnableDE2deInterpolation(std::string path)
             double energy = particle_->GetEnergy();
 
             ofstream output;
-            output.open(filename.str().c_str());
-
+            if(raw)
+            {
+                output.open(filename.str().c_str(), ios::binary);
+            }
+            else
+            {
+                output.open(filename.str().c_str());
+            }
             if(output.good())
             {
                 output.precision(16);
@@ -248,8 +279,8 @@ void ContinuousRandomization::EnableDE2deInterpolation(std::string path)
                 dE2de_interpolant_       =   new Interpolant(NUM2, particle_->GetLow(), BIGENERGY, boost::bind(&ContinuousRandomization::FunctionToBuildDE2deInterplant, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
                 dE2de_interpolant_diff_  =   new Interpolant(NUM2, particle_->GetLow(), BIGENERGY, boost::bind(&ContinuousRandomization::FunctionToBuildDE2deInterplantDiff, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
 
-                dE2de_interpolant_->Save(output);
-                dE2de_interpolant_diff_->Save(output);
+                dE2de_interpolant_->Save(output,raw);
+                dE2de_interpolant_diff_->Save(output,raw);
                 particle_->SetEnergy(energy);
 
             }

@@ -101,7 +101,7 @@ double StandardNormal::StandardNormalRandomNumber(double rnd, double average, do
 //----------------------------------------------------------------------------//
 
 
-void StandardNormal::EnableInterpolation(std::string path)
+void StandardNormal::EnableInterpolation(std::string path, bool raw)
 {
 
     if(do_interpolation_)return;
@@ -114,16 +114,26 @@ void StandardNormal::EnableInterpolation(std::string path)
         stringstream filename;
         filename<<path<<"/StandardNormal";
 
+        if(!raw)
+            filename<<".txt";
+
         if( FileExist(filename.str()) )
         {
             cerr<<"Info: StandardNormal parametrisation tables will be read from file:"<<endl;
             cerr<<"\t"<<filename.str()<<endl;
             ifstream input;
 
-            input.open(filename.str().c_str());
+            if(raw)
+            {
+                input.open(filename.str().c_str(), ios::binary);
+            }
+            else
+            {
+                input.open(filename.str().c_str());
+            }
 
             interpolant_ = new Interpolant();
-            reading_worked = interpolant_->Load(input);
+            reading_worked = interpolant_->Load(input, raw);
 
             input.close();
         }
@@ -138,14 +148,22 @@ void StandardNormal::EnableInterpolation(std::string path)
             cerr<<"\t"<<filename.str()<<endl;
 
             ofstream output;
-            output.open(filename.str().c_str());
+
+            if(raw)
+            {
+                output.open(filename.str().c_str(), ios::binary);
+            }
+            else
+            {
+                output.open(filename.str().c_str());
+            }
 
             if(output.good())
             {
                 output.precision(16);
 
                 interpolant_    =   new Interpolant(NUM2, -5, 5, boost::bind(&StandardNormal::FunctionToBuildInterpolant, this, _1), order_of_interpolation_, true, false, false, order_of_interpolation_, true, false, false);
-                interpolant_->Save(output);
+                interpolant_->Save(output, raw);
             }
             else
             {

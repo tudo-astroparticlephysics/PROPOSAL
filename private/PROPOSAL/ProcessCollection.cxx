@@ -247,6 +247,11 @@ pair<double,string> ProcessCollection::MakeStochasticLoss()
     return this->MakeStochasticLoss(MathModel::RandomDouble(),MathModel::RandomDouble(),MathModel::RandomDouble());
 }
 
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
 pair<double,string> ProcessCollection::MakeStochasticLoss(double rnd1,double rnd2, double rnd3)
 {
     double total_rate          =    0;
@@ -405,13 +410,13 @@ double ProcessCollection::Randomize(double initial_energy, double final_energy)
 //----------------------------------------------------------------------------//
 
 
-void ProcessCollection::EnableInterpolation(std::string path)
+void ProcessCollection::EnableInterpolation(std::string path, bool raw)
 {
     if(do_interpolation_)return;
 
-    EnableDEdxInterpolation(path);
-    EnableDNdxInterpolation(path);
-    EnableParticleTimeInterpolation(path);
+    EnableDEdxInterpolation(path,raw);
+    EnableDNdxInterpolation(path,raw);
+    EnableParticleTimeInterpolation(path,raw);
 
     bool reading_worked =   true;
     bool storing_failed =   false;
@@ -473,19 +478,29 @@ void ProcessCollection::EnableInterpolation(std::string path)
 
         }
 
+        if(!raw)
+            filename<<".txt";
+
         if( FileExist(filename.str()) )
         {
             cerr<<"Info: ProcessCollection parametrisation tables will be read from file:"<<endl;
             cerr<<"\t"<<filename.str()<<endl;
             ifstream input;
 
-            input.open(filename.str().c_str());
+            if(raw)
+            {
+                input.open(filename.str().c_str(), ios::binary);
+            }
+            else
+            {
+                input.open(filename.str().c_str());
+            }
 
             interpolant_        =   new Interpolant();
             interpolant_diff_   =   new Interpolant();
 
-            reading_worked = interpolant_->Load(input);
-            reading_worked = interpolant_diff_->Load(input);
+            reading_worked = interpolant_->Load(input,raw);
+            reading_worked = interpolant_diff_->Load(input,raw);
 
 
             interpol_prop_decay_            =   new Interpolant();
@@ -493,10 +508,10 @@ void ProcessCollection::EnableInterpolation(std::string path)
             interpol_prop_interaction_      =   new Interpolant();
             interpol_prop_interaction_diff_ =   new Interpolant();
 
-            reading_worked = interpol_prop_decay_->Load(input);
-            reading_worked = interpol_prop_decay_diff_->Load(input);
-            reading_worked = interpol_prop_interaction_->Load(input);
-            reading_worked = interpol_prop_interaction_diff_->Load(input);
+            reading_worked = interpol_prop_decay_->Load(input,raw);
+            reading_worked = interpol_prop_decay_diff_->Load(input,raw);
+            reading_worked = interpol_prop_interaction_->Load(input,raw);
+            reading_worked = interpol_prop_interaction_diff_->Load(input,raw);
 
             input.close();
         }
@@ -513,7 +528,15 @@ void ProcessCollection::EnableInterpolation(std::string path)
             double energy = particle_->GetEnergy();
 
             ofstream output;
-            output.open(filename.str().c_str());
+
+            if(raw)
+            {
+                output.open(filename.str().c_str(), ios::binary);
+            }
+            else
+            {
+                output.open(filename.str().c_str());
+            }
 
             if(output.good())
             {
@@ -531,12 +554,12 @@ void ProcessCollection::EnableInterpolation(std::string path)
 
                 particle_->SetEnergy(energy);
 
-                interpolant_->Save(output);
-                interpolant_diff_->Save(output);
-                interpol_prop_decay_->Save(output);
-                interpol_prop_decay_diff_->Save(output);
-                interpol_prop_interaction_->Save(output);
-                interpol_prop_interaction_diff_->Save(output);
+                interpolant_->Save(output,raw);
+                interpolant_diff_->Save(output,raw);
+                interpol_prop_decay_->Save(output,raw);
+                interpol_prop_decay_diff_->Save(output,raw);
+                interpol_prop_interaction_->Save(output,raw);
+                interpol_prop_interaction_diff_->Save(output,raw);
 
             }
             else
@@ -570,8 +593,8 @@ void ProcessCollection::EnableInterpolation(std::string path)
 
     if(do_continuous_randomization_)
     {
-        randomizer_->EnableDE2dxInterpolation(path);
-        randomizer_->EnableDE2deInterpolation(path);
+        randomizer_->EnableDE2dxInterpolation(path ,raw);
+        randomizer_->EnableDE2deInterpolation(path,raw);
     }
 
     if(do_scattering_)
@@ -592,11 +615,11 @@ void ProcessCollection::EnableInterpolation(std::string path)
 
 
 
-void ProcessCollection::EnableDEdxInterpolation(std::string path)
+void ProcessCollection::EnableDEdxInterpolation(std::string path, bool raw)
 {
     for(unsigned int i =0 ; i < crosssections_.size() ; i++)
     {
-        crosssections_.at(i)->EnableDEdxInterpolation(path);
+        crosssections_.at(i)->EnableDEdxInterpolation(path,raw);
         //cout<<"dEdx for "<<crosssections_.at(i)->GetName()<<" interpolated"<<endl;
     }
 }
@@ -607,11 +630,11 @@ void ProcessCollection::EnableDEdxInterpolation(std::string path)
 
 
 
-void ProcessCollection::EnableDNdxInterpolation(std::string path)
+void ProcessCollection::EnableDNdxInterpolation(std::string path, bool raw)
 {
     for(unsigned int i =0 ; i < crosssections_.size() ; i++)
     {
-        crosssections_.at(i)->EnableDNdxInterpolation(path);
+        crosssections_.at(i)->EnableDNdxInterpolation(path,raw);
         //cout<<"dNdx for "<<crosssections_.at(i)->GetName()<<" interpolated"<<endl;
     }
 }
@@ -663,7 +686,7 @@ void ProcessCollection::DisableInterpolation()
 //----------------------------------------------------------------------------//
 
 
-void ProcessCollection::EnableParticleTimeInterpolation(std::string path)
+void ProcessCollection::EnableParticleTimeInterpolation(std::string path, bool raw)
 {
 
     if(do_time_interpolation_)return;
@@ -718,19 +741,29 @@ void ProcessCollection::EnableParticleTimeInterpolation(std::string path)
 
         }
 
+        if(!raw)
+            filename<<".txt";
+
         if( FileExist(filename.str()) )
         {
             cerr<<"Info: Particle time parametrisation tables will be read from file:"<<endl;
             cerr<<"\t"<<filename.str()<<endl;
             ifstream input;
 
-            input.open(filename.str().c_str());
+            if(raw)
+            {
+                input.open(filename.str().c_str(), ios::binary);
+            }
+            else
+            {
+                input.open(filename.str().c_str());
+            }
 
             interpol_time_particle_         = new Interpolant();
             interpol_time_particle_diff_    = new Interpolant();
 
-            reading_worked = interpol_time_particle_->Load(input);
-            reading_worked = interpol_time_particle_diff_->Load(input);
+            reading_worked = interpol_time_particle_->Load(input,raw);
+            reading_worked = interpol_time_particle_diff_->Load(input,raw);
 
             input.close();
         }
@@ -747,7 +780,15 @@ void ProcessCollection::EnableParticleTimeInterpolation(std::string path)
             double energy = particle_->GetEnergy();
 
             ofstream output;
-            output.open(filename.str().c_str());
+
+            if(raw)
+            {
+                output.open(filename.str().c_str(), ios::binary);
+            }
+            else
+            {
+                output.open(filename.str().c_str());
+            }
 
             if(output.good())
             {
@@ -756,8 +797,8 @@ void ProcessCollection::EnableParticleTimeInterpolation(std::string path)
                 interpol_time_particle_         =   new Interpolant(NUM3, particle_->GetLow(), BIGENERGY, boost::bind(&ProcessCollection::InterpolTimeParticle, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
                 interpol_time_particle_diff_    =   new Interpolant(NUM3, particle_->GetLow(), BIGENERGY, boost::bind(&ProcessCollection::InterpolTimeParticleDiff, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
 
-                interpol_time_particle_->Save(output);
-                interpol_time_particle_diff_->Save(output);
+                interpol_time_particle_->Save(output,raw);
+                interpol_time_particle_diff_->Save(output,raw);
 
             }
             else

@@ -60,7 +60,7 @@ private:
     double  global_cont_behind_;        //!< continuous randominzation flag for behind the detector (it's used when not specified explicit for a sector in congiguration file)
 
     std::string path_to_tables_;        //!< path to interpolation tables (if not empty tables are stored)
-
+    bool    raw_;                       //!< if true interpolation tables will  be written binary if path is not empty
 
     std::vector<ProcessCollection*> collections_;
 
@@ -142,7 +142,7 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    void EnableInterpolation(std::string path ="");
+    void EnableInterpolation(std::string path ="",bool raw=false);
 
 //----------------------------------------------------------------------------//
 

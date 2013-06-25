@@ -135,7 +135,7 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    void EnableInterpolation(std::string path ="");
+    void EnableInterpolation(std::string path ="", bool raw=false);
 
 //----------------------------------------------------------------------------//
 
