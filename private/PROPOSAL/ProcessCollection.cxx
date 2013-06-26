@@ -1055,7 +1055,6 @@ ProcessCollection::ProcessCollection(const ProcessCollection &collection)
             exit(1);
         }
     }
-
     if(collection.interpolant_ != NULL)
     {
         interpolant_ = new Interpolant(*collection.interpolant_) ;
@@ -1145,6 +1144,7 @@ ProcessCollection::ProcessCollection(const ProcessCollection &collection)
     {
         scattering_ = NULL;
     }
+    cout<<"Hallo"<<endl;
 
     if(collection.geometry_ != NULL)
     {
@@ -1208,6 +1208,7 @@ ProcessCollection::ProcessCollection(Particle *particle, Medium *medium, EnergyC
     geometry_                       = NULL;
     interpol_time_particle_         = NULL;
     interpol_time_particle_diff_    = NULL;
+    scattering_                     = NULL;
 }
 
 
