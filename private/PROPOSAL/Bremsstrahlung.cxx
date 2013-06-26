@@ -348,6 +348,7 @@ void Bremsstrahlung::EnableDNdxInterpolation(std::string path ,bool raw)
             {
                 output.open(filename.str().c_str());
             }
+
             if(output.good())
             {
                 output.precision(16);
@@ -371,7 +372,6 @@ void Bremsstrahlung::EnableDNdxInterpolation(std::string path ,bool raw)
                 cerr<<"\t Table will not be stored!"<<endl;
             }
             particle_->SetEnergy(energy);
-
             output.close();
         }
     }

@@ -417,6 +417,7 @@ void ProcessCollection::EnableInterpolation(std::string path, bool raw)
     EnableDEdxInterpolation(path,raw);
     EnableDNdxInterpolation(path,raw);
 
+    double energy = particle_->GetEnergy();
 
     bool reading_worked =   true;
     bool storing_failed =   false;
@@ -430,6 +431,8 @@ void ProcessCollection::EnableInterpolation(std::string path, bool raw)
     {
         up_  =   false;
     }
+
+    particle_->SetEnergy(energy);
 
     if(!path.empty())
     {
@@ -517,15 +520,14 @@ void ProcessCollection::EnableInterpolation(std::string path, bool raw)
         }
         if(!FileExist(filename.str()) || !reading_worked )
         {
+
             if(!reading_worked)
             {
-                cerr<<"Info: file "<<filename.str()<<" is corrupted! Write is again!"<< endl;
+                cerr<<"Info: file "<<filename.str()<<" is corrupted! Write it again!"<< endl;
             }
 
             cerr<<"Info: ProcessCollection parametrisation tables will be saved to file:"<<endl;
             cerr<<"\t"<<filename.str()<<endl;
-
-            double energy = particle_->GetEnergy();
 
             ofstream output;
 
@@ -540,6 +542,7 @@ void ProcessCollection::EnableInterpolation(std::string path, bool raw)
 
             if(output.good())
             {
+
                 output.precision(16);
 
                 interpolant_        =   new Interpolant(NUM3, particle_->GetLow(), BIGENERGY, boost::bind(&ProcessCollection::FunctionToBuildInterpolant, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
@@ -1051,7 +1054,7 @@ ProcessCollection::ProcessCollection(const ProcessCollection &collection)
         }
         else
         {
-            cout<<"In copy constructor of ProcessCollection: Error: Unknown crossSection"<<endl;
+            cerr<<"In copy constructor of ProcessCollection: Error: Unknown crossSection"<<endl;
             exit(1);
         }
     }
@@ -1144,7 +1147,6 @@ ProcessCollection::ProcessCollection(const ProcessCollection &collection)
     {
         scattering_ = NULL;
     }
-    cout<<"Hallo"<<endl;
 
     if(collection.geometry_ != NULL)
     {
@@ -1295,7 +1297,7 @@ bool ProcessCollection::operator==(const ProcessCollection &collection) const
         }
         else
         {
-            cout<<"In copy constructor of ProcessCollection: Error: Unknown crossSection"<<endl;
+            cerr<<"In copy constructor of ProcessCollection: Error: Unknown crossSection"<<endl;
             exit(1);
         }
     }
@@ -1781,7 +1783,6 @@ double ProcessCollection::FunctionToIntegral(double energy)
 
     double result;
     double aux;
-
     particle_->SetEnergy(energy);
     result  =    0;
 

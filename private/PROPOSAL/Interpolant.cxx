@@ -573,12 +573,12 @@ bool Interpolant::Save(ofstream& out, bool raw)
         {
             if(isLog_)
             {
-                xmax_   =   exp(xmax_);
-                xmin_   =   exp(xmin_);
+                double xmax   =   exp(xmax_);
+                double xmin   =   exp(xmin_);
 
                 out.write( reinterpret_cast<char*>( &max_ ), sizeof max_);
-                out.write( reinterpret_cast<char*>( &xmin_ ), sizeof xmin_ );
-                out.write( reinterpret_cast<char*>( &xmax_ ), sizeof xmax_ );
+                out.write( reinterpret_cast<char*>( &xmin ), sizeof xmin );
+                out.write( reinterpret_cast<char*>( &xmax ), sizeof xmax );
             }
             else
             {
@@ -605,12 +605,12 @@ bool Interpolant::Save(ofstream& out, bool raw)
         {
             if(isLog_)
             {
-                xmax_   =   exp(xmax_);
-                xmin_   =   exp(xmin_);
+                double xmax   =   exp(xmax_);
+                double xmin   =   exp(xmin_);
 
                 out.write( reinterpret_cast<char*>( &max_ ), sizeof max_);
-                out.write( reinterpret_cast<char*>( &xmin_ ), sizeof xmin_ );
-                out.write( reinterpret_cast<char*>( &xmax_ ), sizeof xmax_ );
+                out.write( reinterpret_cast<char*>( &xmin ), sizeof xmin );
+                out.write( reinterpret_cast<char*>( &xmax ), sizeof xmax );
             }
             else
             {
@@ -675,6 +675,7 @@ bool Interpolant::Save(ofstream& out, bool raw)
             }
         }
     }
+    out.flush();
     return 1;
 }
 
