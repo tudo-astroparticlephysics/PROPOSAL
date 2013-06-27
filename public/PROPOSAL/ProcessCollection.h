@@ -47,7 +47,7 @@ protected:
 
     bool        enable_randomization_;        //!< if true continuous randomization will be enabled (to remember if randomization should be enable when cross sections are initalized)
     bool        do_continuous_randomization_; //!< if true randomization of continuous energy losses is enabled
-    bool        do_scattering_; //!< if true randomization of continuous energy losses is enabled
+    bool        do_scattering_;               //!< if true moliere scattering is enabled
     int         location_;                    //!< 0 = infront of the detector, 1 = inside the detector, 2 = behind the detector
 
     double      density_correction_;          //!< density correction factor

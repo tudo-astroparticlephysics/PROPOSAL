@@ -422,17 +422,6 @@ void ProcessCollection::EnableInterpolation(std::string path, bool raw)
     bool reading_worked =   true;
     bool storing_failed =   false;
 
-    if(abs(-prop_interaction_->Integrate(particle_->GetLow(), particle_->GetLow()*10, boost::bind(&ProcessCollection::FunctionToPropIntegralInteraction, this, _1),4))
-            < abs(-prop_interaction_->Integrate(BIGENERGY, BIGENERGY/10, boost::bind(&ProcessCollection::FunctionToPropIntegralInteraction, this, _1),4)))
-    {
-        up_  =   true;
-    }
-    else
-    {
-        up_  =   false;
-    }
-
-    particle_->SetEnergy(energy);
 
     if(!path.empty())
     {
@@ -529,6 +518,18 @@ void ProcessCollection::EnableInterpolation(std::string path, bool raw)
             cerr<<"Info: ProcessCollection parametrisation tables will be saved to file:"<<endl;
             cerr<<"\t"<<filename.str()<<endl;
 
+            if(abs(-prop_interaction_->Integrate(particle_->GetLow(), particle_->GetLow()*10, boost::bind(&ProcessCollection::FunctionToPropIntegralInteraction, this, _1),4))
+                    < abs(-prop_interaction_->Integrate(BIGENERGY, BIGENERGY/10, boost::bind(&ProcessCollection::FunctionToPropIntegralInteraction, this, _1),4)))
+            {
+                up_  =   true;
+            }
+            else
+            {
+                up_  =   false;
+            }
+
+            particle_->SetEnergy(energy);
+
             ofstream output;
 
             if(raw)
@@ -579,6 +580,16 @@ void ProcessCollection::EnableInterpolation(std::string path, bool raw)
     if(path.empty() || storing_failed)
     {
         double energy = particle_->GetEnergy();
+
+        if(abs(-prop_interaction_->Integrate(particle_->GetLow(), particle_->GetLow()*10, boost::bind(&ProcessCollection::FunctionToPropIntegralInteraction, this, _1),4))
+                < abs(-prop_interaction_->Integrate(BIGENERGY, BIGENERGY/10, boost::bind(&ProcessCollection::FunctionToPropIntegralInteraction, this, _1),4)))
+        {
+            up_  =   true;
+        }
+        else
+        {
+            up_  =   false;
+        }
 
         interpolant_        =   new Interpolant(NUM3, particle_->GetLow(), BIGENERGY, boost::bind(&ProcessCollection::FunctionToBuildInterpolant, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
         interpolant_diff_   =   new Interpolant(NUM3, particle_->GetLow(), BIGENERGY, boost::bind(&ProcessCollection::FunctionToBuildInterpolantDiff, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
