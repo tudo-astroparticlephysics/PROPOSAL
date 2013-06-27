@@ -977,6 +977,7 @@ ProcessCollection::ProcessCollection()
     ,weighting_starts_at_        ( 0 )
     ,enable_randomization_       ( false )
     ,do_continuous_randomization_( false )
+    ,do_scattering_              ( false )
     ,location_                   ( 0 )
     ,density_correction_         ( 1. )
     ,do_time_interpolation_      ( false )
@@ -1026,6 +1027,7 @@ ProcessCollection::ProcessCollection(const ProcessCollection &collection)
     ,weighting_starts_at_        ( collection.weighting_starts_at_ )
     ,enable_randomization_       ( collection.enable_randomization_ )
     ,do_continuous_randomization_( collection.do_continuous_randomization_ )
+    ,do_scattering_              ( collection.do_scattering_ )
     ,location_                   ( collection.location_ )
     ,density_correction_         ( collection.density_correction_ )
     ,do_time_interpolation_      ( collection.do_time_interpolation_ )
@@ -1185,6 +1187,7 @@ ProcessCollection::ProcessCollection(Particle *particle, Medium *medium, EnergyC
     ,weighting_starts_at_        ( 0 )
     ,enable_randomization_       ( false )
     ,do_continuous_randomization_( false )
+    ,do_scattering_              ( false )
     ,location_                   ( 0 )
     ,density_correction_         ( 1. )
     ,do_time_interpolation_      ( false )
@@ -1266,6 +1269,7 @@ bool ProcessCollection::operator==(const ProcessCollection &collection) const
     if( weighting_starts_at_        != collection.weighting_starts_at_ )     return false;
     if( enable_randomization_       != collection.enable_randomization_ )    return false;
     if( do_continuous_randomization_!= collection.do_continuous_randomization_ )return false;
+    if( do_scattering_              != collection.do_scattering_ )           return false;
     if( location_                   != collection.location_ )                return false;
     if( density_correction_         != collection.density_correction_ )      return false;
     if( do_exact_time_calulation_   != collection.do_exact_time_calulation_ )return false;
