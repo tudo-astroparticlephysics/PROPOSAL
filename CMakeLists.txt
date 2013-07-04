@@ -109,6 +109,8 @@ IF(DoTesting)
   #create tar directory with "tar -czvf TestFiles.tar.Z TestFiles/" and put it in Test directory
   execute_process(COMMAND  tar -xvf ${PROJECT_SOURCE_DIR}/Test/TestFiles.tar.Z -C ${PROPOSAL_BINARY_DIR}/bin/
                     OUTPUT_VARIABLE _output OUTPUT_STRIP_TRAILING_WHITESPACE)
+  execute_process(COMMAND  tar -xvf ${PROJECT_SOURCE_DIR}/Test/TestFiles2.tar.Z -C ${PROPOSAL_BINARY_DIR}/bin/
+                    OUTPUT_VARIABLE _output OUTPUT_STRIP_TRAILING_WHITESPACE)
 
   add_executable(UnitTest_Scattering Test/Scattering_TEST.cxx)
   add_executable(UnitTest_StandardNormal Test/StandardNormal_Test.cxx)
