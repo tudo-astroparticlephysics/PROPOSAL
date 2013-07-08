@@ -88,15 +88,16 @@ double Propagator::Propagate( Particle *particle )
         distance =
         current_collection_->GetGeometry()->DistanceToBorder(particle_).first;
 
-
+cout<<distance<<endl;
         result  =   Propagate(distance);
 
-        //cout<<result<<endl;
-        cout<<current_collection_<<particle->GetX()<<"\t"<<particle->GetY()<<"\t"<<particle->GetZ()<<"\t"<<particle->GetPropagatedDistance()<<endl;
-        //cout<<particle_->GetX()<<"\t"<<particle->
+        cout<<result<<endl;
+        cout<<*current_collection_<<endl;
+        cout<<"\t"<<particle->GetX()<<"\t"<<particle->GetY()<<"\t"<<particle->GetZ()<<"\t"<<particle->GetPropagatedDistance()<<endl;
 
+        particle_->SetPropagatedDistance(0);
         if(result<0) break;
-       // if(counter>20)break;
+        //if(counter>4)break;
 
         counter++;
     }
@@ -384,6 +385,12 @@ void Propagator::ChooseCurrentCollection(Particle* particle)
         }
 
     }
+//    for(unsigned int i = 0 ; i < collections_.size() ; i++)
+//    {
+//        cout<<collections_.at(i)->GetGeometry()->DistanceToBorder(particle_).first<<"\t";
+//        cout<<collections_.at(i)->GetGeometry()->DistanceToBorder(particle_).second<<endl;
+
+//    }
     current_collection_->SetParticle(particle_);
 
 }

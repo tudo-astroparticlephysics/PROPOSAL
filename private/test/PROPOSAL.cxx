@@ -250,12 +250,12 @@ int main(int argc, char** argv){
 //    cout<<*p<<endl;
     Propagator *pr = new Propagator("resources/configuration");
     double x;
-    for(int i =0 ;i< 10; i++)
+    for(int i =0 ;i< 1; i++)
     {
         Particle *p = new Particle("mu");
-        p->SetTheta(45);
-        p->SetX(-5000);
-        p->SetZ(-5000);
+        p->SetTheta(90);
+        p->SetX(-50000);
+        p->SetZ(0);
         p->SetEnergy(1e6);
 
         //cout<<x<<"\t";
