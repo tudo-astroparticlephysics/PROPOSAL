@@ -1402,6 +1402,36 @@ bool ProcessCollection::operator!=(const ProcessCollection &collection) const
 //----------------------------------------------------------------------------//
 
 
+ostream& operator<<(ostream& os, ProcessCollection const& collection)
+{
+
+    os<<"------------ProcessCollection( "<<&collection<<" )------------"<<endl;
+    os<<"------------------------------------------------------"<<endl;
+    os<<"Particle type:\t\t\t\t\t"<<collection.particle_->GetName()<<endl;
+    os<<"Order of interpolation:\t\t\t\t"<<collection.order_of_interpolation_<<endl;
+    os<<"Interpolation enabled:\t\t\t\t"<<collection.do_interpolation_<<endl;
+    os<<"Continuous randomization enabled:\t\t"<<collection.do_continuous_randomization_<<endl;
+    os<<"Moliere scattering enabled:\t\t\t"<<collection.do_scattering_<<endl;
+    os<<"Exact time calculation enabled:\t\t\t"<<collection.do_exact_time_calulation_<<endl;
+    os<<"Location (0=infront, 1=inside, 2=behind)\t"<<collection.location_<<endl;
+    os<<"Density correction factor:\t\t\t"<<collection.density_correction_<<endl;
+
+    os<<"\n"<<*collection.medium_<<"\n"<<endl;
+    os<<*collection.cut_settings_<<"\n"<<endl;
+
+    if(collection.geometry_ != NULL)
+        os<<*collection.geometry_<<"\n"<<endl;
+
+    os<<"------------------------------------------------------"<<endl;
+    os<<"------------------------------------------------------"<<endl;
+    return os;
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
 void ProcessCollection::swap(ProcessCollection &collection)
 {
     using std::swap;
@@ -1863,6 +1893,7 @@ void ProcessCollection::SetMedium(Medium* medium)
 void ProcessCollection::SetParticle(Particle* particle)
 {
     particle_ = particle;
+
     decay_->SetParticle(particle);
     for(unsigned int i = 0 ; i < crosssections_.size() ; i++)
     {
@@ -1871,6 +1902,10 @@ void ProcessCollection::SetParticle(Particle* particle)
     if(do_continuous_randomization_)
     {
         randomizer_->SetParticle(particle_);
+    }
+    if(do_scattering_)
+    {
+        scattering_->SetParticle(particle_);
     }
 }
 
@@ -1885,6 +1920,10 @@ void ProcessCollection::SetCrosssections(
     if(do_continuous_randomization_)
     {
         randomizer_->SetCrosssections(crosssections);
+    }
+    if(do_scattering_)
+    {
+        scattering_->SetCrosssections(crosssections);
     }
 }
 

@@ -72,6 +72,44 @@ std::pair<double,double> Propagator::CalculateEnergyTillStochastic( double initi
 //----------------------------------------------------------------------------//
 
 
+double Propagator::Propagate( Particle *particle )
+{
+    double distance = 0;
+    double result   = 0;
+
+    int counter =0;
+
+    SetParticle(particle);
+
+    while(1)
+    {
+        ChooseCurrentCollection(particle_);
+
+        distance =
+        current_collection_->GetGeometry()->DistanceToBorder(particle_).first;
+
+
+        result  =   Propagate(distance);
+
+        //cout<<result<<endl;
+        cout<<current_collection_<<particle->GetX()<<"\t"<<particle->GetY()<<"\t"<<particle->GetZ()<<"\t"<<particle->GetPropagatedDistance()<<endl;
+        //cout<<particle_->GetX()<<"\t"<<particle->
+
+        if(result<0) break;
+       // if(counter>20)break;
+
+        counter++;
+    }
+
+    return result;
+
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
 double Propagator::Propagate( double distance )
 {
     bool    flag;
@@ -118,16 +156,16 @@ double Propagator::Propagate( double distance )
             final_energy            =   energy_till_stochastic_.second;
 
         }
-        cout<<"efi "<<energy_till_stochastic_.first<<"\t"<<energy_till_stochastic_.second<<"\t";
+        //cout<<"efi "<<energy_till_stochastic_.first<<"\t"<<energy_till_stochastic_.second<<"\t";
 
-        cout<<final_energy<<"\t";
+        //cout<<final_energy<<"\t";
 
         //Calculate the displacement according to initial energy initial_energy and final_energy
         displacement  =   current_collection_->CalculateDisplacement(
                     initial_energy,
                     final_energy,
                     current_collection_->GetDensityCorrection()*(distance - particle_->GetPropagatedDistance())) / current_collection_->GetDensityCorrection();
-        cout<<particle_->GetT()<<"\t";
+        //cout<<particle_->GetT()<<"\t";
         // The first interaction or decay happens behind the distance we want to propagate
         // So we calculate the final energy using only continuous losses
         if( displacement > distance - particle_->GetPropagatedDistance() )
@@ -173,14 +211,14 @@ double Propagator::Propagate( double distance )
             energy_loss     =   current_collection_->MakeStochasticLoss();
             final_energy    -=  energy_loss.first;
 
-            cout<<energy_loss.first<<"\t"<<energy_loss.second<<endl;
+            //cout<<energy_loss.first<<"\t"<<energy_loss.second<<endl;
         }
         else
         {
             decay           =   current_collection_->MakeDecay();
             final_energy    =   0;
 
-            cout<<decay.first<<"\t"<<decay.second<<endl;
+            //cout<<decay.first<<"\t"<<decay.second<<endl;
         }
 
         //break if the lower limit of particle energy is reached
@@ -287,16 +325,12 @@ void Propagator::AdvanceParticle(double dr, double ei, double ef)
 
 void Propagator::ChooseCurrentCollection(Particle* particle)
 {
-    cout<<particle->GetX()<<"\t";
-
     for(unsigned int i = 0 ; i < collections_.size() ; i++)
     {
-        //cout<<collections_.at(i)->GetLocation()<<endl;
+        //cout<<current_collection_<<"\t"<<collections_.at(i)<<endl;
+
         if(particle->GetName().compare(collections_.at(i)->GetParticle()->GetName())!=0 )
             continue;
-//        cout<<detector_->GetObject()<<endl;
-//        cout<<detector_->GetX0()<<"\t"<<detector_->GetY0()<<"\t"<<detector_->GetZ0()<<"\t"<<detector_->GetRadius()<<"\t"<<detector_->GetZ()<<"\t"<<detector_->GetInnerRadius()<< endl;
-//        cout<<particle->GetX()<<"\t"<<particle->GetY()<<"\t"<<particle->GetZ()<<"\t"<<particle->GetTheta()<<"\t"<<particle->GetPhi()<< endl;
 
         if(detector_->IsParticleInfront(particle))
         {
@@ -304,9 +338,11 @@ void Propagator::ChooseCurrentCollection(Particle* particle)
                 continue;
             else
             {
-                if(collections_.at(i)->GetGeometry()->IsParticleInfront(particle))
+                if(collections_.at(i)->GetGeometry()->IsParticleInside(particle))
                 {
-                    cout<<"Hallo0\t"<<i<<endl;
+//                    cout<<"Infront ----"<<i<<"----"<<endl;
+//                    cout<<*collections_.at(i)<<endl;
+                    current_collection_ = collections_.at(i);
                 }
             }
         }
@@ -319,7 +355,11 @@ void Propagator::ChooseCurrentCollection(Particle* particle)
             {
                 if(collections_.at(i)->GetGeometry()->IsParticleInside(particle))
                 {
-                    cout<<"Hallo1\t"<<i<<endl;
+//                    cout<<"Inside ----"<<i<<"----"<<endl;
+//                    cout<<*collections_.at(i)<<endl;
+                    current_collection_ = collections_.at(i);
+
+
                 }
             }
 
@@ -331,18 +371,20 @@ void Propagator::ChooseCurrentCollection(Particle* particle)
                 continue;
             else
             {
-                if(collections_.at(i)->GetGeometry()->IsParticleBehind(particle))
+                if(collections_.at(i)->GetGeometry()->IsParticleInside(particle))
                 {
-                    cout<<"Hallo2\t"<<i<<endl;
+//                    cout<<"Behind ----"<<i<<"----"<<endl;
+//                    cout<<*collections_.at(i)<<endl;
+                    current_collection_ = collections_.at(i);
+
+
                 }
             }
 
         }
 
     }
-    cout<<collections_.at(19)->GetMedium()->GetName()<<"\t"
-        <<collections_.at(19)->GetParticle()->GetName()<<"\t"
-        <<collections_.at(19)->GetLocation()<<endl;
+    current_collection_->SetParticle(particle_);
 
 }
 
@@ -1828,6 +1870,12 @@ void Propagator::ApplyOptions()
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
+void Propagator::SetParticle(Particle* particle)
+{
+    particle_   =   particle;
+    //current_collection_->SetParticle(particle_);
+
+}
 
 
 //----------------------------------------------------------------------------//

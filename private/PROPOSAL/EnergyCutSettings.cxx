@@ -141,8 +141,8 @@ bool EnergyCutSettings::operator!=(const EnergyCutSettings &energyCutSettings) c
 ostream& operator<<(ostream& os, EnergyCutSettings const& cut_settings)
 {
     os<<"--------EnergyCutSettings( "<<&cut_settings<<" )--------"<<endl;
-    os<<"Ecut: "<<cut_settings.ecut_<<endl;
-    os<<"Vcut: "<<cut_settings.vcut_<<endl;
+    os<<"\tEcut: "<<cut_settings.ecut_<<endl;
+    os<<"\tVcut: "<<cut_settings.vcut_<<endl;
     os<<"------------------------------------";
     return os;
 }

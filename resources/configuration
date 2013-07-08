@@ -86,7 +86,7 @@ global
     lpm
     moliere
     exact_time
-    brems_multiplier    1#
+    brems_multiplier    1
     photo_multiplier    1
     ioniz_multiplier    1
     epair_multiplier    1

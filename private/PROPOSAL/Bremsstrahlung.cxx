@@ -228,8 +228,10 @@ double Bremsstrahlung::CalculateStochasticLoss(double rnd1, double rnd2)
     return 0;
 }
 
+
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
+
 
 //formerlly in setlpm Calculates the radiation length of electrons
 double Bremsstrahlung::CalculateScatteringX0()

@@ -84,7 +84,7 @@ public:
     //Setter
 
     void SetParticle(Particle* particle);
-    void    SetCrossSections(std::vector<CrossSections*> crosssections);
+    void    SetCrosssections(std::vector<CrossSections*> crosssections);
 //----------------------------------------------------------------------------//
     // Getter
 

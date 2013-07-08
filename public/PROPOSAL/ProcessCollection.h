@@ -180,6 +180,8 @@ public:
     ProcessCollection& operator=(const ProcessCollection& collection);
     bool operator==(const ProcessCollection &collection) const;
     bool operator!=(const ProcessCollection &collection) const;
+    friend std::ostream& operator<<(std::ostream& os, ProcessCollection const& collection);
+
 //----------------------------------------------------------------------------//
 
     /// @brief  initializes all cross sections,

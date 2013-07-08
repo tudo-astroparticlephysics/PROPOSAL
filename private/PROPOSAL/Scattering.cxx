@@ -205,8 +205,8 @@ void Scattering::swap(Scattering &scattering)
     vector<CrossSections*> tmp_cross1(scattering.crosssections_);
     vector<CrossSections*> tmp_cross2(crosssections_);
 
-    SetCrossSections(  tmp_cross1 );
-    scattering.SetCrossSections(  tmp_cross2 );
+    SetCrosssections(  tmp_cross1 );
+    scattering.SetCrosssections(  tmp_cross2 );
 
     SetParticle( new Particle(tmp_particle1) );
     scattering.SetParticle( new Particle(tmp_particle2) );
@@ -612,7 +612,7 @@ void Scattering::SetParticle(Particle* particle)
     particle_ = particle;
 }
 
-void Scattering::SetCrossSections(std::vector<CrossSections*> crosssections)
+void Scattering::SetCrosssections(std::vector<CrossSections*> crosssections)
 {
     crosssections_ = crosssections;
 }

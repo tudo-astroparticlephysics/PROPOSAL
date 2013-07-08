@@ -248,60 +248,63 @@ int main(int argc, char** argv){
 
 //    Particle *p = new Particle(12,13,"mu",1,2,3,30,43,1e6,0.6,0);
 //    cout<<*p<<endl;
-//    Propagator *pr = new Propagator("resources/configuration");
-//    Particle *p = new Particle("mu");
-//    double x;
-//    for(int i =0 ;i< 20; i++)
-//    {
-//        x=-2000 + 200*i;
-//        p->SetTheta(90);
-//        p->SetX(x);
-//        cout<<x<<"\t";
-//        pr->ChooseCurrentCollection(p);
+    Propagator *pr = new Propagator("resources/configuration");
+    double x;
+    for(int i =0 ;i< 10; i++)
+    {
+        Particle *p = new Particle("mu");
+        p->SetTheta(45);
+        p->SetX(-5000);
+        p->SetZ(-5000);
+        p->SetEnergy(1e6);
+
+        //cout<<x<<"\t";
+        pr->Propagate(p);
+
+    }
+
+//    Propagator* prop = new Propagator();
+
+//    prop->EnableInterpolation("/data/LocalApps/LocalFiles/tables");
+//    prop->GetParticle()->SetEnergy(702);
+//    double distance = prop->Propagate(1E10);
 
 
-    Propagator* prop = new Propagator();
+//    double startenergy = 370;
+//    Medium *medium = new Medium("ice",1.);
+//    Particle *particle = new Particle("mu",1.,1.,1,.20,20,1e5,10);
+//    particle->SetEnergy(startenergy);
+//    EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
 
-    prop->EnableInterpolation("/data/LocalApps/LocalFiles/tables");
-    prop->GetParticle()->SetEnergy(702);
-    double distance = prop->Propagate(1E10);
+//    std::vector<CrossSections*> vecOfProcColl;
+//    CrossSections* ion = new Ionization(particle,medium,cuts);
 
+//    CrossSections* brems = new Bremsstrahlung(particle,medium,cuts);
+//    brems->SetParametrization(1);
 
-    double startenergy = 370;
-    Medium *medium = new Medium("ice",1.);
-    Particle *particle = new Particle("mu",1.,1.,1,.20,20,1e5,10);
-    particle->SetEnergy(startenergy);
-    EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
+//    CrossSections* epair = new Epairproduction(particle,medium,cuts);
 
-    std::vector<CrossSections*> vecOfProcColl;
-    CrossSections* ion = new Ionization(particle,medium,cuts);
-
-    CrossSections* brems = new Bremsstrahlung(particle,medium,cuts);
-    brems->SetParametrization(1);
-
-    CrossSections* epair = new Epairproduction(particle,medium,cuts);
-
-    CrossSections* photo = new Photonuclear(particle,medium,cuts);
-    photo->SetParametrization(12);
+//    CrossSections* photo = new Photonuclear(particle,medium,cuts);
+//    photo->SetParametrization(12);
 
 
-    vecOfProcColl.push_back(ion);
-    vecOfProcColl.push_back(brems);
-    vecOfProcColl.push_back(epair);
-    vecOfProcColl.push_back(photo);
+//    vecOfProcColl.push_back(ion);
+//    vecOfProcColl.push_back(brems);
+//    vecOfProcColl.push_back(epair);
+//    vecOfProcColl.push_back(photo);
 
-    Scattering* scat = new Scattering(vecOfProcColl);
-    scat->GetParticle()->SetPhi(0);
-    scat->GetParticle()->SetTheta(0);
-    scat->GetParticle()->SetX(0);
-    scat->GetParticle()->SetY(0);
-    scat->GetParticle()->SetZ(0);
+//    Scattering* scat = new Scattering(vecOfProcColl);
+//    scat->GetParticle()->SetPhi(0);
+//    scat->GetParticle()->SetTheta(0);
+//    scat->GetParticle()->SetX(0);
+//    scat->GetParticle()->SetY(0);
+//    scat->GetParticle()->SetZ(0);
 
-    scat->EnableInterpolation("/data/LocalApps/LocalFiles/tables");
+//    scat->EnableInterpolation("/data/LocalApps/LocalFiles/tables");
 
-    scat->Scatter(50,startenergy,MMU);
+//    scat->Scatter(50,startenergy,MMU);
 
-    cout << *(scat->GetParticle()) << endl;
+//    cout << *(scat->GetParticle()) << endl;
 //    }
 
 }

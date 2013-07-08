@@ -157,7 +157,7 @@ TEST(Assignment , Operator ) {
 
     EXPECT_TRUE(A==B);
 
-    A.SetCrossSections(crosssections2);
+    A.SetCrosssections(crosssections2);
 
     EXPECT_TRUE(A!=B);
 

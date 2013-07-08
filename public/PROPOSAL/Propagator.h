@@ -113,13 +113,20 @@ public:
      *
      *  \param  distance   maximum track length
      *  \param  energy   initial energy
-     *  \return energy at distance r OR -(track length)
+     *  \return energy at distance OR -(track length)
      */
 
     double Propagate(double distance);
 
 //----------------------------------------------------------------------------//
+    /**
+     * Propagates the particle through the current set of ProcessCollections
+     *  \return energy at distance r OR -(track length)
+     */
 
+    double Propagate( Particle *particle );
+
+//----------------------------------------------------------------------------//
     /*!
     * advances the particle by the given distance
     * Sets the x,y and z coordinates of particle_
@@ -201,7 +208,14 @@ public:
         return particle_;
     }
 
- //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+    //Setter
+    /**
+     *  Sets the particle for the Propagator and its current ProcessCollection
+     */
+    void SetParticle(Particle* particle);
+
+//----------------------------------------------------------------------------//
     //Destructor
     ~Propagator();
 
