@@ -260,20 +260,23 @@ void Propagator::AdvanceParticle(double dr, double ei, double ef)
     }
 
 
-//    if(propagate_->get_molieScat())
-//    Implement the Molie Scattering here see PROPOSALParticle::advance of old version
-
-//    else
-//    {
-    x   +=  particle_->GetSinTheta() * particle_->GetCosPhi() * dr;
-    y   +=  particle_->GetSinTheta() * particle_->GetSinPhi() * dr;
-    z   +=  particle_->GetCosTheta() * dr;
-
+    if(moliere_)
+    {
+        current_collection_->GetScattering()->Scatter(dr,ei,ef);
+        //local displacement and angles are adjusted in the scattering class.
+    }
+    else
+    {
+        x   +=  particle_->GetSinTheta() * particle_->GetCosPhi() * dr;
+        y   +=  particle_->GetSinTheta() * particle_->GetSinPhi() * dr;
+        z   +=  particle_->GetCosTheta() * dr;
+        particle_->SetX(x);
+        particle_->SetY(y);
+        particle_->SetZ(z);
+    }
     particle_->SetPropagatedDistance(dist);
     particle_->SetT(time);
-    particle_->SetX(x);
-    particle_->SetY(y);
-    particle_->SetZ(z);
+
 
 }
 
@@ -1786,7 +1789,7 @@ void Propagator::ApplyOptions()
 
         if(moliere_)
         {
-            //collections_.at(j)->EnableMoliereScattering();
+            collections_.at(j)->EnableScattering();
         }
         if(do_exact_time_calulation_)
         {
