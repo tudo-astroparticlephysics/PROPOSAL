@@ -249,19 +249,24 @@ int main(int argc, char** argv){
 //    Particle *p = new Particle(12,13,"mu",1,2,3,30,43,1e6,0.6,0);
 //    cout<<*p<<endl;
     Propagator *pr = new Propagator("resources/configuration");
+//    Propagator *pr1 = new Propagator();
+//    pr1->EnableInterpolation("resources/tables");
     double x;
-    for(int i =0 ;i< 1; i++)
+
+    ofstream out;
+    out.open("dist_mu_9e6.txt");
+    int number_of_particles =   1e6;
+    for(int i =0 ;i< number_of_particles; i++)
     {
+        if(i%10000==0)cout<<1.*i/1e4<<endl;
+        pr->set_seed(i);
         Particle *p = new Particle("mu");
-        p->SetTheta(90);
-        p->SetX(-50000);
-        p->SetZ(0);
-        p->SetEnergy(1e6);
-
-        //cout<<x<<"\t";
-        pr->Propagate(p);
-
+        p->SetEnergy(9e6);
+        pr->SetParticle(p);
+        x   =   pr->Propagate(p);
+out<<x<<endl;
     }
+
 
 //    Propagator* prop = new Propagator();
 

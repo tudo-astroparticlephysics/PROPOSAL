@@ -44,7 +44,6 @@ std::pair<double,double> Propagator::CalculateEnergyTillStochastic( double initi
     }
 
     rndiMin =   current_collection_->CalculateTrackingIntegal(initial_energy, rndi, true);
-
     //evaluating the energy loss
     if(rndd >= rnddMin || rnddMin<=0)
     {
@@ -74,10 +73,11 @@ std::pair<double,double> Propagator::CalculateEnergyTillStochastic( double initi
 
 double Propagator::Propagate( Particle *particle )
 {
-    double distance = 0;
-    double result   = 0;
-
-    int counter =0;
+    double distance_to_collection_border    =   0;
+    double distance_to_detector_            =   0;
+    double distance                         =   0;
+    double result                           =   0;
+    double prop_dist                        =   0;
 
     SetParticle(particle);
 
@@ -85,24 +85,40 @@ double Propagator::Propagate( Particle *particle )
     {
         ChooseCurrentCollection(particle_);
 
-        distance =
+        distance_to_collection_border =
         current_collection_->GetGeometry()->DistanceToBorder(particle_).first;
 
-cout<<distance<<endl;
+        distance_to_detector_ =
+        detector_->DistanceToBorder(particle_).first;
+
+        if(distance_to_detector_ > 0)
+        {
+            if( distance_to_detector_ < distance_to_collection_border )
+            {
+                distance    =   distance_to_detector_;
+            }
+            else
+            {
+                distance    =   distance_to_collection_border;
+            }
+        }
+        else
+        {
+            distance    =   distance_to_collection_border;
+        }
+
         result  =   Propagate(distance);
+//        cout<<result<<endl;
+//        cout<<current_collection_<<"\t"<<current_collection_->GetLocation();
+//        cout<<"\t"<<particle->GetX()<<"\t"<<particle->GetY()<<"\t"<<particle->GetZ()<<"\t"<<particle->GetPropagatedDistance()<<endl;
 
-        cout<<result<<endl;
-        cout<<*current_collection_<<endl;
-        cout<<"\t"<<particle->GetX()<<"\t"<<particle->GetY()<<"\t"<<particle->GetZ()<<"\t"<<particle->GetPropagatedDistance()<<endl;
-
+        prop_dist   +=  particle_->GetPropagatedDistance();
         particle_->SetPropagatedDistance(0);
         if(result<0) break;
-        //if(counter>4)break;
 
-        counter++;
     }
 
-    return result;
+    return prop_dist;
 
 }
 
@@ -157,7 +173,7 @@ double Propagator::Propagate( double distance )
             final_energy            =   energy_till_stochastic_.second;
 
         }
-        //cout<<"efi "<<energy_till_stochastic_.first<<"\t"<<energy_till_stochastic_.second<<"\t";
+        //cout<<"efi "<<energy_till_stochastic_.first<<"\t"<<energy_till_stochastic_.second<<"\t"<<endl;
 
         //cout<<final_energy<<"\t";
 
@@ -1080,7 +1096,7 @@ void Propagator::swap(Propagator &propagator)
 void Propagator::InitDefaultCollection()
 {
     Medium* med             = new Medium("ice",1.);
-    EnergyCutSettings* cuts = new EnergyCutSettings(500,-1);
+    EnergyCutSettings* cuts = new EnergyCutSettings(-1,0.01);
     current_collection_     = new ProcessCollection(particle_ , med, cuts);
 
 }

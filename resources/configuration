@@ -84,7 +84,7 @@ global
     brems               1
     photo               12
     lpm
-    moliere
+   # moliere
     exact_time
     brems_multiplier    1
     photo_multiplier    1
@@ -145,41 +145,52 @@ global
 # third 200 m ice with density correction factor 0.832
 # last air with density correction factor 0.673
 
-sector
-    sphere  0   0   -6372186   1000000000  6374134
+#sector
+#    sphere  0   0   -6372186   1000000000  6374134
+#
+#    inside  500     -1  0
+#    infront -1    0.05  1
+#    behind  -1      -1  0
 
-    inside  500     -1  0
+#    medium air 0.673
+
+#sector
+#    sphere  0   0   -6372186   6374134  6373934
+
+#    inside  500     -1  0
+#    infront -1    0.05  1
+#    behind  -1      -1  0
+
+#    medium Ice 0.832
+
+#sector
+#    sphere  0   0   -6372186   6373934  6371324
+
+#    inside  500     -1  0
+#    infront -1    0.05  1
+#    behind  -1      -1  0
+
+#   medium Ice 1.005
+
+#sector
+#    sphere  0   0   -6372186   6371324  0
+
+#    inside  500     -1  0
+#    infront -1    0.05  1
+#    behind  -1      -1  0
+
+#    medium  Standard_Rock 1.
+
+
+sector
+    sphere  0   0   0   6371324  0
+
+    inside  -1     0.01  0
     infront -1    0.05  1
     behind  -1      -1  0
 
-    medium air 0.673
+    medium  water 1.
 
-sector
-    sphere  0   0   -6372186   6374134  6373934
-
-    inside  500     -1  0
-    infront -1    0.05  1
-    behind  -1      -1  0
-
-    medium Ice 0.832
-
-sector
-    sphere  0   0   -6372186   6373934  6371324
-
-    inside  500     -1  0
-    infront -1    0.05  1
-    behind  -1      -1  0
-
-    medium Ice 1.005
-
-sector
-    sphere  0   0   -6372186   6371324  0
-
-    inside  500     -1  0
-    infront -1    0.05  1
-    behind  -1      -1  0
-
-    medium  Standard_Rock 1.
 
 # keyword detector must be followed by one line
 # geometry information
@@ -203,7 +214,9 @@ sector
 #       box         origin_x width_x  width_y width_z   <--- this is not allowed
 #       ( box + 3 or 6 values are expected )
 
-detector
-    cylinder 1200   1700
+#detector
+#    cylinder 1200   1700
 
+detector
+    sphere  0   0   0   6371324  0
 

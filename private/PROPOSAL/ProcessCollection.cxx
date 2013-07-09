@@ -63,6 +63,7 @@ double ProcessCollection::CalculateTrackingIntegal(double initial_energy, double
         if(particle_interaction)
         {
             storeDif_.at(1) =   interpol_prop_interaction_->Interpolate(initial_energy);
+
         }
         else
         {
@@ -423,6 +424,16 @@ void ProcessCollection::EnableInterpolation(std::string path, bool raw)
     bool storing_failed =   false;
 
 
+    if(abs(-prop_interaction_->Integrate(particle_->GetLow(), particle_->GetLow()*10, boost::bind(&ProcessCollection::FunctionToPropIntegralInteraction, this, _1),4))
+            < abs(-prop_interaction_->Integrate(BIGENERGY, BIGENERGY/10, boost::bind(&ProcessCollection::FunctionToPropIntegralInteraction, this, _1),4)))
+    {
+        up_  =   true;
+    }
+    else
+    {
+        up_  =   false;
+    }
+
     if(!path.empty())
     {
         stringstream filename;
@@ -518,16 +529,6 @@ void ProcessCollection::EnableInterpolation(std::string path, bool raw)
             cerr<<"Info: ProcessCollection parametrisation tables will be saved to file:"<<endl;
             cerr<<"\t"<<filename.str()<<endl;
 
-            if(abs(-prop_interaction_->Integrate(particle_->GetLow(), particle_->GetLow()*10, boost::bind(&ProcessCollection::FunctionToPropIntegralInteraction, this, _1),4))
-                    < abs(-prop_interaction_->Integrate(BIGENERGY, BIGENERGY/10, boost::bind(&ProcessCollection::FunctionToPropIntegralInteraction, this, _1),4)))
-            {
-                up_  =   true;
-            }
-            else
-            {
-                up_  =   false;
-            }
-
             particle_->SetEnergy(energy);
 
             ofstream output;
@@ -581,16 +582,6 @@ void ProcessCollection::EnableInterpolation(std::string path, bool raw)
     {
         double energy = particle_->GetEnergy();
 
-        if(abs(-prop_interaction_->Integrate(particle_->GetLow(), particle_->GetLow()*10, boost::bind(&ProcessCollection::FunctionToPropIntegralInteraction, this, _1),4))
-                < abs(-prop_interaction_->Integrate(BIGENERGY, BIGENERGY/10, boost::bind(&ProcessCollection::FunctionToPropIntegralInteraction, this, _1),4)))
-        {
-            up_  =   true;
-        }
-        else
-        {
-            up_  =   false;
-        }
-
         interpolant_        =   new Interpolant(NUM3, particle_->GetLow(), BIGENERGY, boost::bind(&ProcessCollection::FunctionToBuildInterpolant, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
         interpolant_diff_   =   new Interpolant(NUM3, particle_->GetLow(), BIGENERGY, boost::bind(&ProcessCollection::FunctionToBuildInterpolantDiff, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
 
@@ -621,8 +612,15 @@ void ProcessCollection::EnableInterpolation(std::string path, bool raw)
         scattering_->EnableInterpolation(path);
     }
 
-    bigLow_.at(0)=interpol_prop_decay_->Interpolate(particle_->GetLow());
-    bigLow_.at(1)=interpol_prop_interaction_->Interpolate(particle_->GetLow());
+
+    if(up_)
+    {
+        bigLow_.at(0)=interpol_prop_decay_->Interpolate(particle_->GetLow());
+    }
+    else
+    {
+        bigLow_.at(1)=interpol_prop_interaction_->Interpolate(particle_->GetLow());
+    }
 
     do_interpolation_=true;
 

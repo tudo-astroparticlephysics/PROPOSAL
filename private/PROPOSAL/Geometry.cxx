@@ -23,13 +23,13 @@ using namespace std;
 
 void Geometry::InitBox(double x0, double y0, double z0, double x, double y, double z)
 {
-    x0_     =   x0;
-    y0_     =   y0;
-    z0_     =   z0;
+    x0_     =   100*x0;
+    y0_     =   100*y0;
+    z0_     =   100*z0;
 
-    x_      =   x;
-    y_      =   y;
-    z_      =   z;
+    x_      =   100*x;
+    y_      =   100*y;
+    z_      =   100*z;
 
     object_ =   "box";
 }
@@ -40,12 +40,12 @@ void Geometry::InitBox(double x0, double y0, double z0, double x, double y, doub
 
 void Geometry::InitSphere(double x0, double y0, double z0, double radius, double inner_radius)
 {
-    x0_     =   x0;
-    y0_     =   y0;
-    z0_     =   z0;
+    x0_     =   100*x0;
+    y0_     =   100*y0;
+    z0_     =   100*z0;
 
-    radius_         =   radius;
-    inner_radius_   =   inner_radius;
+    radius_         =   100*radius;
+    inner_radius_   =   100*inner_radius;
 
     if(inner_radius > radius_)
     {
@@ -66,12 +66,12 @@ void Geometry::InitSphere(double x0, double y0, double z0, double radius, double
 
 void Geometry::InitCylinder(double x0, double y0, double z0, double radius, double inner_radius, double z)
 {
-    x0_     =   x0;
-    y0_     =   y0;
-    z0_     =   z0;
+    x0_     =   100*x0;
+    y0_     =   100*y0;
+    z0_     =   100*z0;
 
-    radius_         =   radius;
-    inner_radius_   =   inner_radius;
+    radius_         =   100*radius;
+    inner_radius_   =   100*inner_radius;
 
     if(inner_radius_ > radius_)
     {
@@ -83,7 +83,7 @@ void Geometry::InitCylinder(double x0, double y0, double z0, double radius, doub
         cerr<<"Warning: Inner radius == radius (Volume is 0)"<<endl;
     }
 
-    z_      =   z;
+    z_      =   100*z;
 
     object_ =   "cylinder";
 }
