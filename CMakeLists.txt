@@ -166,4 +166,4 @@ IF(DoTesting)
 ENDIF()
 
 ADD_SUBDIRECTORY( doc )
-ADD_SUBDIRECTORY( ${CMAKE_SOURCE_DIR}/resources/root_examples )
+ADD_SUBDIRECTORY( root_examples )
