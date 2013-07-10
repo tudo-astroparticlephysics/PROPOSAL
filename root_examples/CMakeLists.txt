@@ -19,6 +19,7 @@ IF(ROOT_FOUND)
 
     add_executable(Plot_range plot_range.cxx)
     add_executable(Plot_Ionization_dEdx plot_Ionization_dEdx.cxx)
+    add_executable(Plot_Ionization_dNdx plot_Ionization_dNdx.cxx)
     add_executable(Plot_Epairproduction_dEdx plot_Epairproduction_dEdx.cxx)
 
     target_link_libraries(Plot_range ${ROOT_LIBRARIES})
@@ -26,6 +27,9 @@ IF(ROOT_FOUND)
 
     target_link_libraries(Plot_Ionization_dEdx ${ROOT_LIBRARIES})
     target_link_libraries(Plot_Ionization_dEdx PROPOSAL)
+
+    target_link_libraries(Plot_Ionization_dNdx ${ROOT_LIBRARIES})
+    target_link_libraries(Plot_Ionization_dNdx PROPOSAL)
 
     target_link_libraries(Plot_Epairproduction_dEdx ${ROOT_LIBRARIES})
     target_link_libraries(Plot_Epairproduction_dEdx PROPOSAL)
