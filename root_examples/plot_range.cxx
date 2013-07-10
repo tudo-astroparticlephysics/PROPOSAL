@@ -1,5 +1,3 @@
-#include <iostream>
-#include <fstream>
 #include "TH1D.h"
 #include "TCanvas.h"
 #include "PROPOSAL/Propagator.h"

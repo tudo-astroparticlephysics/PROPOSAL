@@ -18,9 +18,13 @@ IF(ROOT_FOUND)
     link_directories( ${LINK_DIRECTORIES})
 
     add_executable(Plot_range plot_range.cxx)
+    add_executable(Plot_Ionization_dEdx plot_Ionization_dEdx.cxx)
 
     target_link_libraries(Plot_range ${ROOT_LIBRARIES})
     target_link_libraries(Plot_range PROPOSAL)
+
+    target_link_libraries(Plot_Ionization_dEdx ${ROOT_LIBRARIES})
+    target_link_libraries(Plot_Ionization_dEdx PROPOSAL)
 
 ELSE(ROOT_FOUND)
     MESSAGE(STATUS "ROOT not found...")
