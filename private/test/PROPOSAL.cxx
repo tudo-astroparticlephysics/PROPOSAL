@@ -9,6 +9,14 @@
 #include "PROPOSAL/ContinuousRandomization.h"
 #include "PROPOSAL/Geometry.h"
 
+
+//Stuff for LOG4CPLUS
+#include <log4cplus/logger.h>
+#include <log4cplus/loggingmacros.h>
+#include <log4cplus/configurator.h>
+#include <iomanip>
+
+using namespace log4cplus;
 using namespace std;
 
 //double integrate(double min, double max, int N, double (*func)(double) ){
@@ -248,24 +256,24 @@ int main(int argc, char** argv){
 
 //    Particle *p = new Particle(12,13,"mu",1,2,3,30,43,1e6,0.6,0);
 //    cout<<*p<<endl;
-    Propagator *pr = new Propagator("resources/configuration");
+//    Propagator *pr = new Propagator("resources/configuration");
 //    Propagator *pr1 = new Propagator();
 //    pr1->EnableInterpolation("resources/tables");
-    double x;
+//    double x;
 
-    ofstream out;
-    out.open("dist_mu_9e6.txt");
-    int number_of_particles =   1e6;
-    for(int i =0 ;i< number_of_particles; i++)
-    {
-        if(i%10000==0)cout<<1.*i/1e4<<endl;
-        pr->set_seed(i);
-        Particle *p = new Particle("mu");
-        p->SetEnergy(9e6);
-        pr->SetParticle(p);
-        x   =   pr->Propagate(p);
-out<<x<<endl;
-    }
+//    ofstream out;
+//    out.open("dist_mu_9e6.txt");
+//    int number_of_particles =   1e6;
+//    for(int i =0 ;i< number_of_particles; i++)
+//    {
+//        if(i%10000==0)cout<<1.*i/1e4<<endl;
+//        pr->set_seed(i);
+//        Particle *p = new Particle("mu");
+//        p->SetEnergy(9e6);
+//        pr->SetParticle(p);
+//        x   =   pr->Propagate(p);
+//out<<x<<endl;
+//    }
 
 
 //    Propagator* prop = new Propagator();
@@ -311,5 +319,14 @@ out<<x<<endl;
 
 //    cout << *(scat->GetParticle()) << endl;
 //    }
+
+
+    PropertyConfigurator::doConfigure(LOG4CPLUS_TEXT("resources/log4cplus.conf"));
+    Logger logger;
+     logger = Logger::getInstance(LOG4CPLUS_TEXT("main"));
+    LOG4CPLUS_ERROR(logger, LOG4CPLUS_TEXT("ERROR!!!"));
+     LOG4CPLUS_WARN(logger, LOG4CPLUS_TEXT("WARNING!!"));
+     LOG4CPLUS_INFO(logger, LOG4CPLUS_TEXT("INFO!"));
+    LOG4CPLUS_TRACE(logger, LOG4CPLUS_TEXT("TRACE"));
 
 }

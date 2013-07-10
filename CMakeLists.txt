@@ -6,40 +6,21 @@ project( PROPOSAL)
 
 FIND_PACKAGE( Boost COMPONENTS program_options REQUIRED )
 
-# This module defines
-# LOG4CPP_INCLUDE_DIR, where to find ptlib.h, etc.
-# LOG4CPP_LIBRARIES, the libraries to link against to use pwlib.
-# LOG4CPP_FOUND, If false, don't try to use pwlib.
+
 
 #################################################################
 #################           log4cpp     #########################
 #################################################################
-#FIND_PATH(LOG4CPP_INCLUDE_DIR log4cpp/Category.hh
-#  PATHS
-#    "$ENV{LOG4CPP}/include"
-#    /usr/local/include
-#    /usr/include
-#)
-#
-#FIND_LIBRARY(LOG4CPP_LIBRARIES log4cpp
-#  PATHS
-#    "$ENV{LOG4CPP}/lib"
-#    /usr/local/lib
-#    /usr/lib
-#)
-#
-#SET(LOG4CPP_FOUND 0)
-#IF(LOG4CPP_INCLUDE_DIR)
-#  IF(LOG4CPP_LIBRARIES)
-#    SET(LOG4CPP_FOUND 1)
-#    MESSAGE(STATUS "Found Log4CPP")
-#  ENDIF(LOG4CPP_LIBRARIES)
-#ENDIF(LOG4CPP_INCLUDE_DIR)
 
-#MARK_AS_ADVANCED(
-#  LOG4CPP_INCLUDE_DIR
-#  LOG4CPP_LIBRARIES
-#)
+# Once done this will define
+#  LOG4CPLUS_FOUND - System has Log4cplus
+#  LOG4CPLUS_INCLUDE_DIRS - The Log4cplus include directories
+#  LOG4CPLUS_LIBRARIES - The libraries needed to use Log4cplus
+include(resources/FindLog4cplus.cmake)
+#message("LOG4CPLUS_FOUND: " ${LOG4CPLUS_FOUND})
+#message("LOG4CPLUS_INCLUDE_DIR: " ${LOG4CPLUS_INCLUDE_DIR})
+#message("LOG4CPLUS_LIBRARIES: " ${LOG4CPLUS_LIBRARIES})
+
 
 #################################################################
 #################           GTest       #########################
@@ -66,7 +47,7 @@ if(DEBUG)
         set( CMAKE_CXX_FLAGS "-g -pg -O0" )
 endif()
 
-include_directories("${PROJECT_SOURCE_DIR}/public" ${GTEST_INCLUDE_DIR} ${LOG4CPP_INCLUDE_DIR} ${Boost_INCLUDE_DIR})
+include_directories("${PROJECT_SOURCE_DIR}/public" ${GTEST_INCLUDE_DIR} ${LOG4CPLUS_INCLUDE_DIR} ${Boost_INCLUDE_DIR})
 
 add_library(PROPOSAL
         private/PROPOSAL/Integral.cxx
@@ -93,7 +74,7 @@ add_library(PROPOSAL
 
 set_target_properties(PROPOSAL PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -O2 -Wall -Werror")# -Wextra -pedantic")
 
-target_link_libraries(PROPOSAL ${Boost_LIBRARIES})
+target_link_libraries(PROPOSAL ${Boost_LIBRARIES} ${LOG4CPLUS_LIBRARIES})
 
 add_executable(PROPOSALtest
         private/test/PROPOSAL.cxx
