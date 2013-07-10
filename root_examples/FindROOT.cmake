@@ -28,7 +28,7 @@ FIND_PROGRAM(ROOT_CONFIG_EXECUTABLE NAMES root-config PATHS
    NO_DEFAULT_PATH)
     
 IF (${ROOT_CONFIG_EXECUTABLE} MATCHES "ROOT_CONFIG_EXECUTABLE-NOTFOUND")
-  MESSAGE( FATAL_ERROR "ROOT not installed in the searchpath and ROOTSYS is not set. Please
+  MESSAGE( STATUS "ROOT not installed in the searchpath and ROOTSYS is not set. Please
  set ROOTSYS or add the path to your ROOT installation in the Macro FindROOT.cmake in the
  subdirectory cmake/modules.")
 ELSE (${ROOT_CONFIG_EXECUTABLE} MATCHES "ROOT_CONFIG_EXECUTABLE-NOTFOUND")
@@ -63,7 +63,7 @@ IF (ROOT_CONFIG_EXECUTABLE)
   STRING(REGEX REPLACE "^[0-9]+\\.[0-9][0-9]+\\/([0-9][0-9]+).*" "\\1" found_root_patch_vers "${ROOTVERSION}")
 
   IF (found_root_major_vers LESS 5)
-    MESSAGE( FATAL_ERROR "Invalid ROOT version \"${ROOTERSION}\", at least major version 4 is required, e.g. \"5.00/00\"")
+    MESSAGE( STATUS "Invalid ROOT version \"${ROOTERSION}\", at least major version 4 is required, e.g. \"5.00/00\"")
   ENDIF (found_root_major_vers LESS 5)
 
   # compute an overall version number which can be compared at once

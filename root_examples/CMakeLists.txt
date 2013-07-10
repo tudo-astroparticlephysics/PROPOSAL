@@ -1,45 +1,31 @@
 # Load some basic macros which are needed later on
 include(FindROOT.cmake)
 
-set(LIBRARY_OUTPUT_PATH "${CMAKE_BINARY_DIR}/lib")
-set(EXECUTABLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}/bin")
+IF(ROOT_FOUND)
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/root_examples)
 
+    set(INCLUDE_DIRECTORIES
+    ${ROOT_INCLUDE_DIR}
+    )
 
-# Create a library called "libEvent" which includes the source files given in
-# the array .
-# The extension is already found.  Any number of sources could be listed here.
+    include_directories( ${INCLUDE_DIRECTORIES})
 
-set(INCLUDE_DIRECTORIES
-${ROOT_INCLUDE_DIR} 
-)
+    set(LINK_DIRECTORIES
+    ${ROOT_LIBRARY_DIR}
+    ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
+    )
 
-include_directories( ${INCLUDE_DIRECTORIES})
+    link_directories( ${LINK_DIRECTORIES})
 
-set(LINK_DIRECTORIES
-${ROOT_LIBRARY_DIR}
-${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
-)
- 
-link_directories( ${LINK_DIRECTORIES})
+    add_executable(Plot_range plot_range.cxx)
 
-# List of source files
-set(Examples_SRC
-plot_range.cxx
-)
+    target_link_libraries(Plot_range ${ROOT_LIBRARIES})
+    target_link_libraries(Plot_range PROPOSAL)
 
-# fill list of header files 
-#set(Examples_HEADERS 
-#Event.h
-#)
+ELSE(ROOT_FOUND)
+    MESSAGE(STATUS "ROOT not found...")
+    MESSAGE(STATUS "ROOT examples will not be builded.")
+    MESSAGE(STATUS "Make sure you have ROOT installed and ROOTSYS is set.")
 
-
-############### build the library #####################
-#add_library(Event ${Event_SRCS})
-
-add_executable(Plot_range ${Examples_SRC})
-
-target_link_libraries(Plot_range ${ROOT_LIBRARIES})
-target_link_libraries(Plot_range PROPOSAL)
-
-
+ENDIF(ROOT_FOUND)
 
