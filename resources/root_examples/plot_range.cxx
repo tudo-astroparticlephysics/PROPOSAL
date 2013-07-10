@@ -8,7 +8,7 @@
 
 using namespace std;
 
-main()
+int main()
 {
 
     cout<<"This program will propagte 1e6 muons with an energy of 9 TeV."<<endl;
