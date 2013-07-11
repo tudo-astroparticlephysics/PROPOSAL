@@ -20,6 +20,7 @@ IF(ROOT_FOUND)
     add_executable(Plot_range plot_range.cxx)
     add_executable(Plot_Ionization_dEdx plot_Ionization_dEdx.cxx)
     add_executable(Plot_Ionization_dNdx plot_Ionization_dNdx.cxx)
+    add_executable(Plot_Ionization_dNdx_different_ecut plot_Ionization_dNdx_different_ecut.cxx)
     add_executable(Plot_Epairproduction_dEdx plot_Epairproduction_dEdx.cxx)
     add_executable(Plot_Epairproduction_dNdx plot_Epairproduction_dNdx.cxx)
 
@@ -37,6 +38,9 @@ IF(ROOT_FOUND)
 
     target_link_libraries(Plot_Epairproduction_dNdx ${ROOT_LIBRARIES})
     target_link_libraries(Plot_Epairproduction_dNdx PROPOSAL)
+
+    target_link_libraries(Plot_Ionization_dNdx_different_ecut ${ROOT_LIBRARIES})
+    target_link_libraries(Plot_Ionization_dNdx_different_ecut PROPOSAL)
 
 ELSE(ROOT_FOUND)
     MESSAGE(STATUS "ROOT not found...")
