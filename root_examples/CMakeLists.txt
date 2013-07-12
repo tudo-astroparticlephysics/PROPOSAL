@@ -25,6 +25,9 @@ IF(ROOT_FOUND)
     add_executable(Plot_Epairproduction_dNdx plot_Epairproduction_dNdx.cxx)
     add_executable(Plot_Epairproduction_dNdx_different_ecut plot_Epairproduction_dNdx_different_ecut.cxx)
     add_executable(Plot_Bremsstrahlung_dEdx plot_Bremsstrahlung_dEdx.cxx)
+    add_executable(Plot_Bremsstrahlung_dNdx plot_Bremsstrahlung_dNdx.cxx)
+    add_executable(Plot_Bremsstrahlung_dNdx_different_ecut plot_Bremsstrahlung_dNdx_different_ecut.cxx)
+    add_executable(Plot_Photonuclear_dEdx plot_Photonuclear_dEdx.cxx)
 
 
     target_link_libraries(Plot_range ${ROOT_LIBRARIES})
@@ -51,6 +54,14 @@ IF(ROOT_FOUND)
     target_link_libraries(Plot_Bremsstrahlung_dEdx ${ROOT_LIBRARIES})
     target_link_libraries(Plot_Bremsstrahlung_dEdx PROPOSAL)
 
+    target_link_libraries(Plot_Bremsstrahlung_dNdx ${ROOT_LIBRARIES})
+    target_link_libraries(Plot_Bremsstrahlung_dNdx PROPOSAL)
+
+    target_link_libraries(Plot_Bremsstrahlung_dNdx_different_ecut ${ROOT_LIBRARIES})
+    target_link_libraries(Plot_Bremsstrahlung_dNdx_different_ecut PROPOSAL)
+
+    target_link_libraries(Plot_Photonuclear_dEdx ${ROOT_LIBRARIES})
+    target_link_libraries(Plot_Photonuclear_dEdx PROPOSAL)
 
 ELSE(ROOT_FOUND)
     MESSAGE(STATUS "ROOT not found...")

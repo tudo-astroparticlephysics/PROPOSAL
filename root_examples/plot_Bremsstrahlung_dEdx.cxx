@@ -194,7 +194,7 @@ int main()
 
     TMultiGraph* muons_hydrogen_gr      =   new TMultiGraph("muons_hydrogen","muons in hydrogen");
     TMultiGraph* taus_hydrogen_gr       =   new TMultiGraph("taus_hydrogen","taus in hydrogen");
-    TMultiGraph* electrons_hydrogen_gr  =   new TMultiGraph("electrons_hydrogen","electrons in water");
+    TMultiGraph* electrons_hydrogen_gr  =   new TMultiGraph("electrons_hydrogen","electrons in hydrogen");
 
     TMultiGraph* muons_uranium_gr      =   new TMultiGraph("muons_uranium","muons in uranium");
     TMultiGraph* taus_uranium_gr       =   new TMultiGraph("taus_uranium","taus in uranium");
