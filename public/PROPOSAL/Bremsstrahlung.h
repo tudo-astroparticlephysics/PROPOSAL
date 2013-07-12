@@ -2,7 +2,7 @@
 #define Bremsstrahlung_H
 
 #include <vector>
-#include "CrossSections.h"
+#include "PROPOSAL/CrossSections.h"
 #include "PROPOSAL/Integral.h"
 #include "PROPOSAL/Interpolant.h"
 #include "PROPOSAL/Medium.h"

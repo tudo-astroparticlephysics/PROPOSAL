@@ -1,3 +1,18 @@
+/** \file
+ * This is an example to plot dN/dx for Epairproduction.\n
+ * If you have ROOT installed this file will be compilied when running make\n
+ * and you can find an executable in your build directory in root_examples:\n
+ * -->   Plot_Epairproduction_dNdx   <--\n
+ * A ROOT-file named Epairproduction_dNdx.root will be generated,
+ * which contains TCanvas's with TGraphs dN/dx vs. energy.\n
+ * These TGraphs are generated for muons, taus and electrons in \n
+ * water, hydrogen and uranium \n
+ * (with and without Landau-Pomeranchuk-Migdal supression)\n.
+ * You will also find summary plots for every particle and medium.
+ * @brief Example to plot dN/dx for Epairproduction
+ * @author Jan-Hendrik Köhne
+ */
+
 #include "TGraph.h"
 #include "TCanvas.h"
 #include "PROPOSAL/Epairproduction.h"
@@ -15,6 +30,18 @@ using namespace std;
 
 int main()
 {
+
+    cout<<"\n----------------------------------------------------------------\n"
+        <<"This is an example to plot dN/dx for Epairproduction.\n"
+        <<"A ROOT-file named Epairproduction_dNdx.root will be generated,\n"
+        <<"which contains TCanvas's with TGraphs dN/dx vs. energy.\n"
+        <<"These TGraphs are generated for muons, taus and electrons in \n"
+        <<"water, hydrogen and uranium \n"
+        <<"(with and without Landau-Pomeranchuk-Migdal supression).\n"
+        <<"You will also find summary plots for every particle and medium.\n"
+        <<"----------------------------------------------------------------\n"
+        <<endl;
+
     TFile *file     =   new TFile("Epairproduction_dNdx.root","RECREATE");
 
     Particle *mu    =   new Particle("mu");

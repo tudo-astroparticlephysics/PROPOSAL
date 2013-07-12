@@ -1,3 +1,21 @@
+/** \file
+ * This is an example to plot dN/dx for Bremsstrahlung.\n
+ * If you have ROOT installed this file will be compilied when running make\n
+ * and you can find an executable in your build directory in root_examples:\n
+ * -->   Plot_Bremsstrahlung_dNdx   <--\n
+ * A ROOT-file named Bremsstrahlung_dNdx.root will be generated,
+ * which contains TCanvas's with TGraphs dN/dx vs. energy.\n
+ * These TGraphs are generated for muons, taus and electrons in
+ * water, hydrogen and uranium. All four parametrizations are shown:\n
+ * Kelner-Kakoulin-Petrukhin\n
+ * Andreev-Bezrukov-Bugaev\n
+ * Petrukhin-Shestakov\n
+ * Complete screening case\n
+ * You will also find summary plots for every particle and medium.
+ * @brief Example to plot dN/dx for Bremsstrahlung
+ * @author Jan-Hendrik Köhne
+ */
+
 #include "TGraph.h"
 #include "TCanvas.h"
 #include "PROPOSAL/Bremsstrahlung.h"
@@ -15,6 +33,20 @@ using namespace std;
 
 int main()
 {
+    cout<<"\n------------------------------------------------------------------\n"
+        <<"This is an example to plot dN/dx for Bremsstrahlung.\n"
+        <<"A ROOT-file named Bremsstrahlung_dNdx.root will be generated,\n"
+        <<"which contains TCanvas's with TGraphs dN/dx vs. energy.\n"
+        <<"These TGraphs are generated for muons, taus and electrons in\n"
+        <<"water, hydrogen and uranium. All four parametrizations are shown:\n"
+        <<"Kelner-Kakoulin-Petrukhin\n"
+        <<"Andreev-Bezrukov-Bugaev\n"
+        <<"Petrukhin-Shestakov\n"
+        <<"Complete screening case\n"
+        <<"You will also find summary plots for every particle and medium.\n"
+        <<"------------------------------------------------------------------\n"
+        <<endl;
+
     TFile *file     =   new TFile("Bremsstrahlung_dNdx.root","RECREATE");
 
     Particle *mu    =   new Particle("mu");

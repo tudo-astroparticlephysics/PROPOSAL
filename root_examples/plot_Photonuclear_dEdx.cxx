@@ -1,3 +1,32 @@
+/** \file
+ * This is an example to plot dE/dx for Photonuclear.\n
+ * If you have ROOT installed this file will be compilied when running make\n
+ * and you can find an executable in your build directory in root_examples:\n
+ * -->   Plot_Photonuclear_dEdx   <--\n
+ * A ROOT-file named Photonuclear_dEdx.root will be generated,
+ * which contains TCanvas's with TGraphs dE/dx vs. energy.\n
+ * These TGraphs are generated for muons, taus and electrons in
+ * water, hydrogen and uranium. All 14 parametrizations are shown:\n
+ * Kokoulin\n
+ * Kokoulin + hard component\n
+ * Rhode\n
+ * Rhode + hard component\n
+ * Bezrukov/Bugaev\n
+ * Bezrukov/Bugaev + hard component\n
+ * Zeus\n
+ * Zeus + hard component\n
+ * shadow=1 ALLM 91\n
+ * shadow=2 ALLM 91\n
+ * shadow=1 ALLM 97\n
+ * shadow=2 ALLM 97\n
+ * shadow=1 Butkevich/Mikhailov\n
+ * shadow=2 Butkevich/Mikhailov\n
+ * You will also find summary plots for every particle and medium.
+ * @brief Example to plot dE/dx for Photonuclear
+ * @author Jan-Hendrik Köhne
+ */
+
+
 #include "TGraph.h"
 #include "TCanvas.h"
 #include "PROPOSAL/Photonuclear.h"
@@ -15,6 +44,31 @@ using namespace std;
 
 int main()
 {
+
+    cout<<"\n-----------------------------------------------------------------\n"
+        <<"This is an example to plot dE/dx for Photonuclear.\n"
+        <<"A ROOT-file named Photonuclear_dEdx.root will be generated,\n"
+        <<"which contains TCanvas's with TGraphs dE/dx vs. energy.\n"
+        <<"These TGraphs are generated for muons, taus and electrons in\n"
+        <<"water, hydrogen and uranium. All 14 parametrizations are shown:\n"
+        <<"Kokoulin\n"
+        <<"Kokoulin + hard component\n"
+        <<"Rhode\n"
+        <<"Rhode + hard component\n"
+        <<"Bezrukov/Bugaev\n"
+        <<"Bezrukov/Bugaev + hard component\n"
+        <<"Zeus\n"
+        <<"Zeus + hard component\n"
+        <<"shadow=1 ALLM 91\n"
+        <<"shadow=2 ALLM 91\n"
+        <<"shadow=1 ALLM 97\n"
+        <<"shadow=2 ALLM 97\n"
+        <<"shadow=1 Butkevich/Mikhailov\n"
+        <<"shadow=2 Butkevich/Mikhailov\n"
+        <<"You will also find summary plots for every particle and medium.\n"
+        <<"-----------------------------------------------------------------\n"
+        <<endl;
+
     TFile *file     =   new TFile("Photonuclear_dEdx.root","RECREATE");
 
     Particle *mu    =   new Particle("mu");
