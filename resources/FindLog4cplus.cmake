@@ -6,11 +6,18 @@
 
 
 find_path(LOG4CPLUS_INCLUDE_DIR log4cplus/config.hxx
-          PATH_SUFFIXES log4cplus )
+                PATHS
+                        ENV CPLUS_INCLUDE_PATH
+                        ENV C_INCLUDE_PATH
+
+                PATH_SUFFIXES
+                        log4cplus )
 
 find_library(LOG4CPLUS_LIBRARY NAMES log4cplus
-             PATHS /usr)
-
+             PATHS
+                /usr
+                ENV LD_LIBRARY_PATH
+)
 set(LOG4CPLUS_LIBRARIES ${LOG4CPLUS_LIBRARY} )
 set(LOG4CPLUS_INCLUDE_DIRS ${LOG4CPLUS_INCLUDE_DIR} )
 
