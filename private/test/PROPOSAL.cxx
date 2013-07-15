@@ -12,6 +12,15 @@
 #include "PROPOSAL/StandardNormal.h"
 
 
+
+//Stuff for LOG4CPLUS
+#include <log4cplus/logger.h>
+#include <log4cplus/loggingmacros.h>
+#include <log4cplus/configurator.h>
+#include <log4cplus/layout.h>
+#include <iomanip>
+
+using namespace log4cplus;
 using namespace std;
 
 //double integrate(double min, double max, int N, double (*func)(double) ){
@@ -315,13 +324,24 @@ int main(int argc, char** argv){
 //    cout << *(scat->GetParticle()) << endl;
 //    }
 
-    StandardNormal *bla = new StandardNormal(5,10,12-6);
-    bla->EnableInterpolation("resources/tables");
 
-    double dx = 45.2;
-    log_warn("warning");
-     log_info("info");
-     log_error("error "<<dx);
+    int b = 213;
+    double blah = sqrt(3.)*sqrt(2.);
+
+
+    PropertyConfigurator::doConfigure(LOG4CPLUS_TEXT("resources/log4cplus.conf"));
+    Logger logger;
+    logger = Logger::getInstance(LOG4CPLUS_TEXT("main"));
+
+    LOG4CPLUS_ERROR_FMT(logger, "ERROR!!! %d \n" , b );
+    LOG4CPLUS_INFO_FMT(logger,
+        LOG4CPLUS_TEXT (
+            "Actually doing something...%d, %d, %d, %ls...DONE"),
+        1, 2, 3, L"testing");
+     LOG4CPLUS_WARN(logger, "WARNING!! " << setprecision(16) << blah);
+     LOG4CPLUS_INFO(logger, "INFO! " << blah);
+    LOG4CPLUS_TRACE(logger, LOG4CPLUS_TEXT("TRACE"));
+
 
 
 
