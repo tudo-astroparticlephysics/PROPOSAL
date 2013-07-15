@@ -47,7 +47,10 @@ if(DEBUG)
         set( CMAKE_CXX_FLAGS "-g -pg -O0" )
 endif()
 
-include_directories("${PROJECT_SOURCE_DIR}/public" ${GTEST_INCLUDE_DIR} ${LOG4CPLUS_INCLUDE_DIR} ${Boost_INCLUDE_DIR})
+SET(ICETRAY_INCLUDE_PATH "/home/koehne/Simulation/icesim4_candidate/V04-00-01-RC/icetray/public/")
+
+include_directories("${PROJECT_SOURCE_DIR}/public" ${GTEST_INCLUDE_DIR} ${LOG4CPLUS_INCLUDE_DIR} ${Boost_INCLUDE_DIR} )#${ICETRAY_INCLUDE_PATH})
+
 
 add_library(PROPOSAL
         private/PROPOSAL/Integral.cxx
@@ -70,6 +73,7 @@ add_library(PROPOSAL
         private/PROPOSAL/ContinuousRandomization.cxx
         private/PROPOSAL/Geometry.cxx
         private/PROPOSAL/Scattering.cxx
+        private/PROPOSAL/Output.cxx
 	)
 
 set_target_properties(PROPOSAL PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -O2 -Wall -Werror")# -Wextra -pedantic")
@@ -79,6 +83,7 @@ target_link_libraries(PROPOSAL ${Boost_LIBRARIES} ${LOG4CPLUS_LIBRARIES})
 add_executable(PROPOSALtest
         private/test/PROPOSAL.cxx
 )
+#set_target_properties(PROPOSALtest PROPERTIES LINK_FLAGS "-L/home/koehne/Simulation/icesim4_candidate/buildV04-00-01-RC/lib")
 
 target_link_libraries(PROPOSALtest PROPOSAL)
 

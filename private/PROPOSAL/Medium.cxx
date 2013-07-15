@@ -13,6 +13,7 @@
 #include "PROPOSAL/Integral.h"
 #include "boost/bind.hpp"
 #include <iomanip>
+#include "PROPOSAL/Output.h"
 
 
 using namespace std;
@@ -56,7 +57,7 @@ Medium::Medium()
     ,sumNucleons_       (0)
     ,r0_                (0)
 {
-    cerr<<"Warning (in Medium/Medium): Standard constructor called: defaulting to water"<<endl;
+    log_warn("Warning (in Medium/Medium): Standard constructor called: defaulting to water");
     InitWater();
 }
 

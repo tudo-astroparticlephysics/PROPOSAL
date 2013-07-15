@@ -11,6 +11,8 @@
 #include "PROPOSAL/StandardNormal.h"
 #include <algorithm>
 #include <sstream>
+#include "PROPOSAL/Output.h"
+
 
 using namespace std;
 
@@ -119,8 +121,7 @@ void StandardNormal::EnableInterpolation(std::string path, bool raw)
 
         if( FileExist(filename.str()) )
         {
-            cerr<<"Info: StandardNormal parametrisation tables will be read from file:"<<endl;
-            cerr<<"\t"<<filename.str()<<endl;
+            log_info("StandardNormal parametrisation tables will be read from file:\t"<<filename.str());
             ifstream input;
 
             if(raw)
@@ -141,11 +142,10 @@ void StandardNormal::EnableInterpolation(std::string path, bool raw)
         {
             if(!reading_worked)
             {
-                cerr<<"Info: file "<<filename.str()<<" is corrupted! Write is again!"<< endl;
+                log_info("File "<<filename.str()<<" is corrupted! Write it again!");
             }
 
-            cerr<<"Info: StandardNormal parametrisation tables will be saved to file:"<<endl;
-            cerr<<"\t"<<filename.str()<<endl;
+            log_info("StandardNormal parametrisation tables will be saved to file:\t"<<filename.str());
 
             ofstream output;
 
@@ -168,8 +168,7 @@ void StandardNormal::EnableInterpolation(std::string path, bool raw)
             else
             {
                 storing_failed  =   true;
-                cerr<<"Warning: Can not open file "<<filename.str()<<" for writing!"<<endl;
-                cerr<<"\t Table will not be stored!"<<endl;
+                log_warn("Can not open file "<<filename.str()<<" for writing!\t Table will not be stored!");
             }
 
             output.close();

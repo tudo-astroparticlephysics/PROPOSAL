@@ -8,15 +8,10 @@
 #include "PROPOSAL/Propagator.h"
 #include "PROPOSAL/ContinuousRandomization.h"
 #include "PROPOSAL/Geometry.h"
+#include "PROPOSAL/Output.h"
+#include "PROPOSAL/StandardNormal.h"
 
 
-//Stuff for LOG4CPLUS
-#include <log4cplus/logger.h>
-#include <log4cplus/loggingmacros.h>
-#include <log4cplus/configurator.h>
-#include <iomanip>
-
-using namespace log4cplus;
 using namespace std;
 
 //double integrate(double min, double max, int N, double (*func)(double) ){
@@ -320,13 +315,14 @@ int main(int argc, char** argv){
 //    cout << *(scat->GetParticle()) << endl;
 //    }
 
+    StandardNormal *bla = new StandardNormal(5,10,12-6);
+    bla->EnableInterpolation("resources/tables");
 
-    PropertyConfigurator::doConfigure(LOG4CPLUS_TEXT("resources/log4cplus.conf"));
-    Logger logger;
-     logger = Logger::getInstance(LOG4CPLUS_TEXT("main"));
-  //  LOG4CPLUS_ERROR(logger, LOG4CPLUS_TEXT("ERROR!!!"));
-     LOG4CPLUS_WARN(logger, LOG4CPLUS_TEXT("WARNING!!"));
-     LOG4CPLUS_INFO(logger, LOG4CPLUS_TEXT("INFO!"));
-    LOG4CPLUS_TRACE(logger, LOG4CPLUS_TEXT("TRACE"));
+    double dx = 45.2;
+    log_warn("warning");
+     log_info("info");
+     log_error("error "<<dx);
+
+
 
 }
