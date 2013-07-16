@@ -324,7 +324,13 @@ int main(int argc, char** argv){
 
 
     int b =4;
-    log_arsch("a");
+    log_warn("a");
+    log_warn("a%i",1);
+    log_warn("a%i",2);
+    log_warn("a");
+    log_warn("a%i%i%i%i",3,3,3,3);
+    log_warn("a");
+
     //log_arsch("a2 %i\n",2);
 
   //  cout<<VA_COUNT("a2 %i")<<endl;

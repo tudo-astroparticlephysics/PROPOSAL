@@ -152,7 +152,7 @@ bool Scattering::operator==(const Scattering &scattering) const
         }
         else
         {
-            //log_fatal("In copy constructor of Scattering: Error: Unknown crossSection");
+            log_fatal("In copy constructor of Scattering: Error: Unknown crossSection");
             exit(1);
         }
     }
