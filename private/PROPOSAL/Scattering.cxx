@@ -18,6 +18,7 @@
 #include "PROPOSAL/Bremsstrahlung.h"
 #include "PROPOSAL/Epairproduction.h"
 #include "PROPOSAL/Photonuclear.h"
+#include "PROPOSAL/Output.h"
 
 using namespace std;
 
@@ -151,7 +152,7 @@ bool Scattering::operator==(const Scattering &scattering) const
         }
         else
         {
-            cout<<"In copy constructor of Scattering: Error: Unknown crossSection"<<endl;
+            //log_fatal("In copy constructor of Scattering: Error: Unknown crossSection");
             exit(1);
         }
     }
@@ -510,8 +511,7 @@ void Scattering::EnableInterpolation(string path)
 
         if( FileExist(filename.str()) )
         {
-            cerr<<"Info: Scattering tables will be read from file:"<<endl;
-            cerr<<"\t"<<filename.str()<<endl;
+            log_info( "Scattering tables will be read from file:\t%s",filename.str().c_str());
             ifstream input;
 
             input.open(filename.str().c_str());
@@ -528,11 +528,10 @@ void Scattering::EnableInterpolation(string path)
         {
             if(!reading_worked)
             {
-                cerr<<"Info: file "<<filename.str()<<" is corrupted! Write is again!"<< endl;
+                log_info( "File %s is corrupted! Write it again!",filename.str().c_str());
             }
 
-            cerr<<"Info: Scattering tables will be saved to file:"<<endl;
-            cerr<<"\t"<<filename.str()<<endl;
+            log_info("Scattering tables will be saved to file:\t%s",filename.str().c_str());
 
             double energy = particle_->GetEnergy();
 
@@ -552,8 +551,7 @@ void Scattering::EnableInterpolation(string path)
             else
             {
                 storing_failed  =   true;
-                cerr<<"Warning: Can not open file "<<filename.str()<<" for writing!"<<endl;
-                cerr<<"\t Table will not be stored!"<<endl;
+                log_warn("Can not open file %s for writing! Table will not be stored!",filename.str().c_str());
             }
             particle_->SetEnergy(energy);
 

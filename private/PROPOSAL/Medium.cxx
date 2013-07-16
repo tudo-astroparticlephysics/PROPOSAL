@@ -57,7 +57,7 @@ Medium::Medium()
     ,sumNucleons_       (0)
     ,r0_                (0)
 {
-    log_warn("Warning (in Medium/Medium): Standard constructor called: defaulting to water");
+//    log_warn("Standard constructor called: defaulting to water");
     InitWater();
 }
 

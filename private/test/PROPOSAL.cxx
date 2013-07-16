@@ -325,24 +325,30 @@ int main(int argc, char** argv){
 //    }
 
 
-    int b = 213;
-    double blah = sqrt(3.)*sqrt(2.);
+    int b =4;
+    log_arsch("Hallo %i, %i\n",4,4);
+
+//    int b = 213;
+//    double blah = sqrt(3.)*sqrt(2.);
 
 
-    PropertyConfigurator::doConfigure(LOG4CPLUS_TEXT("resources/log4cplus.conf"));
-    Logger logger;
-    logger = Logger::getInstance(LOG4CPLUS_TEXT("main"));
+//    PropertyConfigurator::doConfigure(LOG4CPLUS_TEXT("resources/log4cplus.conf"));
+//    Logger logger;
+//    logger = Logger::getInstance(LOG4CPLUS_TEXT("main"));
 
-    LOG4CPLUS_ERROR_FMT(logger, "ERROR!!! %d \n" , b );
-    LOG4CPLUS_INFO_FMT(logger,
-        LOG4CPLUS_TEXT (
-            "Actually doing something...%d, %d, %d, %ls...DONE"),
-        1, 2, 3, L"testing");
-     LOG4CPLUS_WARN(logger, "WARNING!! " << setprecision(16) << blah);
-     LOG4CPLUS_INFO(logger, "INFO! " << blah);
-    LOG4CPLUS_TRACE(logger, LOG4CPLUS_TEXT("TRACE"));
+//    LOG4CPLUS_FATAL_FMT(logger, "ERROR!!! %d \n" , b );
+//    LOG4CPLUS_FATAL(logger, "ERROR!!!");
 
+////    LOG4CPLUS_INFO_FMT(logger,
+////        LOG4CPLUS_TEXT (
+////            "Actually doing something...%d, %d, %d, %ls...DONE"),
+////        1, 2, 3, L"testing");
+////     LOG4CPLUS_WARN(logger, "WARNING!! " << setprecision(16) << blah);
+////     LOG4CPLUS_INFO(logger, "INFO! " << blah);
+////    LOG4CPLUS_TRACE(logger, LOG4CPLUS_TEXT("TRACE"));
 
+//    StandardNormal *s = new StandardNormal(5,10,1e-6);
+//    s->EnableInterpolation("resources/table");
 
 
 }

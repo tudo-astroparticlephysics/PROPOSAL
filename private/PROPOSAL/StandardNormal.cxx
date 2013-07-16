@@ -121,7 +121,7 @@ void StandardNormal::EnableInterpolation(std::string path, bool raw)
 
         if( FileExist(filename.str()) )
         {
-            log_info("StandardNormal parametrisation tables will be read from file:\t"<<filename.str());
+            log_info("StandardNormal parametrisation tables will be read from file:\t%s",filename.str().c_str());
             ifstream input;
 
             if(raw)
@@ -142,10 +142,10 @@ void StandardNormal::EnableInterpolation(std::string path, bool raw)
         {
             if(!reading_worked)
             {
-                log_info("File "<<filename.str()<<" is corrupted! Write it again!");
+                log_info("File %s is corrupted! Write it again!",filename.str().c_str());
             }
 
-            log_info("StandardNormal parametrisation tables will be saved to file:\t"<<filename.str());
+            log_info("StandardNormal parametrisation tables will be saved to file:\t%s",filename.str().c_str());
 
             ofstream output;
 
@@ -168,7 +168,7 @@ void StandardNormal::EnableInterpolation(std::string path, bool raw)
             else
             {
                 storing_failed  =   true;
-                log_warn("Can not open file "<<filename.str()<<" for writing!\t Table will not be stored!");
+                log_warn("Can not open file %s for writing! Table will not be stored!",filename.str().c_str());
             }
 
             output.close();
