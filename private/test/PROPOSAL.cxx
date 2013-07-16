@@ -322,13 +322,14 @@ int main(int argc, char** argv){
 //    cout << *(scat->GetParticle()) << endl;
 //    }
 
+    cout<<BOOST_PP_LIMIT_TUPLE<<endl;
 
     int b =4;
     log_warn("a");
     log_warn("a%i",1);
     log_warn("a%i",2);
     log_warn("a");
-    log_warn("a%i%i%i%i",3,3,3,3);
+    log_warn("a %i %i %i %i %i %i %i %i %i %i %i %i",3,33,3,3,33,3,4,4,4,4,4,4);
     log_warn("a");
 
     //log_arsch("a2 %i\n",2);
@@ -353,8 +354,8 @@ int main(int argc, char** argv){
 ////     LOG4CPLUS_INFO(logger, "INFO! " << blah);
 ////    LOG4CPLUS_TRACE(logger, LOG4CPLUS_TEXT("TRAC//E"));
 
-//    StandardNormal *s = new StandardNormal(5,10,1e-6);
-//    s->EnableInterpolation("resources/table");
+    StandardNormal *s = new StandardNormal(5,10,1e-6);
+    s->EnableInterpolation("resources/table");
 
 
 }
