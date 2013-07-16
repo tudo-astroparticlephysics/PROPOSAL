@@ -11,8 +11,6 @@
 #include "PROPOSAL/Output.h"
 #include "PROPOSAL/StandardNormal.h"
 
-
-
 //Stuff for LOG4CPLUS
 #include <log4cplus/logger.h>
 #include <log4cplus/loggingmacros.h>
@@ -326,8 +324,10 @@ int main(int argc, char** argv){
 
 
     int b =4;
-    log_arsch("Hallo %i, %i\n",4,4);
+    log_arsch("a");
+    //log_arsch("a2 %i\n",2);
 
+  //  cout<<VA_COUNT("a2 %i")<<endl;
 //    int b = 213;
 //    double blah = sqrt(3.)*sqrt(2.);
 
@@ -345,7 +345,7 @@ int main(int argc, char** argv){
 ////        1, 2, 3, L"testing");
 ////     LOG4CPLUS_WARN(logger, "WARNING!! " << setprecision(16) << blah);
 ////     LOG4CPLUS_INFO(logger, "INFO! " << blah);
-////    LOG4CPLUS_TRACE(logger, LOG4CPLUS_TEXT("TRACE"));
+////    LOG4CPLUS_TRACE(logger, LOG4CPLUS_TEXT("TRAC//E"));
 
 //    StandardNormal *s = new StandardNormal(5,10,1e-6);
 //    s->EnableInterpolation("resources/table");
