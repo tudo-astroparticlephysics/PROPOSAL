@@ -140,7 +140,9 @@ TEST(IsInside , Box ) {
         y0   =   ( 2 * rnd_y  - 1)* 0.5 *( big_width_y - width_y );
         z0   =   ( 2 * rnd_z  - 1)* 0.5 *( big_height  - height  );
 
-        A.InitBox(x0,y0,z0,width_x,width_y,height);
+        // The values are divided by 100 to convert the units...
+        // Init functions expects m but here everthing is in cm
+        A.InitBox(x0/100,y0/100,z0/100,width_x/100,width_y/100,height/100);
 
         volumia_ratio = width_x*width_y*height /( big_width_x*big_width_y*big_height);
         for(int j = 0; j<number_particles; j++)
@@ -190,7 +192,9 @@ TEST(IsInside , Box ) {
     }
     // Check what happens if particles are on the border of the box
 
-    A.InitBox(0,0,0,width_x,width_y,height);
+    // The values are divided by 100 to convert the units...
+    // Init functions expects m but here everthing is in cm
+    A.InitBox(0,0,0,width_x/100,width_y/100,height/100);
 
     // Particle is on the top surface.
     // Theta 0° - 90° means particle is moving outside
@@ -415,7 +419,9 @@ TEST(IsInside , Cylinder ) {
 
         inner_radius    = radius*rnd_inner_radius;
 
-        A.InitCylinder(x0,y0,z0,radius,inner_radius,height);
+        // The values are divided by 100 to convert the units...
+        // Init functions expects m but here everthing is in cm
+        A.InitCylinder(x0/100,y0/100,z0/100,radius/100,inner_radius/100,height/100);
 
         volumia_ratio = height*PI*( pow(radius,2) - pow(inner_radius,2) )
                 /( big_width_x*big_width_y*big_height);
@@ -466,7 +472,10 @@ TEST(IsInside , Cylinder ) {
     }
 
     // Test borders
-    A.InitSphere(0,0,0,radius,0);
+
+    // The values are divided by 100 to convert the units...
+    // Init functions expects m but here everthing is in cm
+    A.InitSphere(0,0,0,radius/100,0);
 
     z=0;
     particle->SetZ(z);
@@ -523,7 +532,10 @@ TEST(IsInside , Cylinder ) {
     particle->SetX(0);
     particle->SetY(0);
     particle->SetZ(0.5*height);
-    A.InitCylinder(0,0,0,radius,0,height);
+
+    // The values are divided by 100 to convert the units...
+    // Init functions expects m but here everthing is in cm
+    A.InitCylinder(0,0,0,radius/100,0,height/100);
 
     for(int i = 0; i<1e4; i++)
     {
@@ -570,7 +582,10 @@ TEST(IsInside , Cylinder ) {
 
     // Test inner border
     inner_radius    =   5;
-    A.InitCylinder(0,0,0,radius,inner_radius,height);
+
+    // The values are divided by 100 to convert the units...
+    // Init functions expects m but here everthing is in cm
+    A.InitCylinder(0,0,0,radius/100,inner_radius/100,height/100);
 
     z=0;
     particle->SetZ(z);
@@ -671,7 +686,9 @@ TEST(IsInside , Sphere ) {
 
         inner_radius    = radius*rnd_inner_radius;
 
-        A.InitSphere(x0,y0,z0,radius,inner_radius);
+        // The values are divided by 100 to convert the units...
+        // Init functions expects m but here everthing is in cm
+        A.InitSphere(x0/100,y0/100,z0/100,radius/100,inner_radius/100);
 
         volumia_ratio = (4./3.*PI* ( pow(radius ,3)  - pow(inner_radius ,3) ) )
                         /( big_width_x*big_width_y*big_height);
@@ -719,7 +736,10 @@ TEST(IsInside , Sphere ) {
     }
 
     // Test borders
-    A.InitSphere(0,0,0,radius,0);
+
+    // The values are divided by 100 to convert the units...
+    // Init functions expects m but here everthing is in cm
+    A.InitSphere(0,0,0,radius/100,0);
 
     z=0;
     particle->SetZ(z);
@@ -766,7 +786,10 @@ TEST(IsInside , Sphere ) {
 
     // Test inner border
     inner_radius    =   5;
-    A.InitSphere(0,0,0,radius,inner_radius);
+
+    // The values are divided by 100 to convert the units...
+    // Init functions expects m but here everthing is in cm
+    A.InitSphere(0,0,0,radius/100,inner_radius/100);
 
     z=0;
     particle->SetZ(z);
@@ -847,7 +870,9 @@ TEST(DistanceTo , Sphere ) {
             rnd_inner_radius    = M.RandomDouble();
             inner_radius        = radius*rnd_inner_radius;
 
-            A.InitSphere(0,0,0,radius,inner_radius);
+            // The values are divided by 100 to convert the units...
+            // Init functions expects m but here everthing is in cm
+            A.InitSphere(0,0,0,radius/100,inner_radius/100);
 
             rnd_phi             = M.RandomDouble();
             rnd_theta           = M.RandomDouble();
@@ -978,7 +1003,9 @@ TEST(DistanceTo , Cylinder ) {
             rnd_inner_radius    = M.RandomDouble();
             inner_radius        = radius*rnd_inner_radius;
 
-            A.InitCylinder(0,0,0,radius,inner_radius,height);
+            // The values are divided by 100 to convert the units...
+            // Init functions expects m but here everthing is in cm
+            A.InitCylinder(0,0,0,radius/100,inner_radius/100,height/100);
 
             rnd_phi             = M.RandomDouble();
 
@@ -1067,7 +1094,10 @@ TEST(DistanceTo , Cylinder ) {
 
     //One test for inner_radius =0
     inner_radius    =   0;
-    A.InitCylinder(0,0,0,radius,inner_radius,height);
+
+    // The values are divided by 100 to convert the units...
+    // Init functions expects m but here everthing is in cm
+    A.InitCylinder(0,0,0,radius/100,inner_radius/100,height/100);
 
     // Chose particle location and angle
 
@@ -1090,7 +1120,10 @@ TEST(DistanceTo , Cylinder ) {
     double alpha;
 
     inner_radius    =   6;
-    A.InitCylinder(0,0,0,radius,inner_radius,height);
+
+    // The values are divided by 100 to convert the units...
+    // Init functions expects m but here everthing is in cm
+    A.InitCylinder(0,0,0,radius/100,inner_radius/100,height/100);
 
     for(int j = 0; j<number_particles; j++)
     {
@@ -1239,7 +1272,9 @@ TEST(DistanceTo , Box ) {
     {
         rnd_phi =   M.RandomDouble();
 
-        A.InitBox(0,0,0,width,width,height);
+        // The values are divided by 100 to convert the units...
+        // Init functions expects m but here everthing is in cm
+        A.InitBox(0,0,0,width/100,width/100,height/100);
 
         phi     =   rnd_phi*2*PI;
         theta   =   0.5*PI;
