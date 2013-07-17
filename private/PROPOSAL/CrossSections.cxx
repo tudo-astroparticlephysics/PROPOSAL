@@ -14,6 +14,7 @@ CrossSections::CrossSections( )
     ,vUp_                   ( 0 )
     ,vMin_                  ( 0 )
     ,ebig_                  ( BIGENERGY )
+    ,rnd_                   ( 0 )
     ,do_dedx_Interpolation_ ( false )
     ,do_dndx_Interpolation_ ( false )
     ,multiplier_            ( 1. )
@@ -40,6 +41,7 @@ CrossSections::CrossSections(Particle* particle,
     ,vUp_                   ( 0 )
     ,vMin_                  ( 0 )
     ,ebig_                  ( BIGENERGY )
+    ,rnd_                   ( 0 )
     ,do_dedx_Interpolation_ ( false )
     ,do_dndx_Interpolation_ ( false )
     ,multiplier_            ( 1. )
@@ -65,6 +67,7 @@ CrossSections::CrossSections(const CrossSections& crossSections)
     ,vUp_                      ( crossSections.vUp_ )
     ,vMin_                     ( crossSections.vMin_ )
     ,ebig_                     ( crossSections.ebig_ )
+    ,rnd_                      ( crossSections.rnd_ )
     ,do_dedx_Interpolation_    ( crossSections.do_dedx_Interpolation_ )
     ,do_dndx_Interpolation_    ( crossSections.do_dndx_Interpolation_ )
     ,multiplier_               ( crossSections.multiplier_ )
@@ -93,6 +96,7 @@ bool CrossSections::operator==(const CrossSections &crossSections) const
     if( vUp_                      != crossSections.vUp_ )                   return false;
     if( vMin_                     != crossSections.vMin_ )                  return false;
     if( ebig_                     != crossSections.ebig_ )                  return false;
+    if( rnd_                      != crossSections.rnd_ )                   return false;
     if( do_dedx_Interpolation_    != crossSections.do_dedx_Interpolation_ ) return false;
     if( do_dndx_Interpolation_    != crossSections.do_dndx_Interpolation_ ) return false;
     if( multiplier_               != crossSections.multiplier_ )            return false;
@@ -135,6 +139,7 @@ void CrossSections::swap(CrossSections &crossSections)
     swap( vUp_                      , crossSections.vUp_ );
     swap( vMin_                     , crossSections.vMin_ );
     swap( ebig_                     , crossSections.ebig_ );
+    swap( rnd_                      , crossSections.rnd_ );
     swap( do_dedx_Interpolation_    , crossSections.do_dedx_Interpolation_ );
     swap( do_dndx_Interpolation_    , crossSections.do_dndx_Interpolation_ );
     swap( multiplier_               , crossSections.multiplier_ );

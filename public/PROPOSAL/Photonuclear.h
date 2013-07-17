@@ -179,6 +179,9 @@ protected:
     double FunctionToBuildDNdxInterpolant2D(double energy, double v);
 
 //----------------------------------------------------------------------------//
+    double CalculateStochasticLoss(double rnd1);
+
+//----------------------------------------------------------------------------//
 
 public:
 
@@ -226,9 +229,7 @@ public:
     void DisableDNdxInterpolation();
 
 //----------------------------------------------------------------------------//
-    double CalculateStochasticLoss(double rnd1);
 
-//----------------------------------------------------------------------------//
     void DisableDEdxInterpolation();
 
 //----------------------------------------------------------------------------//

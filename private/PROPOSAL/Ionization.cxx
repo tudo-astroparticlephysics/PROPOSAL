@@ -82,6 +82,12 @@ double Ionization::CalculatedNdx(double rnd)
         return 0;
     }
 
+    // The random number will be stored to be able
+    // to check if dNdx is already calculated for this random number.
+    // This avoids a second calculation in CalculateStochaticLoss
+
+    rnd_    =   rnd;
+
     if(do_dndx_Interpolation_)
     {
         return sum_of_rates_ = max(dndx_interpolant_1d_->Interpolate(particle_->GetEnergy()), 0.);
@@ -98,73 +104,14 @@ double Ionization::CalculatedNdx(double rnd)
 //----------------------------------------------------------------------------//
 
 
-double Ionization::CalculateStochasticLoss(double rnd)
-{
-    double rand, rsum;
-
-    rand=medium_->GetSumCharge()*rnd;
-    rsum=0;
-
-    for(int i=0; i<medium_->GetNumCompontents(); i++){
-        rsum+=medium_->GetAtomInMolecule().at(i)* medium_->GetNucCharge().at(i);
-
-        if(rsum>rand){
-
-            if(do_dndx_Interpolation_)
-            {
-                SetIntegralLimits(0);
-                if(vUp_==vMax_){
-                    return particle_->GetEnergy()*vUp_;
-                }
-                return particle_->GetEnergy()*(vUp_*exp(dndx_interpolant_2d_->FindLimit(particle_->GetEnergy(), rnd*sum_of_rates_)*log(vMax_/vUp_)));
-            }
-            else
-            {
-                return particle_->GetEnergy()*integral_->GetUpperLimit();
-            }
-        }
-    }
-
-    cerr<<"Error (in IonizStochastic/e): m.totZ was not initialized correctly"<<endl;
-        return 0;
-}
-
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
 double Ionization::CalculateStochasticLoss(double rnd1, double rnd2)
-{
-    double rand, rsum;
-
-    double sum = this->CalculatedNdx(rnd1);
-
-    rand=medium_->GetSumCharge()*rnd2;
-    rsum=0;
-
-    for(int i=0; i<medium_->GetNumCompontents(); i++){
-        rsum+=medium_->GetAtomInMolecule().at(i)* medium_->GetNucCharge().at(i);
-
-        if(rsum>rand){
-
-            if(do_dndx_Interpolation_)
-            {
-                SetIntegralLimits(0);
-                if(vUp_==vMax_){
-                    return particle_->GetEnergy()*vUp_;
-                }
-                return particle_->GetEnergy()*(vUp_*exp(dndx_interpolant_2d_->FindLimit(particle_->GetEnergy(), rnd1*sum)*log(vMax_/vUp_)));
-            }
-            else
-            {
-                return particle_->GetEnergy()*integral_->GetUpperLimit();
-            }
-        }
+{   
+    if(rnd1 != rnd_ )
+    {
+        CalculatedNdx(rnd1);
     }
 
-    cerr<<"Error (in IonizStochastic/e): m.totZ was not initialized correctly"<<endl;
-        return 0;
+    return CalculateStochasticLoss(rnd2);
 }
 
 
@@ -664,6 +611,42 @@ void Ionization::swap(Ionization &ioniz)
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 //----------------------Cross section / limit / private-----------------------//
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+double Ionization::CalculateStochasticLoss(double rnd)
+{
+    double rand, rsum;
+
+    rand=medium_->GetSumCharge()*rnd;
+    rsum=0;
+
+    for(int i=0; i<medium_->GetNumCompontents(); i++){
+        rsum+=medium_->GetAtomInMolecule().at(i)* medium_->GetNucCharge().at(i);
+
+        if(rsum>rand){
+
+            if(do_dndx_Interpolation_)
+            {
+                SetIntegralLimits(0);
+                if(vUp_==vMax_){
+                    return particle_->GetEnergy()*vUp_;
+                }
+                return particle_->GetEnergy()*(vUp_*exp(dndx_interpolant_2d_->FindLimit(particle_->GetEnergy(), rnd*sum_of_rates_)*log(vMax_/vUp_)));
+            }
+            else
+            {
+                return particle_->GetEnergy()*integral_->GetUpperLimit();
+            }
+        }
+    }
+
+    cerr<<"Error (in IonizStochastic/e): m.totZ was not initialized correctly"<<endl;
+        return 0;
+}
+
+
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 

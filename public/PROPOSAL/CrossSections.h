@@ -45,6 +45,9 @@ protected:
 
     double ebig_;   //!< upper bound of parameterizations
 
+    double rnd_;    //!< This random number will be stored in CalculateDNdx to avoid calculate dNdx a second time in ClaculateSochasticLoss when it is already done
+
+
     // Interpolation flags
     bool do_dedx_Interpolation_;
     bool do_dndx_Interpolation_;
@@ -62,6 +65,10 @@ protected:
 //----------------------------------------------------------------------------//
 
     virtual double FunctionToDEdxIntegral(double variable) = 0;
+
+//----------------------------------------------------------------------------//
+
+    virtual double CalculateStochasticLoss(double rnd1) = 0;
 
 //----------------------------------------------------------------------------//
 
@@ -94,10 +101,6 @@ public:
 //----------------------------------------------------------------------------//
 
     virtual double CalculatedNdx(double rnd) = 0;
-
-//----------------------------------------------------------------------------//
-
-    virtual double CalculateStochasticLoss(double rnd1) = 0;
 
 //----------------------------------------------------------------------------//
 
