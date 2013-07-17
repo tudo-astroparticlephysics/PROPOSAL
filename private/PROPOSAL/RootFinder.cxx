@@ -9,6 +9,7 @@
 #include "stdio.h"
 #include <cmath>
 #include <iostream>
+#include "PROPOSAL/Output.h"
 
 using namespace std;
 
@@ -46,7 +47,7 @@ double RootFinder::FindRoot(double min,
 
     if(fmin*fmax>0)
     {
-        printf("Warning (in RootFinder/RootFinder): Root must be bracketed\n");
+        log_warn("Root must be bracketed");
         //return min;
     }
 
@@ -126,7 +127,7 @@ double RootFinder::FindRoot(double min,
 
     if(i==maxSteps_)
     {
-        cerr<<"Warning (in RootFinder/RootFinder): Precision"<<precision_<<" has not been reached after " << maxSteps_<<" steps"<<endl;
+        log_warn("Precision %e has not been reached after %i steps",precision_, maxSteps_);
     }
 
     return currentX;
