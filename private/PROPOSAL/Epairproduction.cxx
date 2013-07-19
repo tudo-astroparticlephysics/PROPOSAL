@@ -1,6 +1,7 @@
 #include "PROPOSAL/Epairproduction.h"
 #include <algorithm>
 #include "boost/bind.hpp"
+#include "PROPOSAL/Output.h"
 
 
 using namespace std;
@@ -199,8 +200,7 @@ void Epairproduction::EnableDNdxInterpolation(std::string path, bool raw)
 
         if( FileExist(filename.str()) )
         {
-            cerr<<"Info: Epairproduction parametrisation tables (dNdx) will be read from file:"<<endl;
-            cerr<<"\t"<<filename.str()<<endl;
+            log_info("Epairproduction parametrisation tables (dNdx) will be read from file:\t%s",filename.str().c_str());
             ifstream input;
 
             if(raw)
@@ -227,11 +227,10 @@ void Epairproduction::EnableDNdxInterpolation(std::string path, bool raw)
         {
             if(!reading_worked)
             {
-                cerr<<"Info: file "<<filename.str()<<" is corrupted! Write is again!"<< endl;
+                log_info("File %s is corrupted! Write it again!",filename.str().c_str());
             }
 
-            cerr<<"Info: Epairproduction parametrisation tables (dNdx) will be saved to file:"<<endl;
-            cerr<<"\t"<<filename.str()<<endl;
+            log_info("Epairproduction parametrisation tables (dNdx) will be saved to file:\t%s",filename.str().c_str());
 
             double energy = particle_->GetEnergy();
 
@@ -265,8 +264,7 @@ void Epairproduction::EnableDNdxInterpolation(std::string path, bool raw)
             else
             {
                 storing_failed  =   true;
-                cerr<<"Warning: Can not open file "<<filename.str()<<" for writing!"<<endl;
-                cerr<<"\t Table will not be stored!"<<endl;
+                log_warn("Can not open file %s for writing! Table will not be stored!",filename.str().c_str());
             }
             particle_->SetEnergy(energy);
 
@@ -322,8 +320,7 @@ void Epairproduction::EnableDEdxInterpolation(std::string path, bool raw)
 
         if( FileExist(filename.str()) )
         {
-            cerr<<"Info: Epairproduction parametrisation tables (dEdx) will be read from file:"<<endl;
-            cerr<<"\t"<<filename.str()<<endl;
+            log_info("Epairproduction parametrisation tables (dEdx) will be read from file:\t%s",filename.str().c_str());
             ifstream input;
 
             if(raw)
@@ -344,11 +341,10 @@ void Epairproduction::EnableDEdxInterpolation(std::string path, bool raw)
         {
             if(!reading_worked)
             {
-                cerr<<"Info: file "<<filename.str()<<" is corrupted! Write is again!"<< endl;
+                log_info("File %s is corrupted! Write it again!",filename.str().c_str());
             }
 
-            cerr<<"Info: Epairproduction parametrisation tables (dEdx) will be saved to file:"<<endl;
-            cerr<<"\t"<<filename.str()<<endl;
+            log_info("Epairproduction parametrisation tables (dEdx) will be saved to file:\t%s",filename.str().c_str());
 
             double energy = particle_->GetEnergy();
 
@@ -374,8 +370,7 @@ void Epairproduction::EnableDEdxInterpolation(std::string path, bool raw)
             else
             {
                 storing_failed  =   true;
-                cerr<<"Warning: Can not open file "<<filename.str()<<" for writing!"<<endl;
-                cerr<<"\t Table will not be stored!"<<endl;
+                log_warn("Can not open file %s for writing! Table will not be stored!",filename.str().c_str());
             }
             particle_->SetEnergy(energy);
 
@@ -425,8 +420,7 @@ void Epairproduction::EnableEpairInterpolation(std::string path, bool raw)
 
         if( FileExist(filename.str()) )
         {
-            cerr<<"Info: Epairproduction parametrisation tables will be read from file:"<<endl;
-            cerr<<"\t"<<filename.str()<<endl;
+            log_info("Epairproduction parametrisation tables will be read from file:\t%s",filename.str().c_str());
             ifstream input;
 
             if(raw)
@@ -451,11 +445,10 @@ void Epairproduction::EnableEpairInterpolation(std::string path, bool raw)
         {
             if(!reading_worked)
             {
-                cerr<<"Info: file "<<filename.str()<<" is corrupted! Write is again!"<< endl;
+                log_info("File %s is corrupted! Write it again!",filename.str().c_str());
             }
 
-            cerr<<"Info: Epairproduction parametrisation tables will be saved to file:"<<endl;
-            cerr<<"\t"<<filename.str()<<endl;
+            log_info("Epairproduction parametrisation tables will be saved to file:\t%s",filename.str().c_str());
 
             double energy = particle_->GetEnergy();
 
@@ -487,8 +480,7 @@ void Epairproduction::EnableEpairInterpolation(std::string path, bool raw)
             else
             {
                 storing_failed  =   true;
-                cerr<<"Warning: Can not open file "<<filename.str()<<" for writing!"<<endl;
-                cerr<<"\t Table will not be stored!"<<endl;
+                log_warn("Can not open file %s for writing! Table will not be stored!",filename.str().c_str());
             }
             particle_->SetEnergy(energy);
 
@@ -893,7 +885,7 @@ double Epairproduction::CalculateStochasticLoss(double rnd)
         }
     }
 
-    //TOMASZ sometime everything is fine, just the probability for interaction is zero
+    //sometime everything is fine, just the probability for interaction is zero
     bool prob_for_all_comp_is_zero=true;
     for(int i=0; i<(medium_->GetNumCompontents()); i++)
     {
@@ -902,8 +894,7 @@ double Epairproduction::CalculateStochasticLoss(double rnd)
     }
     if(prob_for_all_comp_is_zero)return 0;
 
-    cerr<<"Error (in Epairproduction/e): sum was not initialized correctly" << endl;
-    cerr<<"ecut: " << cut_settings_->GetEcut() << "\t vcut: " <<  cut_settings_->GetVcut() << "\t energy: " << particle_->GetEnergy() << "\t type: " << particle_->GetName() << endl;
+    log_fatal("sum was not initialized correctly");
     return 0;
 }
 
@@ -1245,7 +1236,7 @@ double Epairproduction::FunctionToIntegral(double r)
 
 void Epairproduction::SetParametrization(int parametrization){
     parametrization_ = parametrization;
-    cerr<<"Warning: This has no effect. Till now only one parametrization for Epairproduction implemented"<<endl;
+    log_warn("This has no effect. Till now only one parametrization for Epairproduction implemented");
 }
 
 void Epairproduction::SetComponent(int component) {
