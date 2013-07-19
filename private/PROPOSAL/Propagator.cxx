@@ -11,6 +11,7 @@
 #include <utility>
 #include <boost/program_options.hpp>
 #include "boost/lexical_cast.hpp"
+#include "PROPOSAL/Output.h"
 
 using namespace std;
 
@@ -426,7 +427,7 @@ void Propagator::ReadConfigFile(string config_file)
 
     if(!FileExist(config_file))
     {
-        cerr<<"Error: config file "<<config_file<<" does not exist!"<<endl;
+        log_fatal("Error: config file %s does not exist!",config_file.c_str());
         exit(1);
     }
     ifstream file;
@@ -462,7 +463,7 @@ void Propagator::ReadConfigFile(string config_file)
         // Reading the global options
         else if(ToLowerCase(taux).compare("global")==0)
         {
-            cerr<<"Reading the global options"<<endl;
+            log_info("Reading the global options");
             continue;
         }
         // seed
@@ -474,7 +475,7 @@ void Propagator::ReadConfigFile(string config_file)
                 seed_ = boost::lexical_cast<int>(taux);
             }
             catch(boost::bad_lexical_cast&) {
-                cout<<"Warning: The seed must be an integer! Set to 1"<<endl;
+                log_warn("The seed is set to %s but must be an integer! Set to 1", taux.c_str());
                 seed_ = 1;
             }
         }
@@ -487,7 +488,7 @@ void Propagator::ReadConfigFile(string config_file)
                 brems_ = boost::lexical_cast<int>(taux);
             }
             catch(boost::bad_lexical_cast&) {
-                cout<<"Warning: The bremsstrahlungs parametrization indentifier must be an integer! Set to 1"<<endl;
+                log_warn("The bremsstrahlungs parametrization indentifier is set to %s but must be an integer! Set to 1", taux.c_str());
                 brems_ = 1;
             }
         }
@@ -500,7 +501,7 @@ void Propagator::ReadConfigFile(string config_file)
                 photo_ = boost::lexical_cast<int>(taux);
             }
             catch(boost::bad_lexical_cast&) {
-                cout<<"Warning: The photonuclear parametrization indentifier must be an integer! Set to 12"<<endl;
+                log_warn("The photonuclear parametrization indentifier is set to %s but must be an integer! Set to 12", taux.c_str());
                 photo_ = 12;
             }
         }
@@ -513,7 +514,7 @@ void Propagator::ReadConfigFile(string config_file)
                 brems_multiplier_  = boost::lexical_cast<double>(taux);
             }
             catch(boost::bad_lexical_cast&) {
-                cout<<"Warning: The bremsstrahlungs multiplier must be a double! Set to 1."<<endl;
+                log_warn("The bremsstrahlungs multiplier is set to %s but must be a double! Set to 1.", taux.c_str());
                 brems_multiplier_ = 1.;
             }
         }
@@ -526,7 +527,7 @@ void Propagator::ReadConfigFile(string config_file)
                 photo_multiplier_  = boost::lexical_cast<double>(taux);
             }
             catch(boost::bad_lexical_cast&) {
-                cout<<"Warning: The photonuclear multiplier must be a double! Set to 1."<<endl;
+                log_warn("The photonuclear multiplier is set to %s but must be a double! Set to 1.", taux.c_str());
                 photo_multiplier_ = 1.;
             }
         }
@@ -539,7 +540,7 @@ void Propagator::ReadConfigFile(string config_file)
                 epair_multiplier_  = boost::lexical_cast<double>(taux);
             }
             catch(boost::bad_lexical_cast&) {
-                cout<<"Warning: The epairproduction multiplier must be a double! Set to 1."<<endl;
+                log_warn("The epairproduction multiplier is set to %s but must be a double! Set to 1.", taux.c_str());
                 epair_multiplier_ = 1.;
             }
         }
@@ -552,7 +553,7 @@ void Propagator::ReadConfigFile(string config_file)
                 ioniz_multiplier_  = boost::lexical_cast<double>(taux);
             }
             catch(boost::bad_lexical_cast&) {
-                cout<<"Warning: The ionization multiplier must be a double! Set to 1."<<endl;
+                log_warn("The ionization multiplier is set to %s but must be a double! Set to 1.", taux.c_str());
                 ioniz_multiplier_ = 1.;
             }
         }
@@ -565,7 +566,7 @@ void Propagator::ReadConfigFile(string config_file)
                 global_ecut_inside_  = boost::lexical_cast<double>(taux);
             }
             catch(boost::bad_lexical_cast&) {
-                cout<<"Warning: The ecut for inside the detector must be a double! Set to 500."<<endl;
+                log_warn("The ecut for inside the detector is set to %s but must be a double! Set to 500.", taux.c_str());
                 global_ecut_inside_ = 500.;
             }
         }
@@ -578,7 +579,7 @@ void Propagator::ReadConfigFile(string config_file)
                 global_ecut_behind_  = boost::lexical_cast<double>(taux);
             }
             catch(boost::bad_lexical_cast&) {
-                cout<<"Warning: The ecut for behind the detector must be a double! Set to -1."<<endl;
+                log_warn("The ecut for behind the detector is set to %s but must be a double! Set to -1.", taux.c_str());
                 global_ecut_behind_ = -1.;
             }
         }
@@ -591,7 +592,7 @@ void Propagator::ReadConfigFile(string config_file)
                 global_ecut_infront_  = boost::lexical_cast<double>(taux);
             }
             catch(boost::bad_lexical_cast&) {
-                cout<<"Warning: The ecut for infront of the detector must be a double! Set to -1."<<endl;
+                log_warn("The ecut for infront of the detector is set to %s but must be a double! Set to -1.", taux.c_str());
                 global_ecut_infront_ = -1.;
             }
         }
@@ -604,7 +605,7 @@ void Propagator::ReadConfigFile(string config_file)
                 global_vcut_inside_  = boost::lexical_cast<double>(taux);
             }
             catch(boost::bad_lexical_cast&) {
-                cout<<"Warning: The vcut for inside the detector must be a double! Set to -1."<<endl;
+                log_warn("The vcut for inside the detector is set to %s but must be a double! Set to -1.", taux.c_str());
                 global_vcut_inside_ = -1.;
             }
         }
@@ -617,7 +618,7 @@ void Propagator::ReadConfigFile(string config_file)
                 global_vcut_behind_  = boost::lexical_cast<double>(taux);
             }
             catch(boost::bad_lexical_cast&) {
-                cout<<"Warning: The vcut for behind the detector must be a double! Set to -1."<<endl;
+                log_warn("The vcut for behind the detector is set to %s but must be a double! Set to -1.", taux.c_str());
                 global_vcut_behind_ = -1.;
             }
         }
@@ -630,7 +631,7 @@ void Propagator::ReadConfigFile(string config_file)
                 global_vcut_infront_  = boost::lexical_cast<double>(taux);
             }
             catch(boost::bad_lexical_cast&) {
-                cout<<"Warning: The vcut for infront of the detector must be a double! Set to 0.001"<<endl;
+                log_warn("The vcut for infront of the detector is set to %s but must be a double! Set to 0.001", taux.c_str());
                 global_vcut_infront_ = 0.001;
             }
         }
@@ -643,7 +644,7 @@ void Propagator::ReadConfigFile(string config_file)
                 global_cont_inside_  = boost::lexical_cast<bool>(taux);
             }
             catch(boost::bad_lexical_cast&) {
-                cout<<"Warning: cont for inside the detector must be a bool! Set to false"<<endl;
+                log_warn("cont for inside the detector is set to %s but must be a bool! Set to false", taux.c_str());
                 global_cont_inside_ = false;
             }
         }
@@ -656,7 +657,7 @@ void Propagator::ReadConfigFile(string config_file)
                 global_cont_behind_  = boost::lexical_cast<bool>(taux);
             }
             catch(boost::bad_lexical_cast&) {
-                cout<<"Warning: cont for behind the detector must be a double! Set to false."<<endl;
+                log_warn("cont for behind the detector is set to %s but must be a double! Set to false.", taux.c_str());
                 global_vcut_behind_ = false;
             }
         }
@@ -669,7 +670,7 @@ void Propagator::ReadConfigFile(string config_file)
                 global_cont_infront_  = boost::lexical_cast<bool>(taux);
             }
             catch(boost::bad_lexical_cast&) {
-                cout<<"Warning: cont for infront of the detector must be a double! Set to true"<<endl;
+                log_warn("cont for infront of the detector is set to %s but must be a double! Set to true", taux.c_str());
                 global_vcut_infront_ = true;
             }
         }
@@ -710,8 +711,7 @@ void Propagator::ReadConfigFile(string config_file)
         {
             if(found_detector)
             {
-                cerr<<"Warning: Detector already specified. There can be only one"<<endl;
-                cerr<<"This one will be ignored"<<endl;
+                log_warn("Detector already specified. There can be only one. This one will be ignored");
                 continue;
             }
             found_detector  =   true;
@@ -746,7 +746,7 @@ void Propagator::ReadConfigFile(string config_file)
         }
         else
         {
-            cerr<<"Unrecognized option: "<<taux<<endl;
+            log_warn("Unrecognized option: %s",taux.c_str());
             continue;
         }
     }
@@ -1114,7 +1114,7 @@ void Propagator::InitProcessCollections(ifstream &file)
     deque<string> *token = new deque<string>();
     string taux;
 
-    cerr<<"Reading sector informations"<<endl;
+    log_info("Reading sector informations");
     double ecut_inside  = -1;
     double ecut_infront = -1;
     double ecut_behind  = -1;
@@ -1174,7 +1174,7 @@ void Propagator::InitProcessCollections(ifstream &file)
                     ecut_inside  = boost::lexical_cast<double>(taux);
                 }
                 catch(boost::bad_lexical_cast&) {
-                    cout<<"Warning: ecut for inside of the detector must be a double! Set to 500."<<endl;
+                    log_warn("ecut for inside of the detector is set to %s but must be a double! Set to 500.", taux.c_str());
                     ecut_inside = 500;
                 }
 
@@ -1183,7 +1183,7 @@ void Propagator::InitProcessCollections(ifstream &file)
                     vcut_inside  = boost::lexical_cast<double>(taux);
                 }
                 catch(boost::bad_lexical_cast&) {
-                    cout<<"Warning: vcut for inside of the detector must be a double! Set to -1."<<endl;
+                    log_warn("vcut for inside of the detector is set to %s but must be a double! Set to -1.", taux.c_str());
                     vcut_inside = -1;
                 }
 
@@ -1192,7 +1192,7 @@ void Propagator::InitProcessCollections(ifstream &file)
                     cont_inside  = boost::lexical_cast<bool>(taux);
                 }
                 catch(boost::bad_lexical_cast&) {
-                    cout<<"Warning: cont for inside of the detector must be a bool! Set to false."<<endl;
+                    log_warn("cont for inside of the detector is set to %s but must be a bool! Set to false.", taux.c_str());
                     cont_inside = false;
                 }
 
@@ -1201,7 +1201,7 @@ void Propagator::InitProcessCollections(ifstream &file)
             }
             else
             {
-                cerr<<"Warning: Expect 3 parameters afer keyword inside! Set inside cut settings to global cut settings"<<endl;
+                log_warn("Expect 3 parameters afer keyword inside! Set inside cut settings to global cut settings");
             }
         }
         else if(ToLowerCase(taux).compare("infront")==0)
@@ -1213,7 +1213,7 @@ void Propagator::InitProcessCollections(ifstream &file)
                     ecut_infront  = boost::lexical_cast<double>(taux);
                 }
                 catch(boost::bad_lexical_cast&) {
-                    cout<<"Warning: ecut for infront of the detector must be a double! Set to -1."<<endl;
+                    log_warn("ecut for infront of the detector is set to %s but must be a double! Set to -1.", taux.c_str());
                     ecut_infront = -1;
                 }
 
@@ -1222,7 +1222,7 @@ void Propagator::InitProcessCollections(ifstream &file)
                     vcut_infront  = boost::lexical_cast<double>(taux);
                 }
                 catch(boost::bad_lexical_cast&) {
-                    cout<<"Warning: vcut for infront of the detector must be a double! Set to 0.001."<<endl;
+                    log_warn("vcut for infront of the detector is set %s to but must be a double! Set to 0.001.", taux.c_str());
                     vcut_infront = 0.001;
                 }
 
@@ -1231,7 +1231,7 @@ void Propagator::InitProcessCollections(ifstream &file)
                     cont_infront  = boost::lexical_cast<bool>(taux);
                 }
                 catch(boost::bad_lexical_cast&) {
-                    cout<<"Warning: cont for infront of the detector must be a bool! Set to true."<<endl;
+                    log_warn("cont for infront of the detector is set to %s but must be a bool! Set to true.", taux.c_str());
                     cont_infront = true;
                 }
 
@@ -1240,7 +1240,7 @@ void Propagator::InitProcessCollections(ifstream &file)
             }
             else
             {
-                cerr<<"Warning: Expect 3 parameters afer keyword infront! Set inside cut settings to global cut settings"<<endl;
+                log_warn("Expect 3 parameters afer keyword infront! Set inside cut settings to global cut settings");
             }
         }
         else if(ToLowerCase(taux).compare("behind")==0)
@@ -1252,7 +1252,7 @@ void Propagator::InitProcessCollections(ifstream &file)
                     ecut_behind  = boost::lexical_cast<double>(taux);
                 }
                 catch(boost::bad_lexical_cast&) {
-                    cout<<"Warning: ecut for behind of the detector must be a double! Set to -1."<<endl;
+                    log_warn("ecut for behind of the detector is set to %s but must be a double! Set to -1.", taux.c_str());
                     ecut_behind = -1;
                 }
 
@@ -1261,7 +1261,7 @@ void Propagator::InitProcessCollections(ifstream &file)
                     vcut_behind  = boost::lexical_cast<double>(taux);
                 }
                 catch(boost::bad_lexical_cast&) {
-                    cout<<"Warning: vcut for behind of the detector must be a double! Set to -1."<<endl;
+                    log_warn("vcut for behind of the detector is set to %s but must be a double! Set to -1.", taux.c_str());
                     vcut_behind = -1;
                 }
 
@@ -1270,7 +1270,7 @@ void Propagator::InitProcessCollections(ifstream &file)
                     cont_behind  = boost::lexical_cast<bool>(taux);
                 }
                 catch(boost::bad_lexical_cast&) {
-                    cout<<"Warning: cont for behind of the detector must be a bool! Set to false."<<endl;
+                    log_warn("cont for behind of the detector is set to %s but must be a bool! Set to false.", taux.c_str());
                     cont_behind = false;
                 }
                 found_behind_cuts = true;
@@ -1278,7 +1278,7 @@ void Propagator::InitProcessCollections(ifstream &file)
             }
             else
             {
-                cerr<<"Warning: Expect 3 parameters afer keyword behind! Set inside cut settings to global cut settings"<<endl;
+                log_warn("Expect 3 parameters afer keyword behind! Set inside cut settings to global cut settings");
             }
         }
         else if(ToLowerCase(taux).compare("medium")==0)
@@ -1292,7 +1292,7 @@ void Propagator::InitProcessCollections(ifstream &file)
                 density_correction  = boost::lexical_cast<double>(taux);
             }
             catch(boost::bad_lexical_cast&) {
-                cout<<"Warning: density correction factor must be a double! Set to 1."<<endl;
+                log_warn("density correction factor is set to %s but must be a double! Set to 1.",taux.c_str());
                 density_correction = 1;
             }
 
@@ -1456,14 +1456,10 @@ void Propagator::InitProcessCollections(ifstream &file)
         }
         else
         {
-            cerr<<"Error! Last line in a sector segment must start with ’medium’!Exit"<<endl;
+            log_fatal("Last line in a sector segment must start with ’medium’!");
             exit(1);
         }
     }
-    cout<<ecut_inside<<"\t"<<ecut_infront<<"\t"<<ecut_behind<<endl;
-    cout<<vcut_inside<<"\t"<<vcut_infront<<"\t"<<vcut_behind<<endl;
-    cout<<cont_inside<<"\t"<<cont_infront<<"\t"<<cont_behind<<endl;
-    cout<<found_inside_cuts<<"\t"<<found_behind_cuts<<"\t"<<found_infront_cuts<<endl;
 }
 
 
@@ -1492,7 +1488,7 @@ void Propagator::InitGeometry(Geometry* geometry, std::deque<std::string>* token
                 radius  = boost::lexical_cast<double>(taux);
             }
             catch(boost::bad_lexical_cast&) {
-                cout<<"Error: radius must be a double! Exit"<<endl;
+                log_fatal("radius must be a double! Exit");
                 exit(1);
             }
 
@@ -1501,7 +1497,7 @@ void Propagator::InitGeometry(Geometry* geometry, std::deque<std::string>* token
                 height  = boost::lexical_cast<double>(taux);
             }
             catch(boost::bad_lexical_cast&) {
-                cout<<"Error: height must be a double! Exit"<<endl;
+                log_fatal("height must be a double! Exit");
                 exit(1);
             }
         }
@@ -1513,7 +1509,7 @@ void Propagator::InitGeometry(Geometry* geometry, std::deque<std::string>* token
                 radius  = boost::lexical_cast<double>(taux);
             }
             catch(boost::bad_lexical_cast&) {
-                cout<<"Error: radius must be a double! Exit"<<endl;
+                log_fatal("adius must be a double! Exit");
                 exit(1);
             }
 
@@ -1522,7 +1518,7 @@ void Propagator::InitGeometry(Geometry* geometry, std::deque<std::string>* token
                 inner_radius  = boost::lexical_cast<double>(taux);
             }
             catch(boost::bad_lexical_cast&) {
-                cout<<"Warning: inner_radius must be a double! Set to 0"<<endl;
+                log_warn("inner_radius is set to %s but must be a double! Set to 0",taux.c_str());
                 inner_radius    =   0;
             }
 
@@ -1531,7 +1527,7 @@ void Propagator::InitGeometry(Geometry* geometry, std::deque<std::string>* token
                 height  = boost::lexical_cast<double>(taux);
             }
             catch(boost::bad_lexical_cast&) {
-                cout<<"Error: height must be a double! Exit"<<endl;
+                log_fatal("Error: height must be a double! Exit");
                 exit(1);
             }
         }
@@ -1543,7 +1539,7 @@ void Propagator::InitGeometry(Geometry* geometry, std::deque<std::string>* token
                 origin_x  = boost::lexical_cast<double>(taux);
             }
             catch(boost::bad_lexical_cast&) {
-                cout<<"Warning: origin_x must be a double! Set to 0"<<endl;
+                log_warn("origin_x is set to %s but must be a double! Set to 0",taux.c_str());
                 origin_x    =   0;
             }
 
@@ -1552,7 +1548,7 @@ void Propagator::InitGeometry(Geometry* geometry, std::deque<std::string>* token
                 origin_y  = boost::lexical_cast<double>(taux);
             }
             catch(boost::bad_lexical_cast&) {
-                cout<<"Warning: origin_y must be a double! Set to 0"<<endl;
+                log_warn("origin_y is set to %s but must be a double! Set to 0", taux.c_str());
                 origin_y    =   0;
             }
 
@@ -1561,7 +1557,7 @@ void Propagator::InitGeometry(Geometry* geometry, std::deque<std::string>* token
                 origin_z  = boost::lexical_cast<double>(taux);
             }
             catch(boost::bad_lexical_cast&) {
-                cout<<"Warning: origin_z must be a double! Set to 0"<<endl;
+                log_warn("origin_z is set to %s but must be a double! Set to 0",taux.c_str());
                 origin_z    =   0;
             }
 
@@ -1570,7 +1566,7 @@ void Propagator::InitGeometry(Geometry* geometry, std::deque<std::string>* token
                 radius  = boost::lexical_cast<double>(taux);
             }
             catch(boost::bad_lexical_cast&) {
-                cout<<"Error: radius must be a double! Exit"<<endl;
+                log_fatal("radius must be a double! Exit");
                 exit(1);
             }
 
@@ -1579,7 +1575,7 @@ void Propagator::InitGeometry(Geometry* geometry, std::deque<std::string>* token
                 inner_radius  = boost::lexical_cast<double>(taux);
             }
             catch(boost::bad_lexical_cast&) {
-                cout<<"Warning: inner_radius must be a double! Set to 0"<<endl;
+                log_warn("inner_radius is set to %s but must be a double! Set to 0", taux.c_str());
                 inner_radius    =   0;
             }
 
@@ -1588,18 +1584,17 @@ void Propagator::InitGeometry(Geometry* geometry, std::deque<std::string>* token
                 height  = boost::lexical_cast<double>(taux);
             }
             catch(boost::bad_lexical_cast&) {
-                cout<<"Error: height must be a double! Exit"<<endl;
+                log_fatal("Error: height must be a double! Exit");
                 exit(1);
             }
         }
         else
         {
-            cerr<<"Error: Number of values after 'cylinder' must be 2,3 or 6. Exit!"<<endl;
+            log_fatal("Number of values after 'cylinder' must be 2,3 or 6. Exit!");
             exit(1);
         }
 
         geometry->InitCylinder(origin_x,origin_y,origin_z,radius,inner_radius,height);
-        cout<<origin_x<<"\t"<<origin_y<<"\t"<<origin_z<<"\t"<<radius<<"\t"<<inner_radius<<"\t"<<height<<endl;
 
     }
     else if(ToLowerCase(taux).compare("sphere")==0)
@@ -1615,7 +1610,7 @@ void Propagator::InitGeometry(Geometry* geometry, std::deque<std::string>* token
                 radius  = boost::lexical_cast<double>(taux);
             }
             catch(boost::bad_lexical_cast&) {
-                cout<<"Error: radius must be a double! Exit"<<endl;
+                log_fatal("radius must be a double! Exit");
                 exit(1);
             }
         }
@@ -1627,7 +1622,7 @@ void Propagator::InitGeometry(Geometry* geometry, std::deque<std::string>* token
                 radius  = boost::lexical_cast<double>(taux);
             }
             catch(boost::bad_lexical_cast&) {
-                cout<<"Error: radius must be a double! Exit"<<endl;
+                log_fatal("radius must be a double! Exit");
                 exit(1);
             }
 
@@ -1636,7 +1631,7 @@ void Propagator::InitGeometry(Geometry* geometry, std::deque<std::string>* token
                 inner_radius  = boost::lexical_cast<double>(taux);
             }
             catch(boost::bad_lexical_cast&) {
-                cout<<"Warning: inner_radius must be a double! Set to 0"<<endl;
+                log_warn("inner_radius is set to %s but must be a double! Set to 0", taux.c_str());
                 inner_radius    =   0;
             }
 
@@ -1649,7 +1644,7 @@ void Propagator::InitGeometry(Geometry* geometry, std::deque<std::string>* token
                 origin_x  = boost::lexical_cast<double>(taux);
             }
             catch(boost::bad_lexical_cast&) {
-                cout<<"Warning: origin_x must be a double! Set to 0"<<endl;
+                log_warn("origin_x is set to %s but must be a double! Set to 0", taux.c_str());
                 origin_x    =   0;
             }
 
@@ -1658,7 +1653,7 @@ void Propagator::InitGeometry(Geometry* geometry, std::deque<std::string>* token
                 origin_y  = boost::lexical_cast<double>(taux);
             }
             catch(boost::bad_lexical_cast&) {
-                cout<<"Warning: origin_y must be a double! Set to 0"<<endl;
+                log_warn("origin_y is set to %s but must be a double! Set to 0", taux.c_str());
                 origin_y    =   0;
             }
 
@@ -1667,7 +1662,7 @@ void Propagator::InitGeometry(Geometry* geometry, std::deque<std::string>* token
                 origin_z  = boost::lexical_cast<double>(taux);
             }
             catch(boost::bad_lexical_cast&) {
-                cout<<"Warning: origin_z must be a double! Set to 0"<<endl;
+                log_warn("origin_z is set to %s but must be a double! Set to 0", taux.c_str());
                 origin_z    =   0;
             }
 
@@ -1676,7 +1671,7 @@ void Propagator::InitGeometry(Geometry* geometry, std::deque<std::string>* token
                 radius  = boost::lexical_cast<double>(taux);
             }
             catch(boost::bad_lexical_cast&) {
-                cout<<"Error: radius must be a double! Exit"<<endl;
+                log_fatal("Error: radius must be a double! Exit");
                 exit(1);
             }
 
@@ -1685,19 +1680,18 @@ void Propagator::InitGeometry(Geometry* geometry, std::deque<std::string>* token
                 inner_radius  = boost::lexical_cast<double>(taux);
             }
             catch(boost::bad_lexical_cast&) {
-                cout<<"Warning: inner_radius must be a double! Set to 0"<<endl;
+                log_warn("inner_radius is set to %s but must be a double! Set to 0", taux.c_str());
                 inner_radius    =   0;
             }
 
         }
         else
         {
-            cerr<<"Error: Number of values after 'sphere' must be 1,2 or 5. Exit!"<<endl;
+            log_fatal("Number of values after 'sphere' must be 1,2 or 5. Exit!");
             exit(1);
         }
 
         geometry->InitSphere(origin_x,origin_y,origin_z,radius,inner_radius);
-        cout<<origin_x<<"\t"<<origin_y<<"\t"<<origin_z<<"\t"<<radius<<"\t"<<inner_radius<<endl;
 
     }
     else if(ToLowerCase(taux).compare("box")==0)
@@ -1714,7 +1708,7 @@ void Propagator::InitGeometry(Geometry* geometry, std::deque<std::string>* token
                 width_x  = boost::lexical_cast<double>(taux);
             }
             catch(boost::bad_lexical_cast&) {
-                cout<<"Error: width_x must be a double! Exit"<<endl;
+                log_fatal("width_x must be a double! Exit");
                 exit(1);
             }
 
@@ -1723,7 +1717,7 @@ void Propagator::InitGeometry(Geometry* geometry, std::deque<std::string>* token
                 width_y  = boost::lexical_cast<double>(taux);
             }
             catch(boost::bad_lexical_cast&) {
-                cout<<"Error: width_y must be a double! Exit"<<endl;
+                log_fatal("width_y must be a double! Exit");
                 exit(1);
             }
 
@@ -1732,7 +1726,7 @@ void Propagator::InitGeometry(Geometry* geometry, std::deque<std::string>* token
                 width_z  = boost::lexical_cast<double>(taux);
             }
             catch(boost::bad_lexical_cast&) {
-                cout<<"Error: width_z must be a double! Exit"<<endl;
+                log_fatal("width_z must be a double! Exit");
                 exit(1);
             }
         }
@@ -1744,7 +1738,7 @@ void Propagator::InitGeometry(Geometry* geometry, std::deque<std::string>* token
                 origin_x  = boost::lexical_cast<double>(taux);
             }
             catch(boost::bad_lexical_cast&) {
-                cout<<"Warning: origin_x must be a double! Set to 0"<<endl;
+                log_warn("origin_x is set to %s but must be a double! Set to 0", taux.c_str());
                 origin_x    =   0;
             }
 
@@ -1753,7 +1747,7 @@ void Propagator::InitGeometry(Geometry* geometry, std::deque<std::string>* token
                 origin_y  = boost::lexical_cast<double>(taux);
             }
             catch(boost::bad_lexical_cast&) {
-                cout<<"Warning: origin_y must be a double! Set to 0"<<endl;
+                log_warn("origin_y is set to %s but must be a double! Set to 0", taux.c_str());
                 origin_y    =   0;
             }
 
@@ -1762,7 +1756,7 @@ void Propagator::InitGeometry(Geometry* geometry, std::deque<std::string>* token
                 origin_z  = boost::lexical_cast<double>(taux);
             }
             catch(boost::bad_lexical_cast&) {
-                cout<<"Warning: origin_z must be a double! Set to 0"<<endl;
+                log_warn("origin_z is set to %s but must be a double! Set to 0", taux.c_str());
                 origin_z    =   0;
             }
 
@@ -1771,7 +1765,7 @@ void Propagator::InitGeometry(Geometry* geometry, std::deque<std::string>* token
                 width_x  = boost::lexical_cast<double>(taux);
             }
             catch(boost::bad_lexical_cast&) {
-                cout<<"Error: width_x must be a double! Exit"<<endl;
+                log_fatal("width_x must be a double! Exit");
                 exit(1);
             }
 
@@ -1780,7 +1774,7 @@ void Propagator::InitGeometry(Geometry* geometry, std::deque<std::string>* token
                 width_y  = boost::lexical_cast<double>(taux);
             }
             catch(boost::bad_lexical_cast&) {
-                cout<<"Error: width_y must be a double! Exit"<<endl;
+                log_fatal("width_y must be a double! Exit");
                 exit(1);
             }
 
@@ -1789,24 +1783,23 @@ void Propagator::InitGeometry(Geometry* geometry, std::deque<std::string>* token
                 width_z  = boost::lexical_cast<double>(taux);
             }
             catch(boost::bad_lexical_cast&) {
-                cout<<"Error: width_z must be a double! Exit"<<endl;
+                log_fatal("width_z must be a double! Exit");
                 exit(1);
             }
 
         }
         else
         {
-            cerr<<"Error: Number of values after 'box' must be 3 or 6. Exit!"<<endl;
+            log_fatal("Number of values after 'box' must be 3 or 6. Exit!");
             exit(1);
         }
 
         geometry->InitBox(origin_x,origin_y,origin_z,width_x,width_y,width_z);
-        cout<<origin_x<<"\t"<<origin_y<<"\t"<<origin_z<<"\t"<<width_x<<"\t"<<width_y<<"\t"<<width_z<<endl;
 
     }
     else
     {
-        cerr<<"Error: Unrecognized geometry: "<<taux<<" Must be cylinder, sphere or box! Exit"<<endl;
+        log_fatal("Unrecognized geometry: %s Must be cylinder, sphere or box! Exit",taux.c_str());
         exit(1);
     }
 
