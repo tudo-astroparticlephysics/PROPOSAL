@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <vector>
 #include "PROPOSAL/Constants.h"
+#include "PROPOSAL/Output.h"
 
 using namespace std;
 
@@ -49,12 +50,12 @@ void Geometry::InitSphere(double x0, double y0, double z0, double radius, double
 
     if(inner_radius > radius_)
     {
-        cerr<<"Warning: Inner radius is greater then radius (will be swaped)"<<endl;
+        log_error("Inner radius %f is greater then radius %f (will be swaped)",inner_radius_ ,radius_);
         std::swap( inner_radius_ ,radius_ );
     }
     if(inner_radius == radius_)
     {
-        cerr<<"Warning: Inner radius == radius (Volume is 0)"<<endl;
+        log_error("Warning: Inner radius %f == radius %f (Volume is 0)",inner_radius_,radius_);
     }
     object_ =   "sphere";
 }
@@ -75,12 +76,12 @@ void Geometry::InitCylinder(double x0, double y0, double z0, double radius, doub
 
     if(inner_radius_ > radius_)
     {
-        cerr<<"Warning: Inner radius is greater then radius (will be swaped)"<<endl;
+        log_error("Inner radius %f is greater then radius %f (will be swaped)",inner_radius_ ,radius_);
         std::swap( inner_radius_ ,radius_ );
     }
     if(inner_radius_ == radius_)
     {
-        cerr<<"Warning: Inner radius == radius (Volume is 0)"<<endl;
+        log_error("Warning: Inner radius %f == radius %f (Volume is 0)",inner_radius_,radius_);
     }
 
     z_      =   100*z;
@@ -171,7 +172,7 @@ pair<double,double> Geometry::DistanceToBorder(Particle* particle)
     }
     else
     {
-        cerr<<"Warning: geometry type is not recognized! -1 is returned"<<endl;
+        log_error("geometry type is not recognized! (-1,-1) is returned");
         distance.first  =   -1;
         distance.second =   -1;
     }
@@ -725,8 +726,7 @@ pair<double,double> Geometry::DistanceToBorderBox(Particle* particle)
     }
     else
     {
-        cerr<<"In Geometry::DistanceToBorderBox(Particle*) this point should nerver be reached..."<<endl;
-        cerr<<"(-1/-1) is returned"<<endl;
+        log_error("This point should nerver be reached... (-1/-1) is returned");
 
         distance.first  =   -1;
         distance.second =   -1;
@@ -910,7 +910,7 @@ pair<double,double> Geometry::DistanceToBorderCylinder(Particle* particle)
     }
     else
     {
-        cerr<<"Warning: In DistanceToBorderCylinder(Particle* particle) this point should never be reached"<<endl;
+        log_error("This point should never be reached");
     }
     // This cylinder might be hollow and we have to check if the inner border is
     // reached before.
