@@ -26,6 +26,8 @@
 
 #include "PROPOSAL/Interpolant.h"
 #include "PROPOSAL/methods.h"
+#include "PROPOSAL/Output.h"
+
 #include <algorithm>
 #include <sstream>
 
@@ -527,7 +529,7 @@ bool Interpolant::Save(string Path, bool raw)
 
         if(!out.good())
         {
-            cerr<<"Error: Can not open file "<< Path<<" for writing"<<endl;
+            log_error("Can not open file %s for writing", Path.c_str());
             return 0;
         }
     }
@@ -538,7 +540,7 @@ bool Interpolant::Save(string Path, bool raw)
 
         if(!out.good())
         {
-            cerr<<"Error: Can not open file "<< Path<<" for writing"<<endl;
+            log_error("Can not open file %s for writing", Path.c_str());
             return 0;
         }
 
@@ -559,7 +561,7 @@ bool Interpolant::Save(ofstream& out, bool raw)
 {
     if(!out.good())
     {
-        cerr<<"Error: Can not open file for writing"<<endl;
+        log_error("Can not open file for writing");
         return 0;
     }
     bool D2 = false;
@@ -1119,7 +1121,7 @@ Interpolant::Interpolant(vector<double> x, vector<double> y, int romberg, bool r
 
     if(x.size() != y.size())
     {
-        cerr<<"Warning (in ): Interpolant/Interpolant: x and y do not match"<<endl;
+        log_fatal("size of x(%i) and y(%i) do not match!", (int)(x.size()) ,(int)(y.size()) );
     }
 
     for(int i=0 ; i<(int)x.size() ; i++)
@@ -1294,7 +1296,7 @@ void Interpolant::InitInterpolant(int max, double xmin, double xmax,
 
     if(max<=0)
     {
-        cerr<<"Warning (in Interpolant/Interpolant/0): max = "<<max<<" must be > 0, setting to 1"<<endl;
+        log_warn("max = %i must be > 0! setting to 1!",max);
         max =   1;
     }
 
@@ -1302,13 +1304,13 @@ void Interpolant::InitInterpolant(int max, double xmin, double xmax,
     {
         if(xmin<=0)
         {
-            cerr<<"Warning (in Interpolant/Interpolant/1): xmin = "<<xmin<<" must be > 0, setting to 1"<<endl;
+            log_warn("xmin = %f must be > 0! setting to 1!",xmin);
             xmin    =   1;
         }
 
         if(xmax<=0)
         {
-            cerr<<"Warning (in Interpolant/Interpolant/2): xmax = "<<xmax<<" must be > 0, setting to 1"<<endl;
+            log_warn("xmax = %f must be > 0, setting to 1",xmax);
             xmax    =   1;
         }
     }
@@ -1324,29 +1326,25 @@ void Interpolant::InitInterpolant(int max, double xmin, double xmax,
 
     if(romberg<=0)
     {
-        cerr<<"Warning (in Interpolant/Interpolant/3): romberg = "<<romberg<<" must be > 0, setting to 1"<<endl;
-        cout<<"Warning (in Interpolant/Interpolant/3): romberg = "<<romberg<<" must be > 0, setting to 1"<<endl;
+        log_warn("romberg = %i must be > 0! setting to 1!",romberg);
         romberg =   1;
     }
 
     if(romberg>max)
     {
-        cerr<<"Warning (in Interpolant/Interpolant/4): romberg = "<<romberg<<" must be <= max = "<<max<<", setting to "<<max<<endl;
-        cout<<"Warning (in Interpolant/Interpolant/4): romberg = "<<romberg<<" must be <= max = "<<max<<", setting to "<<max<<endl;
+        log_warn("romberg = %i must be <= max = %i! setting to %i!",romberg,max,max);
         romberg =   max;
     }
 
     if(rombergY<=0)
     {
-        cerr<<"Warning (in Interpolant/Interpolant/5): rombergY = "<<rombergY<<" must be > 0, setting to 1"<<endl;
-        cout<<"Warning (in Interpolant/Interpolant/5): rombergY = "<<rombergY<<" must be > 0, setting to 1"<<endl;
+        log_warn("rombergY = %i must be > 0! setting to 1!",rombergY);
         rombergY    =   1;
     }
 
     if(rombergY>max)
     {
-        cerr<<"Warning (in Interpolant/Interpolant/6): rombergY = "<<rombergY<<" must be <= max = "<<max<<", setting to "<<max<<endl;
-        cout<<"Warning (in Interpolant/Interpolant/6): rombergY = "<<rombergY<<" must be <= max = "<<max<<", setting to "<<max<<endl;
+        log_warn("rombergY = %i must be < %i! setting to %i!",rombergY,max,max);
         rombergY    =   max;
     }
 
