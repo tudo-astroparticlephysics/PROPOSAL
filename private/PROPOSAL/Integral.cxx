@@ -13,6 +13,7 @@
 #include <math.h>
 #include <algorithm>
 #include "PROPOSAL/methods.h"
+#include "PROPOSAL/Output.h"
 
 using namespace std;
 
@@ -40,7 +41,7 @@ double Integral::Integrate(double min, double max, boost::function<double (doubl
         case 3: return IntegrateWithSubstitution(min,max,integrand,powerOfSubstitution);
         case 4: return IntegrateWithLog(min,max,integrand);
         case 5: return IntegrateWithLogSubstitution(min,max,integrand,powerOfSubstitution);
-        default: cout <<"Unknown integration method! 0 is returned"<<endl; return 0;
+        default: log_error("Unknown integration method! 0 is returned!"); return 0;
 
     }
 }
@@ -84,7 +85,7 @@ double Integral::GetUpperLimit()
         return randomX_;
     }
     else{
-        printf("Error (in Integral/getUpperLimit): no previous call to upper limit functions was made\n");
+        log_error("No previous call to upper limit functions was made!");
         return 0;
     }
 }
@@ -373,19 +374,19 @@ Integral::Integral()
     int aux;
     if(romberg_<=0)
     {
-        printf("Warning (in Integral/Integral/0): romberg = %i must be > 0, setting to 1",romberg_);
+        log_warn("Warning (in Integral/Integral/0): romberg = %i must be > 0, setting to 1",romberg_);
         romberg_     =   1;
     }
 
     if(maxSteps_<=0)
     {
-        printf("Warning (in Integral/Integral/1): maxSteps = %i must be > 0, setting to 1", maxSteps_);
+        log_warn("Warning (in Integral/Integral/1): maxSteps = %i must be > 0, setting to 1", maxSteps_);
         maxSteps_    =   1;
     }
 
     if(precision_<=0)
     {
-        printf("Warning (in Integral/Integral/2): precision = %f must be > 0, setting to 1.e-6",precision_);
+        log_warn("Warning (in Integral/Integral/2): precision = %f must be > 0, setting to 1.e-6",precision_);
         precision_   =   1.e-6;
     }
 
@@ -454,19 +455,19 @@ Integral::Integral(int  romberg, int maxSteps, double precision)
     int aux;
     if(romberg<=0)
     {
-        printf("Warning (in Integral/Integral/0): romberg = %i must be > 0, setting to 1",romberg);
+        log_warn("Warning (in Integral/Integral/0): romberg = %i must be > 0, setting to 1",romberg);
         romberg     =   1;
     }
 
     if(maxSteps<=0)
     {
-        printf("Warning (in Integral/Integral/1): maxSteps = %i must be > 0, setting to 1", maxSteps);
+        log_warn("Warning (in Integral/Integral/1): maxSteps = %i must be > 0, setting to 1", maxSteps);
         maxSteps    =   1;
     }
 
     if(precision<=0)
     {
-        printf("Warning (in Integral/Integral/2): precision = %f must be > 0, setting to 1.e-6",precision);
+        log_warn("Warning (in Integral/Integral/2): precision = %f must be > 0, setting to 1.e-6",precision);
         precision   =   1.e-6;
     }
 
@@ -772,7 +773,7 @@ double Integral::Trapezoid3S(int n, double oldSum, int stepNumber)
                     }
                     else
                     {
-                            printf("Warning (in Integral/trapezoid3S): Determinant is negative, proceeding with linear approximation");
+                            log_warn("Warning (in Integral/trapezoid3S): Determinant is negative, proceeding with linear approximation");
                             approX  =   sumDifference*2/functionSum;
                     }
                 }
@@ -934,7 +935,7 @@ double Integral::RombergIntegrateClosed()
         n   =   n/4;
     }
 
-    printf("Warning (in Integral/rombergIntegrateClosed): Precision %f has not been reached after %i steps \n", precision_, maxSteps_);
+    log_warn("Precision %f has not been reached after %i steps! Returning %f!", precision_, maxSteps_,value);
     return value;
 }
 
@@ -959,7 +960,7 @@ double Integral::RombergIntegrateOpened()
         {
             result  =   Trapezoid3(k, result);
             if(result != result){
-                printf("Warning (in Integral/rombergIntegrateOpened/0): Function Value of is nan. Return 0 \n");
+                log_error("Function Value of is nan! Returning 0!");
                 return 0;
             }
 
@@ -1000,7 +1001,7 @@ double Integral::RombergIntegrateOpened()
         n   /=  9;
     }
 
-    printf("Warning (in Integral/rombergIntegrateOpened/0): Precision %f has not been reached after %i steps \n", precision_, maxSteps_);
+    log_warn("Precision %f has not been reached after %i steps! Returning %f!", precision_, maxSteps_,value);
     return value;
 }
 
@@ -1041,7 +1042,7 @@ double Integral::RombergIntegrateOpened(double bigValue)
         n   /=  9;
     }
 
-    printf("Warning (in Integral/rombergIntegrateOpened/1): Precision %f has not been reached after %i steps \n", precision_, maxSteps_);
+    log_warn("Precision %f has not been reached after %i steps! Returning %f!", precision_, maxSteps_,value);
     return value;
 }
 
@@ -1226,7 +1227,7 @@ void Integral::RefineUpperLimit(double result)
 
     if(flow*fhi>0)
     {
-        printf("Error (in Integral/refineUpperLimit): Root must be bracketed");
+        log_error("Root must be bracketed");
         return;
     }
 
@@ -1326,7 +1327,7 @@ void Integral::RefineUpperLimit(double result)
 
     if(i==maxSteps_)
     {
-        printf("Warning (in Integral/refineUpperLimit): Precision %f has not been reached after %i steps \n", precision_, maxSteps_);
+        log_warn("Precision %f has not been reached after %i steps!", precision_, maxSteps_);
     }
 
     randomX_ =   currentX;
