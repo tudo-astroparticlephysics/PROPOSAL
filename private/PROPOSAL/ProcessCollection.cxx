@@ -10,6 +10,7 @@
 #include "boost/function.hpp"
 #include "boost/bind.hpp"
 #include "PROPOSAL/MathModel.h"
+#include "PROPOSAL/Output.h"
 
 
 using namespace std;
@@ -256,8 +257,9 @@ pair<double,string> ProcessCollection::MakeStochasticLoss(double rnd1,double rnd
 {
     double total_rate          =    0;
     double total_rate_weighted =    0;
-    double decayS              =    0;
     double rates_sum           =    0;
+
+    //double decayS              =    0;
 
     pair<double,string> energy_loss;
 
@@ -291,20 +293,17 @@ pair<double,string> ProcessCollection::MakeStochasticLoss(double rnd1,double rnd
     {
         rates.at(i) =  crosssections_.at(i)->CalculatedNdx( rnd2 );
         total_rate  +=  rates.at(i);
-        if(debug_)
-        {
-            cerr<<"\t"<<crosssections_.at(i)->GetName()<<" = "<<rates.at(i);
-        }
+
+        log_debug("Rate for %s = %f",crosssections_.at(i)->GetName().c_str(), rates.at(i));
 
     }
 
     total_rate_weighted = total_rate*rnd1;
 
-    if(debug_)
-    {
-        cerr<<" . rnd1 = "<<rnd1<<" rnd2 = "<<rnd2<<
-            " rnd3 = "<<rnd3<<" decay = "<<decayS<<endl;
-    }
+    log_debug("Total rate = %f, total rate weighted = %f",total_rate ,total_rate_weighted);
+
+//        cerr<<" . rnd1 = "<<rnd1<<" rnd2 = "<<rnd2<<
+//            " rnd3 = "<<rnd3<<" decay = "<<decayS<<endl;
 
 
     for(unsigned int i = 0 ; i < rates.size(); i++)
@@ -484,8 +483,7 @@ void ProcessCollection::EnableInterpolation(std::string path, bool raw)
 
         if( FileExist(filename.str()) )
         {
-            cerr<<"Info: ProcessCollection parametrisation tables will be read from file:"<<endl;
-            cerr<<"\t"<<filename.str()<<endl;
+            log_info("ProcessCollection parametrisation tables will be read from file:\t%s",filename.str().c_str());
             ifstream input;
 
             if(raw)
@@ -521,11 +519,10 @@ void ProcessCollection::EnableInterpolation(std::string path, bool raw)
 
             if(!reading_worked)
             {
-                cerr<<"Info: file "<<filename.str()<<" is corrupted! Write it again!"<< endl;
+                log_info("File %s is corrupted! Write it again!",filename.str().c_str());
             }
 
-            cerr<<"Info: ProcessCollection parametrisation tables will be saved to file:"<<endl;
-            cerr<<"\t"<<filename.str()<<endl;
+            log_info("ProcessCollection parametrisation tables will be saved to file:\t%s",filename.str().c_str());
 
             if(abs(-prop_interaction_->Integrate(particle_->GetLow(), particle_->GetLow()*10, boost::bind(&ProcessCollection::FunctionToPropIntegralInteraction, this, _1),4))
                     < abs(-prop_interaction_->Integrate(BIGENERGY, BIGENERGY/10, boost::bind(&ProcessCollection::FunctionToPropIntegralInteraction, this, _1),4)))
@@ -578,8 +575,7 @@ void ProcessCollection::EnableInterpolation(std::string path, bool raw)
             else
             {
                 storing_failed  =   true;
-                cerr<<"Warning: Can not open file "<<filename.str()<<" for writing!"<<endl;
-                cerr<<"\t Table will not be stored!"<<endl;
+                log_warn("Can not open file %s for writing! Table will not be stored!",filename.str().c_str());
             }
             particle_->SetEnergy(energy);
 
@@ -638,7 +634,6 @@ void ProcessCollection::EnableDEdxInterpolation(std::string path, bool raw)
     for(unsigned int i =0 ; i < crosssections_.size() ; i++)
     {
         crosssections_.at(i)->EnableDEdxInterpolation(path,raw);
-        //cout<<"dEdx for "<<crosssections_.at(i)->GetName()<<" interpolated"<<endl;
     }
 }
 
@@ -653,7 +648,6 @@ void ProcessCollection::EnableDNdxInterpolation(std::string path, bool raw)
     for(unsigned int i =0 ; i < crosssections_.size() ; i++)
     {
         crosssections_.at(i)->EnableDNdxInterpolation(path,raw);
-        //cout<<"dNdx for "<<crosssections_.at(i)->GetName()<<" interpolated"<<endl;
     }
 }
 
@@ -667,7 +661,6 @@ void ProcessCollection::DisableDEdxInterpolation()
     for(unsigned int i =0 ; i < crosssections_.size() ; i++)
     {
         crosssections_.at(i)->DisableDEdxInterpolation();
-        //cout<<"Interpolation for dEdx for "<<crosssections_.at(i)->GetName()<<" disabled"<<endl;
     }
 }
 
@@ -681,7 +674,6 @@ void ProcessCollection::DisableDNdxInterpolation()
     for(unsigned int i =0 ; i < crosssections_.size() ; i++)
     {
         crosssections_.at(i)->DisableDNdxInterpolation();
-        //cout<<"Interpolation fordNdx for "<<crosssections_.at(i)->GetName()<<" disbaled"<<endl;
     }
 }
 
@@ -764,8 +756,7 @@ void ProcessCollection::EnableParticleTimeInterpolation(std::string path, bool r
 
         if( FileExist(filename.str()) )
         {
-            cerr<<"Info: Particle time parametrisation tables will be read from file:"<<endl;
-            cerr<<"\t"<<filename.str()<<endl;
+            log_info("Particle time parametrisation tables will be read from file:\t%s",filename.str().c_str());
             ifstream input;
 
             if(raw)
@@ -789,11 +780,10 @@ void ProcessCollection::EnableParticleTimeInterpolation(std::string path, bool r
         {
             if(!reading_worked)
             {
-                cerr<<"Info: file "<<filename.str()<<" is corrupted! Write is again!"<< endl;
+                log_info("File %s is corrupted! Write it again!",filename.str().c_str());
             }
 
-            cerr<<"Info: Particle time parametrisation tables will be saved to file:"<<endl;
-            cerr<<"\t"<<filename.str()<<endl;
+            log_info("Particle time parametrisation tables will be saved to file:\t%s",filename.str().c_str());
 
             double energy = particle_->GetEnergy();
 
@@ -822,8 +812,7 @@ void ProcessCollection::EnableParticleTimeInterpolation(std::string path, bool r
             else
             {
                 storing_failed  =   true;
-                cerr<<"Warning: Can not open file "<<filename.str()<<" for writing!"<<endl;
-                cerr<<"\t Table will not be stored!"<<endl;
+                log_warn("Can not open file %s for writing! Table will not be stored!",filename.str().c_str());
             }
             particle_->SetEnergy(energy);
 
@@ -1066,7 +1055,7 @@ ProcessCollection::ProcessCollection(const ProcessCollection &collection)
         }
         else
         {
-            cerr<<"In copy constructor of ProcessCollection: Error: Unknown crossSection"<<endl;
+            log_fatal("Unknown cross section");
             exit(1);
         }
     }
@@ -1311,7 +1300,7 @@ bool ProcessCollection::operator==(const ProcessCollection &collection) const
         }
         else
         {
-            cerr<<"In copy constructor of ProcessCollection: Error: Unknown crossSection"<<endl;
+            log_fatal("Unknown cross section");
             exit(1);
         }
     }
@@ -1781,10 +1770,8 @@ double ProcessCollection::FunctionToPropIntegralDecay(double energy)
 
     decay  =   decay_->MakeDecay();
 
-    if(debug_)
-    {
-        cerr<<" + "<<particle_->GetEnergy();
-    }
+    log_debug(" + %f",particle_->GetEnergy());
+
 
     return aux*decay;
 }
@@ -1806,10 +1793,8 @@ double ProcessCollection::FunctionToPropIntegralInteraction(double energy)
     {
         rate  =   crosssections_.at(i)->CalculatedNdx();
 
-        if(debug_)
-        {
-            cerr<<" \t "<<rate;
-        }
+        log_debug("Rate for %s = %f",crosssections_.at(i)->GetName().c_str(),rate);
+
         total_rate += rate;
 
     }
@@ -1830,20 +1815,13 @@ double ProcessCollection::FunctionToIntegral(double energy)
     particle_->SetEnergy(energy);
     result  =    0;
 
-    if(debug_)
-    {
-        cout<<" * "<<particle_->GetEnergy();
-    }
-
     for(unsigned int i =0;i<crosssections_.size();i++)
     {
         aux     =   crosssections_.at(i)->CalculatedEdx();
         result  +=  aux;
 
-        if(debug_)
-        {
-            cout<<" \t "<<aux;
-        }
+        log_debug("energy %f , dE/dx = %f",particle_->GetEnergy() ,aux);
+
     }
 
     return -1/result;
@@ -1963,7 +1941,7 @@ void ProcessCollection::SetLocation(int location)
 {
     if(location<0 || location > 2)
     {
-        cerr<<"Warning: Invalid location! Must be 0,1,2 (infront, inside, behind). Set to 0!"<<endl;
+        log_error("Invalid location! Must be 0,1,2 (infront, inside, behind). Set to 0!");
         location_   =   0;
     }
     else
