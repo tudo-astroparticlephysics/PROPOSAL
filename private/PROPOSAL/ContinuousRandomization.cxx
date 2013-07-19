@@ -8,6 +8,7 @@
 #include <algorithm>
 #include "boost/bind.hpp"
 #include <cmath>
+#include "PROPOSAL/Output.h"
 
 using namespace std;
 
@@ -94,8 +95,7 @@ void ContinuousRandomization::EnableDE2dxInterpolation(std::string path, bool ra
 
         if( FileExist(filename.str()) )
         {
-            cerr<<"Info: Continuous Randomization parametrisation tables (dE2dx) will be read from file:"<<endl;
-            cerr<<"\t"<<filename.str()<<endl;
+            log_info("Continuous Randomization parametrisation tables (dE2dx) will be read from file:\t%s",filename.str().c_str());
             ifstream input;
 
             if(raw)
@@ -116,11 +116,10 @@ void ContinuousRandomization::EnableDE2dxInterpolation(std::string path, bool ra
         {
             if(!reading_worked)
             {
-                cerr<<"Info: file "<<filename.str()<<" is corrupted! Write is again!"<< endl;
+                log_info("File %s is corrupted! Write it again!",filename.str().c_str());
             }
 
-            cerr<<"Info: Continuous Randomization parametrisation tables (dE2dx) will be saved to file:"<<endl;
-            cerr<<"\t"<<filename.str()<<endl;
+            log_info("Continuous Randomization parametrisation tables (dE2dx) will be saved to file:\t%s",filename.str().c_str());
 
             double energy = particle_->GetEnergy();
 
@@ -147,8 +146,7 @@ void ContinuousRandomization::EnableDE2dxInterpolation(std::string path, bool ra
             else
             {
                 storing_failed  =   true;
-                cerr<<"Warning: Can not open file "<<filename.str()<<" for writing!"<<endl;
-                cerr<<"\t Table will not be stored!"<<endl;
+                log_warn("Can not open file %s for writing! Table will not be stored!",filename.str().c_str());
             }
             particle_->SetEnergy(energy);
 
@@ -230,8 +228,7 @@ void ContinuousRandomization::EnableDE2deInterpolation(std::string path, bool ra
 
         if( FileExist(filename.str()) )
         {
-            cerr<<"Info: Continuous Randomization parametrisation tables (dE2de) will be read from file:"<<endl;
-            cerr<<"\t"<<filename.str()<<endl;
+            log_info("Continuous Randomization parametrisation tables (dE2de) will be read from file:\t%s",filename.str().c_str());
             ifstream input;
 
             if(raw)
@@ -254,11 +251,10 @@ void ContinuousRandomization::EnableDE2deInterpolation(std::string path, bool ra
         {
             if(!reading_worked)
             {
-                cerr<<"Info: file "<<filename.str()<<" is corrupted! Write is again!"<< endl;
+                log_info("File %s is corrupted! Write it again!",filename.str().c_str());
             }
 
-            cerr<<"Info: Continuous Randomization parametrisation tables (dE2de) will be saved to file:"<<endl;
-            cerr<<"\t"<<filename.str()<<endl;
+            log_info("Continuous Randomization parametrisation tables (dE2de) will be saved to file:\t%s",filename.str().c_str());
 
             double energy = particle_->GetEnergy();
 
@@ -287,8 +283,7 @@ void ContinuousRandomization::EnableDE2deInterpolation(std::string path, bool ra
             else
             {
                 storing_failed  =   true;
-                cerr<<"Warning: Can not open file "<<filename.str()<<" for writing!"<<endl;
-                cerr<<"\t Table will not be stored!"<<endl;
+                log_warn("Can not open file %s for writing! Table will not be stored!",filename.str().c_str());
             }
             particle_->SetEnergy(energy);
 
@@ -421,8 +416,7 @@ ContinuousRandomization::ContinuousRandomization(const ContinuousRandomization &
         }
         else
         {
-            cout<<"In copy constructor of ContinuousRandomization: Error: Unknown crossSection"<<endl;
-            exit(1);
+            log_fatal("Unknown cross section");
         }
     }
 
@@ -511,8 +505,7 @@ bool ContinuousRandomization::operator==(const ContinuousRandomization &continuo
         }
         else
         {
-            cout<<"In operator== of ContinuousRandomization: Error: Unknown crossSection"<<endl;
-            exit(1);
+            log_fatal("Unknown cross section");
         }
     }
 

@@ -328,9 +328,11 @@ int main(int argc, char** argv){
     log_warn("a");
     log_warn("a%i",1);
     log_warn("a%i",2);
+    log_fatal("NEIIIIIIIIIIIIIIIIIIIIIIN");
     log_warn("a");
     log_warn("a %i %i %i %i %i %i %i %i %i %i %i %i",3,33,3,3,33,3,4,4,4,4,4,4);
     log_warn("a");
+    log_debug("hshshssh");
 
     //log_arsch("a2 %i\n",2);
 

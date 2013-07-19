@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <boost/program_options.hpp>
 #include <sstream>
+#include "PROPOSAL/Output.h"
 
 using namespace std;
 
@@ -209,8 +210,8 @@ void Bremsstrahlung::EnableDNdxInterpolation(std::string path ,bool raw)
 
         if( FileExist(filename.str()) )
         {
-            cerr<<"Info: Bremsstrahlungs parametrisation tables (dNdx) will be read from file:"<<endl;
-            cerr<<"\t"<<filename.str()<<endl;
+            log_info("Bremsstrahlungs parametrisation tables (dNdx) will be read from file:\t%s",filename.str().c_str());
+
             ifstream input;
             if(raw)
             {
@@ -235,11 +236,10 @@ void Bremsstrahlung::EnableDNdxInterpolation(std::string path ,bool raw)
         {
             if(!reading_worked)
             {
-                cerr<<"Info: file "<<filename.str()<<" is corrupted! Write is again!"<< endl;
+                log_info("file %s is corrupted! Write it again!",filename.str().c_str());
             }
 
-            cerr<<"Info: Bremsstrahlungs parametrisation tables (dNdx) will be saved to file:"<<endl;
-            cerr<<"\t"<<filename.str()<<endl;
+            log_info("Info: Bremsstrahlungs parametrisation tables (dNdx) will be saved to file:\t%s",filename.str().c_str());
 
             double energy = particle_->GetEnergy();
 
@@ -273,8 +273,7 @@ void Bremsstrahlung::EnableDNdxInterpolation(std::string path ,bool raw)
             else
             {
                 storing_failed  =   true;
-                cerr<<"Warning: Can not open file "<<filename.str()<<" for writing!"<<endl;
-                cerr<<"\t Table will not be stored!"<<endl;
+                log_warn("Can not open file %s for writing! Table will not be stored!",filename.str().c_str());
             }
             particle_->SetEnergy(energy);
             output.close();
@@ -325,8 +324,7 @@ void Bremsstrahlung::EnableDEdxInterpolation(std::string path, bool raw)
 
         if( FileExist(filename.str()) )
         {
-            cerr<<"Info: Bremsstrahlungs parametrisation tables (dEdx) will be read from file:"<<endl;
-            cerr<<"\t"<<filename.str()<<endl;
+            log_info("Bremsstrahlungs parametrisation tables (dEdx) will be read from file:\t%s",filename.str().c_str());
             ifstream input;
 
             if(raw)
@@ -347,11 +345,10 @@ void Bremsstrahlung::EnableDEdxInterpolation(std::string path, bool raw)
         {
             if(!reading_worked)
             {
-                cerr<<"Info: file "<<filename.str()<<" is corrupted! Write is again!"<< endl;
+                log_info("File %s is corrupted! Write it again!",filename.str().c_str());
             }
 
-            cerr<<"Info: Bremsstrahlungs parametrisation tables (dEdx) will be saved to file:"<<endl;
-            cerr<<"\t"<<filename.str()<<endl;
+            log_info("Bremsstrahlungs parametrisation tables (dEdx) will be saved to file:%s\t",filename.str().c_str());
 
             double energy = particle_->GetEnergy();
 
@@ -375,8 +372,7 @@ void Bremsstrahlung::EnableDEdxInterpolation(std::string path, bool raw)
             else
             {
                 storing_failed  =   true;
-                cerr<<"Warning: Can not open file "<<filename.str()<<" for writing!"<<endl;
-                cerr<<"\t Table will not be stored!"<<endl;
+                log_warn("Can not open file %s for writing! Table will not be stored!",filename.str().c_str());
             }
             particle_->SetEnergy(energy);
 
@@ -992,7 +988,7 @@ double Bremsstrahlung::CalculateStochasticLoss(double rnd)
         }
     }
 
-    //TOMASZ sometime everything is fine, just the probability for interaction is zero
+    //sometime everything is fine, just the probability for interaction is zero
     bool prob_for_all_comp_is_zero=true;
     for(int i=0; i<(medium_->GetNumCompontents()); i++)
     {
@@ -1001,8 +997,7 @@ double Bremsstrahlung::CalculateStochasticLoss(double rnd)
     }
     if(prob_for_all_comp_is_zero)return 0;
 
-    cout<<"Error (in BremsStochastic/e): sum was not initialized correctly" << endl;
-    cout<<"ecut: " << cut_settings_->GetEcut() << "\t vcut: " <<  cut_settings_->GetVcut() << "\t energy: " << particle_->GetEnergy() << "\t type: " << particle_->GetName() << endl;
+    log_fatal("sum was not initialized correctly");
     return 0;
 
 }
@@ -1267,21 +1262,19 @@ void Bremsstrahlung::SetParametrization(int parametrization)
     parametrization_ = parametrization;
     if(parametrization > 4)
     {
-        cerr<<"Warning: Parametrization not supported. Set to 1 (icecube default)"<<endl;
+        log_warn("Parametrization %i not supported. Set to 1 (icecube default)",parametrization);
         parametrization_    =   1;
     }
 
     if(do_dedx_Interpolation_)
     {
-        cerr<<"Warning: dEdx-interpolation enabled before choosing the parametrization."<<endl;
-        cerr<<"Rebuilding the tables"<<endl;
+        log_warn("dEdx-interpolation enabled before choosing the parametrization. Building the tables again");
         DisableDEdxInterpolation();
         EnableDEdxInterpolation();
     }
     if(do_dndx_Interpolation_)
     {
-        cerr<<"Warning: dNdx-interpolation enabled before choosing the parametrization."<<endl;
-        cerr<<"Rebuilding the tables"<<endl;
+        log_warn("dNdx-interpolation enabled before choosing the parametrization. Building the tables again");
         DisableDNdxInterpolation();
         EnableDNdxInterpolation();
     }
