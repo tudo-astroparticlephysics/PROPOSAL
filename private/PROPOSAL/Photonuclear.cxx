@@ -1,5 +1,6 @@
 #include "PROPOSAL/Photonuclear.h"
 #include <algorithm>
+#include "PROPOSAL/Output.h"
 
 using namespace std;
 
@@ -157,8 +158,7 @@ void Photonuclear::EnableDNdxInterpolation(std::string path, bool raw)
 
         if( FileExist(filename.str()) )
         {
-            cerr<<"Info: Photonuclear parametrisation tables (dNdx) will be read from file:"<<endl;
-            cerr<<"\t"<<filename.str()<<endl;
+            log_info("Photonuclear parametrisation tables (dNdx) will be read from file:\t%s",filename.str().c_str());
             ifstream input;
 
             if(raw)
@@ -185,11 +185,10 @@ void Photonuclear::EnableDNdxInterpolation(std::string path, bool raw)
         {
             if(!reading_worked)
             {
-                cerr<<"Info: file "<<filename.str()<<" is corrupted! Write is again!"<< endl;
+                log_info("File %s is corrupted! Write it again!",filename.str().c_str());
             }
 
-            cerr<<"Info: Photonuclear parametrisation tables (dNdx) will be saved to file:"<<endl;
-            cerr<<"\t"<<filename.str()<<endl;
+            log_info("Photonuclear parametrisation tables (dNdx) will be saved to file:\t%s",filename.str().c_str());
 
             double energy = particle_->GetEnergy();
 
@@ -223,8 +222,7 @@ void Photonuclear::EnableDNdxInterpolation(std::string path, bool raw)
             else
             {
                 storing_failed  =   true;
-                cerr<<"Warning: Can not open file "<<filename.str()<<" for writing!"<<endl;
-                cerr<<"\t Table will not be stored!"<<endl;
+                log_warn("Can not open file %s for writing! Table will not be stored!",filename.str().c_str());
             }
             particle_->SetEnergy(energy);
 
@@ -280,8 +278,7 @@ void Photonuclear::EnableDEdxInterpolation(std::string path, bool raw)
 
         if( FileExist(filename.str()) )
         {
-            cerr<<"Info: Photonuclear parametrisation tables (dEdx) will be read from file:"<<endl;
-            cerr<<"\t"<<filename.str()<<endl;
+            log_info("Photonuclear parametrisation tables (dEdx) will be read from file:\t%s",filename.str().c_str());
             ifstream input;
 
             if(raw)
@@ -302,11 +299,10 @@ void Photonuclear::EnableDEdxInterpolation(std::string path, bool raw)
         {
             if(!reading_worked)
             {
-                cerr<<"Info: file "<<filename.str()<<" is corrupted! Write is again!"<< endl;
+                log_info("File %s is corrupted! Write it again!",filename.str().c_str());
             }
 
-            cerr<<"Info: Photonuclear parametrisation tables (dEdx) will be saved to file:"<<endl;
-            cerr<<"\t"<<filename.str()<<endl;
+            log_info("Photonuclear parametrisation tables (dEdx) will be saved to file:\t%s",filename.str().c_str());
 
             double energy = particle_->GetEnergy();
 
@@ -332,8 +328,7 @@ void Photonuclear::EnableDEdxInterpolation(std::string path, bool raw)
             else
             {
                 storing_failed  =   true;
-                cerr<<"Warning: Can not open file "<<filename.str()<<" for writing!"<<endl;
-                cerr<<"\t Table will not be stored!"<<endl;
+                log_warn("Can not open file %s for writing! Table will not be stored!",filename.str().c_str());
             }
             particle_->SetEnergy(energy);
 
@@ -381,8 +376,7 @@ void Photonuclear::EnablePhotoInterpolation(std::string path, bool raw)
 
         if( FileExist(filename.str()) )
         {
-            cerr<<"Info: Photonuclear parametrisation tables will be read from file:"<<endl;
-            cerr<<"\t"<<filename.str()<<endl;
+            log_info("Photonuclear parametrisation tables will be read from file:\t%s",filename.str().c_str());
             ifstream input;
 
             if(raw)
@@ -407,11 +401,10 @@ void Photonuclear::EnablePhotoInterpolation(std::string path, bool raw)
         {
             if(!reading_worked)
             {
-                cerr<<"Info: file "<<filename.str()<<" is corrupted! Write is again!"<< endl;
+                log_info("File %s is corrupted! Write it again!",filename.str().c_str());
             }
 
-            cerr<<"Info: Photonuclear parametrisation tables will be saved to file:"<<endl;
-            cerr<<"\t"<<filename.str()<<endl;
+            log_info("Photonuclear parametrisation tables will be saved to file:\t%s",filename.str().c_str());
 
             double energy = particle_->GetEnergy();
 
@@ -443,8 +436,7 @@ void Photonuclear::EnablePhotoInterpolation(std::string path, bool raw)
             else
             {
                 storing_failed  =   true;
-                cerr<<"Warning: Can not open file "<<filename.str()<<" for writing!"<<endl;
-                cerr<<"\t Table will not be stored!"<<endl;
+                log_warn("Can not open file %s for writing! Table will not be stored!",filename.str().c_str());
             }
             particle_->SetEnergy(energy);
 
@@ -1292,6 +1284,8 @@ double Photonuclear::CalculateStochasticLoss(double rnd)
             }
         }
     }
+
+    //sometime everything is fine, just the probability for interaction is zero
     bool prob_for_all_comp_is_zero=true;
     for(int i=0; i<(medium_->GetNumCompontents()); i++)
     {
@@ -1300,8 +1294,8 @@ double Photonuclear::CalculateStochasticLoss(double rnd)
     }
     if(prob_for_all_comp_is_zero)return 0;
 
-    cerr<<"Error (in Photonuclear/e): sum was not initialized correctly";
-    cerr<<"ecut: " << cut_settings_->GetEcut() << "\t vcut: " <<  cut_settings_->GetVcut() << "\t energy: " << particle_->GetEnergy() << "\t type: " << particle_->GetName() << endl;
+    log_fatal("sum was not initialized correctly");
+
     return 0;
 }
 
@@ -1368,8 +1362,7 @@ double Photonuclear::PhotoN(double v, int i)
         case 7: return ButkevichMikhailovParametrization(v, i);
 
         default:
-            cerr<<"parametrization_family_ "<<parametrization_family_ <<" is not supported!"<<endl;
-            cerr<<"Be careful 0 is returned"<<endl;
+            log_error("parametrization_family_ %i is not supported! Be careful 0 is returned",parametrization_family_);
             return 0;
 
     }
@@ -1580,8 +1573,7 @@ double Photonuclear::ShadowEffect(double x , double nu)
     }
     else
     {
-        cout<<"shadow_ must be 1 or 2, other values are not supported!"<<endl;
-        cout<<"Be careful shadow effect factor is set to 1!"<<endl;
+        log_warn("shadow_ must be 1 or 2, other values are not supported! Be careful shadow effect factor is set to 1!");
 
         G   =   1.;
     }
@@ -2028,30 +2020,27 @@ void Photonuclear::SetParametrization(int parametrization)
             shadow_                 =   2;
             break;
         default:
-            cerr<<"Warning: Parametrization not supported. Set to 12 (icecube default)"<<endl;
+            log_warn("Parametrization %i not supported. Set to 12 (icecube default)",parametrization_);
             parametrization_family_ =   6;
             shadow_                 =   2;
     }
 
     if(do_photo_interpolation_)
     {
-        cerr<<"Warning: photo-interpolation enabled before choosing the parametrization (Photonuclear)."<<endl;
-        cerr<<"Rebuilding the tables"<<endl;
+        log_warn("photo-interpolation enabled before choosing the parametrization. Building the tables again");
         DisablePhotoInterpolation();
         EnablePhotoInterpolation();
     }
 
     if(do_dedx_Interpolation_)
     {
-        cerr<<"Warning: dEdx-interpolation enabled before choosing the parametrization (Photonuclear)."<<endl;
-        cerr<<"Rebuilding the tables"<<endl;
+        log_warn("dEdx-interpolation enabled before choosing the parametrization. Building the tables again");
         DisableDEdxInterpolation();
         EnableDEdxInterpolation();
     }
     if(do_dndx_Interpolation_)
     {
-        cerr<<"Warning: dNdx-interpolation enabled before choosing the parametrization (Photonuclear)."<<endl;
-        cerr<<"Rebuilding the tables"<<endl;
+        log_warn("dNdx-interpolation enabled before choosing the parametrization. Building the tables again");
         DisableDNdxInterpolation();
         EnableDNdxInterpolation();
     }
