@@ -4,6 +4,8 @@
 #include <iostream>
 #include <string>
 #include "PROPOSAL/Geometry.h"
+#include "PROPOSAL/Output.h"
+
 
 using namespace std;
 
@@ -19,7 +21,7 @@ public:
         Path_ = Path;
         in_.open(Path_.c_str());
         in_>>rnd_;
-        if(!in_.good())cout << "less than one rnd_number!" << endl;
+        if(!in_.good())log_warn("less than one rnd_number!");
     }
 
     double rnd(){
@@ -236,7 +238,7 @@ TEST(ProcessCollection , Set_Up ) {
         }
 
         CombOfProcColl.at(i)->EnableInterpolation();
-        cout << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << med << "\t" << particleName <<  endl;
+        log_info("ecut = %f\tvcut = %f\tlpm = %s\tenergy = %f\tmed = %s\tparticleName = %s" ,ecut,vcut,(lpm)?"true":"false",energy,med.c_str(),particleName.c_str());
         while(energy_old < energy)
         {
             energy_old = energy;

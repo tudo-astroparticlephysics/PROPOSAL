@@ -233,7 +233,7 @@ TEST(Scattering , Theta0 ) {
             Theta0_new = scat->CalculateTheta0(dr,energy,ef);
 
 
-            if(fabs(Theta0 -  Theta0_new)>1e-4*Theta0)cout << med << "\t" << particleName << "\t" << ecut << "\t" << vcut << endl;
+            //if(fabs(Theta0 -  Theta0_new)>1e-4*Theta0)cout << med << "\t" << particleName << "\t" << ecut << "\t" << vcut << endl;
 
             EXPECT_NEAR(Theta0, Theta0_new, 1e-2*Theta0);
 

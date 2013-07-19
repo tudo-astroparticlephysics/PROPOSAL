@@ -2,6 +2,7 @@
 #include "PROPOSAL/StandardNormal.h"
 #include <iostream>
 #include <string>
+#include "PROPOSAL/Output.h"
 
 using namespace std;
 
@@ -16,7 +17,7 @@ public:
         Path_ = Path;
         in_.open(Path_.c_str());
         in_>>rnd_;
-        if(!in_.good())cout << "less than one rnd_number!" << endl;
+        if(!in_.good())log_warn("less than one rnd_number!");
     }
 
     double rnd(){

@@ -512,13 +512,8 @@ TEST(IsInside , Cylinder ) {
         //cosine of angle between direction vector and position vector
         cos = (-x * dir_vec_x -y*dir_vec_y - z* dir_vec_z) / radius;
 
-        if(cos < 1 && cos > 0){
-            if(!A.IsParticleInside(particle))
-            {   cout.precision(16);
-                cout<< cos << "\t"<<x <<"\t"<< y<<"\t"<<z<<"\t"<<sqrt(x*x +y*y)<<endl;
-                cout<<A.DistanceToBorder(particle).first<<"\t"<<A.DistanceToBorder(particle).second<<endl;
-            }
-            EXPECT_TRUE(A.IsParticleInside(particle));}
+        if(cos < 1 && cos > 0)
+            EXPECT_TRUE(A.IsParticleInside(particle));
         else
             EXPECT_FALSE(A.IsParticleInside(particle));
 
