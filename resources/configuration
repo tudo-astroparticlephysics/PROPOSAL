@@ -185,7 +185,7 @@ global
 sector
     sphere  0   0   0   6371324  0
 
-    inside  -1     0.01  0
+    inside  20     -1  0
     infront -1    0.05  1
     behind  -1      -1  0
 

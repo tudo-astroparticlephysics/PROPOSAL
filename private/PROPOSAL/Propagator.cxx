@@ -162,7 +162,6 @@ double Propagator::Propagate( double distance )
     while(flag)
     {
         energy_till_stochastic_ = CalculateEnergyTillStochastic( initial_energy );
-
         if(energy_till_stochastic_.first > energy_till_stochastic_.second)
         {
             particle_interaction_   =   true;
@@ -233,6 +232,7 @@ double Propagator::Propagate( double distance )
         }
         else
         {
+            cout<<"Hallo"<<endl;
             decay           =   current_collection_->MakeDecay();
             final_energy    =   0;
 
@@ -251,27 +251,36 @@ double Propagator::Propagate( double distance )
 
     }
 
-//    if(sdec)
+//    if(sdec) <-- TODO: Include the flag
 //    {
-//        if(particle_->r!=r && ef!=0 && particle_->l>=0)
-//        {
-//            particle_->setEnergy(particle_->m);
+    if(particle_->GetPropagatedDistance()!=distance && final_energy!=0 && particle_->GetLifetime()>=0)
+    {
+        particle_->SetEnergy(particle_->GetMass());
 
-//            particle_->t    +=  -particle_->l*log(RandomDouble());
+        double t    =   particle_->GetT() -particle_->GetLifetime()*log(RandomDouble());
+        double product_energy   =   0;
 
-//            if(particle_->type==2)
-//            {
-//                aux =   cros->get_decay()->e(RandomDouble(), 0.5, RandomDouble(), o);
-//            }
-//            else
-//            {
-//                aux =   cros->get_decay()->e(RandomDouble(), 0.5, 0.5, o);
-//            }
+        pair<double, string> decay_to_store;
+        int secondary_id    =   particle_->GetParentParticleId() + 1;
 
-//            ef  =   0;
+        particle_->SetT( t );
 
-//            o->output(1, cros->get_decay()->get_out(), aux, ef);
-//        }
+        if(particle_->GetType()==2)
+        {
+            product_energy  =   current_collection_->GetDecay()->CalculateProductEnergy(RandomDouble(), 0.5, RandomDouble());
+        }
+        else
+        {
+            product_energy  =   current_collection_->GetDecay()->CalculateProductEnergy(RandomDouble(), 0.5, 0.5);
+        }
+
+        decay_to_store.first    =   product_energy;
+        decay_to_store.second   =   current_collection_->GetDecay()->GetOut();
+
+        final_energy  =   0;
+
+        Output::getInstance().FillSecondaryVector(particle_,secondary_id, decay_to_store, final_energy);
+    }
 //    }
 
     particle_->SetEnergy(final_energy);

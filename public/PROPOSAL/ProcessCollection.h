@@ -395,6 +395,10 @@ public:
 //----------------------------------------------------------------------------//
     //Getter
 
+    Decay* GetDecay() const {
+        return decay_;
+    }
+
     int GetLocation() const {
         return location_;
     }

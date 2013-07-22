@@ -328,11 +328,25 @@ int main(int argc, char** argv){
     log_warn("a");
     log_warn("a%i",1);
     log_warn("a%i",2);
-    log_fatal("NEIIIIIIIIIIIIIIIIIIIIIIN");
+    //log_fatal("NEIIIIIIIIIIIIIIIIIIIIIIN");
     log_warn("a");
     log_warn("a %i %i %i %i %i %i %i %i %i %i %i %i",3,33,3,3,33,3,4,4,4,4,4,4);
     log_warn("a");
     log_debug("hshshssh");
+    Particle * particle = new Particle("mu");
+    std::cout<<"Hallo"<<std::endl;
+
+    Propagator *pr = new Propagator("resources/configuration");
+    particle->SetEnergy(1e5);
+
+    pr->Propagate(particle);
+
+    for (unsigned int i =0 ; i <Output::getInstance().GetSecondarys().size(); i++)
+    {
+        cout<<Output::getInstance().GetSecondarys().at(i)->GetName()<<"\t"<<
+           Output::getInstance().GetSecondarys().at(i)->GetEnergy()<<endl;
+    }
+
 
     //log_arsch("a2 %i\n",2);
 
@@ -356,8 +370,6 @@ int main(int argc, char** argv){
 ////     LOG4CPLUS_INFO(logger, "INFO! " << blah);
 ////    LOG4CPLUS_TRACE(logger, LOG4CPLUS_TEXT("TRAC//E"));
 
-    StandardNormal *s = new StandardNormal(5,10,1e-6);
-    s->EnableInterpolation("resources/table");
 
 
 }

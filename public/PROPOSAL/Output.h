@@ -14,6 +14,11 @@
 #include <boost/preprocessor/array/elem.hpp>
 #include <boost/preprocessor/comparison/equal.hpp>
 #include <boost/preprocessor/config/limits.hpp>
+#include <iostream>
+#include <vector>
+#include <string>
+#include "PROPOSAL/Particle.h"
+#include "utility"
 
 #define VA_COUNT(...) VA_COUNT0(__VA_ARGS__, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1)
 #define VA_COUNT0(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, N,...) N
@@ -52,25 +57,64 @@ using namespace log4cplus;
 
 class Output
 {
-    public:
-        static Output& getInstance()
-        {
-            static Output instance;
-            return instance;
-        }
-        Logger logger;
+private:
+    Output()
+    {
+        PropertyConfigurator::doConfigure(LOG4CPLUS_TEXT("resources/log4cplus.conf"));
+        logger = Logger::getInstance(LOG4CPLUS_TEXT("PORPOSAL"));
+    }
 
-        void SetLoggingConfigurationFile(std::string file);
+    Output(Output const&);         // Don't Implement.
+    void operator=(Output const&); // Don't implement
 
-    private:
-        Output() {
-            PropertyConfigurator::doConfigure(LOG4CPLUS_TEXT("resources/log4cplus.conf"));
-            logger = Logger::getInstance(LOG4CPLUS_TEXT("PORPOSAL"));
-        }
-        Output(Output const&);              // Don't Implement.
-        void operator=(Output const&); // Don't implement
+    static std::vector<Particle*> secondarys_;
+
+public:
+
+    Logger logger;
+
+    static Output& getInstance()
+    {
+        static Output instance;
+        return instance;
+    }
+
+    void SetLoggingConfigurationFile(std::string file);
+
+    void FillSecondaryVector(Particle *particle, int secondary_id, std::pair<double,std::string> energy_loss, double distance);
+
+
+    //Getter
+    std::vector<Particle*> GetSecondarys() const
+    {
+        return secondarys_;
+    }
+
  };
 
 #endif //ICECUBE
 
 #endif //OUTPUT_H
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

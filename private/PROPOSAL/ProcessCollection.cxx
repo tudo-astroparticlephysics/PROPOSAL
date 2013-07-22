@@ -258,8 +258,10 @@ pair<double,string> ProcessCollection::MakeStochasticLoss(double rnd1,double rnd
     double total_rate          =    0;
     double total_rate_weighted =    0;
     double rates_sum           =    0;
+    int secondary_id           =    0;
 
     //double decayS              =    0;
+
 
     pair<double,string> energy_loss;
 
@@ -318,6 +320,10 @@ pair<double,string> ProcessCollection::MakeStochasticLoss(double rnd1,double rnd
         }
     }
 
+    secondary_id    =   particle_->GetParticleId() + 1;
+
+    Output::getInstance().FillSecondaryVector(particle_, secondary_id, energy_loss, 0);
+
 //        else  // due to the parameterization of the cross section cutoffs
 //        {
 //            ei  =   ef;
@@ -348,6 +354,8 @@ pair<double,string> ProcessCollection::MakeDecay(double rnd1,double rnd2, double
 {
     pair<double,string> decay;
 
+    int secondary_id;
+
     if(particle_->GetType() ==2)
     {
         decay.first     =   decay_->CalculateProductEnergy(rnd1, rnd2, rnd3);
@@ -359,6 +367,9 @@ pair<double,string> ProcessCollection::MakeDecay(double rnd1,double rnd2, double
 
     decay.second    =   decay_->GetOut();
 
+    secondary_id    = particle_->GetParentParticleId()  +   1;
+
+    Output::getInstance().FillSecondaryVector(particle_, secondary_id, decay ,0);
     return decay;
 }
 
