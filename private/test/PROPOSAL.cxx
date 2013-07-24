@@ -333,17 +333,18 @@ int main(int argc, char** argv){
 //    log_warn("a %i %i %i %i %i %i %i %i %i %i %i %i",3,33,3,3,33,3,4,4,4,4,4,4);
 //    log_warn("a");
 //    log_debug("hshshssh");
-    Particle * particle = new Particle("mu");
     Particle * particle1 = new Particle("mu");
     Particle * particle2 = new Particle("mu");
+    Particle * particle = new Particle("mu");
 
     std::cout<<"Hallo"<<std::endl;
 
     Propagator *pr = new Propagator("resources/configuration");
-    particle->SetEnergy(1e4);
     particle1->SetEnergy(1e5);
     particle2->SetEnergy(1e4);
-            vector<Particle*> a ;
+    particle->SetEnergy(1e4);
+
+    vector<Particle*> a ;
 
 //    vector<Particle*> a = pr->Propagate(particle);
 //    vector<Particle*> b = pr->Propagate(particle1);
@@ -351,9 +352,12 @@ int main(int argc, char** argv){
 
     for(int j= 0 ; j<1e2; j++)
     {
-        cout<<j<<endl;
-        a= pr->Propagate(particle);
+        particle = new Particle("mu");
+        particle->SetEnergy(1e6);
 
+        cout<<"--------------"<<j<<"--------------"<<endl;
+        a= pr->Propagate(particle);
+cout<<particle->GetEnergy()<<endl;
         for(unsigned int i =0; i<a.size();i++)
         {
             cout<<a.at(i)->GetName()<<"\t"<<a.at(i)->GetEnergy()<<endl;

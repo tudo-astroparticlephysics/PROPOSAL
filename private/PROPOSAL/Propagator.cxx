@@ -75,7 +75,6 @@ std::pair<double,double> Propagator::CalculateEnergyTillStochastic( double initi
 vector<Particle*> Propagator::Propagate( Particle *particle )
 {
     Output::getInstance().ClearSecondaryVector();
-
     double distance_to_collection_border    =   0;
     double distance_to_detector_            =   0;
     double distance                         =   0;
@@ -120,7 +119,6 @@ vector<Particle*> Propagator::Propagate( Particle *particle )
         if(result<0) break;
 
     }
-
     return Output::getInstance().GetSecondarys();
 
 }
