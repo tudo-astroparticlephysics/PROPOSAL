@@ -352,12 +352,11 @@ int main(int argc, char** argv){
 
     for(int j= 0 ; j<1e2; j++)
     {
-        particle = new Particle("mu");
-        particle->SetEnergy(1e6);
+//        particle = new Particle("mu");
+//        particle->SetEnergy(1e6);
 
         cout<<"--------------"<<j<<"--------------"<<endl;
         a= pr->Propagate(particle);
-cout<<particle->GetEnergy()<<endl;
         for(unsigned int i =0; i<a.size();i++)
         {
             cout<<a.at(i)->GetName()<<"\t"<<a.at(i)->GetEnergy()<<endl;

@@ -116,7 +116,7 @@ vector<Particle*> Propagator::Propagate( Particle *particle )
 
         prop_dist   +=  particle_->GetPropagatedDistance();
         particle_->SetPropagatedDistance(0);
-        if(result<0) break;
+        if(result<=0) break;
 
     }
     return Output::getInstance().GetSecondarys();
