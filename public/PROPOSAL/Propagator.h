@@ -121,10 +121,10 @@ public:
 //----------------------------------------------------------------------------//
     /**
      * Propagates the particle through the current set of ProcessCollections
-     *  \return energy at distance r OR -(track length)
+     *  \return vector of secondarys
      */
 
-    double Propagate( Particle *particle );
+    std::vector<Particle*> Propagate( Particle *particle );
 
 //----------------------------------------------------------------------------//
     /*!

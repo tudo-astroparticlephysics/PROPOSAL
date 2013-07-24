@@ -322,32 +322,43 @@ int main(int argc, char** argv){
 //    cout << *(scat->GetParticle()) << endl;
 //    }
 
-    cout<<BOOST_PP_LIMIT_TUPLE<<endl;
+//    cout<<BOOST_PP_LIMIT_TUPLE<<endl;
 
-    int b =4;
-    log_warn("a");
-    log_warn("a%i",1);
-    log_warn("a%i",2);
-    //log_fatal("NEIIIIIIIIIIIIIIIIIIIIIIN");
-    log_warn("a");
-    log_warn("a %i %i %i %i %i %i %i %i %i %i %i %i",3,33,3,3,33,3,4,4,4,4,4,4);
-    log_warn("a");
-    log_debug("hshshssh");
+//    int b =4;
+//    log_warn("a");
+//    log_warn("a%i",1);
+//    log_warn("a%i",2);
+//    //log_fatal("NEIIIIIIIIIIIIIIIIIIIIIIN");
+//    log_warn("a");
+//    log_warn("a %i %i %i %i %i %i %i %i %i %i %i %i",3,33,3,3,33,3,4,4,4,4,4,4);
+//    log_warn("a");
+//    log_debug("hshshssh");
     Particle * particle = new Particle("mu");
+    Particle * particle1 = new Particle("mu");
+    Particle * particle2 = new Particle("mu");
+
     std::cout<<"Hallo"<<std::endl;
 
     Propagator *pr = new Propagator("resources/configuration");
-    particle->SetEnergy(1e5);
+    particle->SetEnergy(1e4);
+    particle1->SetEnergy(1e5);
+    particle2->SetEnergy(1e4);
+            vector<Particle*> a ;
 
-    pr->Propagate(particle);
+//    vector<Particle*> a = pr->Propagate(particle);
+//    vector<Particle*> b = pr->Propagate(particle1);
+//    vector<Particle*> c = pr->Propagate(particle2);
 
-    for (unsigned int i =0 ; i <Output::getInstance().GetSecondarys().size(); i++)
+    for(int j= 0 ; j<1e2; j++)
     {
-        cout<<Output::getInstance().GetSecondarys().at(i)->GetName()<<"\t"<<
-           Output::getInstance().GetSecondarys().at(i)->GetEnergy()<<endl;
+        cout<<j<<endl;
+        a= pr->Propagate(particle);
+
+        for(unsigned int i =0; i<a.size();i++)
+        {
+            cout<<a.at(i)->GetName()<<"\t"<<a.at(i)->GetEnergy()<<endl;
+        }
     }
-
-
     //log_arsch("a2 %i\n",2);
 
   //  cout<<VA_COUNT("a2 %i")<<endl;

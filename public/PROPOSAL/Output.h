@@ -58,6 +58,7 @@ using namespace log4cplus;
 class Output
 {
 private:
+
     Output()
     {
         PropertyConfigurator::doConfigure(LOG4CPLUS_TEXT("resources/log4cplus.conf"));
@@ -73,16 +74,26 @@ public:
 
     Logger logger;
 
+//----------------------------------------------------------------------------//
+
     static Output& getInstance()
     {
         static Output instance;
         return instance;
     }
+//----------------------------------------------------------------------------//
 
     void SetLoggingConfigurationFile(std::string file);
 
+//----------------------------------------------------------------------------//
+
     void FillSecondaryVector(Particle *particle, int secondary_id, std::pair<double,std::string> energy_loss, double distance);
 
+//----------------------------------------------------------------------------//
+
+    void ClearSecondaryVector();
+
+//----------------------------------------------------------------------------//
 
     //Getter
     std::vector<Particle*> GetSecondarys() const

@@ -1273,7 +1273,7 @@ double Photonuclear::CalculateStochasticLoss(double rnd)
                     return (particle_->GetEnergy())*vUp_;
                 }
 
-                return particle_->GetEnergy()*(vUp_*exp(dndx_interpolant_2d_.at(i)->FindLimit((particle_->GetEnergy()), (rnd)*prob_for_component_.at(i))*log(vMax_/vUp_)));
+                return particle_->GetEnergy()*(vUp_*exp(dndx_interpolant_2d_.at(i)->FindLimit((particle_->GetEnergy()), (rnd_)*prob_for_component_.at(i))*log(vMax_/vUp_)));
 
             }
             else

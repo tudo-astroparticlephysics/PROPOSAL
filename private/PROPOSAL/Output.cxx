@@ -43,3 +43,17 @@ void Output::FillSecondaryVector(Particle *particle, int secondary_id, pair<doub
     secondarys_.push_back(particle_to_store);
 
 }
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+void Output::ClearSecondaryVector()
+{
+//    for(unsigned int i = 0 ; i< secondarys_.size() ; i++)
+//    {
+//        delete secondarys_.at(i);
+//    }
+    secondarys_.clear();
+}
