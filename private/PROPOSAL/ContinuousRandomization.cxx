@@ -624,6 +624,50 @@ void ContinuousRandomization::swap(ContinuousRandomization &continuous_randomiza
     }
 }
 
+ostream& operator<<(ostream& os, ContinuousRandomization const& continuous_randomization)
+{
+    os<<"---------------------------ContinuousRandomization( "<<&continuous_randomization<<" )---------------------------"<<endl;
+    os<<fixed<<setprecision(5);
+    os<<"\tParticle:\t"<<continuous_randomization.particle_<<endl;
+    if(continuous_randomization.particle_!=NULL)
+    {
+        os<<"\t\tname:\t\t\t"<<continuous_randomization.particle_->GetName()<<endl;
+        os<<"\t\tenergy:\t\t\t"<<continuous_randomization.particle_->GetEnergy()<<endl;
+        os<<"\t\tdistance:\t\t\t"<<continuous_randomization.particle_->GetPropagatedDistance()<<endl;
+    }
+    os<<endl;
+    os<<"\tMedium:\t"<<continuous_randomization.medium_<<endl;
+    if(continuous_randomization.medium_!=NULL)
+    {
+        os<<"\t\tname:\t\t\t"<<continuous_randomization.medium_->GetName()<<endl;
+        os<<"\t\trho:\t\t\t"<<continuous_randomization.medium_->GetRho()<<endl;
+    }
+    os<<endl;
+    os<<"\tCrossSections:\t"<<continuous_randomization.cross_sections_.size()<<endl;
+    for(unsigned int i=0;i<continuous_randomization.cross_sections_.size();i++)
+    {
+        os<<"\t\t\tname:\t\t"<<continuous_randomization.cross_sections_.at(i)->GetName() << endl;
+        os<<"\t\t\tadress:\t\t" << continuous_randomization.cross_sections_.at(i)<< endl;
+        //os<<endl;
+    }
+    os<<endl;
+    os<<"\tStandardNormal:\t"<<continuous_randomization.standard_normal_<<endl;
+    os<<"\tdE2dx_integral:\t"<<continuous_randomization.dE2dx_integral_<<endl;
+    os<<"\tdE2de_integral:\t"<<continuous_randomization.dE2de_integral_<<endl;
+    os<<endl;
+    os<<"\tdo_dE2dx_Interpolation:\t"<<continuous_randomization.do_dE2dx_Interpolation_<<endl;
+    os<<"\tdE2dx_interpolant_:\t\t"<<continuous_randomization.dE2dx_interpolant_<<endl;
+    os<<endl;
+    os<<"\tdo_dE2de_Interpolation:\t"<<continuous_randomization.do_dE2de_Interpolation_<<endl;
+    os<<"\tdE2de_interpolant_:\t\t"<<continuous_randomization.dE2de_interpolant_<<endl;
+    os<<"\tdE2de_interpolant_diff:\t"<<continuous_randomization.dE2de_interpolant_diff_<<endl;
+    os<<endl<<endl;
+    os<<"\tTemp. variables: " << endl;
+    os<<"\t\twhich_cros:\t\t\t" << continuous_randomization.which_cross_ << endl;
+    os<<"\t\torder_of_interpolation:\t" << continuous_randomization.order_of_interpolation_ << endl;
+    os<<"-----------------------------------------------------------------------------------------------";
+    return os;
+}
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//

@@ -69,7 +69,7 @@ public:
     ContinuousRandomization& operator=(const ContinuousRandomization& continuous_randomization);
     bool operator==(const ContinuousRandomization &continuous_randomization) const;
     bool operator!=(const ContinuousRandomization &continuous_randomization) const;
-
+    friend std::ostream& operator<<(std::ostream& os, ContinuousRandomization const &continuous_randomization);
 //----------------------------------------------------------------------------//
 
     //Memberfunction
