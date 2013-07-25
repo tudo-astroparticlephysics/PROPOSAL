@@ -126,6 +126,45 @@ bool CrossSections::operator!=(const CrossSections &crossSections) const
     return !(*this == crossSections);
 }
 
+std::ostream& operator<<(std::ostream& os, CrossSections const &crossSections)
+{
+    os<<"\tParametrization:\t" << crossSections.parametrization_ << std::endl;
+    os<<"\tEbig:\t\t"<< crossSections.ebig_ << std::endl;
+    os<<"\tMultiplier:\t\t"<<crossSections.multiplier_<<std::endl;
+    os<<std::endl;
+    os<<"\tParticle:\t\t"<<crossSections.particle_<<std::endl;
+    if(crossSections.particle_!=NULL)
+    {
+        os<<"\t\tname:\t\t\t"<<crossSections.particle_->GetName()<<std::endl;
+        os<<"\t\tenergy:\t\t\t"<<crossSections.particle_->GetEnergy()<<std::endl;
+        os<<"\t\tdistance:\t\t\t"<<crossSections.particle_->GetPropagatedDistance()<<std::endl;
+    }
+    os<<std::endl;
+    os<<"\tMedium:\t\t"<<crossSections.medium_<<std::endl;
+    if(crossSections.medium_!=NULL)
+    {
+        os<<"\t\tname:\t\t\t"<<crossSections.medium_->GetName()<<std::endl;
+        os<<"\t\trho:\t\t\t"<<crossSections.medium_->GetRho()<<std::endl;
+    }
+    os<<std::endl;
+    os<<"\tCutSettings:\t"<<crossSections.cut_settings_<<std::endl;
+    if(crossSections.cut_settings_!=NULL)
+    {
+        os<<"\t\tecut:\t\t\t"<<crossSections.cut_settings_->GetEcut()<<std::endl;
+        os<<"\t\tvcut:\t\t\t"<<crossSections.cut_settings_->GetVcut()<<std::endl;
+    }
+    os<<std::endl;
+    os<<"\tTemp. variables: " << std::endl;
+    os<<"\t\tvMax:\t\t\t"<<crossSections.vMax_<<std::endl;
+    os<<"\t\tvUp:\t\t\t"<<crossSections.vUp_<<std::endl;
+    os<<"\t\tvMin:\t\t\t"<<crossSections.vMin_<<std::endl;
+    os<<"\t\trnd:\t\t\t"<<crossSections.rnd_<<std::endl;
+    os<<"\t\torder_of_interpolation:\t"<<crossSections.order_of_interpolation_<<std::endl;
+    os<<"\t\tsum_of_rates:\t\t"<<crossSections.sum_of_rates_<<std::endl;
+    os<<"\t\tinit_lpm_effect:\t\t"<<crossSections.init_lpm_effect_<<std::endl;
+    os<<"\t\tlpm_effect_enabled:\t\t"<<crossSections.lpm_effect_enabled_<<std::endl;
+    return os;
+}
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//

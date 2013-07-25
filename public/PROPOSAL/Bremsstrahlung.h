@@ -138,7 +138,7 @@ public:
     bool operator==(const Bremsstrahlung &brems) const;
     bool operator!=(const Bremsstrahlung &brems) const;
     Bremsstrahlung(Particle* particle, Medium* medium, EnergyCutSettings* cut_settings);
-
+    friend std::ostream& operator<<(std::ostream& os, Bremsstrahlung const &brems);
 
 //----------------------------------------------------------------------------//
 

@@ -82,7 +82,7 @@ public:
     CrossSections(const CrossSections& crossSections);
     bool operator==(const CrossSections &crossSections) const;
     bool operator!=(const CrossSections &crossSections) const;
-
+    friend std::ostream& operator<<(std::ostream& os, CrossSections const&crossSections);
 
 //----------------------------------------------------------------------------//
 
