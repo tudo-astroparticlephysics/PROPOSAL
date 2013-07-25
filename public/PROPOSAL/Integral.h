@@ -118,9 +118,11 @@ private:
 //----------------------------------------------------------------------------//
 
    /*!
-    * table of substitutions
+    * Interface for the integrand. This function does all the substitutions (like
+    * log, exp, pow...), which are needed by the integration routines
+    * (e.g. Trapezoid).
     * \param   x
-    * \return  function value
+    * \return  modified integrand value
     */
    double Function(double x);
 
@@ -128,7 +130,11 @@ private:
 
 
    /*!
-    * finds f(x) for f: iY[i]=f(iX[i]), i=start, ..., start+romberg
+    * Interpolates the integral value by interpolating/extrapolating the value
+    * on the basis of the last "romberg" integral values. Mostly it is used with
+    * x=0 because it extrapolates to an infinite number of sampling points or
+    * in other words a step size of 0. So it extrapolates the function: integral
+    * values over stepsize(or 1/sampling points).
     *
     * \param   start   Starting point of the interpolation
     * \param   x       Searched function value for f(x)
