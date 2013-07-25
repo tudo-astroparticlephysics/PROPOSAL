@@ -721,6 +721,33 @@ ostream& operator<<(std::ostream& os, Bremsstrahlung const &brems)
 {
     os<<"---------------------------Bremsstrahlung( "<<&brems<<" )---------------------------"<<std::endl;
     os<< static_cast <const CrossSections &>( brems ) << endl;
+    os<< "------- Class Specific: " << endl;
+    os<< "\tlorenz:\t\t" << brems.lorenz_ << endl;
+    os<< "\tlorenz_cut:\t\t" << brems.lorenz_cut_ << endl;
+    os<< "\tcomponent:\t\t" << brems.component_<<endl;
+    os<< "\teLpm:\t\t" << brems.eLpm_<<endl;
+    os<<endl;
+    os<<"\tdedx_integral:\t"<<brems.dedx_integral_ << endl;
+    os<<"\tdndx_integral:\t"<<brems.dndx_integral_.size()<<endl;
+    for(unsigned int i=0;i<brems.dndx_integral_.size();i++)
+    {
+        os<<"\t\taddress:\t\t"<<brems.dndx_integral_.at(i)<<endl;
+    }
+    os<<endl;
+    os<<"\tdo_dedx_Interpolation:\t\t"<<brems.do_dedx_Interpolation_<<endl;
+    os<<"\tdedx_interpolant:\t\t"<<brems.dedx_interpolant_<<endl;
+    os<<endl;
+    os<<"\tdo_dndx_Interpolation:\t\t"<<brems.do_dndx_Interpolation_<<endl;
+    os<<"\tdndx_interpolant_1d:\t\t"<<brems.dndx_interpolant_1d_.size()<<endl;
+    for(unsigned int i=0;i<brems.dndx_interpolant_1d_.size();i++)
+    {
+        os<<"\t\taddress:\t\t"<<brems.dndx_interpolant_1d_.at(i)<<endl;
+    }
+    os<<"\tdndx_interpolant_2d:\t\t"<<brems.dndx_interpolant_2d_.size()<<endl;
+    for(unsigned int i=0;i<brems.dndx_interpolant_2d_.size();i++)
+    {
+        os<<"\t\taddress:\t\t"<<brems.dndx_interpolant_2d_.at(i)<<endl;
+    }
     os<<"-----------------------------------------------------------------------------------------------";
     return os;
 }
