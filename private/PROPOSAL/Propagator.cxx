@@ -148,7 +148,7 @@ vector<Particle*> Propagator::Propagate( Particle *particle )
             particle_->SetTf( particle_->GetT() );
 
             energy_at_exit_point    =   particle_->GetEnergy();
-
+            //we don't want to run in this case a second time so we set was_in_detector to false
             was_in_detector =   false;
 
         }
@@ -162,7 +162,7 @@ vector<Particle*> Propagator::Propagate( Particle *particle )
             particle_->SetTf( particle_->GetT() );
 
             energy_at_exit_point    =   particle_->GetEnergy();
-
+            //we don't want to run in this case a second time so we set starts_in_detector to false
             starts_in_detector  =   false;
 
         }
@@ -398,8 +398,6 @@ void Propagator::AdvanceParticle(double dr, double ei, double ef)
         particle_->SetY(y);
         particle_->SetZ(z);
     }
-    cout.precision(16);
-    cout<<time<<endl;
     particle_->SetPropagatedDistance(dist);
     particle_->SetT(time);
 

@@ -368,11 +368,8 @@ int main(int argc, char** argv){
 
         //cout<<"--------------"<<j<<"--------------"<<endl;
         a= pr->Propagate(particle);
-        out<<particle->GetPropagatedDistance()<<endl;
-        for(unsigned int i =0; i<a.size();i++)
-        {
-            cout<<*particle<<endl;
-        }
+
+        cout<<*particle<<endl;
     }
     out.close();
     //log_arsch("a2 %i\n",2);
