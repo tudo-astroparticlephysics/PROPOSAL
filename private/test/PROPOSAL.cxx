@@ -335,33 +335,46 @@ int main(int argc, char** argv){
 //    log_debug("hshshssh");
     Particle * particle1 = new Particle("mu");
     Particle * particle2 = new Particle("mu");
-    Particle * particle = new Particle("mu");
+    Particle * particle = new Particle("mu" ,-200.,10.,-10.,90.,0.,0.,0.);
 
     std::cout<<"Hallo"<<std::endl;
+
+    Medium *m = new Medium("air",1.2);
+    EnergyCutSettings *e = new EnergyCutSettings(500,0.1);
+    Bremsstrahlung *b = new Bremsstrahlung(particle,m,e);
+
+    cout<<*b<<endl;
 
     Propagator *pr = new Propagator("resources/configuration");
     particle1->SetEnergy(1e5);
     particle2->SetEnergy(1e4);
-    particle->SetEnergy(1e4);
+    particle->SetEnergy(1e5);
 
     vector<Particle*> a ;
+
+    ofstream out;
+    out.open("test_2media.txt");
 
 //    vector<Particle*> a = pr->Propagate(particle);
 //    vector<Particle*> b = pr->Propagate(particle1);
 //    vector<Particle*> c = pr->Propagate(particle2);
 
-    for(int j= 0 ; j<1e2; j++)
+    for(int j= 0 ; j<1e1; j++)
     {
-//        particle = new Particle("mu");
-//        particle->SetEnergy(1e6);
+        if(j%10000==0)cout<<"Progress: " <<1.*j/1e4<<"%"<<endl;
 
-        cout<<"--------------"<<j<<"--------------"<<endl;
+        particle = new Particle("mu" ,-200.,10.,-10.,90.,0.,0.,0.);
+        particle->SetEnergy(1e6);
+
+        //cout<<"--------------"<<j<<"--------------"<<endl;
         a= pr->Propagate(particle);
+        out<<particle->GetPropagatedDistance()<<endl;
         for(unsigned int i =0; i<a.size();i++)
         {
-            cout<<a.at(i)->GetName()<<"\t"<<a.at(i)->GetEnergy()<<endl;
+            cout<<*particle<<endl;
         }
     }
+    out.close();
     //log_arsch("a2 %i\n",2);
 
   //  cout<<VA_COUNT("a2 %i")<<endl;

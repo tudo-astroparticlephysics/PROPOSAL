@@ -53,25 +53,25 @@ private:
     int parent_particle_id_;     //!< parent particle id
     int particle_id_;            //!< particle id
 
-    double xi_;                  //!< x-coordinate entry Point [m]
-    double yi_;                  //!< y-coordinate entry Point [m]
-    double zi_;                  //!< z-coordinate entry Point [m]
+    double xi_;                  //!< x-coordinate entry Point [cm]
+    double yi_;                  //!< y-coordinate entry Point [cm]
+    double zi_;                  //!< z-coordinate entry Point [cm]
     double ti_;                  //!< t-coordinate entry Point [sec]
-    double ei_;                  //!< energy at entry point [GeV]
+    double ei_;                  //!< energy at entry point [MeV]
 
-    double xf_;                  //!< x-coordinate exit Point [m]
-    double yf_;                  //!< y-coordinate exit Point [m]
-    double zf_;                  //!< z-coordinate exit Point [m]
+    double xf_;                  //!< x-coordinate exit Point [cm]
+    double yf_;                  //!< y-coordinate exit Point [cm]
+    double zf_;                  //!< z-coordinate exit Point [cm]
     double tf_;                  //!< t-coordinate exit Point [sec]
-    double ef_;                  //!< energy at exit point [GeV]
+    double ef_;                  //!< energy at exit point [MeV]
 
-    double xc_;                  //!< x-coordinate at point of closest approach [m]
-    double yc_;                  //!< y-coordinate at point of closest approach [m]
-    double zc_;                  //!< z-coordinate at point of closest approach [m]
+    double xc_;                  //!< x-coordinate at point of closest approach [cm]
+    double yc_;                  //!< y-coordinate at point of closest approach [cm]
+    double zc_;                  //!< z-coordinate at point of closest approach [cm]
     double tc_;                  //!< t-coordinate at point of closest approach [sec]
-    double ec_;                  //!< energy at at point of closest approach [GeV]
+    double ec_;                  //!< energy at at point of closest approach [MeV]
 
-    double elost_;               //!< energy lost in the detector volume [GeV]
+    double elost_;               //!< energy lost in the detector volume [MeV]
 
 
 //----------------------------------------------------------------------------//

@@ -536,14 +536,14 @@ ostream& operator<<(ostream& os, Particle const& particle)
     os<<"\tparent particle id_:\t\t\t"<<particle.parent_particle_id_<<scientific<<endl;
     os<<"\tenergy below paricle is lost [MeV]:\t"<<particle.low_<<fixed<<endl;
     os<<"\tpropagated distance [cm]:\t\t"<<particle.propagated_distance_<<endl;
-    os<<"\tenergy lost in detector [GeV]:\t\t"<<particle.elost_<<endl;
+    os<<"\tenergy lost in detector [MeV]:\t\t"<<particle.elost_<<endl;
 
-    os<<"\n\tDetector entry point: x [m] | y [m] | z [m] | time [s] | energy [GeV]"<<endl;
-    os<<"\t\t"<<particle.xi_<<"\t"<<particle.yi_<<"\t"<<particle.zi_<<"\t"<<particle.ti_<<"\t"<<particle.ei_<<endl;
-    os<<"\n\tDetector exit point: x [m] | y [m] | z [m] | time [s] | energy [GeV]"<<endl;
-    os<<"\t\t"<<particle.xf_<<"\t"<<particle.yf_<<"\t"<<particle.zf_<<"\t"<<particle.tf_<<"\t"<<particle.ef_<<endl;
-    os<<"\n\tPoint of closest approach: x [m] | y [m] | z [m] | time [s] | energy [GeV]"<<endl;
-    os<<"\t\t"<<particle.xc_<<"\t"<<particle.yc_<<"\t"<<particle.zc_<<"\t"<<particle.tc_<<"\t"<<particle.ec_<<endl;
+    os<<"\n\tDetector entry point: x [cm] | y [cm] | z [cm] | time [s] | energy [MeV]"<<endl;
+    os<<"\t\t"<<particle.xi_<<"\t"<<particle.yi_<<"\t"<<particle.zi_<<scientific<<"\t"<<particle.ti_<<fixed<<"\t"<<particle.ei_<<endl;
+    os<<"\n\tDetector exit point: x [cm] | y [cm] | z [cm] | time [s] | energy [MeV]"<<endl;
+    os<<"\t\t"<<particle.xf_<<"\t"<<particle.yf_<<"\t"<<particle.zf_<<scientific<<"\t"<<particle.tf_<<fixed<<"\t"<<particle.ef_<<endl;
+    os<<"\n\tPoint of closest approach: x [cm] | y [cm] | z [cm] | time [s] | energy [MeV]"<<endl;
+    os<<"\t\t"<<particle.xc_<<"\t"<<particle.yc_<<"\t"<<particle.zc_<<scientific<<"\t"<<particle.tc_<<fixed<<"\t"<<particle.ec_<<endl;
     os<<"--------------------------------------------------------------------------";
     return os;
 }

@@ -75,17 +75,33 @@ std::pair<double,double> Propagator::CalculateEnergyTillStochastic( double initi
 vector<Particle*> Propagator::Propagate( Particle *particle )
 {
     Output::getInstance().ClearSecondaryVector();
+
+    SetParticle(particle);
+
     double distance_to_collection_border    =   0;
     double distance_to_detector_            =   0;
     double distance                         =   0;
     double result                           =   0;
-    double prop_dist                        =   0;
 
-    SetParticle(particle);
+    // These two variables are needed to calculate the energy loss inside the detector
+    // energy_at_entry_point is initialized with the current energy because this is a
+    // reasonable value for particle which starts inside the detector
+
+    double energy_at_entry_point            =   particle_->GetEnergy();
+    double energy_at_exit_point             =   0;
+
+
+    bool starts_in_detector     =   detector_->IsParticleInside(particle_);
+    bool is_in_detector     =   false;
+    bool was_in_detector    =   false;
+
 
     while(1)
     {
         ChooseCurrentCollection(particle_);
+
+        // Check if have have to propagate the particle through the whole collection
+        // or only to the collection border
 
         distance_to_collection_border =
         current_collection_->GetGeometry()->DistanceToBorder(particle_).first;
@@ -108,17 +124,57 @@ vector<Particle*> Propagator::Propagate( Particle *particle )
         {
             distance    =   distance_to_collection_border;
         }
+        is_in_detector  =   detector_->IsParticleInside(particle_);
+        // entry point of the detector
+        if(!starts_in_detector && !was_in_detector && is_in_detector)
+        {
+            particle_->SetXi( particle_->GetX() );
+            particle_->SetYi( particle_->GetY() );
+            particle_->SetZi( particle_->GetZ() );
+            particle_->SetEi( particle_->GetEnergy() );
+            particle_->SetTi( particle_->GetT() );
+
+            energy_at_entry_point   =   particle_->GetEnergy();
+
+            was_in_detector =   true;
+        }
+        // exit point of the detector
+        else if(was_in_detector && !is_in_detector)
+        {
+            particle_->SetXf( particle_->GetX() );
+            particle_->SetYf( particle_->GetY() );
+            particle_->SetZf( particle_->GetZ() );
+            particle_->SetEf( particle_->GetEnergy() );
+            particle_->SetTf( particle_->GetT() );
+
+            energy_at_exit_point    =   particle_->GetEnergy();
+
+            was_in_detector =   false;
+
+        }
+        // if particle starts inside the detector we only ant to fill the exit point
+        else if(starts_in_detector && !is_in_detector)
+        {
+            particle_->SetXf( particle_->GetX() );
+            particle_->SetYf( particle_->GetY() );
+            particle_->SetZf( particle_->GetZ() );
+            particle_->SetEf( particle_->GetEnergy() );
+            particle_->SetTf( particle_->GetT() );
+
+            energy_at_exit_point    =   particle_->GetEnergy();
+
+            starts_in_detector  =   false;
+
+        }
 
         result  =   Propagate(distance);
-//        cout<<result<<endl;
-//        cout<<current_collection_<<"\t"<<current_collection_->GetLocation();
-//        cout<<"\t"<<particle->GetX()<<"\t"<<particle->GetY()<<"\t"<<particle->GetZ()<<"\t"<<particle->GetPropagatedDistance()<<endl;
 
-        prop_dist   +=  particle_->GetPropagatedDistance();
-        particle_->SetPropagatedDistance(0);
         if(result<=0) break;
 
     }
+
+    particle_->SetElost(energy_at_entry_point - energy_at_exit_point);
+
     return Output::getInstance().GetSecondarys();
 
 }
@@ -132,6 +188,8 @@ double Propagator::Propagate( double distance )
 {
     bool    flag;
     double  displacement;
+
+    double propagated_distance  =   0;
 
     double  initial_energy  =   particle_->GetEnergy();
     double  final_energy    =   particle_->GetEnergy();
@@ -181,13 +239,13 @@ double Propagator::Propagate( double distance )
         displacement  =   current_collection_->CalculateDisplacement(
                     initial_energy,
                     final_energy,
-                    current_collection_->GetDensityCorrection()*(distance - particle_->GetPropagatedDistance())) / current_collection_->GetDensityCorrection();
+                    current_collection_->GetDensityCorrection()*(distance - propagated_distance)) / current_collection_->GetDensityCorrection();
         //cout<<particle_->GetT()<<"\t";
         // The first interaction or decay happens behind the distance we want to propagate
         // So we calculate the final energy using only continuous losses
-        if( displacement > distance - particle_->GetPropagatedDistance() )
+        if( displacement > distance - propagated_distance )
         {
-            displacement  =   distance - particle_->GetPropagatedDistance();
+            displacement  =   distance - propagated_distance;
 
             final_energy  =   current_collection_->CalculateFinalEnergy(initial_energy, current_collection_->GetDensityCorrection()*displacement);
 
@@ -197,9 +255,11 @@ double Propagator::Propagate( double distance )
         //Initial energy and final energy are needed if Molier Scattering is enabled
         AdvanceParticle(displacement, initial_energy, final_energy);
 
-        if(abs(distance - particle_->GetPropagatedDistance()) < abs(distance)*COMPUTER_PRECISION)
+        propagated_distance +=  displacement;
+
+        if(abs(distance - propagated_distance) < abs(distance)*COMPUTER_PRECISION)
         {
-            particle_->SetPropagatedDistance( distance );  // computer precision control
+            propagated_distance = distance;  // computer precision control
         }
 
         //Randomize the continuous energy loss if this option is enabled
@@ -214,7 +274,7 @@ double Propagator::Propagate( double distance )
 
         // Lower limit of particle energy is reached or
         // or complete particle is propagated the whole distance
-        if( final_energy == particle_->GetLow() || particle_->GetPropagatedDistance() == distance)
+        if( final_energy == particle_->GetLow() || propagated_distance == distance)
         {
             break;
         }
@@ -232,7 +292,6 @@ double Propagator::Propagate( double distance )
         }
         else
         {
-            cout<<"Hallo"<<endl;
             decay           =   current_collection_->MakeDecay();
             final_energy    =   0;
 
@@ -253,7 +312,7 @@ double Propagator::Propagate( double distance )
 
 //    if(sdec) <-- TODO: Include the flag
 //    {
-    if(particle_->GetPropagatedDistance()!=distance && final_energy!=0 && particle_->GetLifetime()>=0)
+    if(propagated_distance!=distance && final_energy!=0 && particle_->GetLifetime()>=0)
     {
         particle_->SetEnergy(particle_->GetMass());
 
@@ -286,14 +345,14 @@ double Propagator::Propagate( double distance )
     particle_->SetEnergy(final_energy);
 
     //Particle reached the border, final energy is returned
-    if(particle_->GetPropagatedDistance()==distance)
+    if(propagated_distance==distance)
     {
         return final_energy;
     }
     //The particle stopped/decayed, the propageted distance is return with a minus sign
     else
     {
-        return -particle_->GetPropagatedDistance();
+        return -propagated_distance;
     }
     //Should never be here
     return 0;
@@ -339,6 +398,8 @@ void Propagator::AdvanceParticle(double dr, double ei, double ef)
         particle_->SetY(y);
         particle_->SetZ(z);
     }
+    cout.precision(16);
+    cout<<time<<endl;
     particle_->SetPropagatedDistance(dist);
     particle_->SetT(time);
 
@@ -354,7 +415,6 @@ void Propagator::ChooseCurrentCollection(Particle* particle)
 {
     for(unsigned int i = 0 ; i < collections_.size() ; i++)
     {
-        //cout<<current_collection_<<"\t"<<collections_.at(i)<<endl;
 
         if(particle->GetName().compare(collections_.at(i)->GetParticle()->GetName())!=0 )
             continue;
@@ -367,8 +427,6 @@ void Propagator::ChooseCurrentCollection(Particle* particle)
             {
                 if(collections_.at(i)->GetGeometry()->IsParticleInside(particle))
                 {
-//                    cout<<"Infront ----"<<i<<"----"<<endl;
-//                    cout<<*collections_.at(i)<<endl;
                     current_collection_ = collections_.at(i);
                 }
             }
@@ -382,11 +440,7 @@ void Propagator::ChooseCurrentCollection(Particle* particle)
             {
                 if(collections_.at(i)->GetGeometry()->IsParticleInside(particle))
                 {
-//                    cout<<"Inside ----"<<i<<"----"<<endl;
-//                    cout<<*collections_.at(i)<<endl;
                     current_collection_ = collections_.at(i);
-
-
                 }
             }
 
@@ -400,23 +454,12 @@ void Propagator::ChooseCurrentCollection(Particle* particle)
             {
                 if(collections_.at(i)->GetGeometry()->IsParticleInside(particle))
                 {
-//                    cout<<"Behind ----"<<i<<"----"<<endl;
-//                    cout<<*collections_.at(i)<<endl;
                     current_collection_ = collections_.at(i);
-
-
                 }
             }
-
         }
-
     }
-//    for(unsigned int i = 0 ; i < collections_.size() ; i++)
-//    {
-//        cout<<collections_.at(i)->GetGeometry()->DistanceToBorder(particle_).first<<"\t";
-//        cout<<collections_.at(i)->GetGeometry()->DistanceToBorder(particle_).second<<endl;
 
-//    }
     current_collection_->SetParticle(particle_);
 
 }
