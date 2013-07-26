@@ -843,6 +843,54 @@ void Epairproduction::swap(Epairproduction &epair)
 }
 
 
+ostream& operator<<(std::ostream& os, Epairproduction const &epair)
+{
+    os<<"---------------------------Epairproduction( "<<&epair<<" )---------------------------"<<std::endl;
+    os<< static_cast <const CrossSections &>( epair ) << endl;
+    os<< "------- Class Specific: " << endl;
+    os<<"\tintegral:\t\t"<<epair.integral_ << endl;
+    os<<"\tdedx_integral:\t"<<epair.integral_for_dEdx_ << endl;
+    for(unsigned int i=0;i<epair.dndx_integral_.size();i++)
+    {
+        os<<"\t\tadress:\t\t"<<epair.dndx_integral_.at(i)<<endl;
+    }
+    os<<endl;
+    os<<"\tdo_dedx_Interpolation:\t\t"<<epair.do_dedx_Interpolation_<<endl;
+    os<<"\tdedx_interpolant:\t\t"<<epair.dedx_interpolant_<<endl;
+    os<<endl;
+    os<<"\tdo_dndx_Interpolation:\t\t"<<epair.do_dndx_Interpolation_<<endl;
+    os<<"\tdndx_interpolant_1d:\t\t"<<epair.dndx_interpolant_1d_.size()<<endl;
+    for(unsigned int i=0;i<epair.dndx_interpolant_1d_.size();i++)
+    {
+        os<<"\t\tadress:\t\t"<<epair.dndx_interpolant_1d_.at(i)<<endl;
+    }
+    os<<"\tdndx_interpolant_2d:\t\t"<<epair.dndx_interpolant_2d_.size()<<endl;
+    for(unsigned int i=0;i<epair.dndx_interpolant_2d_.size();i++)
+    {
+        os<<"\t\tadress:\t\t"<<epair.dndx_interpolant_2d_.at(i)<<endl;
+    }
+    os<<endl;
+    os<<"\tdo_epair_interpolation:\t"<<epair.do_epair_interpolation_<<endl;
+    os<<"\tepair_interpolant:\t\t"<<epair.epair_interpolant_.size()<<endl;
+    for(unsigned int i=0;i<epair.epair_interpolant_.size();i++)
+    {
+        os<<"\t\tadress:\t\t"<<epair.epair_interpolant_.at(i)<<endl;
+    }
+    os<<endl;
+    os<<"\tTemp. variables: " << endl;
+    os<< "\t\tcomponent:\t\t" << epair.component_<<endl;
+    os<< "\t\tv:\t\t" << epair.v_<<endl;
+    os<< "\t\treverse:\t\t" << epair.reverse_<<endl;
+    os<< "\t\teLpm:\t\t" << epair.eLpm_<<endl;
+    os<<"\t\tprob_for_component:\t"<<epair.prob_for_component_.size()<<endl;
+    for(unsigned int i=0;i<epair.prob_for_component_.size();i++)
+    {
+        os<<"\t\t\tvalue:\t\t"<<epair.prob_for_component_.at(i)<<endl;
+    }
+    os<<"-----------------------------------------------------------------------------------------------";
+    return os;
+}
+
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 //----------------------Cross section / limit / lpm---------------------------//

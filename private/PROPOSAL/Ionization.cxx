@@ -602,6 +602,26 @@ void Ionization::swap(Ionization &ioniz)
 
 }
 
+ostream& operator<<(std::ostream& os, Ionization const &ioniz)
+{
+    os<<"---------------------------Ionization( "<<&ioniz<<" )---------------------------"<<std::endl;
+    os<< static_cast <const CrossSections &>( ioniz ) << endl;
+    os<< "------- Class Specific: " << endl;
+    os<<"\tintegral:\t\t"<<ioniz.integral_ << endl;
+    os<<endl;
+    os<<"\tdo_dedx_Interpolation:\t\t"<<ioniz.do_dedx_Interpolation_<<endl;
+    os<<"\tdedx_interpolant:\t\t"<<ioniz.dedx_interpolant_<<endl;
+    os<<endl;
+    os<<"\tdo_dndx_Interpolation:\t\t"<<ioniz.do_dndx_Interpolation_<<endl;
+    os<<"\tdndx_interpolant_1d:\t\t"<<ioniz.dndx_interpolant_1d_<<endl;
+    os<<"\tdndx_interpolant_2d:\t\t"<<ioniz.dndx_interpolant_2d_<<endl;
+    os<<endl;
+    os<<"\tTemp. variables: " << endl;
+    os<< "\t\tbeta:\t\t" << ioniz.beta_<<endl;
+    os<< "\t\tgamma:\t\t" << ioniz.gamma_<<endl;
+    os<<"-----------------------------------------------------------------------------------------------";
+    return os;
+}
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//

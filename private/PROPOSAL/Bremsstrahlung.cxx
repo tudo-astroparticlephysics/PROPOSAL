@@ -753,7 +753,7 @@ ostream& operator<<(std::ostream& os, Bremsstrahlung const &brems)
     os<<"\t\tprob_for_component:\t"<<brems.prob_for_component_.size()<<endl;
     for(unsigned int i=0;i<brems.prob_for_component_.size();i++)
     {
-        os<<"\t\t\tadress:\t\t"<<brems.prob_for_component_.at(i)<<endl;
+        os<<"\t\t\tvalue:\t\t"<<brems.prob_for_component_.at(i)<<endl;
     }
     os<<"-----------------------------------------------------------------------------------------------";
     return os;

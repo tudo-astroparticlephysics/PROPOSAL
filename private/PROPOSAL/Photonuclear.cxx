@@ -876,6 +876,66 @@ void Photonuclear::swap(Photonuclear &photo)
 
 }
 
+ostream& operator<<(std::ostream& os, Photonuclear const &photo)
+{
+    os<<"---------------------------Photonuclear( "<<&photo<<" )---------------------------"<<std::endl;
+    os<< static_cast <const CrossSections &>( photo ) << endl;
+    os<< "------- Class Specific: " << endl;
+    os<< "\tinit_measured:\t\t" << photo.init_measured_ << endl;
+    os<< "\tinit_hardbb:\t\t" << photo.init_hardbb_ << endl;
+    os<< "\tshadow:\t\t\t" << photo.shadow_ << endl;
+    os<< "\thard_component:\t\t" << photo.hard_component_ << endl;
+    os<< "\tparametrization_family_:\t" << photo.parametrization_family_ << endl;
+    os<<endl;
+    os<<"\tintegral:\t\t"<<photo.integral_ << endl;
+    os<<"\tdedx_integral:\t"<<photo.integral_for_dEdx_ << endl;
+    os<<"\tdndx_integral:\t"<<photo.dndx_integral_.size()<<endl;
+    for(unsigned int i=0;i<photo.dndx_integral_.size();i++)
+    {
+        os<<"\t\tadress:\t\t"<<photo.dndx_integral_.at(i)<<endl;
+    }
+    os<<endl;
+    os<<"\tdo_dedx_Interpolation:\t\t"<<photo.do_dedx_Interpolation_<<endl;
+    os<<"\tdedx_interpolant:\t\t"<<photo.dedx_interpolant_<<endl;
+    os<<endl;
+    os<<"\tinterpolant_measured:\t\t"<<photo.interpolant_measured_<<endl;
+    os<<"\tinterpolant_hardBB:\t\t"<<photo.interpolant_hardBB_.size()<<endl;
+    for(unsigned int i=0;i<photo.interpolant_hardBB_.size();i++)
+    {
+        os<<"\t\tadress:\t\t"<<photo.interpolant_hardBB_.at(i)<<endl;
+    }
+    os<<endl;
+    os<<"\tdo_dndx_Interpolation:\t\t"<<photo.do_dndx_Interpolation_<<endl;
+    os<<"\tdndx_interpolant_1d:\t\t"<<photo.dndx_interpolant_1d_.size()<<endl;
+    for(unsigned int i=0;i<photo.dndx_interpolant_1d_.size();i++)
+    {
+        os<<"\t\tadress:\t\t"<<photo.dndx_interpolant_1d_.at(i)<<endl;
+    }
+    os<<"\tdndx_interpolant_2d:\t\t"<<photo.dndx_interpolant_2d_.size()<<endl;
+    for(unsigned int i=0;i<photo.dndx_interpolant_2d_.size();i++)
+    {
+        os<<"\t\tadress:\t\t"<<photo.dndx_interpolant_2d_.at(i)<<endl;
+    }
+    os<<endl;
+    os<<"\tdo_photo_interpolation:\t"<<photo.do_photo_interpolation_<<endl;
+    os<<"\tphoto_interpolant:\t\t"<<photo.photo_interpolant_.size()<<endl;
+    for(unsigned int i=0;i<photo.photo_interpolant_.size();i++)
+    {
+        os<<"\t\tadress:\t\t"<<photo.photo_interpolant_.at(i)<<endl;
+    }
+    os<<endl;
+    os<<"\tTemp. variables: " << endl;
+    os<< "\t\tcomponent:\t\t" << photo.component_<<endl;
+    os<< "\t\thmax:\t\t" << photo.hmax_<<endl;
+    os<< "\t\tv:\t\t" << photo.v_<<endl;
+    os<<"\t\tprob_for_component:\t"<<photo.prob_for_component_.size()<<endl;
+    for(unsigned int i=0;i<photo.prob_for_component_.size();i++)
+    {
+        os<<"\t\t\tvalue:\t\t"<<photo.prob_for_component_.at(i)<<endl;
+    }
+    os<<"-----------------------------------------------------------------------------------------------";
+    return os;
+}
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
