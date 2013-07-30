@@ -1,26 +1,17 @@
 cmake_minimum_required(VERSION 2.8)
 
-#FIND_LIBRARY(LOG4CPLUS_LIB NAMES log4cplus HINTS $LD_LIBRARY_PATH)
-#MESSAGE(STATUS "log4cplus lib path: ${LOG4CPLUS_LIB}")
 project( PROPOSAL)
 
 FIND_PACKAGE( Boost COMPONENTS program_options REQUIRED )
 
-
+# Load some basic macros which are needed later on
+include(FindROOT.cmake)
 
 #################################################################
 #################           log4cpp     #########################
 #################################################################
 
-# Once done this will define
-#  LOG4CPLUS_FOUND - System has Log4cplus
-#  LOG4CPLUS_INCLUDE_DIRS - The Log4cplus include directories
-#  LOG4CPLUS_LIBRARIES - The libraries needed to use Log4cplus
 include(resources/FindLog4cplus.cmake)
-#message("LOG4CPLUS_FOUND: " ${LOG4CPLUS_FOUND})
-#message("LOG4CPLUS_INCLUDE_DIR: " ${LOG4CPLUS_INCLUDE_DIR})
-#message("LOG4CPLUS_LIBRARIES: " ${LOG4CPLUS_LIBRARIES})
-
 
 #################################################################
 #################           GTest       #########################
@@ -51,6 +42,33 @@ SET(ICETRAY_INCLUDE_PATH "/home/koehne/Simulation/icesim4_candidate/V04-00-01-RC
 
 include_directories("${PROJECT_SOURCE_DIR}/public" ${GTEST_INCLUDE_DIR} ${LOG4CPLUS_INCLUDE_DIR} ${Boost_INCLUDE_DIR} )#${ICETRAY_INCLUDE_PATH})
 
+#if ROOT is found ROOT files with ROOT trees can be written
+IF(ROOT_FOUND)
+    add_definitions(-DROOT_SUPPORT=1)
+
+    set(INCLUDE_DIRECTORIES
+    ${ROOT_INCLUDE_DIR}
+    )
+
+    include_directories( ${INCLUDE_DIRECTORIES})
+
+    set(LINK_DIRECTORIES
+    ${ROOT_LIBRARY_DIR}
+    ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
+    )
+
+    link_directories( ${LINK_DIRECTORIES})
+
+ELSE(ROOT_FOUND)
+
+    add_definitions(-DROOT_SUPPORT=0)
+
+    MESSAGE(STATUS "ROOT not found...")
+    MESSAGE(STATUS "ROOT examples will not be builded.")
+    MESSAGE(STATUS "No ROOT Output is available.")
+    MESSAGE(STATUS "Make sure you have ROOT installed and ROOTSYS is set.")
+
+ENDIF(ROOT_FOUND)
 
 add_library(PROPOSAL
         private/PROPOSAL/Integral.cxx
@@ -78,7 +96,11 @@ add_library(PROPOSAL
 
 set_target_properties(PROPOSAL PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -O2 -Wall -Werror")# -Wextra -pedantic")
 
-target_link_libraries(PROPOSAL ${Boost_LIBRARIES} ${LOG4CPLUS_LIBRARIES})
+IF(ROOT_FOUND)
+    target_link_libraries(PROPOSAL ${Boost_LIBRARIES} ${LOG4CPLUS_LIBRARIES} ${ROOT_LIBRARIES})
+ELSE(ROOT_FOUND)
+    target_link_libraries(PROPOSAL ${Boost_LIBRARIES} ${LOG4CPLUS_LIBRARIES})
+ENDIF(ROOT_FOUND)
 
 add_executable(PROPOSALtest
         private/test/PROPOSAL.cxx
@@ -152,4 +174,6 @@ IF(DoTesting)
 ENDIF()
 
 ADD_SUBDIRECTORY( doc )
-ADD_SUBDIRECTORY( root_examples )
+IF(ROOT_FOUND)
+    ADD_SUBDIRECTORY( root_examples )
+ENDIF(ROOT_FOUND)

@@ -352,26 +352,24 @@ int main(int argc, char** argv){
 
     vector<Particle*> a ;
 
-    ofstream out;
-    out.open("test_2media.txt");
+    Output::getInstance().EnableROOTOutput("test.root");
 
 //    vector<Particle*> a = pr->Propagate(particle);
 //    vector<Particle*> b = pr->Propagate(particle1);
 //    vector<Particle*> c = pr->Propagate(particle2);
 
-    for(int j= 0 ; j<1e1; j++)
+    for(int j= 0 ; j<1e3; j++)
     {
-        if(j%10000==0)cout<<"Progress: " <<1.*j/1e4<<"%"<<endl;
+        if(j%10==0)cout<<"Progress: " <<1.*j/1e4<<"%"<<endl;
 
         particle = new Particle("mu" ,-200.,10.,-10.,90.,0.,0.,0.);
         particle->SetEnergy(1e6);
 
         //cout<<"--------------"<<j<<"--------------"<<endl;
         a= pr->Propagate(particle);
-
-        cout<<*particle<<endl;
     }
-    out.close();
+
+    Output::getInstance().Close();
     //log_arsch("a2 %i\n",2);
 
   //  cout<<VA_COUNT("a2 %i")<<endl;

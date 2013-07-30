@@ -53,6 +53,11 @@
     LOG4CPLUS_NOTICE_FMT(Output::getInstance().logger, __VA_ARGS__ ) )
 
 
+#if ROOT_SUPPORT
+    #include "TTree.h"
+    #include "TFile.h"
+#endif
+
 using namespace log4cplus;
 
 class Output
@@ -63,12 +68,74 @@ private:
     {
         PropertyConfigurator::doConfigure(LOG4CPLUS_TEXT("resources/log4cplus.conf"));
         logger = Logger::getInstance(LOG4CPLUS_TEXT("PORPOSAL"));
+
     }
 
     Output(Output const&);         // Don't Implement.
     void operator=(Output const&); // Don't implement
 
     static std::vector<Particle*> secondarys_;
+
+    static bool store_in_root_trees_;
+
+    #if ROOT_SUPPORT
+
+        TTree *secondary_tree_;
+        TTree *primary_tree_;
+        TTree *propagated_primary_tree_;
+        TFile *rootfile_;
+
+        double secondary_x_;
+        double secondary_y_;
+        double secondary_z_;
+        double secondary_t_;
+        double secondary_theta_;
+        double secondary_phi_;
+        double secondary_energy_;
+        int secondary_parent_particle_id_;
+        int secondary_particle_id_;
+        std::string secondary_name_;
+
+        double primary_x_;
+        double primary_y_;
+        double primary_z_;
+        double primary_t_;
+        double primary_theta_;
+        double primary_phi_;
+        double primary_energy_;
+        int primary_parent_particle_id_;
+        int primary_particle_id_;
+        std::string primary_name_;
+
+        double prop_primary_x_;
+        double prop_primary_y_;
+        double prop_primary_z_;
+        double prop_primary_t_;
+        double prop_primary_theta_;
+        double prop_primary_phi_;
+        double prop_primary_energy_;
+        int prop_primary_parent_particle_id_;
+        int prop_primary_particle_id_;
+        std::string prop_primary_name_;
+        double prop_primary_propagated_distance_;
+        double prop_primary_xi_;
+        double prop_primary_yi_;
+        double prop_primary_zi_;
+        double prop_primary_ti_;
+        double prop_primary_ei_;
+        double prop_primary_xf_;
+        double prop_primary_yf_;
+        double prop_primary_zf_;
+        double prop_primary_tf_;
+        double prop_primary_ef_;
+        double prop_primary_xc_;
+        double prop_primary_yc_;
+        double prop_primary_zc_;
+        double prop_primary_tc_;
+        double prop_primary_ec_;
+        double prop_primary_elost_;
+
+    #endif
 
 public:
 
@@ -94,6 +161,28 @@ public:
     void ClearSecondaryVector();
 
 //----------------------------------------------------------------------------//
+
+    void Close();
+
+//----------------------------------------------------------------------------//
+
+    #if ROOT_SUPPORT
+
+        void EnableROOTOutput(std::string rootfile_name);
+
+//----------------------------------------------------------------------------//
+
+        void DisableROOTOutput();
+
+//----------------------------------------------------------------------------//
+
+        void StorePrimaryInTree(Particle *primary);
+
+//----------------------------------------------------------------------------//
+
+        void StorePropagatedPrimaryInTree(Particle *prop_primary);
+
+    #endif
 
     //Getter
     std::vector<Particle*> GetSecondarys() const
