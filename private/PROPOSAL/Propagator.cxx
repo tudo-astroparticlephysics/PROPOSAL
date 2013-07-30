@@ -486,13 +486,12 @@ void Propagator::ReadConfigFile(string config_file)
 
     //global
 
-
-
     if(!FileExist(config_file))
     {
         log_fatal("Error: config file %s does not exist!",config_file.c_str());
         exit(1);
     }
+
     ifstream file;
     file.open(config_file.c_str());
 

@@ -337,15 +337,10 @@ int main(int argc, char** argv){
     Particle * particle2 = new Particle("mu");
     Particle * particle = new Particle("mu" ,-200.,10.,-10.,90.,0.,0.,0.);
 
-    std::cout<<"Hallo"<<std::endl;
+    cout<<"hsa"<<endl;
 
-    Medium *m = new Medium("air",1.2);
-    EnergyCutSettings *e = new EnergyCutSettings(500,0.1);
-    Bremsstrahlung *b = new Bremsstrahlung(particle,m,e);
+    Propagator *pr = new Propagator("/home/koehne/PROPOSAL_restructure/restructure_Mar_11_2013/resources/configuration");
 
-    cout<<*b<<endl;
-
-    Propagator *pr = new Propagator("resources/configuration");
     particle1->SetEnergy(1e5);
     particle2->SetEnergy(1e4);
     particle->SetEnergy(1e5);

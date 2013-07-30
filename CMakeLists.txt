@@ -109,7 +109,8 @@ add_executable(PROPOSALtest
 
 target_link_libraries(PROPOSALtest PROPOSAL)
 
-file(COPY ${CMAKE_SOURCE_DIR}/resources DESTINATION ${CMAKE_BINARY_DIR})
+execute_process(COMMAND ln -s ${CMAKE_SOURCE_DIR}/resources ${CMAKE_BINARY_DIR}/resources)
+
 
 IF(DoTesting)
   execute_process(COMMAND mkdir ${PROPOSAL_BINARY_DIR}/bin/ OUTPUT_VARIABLE _output OUTPUT_STRIP_TRAILING_WHITESPACE)
