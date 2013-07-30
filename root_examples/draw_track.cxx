@@ -1,16 +1,18 @@
 #include "TH3F.h"
 #include "TCanvas.h"
 #include "PROPOSAL/Propagator.h"
-#include "TFile.h"
 #include "TPolyMarker3D.h"
 #include "TApplication.h"
 #include "PROPOSAL/Output.h"
 #include "TSystem.h"
+#include "TStyle.h"
 
 using namespace std;
 
 int main(int argc, char **argv)
 {
+    gStyle->SetOptStat(0);
+
     TApplication theApp("Analysis", &argc, argv);
     double energy   =   9e6;
     int scale       =   1;
@@ -174,6 +176,11 @@ int main(int argc, char **argv)
     h3->GetXaxis()->SetTitle("x [cm]");
     h3->GetYaxis()->SetTitle("y [cm]");
     h3->GetZaxis()->SetTitle("z [cm]");
+
+    h3->GetXaxis()->SetTitleOffset(1.6);
+    h3->GetYaxis()->SetTitleOffset(1.6);
+    h3->GetZaxis()->SetTitleOffset(1.6);
+
     h3->Draw();
 
     for(unsigned int i = 0;i<marker.size();i++)
@@ -185,12 +192,6 @@ int main(int argc, char **argv)
     }
     secondarys.clear();
     marker.clear();
-//    cout<<"Type q to quit!"<<endl;
-//    //cin>>s;
-//    if(s.compare("q")==0)
-//    {
-//        theApp.Terminate();
-//    }
 
 
     theApp.Run(kTRUE);
