@@ -186,7 +186,7 @@ global
 sector
     sphere  0   0   0   777777777777777777750  0
 
-    inside  -1     0.01  0
+    inside  20     -1  0
     infront -1    0.05  1
     behind  -1      -1  0
 
@@ -218,5 +218,5 @@ sector
 #    cylinder 1200   1700
 
 detector
-    sphere  0   0   0   1  0
+    sphere  0   0   0   100  0
 
