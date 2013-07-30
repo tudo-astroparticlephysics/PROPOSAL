@@ -185,12 +185,12 @@ int main(int argc, char **argv)
     }
     secondarys.clear();
     marker.clear();
-    cout<<"Type q to quit!"<<endl;
-    cin>>s;
-    if(s.compare("q")==0)
-    {
-        theApp.Terminate();
-    }
+//    cout<<"Type q to quit!"<<endl;
+//    //cin>>s;
+//    if(s.compare("q")==0)
+//    {
+//        theApp.Terminate();
+//    }
 
 
     theApp.Run(kTRUE);
