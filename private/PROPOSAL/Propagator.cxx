@@ -205,6 +205,8 @@ double Propagator::Propagate( double distance )
     pair<double,string> decay;
     pair<double,string> energy_loss;
 
+    int secondary_id    =   0;
+
     //first: final energy befor first interaction second: energy at which the
     // particle decay
     //first and second are compared to decide if interaction happens or decay
@@ -296,14 +298,17 @@ double Propagator::Propagate( double distance )
             energy_loss     =   current_collection_->MakeStochasticLoss();
             final_energy    -=  energy_loss.first;
 
-            //cout<<energy_loss.first<<"\t"<<energy_loss.second<<endl;
+            secondary_id    =   particle_->GetParticleId() + 1;
+            Output::getInstance().FillSecondaryVector(particle_, secondary_id, energy_loss, 0);
         }
         else
         {
             decay           =   current_collection_->MakeDecay();
             final_energy    =   0;
 
-            //cout<<decay.first<<"\t"<<decay.second<<endl;
+            secondary_id    = particle_->GetParticleId()  +   1;
+            Output::getInstance().FillSecondaryVector(particle_, secondary_id, decay ,0);
+
         }
 
         //break if the lower limit of particle energy is reached
@@ -328,7 +333,7 @@ double Propagator::Propagate( double distance )
         double product_energy   =   0;
 
         pair<double, string> decay_to_store;
-        int secondary_id    =   particle_->GetParentParticleId() + 1;
+        secondary_id    =   particle_->GetParticleId() + 1;
 
         particle_->SetT( t );
 
