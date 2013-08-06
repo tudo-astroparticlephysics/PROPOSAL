@@ -183,6 +183,23 @@ pair<double,double> Geometry::DistanceToBorder(Particle* particle)
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
+
+
+double Geometry::DistanceToClosestApproach(Particle* particle)
+{
+    double dir_vec_x = particle->GetCosPhi()*particle->GetSinTheta();
+    double dir_vec_y = particle->GetSinPhi()*particle->GetSinTheta();
+    double dir_vec_z = particle->GetCosTheta();
+
+    double distance  =   (x0_ - particle->GetX()) * dir_vec_x +
+                         (y0_ - particle->GetY()) * dir_vec_y +
+                         (z0_ - particle->GetZ()) * dir_vec_z;
+    return distance;
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
 //--------------------------------constructors--------------------------------//
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//

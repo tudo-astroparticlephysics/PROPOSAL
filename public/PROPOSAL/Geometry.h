@@ -108,6 +108,12 @@ public:
     std::pair<double,double> DistanceToBorder(Particle* particle);
 
 //----------------------------------------------------------------------------//
+    /*!
+     * Calculates the distance to the closest approch to the geometry center
+     */
+    double DistanceToClosestApproach(Particle* particle);
+
+//----------------------------------------------------------------------------//
 
     void InitBox(double x0, double y0, double z0, double x, double y, double z);
 

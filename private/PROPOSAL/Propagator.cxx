@@ -83,7 +83,8 @@ vector<Particle*> Propagator::Propagate( Particle *particle )
     SetParticle(particle);
 
     double distance_to_collection_border    =   0;
-    double distance_to_detector_            =   0;
+    double distance_to_detector             =   0;
+    double distance_to_closest_approach     =   0;
     double distance                         =   0;
     double result                           =   0;
 
@@ -110,24 +111,76 @@ vector<Particle*> Propagator::Propagate( Particle *particle )
         distance_to_collection_border =
         current_collection_->GetGeometry()->DistanceToBorder(particle_).first;
 
-        distance_to_detector_ =
+        distance_to_detector =
         detector_->DistanceToBorder(particle_).first;
 
-        if(distance_to_detector_ > 0)
+        distance_to_closest_approach  =
+        detector_->DistanceToClosestApproach(particle);
+
+
+        if(abs(distance_to_closest_approach) < GEOMETRY_PRECISION )
         {
-            if( distance_to_detector_ < distance_to_collection_border )
+            particle_->SetXc( particle_->GetX() );
+            particle_->SetYc( particle_->GetY() );
+            particle_->SetZc( particle_->GetZ() );
+            particle_->SetEc( particle_->GetEnergy() );
+            particle_->SetTc( particle_->GetT() );
+
+            distance_to_closest_approach    =   0;
+
+        }
+
+
+        if(distance_to_detector > 0)
+        {
+            if(distance_to_closest_approach > 0)
             {
-                distance    =   distance_to_detector_;
+                if( distance_to_detector < distance_to_collection_border &&
+                    distance_to_detector < distance_to_closest_approach )
+                {
+                    distance    =   distance_to_detector;
+                }
+                else if( distance_to_closest_approach < distance_to_collection_border)
+                {
+                    distance    =   distance_to_closest_approach;
+                }
+                else
+                {
+                    distance    =   distance_to_collection_border;
+                }
+            }
+            else
+            {
+                if( distance_to_detector < distance_to_collection_border)
+                {
+                    distance    =   distance_to_detector;
+                }
+                else
+                {
+                    distance    =   distance_to_collection_border;
+                }
+            }
+
+        }
+        else
+        {
+            if(distance_to_closest_approach > 0)
+            {
+                if( distance_to_closest_approach < distance_to_collection_border)
+                {
+                    distance    =   distance_to_closest_approach;
+                }
+                else
+                {
+                    distance    =   distance_to_collection_border;
+                }
             }
             else
             {
                 distance    =   distance_to_collection_border;
             }
         }
-        else
-        {
-            distance    =   distance_to_collection_border;
-        }
+
         is_in_detector  =   detector_->IsParticleInside(particle_);
         // entry point of the detector
         if(!starts_in_detector && !was_in_detector && is_in_detector)
@@ -140,7 +193,7 @@ vector<Particle*> Propagator::Propagate( Particle *particle )
 
             energy_at_entry_point   =   particle_->GetEnergy();
 
-            was_in_detector =   true;
+            was_in_detector =   true;      
         }
         // exit point of the detector
         else if(was_in_detector && !is_in_detector)
