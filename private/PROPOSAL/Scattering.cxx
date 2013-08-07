@@ -347,6 +347,7 @@ void Scattering::Scatter(double dr, double ei, double ef)
         long double Theta0, Theta_max,rnd1,rnd2,sx,tx,sy,ty,sz,tz,ax,ay,az;
         double x,y,z;
         Theta0     =   CalculateTheta0(dr, ei, ef);
+
         Theta_max    =   1./SQRT2;
 
 
@@ -354,18 +355,22 @@ void Scattering::Scatter(double dr, double ei, double ef)
         rnd2    =   (long double)standard_normal_-> StandardNormalRandomNumber(RandomDouble(), 0, Theta0, -Theta_max, Theta_max, false);
         sx      =   (rnd1/SQRT3+rnd2)/2;
         tx      =   rnd2;
-
+        cout<<rnd1<<"\t"<<rnd2<<"\t";
 
         rnd1    =   (long double)standard_normal_-> StandardNormalRandomNumber(RandomDouble(), 0, Theta0, -Theta_max, Theta_max, false);
-        rnd2    =   (long double)standard_normal_-> StandardNormalRandomNumber(RandomDouble(), 0, Theta0, -Theta_max, Theta_max, false);
+        double r=RandomDouble();
+
+        rnd2    =   (long double)standard_normal_-> StandardNormalRandomNumber(r, 0, Theta0, -Theta_max, Theta_max, false);
         sy      =   (rnd1/SQRT3+rnd2)/2;
         ty      =   rnd2;
-
+        cout<<rnd1<<"\t"<<r<<"\t"<<rnd2<<"\t"<<Theta0<<"\t";
 
         sz      =   sqrt(max(1.-(sx*sx+sy*sy), (long double)0.));
         tz      =   sqrt(max(1.-(tx*tx+ty*ty), (long double)0.));
+        cout<<sz<<"\t"<<tz<<"\t";
 
-
+double hsaa    =   (long double)standard_normal_-> StandardNormalRandomNumber(0.999999, 0, Theta0, -Theta_max, Theta_max, false);
+cout<<hsaa<<endl;
         long double sinth, costh,sinph,cosph;
         long double theta,phi;
         sinth = (long double)particle_->GetSinTheta();

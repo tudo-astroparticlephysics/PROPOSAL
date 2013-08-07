@@ -337,7 +337,7 @@ int main(int argc, char** argv){
     Particle * particle2 = new Particle("mu");
     Particle * particle = new Particle("mu" ,-20000.,10.,-10.,90.,0.,0.,0.);
 
-    Propagator *pr = new Propagator("/home/koehne/PROPOSAL_restructure/restructure_Mar_11_2013/resources/configuration");
+    Propagator *pr = new Propagator("resources/configuration");
 
     particle1->SetEnergy(1e5);
     particle2->SetEnergy(1e4);
@@ -351,21 +351,22 @@ int main(int argc, char** argv){
 //    vector<Particle*> b = pr->Propagate(particle1);
 //    vector<Particle*> c = pr->Propagate(particle2);
 
-    for(int j= 0 ; j<1e3; j++)
+    for(int j= 0 ; j<1e5; j++)
     {
-        if(j%10==0)cout<<"Progress: " <<1.*j/1e4<<"%"<<endl;
+        //if(j%10==0)cout<<"Progress: " <<1.*j/1e4<<"%"<<endl;
 
-        double x    =   -20000. +j;
-        double y    =   j*1.1;
-        double z    =   -100+1.1*j;
-        double theta    =   85 + j*0.005;
+        double x    =   -10.;
+        double y    =   -10;//j*1.1;
+        double z    =   -90000;//-100+1.1*j;
+        double theta    = 0;//  85 + j*0.005;
         double phi       =   0;
 
+        cout<<j<<endl;
 
         particle = new Particle("mu" ,x,y,z,theta,phi,0.,0.);
         particle->SetEnergy(1e6);
 
-        cout<<"--------------"<<j<<"--------------"<<endl;
+       // cout<<"--------------"<<j<<"--------------"<<endl;
         a= pr->Propagate(particle);
     }
 

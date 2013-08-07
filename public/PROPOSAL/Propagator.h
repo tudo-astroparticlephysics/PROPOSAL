@@ -93,6 +93,8 @@ private:
     */
     void ApplyOptions();
 
+    void MoveParticle(double distance);
+
 public:
 
     //Constructors
