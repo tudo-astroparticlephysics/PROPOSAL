@@ -119,11 +119,11 @@ vector<Particle*> Propagator::Propagate( Particle *particle )
         distance_to_closest_approach  =
         detector_->DistanceToClosestApproach(particle);
 
-        cout<<"c1 "<<current_collection_->GetGeometry()->DistanceToBorder(particle_).first<<"\t";
-        cout<<" ,c2 "<<current_collection_->GetGeometry()->DistanceToBorder(particle_).second<<"\t";
-        cout<<" ,d1 "<<detector_->DistanceToBorder(particle_).first<<"\t";
-        cout<<" ,d2 "<<detector_->DistanceToBorder(particle_).second<<"\t";
-        cout<<" clo "<<distance_to_closest_approach<<endl;
+//        cout<<"c1 "<<current_collection_->GetGeometry()->DistanceToBorder(particle_).first<<"\t";
+//        cout<<" ,c2 "<<current_collection_->GetGeometry()->DistanceToBorder(particle_).second<<"\t";
+//        cout<<" ,d1 "<<detector_->DistanceToBorder(particle_).first<<"\t";
+//        cout<<" ,d2 "<<detector_->DistanceToBorder(particle_).second<<"\t";
+//        cout<<" clo "<<distance_to_closest_approach<<endl;
 
         if(abs(distance_to_closest_approach) < GEOMETRY_PRECISION )
         {
@@ -188,8 +188,8 @@ vector<Particle*> Propagator::Propagate( Particle *particle )
             }
         }
 
-        if(distance < 1 && distance > 0){MoveParticle(distance);continue;}
-        if(distance < 0){MoveParticle(1);cout<<*particle<<endl;exit(1);}
+//        if(distance < 1 && distance > 0){MoveParticle(distance);continue;}
+//        if(distance < 0){MoveParticle(1);cout<<*particle<<endl;exit(1);}
         is_in_detector  =   detector_->IsParticleInside(particle_);
         // entry point of the detector
         if(!starts_in_detector && !was_in_detector && is_in_detector)

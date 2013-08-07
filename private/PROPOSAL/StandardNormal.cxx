@@ -78,7 +78,6 @@ double StandardNormal::StandardNormalRandomNumber(double rnd, double average, do
             xh  =   IntegratedProbability((xmax-average)/sigma);
             x   =   xl+(xh-xl)*rnd;
         }
-
         x   =   average + sigma*StandardNormalRandomNumber(x);
     }
 

@@ -355,7 +355,6 @@ void Scattering::Scatter(double dr, double ei, double ef)
         rnd2    =   (long double)standard_normal_-> StandardNormalRandomNumber(RandomDouble(), 0, Theta0, -Theta_max, Theta_max, false);
         sx      =   (rnd1/SQRT3+rnd2)/2;
         tx      =   rnd2;
-        cout<<rnd1<<"\t"<<rnd2<<"\t";
 
         rnd1    =   (long double)standard_normal_-> StandardNormalRandomNumber(RandomDouble(), 0, Theta0, -Theta_max, Theta_max, false);
         double r=RandomDouble();
@@ -363,14 +362,11 @@ void Scattering::Scatter(double dr, double ei, double ef)
         rnd2    =   (long double)standard_normal_-> StandardNormalRandomNumber(r, 0, Theta0, -Theta_max, Theta_max, false);
         sy      =   (rnd1/SQRT3+rnd2)/2;
         ty      =   rnd2;
-        cout<<rnd1<<"\t"<<r<<"\t"<<rnd2<<"\t"<<Theta0<<"\t";
+        //cout<<"scat "<<rnd1<<"\t"<<r<<"\t"<<rnd2<<"\t"<<Theta0<<"\t"<<endl;
 
         sz      =   sqrt(max(1.-(sx*sx+sy*sy), (long double)0.));
         tz      =   sqrt(max(1.-(tx*tx+ty*ty), (long double)0.));
-        cout<<sz<<"\t"<<tz<<"\t";
 
-double hsaa    =   (long double)standard_normal_-> StandardNormalRandomNumber(0.999999, 0, Theta0, -Theta_max, Theta_max, false);
-cout<<hsaa<<endl;
         long double sinth, costh,sinph,cosph;
         long double theta,phi;
         sinth = (long double)particle_->GetSinTheta();
@@ -459,6 +455,8 @@ double Scattering::FunctionToBuildInterpolant(double energy)
 void Scattering::EnableInterpolation(string path)
 {
     if(do_interpolation_)return;
+
+    standard_normal_->EnableInterpolation(path);
 
     bool reading_worked=true, storing_failed=false;
     if(!path.empty())
