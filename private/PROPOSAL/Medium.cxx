@@ -180,6 +180,10 @@ Medium::Medium(string w, double rho)
     {
         InitLead();
     }
+    else if(EqualsIgnoreCase(w,"copper"))
+    {
+        InitCopper();
+    }
     else if(EqualsIgnoreCase(w,"uranium"))
     {
         InitUranium();
@@ -792,6 +796,32 @@ void Medium::InitLead()
     Initr();
 }
 
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+/*
+* initialize copper
+*/
+
+void Medium::InitCopper()
+{
+    Inita(1);
+
+    elementName_.at(0)      =   "Cu";
+    nucCharge_.at(0)        =   29;
+    atomicNum_.at(0)        =   63.546;
+    atomInMolecule_.at(0)   =   1;
+    I_                      =   322.0;
+    C_                      =   -4.4190;
+    a_                      =   0.14339;
+    m_                      =   2.9044;
+    X0_                     =   -0.0254;
+    X1_                     =   3.2792;
+    d0_                     =   0.08;
+    massDensity_            =   8.960;
+
+    Initr();
+}
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
