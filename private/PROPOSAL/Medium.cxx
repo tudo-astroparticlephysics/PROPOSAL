@@ -54,6 +54,7 @@ double Lrad(unsigned int Z)
     if(Z == 2) return 4.79;     //Helium
     if(Z == 3) return 4.74;     //Lithium
     if(Z == 4) return 4.71;     //Beryllium
+    return 0;
 }
 
 double Lrad_dash(unsigned int Z)
@@ -64,6 +65,7 @@ double Lrad_dash(unsigned int Z)
     if(Z == 2) return 5.621;     //Helium
     if(Z == 3) return 5.805;     //Lithium
     if(Z == 4) return 5.924;     //Beryllium
+    return 0;
 }
 
 double X0_inv(unsigned int Z, double M)
