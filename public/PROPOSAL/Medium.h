@@ -38,6 +38,8 @@ protected:
     double rho_;                        	///< multiplicative density correction factor
     double massDensity_;                	///< mass density [g/cm3]
     double molDensity_;                 	///< molecule density [number/cm3]
+    double radiationLength_;                ///< radiation length [cm]
+
     std::vector<double> M_;                 ///< average nucleon weight in a nucleus [MeV]
     std::vector<std::string> elementName_;  ///< element name
     std::string name_;                  	///< medium name
