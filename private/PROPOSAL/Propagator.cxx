@@ -78,7 +78,7 @@ vector<Particle*> Propagator::Propagate( Particle *particle )
 
     Output::getInstance().GetSecondarys().reserve(1000);
 
-    #ifdef ROOT_SUPPORT
+    #if ROOT_SUPPORT
         Output::getInstance().StorePrimaryInTree(particle);
     #endif
 
@@ -241,7 +241,7 @@ vector<Particle*> Propagator::Propagate( Particle *particle )
 
     particle_->SetElost(energy_at_entry_point - energy_at_exit_point);
 
-    #ifdef ROOT_SUPPORT
+    #if ROOT_SUPPORT
         Output::getInstance().StorePropagatedPrimaryInTree(particle);
     #endif
 
