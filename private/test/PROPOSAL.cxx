@@ -345,8 +345,9 @@ int main(int argc, char** argv){
 
     vector<Particle*> a ;
 
+    #if ROOT_SUPPORT
     Output::getInstance().EnableROOTOutput("test.root");
-
+    #endif
 //    vector<Particle*> a = pr->Propagate(particle);
 //    vector<Particle*> b = pr->Propagate(particle1);
 //    vector<Particle*> c = pr->Propagate(particle2);
