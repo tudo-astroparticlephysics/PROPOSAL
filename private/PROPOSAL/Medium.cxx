@@ -307,6 +307,7 @@ bool Medium::operator==(const Medium &medium) const
     if( rho_              != medium.rho_)           return false;
     if( massDensity_      != medium.massDensity_)   return false;
     if( molDensity_       != medium.molDensity_)    return false;
+    if( radiationLength_  != medium.radiationLength_)return false;
     if( ecut_             != medium.ecut_)          return false;
     if( vcut_             != medium.vcut_)          return false;
     if( vCut_             != medium.vCut_)          return false;
@@ -398,6 +399,7 @@ ostream& operator<<(ostream& os, Medium const& medium)
     os<<"\taverage all-component nucleon weight [MeV]:\t"<<medium.MM_<<endl;
     os<<"\tmultiplicative density correction factor:\t"<<medium.rho_<<endl;
     os<<"\tsum of charges of all nuclei:\t\t\t"<<medium.sumCharge_<<endl;
+    os<<"\tradiation Length:\t\t"<<medium.radiationLength_<<endl;
 
     os<<"\n# | Name | atomic number | number of atoms in a molecule | nucleus charge | average nucleon weight in a nucleus [MeV]\n"<<endl;
 
@@ -436,6 +438,7 @@ void Medium::swap(Medium &medium)
     swap( rho_              , medium.rho_);
     swap( massDensity_      , medium.massDensity_);
     swap( molDensity_       , medium.molDensity_);
+    swap( radiationLength_  , medium.radiationLength_);
     swap( ecut_             , medium.ecut_);
     swap( vcut_             , medium.vcut_);
     swap( vCut_             , medium.vCut_);
