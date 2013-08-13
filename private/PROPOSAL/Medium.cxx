@@ -20,58 +20,15 @@ using namespace std;
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
-//--------------------------------Temporary Functions-------------------------//
+//-------------------Temp. Func for radiation length calc.--------------------//
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
+double fZ(unsigned int Z);
+double Lrad(unsigned int Z);
+double Lrad_dash(unsigned int Z);
+double X0_inv(unsigned int Z, double M);
 
-///////////////////// constants ////////////////////
-
-#define m_e 0.510998928                             //mass of an electron in MeV/c²
-#define e_0 1.602176462e-19                         //charge of an electron in A*s (SI)
-#define r_e 2.8179403267e-13                        //classical electron radius in cm
-
-#define N_A 6.02214129e23                           //Avogadro constant in 1/mol
-#define sommerfeld 7.297352533e-3                   //Sommerfeld constant
-
-////////////////////////////////////////////////////
-
-
-///////////////// radiation length /////////////////
-
-double fZ(unsigned int Z)
-{
-    double a_sq = sommerfeld*sommerfeld*Z*Z;
-
-    return a_sq*( 1./(1.+a_sq)+0.20206-0.0369*a_sq+0.0083*a_sq*a_sq-0.002*a_sq*a_sq*a_sq );
-}
-
-double Lrad(unsigned int Z)
-{
-    if(Z > 4) return log(184.15*pow(Z, -1./3.)); //Elements Z>4
-
-    if(Z == 1) return 5.31;     //Hydrogen
-    if(Z == 2) return 4.79;     //Helium
-    if(Z == 3) return 4.74;     //Lithium
-    if(Z == 4) return 4.71;     //Beryllium
-    return 0;
-}
-
-double Lrad_dash(unsigned int Z)
-{
-    if(Z > 4) return log(1194.*pow(Z, -2./3.)); //Elements Z>4
-
-    if(Z == 1) return 6.144;     //Hydrogen
-    if(Z == 2) return 5.621;     //Helium
-    if(Z == 3) return 5.805;     //Lithium
-    if(Z == 4) return 5.924;     //Beryllium
-    return 0;
-}
-
-double X0_inv(unsigned int Z, double M)
-{
-    return 4.*sommerfeld*r_e*r_e*N_A/M*( Z*Z*(Lrad(Z)-fZ(Z))+Z*Lrad_dash(Z) );
-}
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
@@ -548,7 +505,8 @@ void Medium::Initr()
         aux2 += atomInMolecule_.at(i)*atomicNum_.at(i);
     }
     radiationLength_ = aux2/aux1;
-    radiationLength_ *= massDensity_;
+    radiationLength_ /= massDensity_;
+
 }
 
 
@@ -1222,4 +1180,45 @@ Medium::~Medium()
     M_.clear();
     elementName_.clear();
     mN_.clear();
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//--------------------------------Temporary Functions-------------------------//
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+double fZ(unsigned int Z)
+{
+    double a_sq = ALPHA*ALPHA*Z*Z;
+
+    return a_sq*( 1./(1.+a_sq)+0.20206-0.0369*a_sq+0.0083*a_sq*a_sq-0.002*a_sq*a_sq*a_sq );
+}
+
+double Lrad(unsigned int Z)
+{
+    if(Z > 4) return log(184.15*pow(Z, -1./3.)); //Elements Z>4
+
+    if(Z == 1) return 5.31;     //Hydrogen
+    if(Z == 2) return 4.79;     //Helium
+    if(Z == 3) return 4.74;     //Lithium
+    if(Z == 4) return 4.71;     //Beryllium
+    return 0;
+}
+
+double Lrad_dash(unsigned int Z)
+{
+    if(Z > 4) return log(1194.*pow(Z, -2./3.)); //Elements Z>4
+
+    if(Z == 1) return 6.144;     //Hydrogen
+    if(Z == 2) return 5.621;     //Helium
+    if(Z == 3) return 5.805;     //Lithium
+    if(Z == 4) return 5.924;     //Beryllium
+    return 0;
+}
+
+double X0_inv(unsigned int Z, double M)
+{
+    return 4.*ALPHA*RE*RE*NA/M*( Z*Z*(Lrad(Z)-fZ(Z))+Z*Lrad_dash(Z) );
 }
