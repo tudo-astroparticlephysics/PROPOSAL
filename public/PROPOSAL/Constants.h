@@ -69,6 +69,10 @@
     #define RE 2.817940285e-13
 #endif
 
+#ifndef E0
+    #define E0 1.602176462e-19                         //charge of an electron in A*s (SI)
+#endif
+
 #ifndef RM // classical Muon radius(cm) :   RM = (1.602176487*pow(10,-19))/(4*PI*8.854187817*pow(10,-12)*Mmu_)*pow(10,-4);
     #define RM 1.362849110866631e-15
 #endif
