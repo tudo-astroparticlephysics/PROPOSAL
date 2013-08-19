@@ -20,16 +20,20 @@ int main()
     stringstream hist_title2;
 
 
-    TFile *file = new TFile("Scattering_distribution.root","RECREATE");
+    vector<TH1D*> tmp_hist_dev_vec;
+    vector<TH1D*> tmp_hist_angle_vec;
+
 
     int number_of_particles =   1e3;
+
     double distance;
     double deviation;
     double angle;
 
     double Emin=1e3;
-    double Emax=1e4;
+    double Emax=1e12;
     double multiplier = 10;
+
     for(double energy = Emin; energy <= Emax ; energy *= multiplier)
     {
         hist_name.str("");
@@ -52,17 +56,15 @@ int main()
 
         TH1D *tmp_hist_dev = new TH1D(hist_name.str().c_str(),"dd",64,1,1000);
         TH1D *tmp_hist_angle = new TH1D(hist_name2.str().c_str(),"ss",64,1e-8,1);
+        cout<<tmp_hist_dev<<endl;
+        cout<<tmp_hist_angle<<endl;
         for(int i =0 ;i< number_of_particles; i++)
         {
             if(i%(number_of_particles/10)==0)cout<<"Progress: " <<100.*i/number_of_particles<<"%"<<endl;
 
-            Particle * prtcl = new Particle("mu",0,0,0,0,0,energy/energy*1000,0);
-
-            cout << prpgtr << endl;
-            cout << prtcl << endl;
+            Particle * prtcl = new Particle("mu",0,0,0,0,0,energy,0);
 
             prpgtr->Propagate(prtcl);
-            if(energy>1E3)cout << "asdasdadasdasd" << endl;
 
             distance    += prtcl->GetPropagatedDistance();
             deviation   = sqrt(prtcl->GetX()*prtcl->GetX()+prtcl->GetY()*prtcl->GetY());
@@ -71,7 +73,7 @@ int main()
             tmp_hist_dev->Fill(deviation);
             tmp_hist_angle->Fill(angle);
 
-            delete prtcl;
+            //delete prtcl;
         }
         hist_title  <<   distance/number_of_particles   <<")";
         hist_title2 <<   distance/number_of_particles   <<")";
@@ -79,15 +81,25 @@ int main()
         tmp_hist_dev->GetXaxis()->SetTitle("range [cm]");
         tmp_hist_dev->GetYaxis()->SetTitle("#");
         tmp_hist_dev->SetTitle(hist_title.str().c_str());
-        tmp_hist_dev->Write();
-        delete tmp_hist_dev;
+        tmp_hist_dev_vec.push_back(tmp_hist_dev);
+
+        //delete tmp_hist_dev;
 
         tmp_hist_angle->GetXaxis()->SetTitle("angle [deg]");
         tmp_hist_angle->GetYaxis()->SetTitle("#");
         tmp_hist_angle->SetTitle(hist_title2.str().c_str());
-        tmp_hist_angle->Write();
-        delete tmp_hist_angle;
+        tmp_hist_angle_vec.push_back(tmp_hist_angle);
+        //delete tmp_hist_angle;
 
+    }
+
+    TFile *file = new TFile("Scattering_distribution.root","RECREATE");
+
+
+    for(unsigned int i =0 ;i< tmp_hist_dev_vec.size();i++)
+    {
+        tmp_hist_dev_vec.at(i)->Write();
+        tmp_hist_angle_vec.at(i)->Write();
     }
     file->Close();
 

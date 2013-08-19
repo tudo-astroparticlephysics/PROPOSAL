@@ -324,6 +324,13 @@ int main(int argc, char** argv){
 
 //    cout<<BOOST_PP_LIMIT_TUPLE<<endl;
 
+    Propagator *pr  =   new Propagator();
+    Particle *p = new Particle("mu");
+    pr->EnableInterpolation("resources");
+    p->SetEnergy(9e6);
+    pr->SetParticle(p);
+    pr->Propagate(1e20);
+
 //    int b =4;
 //    log_warn("a");
 //    log_warn("a%i",1);

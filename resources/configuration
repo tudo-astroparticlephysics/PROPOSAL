@@ -84,7 +84,7 @@ global
     brems               1
     photo               12
     lpm
-    moliere
+    #moliere
     exact_time
     brems_multiplier    1
     photo_multiplier    1
@@ -100,7 +100,7 @@ global
     cont_inside         0
     cont_infront        1
     cont_behind         0
-    #raw
+    raw
 
 # keyword sector must be followed by these lines
 # first: geometry information (this must be the first line)

@@ -25,7 +25,7 @@
 
 
 
-class CrossSections : public MathModel
+class CrossSections
 {
 
 
