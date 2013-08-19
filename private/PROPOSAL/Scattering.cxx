@@ -341,6 +341,120 @@ long double Scattering::CalculateTheta0(double dr, double ei, double ef)
     return min(aux, cutoff);
 }
 
+long double Scattering::CalculateTheta0New(double dr, Medium* med)
+{
+    long double y = dr/med->GetRadiationLength();
+    double beta = 1./sqrt(1 +  particle_->GetMass() * particle_->GetMass()/ (particle_->GetMomentum()*particle_->GetMomentum() ));
+    y = 13.6/(particle_->GetMomentum()* beta ) *sqrt(y)*( 1.+0.038*log(y) );
+    return y;
+}
+
+
+void Scattering::ScatterNew(double dr) //, Medium* med)
+{
+    //    Implement the Molie Scattering here see PROPOSALParticle::advance of old version
+        long double Theta0, Theta_max,rnd1,rnd2,sx,tx,sy,ty,sz,tz,ax,ay,az;
+        double x,y,z;
+        Theta0     =   CalculateTheta0New(dr, this->crosssections_.at(0)->GetMedium());
+
+        Theta_max    =   1./SQRT2;
+
+
+        rnd1    =   (long double)standard_normal_-> StandardNormalRandomNumber(RandomDouble(), 0, Theta0, -Theta_max, Theta_max, false);
+        rnd2    =   (long double)standard_normal_-> StandardNormalRandomNumber(RandomDouble(), 0, Theta0, -Theta_max, Theta_max, false);
+        sx      =   (rnd1/SQRT3+rnd2)/2;
+        tx      =   rnd2;
+
+        rnd1    =   (long double)standard_normal_-> StandardNormalRandomNumber(RandomDouble(), 0, Theta0, -Theta_max, Theta_max, false);
+        double r=RandomDouble();
+
+        rnd2    =   (long double)standard_normal_-> StandardNormalRandomNumber(r, 0, Theta0, -Theta_max, Theta_max, false);
+        sy      =   (rnd1/SQRT3+rnd2)/2;
+        ty      =   rnd2;
+        //cout<<"scat "<<rnd1<<"\t"<<r<<"\t"<<rnd2<<"\t"<<Theta0<<"\t"<<endl;
+
+        sz      =   sqrt(max(1.-(sx*sx+sy*sy), (long double)0.));
+        tz      =   sqrt(max(1.-(tx*tx+ty*ty), (long double)0.));
+
+        long double sinth, costh,sinph,cosph;
+        long double theta,phi;
+        sinth = (long double)particle_->GetSinTheta();
+        costh = (long double)particle_->GetCosTheta();
+        sinph = (long double)particle_->GetSinPhi();
+        cosph = (long double)particle_->GetCosPhi();
+        x   = particle_->GetX();
+        y   = particle_->GetY();
+        z   = particle_->GetZ();
+
+
+        ax      =   sinth*cosph*sz+costh*cosph*sx-sinph*sy;
+        ay      =   sinth*sinph*sz+costh*sinph*sx+cosph*sy;
+        az      =   costh*sz-sinth*sx;
+
+        x       +=  ax*dr;
+        y       +=  ay*dr;
+        z       +=  az*dr;
+
+
+        ax      =   sinth*cosph*tz+costh*cosph*tx-sinph*ty;
+        ay      =   sinth*sinph*tz+costh*sinph*tx+cosph*ty;
+        az      =   costh*tz-sinth*tx;
+
+
+
+        costh   =   az;
+        sinth   =   sqrt(max(1-costh*costh, (long double)0));
+
+        if(sinth!=0)
+        {
+            sinph   =   ay/sinth;
+            cosph   =   ax/sinth;
+        }
+
+        if(costh>1)
+        {
+            theta   =   acos(1)*180./PI;
+        }
+        else if(costh<-1)
+        {
+            theta   =   acos(-1)*180./PI;
+        }
+        else
+        {
+            theta   =   acos(costh)*180./PI;
+        }
+
+        if(cosph>1)
+        {
+            phi =   acos(1)*180./PI;
+        }
+        else if(cosph<-1)
+        {
+            phi =   acos(-1)*180./PI;
+        }
+        else
+        {
+            phi =   acos(cosph)*180./PI;
+        }
+
+        if(sinph<0)
+        {
+            phi =   360.-phi;
+        }
+
+        if(phi>=360)
+        {
+            phi -=  360.;
+        }
+
+        particle_->SetX(x);
+        particle_->SetY(y);
+        particle_->SetZ(z);
+        particle_->SetPhi(phi);
+        particle_->SetTheta(theta);
+}
+
+
 void Scattering::Scatter(double dr, double ei, double ef)
 {
     //    Implement the Molie Scattering here see PROPOSALParticle::advance of old version

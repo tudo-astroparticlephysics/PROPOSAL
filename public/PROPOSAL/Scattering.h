@@ -71,6 +71,8 @@ public:
 
     long    double  CalculateTheta0(double dr, double ei, double ef);
     void            Scatter(double dr, double ei, double ef);
+    long    double  CalculateTheta0New(double dr, Medium* med);
+    void            ScatterNew(double dr);//, Medium* med);
     double          FunctionToIntegral(double energy);
     double          FunctionToBuildInterpolant(double energy);
     void            EnableInterpolation(std::string path = "");

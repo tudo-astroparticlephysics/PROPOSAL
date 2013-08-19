@@ -333,66 +333,20 @@ int main(int argc, char** argv){
 //    log_warn("a %i %i %i %i %i %i %i %i %i %i %i %i",3,33,3,3,33,3,4,4,4,4,4,4);
 //    log_warn("a");
 //    log_debug("hshshssh");
-    Particle * particle1 = new Particle("mu");
-    Particle * particle2 = new Particle("mu");
-    Particle * particle = new Particle("mu" ,-20000.,10.,-10.,90.,0.,0.,0.);
 
-    Propagator *pr = new Propagator("resources/configuration");
+    Scattering* scat = new Scattering();
+    scat->GetParticle()->SetEnergy(7.3*1E3);
+    Medium* medtest = new Medium("copper",1);
+    cout << "Theta[mrad]: " << scat->CalculateTheta0New(1.44,medtest)*1E3 << endl;
+    //return 0;
 
-    particle1->SetEnergy(1e5);
-    particle2->SetEnergy(1e4);
-    particle->SetEnergy(1e5);
-
-    vector<Particle*> a ;
-
-    #if ROOT_SUPPORT
-    Output::getInstance().EnableROOTOutput("test.root");
-    #endif
-//    vector<Particle*> a = pr->Propagate(particle);
-//    vector<Particle*> b = pr->Propagate(particle1);
-//    vector<Particle*> c = pr->Propagate(particle2);
-
-    for(int j= 0 ; j<1e5; j++)
-    {
-        //if(j%10==0)cout<<"Progress: " <<1.*j/1e4<<"%"<<endl;
-
-        double x    =   -10.;
-        double y    =   -10;//j*1.1;
-        double z    =   -90000;//-100+1.1*j;
-        double theta    = 0;//  85 + j*0.005;
-        double phi       =   0;
-
-        cout<<j<<endl;
-
-        particle = new Particle("mu" ,x,y,z,theta,phi,0.,0.);
-        particle->SetEnergy(1e6);
-
-       // cout<<"--------------"<<j<<"--------------"<<endl;
-        a= pr->Propagate(particle);
-    }
-
-    Output::getInstance().Close();
-    //log_arsch("a2 %i\n",2);
-
-  //  cout<<VA_COUNT("a2 %i")<<endl;
-//    int b = 213;
-//    double blah = sqrt(3.)*sqrt(2.);
+    Particle * prtcl = new Particle("mu",0,0,0,0,0,1E3,0);
+    Propagator* prpgtr = new Propagator("resources/configurationTest");
+    prpgtr->Propagate(prtcl);
+    cout << *prtcl << endl;
+    cout << "D: " << sqrt(prtcl->GetX()*prtcl->GetX()+prtcl->GetY()*prtcl->GetY()) << endl;
 
 
-//    PropertyConfigurator::doConfigure(LOG4CPLUS_TEXT("resources/log4cplus.conf"));
-//    Logger logger;
-//    logger = Logger::getInstance(LOG4CPLUS_TEXT("main"));
-
-//    LOG4CPLUS_FATAL_FMT(logger, "ERROR!!! %d \n" , b );
-//    LOG4CPLUS_FATAL(logger, "ERROR!!!");
-
-////    LOG4CPLUS_INFO_FMT(logger,
-////        LOG4CPLUS_TEXT (
-////            "Actually doing something...%d, %d, %d, %ls...DONE"),
-////        1, 2, 3, L"testing");
-////     LOG4CPLUS_WARN(logger, "WARNING!! " << setprecision(16) << blah);
-////     LOG4CPLUS_INFO(logger, "INFO! " << blah);
-////    LOG4CPLUS_TRACE(logger, LOG4CPLUS_TEXT("TRAC//E"));
 
 
 

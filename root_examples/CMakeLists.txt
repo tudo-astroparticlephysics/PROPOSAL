@@ -1,6 +1,7 @@
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/root_examples)
 
 add_executable(Plot_range plot_range.cxx)
+add_executable(Plot_Scattering plot_Scattering.cxx)
 add_executable(Plot_Ionization_dEdx plot_Ionization_dEdx.cxx)
 add_executable(Plot_Ionization_dNdx plot_Ionization_dNdx.cxx)
 add_executable(Plot_Ionization_dNdx_different_ecut plot_Ionization_dNdx_different_ecut.cxx)
@@ -17,6 +18,9 @@ add_executable(Draw_Track draw_track.cxx)
 
 target_link_libraries(Plot_range ${ROOT_LIBRARIES})
 target_link_libraries(Plot_range PROPOSAL)
+
+target_link_libraries(Plot_Scattering ${ROOT_LIBRARIES})
+target_link_libraries(Plot_Scattering PROPOSAL)
 
 target_link_libraries(Plot_Ionization_dEdx ${ROOT_LIBRARIES})
 target_link_libraries(Plot_Ionization_dEdx PROPOSAL)

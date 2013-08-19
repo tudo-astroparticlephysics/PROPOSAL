@@ -330,6 +330,11 @@ public:
         return massDensity_;
     }
 //----------------------------------------------------------------------------//
+    double GetRadiationLength() const
+    {
+        return radiationLength_;
+    }
+//----------------------------------------------------------------------------//
     double GetMolDensity() const
     {
         return molDensity_;
