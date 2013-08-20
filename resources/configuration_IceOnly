@@ -149,8 +149,8 @@ sector
     sphere  0   0   0   637413400  0
 
     inside  500     0.05  1
-    infront -1    0.05  1
-    behind  -1      -1  0
+    infront 500     0.05  1
+    behind  500     0.05  1
 
     medium Ice 0.832
 
