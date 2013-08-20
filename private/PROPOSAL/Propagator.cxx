@@ -461,8 +461,8 @@ void Propagator::AdvanceParticle(double dr, double ei, double ef)
 
     if(moliere_)
     {
-//        current_collection_->GetScattering_bug()->Scatter(dr,ei,ef);
-        scattering_->Scatter(dr ,   particle_   ,   current_collection_->GetMedium());
+        current_collection_->GetScattering_bug()->Scatter(dr,ei,ef);
+//        scattering_->Scatter(dr ,   particle_   ,   current_collection_->GetMedium());
         //local displacement and angles are adjusted in the scattering class.
     }
     else
@@ -1997,8 +1997,8 @@ void Propagator::ApplyOptions()
 
         if(moliere_)
         {
-            log_error("No scattering in process collections enabled!");
-            //collections_.at(j)->EnableScattering();
+            //This Scattering routine shouldnt be used!
+            collections_.at(j)->EnableScattering();
         }
         if(do_exact_time_calulation_)
         {
