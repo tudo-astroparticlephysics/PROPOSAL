@@ -6,6 +6,7 @@
 #include <sstream>
 #include <stdio.h>
 #include <string>
+#include "TGraphErrors.h"
 
 
 using namespace std;
@@ -26,20 +27,43 @@ int main()
     vector<TH1D*> tmp_hist_dev_vec;
     vector<TH1D*> tmp_hist_angle_vec;
 
+    vector<double> e;
 
-    int number_of_particles =   3e6;
+    int number_of_particles =   3e5;
 
     double distance;
     double deviation;
     double angle;
 
-    double Emin=1e3;
+    double Emin=2e2;
     double Emax=1e12;
-    double multiplier = 10;
+    double multiplier = 1;
 
 
-    for(double energy = Emin; energy <= Emax ; energy *= multiplier)
-    {
+    for(double energy = 0; energy <= Emax ; energy *= multiplier)
+    {        
+        if(energy<1e3)
+        {
+            multiplier=1;
+            energy = energy + Emin;
+        }
+
+        else if(energy<1e4)
+        {
+            multiplier=1;
+            energy = energy + 5*Emin;
+        }
+        else if(energy <1e5)
+        {
+            energy  =   10*energy;
+            multiplier =10;
+        }
+        else
+        {
+            multiplier =10;
+        }
+
+
         hist_name.str("");
         hist_name.clear();
         hist_name2.str("");
@@ -86,13 +110,13 @@ int main()
         hist_title  <<   distance/number_of_particles   <<")";
         hist_title2 <<   distance/number_of_particles   <<")";
 
-        tmp_hist_dev->GetXaxis()->SetTitle("range [cm]");
+        tmp_hist_dev->GetXaxis()->SetTitle("log10( range / [cm] )");
         tmp_hist_dev->GetYaxis()->SetTitle("#");
         tmp_hist_dev->SetTitle(hist_title.str().c_str());
         tmp_hist_dev_vec.push_back(tmp_hist_dev);
+        e.push_back(energy);
 
-
-        tmp_hist_angle->GetXaxis()->SetTitle("angle [deg]");
+        tmp_hist_angle->GetXaxis()->SetTitle("log( angle [deg] )");
         tmp_hist_angle->GetYaxis()->SetTitle("#");
         tmp_hist_angle->SetTitle(hist_title2.str().c_str());
         tmp_hist_angle_vec.push_back(tmp_hist_angle);
@@ -106,12 +130,31 @@ int main()
 
     TFile *file = new TFile("Scattering_distribution.root","RECREATE");
 
+    TGraphErrors *angle_vs_energy = new TGraphErrors();
+    angle_vs_energy->SetName("angle_vs_energy");
+    angle_vs_energy->SetTitle("angle vs energy");
+
 
     for(unsigned int i =0 ;i< tmp_hist_dev_vec.size();i++)
     {
+        angle_vs_energy->SetPoint(i,e.at(i),pow(10 ,tmp_hist_angle_vec.at(i)->GetMean()));
+        angle_vs_energy->SetPointError(i,0,pow(10,tmp_hist_angle_vec.at(i)->GetRMS()));
         tmp_hist_dev_vec.at(i)->Write();
         tmp_hist_angle_vec.at(i)->Write();
     }
+
+
+    TCanvas *can = new TCanvas("can","can",1400,1050);
+    can->cd();
+    can->SetLogx();
+    can->SetGridx();
+    can->SetGridy();
+    angle_vs_energy->SetMarkerStyle(3);
+    angle_vs_energy->Draw("AP");
+    angle_vs_energy->GetXaxis()->SetTitle("energy [deg]");
+    angle_vs_energy->GetYaxis()->SetTitle("angle [deg]");
+
+    can->Write();
     file->Close();
 
 	return 0;
