@@ -462,7 +462,7 @@ void Propagator::AdvanceParticle(double dr, double ei, double ef)
     if(moliere_)
     {
         //current_collection_->GetScattering()->Scatter(dr,ei,ef);
-        current_collection_->GetScattering()->ScatterNew(dr);
+        scattering_->Scatter(dr ,   particle_   ,   current_collection_->GetMedium());
         //local displacement and angles are adjusted in the scattering class.
     }
     else
@@ -806,6 +806,7 @@ void Propagator::ReadConfigFile(string config_file)
         else if(ToLowerCase(taux).compare("moliere")==0)
         {
             moliere_ =   true;
+            scattering_ = new Scattering();
         }
         // exact location time
         else if(ToLowerCase(taux).compare("exact_time")==0)
@@ -1022,7 +1023,7 @@ Propagator::Propagator()
     ,raw_                       ( false )
 {
     particle_              = new Particle("mu");
-
+    scattering_            = new Scattering();
     InitDefaultCollection();
 }
 
@@ -1093,6 +1094,7 @@ Propagator::Propagator(const Propagator &propagator)
     ,path_to_tables_            ( propagator.path_to_tables_ )
     ,raw_                       ( propagator.raw_ )
     ,particle_                  ( propagator.particle_ )
+    ,scattering_                ( propagator.scattering_ )
     ,current_collection_        ( new ProcessCollection(*propagator.current_collection_) )
 
 {
@@ -1127,6 +1129,7 @@ bool Propagator::operator==(const Propagator &propagator) const
     if( order_of_interpolation_   != propagator.order_of_interpolation_ ) return false;
     if( debug_                    != propagator.debug_ )                  return false;
     if( particle_                 != propagator.particle_ )               return false;
+    if( scattering_               != propagator.scattering_ )             return false;
     if( particle_interaction_     != propagator.particle_interaction_ )   return false;
     if( seed_                     != propagator.seed_ )                   return false;
     if( brems_                    != propagator.brems_ )                  return false;
@@ -1204,8 +1207,9 @@ void Propagator::swap(Propagator &propagator)
     path_to_tables_.swap( propagator.path_to_tables_ );
 
     particle_->swap( *propagator.particle_ );
-    current_collection_->swap( *propagator.current_collection_ );
+    scattering_->swap(*propagator.scattering_);
 
+    current_collection_->swap( *propagator.current_collection_ );
 }
 
 
@@ -1993,7 +1997,8 @@ void Propagator::ApplyOptions()
 
         if(moliere_)
         {
-            collections_.at(j)->EnableScattering();
+            log_error("No scattering in process collections enabled!");
+            //collections_.at(j)->EnableScattering();
         }
         if(do_exact_time_calulation_)
         {
@@ -2035,8 +2040,6 @@ void Propagator::ApplyOptions()
 void Propagator::SetParticle(Particle* particle)
 {
     particle_   =   particle;
-    //current_collection_->SetParticle(particle_);
-
 }
 
 

@@ -341,11 +341,6 @@ int main(int argc, char** argv){
 //    log_warn("a");
 //    log_debug("hshshssh");
 
-    Scattering* scat = new Scattering();
-    scat->GetParticle()->SetEnergy(7.3*1E3);
-    Medium* medtest = new Medium("copper",1);
-    cout << "Theta[mrad]: " << scat->CalculateTheta0New(1.44,medtest)*1E3 << endl;
-    //return 0;
 
     Particle * prtcl = new Particle("mu",0,0,0,0,0,1E3,0);
     Propagator* prpgtr = new Propagator("resources/configurationTest");

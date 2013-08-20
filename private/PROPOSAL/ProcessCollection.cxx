@@ -612,10 +612,10 @@ void ProcessCollection::EnableInterpolation(std::string path, bool raw)
         EnableParticleTimeInterpolation(path,raw);
     }
 
-    if(do_scattering_)
-    {
-        scattering_->EnableInterpolation(path);
-    }
+//    if(do_scattering_)
+//    {
+//        scattering_->EnableInterpolation(path);
+//    }
 
     bigLow_.at(0)=interpol_prop_decay_->Interpolate(particle_->GetLow());
     bigLow_.at(1)=interpol_prop_interaction_->Interpolate(particle_->GetLow());
@@ -906,18 +906,18 @@ void ProcessCollection::DisableContinuousRandomization()
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-
+/*
 void ProcessCollection::DisableScattering()
 {
     delete  scattering_;
     scattering_         =   NULL;
     do_scattering_      =   false;
 }
-
+*/
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
-
+/*
 
 void ProcessCollection::EnableScattering()
 {
@@ -925,7 +925,7 @@ void ProcessCollection::EnableScattering()
     do_scattering_      =   true;
 }
 
-
+*/
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
@@ -966,7 +966,7 @@ ProcessCollection::ProcessCollection()
     ,weighting_starts_at_        ( 0 )
     ,enable_randomization_       ( false )
     ,do_continuous_randomization_( false )
-    ,do_scattering_              ( false )
+//    ,do_scattering_              ( false )
     ,location_                   ( 0 )
     ,density_correction_         ( 1. )
     ,do_time_interpolation_      ( false )
@@ -996,7 +996,7 @@ ProcessCollection::ProcessCollection()
     interpol_prop_interaction_diff_ = NULL;
     randomizer_                     = NULL;
     geometry_                       = NULL;
-    scattering_                     = NULL;
+    //scattering_                     = NULL;
 }
 
 
@@ -1016,7 +1016,7 @@ ProcessCollection::ProcessCollection(const ProcessCollection &collection)
     ,weighting_starts_at_        ( collection.weighting_starts_at_ )
     ,enable_randomization_       ( collection.enable_randomization_ )
     ,do_continuous_randomization_( collection.do_continuous_randomization_ )
-    ,do_scattering_              ( collection.do_scattering_ )
+//    ,do_scattering_              ( collection.do_scattering_ )
     ,location_                   ( collection.location_ )
     ,density_correction_         ( collection.density_correction_ )
     ,do_time_interpolation_      ( collection.do_time_interpolation_ )
@@ -1140,7 +1140,7 @@ ProcessCollection::ProcessCollection(const ProcessCollection &collection)
     {
         randomizer_ = NULL;
     }
-
+/*
     if(collection.scattering_ != NULL)
     {
         scattering_ = new Scattering(*collection.scattering_) ;
@@ -1149,7 +1149,7 @@ ProcessCollection::ProcessCollection(const ProcessCollection &collection)
     {
         scattering_ = NULL;
     }
-
+*/
     if(collection.geometry_ != NULL)
     {
         geometry_ = new Geometry(*collection.geometry_) ;
@@ -1176,7 +1176,7 @@ ProcessCollection::ProcessCollection(Particle *particle, Medium *medium, EnergyC
     ,weighting_starts_at_        ( 0 )
     ,enable_randomization_       ( false )
     ,do_continuous_randomization_( false )
-    ,do_scattering_              ( false )
+//    ,do_scattering_              ( false )
     ,location_                   ( 0 )
     ,density_correction_         ( 1. )
     ,do_time_interpolation_      ( false )
@@ -1213,7 +1213,7 @@ ProcessCollection::ProcessCollection(Particle *particle, Medium *medium, EnergyC
     geometry_                       = NULL;
     interpol_time_particle_         = NULL;
     interpol_time_particle_diff_    = NULL;
-    scattering_                     = NULL;
+    //scattering_                     = NULL;
 }
 
 
@@ -1258,7 +1258,7 @@ bool ProcessCollection::operator==(const ProcessCollection &collection) const
     if( weighting_starts_at_        != collection.weighting_starts_at_ )     return false;
     if( enable_randomization_       != collection.enable_randomization_ )    return false;
     if( do_continuous_randomization_!= collection.do_continuous_randomization_ )return false;
-    if( do_scattering_              != collection.do_scattering_ )           return false;
+//    if( do_scattering_              != collection.do_scattering_ )           return false;
     if( location_                   != collection.location_ )                return false;
     if( density_correction_         != collection.density_correction_ )      return false;
     if( do_exact_time_calulation_   != collection.do_exact_time_calulation_ )return false;
@@ -1360,11 +1360,11 @@ bool ProcessCollection::operator==(const ProcessCollection &collection) const
     }
     else if( randomizer_ != collection.randomizer_)                                           return false;
 
-    if( scattering_ != NULL && collection.scattering_ != NULL)
+/*    if( scattering_ != NULL && collection.scattering_ != NULL)
     {
         if( *scattering_   != *collection.scattering_)                                        return false;
     }
-    else if( scattering_ != collection.scattering_)                                           return false;
+    else if( scattering_ != collection.scattering_)  */                                         return false;
 
     if( geometry_ != NULL && collection.geometry_ != NULL)
     {
@@ -1400,7 +1400,7 @@ ostream& operator<<(ostream& os, ProcessCollection const& collection)
     os<<"Order of interpolation:\t\t\t\t"<<collection.order_of_interpolation_<<endl;
     os<<"Interpolation enabled:\t\t\t\t"<<collection.do_interpolation_<<endl;
     os<<"Continuous randomization enabled:\t\t"<<collection.do_continuous_randomization_<<endl;
-    os<<"Moliere scattering enabled:\t\t\t"<<collection.do_scattering_<<endl;
+//    os<<"Moliere scattering enabled:\t\t\t"<<collection.do_scattering_<<endl;
     os<<"Exact time calculation enabled:\t\t\t"<<collection.do_exact_time_calulation_<<endl;
     os<<"Location (0=infront, 1=inside, 2=behind)\t"<<collection.location_<<endl;
     os<<"Density correction factor:\t\t\t"<<collection.density_correction_<<endl;
@@ -1483,20 +1483,20 @@ void ProcessCollection::swap(ProcessCollection &collection)
         randomizer_ = NULL;
     }
 
-    if( scattering_ != NULL && collection.scattering_ != NULL)
-    {
-        scattering_->swap(*collection.scattering_);
-    }
-    else if( scattering_ == NULL && collection.scattering_ != NULL)
-    {
-        scattering_ = new Scattering(*collection.scattering_);
-        collection.scattering_ = NULL;
-    }
-    else if( scattering_ != NULL && collection.scattering_ == NULL)
-    {
-        collection.scattering_ = new Scattering(*scattering_);
-        scattering_ = NULL;
-    }
+//    if( scattering_ != NULL && collection.scattering_ != NULL)
+//    {
+//        scattering_->swap(*collection.scattering_);
+//    }
+//    else if( scattering_ == NULL && collection.scattering_ != NULL)
+//    {
+//        scattering_ = new Scattering(*collection.scattering_);
+//        collection.scattering_ = NULL;
+//    }
+//    else if( scattering_ != NULL && collection.scattering_ == NULL)
+//    {
+//        collection.scattering_ = new Scattering(*scattering_);
+//        scattering_ = NULL;
+//    }
 
     if( geometry_ != NULL && collection.geometry_ != NULL)
     {
@@ -1881,10 +1881,10 @@ void ProcessCollection::SetParticle(Particle* particle)
     {
         randomizer_->SetParticle(particle_);
     }
-    if(do_scattering_)
-    {
-        scattering_->SetParticle(particle_);
-    }
+//    if(do_scattering_)
+//    {
+//        scattering_->SetParticle(particle_);
+//    }
 }
 
 
@@ -1899,10 +1899,10 @@ void ProcessCollection::SetCrosssections(
     {
         randomizer_->SetCrosssections(crosssections);
     }
-    if(do_scattering_)
-    {
-        scattering_->SetCrosssections(crosssections);
-    }
+//    if(do_scattering_)
+//    {
+//        scattering_->SetCrosssections(crosssections);
+//    }
 }
 
 void ProcessCollection::SetDebug(bool debug) {

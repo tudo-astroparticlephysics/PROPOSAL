@@ -47,7 +47,7 @@ protected:
 
     bool        enable_randomization_;        //!< if true continuous randomization will be enabled (to remember if randomization should be enable when cross sections are initalized)
     bool        do_continuous_randomization_; //!< if true randomization of continuous energy losses is enabled
-    bool        do_scattering_;               //!< if true moliere scattering is enabled
+//    bool        do_scattering_;               //!< if true moliere scattering is enabled
     int         location_;                    //!< 0 = infront of the detector, 1 = inside the detector, 2 = behind the detector
 
     double      density_correction_;          //!< density correction factor
@@ -88,7 +88,7 @@ protected:
     Interpolant *interpol_prop_interaction_diff_;//!< Interpolant object of the function FunctionToPropIntegralInteraction
 
     ContinuousRandomization *randomizer_;
-    Scattering* scattering_;
+    //Scattering* scattering_;
 
     Interpolant* interpol_time_particle_;
     Interpolant* interpol_time_particle_diff_;
@@ -423,9 +423,9 @@ public:
         return do_continuous_randomization_;
     }
 
-    bool GetDoScattering() const {
-        return do_scattering_;
-    }
+//    bool GetDoScattering() const {
+//        return do_scattering_;
+//    }
 
 	double GetIni() const {
 		return ini_;
@@ -451,9 +451,9 @@ public:
         return randomizer_;
     }
 
-    Scattering* GetScattering() const {
-        return scattering_;
-    }
+//    Scattering* GetScattering() const {
+//        return scattering_;
+//    }
 
     bool GetEnableRandomization() const {
         return enable_randomization_;
