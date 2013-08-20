@@ -461,7 +461,7 @@ void Propagator::AdvanceParticle(double dr, double ei, double ef)
 
     if(moliere_)
     {
-        //current_collection_->GetScattering()->Scatter(dr,ei,ef);
+//        current_collection_->GetScattering_bug()->Scatter(dr,ei,ef);
         scattering_->Scatter(dr ,   particle_   ,   current_collection_->GetMedium());
         //local displacement and angles are adjusted in the scattering class.
     }

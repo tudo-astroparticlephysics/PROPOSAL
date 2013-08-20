@@ -29,7 +29,7 @@
 #include <utility>
 #include <boost/program_options.hpp>
 #include "PROPOSAL/Geometry.h"
-
+#include "PROPOSAL/Scattering.h"
 
 class Propagator :public MathModel
 {

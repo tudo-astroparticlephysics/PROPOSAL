@@ -25,11 +25,13 @@
   */
 
 
-class Scattering : public MathModel
+class Scattering_bug : public MathModel
 {
 
 
 private:
+
+    double x0_;
 
     bool do_interpolation_;
     int order_of_interpolation_;
@@ -50,17 +52,17 @@ public:
      *
      * Constructor which sets "default" settings.
      */
-    Scattering();
+    Scattering_bug();
 
 //----------------------------------------------------------------------------//
 
-    Scattering(std::vector<CrossSections*> crosssections);
+    Scattering_bug(std::vector<CrossSections*> crosssections);
 //----------------------------------------------------------------------------//
 
-    Scattering(const Scattering&);
-    Scattering& operator=(const Scattering&);
-    bool operator==(const Scattering &scattering) const;
-    bool operator!=(const Scattering &scattering) const;
+    Scattering_bug(const Scattering_bug&);
+    Scattering_bug& operator=(const Scattering_bug&);
+    bool operator==(const Scattering_bug &scattering) const;
+    bool operator!=(const Scattering_bug &scattering) const;
 //----------------------------------------------------------------------------//
 
 
@@ -76,7 +78,7 @@ public:
     void            DisableInterpolation();
 //----------------------------------------------------------------------------//
 
-    void swap(Scattering &scattering);
+    void swap(Scattering_bug &scattering);
 
 //----------------------------------------------------------------------------//
 
@@ -94,7 +96,7 @@ public:
 
 //----------------------------------------------------------------------------//
     // destructors
-    ~Scattering() {}
+    ~Scattering_bug() {}
 
 
 };

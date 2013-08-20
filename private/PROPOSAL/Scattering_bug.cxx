@@ -5,8 +5,8 @@
 *
 *   \date   2013.08.19
 *   \author Tomasz Fuchs
-*/
-*/
+**/
+
 
 
 #include <cmath>
@@ -14,7 +14,7 @@
 #include <stdlib.h>
 #include "PROPOSAL/methods.h"
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/Scattering.h"
+#include "PROPOSAL/Scattering_bug.h"
 #include "PROPOSAL/Ionization.h"
 #include "PROPOSAL/Bremsstrahlung.h"
 #include "PROPOSAL/Epairproduction.h"
@@ -29,7 +29,7 @@ using namespace std;
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-Scattering::Scattering( )
+Scattering_bug::Scattering_bug( )
     :x0_(0)
     ,do_interpolation_(false)
     ,order_of_interpolation_(5)
@@ -58,7 +58,7 @@ Scattering::Scattering( )
 //double Scattering::cutoff   =   1;
 
 
-Scattering::Scattering(std::vector<CrossSections*> crosssections)
+Scattering_bug::Scattering_bug(std::vector<CrossSections*> crosssections)
     :x0_(0)
     ,do_interpolation_(false)
     ,order_of_interpolation_(5)
@@ -80,7 +80,7 @@ Scattering::Scattering(std::vector<CrossSections*> crosssections)
     standard_normal_    =   new StandardNormal(IROMB, IMAXS, IPREC);
 }
 
-Scattering::Scattering(const Scattering &scattering)
+Scattering_bug::Scattering_bug(const Scattering_bug &scattering)
     :x0_(scattering.x0_)
     ,do_interpolation_(scattering.do_interpolation_)
     ,particle_(scattering.particle_)
@@ -115,10 +115,10 @@ Scattering::Scattering(const Scattering &scattering)
 //----------------------------------------------------------------------------//
 
 
-Scattering& Scattering::operator=(const Scattering &scattering){
+Scattering_bug& Scattering_bug::operator=(const Scattering_bug &scattering){
     if (this != &scattering)
     {
-      Scattering tmp(scattering);
+      Scattering_bug tmp(scattering);
       swap(tmp);
     }
     return *this;
@@ -129,7 +129,7 @@ Scattering& Scattering::operator=(const Scattering &scattering){
 //----------------------------------------------------------------------------//
 
 
-bool Scattering::operator==(const Scattering &scattering) const
+bool Scattering_bug::operator==(const Scattering_bug &scattering) const
 {
     if(*particle_ != *(scattering.particle_))return false;
 
@@ -188,7 +188,7 @@ bool Scattering::operator==(const Scattering &scattering) const
 //----------------------------------------------------------------------------//
 
 
-bool Scattering::operator!=(const Scattering &scattering) const {
+bool Scattering_bug::operator!=(const Scattering_bug &scattering) const {
   return !(*this == scattering);
 }
 
@@ -197,7 +197,7 @@ bool Scattering::operator!=(const Scattering &scattering) const {
 //----------------------------------------------------------------------------//
 
 
-void Scattering::swap(Scattering &scattering)
+void Scattering_bug::swap(Scattering_bug &scattering)
 {
     using std::swap;
 
@@ -257,7 +257,7 @@ void Scattering::swap(Scattering &scattering)
 //----------------------------------------------------------------------------//
 
 
-double Scattering::FunctionToIntegral(double energy)
+double Scattering_bug::FunctionToIntegral(double energy)
 {
     double aux, aux2;
     double result;
@@ -285,7 +285,7 @@ double Scattering::FunctionToIntegral(double energy)
 
 //----------------------------------------------------------------------------//
 
-long double Scattering::CalculateTheta0(double dr, double ei, double ef)
+long double Scattering_bug::CalculateTheta0(double dr, double ei, double ef)
 {
 
     double aux=-1;
@@ -313,7 +313,7 @@ long double Scattering::CalculateTheta0(double dr, double ei, double ef)
     }
     else
     {
-        aux = integral_->Integrate(ei, ef, boost::bind(&Scattering::FunctionToIntegral, this, _1),4);
+        aux = integral_->Integrate(ei, ef, boost::bind(&Scattering_bug::FunctionToIntegral, this, _1),4);
     }
 
     aux =   sqrt(max(aux, 0.0)/x0_) *particle_->GetCharge();
@@ -322,7 +322,7 @@ long double Scattering::CalculateTheta0(double dr, double ei, double ef)
     return min(aux, cutoff);
 }
 
-void Scattering::Scatter(double dr, double ei, double ef)
+void Scattering_bug::Scatter(double dr, double ei, double ef)
 {
     //    Implement the Molie Scattering here see PROPOSALParticle::advance of old version
         long double Theta0, Theta_max,rnd1,rnd2,sx,tx,sy,ty,sz,tz,ax,ay,az;
@@ -428,12 +428,12 @@ void Scattering::Scatter(double dr, double ei, double ef)
 
 //----------------------------------------------------------------------------//
 
-double Scattering::FunctionToBuildInterpolant(double energy)
+double Scattering_bug::FunctionToBuildInterpolant(double energy)
 {
-        return integral_->Integrate(energy, BIGENERGY, boost::bind(&Scattering::FunctionToIntegral, this, _1),4);
+        return integral_->Integrate(energy, BIGENERGY, boost::bind(&Scattering_bug::FunctionToIntegral, this, _1),4);
 }
 
-void Scattering::EnableInterpolation(string path)
+void Scattering_bug::EnableInterpolation(string path)
 {
     if(do_interpolation_)return;
 
@@ -526,8 +526,8 @@ void Scattering::EnableInterpolation(string path)
             {
                 output.precision(16);
 
-                interpolant_ = new Interpolant(NUM2,particle_->GetLow() , BIGENERGY ,boost::bind(&Scattering::FunctionToBuildInterpolant, this, _1), order_of_interpolation_ , false, false, true, order_of_interpolation_, false, false, false );
-                interpolant_diff_ = new Interpolant(NUM2,particle_->GetLow() , BIGENERGY ,boost::bind(&Scattering::FunctionToIntegral, this, _1), order_of_interpolation_ , false, false, true, order_of_interpolation_, false, false, false );
+                interpolant_ = new Interpolant(NUM2,particle_->GetLow() , BIGENERGY ,boost::bind(&Scattering_bug::FunctionToBuildInterpolant, this, _1), order_of_interpolation_ , false, false, true, order_of_interpolation_, false, false, false );
+                interpolant_diff_ = new Interpolant(NUM2,particle_->GetLow() , BIGENERGY ,boost::bind(&Scattering_bug::FunctionToIntegral, this, _1), order_of_interpolation_ , false, false, true, order_of_interpolation_, false, false, false );
 
                 interpolant_->Save(output);
                 interpolant_diff_->Save(output);
@@ -552,8 +552,8 @@ void Scattering::EnableInterpolation(string path)
             crosssections_.at(i)->EnableDNdxInterpolation(path);
         }
 
-        interpolant_ = new Interpolant(NUM2,particle_->GetLow() , BIGENERGY ,boost::bind(&Scattering::FunctionToBuildInterpolant, this, _1), order_of_interpolation_ , false, false, true, order_of_interpolation_, false, false, false );
-        interpolant_diff_ = new Interpolant(NUM2,particle_->GetLow() , BIGENERGY ,boost::bind(&Scattering::FunctionToIntegral, this, _1), order_of_interpolation_ , false, false, true, order_of_interpolation_, false, false, false );
+        interpolant_ = new Interpolant(NUM2,particle_->GetLow() , BIGENERGY ,boost::bind(&Scattering_bug::FunctionToBuildInterpolant, this, _1), order_of_interpolation_ , false, false, true, order_of_interpolation_, false, false, false );
+        interpolant_diff_ = new Interpolant(NUM2,particle_->GetLow() , BIGENERGY ,boost::bind(&Scattering_bug::FunctionToIntegral, this, _1), order_of_interpolation_ , false, false, true, order_of_interpolation_, false, false, false );
 
         particle_->SetEnergy(energy);
     }
@@ -562,7 +562,7 @@ void Scattering::EnableInterpolation(string path)
     do_interpolation_ = true;
 }
 
-void Scattering::DisableInterpolation()
+void Scattering_bug::DisableInterpolation()
 {
     delete interpolant_;
     delete interpolant_diff_;
@@ -582,7 +582,7 @@ void Scattering::DisableInterpolation()
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-void Scattering::SetParticle(Particle* particle)
+void Scattering_bug::SetParticle(Particle* particle)
 {
     if(particle == NULL || particle == particle_)return;
 
@@ -594,7 +594,7 @@ void Scattering::SetParticle(Particle* particle)
     particle_ = particle;
 }
 
-void Scattering::SetCrosssections(std::vector<CrossSections*> crosssections)
+void Scattering_bug::SetCrosssections(std::vector<CrossSections*> crosssections)
 {
     crosssections_ = crosssections;
 }
