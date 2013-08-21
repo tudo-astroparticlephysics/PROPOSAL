@@ -18,114 +18,12 @@
 
 using namespace std;
 
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-//--------------------------------constructors--------------------------------//
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-Scattering::Scattering( )
-{
-    standard_normal_    =   new StandardNormal(IROMB, IMAXS, IPREC);
-}
-
-
-Scattering::Scattering(StandardNormal* standard_normal)
-{
-    if(standard_normal != NULL)
-    {
-        standard_normal_    =   standard_normal;
-    }
-    else
-    {
-        standard_normal_    =   new StandardNormal(IROMB, IMAXS, IPREC);
-    }
-}
-
-Scattering::Scattering(const Scattering &scattering)
-{
-    if(scattering.standard_normal_ != NULL)
-    {
-        standard_normal_ = new StandardNormal( *scattering.standard_normal_);
-    }
-    else
-    {
-        standard_normal_    =   new StandardNormal(IROMB, IMAXS, IPREC);
-    }
-}
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
-//-------------------------operators and swap function------------------------//
+//-------------------------public member functions----------------------------//
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
-
-
-Scattering& Scattering::operator=(const Scattering &scattering){
-    if (this != &scattering)
-    {
-      Scattering tmp(scattering);
-      swap(tmp);
-    }
-    return *this;
-}
-
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-bool Scattering::operator==(const Scattering &scattering) const
-{
-    if( standard_normal_ != NULL && scattering.standard_normal_ != NULL)
-    {
-        if( *standard_normal_   != *scattering.standard_normal_)                                        return false;
-    }
-    return true;
-}
-
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-bool Scattering::operator!=(const Scattering &scattering) const {
-  return !(*this == scattering);
-}
-
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-void Scattering::swap(Scattering &scattering)
-{
-    using std::swap;
-
-    if(scattering.standard_normal_ != NULL)
-    {
-        standard_normal_->swap(*scattering.standard_normal_) ;
-    }
-    else
-    {
-        standard_normal_ = NULL;
-    }
-}
-
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-//------------------------private member functions----------------------------//
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-double Scattering::CalculateTheta0(double dr, Particle* part, Medium* med)
-{
-    double y = dr/med->GetRadiationLength();
-    double beta = 1./sqrt(1 +  part->GetMass() * part->GetMass()/ (part->GetMomentum()*part->GetMomentum() ));
-    y = 13.6/(part->GetMomentum()* beta ) *sqrt(y)*( 1.+0.038*log(y) );
-    return y;
-}
 
 
 void Scattering::Scatter(double dr, Particle* part, Medium* med)
@@ -231,6 +129,128 @@ void Scattering::Scatter(double dr, Particle* part, Medium* med)
         part->SetPhi(phi);
         part->SetTheta(theta);
 }
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//--------------------------------constructors--------------------------------//
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+Scattering::Scattering( )
+{
+    standard_normal_    =   new StandardNormal(IROMB, IMAXS, IPREC);
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+Scattering::Scattering(StandardNormal* standard_normal)
+{
+    if(standard_normal != NULL)
+    {
+        standard_normal_    =   standard_normal;
+    }
+    else
+    {
+        standard_normal_    =   new StandardNormal(IROMB, IMAXS, IPREC);
+    }
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+Scattering::Scattering(const Scattering &scattering)
+{
+    if(scattering.standard_normal_ != NULL)
+    {
+        standard_normal_ = new StandardNormal( *scattering.standard_normal_);
+    }
+    else
+    {
+        standard_normal_    =   new StandardNormal(IROMB, IMAXS, IPREC);
+    }
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//-------------------------operators and swap function------------------------//
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+Scattering& Scattering::operator=(const Scattering &scattering){
+    if (this != &scattering)
+    {
+      Scattering tmp(scattering);
+      swap(tmp);
+    }
+    return *this;
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+bool Scattering::operator==(const Scattering &scattering) const
+{
+    if( standard_normal_ != NULL && scattering.standard_normal_ != NULL)
+    {
+        if( *standard_normal_   != *scattering.standard_normal_)    return false;
+    }
+    return true;
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+bool Scattering::operator!=(const Scattering &scattering) const {
+  return !(*this == scattering);
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+void Scattering::swap(Scattering &scattering)
+{
+    using std::swap;
+
+    if(scattering.standard_normal_ != NULL)
+    {
+        standard_normal_->swap(*scattering.standard_normal_) ;
+    }
+    else
+    {
+        standard_normal_ = NULL;
+    }
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+//------------------------private member functions----------------------------//
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+double Scattering::CalculateTheta0(double dr, Particle* part, Medium* med)
+{
+    double y = dr/med->GetRadiationLength();
+    double beta = 1./sqrt(1 +  part->GetMass() * part->GetMass()/ (part->GetMomentum()*part->GetMomentum() ));
+    y = 13.6/(part->GetMomentum()* beta ) *sqrt(y)*( 1.+0.038*log(y) );
+    return y;
+}
+
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
