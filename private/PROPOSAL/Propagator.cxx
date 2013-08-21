@@ -119,12 +119,6 @@ vector<Particle*> Propagator::Propagate( Particle *particle )
         distance_to_closest_approach  =
         detector_->DistanceToClosestApproach(particle);
 
-//        cout<<"c1 "<<current_collection_->GetGeometry()->DistanceToBorder(particle_).first<<"\t";
-//        cout<<" ,c2 "<<current_collection_->GetGeometry()->DistanceToBorder(particle_).second<<"\t";
-//        cout<<" ,d1 "<<detector_->DistanceToBorder(particle_).first<<"\t";
-//        cout<<" ,d2 "<<detector_->DistanceToBorder(particle_).second<<"\t";
-//        cout<<" clo "<<distance_to_closest_approach<<endl;
-
         if(abs(distance_to_closest_approach) < GEOMETRY_PRECISION )
         {
             particle_->SetXc( particle_->GetX() );
@@ -136,7 +130,6 @@ vector<Particle*> Propagator::Propagate( Particle *particle )
             distance_to_closest_approach    =   0;
 
         }
-
 
         if(distance_to_detector > 0)
         {
@@ -188,8 +181,7 @@ vector<Particle*> Propagator::Propagate( Particle *particle )
             }
         }
 
-//        if(distance < 1 && distance > 0){MoveParticle(distance);continue;}
-//        if(distance < 0){MoveParticle(1);cout<<*particle<<endl;exit(1);}
+
         is_in_detector  =   detector_->IsParticleInside(particle_);
         // entry point of the detector
         if(!starts_in_detector && !was_in_detector && is_in_detector)
@@ -303,16 +295,13 @@ double Propagator::Propagate( double distance )
             final_energy            =   energy_till_stochastic_.second;
 
         }
-        //cout<<"efi "<<energy_till_stochastic_.first<<"\t"<<energy_till_stochastic_.second<<"\t"<<endl;
-
-        //cout<<final_energy<<"\t";
 
         //Calculate the displacement according to initial energy initial_energy and final_energy
         displacement  =   current_collection_->CalculateDisplacement(
                     initial_energy,
                     final_energy,
                     current_collection_->GetDensityCorrection()*(distance - propagated_distance)) / current_collection_->GetDensityCorrection();
-        //cout<<particle_->GetT()<<"\t";
+
         // The first interaction or decay happens behind the distance we want to propagate
         // So we calculate the final energy using only continuous losses
         if( displacement > distance - propagated_distance )
