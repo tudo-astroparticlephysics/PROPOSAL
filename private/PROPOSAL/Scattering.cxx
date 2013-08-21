@@ -119,9 +119,9 @@ void Scattering::swap(Scattering &scattering)
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-long double Scattering::CalculateTheta0(double dr, Particle* part, Medium* med)
+double Scattering::CalculateTheta0(double dr, Particle* part, Medium* med)
 {
-    long double y = dr/med->GetRadiationLength();
+    double y = dr/med->GetRadiationLength();
     double beta = 1./sqrt(1 +  part->GetMass() * part->GetMass()/ (part->GetMomentum()*part->GetMomentum() ));
     y = 13.6/(part->GetMomentum()* beta ) *sqrt(y)*( 1.+0.038*log(y) );
     return y;
@@ -130,36 +130,36 @@ long double Scattering::CalculateTheta0(double dr, Particle* part, Medium* med)
 
 void Scattering::Scatter(double dr, Particle* part, Medium* med)
 {
-    //    Implement the Molie Scattering here see PROPOSALParticle::advance of old version
-        long double Theta0, Theta_max,rnd1,rnd2,sx,tx,sy,ty,sz,tz,ax,ay,az;
+        double theta0, theta_max, rnd1, rnd2, sx, tx, sy, ty, sz, tz, ax, ay, az;
         double x,y,z;
-        Theta0     =   CalculateTheta0(dr, part,med);
 
-        Theta_max    =   1./SQRT2;
+        theta0     =   CalculateTheta0(dr, part,med);
+
+        theta_max    =   1./SQRT2;
 
 
-        rnd1    =   (long double)standard_normal_-> StandardNormalRandomNumber(RandomDouble(), 0, Theta0, -Theta_max, Theta_max, false);
-        rnd2    =   (long double)standard_normal_-> StandardNormalRandomNumber(RandomDouble(), 0, Theta0, -Theta_max, Theta_max, false);
+        rnd1    =   standard_normal_-> StandardNormalRandomNumber(RandomDouble(), 0, theta0, -theta_max, theta_max, false);
+        rnd2    =   standard_normal_-> StandardNormalRandomNumber(RandomDouble(), 0, theta0, -theta_max, theta_max, false);
         sx      =   (rnd1/SQRT3+rnd2)/2;
         tx      =   rnd2;
 
-        rnd1    =   (long double)standard_normal_-> StandardNormalRandomNumber(RandomDouble(), 0, Theta0, -Theta_max, Theta_max, false);
-        double r=RandomDouble();
+        rnd1    =   standard_normal_-> StandardNormalRandomNumber(RandomDouble(), 0, theta0, -theta_max, theta_max, false);
+        rnd2    =   standard_normal_-> StandardNormalRandomNumber(RandomDouble(), 0, theta0, -theta_max, theta_max, false);
 
-        rnd2    =   (long double)standard_normal_-> StandardNormalRandomNumber(r, 0, Theta0, -Theta_max, Theta_max, false);
         sy      =   (rnd1/SQRT3+rnd2)/2;
         ty      =   rnd2;
-        //cout<<"scat "<<rnd1<<"\t"<<r<<"\t"<<rnd2<<"\t"<<Theta0<<"\t"<<endl;
 
-        sz      =   sqrt(max(1.-(sx*sx+sy*sy), (long double)0.));
-        tz      =   sqrt(max(1.-(tx*tx+ty*ty), (long double)0.));
+        sz      =   sqrt(max(1.-(sx*sx+sy*sy), 0.));
+        tz      =   sqrt(max(1.-(tx*tx+ty*ty), 0.));
 
-        long double sinth, costh,sinph,cosph;
-        long double theta,phi;
-        sinth = (long double)part->GetSinTheta();
-        costh = (long double)part->GetCosTheta();
-        sinph = (long double)part->GetSinPhi();
-        cosph = (long double)part->GetCosPhi();
+        double sinth, costh,sinph,cosph;
+        double theta, phi;
+
+        sinth = part->GetSinTheta();
+        costh = part->GetCosTheta();
+        sinph = part->GetSinPhi();
+        cosph = part->GetCosPhi();
+
         x   = part->GetX();
         y   = part->GetY();
         z   = part->GetZ();
@@ -181,7 +181,7 @@ void Scattering::Scatter(double dr, Particle* part, Medium* med)
 
 
         costh   =   az;
-        sinth   =   sqrt(max(1-costh*costh, (long double)0));
+        sinth   =   sqrt(max(1-costh*costh, 0.));
 
         if(sinth!=0)
         {

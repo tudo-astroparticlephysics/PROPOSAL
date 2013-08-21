@@ -56,8 +56,8 @@ public:
 //----------------------------------------------------------------------------//
     // Memberfunctions
 
-    long    double  CalculateTheta0(double dr, Particle* part, Medium* med);
-    void            Scatter(double dr, Particle* part, Medium* med);
+    double  CalculateTheta0(double dr, Particle* part, Medium* med);
+    void    Scatter(double dr, Particle* part, Medium* med);
 
 //----------------------------------------------------------------------------//
 

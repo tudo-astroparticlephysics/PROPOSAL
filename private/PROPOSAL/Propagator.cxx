@@ -917,6 +917,10 @@ void Propagator::DisableInterpolation()
     {
         collections_.at(i)->DisableInterpolation();
     }
+    if(scattering_ != NULL)
+    {
+        scattering_->GetStandardNormal()->DisableInterpolation();
+    }
 }
 
 
