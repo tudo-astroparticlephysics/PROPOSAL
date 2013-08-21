@@ -461,8 +461,8 @@ void Propagator::AdvanceParticle(double dr, double ei, double ef)
 
     if(moliere_)
     {
-        current_collection_->GetScattering_bug()->Scatter(dr,ei,ef);
-//        scattering_->Scatter(dr ,   particle_   ,   current_collection_->GetMedium());
+//        current_collection_->GetScattering_bug()->Scatter(dr,ei,ef);
+        scattering_->Scatter(dr ,   particle_   ,   current_collection_->GetMedium());
         //local displacement and angles are adjusted in the scattering class.
     }
     else
@@ -895,6 +895,10 @@ void Propagator::EnableInterpolation(std::string path, bool raw)
     for(unsigned int i = 0 ; i < collections_.size() ; i++)
     {
         collections_.at(i)->EnableInterpolation(path,raw);
+    }
+    if(scattering_ != NULL)
+    {
+        scattering_->GetStandardNormal()->EnableInterpolation(path,raw);
     }
 }
 
