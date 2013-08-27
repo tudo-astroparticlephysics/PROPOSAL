@@ -28,7 +28,9 @@ TEST(Comparison , Comparison_equal ) {
 
 TEST(Comparison , Comparison_not_equal ) {
     Scattering A;
-    Scattering B;
+
+    StandardNormal* stdnrmNotDefault = new StandardNormal(2,12,1e-10);
+    Scattering B(stdnrmNotDefault);
 
     EXPECT_TRUE(A!=B);
 
