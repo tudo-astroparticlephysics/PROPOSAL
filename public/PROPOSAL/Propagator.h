@@ -101,6 +101,7 @@ public:
     //Constructors
     Propagator();
     Propagator(std::string config_file);
+    Propagator(Medium* medium, EnergyCutSettings* cuts, std::string particle_type);
     Propagator(const Propagator&);
     Propagator& operator=(const Propagator& propagator);
     bool operator==(const Propagator &propagator) const;

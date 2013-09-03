@@ -1028,6 +1028,44 @@ Propagator::Propagator()
 //----------------------------------------------------------------------------//
 
 
+Propagator::Propagator(Medium* medium, EnergyCutSettings* cuts, string particle_type)
+    :order_of_interpolation_    ( 5 )
+    ,debug_                     ( false )
+    ,particle_interaction_      ( false )
+    ,seed_                      ( 1 )
+    ,brems_                     ( 1 )
+    ,photo_                     ( 12 )
+    ,lpm_                       ( false )
+    ,moliere_                   ( false )
+    ,do_exact_time_calulation_  ( false )
+    ,integrate_                 ( false )
+    ,brems_multiplier_          ( 1 )
+    ,photo_multiplier_          ( 1 )
+    ,ioniz_multiplier_          ( 1 )
+    ,epair_multiplier_          ( 1 )
+    ,global_ecut_inside_        ( 500 )
+    ,global_ecut_infront_       ( -1 )
+    ,global_ecut_behind_        ( -1 )
+    ,global_vcut_inside_        ( -1 )
+    ,global_vcut_infront_       ( 0.001 )
+    ,global_vcut_behind_        ( -1 )
+    ,global_cont_inside_        ( false )
+    ,global_cont_infront_       ( true )
+    ,global_cont_behind_        ( false )
+    ,path_to_tables_            ( "" )
+    ,raw_                       ( false )
+{
+    particle_              = new Particle(particle_type);
+    scattering_            = new Scattering();
+    current_collection_    = new ProcessCollection(particle_, medium, cuts);
+    detector_              = new Geometry();
+    detector_->InitSphere(0,0,0,1e18,0);
+    current_collection_->SetGeometry(detector_);
+}
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
 Propagator::Propagator(string config_file)
     :order_of_interpolation_    ( 5 )
     ,debug_                     ( false )
