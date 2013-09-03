@@ -1109,14 +1109,12 @@ Propagator::Propagator(Medium* medium,
 
     if(moliere_)
     {
-        //This Scattering routine shouldnt be used!
-        current_collection_->EnableScattering();
+        scattering_ =   new Scattering();
     }
     if(do_exact_time_calulation_)
     {
         current_collection_->EnableExactTimeCalculation();
     }
-
 
     if(!integrate_)
     {
