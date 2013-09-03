@@ -1028,21 +1028,36 @@ Propagator::Propagator()
 //----------------------------------------------------------------------------//
 
 
-Propagator::Propagator(Medium* medium, EnergyCutSettings* cuts, string particle_type)
+Propagator::Propagator(Medium* medium,
+                       EnergyCutSettings* cuts,
+                       string particle_type,
+                       string path_to_tables,
+                       bool moliere,
+                       bool continuous_rand,
+                       bool exact_time,
+                       bool lpm,
+                       int brems,
+                       int photo,
+                       double brems_multiplier,
+                       double photo_multiplier,
+                       double ioniz_multiplier,
+                       double epair_multiplier,
+                       bool integrate
+                       )
     :order_of_interpolation_    ( 5 )
     ,debug_                     ( false )
     ,particle_interaction_      ( false )
     ,seed_                      ( 1 )
-    ,brems_                     ( 1 )
-    ,photo_                     ( 12 )
-    ,lpm_                       ( false )
-    ,moliere_                   ( false )
-    ,do_exact_time_calulation_  ( false )
-    ,integrate_                 ( false )
-    ,brems_multiplier_          ( 1 )
-    ,photo_multiplier_          ( 1 )
-    ,ioniz_multiplier_          ( 1 )
-    ,epair_multiplier_          ( 1 )
+    ,brems_                     ( brems )
+    ,photo_                     ( photo )
+    ,lpm_                       ( lpm )
+    ,moliere_                   ( moliere )
+    ,do_exact_time_calulation_  ( exact_time )
+    ,integrate_                 ( integrate )
+    ,brems_multiplier_          ( brems_multiplier )
+    ,photo_multiplier_          ( photo_multiplier )
+    ,ioniz_multiplier_          ( ioniz_multiplier )
+    ,epair_multiplier_          ( epair_multiplier )
     ,global_ecut_inside_        ( 500 )
     ,global_ecut_infront_       ( -1 )
     ,global_ecut_behind_        ( -1 )
@@ -1052,15 +1067,61 @@ Propagator::Propagator(Medium* medium, EnergyCutSettings* cuts, string particle_
     ,global_cont_inside_        ( false )
     ,global_cont_infront_       ( true )
     ,global_cont_behind_        ( false )
-    ,path_to_tables_            ( "" )
-    ,raw_                       ( false )
+    ,path_to_tables_            ( path_to_tables )
+    ,raw_                       ( true )
 {
     particle_              = new Particle(particle_type);
-    scattering_            = new Scattering();
     current_collection_    = new ProcessCollection(particle_, medium, cuts);
     detector_              = new Geometry();
     detector_->InitSphere(0,0,0,1e18,0);
     current_collection_->SetGeometry(detector_);
+
+    for(unsigned int i =0; i<current_collection_->GetCrosssections().size(); i++)
+    {
+        if(current_collection_->GetCrosssections().at(i)->GetName().compare("Bremsstrahlung")==0)
+        {
+            current_collection_->GetCrosssections().at(i)->SetParametrization(brems_);
+            current_collection_->GetCrosssections().at(i)->SetMultiplier(brems_multiplier_);
+            current_collection_->GetCrosssections().at(i)->EnableLpmEffect(lpm_);
+
+        }
+        else if(current_collection_->GetCrosssections().at(i)->GetName().compare("Ionization")==0)
+        {
+            current_collection_->GetCrosssections().at(i)->SetMultiplier(ioniz_multiplier_);
+        }
+        else if(current_collection_->GetCrosssections().at(i)->GetName().compare("Epairproduction")==0)
+        {
+            current_collection_->GetCrosssections().at(i)->SetMultiplier(epair_multiplier_);
+            current_collection_->GetCrosssections().at(i)->EnableLpmEffect(lpm_);
+        }
+        else if(current_collection_->GetCrosssections().at(i)->GetName().compare("Photonuclear")==0)
+        {
+            current_collection_->GetCrosssections().at(i)->SetParametrization(photo_);
+            current_collection_->GetCrosssections().at(i)->SetMultiplier(photo_multiplier_);
+        }
+
+    }
+
+    if(continuous_rand)
+    {
+        current_collection_->EnableContinuousRandomization();
+    }
+
+    if(moliere_)
+    {
+        //This Scattering routine shouldnt be used!
+        current_collection_->EnableScattering();
+    }
+    if(do_exact_time_calulation_)
+    {
+        current_collection_->EnableExactTimeCalculation();
+    }
+
+
+    if(!integrate_)
+    {
+        EnableInterpolation(path_to_tables_, raw_);
+    }
 }
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//

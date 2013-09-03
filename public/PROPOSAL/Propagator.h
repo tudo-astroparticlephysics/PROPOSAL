@@ -101,7 +101,21 @@ public:
     //Constructors
     Propagator();
     Propagator(std::string config_file);
-    Propagator(Medium* medium, EnergyCutSettings* cuts, std::string particle_type);
+    Propagator(Medium* medium,
+               EnergyCutSettings* cuts,
+               std::string particle_type,
+               std::string path_to_tables,
+               bool moliere = true,
+               bool continuous_rand = true,
+               bool exact_time = true,
+               bool lpm = true,
+               int brems = 1,
+               int photo = 12,
+               double brems_multiplier = 1,
+               double photo_multiplier = 1,
+               double ioniz_multiplier = 1,
+               double epair_multiplier = 1,
+               bool integrate = false);
     Propagator(const Propagator&);
     Propagator& operator=(const Propagator& propagator);
     bool operator==(const Propagator &propagator) const;
