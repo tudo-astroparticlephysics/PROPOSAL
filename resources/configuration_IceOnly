@@ -100,7 +100,7 @@ global
     cont_inside         0
     cont_infront        1
     cont_behind         0
-    #raw
+    raw
 
 # keyword sector must be followed by these lines
 # first: geometry information (this must be the first line)
@@ -152,7 +152,7 @@ sector
     infront 500     0.05  1
     behind  500     0.05  1
 
-    medium Ice 0.832
+    medium Ice 1.
 
 
 

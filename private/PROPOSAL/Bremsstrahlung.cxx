@@ -197,6 +197,7 @@ void Bremsstrahlung::EnableDNdxInterpolation(std::string path ,bool raw)
         filename<<path<<"/Brems_dNdx_particle_"<<particle_->GetName()
                 <<"_para_"<<parametrization_
                 <<"_med_"<<medium_->GetName()
+                <<medium_->GetMassDensity()
                 <<"_ecut_"<<cut_settings_->GetEcut()
                 <<"_vcut_"<<cut_settings_->GetVcut()
                 <<"_lpm_"<<lpm_effect_enabled_
@@ -315,6 +316,7 @@ void Bremsstrahlung::EnableDEdxInterpolation(std::string path, bool raw)
         filename<<path<<"/Brems_dEdx_particle_"<<particle_->GetName()
                 <<"_para_"<<parametrization_
                 <<"_med_"<<medium_->GetName()
+                <<medium_->GetMassDensity()
                 <<"_ecut_"<<cut_settings_->GetEcut()
                 <<"_vcut_"<<cut_settings_->GetVcut()
                 <<"_lpm_"<<lpm_effect_enabled_

@@ -100,7 +100,7 @@ int main()
 
     }
 
-    for(double log_energy = 0 ;  log_energy < 12; log_energy +=0.2)
+    for(double log_energy = 2.6 ;  log_energy < 12; log_energy +=0.2)
     {
         for(unsigned int i = 0 ; i < ioniz.size() ; i++)
         {
@@ -227,22 +227,24 @@ int main()
 
     muons->cd();
     muons->SetLogx();
+    muons->SetLogy();
     muons->SetGridx();
     muons->SetGridy();
     muons_gr->Draw("A");
     muons_gr->GetXaxis()->SetTitle("energy [MeV]");
-    muons_gr->GetXaxis()->SetTitleOffset(1.1);
+    muons_gr->GetXaxis()->SetTitleOffset(1.2);
     muons_gr->GetYaxis()->SetTitle("dE/dx [MeV g^{-1} cm^{2}]");
     muons_leg->Draw("Same");
     muons->Write();
 
     taus->cd();
     taus->SetLogx();
+    taus->SetLogy();
     taus->SetGridx();
     taus->SetGridy();
     taus_gr->Draw("A");
     taus_gr->GetXaxis()->SetTitle("energy [MeV]");
-    taus_gr->GetXaxis()->SetTitleOffset(1.1);
+    taus_gr->GetXaxis()->SetTitleOffset(1.2);
     taus_gr->GetYaxis()->SetTitle("dE/dx [MeV g^{-1} cm^{2}]");
     taus_leg->Draw("Same");
     taus->Write();
@@ -251,9 +253,10 @@ int main()
     electrons->SetGridx();
     electrons->SetGridy();
     electrons->SetLogx();
+    electrons->SetLogx();
     electrons_gr->Draw("A");
     electrons_gr->GetXaxis()->SetTitle("energy [MeV]");
-    electrons_gr->GetXaxis()->SetTitleOffset(1.1);
+    electrons_gr->GetXaxis()->SetTitleOffset(1.2);
     electrons_gr->GetYaxis()->SetTitle("dE/dx [MeV g^{-1} cm^{2}]");
     electrons_leg->Draw("Same");
     electrons->Write();

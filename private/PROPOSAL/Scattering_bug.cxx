@@ -451,6 +451,7 @@ void Scattering_bug::EnableInterpolation(string path)
         stringstream filename;
         filename<<path<<"/Scattering_"<<particle_->GetName()
                <<"_"<<crosssections_.at(0)->GetMedium()->GetName()
+               <<"_"<<crosssections_.at(0)->GetMedium()->GetMassDensity()
                <<"_"<< crosssections_.at(0)->GetEnergyCutSettings()->GetEcut()
                <<"_"<<crosssections_.at(0)->GetEnergyCutSettings()->GetVcut();
 

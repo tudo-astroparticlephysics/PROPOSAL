@@ -325,9 +325,11 @@ int main(int argc, char** argv){
 //    cout<<BOOST_PP_LIMIT_TUPLE<<endl;
 
     Propagator* prop = new Propagator();
+    prop->set_seed(6554);
         Propagator* prop3 = new Propagator("resources/configuration_IceOnly");
+        prop3->set_seed(12937);
 //        prop->ReadConfigFile("resources/configuration_IceOnly");
-        prop->EnableInterpolation("/data/LocalApps/LocalFiles/tables");
+        prop->EnableInterpolation("resources/tables");
         double distanceMean=0;
         double distance2Mean = 0;
         double distance3Mean = 0;

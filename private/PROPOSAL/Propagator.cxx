@@ -102,7 +102,6 @@ vector<Particle*> Propagator::Propagate( Particle *particle )
     bool is_in_detector     =   false;
     bool was_in_detector    =   false;
 
-
     while(1)
     {
         ChooseCurrentCollection(particle_);
@@ -225,7 +224,6 @@ vector<Particle*> Propagator::Propagate( Particle *particle )
 
         }
         result  =   Propagate(distance);
-
         if(result<=0) break;
 
     }

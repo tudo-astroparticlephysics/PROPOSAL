@@ -437,9 +437,9 @@ void ProcessCollection::EnableInterpolation(std::string path, bool raw)
         stringstream filename;
         filename<<path<<"/Collection_"<<particle_->GetName()
                <<"_"<<medium_->GetName()
+               <<"_"<<medium_->GetMassDensity()
                <<"_"<<cut_settings_->GetEcut()
-               <<"_"<<cut_settings_->GetVcut()
-               <<"_"<<density_correction_;
+               <<"_"<<cut_settings_->GetVcut();
 
         for(unsigned int i =0; i<crosssections_.size(); i++)
         {
@@ -710,9 +710,9 @@ void ProcessCollection::EnableParticleTimeInterpolation(std::string path, bool r
         stringstream filename;
         filename<<path<<"/Time_"<<particle_->GetName()
                <<"_"<<medium_->GetName()
+               <<"_"<<medium_->GetMassDensity()
                <<"_"<<cut_settings_->GetEcut()
-               <<"_"<<cut_settings_->GetVcut()
-               <<"_"<<density_correction_;
+               <<"_"<<cut_settings_->GetVcut();
 
         for(unsigned int i =0; i<crosssections_.size(); i++)
         {

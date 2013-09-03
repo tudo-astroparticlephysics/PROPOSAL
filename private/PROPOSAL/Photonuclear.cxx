@@ -146,6 +146,7 @@ void Photonuclear::EnableDNdxInterpolation(std::string path, bool raw)
         filename<<path<<"/Photo_dNdx_particle_"<<particle_->GetName()
                 <<"_para_"<<parametrization_
                 <<"_med_"<<medium_->GetName()
+                <<medium_->GetMassDensity()
                 <<"_ecut_"<<cut_settings_->GetEcut()
                 <<"_vcut_"<<cut_settings_->GetVcut()
                 <<"_multiplier_"<<multiplier_;
@@ -269,6 +270,7 @@ void Photonuclear::EnableDEdxInterpolation(std::string path, bool raw)
         filename<<path<<"/Photo_dEdx_particle_"<<particle_->GetName()
                 <<"_para_"<<parametrization_
                 <<"_med_"<<medium_->GetName()
+                <<medium_->GetMassDensity()
                 <<"_ecut_"<<cut_settings_->GetEcut()
                 <<"_vcut_"<<cut_settings_->GetVcut()
                 <<"_multiplier_"<<multiplier_;
@@ -365,6 +367,7 @@ void Photonuclear::EnablePhotoInterpolation(std::string path, bool raw)
         filename<<path<<"/Photo_particle_"<<particle_->GetName()
                 <<"_para_"<<parametrization_
                 <<"_med_"<<medium_->GetName()
+                <<medium_->GetMassDensity()
                 <<"_ecut_"<<cut_settings_->GetEcut()
                 <<"_vcut_"<<cut_settings_->GetVcut()
                 <<"_multiplier_"<<multiplier_;

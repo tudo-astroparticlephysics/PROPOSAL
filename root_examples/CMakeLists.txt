@@ -13,6 +13,8 @@ add_executable(Plot_Bremsstrahlung_dNdx plot_Bremsstrahlung_dNdx.cxx)
 add_executable(Plot_Bremsstrahlung_dNdx_different_ecut plot_Bremsstrahlung_dNdx_different_ecut.cxx)
 add_executable(Plot_Photonuclear_dEdx plot_Photonuclear_dEdx.cxx)
 add_executable(Plot_Photonuclear_dNdx plot_Photonuclear_dNdx.cxx)
+add_executable(Plot_rel_Bremsstrahlung_dEdx plot_rel_brems_dEdx.cxx)
+
 add_executable(Draw_Track draw_track.cxx)
 
 
@@ -42,6 +44,9 @@ target_link_libraries(Plot_Epairproduction_dNdx_different_ecut PROPOSAL)
 
 target_link_libraries(Plot_Bremsstrahlung_dEdx ${ROOT_LIBRARIES})
 target_link_libraries(Plot_Bremsstrahlung_dEdx PROPOSAL)
+
+target_link_libraries(Plot_rel_Bremsstrahlung_dEdx ${ROOT_LIBRARIES})
+target_link_libraries(Plot_rel_Bremsstrahlung_dEdx PROPOSAL)
 
 target_link_libraries(Plot_Bremsstrahlung_dNdx ${ROOT_LIBRARIES})
 target_link_libraries(Plot_Bremsstrahlung_dNdx PROPOSAL)
