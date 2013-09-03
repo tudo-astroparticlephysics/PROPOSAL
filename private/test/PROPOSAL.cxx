@@ -324,30 +324,40 @@ int main(int argc, char** argv){
 
 //    cout<<BOOST_PP_LIMIT_TUPLE<<endl;
 
-    Propagator *pr  =   new Propagator();
-    Particle *p = new Particle("mu");
-    pr->EnableInterpolation("resources");
-    p->SetEnergy(9e6);
-    pr->SetParticle(p);
-    pr->Propagate(1e20);
+    Propagator* prop = new Propagator();
+        Propagator* prop3 = new Propagator("resources/configuration_IceOnly");
+//        prop->ReadConfigFile("resources/configuration_IceOnly");
+        prop->EnableInterpolation("/data/LocalApps/LocalFiles/tables");
+        double distanceMean=0;
+        double distance2Mean = 0;
+        double distance3Mean = 0;
+        int N = (int)1e3;
+        for(int i = 0; i<N ; i++)
+        {
+            Particle* prtcl = new Particle("mu",0,0,0,0,0,1e6,0);
 
-//    int b =4;
-//    log_warn("a");
-//    log_warn("a%i",1);
-//    log_warn("a%i",2);
-//    //log_fatal("NEIIIIIIIIIIIIIIIIIIIIIIN");
-//    log_warn("a");
-//    log_warn("a %i %i %i %i %i %i %i %i %i %i %i %i",3,33,3,3,33,3,4,4,4,4,4,4);
-//    log_warn("a");
-//    log_debug("hshshssh");
+            prop3->Propagate(prtcl);
+            distance3Mean  +=   prtcl->GetPropagatedDistance();
 
+            prop->GetParticle()->SetEnergy(1e6);
+            prop->GetParticle()->SetX(0);
+            prop->GetParticle()->SetY(0);
+            prop->GetParticle()->SetZ(0);
+            prop->GetParticle()->SetTheta(0);
+            prop->GetParticle()->SetPhi(0);
+            prop->GetParticle()->SetPropagatedDistance(0);
 
-    Particle * prtcl = new Particle("mu",0,0,0,0,0,1E3,0);
-    Propagator* prpgtr = new Propagator("resources/configurationTest");
-    prpgtr->Propagate(prtcl);
-    cout << *prtcl << endl;
-    cout << "D: " << sqrt(prtcl->GetX()*prtcl->GetX()+prtcl->GetY()*prtcl->GetY()) << endl;
-
+            distance2Mean += prop->Propagate(1e20);
+            distanceMean += prop->GetParticle()->GetPropagatedDistance();
+        }
+        distanceMean /= N;
+        cout << "Distance Mean: " << distanceMean << endl;
+        distance2Mean /= N;
+        cout << "Distance Mean2: " << distance2Mean << endl;
+        distance3Mean /= N;
+        cout << "Distance Mean3: " << distance3Mean << endl;
+//    Medium* med = new Medium("ice",1);
+//    cout << *med << endl;
 
 
 

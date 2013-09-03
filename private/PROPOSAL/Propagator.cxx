@@ -117,7 +117,7 @@ vector<Particle*> Propagator::Propagate( Particle *particle )
         detector_->DistanceToBorder(particle_).first;
 
         distance_to_closest_approach  =
-        detector_->DistanceToClosestApproach(particle);
+        detector_->DistanceToClosestApproach(particle_);
 
         if(abs(distance_to_closest_approach) < GEOMETRY_PRECISION )
         {
@@ -224,7 +224,6 @@ vector<Particle*> Propagator::Propagate( Particle *particle )
             starts_in_detector  =   false;
 
         }
-
         result  =   Propagate(distance);
 
         if(result<=0) break;
@@ -258,6 +257,7 @@ double Propagator::Propagate( double distance )
 
     pair<double,string> decay;
     pair<double,string> energy_loss;
+
 
     int secondary_id    =   0;
 
@@ -450,7 +450,6 @@ void Propagator::AdvanceParticle(double dr, double ei, double ef)
 
     if(moliere_)
     {
-//        current_collection_->GetScattering_bug()->Scatter(dr,ei,ef);
         scattering_->Scatter(dr ,   particle_   ,   current_collection_->GetMedium());
         //local displacement and angles are adjusted in the scattering class.
     }
@@ -474,6 +473,7 @@ void Propagator::AdvanceParticle(double dr, double ei, double ef)
 
 void Propagator::ChooseCurrentCollection(Particle* particle)
 {
+
     for(unsigned int i = 0 ; i < collections_.size() ; i++)
     {
 
@@ -522,7 +522,6 @@ void Propagator::ChooseCurrentCollection(Particle* particle)
     }
 
     current_collection_->SetParticle(particle_);
-
 }
 
 
@@ -1021,7 +1020,9 @@ Propagator::Propagator()
 {
     particle_              = new Particle("mu");
     scattering_            = new Scattering();
-    InitDefaultCollection();
+    detector_              = new Geometry();
+    detector_->InitSphere(0,0,0,1e18,0);
+    InitDefaultCollection(detector_);
 }
 
 
@@ -1240,12 +1241,12 @@ void Propagator::MoveParticle(double distance)
 }
 
 
-void Propagator::InitDefaultCollection()
+void Propagator::InitDefaultCollection(Geometry* geom)
 {
     Medium* med             = new Medium("ice",1.);
-    EnergyCutSettings* cuts = new EnergyCutSettings(-1,0.01);
+    EnergyCutSettings* cuts = new EnergyCutSettings(500,0.05);
     current_collection_     = new ProcessCollection(particle_ , med, cuts);
-
+    current_collection_->SetGeometry(geom);
 }
 
 
