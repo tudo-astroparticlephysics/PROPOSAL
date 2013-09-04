@@ -105,9 +105,14 @@ vector<Particle*> Propagator::Propagate( Particle *particle )
     while(1)
     {
         ChooseCurrentCollection(particle_);
+        if(current_collection_ == NULL)
+        {
+            log_info("particle reached the border");
+            break;
+        }
 
         // Check if have have to propagate the particle through the whole collection
-        // or only to the collection border
+        // or only to the collection border        
 
         distance_to_collection_border =
         current_collection_->GetGeometry()->DistanceToBorder(particle_).first;
@@ -223,6 +228,7 @@ vector<Particle*> Propagator::Propagate( Particle *particle )
             starts_in_detector  =   false;
 
         }
+
         result  =   Propagate(distance);
         if(result<=0) break;
 
@@ -491,7 +497,7 @@ void Propagator::ChooseCurrentCollection(Particle* particle)
             }
         }
 
-        if(detector_->IsParticleInside(particle))
+        else if(detector_->IsParticleInside(particle))
         {
             if(collections_.at(i)->GetLocation() != 1)
                 continue;
@@ -505,7 +511,7 @@ void Propagator::ChooseCurrentCollection(Particle* particle)
 
         }
 
-        if(detector_->IsParticleBehind(particle))
+        else if(detector_->IsParticleBehind(particle))
         {
             if(collections_.at(i)->GetLocation() != 2)
                 continue;
@@ -515,11 +521,17 @@ void Propagator::ChooseCurrentCollection(Particle* particle)
                 {
                     current_collection_ = collections_.at(i);
                 }
+                //The particle reached the border of all specified collections
+                else
+                {
+                    current_collection_ =   NULL;
+                }
             }
         }
     }
 
-    current_collection_->SetParticle(particle_);
+    if(current_collection_ != NULL)
+        current_collection_->SetParticle(particle_);
 }
 
 

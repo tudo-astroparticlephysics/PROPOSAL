@@ -333,13 +333,19 @@ int main(int argc, char** argv){
         double distanceMean=0;
         double distance2Mean = 0;
         double distance3Mean = 0;
+        double meanXY   = 0;
+        double angle    = 0;
         int N = (int)1e3;
+        cout.precision(16);
         for(int i = 0; i<N ; i++)
         {
-            Particle* prtcl = new Particle("mu",0,0,0,0,0,1e6,0);
+            Particle* prtcl = new Particle("mu",0,0,0,0,0,1e10,0);
 
             prop3->Propagate(prtcl);
             distance3Mean  +=   prtcl->GetPropagatedDistance();
+            meanXY += sqrt(prtcl->GetX()*prtcl->GetX() + prtcl->GetY()*prtcl->GetY());
+            angle += asin(sqrt(prtcl->GetX()*prtcl->GetX() + prtcl->GetY()*prtcl->GetY()) / prtcl->GetPropagatedDistance())*180/PI;
+            //cout<<prtcl->GetX()<<endl;
 
             prop->GetParticle()->SetEnergy(1e6);
             prop->GetParticle()->SetX(0);
@@ -358,6 +364,11 @@ int main(int argc, char** argv){
         cout << "Distance Mean2: " << distance2Mean << endl;
         distance3Mean /= N;
         cout << "Distance Mean3: " << distance3Mean << endl;
+        meanXY  /= N;
+        cout << "meanXY: " << meanXY << endl;
+        angle  /= N;
+        cout << "angle: " << angle << endl;
+
 //    Medium* med = new Medium("ice",1);
 //    cout << *med << endl;
 
