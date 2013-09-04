@@ -614,7 +614,7 @@ void ProcessCollection::EnableInterpolation(std::string path, bool raw)
 
     if(do_scattering_)
     {
-        scattering_bug_->EnableInterpolation(path);
+        scattering_->EnableInterpolation(path);
     }
 
     bigLow_.at(0)=interpol_prop_decay_->Interpolate(particle_->GetLow());
@@ -909,8 +909,8 @@ void ProcessCollection::DisableContinuousRandomization()
 
 void ProcessCollection::DisableScattering()
 {
-    delete  scattering_bug_;
-    scattering_bug_        =   NULL;
+    delete  scattering_;
+    scattering_        =   NULL;
     do_scattering_      =   false;
 }
 
@@ -921,7 +921,7 @@ void ProcessCollection::DisableScattering()
 
 void ProcessCollection::EnableScattering()
 {
-    scattering_bug_     =   new Scattering_bug(crosssections_);
+    scattering_     =   new Scattering(crosssections_);
     do_scattering_      =   true;
 }
 
@@ -996,7 +996,7 @@ ProcessCollection::ProcessCollection()
     interpol_prop_interaction_diff_ = NULL;
     randomizer_                     = NULL;
     geometry_                       = NULL;
-    scattering_bug_                 = NULL;
+    scattering_                 = NULL;
 }
 
 
@@ -1141,13 +1141,13 @@ ProcessCollection::ProcessCollection(const ProcessCollection &collection)
         randomizer_ = NULL;
     }
 
-    if(collection.scattering_bug_ != NULL)
+    if(collection.scattering_ != NULL)
     {
-        scattering_bug_ = new Scattering_bug(*collection.scattering_bug_) ;
+        scattering_ = new Scattering(*collection.scattering_) ;
     }
     else
     {
-        scattering_bug_ = NULL;
+        scattering_ = NULL;
     }
 
     if(collection.geometry_ != NULL)
@@ -1213,7 +1213,7 @@ ProcessCollection::ProcessCollection(Particle *particle, Medium *medium, EnergyC
     geometry_                       = NULL;
     interpol_time_particle_         = NULL;
     interpol_time_particle_diff_    = NULL;
-    scattering_bug_                 = NULL;
+    scattering_                 = NULL;
 }
 
 
@@ -1360,11 +1360,11 @@ bool ProcessCollection::operator==(const ProcessCollection &collection) const
     }
     else if( randomizer_ != collection.randomizer_)                                           return false;
 
-    if( scattering_bug_ != NULL && collection.scattering_bug_ != NULL)
+    if( scattering_ != NULL && collection.scattering_ != NULL)
     {
-        if( *scattering_bug_   != *collection.scattering_bug_)                                        return false;
+        if( *scattering_   != *collection.scattering_)                                        return false;
     }
-    else if( scattering_bug_ != collection.scattering_bug_)                                           return false;
+    else if( scattering_ != collection.scattering_)                                           return false;
 
     if( geometry_ != NULL && collection.geometry_ != NULL)
     {
@@ -1483,19 +1483,19 @@ void ProcessCollection::swap(ProcessCollection &collection)
         randomizer_ = NULL;
     }
 
-    if( scattering_bug_ != NULL && collection.scattering_bug_ != NULL)
+    if( scattering_ != NULL && collection.scattering_ != NULL)
     {
-        scattering_bug_->swap(*collection.scattering_bug_);
+        scattering_->swap(*collection.scattering_);
     }
-    else if( scattering_bug_ == NULL && collection.scattering_bug_ != NULL)
+    else if( scattering_ == NULL && collection.scattering_ != NULL)
     {
-        scattering_bug_ = new Scattering_bug(*collection.scattering_bug_);
-        collection.scattering_bug_ = NULL;
+        scattering_ = new Scattering(*collection.scattering_);
+        collection.scattering_ = NULL;
     }
-    else if( scattering_bug_ != NULL && collection.scattering_bug_ == NULL)
+    else if( scattering_ != NULL && collection.scattering_ == NULL)
     {
-        collection.scattering_bug_ = new Scattering_bug(*scattering_bug_);
-        scattering_bug_ = NULL;
+        collection.scattering_ = new Scattering(*scattering_);
+        scattering_ = NULL;
     }
 
     if( geometry_ != NULL && collection.geometry_ != NULL)
@@ -1883,7 +1883,7 @@ void ProcessCollection::SetParticle(Particle* particle)
     }
     if(do_scattering_)
     {
-        scattering_bug_->SetParticle(particle_);
+        scattering_->SetParticle(particle_);
     }
 }
 
@@ -1901,7 +1901,7 @@ void ProcessCollection::SetCrosssections(
     }
     if(do_scattering_)
     {
-        scattering_bug_->SetCrosssections(crosssections);
+        scattering_->SetCrosssections(crosssections);
     }
 }
 

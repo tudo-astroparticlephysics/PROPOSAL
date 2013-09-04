@@ -83,7 +83,7 @@ int main()
         angle       = 0;
 
         TH1D *tmp_hist_dev = new TH1D(hist_name.str().c_str(),"dd",80,-2,6);
-        TH1D *tmp_hist_angle = new TH1D(hist_name2.str().c_str(),"ss",50,-5,0);
+        TH1D *tmp_hist_angle = new TH1D(hist_name2.str().c_str(),"ss",25,-1,24);
 
         cout << "Energy: " << energy << endl;
         bool cross = false;
@@ -98,25 +98,37 @@ int main()
             }
             Particle * prtcl = new Particle("mu",0,0,0,0,0,energy,0);
 
+//            prtcl->SetEnergy(1e6);
+//            prtcl->SetX(0);
+//            prtcl->SetY(0);
+//            prtcl->SetZ(0);
+//            prtcl->SetPhi(0);
+//            prtcl->SetTheta(0);
+//            prtcl->SetPropagatedDistance(0);
+
             prpgtr->Propagate(prtcl);
 
             distance    += prtcl->GetPropagatedDistance();
             deviation   = sqrt(prtcl->GetX()*prtcl->GetX()+prtcl->GetY()*prtcl->GetY());
-            angle       = prtcl->GetTheta();
+//            angle       = prtcl->GetTheta();
+            angle       = prtcl->GetTheta()*180/PI;
 
             tmp_hist_dev->Fill(log10(deviation));
-            tmp_hist_angle->Fill(log10(angle));
+//            tmp_hist_angle->Fill(log10(angle));
+            tmp_hist_angle->Fill(angle);
         }
+//        delete prtcl;
         hist_title  <<   distance/number_of_particles   <<")";
         hist_title2 <<   distance/number_of_particles   <<")";
-
+        cout << "distance: " <<   distance/number_of_particles   << endl;
         tmp_hist_dev->GetXaxis()->SetTitle("log10( range / [cm] )");
         tmp_hist_dev->GetYaxis()->SetTitle("#");
         tmp_hist_dev->SetTitle(hist_title.str().c_str());
         tmp_hist_dev_vec.push_back(tmp_hist_dev);
         e.push_back(energy);
 
-        tmp_hist_angle->GetXaxis()->SetTitle("log( angle [deg] )");
+//        tmp_hist_angle->GetXaxis()->SetTitle("log( angle [deg] )");
+        tmp_hist_angle->GetXaxis()->SetTitle("angle [deg]");
         tmp_hist_angle->GetYaxis()->SetTitle("#");
         tmp_hist_angle->SetTitle(hist_title2.str().c_str());
         tmp_hist_angle_vec.push_back(tmp_hist_angle);

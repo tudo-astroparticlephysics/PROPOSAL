@@ -254,6 +254,7 @@ double Propagator::Propagate( double distance )
     bool    flag;
     double  displacement;
 
+
     double propagated_distance  =   0;
 
     double  initial_energy  =   particle_->GetEnergy();
@@ -315,7 +316,6 @@ double Propagator::Propagate( double distance )
             final_energy  =   current_collection_->CalculateFinalEnergy(initial_energy, current_collection_->GetDensityCorrection()*displacement);
 
         }
-
         //Advance the Particle according to the displacement
         //Initial energy and final energy are needed if Molier Scattering is enabled
         AdvanceParticle(displacement, initial_energy, final_energy);
@@ -326,7 +326,6 @@ double Propagator::Propagate( double distance )
         {
             propagated_distance = distance;  // computer precision control
         }
-
         //Randomize the continuous energy loss if this option is enabled
         if( current_collection_->GetDoRandomization() )
         {
@@ -336,7 +335,6 @@ double Propagator::Propagate( double distance )
             }
 
         }
-
         // Lower limit of particle energy is reached or
         // or complete particle is propagated the whole distance
         if( final_energy == particle_->GetLow() || propagated_distance == distance)
@@ -352,7 +350,6 @@ double Propagator::Propagate( double distance )
         {
             energy_loss     =   current_collection_->MakeStochasticLoss();
             final_energy    -=  energy_loss.first;
-
             secondary_id    =   particle_->GetParticleId() + 1;
             Output::getInstance().FillSecondaryVector(particle_, secondary_id, energy_loss, 0);
         }
@@ -454,7 +451,11 @@ void Propagator::AdvanceParticle(double dr, double ei, double ef)
 
     if(moliere_)
     {
-        scattering_->Scatter(dr ,   particle_   ,   current_collection_->GetMedium());
+        //First Order Scattering
+        ///////////
+        ///////////scattering_->Scatter(dr ,   particle_   ,   current_collection_->GetMedium());
+        ///////////////
+        current_collection_->GetScattering()->Scatter(dr,ei,ef);
         //local displacement and angles are adjusted in the scattering class.
     }
     else
@@ -804,7 +805,8 @@ void Propagator::ReadConfigFile(string config_file)
         else if(ToLowerCase(taux).compare("moliere")==0)
         {
             moliere_ =   true;
-            scattering_ = new Scattering();
+            //FirstOrderScattering
+//            scattering_ = new Scattering();
         }
         // exact location time
         else if(ToLowerCase(taux).compare("exact_time")==0)
@@ -894,10 +896,12 @@ void Propagator::EnableInterpolation(std::string path, bool raw)
     {
         collections_.at(i)->EnableInterpolation(path,raw);
     }
-    if(scattering_ != NULL)
-    {
-        scattering_->GetStandardNormal()->EnableInterpolation(path,raw);
-    }
+
+    //FirstOrderScattering
+//    if(scattering_ != NULL)
+//    {
+//        scattering_->GetStandardNormal()->EnableInterpolation(path,raw);
+//    }
 }
 
 
@@ -915,10 +919,12 @@ void Propagator::DisableInterpolation()
     {
         collections_.at(i)->DisableInterpolation();
     }
-    if(scattering_ != NULL)
-    {
-        scattering_->GetStandardNormal()->DisableInterpolation();
-    }
+
+    //FirstOrderScattering
+//    if(scattering_ != NULL)
+//    {
+//        scattering_->GetStandardNormal()->DisableInterpolation();
+//    }
 }
 
 
@@ -1029,7 +1035,8 @@ Propagator::Propagator()
     ,raw_                       ( false )
 {
     particle_              = new Particle("mu");
-    scattering_            = new Scattering();
+    //FirstOrderScattering
+    //    scattering_            = new Scattering();
     detector_              = new Geometry();
     detector_->InitSphere(0,0,0,1e18,0);
     InitDefaultCollection(detector_);
@@ -1121,7 +1128,9 @@ Propagator::Propagator(Medium* medium,
 
     if(moliere_)
     {
-        scattering_ =   new Scattering();
+        current_collection_->EnableScattering();
+        //FirstOrderScattering
+//        scattering_ =   new Scattering();
     }
     if(do_exact_time_calulation_)
     {
@@ -1132,6 +1141,7 @@ Propagator::Propagator(Medium* medium,
     {
         EnableInterpolation(path_to_tables_, raw_);
     }
+
 }
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
@@ -1199,7 +1209,8 @@ Propagator::Propagator(const Propagator &propagator)
     ,path_to_tables_            ( propagator.path_to_tables_ )
     ,raw_                       ( propagator.raw_ )
     ,particle_                  ( propagator.particle_ )
-    ,scattering_                ( propagator.scattering_ )
+    //FirstOrderScattering
+    //    ,scattering_                ( propagator.scattering_ )
     ,current_collection_        ( new ProcessCollection(*propagator.current_collection_) )
 
 {
@@ -1234,7 +1245,8 @@ bool Propagator::operator==(const Propagator &propagator) const
     if( order_of_interpolation_   != propagator.order_of_interpolation_ ) return false;
     if( debug_                    != propagator.debug_ )                  return false;
     if( particle_                 != propagator.particle_ )               return false;
-    if( scattering_               != propagator.scattering_ )             return false;
+    //FirstOrderScattering
+    //    if( scattering_               != propagator.scattering_ )             return false;
     if( particle_interaction_     != propagator.particle_interaction_ )   return false;
     if( seed_                     != propagator.seed_ )                   return false;
     if( brems_                    != propagator.brems_ )                  return false;
@@ -1312,7 +1324,8 @@ void Propagator::swap(Propagator &propagator)
     path_to_tables_.swap( propagator.path_to_tables_ );
 
     particle_->swap( *propagator.particle_ );
-    scattering_->swap(*propagator.scattering_);
+    //FirstOrderScattering
+    //    scattering_->swap(*propagator.scattering_);
 
     current_collection_->swap( *propagator.current_collection_ );
 }
@@ -2102,7 +2115,6 @@ void Propagator::ApplyOptions()
 
         if(moliere_)
         {
-            //This Scattering routine shouldnt be used!
             collections_.at(j)->EnableScattering();
         }
         if(do_exact_time_calulation_)

@@ -324,55 +324,44 @@ int main(int argc, char** argv){
 
 //    cout<<BOOST_PP_LIMIT_TUPLE<<endl;
 
-    Propagator* prop = new Propagator();
-    prop->set_seed(6554);
-        Propagator* prop3 = new Propagator("resources/configuration_IceOnly");
-        prop3->set_seed(12937);
-//        prop->ReadConfigFile("resources/configuration_IceOnly");
-        prop->EnableInterpolation("resources/tables");
+
+        Medium* med = new Medium("ice",1.);
+        EnergyCutSettings* ecut = new EnergyCutSettings(500,0.05);
+
+        Propagator* prop = new Propagator(med,ecut,"mu","resources/tables");
+        cout << "fertig eingelesen" << endl;
         double distanceMean=0;
-        double distance2Mean = 0;
-        double distance3Mean = 0;
-        double meanXY   = 0;
-        double angle    = 0;
-        int N = (int)1e3;
-        cout.precision(16);
+        double thetaMean=0;
+        double devMean=0;
+        double dist;
+        double dev;
+        int N = (int)1e4;
         for(int i = 0; i<N ; i++)
         {
-            Particle* prtcl = new Particle("mu",0,0,0,0,0,1e10,0);
-
-            prop3->Propagate(prtcl);
-            distance3Mean  +=   prtcl->GetPropagatedDistance();
-            meanXY += sqrt(prtcl->GetX()*prtcl->GetX() + prtcl->GetY()*prtcl->GetY());
-            angle += asin(sqrt(prtcl->GetX()*prtcl->GetX() + prtcl->GetY()*prtcl->GetY()) / prtcl->GetPropagatedDistance())*180/PI;
-            //cout<<prtcl->GetX()<<endl;
-
-            prop->GetParticle()->SetEnergy(1e6);
+            prop->GetParticle()->SetEnergy(1e5);
+            prop->GetParticle()->SetPhi(0);
+            prop->GetParticle()->SetTheta(0);
             prop->GetParticle()->SetX(0);
             prop->GetParticle()->SetY(0);
             prop->GetParticle()->SetZ(0);
-            prop->GetParticle()->SetTheta(0);
-            prop->GetParticle()->SetPhi(0);
+            prop->GetParticle()->SetT(0);
             prop->GetParticle()->SetPropagatedDistance(0);
+            prop->Propagate(1e6);
+            dist = prop->GetParticle()->GetPropagatedDistance();
+            distanceMean += dist;
+            dev = sqrt(
+                        prop->GetParticle()->GetX() * prop->GetParticle()->GetX()
+                    +   prop->GetParticle()->GetY() * prop->GetParticle()->GetY() );
+            devMean += dev;
+            thetaMean += asin(dev/dist)*180/PI;
 
-            distance2Mean += prop->Propagate(1e20);
-            distanceMean += prop->GetParticle()->GetPropagatedDistance();
         }
         distanceMean /= N;
+        thetaMean /= N;
+        devMean /=N;
+
         cout << "Distance Mean: " << distanceMean << endl;
-        distance2Mean /= N;
-        cout << "Distance Mean2: " << distance2Mean << endl;
-        distance3Mean /= N;
-        cout << "Distance Mean3: " << distance3Mean << endl;
-        meanXY  /= N;
-        cout << "meanXY: " << meanXY << endl;
-        angle  /= N;
-        cout << "angle: " << angle << endl;
-
-//    Medium* med = new Medium("ice",1);
-//    cout << *med << endl;
-
-
-
-
+        cout << "Theta Mean: " << thetaMean << endl;
+        cout << "devMean: " << devMean << endl;
+        cout << "X0: " << prop->GetCurrentCollection()->GetScattering()->GetX0() << endl;
 }

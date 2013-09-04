@@ -65,7 +65,8 @@ private:
     std::vector<ProcessCollection*> collections_;
 
     Particle* particle_;
-    Scattering* scattering_;
+    //FirstOrderScattering
+    //    Scattering* scattering_;
     ProcessCollection *current_collection_;
 
     Geometry*    detector_;

@@ -24,7 +24,7 @@
 #include <utility>
 #include "PROPOSAL/ContinuousRandomization.h"
 #include "PROPOSAL/Geometry.h"
-#include "PROPOSAL/Scattering_bug.h"
+#include "PROPOSAL/Scattering.h"
 
 
 /*! \class ProcessCollection ProcessCollection.h "CrossSections.h"
@@ -88,7 +88,7 @@ protected:
     Interpolant *interpol_prop_interaction_diff_;//!< Interpolant object of the function FunctionToPropIntegralInteraction
 
     ContinuousRandomization *randomizer_;
-    Scattering_bug* scattering_bug_;
+    Scattering* scattering_;
 
     Interpolant* interpol_time_particle_;
     Interpolant* interpol_time_particle_diff_;
@@ -451,8 +451,8 @@ public:
         return randomizer_;
     }
 
-    Scattering_bug* GetScattering_bug() const {
-        return scattering_bug_;
+    Scattering* GetScattering() const {
+        return scattering_;
     }
 
     bool GetEnableRandomization() const {
