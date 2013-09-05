@@ -449,14 +449,22 @@ void Propagator::AdvanceParticle(double dr, double ei, double ef)
     }
 
 
-    if(moliere_)
+    if(scattering_model_!=-1)
     {
-        //First Order Scattering
-        ///////////
-        ///////////scattering_->Scatter(dr ,   particle_   ,   current_collection_->GetMedium());
-        ///////////////
-        current_collection_->GetScattering()->Scatter(dr,ei,ef);
-        //local displacement and angles are adjusted in the scattering class.
+        switch(scattering_model_)
+        {
+            case 0:
+                current_collection_->GetScattering()->Scatter(dr,ei,ef);
+                break;
+
+            case 1:
+                scatteringFirstOrder_->Scatter(dr ,   particle_   ,   current_collection_->GetMedium());
+                break;
+
+            default:
+                log_error("Never should be here! scattering_model = %i !",scattering_model_);
+        }
+
     }
     else
     {
@@ -802,11 +810,32 @@ void Propagator::ReadConfigFile(string config_file)
             lpm_ =   true;
         }
         // moliere scattering
-        else if(ToLowerCase(taux).compare("moliere")==0)
+        else if(ToLowerCase(taux).compare("moliere")==0 || ToLowerCase(taux).compare("scattering")==0)
         {
+            if(ToLowerCase(taux).compare("moliere")==0)
+            {
+                moliere_ =   true;
+                scattering_model_ = 0;
+                continue;
+            }
+            taux = NextToken(token);
+            if(ToLowerCase(taux).compare("moliere")==0)
+            {
+                moliere_ =   true;
+                scattering_model_ = 0;
+                continue;
+            }
+            if(ToLowerCase(taux).compare("firstorder")==0)
+            {
+                scatteringFirstOrder_ = new ScatteringFirstOrder();
+                scattering_model_ = 1;
+                continue;
+            }
+
+            log_error("Scattering model not known. Defaulting to moliere!");
             moliere_ =   true;
-            //FirstOrderScattering
-//            scattering_ = new Scattering();
+            scattering_model_ = 0;
+            continue;
         }
         // exact location time
         else if(ToLowerCase(taux).compare("exact_time")==0)
@@ -898,10 +927,10 @@ void Propagator::EnableInterpolation(std::string path, bool raw)
     }
 
     //FirstOrderScattering
-//    if(scattering_ != NULL)
-//    {
-//        scattering_->GetStandardNormal()->EnableInterpolation(path,raw);
-//    }
+    if(scatteringFirstOrder_ != NULL && scattering_model_ == 1)
+    {
+        scatteringFirstOrder_->GetStandardNormal()->EnableInterpolation(path,raw);
+    }
 }
 
 
@@ -921,10 +950,10 @@ void Propagator::DisableInterpolation()
     }
 
     //FirstOrderScattering
-//    if(scattering_ != NULL)
-//    {
-//        scattering_->GetStandardNormal()->DisableInterpolation();
-//    }
+    if(scatteringFirstOrder_ != NULL && scattering_model_ == 1)
+    {
+        scatteringFirstOrder_->GetStandardNormal()->DisableInterpolation();
+    }
 }
 
 
@@ -1033,10 +1062,9 @@ Propagator::Propagator()
     ,global_cont_behind_        ( false )
     ,path_to_tables_            ( "" )
     ,raw_                       ( false )
+    ,scattering_model_          (-1)
 {
     particle_              = new Particle("mu");
-    //FirstOrderScattering
-    //    scattering_            = new Scattering();
     detector_              = new Geometry();
     detector_->InitSphere(0,0,0,1e18,0);
     InitDefaultCollection(detector_);
@@ -1061,7 +1089,8 @@ Propagator::Propagator(Medium* medium,
                        double photo_multiplier,
                        double ioniz_multiplier,
                        double epair_multiplier,
-                       bool integrate
+                       bool integrate,
+                       int scattering_model
                        )
     :order_of_interpolation_    ( 5 )
     ,debug_                     ( false )
@@ -1088,6 +1117,7 @@ Propagator::Propagator(Medium* medium,
     ,global_cont_behind_        ( false )
     ,path_to_tables_            ( path_to_tables )
     ,raw_                       ( true )
+    ,scattering_model_          (scattering_model)
 {
     particle_              = new Particle(particle_type);
     current_collection_    = new ProcessCollection(particle_, medium, cuts);
@@ -1126,12 +1156,34 @@ Propagator::Propagator(Medium* medium,
         current_collection_->EnableContinuousRandomization();
     }
 
+    if(scattering_model_ != -1)
+    {
+        switch(scattering_model_)
+        {
+            case 0:
+                moliere_ = true;
+                scattering_model_ = 0;
+                break;
+
+            case 1:
+                moliere_ = false;
+                scatteringFirstOrder_ =   new ScatteringFirstOrder();
+                break;
+
+            default:
+                log_error("scattering model not known! defaulting to moliere!");
+                moliere = true;
+                scattering_model_ = 0;
+        }
+    }
+
     if(moliere_)
     {
         current_collection_->EnableScattering();
         //FirstOrderScattering
-//        scattering_ =   new Scattering();
+//
     }
+
     if(do_exact_time_calulation_)
     {
         current_collection_->EnableExactTimeCalculation();
@@ -1173,6 +1225,7 @@ Propagator::Propagator(string config_file)
     ,global_cont_behind_        ( false )
     ,path_to_tables_            ( "" )
     ,raw_                       ( false )
+    ,scattering_model_          (-1)
 {
     ReadConfigFile(config_file);
 }
@@ -1210,7 +1263,8 @@ Propagator::Propagator(const Propagator &propagator)
     ,raw_                       ( propagator.raw_ )
     ,particle_                  ( propagator.particle_ )
     //FirstOrderScattering
-    //    ,scattering_                ( propagator.scattering_ )
+    ,scatteringFirstOrder_      ( propagator.scatteringFirstOrder_ )
+    ,scattering_model_          (-1)
     ,current_collection_        ( new ProcessCollection(*propagator.current_collection_) )
 
 {
@@ -1246,7 +1300,9 @@ bool Propagator::operator==(const Propagator &propagator) const
     if( debug_                    != propagator.debug_ )                  return false;
     if( particle_                 != propagator.particle_ )               return false;
     //FirstOrderScattering
-    //    if( scattering_               != propagator.scattering_ )             return false;
+    if( scatteringFirstOrder_     != propagator.scatteringFirstOrder_ )   return false;
+    if( scattering_model_         != propagator.scattering_model_)        return false;
+
     if( particle_interaction_     != propagator.particle_interaction_ )   return false;
     if( seed_                     != propagator.seed_ )                   return false;
     if( brems_                    != propagator.brems_ )                  return false;
@@ -1325,7 +1381,8 @@ void Propagator::swap(Propagator &propagator)
 
     particle_->swap( *propagator.particle_ );
     //FirstOrderScattering
-    //    scattering_->swap(*propagator.scattering_);
+    scatteringFirstOrder_->swap(*propagator.scatteringFirstOrder_);
+    swap(scattering_model_ , propagator.scattering_model_);
 
     current_collection_->swap( *propagator.current_collection_ );
 }

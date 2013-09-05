@@ -84,7 +84,7 @@ global
     brems               1
     photo               12
     lpm
-    #moliere
+    scattering          firstorder
     exact_time
     brems_multiplier    1
     photo_multiplier    1

@@ -23,7 +23,7 @@
   */
 
 
-class Scattering : public MathModel
+class ScatteringFirstOrder : public MathModel
 {
 
 
@@ -45,8 +45,8 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    ScatteringFirstOrder(const Scattering&);
-    ScatteringFirstOrder& operator=(const Scattering&);
+    ScatteringFirstOrder(const ScatteringFirstOrder&);
+    ScatteringFirstOrder& operator=(const ScatteringFirstOrder&);
     bool operator==(const ScatteringFirstOrder &scattering) const;
     bool operator!=(const ScatteringFirstOrder &scattering) const;
 //----------------------------------------------------------------------------//

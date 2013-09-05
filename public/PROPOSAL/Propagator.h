@@ -30,6 +30,7 @@
 #include <boost/program_options.hpp>
 #include "PROPOSAL/Geometry.h"
 #include "PROPOSAL/Scattering.h"
+#include "PROPOSAL/ScatteringFirstOrder.h"
 
 class Propagator :public MathModel
 {
@@ -66,7 +67,8 @@ private:
 
     Particle* particle_;
     //FirstOrderScattering
-    //    Scattering* scattering_;
+    ScatteringFirstOrder* scatteringFirstOrder_;
+    int scattering_model_;
     ProcessCollection *current_collection_;
 
     Geometry*    detector_;
@@ -116,7 +118,8 @@ public:
                double photo_multiplier = 1,
                double ioniz_multiplier = 1,
                double epair_multiplier = 1,
-               bool integrate = false);
+               bool integrate = false,
+               int scattering_model = 0);
     Propagator(const Propagator&);
     Propagator& operator=(const Propagator& propagator);
     bool operator==(const Propagator &propagator) const;

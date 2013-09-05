@@ -23,7 +23,17 @@ using namespace std;
 
 
 
-int main(int argc, char** argv){
+int main(int argc, char** argv)
+{
 
+    Propagator *pr = new Propagator("resources/configuration");
+    pr->set_seed(1234);
+    cout << "blah!" << endl;
 
+    Particle *p = new Particle("mu");
+    p->SetEnergy(9e3);
+    pr->SetParticle(p);
+
+    pr->Propagate(p);
+    cout << *p << endl;
 }
