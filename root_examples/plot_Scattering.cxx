@@ -1,5 +1,7 @@
 #include "TH1D.h"
 #include "TCanvas.h"
+#include "TBrowser.h"
+#include "TTree.h"
 #include "PROPOSAL/Propagator.h"
 #include "TFile.h"
 #include <iostream>
@@ -14,160 +16,79 @@ using namespace std;
 int main()
 {
 
-    cout<<"This program will propagte 1e6 muons with an energy of 9 TeV."<<endl;
-    Propagator *prpgtr = new Propagator("resources/configuration_IceOnly");
-    prpgtr->set_seed(1234);
+    Medium* med = new Medium("ice",1.);
+    EnergyCutSettings* ecut = new EnergyCutSettings(500,0.05);
+    Propagator* prop = new Propagator(med,ecut,"mu","resources/tables");
+    cout << "fertig eingelesen" << endl;
 
-    stringstream hist_name;
-    stringstream hist_name2;
-    stringstream hist_title;
-    stringstream hist_title2;
+    TFile hfile("Decay_Reached_Scattering.root","RECREATE","Scattering_Info");
 
-
-    vector<TH1D*> tmp_hist_dev_vec;
-    vector<TH1D*> tmp_hist_angle_vec;
-
-    vector<double> e;
-
-    int number_of_particles =   3e5;
-
-    double distance;
-    double deviation;
+    double dist;
+    double dev;
+    double energy;
     double angle;
+    int N = (int)1e5;
 
-    double Emin=2e2;
-    double Emax=1e12;
-    double multiplier = 1;
+    TTree *tree_decay = new TTree("Decay","An example of ROOT tree with a few branches");
+    tree_decay->Branch("energy",&energy);
+    tree_decay->Branch("distance",&dist);
+    tree_decay->Branch("deviation",&dev);
+    tree_decay->Branch("angle",&angle);
 
+    TTree *tree_reached = new TTree("Reached","An example of ROOT tree with a few branches");
+    tree_reached->Branch("energy",&energy);
+    tree_reached->Branch("distance",&dist);
+    tree_reached->Branch("deviation",&dev);
+    tree_reached->Branch("angle",&angle);
 
-    for(double energy = 0; energy <= Emax ; energy *= multiplier)
-    {        
-        if(energy<1e3)
+    double propout;
+    for(int i = 0; i<N ; i++)
+    {
+        prop->GetParticle()->SetEnergy(1e5);
+        prop->GetParticle()->SetPhi(0);
+        prop->GetParticle()->SetTheta(0);
+        prop->GetParticle()->SetX(0);
+        prop->GetParticle()->SetY(0);
+        prop->GetParticle()->SetZ(0);
+        prop->GetParticle()->SetT(0);
+        prop->GetParticle()->SetPropagatedDistance(0);
+        propout = prop->Propagate(4.05e4);
+
+        energy  =   prop->GetParticle()->GetEnergy();
+        dist    =   prop->GetParticle()->GetPropagatedDistance();
+        dev     =   sqrt(       prop->GetParticle()->GetX() * prop->GetParticle()->GetX()
+                            +   prop->GetParticle()->GetY() * prop->GetParticle()->GetY() );
+        angle   = asin(dev/dist)*180/PI;
+
+        if(propout<0)
         {
-            multiplier=1;
-            energy = energy + Emin;
-        }
-
-        else if(energy<1e4)
-        {
-            multiplier=1;
-            energy = energy + 5*Emin;
-        }
-        else if(energy <1e5)
-        {
-            energy  =   10*energy;
-            multiplier =10;
+            tree_decay->Fill();
         }
         else
         {
-            multiplier =10;
-        }
-
-
-        hist_name.str("");
-        hist_name.clear();
-        hist_name2.str("");
-        hist_name2.clear();
-        hist_title.str("");
-        hist_title.clear();
-        hist_title2.str("");
-        hist_title2.clear();
-
-        hist_name   << "Scattering_dev_"    <<energy;
-        hist_name2  << "Scattering_angle_"  <<energy;
-        hist_title  << "dev. of mouns with E="<<energy<< " and range(";
-        hist_title2 << "angle of mouns with E="<<energy<< " and range(";
-
-        distance    = 0;
-        deviation   = 0;
-        angle       = 0;
-
-        TH1D *tmp_hist_dev = new TH1D(hist_name.str().c_str(),"dd",80,-2,6);
-        TH1D *tmp_hist_angle = new TH1D(hist_name2.str().c_str(),"ss",25,-1,24);
-
-        cout << "Energy: " << energy << endl;
-        bool cross = false;
-        for(int i =0 ;i< number_of_particles; i++)
-        {
-            if(i%(number_of_particles/10)==0)
-            {
-                if(cross)cout<< "+";
-                if(!cross)cout<< "#";
-                cross = !cross;
-                fflush(stdout);
-            }
-            Particle * prtcl = new Particle("mu",0,0,0,0,0,energy,0);
-
-//            prtcl->SetEnergy(1e6);
-//            prtcl->SetX(0);
-//            prtcl->SetY(0);
-//            prtcl->SetZ(0);
-//            prtcl->SetPhi(0);
-//            prtcl->SetTheta(0);
-//            prtcl->SetPropagatedDistance(0);
-
-            prpgtr->Propagate(prtcl);
-
-            distance    += prtcl->GetPropagatedDistance();
-            deviation   = sqrt(prtcl->GetX()*prtcl->GetX()+prtcl->GetY()*prtcl->GetY());
-//            angle       = prtcl->GetTheta();
-            angle       = prtcl->GetTheta()*180/PI;
-
-            tmp_hist_dev->Fill(log10(deviation));
-//            tmp_hist_angle->Fill(log10(angle));
-            tmp_hist_angle->Fill(angle);
-        }
-//        delete prtcl;
-        hist_title  <<   distance/number_of_particles   <<")";
-        hist_title2 <<   distance/number_of_particles   <<")";
-        cout << "distance: " <<   distance/number_of_particles   << endl;
-        tmp_hist_dev->GetXaxis()->SetTitle("log10( range / [cm] )");
-        tmp_hist_dev->GetYaxis()->SetTitle("#");
-        tmp_hist_dev->SetTitle(hist_title.str().c_str());
-        tmp_hist_dev_vec.push_back(tmp_hist_dev);
-        e.push_back(energy);
-
-//        tmp_hist_angle->GetXaxis()->SetTitle("log( angle [deg] )");
-        tmp_hist_angle->GetXaxis()->SetTitle("angle [deg]");
-        tmp_hist_angle->GetYaxis()->SetTitle("#");
-        tmp_hist_angle->SetTitle(hist_title2.str().c_str());
-        tmp_hist_angle_vec.push_back(tmp_hist_angle);
-
-        cout << endl;
-        if(log10(energy)>=4 && (number_of_particles>=1e3))
-        {
-            number_of_particles/=10;
+            tree_reached->Fill();
         }
     }
+    tree_decay->Print();
+    tree_reached->Print();
+    hfile.Write();
+    hfile.Close();
 
-    TFile *file = new TFile("Scattering_distribution.root","RECREATE");
+//    distanceMean /= N;
+//    thetaMean /= N;
+//    devMean /=N;
+//    energyMean /=N;
+//    cout << "Distance Mean: " << distanceMean << endl;
+//    cout << "Theta Mean: " << thetaMean << endl;
+//    cout << "devMean: " << devMean << endl;
+//    cout << "energyMean: " << energyMean << endl;
 
-    TGraphErrors *angle_vs_energy = new TGraphErrors();
-    angle_vs_energy->SetName("angle_vs_energy");
-    angle_vs_energy->SetTitle("angle vs energy");
-
-
-    for(unsigned int i =0 ;i< tmp_hist_dev_vec.size();i++)
-    {
-        angle_vs_energy->SetPoint(i,e.at(i),pow(10 ,tmp_hist_angle_vec.at(i)->GetMean()));
-        angle_vs_energy->SetPointError(i,0,pow(10,tmp_hist_angle_vec.at(i)->GetRMS()));
-        tmp_hist_dev_vec.at(i)->Write();
-        tmp_hist_angle_vec.at(i)->Write();
-    }
-
-
-    TCanvas *can = new TCanvas("can","can",1400,1050);
-    can->cd();
-    can->SetLogx();
-    can->SetGridx();
-    can->SetGridy();
-    angle_vs_energy->SetMarkerStyle(3);
-    angle_vs_energy->Draw("AP");
-    angle_vs_energy->GetXaxis()->SetTitle("energy [deg]");
-    angle_vs_energy->GetYaxis()->SetTitle("angle [deg]");
-
-    can->Write();
-    file->Close();
+//    cout << "X0: " << prop->GetCurrentCollection()->GetScattering()->GetX0() << endl;
+//    cout << endl << endl;
+//    cout << "2e2: " << prop->GetCurrentCollection()->FunctionToIntegral(2e2) << endl;
+//    cout << "2e3: " << prop->GetCurrentCollection()->FunctionToIntegral(2e3) << endl;
+//    cout << "2e4: " << prop->GetCurrentCollection()->FunctionToIntegral(2e4) << endl;
+//    cout << "2e5: " << prop->GetCurrentCollection()->FunctionToIntegral(2e5) << endl;
 
 	return 0;
 }
