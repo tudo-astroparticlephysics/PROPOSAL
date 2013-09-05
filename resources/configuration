@@ -38,6 +38,10 @@
 #
 # To enable Moliere scattering give the following keyword
 #       moliere
+#       or scattering   moliere
+#
+#       First order scattering is available with the flag
+#       scattering firstorder
 #
 # To calculate the exact local time give the following keyword
 #       exact_time
@@ -84,7 +88,7 @@ global
     brems               1
     photo               12
     lpm
-    scattering          firstorder
+    scattering          moliere
     exact_time
     brems_multiplier    1
     photo_multiplier    1
