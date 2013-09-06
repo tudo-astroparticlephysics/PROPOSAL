@@ -33,7 +33,7 @@ double Bremsstrahlung::CalculatedEdx()
         return max(dedx_interpolant_->Interpolate(particle_->GetEnergy()), 0.0);
     }
 
-    for(int i=0; i<(medium_->GetNumCompontents()); i++)
+    for(int i=0; i<(medium_->GetNumComponents()); i++)
     {
         SetIntegralLimits(i);
         sum +=  dedx_integral_->Integrate(0, vUp_, boost::bind(&Bremsstrahlung::FunctionToDEdxIntegral, this, _1),2);
@@ -57,7 +57,7 @@ double Bremsstrahlung::CalculatedNdx()
 
     sum_of_rates_    =   0;
 
-    for(int i=0; i<(medium_->GetNumCompontents()); i++)
+    for(int i=0; i<(medium_->GetNumComponents()); i++)
     {
 
         if(do_dndx_Interpolation_)
@@ -97,7 +97,7 @@ double Bremsstrahlung::CalculatedNdx(double rnd)
 
     sum_of_rates_ = 0;
 
-    for(int i=0; i<(medium_->GetNumCompontents()); i++)
+    for(int i=0; i<(medium_->GetNumComponents()); i++)
     {
         if(do_dndx_Interpolation_)
         {
@@ -153,7 +153,7 @@ double Bremsstrahlung::CalculateScatteringX0()
     init_lpm_effect_    =   false;
     particle_->SetEnergy(BIGENERGY);
 
-    for(int i=0; i < medium_->GetNumCompontents(); i++)
+    for(int i=0; i < medium_->GetNumComponents(); i++)
     {
 
        SetIntegralLimits(i);
@@ -206,8 +206,8 @@ void Bremsstrahlung::EnableDNdxInterpolation(std::string path ,bool raw)
         if(!raw)
             filename<<".txt";
 
-        dndx_interpolant_1d_.resize( medium_->GetNumCompontents() );
-        dndx_interpolant_2d_.resize( medium_->GetNumCompontents() );
+        dndx_interpolant_1d_.resize( medium_->GetNumComponents() );
+        dndx_interpolant_2d_.resize( medium_->GetNumComponents() );
 
         if( FileExist(filename.str()) )
         {
@@ -222,7 +222,7 @@ void Bremsstrahlung::EnableDNdxInterpolation(std::string path ,bool raw)
             {
                 input.open(filename.str().c_str());
             }
-            for(int i=0; i<(medium_->GetNumCompontents()); i++)
+            for(int i=0; i<(medium_->GetNumComponents()); i++)
             {
                 component_ = i;
                 dndx_interpolant_2d_.at(i) = new Interpolant();
@@ -259,7 +259,7 @@ void Bremsstrahlung::EnableDNdxInterpolation(std::string path ,bool raw)
             {
                 output.precision(16);
 
-                for(int i=0; i<(medium_->GetNumCompontents()); i++)
+                for(int i=0; i<(medium_->GetNumComponents()); i++)
                 {
                     component_ = i;
 
@@ -283,9 +283,9 @@ void Bremsstrahlung::EnableDNdxInterpolation(std::string path ,bool raw)
     if(path.empty() || storing_failed)
     {
         double energy = particle_->GetEnergy();
-        dndx_interpolant_1d_.resize( medium_->GetNumCompontents() );
-        dndx_interpolant_2d_.resize( medium_->GetNumCompontents() );
-        for(int i=0; i<(medium_->GetNumCompontents()); i++)
+        dndx_interpolant_1d_.resize( medium_->GetNumComponents() );
+        dndx_interpolant_2d_.resize( medium_->GetNumComponents() );
+        for(int i=0; i<(medium_->GetNumComponents()); i++)
         {
             component_ = i;
             dndx_interpolant_2d_.at(i) = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY,  NUM1, 0, 1, boost::bind(&Bremsstrahlung::FunctionToBuildDNdxInterpolant2D, this, _1 , _2), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false, order_of_interpolation_, true, false, false);
@@ -500,9 +500,9 @@ Bremsstrahlung::Bremsstrahlung( )
     dedx_integral_   =  new Integral(IROMB, IMAXS, IPREC);
     dedx_interpolant_= NULL;
 
-    dndx_integral_.resize(medium_->GetNumCompontents());
+    dndx_integral_.resize(medium_->GetNumComponents());
 
-    for(int i =0; i<(medium_->GetNumCompontents()); i++)
+    for(int i =0; i<(medium_->GetNumComponents()); i++)
     {
             dndx_integral_.at(i) =   new Integral(IROMB, IMAXS, IPREC);
     }
@@ -587,14 +587,14 @@ Bremsstrahlung::Bremsstrahlung(Particle* particle,
     dedx_integral_   =  new Integral(IROMB, IMAXS, IPREC);
     dedx_interpolant_=  NULL;
 
-    dndx_integral_.resize( medium_->GetNumCompontents() );
+    dndx_integral_.resize( medium_->GetNumComponents() );
 
-    for(int i =0; i<(medium_->GetNumCompontents()); i++)
+    for(int i =0; i<(medium_->GetNumComponents()); i++)
     {
             dndx_integral_.at(i) =   new Integral(IROMB, IMAXS, IPREC);
     }
 
-    prob_for_component_.resize(medium_->GetNumCompontents());
+    prob_for_component_.resize(medium_->GetNumComponents());
 
     do_dedx_Interpolation_  = false;
     do_dndx_Interpolation_  = false;
@@ -1003,7 +1003,7 @@ double Bremsstrahlung::CalculateStochasticLoss(double rnd)
     rand    =   rnd*sum_of_rates_;
     rsum    =   0;
 
-    for(int i=0; i<(medium_->GetNumCompontents()); i++)
+    for(int i=0; i<(medium_->GetNumComponents()); i++)
     {
         rsum    += prob_for_component_.at(i);
 
@@ -1034,7 +1034,7 @@ double Bremsstrahlung::CalculateStochasticLoss(double rnd)
 
     //sometime everything is fine, just the probability for interaction is zero
     bool prob_for_all_comp_is_zero=true;
-    for(int i=0; i<(medium_->GetNumCompontents()); i++)
+    for(int i=0; i<(medium_->GetNumComponents()); i++)
     {
         SetIntegralLimits(i);
         if(vUp_!=vMax_)prob_for_all_comp_is_zero=false;
@@ -1122,7 +1122,7 @@ double Bremsstrahlung::lpm(double v, double s1)
         init_lpm_effect_    =   false;
         particle_->SetEnergy(BIGENERGY);
 
-        for(int i=0; i < medium_->GetNumCompontents(); i++)
+        for(int i=0; i < medium_->GetNumComponents(); i++)
         {
 
            SetIntegralLimits(i);

@@ -1063,7 +1063,7 @@ double Medium::FunctionToIntegral(double r)
 //----------------------------------------------------------------------------//
 
 
-void Medium::SetNumCompontents(int numCompontents){
+void Medium::SetNumComponents(int numCompontents){
     numCompontents_ = numCompontents;
 }
 

@@ -27,7 +27,7 @@ double Photonuclear::CalculatedEdx()
 
     double sum  =   0;
 
-    for(int i=0; i < medium_->GetNumCompontents(); i++)
+    for(int i=0; i < medium_->GetNumComponents(); i++)
     {
         SetIntegralLimits(i);
         sum +=  integral_for_dEdx_->Integrate(vMin_, vUp_, boost::bind(&Photonuclear::FunctionToDEdxIntegral, this, _1),4);
@@ -50,7 +50,7 @@ double Photonuclear::CalculatedNdx()
 
     sum_of_rates_    =   0;
 
-    for(int i=0; i<medium_->GetNumCompontents(); i++)
+    for(int i=0; i<medium_->GetNumComponents(); i++)
     {
 
         if(do_dndx_Interpolation_)
@@ -88,7 +88,7 @@ double Photonuclear::CalculatedNdx(double rnd)
 
     sum_of_rates_   =   0;
 
-    for(int i=0; i<medium_->GetNumCompontents(); i++)
+    for(int i=0; i<medium_->GetNumComponents(); i++)
     {
 
         if(do_dndx_Interpolation_)
@@ -154,8 +154,8 @@ void Photonuclear::EnableDNdxInterpolation(std::string path, bool raw)
         if(!raw)
             filename<<".txt";
 
-        dndx_interpolant_2d_.resize(medium_->GetNumCompontents());
-        dndx_interpolant_1d_.resize(medium_->GetNumCompontents());
+        dndx_interpolant_2d_.resize(medium_->GetNumComponents());
+        dndx_interpolant_1d_.resize(medium_->GetNumComponents());
 
         if( FileExist(filename.str()) )
         {
@@ -171,7 +171,7 @@ void Photonuclear::EnableDNdxInterpolation(std::string path, bool raw)
                 input.open(filename.str().c_str());
             }
 
-            for(int i=0; i<(medium_->GetNumCompontents()); i++)
+            for(int i=0; i<(medium_->GetNumComponents()); i++)
             {
                 component_ = i;
                 dndx_interpolant_2d_.at(i) = new Interpolant();
@@ -208,7 +208,7 @@ void Photonuclear::EnableDNdxInterpolation(std::string path, bool raw)
             {
                 output.precision(16);
 
-                for(int i=0; i<(medium_->GetNumCompontents()); i++)
+                for(int i=0; i<(medium_->GetNumComponents()); i++)
                 {
                     component_ = i;
 
@@ -235,9 +235,9 @@ void Photonuclear::EnableDNdxInterpolation(std::string path, bool raw)
         EnablePhotoInterpolation(path);
 
         double energy = particle_->GetEnergy();
-        dndx_interpolant_1d_.resize(medium_->GetNumCompontents());
-        dndx_interpolant_2d_.resize(medium_->GetNumCompontents());
-        for(int i=0; i<(medium_->GetNumCompontents()); i++)
+        dndx_interpolant_1d_.resize(medium_->GetNumComponents());
+        dndx_interpolant_2d_.resize(medium_->GetNumComponents());
+        for(int i=0; i<(medium_->GetNumComponents()); i++)
         {
             component_ = i;
             dndx_interpolant_2d_.at(i) =    new Interpolant(NUM1, particle_->GetLow(), BIGENERGY,  NUM1, 0, 1, boost::bind(&Photonuclear::FunctionToBuildDNdxInterpolant2D, this, _1 , _2), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false, order_of_interpolation_, true, false, false);
@@ -375,7 +375,7 @@ void Photonuclear::EnablePhotoInterpolation(std::string path, bool raw)
         if(!raw)
             filename<<".txt";
 
-        photo_interpolant_.resize( medium_->GetNumCompontents() );
+        photo_interpolant_.resize( medium_->GetNumComponents() );
 
         if( FileExist(filename.str()) )
         {
@@ -391,7 +391,7 @@ void Photonuclear::EnablePhotoInterpolation(std::string path, bool raw)
                 input.open(filename.str().c_str());
             }
 
-            for(int i=0; i<(medium_->GetNumCompontents()); i++)
+            for(int i=0; i<(medium_->GetNumComponents()); i++)
             {
                 component_ = i;
                 photo_interpolant_.at(i) = new Interpolant();
@@ -426,7 +426,7 @@ void Photonuclear::EnablePhotoInterpolation(std::string path, bool raw)
             {
                 output.precision(16);
 
-                for(int i=0; i<(medium_->GetNumCompontents()); i++)
+                for(int i=0; i<(medium_->GetNumComponents()); i++)
                 {
                     component_ = i;
 
@@ -450,9 +450,9 @@ void Photonuclear::EnablePhotoInterpolation(std::string path, bool raw)
     {
         double energy = particle_->GetEnergy();
 
-        photo_interpolant_.resize( medium_->GetNumCompontents() );
+        photo_interpolant_.resize( medium_->GetNumComponents() );
 
-        for(int i=0; i<medium_->GetNumCompontents(); i++)
+        for(int i=0; i<medium_->GetNumComponents(); i++)
         {
             component_ = i;
             photo_interpolant_.at(i)  = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, NUM1, 0., 1., boost::bind(&Photonuclear::FunctionToBuildPhotoInterpolant, this, _1, _2), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false, order_of_interpolation_, false, false, false);
@@ -591,13 +591,13 @@ Photonuclear::Photonuclear()
     integral_             = new Integral(IROMB, IMAXS, IPREC);
     integral_for_dEdx_    = new Integral(IROMB, IMAXS, IPREC);
 
-    dndx_integral_.resize(medium_->GetNumCompontents());
+    dndx_integral_.resize(medium_->GetNumComponents());
 
-    for(int i =0 ; i<medium_->GetNumCompontents();i++){
+    for(int i =0 ; i<medium_->GetNumComponents();i++){
         dndx_integral_.at(i) = new Integral(IROMB, IMAXS, IPREC);
     }
 
-    prob_for_component_.resize(medium_->GetNumCompontents());
+    prob_for_component_.resize(medium_->GetNumComponents());
     dedx_interpolant_     = NULL;
     interpolant_measured_ = NULL;
 }
@@ -702,13 +702,13 @@ Photonuclear::Photonuclear(Particle* particle,
     integral_             = new Integral(IROMB, IMAXS, IPREC);
     integral_for_dEdx_    = new Integral(IROMB, IMAXS, IPREC);
 
-    dndx_integral_.resize(medium_->GetNumCompontents());
+    dndx_integral_.resize(medium_->GetNumComponents());
 
-    for(int i =0 ; i<medium_->GetNumCompontents();i++){
+    for(int i =0 ; i<medium_->GetNumComponents();i++){
         dndx_integral_.at(i) = new Integral(IROMB, IMAXS, IPREC);
     }
 
-    prob_for_component_.resize(medium_->GetNumCompontents());
+    prob_for_component_.resize(medium_->GetNumComponents());
     dedx_interpolant_     = NULL;
     interpolant_measured_ = NULL;
 
@@ -1322,7 +1322,7 @@ double Photonuclear::CalculateStochasticLoss(double rnd)
     rsum    =   0;
 
 
-    for(int i=0; i<(medium_->GetNumCompontents()); i++)
+    for(int i=0; i<(medium_->GetNumComponents()); i++)
     {
         rsum    += prob_for_component_.at(i);
         if(rsum > rand)
@@ -1350,7 +1350,7 @@ double Photonuclear::CalculateStochasticLoss(double rnd)
 
     //sometime everything is fine, just the probability for interaction is zero
     bool prob_for_all_comp_is_zero=true;
-    for(int i=0; i<(medium_->GetNumCompontents()); i++)
+    for(int i=0; i<(medium_->GetNumComponents()); i++)
     {
         SetIntegralLimits(i);
         if(vUp_!=vMax_)prob_for_all_comp_is_zero=false;

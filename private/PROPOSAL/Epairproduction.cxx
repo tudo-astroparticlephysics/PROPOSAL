@@ -30,7 +30,7 @@ double Epairproduction::CalculatedEdx()
 
     double sum  =   0;
 
-    for(int i=0; i<medium_->GetNumCompontents(); i++)
+    for(int i=0; i<medium_->GetNumComponents(); i++)
     {
         SetIntegralLimits(i);
         double r1   =   0.8;
@@ -96,7 +96,7 @@ double Epairproduction::CalculatedNdx()
 
     sum_of_rates_ = 0;
 
-    for(int i=0; i<medium_->GetNumCompontents(); i++){
+    for(int i=0; i<medium_->GetNumComponents(); i++){
         if(do_dndx_Interpolation_)
         {
             sum_of_rates_ += max(dndx_interpolant_1d_.at(i)->Interpolate(particle_->GetEnergy()), 0.0);
@@ -131,7 +131,7 @@ double Epairproduction::CalculatedNdx(double rnd)
 
     sum_of_rates_  =   0;
 
-    for(int i=0; i<medium_->GetNumCompontents(); i++){
+    for(int i=0; i<medium_->GetNumComponents(); i++){
         if(do_dndx_Interpolation_)
         {
             prob_for_component_.at(i) = max(dndx_interpolant_1d_.at(i)->Interpolate(particle_->GetEnergy()), 0.0);
@@ -196,8 +196,8 @@ void Epairproduction::EnableDNdxInterpolation(std::string path, bool raw)
         if(!raw)
             filename<<".txt";
 
-        dndx_interpolant_1d_.resize(medium_->GetNumCompontents());
-        dndx_interpolant_2d_.resize(medium_->GetNumCompontents());
+        dndx_interpolant_1d_.resize(medium_->GetNumComponents());
+        dndx_interpolant_2d_.resize(medium_->GetNumComponents());
 
         if( FileExist(filename.str()) )
         {
@@ -213,7 +213,7 @@ void Epairproduction::EnableDNdxInterpolation(std::string path, bool raw)
                 input.open(filename.str().c_str());
             }
 
-            for(int i=0; i<(medium_->GetNumCompontents()); i++)
+            for(int i=0; i<(medium_->GetNumComponents()); i++)
             {
                 component_ = i;
                 dndx_interpolant_2d_.at(i) = new Interpolant();
@@ -250,7 +250,7 @@ void Epairproduction::EnableDNdxInterpolation(std::string path, bool raw)
             {
                 output.precision(16);
 
-                for(int i=0; i<(medium_->GetNumCompontents()); i++)
+                for(int i=0; i<(medium_->GetNumComponents()); i++)
                 {
                     component_ = i;
 
@@ -275,9 +275,9 @@ void Epairproduction::EnableDNdxInterpolation(std::string path, bool raw)
     if(path.empty() || storing_failed)
     {
         double energy = particle_->GetEnergy();
-        dndx_interpolant_1d_.resize( medium_->GetNumCompontents() );
-        dndx_interpolant_2d_.resize( medium_->GetNumCompontents() );
-        for(int i=0; i<(medium_->GetNumCompontents()); i++)
+        dndx_interpolant_1d_.resize( medium_->GetNumComponents() );
+        dndx_interpolant_2d_.resize( medium_->GetNumComponents() );
+        for(int i=0; i<(medium_->GetNumComponents()); i++)
         {
             component_ = i;
             dndx_interpolant_2d_.at(i) =    new Interpolant(NUM1, particle_->GetLow(), BIGENERGY,  NUM1, 0, 1, boost::bind(&Epairproduction::FunctionToBuildDNdxInterpolant2D, this, _1 , _2), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false, order_of_interpolation_, true, false, false);
@@ -419,7 +419,7 @@ void Epairproduction::EnableEpairInterpolation(std::string path, bool raw)
         if(!raw)
             filename<<".txt";
 
-        epair_interpolant_.resize( medium_->GetNumCompontents() );
+        epair_interpolant_.resize( medium_->GetNumComponents() );
 
         if( FileExist(filename.str()) )
         {
@@ -435,7 +435,7 @@ void Epairproduction::EnableEpairInterpolation(std::string path, bool raw)
                 input.open(filename.str().c_str());
             }
 
-            for(int i=0; i<(medium_->GetNumCompontents()); i++)
+            for(int i=0; i<(medium_->GetNumComponents()); i++)
             {
                 component_ = i;
                 epair_interpolant_.at(i) = new Interpolant();
@@ -470,7 +470,7 @@ void Epairproduction::EnableEpairInterpolation(std::string path, bool raw)
             {
                 output.precision(16);
 
-                for(int i=0; i<(medium_->GetNumCompontents()); i++)
+                for(int i=0; i<(medium_->GetNumComponents()); i++)
                 {
                     component_ = i;
 
@@ -494,9 +494,9 @@ void Epairproduction::EnableEpairInterpolation(std::string path, bool raw)
     {
         double energy = particle_->GetEnergy();
 
-        epair_interpolant_.resize( medium_->GetNumCompontents() );
+        epair_interpolant_.resize( medium_->GetNumComponents() );
 
-        for(int i=0; i < medium_->GetNumCompontents() ; i++)
+        for(int i=0; i < medium_->GetNumComponents() ; i++)
         {
             component_ = i;
             epair_interpolant_.at(i)   = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, NUM1, 0., 1.,boost::bind(&Epairproduction::FunctionToBuildEpairInterpolant, this, _1 , _2) , order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false, order_of_interpolation_, false, false, false);
@@ -706,14 +706,14 @@ Epairproduction::Epairproduction(Particle* particle,
     integral_             = new Integral(IROMB, IMAXS, IPREC);
     integral_for_dEdx_    = new Integral(IROMB, IMAXS, IPREC);
 
-    dndx_integral_.resize(medium_->GetNumCompontents());
+    dndx_integral_.resize(medium_->GetNumComponents());
 
 
-    for(int i =0 ; i<medium_->GetNumCompontents();i++){
+    for(int i =0 ; i<medium_->GetNumComponents();i++){
         dndx_integral_.at(i) = new Integral(IROMB, IMAXS, IPREC);
     }
 
-    prob_for_component_.resize(medium_->GetNumCompontents());
+    prob_for_component_.resize(medium_->GetNumComponents());
     dedx_interpolant_     = NULL;
 
 }
@@ -910,7 +910,7 @@ double Epairproduction::CalculateStochasticLoss(double rnd)
     rand    =   rnd*sum_of_rates_;
     rsum    =   0;
 
-    for(int i=0; i<(medium_->GetNumCompontents()); i++)
+    for(int i=0; i<(medium_->GetNumComponents()); i++)
     {
         rsum    += prob_for_component_.at(i);
         if(rsum > rand)
@@ -938,7 +938,7 @@ double Epairproduction::CalculateStochasticLoss(double rnd)
 
     //sometime everything is fine, just the probability for interaction is zero
     bool prob_for_all_comp_is_zero=true;
-    for(int i=0; i<(medium_->GetNumCompontents()); i++)
+    for(int i=0; i<(medium_->GetNumComponents()); i++)
     {
         SetIntegralLimits(i);
         if(vUp_!=vMax_)prob_for_all_comp_is_zero=false;
@@ -996,7 +996,7 @@ double Epairproduction::lpm(double r2, double b, double x)
         init_lpm_effect_        =   false;
         double sum  =   0;
 
-        for(int i=0; i<medium_->GetNumCompontents(); i++)
+        for(int i=0; i<medium_->GetNumComponents(); i++)
         {
             sum +=  medium_->GetNucCharge().at(i)*medium_->GetNucCharge().at(i)
                     *log(3.25*medium_->GetLogConstant().at(i)*pow(medium_->GetNucCharge().at(i), -1./3));

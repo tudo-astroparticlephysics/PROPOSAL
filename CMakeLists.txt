@@ -92,6 +92,7 @@ add_library(PROPOSAL
         private/PROPOSAL/Geometry.cxx
         private/PROPOSAL/Scattering.cxx
         private/PROPOSAL/ScatteringFirstOrder.cxx
+        private/PROPOSAL/ScatteringMoliere.cxx
         private/PROPOSAL/Output.cxx
 	)
 

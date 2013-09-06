@@ -694,7 +694,7 @@ double ContinuousRandomization::DE2dx()
     {
         which_cross_ = i;
 
-        for(int j=0 ; j < medium_->GetNumCompontents() ; j++)
+        for(int j=0 ; j < medium_->GetNumComponents() ; j++)
         {
             cross_sections_.at(i)->SetIntegralLimits(j);
 

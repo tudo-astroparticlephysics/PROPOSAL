@@ -230,7 +230,7 @@ public:
 //----------------------------------------------------------------------------//
     // Getter
 
-    int GetNumCompontents() const
+    int GetNumComponents() const
     {
         return numCompontents_;
     }
@@ -382,7 +382,7 @@ public:
 //----------------------------------------------------------------------------//
 
     // Setter
-    void SetNumCompontents(int numCompontents);
+    void SetNumComponents(int numCompontents);
     void SetNucCharge(std::vector<double> nucCharge);
     void SetAtomicNum(std::vector<double> atomicNum);
     void SetAtomInMolecule(std::vector<double> atomInMolecule);
