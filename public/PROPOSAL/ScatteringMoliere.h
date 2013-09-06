@@ -17,46 +17,48 @@ class ScatteringMoliere
 private:
 
     //particle
-    double dx;                  //traversing thickness in cm
-    double betaSq;              //beta² = v²/c²
-    double p;                   //momentum in MeV/c
-    double m;                   //mass in MeV/c²
+    double dx_;                  //traversing thickness in cm
+    double betaSq_;              //beta² = v²/c²
+    double p_;                   //momentum in MeV/c
+    double m_;                   //mass in MeV/c²
 
     //medium
-    Medium* medium;
-    int numComp;                //number of components in medium
-    vector<double> Z;           //nuclear charge of different components
-    vector<double> ki;          //number of atoms in molecule of different components
-    vector<double> Ai;          //atomic number of different components
-    vector<double> weight;      //mass weights of different components
+    Medium* medium_;
+    int numComp_;                //number of components in medium
+    vector<double> Z_;           //nuclear charge of different components
+    vector<double> ki_;          //number of atoms in molecule of different components
+    vector<double> Ai_;          //atomic number of different components
+    vector<double> weight_;      //mass weights of different components
 
 
     //scattering parameters
-    vector<double> chi0;
-    vector<double> chiASq;      //screening angle² in rad²
-    double chiCSq;              //characteristic angle² in rad²
-    vector<double> B;
+    vector<double> chi0_;
+    vector<double> chiASq_;      //screening angle² in rad²
+    double chiCSq_;              //characteristic angle² in rad²
+    vector<double> B_;
 
-    double thetaMax;              //maximum randomly generated angle
+    double thetaMax_;              //maximum randomly generated angle
 
 
-    MathModel* MathMachine;
-    Integral* IntMachine;
+    MathModel* MathMachine_;
+    Integral* IntMachine_;
 
 
 public:
 
     //constructor
     ScatteringMoliere();
-
+    ScatteringMoliere(const ScatteringMoliere &);
     //Old constructor
     //ScatteringMoliere(double dr, Particle* part, Medium* med);
-
+    ScatteringMoliere& operator=(const ScatteringMoliere&);
+    bool operator==(const ScatteringMoliere &scattering) const;
+    bool operator!=(const ScatteringMoliere &scattering) const;
 //----------------------------------------------------------------------------//
 
     // Memberfunctions
     void Scatter(double dr, Particle* part, Medium* med);
-
+    void swap(ScatteringMoliere &scattering);
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
@@ -71,38 +73,38 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    void SetBetaSq(double b) { betaSq = b; }
+    void SetBetaSq(double b) { betaSq_ = b; }
 
-    void SetChi0(vector<double> b) { chi0 = b; }
-    void SetChi0(unsigned int i, double b) { chi0.at(i) = b; }
-    void SetChiASq(vector<double> b) { chiASq = b; }
-    void SetChiASq(unsigned int i, double b) { chiASq.at(i) = b; }
-    void SetChiCSq(double b) { chiCSq = b; }
-    void SetB(vector<double> b) { B = b; }
-    void SetB(unsigned int i, double b) { B.at(i) = b; }
+    void SetChi0(vector<double> b) { chi0_ = b; }
+    void SetChi0(unsigned int i, double b) { chi0_.at(i) = b; }
+    void SetChiASq(vector<double> b) { chiASq_ = b; }
+    void SetChiASq(unsigned int i, double b) { chiASq_.at(i) = b; }
+    void SetChiCSq(double b) { chiCSq_ = b; }
+    void SetB(vector<double> b) { B_ = b; }
+    void SetB(unsigned int i, double b) { B_.at(i) = b; }
 
-    void SetThetaMax(double b) { thetaMax = b; }
+    void SetThetaMax(double b) { thetaMax_ = b; }
 
 //----------------------------------------------------------------------------//
 
-    double GetBetaSq() { return betaSq; }
+    double GetBetaSq() { return betaSq_; }
 
-    vector<double> GetWeigth() { return weight; }
+    vector<double> GetWeigth() { return weight_; }
 
-    vector<double> GetChi0() { return chi0; }
-    vector<double> GetChiASq() { return chiASq; }
-    double GetChiCSq() { return chiCSq; }
-    vector<double> GetB() { return B; }
+    vector<double> GetChi0() { return chi0_; }
+    vector<double> GetChiASq() { return chiASq_; }
+    double GetChiCSq() { return chiCSq_; }
+    vector<double> GetB() { return B_; }
 
     vector<double> GetChiCSqrtBq()
     {
-        vector<double> chiCBSq(medium->GetNumComponents());
-        for(int i = 0; i < medium->GetNumComponents() ; i++) chiCBSq.at(i) = sqrt(chiCSq*B.at(i));
+        vector<double> chiCBSq(medium_->GetNumComponents());
+        for(int i = 0; i < medium_->GetNumComponents() ; i++) chiCBSq.at(i) = sqrt(chiCSq_*B_.at(i));
 
         return chiCBSq;
     }
 
-    double GetThetaMax() { return thetaMax; }
+    double GetThetaMax() { return thetaMax_; }
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//

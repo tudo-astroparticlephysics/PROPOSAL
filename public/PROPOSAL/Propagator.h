@@ -31,6 +31,7 @@
 #include "PROPOSAL/Geometry.h"
 #include "PROPOSAL/Scattering.h"
 #include "PROPOSAL/ScatteringFirstOrder.h"
+#include "PROPOSAL/ScatteringMoliere.h"
 
 class Propagator :public MathModel
 {
@@ -68,6 +69,8 @@ private:
     Particle* particle_;
     //FirstOrderScattering
     ScatteringFirstOrder* scatteringFirstOrder_;
+    //FirstOrderMoliere
+    ScatteringMoliere* scatteringFirstOrderMoliere_;
     int scattering_model_;
     ProcessCollection *current_collection_;
 

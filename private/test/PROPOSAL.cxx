@@ -36,4 +36,21 @@ int main(int argc, char** argv)
 
     pr->Propagate(p);
     cout << *p << endl;
+
+    const int init1[] = {1000, 1, 0, 0};
+     const int init2[] = {1000, 1, 0, 0};
+     const int init3[] = {1000, 1, 0, 1};
+     std::vector<int> vector1 ( init1, init1 + 4 );
+     std::vector<int> vector2 ( init2, init2 + 4 );
+     std::vector<int> vector3 ( init3, init3 + 4 );
+     bool is_equal = false;
+     if ( vector1.size() < vector2.size() )
+       is_equal = std::equal ( vector1.begin(), vector1.end(), vector2.begin() );
+     else
+       is_equal = std::equal ( vector2.begin(), vector2.end(), vector1.begin() );
+     std::cout<<"operator==: "<< ( vector1 == vector2 ) <<'\n';
+     std::cout<<"std::equal: "<< is_equal <<'\n';
+          std::cout<<"operator==: "<< ( vector1 == vector3 ) <<'\n';
+     vector3 = vector2;
+     std::cout<<"operator==: "<< ( vector1 == vector3 ) <<'\n';
 }

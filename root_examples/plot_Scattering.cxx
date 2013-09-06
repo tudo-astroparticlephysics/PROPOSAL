@@ -18,7 +18,7 @@ int main()
 
     Medium* med = new Medium("ice",1.);
     EnergyCutSettings* ecut = new EnergyCutSettings(500,0.05);
-    Propagator* prop = new Propagator(med,ecut,"mu","resources/tables");
+    Propagator* prop = new Propagator(med,ecut,"mu","resources/tables",false,true,true,true,1,12,1,1,1,1,false,2);
     cout << "fertig eingelesen" << endl;
 
     TFile hfile("Decay_Reached_Scattering.root","RECREATE","Scattering_Info");
@@ -27,7 +27,7 @@ int main()
     double dev;
     double energy;
     double angle;
-    int N = (int)1e5;
+    int N = (int)1e4;
 
     TTree *tree_decay = new TTree("Decay","An example of ROOT tree with a few branches");
     tree_decay->Branch("energy",&energy);
