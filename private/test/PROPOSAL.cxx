@@ -35,7 +35,7 @@ int main(int argc, char** argv)
     pr->SetParticle(p);
 
     pr->Propagate(p);
-    cout << *p << endl;
+
 
     const int init1[] = {1000, 1, 0, 0};
      const int init2[] = {1000, 1, 0, 0};
@@ -53,4 +53,5 @@ int main(int argc, char** argv)
           std::cout<<"operator==: "<< ( vector1 == vector3 ) <<'\n';
      vector3 = vector2;
      std::cout<<"operator==: "<< ( vector1 == vector3 ) <<'\n';
+
 }

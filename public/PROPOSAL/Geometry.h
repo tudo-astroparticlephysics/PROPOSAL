@@ -30,6 +30,8 @@ private:
 
     std::string object_;    //!< "box" , "cylinder" , "sphere" (sphere and cylinder might be hollow)
 
+    unsigned int hirarchy_; //!< adds a hirarchy of geometry objects to allow crossing geometries
+
 //----------------------------------------------------------------------------//
     /*!
      * This function calculates the distance of the particle position
@@ -167,6 +169,10 @@ public:
         return object_;
     }
 
+    unsigned int GetHirarchy() const {
+        return hirarchy_;
+    }
+
 //----------------------------------------------------------------------------//
     //Setter
     void SetX0(double x0);
@@ -178,7 +184,7 @@ public:
     void SetInnerRadius(double inner_radius);
     void SetRadius(double radius);
     void SetObject(std::string object);
-
+    void SetHirarchy(unsigned int hirarchy);
 //----------------------------------------------------------------------------//
     //Destructor
     ~Geometry();

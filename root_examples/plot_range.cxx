@@ -16,14 +16,15 @@ int main()
     double range;
 
     int number_of_particles =   1e6;
-
+    int OnePercent = number_of_particles/100;
     TH1D *range_hist = new TH1D("Range","Range distribution of muons with an energy of 9 TeV",64,0,1.2e6);
     TFile *file = new TFile("Range_distribution.root","RECREATE");
 
 
+
     for(int i =0 ;i< number_of_particles; i++)
     {
-        if(i%10000==0)cout<<"Progress: " <<1.*i/1e4<<"%"<<endl;
+        if(i%OnePercent==0)cout<<"Progress: " <<100.*i/number_of_particles<<"%"<<endl;
 
         Particle *p = new Particle("mu");
         p->SetEnergy(9e6);

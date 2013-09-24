@@ -248,7 +248,7 @@ TEST(Epairproduction , Test_of_dEdx ) {
             CombOfEpair.at(i)->GetParticle()->SetEnergy(energy);
             dEdx_new=CombOfEpair.at(i)->CalculatedEdx();
 
-            ASSERT_NEAR(dEdx_new, dEdx, 1E-6*dEdx);
+            ASSERT_NEAR(dEdx_new, dEdx, 1E-5*dEdx);
 
             in>>ecut>>vcut>>lpm>>energy>>med>>particleName>>dEdx;
         }
@@ -270,7 +270,7 @@ TEST(Epairproduction , Test_of_dNdx ) {
     string particleName;
     bool lpm;
 
-    double precision = 1E-6;
+    double precision = 1E-5;
 
     double energy_old;
     bool first = true;
@@ -320,7 +320,7 @@ TEST(Epairproduction , Test_of_dNdxrnd ) {
     string particleName;
     bool lpm;
 
-    double precision = 1E-6;
+    double precision = 1E-5;
 
     double energy_old;
     bool first = true;
@@ -374,7 +374,7 @@ TEST(Epairproduction , Test_of_e ) {
     string particleName;
     bool lpm;
 
-    double precision = 1E-6;
+    double precision = 1E-5;
 
     double energy_old;
     bool first = true;
@@ -554,10 +554,10 @@ TEST(Epairproduction , Test_of_dNdxrnd_interpol ) {
 
 
             if(dNdxrnd!=0){
-                if(log10(fabs(1-dNdxrnd_new/dNdxrnd))>-6)
+                if(log10(fabs(1-dNdxrnd_new/dNdxrnd))>-5)
                 {
-//                    cout <<ecut << "\t" << vcut<< "\t" << lpm<< "\t" << energy<< "\t" << med<< "\t" << particleName << endl;
-//                    cout << energy << "\t" << log10(fabs(1-dNdxrnd_new/dNdxrnd)) << endl;
+                    log_warn("%f \t %f \t %i \t %f \t %s \t %s \t",ecut,vcut,lpm,energy,med.c_str(),particleName.c_str());
+                    log_warn("%f \t %f",energy,log10(fabs(1-dNdxrnd_new/dNdxrnd)));
                 }
             }
 
@@ -593,6 +593,7 @@ TEST(Epairproduction , Test_of_e_interpol ) {
     Rand2->rnd();
     double rnd1,rnd2;
     int i=-1;
+    int ctr=0;
     while(in.good())
     {
         if(first)in>>ecut>>vcut>>lpm>>energy>>med>>particleName>>e;
@@ -623,11 +624,12 @@ TEST(Epairproduction , Test_of_e_interpol ) {
                 if(log10(fabs(1-e_new/e))>-3)
                 {
                     //cout <<ecut << "\t" << vcut<< "\t" << lpm<< "\t" << energy<< "\t" << med<< "\t" << particleName << endl;
-                    //cout << energy << "\t" << log10(fabs(1-e_new/e)) << endl;
+                    cout << energy << "\t" << log10(fabs(1-e_new/e)) << endl;
                 }
             }
-
-            ASSERT_NEAR(e_new, e, precision*e);
+            cout <<ecut << "\t" << vcut<< "\t" << lpm<< "\t" << energy<< "\t" << med<< "\t" << particleName << endl;
+            cout << "ctr: " << ctr++ << endl;
+            EXPECT_NEAR(e_new, e, precision*e);
 
             in>>ecut>>vcut>>lpm>>energy>>med>>particleName>>e;
         }

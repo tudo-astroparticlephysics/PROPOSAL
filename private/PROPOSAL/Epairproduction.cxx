@@ -159,6 +159,7 @@ double Epairproduction::CalculateStochasticLoss(double rnd1, double rnd2)
     if(rnd1 != rnd_ )
     {
         CalculatedNdx(rnd1);
+        cout << "rnd_: " << rnd_ << "\t rnd1: " << rnd1 << "/t rnd2: " << rnd2 << endl;
     }
 
     return CalculateStochasticLoss(rnd2);

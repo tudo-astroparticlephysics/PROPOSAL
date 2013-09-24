@@ -489,6 +489,8 @@ void Propagator::AdvanceParticle(double dr, double ei, double ef)
 
 void Propagator::ChooseCurrentCollection(Particle* particle)
 {
+    vector<unsigned int> crossed_collections;
+    crossed_collections.resize(0);
 
     for(unsigned int i = 0 ; i < collections_.size() ; i++)
     {
@@ -505,6 +507,7 @@ void Propagator::ChooseCurrentCollection(Particle* particle)
                 if(collections_.at(i)->GetGeometry()->IsParticleInside(particle))
                 {
                     current_collection_ = collections_.at(i);
+                    crossed_collections.push_back(i);
                 }
             }
         }
@@ -518,6 +521,7 @@ void Propagator::ChooseCurrentCollection(Particle* particle)
                 if(collections_.at(i)->GetGeometry()->IsParticleInside(particle))
                 {
                     current_collection_ = collections_.at(i);
+                    crossed_collections.push_back(i);
                 }
             }
 
@@ -532,13 +536,80 @@ void Propagator::ChooseCurrentCollection(Particle* particle)
                 if(collections_.at(i)->GetGeometry()->IsParticleInside(particle))
                 {
                     current_collection_ = collections_.at(i);
+                    crossed_collections.push_back(i);
                 }
                 //The particle reached the border of all specified collections
                 else
                 {
-                    current_collection_ =   NULL;
+                    //JHK! Ich glaube das muss weg, weil es dann auf die sortierung ankommt
+                    // z.B. :
+                    // 1.   Myon ist in Geometry A, welches an der stelle 10 collections und nach durchgang
+                    //      durch den detektor ist. -> current_collection wird auf Geometrie A gesetzt.
+                    // 2.   Myon ist nicht in Geometry B, welches an Stelle 11 in collections und nach durchgang
+                    //      durch den detektor ist. -> current_collection wird auf NULL gesetzt
+                    // 3.   Damit hat der Algorithmus sofort vergessen, dass es A gegeben hat!
+                    //
+                    // Vielleicht tut die IsParticleInside funktion auch etwas, das das abfängt, aber mir fällt
+                    // gerade nichts ein.
+                    // Ich habe für überschneidende Medien den Vektor crossed_collections eingeführt. Über den
+                    // kann man das Theoretisch abfangen, wenn eine Grenze erreicht ist. Das mache ich mal weiter
+                    // unten.
+
+                    //current_collection_ =   NULL;
                 }
             }
+        }
+    }
+
+    //JHK! Ich glaube an der Stelle ist as ok.
+    if(crossed_collections.size() == 0)current_collection_ = NULL;
+
+
+    //Choose current collection when multiple collections are crossed!
+    //
+    //Choose by hirarchy of Geometry
+    //If same hirarchys are available the denser one is choosen
+    //If hirarchy and density are the same then the first found is taken.
+    //
+    for(unsigned int i = 0  ; i < crossed_collections.size() ;i++)
+    {
+        unsigned int ColNow     = crossed_collections.at(i);
+
+        //Current Hirachy is bigger -> Nothing to do!
+        //
+        if(current_collection_->GetGeometry()->GetHirarchy() >
+                collections_.at(ColNow)->GetGeometry()->GetHirarchy() )
+        {
+            continue;
+        }
+        //Current Hirachy is equal -> Look at the density!
+        //
+        else if( current_collection_->GetGeometry()->GetHirarchy() ==
+                 collections_.at(ColNow)->GetGeometry()->GetHirarchy() )
+        {
+            //Current Density is bigger or same -> Nothing to do!
+            //
+
+            if( current_collection_->GetMedium()->GetRho() >=
+                    collections_.at(ColNow)->GetMedium()->GetRho() )
+            {
+                continue;
+            }
+
+            //Current Density is smaller -> Set the new collection!
+            //
+            else
+            {
+                current_collection_ =  collections_.at(ColNow);
+            }
+
+        }
+
+        //Current Hirachy is smaller -> Set the new collection!
+        //
+        else
+        {
+            current_collection_ =  collections_.at(ColNow);
         }
     }
 
@@ -1451,6 +1522,9 @@ void Propagator::InitProcessCollections(ifstream &file)
     deque<string> *token = new deque<string>();
     string taux;
 
+    unsigned int hirarchy;
+    bool found_hirarchy = false;
+
     log_info("Reading sector informations");
     double ecut_inside  = -1;
     double ecut_infront = -1;
@@ -1485,6 +1559,7 @@ void Propagator::InitProcessCollections(ifstream &file)
     }
     Geometry *geometry  = new Geometry();
     InitGeometry(geometry,token,taux);
+    geometry->SetHirarchy(0);
 
     while(file.good())
     {
@@ -1502,7 +1577,23 @@ void Propagator::InitProcessCollections(ifstream &file)
             continue;
         }
 
-        if(ToLowerCase(taux).compare("inside")==0)
+        if(ToLowerCase(taux).compare("hirarchy")==0)
+        {
+            found_hirarchy = true;
+            taux = NextToken(token);
+            try
+            {
+                hirarchy  = boost::lexical_cast<unsigned int>(taux);
+            }
+            catch(boost::bad_lexical_cast&)
+            {
+                log_warn("Chosen hirarchy %s but must be an unsigned int! Set to 0.", taux.c_str());
+                hirarchy = 0;
+            }
+            geometry->SetHirarchy(hirarchy);
+            continue;
+        }
+        else if(ToLowerCase(taux).compare("inside")==0)
         {
             if(token->size()==3)
             {
@@ -1797,6 +1888,8 @@ void Propagator::InitProcessCollections(ifstream &file)
             exit(1);
         }
     }
+
+    if(!found_hirarchy)log_info("Hirarchy for geometry not set!");
 }
 
 

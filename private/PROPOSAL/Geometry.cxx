@@ -215,6 +215,7 @@ Geometry::Geometry()
     ,y_             ( 0. )
     ,z_             ( 0. )
     ,object_        ( "sphere" )
+    ,hirarchy_      (0)
 {
 
 }
@@ -234,6 +235,7 @@ Geometry::Geometry(const Geometry &geometry)
     ,y_             ( geometry.y_ )
     ,z_             ( geometry.z_ )
     ,object_        ( geometry.object_ )
+    ,hirarchy_      ( geometry.hirarchy_)
 {
 
 }
@@ -279,6 +281,8 @@ bool Geometry::operator==(const Geometry &geometry) const
 
     if( object_.compare(geometry.object_)!= 0 )     return false;
 
+    if( hirarchy_      != geometry.hirarchy_  )     return false;
+
     //else
     return true;
 }
@@ -303,6 +307,7 @@ ostream& operator<<(ostream& os, Geometry const& geometry)
     os<<"--------Geometry( "<<&geometry<<" )--------"<<endl;
     os<<"\t"<<geometry.object_<<endl;
     os<<"\tOrigin (x,y,z):\t"<<geometry.x0_<<"\t"<<geometry.y0_<<"\t"<<geometry.z0_<<endl;
+    os<<"\tHirarchy:\t"<<geometry.hirarchy_ << endl;
     if(geometry.object_.compare("sphere")==0)
     {
         os<<"\tRadius: "<<geometry.radius_<<"\tInner radius: "<<geometry.inner_radius_<<endl;
@@ -336,6 +341,7 @@ void Geometry::swap(Geometry &geometry)
     swap( x_             , geometry.x_ );
     swap( y_             , geometry.y_ );
     swap( z_             , geometry.z_ );
+    swap( hirarchy_      , geometry.hirarchy_ );
 
     object_.swap( geometry.object_ );
 }
@@ -1260,6 +1266,10 @@ void Geometry::SetRadius(double radius) {
 
 void Geometry::SetObject(string object) {
     object_ =   object;
+}
+
+void Geometry::SetHirarchy(unsigned int hirarchy) {
+    hirarchy_ =   hirarchy;
 }
 
 //----------------------------------------------------------------------------//
