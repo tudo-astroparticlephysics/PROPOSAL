@@ -1,4 +1,5 @@
 #include "TH1D.h"
+#include "TTree.h"
 #include "TCanvas.h"
 #include "PROPOSAL/Propagator.h"
 #include "TFile.h"
@@ -15,11 +16,12 @@ int main()
     pr->RandomDouble();
     double range;
 
-    int number_of_particles =   1e6;
+    int number_of_particles =   1e5;
     int OnePercent = number_of_particles/100;
     TH1D *range_hist = new TH1D("Range","Range distribution of muons with an energy of 9 TeV",64,0,1.2e6);
     TFile *file = new TFile("Range_distribution.root","RECREATE");
-
+    TTree *tree_range = new TTree("RangeTree","Range of the particles in a tree");
+    tree_range->Branch("range",&range);
 
 
     for(int i =0 ;i< number_of_particles; i++)
@@ -34,11 +36,15 @@ int main()
         range = p->GetPropagatedDistance();
 
         range_hist->Fill(range);
+        tree_range->Fill();
 
     }
     range_hist->GetXaxis()->SetTitle("range [cm]");
     range_hist->GetYaxis()->SetTitle("#");
     range_hist->Write();
+
+    tree_range->Print();
+    file->Write();
     file->Close();
 
 	return 0;

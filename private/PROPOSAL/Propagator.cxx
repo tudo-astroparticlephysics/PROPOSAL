@@ -116,6 +116,81 @@ vector<Particle*> Propagator::Propagate( Particle *particle )
 
         distance_to_collection_border =
         current_collection_->GetGeometry()->DistanceToBorder(particle_).first;
+        double tmp_distance_to_border;
+        for(unsigned int i = 0 ; i < collections_.size() ; i++)
+        {
+
+            if(particle->GetName().compare(collections_.at(i)->GetParticle()->GetName())!=0 )
+                continue;
+
+            if(detector_->IsParticleInfront(particle))
+            {
+                if(collections_.at(i)->GetLocation() != 0)
+                    continue;
+                else
+                {
+                    if(collections_.at(i)->GetGeometry()->GetHirarchy() >= current_collection_->GetGeometry()->GetHirarchy())
+                    {
+                        tmp_distance_to_border = collections_.at(i)->GetGeometry()->DistanceToBorder(particle_).first;
+                        if(tmp_distance_to_border<=0)continue;
+                        distance_to_collection_border = min(
+                                      tmp_distance_to_border
+                                    , distance_to_collection_border);
+                    }
+                }
+            }
+
+            else if(detector_->IsParticleInside(particle))
+            {
+                if(collections_.at(i)->GetLocation() != 1)
+                    continue;
+                else
+                {
+                    tmp_distance_to_border = collections_.at(i)->GetGeometry()->DistanceToBorder(particle_).first;
+                    if(tmp_distance_to_border<=0)continue;
+                    distance_to_collection_border = min(
+                                  tmp_distance_to_border
+                                , distance_to_collection_border);
+                }
+
+            }
+
+            else if(detector_->IsParticleBehind(particle))
+            {
+                if(collections_.at(i)->GetLocation() != 2)
+                    continue;
+                else
+                {
+                    if(collections_.at(i)->GetGeometry()->GetHirarchy() >= current_collection_->GetGeometry()->GetHirarchy())
+                    {
+                        tmp_distance_to_border = collections_.at(i)->GetGeometry()->DistanceToBorder(particle_).first;
+                        if(tmp_distance_to_border<=0)continue;
+                        distance_to_collection_border = min(
+                                      tmp_distance_to_border
+                                    , distance_to_collection_border);
+                    }
+                    //The particle reached the border of all specified collections
+                    else
+                    {
+                        //JHK! Ich glaube das muss weg, weil es dann auf die sortierung ankommt
+                        // z.B. :
+                        // 1.   Myon ist in Geometry A, welches an der stelle 10 collections und nach durchgang
+                        //      durch den detektor ist. -> current_collection wird auf Geometrie A gesetzt.
+                        // 2.   Myon ist nicht in Geometry B, welches an Stelle 11 in collections und nach durchgang
+                        //      durch den detektor ist. -> current_collection wird auf NULL gesetzt
+                        // 3.   Damit hat der Algorithmus sofort vergessen, dass es A gegeben hat!
+                        //
+                        // Vielleicht tut die IsParticleInside funktion auch etwas, das das abfängt, aber mir fällt
+                        // gerade nichts ein.
+                        // Ich habe für überschneidende Medien den Vektor crossed_collections eingeführt. Über den
+                        // kann man das Theoretisch abfangen, wenn eine Grenze erreicht ist. Das mache ich mal weiter
+                        // unten.
+
+                        //current_collection_ =   NULL;
+                    }
+                }
+            }
+        }
 
         distance_to_detector =
         detector_->DistanceToBorder(particle_).first;
@@ -590,8 +665,8 @@ void Propagator::ChooseCurrentCollection(Particle* particle)
             //Current Density is bigger or same -> Nothing to do!
             //
 
-            if( current_collection_->GetMedium()->GetRho() >=
-                    collections_.at(ColNow)->GetMedium()->GetRho() )
+            if( current_collection_->GetMedium()->GetMassDensity() >=
+                    collections_.at(ColNow)->GetMedium()->GetMassDensity() )
             {
                 continue;
             }

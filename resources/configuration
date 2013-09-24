@@ -151,6 +151,7 @@ global
 
 sector
     sphere  0   0   -6372186   1000000000  6374134
+    hirarchy 1
 
     inside  500     -1  0
     infront -1    0.05  1
@@ -160,6 +161,7 @@ sector
 
 sector
     sphere  0   0   -6372186   6374134  6373934
+    hirarchy 1
 
     inside  500     -1  0
     infront -1    0.05  1
@@ -169,6 +171,7 @@ sector
 
 sector
     sphere  0   0   -6372186   6373934  6371324
+    hirarchy 1
 
     inside  500     -1  0
     infront -1    0.05  1
@@ -178,6 +181,7 @@ sector
 
 sector
     sphere  0   0   -6372186   6371324  0
+    hirarchy 1
 
     inside  500     -1  0
     infront -1    0.05  1
@@ -187,14 +191,15 @@ sector
 
 
 
-#sector
-#    sphere  0   0   0   777777777777777777750  0
+sector
+    cylinder 0 0   500 1200 0   50
 
-#    inside  20     -1  0
-#    infront -1    0.05  1
-#    behind  -1      -1  0
+    hirarchy 0
+    inside  500     -1  0
+    infront -1    0.05  1
+    behind  -1      -1  0
 
-#    medium  uranium 1.
+    medium  uranium 1.
 
 # keyword detector must be followed by one line
 # geometry information
