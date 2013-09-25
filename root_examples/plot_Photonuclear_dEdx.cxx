@@ -69,7 +69,7 @@ int main()
         <<"-----------------------------------------------------------------\n"
         <<endl;
 
-    TFile *file     =   new TFile("Photonuclear_dEdx.root","RECREATE");
+    TFile *file     =   new TFile("Photonuclear_dEdxper_e.root","RECREATE");
 
     Particle *mu    =   new Particle("mu");
     Particle *tau   =   new Particle("tau");
@@ -250,7 +250,7 @@ int main()
 
             if(dEdx.at(i) !=0 )
             {
-                graphs.at(i)->SetPoint(counter.at(i),energy,dEdx.at(i));
+                graphs.at(i)->SetPoint(counter.at(i),energy,dEdx.at(i)/energy);
                 counter.at(i)++;
             }
         }

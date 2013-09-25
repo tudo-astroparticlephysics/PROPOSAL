@@ -113,6 +113,11 @@ target_link_libraries(PROPOSALtest PROPOSAL)
 
 execute_process(COMMAND ln -s ${CMAKE_SOURCE_DIR}/resources ${CMAKE_BINARY_DIR}/resources)
 
+add_executable(WriteSectorsFromDomList
+        private/test/WriteSectorsFromDomList.cxx
+)
+target_link_libraries(WriteSectorsFromDomList PROPOSAL)
+
 
 IF(DoTesting)
   execute_process(COMMAND mkdir ${PROPOSAL_BINARY_DIR}/bin/ OUTPUT_VARIABLE _output OUTPUT_STRIP_TRAILING_WHITESPACE)
