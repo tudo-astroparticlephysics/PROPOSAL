@@ -627,8 +627,8 @@ TEST(Epairproduction , Test_of_e_interpol ) {
                     cout << energy << "\t" << log10(fabs(1-e_new/e)) << endl;
                 }
             }
-            cout <<ecut << "\t" << vcut<< "\t" << lpm<< "\t" << energy<< "\t" << med<< "\t" << particleName << endl;
-            cout << "ctr: " << ctr++ << endl;
+            //cout <<ecut << "\t" << vcut<< "\t" << lpm<< "\t" << energy<< "\t" << med<< "\t" << particleName << endl;
+            //cout << "ctr: " << ctr++ << endl;
             EXPECT_NEAR(e_new, e, precision*e);
 
             in>>ecut>>vcut>>lpm>>energy>>med>>particleName>>e;
