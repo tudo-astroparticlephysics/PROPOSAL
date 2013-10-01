@@ -361,6 +361,7 @@ double Propagator::Propagate( double distance )
         flag    =   true;
     }
 
+    int NumInt = 0;//TOMASZ
     while(flag)
     {
         energy_till_stochastic_ = CalculateEnergyTillStochastic( initial_energy );
@@ -423,6 +424,7 @@ double Propagator::Propagate( double distance )
 
         if(particle_interaction_)
         {
+            NumInt++;//TOMASZ
             energy_loss     =   current_collection_->MakeStochasticLoss();
             final_energy    -=  energy_loss.first;
             secondary_id    =   particle_->GetParticleId() + 1;
@@ -482,6 +484,8 @@ double Propagator::Propagate( double distance )
     }
 //    }
 
+
+    //particle_->SetParticleId(NumInt); //TOMASZ: Hack to get the number of interactions
     particle_->SetEnergy(final_energy);
 
     //Particle reached the border, final energy is returned
