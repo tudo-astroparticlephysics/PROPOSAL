@@ -1215,10 +1215,13 @@ void Integral::RefineUpperLimit(double result)
     double deltaX, deltaOld, currentX, aux;
     double xlow, xhi, flow, fhi;
 
-//    if(randomNumber_==0 || randomNumber_==1)
-//    {
-//        return;
-//    }
+    //This was commented out but is necessary since
+    //it ensures to find a value if the searched integral value
+    //is out of integral range.
+    if(randomNumber_==0 || randomNumber_==1)
+    {
+        return;
+    }
 
     xlow    =   min_;
     xhi     =   max_;
