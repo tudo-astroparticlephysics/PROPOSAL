@@ -35,9 +35,13 @@ void ScatteringFirstOrder::Scatter(double dr, Particle* part, Medium* med)
 
         theta_max    =   1./SQRT2;
 
+        double rnd = RandomDouble();
+        rnd1    =   standard_normal_-> StandardNormalRandomNumber(rnd, 0, theta0, -theta_max, theta_max, false);
+        if(rnd1 != rnd1)cerr << rnd << "\t" << theta0 << "\t" << -theta_max << "\t" << theta_max << endl;
 
-        rnd1    =   standard_normal_-> StandardNormalRandomNumber(RandomDouble(), 0, theta0, -theta_max, theta_max, false);
-        rnd2    =   standard_normal_-> StandardNormalRandomNumber(RandomDouble(), 0, theta0, -theta_max, theta_max, false);
+        rnd = RandomDouble();
+        rnd2    =   standard_normal_-> StandardNormalRandomNumber(rnd, 0, theta0, -theta_max, theta_max, false);
+        if(rnd2 != rnd2)cerr << rnd << "\t" << theta0 << "\t" << -theta_max << "\t" << theta_max << endl;
         sx      =   (rnd1/SQRT3+rnd2)/2;
         tx      =   rnd2;
 
@@ -247,7 +251,7 @@ double ScatteringFirstOrder::CalculateTheta0(double dr, Particle* part, Medium* 
 {
     double y = dr/med->GetRadiationLength();
     double beta = 1./sqrt(1 +  part->GetMass() * part->GetMass()/ (part->GetMomentum()*part->GetMomentum() ));
-    y = 13.6/(part->GetMomentum()* beta ) *sqrt(y)*( 1.+0.038*log(y) );
+    y = 13.6/(part->GetMomentum()* beta ) *sqrt(y)*( 1.+0.088*log10(y) );
     return y;
 }
 

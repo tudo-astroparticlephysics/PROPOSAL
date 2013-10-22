@@ -640,6 +640,20 @@ double Integral::Function(double x)
         result  *=  t;
     }
     result  *=  integrand_(t);
+
+    if(result!=result)
+    {
+        if(integrand_(t) == 0 )
+        {
+            log_info("substitution not suitable! returning 0!");
+            return 0;
+        }
+        else
+        {
+        log_error("result is nan! returning 0");
+        return result;
+        }
+    }
     return result;
 }
 

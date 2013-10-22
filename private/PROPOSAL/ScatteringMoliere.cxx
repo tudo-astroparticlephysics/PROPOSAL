@@ -1,16 +1,18 @@
 #include <cmath>
 
-#include "boost/bind.hpp"
+#include <boost/math/special_functions/erf.hpp>
 
-#include "PROPOSAL/Coefficients.h"          //coefficients for calculating the power series approximation of the moliere function
-#include "PROPOSAL/ScatteringMoliere.h"
-
+#include "PROPOSAL/Coefficients.h"                  //coefficients for calculating the power series approximation of the moliere function
 #include "PROPOSAL/Constants.h"
 
+#include "PROPOSAL/ScatteringMoliere.h"
 
-#define E0CGS 4.803204197*1e-10                     //charge of an electron in (cm^(3/2)*g^(1/2))/s (Gauß-cgs)
-#define C 0.577215664901532860606512090082402431	//Euler-Mascheroni constant
 
+#define HBAR    6.58211928e-22                          //hbar in MeV*s
+#define C       0.577215664901532860606512090082402431	//Euler-Mascheroni constant
+
+#define erf(x)      boost::math::erf(x)
+#define erfInv(x)   boost::math::erf_inv(x)
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
@@ -32,13 +34,13 @@ void ScatteringMoliere::Scatter(double dr, Particle* part, Medium* med)
     p_           =   part->GetMomentum();
     m_           =   part->GetMass();
 
-    Z_.resize(numComp_);
+    Zi_.resize(numComp_);
     ki_.resize(numComp_);
     Ai_.resize(numComp_);
 
     for(int i = 0; i < numComp_; i++)
     {
-        Z_.at(i)     =   medium_->GetNucCharge().at(i);
+        Zi_.at(i)    =   medium_->GetNucCharge().at(i);
         ki_.at(i)    =   medium_->GetAtomInMolecule().at(i);
         Ai_.at(i)    =   medium_->GetAtomicNum().at(i);
     }
@@ -51,10 +53,6 @@ void ScatteringMoliere::Scatter(double dr, Particle* part, Medium* med)
     CalcChiASq();
     CalcChiCSq();
     CalcB();
-
-
-    thetaMax_    =  15.*sqrt(0.5*chiCSq_*20.);
-    // vaguely 15 sigma of the gaussian aprroximation (for B set to 20)
 
     //----------------------------------------------------------------------------//
 
@@ -158,11 +156,9 @@ void ScatteringMoliere::Scatter(double dr, Particle* part, Medium* med)
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-//new constructur as expected in PROPOSAL
 ScatteringMoliere::ScatteringMoliere()
 {
     MathMachine_ =   new MathModel();
-    IntMachine_  =   new Integral();
 }
 
 ScatteringMoliere::ScatteringMoliere(const ScatteringMoliere &scattering)
@@ -172,9 +168,8 @@ ScatteringMoliere::ScatteringMoliere(const ScatteringMoliere &scattering)
     ,m_(scattering.m_)
     ,numComp_(scattering.numComp_)
     ,chiCSq_(scattering.chiCSq_)
-    ,thetaMax_(scattering.thetaMax_)
 {
-    Z_       = scattering.Z_;
+    Zi_      = scattering.Zi_;
     ki_      = scattering.ki_;
     Ai_      = scattering.Ai_;
     weight_  = scattering.weight_;
@@ -200,56 +195,7 @@ ScatteringMoliere::ScatteringMoliere(const ScatteringMoliere &scattering)
     {
         MathMachine_ = NULL;
     }
-
-    if(scattering.IntMachine_ != NULL)
-    {
-        IntMachine_ = new Integral(*scattering.IntMachine_) ;
-    }
-    else
-    {
-        IntMachine_ = NULL;
-    }
 }
-
-/* This is the old constructur. The current version of PROPOSAL does require no transfer parameter for the constructor.
-ScatteringMoliere::ScatteringMoliere(double dr, Particle* part, Medium* med)
-{
-    MathMachine =   new MathModel();
-    IntMachine  =   new Integral();
-
-    dx          =   dr;
-    medium      =   med;
-
-    numComp     =   medium->GetNumComponents();
-
-    p           =   part->GetMomentum();
-    m           =   part->GetMass();
-
-    Z.resize(numComp);
-    ki.resize(numComp);
-    Ai.resize(numComp);
-
-    for(int i = 0; i < numComp; i++)
-    {
-        Z.at(i)     =   medium->GetNucCharge().at(i);
-        ki.at(i)    =   medium->GetAtomInMolecule().at(i);
-        Ai.at(i)    =   medium->GetAtomicNum().at(i);
-    }
-
-    CalcBetaSq();
-
-    CalcWeight();
-
-    CalcChi0();
-    CalcChiASq();
-    CalcChiCSq();
-    CalcB();
-
-
-    phiMax      =   15.*sqrt(0.5*chiCSq*20.);
-    // vaguely 15 sigma of the gaussian aprroximation (for B set to 20)
-}
-*/
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
@@ -280,7 +226,7 @@ bool ScatteringMoliere::operator==(const ScatteringMoliere &scattering) const
     if(this->chiASq_  != scattering.chiASq_)    return false;
     if(this->ki_      != scattering.ki_)        return false;
     if(this->weight_  != scattering.weight_)    return false;
-    if(this->Z_       != scattering.Z_)         return false;
+    if(this->Zi_      != scattering.Zi_)         return false;
 
     if(this->dx_         != scattering.dx_ )          return false;
     if(this->betaSq_     != scattering.betaSq_ )      return false;
@@ -288,11 +234,9 @@ bool ScatteringMoliere::operator==(const ScatteringMoliere &scattering) const
     if(this->m_          != scattering.m_ )           return false;
     if(this->numComp_    != scattering.numComp_ )     return false;
     if(this->chiCSq_     != scattering.chiCSq_ )      return false;
-    if(this->thetaMax_   != scattering.thetaMax_ )    return false;
 
     if(*(this->medium_)          != *(scattering.medium_) )       return false;
 //    if(*(this->MathMachine)     != *(scattering.MathMachine) )  return false;
-    if(*(this->IntMachine_)      != *(scattering.IntMachine_) )   return false;
     return true;
 }
 
@@ -314,7 +258,7 @@ void ScatteringMoliere::swap(ScatteringMoliere &scattering)
 {
     using std::swap;
 
-    swap(this->Z_ , scattering.Z_);
+    swap(this->Zi_ , scattering.Zi_);
     swap(this->ki_ , scattering.ki_);
     swap(this->Ai_ , scattering.Ai_);
     swap(this->weight_ , scattering.weight_);
@@ -328,7 +272,6 @@ void ScatteringMoliere::swap(ScatteringMoliere &scattering)
     swap(this->m_ , scattering.m_);
     swap(this->numComp_ , scattering.numComp_);
     swap(this->chiCSq_ , scattering.chiCSq_);
-    swap(this->thetaMax_ , scattering.thetaMax_);
 
     if(scattering.medium_ != NULL)
     {
@@ -346,15 +289,6 @@ void ScatteringMoliere::swap(ScatteringMoliere &scattering)
     else
     {
         MathMachine_ = NULL;
-    }
-
-    if(scattering.IntMachine_ != NULL)
-    {
-        IntMachine_->swap(*scattering.IntMachine_) ;
-    }
-    else
-    {
-        IntMachine_ = NULL;
     }
 }
 
@@ -404,7 +338,7 @@ void ScatteringMoliere::CalcChi0()
 
     for(int i = 0; i < numComp_; i++)
     {
-        chi0_.at(i) = ( ME*ALPHA*pow(Z_.at(i)*128./(9.*PI*PI), 1./3.) )/p_ ;
+        chi0_.at(i) = ( ME*ALPHA*pow(Zi_.at(i)*128./(9.*PI*PI), 1./3.) )/p_ ;
     }
 }
 
@@ -416,7 +350,7 @@ void ScatteringMoliere::CalcChiASq()
 
     for(int i = 0; i < numComp_; i++)
     {
-        chiASq_.at(i) = chi0_.at(i)*chi0_.at(i)*( 1.13+3.76*Z_.at(i)*Z_.at(i)*ALPHA*ALPHA/betaSq_ );
+        chiASq_.at(i) = chi0_.at(i)*chi0_.at(i)*( 1.13+3.76*ALPHA*ALPHA*Zi_.at(i)*Zi_.at(i)/betaSq_ );
     }
 }
 
@@ -429,11 +363,14 @@ void ScatteringMoliere::CalcChiCSq()
 
     for(int i = 0; i < numComp_; i++)
     {
-        y1 += weight_.at(i)*Z_.at(i)*(Z_.at(i)+1.);
+        //if case of an electron, replace Z² by Z(Z+1) to into account scatterings
+        //on atomic electrons in the medium
+        if(m_ == ME) y1 += weight_.at(i)*Zi_.at(i)*(Zi_.at(i)+1.);
+        else y1 += weight_.at(i)*Zi_.at(i)*Zi_.at(i);
         y2 += weight_.at(i)*Ai_.at(i);
     }
 
-    chiCSq_ = ( (4.*PI*NA*pow(E0CGS, 4.)/(1e26*E0*E0))*(medium_->GetMassDensity()*medium_->GetRho()*dx_) / (p_*p_*betaSq_) ) * ( y1/y2 );
+    chiCSq_ = ( (4.*PI*NA*ALPHA*ALPHA*HBAR*HBAR*SPEED*SPEED)*(medium_->GetMassDensity()*medium_->GetRho()*dx_) / (p_*p_*betaSq_) ) * ( y1/y2 );
 }
 
 
@@ -462,26 +399,45 @@ void ScatteringMoliere::CalcB()
 double ScatteringMoliere::f1M(double x)
 {
     // approximation for large numbers to avoid numerical errors
-    if(x < -12.) return 0.5*sqrt(PI)/( pow(-x, 1.5)*pow(1.+4.5/x, 2./3.) );
+    if(x > 12.) return 0.5*sqrt(PI)/( pow(x, 1.5)*pow(1.-4.5/x, 2./3.) );
 
-    double sum = coeff1[69];
+    double sum = c1[69];
 
     // Horner's method
-    for(int n = 68; n >= 0; n--) sum = sum*x+coeff1[n];
+    for(int p = 68; p >= 0; p--) sum = sum*x+c1[p];
 
     return sum;
 }
 
 //----------------------------------------------------------------------------//
 
+double f2Mlarge(double x)
+{
+    double a = 0.00013567765224589459194769192063035;
+    double b = -0.0022635502525409950842771866774683;
+    double c = 0.0098037758070269476889935233998585;
+
+    // the junction of both parametrizations is smoothed by an interpolation parabola
+    if((x >= 4.25*4.25) && (x <= 6.5*6.5)) return a*x+b*sqrt(x)+c;
+
+    double sum = 0;
+
+    for(int p = 2; p < 13; p++)
+    {
+        sum += c2large[p]*(0.5*log(x)+s2large[p])*pow(x, -(p+0.5));
+    }
+
+    return sum;
+}
+
 double ScatteringMoliere::f2M(double x)
 {
-    // approximation for large numbers to avoid numerical errors
-    if(x < -19.) return 0.;
+    // approximation for larger x to avoid numerical errors
+    if(x > 4.25*4.25) return f2Mlarge(x);
 
-    double sum = coeff2[69];
+    double sum = c2[69];
 
-    for(int n = 68; n >= 0; n--) sum = sum*x+coeff2[n];
+    for(int p = 68; p >= 0; p--) sum = sum*x+c2[p];
 
     return sum;
 }
@@ -495,133 +451,128 @@ double ScatteringMoliere::f(double theta)
 
     for(int i = 0; i < numComp_; i++)
     {
-        double x = -theta*theta/(chiCSq_*B_.at(i));
+        double x = theta*theta/(chiCSq_*B_.at(i));
 
-        y1 += weight_.at(i)*Z_.at(i)*Z_.at(i)/sqrt( chiCSq_*B_.at(i)*PI )*( exp(x) + f1M(x)/B_.at(i) + f2M(x)/(B_.at(i)*B_.at(i)) );
-        y2 += weight_.at(i)*Z_.at(i)*Z_.at(i);
+        y1 += weight_.at(i)*Zi_.at(i)*Zi_.at(i)/sqrt( chiCSq_*B_.at(i)*PI )*( exp(-x) + f1M(x)/B_.at(i) + f2M(x)/(B_.at(i)*B_.at(i)) );
+        y2 += weight_.at(i)*Zi_.at(i)*Zi_.at(i);
     }
 
     return y1/y2;
 }
 
 //----------------------------------------------------------------------------//
-//-------------------------generate random angle------------------------------//
+//----------------------calculate indefinite integral-------------------------//
 //----------------------------------------------------------------------------//
 
-int ScatteringMoliere::BinarySearch(int n, const double *array, double value)
+double F1Mlarge(double x)
 {
-    // Binary search in an array of n values to locate value.
-    //
-    // Array is supposed  to be sorted prior to this call.
-    // If match is found, function returns position of element.
-    // If no match found, function gives nearest element smaller than value.
+    double sum = C1large[14];
 
-    const double* pind;
-    pind = lower_bound(array, array + n, value);
+    // Horner's method
+    for(int p = 13; p >= 0; p--) sum = C1large[p] + sum/x;
 
-    if ( (pind != array + n) && (*pind == value) )
-    {
-        return (pind - array);
-    }
-    else
-    {
-        return ( pind - array - 1);
-    }
+    return sum;
+}
+
+double ScatteringMoliere::F1M(double x)
+{
+    if(x > 12.) return F1Mlarge(x);
+
+    double sum = c1[69]/(2.*69+1.);
+
+    // Horner's method
+    for(int p = 68; p >= 0; p--) sum = sum*x+c1[p]/(2.*p+1.);
+
+    return sum*sqrt(x);
 }
 
 //----------------------------------------------------------------------------//
 
-double ScatteringMoliere::GetRandom()
+double F2Mlarge(double x)
 {
-   // Return a random number following this function shape in [-thetaMax,thetaMax]
-   //
-   //   The distribution function must be normalized to 1.
-   //   For each bin the integral is approximated by a parabola.
-   //   The parabola coefficients are stored as non persistent data members
-   //   Getting one random number implies:
-   //     - Generating a random number between 0 and 1
-   //     - Looking in which bin in the normalized integral corresponds to
-   //     - Evaluate the parabolic curve in the selected bin to find
-   //       the corresponding x value.
+    double a = -0.00026360133958801203364619158975302;
+    double b = 0.0039965027465457608410459577896745;
+    double c = -0.016305842044996649714549974419242;
 
+    // the junction of both parametrizations is smoothed by an interpolation parabola
+    if((x >= 4.25*4.25) && (x <= 6.5*6.5)) return a*x+b*sqrt(x)+c;
 
-    const int NumBin = 100;
-    double dtheta = 2.*thetaMax_/NumBin;
+    double sum = 0;
 
-    double* integral = new double[NumBin+1];
-    double* alpha    = new double[NumBin];
-    double* beta     = new double[NumBin];
-    double* gamma    = new double[NumBin];
-
-    integral[0] =   0;
-    double integ;
-    double x0, r1, r2, r3;
-
-    int i;
-    for (i = 0; i < NumBin; i++)
+    for(int p = 2; p < 13; p++)
     {
-        x0      =   -thetaMax_+i*dtheta;
-
-        integ   =   IntMachine_->Integrate(x0, x0+dtheta, boost::bind(&ScatteringMoliere::f, this, _1), 2, 0);
-
-        integral[i+1] = integral[i] + integ;
-
-    //the integral r for each bin is approximated by a parabola
-    //  x = alpha + beta*r +gamma*r²
-    // compute the coefficients alpha, beta, gamma for each bin
-
-        x0      =   -thetaMax_+i*dtheta;
-
-        r2      =   integ;
-        r1      =   IntMachine_->Integrate(x0,x0+0.5*dtheta, boost::bind(&ScatteringMoliere::f, this, _1), 2, 0);
-        r3      =   2.*r2 - 4.*r1;
-
-        if (abs(r3) > 1e-8)
-        {
-            gamma[i] = r3/(dtheta*dtheta);
-        }
-        else
-        {
-            gamma[i] = 0;
-        }
-
-        beta[i] =   r2/dtheta - gamma[i]*dtheta;
-        alpha[i] =  x0;
-        gamma[i] *= 2.;
+        sum += -0.5*c2large[p]/p*(0.5/p+0.5*log(x)+s2large[p])*pow(x, -p);
     }
 
+    return sum;
+}
 
-    // return random number
-    int nbinmin =   0;
-    int nbinmax =   (int)(2.*thetaMax_/dtheta)+2;
-    if(nbinmax > NumBin) nbinmax=NumBin;
+double ScatteringMoliere::F2M(double x)
+{
+    if(x > 4.25*4.25) return F2Mlarge(x);
 
-    double pmin =   integral[nbinmin];
-    double pmax =   integral[nbinmax];
+    double sum = c2[69]/(2.*69+1.);
 
-    double r, thetaRndm, xx, rr;
+    for(int p = 68; p >= 0; p--) sum = sum*x+c2[p]/(2.*p+1.);
+
+    return sum*sqrt(x);
+}
+
+//----------------------------------------------------------------------------//
+
+double ScatteringMoliere::F(double theta)
+{
+    double y1 = 0;
+    double y2 = 0;
+
+    for(int i = 0; i < numComp_; i++)
+    {
+        double x = theta*theta/(chiCSq_*B_.at(i));
+
+        y1 += weight_.at(i)*Zi_.at(i)*Zi_.at(i)*( 0.5*erf(sqrt(x)) + sqrt(1./PI)*( F1M(x)/B_.at(i) + F2M(x)/(B_.at(i)*B_.at(i)) ) );
+        y2 += weight_.at(i)*Zi_.at(i)*Zi_.at(i);
+    }
+
+    return (theta < 0.) ? (-1.)*y1/y2 : y1/y2;
+}
+
+//----------------------------------------------------------------------------//
+//-------------------------generate random angle------------------------------//
+//----------------------------------------------------------------------------//
+
+
+double ScatteringMoliere::GetRandom()
+{
+    //  Generate random angles following Moliere's distribution by comparing a
+    //  uniformly distributed random number with the integral of the distribution.
+    //  Therefore, determine the angle where the integral is equal to the random number.
+
+
+    //rndm element of ]-0.5,0.5]
+    double rndm = (MathMachine_->RandomDouble()-0.5);
+
+
+    // Newton-Raphson method:
+    double theta_n;
+
+        // guessing an initial value by assuming a gaussian distribution
+        // only regarding the component j with maximum weight
+
+    int j = 0;
+    for(int i = 0; i+1 < numComp_; i++)
+    {
+        if( weight_.at(i+1) > weight_.at(i) ) j = i+1;
+    }
+    double theta_np1 = sqrt( chiCSq_*B_.at(j) )*erfInv(2.*rndm);
+
+        // iterating until the number of correct digits is greater than 4
 
     do
     {
-        r       =   pmin + (pmax-pmin)*MathMachine_->RandomDouble();
+        theta_n = theta_np1;
+        theta_np1 = theta_n - (F(theta_n)-rndm)/f(theta_n);
 
-        int bin =   BinarySearch(NumBin, integral, r);
+    } while( abs((theta_n-theta_np1)/theta_np1) > 1e-4 );
 
-        rr      =   r - integral[bin];
-
-        if(gamma[bin] != 0)
-        {
-            xx  =   (-beta[bin] + sqrt(beta[bin]*beta[bin]+2.*gamma[bin]*rr))/gamma[bin];
-        }
-        else
-        {
-            xx  =   rr/beta[bin];
-        }
-        thetaRndm =   alpha[bin] + xx;
-
-    } while( (thetaRndm<-thetaMax_) || (thetaRndm > thetaMax_) );
-
-
-    return thetaRndm;
-
+    return theta_np1;
 }

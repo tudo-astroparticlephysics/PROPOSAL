@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include "PROPOSAL/Bremsstrahlung.h"
 #include "PROPOSAL/Integral.h"
 #include "PROPOSAL/Medium.h"
@@ -25,7 +26,7 @@ using namespace std;
 
 int main(int argc, char** argv)
 {
-
+/*
     Propagator *pr = new Propagator("resources/configuration");
     pr->set_seed(1234);
     cout << "blah!" << endl;
@@ -53,5 +54,89 @@ int main(int argc, char** argv)
           std::cout<<"operator==: "<< ( vector1 == vector3 ) <<'\n';
      vector3 = vector2;
      std::cout<<"operator==: "<< ( vector1 == vector3 ) <<'\n';
+*/
 
+
+    // Test ScatteringMoliere
+
+    // scattering angle
+
+    ScatteringMoliere *scat1 = new ScatteringMoliere();
+
+    Particle *part1 = new Particle("mu",0,0,0,0,0,7.3e3,0);
+    Medium *medi1 = new Medium("salt", 1.);
+
+    scat1->Scatter(1.44,part1,medi1);
+
+    ofstream out1;
+    out1.open("test_salt_getrndm.txt");
+
+    double divisor = 1;
+    for(int i = 0; i < 1e7/divisor; i++)
+    {
+        out1 << scat1->GetRandom() << std::endl;
+    }
+
+    out1.close();
+
+    // now : theta
+
+    ScatteringMoliere *scat2 = new ScatteringMoliere();
+
+    Medium *medi2 = new Medium("salt", 1.);
+    Particle *part2;
+
+
+    ofstream out2;
+    out2.open("test_salt_theta.txt");
+
+    for(int i = 0; i < 1e6/divisor; i++)
+    {
+        part2 = new Particle("mu",0,0,0,0,0,7.3e3,0);
+
+        scat2->Scatter(1.44,part2,medi2);
+
+        out2 << part2->GetTheta() << std::endl;
+    }
+
+    out2.close();
+
+
+
+    // Test ScatteringFirstOrder (Highland)
+    ScatteringFirstOrder *scat = new ScatteringFirstOrder();
+
+    Particle *part = new Particle("mu",0,0,0,0,0,7.3e3,0);
+    Medium *medi = new Medium("salt", 1.);
+
+    std::cout << scat->CalculateTheta0(1.44,part, medi ) << std::endl;
+
+
+    ofstream out;
+    out.open("test_firstorder.txt");
+
+    double X;
+
+    double x = 1./0.;
+    double Zero=0.;
+    double Nan = sqrt(-1.);
+    cerr << "x: " << x << endl;
+    cerr << "x/0. : " << x/Zero << endl;
+    cerr << "x*0 : " << x*Zero << endl;
+    cerr << "Sqrt(-1) : " << Nan << endl;
+
+    for(int i = 0; i < 1e6/divisor; i++)
+    {
+        part = new Particle("mu",0,0,0,0,0,7.3e3,0);
+
+        scat->Scatter(1.44,part, medi );
+
+        X = part->GetTheta();
+
+        if(X == X) out << X << std::endl;
+    }
+
+    out.close();
 }
+
+

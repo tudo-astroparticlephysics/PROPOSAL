@@ -8,7 +8,6 @@
 #include "PROPOSAL/Particle.h"
 
 #include "PROPOSAL/MathModel.h"
-#include "PROPOSAL/Integral.h"
 
 using namespace std;
 
@@ -25,7 +24,7 @@ private:
     //medium
     Medium* medium_;
     int numComp_;                //number of components in medium
-    vector<double> Z_;           //nuclear charge of different components
+    vector<double> Zi_;          //nuclear charge of different components
     vector<double> ki_;          //number of atoms in molecule of different components
     vector<double> Ai_;          //atomic number of different components
     vector<double> weight_;      //mass weights of different components
@@ -37,11 +36,8 @@ private:
     double chiCSq_;              //characteristic angle² in rad²
     vector<double> B_;
 
-    double thetaMax_;              //maximum randomly generated angle
-
 
     MathModel* MathMachine_;
-    Integral* IntMachine_;
 
 
 public:
@@ -49,8 +45,6 @@ public:
     //constructor
     ScatteringMoliere();
     ScatteringMoliere(const ScatteringMoliere &);
-    //Old constructor
-    //ScatteringMoliere(double dr, Particle* part, Medium* med);
     ScatteringMoliere& operator=(const ScatteringMoliere&);
     bool operator==(const ScatteringMoliere &scattering) const;
     bool operator!=(const ScatteringMoliere &scattering) const;
@@ -83,8 +77,6 @@ public:
     void SetB(vector<double> b) { B_ = b; }
     void SetB(unsigned int i, double b) { B_.at(i) = b; }
 
-    void SetThetaMax(double b) { thetaMax_ = b; }
-
 //----------------------------------------------------------------------------//
 
     double GetBetaSq() { return betaSq_; }
@@ -104,8 +96,6 @@ public:
         return chiCBSq;
     }
 
-    double GetThetaMax() { return thetaMax_; }
-
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
@@ -114,10 +104,14 @@ public:
 
     double f(double theta);
 
+    double F1M(double x);
+    double F2M(double x);
+
+    double F(double theta);
+
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-    int BinarySearch(int n, const double *array, double value);
     double GetRandom();
 
 //----------------------------------------------------------------------------//
