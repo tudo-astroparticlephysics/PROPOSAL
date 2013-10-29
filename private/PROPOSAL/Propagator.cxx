@@ -1221,6 +1221,7 @@ Propagator::Propagator()
     ,path_to_tables_            ( "" )
     ,raw_                       ( false )
     ,scattering_model_          (-1)
+    ,current_collection_        (NULL)
 {
     particle_              = new Particle("mu");
     detector_              = new Geometry();
@@ -1276,6 +1277,7 @@ Propagator::Propagator(Medium* medium,
     ,path_to_tables_            ( path_to_tables )
     ,raw_                       ( true )
     ,scattering_model_          (scattering_model)
+    ,current_collection_        (NULL)
 {
     particle_              = new Particle(particle_type);
     current_collection_    = new ProcessCollection(particle_, medium, cuts);
@@ -1385,6 +1387,7 @@ Propagator::Propagator(string config_file)
     ,path_to_tables_            ( "" )
     ,raw_                       ( false )
     ,scattering_model_          (-1)
+    ,current_collection_        (NULL)
 {
     ReadConfigFile(config_file);
 }
