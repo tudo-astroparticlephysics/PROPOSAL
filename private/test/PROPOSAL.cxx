@@ -19,6 +19,9 @@
 #include <log4cplus/layout.h>
 #include <iomanip>
 
+#include <time.h>
+
+
 using namespace log4cplus;
 using namespace std;
 
@@ -26,25 +29,180 @@ using namespace std;
 
 int main(int argc, char** argv)
 {
-    Medium *med = new Medium("ice",1);
+    /*Medium *med = new Medium("ice",1);
         EnergyCutSettings *ecuts = new EnergyCutSettings();
 
-        Particle *part = new Particle("mu");
-        part->SetEnergy(10e6);
-        part->SetPropagatedDistance(5e5);
 
         Propagator *prop = new Propagator("resources/configuration_IceOnly");
 
+        Particle *part[100];
 
         prop->set_seed(142);
-        prop->SetParticle(part);
+
+        ofstream out;
+        out.precision(5);
+        out.open("punktwolke.txt");
+
+        for(int n = 0; n < 100; n++)
+        {
+            part[n] = new Particle("mu");
+            part[n]->SetEnergy(10e6);
+            part[n]->SetPropagatedDistance(5e5);
+
+            prop->SetParticle(part[n]);
+            prop->Propagate(part[n], out);
+
+            //Trigger für ROOT einen neuen Graphen zu erstellen
+            out << 99999 << "\n";
+
+        }
+
+        out.close();
+        */
 
 
-        prop->Propagate(part);
+    // Initialisierung Teilchen und Scattering-Objekt
+    Particle *part = new Particle("mu");
+    part->SetEnergy(1e5);
 
-        std::cout << "GetX = " << part->GetX() << std::endl;
-        std::cout << "GetY = " << part->GetY() << std::endl;
-        std::cout << "GetZ = " << part->GetZ() << std::endl;
+
+    std::cout.precision(16);
+
+    ScatteringMoliere *mol = new ScatteringMoliere();
+    ScatteringFirstOrder *high = new ScatteringFirstOrder();
+
+    //Initialisierung Zeitmesser (N Zeitmessungen)
+    const int N = 50;
+    clock_t start, end;
+    double cpu_time_used[N];
+    double mean, stdabw;
+
+
+    //Antareswasser 10 m
+
+    Medium *med = new Medium("antares_water",1.);
+
+    //Moliere
+    mean = 0;
+
+    for(int n = 0;n<N;n++)
+    {
+        start = clock();
+
+        for(int i = 0; i < 1e5; i++) mol->Scatter(1e3,part,med);
+
+        end = clock();
+        cpu_time_used[n] = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+        mean += cpu_time_used[n];
+    }
+
+    //Mittelwert und Fehler des Mittelwerts
+    mean /=N;
+
+    stdabw = 0;
+
+    for(int i = 0; i<N; i++)
+    {
+        stdabw += (cpu_time_used[i]-mean)*(cpu_time_used[i]-mean);
+    }
+
+    stdabw = sqrt(1./(N*(N-1))*stdabw);
+
+    std::cout << "Antareswasser Moliere : " << mean << "+-" << stdabw << endl;
+
+    //Highland
+    mean = 0;
+
+    for(int n = 0;n<N;n++)
+    {
+        start = clock();
+
+        for(int i = 0; i < 1e5; i++) high->Scatter(1e3,part,med);
+
+        end = clock();
+        cpu_time_used[n] = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+        mean += cpu_time_used[n];
+    }
+
+    //Mittelwert und Fehler des Mittelwerts
+    mean /=N;
+
+    stdabw = 0;
+
+    for(int i = 0; i<N; i++)
+    {
+        stdabw += (cpu_time_used[i]-mean)*(cpu_time_used[i]-mean);
+    }
+
+    stdabw = sqrt(1./(N*(N-1))*stdabw);
+
+    std::cout << "Antareswasser Highland : " << mean << "+-" << stdabw << endl;
+
+
+
+    //Eis 10 m
+    med = new Medium("ice",1.);
+
+    //Moliere
+    mean = 0;
+
+        for(int n = 0;n<N;n++)
+        {
+            start = clock();
+
+            for(int i = 0; i < 1e5; i++) mol->Scatter(1e3,part,med);
+
+            end = clock();
+            cpu_time_used[n] = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+            mean += cpu_time_used[n];
+        }
+
+        //Mittelwert und Fehler des Mittelwerts
+        mean /=N;
+
+        stdabw = 0;
+
+        for(int i = 0; i<N; i++)
+        {
+            stdabw += (cpu_time_used[i]-mean)*(cpu_time_used[i]-mean);
+        }
+
+        stdabw = sqrt(1./(N*(N-1))*stdabw);
+
+        std::cout << "Eis Moliere : " << mean << "+-" << stdabw << endl;
+
+        //Highland
+        mean = 0;
+
+        for(int n = 0;n<N;n++)
+        {
+            start = clock();
+
+            for(int i = 0; i < 1e5; i++) high->Scatter(1e3,part,med);
+
+            end = clock();
+            cpu_time_used[n] = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+            mean += cpu_time_used[n];
+        }
+
+        //Mittelwert und Fehler des Mittelwerts
+        mean /=N;
+
+        stdabw = 0;
+
+        for(int i = 0; i<N; i++)
+        {
+            stdabw += (cpu_time_used[i]-mean)*(cpu_time_used[i]-mean);
+        }
+
+        stdabw = sqrt(1./(N*(N-1))*stdabw);
+
+        std::cout << "Eis Highland : " << mean << "+-" << stdabw << endl;
+
 
 }
 

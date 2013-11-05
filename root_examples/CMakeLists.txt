@@ -15,7 +15,7 @@ add_executable(Plot_Photonuclear_dEdx plot_Photonuclear_dEdx.cxx)
 add_executable(Plot_Photonuclear_dNdx plot_Photonuclear_dNdx.cxx)
 add_executable(Plot_rel_Bremsstrahlung_dEdx plot_rel_brems_dEdx.cxx)
 add_executable(Total_dEdx Total_dEdx.cxx)
-
+add_executable(Plot_StandardNormal plot_StandardNormal.cxx)
 add_executable(Draw_Track draw_track.cxx)
 
 
@@ -67,3 +67,5 @@ target_link_libraries(Draw_Track PROPOSAL)
 target_link_libraries(Total_dEdx ${ROOT_LIBRARIES})
 target_link_libraries(Total_dEdx PROPOSAL)
 
+target_link_libraries(Plot_StandardNormal ${ROOT_LIBRARIES})
+target_link_libraries(Plot_StandardNormal PROPOSAL)
