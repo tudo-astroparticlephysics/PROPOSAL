@@ -356,6 +356,12 @@ ContinuousRandomization::ContinuousRandomization()
     dE2de_interpolant_      =   NULL;
     dE2de_interpolant_diff_ =   NULL;
 
+    EnergyCutSettings* cutsettings = new EnergyCutSettings(500,0.01);
+    cross_sections_.push_back(new Ionization(particle_,medium_,cutsettings));
+    cross_sections_.push_back(new Bremsstrahlung(particle_,medium_,cutsettings));
+    cross_sections_.push_back(new Epairproduction(particle_,medium_,cutsettings));
+    cross_sections_.push_back(new Photonuclear(particle_,medium_,cutsettings));
+
 }
 
 
