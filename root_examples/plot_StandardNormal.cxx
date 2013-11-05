@@ -19,6 +19,14 @@ using namespace std;
 
 int main()
 {
+    cout<<"\n----------------------------------------------------------------\n"
+        <<"This is an example comparison plot of the implemented class\n"
+        <<"StandardNormal and the boost function erf_inv(x).\n"
+        <<"A file StandardNormal_Comparison.root will be created.\n"
+        <<"The index i means that the resulting value is derived by \n"
+        <<"using interpolation of derived sampling points.\n"
+        <<"----------------------------------------------------------------\n"
+        <<endl;
 
     double sigma        =2e-3;
 
@@ -30,8 +38,8 @@ int main()
 
     int Nbins   =   100/2;
 
-    TRandom3 *Gen = new TRandom3(1234);
 
+    TRandom3 *Gen;
     StandardNormal* PropStd     = new StandardNormal();
     StandardNormal* PropStd_i   = new StandardNormal();
     PropStd_i->EnableInterpolation("",false);
@@ -48,19 +56,36 @@ int main()
 
     int NSamples = (int)1e6;
 
+    cout << "Calculating " << NSamples << " points...\n";
+
+    Gen = new TRandom3(1234);
+    cout << "StandardNormal...\n";
     for(int i=0; i<NSamples ; i++)
     {
         rnd = Gen->Rndm();
-
         rnd_PropStd     = PropStd->StandardNormalRandomNumber(rnd,0,sigma,Xlow,Xup,false);
-        rnd_PropStd_i   = PropStd_i->StandardNormalRandomNumber(rnd,0,sigma,Xlow,Xup,false);
-        rnd_Boost       = SQRT2*sigma*erfInv( 2*(rnd-0.5) );
-
         Hist_PropStd->Fill(rnd_PropStd);
+    }
+
+    Gen = new TRandom3(1234);
+    cout << "StandardNormal interpolation...\n";
+    for(int i=0; i<NSamples ; i++)
+    {
+        rnd = Gen->Rndm();
+        rnd_PropStd_i   = PropStd_i->StandardNormalRandomNumber(rnd,0,sigma,Xlow,Xup,false);
         Hist_PropStd_i->Fill(rnd_PropStd_i);
+    }
+
+    Gen = new TRandom3(1234);
+    cout << "Boost erf_inv...\n";
+    for(int i=0; i<NSamples ; i++)
+    {
+        rnd = Gen->Rndm();
+        rnd_Boost       = SQRT2*sigma*erfInv( 2*(rnd-0.5) );
         Hist_BoostStd->Fill(rnd_Boost);
     }
 
+    cout << "Done!\n";
     Hist_PropStd->GetXaxis()->SetTitle("sigma");
     Hist_PropStd->GetYaxis()->SetTitle("#");
     Hist_PropStd->SetLineColor(kBlue);
@@ -113,5 +138,7 @@ int main()
 
     file->Write();
     file->Close();
+
+    cout << "StandardNormal_Comparison.root created" << endl;
 	return 0;
 }
