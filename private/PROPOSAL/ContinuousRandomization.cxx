@@ -25,13 +25,29 @@ double ContinuousRandomization::Randomize(double initial_energy, double final_en
 {
     double sigma,xhi,xlo,rndtmp;
 
+//this happens if small distances are propagated and the
+//energy loss is so small that it is smaller than the precision
+//which is checked for in during the calculation.
+    if(initial_energy == final_energy)
+    {
+        return final_energy;
+    }
+
     sigma   =   sqrt( DE2de(initial_energy, final_energy) );
 
+//It is not drawn from the real gaus distribution but rather from the
+//area which is possible due to the limits of the initial energy and the
+//particle mass. Another possibility would be to draw again but that would be
+//more expensive.
+//
+//calculate the allowed region
     xhi     =   0.5+boost::math::erf((initial_energy        -final_energy)  /(SQRT2*sigma))/2;
     xlo     =   0.5+boost::math::erf((particle_->GetLow()   -final_energy)  /(SQRT2*sigma))/2;
 
+//draw random number from the allowed region.
     rndtmp =  xlo + (xhi-xlo)*rnd;
 
+//Calculate and return the needed value.
     return SQRT2*sigma*erfInv( 2*(rndtmp-0.5) )+final_energy;
 }
 
