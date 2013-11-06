@@ -65,6 +65,7 @@ int main()
         rnd = Gen->Rndm();
         rnd_PropStd     = PropStd->StandardNormalRandomNumber(rnd,0,sigma,Xlow,Xup,false);
         Hist_PropStd->Fill(rnd_PropStd);
+        break;
     }
 
     Gen = new TRandom3(1234);
@@ -74,6 +75,7 @@ int main()
         rnd = Gen->Rndm();
         rnd_PropStd_i   = PropStd_i->StandardNormalRandomNumber(rnd,0,sigma,Xlow,Xup,false);
         Hist_PropStd_i->Fill(rnd_PropStd_i);
+                break;
     }
 
     Gen = new TRandom3(1234);
@@ -83,6 +85,7 @@ int main()
         rnd = Gen->Rndm();
         rnd_Boost       = SQRT2*sigma*erfInv( 2*(rnd-0.5) );
         Hist_BoostStd->Fill(rnd_Boost);
+                break;
     }
 
     cout << "Done!\n";
@@ -135,6 +138,58 @@ int main()
     Leg_PropStd_i->Draw();
 
     Can_PropStd_i->Write();
+
+    ////////////////////////////////////
+    TCanvas* Can_PropStd_i_VGL = new TCanvas("Can_PropStd_i_VGL","Comp",1024,768);
+    Can_PropStd_i_VGL->cd();
+
+    TGraph* Graph_PropStd_i = new TGraph();
+    TGraph* Graph_BoostStd  = new TGraph();
+    cout << "Comparison interpolation...\n";
+    int ctr=0;
+    double avrg = 841764.74;
+    sigma = 3060939.1;
+    Xlow = 105.65839;
+    Xup = 10000000;
+    double xhi,xlo;
+    double rndtmp;
+    for(double rnd = 1e-5; rnd<1 ; rnd += 1e-5)
+    {
+        rnd_PropStd_i   = PropStd_i->StandardNormalRandomNumber(rnd,avrg,sigma,Xlow,Xup,false);
+        xhi =  0.5+boost::math::erf((Xup-avrg)/(SQRT2*sigma))/2;
+        xlo =  0.5+boost::math::erf((Xlow-avrg)/(SQRT2*sigma))/2;
+        rndtmp =  xlo + (xhi-xlo)*rnd;
+        rnd_Boost       = SQRT2*sigma*erfInv( 2*(rndtmp-0.5) )+avrg;
+        Graph_PropStd_i->SetPoint(ctr,rnd,rnd_PropStd_i);
+        Graph_BoostStd->SetPoint(ctr,rnd,rnd_Boost);
+        ctr++;
+    }
+
+
+    Graph_PropStd_i->GetXaxis()->SetTitle("sigma");
+    Graph_PropStd_i->GetYaxis()->SetTitle("#");
+    Graph_PropStd_i->SetMarkerColor(kBlue);
+    Graph_PropStd_i->SetMarkerStyle(2);
+
+    Graph_BoostStd->GetXaxis()->SetTitle("sigma");
+    Graph_BoostStd->GetYaxis()->SetTitle("#");
+    Graph_BoostStd->SetLineColor(kRed);
+    Graph_BoostStd->SetLineStyle(1);
+    Graph_BoostStd->SetLineWidth(3);
+
+
+    Graph_PropStd_i->Draw("AP");
+    Graph_BoostStd->Draw("sameL");
+
+    TLegend* Leg_Graph_Comp = new TLegend(0.1,0.7,0.3,0.9);
+    Leg_Graph_Comp->SetFillColor(0);
+    Leg_Graph_Comp->AddEntry(Graph_PropStd_i,"PROPOSAL","p");
+    Leg_Graph_Comp->AddEntry(Graph_BoostStd,"Boost","l");
+
+    Leg_Graph_Comp->Draw();
+
+    Can_PropStd_i_VGL->Write();
+
 
     file->Write();
     file->Close();
