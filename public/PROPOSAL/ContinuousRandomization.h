@@ -35,8 +35,6 @@ private:
     bool do_dE2dx_Interpolation_; //!< Enables the interpolation of -dE2/dx
     bool do_dE2de_Interpolation_; //!< Enables the interpolation of -dE2/de
 
-    StandardNormal* standard_normal_;
-
     Integral* dE2dx_integral_;
     Integral* dE2de_integral_;
 

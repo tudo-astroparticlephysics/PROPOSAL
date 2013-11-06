@@ -10,6 +10,9 @@
 #include <cmath>
 #include "PROPOSAL/Output.h"
 
+#include <boost/math/special_functions/erf.hpp>
+#define erfInv(x)   boost::math::erf_inv(x)
+
 using namespace std;
 
 //----------------------------------------------------------------------------//
@@ -20,13 +23,16 @@ using namespace std;
 
 double ContinuousRandomization::Randomize(double initial_energy, double final_energy, double rnd)
 {
-    return standard_normal_-> StandardNormalRandomNumber(
-                rnd,
-                final_energy,
-                sqrt( DE2de(initial_energy, final_energy) ),
-                particle_->GetLow(),
-                initial_energy,
-                false );
+    double sigma,xhi,xlo,rndtmp;
+
+    sigma   =   sqrt( DE2de(initial_energy, final_energy) );
+
+    xhi     =   0.5+boost::math::erf((initial_energy        -final_energy)  /(SQRT2*sigma))/2;
+    xlo     =   0.5+boost::math::erf((particle_->GetLow()   -final_energy)  /(SQRT2*sigma))/2;
+
+    rndtmp =  xlo + (xhi-xlo)*rnd;
+
+    return SQRT2*sigma*erfInv( 2*(rndtmp-0.5) )+final_energy;
 }
 
 
@@ -43,8 +49,6 @@ void ContinuousRandomization::EnableDE2dxInterpolation(std::string path, bool ra
 
     bool reading_worked =   true;
     bool storing_failed =   false;
-
-    standard_normal_->EnableInterpolation(path,raw);
 
     if(!path.empty())
     {
@@ -178,8 +182,6 @@ void ContinuousRandomization::EnableDE2deInterpolation(std::string path, bool ra
 
     bool reading_worked =   true;
     bool storing_failed =   false;
-
-    standard_normal_->EnableInterpolation(path,raw);
 
     if(!path.empty())
     {
@@ -350,8 +352,6 @@ ContinuousRandomization::ContinuousRandomization()
     dE2dx_integral_     =   new Integral(IROMB, IMAXS, IPREC);
     dE2de_integral_     =   new Integral(IROMB, IMAXS, IPREC2);
 
-    standard_normal_    =   new StandardNormal(IROMB, IMAXS, IPREC);
-
     dE2dx_interpolant_      =   NULL;
     dE2de_interpolant_      =   NULL;
     dE2de_interpolant_diff_ =   NULL;
@@ -381,8 +381,6 @@ ContinuousRandomization::ContinuousRandomization(Particle* particle, Medium* med
     dE2dx_integral_     =   new Integral(IROMB, IMAXS, IPREC);
     dE2de_integral_     =   new Integral(IROMB, IMAXS, IPREC2);
 
-    standard_normal_    =   new StandardNormal(IROMB, IMAXS, IPREC);
-
     dE2dx_interpolant_      =   NULL;
     dE2de_interpolant_      =   NULL;
     dE2de_interpolant_diff_ =   NULL;
@@ -398,7 +396,6 @@ ContinuousRandomization::ContinuousRandomization(const ContinuousRandomization &
     ,medium_                    ( new Medium( *continuous_randomization.medium_) )
     ,do_dE2dx_Interpolation_    ( continuous_randomization.do_dE2dx_Interpolation_)
     ,do_dE2de_Interpolation_    ( continuous_randomization.do_dE2de_Interpolation_)
-    ,standard_normal_           ( new StandardNormal(*continuous_randomization.standard_normal_) )
     ,dE2dx_integral_            ( new Integral(*continuous_randomization.dE2dx_integral_) )
     ,dE2de_integral_            ( new Integral(*continuous_randomization.dE2de_integral_) )
     ,which_cross_               ( continuous_randomization.which_cross_ )
@@ -490,7 +487,6 @@ bool ContinuousRandomization::operator==(const ContinuousRandomization &continuo
     if( *dE2de_integral_        != *continuous_randomization.dE2de_integral_ )          return false;
     if( do_dE2dx_Interpolation_ != continuous_randomization.do_dE2dx_Interpolation_ )   return false;
     if( do_dE2de_Interpolation_ != continuous_randomization.do_dE2de_Interpolation_ )   return false;
-    if( *standard_normal_       != *continuous_randomization.standard_normal_ )         return false;
     if( which_cross_            != continuous_randomization.which_cross_)               return false;
     if( order_of_interpolation_ != continuous_randomization.order_of_interpolation_ )   return false;
 
@@ -571,7 +567,6 @@ void ContinuousRandomization::swap(ContinuousRandomization &continuous_randomiza
     medium_->swap(*continuous_randomization.medium_);
     dE2dx_integral_->swap( *continuous_randomization.dE2dx_integral_ );
     dE2de_integral_->swap( *continuous_randomization.dE2de_integral_ );
-    standard_normal_->swap( *continuous_randomization.standard_normal_ );
 
     cross_sections_.swap(continuous_randomization.cross_sections_);
 
@@ -661,7 +656,6 @@ ostream& operator<<(ostream& os, ContinuousRandomization const& continuous_rando
         //os<<endl;
     }
     os<<endl;
-    os<<"\tStandardNormal:\t"<<continuous_randomization.standard_normal_<<endl;
     os<<"\tdE2dx_integral:\t"<<continuous_randomization.dE2dx_integral_<<endl;
     os<<"\tdE2de_integral:\t"<<continuous_randomization.dE2de_integral_<<endl;
     os<<endl;
