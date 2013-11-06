@@ -21,6 +21,9 @@
 #include "PROPOSAL/Photonuclear.h"
 #include "PROPOSAL/Output.h"
 
+#include <boost/math/special_functions/erf.hpp>
+#define erfInv(x)   boost::math::erf_inv(x)
+
 using namespace std;
 
 //----------------------------------------------------------------------------//
@@ -53,7 +56,6 @@ Scattering::Scattering( )
 //        }
 //    }
     x0_ = crosssections_.at(0)->GetMedium()->GetRadiationLength();
-    standard_normal_    =   new StandardNormal(IROMB, IMAXS, IPREC);
 }
 
 //double Scattering::cutoff   =   1;
@@ -78,7 +80,6 @@ Scattering::Scattering(std::vector<CrossSections*> crosssections)
 //        }
 //    }
     x0_ = crosssections_.at(0)->GetMedium()->GetRadiationLength();;
-    standard_normal_    =   new StandardNormal(IROMB, IMAXS, IPREC);
 }
 
 Scattering::Scattering(const Scattering &scattering)
@@ -106,7 +107,6 @@ Scattering::Scattering(const Scattering &scattering)
     }
 
     integral_ = new Integral(* scattering.integral_);
-    standard_normal_ = new StandardNormal( *scattering.standard_normal_);
 };
 
 //----------------------------------------------------------------------------//
@@ -157,11 +157,6 @@ bool Scattering::operator==(const Scattering &scattering) const
             log_fatal("In copy constructor of Scattering: Error: Unknown crossSection");
             exit(1);
         }
-    }
-
-    if( standard_normal_ != NULL && scattering.standard_normal_ != NULL)
-    {
-        if( *standard_normal_   != *scattering.standard_normal_)                                        return false;
     }
 
     if( interpolant_ != NULL && scattering.interpolant_ != NULL)
@@ -236,15 +231,6 @@ void Scattering::swap(Scattering &scattering)
     }
 
     integral_->swap(*scattering.integral_);
-
-    if(scattering.standard_normal_ != NULL)
-    {
-        standard_normal_->swap(*scattering.standard_normal_) ;
-    }
-    else
-    {
-        standard_normal_ = NULL;
-    }
 }
 
 
@@ -326,28 +312,27 @@ long double Scattering::CalculateTheta0(double dr, double ei, double ef)
 void Scattering::Scatter(double dr, double ei, double ef)
 {
     //    Implement the Molie Scattering here see PROPOSALParticle::advance of old version
-        long double Theta0, Theta_max,rnd1,rnd2,sx,tx,sy,ty,sz,tz,ax,ay,az;
+        double Theta0,rnd1,rnd2,sx,tx,sy,ty,sz,tz,ax,ay,az;
         double x,y,z;
         Theta0     =   CalculateTheta0(dr, ei, ef);
 
-        Theta_max    =   1./SQRT2;
 
 
-        rnd1    =   (long double)standard_normal_-> StandardNormalRandomNumber(RandomDouble(), 0, Theta0, -Theta_max, Theta_max, false);
-        rnd2    =   (long double)standard_normal_-> StandardNormalRandomNumber(RandomDouble(), 0, Theta0, -Theta_max, Theta_max, false);
+        rnd1 = SQRT2*Theta0*erfInv( 2.*(RandomDouble()-0.5) );
+        rnd2 = SQRT2*Theta0*erfInv( 2.*(RandomDouble()-0.5) );
+
         sx      =   (rnd1/SQRT3+rnd2)/2;
         tx      =   rnd2;
 
-        rnd1    =   (long double)standard_normal_-> StandardNormalRandomNumber(RandomDouble(), 0, Theta0, -Theta_max, Theta_max, false);
-        double r=RandomDouble();
+        rnd1 = SQRT2*Theta0*erfInv(2*(RandomDouble()-0.5));
+        rnd2 = SQRT2*Theta0*erfInv(2*(RandomDouble()-0.5));
 
-        rnd2    =   (long double)standard_normal_-> StandardNormalRandomNumber(r, 0, Theta0, -Theta_max, Theta_max, false);
         sy      =   (rnd1/SQRT3+rnd2)/2;
         ty      =   rnd2;
-        //cout<<"scat "<<rnd1<<"\t"<<r<<"\t"<<rnd2<<"\t"<<Theta0<<"\t"<<endl;
 
-        sz      =   sqrt(max(1.-(sx*sx+sy*sy), (long double)0.));
-        tz      =   sqrt(max(1.-(tx*tx+ty*ty), (long double)0.));
+        sz      =   sqrt(max(1.-(sx*sx+sy*sy), 0.));
+        tz      =   sqrt(max(1.-(tx*tx+ty*ty), 0.));
+
 
         long double sinth, costh,sinph,cosph;
         long double theta,phi;
@@ -437,8 +422,6 @@ double Scattering::FunctionToBuildInterpolant(double energy)
 void Scattering::EnableInterpolation(string path)
 {
     if(do_interpolation_)return;
-
-    standard_normal_->EnableInterpolation(path);
 
     bool reading_worked=true, storing_failed=false;
     if(!path.empty())

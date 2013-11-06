@@ -13,7 +13,7 @@
 #include "vector"
 #include <string>
 #include "PROPOSAL/Particle.h"
-#include "PROPOSAL/StandardNormal.h"
+#include "PROPOSAL/MathModel.h"
 #include "PROPOSAL/Medium.h"
 
 /**
@@ -26,10 +26,6 @@
 class ScatteringFirstOrder : public MathModel
 {
 
-
-private:
-
-    StandardNormal* standard_normal_;
 //----------------------------------------------------------------------------//
 
 public:
@@ -41,14 +37,7 @@ public:
      */
     ScatteringFirstOrder();
 
-    ScatteringFirstOrder(StandardNormal* standard_normal);
 
-//----------------------------------------------------------------------------//
-
-    ScatteringFirstOrder(const ScatteringFirstOrder&);
-    ScatteringFirstOrder& operator=(const ScatteringFirstOrder&);
-    bool operator==(const ScatteringFirstOrder &scattering) const;
-    bool operator!=(const ScatteringFirstOrder &scattering) const;
 //----------------------------------------------------------------------------//
 
 
@@ -59,16 +48,6 @@ public:
     double  CalculateTheta0(double dr, Particle* part, Medium* med);
     void    Scatter(double dr, Particle* part, Medium* med);
 
-//----------------------------------------------------------------------------//
-
-    void swap(ScatteringFirstOrder &scattering);
-
-//----------------------------------------------------------------------------//
-
-    StandardNormal* GetStandardNormal()
-    {
-        return standard_normal_;
-    }
 
 //----------------------------------------------------------------------------//
     // destructors

@@ -1083,12 +1083,6 @@ void Propagator::EnableInterpolation(std::string path, bool raw)
     {
         collections_.at(i)->EnableInterpolation(path,raw);
     }
-
-    //FirstOrderScattering
-    if(scatteringFirstOrder_ != NULL && scattering_model_ == 1)
-    {
-        scatteringFirstOrder_->GetStandardNormal()->EnableInterpolation(path,raw);
-    }
 }
 
 
@@ -1105,12 +1099,6 @@ void Propagator::DisableInterpolation()
     for(unsigned int i = 0 ; i < collections_.size() ; i++)
     {
         collections_.at(i)->DisableInterpolation();
-    }
-
-    //FirstOrderScattering
-    if(scatteringFirstOrder_ != NULL && scattering_model_ == 1)
-    {
-        scatteringFirstOrder_->GetStandardNormal()->DisableInterpolation();
     }
 }
 
@@ -1545,7 +1533,7 @@ void Propagator::swap(Propagator &propagator)
 
     particle_->swap( *propagator.particle_ );
     //FirstOrderScattering
-    scatteringFirstOrder_->swap(*propagator.scatteringFirstOrder_);
+    swap<ScatteringFirstOrder*> (scatteringFirstOrder_ ,propagator.scatteringFirstOrder_);
 //    scatteringFirstOrderMoliere_->swap(*propagator.scatteringFirstOrderMoliere_);
     swap(scattering_model_ , propagator.scattering_model_);
 

@@ -16,6 +16,9 @@
 #include "PROPOSAL/ScatteringFirstOrder.h"
 #include "PROPOSAL/Output.h"
 
+#include <boost/math/special_functions/erf.hpp>
+#define erfInv(x)   boost::math::erf_inv(x)
+
 using namespace std;
 
 
@@ -28,25 +31,19 @@ using namespace std;
 
 void ScatteringFirstOrder::Scatter(double dr, Particle* part, Medium* med)
 {
-        double theta0, theta_max, rnd1, rnd2, sx, tx, sy, ty, sz, tz, ax, ay, az;
+        double theta0, rnd1, rnd2, sx, tx, sy, ty, sz, tz, ax, ay, az;
         double x,y,z;
 
         theta0     =   CalculateTheta0(dr, part,med);
 
-        theta_max    =   1./SQRT2;
+        rnd1 = SQRT2*theta0*erfInv( 2.*(RandomDouble()-0.5) );
+        rnd2 = SQRT2*theta0*erfInv( 2.*(RandomDouble()-0.5) );
 
-        double rnd = RandomDouble();
-        rnd1    =   standard_normal_-> StandardNormalRandomNumber(rnd, 0, theta0, -theta_max, theta_max, false);
-        if(rnd1 != rnd1)cerr << rnd << "\t" << theta0 << "\t" << -theta_max << "\t" << theta_max << endl;
-
-        rnd = RandomDouble();
-        rnd2    =   standard_normal_-> StandardNormalRandomNumber(rnd, 0, theta0, -theta_max, theta_max, false);
-        if(rnd2 != rnd2)cerr << rnd << "\t" << theta0 << "\t" << -theta_max << "\t" << theta_max << endl;
         sx      =   (rnd1/SQRT3+rnd2)/2;
         tx      =   rnd2;
 
-        rnd1    =   standard_normal_-> StandardNormalRandomNumber(RandomDouble(), 0, theta0, -theta_max, theta_max, false);
-        rnd2    =   standard_normal_-> StandardNormalRandomNumber(RandomDouble(), 0, theta0, -theta_max, theta_max, false);
+        rnd1 = SQRT2*theta0*erfInv(2*(RandomDouble()-0.5));
+        rnd2 = SQRT2*theta0*erfInv(2*(RandomDouble()-0.5));
 
         sy      =   (rnd1/SQRT3+rnd2)/2;
         ty      =   rnd2;
@@ -143,101 +140,9 @@ void ScatteringFirstOrder::Scatter(double dr, Particle* part, Medium* med)
 
 ScatteringFirstOrder::ScatteringFirstOrder( )
 {
-    standard_normal_    =   new StandardNormal(IROMB, IMAXS, IPREC);
+
 }
 
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-ScatteringFirstOrder::ScatteringFirstOrder(StandardNormal* standard_normal)
-{
-    if(standard_normal != NULL)
-    {
-        standard_normal_    =   standard_normal;
-    }
-    else
-    {
-        standard_normal_    =   new StandardNormal(IROMB, IMAXS, IPREC);
-    }
-}
-
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-ScatteringFirstOrder::ScatteringFirstOrder(const ScatteringFirstOrder &scattering)
-{
-    if(scattering.standard_normal_ != NULL)
-    {
-        standard_normal_ = new StandardNormal( *scattering.standard_normal_);
-    }
-    else
-    {
-        standard_normal_    =   new StandardNormal(IROMB, IMAXS, IPREC);
-    }
-}
-
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-//-------------------------operators and swap function------------------------//
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-ScatteringFirstOrder& ScatteringFirstOrder::operator=(const ScatteringFirstOrder &scattering){
-    if (this != &scattering)
-    {
-      ScatteringFirstOrder tmp(scattering);
-      swap(tmp);
-    }
-    return *this;
-}
-
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-bool ScatteringFirstOrder::operator==(const ScatteringFirstOrder &scattering) const
-{
-    if( standard_normal_ != NULL && scattering.standard_normal_ != NULL)
-    {
-        if( *standard_normal_   != *scattering.standard_normal_)    return false;
-    }
-    return true;
-}
-
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-bool ScatteringFirstOrder::operator!=(const ScatteringFirstOrder &scattering) const {
-  return !(*this == scattering);
-}
-
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-void ScatteringFirstOrder::swap(ScatteringFirstOrder &scattering)
-{
-    using std::swap;
-
-    if(scattering.standard_normal_ != NULL)
-    {
-        standard_normal_->swap(*scattering.standard_normal_) ;
-    }
-    else
-    {
-        standard_normal_ = NULL;
-    }
-}
 
 
 //----------------------------------------------------------------------------//

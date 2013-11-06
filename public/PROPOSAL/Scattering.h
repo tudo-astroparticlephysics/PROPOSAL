@@ -14,9 +14,10 @@
 #include <string>
 #include "PROPOSAL/Particle.h"
 #include "PROPOSAL/CrossSections.h"
-#include "PROPOSAL/StandardNormal.h"
 #include "PROPOSAL/Interpolant.h"
 #include "PROPOSAL/Integral.h"
+#include "PROPOSAL/MathModel.h"
+
 
 /**
   * \brief This class provides the scattering routine provided by moliere.
@@ -42,7 +43,7 @@ private:
 
     Particle* particle_;
     std::vector<CrossSections*> crosssections_;
-    StandardNormal* standard_normal_;
+
 //----------------------------------------------------------------------------//
 
 public:
