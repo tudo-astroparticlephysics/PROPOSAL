@@ -20,18 +20,65 @@
 #include <iomanip>
 
 #include <time.h>
-
+#include <boost/math/special_functions/erf.hpp>
+#define erfInv(x)   boost::math::erf_inv(x)
 
 using namespace log4cplus;
 using namespace std;
 
 
 
+
 int main(int argc, char** argv)
 {
-    ContinuousRandomization* cont = new ContinuousRandomization();
+
+//    Propagator* propa = new Propagator("resources/configuration");
+//    Output::getInstance().EnableROOTOutput("test_Output.root");
+
+//    for(int i = 0; i< (int)(1e4) ; i++)
+//    {
+//        Particle* part = new Particle(i,i,"mu",0,0,0,0,0,0,0,0);
+//        part->SetEnergy(1e6);
+
+//        propa->Propagate(part);
+//    }
+
+//    Output::getInstance().Close();
 
 
+
+
+
+
+    double alpha,blobel_alpha;
+
+    alpha = 0.68;
+    blobel_alpha = alpha/2 + 0.5;
+
+    blobel_alpha = 0.84;
+    alpha = (blobel_alpha -0.5)*2;
+
+    cerr << "alpha:\t" << alpha  << endl;
+    cerr << "B_alpha:\t" << blobel_alpha << endl;
+
+    double Z = SQRT2*erfInv(alpha);
+    cerr << "Z(" << alpha << "): " << Z << endl;
+
+    double low, high;
+    double event = 1;
+    double epsilonH = 0.46;
+    double epsilonL = 0.48;
+
+    for(event = 1; event < 11; event++)
+    {
+        high = pow( Z/2 + sqrt(event + 0.5 + epsilonH),2.);
+        low  = pow(Z /2 - sqrt(event + 0.5 - epsilonL), 2.);
+
+        cerr << "k: \t" << event << "\t\tLimits: [" << low << " - " << high << "]\n";
+    }
+
+
+    boost::math::
 }
 
 
