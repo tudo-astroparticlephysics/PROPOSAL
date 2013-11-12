@@ -32,24 +32,23 @@ using namespace std;
 int main(int argc, char** argv)
 {
 
-//    Propagator* propa = new Propagator("resources/configuration");
-//    Output::getInstance().EnableROOTOutput("test_Output.root");
+    Propagator* propa = new Propagator("resources/configuration");
+    Output::getInstance().EnableROOTOutput("test_Output.root");
+    for(int i = 0; i< (int)(1e4) ; i++)
+    {
+        Particle* part = new Particle(i,i,"mu",0,0,0,0,0,0,0,0);
+        part->SetEnergy(1e6);
 
-//    for(int i = 0; i< (int)(1e4) ; i++)
-//    {
-//        Particle* part = new Particle(i,i,"mu",0,0,0,0,0,0,0,0);
-//        part->SetEnergy(1e6);
+        propa->Propagate(part);
+    }
 
-//        propa->Propagate(part);
-//    }
-
-//    Output::getInstance().Close();
-
+    Output::getInstance().Close();
 
 
 
 
 
+/*
     double alpha,blobel_alpha;
 
     alpha = 0.68;
@@ -76,9 +75,7 @@ int main(int argc, char** argv)
 
         cerr << "k: \t" << event << "\t\tLimits: [" << low << " - " << high << "]\n";
     }
-
-
-    boost::math::
+*/
 }
 
 
