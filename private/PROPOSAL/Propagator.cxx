@@ -82,6 +82,8 @@ vector<Particle*> Propagator::Propagate( Particle *particle )
         Output::getInstance().StorePrimaryInTree(particle);
     #endif
 
+    if(Output::store_in_ASCII_file_)Output::getInstance().StorePrimaryInASCII(particle);
+
     SetParticle(particle);
 
     double distance_to_collection_border    =   0;
@@ -314,6 +316,7 @@ vector<Particle*> Propagator::Propagate( Particle *particle )
     #if ROOT_SUPPORT
         Output::getInstance().StorePropagatedPrimaryInTree(particle);
     #endif
+        if(Output::store_in_ASCII_file_)Output::getInstance().StorePropagatedPrimaryInASCII(particle);
 
     return Output::getInstance().GetSecondarys();
 

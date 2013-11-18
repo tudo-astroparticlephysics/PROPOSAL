@@ -33,7 +33,8 @@ int main(int argc, char** argv)
 {
 
     Propagator* propa = new Propagator("resources/configuration");
-    Output::getInstance().EnableROOTOutput("test_Output.root");
+//    Output::getInstance().EnableROOTOutput("test_Output.root");
+    Output::getInstance().EnableASCIIOutput("ascii_test");
     for(int i = 0; i< (int)(1e4) ; i++)
     {
         Particle* part = new Particle(i,i,"mu",0,0,0,0,0,0,0,0);

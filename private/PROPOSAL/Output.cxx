@@ -4,7 +4,7 @@ using namespace std;
 
 vector<Particle*> Output::secondarys_;
 bool Output::store_in_root_trees_ =   false;
-
+bool Output::store_in_ASCII_file_ =   false;
 
 void Output::SetLoggingConfigurationFile(std::string file)
 {
@@ -61,6 +61,20 @@ void Output::FillSecondaryVector(Particle *particle, int secondary_id, pair<doub
             secondary_tree_->Fill();
         }
     #endif
+        if(store_in_ASCII_file_)
+        {
+            secondary_ascii_ <<
+            particle_to_store->GetX()<< "\t" <<
+            particle_to_store->GetY()<< "\t" <<
+            particle_to_store->GetZ()<< "\t" <<
+            particle_to_store->GetT()<< "\t" <<
+            particle_to_store->GetTheta()<< "\t" <<
+            particle_to_store->GetPhi()<< "\t" <<
+            particle_to_store->GetEnergy()<< "\t" <<
+            particle_to_store->GetParentParticleId()<< "\t" <<
+            particle_to_store->GetParticleId()<< "\t" <<
+            particle_to_store->GetName()<< endl;
+        }
 
 }
 
@@ -94,6 +108,12 @@ void Output::Close()
             rootfile_->Close();
         }
     #endif
+        if(store_in_ASCII_file_)
+        {
+            secondary_ascii_.close();
+            primary_ascii_.close();
+            propagated_primary_ascii_.close();
+        }
 }
 
 
@@ -200,8 +220,8 @@ void Output::Close()
     }
 
 
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
+    //----------------------------------------------------------------------------//
+    //----------------------------------------------------------------------------//
 
     void Output::StorePropagatedPrimaryInTree(Particle *prop_primary)
     {
@@ -241,8 +261,138 @@ void Output::Close()
 
 #endif
 
+    //----------------------------------------------------------------------------//
+    //----------------------------------------------------------------------------//
+    //------------------------------ASCII OUTPUT----------------------------------//
+    //----------------------------------------------------------------------------//
+    //----------------------------------------------------------------------------//
+
+    void Output::EnableASCIIOutput(string ASCII_Prefix, bool append)
+     {
+         if(store_in_ASCII_file_)
+         {
+             log_info("Storing in ascii file is already enabled!");
+             return;
+         }
+
+         stringstream ss;
+
+         ss.str("");
+         ss << ASCII_Prefix << "_secondarys.txt";
+         if(append)
+         {
+             secondary_ascii_.open(ss.str().c_str(),ios::app);
+         }
+         else
+         {
+             secondary_ascii_.open(ss.str().c_str(),ios::out);
+         }
+
+         ss.str("");
+         ss << ASCII_Prefix << "_primarys.txt";
+         if(append)
+         {
+             primary_ascii_.open(ss.str().c_str(),ios::app);
+         }
+         else
+         {
+             primary_ascii_.open(ss.str().c_str(),ios::out);
+         }
+
+         ss.str("");
+         ss << ASCII_Prefix << "_propagated_primarys.txt";
+         if(append)
+         {
+             propagated_primary_ascii_.open(ss.str().c_str(),ios::app);
+         }
+         else
+         {
+             propagated_primary_ascii_.open(ss.str().c_str(),ios::out);
+         }
 
 
+         if( !(propagated_primary_ascii_.is_open() && secondary_ascii_.is_open() && primary_ascii_.is_open()))
+         {
+             log_error("Could not open ASCII streams. ASCII output disabled.");
+             store_in_ASCII_file_ = false;
+         }
+
+         store_in_ASCII_file_ = true;
+     }
+
+
+ //----------------------------------------------------------------------------//
+ //----------------------------------------------------------------------------//
+
+
+     void Output::DisableASCIIOutput()
+     {
+         store_in_ASCII_file_ =   false;
+         secondary_ascii_.close();
+         primary_ascii_.close();
+         propagated_primary_ascii_.close();
+     }
+
+ //----------------------------------------------------------------------------//
+ //----------------------------------------------------------------------------//
+
+
+     void Output::StorePrimaryInASCII(Particle *primary)
+     {
+         if(store_in_ASCII_file_)
+         {
+             primary_ascii_ <<
+             primary->GetX()<< "\t" <<
+             primary->GetY()<< "\t" <<
+             primary->GetZ()<< "\t" <<
+             primary->GetT()<< "\t" <<
+             primary->GetTheta()<< "\t" <<
+             primary->GetPhi()<< "\t" <<
+             primary->GetEnergy()<< "\t" <<
+             primary->GetParentParticleId()<< "\t" <<
+             primary->GetParticleId()<< "\t" <<
+             primary->GetName() << endl;
+         }
+     }
+
+
+ //----------------------------------------------------------------------------//
+ //----------------------------------------------------------------------------//
+
+     void Output::StorePropagatedPrimaryInASCII(Particle *prop_primary)
+     {
+         if(store_in_ASCII_file_)
+         {
+             propagated_primary_ascii_ <<
+             prop_primary->GetX()<< "\t" <<
+             prop_primary->GetY()<< "\t" <<
+             prop_primary->GetZ()<< "\t" <<
+             prop_primary->GetT()<< "\t" <<
+             prop_primary->GetTheta()<< "\t" <<
+             prop_primary->GetPhi()<< "\t" <<
+             prop_primary->GetEnergy()<< "\t" <<
+             prop_primary->GetParentParticleId()<< "\t" <<
+             prop_primary->GetParticleId()<< "\t" <<
+             prop_primary->GetName()<< "\t" <<
+             prop_primary->GetXi()<< "\t" <<
+             prop_primary->GetYi()<< "\t" <<
+             prop_primary->GetZi()<< "\t" <<
+             prop_primary->GetTi()<< "\t" <<
+             prop_primary->GetEi()<< "\t" <<
+             prop_primary->GetXf()<< "\t" <<
+             prop_primary->GetYf()<< "\t" <<
+             prop_primary->GetZf()<< "\t" <<
+             prop_primary->GetTf()<< "\t" <<
+             prop_primary->GetEf()<< "\t" <<
+             prop_primary->GetXc()<< "\t" <<
+             prop_primary->GetYc()<< "\t" <<
+             prop_primary->GetZc()<< "\t" <<
+             prop_primary->GetTc()<< "\t" <<
+             prop_primary->GetEc()<< "\t" <<
+             prop_primary->GetPropagatedDistance()<< "\t" <<
+             prop_primary->GetElost()<< endl;
+         }
+     }
 
 
 

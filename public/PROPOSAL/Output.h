@@ -15,6 +15,7 @@
 #include <boost/preprocessor/comparison/equal.hpp>
 #include <boost/preprocessor/config/limits.hpp>
 #include <iostream>
+#include <fstream>
 #include <vector>
 #include <string>
 #include "PROPOSAL/Particle.h"
@@ -77,6 +78,11 @@ private:
     static std::vector<Particle*> secondarys_;
 
     static bool store_in_root_trees_;
+
+    //ASCII Output
+    std::ofstream secondary_ascii_;
+    std::ofstream primary_ascii_;
+    std::ofstream propagated_primary_ascii_;
 
     #if ROOT_SUPPORT
 
@@ -141,6 +147,9 @@ public:
 
     Logger logger;
 
+    //ASCII
+    static bool store_in_ASCII_file_;
+
 //----------------------------------------------------------------------------//
 
     static Output& getInstance()
@@ -183,6 +192,23 @@ public:
         void StorePropagatedPrimaryInTree(Particle *prop_primary);
 
     #endif
+
+// ASCII OUTPUT
+        void EnableASCIIOutput(std::string ASCII_Prefix, bool append = false);
+
+     //----------------------------------------------------------------------------//
+
+         void DisableASCIIOutput();
+
+     //----------------------------------------------------------------------------//
+
+         void StorePrimaryInASCII(Particle *primary);
+
+     //----------------------------------------------------------------------------//
+
+         void StorePropagatedPrimaryInASCII(Particle *prop_primary);
+
+     //----------------------------------------------------------------------------//
 
     //Getter
     std::vector<Particle*> GetSecondarys() const
