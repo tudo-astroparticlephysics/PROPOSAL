@@ -22,7 +22,9 @@ eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
 
 1.	The distribution of PROPOSAL in any form is not allowed except from hosts or persons where 
 	the distribution was explicitly granted.
-2.	The user should report any bugs or errors in PROPOSAL to Tomasz.Fuchs@tu-dortmund.de.
+2.	The user should report any bugs or errors in PROPOSAL to
+            Tomasz.Fuchs@tu-dortmund.de
+            Jan-Hendrik.Koehne@tu-dortmund.de.
 3.	The use of PROPOSAL is limited to non-commercial, non-military and scientific purposes only.
 4.	The user is not allowed to insert code in whole or in part of PROPOSAL into other projects 
 	without prior permission.
