@@ -19,7 +19,6 @@ int main()
     Medium* med = new Medium("ice",1.);
     EnergyCutSettings* ecut = new EnergyCutSettings(10,1e-3);
     Propagator* prop = new Propagator(med,ecut,"mu","resources/tables");//,false,true,true,true,1,12,1,1,1,1,false,2);
-    cout << "fertig eingelesen" << endl;
 
     TFile hfile("Decay_Reached_Scattering.root","RECREATE","Scattering_Info");
 
@@ -27,8 +26,7 @@ int main()
     double dev;
     double energy;
     double angle;
-    double interactions;
-    double distanceMean=0,angleMean=0,devMean=0,energyMean=0,interMean=0;
+    double distanceMean=0,angleMean=0,devMean=0,energyMean=0;
 
     int N = (int)1e4;
 
@@ -64,14 +62,12 @@ int main()
         dev     =   sqrt(       prop->GetParticle()->GetX() * prop->GetParticle()->GetX()
                             +   prop->GetParticle()->GetY() * prop->GetParticle()->GetY() );
         angle   = asin(dev/dist)*180/PI;
-        interactions = prop->GetParticle()->GetParticleId();
 
 
         energyMean += energy;
         distanceMean += dist;
         devMean += dev;
         angleMean += angle;
-        interMean += interactions;
 
         if(propout<0)
         {
@@ -91,24 +87,11 @@ int main()
     angleMean /= N;
     devMean /=N;
     energyMean /=N;
-    interMean /=N;
     cout.precision(16);
     cout << "Distance Mean: " << distanceMean << endl;
     cout << "Theta Mean: " << angleMean << endl;
     cout << "devMean: " << devMean << endl;
     cout << "energyMean: " << energyMean << endl;
-    cout << "interactionsMean: " << interMean << endl;
-    cout << "X0: " << prop->GetCurrentCollection()->GetScattering()->GetX0() << endl;
-    cout << endl << endl;
-    cout << "2e2: " << prop->GetCurrentCollection()->FunctionToIntegral(2e2) << endl;
-    cout << "2e3: " << prop->GetCurrentCollection()->FunctionToIntegral(2e3) << endl;
-    cout << "2e4: " << prop->GetCurrentCollection()->FunctionToIntegral(2e4) << endl;
-    cout << "2e5: " << prop->GetCurrentCollection()->FunctionToIntegral(2e5) << endl;
 
-    cout << endl << "scattering:" << endl;
-    cout << "2e2: " << prop->GetCurrentCollection()->GetScattering()->FunctionToIntegral(2e2) << endl;
-    cout << "2e3: " << prop->GetCurrentCollection()->GetScattering()->FunctionToIntegral(2e3) << endl;
-    cout << "2e4: " << prop->GetCurrentCollection()->GetScattering()->FunctionToIntegral(2e4) << endl;
-    cout << "2e5: " << prop->GetCurrentCollection()->GetScattering()->FunctionToIntegral(2e5) << endl;
 	return 0;
 }

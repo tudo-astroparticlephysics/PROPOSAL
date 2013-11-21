@@ -174,21 +174,7 @@ vector<Particle*> Propagator::Propagate( Particle *particle )
                     //The particle reached the border of all specified collections
                     else
                     {
-                        //JHK! Ich glaube das muss weg, weil es dann auf die sortierung ankommt
-                        // z.B. :
-                        // 1.   Myon ist in Geometry A, welches an der stelle 10 collections und nach durchgang
-                        //      durch den detektor ist. -> current_collection wird auf Geometrie A gesetzt.
-                        // 2.   Myon ist nicht in Geometry B, welches an Stelle 11 in collections und nach durchgang
-                        //      durch den detektor ist. -> current_collection wird auf NULL gesetzt
-                        // 3.   Damit hat der Algorithmus sofort vergessen, dass es A gegeben hat!
-                        //
-                        // Vielleicht tut die IsParticleInside funktion auch etwas, das das abfängt, aber mir fällt
-                        // gerade nichts ein.
-                        // Ich habe für überschneidende Medien den Vektor crossed_collections eingeführt. Über den
-                        // kann man das Theoretisch abfangen, wenn eine Grenze erreicht ist. Das mache ich mal weiter
-                        // unten.
 
-                        //current_collection_ =   NULL;
                     }
                 }
             }
@@ -364,7 +350,7 @@ double Propagator::Propagate( double distance )
         flag    =   true;
     }
 
-    int NumInt = 0;//TOMASZ
+    int NumInt = 0;
     while(flag)
     {
         energy_till_stochastic_ = CalculateEnergyTillStochastic( initial_energy );
@@ -623,27 +609,13 @@ void Propagator::ChooseCurrentCollection(Particle* particle)
                 //The particle reached the border of all specified collections
                 else
                 {
-                    //JHK! Ich glaube das muss weg, weil es dann auf die sortierung ankommt
-                    // z.B. :
-                    // 1.   Myon ist in Geometry A, welches an der stelle 10 collections und nach durchgang
-                    //      durch den detektor ist. -> current_collection wird auf Geometrie A gesetzt.
-                    // 2.   Myon ist nicht in Geometry B, welches an Stelle 11 in collections und nach durchgang
-                    //      durch den detektor ist. -> current_collection wird auf NULL gesetzt
-                    // 3.   Damit hat der Algorithmus sofort vergessen, dass es A gegeben hat!
-                    //
-                    // Vielleicht tut die IsParticleInside funktion auch etwas, das das abfängt, aber mir fällt
-                    // gerade nichts ein.
-                    // Ich habe für überschneidende Medien den Vektor crossed_collections eingeführt. Über den
-                    // kann man das Theoretisch abfangen, wenn eine Grenze erreicht ist. Das mache ich mal weiter
-                    // unten.
 
-                    //current_collection_ =   NULL;
                 }
             }
         }
     }
 
-    //JHK! Ich glaube an der Stelle ist as ok.
+    //No process collection was found
     if(crossed_collections.size() == 0)current_collection_ = NULL;
 
 

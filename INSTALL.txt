@@ -1,0 +1,56 @@
+#eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee 
+e                                                                                              e 
+e      K#5z#zy   W#5z9#X,      zE9y    K#Xz#zW      XEEX      WGeGy      9yXK    EXG           e 
+e      Geeeeeeee eeeeeeeee  Weeeeeeee  eeeeeeeeD  eeeeeeee  ,eeeueeee   Weeee    eee           e 
+e      Xee   eee 9ee   Eee  eee    eee Dee   eee eee    eee Deee        ee eee   eee           e 
+e      Xeeeeeee  EeeeeeeX   eee    eee Deeeeeee  eee    eee   Weeeeez  eee  eey  eee           e 
+e      Xee,      9ee  eee,  eee   Weee Dee       eee    eee eee   eee  eeeeeeee  eee           e 
+e      eeee      eee9  eeeE  eeeeeeee  eeeD       eeeeeeee  KeeeeeeeW eee KuXeee eeeeeeee      e 
+e       uu        ,u     uz     uu      uK           uu        uWK    X      u z eeeeeeee      e
+e                                                                                              e 
+e                                                                                              e
+e                                         5   Ku                  yKKy#K                       e 
+e                    ee ee                ee  ee                eeeeeee#                       e 
+e                   9ee eee               e9  ee                   eD                          e 
+e                   eey                   e9  ee                   eK                          e 
+e                    eeeee5               eeeEDee                  eW 9                        e 
+e                     ,ED                 e                        eee#                        e 
+e                                         e                                                    e
+e                                                                                              e 
+eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeze 
+                                                                                                 
+PROPOSAL was tested on Mac OS X V. 10.7.5, Ubuntu 12.04, SUSE Enterprise 10 and PCLinuxos. Since
+all these OS are UNIX based it should be fine to run and compile PROPOSAL on a UNIX based OS.
+
+Requirements:
+	- Boost Library 1.48 or higher
+	- log4cplus 	(http://sourceforge.net/p/log4cplus/wiki/Home/)
+	- CMake 2.8 or higher	
+
+Recommended:
+	- Doxygen 	(For pdf and html documentation of the code)
+	- GTEST 	(To be sure not to break program code if you change something)
+	- ROOT		(This is highly recommended since there are lots of example plots
+			 and you are able to save the output in an root file.)
+
+-----How to Install:
+1. Make a directory where the whole project will be (e.g. "PROPOSAL")
+2. Extract the sources from the homepage to the folder (e.g. "PROPOSAL/PROPOSALsrc")
+3. Create and move to a build directory in the main folder (here "PROPOSAL/build")
+4. Do
+	cmake source_folder (e.g. "cmake ../PROPOSALsrc")
+5. Do
+	make (hint: "make -j#" will make the project with # processors simultaneous.)
+
+-----Usage:
+You can execute the PROPOSAL main from from the build directory. (e.g. "./bin/PROPOSALtest")
+The main part of the configuration of the propagator routine are the configuration files which
+you can find in resources. The file is fully documented and should guide you through your configuration.
+Even if you haven't installed root you should find some interesting code in the root_examples.
+All particle coordinates take the detector as the origin of the coordinate system.
+
+
+-----Erros:
+When you encounter any errors or misunderstandings don't hesitate and write a mail to
+        Tomasz.Fuchs@tu-dortmund.de
+
