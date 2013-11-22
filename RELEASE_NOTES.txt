@@ -99,7 +99,7 @@ V.1.3 - 30.07.13
 
 V.1.2 - 09.07.13
 
-    +   Added the readin of the configuration file
+    +   Added the reading of the configuration file
     *   Changed the layout of the scattering routines
     +   Added a binary output for interpolation tables
     +   Added << operators to every function
@@ -109,7 +109,7 @@ V.1.2 - 09.07.13
 
 V.1.1 - 13.06.13
 
-    *   Integration and Interpolation routine use now boost::function boost::bind
+    *   Integration and Interpolation routines use now boost::function boost::bind
     +   Added gtest to the framework
     -   Removed FunctionInt and FunctionInt2 classes
     +   Added RootFinder class
