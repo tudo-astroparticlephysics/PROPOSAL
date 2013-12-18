@@ -57,6 +57,7 @@ void Output::FillSecondaryVector(Particle *particle, int secondary_id, pair<doub
             secondary_parent_particle_id_   =   particle_to_store->GetParentParticleId();
             secondary_particle_id_          =   particle_to_store->GetParticleId();
             secondary_name_                 =   particle_to_store->GetName();
+            current_primary_energy_         =   particle->GetEnergy();
 
             secondary_tree_->Fill();
         }
@@ -73,7 +74,8 @@ void Output::FillSecondaryVector(Particle *particle, int secondary_id, pair<doub
             particle_to_store->GetEnergy()<< "\t" <<
             particle_to_store->GetParentParticleId()<< "\t" <<
             particle_to_store->GetParticleId()<< "\t" <<
-            particle_to_store->GetName()<< endl;
+            particle_to_store->GetName() << "\t" <<
+            particle->GetEnergy() << endl;
         }
 
 }
@@ -144,6 +146,7 @@ void Output::Close()
         secondary_tree_->Branch("parent_particle_id",&secondary_parent_particle_id_,"parent_particle_id/I");
         secondary_tree_->Branch("particle_id",&secondary_particle_id_,"particle_id/I");
         secondary_tree_->Branch("name",&secondary_name_);
+        secondary_tree_->Branch("current_primary_energy",&current_primary_energy_);
 
         primary_tree_->Branch("x",&primary_x_,"x/D");
         primary_tree_->Branch("y",&primary_y_,"y/D");

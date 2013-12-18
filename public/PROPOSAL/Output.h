@@ -101,6 +101,7 @@ private:
         int secondary_parent_particle_id_;
         int secondary_particle_id_;
         std::string secondary_name_;
+        double current_primary_energy_;
 
         double primary_x_;
         double primary_y_;
