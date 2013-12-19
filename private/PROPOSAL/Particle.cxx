@@ -48,6 +48,7 @@ Particle::Particle( )
     ,low_                   ( mass_ )
     ,type_                  ( 1 )
     ,parent_particle_id_    ( 0 )
+    ,parent_particle_energy_( 0 )
     ,particle_id_           ( 1 )
     ,xi_                    ( 0 )
     ,yi_                    ( 0 )
@@ -96,6 +97,7 @@ Particle::Particle(const Particle& particle)
     ,low_                   ( particle.low_ )
     ,type_                  ( particle.type_ )
     ,parent_particle_id_    ( particle.parent_particle_id_ )
+    ,parent_particle_energy_( particle.parent_particle_energy_  )
     ,particle_id_           ( particle.particle_id_ )
     ,xi_                    ( particle.xi_ )
     ,yi_                    ( particle.yi_ )
@@ -152,6 +154,7 @@ Particle::Particle(int parent_particle_id,
     ,low_                   ( mass_ )
     ,type_                  ( 1 )
     ,parent_particle_id_    ( parent_particle_id )
+    ,parent_particle_energy_( 0 )
     ,particle_id_           ( particle_id )
     ,xi_                    ( 0 )
     ,yi_                    ( 0 )
@@ -235,7 +238,8 @@ Particle::Particle(int parent_particle_id,
                    double phi,
                    double energy,
                    double t,
-                   double prop_dist)
+                   double prop_dist,
+                   double prim_energy)
 
     :propagated_distance_   ( prop_dist )
     ,x_                     ( x )
@@ -254,6 +258,7 @@ Particle::Particle(int parent_particle_id,
     ,low_                   ( mass_ )
     ,type_                  ( 1 )
     ,parent_particle_id_    ( parent_particle_id )
+    ,parent_particle_energy_( prim_energy )
     ,particle_id_           ( particle_id )
     ,xi_                    ( 0 )
     ,yi_                    ( 0 )
@@ -309,6 +314,7 @@ Particle::Particle(string name,
     ,low_                   ( mass_ )
     ,type_                  ( 1 )
     ,parent_particle_id_    ( 0 )
+    ,parent_particle_energy_( 0 )
     ,particle_id_           ( 1 )
     ,xi_                    ( 0 )
     ,yi_                    ( 0 )
@@ -382,6 +388,7 @@ Particle::Particle(string name)
     ,low_                   ( mass_ )
     ,type_                  ( 1 )
     ,parent_particle_id_    ( 0 )
+    ,parent_particle_energy_( 0 )
     ,particle_id_           ( 1 )
     ,xi_                    ( 0 )
     ,yi_                    ( 0 )
@@ -476,6 +483,7 @@ bool Particle::operator==(const Particle &particle) const
     if(  low_                   != particle.low_)                   return false;
     if(  type_                  != particle.type_)                  return false;
     if(  parent_particle_id_    != particle.parent_particle_id_)    return false;
+    if(  parent_particle_energy_!= particle.parent_particle_energy_)return false;
     if(  particle_id_           != particle.particle_id_)           return false;
     if(  xi_                    != particle.xi_)                    return false;
     if(  yi_                    != particle.yi_)                    return false;
@@ -577,6 +585,7 @@ void Particle::swap(Particle &particle)
     swap( low_                   , particle.low_);
     swap( type_                  , particle.type_);
     swap( parent_particle_id_    , particle.parent_particle_id_);
+    swap( parent_particle_energy_, particle.parent_particle_energy_);
     swap( particle_id_           , particle.particle_id_);
     swap( xi_                    , particle.xi_);
     swap( yi_                    , particle.yi_);
@@ -885,6 +894,10 @@ void Particle::SetType(int type){
 
 void Particle::SetParentParticleId(int parent_particle_id){
     parent_particle_id_ = parent_particle_id;
+}
+
+void Particle::SetParentParticleEnergy(double parent_particle_energy){
+    parent_particle_energy_ = parent_particle_energy;
 }
 
 void Particle::SetParticleId(int particle_id){

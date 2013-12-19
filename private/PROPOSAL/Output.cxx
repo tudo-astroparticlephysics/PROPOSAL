@@ -41,7 +41,7 @@ void Output::FillSecondaryVector(Particle *particle, int secondary_id, pair<doub
         secondary_name  =   energy_loss.second;
     }
 
-    Particle *particle_to_store   =   new Particle(particle->GetParentParticleId(), secondary_id, secondary_name, particle->GetX(), particle->GetY(), particle->GetZ(), particle->GetTheta(), particle->GetPhi(), energy_loss.first, particle->GetT(), distance);    
+    Particle *particle_to_store   =   new Particle(particle->GetParentParticleId(), secondary_id, secondary_name, particle->GetX(), particle->GetY(), particle->GetZ(), particle->GetTheta(), particle->GetPhi(), energy_loss.first, particle->GetT(), distance,particle->GetEnergy());
     secondarys_.push_back(particle_to_store);
 
     #if ROOT_SUPPORT
@@ -57,7 +57,7 @@ void Output::FillSecondaryVector(Particle *particle, int secondary_id, pair<doub
             secondary_parent_particle_id_   =   particle_to_store->GetParentParticleId();
             secondary_particle_id_          =   particle_to_store->GetParticleId();
             secondary_name_                 =   particle_to_store->GetName();
-            current_primary_energy_         =   particle->GetEnergy();
+            current_primary_energy_         =   particle_to_store->GetParentParticleEnergy();
 
             secondary_tree_->Fill();
         }
@@ -75,7 +75,7 @@ void Output::FillSecondaryVector(Particle *particle, int secondary_id, pair<doub
             particle_to_store->GetParentParticleId()<< "\t" <<
             particle_to_store->GetParticleId()<< "\t" <<
             particle_to_store->GetName() << "\t" <<
-            particle->GetEnergy() << endl;
+            particle_to_store->GetParentParticleEnergy() << endl;
         }
 
 }

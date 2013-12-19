@@ -50,8 +50,9 @@ private:
     double low_;                 //!< energy below which the particle is lost [MeV]
     int type_;                   //!< particle type: 1 for muon, 2 for tau, 3 for electron
 
-    int parent_particle_id_;     //!< parent particle id
-    int particle_id_;            //!< particle id
+    int parent_particle_id_;        //!< parent particle id
+    double parent_particle_energy_; //!< energy of the parent particle
+    int particle_id_;               //!< particle id
 
     double xi_;                  //!< x-coordinate entry Point [cm]
     double yi_;                  //!< y-coordinate entry Point [cm]
@@ -155,7 +156,8 @@ public:
              double phi,
              double energy,
              double t,
-             double prop_dist);
+             double prop_dist,
+             double prim_energy = 0);
 
 //----------------------------------------------------------------------------//
     /*!
@@ -249,6 +251,7 @@ public:
     void SetLow(double low);
     void SetType(int type);
     void SetParentParticleId(int parent_particle_id);
+    void SetParentParticleEnergy(double parent_particle_energy);
     void SetParticleId(int particle_id);
     void SetXi(double xi);
     void SetYi(double yi);
@@ -313,6 +316,8 @@ public:
     int GetType() const{return type_;}
 //----------------------------------------------------------------------------//
     int GetParentParticleId() const{return parent_particle_id_;}
+//----------------------------------------------------------------------------//
+    double GetParentParticleEnergy() const{return parent_particle_energy_;}
 //----------------------------------------------------------------------------//
     int GetParticleId() const{return particle_id_;}
 //----------------------------------------------------------------------------//
