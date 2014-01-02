@@ -176,7 +176,7 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    #if ROOT_SUPPORT
+
 
         void EnableROOTOutput(std::string rootfile_name);
 
@@ -185,7 +185,7 @@ public:
         void DisableROOTOutput();
 
 //----------------------------------------------------------------------------//
-
+    #if ROOT_SUPPORT
         void StorePrimaryInTree(Particle *primary);
 
 //----------------------------------------------------------------------------//

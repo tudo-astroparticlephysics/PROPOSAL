@@ -123,10 +123,11 @@ void Output::Close()
 //----------------------------------------------------------------------------//
 
 
-#if ROOT_SUPPORT
+
 
     void Output::EnableROOTOutput(std::string rootfile_name)
     {
+        #if ROOT_SUPPORT
         rootfile_               =   new TFile(rootfile_name.c_str(),"RECREATE");
 
         secondary_tree_             =   new TTree("secondarys","secondarys");
@@ -186,7 +187,9 @@ void Output::Close()
         propagated_primary_tree_->Branch("ec",&prop_primary_ec_,"ec/D");
         propagated_primary_tree_->Branch("propagated_distance",&prop_primary_propagated_distance_,"propagated_distance/D");
         propagated_primary_tree_->Branch("energy_lost",&prop_primary_elost_,"energy_lost/D");
-
+        #else
+            log_error("NO ROOT SUPPORT! NOTHING WILL BE STORED IN TREES!");
+        #endif
     }
 
 
@@ -196,13 +199,17 @@ void Output::Close()
 
     void Output::DisableROOTOutput()
     {
+        #if ROOT_SUPPORT
         store_in_root_trees_ =   false;
+        #else
+        log_error("NO ROOT SUPPORT! NOTHING TO CLOSE!");
+        #endif
     }
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-
+#if ROOT_SUPPORT
     void Output::StorePrimaryInTree(Particle *primary)
     {
         if(store_in_root_trees_)

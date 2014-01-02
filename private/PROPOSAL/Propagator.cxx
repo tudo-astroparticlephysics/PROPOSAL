@@ -2332,6 +2332,7 @@ void Propagator::ApplyOptions()
     }
     if(!integrate_)
     {
+        cout << "Starting Interpolation! This will take some time depending on the number of media you defined!/n";
         EnableInterpolation(path_to_tables_, raw_);
     }
 
