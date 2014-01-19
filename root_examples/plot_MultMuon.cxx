@@ -126,7 +126,6 @@ int main(int argc, char** argv)
     stringstream ss;
 
 
-
     double ecut = atof(argv[1]);
     int seed = atoi(argv[2]);
     double vcut = atof(argv[3]);
@@ -146,20 +145,35 @@ int main(int argc, char** argv)
     EnergyCutSettings* cuts = new EnergyCutSettings(ecut,vcut);
 
 
-    Propagator *pr = new Propagator("resources/configuration");
+    Propagator *pr = new Propagator("resources/configuration_IceOnly");
 
     Output::getInstance().EnableROOTOutput("lol.root");
 
-    ProgressBar* P = new ProgressBar(statistic,100);
     Particle* part;
-    P->start("Propagation Starts!");
-    for(int i =0;i<statistic;i++)
+
+
+    EminLog10 = 3;
+    EmaxLog10 = 8;
+
+    double energy = pow(10,EmaxLog10);
+    int ctr = (int)(EmaxLog10 - EminLog10)/(log10(2));
+    cerr << "ctrmax = " << ctr << endl;
+
+
+    ProgressBar* P = new ProgressBar(statistic*ctr,100);
+    for(;ctr > 0; ctr--)
     {
-        P->update();
-        part = new Particle();
-        part->SetProperties(0,i,10e6);
-        pr->Propagate(part,1234*1e2);
+        energy /= 2;
+        P->start("Propagation Starts!");
+        for(int i =0;i<statistic;i++)
+        {
+            P->update();
+            part = new Particle();
+            part->SetProperties(ctr,i,energy);
+            pr->Propagate(part,SQRT2*1e2*1e3);
+        }
     }
+
 
     Output::getInstance().Close();
 
