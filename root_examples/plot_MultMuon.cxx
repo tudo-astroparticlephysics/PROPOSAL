@@ -126,7 +126,7 @@ int main(int argc, char** argv)
     }
 
     stringstream ss;
-
+    ss.precision(4);
 
     double ecut = atof(argv[1]);
     int seed = atoi(argv[2]);
@@ -174,7 +174,7 @@ int main(int argc, char** argv)
         {
             P->update();
             part = new Particle();
-            part->SetProperties(ctr,i,energy);
+            part->SetProperties(ctr+ ctr*statistic,i,energy);
             pr->Propagate(part,SQRT2*1e2*1e3);
         }
         delete P;
@@ -186,23 +186,122 @@ int main(int argc, char** argv)
 
     TFile f("MultiMuon.root","update");
     TTree* TreeSec = (TTree*)f.Get("secondarys");
+    TTree* TreePrim = (TTree*)f.Get("propagated_primarys");
+    TTree* TreeInPrim = (TTree*)f.Get("primarys");
 
-    double X,Y,Z,Distance,ELossHalf1, ELossHalf2;
-    int ParentParticleSec, ParentParticlePrim;
+    double X,Y,Z;
+    double CurrPartEnergySec;
+    double energy_propagated;
 
+    int ParentParticleSec,ParticleIdSec, ParentParticlePrim, ParticleIdPrim;
+
+    double Distance,ELossHalf1, ELossHalf2;
+
+    double EIn;
     TreeSec->SetBranchAddress("z",&Z);
     TreeSec->SetBranchAddress("y",&Y);
     TreeSec->SetBranchAddress("x",&X);
+    TreeSec->SetBranchAddress("particle_id",&ParticleIdSec);
+    TreeSec->SetBranchAddress("parent_particle_id",&ParentParticleSec);
+    TreeSec->SetBranchAddress("current_primary_energy",&CurrPartEnergySec);
+
+    TreePrim->SetBranchAddress("particle_id",&ParticleIdPrim);
+    TreePrim->SetBranchAddress("parent_particle_id",&ParentParticlePrim);
+
+    TreePrim->SetBranchAddress("energy",&energy_propagated);
+
+    TreeInPrim->SetBranchAddress("energy",&EIn);
     long NMaxSec = TreeSec->GetEntries();
+    long NMaxPrim = TreePrim->GetEntries();
+
+    double MaxDistance = SQRT2*1e2*1e3;
+    double HalfDistance = MaxDistance/2;
 
     cerr << "\n Secondarys: " << NMaxSec  << endl;
-    for(long i = 0; i< 10 ; i++)
+
+    TCanvas* can;
+    TH1D* HistELossHalf1,*HistELossHalf2;
+
+
+    TreePrim->GetEntry(0);
+    TreeInPrim->GetEntry(0);
+    TreeSec->GetEntry(0);
+    long ctrPrim = 0,    ctrSec = 0;
+    double EInOld = -1;
+    bool first = true;
+
+    while(ctrPrim < NMaxPrim)
     {
-        TreeSec->GetEntry(i);
-        Distance = sqrt( Z*Z + Y*Y + X*X);
-        cerr << "D: " << Distance << endl;
+        TreePrim->GetEntry(ctrPrim);
+        TreeInPrim->GetEntry(ctrPrim);
+        ctrPrim++;
+//        cerr << "Particle" << endl;
+        if(EInOld != EIn)
+        {
+            EInOld = EIn;
+//            cerr << "Energy" << endl;
+            if(!first)
+            {
+                HistELossHalf1->SetLineColor(kRed);
+                HistELossHalf1->Draw();
+                HistELossHalf1->SetStats(0);
+
+                HistELossHalf2->SetLineColor(kBlue);
+                HistELossHalf2->Draw("same");
+
+                TLegend* Leg = new TLegend(0.2,0.7,0.4,0.9);
+                Leg->AddEntry(HistELossHalf1,"First","L");
+                Leg->AddEntry(HistELossHalf2,"Second","L");
+                Leg->Draw("Same");
+
+
+                can->Write();
+                HistELossHalf1->Write();
+                HistELossHalf2->Write();
+            }
+            first=false;
+
+            ss.str(""); ss << log10(EIn);
+            can = new TCanvas("","");
+            can->SetName(ss.str().c_str());
+            ss.str(""); ss << "Muons with log10(EIn)=" << log10(EIn) << " and dist/2=" << HalfDistance;
+            can->SetTitle(ss.str().c_str());
+            ss.str(""); ss << log10(EIn)<<"First";
+            HistELossHalf1 = new TH1D(ss.str().c_str(),"First",1024,2,log10(EIn));
+            ss.str(""); ss << log10(EIn)<<"Second";
+            HistELossHalf2 = new TH1D(ss.str().c_str(),"Second",1024,2,log10(EIn));
+        }
+
+
+        bool done=false;
+        ELossHalf1=0;
+        ELossHalf2=0;
+
+        while(      ParentParticleSec == ParentParticlePrim
+                &&  ParticleIdPrim == ParticleIdSec-1
+                &&  NMaxSec > ctrSec)
+        {
+            Distance = sqrt( Z*Z + Y*Y + X*X);
+
+            if(Distance>HalfDistance && !done)
+            {
+                ELossHalf1 = EIn - CurrPartEnergySec;
+                ELossHalf2 = EIn - energy_propagated - ELossHalf1;
+                done = true;
+            }
+            TreeSec->GetEntry(ctrSec);
+            ctrSec++;
+
+        }
+        if(ELossHalf1<106)ELossHalf1=106;
+        if(ELossHalf2<106)ELossHalf2=106;
+        HistELossHalf1->Fill(log10(ELossHalf1));
+        HistELossHalf2->Fill(log10(ELossHalf2));
+
     }
 
+
+    f.Close();
 }
 
 
