@@ -792,6 +792,21 @@ void Particle::Location(double time,
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
+void Particle::SetProperties(int parent_particle_id, int particle_id, double energy, double t,
+                             double x, double y, double z, double theta, double phi,
+                             double xi, double yi, double zi, double ti, double Ei,
+                             double xf, double yf, double zf, double tf, double Ef,
+                             double xc, double yc, double zc, double tc, double Ec)
+{
+    SetParentParticleEnergy(parent_particle_id);
+    SetParticleId(particle_id);
+    SetEnergy(energy);
+    SetT(t);
+    SetX(x); SetY(y); SetZ(z); SetTheta(theta); SetPhi(phi);
+    SetXi(xi); SetYi(yi); SetZi(zi); SetTi(ti); SetEi(Ei);
+    SetXf(xf); SetYf(yf); SetZf(zf); SetTf(tf); SetEf(Ef);
+    SetXc(xc); SetYc(yc); SetZc(zc); SetTc(tc); SetEc(Ec);
+}
 
 void Particle::SetEnergy(double e)
 {

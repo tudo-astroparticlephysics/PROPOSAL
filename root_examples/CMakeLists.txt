@@ -18,6 +18,7 @@ add_executable(Total_dEdx Total_dEdx.cxx)
 add_executable(Plot_StandardNormal plot_StandardNormal.cxx)
 add_executable(Draw_Track draw_track.cxx)
 add_executable(Plot_EnergyLossProbability plot_EnergyLossProbability.cxx)
+add_executable(Plot_MultMuon plot_MultMuon.cxx)
 
 target_link_libraries(Plot_range ${ROOT_LIBRARIES})
 target_link_libraries(Plot_range PROPOSAL)
@@ -72,3 +73,6 @@ target_link_libraries(Plot_StandardNormal PROPOSAL)
 
 target_link_libraries(Plot_EnergyLossProbability ${ROOT_LIBRARIES})
 target_link_libraries(Plot_EnergyLossProbability PROPOSAL)
+
+target_link_libraries(Plot_MultMuon ${ROOT_LIBRARIES})
+target_link_libraries(Plot_MultMuon PROPOSAL)

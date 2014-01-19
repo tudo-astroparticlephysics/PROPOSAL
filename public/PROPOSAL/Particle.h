@@ -234,7 +234,11 @@ public:
 //----------------------------------------------------------------------------//
 
     //Setter
-
+    void SetProperties( int parent_particle_id = 0,  int particle_id = 0,    double energy = 0, double t=0,
+                        double x = 0,   double y = 0,   double z = 0,   double theta = 0,   double phi = 0,
+                        double xi = 0,  double yi= 0,   double zi= 0,   double ti = 0   ,   double Ei = 0,
+                        double xf = 0,  double yf= 0,   double zf= 0,   double tf = 0   ,   double Ef = 0,
+                        double xc = 0,  double yc= 0,   double zc= 0,   double tc = 0   ,   double Ec = 0);
     void SetEnergy(double e);
     void SetPropagatedDistance(double prop_dist);
     void SetX(double x);
