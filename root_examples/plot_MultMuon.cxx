@@ -101,9 +101,11 @@ using namespace std;
 int main(int argc, char** argv)
 {
     cout<<"\n------------------------------------------------------------------\n"
-        <<"This is an example to plot the probabilities for are energy losses.\n"
-        <<"A ROOT-file named EnergyLosses.root will be generated,\n"
-        <<"which contains TCanvas (stochastic) with an overview of all losses.\n"
+        <<"This is an example to plot the behavior of multi/dou muon events.\n"
+        <<"An multi muon event contains 2 muons with half of the energy of the\n"
+        <<"previous simulated muon.\n"
+        <<"A ROOT-file named MultiMuon.root will be generated,\n"
+        <<"which contains all Particles and secondarys generated.\n"
         <<"You have to call the app. with 4 parameters: \n"
         <<"ecut seed vcut #particles \n"
         <<"e.g. 500 42 -1 1000\n"
@@ -138,30 +140,29 @@ int main(int argc, char** argv)
         EminLog10 = atof(argv[5]);
         EmaxLog10 = atof(argv[6]);
     }
-    string vcut_o;
-    string ecut_o;
 
-
-    Medium *med = new Medium("ice",1.);
-    EnergyCutSettings* cuts = new EnergyCutSettings(ecut,vcut);
-
-
+    ////////////////////////////////////////////////////////
+    //Set up all the propagation variables
+    //
     Propagator *pr = new Propagator("resources/configuration_IceOnly");
-
-    Output::getInstance().EnableROOTOutput("lol.root");
-
+    Output::getInstance().EnableROOTOutput("MultiMuon.root");
     Particle* part;
+    //
+    ////////////////////////////////////////////////////////
 
-
-
+    ////////////////////////////////////////////////////////
+    //Set up variables for loop
+    //
     double energy = pow(10,EmaxLog10);
     int ctr = (int)(EmaxLog10 - EminLog10)/(log10(2));
-    cerr << "ctrmax = " << ctr << endl;
-
-
-
-
     energy *=2;
+    //
+    ////////////////////////////////////////////////////////
+
+    ////////////////////////////////////////////////////////
+    //Start the loop which generates N="statistic" particles with starting
+    //energy and then again N="statistic" with half the energy and so forth.
+    //
     for(;ctr > 0; ctr--)
     {
         energy /= 2;
@@ -179,8 +180,28 @@ int main(int argc, char** argv)
         delete P;
     }
 
-
     Output::getInstance().Close();
+    //
+    ////////////////////////////////////////////////////////
+
+    TFile f("MultiMuon.root","update");
+    TTree* TreeSec = (TTree*)f.Get("secondarys");
+
+    double X,Y,Z,Distance,ELossHalf1, ELossHalf2;
+    int ParentParticleSec, ParentParticlePrim;
+
+    TreeSec->SetBranchAddress("z",&Z);
+    TreeSec->SetBranchAddress("y",&Y);
+    TreeSec->SetBranchAddress("x",&X);
+    long NMaxSec = TreeSec->GetEntries();
+
+    cerr << "\n Secondarys: " << NMaxSec  << endl;
+    for(long i = 0; i< 10 ; i++)
+    {
+        TreeSec->GetEntry(i);
+        Distance = sqrt( Z*Z + Y*Y + X*X);
+        cerr << "D: " << Distance << endl;
+    }
 
 }
 
