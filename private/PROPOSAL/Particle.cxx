@@ -798,7 +798,7 @@ void Particle::SetProperties(int parent_particle_id, int particle_id, double ene
                              double xf, double yf, double zf, double tf, double Ef,
                              double xc, double yc, double zc, double tc, double Ec)
 {
-    SetParentParticleEnergy(parent_particle_id);
+    SetParentParticleId(parent_particle_id);
     SetParticleId(particle_id);
     SetEnergy(energy);
     SetT(t);

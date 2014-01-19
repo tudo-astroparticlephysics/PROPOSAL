@@ -130,8 +130,9 @@ int main(int argc, char** argv)
     int seed = atoi(argv[2]);
     double vcut = atof(argv[3]);
     int statistic = atoi(argv[4]);
-    double EminLog10 = -4;
-    double EmaxLog10 = 14;
+
+    double EminLog10 = 3;
+    double EmaxLog10 = 8;
     if(argc>6)
     {
         EminLog10 = atof(argv[5]);
@@ -152,19 +153,22 @@ int main(int argc, char** argv)
     Particle* part;
 
 
-    EminLog10 = 3;
-    EmaxLog10 = 8;
 
     double energy = pow(10,EmaxLog10);
     int ctr = (int)(EmaxLog10 - EminLog10)/(log10(2));
     cerr << "ctrmax = " << ctr << endl;
 
 
-    ProgressBar* P = new ProgressBar(statistic*ctr,100);
+
+
+    energy *=2;
     for(;ctr > 0; ctr--)
     {
         energy /= 2;
-        P->start("Propagation Starts!");
+        ss.str("");
+        ss << "Propagation of particle with log10(energy/MeV)=" << log10(energy) << " starts!";
+        ProgressBar* P = new ProgressBar(statistic,25);
+        P->start(ss.str());
         for(int i =0;i<statistic;i++)
         {
             P->update();
@@ -172,6 +176,7 @@ int main(int argc, char** argv)
             part->SetProperties(ctr,i,energy);
             pr->Propagate(part,SQRT2*1e2*1e3);
         }
+        delete P;
     }
 
 

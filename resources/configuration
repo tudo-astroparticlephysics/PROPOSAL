@@ -190,17 +190,6 @@ sector
     medium  Standard_Rock 1.
 
 
-
-sector
-    cylinder 0 0   500 1200 0   50
-
-    hirarchy 0
-    inside  500     -1  0
-    infront -1    0.05  1
-    behind  -1      -1  0
-
-    medium  uranium 1.
-
 # keyword detector must be followed by one line
 # geometry information
 #       sphere      origin_x origin_y origin_z      radius  inner_radius
