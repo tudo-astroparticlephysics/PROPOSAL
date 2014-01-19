@@ -149,7 +149,7 @@ public:
      *  \return vector of secondarys
      */
 
-    std::vector<Particle*> Propagate( Particle *particle );
+    std::vector<Particle*> Propagate( Particle *particle, double MaxDistance_cm = 1e20 );
 
 //----------------------------------------------------------------------------//
     /*!

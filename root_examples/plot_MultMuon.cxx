@@ -146,19 +146,19 @@ int main(int argc, char** argv)
     EnergyCutSettings* cuts = new EnergyCutSettings(ecut,vcut);
 
 
-    Propagator *pr = new Propagator(med,cuts,"mu","resources/tables",false,false,false,false,1);
+    Propagator *pr = new Propagator("resources/configuration");
 
-    Output::getInstance().EnableASCIIOutput("TestOutput.txt");
+    Output::getInstance().EnableROOTOutput("lol.root");
 
     ProgressBar* P = new ProgressBar(statistic,100);
+    Particle* part;
     P->start("Propagation Starts!");
     for(int i =0;i<statistic;i++)
     {
         P->update();
-        pr->GetParticle()->SetProperties(0,i,1e6);
-        pr->Propagate(SQRT2*1e2*1e3);
-
-
+        part = new Particle();
+        part->SetProperties(0,i,10e6);
+        pr->Propagate(part,1234*1e2);
     }
 
     Output::getInstance().Close();

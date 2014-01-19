@@ -72,7 +72,7 @@ std::pair<double,double> Propagator::CalculateEnergyTillStochastic( double initi
 //----------------------------------------------------------------------------//
 
 
-vector<Particle*> Propagator::Propagate( Particle *particle )
+vector<Particle*> Propagator::Propagate( Particle *particle, double MaxDistance_cm )
 {
     Output::getInstance().ClearSecondaryVector();
 
@@ -291,9 +291,12 @@ vector<Particle*> Propagator::Propagate( Particle *particle )
             starts_in_detector  =   false;
 
         }
-
+        if(MaxDistance_cm <= particle_->GetPropagatedDistance() + distance)
+        {
+            distance = MaxDistance_cm - particle_->GetPropagatedDistance();
+        }
         result  =   Propagate(distance);
-        if(result<=0) break;
+        if(result<=0 || MaxDistance_cm <= particle_->GetPropagatedDistance()) break;
 
     }
 
