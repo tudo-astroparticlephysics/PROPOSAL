@@ -114,7 +114,9 @@ int main(int argc, char** argv)
         <<"------------------------------------------------------------------\n"
         <<endl;
 
-    if(argc<5)
+
+
+    if(argc<5 && argc != 2)
     {
         cerr<<"Not enough parameters(" << argc-1 << ") given! Expected 4 or 6 parameters! \n Aborting application!";
         exit(1);
@@ -128,24 +130,49 @@ int main(int argc, char** argv)
     stringstream ss;
     ss.precision(4);
 
-    double ecut = atof(argv[1]);
-    int seed = atoi(argv[2]);
-    double vcut = atof(argv[3]);
-    int statistic = atoi(argv[4]);
+    string OutputFile = "/data/LocalApps/PROPOSAL/Output/MultiMuon.root";
+    double ecut = 500;
+    int seed = 42;
+    double vcut = -1;
+    int statistic = 200;
 
     double EminLog10 = 3;
     double EmaxLog10 = 8;
+
+    if(2 == argc)
+    {
+        statistic = atof(argv[1]);
+    }
+
+    if(argc==5)
+    {
+        ecut = atof(argv[1]);
+        seed = atoi(argv[2]);
+        vcut = atof(argv[3]);
+        statistic = atoi(argv[4]);
+    }
+
     if(argc>6)
     {
         EminLog10 = atof(argv[5]);
         EmaxLog10 = atof(argv[6]);
     }
 
+
+    cerr << "Starting with: \t ecut=" << ecut;
+    cerr << "\n \t\t seed=" << seed;
+    cerr << "\n \t\t vcut=" << vcut;
+    cerr << "\n \t\t statitic=" << statistic;
+    cerr << "\n \t\t Emin=" << EminLog10;
+    cerr << "\n \t\t Emax=" << EmaxLog10;
+    cerr << "\n------------------------------";
+    cerr << "\n------------------------------\n";
+
     ////////////////////////////////////////////////////////
     //Set up all the propagation variables
     //
     Propagator *pr = new Propagator("resources/configuration_IceOnly");
-    Output::getInstance().EnableROOTOutput("MultiMuon.root");
+    Output::getInstance().EnableROOTOutput( OutputFile.c_str() );
     Particle* part;
     //
     ////////////////////////////////////////////////////////
@@ -184,7 +211,7 @@ int main(int argc, char** argv)
     //
     ////////////////////////////////////////////////////////
 
-    TFile f("MultiMuon.root","update");
+    TFile f(OutputFile.c_str(),"update");
     TTree* TreeSec = (TTree*)f.Get("secondarys");
     TTree* TreePrim = (TTree*)f.Get("propagated_primarys");
     TTree* TreeInPrim = (TTree*)f.Get("primarys");
