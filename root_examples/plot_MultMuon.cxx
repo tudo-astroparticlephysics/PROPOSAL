@@ -130,13 +130,13 @@ int main(int argc, char** argv)
     stringstream ss;
     ss.precision(4);
 
-    string OutputFile = "/data/LocalApps/PROPOSAL/Output/MultiMuon.root";
+    string OutputFile = "MultiMuon.root";
     double ecut = 500;
     int seed = 42;
     double vcut = -1;
     int statistic = 200;
 
-    double EminLog10 = 3;
+    double EminLog10 = 5;
     double EmaxLog10 = 8;
 
     if(2 == argc)
@@ -211,6 +211,10 @@ int main(int argc, char** argv)
     //
     ////////////////////////////////////////////////////////
 
+    ////////////////////////////////////////////////////////
+    //Start the loop which generates N="statistic" particles with starting
+    //energy and then again N="statistic" with half the energy and so forth.
+    //
     TFile f(OutputFile.c_str(),"update");
     TTree* TreeSec = (TTree*)f.Get("secondarys");
     TTree* TreePrim = (TTree*)f.Get("propagated_primarys");
@@ -248,7 +252,11 @@ int main(int argc, char** argv)
 
     TCanvas* can;
     TH1D* HistELossHalf1,*HistELossHalf2;
-
+    vector<TH1D*> VecOfHistsHalf1;
+    vector<TH1D*> VecOfHistsHalf2;
+    vector<TCanvas*> VecOfCanvas;
+    VecOfHistsHalf1.resize(0);
+    VecOfHistsHalf2.resize(0);
 
     TreePrim->GetEntry(0);
     TreeInPrim->GetEntry(0);
@@ -285,6 +293,11 @@ int main(int argc, char** argv)
                 can->Write();
                 HistELossHalf1->Write();
                 HistELossHalf2->Write();
+
+                VecOfHistsHalf1.push_back(HistELossHalf1);
+                VecOfHistsHalf2.push_back(HistELossHalf2);
+                VecOfCanvas.push_back(can);
+
             }
             first=false;
 
@@ -294,9 +307,9 @@ int main(int argc, char** argv)
             ss.str(""); ss << "Muons with log10(EIn)=" << log10(EIn) << " and dist/2=" << HalfDistance;
             can->SetTitle(ss.str().c_str());
             ss.str(""); ss << log10(EIn)<<"First";
-            HistELossHalf1 = new TH1D(ss.str().c_str(),"First",1024,2,log10(EIn));
+            HistELossHalf1 = new TH1D(ss.str().c_str(),"First",64,4,EmaxLog10);
             ss.str(""); ss << log10(EIn)<<"Second";
-            HistELossHalf2 = new TH1D(ss.str().c_str(),"Second",1024,2,log10(EIn));
+            HistELossHalf2 = new TH1D(ss.str().c_str(),"Second",64,4,EmaxLog10);
         }
 
 
@@ -326,6 +339,69 @@ int main(int argc, char** argv)
         HistELossHalf2->Fill(log10(ELossHalf2));
 
     }
+
+    vector<TH1D*> VecOfDouHistHalf1;
+    vector<TH1D*> VecOfDouHistHalf2;
+
+    vector<TH1D*> VecOfSingleHistHalf1;
+    vector<TH1D*> VecOfSingleHistHalf2;
+
+    vector<TCanvas*> VecOfFinalCanvas;
+    double DouEnergyLoss;
+    for(unsigned int k = 0; k < VecOfHistsHalf1.size() - 1; k++)
+    {
+        ss.str(""); ss << "Final_" << VecOfCanvas.at(k)->GetName();
+        VecOfFinalCanvas.push_back( new TCanvas(ss.str().c_str(),ss.str().c_str()));
+
+        VecOfDouHistHalf1.push_back( (TH1D*)VecOfHistsHalf1.at(k+1)->Clone("half1D") );
+        VecOfDouHistHalf1.at(k)->Reset();
+        VecOfDouHistHalf1.at(k)->SetMarkerStyle(20);
+        VecOfDouHistHalf1.at(k)->SetMarkerColor(kRed);
+        VecOfDouHistHalf1.at(k)->SetDrawOption("P");
+
+        VecOfDouHistHalf2.push_back( (TH1D*)VecOfHistsHalf2.at(k+1)->Clone("half2D") );
+        VecOfDouHistHalf2.at(k)->Reset();
+        VecOfDouHistHalf2.at(k)->SetMarkerStyle(34);
+        VecOfDouHistHalf2.at(k)->SetMarkerColor(kBlue);
+        VecOfDouHistHalf2.at(k)->SetDrawOption("P");
+
+        VecOfSingleHistHalf1.push_back( (TH1D*)VecOfHistsHalf1.at(k)->Clone("half1S") );
+        VecOfSingleHistHalf1.at(k)->Reset();
+
+        VecOfSingleHistHalf2.push_back( (TH1D*)VecOfHistsHalf2.at(k)->Clone("half1S") );
+        VecOfSingleHistHalf2.at(k)->Reset();
+
+        for(unsigned int i = 0; i< statistic/2; i++)
+        {
+            DouEnergyLoss = 0;
+            DouEnergyLoss += pow(10,VecOfHistsHalf1.at(k+1)->GetRandom());
+            DouEnergyLoss += pow(10,VecOfHistsHalf1.at(k+1)->GetRandom());
+            DouEnergyLoss = log10(DouEnergyLoss);
+            VecOfDouHistHalf1.at(k)->Fill(DouEnergyLoss);
+
+            DouEnergyLoss = 0;
+            DouEnergyLoss += pow(10,VecOfHistsHalf2.at(k+1)->GetRandom());
+            DouEnergyLoss += pow(10,VecOfHistsHalf2.at(k+1)->GetRandom());
+            DouEnergyLoss = log10(DouEnergyLoss);
+            VecOfDouHistHalf2.at(k)->Fill(DouEnergyLoss);
+
+            VecOfSingleHistHalf1.at(k)->Fill(VecOfHistsHalf1.at(k)->GetRandom());
+            VecOfSingleHistHalf2.at(k)->Fill(VecOfHistsHalf2.at(k)->GetRandom());
+        }
+        VecOfDouHistHalf1.at(k)->Draw("P");
+        VecOfDouHistHalf2.at(k)->Draw("SAME P");
+
+        VecOfSingleHistHalf1.at(k)->Draw("SAME");
+        VecOfSingleHistHalf2.at(k)->Draw("SAME");
+
+        VecOfDouHistHalf1.at(k)->Write();
+        VecOfDouHistHalf2.at(k)->Write();
+        VecOfSingleHistHalf1.at(k)->Write();
+        VecOfSingleHistHalf2.at(k)->Write();
+        VecOfFinalCanvas.at(k)->Write();
+
+    }
+
 
 
     f.Close();
