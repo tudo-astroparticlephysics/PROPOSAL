@@ -56,19 +56,43 @@ void ScatteringMoliere::Scatter(double dr, Particle* part, Medium* med)
 
     //----------------------------------------------------------------------------//
 
-    rnd1    =   GetRandom();
-    rnd2    =   GetRandom();
-    sx      =   (rnd1/SQRT3+rnd2)/2;
-    tx      =   rnd2;
+    //  Check for inappropriate values of B. If B < 4.5 it is practical to assume no deviation.
+    bool checkB = true;
 
-    rnd1    =   GetRandom();
-    rnd2    =   GetRandom();
+    for(int i = 0; i < numComp_; i++)
+    {
+        if( (B_.at(i) < 4.5) || B_.at(i) != B_.at(i) ) checkB = false;
+    }
 
-    sy      =   (rnd1/SQRT3+rnd2)/2;
-    ty      =   rnd2;
+    if(checkB)
+    {
+        rnd1    =   GetRandom();
+        rnd2    =   GetRandom();
 
-    sz      =   sqrt(max(1.-(sx*sx+sy*sy), 0.));
-    tz      =   sqrt(max(1.-(tx*tx+ty*ty), 0.));
+        sx      =   (rnd1/SQRT3+rnd2)/2;
+        tx      =   rnd2;
+
+        rnd1    =   GetRandom();
+        rnd2    =   GetRandom();
+
+        sy      =   (rnd1/SQRT3+rnd2)/2;
+        ty      =   rnd2;
+
+        sz      =   sqrt(max(1.-(sx*sx+sy*sy), 0.));
+        tz      =   sqrt(max(1.-(tx*tx+ty*ty), 0.));
+
+    }
+    else
+    {
+        sx      =   0.;
+        sy      =   0.;
+        sz      =   1.;
+
+        tx      =   0.;
+        ty      =   0.;
+        tz      =   1.;
+    }
+
 
     double sinth, costh,sinph,cosph;
     double theta, phi;
@@ -86,6 +110,7 @@ void ScatteringMoliere::Scatter(double dr, Particle* part, Medium* med)
     ax      =   sinth*cosph*sz+costh*cosph*sx-sinph*sy;
     ay      =   sinth*sinph*sz+costh*sinph*sx+cosph*sy;
     az      =   costh*sz-sinth*sx;
+
 
     x       +=  ax*dr;
     y       +=  ay*dr;
