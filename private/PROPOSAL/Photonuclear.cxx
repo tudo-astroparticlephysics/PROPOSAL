@@ -1031,44 +1031,45 @@ double Photonuclear::RhodeParametrization(double v, int i)
     }
     else
     {
-        sgn =   49.2 + 11.1*log(nu) + 151.8/sqrt(nu);
+        return KokoulinParametrization(v,i);
+        //sgn =   49.2 + 11.1*log(nu) + 151.8/sqrt(nu);
     }
 
 
-    k   =   1 - 2/v + 2/(v*v);
+//    k   =   1 - 2/v + 2/(v*v);
 
-    if(medium_->GetNucCharge().at(i)==1)
-    {
-        G   =   1;
-    }
-    else
-    {
-        aux =   0.00282*pow(medium_->GetAtomicNum().at(i), 1./3)*sgn;
-        G   =   (3/aux)*(0.5 + ((1 + aux)*exp(-aux) - 1)/(aux*aux));
-    }
+//    if(medium_->GetNucCharge().at(i)==1)
+//    {
+//        G   =   1;
+//    }
+//    else
+//    {
+//        aux =   0.00282*pow(medium_->GetAtomicNum().at(i), 1./3)*sgn;
+//        G   =   (3/aux)*(0.5 + ((1 + aux)*exp(-aux) - 1)/(aux*aux));
+//    }
 
-    G       *=  3;
-    aux     =   v*particle_->GetMass()*1.e-3;
-    t       =   aux*aux/(1-v);
-    sgn     *=  1.e-30;
-    aum     =   particle_->GetMass()*1.e-3;
-    aum     *=  aum;
-    aux     =   2*aum/t;
-    aux     =   G*((k + 4*aum/m1)*log(1 + m1/t) - (k*m1)/(m1 + t) - aux) +
-                ((k + 2*aum/m2)*log(1 + m2/t) - aux) + 0.25*aux*((G*(m1 - 4*t))/(m1 + t) + (m2/t)*log(1 + t/m2));
+//    G       *=  3;
+//    aux     =   v*particle_->GetMass()*1.e-3;
+//    t       =   aux*aux/(1-v);
+//    sgn     *=  1.e-30;
+//    aum     =   particle_->GetMass()*1.e-3;
+//    aum     *=  aum;
+//    aux     =   2*aum/t;
+//    aux     =   G*((k + 4*aum/m1)*log(1 + m1/t) - (k*m1)/(m1 + t) - aux) +
+//                ((k + 2*aum/m2)*log(1 + m2/t) - aux) + 0.25*aux*((G*(m1 - 4*t))/(m1 + t) + (m2/t)*log(1 + t/m2));
 
-    aux     *=  ALPHA/(8*PI)*medium_->GetAtomicNum().at(i)*sgn*v;
+//    aux     *=  ALPHA/(8*PI)*medium_->GetAtomicNum().at(i)*sgn*v;
 
-    if(hard_component_)
-    {
-        if(particle_->GetType()==1 || particle_->GetType()==2)
-        {
-            aux +=  medium_->GetAtomicNum().at(i)*1.e-30*HardBB(particle_->GetEnergy(), v);
-        }
+//    if(hard_component_)
+//    {
+//        if(particle_->GetType()==1 || particle_->GetType()==2)
+//        {
+//            aux +=  medium_->GetAtomicNum().at(i)*1.e-30*HardBB(particle_->GetEnergy(), v);
+//        }
 
-    }
+//    }
 
-    return medium_->GetMolDensity()*medium_->GetAtomInMolecule().at(i)*particle_->GetCharge()*particle_->GetCharge()*aux;
+//    return medium_->GetMolDensity()*medium_->GetAtomInMolecule().at(i)*particle_->GetCharge()*particle_->GetCharge()*aux;
 
 }
 
