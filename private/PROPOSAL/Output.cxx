@@ -146,7 +146,7 @@ void Output::Close()
         secondary_tree_->Branch("energy",&secondary_energy_,"energy/D");
         secondary_tree_->Branch("parent_particle_id",&secondary_parent_particle_id_,"parent_particle_id/I");
         secondary_tree_->Branch("particle_id",&secondary_particle_id_,"particle_id/I");
-        secondary_tree_->Branch("name",&secondary_name_);
+        secondary_tree_->Branch("name",&secondary_name_,"name/C");
         secondary_tree_->Branch("current_primary_energy",&current_primary_energy_);
 
         primary_tree_->Branch("x",&primary_x_,"x/D");
@@ -158,7 +158,7 @@ void Output::Close()
         primary_tree_->Branch("energy",&primary_energy_,"energy/D");
         primary_tree_->Branch("parent_particle_id",&primary_parent_particle_id_,"parent_particle_id/I");
         primary_tree_->Branch("particle_id",&primary_particle_id_,"particle_id/I");
-        primary_tree_->Branch("name",&primary_name_);
+        primary_tree_->Branch("name",&primary_name_,"name/C");
 
         propagated_primary_tree_->Branch("x",&prop_primary_x_,"x/D");
         propagated_primary_tree_->Branch("y",&prop_primary_y_,"y/D");
@@ -169,7 +169,7 @@ void Output::Close()
         propagated_primary_tree_->Branch("energy",&prop_primary_energy_,"energy/D");
         propagated_primary_tree_->Branch("parent_particle_id",&prop_primary_parent_particle_id_,"parent_particle_id/I");
         propagated_primary_tree_->Branch("particle_id",&prop_primary_particle_id_,"particle_id/I");
-        propagated_primary_tree_->Branch("name",&prop_primary_name_);
+        propagated_primary_tree_->Branch("name",&prop_primary_name_,"name/C");
         propagated_primary_tree_->Branch("xi",&prop_primary_xi_,"xi/D");
         propagated_primary_tree_->Branch("yi",&prop_primary_yi_,"yi/D");
         propagated_primary_tree_->Branch("zi",&prop_primary_zi_,"zi/D");

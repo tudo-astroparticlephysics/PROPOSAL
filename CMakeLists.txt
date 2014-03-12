@@ -107,7 +107,8 @@ ENDIF(ROOT_FOUND)
 add_executable(PROPOSALtest
         private/test/PROPOSAL.cxx
 )
-#set_target_properties(PROPOSALtest PROPERTIES LINK_FLAGS "-L/home/koehne/Simulation/icesim4_candidate/buildV04-00-01-RC/lib")
+
+
 
 target_link_libraries(PROPOSALtest PROPOSAL)
 

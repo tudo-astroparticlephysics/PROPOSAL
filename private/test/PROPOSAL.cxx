@@ -3,7 +3,7 @@
 
 #include "PROPOSAL/Propagator.h"
 
-#include <boost/program_options.hpp>
+#include "boost/program_options.hpp"
 #include "boost/lexical_cast.hpp"
 using namespace std;
 namespace po	= boost::program_options;
@@ -30,7 +30,6 @@ char** LoadArgsFromCacheFile(int &argc, char** argv);
 
 int main(int argc, char** argv)
 {
-
     if(argc != 1)
     {
         SaveArgsToCacheFile(argc,argv);
