@@ -211,6 +211,9 @@ public:
 
      //----------------------------------------------------------------------------//
 
+         void WriteDescriptionFile();
+
+
     //Getter
     std::vector<Particle*> GetSecondarys() const
     {

@@ -328,6 +328,8 @@ void Output::Close()
          }
 
          store_in_ASCII_file_ = true;
+
+         WriteDescriptionFile();
      }
 
 
@@ -402,6 +404,70 @@ void Output::Close()
              prop_primary->GetPropagatedDistance()<< "\t" <<
              prop_primary->GetElost()<< endl;
          }
+     }
+
+     void Output::WriteDescriptionFile()
+     {
+         ofstream description;
+         description.open("ASCII_OUTPUT_DESCRIPTION.txt",ios_base::out);
+
+        description << "Primary" << endl;
+            description << "\tx				x-coordinate of the particle in cm from detector center [cm]" << endl;
+            description << "\ty				y-coordinate *" << endl;
+            description << "\tz				z-coordinate *" << endl;
+            description << "\tt				time-coordinate * [s]" << endl;
+            description << "\ttheta 			theta angle of the direction of the particle from z-axis [rad]" << endl;
+            description << "\tphi				phi angle of the direction of the particle from x-axis [rad]" << endl;
+            description << "\tenergy			particle energy [MeV]" << endl;
+            description << "\tparentParticleId		Id of the parent particle (in real simulation e.g. HE4 Nucleus)" << endl;
+            description << "\tparticleId			Id of the particle" << endl;
+            description << "\tname			name of the particle" << endl;
+
+        description << endl;
+
+        description << "Propagated Primary" << endl;
+            description << "\tx				x-coordinate of the particle in cm from detector center [cm]" << endl;
+            description << "\ty				y-coordinate *" << endl;
+            description << "\tz				z-coordinate *" << endl;
+            description << "\tt				time-coordinate * [s]" << endl;
+            description << "\ttheta 			theta angle of the direction of the particle from z-axis [rad]" << endl;
+            description << "\tphi				phi angle of the direction of the particle from x-axis [rad]" << endl;
+            description << "\tenergy			particle energy [MeV]" << endl;
+            description << "\tparentParticleId		Id of the parent particle (in real simulation e.g. HE4 Nucleus)" << endl;
+            description << "\tparticleId			Id of the particle" << endl;
+            description << "\tname			name of the particle" << endl;
+            description << "\txi				x-coordinate of the particle entering the detector center [cm]" << endl;
+            description << "\tyi				y-coordinate *" << endl;
+            description << "\tzi				z-coordinate *" << endl;
+            description << "\tti				time-coordinate * [s]" << endl;
+            description << "\tenergyi			particle energy * [MeV]" << endl;
+            description << "\txf				x-coordinate of the particle exiting the detector center [cm]" << endl;
+            description << "\tyf				y-coordinate *" << endl;
+            description << "\tzf				z-coordinate *" << endl;
+            description << "\ttf				time-coordinate * [s]" << endl;
+            description << "\tenergyf			particle energy * [MeV]" << endl;
+            description << "\txc				x-coordinate of the particles closes approach to the detector center [cm]" << endl;
+            description << "\tyc				y-coordinate *" << endl;
+            description << "\tzc				z-coordinate *" << endl;
+            description << "\ttc				time-coordinate * [s]" << endl;
+            description << "\tenergyc			particle energy * [MeV]" << endl;
+            description << "\tpropagated distance	propagated distance of the particle [cm]" << endl;
+            description << "\tElost				particle energy which was lost in the detector [MeV]" << endl;
+
+        description << "Secondary" << endl;
+            description << "\tx				x-coordinate of the secondary in cm from detector center [cm]" << endl;
+            description << "\ty				y-coordinate *" << endl;
+            description << "\tz				z-coordinate *" << endl;
+            description << "\tt				time-coordinate * [s]" << endl;
+            description << "\ttheta 			theta angle of the direction of the secondary from z-axis [rad]" << endl;
+            description << "\tphi				phi angle of the direction of the secondary from x-axis [rad]" << endl;
+            description << "\tenergy			secondary energy [MeV]" << endl;
+            description << "\tparentParticleId		Id of the parent particle (in real simulation e.g. HE4 Nucleus)" << endl;
+            description << "\tparticleId			Id of the particle (here propagated particle ID +1)" << endl;
+            description << "\tname			name of the secondary" << endl;
+            description << "\tParentEnergy		energy of the particle which created the secondary [MeV]" << endl;
+
+        description.close();
      }
 
 
