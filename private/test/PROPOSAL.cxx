@@ -2,7 +2,7 @@
 #include <fstream>
 
 #include "PROPOSAL/Propagator.h"
-
+#include "PROPOSAL/Output.h"
 #include "boost/program_options.hpp"
 #include "boost/lexical_cast.hpp"
 using namespace std;
@@ -30,6 +30,9 @@ char** LoadArgsFromCacheFile(int &argc, char** argv);
 
 int main(int argc, char** argv)
 {
+    Propagator* propa = new Propagator("resources/configuration");
+    Output::getInstance().WriteDescriptionFile();
+
     if(argc != 1)
     {
         SaveArgsToCacheFile(argc,argv);

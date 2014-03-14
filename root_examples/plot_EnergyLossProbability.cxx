@@ -14,6 +14,7 @@
 #include "TProfile.h"
 #include "TGraph.h"
 #include "TLegend.h"
+#include "TPaveStats.h"
 
 class ProgressBar {
 private:
@@ -107,8 +108,9 @@ int main(int argc, char** argv)
         <<"You have to call the app. with 4 parameters: \n"
         <<"ecut seed vcut #particles \n"
         <<"e.g. 500 42 -1 1000\n"
-        <<"or with 6 parameters using the first few parameters and\n"
-        <<"giving log10(energy_min/MeV) and log10(energy_max/MeV) in addition.\n"
+        <<"or with 7 parameters using the first few parameters and\n"
+        <<"giving log10(energy_min/MeV),log10(energy_max/MeV) and path. \n."
+        <<"for the output file.\n"
         <<"------------------------------------------------------------------\n"
         <<endl;
 
@@ -117,11 +119,15 @@ int main(int argc, char** argv)
         cerr<<"Not enough parameters(" << argc-1 << ") given! Expected 4 or 6 parameters! \n Aborting application!";
         exit(1);
     }
-    else if(argc == 6|| argc > 7)
+    else if(argc == 6|| argc > 8)
     {
         cerr<<"Number of parameters(" << argc-1 << ") not supported! Expected 4 or 6 parameters! \n Aborting application!";
         exit(1);
     }
+
+    string path = "";
+
+
 
     stringstream ss;
 
@@ -137,11 +143,12 @@ int main(int argc, char** argv)
     {
         EminLog10 = atof(argv[5]);
         EmaxLog10 = atof(argv[6]);
+        path = argv[7];
     }
     string vcut_o;
     string ecut_o;
 
-    ss<<"EnergyLosses.root";
+    ss<<path << "EnergyLosses.root";
     Medium *med = new Medium("ice",1.);
     EnergyCutSettings* cuts = new EnergyCutSettings(ecut,vcut);
 
@@ -226,7 +233,9 @@ int main(int argc, char** argv)
 
     }
 
+    TPaveStats *st;
     TCanvas *can = new TCanvas("stochatic","stochastic",1400,1050);
+
     can->Divide(2,2);
     can->cd(1);
     can->SetGridx();
@@ -235,6 +244,14 @@ int main(int argc, char** argv)
     can->SetTicky();
     gPad->SetLogz(1);
     ioniz->Draw("colz");
+    gPad->Update();
+    st = (TPaveStats*)ioniz->FindObject("stats");
+    st->SetOptStat(10);
+    st->SetX1NDC(0.1);
+    st->SetX2NDC(0.4);
+    st->SetY1NDC(0.9);
+    st->SetY2NDC(0.85);
+    gPad->Update();
 
     can->cd(2);
     can->SetGridx();
@@ -243,6 +260,14 @@ int main(int argc, char** argv)
     can->SetTicky();
     gPad->SetLogz(1);
     brems->Draw("colz");
+    gPad->Update();
+    st = (TPaveStats*)brems->FindObject("stats");
+    st->SetOptStat(10);
+    st->SetX1NDC(0.1);
+    st->SetX2NDC(0.4);
+    st->SetY1NDC(0.9);
+    st->SetY2NDC(0.85);
+    gPad->Update();
 
     can->cd(3);
     can->SetGridx();
@@ -251,6 +276,14 @@ int main(int argc, char** argv)
     can->SetTicky();
     gPad->SetLogz(1);
     photo->Draw("colz");
+    gPad->Update();
+    st = (TPaveStats*)photo->FindObject("stats");
+    st->SetOptStat(10);
+    st->SetX1NDC(0.1);
+    st->SetX2NDC(0.4);
+    st->SetY1NDC(0.9);
+    st->SetY2NDC(0.85);
+    gPad->Update();
 
     can->cd(4);
     can->SetGridx();
@@ -259,6 +292,14 @@ int main(int argc, char** argv)
     can->SetTicky();
     gPad->SetLogz(1);
     epair->Draw("colz");
+    gPad->Update();
+    st = (TPaveStats*)epair->FindObject("stats");
+    st->SetOptStat(10);
+    st->SetX1NDC(0.1);
+    st->SetX2NDC(0.4);
+    st->SetY1NDC(0.9);
+    st->SetY2NDC(0.85);
+    gPad->Update();
 
     can->Write();
     ioniz->Write();
@@ -271,7 +312,19 @@ int main(int argc, char** argv)
 
 
     TCanvas* can_tot = new TCanvas("total","Total Contribution",1);
+
     double content;
+    for(int i = 1 ; i<hist_epair->GetNbinsX()+1;i++)
+    {
+        content = (hist_epair->GetBinContent(i)+1)/statistic;
+        content = log10(content);
+        hist_epair->SetBinContent(i,content);
+    }
+    hist_epair->SetStats(0);
+    hist_epair->SetLineColor(4);
+    hist_epair->SetLineWidth(2.);
+    hist_epair->Draw("L");
+
     for(int i = 1 ; i<hist_ioniz->GetNbinsX()+1;i++)
     {
         content = (hist_ioniz->GetBinContent(i)+1)/statistic;
@@ -279,7 +332,8 @@ int main(int argc, char** argv)
         hist_ioniz->SetBinContent(i,content);
     }
     hist_ioniz->SetLineColor(1);
-    hist_ioniz->Draw("L");
+    hist_ioniz->SetLineWidth(2.);
+    hist_ioniz->Draw("L Same");
 
     for(int i = 1 ; i<hist_brems->GetNbinsX()+1;i++)
     {
@@ -288,6 +342,7 @@ int main(int argc, char** argv)
         hist_brems->SetBinContent(i,content);
     }
     hist_brems->SetLineColor(2);
+    hist_ioniz->SetLineWidth(2.);
     hist_brems->Draw("L same");
 
     for(int i = 1 ; i<hist_photo->GetNbinsX()+1;i++)
@@ -297,16 +352,8 @@ int main(int argc, char** argv)
         hist_photo->SetBinContent(i,content);
     }
     hist_photo->SetLineColor(3);
+    hist_ioniz->SetLineWidth(2.);
     hist_photo->Draw("L same");
-
-    for(int i = 1 ; i<hist_epair->GetNbinsX()+1;i++)
-    {
-        content = (hist_epair->GetBinContent(i)+1)/statistic;
-        content = log10(content);
-        hist_epair->SetBinContent(i,content);
-    }
-    hist_epair->SetLineColor(4);
-    hist_epair->Draw("L same");
 
     TLegend* leg = new TLegend(0.1,0.7,0.3,0.9);
     leg->SetFillColor(0);
