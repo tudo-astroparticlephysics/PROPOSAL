@@ -77,6 +77,3 @@ target_link_libraries(Plot_EnergyLossProbability PROPOSAL)
 target_link_libraries(Plot_MultMuon ${ROOT_LIBRARIES})
 target_link_libraries(Plot_MultMuon PROPOSAL)
 
-target_link_libraries(Plot_StochasticLosses ${ROOT_LIBRARIES})
-target_link_libraries(Plot_StochasticLosses PROPOSAL)
-
