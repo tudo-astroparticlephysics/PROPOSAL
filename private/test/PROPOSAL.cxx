@@ -5,6 +5,9 @@
 #include "PROPOSAL/Output.h"
 #include "boost/program_options.hpp"
 #include "boost/lexical_cast.hpp"
+#include "PROPOSAL/methods.h"
+
+
 using namespace std;
 namespace po	= boost::program_options;
 
@@ -30,6 +33,9 @@ char** LoadArgsFromCacheFile(int &argc, char** argv);
 
 int main(int argc, char** argv)
 {
+//    double x = (1-1e-16);
+//    cerr << "erfInv(" << x << "): " << erfInv(x*2*(1-0.5)) << endl;
+//    return 1;
     Propagator* propa = new Propagator("resources/configuration");
     Output::getInstance().WriteDescriptionFile();
 

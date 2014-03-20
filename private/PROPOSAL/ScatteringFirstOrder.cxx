@@ -16,9 +16,6 @@
 #include "PROPOSAL/ScatteringFirstOrder.h"
 #include "PROPOSAL/Output.h"
 
-#include <boost/math/special_functions/erf.hpp>
-#define erfInv(x)   boost::math::erf_inv(x)
-
 using namespace std;
 
 

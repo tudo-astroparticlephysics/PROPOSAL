@@ -4,7 +4,7 @@
 
 #include "PROPOSAL/Coefficients.h"                  //coefficients for calculating the power series approximation of the moliere function
 #include "PROPOSAL/Constants.h"
-
+#include "PROPOSAL/methods.h"
 #include "PROPOSAL/ScatteringMoliere.h"
 
 
@@ -12,7 +12,7 @@
 #define C       0.577215664901532860606512090082402431	//Euler-Mascheroni constant
 
 #define erf(x)      boost::math::erf(x)
-#define erfInv(x)   boost::math::erf_inv(x)
+
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
@@ -571,7 +571,6 @@ double ScatteringMoliere::GetRandom()
     //  Generate random angles following Moliere's distribution by comparing a
     //  uniformly distributed random number with the integral of the distribution.
     //  Therefore, determine the angle where the integral is equal to the random number.
-
 
     //rndm element of ]-0.5,0.5]
     double rndm = (MathMachine_->RandomDouble()-0.5);

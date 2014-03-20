@@ -15,6 +15,11 @@
 #include <fstream>
 #include <vector>
 #include "deque"
+#include <boost/math/special_functions/erf.hpp>
+
+//necessary since the boost function does not work for [-1,1] but for (-1,1)
+#define FIXPREC 0.9999999999999999
+#define erfInv(x)   boost::math::erf_inv(FIXPREC*x)
 
 bool FileExist(std::string path);
 

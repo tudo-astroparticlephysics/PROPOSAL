@@ -21,9 +21,6 @@
 #include "PROPOSAL/Photonuclear.h"
 #include "PROPOSAL/Output.h"
 
-#include <boost/math/special_functions/erf.hpp>
-#define erfInv(x)   boost::math::erf_inv(x)
-
 using namespace std;
 
 //----------------------------------------------------------------------------//
@@ -316,7 +313,7 @@ void Scattering::Scatter(double dr, double ei, double ef)
         double x,y,z;
         Theta0     =   CalculateTheta0(dr, ei, ef);
 
-
+//        cerr << "scatter called" << endl;
 
         rnd1 = SQRT2*Theta0*erfInv( 2.*(RandomDouble()-0.5) );
         rnd2 = SQRT2*Theta0*erfInv( 2.*(RandomDouble()-0.5) );

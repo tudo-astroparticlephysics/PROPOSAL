@@ -11,9 +11,7 @@
 #include "TGraphErrors.h"
 #include "TRandom3.h"
 #include "TLegend.h"
-
-#include <boost/math/special_functions/erf.hpp>
-#define erfInv(x)   boost::math::erf_inv(x)
+#include "PROPOSAL/methods.h"
 
 using namespace std;
 
