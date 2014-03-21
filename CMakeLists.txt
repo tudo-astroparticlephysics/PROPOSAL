@@ -21,11 +21,13 @@ IF(DEFINED ENV{GTEST_PATH})
   #1. Path
   #2. Path where the binarys will be copied to
   add_subdirectory($ENV{GTEST_PATH} ${CMAKE_CURRENT_BINARY_DIR}/gtestbin)
+  set(GTEST_INCLUDE_DIR "$ENV{GTEST_PATH}/include")
+  set(GTEST_LIBRARY_DIR $ENV{GTEST_PATH})
+  set(LINK_DIRECTORIES $ENV{GTEST_PATH})
   set(DoTesting true)
   MESSAGE(STATUS "Found gtest-path")
 ELSE()
     message("GTEST_PATH is not defined.  To build testsuite you have to set GTEST_PATH to gtest root directory")
-    message("Remember to add gtest/include to C_INCLUDE_PATH and CPP_INCLUDE_PATH")
 ENDIF()
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
