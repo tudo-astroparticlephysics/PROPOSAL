@@ -268,7 +268,7 @@ double Interpolant::FindLimit(double y)
         }
     }
 
-    SWAP(iX_,iY_, vector<double>);
+    iX_.swap(iY_);
     if(!fast_)
     {
         SWAP(precision_,precisionY_,double);
@@ -314,7 +314,7 @@ double Interpolant::FindLimit(double y)
 
     result  =   Interpolate(y, start);
 
-    SWAP(iX_,iY_, vector<double>);
+    iX_.swap(iY_);
 
     if(!fast_)
     {
@@ -406,7 +406,7 @@ double Interpolant::FindLimit(double x1, double y)
         }
     }
 
-    SWAP(iX_,iY_, vector<double>);
+    iX_.swap(iY_);
 
     if(!fast_)
     {
@@ -457,7 +457,7 @@ double Interpolant::FindLimit(double x1, double y)
 
     result  =   Interpolate(y, start);
 
-    SWAP(iX_,iY_, vector<double>);
+    iX_.swap(iY_);
 
     if(!fast_)
     {
