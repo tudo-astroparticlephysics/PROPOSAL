@@ -35,7 +35,7 @@ public:
 
 TEST(Comparison , Comparison_equal ) {
 
-    Particle *particle = new Particle("mu",1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle = new PROPOSALParticle("mu",1.,1.,1,.20,20,1e5,10);
     Decay *A = new Decay(particle);
     Decay *B = new Decay(particle);
     EXPECT_TRUE(*A==*B);
@@ -53,8 +53,8 @@ TEST(Comparison , Comparison_equal ) {
 
 TEST(Comparison , Comparison_not_equal ) {
 
-    Particle *particle = new Particle("mu",1.,1.,1,20,20,1e5,10);
-    Particle *particle2 = new Particle("tau",1.,1.,1,20,20,1e5,10);
+    PROPOSALParticle *particle = new PROPOSALParticle("mu",1.,1.,1,20,20,1e5,10);
+    PROPOSALParticle *particle2 = new PROPOSALParticle("tau",1.,1.,1,20,20,1e5,10);
     Decay *A = new Decay(particle);
     Decay *B = new Decay(particle2);
 
@@ -79,7 +79,7 @@ TEST(Assignment , Copyconstructor ) {
 }
 
 TEST(Assignment , Copyconstructor2 ) {
-    Particle *particle = new Particle("mu",1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle = new PROPOSALParticle("mu",1.,1.,1,.20,20,1e5,10);
 
     Decay A(particle);
     Decay B(A);
@@ -89,8 +89,8 @@ TEST(Assignment , Copyconstructor2 ) {
 }
 
 TEST(Assignment , Operator ) {
-    Particle *particle = new Particle("mu",1.,1.,1,.20,20,1e5,10);
-    Particle *particle2 = new Particle("tau",1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle = new PROPOSALParticle("mu",1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle2 = new PROPOSALParticle("tau",1.,1.,1,.20,20,1e5,10);
     Decay A(particle);
     Decay B(particle2);
 
@@ -100,7 +100,7 @@ TEST(Assignment , Operator ) {
 
     EXPECT_TRUE(A==B);
 
-    Particle *particle3 = new Particle("tau",1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle3 = new PROPOSALParticle("tau",1.,1.,1,.20,20,1e5,10);
     Decay *C = new Decay(particle3);
     EXPECT_TRUE(A!=*C);
 
@@ -112,15 +112,15 @@ TEST(Assignment , Operator ) {
 
 TEST(Assignment , Swap ) {
 
-    Particle *particle = new Particle("mu",1.,1.,1,.20,20,1e5,10);
-    Particle *particle2 = new Particle("mu",1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle = new PROPOSALParticle("mu",1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle2 = new PROPOSALParticle("mu",1.,1.,1,.20,20,1e5,10);
 
     Decay A(particle);
     Decay B(particle2);
     EXPECT_TRUE(A==B);
 
-    Particle *particle3 = new Particle("tau",1.,1.,1,.20,20,1e5,10);
-    Particle *particle4 = new Particle("tau",1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle3 = new PROPOSALParticle("tau",1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle4 = new PROPOSALParticle("tau",1.,1.,1,.20,20,1e5,10);
 
     Decay *C = new Decay(particle3);
     Decay *D = new Decay(particle4);
@@ -157,7 +157,7 @@ TEST(Decay , decay ) {
     {
         in>>particleName>>energy>>decay;
 
-        Particle *particle = new Particle(particleName,1.,1.,1,.20,20,1e5,10);
+        PROPOSALParticle *particle = new PROPOSALParticle(particleName,1.,1.,1,.20,20,1e5,10);
         particle->SetEnergy(energy);
 
         Decay* dec  = new Decay(particle);
@@ -201,7 +201,7 @@ TEST(Decay , ProductEnergy ) {
     {
         in>>particleName>>energy>>product_energy;
 
-        Particle *particle = new Particle(particleName,1.,1.,1,.20,20,1e5,10);
+        PROPOSALParticle *particle = new PROPOSALParticle(particleName,1.,1.,1,.20,20,1e5,10);
         particle->SetEnergy(energy);
 
         rnd1= Rand1->rnd();

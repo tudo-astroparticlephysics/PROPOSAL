@@ -2,13 +2,18 @@
 
 using namespace std;
 
-vector<Particle*> Output::secondarys_;
+vector<PROPOSALParticle*> Output::secondarys_;
 bool Output::store_in_root_trees_ =   false;
 bool Output::store_in_ASCII_file_ =   false;
 
 void Output::SetLoggingConfigurationFile(std::string file)
 {
+    #if LOG4CPLUS_SUPPORT
     PropertyConfigurator::doConfigure(LOG4CPLUS_TEXT(file));
+    #else
+    cout << "Log4cplus not found! No log messages will be shown!" << endl;
+    #endif
+
 }
 
 
@@ -16,7 +21,7 @@ void Output::SetLoggingConfigurationFile(std::string file)
 //----------------------------------------------------------------------------//
 
 
-void Output::FillSecondaryVector(Particle *particle, int secondary_id, pair<double,string> energy_loss, double distance)
+void Output::FillSecondaryVector(PROPOSALParticle *particle, int secondary_id, pair<double,string> energy_loss, double distance)
 {
     string secondary_name;
 
@@ -41,7 +46,7 @@ void Output::FillSecondaryVector(Particle *particle, int secondary_id, pair<doub
         secondary_name  =   energy_loss.second;
     }
 
-    Particle *particle_to_store   =   new Particle(particle->GetParentParticleId(), secondary_id, secondary_name, particle->GetX(), particle->GetY(), particle->GetZ(), particle->GetTheta(), particle->GetPhi(), energy_loss.first, particle->GetT(), distance,particle->GetEnergy());
+    PROPOSALParticle *particle_to_store   =   new PROPOSALParticle(particle->GetParentParticleId(), secondary_id, secondary_name, particle->GetX(), particle->GetY(), particle->GetZ(), particle->GetTheta(), particle->GetPhi(), energy_loss.first, particle->GetT(), distance,particle->GetEnergy());
     secondarys_.push_back(particle_to_store);
 
     #if ROOT_SUPPORT
@@ -210,7 +215,7 @@ void Output::Close()
 //----------------------------------------------------------------------------//
 
 #if ROOT_SUPPORT
-    void Output::StorePrimaryInTree(Particle *primary)
+    void Output::StorePrimaryInTree(PROPOSALParticle *primary)
     {
         if(store_in_root_trees_)
         {
@@ -233,7 +238,7 @@ void Output::Close()
     //----------------------------------------------------------------------------//
     //----------------------------------------------------------------------------//
 
-    void Output::StorePropagatedPrimaryInTree(Particle *prop_primary)
+    void Output::StorePropagatedPrimaryInTree(PROPOSALParticle *prop_primary)
     {
         if(store_in_root_trees_)
         {
@@ -349,7 +354,7 @@ void Output::Close()
  //----------------------------------------------------------------------------//
 
 
-     void Output::StorePrimaryInASCII(Particle *primary)
+     void Output::StorePrimaryInASCII(PROPOSALParticle *primary)
      {
          if(store_in_ASCII_file_)
          {
@@ -371,7 +376,7 @@ void Output::Close()
  //----------------------------------------------------------------------------//
  //----------------------------------------------------------------------------//
 
-     void Output::StorePropagatedPrimaryInASCII(Particle *prop_primary)
+     void Output::StorePropagatedPrimaryInASCII(PROPOSALParticle *prop_primary)
      {
          if(store_in_ASCII_file_)
          {

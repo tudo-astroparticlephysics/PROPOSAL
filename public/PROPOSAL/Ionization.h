@@ -117,7 +117,7 @@ public:
     Ionization& operator=(const Ionization&);
     bool operator==(const Ionization &ioniz) const;
     bool operator!=(const Ionization &ioniz) const;
-    Ionization(Particle* particle, Medium* medium, EnergyCutSettings* cut_settings);
+    Ionization(PROPOSALParticle* particle, Medium* medium, EnergyCutSettings* cut_settings);
     friend std::ostream& operator<<(std::ostream& os, Ionization const &ioniz);
 
 //----------------------------------------------------------------------------//

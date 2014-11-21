@@ -12,7 +12,7 @@
 #define SCATTERING_H
 #include "vector"
 #include <string>
-#include "PROPOSAL/Particle.h"
+#include "PROPOSAL/PROPOSALParticle.h"
 #include "PROPOSAL/CrossSections.h"
 #include "PROPOSAL/Interpolant.h"
 #include "PROPOSAL/Integral.h"
@@ -41,7 +41,8 @@ private:
     Interpolant* interpolant_;
     Interpolant* interpolant_diff_;
 
-    Particle* particle_;
+    PROPOSALParticle* particle_;
+    PROPOSALParticle* backup_particle_;
     std::vector<CrossSections*> crosssections_;
 
 //----------------------------------------------------------------------------//
@@ -85,12 +86,12 @@ public:
 
     //Setter
 
-    void SetParticle(Particle* particle);
+    void SetParticle(PROPOSALParticle* particle);
     void SetCrosssections(std::vector<CrossSections*> crosssections);
 //----------------------------------------------------------------------------//
     // Getter
 
-    Particle* GetParticle()
+    PROPOSALParticle* GetParticle()
     {
         return particle_;
     }
@@ -104,6 +105,9 @@ public:
     // destructors
     ~Scattering() {}
 
+    PROPOSALParticle *GetBackup_particle() const;
+    void SetBackup_particle(PROPOSALParticle *backup_particle);
+    void RestoreBackup_particle();
 
 };
 

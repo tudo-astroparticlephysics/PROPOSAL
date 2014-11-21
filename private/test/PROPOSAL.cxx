@@ -33,64 +33,67 @@ char** LoadArgsFromCacheFile(int &argc, char** argv);
 
 int main(int argc, char** argv)
 {
-//    double x = (1-1e-16);
-//    cerr << "erfInv(" << x << "): " << erfInv(x*2*(1-0.5)) << endl;
-//    return 1;
-    Propagator* propa = new Propagator("resources/configuration");
-    Output::getInstance().WriteDescriptionFile();
-
-    if(argc != 1)
-    {
-        SaveArgsToCacheFile(argc,argv);
-    }
-    else
-    {
-        argv = LoadArgsFromCacheFile(argc,argv);
-    }
-
-
-    po::options_description all = CreateOptions();
-
-    //parse cmd line
-    po::variables_map vm;
-    po::store( po::command_line_parser(argc, argv).options(all).run(), vm);
-
-    //print help message if wanted
-    if(vm.count("help") || argc == 1)
-    {
-        ShowHelp(all);
-        exit(0);
-    }
-    //print version message if wanted
-    else if(vm.count("version"))
-    {
-        ShowVersion();
-        exit(0);
-    }
-    //notifies globalVar
-    try
-    {
-        //set the variables
-        vm.notify();
-    }
-    catch (po::invalid_command_line_syntax &e)
-    {
-        std::cerr<<"Error: "<<e.what()<<"\n";
-        exit(1);
-    }
-
+////    double x = (1-1e-16);
+////    cerr << "erfInv(" << x << "): " << erfInv(x*2*(1-0.5)) << endl;
+////    return 1;
 //    Propagator* propa = new Propagator("resources/configuration");
+//    Output::getInstance().WriteDescriptionFile();
 
-//    Output::getInstance().EnableROOTOutput("TestOutput.root");
-//    for(int i = 0; i< (int)(1e4) ; i++)
+//    if(argc != 1)
 //    {
-//        Particle* part = new Particle(i,i,"mu",0,0,0,0,0,0,0,0);
-//        part->SetEnergy(1e6);
-
-//        propa->Propagate(part);
+//        SaveArgsToCacheFile(argc,argv);
+//    }
+//    else
+//    {
+//        argv = LoadArgsFromCacheFile(argc,argv);
 //    }
 
-//    Output::getInstance().Close();
+
+//    po::options_description all = CreateOptions();
+
+//    //parse cmd line
+//    po::variables_map vm;
+//    po::store( po::command_line_parser(argc, argv).options(all).run(), vm);
+
+//    //print help message if wanted
+//    if(vm.count("help") || argc == 1)
+//    {
+//        ShowHelp(all);
+//        exit(0);
+//    }
+//    //print version message if wanted
+//    else if(vm.count("version"))
+//    {
+//        ShowVersion();
+//        exit(0);
+//    }
+//    //notifies globalVar
+//    try
+//    {
+//        //set the variables
+//        vm.notify();
+//    }
+//    catch (po::invalid_command_line_syntax &e)
+//    {
+//        std::cerr<<"Error: "<<e.what()<<"\n";
+//        exit(1);
+//    }
+
+    Propagator* propa = new Propagator("resources/configuration");
+
+    Output::getInstance().EnableROOTOutput("TestOutput.root");
+//Output::getInstance().SetLoggingConfigurationFile("resources/log4cplus.conf");
+    for(int i = 0; i< (int)(1e4) ; i++)
+    {
+        PROPOSALParticle* part = new PROPOSALParticle(i,i,"mu",0,0,0,0,0,0,0,0);
+        part->SetEnergy(1e6);
+
+        propa->Propagate(part);
+        log_error("asdsadada");
+        delete part;
+    }
+
+    Output::getInstance().Close();
 }
 
 

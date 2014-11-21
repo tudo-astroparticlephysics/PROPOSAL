@@ -10,7 +10,7 @@
 #ifndef CONTINUOUSRANDOMIZATION_H_
 #define CONTINUOUSRANDOMIZATION_H_
 
-#include "PROPOSAL/Particle.h"
+#include "PROPOSAL/PROPOSALParticle.h"
 #include "PROPOSAL/Medium.h"
 #include "PROPOSAL/CrossSections.h"
 #include "PROPOSAL/StandardNormal.h"
@@ -28,7 +28,8 @@ class ContinuousRandomization
 
 private:
 
-    Particle*   particle_;
+    PROPOSALParticle*   particle_;
+    PROPOSALParticle*   backup_particle_;
     Medium*     medium_;
     std::vector<CrossSections*> cross_sections_;
 
@@ -62,7 +63,7 @@ public:
     // Constructors
 
     ContinuousRandomization();
-    ContinuousRandomization(Particle* particle, Medium* medium, std::vector<CrossSections*> cross_sections);
+    ContinuousRandomization(PROPOSALParticle* particle, Medium* medium, std::vector<CrossSections*> cross_sections);
     ContinuousRandomization(const ContinuousRandomization&);
     ContinuousRandomization& operator=(const ContinuousRandomization& continuous_randomization);
     bool operator==(const ContinuousRandomization &continuous_randomization) const;
@@ -97,7 +98,7 @@ public:
 //----------------------------------------------------------------------------//
     //Getter
 
-    Particle* GetParticle() const
+    PROPOSALParticle* GetParticle() const
     {
         return particle_;
     }
@@ -117,7 +118,7 @@ public:
 //----------------------------------------------------------------------------//
     //Setter
 
-    void SetParticle(Particle *particle);
+    void SetParticle(PROPOSALParticle *particle);
 
 //----------------------------------------------------------------------------//
 
@@ -127,6 +128,9 @@ public:
 
     void SetCrosssections(std::vector<CrossSections*> crosssections);
 
+    PROPOSALParticle *GetBackup_particle() const;
+    void SetBackup_particle(PROPOSALParticle *backup_particle);
+    void RestoreBackup_particle();
 
 };
 

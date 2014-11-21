@@ -10,7 +10,7 @@
 
 #include "PROPOSAL/Integral.h"
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/Particle.h"
+#include "PROPOSAL/PROPOSALParticle.h"
 #include "PROPOSAL/CrossSections.h"
 #include "PROPOSAL/Bremsstrahlung.h"
 #include "PROPOSAL/Epairproduction.h"
@@ -72,7 +72,8 @@ protected:
 
     Interpolant*        interpolant_;
     Interpolant*        interpolant_diff_;
-    Particle*           particle_;
+    PROPOSALParticle*           particle_;
+    PROPOSALParticle*           backup_particle_;
     Medium*             medium_;
     Integral*           integral_;
     EnergyCutSettings*  cut_settings_;
@@ -186,7 +187,7 @@ public:
 
     /// @brief  initializes all cross sections,
 
-    ProcessCollection(Particle *particle, Medium *medium, EnergyCutSettings* cut_settings);
+    ProcessCollection(PROPOSALParticle *particle, Medium *medium, EnergyCutSettings* cut_settings);
 
 //----------------------------------------------------------------------------//
 
@@ -467,7 +468,7 @@ public:
 		return order_of_interpolation_;
 	}
 
-	Particle* GetParticle() const {
+	PROPOSALParticle* GetParticle() const {
 		return particle_;
 	}
 
@@ -492,12 +493,15 @@ public:
 	void SetLpmEffectEnabled(bool lpmEffectEnabled);
 	void SetMedium(Medium* medium);
 	void SetOrderOfInterpolation(int orderOfInterpolation);
-	void SetParticle(Particle* particle);
+	void SetParticle(PROPOSALParticle* particle);
     void SetLocation(int location);
     void SetGeometry(Geometry* geometry);
     void SetDensityCorrection(double density_correction);
     void SetEnableRandomization(bool enable_randomization);
 
+    PROPOSALParticle *GetBackup_particle() const;
+    void SetBackup_particle(PROPOSALParticle *backup_particle);
+    void RestoreBackup_particle();
 };
 
 

@@ -3,7 +3,7 @@
 #include <iostream>
 #include <string>
 #include <cmath>
-#include "PROPOSAL/Particle.h"
+#include "PROPOSAL/PROPOSALParticle.h"
 #include "PROPOSAL/MathModel.h"
 #include "PROPOSAL/Constants.h"
 
@@ -114,7 +114,7 @@ TEST(IsInside , Box ) {
     double y0   =   0;
     double z0   =   0;
 
-    Particle * particle = new Particle("mu",x,y,z,theta,phi,0,0);
+    PROPOSALParticle * particle = new PROPOSALParticle("mu",x,y,z,theta,phi,0,0);
     int is_inside  =0;
     int is_outside =0;
 
@@ -387,7 +387,7 @@ TEST(IsInside , Cylinder ) {
     double y0   =   0;
     double z0   =   0;
 
-    Particle * particle = new Particle("mu",x,y,z,theta,phi,0,0);
+    PROPOSALParticle * particle = new PROPOSALParticle("mu",x,y,z,theta,phi,0,0);
     int is_inside  =0;
     int is_outside =0;
 
@@ -652,7 +652,7 @@ TEST(IsInside , Sphere ) {
     double y0   =   0;
     double z0   =   0;
 
-    Particle * particle = new Particle("mu",x,y,z,theta,phi,0,0);
+    PROPOSALParticle * particle = new PROPOSALParticle("mu",x,y,z,theta,phi,0,0);
     int is_inside  =0;
     int is_outside =0;
 
@@ -845,7 +845,7 @@ TEST(DistanceTo , Sphere ) {
 
     pair<double,double> distance;
 
-    Particle * particle = new Particle("mu",x,y,z,theta,phi,0,0);
+    PROPOSALParticle * particle = new PROPOSALParticle("mu",x,y,z,theta,phi,0,0);
 
 
     MathModel M;
@@ -978,7 +978,7 @@ TEST(DistanceTo , Cylinder ) {
 
     pair<double,double> distance;
 
-    Particle * particle = new Particle("mu",x,y,z,theta,phi,0,0);
+    PROPOSALParticle * particle = new PROPOSALParticle("mu",x,y,z,theta,phi,0,0);
 
 
     MathModel M;
@@ -1254,7 +1254,7 @@ TEST(DistanceTo , Box ) {
 
     pair<double,double> distance;
 
-    Particle * particle = new Particle("mu",x,y,z,theta,phi,0,0);
+    PROPOSALParticle * particle = new PROPOSALParticle("mu",x,y,z,theta,phi,0,0);
 
 
     MathModel M;

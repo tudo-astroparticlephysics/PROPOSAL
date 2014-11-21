@@ -9,7 +9,7 @@
 #define DECAY_H_
 
 #include "PROPOSAL/RootFinder.h"
-#include "PROPOSAL/Particle.h"
+#include "PROPOSAL/PROPOSALParticle.h"
 
 
 /*! \class  Decay  Decay.h " Decay.h"
@@ -23,7 +23,8 @@ class Decay
 protected:
 
     RootFinder* root_finder_;
-    Particle*   particle_;
+    PROPOSALParticle*   particle_;
+    PROPOSALParticle*   backup_particle_;
     std::string out_;
 
     bool        store_neutrinos_;
@@ -55,7 +56,7 @@ public:
     */
 
     Decay();
-    Decay(Particle* particle);
+    Decay(PROPOSALParticle* particle);
     Decay(const Decay&);
     Decay& operator=(const Decay& decay);
     bool operator==(const Decay &decay) const;
@@ -94,7 +95,7 @@ public:
         return root_finder_;
     }
 
-    Particle* GetParticle() const
+    PROPOSALParticle* GetParticle() const
     {
         return particle_;
     }
@@ -114,11 +115,15 @@ public:
 
     void SetRootFinder(RootFinder *root_finder);
 
-    void SetParticle(Particle* particle);
+    void SetParticle(PROPOSALParticle* particle);
 
     void SetStoreNeutrinos(bool store_neutrinos);
 
     void SetMultiplier(double multiplier);
+
+    PROPOSALParticle *GetBackup_particle() const;
+    void SetBackup_particle(PROPOSALParticle *backup_particle);
+    void RestoreBackup_particle();
 };
 
 

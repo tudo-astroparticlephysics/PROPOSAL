@@ -11,7 +11,7 @@
 
 #include "PROPOSAL/MathModel.h"
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/Particle.h"
+#include "PROPOSAL/PROPOSALParticle.h"
 #include "PROPOSAL/Medium.h"
 #include "PROPOSAL/EnergyCutSettings.h"
 #include <string>
@@ -33,7 +33,8 @@ protected:
 
     std::string name_;
 
-    Particle*   particle_;
+    PROPOSALParticle*   particle_;
+    PROPOSALParticle*   backup_particle_;
     Medium*     medium_;
     EnergyCutSettings* cut_settings_;
 
@@ -78,7 +79,7 @@ public:
     CrossSections();
 //----------------------------------------------------------------------------//
 
-    CrossSections(Particle* particle, Medium* medium, EnergyCutSettings* cut_settings);
+    CrossSections(PROPOSALParticle* particle, Medium* medium, EnergyCutSettings* cut_settings);
     CrossSections(const CrossSections& crossSections);
     bool operator==(const CrossSections &crossSections) const;
     bool operator!=(const CrossSections &crossSections) const;
@@ -143,7 +144,7 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    void SetParticle(Particle *particle);
+    void SetParticle(PROPOSALParticle *particle);
 
 //----------------------------------------------------------------------------//
 
@@ -190,7 +191,7 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    Particle* GetParticle() const
+    PROPOSALParticle* GetParticle() const
     {
         return particle_;
     }
@@ -260,6 +261,9 @@ public:
 
     virtual ~CrossSections(){}
 
+    PROPOSALParticle *GetBackup_particle() const;
+    void SetBackup_particle(PROPOSALParticle *backup_particle);
+    void RestoreBackup_particle();
 };
 
 

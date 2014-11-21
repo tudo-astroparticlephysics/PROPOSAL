@@ -361,7 +361,7 @@ ContinuousRandomization::ContinuousRandomization()
     ,which_cross_               ( 0 )
     ,order_of_interpolation_    ( 5 )
 {
-    particle_           =   new Particle();
+    particle_           =   new PROPOSALParticle();
     medium_             =   new Medium();
     dE2dx_integral_     =   new Integral(IROMB, IMAXS, IPREC);
     dE2de_integral_     =   new Integral(IROMB, IMAXS, IPREC2);
@@ -383,7 +383,7 @@ ContinuousRandomization::ContinuousRandomization()
 //----------------------------------------------------------------------------//
 
 
-ContinuousRandomization::ContinuousRandomization(Particle* particle, Medium* medium, std::vector<CrossSections*> cross_sections)
+ContinuousRandomization::ContinuousRandomization(PROPOSALParticle* particle, Medium* medium, std::vector<CrossSections*> cross_sections)
     :particle_                  ( particle )
     ,medium_                    ( medium )
     ,cross_sections_            ( cross_sections )
@@ -406,7 +406,7 @@ ContinuousRandomization::ContinuousRandomization(Particle* particle, Medium* med
 //----------------------------------------------------------------------------//
 
 ContinuousRandomization::ContinuousRandomization(const ContinuousRandomization &continuous_randomization)
-    :particle_                  ( new Particle(*continuous_randomization.particle_) )
+    :particle_                  ( new PROPOSALParticle(*continuous_randomization.particle_) )
     ,medium_                    ( new Medium( *continuous_randomization.medium_) )
     ,do_dE2dx_Interpolation_    ( continuous_randomization.do_dE2dx_Interpolation_)
     ,do_dE2de_Interpolation_    ( continuous_randomization.do_dE2de_Interpolation_)
@@ -570,8 +570,8 @@ void ContinuousRandomization::swap(ContinuousRandomization &continuous_randomiza
 {
     using std::swap;
 
-    Particle tmp_particle1(*continuous_randomization.particle_);
-    Particle tmp_particle2(*particle_);
+    PROPOSALParticle tmp_particle1(*continuous_randomization.particle_);
+    PROPOSALParticle tmp_particle2(*particle_);
 
     Medium tmp_medium1(*continuous_randomization.medium_);
     Medium tmp_medium2(*medium_);
@@ -590,8 +590,8 @@ void ContinuousRandomization::swap(ContinuousRandomization &continuous_randomiza
     swap( order_of_interpolation_, continuous_randomization.order_of_interpolation_);
 
     // Set pointers again (to many swapping above....)
-    SetParticle( new Particle(tmp_particle1) );
-    continuous_randomization.SetParticle( new Particle(tmp_particle2) );
+    SetParticle( new PROPOSALParticle(tmp_particle1) );
+    continuous_randomization.SetParticle( new PROPOSALParticle(tmp_particle2) );
 
     SetMedium( new Medium(tmp_medium1) );
     continuous_randomization.SetMedium( new Medium(tmp_medium2) );
@@ -853,7 +853,7 @@ void ContinuousRandomization::SetMedium(Medium* medium)
 //----------------------------------------------------------------------------//
 
 
-void ContinuousRandomization::SetParticle(Particle* particle)
+void ContinuousRandomization::SetParticle(PROPOSALParticle* particle)
 {
     particle_ = particle;
     for(unsigned int i = 0 ; i < cross_sections_.size() ; i++)
@@ -870,4 +870,19 @@ void ContinuousRandomization::SetParticle(Particle* particle)
 void ContinuousRandomization::SetCrosssections(
         std::vector<CrossSections*> crosssections) {
     cross_sections_ = crosssections;
+}
+
+PROPOSALParticle *ContinuousRandomization::GetBackup_particle() const
+{
+    return backup_particle_;
+}
+
+void ContinuousRandomization::SetBackup_particle(PROPOSALParticle *backup_particle)
+{
+    backup_particle_ = backup_particle;
+}
+
+void ContinuousRandomization::RestoreBackup_particle()
+{
+    particle_ = backup_particle_;
 }

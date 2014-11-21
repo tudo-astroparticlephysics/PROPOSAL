@@ -36,7 +36,7 @@ Scattering::Scattering( )
     ,integral_(  new Integral(IROMB, IMAXS, IPREC2) )
     ,interpolant_(NULL)
     ,interpolant_diff_(NULL)
-    ,particle_( new Particle("mu") )
+    ,particle_( new PROPOSALParticle("mu") )
 {
     crosssections_.push_back(new Ionization());
     crosssections_.push_back(new Bremsstrahlung());
@@ -194,8 +194,8 @@ void Scattering::swap(Scattering &scattering)
 {
     using std::swap;
 
-    Particle tmp_particle1(*scattering.particle_);
-    Particle tmp_particle2(*particle_);
+    PROPOSALParticle tmp_particle1(*scattering.particle_);
+    PROPOSALParticle tmp_particle2(*particle_);
 
     vector<CrossSections*> tmp_cross1(scattering.crosssections_);
     vector<CrossSections*> tmp_cross2(crosssections_);
@@ -203,8 +203,8 @@ void Scattering::swap(Scattering &scattering)
     SetCrosssections(  tmp_cross1 );
     scattering.SetCrosssections(  tmp_cross2 );
 
-    SetParticle( new Particle(tmp_particle1) );
-    scattering.SetParticle( new Particle(tmp_particle2) );
+    SetParticle( new PROPOSALParticle(tmp_particle1) );
+    scattering.SetParticle( new PROPOSALParticle(tmp_particle2) );
 
     swap(x0_,scattering.x0_);
     swap(do_interpolation_,scattering.do_interpolation_);
@@ -564,7 +564,7 @@ void Scattering::DisableInterpolation()
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-void Scattering::SetParticle(Particle* particle)
+void Scattering::SetParticle(PROPOSALParticle* particle)
 {
     if(particle == NULL || particle == particle_)return;
 
@@ -583,4 +583,17 @@ void Scattering::SetCrosssections(std::vector<CrossSections*> crosssections)
 
 
 
+PROPOSALParticle *Scattering::GetBackup_particle() const
+{
+    return backup_particle_;
+}
 
+void Scattering::SetBackup_particle(PROPOSALParticle *backup_particle)
+{
+    backup_particle_ = backup_particle;
+}
+
+void Scattering::RestoreBackup_particle()
+{
+    particle_ = backup_particle_;
+}

@@ -28,7 +28,7 @@ int main()
     {
         if(i%OnePercent==0)cout<<"Progress: " <<100.*i/number_of_particles<<"%"<<endl;
 
-        Particle *p = new Particle("mu");
+        PROPOSALParticle *p = new PROPOSALParticle("mu");
         p->SetEnergy(9e6);
         pr->SetParticle(p);
 

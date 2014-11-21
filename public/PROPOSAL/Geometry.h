@@ -8,7 +8,7 @@
 #ifndef GEOMETRY_H
 #define GEOMETRY_H
 
-#include "PROPOSAL/Particle.h"
+#include "PROPOSAL/PROPOSALParticle.h"
 #include <string>
 #include <utility>
 #include <iostream>
@@ -48,7 +48,7 @@ private:
      * a particle on the spheres border which moves outside has no intersection.
      * Distances smaller then GEOMETRY_PRECISION (1e-9) are also set to -1
      */
-    std::pair<double,double> DistanceToBorderSphere(Particle* particle);
+    std::pair<double,double> DistanceToBorderSphere(PROPOSALParticle* particle);
 
 //----------------------------------------------------------------------------//
     /*!
@@ -65,7 +65,7 @@ private:
      * a particle on the box' border which moves outside has no intersection.
      * Distances smaller then GEOMETRY_PRECISION (1e-9) are also set to -1
      */
-    std::pair<double,double> DistanceToBorderBox(Particle* particle);
+    std::pair<double,double> DistanceToBorderBox(PROPOSALParticle* particle);
 
 //----------------------------------------------------------------------------//
     /*!
@@ -82,7 +82,7 @@ private:
      * a particle on the cylinders border which moves outside has no intersection.
      * Distances smaller then GEOMETRY_PRECISION (1e-9) are also set to -1
      */
-    std::pair<double,double> DistanceToBorderCylinder(Particle* particle);
+    std::pair<double,double> DistanceToBorderCylinder(PROPOSALParticle* particle);
 
 public:
 
@@ -98,22 +98,22 @@ public:
 //----------------------------------------------------------------------------//
     //Memberfunctions
 
-    bool IsParticleInside(Particle* particle);
+    bool IsParticleInside(PROPOSALParticle* particle);
 
 //----------------------------------------------------------------------------//
-    bool IsParticleInfront(Particle* particle);
+    bool IsParticleInfront(PROPOSALParticle* particle);
 
 //----------------------------------------------------------------------------//
-    bool IsParticleBehind(Particle* particle);
+    bool IsParticleBehind(PROPOSALParticle* particle);
 
 //----------------------------------------------------------------------------//
-    std::pair<double,double> DistanceToBorder(Particle* particle);
+    std::pair<double,double> DistanceToBorder(PROPOSALParticle* particle);
 
 //----------------------------------------------------------------------------//
     /*!
      * Calculates the distance to the closest approch to the geometry center
      */
-    double DistanceToClosestApproach(Particle* particle);
+    double DistanceToClosestApproach(PROPOSALParticle* particle);
 
 //----------------------------------------------------------------------------//
 

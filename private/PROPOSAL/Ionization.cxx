@@ -450,7 +450,7 @@ Ionization::Ionization(const Ionization &ioniz)
 //----------------------------------------------------------------------------//
 
 
-Ionization::Ionization(Particle* particle,
+Ionization::Ionization(PROPOSALParticle* particle,
                              Medium* medium,
                              EnergyCutSettings* cut_settings)
     :CrossSections(particle, medium, cut_settings)

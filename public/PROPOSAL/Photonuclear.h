@@ -192,7 +192,7 @@ public:
     Photonuclear& operator=(const Photonuclear&);
     bool operator==(const Photonuclear &photo) const;
     bool operator!=(const Photonuclear &photo) const;
-    Photonuclear(Particle* particle, Medium* medium, EnergyCutSettings* cut_settings);
+    Photonuclear(PROPOSALParticle* particle, Medium* medium, EnergyCutSettings* cut_settings);
     friend std::ostream& operator<<(std::ostream& os, Photonuclear const &photo);
 
 //----------------------------------------------------------------------------//

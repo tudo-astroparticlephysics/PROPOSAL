@@ -6,7 +6,7 @@
 #include "PROPOSAL/Integral.h"
 #include "PROPOSAL/Interpolant.h"
 #include "PROPOSAL/Medium.h"
-#include "PROPOSAL/Particle.h"
+#include "PROPOSAL/PROPOSALParticle.h"
 
 
 class Bremsstrahlung: public CrossSections
@@ -137,7 +137,7 @@ public:
     Bremsstrahlung& operator=(const Bremsstrahlung& brems);
     bool operator==(const Bremsstrahlung &brems) const;
     bool operator!=(const Bremsstrahlung &brems) const;
-    Bremsstrahlung(Particle* particle, Medium* medium, EnergyCutSettings* cut_settings);
+    Bremsstrahlung(PROPOSALParticle* particle, Medium* medium, EnergyCutSettings* cut_settings);
     friend std::ostream& operator<<(std::ostream& os, Bremsstrahlung const &brems);
 
 //----------------------------------------------------------------------------//

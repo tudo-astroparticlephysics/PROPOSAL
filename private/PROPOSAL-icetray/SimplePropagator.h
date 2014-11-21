@@ -15,7 +15,7 @@
 #include "dataclasses/physics/I3Particle.h"
 #include "phys-services/I3RandomService.h"
 
-class Propagate;
+class Propagator;
 
 namespace PROPOSAL {
 
@@ -64,9 +64,9 @@ public:
 	 */
 	static std::string GetName(const I3Particle &p);
 	
-	Propagate* GetImplementation() { return propagator_; };
+    Propagator* GetImplementation() { return propagator_; };
 private:
-	Propagate *propagator_;
+    Propagator *propagator_;
 };
 
 }

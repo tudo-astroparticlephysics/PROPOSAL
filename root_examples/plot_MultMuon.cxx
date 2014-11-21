@@ -173,7 +173,7 @@ int main(int argc, char** argv)
     //
     Propagator *pr = new Propagator("resources/configuration_IceOnly");
     Output::getInstance().EnableROOTOutput( OutputFile.c_str() );
-    Particle* part;
+    PROPOSALParticle* part;
     //
     ////////////////////////////////////////////////////////
 
@@ -200,7 +200,7 @@ int main(int argc, char** argv)
         for(int i =0;i<statistic;i++)
         {
             P->update();
-            part = new Particle();
+            part = new PROPOSALParticle();
             part->SetProperties(ctr+ ctr*statistic,i,energy);
             pr->Propagate(part,SQRT2*1e2*1e3);
         }

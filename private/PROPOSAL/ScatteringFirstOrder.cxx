@@ -26,7 +26,7 @@ using namespace std;
 //----------------------------------------------------------------------------//
 
 
-void ScatteringFirstOrder::Scatter(double dr, Particle* part, Medium* med)
+void ScatteringFirstOrder::Scatter(double dr, PROPOSALParticle* part, Medium* med)
 {
         double theta0, rnd1, rnd2, sx, tx, sy, ty, sz, tz, ax, ay, az;
         double x,y,z;
@@ -149,7 +149,7 @@ ScatteringFirstOrder::ScatteringFirstOrder( )
 //----------------------------------------------------------------------------//
 
 
-double ScatteringFirstOrder::CalculateTheta0(double dr, Particle* part, Medium* med)
+double ScatteringFirstOrder::CalculateTheta0(double dr, PROPOSALParticle* part, Medium* med)
 {
     double y = dr/med->GetRadiationLength();
     double beta = 1./sqrt(1 +  part->GetMass() * part->GetMass()/ (part->GetMomentum()*part->GetMomentum() ));

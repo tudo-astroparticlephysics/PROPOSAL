@@ -14,14 +14,15 @@
 #include <icetray/I3PointerTypedefs.h>
 #include <sim-services/I3PropagatorService.h>
 
-#include "PROPOSAL/Amanda.h"
+#include "PROPOSAL/Propagator.h"
 #include "PROPOSAL/PROPOSALParticle.h"
 #include "PROPOSAL/Output.h"
 
-class I3Particle; 
+class I3Particle;
 class PROPOSALParticle;
 class Output;
-class Amanda;
+class Propagator;
+
 /**
  * @version $Id: I3PropagatorService.h 68823 2010-11-22 15:14:19Z dima $
  *
@@ -113,7 +114,7 @@ public:
 
  private:
 
-  Amanda *amanda;
+  Propagator *proposal;
   double particleMass_;
   
   /** @brief Tear down and re-initialize the propagator on every call to Propagate().

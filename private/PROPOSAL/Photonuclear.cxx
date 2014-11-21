@@ -674,7 +674,7 @@ Photonuclear::Photonuclear(const Photonuclear &photo)
 //----------------------------------------------------------------------------//
 
 
-Photonuclear::Photonuclear(Particle* particle,
+Photonuclear::Photonuclear(PROPOSALParticle* particle,
                              Medium* medium,
                              EnergyCutSettings* cut_settings)
     :CrossSections(particle, medium, cut_settings)

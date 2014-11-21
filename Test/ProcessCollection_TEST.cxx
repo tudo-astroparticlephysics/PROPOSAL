@@ -37,7 +37,7 @@ public:
 };
 
 std::vector<Medium*>                CombOfMedium;
-std::vector<Particle*>              CombOfParticle;
+std::vector<PROPOSALParticle*>              CombOfParticle;
 std::vector<EnergyCutSettings*>     CombOfEnergyCutSettings;
 std::vector<ProcessCollection*>         CombOfProcColl;
 
@@ -46,7 +46,7 @@ TEST(Comparison , Comparison_equal ) {
     double dNdx;
 
     Medium *medium = new Medium("hydrogen",1.);
-    Particle *particle = new Particle("mu",1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle = new PROPOSALParticle("mu",1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
     ProcessCollection *A = new ProcessCollection(particle, medium, cuts);
     ProcessCollection *B = new ProcessCollection(particle, medium, cuts);
@@ -73,8 +73,8 @@ TEST(Comparison , Comparison_not_equal ) {
     double dEdx;
     Medium *medium = new Medium("air",1.);
     Medium *medium2 = new Medium("water",1.);
-    Particle *particle = new Particle("mu",1.,1.,1,20,20,1e5,10);
-    Particle *particle2 = new Particle("tau",1.,1.,1,20,20,1e5,10);
+    PROPOSALParticle *particle = new PROPOSALParticle("mu",1.,1.,1,20,20,1e5,10);
+    PROPOSALParticle *particle2 = new PROPOSALParticle("tau",1.,1.,1,20,20,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
     ProcessCollection *A = new ProcessCollection(particle, medium, cuts);
     ProcessCollection *B = new ProcessCollection(particle, medium2, cuts);
@@ -118,7 +118,7 @@ TEST(Assignment , Copyconstructor ) {
 
 TEST(Assignment , Copyconstructor2 ) {
     Medium *medium = new Medium("air",1.);
-    Particle *particle = new Particle("mu",1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle = new PROPOSALParticle("mu",1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
 
     ProcessCollection A(particle, medium, cuts);
@@ -130,7 +130,7 @@ TEST(Assignment , Copyconstructor2 ) {
 
 TEST(Assignment , Operator ) {
     Medium *medium = new Medium("air",1.);
-    Particle *particle = new Particle("mu",1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle = new PROPOSALParticle("mu",1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
     ProcessCollection A(particle, medium, cuts);
     ProcessCollection B(particle, medium, cuts);
@@ -143,7 +143,7 @@ TEST(Assignment , Operator ) {
     EXPECT_TRUE(A==B);
 
     Medium *medium2 = new Medium("water",1.);
-    Particle *particle2 = new Particle("tau",1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle2 = new PROPOSALParticle("tau",1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cuts2 = new EnergyCutSettings(200,-1);
     ProcessCollection *C = new ProcessCollection(particle2, medium2, cuts2);
     EXPECT_TRUE(A!=*C);
@@ -157,8 +157,8 @@ TEST(Assignment , Operator ) {
 TEST(Assignment , Swap ) {
     Medium *medium = new Medium("hydrogen",1.);
     Medium *medium2 = new Medium("hydrogen",1.);
-    Particle *particle = new Particle("mu",1.,1.,1,.20,20,1e5,10);
-    Particle *particle2 = new Particle("mu",1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle = new PROPOSALParticle("mu",1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle2 = new PROPOSALParticle("mu",1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
     EnergyCutSettings *cuts2 = new EnergyCutSettings(500,-1);
     ProcessCollection A(particle, medium, cuts);
@@ -171,8 +171,8 @@ TEST(Assignment , Swap ) {
 
     Medium *medium3 = new Medium("water",1.);
     Medium *medium4 = new Medium("water",1.);
-    Particle *particle3 = new Particle("tau",1.,1.,1,.20,20,1e5,10);
-    Particle *particle4 = new Particle("tau",1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle3 = new PROPOSALParticle("tau",1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle4 = new PROPOSALParticle("tau",1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cuts3 = new EnergyCutSettings(200,-1);
     EnergyCutSettings *cuts4 = new EnergyCutSettings(200,-1);
     ProcessCollection *C = new ProcessCollection(particle3, medium3, cuts3);
@@ -220,7 +220,7 @@ TEST(ProcessCollection , Set_Up ) {
 
         i++;
         CombOfMedium.push_back(new Medium(med,1.));
-        CombOfParticle.push_back(new Particle(particleName,1.,1.,1,.20,20,1e5,10));
+        CombOfParticle.push_back(new PROPOSALParticle(particleName,1.,1.,1,.20,20,1e5,10));
         CombOfParticle.at(i)->SetEnergy(energy);
         CombOfEnergyCutSettings.push_back(new EnergyCutSettings(ecut,vcut));
         CombOfProcColl.push_back(new ProcessCollection(CombOfParticle.at(i), CombOfMedium.at(i), CombOfEnergyCutSettings.at(i)));
@@ -301,7 +301,7 @@ TEST(ProcessCollection , Stochasticity)
         energy_old = -1;
 
         Medium *medium = new Medium(med,1.);
-        Particle *particle = new Particle(particleName,1.,1.,1,.20,20,1e5,10);
+        PROPOSALParticle *particle = new PROPOSALParticle(particleName,1.,1.,1,.20,20,1e5,10);
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
 
@@ -438,7 +438,7 @@ TEST(ProcessCollection , Displacement)
 
         energy_old = -1;
         Medium *medium = new Medium(med,1.);
-        Particle *particle = new Particle(particleName,1.,1.,1,.20,20,1e5,10);
+        PROPOSALParticle *particle = new PROPOSALParticle(particleName,1.,1.,1,.20,20,1e5,10);
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
 
@@ -527,7 +527,7 @@ TEST(ProcessCollection , TrackingIntegral)
 
         energy_old = -1;
         Medium *medium = new Medium(med,1.);
-        Particle *particle = new Particle(particleName,1.,1.,1,.20,20,1e5,10);
+        PROPOSALParticle *particle = new PROPOSALParticle(particleName,1.,1.,1,.20,20,1e5,10);
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
 
@@ -615,7 +615,7 @@ TEST(ProcessCollection , FinalEnergyDist)
 
         energy_old = -1;
         Medium *medium = new Medium(med,1.);
-        Particle *particle = new Particle(particleName,1.,1.,1,.20,20,1e5,10);
+        PROPOSALParticle *particle = new PROPOSALParticle(particleName,1.,1.,1,.20,20,1e5,10);
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
 
@@ -705,7 +705,7 @@ TEST(ProcessCollection , MakeDecay)
 
         energy_old = -1;
         Medium *medium = new Medium(med,1.);
-        Particle *particle = new Particle(particleName,1.,1.,1,.20,20,1e5,10);
+        PROPOSALParticle *particle = new PROPOSALParticle(particleName,1.,1.,1,.20,20,1e5,10);
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
 
@@ -800,7 +800,7 @@ TEST(ProcessCollection , FinalEnergyParticleInteraction)
 
         energy_old = -1;
         Medium *medium = new Medium(med,1.);
-        Particle *particle = new Particle(particleName,1.,1.,1,.20,20,1e5,10);
+        PROPOSALParticle *particle = new PROPOSALParticle(particleName,1.,1.,1,.20,20,1e5,10);
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
 

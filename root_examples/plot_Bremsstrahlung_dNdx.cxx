@@ -19,7 +19,7 @@
 #include "TGraph.h"
 #include "TCanvas.h"
 #include "PROPOSAL/Bremsstrahlung.h"
-#include "PROPOSAL/Particle.h"
+#include "PROPOSAL/PROPOSALParticle.h"
 #include "PROPOSAL/EnergyCutSettings.h"
 #include "PROPOSAL/Medium.h"
 #include "TFile.h"
@@ -49,9 +49,9 @@ int main()
 
     TFile *file     =   new TFile("Bremsstrahlung_dNdx.root","RECREATE");
 
-    Particle *mu    =   new Particle("mu");
-    Particle *tau   =   new Particle("tau");
-    Particle *e     =   new Particle("e");
+    PROPOSALParticle *mu    =   new PROPOSALParticle("mu");
+    PROPOSALParticle *tau   =   new PROPOSALParticle("tau");
+    PROPOSALParticle *e     =   new PROPOSALParticle("e");
 
     Medium  *med1   =   new Medium("hydrogen",1.);
     Medium  *med2   =   new Medium("water",1.);

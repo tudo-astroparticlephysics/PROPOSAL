@@ -1,7 +1,7 @@
 #include "TGraph.h"
 #include "TCanvas.h"
 #include "PROPOSAL/Ionization.h"
-#include "PROPOSAL/Particle.h"
+#include "PROPOSAL/PROPOSALParticle.h"
 #include "PROPOSAL/EnergyCutSettings.h"
 #include "PROPOSAL/Medium.h"
 #include "TFile.h"
@@ -17,9 +17,9 @@ int main()
 {
     TFile *file     =   new TFile("Ionization_dNdx_different_ecut.root","RECREATE");
 
-    Particle *mu    =   new Particle("mu");
-    Particle *e     =   new Particle("e");
-    Particle *tau   =   new Particle("tau");
+    PROPOSALParticle *mu    =   new PROPOSALParticle("mu");
+    PROPOSALParticle *e     =   new PROPOSALParticle("e");
+    PROPOSALParticle *tau   =   new PROPOSALParticle("tau");
 
     Medium  *med    =   new Medium("water",1.);
 

@@ -7,7 +7,7 @@
 #include "PROPOSAL/methods.h"
 #include "PROPOSAL/ScatteringMoliere.h"
 
-
+using namespace std;
 #define HBAR    6.58211928e-22                          //hbar in MeV*s
 #define C       0.577215664901532860606512090082402431	//Euler-Mascheroni constant
 
@@ -21,7 +21,7 @@
 //----------------------------------------------------------------------------//
 
 
-void ScatteringMoliere::Scatter(double dr, Particle* part, Medium* med)
+void ScatteringMoliere::Scatter(double dr, PROPOSALParticle* part, Medium* med)
 {
     double rnd1, rnd2, sx, tx, sy, ty, sz, tz, ax, ay, az;
     double x, y, z;

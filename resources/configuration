@@ -105,7 +105,6 @@ global
     cont_infront        1
     cont_behind         0
     raw
-    integrate
 
 # keyword sector must be followed by these lines
 # first: geometry information (this must be the first line)
@@ -214,7 +213,7 @@ sector
 #       ( box + 3 or 6 values are expected )
 
 detector
-    cylinder 1200   1700
+    cylinder 800   1600
 
 #detector
 #    sphere  0   0   0   100  0

@@ -559,7 +559,7 @@ Bremsstrahlung::Bremsstrahlung(const Bremsstrahlung &brems)
 //----------------------------------------------------------------------------//
 
 
-Bremsstrahlung::Bremsstrahlung(Particle* particle,
+Bremsstrahlung::Bremsstrahlung(PROPOSALParticle* particle,
                              Medium* medium,
                              EnergyCutSettings* cut_settings)
     :CrossSections          ( particle, medium, cut_settings )

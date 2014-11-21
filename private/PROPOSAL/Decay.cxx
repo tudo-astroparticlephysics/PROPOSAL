@@ -262,7 +262,8 @@ Decay::Decay()
     ,multiplier_        ( 1 )
 {
     root_finder_    =   new RootFinder(IMAXS, IPREC);
-    particle_       =   new Particle();
+    particle_       =   new PROPOSALParticle();
+    backup_particle_= particle_;
 }
 
 
@@ -270,13 +271,14 @@ Decay::Decay()
 //----------------------------------------------------------------------------//
 
 
-Decay::Decay(Particle* particle)
+Decay::Decay(PROPOSALParticle* particle)
     :particle_          ( particle )
     ,out_               ( )
     ,store_neutrinos_   ( false )
     ,multiplier_        ( 1 )
 {
     root_finder_    =   new RootFinder(IMAXS, IPREC);
+    backup_particle_= particle_;
 
 }
 
@@ -287,10 +289,11 @@ Decay::Decay(Particle* particle)
 
 Decay::Decay(const Decay &decay)
     :root_finder_       ( new RootFinder(*decay.root_finder_) )
-    ,particle_          ( new Particle(*decay.particle_) )
+    ,particle_          ( new PROPOSALParticle(*decay.particle_) )
     ,out_               ( decay.out_)
     ,store_neutrinos_   ( decay.store_neutrinos_ )
     ,multiplier_        ( decay.multiplier_ )
+    ,backup_particle_   ( new PROPOSALParticle(*decay.backup_particle_) )
 {
 
 }
@@ -400,7 +403,7 @@ void Decay::SetRootFinder(RootFinder *root_finder){
     root_finder_    =   root_finder;
 }
 
-void Decay::SetParticle(Particle* particle){
+void Decay::SetParticle(PROPOSALParticle* particle){
     particle_   =   particle;
 }
 
@@ -410,4 +413,19 @@ void Decay::SetStoreNeutrinos(bool store_neutrinos){
 
 void Decay::SetMultiplier(double multiplier){
     multiplier_ =   multiplier;
+}
+
+PROPOSALParticle *Decay::GetBackup_particle() const
+{
+    return backup_particle_;
+}
+
+void Decay::SetBackup_particle(PROPOSALParticle *backup_particle)
+{
+    backup_particle_ = backup_particle;
+}
+
+void Decay::RestoreBackup_particle()
+{
+    particle_ = backup_particle_;
 }

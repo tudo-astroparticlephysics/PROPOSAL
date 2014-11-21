@@ -12,7 +12,7 @@
 #define SCATTERING_FIRSTORDER_H
 #include "vector"
 #include <string>
-#include "PROPOSAL/Particle.h"
+#include "PROPOSAL/PROPOSALParticle.h"
 #include "PROPOSAL/MathModel.h"
 #include "PROPOSAL/Medium.h"
 
@@ -45,8 +45,8 @@ public:
 //----------------------------------------------------------------------------//
     // Memberfunctions
 
-    double  CalculateTheta0(double dr, Particle* part, Medium* med);
-    void    Scatter(double dr, Particle* part, Medium* med);
+    double  CalculateTheta0(double dr, PROPOSALParticle* part, Medium* med);
+    void    Scatter(double dr, PROPOSALParticle* part, Medium* med);
 
 
 //----------------------------------------------------------------------------//

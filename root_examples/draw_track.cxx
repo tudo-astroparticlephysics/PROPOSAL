@@ -23,12 +23,12 @@ int main(int argc, char **argv)
     double xmax =   -1e20;
     double ymax =   -1e20;
     double zmax =   -1e20;
-    Particle *particle;
+    PROPOSALParticle *particle;
     Propagator *pr = new Propagator("resources/configuration");
     pr->set_seed(1234);
 
     vector<TPolyMarker3D*> marker;
-    vector<Particle*> secondarys;
+    vector<PROPOSALParticle*> secondarys;
 
     string type;
 
@@ -39,7 +39,7 @@ int main(int argc, char **argv)
     cin>>type;
     cout<<"Enter the particle energy [MeV]"<<endl;
     cin>>energy;
-    particle = new Particle(type ,-200.,10.,-10.,90.,0.,0.,0.);
+    particle = new PROPOSALParticle(type ,-200.,10.,-10.,90.,0.,0.,0.);
 
     particle->SetEnergy(energy);
 

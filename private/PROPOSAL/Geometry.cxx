@@ -94,7 +94,7 @@ void Geometry::InitCylinder(double x0, double y0, double z0, double radius, doub
 //----------------------------------------------------------------------------//
 
 
-bool Geometry::IsParticleInside(Particle* particle)
+bool Geometry::IsParticleInside(PROPOSALParticle* particle)
 {
     bool is_inside  =   false;
 
@@ -112,7 +112,7 @@ bool Geometry::IsParticleInside(Particle* particle)
 //----------------------------------------------------------------------------//
 
 
-bool Geometry::IsParticleInfront(Particle* particle)
+bool Geometry::IsParticleInfront(PROPOSALParticle* particle)
 {
     bool is_infront  =   false;
 
@@ -130,7 +130,7 @@ bool Geometry::IsParticleInfront(Particle* particle)
 //----------------------------------------------------------------------------//
 
 
-bool Geometry::IsParticleBehind(Particle* particle)
+bool Geometry::IsParticleBehind(PROPOSALParticle* particle)
 {
     bool is_behind  =   false;
 
@@ -149,7 +149,7 @@ bool Geometry::IsParticleBehind(Particle* particle)
 //----------------------------------------------------------------------------//
 
 
-pair<double,double> Geometry::DistanceToBorder(Particle* particle)
+pair<double,double> Geometry::DistanceToBorder(PROPOSALParticle* particle)
 {
     //if( !IsParticleInside(particle) ) return 0;
 
@@ -185,7 +185,7 @@ pair<double,double> Geometry::DistanceToBorder(Particle* particle)
 //----------------------------------------------------------------------------//
 
 
-double Geometry::DistanceToClosestApproach(Particle* particle)
+double Geometry::DistanceToClosestApproach(PROPOSALParticle* particle)
 {
     double dir_vec_x = particle->GetCosPhi()*particle->GetSinTheta();
     double dir_vec_y = particle->GetSinPhi()*particle->GetSinTheta();
@@ -354,7 +354,7 @@ void Geometry::swap(Geometry &geometry)
 //----------------------------------------------------------------------------//
 
 
-pair<double,double> Geometry::DistanceToBorderSphere(Particle* particle)
+pair<double,double> Geometry::DistanceToBorderSphere(PROPOSALParticle* particle)
 {
     // Calculate intersection of particle trajectory and the sphere
     // sphere (x1 + x0)^2 + (x2 + y0)^2 + (x3 + z0)^2 = radius^2
@@ -551,7 +551,7 @@ pair<double,double> Geometry::DistanceToBorderSphere(Particle* particle)
 //----------------------------------------------------------------------------//
 
 
-pair<double,double> Geometry::DistanceToBorderBox(Particle* particle)
+pair<double,double> Geometry::DistanceToBorderBox(PROPOSALParticle* particle)
 {
     // Calculate intersection of particle trajectory and the box
     // Surface of the box is defined by six planes:
@@ -774,7 +774,7 @@ pair<double,double> Geometry::DistanceToBorderBox(Particle* particle)
 //----------------------------------------------------------------------------//
 
 
-pair<double,double> Geometry::DistanceToBorderCylinder(Particle* particle)
+pair<double,double> Geometry::DistanceToBorderCylinder(PROPOSALParticle* particle)
 {
     // Calculate intersection of particle trajectory and the cylinder
     // cylinder barrel (x1 + x0)^2 + (x2 + y0)^2  = radius^2 [ z0_-0.5*z_ < particle->z <z0_ - 0.5*z_ ]

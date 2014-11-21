@@ -979,7 +979,8 @@ ProcessCollection::ProcessCollection()
 
     interpolant_                    = NULL;
     interpolant_diff_               = NULL;
-    particle_                       = new Particle();
+    particle_                       = new PROPOSALParticle();
+    backup_particle_                = particle_;
     medium_                         = new Medium();
     integral_                       = new Integral();
     cut_settings_                   = new EnergyCutSettings();
@@ -1024,7 +1025,8 @@ ProcessCollection::ProcessCollection(const ProcessCollection &collection)
     ,up_                         ( collection.up_)
     ,bigLow_                     ( collection.bigLow_ )
     ,storeDif_                   ( collection.storeDif_ )
-    ,particle_                   ( new Particle(*collection.particle_) )
+    ,particle_                   ( new PROPOSALParticle(*collection.particle_) )
+    ,backup_particle_            ( new PROPOSALParticle(*collection.backup_particle_) )
     ,medium_                     ( new Medium( *collection.medium_) )
     ,integral_                   ( new Integral(*collection.integral_) )
     ,cut_settings_               ( new EnergyCutSettings(*collection.cut_settings_) )
@@ -1165,7 +1167,7 @@ ProcessCollection::ProcessCollection(const ProcessCollection &collection)
 //----------------------------------------------------------------------------//
 
 
-ProcessCollection::ProcessCollection(Particle *particle, Medium *medium, EnergyCutSettings* cut_settings)
+ProcessCollection::ProcessCollection(PROPOSALParticle *particle, Medium *medium, EnergyCutSettings* cut_settings)
     :order_of_interpolation_     ( 5 )
     ,do_interpolation_           ( false )
     ,lpm_effect_enabled_         ( false )
@@ -1187,6 +1189,7 @@ ProcessCollection::ProcessCollection(Particle *particle, Medium *medium, EnergyC
 {
 
     particle_           =   particle;
+    backup_particle_    =   particle_;
     medium_             =   medium;
     cut_settings_       =   cut_settings;
 
@@ -1425,8 +1428,8 @@ void ProcessCollection::swap(ProcessCollection &collection)
 {
     using std::swap;
 
-    Particle tmp_particle1(*collection.particle_);
-    Particle tmp_particle2(*particle_);
+    PROPOSALParticle tmp_particle1(*collection.particle_);
+    PROPOSALParticle tmp_particle2(*particle_);
 
     EnergyCutSettings tmp_cuts1(*collection.cut_settings_);
     EnergyCutSettings tmp_cuts2(*cut_settings_);
@@ -1515,8 +1518,8 @@ void ProcessCollection::swap(ProcessCollection &collection)
 
 
     // Set pointers again (to many swapping above....)
-    SetParticle( new Particle(tmp_particle1) );
-    collection.SetParticle( new Particle(tmp_particle2) );
+    SetParticle( new PROPOSALParticle(tmp_particle1) );
+    collection.SetParticle( new PROPOSALParticle(tmp_particle2) );
 
     SetMedium( new Medium(tmp_medium1) );
     collection.SetMedium( new Medium(tmp_medium2) );
@@ -1868,7 +1871,7 @@ void ProcessCollection::SetMedium(Medium* medium)
 //----------------------------------------------------------------------------//
 
 
-void ProcessCollection::SetParticle(Particle* particle)
+void ProcessCollection::SetParticle(PROPOSALParticle* particle)
 {
     particle_ = particle;
 
@@ -1887,6 +1890,34 @@ void ProcessCollection::SetParticle(Particle* particle)
     }
 }
 
+PROPOSALParticle *ProcessCollection::GetBackup_particle() const
+{
+    return backup_particle_;
+}
+
+void ProcessCollection::SetBackup_particle(PROPOSALParticle *backup_particle)
+{
+    backup_particle_ = backup_particle;
+}
+
+void ProcessCollection::RestoreBackup_particle()
+{
+    particle_ = backup_particle_;
+
+    decay_->RestoreBackup_particle();
+    for(unsigned int i = 0 ; i < crosssections_.size() ; i++)
+    {
+        crosssections_.at(i)->RestoreBackup_particle();
+    }
+    if(do_continuous_randomization_)
+    {
+        randomizer_->RestoreBackup_particle();
+    }
+    if(do_scattering_)
+    {
+        scattering_->RestoreBackup_particle();
+    }
+}
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//

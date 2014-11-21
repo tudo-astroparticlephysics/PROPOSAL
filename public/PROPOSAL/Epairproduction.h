@@ -112,7 +112,7 @@ public:
     bool operator==(const Epairproduction &epair) const;
     bool operator!=(const Epairproduction &epair) const;
     Epairproduction& operator=(const Epairproduction&);
-    Epairproduction(Particle* particle, Medium* medium, EnergyCutSettings* cut_settings);
+    Epairproduction(PROPOSALParticle* particle, Medium* medium, EnergyCutSettings* cut_settings);
     friend std::ostream& operator<<(std::ostream& os, Epairproduction const &epair);
 //----------------------------------------------------------------------------//
 

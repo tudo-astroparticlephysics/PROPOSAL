@@ -676,7 +676,7 @@ Epairproduction::Epairproduction(const Epairproduction &epair)
 //----------------------------------------------------------------------------//
 
 
-Epairproduction::Epairproduction(Particle* particle,
+Epairproduction::Epairproduction(PROPOSALParticle* particle,
                              Medium* medium,
                              EnergyCutSettings* cut_settings)
     :CrossSections(particle, medium, cut_settings)

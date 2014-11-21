@@ -23,7 +23,7 @@
  *
  */
 
-#include "PROPOSAL/Particle.h"
+#include "PROPOSAL/PROPOSALParticle.h"
 #include "PROPOSAL/MathModel.h"
 #include "PROPOSAL/ProcessCollection.h"
 #include <utility>
@@ -45,6 +45,7 @@ private:
     int     photo_;                     //!< Photonuclear parametrization
     bool    lpm_;                       //!< Landau-Pomeranchuk-Migdal supression of EM cross-sections enabled if true
     bool    moliere_;                   //!< Moliere scattering enabled if true
+    bool    stopping_decay_;            //!< Do decay of particles. formarly sdec
     bool    do_exact_time_calulation_;  //!< exact local time calculation enabled if true
     bool    integrate_;                 //!< if true nothing will be interpolated
     double  brems_multiplier_;          //!< multiplier to in- or decrease the Bremsstrahlung cross-sections
@@ -66,7 +67,7 @@ private:
 
     std::vector<ProcessCollection*> collections_;
 
-    Particle* particle_;
+    PROPOSALParticle* particle_;
     //FirstOrderScattering
     ScatteringFirstOrder* scatteringFirstOrder_;
     //FirstOrderMoliere
@@ -94,11 +95,6 @@ private:
     */
     void InitProcessCollections(std::ifstream &file);
 
-//----------------------------------------------------------------------------//
-    /*!
-     *  Apply options which are read from configuration file to ProcessCollections
-    */
-    void ApplyOptions();
 
     void MoveParticle(double distance);
 
@@ -106,7 +102,7 @@ public:
 
     //Constructors
     Propagator();
-    Propagator(std::string config_file);
+    Propagator(std::string config_file, bool DoApplyOptions=true);
     Propagator(Medium* medium,
                EnergyCutSettings* cuts,
                std::string particle_type,
@@ -149,7 +145,13 @@ public:
      *  \return vector of secondarys
      */
 
-    std::vector<Particle*> Propagate( Particle *particle, double MaxDistance_cm = 1e20 );
+    std::vector<PROPOSALParticle*> Propagate( PROPOSALParticle *particle, double MaxDistance_cm = 1e20 );
+
+//----------------------------------------------------------------------------//
+        /*!
+         *  Apply options which are read from configuration file to ProcessCollections
+        */
+        void ApplyOptions();
 
 //----------------------------------------------------------------------------//
     /*!
@@ -182,14 +184,14 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    void ReadConfigFile(std::string config_file);
+    void ReadConfigFile(std::string config_file, bool DoApplyOptions=true);
 
 //----------------------------------------------------------------------------//
     /**
      * Choose the current collection by particle type and location.
      */
 
-    void ChooseCurrentCollection(Particle* particle);
+    void ChooseCurrentCollection(PROPOSALParticle* particle);
 
 //----------------------------------------------------------------------------//
     /**
@@ -228,7 +230,7 @@ public:
     }
 
 //----------------------------------------------------------------------------//
-    Particle* GetParticle() const
+    PROPOSALParticle* GetParticle() const
     {
         return particle_;
     }
@@ -238,12 +240,24 @@ public:
     /**
      *  Sets the particle for the Propagator and its current ProcessCollection
      */
-    void SetParticle(Particle* particle);
+    void SetParticle(PROPOSALParticle* particle);
 
 //----------------------------------------------------------------------------//
     //Destructor
     ~Propagator();
 
+    int GetSeed() const;
+    void SetSeed(int seed);
+    int GetBrems() const;
+    void SetBrems(int brems);
+    int GetPhoto() const;
+    void SetPhoto(int photo);
+    std::string GetPath_to_tables() const;
+    void SetPath_to_tables(const std::string &path_to_tables);
+    Geometry *GetDetector() const;
+    void SetDetector(Geometry *detector);
+    bool GetStopping_decay() const;
+    void SetStopping_decay(bool stopping_decay);
 };
 
 #endif // _PROPAGATOR_H

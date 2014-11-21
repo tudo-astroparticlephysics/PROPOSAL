@@ -189,7 +189,7 @@ int main(int argc, char** argv)
         pr->GetParticle()->SetEnergy(pow(10,EmaxLog10));
         pr->GetParticle()->SetPropagatedDistance(0);
         pr->Propagate(1e20);
-        vector<Particle*> bla (Output::getInstance().GetSecondarys());
+        vector<PROPOSALParticle*> bla (Output::getInstance().GetSecondarys());
         for(unsigned int k =0 ; k<bla.size();k++)
         {
             sec_energy  =   bla.at(k)->GetEnergy();

@@ -24,7 +24,8 @@ CrossSections::CrossSections( )
     ,order_of_interpolation_( 5 )
     ,sum_of_rates_          ( 0 )
 {
-    particle_       = new Particle();
+    particle_       = new PROPOSALParticle();
+    backup_particle_= particle_;
     medium_         = new Medium();
     cut_settings_   = new EnergyCutSettings(-1,-1);
 }
@@ -34,7 +35,7 @@ CrossSections::CrossSections( )
 //----------------------------------------------------------------------------//
 
 
-CrossSections::CrossSections(Particle* particle,
+CrossSections::CrossSections(PROPOSALParticle* particle,
                              Medium* medium,
                              EnergyCutSettings* cut_settings)
     :vMax_                  ( 0 )
@@ -52,6 +53,7 @@ CrossSections::CrossSections(Particle* particle,
     ,sum_of_rates_          ( 0 )
 {
     particle_       = particle;
+    backup_particle_= particle_;
     medium_         = medium;
     cut_settings_   = cut_settings;
 }
@@ -77,7 +79,7 @@ CrossSections::CrossSections(const CrossSections& crossSections)
     ,order_of_interpolation_   ( crossSections.order_of_interpolation_ )
     ,sum_of_rates_             ( crossSections.sum_of_rates_ )
 {
-    particle_                 = new Particle( *crossSections.particle_ );
+    particle_                 = new PROPOSALParticle( *crossSections.particle_ );
     medium_                   = new Medium( *crossSections.medium_ );
     cut_settings_             = new EnergyCutSettings( *crossSections.cut_settings_ );
 }
@@ -221,7 +223,7 @@ void CrossSections::SetVUp(double vUp){
     vUp_ = vUp;
 }
 
-void CrossSections::SetParticle(Particle *particle){
+void CrossSections::SetParticle(PROPOSALParticle *particle){
     particle_ = particle;
 }
 
@@ -238,3 +240,18 @@ void CrossSections::EnableLpmEffect(bool lpm_effect_enabled){
 }
 
 
+
+PROPOSALParticle *CrossSections::GetBackup_particle() const
+{
+    return backup_particle_;
+}
+
+void CrossSections::SetBackup_particle(PROPOSALParticle *backup_particle)
+{
+    backup_particle_ = backup_particle;
+}
+
+void CrossSections::RestoreBackup_particle()
+{
+    particle_ = backup_particle_;
+}

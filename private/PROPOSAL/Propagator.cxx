@@ -72,7 +72,7 @@ std::pair<double,double> Propagator::CalculateEnergyTillStochastic( double initi
 //----------------------------------------------------------------------------//
 
 
-vector<Particle*> Propagator::Propagate( Particle *particle, double MaxDistance_cm )
+vector<PROPOSALParticle*> Propagator::Propagate( PROPOSALParticle *particle, double MaxDistance_cm )
 {
     Output::getInstance().ClearSecondaryVector();
 
@@ -444,37 +444,37 @@ double Propagator::Propagate( double distance )
 
     }
 
-//    if(sdec) <-- TODO: Include the flag
-//    {
-    if(propagated_distance!=distance && final_energy!=0 && particle_->GetLifetime()>=0)
+    if(stopping_decay_)
     {
-        particle_->SetEnergy(particle_->GetMass());
-
-        double t    =   particle_->GetT() -particle_->GetLifetime()*log(RandomDouble());
-        double product_energy   =   0;
-
-        pair<double, string> decay_to_store;
-        secondary_id    =   particle_->GetParticleId() + 1;
-
-        particle_->SetT( t );
-
-        if(particle_->GetType()==2)
+        if(propagated_distance!=distance && final_energy!=0 && particle_->GetLifetime()>=0)
         {
-            product_energy  =   current_collection_->GetDecay()->CalculateProductEnergy(RandomDouble(), 0.5, RandomDouble());
+            particle_->SetEnergy(particle_->GetMass());
+
+            double t    =   particle_->GetT() -particle_->GetLifetime()*log(RandomDouble());
+            double product_energy   =   0;
+
+            pair<double, string> decay_to_store;
+            secondary_id    =   particle_->GetParticleId() + 1;
+
+            particle_->SetT( t );
+
+            if(particle_->GetType()==2)
+            {
+                product_energy  =   current_collection_->GetDecay()->CalculateProductEnergy(RandomDouble(), 0.5, RandomDouble());
+            }
+            else
+            {
+                product_energy  =   current_collection_->GetDecay()->CalculateProductEnergy(RandomDouble(), 0.5, 0.5);
+            }
+
+            decay_to_store.first    =   product_energy;
+            decay_to_store.second   =   current_collection_->GetDecay()->GetOut();
+
+            final_energy  =   0;
+
+            Output::getInstance().FillSecondaryVector(particle_,secondary_id, decay_to_store, final_energy);
         }
-        else
-        {
-            product_energy  =   current_collection_->GetDecay()->CalculateProductEnergy(RandomDouble(), 0.5, 0.5);
-        }
-
-        decay_to_store.first    =   product_energy;
-        decay_to_store.second   =   current_collection_->GetDecay()->GetOut();
-
-        final_energy  =   0;
-
-        Output::getInstance().FillSecondaryVector(particle_,secondary_id, decay_to_store, final_energy);
     }
-//    }
 
 
     //particle_->SetParticleId(NumInt); //TOMASZ: Hack to get the number of interactions
@@ -558,13 +558,14 @@ void Propagator::AdvanceParticle(double dr, double ei, double ef)
 //----------------------------------------------------------------------------//
 
 
-void Propagator::ChooseCurrentCollection(Particle* particle)
+void Propagator::ChooseCurrentCollection(PROPOSALParticle* particle)
 {
     vector<unsigned int> crossed_collections;
     crossed_collections.resize(0);
 
     for(unsigned int i = 0 ; i < collections_.size() ; i++)
     {
+        collections_.at(i)->RestoreBackup_particle();
 
         if(particle->GetName().compare(collections_.at(i)->GetParticle()->GetName())!=0 )
             continue;
@@ -619,7 +620,11 @@ void Propagator::ChooseCurrentCollection(Particle* particle)
     }
 
     //No process collection was found
-    if(crossed_collections.size() == 0)current_collection_ = NULL;
+    if(crossed_collections.size() == 0)
+    {
+        current_collection_ = NULL;
+        log_fatal("No Cross Section was found!!!");
+    }
 
 
     //Choose current collection when multiple collections are crossed!
@@ -671,7 +676,9 @@ void Propagator::ChooseCurrentCollection(Particle* particle)
     }
 
     if(current_collection_ != NULL)
+    {
         current_collection_->SetParticle(particle_);
+    }
 }
 
 
@@ -679,7 +686,7 @@ void Propagator::ChooseCurrentCollection(Particle* particle)
 //----------------------------------------------------------------------------//
 
 
-void Propagator::ReadConfigFile(string config_file)
+void Propagator::ReadConfigFile(string config_file, bool DoApplyOptions)
 {
     bool found_detector         =   false;
 
@@ -1040,7 +1047,10 @@ void Propagator::ReadConfigFile(string config_file)
         }
     }
 
-    ApplyOptions();
+    if(DoApplyOptions)
+    {
+        ApplyOptions();
+    }
 }
 
 
@@ -1169,6 +1179,7 @@ Propagator::Propagator()
     ,photo_                     ( 12 )
     ,lpm_                       ( false )
     ,moliere_                   ( false )
+    ,stopping_decay_            ( true )
     ,do_exact_time_calulation_  ( false )
     ,integrate_                 ( false )
     ,brems_multiplier_          ( 1 )
@@ -1189,7 +1200,7 @@ Propagator::Propagator()
     ,scattering_model_          (-1)
     ,current_collection_        (NULL)
 {
-    particle_              = new Particle("mu");
+    particle_              = new PROPOSALParticle("mu");
     detector_              = new Geometry();
     detector_->InitSphere(0,0,0,1e18,0);
     InitDefaultCollection(detector_);
@@ -1225,6 +1236,7 @@ Propagator::Propagator(Medium* medium,
     ,photo_                     ( photo )
     ,lpm_                       ( lpm )
     ,moliere_                   ( moliere )
+    ,stopping_decay_            ( true )
     ,do_exact_time_calulation_  ( exact_time )
     ,integrate_                 ( integrate )
     ,brems_multiplier_          ( brems_multiplier )
@@ -1245,7 +1257,7 @@ Propagator::Propagator(Medium* medium,
     ,scattering_model_          (scattering_model)
     ,current_collection_        (NULL)
 {
-    particle_              = new Particle(particle_type);
+    particle_              = new PROPOSALParticle(particle_type);
     current_collection_    = new ProcessCollection(particle_, medium, cuts);
     detector_              = new Geometry();
     detector_->InitSphere(0,0,0,1e18,0);
@@ -1326,7 +1338,7 @@ Propagator::Propagator(Medium* medium,
 //----------------------------------------------------------------------------//
 
 
-Propagator::Propagator(string config_file)
+Propagator::Propagator(string config_file, bool DoApplyOptions)
     :order_of_interpolation_    ( 5 )
     ,debug_                     ( false )
     ,particle_interaction_      ( false )
@@ -1335,6 +1347,7 @@ Propagator::Propagator(string config_file)
     ,photo_                     ( 12 )
     ,lpm_                       ( false )
     ,moliere_                   ( false )
+    ,stopping_decay_            ( true )
     ,do_exact_time_calulation_  ( false )
     ,integrate_                 ( false )
     ,brems_multiplier_          ( 1 )
@@ -1355,7 +1368,7 @@ Propagator::Propagator(string config_file)
     ,scattering_model_          (-1)
     ,current_collection_        (NULL)
 {
-    ReadConfigFile(config_file);
+    ReadConfigFile(config_file, DoApplyOptions);
 }
 
 
@@ -1372,6 +1385,7 @@ Propagator::Propagator(const Propagator &propagator)
     ,photo_                     ( propagator.photo_ )
     ,lpm_                       ( propagator.lpm_ )
     ,moliere_                   ( propagator.moliere_ )
+    ,stopping_decay_            ( propagator.stopping_decay_ )
     ,do_exact_time_calulation_  ( propagator.do_exact_time_calulation_ )
     ,integrate_                 ( propagator.integrate_ )
     ,brems_multiplier_          ( propagator.brems_multiplier_ )
@@ -1439,6 +1453,7 @@ bool Propagator::operator==(const Propagator &propagator) const
     if( photo_                    != propagator.photo_ )                  return false;
     if( lpm_                      != propagator.lpm_ )                    return false;
     if( moliere_                  != propagator.moliere_ )                return false;
+    if( stopping_decay_           != propagator.stopping_decay_ )         return false;
     if( do_exact_time_calulation_ != propagator.do_exact_time_calulation_ )return false;
     if( integrate_                != propagator.integrate_ )              return false;
     if( brems_multiplier_         != propagator.brems_multiplier_ )       return false;
@@ -1490,6 +1505,7 @@ void Propagator::swap(Propagator &propagator)
     swap( photo_                    ,   propagator.photo_ );
     swap( lpm_                      ,   propagator.lpm_ );
     swap( moliere_                  ,   propagator.moliere_ );
+    swap( stopping_decay_           ,   propagator.stopping_decay_ );
     swap( do_exact_time_calulation_ ,   propagator.do_exact_time_calulation_ );
     swap( integrate_                ,   propagator.integrate_ );
     swap( brems_multiplier_         ,   propagator.brems_multiplier_ );
@@ -1774,9 +1790,9 @@ void Propagator::InitProcessCollections(ifstream &file)
 
             Medium *med     =   new Medium(name,density_correction);
 
-            Particle *mu    =   new Particle("mu");
-            Particle *tau   =   new Particle("tau");
-            Particle *e     =   new Particle("e");
+            PROPOSALParticle *mu    =   new PROPOSALParticle("mu");
+            PROPOSALParticle *tau   =   new PROPOSALParticle("tau");
+            PROPOSALParticle *e     =   new PROPOSALParticle("e");
 
             EnergyCutSettings *inside;
             EnergyCutSettings *infront;
@@ -1798,9 +1814,9 @@ void Propagator::InitProcessCollections(ifstream &file)
             {
                 inside = new EnergyCutSettings(ecut_inside,vcut_inside);
 
-                mu_inside   = new ProcessCollection(new Particle(*mu),new Medium(*med),new EnergyCutSettings(*inside));
-                tau_inside  = new ProcessCollection(new Particle(*tau),new Medium(*med),new EnergyCutSettings(*inside));
-                e_inside    = new ProcessCollection(new Particle(*e),new Medium(*med),new EnergyCutSettings(*inside));
+                mu_inside   = new ProcessCollection(new PROPOSALParticle(*mu),new Medium(*med),new EnergyCutSettings(*inside));
+                tau_inside  = new ProcessCollection(new PROPOSALParticle(*tau),new Medium(*med),new EnergyCutSettings(*inside));
+                e_inside    = new ProcessCollection(new PROPOSALParticle(*e),new Medium(*med),new EnergyCutSettings(*inside));
 
                 mu_inside->SetEnableRandomization(cont_inside);
                 mu_inside->SetLocation(1);
@@ -1815,9 +1831,9 @@ void Propagator::InitProcessCollections(ifstream &file)
             {
                 inside = new EnergyCutSettings(global_ecut_inside_,global_vcut_inside_);
 
-                mu_inside   = new ProcessCollection(new Particle(*mu),new Medium(*med),new EnergyCutSettings(*inside));
-                tau_inside  = new ProcessCollection(new Particle(*tau),new Medium(*med),new EnergyCutSettings(*inside));
-                e_inside    = new ProcessCollection(new Particle(*e),new Medium(*med),new EnergyCutSettings(*inside));
+                mu_inside   = new ProcessCollection(new PROPOSALParticle(*mu),new Medium(*med),new EnergyCutSettings(*inside));
+                tau_inside  = new ProcessCollection(new PROPOSALParticle(*tau),new Medium(*med),new EnergyCutSettings(*inside));
+                e_inside    = new ProcessCollection(new PROPOSALParticle(*e),new Medium(*med),new EnergyCutSettings(*inside));
 
                 mu_inside->SetEnableRandomization(global_cont_inside_);
                 mu_inside->SetLocation(1);
@@ -1833,9 +1849,9 @@ void Propagator::InitProcessCollections(ifstream &file)
             {
                 infront = new EnergyCutSettings(ecut_infront,vcut_infront);
 
-                mu_infront   = new ProcessCollection(new Particle(*mu),new Medium(*med),new EnergyCutSettings(*infront));
-                tau_infront  = new ProcessCollection(new Particle(*tau),new Medium(*med),new EnergyCutSettings(*infront));
-                e_infront    = new ProcessCollection(new Particle(*e),new Medium(*med),new EnergyCutSettings(*infront));
+                mu_infront   = new ProcessCollection(new PROPOSALParticle(*mu),new Medium(*med),new EnergyCutSettings(*infront));
+                tau_infront  = new ProcessCollection(new PROPOSALParticle(*tau),new Medium(*med),new EnergyCutSettings(*infront));
+                e_infront    = new ProcessCollection(new PROPOSALParticle(*e),new Medium(*med),new EnergyCutSettings(*infront));
 
                 mu_infront->SetEnableRandomization(cont_infront);
                 mu_infront->SetLocation(0);
@@ -1850,9 +1866,9 @@ void Propagator::InitProcessCollections(ifstream &file)
             {
                 infront = new EnergyCutSettings(global_ecut_infront_,global_vcut_infront_);
 
-                mu_infront   = new ProcessCollection(new Particle(*mu),new Medium(*med),new EnergyCutSettings(*infront));
-                tau_infront  = new ProcessCollection(new Particle(*tau),new Medium(*med),new EnergyCutSettings(*infront));
-                e_infront    = new ProcessCollection(new Particle(*e),new Medium(*med),new EnergyCutSettings(*infront));
+                mu_infront   = new ProcessCollection(new PROPOSALParticle(*mu),new Medium(*med),new EnergyCutSettings(*infront));
+                tau_infront  = new ProcessCollection(new PROPOSALParticle(*tau),new Medium(*med),new EnergyCutSettings(*infront));
+                e_infront    = new ProcessCollection(new PROPOSALParticle(*e),new Medium(*med),new EnergyCutSettings(*infront));
 
                 mu_infront->SetEnableRandomization(global_cont_infront_);
                 mu_infront->SetLocation(0);
@@ -1868,9 +1884,9 @@ void Propagator::InitProcessCollections(ifstream &file)
             {
                 behind = new EnergyCutSettings(ecut_behind,vcut_behind);
 
-                mu_behind   = new ProcessCollection(new Particle(*mu),new Medium(*med),new EnergyCutSettings(*behind));
-                tau_behind  = new ProcessCollection(new Particle(*tau),new Medium(*med),new EnergyCutSettings(*behind));
-                e_behind    = new ProcessCollection(new Particle(*e),new Medium(*med),new EnergyCutSettings(*behind));
+                mu_behind   = new ProcessCollection(new PROPOSALParticle(*mu),new Medium(*med),new EnergyCutSettings(*behind));
+                tau_behind  = new ProcessCollection(new PROPOSALParticle(*tau),new Medium(*med),new EnergyCutSettings(*behind));
+                e_behind    = new ProcessCollection(new PROPOSALParticle(*e),new Medium(*med),new EnergyCutSettings(*behind));
 
                 mu_behind->SetEnableRandomization(cont_behind);
                 mu_behind->SetLocation(2);
@@ -1885,9 +1901,9 @@ void Propagator::InitProcessCollections(ifstream &file)
             {
                 behind = new EnergyCutSettings(global_ecut_behind_,global_vcut_behind_);
 
-                mu_behind   = new ProcessCollection(new Particle(*mu),new Medium(*med),new EnergyCutSettings(*behind));
-                tau_behind  = new ProcessCollection(new Particle(*tau),new Medium(*med),new EnergyCutSettings(*behind));
-                e_behind    = new ProcessCollection(new Particle(*e),new Medium(*med),new EnergyCutSettings(*behind));
+                mu_behind   = new ProcessCollection(new PROPOSALParticle(*mu),new Medium(*med),new EnergyCutSettings(*behind));
+                tau_behind  = new ProcessCollection(new PROPOSALParticle(*tau),new Medium(*med),new EnergyCutSettings(*behind));
+                e_behind    = new ProcessCollection(new PROPOSALParticle(*e),new Medium(*med),new EnergyCutSettings(*behind));
 
                 mu_behind->SetEnableRandomization(global_cont_behind_);
                 mu_behind->SetLocation(2);
@@ -1945,6 +1961,66 @@ void Propagator::InitProcessCollections(ifstream &file)
 //----------------------------------------------------------------------------//
 
 
+
+int Propagator::GetSeed() const
+{
+    return seed_;
+}
+
+void Propagator::SetSeed(int seed)
+{
+    seed_ = seed;
+}
+
+int Propagator::GetBrems() const
+{
+    return brems_;
+}
+
+void Propagator::SetBrems(int brems)
+{
+    brems_ = brems;
+}
+
+int Propagator::GetPhoto() const
+{
+    return photo_;
+}
+
+void Propagator::SetPhoto(int photo)
+{
+    photo_ = photo;
+}
+
+std::string Propagator::GetPath_to_tables() const
+{
+    return path_to_tables_;
+}
+
+void Propagator::SetPath_to_tables(const std::string &path_to_tables)
+{
+    path_to_tables_ = path_to_tables;
+}
+
+Geometry *Propagator::GetDetector() const
+{
+    return detector_;
+}
+
+void Propagator::SetDetector(Geometry *detector)
+{
+    detector_ = detector;
+}
+
+bool Propagator::GetStopping_decay() const
+{
+    return stopping_decay_;
+}
+
+void Propagator::SetStopping_decay(bool stopping_decay)
+{
+    stopping_decay_ = stopping_decay;
+}
 void Propagator::InitGeometry(Geometry* geometry, std::deque<std::string>* token, string first_token)
 {
     string taux = first_token;
@@ -2335,8 +2411,10 @@ void Propagator::ApplyOptions()
     }
     if(!integrate_)
     {
-        cout << "Starting Interpolation! This will take some time depending on the number of media you defined!/n";
+        cout << "Starting Interpolation! This will take some time depending on the number of media you defined!\n";
+        cout.flush();
         EnableInterpolation(path_to_tables_, raw_);
+        cout << "Done!\n";
     }
 
 }
@@ -2365,7 +2443,7 @@ void Propagator::ApplyOptions()
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-void Propagator::SetParticle(Particle* particle)
+void Propagator::SetParticle(PROPOSALParticle* particle)
 {
     particle_   =   particle;
 }

@@ -8,7 +8,7 @@
 #include "PROPOSAL/Bremsstrahlung.h"
 #include "PROPOSAL/Photonuclear.h"
 #include "PROPOSAL/Epairproduction.h"
-#include "PROPOSAL/Particle.h"
+#include "PROPOSAL/PROPOSALParticle.h"
 #include "PROPOSAL/Medium.h"
 #include "PROPOSAL/EnergyCutSettings.h"
 #include "PROPOSAL/Output.h"
@@ -48,7 +48,7 @@ TEST(Comparison , Comparison_equal ) {
     double dNdx;
 
     Medium *medium = new Medium("hydrogen",1.);
-    Particle *particle = new Particle("mu",1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle = new PROPOSALParticle("mu",1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cut_settings = new EnergyCutSettings(500,-1);
 
     vector<CrossSections*> crosssections;
@@ -88,8 +88,8 @@ TEST(Comparison , Comparison_equal ) {
 TEST(Comparison , Comparison_not_equal ) {
     Medium *medium = new Medium("air",1.);
     Medium *medium2 = new Medium("water",1.);
-    Particle *particle = new Particle("mu",1.,1.,1,20,20,1e5,10);
-    Particle *particle2 = new Particle("tau",1.,1.,1,20,20,1e5,10);
+    PROPOSALParticle *particle = new PROPOSALParticle("mu",1.,1.,1,20,20,1e5,10);
+    PROPOSALParticle *particle2 = new PROPOSALParticle("tau",1.,1.,1,20,20,1e5,10);
     EnergyCutSettings *cut_settings = new EnergyCutSettings(500,-1);
 
     vector<CrossSections*> crosssections;
@@ -140,7 +140,7 @@ TEST(Assignment , Copyconstructor ) {
 
 TEST(Assignment , Copyconstructor2 ) {
     Medium *medium = new Medium("air",1.);
-    Particle *particle = new Particle("mu",1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle = new PROPOSALParticle("mu",1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cut_settings = new EnergyCutSettings(500,-1);
 
     vector<CrossSections*> crosssections;
@@ -160,7 +160,7 @@ TEST(Assignment , Copyconstructor2 ) {
 
 TEST(Assignment , Operator ) {
     Medium *medium = new Medium("air",1.);
-    Particle *particle = new Particle("mu",1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle = new PROPOSALParticle("mu",1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cut_settings = new EnergyCutSettings(500,-1);
 
     vector<CrossSections*> crosssections;
@@ -209,8 +209,8 @@ TEST(Assignment , Operator ) {
 TEST(Assignment , Swap ) {
     Medium *medium = new Medium("hydrogen",1.);
     Medium *medium2 = new Medium("hydrogen",1.);
-    Particle *particle = new Particle("mu",1.,1.,1,.20,20,1e5,10);
-    Particle *particle2 = new Particle("mu",1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle = new PROPOSALParticle("mu",1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle2 = new PROPOSALParticle("mu",1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cut_settings = new EnergyCutSettings(500,0.05);
     EnergyCutSettings *cut_settings2 = new EnergyCutSettings(500,0.05);
 
@@ -254,8 +254,8 @@ TEST(Assignment , Swap ) {
 
     Medium *medium3 = new Medium("water",1.);
     Medium *medium4 = new Medium("water",1.);
-    Particle *particle3 = new Particle("tau",1.,1.,1,.20,20,1e5,10);
-    Particle *particle4 = new Particle("tau",1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle3 = new PROPOSALParticle("tau",1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle4 = new PROPOSALParticle("tau",1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cut_settings3 = new EnergyCutSettings(200,-1);
     EnergyCutSettings *cut_settings4 = new EnergyCutSettings(200,-1);
 
@@ -386,7 +386,7 @@ TEST(ContinuousRandomization , Randomize_interpol ) {
         energy_old = -1;
 
         Medium *medium = new Medium(med,1.);
-        Particle *particle = new Particle(particleName,1.,1.,1,.20,20,1e5,10);
+        PROPOSALParticle *particle = new PROPOSALParticle(particleName,1.,1.,1,.20,20,1e5,10);
         EnergyCutSettings *cut_settings = new EnergyCutSettings(ecut,vcut);
 
         vector<CrossSections*> crosssections;
