@@ -11,7 +11,7 @@
 #include <cmath>
 #include <algorithm>
 #include <stdlib.h>
-#include "PROPOSAL/Particle.h"
+#include "PROPOSAL/PROPOSALParticle.h"
 #include "PROPOSAL/methods.h"
 #include "PROPOSAL/Constants.h"
 #include <iomanip>
@@ -26,7 +26,7 @@ using namespace std;
 //----------------------------------------------------------------------------//
 
 
-Particle::Particle( )
+PROPOSALParticle::PROPOSALParticle( )
     :propagated_distance_   ( 0 )
     ,x_                     ( 0 )
     ,y_                     ( 0 )
@@ -75,7 +75,7 @@ Particle::Particle( )
 //----------------------------------------------------------------------------//
 
 
-Particle::Particle(const Particle& particle)
+PROPOSALParticle::PROPOSALParticle(const PROPOSALParticle& particle)
     :propagated_distance_   ( particle.propagated_distance_ )
     ,x_                     ( particle.x_ )
     ,y_                     ( particle.y_ )
@@ -124,7 +124,7 @@ Particle::Particle(const Particle& particle)
 //----------------------------------------------------------------------------//
 
 
-Particle::Particle(int parent_particle_id,
+PROPOSALParticle::PROPOSALParticle(int parent_particle_id,
                    int particle_id,
                    string name,
                    double x,
@@ -135,7 +135,7 @@ Particle::Particle(int parent_particle_id,
                    double energy,
                    double t,
                    double prop_dist,
-                   Particle *p)
+                   PROPOSALParticle *p)
 
     :propagated_distance_   ( prop_dist )
     ,x_                     ( x )
@@ -228,7 +228,7 @@ Particle::Particle(int parent_particle_id,
 //----------------------------------------------------------------------------//
 
 
-Particle::Particle(int parent_particle_id,
+PROPOSALParticle::PROPOSALParticle(int parent_particle_id,
                    int particle_id,
                    string name,
                    double x,
@@ -288,7 +288,7 @@ Particle::Particle(int parent_particle_id,
 //----------------------------------------------------------------------------//
 
 
-Particle::Particle(string name,
+PROPOSALParticle::PROPOSALParticle(string name,
                    double x,
                    double y,
                    double z,
@@ -370,7 +370,7 @@ Particle::Particle(string name,
 //----------------------------------------------------------------------------//
 
 
-Particle::Particle(string name)
+PROPOSALParticle::PROPOSALParticle(string name)
     :propagated_distance_   ( 0 )
     ,x_                     ( 0 )
     ,y_                     ( 0 )
@@ -447,10 +447,10 @@ Particle::Particle(string name)
 //----------------------------------------------------------------------------//
 
 
-Particle& Particle::operator=(const Particle &particle){
+PROPOSALParticle& PROPOSALParticle::operator=(const PROPOSALParticle &particle){
     if (this != &particle)
     {
-      Particle tmp(particle);
+      PROPOSALParticle tmp(particle);
       swap(tmp);
     }
     return *this;
@@ -461,7 +461,7 @@ Particle& Particle::operator=(const Particle &particle){
 //----------------------------------------------------------------------------//
 
 
-bool Particle::operator==(const Particle &particle) const
+bool PROPOSALParticle::operator==(const PROPOSALParticle &particle) const
 {
     if(  propagated_distance_   != particle.propagated_distance_)   return false;
     if(  x_                     != particle.x_)                     return false;
@@ -514,7 +514,7 @@ bool Particle::operator==(const Particle &particle) const
 //----------------------------------------------------------------------------//
 
 
-bool Particle::operator!=(const Particle &particle) const {
+bool PROPOSALParticle::operator!=(const PROPOSALParticle &particle) const {
   return !(*this == particle);
 }
 
@@ -523,7 +523,7 @@ bool Particle::operator!=(const Particle &particle) const {
 //----------------------------------------------------------------------------//
 
 
-ostream& operator<<(ostream& os, Particle const& particle)
+ostream& operator<<(ostream& os, PROPOSALParticle const& particle)
 {
     os<<"---------------------------Particle( "<<&particle<<" )---------------------------"<<endl;
     os<<fixed<<setprecision(5);
@@ -561,7 +561,7 @@ ostream& operator<<(ostream& os, Particle const& particle)
 //----------------------------------------------------------------------------//
 
 
-void Particle::swap(Particle &particle)
+void PROPOSALParticle::swap(PROPOSALParticle &particle)
 {
     using std::swap;
 
@@ -617,7 +617,7 @@ void Particle::swap(Particle &particle)
 //----------------------------------------------------------------------------//
 
 
-void Particle::InitByName(std::string aname){
+void PROPOSALParticle::InitByName(std::string aname){
 
     string name=aname.length()==0?"?":aname[0]=='a'?aname.substr(1):aname;
 
@@ -763,7 +763,7 @@ void Particle::InitByName(std::string aname){
 //----------------------------------------------------------------------------//
 
 
-void Particle::Location(double time,
+void PROPOSALParticle::Location(double time,
                         double x,
                         double y,
                         double z,
@@ -792,7 +792,7 @@ void Particle::Location(double time,
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-void Particle::SetProperties(int parent_particle_id, int particle_id, double energy, double t,
+void PROPOSALParticle::SetProperties(int parent_particle_id, int particle_id, double energy, double t,
                              double x, double y, double z, double theta, double phi,
                              double xi, double yi, double zi, double ti, double Ei,
                              double xf, double yf, double zf, double tf, double Ef,
@@ -808,7 +808,7 @@ void Particle::SetProperties(int parent_particle_id, int particle_id, double ene
     SetXc(xc); SetYc(yc); SetZc(zc); SetTc(tc); SetEc(Ec);
 }
 
-void Particle::SetEnergy(double e)
+void PROPOSALParticle::SetEnergy(double e)
 {
     energy_             =   e;
 
@@ -822,7 +822,7 @@ void Particle::SetEnergy(double e)
 //----------------------------------------------------------------------------//
 
 
-void Particle::SetTheta(double theta)
+void PROPOSALParticle::SetTheta(double theta)
 {
     theta_  =   theta;
     theta_ *=   (PI/180);
@@ -837,7 +837,7 @@ void Particle::SetTheta(double theta)
 //----------------------------------------------------------------------------//
 
 
-void Particle::SetPhi(double phi)
+void PROPOSALParticle::SetPhi(double phi)
 {
     phi_   =    phi;
     phi_  *=    (PI/180);
@@ -851,7 +851,7 @@ void Particle::SetPhi(double phi)
 //----------------------------------------------------------------------------//
 
 
-void Particle::SetMomentum(double momentum)
+void PROPOSALParticle::SetMomentum(double momentum)
 {
     momentum_           =   momentum;
     square_momentum_    =   momentum_*momentum_;
@@ -863,123 +863,123 @@ void Particle::SetMomentum(double momentum)
 //----------------------------------------------------------------------------//
 
 
-void Particle::SetPropagatedDistance(double prop_dist){
+void PROPOSALParticle::SetPropagatedDistance(double prop_dist){
     propagated_distance_ = prop_dist;
 }
 
-void Particle::SetX(double x){
+void PROPOSALParticle::SetX(double x){
     x_ = x;
 }
 
-void Particle::SetY(double y){
+void PROPOSALParticle::SetY(double y){
     y_ = y;
 }
 
-void Particle::SetZ(double z){
+void PROPOSALParticle::SetZ(double z){
     z_ = z;
 }
 
-void Particle::SetT(double t){
+void PROPOSALParticle::SetT(double t){
     t_ = t;
 }
 
-void Particle::SetMass(double mass){
+void PROPOSALParticle::SetMass(double mass){
     mass_ = mass;
 }
 
-void Particle::SetLifetime(double lifetime){
+void PROPOSALParticle::SetLifetime(double lifetime){
     lifetime_ = lifetime;
 }
 
-void Particle::SetCharge(double charge){
+void PROPOSALParticle::SetCharge(double charge){
     charge_ = charge;
 }
 
-void Particle::SetName(std::string name){
+void PROPOSALParticle::SetName(std::string name){
     name_ = name;
 }
 
-void Particle::SetLow(double low){
+void PROPOSALParticle::SetLow(double low){
     low_ = low;
 }
 
-void Particle::SetType(int type){
+void PROPOSALParticle::SetType(int type){
     type_ = type;
 }
 
-void Particle::SetParentParticleId(int parent_particle_id){
+void PROPOSALParticle::SetParentParticleId(int parent_particle_id){
     parent_particle_id_ = parent_particle_id;
 }
 
-void Particle::SetParentParticleEnergy(double parent_particle_energy){
+void PROPOSALParticle::SetParentParticleEnergy(double parent_particle_energy){
     parent_particle_energy_ = parent_particle_energy;
 }
 
-void Particle::SetParticleId(int particle_id){
+void PROPOSALParticle::SetParticleId(int particle_id){
     particle_id_ = particle_id;
 }
 
-void Particle::SetXi(double xi){
+void PROPOSALParticle::SetXi(double xi){
     xi_ = xi;
 }
 
-void Particle::SetYi(double yi){
+void PROPOSALParticle::SetYi(double yi){
     yi_ = yi;
 }
 
-void Particle::SetZi(double zi){
+void PROPOSALParticle::SetZi(double zi){
     zi_ = zi;
 }
 
-void Particle::SetTi(double ti){
+void PROPOSALParticle::SetTi(double ti){
     ti_ = ti;
 }
 
-void Particle::SetEi(double ei){
+void PROPOSALParticle::SetEi(double ei){
     ei_ = ei;
 }
 
-void Particle::SetXf(double xf){
+void PROPOSALParticle::SetXf(double xf){
     xf_ = xf;
 }
 
-void Particle::SetYf(double yf){
+void PROPOSALParticle::SetYf(double yf){
     yf_ = yf;
 }
 
-void Particle::SetZf(double zf){
+void PROPOSALParticle::SetZf(double zf){
     zf_ = zf;
 }
 
-void Particle::SetTf(double tf){
+void PROPOSALParticle::SetTf(double tf){
     tf_ = tf;
 }
 
-void Particle::SetEf(double ef){
+void PROPOSALParticle::SetEf(double ef){
     ef_ = ef;
 }
 
-void Particle::SetXc(double xc){
+void PROPOSALParticle::SetXc(double xc){
     xc_ = xc;
 }
 
-void Particle::SetYc(double yc){
+void PROPOSALParticle::SetYc(double yc){
     yc_ = yc;
 }
 
-void Particle::SetZc(double zc){
+void PROPOSALParticle::SetZc(double zc){
     zc_ = zc;
 }
 
-void Particle::SetTc(double tc){
+void PROPOSALParticle::SetTc(double tc){
     tc_ = tc;
 }
 
-void Particle::SetEc(double ec){
+void PROPOSALParticle::SetEc(double ec){
     ec_ = ec;
 }
 
-void Particle::SetElost(double elost){
+void PROPOSALParticle::SetElost(double elost){
     elost_ = elost;
 }
 

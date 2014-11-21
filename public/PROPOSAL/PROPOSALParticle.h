@@ -1,4 +1,4 @@
-/*! \file   Particle.h
+/*! \file   PROPOSALParticle.h
 *   \brief  Header file for the Particle routines.
 *
 *   For more details see the class documentation.
@@ -20,7 +20,7 @@
   */
 
 
-class Particle
+class PROPOSALParticle
 {
 
 
@@ -84,15 +84,15 @@ public:
      *
      * Constructor which sets "default" settings.
      */
-    Particle();
+    PROPOSALParticle();
 
 //----------------------------------------------------------------------------//
 
-    Particle(const Particle&);
-    Particle& operator=(const Particle&);
-    bool operator==(const Particle &particle) const;
-    bool operator!=(const Particle &particle) const;
-    friend std::ostream& operator<<(std::ostream& os, Particle const& particle);
+    PROPOSALParticle(const PROPOSALParticle&);
+    PROPOSALParticle& operator=(const PROPOSALParticle&);
+    bool operator==(const PROPOSALParticle &particle) const;
+    bool operator!=(const PROPOSALParticle &particle) const;
+    friend std::ostream& operator<<(std::ostream& os, PROPOSALParticle const& particle);
 
 //----------------------------------------------------------------------------//
 
@@ -115,7 +115,7 @@ public:
      * \param *p                      source particle
      */
 
-    Particle(int parent_particle_id,
+    PROPOSALParticle(int parent_particle_id,
              int particle_id,
              std::string name,
              double x,
@@ -126,7 +126,7 @@ public:
              double energy,
              double t,
              double prop_dist,
-             Particle *p);
+             PROPOSALParticle *p);
 
 //----------------------------------------------------------------------------//
     /*!
@@ -146,7 +146,7 @@ public:
      * \param t                       particle time
      * \param prop_dist               flight distance
      */
-    Particle(int parent_particle_id,
+    PROPOSALParticle(int parent_particle_id,
              int particle_id,
              std::string name,
              double x,
@@ -174,7 +174,7 @@ public:
      * \param energy    particle energy
      * \param t         particle time
      */
-    Particle(std::string name,
+    PROPOSALParticle(std::string name,
              double x,
              double y,
              double z,
@@ -193,7 +193,7 @@ public:
      *
      * \param name     particle name
      */
-    Particle(std::string name);
+    PROPOSALParticle(std::string name);
 
 //----------------------------------------------------------------------------//
     /*!
@@ -229,7 +229,7 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    void swap(Particle &particle);
+    void swap(PROPOSALParticle &particle);
 
 //----------------------------------------------------------------------------//
 
@@ -359,7 +359,7 @@ public:
 
 //----------------------------------------------------------------------------//
     // destructors
-    ~Particle() {}
+    ~PROPOSALParticle() {}
 
 
 };
