@@ -20,7 +20,7 @@ mu.location_type = dc.I3Particle.InIce
 
 mu_length = list()
 n_daughters = list()
-for i in range(100000):
+for i in range(10000):
     mu.length = NaN
     daughters = dc.I3ParticleVect()
     # returns None instead of an I3MMCTrack
