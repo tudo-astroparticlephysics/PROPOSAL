@@ -91,7 +91,6 @@ private:
     Output()
     {
         #if LOG4CPLUS_SUPPORT
-        std::cout << "askdfjsahkdghaskdh" << std::endl;
         PropertyConfigurator::doConfigure(LOG4CPLUS_TEXT("resources/log4cplus.conf"));
         logger = Logger::getInstance(LOG4CPLUS_TEXT("PROPOSAL"));
         #endif

@@ -10,15 +10,15 @@ using namespace std;
 int main()
 {
 
-    cout<<"This program will propagte 1e6 muons with an energy of 9 TeV."<<endl;
+    cout<<"This program will propagte 1e4 muons with an energy of 9 TeV."<<endl;
     Propagator *pr = new Propagator("resources/configuration");
     pr->set_seed(1234);
     pr->RandomDouble();
     double range;
 
-    int number_of_particles =   1e5;
+    int number_of_particles =   1e4;
     int OnePercent = number_of_particles/100;
-    TH1D *range_hist = new TH1D("Range","Range distribution of muons with an energy of 9 TeV",64,0,1.2e6);
+    TH1D *range_hist = new TH1D("Range","Range distribution of muons with an energy of 9 TeV",64,0,1.2e9);
     TFile *file = new TFile("Range_distribution.root","RECREATE");
     TTree *tree_range = new TTree("RangeTree","Range of the particles in a tree");
     tree_range->Branch("range",&range);
