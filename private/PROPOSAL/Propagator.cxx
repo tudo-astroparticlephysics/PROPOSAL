@@ -1133,6 +1133,7 @@ boost::program_options::options_description Propagator::CreateOptions()
 
 void Propagator::Setup(int argc, char** argv)
 {
+/*
     vector <string> test = po::split_unix("a b c");
     cout<<test.at(2)<<endl;
     po::options_description all = CreateOptions();
@@ -1160,6 +1161,8 @@ void Propagator::Setup(int argc, char** argv)
     {
         current_collection_->GetCrosssections().at(i)->ValidateOptions();
     }
+*/
+	log_warn("Test Function for standalone version. Should not be used!");
 }
 
 
