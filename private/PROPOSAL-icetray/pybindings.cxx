@@ -36,7 +36,7 @@ I3_PYTHON_MODULE(PROPOSAL)
 		.value("Butkevich", I3PropagatorServicePROPOSAL::Butkevich)
 	;
 		
-	class_<I3PropagatorServicePROPOSAL, shared_ptr<I3PropagatorServicePROPOSAL>,
+	class_<I3PropagatorServicePROPOSAL, boost::shared_ptr<I3PropagatorServicePROPOSAL>,
 	    bases<I3PropagatorService>, boost::noncopyable>(
 	    "I3PropagatorServicePROPOSAL",
 	    init<std::string,std::string,double,double,I3Particle::ParticleType,double,
@@ -62,7 +62,6 @@ I3_PYTHON_MODULE(PROPOSAL)
 	     ":param photonuclearParametrizationFamily: Family of photonuclear cross-section parametrization to use\n"
 	     ":param photonuclearParametrization: Specific edition of the photonuclear cross-section parametrization to use\n"
 	     ":param nuclearShadowingParametrization: Nuclear shadowing parametrization to use\n"))
-	    .def("propagate", &I3PropagatorServicePROPOSAL::Propagate)
 	    .def("set_tear_down_per_call", &I3PropagatorServicePROPOSAL::SetTearDownPerCall)
 	;
 

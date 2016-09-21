@@ -11,7 +11,7 @@ ptype = dc.I3Particle.MuMinus
 propagator = PROPOSAL.I3PropagatorServicePROPOSAL(type = ptype)
 
 mu = dc.I3Particle()
-mu.type = dc.I3Particle.MuMinus
+mu.type = ptype
 mu.pos = dc.I3Position(0,0,0)
 mu.dir = dc.I3Direction(0,0)
 mu.energy = 100 * I3Units.TeV
@@ -22,26 +22,27 @@ mu_length = list()
 n_daughters = list()
 for i in range(10000):
     mu.length = NaN
-    daughters = dc.I3ParticleVect()
     # returns None instead of an I3MMCTrack
-    frame = icetray.I3Frame()
-    daughters = propagator.propagate(mu,frame)
+    daughters = propagator.Propagate(mu)
     # length of daughters is always 1
     mu_length.append(mu.length)
     n_daughters.append(len(daughters))
-
 try:
+    import matplotlib as mpl
+    mpl.use('Agg')
     import pylab
+
     pylab.figure()
     pylab.title("Mu Lengths")
     pylab.hist(mu_length, histtype = "step", log = True, bins = 100)
     pylab.xlabel(r'$l_{\mu}(\rm{m})$')
-
+    pylab.savefig('MuonLenghts.png')
+    
     pylab.figure()
     pylab.title("N Daughters")
     pylab.hist(n_daughters, histtype = "step", log = True, bins = 100)
     pylab.xlabel('N')
-    pylab.show()
+    pylab.savefig('Daughters.png')
 except ImportError :
     print("pylab not installed.  no plots for you.")
     

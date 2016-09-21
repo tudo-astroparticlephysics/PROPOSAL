@@ -1,30 +1,29 @@
-/** $Id$
+/** $Id: MuonPropagator.h 137064 2015-08-31 18:24:47Z jvansanten $
  * @file
  * @author Jakob van Santen <vansanten@wisc.edu>
  *
- * $Revision$
- * $Date$
+ * $Revision: 137064 $
+ * $Date: 2015-08-31 13:24:47 -0500 (Mo, 31 Aug 2015) $
  */
 
-#ifndef PROPOSAL_SIMPLEPROPAGATOR_H_INCLUDED
-#define PROPOSAL_SIMPLEPROPAGATOR_H_INCLUDED
-
-#include <boost/shared_ptr.hpp>
+#ifndef MUONGUN_MUONPROPAGATOR_H_INCLUDED
+#define MUONGUN_MUONPROPAGATOR_H_INCLUDED
 
 #include "icetray/I3Units.h"
 #include "dataclasses/physics/I3Particle.h"
-#include "phys-services/I3RandomService.h"
+#include "MuonGun/I3MuonGun.h"
+#include "phys-services/surfaces/Surface.h"
 
 class Propagator;
 
-namespace PROPOSAL {
+namespace I3MuonGun {
 
 /**
  * @brief A simple muon energy-loss calculator
  *
  * This hides the nasty details of PROPOSAL (a C++ translation of MMC)
  */
-class SimplePropagator {
+class MuonPropagator {
 public:
 	/**
 	 * @param[in] medium The name of the medium, e.g. "ice"
@@ -34,8 +33,8 @@ public:
 	 *                   which an energy loss is considered stochastic
 	 * @param[in] rho    Density adjustment factor for the medium
 	 */
-	SimplePropagator(const std::string &medium, double ecut=-1, double vcut=-1, double rho=1.0);
-	~SimplePropagator();
+	MuonPropagator(const std::string &medium, double ecut=-1, double vcut=-1, double rho=1.0);
+	~MuonPropagator();
 	/**
 	 * @param[in] p        Muon to propagate
 	 * @param[in] distance Maximum distance to propagate
@@ -54,21 +53,34 @@ public:
 	 * in the implementation.
 	 */
 	static void SetSeed(int seed);
-	
-	/**
-	 * Use a specific random number generator for this instance
-	 */
-	void SetRandomNumberGenerator(I3RandomServicePtr rng);
 	/**
 	 * Get the internal MMC name associated with a particle type
 	 */
 	static std::string GetName(const I3Particle &p);
 	
-	Propagator* GetImplementation() { return propagator_; };
+	double GetStochasticRate(double energy, double fraction, I3Particle::ParticleType type=I3Particle::MuMinus) const;
+	double GetTotalStochasticRate(double energy, I3Particle::ParticleType type=I3Particle::MuMinus) const;
 private:
 	Propagator *propagator_;
 };
 
+/**
+ * @brief A set of nested media layers
+ */
+class Crust {
+public:
+	Crust(boost::shared_ptr<MuonPropagator> defaultPropagator) : defaultPropagator_(defaultPropagator) {};
+	
+	/** Add an inner layer */
+	void AddLayer(I3Surfaces::SurfacePtr, boost::shared_ptr<MuonPropagator>);
+	/** Propagate a muon to the outer boundary of the innermost layer */
+	I3Particle Ingest(const I3Particle &p);
+private:
+	boost::shared_ptr<MuonPropagator> defaultPropagator_;
+	std::vector<I3Surfaces::SurfacePtr > boundaries_;
+	std::vector<boost::shared_ptr<MuonPropagator> > propagators_;
+};
+
 }
 
-#endif // PROPOSAL_SIMPLEPROPAGATOR_H_INCLUDED
+#endif // MUONGUN_MUONPROPAGATOR_H_INCLUDED

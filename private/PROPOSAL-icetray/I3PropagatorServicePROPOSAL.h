@@ -14,14 +14,14 @@
 #include <icetray/I3PointerTypedefs.h>
 #include <sim-services/I3PropagatorService.h>
 
-#include "PROPOSAL/Propagator.h"
+#include "PROPOSAL/Propagator.h" //Tomasz
 #include "PROPOSAL/PROPOSALParticle.h"
 #include "PROPOSAL/Output.h"
 
 class I3Particle;
 class PROPOSALParticle;
 class Output;
-class Propagator;
+class Propagator; //Tomasz
 
 /**
  * @version $Id: I3PropagatorService.h 68823 2010-11-22 15:14:19Z dima $
@@ -75,7 +75,7 @@ public:
 		Butkevich = 2 // default
 	};
  
-  virtual std::vector<I3Particle> Propagate(I3Particle& p, I3FramePtr frame);
+  virtual std::vector<I3Particle> Propagate(I3Particle& p, DiagnosticMapPtr frame);
 
   virtual void SetRandomNumberGenerator(I3RandomServicePtr random);
 

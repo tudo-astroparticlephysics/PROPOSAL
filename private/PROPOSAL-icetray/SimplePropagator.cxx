@@ -20,7 +20,6 @@
 
 #include "PROPOSAL/Medium.h"
 
-
 namespace PROPOSAL {
 
 SimplePropagator::SimplePropagator(const std::string &medium, double ecut, double vcut, double rho)
@@ -145,21 +144,22 @@ to_I3Particle(const PROPOSALParticle *pp)
 	I3Particle p;
 	I3Particle::ParticleType type;
 	particle_type_conversion_t::const_iterator it =
-        fromRDMCTable.find(abs(pp->GetType()));
+	    fromRDMCTable.find(abs(pp->GetType())); //Tomasz
 	if (it == fromRDMCTable.end()) {
-        log_fatal("unknown RDMC code \"%i\" cannot be converted to a I3Particle::ParticleType. It will appear as \"unknown\".", pp->GetType());
+		log_fatal("unknown RDMC code \"%i\" cannot be converted to a I3Particle::ParticleType. It will appear as \"unknown\".", pp->GetType());//Tomasz
 		type = I3Particle::unknown;
 	} else {
 		type = it->second;
 	}
 	p.SetType(type);
+	//Tomasz
     p.SetLocationType(I3Particle::InIce);
     p.SetPos(pp->GetX()*I3Units::cm, pp->GetY()*I3Units::cm, pp->GetZ()*I3Units::cm);
     p.SetTime(pp->GetT()*I3Units::s);
     p.SetThetaPhi(pp->GetTheta()*I3Units::deg, pp->GetPhi()*I3Units::deg);
     p.SetLength(pp->GetPropagatedDistance()*I3Units::cm);
     p.SetEnergy(pp->GetEnergy()*I3Units::MeV);
-	
+	//Tomasz End
 	return p;
 }
 
@@ -168,7 +168,7 @@ SimplePropagator::propagate(const I3Particle &p, double distance, boost::shared_
 {
 	I3Particle endpoint(p);
 	
-    /*
+	/*
 	if (losses) {
 		propagator_->get_output()->I3flag = true;
 		propagator_->get_output()->initF2000(0, 0, GetName(p), p.GetTime()/I3Units::second,
@@ -178,8 +178,10 @@ SimplePropagator::propagate(const I3Particle &p, double distance, boost::shared_
 		propagator_->get_output()->initDefault(0, 0, GetName(p), p.GetTime()/I3Units::second,
 		    p.GetPos().GetX()/I3Units::cm, p.GetPos().GetY()/I3Units::cm, p.GetPos().GetZ()/I3Units::cm,
 		    p.GetDir().CalcTheta()/I3Units::deg, p.GetDir().CalcPhi()/I3Units::deg);
-    */
-    PROPOSALParticle *pp = propagator_->GetParticle();
+	
+	*/
+	
+	    PROPOSALParticle *pp = propagator_->GetParticle();
     pp->SetParentParticleId(0);
     pp->SetParticleId(0);
     pp->SetT(p.GetTime()/I3Units::second);
@@ -190,34 +192,41 @@ SimplePropagator::propagate(const I3Particle &p, double distance, boost::shared_
 
 
 
+    
     if (propagator_->Propagate(distance/I3Units::cm))
-        endpoint.SetEnergy(pp->GetEnergy()*I3Units::MeV);
+	    endpoint.SetEnergy(pp->GetEnergy()*I3Units::MeV);
 	else
-		endpoint.SetEnergy(0);
-	
-    endpoint.SetPos(pp->GetX()*I3Units::cm, pp->GetY()*I3Units::cm, pp->GetZ()*I3Units::cm);
-    endpoint.SetThetaPhi(pp->GetTheta()*I3Units::degree, pp->GetPhi()*I3Units::degree);
-    endpoint.SetLength(pp->GetPropagatedDistance()*I3Units::cm);
-    endpoint.SetTime(pp->GetT()*I3Units::second);
-	
-	if (losses) {
-        //std::vector<PROPOSALParticle*> &history = propagator_->get_output()->I3hist;
-        std::vector<PROPOSALParticle*> history = Output::getInstance().GetSecondarys();
-        for(unsigned int i = 0; i<history.size();i++)
-        {
-            losses->push_back(to_I3Particle(history.at(i)));
-        }
-        Output::getInstance().ClearSecondaryVector();
+	    endpoint.SetEnergy(0);
 
-//        BOOST_FOREACH(PROPOSALParticle *pp, history)
-//        {
-//			losses->push_back(to_I3Particle(pp));
-//			delete pp;
-//		}
-//		history.clear();
-        //propagator_->get_output()->I3flag = false;
-	}
+	endpoint.SetPos(pp->GetX()*I3Units::cm, pp->GetY()*I3Units::cm, pp->GetZ()*I3Units::cm);
+	endpoint.SetThetaPhi(pp->GetTheta()*I3Units::degree, pp->GetPhi()*I3Units::degree);
+	endpoint.SetLength(pp->GetPropagatedDistance()*I3Units::cm);
+	endpoint.SetTime(pp->GetT()*I3Units::second);
 	
+	//Tomasz
+	if (losses) {
+	    //std::vector<PROPOSALParticle*> &history = propagator_->get_output()->I3hist;
+	    std::vector<PROPOSALParticle*> history = Output::getInstance().GetSecondarys();
+	    for(unsigned int i = 0; i<history.size();i++)
+	    {
+		losses->push_back(to_I3Particle(history.at(i)));
+	    }
+	}
+	Output::getInstance().ClearSecondaryVector();
+	//Tomasz New End
+	
+	//Tomasz
+	/*
+	if (losses) {
+		std::vector<PROPOSALParticle*> &history = propagator_->get_output()->I3hist;
+		BOOST_FOREACH(PROPOSALParticle *pp, history) {
+			losses->push_back(to_I3Particle(pp));
+			delete pp;
+		}
+		history.clear();
+		propagator_->get_output()->I3flag = false;
+	}
+	*/ //Tomasz Old End
 	return endpoint;
 }
 

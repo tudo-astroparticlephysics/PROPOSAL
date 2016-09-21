@@ -617,8 +617,10 @@ void PROPOSALParticle::swap(PROPOSALParticle &particle)
 //----------------------------------------------------------------------------//
 
 
-void PROPOSALParticle::InitByName(std::string aname){
+void PROPOSALParticle::InitByName(string aname){
 
+    cout << "Name: \t" << aname << endl;
+    
     string name=aname.length()==0?"?":aname[0]=='a'?aname.substr(1):aname;
 
     if(name.compare("tau")==0 || name.compare("tau-")==0 || name.compare("tau+")==0)

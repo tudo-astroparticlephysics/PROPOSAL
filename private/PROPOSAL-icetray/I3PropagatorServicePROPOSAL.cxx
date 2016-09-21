@@ -28,8 +28,6 @@ using namespace std;
 
 class Output;
 
-using namespace std;
-
 // Now: parametrization_ = 1,  Former: form=1 and bb=1 Kokoulin
 // Now: parametrization_ = 2,  Former: form=2 and bb=1 Kokoulin + hard component
 // Now: parametrization_ = 3,  Former: form=1 and bb=2 Rhode
@@ -120,7 +118,7 @@ I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(std::string mediadef, s
 			dummy.SetType(type);
 			log_fatal("I don't know how to propagate %s", dummy.GetTypeString().c_str());
 	}
-    //if (mediadef.empty())
+	//if (mediadef.empty())
 		mediadef = GetDefaultMediaDef();
 	if (tabledir.empty())
 		tabledir = GetDefaultTableDir();
@@ -149,7 +147,7 @@ I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(std::string mediadef, s
     proposal->ApplyOptions();
     //amanda->setup(mmcOpts.str());
     //--- Tomasz End
-	
+    
 	mmcOpts_ = mmcOpts.str();
 	tearDownPerCall_ = false;
 }
@@ -170,11 +168,41 @@ std::string I3PropagatorServicePROPOSAL::GetDefaultMediaDef()
 
 std::string I3PropagatorServicePROPOSAL::GetDefaultTableDir()
 {
-	const char *I3_BUILD = getenv("I3_BUILD");
-	if (!I3_BUILD)
-		log_fatal("$I3_BUILD is not set!");
-	std::string s(I3_BUILD);
-	return s + "/PROPOSAL/resources/tables";
+  //Initializing a std::string with a NULL ptr is undefined behavior.
+  //Why it doens't just return an empty string, I have no idea.
+  std::string append_string = "/PROPOSAL/resources/tables";
+  std::string table_dir(getenv("PROPOSALTABLEDIR") ? getenv("PROPOSALTABLEDIR") : "");
+  if (table_dir.empty())
+  {
+    log_info("PROPOSALTABLEDIR is not set in env variables. Falling back to defaults.");
+  }
+  else
+  {
+      if(boost::filesystem::exists(table_dir))return table_dir;
+  }
+      
+      
+  table_dir = std::string(getenv("I3_TESTDATA") ? getenv("I3_TESTDATA") : "");
+  if (table_dir.empty())
+  {
+    log_warn("$%s is not set, falling back to build folder!", table_dir.c_str());
+    table_dir = std::string(getenv("I3_BUILD") ? getenv("I3_BUILD") : "");
+  }
+  
+  if ( !boost::filesystem::exists(table_dir+append_string))
+  {
+    table_dir +=append_string;
+    log_warn("$%s does not exist, falling back to build folder!", table_dir.c_str());
+    table_dir = std::string(getenv("I3_BUILD") ? getenv("I3_BUILD") : "");
+  }
+  
+  if (table_dir.empty())
+    log_fatal("$%s is not set!", table_dir.c_str());
+  
+  table_dir += append_string;
+  if(!boost::filesystem::exists(table_dir))
+    log_fatal("%s does not exist", table_dir.c_str());
+  return table_dir;
 }
 
 void I3PropagatorServicePROPOSAL::SetRandomNumberGenerator(I3RandomServicePtr random)
@@ -191,14 +219,13 @@ void I3PropagatorServicePROPOSAL::SetRandomNumberGenerator(I3RandomServicePtr ra
 
 I3PropagatorServicePROPOSAL::~I3PropagatorServicePROPOSAL()
 {
-    delete proposal;
+    delete proposal; //Tomasz
 }
 
 /**
  *
  */
-//TODO: TearDownPerCall
-std::vector<I3Particle> I3PropagatorServicePROPOSAL::Propagate(I3Particle& p, I3FramePtr frame){
+std::vector<I3Particle> I3PropagatorServicePROPOSAL::Propagate(I3Particle& p, DiagnosticMapPtr frame){
   // saying where we are
   log_debug("Entering I3PropagatorServicePROPOSAL::Propagate()");
   
@@ -225,30 +252,22 @@ std::vector<I3Particle> I3PropagatorServicePROPOSAL::Propagate(I3Particle& p, I3
   
 	if (tearDownPerCall_) {
         //--- Tomasz
-        log_warn("tearDownPerCall called! NOT IMPLEMENTED! DOING NOTHING INSTEAD!!!");
-        //delete amanda;
-        //amanda = new Amanda();
-        //amanda->setup(mmcOpts_);
-        //boost::function<double ()> f = boost::bind(&I3RandomService::Uniform, rng_, 0, 1);
-        //amanda->SetRandomNumberGenerator(f);
+	    log_warn("tearDownPerCall called! NOT IMPLEMENTED! DOING NOTHING INSTEAD!!!");
+	    //delete amanda;
+	    //amanda = new Amanda();
+	    //amanda->setup(mmcOpts_);
+	    //boost::function<double ()> f = boost::bind(&I3RandomService::Uniform, rng_, 0, 1);
+	    //amanda->SetRandomNumberGenerator(f);
 	}
   I3MMCTrackPtr mmcTrack = propagate(p, daughters);
 
-  if ((frame) && (mmcTrack)) {
-    I3MMCTrackListConstPtr origMMCList = frame->Get<I3MMCTrackListConstPtr>("MMCTrackList");
+  if (mmcTrack && frame) {
+    if (!frame->Has("MMCTrackList"))
+        frame->Put("MMCTrackList", I3MMCTrackListPtr(new I3MMCTrackList));
+    I3MMCTrackListPtr trackList = frame->Get<I3MMCTrackListPtr>("MMCTrackList");
+    i3_assert(trackList != NULL);
 
-    I3MMCTrackListPtr newMMCList;
-    if (origMMCList) {
-      // copy-construct a new list and delete the original one from the frame
-      newMMCList = I3MMCTrackListPtr(new I3MMCTrackList(*origMMCList));
-      frame->Delete("MMCTrackList");
-    } else {
-      newMMCList = I3MMCTrackListPtr(new I3MMCTrackList);
-    }
-
-    newMMCList->push_back(*mmcTrack);
-
-    frame->Put("MMCTrackList", newMMCList);
+    trackList->push_back(*mmcTrack);
   }
 
   return daughters;
@@ -381,10 +400,7 @@ I3PropagatorServicePROPOSAL::propagate( I3Particle& p, vector<I3Particle>& daugh
   proposal->Propagate(particle);
 
   vector<PROPOSALParticle*> aobj_l = Output::getInstance().GetSecondarys();
-  //--- Tomasz End
-
   //get the propagated length of the particle
-  //--- Tomasz
   //double length = particle->r;
     double length = particle->GetPropagatedDistance();
   //--- Tomasz End
@@ -402,7 +418,7 @@ I3PropagatorServicePROPOSAL::propagate( I3Particle& p, vector<I3Particle>& daugh
 
   for(int i=0; i < nParticles; i++){
 
-    
+    //Tomasz
     //in mmc the particle relationships are stored
     int type = aobj_l.at(i)->GetType();
     double x = aobj_l.at(i)->GetX() * I3Units::cm;
@@ -424,6 +440,7 @@ I3PropagatorServicePROPOSAL::propagate( I3Particle& p, vector<I3Particle>& daugh
     I3Particle::ParticleType mcType(static_cast<I3Particle::ParticleType>(abs(type)));
     particle_type_conversion_t::const_iterator it = fromRDMCTable.find(mcType);
     if (it == fromRDMCTable.end()) {
+	cout << "Particle information!" << endl << endl << *(aobj_l.at(i)) << endl << endl;
        log_fatal("unknown RDMC code \"%i\" cannot be converted to a I3Particle::ParticleType.", mcType);
     } else {
        new_particle.SetType(it->second);
@@ -440,9 +457,9 @@ I3PropagatorServicePROPOSAL::propagate( I3Particle& p, vector<I3Particle>& daugh
     daughters.push_back(new_particle);
 
     //we're done with eobj
-    //delete aobj_l.at(i);
+    //delete aobj_l.at(i); //Tomasz
   }  
-  Output::getInstance().ClearSecondaryVector();
+  Output::getInstance().ClearSecondaryVector(); //Tomasz
   delete particle;
   
   return mmcTrack;
