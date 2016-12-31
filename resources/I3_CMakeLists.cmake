@@ -62,7 +62,7 @@ endif (SPRNG_FOUND)
 
 i3_test_executable(test
         ${LIB_${PROJECT_NAME}_TESTS}
-        USE_TOOLS boost gsl
+        USE_TOOLS boost gsl python
         USE_PROJECTS PROPOSAL icetray dataclasses phys-services
 )
 

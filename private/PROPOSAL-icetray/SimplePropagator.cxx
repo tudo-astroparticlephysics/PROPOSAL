@@ -1,9 +1,9 @@
-/** $Id$
+/** $Id: SimplePropagator.cxx 150208 2016-09-21 11:32:47Z tfuchs $
  * @file
  * @author Jakob van Santen <vansanten@wisc.edu>
  *
- * $Revision$
- * $Date$
+ * $Revision: 150208 $
+ * $Date: 2016-09-21 13:32:47 +0200 (Mi, 21. Sep 2016) $
  */
 
 #include <boost/assign.hpp>

@@ -71,7 +71,7 @@ int ConvertOldToNewPhotonuclearParametrization(int ph,int bb,int bs)
         break;
     }
 
-    log_warn("No fitting parametrization &i found setting default! 322 / 12!",ph*100+bb*10+bs);
+    log_warn("No fitting parametrization %i found setting default! 322 / 12!",ph*100+bb*10+bs);
 
     return 12;
 }
@@ -118,11 +118,14 @@ I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(std::string mediadef, s
 			dummy.SetType(type);
 			log_fatal("I don't know how to propagate %s", dummy.GetTypeString().c_str());
 	}
-	//if (mediadef.empty())
+
+    log_info("Path of mediadef: %s", mediadef.c_str());
+    printf("Path of mediadef: %s\n", mediadef.c_str());
+	if (mediadef.empty())
 		mediadef = GetDefaultMediaDef();
 	if (tabledir.empty())
 		tabledir = GetDefaultTableDir();
-	
+
 	namespace fs = boost::filesystem;
 	if (!fs::exists(mediadef))
 		log_fatal("The mediadef file '%s' can't be read!", mediadef.c_str());
@@ -130,9 +133,9 @@ I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(std::string mediadef, s
 		log_fatal("The table directory '%s' doesn't exist!", tabledir.c_str());
 	mmcOpts << " -mediadef=" << mediadef << " -tdir=" << tabledir;
 	mmcOpts << " ";
-	
+
 	log_info("Amanda option string: '%s'", mmcOpts.str().c_str());
-	
+
     //--- Tomasz
     //amanda = new Amanda();
 
@@ -147,7 +150,7 @@ I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(std::string mediadef, s
     proposal->ApplyOptions();
     //amanda->setup(mmcOpts.str());
     //--- Tomasz End
-    
+
 	mmcOpts_ = mmcOpts.str();
 	tearDownPerCall_ = false;
 }
@@ -180,25 +183,25 @@ std::string I3PropagatorServicePROPOSAL::GetDefaultTableDir()
   {
       if(boost::filesystem::exists(table_dir))return table_dir;
   }
-      
-      
+
+
   table_dir = std::string(getenv("I3_TESTDATA") ? getenv("I3_TESTDATA") : "");
   if (table_dir.empty())
   {
     log_warn("$%s is not set, falling back to build folder!", table_dir.c_str());
     table_dir = std::string(getenv("I3_BUILD") ? getenv("I3_BUILD") : "");
   }
-  
+
   if ( !boost::filesystem::exists(table_dir+append_string))
   {
     table_dir +=append_string;
     log_warn("$%s does not exist, falling back to build folder!", table_dir.c_str());
     table_dir = std::string(getenv("I3_BUILD") ? getenv("I3_BUILD") : "");
   }
-  
+
   if (table_dir.empty())
     log_fatal("$%s is not set!", table_dir.c_str());
-  
+
   table_dir += append_string;
   if(!boost::filesystem::exists(table_dir))
     log_fatal("%s does not exist", table_dir.c_str());
@@ -228,7 +231,7 @@ I3PropagatorServicePROPOSAL::~I3PropagatorServicePROPOSAL()
 std::vector<I3Particle> I3PropagatorServicePROPOSAL::Propagate(I3Particle& p, DiagnosticMapPtr frame){
   // saying where we are
   log_debug("Entering I3PropagatorServicePROPOSAL::Propagate()");
-  
+
   vector<I3Particle> daughters;
 
   log_trace("location type = %d",p.GetLocationType());
@@ -249,7 +252,7 @@ std::vector<I3Particle> I3PropagatorServicePROPOSAL::Propagate(I3Particle& p, Di
 	    p.GetZenith ()/I3Units::deg,
 	    p.GetAzimuth ()/I3Units::deg,
 	    p.GetLength()/I3Units::m);
-  
+
 	if (tearDownPerCall_) {
         //--- Tomasz
 	    log_warn("tearDownPerCall called! NOT IMPLEMENTED! DOING NOTHING INSTEAD!!!");
@@ -285,9 +288,9 @@ string I3PropagatorServicePROPOSAL::GenerateMMCName(const I3Particle& p){
   else if(p.GetType()==I3Particle::NuEBar) name="~nu_e";
   else if(p.GetType()==I3Particle::NuTau) name="nu_tau";
   else if(p.GetType()==I3Particle::NuTauBar) name="~nu_tau";
-  else if((p.GetType()==I3Particle::EMinus) && 
+  else if((p.GetType()==I3Particle::EMinus) &&
 	  (p.GetShape()==I3Particle::TopShower)) name="e-";
-  else if((p.GetType()==I3Particle::EPlus) && 
+  else if((p.GetType()==I3Particle::EPlus) &&
 	  (p.GetShape()==I3Particle::TopShower)) name="e+";
   else if(p.GetType()==I3Particle::TauMinus) name="tau-";
   else if(p.GetType()==I3Particle::TauPlus) name="tau+";
@@ -305,7 +308,7 @@ string I3PropagatorServicePROPOSAL::GenerateMMCName(const I3Particle& p){
 }
 
 I3MMCTrackPtr I3PropagatorServicePROPOSAL::GenerateMMCTrack(PROPOSALParticle* particle){
-   
+
     //explicitly specifying the units from MMC
     double xi = particle->GetXi() * I3Units::m;
     double yi = particle->GetYi() * I3Units::m;
@@ -378,9 +381,9 @@ I3PropagatorServicePROPOSAL::propagate( I3Particle& p, vector<I3Particle>& daugh
 
   /**
    * Natural units of MMC is cm, deg, MeV, and s.
-   * Therefore we need to convert explicitly to 
+   * Therefore we need to convert explicitly to
    * MMC units before passing the propagate method
-   */	    
+   */
   double x_0 = p.GetPos().GetX()/I3Units::cm;     // [cm]
   double y_0 = p.GetPos().GetY()/I3Units::cm;    // [cm]
   double z_0 = p.GetPos().GetZ()/I3Units::cm;     // [cm]
@@ -388,10 +391,10 @@ I3PropagatorServicePROPOSAL::propagate( I3Particle& p, vector<I3Particle>& daugh
   double phi_0 = p.GetDir().CalcPhi()/I3Units::deg;   // [deg]
   double e_0 = p.GetEnergy()/I3Units::MeV;  // [MeV]
   double t_0 = p.GetTime()/I3Units::s;     // [s]
-  
-  string mmcName = GenerateMMCName(p);	
+
+  string mmcName = GenerateMMCName(p);
   log_debug("MMC name of particle to propagate: %s",mmcName.c_str());
-  
+
   PROPOSALParticle* particle = new PROPOSALParticle(mmcName, x_0, y_0, z_0, theta_0, phi_0, e_0, t_0);
   if (particle == 0) log_fatal("Error calling the Particle constructor");
 
@@ -409,7 +412,7 @@ I3PropagatorServicePROPOSAL::propagate( I3Particle& p, vector<I3Particle>& daugh
 
   int nParticles =  aobj_l.size();
   log_trace("nParticles = %d", nParticles);
-  
+
   I3MMCTrackPtr mmcTrack;
   log_trace("javaClass_ == AMANDA");
   mmcTrack = GenerateMMCTrack(particle);
@@ -430,13 +433,13 @@ I3PropagatorServicePROPOSAL::propagate( I3Particle& p, vector<I3Particle>& daugh
     double e = aobj_l.at(i)->GetEnergy() * I3Units::MeV;
     double l = aobj_l.at(i)->GetPropagatedDistance() * I3Units::cm;
 
-    log_trace("MMC DEBUG SEC  \n    type=%d pos=(%g,%g,%g) ang=(%g,%g)  e=%g t=%g  l=%g", 
+    log_trace("MMC DEBUG SEC  \n    type=%d pos=(%g,%g,%g) ang=(%g,%g)  e=%g t=%g  l=%g",
 	      type, x, y, z, theta, phi, e, t, l);
 
     //this should be a stochastic
     I3Particle new_particle;
 
-    //Setting MC Type     
+    //Setting MC Type
     I3Particle::ParticleType mcType(static_cast<I3Particle::ParticleType>(abs(type)));
     particle_type_conversion_t::const_iterator it = fromRDMCTable.find(mcType);
     if (it == fromRDMCTable.end()) {
@@ -458,10 +461,10 @@ I3PropagatorServicePROPOSAL::propagate( I3Particle& p, vector<I3Particle>& daugh
 
     //we're done with eobj
     //delete aobj_l.at(i); //Tomasz
-  }  
+  }
   Output::getInstance().ClearSecondaryVector(); //Tomasz
   delete particle;
-  
+
   return mmcTrack;
 }
 
