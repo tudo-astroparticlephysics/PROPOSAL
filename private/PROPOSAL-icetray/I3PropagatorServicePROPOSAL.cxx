@@ -122,42 +122,45 @@ std::string I3PropagatorServicePROPOSAL::GetDefaultMediaDef()
 
 std::string I3PropagatorServicePROPOSAL::GetDefaultTableDir()
 {
-  //Initializing a std::string with a NULL ptr is undefined behavior.
-  //Why it doens't just return an empty string, I have no idea.
-  std::string append_string = "/PROPOSAL/resources/tables";
-  std::string table_dir(getenv("PROPOSALTABLEDIR") ? getenv("PROPOSALTABLEDIR") : "");
-  if (table_dir.empty())
-  {
-    log_info("$PROPOSALTABLEDIR is not set in env variables. Falling back to defaults.");
-  }
-  else
-  {
-      if(boost::filesystem::exists(table_dir))return table_dir;
-  }
+    //Initializing a std::string with a NULL ptr is undefined behavior.
+    //Why it doens't just return an empty string, I have no idea.
+    std::string append_string = "/PROPOSAL/resources/tables";
+    std::string table_dir(getenv("PROPOSALTABLEDIR") ? getenv("PROPOSALTABLEDIR") : "");
+
+    if (table_dir.empty())
+    {
+        log_info("$PROPOSALTABLEDIR is not set in env variables. Falling back to defaults.");
+    }
+    else
+    {
+        if(boost::filesystem::exists(table_dir)) return table_dir;
+    }
 
 
-  table_dir = std::string(getenv("I3_TESTDATA") ? getenv("I3_TESTDATA") : "");
-  if (table_dir.empty())
-  {
-    log_warn("$I3_TESTDATA is not set, falling back to build folder!");
+    table_dir = std::string(getenv("I3_TESTDATA") ? getenv("I3_TESTDATA") : "");
+
+    if (table_dir.empty())
+    {
+        log_warn("$I3_TESTDATA is not set, falling back to build folder!");
+    }
+    else
+    {
+        table_dir += append_string;
+    if (boost::filesystem::exists(table_dir))
+        return table_dir;
+    else
+        log_warn("Table directory \"%s\" is not set, falling back to build folder!", table_dir.c_str());
+    }
+
     table_dir = std::string(getenv("I3_BUILD") ? getenv("I3_BUILD") : "");
-  }
+    table_dir += append_string;
 
-  if ( !boost::filesystem::exists(table_dir+append_string))
-  {
-    table_dir +=append_string;
-    log_warn("$%s does not exist, falling back to build folder!", table_dir.c_str());
-    table_dir = std::string(getenv("I3_BUILD") ? getenv("I3_BUILD") : "");
-  }
-
-  if (table_dir.empty())
-    log_fatal("$%s is not set!", table_dir.c_str());
-
-  table_dir += append_string;
-  if(!boost::filesystem::exists(table_dir))
-    log_fatal("%s does not exist", table_dir.c_str());
-  return table_dir;
+    if (boost::filesystem::exists(table_dir))
+        return table_dir;
+    else
+        log_fatal("Table directory \"%s\" does not exist!", table_dir.c_str());
 }
+
 
 void I3PropagatorServicePROPOSAL::SetRandomNumberGenerator(I3RandomServicePtr random)
 {
