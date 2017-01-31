@@ -81,44 +81,6 @@ I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(std::string mediadef, s
     BremsstrahlungParametrization bs, PhotonuclearParametrizationFamily ph, PhotonuclearParametrization bb,
     ShadowingParametrization sh) : particleMass_(particleMass)
 {
-	std::ostringstream mmcOpts;
-	// Some options that no one should change:
-	// romb: order-5 Rombert interpolation
-	// raw: save interpolation tables in binary format
-	// user: write "user" fields (entry/center/exit positions, energies, times for I3MMCTrack)
-	// sdec: enable stopped muon decay
-	// time: enable exact time calculation
-	// lpm: enable Landau-Pomeranchuk-Migdal supression of EM cross-sections
-	// frho: enable "smart" density factor handling
-	// cont: enable continuous randomization for realistic energy loss at high vcut
-	mmcOpts << "-romb=5 -raw -user -sdec -time -lpm -frho -cont";
-	mmcOpts << " -bs=" << bs << " -ph=" << ph << " -bb=" << bb << " -sh=" << sh;
-	mmcOpts << " -radius=" << cylinderRadius << " -length=" << cylinderHeight;
-	switch (type) {
-		case I3Particle::MuMinus:
-		case I3Particle::MuPlus:
-			break;
-		case I3Particle::TauMinus:
-		case I3Particle::TauPlus:
-			mmcOpts << " -tau";
-			break;
-		case I3Particle::STauMinus:
-		case I3Particle::STauPlus:
-			if (!std::isfinite(particleMass))
-				log_fatal("You asked for staus of non-finite mass %f", particleMass_);
-			mmcOpts << " -stau=" << particleMass_;
-			break;
-		case I3Particle::Monopole:
-			if (!std::isfinite(particleMass))
-				log_fatal("You asked for monopoles of non-finite mass %f", particleMass_);
-			mmcOpts << " -monopole=" << particleMass_;
-			break;
-		default:
-			I3Particle dummy;
-			dummy.SetType(type);
-			log_fatal("I don't know how to propagate %s", dummy.GetTypeString().c_str());
-	}
-
 	if (mediadef.empty())
 		mediadef = GetDefaultMediaDef();
 	if (tabledir.empty())
@@ -129,27 +91,22 @@ I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(std::string mediadef, s
 		log_fatal("The mediadef file '%s' can't be read!", mediadef.c_str());
 	if (!fs::is_directory(tabledir))
 		log_fatal("The table directory '%s' doesn't exist!", tabledir.c_str());
-	mmcOpts << " -mediadef=" << mediadef << " -tdir=" << tabledir;
-	mmcOpts << " ";
 
-	log_info("Amanda option string: '%s'", mmcOpts.str().c_str());
+    //TODO(mario): params for cross section and detector settings specified
+    // in the configfile will always be overwritten? Di 2017/01/31
 
-    //--- Tomasz
-    //amanda = new Amanda();
-
+    // Define propagator but do not apply option yet
     proposal = new Propagator(mediadef,false);
-    //Hier die ganzen einstellungen rein schmeissen!!! Setter du masa fasa
+
     Geometry* geo = new Geometry();
     geo->InitCylinder(0,0,0,cylinderRadius,0,cylinderHeight);
     proposal->SetDetector(geo);
     proposal->SetBrems(bs);
     proposal->SetPhoto(ConvertOldToNewPhotonuclearParametrization(ph,bb,bs));
     proposal->SetPath_to_tables(tabledir);
-    proposal->ApplyOptions();
-    //amanda->setup(mmcOpts.str());
-    //--- Tomasz End
 
-	mmcOpts_ = mmcOpts.str();
+    proposal->ApplyOptions();
+
 	tearDownPerCall_ = false;
 }
 
@@ -159,12 +116,8 @@ std::string I3PropagatorServicePROPOSAL::GetDefaultMediaDef()
 	if (!I3_BUILD)
 		log_fatal("$I3_BUILD is not set!");
 	std::string s(I3_BUILD);
-    //--- Tomasz
-    //return s + "/PROPOSAL/resources/mediadef";
 
     return s + "/PROPOSAL/resources/configuration";
-
-    //--- Tomasz End
 }
 
 std::string I3PropagatorServicePROPOSAL::GetDefaultTableDir()
