@@ -119,8 +119,6 @@ I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(std::string mediadef, s
 			log_fatal("I don't know how to propagate %s", dummy.GetTypeString().c_str());
 	}
 
-    log_info("Path of mediadef: %s", mediadef.c_str());
-    printf("Path of mediadef: %s\n", mediadef.c_str());
 	if (mediadef.empty())
 		mediadef = GetDefaultMediaDef();
 	if (tabledir.empty())
@@ -177,7 +175,7 @@ std::string I3PropagatorServicePROPOSAL::GetDefaultTableDir()
   std::string table_dir(getenv("PROPOSALTABLEDIR") ? getenv("PROPOSALTABLEDIR") : "");
   if (table_dir.empty())
   {
-    log_info("PROPOSALTABLEDIR is not set in env variables. Falling back to defaults.");
+    log_info("$PROPOSALTABLEDIR is not set in env variables. Falling back to defaults.");
   }
   else
   {
@@ -188,7 +186,7 @@ std::string I3PropagatorServicePROPOSAL::GetDefaultTableDir()
   table_dir = std::string(getenv("I3_TESTDATA") ? getenv("I3_TESTDATA") : "");
   if (table_dir.empty())
   {
-    log_warn("$%s is not set, falling back to build folder!", table_dir.c_str());
+    log_warn("$I3_TESTDATA is not set, falling back to build folder!");
     table_dir = std::string(getenv("I3_BUILD") ? getenv("I3_BUILD") : "");
   }
 
