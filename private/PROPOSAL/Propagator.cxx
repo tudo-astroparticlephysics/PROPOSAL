@@ -114,7 +114,7 @@ vector<PROPOSALParticle*> Propagator::Propagate( PROPOSALParticle *particle, dou
         }
 
         // Check if have have to propagate the particle through the whole collection
-        // or only to the collection border        
+        // or only to the collection border
 
         distance_to_collection_border =
         current_collection_->GetGeometry()->DistanceToBorder(particle_).first;
@@ -261,7 +261,7 @@ vector<PROPOSALParticle*> Propagator::Propagate( PROPOSALParticle *particle, dou
 
             energy_at_entry_point   =   particle_->GetEnergy();
 
-            was_in_detector =   true;      
+            was_in_detector =   true;
         }
         // exit point of the detector
         else if(was_in_detector && !is_in_detector)
@@ -419,7 +419,7 @@ double Propagator::Propagate( double distance )
             NumInt++;//TOMASZ
             energy_loss     =   current_collection_->MakeStochasticLoss();
             final_energy    -=  energy_loss.first;
-            cout << "Energyloss: " << energy_loss.first << "\t" << energy_loss.second << "\t" <<particle_->GetX() << "\t" << particle_->GetY() << "\t" << particle_->GetZ() << endl;
+            // cout << "Energyloss: " << energy_loss.first << "\t" << energy_loss.second << "\t" <<particle_->GetX() << "\t" << particle_->GetY() << "\t" << particle_->GetZ() << endl;
             secondary_id    =   particle_->GetParticleId() + 1;
             Output::getInstance().FillSecondaryVector(particle_, secondary_id, energy_loss, 0);
         }
