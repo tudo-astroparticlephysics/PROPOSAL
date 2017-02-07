@@ -5,7 +5,7 @@ Before installation of icesim, one should copy some files from the resources fol
 
 cp src/PROPOSAL/resources/MuonGun/MuonPropagator.* src/MuonGun/private/MuonGun/
 
-cp src/PROPOSAL/resources/simprod-scripts/PropagateMuons.py src/simprod-scripts/python/segments
+cp src/PROPOSAL/resources/simprod-scripts/PropagateMuons.py src/simprod-scripts/python/segments/
 
 cp src/PROPOSAL/resources/simprod-scripts/proposal_alternative_cross_sections.py src/simprod-scripts/resources/examples/
 
