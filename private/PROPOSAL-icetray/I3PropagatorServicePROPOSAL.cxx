@@ -164,19 +164,16 @@ std::string I3PropagatorServicePROPOSAL::GetDefaultTableDir()
 
 void I3PropagatorServicePROPOSAL::SetRandomNumberGenerator(I3RandomServicePtr random)
 {
-	rng_ = random;
-	boost::function<double ()> f = boost::bind(&I3RandomService::Uniform, random, 0, 1);
-    //--- Tomasz
-    //amanda->SetRandomNumberGenerator(f);
+  rng_ = random;
+  boost::function<double ()> f = boost::bind(&I3RandomService::Uniform, random, 0, 1);
 
-    proposal->SetRandomNumberGenerator(f);
+  proposal->SetRandomNumberGenerator(f);
 
-    //--- Tomasz End
 }
 
 I3PropagatorServicePROPOSAL::~I3PropagatorServicePROPOSAL()
 {
-    delete proposal; //Tomasz
+    delete proposal;
 }
 
 /**
@@ -208,13 +205,20 @@ std::vector<I3Particle> I3PropagatorServicePROPOSAL::Propagate(I3Particle& p, Di
 	    p.GetLength()/I3Units::m);
 
 	if (tearDownPerCall_) {
-        //--- Tomasz
-	    log_warn("tearDownPerCall called! NOT IMPLEMENTED! DOING NOTHING INSTEAD!!!");
-	    //delete amanda;
-	    //amanda = new Amanda();
-	    //amanda->setup(mmcOpts_);
-	    //boost::function<double ()> f = boost::bind(&I3RandomService::Uniform, rng_, 0, 1);
-	    //amanda->SetRandomNumberGenerator(f);
+
+    delete proposal;
+    proposal = new Propagator(mediadef,false);
+    // Apply Settings
+    Geometry* geo = new Geometry();
+    geo->InitCylinder(0,0,0,cylinderRadius,0,cylinderHeight);
+    proposal->SetDetector(geo);
+    proposal->SetBrems(bs);
+    proposal->SetPhoto(ConvertOldToNewPhotonuclearParametrization(ph,bb,bs));
+    proposal->SetPath_to_tables(tabledir);
+    proposal->ApplyOptions();
+    
+    boost::function<double ()> f = boost::bind(&I3RandomService::Uniform, rng_, 0, 1);
+    proposal->SetRandomNumberGenerator(f);
 	}
   I3MMCTrackPtr mmcTrack = propagate(p, daughters);
 
