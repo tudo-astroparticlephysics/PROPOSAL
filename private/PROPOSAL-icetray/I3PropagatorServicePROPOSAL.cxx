@@ -76,6 +76,32 @@ int ConvertOldToNewPhotonuclearParametrization(int ph,int bb,int bs)
     return 12;
 }
 
+bool check_writable(std::string table_dir)
+{
+    boost::filesystem::file_status status = boost::filesystem::status(boost::filesystem::path(table_dir));
+
+    int bitmask = status.permissions();
+    bool writeable = false;
+
+    if (bitmask & boost::filesystem::perms::owner_write)
+    {
+        log_info("Permission of table directory: owner_write");
+        writeable = true;
+    }
+    else if (bitmask & boost::filesystem::perms::group_write)
+    {
+        log_info("Permission of table directory: group_write");
+        writeable = true;
+    }
+    else if (bitmask & boost::filesystem::perms::others_write)
+    {
+        log_info("Permission of table directory: others_write");
+        writeable = true;
+    }
+
+    return writeable;
+}
+
 I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(std::string mediadef, std::string tabledir,
     double cylinderRadius, double cylinderHeight, I3Particle::ParticleType type, double particleMass,
     BremsstrahlungParametrization bs, PhotonuclearParametrizationFamily ph, PhotonuclearParametrization bb,
@@ -156,7 +182,10 @@ std::string I3PropagatorServicePROPOSAL::GetDefaultTableDir()
     table_dir += append_string;
 
     if (boost::filesystem::exists(table_dir))
+    {
+        check_writable(table_dir);
         return table_dir;
+    }
     else
         log_fatal("Table directory \"%s\" does not exist!", table_dir.c_str());
 }
