@@ -16,14 +16,16 @@
 #include <boost/bind.hpp>
 #include <boost/filesystem.hpp>
 
-#include "PROPOSAL-icetray/I3PropagatorServicePROPOSAL.h"
+#include <sstream>
+#include <unistd.h> // check for write permissions
+
 #include "dataclasses/physics/I3Particle.h"
 #include "simclasses/I3MMCTrack.h"
+
+#include "PROPOSAL-icetray/I3PropagatorServicePROPOSAL.h"
 #include "PROPOSAL/Propagator.h"
 #include "PROPOSAL/PROPOSALParticle.h"
 #include "PROPOSAL/Output.h"
-#include <sstream>
-#include <unistd.h>
 
 using namespace std;
 
@@ -76,6 +78,7 @@ int ConvertOldToNewPhotonuclearParametrization(int ph,int bb,int bs)
 
     return 12;
 }
+
 
 bool IsWritable(std::string table_dir)
 {
@@ -152,13 +155,18 @@ std::string I3PropagatorServicePROPOSAL::GetDefaultMediaDef()
     return s + "/PROPOSAL/resources/configuration";
 }
 
+
 std::string I3PropagatorServicePROPOSAL::GetDefaultTableDir()
 {
-    std::string append_string = "/PROPOSAL/resources/tables";
+    std::string append_string  = "/PROPOSAL/resources/tables";
     std::string append_string2 = "/PROPOSAL/tables";
 
-    //Initializing a std::string with a NULL ptr is undefined behavior.
-    //Why it doens't just return an empty string, I have no idea.
+    // --------------------------------------------------------------------- //
+    // Environment variable set?
+    // --------------------------------------------------------------------- //
+
+    // Initializing a std::string with a NULL ptr is undefined behavior.
+    // Why it doens't just return an empty string, I have no idea.
     std::string table_dir(getenv("PROPOSALTABLEDIR") ? getenv("PROPOSALTABLEDIR") : "");
 
     if (table_dir.empty())
@@ -170,6 +178,9 @@ std::string I3PropagatorServicePROPOSAL::GetDefaultTableDir()
         if(IsWritable(table_dir)) return table_dir;
     }
 
+    // --------------------------------------------------------------------- //
+    // Writable in I3_TESTDATA?
+    // --------------------------------------------------------------------- //
 
     table_dir = std::string(getenv("I3_TESTDATA") ? getenv("I3_TESTDATA") : "");
 
@@ -189,6 +200,10 @@ std::string I3PropagatorServicePROPOSAL::GetDefaultTableDir()
         }
     }
 
+    // --------------------------------------------------------------------- //
+    // Fall back to I3_BUID
+    // --------------------------------------------------------------------- //
+
     table_dir = std::string(getenv("I3_BUILD") ? getenv("I3_BUILD") : "");
 
     if (table_dir.empty())
@@ -197,13 +212,12 @@ std::string I3PropagatorServicePROPOSAL::GetDefaultTableDir()
     }
     else
     {
-        if (IsWritable(table_dir + append_string2))
+        if (IsWritable(table_dir + append_string))
         {
             return table_dir + append_string;
         }
-        else if (IsWritable(table_dir + append_string))
+        else if (IsWritable(table_dir + append_string2))
         {
-            //TODO(mario): Maybe check next path message Mi 2017/02/08
             return table_dir + append_string2;
         }
         else
