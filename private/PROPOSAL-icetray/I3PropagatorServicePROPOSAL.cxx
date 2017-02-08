@@ -183,11 +183,6 @@ std::string I3PropagatorServicePROPOSAL::GetDefaultTableDir()
         {
             return table_dir + append_string;
         }
-        else if (IsWritable(table_dir + append_string2))
-        {
-            //TODO(mario): Maybe check next path message Mi 2017/02/08
-            return table_dir + append_string2;
-        }
         else
         {
             log_warn("Falling back to build folder!");
@@ -202,13 +197,13 @@ std::string I3PropagatorServicePROPOSAL::GetDefaultTableDir()
     }
     else
     {
-        if (IsWritable(table_dir + append_string))
-        {
-            return table_dir + append_string;
-        }
-        else if (IsWritable(table_dir + append_string2))
+        if (IsWritable(table_dir + append_string2))
         {
             //TODO(mario): Maybe check next path message Mi 2017/02/08
+            return table_dir + append_string;
+        }
+        else if (IsWritable(table_dir + append_string))
+        {
             return table_dir + append_string2;
         }
         else
