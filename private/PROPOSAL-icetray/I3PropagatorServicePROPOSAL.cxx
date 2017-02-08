@@ -23,6 +23,7 @@
 #include "PROPOSAL/PROPOSALParticle.h"
 #include "PROPOSAL/Output.h"
 #include <sstream>
+#include <unistd.h>
 
 using namespace std;
 
@@ -78,26 +79,56 @@ int ConvertOldToNewPhotonuclearParametrization(int ph,int bb,int bs)
 
 bool check_writable(std::string table_dir)
 {
-    boost::filesystem::file_status status = boost::filesystem::status(boost::filesystem::path(table_dir));
-
-    int bitmask = status.permissions();
     bool writeable = false;
 
-    if (bitmask & boost::filesystem::perms::owner_write)
+    if (access(table_dir.c_str(), F_OK))
     {
-        log_info("Permission of table directory: owner_write");
+        log_info("Table directory does exist: %s", table_dir.c_str());
+    }
+    else
+    {
+        log_info("Table directory does not exist");
+    }
+
+    if (access(table_dir.c_str(), W_OK))
+    {
+        log_info("Table directory is writable: %s", table_dir.c_str());
         writeable = true;
     }
-    else if (bitmask & boost::filesystem::perms::group_write)
+    else
     {
-        log_info("Permission of table directory: group_write");
-        writeable = true;
+        log_info("Table directory is not writable!");
     }
-    else if (bitmask & boost::filesystem::perms::others_write)
+
+    if (access(table_dir.c_str(), R_OK))
     {
-        log_info("Permission of table directory: others_write");
-        writeable = true;
+        log_info("Table directory is readable: %s", table_dir.c_str());
     }
+    else
+    {
+        log_info("Table directory is not readable!");
+    }
+
+    // boost::filesystem::file_status status = boost::filesystem::status(boost::filesystem::path(table_dir));
+    //
+    // int bitmask = status.permissions();
+    // bool writeable = false;
+    //
+    // if (bitmask & boost::filesystem::perms::owner_write)
+    // {
+    //     log_info("Permission of table directory: owner_write");
+    //     writeable = true;
+    // }
+    // else if (bitmask & boost::filesystem::perms::group_write)
+    // {
+    //     log_info("Permission of table directory: group_write");
+    //     writeable = true;
+    // }
+    // else if (bitmask & boost::filesystem::perms::others_write)
+    // {
+    //     log_info("Permission of table directory: others_write");
+    //     writeable = true;
+    // }
 
     return writeable;
 }
