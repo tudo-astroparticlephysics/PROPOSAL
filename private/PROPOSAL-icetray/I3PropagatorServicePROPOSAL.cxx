@@ -77,58 +77,33 @@ int ConvertOldToNewPhotonuclearParametrization(int ph,int bb,int bs)
     return 12;
 }
 
-bool check_writable(std::string table_dir)
+bool IsWritable(std::string table_dir)
 {
     bool writeable = false;
 
     if (access(table_dir.c_str(), F_OK) == 0)
     {
-        log_info("Table directory does exist: %s", table_dir.c_str());
+        if (access(table_dir.c_str(), R_OK) == 0 && access(table_dir.c_str(), W_OK) == 0)
+        {
+            writeable = true;
+            log_info("Table directory does exist and has read and write permissions: %s", table_dir.c_str());
+        }
+        else
+        {
+            if (access(table_dir.c_str(), R_OK) != 0)
+            {
+                log_info("Table directory is not readable: %s", table_dir.c_str());
+            }
+            else
+            {
+                log_info("Table directory is not writable: %s", table_dir.c_str());
+            }
+        }
     }
     else
     {
         log_info("Table directory does not exist: %s", table_dir.c_str());
     }
-
-    if (access(table_dir.c_str(), W_OK) == 0)
-    {
-        log_info("Table directory is writable: %s", table_dir.c_str());
-        writeable = true;
-    }
-    else
-    {
-        log_info("Table directory is not writable: %s", table_dir.c_str());
-    }
-
-    if (access(table_dir.c_str(), R_OK) == 0)
-    {
-        log_info("Table directory is readable: %s", table_dir.c_str());
-    }
-    else
-    {
-        log_info("Table directory is not readable: %s", table_dir.c_str());
-    }
-
-    // boost::filesystem::file_status status = boost::filesystem::status(boost::filesystem::path(table_dir));
-    //
-    // int bitmask = status.permissions();
-    // bool writeable = false;
-    //
-    // if (bitmask & boost::filesystem::perms::owner_write)
-    // {
-    //     log_info("Permission of table directory: owner_write");
-    //     writeable = true;
-    // }
-    // else if (bitmask & boost::filesystem::perms::group_write)
-    // {
-    //     log_info("Permission of table directory: group_write");
-    //     writeable = true;
-    // }
-    // else if (bitmask & boost::filesystem::perms::others_write)
-    // {
-    //     log_info("Permission of table directory: others_write");
-    //     writeable = true;
-    // }
 
     return writeable;
 }
@@ -179,9 +154,11 @@ std::string I3PropagatorServicePROPOSAL::GetDefaultMediaDef()
 
 std::string I3PropagatorServicePROPOSAL::GetDefaultTableDir()
 {
+    std::string append_string = "/PROPOSAL/resources/tables";
+    std::string append_string2 = "/PROPOSAL/tables";
+
     //Initializing a std::string with a NULL ptr is undefined behavior.
     //Why it doens't just return an empty string, I have no idea.
-    std::string append_string = "/PROPOSAL/resources/tables";
     std::string table_dir(getenv("PROPOSALTABLEDIR") ? getenv("PROPOSALTABLEDIR") : "");
 
     if (table_dir.empty())
@@ -190,7 +167,7 @@ std::string I3PropagatorServicePROPOSAL::GetDefaultTableDir()
     }
     else
     {
-        if(boost::filesystem::exists(table_dir)) return table_dir;
+        if(IsWritable(table_dir)) return table_dir;
     }
 
 
@@ -202,26 +179,43 @@ std::string I3PropagatorServicePROPOSAL::GetDefaultTableDir()
     }
     else
     {
-        table_dir += append_string;
-        if (boost::filesystem::exists(table_dir))
+        if (IsWritable(table_dir + append_string))
         {
-            check_writable(table_dir);
-            return table_dir;
+            return table_dir + append_string;
+        }
+        else if (IsWritable(table_dir + append_string2))
+        {
+            //TODO(mario): Maybe check next path message Mi 2017/02/08
+            return table_dir + append_string2;
         }
         else
-            log_warn("Table directory \"%s\" is not set, falling back to build folder!", table_dir.c_str());
+        {
+            log_warn("Falling back to build folder!");
+        }
     }
 
     table_dir = std::string(getenv("I3_BUILD") ? getenv("I3_BUILD") : "");
-    table_dir += append_string;
 
-    if (boost::filesystem::exists(table_dir))
+    if (table_dir.empty())
     {
-        check_writable(table_dir);
-        return table_dir;
+        log_fatal("$I3_BUILD is not set");
     }
     else
-        log_fatal("Table directory \"%s\" does not exist!", table_dir.c_str());
+    {
+        if (IsWritable(table_dir + append_string))
+        {
+            return table_dir + append_string;
+        }
+        else if (IsWritable(table_dir + append_string2))
+        {
+            //TODO(mario): Maybe check next path message Mi 2017/02/08
+            return table_dir + append_string2;
+        }
+        else
+        {
+            log_fatal("No folder availble to fall back! Abort search for table directory.");
+        }
+    }
 }
 
 
