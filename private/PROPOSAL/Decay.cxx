@@ -290,10 +290,10 @@ Decay::Decay(PROPOSALParticle* particle)
 Decay::Decay(const Decay &decay)
     :root_finder_       ( new RootFinder(*decay.root_finder_) )
     ,particle_          ( new PROPOSALParticle(*decay.particle_) )
+    ,backup_particle_   ( new PROPOSALParticle(*decay.backup_particle_) )
     ,out_               ( decay.out_)
     ,store_neutrinos_   ( decay.store_neutrinos_ )
     ,multiplier_        ( decay.multiplier_ )
-    ,backup_particle_   ( new PROPOSALParticle(*decay.backup_particle_) )
 {
 
 }
