@@ -16,13 +16,16 @@
 #include <boost/bind.hpp>
 #include <boost/filesystem.hpp>
 
-#include "PROPOSAL-icetray/I3PropagatorServicePROPOSAL.h"
+#include <sstream>
+#include <unistd.h> // check for write permissions
+
 #include "dataclasses/physics/I3Particle.h"
 #include "simclasses/I3MMCTrack.h"
+
+#include "PROPOSAL-icetray/I3PropagatorServicePROPOSAL.h"
 #include "PROPOSAL/Propagator.h"
 #include "PROPOSAL/PROPOSALParticle.h"
 #include "PROPOSAL/Output.h"
-#include <sstream>
 
 using namespace std;
 
@@ -76,49 +79,43 @@ int ConvertOldToNewPhotonuclearParametrization(int ph,int bb,int bs)
     return 12;
 }
 
+
+bool IsWritable(std::string table_dir)
+{
+    bool writeable = false;
+
+    if (access(table_dir.c_str(), F_OK) == 0)
+    {
+        if ((access(table_dir.c_str(), R_OK) == 0) && (access(table_dir.c_str(), W_OK) == 0))
+        {
+            writeable = true;
+            log_info("Table directory does exist and has read and write permissions: %s", table_dir.c_str());
+        }
+        else
+        {
+            if (access(table_dir.c_str(), R_OK) != 0)
+            {
+                log_info("Table directory is not readable: %s", table_dir.c_str());
+            }
+            else
+            {
+                log_info("Table directory is not writable: %s", table_dir.c_str());
+            }
+        }
+    }
+    else
+    {
+        log_info("Table directory does not exist: %s", table_dir.c_str());
+    }
+
+    return writeable;
+}
+
 I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(std::string mediadef, std::string tabledir,
     double cylinderRadius, double cylinderHeight, I3Particle::ParticleType type, double particleMass,
     BremsstrahlungParametrization bs, PhotonuclearParametrizationFamily ph, PhotonuclearParametrization bb,
     ShadowingParametrization sh) : particleMass_(particleMass)
 {
-	std::ostringstream mmcOpts;
-	// Some options that no one should change:
-	// romb: order-5 Rombert interpolation
-	// raw: save interpolation tables in binary format
-	// user: write "user" fields (entry/center/exit positions, energies, times for I3MMCTrack)
-	// sdec: enable stopped muon decay
-	// time: enable exact time calculation
-	// lpm: enable Landau-Pomeranchuk-Migdal supression of EM cross-sections
-	// frho: enable "smart" density factor handling
-	// cont: enable continuous randomization for realistic energy loss at high vcut
-	mmcOpts << "-romb=5 -raw -user -sdec -time -lpm -frho -cont";
-	mmcOpts << " -bs=" << bs << " -ph=" << ph << " -bb=" << bb << " -sh=" << sh;
-	mmcOpts << " -radius=" << cylinderRadius << " -length=" << cylinderHeight;
-	switch (type) {
-		case I3Particle::MuMinus:
-		case I3Particle::MuPlus:
-			break;
-		case I3Particle::TauMinus:
-		case I3Particle::TauPlus:
-			mmcOpts << " -tau";
-			break;
-		case I3Particle::STauMinus:
-		case I3Particle::STauPlus:
-			if (!std::isfinite(particleMass))
-				log_fatal("You asked for staus of non-finite mass %f", particleMass_);
-			mmcOpts << " -stau=" << particleMass_;
-			break;
-		case I3Particle::Monopole:
-			if (!std::isfinite(particleMass))
-				log_fatal("You asked for monopoles of non-finite mass %f", particleMass_);
-			mmcOpts << " -monopole=" << particleMass_;
-			break;
-		default:
-			I3Particle dummy;
-			dummy.SetType(type);
-			log_fatal("I don't know how to propagate %s", dummy.GetTypeString().c_str());
-	}
-
 	if (mediadef.empty())
 		mediadef = GetDefaultMediaDef();
 	if (tabledir.empty())
@@ -129,27 +126,22 @@ I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(std::string mediadef, s
 		log_fatal("The mediadef file '%s' can't be read!", mediadef.c_str());
 	if (!fs::is_directory(tabledir))
 		log_fatal("The table directory '%s' doesn't exist!", tabledir.c_str());
-	mmcOpts << " -mediadef=" << mediadef << " -tdir=" << tabledir;
-	mmcOpts << " ";
 
-	log_info("Amanda option string: '%s'", mmcOpts.str().c_str());
+    //TODO(mario): params for cross section and detector settings specified
+    // in the configfile will always be overwritten? Di 2017/01/31
 
-    //--- Tomasz
-    //amanda = new Amanda();
-
+    // Define propagator but do not apply option yet
     proposal = new Propagator(mediadef,false);
-    //Hier die ganzen einstellungen rein schmeissen!!! Setter du masa fasa
+
     Geometry* geo = new Geometry();
     geo->InitCylinder(0,0,0,cylinderRadius,0,cylinderHeight);
     proposal->SetDetector(geo);
     proposal->SetBrems(bs);
     proposal->SetPhoto(ConvertOldToNewPhotonuclearParametrization(ph,bb,bs));
     proposal->SetPath_to_tables(tabledir);
-    proposal->ApplyOptions();
-    //amanda->setup(mmcOpts.str());
-    //--- Tomasz End
 
-	mmcOpts_ = mmcOpts.str();
+    proposal->ApplyOptions();
+
 	tearDownPerCall_ = false;
 }
 
@@ -159,52 +151,82 @@ std::string I3PropagatorServicePROPOSAL::GetDefaultMediaDef()
 	if (!I3_BUILD)
 		log_fatal("$I3_BUILD is not set!");
 	std::string s(I3_BUILD);
-    //--- Tomasz
-    //return s + "/PROPOSAL/resources/mediadef";
 
     return s + "/PROPOSAL/resources/configuration";
-
-    //--- Tomasz End
 }
+
 
 std::string I3PropagatorServicePROPOSAL::GetDefaultTableDir()
 {
-  //Initializing a std::string with a NULL ptr is undefined behavior.
-  //Why it doens't just return an empty string, I have no idea.
-  std::string append_string = "/PROPOSAL/resources/tables";
-  std::string table_dir(getenv("PROPOSALTABLEDIR") ? getenv("PROPOSALTABLEDIR") : "");
-  if (table_dir.empty())
-  {
-    log_info("$PROPOSALTABLEDIR is not set in env variables. Falling back to defaults.");
-  }
-  else
-  {
-      if(boost::filesystem::exists(table_dir))return table_dir;
-  }
+    std::string append_string  = "/PROPOSAL/resources/tables";
+    std::string append_string2 = "/PROPOSAL/tables";
 
+    // --------------------------------------------------------------------- //
+    // Environment variable set?
+    // --------------------------------------------------------------------- //
 
-  table_dir = std::string(getenv("I3_TESTDATA") ? getenv("I3_TESTDATA") : "");
-  if (table_dir.empty())
-  {
-    log_warn("$I3_TESTDATA is not set, falling back to build folder!");
+    // Initializing a std::string with a NULL ptr is undefined behavior.
+    // Why it doens't just return an empty string, I have no idea.
+    std::string table_dir(getenv("PROPOSALTABLEDIR") ? getenv("PROPOSALTABLEDIR") : "");
+
+    if (table_dir.empty())
+    {
+        log_info("$PROPOSALTABLEDIR is not set in env variables. Falling back to defaults.");
+    }
+    else
+    {
+        if(IsWritable(table_dir)) return table_dir;
+    }
+
+    // --------------------------------------------------------------------- //
+    // Writable in I3_TESTDATA?
+    // --------------------------------------------------------------------- //
+
+    table_dir = std::string(getenv("I3_TESTDATA") ? getenv("I3_TESTDATA") : "");
+
+    if (table_dir.empty())
+    {
+        log_warn("$I3_TESTDATA is not set, falling back to build folder!");
+    }
+    else
+    {
+        if (IsWritable(table_dir + append_string))
+        {
+            return table_dir + append_string;
+        }
+        else
+        {
+            log_warn("Falling back to build folder!");
+        }
+    }
+
+    // --------------------------------------------------------------------- //
+    // Fall back to I3_BUID
+    // --------------------------------------------------------------------- //
+
     table_dir = std::string(getenv("I3_BUILD") ? getenv("I3_BUILD") : "");
-  }
 
-  if ( !boost::filesystem::exists(table_dir+append_string))
-  {
-    table_dir +=append_string;
-    log_warn("$%s does not exist, falling back to build folder!", table_dir.c_str());
-    table_dir = std::string(getenv("I3_BUILD") ? getenv("I3_BUILD") : "");
-  }
-
-  if (table_dir.empty())
-    log_fatal("$%s is not set!", table_dir.c_str());
-
-  table_dir += append_string;
-  if(!boost::filesystem::exists(table_dir))
-    log_fatal("%s does not exist", table_dir.c_str());
-  return table_dir;
+    if (table_dir.empty())
+    {
+        log_fatal("$I3_BUILD is not set");
+    }
+    else
+    {
+        if (IsWritable(table_dir + append_string))
+        {
+            return table_dir + append_string;
+        }
+        else if (IsWritable(table_dir + append_string2))
+        {
+            return table_dir + append_string2;
+        }
+        else
+        {
+            log_fatal("No folder availble to fall back! Abort search for table directory.");
+        }
+    }
 }
+
 
 void I3PropagatorServicePROPOSAL::SetRandomNumberGenerator(I3RandomServicePtr random)
 {
