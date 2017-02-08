@@ -199,11 +199,11 @@ std::string I3PropagatorServicePROPOSAL::GetDefaultTableDir()
     {
         if (IsWritable(table_dir + append_string2))
         {
-            //TODO(mario): Maybe check next path message Mi 2017/02/08
             return table_dir + append_string;
         }
         else if (IsWritable(table_dir + append_string))
         {
+            //TODO(mario): Maybe check next path message Mi 2017/02/08
             return table_dir + append_string2;
         }
         else
