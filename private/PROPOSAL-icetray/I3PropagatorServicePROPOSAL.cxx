@@ -76,25 +76,51 @@ int ConvertOldToNewPhotonuclearParametrization(int photo_family,int photo_param,
     return 12;
 }
 
-I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(std::string mediadef, std::string tabledir,
-    double cylinderRadius, double cylinderHeight, I3Particle::ParticleType type, double particleMass,
-    BremsstrahlungParametrization brems_param, 
-    PhotonuclearParametrizationFamily photo_family, 
-    PhotonuclearParametrization photo_param,
-    ShadowingParametrization shadow) : particleMass_(particleMass)
+I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(
+      std::string mediadef, std::string tabledir
+    , double cylinderRadius, double cylinderHeight
+    , I3Particle::ParticleType type, double particleMass
+    , BremsstrahlungParametrization brems_param
+    , PhotonuclearParametrizationFamily photo_family,
+    , PhotonuclearParametrization photo_param
+    , ShadowingParametrization shadow) 
+  : particleMass_(particleMass)
+  , mediadef_(mediadef)
+  , tabledir_(tabledir)
+  , cylinderRadius_(cylinderRadius)
+  , cylinderHeight_(cylinderHeight)
+  , brems_param_(brems_param)
+  , photo_family_(photo_family)
+  , photo_param_(photo_param)
+  , shadow_(shadow)
+
 {
-  // TODO: type
+  // TODO(sudojan): type
 
-  mediadef_ = mediadef;
-  tabledir_ = tabledir;
-  
-  cylinderRadius_ = cylinderRadius;
-  cylinderHeight_ = cylinderHeight;
+  // switch(type) {
+  //   case I3Particle::MuMinus:
+  //   case I3Particle::MuPlus:
+  //     break;
+  //   case I3Particle::TauMinus:
+  //   case I3Particle::TauPlus:
+  //     break;
+  //   case I3Particle::STauMinus:
+  //   case I3Particle::STauPlus:
+  //     if (!std::isfinite(particleMass))
+  //       log_fatal("You asked for staus of non-finite mass %f", particleMass_);
+  //     break;
+  //   case I3Particle::Monopole:
+  //     if (!std::isfinite(particleMass))
+  //       log_fatal("You asked for monopoles of non-finite mass %f", particleMass_);
+  //     break;
+  //   default:
+  //     I3Particle dummy;
+  //     dummy.SetType(type);
+  //     log_fatal("I don't know how to propagate %s", dummy.GetTypeString().c_str());
+  // }
 
-  brems_param_ = brems_param;
-  photo_family_ = photo_family;
-  photo_param_ = photo_param;
-  shadow_ = shadow;
+  // particle_type = new PROPOSALParticle(GenerateMMCName(type))
+
 
   if (mediadef.empty())
     mediadef = GetDefaultMediaDef();
@@ -111,14 +137,16 @@ I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(std::string mediadef, s
     // in the configfile will always be overwritten? Di 2017/01/31
 
     // Define propagator but do not apply option yet
-    proposal = new Propagator(mediadef,false);
+    proposal = new Propagator(mediadef_,false);
 
     Geometry* geo = new Geometry();
-    geo->InitCylinder(0,0,0,cylinderRadius,0,cylinderHeight);
+    geo->InitCylinder(0,0,0,cylinderRadius_,0,cylinderHeight_);
     proposal->SetDetector(geo);
     proposal->SetBrems(brems_param_);
     proposal->SetPhoto(ConvertOldToNewPhotonuclearParametrization(photo_family_, photo_param_, shadow_));
-    proposal->SetPath_to_tables(tabledir);
+    proposal->SetPath_to_tables(tabledir_);
+
+    // proposal->SetParticle(particle_type)
 
     proposal->ApplyOptions();
 
@@ -222,15 +250,16 @@ std::vector<I3Particle> I3PropagatorServicePROPOSAL::Propagate(I3Particle& p, Di
 	if (tearDownPerCall_) {
 
     delete proposal;
-    proposal = new Propagator(mediadef,false);
+    proposal = new Propagator(mediadef_,false);
     // Apply Settings
     Geometry* geo = new Geometry();
-    geo->InitCylinder(0,0,0,cylinderRadius,0,cylinderHeight);
+    geo->InitCylinder(0,0,0,cylinderRadius_,0,cylinderHeight_);
     proposal->SetDetector(geo);
     proposal->SetBrems(brems_param_);
     proposal->SetPhoto(ConvertOldToNewPhotonuclearParametrization(photo_family_, photo_param_, shadow_));
-    proposal->SetPath_to_tables(tabledir);
+    proposal->SetPath_to_tables(tabledir_);
     proposal->ApplyOptions();
+    // proposal->SetParticle(particle_type)
     
     boost::function<double ()> f = boost::bind(&I3RandomService::Uniform, rng_, 0, 1);
     proposal->SetRandomNumberGenerator(f);
