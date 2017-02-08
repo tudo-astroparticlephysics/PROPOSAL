@@ -83,7 +83,7 @@ bool IsWritable(std::string table_dir)
 
     if (access(table_dir.c_str(), F_OK) == 0)
     {
-        if (access(table_dir.c_str(), R_OK) == 0 && access(table_dir.c_str(), W_OK) == 0)
+        if ((access(table_dir.c_str(), R_OK) == 0) && (access(table_dir.c_str(), W_OK) == 0))
         {
             writeable = true;
             log_info("Table directory does exist and has read and write permissions: %s", table_dir.c_str());
