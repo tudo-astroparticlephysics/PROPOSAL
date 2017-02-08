@@ -119,6 +119,7 @@ public:
   
   Propagator *proposal;
   double particleMass_;
+  PROPOSALParticle* particle_type
 
   std::string mediadef_;
   std::string tabledir_;
