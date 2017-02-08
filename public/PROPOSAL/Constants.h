@@ -46,15 +46,15 @@
 #endif
 
 #ifndef ALPHA // fine structure constant
-    #define ALPHA 0.007297352533285885
+    #define ALPHA 0.0072973525664
 #endif
 
 #ifndef ME // electron mass (MeV)
-    #define ME 0.510998902
+    #define ME 0.5109989461
 #endif
 
 #ifndef RY // Rydberg energy (eV)
-    #define RY 13.60569172
+    #define RY 13.605693009
 #endif
 
 #ifndef IONK // in the ionization formula (MeV*cm2/g)
@@ -66,11 +66,11 @@
 #endif
 
 #ifndef RE // classical electron radius (cm)
-    #define RE 2.817940285e-13
+    #define RE 2.8179403227e-13
 #endif
 
-#ifndef E0
-    #define E0 1.602176462e-19                         //charge of an electron in A*s (SI)
+#ifndef E0 //charge of an electron in A*s (SI)
+    #define E0 1.6021766208-19
 #endif
 
 #ifndef RM // classical Muon radius(cm) :   RM = (1.602176487*pow(10,-19))/(4*PI*8.854187817*pow(10,-12)*Mmu_)*pow(10,-4);
@@ -78,23 +78,23 @@
 #endif
 
 #ifndef NA // Avogadro's number (1/mol)
-    #define NA 6.02214199e23
+    #define NA 6.022140857e23
 #endif
 
 #ifndef MMU // muon mass (MeV)
-    #define MMU 105.658389
+    #define MMU 105.6583745
 #endif
 
 #ifndef LMU // muon lifetime (sec)
-    #define LMU 2.19703e-6
+    #define LMU 2.1969811e-6
 #endif
 
 #ifndef MTAU // tau mass (MeV)
-    #define MTAU 1777.03
+    #define MTAU 1776.86
 #endif
 
 #ifndef LTAU // tau lifetime (sec)
-    #define LTAU 290.6e-15
+    #define LTAU 290.3e-15
 #endif
 
 #ifndef MPI // pion mass (MeV)
@@ -102,15 +102,15 @@
 #endif
 
 #ifndef MP // proton mass (MeV)
-    #define MP 938.271998
+    #define MP 938.2720813
 #endif
 
 #ifndef MN // neutron mass (MeV)
-    #define MN 939.56533
+    #define MN 939.565413
 #endif
 
 #ifndef MRH // rho-770 mass (MeV)
-    #define MRH 769.3
+    #define MRH 775.26
 #endif
 
 #ifndef MA1 // a1-1260 mass (MeV)
@@ -122,15 +122,15 @@
 #endif
 
 #ifndef GF // Fermi coupling const staticant (MeV^-2)
-    #define GF 1.16639e-11
+    #define GF 1.1663787e-11
 #endif
 
 #ifndef MW // W+- boson mass (MeV)
-    #define MW 80419.
+    #define MW 80385.
 #endif
 
 #ifndef MZ // Z0 boson mass (MeV)
-    #define MZ 91188.2
+    #define MZ 91187.6
 #endif
 
 #ifndef XW // sin^2(mixing angle at Mz)
@@ -138,7 +138,7 @@
 #endif
 
 #ifndef GW // W+- boson width (MeV)
-    #define GW 2120.
+    #define GW 2085.
 #endif
 
 #ifndef GZ // Z0 boson width (MeV)
