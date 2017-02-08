@@ -81,32 +81,32 @@ bool check_writable(std::string table_dir)
 {
     bool writeable = false;
 
-    if (access(table_dir.c_str(), F_OK))
+    if (access(table_dir.c_str(), F_OK) == 0)
     {
         log_info("Table directory does exist: %s", table_dir.c_str());
     }
     else
     {
-        log_info("Table directory does not exist");
+        log_info("Table directory does not exist: %s", table_dir.c_str());
     }
 
-    if (access(table_dir.c_str(), W_OK))
+    if (access(table_dir.c_str(), W_OK) == 0)
     {
         log_info("Table directory is writable: %s", table_dir.c_str());
         writeable = true;
     }
     else
     {
-        log_info("Table directory is not writable!");
+        log_info("Table directory is not writable: %s", table_dir.c_str());
     }
 
-    if (access(table_dir.c_str(), R_OK))
+    if (access(table_dir.c_str(), R_OK) == 0)
     {
         log_info("Table directory is readable: %s", table_dir.c_str());
     }
     else
     {
-        log_info("Table directory is not readable!");
+        log_info("Table directory is not readable: %s", table_dir.c_str());
     }
 
     // boost::filesystem::file_status status = boost::filesystem::status(boost::filesystem::path(table_dir));
