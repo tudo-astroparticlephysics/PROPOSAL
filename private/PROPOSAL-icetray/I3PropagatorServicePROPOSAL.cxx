@@ -116,7 +116,7 @@ I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(
     , double cylinderRadius, double cylinderHeight
     , I3Particle::ParticleType type, double particleMass
     , BremsstrahlungParametrization brems_param
-    , PhotonuclearParametrizationFamily photo_family,
+    , PhotonuclearParametrizationFamily photo_family
     , PhotonuclearParametrization photo_param
     , ShadowingParametrization shadow)
   : particleMass_(particleMass)
