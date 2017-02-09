@@ -32,8 +32,8 @@ class Propagator; //Tomasz
  */
 class I3PropagatorServicePROPOSAL : public I3PropagatorService {
 public:
-	 
-	/** @brief Parametrization of the bremsstrahlung cross-section 
+
+	/** @brief Parametrization of the bremsstrahlung cross-section
 	 *
 	 * See references in the <a href="http://arxiv.org/abs/hep-ph/0407075">MMC paper</a>.
 	 */
@@ -43,7 +43,7 @@ public:
 		AndreevBerzrukovBugaev = 3,
 		CompleteScreeningCase = 4,
 	};
-	
+
 	/** @brief General type of the photonuclear cross-section parametrization
 	 *
 	 * See references in the <a href="http://arxiv.org/abs/hep-ph/0407075">MMC paper</a>.
@@ -54,7 +54,7 @@ public:
 		AbramowiczLevinLevyMaor = 3, // default
 		ButkevichMikheyev = 4
 	};
-	
+
 	/** @brief Specific edition of the photonuclear cross-section parametrization
 	 *
 	 * See references in the <a href="http://arxiv.org/abs/hep-ph/0407075">MMC paper</a>.
@@ -63,10 +63,10 @@ public:
 		AbramowiczLevinLevyMaor91 = 1,
 		AbramowiczLevinLevyMaor97 = 2, // default
 		BezrukovBugaev = 3,
-		ZEUS = 4	
+		ZEUS = 4
 	};
-	
-	/** @brief Parametrization of nuclear shadowing 
+
+	/** @brief Parametrization of nuclear shadowing
 	 *
 	 * See references in the <a href="http://arxiv.org/abs/hep-ph/0407075">MMC paper</a>.
 	 */
@@ -74,14 +74,14 @@ public:
 		Dutta = 1,
 		Butkevich = 2 // default
 	};
- 
+
   virtual std::vector<I3Particle> Propagate(I3Particle& p, DiagnosticMapPtr frame);
 
   virtual void SetRandomNumberGenerator(I3RandomServicePtr random);
 
   SET_LOGGER("I3PropagatorService");
 
-  /** 
+  /**
    * @param mediadef[in] Path the the media definition file. If unspecified, this will
    *                     default to $I3_BUILD/PROPOSAL/resources/mediadef
    * @param tabledir[in] Path to a directory in which to store interpolation
@@ -109,20 +109,19 @@ public:
   static std::string GetDefaultMediaDef();
   static std::string GetDefaultTableDir();
   virtual ~I3PropagatorServicePROPOSAL();
-  
+
   void SetTearDownPerCall(bool f) { tearDownPerCall_ = f; }
 
  private:
 
   Propagator *proposal;
   double particleMass_;
-  
+
   /** @brief Tear down and re-initialize the propagator on every call to Propagate().
    * This is used for tests that ensure that propagation results do not depend
    * on event-to-event state.
    */
   bool tearDownPerCall_;
-  std::string mmcOpts_;
   I3RandomServicePtr rng_;
 
   // default, assignment, and copy constructor declared private
