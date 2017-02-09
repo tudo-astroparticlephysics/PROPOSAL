@@ -101,9 +101,10 @@ public:
    */
   I3PropagatorServicePROPOSAL(std::string mediadef="", std::string tabledir="",
       double cylinderRadius=800*I3Units::m, double cylinderHeight=1600*I3Units::m, I3Particle::ParticleType type=I3Particle::MuMinus,
-      double particleMass=NAN, BremsstrahlungParametrization bs=KelnerKokoulinPetrukhin,
-      PhotonuclearParametrizationFamily ph=AbramowiczLevinLevyMaor, PhotonuclearParametrization bb=AbramowiczLevinLevyMaor97,
-      ShadowingParametrization sh=Butkevich);
+      double particleMass=NAN, BremsstrahlungParametrization brems_param_=KelnerKokoulinPetrukhin,
+      PhotonuclearParametrizationFamily photo_family_=AbramowiczLevinLevyMaor, 
+      PhotonuclearParametrization photo_param_=AbramowiczLevinLevyMaor97,
+      ShadowingParametrization shadow_=Butkevich);
 
 
   static std::string GetDefaultMediaDef();
@@ -114,8 +115,22 @@ public:
 
  private:
 
+  // TODO: Why is particleMass=NAN???
+  
   Propagator *proposal;
   double particleMass_;
+  PROPOSALParticle* particle_type
+
+  std::string mediadef_;
+  std::string tabledir_;
+
+  double cylinderRadius_;
+  double cylinderHeight_;
+
+  BremsstrahlungParametrization brems_param_;
+  PhotonuclearParametrizationFamily photo_family_;
+  PhotonuclearParametrization photo_param_;
+  ShadowingParametrization shadow_;
 
   /** @brief Tear down and re-initialize the propagator on every call to Propagate().
    * This is used for tests that ensure that propagation results do not depend
