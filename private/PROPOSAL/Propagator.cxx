@@ -419,7 +419,7 @@ double Propagator::Propagate( double distance )
             NumInt++;//TOMASZ
             energy_loss     =   current_collection_->MakeStochasticLoss();
             final_energy    -=  energy_loss.first;
-            // cout << "Energyloss: " << energy_loss.first << "\t" << energy_loss.second << "\t" <<particle_->GetX() << "\t" << particle_->GetY() << "\t" << particle_->GetZ() << endl;
+            log_debug("Energyloss: %d\t%d\t%d\t%d\t%d", energy_loss.first, energy_loss.second, particle_->GetX(), particle_->GetY(), particle_->GetZ());
             secondary_id    =   particle_->GetParticleId() + 1;
             Output::getInstance().FillSecondaryVector(particle_, secondary_id, energy_loss, 0);
         }
@@ -427,7 +427,7 @@ double Propagator::Propagate( double distance )
         {
             decay           =   current_collection_->MakeDecay();
             final_energy    =   0;
-            cout << endl << "------------------------------" << endl << "------------------------------" << endl << "------------------------------" << endl << endl; //Tomasz
+            log_debug("Decay of particle: %s", particle_->GetName().c_str());
             secondary_id    = particle_->GetParticleId()  +   1;
             Output::getInstance().FillSecondaryVector(particle_, secondary_id, decay ,0);
 
