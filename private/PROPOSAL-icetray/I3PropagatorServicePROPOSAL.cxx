@@ -79,7 +79,6 @@ int ConvertOldToNewPhotonuclearParametrization(int photo_family,int photo_param,
     return 12;
 }
 
-<<<<<<< HEAD
 
 bool IsWritable(std::string table_dir)
 {
@@ -119,7 +118,7 @@ I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(
     , BremsstrahlungParametrization brems_param
     , PhotonuclearParametrizationFamily photo_family,
     , PhotonuclearParametrization photo_param
-    , ShadowingParametrization shadow) 
+    , ShadowingParametrization shadow)
   : particleMass_(particleMass)
   , mediadef_(mediadef)
   , tabledir_(tabledir)
@@ -326,7 +325,7 @@ std::vector<I3Particle> I3PropagatorServicePROPOSAL::Propagate(I3Particle& p, Di
     proposal->SetPath_to_tables(tabledir_);
     proposal->ApplyOptions();
     // proposal->SetParticle(particle_type)
-    
+
     boost::function<double ()> f = boost::bind(&I3RandomService::Uniform, rng_, 0, 1);
     proposal->SetRandomNumberGenerator(f);
 	}
