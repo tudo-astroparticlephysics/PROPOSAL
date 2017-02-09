@@ -619,7 +619,7 @@ void PROPOSALParticle::swap(PROPOSALParticle &particle)
 
 void PROPOSALParticle::InitByName(string aname){
 
-    // cout << "Name: \t" << aname << endl;
+    log_debug("Particle initialized in InitByName: %s", aname.c_str());
 
     string name=aname.length()==0?"?":aname[0]=='a'?aname.substr(1):aname;
 
