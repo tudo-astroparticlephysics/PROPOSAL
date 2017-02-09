@@ -31,24 +31,24 @@ using namespace std;
 
 class Output;
 
-// Now: parametrization_ = 1,  Former: form=1 and bb=1 Kokoulin
-// Now: parametrization_ = 2,  Former: form=2 and bb=1 Kokoulin + hard component
-// Now: parametrization_ = 3,  Former: form=1 and bb=2 Rhode
-// Now: parametrization_ = 4,  Former: form=2 and bb=2 Rhode + hard component
-// Now: parametrization_ = 5,  Former: form=1 and bb=3 Bezrukov/Bugaev
-// Now: parametrization_ = 6,  Former: form=2 and bb=3 Bezrukov/Bugaev + hard component
-// Now: parametrization_ = 7,  Former: form=1 and bb=4 Zeus
-// Now: parametrization_ = 8,  Former: form=2 and bb=4 Zeus + hard component
-// Now: parametrization_ = 9,  Former: form=3 and bb=1 shadow=1 ALLM 91
-// Now: parametrization_ = 10, Former: form=3 and bb=1 shadow=2 ALLM 91
-// Now: parametrization_ = 11, Former: form=3 and bb=2 shadow=1 ALLM 97
-// Now: parametrization_ = 12, Former: form=3 and bb=2 shadow=2 ALLM 97
-// Now: parametrization_ = 13, Former: form=4 and bb=1 shadow=1 Butkevich/Mikhailov
-// Now: parametrization_ = 14, Former: form=4 and bb=1 shadow=2 Butkevich/Mikhailov
+// Now: parametrization_ = 1,  Former: photo_family=1 and photo_param=1 Kokoulin
+// Now: parametrization_ = 2,  Former: photo_family=2 and photo_param=1 Kokoulin + hard component
+// Now: parametrization_ = 3,  Former: photo_family=1 and photo_param=2 Rhode
+// Now: parametrization_ = 4,  Former: photo_family=2 and photo_param=2 Rhode + hard component
+// Now: parametrization_ = 5,  Former: photo_family=1 and photo_param=3 Bezrukov/Bugaev
+// Now: parametrization_ = 6,  Former: photo_family=2 and photo_param=3 Bezrukov/Bugaev + hard component
+// Now: parametrization_ = 7,  Former: photo_family=1 and photo_param=4 Zeus
+// Now: parametrization_ = 8,  Former: photo_family=2 and photo_param=4 Zeus + hard component
+// Now: parametrization_ = 9,  Former: photo_family=3 and photo_param=1 shadow=1 ALLM 91
+// Now: parametrization_ = 10, Former: photo_family=3 and photo_param=1 shadow=2 ALLM 91
+// Now: parametrization_ = 11, Former: photo_family=3 and photo_param=2 shadow=1 ALLM 97
+// Now: parametrization_ = 12, Former: photo_family=3 and photo_param=2 shadow=2 ALLM 97
+// Now: parametrization_ = 13, Former: photo_family=4 and photo_param=1 shadow=1 Butkevich/Mikhailov
+// Now: parametrization_ = 14, Former: photo_family=4 and photo_param=1 shadow=2 Butkevich/Mikhailov
 
-int ConvertOldToNewPhotonuclearParametrization(int ph,int bb,int bs)
+int ConvertOldToNewPhotonuclearParametrization(int photo_family,int photo_param,int shadow)
 {
-    switch(ph*100+bb*10)
+    switch(photo_family*100+photo_param*10)
     {
         case 110:   return 1; break;
         case 210:   return 2; break;
@@ -62,7 +62,7 @@ int ConvertOldToNewPhotonuclearParametrization(int ph,int bb,int bs)
         break;
     }
 
-    switch(ph*100+bb*10+bs)
+    switch(photo_family*100+photo_param*10+shadow)
     {
         case 311:   return 9; break;
         case 312:   return 10; break;
@@ -74,11 +74,12 @@ int ConvertOldToNewPhotonuclearParametrization(int ph,int bb,int bs)
         break;
     }
 
-    log_warn("No fitting parametrization %i found setting default! 322 / 12!",ph*100+bb*10+bs);
+    log_warn("No fitting parametrization %i found setting default! 322 / 12!",photo_family*100+photo_param*10+shadow);
 
     return 12;
 }
 
+<<<<<<< HEAD
 
 bool IsWritable(std::string table_dir)
 {
@@ -111,34 +112,76 @@ bool IsWritable(std::string table_dir)
     return writeable;
 }
 
-I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(std::string mediadef, std::string tabledir,
-    double cylinderRadius, double cylinderHeight, I3Particle::ParticleType type, double particleMass,
-    BremsstrahlungParametrization bs, PhotonuclearParametrizationFamily ph, PhotonuclearParametrization bb,
-    ShadowingParametrization sh) : particleMass_(particleMass)
+I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(
+      std::string mediadef, std::string tabledir
+    , double cylinderRadius, double cylinderHeight
+    , I3Particle::ParticleType type, double particleMass
+    , BremsstrahlungParametrization brems_param
+    , PhotonuclearParametrizationFamily photo_family,
+    , PhotonuclearParametrization photo_param
+    , ShadowingParametrization shadow) 
+  : particleMass_(particleMass)
+  , mediadef_(mediadef)
+  , tabledir_(tabledir)
+  , cylinderRadius_(cylinderRadius)
+  , cylinderHeight_(cylinderHeight)
+  , brems_param_(brems_param)
+  , photo_family_(photo_family)
+  , photo_param_(photo_param)
+  , shadow_(shadow)
 {
-	if (mediadef.empty())
-		mediadef = GetDefaultMediaDef();
-	if (tabledir.empty())
-		tabledir = GetDefaultTableDir();
+  // TODO(sudojan): type
 
-	namespace fs = boost::filesystem;
-	if (!fs::exists(mediadef))
-		log_fatal("The mediadef file '%s' can't be read!", mediadef.c_str());
-	if (!fs::is_directory(tabledir))
-		log_fatal("The table directory '%s' doesn't exist!", tabledir.c_str());
+  // switch(type) {
+  //   case I3Particle::MuMinus:
+  //   case I3Particle::MuPlus:
+  //     break;
+  //   case I3Particle::TauMinus:
+  //   case I3Particle::TauPlus:
+  //     break;
+  //   case I3Particle::STauMinus:
+  //   case I3Particle::STauPlus:
+  //     if (!std::isfinite(particleMass))
+  //       log_fatal("You asked for staus of non-finite mass %f", particleMass_);
+  //     break;
+  //   case I3Particle::Monopole:
+  //     if (!std::isfinite(particleMass))
+  //       log_fatal("You asked for monopoles of non-finite mass %f", particleMass_);
+  //     break;
+  //   default:
+  //     I3Particle dummy;
+  //     dummy.SetType(type);
+  //     log_fatal("I don't know how to propagate %s", dummy.GetTypeString().c_str());
+  // }
+
+  // particle_type = new PROPOSALParticle(GenerateMMCName(type))
+
+
+  if (mediadef.empty())
+    mediadef = GetDefaultMediaDef();
+  if (tabledir.empty())
+    tabledir = GetDefaultTableDir();
+
+  namespace fs = boost::filesystem;
+  if (!fs::exists(mediadef))
+    log_fatal("The mediadef file '%s' can't be read!", mediadef.c_str());
+  if (!fs::is_directory(tabledir))
+    log_fatal("The table directory '%s' doesn't exist!", tabledir.c_str());
 
     //TODO(mario): params for cross section and detector settings specified
     // in the configfile will always be overwritten? Di 2017/01/31
 
     // Define propagator but do not apply option yet
-    proposal = new Propagator(mediadef,false);
+    proposal = new Propagator(mediadef_,false);
 
     Geometry* geo = new Geometry();
-    geo->InitCylinder(0,0,0,cylinderRadius,0,cylinderHeight);
+    geo->InitCylinder(0,0,0,cylinderRadius_,0,cylinderHeight_);
     proposal->SetDetector(geo);
-    proposal->SetBrems(bs);
-    proposal->SetPhoto(ConvertOldToNewPhotonuclearParametrization(ph,bb,bs));
-    proposal->SetPath_to_tables(tabledir);
+    proposal->SetBrems(brems_param_);
+    proposal->SetPhoto(ConvertOldToNewPhotonuclearParametrization(photo_family_, photo_param_, shadow_));
+    proposal->SetPath_to_tables(tabledir_);
+
+    // proposal->SetParticle(particle_type)
 
     proposal->ApplyOptions();
 
@@ -230,19 +273,16 @@ std::string I3PropagatorServicePROPOSAL::GetDefaultTableDir()
 
 void I3PropagatorServicePROPOSAL::SetRandomNumberGenerator(I3RandomServicePtr random)
 {
-	rng_ = random;
-	boost::function<double ()> f = boost::bind(&I3RandomService::Uniform, random, 0, 1);
-    //--- Tomasz
-    //amanda->SetRandomNumberGenerator(f);
+  rng_ = random;
+  boost::function<double ()> f = boost::bind(&I3RandomService::Uniform, random, 0, 1);
 
-    proposal->SetRandomNumberGenerator(f);
+  proposal->SetRandomNumberGenerator(f);
 
-    //--- Tomasz End
 }
 
 I3PropagatorServicePROPOSAL::~I3PropagatorServicePROPOSAL()
 {
-    delete proposal; //Tomasz
+    delete proposal;
 }
 
 /**
@@ -274,13 +314,21 @@ std::vector<I3Particle> I3PropagatorServicePROPOSAL::Propagate(I3Particle& p, Di
 	    p.GetLength()/I3Units::m);
 
 	if (tearDownPerCall_) {
-        //--- Tomasz
-	    log_warn("tearDownPerCall called! NOT IMPLEMENTED! DOING NOTHING INSTEAD!!!");
-	    //delete amanda;
-	    //amanda = new Amanda();
-	    //amanda->setup(mmcOpts_);
-	    //boost::function<double ()> f = boost::bind(&I3RandomService::Uniform, rng_, 0, 1);
-	    //amanda->SetRandomNumberGenerator(f);
+
+    delete proposal;
+    proposal = new Propagator(mediadef_,false);
+    // Apply Settings
+    Geometry* geo = new Geometry();
+    geo->InitCylinder(0,0,0,cylinderRadius_,0,cylinderHeight_);
+    proposal->SetDetector(geo);
+    proposal->SetBrems(brems_param_);
+    proposal->SetPhoto(ConvertOldToNewPhotonuclearParametrization(photo_family_, photo_param_, shadow_));
+    proposal->SetPath_to_tables(tabledir_);
+    proposal->ApplyOptions();
+    // proposal->SetParticle(particle_type)
+    
+    boost::function<double ()> f = boost::bind(&I3RandomService::Uniform, rng_, 0, 1);
+    proposal->SetRandomNumberGenerator(f);
 	}
   I3MMCTrackPtr mmcTrack = propagate(p, daughters);
 
