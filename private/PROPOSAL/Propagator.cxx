@@ -1130,45 +1130,6 @@ boost::program_options::options_description Propagator::CreateOptions()
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
-
-
-void Propagator::Setup(int argc, char** argv)
-{
-/*
-    vector <string> test = po::split_unix("a b c");
-    cout<<test.at(2)<<endl;
-    po::options_description all = CreateOptions();
-
-    //parse cmd line
-    po::variables_map vm;
-    po::store( po::command_line_parser(argc, argv).options(all).run(), vm);
-
-    //print help message if wanted
-    if(vm.count("help")) {
-        std::cout<< all;
-        exit(0);
-    }
-    //notifies globalVar
-    try {
-        //set the variables
-        vm.notify();
-    }
-    catch (po::invalid_command_line_syntax &e) {
-        std::cerr<<"Error: "<<e.what()<<"\n";
-        exit(1);
-    }
-
-    for(unsigned int i = 0 ; i < current_collection_->GetCrosssections().size() ; i++)
-    {
-        current_collection_->GetCrosssections().at(i)->ValidateOptions();
-    }
-*/
-	log_warn("Test Function for standalone version. Should not be used!");
-}
-
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
 //--------------------------------constructors--------------------------------//
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
