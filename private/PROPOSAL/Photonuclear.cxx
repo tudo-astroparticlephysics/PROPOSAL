@@ -159,7 +159,7 @@ void Photonuclear::EnableDNdxInterpolation(std::string path, bool raw)
 
         if( FileExist(filename.str()) )
         {
-            log_info("Photonuclear parametrisation tables (dNdx) will be read from file:\t%s",filename.str().c_str());
+            log_debug("Photonuclear parametrisation tables (dNdx) will be read from file:\t%s",filename.str().c_str());
             ifstream input;
 
             if(raw)
@@ -280,7 +280,7 @@ void Photonuclear::EnableDEdxInterpolation(std::string path, bool raw)
 
         if( FileExist(filename.str()) )
         {
-            log_info("Photonuclear parametrisation tables (dEdx) will be read from file:\t%s",filename.str().c_str());
+            log_debug("Photonuclear parametrisation tables (dEdx) will be read from file:\t%s",filename.str().c_str());
             ifstream input;
 
             if(raw)
@@ -379,7 +379,7 @@ void Photonuclear::EnablePhotoInterpolation(std::string path, bool raw)
 
         if( FileExist(filename.str()) )
         {
-            log_info("Photonuclear parametrisation tables will be read from file:\t%s",filename.str().c_str());
+            log_debug("Photonuclear parametrisation tables will be read from file:\t%s",filename.str().c_str());
             ifstream input;
 
             if(raw)

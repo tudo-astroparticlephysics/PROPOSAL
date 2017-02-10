@@ -477,7 +477,7 @@ void Scattering::EnableInterpolation(string path)
 
         if( FileExist(filename.str()) )
         {
-            log_info( "Scattering tables will be read from file:\t%s",filename.str().c_str());
+            log_debug( "Scattering tables will be read from file:\t%s",filename.str().c_str());
             ifstream input;
 
             input.open(filename.str().c_str());

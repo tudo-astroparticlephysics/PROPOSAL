@@ -120,7 +120,7 @@ void StandardNormal::EnableInterpolation(std::string path, bool raw)
 
         if( FileExist(filename.str()) )
         {
-            log_info("StandardNormal parametrisation tables will be read from file:\t%s",filename.str().c_str());
+            log_debug("StandardNormal parametrisation tables will be read from file:\t%s",filename.str().c_str());
             ifstream input;
 
             if(raw)

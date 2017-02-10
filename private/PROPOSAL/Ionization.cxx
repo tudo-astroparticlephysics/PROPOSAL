@@ -106,7 +106,7 @@ double Ionization::CalculatedNdx(double rnd)
 
 
 double Ionization::CalculateStochasticLoss(double rnd1, double rnd2)
-{   
+{
     if(rnd1 != rnd_ )
     {
         CalculatedNdx(rnd1);
@@ -147,7 +147,7 @@ void Ionization::EnableDNdxInterpolation(std::string path, bool raw)
 
         if( FileExist(filename.str()) )
         {
-            log_info("Ionization parametrisation tables (dNdx) will be read from file:\t%s",filename.str().c_str());
+            log_debug("Ionization parametrisation tables (dNdx) will be read from file:\t%s",filename.str().c_str());
             ifstream input;
 
             if(raw)
@@ -252,7 +252,7 @@ void Ionization::EnableDEdxInterpolation(std::string path, bool raw)
 
         if( FileExist(filename.str()) )
         {
-            log_info("Ionization parametrisation tables (dEdx) will be read from file:\t%s",filename.str().c_str());
+            log_debug("Ionization parametrisation tables (dEdx) will be read from file:\t%s",filename.str().c_str());
             ifstream input;
 
             if(raw)
