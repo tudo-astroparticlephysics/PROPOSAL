@@ -115,7 +115,7 @@ void ContinuousRandomization::EnableDE2dxInterpolation(std::string path, bool ra
 
         if( FileExist(filename.str()) )
         {
-            log_info("Continuous Randomization parametrisation tables (dE2dx) will be read from file:\t%s",filename.str().c_str());
+            log_debug("Continuous Randomization parametrisation tables (dE2dx) will be read from file:\t%s",filename.str().c_str());
             ifstream input;
 
             if(raw)
@@ -248,7 +248,7 @@ void ContinuousRandomization::EnableDE2deInterpolation(std::string path, bool ra
 
         if( FileExist(filename.str()) )
         {
-            log_info("Continuous Randomization parametrisation tables (dE2de) will be read from file:\t%s",filename.str().c_str());
+            log_debug("Continuous Randomization parametrisation tables (dE2de) will be read from file:\t%s",filename.str().c_str());
             ifstream input;
 
             if(raw)
