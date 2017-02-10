@@ -156,28 +156,54 @@ I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(
   // particle_type = new PROPOSALParticle(GenerateMMCName(type))
 
 
-  if (mediadef.empty())
-    mediadef = GetDefaultMediaDef();
-  if (tabledir.empty())
-    tabledir = GetDefaultTableDir();
+    // ----[ Check table dir and mediadef ]------------------ //
 
-  namespace fs = boost::filesystem;
-  if (!fs::exists(mediadef))
-    log_fatal("The mediadef file '%s' can't be read!", mediadef.c_str());
-  if (!fs::is_directory(tabledir))
-    log_fatal("The table directory '%s' doesn't exist!", tabledir.c_str());
+    if (mediadef_.empty())
+        mediadef_ = GetDefaultMediaDef();
+    if (tabledir_.empty())
+        tabledir_ = GetDefaultTableDir();
 
-    //TODO(mario): params for cross section and detector settings specified
-    // in the configfile will always be overwritten? Di 2017/01/31
+    namespace fs = boost::filesystem;
+    if (!fs::exists(mediadef_))
+        log_fatal("The mediadef file '%s' can't be read!", mediadef_.c_str());
+    if (!fs::is_directory(tabledir_))
+        log_fatal("The table directory '%s' doesn't exist!", tabledir_.c_str());
+
+
+    // ----[ Check, apply options ]-------------------------- //
+
 
     // Define propagator but do not apply option yet
     proposal = new Propagator(mediadef_,false);
+
+    stringstream options;
+    int photo = ConvertOldToNewPhotonuclearParametrization(photo_family_, photo_param_, shadow_);
+
+    options << "You choose the following parameter by passing arguments:" << std::endl;
+    options << "\tcylinderRadius = " << cylinderRadius_ << std::endl;
+    options << "\tcylinderHeight = " << cylinderHeight_ << std::endl;
+    options << "\tBremsstrahlungParametrization = " << brems_param_ << std::endl;
+    options << "\tPhotonuclearParametrization = " << photo << std::endl;
+
+    if (brems_param_ != proposal->GetBrems())
+    {
+        options << "\tChosen BremsstrahlungParametrization differs from parametrization in config file!" << std::endl;
+        options << "Passed parametrization will be used: " << brems_param_ << std::endl;
+    }
+
+    if (photo != proposal->GetPhoto())
+    {
+        options << "\tChosen PhotonuclearParametrization differs from parametrization in config file!" << std::endl;
+        options << "Passed parametrization will be used: " << photo << std::endl;
+    }
+
+    log_info(options.str().c_str());
 
     Geometry* geo = new Geometry();
     geo->InitCylinder(0,0,0,cylinderRadius_,0,cylinderHeight_);
     proposal->SetDetector(geo);
     proposal->SetBrems(brems_param_);
-    proposal->SetPhoto(ConvertOldToNewPhotonuclearParametrization(photo_family_, photo_param_, shadow_));
+    proposal->SetPhoto(photo);
     proposal->SetPath_to_tables(tabledir_);
 
     // proposal->SetParticle(particle_type)

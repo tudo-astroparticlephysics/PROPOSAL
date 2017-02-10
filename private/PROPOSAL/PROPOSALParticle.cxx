@@ -14,6 +14,7 @@
 #include "PROPOSAL/PROPOSALParticle.h"
 #include "PROPOSAL/methods.h"
 #include "PROPOSAL/Constants.h"
+#include "PROPOSAL/Output.h"
 #include <iomanip>
 
 

@@ -484,7 +484,7 @@ void ProcessCollection::EnableInterpolation(std::string path, bool raw)
 
         if( FileExist(filename.str()) )
         {
-            log_info("ProcessCollection parametrisation tables will be read from file:\t%s",filename.str().c_str());
+            log_debug("ProcessCollection parametrisation tables will be read from file:\t%s",filename.str().c_str());
             ifstream input;
 
             if(raw)
@@ -757,7 +757,7 @@ void ProcessCollection::EnableParticleTimeInterpolation(std::string path, bool r
 
         if( FileExist(filename.str()) )
         {
-            log_info("Particle time parametrisation tables will be read from file:\t%s",filename.str().c_str());
+            log_debug("Particle time parametrisation tables will be read from file:\t%s",filename.str().c_str());
             ifstream input;
 
             if(raw)

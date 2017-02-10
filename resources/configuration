@@ -159,6 +159,7 @@ sector
 
     medium air 0.673
 
+
 sector
     sphere  0   0   -6372186   6374134  6373934
     hirarchy 1
