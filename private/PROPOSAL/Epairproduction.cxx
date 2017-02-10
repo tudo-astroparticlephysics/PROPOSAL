@@ -202,7 +202,7 @@ void Epairproduction::EnableDNdxInterpolation(std::string path, bool raw)
 
         if( FileExist(filename.str()) )
         {
-            log_info("Epairproduction parametrisation tables (dNdx) will be read from file:\t%s",filename.str().c_str());
+            log_debug("Epairproduction parametrisation tables (dNdx) will be read from file:\t%s",filename.str().c_str());
             ifstream input;
 
             if(raw)
@@ -323,7 +323,7 @@ void Epairproduction::EnableDEdxInterpolation(std::string path, bool raw)
 
         if( FileExist(filename.str()) )
         {
-            log_info("Epairproduction parametrisation tables (dEdx) will be read from file:\t%s",filename.str().c_str());
+            log_debug("Epairproduction parametrisation tables (dEdx) will be read from file:\t%s",filename.str().c_str());
             ifstream input;
 
             if(raw)
@@ -424,7 +424,7 @@ void Epairproduction::EnableEpairInterpolation(std::string path, bool raw)
 
         if( FileExist(filename.str()) )
         {
-            log_info("Epairproduction parametrisation tables will be read from file:\t%s",filename.str().c_str());
+            log_debug("Epairproduction parametrisation tables will be read from file:\t%s",filename.str().c_str());
             ifstream input;
 
             if(raw)
@@ -638,7 +638,7 @@ Epairproduction::Epairproduction(const Epairproduction &epair)
     ,integral_for_dEdx_                 ( new Integral(*epair.integral_for_dEdx_) )
     ,prob_for_component_                ( epair.prob_for_component_)
 
-{    
+{
     if(epair.dedx_interpolant_ != NULL)
     {
         dedx_interpolant_ = new Interpolant(*epair.dedx_interpolant_) ;
