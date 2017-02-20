@@ -49,7 +49,7 @@ ptype = dc.I3Particle.TauMinus
 propagator = PROPOSAL.I3PropagatorServicePROPOSAL(type = ptype)
 
 tau = dc.I3Particle()
-tau.type = dc.I3Particle.TauMinus
+tau.type = ptype
 tau.pos = dc.I3Position(0,0,0)
 tau.dir = dc.I3Direction(0,0)
 tau.energy = 100 * I3Units.TeV
@@ -60,10 +60,10 @@ tau_length = list()
 n_daughters = list()
 for i in range(10000):
     tau.length = NaN
-    daughters = dc.I3ParticleVect()
+    # daughters = dc.I3ParticleVect()
     # returns None instead of an I3MMCTrack
     frame = icetray.I3Frame()
-    daughters = propagator.propagate(tau,frame)
+    daughters = propagator.Propagate(tau,frame)
     # length of daughters is always 1
     tau_length.append(tau.length)
     n_daughters.append(len(daughters))
