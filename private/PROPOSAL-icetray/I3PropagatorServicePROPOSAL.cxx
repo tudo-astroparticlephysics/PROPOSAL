@@ -129,31 +129,32 @@ I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(
   , photo_param_(photo_param)
   , shadow_(shadow)
 {
-  // TODO(sudojan): type
+    // TODO(sudojan): type
+    //TODO(mario): particeMass Mo 2017/02/20
 
-  // switch(type) {
-  //   case I3Particle::MuMinus:
-  //   case I3Particle::MuPlus:
-  //     break;
-  //   case I3Particle::TauMinus:
-  //   case I3Particle::TauPlus:
-  //     break;
-  //   case I3Particle::STauMinus:
-  //   case I3Particle::STauPlus:
-  //     if (!std::isfinite(particleMass))
-  //       log_fatal("You asked for staus of non-finite mass %f", particleMass_);
-  //     break;
-  //   case I3Particle::Monopole:
-  //     if (!std::isfinite(particleMass))
-  //       log_fatal("You asked for monopoles of non-finite mass %f", particleMass_);
-  //     break;
-  //   default:
-  //     I3Particle dummy;
-  //     dummy.SetType(type);
-  //     log_fatal("I don't know how to propagate %s", dummy.GetTypeString().c_str());
-  // }
+    // switch(type) {
+    //   case I3Particle::MuMinus:
+    //   case I3Particle::MuPlus:
+    //     break;
+    //   case I3Particle::TauMinus:
+    //   case I3Particle::TauPlus:
+    //     break;
+    //   case I3Particle::STauMinus:
+    //   case I3Particle::STauPlus:
+    //     if (!std::isfinite(particleMass))
+    //       log_fatal("You asked for staus of non-finite mass %f", particleMass_);
+    //     break;
+    //   case I3Particle::Monopole:
+    //     if (!std::isfinite(particleMass))
+    //       log_fatal("You asked for monopoles of non-finite mass %f", particleMass_);
+    //     break;
+    //   default:
+    //     I3Particle dummy;
+    //     dummy.SetType(type);
+    //     log_fatal("I don't know how to propagate %s", dummy.GetTypeString().c_str());
+    // }
 
-  // particle_type = new PROPOSALParticle(GenerateMMCName(type))
+    // particle_type = new PROPOSALParticle(GenerateMMCName(type))
 
 
     // ----[ Check table dir and mediadef ]------------------ //
@@ -198,6 +199,11 @@ I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(
     }
 
     log_info(options.str().c_str());
+
+    // if (std::isinf(particleMass_))
+    // {
+    //     log_fatal("You asked for monopoles of non-finite mass %f", particleMass_);
+    // }
 
     Geometry* geo = new Geometry();
     geo->InitCylinder(0,0,0,cylinderRadius_,0,cylinderHeight_);
