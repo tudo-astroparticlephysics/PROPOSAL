@@ -1,5 +1,6 @@
 
 #include "PROPOSAL-icetray/I3PropagatorServicePROPOSAL.h"
+#include "PROPOSAL-icetray/SimplePropagator.h"
 #include "icetray/load_project.h"
 
 I3_PYTHON_MODULE(PROPOSAL)
@@ -64,5 +65,16 @@ I3_PYTHON_MODULE(PROPOSAL)
 	     ":param nuclearShadowingParametrization: Nuclear shadowing parametrization to use\n"))
 	    .def("set_tear_down_per_call", &I3PropagatorServicePROPOSAL::SetTearDownPerCall)
 	;
+
+    class_<PROPOSAL::SimplePropagator, boost::shared_ptr<PROPOSAL::SimplePropagator>,
+        boost::noncopyable>(
+            "SimplePropagator",
+        init<std::string,I3Particle::ParticleType,double,double,double>(
+        (arg("medium")="ice",
+         arg("type")=I3Particle::MuMinus,
+             arg("ecut")=-1.,arg("vcut")=-1,arg("rho")=-1)))
+        .def("set_seed", &PROPOSAL::SimplePropagator::SetSeed)
+        .def("propagate", &PROPOSAL::SimplePropagator::propagate, (args("p"), arg("distance"), arg("secondaries")=boost::shared_ptr<std::vector<I3Particle> >()))
+    ;
 
 }

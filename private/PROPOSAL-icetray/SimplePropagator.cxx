@@ -22,17 +22,30 @@
 
 namespace PROPOSAL {
 
-SimplePropagator::SimplePropagator(const std::string &medium, double ecut, double vcut, double rho)
-//--- Tomasz
-    //: propagator_(new Propagate(medium, ecut, vcut, "mu", rho))
+std::string
+GetMMCCode(I3Particle::ParticleType pt)
+{
+    std::string code;
+    switch (pt) {
+        case I3Particle::MuMinus:
+        case I3Particle::MuPlus:
+            code = "mu";
+            break;
+        case I3Particle::TauMinus:
+        case I3Particle::TauPlus:
+            code = "tau";
+            break;
+        default:
+            log_fatal_stream("Unsupported particle type: " << pt);
+    }
+    return code;
+}
+
+SimplePropagator::SimplePropagator(const std::string &medium, I3Particle::ParticleType pt, double ecut, double vcut, double rho)
 {
     EnergyCutSettings* cutset = new EnergyCutSettings(ecut,vcut);
     Medium* med = new Medium(medium,rho);
 
-    //Tomasz
-//	propagator_->sdec      = true; // stopped muon decay
-//	propagator_->exactTime = true; // exact local time
-//	propagator_->molieScat = true; // Moliere scattering
     bool sdec      = true; // stopped muon decay
     bool exactTime = true; // exact local time
     bool molieScat = true; // Moliere scattering
@@ -58,44 +71,50 @@ SimplePropagator::SimplePropagator(const std::string &medium, double ecut, doubl
 
     //Implement a function old param -> new param
     int new_ph_param=12;
-    propagator_ = new Propagator(med,cutset,"mu",prefix.str(),molieScat,contiCorr,exactTime,lpm,1,new_ph_param,1.,1.,1.,1.,false,0);
+    propagator_ = new Propagator(med,cutset,GetMMCCode(pt),prefix.str(),molieScat,contiCorr,exactTime,lpm,1,new_ph_param,1.,1.,1.,1.,false,0);
+    propagator_->SetStopping_decay(sdec)
 }
 
 SimplePropagator::~SimplePropagator()
 {
-	delete propagator_;
+    delete propagator_;
 }
 
 void
 SimplePropagator::SetSeed(int seed)
 {
-	MathModel::set_seed(seed);
+    MathModel::set_seed(seed);
 }
 
 void
 SimplePropagator::SetRandomNumberGenerator(I3RandomServicePtr rng)
 {
-	boost::function<double ()> f = boost::bind(&I3RandomService::Uniform, rng, 0, 1);
-	propagator_->SetRandomNumberGenerator(f);
+    boost::function<double ()> f = boost::bind(&I3RandomService::Uniform, rng, 0, 1);
+    propagator_->SetRandomNumberGenerator(f);
 }
 
 inline std::string
 GetMMCName(I3Particle::ParticleType pt)
 {
-	std::string name;
-	
-	switch (pt) {
-		case I3Particle::MuMinus:
-			name="mu-";
-			break;
-		case I3Particle::MuPlus:
-			name="mu+";
-			break;
-		default:
-			break;
-	}
-	
-	return name;
+    std::string name;
+
+    switch (pt) {
+        case I3Particle::MuMinus:
+            name="mu-";
+            break;
+        case I3Particle::MuPlus:
+            name="mu+";
+            break;
+        case I3Particle::TauMinus:
+            name="tau-";
+            break;
+        case I3Particle::TauPlus:
+            name="tau+";
+            break;
+        default:
+            break;
+    }
+    return name;
 }
 
 std::string
