@@ -28,13 +28,14 @@ class SimplePropagator {
 public:
 	/**
 	 * @param[in] medium The name of the medium, e.g. "ice"
+	 * @param[in] type   The family of particles to propagate
 	 * @param[in] ecut   Absolute energy above which an energy
 	 *                   loss is considered stochastic @f$ [MeV] @f$
 	 * @param[in] vcut   Proportion of the current muon energy above
 	 *                   which an energy loss is considered stochastic
 	 * @param[in] rho    Density adjustment factor for the medium
 	 */
-	SimplePropagator(const std::string &medium, double ecut=-1, double vcut=-1, double rho=1.0);
+	SimplePropagator(const std::string &medium, I3Particle::ParticleType type=I3Particle::MuMinus, double ecut=-1, double vcut=-1, double rho=1.0);
 	~SimplePropagator();
 	/**
 	 * @param[in] p        Muon to propagate
@@ -53,7 +54,7 @@ public:
 	 * Set the (global) state of the random number generator used
 	 * in the implementation.
 	 */
-	static void SetSeed(int seed);
+	void SetSeed(int seed);
 	
 	/**
 	 * Use a specific random number generator for this instance
