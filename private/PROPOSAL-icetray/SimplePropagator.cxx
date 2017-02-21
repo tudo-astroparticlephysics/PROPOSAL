@@ -58,20 +58,23 @@ SimplePropagator::SimplePropagator(const std::string &medium, I3Particle::Partic
     bool lpm = true;
     // Kelner, Kokoulin, and Petrukhin parametrization
     int bsform = 1;
-    // Abramowicz Levin Levy Maor parametrization
-    int ph_fam = 3;
-    // ALLM 97 (rather than 91)
-    int ph_param = 2;
-    // Butkevich- Mikhailov nuclear structure function
-    int ph_shad = 2;
+
+    // The old photonuclear parameters are:
+    // // Abramowicz Levin Levy Maor parametrization
+    // int ph_fam = 3;
+    // // ALLM 97 (rather than 91)
+    // int ph_param = 2;
+    // // Butkevich- Mikhailov nuclear structure function
+    // int ph_shad = 2;
+    // The new parameter is
+    int new_ph_param=12;
+    // TODO: Implement a function old param -> new param or just do it in enums
 
     std::ostringstream prefix;
     prefix << getenv("I3_BUILD") << "/MuonGun/resources/tables/icecube";
     //propagator_->interpolate("all", prefix.str());
 
-    //Implement a function old param -> new param
-    int new_ph_param=12;
-    propagator_ = new Propagator(med,cutset,GetMMCCode(pt),prefix.str(),molieScat,contiCorr,exactTime,lpm,1,new_ph_param,1.,1.,1.,1.,false,0);
+    propagator_ = new Propagator(med,cutset,GetMMCCode(pt),prefix.str(),molieScat,contiCorr,exactTime,lpm,bsform,new_ph_param,1.,1.,1.,1.,false,0);
     propagator_->SetStopping_decay(sdec)
 }
 
