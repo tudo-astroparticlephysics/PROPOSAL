@@ -75,7 +75,7 @@ SimplePropagator::SimplePropagator(const std::string &medium, I3Particle::Partic
     //propagator_->interpolate("all", prefix.str());
 
     propagator_ = new Propagator(med,cutset,GetMMCCode(pt),prefix.str(),molieScat,contiCorr,exactTime,lpm,bsform,new_ph_param,1.,1.,1.,1.,false,0);
-    propagator_->SetStopping_decay(sdec)
+    propagator_->SetStopping_decay(sdec);
 }
 
 SimplePropagator::~SimplePropagator()
