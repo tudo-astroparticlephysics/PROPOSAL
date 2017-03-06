@@ -90,7 +90,7 @@ public:
         MuPair = -1005,
         Hadrons = -1006,
         ContinuousEnergyLoss = -1111,
-        Monopol = -41,
+        Monopole = -41,
         STauPlus = -9131,
         StauMinus = -9132
     };

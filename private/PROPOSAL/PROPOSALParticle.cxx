@@ -581,12 +581,12 @@ void PROPOSALParticle::InitParticle(ParticleType type){
             lifetime_   =   LTAU;
             break;
         case ParticleType::StauMinus: //TODO(mario): Handle different masses! Mo 2017/03/06
-            name_ = "tau-";
+            name_ = "stau-";
             mass_       =   MSTAU;
             lifetime_   =   LSTAU;
             break;
         case ParticleType::STauPlus:
-            name_ = "tau+";
+            name_ = "stau+";
             mass_       =   MSTAU;
             lifetime_   =   LSTAU;
             break;
@@ -647,6 +647,11 @@ void PROPOSALParticle::InitParticle(ParticleType type){
             break;
         case ParticleType::EPair:
             name_ = "Epair";
+            mass_       =   0;
+            lifetime_   =   0;
+            break;
+        case ParticleType::Monopole:
+            name_ = "monopole";
             mass_       =   0;
             lifetime_   =   0;
             break;
