@@ -40,7 +40,7 @@ private:
     \param i the nucleon in the medium on which the bremsstahlung occur
     \return  Calculates \f$ a_{1} \f$ see function Sel in this class
     */
-    double KelnerKakoulinPetrukhinParametrization(double v, int i);
+    double KelnerKokoulinPetrukhinParametrization(double v, int i);
 
 //----------------------------------------------------------------------------//
     /*!
