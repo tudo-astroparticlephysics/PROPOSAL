@@ -47,7 +47,7 @@ PROPOSALParticle::PROPOSALParticle( )
     ,charge_                ( 1 )
     ,name_                  ( "mu" )
     ,low_                   ( mass_ )
-    ,type_                  ( 1 )
+    ,type_                  ( ParticleType::MuMinus )
     ,parent_particle_id_    ( 0 )
     ,parent_particle_energy_( 0 )
     ,particle_id_           ( 1 )
@@ -127,7 +127,7 @@ PROPOSALParticle::PROPOSALParticle(const PROPOSALParticle& particle)
 
 PROPOSALParticle::PROPOSALParticle(int parent_particle_id,
                    int particle_id,
-                   string name,
+                   ParticleType type,
                    double x,
                    double y,
                    double z,
@@ -153,7 +153,7 @@ PROPOSALParticle::PROPOSALParticle(int parent_particle_id,
     ,charge_                ( 1 )
     ,name_                  ( "mu" )
     ,low_                   ( mass_ )
-    ,type_                  ( 1 )
+    ,type_                  ( ParticleType::MuMinus )
     ,parent_particle_id_    ( parent_particle_id )
     ,parent_particle_energy_( 0 )
     ,particle_id_           ( particle_id )
@@ -174,31 +174,7 @@ PROPOSALParticle::PROPOSALParticle(int parent_particle_id,
     ,ec_                    ( 0 )
     ,elost_                 ( 0 )
 {
-    if(StartsWith(name,"tau"))
-    {
-        name_        =   "tau";
-        type_        =   2;
-        mass_        =   MTAU;
-        lifetime_    =   LTAU;
-    }
-    else if(StartsWith(name,"e"))
-    {
-        name_        =   "e";
-        type_        =   3;
-        mass_        =   ME;
-        lifetime_    =   -1;
-    }
-    else if(StartsWith(name,"mu"))
-    {
-        name_        =   "mu";
-        type_        =   1;
-        mass_        =   MMU;
-        lifetime_    =   LMU;
-    }
-    else
-    {
-        InitByName(name);
-    }
+    InitParticle(type);
     SetEnergy(energy);
     Location(t, x, y, t, theta, phi);
 
@@ -231,7 +207,7 @@ PROPOSALParticle::PROPOSALParticle(int parent_particle_id,
 
 PROPOSALParticle::PROPOSALParticle(int parent_particle_id,
                    int particle_id,
-                   string name,
+                   ParticleType type,
                    double x,
                    double y,
                    double z,
@@ -257,7 +233,7 @@ PROPOSALParticle::PROPOSALParticle(int parent_particle_id,
     ,charge_                ( 1 )
     ,name_                  ( "mu" )
     ,low_                   ( mass_ )
-    ,type_                  ( 1 )
+    ,type_                  ( ParticleType::MuMinus )
     ,parent_particle_id_    ( parent_particle_id )
     ,parent_particle_energy_( prim_energy )
     ,particle_id_           ( particle_id )
@@ -279,7 +255,7 @@ PROPOSALParticle::PROPOSALParticle(int parent_particle_id,
     ,elost_                 ( 0 )
 
 {
-    InitByName(name);
+    InitParticle(type);
     SetEnergy(energy);
     Location(t, x, y, z, theta, phi);
 }
@@ -289,14 +265,15 @@ PROPOSALParticle::PROPOSALParticle(int parent_particle_id,
 //----------------------------------------------------------------------------//
 
 
-PROPOSALParticle::PROPOSALParticle(string name,
-                   double x,
-                   double y,
-                   double z,
-                   double theta,
-                   double phi,
-                   double energy,
-                   double t)
+PROPOSALParticle::PROPOSALParticle(
+                        ParticleType type,
+                        double x,
+                        double y,
+                        double z,
+                        double theta,
+                        double phi,
+                        double energy,
+                        double t)
 
     :propagated_distance_   ( 0 )
     ,x_                     ( x )
@@ -311,9 +288,9 @@ PROPOSALParticle::PROPOSALParticle(string name,
     ,mass_                  ( MMU )
     ,lifetime_              ( LMU )
     ,charge_                ( 1 )
-    ,name_                  ( name )
+    ,name_                  ( "mu" )
     ,low_                   ( mass_ )
-    ,type_                  ( 1 )
+    ,type_                  ( ParticleType::MuMinus )
     ,parent_particle_id_    ( 0 )
     ,parent_particle_energy_( 0 )
     ,particle_id_           ( 1 )
@@ -334,34 +311,7 @@ PROPOSALParticle::PROPOSALParticle(string name,
     ,ec_                    ( 0 )
     ,elost_                 ( 0 )
 {
-    if(StartsWith(name,"tau"))
-    {
-        name_        =   "tau";
-        type_        =   2;
-        mass_        =   MTAU;
-        lifetime_    =   LTAU;
-        low_         =   mass_;
-    }
-    else if(StartsWith(name,"e"))
-    {
-        name_        =   "e";
-        type_        =   3;
-        mass_        =   ME;
-        lifetime_    =   -1;
-        low_         =   mass_;
-    }
-    else if(StartsWith(name,"mu"))
-    {
-        name_        =   "mu";
-        type_        =   1;
-        mass_        =   MMU;
-        lifetime_    =   LMU;
-        low_         =   mass_;
-    }
-    else
-    {
-        InitByName(name);
-    }
+    InitParticle(type);
     SetEnergy(energy);
     Location(t, x, y, z, theta, phi);
 }
@@ -371,7 +321,7 @@ PROPOSALParticle::PROPOSALParticle(string name,
 //----------------------------------------------------------------------------//
 
 
-PROPOSALParticle::PROPOSALParticle(string name)
+PROPOSALParticle::PROPOSALParticle(ParticleType type)
     :propagated_distance_   ( 0 )
     ,x_                     ( 0 )
     ,y_                     ( 0 )
@@ -385,9 +335,9 @@ PROPOSALParticle::PROPOSALParticle(string name)
     ,mass_                  ( MMU )
     ,lifetime_              ( LMU )
     ,charge_                ( 1 )
-    ,name_                  ( name )
+    ,name_                  ( "mu" )
     ,low_                   ( mass_ )
-    ,type_                  ( 1 )
+    ,type_                  ( ParticleType::MuMinus )
     ,parent_particle_id_    ( 0 )
     ,parent_particle_energy_( 0 )
     ,particle_id_           ( 1 )
@@ -408,34 +358,7 @@ PROPOSALParticle::PROPOSALParticle(string name)
     ,ec_                    ( 0 )
     ,elost_                 ( 0 )
 {
-    if(StartsWith(name,"tau"))
-    {
-        name_        =   "tau";
-        type_        =   2;
-        mass_        =   MTAU;
-        lifetime_    =   LTAU;
-        low_         =   mass_;
-    }
-    else if(StartsWith(name,"e"))
-    {
-        name_        =   "e";
-        type_        =   3;
-        mass_        =   ME;
-        lifetime_    =   -1;
-        low_         =   mass_;
-    }
-    else if(StartsWith(name,"mu"))
-    {
-        name_        =   "mu";
-        type_        =   1;
-        mass_        =   MMU;
-        lifetime_    =   LMU;
-        low_         =   mass_;
-    }
-    else
-    {
-        InitByName(name);
-    }
+    InitParticle(type);
     SetEnergy(0);
     Location(0, 0, 0, 0, 0, 0);
 }
@@ -618,147 +541,125 @@ void PROPOSALParticle::swap(PROPOSALParticle &particle)
 //----------------------------------------------------------------------------//
 
 
-void PROPOSALParticle::InitByName(string aname){
+void PROPOSALParticle::InitParticle(ParticleType type){
 
-    log_debug("Particle initialized in InitByName: %s", aname.c_str());
+    //TODO(mario): Output Mo 2017/03/06
+    // log_debug("Particle initialized in InitByName: %s", aname.c_str());
 
-    string name=aname.length()==0?"?":aname[0]=='a'?aname.substr(1):aname;
+    // string name=aname.length()==0?"?":aname[0]=='a'?aname.substr(1):aname;
 
-    if(name.compare("tau")==0 || name.compare("tau-")==0 || name.compare("tau+")==0)
+    switch (type)
     {
-        if(name.compare("tau+")==0)
-        {
-            type_    =   -33;
-        }
-        else
-        {
-            type_    =   -34;
-        }
-
-        mass_       =   MTAU;
-        lifetime_   =   LTAU;
+        case ParticleType::MuMinus:
+            name_ = "mu-";
+            mass_       =   MMU;
+            lifetime_   =   LMU;
+            break;
+        case ParticleType::MuPlus:
+            name_ = "mu+";
+            mass_       =   MMU;
+            lifetime_   =   LMU;
+            break;
+        case ParticleType::EMinus:
+            name_ = "e-";
+            mass_       =   ME;
+            lifetime_   =   -1;
+            break;
+        case ParticleType::EPlus:
+            name_ = "e+";
+            mass_       =   ME;
+            lifetime_   =   -1;
+            break;
+        case ParticleType::TauMinus:
+            name_ = "tau-";
+            mass_       =   MTAU;
+            lifetime_   =   LTAU;
+            break;
+        case ParticleType::TauPlus:
+            name_ = "tau+";
+            mass_       =   MTAU;
+            lifetime_   =   LTAU;
+            break;
+        case ParticleType::StauMinus: //TODO(mario): Handle different masses! Mo 2017/03/06
+            name_ = "tau-";
+            mass_       =   MSTAU;
+            lifetime_   =   LSTAU;
+            break;
+        case ParticleType::STauPlus:
+            name_ = "tau+";
+            mass_       =   MSTAU;
+            lifetime_   =   LSTAU;
+            break;
+        case ParticleType::NuE:
+            name_ = "nu_e";
+            mass_       =   0;
+            lifetime_   =   -1;
+            break;
+        case ParticleType::NuEBar:
+            name_ = "~nu_e";
+            mass_       =   0;
+            lifetime_   =   -1;
+            break;
+        case ParticleType::NuMu:
+            name_ = "nu_mu";
+            mass_       =   0;
+            lifetime_   =   -1;
+            break;
+        case ParticleType::NuMuBar:
+            name_ = "~nu_mu";
+            mass_       =   0;
+            lifetime_   =   -1;
+            break;
+        case ParticleType::NuTau:
+            name_ = "nu_tau";
+            mass_       =   0;
+            lifetime_   =   -1;
+            break;
+        case ParticleType::NuTauBar:
+            name_ = "~nu_tau";
+            mass_       =   0;
+            lifetime_   =   -1;
+            break;
+        case ParticleType::DeltaE:
+            name_ = "DeltaE";
+            mass_       =   0;
+            lifetime_   =   0;
+            break;
+        case ParticleType::Brems:
+            name_ = "Brems";
+            mass_       =   0;
+            lifetime_   =   0;
+            break;
+        case ParticleType::NuclInt:
+            name_ = "NuclInt";
+            mass_       =   0;
+            lifetime_   =   0;
+            break;
+        case ParticleType::Hadrons:
+            name_ = "Hadrons";
+            mass_       =   0;
+            lifetime_   =   0;
+            break;
+        case ParticleType::ContinuousEnergyLoss:
+            name_ = "ContinuousEnergyLoss";
+            mass_       =   0;
+            lifetime_   =   0;
+            break;
+        case ParticleType::EPair:
+            name_ = "Epair";
+            mass_       =   0;
+            lifetime_   =   0;
+            break;
+        default:
+            type = ParticleType::unknown;
+            name_ = "Unkown";
+            mass_ = 0;
+            lifetime_ = 0;
+            break;
     }
-    else if(name.compare("mu")==0 || name.compare("mu-")==0 || name.compare("mu+")==0)
-    {
-        if(name.compare("mu+")==0)
-        {
-            type_    =   -5;
-        }
-        else
-        {
-            type_    =   -6;
-        }
 
-        mass_       =   MMU;
-        lifetime_   =   LMU;
-    }
-    else if(StartsWith(name,"stau") )
-    {
-        if((int)(name.find("stau+"))!=-1)
-        {
-            type_    =   -9131;
-        }
-        else
-        {
-            type_    =   -9132;
-        }
-
-        try
-        {
-            mass_   =   strtod(name.substr(5).c_str(),NULL)*1.e3;
-        }
-        catch(exception &e)
-        {
-            mass_   =   0;
-        }
-
-        if(mass_<=0)
-        {
-            mass_   =   MSTAU;
-        }
-
-        lifetime_   =   LSTAU;
-    }
-    else if(name.compare("e")==0 || name.compare("e-")==0 || name.compare("e+")==0)
-    {
-        if(name.compare("e+")==0)
-        {
-            type_    =   -2;
-        }
-        else
-        {
-            type_    =   -3;
-        }
-
-        mass_       =   ME;
-        lifetime_   =   -1;
-    }
-    else if((int)(name.find("nu_"))!=-1)
-    {
-        if(name.compare("nu_e")==0)
-        {
-            type_    =   -201;
-        }
-        else if(name.compare("~nu_e")==0)
-        {
-            type_    =   -204;
-        }
-        else if(name.compare("nu_mu")==0)
-        {
-            type_    =   -202;
-        }
-        else if(name.compare("~nu_mu")==0)
-        {
-            type_    =   -205;
-        }
-        else if(name.compare("nu_tau")==0)
-        {
-            type_    =   -203;
-        }
-        else if(name.compare("~nu_tau")==0)
-        {
-            type_    =   -206;
-        }
-
-        mass_       =    0;
-        lifetime_   =   -1;
-    }
-    else
-    {
-        if(name.compare("delta")==0)
-        {
-            type_    =   -1002;
-        }
-        else if(name.compare("brems")==0)
-        {
-            type_    =   -1001;
-        }
-        else if(name.compare("munu")==0)
-        {
-            type_    =   -1004;
-        }
-        else if(name.compare("epair")==0)
-        {
-            type_    =   -1003;
-        }
-        else if(name.compare("hadr")==0)
-        {
-            type_    =   -1006;
-        }
-        else if(name.compare("conti")==0)
-        {
-            type_    =   -1111;
-        }
-        else
-        {
-            type_    =   0;
-        }
-
-        mass_       =   0;
-        lifetime_   =   0;
-    }
-    name_   =   name;
-    low_    =   mass_;
+    type_ = type;
+    low_ = mass_;
 }
 
 
@@ -906,7 +807,7 @@ void PROPOSALParticle::SetLow(double low){
     low_ = low;
 }
 
-void PROPOSALParticle::SetType(int type){
+void PROPOSALParticle::SetType(ParticleType type){
     type_ = type;
 }
 
