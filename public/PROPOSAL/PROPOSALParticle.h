@@ -80,6 +80,75 @@ private:
 public:
 
     /**
+     * Particle enums
+
+    */
+    enum ParticleType { // NB: These match the PDG codes. Keep it that way!
+        unknown = 0,
+        Gamma = 22,
+
+        EPlus = -11,
+        EMinus = 11,
+        MuPlus = -13,
+        MuMinus = 13,
+        TauPlus = -15,
+        TauMinus = 15,
+        NuE = 12,
+        NuEBar = -12,
+        NuMu = 14,
+        NuMuBar = -14,
+        NuTau = 16,
+        NuTauBar = -16,
+
+        // TODO: Ist das Kunst, oder kann das weg?
+        // Pi0 = 111,
+        // PiPlus = 211,
+        // PiMinus = -211,
+        // K0_Long = 130,
+        // KPlus = 321,
+        // KMinus = -321,
+        // Neutron = 2112,
+        // PPlus = 2212,
+        // PMinus = -2212,
+        // K0_Short = 310,
+        // Eta = 221,
+        // Lambda = 3122,
+        // SigmaPlus = 3222,
+        // Sigma0 = 3212,
+        // SigmaMinus = 3112,
+        // Xi0 = 3322,
+        // XiMinus = 3312,
+        // OmegaMinus = 3334,
+        // NeutronBar = -2112,
+        // LambdaBar = -3122,
+        // SigmaMinusBar = -3222,
+        // Sigma0Bar = -3212,
+        // SigmaPlusBar = -3112,
+        // Xi0Bar = -3322,
+        // XiPlusBar = -3312,
+        // OmegaPlusBar = -3334,
+        // DPlus = 411,
+        // DMinus = -411,
+        // D0 = 421,
+        // D0Bar = -421,
+        // DsPlus = 431,
+        // DsMinusBar = -431,
+        // LambdacPlus = 4122,
+        // WPlus = 24,
+        // WMinus = -24,
+        // Z0 = 23,
+
+        Brems = -1001,
+        DeltaE = -1002,
+        EPair = -1003,
+        MuPair = -1005,
+        Hadrons = -1006,
+        ContinuousEnergyLoss = -1111,
+        Monopol = -41,
+        STauPlus = -9131,
+        StauMinus = -9132,
+    };
+    /**
      * \brief Default Constructor
      *
      * Constructor which sets "default" settings.
