@@ -768,7 +768,7 @@ ostream& operator<<(std::ostream& os, Bremsstrahlung const &brems)
 //----------------------------------------------------------------------------//
 
 
-double Bremsstrahlung::KelnerKakoulinPetrukhinParametrization(double v, int i)
+double Bremsstrahlung::KelnerKokoulinPetrukhinParametrization(double v, int i)
 {
     double Z3       =   0;
     double result   =   0;
@@ -1066,7 +1066,7 @@ double Bremsstrahlung::ElasticBremsstrahlungCrossSection(double v, int i)
     {
         case 1:
         {
-            result  =   KelnerKakoulinPetrukhinParametrization(v, i);
+            result  =   KelnerKokoulinPetrukhinParametrization(v, i);
         }break;
 
         case 2:
