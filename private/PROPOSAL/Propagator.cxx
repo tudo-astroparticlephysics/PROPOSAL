@@ -1165,7 +1165,7 @@ Propagator::Propagator()
     ,scattering_model_          (-1)
     ,current_collection_        (NULL)
 {
-    particle_              = new PROPOSALParticle("mu");
+    particle_              = new PROPOSALParticle(ParticleType::MuMinus);
     detector_              = new Geometry();
     detector_->InitSphere(0,0,0,1e18,0);
     InitDefaultCollection(detector_);
@@ -1178,7 +1178,7 @@ Propagator::Propagator()
 
 Propagator::Propagator(Medium* medium,
                        EnergyCutSettings* cuts,
-                       string particle_type,
+                       ParticleType particle_type,
                        string path_to_tables,
                        bool moliere,
                        bool continuous_rand,
@@ -1755,9 +1755,9 @@ void Propagator::InitProcessCollections(ifstream &file)
 
             Medium *med     =   new Medium(name,density_correction);
 
-            PROPOSALParticle *mu    =   new PROPOSALParticle("mu");
-            PROPOSALParticle *tau   =   new PROPOSALParticle("tau");
-            PROPOSALParticle *e     =   new PROPOSALParticle("e");
+            PROPOSALParticle *mu    =   new PROPOSALParticle(ParticleType::MuMinus);
+            PROPOSALParticle *tau   =   new PROPOSALParticle(ParticleType::TauMinus);
+            PROPOSALParticle *e     =   new PROPOSALParticle(ParticleType::EMinus);
 
             EnergyCutSettings *inside;
             EnergyCutSettings *infront;
