@@ -23,66 +23,11 @@
 class PROPOSALParticle
 {
 
-
-private:
-
-    double propagated_distance_; //!< propagation distance [cm]
-    double x_;                   //!< x-coordinate [cm]
-    double y_;                   //!< y-coordinate [cm]
-    double z_;                   //!< z-coordinate [cm]
-    double t_;                   //!< age [sec]
-    double theta_;               //!< zenith of the momentum in [deg]
-    double phi_;                 //!< azimuth of the momentum in [deg]
-
-    long double costh_;          //!< cos(theta)
-    long double sinth_;          //!< sin(theta)
-    long double cosph_;          //!< cos(phi)
-    long double sinph_;          //!< sin(phi)
-
-    double momentum_;            //!< momentum [MeV]
-    double square_momentum_;     //!< momentum square [MeV]
-    double energy_;              //!< energy [MeV]
-    double mass_;                //!< mass [MeV]
-    double lifetime_;            //!< lifetime [sec]
-    double charge_;              //!< charge
-
-    std::string name_;           //!< name of the particle - Presetted to "mu"
-    double low_;                 //!< energy below which the particle is lost [MeV]
-    int type_;                   //!< particle type: 1 for muon, 2 for tau, 3 for electron
-
-    int parent_particle_id_;        //!< parent particle id
-    double parent_particle_energy_; //!< energy of the parent particle
-    int particle_id_;               //!< particle id
-
-    double xi_;                  //!< x-coordinate entry Point [cm]
-    double yi_;                  //!< y-coordinate entry Point [cm]
-    double zi_;                  //!< z-coordinate entry Point [cm]
-    double ti_;                  //!< t-coordinate entry Point [sec]
-    double ei_;                  //!< energy at entry point [MeV]
-
-    double xf_;                  //!< x-coordinate exit Point [cm]
-    double yf_;                  //!< y-coordinate exit Point [cm]
-    double zf_;                  //!< z-coordinate exit Point [cm]
-    double tf_;                  //!< t-coordinate exit Point [sec]
-    double ef_;                  //!< energy at exit point [MeV]
-
-    double xc_;                  //!< x-coordinate at point of closest approach [cm]
-    double yc_;                  //!< y-coordinate at point of closest approach [cm]
-    double zc_;                  //!< z-coordinate at point of closest approach [cm]
-    double tc_;                  //!< t-coordinate at point of closest approach [sec]
-    double ec_;                  //!< energy at at point of closest approach [MeV]
-
-    double elost_;               //!< energy lost in the detector volume [MeV]
-
-
-//----------------------------------------------------------------------------//
-
 public:
 
-    /**
-     * Particle enums
-
-    */
+    // ----------------------------------------------------------------------------
+    /// @brief Particle enums
+    // ----------------------------------------------------------------------------
     enum ParticleType { // NB: These match the PDG codes. Keep it that way!
         unknown = 0,
         Gamma = 22,
@@ -141,13 +86,70 @@ public:
         Brems = -1001,
         DeltaE = -1002,
         EPair = -1003,
+        NuclInt = -1004,
         MuPair = -1005,
         Hadrons = -1006,
         ContinuousEnergyLoss = -1111,
         Monopol = -41,
         STauPlus = -9131,
-        StauMinus = -9132,
+        StauMinus = -9132
     };
+
+private:
+
+    double propagated_distance_; //!< propagation distance [cm]
+    double x_;                   //!< x-coordinate [cm]
+    double y_;                   //!< y-coordinate [cm]
+    double z_;                   //!< z-coordinate [cm]
+    double t_;                   //!< age [sec]
+    double theta_;               //!< zenith of the momentum in [deg]
+    double phi_;                 //!< azimuth of the momentum in [deg]
+
+    long double costh_;          //!< cos(theta)
+    long double sinth_;          //!< sin(theta)
+    long double cosph_;          //!< cos(phi)
+    long double sinph_;          //!< sin(phi)
+
+    double momentum_;            //!< momentum [MeV]
+    double square_momentum_;     //!< momentum square [MeV]
+    double energy_;              //!< energy [MeV]
+    double mass_;                //!< mass [MeV]
+    double lifetime_;            //!< lifetime [sec]
+    double charge_;              //!< charge
+
+    std::string name_;           //!< name of the particle - Presetted to "mu"
+    double low_;                 //!< energy below which the particle is lost [MeV]
+    ParticleType type_;          //!< particle type: 1 for muon, 2 for tau, 3 for electron
+
+    int parent_particle_id_;        //!< parent particle id
+    double parent_particle_energy_; //!< energy of the parent particle
+    int particle_id_;               //!< particle id
+
+    double xi_;                  //!< x-coordinate entry Point [cm]
+    double yi_;                  //!< y-coordinate entry Point [cm]
+    double zi_;                  //!< z-coordinate entry Point [cm]
+    double ti_;                  //!< t-coordinate entry Point [sec]
+    double ei_;                  //!< energy at entry point [MeV]
+
+    double xf_;                  //!< x-coordinate exit Point [cm]
+    double yf_;                  //!< y-coordinate exit Point [cm]
+    double zf_;                  //!< z-coordinate exit Point [cm]
+    double tf_;                  //!< t-coordinate exit Point [sec]
+    double ef_;                  //!< energy at exit point [MeV]
+
+    double xc_;                  //!< x-coordinate at point of closest approach [cm]
+    double yc_;                  //!< y-coordinate at point of closest approach [cm]
+    double zc_;                  //!< z-coordinate at point of closest approach [cm]
+    double tc_;                  //!< t-coordinate at point of closest approach [sec]
+    double ec_;                  //!< energy at at point of closest approach [MeV]
+
+    double elost_;               //!< energy lost in the detector volume [MeV]
+
+
+//----------------------------------------------------------------------------//
+
+public:
+
     /**
      * \brief Default Constructor
      *
@@ -186,7 +188,7 @@ public:
 
     PROPOSALParticle(int parent_particle_id,
              int particle_id,
-             std::string name,
+             ParticleType type,
              double x,
              double y,
              double z,
@@ -217,7 +219,7 @@ public:
      */
     PROPOSALParticle(int parent_particle_id,
              int particle_id,
-             std::string name,
+             ParticleType type,
              double x,
              double y,
              double z,
@@ -243,14 +245,15 @@ public:
      * \param energy    particle energy
      * \param t         particle time
      */
-    PROPOSALParticle(std::string name,
-             double x,
-             double y,
-             double z,
-             double theta,
-             double phi,
-             double energy,
-             double t);
+    PROPOSALParticle(
+            ParticleType type,
+            double x,
+            double y,
+            double z,
+            double theta,
+            double phi,
+            double energy,
+            double t);
 
 //----------------------------------------------------------------------------//
     /*!
@@ -262,7 +265,7 @@ public:
      *
      * \param name     particle name
      */
-    PROPOSALParticle(std::string name);
+    PROPOSALParticle(ParticleType type);
 
 //----------------------------------------------------------------------------//
     /*!
@@ -271,7 +274,8 @@ public:
      * \param name      particle type
      */
 
-    void InitByName(std::string name);
+    // void InitByName(ParticleType type);
+    void InitParticle(ParticleType type);
 
 
 //----------------------------------------------------------------------------//
@@ -322,7 +326,7 @@ public:
     void SetCharge(double charge);
     void SetName(std::string name);
     void SetLow(double low);
-    void SetType(int type);
+    void SetType(ParticleType type);
     void SetParentParticleId(int parent_particle_id);
     void SetParentParticleEnergy(double parent_particle_energy);
     void SetParticleId(int particle_id);
@@ -386,7 +390,7 @@ public:
 //----------------------------------------------------------------------------//
     double GetLow() const{return low_;}
 //----------------------------------------------------------------------------//
-    int GetType() const{return type_;}
+    ParticleType GetType() const{return type_;}
 //----------------------------------------------------------------------------//
     int GetParentParticleId() const{return parent_particle_id_;}
 //----------------------------------------------------------------------------//
