@@ -122,7 +122,7 @@ vector<PROPOSALParticle*> Propagator::Propagate( PROPOSALParticle *particle, dou
         for(unsigned int i = 0 ; i < collections_.size() ; i++)
         {
 
-            if(particle->GetType().compare(collections_.at(i)->GetParticle()->GetType())!=0 )
+            if (particle->GetType() != collections_.at(i)->GetParticle()->GetType())
                 continue;
 
             if(detector_->IsParticleInfront(particle))
@@ -568,7 +568,7 @@ void Propagator::ChooseCurrentCollection(PROPOSALParticle* particle)
     {
         collections_.at(i)->RestoreBackup_particle();
 
-        if(particle->GetType().compare(collections_.at(i)->GetParticle()->GetType())!=0 )
+        if(particle->GetType() != collections_.at(i)->GetParticle()->GetType())
             continue;
 
         if(detector_->IsParticleInfront(particle))
