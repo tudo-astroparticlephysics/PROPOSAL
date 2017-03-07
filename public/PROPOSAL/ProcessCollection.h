@@ -277,9 +277,9 @@ public:
      *
      *  \return pair of energy loss [MeV] and kind of interaction
      */
-    std::pair<double,std::string> MakeStochasticLoss();
+    std::pair<double, PROPOSALParticle::ParticleType> MakeStochasticLoss();
 
-    std::pair<double,std::string> MakeStochasticLoss(double rnd1,double rnd2, double rnd3);
+    std::pair<double, PROPOSALParticle::ParticleType> MakeStochasticLoss(double rnd1,double rnd2, double rnd3);
 //----------------------------------------------------------------------------//
 
     /**
@@ -287,9 +287,9 @@ public:
      *
      *  \return pair of product energy [MeV] and kind of product
      */
-    std::pair<double,std::string> MakeDecay();
+    std::pair<double, PROPOSALParticle::ParticleType> MakeDecay();
 
-    std::pair<double,std::string> MakeDecay(double rnd1,double rnd2, double rnd3);
+    std::pair<double, PROPOSALParticle::ParticleType> MakeDecay(double rnd1,double rnd2, double rnd3);
 //----------------------------------------------------------------------------//
     /**
      * Enables the Interpolation including dEdx and dNdx for

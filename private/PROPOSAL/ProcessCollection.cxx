@@ -243,7 +243,7 @@ double ProcessCollection::CalculateFinalEnergy(double ei, double rnd, bool parti
 //----------------------------------------------------------------------------//
 
 
-pair<double,string> ProcessCollection::MakeStochasticLoss()
+pair<double, PROPOSALParticle::ParticleType> ProcessCollection::MakeStochasticLoss()
 {
     return this->MakeStochasticLoss(MathModel::RandomDouble(),MathModel::RandomDouble(),MathModel::RandomDouble());
 }
@@ -253,7 +253,7 @@ pair<double,string> ProcessCollection::MakeStochasticLoss()
 //----------------------------------------------------------------------------//
 
 
-pair<double,string> ProcessCollection::MakeStochasticLoss(double rnd1,double rnd2, double rnd3)
+pair<double, PROPOSALParticle::ParticleType> ProcessCollection::MakeStochasticLoss(double rnd1,double rnd2, double rnd3)
 {
     double total_rate          =    0;
     double total_rate_weighted =    0;
@@ -334,7 +334,7 @@ pair<double,string> ProcessCollection::MakeStochasticLoss(double rnd1,double rnd
 //----------------------------------------------------------------------------//
 
 
-pair<double,string> ProcessCollection::MakeDecay()
+pair<double, PROPOSALParticle::ParticleType> ProcessCollection::MakeDecay()
 {
     return MakeDecay(MathModel::RandomDouble(),MathModel::RandomDouble(),MathModel::RandomDouble());
 }
@@ -345,11 +345,11 @@ pair<double,string> ProcessCollection::MakeDecay()
 
 
 
-pair<double,string> ProcessCollection::MakeDecay(double rnd1,double rnd2, double rnd3)
+pair<double, PROPOSALParticle::ParticleType> ProcessCollection::MakeDecay(double rnd1,double rnd2, double rnd3)
 {
-    pair<double,string> decay;
+    pair<double, PROPOSALParticle::ParticleType> decay;
 
-    if(particle_->GetType() ==2)
+    if(particle_->GetType() == PROPOSALParticle::ParticleType::TauPlus || particle_->GetType() == PROPOSALParticle::ParticleType::TauMinus)
     {
         decay.first     =   decay_->CalculateProductEnergy(rnd1, rnd2, rnd3);
     }

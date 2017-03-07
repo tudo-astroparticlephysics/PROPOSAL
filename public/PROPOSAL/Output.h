@@ -189,7 +189,7 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    void FillSecondaryVector(PROPOSALParticle *particle, int secondary_id, std::pair<double,std::string> energy_loss, double distance);
+    void FillSecondaryVector(PROPOSALParticle *particle, int secondary_id, std::pair<double, PROPOSALParticle::ParticleType> energy_loss, double distance);
 
 //----------------------------------------------------------------------------//
 
