@@ -509,6 +509,7 @@ Bremsstrahlung::Bremsstrahlung( )
     do_dedx_Interpolation_  = false;
     do_dndx_Interpolation_  = false;
     name_                   = "Bremsstrahlung";
+    type_                   = PROPOSALParticle::ParticleType::Brems;
 
 }
 
@@ -572,6 +573,7 @@ Bremsstrahlung::Bremsstrahlung(PROPOSALParticle* particle,
     ,prob_for_component_    ( )
 {
     name_                       = "Bremsstrahlung";
+    type_                       = PROPOSALParticle::ParticleType::Brems;
     vMax_                       = 0;
     vUp_                        = 0;
     vMin_                       = 0;

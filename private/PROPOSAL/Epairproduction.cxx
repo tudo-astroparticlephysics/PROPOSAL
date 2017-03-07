@@ -620,6 +620,7 @@ Epairproduction::Epairproduction()
     integral_for_dEdx_    = new Integral(IROMB, IMAXS, IPREC);
     dedx_interpolant_     = NULL;
     name_                 = "Epairproduction";
+    type_                 = PROPOSALParticle::ParticleType::EPair;
 
 }
 
@@ -691,6 +692,7 @@ Epairproduction::Epairproduction(PROPOSALParticle* particle,
     ,prob_for_component_    ( )
 {
     name_                       = "Epairproduction";
+    type_                       = PROPOSALParticle::ParticleType::EPair;
     vMax_                       = 0;
     vUp_                        = 0;
     vMin_                       = 0;
