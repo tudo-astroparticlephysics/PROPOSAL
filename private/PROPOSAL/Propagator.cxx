@@ -122,7 +122,7 @@ vector<PROPOSALParticle*> Propagator::Propagate( PROPOSALParticle *particle, dou
         for(unsigned int i = 0 ; i < collections_.size() ; i++)
         {
 
-            if(particle->GetName().compare(collections_.at(i)->GetParticle()->GetName())!=0 )
+            if(particle->GetType().compare(collections_.at(i)->GetParticle()->GetType())!=0 )
                 continue;
 
             if(detector_->IsParticleInfront(particle))
@@ -328,7 +328,7 @@ double Propagator::Propagate( double distance )
     double  final_energy    =   particle_->GetEnergy();
 
     pair<double,string> decay;
-    pair<double,string> energy_loss;
+    pair<double,PROPOSALParticle::ParticleType> energy_loss;
 
 
     int secondary_id    =   0;
@@ -419,7 +419,7 @@ double Propagator::Propagate( double distance )
             NumInt++;//TOMASZ
             energy_loss     =   current_collection_->MakeStochasticLoss();
             final_energy    -=  energy_loss.first;
-            log_debug("Energyloss: %d\t%d\t%d\t%d\t%d", energy_loss.first, energy_loss.second, particle_->GetX(), particle_->GetY(), particle_->GetZ());
+            log_debug("Energyloss: %d\t%d\t%d\t%d\t%d", energy_loss.first, energy_loss.second->GetName(), particle_->GetX(), particle_->GetY(), particle_->GetZ());
             secondary_id    =   particle_->GetParticleId() + 1;
             Output::getInstance().FillSecondaryVector(particle_, secondary_id, energy_loss, 0);
         }
@@ -568,7 +568,7 @@ void Propagator::ChooseCurrentCollection(PROPOSALParticle* particle)
     {
         collections_.at(i)->RestoreBackup_particle();
 
-        if(particle->GetName().compare(collections_.at(i)->GetParticle()->GetName())!=0 )
+        if(particle->GetType().compare(collections_.at(i)->GetParticle()->GetType())!=0 )
             continue;
 
         if(detector_->IsParticleInfront(particle))
@@ -1165,7 +1165,7 @@ Propagator::Propagator()
     ,scattering_model_          (-1)
     ,current_collection_        (NULL)
 {
-    particle_              = new PROPOSALParticle(ParticleType::MuMinus);
+    particle_              = new PROPOSALParticle(PROPOSALParticle::ParticleType::MuMinus);
     detector_              = new Geometry();
     detector_->InitSphere(0,0,0,1e18,0);
     InitDefaultCollection(detector_);
@@ -1178,7 +1178,7 @@ Propagator::Propagator()
 
 Propagator::Propagator(Medium* medium,
                        EnergyCutSettings* cuts,
-                       ParticleType particle_type,
+                       PROPOSALParticle::ParticleType particle_type,
                        string path_to_tables,
                        bool moliere,
                        bool continuous_rand,
@@ -1755,9 +1755,9 @@ void Propagator::InitProcessCollections(ifstream &file)
 
             Medium *med     =   new Medium(name,density_correction);
 
-            PROPOSALParticle *mu    =   new PROPOSALParticle(ParticleType::MuMinus);
-            PROPOSALParticle *tau   =   new PROPOSALParticle(ParticleType::TauMinus);
-            PROPOSALParticle *e     =   new PROPOSALParticle(ParticleType::EMinus);
+            PROPOSALParticle *mu    =   new PROPOSALParticle(PROPOSALParticle::ParticleType::MuMinus);
+            PROPOSALParticle *tau   =   new PROPOSALParticle(PROPOSALParticle::ParticleType::TauMinus);
+            PROPOSALParticle *e     =   new PROPOSALParticle(PROPOSALParticle::ParticleType::EMinus);
 
             EnergyCutSettings *inside;
             EnergyCutSettings *infront;
