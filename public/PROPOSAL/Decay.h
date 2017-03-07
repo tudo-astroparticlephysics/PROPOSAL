@@ -25,7 +25,8 @@ protected:
     RootFinder* root_finder_;
     PROPOSALParticle*   particle_;
     PROPOSALParticle*   backup_particle_;
-    std::string out_;
+    // std::string out_;
+    PROPOSALParticle::ParticleType out_;
 
     bool        store_neutrinos_;
     double      multiplier_;
@@ -85,7 +86,7 @@ public:
 //----------------------------------------------------------------------------//
 
     // Getter
-    std::string GetOut() const
+    PROPOSALParticle::ParticleType GetOut() const
     {
         return out_;
     }
@@ -111,7 +112,7 @@ public:
     }
 //----------------------------------------------------------------------------//
     //Setter
-    void SetOut(std::string out);
+    void SetOut(PROPOSALParticle::ParticleType out);
 
     void SetRootFinder(RootFinder *root_finder);
 
