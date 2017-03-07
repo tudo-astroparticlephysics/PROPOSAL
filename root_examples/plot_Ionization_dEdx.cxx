@@ -42,9 +42,9 @@ int main()
 
     TFile *file     =   new TFile("Ionization_dEdx.root","RECREATE");
 
-    PROPOSALParticle *mu    =   new PROPOSALParticle("mu");
-    PROPOSALParticle *tau   =   new PROPOSALParticle("tau");
-    PROPOSALParticle *e     =   new PROPOSALParticle("e");
+    PROPOSALParticle *mu    =   new PROPOSALParticle(PROPOSALParticle::ParticleType::MuMinus);
+    PROPOSALParticle *tau   =   new PROPOSALParticle(PROPOSALParticle::ParticleType::TauMinus);
+    PROPOSALParticle *e     =   new PROPOSALParticle(PROPOSALParticle::ParticleType::EMinus);
 
     Medium  *med1   =   new Medium("hydrogen",1.);
     Medium  *med2   =   new Medium("water",1.);
@@ -168,7 +168,7 @@ int main()
 
     for(unsigned int i = 0 ; i < graphs.size() ; i++)
     {
-        if(ioniz.at(i)->GetParticle()->GetName().compare("mu")==0)
+        if(ioniz.at(i)->GetParticle()->GetType() == PROPOSALParticle::ParticleType::MuMinus)
         {
             muons_gr->Add(graphs.at(i),"P");
             muons_leg->AddEntry(graphs.at(i),ioniz.at(i)->GetMedium()->GetName().c_str(),"p");
@@ -187,7 +187,7 @@ int main()
             }
 
         }
-        if(ioniz.at(i)->GetParticle()->GetName().compare("tau")==0)
+        if(ioniz.at(i)->GetParticle()->GetType() == PROPOSALParticle::ParticleType::TauMinus)
         {
             taus_gr->Add(graphs.at(i),"P");
             taus_leg->AddEntry(graphs.at(i),ioniz.at(i)->GetMedium()->GetName().c_str(),"p");
@@ -205,7 +205,7 @@ int main()
                 graphs.at(i)->SetMarkerColor(kGreen);
             }
         }
-        if(ioniz.at(i)->GetParticle()->GetName().compare("e")==0)
+        if(ioniz.at(i)->GetParticle()->GetType() == PROPOSALParticle::ParticleType::EMinus)
         {
             electrons_gr->Add(graphs.at(i),"P");
             electrons_leg->AddEntry(graphs.at(i),ioniz.at(i)->GetMedium()->GetName().c_str(),"p");
