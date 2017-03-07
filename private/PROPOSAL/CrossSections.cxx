@@ -64,7 +64,7 @@ CrossSections::CrossSections(PROPOSALParticle* particle,
 
 
 CrossSections::CrossSections(const CrossSections& crossSections)
-    :name_                     ( crossSections.name_ )
+    :type_                     ( crossSections.type_ )
     ,vMax_                     ( crossSections.vMax_ )
     ,vUp_                      ( crossSections.vUp_ )
     ,vMin_                     ( crossSections.vMin_ )
@@ -110,7 +110,7 @@ bool CrossSections::operator==(const CrossSections &crossSections) const
     if( *particle_                != *crossSections.particle_ )             return false;
     if( *medium_                  != *crossSections.medium_ )               return false;
     if( sum_of_rates_             != crossSections.sum_of_rates_ )          return false;
-    if( name_.compare(crossSections.name_) != 0 )                           return false;
+    if( type_ != crossSections.type_)                                       return false;
 
 
 
