@@ -17,9 +17,9 @@ int main()
 {
     TFile *file     =   new TFile("Bremsstrahlung_dNdx_different_ecut.root","RECREATE");
 
-    PROPOSALParticle *mu    =   new PROPOSALParticle("mu");
-    PROPOSALParticle *tau   =   new PROPOSALParticle("tau");
-    PROPOSALParticle *e     =   new PROPOSALParticle("e");
+    PROPOSALParticle *mu    =   new PROPOSALParticle(PROPOSALParticle::ParticleType::MuMinus);
+    PROPOSALParticle *tau   =   new PROPOSALParticle(PROPOSALParticle::ParticleType::TauMinus);
+    PROPOSALParticle *e     =   new PROPOSALParticle(PROPOSALParticle::ParticleType::EMinus);
 
     Medium  *med   =   new Medium("water",1.);
 
@@ -336,492 +336,403 @@ int main()
 
     for(unsigned int i = 0 ; i < graphs.size() ; i++)
     {
-        if(brems.at(i)->GetParticle()->GetName().compare("mu")==0 && brems.at(i)->GetParametrization()==1)
+        if(brems.at(i)->GetParticle()->GetType() == PROPOSALParticle::ParticleType::MuMinus)
         {
-            muons_para1_gr->Add(graphs.at(i),"P");
+            if (brems.at(i)->GetParametrization()==1)
+            {
+                muons_para1_gr->Add(graphs.at(i),"P");
 
-            leg_entry<<"ecut = "<<brems.at(i)->GetEnergyCutSettings()->GetEcut();
-            muons_leg_para1->AddEntry(graphs.at(i),leg_entry.str().c_str(),"p");
+                leg_entry<<"ecut = "<<brems.at(i)->GetEnergyCutSettings()->GetEcut();
+                muons_leg_para1->AddEntry(graphs.at(i),leg_entry.str().c_str(),"p");
 
-            if(muons_para1_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
+                switch (muons_para1_gr->GetListOfGraphs()->Capacity())
+                {
+                    case 1:
+                        graphs.at(i)->SetMarkerColor(kRed);
+                        break;
+                    case 2:
+                        graphs.at(i)->SetMarkerColor(kBlue);
+                        break;
+                    case 3:
+                        graphs.at(i)->SetMarkerColor(kGreen);
+                        break;
+                    case 4:
+                        graphs.at(i)->SetMarkerColor(kBlack);
+                        break;
+                    case 5:
+                        graphs.at(i)->SetMarkerColor(kMagenta);
+                        break;
+                    case 6:
+                        graphs.at(i)->SetMarkerColor(kCyan+2);
+                        break;
+                    case 7:
+                        graphs.at(i)->SetMarkerColor(kOrange);
+                        break;
+                }
             }
-            if(muons_para1_gr->GetListOfGraphs()->Capacity()==2)
+            else if(brems.at(i)->GetParametrization()==2)
             {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(muons_para1_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-            if(muons_para1_gr->GetListOfGraphs()->Capacity()==4)
-            {
-                graphs.at(i)->SetMarkerColor(kBlack);
-            }
-            if(muons_para1_gr->GetListOfGraphs()->Capacity()==5)
-            {
-                graphs.at(i)->SetMarkerColor(kMagenta);
-            }
-            if(muons_para1_gr->GetListOfGraphs()->Capacity()==6)
-            {
-                graphs.at(i)->SetMarkerColor(kCyan+2);
-            }
-            if(muons_para1_gr->GetListOfGraphs()->Capacity()==7)
-            {
-                graphs.at(i)->SetMarkerColor(kOrange);
-            }
+                muons_para2_gr->Add(graphs.at(i),"P");
 
-            leg_entry.str("");
-            leg_entry.clear();
+                leg_entry<<"ecut = "<<brems.at(i)->GetEnergyCutSettings()->GetEcut();
+                muons_leg_para2->AddEntry(graphs.at(i),leg_entry.str().c_str(),"p");
 
-        }
-        if(brems.at(i)->GetParticle()->GetName().compare("mu")==0 && brems.at(i)->GetParametrization()==2)
-        {
-            muons_para2_gr->Add(graphs.at(i),"P");
+                switch (muons_para2_gr->GetListOfGraphs()->Capacity())
+                {
+                    case 1:
+                        graphs.at(i)->SetMarkerColor(kRed);
+                        break;
+                    case 2:
+                        graphs.at(i)->SetMarkerColor(kBlue);
+                        break;
+                    case 3:
+                        graphs.at(i)->SetMarkerColor(kGreen);
+                        break;
+                    case 4:
+                        graphs.at(i)->SetMarkerColor(kBlack);
+                        break;
+                    case 5:
+                        graphs.at(i)->SetMarkerColor(kMagenta);
+                        break;
+                    case 6:
+                        graphs.at(i)->SetMarkerColor(kCyan+2);
+                        break;
+                    case 7:
+                        graphs.at(i)->SetMarkerColor(kOrange);
+                        break;
+                }
+            }
+            else if(brems.at(i)->GetParametrization()==3)
+            {
+                muons_para3_gr->Add(graphs.at(i),"P");
 
-            leg_entry<<"ecut = "<<brems.at(i)->GetEnergyCutSettings()->GetEcut();
-            muons_leg_para2->AddEntry(graphs.at(i),leg_entry.str().c_str(),"p");
+                leg_entry<<"ecut = "<<brems.at(i)->GetEnergyCutSettings()->GetEcut();
+                muons_leg_para3->AddEntry(graphs.at(i),leg_entry.str().c_str(),"p");
 
-            if(muons_para2_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
+                switch (muons_para3_gr->GetListOfGraphs()->Capacity())
+                {
+                    case 1:
+                        graphs.at(i)->SetMarkerColor(kRed);
+                        break;
+                    case 2:
+                        graphs.at(i)->SetMarkerColor(kBlue);
+                        break;
+                    case 3:
+                        graphs.at(i)->SetMarkerColor(kGreen);
+                        break;
+                    case 4:
+                        graphs.at(i)->SetMarkerColor(kBlack);
+                        break;
+                    case 5:
+                        graphs.at(i)->SetMarkerColor(kMagenta);
+                        break;
+                    case 6:
+                        graphs.at(i)->SetMarkerColor(kCyan+2);
+                        break;
+                    case 7:
+                        graphs.at(i)->SetMarkerColor(kOrange);
+                        break;
+                }
             }
-            if(muons_para2_gr->GetListOfGraphs()->Capacity()==2)
+            else if(brems.at(i)->GetParametrization()==4)
             {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(muons_para2_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-            if(muons_para2_gr->GetListOfGraphs()->Capacity()==4)
-            {
-                graphs.at(i)->SetMarkerColor(kBlack);
-            }
-            if(muons_para2_gr->GetListOfGraphs()->Capacity()==5)
-            {
-                graphs.at(i)->SetMarkerColor(kMagenta);
-            }
-            if(muons_para2_gr->GetListOfGraphs()->Capacity()==6)
-            {
-                graphs.at(i)->SetMarkerColor(kCyan+2);
-            }
-            if(muons_para2_gr->GetListOfGraphs()->Capacity()==7)
-            {
-                graphs.at(i)->SetMarkerColor(kOrange);
-            }
+                muons_para4_gr->Add(graphs.at(i),"P");
 
-            leg_entry.str("");
-            leg_entry.clear();
+                leg_entry<<"ecut = "<<brems.at(i)->GetEnergyCutSettings()->GetEcut();
+                muons_leg_para4->AddEntry(graphs.at(i),leg_entry.str().c_str(),"p");
 
-        }
-        if(brems.at(i)->GetParticle()->GetName().compare("mu")==0 && brems.at(i)->GetParametrization()==3)
-        {
-            muons_para3_gr->Add(graphs.at(i),"P");
-
-            leg_entry<<"ecut = "<<brems.at(i)->GetEnergyCutSettings()->GetEcut();
-            muons_leg_para3->AddEntry(graphs.at(i),leg_entry.str().c_str(),"p");
-
-            if(muons_para3_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
+                switch (muons_para4_gr->GetListOfGraphs()->Capacity())
+                {
+                    case 1:
+                        graphs.at(i)->SetMarkerColor(kRed);
+                        break;
+                    case 2:
+                        graphs.at(i)->SetMarkerColor(kBlue);
+                        break;
+                    case 3:
+                        graphs.at(i)->SetMarkerColor(kGreen);
+                        break;
+                    case 4:
+                        graphs.at(i)->SetMarkerColor(kBlack);
+                        break;
+                    case 5:
+                        graphs.at(i)->SetMarkerColor(kMagenta);
+                        break;
+                    case 6:
+                        graphs.at(i)->SetMarkerColor(kCyan+2);
+                        break;
+                    case 7:
+                        graphs.at(i)->SetMarkerColor(kOrange);
+                        break;
+                }
             }
-            if(muons_para3_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(muons_para3_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-            if(muons_para3_gr->GetListOfGraphs()->Capacity()==4)
-            {
-                graphs.at(i)->SetMarkerColor(kBlack);
-            }
-            if(muons_para3_gr->GetListOfGraphs()->Capacity()==5)
-            {
-                graphs.at(i)->SetMarkerColor(kMagenta);
-            }
-            if(muons_para3_gr->GetListOfGraphs()->Capacity()==6)
-            {
-                graphs.at(i)->SetMarkerColor(kCyan+2);
-            }
-            if(muons_para3_gr->GetListOfGraphs()->Capacity()==7)
-            {
-                graphs.at(i)->SetMarkerColor(kOrange);
-            }
-
-            leg_entry.str("");
-            leg_entry.clear();
-
-        }
-        if(brems.at(i)->GetParticle()->GetName().compare("mu")==0 && brems.at(i)->GetParametrization()==4)
-        {
-            muons_para4_gr->Add(graphs.at(i),"P");
-
-            leg_entry<<"ecut = "<<brems.at(i)->GetEnergyCutSettings()->GetEcut();
-            muons_leg_para4->AddEntry(graphs.at(i),leg_entry.str().c_str(),"p");
-
-            if(muons_para4_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(muons_para4_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(muons_para4_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-            if(muons_para4_gr->GetListOfGraphs()->Capacity()==4)
-            {
-                graphs.at(i)->SetMarkerColor(kBlack);
-            }
-            if(muons_para4_gr->GetListOfGraphs()->Capacity()==5)
-            {
-                graphs.at(i)->SetMarkerColor(kMagenta);
-            }
-            if(muons_para4_gr->GetListOfGraphs()->Capacity()==6)
-            {
-                graphs.at(i)->SetMarkerColor(kCyan+2);
-            }
-            if(muons_para4_gr->GetListOfGraphs()->Capacity()==7)
-            {
-                graphs.at(i)->SetMarkerColor(kOrange);
-            }
-
-            leg_entry.str("");
-            leg_entry.clear();
-
         }
 
-
-
-        if(brems.at(i)->GetParticle()->GetName().compare("tau")==0 && brems.at(i)->GetParametrization()==1)
+        else if(brems.at(i)->GetParticle()->GetType() == PROPOSALParticle::ParticleType::TauMinus)
         {
-            taus_para1_gr->Add(graphs.at(i),"P");
+            if (brems.at(i)->GetParametrization()==1)
+            {
+                taus_para1_gr->Add(graphs.at(i),"P");
 
-            leg_entry<<"ecut = "<<brems.at(i)->GetEnergyCutSettings()->GetEcut();
-            taus_leg_para1->AddEntry(graphs.at(i),leg_entry.str().c_str(),"p");
+                leg_entry<<"ecut = "<<brems.at(i)->GetEnergyCutSettings()->GetEcut();
+                taus_leg_para1->AddEntry(graphs.at(i),leg_entry.str().c_str(),"p");
 
-            if(taus_para1_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
+                switch (taus_para1_gr->GetListOfGraphs()->Capacity())
+                {
+                    case 1:
+                        graphs.at(i)->SetMarkerColor(kRed);
+                        break;
+                    case 2:
+                        graphs.at(i)->SetMarkerColor(kBlue);
+                        break;
+                    case 3:
+                        graphs.at(i)->SetMarkerColor(kGreen);
+                        break;
+                    case 4:
+                        graphs.at(i)->SetMarkerColor(kBlack);
+                        break;
+                    case 5:
+                        graphs.at(i)->SetMarkerColor(kMagenta);
+                        break;
+                    case 6:
+                        graphs.at(i)->SetMarkerColor(kCyan+2);
+                        break;
+                    case 7:
+                        graphs.at(i)->SetMarkerColor(kOrange);
+                        break;
+                }
             }
-            if(taus_para1_gr->GetListOfGraphs()->Capacity()==2)
+            else if(brems.at(i)->GetParametrization()==2)
             {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(taus_para1_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-            if(taus_para1_gr->GetListOfGraphs()->Capacity()==4)
-            {
-                graphs.at(i)->SetMarkerColor(kBlack);
-            }
-            if(taus_para1_gr->GetListOfGraphs()->Capacity()==5)
-            {
-                graphs.at(i)->SetMarkerColor(kMagenta);
-            }
-            if(taus_para1_gr->GetListOfGraphs()->Capacity()==6)
-            {
-                graphs.at(i)->SetMarkerColor(kCyan+2);
-            }
-            if(taus_para1_gr->GetListOfGraphs()->Capacity()==7)
-            {
-                graphs.at(i)->SetMarkerColor(kOrange);
-            }
+                taus_para2_gr->Add(graphs.at(i),"P");
 
-            leg_entry.str("");
-            leg_entry.clear();
+                leg_entry<<"ecut = "<<brems.at(i)->GetEnergyCutSettings()->GetEcut();
+                taus_leg_para2->AddEntry(graphs.at(i),leg_entry.str().c_str(),"p");
 
-        }
-        if(brems.at(i)->GetParticle()->GetName().compare("tau")==0 && brems.at(i)->GetParametrization()==2)
-        {
-            taus_para2_gr->Add(graphs.at(i),"P");
+                switch (taus_para2_gr->GetListOfGraphs()->Capacity())
+                {
+                    case 1:
+                        graphs.at(i)->SetMarkerColor(kRed);
+                        break;
+                    case 2:
+                        graphs.at(i)->SetMarkerColor(kBlue);
+                        break;
+                    case 3:
+                        graphs.at(i)->SetMarkerColor(kGreen);
+                        break;
+                    case 4:
+                        graphs.at(i)->SetMarkerColor(kBlack);
+                        break;
+                    case 5:
+                        graphs.at(i)->SetMarkerColor(kMagenta);
+                        break;
+                    case 6:
+                        graphs.at(i)->SetMarkerColor(kCyan+2);
+                        break;
+                    case 7:
+                        graphs.at(i)->SetMarkerColor(kOrange);
+                        break;
+                }
+            }
+            else if(brems.at(i)->GetParametrization()==3)
+            {
+                taus_para3_gr->Add(graphs.at(i),"P");
 
-            leg_entry<<"ecut = "<<brems.at(i)->GetEnergyCutSettings()->GetEcut();
-            taus_leg_para2->AddEntry(graphs.at(i),leg_entry.str().c_str(),"p");
+                leg_entry<<"ecut = "<<brems.at(i)->GetEnergyCutSettings()->GetEcut();
+                taus_leg_para3->AddEntry(graphs.at(i),leg_entry.str().c_str(),"p");
 
-            if(taus_para2_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
+                switch (taus_para3_gr->GetListOfGraphs()->Capacity())
+                {
+                    case 1:
+                        graphs.at(i)->SetMarkerColor(kRed);
+                        break;
+                    case 2:
+                        graphs.at(i)->SetMarkerColor(kBlue);
+                        break;
+                    case 3:
+                        graphs.at(i)->SetMarkerColor(kGreen);
+                        break;
+                    case 4:
+                        graphs.at(i)->SetMarkerColor(kBlack);
+                        break;
+                    case 5:
+                        graphs.at(i)->SetMarkerColor(kMagenta);
+                        break;
+                    case 6:
+                        graphs.at(i)->SetMarkerColor(kCyan+2);
+                        break;
+                    case 7:
+                        graphs.at(i)->SetMarkerColor(kOrange);
+                        break;
+                }
             }
-            if(taus_para2_gr->GetListOfGraphs()->Capacity()==2)
+            else if(brems.at(i)->GetParametrization()==4)
             {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(taus_para2_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-            if(taus_para2_gr->GetListOfGraphs()->Capacity()==4)
-            {
-                graphs.at(i)->SetMarkerColor(kBlack);
-            }
-            if(taus_para2_gr->GetListOfGraphs()->Capacity()==5)
-            {
-                graphs.at(i)->SetMarkerColor(kMagenta);
-            }
-            if(taus_para2_gr->GetListOfGraphs()->Capacity()==6)
-            {
-                graphs.at(i)->SetMarkerColor(kCyan+2);
-            }
-            if(taus_para2_gr->GetListOfGraphs()->Capacity()==7)
-            {
-                graphs.at(i)->SetMarkerColor(kOrange);
-            }
+                taus_para4_gr->Add(graphs.at(i),"P");
 
-            leg_entry.str("");
-            leg_entry.clear();
+                leg_entry<<"ecut = "<<brems.at(i)->GetEnergyCutSettings()->GetEcut();
+                taus_leg_para4->AddEntry(graphs.at(i),leg_entry.str().c_str(),"p");
 
-        }
-        if(brems.at(i)->GetParticle()->GetName().compare("tau")==0 && brems.at(i)->GetParametrization()==3)
-        {
-            taus_para3_gr->Add(graphs.at(i),"P");
-
-            leg_entry<<"ecut = "<<brems.at(i)->GetEnergyCutSettings()->GetEcut();
-            taus_leg_para3->AddEntry(graphs.at(i),leg_entry.str().c_str(),"p");
-
-            if(taus_para3_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
+                switch (taus_para4_gr->GetListOfGraphs()->Capacity())
+                {
+                    case 1:
+                        graphs.at(i)->SetMarkerColor(kRed);
+                        break;
+                    case 2:
+                        graphs.at(i)->SetMarkerColor(kBlue);
+                        break;
+                    case 3:
+                        graphs.at(i)->SetMarkerColor(kGreen);
+                        break;
+                    case 4:
+                        graphs.at(i)->SetMarkerColor(kBlack);
+                        break;
+                    case 5:
+                        graphs.at(i)->SetMarkerColor(kMagenta);
+                        break;
+                    case 6:
+                        graphs.at(i)->SetMarkerColor(kCyan+2);
+                        break;
+                    case 7:
+                        graphs.at(i)->SetMarkerColor(kOrange);
+                        break;
+                }
             }
-            if(taus_para3_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(taus_para3_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-            if(taus_para3_gr->GetListOfGraphs()->Capacity()==4)
-            {
-                graphs.at(i)->SetMarkerColor(kBlack);
-            }
-            if(taus_para3_gr->GetListOfGraphs()->Capacity()==5)
-            {
-                graphs.at(i)->SetMarkerColor(kMagenta);
-            }
-            if(taus_para3_gr->GetListOfGraphs()->Capacity()==6)
-            {
-                graphs.at(i)->SetMarkerColor(kCyan+2);
-            }
-            if(taus_para3_gr->GetListOfGraphs()->Capacity()==7)
-            {
-                graphs.at(i)->SetMarkerColor(kOrange);
-            }
-
-            leg_entry.str("");
-            leg_entry.clear();
-
-        }
-        if(brems.at(i)->GetParticle()->GetName().compare("tau")==0 && brems.at(i)->GetParametrization()==4)
-        {
-            taus_para4_gr->Add(graphs.at(i),"P");
-
-            leg_entry<<"ecut = "<<brems.at(i)->GetEnergyCutSettings()->GetEcut();
-            taus_leg_para4->AddEntry(graphs.at(i),leg_entry.str().c_str(),"p");
-
-            if(taus_para4_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(taus_para4_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(taus_para4_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-            if(taus_para4_gr->GetListOfGraphs()->Capacity()==4)
-            {
-                graphs.at(i)->SetMarkerColor(kBlack);
-            }
-            if(taus_para4_gr->GetListOfGraphs()->Capacity()==5)
-            {
-                graphs.at(i)->SetMarkerColor(kMagenta);
-            }
-            if(taus_para4_gr->GetListOfGraphs()->Capacity()==6)
-            {
-                graphs.at(i)->SetMarkerColor(kCyan+2);
-            }
-            if(taus_para4_gr->GetListOfGraphs()->Capacity()==7)
-            {
-                graphs.at(i)->SetMarkerColor(kOrange);
-            }
-
-            leg_entry.str("");
-            leg_entry.clear();
-
         }
 
-
-        if(brems.at(i)->GetParticle()->GetName().compare("e")==0 && brems.at(i)->GetParametrization()==1)
+        else if(brems.at(i)->GetParticle()->GetType() == PROPOSALParticle::ParticleType::EMinus)
         {
-            electrons_para1_gr->Add(graphs.at(i),"P");
+            if (brems.at(i)->GetParametrization()==1)
+            {
+                electrons_para1_gr->Add(graphs.at(i),"P");
 
-            leg_entry<<"ecut = "<<brems.at(i)->GetEnergyCutSettings()->GetEcut();
-            electrons_leg_para1->AddEntry(graphs.at(i),leg_entry.str().c_str(),"p");
+                leg_entry<<"ecut = "<<brems.at(i)->GetEnergyCutSettings()->GetEcut();
+                electrons_leg_para1->AddEntry(graphs.at(i),leg_entry.str().c_str(),"p");
 
-            if(electrons_para1_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
+                switch (electrons_para1_gr->GetListOfGraphs()->Capacity())
+                {
+                    case 1:
+                        graphs.at(i)->SetMarkerColor(kRed);
+                        break;
+                    case 2:
+                        graphs.at(i)->SetMarkerColor(kBlue);
+                        break;
+                    case 3:
+                        graphs.at(i)->SetMarkerColor(kGreen);
+                        break;
+                    case 4:
+                        graphs.at(i)->SetMarkerColor(kBlack);
+                        break;
+                    case 5:
+                        graphs.at(i)->SetMarkerColor(kMagenta);
+                        break;
+                    case 6:
+                        graphs.at(i)->SetMarkerColor(kCyan+2);
+                        break;
+                    case 7:
+                        graphs.at(i)->SetMarkerColor(kOrange);
+                        break;
+                }
             }
-            if(electrons_para1_gr->GetListOfGraphs()->Capacity()==2)
+            else if(brems.at(i)->GetParametrization()==2)
             {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(electrons_para1_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-            if(electrons_para1_gr->GetListOfGraphs()->Capacity()==4)
-            {
-                graphs.at(i)->SetMarkerColor(kBlack);
-            }
-            if(electrons_para1_gr->GetListOfGraphs()->Capacity()==5)
-            {
-                graphs.at(i)->SetMarkerColor(kMagenta);
-            }
-            if(electrons_para1_gr->GetListOfGraphs()->Capacity()==6)
-            {
-                graphs.at(i)->SetMarkerColor(kCyan+2);
-            }
-            if(electrons_para1_gr->GetListOfGraphs()->Capacity()==7)
-            {
-                graphs.at(i)->SetMarkerColor(kOrange);
-            }
+                electrons_para2_gr->Add(graphs.at(i),"P");
 
-            leg_entry.str("");
-            leg_entry.clear();
+                leg_entry<<"ecut = "<<brems.at(i)->GetEnergyCutSettings()->GetEcut();
+                electrons_leg_para2->AddEntry(graphs.at(i),leg_entry.str().c_str(),"p");
 
+                switch (electrons_para2_gr->GetListOfGraphs()->Capacity())
+                {
+                    case 1:
+                        graphs.at(i)->SetMarkerColor(kRed);
+                        break;
+                    case 2:
+                        graphs.at(i)->SetMarkerColor(kBlue);
+                        break;
+                    case 3:
+                        graphs.at(i)->SetMarkerColor(kGreen);
+                        break;
+                    case 4:
+                        graphs.at(i)->SetMarkerColor(kBlack);
+                        break;
+                    case 5:
+                        graphs.at(i)->SetMarkerColor(kMagenta);
+                        break;
+                    case 6:
+                        graphs.at(i)->SetMarkerColor(kCyan+2);
+                        break;
+                    case 7:
+                        graphs.at(i)->SetMarkerColor(kOrange);
+                        break;
+                }
+            }
+            else if(brems.at(i)->GetParametrization()==3)
+            {
+                electrons_para3_gr->Add(graphs.at(i),"P");
+
+                leg_entry<<"ecut = "<<brems.at(i)->GetEnergyCutSettings()->GetEcut();
+                electrons_leg_para3->AddEntry(graphs.at(i),leg_entry.str().c_str(),"p");
+
+                switch (electrons_para3_gr->GetListOfGraphs()->Capacity())
+                {
+                    case 1:
+                        graphs.at(i)->SetMarkerColor(kRed);
+                        break;
+                    case 2:
+                        graphs.at(i)->SetMarkerColor(kBlue);
+                        break;
+                    case 3:
+                        graphs.at(i)->SetMarkerColor(kGreen);
+                        break;
+                    case 4:
+                        graphs.at(i)->SetMarkerColor(kBlack);
+                        break;
+                    case 5:
+                        graphs.at(i)->SetMarkerColor(kMagenta);
+                        break;
+                    case 6:
+                        graphs.at(i)->SetMarkerColor(kCyan+2);
+                        break;
+                    case 7:
+                        graphs.at(i)->SetMarkerColor(kOrange);
+                        break;
+                }
+            }
+            else if(brems.at(i)->GetParametrization()==4)
+            {
+                electrons_para4_gr->Add(graphs.at(i),"P");
+
+                leg_entry<<"ecut = "<<brems.at(i)->GetEnergyCutSettings()->GetEcut();
+                electrons_leg_para4->AddEntry(graphs.at(i),leg_entry.str().c_str(),"p");
+
+                switch (electrons_para4_gr->GetListOfGraphs()->Capacity())
+                {
+                    case 1:
+                        graphs.at(i)->SetMarkerColor(kRed);
+                        break;
+                    case 2:
+                        graphs.at(i)->SetMarkerColor(kBlue);
+                        break;
+                    case 3:
+                        graphs.at(i)->SetMarkerColor(kGreen);
+                        break;
+                    case 4:
+                        graphs.at(i)->SetMarkerColor(kBlack);
+                        break;
+                    case 5:
+                        graphs.at(i)->SetMarkerColor(kMagenta);
+                        break;
+                    case 6:
+                        graphs.at(i)->SetMarkerColor(kCyan+2);
+                        break;
+                    case 7:
+                        graphs.at(i)->SetMarkerColor(kOrange);
+                        break;
+                }
+            }
         }
-        if(brems.at(i)->GetParticle()->GetName().compare("e")==0 && brems.at(i)->GetParametrization()==2)
-        {
-            electrons_para2_gr->Add(graphs.at(i),"P");
-
-            leg_entry<<"ecut = "<<brems.at(i)->GetEnergyCutSettings()->GetEcut();
-            electrons_leg_para2->AddEntry(graphs.at(i),leg_entry.str().c_str(),"p");
-
-            if(electrons_para2_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(electrons_para2_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(electrons_para2_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-            if(electrons_para2_gr->GetListOfGraphs()->Capacity()==4)
-            {
-                graphs.at(i)->SetMarkerColor(kBlack);
-            }
-            if(electrons_para2_gr->GetListOfGraphs()->Capacity()==5)
-            {
-                graphs.at(i)->SetMarkerColor(kMagenta);
-            }
-            if(electrons_para2_gr->GetListOfGraphs()->Capacity()==6)
-            {
-                graphs.at(i)->SetMarkerColor(kCyan+2);
-            }
-            if(electrons_para2_gr->GetListOfGraphs()->Capacity()==7)
-            {
-                graphs.at(i)->SetMarkerColor(kOrange);
-            }
-
-            leg_entry.str("");
-            leg_entry.clear();
-
-        }
-        if(brems.at(i)->GetParticle()->GetName().compare("e")==0 && brems.at(i)->GetParametrization()==3)
-        {
-            electrons_para3_gr->Add(graphs.at(i),"P");
-
-            leg_entry<<"ecut = "<<brems.at(i)->GetEnergyCutSettings()->GetEcut();
-            electrons_leg_para3->AddEntry(graphs.at(i),leg_entry.str().c_str(),"p");
-
-            if(electrons_para3_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(electrons_para3_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(electrons_para3_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-            if(electrons_para3_gr->GetListOfGraphs()->Capacity()==4)
-            {
-                graphs.at(i)->SetMarkerColor(kBlack);
-            }
-            if(electrons_para3_gr->GetListOfGraphs()->Capacity()==5)
-            {
-                graphs.at(i)->SetMarkerColor(kMagenta);
-            }
-            if(electrons_para3_gr->GetListOfGraphs()->Capacity()==6)
-            {
-                graphs.at(i)->SetMarkerColor(kCyan+2);
-            }
-            if(electrons_para3_gr->GetListOfGraphs()->Capacity()==7)
-            {
-                graphs.at(i)->SetMarkerColor(kOrange);
-            }
-
-            leg_entry.str("");
-            leg_entry.clear();
-
-        }
-        if(brems.at(i)->GetParticle()->GetName().compare("e")==0 && brems.at(i)->GetParametrization()==4)
-        {
-            electrons_para4_gr->Add(graphs.at(i),"P");
-
-            leg_entry<<"ecut = "<<brems.at(i)->GetEnergyCutSettings()->GetEcut();
-            electrons_leg_para4->AddEntry(graphs.at(i),leg_entry.str().c_str(),"p");
-
-            if(electrons_para4_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(electrons_para4_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(electrons_para4_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-            if(electrons_para4_gr->GetListOfGraphs()->Capacity()==4)
-            {
-                graphs.at(i)->SetMarkerColor(kBlack);
-            }
-            if(electrons_para4_gr->GetListOfGraphs()->Capacity()==5)
-            {
-                graphs.at(i)->SetMarkerColor(kMagenta);
-            }
-            if(electrons_para4_gr->GetListOfGraphs()->Capacity()==6)
-            {
-                graphs.at(i)->SetMarkerColor(kCyan+2);
-            }
-            if(electrons_para4_gr->GetListOfGraphs()->Capacity()==7)
-            {
-                graphs.at(i)->SetMarkerColor(kOrange);
-            }
-
-            leg_entry.str("");
-            leg_entry.clear();
-
-        }
-
+        leg_entry.str("");
+        leg_entry.clear();
     }
 
     muons_para1->cd();
@@ -984,19 +895,3 @@ int main()
 
     return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

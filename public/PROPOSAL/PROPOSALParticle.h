@@ -119,7 +119,7 @@ private:
 
     std::string name_;           //!< name of the particle - Presetted to "mu"
     double low_;                 //!< energy below which the particle is lost [MeV]
-    ParticleType type_;          //!< particle type: 1 for muon, 2 for tau, 3 for electron
+    ParticleType type_;          //!< particle type: all particles, that can be propagated with PROPOSAL
 
     int parent_particle_id_;        //!< parent particle id
     double parent_particle_energy_; //!< energy of the parent particle
