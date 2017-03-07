@@ -31,7 +31,7 @@ class CrossSections
 
 protected:
 
-    std::string name_;
+    PROPOSALParticle::ParticleType type_;
 
     PROPOSALParticle*   particle_;
     PROPOSALParticle*   backup_particle_;
@@ -126,7 +126,7 @@ public:
 //----------------------------------------------------------------------------//
 
     void SetParametrizationLimit(double ebig=BIGENERGY);
-    
+
 //----------------------------------------------------------------------------//
 
     virtual double FunctionToDNdxIntegral(double variable) = 0;
@@ -179,9 +179,9 @@ public:
 
 //----------------------------------------------------------------------------//
     // Getter
-    std::string GetName() const
+    PROPOSALParticle::ParticleType GetType() const
     {
-        return name_;
+        return type_;
     }
 //----------------------------------------------------------------------------//
     double GetEbig() const
