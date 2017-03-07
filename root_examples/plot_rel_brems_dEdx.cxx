@@ -51,9 +51,9 @@ int main()
 
     TFile *file     =   new TFile("Bremsstrahlung_rel_dEdx.root","RECREATE");
 
-    PROPOSALParticle *mu    =   new PROPOSALParticle("mu");
-    PROPOSALParticle *tau   =   new PROPOSALParticle("tau");
-    PROPOSALParticle *e     =   new PROPOSALParticle("e");
+    PROPOSALParticle *mu    =   new PROPOSALParticle(PROPOSALParticle::ParticleType::MuMinus);
+    PROPOSALParticle *tau   =   new PROPOSALParticle(PROPOSALParticle::ParticleType::TauMinus);
+    PROPOSALParticle *e     =   new PROPOSALParticle(PROPOSALParticle::ParticleType::EMinus);
 
     Medium  *med1   =   new Medium("hydrogen",1.);
     Medium  *med2   =   new Medium("water",1.);
@@ -340,7 +340,7 @@ int main()
 
     for(unsigned int i = 0 ; i < graphs.size() ; i++)
     {
-        if(brems.at(i)->GetParticle()->GetName().compare("mu")==0 && brems.at(i)->GetMedium()->GetName().compare("water")==0)
+        if(brems.at(i)->GetParticle()->GetType() == PROPOSALParticle::ParticleType::MuMinus && brems.at(i)->GetMedium()->GetName().compare("water")==0)
         {
             muons_water_gr->Add(graphs.at(i),"P");
 
@@ -384,7 +384,7 @@ int main()
             leg_entry.clear();
 
         }
-        if(brems.at(i)->GetParticle()->GetName().compare("mu")==0 && brems.at(i)->GetMedium()->GetName().compare("hydrogen")==0)
+        if(brems.at(i)->GetParticle()->GetType() == PROPOSALParticle::ParticleType::MuMinus && brems.at(i)->GetMedium()->GetName().compare("hydrogen")==0)
         {
             muons_hydrogen_gr->Add(graphs.at(i),"P");
 
@@ -428,7 +428,7 @@ int main()
             leg_entry.clear();
 
         }
-        if(brems.at(i)->GetParticle()->GetName().compare("mu")==0 && brems.at(i)->GetMedium()->GetName().compare("uranium")==0)
+        if(brems.at(i)->GetParticle()->GetType() == PROPOSALParticle::ParticleType::MuMinus && brems.at(i)->GetMedium()->GetName().compare("uranium")==0)
         {
             muons_uranium_gr->Add(graphs.at(i),"P");
 
@@ -474,7 +474,7 @@ int main()
         }
 
 
-        if(brems.at(i)->GetParticle()->GetName().compare("tau")==0 && brems.at(i)->GetMedium()->GetName().compare("water")==0)
+        if(brems.at(i)->GetParticle()->GetType() == PROPOSALParticle::ParticleType::TauMinus && brems.at(i)->GetMedium()->GetName().compare("water")==0)
         {
             taus_water_gr->Add(graphs.at(i),"P");
 
@@ -518,7 +518,7 @@ int main()
             leg_entry.clear();
 
         }
-        if(brems.at(i)->GetParticle()->GetName().compare("tau")==0 && brems.at(i)->GetMedium()->GetName().compare("hydrogen")==0)
+        if(brems.at(i)->GetParticle()->GetType() == PROPOSALParticle::ParticleType::TauMinus && brems.at(i)->GetMedium()->GetName().compare("hydrogen")==0)
         {
             taus_hydrogen_gr->Add(graphs.at(i),"P");
 
@@ -562,7 +562,7 @@ int main()
             leg_entry.clear();
 
         }
-        if(brems.at(i)->GetParticle()->GetName().compare("tau")==0 && brems.at(i)->GetMedium()->GetName().compare("uranium")==0)
+        if(brems.at(i)->GetParticle()->GetType() == PROPOSALParticle::ParticleType::TauMinus && brems.at(i)->GetMedium()->GetName().compare("uranium")==0)
         {
             taus_uranium_gr->Add(graphs.at(i),"P");
 
@@ -608,7 +608,7 @@ int main()
         }
 
 
-        if(brems.at(i)->GetParticle()->GetName().compare("e")==0 && brems.at(i)->GetMedium()->GetName().compare("water")==0)
+        if(brems.at(i)->GetParticle()->GetType() == PROPOSALParticle::ParticleType::EMinus && brems.at(i)->GetMedium()->GetName().compare("water")==0)
         {
             electrons_water_gr->Add(graphs.at(i),"P");
 
@@ -652,7 +652,7 @@ int main()
             leg_entry.clear();
 
         }
-        if(brems.at(i)->GetParticle()->GetName().compare("e")==0 && brems.at(i)->GetMedium()->GetName().compare("hydrogen")==0)
+        if(brems.at(i)->GetParticle()->GetType() == PROPOSALParticle::ParticleType::EMinus && brems.at(i)->GetMedium()->GetName().compare("hydrogen")==0)
         {
             electrons_hydrogen_gr->Add(graphs.at(i),"P");
 
@@ -696,7 +696,7 @@ int main()
             leg_entry.clear();
 
         }
-        if(brems.at(i)->GetParticle()->GetName().compare("e")==0 && brems.at(i)->GetMedium()->GetName().compare("uranium")==0)
+        if(brems.at(i)->GetParticle()->GetType() == PROPOSALParticle::ParticleType::EMinus && brems.at(i)->GetMedium()->GetName().compare("uranium")==0)
         {
             electrons_uranium_gr->Add(graphs.at(i),"P");
 

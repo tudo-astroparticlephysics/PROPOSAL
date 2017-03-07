@@ -17,9 +17,9 @@ int main()
 {
     TFile *file     =   new TFile("Epairproduction_dNdx_different_ecut.root","RECREATE");
 
-    PROPOSALParticle *mu    =   new PROPOSALParticle("mu");
-    PROPOSALParticle *e     =   new PROPOSALParticle("e");
-    PROPOSALParticle *tau   =   new PROPOSALParticle("tau");
+    PROPOSALParticle *mu    =   new PROPOSALParticle(PROPOSALParticle::ParticleType::MuMinus);
+    PROPOSALParticle *tau   =   new PROPOSALParticle(PROPOSALParticle::ParticleType::TauMinus);
+    PROPOSALParticle *e     =   new PROPOSALParticle(PROPOSALParticle::ParticleType::EMinus);
 
     Medium  *med    =   new Medium("water",1.);
 
@@ -152,7 +152,7 @@ int main()
 
     for(unsigned int i = 0 ; i < graphs.size() ; i++)
     {
-        if(epair.at(i)->GetParticle()->GetName().compare("mu")==0)
+        if(epair.at(i)->GetParticle()->GetType() == PROPOSALParticle::ParticleType::MuMinus)
         {
             muons_gr->Add(graphs.at(i),"P");
 
@@ -191,7 +191,7 @@ int main()
             entry_name.str("");
             entry_name.clear();
         }
-        if(epair.at(i)->GetParticle()->GetName().compare("tau")==0)
+        if(epair.at(i)->GetParticle()->GetType() == PROPOSALParticle::ParticleType::TauMinus)
         {
             taus_gr->Add(graphs.at(i),"P");
 
@@ -230,7 +230,7 @@ int main()
             entry_name.str("");
             entry_name.clear();
         }
-        if(epair.at(i)->GetParticle()->GetName().compare("e")==0)
+        if(epair.at(i)->GetParticle()->GetType() == PROPOSALParticle::ParticleType::EMinus)
         {
             electrons_gr->Add(graphs.at(i),"P");
 

@@ -44,9 +44,9 @@ int main()
 
     TFile *file     =   new TFile("Epairproduction_dNdx.root","RECREATE");
 
-    PROPOSALParticle *mu    =   new PROPOSALParticle("mu");
-    PROPOSALParticle *tau   =   new PROPOSALParticle("tau");
-    PROPOSALParticle *e     =   new PROPOSALParticle("e");
+    PROPOSALParticle *mu    =   new PROPOSALParticle(PROPOSALParticle::ParticleType::MuMinus);
+    PROPOSALParticle *tau   =   new PROPOSALParticle(PROPOSALParticle::ParticleType::TauMinus);
+    PROPOSALParticle *e     =   new PROPOSALParticle(PROPOSALParticle::ParticleType::EMinus);
 
     Medium  *med1   =   new Medium("hydrogen",1.);
     Medium  *med2   =   new Medium("water",1.);
@@ -240,7 +240,7 @@ int main()
 
     for(unsigned int i = 0 ; i < graphs.size() ; i++)
     {
-        if(epair.at(i)->GetParticle()->GetName().compare("mu")==0)
+        if(epair.at(i)->GetParticle()->GetType() == PROPOSALParticle::ParticleType::MuMinus)
         {
             muons_gr->Add(graphs.at(i),"P");
             leg_entry<<epair.at(i)->GetMedium()->GetName().c_str();
@@ -268,7 +268,7 @@ int main()
             leg_entry.clear();
 
         }
-        if(epair.at(i)->GetParticle()->GetName().compare("tau")==0)
+        if(epair.at(i)->GetParticle()->GetType() == PROPOSALParticle::ParticleType::TauMinus)
         {
             taus_gr->Add(graphs.at(i),"P");
 
@@ -297,7 +297,7 @@ int main()
             leg_entry.clear();
 
         }
-        if(epair.at(i)->GetParticle()->GetName().compare("e")==0)
+        if(epair.at(i)->GetParticle()->GetType() == PROPOSALParticle::ParticleType::EMinus)
         {
             electrons_gr->Add(graphs.at(i),"P");
 
