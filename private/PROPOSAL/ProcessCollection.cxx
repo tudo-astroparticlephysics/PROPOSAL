@@ -262,7 +262,7 @@ pair<double,string> ProcessCollection::MakeStochasticLoss(double rnd1,double rnd
     //double decayS              =    0;
 
 
-    pair<double,PROPOSALParticle::ParticleType> energy_loss;
+    pair<double,string> energy_loss;
 
     std::vector<double> rates;
 
@@ -314,7 +314,7 @@ pair<double,string> ProcessCollection::MakeStochasticLoss(double rnd1,double rnd
         if(rates_sum > total_rate_weighted)
         {
             energy_loss.first   =   crosssections_.at(i)->CalculateStochasticLoss(rnd2,rnd3);
-            energy_loss.second  =   crosssections_.at(i)->GetType();
+            energy_loss.second  =   crosssections_.at(i)->GetName();
             break;
         }
     }
