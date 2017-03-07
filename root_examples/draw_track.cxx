@@ -127,50 +127,56 @@ int main(int argc, char **argv)
 
     for(unsigned int i = 0; i<secondarys.size(); i++)
     {
-        if(secondarys.at(i)->GetName().compare("epair")==0)
+        switch(secondarys.at(i)->GetType())
         {
-            TPolyMarker3D* m  = new TPolyMarker3D();
-            m->SetPoint(0,secondarys.at(i)->GetX(),secondarys.at(i)->GetY(),secondarys.at(i)->GetZ());
-            m->SetMarkerStyle(20);
-            m->SetMarkerColor(kRed);
-            m->SetMarkerSize(secondarys.at(i)->GetEnergy()/energy*400*scale);
-            marker.push_back(m);
-        }
-        else if(secondarys.at(i)->GetName().compare("delta")==0)
-        {
-            TPolyMarker3D* m  = new TPolyMarker3D();
-            m->SetPoint(0,secondarys.at(i)->GetX(),secondarys.at(i)->GetY(),secondarys.at(i)->GetZ());
-            m->SetMarkerStyle(20);
-            m->SetMarkerColor(kGreen);
-            m->SetMarkerSize(secondarys.at(i)->GetEnergy()/energy*4000*scale);
-            marker.push_back(m);
-        }
-        else if(secondarys.at(i)->GetName().compare("brems")==0)
-        {
-            TPolyMarker3D* m  = new TPolyMarker3D();
-            m->SetPoint(0,secondarys.at(i)->GetX(),secondarys.at(i)->GetY(),secondarys.at(i)->GetZ());
-            m->SetMarkerStyle(20);
-            m->SetMarkerColor(kBlue);
-            m->SetMarkerSize(secondarys.at(i)->GetEnergy()/energy*400*scale);
-            marker.push_back(m);
-        }
-        else if(secondarys.at(i)->GetName().compare("munu")==0)
-        {
-            TPolyMarker3D* m  = new TPolyMarker3D();
-            m->SetPoint(0,secondarys.at(i)->GetX(),secondarys.at(i)->GetY(),secondarys.at(i)->GetZ());
-            m->SetMarkerStyle(20);
-            m->SetMarkerColor(kBlack);
-            m->SetMarkerSize(secondarys.at(i)->GetEnergy()/energy*4000*scale);
-            marker.push_back(m);
-        }
-        else if(secondarys.at(i)->GetName().compare("e")==0)
-        {
-            TPolyMarker3D* m  = new TPolyMarker3D();
-            m->SetPoint(0,secondarys.at(i)->GetX(),secondarys.at(i)->GetY(),secondarys.at(i)->GetZ());
-            m->SetMarkerStyle(20);
-            m->SetMarkerColor(kCyan);
-            m->SetMarkerSize(secondarys.at(i)->GetEnergy()/energy*400000*scale);
-            marker.push_back(m);
+            case PROPOSALParticle::ParticleType::EPair:
+                TPolyMarker3D* m  = new TPolyMarker3D();
+                m->SetPoint(0,secondarys.at(i)->GetX(),secondarys.at(i)->GetY(),secondarys.at(i)->GetZ());
+                m->SetMarkerStyle(20);
+                m->SetMarkerColor(kRed);
+                m->SetMarkerSize(secondarys.at(i)->GetEnergy()/energy*400*scale);
+                marker.push_back(m);
+                break;
+
+            case PROPOSALParticle::ParticleType::DeltaE:
+                TPolyMarker3D* m  = new TPolyMarker3D();
+                m->SetPoint(0,secondarys.at(i)->GetX(),secondarys.at(i)->GetY(),secondarys.at(i)->GetZ());
+                m->SetMarkerStyle(20);
+                m->SetMarkerColor(kGreen);
+                m->SetMarkerSize(secondarys.at(i)->GetEnergy()/energy*4000*scale);
+                marker.push_back(m);
+                break;
+
+            case PROPOSALParticle::ParticleType::Brems:
+                TPolyMarker3D* m  = new TPolyMarker3D();
+                m->SetPoint(0,secondarys.at(i)->GetX(),secondarys.at(i)->GetY(),secondarys.at(i)->GetZ());
+                m->SetMarkerStyle(20);
+                m->SetMarkerColor(kBlue);
+                m->SetMarkerSize(secondarys.at(i)->GetEnergy()/energy*400*scale);
+                marker.push_back(m);
+                break;
+
+            case PROPOSALParticle::ParticleType::NuclInt:
+                TPolyMarker3D* m  = new TPolyMarker3D();
+                m->SetPoint(0,secondarys.at(i)->GetX(),secondarys.at(i)->GetY(),secondarys.at(i)->GetZ());
+                m->SetMarkerStyle(20);
+                m->SetMarkerColor(kBlack);
+                m->SetMarkerSize(secondarys.at(i)->GetEnergy()/energy*4000*scale);
+                marker.push_back(m);
+                break;
+
+            case (PROPOSALParticle::ParticleType::EMinus || PROPOSALParticle::ParticleType::EPlus):
+                TPolyMarker3D* m  = new TPolyMarker3D();
+                m->SetPoint(0,secondarys.at(i)->GetX(),secondarys.at(i)->GetY(),secondarys.at(i)->GetZ());
+                m->SetMarkerStyle(20);
+                m->SetMarkerColor(kCyan);
+                m->SetMarkerSize(secondarys.at(i)->GetEnergy()/energy*400000*scale);
+                marker.push_back(m);
+                break;
+
+            default:
+                log_fatal("You shouldn't be here: Your secondary particle is not Epair, DeltaE, Brems, NuclInt or EMinus/EPlus");
+                break;
         }
     }
     h3->GetXaxis()->SetTitle("x [cm]");

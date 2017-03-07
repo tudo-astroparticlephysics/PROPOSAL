@@ -49,9 +49,9 @@ int main()
 
     TFile *file     =   new TFile("Bremsstrahlung_dNdx.root","RECREATE");
 
-    PROPOSALParticle *mu    =   new PROPOSALParticle("mu");
-    PROPOSALParticle *tau   =   new PROPOSALParticle("tau");
-    PROPOSALParticle *e     =   new PROPOSALParticle("e");
+    PROPOSALParticle *mu    =   new PROPOSALParticle(PROPOSALParticle::ParticleType::MuMinus);
+    PROPOSALParticle *tau   =   new PROPOSALParticle(PROPOSALParticle::ParticleType::TauMinus);
+    PROPOSALParticle *e     =   new PROPOSALParticle(PROPOSALParticle::ParticleType::EMinus);
 
     Medium  *med1   =   new Medium("hydrogen",1.);
     Medium  *med2   =   new Medium("water",1.);
@@ -338,406 +338,233 @@ int main()
 
     for(unsigned int i = 0 ; i < graphs.size() ; i++)
     {
-        if(brems.at(i)->GetParticle()->GetName().compare("mu")==0 && brems.at(i)->GetMedium()->GetName().compare("water")==0)
+        switch (brems.at(i)->GetParametrization())
         {
-            muons_water_gr->Add(graphs.at(i),"P");
-
-            if(brems.at(i)->GetParametrization()==1)
-            {
+            case 1:
                 leg_entry<<"KKP";
-            }
-            if(brems.at(i)->GetParametrization()==2)
-            {
+                break;
+            case 2:
                 leg_entry<<"ABB";
-            }
-            if(brems.at(i)->GetParametrization()==3)
-            {
+                break;
+            case 3:
                 leg_entry<<"PS";
-            }
-            if(brems.at(i)->GetParametrization()==4)
-            {
+                break;
+            case 4:
                 leg_entry<<"CSC";
-            }
-
-            muons_leg_water->AddEntry(graphs.at(i),leg_entry.str().c_str(),"p");
-
-            if(muons_water_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(muons_water_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(muons_water_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-            if(muons_water_gr->GetListOfGraphs()->Capacity()==4)
-            {
-                graphs.at(i)->SetMarkerColor(kBlack);
-            }
-
-            leg_entry.str("");
-            leg_entry.clear();
-
-        }
-        if(brems.at(i)->GetParticle()->GetName().compare("mu")==0 && brems.at(i)->GetMedium()->GetName().compare("hydrogen")==0)
-        {
-            muons_hydrogen_gr->Add(graphs.at(i),"P");
-
-            if(brems.at(i)->GetParametrization()==1)
-            {
-                leg_entry<<"KKP";
-            }
-            if(brems.at(i)->GetParametrization()==2)
-            {
-                leg_entry<<"ABB";
-            }
-            if(brems.at(i)->GetParametrization()==3)
-            {
-                leg_entry<<"PS";
-            }
-            if(brems.at(i)->GetParametrization()==4)
-            {
-                leg_entry<<"CSC";
-            }
-
-            muons_leg_hydrogen->AddEntry(graphs.at(i),leg_entry.str().c_str(),"p");
-
-            if(muons_hydrogen_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(muons_hydrogen_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(muons_hydrogen_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-            if(muons_hydrogen_gr->GetListOfGraphs()->Capacity()==4)
-            {
-                graphs.at(i)->SetMarkerColor(kBlack);
-            }
-
-            leg_entry.str("");
-            leg_entry.clear();
-
-        }
-        if(brems.at(i)->GetParticle()->GetName().compare("mu")==0 && brems.at(i)->GetMedium()->GetName().compare("uranium")==0)
-        {
-            muons_uranium_gr->Add(graphs.at(i),"P");
-
-            if(brems.at(i)->GetParametrization()==1)
-            {
-                leg_entry<<"KKP";
-            }
-            if(brems.at(i)->GetParametrization()==2)
-            {
-                leg_entry<<"ABB";
-            }
-            if(brems.at(i)->GetParametrization()==3)
-            {
-                leg_entry<<"PS";
-            }
-            if(brems.at(i)->GetParametrization()==4)
-            {
-                leg_entry<<"CSC";
-            }
-
-            muons_leg_uranium->AddEntry(graphs.at(i),leg_entry.str().c_str(),"p");
-
-            if(muons_uranium_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(muons_uranium_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(muons_uranium_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-            if(muons_uranium_gr->GetListOfGraphs()->Capacity()==4)
-            {
-                graphs.at(i)->SetMarkerColor(kBlack);
-            }
-
-            leg_entry.str("");
-            leg_entry.clear();
-
+                break;
+            default:
+                log_fatal("You shouldn't be here: Your Parametrisation is not KKP, ABB, Brems, PS or CSC");
+                break;
         }
 
-
-        if(brems.at(i)->GetParticle()->GetName().compare("tau")==0 && brems.at(i)->GetMedium()->GetName().compare("water")==0)
+        if(brems.at(i)->GetParticle()->GetType() == PROPOSALParticle::ParticleType::MuMinus)
         {
-            taus_water_gr->Add(graphs.at(i),"P");
+            if (brems.at(i)->GetMedium()->GetName().compare("water")==0)
+            {
+                muons_water_gr->Add(graphs.at(i),"P");
+                muons_leg_water->AddEntry(graphs.at(i),leg_entry.str().c_str(),"p");
 
-            if(brems.at(i)->GetParametrization()==1)
-            {
-                leg_entry<<"KKP";
-            }
-            if(brems.at(i)->GetParametrization()==2)
-            {
-                leg_entry<<"ABB";
-            }
-            if(brems.at(i)->GetParametrization()==3)
-            {
-                leg_entry<<"PS";
-            }
-            if(brems.at(i)->GetParametrization()==4)
-            {
-                leg_entry<<"CSC";
-            }
-
-            taus_leg_water->AddEntry(graphs.at(i),leg_entry.str().c_str(),"p");
-
-            if(taus_water_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(taus_water_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(taus_water_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-            if(taus_water_gr->GetListOfGraphs()->Capacity()==4)
-            {
-                graphs.at(i)->SetMarkerColor(kBlack);
+                switch(muons_water_gr->GetListOfGraphs()->Capacity())
+                {
+                    case 1:
+                        graphs.at(i)->SetMarkerColor(kRed);
+                        break;
+                    case 2:
+                        graphs.at(i)->SetMarkerColor(kBlue);
+                        break;
+                    case 3:
+                        graphs.at(i)->SetMarkerColor(kGreen);
+                        break;
+                    case 4:
+                        graphs.at(i)->SetMarkerColor(kBlack);
+                        break;
+                }
             }
 
-            leg_entry.str("");
-            leg_entry.clear();
+            else if (brems.at(i)->GetMedium()->GetName().compare("hydrogen")==0)
+            {
+                muons_hydrogen_gr->Add(graphs.at(i),"P");
+                muons_leg_hydrogen->AddEntry(graphs.at(i),leg_entry.str().c_str(),"p");
 
-        }
-        if(brems.at(i)->GetParticle()->GetName().compare("tau")==0 && brems.at(i)->GetMedium()->GetName().compare("hydrogen")==0)
-        {
-            taus_hydrogen_gr->Add(graphs.at(i),"P");
-
-            if(brems.at(i)->GetParametrization()==1)
-            {
-                leg_entry<<"KKP";
-            }
-            if(brems.at(i)->GetParametrization()==2)
-            {
-                leg_entry<<"ABB";
-            }
-            if(brems.at(i)->GetParametrization()==3)
-            {
-                leg_entry<<"PS";
-            }
-            if(brems.at(i)->GetParametrization()==4)
-            {
-                leg_entry<<"CSC";
+                switch(muons_hydrogen_gr->GetListOfGraphs()->Capacity())
+                {
+                    case 1:
+                        graphs.at(i)->SetMarkerColor(kRed);
+                        break;
+                    case 2:
+                        graphs.at(i)->SetMarkerColor(kBlue);
+                        break;
+                    case 3:
+                        graphs.at(i)->SetMarkerColor(kGreen);
+                        break;
+                    case 4:
+                        graphs.at(i)->SetMarkerColor(kBlack);
+                        break;
+                }
             }
 
-            taus_leg_hydrogen->AddEntry(graphs.at(i),leg_entry.str().c_str(),"p");
+            else if (brems.at(i)->GetMedium()->GetName().compare("uranium")==0)
+            {
+                muons_uranium_gr->Add(graphs.at(i),"P");
+                muons_leg_uranium->AddEntry(graphs.at(i),leg_entry.str().c_str(),"p");
 
-            if(taus_hydrogen_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
+                switch(muons_uranium_gr->GetListOfGraphs()->Capacity())
+                {
+                    case 1:
+                        graphs.at(i)->SetMarkerColor(kRed);
+                        break;
+                    case 2:
+                        graphs.at(i)->SetMarkerColor(kBlue);
+                        break;
+                    case 3:
+                        graphs.at(i)->SetMarkerColor(kGreen);
+                        break;
+                    case 4:
+                        graphs.at(i)->SetMarkerColor(kBlack);
+                        break;
+                }
             }
-            if(taus_hydrogen_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(taus_hydrogen_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-            if(taus_hydrogen_gr->GetListOfGraphs()->Capacity()==4)
-            {
-                graphs.at(i)->SetMarkerColor(kBlack);
-            }
-
-            leg_entry.str("");
-            leg_entry.clear();
-
-        }
-        if(brems.at(i)->GetParticle()->GetName().compare("tau")==0 && brems.at(i)->GetMedium()->GetName().compare("uranium")==0)
-        {
-            taus_uranium_gr->Add(graphs.at(i),"P");
-
-            if(brems.at(i)->GetParametrization()==1)
-            {
-                leg_entry<<"KKP";
-            }
-            if(brems.at(i)->GetParametrization()==2)
-            {
-                leg_entry<<"ABB";
-            }
-            if(brems.at(i)->GetParametrization()==3)
-            {
-                leg_entry<<"PS";
-            }
-            if(brems.at(i)->GetParametrization()==4)
-            {
-                leg_entry<<"CSC";
-            }
-
-            taus_leg_uranium->AddEntry(graphs.at(i),leg_entry.str().c_str(),"p");
-
-            if(taus_uranium_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(taus_uranium_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(taus_uranium_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-            if(taus_uranium_gr->GetListOfGraphs()->Capacity()==4)
-            {
-                graphs.at(i)->SetMarkerColor(kBlack);
-            }
-
-            leg_entry.str("");
-            leg_entry.clear();
-
         }
 
-
-        if(brems.at(i)->GetParticle()->GetName().compare("e")==0 && brems.at(i)->GetMedium()->GetName().compare("water")==0)
+        else if(brems.at(i)->GetParticle()->GetType() == PROPOSALParticle::ParticleType::TauMinus)
         {
-            electrons_water_gr->Add(graphs.at(i),"P");
+            if (brems.at(i)->GetMedium()->GetName().compare("water")==0)
+            {
+                taus_water_gr->Add(graphs.at(i),"P");
+                taus_leg_water->AddEntry(graphs.at(i),leg_entry.str().c_str(),"p");
 
-            if(brems.at(i)->GetParametrization()==1)
-            {
-                leg_entry<<"KKP";
-            }
-            if(brems.at(i)->GetParametrization()==2)
-            {
-                leg_entry<<"ABB";
-            }
-            if(brems.at(i)->GetParametrization()==3)
-            {
-                leg_entry<<"PS";
-            }
-            if(brems.at(i)->GetParametrization()==4)
-            {
-                leg_entry<<"CSC";
-            }
-
-            electrons_leg_water->AddEntry(graphs.at(i),leg_entry.str().c_str(),"p");
-
-            if(electrons_water_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(electrons_water_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(electrons_water_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-            if(electrons_water_gr->GetListOfGraphs()->Capacity()==4)
-            {
-                graphs.at(i)->SetMarkerColor(kBlack);
+                switch(taus_water_gr->GetListOfGraphs()->Capacity())
+                {
+                    case 1:
+                        graphs.at(i)->SetMarkerColor(kRed);
+                        break;
+                    case 2:
+                        graphs.at(i)->SetMarkerColor(kBlue);
+                        break;
+                    case 3:
+                        graphs.at(i)->SetMarkerColor(kGreen);
+                        break;
+                    case 4:
+                        graphs.at(i)->SetMarkerColor(kBlack);
+                        break;
+                }
             }
 
-            leg_entry.str("");
-            leg_entry.clear();
+            else if (brems.at(i)->GetMedium()->GetName().compare("hydrogen")==0)
+            {
+                taus_hydrogen_gr->Add(graphs.at(i),"P");
+                taus_leg_hydrogen->AddEntry(graphs.at(i),leg_entry.str().c_str(),"p");
 
+                switch(taus_hydrogen_gr->GetListOfGraphs()->Capacity())
+                {
+                    case 1:
+                        graphs.at(i)->SetMarkerColor(kRed);
+                        break;
+                    case 2:
+                        graphs.at(i)->SetMarkerColor(kBlue);
+                        break;
+                    case 3:
+                        graphs.at(i)->SetMarkerColor(kGreen);
+                        break;
+                    case 4:
+                        graphs.at(i)->SetMarkerColor(kBlack);
+                        break;
+                }
+            }
+
+            else if (brems.at(i)->GetMedium()->GetName().compare("uranium")==0)
+            {
+                taus_uranium_gr->Add(graphs.at(i),"P");
+                taus_leg_uranium->AddEntry(graphs.at(i),leg_entry.str().c_str(),"p");
+
+                switch(taus_uranium_gr->GetListOfGraphs()->Capacity())
+                {
+                    case 1:
+                        graphs.at(i)->SetMarkerColor(kRed);
+                        break;
+                    case 2:
+                        graphs.at(i)->SetMarkerColor(kBlue);
+                        break;
+                    case 3:
+                        graphs.at(i)->SetMarkerColor(kGreen);
+                        break;
+                    case 4:
+                        graphs.at(i)->SetMarkerColor(kBlack);
+                        break;
+                }
+            }
         }
-        if(brems.at(i)->GetParticle()->GetName().compare("e")==0 && brems.at(i)->GetMedium()->GetName().compare("hydrogen")==0)
+
+        else if(brems.at(i)->GetParticle()->GetType() == PROPOSALParticle::ParticleType::EMinus)
         {
-            electrons_hydrogen_gr->Add(graphs.at(i),"P");
+            if (brems.at(i)->GetMedium()->GetName().compare("water")==0)
+            {
+                electrons_water_gr->Add(graphs.at(i),"P");
+                electrons_leg_water->AddEntry(graphs.at(i),leg_entry.str().c_str(),"p");
 
-            if(brems.at(i)->GetParametrization()==1)
-            {
-                leg_entry<<"KKP";
-            }
-            if(brems.at(i)->GetParametrization()==2)
-            {
-                leg_entry<<"ABB";
-            }
-            if(brems.at(i)->GetParametrization()==3)
-            {
-                leg_entry<<"PS";
-            }
-            if(brems.at(i)->GetParametrization()==4)
-            {
-                leg_entry<<"CSC";
-            }
-
-            electrons_leg_hydrogen->AddEntry(graphs.at(i),leg_entry.str().c_str(),"p");
-
-            if(electrons_hydrogen_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(electrons_hydrogen_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(electrons_hydrogen_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-            if(electrons_hydrogen_gr->GetListOfGraphs()->Capacity()==4)
-            {
-                graphs.at(i)->SetMarkerColor(kBlack);
+                switch(electrons_water_gr->GetListOfGraphs()->Capacity())
+                {
+                    case 1:
+                        graphs.at(i)->SetMarkerColor(kRed);
+                        break;
+                    case 2:
+                        graphs.at(i)->SetMarkerColor(kBlue);
+                        break;
+                    case 3:
+                        graphs.at(i)->SetMarkerColor(kGreen);
+                        break;
+                    case 4:
+                        graphs.at(i)->SetMarkerColor(kBlack);
+                        break;
+                }
             }
 
-            leg_entry.str("");
-            leg_entry.clear();
+            else if (brems.at(i)->GetMedium()->GetName().compare("hydrogen")==0)
+            {
+                electrons_hydrogen_gr->Add(graphs.at(i),"P");
+                electrons_leg_hydrogen->AddEntry(graphs.at(i),leg_entry.str().c_str(),"p");
 
+                switch(electrons_hydrogen_gr->GetListOfGraphs()->Capacity())
+                {
+                    case 1:
+                        graphs.at(i)->SetMarkerColor(kRed);
+                        break;
+                    case 2:
+                        graphs.at(i)->SetMarkerColor(kBlue);
+                        break;
+                    case 3:
+                        graphs.at(i)->SetMarkerColor(kGreen);
+                        break;
+                    case 4:
+                        graphs.at(i)->SetMarkerColor(kBlack);
+                        break;
+                }
+            }
+
+            else if (brems.at(i)->GetMedium()->GetName().compare("uranium")==0)
+            {
+                electrons_uranium_gr->Add(graphs.at(i),"P");
+                electrons_leg_uranium->AddEntry(graphs.at(i),leg_entry.str().c_str(),"p");
+
+                switch(electrons_uranium_gr->GetListOfGraphs()->Capacity())
+                {
+                    case 1:
+                        graphs.at(i)->SetMarkerColor(kRed);
+                        break;
+                    case 2:
+                        graphs.at(i)->SetMarkerColor(kBlue);
+                        break;
+                    case 3:
+                        graphs.at(i)->SetMarkerColor(kGreen);
+                        break;
+                    case 4:
+                        graphs.at(i)->SetMarkerColor(kBlack);
+                        break;
+                }
+            }
         }
-        if(brems.at(i)->GetParticle()->GetName().compare("e")==0 && brems.at(i)->GetMedium()->GetName().compare("uranium")==0)
-        {
-            electrons_uranium_gr->Add(graphs.at(i),"P");
-
-            if(brems.at(i)->GetParametrization()==1)
-            {
-                leg_entry<<"KKP";
-            }
-            if(brems.at(i)->GetParametrization()==2)
-            {
-                leg_entry<<"ABB";
-            }
-            if(brems.at(i)->GetParametrization()==3)
-            {
-                leg_entry<<"PS";
-            }
-            if(brems.at(i)->GetParametrization()==4)
-            {
-                leg_entry<<"CSC";
-            }
-
-            electrons_leg_uranium->AddEntry(graphs.at(i),leg_entry.str().c_str(),"p");
-
-            if(electrons_uranium_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(electrons_uranium_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(electrons_uranium_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-            if(electrons_uranium_gr->GetListOfGraphs()->Capacity()==4)
-            {
-                graphs.at(i)->SetMarkerColor(kBlack);
-            }
-
-            leg_entry.str("");
-            leg_entry.clear();
-
-        }
+        leg_entry.str("");
+        leg_entry.clear();
     }
 
     muons_water->cd();
@@ -1224,19 +1051,3 @@ int main()
 
     return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
