@@ -36,7 +36,7 @@ Scattering::Scattering( )
     ,integral_(  new Integral(IROMB, IMAXS, IPREC2) )
     ,interpolant_(NULL)
     ,interpolant_diff_(NULL)
-    ,particle_( new PROPOSALParticle(ParticleType::MuMinus) )
+    ,particle_( new PROPOSALParticle(PROPOSALParticle::ParticleType::MuMinus) )
 {
     crosssections_.push_back(new Ionization());
     crosssections_.push_back(new Bremsstrahlung());
