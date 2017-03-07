@@ -190,7 +190,7 @@
 #endif
 
 #ifndef NLOW // bounds of parameterizations
-    #define NLOW  0.510998902
+    #define NLOW  0.5109989461
 #endif
 
 #ifndef LOG10 // log(10)

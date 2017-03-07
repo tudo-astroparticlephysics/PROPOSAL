@@ -406,6 +406,30 @@ string I3PropagatorServicePROPOSAL::GenerateMMCName(const I3Particle& p){
   return name;
 }
 
+ParticleType I3PropagatorServicePROPOSAL::GeneratePROPOSALName(const I3Particle& p){
+
+  if(p.GetType()==I3Particle::MuMinus) return ParticleType::MuMinus;
+  else if(p.GetType()==I3Particle::MuPlus) return ParticleType::MuPlus;
+  else if(p.GetType()==I3Particle::NuMu) return ParticleType::NuMu;
+  else if(p.GetType()==I3Particle::NuMuBar) return ParticleType::NuMuBar;
+  else if(p.GetType()==I3Particle::NuE) return ParticleType::NuE;
+  else if(p.GetType()==I3Particle::NuEBar) return ParticleType::NuEBar;
+  else if(p.GetType()==I3Particle::NuTau) return ParticleType::NuTau;
+  else if(p.GetType()==I3Particle::NuTauBar) return ParticleType::NuTauBar;
+  else if((p.GetType()==I3Particle::EMinus) &&
+    (p.GetShape()==I3Particle::TopShower)) return ParticleType::EMinus;
+  else if((p.GetType()==I3Particle::EPlus) &&
+    (p.GetShape()==I3Particle::TopShower)) return ParticleType::EPlus;
+  else if(p.GetType()==I3Particle::TauMinus) return ParticleType::TauMinus;
+  else if(p.GetType()==I3Particle::TauPlus) return ParticleType::TauPlus;
+  else if((p.GetType()==I3Particle::Hadrons) &&
+    (p.GetShape()==I3Particle::TopShower)) return ParticleType::Hadrons;
+  else if(p.GetType()==I3Particle::Monopole) return ParticleType::Monopole;
+  // TODO: implement stau masses
+  // else if(p.GetType()==I3Particle::STauPlus) return ParticleType::STauPlus;
+  // else if(p.GetType()==I3Particle::STauMinus) return ParticleType::STauMinus;
+}
+
 I3MMCTrackPtr I3PropagatorServicePROPOSAL::GenerateMMCTrack(PROPOSALParticle* particle){
 
     //explicitly specifying the units from MMC
