@@ -105,7 +105,7 @@ public:
     Propagator(std::string config_file, bool DoApplyOptions=true);
     Propagator(Medium* medium,
                EnergyCutSettings* cuts,
-               ParticleType particle_type,
+               PROPOSALParticle::ParticleType particle_type,
                std::string path_to_tables,
                bool moliere = true,
                bool continuous_rand = true,
