@@ -408,26 +408,26 @@ string I3PropagatorServicePROPOSAL::GenerateMMCName(const I3Particle& p){
 
 ParticleType I3PropagatorServicePROPOSAL::GeneratePROPOSALName(const I3Particle& p){
 
-  if(p.GetType()==I3Particle::MuMinus) return ParticleType::MuMinus;
-  else if(p.GetType()==I3Particle::MuPlus) return ParticleType::MuPlus;
-  else if(p.GetType()==I3Particle::NuMu) return ParticleType::NuMu;
-  else if(p.GetType()==I3Particle::NuMuBar) return ParticleType::NuMuBar;
-  else if(p.GetType()==I3Particle::NuE) return ParticleType::NuE;
-  else if(p.GetType()==I3Particle::NuEBar) return ParticleType::NuEBar;
-  else if(p.GetType()==I3Particle::NuTau) return ParticleType::NuTau;
-  else if(p.GetType()==I3Particle::NuTauBar) return ParticleType::NuTauBar;
+  if(p.GetType()==I3Particle::MuMinus) return PROPOSALParticle::ParticleType::MuMinus;
+  else if(p.GetType()==I3Particle::MuPlus) return PROPOSALParticle::ParticleType::MuPlus;
+  else if(p.GetType()==I3Particle::NuMu) return PROPOSALParticle::ParticleType::NuMu;
+  else if(p.GetType()==I3Particle::NuMuBar) return PROPOSALParticle::ParticleType::NuMuBar;
+  else if(p.GetType()==I3Particle::NuE) return PROPOSALParticle::ParticleType::NuE;
+  else if(p.GetType()==I3Particle::NuEBar) return PROPOSALParticle::ParticleType::NuEBar;
+  else if(p.GetType()==I3Particle::NuTau) return PROPOSALParticle::ParticleType::NuTau;
+  else if(p.GetType()==I3Particle::NuTauBar) return PROPOSALParticle::ParticleType::NuTauBar;
   else if((p.GetType()==I3Particle::EMinus) &&
-    (p.GetShape()==I3Particle::TopShower)) return ParticleType::EMinus;
+    (p.GetShape()==I3Particle::TopShower)) return PROPOSALParticle::ParticleType::EMinus;
   else if((p.GetType()==I3Particle::EPlus) &&
-    (p.GetShape()==I3Particle::TopShower)) return ParticleType::EPlus;
-  else if(p.GetType()==I3Particle::TauMinus) return ParticleType::TauMinus;
-  else if(p.GetType()==I3Particle::TauPlus) return ParticleType::TauPlus;
+    (p.GetShape()==I3Particle::TopShower)) return PROPOSALParticle::ParticleType::EPlus;
+  else if(p.GetType()==I3Particle::TauMinus) return PROPOSALParticle::ParticleType::TauMinus;
+  else if(p.GetType()==I3Particle::TauPlus) return PROPOSALParticle::ParticleType::TauPlus;
   else if((p.GetType()==I3Particle::Hadrons) &&
-    (p.GetShape()==I3Particle::TopShower)) return ParticleType::Hadrons;
-  else if(p.GetType()==I3Particle::Monopole) return ParticleType::Monopole;
+    (p.GetShape()==I3Particle::TopShower)) return PROPOSALParticle::ParticleType::Hadrons;
+  else if(p.GetType()==I3Particle::Monopole) return PROPOSALParticle::ParticleType::Monopole;
   // TODO: implement stau masses
-  // else if(p.GetType()==I3Particle::STauPlus) return ParticleType::STauPlus;
-  // else if(p.GetType()==I3Particle::STauMinus) return ParticleType::STauMinus;
+  else if(p.GetType()==I3Particle::STauPlus) return PROPOSALParticle::ParticleType::STauPlus;
+  else if(p.GetType()==I3Particle::STauMinus) return PROPOSALParticle::ParticleType::STauMinus;
 }
 
 I3MMCTrackPtr I3PropagatorServicePROPOSAL::GenerateMMCTrack(PROPOSALParticle* particle){
