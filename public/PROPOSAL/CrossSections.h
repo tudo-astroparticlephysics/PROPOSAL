@@ -31,6 +31,7 @@ class CrossSections
 
 protected:
 
+    std::string name_;
     PROPOSALParticle::ParticleType type_;
 
     PROPOSALParticle*   particle_;
@@ -179,6 +180,11 @@ public:
 
 //----------------------------------------------------------------------------//
     // Getter
+    std::string GetName() const
+    {
+        return name_;
+    }
+
     PROPOSALParticle::ParticleType GetType() const
     {
         return type_;
