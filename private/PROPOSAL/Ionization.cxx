@@ -399,6 +399,7 @@ Ionization::Ionization()
     ,integral_              (  )
 {
     name_                  = "Ionization";
+    type_                  = PROPOSALParticle::ParticleType::DeltaE;
 
     dedx_interpolant_      = NULL;
     dndx_interpolant_1d_   = NULL;
@@ -458,6 +459,7 @@ Ionization::Ionization(PROPOSALParticle* particle,
     ,gamma_ ( 0 )
 {
     name_                       = "Ionization";
+    type_                       = PROPOSALParticle::ParticleType::DeltaE;
     vMax_                       = 0;
     vUp_                        = 0;
     vMin_                       = 0;
