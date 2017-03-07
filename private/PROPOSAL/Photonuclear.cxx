@@ -587,6 +587,7 @@ Photonuclear::Photonuclear()
 
 {
     name_   =   "Photonuclear";
+    type_   =   PROPOSALParticle::ParticleType::NuclInt;
 
     integral_             = new Integral(IROMB, IMAXS, IPREC);
     integral_for_dEdx_    = new Integral(IROMB, IMAXS, IPREC);
@@ -697,6 +698,7 @@ Photonuclear::Photonuclear(PROPOSALParticle* particle,
 
 {
     name_       = "Photonuclear";
+    type_       = PROPOSALParticle::ParticleType::NuclInt;
     multiplier_ = 1.;
 
     integral_             = new Integral(IROMB, IMAXS, IPREC);
