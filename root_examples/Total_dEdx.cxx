@@ -213,7 +213,6 @@ int main()
 
     }
 
-
     vector<TGraph*> mu_ice_graphs;
     vector<TGraph*> mu_uranium_graphs;
     vector<TGraph*> mu_hydrogen_graphs;
@@ -310,19 +309,3 @@ int main()
     file->Close();
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
