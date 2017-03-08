@@ -136,31 +136,25 @@ int main()
         graph_name<<"_"<<brems.at(i)->GetParametrization();
         graph_title<<brems.at(i)->GetParticle()->GetName()<<" in "<<brems.at(i)->GetMedium()->GetName();
 
-        if(brems.at(i)->GetParametrization()==1)
+        switch (brems.at(i)->GetParametrization())
         {
-            graph_title<<", parametrization: Kelner-Kakoulin-Petrukhin";
-            graphs.at(i)->SetMarkerStyle(4);
-
+            case 1:
+                graph_title<<", parametrization: Kelner-Kakoulin-Petrukhin";
+                graphs.at(i)->SetMarkerStyle(4);
+                break;
+            case 2:
+                graph_title<<", parametrization: Andreev-Bezrukov-Bugaev";
+                graphs.at(i)->SetMarkerStyle(3);
+                break;
+            case 3:
+                graph_title<<", parametrization: Petrukhin-Shestakov";
+                graphs.at(i)->SetMarkerStyle(2);
+                break;
+            case 4:
+                graph_title<<", parametrization: Complete screening case";
+                graphs.at(i)->SetMarkerStyle(28);
+                break;
         }
-        if(brems.at(i)->GetParametrization()==2)
-        {
-            graph_title<<", parametrization: Andreev-Bezrukov-Bugaev";
-            graphs.at(i)->SetMarkerStyle(3);
-
-        }
-        if(brems.at(i)->GetParametrization()==3)
-        {
-            graph_title<<", parametrization: Petrukhin-Shestakov";
-            graphs.at(i)->SetMarkerStyle(2);
-
-        }
-        if(brems.at(i)->GetParametrization()==4)
-        {
-            graph_title<<", parametrization: Complete screening case";
-            graphs.at(i)->SetMarkerStyle(28);
-
-        }
-
 
         graphs.at(i)->SetName(graph_name.str().c_str());
         graphs.at(i)->SetTitle(graph_title.str().c_str());
@@ -679,223 +673,216 @@ int main()
 
     for(unsigned int i = 0 ; i < graphs.size() ; i++)
     {
-        if(brems.at(i)->GetMedium()->GetName().compare("hydrogen")==0 && brems.at(i)->GetParametrization()==1)
+        if(brems.at(i)->GetMedium()->GetName().compare("hydrogen")==0)
         {
-            hydrogen_para1_gr->Add(graphs.at(i),"P");
-            hydrogen_para1_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
-
-            if(hydrogen_para1_gr->GetListOfGraphs()->Capacity()==1)
+            switch (brems.at(i)->GetParametrization())
             {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(hydrogen_para1_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(hydrogen_para1_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-        }
-        if(brems.at(i)->GetMedium()->GetName().compare("hydrogen")==0 && brems.at(i)->GetParametrization()==2)
-        {
-            hydrogen_para2_gr->Add(graphs.at(i),"P");
-            hydrogen_para2_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
-
-            if(hydrogen_para2_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(hydrogen_para2_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(hydrogen_para2_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-        }
-        if(brems.at(i)->GetMedium()->GetName().compare("hydrogen")==0 && brems.at(i)->GetParametrization()==3)
-        {
-            hydrogen_para3_gr->Add(graphs.at(i),"P");
-            hydrogen_para3_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
-
-            if(hydrogen_para3_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(hydrogen_para3_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(hydrogen_para3_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-        }
-        if(brems.at(i)->GetMedium()->GetName().compare("hydrogen")==0 && brems.at(i)->GetParametrization()==4)
-        {
-            hydrogen_para4_gr->Add(graphs.at(i),"P");
-            hydrogen_para4_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
-
-            if(hydrogen_para4_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(hydrogen_para4_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(hydrogen_para4_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
+                case 1:
+                    hydrogen_para1_gr->Add(graphs.at(i),"P");
+                    hydrogen_para1_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    switch (hydrogen_para1_gr->GetListOfGraphs()->Capacity())
+                    {
+                        case 1:
+                            graphs.at(i)->SetMarkerColor(kRed);
+                            break;
+                        case 2:
+                            graphs.at(i)->SetMarkerColor(kBlue);
+                            break;
+                        case 3:
+                            graphs.at(i)->SetMarkerColor(kGreen);
+                            break;
+                    }
+                    break;
+                case 2:
+                    hydrogen_para2_gr->Add(graphs.at(i),"P");
+                    hydrogen_para2_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    switch (hydrogen_para2_gr->GetListOfGraphs()->Capacity())
+                    {
+                        case 1:
+                            graphs.at(i)->SetMarkerColor(kRed);
+                            break;
+                        case 2:
+                            graphs.at(i)->SetMarkerColor(kBlue);
+                            break;
+                        case 3:
+                            graphs.at(i)->SetMarkerColor(kGreen);
+                            break;
+                    }
+                    break;
+                case 3:
+                    hydrogen_para3_gr->Add(graphs.at(i),"P");
+                    hydrogen_para3_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    switch (hydrogen_para3_gr->GetListOfGraphs()->Capacity())
+                    {
+                        case 1:
+                            graphs.at(i)->SetMarkerColor(kRed);
+                            break;
+                        case 2:
+                            graphs.at(i)->SetMarkerColor(kBlue);
+                            break;
+                        case 3:
+                            graphs.at(i)->SetMarkerColor(kGreen);
+                            break;
+                    }
+                    break;
+                case 4:
+                    hydrogen_para4_gr->Add(graphs.at(i),"P");
+                    hydrogen_para4_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    switch (hydrogen_para4_gr->GetListOfGraphs()->Capacity())
+                    {
+                        case 1:
+                            graphs.at(i)->SetMarkerColor(kRed);
+                            break;
+                        case 2:
+                            graphs.at(i)->SetMarkerColor(kBlue);
+                            break;
+                        case 3:
+                            graphs.at(i)->SetMarkerColor(kGreen);
+                            break;
+                    }
+                    break;
             }
         }
 
-        if(brems.at(i)->GetMedium()->GetName().compare("water")==0 && brems.at(i)->GetParametrization()==1)
+        else if(brems.at(i)->GetMedium()->GetName().compare("water")==0)
         {
-            water_para1_gr->Add(graphs.at(i),"P");
-            water_para1_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
-
-            if(water_para1_gr->GetListOfGraphs()->Capacity()==1)
+            switch (brems.at(i)->GetParametrization())
             {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(water_para1_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(water_para1_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-        }
-        if(brems.at(i)->GetMedium()->GetName().compare("water")==0 && brems.at(i)->GetParametrization()==2)
-        {
-            water_para2_gr->Add(graphs.at(i),"P");
-            water_para2_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
-
-            if(water_para2_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(water_para2_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(water_para2_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-        }
-        if(brems.at(i)->GetMedium()->GetName().compare("water")==0 && brems.at(i)->GetParametrization()==3)
-        {
-            water_para3_gr->Add(graphs.at(i),"P");
-            water_para3_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
-
-            if(water_para3_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(water_para3_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(water_para3_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-        }
-        if(brems.at(i)->GetMedium()->GetName().compare("water")==0 && brems.at(i)->GetParametrization()==4)
-        {
-            water_para4_gr->Add(graphs.at(i),"P");
-            water_para4_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
-
-            if(water_para4_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(water_para4_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(water_para4_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
+                case 1:
+                    water_para1_gr->Add(graphs.at(i),"P");
+                    water_para1_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    switch (water_para1_gr->GetListOfGraphs()->Capacity())
+                    {
+                        case 1:
+                            graphs.at(i)->SetMarkerColor(kRed);
+                            break;
+                        case 2:
+                            graphs.at(i)->SetMarkerColor(kBlue);
+                            break;
+                        case 3:
+                            graphs.at(i)->SetMarkerColor(kGreen);
+                            break;
+                    }
+                    break;
+                case 2:
+                    water_para2_gr->Add(graphs.at(i),"P");
+                    water_para2_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    switch (water_para2_gr->GetListOfGraphs()->Capacity())
+                    {
+                        case 1:
+                            graphs.at(i)->SetMarkerColor(kRed);
+                            break;
+                        case 2:
+                            graphs.at(i)->SetMarkerColor(kBlue);
+                            break;
+                        case 3:
+                            graphs.at(i)->SetMarkerColor(kGreen);
+                            break;
+                    }
+                    break;
+                case 3:
+                    water_para3_gr->Add(graphs.at(i),"P");
+                    water_para3_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    switch (water_para3_gr->GetListOfGraphs()->Capacity())
+                    {
+                        case 1:
+                            graphs.at(i)->SetMarkerColor(kRed);
+                            break;
+                        case 2:
+                            graphs.at(i)->SetMarkerColor(kBlue);
+                            break;
+                        case 3:
+                            graphs.at(i)->SetMarkerColor(kGreen);
+                            break;
+                    }
+                    break;
+                case 4:
+                    water_para4_gr->Add(graphs.at(i),"P");
+                    water_para4_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    switch (water_para4_gr->GetListOfGraphs()->Capacity())
+                    {
+                        case 1:
+                            graphs.at(i)->SetMarkerColor(kRed);
+                            break;
+                        case 2:
+                            graphs.at(i)->SetMarkerColor(kBlue);
+                            break;
+                        case 3:
+                            graphs.at(i)->SetMarkerColor(kGreen);
+                            break;
+                    }
+                    break;
             }
         }
 
-
-        if(brems.at(i)->GetMedium()->GetName().compare("uranium")==0 && brems.at(i)->GetParametrization()==1)
+        else if(brems.at(i)->GetMedium()->GetName().compare("uranium")==0)
         {
-            uranium_para1_gr->Add(graphs.at(i),"P");
-            uranium_para1_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
-
-            if(uranium_para1_gr->GetListOfGraphs()->Capacity()==1)
+            switch (brems.at(i)->GetParametrization())
             {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(uranium_para1_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(uranium_para1_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-        }
-        if(brems.at(i)->GetMedium()->GetName().compare("uranium")==0 && brems.at(i)->GetParametrization()==2)
-        {
-            uranium_para2_gr->Add(graphs.at(i),"P");
-            uranium_para2_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
-
-            if(uranium_para2_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(uranium_para2_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(uranium_para2_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-        }
-        if(brems.at(i)->GetMedium()->GetName().compare("uranium")==0 && brems.at(i)->GetParametrization()==3)
-        {
-            uranium_para3_gr->Add(graphs.at(i),"P");
-            uranium_para3_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
-
-            if(uranium_para3_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(uranium_para3_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(uranium_para3_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-        }
-        if(brems.at(i)->GetMedium()->GetName().compare("uranium")==0 && brems.at(i)->GetParametrization()==4)
-        {
-            uranium_para4_gr->Add(graphs.at(i),"P");
-            uranium_para4_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
-
-            if(uranium_para4_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(uranium_para4_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(uranium_para4_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
+                case 1:
+                    uranium_para1_gr->Add(graphs.at(i),"P");
+                    uranium_para1_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    switch (uranium_para1_gr->GetListOfGraphs()->Capacity())
+                    {
+                        case 1:
+                            graphs.at(i)->SetMarkerColor(kRed);
+                            break;
+                        case 2:
+                            graphs.at(i)->SetMarkerColor(kBlue);
+                            break;
+                        case 3:
+                            graphs.at(i)->SetMarkerColor(kGreen);
+                            break;
+                    }
+                    break;
+                case 2:
+                    uranium_para2_gr->Add(graphs.at(i),"P");
+                    uranium_para2_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    switch (uranium_para2_gr->GetListOfGraphs()->Capacity())
+                    {
+                        case 1:
+                            graphs.at(i)->SetMarkerColor(kRed);
+                            break;
+                        case 2:
+                            graphs.at(i)->SetMarkerColor(kBlue);
+                            break;
+                        case 3:
+                            graphs.at(i)->SetMarkerColor(kGreen);
+                            break;
+                    }
+                    break;
+                case 3:
+                    uranium_para3_gr->Add(graphs.at(i),"P");
+                    uranium_para3_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    switch (uranium_para3_gr->GetListOfGraphs()->Capacity())
+                    {
+                        case 1:
+                            graphs.at(i)->SetMarkerColor(kRed);
+                            break;
+                        case 2:
+                            graphs.at(i)->SetMarkerColor(kBlue);
+                            break;
+                        case 3:
+                            graphs.at(i)->SetMarkerColor(kGreen);
+                            break;
+                    }
+                    break;
+                case 4:
+                    uraniumpara4_gr->Add(graphs.at(i),"P");
+                    uranium_para4_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    switch (uranium_para4_gr->GetListOfGraphs()->Capacity())
+                    {
+                        case 1:
+                            graphs.at(i)->SetMarkerColor(kRed);
+                            break;
+                        case 2:
+                            graphs.at(i)->SetMarkerColor(kBlue);
+                            break;
+                        case 3:
+                            graphs.at(i)->SetMarkerColor(kGreen);
+                            break;
+                    }
+                    break;
             }
         }
     }
