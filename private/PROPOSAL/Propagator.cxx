@@ -1268,7 +1268,6 @@ Propagator::Propagator(Medium* medium,
                 moliere_ = true;
                 scattering_model_ = 0;
                 break;
-
             case 1:
                 moliere_ = false;
                 scatteringFirstOrder_ =   new ScatteringFirstOrder();
