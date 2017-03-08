@@ -49,13 +49,13 @@ public:
 	 */
 	I3Particle propagate(const I3Particle &p, double distance,
 	    boost::shared_ptr<std::vector<I3Particle> > losses=boost::shared_ptr<std::vector<I3Particle> >());
-	
+
 	/**
 	 * Set the (global) state of the random number generator used
 	 * in the implementation.
 	 */
 	void SetSeed(int seed);
-	
+
 	/**
 	 * Use a specific random number generator for this instance
 	 */
@@ -64,7 +64,7 @@ public:
 	 * Get the internal MMC name associated with a particle type
 	 */
 	static std::string GetName(const I3Particle &p);
-	
+
 	Propagator* GetImplementation() { return propagator_; };
 private:
 	Propagator *propagator_;

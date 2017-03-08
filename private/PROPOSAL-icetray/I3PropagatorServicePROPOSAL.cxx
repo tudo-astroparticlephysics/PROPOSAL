@@ -320,57 +320,46 @@ I3PropagatorServicePROPOSAL::~I3PropagatorServicePROPOSAL()
  *
  */
 std::vector<I3Particle> I3PropagatorServicePROPOSAL::Propagate(I3Particle& p, DiagnosticMapPtr frame){
-  // saying where we are
-  log_debug("Entering I3PropagatorServicePROPOSAL::Propagate()");
+    // saying where we are
+    log_debug("Entering I3PropagatorServicePROPOSAL::Propagate()");
 
-  vector<I3Particle> daughters;
+    vector<I3Particle> daughters;
 
-  log_trace("location type = %d",p.GetLocationType());
-  if(p.GetLocationType()!=I3Particle::InIce) return std::vector<I3Particle>();
+    log_trace("location type = %d",p.GetLocationType());
+    if(p.GetLocationType()!=I3Particle::InIce) return
+        std::vector<I3Particle>();
 
-  if((p.GetType()==I3Particle::NuE)||(p.GetType()==I3Particle::NuEBar)||
-     (p.GetType()==I3Particle::NuMu)||(p.GetType()==I3Particle::NuMuBar)||
-     (p.GetType()==I3Particle::NuTau)||(p.GetType()==I3Particle::NuTauBar)) return std::vector<I3Particle>();
+    if((p.GetType()==I3Particle::NuE)||(p.GetType()==I3Particle::NuEBar)||
+       (p.GetType()==I3Particle::NuMu)||(p.GetType()==I3Particle::NuMuBar)||
+       (p.GetType()==I3Particle::NuTau)||(p.GetType()==I3Particle::NuTauBar))
+        return std::vector<I3Particle>();
 
   log_trace("particle to propagate:\n"
-	    "type/energy[GeV]/posx[m]/posy[m]/posz[m]/theta[deg]/phi[deg]/length[m]\n"
-	    "%d/%.2e/%.2f/%.2f/%.2f/%.2f/%.2f/%.2f",
-	    p.GetType(),
-	    p.GetEnergy ()/I3Units::GeV,
-	    p.GetPos().GetX()/I3Units::m,
-	    p.GetPos().GetY()/I3Units::m,
-	    p.GetPos().GetZ()/I3Units::m,
-	    p.GetZenith ()/I3Units::deg,
-	    p.GetAzimuth ()/I3Units::deg,
-	    p.GetLength()/I3Units::m);
+            "type/energy[GeV]/posx[m]/posy[m]/posz[m]/theta[deg]/phi[deg]/length[m]\n"
+            "%d/%.2e/%.2f/%.2f/%.2f/%.2f/%.2f/%.2f", p.GetType(), p.GetEnergy
+            ()/I3Units::GeV, p.GetPos().GetX()/I3Units::m,
+            p.GetPos().GetY()/I3Units::m, p.GetPos().GetZ()/I3Units::m,
+            p.GetZenith ()/I3Units::deg, p.GetAzimuth ()/I3Units::deg,
+            p.GetLength()/I3Units::m);
 
-	if (tearDownPerCall_) {
+    if (tearDownPerCall_) { delete proposal; proposal = new
+        Propagator(mediadef_,false);
+        // Apply Settings
+        Geometry* geo = new Geometry();
+        geo->InitCylinder(0,0,0,cylinderRadius_,0,cylinderHeight_);
+        proposal->SetDetector(geo); proposal->SetBrems(brems_param_);
+        proposal->SetPhoto(ConvertOldToNewPhotonuclearParametrization(photo_family_, photo_param_, shadow_));
+        proposal->SetPath_to_tables(tabledir_); proposal->ApplyOptions();
+        // proposal->SetParticle(particle_type)
 
-    delete proposal;
-    proposal = new Propagator(mediadef_,false);
-    // Apply Settings
-    Geometry* geo = new Geometry();
-    geo->InitCylinder(0,0,0,cylinderRadius_,0,cylinderHeight_);
-    proposal->SetDetector(geo);
-    proposal->SetBrems(brems_param_);
-    proposal->SetPhoto(ConvertOldToNewPhotonuclearParametrization(photo_family_, photo_param_, shadow_));
-    proposal->SetPath_to_tables(tabledir_);
-    proposal->ApplyOptions();
-    // proposal->SetParticle(particle_type)
+        boost::function<double ()> f = boost::bind(&I3RandomService::Uniform, rng_, 0, 1);
+        proposal->SetRandomNumberGenerator(f); } I3MMCTrackPtr mmcTrack = propagate(p, daughters);
 
-    boost::function<double ()> f = boost::bind(&I3RandomService::Uniform, rng_, 0, 1);
-    proposal->SetRandomNumberGenerator(f);
-	}
-  I3MMCTrackPtr mmcTrack = propagate(p, daughters);
+  if (mmcTrack && frame) { if (!frame->Has("MMCTrackList"))
+      frame->Put("MMCTrackList", I3MMCTrackListPtr(new I3MMCTrackList));
+      I3MMCTrackListPtr trackList = frame->Get<I3MMCTrackListPtr>("MMCTrackList"); i3_assert(trackList != NULL);
 
-  if (mmcTrack && frame) {
-    if (!frame->Has("MMCTrackList"))
-        frame->Put("MMCTrackList", I3MMCTrackListPtr(new I3MMCTrackList));
-    I3MMCTrackListPtr trackList = frame->Get<I3MMCTrackListPtr>("MMCTrackList");
-    i3_assert(trackList != NULL);
-
-    trackList->push_back(*mmcTrack);
-  }
+    trackList->push_back(*mmcTrack); }
 
   return daughters;
 }
@@ -406,7 +395,7 @@ string I3PropagatorServicePROPOSAL::GenerateMMCName(const I3Particle& p){
   return name;
 }
 
-ParticleType I3PropagatorServicePROPOSAL::GeneratePROPOSALName(const I3Particle& p){
+PROPOSALParticle::ParticleType I3PropagatorServicePROPOSAL::GeneratePROPOSALName(const I3Particle& p){
 
   if(p.GetType()==I3Particle::MuMinus) return PROPOSALParticle::ParticleType::MuMinus;
   else if(p.GetType()==I3Particle::MuPlus) return PROPOSALParticle::ParticleType::MuPlus;
@@ -515,10 +504,13 @@ I3PropagatorServicePROPOSAL::propagate( I3Particle& p, vector<I3Particle>& daugh
   double e_0 = p.GetEnergy()/I3Units::MeV;  // [MeV]
   double t_0 = p.GetTime()/I3Units::s;     // [s]
 
-  string mmcName = GenerateMMCName(p);
-  log_debug("MMC name of particle to propagate: %s",mmcName.c_str());
+  // string mmcName = GenerateMMCName(p);
+  // log_debug("MMC name of particle to propagate: %s",mmcName.c_str());
+  PROPOSALParticle::ParticleType particleType = GeneratePROPOSALName(p);
+  // log_debug("MMC name of particle to propagate: %s",mmcName.c_str()); //TODO(mario): gerenate name from type Mi 2017/03/08
 
-  PROPOSALParticle* particle = new PROPOSALParticle(mmcName, x_0, y_0, z_0, theta_0, phi_0, e_0, t_0);
+  // PROPOSALParticle* particle = new PROPOSALParticle(mmcName, x_0, y_0, z_0, theta_0, phi_0, e_0, t_0);
+  PROPOSALParticle* particle = new PROPOSALParticle(particleType, x_0, y_0, z_0, theta_0, phi_0, e_0, t_0);
   if (particle == 0) log_fatal("Error calling the Particle constructor");
 
   //--- Tomasz
