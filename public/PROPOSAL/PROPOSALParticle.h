@@ -92,7 +92,7 @@ public:
         ContinuousEnergyLoss = -1111,
         Monopole = -41,
         STauPlus = -9131,
-        StauMinus = -9132
+        STauMinus = -9132
     };
 
 private:
