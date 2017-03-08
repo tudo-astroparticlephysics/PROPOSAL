@@ -140,89 +140,64 @@ int main()
         graph_title<<photo.at(i)->GetParticle()->GetName()<<" in "<<photo.at(i)->GetMedium()->GetName();
 
 
-        if(photo.at(i)->GetParametrization()==1)
+        switch (photo.at(i)->GetParametrization())
         {
-            graph_title<<", parametrization: Kokoulin";
-            graphs.at(i)->SetMarkerStyle(2);
-
-        }
-        if(photo.at(i)->GetParametrization()==2)
-        {
-            graph_title<<", parametrization: Kokoulin + hard component";
-            graphs.at(i)->SetMarkerStyle(30);
-
-        }
-        if(photo.at(i)->GetParametrization()==3)
-        {
-            graph_title<<", parametrization: Rhode";
-            graphs.at(i)->SetMarkerStyle(4);
-
-        }
-        if(photo.at(i)->GetParametrization()==4)
-        {
-            graph_title<<", parametrization: Rhode + hard component";
-            graphs.at(i)->SetMarkerStyle(5);
-
-        }
-        if(photo.at(i)->GetParametrization()==5)
-        {
-            graph_title<<", parametrization: Bezrukov/Bugaev";
-            graphs.at(i)->SetMarkerStyle(20);
-
-        }
-        if(photo.at(i)->GetParametrization()==6)
-        {
-            graph_title<<", parametrization: Bezrukov/Bugaev + hard component";
-            graphs.at(i)->SetMarkerStyle(21);
-
-        }
-        if(photo.at(i)->GetParametrization()==7)
-        {
-            graph_title<<", parametrization: Zeus";
-            graphs.at(i)->SetMarkerStyle(25);
-
-        }
-        if(photo.at(i)->GetParametrization()==8)
-        {
-            graph_title<<", parametrization: Zeus + hard component";
-            graphs.at(i)->SetMarkerStyle(26);
-
-        }
-        if(photo.at(i)->GetParametrization()==9)
-        {
-            graph_title<<", parametrization: shadow=1 ALLM 91";
-            graphs.at(i)->SetMarkerStyle(22);
-
-        }
-        if(photo.at(i)->GetParametrization()==10)
-        {
-            graph_title<<", parametrization: shadow=2 ALLM 91";
-            graphs.at(i)->SetMarkerStyle(27);
-
-        }
-        if(photo.at(i)->GetParametrization()==11)
-        {
-            graph_title<<", parametrization: shadow=1 ALLM 97";
-            graphs.at(i)->SetMarkerStyle(29);
-
-        }
-        if(photo.at(i)->GetParametrization()==12)
-        {
-            graph_title<<", parametrization: shadow=2 ALLM 97";
-            graphs.at(i)->SetMarkerStyle(3);
-
-        }
-        if(photo.at(i)->GetParametrization()==13)
-        {
-            graph_title<<", parametrization: shadow=1 Butkevich/Mikhailov";
-            graphs.at(i)->SetMarkerStyle(23);
-
-        }
-        if(photo.at(i)->GetParametrization()==14)
-        {
-            graph_title<<", parametrization: shadow=2 Butkevich/Mikhailov";
-            graphs.at(i)->SetMarkerStyle(28);
-
+            case 1:
+                graph_title<<", parametrization: Kokoulin";
+                graphs.at(i)->SetMarkerStyle(2);
+                break;
+            case 2:
+                graph_title<<", parametrization: Kokoulin + hard component";
+                graphs.at(i)->SetMarkerStyle(30);
+                break;
+            case 3:
+                graph_title<<", parametrization: Rhode";
+                graphs.at(i)->SetMarkerStyle(4);
+                break;
+            case 4:
+                graph_title<<", parametrization: Rhode + hard component";
+                graphs.at(i)->SetMarkerStyle(5);
+                break;
+            case 5:
+                graph_title<<", parametrization: Bezrukov/Bugaev";
+                graphs.at(i)->SetMarkerStyle(20);
+                break;
+            case 6:
+                graph_title<<", parametrization: Bezrukov/Bugaev + hard component";
+                graphs.at(i)->SetMarkerStyle(21);
+                break;
+            case 7:
+                graph_title<<", parametrization: Zeus";
+                graphs.at(i)->SetMarkerStyle(25);
+                break;
+            case 8:
+                graph_title<<", parametrization: Zeus + hard component";
+                graphs.at(i)->SetMarkerStyle(26);
+                break;
+            case 9:
+                graph_title<<", parametrization: shadow=1 ALLM 91";
+                graphs.at(i)->SetMarkerStyle(22);
+                break;
+            case 10:
+                graph_title<<", parametrization: shadow=2 ALLM 91";
+                graphs.at(i)->SetMarkerStyle(27);
+                break;
+            case 11:
+                graph_title<<", parametrization: shadow=1 ALLM 97";
+                graphs.at(i)->SetMarkerStyle(29);
+                break;
+            case 12:
+                graph_title<<", parametrization: shadow=2 ALLM 97";
+                graphs.at(i)->SetMarkerStyle(3);
+                break;
+            case 13:
+                graph_title<<", parametrization: shadow=1 Butkevich/Mikhailov";
+                graphs.at(i)->SetMarkerStyle(23);
+                break;
+            case 14:
+                graph_title<<", parametrization: shadow=2 Butkevich/Mikhailov";
+                graphs.at(i)->SetMarkerStyle(28);
+                break;
         }
 
         graphs.at(i)->SetName(graph_name.str().c_str());
@@ -574,1388 +549,656 @@ int main()
 
     for(unsigned int i = 0 ; i < graphs.size() ; i++)
     {
-        if(photo.at(i)->GetParticle()->GetType() == PROPOSALParticle::ParticleType::MuMinus && photo.at(i)->GetMedium()->GetName().compare("water")==0)
+        switch (photo.at(i)->GetParametrization())
         {
-            muons_water_gr->Add(graphs.at(i),"l");
-            graphs.at(i)->SetLineWidth(2);
-
-            if(photo.at(i)->GetParametrization()==1)
-            {
+            case 1:
                 leg_entry<<"Kokoulin";
-            }
-            if(photo.at(i)->GetParametrization()==2)
-            {
+                break;
+            case 2:
                 leg_entry<<"Kokoulin + hard";
-            }
-            if(photo.at(i)->GetParametrization()==3)
-            {
+                break;
+            case 3:
                 leg_entry<<"Rhode";
-            }
-            if(photo.at(i)->GetParametrization()==4)
-            {
+                break;
+            case 4:
                 leg_entry<<"Rhode + hard";
-            }
-            if(photo.at(i)->GetParametrization()==5)
-            {
+                break;
+            case 5:
                 leg_entry<<"Bezrukov/Bugaev";
-            }
-            if(photo.at(i)->GetParametrization()==6)
-            {
+                break;
+            case 6:
                 leg_entry<<"Bezrukov/Bugaev + hard";
-            }
-            if(photo.at(i)->GetParametrization()==7)
-            {
+                break;
+            case 7:
                 leg_entry<<"Zeus";
-            }
-            if(photo.at(i)->GetParametrization()==8)
-            {
+                break;
+            case 8:
                 leg_entry<<"Zeus + hard";
-            }
-            if(photo.at(i)->GetParametrization()==9)
-            {
+                break;
+            case 9:
                 leg_entry<<"shadow=1 ALLM 91";
-            }
-            if(photo.at(i)->GetParametrization()==10)
-            {
+                break;
+            case 10:
                 leg_entry<<"shadow=2 ALLM 91";
-            }
-            if(photo.at(i)->GetParametrization()==11)
-            {
+                break;
+            case 11:
                 leg_entry<<"shadow=1 ALLM 97";
-            }
-            if(photo.at(i)->GetParametrization()==12)
-            {
+                break;
+            case 12:
                 leg_entry<<"shadow=2 ALLM 97";
-            }
-            if(photo.at(i)->GetParametrization()==13)
-            {
+                break;
+            case 13:
                 leg_entry<<"shadow=1 Butkevich/Mikhailov";
-            }
-            if(photo.at(i)->GetParametrization()==14)
-            {
+                break;
+            case 14:
                 leg_entry<<"shadow=2 Butkevich/Mikhailovd";
-            }
-
-            muons_leg_water->AddEntry(graphs.at(i),leg_entry.str().c_str(),"l");
-
-            if(muons_water_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetLineColor(kRed);
-                graphs.at(i)->SetLineStyle(1);
-
-            }
-            if(muons_water_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetLineColor(kRed);
-                graphs.at(i)->SetLineStyle(2);
-
-            }
-            if(muons_water_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetLineColor(kGreen);
-                graphs.at(i)->SetLineStyle(1);
-
-            }
-            if(muons_water_gr->GetListOfGraphs()->Capacity()==4)
-            {
-                graphs.at(i)->SetLineColor(kGreen);
-                graphs.at(i)->SetLineStyle(2);
-
-            }
-            if(muons_water_gr->GetListOfGraphs()->Capacity()==5)
-            {
-                graphs.at(i)->SetLineColor(kBlue);
-                graphs.at(i)->SetLineStyle(1);
-
-            }
-            if(muons_water_gr->GetListOfGraphs()->Capacity()==6)
-            {
-                graphs.at(i)->SetLineColor(kBlue);
-                graphs.at(i)->SetLineStyle(2);
-
-            }
-            if(muons_water_gr->GetListOfGraphs()->Capacity()==7)
-            {
-                graphs.at(i)->SetLineColor(kBlack);
-                graphs.at(i)->SetLineStyle(1);
-
-            }
-            if(muons_water_gr->GetListOfGraphs()->Capacity()==8)
-            {
-                graphs.at(i)->SetLineColor(kBlack);
-                graphs.at(i)->SetLineStyle(2);
-
-            }
-            if(muons_water_gr->GetListOfGraphs()->Capacity()==9)
-            {
-                graphs.at(i)->SetLineColor(kOrange);
-                graphs.at(i)->SetLineStyle(1);
-
-            }
-            if(muons_water_gr->GetListOfGraphs()->Capacity()==10)
-            {
-                graphs.at(i)->SetLineColor(kOrange);
-                graphs.at(i)->SetLineStyle(2);
-
-            }
-            if(muons_water_gr->GetListOfGraphs()->Capacity()==11)
-            {
-                graphs.at(i)->SetLineColor(kMagenta);
-                graphs.at(i)->SetLineStyle(1);
-
-            }
-            if(muons_water_gr->GetListOfGraphs()->Capacity()==12)
-            {
-                graphs.at(i)->SetLineColor(kMagenta);
-                graphs.at(i)->SetLineStyle(2);
-
-            }
-            if(muons_water_gr->GetListOfGraphs()->Capacity()==13)
-            {
-                graphs.at(i)->SetLineColor(kCyan +2);
-                graphs.at(i)->SetLineStyle(1);
-
-            }
-            if(muons_water_gr->GetListOfGraphs()->Capacity()==14)
-            {
-                graphs.at(i)->SetLineColor(kCyan +2);
-                graphs.at(i)->SetLineStyle(2);
-
-            }
-
-            leg_entry.str("");
-            leg_entry.clear();
-
+                break;
         }
-        if(photo.at(i)->GetParticle()->GetType() == PROPOSALParticle::ParticleType::MuMinus && photo.at(i)->GetMedium()->GetName().compare("hydrogen")==0)
+        if(photo.at(i)->GetParticle()->GetType() == PROPOSALParticle::ParticleType::MuMinus)
         {
-            muons_hydrogen_gr->Add(graphs.at(i),"l");
-            graphs.at(i)->SetLineWidth(2);
+            if (photo.at(i)->GetMedium()->GetName().compare("water")==0)
+            {
+                muons_water_gr->Add(graphs.at(i),"l");
+                graphs.at(i)->SetLineWidth(2);
+                muons_leg_water->AddEntry(graphs.at(i),leg_entry.str().c_str(),"l");
 
-            if(photo.at(i)->GetParametrization()==1)
-            {
-                leg_entry<<"Kokoulin";
+                switch (muons_water_gr->GetListOfGraphs()->Capacity())
+                {
+                    case 1:
+                        graphs.at(i)->SetLineColor(kRed);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 2:
+                        graphs.at(i)->SetLineColor(kRed);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                    case 3:
+                        graphs.at(i)->SetLineColor(kGreen);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 4:
+                        graphs.at(i)->SetLineColor(kGreen);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                    case 5:
+                        graphs.at(i)->SetLineColor(kBlue);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 6:
+                        graphs.at(i)->SetLineColor(kBlue);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                    case 7:
+                        graphs.at(i)->SetLineColor(kBlack);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 8:
+                        graphs.at(i)->SetLineColor(kBlack);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                    case 9:
+                        graphs.at(i)->SetLineColor(kOrange);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 10:
+                        graphs.at(i)->SetLineColor(kOrange);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                    case 11:
+                        graphs.at(i)->SetLineColor(kMagenta);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 12:
+                        graphs.at(i)->SetLineColor(kMagenta);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                    case 13:
+                        graphs.at(i)->SetLineColor(kCyan +2);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 14:
+                        graphs.at(i)->SetLineColor(kCyan +2);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                }
             }
-            if(photo.at(i)->GetParametrization()==2)
+            else if(photo.at(i)->GetMedium()->GetName().compare("hydrogen")==0)
             {
-                leg_entry<<"Kokoulin + hard";
-            }
-            if(photo.at(i)->GetParametrization()==3)
-            {
-                leg_entry<<"Rhode";
-            }
-            if(photo.at(i)->GetParametrization()==4)
-            {
-                leg_entry<<"Rhode + hard";
-            }
-            if(photo.at(i)->GetParametrization()==5)
-            {
-                leg_entry<<"Bezrukov/Bugaev";
-            }
-            if(photo.at(i)->GetParametrization()==6)
-            {
-                leg_entry<<"Bezrukov/Bugaev + hard";
-            }
-            if(photo.at(i)->GetParametrization()==7)
-            {
-                leg_entry<<"Zeus";
-            }
-            if(photo.at(i)->GetParametrization()==8)
-            {
-                leg_entry<<"Zeus + hard";
-            }
-            if(photo.at(i)->GetParametrization()==9)
-            {
-                leg_entry<<"shadow=1 ALLM 91";
-            }
-            if(photo.at(i)->GetParametrization()==10)
-            {
-                leg_entry<<"shadow=2 ALLM 91";
-            }
-            if(photo.at(i)->GetParametrization()==11)
-            {
-                leg_entry<<"shadow=1 ALLM 97";
-            }
-            if(photo.at(i)->GetParametrization()==12)
-            {
-                leg_entry<<"shadow=2 ALLM 97";
-            }
-            if(photo.at(i)->GetParametrization()==13)
-            {
-                leg_entry<<"shadow=1 Butkevich/Mikhailov";
-            }
-            if(photo.at(i)->GetParametrization()==14)
-            {
-                leg_entry<<"shadow=2 Butkevich/Mikhailovd";
-            }
+                muons_hydrogen_gr->Add(graphs.at(i),"l");
+                graphs.at(i)->SetLineWidth(2);
+                muons_leg_hydrogen->AddEntry(graphs.at(i),leg_entry.str().c_str(),"l");
 
-            muons_leg_hydrogen->AddEntry(graphs.at(i),leg_entry.str().c_str(),"l");
-
-            if(muons_hydrogen_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetLineColor(kRed);
-                graphs.at(i)->SetLineStyle(1);
-
+                switch (muons_hydrogen_gr->GetListOfGraphs()->Capacity())
+                {
+                    case 1:
+                        graphs.at(i)->SetLineColor(kRed);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 2:
+                        graphs.at(i)->SetLineColor(kRed);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                    case 3:
+                        graphs.at(i)->SetLineColor(kGreen);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 4:
+                        graphs.at(i)->SetLineColor(kGreen);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                    case 5:
+                        graphs.at(i)->SetLineColor(kBlue);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 6:
+                        graphs.at(i)->SetLineColor(kBlue);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                    case 7:
+                        graphs.at(i)->SetLineColor(kBlack);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 8:
+                        graphs.at(i)->SetLineColor(kBlack);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                    case 9:
+                        graphs.at(i)->SetLineColor(kOrange);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 10:
+                        graphs.at(i)->SetLineColor(kOrange);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                    case 11:
+                        graphs.at(i)->SetLineColor(kMagenta);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 12:
+                        graphs.at(i)->SetLineColor(kMagenta);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                    case 13:
+                        graphs.at(i)->SetLineColor(kCyan +2);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 14:
+                        graphs.at(i)->SetLineColor(kCyan +2);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                }
             }
-            if(muons_hydrogen_gr->GetListOfGraphs()->Capacity()==2)
+            else if(photo.at(i)->GetMedium()->GetName().compare("uranium")==0)
             {
-                graphs.at(i)->SetLineColor(kRed);
-                graphs.at(i)->SetLineStyle(2);
+                muons_uranium_gr->Add(graphs.at(i),"l");
+                graphs.at(i)->SetLineWidth(2);
+                muons_leg_uranium->AddEntry(graphs.at(i),leg_entry.str().c_str(),"l");
 
+                switch (muons_uranium_gr->GetListOfGraphs()->Capacity())
+                {
+                    case 1:
+                        graphs.at(i)->SetLineColor(kRed);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 2:
+                        graphs.at(i)->SetLineColor(kRed);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                    case 3:
+                        graphs.at(i)->SetLineColor(kGreen);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 4:
+                        graphs.at(i)->SetLineColor(kGreen);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                    case 5:
+                        graphs.at(i)->SetLineColor(kBlue);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 6:
+                        graphs.at(i)->SetLineColor(kBlue);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                    case 7:
+                        graphs.at(i)->SetLineColor(kBlack);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 8:
+                        graphs.at(i)->SetLineColor(kBlack);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                    case 9:
+                        graphs.at(i)->SetLineColor(kOrange);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 10:
+                        graphs.at(i)->SetLineColor(kOrange);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                    case 11:
+                        graphs.at(i)->SetLineColor(kMagenta);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 12:
+                        graphs.at(i)->SetLineColor(kMagenta);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                    case 13:
+                        graphs.at(i)->SetLineColor(kCyan +2);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 14:
+                        graphs.at(i)->SetLineColor(kCyan +2);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                }
             }
-            if(muons_hydrogen_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetLineColor(kGreen);
-                graphs.at(i)->SetLineStyle(1);
-
-            }
-            if(muons_hydrogen_gr->GetListOfGraphs()->Capacity()==4)
-            {
-                graphs.at(i)->SetLineColor(kGreen);
-                graphs.at(i)->SetLineStyle(2);
-
-            }
-            if(muons_hydrogen_gr->GetListOfGraphs()->Capacity()==5)
-            {
-                graphs.at(i)->SetLineColor(kBlue);
-                graphs.at(i)->SetLineStyle(1);
-
-            }
-            if(muons_hydrogen_gr->GetListOfGraphs()->Capacity()==6)
-            {
-                graphs.at(i)->SetLineColor(kBlue);
-                graphs.at(i)->SetLineStyle(2);
-
-            }
-            if(muons_hydrogen_gr->GetListOfGraphs()->Capacity()==7)
-            {
-                graphs.at(i)->SetLineColor(kBlack);
-                graphs.at(i)->SetLineStyle(1);
-
-            }
-            if(muons_hydrogen_gr->GetListOfGraphs()->Capacity()==8)
-            {
-                graphs.at(i)->SetLineColor(kBlack);
-                graphs.at(i)->SetLineStyle(2);
-
-            }
-            if(muons_hydrogen_gr->GetListOfGraphs()->Capacity()==9)
-            {
-                graphs.at(i)->SetLineColor(kOrange);
-                graphs.at(i)->SetLineStyle(1);
-
-            }
-            if(muons_hydrogen_gr->GetListOfGraphs()->Capacity()==10)
-            {
-                graphs.at(i)->SetLineColor(kOrange);
-                graphs.at(i)->SetLineStyle(2);
-
-            }
-            if(muons_hydrogen_gr->GetListOfGraphs()->Capacity()==11)
-            {
-                graphs.at(i)->SetLineColor(kMagenta);
-                graphs.at(i)->SetLineStyle(1);
-
-            }
-            if(muons_hydrogen_gr->GetListOfGraphs()->Capacity()==12)
-            {
-                graphs.at(i)->SetLineColor(kMagenta);
-                graphs.at(i)->SetLineStyle(2);
-
-            }
-            if(muons_hydrogen_gr->GetListOfGraphs()->Capacity()==13)
-            {
-                graphs.at(i)->SetLineColor(kCyan +2);
-                graphs.at(i)->SetLineStyle(1);
-
-            }
-            if(muons_hydrogen_gr->GetListOfGraphs()->Capacity()==14)
-            {
-                graphs.at(i)->SetLineColor(kCyan +2);
-                graphs.at(i)->SetLineStyle(2);
-
-            }
-
-            leg_entry.str("");
-            leg_entry.clear();
-
         }
-        if(photo.at(i)->GetParticle()->GetType() == PROPOSALParticle::ParticleType::MuMinus && photo.at(i)->GetMedium()->GetName().compare("uranium")==0)
+        else if(photo.at(i)->GetParticle()->GetType() == PROPOSALParticle::ParticleType::TauMinus)
         {
-            muons_uranium_gr->Add(graphs.at(i),"l");
-            graphs.at(i)->SetLineWidth(2);
+            if (photo.at(i)->GetMedium()->GetName().compare("water")==0)
+            {
+                taus_water_gr->Add(graphs.at(i),"l");
+                graphs.at(i)->SetLineWidth(2);
+                taus_leg_water->AddEntry(graphs.at(i),leg_entry.str().c_str(),"l");
 
-            if(photo.at(i)->GetParametrization()==1)
-            {
-                leg_entry<<"Kokoulin";
+                switch (taus_water_gr->GetListOfGraphs()->Capacity())
+                {
+                    case 1:
+                        graphs.at(i)->SetLineColor(kRed);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 2:
+                        graphs.at(i)->SetLineColor(kRed);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                    case 3:
+                        graphs.at(i)->SetLineColor(kGreen);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 4:
+                        graphs.at(i)->SetLineColor(kGreen);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                    case 5:
+                        graphs.at(i)->SetLineColor(kBlue);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 6:
+                        graphs.at(i)->SetLineColor(kBlue);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                    case 7:
+                        graphs.at(i)->SetLineColor(kBlack);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 8:
+                        graphs.at(i)->SetLineColor(kBlack);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                    case 9:
+                        graphs.at(i)->SetLineColor(kOrange);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 10:
+                        graphs.at(i)->SetLineColor(kOrange);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                    case 11:
+                        graphs.at(i)->SetLineColor(kMagenta);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 12:
+                        graphs.at(i)->SetLineColor(kMagenta);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                    case 13:
+                        graphs.at(i)->SetLineColor(kCyan +2);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 14:
+                        graphs.at(i)->SetLineColor(kCyan +2);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                }
             }
-            if(photo.at(i)->GetParametrization()==2)
+            else if(photo.at(i)->GetMedium()->GetName().compare("hydrogen")==0)
             {
-                leg_entry<<"Kokoulin + hard";
-            }
-            if(photo.at(i)->GetParametrization()==3)
-            {
-                leg_entry<<"Rhode";
-            }
-            if(photo.at(i)->GetParametrization()==4)
-            {
-                leg_entry<<"Rhode + hard";
-            }
-            if(photo.at(i)->GetParametrization()==5)
-            {
-                leg_entry<<"Bezrukov/Bugaev";
-            }
-            if(photo.at(i)->GetParametrization()==6)
-            {
-                leg_entry<<"Bezrukov/Bugaev + hard";
-            }
-            if(photo.at(i)->GetParametrization()==7)
-            {
-                leg_entry<<"Zeus";
-            }
-            if(photo.at(i)->GetParametrization()==8)
-            {
-                leg_entry<<"Zeus + hard";
-            }
-            if(photo.at(i)->GetParametrization()==9)
-            {
-                leg_entry<<"shadow=1 ALLM 91";
-            }
-            if(photo.at(i)->GetParametrization()==10)
-            {
-                leg_entry<<"shadow=2 ALLM 91";
-            }
-            if(photo.at(i)->GetParametrization()==11)
-            {
-                leg_entry<<"shadow=1 ALLM 97";
-            }
-            if(photo.at(i)->GetParametrization()==12)
-            {
-                leg_entry<<"shadow=2 ALLM 97";
-            }
-            if(photo.at(i)->GetParametrization()==13)
-            {
-                leg_entry<<"shadow=1 Butkevich/Mikhailov";
-            }
-            if(photo.at(i)->GetParametrization()==14)
-            {
-                leg_entry<<"shadow=2 Butkevich/Mikhailovd";
-            }
+                taus_hydrogen_gr->Add(graphs.at(i),"l");
+                graphs.at(i)->SetLineWidth(2);
+                taus_leg_hydrogen->AddEntry(graphs.at(i),leg_entry.str().c_str(),"l");
 
-            muons_leg_uranium->AddEntry(graphs.at(i),leg_entry.str().c_str(),"l");
-
-            if(muons_uranium_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetLineColor(kRed);
-                graphs.at(i)->SetLineStyle(1);
-
+                switch (taus_hydrogen_gr->GetListOfGraphs()->Capacity())
+                {
+                    case 1:
+                        graphs.at(i)->SetLineColor(kRed);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 2:
+                        graphs.at(i)->SetLineColor(kRed);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                    case 3:
+                        graphs.at(i)->SetLineColor(kGreen);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 4:
+                        graphs.at(i)->SetLineColor(kGreen);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                    case 5:
+                        graphs.at(i)->SetLineColor(kBlue);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 6:
+                        graphs.at(i)->SetLineColor(kBlue);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                    case 7:
+                        graphs.at(i)->SetLineColor(kBlack);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 8:
+                        graphs.at(i)->SetLineColor(kBlack);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                    case 9:
+                        graphs.at(i)->SetLineColor(kOrange);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 10:
+                        graphs.at(i)->SetLineColor(kOrange);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                    case 11:
+                        graphs.at(i)->SetLineColor(kMagenta);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 12:
+                        graphs.at(i)->SetLineColor(kMagenta);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                    case 13:
+                        graphs.at(i)->SetLineColor(kCyan +2);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 14:
+                        graphs.at(i)->SetLineColor(kCyan +2);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                }
             }
-            if(muons_uranium_gr->GetListOfGraphs()->Capacity()==2)
+            else if(photo.at(i)->GetMedium()->GetName().compare("uranium")==0)
             {
-                graphs.at(i)->SetLineColor(kRed);
-                graphs.at(i)->SetLineStyle(2);
+                taus_uranium_gr->Add(graphs.at(i),"l");
+                graphs.at(i)->SetLineWidth(2);
+                taus_leg_uranium->AddEntry(graphs.at(i),leg_entry.str().c_str(),"l");
 
+                switch (taus_uranium_gr->GetListOfGraphs()->Capacity())
+                {
+                    case 1:
+                        graphs.at(i)->SetLineColor(kRed);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 2:
+                        graphs.at(i)->SetLineColor(kRed);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                    case 3:
+                        graphs.at(i)->SetLineColor(kGreen);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 4:
+                        graphs.at(i)->SetLineColor(kGreen);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                    case 5:
+                        graphs.at(i)->SetLineColor(kBlue);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 6:
+                        graphs.at(i)->SetLineColor(kBlue);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                    case 7:
+                        graphs.at(i)->SetLineColor(kBlack);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 8:
+                        graphs.at(i)->SetLineColor(kBlack);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                    case 9:
+                        graphs.at(i)->SetLineColor(kOrange);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 10:
+                        graphs.at(i)->SetLineColor(kOrange);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                    case 11:
+                        graphs.at(i)->SetLineColor(kMagenta);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 12:
+                        graphs.at(i)->SetLineColor(kMagenta);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                    case 13:
+                        graphs.at(i)->SetLineColor(kCyan +2);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 14:
+                        graphs.at(i)->SetLineColor(kCyan +2);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                }
             }
-            if(muons_uranium_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetLineColor(kGreen);
-                graphs.at(i)->SetLineStyle(1);
-
-            }
-            if(muons_uranium_gr->GetListOfGraphs()->Capacity()==4)
-            {
-                graphs.at(i)->SetLineColor(kGreen);
-                graphs.at(i)->SetLineStyle(2);
-
-            }
-            if(muons_uranium_gr->GetListOfGraphs()->Capacity()==5)
-            {
-                graphs.at(i)->SetLineColor(kBlue);
-                graphs.at(i)->SetLineStyle(1);
-
-            }
-            if(muons_uranium_gr->GetListOfGraphs()->Capacity()==6)
-            {
-                graphs.at(i)->SetLineColor(kBlue);
-                graphs.at(i)->SetLineStyle(2);
-
-            }
-            if(muons_uranium_gr->GetListOfGraphs()->Capacity()==7)
-            {
-                graphs.at(i)->SetLineColor(kBlack);
-                graphs.at(i)->SetLineStyle(1);
-
-            }
-            if(muons_uranium_gr->GetListOfGraphs()->Capacity()==8)
-            {
-                graphs.at(i)->SetLineColor(kBlack);
-                graphs.at(i)->SetLineStyle(2);
-
-            }
-            if(muons_uranium_gr->GetListOfGraphs()->Capacity()==9)
-            {
-                graphs.at(i)->SetLineColor(kOrange);
-                graphs.at(i)->SetLineStyle(1);
-
-            }
-            if(muons_uranium_gr->GetListOfGraphs()->Capacity()==10)
-            {
-                graphs.at(i)->SetLineColor(kOrange);
-                graphs.at(i)->SetLineStyle(2);
-
-            }
-            if(muons_uranium_gr->GetListOfGraphs()->Capacity()==11)
-            {
-                graphs.at(i)->SetLineColor(kMagenta);
-                graphs.at(i)->SetLineStyle(1);
-
-            }
-            if(muons_uranium_gr->GetListOfGraphs()->Capacity()==12)
-            {
-                graphs.at(i)->SetLineColor(kMagenta);
-                graphs.at(i)->SetLineStyle(2);
-
-            }
-            if(muons_uranium_gr->GetListOfGraphs()->Capacity()==13)
-            {
-                graphs.at(i)->SetLineColor(kCyan +2);
-                graphs.at(i)->SetLineStyle(1);
-
-            }
-            if(muons_uranium_gr->GetListOfGraphs()->Capacity()==14)
-            {
-                graphs.at(i)->SetLineColor(kCyan +2);
-                graphs.at(i)->SetLineStyle(2);
-
-            }
-
-            leg_entry.str("");
-            leg_entry.clear();
-
         }
-
-
-
-        if(photo.at(i)->GetParticle()->GetType() == PROPOSALParticle::ParticleType::TauMinus && photo.at(i)->GetMedium()->GetName().compare("water")==0)
+        else if(photo.at(i)->GetParticle()->GetType() == PROPOSALParticle::ParticleType::EMinus)
         {
-            taus_water_gr->Add(graphs.at(i),"l");
-            graphs.at(i)->SetLineWidth(2);
+            if (photo.at(i)->GetMedium()->GetName().compare("water")==0)
+            {
+                electrons_water_gr->Add(graphs.at(i),"l");
+                graphs.at(i)->SetLineWidth(2);
+                electrons_leg_water->AddEntry(graphs.at(i),leg_entry.str().c_str(),"l");
 
-            if(photo.at(i)->GetParametrization()==1)
-            {
-                leg_entry<<"Kokoulin";
+                switch (electrons_water_gr->GetListOfGraphs()->Capacity())
+                {
+                    case 1:
+                        graphs.at(i)->SetLineColor(kRed);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 2:
+                        graphs.at(i)->SetLineColor(kRed);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                    case 3:
+                        graphs.at(i)->SetLineColor(kGreen);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 4:
+                        graphs.at(i)->SetLineColor(kGreen);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                    case 5:
+                        graphs.at(i)->SetLineColor(kBlue);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 6:
+                        graphs.at(i)->SetLineColor(kBlue);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                    case 7:
+                        graphs.at(i)->SetLineColor(kBlack);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 8:
+                        graphs.at(i)->SetLineColor(kBlack);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                    case 9:
+                        graphs.at(i)->SetLineColor(kOrange);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 10:
+                        graphs.at(i)->SetLineColor(kOrange);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                    case 11:
+                        graphs.at(i)->SetLineColor(kMagenta);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 12:
+                        graphs.at(i)->SetLineColor(kMagenta);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                    case 13:
+                        graphs.at(i)->SetLineColor(kCyan +2);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 14:
+                        graphs.at(i)->SetLineColor(kCyan +2);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                }
             }
-            if(photo.at(i)->GetParametrization()==2)
+            else if(photo.at(i)->GetMedium()->GetName().compare("hydrogen")==0)
             {
-                leg_entry<<"Kokoulin + hard";
-            }
-            if(photo.at(i)->GetParametrization()==3)
-            {
-                leg_entry<<"Rhode";
-            }
-            if(photo.at(i)->GetParametrization()==4)
-            {
-                leg_entry<<"Rhode + hard";
-            }
-            if(photo.at(i)->GetParametrization()==5)
-            {
-                leg_entry<<"Bezrukov/Bugaev";
-            }
-            if(photo.at(i)->GetParametrization()==6)
-            {
-                leg_entry<<"Bezrukov/Bugaev + hard";
-            }
-            if(photo.at(i)->GetParametrization()==7)
-            {
-                leg_entry<<"Zeus";
-            }
-            if(photo.at(i)->GetParametrization()==8)
-            {
-                leg_entry<<"Zeus + hard";
-            }
-            if(photo.at(i)->GetParametrization()==9)
-            {
-                leg_entry<<"shadow=1 ALLM 91";
-            }
-            if(photo.at(i)->GetParametrization()==10)
-            {
-                leg_entry<<"shadow=2 ALLM 91";
-            }
-            if(photo.at(i)->GetParametrization()==11)
-            {
-                leg_entry<<"shadow=1 ALLM 97";
-            }
-            if(photo.at(i)->GetParametrization()==12)
-            {
-                leg_entry<<"shadow=2 ALLM 97";
-            }
-            if(photo.at(i)->GetParametrization()==13)
-            {
-                leg_entry<<"shadow=1 Butkevich/Mikhailov";
-            }
-            if(photo.at(i)->GetParametrization()==14)
-            {
-                leg_entry<<"shadow=2 Butkevich/Mikhailovd";
-            }
+                electrons_hydrogen_gr->Add(graphs.at(i),"l");
+                graphs.at(i)->SetLineWidth(2);
+                electrons_leg_hydrogen->AddEntry(graphs.at(i),leg_entry.str().c_str(),"l");
 
-            taus_leg_water->AddEntry(graphs.at(i),leg_entry.str().c_str(),"l");
-
-            if(taus_water_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetLineColor(kRed);
-                graphs.at(i)->SetLineStyle(1);
-
+                switch (electrons_hydrogen_gr->GetListOfGraphs()->Capacity())
+                {
+                    case 1:
+                        graphs.at(i)->SetLineColor(kRed);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 2:
+                        graphs.at(i)->SetLineColor(kRed);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                    case 3:
+                        graphs.at(i)->SetLineColor(kGreen);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 4:
+                        graphs.at(i)->SetLineColor(kGreen);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                    case 5:
+                        graphs.at(i)->SetLineColor(kBlue);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 6:
+                        graphs.at(i)->SetLineColor(kBlue);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                    case 7:
+                        graphs.at(i)->SetLineColor(kBlack);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 8:
+                        graphs.at(i)->SetLineColor(kBlack);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                    case 9:
+                        graphs.at(i)->SetLineColor(kOrange);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 10:
+                        graphs.at(i)->SetLineColor(kOrange);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                    case 11:
+                        graphs.at(i)->SetLineColor(kMagenta);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 12:
+                        graphs.at(i)->SetLineColor(kMagenta);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                    case 13:
+                        graphs.at(i)->SetLineColor(kCyan +2);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 14:
+                        graphs.at(i)->SetLineColor(kCyan +2);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                }
             }
-            if(taus_water_gr->GetListOfGraphs()->Capacity()==2)
+            else if(photo.at(i)->GetMedium()->GetName().compare("uranium")==0)
             {
-                graphs.at(i)->SetLineColor(kRed);
-                graphs.at(i)->SetLineStyle(2);
+                electrons_uranium_gr->Add(graphs.at(i),"l");
+                graphs.at(i)->SetLineWidth(2);
+                electrons_leg_uranium->AddEntry(graphs.at(i),leg_entry.str().c_str(),"l");
 
+                switch (electrons_uranium_gr->GetListOfGraphs()->Capacity())
+                {
+                    case 1:
+                        graphs.at(i)->SetLineColor(kRed);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 2:
+                        graphs.at(i)->SetLineColor(kRed);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                    case 3:
+                        graphs.at(i)->SetLineColor(kGreen);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 4:
+                        graphs.at(i)->SetLineColor(kGreen);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                    case 5:
+                        graphs.at(i)->SetLineColor(kBlue);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 6:
+                        graphs.at(i)->SetLineColor(kBlue);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                    case 7:
+                        graphs.at(i)->SetLineColor(kBlack);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 8:
+                        graphs.at(i)->SetLineColor(kBlack);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                    case 9:
+                        graphs.at(i)->SetLineColor(kOrange);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 10:
+                        graphs.at(i)->SetLineColor(kOrange);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                    case 11:
+                        graphs.at(i)->SetLineColor(kMagenta);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 12:
+                        graphs.at(i)->SetLineColor(kMagenta);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                    case 13:
+                        graphs.at(i)->SetLineColor(kCyan +2);
+                        graphs.at(i)->SetLineStyle(1);
+                        break;
+                    case 14:
+                        graphs.at(i)->SetLineColor(kCyan +2);
+                        graphs.at(i)->SetLineStyle(2);
+                        break;
+                }
             }
-            if(taus_water_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetLineColor(kGreen);
-                graphs.at(i)->SetLineStyle(1);
-
-            }
-            if(taus_water_gr->GetListOfGraphs()->Capacity()==4)
-            {
-                graphs.at(i)->SetLineColor(kGreen);
-                graphs.at(i)->SetLineStyle(2);
-
-            }
-            if(taus_water_gr->GetListOfGraphs()->Capacity()==5)
-            {
-                graphs.at(i)->SetLineColor(kBlue);
-                graphs.at(i)->SetLineStyle(1);
-
-            }
-            if(taus_water_gr->GetListOfGraphs()->Capacity()==6)
-            {
-                graphs.at(i)->SetLineColor(kBlue);
-                graphs.at(i)->SetLineStyle(2);
-
-            }
-            if(taus_water_gr->GetListOfGraphs()->Capacity()==7)
-            {
-                graphs.at(i)->SetLineColor(kBlack);
-                graphs.at(i)->SetLineStyle(1);
-
-            }
-            if(taus_water_gr->GetListOfGraphs()->Capacity()==8)
-            {
-                graphs.at(i)->SetLineColor(kBlack);
-                graphs.at(i)->SetLineStyle(2);
-
-            }
-            if(taus_water_gr->GetListOfGraphs()->Capacity()==9)
-            {
-                graphs.at(i)->SetLineColor(kOrange);
-                graphs.at(i)->SetLineStyle(1);
-
-            }
-            if(taus_water_gr->GetListOfGraphs()->Capacity()==10)
-            {
-                graphs.at(i)->SetLineColor(kOrange);
-                graphs.at(i)->SetLineStyle(2);
-
-            }
-            if(taus_water_gr->GetListOfGraphs()->Capacity()==11)
-            {
-                graphs.at(i)->SetLineColor(kMagenta);
-                graphs.at(i)->SetLineStyle(1);
-
-            }
-            if(taus_water_gr->GetListOfGraphs()->Capacity()==12)
-            {
-                graphs.at(i)->SetLineColor(kMagenta);
-                graphs.at(i)->SetLineStyle(2);
-
-            }
-            if(taus_water_gr->GetListOfGraphs()->Capacity()==13)
-            {
-                graphs.at(i)->SetLineColor(kCyan +2);
-                graphs.at(i)->SetLineStyle(1);
-
-            }
-            if(taus_water_gr->GetListOfGraphs()->Capacity()==14)
-            {
-                graphs.at(i)->SetLineColor(kCyan +2);
-                graphs.at(i)->SetLineStyle(2);
-
-            }
-
-            leg_entry.str("");
-            leg_entry.clear();
-
         }
-        if(photo.at(i)->GetParticle()->GetType() == PROPOSALParticle::ParticleType::TauMinus && photo.at(i)->GetMedium()->GetName().compare("hydrogen")==0)
-        {
-            taus_hydrogen_gr->Add(graphs.at(i),"l");
-            graphs.at(i)->SetLineWidth(2);
-
-            if(photo.at(i)->GetParametrization()==1)
-            {
-                leg_entry<<"Kokoulin";
-            }
-            if(photo.at(i)->GetParametrization()==2)
-            {
-                leg_entry<<"Kokoulin + hard";
-            }
-            if(photo.at(i)->GetParametrization()==3)
-            {
-                leg_entry<<"Rhode";
-            }
-            if(photo.at(i)->GetParametrization()==4)
-            {
-                leg_entry<<"Rhode + hard";
-            }
-            if(photo.at(i)->GetParametrization()==5)
-            {
-                leg_entry<<"Bezrukov/Bugaev";
-            }
-            if(photo.at(i)->GetParametrization()==6)
-            {
-                leg_entry<<"Bezrukov/Bugaev + hard";
-            }
-            if(photo.at(i)->GetParametrization()==7)
-            {
-                leg_entry<<"Zeus";
-            }
-            if(photo.at(i)->GetParametrization()==8)
-            {
-                leg_entry<<"Zeus + hard";
-            }
-            if(photo.at(i)->GetParametrization()==9)
-            {
-                leg_entry<<"shadow=1 ALLM 91";
-            }
-            if(photo.at(i)->GetParametrization()==10)
-            {
-                leg_entry<<"shadow=2 ALLM 91";
-            }
-            if(photo.at(i)->GetParametrization()==11)
-            {
-                leg_entry<<"shadow=1 ALLM 97";
-            }
-            if(photo.at(i)->GetParametrization()==12)
-            {
-                leg_entry<<"shadow=2 ALLM 97";
-            }
-            if(photo.at(i)->GetParametrization()==13)
-            {
-                leg_entry<<"shadow=1 Butkevich/Mikhailov";
-            }
-            if(photo.at(i)->GetParametrization()==14)
-            {
-                leg_entry<<"shadow=2 Butkevich/Mikhailovd";
-            }
-
-            taus_leg_hydrogen->AddEntry(graphs.at(i),leg_entry.str().c_str(),"l");
-
-            if(taus_hydrogen_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetLineColor(kRed);
-                graphs.at(i)->SetLineStyle(1);
-
-            }
-            if(taus_hydrogen_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetLineColor(kRed);
-                graphs.at(i)->SetLineStyle(2);
-
-            }
-            if(taus_hydrogen_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetLineColor(kGreen);
-                graphs.at(i)->SetLineStyle(1);
-
-            }
-            if(taus_hydrogen_gr->GetListOfGraphs()->Capacity()==4)
-            {
-                graphs.at(i)->SetLineColor(kGreen);
-                graphs.at(i)->SetLineStyle(2);
-
-            }
-            if(taus_hydrogen_gr->GetListOfGraphs()->Capacity()==5)
-            {
-                graphs.at(i)->SetLineColor(kBlue);
-                graphs.at(i)->SetLineStyle(1);
-
-            }
-            if(taus_hydrogen_gr->GetListOfGraphs()->Capacity()==6)
-            {
-                graphs.at(i)->SetLineColor(kBlue);
-                graphs.at(i)->SetLineStyle(2);
-
-            }
-            if(taus_hydrogen_gr->GetListOfGraphs()->Capacity()==7)
-            {
-                graphs.at(i)->SetLineColor(kBlack);
-                graphs.at(i)->SetLineStyle(1);
-
-            }
-            if(taus_hydrogen_gr->GetListOfGraphs()->Capacity()==8)
-            {
-                graphs.at(i)->SetLineColor(kBlack);
-                graphs.at(i)->SetLineStyle(2);
-
-            }
-            if(taus_hydrogen_gr->GetListOfGraphs()->Capacity()==9)
-            {
-                graphs.at(i)->SetLineColor(kOrange);
-                graphs.at(i)->SetLineStyle(1);
-
-            }
-            if(taus_hydrogen_gr->GetListOfGraphs()->Capacity()==10)
-            {
-                graphs.at(i)->SetLineColor(kOrange);
-                graphs.at(i)->SetLineStyle(2);
-
-            }
-            if(taus_hydrogen_gr->GetListOfGraphs()->Capacity()==11)
-            {
-                graphs.at(i)->SetLineColor(kMagenta);
-                graphs.at(i)->SetLineStyle(1);
-
-            }
-            if(taus_hydrogen_gr->GetListOfGraphs()->Capacity()==12)
-            {
-                graphs.at(i)->SetLineColor(kMagenta);
-                graphs.at(i)->SetLineStyle(2);
-
-            }
-            if(taus_hydrogen_gr->GetListOfGraphs()->Capacity()==13)
-            {
-                graphs.at(i)->SetLineColor(kCyan +2);
-                graphs.at(i)->SetLineStyle(1);
-
-            }
-            if(taus_hydrogen_gr->GetListOfGraphs()->Capacity()==14)
-            {
-                graphs.at(i)->SetLineColor(kCyan +2);
-                graphs.at(i)->SetLineStyle(2);
-
-            }
-
-            leg_entry.str("");
-            leg_entry.clear();
-
-        }
-        if(photo.at(i)->GetParticle()->GetType() == PROPOSALParticle::ParticleType::TauMinus && photo.at(i)->GetMedium()->GetName().compare("uranium")==0)
-        {
-            taus_uranium_gr->Add(graphs.at(i),"l");
-            graphs.at(i)->SetLineWidth(2);
-
-            if(photo.at(i)->GetParametrization()==1)
-            {
-                leg_entry<<"Kokoulin";
-            }
-            if(photo.at(i)->GetParametrization()==2)
-            {
-                leg_entry<<"Kokoulin + hard";
-            }
-            if(photo.at(i)->GetParametrization()==3)
-            {
-                leg_entry<<"Rhode";
-            }
-            if(photo.at(i)->GetParametrization()==4)
-            {
-                leg_entry<<"Rhode + hard";
-            }
-            if(photo.at(i)->GetParametrization()==5)
-            {
-                leg_entry<<"Bezrukov/Bugaev";
-            }
-            if(photo.at(i)->GetParametrization()==6)
-            {
-                leg_entry<<"Bezrukov/Bugaev + hard";
-            }
-            if(photo.at(i)->GetParametrization()==7)
-            {
-                leg_entry<<"Zeus";
-            }
-            if(photo.at(i)->GetParametrization()==8)
-            {
-                leg_entry<<"Zeus + hard";
-            }
-            if(photo.at(i)->GetParametrization()==9)
-            {
-                leg_entry<<"shadow=1 ALLM 91";
-            }
-            if(photo.at(i)->GetParametrization()==10)
-            {
-                leg_entry<<"shadow=2 ALLM 91";
-            }
-            if(photo.at(i)->GetParametrization()==11)
-            {
-                leg_entry<<"shadow=1 ALLM 97";
-            }
-            if(photo.at(i)->GetParametrization()==12)
-            {
-                leg_entry<<"shadow=2 ALLM 97";
-            }
-            if(photo.at(i)->GetParametrization()==13)
-            {
-                leg_entry<<"shadow=1 Butkevich/Mikhailov";
-            }
-            if(photo.at(i)->GetParametrization()==14)
-            {
-                leg_entry<<"shadow=2 Butkevich/Mikhailovd";
-            }
-
-            taus_leg_uranium->AddEntry(graphs.at(i),leg_entry.str().c_str(),"l");
-
-            if(taus_uranium_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetLineColor(kRed);
-                graphs.at(i)->SetLineStyle(1);
-
-            }
-            if(taus_uranium_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetLineColor(kRed);
-                graphs.at(i)->SetLineStyle(2);
-
-            }
-            if(taus_uranium_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetLineColor(kGreen);
-                graphs.at(i)->SetLineStyle(1);
-
-            }
-            if(taus_uranium_gr->GetListOfGraphs()->Capacity()==4)
-            {
-                graphs.at(i)->SetLineColor(kGreen);
-                graphs.at(i)->SetLineStyle(2);
-
-            }
-            if(taus_uranium_gr->GetListOfGraphs()->Capacity()==5)
-            {
-                graphs.at(i)->SetLineColor(kBlue);
-                graphs.at(i)->SetLineStyle(1);
-
-            }
-            if(taus_uranium_gr->GetListOfGraphs()->Capacity()==6)
-            {
-                graphs.at(i)->SetLineColor(kBlue);
-                graphs.at(i)->SetLineStyle(2);
-
-            }
-            if(taus_uranium_gr->GetListOfGraphs()->Capacity()==7)
-            {
-                graphs.at(i)->SetLineColor(kBlack);
-                graphs.at(i)->SetLineStyle(1);
-
-            }
-            if(taus_uranium_gr->GetListOfGraphs()->Capacity()==8)
-            {
-                graphs.at(i)->SetLineColor(kBlack);
-                graphs.at(i)->SetLineStyle(2);
-
-            }
-            if(taus_uranium_gr->GetListOfGraphs()->Capacity()==9)
-            {
-                graphs.at(i)->SetLineColor(kOrange);
-                graphs.at(i)->SetLineStyle(1);
-
-            }
-            if(taus_uranium_gr->GetListOfGraphs()->Capacity()==10)
-            {
-                graphs.at(i)->SetLineColor(kOrange);
-                graphs.at(i)->SetLineStyle(2);
-
-            }
-            if(taus_uranium_gr->GetListOfGraphs()->Capacity()==11)
-            {
-                graphs.at(i)->SetLineColor(kMagenta);
-                graphs.at(i)->SetLineStyle(1);
-
-            }
-            if(taus_uranium_gr->GetListOfGraphs()->Capacity()==12)
-            {
-                graphs.at(i)->SetLineColor(kMagenta);
-                graphs.at(i)->SetLineStyle(2);
-
-            }
-            if(taus_uranium_gr->GetListOfGraphs()->Capacity()==13)
-            {
-                graphs.at(i)->SetLineColor(kCyan +2);
-                graphs.at(i)->SetLineStyle(1);
-
-            }
-            if(taus_uranium_gr->GetListOfGraphs()->Capacity()==14)
-            {
-                graphs.at(i)->SetLineColor(kCyan +2);
-                graphs.at(i)->SetLineStyle(2);
-
-            }
-
-            leg_entry.str("");
-            leg_entry.clear();
-
-        }
-
-
-        if(photo.at(i)->GetParticle()->GetType() == PROPOSALParticle::ParticleType::EMinus && photo.at(i)->GetMedium()->GetName().compare("water")==0)
-        {
-            electrons_water_gr->Add(graphs.at(i),"l");
-            graphs.at(i)->SetLineWidth(2);
-
-            if(photo.at(i)->GetParametrization()==1)
-            {
-                leg_entry<<"Kokoulin";
-            }
-            if(photo.at(i)->GetParametrization()==2)
-            {
-                leg_entry<<"Kokoulin + hard";
-            }
-            if(photo.at(i)->GetParametrization()==3)
-            {
-                leg_entry<<"Rhode";
-            }
-            if(photo.at(i)->GetParametrization()==4)
-            {
-                leg_entry<<"Rhode + hard";
-            }
-            if(photo.at(i)->GetParametrization()==5)
-            {
-                leg_entry<<"Bezrukov/Bugaev";
-            }
-            if(photo.at(i)->GetParametrization()==6)
-            {
-                leg_entry<<"Bezrukov/Bugaev + hard";
-            }
-            if(photo.at(i)->GetParametrization()==7)
-            {
-                leg_entry<<"Zeus";
-            }
-            if(photo.at(i)->GetParametrization()==8)
-            {
-                leg_entry<<"Zeus + hard";
-            }
-            if(photo.at(i)->GetParametrization()==9)
-            {
-                leg_entry<<"shadow=1 ALLM 91";
-            }
-            if(photo.at(i)->GetParametrization()==10)
-            {
-                leg_entry<<"shadow=2 ALLM 91";
-            }
-            if(photo.at(i)->GetParametrization()==11)
-            {
-                leg_entry<<"shadow=1 ALLM 97";
-            }
-            if(photo.at(i)->GetParametrization()==12)
-            {
-                leg_entry<<"shadow=2 ALLM 97";
-            }
-            if(photo.at(i)->GetParametrization()==13)
-            {
-                leg_entry<<"shadow=1 Butkevich/Mikhailov";
-            }
-            if(photo.at(i)->GetParametrization()==14)
-            {
-                leg_entry<<"shadow=2 Butkevich/Mikhailovd";
-            }
-
-            electrons_leg_water->AddEntry(graphs.at(i),leg_entry.str().c_str(),"l");
-
-            if(electrons_water_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetLineColor(kRed);
-                graphs.at(i)->SetLineStyle(1);
-
-            }
-            if(electrons_water_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetLineColor(kRed);
-                graphs.at(i)->SetLineStyle(2);
-
-            }
-            if(electrons_water_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetLineColor(kGreen);
-                graphs.at(i)->SetLineStyle(1);
-
-            }
-            if(electrons_water_gr->GetListOfGraphs()->Capacity()==4)
-            {
-                graphs.at(i)->SetLineColor(kGreen);
-                graphs.at(i)->SetLineStyle(2);
-
-            }
-            if(electrons_water_gr->GetListOfGraphs()->Capacity()==5)
-            {
-                graphs.at(i)->SetLineColor(kBlue);
-                graphs.at(i)->SetLineStyle(1);
-
-            }
-            if(electrons_water_gr->GetListOfGraphs()->Capacity()==6)
-            {
-                graphs.at(i)->SetLineColor(kBlue);
-                graphs.at(i)->SetLineStyle(2);
-
-            }
-            if(electrons_water_gr->GetListOfGraphs()->Capacity()==7)
-            {
-                graphs.at(i)->SetLineColor(kBlack);
-                graphs.at(i)->SetLineStyle(1);
-
-            }
-            if(electrons_water_gr->GetListOfGraphs()->Capacity()==8)
-            {
-                graphs.at(i)->SetLineColor(kBlack);
-                graphs.at(i)->SetLineStyle(2);
-
-            }
-            if(electrons_water_gr->GetListOfGraphs()->Capacity()==9)
-            {
-                graphs.at(i)->SetLineColor(kOrange);
-                graphs.at(i)->SetLineStyle(1);
-
-            }
-            if(electrons_water_gr->GetListOfGraphs()->Capacity()==10)
-            {
-                graphs.at(i)->SetLineColor(kOrange);
-                graphs.at(i)->SetLineStyle(2);
-
-            }
-            if(electrons_water_gr->GetListOfGraphs()->Capacity()==11)
-            {
-                graphs.at(i)->SetLineColor(kMagenta);
-                graphs.at(i)->SetLineStyle(1);
-
-            }
-            if(electrons_water_gr->GetListOfGraphs()->Capacity()==12)
-            {
-                graphs.at(i)->SetLineColor(kMagenta);
-                graphs.at(i)->SetLineStyle(2);
-
-            }
-            if(electrons_water_gr->GetListOfGraphs()->Capacity()==13)
-            {
-                graphs.at(i)->SetLineColor(kCyan +2);
-                graphs.at(i)->SetLineStyle(1);
-
-            }
-            if(electrons_water_gr->GetListOfGraphs()->Capacity()==14)
-            {
-                graphs.at(i)->SetLineColor(kCyan +2);
-                graphs.at(i)->SetLineStyle(2);
-
-            }
-
-            leg_entry.str("");
-            leg_entry.clear();
-
-        }
-        if(photo.at(i)->GetParticle()->GetType() == PROPOSALParticle::ParticleType::EMinus && photo.at(i)->GetMedium()->GetName().compare("hydrogen")==0)
-        {
-            electrons_hydrogen_gr->Add(graphs.at(i),"l");
-            graphs.at(i)->SetLineWidth(2);
-
-            if(photo.at(i)->GetParametrization()==1)
-            {
-                leg_entry<<"Kokoulin";
-            }
-            if(photo.at(i)->GetParametrization()==2)
-            {
-                leg_entry<<"Kokoulin + hard";
-            }
-            if(photo.at(i)->GetParametrization()==3)
-            {
-                leg_entry<<"Rhode";
-            }
-            if(photo.at(i)->GetParametrization()==4)
-            {
-                leg_entry<<"Rhode + hard";
-            }
-            if(photo.at(i)->GetParametrization()==5)
-            {
-                leg_entry<<"Bezrukov/Bugaev";
-            }
-            if(photo.at(i)->GetParametrization()==6)
-            {
-                leg_entry<<"Bezrukov/Bugaev + hard";
-            }
-            if(photo.at(i)->GetParametrization()==7)
-            {
-                leg_entry<<"Zeus";
-            }
-            if(photo.at(i)->GetParametrization()==8)
-            {
-                leg_entry<<"Zeus + hard";
-            }
-            if(photo.at(i)->GetParametrization()==9)
-            {
-                leg_entry<<"shadow=1 ALLM 91";
-            }
-            if(photo.at(i)->GetParametrization()==10)
-            {
-                leg_entry<<"shadow=2 ALLM 91";
-            }
-            if(photo.at(i)->GetParametrization()==11)
-            {
-                leg_entry<<"shadow=1 ALLM 97";
-            }
-            if(photo.at(i)->GetParametrization()==12)
-            {
-                leg_entry<<"shadow=2 ALLM 97";
-            }
-            if(photo.at(i)->GetParametrization()==13)
-            {
-                leg_entry<<"shadow=1 Butkevich/Mikhailov";
-            }
-            if(photo.at(i)->GetParametrization()==14)
-            {
-                leg_entry<<"shadow=2 Butkevich/Mikhailovd";
-            }
-
-            electrons_leg_hydrogen->AddEntry(graphs.at(i),leg_entry.str().c_str(),"l");
-
-            if(electrons_hydrogen_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetLineColor(kRed);
-                graphs.at(i)->SetLineStyle(1);
-
-            }
-            if(electrons_hydrogen_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetLineColor(kRed);
-                graphs.at(i)->SetLineStyle(2);
-
-            }
-            if(electrons_hydrogen_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetLineColor(kGreen);
-                graphs.at(i)->SetLineStyle(1);
-
-            }
-            if(electrons_hydrogen_gr->GetListOfGraphs()->Capacity()==4)
-            {
-                graphs.at(i)->SetLineColor(kGreen);
-                graphs.at(i)->SetLineStyle(2);
-
-            }
-            if(electrons_hydrogen_gr->GetListOfGraphs()->Capacity()==5)
-            {
-                graphs.at(i)->SetLineColor(kBlue);
-                graphs.at(i)->SetLineStyle(1);
-
-            }
-            if(electrons_hydrogen_gr->GetListOfGraphs()->Capacity()==6)
-            {
-                graphs.at(i)->SetLineColor(kBlue);
-                graphs.at(i)->SetLineStyle(2);
-
-            }
-            if(electrons_hydrogen_gr->GetListOfGraphs()->Capacity()==7)
-            {
-                graphs.at(i)->SetLineColor(kBlack);
-                graphs.at(i)->SetLineStyle(1);
-
-            }
-            if(electrons_hydrogen_gr->GetListOfGraphs()->Capacity()==8)
-            {
-                graphs.at(i)->SetLineColor(kBlack);
-                graphs.at(i)->SetLineStyle(2);
-
-            }
-            if(electrons_hydrogen_gr->GetListOfGraphs()->Capacity()==9)
-            {
-                graphs.at(i)->SetLineColor(kOrange);
-                graphs.at(i)->SetLineStyle(1);
-
-            }
-            if(electrons_hydrogen_gr->GetListOfGraphs()->Capacity()==10)
-            {
-                graphs.at(i)->SetLineColor(kOrange);
-                graphs.at(i)->SetLineStyle(2);
-
-            }
-            if(electrons_hydrogen_gr->GetListOfGraphs()->Capacity()==11)
-            {
-                graphs.at(i)->SetLineColor(kMagenta);
-                graphs.at(i)->SetLineStyle(1);
-
-            }
-            if(electrons_hydrogen_gr->GetListOfGraphs()->Capacity()==12)
-            {
-                graphs.at(i)->SetLineColor(kMagenta);
-                graphs.at(i)->SetLineStyle(2);
-
-            }
-            if(electrons_hydrogen_gr->GetListOfGraphs()->Capacity()==13)
-            {
-                graphs.at(i)->SetLineColor(kCyan +2);
-                graphs.at(i)->SetLineStyle(1);
-
-            }
-            if(electrons_hydrogen_gr->GetListOfGraphs()->Capacity()==14)
-            {
-                graphs.at(i)->SetLineColor(kCyan +2);
-                graphs.at(i)->SetLineStyle(2);
-
-            }
-
-            leg_entry.str("");
-            leg_entry.clear();
-
-        }
-        if(photo.at(i)->GetParticle()->GetType() == PROPOSALParticle::ParticleType::EMinus && photo.at(i)->GetMedium()->GetName().compare("uranium")==0)
-        {
-            electrons_uranium_gr->Add(graphs.at(i),"l");
-            graphs.at(i)->SetLineWidth(2);
-
-            if(photo.at(i)->GetParametrization()==1)
-            {
-                leg_entry<<"Kokoulin";
-            }
-            if(photo.at(i)->GetParametrization()==2)
-            {
-                leg_entry<<"Kokoulin + hard";
-            }
-            if(photo.at(i)->GetParametrization()==3)
-            {
-                leg_entry<<"Rhode";
-            }
-            if(photo.at(i)->GetParametrization()==4)
-            {
-                leg_entry<<"Rhode + hard";
-            }
-            if(photo.at(i)->GetParametrization()==5)
-            {
-                leg_entry<<"Bezrukov/Bugaev";
-            }
-            if(photo.at(i)->GetParametrization()==6)
-            {
-                leg_entry<<"Bezrukov/Bugaev + hard";
-            }
-            if(photo.at(i)->GetParametrization()==7)
-            {
-                leg_entry<<"Zeus";
-            }
-            if(photo.at(i)->GetParametrization()==8)
-            {
-                leg_entry<<"Zeus + hard";
-            }
-            if(photo.at(i)->GetParametrization()==9)
-            {
-                leg_entry<<"shadow=1 ALLM 91";
-            }
-            if(photo.at(i)->GetParametrization()==10)
-            {
-                leg_entry<<"shadow=2 ALLM 91";
-            }
-            if(photo.at(i)->GetParametrization()==11)
-            {
-                leg_entry<<"shadow=1 ALLM 97";
-            }
-            if(photo.at(i)->GetParametrization()==12)
-            {
-                leg_entry<<"shadow=2 ALLM 97";
-            }
-            if(photo.at(i)->GetParametrization()==13)
-            {
-                leg_entry<<"shadow=1 Butkevich/Mikhailov";
-            }
-            if(photo.at(i)->GetParametrization()==14)
-            {
-                leg_entry<<"shadow=2 Butkevich/Mikhailovd";
-            }
-
-            electrons_leg_uranium->AddEntry(graphs.at(i),leg_entry.str().c_str(),"l");
-
-            if(electrons_uranium_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetLineColor(kRed);
-                graphs.at(i)->SetLineStyle(1);
-
-            }
-            if(electrons_uranium_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetLineColor(kRed);
-                graphs.at(i)->SetLineStyle(2);
-
-            }
-            if(electrons_uranium_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetLineColor(kGreen);
-                graphs.at(i)->SetLineStyle(1);
-
-            }
-            if(electrons_uranium_gr->GetListOfGraphs()->Capacity()==4)
-            {
-                graphs.at(i)->SetLineColor(kGreen);
-                graphs.at(i)->SetLineStyle(2);
-
-            }
-            if(electrons_uranium_gr->GetListOfGraphs()->Capacity()==5)
-            {
-                graphs.at(i)->SetLineColor(kBlue);
-                graphs.at(i)->SetLineStyle(1);
-
-            }
-            if(electrons_uranium_gr->GetListOfGraphs()->Capacity()==6)
-            {
-                graphs.at(i)->SetLineColor(kBlue);
-                graphs.at(i)->SetLineStyle(2);
-
-            }
-            if(electrons_uranium_gr->GetListOfGraphs()->Capacity()==7)
-            {
-                graphs.at(i)->SetLineColor(kBlack);
-                graphs.at(i)->SetLineStyle(1);
-
-            }
-            if(electrons_uranium_gr->GetListOfGraphs()->Capacity()==8)
-            {
-                graphs.at(i)->SetLineColor(kBlack);
-                graphs.at(i)->SetLineStyle(2);
-
-            }
-            if(electrons_uranium_gr->GetListOfGraphs()->Capacity()==9)
-            {
-                graphs.at(i)->SetLineColor(kOrange);
-                graphs.at(i)->SetLineStyle(1);
-
-            }
-            if(electrons_uranium_gr->GetListOfGraphs()->Capacity()==10)
-            {
-                graphs.at(i)->SetLineColor(kOrange);
-                graphs.at(i)->SetLineStyle(2);
-
-            }
-            if(electrons_uranium_gr->GetListOfGraphs()->Capacity()==11)
-            {
-                graphs.at(i)->SetLineColor(kMagenta);
-                graphs.at(i)->SetLineStyle(1);
-
-            }
-            if(electrons_uranium_gr->GetListOfGraphs()->Capacity()==12)
-            {
-                graphs.at(i)->SetLineColor(kMagenta);
-                graphs.at(i)->SetLineStyle(2);
-
-            }
-            if(electrons_uranium_gr->GetListOfGraphs()->Capacity()==13)
-            {
-                graphs.at(i)->SetLineColor(kCyan +2);
-                graphs.at(i)->SetLineStyle(1);
-
-            }
-            if(electrons_uranium_gr->GetListOfGraphs()->Capacity()==14)
-            {
-                graphs.at(i)->SetLineColor(kCyan +2);
-                graphs.at(i)->SetLineStyle(2);
-
-            }
-
-            leg_entry.str("");
-            leg_entry.clear();
-
-        }
+        leg_entry.str("");
+        leg_entry.clear();
     }
     muons_water->cd();
     muons_water->SetLogx();
@@ -2069,767 +1312,696 @@ int main()
 
     for(unsigned int i = 0 ; i < graphs.size() ; i++)
     {
-        if(photo.at(i)->GetMedium()->GetName().compare("hydrogen")==0 && photo.at(i)->GetParametrization()==1)
+        if(photo.at(i)->GetMedium()->GetName().compare("hydrogen")==0)
         {
-            hydrogen_para1_gr->Add(graphs.at(i),"P");
-            hydrogen_para1_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
-
-            if(hydrogen_para1_gr->GetListOfGraphs()->Capacity()==1)
+            switch (photo.at(i)->GetParametrization())
             {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(hydrogen_para1_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(hydrogen_para1_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
+                case 1:
+                    hydrogen_para1_gr->Add(graphs.at(i),"P");
+                    hydrogen_para1_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    switch (hydrogen_para1_gr->GetListOfGraphs()->Capacity())
+                    {
+                        case 1:
+                            graphs.at(i)->SetMarkerColor(kRed);
+                            break;
+                        case 2:
+                            graphs.at(i)->SetMarkerColor(kBlue);
+                            break;
+                        case 3:
+                            graphs.at(i)->SetMarkerColor(kGreen);
+                            break;
+                    }
+                    break;
+                case 2:
+                    hydrogen_para2_gr->Add(graphs.at(i),"P");
+                    hydrogen_para2_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    switch (hydrogen_para2_gr->GetListOfGraphs()->Capacity())
+                    {
+                        case 1:
+                            graphs.at(i)->SetMarkerColor(kRed);
+                            break;
+                        case 2:
+                            graphs.at(i)->SetMarkerColor(kBlue);
+                            break;
+                        case 3:
+                            graphs.at(i)->SetMarkerColor(kGreen);
+                            break;
+                    }
+                    break;
+                case 3:
+                    hydrogen_para3_gr->Add(graphs.at(i),"P");
+                    hydrogen_para3_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    switch (hydrogen_para3_gr->GetListOfGraphs()->Capacity())
+                    {
+                        case 1:
+                            graphs.at(i)->SetMarkerColor(kRed);
+                            break;
+                        case 2:
+                            graphs.at(i)->SetMarkerColor(kBlue);
+                            break;
+                        case 3:
+                            graphs.at(i)->SetMarkerColor(kGreen);
+                            break;
+                    }
+                    break;
+                case 4:
+                    hydrogen_para4_gr->Add(graphs.at(i),"P");
+                    hydrogen_para4_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    switch (hydrogen_para4_gr->GetListOfGraphs()->Capacity())
+                    {
+                        case 1:
+                            graphs.at(i)->SetMarkerColor(kRed);
+                            break;
+                        case 2:
+                            graphs.at(i)->SetMarkerColor(kBlue);
+                            break;
+                        case 3:
+                            graphs.at(i)->SetMarkerColor(kGreen);
+                            break;
+                    }
+                    break;
+                case 5:
+                    hydrogen_para5_gr->Add(graphs.at(i),"P");
+                    hydrogen_para5_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    switch (hydrogen_para5_gr->GetListOfGraphs()->Capacity())
+                    {
+                        case 1:
+                            graphs.at(i)->SetMarkerColor(kRed);
+                            break;
+                        case 2:
+                            graphs.at(i)->SetMarkerColor(kBlue);
+                            break;
+                        case 3:
+                            graphs.at(i)->SetMarkerColor(kGreen);
+                            break;
+                    }
+                    break;
+                case 6:
+                    hydrogen_para6_gr->Add(graphs.at(i),"P");
+                    hydrogen_para6_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    switch (hydrogen_para6_gr->GetListOfGraphs()->Capacity())
+                    {
+                        case 1:
+                            graphs.at(i)->SetMarkerColor(kRed);
+                            break;
+                        case 2:
+                            graphs.at(i)->SetMarkerColor(kBlue);
+                            break;
+                        case 3:
+                            graphs.at(i)->SetMarkerColor(kGreen);
+                            break;
+                    }
+                    break;
+                case 7:
+                    hydrogen_para7_gr->Add(graphs.at(i),"P");
+                    hydrogen_para7_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    switch (hydrogen_para7_gr->GetListOfGraphs()->Capacity())
+                    {
+                        case 1:
+                            graphs.at(i)->SetMarkerColor(kRed);
+                            break;
+                        case 2:
+                            graphs.at(i)->SetMarkerColor(kBlue);
+                            break;
+                        case 3:
+                            graphs.at(i)->SetMarkerColor(kGreen);
+                            break;
+                    }
+                    break;
+                case 8:
+                    hydrogen_para8_gr->Add(graphs.at(i),"P");
+                    hydrogen_para8_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    switch (hydrogen_para8_gr->GetListOfGraphs()->Capacity())
+                    {
+                        case 1:
+                            graphs.at(i)->SetMarkerColor(kRed);
+                            break;
+                        case 2:
+                            graphs.at(i)->SetMarkerColor(kBlue);
+                            break;
+                        case 3:
+                            graphs.at(i)->SetMarkerColor(kGreen);
+                            break;
+                    }
+                    break;
+                case 9:
+                    hydrogen_para9_gr->Add(graphs.at(i),"P");
+                    hydrogen_para9_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    switch (hydrogen_para9_gr->GetListOfGraphs()->Capacity())
+                    {
+                        case 1:
+                            graphs.at(i)->SetMarkerColor(kRed);
+                            break;
+                        case 2:
+                            graphs.at(i)->SetMarkerColor(kBlue);
+                            break;
+                        case 3:
+                            graphs.at(i)->SetMarkerColor(kGreen);
+                            break;
+                    }
+                    break;
+                case 10:
+                    hydrogen_para10_gr->Add(graphs.at(i),"P");
+                    hydrogen_para10_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    switch (hydrogen_para10_gr->GetListOfGraphs()->Capacity())
+                    {
+                        case 1:
+                            graphs.at(i)->SetMarkerColor(kRed);
+                            break;
+                        case 2:
+                            graphs.at(i)->SetMarkerColor(kBlue);
+                            break;
+                        case 3:
+                            graphs.at(i)->SetMarkerColor(kGreen);
+                            break;
+                    }
+                    break;
+                case 11:
+                    hydrogen_para11_gr->Add(graphs.at(i),"P");
+                    hydrogen_para11_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    switch (hydrogen_para11_gr->GetListOfGraphs()->Capacity())
+                    {
+                        case 1:
+                            graphs.at(i)->SetMarkerColor(kRed);
+                            break;
+                        case 2:
+                            graphs.at(i)->SetMarkerColor(kBlue);
+                            break;
+                        case 3:
+                            graphs.at(i)->SetMarkerColor(kGreen);
+                            break;
+                    }
+                    break;
+                case 12:
+                    hydrogen_para12_gr->Add(graphs.at(i),"P");
+                    hydrogen_para12_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    switch (hydrogen_para12_gr->GetListOfGraphs()->Capacity())
+                    {
+                        case 1:
+                            graphs.at(i)->SetMarkerColor(kRed);
+                            break;
+                        case 2:
+                            graphs.at(i)->SetMarkerColor(kBlue);
+                            break;
+                        case 3:
+                            graphs.at(i)->SetMarkerColor(kGreen);
+                            break;
+                    }
+                    break;
+                case 13:
+                    hydrogen_para13_gr->Add(graphs.at(i),"P");
+                    hydrogen_para13_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    switch (hydrogen_para13_gr->GetListOfGraphs()->Capacity())
+                    {
+                        case 1:
+                            graphs.at(i)->SetMarkerColor(kRed);
+                            break;
+                        case 2:
+                            graphs.at(i)->SetMarkerColor(kBlue);
+                            break;
+                        case 3:
+                            graphs.at(i)->SetMarkerColor(kGreen);
+                            break;
+                    }
+                    break;
+                case 14:
+                    hydrogen_para14_gr->Add(graphs.at(i),"P");
+                    hydrogen_para14_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    switch (hydrogen_para14_gr->GetListOfGraphs()->Capacity())
+                    {
+                        case 1:
+                            graphs.at(i)->SetMarkerColor(kRed);
+                            break;
+                        case 2:
+                            graphs.at(i)->SetMarkerColor(kBlue);
+                            break;
+                        case 3:
+                            graphs.at(i)->SetMarkerColor(kGreen);
+                            break;
+                    }
+                    break;
             }
         }
-        if(photo.at(i)->GetMedium()->GetName().compare("hydrogen")==0 && photo.at(i)->GetParametrization()==2)
+        else if(photo.at(i)->GetMedium()->GetName().compare("water")==0)
         {
-            hydrogen_para2_gr->Add(graphs.at(i),"P");
-            hydrogen_para2_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
-
-            if(hydrogen_para2_gr->GetListOfGraphs()->Capacity()==1)
+            switch (photo.at(i)->GetParametrization())
             {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(hydrogen_para2_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(hydrogen_para2_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
+                case 1:
+                    water_para1_gr->Add(graphs.at(i),"P");
+                    water_para1_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    switch (water_para1_gr->GetListOfGraphs()->Capacity())
+                    {
+                        case 1:
+                            graphs.at(i)->SetMarkerColor(kRed);
+                            break;
+                        case 2:
+                            graphs.at(i)->SetMarkerColor(kBlue);
+                            break;
+                        case 3:
+                            graphs.at(i)->SetMarkerColor(kGreen);
+                            break;
+                    }
+                    break;
+                case 2:
+                    water_para2_gr->Add(graphs.at(i),"P");
+                    water_para2_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    switch (water_para2_gr->GetListOfGraphs()->Capacity())
+                    {
+                        case 1:
+                            graphs.at(i)->SetMarkerColor(kRed);
+                            break;
+                        case 2:
+                            graphs.at(i)->SetMarkerColor(kBlue);
+                            break;
+                        case 3:
+                            graphs.at(i)->SetMarkerColor(kGreen);
+                            break;
+                    }
+                    break;
+                case 3:
+                    water_para3_gr->Add(graphs.at(i),"P");
+                    water_para3_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    switch (water_para3_gr->GetListOfGraphs()->Capacity())
+                    {
+                        case 1:
+                            graphs.at(i)->SetMarkerColor(kRed);
+                            break;
+                        case 2:
+                            graphs.at(i)->SetMarkerColor(kBlue);
+                            break;
+                        case 3:
+                            graphs.at(i)->SetMarkerColor(kGreen);
+                            break;
+                    }
+                    break;
+                case 4:
+                    water_para4_gr->Add(graphs.at(i),"P");
+                    water_para4_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    switch (water_para4_gr->GetListOfGraphs()->Capacity())
+                    {
+                        case 1:
+                            graphs.at(i)->SetMarkerColor(kRed);
+                            break;
+                        case 2:
+                            graphs.at(i)->SetMarkerColor(kBlue);
+                            break;
+                        case 3:
+                            graphs.at(i)->SetMarkerColor(kGreen);
+                            break;
+                    }
+                    break;
+                case 5:
+                    water_para5_gr->Add(graphs.at(i),"P");
+                    water_para5_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    switch (water_para5_gr->GetListOfGraphs()->Capacity())
+                    {
+                        case 1:
+                            graphs.at(i)->SetMarkerColor(kRed);
+                            break;
+                        case 2:
+                            graphs.at(i)->SetMarkerColor(kBlue);
+                            break;
+                        case 3:
+                            graphs.at(i)->SetMarkerColor(kGreen);
+                            break;
+                    }
+                    break;
+                case 6:
+                    water_para6_gr->Add(graphs.at(i),"P");
+                    water_para6_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    switch (water_para6_gr->GetListOfGraphs()->Capacity())
+                    {
+                        case 1:
+                            graphs.at(i)->SetMarkerColor(kRed);
+                            break;
+                        case 2:
+                            graphs.at(i)->SetMarkerColor(kBlue);
+                            break;
+                        case 3:
+                            graphs.at(i)->SetMarkerColor(kGreen);
+                            break;
+                    }
+                    break;
+                case 7:
+                    water_para7_gr->Add(graphs.at(i),"P");
+                    water_para7_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    switch (water_para7_gr->GetListOfGraphs()->Capacity())
+                    {
+                        case 1:
+                            graphs.at(i)->SetMarkerColor(kRed);
+                            break;
+                        case 2:
+                            graphs.at(i)->SetMarkerColor(kBlue);
+                            break;
+                        case 3:
+                            graphs.at(i)->SetMarkerColor(kGreen);
+                            break;
+                    }
+                    break;
+                case 8:
+                    water_para8_gr->Add(graphs.at(i),"P");
+                    water_para8_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    switch (water_para8_gr->GetListOfGraphs()->Capacity())
+                    {
+                        case 1:
+                            graphs.at(i)->SetMarkerColor(kRed);
+                            break;
+                        case 2:
+                            graphs.at(i)->SetMarkerColor(kBlue);
+                            break;
+                        case 3:
+                            graphs.at(i)->SetMarkerColor(kGreen);
+                            break;
+                    }
+                    break;
+                case 9:
+                    water_para9_gr->Add(graphs.at(i),"P");
+                    water_para9_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    switch (water_para9_gr->GetListOfGraphs()->Capacity())
+                    {
+                        case 1:
+                            graphs.at(i)->SetMarkerColor(kRed);
+                            break;
+                        case 2:
+                            graphs.at(i)->SetMarkerColor(kBlue);
+                            break;
+                        case 3:
+                            graphs.at(i)->SetMarkerColor(kGreen);
+                            break;
+                    }
+                    break;
+                case 10:
+                    water_para10_gr->Add(graphs.at(i),"P");
+                    water_para10_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    switch (water_para10_gr->GetListOfGraphs()->Capacity())
+                    {
+                        case 1:
+                            graphs.at(i)->SetMarkerColor(kRed);
+                            break;
+                        case 2:
+                            graphs.at(i)->SetMarkerColor(kBlue);
+                            break;
+                        case 3:
+                            graphs.at(i)->SetMarkerColor(kGreen);
+                            break;
+                    }
+                    break;
+                case 11:
+                    water_para11_gr->Add(graphs.at(i),"P");
+                    water_para11_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    switch (water_para11_gr->GetListOfGraphs()->Capacity())
+                    {
+                        case 1:
+                            graphs.at(i)->SetMarkerColor(kRed);
+                            break;
+                        case 2:
+                            graphs.at(i)->SetMarkerColor(kBlue);
+                            break;
+                        case 3:
+                            graphs.at(i)->SetMarkerColor(kGreen);
+                            break;
+                    }
+                    break;
+                case 12:
+                    water_para12_gr->Add(graphs.at(i),"P");
+                    water_para12_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    switch (water_para12_gr->GetListOfGraphs()->Capacity())
+                    {
+                        case 1:
+                            graphs.at(i)->SetMarkerColor(kRed);
+                            break;
+                        case 2:
+                            graphs.at(i)->SetMarkerColor(kBlue);
+                            break;
+                        case 3:
+                            graphs.at(i)->SetMarkerColor(kGreen);
+                            break;
+                    }
+                    break;
+                case 13:
+                    water_para13_gr->Add(graphs.at(i),"P");
+                    water_para13_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    switch (water_para13_gr->GetListOfGraphs()->Capacity())
+                    {
+                        case 1:
+                            graphs.at(i)->SetMarkerColor(kRed);
+                            break;
+                        case 2:
+                            graphs.at(i)->SetMarkerColor(kBlue);
+                            break;
+                        case 3:
+                            graphs.at(i)->SetMarkerColor(kGreen);
+                            break;
+                    }
+                    break;
+                case 14:
+                    water_para14_gr->Add(graphs.at(i),"P");
+                    water_para14_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    switch (water_para14_gr->GetListOfGraphs()->Capacity())
+                    {
+                        case 1:
+                            graphs.at(i)->SetMarkerColor(kRed);
+                            break;
+                        case 2:
+                            graphs.at(i)->SetMarkerColor(kBlue);
+                            break;
+                        case 3:
+                            graphs.at(i)->SetMarkerColor(kGreen);
+                            break;
+                    }
+                    break;
             }
         }
-        if(photo.at(i)->GetMedium()->GetName().compare("hydrogen")==0 && photo.at(i)->GetParametrization()==3)
+        else if(photo.at(i)->GetMedium()->GetName().compare("uranium")==0)
         {
-            hydrogen_para3_gr->Add(graphs.at(i),"P");
-            hydrogen_para3_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
-
-            if(hydrogen_para3_gr->GetListOfGraphs()->Capacity()==1)
+            switch (photo.at(i)->GetParametrization())
             {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(hydrogen_para3_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(hydrogen_para3_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
+                case 1:
+                    uranium_para1_gr->Add(graphs.at(i),"P");
+                    uranium_para1_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    switch (uranium_para1_gr->GetListOfGraphs()->Capacity())
+                    {
+                        case 1:
+                            graphs.at(i)->SetMarkerColor(kRed);
+                            break;
+                        case 2:
+                            graphs.at(i)->SetMarkerColor(kBlue);
+                            break;
+                        case 3:
+                            graphs.at(i)->SetMarkerColor(kGreen);
+                            break;
+                    }
+                    break;
+                case 2:
+                    uranium_para2_gr->Add(graphs.at(i),"P");
+                    uranium_para2_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    switch (uranium_para2_gr->GetListOfGraphs()->Capacity())
+                    {
+                        case 1:
+                            graphs.at(i)->SetMarkerColor(kRed);
+                            break;
+                        case 2:
+                            graphs.at(i)->SetMarkerColor(kBlue);
+                            break;
+                        case 3:
+                            graphs.at(i)->SetMarkerColor(kGreen);
+                            break;
+                    }
+                    break;
+                case 3:
+                    uranium_para3_gr->Add(graphs.at(i),"P");
+                    uranium_para3_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    switch (uranium_para3_gr->GetListOfGraphs()->Capacity())
+                    {
+                        case 1:
+                            graphs.at(i)->SetMarkerColor(kRed);
+                            break;
+                        case 2:
+                            graphs.at(i)->SetMarkerColor(kBlue);
+                            break;
+                        case 3:
+                            graphs.at(i)->SetMarkerColor(kGreen);
+                            break;
+                    }
+                    break;
+                case 4:
+                    uranium_para4_gr->Add(graphs.at(i),"P");
+                    uranium_para4_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    switch (uranium_para4_gr->GetListOfGraphs()->Capacity())
+                    {
+                        case 1:
+                            graphs.at(i)->SetMarkerColor(kRed);
+                            break;
+                        case 2:
+                            graphs.at(i)->SetMarkerColor(kBlue);
+                            break;
+                        case 3:
+                            graphs.at(i)->SetMarkerColor(kGreen);
+                            break;
+                    }
+                    break;
+                case 5:
+                    uranium_para5_gr->Add(graphs.at(i),"P");
+                    uranium_para5_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    switch (uranium_para5_gr->GetListOfGraphs()->Capacity())
+                    {
+                        case 1:
+                            graphs.at(i)->SetMarkerColor(kRed);
+                            break;
+                        case 2:
+                            graphs.at(i)->SetMarkerColor(kBlue);
+                            break;
+                        case 3:
+                            graphs.at(i)->SetMarkerColor(kGreen);
+                            break;
+                    }
+                    break;
+                case 6:
+                    uranium_para6_gr->Add(graphs.at(i),"P");
+                    uranium_para6_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    switch (uranium_para6_gr->GetListOfGraphs()->Capacity())
+                    {
+                        case 1:
+                            graphs.at(i)->SetMarkerColor(kRed);
+                            break;
+                        case 2:
+                            graphs.at(i)->SetMarkerColor(kBlue);
+                            break;
+                        case 3:
+                            graphs.at(i)->SetMarkerColor(kGreen);
+                            break;
+                    }
+                    break;
+                case 7:
+                    uranium_para7_gr->Add(graphs.at(i),"P");
+                    uranium_para7_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    switch (uranium_para7_gr->GetListOfGraphs()->Capacity())
+                    {
+                        case 1:
+                            graphs.at(i)->SetMarkerColor(kRed);
+                            break;
+                        case 2:
+                            graphs.at(i)->SetMarkerColor(kBlue);
+                            break;
+                        case 3:
+                            graphs.at(i)->SetMarkerColor(kGreen);
+                            break;
+                    }
+                    break;
+                case 8:
+                    uranium_para8_gr->Add(graphs.at(i),"P");
+                    uranium_para8_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    switch (uranium_para8_gr->GetListOfGraphs()->Capacity())
+                    {
+                        case 1:
+                            graphs.at(i)->SetMarkerColor(kRed);
+                            break;
+                        case 2:
+                            graphs.at(i)->SetMarkerColor(kBlue);
+                            break;
+                        case 3:
+                            graphs.at(i)->SetMarkerColor(kGreen);
+                            break;
+                    }
+                    break;
+                case 9:
+                    uranium_para9_gr->Add(graphs.at(i),"P");
+                    uranium_para9_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    switch (uranium_para9_gr->GetListOfGraphs()->Capacity())
+                    {
+                        case 1:
+                            graphs.at(i)->SetMarkerColor(kRed);
+                            break;
+                        case 2:
+                            graphs.at(i)->SetMarkerColor(kBlue);
+                            break;
+                        case 3:
+                            graphs.at(i)->SetMarkerColor(kGreen);
+                            break;
+                    }
+                    break;
+                case 10:
+                    uranium_para10_gr->Add(graphs.at(i),"P");
+                    uranium_para10_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    switch (uranium_para10_gr->GetListOfGraphs()->Capacity())
+                    {
+                        case 1:
+                            graphs.at(i)->SetMarkerColor(kRed);
+                            break;
+                        case 2:
+                            graphs.at(i)->SetMarkerColor(kBlue);
+                            break;
+                        case 3:
+                            graphs.at(i)->SetMarkerColor(kGreen);
+                            break;
+                    }
+                    break;
+                case 11:
+                    uranium_para11_gr->Add(graphs.at(i),"P");
+                    uranium_para11_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    switch (uranium_para11_gr->GetListOfGraphs()->Capacity())
+                    {
+                        case 1:
+                            graphs.at(i)->SetMarkerColor(kRed);
+                            break;
+                        case 2:
+                            graphs.at(i)->SetMarkerColor(kBlue);
+                            break;
+                        case 3:
+                            graphs.at(i)->SetMarkerColor(kGreen);
+                            break;
+                    }
+                    break;
+                case 12:
+                    uranium_para12_gr->Add(graphs.at(i),"P");
+                    uranium_para12_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    switch (uranium_para12_gr->GetListOfGraphs()->Capacity())
+                    {
+                        case 1:
+                            graphs.at(i)->SetMarkerColor(kRed);
+                            break;
+                        case 2:
+                            graphs.at(i)->SetMarkerColor(kBlue);
+                            break;
+                        case 3:
+                            graphs.at(i)->SetMarkerColor(kGreen);
+                            break;
+                    }
+                    break;
+                case 13:
+                    uranium_para13_gr->Add(graphs.at(i),"P");
+                    uranium_para13_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    switch (uranium_para13_gr->GetListOfGraphs()->Capacity())
+                    {
+                        case 1:
+                            graphs.at(i)->SetMarkerColor(kRed);
+                            break;
+                        case 2:
+                            graphs.at(i)->SetMarkerColor(kBlue);
+                            break;
+                        case 3:
+                            graphs.at(i)->SetMarkerColor(kGreen);
+                            break;
+                    }
+                    break;
+                case 14:
+                    uranium_para14_gr->Add(graphs.at(i),"P");
+                    uranium_para14_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    switch (uranium_para14_gr->GetListOfGraphs()->Capacity())
+                    {
+                        case 1:
+                            graphs.at(i)->SetMarkerColor(kRed);
+                            break;
+                        case 2:
+                            graphs.at(i)->SetMarkerColor(kBlue);
+                            break;
+                        case 3:
+                            graphs.at(i)->SetMarkerColor(kGreen);
+                            break;
+                    }
+                    break;
             }
         }
-        if(photo.at(i)->GetMedium()->GetName().compare("hydrogen")==0 && photo.at(i)->GetParametrization()==4)
-        {
-            hydrogen_para4_gr->Add(graphs.at(i),"P");
-            hydrogen_para4_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
-
-            if(hydrogen_para4_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(hydrogen_para4_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(hydrogen_para4_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-        }
-        if(photo.at(i)->GetMedium()->GetName().compare("hydrogen")==0 && photo.at(i)->GetParametrization()==5)
-        {
-            hydrogen_para5_gr->Add(graphs.at(i),"P");
-            hydrogen_para5_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
-
-            if(hydrogen_para5_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(hydrogen_para5_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(hydrogen_para5_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-        }
-        if(photo.at(i)->GetMedium()->GetName().compare("hydrogen")==0 && photo.at(i)->GetParametrization()==6)
-        {
-            hydrogen_para6_gr->Add(graphs.at(i),"P");
-            hydrogen_para6_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
-
-            if(hydrogen_para6_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(hydrogen_para6_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(hydrogen_para6_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-        }
-        if(photo.at(i)->GetMedium()->GetName().compare("hydrogen")==0 && photo.at(i)->GetParametrization()==7)
-        {
-            hydrogen_para7_gr->Add(graphs.at(i),"P");
-            hydrogen_para7_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
-
-            if(hydrogen_para7_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(hydrogen_para7_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(hydrogen_para7_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-        }
-        if(photo.at(i)->GetMedium()->GetName().compare("hydrogen")==0 && photo.at(i)->GetParametrization()==8)
-        {
-            hydrogen_para8_gr->Add(graphs.at(i),"P");
-            hydrogen_para8_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
-
-            if(hydrogen_para8_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(hydrogen_para8_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(hydrogen_para8_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-        }
-        if(photo.at(i)->GetMedium()->GetName().compare("hydrogen")==0 && photo.at(i)->GetParametrization()==9)
-        {
-            hydrogen_para9_gr->Add(graphs.at(i),"P");
-            hydrogen_para9_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
-
-            if(hydrogen_para9_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(hydrogen_para9_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(hydrogen_para9_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-        }
-        if(photo.at(i)->GetMedium()->GetName().compare("hydrogen")==0 && photo.at(i)->GetParametrization()==10)
-        {
-            hydrogen_para10_gr->Add(graphs.at(i),"P");
-            hydrogen_para10_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
-
-            if(hydrogen_para10_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(hydrogen_para10_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(hydrogen_para10_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-        }
-        if(photo.at(i)->GetMedium()->GetName().compare("hydrogen")==0 && photo.at(i)->GetParametrization()==11)
-        {
-            hydrogen_para11_gr->Add(graphs.at(i),"P");
-            hydrogen_para11_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
-
-            if(hydrogen_para11_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(hydrogen_para11_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(hydrogen_para11_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-        }
-        if(photo.at(i)->GetMedium()->GetName().compare("hydrogen")==0 && photo.at(i)->GetParametrization()==12)
-        {
-            hydrogen_para12_gr->Add(graphs.at(i),"P");
-            hydrogen_para12_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
-
-            if(hydrogen_para12_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(hydrogen_para12_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(hydrogen_para12_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-        }
-        if(photo.at(i)->GetMedium()->GetName().compare("hydrogen")==0 && photo.at(i)->GetParametrization()==13)
-        {
-            hydrogen_para13_gr->Add(graphs.at(i),"P");
-            hydrogen_para13_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
-
-            if(hydrogen_para13_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(hydrogen_para13_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(hydrogen_para13_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-        }
-        if(photo.at(i)->GetMedium()->GetName().compare("hydrogen")==0 && photo.at(i)->GetParametrization()==14)
-        {
-            hydrogen_para14_gr->Add(graphs.at(i),"P");
-            hydrogen_para14_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
-
-            if(hydrogen_para14_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(hydrogen_para14_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(hydrogen_para14_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-        }
-
-
-        if(photo.at(i)->GetMedium()->GetName().compare("water")==0 && photo.at(i)->GetParametrization()==1)
-        {
-            water_para1_gr->Add(graphs.at(i),"P");
-            water_para1_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
-
-            if(water_para1_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(water_para1_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(water_para1_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-        }
-        if(photo.at(i)->GetMedium()->GetName().compare("water")==0 && photo.at(i)->GetParametrization()==2)
-        {
-            water_para2_gr->Add(graphs.at(i),"P");
-            water_para2_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
-
-            if(water_para2_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(water_para2_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(water_para2_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-        }
-        if(photo.at(i)->GetMedium()->GetName().compare("water")==0 && photo.at(i)->GetParametrization()==3)
-        {
-            water_para3_gr->Add(graphs.at(i),"P");
-            water_para3_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
-
-            if(water_para3_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(water_para3_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(water_para3_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-        }
-        if(photo.at(i)->GetMedium()->GetName().compare("water")==0 && photo.at(i)->GetParametrization()==4)
-        {
-            water_para4_gr->Add(graphs.at(i),"P");
-            water_para4_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
-
-            if(water_para4_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(water_para4_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(water_para4_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-        }
-        if(photo.at(i)->GetMedium()->GetName().compare("water")==0 && photo.at(i)->GetParametrization()==5)
-        {
-            water_para5_gr->Add(graphs.at(i),"P");
-            water_para5_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
-
-            if(water_para5_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(water_para5_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(water_para5_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-        }
-        if(photo.at(i)->GetMedium()->GetName().compare("water")==0 && photo.at(i)->GetParametrization()==6)
-        {
-            water_para6_gr->Add(graphs.at(i),"P");
-            water_para6_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
-
-            if(water_para6_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(water_para6_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(water_para6_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-        }
-        if(photo.at(i)->GetMedium()->GetName().compare("water")==0 && photo.at(i)->GetParametrization()==7)
-        {
-            water_para7_gr->Add(graphs.at(i),"P");
-            water_para7_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
-
-            if(water_para7_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(water_para7_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(water_para7_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-        }
-        if(photo.at(i)->GetMedium()->GetName().compare("water")==0 && photo.at(i)->GetParametrization()==8)
-        {
-            water_para8_gr->Add(graphs.at(i),"P");
-            water_para8_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
-
-            if(water_para8_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(water_para8_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(water_para8_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-        }
-        if(photo.at(i)->GetMedium()->GetName().compare("water")==0 && photo.at(i)->GetParametrization()==9)
-        {
-            water_para9_gr->Add(graphs.at(i),"P");
-            water_para9_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
-
-            if(water_para9_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(water_para9_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(water_para9_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-        }
-        if(photo.at(i)->GetMedium()->GetName().compare("water")==0 && photo.at(i)->GetParametrization()==10)
-        {
-            water_para10_gr->Add(graphs.at(i),"P");
-            water_para10_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
-
-            if(water_para10_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(water_para10_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(water_para10_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-        }
-        if(photo.at(i)->GetMedium()->GetName().compare("water")==0 && photo.at(i)->GetParametrization()==11)
-        {
-            water_para11_gr->Add(graphs.at(i),"P");
-            water_para11_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
-
-            if(water_para11_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(water_para11_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(water_para11_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-        }
-        if(photo.at(i)->GetMedium()->GetName().compare("water")==0 && photo.at(i)->GetParametrization()==12)
-        {
-            water_para12_gr->Add(graphs.at(i),"P");
-            water_para12_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
-
-            if(water_para12_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(water_para12_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(water_para12_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-        }
-        if(photo.at(i)->GetMedium()->GetName().compare("water")==0 && photo.at(i)->GetParametrization()==13)
-        {
-            water_para13_gr->Add(graphs.at(i),"P");
-            water_para13_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
-
-            if(water_para13_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(water_para13_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(water_para13_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-        }
-        if(photo.at(i)->GetMedium()->GetName().compare("water")==0 && photo.at(i)->GetParametrization()==14)
-        {
-            water_para14_gr->Add(graphs.at(i),"P");
-            water_para14_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
-
-            if(water_para14_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(water_para14_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(water_para14_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-        }
-
-
-        if(photo.at(i)->GetMedium()->GetName().compare("uranium")==0 && photo.at(i)->GetParametrization()==1)
-        {
-            uranium_para1_gr->Add(graphs.at(i),"P");
-            uranium_para1_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
-
-            if(uranium_para1_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(uranium_para1_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(uranium_para1_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-        }
-        if(photo.at(i)->GetMedium()->GetName().compare("uranium")==0 && photo.at(i)->GetParametrization()==2)
-        {
-            uranium_para2_gr->Add(graphs.at(i),"P");
-            uranium_para2_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
-
-            if(uranium_para2_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(uranium_para2_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(uranium_para2_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-        }
-        if(photo.at(i)->GetMedium()->GetName().compare("uranium")==0 && photo.at(i)->GetParametrization()==3)
-        {
-            uranium_para3_gr->Add(graphs.at(i),"P");
-            uranium_para3_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
-
-            if(uranium_para3_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(uranium_para3_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(uranium_para3_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-        }
-        if(photo.at(i)->GetMedium()->GetName().compare("uranium")==0 && photo.at(i)->GetParametrization()==4)
-        {
-            uranium_para4_gr->Add(graphs.at(i),"P");
-            uranium_para4_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
-
-            if(uranium_para4_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(uranium_para4_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(uranium_para4_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-        }
-        if(photo.at(i)->GetMedium()->GetName().compare("uranium")==0 && photo.at(i)->GetParametrization()==5)
-        {
-            uranium_para5_gr->Add(graphs.at(i),"P");
-            uranium_para5_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
-
-            if(uranium_para5_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(uranium_para5_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(uranium_para5_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-        }
-        if(photo.at(i)->GetMedium()->GetName().compare("uranium")==0 && photo.at(i)->GetParametrization()==6)
-        {
-            uranium_para6_gr->Add(graphs.at(i),"P");
-            uranium_para6_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
-
-            if(uranium_para6_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(uranium_para6_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(uranium_para6_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-        }
-        if(photo.at(i)->GetMedium()->GetName().compare("uranium")==0 && photo.at(i)->GetParametrization()==7)
-        {
-            uranium_para7_gr->Add(graphs.at(i),"P");
-            uranium_para7_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
-
-            if(uranium_para7_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(uranium_para7_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(uranium_para7_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-        }
-        if(photo.at(i)->GetMedium()->GetName().compare("uranium")==0 && photo.at(i)->GetParametrization()==8)
-        {
-            uranium_para8_gr->Add(graphs.at(i),"P");
-            uranium_para8_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
-
-            if(uranium_para8_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(uranium_para8_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(uranium_para8_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-        }
-        if(photo.at(i)->GetMedium()->GetName().compare("uranium")==0 && photo.at(i)->GetParametrization()==9)
-        {
-            uranium_para9_gr->Add(graphs.at(i),"P");
-            uranium_para9_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
-
-            if(uranium_para9_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(uranium_para9_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(uranium_para9_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-        }
-        if(photo.at(i)->GetMedium()->GetName().compare("uranium")==0 && photo.at(i)->GetParametrization()==10)
-        {
-            uranium_para10_gr->Add(graphs.at(i),"P");
-            uranium_para10_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
-
-            if(uranium_para10_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(uranium_para10_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(uranium_para10_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-        }
-        if(photo.at(i)->GetMedium()->GetName().compare("uranium")==0 && photo.at(i)->GetParametrization()==11)
-        {
-            uranium_para11_gr->Add(graphs.at(i),"P");
-            uranium_para11_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
-
-            if(uranium_para11_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(uranium_para11_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(uranium_para11_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-        }
-        if(photo.at(i)->GetMedium()->GetName().compare("uranium")==0 && photo.at(i)->GetParametrization()==12)
-        {
-            uranium_para12_gr->Add(graphs.at(i),"P");
-            uranium_para12_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
-
-            if(uranium_para12_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(uranium_para12_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(uranium_para12_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-        }
-        if(photo.at(i)->GetMedium()->GetName().compare("uranium")==0 && photo.at(i)->GetParametrization()==13)
-        {
-            uranium_para13_gr->Add(graphs.at(i),"P");
-            uranium_para13_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
-
-            if(uranium_para13_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(uranium_para13_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(uranium_para13_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-        }
-        if(photo.at(i)->GetMedium()->GetName().compare("uranium")==0 && photo.at(i)->GetParametrization()==14)
-        {
-            uranium_para14_gr->Add(graphs.at(i),"P");
-            uranium_para14_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
-
-            if(uranium_para14_gr->GetListOfGraphs()->Capacity()==1)
-            {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(uranium_para14_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(uranium_para14_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-        }
-
     }
 
     hydrogen_para1->cd();
@@ -3340,19 +2512,3 @@ int main()
 
     return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
