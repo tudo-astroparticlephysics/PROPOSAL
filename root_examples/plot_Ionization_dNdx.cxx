@@ -178,17 +178,17 @@ int main()
             muons_gr->Add(graphs.at(i),"P");
             muons_leg->AddEntry(graphs.at(i),ioniz.at(i)->GetMedium()->GetName().c_str(),"p");
 
-            if(muons_gr->GetListOfGraphs()->Capacity()==1)
+            switch (muons_gr->GetListOfGraphs()->Capacity())
             {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(muons_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(muons_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
+                case 1:
+                    graphs.at(i)->SetMarkerColor(kRed);
+                    break;
+                case 2:
+                    graphs.at(i)->SetMarkerColor(kBlue);
+                    break;
+                case 3:
+                    graphs.at(i)->SetMarkerColor(kGreen);
+                    break;
             }
 
         }
@@ -197,17 +197,17 @@ int main()
             taus_gr->Add(graphs.at(i),"P");
             taus_leg->AddEntry(graphs.at(i),ioniz.at(i)->GetMedium()->GetName().c_str(),"p");
 
-            if(taus_gr->GetListOfGraphs()->Capacity()==1)
+            switch (taus_gr->GetListOfGraphs()->Capacity())
             {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(taus_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(taus_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
+                case 1:
+                    graphs.at(i)->SetMarkerColor(kRed);
+                    break;
+                case 2:
+                    graphs.at(i)->SetMarkerColor(kBlue);
+                    break;
+                case 3:
+                    graphs.at(i)->SetMarkerColor(kGreen);
+                    break;
             }
         }
         if(ioniz.at(i)->GetParticle()->GetType() == PROPOSALParticle::ParticleType::EMinus)
@@ -215,17 +215,17 @@ int main()
             electrons_gr->Add(graphs.at(i),"P");
             electrons_leg->AddEntry(graphs.at(i),ioniz.at(i)->GetMedium()->GetName().c_str(),"p");
 
-            if(electrons_gr->GetListOfGraphs()->Capacity()==1)
+            switch (electrons_gr->GetListOfGraphs()->Capacity())
             {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(electrons_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(electrons_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
+                case 1:
+                    graphs.at(i)->SetMarkerColor(kRed);
+                    break;
+                case 2:
+                    graphs.at(i)->SetMarkerColor(kBlue);
+                    break;
+                case 3:
+                    graphs.at(i)->SetMarkerColor(kGreen);
+                    break;
             }
         }
     }
@@ -276,17 +276,17 @@ int main()
             hydrogen_gr->Add(graphs.at(i),"P");
             hydrogen_leg->AddEntry(graphs.at(i),ioniz.at(i)->GetParticle()->GetName().c_str(),"p");
 
-            if(hydrogen_gr->GetListOfGraphs()->Capacity()==1)
+            switch (hydrogen_gr->GetListOfGraphs()->Capacity())
             {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(hydrogen_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(hydrogen_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
+                case 1:
+                    graphs.at(i)->SetMarkerColor(kRed);
+                    break;
+                case 2:
+                    graphs.at(i)->SetMarkerColor(kBlue);
+                    break;
+                case 3:
+                    graphs.at(i)->SetMarkerColor(kGreen);
+                    break;
             }
         }
         if(ioniz.at(i)->GetMedium()->GetName().compare("water")==0)
@@ -294,17 +294,17 @@ int main()
             water_gr->Add(graphs.at(i),"P");
             water_leg->AddEntry(graphs.at(i),ioniz.at(i)->GetParticle()->GetName().c_str(),"p");
 
-            if(water_gr->GetListOfGraphs()->Capacity()==1)
+            switch (water_gr->GetListOfGraphs()->Capacity())
             {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(water_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(water_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
+                case 1:
+                    graphs.at(i)->SetMarkerColor(kRed);
+                    break;
+                case 2:
+                    graphs.at(i)->SetMarkerColor(kBlue);
+                    break;
+                case 3:
+                    graphs.at(i)->SetMarkerColor(kGreen);
+                    break;
             }
         }
         if(ioniz.at(i)->GetMedium()->GetName().compare("uranium")==0)
@@ -312,17 +312,17 @@ int main()
             uranium_gr->Add(graphs.at(i),"P");
             uranium_leg->AddEntry(graphs.at(i),ioniz.at(i)->GetParticle()->GetName().c_str(),"p");
 
-            if(uranium_gr->GetListOfGraphs()->Capacity()==1)
+            switch (uranium_gr->GetListOfGraphs()->Capacity())
             {
-                graphs.at(i)->SetMarkerColor(kRed);
-            }
-            if(uranium_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(uranium_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
+                case 1:
+                    graphs.at(i)->SetMarkerColor(kRed);
+                    break;
+                case 2:
+                    graphs.at(i)->SetMarkerColor(kBlue);
+                    break;
+                case 3:
+                    graphs.at(i)->SetMarkerColor(kGreen);
+                    break;
             }
         }
     }
@@ -372,19 +372,3 @@ int main()
 
     return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -159,116 +159,97 @@ int main()
             entry_name<<"ecut = "<<epair.at(i)->GetEnergyCutSettings()->GetEcut();
             muons_leg->AddEntry(graphs.at(i),entry_name.str().c_str(),"p");
 
-            if(muons_gr->GetListOfGraphs()->Capacity()==1)
+            switch (muons_gr->GetListOfGraphs()->Capacity())
             {
-                graphs.at(i)->SetMarkerColor(kRed);
+                case 1:
+                    graphs.at(i)->SetMarkerColor(kRed);
+                    break;
+                case 2:
+                    graphs.at(i)->SetMarkerColor(kBlue);
+                    break;
+                case 3:
+                    graphs.at(i)->SetMarkerColor(kGreen);
+                    break;
+                case 4:
+                    graphs.at(i)->SetMarkerColor(kBlack);
+                    break;
+                case 5:
+                    graphs.at(i)->SetMarkerColor(kMagenta);
+                    break;
+                case 6:
+                    graphs.at(i)->SetMarkerColor(kCyan+2);
+                    break;
+                case 7:
+                    graphs.at(i)->SetMarkerColor(kOrange);
+                    break;
             }
-            if(muons_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(muons_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-            if(muons_gr->GetListOfGraphs()->Capacity()==4)
-            {
-                graphs.at(i)->SetMarkerColor(kBlack);
-            }
-            if(muons_gr->GetListOfGraphs()->Capacity()==5)
-            {
-                graphs.at(i)->SetMarkerColor(kMagenta);
-            }
-            if(muons_gr->GetListOfGraphs()->Capacity()==6)
-            {
-                graphs.at(i)->SetMarkerColor(kCyan+2);
-            }
-            if(muons_gr->GetListOfGraphs()->Capacity()==7)
-            {
-                graphs.at(i)->SetMarkerColor(kOrange);
-            }
-
-            entry_name.str("");
-            entry_name.clear();
         }
-        if(epair.at(i)->GetParticle()->GetType() == PROPOSALParticle::ParticleType::TauMinus)
+        else if(epair.at(i)->GetParticle()->GetType() == PROPOSALParticle::ParticleType::TauMinus)
         {
             taus_gr->Add(graphs.at(i),"P");
 
             entry_name<<"ecut = "<<epair.at(i)->GetEnergyCutSettings()->GetEcut();
             taus_leg->AddEntry(graphs.at(i),entry_name.str().c_str(),"p");
 
-            if(taus_gr->GetListOfGraphs()->Capacity()==1)
+            switch (taus_gr->GetListOfGraphs()->Capacity())
             {
-                graphs.at(i)->SetMarkerColor(kRed);
+                case 1:
+                    graphs.at(i)->SetMarkerColor(kRed);
+                    break;
+                case 2:
+                    graphs.at(i)->SetMarkerColor(kBlue);
+                    break;
+                case 3:
+                    graphs.at(i)->SetMarkerColor(kGreen);
+                    break;
+                case 4:
+                    graphs.at(i)->SetMarkerColor(kBlack);
+                    break;
+                case 5:
+                    graphs.at(i)->SetMarkerColor(kMagenta);
+                    break;
+                case 6:
+                    graphs.at(i)->SetMarkerColor(kCyan+2);
+                    break;
+                case 7:
+                    graphs.at(i)->SetMarkerColor(kOrange);
+                    break;
             }
-            if(taus_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(taus_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-            if(taus_gr->GetListOfGraphs()->Capacity()==4)
-            {
-                graphs.at(i)->SetMarkerColor(kBlack);
-            }
-            if(taus_gr->GetListOfGraphs()->Capacity()==5)
-            {
-                graphs.at(i)->SetMarkerColor(kMagenta);
-            }
-            if(taus_gr->GetListOfGraphs()->Capacity()==6)
-            {
-                graphs.at(i)->SetMarkerColor(kCyan+2);
-            }
-            if(taus_gr->GetListOfGraphs()->Capacity()==7)
-            {
-                graphs.at(i)->SetMarkerColor(kOrange);
-            }
-
-            entry_name.str("");
-            entry_name.clear();
         }
-        if(epair.at(i)->GetParticle()->GetType() == PROPOSALParticle::ParticleType::EMinus)
+        else if(epair.at(i)->GetParticle()->GetType() == PROPOSALParticle::ParticleType::EMinus)
         {
             electrons_gr->Add(graphs.at(i),"P");
 
             entry_name<<"ecut = "<<epair.at(i)->GetEnergyCutSettings()->GetEcut();
             electrons_leg->AddEntry(graphs.at(i),entry_name.str().c_str(),"p");
 
-            if(electrons_gr->GetListOfGraphs()->Capacity()==1)
+            switch (electrons_gr->GetListOfGraphs()->Capacity())
             {
-                graphs.at(i)->SetMarkerColor(kRed);
+                case 1:
+                    graphs.at(i)->SetMarkerColor(kRed);
+                    break;
+                case 2:
+                    graphs.at(i)->SetMarkerColor(kBlue);
+                    break;
+                case 3:
+                    graphs.at(i)->SetMarkerColor(kGreen);
+                    break;
+                case 4:
+                    graphs.at(i)->SetMarkerColor(kBlack);
+                    break;
+                case 5:
+                    graphs.at(i)->SetMarkerColor(kMagenta);
+                    break;
+                case 6:
+                    graphs.at(i)->SetMarkerColor(kCyan+2);
+                    break;
+                case 7:
+                    graphs.at(i)->SetMarkerColor(kOrange);
+                    break;
             }
-            if(electrons_gr->GetListOfGraphs()->Capacity()==2)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(electrons_gr->GetListOfGraphs()->Capacity()==3)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-            if(electrons_gr->GetListOfGraphs()->Capacity()==4)
-            {
-                graphs.at(i)->SetMarkerColor(kBlack);
-            }
-            if(electrons_gr->GetListOfGraphs()->Capacity()==5)
-            {
-                graphs.at(i)->SetMarkerColor(kMagenta);
-            }
-            if(electrons_gr->GetListOfGraphs()->Capacity()==6)
-            {
-                graphs.at(i)->SetMarkerColor(kCyan+2);
-            }
-            if(electrons_gr->GetListOfGraphs()->Capacity()==7)
-            {
-                graphs.at(i)->SetMarkerColor(kOrange);
-            }
-
-            entry_name.str("");
-            entry_name.clear();
         }
+        entry_name.str("");
+        entry_name.clear();
     }
 
     muons->cd();
@@ -315,19 +296,3 @@ int main()
 
     return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
