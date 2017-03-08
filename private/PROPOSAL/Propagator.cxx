@@ -327,7 +327,7 @@ double Propagator::Propagate( double distance )
     double  initial_energy  =   particle_->GetEnergy();
     double  final_energy    =   particle_->GetEnergy();
 
-    pair<double,string> decay;
+    pair<double, PROPOSALParticle::ParticleType> decay;
     // pair<double,string> energy_loss;
     pair<double, PROPOSALParticle::ParticleType> energy_loss;
 
@@ -455,7 +455,7 @@ double Propagator::Propagate( double distance )
             double t    =   particle_->GetT() -particle_->GetLifetime()*log(RandomDouble());
             double product_energy   =   0;
 
-            pair<double, string> decay_to_store;
+            pair<double, PROPOSALParticle::ParticleType> decay_to_store;
             secondary_id    =   particle_->GetParticleId() + 1;
 
             particle_->SetT( t );
@@ -570,7 +570,13 @@ void Propagator::ChooseCurrentCollection(PROPOSALParticle* particle)
         collections_.at(i)->RestoreBackup_particle();
 
         if(particle->GetType() != collections_.at(i)->GetParticle()->GetType())
+        {
+            printf("particle type:%i\n", particle->GetType());
+            printf("particle name:%s\n", particle->GetName().c_str());
+            printf("particle in collection type:%i\n", collections_.at(i)->GetParticle()->GetType());
+            printf("particle in collection type:%s\n", collections_.at(i)->GetParticle()->GetName().c_str());
             continue;
+        }
 
         if(detector_->IsParticleInfront(particle))
         {

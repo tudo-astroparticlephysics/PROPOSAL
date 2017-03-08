@@ -41,6 +41,30 @@ GetMMCCode(I3Particle::ParticleType pt)
     return code;
 }
 
+PROPOSALParticle::ParticleType
+GetPROPOSALType(I3Particle::ParticleType pt)
+{
+    PROPOSALParticle::ParticleType code;
+    switch (pt) {
+        case I3Particle::MuMinus:
+            code = PROPOSALParticle::ParticleType::MuMinus;
+            break;
+        case I3Particle::MuPlus:
+            code = PROPOSALParticle::ParticleType::MuPlus;
+            break;
+        case I3Particle::TauMinus:
+            code = PROPOSALParticle::ParticleType::TauMinus;
+            break;
+        case I3Particle::TauPlus:
+            code = PROPOSALParticle::ParticleType::TauPlus;
+            break;
+        default:
+            log_fatal_stream("Unsupported particle type: " << pt);
+    }
+    return code;
+}
+
+
 SimplePropagator::SimplePropagator(const std::string &medium, I3Particle::ParticleType pt, double ecut, double vcut, double rho)
 {
     EnergyCutSettings* cutset = new EnergyCutSettings(ecut,vcut);
@@ -74,7 +98,7 @@ SimplePropagator::SimplePropagator(const std::string &medium, I3Particle::Partic
     prefix << getenv("I3_BUILD") << "/MuonGun/resources/tables/icecube";
     //propagator_->interpolate("all", prefix.str());
 
-    propagator_ = new Propagator(med,cutset,GetMMCCode(pt),prefix.str(),molieScat,contiCorr,exactTime,lpm,bsform,new_ph_param,1.,1.,1.,1.,false,0);
+    propagator_ = new Propagator(med,cutset, GetPROPOSALType(pt),prefix.str(),molieScat,contiCorr,exactTime,lpm,bsform,new_ph_param,1.,1.,1.,1.,false,0);
     propagator_->SetStopping_decay(sdec);
 }
 
@@ -189,7 +213,7 @@ I3Particle
 SimplePropagator::propagate(const I3Particle &p, double distance, boost::shared_ptr<std::vector<I3Particle> > losses)
 {
 	I3Particle endpoint(p);
-	
+
 	/*
 	if (losses) {
 		propagator_->get_output()->I3flag = true;
@@ -200,9 +224,9 @@ SimplePropagator::propagate(const I3Particle &p, double distance, boost::shared_
 		propagator_->get_output()->initDefault(0, 0, GetName(p), p.GetTime()/I3Units::second,
 		    p.GetPos().GetX()/I3Units::cm, p.GetPos().GetY()/I3Units::cm, p.GetPos().GetZ()/I3Units::cm,
 		    p.GetDir().CalcTheta()/I3Units::deg, p.GetDir().CalcPhi()/I3Units::deg);
-	
+
 	*/
-	
+
 	    PROPOSALParticle *pp = propagator_->GetParticle();
     pp->SetParentParticleId(0);
     pp->SetParticleId(0);
@@ -214,7 +238,7 @@ SimplePropagator::propagate(const I3Particle &p, double distance, boost::shared_
 
 
 
-    
+
     if (propagator_->Propagate(distance/I3Units::cm))
 	    endpoint.SetEnergy(pp->GetEnergy()*I3Units::MeV);
 	else
@@ -224,7 +248,7 @@ SimplePropagator::propagate(const I3Particle &p, double distance, boost::shared_
 	endpoint.SetThetaPhi(pp->GetTheta()*I3Units::degree, pp->GetPhi()*I3Units::degree);
 	endpoint.SetLength(pp->GetPropagatedDistance()*I3Units::cm);
 	endpoint.SetTime(pp->GetT()*I3Units::second);
-	
+
 	//Tomasz
 	if (losses) {
 	    //std::vector<PROPOSALParticle*> &history = propagator_->get_output()->I3hist;
@@ -236,7 +260,7 @@ SimplePropagator::propagate(const I3Particle &p, double distance, boost::shared_
 	}
 	Output::getInstance().ClearSecondaryVector();
 	//Tomasz New End
-	
+
 	//Tomasz
 	/*
 	if (losses) {
