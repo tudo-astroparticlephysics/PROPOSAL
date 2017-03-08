@@ -12,6 +12,7 @@
 #include "MuonGun/MuonPropagator.h"
 
 #include "PROPOSAL/Propagator.h"
+#include "PROPOSAL/PROPOSALParticle.h"
 #include "PROPOSAL/Medium.h"
 
 namespace I3MuonGun {
@@ -20,16 +21,16 @@ MuonPropagator::MuonPropagator(const std::string &medium, double ecut, double vc
 {
 	EnergyCutSettings* cutset = new EnergyCutSettings(ecut,vcut);
     Medium* med = new Medium(medium,rho);
-	
+
 
     bool sdec      = true; // stopped muon decay
     bool exactTime = true; // exact local time
     bool molieScat = true; // Moliere scattering
-	
+
 	// Turn on continuous randomization if no absolute
 	// energy cutoff set
     bool contiCorr = ecut < 0;
-	
+
 	// LPM suppression
     bool lpm = true;
 	// Kelner, Kokoulin, and Petrukhin parametrization
@@ -47,7 +48,7 @@ MuonPropagator::MuonPropagator(const std::string &medium, double ecut, double vc
 
     //Implement a function old param -> new param
     int new_ph_param=12;
-    propagator_ = new Propagator(med,cutset,"mu",prefix.str(),molieScat,contiCorr,exactTime,lpm,1,new_ph_param,1.,1.,1.,1.,false,0);
+    propagator_ = new Propagator(med,cutset, PROPOSALParticle::ParticleType::MuMinus,prefix.str(),molieScat,contiCorr,exactTime,lpm,1,new_ph_param,1.,1.,1.,1.,false,0);
 }
 
 MuonPropagator::~MuonPropagator()
@@ -65,12 +66,12 @@ inline std::string
 GetMMCName(I3Particle::ParticleType pt)
 {
 	std::string name;
-	
+
 	if (pt == I3Particle::MuMinus)
 		name="mu-";
 	else if (pt == I3Particle::MuPlus)
 		name="mu+";
-	
+
 	return name;
 }
 
@@ -130,7 +131,7 @@ to_I3Particle(const PROPOSALParticle *pp)
     p.SetThetaPhi(pp->GetTheta()*I3Units::deg, pp->GetPhi()*I3Units::deg);
     p.SetLength(pp->GetPropagatedDistance()*I3Units::cm);
     p.SetEnergy(pp->GetEnergy()*I3Units::MeV);
-	
+
 	return p;
 }
 
@@ -146,7 +147,7 @@ MuonPropagator::GetStochasticRate(double energy, double fraction, I3Particle::Pa
 	propagator_->get_particle()->setEnergy(energy/I3Units::MeV);
 	propagator_->get_cros()->get_ionization()->setEnergy();
 	*/
-	
+
 	double contrib;
 	double rate = 0.;
 	/*
@@ -187,7 +188,7 @@ MuonPropagator::GetTotalStochasticRate(double energy, I3Particle::ParticleType t
 	rate += propagator_->get_cros()->get_photonuclear()->get_Stochastic()->dNdx();
 	rate += propagator_->get_cros()->get_ionization()->get_Stochastic()->dNdx();
 	*/
-	
+
 	return rate*(I3Units::m/I3Units::cm);
 }
 
@@ -206,18 +207,18 @@ MuonPropagator::propagate(const I3Particle &p, double distance, boost::shared_pt
 		propagator_->get_output()->initDefault(0, 0, GetName(p), p.GetTime()/I3Units::second,
 		    p.GetPos().GetX()/I3Units::cm, p.GetPos().GetY()/I3Units::cm, p.GetPos().GetZ()/I3Units::cm,
 		    p.GetDir().CalcTheta()/I3Units::deg, p.GetDir().CalcPhi()/I3Units::deg);
-	
+
 	PROPOSALParticle *pp = propagator_->get_particle();
 	if (propagator_->propagateTo(distance/I3Units::cm, p.GetEnergy()/I3Units::MeV) > 0)
 		endpoint.SetEnergy(pp->e*I3Units::MeV);
 	else
 		endpoint.SetEnergy(0);
-	
+
 	endpoint.SetPos(pp->x*I3Units::cm, pp->y*I3Units::cm, pp->z*I3Units::cm);
 	endpoint.SetThetaPhi(pp->theta*I3Units::degree, pp->phi*I3Units::degree);
 	endpoint.SetLength(pp->r*I3Units::cm);
 	endpoint.SetTime(pp->t*I3Units::second);
-	
+
 	if (losses) {
 		std::vector<PROPOSALParticle*> &history = propagator_->get_output()->I3hist;
 		BOOST_FOREACH(PROPOSALParticle *daughter, history) {
@@ -247,7 +248,7 @@ Crust::Ingest(const I3Particle &p)
 		double dx = boundaries_[i]->GetIntersection(propped.GetPos(), propped.GetDir()).first;
 		if (dx > 0)
 			propped = (i > 0 ? propagators_[i-1] : defaultPropagator_)->propagate(propped, dx);
-		// Force lengths to measure the distance back to the outermost surface
+		// Force lengths to measure the distance back to the outermogeschlossenst surface
 		if (i > 0)
 			l += std::min(dx, propped.GetLength());
 	}

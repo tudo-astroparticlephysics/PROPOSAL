@@ -580,7 +580,7 @@ void PROPOSALParticle::InitParticle(ParticleType type){
             mass_       =   MTAU;
             lifetime_   =   LTAU;
             break;
-        case ParticleType::StauMinus: //TODO(mario): Handle different masses! Mo 2017/03/06
+        case ParticleType::STauMinus: //TODO(mario): Handle different masses! Mo 2017/03/06
             name_ = "stau-";
             mass_       =   MSTAU;
             lifetime_   =   LSTAU;
