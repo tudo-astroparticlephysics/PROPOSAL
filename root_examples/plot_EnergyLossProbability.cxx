@@ -195,41 +195,34 @@ int main(int argc, char** argv)
             sec_energy  =   bla.at(k)->GetEnergy();
             energy  =   bla.at(k)->GetParentParticleEnergy();
 
-            if(bla.at(k)->GetType()==-1002)
+            switch (bla.at(k)->GetType())
             {
-                ww=1;
-                ioniz->Fill(log10(energy),log10(sec_energy));
-                hist_ioniz->Fill(log10(energy),sec_energy);
-
-            }
-            else if(bla.at(k)->GetType()==-1001)
-            {
-                ww=2;
-                brems->Fill(log10(energy),log10(sec_energy));
-                hist_brems->Fill(log10(energy),sec_energy);
-
-            }
-            else if(bla.at(k)->GetType()==-1004)
-            {
-                ww=3;
-                photo->Fill(log10(energy),log10(sec_energy));
-                hist_photo->Fill(log10(energy),sec_energy);
-
-            }
-            else if(bla.at(k)->GetType()==-1003)
-            {
-                ww=4;
-                epair->Fill(log10(energy),log10(sec_energy));
-                hist_epair->Fill(log10(energy),sec_energy);
-
+                case -1002:
+                    ww=1;
+                    ioniz->Fill(log10(energy),log10(sec_energy));
+                    hist_ioniz->Fill(log10(energy),sec_energy);
+                    break;
+                case -1001:
+                    ww=2;
+                    brems->Fill(log10(energy),log10(sec_energy));
+                    hist_brems->Fill(log10(energy),sec_energy);
+                    break;
+                case -1004:
+                    ww=3;
+                    photo->Fill(log10(energy),log10(sec_energy));
+                    hist_photo->Fill(log10(energy),sec_energy);
+                    break;
+                case -1003:
+                    ww=4;
+                    epair->Fill(log10(energy),log10(sec_energy));
+                    hist_epair->Fill(log10(energy),sec_energy);
+                    break;
             }
 
             tree->Fill();
 
         }
         Output::getInstance().ClearSecondaryVector();
-
-
 
     }
 
@@ -368,5 +361,3 @@ int main(int argc, char** argv)
 
         file->Close();
 }
-
-

@@ -140,90 +140,64 @@ int main()
         graph_name<<"_"<<photo.at(i)->GetParametrization();
         graph_title<<photo.at(i)->GetParticle()->GetName()<<" in "<<photo.at(i)->GetMedium()->GetName();
 
-
-        if(photo.at(i)->GetParametrization()==1)
+        switch (photo.at(i)->GetParametrization())
         {
-            graph_title<<", parametrization: Kokoulin";
-            graphs.at(i)->SetMarkerStyle(2);
-
-        }
-        if(photo.at(i)->GetParametrization()==2)
-        {
-            graph_title<<", parametrization: Kokoulin + hard component";
-            graphs.at(i)->SetMarkerStyle(30);
-
-        }
-        if(photo.at(i)->GetParametrization()==3)
-        {
-            graph_title<<", parametrization: Rhode";
-            graphs.at(i)->SetMarkerStyle(4);
-
-        }
-        if(photo.at(i)->GetParametrization()==4)
-        {
-            graph_title<<", parametrization: Rhode + hard component";
-            graphs.at(i)->SetMarkerStyle(5);
-
-        }
-        if(photo.at(i)->GetParametrization()==5)
-        {
-            graph_title<<", parametrization: Bezrukov/Bugaev";
-            graphs.at(i)->SetMarkerStyle(20);
-
-        }
-        if(photo.at(i)->GetParametrization()==6)
-        {
-            graph_title<<", parametrization: Bezrukov/Bugaev + hard component";
-            graphs.at(i)->SetMarkerStyle(21);
-
-        }
-        if(photo.at(i)->GetParametrization()==7)
-        {
-            graph_title<<", parametrization: Zeus";
-            graphs.at(i)->SetMarkerStyle(25);
-
-        }
-        if(photo.at(i)->GetParametrization()==8)
-        {
-            graph_title<<", parametrization: Zeus + hard component";
-            graphs.at(i)->SetMarkerStyle(26);
-
-        }
-        if(photo.at(i)->GetParametrization()==9)
-        {
-            graph_title<<", parametrization: shadow=1 ALLM 91";
-            graphs.at(i)->SetMarkerStyle(22);
-
-        }
-        if(photo.at(i)->GetParametrization()==10)
-        {
-            graph_title<<", parametrization: shadow=2 ALLM 91";
-            graphs.at(i)->SetMarkerStyle(27);
-
-        }
-        if(photo.at(i)->GetParametrization()==11)
-        {
-            graph_title<<", parametrization: shadow=1 ALLM 97";
-            graphs.at(i)->SetMarkerStyle(29);
-
-        }
-        if(photo.at(i)->GetParametrization()==12)
-        {
-            graph_title<<", parametrization: shadow=2 ALLM 97";
-            graphs.at(i)->SetMarkerStyle(3);
-
-        }
-        if(photo.at(i)->GetParametrization()==13)
-        {
-            graph_title<<", parametrization: shadow=1 Butkevich/Mikhailov";
-            graphs.at(i)->SetMarkerStyle(23);
-
-        }
-        if(photo.at(i)->GetParametrization()==14)
-        {
-            graph_title<<", parametrization: shadow=2 Butkevich/Mikhailov";
-            graphs.at(i)->SetMarkerStyle(28);
-
+            case 1:
+                graph_title<<", parametrization: Kokoulin";
+                graphs.at(i)->SetMarkerStyle(2);
+                break;
+            case 2:
+                graph_title<<", parametrization: Kokoulin + hard component";
+                graphs.at(i)->SetMarkerStyle(30);
+                break;
+            case 3:
+                graph_title<<", parametrization: Rhode";
+                graphs.at(i)->SetMarkerStyle(4);
+                break;
+            case 4:
+                graph_title<<", parametrization: Rhode + hard component";
+                graphs.at(i)->SetMarkerStyle(5);
+                break;
+            case 5:
+                graph_title<<", parametrization: Bezrukov/Bugaev";
+                graphs.at(i)->SetMarkerStyle(20);
+                break;
+            case 6:
+                graph_title<<", parametrization: Bezrukov/Bugaev + hard component";
+                graphs.at(i)->SetMarkerStyle(21);
+                break;
+            case 7:
+                graph_title<<", parametrization: Zeus";
+                graphs.at(i)->SetMarkerStyle(25);
+                break;
+            case 8:
+                graph_title<<", parametrization: Zeus + hard component";
+                graphs.at(i)->SetMarkerStyle(26);
+                break;
+            case 9:
+                graph_title<<", parametrization: shadow=1 ALLM 91";
+                graphs.at(i)->SetMarkerStyle(22);
+                break;
+            case 10:
+                graph_title<<", parametrization: shadow=2 ALLM 91";
+                graphs.at(i)->SetMarkerStyle(27);
+                break;
+            case 11:
+                graph_title<<", parametrization: shadow=1 ALLM 97";
+                graphs.at(i)->SetMarkerStyle(29);
+                break;
+            case 12:
+                graph_title<<", parametrization: shadow=2 ALLM 97";
+                graphs.at(i)->SetMarkerStyle(3);
+                break;
+            case 13:
+                graph_title<<", parametrization: shadow=1 Butkevich/Mikhailov";
+                graphs.at(i)->SetMarkerStyle(23);
+                break;
+            case 14:
+                graph_title<<", parametrization: shadow=2 Butkevich/Mikhailov";
+                graphs.at(i)->SetMarkerStyle(28);
+                break;
         }
 
         graphs.at(i)->SetName(graph_name.str().c_str());

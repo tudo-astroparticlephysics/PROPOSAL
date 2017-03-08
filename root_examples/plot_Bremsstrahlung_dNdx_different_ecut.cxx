@@ -186,29 +186,24 @@ int main()
         graph_title<<brems.at(i)->GetParticle()->GetName()<<" in "<<brems.at(i)->GetMedium()->GetName();
         graph_title<<" with ecut = "<<brems.at(i)->GetEnergyCutSettings()->GetEcut();
 
-        if(brems.at(i)->GetParametrization()==1)
+        switch (brems.at(i)->GetParametrization())
         {
-            graph_title<<", parametrization: Kelner-Kakoulin-Petrukhin";
-            graphs.at(i)->SetMarkerStyle(4);
-
-        }
-        if(brems.at(i)->GetParametrization()==2)
-        {
-            graph_title<<", parametrization: Andreev-Bezrukov-Bugaev";
-            graphs.at(i)->SetMarkerStyle(3);
-
-        }
-        if(brems.at(i)->GetParametrization()==3)
-        {
-            graph_title<<", parametrization: Petrukhin-Shestakov";
-            graphs.at(i)->SetMarkerStyle(2);
-
-        }
-        if(brems.at(i)->GetParametrization()==4)
-        {
-            graph_title<<", parametrization: Complete screening case";
-            graphs.at(i)->SetMarkerStyle(28);
-
+            case 1:
+                graph_title<<", parametrization: Kelner-Kakoulin-Petrukhin";
+                graphs.at(i)->SetMarkerStyle(4);
+                break;
+            case 2:
+                graph_title<<", parametrization: Andreev-Bezrukov-Bugaev";
+                graphs.at(i)->SetMarkerStyle(3);
+                break;
+            case 3:
+                graph_title<<", parametrization: Petrukhin-Shestakov";
+                graphs.at(i)->SetMarkerStyle(2);
+                break;
+            case 4:
+                graph_title<<", parametrization: Complete screening case";
+                graphs.at(i)->SetMarkerStyle(28);
+                break;
         }
 
 
