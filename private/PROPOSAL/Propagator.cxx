@@ -571,10 +571,10 @@ void Propagator::ChooseCurrentCollection(PROPOSALParticle* particle)
 
         if(particle->GetType() != collections_.at(i)->GetParticle()->GetType())
         {
-            printf("particle type:%i\n", particle->GetType());
-            printf("particle name:%s\n", particle->GetName().c_str());
-            printf("particle in collection type:%i\n", collections_.at(i)->GetParticle()->GetType());
-            printf("particle in collection type:%s\n", collections_.at(i)->GetParticle()->GetName().c_str());
+            // printf("particle type:%i\n", particle->GetType());
+            // printf("particle name:%s\n", particle->GetName().c_str());
+            // printf("particle in collection type:%i\n", collections_.at(i)->GetParticle()->GetType());
+            // printf("particle in collection type:%s\n", collections_.at(i)->GetParticle()->GetName().c_str());
             continue;
         }
 

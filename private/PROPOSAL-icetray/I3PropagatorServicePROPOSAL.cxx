@@ -506,7 +506,7 @@ I3PropagatorServicePROPOSAL::propagate( I3Particle& p, vector<I3Particle>& daugh
   // string mmcName = GenerateMMCName(p);
   // log_debug("MMC name of particle to propagate: %s",mmcName.c_str());
   PROPOSALParticle::ParticleType particleType = GeneratePROPOSALName(p);
-  // log_debug("MMC name of particle to propagate: %s",mmcName.c_str()); //TODO(mario): gerenate name from type Mi 2017/03/08
+  log_debug("Name of particle to propagate: %s", PROPOSALParticle::GetName(particleType).c_str());
 
   // PROPOSALParticle* particle = new PROPOSALParticle(mmcName, x_0, y_0, z_0, theta_0, phi_0, e_0, t_0);
   PROPOSALParticle* particle = new PROPOSALParticle(particleType, x_0, y_0, z_0, theta_0, phi_0, e_0, t_0);
