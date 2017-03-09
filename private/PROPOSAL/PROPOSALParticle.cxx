@@ -898,3 +898,77 @@ std::string PROPOSALParticle::GetName(ParticleType pt) {
     return p.GetName();
 }
 
+ParticleType PROPOSALParticle::GetTypeFromName(std::string particle_name)
+{
+    // returns the particle type of a particle name
+    // if there is just the name without charge (e.g. "mu" and not "mu+")
+    // then it is set to the default "mu-"
+
+    if (StartsWith(particle_name,"mu"))
+    {
+        if (particle_name.compare("mu-"))
+        {
+            return ParticleType::MuMinus;
+        }
+        else if (particle_name.compare("mu+"))
+        {
+            return ParticleType::MuPlus;
+        }
+        else
+        {
+            return ParticleType::MuMinus;
+        }
+    }
+    else if (StartsWith(particle_name,"tau"))
+    {
+        if (particle_name.compare("tau-"))
+        {
+            return ParticleType::TauMinus;
+        }
+        else if (particle_name.compare("tau+"))
+        {
+            return ParticleType::TauPlus;
+        }
+        else
+        {
+            return ParticleType::TauMinus;
+        }
+    }
+    else if (StartsWith(particle_name,"e"))
+    {
+        if (particle_name.compare("e-"))
+        {
+            return ParticleType::EMinus;
+        }
+        else if (particle_name.compare("e+"))
+        {
+            return ParticleType::EPlus;
+        }
+        else
+        {
+            return ParticleType::EMinus;
+        }
+    }
+    else if (StartsWith(particle_name,"stau"))
+    {
+        if (particle_name.compare("stau-"))
+        {
+            return ParticleType::STauMinus;
+        }
+        else if (particle_name.compare("stau+"))
+        {
+            return ParticleType::STauPlus;
+        }
+        else
+        {
+            return ParticleType::STauMinus;
+        }
+    else if (particle_name.compare("monopole"))
+    {
+        return ParticleType::Monopole;
+    }
+    else
+    {
+        log_fatal("the particle can not be propagated with PROPOSAL");
+    }
+}
