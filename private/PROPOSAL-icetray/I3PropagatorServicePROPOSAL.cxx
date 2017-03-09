@@ -490,7 +490,6 @@ boost::assign::list_of<std::pair<int, I3Particle::ParticleType> >
 
 I3MMCTrackPtr
 I3PropagatorServicePROPOSAL::propagate( I3Particle& p, vector<I3Particle>& daughters){
-
   /**
    * Natural units of MMC is cm, deg, MeV, and s.
    * Therefore we need to convert explicitly to
