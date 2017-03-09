@@ -62,23 +62,27 @@ MuonPropagator::SetSeed(int seed)
 	MathModel::set_seed(seed);
 }
 
-inline std::string
-GetMMCName(I3Particle::ParticleType pt)
+PROPOSALParticle::ParticleType
+GetPROPOSALType(I3Particle::ParticleType pt)
 {
-	std::string name;
-
-	if (pt == I3Particle::MuMinus)
-		name="mu-";
-	else if (pt == I3Particle::MuPlus)
-		name="mu+";
-
-	return name;
+    PROPOSALParticle::ParticleType code;
+    switch (pt) {
+        case I3Particle::MuMinus:
+            code = PROPOSALParticle::ParticleType::MuMinus;
+            break;
+        case I3Particle::MuPlus:
+            code = PROPOSALParticle::ParticleType::MuPlus;
+            break;
+        default:
+            log_fatal_stream("Unsupported particle type: " << pt);
+    }
+    return code;
 }
 
 std::string
 MuonPropagator::GetName(const I3Particle &p)
 {
-	return GetMMCName(p.GetType());
+    return PROPOSALParticle::GetName(GetPROPOSALType(p.GetType()));
 }
 
 typedef std::map<int, I3Particle::ParticleType> particle_type_conversion_t;
@@ -140,7 +144,7 @@ double
 MuonPropagator::GetStochasticRate(double energy, double fraction, I3Particle::ParticleType type) const
 {
 	/*
-	propagator_->get_output()->initDefault(0, 0, GetMMCName(type), 0, 0, 0, 0, 0, 0);
+	propagator_->get_output()->initDefault(0, 0, PROPOSALParticle::GetName(GetPROPOSALType(type)), 0, 0, 0, 0, 0, 0);
 	// Check kinematics
 	if (fraction <= 0 || energy*(1-fraction) <= propagator_->get_particle()->m*I3Units::MeV)
 		return 0.;
@@ -177,7 +181,7 @@ double
 MuonPropagator::GetTotalStochasticRate(double energy, I3Particle::ParticleType type) const
 {
 	/*
-	propagator_->get_output()->initDefault(0, 0, GetMMCName(type), 0, 0, 0, 0, 0, 0);
+	propagator_->get_output()->initDefault(0, 0, PROPOSALParticle::GetName(GetPROPOSALType(type)), 0, 0, 0, 0, 0, 0);
 	propagator_->get_particle()->setEnergy(energy/I3Units::MeV);
 	propagator_->get_cros()->get_ionization()->setEnergy();
 	*/
