@@ -103,6 +103,7 @@ public:
     //Constructors
     Propagator();
     Propagator(std::string config_file, bool DoApplyOptions=true);
+    Propagator(std::string config_file, PROPOSALParticle* particle, bool DoApplyOptions=true);
     Propagator(Medium* medium,
                EnergyCutSettings* cuts,
                PROPOSALParticle::ParticleType particle_type,
