@@ -119,7 +119,7 @@ TEST(Scattering , Theta0 )
 //        energy_old = -1;
 
 //        Medium *medium = new Medium(med,1.);
-//        Particle *particle = new Particle(particleName,1.,1.,1,.20,20,1e5,10);
+//        Particle *particle = new Particle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10);
 //        particle->SetEnergy(energy);
 //        EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
 
@@ -206,7 +206,7 @@ TEST(Scattering , Advance ) {
 //        energy_old = -1;
 
 //        Medium *medium = new Medium(med,1.);
-//        Particle *particle = new Particle(particleName,1.,1.,1,.20,20,1e5,10);
+//        Particle *particle = new Particle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10);
 //        particle->SetEnergy(energy);
 //        EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
 
