@@ -248,7 +248,7 @@ Crust::Ingest(const I3Particle &p)
 		double dx = boundaries_[i]->GetIntersection(propped.GetPos(), propped.GetDir()).first;
 		if (dx > 0)
 			propped = (i > 0 ? propagators_[i-1] : defaultPropagator_)->propagate(propped, dx);
-		// Force lengths to measure the distance back to the outermogeschlossenst surface
+		// Force lengths to measure the distance back to the outermost surface
 		if (i > 0)
 			l += std::min(dx, propped.GetLength());
 	}
