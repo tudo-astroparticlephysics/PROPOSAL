@@ -1884,9 +1884,9 @@ void Propagator::InitProcessCollections(ifstream &file)
                 eplus_infront    = new ProcessCollection(new PROPOSALParticle(*eplus),new Medium(*med),new EnergyCutSettings(*infront));
 
                 muminus_infront->SetEnableRandomization(global_cont_infront_);
-                mu_infront->SetEnableRandomization(global_cont_infront_);
+                muplus_infront->SetEnableRandomization(global_cont_infront_);
                 muminus_infront->SetLocation(0);
-                mu_infront->SetLocation(0);
+                muplus_infront->SetLocation(0);
 
                 tauminus_infront->SetEnableRandomization(global_cont_infront_);
                 tauplus_infront->SetEnableRandomization(global_cont_infront_);
@@ -1903,11 +1903,11 @@ void Propagator::InitProcessCollections(ifstream &file)
             {
                 behind = new EnergyCutSettings(ecut_behind,vcut_behind);
 
-                muminus_behind   = new ProcessCollection(new PROPOSALParticle(*muminus),new Medium(*med),new EnergyCutSettings(*behind));
+                muminus_behind  = new ProcessCollection(new PROPOSALParticle(*muminus),new Medium(*med),new EnergyCutSettings(*behind));
                 muplus_behind   = new ProcessCollection(new PROPOSALParticle(*muplus),new Medium(*med),new EnergyCutSettings(*behind));
-                tauminus_behind  = new ProcessCollection(new PROPOSALParticle(*tauminus),new Medium(*med),new EnergyCutSettings(*behind));
+                tauminus_behind = new ProcessCollection(new PROPOSALParticle(*tauminus),new Medium(*med),new EnergyCutSettings(*behind));
                 tauplus_behind  = new ProcessCollection(new PROPOSALParticle(*tauplus),new Medium(*med),new EnergyCutSettings(*behind));
-                eminus_behind    = new ProcessCollection(new PROPOSALParticle(*eminus),new Medium(*med),new EnergyCutSettings(*behind));
+                eminus_behind   = new ProcessCollection(new PROPOSALParticle(*eminus),new Medium(*med),new EnergyCutSettings(*behind));
                 eplus_behind    = new ProcessCollection(new PROPOSALParticle(*eplus),new Medium(*med),new EnergyCutSettings(*behind));
 
                 muminus_behind->SetEnableRandomization(cont_behind);
@@ -1929,11 +1929,11 @@ void Propagator::InitProcessCollections(ifstream &file)
             {
                 behind = new EnergyCutSettings(global_ecut_behind_,global_vcut_behind_);
 
-                muminus_behind   = new ProcessCollection(new PROPOSALParticle(*muminus),new Medium(*med),new EnergyCutSettings(*behind));
+                muminus_behind  = new ProcessCollection(new PROPOSALParticle(*muminus),new Medium(*med),new EnergyCutSettings(*behind));
                 muplus_behind   = new ProcessCollection(new PROPOSALParticle(*muplus),new Medium(*med),new EnergyCutSettings(*behind));
-                tauminus_behind  = new ProcessCollection(new PROPOSALParticle(*tauminus),new Medium(*med),new EnergyCutSettings(*behind));
+                tauminus_behind = new ProcessCollection(new PROPOSALParticle(*tauminus),new Medium(*med),new EnergyCutSettings(*behind));
                 tauplus_behind  = new ProcessCollection(new PROPOSALParticle(*tauplus),new Medium(*med),new EnergyCutSettings(*behind));
-                eminus_behind    = new ProcessCollection(new PROPOSALParticle(*eminus),new Medium(*med),new EnergyCutSettings(*behind));
+                eminus_behind   = new ProcessCollection(new PROPOSALParticle(*eminus),new Medium(*med),new EnergyCutSettings(*behind));
                 eplus_behind    = new ProcessCollection(new PROPOSALParticle(*eplus),new Medium(*med),new EnergyCutSettings(*behind));
 
                 muminus_behind->SetEnableRandomization(global_cont_behind_);
