@@ -388,11 +388,13 @@ public:
 //----------------------------------------------------------------------------//
     std::string GetName() const{return name_;}
 //----------------------------------------------------------------------------//
-    static  std::string GetName(ParticleType pt);
+    static std::string GetName(ParticleType pt);
 //----------------------------------------------------------------------------//
     double GetLow() const{return low_;}
 //----------------------------------------------------------------------------//
     ParticleType GetType() const{return type_;}
+//----------------------------------------------------------------------------//
+    static ParticleType GetTypeFromName(std::string particle_name);
 //----------------------------------------------------------------------------//
     int GetParentParticleId() const{return parent_particle_id_;}
 //----------------------------------------------------------------------------//
