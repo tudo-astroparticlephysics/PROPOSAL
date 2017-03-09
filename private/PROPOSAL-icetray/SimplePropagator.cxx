@@ -22,24 +22,6 @@
 
 namespace PROPOSAL {
 
-std::string
-GetMMCCode(I3Particle::ParticleType pt)
-{
-    std::string code;
-    switch (pt) {
-        case I3Particle::MuMinus:
-        case I3Particle::MuPlus:
-            code = "mu";
-            break;
-        case I3Particle::TauMinus:
-        case I3Particle::TauPlus:
-            code = "tau";
-            break;
-        default:
-            log_fatal_stream("Unsupported particle type: " << pt);
-    }
-    return code;
-}
 
 PROPOSALParticle::ParticleType
 GetPROPOSALType(I3Particle::ParticleType pt)
@@ -120,34 +102,10 @@ SimplePropagator::SetRandomNumberGenerator(I3RandomServicePtr rng)
     propagator_->SetRandomNumberGenerator(f);
 }
 
-inline std::string
-GetMMCName(I3Particle::ParticleType pt)
-{
-    std::string name;
-
-    switch (pt) {
-        case I3Particle::MuMinus:
-            name="mu-";
-            break;
-        case I3Particle::MuPlus:
-            name="mu+";
-            break;
-        case I3Particle::TauMinus:
-            name="tau-";
-            break;
-        case I3Particle::TauPlus:
-            name="tau+";
-            break;
-        default:
-            break;
-    }
-    return name;
-}
-
 std::string
 SimplePropagator::GetName(const I3Particle &p)
 {
-	return GetMMCName(p.GetType());
+    return PROPOSALParticle::GetName(GetPROPOSALType(p.GetType()));
 }
 
 typedef std::map<int, I3Particle::ParticleType> particle_type_conversion_t;

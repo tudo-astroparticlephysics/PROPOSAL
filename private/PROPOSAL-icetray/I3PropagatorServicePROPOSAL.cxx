@@ -154,7 +154,7 @@ I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(
     //     log_fatal("I don't know how to propagate %s", dummy.GetTypeString().c_str());
     // }
 
-    // particle_type = new PROPOSALParticle(GenerateMMCName(type))
+    // particle_type = new PROPOSALParticle(PROPOSALParticle::GetName(GeneratePROPOSALName(type)));
 
 
     // ----[ Check table dir and mediadef ]------------------ //
@@ -364,36 +364,36 @@ std::vector<I3Particle> I3PropagatorServicePROPOSAL::Propagate(I3Particle& p, Di
   return daughters;
 }
 
-string I3PropagatorServicePROPOSAL::GenerateMMCName(const I3Particle& p){
+// string I3PropagatorServicePROPOSAL::GenerateMMCName(const I3Particle& p){
 
-  string name;
+//   string name;
 
-  if(p.GetType()==I3Particle::MuMinus) name="mu-";
-  else if(p.GetType()==I3Particle::MuPlus) name="mu+";
-  else if(p.GetType()==I3Particle::NuMu) name="nu_mu";
-  else if(p.GetType()==I3Particle::NuMuBar) name="~nu_mu";
-  else if(p.GetType()==I3Particle::NuE) name="nu_e";
-  else if(p.GetType()==I3Particle::NuEBar) name="~nu_e";
-  else if(p.GetType()==I3Particle::NuTau) name="nu_tau";
-  else if(p.GetType()==I3Particle::NuTauBar) name="~nu_tau";
-  else if((p.GetType()==I3Particle::EMinus) &&
-	  (p.GetShape()==I3Particle::TopShower)) name="e-";
-  else if((p.GetType()==I3Particle::EPlus) &&
-	  (p.GetShape()==I3Particle::TopShower)) name="e+";
-  else if(p.GetType()==I3Particle::TauMinus) name="tau-";
-  else if(p.GetType()==I3Particle::TauPlus) name="tau+";
-  else if((p.GetType()==I3Particle::Hadrons) &&
-	  (p.GetShape()==I3Particle::TopShower)) name="hadr";
-  else if(p.GetType()==I3Particle::Monopole) name="monopole";
-  else if(p.GetType()==I3Particle::STauPlus ||
-	  p.GetType()==I3Particle::STauMinus){
-    stringstream s;
-    s<<"stau="<<particleMass_/I3Units::GeV;
-    name=s.str();
-  }
+//   if(p.GetType()==I3Particle::MuMinus) name="mu-";
+//   else if(p.GetType()==I3Particle::MuPlus) name="mu+";
+//   else if(p.GetType()==I3Particle::NuMu) name="nu_mu";
+//   else if(p.GetType()==I3Particle::NuMuBar) name="~nu_mu";
+//   else if(p.GetType()==I3Particle::NuE) name="nu_e";
+//   else if(p.GetType()==I3Particle::NuEBar) name="~nu_e";
+//   else if(p.GetType()==I3Particle::NuTau) name="nu_tau";
+//   else if(p.GetType()==I3Particle::NuTauBar) name="~nu_tau";
+//   else if((p.GetType()==I3Particle::EMinus) &&
+// 	  (p.GetShape()==I3Particle::TopShower)) name="e-";
+//   else if((p.GetType()==I3Particle::EPlus) &&
+// 	  (p.GetShape()==I3Particle::TopShower)) name="e+";
+//   else if(p.GetType()==I3Particle::TauMinus) name="tau-";
+//   else if(p.GetType()==I3Particle::TauPlus) name="tau+";
+//   else if((p.GetType()==I3Particle::Hadrons) &&
+// 	  (p.GetShape()==I3Particle::TopShower)) name="hadr";
+//   else if(p.GetType()==I3Particle::Monopole) name="monopole";
+//   else if(p.GetType()==I3Particle::STauPlus ||
+// 	  p.GetType()==I3Particle::STauMinus){
+//     stringstream s;
+//     s<<"stau="<<particleMass_/I3Units::GeV;
+//     name=s.str();
+//   }
 
-  return name;
-}
+//   return name;
+// }
 
 PROPOSALParticle::ParticleType I3PropagatorServicePROPOSAL::GeneratePROPOSALName(const I3Particle& p){
 
@@ -503,12 +503,9 @@ I3PropagatorServicePROPOSAL::propagate( I3Particle& p, vector<I3Particle>& daugh
   double e_0 = p.GetEnergy()/I3Units::MeV;  // [MeV]
   double t_0 = p.GetTime()/I3Units::s;     // [s]
 
-  // string mmcName = GenerateMMCName(p);
-  // log_debug("MMC name of particle to propagate: %s",mmcName.c_str());
   PROPOSALParticle::ParticleType particleType = GeneratePROPOSALName(p);
   log_debug("Name of particle to propagate: %s", PROPOSALParticle::GetName(particleType).c_str());
 
-  // PROPOSALParticle* particle = new PROPOSALParticle(mmcName, x_0, y_0, z_0, theta_0, phi_0, e_0, t_0);
   PROPOSALParticle* particle = new PROPOSALParticle(particleType, x_0, y_0, z_0, theta_0, phi_0, e_0, t_0);
   if (particle == 0) log_fatal("Error calling the Particle constructor");
 
