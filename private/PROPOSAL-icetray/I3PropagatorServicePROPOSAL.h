@@ -144,7 +144,7 @@ public:
   I3PropagatorServicePROPOSAL(const I3PropagatorServicePROPOSAL&);
   I3PropagatorServicePROPOSAL& operator=(const I3PropagatorServicePROPOSAL&);
 
-  std::string GenerateMMCName(const I3Particle&);
+  // std::string GenerateMMCName(const I3Particle&);
   PROPOSALParticle::ParticleType GeneratePROPOSALName(const I3Particle& p);
 
   /**
