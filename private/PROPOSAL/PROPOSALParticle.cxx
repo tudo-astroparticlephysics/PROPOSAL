@@ -892,4 +892,9 @@ void PROPOSALParticle::SetElost(double elost){
     elost_ = elost;
 }
 
+std::string PROPOSALParticle::GetName(ParticleType pt) const {
+
+    PROPOSALParticle p(pt);
+    return p.GetName();
+}
 
