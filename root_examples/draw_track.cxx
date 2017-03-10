@@ -39,7 +39,7 @@ int main(int argc, char **argv)
     cin>>type;
     cout<<"Enter the particle energy [MeV]"<<endl;
     cin>>energy;
-    particle = new PROPOSALParticle(type ,-200.,10.,-10.,90.,0.,0.,0.);
+    particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(type) ,-200.,10.,-10.,90.,0.,0.,0.);
 
     particle->SetEnergy(energy);
 
