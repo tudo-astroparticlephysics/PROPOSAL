@@ -148,6 +148,10 @@ public:
 
     std::vector<PROPOSALParticle*> Propagate( PROPOSALParticle *particle, double MaxDistance_cm = 1e20 );
 
+
+//----------------------------------------------------------------------------//
+    std::vector<PROPOSALParticle*> propagate(double MaxDistance_cm = 1e20 ); //TODO(mario): Find new name Fr 2017/03/10
+
 //----------------------------------------------------------------------------//
         /*!
          *  Apply options which are read from configuration file to ProcessCollections
