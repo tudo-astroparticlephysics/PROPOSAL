@@ -898,3 +898,55 @@ std::string PROPOSALParticle::GetName(ParticleType pt) {
     return p.GetName();
 }
 
+ParticleType PROPOSALParticle::GetTypeFromName(std::string particle_name)
+{
+    // returns the particle type of a particle name
+    // if there is just the name without charge (e.g. "mu" and not "mu+")
+    // then it is set to the default "mu-"
+
+    if (StartsWith(particle_name,"mu"))
+    {
+        if (particle_name.compare("mu-")) return ParticleType::MuMinus;
+        else if (particle_name.compare("mu+")) return ParticleType::MuPlus;
+        else return ParticleType::MuMinus;
+    }
+    else if (StartsWith(particle_name,"tau"))
+    {
+        if (particle_name.compare("tau-")) return ParticleType::TauMinus;
+        else if (particle_name.compare("tau+")) return ParticleType::TauPlus;
+        else return ParticleType::TauMinus;
+    }
+    else if (StartsWith(particle_name,"e"))
+    {
+        if (particle_name.compare("e-")) return ParticleType::EMinus;
+        else if (particle_name.compare("e+")) return ParticleType::EPlus;
+        else return ParticleType::EMinus;
+    }
+    else if (StartsWith(particle_name,"stau"))
+    {
+        if (particle_name.compare("stau-")) return ParticleType::STauMinus;
+        else if (particle_name.compare("stau+")) return ParticleType::STauPlus;
+        else return ParticleType::STauMinus;
+    }
+    if (particle_name.compare("monopole")) return ParticleType::Monopole;
+    else if (StartsWith(particle_name,"nu"))
+    {
+        if (particle_name.compare("nu_mu")) return ParticleType::NuMu;
+        else if (particle_name.compare("nu_mu_bar")) return ParticleType::NuMuBar;
+        else if (particle_name.compare("nu_tau")) return ParticleType::NuTau;
+        else if (particle_name.compare("nu_tau_bar")) return ParticleType::NuTauBar;
+        else if (particle_name.compare("nu_e")) return ParticleType::NuE;
+        else if (particle_name.compare("nu_e_bar")) return ParticleType::NuEBar;
+    }
+    else if (particle_name.compare("DeltaE")) return ParticleType::DeltaE;
+    else if (particle_name.compare("ContinuousEnergyLoss")) return ParticleType::ContinuousEnergyLoss;
+    else if (particle_name.compare("Brems")) return ParticleType::Brems;
+    else if (particle_name.compare("NuclInt")) return ParticleType::NuclInt;
+    else if (particle_name.compare("Hadrons")) return ParticleType::Hadrons;
+    else if (particle_name.compare("EPair")) return ParticleType::EPair;
+    else
+    {
+        log_fatal("the particle is not a PROPOSAL Particle");
+        return ParticleType::unknown;
+    }
+}
