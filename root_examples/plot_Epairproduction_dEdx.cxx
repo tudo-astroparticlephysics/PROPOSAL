@@ -238,92 +238,65 @@ int main()
 
     for(unsigned int i = 0 ; i < graphs.size() ; i++)
     {
+        leg_entry<<epair.at(i)->GetMedium()->GetName().c_str();
+        if(epair.at(i)->GetLpmEffectEnabled()) leg_entry<<" lpm";
+
         if(epair.at(i)->GetParticle()->GetType() == PROPOSALParticle::ParticleType::MuMinus)
         {
             muons_gr->Add(graphs.at(i),"P");
-            leg_entry<<epair.at(i)->GetMedium()->GetName().c_str();
-            if(epair.at(i)->GetLpmEffectEnabled())
-            {
-                leg_entry<<" lpm";
-            }
-
             muons_leg->AddEntry(graphs.at(i),leg_entry.str().c_str(),"p");
 
-            if(muons_gr->GetListOfGraphs()->Capacity()==1||muons_gr->GetListOfGraphs()->Capacity()==4)
+            switch (muons_gr->GetListOfGraphs()->Capacity())
             {
-                graphs.at(i)->SetMarkerColor(kRed);
+                case 1: case 4:
+                    graphs.at(i)->SetMarkerColor(kRed);
+                    break;
+                case 2: case 5:
+                    graphs.at(i)->SetMarkerColor(kBlue);
+                    break;
+                case 3: case 6:
+                    graphs.at(i)->SetMarkerColor(kGreen);
+                    break;
             }
-            if(muons_gr->GetListOfGraphs()->Capacity()==2||muons_gr->GetListOfGraphs()->Capacity()==5)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(muons_gr->GetListOfGraphs()->Capacity()==3||muons_gr->GetListOfGraphs()->Capacity()==6)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-
-            leg_entry.str("");
-            leg_entry.clear();
-
         }
-        if(epair.at(i)->GetParticle()->GetType() == PROPOSALParticle::ParticleType::TauMinus)
+        else if(epair.at(i)->GetParticle()->GetType() == PROPOSALParticle::ParticleType::TauMinus)
         {
             taus_gr->Add(graphs.at(i),"P");
-
-            leg_entry<<epair.at(i)->GetMedium()->GetName().c_str();
-            if(epair.at(i)->GetLpmEffectEnabled())
-            {
-                leg_entry<<" lpm";
-            }
-
             taus_leg->AddEntry(graphs.at(i),leg_entry.str().c_str(),"p");
 
-            if(taus_gr->GetListOfGraphs()->Capacity()==1||taus_gr->GetListOfGraphs()->Capacity()==4)
+            switch (taus_gr->GetListOfGraphs()->Capacity())
             {
-                graphs.at(i)->SetMarkerColor(kRed);
+                case 1: case 4:
+                    graphs.at(i)->SetMarkerColor(kRed);
+                    break;
+                case 2: case 5:
+                    graphs.at(i)->SetMarkerColor(kBlue);
+                    break;
+                case 3: case 6:
+                    graphs.at(i)->SetMarkerColor(kGreen);
+                    break;
             }
-            if(taus_gr->GetListOfGraphs()->Capacity()==2||taus_gr->GetListOfGraphs()->Capacity()==5)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(taus_gr->GetListOfGraphs()->Capacity()==3||taus_gr->GetListOfGraphs()->Capacity()==6)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-
-            leg_entry.str("");
-            leg_entry.clear();
-
         }
-        if(epair.at(i)->GetParticle()->GetType() == PROPOSALParticle::ParticleType::EMinus)
+        else if(epair.at(i)->GetParticle()->GetType() == PROPOSALParticle::ParticleType::EMinus)
         {
             electrons_gr->Add(graphs.at(i),"P");
-
-            leg_entry<<epair.at(i)->GetMedium()->GetName().c_str();
-            if(epair.at(i)->GetLpmEffectEnabled())
-            {
-                leg_entry<<" lpm";
-            }
-
             electrons_leg->AddEntry(graphs.at(i),leg_entry.str().c_str(),"p");
 
-            if(electrons_gr->GetListOfGraphs()->Capacity()==1||electrons_gr->GetListOfGraphs()->Capacity()==4)
+            switch (electrons_gr->GetListOfGraphs()->Capacity())
             {
-                graphs.at(i)->SetMarkerColor(kRed);
+                case 1: case 4:
+                    graphs.at(i)->SetMarkerColor(kRed);
+                    break;
+                case 2: case 5:
+                    graphs.at(i)->SetMarkerColor(kBlue);
+                    break;
+                case 3: case 6:
+                    graphs.at(i)->SetMarkerColor(kGreen);
+                    break;
             }
-            if(electrons_gr->GetListOfGraphs()->Capacity()==2||electrons_gr->GetListOfGraphs()->Capacity()==5)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(electrons_gr->GetListOfGraphs()->Capacity()==3||electrons_gr->GetListOfGraphs()->Capacity()==6)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-
-            leg_entry.str("");
-            leg_entry.clear();
-
         }
+        leg_entry.str("");
+        leg_entry.clear();
     }
 
     muons->cd();
@@ -364,94 +337,65 @@ int main()
 
     for(unsigned int i = 0 ; i < graphs.size() ; i++)
     {
+        leg_entry<<epair.at(i)->GetParticle()->GetName().c_str();
+        if(epair.at(i)->GetLpmEffectEnabled()) leg_entry<<" lpm";
+
         if(epair.at(i)->GetMedium()->GetName().compare("hydrogen")==0)
         {
             hydrogen_gr->Add(graphs.at(i),"P");
-
-            leg_entry<<epair.at(i)->GetParticle()->GetName().c_str();
-            if(epair.at(i)->GetLpmEffectEnabled())
-            {
-                leg_entry<<" lpm";
-            }
-
             hydrogen_leg->AddEntry(graphs.at(i),leg_entry.str().c_str(),"p");
 
-            if(hydrogen_gr->GetListOfGraphs()->Capacity()==1||hydrogen_gr->GetListOfGraphs()->Capacity()==4)
+            switch (hydrogen_gr->GetListOfGraphs()->Capacity())
             {
-                graphs.at(i)->SetMarkerColor(kRed);
+                case 1: case 4:
+                    graphs.at(i)->SetMarkerColor(kRed);
+                    break;
+                case 2: case 5:
+                    graphs.at(i)->SetMarkerColor(kBlue);
+                    break;
+                case 3: case 6:
+                    graphs.at(i)->SetMarkerColor(kGreen);
+                    break;
             }
-            if(hydrogen_gr->GetListOfGraphs()->Capacity()==2||hydrogen_gr->GetListOfGraphs()->Capacity()==5)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(hydrogen_gr->GetListOfGraphs()->Capacity()==3||hydrogen_gr->GetListOfGraphs()->Capacity()==6)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-
-            leg_entry.str("");
-            leg_entry.clear();
-
         }
-        if(epair.at(i)->GetMedium()->GetName().compare("water")==0)
+        else if(epair.at(i)->GetMedium()->GetName().compare("water")==0)
         {
             water_gr->Add(graphs.at(i),"P");
-
-            leg_entry<<epair.at(i)->GetParticle()->GetName().c_str();
-            if(epair.at(i)->GetLpmEffectEnabled())
-            {
-                leg_entry<<" lpm";
-            }
-
             water_leg->AddEntry(graphs.at(i),leg_entry.str().c_str(),"p");
 
-            if(water_gr->GetListOfGraphs()->Capacity()==1||water_gr->GetListOfGraphs()->Capacity()==4)
+            switch (water_gr->GetListOfGraphs()->Capacity())
             {
-                graphs.at(i)->SetMarkerColor(kRed);
+                case 1: case 4:
+                    graphs.at(i)->SetMarkerColor(kRed);
+                    break;
+                case 2: case 5:
+                    graphs.at(i)->SetMarkerColor(kBlue);
+                    break;
+                case 3: case 6:
+                    graphs.at(i)->SetMarkerColor(kGreen);
+                    break;
             }
-            if(water_gr->GetListOfGraphs()->Capacity()==2||water_gr->GetListOfGraphs()->Capacity()==5)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(water_gr->GetListOfGraphs()->Capacity()==3||water_gr->GetListOfGraphs()->Capacity()==6)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-            }
-
-            leg_entry.str("");
-            leg_entry.clear();
-
         }
-        if(epair.at(i)->GetMedium()->GetName().compare("uranium")==0)
+        else if(epair.at(i)->GetMedium()->GetName().compare("uranium")==0)
         {
             uranium_gr->Add(graphs.at(i),"P");
-
-            leg_entry<<epair.at(i)->GetParticle()->GetName().c_str();
-            if(epair.at(i)->GetLpmEffectEnabled())
-            {
-                leg_entry<<" lpm";
-            }
-
             uranium_leg->AddEntry(graphs.at(i),leg_entry.str().c_str(),"p");
 
-            if(uranium_gr->GetListOfGraphs()->Capacity()==1||uranium_gr->GetListOfGraphs()->Capacity()==4)
+            switch (uranium_gr->GetListOfGraphs()->Capacity())
             {
-                graphs.at(i)->SetMarkerColor(kRed);
+                case 1: case 4:
+                    graphs.at(i)->SetMarkerColor(kRed);
+                    break;
+                case 2: case 5:
+                    graphs.at(i)->SetMarkerColor(kBlue);
+                    break;
+                case 3: case 6:
+                    graphs.at(i)->SetMarkerColor(kGreen);
+                    break;
             }
-            if(uranium_gr->GetListOfGraphs()->Capacity()==2||uranium_gr->GetListOfGraphs()->Capacity()==5)
-            {
-                graphs.at(i)->SetMarkerColor(kBlue);
-            }
-            if(uranium_gr->GetListOfGraphs()->Capacity()==3||uranium_gr->GetListOfGraphs()->Capacity()==6)
-            {
-                graphs.at(i)->SetMarkerColor(kGreen);
-
-            }
-
-            leg_entry.str("");
-            leg_entry.clear();
-
         }
+        leg_entry.str("");
+        leg_entry.clear();
     }
 
 
