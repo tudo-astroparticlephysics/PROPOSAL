@@ -38,7 +38,7 @@ TEST(Comparison , Comparison_equal ) {
 
     double dEdx;
     Medium *medium = new Medium("air",1.);
-    PROPOSALParticle *particle = new PROPOSALParticle("mu",1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
     Epairproduction *A = new Epairproduction(particle, medium, cuts);
     Epairproduction *B = new Epairproduction(particle, medium, cuts);
@@ -68,8 +68,8 @@ TEST(Comparison , Comparison_not_equal ) {
     double dEdx;
     Medium *medium = new Medium("air",1.);
     Medium *medium2 = new Medium("water",1.);
-    PROPOSALParticle *particle = new PROPOSALParticle("mu",1.,1.,1,20,20,1e5,10);
-    PROPOSALParticle *particle2 = new PROPOSALParticle("tau",1.,1.,1,20,20,1e5,10);
+    PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::ParticleType::MuMinus,1.,1.,1,20,20,1e5,10);
+    PROPOSALParticle *particle2 = new PROPOSALParticle(PROPOSALParticle::ParticleType::TauMinus,1.,1.,1,20,20,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
     Epairproduction *A = new Epairproduction(particle, medium, cuts);
     Epairproduction *B = new Epairproduction(particle, medium2, cuts);
@@ -102,7 +102,7 @@ TEST(Assignment , Copyconstructor ) {
 
 TEST(Assignment , Copyconstructor2 ) {
     Medium *medium = new Medium("air",1.);
-    PROPOSALParticle *particle = new PROPOSALParticle("mu",1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
 
     Epairproduction A(particle, medium, cuts);
@@ -114,7 +114,7 @@ TEST(Assignment , Copyconstructor2 ) {
 
 TEST(Assignment , Operator ) {
     Medium *medium = new Medium("air",1.);
-    PROPOSALParticle *particle = new PROPOSALParticle("mu",1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
     Epairproduction A(particle, medium, cuts);
     Epairproduction B(particle, medium, cuts);
@@ -127,7 +127,7 @@ TEST(Assignment , Operator ) {
     EXPECT_TRUE(A==B);
 
     Medium *medium2 = new Medium("water",1.);
-    PROPOSALParticle *particle2 = new PROPOSALParticle("tau",1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle2 = new PROPOSALParticle(PROPOSALParticle::ParticleType::TauMinus,1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cuts2 = new EnergyCutSettings(200,-1);
     Epairproduction *C = new Epairproduction(particle2, medium2, cuts2);
     EXPECT_TRUE(A!=*C);
@@ -141,8 +141,8 @@ TEST(Assignment , Operator ) {
 TEST(Assignment , Swap ) {
     Medium *medium = new Medium("air",1.);
     Medium *medium2 = new Medium("air",1.);
-    PROPOSALParticle *particle = new PROPOSALParticle("mu",1.,1.,1,20,20,1e5,10);
-    PROPOSALParticle *particle2 = new PROPOSALParticle("mu",1.,1.,1,20,20,1e5,10);
+    PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::ParticleType::MuMinus,1.,1.,1,20,20,1e5,10);
+    PROPOSALParticle *particle2 = new PROPOSALParticle(PROPOSALParticle::ParticleType::MuMinus,1.,1.,1,20,20,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
     EnergyCutSettings *cuts2 = new EnergyCutSettings(500,-1);
     Epairproduction A(particle, medium, cuts);
@@ -153,8 +153,8 @@ TEST(Assignment , Swap ) {
 
     Medium *medium3 = new Medium("water",1.);
     Medium *medium4 = new Medium("water",1.);
-    PROPOSALParticle *particle3 = new PROPOSALParticle("tau",1.,1.,1,.20,20,1e5,10);
-    PROPOSALParticle *particle4 = new PROPOSALParticle("tau",1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle3 = new PROPOSALParticle(PROPOSALParticle::ParticleType::TauMinus,1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle4 = new PROPOSALParticle(PROPOSALParticle::ParticleType::TauMinus,1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cuts3 = new EnergyCutSettings(200,-1);
     EnergyCutSettings *cuts4 = new EnergyCutSettings(200,-1);
     Epairproduction *C = new Epairproduction(particle3, medium3, cuts3);
@@ -202,7 +202,7 @@ TEST(Epairproduction , Set_Up ) {
 
         i++;
         CombOfMedium.push_back(new Medium(med,1.));
-        CombOfParticle.push_back(new PROPOSALParticle(particleName,1.,1.,1,.20,20,1e5,10));
+        CombOfParticle.push_back(new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10));
         CombOfParticle.at(i)->SetEnergy(energy);
         CombOfEnergyCutSettings.push_back(new EnergyCutSettings(ecut,vcut));
         CombOfEpair.push_back(new Epairproduction(CombOfParticle.at(i), CombOfMedium.at(i), CombOfEnergyCutSettings.at(i)));
