@@ -67,6 +67,243 @@ std::pair<double,double> Propagator::CalculateEnergyTillStochastic( double initi
     return final;
 }
 
+std::vector<PROPOSALParticle*> Propagator::propagate(double MaxDistance_cm)
+{
+    Output::getInstance().ClearSecondaryVector();
+
+    Output::getInstance().GetSecondarys().reserve(1000);
+
+    #if ROOT_SUPPORT
+        Output::getInstance().StorePrimaryInTree(particle_);
+    #endif
+
+    if(Output::store_in_ASCII_file_)Output::getInstance().StorePrimaryInASCII(particle_);
+
+
+    double distance_to_collection_border    =   0;
+    double distance_to_detector             =   0;
+    double distance_to_closest_approach     =   0;
+    double distance                         =   0;
+    double result                           =   0;
+
+    // These two variables are needed to calculate the energy loss inside the detector
+    // energy_at_entry_point is initialized with the current energy because this is a
+    // reasonable value for particle which starts inside the detector
+
+    double energy_at_entry_point            =   particle_->GetEnergy();
+    double energy_at_exit_point             =   0;
+
+
+    bool starts_in_detector     =   detector_->IsParticleInside(particle_);
+    bool is_in_detector     =   false;
+    bool was_in_detector    =   false;
+
+    while(1)
+    {
+        ChooseCurrentCollection(particle_);
+        if(current_collection_ == NULL)
+        {
+            log_info("particle reached the border");
+            break;
+        }
+
+        // Check if have have to propagate the particle through the whole collection
+        // or only to the collection border
+
+        distance_to_collection_border =
+        current_collection_->GetGeometry()->DistanceToBorder(particle_).first;
+        double tmp_distance_to_border;
+        for(unsigned int i = 0 ; i < collections_.size() ; i++)
+        {
+
+            if (particle_->GetType() != collections_.at(i)->GetParticle()->GetType())
+                continue;
+
+            if(detector_->IsParticleInfront(particle_))
+            {
+                if(collections_.at(i)->GetLocation() != 0)
+                    continue;
+                else
+                {
+                    if(collections_.at(i)->GetGeometry()->GetHirarchy() >= current_collection_->GetGeometry()->GetHirarchy())
+                    {
+                        tmp_distance_to_border = collections_.at(i)->GetGeometry()->DistanceToBorder(particle_).first;
+                        if(tmp_distance_to_border<=0)continue;
+                        distance_to_collection_border = min(
+                                      tmp_distance_to_border
+                                    , distance_to_collection_border);
+                    }
+                }
+            }
+
+            else if(detector_->IsParticleInside(particle_))
+            {
+                if(collections_.at(i)->GetLocation() != 1)
+                    continue;
+                else
+                {
+                    tmp_distance_to_border = collections_.at(i)->GetGeometry()->DistanceToBorder(particle_).first;
+                    if(tmp_distance_to_border<=0)continue;
+                    distance_to_collection_border = min(
+                                  tmp_distance_to_border
+                                , distance_to_collection_border);
+                }
+
+            }
+
+            else if(detector_->IsParticleBehind(particle_))
+            {
+                if(collections_.at(i)->GetLocation() != 2)
+                    continue;
+                else
+                {
+                    if(collections_.at(i)->GetGeometry()->GetHirarchy() >= current_collection_->GetGeometry()->GetHirarchy())
+                    {
+                        tmp_distance_to_border = collections_.at(i)->GetGeometry()->DistanceToBorder(particle_).first;
+                        if(tmp_distance_to_border<=0)continue;
+                        distance_to_collection_border = min(
+                                      tmp_distance_to_border
+                                    , distance_to_collection_border);
+                    }
+                    //The particle reached the border of all specified collections
+                    else
+                    {
+
+                    }
+                }
+            }
+        }
+
+        distance_to_detector =
+        detector_->DistanceToBorder(particle_).first;
+
+        distance_to_closest_approach  =
+        detector_->DistanceToClosestApproach(particle_);
+
+        if(abs(distance_to_closest_approach) < GEOMETRY_PRECISION )
+        {
+            particle_->SetXc( particle_->GetX() );
+            particle_->SetYc( particle_->GetY() );
+            particle_->SetZc( particle_->GetZ() );
+            particle_->SetEc( particle_->GetEnergy() );
+            particle_->SetTc( particle_->GetT() );
+
+            distance_to_closest_approach    =   0;
+
+        }
+
+        if(distance_to_detector > 0)
+        {
+            if(distance_to_closest_approach > 0)
+            {
+                if( distance_to_detector < distance_to_collection_border &&
+                    distance_to_detector < distance_to_closest_approach )
+                {
+                    distance    =   distance_to_detector;
+                }
+                else if( distance_to_closest_approach < distance_to_collection_border)
+                {
+                    distance    =   distance_to_closest_approach;
+                }
+                else
+                {
+                    distance    =   distance_to_collection_border;
+                }
+            }
+            else
+            {
+                if( distance_to_detector < distance_to_collection_border)
+                {
+                    distance    =   distance_to_detector;
+                }
+                else
+                {
+                    distance    =   distance_to_collection_border;
+                }
+            }
+
+        }
+        else
+        {
+            if(distance_to_closest_approach > 0)
+            {
+                if( distance_to_closest_approach < distance_to_collection_border)
+                {
+                    distance    =   distance_to_closest_approach;
+                }
+                else
+                {
+                    distance    =   distance_to_collection_border;
+                }
+            }
+            else
+            {
+                distance    =   distance_to_collection_border;
+            }
+        }
+
+
+        is_in_detector  =   detector_->IsParticleInside(particle_);
+        // entry point of the detector
+        if(!starts_in_detector && !was_in_detector && is_in_detector)
+        {
+            particle_->SetXi( particle_->GetX() );
+            particle_->SetYi( particle_->GetY() );
+            particle_->SetZi( particle_->GetZ() );
+            particle_->SetEi( particle_->GetEnergy() );
+            particle_->SetTi( particle_->GetT() );
+
+            energy_at_entry_point   =   particle_->GetEnergy();
+
+            was_in_detector =   true;
+        }
+        // exit point of the detector
+        else if(was_in_detector && !is_in_detector)
+        {
+            particle_->SetXf( particle_->GetX() );
+            particle_->SetYf( particle_->GetY() );
+            particle_->SetZf( particle_->GetZ() );
+            particle_->SetEf( particle_->GetEnergy() );
+            particle_->SetTf( particle_->GetT() );
+
+            energy_at_exit_point    =   particle_->GetEnergy();
+            //we don't want to run in this case a second time so we set was_in_detector to false
+            was_in_detector =   false;
+
+        }
+        // if particle starts inside the detector we only ant to fill the exit point
+        else if(starts_in_detector && !is_in_detector)
+        {
+            particle_->SetXf( particle_->GetX() );
+            particle_->SetYf( particle_->GetY() );
+            particle_->SetZf( particle_->GetZ() );
+            particle_->SetEf( particle_->GetEnergy() );
+            particle_->SetTf( particle_->GetT() );
+
+            energy_at_exit_point    =   particle_->GetEnergy();
+            //we don't want to run in this case a second time so we set starts_in_detector to false
+            starts_in_detector  =   false;
+
+        }
+        if(MaxDistance_cm <= particle_->GetPropagatedDistance() + distance)
+        {
+            distance = MaxDistance_cm - particle_->GetPropagatedDistance();
+        }
+        result  =   Propagate(distance);
+        if(result<=0 || MaxDistance_cm <= particle_->GetPropagatedDistance()) break;
+
+    }
+
+    particle_->SetElost(energy_at_entry_point - energy_at_exit_point);
+
+    #if ROOT_SUPPORT
+        Output::getInstance().StorePropagatedPrimaryInTree(particle_);
+    #endif
+        if(Output::store_in_ASCII_file_)Output::getInstance().StorePropagatedPrimaryInASCII(particle_);
+
+    return Output::getInstance().GetSecondarys();
+}
+
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
@@ -570,13 +807,15 @@ void Propagator::ChooseCurrentCollection(PROPOSALParticle* particle)
         collections_.at(i)->RestoreBackup_particle();
 
         if(particle->GetType() != collections_.at(i)->GetParticle()->GetType())
-        {
-            // printf("particle type:%i\n", particle->GetType());
-            // printf("particle name:%s\n", particle->GetName().c_str());
-            // printf("particle in collection type:%i\n", collections_.at(i)->GetParticle()->GetType());
-            // printf("particle in collection type:%s\n", collections_.at(i)->GetParticle()->GetName().c_str());
             continue;
-        }
+
+        printf("---------------------------------------------------------\n");
+        printf("particle type:%i\n", particle->GetType());
+        printf("particle name:%s\n", particle->GetName().c_str());
+        printf("particle mass:%f\n", particle->GetMass());
+        printf("particle in collection type:%i\n", collections_.at(i)->GetParticle()->GetType());
+        printf("particle in collection type:%s\n", collections_.at(i)->GetParticle()->GetName().c_str());
+        printf("particle in collection mass:%f\n", collections_.at(i)->GetParticle()->GetMass());
 
         if(detector_->IsParticleInfront(particle))
         {
@@ -2037,6 +2276,7 @@ void Propagator::InitProcessCollections(ifstream &file)
             }
             else
             {
+                log_info("Got particle from constructor:%s with mass=%f", particle_->GetName().c_str(), particle_->GetMass());
                 EnergyCutSettings* inside;
                 EnergyCutSettings* infront;
                 EnergyCutSettings* behind;
@@ -2105,6 +2345,7 @@ void Propagator::InitProcessCollections(ifstream &file)
                 delete inside;
                 delete infront;
                 delete behind;
+                break;
             }
         }
         else
