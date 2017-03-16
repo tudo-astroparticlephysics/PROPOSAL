@@ -650,7 +650,7 @@ double Integral::Function(double x)
         }
         else
         {
-        log_error("result is nan! returning 0");
+        log_fatal("result is nan! returning 0");
         return result;
         }
     }

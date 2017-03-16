@@ -103,6 +103,7 @@ public:
     //Constructors
     Propagator();
     Propagator(std::string config_file, bool DoApplyOptions=true);
+    Propagator(std::string config_file, PROPOSALParticle* particle, bool DoApplyOptions=true);
     Propagator(Medium* medium,
                EnergyCutSettings* cuts,
                PROPOSALParticle::ParticleType particle_type,
@@ -146,6 +147,10 @@ public:
      */
 
     std::vector<PROPOSALParticle*> Propagate( PROPOSALParticle *particle, double MaxDistance_cm = 1e20 );
+
+
+//----------------------------------------------------------------------------//
+    std::vector<PROPOSALParticle*> propagate(double MaxDistance_cm = 1e20 ); //TODO(mario): Find new name Fr 2017/03/10
 
 //----------------------------------------------------------------------------//
         /*!
