@@ -554,71 +554,85 @@ void PROPOSALParticle::InitParticle(ParticleType type){
             name_ = "mu-";
             mass_       =   MMU;
             lifetime_   =   LMU;
+            charge_     =   -1;
             break;
         case ParticleType::MuPlus:
             name_ = "mu+";
             mass_       =   MMU;
             lifetime_   =   LMU;
+            charge_     =   1;
             break;
         case ParticleType::EMinus:
             name_ = "e-";
             mass_       =   ME;
             lifetime_   =   -1;
+            charge_     =   -1;
             break;
         case ParticleType::EPlus:
             name_ = "e+";
             mass_       =   ME;
             lifetime_   =   -1;
+            charge_     =   1;
             break;
         case ParticleType::TauMinus:
             name_ = "tau-";
             mass_       =   MTAU;
             lifetime_   =   LTAU;
+            charge_     =   -1;
             break;
         case ParticleType::TauPlus:
             name_ = "tau+";
             mass_       =   MTAU;
             lifetime_   =   LTAU;
+            charge_     =   1;
             break;
         case ParticleType::STauMinus: //TODO(mario): Handle different masses! Mo 2017/03/06
             name_ = "stau-";
             mass_       =   MSTAU;
             lifetime_   =   LSTAU;
+            charge_     =   -1;
             break;
         case ParticleType::STauPlus:
             name_ = "stau+";
             mass_       =   MSTAU;
             lifetime_   =   LSTAU;
+            charge_     =   1;
             break;
         case ParticleType::NuE:
             name_ = "nu_e";
             mass_       =   0;
             lifetime_   =   -1;
+            charge_     =   0;
             break;
         case ParticleType::NuEBar:
             name_ = "~nu_e";
             mass_       =   0;
             lifetime_   =   -1;
+            charge_     =   0;
             break;
         case ParticleType::NuMu:
             name_ = "nu_mu";
             mass_       =   0;
             lifetime_   =   -1;
+            charge_     =   0;
             break;
         case ParticleType::NuMuBar:
             name_ = "~nu_mu";
             mass_       =   0;
             lifetime_   =   -1;
+            charge_     =   0;
             break;
         case ParticleType::NuTau:
             name_ = "nu_tau";
             mass_       =   0;
             lifetime_   =   -1;
+            charge_     =   0;
             break;
         case ParticleType::NuTauBar:
             name_ = "~nu_tau";
             mass_       =   0;
             lifetime_   =   -1;
+            charge_     =   0;
             break;
         case ParticleType::DeltaE:
             name_ = "DeltaE";
@@ -652,8 +666,9 @@ void PROPOSALParticle::InitParticle(ParticleType type){
             break;
         case ParticleType::Monopole:
             name_ = "monopole";
-            mass_       =   0;
-            lifetime_   =   0;
+            mass_       =   MMON;
+            lifetime_   =   -1;
+            charge_     =   CMON;
             break;
         default:
             type = ParticleType::unknown;
