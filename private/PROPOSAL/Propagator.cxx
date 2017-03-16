@@ -67,6 +67,243 @@ std::pair<double,double> Propagator::CalculateEnergyTillStochastic( double initi
     return final;
 }
 
+std::vector<PROPOSALParticle*> Propagator::propagate(double MaxDistance_cm)
+{
+    Output::getInstance().ClearSecondaryVector();
+
+    Output::getInstance().GetSecondarys().reserve(1000);
+
+    #if ROOT_SUPPORT
+        Output::getInstance().StorePrimaryInTree(particle_);
+    #endif
+
+    if(Output::store_in_ASCII_file_)Output::getInstance().StorePrimaryInASCII(particle_);
+
+
+    double distance_to_collection_border    =   0;
+    double distance_to_detector             =   0;
+    double distance_to_closest_approach     =   0;
+    double distance                         =   0;
+    double result                           =   0;
+
+    // These two variables are needed to calculate the energy loss inside the detector
+    // energy_at_entry_point is initialized with the current energy because this is a
+    // reasonable value for particle which starts inside the detector
+
+    double energy_at_entry_point            =   particle_->GetEnergy();
+    double energy_at_exit_point             =   0;
+
+
+    bool starts_in_detector     =   detector_->IsParticleInside(particle_);
+    bool is_in_detector     =   false;
+    bool was_in_detector    =   false;
+
+    while(1)
+    {
+        ChooseCurrentCollection(particle_);
+        if(current_collection_ == NULL)
+        {
+            log_info("particle reached the border");
+            break;
+        }
+
+        // Check if have have to propagate the particle through the whole collection
+        // or only to the collection border
+
+        distance_to_collection_border =
+        current_collection_->GetGeometry()->DistanceToBorder(particle_).first;
+        double tmp_distance_to_border;
+        for(unsigned int i = 0 ; i < collections_.size() ; i++)
+        {
+
+            if (particle_->GetType() != collections_.at(i)->GetParticle()->GetType())
+                continue;
+
+            if(detector_->IsParticleInfront(particle_))
+            {
+                if(collections_.at(i)->GetLocation() != 0)
+                    continue;
+                else
+                {
+                    if(collections_.at(i)->GetGeometry()->GetHirarchy() >= current_collection_->GetGeometry()->GetHirarchy())
+                    {
+                        tmp_distance_to_border = collections_.at(i)->GetGeometry()->DistanceToBorder(particle_).first;
+                        if(tmp_distance_to_border<=0)continue;
+                        distance_to_collection_border = min(
+                                      tmp_distance_to_border
+                                    , distance_to_collection_border);
+                    }
+                }
+            }
+
+            else if(detector_->IsParticleInside(particle_))
+            {
+                if(collections_.at(i)->GetLocation() != 1)
+                    continue;
+                else
+                {
+                    tmp_distance_to_border = collections_.at(i)->GetGeometry()->DistanceToBorder(particle_).first;
+                    if(tmp_distance_to_border<=0)continue;
+                    distance_to_collection_border = min(
+                                  tmp_distance_to_border
+                                , distance_to_collection_border);
+                }
+
+            }
+
+            else if(detector_->IsParticleBehind(particle_))
+            {
+                if(collections_.at(i)->GetLocation() != 2)
+                    continue;
+                else
+                {
+                    if(collections_.at(i)->GetGeometry()->GetHirarchy() >= current_collection_->GetGeometry()->GetHirarchy())
+                    {
+                        tmp_distance_to_border = collections_.at(i)->GetGeometry()->DistanceToBorder(particle_).first;
+                        if(tmp_distance_to_border<=0)continue;
+                        distance_to_collection_border = min(
+                                      tmp_distance_to_border
+                                    , distance_to_collection_border);
+                    }
+                    //The particle reached the border of all specified collections
+                    else
+                    {
+
+                    }
+                }
+            }
+        }
+
+        distance_to_detector =
+        detector_->DistanceToBorder(particle_).first;
+
+        distance_to_closest_approach  =
+        detector_->DistanceToClosestApproach(particle_);
+
+        if(abs(distance_to_closest_approach) < GEOMETRY_PRECISION )
+        {
+            particle_->SetXc( particle_->GetX() );
+            particle_->SetYc( particle_->GetY() );
+            particle_->SetZc( particle_->GetZ() );
+            particle_->SetEc( particle_->GetEnergy() );
+            particle_->SetTc( particle_->GetT() );
+
+            distance_to_closest_approach    =   0;
+
+        }
+
+        if(distance_to_detector > 0)
+        {
+            if(distance_to_closest_approach > 0)
+            {
+                if( distance_to_detector < distance_to_collection_border &&
+                    distance_to_detector < distance_to_closest_approach )
+                {
+                    distance    =   distance_to_detector;
+                }
+                else if( distance_to_closest_approach < distance_to_collection_border)
+                {
+                    distance    =   distance_to_closest_approach;
+                }
+                else
+                {
+                    distance    =   distance_to_collection_border;
+                }
+            }
+            else
+            {
+                if( distance_to_detector < distance_to_collection_border)
+                {
+                    distance    =   distance_to_detector;
+                }
+                else
+                {
+                    distance    =   distance_to_collection_border;
+                }
+            }
+
+        }
+        else
+        {
+            if(distance_to_closest_approach > 0)
+            {
+                if( distance_to_closest_approach < distance_to_collection_border)
+                {
+                    distance    =   distance_to_closest_approach;
+                }
+                else
+                {
+                    distance    =   distance_to_collection_border;
+                }
+            }
+            else
+            {
+                distance    =   distance_to_collection_border;
+            }
+        }
+
+
+        is_in_detector  =   detector_->IsParticleInside(particle_);
+        // entry point of the detector
+        if(!starts_in_detector && !was_in_detector && is_in_detector)
+        {
+            particle_->SetXi( particle_->GetX() );
+            particle_->SetYi( particle_->GetY() );
+            particle_->SetZi( particle_->GetZ() );
+            particle_->SetEi( particle_->GetEnergy() );
+            particle_->SetTi( particle_->GetT() );
+
+            energy_at_entry_point   =   particle_->GetEnergy();
+
+            was_in_detector =   true;
+        }
+        // exit point of the detector
+        else if(was_in_detector && !is_in_detector)
+        {
+            particle_->SetXf( particle_->GetX() );
+            particle_->SetYf( particle_->GetY() );
+            particle_->SetZf( particle_->GetZ() );
+            particle_->SetEf( particle_->GetEnergy() );
+            particle_->SetTf( particle_->GetT() );
+
+            energy_at_exit_point    =   particle_->GetEnergy();
+            //we don't want to run in this case a second time so we set was_in_detector to false
+            was_in_detector =   false;
+
+        }
+        // if particle starts inside the detector we only ant to fill the exit point
+        else if(starts_in_detector && !is_in_detector)
+        {
+            particle_->SetXf( particle_->GetX() );
+            particle_->SetYf( particle_->GetY() );
+            particle_->SetZf( particle_->GetZ() );
+            particle_->SetEf( particle_->GetEnergy() );
+            particle_->SetTf( particle_->GetT() );
+
+            energy_at_exit_point    =   particle_->GetEnergy();
+            //we don't want to run in this case a second time so we set starts_in_detector to false
+            starts_in_detector  =   false;
+
+        }
+        if(MaxDistance_cm <= particle_->GetPropagatedDistance() + distance)
+        {
+            distance = MaxDistance_cm - particle_->GetPropagatedDistance();
+        }
+        result  =   Propagate(distance);
+        if(result<=0 || MaxDistance_cm <= particle_->GetPropagatedDistance()) break;
+
+    }
+
+    particle_->SetElost(energy_at_entry_point - energy_at_exit_point);
+
+    #if ROOT_SUPPORT
+        Output::getInstance().StorePropagatedPrimaryInTree(particle_);
+    #endif
+        if(Output::store_in_ASCII_file_)Output::getInstance().StorePropagatedPrimaryInASCII(particle_);
+
+    return Output::getInstance().GetSecondarys();
+}
+
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
@@ -570,13 +807,15 @@ void Propagator::ChooseCurrentCollection(PROPOSALParticle* particle)
         collections_.at(i)->RestoreBackup_particle();
 
         if(particle->GetType() != collections_.at(i)->GetParticle()->GetType())
-        {
-            // printf("particle type:%i\n", particle->GetType());
-            // printf("particle name:%s\n", particle->GetName().c_str());
-            // printf("particle in collection type:%i\n", collections_.at(i)->GetParticle()->GetType());
-            // printf("particle in collection type:%s\n", collections_.at(i)->GetParticle()->GetName().c_str());
             continue;
-        }
+
+        printf("---------------------------------------------------------\n");
+        printf("particle type:%i\n", particle->GetType());
+        printf("particle name:%s\n", particle->GetName().c_str());
+        printf("particle mass:%f\n", particle->GetMass());
+        printf("particle in collection type:%i\n", collections_.at(i)->GetParticle()->GetType());
+        printf("particle in collection type:%s\n", collections_.at(i)->GetParticle()->GetName().c_str());
+        printf("particle in collection mass:%f\n", collections_.at(i)->GetParticle()->GetMass());
 
         if(detector_->IsParticleInfront(particle))
         {
@@ -1336,12 +1575,49 @@ Propagator::Propagator(string config_file, bool DoApplyOptions)
     ,global_cont_behind_        ( false )
     ,path_to_tables_            ( "" )
     ,raw_                       ( false )
+    ,particle_                  (NULL)
     ,scattering_model_          (-1)
     ,current_collection_        (NULL)
 {
     ReadConfigFile(config_file, DoApplyOptions);
 }
 
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+Propagator::Propagator(std::string config_file, PROPOSALParticle* particle, bool DoApplyOptions)
+    :order_of_interpolation_    ( 5 )
+    ,debug_                     ( false )
+    ,particle_interaction_      ( false )
+    ,seed_                      ( 1 )
+    ,brems_                     ( 1 )
+    ,photo_                     ( 12 )
+    ,lpm_                       ( false )
+    ,moliere_                   ( false )
+    ,stopping_decay_            ( true )
+    ,do_exact_time_calulation_  ( false )
+    ,integrate_                 ( false )
+    ,brems_multiplier_          ( 1 )
+    ,photo_multiplier_          ( 1 )
+    ,ioniz_multiplier_          ( 1 )
+    ,epair_multiplier_          ( 1 )
+    ,global_ecut_inside_        ( 500 )
+    ,global_ecut_infront_       ( -1 )
+    ,global_ecut_behind_        ( -1 )
+    ,global_vcut_inside_        ( -1 )
+    ,global_vcut_infront_       ( 0.001 )
+    ,global_vcut_behind_        ( -1 )
+    ,global_cont_inside_        ( false )
+    ,global_cont_infront_       ( true )
+    ,global_cont_behind_        ( false )
+    ,path_to_tables_            ( "" )
+    ,raw_                       ( false )
+    ,scattering_model_          (-1)
+    ,current_collection_        (NULL)
+{
+    particle_ = new PROPOSALParticle(*particle);
+    ReadConfigFile(config_file, DoApplyOptions);
+}
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
@@ -1761,239 +2037,316 @@ void Propagator::InitProcessCollections(ifstream &file)
 
             Medium *med     =   new Medium(name,density_correction);
 
-            PROPOSALParticle *muminus    =   new PROPOSALParticle(PROPOSALParticle::ParticleType::MuMinus);
-            PROPOSALParticle *muplus    =   new PROPOSALParticle(PROPOSALParticle::ParticleType::MuPlus);
-            PROPOSALParticle *tauminus   =   new PROPOSALParticle(PROPOSALParticle::ParticleType::TauMinus);
-            PROPOSALParticle *tauplus   =   new PROPOSALParticle(PROPOSALParticle::ParticleType::TauPlus);
-            PROPOSALParticle *eminus     =   new PROPOSALParticle(PROPOSALParticle::ParticleType::EMinus);
-            PROPOSALParticle *eplus     =   new PROPOSALParticle(PROPOSALParticle::ParticleType::EPlus);
-
-            EnergyCutSettings *inside;
-            EnergyCutSettings *infront;
-            EnergyCutSettings *behind;
-
-            ProcessCollection* muminus_inside;
-            ProcessCollection* muplus_inside;
-            ProcessCollection* tauminus_inside;
-            ProcessCollection* tauplus_inside;
-            ProcessCollection* eminus_inside;
-            ProcessCollection* eplus_inside;
-
-            ProcessCollection* muminus_infront;
-            ProcessCollection* muplus_infront;
-            ProcessCollection* tauminus_infront;
-            ProcessCollection* tauplus_infront;
-            ProcessCollection* eminus_infront;
-            ProcessCollection* eplus_infront;
-
-            ProcessCollection* muminus_behind;
-            ProcessCollection* muplus_behind;
-            ProcessCollection* tauminus_behind;
-            ProcessCollection* tauplus_behind;
-            ProcessCollection* eminus_behind;
-            ProcessCollection* eplus_behind;
-
-            if(found_inside_cuts)
+            if (particle_ == NULL)
             {
-                inside = new EnergyCutSettings(ecut_inside,vcut_inside);
 
-                muminus_inside  = new ProcessCollection(new PROPOSALParticle(*muminus),new Medium(*med),new EnergyCutSettings(*inside));
-                muplus_inside   = new ProcessCollection(new PROPOSALParticle(*muplus),new Medium(*med),new EnergyCutSettings(*inside));
-                tauminus_inside = new ProcessCollection(new PROPOSALParticle(*tauminus),new Medium(*med),new EnergyCutSettings(*inside));
-                tauplus_inside  = new ProcessCollection(new PROPOSALParticle(*tauplus),new Medium(*med),new EnergyCutSettings(*inside));
-                eminus_inside   = new ProcessCollection(new PROPOSALParticle(*eminus),new Medium(*med),new EnergyCutSettings(*inside));
-                eplus_inside    = new ProcessCollection(new PROPOSALParticle(*eplus),new Medium(*med),new EnergyCutSettings(*inside));
+                PROPOSALParticle *muminus    =   new PROPOSALParticle(PROPOSALParticle::ParticleType::MuMinus);
+                PROPOSALParticle *muplus    =   new PROPOSALParticle(PROPOSALParticle::ParticleType::MuPlus);
+                PROPOSALParticle *tauminus   =   new PROPOSALParticle(PROPOSALParticle::ParticleType::TauMinus);
+                PROPOSALParticle *tauplus   =   new PROPOSALParticle(PROPOSALParticle::ParticleType::TauPlus);
+                PROPOSALParticle *eminus     =   new PROPOSALParticle(PROPOSALParticle::ParticleType::EMinus);
+                PROPOSALParticle *eplus     =   new PROPOSALParticle(PROPOSALParticle::ParticleType::EPlus);
 
-                muminus_inside->SetEnableRandomization(cont_inside);
-                muplus_inside->SetEnableRandomization(cont_inside);
-                muminus_inside->SetLocation(1);
-                muplus_inside->SetLocation(1);
+                EnergyCutSettings *inside;
+                EnergyCutSettings *infront;
+                EnergyCutSettings *behind;
 
-                tauminus_inside->SetEnableRandomization(cont_inside);
-                tauplus_inside->SetEnableRandomization(cont_inside);
-                tauminus_inside->SetLocation(1);
-                tauplus_inside->SetLocation(1);
+                ProcessCollection* muminus_inside;
+                ProcessCollection* muplus_inside;
+                ProcessCollection* tauminus_inside;
+                ProcessCollection* tauplus_inside;
+                ProcessCollection* eminus_inside;
+                ProcessCollection* eplus_inside;
 
-                eminus_inside->SetEnableRandomization(cont_inside);
-                eplus_inside->SetEnableRandomization(cont_inside);
-                eminus_inside->SetLocation(1);
-                eplus_inside->SetLocation(1);
+                ProcessCollection* muminus_infront;
+                ProcessCollection* muplus_infront;
+                ProcessCollection* tauminus_infront;
+                ProcessCollection* tauplus_infront;
+                ProcessCollection* eminus_infront;
+                ProcessCollection* eplus_infront;
+
+                ProcessCollection* muminus_behind;
+                ProcessCollection* muplus_behind;
+                ProcessCollection* tauminus_behind;
+                ProcessCollection* tauplus_behind;
+                ProcessCollection* eminus_behind;
+                ProcessCollection* eplus_behind;
+
+                if(found_inside_cuts)
+                {
+                    inside = new EnergyCutSettings(ecut_inside,vcut_inside);
+
+                    muminus_inside  = new ProcessCollection(new PROPOSALParticle(*muminus),new Medium(*med),new EnergyCutSettings(*inside));
+                    muplus_inside   = new ProcessCollection(new PROPOSALParticle(*muplus),new Medium(*med),new EnergyCutSettings(*inside));
+                    tauminus_inside = new ProcessCollection(new PROPOSALParticle(*tauminus),new Medium(*med),new EnergyCutSettings(*inside));
+                    tauplus_inside  = new ProcessCollection(new PROPOSALParticle(*tauplus),new Medium(*med),new EnergyCutSettings(*inside));
+                    eminus_inside   = new ProcessCollection(new PROPOSALParticle(*eminus),new Medium(*med),new EnergyCutSettings(*inside));
+                    eplus_inside    = new ProcessCollection(new PROPOSALParticle(*eplus),new Medium(*med),new EnergyCutSettings(*inside));
+
+                    muminus_inside->SetEnableRandomization(cont_inside);
+                    muplus_inside->SetEnableRandomization(cont_inside);
+                    muminus_inside->SetLocation(1);
+                    muplus_inside->SetLocation(1);
+
+                    tauminus_inside->SetEnableRandomization(cont_inside);
+                    tauplus_inside->SetEnableRandomization(cont_inside);
+                    tauminus_inside->SetLocation(1);
+                    tauplus_inside->SetLocation(1);
+
+                    eminus_inside->SetEnableRandomization(cont_inside);
+                    eplus_inside->SetEnableRandomization(cont_inside);
+                    eminus_inside->SetLocation(1);
+                    eplus_inside->SetLocation(1);
+                }
+                else
+                {
+                    inside = new EnergyCutSettings(global_ecut_inside_,global_vcut_inside_);
+
+                    muminus_inside  = new ProcessCollection(new PROPOSALParticle(*muminus),new Medium(*med),new EnergyCutSettings(*inside));
+                    muplus_inside   = new ProcessCollection(new PROPOSALParticle(*muplus),new Medium(*med),new EnergyCutSettings(*inside));
+                    tauminus_inside = new ProcessCollection(new PROPOSALParticle(*tauminus),new Medium(*med),new EnergyCutSettings(*inside));
+                    tauplus_inside  = new ProcessCollection(new PROPOSALParticle(*tauplus),new Medium(*med),new EnergyCutSettings(*inside));
+                    eminus_inside   = new ProcessCollection(new PROPOSALParticle(*eminus),new Medium(*med),new EnergyCutSettings(*inside));
+                    eplus_inside    = new ProcessCollection(new PROPOSALParticle(*eplus),new Medium(*med),new EnergyCutSettings(*inside));
+
+                    muminus_inside->SetEnableRandomization(global_cont_inside_);
+                    muplus_inside->SetEnableRandomization(global_cont_inside_);
+                    muminus_inside->SetLocation(1);
+                    muplus_inside->SetLocation(1);
+
+                    tauminus_inside->SetEnableRandomization(global_cont_inside_);
+                    tauplus_inside->SetEnableRandomization(global_cont_inside_);
+                    tauminus_inside->SetLocation(1);
+                    tauplus_inside->SetLocation(1);
+
+                    eminus_inside->SetEnableRandomization(global_cont_inside_);
+                    eplus_inside->SetEnableRandomization(global_cont_inside_);
+                    eminus_inside->SetLocation(1);
+                    eplus_inside->SetLocation(1);
+                }
+
+                if(found_infront_cuts)
+                {
+                    infront = new EnergyCutSettings(ecut_infront,vcut_infront);
+
+                    muminus_infront  = new ProcessCollection(new PROPOSALParticle(*muminus),new Medium(*med),new EnergyCutSettings(*infront));
+                    muplus_infront   = new ProcessCollection(new PROPOSALParticle(*muplus),new Medium(*med),new EnergyCutSettings(*infront));
+                    tauminus_infront = new ProcessCollection(new PROPOSALParticle(*tauminus),new Medium(*med),new EnergyCutSettings(*infront));
+                    tauplus_infront  = new ProcessCollection(new PROPOSALParticle(*tauplus),new Medium(*med),new EnergyCutSettings(*infront));
+                    eminus_infront   = new ProcessCollection(new PROPOSALParticle(*eminus),new Medium(*med),new EnergyCutSettings(*infront));
+                    eplus_infront    = new ProcessCollection(new PROPOSALParticle(*eplus),new Medium(*med),new EnergyCutSettings(*infront));
+
+                    muminus_infront->SetEnableRandomization(cont_infront);
+                    muplus_infront->SetEnableRandomization(cont_infront);
+                    muminus_infront->SetLocation(0);
+                    muplus_infront->SetLocation(0);
+
+                    tauminus_infront->SetEnableRandomization(cont_infront);
+                    tauplus_infront->SetEnableRandomization(cont_infront);
+                    tauminus_infront->SetLocation(0);
+                    tauplus_infront->SetLocation(0);
+
+                    eminus_infront->SetEnableRandomization(cont_infront);
+                    eplus_infront->SetEnableRandomization(cont_infront);
+                    eminus_infront->SetLocation(0);
+                    eplus_infront->SetLocation(0);
+                }
+                else
+                {
+                    infront = new EnergyCutSettings(global_ecut_infront_,global_vcut_infront_);
+
+                    muminus_infront  = new ProcessCollection(new PROPOSALParticle(*muminus),new Medium(*med),new EnergyCutSettings(*infront));
+                    muplus_infront   = new ProcessCollection(new PROPOSALParticle(*muplus),new Medium(*med),new EnergyCutSettings(*infront));
+                    tauminus_infront = new ProcessCollection(new PROPOSALParticle(*tauminus),new Medium(*med),new EnergyCutSettings(*infront));
+                    tauplus_infront  = new ProcessCollection(new PROPOSALParticle(*tauplus),new Medium(*med),new EnergyCutSettings(*infront));
+                    eminus_infront   = new ProcessCollection(new PROPOSALParticle(*eminus),new Medium(*med),new EnergyCutSettings(*infront));
+                    eplus_infront    = new ProcessCollection(new PROPOSALParticle(*eplus),new Medium(*med),new EnergyCutSettings(*infront));
+
+                    muminus_infront->SetEnableRandomization(global_cont_infront_);
+                    muplus_infront->SetEnableRandomization(global_cont_infront_);
+                    muminus_infront->SetLocation(0);
+                    muplus_infront->SetLocation(0);
+
+                    tauminus_infront->SetEnableRandomization(global_cont_infront_);
+                    tauplus_infront->SetEnableRandomization(global_cont_infront_);
+                    tauminus_infront->SetLocation(0);
+                    tauplus_infront->SetLocation(0);
+
+                    eminus_infront->SetEnableRandomization(global_cont_infront_);
+                    eplus_infront->SetEnableRandomization(global_cont_infront_);
+                    eminus_infront->SetLocation(0);
+                    eplus_infront->SetLocation(0);
+                }
+
+                if(found_behind_cuts)
+                {
+                    behind = new EnergyCutSettings(ecut_behind,vcut_behind);
+
+                    muminus_behind  = new ProcessCollection(new PROPOSALParticle(*muminus),new Medium(*med),new EnergyCutSettings(*behind));
+                    muplus_behind   = new ProcessCollection(new PROPOSALParticle(*muplus),new Medium(*med),new EnergyCutSettings(*behind));
+                    tauminus_behind = new ProcessCollection(new PROPOSALParticle(*tauminus),new Medium(*med),new EnergyCutSettings(*behind));
+                    tauplus_behind  = new ProcessCollection(new PROPOSALParticle(*tauplus),new Medium(*med),new EnergyCutSettings(*behind));
+                    eminus_behind   = new ProcessCollection(new PROPOSALParticle(*eminus),new Medium(*med),new EnergyCutSettings(*behind));
+                    eplus_behind    = new ProcessCollection(new PROPOSALParticle(*eplus),new Medium(*med),new EnergyCutSettings(*behind));
+
+                    muminus_behind->SetEnableRandomization(cont_behind);
+                    muplus_behind->SetEnableRandomization(cont_behind);
+                    muminus_behind->SetLocation(2);
+                    muplus_behind->SetLocation(2);
+
+                    tauminus_behind->SetEnableRandomization(cont_behind);
+                    tauplus_behind->SetEnableRandomization(cont_behind);
+                    tauminus_behind->SetLocation(2);
+                    tauplus_behind->SetLocation(2);
+
+                    eminus_behind->SetEnableRandomization(cont_behind);
+                    eplus_behind->SetEnableRandomization(cont_behind);
+                    eminus_behind->SetLocation(2);
+                    eplus_behind->SetLocation(2);
+                }
+                else
+                {
+                    behind = new EnergyCutSettings(global_ecut_behind_,global_vcut_behind_);
+
+                    muminus_behind  = new ProcessCollection(new PROPOSALParticle(*muminus),new Medium(*med),new EnergyCutSettings(*behind));
+                    muplus_behind   = new ProcessCollection(new PROPOSALParticle(*muplus),new Medium(*med),new EnergyCutSettings(*behind));
+                    tauminus_behind = new ProcessCollection(new PROPOSALParticle(*tauminus),new Medium(*med),new EnergyCutSettings(*behind));
+                    tauplus_behind  = new ProcessCollection(new PROPOSALParticle(*tauplus),new Medium(*med),new EnergyCutSettings(*behind));
+                    eminus_behind   = new ProcessCollection(new PROPOSALParticle(*eminus),new Medium(*med),new EnergyCutSettings(*behind));
+                    eplus_behind    = new ProcessCollection(new PROPOSALParticle(*eplus),new Medium(*med),new EnergyCutSettings(*behind));
+
+                    muminus_behind->SetEnableRandomization(global_cont_behind_);
+                    muplus_behind->SetEnableRandomization(global_cont_behind_);
+                    muminus_behind->SetLocation(2);
+                    muplus_behind->SetLocation(2);
+
+                    tauminus_behind->SetEnableRandomization(global_cont_behind_);
+                    tauplus_behind->SetEnableRandomization(global_cont_behind_);
+                    tauminus_behind->SetLocation(2);
+                    tauplus_behind->SetLocation(2);
+
+                    eminus_behind->SetEnableRandomization(global_cont_behind_);
+                    eplus_behind->SetEnableRandomization(global_cont_behind_);
+                    eminus_behind->SetLocation(2);
+                    eplus_behind->SetLocation(2);
+                }
+
+
+                int former_size =collections_.size();
+
+                collections_.push_back( muminus_infront );
+                collections_.push_back( muplus_infront );
+                collections_.push_back( muminus_inside );
+                collections_.push_back( muplus_inside );
+                collections_.push_back( muminus_behind );
+                collections_.push_back( muplus_behind );
+
+                collections_.push_back( tauminus_infront );
+                collections_.push_back( tauplus_infront );
+                collections_.push_back( tauminus_inside );
+                collections_.push_back( tauplus_inside );
+                collections_.push_back( tauminus_behind );
+                collections_.push_back( tauplus_behind );
+
+                collections_.push_back( eminus_infront );
+                collections_.push_back( eplus_infront );
+                collections_.push_back( eminus_inside );
+                collections_.push_back( eplus_inside );
+                collections_.push_back( eminus_behind );
+                collections_.push_back( eplus_behind );
+
+                for(unsigned int i = former_size ;i<collections_.size(); i++)
+                {
+                    collections_.at(i)->SetGeometry(geometry);
+                    collections_.at(i)->SetDensityCorrection(density_correction);
+                }
+
+                delete med;
+                delete muminus;
+                delete muplus;
+                delete tauminus;
+                delete tauplus;
+                delete eminus;
+                delete eplus;
+                delete inside;
+                delete infront;
+                delete behind;
+
+                break;
             }
             else
             {
-                inside = new EnergyCutSettings(global_ecut_inside_,global_vcut_inside_);
+                log_info("Got particle from constructor:%s with mass=%f", particle_->GetName().c_str(), particle_->GetMass());
+                EnergyCutSettings* inside;
+                EnergyCutSettings* infront;
+                EnergyCutSettings* behind;
 
-                muminus_inside  = new ProcessCollection(new PROPOSALParticle(*muminus),new Medium(*med),new EnergyCutSettings(*inside));
-                muplus_inside   = new ProcessCollection(new PROPOSALParticle(*muplus),new Medium(*med),new EnergyCutSettings(*inside));
-                tauminus_inside = new ProcessCollection(new PROPOSALParticle(*tauminus),new Medium(*med),new EnergyCutSettings(*inside));
-                tauplus_inside  = new ProcessCollection(new PROPOSALParticle(*tauplus),new Medium(*med),new EnergyCutSettings(*inside));
-                eminus_inside   = new ProcessCollection(new PROPOSALParticle(*eminus),new Medium(*med),new EnergyCutSettings(*inside));
-                eplus_inside    = new ProcessCollection(new PROPOSALParticle(*eplus),new Medium(*med),new EnergyCutSettings(*inside));
+                ProcessCollection* particle_inside;
+                ProcessCollection* particle_infront;
+                ProcessCollection* particle_behind;
 
-                muminus_inside->SetEnableRandomization(global_cont_inside_);
-                muplus_inside->SetEnableRandomization(global_cont_inside_);
-                muminus_inside->SetLocation(1);
-                muplus_inside->SetLocation(1);
+                if(found_inside_cuts)
+                {
+                    inside = new EnergyCutSettings(ecut_inside,vcut_inside);
+                    particle_inside  = new ProcessCollection(new PROPOSALParticle(*particle_),new Medium(*med),new EnergyCutSettings(*inside));
+                    particle_inside->SetEnableRandomization(cont_inside);
+                    particle_inside->SetLocation(1);
+                }
+                else
+                {
+                    inside = new EnergyCutSettings(global_ecut_inside_,global_vcut_inside_);
+                    particle_inside  = new ProcessCollection(new PROPOSALParticle(*particle_),new Medium(*med),new EnergyCutSettings(*inside));
+                    particle_inside->SetEnableRandomization(global_cont_inside_);
+                    particle_inside->SetLocation(1);
+                }
 
-                tauminus_inside->SetEnableRandomization(global_cont_inside_);
-                tauplus_inside->SetEnableRandomization(global_cont_inside_);
-                tauminus_inside->SetLocation(1);
-                tauplus_inside->SetLocation(1);
+                if (found_infront_cuts)
+                {
+                    infront = new EnergyCutSettings(ecut_infront,vcut_infront);
+                    particle_infront  = new ProcessCollection(new PROPOSALParticle(*particle_),new Medium(*med),new EnergyCutSettings(*infront));
+                    particle_infront->SetEnableRandomization(cont_infront);
+                    particle_infront->SetLocation(0);
+                }
+                else
+                {
+                    infront = new EnergyCutSettings(global_ecut_infront_,global_vcut_infront_);
+                    particle_infront  = new ProcessCollection(new PROPOSALParticle(*particle_),new Medium(*med),new EnergyCutSettings(*infront));
+                    particle_infront->SetEnableRandomization(global_cont_infront_);
+                    particle_infront->SetLocation(0);
+                }
 
-                eminus_inside->SetEnableRandomization(global_cont_inside_);
-                eplus_inside->SetEnableRandomization(global_cont_inside_);
-                eminus_inside->SetLocation(1);
-                eplus_inside->SetLocation(1);
+                if(found_behind_cuts)
+                {
+                    behind = new EnergyCutSettings(ecut_behind,vcut_behind);
+                    particle_behind  = new ProcessCollection(new PROPOSALParticle(*particle_),new Medium(*med),new EnergyCutSettings(*behind));
+                    particle_behind->SetEnableRandomization(cont_behind);
+                    particle_behind->SetLocation(2);
+                }
+                else
+                {
+                    behind = new EnergyCutSettings(global_ecut_behind_,global_vcut_behind_);
+                    particle_behind  = new ProcessCollection(new PROPOSALParticle(*particle_),new Medium(*med),new EnergyCutSettings(*behind));
+                    particle_behind->SetEnableRandomization(global_cont_behind_);
+                    particle_behind->SetLocation(2);
+                }
+
+                int former_size =collections_.size();
+                collections_.push_back( particle_infront );
+                collections_.push_back( particle_inside );
+                collections_.push_back( particle_behind );
+
+                for(unsigned int i = former_size ;i<collections_.size(); i++)
+                {
+                    collections_.at(i)->SetGeometry(geometry);
+                    collections_.at(i)->SetDensityCorrection(density_correction);
+                }
+
+                delete med;
+                delete inside;
+                delete infront;
+                delete behind;
+                break;
             }
-
-            if(found_infront_cuts)
-            {
-                infront = new EnergyCutSettings(ecut_infront,vcut_infront);
-
-                muminus_infront  = new ProcessCollection(new PROPOSALParticle(*muminus),new Medium(*med),new EnergyCutSettings(*infront));
-                muplus_infront   = new ProcessCollection(new PROPOSALParticle(*muplus),new Medium(*med),new EnergyCutSettings(*infront));
-                tauminus_infront = new ProcessCollection(new PROPOSALParticle(*tauminus),new Medium(*med),new EnergyCutSettings(*infront));
-                tauplus_infront  = new ProcessCollection(new PROPOSALParticle(*tauplus),new Medium(*med),new EnergyCutSettings(*infront));
-                eminus_infront   = new ProcessCollection(new PROPOSALParticle(*eminus),new Medium(*med),new EnergyCutSettings(*infront));
-                eplus_infront    = new ProcessCollection(new PROPOSALParticle(*eplus),new Medium(*med),new EnergyCutSettings(*infront));
-
-                muminus_infront->SetEnableRandomization(cont_infront);
-                muplus_infront->SetEnableRandomization(cont_infront);
-                muminus_infront->SetLocation(0);
-                muplus_infront->SetLocation(0);
-
-                tauminus_infront->SetEnableRandomization(cont_infront);
-                tauplus_infront->SetEnableRandomization(cont_infront);
-                tauminus_infront->SetLocation(0);
-                tauplus_infront->SetLocation(0);
-
-                eminus_infront->SetEnableRandomization(cont_infront);
-                eplus_infront->SetEnableRandomization(cont_infront);
-                eminus_infront->SetLocation(0);
-                eplus_infront->SetLocation(0);
-            }
-            else
-            {
-                infront = new EnergyCutSettings(global_ecut_infront_,global_vcut_infront_);
-
-                muminus_infront  = new ProcessCollection(new PROPOSALParticle(*muminus),new Medium(*med),new EnergyCutSettings(*infront));
-                muplus_infront   = new ProcessCollection(new PROPOSALParticle(*muplus),new Medium(*med),new EnergyCutSettings(*infront));
-                tauminus_infront = new ProcessCollection(new PROPOSALParticle(*tauminus),new Medium(*med),new EnergyCutSettings(*infront));
-                tauplus_infront  = new ProcessCollection(new PROPOSALParticle(*tauplus),new Medium(*med),new EnergyCutSettings(*infront));
-                eminus_infront   = new ProcessCollection(new PROPOSALParticle(*eminus),new Medium(*med),new EnergyCutSettings(*infront));
-                eplus_infront    = new ProcessCollection(new PROPOSALParticle(*eplus),new Medium(*med),new EnergyCutSettings(*infront));
-
-                muminus_infront->SetEnableRandomization(global_cont_infront_);
-                muplus_infront->SetEnableRandomization(global_cont_infront_);
-                muminus_infront->SetLocation(0);
-                muplus_infront->SetLocation(0);
-
-                tauminus_infront->SetEnableRandomization(global_cont_infront_);
-                tauplus_infront->SetEnableRandomization(global_cont_infront_);
-                tauminus_infront->SetLocation(0);
-                tauplus_infront->SetLocation(0);
-
-                eminus_infront->SetEnableRandomization(global_cont_infront_);
-                eplus_infront->SetEnableRandomization(global_cont_infront_);
-                eminus_infront->SetLocation(0);
-                eplus_infront->SetLocation(0);
-            }
-
-            if(found_behind_cuts)
-            {
-                behind = new EnergyCutSettings(ecut_behind,vcut_behind);
-
-                muminus_behind  = new ProcessCollection(new PROPOSALParticle(*muminus),new Medium(*med),new EnergyCutSettings(*behind));
-                muplus_behind   = new ProcessCollection(new PROPOSALParticle(*muplus),new Medium(*med),new EnergyCutSettings(*behind));
-                tauminus_behind = new ProcessCollection(new PROPOSALParticle(*tauminus),new Medium(*med),new EnergyCutSettings(*behind));
-                tauplus_behind  = new ProcessCollection(new PROPOSALParticle(*tauplus),new Medium(*med),new EnergyCutSettings(*behind));
-                eminus_behind   = new ProcessCollection(new PROPOSALParticle(*eminus),new Medium(*med),new EnergyCutSettings(*behind));
-                eplus_behind    = new ProcessCollection(new PROPOSALParticle(*eplus),new Medium(*med),new EnergyCutSettings(*behind));
-
-                muminus_behind->SetEnableRandomization(cont_behind);
-                muplus_behind->SetEnableRandomization(cont_behind);
-                muminus_behind->SetLocation(2);
-                muplus_behind->SetLocation(2);
-
-                tauminus_behind->SetEnableRandomization(cont_behind);
-                tauplus_behind->SetEnableRandomization(cont_behind);
-                tauminus_behind->SetLocation(2);
-                tauplus_behind->SetLocation(2);
-
-                eminus_behind->SetEnableRandomization(cont_behind);
-                eplus_behind->SetEnableRandomization(cont_behind);
-                eminus_behind->SetLocation(2);
-                eplus_behind->SetLocation(2);
-            }
-            else
-            {
-                behind = new EnergyCutSettings(global_ecut_behind_,global_vcut_behind_);
-
-                muminus_behind  = new ProcessCollection(new PROPOSALParticle(*muminus),new Medium(*med),new EnergyCutSettings(*behind));
-                muplus_behind   = new ProcessCollection(new PROPOSALParticle(*muplus),new Medium(*med),new EnergyCutSettings(*behind));
-                tauminus_behind = new ProcessCollection(new PROPOSALParticle(*tauminus),new Medium(*med),new EnergyCutSettings(*behind));
-                tauplus_behind  = new ProcessCollection(new PROPOSALParticle(*tauplus),new Medium(*med),new EnergyCutSettings(*behind));
-                eminus_behind   = new ProcessCollection(new PROPOSALParticle(*eminus),new Medium(*med),new EnergyCutSettings(*behind));
-                eplus_behind    = new ProcessCollection(new PROPOSALParticle(*eplus),new Medium(*med),new EnergyCutSettings(*behind));
-
-                muminus_behind->SetEnableRandomization(global_cont_behind_);
-                muplus_behind->SetEnableRandomization(global_cont_behind_);
-                muminus_behind->SetLocation(2);
-                muplus_behind->SetLocation(2);
-
-                tauminus_behind->SetEnableRandomization(global_cont_behind_);
-                tauplus_behind->SetEnableRandomization(global_cont_behind_);
-                tauminus_behind->SetLocation(2);
-                tauplus_behind->SetLocation(2);
-
-                eminus_behind->SetEnableRandomization(global_cont_behind_);
-                eplus_behind->SetEnableRandomization(global_cont_behind_);
-                eminus_behind->SetLocation(2);
-                eplus_behind->SetLocation(2);
-            }
-
-
-            int former_size =collections_.size();
-
-            collections_.push_back( muminus_infront );
-            collections_.push_back( muplus_infront );
-            collections_.push_back( muminus_inside );
-            collections_.push_back( muplus_inside );
-            collections_.push_back( muminus_behind );
-            collections_.push_back( muplus_behind );
-
-            collections_.push_back( tauminus_infront );
-            collections_.push_back( tauplus_infront );
-            collections_.push_back( tauminus_inside );
-            collections_.push_back( tauplus_inside );
-            collections_.push_back( tauminus_behind );
-            collections_.push_back( tauplus_behind );
-
-            collections_.push_back( eminus_infront );
-            collections_.push_back( eplus_infront );
-            collections_.push_back( eminus_inside );
-            collections_.push_back( eplus_inside );
-            collections_.push_back( eminus_behind );
-            collections_.push_back( eplus_behind );
-
-            for(unsigned int i = former_size ;i<collections_.size(); i++)
-            {
-                collections_.at(i)->SetGeometry(geometry);
-                collections_.at(i)->SetDensityCorrection(density_correction);
-            }
-
-            delete med;
-            delete muminus;
-            delete muplus;
-            delete tauminus;
-            delete tauplus;
-            delete eminus;
-            delete eplus;
-            delete inside;
-            delete infront;
-            delete behind;
-
-            break;
         }
         else
         {
