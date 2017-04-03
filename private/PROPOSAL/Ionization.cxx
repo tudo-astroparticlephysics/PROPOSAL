@@ -132,10 +132,30 @@ void Ionization::EnableDNdxInterpolation(std::string path, bool raw)
     bool reading_worked =   true;
     bool storing_failed =   false;
 
+    // charged anti leptons have the same cross sections like charged leptons
+    // so they use the same interpolation tables
+    string particle_name;
+    if (particle_->GetType() == ParticleType::MuPlus)
+    {
+        particle_name = ParticleType::MuMinus->GetName();
+    }
+    else if (particle_->GetType() == ParticleType::TauPlus)
+    {
+        particle_name = ParticleType::TauMinus->GetName();
+    }
+    else if (particle_->GetType() == ParticleType::EPlus)
+    {
+        particle_name = ParticleType::EMinus->GetName();
+    }
+    else
+    {
+        particle_name = particle_->GetName();
+    }
+
     if(!path.empty())
     {
         stringstream filename;
-        filename<<path<<"/Ioniz_dNdx_particle_"<<particle_->GetName()
+        filename<<path<<"/Ioniz_dNdx_particle_"<<particle_name
                 <<"_med_"<<medium_->GetName()
                 <<medium_->GetMassDensity()
                 <<"_ecut_"<<cut_settings_->GetEcut()
@@ -237,10 +257,30 @@ void Ionization::EnableDEdxInterpolation(std::string path, bool raw)
     bool reading_worked =   true;
     bool storing_failed =   false;
 
+    // charged anti leptons have the same cross sections like charged leptons
+    // so they use the same interpolation tables
+    string particle_name;
+    if (particle_->GetType() == ParticleType::MuPlus)
+    {
+        particle_name = ParticleType::MuMinus->GetName();
+    }
+    else if (particle_->GetType() == ParticleType::TauPlus)
+    {
+        particle_name = ParticleType::TauMinus->GetName();
+    }
+    else if (particle_->GetType() == ParticleType::EPlus)
+    {
+        particle_name = ParticleType::EMinus->GetName();
+    }
+    else
+    {
+        particle_name = particle_->GetName();
+    }
+
     if(!path.empty())
     {
         stringstream filename;
-        filename<<path<<"/Ioniz_dEdx_particle_"<<particle_->GetName()
+        filename<<path<<"/Ioniz_dEdx_particle_"<<particle_name
                 <<"_med_"<<medium_->GetName()
                 <<medium_->GetMassDensity()
                 <<"_ecut_"<<cut_settings_->GetEcut()
