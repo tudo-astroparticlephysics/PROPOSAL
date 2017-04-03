@@ -421,6 +421,28 @@ void Scattering::EnableInterpolation(string path)
     if(do_interpolation_)return;
 
     bool reading_worked=true, storing_failed=false;
+
+    // charged anti leptons have the same cross sections like charged leptons
+    // (except of diffractive Bremsstrahlung, where one can analyse the interference term if implemented)
+    // so they use the same interpolation tables
+    string particle_name;
+    if (particle_->GetType() == ParticleType::MuPlus)
+    {
+        particle_name = ParticleType::MuMinus->GetName();
+    }
+    else if (particle_->GetType() == ParticleType::TauPlus)
+    {
+        particle_name = ParticleType::TauMinus->GetName();
+    }
+    else if (particle_->GetType() == ParticleType::EPlus)
+    {
+        particle_name = ParticleType::EMinus->GetName();
+    }
+    else
+    {
+        particle_name = particle_->GetName();
+    }
+
     if(!path.empty())
     {
         for(unsigned int i = 0; i< crosssections_.size(); i++)
@@ -430,7 +452,7 @@ void Scattering::EnableInterpolation(string path)
         }
 
         stringstream filename;
-        filename<<path<<"/Scattering_"<<particle_->GetName()
+        filename<<path<<"/Scattering_"<<particle_name
                <<"_"<<crosssections_.at(0)->GetMedium()->GetName()
                <<"_"<<crosssections_.at(0)->GetMedium()->GetMassDensity()
                <<"_"<< crosssections_.at(0)->GetEnergyCutSettings()->GetEcut()

@@ -191,10 +191,31 @@ void Bremsstrahlung::EnableDNdxInterpolation(std::string path ,bool raw)
     bool storing_failed =   false;
     bool reading_worked =   true;
 
+    // charged anti leptons have the same cross sections like charged leptons
+    // (except of diffractive Bremsstrahlung, where one can analyse the interference term if implemented)
+    // so they use the same interpolation tables
+    string particle_name;
+    if (particle_->GetType() == ParticleType::MuPlus)
+    {
+        particle_name = ParticleType::MuMinus->GetName();
+    }
+    else if (particle_->GetType() == ParticleType::TauPlus)
+    {
+        particle_name = ParticleType::TauMinus->GetName();
+    }
+    else if (particle_->GetType() == ParticleType::EPlus)
+    {
+        particle_name = ParticleType::EMinus->GetName();
+    }
+    else
+    {
+        particle_name = particle_->GetName();
+    }
+
     if(!path.empty())
     {
         stringstream filename;
-        filename<<path<<"/Brems_dNdx_particle_"<<particle_->GetName()
+        filename<<path<<"/Brems_dNdx_particle_"<<particle_name
                 <<"_para_"<<parametrization_
                 <<"_med_"<<medium_->GetName()
                 <<medium_->GetMassDensity()
@@ -310,10 +331,31 @@ void Bremsstrahlung::EnableDEdxInterpolation(std::string path, bool raw)
     bool reading_worked =   true;
     bool storing_failed =   false;
 
+    // charged anti leptons have the same cross sections like charged leptons
+    // (except of diffractive Bremsstrahlung, where one can analyse the interference term if implemented)
+    // so they use the same interpolation tables
+    string particle_name;
+    if (particle_->GetType() == ParticleType::MuPlus)
+    {
+        particle_name = ParticleType::MuMinus->GetName();
+    }
+    else if (particle_->GetType() == ParticleType::TauPlus)
+    {
+        particle_name = ParticleType::TauMinus->GetName();
+    }
+    else if (particle_->GetType() == ParticleType::EPlus)
+    {
+        particle_name = ParticleType::EMinus->GetName();
+    }
+    else
+    {
+        particle_name = particle_->GetName();
+    }
+
     if(!path.empty())
     {
         stringstream filename;
-        filename<<path<<"/Brems_dEdx_particle_"<<particle_->GetName()
+        filename<<path<<"/Brems_dEdx_particle_"<<particle_name
                 <<"_para_"<<parametrization_
                 <<"_med_"<<medium_->GetName()
                 <<medium_->GetMassDensity()
