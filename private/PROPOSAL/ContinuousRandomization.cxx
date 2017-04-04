@@ -64,10 +64,31 @@ void ContinuousRandomization::EnableDE2dxInterpolation(std::string path, bool ra
     bool reading_worked =   true;
     bool storing_failed =   false;
 
+    // charged anti leptons have the same cross sections like charged leptons
+    // (except of diffractive Bremsstrahlung, where one can analyse the interference term if implemented)
+    // so they use the same interpolation tables
+    string particle_name;
+    if (particle_->GetType() == PROPOSALParticle::ParticleType::MuPlus)
+    {
+        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::MuMinus);
+    }
+    else if (particle_->GetType() == PROPOSALParticle::ParticleType::TauPlus)
+    {
+        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::TauMinus);
+    }
+    else if (particle_->GetType() == PROPOSALParticle::ParticleType::EPlus)
+    {
+        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::EMinus);
+    }
+    else
+    {
+        particle_name = particle_->GetName();
+    }
+
     if(!path.empty())
     {
         stringstream filename;
-        filename<<path<<"/Cont_dE2dx_"<<particle_->GetName()
+        filename<<path<<"/Cont_dE2dx_"<<particle_name
                <<"_"<<medium_->GetName()<<"_"
                <<medium_->GetMassDensity();
 
@@ -197,10 +218,31 @@ void ContinuousRandomization::EnableDE2deInterpolation(std::string path, bool ra
     bool reading_worked =   true;
     bool storing_failed =   false;
 
+    // charged anti leptons have the same cross sections like charged leptons
+    // (except of diffractive Bremsstrahlung, where one can analyse the interference term if implemented)
+    // so they use the same interpolation tables
+    string particle_name;
+    if (particle_->GetType() == PROPOSALParticle::ParticleType::MuPlus)
+    {
+        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::MuMinus);
+    }
+    else if (particle_->GetType() == PROPOSALParticle::ParticleType::TauPlus)
+    {
+        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::TauMinus);
+    }
+    else if (particle_->GetType() == PROPOSALParticle::ParticleType::EPlus)
+    {
+        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::EMinus);
+    }
+    else
+    {
+        particle_name = particle_->GetName();
+    }
+
     if(!path.empty())
     {
         stringstream filename;
-        filename<<path<<"/Cont_dE2de_"<<particle_->GetName()
+        filename<<path<<"/Cont_dE2de_"<<particle_name
                <<"_"<<medium_->GetName()<<"_"
                <<medium_->GetMassDensity();
 

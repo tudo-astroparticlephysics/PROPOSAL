@@ -434,10 +434,31 @@ void ProcessCollection::EnableInterpolation(std::string path, bool raw)
 
     particle_->SetEnergy(energy); //(mario) Previous if condition changes the particle energy
 
+    // charged anti leptons have the same cross sections like charged leptons
+    // (except of diffractive Bremsstrahlung, where one can analyse the interference term if implemented)
+    // so they use the same interpolation tables
+    string particle_name;
+    if (particle_->GetType() == PROPOSALParticle::ParticleType::MuPlus)
+    {
+        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::MuMinus);
+    }
+    else if (particle_->GetType() == PROPOSALParticle::ParticleType::TauPlus)
+    {
+        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::TauMinus);
+    }
+    else if (particle_->GetType() == PROPOSALParticle::ParticleType::EPlus)
+    {
+        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::EMinus);
+    }
+    else
+    {
+        particle_name = particle_->GetName();
+    }
+
     if(!path.empty())
     {
         stringstream filename;
-        filename<<path<<"/Collection_"<<particle_->GetName()
+        filename<<path<<"/Collection_"<<particle_name
                <<"_"<<medium_->GetName()
                <<"_"<<medium_->GetMassDensity()
                <<"_"<<cut_settings_->GetEcut()
@@ -580,7 +601,6 @@ void ProcessCollection::EnableInterpolation(std::string path, bool raw)
                 storing_failed  =   true;
                 log_warn("Can not open file %s for writing! Table will not be stored!",filename.str().c_str());
             }
-            printf("particle energy after interpolations save: %f\n", energy);
             particle_->SetEnergy(energy);
 
             output.close();
@@ -625,8 +645,6 @@ void ProcessCollection::EnableInterpolation(std::string path, bool raw)
 
     do_interpolation_=true;
 
-    //TODO(mario): hard fix Mo 2017/04/03
-    particle_->SetEnergy(energy);
 }
 
 
@@ -710,10 +728,31 @@ void ProcessCollection::EnableParticleTimeInterpolation(std::string path, bool r
     bool reading_worked =   true;
     bool storing_failed =   false;
 
+    // charged anti leptons have the same cross sections like charged leptons
+    // (except of diffractive Bremsstrahlung, where one can analyse the interference term if implemented)
+    // so they use the same interpolation tables
+    string particle_name;
+    if (particle_->GetType() == PROPOSALParticle::ParticleType::MuPlus)
+    {
+        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::MuMinus);
+    }
+    else if (particle_->GetType() == PROPOSALParticle::ParticleType::TauPlus)
+    {
+        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::TauMinus);
+    }
+    else if (particle_->GetType() == PROPOSALParticle::ParticleType::EPlus)
+    {
+        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::EMinus);
+    }
+    else
+    {
+        particle_name = particle_->GetName();
+    }
+
     if(!path.empty())
     {
         stringstream filename;
-        filename<<path<<"/Time_"<<particle_->GetName()
+        filename<<path<<"/Time_"<<particle_name
                <<"_"<<medium_->GetName()
                <<"_"<<medium_->GetMassDensity()
                <<"_"<<cut_settings_->GetEcut()
