@@ -85,7 +85,7 @@ int main(int argc, char** argv)
 //Output::getInstance().SetLoggingConfigurationFile("resources/log4cplus.conf");
     for(int i = 0; i< (int)(1e4) ; i++)
     {
-        PROPOSALParticle* part = new PROPOSALParticle(i,i,"mu",0,0,0,0,0,0,0,0);
+        PROPOSALParticle* part = new PROPOSALParticle(i,i,ParticleType::MuMinus,0,0,0,0,0,0,0,0);
         part->SetEnergy(1e6);
 
         propa->Propagate(part);

@@ -183,10 +183,30 @@ void Epairproduction::EnableDNdxInterpolation(std::string path, bool raw)
     bool storing_failed =   false;
     bool reading_worked =   true;
 
+    // charged anti leptons have the same cross sections like charged leptons
+    // so they use the same interpolation tables
+    string particle_name;
+    if (particle_->GetType() == PROPOSALParticle::ParticleType::MuPlus)
+    {
+        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::MuMinus);
+    }
+    else if (particle_->GetType() == PROPOSALParticle::ParticleType::TauPlus)
+    {
+        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::TauMinus);
+    }
+    else if (particle_->GetType() == PROPOSALParticle::ParticleType::EPlus)
+    {
+        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::EMinus);
+    }
+    else
+    {
+        particle_name = particle_->GetName();
+    }
+
     if(!path.empty())
     {
         stringstream filename;
-        filename<<path<<"/Epair_dNdx_particle_"<<particle_->GetName()
+        filename<<path<<"/Epair_dNdx_particle_"<<particle_name
                 <<"_med_"<<medium_->GetName()
                 <<medium_->GetMassDensity()
                 <<"_ecut_"<<cut_settings_->GetEcut()
@@ -307,10 +327,30 @@ void Epairproduction::EnableDEdxInterpolation(std::string path, bool raw)
     bool reading_worked =   true;
     bool storing_failed =   false;
 
+    // charged anti leptons have the same cross sections like charged leptons
+    // so they use the same interpolation tables
+    string particle_name;
+    if (particle_->GetType() == PROPOSALParticle::ParticleType::MuPlus)
+    {
+        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::MuMinus);
+    }
+    else if (particle_->GetType() == PROPOSALParticle::ParticleType::TauPlus)
+    {
+        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::TauMinus);
+    }
+    else if (particle_->GetType() == PROPOSALParticle::ParticleType::EPlus)
+    {
+        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::EMinus);
+    }
+    else
+    {
+        particle_name = particle_->GetName();
+    }
+
     if(!path.empty())
     {
         stringstream filename;
-        filename<<path<<"/Epair_dEdx_particle_"<<particle_->GetName()
+        filename<<path<<"/Epair_dEdx_particle_"<<particle_name
                 <<"_med_"<<medium_->GetName()
                 <<medium_->GetMassDensity()
                 <<"_ecut_"<<cut_settings_->GetEcut()
@@ -406,10 +446,30 @@ void Epairproduction::EnableEpairInterpolation(std::string path, bool raw)
     bool storing_failed =   false;
     bool reading_worked =   true;
 
+    // charged anti leptons have the same cross sections like charged leptons
+    // so they use the same interpolation tables
+    string particle_name;
+    if (particle_->GetType() == PROPOSALParticle::ParticleType::MuPlus)
+    {
+        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::MuMinus);
+    }
+    else if (particle_->GetType() == PROPOSALParticle::ParticleType::TauPlus)
+    {
+        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::TauMinus);
+    }
+    else if (particle_->GetType() == PROPOSALParticle::ParticleType::EPlus)
+    {
+        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::EMinus);
+    }
+    else
+    {
+        particle_name = particle_->GetName();
+    }
+
     if(!path.empty())
     {
         stringstream filename;
-        filename<<path<<"/Epair_particle_"<<particle_->GetName()
+        filename<<path<<"/Epair_particle_"<<particle_name
                 <<"_med_"<<medium_->GetName()
                 <<medium_->GetMassDensity()
                 <<"_ecut_"<<cut_settings_->GetEcut()
