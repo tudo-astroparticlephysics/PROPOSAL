@@ -432,6 +432,8 @@ void ProcessCollection::EnableInterpolation(std::string path, bool raw)
         up_  =   false;
     }
 
+    particle_->SetEnergy(energy); //(mario) Previous if condition changes the particle energy
+
     if(!path.empty())
     {
         stringstream filename;
@@ -578,6 +580,7 @@ void ProcessCollection::EnableInterpolation(std::string path, bool raw)
                 storing_failed  =   true;
                 log_warn("Can not open file %s for writing! Table will not be stored!",filename.str().c_str());
             }
+            printf("particle energy after interpolations save: %f\n", energy);
             particle_->SetEnergy(energy);
 
             output.close();
@@ -622,6 +625,8 @@ void ProcessCollection::EnableInterpolation(std::string path, bool raw)
 
     do_interpolation_=true;
 
+    //TODO(mario): hard fix Mo 2017/04/03
+    particle_->SetEnergy(energy);
 }
 
 
