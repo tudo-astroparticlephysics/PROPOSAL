@@ -20,6 +20,7 @@ mu.location_type = dc.I3Particle.InIce
 
 mu_length = list()
 n_daughters = list()
+
 for i in range(10000):
     mu.length = NaN
     # returns None instead of an I3MMCTrack
@@ -27,6 +28,7 @@ for i in range(10000):
     # length of daughters is always 1
     mu_length.append(mu.length)
     n_daughters.append(len(daughters))
+
 try:
     import matplotlib as mpl
     mpl.use('Agg')
@@ -37,7 +39,7 @@ try:
     pylab.hist(mu_length, histtype = "step", log = True, bins = 100)
     pylab.xlabel(r'$l_{\mu}(\rm{m})$')
     pylab.savefig('MuonLenghts.png')
-    
+
     pylab.figure()
     pylab.title("N Daughters")
     pylab.hist(n_daughters, histtype = "step", log = True, bins = 100)
@@ -45,5 +47,5 @@ try:
     pylab.savefig('Daughters.png')
 except ImportError :
     print("pylab not installed.  no plots for you.")
-    
+
 

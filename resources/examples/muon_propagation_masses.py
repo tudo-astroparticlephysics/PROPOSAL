@@ -9,8 +9,8 @@ from icecube import simclasses
 
 ptype = dc.I3Particle.MuMinus
 propagator = PROPOSAL.I3PropagatorServicePROPOSAL(
-    type=ptype
-    # particleMass=1000
+    type=ptype,
+    particleMass=1000
 )
 
 mu = dc.I3Particle()
