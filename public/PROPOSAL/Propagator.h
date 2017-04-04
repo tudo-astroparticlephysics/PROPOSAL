@@ -68,6 +68,9 @@ private:
     std::vector<ProcessCollection*> collections_;
 
     PROPOSALParticle* particle_;
+    //TODO(mario): decide to hold backup particle, because particle could be deleted and cause crashes.
+    // So this particle could be reinitialized at the end of propagate(). Di 2017/04/04
+    PROPOSALParticle* backup_particle_;
     //FirstOrderScattering
     ScatteringFirstOrder* scatteringFirstOrder_;
     //FirstOrderMoliere
@@ -259,6 +262,7 @@ public:
     void SetDetector(Geometry *detector);
     bool GetStopping_decay() const;
     void SetStopping_decay(bool stopping_decay);
+    void RestoreBackup_particle();
 };
 
 #endif // _PROPAGATOR_H

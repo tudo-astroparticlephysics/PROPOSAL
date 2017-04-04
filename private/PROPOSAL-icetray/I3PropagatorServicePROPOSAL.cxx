@@ -506,101 +506,103 @@ boost::assign::list_of<std::pair<int, I3Particle::ParticleType> >
 
 I3MMCTrackPtr
 I3PropagatorServicePROPOSAL::propagate( I3Particle& p, vector<I3Particle>& daughters){
-  /**
-   * Natural units of MMC is cm, deg, MeV, and s.
-   * Therefore we need to convert explicitly to
-   * MMC units before passing the propagate method
-   */
-  double x_0 = p.GetPos().GetX()/I3Units::cm;     // [cm]
-  double y_0 = p.GetPos().GetY()/I3Units::cm;    // [cm]
-  double z_0 = p.GetPos().GetZ()/I3Units::cm;     // [cm]
-  double theta_0 = p.GetDir().CalcTheta()/I3Units::deg; // [deg]
-  double phi_0 = p.GetDir().CalcPhi()/I3Units::deg;   // [deg]
-  double e_0 = p.GetEnergy()/I3Units::MeV;  // [MeV]
-  double t_0 = p.GetTime()/I3Units::s;     // [s]
+    /**
+     * Natural units of MMC is cm, deg, MeV, and s.
+     * Therefore we need to convert explicitly to
+     * MMC units before passing the propagate method
+     */
+    double x_0 = p.GetPos().GetX()/I3Units::cm;     // [cm]
+    double y_0 = p.GetPos().GetY()/I3Units::cm;    // [cm]
+    double z_0 = p.GetPos().GetZ()/I3Units::cm;     // [cm]
+    double theta_0 = p.GetDir().CalcTheta()/I3Units::deg; // [deg]
+    double phi_0 = p.GetDir().CalcPhi()/I3Units::deg;   // [deg]
+    double e_0 = p.GetEnergy()/I3Units::MeV;  // [MeV]
+    double t_0 = p.GetTime()/I3Units::s;     // [s]
 
-  PROPOSALParticle::ParticleType particleType = GeneratePROPOSALName(p);
-  log_debug("Name of particle to propagate: %s", PROPOSALParticle::GetName(particleType).c_str());
+    PROPOSALParticle::ParticleType particleType = GeneratePROPOSALName(p);
+    log_debug("Name of particle to propagate: %s", PROPOSALParticle::GetName(particleType).c_str());
 
-  // PROPOSALParticle* particle = new PROPOSALParticle(particleType, x_0, y_0, z_0, theta_0, phi_0, e_0, t_0);
-  PROPOSALParticle* particle = proposal->GetParticle();
-  particle->SetX(x_0);
-  particle->SetY(y_0);
-  particle->SetZ(z_0);
-  particle->SetTheta(theta_0);
-  particle->SetPhi(phi_0);
-  particle->SetEnergy(e_0);
-  particle->SetT(t_0);
-  if (particle == NULL) log_fatal("Error calling the Particle constructor");
 
-  //--- Tomasz
-  //vector<PROPOSALParticle*> aobj_l = amanda->propagate(particle);
-  proposal->propagate();
-  // proposal->Propagate(particle);
+    // PROPOSALParticle* particle = new PROPOSALParticle(particleType, x_0, y_0, z_0, theta_0, phi_0, e_0, t_0);
+    PROPOSALParticle* particle = proposal->GetParticle();
+    if (particle == NULL) log_fatal("Error calling the Particle constructor");
+    particle->SetX(x_0);
+    particle->SetY(y_0);
+    particle->SetZ(z_0);
+    particle->SetTheta(theta_0);
+    particle->SetPhi(phi_0);
+    particle->SetEnergy(e_0);
+    particle->SetT(t_0);
 
-  vector<PROPOSALParticle*> aobj_l = Output::getInstance().GetSecondarys();
-  //get the propagated length of the particle
-  //double length = particle->r;
-  double length = particle->GetPropagatedDistance();
-  //--- Tomasz End
-  p.SetLength( length * I3Units::cm );
-  log_trace(" length = %f cm ", length );
+    //--- Tomasz
+    //vector<PROPOSALParticle*> aobj_l = amanda->propagate(particle);
+    proposal->propagate();
+    // proposal->Propagate(particle);
 
-  int nParticles =  aobj_l.size();
-  log_trace("nParticles = %d", nParticles);
+    vector<PROPOSALParticle*> aobj_l = Output::getInstance().GetSecondarys();
+    //get the propagated length of the particle
+    //double length = particle->r;
+    double length = particle->GetPropagatedDistance();
+    //--- Tomasz End
+    p.SetLength( length * I3Units::cm );
+    log_trace(" length = %f cm ", length );
 
-  I3MMCTrackPtr mmcTrack;
-  log_trace("javaClass_ == AMANDA");
-  mmcTrack = GenerateMMCTrack(particle);
-  if(mmcTrack)
-      mmcTrack->SetParticle( p );
+    int nParticles =  aobj_l.size();
+    log_trace("nParticles = %d", nParticles);
 
-  for(int i=0; i < nParticles; i++){
+    I3MMCTrackPtr mmcTrack;
+    log_trace("javaClass_ == AMANDA");
+    mmcTrack = GenerateMMCTrack(particle);
+    if(mmcTrack)
+        mmcTrack->SetParticle( p );
 
-    //Tomasz
-    //in mmc the particle relationships are stored
-    int type = aobj_l.at(i)->GetType();
-    double x = aobj_l.at(i)->GetX() * I3Units::cm;
-    double y = aobj_l.at(i)->GetY() * I3Units::cm;
-    double z = aobj_l.at(i)->GetZ() * I3Units::cm;
-    double theta = aobj_l.at(i)->GetTheta() * I3Units::deg;
-    double phi = aobj_l.at(i)->GetPhi() * I3Units::deg;
-    double t = aobj_l.at(i)->GetT() * I3Units::s;
-    double e = aobj_l.at(i)->GetEnergy() * I3Units::MeV;
-    double l = aobj_l.at(i)->GetPropagatedDistance() * I3Units::cm;
+    for(int i=0; i < nParticles; i++){
 
-    log_trace("MMC DEBUG SEC  \n    type=%d pos=(%g,%g,%g) ang=(%g,%g)  e=%g t=%g  l=%g",
-	      type, x, y, z, theta, phi, e, t, l);
+        //Tomasz
+        //in mmc the particle relationships are stored
+        int type = aobj_l.at(i)->GetType();
+        double x = aobj_l.at(i)->GetX() * I3Units::cm;
+        double y = aobj_l.at(i)->GetY() * I3Units::cm;
+        double z = aobj_l.at(i)->GetZ() * I3Units::cm;
+        double theta = aobj_l.at(i)->GetTheta() * I3Units::deg;
+        double phi = aobj_l.at(i)->GetPhi() * I3Units::deg;
+        double t = aobj_l.at(i)->GetT() * I3Units::s;
+        double e = aobj_l.at(i)->GetEnergy() * I3Units::MeV;
+        double l = aobj_l.at(i)->GetPropagatedDistance() * I3Units::cm;
 
-    //this should be a stochastic
-    I3Particle new_particle;
+        log_trace("MMC DEBUG SEC  \n    type=%d pos=(%g,%g,%g) ang=(%g,%g)  e=%g t=%g  l=%g",
+                  type, x, y, z, theta, phi, e, t, l);
 
-    //Setting MC Type
-    I3Particle::ParticleType mcType(static_cast<I3Particle::ParticleType>(abs(type)));
-    particle_type_conversion_t::const_iterator it = fromRDMCTable.find(mcType);
-    if (it == fromRDMCTable.end()) {
-	cout << "Particle information!" << endl << endl << *(aobj_l.at(i)) << endl << endl;
-       log_fatal("unknown RDMC code \"%i\" cannot be converted to a I3Particle::ParticleType.", mcType);
-    } else {
-       new_particle.SetType(it->second);
+        //this should be a stochastic
+        I3Particle new_particle;
+
+        //Setting MC Type
+        I3Particle::ParticleType mcType(static_cast<I3Particle::ParticleType>(abs(type)));
+        particle_type_conversion_t::const_iterator it = fromRDMCTable.find(mcType);
+        if (it == fromRDMCTable.end()) {
+            cout << "Particle information!" << endl << endl << *(aobj_l.at(i)) << endl << endl;
+            log_fatal("unknown RDMC code \"%i\" cannot be converted to a I3Particle::ParticleType.", mcType);
+        } else {
+            new_particle.SetType(it->second);
+        }
+        new_particle.SetLocationType(I3Particle::InIce);
+        new_particle.SetPos(x, y, z);
+        new_particle.SetTime(t);
+        new_particle.SetLength(l);
+        new_particle.SetThetaPhi(theta,phi);
+        new_particle.SetEnergy(e);
+
+        // this is not the particle you're looking for
+        // move along...and add it to the daughter list
+        daughters.push_back(new_particle);
+
+        //we're done with eobj
+        //delete aobj_l.at(i); //Tomasz
     }
-    new_particle.SetLocationType(I3Particle::InIce);
-    new_particle.SetPos(x, y, z);
-    new_particle.SetTime(t);
-    new_particle.SetLength(l);
-    new_particle.SetThetaPhi(theta,phi);
-    new_particle.SetEnergy(e);
 
-    // this is not the particle you're looking for
-    // move along...and add it to the daughter list
-    daughters.push_back(new_particle);
+    Output::getInstance().ClearSecondaryVector(); //Tomasz
+    // delete particle; //Mario
 
-    //we're done with eobj
-    //delete aobj_l.at(i); //Tomasz
-  }
-  Output::getInstance().ClearSecondaryVector(); //Tomasz
-  delete particle;
-
-  return mmcTrack;
+    return mmcTrack;
 }
 

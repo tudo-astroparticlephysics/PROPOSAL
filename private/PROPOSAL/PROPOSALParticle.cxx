@@ -898,7 +898,7 @@ std::string PROPOSALParticle::GetName(ParticleType pt) {
     return p.GetName();
 }
 
-ParticleType PROPOSALParticle::GetTypeFromName(std::string particle_name)
+PROPOSALParticle::ParticleType PROPOSALParticle::GetTypeFromName(std::string particle_name)
 {
     // returns the particle type of a particle name
     // if there is just the name without charge (e.g. "mu" and not "mu+")
