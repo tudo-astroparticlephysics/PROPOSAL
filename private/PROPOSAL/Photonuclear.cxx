@@ -140,10 +140,30 @@ void Photonuclear::EnableDNdxInterpolation(std::string path, bool raw)
     bool storing_failed =   false;
     bool reading_worked =   true;
 
+    // charged anti leptons have the same cross sections like charged leptons
+    // so they use the same interpolation tables
+    string particle_name;
+    if (particle_->GetType() == PROPOSALParticle::ParticleType::MuPlus)
+    {
+        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::MuMinus);
+    }
+    else if (particle_->GetType() == PROPOSALParticle::ParticleType::TauPlus)
+    {
+        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::TauMinus);
+    }
+    else if (particle_->GetType() == PROPOSALParticle::ParticleType::EPlus)
+    {
+        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::EMinus);
+    }
+    else
+    {
+        particle_name = particle_->GetName();
+    }
+
     if(!path.empty())
     {
         stringstream filename;
-        filename<<path<<"/Photo_dNdx_particle_"<<particle_->GetName()
+        filename<<path<<"/Photo_dNdx_particle_"<<particle_name
                 <<"_para_"<<parametrization_
                 <<"_med_"<<medium_->GetName()
                 <<medium_->GetMassDensity()
@@ -264,10 +284,30 @@ void Photonuclear::EnableDEdxInterpolation(std::string path, bool raw)
     bool reading_worked =   true;
     bool storing_failed =   false;
 
+    // charged anti leptons have the same cross sections like charged leptons
+    // so they use the same interpolation tables
+    string particle_name;
+    if (particle_->GetType() == PROPOSALParticle::ParticleType::MuPlus)
+    {
+        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::MuMinus);
+    }
+    else if (particle_->GetType() == PROPOSALParticle::ParticleType::TauPlus)
+    {
+        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::TauMinus);
+    }
+    else if (particle_->GetType() == PROPOSALParticle::ParticleType::EPlus)
+    {
+        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::EMinus);
+    }
+    else
+    {
+        particle_name = particle_->GetName();
+    }
+
     if(!path.empty())
     {
         stringstream filename;
-        filename<<path<<"/Photo_dEdx_particle_"<<particle_->GetName()
+        filename<<path<<"/Photo_dEdx_particle_"<<particle_name
                 <<"_para_"<<parametrization_
                 <<"_med_"<<medium_->GetName()
                 <<medium_->GetMassDensity()
@@ -361,10 +401,30 @@ void Photonuclear::EnablePhotoInterpolation(std::string path, bool raw)
     bool storing_failed =   false;
     bool reading_worked =   true;
 
+    // charged anti leptons have the same cross sections like charged leptons
+    // so they use the same interpolation tables
+    string particle_name;
+    if (particle_->GetType() == PROPOSALParticle::ParticleType::MuPlus)
+    {
+        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::MuMinus);
+    }
+    else if (particle_->GetType() == PROPOSALParticle::ParticleType::TauPlus)
+    {
+        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::TauMinus);
+    }
+    else if (particle_->GetType() == PROPOSALParticle::ParticleType::EPlus)
+    {
+        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::EMinus);
+    }
+    else
+    {
+        particle_name = particle_->GetName();
+    }
+
     if(!path.empty())
     {
         stringstream filename;
-        filename<<path<<"/Photo_particle_"<<particle_->GetName()
+        filename<<path<<"/Photo_particle_"<<particle_name
                 <<"_para_"<<parametrization_
                 <<"_med_"<<medium_->GetName()
                 <<medium_->GetMassDensity()
