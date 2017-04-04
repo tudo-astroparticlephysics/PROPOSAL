@@ -52,7 +52,21 @@ void Output::FillSecondaryVector(PROPOSALParticle *particle, int secondary_id, p
     //     secondary_name  =   energy_loss.second;
     // }
 
-    PROPOSALParticle *particle_to_store   =   new PROPOSALParticle(particle->GetParentParticleId(), secondary_id, energy_loss.second, particle->GetX(), particle->GetY(), particle->GetZ(), particle->GetTheta(), particle->GetPhi(), energy_loss.first, particle->GetT(), distance,particle->GetEnergy());
+    PROPOSALParticle *particle_to_store = new PROPOSALParticle(
+        particle->GetParentParticleId(),
+        secondary_id,
+        energy_loss.second,
+        particle->GetX(),
+        particle->GetY(),
+        particle->GetZ(),
+        particle->GetTheta(),
+        particle->GetPhi(),
+        energy_loss.first,
+        particle->GetT(),
+        distance,
+        particle->GetEnergy()
+    );
+
     secondarys_.push_back(particle_to_store);
 
     #if ROOT_SUPPORT
@@ -88,7 +102,6 @@ void Output::FillSecondaryVector(PROPOSALParticle *particle, int secondary_id, p
             particle_to_store->GetName() << "\t" <<
             particle_to_store->GetParentParticleEnergy() << endl;
         }
-
 }
 
 

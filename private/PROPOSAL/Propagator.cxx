@@ -79,7 +79,6 @@ std::vector<PROPOSALParticle*> Propagator::propagate(double MaxDistance_cm)
 
     if(Output::store_in_ASCII_file_)Output::getInstance().StorePrimaryInASCII(particle_);
 
-
     double distance_to_collection_border    =   0;
     double distance_to_detector             =   0;
     double distance_to_closest_approach     =   0;
@@ -101,6 +100,7 @@ std::vector<PROPOSALParticle*> Propagator::propagate(double MaxDistance_cm)
     while(1)
     {
         ChooseCurrentCollection(particle_);
+
         if(current_collection_ == NULL)
         {
             log_info("particle reached the border");
@@ -291,7 +291,6 @@ std::vector<PROPOSALParticle*> Propagator::propagate(double MaxDistance_cm)
         }
         result  =   Propagate(distance);
         if(result<=0 || MaxDistance_cm <= particle_->GetPropagatedDistance()) break;
-
     }
 
     particle_->SetElost(energy_at_entry_point - energy_at_exit_point);
@@ -300,6 +299,9 @@ std::vector<PROPOSALParticle*> Propagator::propagate(double MaxDistance_cm)
         Output::getInstance().StorePropagatedPrimaryInTree(particle_);
     #endif
         if(Output::store_in_ASCII_file_)Output::getInstance().StorePropagatedPrimaryInASCII(particle_);
+
+    //TODO(mario): undo backup Mo 2017/04/03
+    // RestoreBackup_particle();
 
     return Output::getInstance().GetSecondarys();
 }
@@ -558,7 +560,6 @@ double Propagator::Propagate( double distance )
     bool    flag;
     double  displacement;
 
-    //cout << *particle_ << endl; //Tomasz
     double propagated_distance  =   0;
 
     double  initial_energy  =   particle_->GetEnergy();
@@ -674,7 +675,6 @@ double Propagator::Propagate( double distance )
         //break if the lower limit of particle energy is reached
         if(final_energy <= particle_->GetLow())
         {
-
             break;
         }
 
@@ -807,20 +807,17 @@ void Propagator::ChooseCurrentCollection(PROPOSALParticle* particle)
         collections_.at(i)->RestoreBackup_particle();
 
         if(particle->GetType() != collections_.at(i)->GetParticle()->GetType())
+        {
             continue;
+        }
 
-        printf("---------------------------------------------------------\n");
-        printf("particle type:%i\n", particle->GetType());
-        printf("particle name:%s\n", particle->GetName().c_str());
-        printf("particle mass:%f\n", particle->GetMass());
-        printf("particle in collection type:%i\n", collections_.at(i)->GetParticle()->GetType());
-        printf("particle in collection type:%s\n", collections_.at(i)->GetParticle()->GetName().c_str());
-        printf("particle in collection mass:%f\n", collections_.at(i)->GetParticle()->GetMass());
 
         if(detector_->IsParticleInfront(particle))
         {
             if(collections_.at(i)->GetLocation() != 0)
+            {
                 continue;
+            }
             else
             {
                 if(collections_.at(i)->GetGeometry()->IsParticleInside(particle))
@@ -828,19 +825,29 @@ void Propagator::ChooseCurrentCollection(PROPOSALParticle* particle)
                     current_collection_ = collections_.at(i);
                     crossed_collections.push_back(i);
                 }
+                else
+                {
+
+                }
             }
         }
 
         else if(detector_->IsParticleInside(particle))
         {
             if(collections_.at(i)->GetLocation() != 1)
+            {
                 continue;
+            }
             else
             {
                 if(collections_.at(i)->GetGeometry()->IsParticleInside(particle))
                 {
                     current_collection_ = collections_.at(i);
                     crossed_collections.push_back(i);
+                }
+                else
+                {
+
                 }
             }
 
@@ -849,7 +856,9 @@ void Propagator::ChooseCurrentCollection(PROPOSALParticle* particle)
         else if(detector_->IsParticleBehind(particle))
         {
             if(collections_.at(i)->GetLocation() != 2)
+            {
                 continue;
+            }
             else
             {
                 if(collections_.at(i)->GetGeometry()->IsParticleInside(particle))
@@ -1412,6 +1421,7 @@ Propagator::Propagator()
     ,current_collection_        (NULL)
 {
     particle_              = new PROPOSALParticle(PROPOSALParticle::ParticleType::MuMinus);
+    backup_particle_       = new PROPOSALParticle(*particle_);
     detector_              = new Geometry();
     detector_->InitSphere(0,0,0,1e18,0);
     InitDefaultCollection(detector_);
@@ -1469,6 +1479,7 @@ Propagator::Propagator(Medium* medium,
     ,current_collection_        (NULL)
 {
     particle_              = new PROPOSALParticle(particle_type);
+    backup_particle_       = new PROPOSALParticle(*particle_);
     current_collection_    = new ProcessCollection(particle_, medium, cuts);
     detector_              = new Geometry();
     detector_->InitSphere(0,0,0,1e18,0);
@@ -1576,6 +1587,7 @@ Propagator::Propagator(string config_file, bool DoApplyOptions)
     ,path_to_tables_            ( "" )
     ,raw_                       ( false )
     ,particle_                  (NULL)
+    ,backup_particle_           (NULL)
     ,scattering_model_          (-1)
     ,current_collection_        (NULL)
 {
@@ -1615,7 +1627,8 @@ Propagator::Propagator(std::string config_file, PROPOSALParticle* particle, bool
     ,scattering_model_          (-1)
     ,current_collection_        (NULL)
 {
-    particle_ = new PROPOSALParticle(*particle);
+    particle_        = new PROPOSALParticle(*particle);
+    backup_particle_ = new PROPOSALParticle(*particle_);
     ReadConfigFile(config_file, DoApplyOptions);
 }
 
@@ -1651,6 +1664,7 @@ Propagator::Propagator(const Propagator &propagator)
     ,path_to_tables_            ( propagator.path_to_tables_ )
     ,raw_                       ( propagator.raw_ )
     ,particle_                  ( propagator.particle_ )
+    ,backup_particle_           ( propagator.backup_particle_ )
     //FirstOrderScattering
     ,scatteringFirstOrder_          ( propagator.scatteringFirstOrder_ )
     ,scatteringFirstOrderMoliere_   ( propagator.scatteringFirstOrderMoliere_ )
@@ -1773,6 +1787,7 @@ void Propagator::swap(Propagator &propagator)
     path_to_tables_.swap( propagator.path_to_tables_ );
 
     particle_->swap( *propagator.particle_ );
+    backup_particle_->swap( *propagator.backup_particle_ );
     //FirstOrderScattering
     swap<ScatteringFirstOrder*> (scatteringFirstOrder_ ,propagator.scatteringFirstOrder_);
 //    scatteringFirstOrderMoliere_->swap(*propagator.scatteringFirstOrderMoliere_);
@@ -2423,6 +2438,12 @@ void Propagator::SetStopping_decay(bool stopping_decay)
 {
     stopping_decay_ = stopping_decay;
 }
+
+void Propagator::RestoreBackup_particle()
+{
+    particle_ = new PROPOSALParticle(*backup_particle_);
+}
+
 void Propagator::InitGeometry(Geometry* geometry, std::deque<std::string>* token, string first_token)
 {
     string taux = first_token;
