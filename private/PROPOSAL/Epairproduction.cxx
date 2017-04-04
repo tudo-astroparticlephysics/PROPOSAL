@@ -186,17 +186,17 @@ void Epairproduction::EnableDNdxInterpolation(std::string path, bool raw)
     // charged anti leptons have the same cross sections like charged leptons
     // so they use the same interpolation tables
     string particle_name;
-    if (particle_->GetType() == ParticleType::MuPlus)
+    if (particle_->GetType() == PROPOSALParticle::ParticleType::MuPlus)
     {
-        particle_name = ParticleType::MuMinus->GetName();
+        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::MuMinus);
     }
-    else if (particle_->GetType() == ParticleType::TauPlus)
+    else if (particle_->GetType() == PROPOSALParticle::ParticleType::TauPlus)
     {
-        particle_name = ParticleType::TauMinus->GetName();
+        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::TauMinus);
     }
-    else if (particle_->GetType() == ParticleType::EPlus)
+    else if (particle_->GetType() == PROPOSALParticle::ParticleType::EPlus)
     {
-        particle_name = ParticleType::EMinus->GetName();
+        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::EMinus);
     }
     else
     {
@@ -330,17 +330,17 @@ void Epairproduction::EnableDEdxInterpolation(std::string path, bool raw)
     // charged anti leptons have the same cross sections like charged leptons
     // so they use the same interpolation tables
     string particle_name;
-    if (particle_->GetType() == ParticleType::MuPlus)
+    if (particle_->GetType() == PROPOSALParticle::ParticleType::MuPlus)
     {
-        particle_name = ParticleType::MuMinus->GetName();
+        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::MuMinus);
     }
-    else if (particle_->GetType() == ParticleType::TauPlus)
+    else if (particle_->GetType() == PROPOSALParticle::ParticleType::TauPlus)
     {
-        particle_name = ParticleType::TauMinus->GetName();
+        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::TauMinus);
     }
-    else if (particle_->GetType() == ParticleType::EPlus)
+    else if (particle_->GetType() == PROPOSALParticle::ParticleType::EPlus)
     {
-        particle_name = ParticleType::EMinus->GetName();
+        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::EMinus);
     }
     else
     {
@@ -449,17 +449,17 @@ void Epairproduction::EnableEpairInterpolation(std::string path, bool raw)
     // charged anti leptons have the same cross sections like charged leptons
     // so they use the same interpolation tables
     string particle_name;
-    if (particle_->GetType() == ParticleType::MuPlus)
+    if (particle_->GetType() == PROPOSALParticle::ParticleType::MuPlus)
     {
-        particle_name = ParticleType::MuMinus->GetName();
+        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::MuMinus);
     }
-    else if (particle_->GetType() == ParticleType::TauPlus)
+    else if (particle_->GetType() == PROPOSALParticle::ParticleType::TauPlus)
     {
-        particle_name = ParticleType::TauMinus->GetName();
+        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::TauMinus);
     }
-    else if (particle_->GetType() == ParticleType::EPlus)
+    else if (particle_->GetType() == PROPOSALParticle::ParticleType::EPlus)
     {
-        particle_name = ParticleType::EMinus->GetName();
+        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::EMinus);
     }
     else
     {
