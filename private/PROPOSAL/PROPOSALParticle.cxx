@@ -943,7 +943,7 @@ PROPOSALParticle::ParticleType PROPOSALParticle::GetTypeFromName(std::string par
         else if (particle_name.compare("stau+")) return ParticleType::STauPlus;
         else return ParticleType::STauMinus;
     }
-    if (particle_name.compare("monopole")) return ParticleType::Monopole;
+    else if (particle_name.compare("monopole")) return ParticleType::Monopole;
     else if (StartsWith(particle_name,"nu"))
     {
         if (particle_name.compare("nu_mu")) return ParticleType::NuMu;
@@ -952,6 +952,10 @@ PROPOSALParticle::ParticleType PROPOSALParticle::GetTypeFromName(std::string par
         else if (particle_name.compare("nu_tau_bar")) return ParticleType::NuTauBar;
         else if (particle_name.compare("nu_e")) return ParticleType::NuE;
         else if (particle_name.compare("nu_e_bar")) return ParticleType::NuEBar;
+        else
+        {
+            log_fatal("the neutrino name '%s' is not correct it should be e.g. nu_mu_bar", particle_name.c_str());
+        }
     }
     else if (particle_name.compare("DeltaE")) return ParticleType::DeltaE;
     else if (particle_name.compare("ContinuousEnergyLoss")) return ParticleType::ContinuousEnergyLoss;
@@ -961,7 +965,6 @@ PROPOSALParticle::ParticleType PROPOSALParticle::GetTypeFromName(std::string par
     else if (particle_name.compare("EPair")) return ParticleType::EPair;
     else
     {
-        log_fatal("the particle is not a PROPOSAL Particle");
-        return ParticleType::unknown;
+        log_fatal("the particle name '%s' is not a PROPOSAL Particle", particle_name.c_str());
     }
 }
