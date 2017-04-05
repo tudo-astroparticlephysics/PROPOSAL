@@ -46,6 +46,7 @@ class Output;
 // Now: parametrization_ = 13, Former: photo_family=4 and photo_param=1 shadow=1 Butkevich/Mikhailov
 // Now: parametrization_ = 14, Former: photo_family=4 and photo_param=1 shadow=2 Butkevich/Mikhailov
 
+// ------------------------------------------------------------------------- //
 int ConvertOldToNewPhotonuclearParametrization(int photo_family,int photo_param,int shadow)
 {
     switch(photo_family*100+photo_param*10)
@@ -79,7 +80,7 @@ int ConvertOldToNewPhotonuclearParametrization(int photo_family,int photo_param,
     return 12;
 }
 
-
+// ------------------------------------------------------------------------- //
 bool IsWritable(std::string table_dir)
 {
     bool writeable = false;
@@ -94,40 +95,38 @@ bool IsWritable(std::string table_dir)
         else
         {
             if (access(table_dir.c_str(), R_OK) != 0)
-            {
                 log_info("Table directory is not readable: %s", table_dir.c_str());
-            }
             else
-            {
                 log_info("Table directory is not writable: %s", table_dir.c_str());
-            }
         }
     }
     else
-    {
         log_info("Table directory does not exist: %s", table_dir.c_str());
-    }
 
     return writeable;
 }
 
+// ------------------------------------------------------------------------- //
 I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(
-      std::string mediadef, std::string tabledir
-    , double cylinderRadius, double cylinderHeight
-    , I3Particle::ParticleType type, double particleMass
-    , BremsstrahlungParametrization brems_param
-    , PhotonuclearParametrizationFamily photo_family
-    , PhotonuclearParametrization photo_param
-    , ShadowingParametrization shadow)
-  : particleMass_(particleMass)
-  , mediadef_(mediadef)
-  , tabledir_(tabledir)
-  , cylinderRadius_(cylinderRadius)
-  , cylinderHeight_(cylinderHeight)
-  , brems_param_(brems_param)
-  , photo_family_(photo_family)
-  , photo_param_(photo_param)
-  , shadow_(shadow)
+                                                         std::string mediadef
+                                                         , std::string tabledir
+                                                         , double cylinderRadius
+                                                         , double cylinderHeight
+                                                         , I3Particle::ParticleType type
+                                                         , double particleMass
+                                                         , BremsstrahlungParametrization brems_param
+                                                         , PhotonuclearParametrizationFamily photo_family
+                                                         , PhotonuclearParametrization photo_param
+                                                         , ShadowingParametrization shadow)
+    : particleMass_(particleMass)
+    , mediadef_(mediadef)
+    , tabledir_(tabledir)
+    , cylinderRadius_(cylinderRadius)
+    , cylinderHeight_(cylinderHeight)
+    , brems_param_(brems_param)
+    , photo_family_(photo_family)
+    , photo_param_(photo_param)
+    , shadow_(shadow)
 {
     // TODO(sudojan): type
     //TODO(mario): particeMass Mo 2017/02/20
@@ -172,6 +171,7 @@ I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(
         tabledir_ = GetDefaultTableDir();
 
     namespace fs = boost::filesystem;
+
     if (!fs::exists(mediadef_))
         log_fatal("The mediadef file '%s' can't be read!", mediadef_.c_str());
     if (!fs::is_directory(tabledir_))
@@ -206,7 +206,7 @@ I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(
         options << "Passed parametrization will be used: " << photo << std::endl;
     }
 
-    log_info(options.str().c_str());
+    log_info("%s", options.str().c_str());
 
     // if (std::isinf(particleMass_))
     // {
@@ -227,6 +227,7 @@ I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(
 	tearDownPerCall_ = false;
 }
 
+// ------------------------------------------------------------------------- //
 std::string I3PropagatorServicePROPOSAL::GetDefaultMediaDef()
 {
 	const char *I3_BUILD = getenv("I3_BUILD");
@@ -237,7 +238,7 @@ std::string I3PropagatorServicePROPOSAL::GetDefaultMediaDef()
     return s + "/PROPOSAL/resources/configuration";
 }
 
-
+// ------------------------------------------------------------------------- //
 std::string I3PropagatorServicePROPOSAL::GetDefaultTableDir()
 {
     std::string append_string  = "/PROPOSAL/resources/tables";
@@ -309,24 +310,22 @@ std::string I3PropagatorServicePROPOSAL::GetDefaultTableDir()
     }
 }
 
-
+// ------------------------------------------------------------------------- //
 void I3PropagatorServicePROPOSAL::SetRandomNumberGenerator(I3RandomServicePtr random)
 {
-  rng_ = random;
-  boost::function<double ()> f = boost::bind(&I3RandomService::Uniform, random, 0, 1);
+    rng_ = random;
+    boost::function<double ()> f = boost::bind(&I3RandomService::Uniform, random, 0, 1);
 
-  proposal->SetRandomNumberGenerator(f);
-
+    proposal->SetRandomNumberGenerator(f);
 }
 
+// ------------------------------------------------------------------------- //
 I3PropagatorServicePROPOSAL::~I3PropagatorServicePROPOSAL()
 {
     delete proposal;
 }
 
-/**
- *
- */
+// ------------------------------------------------------------------------- //
 std::vector<I3Particle> I3PropagatorServicePROPOSAL::Propagate(I3Particle& p, DiagnosticMapPtr frame){
     // saying where we are
     log_debug("Entering I3PropagatorServicePROPOSAL::Propagate()");
@@ -354,7 +353,8 @@ std::vector<I3Particle> I3PropagatorServicePROPOSAL::Propagate(I3Particle& p, Di
         p.GetLength()/I3Units::m
     );
 
-    if (tearDownPerCall_) {
+    if (tearDownPerCall_)
+    {
         delete proposal;
         proposal = new Propagator(mediadef_,false);
         // Apply Settings
@@ -384,40 +384,10 @@ std::vector<I3Particle> I3PropagatorServicePROPOSAL::Propagate(I3Particle& p, Di
         trackList->push_back(*mmcTrack);
     }
 
-  return daughters;
+    return daughters;
 }
 
-// string I3PropagatorServicePROPOSAL::GenerateMMCName(const I3Particle& p){
-
-//   string name;
-
-//   if(p.GetType()==I3Particle::MuMinus) name="mu-";
-//   else if(p.GetType()==I3Particle::MuPlus) name="mu+";
-//   else if(p.GetType()==I3Particle::NuMu) name="nu_mu";
-//   else if(p.GetType()==I3Particle::NuMuBar) name="~nu_mu";
-//   else if(p.GetType()==I3Particle::NuE) name="nu_e";
-//   else if(p.GetType()==I3Particle::NuEBar) name="~nu_e";
-//   else if(p.GetType()==I3Particle::NuTau) name="nu_tau";
-//   else if(p.GetType()==I3Particle::NuTauBar) name="~nu_tau";
-//   else if((p.GetType()==I3Particle::EMinus) &&
-// 	  (p.GetShape()==I3Particle::TopShower)) name="e-";
-//   else if((p.GetType()==I3Particle::EPlus) &&
-// 	  (p.GetShape()==I3Particle::TopShower)) name="e+";
-//   else if(p.GetType()==I3Particle::TauMinus) name="tau-";
-//   else if(p.GetType()==I3Particle::TauPlus) name="tau+";
-//   else if((p.GetType()==I3Particle::Hadrons) &&
-// 	  (p.GetShape()==I3Particle::TopShower)) name="hadr";
-//   else if(p.GetType()==I3Particle::Monopole) name="monopole";
-//   else if(p.GetType()==I3Particle::STauPlus ||
-// 	  p.GetType()==I3Particle::STauMinus){
-//     stringstream s;
-//     s<<"stau="<<particleMass_/I3Units::GeV;
-//     name=s.str();
-//   }
-
-//   return name;
-// }
-
+// ------------------------------------------------------------------------- //
 PROPOSALParticle::ParticleType I3PropagatorServicePROPOSAL::GeneratePROPOSALName(const I3Particle& p)
 {
     I3Particle::ParticleType ptype = p.GetType();
@@ -434,22 +404,14 @@ PROPOSALParticle::ParticleType I3PropagatorServicePROPOSAL::GeneratePROPOSALName
             return PROPOSALParticle::ParticleType::TauPlus;
         case I3Particle::EMinus:
             if (p.GetShape() == I3Particle::TopShower)
-            {
                 return PROPOSALParticle::ParticleType::EMinus;
-            }
             else
-            {
                 return PROPOSALParticle::ParticleType::unknown;
-            }
         case I3Particle::EPlus:
             if (p.GetShape() == I3Particle::TopShower)
-            {
                 return PROPOSALParticle::ParticleType::EPlus;
-            }
             else
-            {
                 return PROPOSALParticle::ParticleType::unknown;
-            }
         case I3Particle::NuMu:
             return PROPOSALParticle::ParticleType::NuMu;
         case I3Particle::NuMuBar:
@@ -464,13 +426,9 @@ PROPOSALParticle::ParticleType I3PropagatorServicePROPOSAL::GeneratePROPOSALName
             return PROPOSALParticle::ParticleType::NuTauBar;
         case I3Particle::Hadrons:
             if (p.GetShape() == I3Particle::TopShower)
-            {
                 return PROPOSALParticle::ParticleType::Hadrons;
-            }
             else
-            {
                 return PROPOSALParticle::ParticleType::unknown;
-            }
         case I3Particle::Monopole:
             return PROPOSALParticle::ParticleType::Monopole;
         case I3Particle::STauPlus:
@@ -480,29 +438,9 @@ PROPOSALParticle::ParticleType I3PropagatorServicePROPOSAL::GeneratePROPOSALName
         default:
             return PROPOSALParticle::ParticleType::unknown;
     }
-
-  // if(p.GetType()==I3Particle::MuMinus)            return PROPOSALParticle::ParticleType::MuMinus;
-  // else if(p.GetType()==I3Particle::MuPlus)        return PROPOSALParticle::ParticleType::MuPlus;
-  // else if(p.GetType()==I3Particle::NuMu)          return PROPOSALParticle::ParticleType::NuMu;
-  // else if(p.GetType()==I3Particle::NuMuBar)       return PROPOSALParticle::ParticleType::NuMuBar;
-  // else if(p.GetType()==I3Particle::NuE)           return PROPOSALParticle::ParticleType::NuE;
-  // else if(p.GetType()==I3Particle::NuEBar)        return PROPOSALParticle::ParticleType::NuEBar;
-  // else if(p.GetType()==I3Particle::NuTau)         return PROPOSALParticle::ParticleType::NuTau;
-  // else if(p.GetType()==I3Particle::NuTauBar)      return PROPOSALParticle::ParticleType::NuTauBar;
-  // else if((p.GetType()==I3Particle::EMinus)       &&
-  //   (p.GetShape()==I3Particle::TopShower))        return PROPOSALParticle::ParticleType::EMinus;
-  // else if((p.GetType()==I3Particle::EPlus)        &&
-  //   (p.GetShape()==I3Particle::TopShower))        return PROPOSALParticle::ParticleType::EPlus;
-  // else if(p.GetType()==I3Particle::TauMinus)      return PROPOSALParticle::ParticleType::TauMinus;
-  // else if(p.GetType()==I3Particle::TauPlus)       return PROPOSALParticle::ParticleType::TauPlus;
-  // else if((p.GetType()==I3Particle::Hadrons)      &&
-  //   (p.GetShape()==I3Particle::TopShower))        return PROPOSALParticle::ParticleType::Hadrons;
-  // else if(p.GetType()==I3Particle::Monopole)      return PROPOSALParticle::ParticleType::Monopole;
-  // // TODO: implement stau masses
-  // else if(p.GetType()==I3Particle::STauPlus)      return PROPOSALParticle::ParticleType::STauPlus;
-  // else if(p.GetType()==I3Particle::STauMinus)     return PROPOSALParticle::ParticleType::STauMinus;
 }
 
+// ------------------------------------------------------------------------- //
 I3MMCTrackPtr I3PropagatorServicePROPOSAL::GenerateMMCTrack(PROPOSALParticle* particle){
 
     //explicitly specifying the units from MMC
@@ -524,19 +462,21 @@ I3MMCTrackPtr I3PropagatorServicePROPOSAL::GenerateMMCTrack(PROPOSALParticle* pa
     double tc = particle->GetTc() * I3Units::second;
     double Ec = particle->GetEc() * I3Units::GeV;
 
-  I3MMCTrackPtr mmcTrack( new I3MMCTrack);
-  mmcTrack->SetEnter(xi,yi,zi,ti,Ei);
-  mmcTrack->SetCenter(xc,yc,zc,tc,Ec);
-  mmcTrack->SetExit(xf,yf,zf,tf,Ef);
+    I3MMCTrackPtr mmcTrack( new I3MMCTrack);
+    mmcTrack->SetEnter(xi,yi,zi,ti,Ei);
+    mmcTrack->SetCenter(xc,yc,zc,tc,Ec);
+    mmcTrack->SetExit(xf,yf,zf,tf,Ef);
 
-  double Elost = particle->GetElost() * I3Units::GeV;
-  mmcTrack->SetDepositedEnergy(Elost);
-  log_debug("Elost = %f", Elost);
+    double Elost = particle->GetElost() * I3Units::GeV;
+    mmcTrack->SetDepositedEnergy(Elost);
+    log_debug("Elost = %f", Elost);
 
-  if(Elost>0) return mmcTrack;
-  //return null pointer if Elost <= 0
-  return I3MMCTrackPtr();
+    if(Elost>0)
+        return mmcTrack;
+    //return null pointer if Elost <= 0
+    return I3MMCTrackPtr();
 }
+
 
 typedef std::map<int, I3Particle::ParticleType> particle_type_conversion_t;
 
@@ -572,8 +512,8 @@ boost::assign::list_of<std::pair<int, I3Particle::ParticleType> >
 (1005, I3Particle::MuPair)
 (1006, I3Particle::Hadrons);
 
-I3MMCTrackPtr
-I3PropagatorServicePROPOSAL::propagate( I3Particle& p, vector<I3Particle>& daughters){
+// ------------------------------------------------------------------------- //
+I3MMCTrackPtr I3PropagatorServicePROPOSAL::propagate( I3Particle& p, vector<I3Particle>& daughters){
     /**
      * Natural units of MMC is cm, deg, MeV, and s.
      * Therefore we need to convert explicitly to
@@ -592,8 +532,13 @@ I3PropagatorServicePROPOSAL::propagate( I3Particle& p, vector<I3Particle>& daugh
 
 
     // PROPOSALParticle* particle = new PROPOSALParticle(particleType, x_0, y_0, z_0, theta_0, phi_0, e_0, t_0);
+    proposal->ResetParticle();
     PROPOSALParticle* particle = proposal->GetParticle();
-    if (particle == NULL) log_fatal("Error calling the Particle constructor");
+    printf("Mass: %f\n", particle->GetMass());
+
+    if (particle == NULL)
+        log_fatal("Error calling the Particle constructor");
+
     particle->SetX(x_0);
     particle->SetY(y_0);
     particle->SetZ(z_0);
@@ -621,11 +566,12 @@ I3PropagatorServicePROPOSAL::propagate( I3Particle& p, vector<I3Particle>& daugh
     I3MMCTrackPtr mmcTrack;
     log_trace("javaClass_ == AMANDA");
     mmcTrack = GenerateMMCTrack(particle);
+
     if(mmcTrack)
         mmcTrack->SetParticle( p );
 
-    for(int i=0; i < nParticles; i++){
-
+    for(int i=0; i < nParticles; i++)
+    {
         //Tomasz
         //in mmc the particle relationships are stored
         int type = aobj_l.at(i)->GetType();
@@ -647,12 +593,16 @@ I3PropagatorServicePROPOSAL::propagate( I3Particle& p, vector<I3Particle>& daugh
         //Setting MC Type
         I3Particle::ParticleType mcType(static_cast<I3Particle::ParticleType>(abs(type)));
         particle_type_conversion_t::const_iterator it = fromRDMCTable.find(mcType);
-        if (it == fromRDMCTable.end()) {
+        if (it == fromRDMCTable.end())
+        {
             cout << "Particle information!" << endl << endl << *(aobj_l.at(i)) << endl << endl;
             log_fatal("unknown RDMC code \"%i\" cannot be converted to a I3Particle::ParticleType.", mcType);
-        } else {
+        }
+        else
+        {
             new_particle.SetType(it->second);
         }
+
         new_particle.SetLocationType(I3Particle::InIce);
         new_particle.SetPos(x, y, z);
         new_particle.SetTime(t);
