@@ -7,8 +7,8 @@ from icecube import icetray
 from icecube import PROPOSAL
 from icecube import simclasses
 
-ptype = dc.I3Particle.MuMinus
-propagator = PROPOSAL.I3PropagatorServicePROPOSAL(type = ptype)
+ptype = dc.I3Particle.MuPlus
+propagator = PROPOSAL.I3PropagatorServicePROPOSAL(type = ptype )# particleMass = 1000)
 
 mu = dc.I3Particle()
 mu.type = ptype
@@ -21,7 +21,7 @@ mu.location_type = dc.I3Particle.InIce
 mu_length = list()
 n_daughters = list()
 
-for i in range(100):
+for i in range(10000):
     mu.length = NaN
     # returns None instead of an I3MMCTrack
     daughters = propagator.Propagate(mu)
@@ -38,13 +38,13 @@ try:
     pylab.title("Mu Lengths")
     pylab.hist(mu_length, histtype = "step", log = True, bins = 100)
     pylab.xlabel(r'$l_{\mu}(\rm{m})$')
-    pylab.savefig('MuonLenghts.png')
+    pylab.savefig('muon_Lenghts.png')
 
     pylab.figure()
-    pylab.title("N Daughters")
+    pylab.title("N Daughters of Muon")
     pylab.hist(n_daughters, histtype = "step", log = True, bins = 100)
     pylab.xlabel('N')
-    pylab.savefig('Daughters.png')
+    pylab.savefig('muon_Daughters.png')
 except ImportError :
     print("pylab not installed.  no plots for you.")
 

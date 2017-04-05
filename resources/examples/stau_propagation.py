@@ -23,13 +23,13 @@ propagator = PROPOSAL.I3PropagatorServicePROPOSAL(
     # particleMass=1000
 )
 
-mu = dc.I3Particle()
-mu.type = ptype
-mu.pos = dc.I3Position(0,0,0)
-mu.dir = dc.I3Direction(0,0)
-mu.energy = 100 * I3Units.TeV
-mu.time = 0 * I3Units.ns
-mu.location_type = dc.I3Particle.InIce
+stau = dc.I3Particle()
+stau.type = ptype
+stau.pos = dc.I3Position(0,0,0)
+stau.dir = dc.I3Direction(0,0)
+stau.energy = 100 * I3Units.TeV
+stau.time = 0 * I3Units.ns
+stau.location_type = dc.I3Particle.InIce
 
 mu_length = list()
 n_daughters = list()
@@ -38,11 +38,11 @@ primary_energy_epair = list()
 secondary_energy_epair = list()
 
 for i in range(10000):
-    mu.length = NaN
+    stau.length = NaN
     # returns None instead of an I3MMCTrack
-    daughters = propagator.Propagate(mu)
+    daughters = propagator.Propagate(stau)
     # length of daughters is always 1
-    mu_length.append(mu.length)
+    mu_length.append(stau.length)
     n_daughters.append(len(daughters))
 
     for particle in daughters:
