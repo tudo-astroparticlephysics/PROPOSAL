@@ -23,6 +23,7 @@
 #include "PROPOSAL/PROPOSALParticle.h"
 #include "PROPOSAL/EnergyCutSettings.h"
 #include "PROPOSAL/Medium.h"
+#include "PROPOSAL/Output.h"
 #include "TFile.h"
 #include "TMultiGraph.h"
 #include "TLegend.h"
@@ -871,7 +872,7 @@ int main()
                     }
                     break;
                 case 4:
-                    uraniumpara4_gr->Add(graphs.at(i),"P");
+                    uranium_para4_gr->Add(graphs.at(i),"P");
                     uranium_para4_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (uranium_para4_gr->GetListOfGraphs()->Capacity())
                     {

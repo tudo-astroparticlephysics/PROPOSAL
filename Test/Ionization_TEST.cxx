@@ -102,7 +102,7 @@ TEST(Assignment , Copyconstructor ) {
 
 TEST(Assignment , Copyconstructor2 ) {
     Medium *medium = new Medium("air",1.);
-    PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::ParticleType::MuMinus1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
 
     Ionization A(particle, medium, cuts);
