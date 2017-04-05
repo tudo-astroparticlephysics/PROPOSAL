@@ -21,7 +21,7 @@ mu.location_type = dc.I3Particle.InIce
 mu_length = list()
 n_daughters = list()
 
-for i in range(10000):
+for i in range(100):
     mu.length = NaN
     # returns None instead of an I3MMCTrack
     daughters = propagator.Propagate(mu)
