@@ -7,9 +7,18 @@ from icecube import icetray
 from icecube import PROPOSAL
 from icecube import simclasses
 
-ptype = dc.I3Particle.STauMinus
+import numpy as np
+
+import os
+import sys
+
+os.chdir(sys.path[0])
+
+# ptype = dc.I3Particle.STauMinus
+ptype = dc.I3Particle.MuMinus
 propagator = PROPOSAL.I3PropagatorServicePROPOSAL(
-    type=ptype
+    type=ptype,
+    mediadef="../configuration_IceOnly"
     # type=ptype,
     # particleMass=1000
 )
@@ -24,6 +33,10 @@ mu.location_type = dc.I3Particle.InIce
 
 mu_length = list()
 n_daughters = list()
+
+primary_energy_epair = list()
+secondary_energy_epair = list()
+
 for i in range(10000):
     mu.length = NaN
     # returns None instead of an I3MMCTrack
@@ -31,6 +44,16 @@ for i in range(10000):
     # length of daughters is always 1
     mu_length.append(mu.length)
     n_daughters.append(len(daughters))
+
+    for particle in daughters:
+        # print("-------------------------------")
+        # print("particle type: ", particle.type)
+        # print("primary energy", particle.speed)
+        # print("secondary energy: ", particle.energy)
+
+        if particle.type == dc.I3Particle.PairProd:
+            primary_energy_epair.append(np.log10(particle.speed))
+            secondary_energy_epair.append(np.log10(particle.energy))
 try:
     import matplotlib as mpl
     mpl.use('Agg')
@@ -38,15 +61,28 @@ try:
 
     pylab.figure()
     pylab.title("Mu Lengths")
-    pylab.hist(mu_length, histtype = "step", log = True, bins = 100)
+    pylab.hist(mu_length, histtype="step", log=True, bins=100)
     pylab.xlabel(r'$l_{\mu}(\rm{m})$')
     pylab.savefig('MuonLenghts.png')
 
     pylab.figure()
     pylab.title("N Daughters")
-    pylab.hist(n_daughters, histtype = "step", log = True, bins = 100)
+    pylab.hist(n_daughters, histtype="step", log=True, bins=100)
     pylab.xlabel('N')
     pylab.savefig('Daughters.png')
+
+    from matplotlib.colors import LogNorm
+
+    pylab.figure()
+    pylab.title("Energyloss")
+    pylab.hist2d(
+        primary_energy_epair,
+        secondary_energy_epair,
+        bins=60,
+        norm=LogNorm()
+    )
+    pylab.colorbar()
+    pylab.savefig('Energyloss.png')
 except ImportError :
     print("pylab not installed.  no plots for you.")
 

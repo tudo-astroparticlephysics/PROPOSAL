@@ -534,7 +534,6 @@ I3MMCTrackPtr I3PropagatorServicePROPOSAL::propagate( I3Particle& p, vector<I3Pa
     // PROPOSALParticle* particle = new PROPOSALParticle(particleType, x_0, y_0, z_0, theta_0, phi_0, e_0, t_0);
     proposal->ResetParticle();
     PROPOSALParticle* particle = proposal->GetParticle();
-    printf("Mass: %f\n", particle->GetMass());
 
     if (particle == NULL)
         log_fatal("Error calling the Particle constructor");
@@ -609,6 +608,9 @@ I3MMCTrackPtr I3PropagatorServicePROPOSAL::propagate( I3Particle& p, vector<I3Pa
         new_particle.SetLength(l);
         new_particle.SetThetaPhi(theta,phi);
         new_particle.SetEnergy(e);
+
+        //TODO(mario): Damn hard hack Mi 2017/04/05
+        new_particle.SetSpeed(aobj_l.at(i)->GetParentParticleEnergy());
 
         // this is not the particle you're looking for
         // move along...and add it to the daughter list
