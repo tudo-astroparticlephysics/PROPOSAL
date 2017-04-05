@@ -1,6 +1,7 @@
 .svn
 .ycm_extra_conf.py
 resources/tables/*
+build/
 !resources/tables/generate_tables.py
 .DS_Store
 **/Test/TestFiles*/

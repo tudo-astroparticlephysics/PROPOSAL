@@ -237,7 +237,7 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    double GetParametrization() const
+    int GetParametrization() const
     {
         return parametrization_;
     }
