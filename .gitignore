@@ -4,3 +4,4 @@ resources/tables/*
 !resources/tables/generate_tables.py
 .DS_Store
 **/Test/TestFiles*/
+*.png
