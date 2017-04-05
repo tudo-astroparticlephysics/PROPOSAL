@@ -2444,6 +2444,12 @@ void Propagator::RestoreBackup_particle()
     particle_ = new PROPOSALParticle(*backup_particle_);
 }
 
+void Propagator::ResetParticle()
+{
+    // particle_ = new PROPOSALParticle(*backup_particle_);
+    *particle_ = *backup_particle_;
+}
+
 void Propagator::InitGeometry(Geometry* geometry, std::deque<std::string>* token, string first_token)
 {
     string taux = first_token;

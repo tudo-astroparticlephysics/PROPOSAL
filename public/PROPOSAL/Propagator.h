@@ -263,6 +263,7 @@ public:
     bool GetStopping_decay() const;
     void SetStopping_decay(bool stopping_decay);
     void RestoreBackup_particle();
+    void ResetParticle();
 };
 
 #endif // _PROPAGATOR_H
