@@ -1319,7 +1319,7 @@ int main()
             {
                 case 1:
                     hydrogen_para1_gr->Add(graphs.at(i),"P");
-                    hydrogen_para1_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    hydrogen_para1_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (hydrogen_para1_gr->GetListOfGraphs()->Capacity())
                     {
                         case 1:
@@ -1335,7 +1335,7 @@ int main()
                     break;
                 case 2:
                     hydrogen_para2_gr->Add(graphs.at(i),"P");
-                    hydrogen_para2_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    hydrogen_para2_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (hydrogen_para2_gr->GetListOfGraphs()->Capacity())
                     {
                         case 1:
@@ -1351,7 +1351,7 @@ int main()
                     break;
                 case 3:
                     hydrogen_para3_gr->Add(graphs.at(i),"P");
-                    hydrogen_para3_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    hydrogen_para3_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (hydrogen_para3_gr->GetListOfGraphs()->Capacity())
                     {
                         case 1:
@@ -1367,7 +1367,7 @@ int main()
                     break;
                 case 4:
                     hydrogen_para4_gr->Add(graphs.at(i),"P");
-                    hydrogen_para4_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    hydrogen_para4_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (hydrogen_para4_gr->GetListOfGraphs()->Capacity())
                     {
                         case 1:
@@ -1383,7 +1383,7 @@ int main()
                     break;
                 case 5:
                     hydrogen_para5_gr->Add(graphs.at(i),"P");
-                    hydrogen_para5_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    hydrogen_para5_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (hydrogen_para5_gr->GetListOfGraphs()->Capacity())
                     {
                         case 1:
@@ -1399,7 +1399,7 @@ int main()
                     break;
                 case 6:
                     hydrogen_para6_gr->Add(graphs.at(i),"P");
-                    hydrogen_para6_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    hydrogen_para6_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (hydrogen_para6_gr->GetListOfGraphs()->Capacity())
                     {
                         case 1:
@@ -1415,7 +1415,7 @@ int main()
                     break;
                 case 7:
                     hydrogen_para7_gr->Add(graphs.at(i),"P");
-                    hydrogen_para7_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    hydrogen_para7_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (hydrogen_para7_gr->GetListOfGraphs()->Capacity())
                     {
                         case 1:
@@ -1431,7 +1431,7 @@ int main()
                     break;
                 case 8:
                     hydrogen_para8_gr->Add(graphs.at(i),"P");
-                    hydrogen_para8_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    hydrogen_para8_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (hydrogen_para8_gr->GetListOfGraphs()->Capacity())
                     {
                         case 1:
@@ -1447,7 +1447,7 @@ int main()
                     break;
                 case 9:
                     hydrogen_para9_gr->Add(graphs.at(i),"P");
-                    hydrogen_para9_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    hydrogen_para9_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (hydrogen_para9_gr->GetListOfGraphs()->Capacity())
                     {
                         case 1:
@@ -1463,7 +1463,7 @@ int main()
                     break;
                 case 10:
                     hydrogen_para10_gr->Add(graphs.at(i),"P");
-                    hydrogen_para10_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    hydrogen_para10_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (hydrogen_para10_gr->GetListOfGraphs()->Capacity())
                     {
                         case 1:
@@ -1479,7 +1479,7 @@ int main()
                     break;
                 case 11:
                     hydrogen_para11_gr->Add(graphs.at(i),"P");
-                    hydrogen_para11_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    hydrogen_para11_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (hydrogen_para11_gr->GetListOfGraphs()->Capacity())
                     {
                         case 1:
@@ -1495,7 +1495,7 @@ int main()
                     break;
                 case 12:
                     hydrogen_para12_gr->Add(graphs.at(i),"P");
-                    hydrogen_para12_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    hydrogen_para12_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (hydrogen_para12_gr->GetListOfGraphs()->Capacity())
                     {
                         case 1:
@@ -1511,7 +1511,7 @@ int main()
                     break;
                 case 13:
                     hydrogen_para13_gr->Add(graphs.at(i),"P");
-                    hydrogen_para13_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    hydrogen_para13_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (hydrogen_para13_gr->GetListOfGraphs()->Capacity())
                     {
                         case 1:
@@ -1527,7 +1527,7 @@ int main()
                     break;
                 case 14:
                     hydrogen_para14_gr->Add(graphs.at(i),"P");
-                    hydrogen_para14_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    hydrogen_para14_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (hydrogen_para14_gr->GetListOfGraphs()->Capacity())
                     {
                         case 1:
@@ -1549,7 +1549,7 @@ int main()
             {
                 case 1:
                     water_para1_gr->Add(graphs.at(i),"P");
-                    water_para1_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    water_para1_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (water_para1_gr->GetListOfGraphs()->Capacity())
                     {
                         case 1:
@@ -1565,7 +1565,7 @@ int main()
                     break;
                 case 2:
                     water_para2_gr->Add(graphs.at(i),"P");
-                    water_para2_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    water_para2_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (water_para2_gr->GetListOfGraphs()->Capacity())
                     {
                         case 1:
@@ -1581,7 +1581,7 @@ int main()
                     break;
                 case 3:
                     water_para3_gr->Add(graphs.at(i),"P");
-                    water_para3_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    water_para3_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (water_para3_gr->GetListOfGraphs()->Capacity())
                     {
                         case 1:
@@ -1597,7 +1597,7 @@ int main()
                     break;
                 case 4:
                     water_para4_gr->Add(graphs.at(i),"P");
-                    water_para4_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    water_para4_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (water_para4_gr->GetListOfGraphs()->Capacity())
                     {
                         case 1:
@@ -1613,7 +1613,7 @@ int main()
                     break;
                 case 5:
                     water_para5_gr->Add(graphs.at(i),"P");
-                    water_para5_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    water_para5_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (water_para5_gr->GetListOfGraphs()->Capacity())
                     {
                         case 1:
@@ -1629,7 +1629,7 @@ int main()
                     break;
                 case 6:
                     water_para6_gr->Add(graphs.at(i),"P");
-                    water_para6_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    water_para6_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (water_para6_gr->GetListOfGraphs()->Capacity())
                     {
                         case 1:
@@ -1645,7 +1645,7 @@ int main()
                     break;
                 case 7:
                     water_para7_gr->Add(graphs.at(i),"P");
-                    water_para7_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    water_para7_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (water_para7_gr->GetListOfGraphs()->Capacity())
                     {
                         case 1:
@@ -1661,7 +1661,7 @@ int main()
                     break;
                 case 8:
                     water_para8_gr->Add(graphs.at(i),"P");
-                    water_para8_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    water_para8_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (water_para8_gr->GetListOfGraphs()->Capacity())
                     {
                         case 1:
@@ -1677,7 +1677,7 @@ int main()
                     break;
                 case 9:
                     water_para9_gr->Add(graphs.at(i),"P");
-                    water_para9_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    water_para9_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (water_para9_gr->GetListOfGraphs()->Capacity())
                     {
                         case 1:
@@ -1693,7 +1693,7 @@ int main()
                     break;
                 case 10:
                     water_para10_gr->Add(graphs.at(i),"P");
-                    water_para10_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    water_para10_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (water_para10_gr->GetListOfGraphs()->Capacity())
                     {
                         case 1:
@@ -1709,7 +1709,7 @@ int main()
                     break;
                 case 11:
                     water_para11_gr->Add(graphs.at(i),"P");
-                    water_para11_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    water_para11_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (water_para11_gr->GetListOfGraphs()->Capacity())
                     {
                         case 1:
@@ -1725,7 +1725,7 @@ int main()
                     break;
                 case 12:
                     water_para12_gr->Add(graphs.at(i),"P");
-                    water_para12_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    water_para12_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (water_para12_gr->GetListOfGraphs()->Capacity())
                     {
                         case 1:
@@ -1741,7 +1741,7 @@ int main()
                     break;
                 case 13:
                     water_para13_gr->Add(graphs.at(i),"P");
-                    water_para13_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    water_para13_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (water_para13_gr->GetListOfGraphs()->Capacity())
                     {
                         case 1:
@@ -1757,7 +1757,7 @@ int main()
                     break;
                 case 14:
                     water_para14_gr->Add(graphs.at(i),"P");
-                    water_para14_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    water_para14_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (water_para14_gr->GetListOfGraphs()->Capacity())
                     {
                         case 1:
@@ -1779,7 +1779,7 @@ int main()
             {
                 case 1:
                     uranium_para1_gr->Add(graphs.at(i),"P");
-                    uranium_para1_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    uranium_para1_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (uranium_para1_gr->GetListOfGraphs()->Capacity())
                     {
                         case 1:
@@ -1795,7 +1795,7 @@ int main()
                     break;
                 case 2:
                     uranium_para2_gr->Add(graphs.at(i),"P");
-                    uranium_para2_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    uranium_para2_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (uranium_para2_gr->GetListOfGraphs()->Capacity())
                     {
                         case 1:
@@ -1811,7 +1811,7 @@ int main()
                     break;
                 case 3:
                     uranium_para3_gr->Add(graphs.at(i),"P");
-                    uranium_para3_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    uranium_para3_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (uranium_para3_gr->GetListOfGraphs()->Capacity())
                     {
                         case 1:
@@ -1827,7 +1827,7 @@ int main()
                     break;
                 case 4:
                     uranium_para4_gr->Add(graphs.at(i),"P");
-                    uranium_para4_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    uranium_para4_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (uranium_para4_gr->GetListOfGraphs()->Capacity())
                     {
                         case 1:
@@ -1843,7 +1843,7 @@ int main()
                     break;
                 case 5:
                     uranium_para5_gr->Add(graphs.at(i),"P");
-                    uranium_para5_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    uranium_para5_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (uranium_para5_gr->GetListOfGraphs()->Capacity())
                     {
                         case 1:
@@ -1859,7 +1859,7 @@ int main()
                     break;
                 case 6:
                     uranium_para6_gr->Add(graphs.at(i),"P");
-                    uranium_para6_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    uranium_para6_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (uranium_para6_gr->GetListOfGraphs()->Capacity())
                     {
                         case 1:
@@ -1875,7 +1875,7 @@ int main()
                     break;
                 case 7:
                     uranium_para7_gr->Add(graphs.at(i),"P");
-                    uranium_para7_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    uranium_para7_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (uranium_para7_gr->GetListOfGraphs()->Capacity())
                     {
                         case 1:
@@ -1891,7 +1891,7 @@ int main()
                     break;
                 case 8:
                     uranium_para8_gr->Add(graphs.at(i),"P");
-                    uranium_para8_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    uranium_para8_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (uranium_para8_gr->GetListOfGraphs()->Capacity())
                     {
                         case 1:
@@ -1907,7 +1907,7 @@ int main()
                     break;
                 case 9:
                     uranium_para9_gr->Add(graphs.at(i),"P");
-                    uranium_para9_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    uranium_para9_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (uranium_para9_gr->GetListOfGraphs()->Capacity())
                     {
                         case 1:
@@ -1923,7 +1923,7 @@ int main()
                     break;
                 case 10:
                     uranium_para10_gr->Add(graphs.at(i),"P");
-                    uranium_para10_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    uranium_para10_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (uranium_para10_gr->GetListOfGraphs()->Capacity())
                     {
                         case 1:
@@ -1939,7 +1939,7 @@ int main()
                     break;
                 case 11:
                     uranium_para11_gr->Add(graphs.at(i),"P");
-                    uranium_para11_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    uranium_para11_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (uranium_para11_gr->GetListOfGraphs()->Capacity())
                     {
                         case 1:
@@ -1955,7 +1955,7 @@ int main()
                     break;
                 case 12:
                     uranium_para12_gr->Add(graphs.at(i),"P");
-                    uranium_para12_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    uranium_para12_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (uranium_para12_gr->GetListOfGraphs()->Capacity())
                     {
                         case 1:
@@ -1971,7 +1971,7 @@ int main()
                     break;
                 case 13:
                     uranium_para13_gr->Add(graphs.at(i),"P");
-                    uranium_para13_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    uranium_para13_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (uranium_para13_gr->GetListOfGraphs()->Capacity())
                     {
                         case 1:
@@ -1987,7 +1987,7 @@ int main()
                     break;
                 case 14:
                     uranium_para14_gr->Add(graphs.at(i),"P");
-                    uranium_para14_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
+                    uranium_para14_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (uranium_para14_gr->GetListOfGraphs()->Capacity())
                     {
                         case 1:
