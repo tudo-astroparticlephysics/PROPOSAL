@@ -4,6 +4,9 @@ cmake_minimum_required(VERSION 2.8)
 FIND_PACKAGE( Boost COMPONENTS program_options REQUIRED )
 set(LIBRARYS_TO_LINK ${Boost_LIBRARIES})
 
+find_package( PythonLibs 2.7 REQUIRED )
+include_directories( ${PYTHON_INCLUDE_DIRS} )
+
 # Load some basic macros which are needed later on
 include(FindROOT.cmake)
 
@@ -42,7 +45,7 @@ endif()
 
 SET(ICETRAY_INCLUDE_PATH "/home/koehne/Simulation/icesim4_candidate/V04-00-01-RC/icetray/public/")
 
-include_directories("${PROJECT_SOURCE_DIR}/public" ${GTEST_INCLUDE_DIR} ${LOG4CPLUS_INCLUDE_DIR} ${Boost_INCLUDE_DIR} )
+include_directories("${PROJECT_SOURCE_DIR}/public" "${PROJECT_SOURCE_DIR}/private" ${GTEST_INCLUDE_DIR} ${LOG4CPLUS_INCLUDE_DIR} ${Boost_INCLUDE_DIR} )
 
 #if ROOT is found ROOT files with ROOT trees can be written
 IF(ROOT_FOUND)
@@ -109,6 +112,17 @@ add_library(PROPOSAL
         private/PROPOSAL/ScatteringMoliere.cxx
         private/PROPOSAL/Output.cxx
 	)
+
+add_library(pyPROPOSAL SHARED private/python/test.cxx)
+add_library(pyPROPOSAL_ext SHARED private/python/python_test.cxx)
+# target_link_libraries(pyPROPOSAL_ext ${Boost_LIBRARIES} pyPROPOSAL)
+target_link_libraries (pyPROPOSAL_ext
+    boost_python
+    ${PYTHON_LIBRARIES}
+    ${Boost_LIBRARIES}
+	pyPROPOSAL
+)
+set_target_properties(pyPROPOSAL_ext PROPERTIES PREFIX "")
 
 set_target_properties(PROPOSAL PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -O2")# -Wextra -pedantic")
 
