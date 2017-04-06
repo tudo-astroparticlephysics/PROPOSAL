@@ -1,11 +1,12 @@
 cmake_minimum_required(VERSION 2.8)
 
-    add_definitions(-DPROPOSAL_STANDALONE=1)
+add_definitions(-DPROPOSAL_STANDALONE=1)
 FIND_PACKAGE( Boost COMPONENTS program_options REQUIRED )
 set(LIBRARYS_TO_LINK ${Boost_LIBRARIES})
 
 find_package( PythonLibs 2.7 REQUIRED )
 include_directories( ${PYTHON_INCLUDE_DIRS} )
+
 
 # Load some basic macros which are needed later on
 include(FindROOT.cmake)
@@ -113,22 +114,28 @@ add_library(PROPOSAL
         private/PROPOSAL/Output.cxx
 	)
 
-add_library(pyPROPOSAL SHARED private/python/test.cxx)
-add_library(pyPROPOSAL_ext SHARED private/python/python_test.cxx)
-# target_link_libraries(pyPROPOSAL_ext ${Boost_LIBRARIES} pyPROPOSAL)
-target_link_libraries (pyPROPOSAL_ext
+# add_library(pyPROPOSAL SHARED private/python/test.cxx)
+add_library(pyPROPOSAL SHARED private/python/python_test.cxx)
+# target_link_libraries(pyPROPOSAL_ext ${Boost_LIBRARIES} PROPOSAL)
+# target_link_libraries (PROPOSAL
+#     boost_python
+#     ${PYTHON_LIBRARIES}
+#     ${Boost_LIBRARIES}
+# 	pyPROPOSAL
+# )
+# set_target_properties(pyPROPOSAL_ext PROPERTIES PREFIX "")
+target_link_libraries (pyPROPOSAL
     boost_python
     ${PYTHON_LIBRARIES}
     ${Boost_LIBRARIES}
-	pyPROPOSAL
+	PROPOSAL
 )
-set_target_properties(pyPROPOSAL_ext PROPERTIES PREFIX "")
-
-set_target_properties(PROPOSAL PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -O2")# -Wextra -pedantic")
+set_target_properties(pyPROPOSAL PROPERTIES PREFIX "")
 
 
+set_target_properties(PROPOSAL PROPERTIES PREFIX "" COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -O2")# -Wextra -pedantic")
 
-target_link_libraries(PROPOSAL ${LIBRARYS_TO_LINK}  )
+target_link_libraries(PROPOSAL ${LIBRARYS_TO_LINK})
 
 
 add_executable(PROPOSALtest
