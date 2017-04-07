@@ -2,16 +2,117 @@
 #include <boost/python/overloads.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include <string>
+
 #include "PROPOSAL/PROPOSALParticle.h"
 #include "PROPOSAL/Propagator.h"
+#include "PROPOSAL/Medium.h"
+#include "PROPOSAL/EnergyCutSettings.h"
 
 
-// BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getName_overloads , PROPOSALParticle::GetName, 0, 1)
+template<typename T>
+struct VectorToPythonList
+{
+    // static PyObject* convert(std::vector<T> const& v)
+    static PyObject* convert(std::vector<T> const& vec)
+    {
+        boost::python::list python_list;
+        typename std::vector<T>::const_iterator iter;
+
+        for(iter = vec.begin(); iter != vec.end(); ++iter)
+        {
+            python_list.append(boost::python::object(*iter));
+        }
+
+        return boost::python::incref(python_list.ptr());
+    }
+};
+
+
+template<typename T>
+struct VectorFromPythonList
+{
+
+    VectorFromPythonList()
+    {
+        boost::python::converter::registry::push_back(&VectorFromPythonList<T>::convertible,
+                            &VectorFromPythonList<T>::construct,
+                            boost::python::type_id<std::vector<T> >());
+    }
+
+    // Determine if obj_ptr can be converted in a std::vector<T>
+    static void* convertible(PyObject* obj_ptr)
+    {
+        if (!PyList_Check(obj_ptr))
+        {
+            return 0;
+        }
+
+        return obj_ptr;
+    }
+
+    // Convert obj_ptr into a std::vector<T>
+    static void construct(PyObject* obj_ptr, boost::python::converter::rvalue_from_python_stage1_data* data)
+    {
+        // Use borrowed to construct the object so that a reference
+        // count will be properly handled.
+        boost::python::list python_list(boost::python::handle<>(boost::python::borrowed(obj_ptr)));
+
+        // Grab pointer to memory into which to construct the new std::vector<T>
+        void* storage = reinterpret_cast<boost::python::converter::rvalue_from_python_storage<std::vector<T>>*>(data)->storage.bytes;
+
+        // in-place construct the new std::vector<T> using the character data
+        // extraced from the python object
+        std::vector<T>& vec = *(new (storage) std::vector<T>());
+
+        // populate the vector from list contains !!!
+        int lenght = boost::python::len(python_list);
+        vec.resize(lenght);
+
+        for(int i = 0; i != lenght; ++i)
+        {
+            vec[i] = boost::python::extract<T>(python_list[i]);
+        }
+
+        // Stash the memory chunk pointer for later use by boost.python
+        data->convertible = storage;
+    }
+};
+
+/******************************************************************************
+*                               Python Module                                *
+******************************************************************************/
 
 BOOST_PYTHON_MODULE(pyPROPOSAL)
 {
 
     using namespace boost::python;
+
+    // --------------------------------------------------------------------- //
+    // Vector classes
+    // --------------------------------------------------------------------- //
+
+    // register the to-python converter
+    to_python_converter< std::vector<double>, VectorToPythonList<double> >();
+    to_python_converter< std::vector<std::string>, VectorToPythonList<std::string> >();
+    to_python_converter< std::vector<PROPOSALParticle*>, VectorToPythonList<PROPOSALParticle*> >();
+
+    // register the from-python converter
+    VectorFromPythonList<double>();
+    VectorFromPythonList<std::string>();
+    VectorFromPythonList<PROPOSALParticle*>();
+
+    // class_<std::vector<double>>("DoubelVec")
+    //     .def(vector_indexing_suite<std::vector<double>>())
+    //     ;
+    //
+    // class_<std::vector<std::string>>("StringVec")
+    //     .def(vector_indexing_suite<std::vector<std::string>>())
+    //     ;
+    //
+    // class_<std::vector<PROPOSALParticle*>>("Secondarys")
+    //     .def(vector_indexing_suite<std::vector<PROPOSALParticle*>>())
+    //     ;
+
 
     // --------------------------------------------------------------------- //
     // ParticleType
@@ -47,7 +148,7 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
     // Particle
     // --------------------------------------------------------------------- //
 
-    std::string (PROPOSALParticle::*getName1)() const = &PROPOSALParticle::GetName;
+    std::string (PROPOSALParticle::*getNameParticle)() const = &PROPOSALParticle::GetName;
 
     class_<PROPOSALParticle, boost::shared_ptr<PROPOSALParticle>>("Particle",
                                                                   init<PROPOSALParticle::ParticleType>(
@@ -67,7 +168,7 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
             .add_property("mass", &PROPOSALParticle::GetMass, &PROPOSALParticle::SetMass)
             .add_property("lifetime", &PROPOSALParticle::GetLifetime, &PROPOSALParticle::SetLifetime)
             .add_property("charge", &PROPOSALParticle::GetCharge, &PROPOSALParticle::SetCharge)
-            .add_property("name", getName1)
+            .add_property("name", getNameParticle)
             .add_property("low", &PROPOSALParticle::GetLow, &PROPOSALParticle::SetLow)
             .add_property("type", &PROPOSALParticle::GetType, &PROPOSALParticle::SetType)
             .add_property("parent_particle_id", &PROPOSALParticle::GetParentParticleId, &PROPOSALParticle::SetParentParticleId)
@@ -96,12 +197,67 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
         ;
 
     // --------------------------------------------------------------------- //
-    // Propagator
+    // EnergyCutSettings
     // --------------------------------------------------------------------- //
 
-    class_<std::vector<PROPOSALParticle*>>("Secondarys")
-        .def(vector_indexing_suite<std::vector<PROPOSALParticle*>>())
+    class_<EnergyCutSettings, boost::shared_ptr<EnergyCutSettings>>("EnergyCutSettings",
+                                              init<double, double>(
+                                              (arg("ecut"),
+                                               arg("vcut"))))
+
+            .def(self_ns::str(self_ns::self))
+
+            .add_property("ecut", &EnergyCutSettings::GetEcut, &EnergyCutSettings::SetEcut)
+            .add_property("vcut", &EnergyCutSettings::GetVcut, &EnergyCutSettings::SetVcut)
+
+            .def("get_cut", &EnergyCutSettings::GetCut, "Return the lower from E*v = e")
         ;
+
+    // --------------------------------------------------------------------- //
+    // Medium
+    // --------------------------------------------------------------------- //
+
+    std::vector<std::string> (Medium::*getNameMed)() const = &Medium::GetElementName;
+
+    class_<Medium, boost::shared_ptr<Medium>>("Medium",
+                                              init<std::string, double>(
+                                              (arg("type"),
+                                               arg("rho")=1.0)))
+
+            .def(self_ns::str(self_ns::self))
+
+            .add_property("num_components", &Medium::GetNumComponents, &Medium::SetNumComponents)
+            .add_property("nuc_charge", &Medium::GetNucCharge, &Medium::SetNucCharge)
+            .add_property("atomic_num", &Medium::GetAtomicNum, &Medium::SetAtomicNum)
+            .add_property("atom_in_molecule", &Medium::GetAtomInMolecule, &Medium::SetAtomInMolecule)
+            .add_property("sum_charge", &Medium::GetSumCharge, &Medium::SetSumCharge)
+            .add_property("ZA", &Medium::GetZA, &Medium::SetZA)
+            .add_property("I", &Medium::GetI, &Medium::SetI)
+            .add_property("C1", &Medium::GetC1, &Medium::SetC1)
+            .add_property("C", &Medium::GetC, &Medium::SetC)
+            .add_property("A", &Medium::GetA, &Medium::SetA)
+            .add_property("M", &Medium::GetM, &Medium::SetM)
+            .add_property("X0", &Medium::GetX0, &Medium::SetX0)
+            .add_property("X1", &Medium::GetX1, &Medium::SetX1)
+            .add_property("D0", &Medium::GetD0, &Medium::SetD0)
+            .add_property("R", &Medium::GetR, &Medium::SetR)
+            .add_property("log_constant", &Medium::GetLogConstant)
+            .add_property("b_prime", &Medium::GetBPrime)
+            .add_property("rho", &Medium::GetRho, &Medium::SetRho)
+            .add_property("mass_density", &Medium::GetMassDensity, &Medium::SetMassDensity)
+            .add_property("average_nucleon_weight", &Medium::GetAverageNucleonWeight, &Medium::SetAverageNucleonWeight)
+            .add_property("element_name", getNameMed, &Medium::SetElementName)
+            .add_property("mol_density", &Medium::GetMolDensity, &Medium::SetMolDensity)
+            .add_property("name", &Medium::GetName, &Medium::SetName)
+            .add_property("MN", &Medium::GetMN, &Medium::SetMN)
+            .add_property("MM", &Medium::GetMM, &Medium::SetMM)
+            .add_property("sum_nucleons", &Medium::GetSumNucleons, &Medium::SetSumNucleons)
+            .add_property("R0", &Medium::GetR0, &Medium::SetR0)
+        ;
+
+    // --------------------------------------------------------------------- //
+    // Propagator
+    // --------------------------------------------------------------------- //
 
     class_<Propagator, boost::shared_ptr<Propagator>>("Propagator",
                                                       init<std::string, PROPOSALParticle*, bool>(
