@@ -1,3 +1,5 @@
+#define BOOST_PYTHON_MAX_ARITY 17
+
 #include <boost/python.hpp>
 #include <boost/python/overloads.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
@@ -7,6 +9,7 @@
 #include "PROPOSAL/Propagator.h"
 #include "PROPOSAL/Medium.h"
 #include "PROPOSAL/EnergyCutSettings.h"
+
 
 
 template<typename T>
@@ -101,23 +104,9 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
     VectorFromPythonList<std::string>();
     VectorFromPythonList<PROPOSALParticle*>();
 
-    // class_<std::vector<double>>("DoubelVec")
-    //     .def(vector_indexing_suite<std::vector<double>>())
-    //     ;
-    //
-    // class_<std::vector<std::string>>("StringVec")
-    //     .def(vector_indexing_suite<std::vector<std::string>>())
-    //     ;
-    //
-    // class_<std::vector<PROPOSALParticle*>>("Secondarys")
-    //     .def(vector_indexing_suite<std::vector<PROPOSALParticle*>>())
-    //     ;
-
-
     // --------------------------------------------------------------------- //
     // ParticleType
     // --------------------------------------------------------------------- //
-
 
     enum_<PROPOSALParticle::ParticleType>("ParticleType")
             .value("EPlus",                PROPOSALParticle::ParticleType::EPlus)
@@ -152,7 +141,7 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
 
     class_<PROPOSALParticle, boost::shared_ptr<PROPOSALParticle>>("Particle",
                                                                   init<PROPOSALParticle::ParticleType>(
-                                                                  (arg("type")=PROPOSALParticle::ParticleType::MuMinus)))
+                                                                  (arg("ptype")=PROPOSALParticle::ParticleType::MuMinus)))
 
             .def(self_ns::str(self_ns::self))
 
@@ -264,6 +253,41 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
                                                       (arg("config"),
                                                        arg("particle"),
                                                        arg("applyoptions")=true)))
+
+            .def(init<
+                 Medium*,
+                 EnergyCutSettings*,
+                 PROPOSALParticle::ParticleType,
+                 std::string,
+                 bool,
+                 bool,
+                 bool,
+                 bool,
+                 int,
+                 int,
+                 double,
+                 double,
+                 double,
+                 double,
+                 bool,
+                 int>(
+                (arg("medium"),
+                 arg("energy_cuts"),
+                 arg("ptype"),
+                 arg("path_to_tables"),
+                 arg("moliere") = true,
+                 arg("continuous_rand") = true,
+                 arg("exact_time") = true,
+                 arg("lpm") = true,
+                 arg("brems") = 1,
+                 arg("photo") = 12,
+                 arg("brems_multiplier") = 1,
+                 arg("photo_multiplier") = 1,
+                 arg("ioniz_multiplier") = 1,
+                 arg("epair_multiplier") = 1,
+                 arg("integrate") = false,
+                 arg("scattering_model") = 0
+                )))
 
             .def("propagate", &Propagator::propagate, (arg("max_distance_cm") = 1e20))
             .def("apply_options", &Propagator::ApplyOptions)

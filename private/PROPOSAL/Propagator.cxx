@@ -811,7 +811,6 @@ void Propagator::ChooseCurrentCollection(PROPOSALParticle* particle)
             continue;
         }
 
-
         if(detector_->IsParticleInfront(particle))
         {
             if(collections_.at(i)->GetLocation() != 0)
@@ -1484,6 +1483,9 @@ Propagator::Propagator(Medium* medium,
     detector_              = new Geometry();
     detector_->InitSphere(0,0,0,1e18,0);
     current_collection_->SetGeometry(detector_);
+
+    current_collection_->SetLocation(1); // Inside the detector
+    collections_.push_back(current_collection_);
 
     for(unsigned int i =0; i<current_collection_->GetCrosssections().size(); i++)
     {
