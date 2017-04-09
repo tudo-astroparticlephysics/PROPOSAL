@@ -9,13 +9,71 @@
 #include "PROPOSAL/Propagator.h"
 #include "PROPOSAL/Medium.h"
 #include "PROPOSAL/EnergyCutSettings.h"
+#include "PROPOSAL/ProcessCollection.h"
+#include "PROPOSAL/CrossSections.h"
+#include "PROPOSAL/Photonuclear.h"
+#include "PROPOSAL/Bremsstrahlung.h"
+#include "PROPOSAL/Epairproduction.h"
+#include "PROPOSAL/Ionization.h"
 
 
+// struct CrossSectionsWrap : CrossSections, boost::python::wrapper<CrossSections>
+// {
+//     CrossSectionsWrap(): CrossSections(), wrapper<CrossSections>(){}
+//
+//     // virtual double CalculatedEdx()
+//     // {
+//     //     return this->get_override("calculate_dEdx")();
+//     // }
+// };
+
+
+/******************************************************************************
+*                             Register functions                              *
+******************************************************************************/
+
+struct CrossSectionToPython
+{
+    static PyObject* convert(std::vector<CrossSections*> const& vec)
+    {
+        boost::python::list python_list;
+        typename std::vector<CrossSections*>::const_iterator iter;
+
+        for (unsigned int i = 0; i < vec.size(); ++i)
+        {
+            boost::python::object obj;
+            if (vec[i]->GetName().compare("Bremsstrahlung") == 0)
+            {
+                obj = boost::python::object((Bremsstrahlung*)vec[i]);
+            }
+            else if (vec[i]->GetName().compare("Photonuclear") == 0)
+            {
+                obj = boost::python::object((Photonuclear*)vec[i]);
+            }
+            else if (vec[i]->GetName().compare("Ionization") == 0)
+            {
+                obj = boost::python::object((Ionization*)vec[i]);
+            }
+            else if (vec[i]->GetName().compare("Epairproduction") == 0)
+            {
+                obj = boost::python::object((Epairproduction*)vec[i]);
+            }
+            else
+            {
+                boost::python::object obj(NULL);
+            }
+
+            python_list.append(obj);
+        }
+
+        PyObject* py = boost::python::incref(python_list.ptr());
+        return py;
+    }
+};
 
 template<typename T>
 struct VectorToPythonList
 {
-    // static PyObject* convert(std::vector<T> const& v)
     static PyObject* convert(std::vector<T> const& vec)
     {
         boost::python::list python_list;
@@ -82,7 +140,7 @@ struct VectorFromPythonList
 };
 
 /******************************************************************************
-*                               Python Module                                *
+*                               Python Module                                 *
 ******************************************************************************/
 
 BOOST_PYTHON_MODULE(pyPROPOSAL)
@@ -98,11 +156,20 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
     to_python_converter< std::vector<double>, VectorToPythonList<double> >();
     to_python_converter< std::vector<std::string>, VectorToPythonList<std::string> >();
     to_python_converter< std::vector<PROPOSALParticle*>, VectorToPythonList<PROPOSALParticle*> >();
+    to_python_converter< std::vector<ProcessCollection*>, VectorToPythonList<ProcessCollection*> >();
+
+    to_python_converter<std::vector<CrossSections*>, CrossSectionToPython>();
 
     // register the from-python converter
     VectorFromPythonList<double>();
     VectorFromPythonList<std::string>();
     VectorFromPythonList<PROPOSALParticle*>();
+    VectorFromPythonList<CrossSections*>();
+    VectorFromPythonList<ProcessCollection*>();
+
+    // class_<std::vector<CrossSections*> >("CrossSections")
+    //         .def(vector_indexing_suite<std::vector<CrossSections*> >())
+    //     ;
 
     // --------------------------------------------------------------------- //
     // ParticleType
@@ -300,5 +367,62 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
             .add_property("photo",&Propagator::GetPhoto ,&Propagator::SetPhoto)
             .add_property("path_to_tables",&Propagator::GetPath_to_tables ,&Propagator::SetPath_to_tables)
             .add_property("stopping_decay",&Propagator::GetStopping_decay ,&Propagator::SetStopping_decay)
+            .add_property("current_collection",make_function(&Propagator::GetCurrentCollection, return_value_policy<reference_existing_object>()))
+            .add_property("collections",&Propagator::GetCollections)
+        ;
+
+    // --------------------------------------------------------------------- //
+    // Cross sections
+    // --------------------------------------------------------------------- //
+
+    double (CrossSections::*CalculatedNdx)() = &CrossSections::CalculatedNdx;
+    double (CrossSections::*CalculatedNdxRnd)(double) = &CrossSections::CalculatedNdx;
+
+    class_<CrossSections, boost::shared_ptr<CrossSections>, boost::noncopyable>("CrossSections", no_init)
+
+            .def(self_ns::str(self_ns::self))
+
+            .add_property("cut_setting", make_function(&CrossSections::GetEnergyCutSettings, return_value_policy<reference_existing_object>()), &CrossSections::SetEnergyCutSettings)
+            .add_property("medium", make_function(&CrossSections::GetMedium, return_value_policy<reference_existing_object>()), &CrossSections::SetMedium)
+            .add_property("parametrization", &CrossSections::GetParametrization, &CrossSections::SetParametrization)
+            .add_property("name", &CrossSections::GetName)
+            .add_property("particle", make_function(&CrossSections::GetParticle, return_value_policy<reference_existing_object>()))
+
+            .def("calculate_dEdx", &CrossSections::CalculatedEdx, "Calculates dE/dx")
+            .def("calculate_dNdx", CalculatedNdx, "Calculates dN/dx")
+            .def("calculate_dNdx", CalculatedNdxRnd, "Calculates dN/dx with random number rnd")
+            .def("enable_dEdx_interpolation", &CrossSections::EnableDEdxInterpolation, (arg("path") = "", arg("raw") = false))
+            .def("enable_dNdx_interpolation", &CrossSections::EnableDNdxInterpolation, (arg("path") = "", arg("raw") = false))
+            .def("disable_dEdx_interpolation", &CrossSections::DisableDEdxInterpolation)
+            .def("disable_dNdx_interpolation", &CrossSections::DisableDNdxInterpolation)
+        ;
+
+    class_<Photonuclear, boost::shared_ptr<Photonuclear>, bases<CrossSections>>("Photonuclear", init<PROPOSALParticle*, Medium*, EnergyCutSettings*>())
+        ;
+    class_<Epairproduction, boost::shared_ptr<Epairproduction>, bases<CrossSections>>("Epairproduction", init<PROPOSALParticle*, Medium*, EnergyCutSettings*>())
+        ;
+    class_<Bremsstrahlung, boost::shared_ptr<Bremsstrahlung>, bases<CrossSections>>("Bremsstrahlung", init<PROPOSALParticle*, Medium*, EnergyCutSettings*>())
+        ;
+    class_<Ionization, boost::shared_ptr<Ionization>, bases<CrossSections>>("Ionization", init<PROPOSALParticle*, Medium*, EnergyCutSettings*>())
+        ;
+
+    // ------------------------------------------------------------------------- //
+    // ProcessCollection
+    // ------------------------------------------------------------------------- //
+
+    class_<ProcessCollection, boost::shared_ptr<ProcessCollection>>("ProcessCollection",
+                                                                    init<PROPOSALParticle*, Medium*, EnergyCutSettings*>(
+                                                                    (arg("particle"),
+                                                                     arg("medium"),
+                                                                     arg("energy_cut"))))
+
+            .def(self_ns::str(self_ns::self))
+
+            .add_property("cut_setting", make_function(&ProcessCollection::GetCutSettings, return_value_policy<reference_existing_object>()), &ProcessCollection::SetCutSettings)
+            .add_property("medium", make_function(&ProcessCollection::GetMedium, return_value_policy<reference_existing_object>()), &ProcessCollection::SetMedium)
+            .add_property("location", &ProcessCollection::GetLocation, &ProcessCollection::SetLocation)
+            .add_property("cross_sections", &ProcessCollection::GetCrosssections, &ProcessCollection::SetCrosssections)
         ;
 }
+
+
