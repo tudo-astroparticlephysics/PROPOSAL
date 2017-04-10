@@ -1553,7 +1553,11 @@ Propagator::Propagator(Medium* medium,
 
     if(!integrate_)
     {
+
+        cout << "Starting Interpolation! This will take some time depending on the number of media you defined!\n";
+        cout.flush();
         EnableInterpolation(path_to_tables_, raw_);
+        cout << "Done!\n";
     }
 
 }
