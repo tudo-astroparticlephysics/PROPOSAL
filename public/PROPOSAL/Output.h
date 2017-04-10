@@ -91,7 +91,8 @@ private:
     Output()
     {
         #if LOG4CPLUS_SUPPORT
-        PropertyConfigurator::doConfigure(LOG4CPLUS_TEXT("resources/log4cplus.conf"));
+        // PropertyConfigurator::doConfigure(LOG4CPLUS_TEXT("resources/log4cplus.conf"));
+        PropertyConfigurator::doConfigure(LOG4CPLUS_TEXT(LOG4CPLUS_CONFIG));
         logger = Logger::getInstance(LOG4CPLUS_TEXT("PROPOSAL"));
         #endif
     }
