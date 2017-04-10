@@ -148,6 +148,8 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
 
     using namespace boost::python;
 
+    docstring_options doc_options(true, true, false);
+
     // --------------------------------------------------------------------- //
     // Vector classes
     // --------------------------------------------------------------------- //
@@ -208,9 +210,10 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
 
     class_<PROPOSALParticle, boost::shared_ptr<PROPOSALParticle>>("Particle",
                                                                   init<PROPOSALParticle::ParticleType>(
-                                                                  (arg("ptype")=PROPOSALParticle::ParticleType::MuMinus)))
+                                                                  (arg("particle_type")=PROPOSALParticle::ParticleType::MuMinus)))
 
             .def(self_ns::str(self_ns::self))
+            .def(self_ns::repr(self_ns::self))
 
             .add_property("energy", &PROPOSALParticle::GetEnergy, &PROPOSALParticle::SetEnergy)
             .add_property("propagated_distance", &PROPOSALParticle::GetPropagatedDistance, &PROPOSALParticle::SetPropagatedDistance)
@@ -256,12 +259,11 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
     // EnergyCutSettings
     // --------------------------------------------------------------------- //
 
-    class_<EnergyCutSettings, boost::shared_ptr<EnergyCutSettings>>("EnergyCutSettings",
-                                              init<double, double>(
-                                              (arg("ecut"),
-                                               arg("vcut"))))
+    class_<EnergyCutSettings, boost::shared_ptr<EnergyCutSettings>>("EnergyCutSettings", init<>())
 
+            .def(init<double, double>((arg("ecut"), arg("vcut"))))
             .def(self_ns::str(self_ns::self))
+            .def(self_ns::repr(self_ns::self))
 
             .add_property("ecut", &EnergyCutSettings::GetEcut, &EnergyCutSettings::SetEcut)
             .add_property("vcut", &EnergyCutSettings::GetVcut, &EnergyCutSettings::SetVcut)
@@ -275,12 +277,11 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
 
     std::vector<std::string> (Medium::*getNameMed)() const = &Medium::GetElementName;
 
-    class_<Medium, boost::shared_ptr<Medium>>("Medium",
-                                              init<std::string, double>(
-                                              (arg("type"),
-                                               arg("rho")=1.0)))
+    class_<Medium, boost::shared_ptr<Medium>>("Medium", init<>())
 
+            .def(init<std::string, double>((arg("medium_type"), arg("rho")=1.0)))
             .def(self_ns::str(self_ns::self))
+            .def(self_ns::repr(self_ns::self))
 
             .add_property("num_components", &Medium::GetNumComponents, &Medium::SetNumComponents)
             .add_property("nuc_charge", &Medium::GetNucCharge, &Medium::SetNucCharge)
@@ -340,7 +341,7 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
                  int>(
                 (arg("medium"),
                  arg("energy_cuts"),
-                 arg("ptype"),
+                 arg("particle_type"),
                  arg("path_to_tables"),
                  arg("moliere") = true,
                  arg("continuous_rand") = true,
@@ -381,6 +382,7 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
     class_<CrossSections, boost::shared_ptr<CrossSections>, boost::noncopyable>("CrossSections", no_init)
 
             .def(self_ns::str(self_ns::self))
+            .def(self_ns::repr(self_ns::self))
 
             .add_property("cut_setting", make_function(&CrossSections::GetEnergyCutSettings, return_value_policy<reference_existing_object>()), &CrossSections::SetEnergyCutSettings)
             .add_property("medium", make_function(&CrossSections::GetMedium, return_value_policy<reference_existing_object>()), &CrossSections::SetMedium)
@@ -398,25 +400,31 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
         ;
 
     class_<Photonuclear, boost::shared_ptr<Photonuclear>, bases<CrossSections>>("Photonuclear", init<PROPOSALParticle*, Medium*, EnergyCutSettings*>())
+            .def(self_ns::str(self_ns::self))
+            .def(self_ns::repr(self_ns::self))
         ;
     class_<Epairproduction, boost::shared_ptr<Epairproduction>, bases<CrossSections>>("Epairproduction", init<PROPOSALParticle*, Medium*, EnergyCutSettings*>())
+            .def(self_ns::str(self_ns::self))
+            .def(self_ns::repr(self_ns::self))
         ;
     class_<Bremsstrahlung, boost::shared_ptr<Bremsstrahlung>, bases<CrossSections>>("Bremsstrahlung", init<PROPOSALParticle*, Medium*, EnergyCutSettings*>())
+            .def(self_ns::str(self_ns::self))
+            .def(self_ns::repr(self_ns::self))
         ;
     class_<Ionization, boost::shared_ptr<Ionization>, bases<CrossSections>>("Ionization", init<PROPOSALParticle*, Medium*, EnergyCutSettings*>())
+            .def(self_ns::str(self_ns::self))
+            .def(self_ns::repr(self_ns::self))
         ;
 
     // ------------------------------------------------------------------------- //
     // ProcessCollection
     // ------------------------------------------------------------------------- //
 
-    class_<ProcessCollection, boost::shared_ptr<ProcessCollection>>("ProcessCollection",
-                                                                    init<PROPOSALParticle*, Medium*, EnergyCutSettings*>(
-                                                                    (arg("particle"),
-                                                                     arg("medium"),
-                                                                     arg("energy_cut"))))
+    class_<ProcessCollection, boost::shared_ptr<ProcessCollection>>("ProcessCollection", init<>())
 
+            .def(init<PROPOSALParticle*, Medium*, EnergyCutSettings*>((arg("particle"), arg("medium"), arg("energy_cut"))))
             .def(self_ns::str(self_ns::self))
+            .def(self_ns::repr(self_ns::self))
 
             .add_property("cut_setting", make_function(&ProcessCollection::GetCutSettings, return_value_policy<reference_existing_object>()), &ProcessCollection::SetCutSettings)
             .add_property("medium", make_function(&ProcessCollection::GetMedium, return_value_policy<reference_existing_object>()), &ProcessCollection::SetMedium)
