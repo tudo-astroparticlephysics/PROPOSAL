@@ -115,7 +115,7 @@ add_library(PROPOSAL
 	)
 
 # add_library(pyPROPOSAL SHARED private/python/test.cxx)
-add_library(pyPROPOSAL SHARED private/python/python_test.cxx)
+add_library(pyPROPOSAL SHARED private/python/pybindings.cxx)
 # target_link_libraries(pyPROPOSAL_ext ${Boost_LIBRARIES} PROPOSAL)
 # target_link_libraries (PROPOSAL
 #     boost_python
