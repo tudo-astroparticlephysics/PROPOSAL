@@ -608,6 +608,8 @@ void ProcessCollection::EnableInterpolation(std::string path, bool raw)
     }
     if(path.empty() || storing_failed)
     {
+        log_info("ProcessCollection parametrisation tables will be stored in memory!");
+
         double energy = particle_->GetEnergy();
 
         interpolant_        =   new Interpolant(NUM3, particle_->GetLow(), BIGENERGY, boost::bind(&ProcessCollection::FunctionToBuildInterpolant, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
