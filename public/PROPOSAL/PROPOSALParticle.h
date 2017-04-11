@@ -13,22 +13,15 @@
 #include "vector"
 #include <string>
 
-/**
-  * \brief This class provides the main particle properties and functions.
-  *
-  * All coordinates, angles and physical values are stored in this class.
-  */
 
 
-class PROPOSALParticle
+// ----------------------------------------------------------------------------
+/// @brief Particle enums
+// ----------------------------------------------------------------------------
+namespace PROPOSALParticleTypes
 {
-
-public:
-
-    // ----------------------------------------------------------------------------
-    /// @brief Particle enums
-    // ----------------------------------------------------------------------------
-    enum ParticleType { // NB: These match the PDG codes. Keep it that way!
+    enum ParticleType // NB: These match the PDG codes. Keep it that way!
+    {
         unknown = 0,
         Gamma = 22,
 
@@ -94,7 +87,17 @@ public:
         STauPlus = -9131,
         STauMinus = -9132
     };
+};
 
+typedef PROPOSALParticleTypes::ParticleType ParticleType;
+
+/**
+  * \brief This class provides the main particle properties and functions.
+  *
+  * All coordinates, angles and physical values are stored in this class.
+  */
+class PROPOSALParticle
+{
 private:
 
     double propagated_distance_; //!< propagation distance [cm]

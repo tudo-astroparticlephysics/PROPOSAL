@@ -37,7 +37,7 @@ TEST(Comparison , Comparison_equal ) {
 
     double dEdx;
     Medium *medium = new Medium("air",1.);
-    PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
     Bremsstrahlung *A = new Bremsstrahlung(particle, medium, cuts);
     Bremsstrahlung *B = new Bremsstrahlung(particle, medium, cuts);
@@ -67,8 +67,8 @@ TEST(Comparison , Comparison_not_equal ) {
 
     Medium *medium = new Medium("air",1.);
     Medium *medium2 = new Medium("water",1.);
-    PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::ParticleType::MuMinus,1.,1.,1,20,20,1e5,10);
-    PROPOSALParticle *particle2 = new PROPOSALParticle(PROPOSALParticle::ParticleType::TauMinus,1.,1.,1,20,20,1e5,10);
+    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,20,20,1e5,10);
+    PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,20,20,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
     Bremsstrahlung *A = new Bremsstrahlung(particle, medium, cuts);
     Bremsstrahlung *B = new Bremsstrahlung(particle, medium2, cuts);
@@ -99,7 +99,7 @@ TEST(Assignment , Copyconstructor ) {
 
 TEST(Assignment , Copyconstructor2 ) {
     Medium *medium = new Medium("air",1.);
-    PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
 
     Bremsstrahlung A(particle, medium, cuts);
@@ -111,7 +111,7 @@ TEST(Assignment , Copyconstructor2 ) {
 
 TEST(Assignment , Operator ) {
     Medium *medium = new Medium("air",1.);
-    PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
     Bremsstrahlung A(particle, medium, cuts);
     Bremsstrahlung B(particle, medium, cuts);
@@ -124,7 +124,7 @@ TEST(Assignment , Operator ) {
     EXPECT_TRUE(A==B);
 
     Medium *medium2 = new Medium("water",1.);
-    PROPOSALParticle *particle2 = new PROPOSALParticle(PROPOSALParticle::ParticleType::TauMinus,1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cuts2 = new EnergyCutSettings(200,-1);
     Bremsstrahlung *C = new Bremsstrahlung(particle2, medium2, cuts2);
     EXPECT_TRUE(A!=*C);
@@ -138,8 +138,8 @@ TEST(Assignment , Operator ) {
 TEST(Assignment , Swap ) {
     Medium *medium = new Medium("air",1.);
     Medium *medium2 = new Medium("air",1.);
-    PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
-    PROPOSALParticle *particle2 = new PROPOSALParticle(PROPOSALParticle::ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
     EnergyCutSettings *cuts2 = new EnergyCutSettings(500,-1);
     Bremsstrahlung A(particle, medium, cuts);
@@ -150,8 +150,8 @@ TEST(Assignment , Swap ) {
 
     Medium *medium3 = new Medium("water",1.);
     Medium *medium4 = new Medium("water",1.);
-    PROPOSALParticle *particle3 = new PROPOSALParticle(PROPOSALParticle::ParticleType::TauMinus,1.,1.,1,.20,20,1e5,10);
-    PROPOSALParticle *particle4 = new PROPOSALParticle(PROPOSALParticle::ParticleType::TauMinus,1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle3 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle4 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cuts3 = new EnergyCutSettings(200,-1);
     EnergyCutSettings *cuts4 = new EnergyCutSettings(200,-1);
     Bremsstrahlung *C = new Bremsstrahlung(particle3, medium3, cuts3);

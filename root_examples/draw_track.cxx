@@ -129,7 +129,7 @@ int main(int argc, char **argv)
     {
         switch(secondarys.at(i)->GetType())
         {
-            case PROPOSALParticle::ParticleType::EPair:
+            case ParticleType::EPair:
             {
                 TPolyMarker3D* m  = new TPolyMarker3D();
                 m->SetPoint(0,secondarys.at(i)->GetX(),secondarys.at(i)->GetY(),secondarys.at(i)->GetZ());
@@ -140,7 +140,7 @@ int main(int argc, char **argv)
                 break;
             }
 
-            case PROPOSALParticle::ParticleType::DeltaE:
+            case ParticleType::DeltaE:
             {
                 TPolyMarker3D* m  = new TPolyMarker3D();
                 m->SetPoint(0,secondarys.at(i)->GetX(),secondarys.at(i)->GetY(),secondarys.at(i)->GetZ());
@@ -151,7 +151,7 @@ int main(int argc, char **argv)
                 break;
             }
 
-            case PROPOSALParticle::ParticleType::Brems:
+            case ParticleType::Brems:
             {
                 TPolyMarker3D* m  = new TPolyMarker3D();
                 m->SetPoint(0,secondarys.at(i)->GetX(),secondarys.at(i)->GetY(),secondarys.at(i)->GetZ());
@@ -162,7 +162,7 @@ int main(int argc, char **argv)
                 break;
             }
 
-            case PROPOSALParticle::ParticleType::NuclInt:
+            case ParticleType::NuclInt:
             {
                 TPolyMarker3D* m  = new TPolyMarker3D();
                 m->SetPoint(0,secondarys.at(i)->GetX(),secondarys.at(i)->GetY(),secondarys.at(i)->GetZ());
@@ -173,7 +173,7 @@ int main(int argc, char **argv)
                 break;
             }
 
-            case (PROPOSALParticle::ParticleType::EMinus || PROPOSALParticle::ParticleType::EPlus):
+            case (ParticleType::EMinus || ParticleType::EPlus):
             {
                 TPolyMarker3D* m  = new TPolyMarker3D();
                 m->SetPoint(0,secondarys.at(i)->GetX(),secondarys.at(i)->GetY(),secondarys.at(i)->GetZ());

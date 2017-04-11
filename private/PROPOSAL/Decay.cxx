@@ -43,15 +43,15 @@ double Decay::CalculateProductEnergy( double ernd, double arnd, double srnd )
 {
     if(particle_->GetLifetime()<0)
     {
-        out_ = PROPOSALParticle::ParticleType::unknown;
+        out_ = ParticleType::unknown;
         return 0;
     }
     double emax, x0, f0, el, lm, pl;
-    PROPOSALParticle::ParticleType out1 = PROPOSALParticle::ParticleType::NuMu;
-    PROPOSALParticle::ParticleType out2 = PROPOSALParticle::ParticleType::NuMu;
+    ParticleType out1 = ParticleType::NuMu;
+    ParticleType out2 = ParticleType::NuMu;
 
     // Tau Decay
-    if (particle_->GetType() == PROPOSALParticle::ParticleType::TauMinus || particle_->GetType() == PROPOSALParticle::ParticleType::TauPlus)
+    if (particle_->GetType() == ParticleType::TauMinus || particle_->GetType() == ParticleType::TauPlus)
     {
 
         const double brmu   =   0.1737;         // ratio: tau- ---> mu + anti-munu + nu-tau
@@ -64,22 +64,22 @@ double Decay::CalculateProductEnergy( double ernd, double arnd, double srnd )
         {
             lm  =   MMU;
 
-            if (particle_->GetType() == PROPOSALParticle::ParticleType::TauPlus)
+            if (particle_->GetType() == ParticleType::TauPlus)
             {
-                out_ = PROPOSALParticle::ParticleType::MuPlus;
+                out_ = ParticleType::MuPlus;
                 if(store_neutrinos_)
                 {
-                    out1 = PROPOSALParticle::ParticleType::NuTauBar;
-                    out2 = PROPOSALParticle::ParticleType::NuMu;
+                    out1 = ParticleType::NuTauBar;
+                    out2 = ParticleType::NuMu;
                 }
             }
-            else if (particle_->GetType() == PROPOSALParticle::ParticleType::TauMinus)
+            else if (particle_->GetType() == ParticleType::TauMinus)
             {
-                out_ = PROPOSALParticle::ParticleType::MuMinus;
+                out_ = ParticleType::MuMinus;
                 if(store_neutrinos_)
                 {
-                    out1 = PROPOSALParticle::ParticleType::NuTau;
-                    out2 = PROPOSALParticle::ParticleType::NuMuBar;
+                    out1 = ParticleType::NuTau;
+                    out2 = ParticleType::NuMuBar;
                 }
             }
             else
@@ -91,24 +91,24 @@ double Decay::CalculateProductEnergy( double ernd, double arnd, double srnd )
         {
             lm  =   ME;
 
-            if (particle_->GetType() == PROPOSALParticle::ParticleType::TauPlus)
+            if (particle_->GetType() == ParticleType::TauPlus)
             {
-                out_ = PROPOSALParticle::ParticleType::EPlus;
+                out_ = ParticleType::EPlus;
 
                 if(store_neutrinos_)
                 {
-                    out1 = PROPOSALParticle::ParticleType::NuTauBar;
-                    out2 = PROPOSALParticle::ParticleType::NuE;
+                    out1 = ParticleType::NuTauBar;
+                    out2 = ParticleType::NuE;
                 }
             }
-            else if (particle_->GetType() == PROPOSALParticle::ParticleType::TauMinus)
+            else if (particle_->GetType() == ParticleType::TauMinus)
             {
-                out_ = PROPOSALParticle::ParticleType::EMinus;
+                out_ = ParticleType::EMinus;
 
                 if(store_neutrinos_)
                 {
-                    out1 = PROPOSALParticle::ParticleType::NuTau;
-                    out2 = PROPOSALParticle::ParticleType::NuEBar;
+                    out1 = ParticleType::NuTau;
+                    out2 = ParticleType::NuEBar;
                 }
             }
             else
@@ -136,7 +136,7 @@ double Decay::CalculateProductEnergy( double ernd, double arnd, double srnd )
             }
             el  =   (MTAU*MTAU + lm*lm) / (2*MTAU);
 
-            out_ = PROPOSALParticle::ParticleType::Hadrons;
+            out_ = ParticleType::Hadrons;
 
             el  =   el * (particle_->GetEnergy()/particle_->GetMass()) + sqrt(el*el - lm*lm) * (particle_->GetMomentum()/particle_->GetMass()) * (2*arnd-1);
 
@@ -144,15 +144,15 @@ double Decay::CalculateProductEnergy( double ernd, double arnd, double srnd )
             {
                 if( EndsWith(particle_->GetName(),"+") )
                 {
-                    out1 = PROPOSALParticle::ParticleType::NuTauBar;
+                    out1 = ParticleType::NuTauBar;
                 }
                 else if( EndsWith(particle_->GetName(),"-") )
                 {
-                    out1 = PROPOSALParticle::ParticleType::NuTau;
+                    out1 = ParticleType::NuTau;
                 }
                 else
                 {
-                    out1 = PROPOSALParticle::ParticleType::NuTau;
+                    out1 = ParticleType::NuTau;
                 }
                // o->output(1, out1, particle_->GetEnergy()-el, 0);
             }
@@ -164,24 +164,24 @@ double Decay::CalculateProductEnergy( double ernd, double arnd, double srnd )
     else
     {
         lm  =   ME;
-        if (particle_->GetType() == PROPOSALParticle::ParticleType::MuPlus)
+        if (particle_->GetType() == ParticleType::MuPlus)
         {
-            out_ = PROPOSALParticle::ParticleType::EPlus;
+            out_ = ParticleType::EPlus;
 
             if(store_neutrinos_)
             {
-                out1 = PROPOSALParticle::ParticleType::NuMuBar;
-                out2 = PROPOSALParticle::ParticleType::NuE;
+                out1 = ParticleType::NuMuBar;
+                out2 = ParticleType::NuE;
             }
         }
-        else if (particle_->GetType() == PROPOSALParticle::ParticleType::MuMinus)
+        else if (particle_->GetType() == ParticleType::MuMinus)
         {
-            out_ = PROPOSALParticle::ParticleType::EMinus;
+            out_ = ParticleType::EMinus;
 
             if(store_neutrinos_)
             {
-                out1 = PROPOSALParticle::ParticleType::NuMu;
-                out2 = PROPOSALParticle::ParticleType::NuEBar;
+                out1 = ParticleType::NuMu;
+                out2 = ParticleType::NuEBar;
             }
         }
         else
@@ -378,7 +378,7 @@ double Decay::DifferentiatedFunction(double x)
 //----------------------------------------------------------------------------//
 
 
-void Decay::SetOut(PROPOSALParticle::ParticleType out){
+void Decay::SetOut(ParticleType out){
     out_    =   out;
 }
 

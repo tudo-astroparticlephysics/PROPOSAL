@@ -145,7 +145,7 @@ public:
   I3PropagatorServicePROPOSAL& operator=(const I3PropagatorServicePROPOSAL&);
 
   // std::string GenerateMMCName(const I3Particle&);
-  PROPOSALParticle::ParticleType GeneratePROPOSALName(const I3Particle& p);
+  ParticleType GeneratePROPOSALName(const I3Particle& p);
 
   /**
    *Fills an I3MMCTrackList with position, time, and energy

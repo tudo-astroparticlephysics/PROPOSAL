@@ -42,9 +42,9 @@ int main()
 
     TFile *file     =   new TFile("Ionization_dNdx.root","RECREATE");
 
-    PROPOSALParticle *mu    =   new PROPOSALParticle(PROPOSALParticle::ParticleType::MuMinus);
-    PROPOSALParticle *tau   =   new PROPOSALParticle(PROPOSALParticle::ParticleType::TauMinus);
-    PROPOSALParticle *e     =   new PROPOSALParticle(PROPOSALParticle::ParticleType::EMinus);
+    PROPOSALParticle *mu    =   new PROPOSALParticle(ParticleType::MuMinus);
+    PROPOSALParticle *tau   =   new PROPOSALParticle(ParticleType::TauMinus);
+    PROPOSALParticle *e     =   new PROPOSALParticle(ParticleType::EMinus);
 
     Medium  *med1   =   new Medium("hydrogen",1.);
     Medium  *med2   =   new Medium("water",1.);
@@ -173,7 +173,7 @@ int main()
 
     for(unsigned int i = 0 ; i < graphs.size() ; i++)
     {
-        if(ioniz.at(i)->GetParticle()->GetType() == PROPOSALParticle::ParticleType::MuMinus)
+        if(ioniz.at(i)->GetParticle()->GetType() == ParticleType::MuMinus)
         {
             muons_gr->Add(graphs.at(i),"P");
             muons_leg->AddEntry(graphs.at(i),ioniz.at(i)->GetMedium()->GetName().c_str(),"p");
@@ -192,7 +192,7 @@ int main()
             }
 
         }
-        if(ioniz.at(i)->GetParticle()->GetType() == PROPOSALParticle::ParticleType::TauMinus)
+        if(ioniz.at(i)->GetParticle()->GetType() == ParticleType::TauMinus)
         {
             taus_gr->Add(graphs.at(i),"P");
             taus_leg->AddEntry(graphs.at(i),ioniz.at(i)->GetMedium()->GetName().c_str(),"p");
@@ -210,7 +210,7 @@ int main()
                     break;
             }
         }
-        if(ioniz.at(i)->GetParticle()->GetType() == PROPOSALParticle::ParticleType::EMinus)
+        if(ioniz.at(i)->GetParticle()->GetType() == ParticleType::EMinus)
         {
             electrons_gr->Add(graphs.at(i),"P");
             electrons_leg->AddEntry(graphs.at(i),ioniz.at(i)->GetMedium()->GetName().c_str(),"p");

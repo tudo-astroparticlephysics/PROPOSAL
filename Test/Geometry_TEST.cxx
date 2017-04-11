@@ -114,7 +114,7 @@ TEST(IsInside , Box ) {
     double y0   =   0;
     double z0   =   0;
 
-    PROPOSALParticle * particle = new PROPOSALParticle(PROPOSALParticle::ParticleType::MuMinus,x,y,z,theta,phi,0,0);
+    PROPOSALParticle * particle = new PROPOSALParticle(ParticleType::MuMinus,x,y,z,theta,phi,0,0);
     int is_inside  =0;
     int is_outside =0;
 
@@ -387,7 +387,7 @@ TEST(IsInside , Cylinder ) {
     double y0   =   0;
     double z0   =   0;
 
-    PROPOSALParticle * particle = new PROPOSALParticle(PROPOSALParticle::ParticleType::MuMinus,x,y,z,theta,phi,0,0);
+    PROPOSALParticle * particle = new PROPOSALParticle(ParticleType::MuMinus,x,y,z,theta,phi,0,0);
     int is_inside  =0;
     int is_outside =0;
 
@@ -652,7 +652,7 @@ TEST(IsInside , Sphere ) {
     double y0   =   0;
     double z0   =   0;
 
-    PROPOSALParticle * particle = new PROPOSALParticle(PROPOSALParticle::ParticleType::MuMinus,x,y,z,theta,phi,0,0);
+    PROPOSALParticle * particle = new PROPOSALParticle(ParticleType::MuMinus,x,y,z,theta,phi,0,0);
     int is_inside  =0;
     int is_outside =0;
 
@@ -845,7 +845,7 @@ TEST(DistanceTo , Sphere ) {
 
     pair<double,double> distance;
 
-    PROPOSALParticle * particle = new PROPOSALParticle(PROPOSALParticle::ParticleType::MuMinus,x,y,z,theta,phi,0,0);
+    PROPOSALParticle * particle = new PROPOSALParticle(ParticleType::MuMinus,x,y,z,theta,phi,0,0);
 
 
     MathModel M;
@@ -978,7 +978,7 @@ TEST(DistanceTo , Cylinder ) {
 
     pair<double,double> distance;
 
-    PROPOSALParticle * particle = new PROPOSALParticle(PROPOSALParticle::ParticleType::MuMinus,x,y,z,theta,phi,0,0);
+    PROPOSALParticle * particle = new PROPOSALParticle(ParticleType::MuMinus,x,y,z,theta,phi,0,0);
 
 
     MathModel M;
@@ -1254,7 +1254,7 @@ TEST(DistanceTo , Box ) {
 
     pair<double,double> distance;
 
-    PROPOSALParticle * particle = new PROPOSALParticle(PROPOSALParticle::ParticleType::MuMinus,x,y,z,theta,phi,0,0);
+    PROPOSALParticle * particle = new PROPOSALParticle(ParticleType::MuMinus,x,y,z,theta,phi,0,0);
 
 
     MathModel M;
