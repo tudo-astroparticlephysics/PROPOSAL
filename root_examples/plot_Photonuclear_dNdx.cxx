@@ -70,9 +70,9 @@ int main()
 
     TFile *file     =   new TFile("Photonuclear_dNdx.root","RECREATE");
 
-    PROPOSALParticle *mu    =   new PROPOSALParticle(PROPOSALParticle::ParticleType::MuMinus);
-    PROPOSALParticle *tau   =   new PROPOSALParticle(PROPOSALParticle::ParticleType::TauMinus);
-    PROPOSALParticle *e     =   new PROPOSALParticle(PROPOSALParticle::ParticleType::EMinus);
+    PROPOSALParticle *mu    =   new PROPOSALParticle(ParticleType::MuMinus);
+    PROPOSALParticle *tau   =   new PROPOSALParticle(ParticleType::TauMinus);
+    PROPOSALParticle *e     =   new PROPOSALParticle(ParticleType::EMinus);
 
     Medium  *med1   =   new Medium("hydrogen",1.);
     Medium  *med2   =   new Medium("water",1.);
@@ -594,7 +594,7 @@ int main()
                 leg_entry<<"shadow=2 Butkevich/Mikhailovd";
                 break;
         }
-        if(photo.at(i)->GetParticle()->GetType() == PROPOSALParticle::ParticleType::MuMinus)
+        if(photo.at(i)->GetParticle()->GetType() == ParticleType::MuMinus)
         {
             if (photo.at(i)->GetMedium()->GetName().compare("water")==0)
             {
@@ -795,7 +795,7 @@ int main()
                 }
             }
         }
-        else if(photo.at(i)->GetParticle()->GetType() == PROPOSALParticle::ParticleType::TauMinus)
+        else if(photo.at(i)->GetParticle()->GetType() == ParticleType::TauMinus)
         {
             if (photo.at(i)->GetMedium()->GetName().compare("water")==0)
             {
@@ -996,7 +996,7 @@ int main()
                 }
             }
         }
-        else if(photo.at(i)->GetParticle()->GetType() == PROPOSALParticle::ParticleType::EMinus)
+        else if(photo.at(i)->GetParticle()->GetType() == ParticleType::EMinus)
         {
             if (photo.at(i)->GetMedium()->GetName().compare("water")==0)
             {

@@ -565,9 +565,9 @@ double Propagator::Propagate( double distance )
     double  initial_energy  =   particle_->GetEnergy();
     double  final_energy    =   particle_->GetEnergy();
 
-    pair<double, PROPOSALParticle::ParticleType> decay;
+    pair<double, ParticleType> decay;
     // pair<double,string> energy_loss;
-    pair<double, PROPOSALParticle::ParticleType> energy_loss;
+    pair<double, ParticleType> energy_loss;
 
 
     int secondary_id    =   0;
@@ -692,7 +692,7 @@ double Propagator::Propagate( double distance )
             double t    =   particle_->GetT() -particle_->GetLifetime()*log(RandomDouble());
             double product_energy   =   0;
 
-            pair<double, PROPOSALParticle::ParticleType> decay_to_store;
+            pair<double, ParticleType> decay_to_store;
             secondary_id    =   particle_->GetParticleId() + 1;
 
             particle_->SetT( t );
@@ -1419,7 +1419,7 @@ Propagator::Propagator()
     ,scattering_model_          (-1)
     ,current_collection_        (NULL)
 {
-    particle_              = new PROPOSALParticle(PROPOSALParticle::ParticleType::MuMinus);
+    particle_              = new PROPOSALParticle(ParticleType::MuMinus);
     backup_particle_       = new PROPOSALParticle(*particle_);
     detector_              = new Geometry();
     detector_->InitSphere(0,0,0,1e18,0);
@@ -1433,7 +1433,7 @@ Propagator::Propagator()
 
 Propagator::Propagator(Medium* medium,
                        EnergyCutSettings* cuts,
-                       PROPOSALParticle::ParticleType particle_type,
+                       ParticleType particle_type,
                        string path_to_tables,
                        bool moliere,
                        bool continuous_rand,
@@ -2063,12 +2063,12 @@ void Propagator::InitProcessCollections(ifstream &file)
             if (particle_ == NULL)
             {
 
-                PROPOSALParticle *muminus    =   new PROPOSALParticle(PROPOSALParticle::ParticleType::MuMinus);
-                PROPOSALParticle *tauminus   =   new PROPOSALParticle(PROPOSALParticle::ParticleType::TauMinus);
-                PROPOSALParticle *eminus     =   new PROPOSALParticle(PROPOSALParticle::ParticleType::EMinus);
-                // PROPOSALParticle *muplus    =   new PROPOSALParticle(PROPOSALParticle::ParticleType::MuPlus);
-                // PROPOSALParticle *tauplus   =   new PROPOSALParticle(PROPOSALParticle::ParticleType::TauPlus);
-                // PROPOSALParticle *eplus     =   new PROPOSALParticle(PROPOSALParticle::ParticleType::EPlus);
+                PROPOSALParticle *muminus    =   new PROPOSALParticle(ParticleType::MuMinus);
+                PROPOSALParticle *tauminus   =   new PROPOSALParticle(ParticleType::TauMinus);
+                PROPOSALParticle *eminus     =   new PROPOSALParticle(ParticleType::EMinus);
+                // PROPOSALParticle *muplus    =   new PROPOSALParticle(ParticleType::MuPlus);
+                // PROPOSALParticle *tauplus   =   new PROPOSALParticle(ParticleType::TauPlus);
+                // PROPOSALParticle *eplus     =   new PROPOSALParticle(ParticleType::EPlus);
 
                 EnergyCutSettings *inside;
                 EnergyCutSettings *infront;
