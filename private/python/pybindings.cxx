@@ -260,29 +260,29 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
     // ParticleType
     // --------------------------------------------------------------------- //
 
-    enum_<PROPOSALParticle::ParticleType>("ParticleType")
-        .value("EPlus",                PROPOSALParticle::ParticleType::EPlus)
-        .value("EMinus",               PROPOSALParticle::ParticleType::EPlus)
-        .value("MuPlus",               PROPOSALParticle::ParticleType::MuPlus)
-        .value("MuMinus",              PROPOSALParticle::ParticleType::MuMinus)
-        .value("TauPlus",              PROPOSALParticle::ParticleType::TauPlus)
-        .value("TauMinus",             PROPOSALParticle::ParticleType::TauMinus)
-        .value("NuE",                  PROPOSALParticle::ParticleType::NuE)
-        .value("NuEBar",               PROPOSALParticle::ParticleType::NuEBar)
-        .value("NuMu",                 PROPOSALParticle::ParticleType::NuMu)
-        .value("NuMuBar",              PROPOSALParticle::ParticleType::NuMuBar)
-        .value("NuTau",                PROPOSALParticle::ParticleType::NuTau)
-        .value("NuTauBar",             PROPOSALParticle::ParticleType::NuTauBar)
-        .value("Brems",                PROPOSALParticle::ParticleType::Brems)
-        .value("DeltaE",               PROPOSALParticle::ParticleType::DeltaE)
-        .value("EPair",                PROPOSALParticle::ParticleType::EPair)
-        .value("NuclInt",              PROPOSALParticle::ParticleType::NuclInt)
-        .value("MuPair",               PROPOSALParticle::ParticleType::MuPair)
-        .value("Hadrons",              PROPOSALParticle::ParticleType::Hadrons)
-        .value("ContinuousEnergyLoss", PROPOSALParticle::ParticleType::ContinuousEnergyLoss)
-        .value("Monopole",             PROPOSALParticle::ParticleType::Monopole)
-        .value("STauPlus",             PROPOSALParticle::ParticleType::STauPlus)
-        .value("STauMinus",            PROPOSALParticle::ParticleType::STauMinus)
+    enum_<ParticleType>("ParticleType")
+        .value("EPlus",                ParticleType::EPlus)
+        .value("EMinus",               ParticleType::EPlus)
+        .value("MuPlus",               ParticleType::MuPlus)
+        .value("MuMinus",              ParticleType::MuMinus)
+        .value("TauPlus",              ParticleType::TauPlus)
+        .value("TauMinus",             ParticleType::TauMinus)
+        .value("NuE",                  ParticleType::NuE)
+        .value("NuEBar",               ParticleType::NuEBar)
+        .value("NuMu",                 ParticleType::NuMu)
+        .value("NuMuBar",              ParticleType::NuMuBar)
+        .value("NuTau",                ParticleType::NuTau)
+        .value("NuTauBar",             ParticleType::NuTauBar)
+        .value("Brems",                ParticleType::Brems)
+        .value("DeltaE",               ParticleType::DeltaE)
+        .value("EPair",                ParticleType::EPair)
+        .value("NuclInt",              ParticleType::NuclInt)
+        .value("MuPair",               ParticleType::MuPair)
+        .value("Hadrons",              ParticleType::Hadrons)
+        .value("ContinuousEnergyLoss", ParticleType::ContinuousEnergyLoss)
+        .value("Monopole",             ParticleType::Monopole)
+        .value("STauPlus",             ParticleType::STauPlus)
+        .value("STauMinus",            ParticleType::STauMinus)
     ;
 
     // --------------------------------------------------------------------- //
@@ -292,8 +292,8 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
     std::string (PROPOSALParticle::*getNameParticle)() const = &PROPOSALParticle::GetName;
 
     class_<PROPOSALParticle, boost::shared_ptr<PROPOSALParticle>>("Particle",
-                                                                  init<PROPOSALParticle::ParticleType>(
-                                                                  (arg("particle_type") = PROPOSALParticle::ParticleType::MuMinus)))
+                                                                  init<ParticleType>(
+                                                                  (arg("particle_type") = ParticleType::MuMinus)))
 
         .def(self_ns::str(self_ns::self))
         .def(self_ns::repr(self_ns::self))
@@ -408,7 +408,7 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
         .def(init<
              Medium*,
              EnergyCutSettings*,
-             PROPOSALParticle::ParticleType,
+             ParticleType,
              std::string,
              bool,
              bool,

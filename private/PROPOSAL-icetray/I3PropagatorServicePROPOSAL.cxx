@@ -388,55 +388,55 @@ std::vector<I3Particle> I3PropagatorServicePROPOSAL::Propagate(I3Particle& p, Di
 }
 
 // ------------------------------------------------------------------------- //
-PROPOSALParticle::ParticleType I3PropagatorServicePROPOSAL::GeneratePROPOSALName(const I3Particle& p)
+ParticleType I3PropagatorServicePROPOSAL::GeneratePROPOSALName(const I3Particle& p)
 {
     I3Particle::ParticleType ptype = p.GetType();
 
     switch (ptype)
     {
         case I3Particle::MuMinus:
-            return PROPOSALParticle::ParticleType::MuMinus;
+            return ParticleType::MuMinus;
         case I3Particle::MuPlus:
-            return PROPOSALParticle::ParticleType::MuPlus;
+            return ParticleType::MuPlus;
         case I3Particle::TauMinus:
-            return PROPOSALParticle::ParticleType::TauMinus;
+            return ParticleType::TauMinus;
         case I3Particle::TauPlus:
-            return PROPOSALParticle::ParticleType::TauPlus;
+            return ParticleType::TauPlus;
         case I3Particle::EMinus:
             if (p.GetShape() == I3Particle::TopShower)
-                return PROPOSALParticle::ParticleType::EMinus;
+                return ParticleType::EMinus;
             else
-                return PROPOSALParticle::ParticleType::unknown;
+                return ParticleType::unknown;
         case I3Particle::EPlus:
             if (p.GetShape() == I3Particle::TopShower)
-                return PROPOSALParticle::ParticleType::EPlus;
+                return ParticleType::EPlus;
             else
-                return PROPOSALParticle::ParticleType::unknown;
+                return ParticleType::unknown;
         case I3Particle::NuMu:
-            return PROPOSALParticle::ParticleType::NuMu;
+            return ParticleType::NuMu;
         case I3Particle::NuMuBar:
-            return PROPOSALParticle::ParticleType::NuMuBar;
+            return ParticleType::NuMuBar;
         case I3Particle::NuE:
-            return PROPOSALParticle::ParticleType::NuE;
+            return ParticleType::NuE;
         case I3Particle::NuEBar:
-            return PROPOSALParticle::ParticleType::NuEBar;
+            return ParticleType::NuEBar;
         case I3Particle::NuTau:
-            return PROPOSALParticle::ParticleType::NuTau;
+            return ParticleType::NuTau;
         case I3Particle::NuTauBar:
-            return PROPOSALParticle::ParticleType::NuTauBar;
+            return ParticleType::NuTauBar;
         case I3Particle::Hadrons:
             if (p.GetShape() == I3Particle::TopShower)
-                return PROPOSALParticle::ParticleType::Hadrons;
+                return ParticleType::Hadrons;
             else
-                return PROPOSALParticle::ParticleType::unknown;
+                return ParticleType::unknown;
         case I3Particle::Monopole:
-            return PROPOSALParticle::ParticleType::Monopole;
+            return ParticleType::Monopole;
         case I3Particle::STauPlus:
-            return PROPOSALParticle::ParticleType::STauPlus;
+            return ParticleType::STauPlus;
         case I3Particle::STauMinus:
-            return PROPOSALParticle::ParticleType::STauMinus;
+            return ParticleType::STauMinus;
         default:
-            return PROPOSALParticle::ParticleType::unknown;
+            return ParticleType::unknown;
     }
 }
 
@@ -527,7 +527,7 @@ I3MMCTrackPtr I3PropagatorServicePROPOSAL::propagate( I3Particle& p, vector<I3Pa
     double e_0 = p.GetEnergy()/I3Units::MeV;  // [MeV]
     double t_0 = p.GetTime()/I3Units::s;     // [s]
 
-    PROPOSALParticle::ParticleType particleType = GeneratePROPOSALName(p);
+    ParticleType particleType = GeneratePROPOSALName(p);
     log_debug("Name of particle to propagate: %s", PROPOSALParticle::GetName(particleType).c_str());
 
 

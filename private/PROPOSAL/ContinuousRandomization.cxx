@@ -68,17 +68,17 @@ void ContinuousRandomization::EnableDE2dxInterpolation(std::string path, bool ra
     // (except of diffractive Bremsstrahlung, where one can analyse the interference term if implemented)
     // so they use the same interpolation tables
     string particle_name;
-    if (particle_->GetType() == PROPOSALParticle::ParticleType::MuPlus)
+    if (particle_->GetType() == ParticleType::MuPlus)
     {
-        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::MuMinus);
+        particle_name = PROPOSALParticle::GetName(ParticleType::MuMinus);
     }
-    else if (particle_->GetType() == PROPOSALParticle::ParticleType::TauPlus)
+    else if (particle_->GetType() == ParticleType::TauPlus)
     {
-        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::TauMinus);
+        particle_name = PROPOSALParticle::GetName(ParticleType::TauMinus);
     }
-    else if (particle_->GetType() == PROPOSALParticle::ParticleType::EPlus)
+    else if (particle_->GetType() == ParticleType::EPlus)
     {
-        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::EMinus);
+        particle_name = PROPOSALParticle::GetName(ParticleType::EMinus);
     }
     else
     {
@@ -222,17 +222,17 @@ void ContinuousRandomization::EnableDE2deInterpolation(std::string path, bool ra
     // (except of diffractive Bremsstrahlung, where one can analyse the interference term if implemented)
     // so they use the same interpolation tables
     string particle_name;
-    if (particle_->GetType() == PROPOSALParticle::ParticleType::MuPlus)
+    if (particle_->GetType() == ParticleType::MuPlus)
     {
-        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::MuMinus);
+        particle_name = PROPOSALParticle::GetName(ParticleType::MuMinus);
     }
-    else if (particle_->GetType() == PROPOSALParticle::ParticleType::TauPlus)
+    else if (particle_->GetType() == ParticleType::TauPlus)
     {
-        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::TauMinus);
+        particle_name = PROPOSALParticle::GetName(ParticleType::TauMinus);
     }
-    else if (particle_->GetType() == PROPOSALParticle::ParticleType::EPlus)
+    else if (particle_->GetType() == ParticleType::EPlus)
     {
-        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::EMinus);
+        particle_name = PROPOSALParticle::GetName(ParticleType::EMinus);
     }
     else
     {
