@@ -17,9 +17,9 @@ int main()
 {
     TFile *file     =   new TFile("Bremsstrahlung_dNdx_different_ecut.root","RECREATE");
 
-    PROPOSALParticle *mu    =   new PROPOSALParticle(PROPOSALParticle::ParticleType::MuMinus);
-    PROPOSALParticle *tau   =   new PROPOSALParticle(PROPOSALParticle::ParticleType::TauMinus);
-    PROPOSALParticle *e     =   new PROPOSALParticle(PROPOSALParticle::ParticleType::EMinus);
+    PROPOSALParticle *mu    =   new PROPOSALParticle(ParticleType::MuMinus);
+    PROPOSALParticle *tau   =   new PROPOSALParticle(ParticleType::TauMinus);
+    PROPOSALParticle *e     =   new PROPOSALParticle(ParticleType::EMinus);
 
     Medium  *med   =   new Medium("water",1.);
 
@@ -331,7 +331,7 @@ int main()
 
     for(unsigned int i = 0 ; i < graphs.size() ; i++)
     {
-        if(brems.at(i)->GetParticle()->GetType() == PROPOSALParticle::ParticleType::MuMinus)
+        if(brems.at(i)->GetParticle()->GetType() == ParticleType::MuMinus)
         {
             if (brems.at(i)->GetParametrization()==1)
             {
@@ -463,7 +463,7 @@ int main()
             }
         }
 
-        else if(brems.at(i)->GetParticle()->GetType() == PROPOSALParticle::ParticleType::TauMinus)
+        else if(brems.at(i)->GetParticle()->GetType() == ParticleType::TauMinus)
         {
             if (brems.at(i)->GetParametrization()==1)
             {
@@ -595,7 +595,7 @@ int main()
             }
         }
 
-        else if(brems.at(i)->GetParticle()->GetType() == PROPOSALParticle::ParticleType::EMinus)
+        else if(brems.at(i)->GetParticle()->GetType() == ParticleType::EMinus)
         {
             if (brems.at(i)->GetParametrization()==1)
             {
