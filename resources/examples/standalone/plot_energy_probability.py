@@ -1,14 +1,14 @@
 import pyPROPOSAL
 import numpy as np
 
-ptype = pyPROPOSAL.ParticleType.MuMinus
+ptype = pyPROPOSAL.ParticleType.EMinus
 mu = pyPROPOSAL.Particle(ptype)
 med = pyPROPOSAL.Medium("standard_rock")
 cuts = pyPROPOSAL.EnergyCutSettings()
 
 prop = pyPROPOSAL.Propagator(med, cuts, ptype, "../../resources/tables")
 
-statistics = 10
+statistics = 1000
 E_max_log = 14
 
 epair_primary_energy = []

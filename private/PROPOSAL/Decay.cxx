@@ -47,8 +47,8 @@ double Decay::CalculateProductEnergy( double ernd, double arnd, double srnd )
         return 0;
     }
     double emax, x0, f0, el, lm, pl;
-    ParticleType out1 = ParticleType::NuMu;
-    ParticleType out2 = ParticleType::NuMu;
+    ParticleType::Enum out1 = ParticleType::NuMu;
+    ParticleType::Enum out2 = ParticleType::NuMu;
 
     // Tau Decay
     if (particle_->GetType() == ParticleType::TauMinus || particle_->GetType() == ParticleType::TauPlus)
@@ -378,7 +378,7 @@ double Decay::DifferentiatedFunction(double x)
 //----------------------------------------------------------------------------//
 
 
-void Decay::SetOut(ParticleType out){
+void Decay::SetOut(ParticleType::Enum out){
     out_    =   out;
 }
 

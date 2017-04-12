@@ -243,7 +243,7 @@ double ProcessCollection::CalculateFinalEnergy(double ei, double rnd, bool parti
 //----------------------------------------------------------------------------//
 
 
-pair<double, ParticleType> ProcessCollection::MakeStochasticLoss()
+pair<double, ParticleType::Enum> ProcessCollection::MakeStochasticLoss()
 {
     return this->MakeStochasticLoss(MathModel::RandomDouble(),MathModel::RandomDouble(),MathModel::RandomDouble());
 }
@@ -253,7 +253,7 @@ pair<double, ParticleType> ProcessCollection::MakeStochasticLoss()
 //----------------------------------------------------------------------------//
 
 
-pair<double, ParticleType> ProcessCollection::MakeStochasticLoss(double rnd1,double rnd2, double rnd3)
+pair<double, ParticleType::Enum> ProcessCollection::MakeStochasticLoss(double rnd1,double rnd2, double rnd3)
 {
     double total_rate          =    0;
     double total_rate_weighted =    0;
@@ -262,7 +262,7 @@ pair<double, ParticleType> ProcessCollection::MakeStochasticLoss(double rnd1,dou
     //double decayS              =    0;
 
 
-    pair<double, ParticleType> energy_loss;
+    pair<double, ParticleType::Enum> energy_loss;
 
     std::vector<double> rates;
 
@@ -334,7 +334,7 @@ pair<double, ParticleType> ProcessCollection::MakeStochasticLoss(double rnd1,dou
 //----------------------------------------------------------------------------//
 
 
-pair<double, ParticleType> ProcessCollection::MakeDecay()
+pair<double, ParticleType::Enum> ProcessCollection::MakeDecay()
 {
     return MakeDecay(MathModel::RandomDouble(),MathModel::RandomDouble(),MathModel::RandomDouble());
 }
@@ -345,9 +345,9 @@ pair<double, ParticleType> ProcessCollection::MakeDecay()
 
 
 
-pair<double, ParticleType> ProcessCollection::MakeDecay(double rnd1,double rnd2, double rnd3)
+pair<double, ParticleType::Enum> ProcessCollection::MakeDecay(double rnd1,double rnd2, double rnd3)
 {
-    pair<double, ParticleType> decay;
+    pair<double, ParticleType::Enum> decay;
 
     if(particle_->GetType() == ParticleType::TauPlus || particle_->GetType() == ParticleType::TauMinus)
     {

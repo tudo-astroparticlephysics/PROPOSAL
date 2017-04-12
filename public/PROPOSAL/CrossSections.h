@@ -32,7 +32,7 @@ class CrossSections
 protected:
 
     std::string name_;
-    ParticleType type_;
+    ParticleType::Enum type_;
 
     PROPOSALParticle*   particle_;
     PROPOSALParticle*   backup_particle_;
@@ -185,7 +185,7 @@ public:
         return name_;
     }
 
-    ParticleType GetType() const
+    ParticleType::Enum GetType() const
     {
         return type_;
     }
