@@ -18,9 +18,9 @@
 // ----------------------------------------------------------------------------
 /// @brief Particle enums
 // ----------------------------------------------------------------------------
-struct PROPOSALParticleTypes
+namespace ParticleType
 {
-    enum ParticleType // NB: These match the PDG codes. Keep it that way!
+    enum Enum // NB: These match the PDG codes. Keep it that way!
     {
         unknown = 0,
         Gamma = 22,
@@ -89,7 +89,7 @@ struct PROPOSALParticleTypes
     };
 };
 
-typedef PROPOSALParticleTypes::ParticleType ParticleType;
+// typedef PROPOSALParticleType::Enums::ParticleType::Enum ParticleType::Enum;
 
 /**
   * \brief This class provides the main particle properties and functions.
@@ -122,7 +122,7 @@ private:
 
     std::string name_;           //!< name of the particle - Presetted to "mu"
     double low_;                 //!< energy below which the particle is lost [MeV]
-    ParticleType type_;          //!< particle type: all particles, that can be propagated with PROPOSAL
+    ParticleType::Enum type_;          //!< particle type: all particles, that can be propagated with PROPOSAL
 
     int parent_particle_id_;        //!< parent particle id
     double parent_particle_energy_; //!< energy of the parent particle
@@ -191,7 +191,7 @@ public:
 
     PROPOSALParticle(int parent_particle_id,
              int particle_id,
-             ParticleType type,
+             ParticleType::Enum type,
              double x,
              double y,
              double z,
@@ -222,7 +222,7 @@ public:
      */
     PROPOSALParticle(int parent_particle_id,
              int particle_id,
-             ParticleType type,
+             ParticleType::Enum type,
              double x,
              double y,
              double z,
@@ -249,7 +249,7 @@ public:
      * \param t         particle time
      */
     PROPOSALParticle(
-            ParticleType type,
+            ParticleType::Enum type,
             double x,
             double y,
             double z,
@@ -268,7 +268,7 @@ public:
      *
      * \param name     particle name
      */
-    PROPOSALParticle(ParticleType type);
+    PROPOSALParticle(ParticleType::Enum type);
 
 //----------------------------------------------------------------------------//
     /*!
@@ -277,8 +277,8 @@ public:
      * \param name      particle type
      */
 
-    // void InitByName(ParticleType type);
-    void InitParticle(ParticleType type);
+    // void InitByName(ParticleType::Enum type);
+    void InitParticle(ParticleType::Enum type);
 
 
 //----------------------------------------------------------------------------//
@@ -329,7 +329,7 @@ public:
     void SetCharge(double charge);
     void SetName(std::string name);
     void SetLow(double low);
-    void SetType(ParticleType type);
+    void SetType(ParticleType::Enum type);
     void SetParentParticleId(int parent_particle_id);
     void SetParentParticleEnergy(double parent_particle_energy);
     void SetParticleId(int particle_id);
@@ -391,13 +391,13 @@ public:
 //----------------------------------------------------------------------------//
     std::string GetName() const{return name_;}
 //----------------------------------------------------------------------------//
-    static std::string GetName(ParticleType pt);
+    static std::string GetName(ParticleType::Enum pt);
 //----------------------------------------------------------------------------//
     double GetLow() const{return low_;}
 //----------------------------------------------------------------------------//
-    ParticleType GetType() const{return type_;}
+    ParticleType::Enum GetType() const{return type_;}
 //----------------------------------------------------------------------------//
-    static ParticleType GetTypeFromName(std::string particle_name);
+    static ParticleType::Enum GetTypeFromName(std::string particle_name);
 //----------------------------------------------------------------------------//
     int GetParentParticleId() const{return parent_particle_id_;}
 //----------------------------------------------------------------------------//

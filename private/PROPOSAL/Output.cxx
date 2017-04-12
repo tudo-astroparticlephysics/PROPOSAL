@@ -21,9 +21,9 @@ void Output::SetLoggingConfigurationFile(std::string file)
 //----------------------------------------------------------------------------//
 
 
-void Output::FillSecondaryVector(PROPOSALParticle *particle, int secondary_id, pair<double, ParticleType> energy_loss, double distance)
+void Output::FillSecondaryVector(PROPOSALParticle *particle, int secondary_id, pair<double, ParticleType::Enum> energy_loss, double distance)
 {
-    // ParticleType secondary_type;
+    // ParticleType::Enum secondary_type;
     // string secondary_name;
 
     // if(energy_loss.second.compare("Epairproduction")==0)

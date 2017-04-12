@@ -127,7 +127,7 @@ PROPOSALParticle::PROPOSALParticle(const PROPOSALParticle& particle)
 
 PROPOSALParticle::PROPOSALParticle(int parent_particle_id,
                    int particle_id,
-                   ParticleType type,
+                   ParticleType::Enum type,
                    double x,
                    double y,
                    double z,
@@ -207,7 +207,7 @@ PROPOSALParticle::PROPOSALParticle(int parent_particle_id,
 
 PROPOSALParticle::PROPOSALParticle(int parent_particle_id,
                    int particle_id,
-                   ParticleType type,
+                   ParticleType::Enum type,
                    double x,
                    double y,
                    double z,
@@ -266,7 +266,7 @@ PROPOSALParticle::PROPOSALParticle(int parent_particle_id,
 
 
 PROPOSALParticle::PROPOSALParticle(
-                        ParticleType type,
+                        ParticleType::Enum type,
                         double x,
                         double y,
                         double z,
@@ -321,7 +321,7 @@ PROPOSALParticle::PROPOSALParticle(
 //----------------------------------------------------------------------------//
 
 
-PROPOSALParticle::PROPOSALParticle(ParticleType type)
+PROPOSALParticle::PROPOSALParticle(ParticleType::Enum type)
     :propagated_distance_   ( 0 )
     ,x_                     ( 0 )
     ,y_                     ( 0 )
@@ -541,7 +541,7 @@ void PROPOSALParticle::swap(PROPOSALParticle &particle)
 //----------------------------------------------------------------------------//
 
 
-void PROPOSALParticle::InitParticle(ParticleType type){
+void PROPOSALParticle::InitParticle(ParticleType::Enum type){
 
     //TODO(mario): Output Mo 2017/03/06
     // log_debug("Particle initialized in InitByName: %s", aname.c_str());
@@ -827,7 +827,7 @@ void PROPOSALParticle::SetLow(double low){
     low_ = low;
 }
 
-void PROPOSALParticle::SetType(ParticleType type){
+void PROPOSALParticle::SetType(ParticleType::Enum type){
     type_ = type;
 }
 
@@ -907,13 +907,13 @@ void PROPOSALParticle::SetElost(double elost){
     elost_ = elost;
 }
 
-std::string PROPOSALParticle::GetName(ParticleType pt) {
+std::string PROPOSALParticle::GetName(ParticleType::Enum pt) {
 
     PROPOSALParticle p(pt);
     return p.GetName();
 }
 
-ParticleType PROPOSALParticle::GetTypeFromName(std::string particle_name)
+ParticleType::Enum PROPOSALParticle::GetTypeFromName(std::string particle_name)
 {
     // returns the particle type of a particle name
     // if there is just the name without charge (e.g. "mu" and not "mu+")
