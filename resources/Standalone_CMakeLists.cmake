@@ -125,25 +125,22 @@ add_library(pyPROPOSAL SHARED private/python/pybindings.cxx)
 # 	pyPROPOSAL
 # )
 # set_target_properties(pyPROPOSAL_ext PROPERTIES PREFIX "")
+set_target_properties(pyPROPOSAL PROPERTIES PREFIX "")
+
+set_target_properties(PROPOSAL PROPERTIES PREFIX "" COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -O2")# -Wextra -pedantic")
+
+target_link_libraries(PROPOSAL ${LIBRARYS_TO_LINK})
+
 target_link_libraries (pyPROPOSAL
     boost_python
     ${PYTHON_LIBRARIES}
     ${Boost_LIBRARIES}
 	PROPOSAL
 )
-set_target_properties(pyPROPOSAL PROPERTIES PREFIX "")
-
-
-set_target_properties(PROPOSAL PROPERTIES PREFIX "" COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -O2")# -Wextra -pedantic")
-
-target_link_libraries(PROPOSAL ${LIBRARYS_TO_LINK})
-
 
 add_executable(PROPOSALtest
         private/test/PROPOSAL.cxx
 )
-
-
 
 target_link_libraries(PROPOSALtest PROPOSAL)
 
