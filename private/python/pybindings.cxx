@@ -257,10 +257,10 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
     //     ;
 
     // --------------------------------------------------------------------- //
-    // ParticleType
+    // ParticleType::Enum
     // --------------------------------------------------------------------- //
 
-    enum_<ParticleType>("ParticleType")
+    enum_<ParticleType::Enum>("ParticleType")
         .value("EPlus",                ParticleType::EPlus)
         .value("EMinus",               ParticleType::EPlus)
         .value("MuPlus",               ParticleType::MuPlus)
@@ -292,7 +292,7 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
     std::string (PROPOSALParticle::*getNameParticle)() const = &PROPOSALParticle::GetName;
 
     class_<PROPOSALParticle, boost::shared_ptr<PROPOSALParticle> >("Particle",
-                                                                  init<ParticleType>(
+                                                                  init<ParticleType::Enum>(
                                                                   (arg("particle_type") = ParticleType::MuMinus)))
 
         .def(self_ns::str(self_ns::self))
@@ -408,7 +408,7 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
         .def(init<
              Medium*,
              EnergyCutSettings*,
-             ParticleType,
+             ParticleType::Enum,
              std::string,
              bool,
              bool,

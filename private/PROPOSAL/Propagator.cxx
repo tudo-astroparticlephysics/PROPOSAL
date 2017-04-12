@@ -565,9 +565,9 @@ double Propagator::Propagate( double distance )
     double  initial_energy  =   particle_->GetEnergy();
     double  final_energy    =   particle_->GetEnergy();
 
-    pair<double, ParticleType> decay;
+    pair<double, ParticleType::Enum> decay;
     // pair<double,string> energy_loss;
-    pair<double, ParticleType> energy_loss;
+    pair<double, ParticleType::Enum> energy_loss;
 
 
     int secondary_id    =   0;
@@ -692,7 +692,7 @@ double Propagator::Propagate( double distance )
             double t    =   particle_->GetT() -particle_->GetLifetime()*log(RandomDouble());
             double product_energy   =   0;
 
-            pair<double, ParticleType> decay_to_store;
+            pair<double, ParticleType::Enum> decay_to_store;
             secondary_id    =   particle_->GetParticleId() + 1;
 
             particle_->SetT( t );
@@ -1433,7 +1433,7 @@ Propagator::Propagator()
 
 Propagator::Propagator(Medium* medium,
                        EnergyCutSettings* cuts,
-                       ParticleType particle_type,
+                       ParticleType::Enum particle_type,
                        string path_to_tables,
                        bool moliere,
                        bool continuous_rand,
