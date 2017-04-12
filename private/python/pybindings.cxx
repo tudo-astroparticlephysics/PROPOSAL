@@ -125,7 +125,7 @@ struct VectorFromPythonList
         boost::python::list python_list(boost::python::handle<>(boost::python::borrowed(obj_ptr)));
 
         // Grab pointer to memory into which to construct the new std::vector<T>
-        void* storage = reinterpret_cast<boost::python::converter::rvalue_from_python_storage<std::vector<T>>*>(data)->storage.bytes;
+        void* storage = reinterpret_cast<boost::python::converter::rvalue_from_python_storage<std::vector<T> >*>(data)->storage.bytes;
 
         // in-place construct the new std::vector<T> using the character data
         // extraced from the python object
@@ -201,7 +201,7 @@ struct PairFromPythonList
         boost::python::list python_list(boost::python::handle<>(boost::python::borrowed(obj_ptr)));
 
         // Grab pointer to memory into which to construct the new std::vector<T>
-        void* storage = reinterpret_cast<boost::python::converter::rvalue_from_python_storage<std::pair<T1, T2>>*>(data)->storage.bytes;
+        void* storage = reinterpret_cast<boost::python::converter::rvalue_from_python_storage<std::pair<T1, T2> >*>(data)->storage.bytes;
 
         // in-place construct the new std::vector<T> using the character data
         // extraced from the python object
@@ -241,7 +241,7 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
 
     to_python_converter<std::vector<CrossSections*>, CrossSectionToPython>();
 
-    to_python_converter<std::pair<double, double>, PairToPythonList<double, double>>();
+    to_python_converter<std::pair<double, double>, PairToPythonList<double, double> >();
 
     // register the from-python converter
     VectorFromPythonList<double>();
@@ -291,7 +291,7 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
 
     std::string (PROPOSALParticle::*getNameParticle)() const = &PROPOSALParticle::GetName;
 
-    class_<PROPOSALParticle, boost::shared_ptr<PROPOSALParticle>>("Particle",
+    class_<PROPOSALParticle, boost::shared_ptr<PROPOSALParticle> >("Particle",
                                                                   init<ParticleType>(
                                                                   (arg("particle_type") = ParticleType::MuMinus)))
 
@@ -342,7 +342,7 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
     // EnergyCutSettings
     // --------------------------------------------------------------------- //
 
-    class_<EnergyCutSettings, boost::shared_ptr<EnergyCutSettings>>("EnergyCutSettings", init<>())
+    class_<EnergyCutSettings, boost::shared_ptr<EnergyCutSettings> >("EnergyCutSettings", init<>())
 
         .def(init<double, double>((arg("ecut"), arg("vcut"))))
         .def(self_ns::str(self_ns::self))
@@ -360,7 +360,7 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
 
     std::vector<std::string> (Medium::*getNameMed)() const = &Medium::GetElementName;
 
-    class_<Medium, boost::shared_ptr<Medium>>("Medium", init<>())
+    class_<Medium, boost::shared_ptr<Medium> >("Medium", init<>())
 
         .def(init<std::string, double>((arg("medium_type"), arg("rho") = 1.0)))
         .def(self_ns::str(self_ns::self))
@@ -399,7 +399,7 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
     // Propagator
     // --------------------------------------------------------------------- //
 
-    class_<Propagator, boost::shared_ptr<Propagator>>("Propagator",
+    class_<Propagator, boost::shared_ptr<Propagator> >("Propagator",
                                                       init<std::string, PROPOSALParticle*, bool>(
                                                       (arg("config"),
                                                        arg("particle"),
@@ -483,19 +483,19 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
         .def("disable_dNdx_interpolation", &CrossSections::DisableDNdxInterpolation)
     ;
 
-    class_<Photonuclear, boost::shared_ptr<Photonuclear>, bases<CrossSections>>("Photonuclear", init<PROPOSALParticle*, Medium*, EnergyCutSettings*>())
+    class_<Photonuclear, boost::shared_ptr<Photonuclear>, bases<CrossSections> >("Photonuclear", init<PROPOSALParticle*, Medium*, EnergyCutSettings*>())
         .def(self_ns::str(self_ns::self))
         .def(self_ns::repr(self_ns::self))
     ;
-    class_<Epairproduction, boost::shared_ptr<Epairproduction>, bases<CrossSections>>("Epairproduction", init<PROPOSALParticle*, Medium*, EnergyCutSettings*>())
+    class_<Epairproduction, boost::shared_ptr<Epairproduction>, bases<CrossSections> >("Epairproduction", init<PROPOSALParticle*, Medium*, EnergyCutSettings*>())
         .def(self_ns::str(self_ns::self))
         .def(self_ns::repr(self_ns::self))
     ;
-    class_<Bremsstrahlung, boost::shared_ptr<Bremsstrahlung>, bases<CrossSections>>("Bremsstrahlung", init<PROPOSALParticle*, Medium*, EnergyCutSettings*>())
+    class_<Bremsstrahlung, boost::shared_ptr<Bremsstrahlung>, bases<CrossSections> >("Bremsstrahlung", init<PROPOSALParticle*, Medium*, EnergyCutSettings*>())
         .def(self_ns::str(self_ns::self))
         .def(self_ns::repr(self_ns::self))
     ;
-    class_<Ionization, boost::shared_ptr<Ionization>, bases<CrossSections>>("Ionization", init<PROPOSALParticle*, Medium*, EnergyCutSettings*>())
+    class_<Ionization, boost::shared_ptr<Ionization>, bases<CrossSections> >("Ionization", init<PROPOSALParticle*, Medium*, EnergyCutSettings*>())
         .def(self_ns::str(self_ns::self))
         .def(self_ns::repr(self_ns::self))
     ;
@@ -504,7 +504,7 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
     // ProcessCollection
     // ------------------------------------------------------------------------- //
 
-    class_<ProcessCollection, boost::shared_ptr<ProcessCollection>>("ProcessCollection", init<>())
+    class_<ProcessCollection, boost::shared_ptr<ProcessCollection> >("ProcessCollection", init<>())
 
         .def(init<PROPOSALParticle*, Medium*, EnergyCutSettings*>((arg("particle"), arg("medium"), arg("energy_cut"))))
 
@@ -526,7 +526,7 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
     // Geometry
     // ------------------------------------------------------------------------- //
 
-    class_<Geometry, boost::shared_ptr<Geometry>>("Geometry", init<>())
+    class_<Geometry, boost::shared_ptr<Geometry> >("Geometry", init<>())
 
         .def(self_ns::str(self_ns::self))
         .def(self_ns::repr(self_ns::self))
