@@ -102,7 +102,7 @@ add_library(PROPOSAL
         private/PROPOSAL/Medium.cxx
         private/PROPOSAL/PROPOSALParticle.cxx
         private/PROPOSAL/EnergyCutSettings.cxx
-	private/PROPOSAL/Interpolant.cxx
+		private/PROPOSAL/Interpolant.cxx
         private/PROPOSAL/StandardNormal.cxx
         private/PROPOSAL/RootFinder.cxx
         private/PROPOSAL/ProcessCollection.cxx
@@ -115,22 +115,12 @@ add_library(PROPOSAL
         private/PROPOSAL/Output.cxx
 	)
 
-# add_library(pyPROPOSAL SHARED private/python/test.cxx)
 add_library(pyPROPOSAL SHARED private/python/pybindings.cxx)
-# target_link_libraries(pyPROPOSAL_ext ${Boost_LIBRARIES} PROPOSAL)
-# target_link_libraries (PROPOSAL
-#     boost_python
-#     ${PYTHON_LIBRARIES}
-#     ${Boost_LIBRARIES}
-# 	pyPROPOSAL
-# )
-# set_target_properties(pyPROPOSAL_ext PROPERTIES PREFIX "")
-set_target_properties(pyPROPOSAL PROPERTIES PREFIX "")
 
+set_target_properties(pyPROPOSAL PROPERTIES PREFIX "" COMPILE_FLAGS "${CMAKE_CXX_FLAGS}")
 set_target_properties(PROPOSAL PROPERTIES PREFIX "" COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -O2")# -Wextra -pedantic")
 
 target_link_libraries(PROPOSAL ${LIBRARYS_TO_LINK})
-
 target_link_libraries (pyPROPOSAL
     boost_python
     ${PYTHON_LIBRARIES}
@@ -142,6 +132,7 @@ add_executable(PROPOSALtest
         private/test/PROPOSAL.cxx
 )
 
+set_target_properties(PROPOSALtest PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS}")
 target_link_libraries(PROPOSALtest PROPOSAL)
 
 execute_process(COMMAND ln -s ${CMAKE_SOURCE_DIR}/resources ${CMAKE_BINARY_DIR}/resources)
