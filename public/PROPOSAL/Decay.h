@@ -26,7 +26,7 @@ protected:
     PROPOSALParticle*   particle_;
     PROPOSALParticle*   backup_particle_;
     // std::string out_;
-    ParticleType out_;
+    ParticleType::Enum out_;
 
     bool        store_neutrinos_;
     double      multiplier_;
@@ -86,7 +86,7 @@ public:
 //----------------------------------------------------------------------------//
 
     // Getter
-    ParticleType GetOut() const
+    ParticleType::Enum GetOut() const
     {
         return out_;
     }
@@ -112,7 +112,7 @@ public:
     }
 //----------------------------------------------------------------------------//
     //Setter
-    void SetOut(ParticleType out);
+    void SetOut(ParticleType::Enum out);
 
     void SetRootFinder(RootFinder *root_finder);
 
