@@ -18,7 +18,7 @@
 // ----------------------------------------------------------------------------
 /// @brief Particle enums
 // ----------------------------------------------------------------------------
-namespace PROPOSALParticleTypes
+struct PROPOSALParticleTypes
 {
     enum ParticleType // NB: These match the PDG codes. Keep it that way!
     {
