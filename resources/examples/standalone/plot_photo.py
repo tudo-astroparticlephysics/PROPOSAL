@@ -1,7 +1,7 @@
 import pyPROPOSAL
 import numpy as np
 
-ptype = pyPROPOSAL.ParticleType::Enum.MuMinus
+ptype = pyPROPOSAL.ParticleType.MuMinus
 mu = pyPROPOSAL.Particle(ptype)
 med = pyPROPOSAL.Medium("standard_rock")
 E = pyPROPOSAL.EnergyCutSettings(-1, -1)
