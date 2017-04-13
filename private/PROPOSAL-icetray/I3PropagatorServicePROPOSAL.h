@@ -144,8 +144,8 @@ public:
   I3PropagatorServicePROPOSAL(const I3PropagatorServicePROPOSAL&);
   I3PropagatorServicePROPOSAL& operator=(const I3PropagatorServicePROPOSAL&);
 
-  PROPOSALParticle::ParticleType GeneratePROPOSALType(const I3Particle& p);
-  I3Particle::ParticleType GenerateI3Type(PROPOSALParticle::ParticleType ptype_PROPOSAL);
+  ParticleType::Enum GeneratePROPOSALType(const I3Particle& p);
+  I3Particle::ParticleType GenerateI3Type(ParticleType::Enum ptype_PROPOSAL);
 
   /**
    *Fills an I3MMCTrackList with position, time, and energy

@@ -109,7 +109,7 @@ public:
     Propagator(std::string config_file, PROPOSALParticle* particle, bool DoApplyOptions=true);
     Propagator(Medium* medium,
                EnergyCutSettings* cuts,
-               PROPOSALParticle::ParticleType particle_type,
+               ParticleType::Enum particle_type,
                std::string path_to_tables,
                bool moliere = true,
                bool continuous_rand = true,
@@ -241,6 +241,11 @@ public:
 
 //----------------------------------------------------------------------------//
     //Setter
+
+    /**
+     *  Sets the ProcessCollections. Need to execute AplyOptions() afterward.
+     */
+    void SetCollections(std::vector<ProcessCollection*>);
     /**
      *  Sets the particle for the Propagator and its current ProcessCollection
      */
