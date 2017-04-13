@@ -432,16 +432,6 @@ ParticleType::Enum I3PropagatorServicePROPOSAL::GeneratePROPOSALType(const I3Par
 
     ptype_PROPOSAL = I3_PROPOSAL_ParticleType_bimap.left.find(ptype_I3) -> second;
 
-    if (ptype_I3 == I3Particle::EMinus || ptype_I3 == I3Particle::EPlus || ptype_I3 == I3Particle::Hadrons)
-    {
-        if (p.GetShape() != I3Particle::TopShower)
-        {
-            log_info("The particle '%s' has no TopShower shape, but 'e-', 'e+' and 'Hadrons' need that.",
-                PROPOSALParticle::GetName(ptype_PROPOSAL).c_str());
-            ptype_PROPOSAL = ParticleType::unknown;
-            log_info("so the particle is set to unknown");
-        }
-    }
     return ptype_PROPOSAL;
 }
 
@@ -627,6 +617,17 @@ I3MMCTrackPtr I3PropagatorServicePROPOSAL::propagate( I3Particle& p, vector<I3Pa
         // {
         //     new_particle.SetType(it->second);
         // }
+
+        if (GeneratePROPOSALType(p) == ParticleType::EMinus 
+            || GeneratePROPOSALType(p) == ParticleType::EPlus 
+            || GeneratePROPOSALType(p) == ParticleType::Hadrons)
+        {
+            if (p.GetShape() != I3Particle::TopShower)
+            {
+                log_fatal("The particle '%s' has no TopShower shape, but 'e-', 'e+' and 'Hadrons' need that. I don't know why?",
+                    PROPOSALParticle::GetName(GeneratePROPOSALType(p)).c_str());
+            }
+        }
 
         new_particle.SetType(GenerateI3Type(type));
 
