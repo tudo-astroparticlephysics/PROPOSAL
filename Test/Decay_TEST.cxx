@@ -35,7 +35,7 @@ public:
 
 TEST(Comparison , Comparison_equal ) {
 
-    PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
     Decay *A = new Decay(particle);
     Decay *B = new Decay(particle);
     EXPECT_TRUE(*A==*B);
@@ -53,8 +53,8 @@ TEST(Comparison , Comparison_equal ) {
 
 TEST(Comparison , Comparison_not_equal ) {
 
-    PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::ParticleType::MuMinus,1.,1.,1,20,20,1e5,10);
-    PROPOSALParticle *particle2 = new PROPOSALParticle(PROPOSALParticle::ParticleType::TauMinus,1.,1.,1,20,20,1e5,10);
+    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,20,20,1e5,10);
+    PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,20,20,1e5,10);
     Decay *A = new Decay(particle);
     Decay *B = new Decay(particle2);
 
@@ -79,7 +79,7 @@ TEST(Assignment , Copyconstructor ) {
 }
 
 TEST(Assignment , Copyconstructor2 ) {
-    PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
 
     Decay A(particle);
     Decay B(A);
@@ -89,8 +89,8 @@ TEST(Assignment , Copyconstructor2 ) {
 }
 
 TEST(Assignment , Operator ) {
-    PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
-    PROPOSALParticle *particle2 = new PROPOSALParticle(PROPOSALParticle::ParticleType::TauMinus,1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,.20,20,1e5,10);
     Decay A(particle);
     Decay B(particle2);
 
@@ -100,7 +100,7 @@ TEST(Assignment , Operator ) {
 
     EXPECT_TRUE(A==B);
 
-    PROPOSALParticle *particle3 = new PROPOSALParticle(PROPOSALParticle::ParticleType::TauMinus,1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle3 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,.20,20,1e5,10);
     Decay *C = new Decay(particle3);
     EXPECT_TRUE(A!=*C);
 
@@ -112,15 +112,15 @@ TEST(Assignment , Operator ) {
 
 TEST(Assignment , Swap ) {
 
-    PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
-    PROPOSALParticle *particle2 = new PROPOSALParticle(PROPOSALParticle::ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
 
     Decay A(particle);
     Decay B(particle2);
     EXPECT_TRUE(A==B);
 
-    PROPOSALParticle *particle3 = new PROPOSALParticle(PROPOSALParticle::ParticleType::TauMinus,1.,1.,1,.20,20,1e5,10);
-    PROPOSALParticle *particle4 = new PROPOSALParticle(PROPOSALParticle::ParticleType::TauMinus,1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle3 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle4 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,.20,20,1e5,10);
 
     Decay *C = new Decay(particle3);
     Decay *D = new Decay(particle4);
