@@ -15,6 +15,7 @@
 #include <boost/foreach.hpp>
 #include <boost/bind.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/bimap.hpp>
 
 #include <sstream>
 #include <unistd.h> // check for write permissions
@@ -79,6 +80,8 @@ int ConvertOldToNewPhotonuclearParametrization(int photo_family,int photo_param,
 
     return 12;
 }
+
+
 
 // ------------------------------------------------------------------------- //
 bool IsWritable(std::string table_dir)
@@ -153,11 +156,11 @@ I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(
     //     log_fatal("I don't know how to propagate %s", dummy.GetTypeString().c_str());
     // }
 
-    // particle_type = new PROPOSALParticle(PROPOSALParticle::GetName(GeneratePROPOSALName(type)));
+    // particle_type = new PROPOSALParticle(PROPOSALParticle::GetName(GeneratePROPOSALType(type)));
 
     I3Particle i3particle;
     i3particle.SetType(type);
-    PROPOSALParticle* particle = new PROPOSALParticle(GeneratePROPOSALName(i3particle));
+    PROPOSALParticle* particle = new PROPOSALParticle(GeneratePROPOSALType(i3particle));
     if (isnan(particleMass_) == false)
     {
         particle->SetMass(particleMass_);
@@ -387,57 +390,78 @@ std::vector<I3Particle> I3PropagatorServicePROPOSAL::Propagate(I3Particle& p, Di
     return daughters;
 }
 
-// ------------------------------------------------------------------------- //
-PROPOSALParticle::ParticleType I3PropagatorServicePROPOSAL::GeneratePROPOSALName(const I3Particle& p)
-{
-    I3Particle::ParticleType ptype = p.GetType();
+typedef boost::bimap<I3Particle::ParticleType, PROPOSALParticle::ParticleType> bimap_ParticleType;
+static const bimap_ParticleType I3_PROPOSAL_ParticleType_bimap = boost::assign::list_of<bimap_ParticleType::relation>
+    (I3Particle::MuMinus,   PROPOSALParticle::ParticleType::MuMinus)
+    (I3Particle::MuPlus,    PROPOSALParticle::ParticleType::MuPlus)
+    (I3Particle::TauMinus,  PROPOSALParticle::ParticleType::TauMinus)
+    (I3Particle::TauPlus,   PROPOSALParticle::ParticleType::TauPlus)
+    (I3Particle::EMinus,    PROPOSALParticle::ParticleType::EMinus)
+    (I3Particle::EPlus,     PROPOSALParticle::ParticleType::EPlus)
+    (I3Particle::NuMu,      PROPOSALParticle::ParticleType::NuMu)
+    (I3Particle::NuMuBar,   PROPOSALParticle::ParticleType::NuMuBar)
+    (I3Particle::NuE,       PROPOSALParticle::ParticleType::NuE)
+    (I3Particle::NuEBar,    PROPOSALParticle::ParticleType::NuEBar)
+    (I3Particle::NuTau,     PROPOSALParticle::ParticleType::NuTau)
+    (I3Particle::NuTauBar,  PROPOSALParticle::ParticleType::NuTauBar)
+    (I3Particle::Brems,     PROPOSALParticle::ParticleType::Brems)
+    (I3Particle::DeltaE,    PROPOSALParticle::ParticleType::DeltaE)
+    (I3Particle::PairProd,  PROPOSALParticle::ParticleType::EPair)
+    (I3Particle::NuclInt,   PROPOSALParticle::ParticleType::NuclInt)
+    (I3Particle::MuPair,    PROPOSALParticle::ParticleType::MuPair)
+    (I3Particle::Hadrons,   PROPOSALParticle::ParticleType::Hadrons)
+    (I3Particle::Monopole,  PROPOSALParticle::ParticleType::Monopole)
+    (I3Particle::STauMinus, PROPOSALParticle::ParticleType::STauMinus)
+    (I3Particle::STauPlus,  PROPOSALParticle::ParticleType::STauPlus);
 
-    switch (ptype)
+
+// ------------------------------------------------------------------------- //
+PROPOSALParticle::ParticleType I3PropagatorServicePROPOSAL::GeneratePROPOSALType(const I3Particle& p)
+{
+    I3Particle::ParticleType ptype_I3 = p.GetType();
+    PROPOSALParticle::ParticleType ptype_PROPOSAL;
+
+    // TODO: Exception handling if I3Particle is not in bimap
+    // the following uncomment thing is not working yet
+
+    // bimap_ParticleType::left_const_iterator i3_iterator = I3_PROPOSAL_ParticleType_bimap.left.find(ptype_I3);
+    // if (i3_iterator == I3_PROPOSAL_ParticleType_bimap.end())
+    // {
+    //     log_fatal("The I3Particle '%i' can not be converted to a PROPOSALParticle", ptype_I3);
+    // }
+
+    ptype_PROPOSAL = I3_PROPOSAL_ParticleType_bimap.left.find(ptype_I3) -> second;
+
+    if (ptype_I3 == I3Particle::EMinus || ptype_I3 == I3Particle::EPlus || ptype_I3 == I3Particle::Hadrons)
     {
-        case I3Particle::MuMinus:
-            return PROPOSALParticle::ParticleType::MuMinus;
-        case I3Particle::MuPlus:
-            return PROPOSALParticle::ParticleType::MuPlus;
-        case I3Particle::TauMinus:
-            return PROPOSALParticle::ParticleType::TauMinus;
-        case I3Particle::TauPlus:
-            return PROPOSALParticle::ParticleType::TauPlus;
-        case I3Particle::EMinus:
-            if (p.GetShape() == I3Particle::TopShower)
-                return PROPOSALParticle::ParticleType::EMinus;
-            else
-                return PROPOSALParticle::ParticleType::unknown;
-        case I3Particle::EPlus:
-            if (p.GetShape() == I3Particle::TopShower)
-                return PROPOSALParticle::ParticleType::EPlus;
-            else
-                return PROPOSALParticle::ParticleType::unknown;
-        case I3Particle::NuMu:
-            return PROPOSALParticle::ParticleType::NuMu;
-        case I3Particle::NuMuBar:
-            return PROPOSALParticle::ParticleType::NuMuBar;
-        case I3Particle::NuE:
-            return PROPOSALParticle::ParticleType::NuE;
-        case I3Particle::NuEBar:
-            return PROPOSALParticle::ParticleType::NuEBar;
-        case I3Particle::NuTau:
-            return PROPOSALParticle::ParticleType::NuTau;
-        case I3Particle::NuTauBar:
-            return PROPOSALParticle::ParticleType::NuTauBar;
-        case I3Particle::Hadrons:
-            if (p.GetShape() == I3Particle::TopShower)
-                return PROPOSALParticle::ParticleType::Hadrons;
-            else
-                return PROPOSALParticle::ParticleType::unknown;
-        case I3Particle::Monopole:
-            return PROPOSALParticle::ParticleType::Monopole;
-        case I3Particle::STauPlus:
-            return PROPOSALParticle::ParticleType::STauPlus;
-        case I3Particle::STauMinus:
-            return PROPOSALParticle::ParticleType::STauMinus;
-        default:
-            return PROPOSALParticle::ParticleType::unknown;
+        if (p.GetShape() != I3Particle::TopShower) 
+        {
+            log_info("The particle '%s' has no TopShower shape, but 'e-', 'e+' and 'Hadrons' need that.",
+                PROPOSALParticle::GetName(ptype_PROPOSAL).c_str());
+            ptype_PROPOSAL = PROPOSALParticle::ParticleType::unknown;
+            log_info("so the particle is set to unknown");
+        }
     }
+    return ptype_PROPOSAL;
+}
+
+I3Particle::ParticleType I3PropagatorServicePROPOSAL::GenerateI3Type(PROPOSALParticle::ParticleType ptype_PROPOSAL)
+{
+    I3Particle::ParticleType ptype_I3;
+
+    // TODO: Exception handling if PROPOSALParticle type is not in bimap
+    // the following uncomment thing is not working yet
+
+    // bimap_ParticleType::right_const_iterator proposal_iterator = I3_PROPOSAL_ParticleType_bimap.right.find(ptype_PROPOSAL);
+    // if (proposal_iterator == I3_PROPOSAL_ParticleType_bimap.end())
+    // {
+    //     log_fatal("The PROPOSALParticle '%i' can not be converted to a I3Particle", ptype_PROPOSAL);
+    // }
+
+    ptype_I3 = I3_PROPOSAL_ParticleType_bimap.right.find(ptype_PROPOSAL) -> second;
+
+    return ptype_I3;
+
 }
 
 // ------------------------------------------------------------------------- //
@@ -477,40 +501,39 @@ I3MMCTrackPtr I3PropagatorServicePROPOSAL::GenerateMMCTrack(PROPOSALParticle* pa
     return I3MMCTrackPtr();
 }
 
+// typedef std::map<int, I3Particle::ParticleType> particle_type_conversion_t;
 
-typedef std::map<int, I3Particle::ParticleType> particle_type_conversion_t;
-
-static const particle_type_conversion_t fromRDMCTable =
-boost::assign::list_of<std::pair<int, I3Particle::ParticleType> >
-(-100, I3Particle::unknown)
-(1, I3Particle::Gamma)
-(2, I3Particle::EPlus)
-(3, I3Particle::EMinus)
-(4, I3Particle::Nu)
-(5, I3Particle::MuPlus)
-(6, I3Particle::MuMinus)
-(7, I3Particle::Pi0)
-(8, I3Particle::PiPlus)
-(9, I3Particle::PiMinus)
-(11, I3Particle::KPlus)
-(12, I3Particle::KMinus)
-(14, I3Particle::PPlus)
-(15, I3Particle::PMinus)
-(33, I3Particle::TauPlus)
-(34, I3Particle::TauMinus)
-(41, I3Particle::Monopole)
-(201, I3Particle::NuE)
-(202, I3Particle::NuMu)
-(203, I3Particle::NuTau)
-(204, I3Particle::NuEBar)
-(205, I3Particle::NuMuBar)
-(206, I3Particle::NuTauBar)
-(1001, I3Particle::Brems)
-(1002, I3Particle::DeltaE)
-(1003, I3Particle::PairProd)
-(1004, I3Particle::NuclInt)
-(1005, I3Particle::MuPair)
-(1006, I3Particle::Hadrons);
+// static const particle_type_conversion_t fromRDMCTable =
+// boost::assign::list_of<std::pair<int, I3Particle::ParticleType> >
+// (-100, I3Particle::unknown)
+// (1, I3Particle::Gamma)
+// (2, I3Particle::EPlus)
+// (3, I3Particle::EMinus)
+// (4, I3Particle::Nu)
+// (5, I3Particle::MuPlus)
+// (6, I3Particle::MuMinus)
+// (7, I3Particle::Pi0)
+// (8, I3Particle::PiPlus)
+// (9, I3Particle::PiMinus)
+// (11, I3Particle::KPlus)
+// (12, I3Particle::KMinus)
+// (14, I3Particle::PPlus)
+// (15, I3Particle::PMinus)
+// (33, I3Particle::TauPlus)
+// (34, I3Particle::TauMinus)
+// (41, I3Particle::Monopole)
+// (201, I3Particle::NuE)
+// (202, I3Particle::NuMu)
+// (203, I3Particle::NuTau)
+// (204, I3Particle::NuEBar)
+// (205, I3Particle::NuMuBar)
+// (206, I3Particle::NuTauBar)
+// (1001, I3Particle::Brems)
+// (1002, I3Particle::DeltaE)
+// (1003, I3Particle::PairProd)
+// (1004, I3Particle::NuclInt)
+// (1005, I3Particle::MuPair)
+// (1006, I3Particle::Hadrons);
 
 // ------------------------------------------------------------------------- //
 I3MMCTrackPtr I3PropagatorServicePROPOSAL::propagate( I3Particle& p, vector<I3Particle>& daughters){
@@ -527,11 +550,11 @@ I3MMCTrackPtr I3PropagatorServicePROPOSAL::propagate( I3Particle& p, vector<I3Pa
     double e_0 = p.GetEnergy()/I3Units::MeV;  // [MeV]
     double t_0 = p.GetTime()/I3Units::s;     // [s]
 
-    PROPOSALParticle::ParticleType particleType = GeneratePROPOSALName(p);
-    log_debug("Name of particle to propagate: %s", PROPOSALParticle::GetName(particleType).c_str());
+    // PROPOSALParticle::ParticleType particleType = GeneratePROPOSALType(p);
+    log_debug("Name of particle to propagate: %s", PROPOSALParticle::GetName(GeneratePROPOSALType(p)).c_str());
 
 
-    // PROPOSALParticle* particle = new PROPOSALParticle(particleType, x_0, y_0, z_0, theta_0, phi_0, e_0, t_0);
+    // PROPOSALParticle* particle = new PROPOSALParticle(GeneratePROPOSALType(p), x_0, y_0, z_0, theta_0, phi_0, e_0, t_0);
     proposal->ResetParticle();
     PROPOSALParticle* particle = proposal->GetParticle();
 
@@ -573,7 +596,7 @@ I3MMCTrackPtr I3PropagatorServicePROPOSAL::propagate( I3Particle& p, vector<I3Pa
     {
         //Tomasz
         //in mmc the particle relationships are stored
-        int type = aobj_l.at(i)->GetType();
+        PROPOSALParticle::ParticleType type = aobj_l.at(i)->GetType();
         double x = aobj_l.at(i)->GetX() * I3Units::cm;
         double y = aobj_l.at(i)->GetY() * I3Units::cm;
         double z = aobj_l.at(i)->GetZ() * I3Units::cm;
@@ -589,18 +612,23 @@ I3MMCTrackPtr I3PropagatorServicePROPOSAL::propagate( I3Particle& p, vector<I3Pa
         //this should be a stochastic
         I3Particle new_particle;
 
-        //Setting MC Type
-        I3Particle::ParticleType mcType(static_cast<I3Particle::ParticleType>(abs(type)));
-        particle_type_conversion_t::const_iterator it = fromRDMCTable.find(mcType);
-        if (it == fromRDMCTable.end())
-        {
-            cout << "Particle information!" << endl << endl << *(aobj_l.at(i)) << endl << endl;
-            log_fatal("unknown RDMC code \"%i\" cannot be converted to a I3Particle::ParticleType.", mcType);
-        }
-        else
-        {
-            new_particle.SetType(it->second);
-        }
+
+        // the following case should be asked in the GenerateI3Type() function, but it's not working yet :(
+
+        // //Setting MC Type
+        // I3Particle::ParticleType mcType(static_cast<I3Particle::ParticleType>(abs(type)));
+        // particle_type_conversion_t::const_iterator it = fromRDMCTable.find(mcType);
+        // if (it == fromRDMCTable.end())
+        // {
+        //     cout << "Particle information!" << endl << endl << *(aobj_l.at(i)) << endl << endl;
+        //     log_fatal("unknown RDMC code \"%i\" cannot be converted to a I3Particle::ParticleType.", mcType);
+        // }
+        // else
+        // {
+        //     new_particle.SetType(it->second);
+        // }
+
+        new_particle.SetType(GenerateI3Type(type));
 
         new_particle.SetLocationType(I3Particle::InIce);
         new_particle.SetPos(x, y, z);
