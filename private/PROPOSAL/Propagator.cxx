@@ -2880,6 +2880,11 @@ void Propagator::ApplyOptions()
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
+void Propagator::SetCollections(std::vector<ProcessCollection*> collections)
+{
+    collections_ = collections;
+}
+
 void Propagator::SetParticle(PROPOSALParticle* particle)
 {
     particle_   =   particle;
