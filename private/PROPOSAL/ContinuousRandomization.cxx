@@ -89,8 +89,9 @@ void ContinuousRandomization::EnableDE2dxInterpolation(std::string path, bool ra
     {
         stringstream filename;
         filename<<path<<"/Cont_dE2dx_"<<particle_name
-               <<"_"<<medium_->GetName()<<"_"
-               <<medium_->GetMassDensity();
+            <<"_mass_"<<particle_->GetMass()
+            <<"_"<<medium_->GetName()
+            <<"_"<<medium_->GetMassDensity();
 
 
         for(unsigned int i =0; i<cross_sections_.size(); i++)
@@ -243,8 +244,9 @@ void ContinuousRandomization::EnableDE2deInterpolation(std::string path, bool ra
     {
         stringstream filename;
         filename<<path<<"/Cont_dE2de_"<<particle_name
-               <<"_"<<medium_->GetName()<<"_"
-               <<medium_->GetMassDensity();
+            <<"_mass_"<<particle_->GetMass()
+            <<"_"<<medium_->GetName()
+            <<"_"<<medium_->GetMassDensity();
 
 
         for(unsigned int i =0; i<cross_sections_.size(); i++)

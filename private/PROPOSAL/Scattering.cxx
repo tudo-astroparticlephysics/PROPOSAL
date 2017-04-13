@@ -453,10 +453,11 @@ void Scattering::EnableInterpolation(string path)
 
         stringstream filename;
         filename<<path<<"/Scattering_"<<particle_name
-               <<"_"<<crosssections_.at(0)->GetMedium()->GetName()
-               <<"_"<<crosssections_.at(0)->GetMedium()->GetMassDensity()
-               <<"_"<< crosssections_.at(0)->GetEnergyCutSettings()->GetEcut()
-               <<"_"<<crosssections_.at(0)->GetEnergyCutSettings()->GetVcut();
+            <<"_mass_"<<particle_->GetMass()
+            <<"_"<<crosssections_.at(0)->GetMedium()->GetName()
+            <<"_"<<crosssections_.at(0)->GetMedium()->GetMassDensity()
+            <<"_"<< crosssections_.at(0)->GetEnergyCutSettings()->GetEcut()
+            <<"_"<<crosssections_.at(0)->GetEnergyCutSettings()->GetVcut();
 
         for(unsigned int i =0; i<crosssections_.size(); i++)
         {
