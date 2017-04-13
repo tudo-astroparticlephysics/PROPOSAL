@@ -241,6 +241,11 @@ public:
 
 //----------------------------------------------------------------------------//
     //Setter
+
+    /**
+     *  Sets the ProcessCollections. Need to execute AplyOptions() afterward.
+     */
+    void SetCollections(std::vector<ProcessCollection*>);
     /**
      *  Sets the particle for the Propagator and its current ProcessCollection
      */
