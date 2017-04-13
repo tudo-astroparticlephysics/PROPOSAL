@@ -421,14 +421,11 @@ ParticleType::Enum I3PropagatorServicePROPOSAL::GeneratePROPOSALType(const I3Par
     I3Particle::ParticleType ptype_I3 = p.GetType();
     ParticleType::Enum ptype_PROPOSAL;
 
-    // TODO: Exception handling if I3Particle is not in bimap
-    // the following uncomment thing is not working yet
-
-    // bimap_ParticleType::left_const_iterator i3_iterator = I3_PROPOSAL_ParticleType_bimap.left.find(ptype_I3);
-    // if (i3_iterator == I3_PROPOSAL_ParticleType_bimap.end())
-    // {
-    //     log_fatal("The I3Particle '%i' can not be converted to a PROPOSALParticle", ptype_I3);
-    // }
+    bimap_ParticleType::left_const_iterator i3_iterator = I3_PROPOSAL_ParticleType_bimap.left.find(ptype_I3);
+    if (i3_iterator == I3_PROPOSAL_ParticleType_bimap.left.end())
+    {
+        log_fatal("The I3Particle '%i' can not be converted to a PROPOSALParticle", ptype_I3);
+    }
 
     ptype_PROPOSAL = I3_PROPOSAL_ParticleType_bimap.left.find(ptype_I3) -> second;
 
@@ -439,14 +436,11 @@ I3Particle::ParticleType I3PropagatorServicePROPOSAL::GenerateI3Type(ParticleTyp
 {
     I3Particle::ParticleType ptype_I3;
 
-    // TODO: Exception handling if PROPOSALParticle type is not in bimap
-    // the following uncomment thing is not working yet
-
-    // bimap_ParticleType::right_const_iterator proposal_iterator = I3_PROPOSAL_ParticleType_bimap.right.find(ptype_PROPOSAL);
-    // if (proposal_iterator == I3_PROPOSAL_ParticleType_bimap.end())
-    // {
-    //     log_fatal("The PROPOSALParticle '%i' can not be converted to a I3Particle", ptype_PROPOSAL);
-    // }
+    bimap_ParticleType::right_const_iterator proposal_iterator = I3_PROPOSAL_ParticleType_bimap.right.find(ptype_PROPOSAL);
+    if (proposal_iterator == I3_PROPOSAL_ParticleType_bimap.right.end())
+    {
+        log_fatal("The PROPOSALParticle '%i' can not be converted to a I3Particle", ptype_PROPOSAL);
+    }
 
     ptype_I3 = I3_PROPOSAL_ParticleType_bimap.right.find(ptype_PROPOSAL) -> second;
 
@@ -618,8 +612,8 @@ I3MMCTrackPtr I3PropagatorServicePROPOSAL::propagate( I3Particle& p, vector<I3Pa
         //     new_particle.SetType(it->second);
         // }
 
-        if (GeneratePROPOSALType(p) == ParticleType::EMinus 
-            || GeneratePROPOSALType(p) == ParticleType::EPlus 
+        if (GeneratePROPOSALType(p) == ParticleType::EMinus
+            || GeneratePROPOSALType(p) == ParticleType::EPlus
             || GeneratePROPOSALType(p) == ParticleType::Hadrons)
         {
             if (p.GetShape() != I3Particle::TopShower)
