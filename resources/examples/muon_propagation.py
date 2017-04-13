@@ -7,7 +7,7 @@ from icecube import icetray
 from icecube import PROPOSAL
 from icecube import simclasses
 
-ptype = dc.I3Particle.MuPlus
+ptype = dc.I3Particle.MuMinus
 propagator = PROPOSAL.I3PropagatorServicePROPOSAL(type = ptype )# particleMass = 1000)
 
 mu = dc.I3Particle()
@@ -35,13 +35,13 @@ try:
     import pylab
 
     pylab.figure()
-    pylab.title("Mu Lengths")
+    pylab.title(str(mu.energy) + " GeV Muon Lengths")
     pylab.hist(mu_length, histtype = "step", log = True, bins = 100)
     pylab.xlabel(r'$l_{\mu}(\rm{m})$')
     pylab.savefig('muon_Lenghts.png')
 
     pylab.figure()
-    pylab.title("N Daughters of Muon")
+    pylab.title("N Daughters of " + str(mu.energy) + "GeV Muon")
     pylab.hist(n_daughters, histtype = "step", log = True, bins = 100)
     pylab.xlabel('N')
     pylab.savefig('muon_Daughters.png')
