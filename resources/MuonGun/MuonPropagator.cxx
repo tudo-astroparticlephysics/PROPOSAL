@@ -48,7 +48,7 @@ MuonPropagator::MuonPropagator(const std::string &medium, double ecut, double vc
 
     //Implement a function old param -> new param
     int new_ph_param=12;
-    propagator_ = new Propagator(med,cutset, PROPOSALParticle::ParticleType::MuMinus,prefix.str(),molieScat,contiCorr,exactTime,lpm,1,new_ph_param,1.,1.,1.,1.,false,0);
+    propagator_ = new Propagator(med,cutset, ParticleType::MuMinus,prefix.str(),molieScat,contiCorr,exactTime,lpm,1,new_ph_param,1.,1.,1.,1.,false,0);
 }
 
 MuonPropagator::~MuonPropagator()
@@ -62,16 +62,16 @@ MuonPropagator::SetSeed(int seed)
 	MathModel::set_seed(seed);
 }
 
-PROPOSALParticle::ParticleType
+ParticleType
 GetPROPOSALType(I3Particle::ParticleType pt)
 {
-    PROPOSALParticle::ParticleType code;
+    ParticleType code;
     switch (pt) {
         case I3Particle::MuMinus:
-            code = PROPOSALParticle::ParticleType::MuMinus;
+            code = ParticleType::MuMinus;
             break;
         case I3Particle::MuPlus:
-            code = PROPOSALParticle::ParticleType::MuPlus;
+            code = ParticleType::MuPlus;
             break;
         default:
             log_fatal_stream("Unsupported particle type: " << pt);

@@ -23,22 +23,22 @@
 namespace PROPOSAL {
 
 
-PROPOSALParticle::ParticleType
+ParticleType
 GetPROPOSALType(I3Particle::ParticleType pt)
 {
-    PROPOSALParticle::ParticleType code;
+    ParticleType code;
     switch (pt) {
         case I3Particle::MuMinus:
-            code = PROPOSALParticle::ParticleType::MuMinus;
+            code = ParticleType::MuMinus;
             break;
         case I3Particle::MuPlus:
-            code = PROPOSALParticle::ParticleType::MuPlus;
+            code = ParticleType::MuPlus;
             break;
         case I3Particle::TauMinus:
-            code = PROPOSALParticle::ParticleType::TauMinus;
+            code = ParticleType::TauMinus;
             break;
         case I3Particle::TauPlus:
-            code = PROPOSALParticle::ParticleType::TauPlus;
+            code = ParticleType::TauPlus;
             break;
         default:
             log_fatal_stream("Unsupported particle type: " << pt);
