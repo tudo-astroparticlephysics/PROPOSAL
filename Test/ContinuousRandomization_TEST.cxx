@@ -49,7 +49,7 @@ TEST(Comparison , Comparison_equal ) {
     double dNdx;
 
     Medium *medium = new Medium("hydrogen",1.);
-    PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cut_settings = new EnergyCutSettings(500,-1);
 
     vector<CrossSections*> crosssections;
@@ -89,8 +89,8 @@ TEST(Comparison , Comparison_equal ) {
 TEST(Comparison , Comparison_not_equal ) {
     Medium *medium = new Medium("air",1.);
     Medium *medium2 = new Medium("water",1.);
-    PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::ParticleType::MuMinus,1.,1.,1,20,20,1e5,10);
-    PROPOSALParticle *particle2 = new PROPOSALParticle(PROPOSALParticle::ParticleType::TauMinus,1.,1.,1,20,20,1e5,10);
+    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,20,20,1e5,10);
+    PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,20,20,1e5,10);
     EnergyCutSettings *cut_settings = new EnergyCutSettings(500,-1);
 
     vector<CrossSections*> crosssections;
@@ -141,7 +141,7 @@ TEST(Assignment , Copyconstructor ) {
 
 TEST(Assignment , Copyconstructor2 ) {
     Medium *medium = new Medium("air",1.);
-    PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cut_settings = new EnergyCutSettings(500,-1);
 
     vector<CrossSections*> crosssections;
@@ -161,7 +161,7 @@ TEST(Assignment , Copyconstructor2 ) {
 
 TEST(Assignment , Operator ) {
     Medium *medium = new Medium("air",1.);
-    PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cut_settings = new EnergyCutSettings(500,-1);
 
     vector<CrossSections*> crosssections;
@@ -210,8 +210,8 @@ TEST(Assignment , Operator ) {
 TEST(Assignment , Swap ) {
     Medium *medium = new Medium("hydrogen",1.);
     Medium *medium2 = new Medium("hydrogen",1.);
-    PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
-    PROPOSALParticle *particle2 = new PROPOSALParticle(PROPOSALParticle::ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cut_settings = new EnergyCutSettings(500,0.05);
     EnergyCutSettings *cut_settings2 = new EnergyCutSettings(500,0.05);
 
@@ -255,8 +255,8 @@ TEST(Assignment , Swap ) {
 
     Medium *medium3 = new Medium("water",1.);
     Medium *medium4 = new Medium("water",1.);
-    PROPOSALParticle *particle3 = new PROPOSALParticle(PROPOSALParticle::ParticleType::TauMinus,1.,1.,1,.20,20,1e5,10);
-    PROPOSALParticle *particle4 = new PROPOSALParticle(PROPOSALParticle::ParticleType::TauMinus,1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle3 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle4 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cut_settings3 = new EnergyCutSettings(200,-1);
     EnergyCutSettings *cut_settings4 = new EnergyCutSettings(200,-1);
 

@@ -41,9 +41,9 @@ int main()
 
     TFile *file     =   new TFile("Total_dEdx.root","RECREATE");
 
-    PROPOSALParticle *mu    =   new PROPOSALParticle(PROPOSALParticle::ParticleType::MuMinus);
-    PROPOSALParticle *tau   =   new PROPOSALParticle(PROPOSALParticle::ParticleType::TauMinus);
-    PROPOSALParticle *e     =   new PROPOSALParticle(PROPOSALParticle::ParticleType::EMinus);
+    PROPOSALParticle *mu    =   new PROPOSALParticle(ParticleType::MuMinus);
+    PROPOSALParticle *tau   =   new PROPOSALParticle(ParticleType::TauMinus);
+    PROPOSALParticle *e     =   new PROPOSALParticle(ParticleType::EMinus);
 
     Medium  *med1   =   new Medium("hydrogen",1.);
     Medium  *med2   =   new Medium("ice",1.);
