@@ -434,7 +434,7 @@ PROPOSALParticle::ParticleType I3PropagatorServicePROPOSAL::GeneratePROPOSALType
 
     if (ptype_I3 == I3Particle::EMinus || ptype_I3 == I3Particle::EPlus || ptype_I3 == I3Particle::Hadrons)
     {
-        if (p.GetShape() != I3Particle::TopShower) 
+        if (p.GetShape() != I3Particle::TopShower)
         {
             log_info("The particle '%s' has no TopShower shape, but 'e-', 'e+' and 'Hadrons' need that.",
                 PROPOSALParticle::GetName(ptype_PROPOSAL).c_str());

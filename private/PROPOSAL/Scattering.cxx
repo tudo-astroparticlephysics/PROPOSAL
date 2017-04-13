@@ -36,7 +36,7 @@ Scattering::Scattering( )
     ,integral_(  new Integral(IROMB, IMAXS, IPREC2) )
     ,interpolant_(NULL)
     ,interpolant_diff_(NULL)
-    ,particle_( new PROPOSALParticle(PROPOSALParticle::ParticleType::MuMinus) )
+    ,particle_( new PROPOSALParticle(ParticleType::MuMinus) )
 {
     crosssections_.push_back(new Ionization());
     crosssections_.push_back(new Bremsstrahlung());
@@ -426,17 +426,17 @@ void Scattering::EnableInterpolation(string path)
     // (except of diffractive Bremsstrahlung, where one can analyse the interference term if implemented)
     // so they use the same interpolation tables
     string particle_name;
-    if (particle_->GetType() == PROPOSALParticle::ParticleType::MuPlus)
+    if (particle_->GetType() == ParticleType::MuPlus)
     {
-        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::MuMinus);
+        particle_name = PROPOSALParticle::GetName(ParticleType::MuMinus);
     }
-    else if (particle_->GetType() == PROPOSALParticle::ParticleType::TauPlus)
+    else if (particle_->GetType() == ParticleType::TauPlus)
     {
-        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::TauMinus);
+        particle_name = PROPOSALParticle::GetName(ParticleType::TauMinus);
     }
-    else if (particle_->GetType() == PROPOSALParticle::ParticleType::EPlus)
+    else if (particle_->GetType() == ParticleType::EPlus)
     {
-        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::EMinus);
+        particle_name = PROPOSALParticle::GetName(ParticleType::EMinus);
     }
     else
     {
