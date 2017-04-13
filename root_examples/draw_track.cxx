@@ -129,7 +129,8 @@ int main(int argc, char **argv)
     {
         switch(secondarys.at(i)->GetType())
         {
-            case PROPOSALParticle::ParticleType::EPair:
+            case ParticleType::EPair:
+            {
                 TPolyMarker3D* m  = new TPolyMarker3D();
                 m->SetPoint(0,secondarys.at(i)->GetX(),secondarys.at(i)->GetY(),secondarys.at(i)->GetZ());
                 m->SetMarkerStyle(20);
@@ -137,8 +138,10 @@ int main(int argc, char **argv)
                 m->SetMarkerSize(secondarys.at(i)->GetEnergy()/energy*400*scale);
                 marker.push_back(m);
                 break;
+            }
 
-            case PROPOSALParticle::ParticleType::DeltaE:
+            case ParticleType::DeltaE:
+            {
                 TPolyMarker3D* m  = new TPolyMarker3D();
                 m->SetPoint(0,secondarys.at(i)->GetX(),secondarys.at(i)->GetY(),secondarys.at(i)->GetZ());
                 m->SetMarkerStyle(20);
@@ -146,8 +149,10 @@ int main(int argc, char **argv)
                 m->SetMarkerSize(secondarys.at(i)->GetEnergy()/energy*4000*scale);
                 marker.push_back(m);
                 break;
+            }
 
-            case PROPOSALParticle::ParticleType::Brems:
+            case ParticleType::Brems:
+            {
                 TPolyMarker3D* m  = new TPolyMarker3D();
                 m->SetPoint(0,secondarys.at(i)->GetX(),secondarys.at(i)->GetY(),secondarys.at(i)->GetZ());
                 m->SetMarkerStyle(20);
@@ -155,8 +160,10 @@ int main(int argc, char **argv)
                 m->SetMarkerSize(secondarys.at(i)->GetEnergy()/energy*400*scale);
                 marker.push_back(m);
                 break;
+            }
 
-            case PROPOSALParticle::ParticleType::NuclInt:
+            case ParticleType::NuclInt:
+            {
                 TPolyMarker3D* m  = new TPolyMarker3D();
                 m->SetPoint(0,secondarys.at(i)->GetX(),secondarys.at(i)->GetY(),secondarys.at(i)->GetZ());
                 m->SetMarkerStyle(20);
@@ -164,8 +171,10 @@ int main(int argc, char **argv)
                 m->SetMarkerSize(secondarys.at(i)->GetEnergy()/energy*4000*scale);
                 marker.push_back(m);
                 break;
+            }
 
-            case (PROPOSALParticle::ParticleType::EMinus || PROPOSALParticle::ParticleType::EPlus):
+            case (ParticleType::EMinus || ParticleType::EPlus):
+            {
                 TPolyMarker3D* m  = new TPolyMarker3D();
                 m->SetPoint(0,secondarys.at(i)->GetX(),secondarys.at(i)->GetY(),secondarys.at(i)->GetZ());
                 m->SetMarkerStyle(20);
@@ -173,6 +182,7 @@ int main(int argc, char **argv)
                 m->SetMarkerSize(secondarys.at(i)->GetEnergy()/energy*400000*scale);
                 marker.push_back(m);
                 break;
+            }
 
             default:
                 log_fatal("You shouldn't be here: Your secondary particle is not Epair, DeltaE, Brems, NuclInt or EMinus/EPlus");

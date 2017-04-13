@@ -18,7 +18,7 @@ int main()
 
     Medium* med = new Medium("ice",1.);
     EnergyCutSettings* ecut = new EnergyCutSettings(10,1e-3);
-    Propagator* prop = new Propagator(med, ecut, PROPOSALParticle::ParticleType::MuMinus, "resources/tables");//,false,true,true,true,1,12,1,1,1,1,false,2);
+    Propagator* prop = new Propagator(med, ecut, ParticleType::MuMinus, "resources/tables");//,false,true,true,true,1,12,1,1,1,1,false,2);
 
     TFile hfile("Decay_Reached_Scattering.root","RECREATE","Scattering_Info");
 

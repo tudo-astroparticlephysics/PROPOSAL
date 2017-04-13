@@ -22,6 +22,7 @@
 #include "PROPOSAL/PROPOSALParticle.h"
 #include "PROPOSAL/EnergyCutSettings.h"
 #include "PROPOSAL/Medium.h"
+#include "PROPOSAL/Output.h"
 #include "TFile.h"
 #include "TMultiGraph.h"
 #include "TLegend.h"
@@ -49,9 +50,9 @@ int main()
 
     TFile *file     =   new TFile("Bremsstrahlung_dNdx.root","RECREATE");
 
-    PROPOSALParticle *mu    =   new PROPOSALParticle(PROPOSALParticle::ParticleType::MuMinus);
-    PROPOSALParticle *tau   =   new PROPOSALParticle(PROPOSALParticle::ParticleType::TauMinus);
-    PROPOSALParticle *e     =   new PROPOSALParticle(PROPOSALParticle::ParticleType::EMinus);
+    PROPOSALParticle *mu    =   new PROPOSALParticle(ParticleType::MuMinus);
+    PROPOSALParticle *tau   =   new PROPOSALParticle(ParticleType::TauMinus);
+    PROPOSALParticle *e     =   new PROPOSALParticle(ParticleType::EMinus);
 
     Medium  *med1   =   new Medium("hydrogen",1.);
     Medium  *med2   =   new Medium("water",1.);
@@ -351,7 +352,7 @@ int main()
                 break;
         }
 
-        if(brems.at(i)->GetParticle()->GetType() == PROPOSALParticle::ParticleType::MuMinus)
+        if(brems.at(i)->GetParticle()->GetType() == ParticleType::MuMinus)
         {
             if (brems.at(i)->GetMedium()->GetName().compare("water")==0)
             {
@@ -420,7 +421,7 @@ int main()
             }
         }
 
-        else if(brems.at(i)->GetParticle()->GetType() == PROPOSALParticle::ParticleType::TauMinus)
+        else if(brems.at(i)->GetParticle()->GetType() == ParticleType::TauMinus)
         {
             if (brems.at(i)->GetMedium()->GetName().compare("water")==0)
             {
@@ -489,7 +490,7 @@ int main()
             }
         }
 
-        else if(brems.at(i)->GetParticle()->GetType() == PROPOSALParticle::ParticleType::EMinus)
+        else if(brems.at(i)->GetParticle()->GetType() == ParticleType::EMinus)
         {
             if (brems.at(i)->GetMedium()->GetName().compare("water")==0)
             {
@@ -868,7 +869,7 @@ int main()
                     }
                     break;
                 case 4:
-                    uraniumpara4_gr->Add(graphs.at(i),"P");
+                    uranium_para4_gr->Add(graphs.at(i),"P");
                     uranium_para4_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (uranium_para4_gr->GetListOfGraphs()->Capacity())
                     {

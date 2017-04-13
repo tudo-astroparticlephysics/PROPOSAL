@@ -565,9 +565,9 @@ double Propagator::Propagate( double distance )
     double  initial_energy  =   particle_->GetEnergy();
     double  final_energy    =   particle_->GetEnergy();
 
-    pair<double, PROPOSALParticle::ParticleType> decay;
+    pair<double, ParticleType::Enum> decay;
     // pair<double,string> energy_loss;
-    pair<double, PROPOSALParticle::ParticleType> energy_loss;
+    pair<double, ParticleType::Enum> energy_loss;
 
 
     int secondary_id    =   0;
@@ -692,7 +692,7 @@ double Propagator::Propagate( double distance )
             double t    =   particle_->GetT() -particle_->GetLifetime()*log(RandomDouble());
             double product_energy   =   0;
 
-            pair<double, PROPOSALParticle::ParticleType> decay_to_store;
+            pair<double, ParticleType::Enum> decay_to_store;
             secondary_id    =   particle_->GetParticleId() + 1;
 
             particle_->SetT( t );
@@ -810,7 +810,6 @@ void Propagator::ChooseCurrentCollection(PROPOSALParticle* particle)
         {
             continue;
         }
-
 
         if(detector_->IsParticleInfront(particle))
         {
@@ -1420,7 +1419,7 @@ Propagator::Propagator()
     ,scattering_model_          (-1)
     ,current_collection_        (NULL)
 {
-    particle_              = new PROPOSALParticle(PROPOSALParticle::ParticleType::MuMinus);
+    particle_              = new PROPOSALParticle(ParticleType::MuMinus);
     backup_particle_       = new PROPOSALParticle(*particle_);
     detector_              = new Geometry();
     detector_->InitSphere(0,0,0,1e18,0);
@@ -1434,7 +1433,7 @@ Propagator::Propagator()
 
 Propagator::Propagator(Medium* medium,
                        EnergyCutSettings* cuts,
-                       PROPOSALParticle::ParticleType particle_type,
+                       ParticleType::Enum particle_type,
                        string path_to_tables,
                        bool moliere,
                        bool continuous_rand,
@@ -1484,6 +1483,9 @@ Propagator::Propagator(Medium* medium,
     detector_              = new Geometry();
     detector_->InitSphere(0,0,0,1e18,0);
     current_collection_->SetGeometry(detector_);
+
+    current_collection_->SetLocation(1); // Inside the detector
+    collections_.push_back(current_collection_);
 
     for(unsigned int i =0; i<current_collection_->GetCrosssections().size(); i++)
     {
@@ -1551,7 +1553,11 @@ Propagator::Propagator(Medium* medium,
 
     if(!integrate_)
     {
+
+        cout << "Starting Interpolation! This will take some time depending on the number of media you defined!\n";
+        cout.flush();
         EnableInterpolation(path_to_tables_, raw_);
+        cout << "Done!\n";
     }
 
 }
@@ -1627,7 +1633,9 @@ Propagator::Propagator(std::string config_file, PROPOSALParticle* particle, bool
     ,scattering_model_          (-1)
     ,current_collection_        (NULL)
 {
-    particle_        = new PROPOSALParticle(*particle);
+    //TODO(mario): uncomment Do 2017/04/06
+    // particle_        = new PROPOSALParticle(*particle);
+    particle_        = particle;
     backup_particle_ = new PROPOSALParticle(*particle_);
     ReadConfigFile(config_file, DoApplyOptions);
 }
@@ -2055,12 +2063,12 @@ void Propagator::InitProcessCollections(ifstream &file)
             if (particle_ == NULL)
             {
 
-                PROPOSALParticle *muminus    =   new PROPOSALParticle(PROPOSALParticle::ParticleType::MuMinus);
-                PROPOSALParticle *tauminus   =   new PROPOSALParticle(PROPOSALParticle::ParticleType::TauMinus);
-                PROPOSALParticle *eminus     =   new PROPOSALParticle(PROPOSALParticle::ParticleType::EMinus);
-                // PROPOSALParticle *muplus    =   new PROPOSALParticle(PROPOSALParticle::ParticleType::MuPlus);
-                // PROPOSALParticle *tauplus   =   new PROPOSALParticle(PROPOSALParticle::ParticleType::TauPlus);
-                // PROPOSALParticle *eplus     =   new PROPOSALParticle(PROPOSALParticle::ParticleType::EPlus);
+                PROPOSALParticle *muminus    =   new PROPOSALParticle(ParticleType::MuMinus);
+                PROPOSALParticle *tauminus   =   new PROPOSALParticle(ParticleType::TauMinus);
+                PROPOSALParticle *eminus     =   new PROPOSALParticle(ParticleType::EMinus);
+                // PROPOSALParticle *muplus    =   new PROPOSALParticle(ParticleType::MuPlus);
+                // PROPOSALParticle *tauplus   =   new PROPOSALParticle(ParticleType::TauPlus);
+                // PROPOSALParticle *eplus     =   new PROPOSALParticle(ParticleType::EPlus);
 
                 EnergyCutSettings *inside;
                 EnergyCutSettings *infront;
@@ -2871,6 +2879,11 @@ void Propagator::ApplyOptions()
 //---------------------------------Setter-------------------------------------//
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
+
+void Propagator::SetCollections(std::vector<ProcessCollection*> collections)
+{
+    collections_ = collections;
+}
 
 void Propagator::SetParticle(PROPOSALParticle* particle)
 {

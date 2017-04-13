@@ -390,36 +390,36 @@ std::vector<I3Particle> I3PropagatorServicePROPOSAL::Propagate(I3Particle& p, Di
     return daughters;
 }
 
-typedef boost::bimap<I3Particle::ParticleType, PROPOSALParticle::ParticleType> bimap_ParticleType;
+typedef boost::bimap<I3Particle::ParticleType, ParticleType::Enum> bimap_ParticleType;
 static const bimap_ParticleType I3_PROPOSAL_ParticleType_bimap = boost::assign::list_of<bimap_ParticleType::relation>
-    (I3Particle::MuMinus,   PROPOSALParticle::ParticleType::MuMinus)
-    (I3Particle::MuPlus,    PROPOSALParticle::ParticleType::MuPlus)
-    (I3Particle::TauMinus,  PROPOSALParticle::ParticleType::TauMinus)
-    (I3Particle::TauPlus,   PROPOSALParticle::ParticleType::TauPlus)
-    (I3Particle::EMinus,    PROPOSALParticle::ParticleType::EMinus)
-    (I3Particle::EPlus,     PROPOSALParticle::ParticleType::EPlus)
-    (I3Particle::NuMu,      PROPOSALParticle::ParticleType::NuMu)
-    (I3Particle::NuMuBar,   PROPOSALParticle::ParticleType::NuMuBar)
-    (I3Particle::NuE,       PROPOSALParticle::ParticleType::NuE)
-    (I3Particle::NuEBar,    PROPOSALParticle::ParticleType::NuEBar)
-    (I3Particle::NuTau,     PROPOSALParticle::ParticleType::NuTau)
-    (I3Particle::NuTauBar,  PROPOSALParticle::ParticleType::NuTauBar)
-    (I3Particle::Brems,     PROPOSALParticle::ParticleType::Brems)
-    (I3Particle::DeltaE,    PROPOSALParticle::ParticleType::DeltaE)
-    (I3Particle::PairProd,  PROPOSALParticle::ParticleType::EPair)
-    (I3Particle::NuclInt,   PROPOSALParticle::ParticleType::NuclInt)
-    (I3Particle::MuPair,    PROPOSALParticle::ParticleType::MuPair)
-    (I3Particle::Hadrons,   PROPOSALParticle::ParticleType::Hadrons)
-    (I3Particle::Monopole,  PROPOSALParticle::ParticleType::Monopole)
-    (I3Particle::STauMinus, PROPOSALParticle::ParticleType::STauMinus)
-    (I3Particle::STauPlus,  PROPOSALParticle::ParticleType::STauPlus);
+    (I3Particle::MuMinus,   ParticleType::MuMinus)
+    (I3Particle::MuPlus,    ParticleType::MuPlus)
+    (I3Particle::TauMinus,  ParticleType::TauMinus)
+    (I3Particle::TauPlus,   ParticleType::TauPlus)
+    (I3Particle::EMinus,    ParticleType::EMinus)
+    (I3Particle::EPlus,     ParticleType::EPlus)
+    (I3Particle::NuMu,      ParticleType::NuMu)
+    (I3Particle::NuMuBar,   ParticleType::NuMuBar)
+    (I3Particle::NuE,       ParticleType::NuE)
+    (I3Particle::NuEBar,    ParticleType::NuEBar)
+    (I3Particle::NuTau,     ParticleType::NuTau)
+    (I3Particle::NuTauBar,  ParticleType::NuTauBar)
+    (I3Particle::Brems,     ParticleType::Brems)
+    (I3Particle::DeltaE,    ParticleType::DeltaE)
+    (I3Particle::PairProd,  ParticleType::EPair)
+    (I3Particle::NuclInt,   ParticleType::NuclInt)
+    (I3Particle::MuPair,    ParticleType::MuPair)
+    (I3Particle::Hadrons,   ParticleType::Hadrons)
+    (I3Particle::Monopole,  ParticleType::Monopole)
+    (I3Particle::STauMinus, ParticleType::STauMinus)
+    (I3Particle::STauPlus,  ParticleType::STauPlus);
 
 
 // ------------------------------------------------------------------------- //
-PROPOSALParticle::ParticleType I3PropagatorServicePROPOSAL::GeneratePROPOSALType(const I3Particle& p)
+ParticleType::Enum I3PropagatorServicePROPOSAL::GeneratePROPOSALType(const I3Particle& p)
 {
     I3Particle::ParticleType ptype_I3 = p.GetType();
-    PROPOSALParticle::ParticleType ptype_PROPOSAL;
+    ParticleType::Enum ptype_PROPOSAL;
 
     // TODO: Exception handling if I3Particle is not in bimap
     // the following uncomment thing is not working yet
@@ -434,18 +434,18 @@ PROPOSALParticle::ParticleType I3PropagatorServicePROPOSAL::GeneratePROPOSALType
 
     if (ptype_I3 == I3Particle::EMinus || ptype_I3 == I3Particle::EPlus || ptype_I3 == I3Particle::Hadrons)
     {
-        if (p.GetShape() != I3Particle::TopShower) 
+        if (p.GetShape() != I3Particle::TopShower)
         {
             log_info("The particle '%s' has no TopShower shape, but 'e-', 'e+' and 'Hadrons' need that.",
                 PROPOSALParticle::GetName(ptype_PROPOSAL).c_str());
-            ptype_PROPOSAL = PROPOSALParticle::ParticleType::unknown;
+            ptype_PROPOSAL = ParticleType::unknown;
             log_info("so the particle is set to unknown");
         }
     }
     return ptype_PROPOSAL;
 }
 
-I3Particle::ParticleType I3PropagatorServicePROPOSAL::GenerateI3Type(PROPOSALParticle::ParticleType ptype_PROPOSAL)
+I3Particle::ParticleType I3PropagatorServicePROPOSAL::GenerateI3Type(ParticleType::Enum ptype_PROPOSAL)
 {
     I3Particle::ParticleType ptype_I3;
 
@@ -550,14 +550,13 @@ I3MMCTrackPtr I3PropagatorServicePROPOSAL::propagate( I3Particle& p, vector<I3Pa
     double e_0 = p.GetEnergy()/I3Units::MeV;  // [MeV]
     double t_0 = p.GetTime()/I3Units::s;     // [s]
 
-    // PROPOSALParticle::ParticleType particleType = GeneratePROPOSALType(p);
+    // ParticleType::Enum particleType = GeneratePROPOSALType(p);
     log_debug("Name of particle to propagate: %s", PROPOSALParticle::GetName(GeneratePROPOSALType(p)).c_str());
 
 
     // PROPOSALParticle* particle = new PROPOSALParticle(GeneratePROPOSALType(p), x_0, y_0, z_0, theta_0, phi_0, e_0, t_0);
     proposal->ResetParticle();
     PROPOSALParticle* particle = proposal->GetParticle();
-    // printf("Mass: %f\n", particle->GetMass());
 
     if (particle == NULL)
         log_fatal("Error calling the Particle constructor");
@@ -597,7 +596,7 @@ I3MMCTrackPtr I3PropagatorServicePROPOSAL::propagate( I3Particle& p, vector<I3Pa
     {
         //Tomasz
         //in mmc the particle relationships are stored
-        PROPOSALParticle::ParticleType type = aobj_l.at(i)->GetType();
+        ParticleType::Enum type = aobj_l.at(i)->GetType();
         double x = aobj_l.at(i)->GetX() * I3Units::cm;
         double y = aobj_l.at(i)->GetY() * I3Units::cm;
         double z = aobj_l.at(i)->GetZ() * I3Units::cm;
@@ -637,6 +636,9 @@ I3MMCTrackPtr I3PropagatorServicePROPOSAL::propagate( I3Particle& p, vector<I3Pa
         new_particle.SetLength(l);
         new_particle.SetThetaPhi(theta,phi);
         new_particle.SetEnergy(e);
+
+        //TODO(mario): Damn hard hack Mi 2017/04/05
+        new_particle.SetSpeed(aobj_l.at(i)->GetParentParticleEnergy());
 
         // this is not the particle you're looking for
         // move along...and add it to the daughter list
