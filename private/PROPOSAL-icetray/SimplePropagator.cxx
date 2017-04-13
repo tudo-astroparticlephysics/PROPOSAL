@@ -23,10 +23,9 @@
 namespace PROPOSAL {
 
 
-ParticleType
-GetPROPOSALType(I3Particle::ParticleType pt)
+ParticleType::Enum GetPROPOSALType(I3Particle::ParticleType pt)
 {
-    ParticleType code;
+    ParticleType::Enum code;
     switch (pt) {
         case I3Particle::MuMinus:
             code = ParticleType::MuMinus;
