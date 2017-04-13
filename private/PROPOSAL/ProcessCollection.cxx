@@ -243,7 +243,7 @@ double ProcessCollection::CalculateFinalEnergy(double ei, double rnd, bool parti
 //----------------------------------------------------------------------------//
 
 
-pair<double, PROPOSALParticle::ParticleType> ProcessCollection::MakeStochasticLoss()
+pair<double, ParticleType::Enum> ProcessCollection::MakeStochasticLoss()
 {
     return this->MakeStochasticLoss(MathModel::RandomDouble(),MathModel::RandomDouble(),MathModel::RandomDouble());
 }
@@ -253,7 +253,7 @@ pair<double, PROPOSALParticle::ParticleType> ProcessCollection::MakeStochasticLo
 //----------------------------------------------------------------------------//
 
 
-pair<double, PROPOSALParticle::ParticleType> ProcessCollection::MakeStochasticLoss(double rnd1,double rnd2, double rnd3)
+pair<double, ParticleType::Enum> ProcessCollection::MakeStochasticLoss(double rnd1,double rnd2, double rnd3)
 {
     double total_rate          =    0;
     double total_rate_weighted =    0;
@@ -262,7 +262,7 @@ pair<double, PROPOSALParticle::ParticleType> ProcessCollection::MakeStochasticLo
     //double decayS              =    0;
 
 
-    pair<double, PROPOSALParticle::ParticleType> energy_loss;
+    pair<double, ParticleType::Enum> energy_loss;
 
     std::vector<double> rates;
 
@@ -334,7 +334,7 @@ pair<double, PROPOSALParticle::ParticleType> ProcessCollection::MakeStochasticLo
 //----------------------------------------------------------------------------//
 
 
-pair<double, PROPOSALParticle::ParticleType> ProcessCollection::MakeDecay()
+pair<double, ParticleType::Enum> ProcessCollection::MakeDecay()
 {
     return MakeDecay(MathModel::RandomDouble(),MathModel::RandomDouble(),MathModel::RandomDouble());
 }
@@ -345,11 +345,11 @@ pair<double, PROPOSALParticle::ParticleType> ProcessCollection::MakeDecay()
 
 
 
-pair<double, PROPOSALParticle::ParticleType> ProcessCollection::MakeDecay(double rnd1,double rnd2, double rnd3)
+pair<double, ParticleType::Enum> ProcessCollection::MakeDecay(double rnd1,double rnd2, double rnd3)
 {
-    pair<double, PROPOSALParticle::ParticleType> decay;
+    pair<double, ParticleType::Enum> decay;
 
-    if(particle_->GetType() == PROPOSALParticle::ParticleType::TauPlus || particle_->GetType() == PROPOSALParticle::ParticleType::TauMinus)
+    if(particle_->GetType() == ParticleType::TauPlus || particle_->GetType() == ParticleType::TauMinus)
     {
         decay.first     =   decay_->CalculateProductEnergy(rnd1, rnd2, rnd3);
     }
@@ -438,17 +438,17 @@ void ProcessCollection::EnableInterpolation(std::string path, bool raw)
     // (except of diffractive Bremsstrahlung, where one can analyse the interference term if implemented)
     // so they use the same interpolation tables
     string particle_name;
-    if (particle_->GetType() == PROPOSALParticle::ParticleType::MuPlus)
+    if (particle_->GetType() == ParticleType::MuPlus)
     {
-        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::MuMinus);
+        particle_name = PROPOSALParticle::GetName(ParticleType::MuMinus);
     }
-    else if (particle_->GetType() == PROPOSALParticle::ParticleType::TauPlus)
+    else if (particle_->GetType() == ParticleType::TauPlus)
     {
-        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::TauMinus);
+        particle_name = PROPOSALParticle::GetName(ParticleType::TauMinus);
     }
-    else if (particle_->GetType() == PROPOSALParticle::ParticleType::EPlus)
+    else if (particle_->GetType() == ParticleType::EPlus)
     {
-        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::EMinus);
+        particle_name = PROPOSALParticle::GetName(ParticleType::EMinus);
     }
     else
     {
@@ -609,6 +609,8 @@ void ProcessCollection::EnableInterpolation(std::string path, bool raw)
     }
     if(path.empty() || storing_failed)
     {
+        log_info("ProcessCollection parametrisation tables will be stored in memory!");
+
         double energy = particle_->GetEnergy();
 
         interpolant_        =   new Interpolant(NUM3, particle_->GetLow(), BIGENERGY, boost::bind(&ProcessCollection::FunctionToBuildInterpolant, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
@@ -733,17 +735,17 @@ void ProcessCollection::EnableParticleTimeInterpolation(std::string path, bool r
     // (except of diffractive Bremsstrahlung, where one can analyse the interference term if implemented)
     // so they use the same interpolation tables
     string particle_name;
-    if (particle_->GetType() == PROPOSALParticle::ParticleType::MuPlus)
+    if (particle_->GetType() == ParticleType::MuPlus)
     {
-        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::MuMinus);
+        particle_name = PROPOSALParticle::GetName(ParticleType::MuMinus);
     }
-    else if (particle_->GetType() == PROPOSALParticle::ParticleType::TauPlus)
+    else if (particle_->GetType() == ParticleType::TauPlus)
     {
-        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::TauMinus);
+        particle_name = PROPOSALParticle::GetName(ParticleType::TauMinus);
     }
-    else if (particle_->GetType() == PROPOSALParticle::ParticleType::EPlus)
+    else if (particle_->GetType() == ParticleType::EPlus)
     {
-        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::EMinus);
+        particle_name = PROPOSALParticle::GetName(ParticleType::EMinus);
     }
     else
     {

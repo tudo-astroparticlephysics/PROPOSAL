@@ -135,17 +135,17 @@ void Ionization::EnableDNdxInterpolation(std::string path, bool raw)
     // charged anti leptons have the same cross sections like charged leptons
     // so they use the same interpolation tables
     string particle_name;
-    if (particle_->GetType() == PROPOSALParticle::ParticleType::MuPlus)
+    if (particle_->GetType() == ParticleType::MuPlus)
     {
-        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::MuMinus);
+        particle_name = PROPOSALParticle::GetName(ParticleType::MuMinus);
     }
-    else if (particle_->GetType() == PROPOSALParticle::ParticleType::TauPlus)
+    else if (particle_->GetType() == ParticleType::TauPlus)
     {
-        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::TauMinus);
+        particle_name = PROPOSALParticle::GetName(ParticleType::TauMinus);
     }
-    else if (particle_->GetType() == PROPOSALParticle::ParticleType::EPlus)
+    else if (particle_->GetType() == ParticleType::EPlus)
     {
-        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::EMinus);
+        particle_name = PROPOSALParticle::GetName(ParticleType::EMinus);
     }
     else
     {
@@ -261,17 +261,17 @@ void Ionization::EnableDEdxInterpolation(std::string path, bool raw)
     // charged anti leptons have the same cross sections like charged leptons
     // so they use the same interpolation tables
     string particle_name;
-    if (particle_->GetType() == PROPOSALParticle::ParticleType::MuPlus)
+    if (particle_->GetType() == ParticleType::MuPlus)
     {
-        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::MuMinus);
+        particle_name = PROPOSALParticle::GetName(ParticleType::MuMinus);
     }
-    else if (particle_->GetType() == PROPOSALParticle::ParticleType::TauPlus)
+    else if (particle_->GetType() == ParticleType::TauPlus)
     {
-        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::TauMinus);
+        particle_name = PROPOSALParticle::GetName(ParticleType::TauMinus);
     }
-    else if (particle_->GetType() == PROPOSALParticle::ParticleType::EPlus)
+    else if (particle_->GetType() == ParticleType::EPlus)
     {
-        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::EMinus);
+        particle_name = PROPOSALParticle::GetName(ParticleType::EMinus);
     }
     else
     {
@@ -441,7 +441,7 @@ Ionization::Ionization()
     ,integral_              (  )
 {
     name_                  = "Ionization";
-    type_                  = PROPOSALParticle::ParticleType::DeltaE;
+    type_                  = ParticleType::DeltaE;
 
     dedx_interpolant_      = NULL;
     dndx_interpolant_1d_   = NULL;
@@ -501,7 +501,7 @@ Ionization::Ionization(PROPOSALParticle* particle,
     ,gamma_ ( 0 )
 {
     name_                       = "Ionization";
-    type_                       = PROPOSALParticle::ParticleType::DeltaE;
+    type_                       = ParticleType::DeltaE;
     vMax_                       = 0;
     vUp_                        = 0;
     vMin_                       = 0;

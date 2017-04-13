@@ -155,7 +155,7 @@ int main(int argc, char** argv)
     TFile *file     =   new TFile(ss.str().c_str(),"RECREATE");
 
 
-    Propagator *pr = new Propagator(med, cuts, PROPOSALParticle::ParticleType::MuMinus, "resources/tables",false,false,false,false);
+    Propagator *pr = new Propagator(med, cuts, ParticleType::MuMinus, "resources/tables",false,false,false,false);
 
 
     TH2D *ioniz = new TH2D("ioniz","Ionization;primary log10(energy/MeV);secondary log10(energy/MeV)",512,2,EmaxLog10,512,EminLog10,EmaxLog10);

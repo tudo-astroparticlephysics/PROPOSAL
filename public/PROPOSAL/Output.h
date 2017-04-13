@@ -91,7 +91,8 @@ private:
     Output()
     {
         #if LOG4CPLUS_SUPPORT
-        PropertyConfigurator::doConfigure(LOG4CPLUS_TEXT("resources/log4cplus.conf"));
+        // PropertyConfigurator::doConfigure(LOG4CPLUS_TEXT("resources/log4cplus.conf"));
+        PropertyConfigurator::doConfigure(LOG4CPLUS_TEXT(LOG4CPLUS_CONFIG));
         logger = Logger::getInstance(LOG4CPLUS_TEXT("PROPOSAL"));
         #endif
     }
@@ -189,7 +190,7 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    void FillSecondaryVector(PROPOSALParticle *particle, int secondary_id, std::pair<double, PROPOSALParticle::ParticleType> energy_loss, double distance);
+    void FillSecondaryVector(PROPOSALParticle *particle, int secondary_id, std::pair<double, ParticleType::Enum> energy_loss, double distance);
 
 //----------------------------------------------------------------------------//
 

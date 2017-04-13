@@ -143,17 +143,17 @@ void Photonuclear::EnableDNdxInterpolation(std::string path, bool raw)
     // charged anti leptons have the same cross sections like charged leptons
     // so they use the same interpolation tables
     string particle_name;
-    if (particle_->GetType() == PROPOSALParticle::ParticleType::MuPlus)
+    if (particle_->GetType() == ParticleType::MuPlus)
     {
-        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::MuMinus);
+        particle_name = PROPOSALParticle::GetName(ParticleType::MuMinus);
     }
-    else if (particle_->GetType() == PROPOSALParticle::ParticleType::TauPlus)
+    else if (particle_->GetType() == ParticleType::TauPlus)
     {
-        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::TauMinus);
+        particle_name = PROPOSALParticle::GetName(ParticleType::TauMinus);
     }
-    else if (particle_->GetType() == PROPOSALParticle::ParticleType::EPlus)
+    else if (particle_->GetType() == ParticleType::EPlus)
     {
-        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::EMinus);
+        particle_name = PROPOSALParticle::GetName(ParticleType::EMinus);
     }
     else
     {
@@ -288,17 +288,17 @@ void Photonuclear::EnableDEdxInterpolation(std::string path, bool raw)
     // charged anti leptons have the same cross sections like charged leptons
     // so they use the same interpolation tables
     string particle_name;
-    if (particle_->GetType() == PROPOSALParticle::ParticleType::MuPlus)
+    if (particle_->GetType() == ParticleType::MuPlus)
     {
-        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::MuMinus);
+        particle_name = PROPOSALParticle::GetName(ParticleType::MuMinus);
     }
-    else if (particle_->GetType() == PROPOSALParticle::ParticleType::TauPlus)
+    else if (particle_->GetType() == ParticleType::TauPlus)
     {
-        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::TauMinus);
+        particle_name = PROPOSALParticle::GetName(ParticleType::TauMinus);
     }
-    else if (particle_->GetType() == PROPOSALParticle::ParticleType::EPlus)
+    else if (particle_->GetType() == ParticleType::EPlus)
     {
-        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::EMinus);
+        particle_name = PROPOSALParticle::GetName(ParticleType::EMinus);
     }
     else
     {
@@ -406,17 +406,17 @@ void Photonuclear::EnablePhotoInterpolation(std::string path, bool raw)
     // charged anti leptons have the same cross sections like charged leptons
     // so they use the same interpolation tables
     string particle_name;
-    if (particle_->GetType() == PROPOSALParticle::ParticleType::MuPlus)
+    if (particle_->GetType() == ParticleType::MuPlus)
     {
-        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::MuMinus);
+        particle_name = PROPOSALParticle::GetName(ParticleType::MuMinus);
     }
-    else if (particle_->GetType() == PROPOSALParticle::ParticleType::TauPlus)
+    else if (particle_->GetType() == ParticleType::TauPlus)
     {
-        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::TauMinus);
+        particle_name = PROPOSALParticle::GetName(ParticleType::TauMinus);
     }
-    else if (particle_->GetType() == PROPOSALParticle::ParticleType::EPlus)
+    else if (particle_->GetType() == ParticleType::EPlus)
     {
-        particle_name = PROPOSALParticle::GetName(PROPOSALParticle::ParticleType::EMinus);
+        particle_name = PROPOSALParticle::GetName(ParticleType::EMinus);
     }
     else
     {
@@ -650,7 +650,7 @@ Photonuclear::Photonuclear()
 
 {
     name_   =   "Photonuclear";
-    type_   =   PROPOSALParticle::ParticleType::NuclInt;
+    type_   =   ParticleType::NuclInt;
 
     integral_             = new Integral(IROMB, IMAXS, IPREC);
     integral_for_dEdx_    = new Integral(IROMB, IMAXS, IPREC);
@@ -761,7 +761,7 @@ Photonuclear::Photonuclear(PROPOSALParticle* particle,
 
 {
     name_       = "Photonuclear";
-    type_       = PROPOSALParticle::ParticleType::NuclInt;
+    type_       = ParticleType::NuclInt;
     multiplier_ = 1.;
 
     integral_             = new Integral(IROMB, IMAXS, IPREC);
