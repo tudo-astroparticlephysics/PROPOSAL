@@ -1,5 +1,19 @@
 import pyPROPOSAL
-import numpy as np
+import math
+
+try:
+    import matplotlib
+    import matplotlib.pyplot as plt
+    from matplotlib.colors import LogNorm
+    from mpl_toolkits.axes_grid1 import make_axes_locatable
+
+except ImportError:
+    print("pylab not installed.  no plots for you.")
+
+# =========================================================
+# 	POPOSAL
+# =========================================================
+
 
 ptype = pyPROPOSAL.ParticleType.EMinus
 mu = pyPROPOSAL.Particle(ptype)
@@ -25,12 +39,12 @@ photo_secondary_energy = []
 
 for i in range(statistics):
     prop.reset_particle()
-    prop.particle.energy = np.power(10, E_max_log)
+    prop.particle.energy = math.pow(10, E_max_log)
     secondarys = prop.propagate()
 
     for sec in secondarys:
-        log_sec_energy = np.log10(sec.energy)
-        log_energy = np.log10(sec.parent_particle_energy)
+        log_sec_energy = math.log10(sec.energy)
+        log_energy = math.log10(sec.parent_particle_energy)
 
         if sec.type is pyPROPOSAL.ParticleType.EPair:
             epair_primary_energy.append(log_energy)
@@ -45,19 +59,18 @@ for i in range(statistics):
             photo_primary_energy.append(log_energy)
             photo_secondary_energy.append(log_sec_energy)
 
-try:
-    import matplotlib.pyplot as plt
-    from matplotlib.colors import LogNorm
-    from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-except ImportError:
-    print("pylab not installed.  no plots for you.")
+# =========================================================
+# 	Plot
+# =========================================================
+
+
+matplotlib.use("Agg")
 
 tex_preamble = [
     r"\usepackage{amsmath}",
     r"\usepackage[utf8]{inputenc}",
     r"\usepackage[T1]{fontenc}",
-    r"\usepackage{siunitx}",
 ]
 
 font_size = 10
@@ -81,7 +94,6 @@ plt.rcParams.update(params)
 
 
 def plot_hist(ax, prim, sec):
-    # ax.set_aspect(0.5)
 
     hist = ax.hist2d(
         prim,
@@ -98,11 +110,7 @@ def plot_hist(ax, prim, sec):
             verticalalignment='top', horizontalalignment='left',
             transform=ax.transAxes, fontsize=10)
 
-    # divider = make_axes_locatable(ax)
-    # cax = divider.append_axes("right", size="5%", pad=0.01)
-
     plt.colorbar(hist[3], ax=ax, pad=0.01)
-    # plt.colorbar(hist[3], cax=cax)
 
     return ax
 
@@ -110,7 +118,9 @@ inch_to_cm = 2.54
 golden_ratio = 1.61803
 width = 29.7  # cm
 
-fig = plt.figure(figsize=(width / inch_to_cm, width / inch_to_cm / golden_ratio))
+fig = plt.figure(
+    figsize=(width / inch_to_cm, width / inch_to_cm / golden_ratio)
+)
 fig.subplots_adjust(wspace=0.1, hspace=0.3)
 
 # =========================================================
@@ -120,7 +130,7 @@ fig.subplots_adjust(wspace=0.1, hspace=0.3)
 ax1 = fig.add_subplot(221)
 ax1 = plot_hist(ax1, ioniz_primary_energy, ioniz_secondary_energy)
 ax1.set_title("ionization")
-ax1.set_ylabel(r'secondary particle energy $\log(E/\si{MeV})$')
+ax1.set_ylabel(r'secondary particle energy log($E$/MeV)')
 
 # =========================================================
 # 	Brems
@@ -137,8 +147,8 @@ ax2.set_title("bremsstrahlung")
 ax3 = fig.add_subplot(223)
 ax3 = plot_hist(ax3, photo_primary_energy, photo_secondary_energy)
 ax3.set_title("photonuclear")
-ax3.set_xlabel(r'primary particle energy $\log(E/\si{MeV})$')
-ax3.set_ylabel(r'secondary particle energy $\log(E/\si{MeV})$')
+ax3.set_xlabel(r'primary particle energy log($E$/MeV)')
+ax3.set_ylabel(r'secondary particle energy log($E$/MeV)')
 
 # =========================================================
 # 	Epair
@@ -147,6 +157,6 @@ ax3.set_ylabel(r'secondary particle energy $\log(E/\si{MeV})$')
 ax4 = fig.add_subplot(224)
 ax4 = plot_hist(ax4, epair_primary_energy, epair_secondary_energy)
 ax4.set_title("pair production")
-ax4.set_xlabel(r'primary particle energy $\log(E/\si{MeV})$')
+ax4.set_xlabel(r'primary particle energy log($E$/MeV)')
 
 fig.savefig("energy_probability.pdf")
