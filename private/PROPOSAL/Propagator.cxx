@@ -1633,9 +1633,7 @@ Propagator::Propagator(std::string config_file, PROPOSALParticle* particle, bool
     ,scattering_model_          (-1)
     ,current_collection_        (NULL)
 {
-    //TODO(mario): uncomment Do 2017/04/06
-    // particle_        = new PROPOSALParticle(*particle);
-    particle_        = particle;
+    particle_        = new PROPOSALParticle(*particle);
     backup_particle_ = new PROPOSALParticle(*particle_);
     ReadConfigFile(config_file, DoApplyOptions);
 }
