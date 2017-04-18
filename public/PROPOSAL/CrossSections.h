@@ -18,6 +18,42 @@
 #include <boost/program_options.hpp>
 
 
+namespace CrossSectionType
+{
+    enum Enum
+    {
+        Bremsstrahlung,
+        Ionization,
+        EPairproduction,
+        MuPairproduction,
+        Photonuclear
+    };
+};
+
+namespace ParametrizationType
+{
+    enum Enum
+    {
+        BremsKelnerKokoulinPetrukhin,
+        BremsAndreevBezrukovBugaev,
+        BremsPetrukhinShestakov,
+        BremsCompleteScreeningCase,
+        PhotoKokoulin,
+        PhotoKokoulinHard,
+        PhotoRhode,
+        PhotoRhodeHard,
+        PhotoBezrukovBugaev,
+        PhotoBezrukovBugaevHard,
+        PhotoZeus,
+        PhotoZeusHard,
+        PhotoALLM91Dutta,
+        PhotoALLM91Butkevich,
+        PhotoALLM97Dutta,
+        PhotoALLM97Butkevich,
+        PhotoButkevichMikhailovDutta,
+        PhotoButkevichMikhailovButkevich
+    };
+};
 
 /*! \class CrossSections CrossSections.h "CrossSections.h"
     \brief This is a pure virtual class
