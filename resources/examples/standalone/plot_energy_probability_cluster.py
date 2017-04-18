@@ -27,9 +27,18 @@ except ImportError:
 
 class EnergyProbability(object):
 
-    def __init__(self, propagator):
+    def __init__(self, ptype, med, cuts, table_dir, stats, processes):
 
-        self.prop = propagator
+        self.statistics = stats
+        self.processes = processes
+        self.stats_per_job = self.statistics / self.processes
+        self.prop = pyPROPOSAL.Propagator(med, cuts, ptype, table_dir)
+
+        # self.prop = []
+        # for p in range(self.cores):
+        #     self.prop.append(
+        #         pyPROPOSAL.Propagator(med, cuts, ptype, table_dir)
+        #     )
 
         self.epair_primary_energy = mp.Manager().list()
         self.epair_secondary_energy = mp.Manager().list()
@@ -40,15 +49,18 @@ class EnergyProbability(object):
         self.photo_primary_energy = mp.Manager().list()
         self.photo_secondary_energy = mp.Manager().list()
 
-    def propagate(self, stats):
+    def propagate(self, stats, process_nr):
         # self.basis.append([i])
         E_max_log = 14
 
-        self.prop.reset_particle()
-        self.prop.particle.energy = math.pow(10, E_max_log)
-        secondarys = self.prop.propagate()
-
         for i in range(stats):
+            # self.prop[process_nr].reset_particle()
+            # self.prop[process_nr].particle.energy = math.pow(10, E_max_log)
+            # secondarys = self.prop[process_nr].propagate()
+            self.prop.reset_particle()
+            self.prop.particle.energy = math.pow(10, E_max_log)
+            secondarys = self.prop.propagate()
+
             for sec in secondarys:
                 log_sec_energy = math.log10(sec.energy)
                 log_energy = math.log10(sec.parent_particle_energy)
@@ -67,16 +79,14 @@ class EnergyProbability(object):
                     self.photo_secondary_energy.append(log_sec_energy)
 
     def run(self):
-        statistics = 100
-        cores = 1
-
-        job_stats = statistics / cores
-        print("job_stats: ", job_stats)
 
         jobs = []
-        for i in xrange(cores):
+        for i in xrange(self.cores):
             print("Job: ", i)
-            job = mp.Process(target=self.propagate, args=(job_stats, ))
+            job = mp.Process(
+                target=self.propagate,
+                args=(self.stats_per_job, i, )
+            )
             jobs.append(job)
             job.start()
         for j in jobs:
@@ -204,8 +214,6 @@ if __name__ == "__main__":
     med = pyPROPOSAL.Medium("standard_rock")
     cuts = pyPROPOSAL.EnergyCutSettings()
 
-    prop = pyPROPOSAL.Propagator(med, cuts, ptype, "../../resources/tables")
-
     # epair_primary_energy = []
     # epair_secondary_energy = []
     #
@@ -218,7 +226,7 @@ if __name__ == "__main__":
     # photo_primary_energy = []
     # photo_secondary_energy = []
 
-    P = EnergyProbability(prop)
+    P = EnergyProbability(ptype, med, cuts, "../../resources/tables", 1000, 3)
     P.run()
 
     epair_primary_energy = P.epair_primary_energy
