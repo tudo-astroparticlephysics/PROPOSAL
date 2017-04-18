@@ -658,7 +658,7 @@ double Propagator::Propagate( double distance )
             NumInt++;//TOMASZ
             energy_loss     =   current_collection_->MakeStochasticLoss();
             final_energy    -=  energy_loss.first;
-            log_debug("Energyloss: %d\t%d\t%d\t%d\t%d", energy_loss.first, energy_loss.second, particle_->GetX(), particle_->GetY(), particle_->GetZ());
+            log_debug("Energyloss: %d\t%s\t%d\t%d\t%d", energy_loss.first, energy_loss.second.c_str(), particle_->GetX(), particle_->GetY(), particle_->GetZ());
             secondary_id    =   particle_->GetParticleId() + 1;
             Output::getInstance().FillSecondaryVector(particle_, secondary_id, energy_loss, 0);
         }
