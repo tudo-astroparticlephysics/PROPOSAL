@@ -133,19 +133,19 @@ bool Scattering::operator==(const Scattering &scattering) const
 
     for(unsigned int i =2; i<scattering.crosssections_.size(); i++)
     {
-        if(scattering.crosssections_.at(i)->GetName().compare("Bremsstrahlung")==0)
+        if(scattering.crosssections_.at(i)->GetType() == ParticleType::Brems)
         {
             if( *(Bremsstrahlung*)crosssections_.at(i) !=  *(Bremsstrahlung*)scattering.crosssections_.at(i) ) return false;
         }
-        else if(scattering.crosssections_.at(i)->GetName().compare("Ionization")==0)
+        else if(scattering.crosssections_.at(i)->GetType() == ParticleType::DeltaE)
         {
             if( *(Ionization*)crosssections_.at(i) != *(Ionization*)scattering.crosssections_.at(i) ) return false;
         }
-        else if(scattering.crosssections_.at(i)->GetName().compare("Epairproduction")==0)
+        else if(scattering.crosssections_.at(i)->GetType() == ParticleType::EPair)
         {
             if( *(Epairproduction*)crosssections_.at(i) !=  *(Epairproduction*)scattering.crosssections_.at(i) ) return false;
         }
-        else if(scattering.crosssections_.at(i)->GetName().compare("Photonuclear")==0)
+        else if(scattering.crosssections_.at(i)->GetType() == ParticleType::NuclInt)
         {
             if( *(Photonuclear*)crosssections_.at(i) !=  *(Photonuclear*)scattering.crosssections_.at(i) )  return false;
         }
@@ -461,7 +461,7 @@ void Scattering::EnableInterpolation(string path)
 
         for(unsigned int i =0; i<crosssections_.size(); i++)
         {
-            if(crosssections_.at(i)->GetName().compare("Bremsstrahlung")==0)
+            if(crosssections_.at(i)->GetType() == ParticleType::Brems)
             {
                 filename << "_b_"
                          << "_" << crosssections_.at(i)->GetParametrization()
@@ -471,14 +471,14 @@ void Scattering::EnableInterpolation(string path)
                          << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetVcut();
 
             }
-            else if(crosssections_.at(i)->GetName().compare("Ionization")==0)
+            else if(crosssections_.at(i)->GetType() == ParticleType::DeltaE)
             {
                 filename << "_i_"
                          << "_" << crosssections_.at(i)->GetMultiplier()
                          << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetEcut()
                          << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetVcut();
             }
-            else if(crosssections_.at(i)->GetName().compare("Epairproduction")==0)
+            else if(crosssections_.at(i)->GetType() == ParticleType::EPair)
             {
                 filename << "_e_"
                          << "_" << crosssections_.at(i)->GetMultiplier()
@@ -486,7 +486,7 @@ void Scattering::EnableInterpolation(string path)
                          << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetEcut()
                          << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetVcut();
             }
-            else if(crosssections_.at(i)->GetName().compare("Photonuclear")==0)
+            else if(crosssections_.at(i)->GetType() == ParticleType::NuclInt)
             {
                 filename << "_p_"
                          << "_" << crosssections_.at(i)->GetParametrization()

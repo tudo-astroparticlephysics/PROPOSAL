@@ -2764,23 +2764,23 @@ void Propagator::ApplyOptions()
     {
         for(unsigned int i =0; i<collections_.at(j)->GetCrosssections().size(); i++)
         {
-            if(collections_.at(j)->GetCrosssections().at(i)->GetName().compare("Bremsstrahlung")==0)
+            if(collections_.at(j)->GetCrosssections().at(i)->GetType() == ParticleType::Brems)
             {
                 collections_.at(j)->GetCrosssections().at(i)->SetParametrization(brems_);
                 collections_.at(j)->GetCrosssections().at(i)->SetMultiplier(brems_multiplier_);
                 collections_.at(j)->GetCrosssections().at(i)->EnableLpmEffect(lpm_);
 
             }
-            else if(collections_.at(j)->GetCrosssections().at(i)->GetName().compare("Ionization")==0)
+            else if(collections_.at(j)->GetCrosssections().at(i)->GetType() == ParticleType::DeltaE)
             {
                 collections_.at(j)->GetCrosssections().at(i)->SetMultiplier(ioniz_multiplier_);
             }
-            else if(collections_.at(j)->GetCrosssections().at(i)->GetName().compare("Epairproduction")==0)
+            else if(collections_.at(j)->GetCrosssections().at(i)->GetType() == ParticleType::EPair)
             {
                 collections_.at(j)->GetCrosssections().at(i)->SetMultiplier(epair_multiplier_);
                 collections_.at(j)->GetCrosssections().at(i)->EnableLpmEffect(lpm_);
             }
-            else if(collections_.at(j)->GetCrosssections().at(i)->GetName().compare("Photonuclear")==0)
+            else if(collections_.at(j)->GetCrosssections().at(i)->GetType() == ParticleType::NuclInt)
             {
                 collections_.at(j)->GetCrosssections().at(i)->SetParametrization(photo_);
                 collections_.at(j)->GetCrosssections().at(i)->SetMultiplier(photo_multiplier_);
