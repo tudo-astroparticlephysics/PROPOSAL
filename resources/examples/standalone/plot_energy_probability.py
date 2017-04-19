@@ -3,6 +3,8 @@ import math
 
 try:
     import matplotlib
+    matplotlib.use("Agg")
+
     import matplotlib.pyplot as plt
     from matplotlib.colors import LogNorm
     from mpl_toolkits.axes_grid1 import make_axes_locatable
@@ -15,14 +17,16 @@ except ImportError:
 # =========================================================
 
 
-ptype = pyPROPOSAL.ParticleType.EMinus
+ptype = pyPROPOSAL.ParticleType.STauMinus
 mu = pyPROPOSAL.Particle(ptype)
 med = pyPROPOSAL.Medium("standard_rock")
 cuts = pyPROPOSAL.EnergyCutSettings()
 
 prop = pyPROPOSAL.Propagator(med, cuts, ptype, "../../resources/tables")
+prop.particle.mass = 500000
+prop.apply_options()
 
-statistics = 1000
+statistics = 1
 E_max_log = 14
 
 epair_primary_energy = []
@@ -65,7 +69,6 @@ for i in range(statistics):
 # =========================================================
 
 
-matplotlib.use("Agg")
 
 tex_preamble = [
     r"\usepackage{amsmath}",
@@ -106,7 +109,8 @@ def plot_hist(ax, prim, sec):
     ax.set_ylim(ymin=-2, ymax=14)
     ax.grid(ls=":", lw=0.2)
 
-    ax.text(0.05, 0.95, 'count = {:g}'.format(np.sum(hist[0])),
+    # ax.text(0.05, 0.95, 'count = {:g}'.format(np.sum(hist[0])),
+    ax.text(0.05, 0.95, 'count = {:g}'.format(sum([sum(x) for x in hist[0]])),
             verticalalignment='top', horizontalalignment='left',
             transform=ax.transAxes, fontsize=10)
 
