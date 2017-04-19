@@ -18,18 +18,6 @@
 #include <boost/program_options.hpp>
 
 
-namespace CrossSectionType
-{
-    enum Enum
-    {
-        Bremsstrahlung,
-        Ionization,
-        EPairproduction,
-        MuPairproduction,
-        Photonuclear
-    };
-};
-
 namespace ParametrizationType
 {
     enum Enum
@@ -56,11 +44,8 @@ namespace ParametrizationType
 };
 
 /*! \class CrossSections CrossSections.h "CrossSections.h"
-    \brief This is a pure virtual class
+ *  \brief This is a pure virtual class
  */
-
-
-
 class CrossSections
 {
 
