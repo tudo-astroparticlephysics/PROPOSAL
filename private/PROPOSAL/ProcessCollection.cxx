@@ -467,7 +467,7 @@ void ProcessCollection::EnableInterpolation(std::string path, bool raw)
 
         for(unsigned int i =0; i<crosssections_.size(); i++)
         {
-            if(crosssections_.at(i)->GetName().compare("Bremsstrahlung")==0)
+            if(crosssections_.at(i)->GetType() == ParticleType::Brems)
             {
                 filename << "_b_"
                          << "_" << crosssections_.at(i)->GetParametrization()
@@ -477,14 +477,14 @@ void ProcessCollection::EnableInterpolation(std::string path, bool raw)
                          << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetVcut();
 
             }
-            else if(crosssections_.at(i)->GetName().compare("Ionization")==0)
+            else if(crosssections_.at(i)->GetType() == ParticleType::DeltaE)
             {
                 filename << "_i_"
                          << "_" << crosssections_.at(i)->GetMultiplier()
                          << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetEcut()
                          << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetVcut();
             }
-            else if(crosssections_.at(i)->GetName().compare("Epairproduction")==0)
+            else if(crosssections_.at(i)->GetType() == ParticleType::EPair)
             {
                 filename << "_e_"
                          << "_" << crosssections_.at(i)->GetMultiplier()
@@ -492,7 +492,7 @@ void ProcessCollection::EnableInterpolation(std::string path, bool raw)
                          << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetEcut()
                          << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetVcut();
             }
-            else if(crosssections_.at(i)->GetName().compare("Photonuclear")==0)
+            else if(crosssections_.at(i)->GetType() == ParticleType::NuclInt)
             {
                 filename << "_p_"
                          << "_" << crosssections_.at(i)->GetParametrization()
@@ -764,7 +764,7 @@ void ProcessCollection::EnableParticleTimeInterpolation(std::string path, bool r
 
         for(unsigned int i =0; i<crosssections_.size(); i++)
         {
-            if(crosssections_.at(i)->GetName().compare("Bremsstrahlung")==0)
+            if(crosssections_.at(i)->GetType() == ParticleType::Brems)
             {
                 filename << "_b_"
                          << "_" << crosssections_.at(i)->GetParametrization()
@@ -774,14 +774,14 @@ void ProcessCollection::EnableParticleTimeInterpolation(std::string path, bool r
                          << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetVcut();
 
             }
-            else if(crosssections_.at(i)->GetName().compare("Ionization")==0)
+            else if(crosssections_.at(i)->GetType() == ParticleType::DeltaE)
             {
                 filename << "_i_"
                          << "_" << crosssections_.at(i)->GetMultiplier()
                          << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetEcut()
                          << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetVcut();
             }
-            else if(crosssections_.at(i)->GetName().compare("Epairproduction")==0)
+            else if(crosssections_.at(i)->GetType() == ParticleType::EPair)
             {
                 filename << "_e_"
                          << "_" << crosssections_.at(i)->GetMultiplier()
@@ -789,7 +789,7 @@ void ProcessCollection::EnableParticleTimeInterpolation(std::string path, bool r
                          << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetEcut()
                          << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetVcut();
             }
-            else if(crosssections_.at(i)->GetName().compare("Photonuclear")==0)
+            else if(crosssections_.at(i)->GetType() == ParticleType::NuclInt)
             {
                 filename << "_p_"
                          << "_" << crosssections_.at(i)->GetParametrization()
@@ -1088,19 +1088,19 @@ ProcessCollection::ProcessCollection(const ProcessCollection &collection)
 
     for(unsigned int i =0; i<collection.crosssections_.size(); i++)
     {
-        if(collection.crosssections_.at(i)->GetName().compare("Bremsstrahlung")==0)
+        if(collection.crosssections_.at(i)->GetType() == ParticleType::Brems)
         {
             crosssections_.at(i) = new Bremsstrahlung( *(Bremsstrahlung*)collection.crosssections_.at(i) );
         }
-        else if(collection.crosssections_.at(i)->GetName().compare("Ionization")==0)
+        else if(collection.crosssections_.at(i)->GetType() == ParticleType::DeltaE)
         {
             crosssections_.at(i) = new Ionization( *(Ionization*)collection.crosssections_.at(i) );
         }
-        else if(collection.crosssections_.at(i)->GetName().compare("Epairproduction")==0)
+        else if(collection.crosssections_.at(i)->GetType() == ParticleType::EPair)
         {
             crosssections_.at(i) = new Epairproduction( *(Epairproduction*)collection.crosssections_.at(i) );
         }
-        else if(collection.crosssections_.at(i)->GetName().compare("Photonuclear")==0)
+        else if(collection.crosssections_.at(i)->GetType() == ParticleType::NuclInt)
         {
             crosssections_.at(i) = new Photonuclear( *(Photonuclear*)collection.crosssections_.at(i) );
         }
@@ -1334,19 +1334,19 @@ bool ProcessCollection::operator==(const ProcessCollection &collection) const
 
     for(unsigned int i =0; i<collection.crosssections_.size(); i++)
     {
-        if(collection.crosssections_.at(i)->GetName().compare("Bremsstrahlung")==0)
+        if(collection.crosssections_.at(i)->GetType() == ParticleType::Brems)
         {
             if( *(Bremsstrahlung*)crosssections_.at(i) !=  *(Bremsstrahlung*)collection.crosssections_.at(i) ) return false;
         }
-        else if(collection.crosssections_.at(i)->GetName().compare("Ionization")==0)
+        else if(collection.crosssections_.at(i)->GetType() == ParticleType::DeltaE)
         {
             if( *(Ionization*)crosssections_.at(i) != *(Ionization*)collection.crosssections_.at(i) ) return false;
         }
-        else if(collection.crosssections_.at(i)->GetName().compare("Epairproduction")==0)
+        else if(collection.crosssections_.at(i)->GetType() == ParticleType::EPair)
         {
             if( *(Epairproduction*)crosssections_.at(i) !=  *(Epairproduction*)collection.crosssections_.at(i) ) return false;
         }
-        else if(collection.crosssections_.at(i)->GetName().compare("Photonuclear")==0)
+        else if(collection.crosssections_.at(i)->GetType() == ParticleType::NuclInt)
         {
             if( *(Photonuclear*)crosssections_.at(i) !=  *(Photonuclear*)collection.crosssections_.at(i) )  return false;
         }

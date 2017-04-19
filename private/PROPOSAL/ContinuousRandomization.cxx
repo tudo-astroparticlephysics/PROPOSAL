@@ -96,7 +96,7 @@ void ContinuousRandomization::EnableDE2dxInterpolation(std::string path, bool ra
 
         for(unsigned int i =0; i<cross_sections_.size(); i++)
         {
-            if(cross_sections_.at(i)->GetName().compare("Bremsstrahlung")==0)
+            if(cross_sections_.at(i)->GetType() == ParticleType::Brems)
             {
                 filename << "_b_"
                          << "_" << cross_sections_.at(i)->GetParametrization()
@@ -106,14 +106,14 @@ void ContinuousRandomization::EnableDE2dxInterpolation(std::string path, bool ra
                          << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetVcut();
 
             }
-            else if(cross_sections_.at(i)->GetName().compare("Ionization")==0)
+            else if(cross_sections_.at(i)->GetType() == ParticleType::DeltaE)
             {
                 filename << "_i_"
                          << "_" << cross_sections_.at(i)->GetMultiplier()
                          << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetEcut()
                          << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetVcut();
             }
-            else if(cross_sections_.at(i)->GetName().compare("Epairproduction")==0)
+            else if(cross_sections_.at(i)->GetType() == ParticleType::EPair)
             {
                 filename << "_e_"
                          << "_" << cross_sections_.at(i)->GetMultiplier()
@@ -121,7 +121,7 @@ void ContinuousRandomization::EnableDE2dxInterpolation(std::string path, bool ra
                          << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetEcut()
                          << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetVcut();
             }
-            else if(cross_sections_.at(i)->GetName().compare("Photonuclear")==0)
+            else if(cross_sections_.at(i)->GetType() == ParticleType::NuclInt)
             {
                 filename << "_p_"
                          << "_" << cross_sections_.at(i)->GetParametrization()
@@ -251,7 +251,7 @@ void ContinuousRandomization::EnableDE2deInterpolation(std::string path, bool ra
 
         for(unsigned int i =0; i<cross_sections_.size(); i++)
         {
-            if(cross_sections_.at(i)->GetName().compare("Bremsstrahlung")==0)
+            if(cross_sections_.at(i)->GetType() == ParticleType::Brems)
             {
                 filename << "_b_"
                          << "_" << cross_sections_.at(i)->GetParametrization()
@@ -261,14 +261,14 @@ void ContinuousRandomization::EnableDE2deInterpolation(std::string path, bool ra
                          << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetVcut();
 
             }
-            else if(cross_sections_.at(i)->GetName().compare("Ionization")==0)
+            else if(cross_sections_.at(i)->GetType() == ParticleType::DeltaE)
             {
                 filename << "_i_"
                          << "_" << cross_sections_.at(i)->GetMultiplier()
                          << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetEcut()
                          << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetVcut();
             }
-            else if(cross_sections_.at(i)->GetName().compare("Epairproduction")==0)
+            else if(cross_sections_.at(i)->GetType() == ParticleType::EPair)
             {
                 filename << "_e_"
                          << "_" << cross_sections_.at(i)->GetMultiplier()
@@ -276,7 +276,7 @@ void ContinuousRandomization::EnableDE2deInterpolation(std::string path, bool ra
                          << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetEcut()
                          << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetVcut();
             }
-            else if(cross_sections_.at(i)->GetName().compare("Photonuclear")==0)
+            else if(cross_sections_.at(i)->GetType() == ParticleType::NuclInt)
             {
                 filename << "_p_"
                          << "_" << cross_sections_.at(i)->GetParametrization()
@@ -463,19 +463,19 @@ ContinuousRandomization::ContinuousRandomization(const ContinuousRandomization &
 
     for(unsigned int i =0; i<continuous_randomization.cross_sections_.size(); i++)
     {
-        if(continuous_randomization.cross_sections_.at(i)->GetName().compare("Bremsstrahlung")==0)
+        if(continuous_randomization.cross_sections_.at(i)->GetType() == ParticleType::Brems)
         {
             cross_sections_.at(i) = new Bremsstrahlung( *(Bremsstrahlung*)continuous_randomization.cross_sections_.at(i) );
         }
-        else if(continuous_randomization.cross_sections_.at(i)->GetName().compare("Ionization")==0)
+        else if(continuous_randomization.cross_sections_.at(i)->GetType() == ParticleType::DeltaE)
         {
             cross_sections_.at(i) = new Ionization( *(Ionization*)continuous_randomization.cross_sections_.at(i) );
         }
-        else if(continuous_randomization.cross_sections_.at(i)->GetName().compare("Epairproduction")==0)
+        else if(continuous_randomization.cross_sections_.at(i)->GetType() == ParticleType::EPair)
         {
             cross_sections_.at(i) = new Epairproduction( *(Epairproduction*)continuous_randomization.cross_sections_.at(i) );
         }
-        else if(continuous_randomization.cross_sections_.at(i)->GetName().compare("Photonuclear")==0)
+        else if(continuous_randomization.cross_sections_.at(i)->GetType() == ParticleType::NuclInt)
         {
             cross_sections_.at(i) = new Photonuclear( *(Photonuclear*)continuous_randomization.cross_sections_.at(i) );
         }
@@ -551,19 +551,19 @@ bool ContinuousRandomization::operator==(const ContinuousRandomization &continuo
 
     for(unsigned int i =0; i<continuous_randomization.cross_sections_.size(); i++)
     {
-        if(continuous_randomization.cross_sections_.at(i)->GetName().compare("Bremsstrahlung")==0)
+        if(continuous_randomization.cross_sections_.at(i)->GetType() == ParticleType::Brems)
         {
             if( *(Bremsstrahlung*)cross_sections_.at(i) !=  *(Bremsstrahlung*)continuous_randomization.cross_sections_.at(i) ) return false;
         }
-        else if(continuous_randomization.cross_sections_.at(i)->GetName().compare("Ionization")==0)
+        else if(continuous_randomization.cross_sections_.at(i)->GetType() == ParticleType::DeltaE)
         {
             if( *(Ionization*)cross_sections_.at(i) != *(Ionization*)continuous_randomization.cross_sections_.at(i) ) return false;
         }
-        else if(continuous_randomization.cross_sections_.at(i)->GetName().compare("Epairproduction")==0)
+        else if(continuous_randomization.cross_sections_.at(i)->GetType() == ParticleType::EPair)
         {
             if( *(Epairproduction*)cross_sections_.at(i) !=  *(Epairproduction*)continuous_randomization.cross_sections_.at(i) ) return false;
         }
-        else if(continuous_randomization.cross_sections_.at(i)->GetName().compare("Photonuclear")==0)
+        else if(continuous_randomization.cross_sections_.at(i)->GetType() == ParticleType::NuclInt)
         {
             if( *(Photonuclear*)cross_sections_.at(i) !=  *(Photonuclear*)continuous_randomization.cross_sections_.at(i) )  return false;
         }
@@ -756,7 +756,7 @@ double ContinuousRandomization::DE2dx()
         {
             cross_sections_.at(i)->SetIntegralLimits(j);
 
-            if(cross_sections_.at(i)->GetName().compare("Bremsstrahlung")==0)
+            if(cross_sections_.at(i)->GetType() == ParticleType::Brems)
             {
                 min =   0;
             }
@@ -766,7 +766,7 @@ double ContinuousRandomization::DE2dx()
             }
             sum +=  dE2dx_integral_->Integrate (min, cross_sections_.at(i)->GetVUp(), boost::bind(&ContinuousRandomization::FunctionToDE2dxIntegral, this, _1) ,2);
 
-            if(cross_sections_.at(i)->GetName().compare("Ionization")==0)
+            if(cross_sections_.at(i)->GetType() == ParticleType::DeltaE)
             {
                 break;
             }
