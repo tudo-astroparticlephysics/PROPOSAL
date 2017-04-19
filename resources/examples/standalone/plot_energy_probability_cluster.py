@@ -81,8 +81,8 @@ class EnergyProbability(object):
     def run(self):
 
         jobs = []
-        for i in xrange(self.cores):
-            print("Job: ", i)
+        for i in xrange(self.processes):
+            print("Process: ", i)
             job = mp.Process(
                 target=self.propagate,
                 args=(self.stats_per_job, i, )
@@ -226,7 +226,7 @@ if __name__ == "__main__":
     # photo_primary_energy = []
     # photo_secondary_energy = []
 
-    P = EnergyProbability(ptype, med, cuts, "../../resources/tables", 1000, 3)
+    P = EnergyProbability(ptype, med, cuts, "../../resources/tables", 1000, 20)
     P.run()
 
     epair_primary_energy = P.epair_primary_energy
