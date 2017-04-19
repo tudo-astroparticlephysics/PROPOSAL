@@ -19,12 +19,12 @@ except ImportError:
 
 ptype = pyPROPOSAL.ParticleType.STauMinus
 mu = pyPROPOSAL.Particle(ptype)
-med = pyPROPOSAL.Medium("standard_rock")
-cuts = pyPROPOSAL.EnergyCutSettings()
+mu.mass = 500000
+# med = pyPROPOSAL.Medium("standard_rock")
+# cuts = pyPROPOSAL.EnergyCutSettings()
 
-prop = pyPROPOSAL.Propagator(med, cuts, ptype, "../../resources/tables")
-prop.particle.mass = 500000
-prop.apply_options()
+# prop = pyPROPOSAL.Propagator(med, cuts, ptype, "../../resources/tables")
+prop = pyPROPOSAL.Propagator("../../resources/configuration_IceOnly", mu)
 
 statistics = 1
 E_max_log = 14
