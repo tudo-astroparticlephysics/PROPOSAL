@@ -131,32 +131,6 @@ I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(
     , photo_param_(photo_param)
     , shadow_(shadow)
 {
-    // TODO(sudojan): type
-    //TODO(mario): particeMass Mo 2017/02/20
-
-    // switch(type) {
-    //   case I3Particle::MuMinus:
-    //   case I3Particle::MuPlus:
-    //     break;
-    //   case I3Particle::TauMinus:
-    //   case I3Particle::TauPlus:
-    //     break;
-    //   case I3Particle::STauMinus:
-    //   case I3Particle::STauPlus:
-    //     if (!std::isfinite(particleMass))
-    //       log_fatal("You asked for staus of non-finite mass %f", particleMass_);
-    //     break;
-    //   case I3Particle::Monopole:
-    //     if (!std::isfinite(particleMass))
-    //       log_fatal("You asked for monopoles of non-finite mass %f", particleMass_);
-    //     break;
-    //   default:
-    //     I3Particle dummy;
-    //     dummy.SetType(type);
-    //     log_fatal("I don't know how to propagate %s", dummy.GetTypeString().c_str());
-    // }
-
-    // particle_type = new PROPOSALParticle(PROPOSALParticle::GetName(GeneratePROPOSALType(type)));
 
     I3Particle i3particle;
     i3particle.SetType(type);
@@ -164,6 +138,10 @@ I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(
     if (isnan(particleMass_) == false)
     {
         particle->SetMass(particleMass_);
+    }
+    if (std::isinf(particleMass_))
+    {
+        log_fatal("You asked for Particle of non-finite mass %f", particleMass_);
     }
 
     // ----[ Check table dir and mediadef ]------------------ //
@@ -211,10 +189,6 @@ I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(
 
     log_info("%s", options.str().c_str());
 
-    // if (std::isinf(particleMass_))
-    // {
-    //     log_fatal("You asked for monopoles of non-finite mass %f", particleMass_);
-    // }
 
     Geometry* geo = new Geometry();
     geo->InitCylinder(0,0,0,cylinderRadius_,0,cylinderHeight_);
@@ -424,7 +398,8 @@ ParticleType::Enum I3PropagatorServicePROPOSAL::GeneratePROPOSALType(const I3Par
     bimap_ParticleType::left_const_iterator i3_iterator = I3_PROPOSAL_ParticleType_bimap.left.find(ptype_I3);
     if (i3_iterator == I3_PROPOSAL_ParticleType_bimap.left.end())
     {
-        log_fatal("The I3Particle '%i' can not be converted to a PROPOSALParticle", ptype_I3);
+        log_fatal("The I3Particle '%s' with type '%i' can not be converted to a PROPOSALParticle"
+            , p.GetTypeString().c_str(), ptype_I3);
     }
 
     ptype_PROPOSAL = I3_PROPOSAL_ParticleType_bimap.left.find(ptype_I3) -> second;
@@ -439,7 +414,8 @@ I3Particle::ParticleType I3PropagatorServicePROPOSAL::GenerateI3Type(ParticleTyp
     bimap_ParticleType::right_const_iterator proposal_iterator = I3_PROPOSAL_ParticleType_bimap.right.find(ptype_PROPOSAL);
     if (proposal_iterator == I3_PROPOSAL_ParticleType_bimap.right.end())
     {
-        log_fatal("The PROPOSALParticle '%i' can not be converted to a I3Particle", ptype_PROPOSAL);
+        log_fatal("The PROPOSALParticle '%s' with type '%i' can not be converted to a I3Particle"
+            , PROPOSALParticle::GetName(ptype_PROPOSAL).c_str(), ptype_PROPOSAL);
     }
 
     ptype_I3 = I3_PROPOSAL_ParticleType_bimap.right.find(ptype_PROPOSAL) -> second;
@@ -485,39 +461,6 @@ I3MMCTrackPtr I3PropagatorServicePROPOSAL::GenerateMMCTrack(PROPOSALParticle* pa
     return I3MMCTrackPtr();
 }
 
-// typedef std::map<int, I3Particle::ParticleType> particle_type_conversion_t;
-
-// static const particle_type_conversion_t fromRDMCTable =
-// boost::assign::list_of<std::pair<int, I3Particle::ParticleType> >
-// (-100, I3Particle::unknown)
-// (1, I3Particle::Gamma)
-// (2, I3Particle::EPlus)
-// (3, I3Particle::EMinus)
-// (4, I3Particle::Nu)
-// (5, I3Particle::MuPlus)
-// (6, I3Particle::MuMinus)
-// (7, I3Particle::Pi0)
-// (8, I3Particle::PiPlus)
-// (9, I3Particle::PiMinus)
-// (11, I3Particle::KPlus)
-// (12, I3Particle::KMinus)
-// (14, I3Particle::PPlus)
-// (15, I3Particle::PMinus)
-// (33, I3Particle::TauPlus)
-// (34, I3Particle::TauMinus)
-// (41, I3Particle::Monopole)
-// (201, I3Particle::NuE)
-// (202, I3Particle::NuMu)
-// (203, I3Particle::NuTau)
-// (204, I3Particle::NuEBar)
-// (205, I3Particle::NuMuBar)
-// (206, I3Particle::NuTauBar)
-// (1001, I3Particle::Brems)
-// (1002, I3Particle::DeltaE)
-// (1003, I3Particle::PairProd)
-// (1004, I3Particle::NuclInt)
-// (1005, I3Particle::MuPair)
-// (1006, I3Particle::Hadrons);
 
 // ------------------------------------------------------------------------- //
 I3MMCTrackPtr I3PropagatorServicePROPOSAL::propagate( I3Particle& p, vector<I3Particle>& daughters){
@@ -534,7 +477,6 @@ I3MMCTrackPtr I3PropagatorServicePROPOSAL::propagate( I3Particle& p, vector<I3Pa
     double e_0 = p.GetEnergy()/I3Units::MeV;  // [MeV]
     double t_0 = p.GetTime()/I3Units::s;     // [s]
 
-    // ParticleType::Enum particleType = GeneratePROPOSALType(p);
     log_debug("Name of particle to propagate: %s", PROPOSALParticle::GetName(GeneratePROPOSALType(p)).c_str());
 
 
@@ -553,16 +495,13 @@ I3MMCTrackPtr I3PropagatorServicePROPOSAL::propagate( I3Particle& p, vector<I3Pa
     particle->SetEnergy(e_0);
     particle->SetT(t_0);
 
-    //--- Tomasz
-    //vector<PROPOSALParticle*> aobj_l = amanda->propagate(particle);
     proposal->propagate();
     // proposal->Propagate(particle);
 
     vector<PROPOSALParticle*> aobj_l = Output::getInstance().GetSecondarys();
     //get the propagated length of the particle
-    //double length = particle->r;
     double length = particle->GetPropagatedDistance();
-    //--- Tomasz End
+
     p.SetLength( length * I3Units::cm );
     log_trace(" length = %f cm ", length );
 
@@ -597,21 +536,6 @@ I3MMCTrackPtr I3PropagatorServicePROPOSAL::propagate( I3Particle& p, vector<I3Pa
         I3Particle new_particle;
 
 
-        // the following case should be asked in the GenerateI3Type() function, but it's not working yet :(
-
-        // //Setting MC Type
-        // I3Particle::ParticleType mcType(static_cast<I3Particle::ParticleType>(abs(type)));
-        // particle_type_conversion_t::const_iterator it = fromRDMCTable.find(mcType);
-        // if (it == fromRDMCTable.end())
-        // {
-        //     cout << "Particle information!" << endl << endl << *(aobj_l.at(i)) << endl << endl;
-        //     log_fatal("unknown RDMC code \"%i\" cannot be converted to a I3Particle::ParticleType.", mcType);
-        // }
-        // else
-        // {
-        //     new_particle.SetType(it->second);
-        // }
-
         if (GeneratePROPOSALType(p) == ParticleType::EMinus
             || GeneratePROPOSALType(p) == ParticleType::EPlus
             || GeneratePROPOSALType(p) == ParticleType::Hadrons)
@@ -622,6 +546,7 @@ I3MMCTrackPtr I3PropagatorServicePROPOSAL::propagate( I3Particle& p, vector<I3Pa
                     PROPOSALParticle::GetName(GeneratePROPOSALType(p)).c_str());
             }
         }
+
 
         new_particle.SetType(GenerateI3Type(type));
 
