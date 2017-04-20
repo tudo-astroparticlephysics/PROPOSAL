@@ -47,29 +47,26 @@ struct CrossSectionToPython
 
         for (unsigned int i = 0; i < vec.size(); ++i)
         {
-            boost::python::object obj;
             if (vec[i]->GetName().compare("Bremsstrahlung") == 0)
             {
-                obj = boost::python::object((Bremsstrahlung*)vec[i]);
+                python_list.append(boost::python::ptr((Bremsstrahlung*)vec[i]));
             }
             else if (vec[i]->GetName().compare("Photonuclear") == 0)
             {
-                obj = boost::python::object((Photonuclear*)vec[i]);
+                python_list.append(boost::python::ptr((Photonuclear*)vec[i]));
             }
             else if (vec[i]->GetName().compare("Ionization") == 0)
             {
-                obj = boost::python::object((Ionization*)vec[i]);
+                python_list.append(boost::python::ptr((Ionization*)vec[i]));
             }
             else if (vec[i]->GetName().compare("Epairproduction") == 0)
             {
-                obj = boost::python::object((Epairproduction*)vec[i]);
+                python_list.append(boost::python::ptr((Epairproduction*)vec[i]));
             }
             else
             {
                 boost::python::object obj(NULL);
             }
-
-            python_list.append(obj);
         }
 
         PyObject* py = boost::python::incref(python_list.ptr());
@@ -88,6 +85,23 @@ struct VectorToPythonList
         for(iter = vec.begin(); iter != vec.end(); ++iter)
         {
             python_list.append(boost::python::object(*iter));
+        }
+
+        return boost::python::incref(python_list.ptr());
+    }
+};
+
+template<typename T>
+struct PVectorToPythonList
+{
+    static PyObject* convert(std::vector<T> const& vec)
+    {
+        boost::python::list python_list;
+        typename std::vector<T>::const_iterator iter;
+
+        for(iter = vec.begin(); iter != vec.end(); ++iter)
+        {
+            python_list.append(boost::python::ptr(*iter));
         }
 
         return boost::python::incref(python_list.ptr());
@@ -236,8 +250,8 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
     // register the to-python converter
     to_python_converter< std::vector<double>, VectorToPythonList<double> >();
     to_python_converter< std::vector<std::string>, VectorToPythonList<std::string> >();
-    to_python_converter< std::vector<PROPOSALParticle*>, VectorToPythonList<PROPOSALParticle*> >();
-    to_python_converter< std::vector<ProcessCollection*>, VectorToPythonList<ProcessCollection*> >();
+    to_python_converter< std::vector<PROPOSALParticle*>, PVectorToPythonList<PROPOSALParticle*> >();
+    to_python_converter< std::vector<ProcessCollection*>, PVectorToPythonList<ProcessCollection*> >();
 
     to_python_converter<std::vector<CrossSections*>, CrossSectionToPython>();
 
