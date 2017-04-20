@@ -1623,12 +1623,23 @@ void Photonuclear::EnableHardBB()
         for(int i=0; i < hmax_; i++)
         {
             vector<double> x(x_aux, x_aux + sizeof(x_aux) / sizeof(double) );
-            // TODO: was passiert hier denn fuer abgefahrener quatsch
-            // particle_->GetType()-1 ergibt mal so gar keinen Sinn
-            // zumindest fuer mich
-            vector<double> y(y_aux[particle_->GetType()-1][i], y_aux[particle_->GetType()-1][i] + sizeof(y_aux[particle_->GetType()-1][i]) / sizeof(double) );
 
-            interpolant_hardBB_.at(i)    =   new Interpolant(x, y, 4, false, false) ;
+            if (particle_->GetType() == ParticleType::MuMinus || particle_->GetType() == ParticleType::MuPlus)
+            {
+                vector<double> y(y_aux[0][i], y_aux[0][i] + sizeof(y_aux[0][i]) / sizeof(double) );
+                interpolant_hardBB_.at(i)    =   new Interpolant(x, y, 4, false, false) ;
+            }
+            else if (particle_->GetType() == ParticleType::TauMinus || particle_->GetType() == ParticleType::TauPlus)
+            {
+                vector<double> y(y_aux[1][i], y_aux[1][i] + sizeof(y_aux[1][i]) / sizeof(double) );
+                interpolant_hardBB_.at(i)    =   new Interpolant(x, y, 4, false, false) ;
+            }
+            else
+            {
+                vector<double> y(y_aux[0][i], y_aux[0][i] + sizeof(y_aux[0][i]) / sizeof(double) );
+                interpolant_hardBB_.at(i)    =   new Interpolant(x, y, 4, false, false) ;
+                log_warn("No hard component paraemtrization found for particle %s! Parametrization for muons are used. Be careful!", particle_->GetName().c_str());
+            }
         }
     }
 }
