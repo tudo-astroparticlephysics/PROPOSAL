@@ -19,14 +19,15 @@ except ImportError:
 
 ptype = pyPROPOSAL.ParticleType.STauMinus
 mu = pyPROPOSAL.Particle(ptype)
-mu.mass = 500000
+mu.mass = 100000
+# mu.mass = 10000
 # med = pyPROPOSAL.Medium("standard_rock")
 # cuts = pyPROPOSAL.EnergyCutSettings()
 
 # prop = pyPROPOSAL.Propagator(med, cuts, ptype, "../../resources/tables")
 prop = pyPROPOSAL.Propagator("../../resources/configuration_IceOnly", mu)
 
-statistics = 1
+statistics = 10
 E_max_log = 14
 
 epair_primary_energy = []
@@ -126,6 +127,11 @@ fig = plt.figure(
     figsize=(width / inch_to_cm, width / inch_to_cm / golden_ratio)
 )
 fig.subplots_adjust(wspace=0.1, hspace=0.3)
+fig.suptitle("{} with mass {} MeV in {}".format(
+    prop.particle.name,
+    prop.particle.mass,
+    prop.collections[0].medium.name
+))
 
 # =========================================================
 # 	Ionization
@@ -163,4 +169,8 @@ ax4 = plot_hist(ax4, epair_primary_energy, epair_secondary_energy)
 ax4.set_title("pair production")
 ax4.set_xlabel(r'primary particle energy log($E$/MeV)')
 
-fig.savefig("energy_probability.pdf")
+fig.savefig("energy_probability_{}_{}_{}.pdf".format(
+    prop.particle.name,
+    prop.particle.mass,
+    prop.collections[0].medium.name
+))
