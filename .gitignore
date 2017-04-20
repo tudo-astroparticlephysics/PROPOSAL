@@ -6,3 +6,4 @@ build/
 .DS_Store
 **/Test/TestFiles*/
 *.png
+*.pdf

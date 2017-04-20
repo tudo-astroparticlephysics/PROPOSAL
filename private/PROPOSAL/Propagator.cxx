@@ -658,7 +658,7 @@ double Propagator::Propagate( double distance )
             NumInt++;//TOMASZ
             energy_loss     =   current_collection_->MakeStochasticLoss();
             final_energy    -=  energy_loss.first;
-            log_debug("Energyloss: %d\t%d\t%d\t%d\t%d", energy_loss.first, energy_loss.second, particle_->GetX(), particle_->GetY(), particle_->GetZ());
+            log_debug("Energyloss: %f\t%s\t%f\t%f\t%f", energy_loss.first, PROPOSALParticle::GetName(energy_loss.second).c_str(), particle_->GetX(), particle_->GetY(), particle_->GetZ());
             secondary_id    =   particle_->GetParticleId() + 1;
             Output::getInstance().FillSecondaryVector(particle_, secondary_id, energy_loss, 0);
         }
@@ -1487,32 +1487,6 @@ Propagator::Propagator(Medium* medium,
     current_collection_->SetLocation(1); // Inside the detector
     collections_.push_back(current_collection_);
 
-    for(unsigned int i =0; i<current_collection_->GetCrosssections().size(); i++)
-    {
-        if(current_collection_->GetCrosssections().at(i)->GetName().compare("Bremsstrahlung")==0)
-        {
-            current_collection_->GetCrosssections().at(i)->SetParametrization(brems_);
-            current_collection_->GetCrosssections().at(i)->SetMultiplier(brems_multiplier_);
-            current_collection_->GetCrosssections().at(i)->EnableLpmEffect(lpm_);
-
-        }
-        else if(current_collection_->GetCrosssections().at(i)->GetName().compare("Ionization")==0)
-        {
-            current_collection_->GetCrosssections().at(i)->SetMultiplier(ioniz_multiplier_);
-        }
-        else if(current_collection_->GetCrosssections().at(i)->GetName().compare("Epairproduction")==0)
-        {
-            current_collection_->GetCrosssections().at(i)->SetMultiplier(epair_multiplier_);
-            current_collection_->GetCrosssections().at(i)->EnableLpmEffect(lpm_);
-        }
-        else if(current_collection_->GetCrosssections().at(i)->GetName().compare("Photonuclear")==0)
-        {
-            current_collection_->GetCrosssections().at(i)->SetParametrization(photo_);
-            current_collection_->GetCrosssections().at(i)->SetMultiplier(photo_multiplier_);
-        }
-
-    }
-
     if(continuous_rand)
     {
         current_collection_->EnableContinuousRandomization();
@@ -1541,25 +1515,7 @@ Propagator::Propagator(Medium* medium,
         }
     }
 
-    if(moliere_)
-    {
-        current_collection_->EnableScattering();
-    }
-
-    if(do_exact_time_calulation_)
-    {
-        current_collection_->EnableExactTimeCalculation();
-    }
-
-    if(!integrate_)
-    {
-
-        cout << "Starting Interpolation! This will take some time depending on the number of media you defined!\n";
-        cout.flush();
-        EnableInterpolation(path_to_tables_, raw_);
-        cout << "Done!\n";
-    }
-
+    ApplyOptions();
 }
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
@@ -1633,9 +1589,7 @@ Propagator::Propagator(std::string config_file, PROPOSALParticle* particle, bool
     ,scattering_model_          (-1)
     ,current_collection_        (NULL)
 {
-    //TODO(mario): uncomment Do 2017/04/06
-    // particle_        = new PROPOSALParticle(*particle);
-    particle_        = particle;
+    particle_        = new PROPOSALParticle(*particle);
     backup_particle_ = new PROPOSALParticle(*particle_);
     ReadConfigFile(config_file, DoApplyOptions);
 }
@@ -1841,6 +1795,9 @@ void Propagator::InitDefaultCollection(Geometry* geom)
     EnergyCutSettings* cuts = new EnergyCutSettings(500,0.05);
     current_collection_     = new ProcessCollection(particle_ , med, cuts);
     current_collection_->SetGeometry(geom);
+
+    current_collection_->SetLocation(1); // Inside the detector
+    collections_.push_back(current_collection_);
 }
 
 
@@ -2887,7 +2844,15 @@ void Propagator::SetCollections(std::vector<ProcessCollection*> collections)
 
 void Propagator::SetParticle(PROPOSALParticle* particle)
 {
-    particle_   =   particle;
+    particle_ = particle;
+
+    //TODO(mario): Remove when shared pointer are used Mi 2017/04/19
+    if (backup_particle_ != NULL)
+    {
+        delete backup_particle_;
+    }
+
+    backup_particle_ = new PROPOSALParticle(*particle_);
 }
 
 
