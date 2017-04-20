@@ -14,7 +14,7 @@ tau = dc.I3Particle()
 tau.type = ptype
 tau.pos = dc.I3Position(0,0,0)
 tau.dir = dc.I3Direction(0,0)
-tau.energy = 100 * I3Units.TeV
+tau.energy = 1000 * I3Units.TeV
 tau.time = 0 * I3Units.ns
 tau.location_type = dc.I3Particle.InIce
 

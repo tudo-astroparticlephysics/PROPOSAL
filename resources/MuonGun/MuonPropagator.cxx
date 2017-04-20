@@ -62,10 +62,10 @@ MuonPropagator::SetSeed(int seed)
 	MathModel::set_seed(seed);
 }
 
-ParticleType
+ParticleType::Enum
 GetPROPOSALType(I3Particle::ParticleType pt)
 {
-    ParticleType code;
+    ParticleType::Enum code;
     switch (pt) {
         case I3Particle::MuMinus:
             code = ParticleType::MuMinus;
