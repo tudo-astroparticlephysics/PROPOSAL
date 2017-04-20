@@ -34,24 +34,25 @@ namespace ParametrizationType
 {
     enum Enum
     {
-        BremsKelnerKokoulinPetrukhin,
-        BremsAndreevBezrukovBugaev,
-        BremsPetrukhinShestakov,
-        BremsCompleteScreeningCase,
-        PhotoKokoulin,
-        PhotoKokoulinHard,
-        PhotoRhode,
-        PhotoRhodeHard,
-        PhotoBezrukovBugaev,
-        PhotoBezrukovBugaevHard,
-        PhotoZeus,
-        PhotoZeusHard,
-        PhotoALLM91Dutta,
-        PhotoALLM91Butkevich,
-        PhotoALLM97Dutta,
-        PhotoALLM97Butkevich,
-        PhotoButkevichMikhailovDutta,
-        PhotoButkevichMikhailovButkevich
+        BremsKelnerKokoulinPetrukhin  = 10,
+        BremsAndreevBezrukovBugaev    = 11,
+        BremsPetrukhinShestakov       = 13,
+        BremsCompleteScreeningCase    = 14,
+
+        PhotoKokoulinSoftShadowBezrukov                = 31,
+        PhotoKokoulinHardShadowBezrukov                = -31,
+        PhotoRhodeSoftShadowBezrukov                   = 32,
+        PhotoRhodeHardShadowBezrukov                   = -32,
+        PhotoBezrukovBugaevSoftShadowBezrukov          = 33,
+        PhotoBezrukovBugaevHardShadowBezrukov          = -33,
+        PhotoZeusSoftShadowBezrukov                    = 34,
+        PhotoZeusHardShadowBezrukov                    = -34,
+        PhotoAbramowiczLevinLevyMaor91ShadowDutta      = 35,
+        PhotoAbramowiczLevinLevyMaor91ShadowButkevich  = -35,
+        PhotoAbramowiczLevinLevyMaor97ShadowDutta      = 36,
+        PhotoAbramowiczLevinLevyMaor97ShadowButkevich  = -36,
+        PhotoButkevichMikhailovShadowDutta             = 37,
+        PhotoButkevichMikhailovShadowButkevich         = -37
     };
 };
 
