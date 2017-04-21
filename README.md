@@ -12,7 +12,7 @@ cp src/PROPOSAL/resources/simprod-scripts/proposal_alternate_cross_sections.py s
 cp src/PROPOSAL/resources/clsim/PropagateMuons.py src/clsim/resources/scripts/photonPaths/
 
 
-the two following files ave not been changed yet
+the three following files ave not been changed yet
 
 cp src/PROPOSAL/resources/MuonGun/propagate_muons.py src/MuonGun/resources/scripts/
 
