@@ -488,7 +488,8 @@ boost::program_options::options_description Bremsstrahlung::CreateOptions()
     bremsstrahlung.add_options()
         ("bremsstrahlung.lorenz",           po::value<bool>(&lorenz_)->implicit_value(false),                 "enable lorenz cut")
         ("bremsstrahlung.lorenzCut",        po::value<double>(&lorenz_cut_)->default_value(1e6),              "lorenz cut in MeV")
-        ("bremsstrahlung.para",             po::value<int>(&parametrization_)->default_value(1),              "1 = Kelner-Kakoulin-Petrukhin \n2 = Andreev-Bezrukov-Bugaev \n3 = Petrukhin-Shestakov \n4 = Complete Screening Case")
+        ("bremsstrahlung.para",             po::value<int>(&parametrization_)->default_value(ParametrizationType::BremsKelnerKokoulinPetrukhin)
+            , "ParametrizationTypes: KelnerKokoulinPetrukhin \n AndreevBezrukovBugaev \n PetrukhinShestakov \n CompleteScreeningCase")
         ("bremsstrahlung.lpm",              po::value<bool>(&lpm_effect_enabled_)->implicit_value(false),     "Enables   Landau-Pomeranchuk-Migdal supression")
         ("bremsstrahlung.interpol_dedx",    po::value<bool>(&do_dedx_Interpolation_)->implicit_value(false),  "Enables interpolation for dEdx")
         ("bremsstrahlung.interpol_dndx",    po::value<bool>(&do_dndx_Interpolation_)->implicit_value(false),  "Enables interpolation for dNdx")
@@ -505,10 +506,18 @@ boost::program_options::options_description Bremsstrahlung::CreateOptions()
 
 void Bremsstrahlung::ValidateOptions()
 {
-    if(parametrization_ < 1 || parametrization_ > 4)
+    switch (parametrization_)
     {
-        parametrization_ = 1;
-        cerr<<"Bremsstrahlung: Parametrization is not a vaild number.  Must be 1-4. Set parametrization to 1"<<endl;
+        case ParametrizationType::BremsKelnerKokoulinPetrukhin:
+        case ParametrizationType::BremsAndreevBezrukovBugaev:
+        case ParametrizationType::BremsPetrukhinShestakov:
+        case ParametrizationType::BremsCompleteScreeningCase:
+            break;
+        default:
+            cerr<<"Bremsstrahlung: Parametrization type number is not vaild. 
+                Set to default parametrization of KelnerKokoulinPetrukhin"<<endl;
+            parametrization_ = ParametrizationType::BremsKelnerKokoulinPetrukhin;
+            break;
     }
     if(order_of_interpolation_ < 2)
     {
@@ -625,7 +634,7 @@ Bremsstrahlung::Bremsstrahlung(PROPOSALParticle* particle,
     do_dedx_Interpolation_      = false;
     do_dndx_Interpolation_      = false;
     multiplier_                 = 1.;
-    parametrization_            = 1;
+    parametrization_            = ParametrizationType::BremsKelnerKokoulinPetrukhin;
     lpm_effect_enabled_         = false;
     init_lpm_effect_            = true;
     component_                  = 0;
@@ -1110,26 +1119,22 @@ double Bremsstrahlung::ElasticBremsstrahlungCrossSection(double v, int i)
 
     switch(parametrization_)
     {
-        case 1:
-        {
+        case ParametrizationType::BremsKelnerKokoulinPetrukhin:
             result  =   KelnerKokoulinPetrukhinParametrization(v, i);
-        }break;
-
-        case 2:
-        {
+            break;
+        case ParametrizationType::BremsAndreevBezrukovBugaev:
             result  =   AndreevBezrukovBugaevParametrization(v, i);
-        }break;
-
-        case 3:
-        {
+            break;
+        case ParametrizationType::BremsPetrukhinShestakov:
             result  =   PetrukhinShestakovParametrization(v, i);
-        }break;
-
-        default:
-        {
+            break;
+        case ParametrizationType::BremsCompleteScreeningCase:
             result  =   CompleteScreeningCase(v, i);
-        }break;
-
+            break;
+        default:
+            log_info("Bremsstrahlung: Parametrization type number '%i' is not vaild. 
+                Set to default parametrization of KelnerKokoulinPetrukhin with type number '%i' "
+                , parametrization_, ParametrizationType::BremsKelnerKokoulinPetrukhin);
     }
 
     aux =   2*(medium_->GetNucCharge()).at(i)*(ME/particle_->GetMass())*RE;
@@ -1137,7 +1142,7 @@ double Bremsstrahlung::ElasticBremsstrahlungCrossSection(double v, int i)
 
     if(lpm_effect_enabled_)
     {
-        if(parametrization_!=1)
+        if(parametrization_!=ParametrizationType::BremsKelnerKokoulinPetrukhin)
         {
             s1  =   (medium_->GetLogConstant()).at(i)*Z3;
             Dn  =   1.54*pow((medium_->GetAtomicNum()).at(i) , 0.27);
@@ -1350,10 +1355,19 @@ double Bremsstrahlung::FunctionToDNdxIntegral(double variable)
 void Bremsstrahlung::SetParametrization(int parametrization)
 {
     parametrization_ = parametrization;
-    if(parametrization > 4)
+    switch (parametrization_)
     {
-        log_warn("Parametrization %i not supported. Set to 1 (icecube default)",parametrization);
-        parametrization_    =   1;
+        case ParametrizationType::BremsKelnerKokoulinPetrukhin:
+        case ParametrizationType::BremsAndreevBezrukovBugaev:
+        case ParametrizationType::BremsPetrukhinShestakov:
+        case ParametrizationType::BremsCompleteScreeningCase:
+            break;
+        default:
+            log_warn("Bremsstrahlung: Parametrization type number '%i' is not vaild. 
+                Set to default parametrization of KelnerKokoulinPetrukhin with type number '%i' "
+                , parametrization, ParametrizationType::BremsKelnerKokoulinPetrukhin);
+            parametrization_ = ParametrizationType::BremsKelnerKokoulinPetrukhin;
+            break;
     }
 
     if(do_dedx_Interpolation_)
