@@ -763,7 +763,7 @@ Epairproduction::Epairproduction(PROPOSALParticle* particle,
     do_dedx_Interpolation_      = false;
     do_dndx_Interpolation_      = false;
     multiplier_                 = 1.;
-    parametrization_            = 1;
+    parametrization_            = ParametrizationType::EPairKelnerKokoulinPetrukhin;
     lpm_effect_enabled_         = false;
     init_lpm_effect_            = true;
     component_                  = 0;
@@ -1354,6 +1354,9 @@ double Epairproduction::FunctionToIntegral(double r)
 void Epairproduction::SetParametrization(int parametrization){
     parametrization_ = parametrization;
     log_warn("This has no effect. Till now only one parametrization for Epairproduction implemented");
+    if (parametrization_ != ParametrizationType::EPairKelnerKokoulinPetrukhin)
+        log_warn("The parametrization type number '%i' is different to the one that is implemented with type number '%i' "
+            , parametrization_, ParametrizationType::EPairKelnerKokoulinPetrukhin);
 }
 
 void Epairproduction::SetComponent(int component) {
