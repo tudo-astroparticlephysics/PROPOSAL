@@ -621,12 +621,28 @@ void Photonuclear::ValidateOptions()
         cerr<<"Photonuclear: Order of Interpolation is set to "<<order_of_interpolation_
             <<".\t Note a order of interpolation > 6 will slow down the program"<<endl;
     }
-    if(parametrization_ < 1 || parametrization_ >14)
+    switch (parametrization_)
     {
-        SetParametrization(12);
-        cerr<<"Photonuclear: Parametrization is not a vaild number. Must be 1-14.\tSet parametrization to 12 (icecube default)"<<endl;
+        case ParametrizationType::PhotoKokoulinShadowBezrukovSoft:
+        case ParametrizationType::PhotoKokoulinShadowBezrukovHard:
+        case ParametrizationType::PhotoRhodeShadowBezrukovSoft:
+        case ParametrizationType::PhotoRhodeShadowBezrukovHard:
+        case ParametrizationType::PhotoBezrukovBugaevShadowBezrukovSoft:
+        case ParametrizationType::PhotoBezrukovBugaevShadowBezrukovHard:
+        case ParametrizationType::PhotoZeusShadowBezrukovSoft:
+        case ParametrizationType::PhotoZeusShadowBezrukovHard:
+        case ParametrizationType::PhotoAbramowiczLevinLevyMaor91ShadowDutta:
+        case ParametrizationType::PhotoAbramowiczLevinLevyMaor91ShadowButkevich:
+        case ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowDutta:
+        case ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich:
+        case ParametrizationType::PhotoButkevichMikhailovShadowDutta:
+        case ParametrizationType::PhotoButkevichMikhailovShadowButkevich:
+            break;
+        default:
+            SetParametrization(ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich);
+            cerr<<"Photonuclear: Parametrization is not a vaild number. \t Set parametrization to ALLM97 with Butkevich Shadowing"<<endl;
+            break;
     }
-
 }
 
 
@@ -1192,8 +1208,9 @@ double Photonuclear::BezrukovBugaevParametrization(double v, int i)
     aum     =   particle_->GetMass()*1.e-3;
     aum     *=  aum;
     aux     =   2*aum/t;
-    aux     =   G*((k + 4*aum/m1)*log(1 + m1/t) - (k*m1)/(m1 + t) - aux) +
-                ((k + 2*aum/m2)*log(1 + m2/t) - aux) + 0.25*aux*((G*(m1 - 4*t))/(m1 + t) + (m2/t)*log(1 + t/m2));
+    aux     =   G*((k + 4*aum/m1)*log(1 + m1/t) - (k*m1)/(m1 + t) - aux)
+                + ((k + 2*aum/m2)*log(1 + m2/t) - aux)
+                + 0.25*aux*((G*(m1 - 4*t))/(m1 + t) + (m2/t)*log(1 + t/m2));
 
     aux     *=  ALPHA/(8*PI)*medium_->GetAtomicNum().at(i)*sgn*v;
 
