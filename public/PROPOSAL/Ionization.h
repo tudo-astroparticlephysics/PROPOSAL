@@ -211,7 +211,7 @@ public:
 
 //----------------------------------------------------------------------------//
     //Setter
-    void SetParametrization(int parametrization=1);
+    void SetParametrization(int parametrization = ParametrizationType::IonizBetheBloch);
 	void SetBeta(double beta);
 	void SetDedxInterpolant(Interpolant* dedxInterpolant);
 	void SetDndxInterpolant1d(Interpolant* dndxInterpolant1d);

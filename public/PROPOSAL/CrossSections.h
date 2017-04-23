@@ -41,6 +41,10 @@ namespace ParametrizationType
         PhotoAbramowiczLevinLevyMaor97ShadowButkevich  = -36,
         PhotoButkevichMikhailovShadowDutta             = 37,
         PhotoButkevichMikhailovShadowButkevich         = -37
+
+        EPairKelnerKokoulinPetrukhin  = 51;
+
+        IonizBetheBloch  = 71;
     };
 };
 
