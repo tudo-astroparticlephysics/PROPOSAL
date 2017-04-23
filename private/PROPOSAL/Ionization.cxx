@@ -874,6 +874,9 @@ double Ionization::FunctionToDNdxIntegral(double variable)
 void Ionization::SetParametrization(int parametrization){
     parametrization_ = parametrization;
     log_warn("This has no effect. Till now only one parametrization for Ionization implemented");
+    if (parametrization_ != ParametrizationType::IonizBetheBloch)
+        log_warn("The parametrization type number '%i' is different to the one that is implemented with type number '%i' "
+            , parametrization_, ParametrizationType::IonizBetheBloch);
 }
 
 void Ionization::SetBeta(double beta) {
