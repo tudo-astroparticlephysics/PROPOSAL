@@ -60,7 +60,11 @@ protected:
     double ALLM97Parametrization(double v, int i);
     double ButkevichMikhailovParametrization(double v, int i);
 
+    double ParametrizationOfRealPhotonAssumption(double v, int i, double sgn);
+    
     double ShadowEffect(double x , double nu);
+    double ShadowBezrukovBugaev(double x , double nu);
+
 
 
 //----------------------------------------------------------------------------//
