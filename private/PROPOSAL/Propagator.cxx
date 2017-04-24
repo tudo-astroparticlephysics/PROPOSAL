@@ -1394,8 +1394,8 @@ Propagator::Propagator()
     ,debug_                     ( false )
     ,particle_interaction_      ( false )
     ,seed_                      ( 1 )
-    ,brems_                     ( 1 )
-    ,photo_                     ( 12 )
+    ,brems_                     ( ParametrizationType::BremsKelnerKokoulinPetrukhin )
+    ,photo_                     ( ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich )
     ,lpm_                       ( false )
     ,moliere_                   ( false )
     ,stopping_decay_            ( true )
@@ -1439,8 +1439,8 @@ Propagator::Propagator(Medium* medium,
                        bool continuous_rand,
                        bool exact_time,
                        bool lpm,
-                       int brems,
-                       int photo,
+                       ParametrizationType::Enum brems,
+                       ParametrizationType::Enum photo,
                        double brems_multiplier,
                        double photo_multiplier,
                        double ioniz_multiplier,
@@ -1526,8 +1526,8 @@ Propagator::Propagator(string config_file, bool DoApplyOptions)
     ,debug_                     ( false )
     ,particle_interaction_      ( false )
     ,seed_                      ( 1 )
-    ,brems_                     ( 1 )
-    ,photo_                     ( 12 )
+    ,brems_                     ( ParametrizationType::BremsKelnerKokoulinPetrukhin )
+    ,photo_                     ( ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich )
     ,lpm_                       ( false )
     ,moliere_                   ( false )
     ,stopping_decay_            ( true )
@@ -1564,8 +1564,8 @@ Propagator::Propagator(std::string config_file, PROPOSALParticle* particle, bool
     ,debug_                     ( false )
     ,particle_interaction_      ( false )
     ,seed_                      ( 1 )
-    ,brems_                     ( 1 )
-    ,photo_                     ( 12 )
+    ,brems_                     ( ParametrizationType::BremsKelnerKokoulinPetrukhin )
+    ,photo_                     ( ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich )
     ,lpm_                       ( false )
     ,moliere_                   ( false )
     ,stopping_decay_            ( true )
@@ -2354,7 +2354,7 @@ void Propagator::SetSeed(int seed)
     seed_ = seed;
 }
 
-int Propagator::GetBrems() const
+ParametrizationType::Enum Propagator::GetBrems() const
 {
     return brems_;
 }
@@ -2364,7 +2364,7 @@ void Propagator::SetBrems(int brems)
     brems_ = brems;
 }
 
-int Propagator::GetPhoto() const
+ParametrizationType::Enum Propagator::GetPhoto() const
 {
     return photo_;
 }
