@@ -311,7 +311,7 @@ public:
 		return v_;
 	}
 
-    int GetShadow() const {
+    ParametrizationType::Enum GetShadow() const {
         return shadow_;
     }
 
@@ -336,7 +336,8 @@ public:
 	void SetProbForComponent(std::vector<double> probForComponent);
     void SetV(double v);
     void SetHardComponent(bool hard);
-    void SetShadow(int shadow);
+    // TODO: why is SetShadow in CrossSection.h and Photonuclear???
+    void SetShadow(ShadowingType::Enum shadow);
 
 //----------------------------------------------------------------------------//
     //Destructor

@@ -2176,7 +2176,7 @@ void Photonuclear::SetV(double v) {
 	v_ = v;
 }
 
-void Photonuclear::SetShadow(int shadow){
+void Photonuclear::SetShadow(ShadowingType::Enum shadow){
     shadow_  =   shadow;
 }
 
