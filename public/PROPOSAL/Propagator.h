@@ -115,8 +115,8 @@ public:
                bool continuous_rand = true,
                bool exact_time = true,
                bool lpm = true,
-               int brems = 1,
-               int photo = 12,
+               ParametrizationType::Enum brems = ParametrizationType::BremsKelnerKokoulinPetrukhin,
+               ParametrizationType::Enum photo = ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich,
                double brems_multiplier = 1,
                double photo_multiplier = 1,
                double ioniz_multiplier = 1,
@@ -257,10 +257,10 @@ public:
 
     int GetSeed() const;
     void SetSeed(int seed);
-    int GetBrems() const;
-    void SetBrems(int brems);
-    int GetPhoto() const;
-    void SetPhoto(int photo);
+    ParametrizationType::Enum GetBrems() const;
+    void SetBrems(ParametrizationType::Enum brems);
+    ParametrizationType::Enum GetPhoto() const;
+    void SetPhoto(ParametrizationType::Enum photo);
     std::string GetPath_to_tables() const;
     void SetPath_to_tables(const std::string &path_to_tables);
     Geometry *GetDetector() const;
