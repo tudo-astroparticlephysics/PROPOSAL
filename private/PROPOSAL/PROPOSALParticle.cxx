@@ -809,6 +809,15 @@ void PROPOSALParticle::SetT(double t){
 
 void PROPOSALParticle::SetMass(double mass){
     mass_ = mass;
+
+    if (low_ < mass)
+    {
+        low_ = mass;
+    }
+    else
+    {
+        log_warn("Your lower interpolation bound is higher than your mass: %f > %f", low_, mass_);
+    }
 }
 
 void PROPOSALParticle::SetLifetime(double lifetime){
