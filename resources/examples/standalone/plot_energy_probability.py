@@ -17,15 +17,16 @@ except ImportError:
 # =========================================================
 
 
+# ptype = pyPROPOSAL.ParticleType.MuMinus
+# mu = pyPROPOSAL.Particle(ptype)
 ptype = pyPROPOSAL.ParticleType.STauMinus
-mu = pyPROPOSAL.Particle(ptype)
 mu.mass = 100000
 # mu.mass = 10000
 # med = pyPROPOSAL.Medium("standard_rock")
 # cuts = pyPROPOSAL.EnergyCutSettings()
 
 # prop = pyPROPOSAL.Propagator(med, cuts, ptype, "../../resources/tables")
-prop = pyPROPOSAL.Propagator("../../resources/configuration_IceOnly", mu)
+prop = pyPROPOSAL.Propagator("../../configuration_IceOnly", mu)
 
 statistics = 10
 E_max_log = 14
@@ -99,12 +100,19 @@ plt.rcParams.update(params)
 
 def plot_hist(ax, prim, sec):
 
-    hist = ax.hist2d(
-        prim,
-        sec,
-        bins=1000,
-        norm=LogNorm(),
-    )
+    if len(prim) != 0 and len(sec) != 0:
+        hist = ax.hist2d(
+            prim,
+            sec,
+            bins=1000,
+            norm=LogNorm(),
+        )
+    else:
+        hist = ax.hist2d(
+            prim,
+            sec,
+            bins=1000,
+        )
 
     ax.set_xlim(xmin=2, xmax=14)
     ax.set_ylim(ymin=-2, ymax=14)
@@ -146,6 +154,8 @@ ax1.set_ylabel(r'secondary particle energy log($E$/MeV)')
 # 	Brems
 # =========================================================
 
+brems_primary_energy = []
+brems_secondary_energy = []
 ax2 = fig.add_subplot(222)
 ax2 = plot_hist(ax2, brems_primary_energy, brems_secondary_energy)
 ax2.set_title("bremsstrahlung")
