@@ -236,7 +236,7 @@ public:
 	}
 
 //----------------------------------------------------------------------------//
-    void SetParametrization(int parametrization=ParametrizationType::BremsKelnerKokoulinPetrukhin);
+    void SetParametrization(ParametrizationType::Enum parametrization = ParametrizationType::BremsKelnerKokoulinPetrukhin);
 	void SetComponent(int component);
 	void SetDedxIntegral(Integral* dedxIntegral);
 	void SetDedxInterpolant(Interpolant* dedxInterpolant);
