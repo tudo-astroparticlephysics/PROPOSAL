@@ -1,5 +1,7 @@
+import sys
 import pyPROPOSAL
 import math
+import time
 
 try:
     import matplotlib
@@ -12,14 +14,39 @@ try:
 except ImportError:
     print("pylab not installed.  no plots for you.")
 
+def update_progress(progress):
+    barLenght = 50
+    status = ""
+    if isinstance(progress, int):
+        progress = float(progress)
+    if not isinstance(progress, float):
+        progress = 0
+        status = "error: progress var must be float\r\n"
+    if progress < 0:
+        status = "Halt...\r\n"
+    if progress >= 1:
+        progress = 1
+        status = "Done...\r\n"
+    block = int(round(barLenght * progress))
+    text = "\rPercent: [{0}] {1}% {2}".format(
+        "="*block + " "*(barLenght - block),
+        progress*100,
+        status
+    )
+    sys.stdout.write(text)
+    sys.stdout.flush()
+
 # =========================================================
-# 	POPOSAL
+#   POPOSAL
 # =========================================================
 
+start_time = time.time()
 
-# ptype = pyPROPOSAL.ParticleType.MuMinus
+
+ptype = pyPROPOSAL.ParticleType.MuMinus
+mu = pyPROPOSAL.Particle(ptype)
+# ptype = pyPROPOSAL.ParticleType.STauMinus
 # mu = pyPROPOSAL.Particle(ptype)
-ptype = pyPROPOSAL.ParticleType.STauMinus
 mu.mass = 100000
 # mu.mass = 10000
 # med = pyPROPOSAL.Medium("standard_rock")
@@ -28,7 +55,7 @@ mu.mass = 100000
 # prop = pyPROPOSAL.Propagator(med, cuts, ptype, "../../resources/tables")
 prop = pyPROPOSAL.Propagator("../../configuration_IceOnly", mu)
 
-statistics = 10
+statistics = 1
 E_max_log = 14
 
 epair_primary_energy = []
@@ -43,10 +70,17 @@ ioniz_secondary_energy = []
 photo_primary_energy = []
 photo_secondary_energy = []
 
+length = []
+n_daughters = []
+
 for i in range(statistics):
+    update_progress(i / statistics)
     prop.reset_particle()
     prop.particle.energy = math.pow(10, E_max_log)
     secondarys = prop.propagate()
+
+    length.append(prop.particle.propagated_distance)
+    n_daughters.append(len(secondarys))
 
     for sec in secondarys:
         log_sec_energy = math.log10(sec.energy)
@@ -65,9 +99,11 @@ for i in range(statistics):
             photo_primary_energy.append(log_energy)
             photo_secondary_energy.append(log_sec_energy)
 
+update_progress(1)
+
 
 # =========================================================
-# 	Plot
+#   Plot
 # =========================================================
 
 
@@ -118,10 +154,18 @@ def plot_hist(ax, prim, sec):
     ax.set_ylim(ymin=-2, ymax=14)
     ax.grid(ls=":", lw=0.2)
 
-    # ax.text(0.05, 0.95, 'count = {:g}'.format(np.sum(hist[0])),
-    ax.text(0.05, 0.95, 'count = {:g}'.format(sum([sum(x) for x in hist[0]])),
+    textstr = "count = {:g}\ntotal energy loss = {:g} MeV".format(sum([sum(x) for x in hist[0]]), sum(sec))
+    props = dict(facecolor='white', alpha=0.8)
+    ax.text(0.03, 0.95, textstr,
             verticalalignment='top', horizontalalignment='left',
-            transform=ax.transAxes, fontsize=10)
+            transform=ax.transAxes, fontsize=10, bbox=props) #, backgroundcolor='white')
+
+    # ax.text(0.05, 0.95, 'count = {:g}'.format(sum([sum(x) for x in hist[0]])),
+    #         verticalalignment='top', horizontalalignment='left',
+    #         transform=ax.transAxes, fontsize=10)
+    # ax.text(0.05, 0.90, 'total energy loss = {:g}'.format(sum(sec)),
+    #         verticalalignment='top', horizontalalignment='left',
+    #         transform=ax.transAxes, fontsize=10)
 
     plt.colorbar(hist[3], ax=ax, pad=0.01)
 
@@ -138,11 +182,11 @@ fig.subplots_adjust(wspace=0.1, hspace=0.3)
 fig.suptitle("{} with mass {} MeV in {}".format(
     prop.particle.name,
     prop.particle.mass,
-    prop.collections[0].medium.name
+    prop.collections[0].medium.name.lower()
 ))
 
 # =========================================================
-# 	Ionization
+#   Ionization
 # =========================================================
 
 ax1 = fig.add_subplot(221)
@@ -151,17 +195,15 @@ ax1.set_title("ionization")
 ax1.set_ylabel(r'secondary particle energy log($E$/MeV)')
 
 # =========================================================
-# 	Brems
+#   Brems
 # =========================================================
 
-brems_primary_energy = []
-brems_secondary_energy = []
 ax2 = fig.add_subplot(222)
 ax2 = plot_hist(ax2, brems_primary_energy, brems_secondary_energy)
 ax2.set_title("bremsstrahlung")
 
 # =========================================================
-# 	Photonuclear
+#   Photonuclear
 # =========================================================
 
 ax3 = fig.add_subplot(223)
@@ -171,7 +213,7 @@ ax3.set_xlabel(r'primary particle energy log($E$/MeV)')
 ax3.set_ylabel(r'secondary particle energy log($E$/MeV)')
 
 # =========================================================
-# 	Epair
+#   Epair
 # =========================================================
 
 ax4 = fig.add_subplot(224)
@@ -179,8 +221,40 @@ ax4 = plot_hist(ax4, epair_primary_energy, epair_secondary_energy)
 ax4.set_title("pair production")
 ax4.set_xlabel(r'primary particle energy log($E$/MeV)')
 
-fig.savefig("energy_probability_{}_{}_{}.pdf".format(
+fig.savefig("energy_probability_{}_{}_{}_stats_{}.pdf".format(
     prop.particle.name,
     prop.particle.mass,
-    prop.collections[0].medium.name
+    prop.collections[0].medium.name.lower(),
+    statistics
 ))
+
+# =========================================================
+#   Lenght
+# =========================================================
+
+fig_length = plt.figure(
+    figsize=(width / inch_to_cm, width / inch_to_cm / golden_ratio)
+)
+fig_length.suptitle("propagation lenght of {} with mass {} MeV in {}".format(
+    prop.particle.name,
+    prop.particle.mass,
+    prop.collections[0].medium.name.lower()
+))
+
+ax_length = fig_length.add_subplot(111)
+ax_length.hist(length, histtype="step", log=True, bins=100)
+ax_length.set_xlabel(r'$l_{}(\rm{{m}})$'.format(prop.particle.name))
+
+fig_length.savefig("lenght_{}_{}_{}_stats_{}.pdf".format(
+    prop.particle.name,
+    prop.particle.mass,
+    prop.collections[0].medium.name.lower(),
+    statistics
+))
+
+# write execution time
+end_time = time.time()
+
+with open("time_{}_stats_{}.txt".format(mu.name, statistics), "w") as f:
+    f.write("execution time: {}".format(end_time - start_time))
+
