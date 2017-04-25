@@ -41,8 +41,8 @@ private:
     bool particle_interaction_;     //!< particle interaction? (false = decay)
 
     int     seed_;                      //!< seed of the random number generator
-    int     brems_;                     //!< Bremsstrahlungs parametrization
-    int     photo_;                     //!< Photonuclear parametrization
+    ParametrizationType::Enum     brems_;                     //!< Bremsstrahlungs parametrization
+    ParametrizationType::Enum     photo_;                     //!< Photonuclear parametrization
     bool    lpm_;                       //!< Landau-Pomeranchuk-Migdal supression of EM cross-sections enabled if true
     bool    moliere_;                   //!< Moliere scattering enabled if true
     bool    stopping_decay_;            //!< Do decay of particles. formarly sdec

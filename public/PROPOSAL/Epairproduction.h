@@ -224,7 +224,7 @@ public:
 //----------------------------------------------------------------------------//
     //Setter
 
-    void SetParametrization(int parametrization = ParametrizationType::EPairKelnerKokoulinPetrukhin);
+    void SetParametrization(ParametrizationType::Enum parametrization = ParametrizationType::EPairKelnerKokoulinPetrukhin);
 	void SetComponent(int component);
 	void SetDedxInterpolant(Interpolant* dedxInterpolant);
 	void SetDndxIntegral(std::vector<Integral*> dndxIntegral);
