@@ -7,6 +7,16 @@
 #include "PROPOSAL/Interpolant.h"
 #include <vector>
 
+
+namespace ShadowingType
+{
+    enum Enum
+    {
+        Dutta               = 141,
+        ButkevichMikhailov  = 142
+    };
+};
+
 class Photonuclear: public CrossSections
 {
 protected:
@@ -16,10 +26,9 @@ protected:
     bool        init_hardbb_;
     int         hmax_;
     double      v_;
-    bool        do_photo_interpolation_;   
-    int         shadow_;
+    bool        do_photo_interpolation_;
     bool        hard_component_;
-    int         parametrization_family_;
+    ShadowingType::Enum        shadow_;
 
     Integral*   integral_;
     Integral*   integral_for_dEdx_;
@@ -311,7 +320,7 @@ public:
 		return v_;
 	}
 
-    int GetShadow() const {
+    ShadowingType::Enum GetShadow() const {
         return shadow_;
     }
 
@@ -320,7 +329,7 @@ public:
     }
 //----------------------------------------------------------------------------//
     //Setter
-    void SetParametrization(int parametrization=1);
+    void SetParametrization(ParametrizationType::Enum parametrization = ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich);
 	void SetComponent(int component);
 	void SetDedxInterpolant(Interpolant* dedxInterpolant);
 	void SetDndxIntegral(std::vector<Integral*> dndxIntegral);

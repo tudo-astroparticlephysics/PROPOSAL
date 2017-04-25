@@ -595,7 +595,8 @@ boost::program_options::options_description Photonuclear::CreateOptions()
 {
     po::options_description photonuclear("Photonuclear options");
     photonuclear.add_options()
-        ("photonuclear.para",             po::value<int>()->notifier(boost::bind(&Photonuclear::SetParametrization, this, _1)),              "1 = Kakoulin \n2 = Rhode \n3 = Bezrukov-Bugaev \n4 = Zeus \n5 = ALLM 91 \n6 = ALLM 97 \n7 = Butkevich-Mikhailov")
+        ("photonuclear.para",             po::value<ParametrizationType::Enum>()->notifier(boost::bind(&Photonuclear::SetParametrization, this, _1)),
+            "Kokoulin \n Rhode \n BezrukovBugaev \n Zeus \n ALLM91 \n ALLM97 \n ButkevichMikhailov")
         ("photonuclear.interpol_dedx",    po::value<bool>(&do_dedx_Interpolation_)->implicit_value(false),  "Enables interpolation for dEdx")
         ("photonuclear.interpol_dndx",    po::value<bool>(&do_dndx_Interpolation_)->implicit_value(false),  "Enables interpolation for dNdx")
         ("photonuclear.multiplier",       po::value<double>(&multiplier_)->default_value(1.),               "modify the cross section by this factor")
@@ -660,9 +661,9 @@ Photonuclear::Photonuclear()
     ,hmax_                  ( 8 )
     ,v_                     ( 0 )
     ,do_photo_interpolation_( false )
-    ,shadow_                ( 1 )
+    ,shadow_                ( ShadowingType::ButkevichMikhailov )
     ,hard_component_        ( false )
-    ,parametrization_family_( 1 )
+    ,parametrization_       ( ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich )
     ,dndx_integral_         ( )
     ,interpolant_hardBB_    ( )
     ,dndx_interpolant_1d_   ( )
@@ -703,7 +704,7 @@ Photonuclear::Photonuclear(const Photonuclear &photo)
     ,do_photo_interpolation_            ( photo.do_photo_interpolation_ )
     ,shadow_                            ( photo.shadow_ )
     ,hard_component_                    ( photo.hard_component_ )
-    ,parametrization_family_            ( photo.parametrization_family_ )
+    ,parametrization_                   ( photo.parametrization_ )
     ,integral_                          ( new Integral(*photo.integral_) )
     ,integral_for_dEdx_                 ( new Integral(*photo.integral_for_dEdx_) )
     ,prob_for_component_                ( photo.prob_for_component_ )
@@ -770,9 +771,9 @@ Photonuclear::Photonuclear(PROPOSALParticle* particle,
     ,hmax_                  ( 8 )
     ,v_                     ( 0 )
     ,do_photo_interpolation_( false )
-    ,shadow_                ( 2 )
+    ,shadow_                ( ShadowingType::ButkevichMikhailov )
     ,hard_component_        ( false )
-    ,parametrization_family_( 1 )
+    ,parametrization_       ( ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich )
     ,dndx_integral_         ( )
     ,interpolant_hardBB_    ( )
     ,dndx_interpolant_1d_   ( )
@@ -836,7 +837,7 @@ bool Photonuclear::operator==(const Photonuclear &photo) const
     if( do_photo_interpolation_     !=  photo.do_photo_interpolation_ )     return false;
     if( shadow_                     !=  photo.shadow_ )                     return false;
     if( hard_component_             !=  photo.hard_component_ )             return false;
-    if( parametrization_family_     !=  photo.parametrization_family_ )     return false;
+    if( parametrization_            !=  photo.parametrization_ )            return false;
     if( init_hardbb_                !=  photo.init_hardbb_)                 return false;
     if( init_measured_              !=  photo.init_measured_)               return false;
     if( *integral_                  != *photo.integral_)                    return false;
@@ -920,7 +921,7 @@ void Photonuclear::swap(Photonuclear &photo)
     swap(do_photo_interpolation_, photo.do_photo_interpolation_);
     swap(shadow_ , photo.shadow_ );
     swap(hard_component_ , photo.hard_component_ );
-    swap(parametrization_family_    ,photo.parametrization_family_ );
+    swap(parametrization_    ,photo.parametrization_ );
 
     integral_for_dEdx_->swap(*photo.integral_for_dEdx_);
     integral_->swap(*photo.integral_);
@@ -975,7 +976,7 @@ ostream& operator<<(std::ostream& os, Photonuclear const &photo)
     os<< "\tinit_hardbb:\t\t" << photo.init_hardbb_ << endl;
     os<< "\tshadow:\t\t\t" << photo.shadow_ << endl;
     os<< "\thard_component:\t\t" << photo.hard_component_ << endl;
-    os<< "\tparametrization_family_:\t" << photo.parametrization_family_ << endl;
+    os<< "\tparametrization_:\t" << photo.parametrization_ << endl;
     os<<endl;
     os<<"\tintegral:\t\t"<<photo.integral_ << endl;
     os<<"\tdedx_integral:\t"<<photo.integral_for_dEdx_ << endl;
@@ -1128,12 +1129,19 @@ double Photonuclear::ZeusParametrization(double v, int i)
 
 double Photonuclear::ALLM91Parametrization(double v, int i)
 {
+    double particle_charge, particle_mass, particle_energy;
+
+    particle_mass = particle_->GetMass();
+    particle_mass = particle_->GetEnergy();
+    particle_charge = particle_->GetCharge();
+    particle_charge *= particle_charge;
+
     if(do_photo_interpolation_)
     {
         SetIntegralLimits(i);
         if(v >= vUp_)
         {
-            return max(photo_interpolant_.at(i)->Interpolate(particle_->GetEnergy(), log(v/vUp_)/log(vMax_/vUp_)), 0.0);
+            return max(photo_interpolant_.at(i)->Interpolate(particle_energy, log(v/vUp_)/log(vMax_/vUp_)), 0.0);
         }
     }
 
@@ -1141,16 +1149,16 @@ double Photonuclear::ALLM91Parametrization(double v, int i)
 
     component_ =   i;
     v_         =   v;
-    min        =   particle_->GetMass()*v;
+    min        =   particle_mass*v;
     min        *=  min/(1-v);
 
-    if(particle_->GetMass() < MPI)
+    if(particle_mass < MPI)
     {
-        aux     =   particle_->GetMass()*particle_->GetMass()/particle_->GetEnergy();
+        aux     =   particle_mass*particle_mass/particle_energy;
         min     -=  (aux*aux)/(2*(1-v));
     }
 
-    max =   2*medium_->GetAverageNucleonWeight().at(i)*particle_->GetEnergy()*(v-vMin_);
+    max =   2*medium_->GetAverageNucleonWeight().at(i)*particle_energy*(v-vMin_);
 
     //  if(form==4) max=Math.min(max, 5.5e6);  // as requested in Butkevich and Mikheyev
     if(min > max)
@@ -1158,7 +1166,7 @@ double Photonuclear::ALLM91Parametrization(double v, int i)
         return 0;
     }
 
-    return medium_->GetMolDensity()*medium_->GetAtomInMolecule().at(i)*particle_->GetCharge()*particle_->GetCharge()*integral_->Integrate(min, max, boost::bind(&Photonuclear::FunctionToIntegralALLM91, this, _1),4);
+    return medium_->GetMolDensity()*medium_->GetAtomInMolecule().at(i)*particle_charge*integral_->Integrate(min, max, boost::bind(&Photonuclear::FunctionToIntegralALLM91, this, _1),4);
 
 }
 
@@ -1169,12 +1177,19 @@ double Photonuclear::ALLM91Parametrization(double v, int i)
 
 double Photonuclear::ALLM97Parametrization(double v, int i)
 {
+    double particle_charge, particle_mass, particle_energy;
+
+    particle_mass = particle_->GetMass();
+    particle_energy = particle_->GetEnergy();
+    particle_charge = particle_->GetCharge();
+    particle_charge *= particle_charge;
+
     if(do_photo_interpolation_)
     {
         SetIntegralLimits(i);
         if(v >= vUp_)
         {
-            return max(photo_interpolant_.at(i)->Interpolate(particle_->GetEnergy(), log(v/vUp_)/log(vMax_/vUp_)), 0.0);
+            return max(photo_interpolant_.at(i)->Interpolate(particle_energy, log(v/vUp_)/log(vMax_/vUp_)), 0.0);
         }
     }
 
@@ -1182,16 +1197,16 @@ double Photonuclear::ALLM97Parametrization(double v, int i)
 
     component_ =   i;
     v_         =   v;
-    min        =   particle_->GetMass()*v;
+    min        =   particle_mass*v;
     min        *=  min/(1-v);
 
-    if(particle_->GetMass() < MPI)
+    if(particle_mass < MPI)
     {
-        aux     =   particle_->GetMass()*particle_->GetMass()/particle_->GetEnergy();
+        aux     =   particle_mass*particle_mass/particle_energy;
         min     -=  (aux*aux)/(2*(1-v));
     }
 
-    max =   2*medium_->GetAverageNucleonWeight().at(i)*particle_->GetEnergy()*(v-vMin_);
+    max =   2*medium_->GetAverageNucleonWeight().at(i)*particle_energy*(v-vMin_);
 
     //  if(form==4) max=Math.min(max, 5.5e6);  // as requested in Butkevich and Mikheyev
     if(min>max)
@@ -1199,7 +1214,7 @@ double Photonuclear::ALLM97Parametrization(double v, int i)
         return 0;
     }
 
-    return medium_->GetMolDensity()*medium_->GetAtomInMolecule().at(i)*particle_->GetCharge()*particle_->GetCharge()*integral_->Integrate(min, max, boost::bind(&Photonuclear::FunctionToIntegralALLM97, this, _1),4);
+    return medium_->GetMolDensity()*medium_->GetAtomInMolecule().at(i)*particle_charge*integral_->Integrate(min, max, boost::bind(&Photonuclear::FunctionToIntegralALLM97, this, _1),4);
 
 }
 
@@ -1210,12 +1225,19 @@ double Photonuclear::ALLM97Parametrization(double v, int i)
 
 double Photonuclear::ButkevichMikhailovParametrization(double v, int i)
 {
+    double particle_charge, particle_mass, particle_energy;
+
+    particle_mass = particle_->GetMass();
+    particle_energy = particle_->GetEnergy();
+    particle_charge = particle_->GetCharge();
+    particle_charge *= particle_charge;
+
     if(do_photo_interpolation_)
     {
         SetIntegralLimits(i);
         if(v >= vUp_)
         {
-            return max(photo_interpolant_.at(i)->Interpolate(particle_->GetEnergy(), log(v/vUp_)/log(vMax_/vUp_)), 0.0);
+            return max(photo_interpolant_.at(i)->Interpolate(particle_energy, log(v/vUp_)/log(vMax_/vUp_)), 0.0);
         }
     }
 
@@ -1223,16 +1245,16 @@ double Photonuclear::ButkevichMikhailovParametrization(double v, int i)
 
     component_ =   i;
     v_         =   v;
-    min        =   particle_->GetMass()*v;
+    min        =   particle_mass*v;
     min        *=  min/(1-v);
 
-    if(particle_->GetMass() < MPI)
+    if(particle_mass < MPI)
     {
-        aux     =   particle_->GetMass()*particle_->GetMass()/particle_->GetEnergy();
+        aux     =   particle_mass*particle_mass/particle_energy;
         min     -=  (aux*aux)/(2*(1-v));
     }
 
-    max =   2*medium_->GetAverageNucleonWeight().at(i)*particle_->GetEnergy()*(v-vMin_);
+    max =   2*medium_->GetAverageNucleonWeight().at(i)*particle_energy*(v-vMin_);
 
     //  if(form==4) max=Math.min(max, 5.5e6);  // as requested in Butkevich and Mikheyev
     if(min>max)
@@ -1240,7 +1262,7 @@ double Photonuclear::ButkevichMikhailovParametrization(double v, int i)
         return 0;
     }
 
-    return medium_->GetMolDensity()*medium_->GetAtomInMolecule().at(i)*particle_->GetCharge()*particle_->GetCharge()*integral_->Integrate(min, max, boost::bind(&Photonuclear::FunctionToIntegralButMik, this, _1),4);
+    return medium_->GetMolDensity()*medium_->GetAtomInMolecule().at(i)*particle_charge*integral_->Integrate(min, max, boost::bind(&Photonuclear::FunctionToIntegralButMik, this, _1),4);
 
 }
 
@@ -1254,8 +1276,9 @@ double Photonuclear::ButkevichMikhailovParametrization(double v, int i)
 
 double Photonuclear::CalculateStochasticLoss(double rnd)
 {
-    double rand;
-    double rsum;
+    double rand, rsum, particle_energy;
+
+    particle_energy = particle_->GetEnergy();
 
     rand    =   rnd*sum_of_rates_;
     rsum    =   0;
@@ -1272,16 +1295,16 @@ double Photonuclear::CalculateStochasticLoss(double rnd)
 
                 if(vUp_==vMax_)
                 {
-                    return (particle_->GetEnergy())*vUp_;
+                    return (particle_energy)*vUp_;
                 }
 
-                return particle_->GetEnergy()*(vUp_*exp(dndx_interpolant_2d_.at(i)->FindLimit((particle_->GetEnergy()), (rnd_)*prob_for_component_.at(i))*log(vMax_/vUp_)));
+                return particle_energy*(vUp_*exp(dndx_interpolant_2d_.at(i)->FindLimit((particle_energy), (rnd_)*prob_for_component_.at(i))*log(vMax_/vUp_)));
 
             }
             else
             {
                 component_ = i;
-                return (particle_->GetEnergy())*dndx_integral_.at(i)->GetUpperLimit();
+                return (particle_energy)*dndx_integral_.at(i)->GetUpperLimit();
 
             }
         }
@@ -1347,24 +1370,38 @@ void Photonuclear::SetIntegralLimits(int component)
 
 double Photonuclear::PhotoN(double v, int i)
 {
-    switch(parametrization_family_)
+    switch(parametrization_)
     {
-        case 1: return KokoulinParametrization(v, i);
-
-        case 2: return RhodeParametrization(v, i);
-
-        case 3: return BezrukovBugaevParametrization(v, i);
-
-        case 4: return ZeusParametrization(v, i);
-
-        case 5: return ALLM91Parametrization(v, i);
-
-        case 6: return ALLM97Parametrization(v, i);
-
-        case 7: return ButkevichMikhailovParametrization(v, i);
-
+        case ParametrizationType::PhotoKokoulinShadowBezrukovSoft:
+            return KokoulinParametrization(v, i);
+        case ParametrizationType::PhotoKokoulinShadowBezrukovHard:
+            return KokoulinParametrization(v, i);
+        case ParametrizationType::PhotoRhodeShadowBezrukovSoft:
+            return RhodeParametrization(v, i);
+        case ParametrizationType::PhotoRhodeShadowBezrukovHard:
+            return RhodeParametrization(v, i);
+        case ParametrizationType::PhotoBezrukovBugaevShadowBezrukovSoft:
+            return BezrukovBugaevParametrization(v, i);
+        case ParametrizationType::PhotoBezrukovBugaevShadowBezrukovHard:
+            return BezrukovBugaevParametrization(v, i);
+        case ParametrizationType::PhotoZeusShadowBezrukovSoft:
+            return ZeusParametrization(v, i);
+        case ParametrizationType::PhotoZeusShadowBezrukovHard:
+            return ZeusParametrization(v, i);
+        case ParametrizationType::PhotoAbramowiczLevinLevyMaor91ShadowDutta:
+            return ALLM91Parametrization(v, i);
+        case ParametrizationType::PhotoAbramowiczLevinLevyMaor91ShadowButkevich:
+            return ALLM91Parametrization(v, i);
+        case ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowDutta:
+            return ALLM97Parametrization(v, i);
+        case ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich:
+            return ALLM97Parametrization(v, i);
+        case ParametrizationType::PhotoButkevichMikhailovShadowDutta:
+            return ButkevichMikhailovParametrization(v, i);
+        case ParametrizationType::PhotoButkevichMikhailovShadowButkevich:
+            return ButkevichMikhailovParametrization(v, i);
         default:
-            log_error("parametrization_family_ %i is not supported! Be careful 0 is returned",parametrization_family_);
+            log_fatal("The photonuclear parametrization_ '%i' is not supported! Be careful 0 is returned",parametrization_);
             return 0;
 
     }
@@ -1529,10 +1566,13 @@ double Photonuclear::HardBB(double e, double v)
 
 double Photonuclear::ParametrizationOfRealPhotonAssumption(double v, int i, double sgn)
 {
-    double aux, aum, k, G, t;
+    double aux, aum, k, G, t, particle_charge;
 
     const double m1 =   0.54;
     const double m2 =   1.80;
+
+    particle_charge = particle_->GetCharge();
+    particle_charge *= particle_charge;
 
     k   =   1 - 2/v + 2/(v*v);
 
@@ -1572,7 +1612,7 @@ double Photonuclear::ParametrizationOfRealPhotonAssumption(double v, int i, doub
         }
     }
 
-    return medium_->GetMolDensity()*medium_->GetAtomInMolecule().at(i)*particle_->GetCharge()*particle_->GetCharge()*aux;
+    return medium_->GetMolDensity()*medium_->GetAtomInMolecule().at(i)*particle_charge*aux;
 }
 
 
@@ -1598,7 +1638,7 @@ double Photonuclear::ShadowEffect(double x , double nu)
     if(medium_->GetNucCharge().at(component_)==1) return 1;
 
 
-    if(shadow_ == 1)
+    if(shadow_ == ShadowingType::Dutta)
     {
         if(x<0.0014)
         {
@@ -1613,7 +1653,7 @@ double Photonuclear::ShadowEffect(double x , double nu)
             G   =   1;
         }
     }
-    else if (shadow_ == 2)
+    else if (shadow_ == ShadowingType::ButkevichMikhailov)
     {
         if(x>0.3)
         {
@@ -1655,7 +1695,8 @@ double Photonuclear::ShadowEffect(double x , double nu)
     }
     else
     {
-        log_warn("shadow_ must be 1 or 2, other values are not supported! Be careful shadow effect factor is set to 1!");
+        log_warn("shadow type '%i' is not valid must be Dutta or Butkevich, other values are not supported!
+            Be careful shadow effect factor is set to 1!", shadow_);
 
         G   =   1.;
     }
@@ -2012,87 +2053,59 @@ double Photonuclear::FunctionToIntegralButMik(double Q2)
 //---------------------------------Setter-------------------------------------//
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
-void Photonuclear::SetParametrization(int parametrization)
+void Photonuclear::SetParametrization(ParametrizationType::Enum parametrization)
 {
-    // Now: parametrization_ = 1,  Former: form=1 and bb=1 Kokoulin
-    // Now: parametrization_ = 2,  Former: form=2 and bb=1 Kokoulin + hard component
-    // Now: parametrization_ = 3,  Former: form=1 and bb=2 Rhode
-    // Now: parametrization_ = 4,  Former: form=2 and bb=2 Rhode + hard component
-    // Now: parametrization_ = 5,  Former: form=1 and bb=3 Bezrukov/Bugaev
-    // Now: parametrization_ = 6,  Former: form=2 and bb=3 Bezrukov/Bugaev + hard component
-    // Now: parametrization_ = 7,  Former: form=1 and bb=4 Zeus
-    // Now: parametrization_ = 8,  Former: form=2 and bb=4 Zeus + hard component
-    // Now: parametrization_ = 9,  Former: form=3 and bb=1 shadow=1 ALLM 91
-    // Now: parametrization_ = 10, Former: form=3 and bb=1 shadow=2 ALLM 91
-    // Now: parametrization_ = 11, Former: form=3 and bb=2 shadow=1 ALLM 97
-    // Now: parametrization_ = 12, Former: form=3 and bb=2 shadow=2 ALLM 97
-    // Now: parametrization_ = 13, Former: form=4 and bb=1 shadow=1 Butkevich/Mikhailov
-    // Now: parametrization_ = 14, Former: form=4 and bb=1 shadow=2 Butkevich/Mikhailov
-
     parametrization_    =   parametrization;
 
-    switch(parametrization)
+    switch(parametrization_)
     {
         case ParametrizationType::PhotoKokoulinShadowBezrukovSoft:
-            parametrization_family_ =   1;
             hard_component_         =   false;
             break;
         case ParametrizationType::PhotoKokoulinShadowBezrukovHard:
-            parametrization_family_ =   1;
             hard_component_         =   true;
             break;
         case ParametrizationType::PhotoRhodeShadowBezrukovSoft:
-            parametrization_family_ =   2;
             hard_component_         =   false;
             break;
         case ParametrizationType::PhotoRhodeShadowBezrukovHard:
-            parametrization_family_ =   2;
             hard_component_         =   true;
             break;
         case ParametrizationType::PhotoZeusShadowBezrukovSoft:
-            parametrization_family_ =   3;
             hard_component_         =   false;
             break;
         case ParametrizationType::PhotoBezrukovBugaevShadowBezrukovHard:
-            parametrization_family_ =   3;
             hard_component_         =   true;
             break;
         case ParametrizationType::PhotoZeusShadowBezrukovSoft:
-            parametrization_family_ =   4;
             hard_component_         =   false;
             break;
         case ParametrizationType::PhotoZeusShadowBezrukovHard:
-            parametrization_family_ =   4;
             hard_component_         =   true;
             break;
         case ParametrizationType::PhotoAbramowiczLevinLevyMaor91ShadowDutta:
-            parametrization_family_ =   5;
-            shadow_                 =   1;
+            shadow_                 =   ShadowingType::Dutta;
             break;
         case ParametrizationType::PhotoAbramowiczLevinLevyMaor91ShadowButkevich:
-            parametrization_family_ =   5;
-            shadow_                 =   2;
+            shadow_                 =   ShadowingType::ButkevichMikhailov;
             break;
         case ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowDutta:
-            parametrization_family_ =   6;
-            shadow_                 =   1;
+            shadow_                 =   ShadowingType::Dutta;
             break;
         case ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich:
-            parametrization_family_ =   6;
-            shadow_                 =   2;
+            shadow_                 =   ShadowingType::ButkevichMikhailov;
             break;
         case ParametrizationType::PhotoButkevichMikhailovShadowDutta:
-            parametrization_family_ =   7;
-            shadow_                 =   1;
+            shadow_                 =   ShadowingType::Dutta;
             break;
         case ParametrizationType::PhotoButkevichMikhailovShadowButkevich:
-            parametrization_family_ =   7;
-            shadow_                 =   2;
+            shadow_                 =   ShadowingType::ButkevichMikhailov;
             break;
         default:
-            log_warn("Parametrization %i not supported. Set to 12 (icecube default)",parametrization_);
-            parametrization_family_ =   6;
-            shadow_                 =   2;
+            log_warn("Photonuclear Parametrization '%i' not supported. Set to default '%i' "
+                ,parametrization_, ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich);
+            parametrization_ =  ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich
+            shadow_          =  ShadowingType::ButkevichMikhailov;
     }
 
     if(do_photo_interpolation_)
@@ -2176,7 +2189,7 @@ void Photonuclear::SetV(double v) {
 	v_ = v;
 }
 
-void Photonuclear::SetShadow(int shadow){
+void Photonuclear::SetShadow(ShadowingType::Enum shadow){
     shadow_  =   shadow;
 }
 

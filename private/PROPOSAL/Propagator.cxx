@@ -1008,7 +1008,7 @@ void Propagator::ReadConfigFile(string config_file, bool DoApplyOptions)
             taux    =   NextToken(token);
 
             try {
-                brems_ = boost::lexical_cast<int>(taux);
+                brems_ = boost::lexical_cast<ParametrizationType::Enum>(taux);
             }
             catch(boost::bad_lexical_cast&) {
                 log_warn("The bremsstrahlungs parametrization indentifier is set to %s but must be an integer! Set to 1", taux.c_str());

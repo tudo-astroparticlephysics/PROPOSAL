@@ -40,11 +40,11 @@ namespace ParametrizationType
         PhotoAbramowiczLevinLevyMaor97ShadowDutta      = 36,
         PhotoAbramowiczLevinLevyMaor97ShadowButkevich  = -36,
         PhotoButkevichMikhailovShadowDutta             = 37,
-        PhotoButkevichMikhailovShadowButkevich         = -37
+        PhotoButkevichMikhailovShadowButkevich         = -37,
 
-        EPairKelnerKokoulinPetrukhin  = 51;
+        EPairKelnerKokoulinPetrukhin  = 51,
 
-        IonizBetheBloch  = 71;
+        IonizBetheBloch  = 71
     };
 };
 
@@ -83,7 +83,7 @@ protected:
     //CrossSection multiplier
     double multiplier_;
 
-    int         parametrization_;
+    ParametrizationType::Enum  parametrization_;
 
     bool        lpm_effect_enabled_;
     bool        init_lpm_effect_;
@@ -191,7 +191,8 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    virtual void SetParametrization(int parametrization=1) = 0;
+    virtual void SetParametrization(
+        ParametrizationType::Enum parametrization = ParametrizationType::BremsKelnerKokoulinPetrukhin) = 0;
 
 //----------------------------------------------------------------------------//
 
@@ -263,7 +264,7 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    int GetParametrization() const
+    ParametrizationType::Enum GetParametrization() const
     {
         return parametrization_;
     }
