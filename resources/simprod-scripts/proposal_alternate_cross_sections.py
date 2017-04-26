@@ -46,10 +46,8 @@ class NuGen(ipmodule.ParsingModule):
         self.AddParameter("RNGSeed","RNG seed",0)
         self.AddParameter("RNGStream","RNG stream number",0)
         self.AddParameter("RNGNumberOfStreams","Number of RNG streams",1)
-        self.AddParameter('bs','Bremsstrahlung Parametrization',1)
-        self.AddParameter('ph','Photonuclear Parametrization Family',3)
-        self.AddParameter('bb','Photonuclear Parametrization',2)
-        self.AddParameter('sh','Nuclear Shadowing Parametrization',2)
+        self.AddParameter('bs','Bremsstrahlung Parametrization', ParametrizationType::BremsKelnerKokoulinPetrukhin)
+        self.AddParameter('ph','Photonuclear Parametrization', ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich)
 
    def Execute(self,stats):
         if not ipmodule.ParsingModule.Execute(self,stats): return 0
@@ -79,9 +77,7 @@ class NuGen(ipmodule.ParsingModule):
              gamma=self.gamma,
              stats=stats,
              bs=self.bs,
-             ph=self.ph,
-             bb=self.bb,
-             sh=self.sh)
+             ph=self.ph)
 
         tray.AddModule("I3Writer","writer")(
             ("filename",self.outputfile),
@@ -147,10 +143,8 @@ class CorsikaGenerator(ipmodule.ParsingModule):
         self.AddParameter("CutoffType","Sets SPRIC=T (EnergyPerNucleon) or F (EnergyPerParticle) ","EnergyPerNucleon")
         self.AddParameter("RepoURL","URL of repository containing corsika tarballs","http://convey.icecube.wisc.edu/data/sim/sim-new/downloads")
 
-        self.AddParameter('bs','Bremsstrahlung Parametrization',1)
-        self.AddParameter('ph','Photonuclear Parametrization Family',3)
-        self.AddParameter('bb','Photonuclear Parametrization',2)
-        self.AddParameter('sh','Nuclear Shadowing Parametrization',2)
+        self.AddParameter('bs','Bremsstrahlung Parametrization', ParametrizationType::BremsKelnerKokoulinPetrukhin)
+        self.AddParameter('ph','Photonuclear Parametrization', ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich)
 
  
    def Execute(self,stats):
@@ -199,9 +193,7 @@ class CorsikaGenerator(ipmodule.ParsingModule):
              CylinderLength=self.length,
              CylinderRadius=self.radius,
              bs=self.bs,
-             ph=self.ph,
-             bb=self.bb,
-             sh=self.sh)
+             ph=self.ph)
 
         tray.AddModule(BasicCounter,"count_g", Streams = [icetray.I3Frame.DAQ], 
               name = "Generated Events", Stats = stats)
@@ -249,10 +241,8 @@ class MuonGunGenerator(ipmodule.ParsingModule):
         self.AddParameter('cthmin','Min theta of injected cosmic rays',0.0)  
         self.AddParameter('cthmax','Max theta of injected cosmic rays',89.99)  
 
-        self.AddParameter('bs','Bremsstrahlung Parametrization',1)
-        self.AddParameter('ph','Photonuclear Parametrization Family',3)
-        self.AddParameter('bb','Photonuclear Parametrization',2)
-        self.AddParameter('sh','Nuclear Shadowing Parametrization',2)
+        self.AddParameter('bs','Bremsstrahlung Parametrization', ParametrizationType::BremsKelnerKokoulinPetrukhin)
+        self.AddParameter('ph','Photonuclear Parametrization', PhotoAbramowiczLevinLevyMaor97ShadowButkevich)
  
    def Execute(self,stats):
         if not ipmodule.ParsingModule.Execute(self,stats): return 0
@@ -318,9 +308,7 @@ class MuonGunGenerator(ipmodule.ParsingModule):
              CylinderLength=self.length,
              CylinderRadius=self.radius,
              bs=self.bs,
-             ph=self.ph,
-             bb=self.bb,
-             sh=self.sh)
+             ph=self.ph)
 
         tray.AddModule(BasicCounter,"count_g", Streams = [icetray.I3Frame.DAQ], 
               name = "Generated Events", Stats = stats)
@@ -342,10 +330,8 @@ def MakePropagator(
     particleType=dataclasses.I3Particle.ParticleType.MuMinus,
     impl='proposal',
     mediadef=None,
-    bs=1,
-    ph=3,
-    bb=2,
-    sh=2
+    bs=ParametrizationType::BremsKelnerKokoulinPetrukhin,
+    ph=ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich
     ):
         """
         Create a muon propagator service.
@@ -372,7 +358,73 @@ def MakePropagator(
             # Now create the MMC propagators, but first *all* of the options must be set here.
             # There's no special options added behind the scenes.  This is much more flexible.
             #  Below are the standard options.  To interpret them see the MMC docs.
-            mmcOpts = "-romb=5 -raw -user -sdec -time -lpm -bs=%d -ph=%d -bb=%d -sh=%d -frho -cont "%(bs,ph,bb,sh)
+
+            # redefine the new bremsstrahlung and photonuclear parametrization to the old one to use mmc
+            int bs_old, ph_old, bb_old, sh_old
+            
+            if (bs == ParametrizationType::BremsKelnerKokoulinPetrukhin): bs_old = 1
+            elif (bs == ParametrizationType::BremsAndreevBezrukovBugaev):   bs_old = 2
+            elif (bs == ParametrizationType::BremsPetrukhinShestakov):      bs_old = 3
+            elif (bs == ParametrizationType::BremsCompleteScreeningCase):   bs_old = 4
+
+            if (ph == ParametrizationType::PhotoKokoulinShadowBezrukovSoft):
+                ph_old = 1
+                bb_old = 1
+                sh_old = 0
+            elif (ph == ParametrizationType::PhotoKokoulinShadowBezrukovHard):
+                ph_old = 2
+                bb_old = 1
+                sh_old = 0
+            elif (ph == ParametrizationType::PhotoRhodeShadowBezrukovSoft):
+                ph_old = 1
+                bb_old = 2
+                sh_old = 0
+            elif (ph == ParametrizationType::PhotoRhodeShadowBezrukovHard):
+                ph_old = 2
+                bb_old = 2
+                sh_old = 0
+            elif (ph == ParametrizationType::PhotoBezrukovBugaevShadowBezrukovSoft):
+                ph_old = 1
+                bb_old = 3
+                sh_old = 0
+            elif (ph == ParametrizationType::PhotoBezrukovBugaevShadowBezrukovHard):
+                ph_old = 2
+                bb_old = 3
+                sh_old = 0
+            elif (ph == ParametrizationType::PhotoZeusShadowBezrukovSoft):
+                ph_old = 1
+                bb_old = 4
+                sh_old = 0
+            elif (ph == ParametrizationType::PhotoZeusShadowBezrukovHard):
+                ph_old = 2
+                bb_old = 4
+                sh_old = 0
+            elif (ph == ParametrizationType::PhotoAbramowiczLevinLevyMaor91ShadowDutta):
+                ph_old = 3
+                bb_old = 1
+                sh_old = 1
+            elif (ph == ParametrizationType::PhotoAbramowiczLevinLevyMaor91ShadowButkevich):
+                ph_old = 3
+                bb_old = 1
+                sh_old = 2
+            elif (ph == ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowDutta):
+                ph_old = 3
+                bb_old = 2
+                sh_old = 1
+            elif (ph == ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich):
+                ph_old = 3
+                bb_old = 2
+                sh_old = 2
+            elif (ph == ParametrizationType::PhotoButkevichMikhailovShadowDutta):
+                ph_old = 4
+                bb_old = 1
+                sh_old = 1
+            elif (ph == ParametrizationType::PhotoButkevichMikhailovShadowButkevich):
+                ph_old = 4
+                bb_old = 1
+                sh_old = 2
+
+            mmcOpts = "-romb=5 -raw -user -sdec -time -lpm -bs=%d -ph=%d -bb=%d -sh=%d -frho -cont "%(bs_old,ph_old,bb_old,sh_old)
             mmcOpts += expandvars("-tdir=$I3_BUILD/mmc-icetray/resources ")
             mmcOpts += expandvars("-mediadef=%s " % mediadef)
             mmcOpts += "-radius=%d " % radius
@@ -399,9 +451,7 @@ def MakePropagator(
                 cylinderHeight=length,
                 type=particleType,
                 bremsstrahlungParametrization=PROPOSAL.BremsstrahlungParametrization(bs),
-                photonuclearParametrizationFamily=PROPOSAL.PhotonuclearParametrizationFamily(ph),
-                photonuclearParametrization=PROPOSAL.PhotonuclearParametrization(bb),
-                nuclearShadowingParametrization=PROPOSAL.ShadowingParametrization(sh),
+                photonuclearParametrization=PROPOSAL.PhotonuclearParametrization(ph)
                 )
         else:
             raise RuntimeError("unknown propagator: %s" % impl)

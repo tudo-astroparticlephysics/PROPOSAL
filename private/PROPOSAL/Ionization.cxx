@@ -871,7 +871,7 @@ double Ionization::FunctionToDNdxIntegral(double variable)
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-void Ionization::SetParametrization(int parametrization){
+void Ionization::SetParametrization(ParametrizationType::Enum parametrization){
     parametrization_ = parametrization;
     log_warn("This has no effect. Till now only one parametrization for Ionization implemented");
     if (parametrization_ != ParametrizationType::IonizBetheBloch)

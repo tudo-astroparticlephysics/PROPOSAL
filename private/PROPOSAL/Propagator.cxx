@@ -1008,11 +1008,12 @@ void Propagator::ReadConfigFile(string config_file, bool DoApplyOptions)
             taux    =   NextToken(token);
 
             try {
-                brems_ = boost::lexical_cast<ParametrizationType::Enum>(taux);
+                brems_ = static_cast<ParametrizationType::Enum>(boost::lexical_cast<int>(taux));
             }
             catch(boost::bad_lexical_cast&) {
-                log_warn("The bremsstrahlungs parametrization indentifier is set to %s but must be an integer! Set to 1", taux.c_str());
-                brems_ = 1;
+                log_warn("The bremsstrahlungs parametrization indentifier is set to %s \
+                    but must be a ParametrizationType::Enum! Set to BremsKelnerKokoulinPetrukhin", taux.c_str());
+                brems_ = ParametrizationType::BremsKelnerKokoulinPetrukhin;
             }
         }
         // photonuclear parametrization
@@ -1021,11 +1022,12 @@ void Propagator::ReadConfigFile(string config_file, bool DoApplyOptions)
             taux    =   NextToken(token);
 
             try {
-                photo_ = boost::lexical_cast<int>(taux);
+                photo_ = static_cast<ParametrizationType::Enum>(boost::lexical_cast<int>(taux));
             }
             catch(boost::bad_lexical_cast&) {
-                log_warn("The photonuclear parametrization indentifier is set to %s but must be an integer! Set to 12", taux.c_str());
-                photo_ = 12;
+                log_warn("The photonuclear parametrization indentifier is set to %s \
+                    but must be a ParametrizationType::Enum! Set to PhotoAbramowiczLevinLevyMaor97ShadowButkevich", taux.c_str());
+                photo_ = ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich;
             }
         }
         // bremsstahlungs mulitpiler
@@ -1394,8 +1396,8 @@ Propagator::Propagator()
     ,debug_                     ( false )
     ,particle_interaction_      ( false )
     ,seed_                      ( 1 )
-    ,brems_                     ( 1 )
-    ,photo_                     ( 12 )
+    ,brems_                     ( ParametrizationType::BremsKelnerKokoulinPetrukhin )
+    ,photo_                     ( ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich )
     ,lpm_                       ( false )
     ,moliere_                   ( false )
     ,stopping_decay_            ( true )
@@ -1439,8 +1441,8 @@ Propagator::Propagator(Medium* medium,
                        bool continuous_rand,
                        bool exact_time,
                        bool lpm,
-                       int brems,
-                       int photo,
+                       ParametrizationType::Enum brems,
+                       ParametrizationType::Enum photo,
                        double brems_multiplier,
                        double photo_multiplier,
                        double ioniz_multiplier,
@@ -1526,8 +1528,8 @@ Propagator::Propagator(string config_file, bool DoApplyOptions)
     ,debug_                     ( false )
     ,particle_interaction_      ( false )
     ,seed_                      ( 1 )
-    ,brems_                     ( 1 )
-    ,photo_                     ( 12 )
+    ,brems_                     ( ParametrizationType::BremsKelnerKokoulinPetrukhin )
+    ,photo_                     ( ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich )
     ,lpm_                       ( false )
     ,moliere_                   ( false )
     ,stopping_decay_            ( true )
@@ -1564,8 +1566,8 @@ Propagator::Propagator(std::string config_file, PROPOSALParticle* particle, bool
     ,debug_                     ( false )
     ,particle_interaction_      ( false )
     ,seed_                      ( 1 )
-    ,brems_                     ( 1 )
-    ,photo_                     ( 12 )
+    ,brems_                     ( ParametrizationType::BremsKelnerKokoulinPetrukhin )
+    ,photo_                     ( ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich )
     ,lpm_                       ( false )
     ,moliere_                   ( false )
     ,stopping_decay_            ( true )
@@ -2354,22 +2356,22 @@ void Propagator::SetSeed(int seed)
     seed_ = seed;
 }
 
-int Propagator::GetBrems() const
+ParametrizationType::Enum Propagator::GetBrems() const
 {
     return brems_;
 }
 
-void Propagator::SetBrems(int brems)
+void Propagator::SetBrems(ParametrizationType::Enum brems)
 {
     brems_ = brems;
 }
 
-int Propagator::GetPhoto() const
+ParametrizationType::Enum Propagator::GetPhoto() const
 {
     return photo_;
 }
 
-void Propagator::SetPhoto(int photo)
+void Propagator::SetPhoto(ParametrizationType::Enum photo)
 {
     photo_ = photo;
 }

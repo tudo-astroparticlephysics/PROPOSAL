@@ -1351,7 +1351,7 @@ double Epairproduction::FunctionToIntegral(double r)
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-void Epairproduction::SetParametrization(int parametrization){
+void Epairproduction::SetParametrization(ParametrizationType::Enum parametrization){
     parametrization_ = parametrization;
     log_warn("This has no effect. Till now only one parametrization for Epairproduction implemented");
     if (parametrization_ != ParametrizationType::EPairKelnerKokoulinPetrukhin)
@@ -1400,10 +1400,6 @@ void Epairproduction::SetProbForComponent(
 
 void Epairproduction::SetReverse(bool reverse) {
 	reverse_ = reverse;
-}
-
-void Epairproduction::SetV(double v) {
-	v_ = v;
 }
 
 

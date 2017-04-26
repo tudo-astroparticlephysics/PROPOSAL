@@ -488,8 +488,9 @@ boost::program_options::options_description Bremsstrahlung::CreateOptions()
     bremsstrahlung.add_options()
         ("bremsstrahlung.lorenz",           po::value<bool>(&lorenz_)->implicit_value(false),                 "enable lorenz cut")
         ("bremsstrahlung.lorenzCut",        po::value<double>(&lorenz_cut_)->default_value(1e6),              "lorenz cut in MeV")
-        ("bremsstrahlung.para",             po::value<ParametrizationType::Enum>(&parametrization_)->default_value(ParametrizationType::BremsKelnerKokoulinPetrukhin)
-            , "ParametrizationTypes: KelnerKokoulinPetrukhin \n AndreevBezrukovBugaev \n PetrukhinShestakov \n CompleteScreeningCase")
+        // TODO
+        // ("bremsstrahlung.para",             po::value<int>(&parametrization_)->default_value(static_cast<int>(ParametrizationType::BremsKelnerKokoulinPetrukhin))
+        //     , "ParametrizationTypes: KelnerKokoulinPetrukhin \n AndreevBezrukovBugaev \n PetrukhinShestakov \n CompleteScreeningCase")
         ("bremsstrahlung.lpm",              po::value<bool>(&lpm_effect_enabled_)->implicit_value(false),     "Enables   Landau-Pomeranchuk-Migdal supression")
         ("bremsstrahlung.interpol_dedx",    po::value<bool>(&do_dedx_Interpolation_)->implicit_value(false),  "Enables interpolation for dEdx")
         ("bremsstrahlung.interpol_dndx",    po::value<bool>(&do_dndx_Interpolation_)->implicit_value(false),  "Enables interpolation for dNdx")
@@ -514,7 +515,7 @@ void Bremsstrahlung::ValidateOptions()
         case ParametrizationType::BremsCompleteScreeningCase:
             break;
         default:
-            cerr<<"Bremsstrahlung: Parametrization type number is not vaild. 
+            cerr<<"Bremsstrahlung: Parametrization type number is not vaild. \
                 Set to default parametrization of KelnerKokoulinPetrukhin"<<endl;
             parametrization_ = ParametrizationType::BremsKelnerKokoulinPetrukhin;
             break;
@@ -1132,7 +1133,7 @@ double Bremsstrahlung::ElasticBremsstrahlungCrossSection(double v, int i)
             result  =   CompleteScreeningCase(v, i);
             break;
         default:
-            log_info("Bremsstrahlung: Parametrization type number '%i' is not vaild. 
+            log_info("Bremsstrahlung: Parametrization type number '%i' is not vaild. \
                 Set to default parametrization of KelnerKokoulinPetrukhin with type number '%i' "
                 , parametrization_, ParametrizationType::BremsKelnerKokoulinPetrukhin);
     }
@@ -1352,7 +1353,7 @@ double Bremsstrahlung::FunctionToDNdxIntegral(double variable)
 //----------------------------------------------------------------------------//
 
 
-void Bremsstrahlung::SetParametrization(int parametrization)
+void Bremsstrahlung::SetParametrization(ParametrizationType::Enum parametrization)
 {
     parametrization_ = parametrization;
     switch (parametrization_)
@@ -1363,7 +1364,7 @@ void Bremsstrahlung::SetParametrization(int parametrization)
         case ParametrizationType::BremsCompleteScreeningCase:
             break;
         default:
-            log_warn("Bremsstrahlung: Parametrization type number '%i' is not vaild. 
+            log_warn("Bremsstrahlung: Parametrization type number '%i' is not vaild. \
                 Set to default parametrization of KelnerKokoulinPetrukhin with type number '%i' "
                 , parametrization, ParametrizationType::BremsKelnerKokoulinPetrukhin);
             parametrization_ = ParametrizationType::BremsKelnerKokoulinPetrukhin;
