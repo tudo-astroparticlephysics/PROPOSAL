@@ -72,7 +72,7 @@ protected:
     double ParametrizationOfRealPhotonAssumption(double v, int i, double sgn);
     
     double ShadowEffect(double x , double nu);
-    double ShadowBezrukovBugaev(double x , double nu);
+    double ShadowBezrukovBugaev(double sgn, double atomic_number);
 
 
 
@@ -343,9 +343,6 @@ public:
 	void SetInterpolantHardBb(std::vector<Interpolant*> interpolantHardBb);
 	void SetInterpolantMeasured(Interpolant* interpolantMeasured);
 	void SetProbForComponent(std::vector<double> probForComponent);
-    void SetV(double v);
-    void SetHardComponent(bool hard);
-    void SetShadow(int shadow);
 
 //----------------------------------------------------------------------------//
     //Destructor
