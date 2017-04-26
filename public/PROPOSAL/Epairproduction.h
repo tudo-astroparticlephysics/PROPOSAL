@@ -235,7 +235,6 @@ public:
 	void SetIntegralForDEdx(Integral* integralForDEdx);
 	void SetProbForComponent(std::vector<double> probForComponent);
 	void SetReverse(bool reverse);
-	void SetV(double v);
 
 //----------------------------------------------------------------------------//
     //Destructor

@@ -22,8 +22,8 @@ namespace ParametrizationType
 {
     enum Enum
     {
-        BremsKelnerKokoulinPetrukhin  = 10,
-        BremsAndreevBezrukovBugaev    = 11,
+        BremsKelnerKokoulinPetrukhin  = 11,
+        BremsAndreevBezrukovBugaev    = 12,
         BremsPetrukhinShestakov       = 13,
         BremsCompleteScreeningCase    = 14,
 
@@ -287,8 +287,6 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    void SetShadow(int newshadow);
-//----------------------------------------------------------------------------//
 
     // destructor
 
