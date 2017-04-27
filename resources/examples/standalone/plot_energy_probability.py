@@ -2,6 +2,7 @@ import sys
 import pyPROPOSAL
 import math
 import time
+import datetime
 
 try:
     import matplotlib
@@ -14,34 +15,64 @@ try:
 except ImportError:
     print("pylab not installed.  no plots for you.")
 
-def update_progress(progress):
-    barLenght = 50
-    status = ""
-    if isinstance(progress, int):
-        progress = float(progress)
-    if not isinstance(progress, float):
-        progress = 0
-        status = "error: progress var must be float\r\n"
-    if progress < 0:
-        status = "Halt...\r\n"
-    if progress >= 1:
-        progress = 1
-        status = "Done...\r\n"
-    block = int(round(barLenght * progress))
-    text = "\rPercent: [{0}] {1}% {2}".format(
-        "="*block + " "*(barLenght - block),
-        progress*100,
-        status
-    )
-    sys.stdout.write(text)
-    sys.stdout.flush()
+
+class ProgressBar(object):
+
+    """Docstring for ProgressBar. """
+
+    def __init__(self, loops, bar_lenght=50, start=0):
+
+        self._bar_lenght = bar_lenght
+        self._loops = loops
+        self._start = float(start)
+        self._current_loop = start
+
+        self._started_process = False
+        self._start_time = None
+
+        self._status = ""
+        self._text = "\rPercent: [{0}] {1}% Time: {2} {3}"
+        self._bar_full = "="
+        self._bar_empty = " "
+
+    def reset(self):
+        self._current_loop = self._start
+        self._status = ""
+        self._started_process = False
+
+    def start(self):
+        self._started_process = True
+        self._start_time = time.time()
+
+    def update(self):
+        if self._started_process is False:
+            print("Pleas start ProgressBar before updating it!")
+            return
+
+        self._current_loop += 1.0
+        progress = self._current_loop / self._loops
+
+        if progress >= 1.0:
+            self._status = "Done..."
+
+        block = int(round(self._bar_lenght * progress))
+
+        text = self._text.format(
+            self._bar_full*block + self._bar_empty*(self._bar_lenght - block),
+            progress*100,
+            str(datetime.timedelta(seconds=(time.time() - self._start_time))),
+            self._status
+        )
+
+        sys.stdout.write(text)
+        sys.stdout.flush()
+
 
 # =========================================================
 #   POPOSAL
 # =========================================================
 
 start_time = time.time()
-
 
 ptype = pyPROPOSAL.ParticleType.MuMinus
 mu = pyPROPOSAL.Particle(ptype)
@@ -53,9 +84,9 @@ mu.mass = 100000
 # cuts = pyPROPOSAL.EnergyCutSettings()
 
 # prop = pyPROPOSAL.Propagator(med, cuts, ptype, "../../resources/tables")
-prop = pyPROPOSAL.Propagator("../../configuration_IceOnly", mu)
+prop = pyPROPOSAL.Propagator("resources/configuration_IceOnly", mu)
 
-statistics = 1
+statistics = 1000
 E_max_log = 14
 
 epair_primary_energy = []
@@ -73,8 +104,12 @@ photo_secondary_energy = []
 length = []
 n_daughters = []
 
+progress = ProgressBar(statistics)
+progress.start()
+
 for i in range(statistics):
-    update_progress(i / statistics)
+    # update_progress(i / statistics)
+    progress.update()
     prop.reset_particle()
     prop.particle.energy = math.pow(10, E_max_log)
     secondarys = prop.propagate()
@@ -99,13 +134,9 @@ for i in range(statistics):
             photo_primary_energy.append(log_energy)
             photo_secondary_energy.append(log_sec_energy)
 
-update_progress(1)
-
-
 # =========================================================
 #   Plot
 # =========================================================
-
 
 
 tex_preamble = [
@@ -154,13 +185,18 @@ def plot_hist(ax, prim, sec):
     ax.set_ylim(ymin=-2, ymax=14)
     ax.grid(ls=":", lw=0.2)
 
-    textstr = "count = {:g}\ntotal energy loss = {:g} MeV".format(sum([sum(x) for x in hist[0]]), sum(sec))
+    textstr = "count = {:g}\ntotal energy loss = {:g} MeV".format(
+        sum([sum(x) for x in hist[0]]),
+        sum(sec)
+    )
     props = dict(facecolor='white', alpha=0.8)
     ax.text(0.03, 0.95, textstr,
             verticalalignment='top', horizontalalignment='left',
-            transform=ax.transAxes, fontsize=10, bbox=props) #, backgroundcolor='white')
+            transform=ax.transAxes, fontsize=10, bbox=props)
 
-    # ax.text(0.05, 0.95, 'count = {:g}'.format(sum([sum(x) for x in hist[0]])),
+    # ax.text(0.05, 0.95, 'count = {:g}'.format(sum([
+    #     sum(x) for x in hist[0]
+    # ])),
     #         verticalalignment='top', horizontalalignment='left',
     #         transform=ax.transAxes, fontsize=10)
     # ax.text(0.05, 0.90, 'total energy loss = {:g}'.format(sum(sec)),
@@ -257,4 +293,3 @@ end_time = time.time()
 
 with open("time_{}_stats_{}.txt".format(mu.name, statistics), "w") as f:
     f.write("execution time: {}".format(end_time - start_time))
-
