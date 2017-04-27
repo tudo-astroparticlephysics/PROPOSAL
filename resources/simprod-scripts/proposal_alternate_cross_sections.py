@@ -34,7 +34,6 @@ class NuGen(ipmodule.ParsingModule):
 
         self.AddParameter('gcdfile','GeoCalibDetStatus filename','')
         self.AddParameter('outputfile','Output filename','')
-        self.AddParameter('summaryfile','XMLSummary filename','')
         self.AddParameter('mjd','MJD for the GCD file','')
         self.AddParameter('nevents','Number of events','')
         self.AddParameter('elogmax','Maximum energy','9.0')
@@ -58,11 +57,8 @@ class NuGen(ipmodule.ParsingModule):
         randomService = phys_services.I3SPRNGRandomService(self.rngseed, self.rngnumberofstreams, self.rngstream)
         tray.context['I3RandomService'] = randomService
 
-        if not self.summaryfile:
-            raise Exception('must define summary file')
-        tray.AddService("I3XMLSummaryServiceFactory","summary")(
-            ("outputfilename",self.summaryfile),
-        )
+        summary = dataclasses.I3MapStringDouble()
+        tray.context["I3SummaryService"] = summary
          
         tray.AddSegment(NuGenTraySegment,"nugen",
              gcdfile=self.gcdfile,
@@ -113,7 +109,6 @@ class CorsikaGenerator(ipmodule.ParsingModule):
         self.AddParameter('outputfile','Output filename','corsika.i3')
         self.AddParameter('inputfile',"Input filename (only if you are not generating file)",'')
         self.AddParameter('RunCorsika','Run CORSIKA or only generate INPUTS file',False)
-        self.AddParameter('summaryfile','XMLSummary filename','summary.xml')
         self.AddParameter('mjd','MJD to set the event times',55697)
         self.AddParameter('atmospheres','Atmospheric models',[11,12,13,14]) # mar, jul, oct, dec
         self.AddParameter('eslope','CR spectral index (only if ranpri=0)',-2.7)
@@ -179,9 +174,8 @@ class CorsikaGenerator(ipmodule.ParsingModule):
         tray = I3Tray()
 
         # Configure IceTray services
-        tray.AddService("I3XMLSummaryServiceFactory","summary", outputfilename=self.summaryfile)
-        #summary = dataclasses.I3MapStringDouble()
-        #tray.context["I3SummaryService"] = summary
+        summary = dataclasses.I3MapStringDouble()
+        tray.context["I3SummaryService"] = summary
          
         randomService = phys_services.I3SPRNGRandomService(self.seed, self.nproc, self.procnum)#, oustatefile="rng.state")
         tray.context["I3RandomService"] = randomService
@@ -228,7 +222,6 @@ class MuonGunGenerator(ipmodule.ParsingModule):
         self.AddParameter('nproc','Number of processes for (RNG)',1)
         self.AddParameter('gcdfile','GeoCalibDetStatus filename','')
         self.AddParameter('outputfile','Output filename','corsika.i3')
-        self.AddParameter('summaryfile','XMLSummary filename','summary.xml')
         self.AddParameter('mjd','MJD to set the event times',55697)
         self.AddParameter('model','MuonGun Model','Hoerandel5_atmod12_SIBYLL')
         self.AddParameter("RunId","Configure run ID",0)
@@ -242,7 +235,7 @@ class MuonGunGenerator(ipmodule.ParsingModule):
         self.AddParameter('cthmax','Max theta of injected cosmic rays',89.99)  
 
         self.AddParameter('bs','Bremsstrahlung Parametrization', ParametrizationType::BremsKelnerKokoulinPetrukhin)
-        self.AddParameter('ph','Photonuclear Parametrization', PhotoAbramowiczLevinLevyMaor97ShadowButkevich)
+        self.AddParameter('ph','Photonuclear Parametrization', ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich)
  
    def Execute(self,stats):
         if not ipmodule.ParsingModule.Execute(self,stats): return 0
@@ -272,9 +265,8 @@ class MuonGunGenerator(ipmodule.ParsingModule):
         tray = I3Tray()
 
         # Configure IceTray services
-        tray.AddService("I3XMLSummaryServiceFactory","summary", outputfilename=self.summaryfile)
-        #summary = dataclasses.I3MapStringDouble()
-        #tray.context["I3SummaryService"] = summary
+        summary = dataclasses.I3MapStringDouble()
+        tray.context["I3SummaryService"] = summary
          
         randomService = phys_services.I3SPRNGRandomService(seed, nproc, procnum)
         tray.context["I3RandomService"] = randomService
