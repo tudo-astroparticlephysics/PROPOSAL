@@ -90,7 +90,7 @@ global
     photo_multiplier    1
     ioniz_multiplier    1
     epair_multiplier    1
-    path_to_tables      ../../tables
+    path_to_tables      resources/tables
     ecut_inside         500
     ecut_infront       -1
     ecut_behind        -1
