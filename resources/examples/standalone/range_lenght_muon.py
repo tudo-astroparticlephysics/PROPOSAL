@@ -1,62 +1,90 @@
 import pyPROPOSAL
 
-energy = 1e8
-statistics = 10000
-
-ptype = pyPROPOSAL.ParticleType.MuMinus
-
-med = pyPROPOSAL.Medium("standard_rock")
-E = pyPROPOSAL.EnergyCutSettings()
-p = pyPROPOSAL.Propagator(
-    med,
-    E,
-    ptype,
-    "resources/tables",
-    moliere=False,
-    scattering_model=2
-)
-
-# mu = pyPROPOSAL.Particle(ptype)
-# mu.energy = energy
-# mu.theta = 180
-# p = pyPROPOSAL.Propagator(
-#     config="resources/configuration",
-#     particle=mu
-# )
-
-mu_length = list()
-n_daughters = list()
-
-for i in range(statistics):
-    p.reset_particle()
-    p.particle.energy = energy
-    d = p.propagate()
-
-    mu_length.append(p.particle.propagated_distance / 100)
-    # mu_length.append(p.GetParticle().GetPropagatedDistance())
-    n_daughters.append(len(d))
-
-
 try:
     import matplotlib as mpl
     mpl.use('Agg')
-    import pylab
+    import matplotlib.pyplot as plt
+except ImportError:
+    raise ImportError("Matplotlib not installed!")
 
-    pylab.figure()
-    pylab.title("{} muons with energy {} TeV in {}".format(
+
+if __name__ == "__main__":
+
+    # =========================================================
+    # 	Propagate
+    # =========================================================
+
+    energy = 1e8  # MeV
+    statistics = 10
+
+    ptype = pyPROPOSAL.ParticleType.MuMinus
+
+    med = pyPROPOSAL.Medium("ice")
+    E = pyPROPOSAL.EnergyCutSettings()
+    p = pyPROPOSAL.Propagator(
+        med,
+        E,
+        ptype,
+        "resources/tables",
+        moliere=False,
+        scattering_model=2
+    )
+
+    # mu = pyPROPOSAL.Particle(ptype)
+    # mu.energy = energy
+    # mu.theta = 180
+    # p = pyPROPOSAL.Propagator(
+    #     config="resources/configuration",
+    #     particle=mu
+    # )
+
+    mu_length = list()
+    n_secondarys = list()
+
+    for i in range(statistics):
+        p.reset_particle()
+        p.particle.energy = energy
+        d = p.propagate()
+
+        mu_length.append(p.particle.propagated_distance / 100)
+        n_secondarys.append(len(d))
+
+    # =========================================================
+    # 	Plot lenghts
+    # =========================================================
+
+    fig_length = plt.figure()
+    ax = fig_length.add_subplot(111)
+
+    ax.hist(mu_length, histtype="step", log=True, bins=1000)
+
+    ax.set_title("{} muons with energy {} TeV in {}".format(
         statistics,
         energy / 1e6,
         p.collections[0].medium.name.lower()
     ))
-    pylab.hist(mu_length, histtype="step", log=True, bins=100)
-    pylab.xlabel(r'range / m')
-    pylab.ylabel(r'count')
-    pylab.savefig('MuonLenghts.pdf')
+    ax.set_xlabel(r'range / m')
+    ax.set_ylabel(r'count')
 
-    pylab.figure()
-    pylab.title("N Daughters")
-    pylab.hist(n_daughters, histtype="step", log=True, bins=100)
-    pylab.xlabel('N')
-    pylab.savefig('Daughters.pdf', bbox_inches='tight', pad_inches=0.02)
-except ImportError :
-    print("pylab not installed.  no plots for you.")
+    fig_length.tight_layout()
+    fig_length.savefig("muon_lenghts.pdf")
+
+    # =========================================================
+    # 	Plot secondarys
+    # =========================================================
+
+    fig_secondarys = plt.figure()
+    ax = fig_secondarys.add_subplot(111)
+
+    ax.hist(n_secondarys, histtype="step", log=True, bins=1000)
+
+    ax.set_title("{} muons with energy {} TeV in {}".format(
+        statistics,
+        energy / 1e6,
+        p.collections[0].medium.name.lower()
+    ))
+    ax.set_xlabel(r'number of interactions')
+    ax.set_ylabel(r'count')
+
+    fig_secondarys.tight_layout()
+    fig_secondarys.savefig("muon_secondarys.pdf")

@@ -146,7 +146,7 @@ global
 # last air with density correction factor 0.673
 
 sector
-    sphere  0   0   0   637413400  0
+    sphere  0   0   0   6374134000000  0
 
     inside  500     0.05  1
     infront 500     0.05  1
@@ -188,7 +188,7 @@ sector
 #       ( box + 3 or 6 values are expected )
 
 detector
-    sphere  0   0   0   637413400  0
+    sphere  0   0   0   6374134000000  0
 
 #detector
 #    sphere  0   0   0   100  0
