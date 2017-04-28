@@ -309,6 +309,8 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
                                                                   init<ParticleType::Enum>(
                                                                   (arg("particle_type") = ParticleType::MuMinus)))
 
+        .def(init<const PROPOSALParticle&>())
+
         .def(self_ns::str(self_ns::self))
         .def(self_ns::repr(self_ns::self))
 
@@ -359,6 +361,8 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
     class_<EnergyCutSettings, boost::shared_ptr<EnergyCutSettings> >("EnergyCutSettings", init<>())
 
         .def(init<double, double>((arg("ecut"), arg("vcut"))))
+        .def(init<const EnergyCutSettings&>())
+
         .def(self_ns::str(self_ns::self))
         .def(self_ns::repr(self_ns::self))
 
@@ -377,6 +381,8 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
     class_<Medium, boost::shared_ptr<Medium> >("Medium", init<>())
 
         .def(init<std::string, double>((arg("medium_type"), arg("rho") = 1.0)))
+        .def(init<const Medium&>())
+
         .def(self_ns::str(self_ns::self))
         .def(self_ns::repr(self_ns::self))
 
@@ -453,6 +459,7 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
              arg("integrate") = false,
              arg("scattering_model") = 0
             )))
+        .def(init<const Propagator&>())
 
         .def("propagate", &Propagator::propagate, (arg("max_distance_cm") = 1e20))
         .def("apply_options", &Propagator::ApplyOptions)
@@ -520,6 +527,7 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
 
     class_<ProcessCollection, boost::shared_ptr<ProcessCollection> >("ProcessCollection", init<>())
 
+        .def(init<const ProcessCollection&>())
         .def(init<PROPOSALParticle*, Medium*, EnergyCutSettings*>((arg("particle"), arg("medium"), arg("energy_cut"))))
 
         .def(self_ns::str(self_ns::self))
@@ -541,6 +549,8 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
     // ------------------------------------------------------------------------- //
 
     class_<Geometry, boost::shared_ptr<Geometry> >("Geometry", init<>())
+
+        .def(init<const Geometry&>())
 
         .def(self_ns::str(self_ns::self))
         .def(self_ns::repr(self_ns::self))
@@ -585,5 +595,3 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
         .add_property("hirachy", &Geometry::GetHirarchy, &Geometry::SetHirarchy)
     ;
 }
-
-
