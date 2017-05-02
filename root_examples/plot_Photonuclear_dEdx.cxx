@@ -161,7 +161,7 @@ int main()
                 graph_title<<", parametrization: Bezrukov/Bugaev";
                 graphs.at(i)->SetMarkerStyle(20);
                 break;
-            case ParametrizationType::PhotoKokoulinShadowBezrukovHard:
+            case ParametrizationType::PhotoBezrukovBugaevShadowBezrukovHard:
                 graph_title<<", parametrization: Bezrukov/Bugaev + hard component";
                 graphs.at(i)->SetMarkerStyle(21);
                 break;
