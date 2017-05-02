@@ -180,8 +180,7 @@ I3Particle::ParticleType SimplePropagator::GenerateI3Type(ParticleType::Enum pty
     return ptype_I3;
 }
 
-inline I3Particle
-to_I3Particle(const PROPOSALParticle *pp)
+I3Particle SimplePropagator::to_I3Particle(const PROPOSALParticle *pp)
 {
 	I3Particle p;
 
