@@ -15,12 +15,12 @@
  * Bezrukov/Bugaev + hard component\n
  * Zeus\n
  * Zeus + hard component\n
- * shadow=1 ALLM 91\n
- * shadow=2 ALLM 91\n
- * shadow=1 ALLM 97\n
- * shadow=2 ALLM 97\n
- * shadow=1 Butkevich/Mikhailov\n
- * shadow=2 Butkevich/Mikhailov\n
+ * ALLM 91 shadow=Dutta\n
+ * ALLM 91 shadow=Butkevich\n
+ * ALLM 97 shadow=Dutta\n
+ * ALLM 97 shadow=Butkevich\n
+ * Butkevich/Mikhailov shadow=Dutta\n
+ * Butkevich/Mikhailov shadow=Butkevich\n
  * You will also find summary plots for every particle and medium.
  * @brief Example to plot dE/dx for Photonuclear
  * @author Jan-Hendrik Köhne
@@ -59,12 +59,12 @@ int main()
         <<"Bezrukov/Bugaev + hard component\n"
         <<"Zeus\n"
         <<"Zeus + hard component\n"
-        <<"shadow=1 ALLM 91\n"
-        <<"shadow=2 ALLM 91\n"
-        <<"shadow=1 ALLM 97\n"
-        <<"shadow=2 ALLM 97\n"
-        <<"shadow=1 Butkevich/Mikhailov\n"
-        <<"shadow=2 Butkevich/Mikhailov\n"
+        <<"ALLM 91 shadow=Dutta\n"
+        <<"ALLM 91 shadow=Butkevich\n"
+        <<"ALLM 97 shadow=Dutta\n"
+        <<"ALLM 97 shadow=Butkevich\n"
+        <<"Butkevich/Mikhailov shadow=Dutta\n"
+        <<"Butkevich/Mikhailov shadow=Butkevich\n"
         <<"You will also find summary plots for every particle and medium.\n"
         <<"-----------------------------------------------------------------\n"
         <<endl;
@@ -97,21 +97,20 @@ int main()
 
     for(unsigned int i = 0; i<photo.size() ; i++)
     {
-        if(i<9) photo.at(i)->SetParametrization(1);
-        else if(i<18) photo.at(i)->SetParametrization(2);
-        else if(i<27) photo.at(i)->SetParametrization(3);
-        else if(i<36) photo.at(i)->SetParametrization(4);
-        else if(i<45) photo.at(i)->SetParametrization(5);
-        else if(i<54) photo.at(i)->SetParametrization(6);
-        else if(i<63) photo.at(i)->SetParametrization(7);
-        else if(i<72) photo.at(i)->SetParametrization(8);
-        else if(i<81) photo.at(i)->SetParametrization(9);
-        else if(i<90) photo.at(i)->SetParametrization(10);
-        else if(i<99) photo.at(i)->SetParametrization(11);
-        else if(i<108) photo.at(i)->SetParametrization(12);
-        else if(i<117) photo.at(i)->SetParametrization(13);
-        else if(i<126) photo.at(i)->SetParametrization(14);
-
+        if(i<9) photo.at(i)->SetParametrization(ParametrizationType::PhotoKokoulinShadowBezrukovSoft);
+        else if(i<18) photo.at(i)->SetParametrization(ParametrizationType::PhotoKokoulinShadowBezrukovHard);
+        else if(i<27) photo.at(i)->SetParametrization(ParametrizationType::PhotoRhodeShadowBezrukovSoft);
+        else if(i<36) photo.at(i)->SetParametrization(ParametrizationType::PhotoRhodeShadowBezrukovHard);
+        else if(i<45) photo.at(i)->SetParametrization(ParametrizationType::PhotoBezrukovBugaevShadowBezrukovSoft);
+        else if(i<54) photo.at(i)->SetParametrization(ParametrizationType::PhotoBezrukovBugaevShadowBezrukovHard);
+        else if(i<63) photo.at(i)->SetParametrization(ParametrizationType::PhotoZeusShadowBezrukovSoft);
+        else if(i<72) photo.at(i)->SetParametrization(ParametrizationType::PhotoZeusShadowBezrukovHard);
+        else if(i<81) photo.at(i)->SetParametrization(ParametrizationType::PhotoAbramowiczLevinLevyMaor91ShadowDutta);
+        else if(i<90) photo.at(i)->SetParametrization(ParametrizationType::PhotoAbramowiczLevinLevyMaor91ShadowButkevich);
+        else if(i<99) photo.at(i)->SetParametrization(ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowDutta);
+        else if(i<108) photo.at(i)->SetParametrization(ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich);
+        else if(i<117) photo.at(i)->SetParametrization(ParametrizationType::PhotoButkevichMikhailovShadowDutta);
+        else if(i<126) photo.at(i)->SetParametrization(ParametrizationType::PhotoButkevichMikhailovShadowButkevich);
     }
 
     vector<TGraph*> graphs;
@@ -142,60 +141,60 @@ int main()
 
         switch (photo.at(i)->GetParametrization())
         {
-            case 1:
+            case ParametrizationType::PhotoKokoulinShadowBezrukovSoft:
                 graph_title<<", parametrization: Kokoulin";
                 graphs.at(i)->SetMarkerStyle(2);
                 break;
-            case 2:
+            case ParametrizationType::PhotoKokoulinShadowBezrukovHard:
                 graph_title<<", parametrization: Kokoulin + hard component";
                 graphs.at(i)->SetMarkerStyle(30);
                 break;
-            case 3:
+            case ParametrizationType::PhotoRhodeShadowBezrukovSoft:
                 graph_title<<", parametrization: Rhode";
                 graphs.at(i)->SetMarkerStyle(4);
                 break;
-            case 4:
+            case ParametrizationType::PhotoRhodeShadowBezrukovHard:
                 graph_title<<", parametrization: Rhode + hard component";
                 graphs.at(i)->SetMarkerStyle(5);
                 break;
-            case 5:
+            case ParametrizationType::PhotoBezrukovBugaevShadowBezrukovSoft:
                 graph_title<<", parametrization: Bezrukov/Bugaev";
                 graphs.at(i)->SetMarkerStyle(20);
                 break;
-            case 6:
+            case ParametrizationType::PhotoKokoulinShadowBezrukovHard:
                 graph_title<<", parametrization: Bezrukov/Bugaev + hard component";
                 graphs.at(i)->SetMarkerStyle(21);
                 break;
-            case 7:
+            case ParametrizationType::PhotoZeusShadowBezrukovSoft:
                 graph_title<<", parametrization: Zeus";
                 graphs.at(i)->SetMarkerStyle(25);
                 break;
-            case 8:
+            case ParametrizationType::PhotoZeusShadowBezrukovHard:
                 graph_title<<", parametrization: Zeus + hard component";
                 graphs.at(i)->SetMarkerStyle(26);
                 break;
-            case 9:
-                graph_title<<", parametrization: shadow=1 ALLM 91";
+            case ParametrizationType::PhotoAbramowiczLevinLevyMaor91ShadowDutta:
+                graph_title<<", parametrization: ALLM 91 shadow=Dutta";
                 graphs.at(i)->SetMarkerStyle(22);
                 break;
-            case 10:
-                graph_title<<", parametrization: shadow=2 ALLM 91";
+            case ParametrizationType::PhotoAbramowiczLevinLevyMaor91ShadowButkevich:
+                graph_title<<", parametrization: ALLM 91 shadow=Butkevich";
                 graphs.at(i)->SetMarkerStyle(27);
                 break;
-            case 11:
-                graph_title<<", parametrization: shadow=1 ALLM 97";
+            case ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowDutta:
+                graph_title<<", parametrization: ALLM 97 shadow=Dutta";
                 graphs.at(i)->SetMarkerStyle(29);
                 break;
-            case 12:
-                graph_title<<", parametrization: shadow=2 ALLM 97";
+            case ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich:
+                graph_title<<", parametrization: ALLM 97 shadow=Butkevich";
                 graphs.at(i)->SetMarkerStyle(3);
                 break;
-            case 13:
-                graph_title<<", parametrization: shadow=1 Butkevich/Mikhailov";
+            case ParametrizationType::PhotoButkevichMikhailovShadowDutta:
+                graph_title<<", parametrization: Butkevich/Mikhailov shadow=Dutta";
                 graphs.at(i)->SetMarkerStyle(23);
                 break;
-            case 14:
-                graph_title<<", parametrization: shadow=2 Butkevich/Mikhailov";
+            case ParametrizationType::PhotoButkevichMikhailovShadowButkevich:
+                graph_title<<", parametrization: Butkevich/Mikhailov shadow=Butkevich";
                 graphs.at(i)->SetMarkerStyle(28);
                 break;
         }
@@ -303,29 +302,29 @@ int main()
     TCanvas* water_para8      =   new TCanvas("water_para8","water parametrization Zeus + hard",1024,768);
     TCanvas* uranium_para8    =   new TCanvas("uranium_para8","uranium parametrization Zeus + hard",1024,768);
 
-    TCanvas* hydrogen_para9   =   new TCanvas("hydrogen_para9","hydrogen parametrization shadow=1 ALLM 91",1024,768);
-    TCanvas* water_para9      =   new TCanvas("water_para9","water parametrization shadow=1 ALLM 91",1024,768);
-    TCanvas* uranium_para9    =   new TCanvas("uranium_para9","uranium parametrization shadow=1 ALLM 91",1024,768);
+    TCanvas* hydrogen_para9   =   new TCanvas("hydrogen_para9","hydrogen parametrization ALLM 91 shadow=Dutta",1024,768);
+    TCanvas* water_para9      =   new TCanvas("water_para9","water parametrization ALLM 91 shadow=Dutta",1024,768);
+    TCanvas* uranium_para9    =   new TCanvas("uranium_para9","uranium parametrization ALLM 91 shadow=Dutta",1024,768);
 
-    TCanvas* hydrogen_para10   =   new TCanvas("hydrogen_para10","hydrogen parametrization shadow=2 ALLM 91",1024,768);
-    TCanvas* water_para10      =   new TCanvas("water_para10","water parametrization shadow=2 ALLM 91",1024,768);
-    TCanvas* uranium_para10    =   new TCanvas("uranium_para10","uranium parametrization shadow=2 ALLM 91",1024,768);
+    TCanvas* hydrogen_para10   =   new TCanvas("hydrogen_para10","hydrogen parametrization ALLM 91 shadow=Butkevich",1024,768);
+    TCanvas* water_para10      =   new TCanvas("water_para10","water parametrization ALLM 91 shadow=Butkevich",1024,768);
+    TCanvas* uranium_para10    =   new TCanvas("uranium_para10","uranium parametrization ALLM 91 shadow=Butkevich",1024,768);
 
-    TCanvas* hydrogen_para11   =   new TCanvas("hydrogen_para11","hydrogen parametrization shadow=1 ALLM 97",1024,768);
-    TCanvas* water_para11      =   new TCanvas("water_para11","water parametrization shadow=1 ALLM 97",1024,768);
-    TCanvas* uranium_para11    =   new TCanvas("uranium_para11","uranium parametrization shadow=1 ALLM 97",1024,768);
+    TCanvas* hydrogen_para11   =   new TCanvas("hydrogen_para11","hydrogen parametrization ALLM 97 shadow=Dutta",1024,768);
+    TCanvas* water_para11      =   new TCanvas("water_para11","water parametrization ALLM 97 shadow=Dutta",1024,768);
+    TCanvas* uranium_para11    =   new TCanvas("uranium_para11","uranium parametrization ALLM 97 shadow=Dutta",1024,768);
 
-    TCanvas* hydrogen_para12   =   new TCanvas("hydrogen_para12","hydrogen parametrization shadow=2 ALLM 97",1024,768);
-    TCanvas* water_para12      =   new TCanvas("water_para12","water parametrization shadow=2 ALLM 97",1024,768);
-    TCanvas* uranium_para12    =   new TCanvas("uranium_para12","uranium parametrization shadow=2 ALLM 97",1024,768);
+    TCanvas* hydrogen_para12   =   new TCanvas("hydrogen_para12","hydrogen parametrization ALLM 97 shadow=Butkevich",1024,768);
+    TCanvas* water_para12      =   new TCanvas("water_para12","water parametrization ALLM 97 shadow=Butkevich",1024,768);
+    TCanvas* uranium_para12    =   new TCanvas("uranium_para12","uranium parametrization ALLM 97 shadow=Butkevich",1024,768);
 
-    TCanvas* hydrogen_para13   =   new TCanvas("hydrogen_para13","hydrogen parametrization shadow=1 Butkevich/Mikhailov",1024,768);
-    TCanvas* water_para13      =   new TCanvas("water_para13","water parametrization shadow=1 Butkevich/Mikhailov",1024,768);
-    TCanvas* uranium_para13    =   new TCanvas("uranium_para13","uranium parametrization shadow=1 Butkevich/Mikhailov",1024,768);
+    TCanvas* hydrogen_para13   =   new TCanvas("hydrogen_para13","hydrogen parametrization Butkevich/Mikhailov shadow=Dutta",1024,768);
+    TCanvas* water_para13      =   new TCanvas("water_para13","water parametrization Butkevich/Mikhailov shadow=Dutta",1024,768);
+    TCanvas* uranium_para13    =   new TCanvas("uranium_para13","uranium parametrization Butkevich/Mikhailov shadow=Dutta",1024,768);
 
-    TCanvas* hydrogen_para14   =   new TCanvas("hydrogen_para14","hydrogen parametrization shadow=2 Butkevich/Mikhailov",1024,768);
-    TCanvas* water_para14      =   new TCanvas("water_para14","water parametrization shadow=2 Butkevich/Mikhailov",1024,768);
-    TCanvas* uranium_para14    =   new TCanvas("uranium_para14","uranium parametrization shadow=2 Butkevich/Mikhailov",1024,768);
+    TCanvas* hydrogen_para14   =   new TCanvas("hydrogen_para14","hydrogen parametrization Butkevich/Mikhailov shadow=Butkevich",1024,768);
+    TCanvas* water_para14      =   new TCanvas("water_para14","water parametrization Butkevich/Mikhailov shadow=Butkevich",1024,768);
+    TCanvas* uranium_para14    =   new TCanvas("uranium_para14","uranium parametrization Butkevich/Mikhailov shadow=Butkevich",1024,768);
 
 
     TMultiGraph* hydrogen_para1_gr   =   new TMultiGraph("hydrogen_para1","hydrogen, parametrization = Kokoulin");
@@ -360,29 +359,29 @@ int main()
     TMultiGraph* water_para8_gr      =   new TMultiGraph("water_para8","water, parametrization = Zeus + hard");
     TMultiGraph* uranium_para8_gr    =   new TMultiGraph("uranium_para8","uranium, parametrization = Zeus + hard");
 
-    TMultiGraph* hydrogen_para9_gr   =   new TMultiGraph("hydrogen_para9","hydrogen, parametrization = shadow=1 ALLM 91");
-    TMultiGraph* water_para9_gr      =   new TMultiGraph("water_para9","water, parametrization = shadow=1 ALLM 91");
-    TMultiGraph* uranium_para9_gr    =   new TMultiGraph("uranium_para9","uranium, parametrization = shadow=1 ALLM 91");
+    TMultiGraph* hydrogen_para9_gr   =   new TMultiGraph("hydrogen_para9","hydrogen, parametrization = ALLM 91 shadow=Dutta");
+    TMultiGraph* water_para9_gr      =   new TMultiGraph("water_para9","water, parametrization = ALLM 91 shadow=Dutta");
+    TMultiGraph* uranium_para9_gr    =   new TMultiGraph("uranium_para9","uranium, parametrization = ALLM 91 shadow=Dutta");
 
-    TMultiGraph* hydrogen_para10_gr   =   new TMultiGraph("hydrogen_para10","hydrogen, parametrization = shadow=2 ALLM 91");
-    TMultiGraph* water_para10_gr      =   new TMultiGraph("water_para10","water, parametrization = shadow=2 ALLM 91");
-    TMultiGraph* uranium_para10_gr    =   new TMultiGraph("uranium_para10","uranium, parametrization = shadow=2 ALLM 91");
+    TMultiGraph* hydrogen_para10_gr   =   new TMultiGraph("hydrogen_para10","hydrogen, parametrization = ALLM 91 shadow=Butkevich");
+    TMultiGraph* water_para10_gr      =   new TMultiGraph("water_para10","water, parametrization = ALLM 91 shadow=Butkevich");
+    TMultiGraph* uranium_para10_gr    =   new TMultiGraph("uranium_para10","uranium, parametrization = ALLM 91 shadow=Butkevich");
 
-    TMultiGraph* hydrogen_para11_gr   =   new TMultiGraph("hydrogen_para11","hydrogen, parametrization = shadow=1 ALLM 97");
-    TMultiGraph* water_para11_gr      =   new TMultiGraph("water_para11","water, parametrization = shadow=1 ALLM 97");
-    TMultiGraph* uranium_para11_gr    =   new TMultiGraph("uranium_para11","uranium, parametrization = shadow=1 ALLM 97");
+    TMultiGraph* hydrogen_para11_gr   =   new TMultiGraph("hydrogen_para11","hydrogen, parametrization = ALLM 97 shadow=Dutta");
+    TMultiGraph* water_para11_gr      =   new TMultiGraph("water_para11","water, parametrization = ALLM 97 shadow=Dutta");
+    TMultiGraph* uranium_para11_gr    =   new TMultiGraph("uranium_para11","uranium, parametrization = ALLM 97 shadow=Dutta");
 
-    TMultiGraph* hydrogen_para12_gr   =   new TMultiGraph("hydrogen_para12","hydrogen, parametrization = shadow=2 ALLM 97");
-    TMultiGraph* water_para12_gr      =   new TMultiGraph("water_para12","water, parametrization = shadow=2 ALLM 97");
-    TMultiGraph* uranium_para12_gr    =   new TMultiGraph("uranium_para12","uranium, parametrization = shadow=2 ALLM 97");
+    TMultiGraph* hydrogen_para12_gr   =   new TMultiGraph("hydrogen_para12","hydrogen, parametrization = ALLM 97 shadow=Butkevich");
+    TMultiGraph* water_para12_gr      =   new TMultiGraph("water_para12","water, parametrization = ALLM 97 shadow=Butkevich");
+    TMultiGraph* uranium_para12_gr    =   new TMultiGraph("uranium_para12","uranium, parametrization = ALLM 97 shadow=Butkevich");
 
-    TMultiGraph* hydrogen_para13_gr   =   new TMultiGraph("hydrogen_para13","hydrogen, parametrization = shadow=1 Butkevich/Mikhailov");
-    TMultiGraph* water_para13_gr      =   new TMultiGraph("water_para13","water, parametrization = shadow=1 Butkevich/Mikhailov");
-    TMultiGraph* uranium_para13_gr    =   new TMultiGraph("uranium_para13","uranium, parametrization = shadow=1 Butkevich/Mikhailov");
+    TMultiGraph* hydrogen_para13_gr   =   new TMultiGraph("hydrogen_para13","hydrogen, parametrization = Butkevich/Mikhailov shadow=Dutta");
+    TMultiGraph* water_para13_gr      =   new TMultiGraph("water_para13","water, parametrization = Butkevich/Mikhailov shadow=Dutta");
+    TMultiGraph* uranium_para13_gr    =   new TMultiGraph("uranium_para13","uranium, parametrization = Butkevich/Mikhailov shadow=Dutta");
 
-    TMultiGraph* hydrogen_para14_gr   =   new TMultiGraph("hydrogen_para14","hydrogen, parametrization = shadow=2 Butkevich/Mikhailov");
-    TMultiGraph* water_para14_gr      =   new TMultiGraph("water_para14","water, parametrization = shadow=2 Butkevich/Mikhailov");
-    TMultiGraph* uranium_para14_gr    =   new TMultiGraph("uranium_para14","uranium, parametrization = shadow=2 Butkevich/Mikhailov");
+    TMultiGraph* hydrogen_para14_gr   =   new TMultiGraph("hydrogen_para14","hydrogen, parametrization = Butkevich/Mikhailov shadow=Butkevich");
+    TMultiGraph* water_para14_gr      =   new TMultiGraph("water_para14","water, parametrization = Butkevich/Mikhailov shadow=Butkevich");
+    TMultiGraph* uranium_para14_gr    =   new TMultiGraph("uranium_para14","uranium, parametrization = Butkevich/Mikhailov shadow=Butkevich");
 
 
 
@@ -551,47 +550,47 @@ int main()
     {
         switch (photo.at(i)->GetParametrization())
         {
-            case 1:
+            case ParametrizationType::PhotoKokoulinShadowBezrukovSoft:
                 leg_entry<<"Kokoulin";
                 break;
-            case 2:
+            case ParametrizationType::PhotoKokoulinShadowBezrukovHard:
                 leg_entry<<"Kokoulin + hard";
                 break;
-            case 3:
+            case ParametrizationType::PhotoRhodeShadowBezrukovSoft:
                 leg_entry<<"Rhode";
                 break;
-            case 4:
+            case ParametrizationType::PhotoRhodeShadowBezrukovHard:
                 leg_entry<<"Rhode + hard";
                 break;
-            case 5:
+            case ParametrizationType::PhotoBezrukovBugaevShadowBezrukovSoft:
                 leg_entry<<"Bezrukov/Bugaev";
                 break;
-            case 6:
+            case ParametrizationType::PhotoBezrukovBugaevShadowBezrukovHard:
                 leg_entry<<"Bezrukov/Bugaev + hard";
                 break;
-            case 7:
+            case ParametrizationType::PhotoZeusShadowBezrukovSoft:
                 leg_entry<<"Zeus";
                 break;
-            case 8:
+            case ParametrizationType::PhotoZeusShadowBezrukovHard:
                 leg_entry<<"Zeus + hard";
                 break;
-            case 9:
-                leg_entry<<"shadow=1 ALLM 91";
+            case ParametrizationType::PhotoAbramowiczLevinLevyMaor91ShadowDutta:
+                leg_entry<<"ALLM 91 shadow=Dutta";
                 break;
-            case 10:
-                leg_entry<<"shadow=2 ALLM 91";
+            case ParametrizationType::PhotoAbramowiczLevinLevyMaor91ShadowButkevich:
+                leg_entry<<"ALLM 91 shadow=Butkevich";
                 break;
-            case 11:
-                leg_entry<<"shadow=1 ALLM 97";
+            case ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowDutta:
+                leg_entry<<"ALLM 97 shadow=Dutta";
                 break;
-            case 12:
-                leg_entry<<"shadow=2 ALLM 97";
+            case ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich:
+                leg_entry<<"ALLM 97 shadow=Butkevich";
                 break;
-            case 13:
-                leg_entry<<"shadow=1 Butkevich/Mikhailov";
+            case ParametrizationType::PhotoButkevichMikhailovShadowDutta:
+                leg_entry<<"Butkevich/Mikhailov shadow=Dutta";
                 break;
-            case 14:
-                leg_entry<<"shadow=2 Butkevich/Mikhailovd";
+            case ParametrizationType::PhotoButkevichMikhailovShadowButkevich:
+                leg_entry<<"Butkevich/Mikhailovd shadow=Butkevich";
                 break;
         }
         if(photo.at(i)->GetParticle()->GetType() == ParticleType::MuMinus)
@@ -1317,7 +1316,7 @@ int main()
         {
             switch (photo.at(i)->GetParametrization())
             {
-                case 1:
+                case ParametrizationType::PhotoKokoulinShadowBezrukovSoft:
                     hydrogen_para1_gr->Add(graphs.at(i),"P");
                     hydrogen_para1_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (hydrogen_para1_gr->GetListOfGraphs()->Capacity())
@@ -1333,7 +1332,7 @@ int main()
                             break;
                     }
                     break;
-                case 2:
+                case ParametrizationType::PhotoKokoulinShadowBezrukovHard:
                     hydrogen_para2_gr->Add(graphs.at(i),"P");
                     hydrogen_para2_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (hydrogen_para2_gr->GetListOfGraphs()->Capacity())
@@ -1349,7 +1348,7 @@ int main()
                             break;
                     }
                     break;
-                case 3:
+                case ParametrizationType::PhotoRhodeShadowBezrukovSoft:
                     hydrogen_para3_gr->Add(graphs.at(i),"P");
                     hydrogen_para3_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (hydrogen_para3_gr->GetListOfGraphs()->Capacity())
@@ -1365,7 +1364,7 @@ int main()
                             break;
                     }
                     break;
-                case 4:
+                case ParametrizationType::PhotoRhodeShadowBezrukovHard:
                     hydrogen_para4_gr->Add(graphs.at(i),"P");
                     hydrogen_para4_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (hydrogen_para4_gr->GetListOfGraphs()->Capacity())
@@ -1381,7 +1380,7 @@ int main()
                             break;
                     }
                     break;
-                case 5:
+                case ParametrizationType::PhotoBezrukovBugaevShadowBezrukovSoft:
                     hydrogen_para5_gr->Add(graphs.at(i),"P");
                     hydrogen_para5_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (hydrogen_para5_gr->GetListOfGraphs()->Capacity())
@@ -1397,7 +1396,7 @@ int main()
                             break;
                     }
                     break;
-                case 6:
+                case ParametrizationType::PhotoBezrukovBugaevShadowBezrukovHard:
                     hydrogen_para6_gr->Add(graphs.at(i),"P");
                     hydrogen_para6_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (hydrogen_para6_gr->GetListOfGraphs()->Capacity())
@@ -1413,7 +1412,7 @@ int main()
                             break;
                     }
                     break;
-                case 7:
+                case ParametrizationType::PhotoZeusShadowBezrukovSoft:
                     hydrogen_para7_gr->Add(graphs.at(i),"P");
                     hydrogen_para7_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (hydrogen_para7_gr->GetListOfGraphs()->Capacity())
@@ -1429,7 +1428,7 @@ int main()
                             break;
                     }
                     break;
-                case 8:
+                case ParametrizationType::PhotoZeusShadowBezrukovHard:
                     hydrogen_para8_gr->Add(graphs.at(i),"P");
                     hydrogen_para8_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (hydrogen_para8_gr->GetListOfGraphs()->Capacity())
@@ -1445,7 +1444,7 @@ int main()
                             break;
                     }
                     break;
-                case 9:
+                case ParametrizationType::PhotoAbramowiczLevinLevyMaor91ShadowDutta:
                     hydrogen_para9_gr->Add(graphs.at(i),"P");
                     hydrogen_para9_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (hydrogen_para9_gr->GetListOfGraphs()->Capacity())
@@ -1461,7 +1460,7 @@ int main()
                             break;
                     }
                     break;
-                case 10:
+                case ParametrizationType::PhotoAbramowiczLevinLevyMaor91ShadowButkevich:
                     hydrogen_para10_gr->Add(graphs.at(i),"P");
                     hydrogen_para10_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (hydrogen_para10_gr->GetListOfGraphs()->Capacity())
@@ -1477,7 +1476,7 @@ int main()
                             break;
                     }
                     break;
-                case 11:
+                case ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowDutta:
                     hydrogen_para11_gr->Add(graphs.at(i),"P");
                     hydrogen_para11_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (hydrogen_para11_gr->GetListOfGraphs()->Capacity())
@@ -1493,7 +1492,7 @@ int main()
                             break;
                     }
                     break;
-                case 12:
+                case ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich:
                     hydrogen_para12_gr->Add(graphs.at(i),"P");
                     hydrogen_para12_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (hydrogen_para12_gr->GetListOfGraphs()->Capacity())
@@ -1509,7 +1508,7 @@ int main()
                             break;
                     }
                     break;
-                case 13:
+                case ParametrizationType::PhotoButkevichMikhailovShadowDutta:
                     hydrogen_para13_gr->Add(graphs.at(i),"P");
                     hydrogen_para13_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (hydrogen_para13_gr->GetListOfGraphs()->Capacity())
@@ -1525,7 +1524,7 @@ int main()
                             break;
                     }
                     break;
-                case 14:
+                case ParametrizationType::PhotoButkevichMikhailovShadowButkevich:
                     hydrogen_para14_gr->Add(graphs.at(i),"P");
                     hydrogen_para14_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (hydrogen_para14_gr->GetListOfGraphs()->Capacity())
@@ -1547,7 +1546,7 @@ int main()
         {
             switch (photo.at(i)->GetParametrization())
             {
-                case 1:
+                case ParametrizationType::PhotoKokoulinShadowBezrukovSoft:
                     water_para1_gr->Add(graphs.at(i),"P");
                     water_para1_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (water_para1_gr->GetListOfGraphs()->Capacity())
@@ -1563,7 +1562,7 @@ int main()
                             break;
                     }
                     break;
-                case 2:
+                case ParametrizationType::PhotoKokoulinShadowBezrukovHard:
                     water_para2_gr->Add(graphs.at(i),"P");
                     water_para2_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (water_para2_gr->GetListOfGraphs()->Capacity())
@@ -1579,7 +1578,7 @@ int main()
                             break;
                     }
                     break;
-                case 3:
+                case ParametrizationType::PhotoRhodeShadowBezrukovSoft:
                     water_para3_gr->Add(graphs.at(i),"P");
                     water_para3_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (water_para3_gr->GetListOfGraphs()->Capacity())
@@ -1595,7 +1594,7 @@ int main()
                             break;
                     }
                     break;
-                case 4:
+                case ParametrizationType::PhotoRhodeShadowBezrukovHard:
                     water_para4_gr->Add(graphs.at(i),"P");
                     water_para4_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (water_para4_gr->GetListOfGraphs()->Capacity())
@@ -1611,7 +1610,7 @@ int main()
                             break;
                     }
                     break;
-                case 5:
+                case ParametrizationType::PhotoBezrukovBugaevShadowBezrukovSoft:
                     water_para5_gr->Add(graphs.at(i),"P");
                     water_para5_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (water_para5_gr->GetListOfGraphs()->Capacity())
@@ -1627,7 +1626,7 @@ int main()
                             break;
                     }
                     break;
-                case 6:
+                case ParametrizationType::PhotoBezrukovBugaevShadowBezrukovHard:
                     water_para6_gr->Add(graphs.at(i),"P");
                     water_para6_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (water_para6_gr->GetListOfGraphs()->Capacity())
@@ -1643,7 +1642,7 @@ int main()
                             break;
                     }
                     break;
-                case 7:
+                case ParametrizationType::PhotoZeusShadowBezrukovSoft:
                     water_para7_gr->Add(graphs.at(i),"P");
                     water_para7_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (water_para7_gr->GetListOfGraphs()->Capacity())
@@ -1659,7 +1658,7 @@ int main()
                             break;
                     }
                     break;
-                case 8:
+                case ParametrizationType::PhotoZeusShadowBezrukovHard:
                     water_para8_gr->Add(graphs.at(i),"P");
                     water_para8_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (water_para8_gr->GetListOfGraphs()->Capacity())
@@ -1675,7 +1674,7 @@ int main()
                             break;
                     }
                     break;
-                case 9:
+                case ParametrizationType::PhotoAbramowiczLevinLevyMaor91ShadowDutta:
                     water_para9_gr->Add(graphs.at(i),"P");
                     water_para9_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (water_para9_gr->GetListOfGraphs()->Capacity())
@@ -1691,7 +1690,7 @@ int main()
                             break;
                     }
                     break;
-                case 10:
+                case ParametrizationType::PhotoAbramowiczLevinLevyMaor91ShadowButkevich:
                     water_para10_gr->Add(graphs.at(i),"P");
                     water_para10_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (water_para10_gr->GetListOfGraphs()->Capacity())
@@ -1707,7 +1706,7 @@ int main()
                             break;
                     }
                     break;
-                case 11:
+                case ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowDutta:
                     water_para11_gr->Add(graphs.at(i),"P");
                     water_para11_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (water_para11_gr->GetListOfGraphs()->Capacity())
@@ -1723,7 +1722,7 @@ int main()
                             break;
                     }
                     break;
-                case 12:
+                case ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich:
                     water_para12_gr->Add(graphs.at(i),"P");
                     water_para12_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (water_para12_gr->GetListOfGraphs()->Capacity())
@@ -1739,7 +1738,7 @@ int main()
                             break;
                     }
                     break;
-                case 13:
+                case ParametrizationType::PhotoButkevichMikhailovShadowDutta:
                     water_para13_gr->Add(graphs.at(i),"P");
                     water_para13_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (water_para13_gr->GetListOfGraphs()->Capacity())
@@ -1755,7 +1754,7 @@ int main()
                             break;
                     }
                     break;
-                case 14:
+                case ParametrizationType::PhotoButkevichMikhailovShadowButkevich:
                     water_para14_gr->Add(graphs.at(i),"P");
                     water_para14_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (water_para14_gr->GetListOfGraphs()->Capacity())
@@ -1777,7 +1776,7 @@ int main()
         {
             switch (photo.at(i)->GetParametrization())
             {
-                case 1:
+                case ParametrizationType::PhotoKokoulinShadowBezrukovSoft:
                     uranium_para1_gr->Add(graphs.at(i),"P");
                     uranium_para1_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (uranium_para1_gr->GetListOfGraphs()->Capacity())
@@ -1793,7 +1792,7 @@ int main()
                             break;
                     }
                     break;
-                case 2:
+                case ParametrizationType::PhotoKokoulinShadowBezrukovHard:
                     uranium_para2_gr->Add(graphs.at(i),"P");
                     uranium_para2_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (uranium_para2_gr->GetListOfGraphs()->Capacity())
@@ -1809,7 +1808,7 @@ int main()
                             break;
                     }
                     break;
-                case 3:
+                case ParametrizationType::PhotoRhodeShadowBezrukovSoft:
                     uranium_para3_gr->Add(graphs.at(i),"P");
                     uranium_para3_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (uranium_para3_gr->GetListOfGraphs()->Capacity())
@@ -1825,7 +1824,7 @@ int main()
                             break;
                     }
                     break;
-                case 4:
+                case ParametrizationType::PhotoRhodeShadowBezrukovHard:
                     uranium_para4_gr->Add(graphs.at(i),"P");
                     uranium_para4_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (uranium_para4_gr->GetListOfGraphs()->Capacity())
@@ -1841,7 +1840,7 @@ int main()
                             break;
                     }
                     break;
-                case 5:
+                case ParametrizationType::PhotoBezrukovBugaevShadowBezrukovSoft:
                     uranium_para5_gr->Add(graphs.at(i),"P");
                     uranium_para5_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (uranium_para5_gr->GetListOfGraphs()->Capacity())
@@ -1857,7 +1856,7 @@ int main()
                             break;
                     }
                     break;
-                case 6:
+                case ParametrizationType::PhotoBezrukovBugaevShadowBezrukovHard:
                     uranium_para6_gr->Add(graphs.at(i),"P");
                     uranium_para6_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (uranium_para6_gr->GetListOfGraphs()->Capacity())
@@ -1873,7 +1872,7 @@ int main()
                             break;
                     }
                     break;
-                case 7:
+                case ParametrizationType::PhotoZeusShadowBezrukovSoft:
                     uranium_para7_gr->Add(graphs.at(i),"P");
                     uranium_para7_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (uranium_para7_gr->GetListOfGraphs()->Capacity())
@@ -1889,7 +1888,7 @@ int main()
                             break;
                     }
                     break;
-                case 8:
+                case ParametrizationType::PhotoZeusShadowBezrukovHard:
                     uranium_para8_gr->Add(graphs.at(i),"P");
                     uranium_para8_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (uranium_para8_gr->GetListOfGraphs()->Capacity())
@@ -1905,7 +1904,7 @@ int main()
                             break;
                     }
                     break;
-                case 9:
+                case ParametrizationType::PhotoAbramowiczLevinLevyMaor91ShadowDutta:
                     uranium_para9_gr->Add(graphs.at(i),"P");
                     uranium_para9_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (uranium_para9_gr->GetListOfGraphs()->Capacity())
@@ -1921,7 +1920,7 @@ int main()
                             break;
                     }
                     break;
-                case 10:
+                case ParametrizationType::PhotoAbramowiczLevinLevyMaor91ShadowButkevich:
                     uranium_para10_gr->Add(graphs.at(i),"P");
                     uranium_para10_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (uranium_para10_gr->GetListOfGraphs()->Capacity())
@@ -1937,7 +1936,7 @@ int main()
                             break;
                     }
                     break;
-                case 11:
+                case ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowDutta:
                     uranium_para11_gr->Add(graphs.at(i),"P");
                     uranium_para11_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (uranium_para11_gr->GetListOfGraphs()->Capacity())
@@ -1953,7 +1952,7 @@ int main()
                             break;
                     }
                     break;
-                case 12:
+                case ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich:
                     uranium_para12_gr->Add(graphs.at(i),"P");
                     uranium_para12_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (uranium_para12_gr->GetListOfGraphs()->Capacity())
@@ -1969,7 +1968,7 @@ int main()
                             break;
                     }
                     break;
-                case 13:
+                case ParametrizationType::PhotoButkevichMikhailovShadowDutta:
                     uranium_para13_gr->Add(graphs.at(i),"P");
                     uranium_para13_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (uranium_para13_gr->GetListOfGraphs()->Capacity())
@@ -1985,7 +1984,7 @@ int main()
                             break;
                     }
                     break;
-                case 14:
+                case ParametrizationType::PhotoButkevichMikhailovShadowButkevich:
                     uranium_para14_gr->Add(graphs.at(i),"P");
                     uranium_para14_leg->AddEntry(graphs.at(i),photo.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (uranium_para14_gr->GetListOfGraphs()->Capacity())

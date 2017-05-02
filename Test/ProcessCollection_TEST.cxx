@@ -91,11 +91,11 @@ TEST(Comparison , Comparison_not_equal ) {
     EXPECT_TRUE(*D!=*E);
     D->SetParticle(particle);
     EXPECT_TRUE(*D==*E);
-    D->GetCrosssections().at(2)->SetParametrization(6);
+    D->GetCrosssections().at(2)->SetParametrization(ParametrizationType::PhotoBezrukovBugaevShadowBezrukovHard);
 
     EXPECT_TRUE(*D!=*E);
 
-    E->GetCrosssections().at(2)->SetParametrization(6);
+    E->GetCrosssections().at(2)->SetParametrization(ParametrizationType::PhotoBezrukovBugaevShadowBezrukovHard);
     EXPECT_TRUE(*D==*E);
 
     Geometry *geo = new Geometry();
@@ -134,7 +134,7 @@ TEST(Assignment , Operator ) {
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
     ProcessCollection A(particle, medium, cuts);
     ProcessCollection B(particle, medium, cuts);
-    A.GetCrosssections().at(2)->SetParametrization(6);
+    A.GetCrosssections().at(2)->SetParametrization(ParametrizationType::PhotoBezrukovBugaevShadowBezrukovHard);
 
     EXPECT_TRUE(A!=B);
 
@@ -203,7 +203,6 @@ TEST(ProcessCollection , Set_Up ) {
     string med;
     string particleName;
     bool lpm;
-    int para;
 
     cout.precision(16);
     double energy_old=-1;
@@ -229,11 +228,11 @@ TEST(ProcessCollection , Set_Up ) {
         {
             if(CombOfProcColl.at(i)->GetCrosssections().at(gna)->GetName().compare("Bremsstrahlung") == 0)
             {
-                CombOfProcColl.at(i)->GetCrosssections().at(gna)->SetParametrization(1);
+                CombOfProcColl.at(i)->GetCrosssections().at(gna)->SetParametrization(ParametrizationType::BremsKelnerKokoulinPetrukhin);
             }
             if(CombOfProcColl.at(i)->GetCrosssections().at(gna)->GetName().compare("Photonuclear") == 0)
             {
-                CombOfProcColl.at(i)->GetCrosssections().at(gna)->SetParametrization(12);
+                CombOfProcColl.at(i)->GetCrosssections().at(gna)->SetParametrization(ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich);
             }
         }
 
@@ -270,7 +269,6 @@ TEST(ProcessCollection , Stochasticity)
     string med;
     string particleName;
     bool lpm;
-    int para;
 
     cout.precision(16);
     double energy_old=-1;
