@@ -418,7 +418,6 @@ I3Particle::ParticleType I3PropagatorServicePROPOSAL::GenerateI3Type(ParticleTyp
     ptype_I3 = I3_PROPOSAL_ParticleType_bimap.right.find(ptype_PROPOSAL) -> second;
 
     return ptype_I3;
-
 }
 
 // ------------------------------------------------------------------------- //
