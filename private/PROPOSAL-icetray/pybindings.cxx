@@ -6,15 +6,15 @@
 I3_PYTHON_MODULE(PROPOSAL)
 {
 	load_project("PROPOSAL", false);
-	
+
 	using namespace boost::python;
 	import("icecube.dataclasses");
 	import("icecube.sim_services");
-	
+
     enum_<ParametrizationType::Enum>("BremsstrahlungParametrization")
         .value("KelnerKokoulinPetrukhin" , ParametrizationType::BremsKelnerKokoulinPetrukhin)
         .value("PetrukhinShestakov"      ,  ParametrizationType::BremsPetrukhinShestakov)
-        .value("AndreevBerzrukovBugaev"  ,  ParametrizationType::BremsAndreevBerzrukovBugaev)
+        .value("AndreevBezrrukovBugaev"  ,  ParametrizationType::BremsAndreevBezrukovBugaev)
         .value("CompleteScreeningCase"   ,  ParametrizationType::BremsCompleteScreeningCase)
     ;
 

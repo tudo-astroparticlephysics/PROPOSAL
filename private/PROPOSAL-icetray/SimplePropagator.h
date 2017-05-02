@@ -66,8 +66,9 @@ public:
 	 * Get the internal MMC name associated with a particle type
 	 */
 
-	ParticleType::Enum GeneratePROPOSALType(const I3Particle& p);
-	I3Particle::ParticleType GenerateI3Type(ParticleType::Enum ptype_PROPOSAL);
+	static I3Particle to_I3Particle(const PROPOSALParticle*);
+	static ParticleType::Enum GeneratePROPOSALType(const I3Particle& p);
+	static I3Particle::ParticleType GenerateI3Type(ParticleType::Enum ptype_PROPOSAL);
 
 	static std::string GetName(const I3Particle &p);
 

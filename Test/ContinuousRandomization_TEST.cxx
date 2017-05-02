@@ -124,7 +124,7 @@ TEST(Comparison , Comparison_not_equal ) {
     EXPECT_TRUE(*C!=*E);
     C->SetParticle(particle2);
     EXPECT_TRUE(*C==*E);
-    C->GetCrosssections().at(2)->SetParametrization(6);
+    C->GetCrosssections().at(2)->SetParametrization(ParametrizationType::PhotoBezrukovBugaevShadowBezrukovHard);
 
     EXPECT_TRUE(*D!=*E);
 
@@ -182,7 +182,7 @@ TEST(Assignment , Operator ) {
 
     ContinuousRandomization A(particle, medium, crosssections);
     ContinuousRandomization B(particle, medium, crosssections2);
-    B.GetCrosssections().at(2)->SetParametrization(6);
+    B.GetCrosssections().at(2)->SetParametrization(ParametrizationType::PhotoBezrukovBugaevShadowBezrukovHard);
 
     EXPECT_TRUE(A!=B);
 
