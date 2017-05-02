@@ -286,6 +286,31 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
     ;
 
     // --------------------------------------------------------------------- //
+    // ParametrizationType
+    // --------------------------------------------------------------------- //
+
+    enum_<ParametrizationType::Enum>("ParametrizationType")
+        .value("BremsKelnerKokoulinPetrukhin",                  ParametrizationType::BremsKelnerKokoulinPetrukhin)
+        .value("BremsAndreevBezrukovBugaev",                    ParametrizationType::BremsAndreevBezrukovBugaev)
+        .value("BremsPetrukhinShestakov",                       ParametrizationType::BremsPetrukhinShestakov)
+        .value("BremsCompleteScreeningCase",                    ParametrizationType::BremsCompleteScreeningCase)
+        .value("PhotoKokoulinShadowBezrukovSoft",               ParametrizationType::PhotoKokoulinShadowBezrukovSoft)
+        .value("PhotoKokoulinShadowBezrukovHard",               ParametrizationType::PhotoKokoulinShadowBezrukovHard)
+        .value("PhotoRhodeShadowBezrukovSoft",                  ParametrizationType::PhotoRhodeShadowBezrukovSoft)
+        .value("PhotoRhodeShadowBezrukovHard",                  ParametrizationType::PhotoRhodeShadowBezrukovHard)
+        .value("PhotoBezrukovBugaevShadowBezrukovSoft",         ParametrizationType::PhotoBezrukovBugaevShadowBezrukovSoft)
+        .value("PhotoBezrukovBugaevShadowBezrukovHard",         ParametrizationType::PhotoBezrukovBugaevShadowBezrukovHard)
+        .value("PhotoZeusShadowBezrukovSoft",                   ParametrizationType::PhotoZeusShadowBezrukovSoft)
+        .value("PhotoZeusShadowBezrukovHard",                   ParametrizationType::PhotoZeusShadowBezrukovHard)
+        .value("PhotoAbramowiczLevinLevyMaor91ShadowDutta",     ParametrizationType::PhotoAbramowiczLevinLevyMaor91ShadowDutta)
+        .value("PhotoAbramowiczLevinLevyMaor91ShadowButkevich", ParametrizationType::PhotoAbramowiczLevinLevyMaor91ShadowButkevich)
+        .value("PhotoAbramowiczLevinLevyMaor97ShadowDutta",     ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowDutta)
+        .value("PhotoAbramowiczLevinLevyMaor97ShadowButkevich", ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich)
+        .value("EPairKelnerKokoulinPetrukhin",                  ParametrizationType::EPairKelnerKokoulinPetrukhin)
+        .value("IonizBetheBloch",                               ParametrizationType::IonizBetheBloch)
+    ;
+
+    // --------------------------------------------------------------------- //
     // Particle
     // --------------------------------------------------------------------- //
 
@@ -414,8 +439,8 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
              bool,
              bool,
              bool,
-             int,
-             int,
+             ParametrizationType::Enum,
+             ParametrizationType::Enum,
              double,
              double,
              double,
