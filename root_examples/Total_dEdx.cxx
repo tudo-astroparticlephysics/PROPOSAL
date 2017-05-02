@@ -95,10 +95,10 @@ int main()
 
     for(unsigned int i = 0; i<cros.size() ; i++)
     {
-        if(i<9) brems.at(i)->SetParametrization(ParametrizationType::BremsKelnerKokoulinPetrukhin);
-        else if(i<18) brems.at(i)->SetParametrization(ParametrizationType::BremsAndreevBezrukovBugaev);
-        else if(i<27) brems.at(i)->SetParametrization(ParametrizationType::BremsPetrukhinShestakov);
-        else if(i<36) brems.at(i)->SetParametrization(ParametrizationType::BremsCompleteScreeningCase);
+        if(i<9) cros.at(i)->SetParametrization(ParametrizationType::BremsKelnerKokoulinPetrukhin);
+        else if(i<18) cros.at(i)->SetParametrization(ParametrizationType::BremsAndreevBezrukovBugaev);
+        else if(i<27) cros.at(i)->SetParametrization(ParametrizationType::BremsPetrukhinShestakov);
+        else if(i<36) cros.at(i)->SetParametrization(ParametrizationType::BremsCompleteScreeningCase);
     }
 
     cros.push_back(new Epairproduction(mu,med1,cuts));
