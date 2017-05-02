@@ -150,11 +150,10 @@ int main()
 
     for(unsigned int i = 0; i<brems.size() ; i++)
     {
-        if(i<21) brems.at(i)->SetParametrization(1);
-        else if(i<42) brems.at(i)->SetParametrization(2);
-        else if(i<63) brems.at(i)->SetParametrization(3);
-        else if(i<84) brems.at(i)->SetParametrization(4);
-
+        if(i<21) brems.at(i)->SetParametrization(ParametrizationType::BremsKelnerKokoulinPetrukhin);
+        else if(i<42) brems.at(i)->SetParametrization(ParametrizationType::BremsAndreevBezrukovBugaev);
+        else if(i<63) brems.at(i)->SetParametrization(ParametrizationType::BremsPetrukhinShestakov);
+        else if(i<84) brems.at(i)->SetParametrization(ParametrizationType::BremsCompleteScreeningCase);
     }
 
     vector<TGraph*> graphs;
@@ -188,19 +187,19 @@ int main()
 
         switch (brems.at(i)->GetParametrization())
         {
-            case 1:
+            case ParametrizationType::BremsKelnerKokoulinPetrukhin:
                 graph_title<<", parametrization: Kelner-Kakoulin-Petrukhin";
                 graphs.at(i)->SetMarkerStyle(4);
                 break;
-            case 2:
+            case ParametrizationType::BremsAndreevBezrukovBugaev:
                 graph_title<<", parametrization: Andreev-Bezrukov-Bugaev";
                 graphs.at(i)->SetMarkerStyle(3);
                 break;
-            case 3:
+            case ParametrizationType::BremsPetrukhinShestakov:
                 graph_title<<", parametrization: Petrukhin-Shestakov";
                 graphs.at(i)->SetMarkerStyle(2);
                 break;
-            case 4:
+            case ParametrizationType::BremsCompleteScreeningCase:
                 graph_title<<", parametrization: Complete screening case";
                 graphs.at(i)->SetMarkerStyle(28);
                 break;
@@ -333,7 +332,7 @@ int main()
     {
         if(brems.at(i)->GetParticle()->GetType() == ParticleType::MuMinus)
         {
-            if (brems.at(i)->GetParametrization()==1)
+            if (brems.at(i)->GetParametrization() == ParametrizationType::BremsKelnerKokoulinPetrukhin)
             {
                 muons_para1_gr->Add(graphs.at(i),"P");
 
@@ -365,7 +364,7 @@ int main()
                         break;
                 }
             }
-            else if(brems.at(i)->GetParametrization()==2)
+            else if(brems.at(i)->GetParametrization() == ParametrizationType::BremsAndreevBezrukovBugaev)
             {
                 muons_para2_gr->Add(graphs.at(i),"P");
 
@@ -397,7 +396,7 @@ int main()
                         break;
                 }
             }
-            else if(brems.at(i)->GetParametrization()==3)
+            else if(brems.at(i)->GetParametrization() == ParametrizationType::BremsPetrukhinShestakov)
             {
                 muons_para3_gr->Add(graphs.at(i),"P");
 
@@ -429,7 +428,7 @@ int main()
                         break;
                 }
             }
-            else if(brems.at(i)->GetParametrization()==4)
+            else if(brems.at(i)->GetParametrization() == ParametrizationType::BremsCompleteScreeningCase)
             {
                 muons_para4_gr->Add(graphs.at(i),"P");
 
@@ -465,7 +464,7 @@ int main()
 
         else if(brems.at(i)->GetParticle()->GetType() == ParticleType::TauMinus)
         {
-            if (brems.at(i)->GetParametrization()==1)
+            if (brems.at(i)->GetParametrization() == ParametrizationType::BremsKelnerKokoulinPetrukhin)
             {
                 taus_para1_gr->Add(graphs.at(i),"P");
 
@@ -497,7 +496,7 @@ int main()
                         break;
                 }
             }
-            else if(brems.at(i)->GetParametrization()==2)
+            else if(brems.at(i)->GetParametrization() == ParametrizationType::BremsAndreevBezrukovBugaev)
             {
                 taus_para2_gr->Add(graphs.at(i),"P");
 
@@ -529,7 +528,7 @@ int main()
                         break;
                 }
             }
-            else if(brems.at(i)->GetParametrization()==3)
+            else if(brems.at(i)->GetParametrization() == ParametrizationType::BremsPetrukhinShestakov)
             {
                 taus_para3_gr->Add(graphs.at(i),"P");
 
@@ -561,7 +560,7 @@ int main()
                         break;
                 }
             }
-            else if(brems.at(i)->GetParametrization()==4)
+            else if(brems.at(i)->GetParametrization() == ParametrizationType::BremsCompleteScreeningCase)
             {
                 taus_para4_gr->Add(graphs.at(i),"P");
 
@@ -597,7 +596,7 @@ int main()
 
         else if(brems.at(i)->GetParticle()->GetType() == ParticleType::EMinus)
         {
-            if (brems.at(i)->GetParametrization()==1)
+            if (brems.at(i)->GetParametrization() == ParametrizationType::BremsKelnerKokoulinPetrukhin)
             {
                 electrons_para1_gr->Add(graphs.at(i),"P");
 
@@ -629,7 +628,7 @@ int main()
                         break;
                 }
             }
-            else if(brems.at(i)->GetParametrization()==2)
+            else if(brems.at(i)->GetParametrization() == ParametrizationType::BremsAndreevBezrukovBugaev)
             {
                 electrons_para2_gr->Add(graphs.at(i),"P");
 
@@ -661,7 +660,7 @@ int main()
                         break;
                 }
             }
-            else if(brems.at(i)->GetParametrization()==3)
+            else if(brems.at(i)->GetParametrization() == ParametrizationType::BremsPetrukhinShestakov)
             {
                 electrons_para3_gr->Add(graphs.at(i),"P");
 
@@ -693,7 +692,7 @@ int main()
                         break;
                 }
             }
-            else if(brems.at(i)->GetParametrization()==4)
+            else if(brems.at(i)->GetParametrization() == ParametrizationType::BremsCompleteScreeningCase)
             {
                 electrons_para4_gr->Add(graphs.at(i),"P");
 
