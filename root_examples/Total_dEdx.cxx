@@ -95,11 +95,10 @@ int main()
 
     for(unsigned int i = 0; i<cros.size() ; i++)
     {
-        if(i<9) cros.at(i)->SetParametrization(1);
-        else if(i<18) cros.at(i)->SetParametrization(2);
-        else if(i<27) cros.at(i)->SetParametrization(3);
-        else if(i<36) cros.at(i)->SetParametrization(4);
-
+        if(i<9) brems.at(i)->SetParametrization(ParametrizationType::BremsKelnerKokoulinPetrukhin);
+        else if(i<18) brems.at(i)->SetParametrization(ParametrizationType::BremsAndreevBezrukovBugaev);
+        else if(i<27) brems.at(i)->SetParametrization(ParametrizationType::BremsPetrukhinShestakov);
+        else if(i<36) brems.at(i)->SetParametrization(ParametrizationType::BremsCompleteScreeningCase);
     }
 
     cros.push_back(new Epairproduction(mu,med1,cuts));
@@ -139,21 +138,20 @@ int main()
 
     for(unsigned int i = 0; i<photo.size() ; i++)
     {
-        if(i<9) photo.at(i)->SetParametrization(1);
-        else if(i<18) photo.at(i)->SetParametrization(2);
-        else if(i<27) photo.at(i)->SetParametrization(3);
-        else if(i<36) photo.at(i)->SetParametrization(4);
-        else if(i<45) photo.at(i)->SetParametrization(5);
-        else if(i<54) photo.at(i)->SetParametrization(6);
-        else if(i<63) photo.at(i)->SetParametrization(7);
-        else if(i<72) photo.at(i)->SetParametrization(8);
-        else if(i<81) photo.at(i)->SetParametrization(9);
-        else if(i<90) photo.at(i)->SetParametrization(10);
-        else if(i<99) photo.at(i)->SetParametrization(11);
-        else if(i<108) photo.at(i)->SetParametrization(12);
-        else if(i<117) photo.at(i)->SetParametrization(13);
-        else if(i<126) photo.at(i)->SetParametrization(14);
-
+        if(i<9) photo.at(i)->SetParametrization(ParametrizationType::PhotoKokoulinShadowBezrukovSoft);
+        else if(i<18) photo.at(i)->SetParametrization(ParametrizationType::PhotoKokoulinShadowBezrukovHard);
+        else if(i<27) photo.at(i)->SetParametrization(ParametrizationType::PhotoRhodeShadowBezrukovSoft);
+        else if(i<36) photo.at(i)->SetParametrization(ParametrizationType::PhotoRhodeShadowBezrukovHard);
+        else if(i<45) photo.at(i)->SetParametrization(ParametrizationType::PhotoBezrukovBugaevShadowBezrukovSoft);
+        else if(i<54) photo.at(i)->SetParametrization(ParametrizationType::PhotoBezrukovBugaevShadowBezrukovHard);
+        else if(i<63) photo.at(i)->SetParametrization(ParametrizationType::PhotoZeusShadowBezrukovSoft);
+        else if(i<72) photo.at(i)->SetParametrization(ParametrizationType::PhotoZeusShadowBezrukovHard);
+        else if(i<81) photo.at(i)->SetParametrization(ParametrizationType::PhotoAbramowiczLevinLevyMaor91ShadowDutta);
+        else if(i<90) photo.at(i)->SetParametrization(ParametrizationType::PhotoAbramowiczLevinLevyMaor91ShadowButkevich);
+        else if(i<99) photo.at(i)->SetParametrization(ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowDutta);
+        else if(i<108) photo.at(i)->SetParametrization(ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich);
+        else if(i<117) photo.at(i)->SetParametrization(ParametrizationType::PhotoButkevichMikhailovShadowDutta);
+        else if(i<126) photo.at(i)->SetParametrization(ParametrizationType::PhotoButkevichMikhailovShadowButkevich);
     }
 
     for(unsigned int i =0; i < photo.size();i++)
@@ -246,11 +244,34 @@ int main()
 
     tree->SetBranchAddress("energy",&energy);
 
+
+    vector<ParametrizationType::Enum> brems_parametrization_vector;
+    brems_parametrization_vector.push_back(ParametrizationType::BremsKelnerKokoulinPetrukhin);
+    brems_parametrization_vector.push_back(ParametrizationType::BremsAndreevBezrukovBugaev);
+    brems_parametrization_vector.push_back(ParametrizationType::BremsPetrukhinShestakov);
+    brems_parametrization_vector.push_back(ParametrizationType::BremsCompleteScreeningCase);
+
+    vector<ParametrizationType::Enum> photo_parametrization_vector;
+    photo_parametrization_vector.push_back(ParametrizationType::PhotoKokoulinShadowBezrukovSoft);
+    photo_parametrization_vector.push_back(ParametrizationType::PhotoKokoulinShadowBezrukovHard);
+    photo_parametrization_vector.push_back(ParametrizationType::PhotoRhodeShadowBezrukovSoft);
+    photo_parametrization_vector.push_back(ParametrizationType::PhotoRhodeShadowBezrukovHard);
+    photo_parametrization_vector.push_back(ParametrizationType::PhotoBezrukovBugaevShadowBezrukovSoft);
+    photo_parametrization_vector.push_back(ParametrizationType::PhotoBezrukovBugaevShadowBezrukovHard);
+    photo_parametrization_vector.push_back(ParametrizationType::PhotoZeusShadowBezrukovSoft);
+    photo_parametrization_vector.push_back(ParametrizationType::PhotoZeusShadowBezrukovHard);
+    photo_parametrization_vector.push_back(ParametrizationType::PhotoAbramowiczLevinLevyMaor91ShadowDutta);
+    photo_parametrization_vector.push_back(ParametrizationType::PhotoAbramowiczLevinLevyMaor91ShadowButkevich);
+    photo_parametrization_vector.push_back(ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowDutta);
+    photo_parametrization_vector.push_back(ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich);
+    photo_parametrization_vector.push_back(ParametrizationType::PhotoButkevichMikhailovShadowDutta);
+    photo_parametrization_vector.push_back(ParametrizationType::PhotoButkevichMikhailovShadowButkevich);
+
     //Muons ice
-    for(unsigned int j = 1; j< 15;j++)
+    for(unsigned int j = 0; j < photo_parametrization_vector.size(); j++)
     {
         tree->SetBranchStatus("*",0);
-        ss<<"Photonuclear_"<<j<<"_mu_ice";
+        ss<<"Photonuclear_"<<photo_parametrization_vector.at(j)<<"_mu_ice";
 
         tree->SetBranchAddress(ss.str().c_str(),&Photo);
         tree->SetBranchStatus(ss.str().c_str(),1);
@@ -259,9 +280,9 @@ int main()
         ss.str("");
         ss.clear();
 
-        for(unsigned int k = 1; k< 5;k++)
+        for(unsigned int k = 0; k < brems_parametrization_vector.size(); k++)
         {
-            ss<<"Bremsstrahlung_"<<j<<"_mu_ice";
+            ss<<"Bremsstrahlung_"<<brems_parametrization_vector.at(k)<<"_mu_ice";
             tree->SetBranchAddress(ss.str().c_str(),&Brems);
             tree->SetBranchAddress("Ionization_mu_ice",&Ioniz);
             tree->SetBranchAddress("Epairproduction_mu_ice",&Epair);
@@ -270,11 +291,12 @@ int main()
             tree->SetBranchStatus("Ionization_mu_ice",1);
             tree->SetBranchStatus("Epairproduction_mu_ice",1);
 
-            graph_name<<"mu_ice_photo_"<<j<<"_brems_"<<k;
+            graph_name<<"mu_ice_photo_"<<photo_parametrization_vector.at(j)<<"_brems_"<<brems_parametrization_vector.at(k);
 
             mu_ice_graphs.push_back(new TGraph(graph_name.str().c_str(),graph_name.str().c_str()));
 
-            if(j==12 && k==1)
+            if(photo_parametrization_vector.at(j) == ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich 
+                && brems_parametrization_vector.at(k) == ParametrizationType::BremsKelnerKokoulinPetrukhin)
             {
                 mu_ice_graphs.back()->SetLineColor(kBlack);
             }
