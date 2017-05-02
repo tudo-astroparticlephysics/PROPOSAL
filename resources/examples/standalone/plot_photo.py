@@ -1,19 +1,31 @@
+
 import pyPROPOSAL
-import numpy as np
+
+try:
+    import matplotlib as mpl
+    mpl.use('Agg')
+    import matplotlib.pyplot as plt
+except ImportError:
+    raise ImportError("Matplotlib not installed!")
+
+try:
+    import numpy as np
+except ImportError:
+    raise ImportError(
+        "Numpy not installed! Needed to calculate the detector cylinder"
+    )
 
 ptype = pyPROPOSAL.ParticleType.MuMinus
 mu = pyPROPOSAL.Particle(ptype)
-med = pyPROPOSAL.Medium("standard_rock")
-E = pyPROPOSAL.EnergyCutSettings(-1, -1)
+med = pyPROPOSAL.Medium("ice")
+E = pyPROPOSAL.EnergyCutSettings(500, 0.05)
 
 photo = pyPROPOSAL.Photonuclear(mu, med, E)
 photo.parametrization = 12
 photo.enable_dEdx_interpolation()
 
-print(photo)
-
-dEdx = list()
-energy = list()
+dEdx = []
+energy = []
 
 for log_E in np.arange(0, 12, 0.2):
     E = mu.mass + np.power(10, log_E)
@@ -22,16 +34,22 @@ for log_E in np.arange(0, 12, 0.2):
     energy.append(E)
     dEdx.append(photo.calculate_dEdx() / E)
 
-try:
-    import matplotlib as mpl
-    mpl.use('Agg')
-    import pylab
+fig = plt.figure()
+ax = fig.add_subplot(111)
 
-    pylab.figure()
-    pylab.title("Mu Lengths")
-    pylab.loglog(energy, dEdx, ls="-")
-    pylab.xlabel(r'$l_{\mu}(\rm{m})$')
-    pylab.savefig('Photo.pdf')
+ax.semilogx(
+    energy,
+    dEdx,
+    color='k',
+    linestyle='-',
+    label='ALLM 97'
+)
 
-except ImportError :
-    print("pylab not installed.  no plots for you.")
+ax.set_xlabel(r'$E$ / MeV')
+ax.set_ylabel(r'')
+
+ax.legend(loc='best')
+
+fig.tight_layout()
+fig.savefig('photo.pdf')
+plt.show()
