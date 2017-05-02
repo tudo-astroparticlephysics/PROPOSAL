@@ -9,6 +9,7 @@
 #include <boost/assign.hpp>
 #include <boost/foreach.hpp>
 #include <boost/bind.hpp>
+#include <boost/bimap.hpp>
 
 #include "PROPOSAL-icetray/SimplePropagator.h"
 
@@ -25,24 +26,24 @@ namespace PROPOSAL {
 
 ParticleType::Enum GetPROPOSALType(I3Particle::ParticleType pt)
 {
-    ParticleType::Enum code;
+    ParticleType::Enum particle_type;
     switch (pt) {
         case I3Particle::MuMinus:
-            code = ParticleType::MuMinus;
+            particle_type = ParticleType::MuMinus;
             break;
         case I3Particle::MuPlus:
-            code = ParticleType::MuPlus;
+            particle_type = ParticleType::MuPlus;
             break;
         case I3Particle::TauMinus:
-            code = ParticleType::TauMinus;
+            particle_type = ParticleType::TauMinus;
             break;
         case I3Particle::TauPlus:
-            code = ParticleType::TauPlus;
+            particle_type = ParticleType::TauPlus;
             break;
         default:
             log_fatal_stream("Unsupported particle type: " << pt);
     }
-    return code;
+    return particle_type;
 }
 
 
@@ -61,25 +62,38 @@ SimplePropagator::SimplePropagator(const std::string &medium, I3Particle::Partic
 
     // LPM suppression
     bool lpm = true;
-    // Kelner, Kokoulin, and Petrukhin parametrization
-    int bsform = 1;
-
-    // The old photonuclear parameters are:
-    // // Abramowicz Levin Levy Maor parametrization
-    // int ph_fam = 3;
-    // // ALLM 97 (rather than 91)
-    // int ph_param = 2;
-    // // Butkevich- Mikhailov nuclear structure function
-    // int ph_shad = 2;
-    // The new parameter is
-    int new_ph_param=12;
+    // Bremsstrahlung: Kelner, Kokoulin, and Petrukhin parametrization
+    ParametrizationType::Enum brems_param = ParametrizationType::BremsKelnerKokoulinPetrukhin;
+    // Photonuclear: Abramowicz Levin Levy Maor 97 with Butkevich shadowing
+    ParametrizationType::Enum photo_param = ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich;
     // TODO: Implement a function old param -> new param or just do it in enums
+
+   double brems_multiplier = 1.;
+   double photo_multiplier = 1.;
+   double ioniz_multiplier = 1.;
+   double epair_multiplier = 1.;
+   bool integrate = false;
+   int scattering_model = 0;
 
     std::ostringstream prefix;
     prefix << getenv("I3_BUILD") << "/MuonGun/resources/tables/icecube";
     //propagator_->interpolate("all", prefix.str());
 
-    propagator_ = new Propagator(med,cutset, GetPROPOSALType(pt),prefix.str(),molieScat,contiCorr,exactTime,lpm,bsform,new_ph_param,1.,1.,1.,1.,false,0);
+    propagator_ = new Propagator(med,cutset
+    	, GetPROPOSALType(pt)
+    	, prefix.str()
+    	, molieScat
+    	, contiCorr
+    	, exactTime
+    	, lpm
+    	, brems_param
+    	, photo_param
+    	, brems_multiplier
+    	, photo_multiplier
+    	, ioniz_multiplier
+    	, epair_multiplier
+    	, integrate
+    	, scattering_model);
     propagator_->SetStopping_decay(sdec);
 }
 
@@ -104,57 +118,74 @@ SimplePropagator::SetRandomNumberGenerator(I3RandomServicePtr rng)
 std::string
 SimplePropagator::GetName(const I3Particle &p)
 {
-    return PROPOSALParticle::GetName(GetPROPOSALType(p.GetType()));
+    return PROPOSALParticle::GetName(GeneratePROPOSALType(p));
 }
 
-typedef std::map<int, I3Particle::ParticleType> particle_type_conversion_t;
+typedef boost::bimap<I3Particle::ParticleType, ParticleType::Enum> bimap_ParticleType;
+static const bimap_ParticleType I3_PROPOSAL_ParticleType_bimap = boost::assign::list_of<bimap_ParticleType::relation>
+    (I3Particle::MuMinus,   ParticleType::MuMinus)
+    (I3Particle::MuPlus,    ParticleType::MuPlus)
+    (I3Particle::TauMinus,  ParticleType::TauMinus)
+    (I3Particle::TauPlus,   ParticleType::TauPlus)
+    (I3Particle::EMinus,    ParticleType::EMinus)
+    (I3Particle::EPlus,     ParticleType::EPlus)
+    (I3Particle::NuMu,      ParticleType::NuMu)
+    (I3Particle::NuMuBar,   ParticleType::NuMuBar)
+    (I3Particle::NuE,       ParticleType::NuE)
+    (I3Particle::NuEBar,    ParticleType::NuEBar)
+    (I3Particle::NuTau,     ParticleType::NuTau)
+    (I3Particle::NuTauBar,  ParticleType::NuTauBar)
+    (I3Particle::Brems,     ParticleType::Brems)
+    (I3Particle::DeltaE,    ParticleType::DeltaE)
+    (I3Particle::PairProd,  ParticleType::EPair)
+    (I3Particle::NuclInt,   ParticleType::NuclInt)
+    (I3Particle::MuPair,    ParticleType::MuPair)
+    (I3Particle::Hadrons,   ParticleType::Hadrons)
+    (I3Particle::Monopole,  ParticleType::Monopole)
+    (I3Particle::STauMinus, ParticleType::STauMinus)
+    (I3Particle::STauPlus,  ParticleType::STauPlus);
 
-static const particle_type_conversion_t fromRDMCTable =
-boost::assign::list_of<std::pair<int, I3Particle::ParticleType> >
-(-100, I3Particle::unknown)
-(1, I3Particle::Gamma)
-(2, I3Particle::EPlus)
-(3, I3Particle::EMinus)
-(4, I3Particle::Nu)
-(5, I3Particle::MuPlus)
-(6, I3Particle::MuMinus)
-(7, I3Particle::Pi0)
-(8, I3Particle::PiPlus)
-(9, I3Particle::PiMinus)
-(11, I3Particle::KPlus)
-(12, I3Particle::KMinus)
-(14, I3Particle::PPlus)
-(15, I3Particle::PMinus)
-(33, I3Particle::TauPlus)
-(34, I3Particle::TauMinus)
-(41, I3Particle::Monopole)
-(201, I3Particle::NuE)
-(202, I3Particle::NuMu)
-(203, I3Particle::NuTau)
-(204, I3Particle::NuEBar)
-(205, I3Particle::NuMuBar)
-(206, I3Particle::NuTauBar)
-(1001, I3Particle::Brems)
-(1002, I3Particle::DeltaE)
-(1003, I3Particle::PairProd)
-(1004, I3Particle::NuclInt)
-(1005, I3Particle::MuPair)
-(1006, I3Particle::Hadrons);
+
+// ------------------------------------------------------------------------- //
+ParticleType::Enum SimplePropagator::GeneratePROPOSALType(const I3Particle& p)
+{
+    I3Particle::ParticleType ptype_I3 = p.GetType();
+    ParticleType::Enum ptype_PROPOSAL;
+
+    bimap_ParticleType::left_const_iterator i3_iterator = I3_PROPOSAL_ParticleType_bimap.left.find(ptype_I3);
+    if (i3_iterator == I3_PROPOSAL_ParticleType_bimap.left.end())
+    {
+        log_fatal("The I3Particle '%s' with type '%i' can not be converted to a PROPOSALParticle"
+            , p.GetTypeString().c_str(), ptype_I3);
+    }
+
+    ptype_PROPOSAL = I3_PROPOSAL_ParticleType_bimap.left.find(ptype_I3) -> second;
+
+    return ptype_PROPOSAL;
+}
+
+I3Particle::ParticleType SimplePropagator::GenerateI3Type(ParticleType::Enum ptype_PROPOSAL)
+{
+    I3Particle::ParticleType ptype_I3;
+
+    bimap_ParticleType::right_const_iterator proposal_iterator = I3_PROPOSAL_ParticleType_bimap.right.find(ptype_PROPOSAL);
+    if (proposal_iterator == I3_PROPOSAL_ParticleType_bimap.right.end())
+    {
+        log_fatal("The PROPOSALParticle '%s' with type '%i' can not be converted to a I3Particle"
+            , PROPOSALParticle::GetName(ptype_PROPOSAL).c_str(), ptype_PROPOSAL);
+    }
+
+    ptype_I3 = I3_PROPOSAL_ParticleType_bimap.right.find(ptype_PROPOSAL) -> second;
+
+    return ptype_I3;
+}
 
 inline I3Particle
 to_I3Particle(const PROPOSALParticle *pp)
 {
 	I3Particle p;
-	I3Particle::ParticleType type;
-	particle_type_conversion_t::const_iterator it =
-	    fromRDMCTable.find(abs(pp->GetType())); //Tomasz
-	if (it == fromRDMCTable.end()) {
-		log_fatal("unknown RDMC code \"%i\" cannot be converted to a I3Particle::ParticleType. It will appear as \"unknown\".", pp->GetType());//Tomasz
-		type = I3Particle::unknown;
-	} else {
-		type = it->second;
-	}
-	p.SetType(type);
+
+	p.SetType(GenerateI3Type(pp->GetType()));
 	//Tomasz
     p.SetLocationType(I3Particle::InIce);
     p.SetPos(pp->GetX()*I3Units::cm, pp->GetY()*I3Units::cm, pp->GetZ()*I3Units::cm);
@@ -184,7 +215,7 @@ SimplePropagator::propagate(const I3Particle &p, double distance, boost::shared_
 
 	*/
 
-	    PROPOSALParticle *pp = propagator_->GetParticle();
+	PROPOSALParticle *pp = propagator_->GetParticle();
     pp->SetParentParticleId(0);
     pp->SetParticleId(0);
     pp->SetT(p.GetTime()/I3Units::second);
