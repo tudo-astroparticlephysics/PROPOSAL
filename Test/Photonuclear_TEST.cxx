@@ -35,7 +35,6 @@ public:
     }
 };
 
-
 TEST(Comparison , Comparison_equal ) {
 
     double dEdx;
