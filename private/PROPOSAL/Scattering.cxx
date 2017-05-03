@@ -453,10 +453,10 @@ void Scattering::EnableInterpolation(string path)
         stringstream filename;
         filename<<path<<"/Scattering_"<<particle_name
             <<"_mass_"<<particle_->GetMass()
-            <<"_"<<crosssections_.at(0)->GetMedium()->GetName()
-            <<"_"<<crosssections_.at(0)->GetMedium()->GetMassDensity()
+            <<"_"<< crosssections_.at(0)->GetMedium()->GetName()
+            <<"_"<< crosssections_.at(0)->GetMedium()->GetMassDensity()
             <<"_"<< crosssections_.at(0)->GetEnergyCutSettings()->GetEcut()
-            <<"_"<<crosssections_.at(0)->GetEnergyCutSettings()->GetVcut();
+            <<"_"<< crosssections_.at(0)->GetEnergyCutSettings()->GetVcut();
 
         for(unsigned int i =0; i<crosssections_.size(); i++)
         {
@@ -465,28 +465,25 @@ void Scattering::EnableInterpolation(string path)
                 case ParticleType::Brems:
                     filename << "_b_"
                         << "_" << crosssections_.at(i)->GetParametrization()
-                        << "_" << crosssections_.at(i)->GetMultiplier()
                         << "_" << crosssections_.at(i)->GetLpmEffectEnabled();
                     break;
                 case ParticleType::DeltaE:
-                    filename << "_i_"
-                        << "_" << crosssections_.at(i)->GetMultiplier();
+                    filename << "_i_";
                     break;
                 case ParticleType::EPair:
                     filename << "_e_"
-                        << "_" << crosssections_.at(i)->GetMultiplier()
                         << "_" << crosssections_.at(i)->GetLpmEffectEnabled();
                     break;
                 case ParticleType::NuclInt:
                     filename << "_p_"
-                        << "_" << crosssections_.at(i)->GetParametrization()
-                        << "_" << crosssections_.at(i)->GetMultiplier();
+                        << "_" << crosssections_.at(i)->GetParametrization();
                     break;
                 default:
                     log_fatal("Unknown cross section");
                     exit(1);
             }
-            filename<< "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetEcut()
+            filename<< "_" << crosssections_.at(i)->GetMultiplier()
+                    << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetEcut()
                     << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetVcut();
 
         }
