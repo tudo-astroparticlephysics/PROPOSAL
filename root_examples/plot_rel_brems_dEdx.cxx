@@ -156,6 +156,9 @@ int main()
                 graph_title<<", parametrization: Complete screening case";
                 graphs.at(i)->SetMarkerStyle(28);
                 break;
+            default:
+                log_fatal("Wrong BremsstrahlungParametrization Type '%i'."
+                    , brems.at(i)->GetParametrization());
         }
 
         graphs.at(i)->SetName(graph_name.str().c_str());
@@ -743,6 +746,9 @@ int main()
                             break;
                     }
                     break;
+                default:
+                    log_fatal("Wrong BremsstrahlungParametrization Type '%i'."
+                        , brems.at(i)->GetParametrization());
             }
         }
 
@@ -814,6 +820,9 @@ int main()
                             break;
                     }
                     break;
+                default:
+                    log_fatal("Wrong BremsstrahlungParametrization Type '%i'."
+                        , brems.at(i)->GetParametrization());
             }
         }
 
@@ -885,6 +894,9 @@ int main()
                             break;
                     }
                     break;
+                default:
+                    log_fatal("Wrong BremsstrahlungParametrization Type '%i'."
+                        , brems.at(i)->GetParametrization());
             }
         }
     }

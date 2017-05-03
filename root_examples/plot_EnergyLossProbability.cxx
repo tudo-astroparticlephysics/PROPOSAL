@@ -217,6 +217,8 @@ int main(int argc, char** argv)
                     epair->Fill(log10(energy),log10(sec_energy));
                     hist_epair->Fill(log10(energy),sec_energy);
                     break;
+                default:
+                    log_fatal("Wrong secondary type '%i'", particle_vector.at(k)->GetType());
             }
 
             tree->Fill();
