@@ -135,21 +135,23 @@ void Ionization::EnableDNdxInterpolation(std::string path, bool raw)
     // charged anti leptons have the same cross sections like charged leptons
     // so they use the same interpolation tables
     string particle_name;
-    if (particle_->GetType() == ParticleType::MuPlus)
+    switch (particle_->GetType())
     {
-        particle_name = PROPOSALParticle::GetName(ParticleType::MuMinus);
-    }
-    else if (particle_->GetType() == ParticleType::TauPlus)
-    {
-        particle_name = PROPOSALParticle::GetName(ParticleType::TauMinus);
-    }
-    else if (particle_->GetType() == ParticleType::EPlus)
-    {
-        particle_name = PROPOSALParticle::GetName(ParticleType::EMinus);
-    }
-    else
-    {
-        particle_name = particle_->GetName();
+        case ParticleType::MuPlus:
+            particle_name = PROPOSALParticle::GetName(ParticleType::MuMinus);
+            break;
+        case ParticleType::TauPlus:
+            particle_name = PROPOSALParticle::GetName(ParticleType::TauMinus);
+            break;
+        case ParticleType::EPlus:
+            particle_name = PROPOSALParticle::GetName(ParticleType::EMinus);
+            break;
+        case ParticleType::STauPlus:
+            particle_name = PROPOSALParticle::GetName(ParticleType::STauMinus);
+            break;
+        default:
+            particle_name = particle_->GetName();
+            break;
     }
 
     if(!path.empty())
@@ -261,21 +263,23 @@ void Ionization::EnableDEdxInterpolation(std::string path, bool raw)
     // charged anti leptons have the same cross sections like charged leptons
     // so they use the same interpolation tables
     string particle_name;
-    if (particle_->GetType() == ParticleType::MuPlus)
+    switch (particle_->GetType())
     {
-        particle_name = PROPOSALParticle::GetName(ParticleType::MuMinus);
-    }
-    else if (particle_->GetType() == ParticleType::TauPlus)
-    {
-        particle_name = PROPOSALParticle::GetName(ParticleType::TauMinus);
-    }
-    else if (particle_->GetType() == ParticleType::EPlus)
-    {
-        particle_name = PROPOSALParticle::GetName(ParticleType::EMinus);
-    }
-    else
-    {
-        particle_name = particle_->GetName();
+        case ParticleType::MuPlus:
+            particle_name = PROPOSALParticle::GetName(ParticleType::MuMinus);
+            break;
+        case ParticleType::TauPlus:
+            particle_name = PROPOSALParticle::GetName(ParticleType::TauMinus);
+            break;
+        case ParticleType::EPlus:
+            particle_name = PROPOSALParticle::GetName(ParticleType::EMinus);
+            break;
+        case ParticleType::STauPlus:
+            particle_name = PROPOSALParticle::GetName(ParticleType::STauMinus);
+            break;
+        default:
+            particle_name = particle_->GetName();
+            break;
     }
 
     if(!path.empty())

@@ -68,21 +68,23 @@ void ContinuousRandomization::EnableDE2dxInterpolation(std::string path, bool ra
     // (except of diffractive Bremsstrahlung, where one can analyse the interference term if implemented)
     // so they use the same interpolation tables
     string particle_name;
-    if (particle_->GetType() == ParticleType::MuPlus)
+    switch (particle_->GetType())
     {
-        particle_name = PROPOSALParticle::GetName(ParticleType::MuMinus);
-    }
-    else if (particle_->GetType() == ParticleType::TauPlus)
-    {
-        particle_name = PROPOSALParticle::GetName(ParticleType::TauMinus);
-    }
-    else if (particle_->GetType() == ParticleType::EPlus)
-    {
-        particle_name = PROPOSALParticle::GetName(ParticleType::EMinus);
-    }
-    else
-    {
-        particle_name = particle_->GetName();
+        case ParticleType::MuPlus:
+            particle_name = PROPOSALParticle::GetName(ParticleType::MuMinus);
+            break;
+        case ParticleType::TauPlus:
+            particle_name = PROPOSALParticle::GetName(ParticleType::TauMinus);
+            break;
+        case ParticleType::EPlus:
+            particle_name = PROPOSALParticle::GetName(ParticleType::EMinus);
+            break;
+        case ParticleType::STauPlus:
+            particle_name = PROPOSALParticle::GetName(ParticleType::STauMinus);
+            break;
+        default:
+            particle_name = particle_->GetName();
+            break;
     }
 
     if(!path.empty())
@@ -96,40 +98,34 @@ void ContinuousRandomization::EnableDE2dxInterpolation(std::string path, bool ra
 
         for(unsigned int i =0; i<cross_sections_.size(); i++)
         {
-            if(cross_sections_.at(i)->GetType() == ParticleType::Brems)
+            switch (cross_sections_.at(i)->GetType())
             {
-                filename << "_b_"
-                         << "_" << cross_sections_.at(i)->GetParametrization()
-                         << "_" << cross_sections_.at(i)->GetMultiplier()
-                         << "_" << cross_sections_.at(i)->GetLpmEffectEnabled()
-                         << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetEcut()
-                         << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetVcut();
-
+                case ParticleType::Brems:
+                    filename << "_b_"
+                        << "_" << cross_sections_.at(i)->GetParametrization()
+                        << "_" << cross_sections_.at(i)->GetMultiplier()
+                        << "_" << cross_sections_.at(i)->GetLpmEffectEnabled();
+                    break;
+                case ParticleType::DeltaE:
+                    filename << "_i_"
+                        << "_" << cross_sections_.at(i)->GetMultiplier();
+                    break;
+                case ParticleType::EPair:
+                    filename << "_e_"
+                        << "_" << cross_sections_.at(i)->GetMultiplier()
+                        << "_" << cross_sections_.at(i)->GetLpmEffectEnabled();
+                    break;
+                case ParticleType::NuclInt:
+                    filename << "_p_"
+                        << "_" << cross_sections_.at(i)->GetParametrization()
+                        << "_" << cross_sections_.at(i)->GetMultiplier();
+                    break;
+                default:
+                    log_fatal("Unknown cross section");
+                    exit(1);
             }
-            else if(cross_sections_.at(i)->GetType() == ParticleType::DeltaE)
-            {
-                filename << "_i_"
-                         << "_" << cross_sections_.at(i)->GetMultiplier()
-                         << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetEcut()
-                         << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetVcut();
-            }
-            else if(cross_sections_.at(i)->GetType() == ParticleType::EPair)
-            {
-                filename << "_e_"
-                         << "_" << cross_sections_.at(i)->GetMultiplier()
-                         << "_" << cross_sections_.at(i)->GetLpmEffectEnabled()
-                         << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetEcut()
-                         << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetVcut();
-            }
-            else if(cross_sections_.at(i)->GetType() == ParticleType::NuclInt)
-            {
-                filename << "_p_"
-                         << "_" << cross_sections_.at(i)->GetParametrization()
-                         << "_" << cross_sections_.at(i)->GetMultiplier()
-                         << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetEcut()
-                         << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetVcut();
-            }
-
+            filename<< "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetEcut()
+                    << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetVcut();
         }
 
         if(!raw)
@@ -223,21 +219,23 @@ void ContinuousRandomization::EnableDE2deInterpolation(std::string path, bool ra
     // (except of diffractive Bremsstrahlung, where one can analyse the interference term if implemented)
     // so they use the same interpolation tables
     string particle_name;
-    if (particle_->GetType() == ParticleType::MuPlus)
+    switch (particle_->GetType())
     {
-        particle_name = PROPOSALParticle::GetName(ParticleType::MuMinus);
-    }
-    else if (particle_->GetType() == ParticleType::TauPlus)
-    {
-        particle_name = PROPOSALParticle::GetName(ParticleType::TauMinus);
-    }
-    else if (particle_->GetType() == ParticleType::EPlus)
-    {
-        particle_name = PROPOSALParticle::GetName(ParticleType::EMinus);
-    }
-    else
-    {
-        particle_name = particle_->GetName();
+        case ParticleType::MuPlus:
+            particle_name = PROPOSALParticle::GetName(ParticleType::MuMinus);
+            break;
+        case ParticleType::TauPlus:
+            particle_name = PROPOSALParticle::GetName(ParticleType::TauMinus);
+            break;
+        case ParticleType::EPlus:
+            particle_name = PROPOSALParticle::GetName(ParticleType::EMinus);
+            break;
+        case ParticleType::STauPlus:
+            particle_name = PROPOSALParticle::GetName(ParticleType::STauMinus);
+            break;
+        default:
+            particle_name = particle_->GetName();
+            break;
     }
 
     if(!path.empty())
@@ -251,40 +249,34 @@ void ContinuousRandomization::EnableDE2deInterpolation(std::string path, bool ra
 
         for(unsigned int i =0; i<cross_sections_.size(); i++)
         {
-            if(cross_sections_.at(i)->GetType() == ParticleType::Brems)
+            switch (cross_sections_.at(i)->GetType())
             {
-                filename << "_b_"
-                         << "_" << cross_sections_.at(i)->GetParametrization()
-                         << "_" << cross_sections_.at(i)->GetMultiplier()
-                         << "_" << cross_sections_.at(i)->GetLpmEffectEnabled()
-                         << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetEcut()
-                         << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetVcut();
-
+                case ParticleType::Brems:
+                    filename << "_b_"
+                        << "_" << cross_sections_.at(i)->GetParametrization()
+                        << "_" << cross_sections_.at(i)->GetMultiplier()
+                        << "_" << cross_sections_.at(i)->GetLpmEffectEnabled();
+                    break;
+                case ParticleType::DeltaE:
+                    filename << "_i_"
+                        << "_" << cross_sections_.at(i)->GetMultiplier();
+                    break;
+                case ParticleType::EPair:
+                    filename << "_e_"
+                        << "_" << cross_sections_.at(i)->GetMultiplier()
+                        << "_" << cross_sections_.at(i)->GetLpmEffectEnabled();
+                    break;
+                case ParticleType::NuclInt:
+                    filename << "_p_"
+                        << "_" << cross_sections_.at(i)->GetParametrization()
+                        << "_" << cross_sections_.at(i)->GetMultiplier();
+                    break;
+                default:
+                    log_fatal("Unknown cross section");
+                    exit(1);
             }
-            else if(cross_sections_.at(i)->GetType() == ParticleType::DeltaE)
-            {
-                filename << "_i_"
-                         << "_" << cross_sections_.at(i)->GetMultiplier()
-                         << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetEcut()
-                         << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetVcut();
-            }
-            else if(cross_sections_.at(i)->GetType() == ParticleType::EPair)
-            {
-                filename << "_e_"
-                         << "_" << cross_sections_.at(i)->GetMultiplier()
-                         << "_" << cross_sections_.at(i)->GetLpmEffectEnabled()
-                         << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetEcut()
-                         << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetVcut();
-            }
-            else if(cross_sections_.at(i)->GetType() == ParticleType::NuclInt)
-            {
-                filename << "_p_"
-                         << "_" << cross_sections_.at(i)->GetParametrization()
-                         << "_" << cross_sections_.at(i)->GetMultiplier()
-                         << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetEcut()
-                         << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetVcut();
-            }
-
+            filename<< "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetEcut()
+                    << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetVcut();
         }
 
         if(!raw)

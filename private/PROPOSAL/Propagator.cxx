@@ -2764,28 +2764,28 @@ void Propagator::ApplyOptions()
     {
         for(unsigned int i =0; i<collections_.at(j)->GetCrosssections().size(); i++)
         {
-            if(collections_.at(j)->GetCrosssections().at(i)->GetType() == ParticleType::Brems)
+            switch (collections_.at(j)->GetCrosssections().at(i)->GetType())
             {
-                collections_.at(j)->GetCrosssections().at(i)->SetParametrization(brems_);
-                collections_.at(j)->GetCrosssections().at(i)->SetMultiplier(brems_multiplier_);
-                collections_.at(j)->GetCrosssections().at(i)->EnableLpmEffect(lpm_);
-
+                case ParticleType::Brems:
+                    collections_.at(j)->GetCrosssections().at(i)->SetParametrization(brems_);
+                    collections_.at(j)->GetCrosssections().at(i)->SetMultiplier(brems_multiplier_);
+                    collections_.at(j)->GetCrosssections().at(i)->EnableLpmEffect(lpm_);
+                    break;
+                case ParticleType::DeltaE:
+                    collections_.at(j)->GetCrosssections().at(i)->SetMultiplier(ioniz_multiplier_);
+                    break;
+                case ParticleType::EPair:
+                    collections_.at(j)->GetCrosssections().at(i)->SetMultiplier(epair_multiplier_);
+                    collections_.at(j)->GetCrosssections().at(i)->EnableLpmEffect(lpm_);
+                    break;
+                case ParticleType::NuclInt:
+                    collections_.at(j)->GetCrosssections().at(i)->SetParametrization(photo_);
+                    collections_.at(j)->GetCrosssections().at(i)->SetMultiplier(photo_multiplier_);
+                    break;
+                default:
+                    log_fatal("Unknown cross section");
+                    exit(1);
             }
-            else if(collections_.at(j)->GetCrosssections().at(i)->GetType() == ParticleType::DeltaE)
-            {
-                collections_.at(j)->GetCrosssections().at(i)->SetMultiplier(ioniz_multiplier_);
-            }
-            else if(collections_.at(j)->GetCrosssections().at(i)->GetType() == ParticleType::EPair)
-            {
-                collections_.at(j)->GetCrosssections().at(i)->SetMultiplier(epair_multiplier_);
-                collections_.at(j)->GetCrosssections().at(i)->EnableLpmEffect(lpm_);
-            }
-            else if(collections_.at(j)->GetCrosssections().at(i)->GetType() == ParticleType::NuclInt)
-            {
-                collections_.at(j)->GetCrosssections().at(i)->SetParametrization(photo_);
-                collections_.at(j)->GetCrosssections().at(i)->SetMultiplier(photo_multiplier_);
-            }
-
         }
 
         if(collections_.at(j)->GetEnableRandomization())
@@ -2863,8 +2863,4 @@ void Propagator::SetParticle(PROPOSALParticle* particle)
 //----------------------------------------------------------------------------//
 
 Propagator::~Propagator(){}
-
-
-
-
 
