@@ -32,6 +32,7 @@
 #include "PROPOSAL/PROPOSALParticle.h"
 #include "PROPOSAL/EnergyCutSettings.h"
 #include "PROPOSAL/Medium.h"
+#include "PROPOSAL/Output.h"
 #include "TFile.h"
 #include "TMultiGraph.h"
 #include "TLegend.h"
@@ -197,6 +198,9 @@ int main()
                 graph_title<<", parametrization: Butkevich/Mikhailov shadow=Butkevich";
                 graphs.at(i)->SetMarkerStyle(28);
                 break;
+            default:
+                log_fatal("Wrong Nuclear Interaction Parametrization Type '%i'. The default type is '%i'"
+                    , photo.at(i)->GetParametrization(), ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich);
         }
 
         graphs.at(i)->SetName(graph_name.str().c_str());
@@ -592,6 +596,9 @@ int main()
             case ParametrizationType::PhotoButkevichMikhailovShadowButkevich:
                 leg_entry<<"Butkevich/Mikhailovd shadow=Butkevich";
                 break;
+            default:
+                log_fatal("Wrong Nuclear Interaction Parametrization Type '%i'."
+                    , photo.at(i)->GetParametrization());
         }
         if(photo.at(i)->GetParticle()->GetType() == ParticleType::MuMinus)
         {
@@ -1539,6 +1546,9 @@ int main()
                             break;
                     }
                     break;
+                default:
+                    log_fatal("Wrong Nuclear Interaction Parametrization Type '%i'."
+                        , photo.at(i)->GetParametrization());
             }
         }
         else if(photo.at(i)->GetMedium()->GetName().compare("water")==0)
@@ -1769,6 +1779,9 @@ int main()
                             break;
                     }
                     break;
+                default:
+                    log_fatal("Wrong Nuclear Interaction Parametrization Type '%i'."
+                        , photo.at(i)->GetParametrization());
             }
         }
         else if(photo.at(i)->GetMedium()->GetName().compare("uranium")==0)
@@ -1999,6 +2012,9 @@ int main()
                             break;
                     }
                     break;
+                default:
+                    log_fatal("Wrong Nuclear Interaction Parametrization Type '%i'."
+                        , photo.at(i)->GetParametrization());
             }
         }
     }

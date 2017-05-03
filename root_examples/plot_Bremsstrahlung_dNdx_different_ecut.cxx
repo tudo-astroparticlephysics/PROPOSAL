@@ -4,6 +4,7 @@
 #include "PROPOSAL/PROPOSALParticle.h"
 #include "PROPOSAL/EnergyCutSettings.h"
 #include "PROPOSAL/Medium.h"
+#include "PROPOSAL/Output.h"
 #include "TFile.h"
 #include "TMultiGraph.h"
 #include "TLegend.h"
@@ -203,6 +204,9 @@ int main()
                 graph_title<<", parametrization: Complete screening case";
                 graphs.at(i)->SetMarkerStyle(28);
                 break;
+            default:
+                log_fatal("Wrong BremsstrahlungParametrization Type '%i'."
+                    , brems.at(i)->GetParametrization());
         }
 
 

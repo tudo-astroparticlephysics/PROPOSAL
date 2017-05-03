@@ -48,27 +48,24 @@ struct CrossSectionToPython
         for (unsigned int i = 0; i < vec.size(); ++i)
         {
             boost::python::object obj;
-            if (vec[i]->GetName().compare("Bremsstrahlung") == 0)
+            switch (vec[i]->GetType())
             {
-                obj = boost::python::object((Bremsstrahlung*)vec[i]);
+                case ParticleType::Brems:
+                    obj = boost::python::object((Bremsstrahlung*)vec[i]);
+                    break;
+                case ParticleType::NuclInt:
+                    obj = boost::python::object((Photonuclear*)vec[i]);
+                    break;
+                case ParticleType::DeltaE:
+                    obj = boost::python::object((Ionization*)vec[i]);
+                    break;
+                case ParticleType::EPair:
+                    obj = boost::python::object((Epairproduction*)vec[i]);
+                    break;
+                default:
+                    boost::python::object obj(NULL);
+                    break;
             }
-            else if (vec[i]->GetName().compare("Photonuclear") == 0)
-            {
-                obj = boost::python::object((Photonuclear*)vec[i]);
-            }
-            else if (vec[i]->GetName().compare("Ionization") == 0)
-            {
-                obj = boost::python::object((Ionization*)vec[i]);
-            }
-            else if (vec[i]->GetName().compare("Epairproduction") == 0)
-            {
-                obj = boost::python::object((Epairproduction*)vec[i]);
-            }
-            else
-            {
-                boost::python::object obj(NULL);
-            }
-
             python_list.append(obj);
         }
 
