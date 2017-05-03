@@ -921,7 +921,6 @@ void Photonuclear::swap(Photonuclear &photo)
     swap(do_photo_interpolation_, photo.do_photo_interpolation_);
     swap(hard_component_ , photo.hard_component_ );
     swap(shadow_ , photo.shadow_ );
-    swap(parametrization_    ,photo.parametrization_ );
 
     integral_for_dEdx_->swap(*photo.integral_for_dEdx_);
     integral_->swap(*photo.integral_);
