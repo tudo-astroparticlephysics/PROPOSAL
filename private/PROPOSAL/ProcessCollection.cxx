@@ -474,28 +474,25 @@ void ProcessCollection::EnableInterpolation(std::string path, bool raw)
                 case ParticleType::Brems:
                     filename << "_b_"
                         << "_" << crosssections_.at(i)->GetParametrization()
-                        << "_" << crosssections_.at(i)->GetMultiplier()
                         << "_" << crosssections_.at(i)->GetLpmEffectEnabled();
                     break;
                 case ParticleType::DeltaE:
-                    filename << "_i_"
-                        << "_" << crosssections_.at(i)->GetMultiplier();
+                    filename << "_i_";
                     break;
                 case ParticleType::EPair:
                     filename << "_e_"
-                        << "_" << crosssections_.at(i)->GetMultiplier()
                         << "_" << crosssections_.at(i)->GetLpmEffectEnabled();
                     break;
                 case ParticleType::NuclInt:
                     filename << "_p_"
-                        << "_" << crosssections_.at(i)->GetParametrization()
-                        << "_" << crosssections_.at(i)->GetMultiplier();
+                        << "_" << crosssections_.at(i)->GetParametrization();
                     break;
                 default:
                     log_fatal("Unknown cross section");
                     exit(1);
             }
-            filename<< "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetEcut()
+            filename<< "_" << crosssections_.at(i)->GetMultiplier()
+                    << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetEcut()
                     << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetVcut();
         }
 
@@ -767,28 +764,25 @@ void ProcessCollection::EnableParticleTimeInterpolation(std::string path, bool r
                 case ParticleType::Brems:
                     filename << "_b_"
                         << "_" << crosssections_.at(i)->GetParametrization()
-                        << "_" << crosssections_.at(i)->GetMultiplier()
                         << "_" << crosssections_.at(i)->GetLpmEffectEnabled();
                     break;
                 case ParticleType::DeltaE:
-                    filename << "_i_"
-                        << "_" << crosssections_.at(i)->GetMultiplier();
+                    filename << "_i_";
                     break;
                 case ParticleType::EPair:
                     filename << "_e_"
-                        << "_" << crosssections_.at(i)->GetMultiplier()
                         << "_" << crosssections_.at(i)->GetLpmEffectEnabled();
                     break;
                 case ParticleType::NuclInt:
                     filename << "_p_"
-                        << "_" << crosssections_.at(i)->GetParametrization()
-                        << "_" << crosssections_.at(i)->GetMultiplier();
+                        << "_" << crosssections_.at(i)->GetParametrization();
                     break;
                 default:
                     log_fatal("Unknown cross section");
                     exit(1);
             }
-            filename<< "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetEcut()
+            filename<< "_" << crosssections_.at(i)->GetMultiplier()
+                    << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetEcut()
                     << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetVcut();
 
         }
