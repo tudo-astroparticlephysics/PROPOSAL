@@ -90,10 +90,11 @@ void ContinuousRandomization::EnableDE2dxInterpolation(std::string path, bool ra
     if(!path.empty())
     {
         stringstream filename;
-        filename<<path<<"/Cont_dE2dx_"<<particle_name
-            <<"_mass_"<<particle_->GetMass()
-            <<"_"<<medium_->GetName()
-            <<"_"<<medium_->GetMassDensity();
+        filename<<path<<"/Cont_dE2dx"
+                <<"_"<<particle_name
+                <<"_mass_"<<particle_->GetMass()
+                <<"_"<<medium_->GetName()
+                <<"_"<<medium_->GetMassDensity();
 
 
         for(unsigned int i =0; i<cross_sections_.size(); i++)
@@ -101,19 +102,19 @@ void ContinuousRandomization::EnableDE2dxInterpolation(std::string path, bool ra
             switch (cross_sections_.at(i)->GetType())
             {
                 case ParticleType::Brems:
-                    filename << "_b_"
+                    filename << "_b"
                         << "_" << cross_sections_.at(i)->GetParametrization()
                         << "_" << cross_sections_.at(i)->GetLpmEffectEnabled();
                     break;
                 case ParticleType::DeltaE:
-                    filename << "_i_";
+                    filename << "_i";
                     break;
                 case ParticleType::EPair:
-                    filename << "_e_"
+                    filename << "_e"
                         << "_" << cross_sections_.at(i)->GetLpmEffectEnabled();
                     break;
                 case ParticleType::NuclInt:
-                    filename << "_p_"
+                    filename << "_p"
                         << "_" << cross_sections_.at(i)->GetParametrization();
                     break;
                 default:
@@ -238,10 +239,11 @@ void ContinuousRandomization::EnableDE2deInterpolation(std::string path, bool ra
     if(!path.empty())
     {
         stringstream filename;
-        filename<<path<<"/Cont_dE2de_"<<particle_name
-            <<"_mass_"<<particle_->GetMass()
-            <<"_"<<medium_->GetName()
-            <<"_"<<medium_->GetMassDensity();
+        filename<<path<<"/Cont_dE2de"
+                <<"_"<<particle_name
+                <<"_mass_"<<particle_->GetMass()
+                <<"_"<<medium_->GetName()
+                <<"_"<<medium_->GetMassDensity();
 
 
         for(unsigned int i =0; i<cross_sections_.size(); i++)
@@ -249,19 +251,19 @@ void ContinuousRandomization::EnableDE2deInterpolation(std::string path, bool ra
             switch (cross_sections_.at(i)->GetType())
             {
                 case ParticleType::Brems:
-                    filename << "_b_"
+                    filename << "_b"
                         << "_" << cross_sections_.at(i)->GetParametrization()
                         << "_" << cross_sections_.at(i)->GetLpmEffectEnabled();
                     break;
                 case ParticleType::DeltaE:
-                    filename << "_i_";
+                    filename << "_i";
                     break;
                 case ParticleType::EPair:
-                    filename << "_e_"
+                    filename << "_e"
                         << "_" << cross_sections_.at(i)->GetLpmEffectEnabled();
                     break;
                 case ParticleType::NuclInt:
-                    filename << "_p_"
+                    filename << "_p"
                         << "_" << cross_sections_.at(i)->GetParametrization();
                     break;
                 default:

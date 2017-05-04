@@ -157,7 +157,8 @@ void Ionization::EnableDNdxInterpolation(std::string path, bool raw)
     if(!path.empty())
     {
         stringstream filename;
-        filename<<path<<"/Ioniz_dNdx_particle_"<<particle_name
+        filename<<path<<"/Ioniz_dNdx"
+                <<"_particle_"<<particle_name
                 <<"_mass_"<<particle_->GetMass()
                 <<"_med_"<<medium_->GetName()
                 <<"_"<<medium_->GetMassDensity()
@@ -285,7 +286,8 @@ void Ionization::EnableDEdxInterpolation(std::string path, bool raw)
     if(!path.empty())
     {
         stringstream filename;
-        filename<<path<<"/Ioniz_dEdx_particle_"<<particle_name
+        filename<<path<<"/Ioniz_dEdx"
+                <<"_particle_"<<particle_name
                 <<"_mass_"<<particle_->GetMass()
                 <<"_med_"<<medium_->GetName()
                 <<"_"<<medium_->GetMassDensity()
