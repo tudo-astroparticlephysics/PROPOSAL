@@ -208,7 +208,8 @@ void Epairproduction::EnableDNdxInterpolation(std::string path, bool raw)
     if(!path.empty())
     {
         stringstream filename;
-        filename<<path<<"/Epair_dNdx_particle_"<<particle_name
+        filename<<path<<"/Epair_dNdx"
+                <<"_particle_"<<particle_name
                 <<"_mass_"<<particle_->GetMass()
                 <<"_med_"<<medium_->GetName()
                 <<"_"<<medium_->GetMassDensity()
@@ -355,7 +356,8 @@ void Epairproduction::EnableDEdxInterpolation(std::string path, bool raw)
     if(!path.empty())
     {
         stringstream filename;
-        filename<<path<<"/Epair_dEdx_particle_"<<particle_name
+        filename<<path<<"/Epair_dEdx"
+                <<"_particle_"<<particle_name
                 <<"_mass_"<<particle_->GetMass()
                 <<"_med_"<<medium_->GetName()
                 <<"_"<<medium_->GetMassDensity()
@@ -477,7 +479,8 @@ void Epairproduction::EnableEpairInterpolation(std::string path, bool raw)
     if(!path.empty())
     {
         stringstream filename;
-        filename<<path<<"/Epair_particle_"<<particle_name
+        filename<<path<<"/Epair"
+                <<"_particle_"<<particle_name
                 <<"_mass_"<<particle_->GetMass()
                 <<"_med_"<<medium_->GetName()
                 <<"_"<<medium_->GetMassDensity()

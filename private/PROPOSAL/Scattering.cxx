@@ -451,31 +451,32 @@ void Scattering::EnableInterpolation(string path)
         }
 
         stringstream filename;
-        filename<<path<<"/Scattering_"<<particle_name
-            <<"_mass_"<<particle_->GetMass()
-            <<"_"<< crosssections_.at(0)->GetMedium()->GetName()
-            <<"_"<< crosssections_.at(0)->GetMedium()->GetMassDensity()
-            <<"_"<< crosssections_.at(0)->GetEnergyCutSettings()->GetEcut()
-            <<"_"<< crosssections_.at(0)->GetEnergyCutSettings()->GetVcut();
+        filename<<path<<"/Scattering"
+                <<"_"<<particle_name
+                <<"_mass_"<<particle_->GetMass()
+                <<"_"<< crosssections_.at(0)->GetMedium()->GetName()
+                <<"_"<< crosssections_.at(0)->GetMedium()->GetMassDensity()
+                <<"_"<< crosssections_.at(0)->GetEnergyCutSettings()->GetEcut()
+                <<"_"<< crosssections_.at(0)->GetEnergyCutSettings()->GetVcut();
 
         for(unsigned int i =0; i<crosssections_.size(); i++)
         {
             switch (crosssections_.at(i)->GetType())
             {
                 case ParticleType::Brems:
-                    filename << "_b_"
+                    filename << "_b"
                         << "_" << crosssections_.at(i)->GetParametrization()
                         << "_" << crosssections_.at(i)->GetLpmEffectEnabled();
                     break;
                 case ParticleType::DeltaE:
-                    filename << "_i_";
+                    filename << "_i";
                     break;
                 case ParticleType::EPair:
-                    filename << "_e_"
+                    filename << "_e"
                         << "_" << crosssections_.at(i)->GetLpmEffectEnabled();
                     break;
                 case ParticleType::NuclInt:
-                    filename << "_p_"
+                    filename << "_p"
                         << "_" << crosssections_.at(i)->GetParametrization();
                     break;
                 default:
