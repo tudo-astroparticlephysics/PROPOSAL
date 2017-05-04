@@ -48,38 +48,38 @@ class Output;
 // Now: parametrization_ = 14, Former: photo_family=4 and photo_param=1 shadow=2 Butkevich/Mikhailov
 
 // ------------------------------------------------------------------------- //
-int ConvertOldToNewPhotonuclearParametrization(int photo_family,int photo_param,int shadow)
-{
-    switch(photo_family*100+photo_param*10)
-    {
-        case 110:   return 1; break;
-        case 210:   return 2; break;
-        case 120:   return 3; break;
-        case 220:   return 4; break;
-        case 130:   return 5; break;
-        case 230:   return 6; break;
-        case 140:   return 7; break;
-        case 240:   return 8; break;
-    default:
-        break;
-    }
+// int ConvertOldToNewPhotonuclearParametrization(int photo_family,int photo_param,int shadow)
+// {
+//     switch(photo_family*100+photo_param*10)
+//     {
+//         case 110:   return 1; break;
+//         case 210:   return 2; break;
+//         case 120:   return 3; break;
+//         case 220:   return 4; break;
+//         case 130:   return 5; break;
+//         case 230:   return 6; break;
+//         case 140:   return 7; break;
+//         case 240:   return 8; break;
+//     default:
+//         break;
+//     }
 
-    switch(photo_family*100+photo_param*10+shadow)
-    {
-        case 311:   return 9; break;
-        case 312:   return 10; break;
-        case 321:   return 11; break;
-        case 322:   return 12; break;
-        case 411:   return 13; break;
-        case 412:   return 14; break;
-    default:
-        break;
-    }
+//     switch(photo_family*100+photo_param*10+shadow)
+//     {
+//         case 311:   return 9; break;
+//         case 312:   return 10; break;
+//         case 321:   return 11; break;
+//         case 322:   return 12; break;
+//         case 411:   return 13; break;
+//         case 412:   return 14; break;
+//     default:
+//         break;
+//     }
 
-    log_warn("No fitting parametrization %i found setting default! 322 / 12!",photo_family*100+photo_param*10+shadow);
+//     log_warn("No fitting parametrization %i found setting default! 322 / 12!",photo_family*100+photo_param*10+shadow);
 
-    return 12;
-}
+//     return 12;
+// }
 
 
 
@@ -117,19 +117,15 @@ I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(
                                                          , double cylinderHeight
                                                          , I3Particle::ParticleType type
                                                          , double particleMass
-                                                         , BremsstrahlungParametrization brems_param
-                                                         , PhotonuclearParametrizationFamily photo_family
-                                                         , PhotonuclearParametrization photo_param
-                                                         , ShadowingParametrization shadow)
+                                                         , ParametrizationType::Enum brems_param
+                                                         , ParametrizationType::Enum photo_param)
     : particleMass_(particleMass)
     , mediadef_(mediadef)
     , tabledir_(tabledir)
     , cylinderRadius_(cylinderRadius)
     , cylinderHeight_(cylinderHeight)
     , brems_param_(brems_param)
-    , photo_family_(photo_family)
     , photo_param_(photo_param)
-    , shadow_(shadow)
 {
 
     I3Particle i3particle;
@@ -167,13 +163,13 @@ I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(
     proposal = new Propagator(mediadef_,particle, false);
 
     stringstream options;
-    int photo = ConvertOldToNewPhotonuclearParametrization(photo_family_, photo_param_, shadow_);
+    // int photo = ConvertOldToNewPhotonuclearParametrization(photo_family_, photo_param_, shadow_);
 
     options << "You choose the following parameter by passing arguments:" << std::endl;
     options << "\tcylinderRadius = " << cylinderRadius_ << std::endl;
     options << "\tcylinderHeight = " << cylinderHeight_ << std::endl;
     options << "\tBremsstrahlungParametrization = " << brems_param_ << std::endl;
-    options << "\tPhotonuclearParametrization = " << photo << std::endl;
+    options << "\tPhotonuclearParametrization = " << photo_param_ << std::endl;
 
     if (brems_param_ != proposal->GetBrems())
     {
@@ -181,10 +177,10 @@ I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(
         options << "Passed parametrization will be used: " << brems_param_ << std::endl;
     }
 
-    if (photo != proposal->GetPhoto())
+    if (photo_param_ != proposal->GetPhoto())
     {
         options << "\tChosen PhotonuclearParametrization differs from parametrization in config file!" << std::endl;
-        options << "Passed parametrization will be used: " << photo << std::endl;
+        options << "Passed parametrization will be used: " << photo_param_ << std::endl;
     }
 
     log_info("%s", options.str().c_str());
@@ -194,7 +190,7 @@ I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(
     geo->InitCylinder(0,0,0,cylinderRadius_,0,cylinderHeight_);
     proposal->SetDetector(geo);
     proposal->SetBrems(brems_param_);
-    proposal->SetPhoto(photo);
+    proposal->SetPhoto(photo_param_);
     proposal->SetPath_to_tables(tabledir_);
 
     // proposal->SetParticle(particle_type)
@@ -338,7 +334,8 @@ std::vector<I3Particle> I3PropagatorServicePROPOSAL::Propagate(I3Particle& p, Di
         Geometry* geo = new Geometry();
         geo->InitCylinder(0,0,0,cylinderRadius_,0,cylinderHeight_);
         proposal->SetDetector(geo); proposal->SetBrems(brems_param_);
-        proposal->SetPhoto(ConvertOldToNewPhotonuclearParametrization(photo_family_, photo_param_, shadow_));
+        // proposal->SetPhoto(ConvertOldToNewPhotonuclearParametrization(photo_family_, photo_param_, shadow_));
+        proposal->SetPhoto(photo_param_);
         proposal->SetPath_to_tables(tabledir_); proposal->ApplyOptions();
         // proposal->SetParticle(particle_type)
 
@@ -421,7 +418,6 @@ I3Particle::ParticleType I3PropagatorServicePROPOSAL::GenerateI3Type(ParticleTyp
     ptype_I3 = I3_PROPOSAL_ParticleType_bimap.right.find(ptype_PROPOSAL) -> second;
 
     return ptype_I3;
-
 }
 
 // ------------------------------------------------------------------------- //

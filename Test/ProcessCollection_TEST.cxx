@@ -91,11 +91,11 @@ TEST(Comparison , Comparison_not_equal ) {
     EXPECT_TRUE(*D!=*E);
     D->SetParticle(particle);
     EXPECT_TRUE(*D==*E);
-    D->GetCrosssections().at(2)->SetParametrization(6);
+    D->GetCrosssections().at(2)->SetParametrization(ParametrizationType::PhotoBezrukovBugaevShadowBezrukovHard);
 
     EXPECT_TRUE(*D!=*E);
 
-    E->GetCrosssections().at(2)->SetParametrization(6);
+    E->GetCrosssections().at(2)->SetParametrization(ParametrizationType::PhotoBezrukovBugaevShadowBezrukovHard);
     EXPECT_TRUE(*D==*E);
 
     Geometry *geo = new Geometry();
@@ -134,7 +134,7 @@ TEST(Assignment , Operator ) {
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
     ProcessCollection A(particle, medium, cuts);
     ProcessCollection B(particle, medium, cuts);
-    A.GetCrosssections().at(2)->SetParametrization(6);
+    A.GetCrosssections().at(2)->SetParametrization(ParametrizationType::PhotoBezrukovBugaevShadowBezrukovHard);
 
     EXPECT_TRUE(A!=B);
 
@@ -203,7 +203,6 @@ TEST(ProcessCollection , Set_Up ) {
     string med;
     string particleName;
     bool lpm;
-    int para;
 
     cout.precision(16);
     double energy_old=-1;
@@ -227,13 +226,13 @@ TEST(ProcessCollection , Set_Up ) {
 
         for(unsigned int gna = 0; gna <CombOfProcColl.at(i)->GetCrosssections().size() ; gna++)
         {
-            if(CombOfProcColl.at(i)->GetCrosssections().at(gna)->GetName().compare("Bremsstrahlung") == 0)
+            if(CombOfProcColl.at(i)->GetCrosssections().at(gna)->GetType() == ParticleType::Brems)
             {
-                CombOfProcColl.at(i)->GetCrosssections().at(gna)->SetParametrization(1);
+                CombOfProcColl.at(i)->GetCrosssections().at(gna)->SetParametrization(ParametrizationType::BremsKelnerKokoulinPetrukhin);
             }
-            if(CombOfProcColl.at(i)->GetCrosssections().at(gna)->GetName().compare("Photonuclear") == 0)
+            if(CombOfProcColl.at(i)->GetCrosssections().at(gna)->GetType() == ParticleType::NuclInt)
             {
-                CombOfProcColl.at(i)->GetCrosssections().at(gna)->SetParametrization(12);
+                CombOfProcColl.at(i)->GetCrosssections().at(gna)->SetParametrization(ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich);
             }
         }
 
@@ -270,17 +269,16 @@ TEST(ProcessCollection , Stochasticity)
     string med;
     string particleName;
     bool lpm;
-    int para;
 
     cout.precision(16);
     double energy_old=-1;
 
-    vector<string> XSecNames;
+    vector<ParticleType::Enum> XSecTypes;
 
-    XSecNames.push_back("Bremsstrahlung");
-    XSecNames.push_back("Epairproduction");
-    XSecNames.push_back("Photonuclear");
-    XSecNames.push_back("Ionization");
+    XSecTypes.push_back(ParticleType::Brems);
+    XSecTypes.push_back(ParticleType::EPair);
+    XSecTypes.push_back(ParticleType::NuclInt);
+    XSecTypes.push_back(ParticleType::DeltaE);
 
     bool first = true;
     int NumberOfEvents, IonizEvents,BremsEvents,PhotoEvents,EpairEvents;
@@ -309,7 +307,7 @@ TEST(ProcessCollection , Stochasticity)
         //cout << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << med << "\t" << particleName <<  endl;
         while(i< CombOfProcColl.size())
         {
-            if(         !particle->GetName().compare(CombOfParticle.at(i)->GetName())
+            if(         particle->GetType() != CombOfParticle.at(i)->GetType()
                     &&  !medium->GetName().compare(CombOfMedium.at(i)->GetName())
                     &&  *cuts == *CombOfEnergyCutSettings.at(i))
                 break;
@@ -327,7 +325,7 @@ TEST(ProcessCollection , Stochasticity)
             ProcColl = new ProcessCollection(particle, medium, cuts);
         }
 
-        pair<double,string> LossReturn;
+        pair<double, ParticleType::Enum> LossReturn;
         while(energy_old < energy){
             energy_old = energy;
 
@@ -343,9 +341,9 @@ TEST(ProcessCollection , Stochasticity)
                 ProcColl->GetParticle()->SetEnergy(energy);
                 LossReturn = ProcColl->MakeStochasticLoss();
                 foundXSecAt = 0;
-                while(foundXSecAt < XSecNames.size())
+                while(foundXSecAt < XSecTypes.size())
                 {
-                    if(LossReturn.second.compare(XSecNames.at(foundXSecAt)) == 0)break;
+                    if(LossReturn.second == XSecTypes.at(foundXSecAt))break;
                     foundXSecAt++;
                 }
 
@@ -446,7 +444,7 @@ TEST(ProcessCollection , Displacement)
         //cout << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << med << "\t" << particleName <<  endl;
         while(i< CombOfProcColl.size())
         {
-            if(         !particle->GetName().compare(CombOfParticle.at(i)->GetName())
+            if(         particle->GetType() != CombOfParticle.at(i)->GetType()
                     &&  !medium->GetName().compare(CombOfMedium.at(i)->GetName())
                     &&  *cuts == *CombOfEnergyCutSettings.at(i))
                 break;
@@ -535,7 +533,7 @@ TEST(ProcessCollection , TrackingIntegral)
         //cout << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << med << "\t" << particleName <<  endl;
         while(i< CombOfProcColl.size())
         {
-            if(         !particle->GetName().compare(CombOfParticle.at(i)->GetName())
+            if(         particle->GetType() != CombOfParticle.at(i)->GetType()
                     &&  !medium->GetName().compare(CombOfMedium.at(i)->GetName())
                     &&  *cuts == *CombOfEnergyCutSettings.at(i))
                 break;
@@ -623,7 +621,7 @@ TEST(ProcessCollection , FinalEnergyDist)
         //cout << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << med << "\t" << particleName <<  endl;
         while(i< CombOfProcColl.size())
         {
-            if(         !particle->GetName().compare(CombOfParticle.at(i)->GetName())
+            if(         particle->GetType() != CombOfParticle.at(i)->GetType()
                     &&  !medium->GetName().compare(CombOfMedium.at(i)->GetName())
                     &&  *cuts == *CombOfEnergyCutSettings.at(i))
                 break;
@@ -691,8 +689,9 @@ TEST(ProcessCollection , MakeDecay)
 
     bool first = true;
 
-    pair<double,string> Decay_new;
-    pair<double,string> Decay_old;
+    pair<double, ParticleType::Enum> Decay_new;
+    pair<double, ParticleType::Enum> Decay_old;
+    string old_decay_second_string;
 
     ProcessCollection* ProcColl;
 
@@ -700,8 +699,9 @@ TEST(ProcessCollection , MakeDecay)
     double rnd1,rnd2,rnd3;
     while(in.good())
     {
-        if(first)in>>ecut>>vcut>>lpm>>med>>particleName>> rnd1>>rnd2>>rnd3 >> energy>> Decay_old.first >> Decay_old.second;
+        if(first)in>>ecut>>vcut>>lpm>>med>>particleName>> rnd1>>rnd2>>rnd3 >> energy>> Decay_old.first >> old_decay_second_string;
         first=false;
+        Decay_old.second = PROPOSALParticle::GetTypeFromName(old_decay_second_string);
 
         energy_old = -1;
         Medium *medium = new Medium(med,1.);
@@ -713,7 +713,7 @@ TEST(ProcessCollection , MakeDecay)
         //cout << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << med << "\t" << particleName <<  endl;
         while(i< CombOfProcColl.size())
         {
-            if(         !particle->GetName().compare(CombOfParticle.at(i)->GetName())
+            if(         particle->GetType() != CombOfParticle.at(i)->GetType()
                     &&  !medium->GetName().compare(CombOfMedium.at(i)->GetName())
                     &&  *cuts == *CombOfEnergyCutSettings.at(i))
                 break;
@@ -749,9 +749,9 @@ TEST(ProcessCollection , MakeDecay)
 //            }
 
             ASSERT_NEAR(Decay_new.first, Decay_old.first, RelError*Decay_new.first);
-            ASSERT_FALSE(   Decay_old.second.compare(   Decay_new.second    )    );
+            ASSERT_FALSE(   Decay_old.second ==   Decay_new.second                );
 
-            in>>ecut>>vcut>>lpm>>med>>particleName>> rnd1>>rnd2>>rnd3 >> energy>> Decay_old.first >> Decay_old.second;
+            in>>ecut>>vcut>>lpm>>med>>particleName>> rnd1>>rnd2>>rnd3 >> energy>> Decay_old.first >> old_decay_second_string;
         }
 
         delete cuts;
@@ -808,7 +808,7 @@ TEST(ProcessCollection , FinalEnergyParticleInteraction)
         //cout << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << med << "\t" << particleName <<  endl;
         while(i< CombOfProcColl.size())
         {
-            if(         !particle->GetName().compare(CombOfParticle.at(i)->GetName())
+            if(         particle->GetType() != CombOfParticle.at(i)->GetType()
                     &&  !medium->GetName().compare(CombOfMedium.at(i)->GetName())
                     &&  *cuts == *CombOfEnergyCutSettings.at(i))
                 break;

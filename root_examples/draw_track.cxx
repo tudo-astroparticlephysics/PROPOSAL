@@ -173,7 +173,8 @@ int main(int argc, char **argv)
                 break;
             }
 
-            case (ParticleType::EMinus || ParticleType::EPlus):
+            case ParticleType::EMinus: 
+            case ParticleType::EPlus:
             {
                 TPolyMarker3D* m  = new TPolyMarker3D();
                 m->SetPoint(0,secondarys.at(i)->GetX(),secondarys.at(i)->GetY(),secondarys.at(i)->GetZ());
@@ -201,7 +202,7 @@ int main(int argc, char **argv)
 
     for(unsigned int i = 0;i<marker.size();i++)
     {
-        sleep(0.1);
+        sleep(1);
         marker.at(i)->Draw("same");
         gPad->Modified();
         gPad->Update();

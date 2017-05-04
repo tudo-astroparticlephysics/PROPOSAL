@@ -186,27 +186,30 @@ void Epairproduction::EnableDNdxInterpolation(std::string path, bool raw)
     // charged anti leptons have the same cross sections like charged leptons
     // so they use the same interpolation tables
     string particle_name;
-    if (particle_->GetType() == ParticleType::MuPlus)
+    switch (particle_->GetType())
     {
-        particle_name = PROPOSALParticle::GetName(ParticleType::MuMinus);
-    }
-    else if (particle_->GetType() == ParticleType::TauPlus)
-    {
-        particle_name = PROPOSALParticle::GetName(ParticleType::TauMinus);
-    }
-    else if (particle_->GetType() == ParticleType::EPlus)
-    {
-        particle_name = PROPOSALParticle::GetName(ParticleType::EMinus);
-    }
-    else
-    {
-        particle_name = particle_->GetName();
+        case ParticleType::MuPlus:
+            particle_name = PROPOSALParticle::GetName(ParticleType::MuMinus);
+            break;
+        case ParticleType::TauPlus:
+            particle_name = PROPOSALParticle::GetName(ParticleType::TauMinus);
+            break;
+        case ParticleType::EPlus:
+            particle_name = PROPOSALParticle::GetName(ParticleType::EMinus);
+            break;
+        case ParticleType::STauPlus:
+            particle_name = PROPOSALParticle::GetName(ParticleType::STauMinus);
+            break;
+        default:
+            particle_name = particle_->GetName();
+            break;
     }
 
     if(!path.empty())
     {
         stringstream filename;
-        filename<<path<<"/Epair_dNdx_particle_"<<particle_name
+        filename<<path<<"/Epair_dNdx"
+                <<"_particle_"<<particle_name
                 <<"_mass_"<<particle_->GetMass()
                 <<"_med_"<<medium_->GetName()
                 <<"_"<<medium_->GetMassDensity()
@@ -331,27 +334,30 @@ void Epairproduction::EnableDEdxInterpolation(std::string path, bool raw)
     // charged anti leptons have the same cross sections like charged leptons
     // so they use the same interpolation tables
     string particle_name;
-    if (particle_->GetType() == ParticleType::MuPlus)
+    switch (particle_->GetType())
     {
-        particle_name = PROPOSALParticle::GetName(ParticleType::MuMinus);
-    }
-    else if (particle_->GetType() == ParticleType::TauPlus)
-    {
-        particle_name = PROPOSALParticle::GetName(ParticleType::TauMinus);
-    }
-    else if (particle_->GetType() == ParticleType::EPlus)
-    {
-        particle_name = PROPOSALParticle::GetName(ParticleType::EMinus);
-    }
-    else
-    {
-        particle_name = particle_->GetName();
+        case ParticleType::MuPlus:
+            particle_name = PROPOSALParticle::GetName(ParticleType::MuMinus);
+            break;
+        case ParticleType::TauPlus:
+            particle_name = PROPOSALParticle::GetName(ParticleType::TauMinus);
+            break;
+        case ParticleType::EPlus:
+            particle_name = PROPOSALParticle::GetName(ParticleType::EMinus);
+            break;
+        case ParticleType::STauPlus:
+            particle_name = PROPOSALParticle::GetName(ParticleType::STauMinus);
+            break;
+        default:
+            particle_name = particle_->GetName();
+            break;
     }
 
     if(!path.empty())
     {
         stringstream filename;
-        filename<<path<<"/Epair_dEdx_particle_"<<particle_name
+        filename<<path<<"/Epair_dEdx"
+                <<"_particle_"<<particle_name
                 <<"_mass_"<<particle_->GetMass()
                 <<"_med_"<<medium_->GetName()
                 <<"_"<<medium_->GetMassDensity()
@@ -451,27 +457,30 @@ void Epairproduction::EnableEpairInterpolation(std::string path, bool raw)
     // charged anti leptons have the same cross sections like charged leptons
     // so they use the same interpolation tables
     string particle_name;
-    if (particle_->GetType() == ParticleType::MuPlus)
+    switch (particle_->GetType())
     {
-        particle_name = PROPOSALParticle::GetName(ParticleType::MuMinus);
-    }
-    else if (particle_->GetType() == ParticleType::TauPlus)
-    {
-        particle_name = PROPOSALParticle::GetName(ParticleType::TauMinus);
-    }
-    else if (particle_->GetType() == ParticleType::EPlus)
-    {
-        particle_name = PROPOSALParticle::GetName(ParticleType::EMinus);
-    }
-    else
-    {
-        particle_name = particle_->GetName();
+        case ParticleType::MuPlus:
+            particle_name = PROPOSALParticle::GetName(ParticleType::MuMinus);
+            break;
+        case ParticleType::TauPlus:
+            particle_name = PROPOSALParticle::GetName(ParticleType::TauMinus);
+            break;
+        case ParticleType::EPlus:
+            particle_name = PROPOSALParticle::GetName(ParticleType::EMinus);
+            break;
+        case ParticleType::STauPlus:
+            particle_name = PROPOSALParticle::GetName(ParticleType::STauMinus);
+            break;
+        default:
+            particle_name = particle_->GetName();
+            break;
     }
 
     if(!path.empty())
     {
         stringstream filename;
-        filename<<path<<"/Epair_particle_"<<particle_name
+        filename<<path<<"/Epair"
+                <<"_particle_"<<particle_name
                 <<"_mass_"<<particle_->GetMass()
                 <<"_med_"<<medium_->GetName()
                 <<"_"<<medium_->GetMassDensity()
@@ -763,7 +772,7 @@ Epairproduction::Epairproduction(PROPOSALParticle* particle,
     do_dedx_Interpolation_      = false;
     do_dndx_Interpolation_      = false;
     multiplier_                 = 1.;
-    parametrization_            = 1;
+    parametrization_            = ParametrizationType::EPairKelnerKokoulinPetrukhin;
     lpm_effect_enabled_         = false;
     init_lpm_effect_            = true;
     component_                  = 0;
@@ -1351,9 +1360,12 @@ double Epairproduction::FunctionToIntegral(double r)
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-void Epairproduction::SetParametrization(int parametrization){
+void Epairproduction::SetParametrization(ParametrizationType::Enum parametrization){
     parametrization_ = parametrization;
     log_warn("This has no effect. Till now only one parametrization for Epairproduction implemented");
+    if (parametrization_ != ParametrizationType::EPairKelnerKokoulinPetrukhin)
+        log_warn("The parametrization type number '%i' is different to the one that is implemented with type number '%i' "
+            , parametrization_, ParametrizationType::EPairKelnerKokoulinPetrukhin);
 }
 
 void Epairproduction::SetComponent(int component) {
@@ -1397,10 +1409,6 @@ void Epairproduction::SetProbForComponent(
 
 void Epairproduction::SetReverse(bool reverse) {
 	reverse_ = reverse;
-}
-
-void Epairproduction::SetV(double v) {
-	v_ = v;
 }
 
 

@@ -89,7 +89,6 @@ namespace ParticleType
     };
 };
 
-// typedef PROPOSALParticleType::Enums::ParticleType::Enum ParticleType::Enum;
 
 /**
   * \brief This class provides the main particle properties and functions.

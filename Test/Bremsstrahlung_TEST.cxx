@@ -33,6 +33,28 @@ public:
     }
 };
 
+int ConvertOldToNewBremsstrahlungParametrization(int old_param)
+{
+    switch (old_param)
+    {
+        case 1: 
+            return ParametrizationType::BremsKelnerKokoulinPetrukhin;
+            break;
+        case 2:
+            return ParametrizationType::BremsAndreevBezrukovBugaev;
+            break;
+        case 3:
+            return ParametrizationType::BremsPetrukhinShestakov;
+            break;
+        case 4:
+            return ParametrizationType::BremsCompleteScreeningCase;
+            break;
+        default:
+            log_fatal("Wrong Bremsstrahlung parametrization type '%i'."
+                , old_param);
+    }
+}
+
 TEST(Comparison , Comparison_equal ) {
 
     double dEdx;
@@ -115,7 +137,7 @@ TEST(Assignment , Operator ) {
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
     Bremsstrahlung A(particle, medium, cuts);
     Bremsstrahlung B(particle, medium, cuts);
-    A.SetParametrization(3);
+    A.SetParametrization(ParametrizationType::BremsPetrukhinShestakov);
 
     EXPECT_TRUE(A!=B);
 
@@ -198,7 +220,7 @@ TEST(Bremsstrahlung , Test_of_dEdx ) {
         CrossSections *brems = new Bremsstrahlung(particle, medium, cuts);
 
 
-        brems->SetParametrization(para);
+        brems->SetParametrization(static_cast<ParametrizationType::Enum>(ConvertOldToNewBremsstrahlungParametrization(para)));
         brems->EnableLpmEffect(lpm);
 
 
@@ -246,7 +268,7 @@ TEST(Bremsstrahlung , Test_of_dNdx ) {
         CrossSections *brems = new Bremsstrahlung(particle, medium, cuts);
 
 
-        brems->SetParametrization(para);
+        brems->SetParametrization(static_cast<ParametrizationType::Enum>(ConvertOldToNewBremsstrahlungParametrization(para)));
         brems->EnableLpmEffect(lpm);
 
         dNdx_new=brems->CalculatedNdx();
@@ -296,8 +318,8 @@ TEST(Bremsstrahlung , Test_of_dNdxrnd ) {
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
 
-       CrossSections *brems = new Bremsstrahlung(particle, medium, cuts);
-        brems->SetParametrization(para);
+        CrossSections *brems = new Bremsstrahlung(particle, medium, cuts);
+        brems->SetParametrization(static_cast<ParametrizationType::Enum>(ConvertOldToNewBremsstrahlungParametrization(para)));
         brems->EnableLpmEffect(lpm);
 
         //cout << para << "\t" << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << med << "\t" << particleName<< "\t" << dNdx << endl;
@@ -361,8 +383,8 @@ TEST(Bremsstrahlung , Test_of_e ) {
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
 
-       CrossSections *brems = new Bremsstrahlung(particle, medium, cuts);
-        brems->SetParametrization(para);
+        CrossSections *brems = new Bremsstrahlung(particle, medium, cuts);
+        brems->SetParametrization(static_cast<ParametrizationType::Enum>(ConvertOldToNewBremsstrahlungParametrization(para)));
         brems->EnableLpmEffect(lpm);
 
         //cout << para << "\t" << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << med << "\t" << particleName<< "\t" << e << endl;
@@ -425,7 +447,7 @@ TEST(Bremsstrahlung , Test_of_dEdx_Interpolant ) {
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
         CrossSections *brems = new Bremsstrahlung(particle, medium, cuts);
 
-        brems->SetParametrization(para);
+        brems->SetParametrization(static_cast<ParametrizationType::Enum>(ConvertOldToNewBremsstrahlungParametrization(para)));
         brems->EnableLpmEffect(lpm);
         brems->EnableDEdxInterpolation();
 
@@ -488,8 +510,8 @@ TEST(Bremsstrahlung , Test_of_dNdx_Interpolant ) {
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
 
-       CrossSections *brems = new Bremsstrahlung(particle, medium, cuts);
-        brems->SetParametrization(para);
+        CrossSections *brems = new Bremsstrahlung(particle, medium, cuts);
+        brems->SetParametrization(static_cast<ParametrizationType::Enum>(ConvertOldToNewBremsstrahlungParametrization(para)));
         brems->EnableLpmEffect(lpm);
         brems->EnableDNdxInterpolation();
 
@@ -550,8 +572,8 @@ return;
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
 
-       CrossSections *brems = new Bremsstrahlung(particle, medium, cuts);
-        brems->SetParametrization(para);
+        CrossSections *brems = new Bremsstrahlung(particle, medium, cuts);
+        brems->SetParametrization(static_cast<ParametrizationType::Enum>(ConvertOldToNewBremsstrahlungParametrization(para)));
         brems->EnableLpmEffect(lpm);
         brems->EnableDNdxInterpolation();
 

@@ -43,29 +43,26 @@ struct CrossSectionToPython
     static PyObject* convert(std::vector<CrossSections*> const& vec)
     {
         boost::python::list python_list;
-        typename std::vector<CrossSections*>::const_iterator iter;
 
         for (unsigned int i = 0; i < vec.size(); ++i)
         {
-            if (vec[i]->GetName().compare("Bremsstrahlung") == 0)
+            switch (vec[i]->GetType())
             {
-                python_list.append(boost::python::ptr((Bremsstrahlung*)vec[i]));
-            }
-            else if (vec[i]->GetName().compare("Photonuclear") == 0)
-            {
-                python_list.append(boost::python::ptr((Photonuclear*)vec[i]));
-            }
-            else if (vec[i]->GetName().compare("Ionization") == 0)
-            {
-                python_list.append(boost::python::ptr((Ionization*)vec[i]));
-            }
-            else if (vec[i]->GetName().compare("Epairproduction") == 0)
-            {
-                python_list.append(boost::python::ptr((Epairproduction*)vec[i]));
-            }
-            else
-            {
-                boost::python::object obj(NULL);
+                case ParticleType::Brems:
+                    python_list.append(boost::python::ptr((Bremsstrahlung*)vec[i]));
+                    break;
+                case ParticleType::NuclInt:
+                    python_list.append(boost::python::ptr((Photonuclear*)vec[i]));
+                    break;
+                case ParticleType::DeltaE:
+                    python_list.append(boost::python::ptr((Ionization*)vec[i]));
+                    break;
+                case ParticleType::EPair:
+                    python_list.append(boost::python::ptr((Epairproduction*)vec[i]));
+                    break;
+                default:
+                    boost::python::object obj(NULL);
+                    break;
             }
         }
 
@@ -300,6 +297,31 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
     ;
 
     // --------------------------------------------------------------------- //
+    // ParametrizationType
+    // --------------------------------------------------------------------- //
+
+    enum_<ParametrizationType::Enum>("ParametrizationType")
+        .value("BremsKelnerKokoulinPetrukhin",                  ParametrizationType::BremsKelnerKokoulinPetrukhin)
+        .value("BremsAndreevBezrukovBugaev",                    ParametrizationType::BremsAndreevBezrukovBugaev)
+        .value("BremsPetrukhinShestakov",                       ParametrizationType::BremsPetrukhinShestakov)
+        .value("BremsCompleteScreeningCase",                    ParametrizationType::BremsCompleteScreeningCase)
+        .value("PhotoKokoulinShadowBezrukovSoft",               ParametrizationType::PhotoKokoulinShadowBezrukovSoft)
+        .value("PhotoKokoulinShadowBezrukovHard",               ParametrizationType::PhotoKokoulinShadowBezrukovHard)
+        .value("PhotoRhodeShadowBezrukovSoft",                  ParametrizationType::PhotoRhodeShadowBezrukovSoft)
+        .value("PhotoRhodeShadowBezrukovHard",                  ParametrizationType::PhotoRhodeShadowBezrukovHard)
+        .value("PhotoBezrukovBugaevShadowBezrukovSoft",         ParametrizationType::PhotoBezrukovBugaevShadowBezrukovSoft)
+        .value("PhotoBezrukovBugaevShadowBezrukovHard",         ParametrizationType::PhotoBezrukovBugaevShadowBezrukovHard)
+        .value("PhotoZeusShadowBezrukovSoft",                   ParametrizationType::PhotoZeusShadowBezrukovSoft)
+        .value("PhotoZeusShadowBezrukovHard",                   ParametrizationType::PhotoZeusShadowBezrukovHard)
+        .value("PhotoAbramowiczLevinLevyMaor91ShadowDutta",     ParametrizationType::PhotoAbramowiczLevinLevyMaor91ShadowDutta)
+        .value("PhotoAbramowiczLevinLevyMaor91ShadowButkevich", ParametrizationType::PhotoAbramowiczLevinLevyMaor91ShadowButkevich)
+        .value("PhotoAbramowiczLevinLevyMaor97ShadowDutta",     ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowDutta)
+        .value("PhotoAbramowiczLevinLevyMaor97ShadowButkevich", ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich)
+        .value("EPairKelnerKokoulinPetrukhin",                  ParametrizationType::EPairKelnerKokoulinPetrukhin)
+        .value("IonizBetheBloch",                               ParametrizationType::IonizBetheBloch)
+    ;
+
+    // --------------------------------------------------------------------- //
     // Particle
     // --------------------------------------------------------------------- //
 
@@ -434,8 +456,8 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
              bool,
              bool,
              bool,
-             int,
-             int,
+             ParametrizationType::Enum,
+             ParametrizationType::Enum,
              double,
              double,
              double,
@@ -450,8 +472,8 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
              arg("continuous_rand") = true,
              arg("exact_time") = true,
              arg("lpm") = true,
-             arg("brems") = 1,
-             arg("photo") = 12,
+             arg("brems") = ParametrizationType::BremsKelnerKokoulinPetrukhin,
+             arg("photo") = ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich,
              arg("brems_multiplier") = 1,
              arg("photo_multiplier") = 1,
              arg("ioniz_multiplier") = 1,

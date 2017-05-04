@@ -26,8 +26,8 @@ def MMCFactory(length=10*I3Units.m, seed=12345, mediadef=expandvars('$I3_BUILD/M
 
 	jvm = c2j_icetray.I3JavaVM(jvmOpts)
 
-	# Now create the MMC propagators, but first *all* of the options must be set here. 
-	# There's no special options added behind the scenes.  This is much more flexible. 
+	# Now create the MMC propagators, but first *all* of the options must be set here.
+	# There's no special options added behind the scenes.  This is much more flexible.
 	#  Below are the standard options.  To interpret them see the MMC docs.
 	mmcOpts = "-romb=5 -raw -user -sdec -time -lpm -bs=1 -ph=3 -bb=2 -sh=2 -frho -cont "
 	mmcOpts += expandvars("-tdir=$I3_BUILD/mmc-icetray/resources ")
@@ -87,4 +87,3 @@ tray.AddModule('I3Writer', 'writer',
 tray.AddModule('TrashCan', 'YesWeCan')
 tray.Execute()
 tray.Finish()
- 
