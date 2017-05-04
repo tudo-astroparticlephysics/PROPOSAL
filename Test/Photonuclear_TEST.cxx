@@ -35,7 +35,6 @@ public:
     }
 };
 
-
 TEST(Comparison , Comparison_equal ) {
 
     double dEdx;
@@ -89,7 +88,7 @@ TEST(Comparison , Comparison_not_equal ) {
     EXPECT_TRUE(*D!=*E);
     D->SetParticle(particle);
     EXPECT_TRUE(*D==*E);
-    D->SetParametrization(6);
+    D->SetParametrization(ParametrizationType::PhotoBezrukovBugaevShadowBezrukovHard);
     EXPECT_TRUE(*D!=*E);
 
 
@@ -121,7 +120,7 @@ TEST(Assignment , Operator ) {
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
     Photonuclear A(particle, medium, cuts);
     Photonuclear B(particle, medium, cuts);
-    A.SetParametrization(6);
+    A.SetParametrization(ParametrizationType::PhotoBezrukovBugaevShadowBezrukovHard);
     EXPECT_TRUE(A!=B);
 
     B=A;
@@ -149,8 +148,8 @@ TEST(Assignment , Swap ) {
     EnergyCutSettings *cuts2 = new EnergyCutSettings(500,-1);
     Photonuclear A(particle, medium, cuts);
     Photonuclear B(particle2, medium2, cuts2);
-    A.SetParametrization(2);
-    B.SetParametrization(2);
+    A.SetParametrization(ParametrizationType::PhotoKokoulinShadowBezrukovHard);
+    B.SetParametrization(ParametrizationType::PhotoKokoulinShadowBezrukovHard);
     A.EnableDEdxInterpolation();
     B.EnableDEdxInterpolation();
     A.EnableDNdxInterpolation();
@@ -231,20 +230,20 @@ TEST(Photonuclear , Set_Up ) {
         // Now: parametrization_ = 13, Former: form=4 and bb=1 shadow=1 Butkevich/Mikhailov
         // Now: parametrization_ = 14, Former: form=4 and bb=1 shadow=2 Butkevich/Mikhailov
 
-        if(bb==1&&para==1)CombOfPhoto.at(i)->SetParametrization(1);
-        if(bb==1&&para==2)CombOfPhoto.at(i)->SetParametrization(2);
-        if(bb==2&&para==1)CombOfPhoto.at(i)->SetParametrization(3);
-        if(bb==2&&para==2)CombOfPhoto.at(i)->SetParametrization(4);
-        if(bb==3&&para==1)CombOfPhoto.at(i)->SetParametrization(5);
-        if(bb==3&&para==2)CombOfPhoto.at(i)->SetParametrization(6);
-        if(bb==4&&para==1)CombOfPhoto.at(i)->SetParametrization(7);
-        if(bb==4&&para==2)CombOfPhoto.at(i)->SetParametrization(8);
-        if(bb==1&&para==3&&shadow==1)CombOfPhoto.at(i)->SetParametrization(9);
-        if(bb==1&&para==3&&shadow==2)CombOfPhoto.at(i)->SetParametrization(10);
-        if(bb==2&&para==3&&shadow==1)CombOfPhoto.at(i)->SetParametrization(11);
-        if(bb==2&&para==3&&shadow==2)CombOfPhoto.at(i)->SetParametrization(12);
-        if(bb==1&&para==4&&shadow==1)CombOfPhoto.at(i)->SetParametrization(13);
-        if(bb==1&&para==4&&shadow==2)CombOfPhoto.at(i)->SetParametrization(14);
+        if(bb==1&&para==1)CombOfPhoto.at(i)->SetParametrization(ParametrizationType::PhotoKokoulinShadowBezrukovSoft);
+        if(bb==1&&para==2)CombOfPhoto.at(i)->SetParametrization(ParametrizationType::PhotoKokoulinShadowBezrukovHard);
+        if(bb==2&&para==1)CombOfPhoto.at(i)->SetParametrization(ParametrizationType::PhotoRhodeShadowBezrukovSoft);
+        if(bb==2&&para==2)CombOfPhoto.at(i)->SetParametrization(ParametrizationType::PhotoRhodeShadowBezrukovHard);
+        if(bb==3&&para==1)CombOfPhoto.at(i)->SetParametrization(ParametrizationType::PhotoBezrukovBugaevShadowBezrukovSoft);
+        if(bb==3&&para==2)CombOfPhoto.at(i)->SetParametrization(ParametrizationType::PhotoBezrukovBugaevShadowBezrukovHard);
+        if(bb==4&&para==1)CombOfPhoto.at(i)->SetParametrization(ParametrizationType::PhotoZeusShadowBezrukovSoft);
+        if(bb==4&&para==2)CombOfPhoto.at(i)->SetParametrization(ParametrizationType::PhotoZeusShadowBezrukovHard);
+        if(bb==1&&para==3&&shadow==1)CombOfPhoto.at(i)->SetParametrization(ParametrizationType::PhotoAbramowiczLevinLevyMaor91ShadowDutta);
+        if(bb==1&&para==3&&shadow==2)CombOfPhoto.at(i)->SetParametrization(ParametrizationType::PhotoAbramowiczLevinLevyMaor91ShadowButkevich);
+        if(bb==2&&para==3&&shadow==1)CombOfPhoto.at(i)->SetParametrization(ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowDutta);
+        if(bb==2&&para==3&&shadow==2)CombOfPhoto.at(i)->SetParametrization(ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich);
+        if(bb==1&&para==4&&shadow==1)CombOfPhoto.at(i)->SetParametrization(ParametrizationType::PhotoButkevichMikhailovShadowDutta);
+        if(bb==1&&para==4&&shadow==2)CombOfPhoto.at(i)->SetParametrization(ParametrizationType::PhotoButkevichMikhailovShadowButkevich);
 
         while(energy_old < energy)
         {

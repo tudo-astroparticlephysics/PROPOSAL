@@ -224,7 +224,7 @@ public:
 //----------------------------------------------------------------------------//
     //Setter
 
-    void SetParametrization(int parametrization=1);
+    void SetParametrization(ParametrizationType::Enum parametrization = ParametrizationType::EPairKelnerKokoulinPetrukhin);
 	void SetComponent(int component);
 	void SetDedxInterpolant(Interpolant* dedxInterpolant);
 	void SetDndxIntegral(std::vector<Integral*> dndxIntegral);
@@ -235,7 +235,6 @@ public:
 	void SetIntegralForDEdx(Integral* integralForDEdx);
 	void SetProbForComponent(std::vector<double> probForComponent);
 	void SetReverse(bool reverse);
-	void SetV(double v);
 
 //----------------------------------------------------------------------------//
     //Destructor

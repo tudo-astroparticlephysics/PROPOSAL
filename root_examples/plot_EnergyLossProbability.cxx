@@ -189,34 +189,36 @@ int main(int argc, char** argv)
         pr->GetParticle()->SetEnergy(pow(10,EmaxLog10));
         pr->GetParticle()->SetPropagatedDistance(0);
         pr->Propagate(1e20);
-        vector<PROPOSALParticle*> bla (Output::getInstance().GetSecondarys());
-        for(unsigned int k =0 ; k<bla.size();k++)
+        vector<PROPOSALParticle*> particle_vector (Output::getInstance().GetSecondarys());
+        for(unsigned int k =0 ; k<particle_vector.size();k++)
         {
-            sec_energy  =   bla.at(k)->GetEnergy();
-            energy  =   bla.at(k)->GetParentParticleEnergy();
+            sec_energy  =   particle_vector.at(k)->GetEnergy();
+            energy  =   particle_vector.at(k)->GetParentParticleEnergy();
 
-            switch (bla.at(k)->GetType())
+            switch (particle_vector.at(k)->GetType())
             {
-                case -1002:
+                case ParticleType::DeltaE:
                     ww=1;
                     ioniz->Fill(log10(energy),log10(sec_energy));
                     hist_ioniz->Fill(log10(energy),sec_energy);
                     break;
-                case -1001:
+                case ParticleType::Brems:
                     ww=2;
                     brems->Fill(log10(energy),log10(sec_energy));
                     hist_brems->Fill(log10(energy),sec_energy);
                     break;
-                case -1004:
+                case ParticleType::NuclInt:
                     ww=3;
                     photo->Fill(log10(energy),log10(sec_energy));
                     hist_photo->Fill(log10(energy),sec_energy);
                     break;
-                case -1003:
+                case ParticleType::EPair:
                     ww=4;
                     epair->Fill(log10(energy),log10(sec_energy));
                     hist_epair->Fill(log10(energy),sec_energy);
                     break;
+                default:
+                    log_fatal("Wrong secondary type '%i'", particle_vector.at(k)->GetType());
             }
 
             tree->Fill();

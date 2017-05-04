@@ -68,68 +68,62 @@ void ContinuousRandomization::EnableDE2dxInterpolation(std::string path, bool ra
     // (except of diffractive Bremsstrahlung, where one can analyse the interference term if implemented)
     // so they use the same interpolation tables
     string particle_name;
-    if (particle_->GetType() == ParticleType::MuPlus)
+    switch (particle_->GetType())
     {
-        particle_name = PROPOSALParticle::GetName(ParticleType::MuMinus);
-    }
-    else if (particle_->GetType() == ParticleType::TauPlus)
-    {
-        particle_name = PROPOSALParticle::GetName(ParticleType::TauMinus);
-    }
-    else if (particle_->GetType() == ParticleType::EPlus)
-    {
-        particle_name = PROPOSALParticle::GetName(ParticleType::EMinus);
-    }
-    else
-    {
-        particle_name = particle_->GetName();
+        case ParticleType::MuPlus:
+            particle_name = PROPOSALParticle::GetName(ParticleType::MuMinus);
+            break;
+        case ParticleType::TauPlus:
+            particle_name = PROPOSALParticle::GetName(ParticleType::TauMinus);
+            break;
+        case ParticleType::EPlus:
+            particle_name = PROPOSALParticle::GetName(ParticleType::EMinus);
+            break;
+        case ParticleType::STauPlus:
+            particle_name = PROPOSALParticle::GetName(ParticleType::STauMinus);
+            break;
+        default:
+            particle_name = particle_->GetName();
+            break;
     }
 
     if(!path.empty())
     {
         stringstream filename;
-        filename<<path<<"/Cont_dE2dx_"<<particle_name
-            <<"_mass_"<<particle_->GetMass()
-            <<"_"<<medium_->GetName()
-            <<"_"<<medium_->GetMassDensity();
+        filename<<path<<"/Cont_dE2dx"
+                <<"_"<<particle_name
+                <<"_mass_"<<particle_->GetMass()
+                <<"_"<<medium_->GetName()
+                <<"_"<<medium_->GetMassDensity();
 
 
         for(unsigned int i =0; i<cross_sections_.size(); i++)
         {
-            if(cross_sections_.at(i)->GetName().compare("Bremsstrahlung")==0)
+            switch (cross_sections_.at(i)->GetType())
             {
-                filename << "_b_"
-                         << "_" << cross_sections_.at(i)->GetParametrization()
-                         << "_" << cross_sections_.at(i)->GetMultiplier()
-                         << "_" << cross_sections_.at(i)->GetLpmEffectEnabled()
-                         << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetEcut()
-                         << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetVcut();
-
+                case ParticleType::Brems:
+                    filename << "_b"
+                        << "_" << cross_sections_.at(i)->GetParametrization()
+                        << "_" << cross_sections_.at(i)->GetLpmEffectEnabled();
+                    break;
+                case ParticleType::DeltaE:
+                    filename << "_i";
+                    break;
+                case ParticleType::EPair:
+                    filename << "_e"
+                        << "_" << cross_sections_.at(i)->GetLpmEffectEnabled();
+                    break;
+                case ParticleType::NuclInt:
+                    filename << "_p"
+                        << "_" << cross_sections_.at(i)->GetParametrization();
+                    break;
+                default:
+                    log_fatal("Unknown cross section");
+                    exit(1);
             }
-            else if(cross_sections_.at(i)->GetName().compare("Ionization")==0)
-            {
-                filename << "_i_"
-                         << "_" << cross_sections_.at(i)->GetMultiplier()
-                         << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetEcut()
-                         << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetVcut();
-            }
-            else if(cross_sections_.at(i)->GetName().compare("Epairproduction")==0)
-            {
-                filename << "_e_"
-                         << "_" << cross_sections_.at(i)->GetMultiplier()
-                         << "_" << cross_sections_.at(i)->GetLpmEffectEnabled()
-                         << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetEcut()
-                         << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetVcut();
-            }
-            else if(cross_sections_.at(i)->GetName().compare("Photonuclear")==0)
-            {
-                filename << "_p_"
-                         << "_" << cross_sections_.at(i)->GetParametrization()
-                         << "_" << cross_sections_.at(i)->GetMultiplier()
-                         << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetEcut()
-                         << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetVcut();
-            }
-
+            filename<< "_" << cross_sections_.at(i)->GetMultiplier()
+                    << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetEcut()
+                    << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetVcut();
         }
 
         if(!raw)
@@ -223,68 +217,62 @@ void ContinuousRandomization::EnableDE2deInterpolation(std::string path, bool ra
     // (except of diffractive Bremsstrahlung, where one can analyse the interference term if implemented)
     // so they use the same interpolation tables
     string particle_name;
-    if (particle_->GetType() == ParticleType::MuPlus)
+    switch (particle_->GetType())
     {
-        particle_name = PROPOSALParticle::GetName(ParticleType::MuMinus);
-    }
-    else if (particle_->GetType() == ParticleType::TauPlus)
-    {
-        particle_name = PROPOSALParticle::GetName(ParticleType::TauMinus);
-    }
-    else if (particle_->GetType() == ParticleType::EPlus)
-    {
-        particle_name = PROPOSALParticle::GetName(ParticleType::EMinus);
-    }
-    else
-    {
-        particle_name = particle_->GetName();
+        case ParticleType::MuPlus:
+            particle_name = PROPOSALParticle::GetName(ParticleType::MuMinus);
+            break;
+        case ParticleType::TauPlus:
+            particle_name = PROPOSALParticle::GetName(ParticleType::TauMinus);
+            break;
+        case ParticleType::EPlus:
+            particle_name = PROPOSALParticle::GetName(ParticleType::EMinus);
+            break;
+        case ParticleType::STauPlus:
+            particle_name = PROPOSALParticle::GetName(ParticleType::STauMinus);
+            break;
+        default:
+            particle_name = particle_->GetName();
+            break;
     }
 
     if(!path.empty())
     {
         stringstream filename;
-        filename<<path<<"/Cont_dE2de_"<<particle_name
-            <<"_mass_"<<particle_->GetMass()
-            <<"_"<<medium_->GetName()
-            <<"_"<<medium_->GetMassDensity();
+        filename<<path<<"/Cont_dE2de"
+                <<"_"<<particle_name
+                <<"_mass_"<<particle_->GetMass()
+                <<"_"<<medium_->GetName()
+                <<"_"<<medium_->GetMassDensity();
 
 
         for(unsigned int i =0; i<cross_sections_.size(); i++)
         {
-            if(cross_sections_.at(i)->GetName().compare("Bremsstrahlung")==0)
+            switch (cross_sections_.at(i)->GetType())
             {
-                filename << "_b_"
-                         << "_" << cross_sections_.at(i)->GetParametrization()
-                         << "_" << cross_sections_.at(i)->GetMultiplier()
-                         << "_" << cross_sections_.at(i)->GetLpmEffectEnabled()
-                         << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetEcut()
-                         << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetVcut();
-
+                case ParticleType::Brems:
+                    filename << "_b"
+                        << "_" << cross_sections_.at(i)->GetParametrization()
+                        << "_" << cross_sections_.at(i)->GetLpmEffectEnabled();
+                    break;
+                case ParticleType::DeltaE:
+                    filename << "_i";
+                    break;
+                case ParticleType::EPair:
+                    filename << "_e"
+                        << "_" << cross_sections_.at(i)->GetLpmEffectEnabled();
+                    break;
+                case ParticleType::NuclInt:
+                    filename << "_p"
+                        << "_" << cross_sections_.at(i)->GetParametrization();
+                    break;
+                default:
+                    log_fatal("Unknown cross section");
+                    exit(1);
             }
-            else if(cross_sections_.at(i)->GetName().compare("Ionization")==0)
-            {
-                filename << "_i_"
-                         << "_" << cross_sections_.at(i)->GetMultiplier()
-                         << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetEcut()
-                         << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetVcut();
-            }
-            else if(cross_sections_.at(i)->GetName().compare("Epairproduction")==0)
-            {
-                filename << "_e_"
-                         << "_" << cross_sections_.at(i)->GetMultiplier()
-                         << "_" << cross_sections_.at(i)->GetLpmEffectEnabled()
-                         << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetEcut()
-                         << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetVcut();
-            }
-            else if(cross_sections_.at(i)->GetName().compare("Photonuclear")==0)
-            {
-                filename << "_p_"
-                         << "_" << cross_sections_.at(i)->GetParametrization()
-                         << "_" << cross_sections_.at(i)->GetMultiplier()
-                         << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetEcut()
-                         << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetVcut();
-            }
-
+            filename<< "_" << cross_sections_.at(i)->GetMultiplier()
+                    << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetEcut()
+                    << "_" << cross_sections_.at(i)->GetEnergyCutSettings()->GetVcut();
         }
 
         if(!raw)
@@ -463,25 +451,22 @@ ContinuousRandomization::ContinuousRandomization(const ContinuousRandomization &
 
     for(unsigned int i =0; i<continuous_randomization.cross_sections_.size(); i++)
     {
-        if(continuous_randomization.cross_sections_.at(i)->GetName().compare("Bremsstrahlung")==0)
+        switch (continuous_randomization.cross_sections_.at(i)->GetType())
         {
-            cross_sections_.at(i) = new Bremsstrahlung( *(Bremsstrahlung*)continuous_randomization.cross_sections_.at(i) );
-        }
-        else if(continuous_randomization.cross_sections_.at(i)->GetName().compare("Ionization")==0)
-        {
-            cross_sections_.at(i) = new Ionization( *(Ionization*)continuous_randomization.cross_sections_.at(i) );
-        }
-        else if(continuous_randomization.cross_sections_.at(i)->GetName().compare("Epairproduction")==0)
-        {
-            cross_sections_.at(i) = new Epairproduction( *(Epairproduction*)continuous_randomization.cross_sections_.at(i) );
-        }
-        else if(continuous_randomization.cross_sections_.at(i)->GetName().compare("Photonuclear")==0)
-        {
-            cross_sections_.at(i) = new Photonuclear( *(Photonuclear*)continuous_randomization.cross_sections_.at(i) );
-        }
-        else
-        {
-            log_fatal("Unknown cross section");
+            case ParticleType::Brems:
+                cross_sections_.at(i) = new Bremsstrahlung( *(Bremsstrahlung*)continuous_randomization.cross_sections_.at(i) );
+                break;
+            case ParticleType::DeltaE:
+                cross_sections_.at(i) = new Ionization( *(Ionization*)continuous_randomization.cross_sections_.at(i) );
+                break;
+            case ParticleType::EPair:
+                cross_sections_.at(i) = new Epairproduction( *(Epairproduction*)continuous_randomization.cross_sections_.at(i) );
+                break;
+            case ParticleType::NuclInt:
+                cross_sections_.at(i) = new Photonuclear( *(Photonuclear*)continuous_randomization.cross_sections_.at(i) );
+                break;
+            default:
+                log_fatal("Unknown cross section of type '%i' ", continuous_randomization.cross_sections_.at(i)->GetType());
         }
     }
 
@@ -551,25 +536,23 @@ bool ContinuousRandomization::operator==(const ContinuousRandomization &continuo
 
     for(unsigned int i =0; i<continuous_randomization.cross_sections_.size(); i++)
     {
-        if(continuous_randomization.cross_sections_.at(i)->GetName().compare("Bremsstrahlung")==0)
+        switch (continuous_randomization.cross_sections_.at(i)->GetType())
         {
-            if( *(Bremsstrahlung*)cross_sections_.at(i) !=  *(Bremsstrahlung*)continuous_randomization.cross_sections_.at(i) ) return false;
-        }
-        else if(continuous_randomization.cross_sections_.at(i)->GetName().compare("Ionization")==0)
-        {
-            if( *(Ionization*)cross_sections_.at(i) != *(Ionization*)continuous_randomization.cross_sections_.at(i) ) return false;
-        }
-        else if(continuous_randomization.cross_sections_.at(i)->GetName().compare("Epairproduction")==0)
-        {
-            if( *(Epairproduction*)cross_sections_.at(i) !=  *(Epairproduction*)continuous_randomization.cross_sections_.at(i) ) return false;
-        }
-        else if(continuous_randomization.cross_sections_.at(i)->GetName().compare("Photonuclear")==0)
-        {
-            if( *(Photonuclear*)cross_sections_.at(i) !=  *(Photonuclear*)continuous_randomization.cross_sections_.at(i) )  return false;
-        }
-        else
-        {
-            log_fatal("Unknown cross section");
+            case ParticleType::Brems:
+                if( *(Bremsstrahlung*)cross_sections_.at(i) !=  *(Bremsstrahlung*)continuous_randomization.cross_sections_.at(i) ) return false;
+                break;
+            case ParticleType::DeltaE:
+                if( *(Ionization*)cross_sections_.at(i) != *(Ionization*)continuous_randomization.cross_sections_.at(i) ) return false;
+                break;
+            case ParticleType::EPair:
+                if( *(Epairproduction*)cross_sections_.at(i) !=  *(Epairproduction*)continuous_randomization.cross_sections_.at(i) ) return false;
+                break;
+            case ParticleType::NuclInt:
+                if( *(Photonuclear*)cross_sections_.at(i) !=  *(Photonuclear*)continuous_randomization.cross_sections_.at(i) )  return false;
+                break;
+            default:
+                log_fatal("Unknown cross section of type '%i' ", continuous_randomization.cross_sections_.at(i)->GetType());
+                return false;
         }
     }
 
@@ -756,7 +739,7 @@ double ContinuousRandomization::DE2dx()
         {
             cross_sections_.at(i)->SetIntegralLimits(j);
 
-            if(cross_sections_.at(i)->GetName().compare("Bremsstrahlung")==0)
+            if(cross_sections_.at(i)->GetType() == ParticleType::Brems)
             {
                 min =   0;
             }
@@ -766,7 +749,7 @@ double ContinuousRandomization::DE2dx()
             }
             sum +=  dE2dx_integral_->Integrate (min, cross_sections_.at(i)->GetVUp(), boost::bind(&ContinuousRandomization::FunctionToDE2dxIntegral, this, _1) ,2);
 
-            if(cross_sections_.at(i)->GetName().compare("Ionization")==0)
+            if(cross_sections_.at(i)->GetType() == ParticleType::DeltaE)
             {
                 break;
             }

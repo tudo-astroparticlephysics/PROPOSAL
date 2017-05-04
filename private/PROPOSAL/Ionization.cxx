@@ -135,27 +135,30 @@ void Ionization::EnableDNdxInterpolation(std::string path, bool raw)
     // charged anti leptons have the same cross sections like charged leptons
     // so they use the same interpolation tables
     string particle_name;
-    if (particle_->GetType() == ParticleType::MuPlus)
+    switch (particle_->GetType())
     {
-        particle_name = PROPOSALParticle::GetName(ParticleType::MuMinus);
-    }
-    else if (particle_->GetType() == ParticleType::TauPlus)
-    {
-        particle_name = PROPOSALParticle::GetName(ParticleType::TauMinus);
-    }
-    else if (particle_->GetType() == ParticleType::EPlus)
-    {
-        particle_name = PROPOSALParticle::GetName(ParticleType::EMinus);
-    }
-    else
-    {
-        particle_name = particle_->GetName();
+        case ParticleType::MuPlus:
+            particle_name = PROPOSALParticle::GetName(ParticleType::MuMinus);
+            break;
+        case ParticleType::TauPlus:
+            particle_name = PROPOSALParticle::GetName(ParticleType::TauMinus);
+            break;
+        case ParticleType::EPlus:
+            particle_name = PROPOSALParticle::GetName(ParticleType::EMinus);
+            break;
+        case ParticleType::STauPlus:
+            particle_name = PROPOSALParticle::GetName(ParticleType::STauMinus);
+            break;
+        default:
+            particle_name = particle_->GetName();
+            break;
     }
 
     if(!path.empty())
     {
         stringstream filename;
-        filename<<path<<"/Ioniz_dNdx_particle_"<<particle_name
+        filename<<path<<"/Ioniz_dNdx"
+                <<"_particle_"<<particle_name
                 <<"_mass_"<<particle_->GetMass()
                 <<"_med_"<<medium_->GetName()
                 <<"_"<<medium_->GetMassDensity()
@@ -261,27 +264,30 @@ void Ionization::EnableDEdxInterpolation(std::string path, bool raw)
     // charged anti leptons have the same cross sections like charged leptons
     // so they use the same interpolation tables
     string particle_name;
-    if (particle_->GetType() == ParticleType::MuPlus)
+    switch (particle_->GetType())
     {
-        particle_name = PROPOSALParticle::GetName(ParticleType::MuMinus);
-    }
-    else if (particle_->GetType() == ParticleType::TauPlus)
-    {
-        particle_name = PROPOSALParticle::GetName(ParticleType::TauMinus);
-    }
-    else if (particle_->GetType() == ParticleType::EPlus)
-    {
-        particle_name = PROPOSALParticle::GetName(ParticleType::EMinus);
-    }
-    else
-    {
-        particle_name = particle_->GetName();
+        case ParticleType::MuPlus:
+            particle_name = PROPOSALParticle::GetName(ParticleType::MuMinus);
+            break;
+        case ParticleType::TauPlus:
+            particle_name = PROPOSALParticle::GetName(ParticleType::TauMinus);
+            break;
+        case ParticleType::EPlus:
+            particle_name = PROPOSALParticle::GetName(ParticleType::EMinus);
+            break;
+        case ParticleType::STauPlus:
+            particle_name = PROPOSALParticle::GetName(ParticleType::STauMinus);
+            break;
+        default:
+            particle_name = particle_->GetName();
+            break;
     }
 
     if(!path.empty())
     {
         stringstream filename;
-        filename<<path<<"/Ioniz_dEdx_particle_"<<particle_name
+        filename<<path<<"/Ioniz_dEdx"
+                <<"_particle_"<<particle_name
                 <<"_mass_"<<particle_->GetMass()
                 <<"_med_"<<medium_->GetName()
                 <<"_"<<medium_->GetMassDensity()
@@ -871,9 +877,12 @@ double Ionization::FunctionToDNdxIntegral(double variable)
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-void Ionization::SetParametrization(int parametrization){
+void Ionization::SetParametrization(ParametrizationType::Enum parametrization){
     parametrization_ = parametrization;
     log_warn("This has no effect. Till now only one parametrization for Ionization implemented");
+    if (parametrization_ != ParametrizationType::IonizBetheBloch)
+        log_warn("The parametrization type number '%i' is different to the one that is implemented with type number '%i' "
+            , parametrization_, ParametrizationType::IonizBetheBloch);
 }
 
 void Ionization::SetBeta(double beta) {
