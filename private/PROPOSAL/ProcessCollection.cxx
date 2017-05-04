@@ -460,31 +460,32 @@ void ProcessCollection::EnableInterpolation(std::string path, bool raw)
     if(!path.empty())
     {
         stringstream filename;
-        filename<<path<<"/Collection_"<<particle_name
-            <<"_mass_"<<particle_->GetMass()
-            <<"_"<<medium_->GetName()
-            <<"_"<<medium_->GetMassDensity()
-            <<"_"<<cut_settings_->GetEcut()
-            <<"_"<<cut_settings_->GetVcut();
+        filename<<path<<"/Collection"
+                <<"_"<<particle_name
+                <<"_mass_"<<particle_->GetMass()
+                <<"_"<<medium_->GetName()
+                <<"_"<<medium_->GetMassDensity()
+                <<"_"<<cut_settings_->GetEcut()
+                <<"_"<<cut_settings_->GetVcut();
 
         for(unsigned int i =0; i<crosssections_.size(); i++)
         {
             switch (crosssections_.at(i)->GetType())
             {
                 case ParticleType::Brems:
-                    filename << "_b_"
+                    filename << "_b"
                         << "_" << crosssections_.at(i)->GetParametrization()
                         << "_" << crosssections_.at(i)->GetLpmEffectEnabled();
                     break;
                 case ParticleType::DeltaE:
-                    filename << "_i_";
+                    filename << "_i";
                     break;
                 case ParticleType::EPair:
-                    filename << "_e_"
+                    filename << "_e"
                         << "_" << crosssections_.at(i)->GetLpmEffectEnabled();
                     break;
                 case ParticleType::NuclInt:
-                    filename << "_p_"
+                    filename << "_p"
                         << "_" << crosssections_.at(i)->GetParametrization();
                     break;
                 default:
@@ -750,31 +751,32 @@ void ProcessCollection::EnableParticleTimeInterpolation(std::string path, bool r
     if(!path.empty())
     {
         stringstream filename;
-        filename<<path<<"/Time_"<<particle_name
-            <<"_mass_"<<particle_->GetMass()
-            <<"_"<<medium_->GetName()
-            <<"_"<<medium_->GetMassDensity()
-            <<"_"<<cut_settings_->GetEcut()
-            <<"_"<<cut_settings_->GetVcut();
+        filename<<path<<"/Time"
+                <<"_"<<particle_name
+                <<"_mass_"<<particle_->GetMass()
+                <<"_"<<medium_->GetName()
+                <<"_"<<medium_->GetMassDensity()
+                <<"_"<<cut_settings_->GetEcut()
+                <<"_"<<cut_settings_->GetVcut();
 
         for(unsigned int i =0; i<crosssections_.size(); i++)
         {
             switch (crosssections_.at(i)->GetType())
             {
                 case ParticleType::Brems:
-                    filename << "_b_"
+                    filename << "_b"
                         << "_" << crosssections_.at(i)->GetParametrization()
                         << "_" << crosssections_.at(i)->GetLpmEffectEnabled();
                     break;
                 case ParticleType::DeltaE:
-                    filename << "_i_";
+                    filename << "_i";
                     break;
                 case ParticleType::EPair:
-                    filename << "_e_"
+                    filename << "_e"
                         << "_" << crosssections_.at(i)->GetLpmEffectEnabled();
                     break;
                 case ParticleType::NuclInt:
-                    filename << "_p_"
+                    filename << "_p"
                         << "_" << crosssections_.at(i)->GetParametrization();
                     break;
                 default:
