@@ -113,9 +113,8 @@ def make_propagator(
         cylinder_radius=800.,
         cylinder_length=1600.,
         bremsstrahlung="KelnerKokoulinPetrukhin",
-        photonuclear_family="AbramowiczLevinLevyMaor",
-        photonuclear="AbramowiczLevinLevyMaor97",
-        nuclear_shadowing="Butkevich"):
+        photonuclear="AbramowiczLevinLevyMaor97ShadowButkevich"
+        ):
     """Create a muon propagator service.
 
     :param str media_definition:
@@ -145,29 +144,14 @@ def make_propagator(
         icecube.PROPOSAL.BremsstrahlungParametrization,
         bremsstrahlung)
 
-    if not hasattr(icecube.PROPOSAL.PhotonuclearParametrizationFamily,
-                   photonuclear_family):
-        photonuclear_family = "AbramowiczLevinLevyMaor"
-
-    photonuclear_parametrization_family = getattr(
-        icecube.PROPOSAL.PhotonuclearParametrizationFamily,
-        photonuclear_family)
-
     if not hasattr(icecube.PROPOSAL.PhotonuclearParametrization,
                    photonuclear):
-        photonuclear = "AbramowiczLevinLevyMaor97"
+        photonuclear = "AbramowiczLevinLevyMaor97ShadowButkevich"
 
     photonuclear_parametrization = getattr(
         icecube.PROPOSAL.PhotonuclearParametrization,
         photonuclear)
 
-    if not hasattr(icecube.PROPOSAL.ShadowingParametrization,
-                   nuclear_shadowing):
-        nuclear_shadowing = "Butkevich"
-
-    nuclear_shadowing_parametrization = getattr(
-        icecube.PROPOSAL.ShadowingParametrization,
-        nuclear_shadowing)
 
     propagator_service = icecube.PROPOSAL.I3PropagatorServicePROPOSAL(
         mediadef=media_definition,
@@ -175,8 +159,7 @@ def make_propagator(
         cylinderHeight=cylinder_length*icecube.icetray.I3Units.m,
         type=particle_type,
         bremsstrahlungParametrization=bremsstrahlung_parametrization,
-        photonuclearParametrizationFamily=photonuclear_parametrization_family,
-        photonuclearParametrization=photonuclear_parametrization,
-        nuclearShadowingParametrization=nuclear_shadowing_parametrization)
+        photonuclearParametrization=photonuclear_parametrization
+        )
 
     return propagator_service

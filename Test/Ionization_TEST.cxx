@@ -86,7 +86,7 @@ TEST(Comparison , Comparison_not_equal ) {
     EXPECT_TRUE(*D!=*E);
     D->SetParticle(particle);
     EXPECT_TRUE(*D==*E);
-    D->SetParametrization(6);
+    D->SetParametrization(ParametrizationType::PhotoBezrukovBugaevShadowBezrukovHard);
     EXPECT_TRUE(*D!=*E);
 
 
@@ -118,7 +118,7 @@ TEST(Assignment , Operator ) {
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
     Ionization A(particle, medium, cuts);
     Ionization B(particle, medium, cuts);
-    A.SetParametrization(6);
+    A.SetParametrization(ParametrizationType::PhotoBezrukovBugaevShadowBezrukovHard);
 
     EXPECT_TRUE(A!=B);
 

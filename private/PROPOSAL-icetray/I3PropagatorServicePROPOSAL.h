@@ -33,48 +33,6 @@ class Propagator; //Tomasz
 class I3PropagatorServicePROPOSAL : public I3PropagatorService {
 public:
 
-	/** @brief Parametrization of the bremsstrahlung cross-section
-	 *
-	 * See references in the <a href="http://arxiv.org/abs/hep-ph/0407075">MMC paper</a>.
-	 */
-	enum BremsstrahlungParametrization {
-		KelnerKokoulinPetrukhin = 1, // default
-		PetrukhinShestakov = 2,
-		AndreevBerzrukovBugaev = 3,
-		CompleteScreeningCase = 4,
-	};
-
-	/** @brief General type of the photonuclear cross-section parametrization
-	 *
-	 * See references in the <a href="http://arxiv.org/abs/hep-ph/0407075">MMC paper</a>.
-	 */
-	enum PhotonuclearParametrizationFamily {
-		BezrukovBugaevSoft = 1, /// BB parametrization, nonperturbative component only
-		BezrukovBugaevHard = 2, /// BB parametrization, both components
-		AbramowiczLevinLevyMaor = 3, // default
-		ButkevichMikheyev = 4
-	};
-
-	/** @brief Specific edition of the photonuclear cross-section parametrization
-	 *
-	 * See references in the <a href="http://arxiv.org/abs/hep-ph/0407075">MMC paper</a>.
-	 */
-	enum PhotonuclearParametrization {
-		AbramowiczLevinLevyMaor91 = 1,
-		AbramowiczLevinLevyMaor97 = 2, // default
-		BezrukovBugaev = 3,
-		ZEUS = 4
-	};
-
-	/** @brief Parametrization of nuclear shadowing
-	 *
-	 * See references in the <a href="http://arxiv.org/abs/hep-ph/0407075">MMC paper</a>.
-	 */
-	enum ShadowingParametrization {
-		Dutta = 1,
-		Butkevich = 2 // default
-	};
-
   virtual std::vector<I3Particle> Propagate(I3Particle& p, DiagnosticMapPtr frame);
 
   virtual void SetRandomNumberGenerator(I3RandomServicePtr random);
@@ -99,12 +57,15 @@ public:
    *
    * The choice of parametrizations is discussed in <a href="http://arxiv.org/abs/hep-ph/0407075">MMC paper</a>.
    */
-  I3PropagatorServicePROPOSAL(std::string mediadef="", std::string tabledir="",
-      double cylinderRadius=800*I3Units::m, double cylinderHeight=1600*I3Units::m, I3Particle::ParticleType type=I3Particle::MuMinus,
-      double particleMass=NAN, BremsstrahlungParametrization brems_param_=KelnerKokoulinPetrukhin,
-      PhotonuclearParametrizationFamily photo_family_=AbramowiczLevinLevyMaor,
-      PhotonuclearParametrization photo_param_=AbramowiczLevinLevyMaor97,
-      ShadowingParametrization shadow_=Butkevich);
+  I3PropagatorServicePROPOSAL(std::string mediadef=""
+      , std::string tabledir=""
+      , double cylinderRadius=800*I3Units::m
+      , double cylinderHeight=1600*I3Units::m
+      , I3Particle::ParticleType type=I3Particle::MuMinus
+      , double particleMass=NAN
+      , ParametrizationType::Enum brems_param_ = ParametrizationType::BremsKelnerKokoulinPetrukhin
+      , ParametrizationType::Enum photo_param_ = ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich
+  );
 
 
   static std::string GetDefaultMediaDef();
@@ -127,10 +88,8 @@ public:
   double cylinderRadius_;
   double cylinderHeight_;
 
-  BremsstrahlungParametrization brems_param_;
-  PhotonuclearParametrizationFamily photo_family_;
-  PhotonuclearParametrization photo_param_;
-  ShadowingParametrization shadow_;
+  ParametrizationType::Enum brems_param_;
+  ParametrizationType::Enum photo_param_;
 
   /** @brief Tear down and re-initialize the propagator on every call to Propagate().
    * This is used for tests that ensure that propagation results do not depend

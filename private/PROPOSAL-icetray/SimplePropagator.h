@@ -15,6 +15,8 @@
 #include "dataclasses/physics/I3Particle.h"
 #include "phys-services/I3RandomService.h"
 
+#include "PROPOSAL/PROPOSALParticle.h"
+
 class Propagator;
 
 namespace PROPOSAL {
@@ -63,6 +65,11 @@ public:
 	/**
 	 * Get the internal MMC name associated with a particle type
 	 */
+
+	static I3Particle to_I3Particle(const PROPOSALParticle*);
+	static ParticleType::Enum GeneratePROPOSALType(const I3Particle& p);
+	static I3Particle::ParticleType GenerateI3Type(ParticleType::Enum ptype_PROPOSAL);
+
 	static std::string GetName(const I3Particle &p);
 
 	Propagator* GetImplementation() { return propagator_; };
