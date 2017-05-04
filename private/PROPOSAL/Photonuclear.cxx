@@ -165,7 +165,8 @@ void Photonuclear::EnableDNdxInterpolation(std::string path, bool raw)
     if(!path.empty())
     {
         stringstream filename;
-        filename<<path<<"/Photo_dNdx_particle_"<<particle_name
+        filename<<path<<"/Photo_dNdx"
+                <<"_particle_"<<particle_name
                 <<"_mass_"<<particle_->GetMass()
                 <<"_para_"<<parametrization_
                 <<"_med_"<<medium_->GetName()
@@ -312,7 +313,8 @@ void Photonuclear::EnableDEdxInterpolation(std::string path, bool raw)
     if(!path.empty())
     {
         stringstream filename;
-        filename<<path<<"/Photo_dEdx_particle_"<<particle_name
+        filename<<path<<"/Photo_dEdx"
+                <<"_particle_"<<particle_name
                 <<"_mass_"<<particle_->GetMass()
                 <<"_para_"<<parametrization_
                 <<"_med_"<<medium_->GetName()
@@ -432,7 +434,8 @@ void Photonuclear::EnablePhotoInterpolation(std::string path, bool raw)
     if(!path.empty())
     {
         stringstream filename;
-        filename<<path<<"/Photo_particle_"<<particle_name
+        filename<<path<<"/Photo"
+                <<"_particle_"<<particle_name
                 <<"_mass_"<<particle_->GetMass()
                 <<"_para_"<<parametrization_
                 <<"_med_"<<medium_->GetName()
