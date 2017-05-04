@@ -147,7 +147,7 @@ int main()
     int ctr=0;
     double avrg = 841764.74;
     sigma = 3060939.1;
-    Xlow = 105.65839;
+    Xlow = MMU;
     Xup = 10000000;
     double xhi,xlo;
     double rndtmp;

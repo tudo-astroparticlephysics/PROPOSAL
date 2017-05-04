@@ -18,13 +18,39 @@
 #include <boost/program_options.hpp>
 
 
+namespace ParametrizationType
+{
+    enum Enum
+    {
+        BremsKelnerKokoulinPetrukhin  = 11,
+        BremsAndreevBezrukovBugaev    = 12,
+        BremsPetrukhinShestakov       = 13,
+        BremsCompleteScreeningCase    = 14,
+
+        PhotoKokoulinShadowBezrukovSoft                = 31,
+        PhotoKokoulinShadowBezrukovHard                = -31,
+        PhotoRhodeShadowBezrukovSoft                   = 32,
+        PhotoRhodeShadowBezrukovHard                   = -32,
+        PhotoBezrukovBugaevShadowBezrukovSoft          = 33,
+        PhotoBezrukovBugaevShadowBezrukovHard          = -33,
+        PhotoZeusShadowBezrukovSoft                    = 34,
+        PhotoZeusShadowBezrukovHard                    = -34,
+        PhotoAbramowiczLevinLevyMaor91ShadowDutta      = 35,
+        PhotoAbramowiczLevinLevyMaor91ShadowButkevich  = -35,
+        PhotoAbramowiczLevinLevyMaor97ShadowDutta      = 36,
+        PhotoAbramowiczLevinLevyMaor97ShadowButkevich  = -36,
+        PhotoButkevichMikhailovShadowDutta             = 37,
+        PhotoButkevichMikhailovShadowButkevich         = -37,
+
+        EPairKelnerKokoulinPetrukhin  = 51,
+
+        IonizBetheBloch  = 71
+    };
+};
 
 /*! \class CrossSections CrossSections.h "CrossSections.h"
-    \brief This is a pure virtual class
+ *  \brief This is a pure virtual class
  */
-
-
-
 class CrossSections
 {
 
@@ -57,7 +83,7 @@ protected:
     //CrossSection multiplier
     double multiplier_;
 
-    int         parametrization_;
+    ParametrizationType::Enum  parametrization_;
 
     bool        lpm_effect_enabled_;
     bool        init_lpm_effect_;
@@ -165,7 +191,8 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    virtual void SetParametrization(int parametrization=1) = 0;
+    virtual void SetParametrization(
+        ParametrizationType::Enum parametrization = ParametrizationType::BremsKelnerKokoulinPetrukhin) = 0;
 
 //----------------------------------------------------------------------------//
 
@@ -237,7 +264,7 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    int GetParametrization() const
+    ParametrizationType::Enum GetParametrization() const
     {
         return parametrization_;
     }
@@ -260,8 +287,6 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    void SetShadow(int newshadow);
-//----------------------------------------------------------------------------//
 
     // destructor
 

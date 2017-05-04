@@ -106,11 +106,10 @@ int main()
 
     for(unsigned int i = 0; i<brems.size() ; i++)
     {
-        if(i<9) brems.at(i)->SetParametrization(1);
-        else if(i<18) brems.at(i)->SetParametrization(2);
-        else if(i<27) brems.at(i)->SetParametrization(3);
-        else if(i<36) brems.at(i)->SetParametrization(4);
-
+        if(i<9) brems.at(i)->SetParametrization(ParametrizationType::BremsKelnerKokoulinPetrukhin);
+        else if(i<18) brems.at(i)->SetParametrization(ParametrizationType::BremsAndreevBezrukovBugaev);
+        else if(i<27) brems.at(i)->SetParametrization(ParametrizationType::BremsPetrukhinShestakov);
+        else if(i<36) brems.at(i)->SetParametrization(ParametrizationType::BremsCompleteScreeningCase);
     }
 
     vector<TGraph*> graphs;
@@ -141,24 +140,26 @@ int main()
 
         switch (brems.at(i)->GetParametrization())
         {
-            case 1:
+            case ParametrizationType::BremsKelnerKokoulinPetrukhin:
                 graph_title<<", parametrization: Kelner-Kakoulin-Petrukhin";
                 graphs.at(i)->SetMarkerStyle(4);
                 break;
-            case 2:
+            case ParametrizationType::BremsAndreevBezrukovBugaev:
                 graph_title<<", parametrization: Andreev-Bezrukov-Bugaev";
                 graphs.at(i)->SetMarkerStyle(3);
                 break;
-            case 3:
+            case ParametrizationType::BremsPetrukhinShestakov:
                 graph_title<<", parametrization: Petrukhin-Shestakov";
                 graphs.at(i)->SetMarkerStyle(2);
                 break;
-            case 4:
+            case ParametrizationType::BremsCompleteScreeningCase:
                 graph_title<<", parametrization: Complete screening case";
                 graphs.at(i)->SetMarkerStyle(28);
                 break;
+            default:
+                log_fatal("Wrong BremsstrahlungParametrization Type '%i'."
+                    , brems.at(i)->GetParametrization());
         }
-
 
         graphs.at(i)->SetName(graph_name.str().c_str());
         graphs.at(i)->SetTitle(graph_title.str().c_str());
@@ -338,16 +339,16 @@ int main()
     {
         switch (brems.at(i)->GetParametrization())
         {
-            case 1:
+            case ParametrizationType::BremsKelnerKokoulinPetrukhin:
                 leg_entry<<"KKP";
                 break;
-            case 2:
+            case ParametrizationType::BremsAndreevBezrukovBugaev:
                 leg_entry<<"ABB";
                 break;
-            case 3:
+            case ParametrizationType::BremsPetrukhinShestakov:
                 leg_entry<<"PS";
                 break;
-            case 4:
+            case ParametrizationType::BremsCompleteScreeningCase:
                 leg_entry<<"CSC";
                 break;
             default:
@@ -681,7 +682,7 @@ int main()
         {
             switch (brems.at(i)->GetParametrization())
             {
-                case 1:
+                case ParametrizationType::BremsKelnerKokoulinPetrukhin:
                     hydrogen_para1_gr->Add(graphs.at(i),"P");
                     hydrogen_para1_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (hydrogen_para1_gr->GetListOfGraphs()->Capacity())
@@ -697,7 +698,7 @@ int main()
                             break;
                     }
                     break;
-                case 2:
+                case ParametrizationType::BremsAndreevBezrukovBugaev:
                     hydrogen_para2_gr->Add(graphs.at(i),"P");
                     hydrogen_para2_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (hydrogen_para2_gr->GetListOfGraphs()->Capacity())
@@ -713,7 +714,7 @@ int main()
                             break;
                     }
                     break;
-                case 3:
+                case ParametrizationType::BremsPetrukhinShestakov:
                     hydrogen_para3_gr->Add(graphs.at(i),"P");
                     hydrogen_para3_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (hydrogen_para3_gr->GetListOfGraphs()->Capacity())
@@ -729,7 +730,7 @@ int main()
                             break;
                     }
                     break;
-                case 4:
+                case ParametrizationType::BremsCompleteScreeningCase:
                     hydrogen_para4_gr->Add(graphs.at(i),"P");
                     hydrogen_para4_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (hydrogen_para4_gr->GetListOfGraphs()->Capacity())
@@ -745,6 +746,9 @@ int main()
                             break;
                     }
                     break;
+                default:
+                    log_fatal("Wrong BremsstrahlungParametrization Type '%i'."
+                        , brems.at(i)->GetParametrization());
             }
         }
 
@@ -752,7 +756,7 @@ int main()
         {
             switch (brems.at(i)->GetParametrization())
             {
-                case 1:
+                case ParametrizationType::BremsKelnerKokoulinPetrukhin:
                     water_para1_gr->Add(graphs.at(i),"P");
                     water_para1_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (water_para1_gr->GetListOfGraphs()->Capacity())
@@ -768,7 +772,7 @@ int main()
                             break;
                     }
                     break;
-                case 2:
+                case ParametrizationType::BremsAndreevBezrukovBugaev:
                     water_para2_gr->Add(graphs.at(i),"P");
                     water_para2_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (water_para2_gr->GetListOfGraphs()->Capacity())
@@ -784,7 +788,7 @@ int main()
                             break;
                     }
                     break;
-                case 3:
+                case ParametrizationType::BremsPetrukhinShestakov:
                     water_para3_gr->Add(graphs.at(i),"P");
                     water_para3_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (water_para3_gr->GetListOfGraphs()->Capacity())
@@ -800,7 +804,7 @@ int main()
                             break;
                     }
                     break;
-                case 4:
+                case ParametrizationType::BremsCompleteScreeningCase:
                     water_para4_gr->Add(graphs.at(i),"P");
                     water_para4_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (water_para4_gr->GetListOfGraphs()->Capacity())
@@ -816,6 +820,9 @@ int main()
                             break;
                     }
                     break;
+                default:
+                    log_fatal("Wrong BremsstrahlungParametrization Type '%i'."
+                        , brems.at(i)->GetParametrization());
             }
         }
 
@@ -823,7 +830,7 @@ int main()
         {
             switch (brems.at(i)->GetParametrization())
             {
-                case 1:
+                case ParametrizationType::BremsKelnerKokoulinPetrukhin:
                     uranium_para1_gr->Add(graphs.at(i),"P");
                     uranium_para1_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (uranium_para1_gr->GetListOfGraphs()->Capacity())
@@ -839,7 +846,7 @@ int main()
                             break;
                     }
                     break;
-                case 2:
+                case ParametrizationType::BremsAndreevBezrukovBugaev:
                     uranium_para2_gr->Add(graphs.at(i),"P");
                     uranium_para2_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (uranium_para2_gr->GetListOfGraphs()->Capacity())
@@ -855,7 +862,7 @@ int main()
                             break;
                     }
                     break;
-                case 3:
+                case ParametrizationType::BremsPetrukhinShestakov:
                     uranium_para3_gr->Add(graphs.at(i),"P");
                     uranium_para3_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (uranium_para3_gr->GetListOfGraphs()->Capacity())
@@ -871,7 +878,7 @@ int main()
                             break;
                     }
                     break;
-                case 4:
+                case ParametrizationType::BremsCompleteScreeningCase:
                     uranium_para4_gr->Add(graphs.at(i),"P");
                     uranium_para4_leg->AddEntry(graphs.at(i),brems.at(i)->GetParticle()->GetName().c_str(),"p");
                     switch (uranium_para4_gr->GetListOfGraphs()->Capacity())
@@ -887,6 +894,9 @@ int main()
                             break;
                     }
                     break;
+                default:
+                    log_fatal("Wrong BremsstrahlungParametrization Type '%i'."
+                        , brems.at(i)->GetParametrization());
             }
         }
     }
