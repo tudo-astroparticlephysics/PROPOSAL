@@ -23,7 +23,6 @@ namespace ParticleType
     enum Enum // NB: These match the PDG codes. Keep it that way!
     {
         unknown = 0,
-        Gamma = 22,
 
         EPlus = -11,
         EMinus = 11,
@@ -39,15 +38,17 @@ namespace ParticleType
         NuTauBar = -16,
 
         // TODO: Ist das Kunst, oder kann das weg?
-        // Pi0 = 111,
-        // PiPlus = 211,
-        // PiMinus = -211,
+        Gamma = 22,
+        
+        Pi0 = 111,
+        PiPlus = 211,
+        PiMinus = -211,
         // K0_Long = 130,
-        // KPlus = 321,
-        // KMinus = -321,
+        KPlus = 321,
+        KMinus = -321,
         // Neutron = 2112,
-        // PPlus = 2212,
-        // PMinus = -2212,
+        PPlus = 2212,
+        PMinus = -2212,
         // K0_Short = 310,
         // Eta = 221,
         // Lambda = 3122,

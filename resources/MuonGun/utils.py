@@ -104,8 +104,11 @@ def MMCFactory(radius=100000*I3Units.m, length=10*I3Units.m, seed=random.randint
 		jvm = c2j_icetray.I3JavaVM(jvmOpts)
 		return mmc_icetray.I3PropagatorServiceMMC(jvm,mmcOpts)
 	else:
-		from icecube import PROPOSAL_icetray
-		return PROPOSAL_icetray.I3PropagatorServicePROPOSAL(mmcOpts)
+		from icecube import PROPOSAL
+        return PROPOSAL.I3PropagatorServicePROPOSAL(
+            mediadef=mediadef,
+            cylinderRadius=radius,
+            cylinderHeight=length)
 
 def PropagatorMMC(tray, name, seed=random.randint(0, (1<<32) - 1)):
 	from icecube import c2j_icetray, mmc_icetray

@@ -97,8 +97,28 @@
     #define LTAU 290.3e-15
 #endif
 
-#ifndef MPI // pion mass (MeV)
+#ifndef MPI // charged pion mass (MeV)
     #define MPI 139.57018
+#endif
+
+#ifndef MPI0 // pion 0 mass (MeV)
+    #define MPI0 134.9766
+#endif
+
+#ifndef LPI // charged pion lifetime (sec)
+    #define LPI 2.6033e-8
+#endif
+
+#ifndef LPI0 // pion 0 lifetime (sec)
+    #define LPI0 8.52e-17
+#endif
+
+#ifndef MKAON // charged kaon mass (MeV)
+    #define MKAON 493.677
+#endif
+
+#ifndef LKAON // charged kaon lifetime (sec)
+    #define LKAON 1.2380
 #endif
 
 #ifndef MP // proton mass (MeV)
