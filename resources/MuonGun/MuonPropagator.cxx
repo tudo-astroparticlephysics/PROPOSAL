@@ -101,46 +101,47 @@ MuonPropagator::GetName(const I3Particle &p)
     return PROPOSALParticle::GetName(GetPROPOSALType(p.GetType()));
 }
 
-typedef std::map<int, I3Particle::ParticleType> particle_type_conversion_t;
+typedef std::map<ParticleType::Enum, I3Particle::ParticleType> particle_type_conversion_t;
 
 static const particle_type_conversion_t fromRDMCTable =
-boost::assign::list_of<std::pair<int, I3Particle::ParticleType> >
-(-100, I3Particle::unknown)
-(1, I3Particle::Gamma)
-(2, I3Particle::EPlus)
-(3, I3Particle::EMinus)
-(4, I3Particle::Nu)
-(5, I3Particle::MuPlus)
-(6, I3Particle::MuMinus)
-(7, I3Particle::Pi0)
-(8, I3Particle::PiPlus)
-(9, I3Particle::PiMinus)
-(11, I3Particle::KPlus)
-(12, I3Particle::KMinus)
-(14, I3Particle::PPlus)
-(15, I3Particle::PMinus)
-(33, I3Particle::TauPlus)
-(34, I3Particle::TauMinus)
-(41, I3Particle::Monopole)
-(201, I3Particle::NuE)
-(202, I3Particle::NuMu)
-(203, I3Particle::NuTau)
-(204, I3Particle::NuEBar)
-(205, I3Particle::NuMuBar)
-(206, I3Particle::NuTauBar)
-(1001, I3Particle::Brems)
-(1002, I3Particle::DeltaE)
-(1003, I3Particle::PairProd)
-(1004, I3Particle::NuclInt)
-(1005, I3Particle::MuPair)
-(1006, I3Particle::Hadrons);
+boost::assign::list_of<std::pair<ParticleType::Enum, I3Particle::ParticleType> >
+(ParticleType::EMinus, I3Particle::EPlus)
+(ParticleType::EMinus, I3Particle::EMinus)
+(ParticleType::MuPlus, I3Particle::MuPlus)
+(ParticleType::MuMinus, I3Particle::MuMinus)
+(ParticleType::TauPlus, I3Particle::TauPlus)
+(ParticleType::TauMinus, I3Particle::TauMinus)
+
+// (-100, I3Particle::unknown)
+(ParticleType::Gamma, I3Particle::Gamma)
+(ParticleType::Pi0, I3Particle::Pi0)
+(ParticleType::PiPlus, I3Particle::PiPlus)
+(ParticleType::PiMinus, I3Particle::PiMinus)
+(ParticleType::KPlus, I3Particle::KPlus)
+(ParticleType::KMinus, I3Particle::KMinus)
+(ParticleType::PPlus, I3Particle::PPlus)
+(ParticleType::PMinus, I3Particle::PMinus)
+
+(ParticleType::Monopole, I3Particle::Monopole)
+(ParticleType::NuE, I3Particle::NuE)
+(ParticleType::NuMu, I3Particle::NuMu)
+(ParticleType::NuTau, I3Particle::NuTau)
+(ParticleType::NuEBar, I3Particle::NuEBar)
+(ParticleType::NuMuBar, I3Particle::NuMuBar)
+(ParticleType::NuTauBar, I3Particle::NuTauBar)
+(ParticleType::Brems, I3Particle::Brems)
+(ParticleType::DeltaE, I3Particle::DeltaE)
+(ParticleType::PairProd, I3Particle::PairProd)
+(ParticleType::NuclInt, I3Particle::NuclInt)
+(ParticleType::MuPair, I3Particle::MuPair)
+(ParticleType::Hadrons, I3Particle::Hadrons);
 
 inline I3Particle
 to_I3Particle(const PROPOSALParticle *pp)
 {
 	I3Particle p;
 	particle_type_conversion_t::const_iterator it =
-	    fromRDMCTable.find(abs(pp->GetType()));
+	    fromRDMCTable.find(pp->GetType());
 	if (it == fromRDMCTable.end())
 		log_fatal("unknown RDMC code \"%i\" cannot be converted to a I3Particle::ParticleType.", pp->GetType());
 	else
