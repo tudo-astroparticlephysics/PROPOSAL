@@ -45,8 +45,10 @@ class NuGen(ipmodule.ParsingModule):
         self.AddParameter("RNGSeed","RNG seed",0)
         self.AddParameter("RNGStream","RNG stream number",0)
         self.AddParameter("RNGNumberOfStreams","Number of RNG streams",1)
-        self.AddParameter('bs','Bremsstrahlung Parametrization', ParametrizationType::BremsKelnerKokoulinPetrukhin)
-        self.AddParameter('ph','Photonuclear Parametrization', ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich)
+        self.AddParameter('bs','Bremsstrahlung Parametrization', 11)
+        self.AddParameter('ph','Photonuclear Parametrization', -36)
+        print(self.bs)
+        print(self.ph)
 
    def Execute(self,stats):
         if not ipmodule.ParsingModule.Execute(self,stats): return 0
@@ -138,8 +140,8 @@ class CorsikaGenerator(ipmodule.ParsingModule):
         self.AddParameter("CutoffType","Sets SPRIC=T (EnergyPerNucleon) or F (EnergyPerParticle) ","EnergyPerNucleon")
         self.AddParameter("RepoURL","URL of repository containing corsika tarballs","http://convey.icecube.wisc.edu/data/sim/sim-new/downloads")
 
-        self.AddParameter('bs','Bremsstrahlung Parametrization', ParametrizationType::BremsKelnerKokoulinPetrukhin)
-        self.AddParameter('ph','Photonuclear Parametrization', ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich)
+        self.AddParameter('bs','Bremsstrahlung Parametrization', 11)
+        self.AddParameter('ph','Photonuclear Parametrization', -36)
 
 
    def Execute(self,stats):
@@ -234,8 +236,8 @@ class MuonGunGenerator(ipmodule.ParsingModule):
         self.AddParameter('cthmin','Min theta of injected cosmic rays',0.0)
         self.AddParameter('cthmax','Max theta of injected cosmic rays',89.99)
 
-        self.AddParameter('bs','Bremsstrahlung Parametrization', ParametrizationType::BremsKelnerKokoulinPetrukhin)
-        self.AddParameter('ph','Photonuclear Parametrization', ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich)
+        self.AddParameter('bs','Bremsstrahlung Parametrization', PROPOSAL.CrossSectionParametrization.BremsKelnerKokoulinPetrukhin)
+        self.AddParameter('ph','Photonuclear Parametrization', PROPOSAL.CrossSectionParametrization.PhotoAbramowiczLevinLevyMaor97ShadowButkevich)
 
    def Execute(self,stats):
         if not ipmodule.ParsingModule.Execute(self,stats): return 0
@@ -322,8 +324,8 @@ def MakePropagator(
     particleType=dataclasses.I3Particle.ParticleType.MuMinus,
     impl='proposal',
     mediadef=None,
-    bs=ParametrizationType::BremsKelnerKokoulinPetrukhin,
-    ph=ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich
+    bs=PROPOSAL.CrossSectionParametrization.BremsKelnerKokoulinPetrukhin,
+    ph=PROPOSAL.CrossSectionParametrization.PhotoAbramowiczLevinLevyMaor97ShadowButkevich
     ):
         """
         Create a muon propagator service.
@@ -352,66 +354,65 @@ def MakePropagator(
             #  Below are the standard options.  To interpret them see the MMC docs.
 
             # redefine the new bremsstrahlung and photonuclear parametrization to the old one to use mmc
-            int bs_old, ph_old, bb_old, sh_old
 
-            if (bs == ParametrizationType::BremsKelnerKokoulinPetrukhin): bs_old = 1
-            elif (bs == ParametrizationType::BremsAndreevBezrukovBugaev):   bs_old = 2
-            elif (bs == ParametrizationType::BremsPetrukhinShestakov):      bs_old = 3
-            elif (bs == ParametrizationType::BremsCompleteScreeningCase):   bs_old = 4
+            if (bs == PROPOSAL.CrossSectionParametrization.BremsKelnerKokoulinPetrukhin): bs_old = 1
+            elif (bs == PROPOSAL.CrossSectionParametrization.BremsAndreevBezrukovBugaev):   bs_old = 2
+            elif (bs == PROPOSAL.CrossSectionParametrization.BremsPetrukhinShestakov):      bs_old = 3
+            elif (bs == PROPOSAL.CrossSectionParametrization.BremsCompleteScreeningCase):   bs_old = 4
 
-            if (ph == ParametrizationType::PhotoKokoulinShadowBezrukovSoft):
+            if (ph == PROPOSAL.CrossSectionParametrization.PhotoKokoulinShadowBezrukovSoft):
                 ph_old = 1
                 bb_old = 1
                 sh_old = 0
-            elif (ph == ParametrizationType::PhotoKokoulinShadowBezrukovHard):
+            elif (ph == PROPOSAL.CrossSectionParametrization.PhotoKokoulinShadowBezrukovHard):
                 ph_old = 2
                 bb_old = 1
                 sh_old = 0
-            elif (ph == ParametrizationType::PhotoRhodeShadowBezrukovSoft):
+            elif (ph == PROPOSAL.CrossSectionParametrization.PhotoRhodeShadowBezrukovSoft):
                 ph_old = 1
                 bb_old = 2
                 sh_old = 0
-            elif (ph == ParametrizationType::PhotoRhodeShadowBezrukovHard):
+            elif (ph == PROPOSAL.CrossSectionParametrization.PhotoRhodeShadowBezrukovHard):
                 ph_old = 2
                 bb_old = 2
                 sh_old = 0
-            elif (ph == ParametrizationType::PhotoBezrukovBugaevShadowBezrukovSoft):
+            elif (ph == POPOSAL.CrossSectionParametrization.PhotoBezrukovBugaevShadowBezrukovSoft):
                 ph_old = 1
                 bb_old = 3
                 sh_old = 0
-            elif (ph == ParametrizationType::PhotoBezrukovBugaevShadowBezrukovHard):
+            elif (ph == PROPOSAL.CrossSectionParametrization.PhotoBezrukovBugaevShadowBezrukovHard):
                 ph_old = 2
                 bb_old = 3
                 sh_old = 0
-            elif (ph == ParametrizationType::PhotoZeusShadowBezrukovSoft):
+            elif (ph == PROPOSAL.CrossSectionParametrization.PhotoZeusShadowBezrukovSoft):
                 ph_old = 1
                 bb_old = 4
                 sh_old = 0
-            elif (ph == ParametrizationType::PhotoZeusShadowBezrukovHard):
+            elif (ph == PROPOSAL.CrossSectionParametrization.PhotoZeusShadowBezrukovHard):
                 ph_old = 2
                 bb_old = 4
                 sh_old = 0
-            elif (ph == ParametrizationType::PhotoAbramowiczLevinLevyMaor91ShadowDutta):
+            elif (ph == PROPOSAL.CrossSectionParametrization.PhotoAbramowiczLevinLevyMaor91ShadowDutta):
                 ph_old = 3
                 bb_old = 1
                 sh_old = 1
-            elif (ph == ParametrizationType::PhotoAbramowiczLevinLevyMaor91ShadowButkevich):
+            elif (ph == PROPOSAL.CrossSectionParametrization.PhotoAbramowiczLevinLevyMaor91ShadowButkevich):
                 ph_old = 3
                 bb_old = 1
                 sh_old = 2
-            elif (ph == ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowDutta):
+            elif (ph == PROPOSAL.CrossSectionParametrization.PhotoAbramowiczLevinLevyMaor97ShadowDutta):
                 ph_old = 3
                 bb_old = 2
                 sh_old = 1
-            elif (ph == ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich):
+            elif (ph == PROPOSAL.CrossSectionParametrization.PhotoAbramowiczLevinLevyMaor97ShadowButkevich):
                 ph_old = 3
                 bb_old = 2
                 sh_old = 2
-            elif (ph == ParametrizationType::PhotoButkevichMikhailovShadowDutta):
+            elif (ph == PROPOSAL.CrossSectionParametrization.PhotoButkevichMikhailovShadowDutta):
                 ph_old = 4
                 bb_old = 1
                 sh_old = 1
-            elif (ph == ParametrizationType::PhotoButkevichMikhailovShadowButkevich):
+            elif (ph == PROPOSAL.CrossSectionParametrization.PhotoButkevichMikhailovShadowButkevich):
                 ph_old = 4
                 bb_old = 1
                 sh_old = 2
@@ -442,8 +443,8 @@ def MakePropagator(
                 cylinderRadius=radius,
                 cylinderHeight=length,
                 type=particleType,
-                bremsstrahlungParametrization=PROPOSAL.BremsstrahlungParametrization(bs),
-                photonuclearParametrization=PROPOSAL.PhotonuclearParametrization(ph)
+                bremsstrahlungParametrization=bs,
+                photonuclearParametrization=ph
                 )
         else:
             raise RuntimeError("unknown propagator: %s" % impl)
