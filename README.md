@@ -1,4 +1,6 @@
-# This is the restructured PROPOSAL Version 2, which should run in the IceCube Simulation.
+# PROPOSAL
+
+This is the restructured PROPOSAL Version 2, which should run in the IceCube Simulation.
 
 
 ## Installation
