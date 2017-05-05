@@ -1,37 +1,24 @@
-#eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee 
-e                                                                                              e 
-e      K#5z#zy   W#5z9#X,      zE9y    K#Xz#zW      XEEX      WGeGy      9yXK    EXG           e 
-e      Geeeeeeee eeeeeeeee  Weeeeeeee  eeeeeeeeD  eeeeeeee  ,eeeueeee   Weeee    eee           e 
-e      Xee   eee 9ee   Eee  eee    eee Dee   eee eee    eee Deee        ee eee   eee           e 
-e      Xeeeeeee  EeeeeeeX   eee    eee Deeeeeee  eee    eee   Weeeeez  eee  eey  eee           e 
-e      Xee,      9ee  eee,  eee   Weee Dee       eee    eee eee   eee  eeeeeeee  eee           e 
-e      eeee      eee9  eeeE  eeeeeeee  eeeD       eeeeeeee  KeeeeeeeW eee KuXeee eeeeeeee      e 
-e       uu        ,u     uz     uu      uK           uu        uWK    X      u z eeeeeeee      e
-e                                                                                              e 
+#eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
 e                                                                                              e
-e                                         5   Ku                  yKKy#K                       e 
-e                    ee ee                ee  ee                eeeeeee#                       e 
-e                   9ee eee               e9  ee                   eD                          e 
-e                   eey                   e9  ee                   eK                          e 
-e                    eeeee5               eeeEDee                  eW 9                        e 
-e                     ,ED                 e                        eee#                        e 
+e      K#5z#zy   W#5z9#X,      zE9y    K#Xz#zW      XEEX      WGeGy      9yXK    EXG           e
+e      Geeeeeeee eeeeeeeee  Weeeeeeee  eeeeeeeeD  eeeeeeee  ,eeeueeee   Weeee    eee           e
+e      Xee   eee 9ee   Eee  eee    eee Dee   eee eee    eee Deee        ee eee   eee           e
+e      Xeeeeeee  EeeeeeeX   eee    eee Deeeeeee  eee    eee   Weeeeez  eee  eey  eee           e
+e      Xee,      9ee  eee,  eee   Weee Dee       eee    eee eee   eee  eeeeeeee  eee           e
+e      eeee      eee9  eeeE  eeeeeeee  eeeD       eeeeeeee  KeeeeeeeW eee KuXeee eeeeeeee      e
+e       uu        ,u     uz     uu      uK           uu        uWK    X      u z eeeeeeee      e
+e                                                                                              e
+e                                                                                              e
+e                                         5   Ku                  yKKy#K                       e
+e                    ee ee                ee  ee                eeeeeee#                       e
+e                   9ee eee               e9  ee                   eD                          e
+e                   eey                   e9  ee                   eK                          e
+e                    eeeee5               eeeEDee                  eW 9                        e
+e                     ,ED                 e                        eee#                        e
 e                                         e                                                    e
-e                                                                                              e 
-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeze 
-                                                                                                 
-PROPOSAL was tested on Mac OS X V. 10.7.5, Ubuntu 12.04, SUSE Enterprise 10 and PCLinuxos. Since
-all these OS are UNIX based it should be fine to run and compile PROPOSAL on a UNIX based OS.
+e                                                                                              e
+eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeze
 
-Requirements:
-	- Boost Library 1.48 or higher
-	- log4cplus 1.1.0 or higher
-	- CMake 2.8 or higher	
-
-Recommended:
-	- Doxygen 	(For pdf and html documentation of the code)
-	- GTEST 	(To be sure not to break program code if you change something)
-	- ROOT		(This is highly recommended since there are lots of example plots
-			 and you are able to save the output in an root file.)
 
 -----How to Install:
 1. Make a directory where the whole project will be (e.g. "PROPOSAL")
@@ -62,9 +49,9 @@ When you encounter any errors or misunderstandings don't hesitate and write a ma
 	   used as include directory in directory /home/tomasz/PROPOSALUpgrade/PROPOSALsrc
 	   used as include directory in directory /home/tomasz/PROPOSALUpgrade/PROPOSALsrc
 	   used as include directory in directory /home/tomasz/PROPOSALUpgrade/PROPOSALsrc
-	
+
 	It seems that you have not installed boost or didn't set the include directory for it properly.
-	To install boost following 
+	To install boost following
 	e.g. http://www.linuxfromscratch.org/blfs/view/svn/general/boost.html	(02.Jan.2014)
 
 	-----------------------------------------------------
@@ -76,7 +63,7 @@ When you encounter any errors or misunderstandings don't hesitate and write a ma
 	   used as include directory in directory /home/tomasz/PROPOSALUpgrade/PROPOSALsrc
 	LOG4CPLUS_LIBRARY (ADVANCED)
 	    linked by target "PROPOSAL" in directory /home/tomasz/PROPOSALUpgrade/PROPOSALsrc
-	
+
 	It seems that you have not installed log4cplus or didn't set the directorys for it properly.
 	To install log4cplus use
 	e.g. http://sourceforge.net/projects/log4cplus/files/log4cplus-stable/1.1.1/	(02.Jan.2014)
@@ -92,5 +79,5 @@ When you encounter any errors or misunderstandings don't hesitate and write a ma
 
 
 
-	
+
 
