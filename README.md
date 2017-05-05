@@ -1,5 +1,19 @@
-# This is the restructured PROPOSAL Version 2, which should run in the IceCube Simulation.
+# PROPOSAL
 
+This is the restructured PROPOSAL Version 2, which should run in the IceCube Simulation.
+
+PROPOSAL was tested on Mac OS X V. 10.7.5, Ubuntu 12.04, SUSE Enterprise 10 and PCLinuxos. Since
+all these OS are UNIX based it should be fine to run and compile PROPOSAL on a UNIX based OS.
+
+## Requirements:
+	- Boost Library 1.48 or higher
+	- log4cplus 1.1.0 or higher
+	- CMake 2.8 or higher
+
+## Recommended:
+	- Doxygen 	(For pdf and html documentation of the code)
+	- GTEST 	(To be sure not to break program code if you change something)
+	- ROOT		(This is highly recommended since there are lots of example plots and you are able to save the output in an root file.)
 
 ## Installation
 
@@ -16,9 +30,8 @@ resources folder to other IceCube Simulation projects to provide compatibility:
 
 ---
 
-the three following files ave not been changed yet
+The three following files have not been changed yet:
 
-* `cp src/PROPOSAL/resources/MuonGun/propagate_muons.py src/MuonGun/resources/scripts/`
 
 * `cp src/PROPOSAL/resources/MuonGun/shower_and_propagate.py src/MuonGun/resources/scripts/`
 
@@ -27,8 +40,9 @@ the three following files ave not been changed yet
 Further install instruction are found in [install](INSTALL.txt).
 
 ## Authors:
-*Mario Dunsch* and *Jan Soedingrekso*
 
-Former Developer and Maintainer:
+*Mario Dunsch*, *Jan Soedingrekso*
 
-*Jan-Hendrick Koehne* and *Tomasz Fuchs*
+## Former Developer and Maintainer:
+
+*Jan-Hendrick Koehne*, *Tomasz Fuchs*
