@@ -112,8 +112,8 @@ def make_propagator(
         particle_type=icecube.dataclasses.I3Particle.ParticleType.MuMinus,
         cylinder_radius=800.,
         cylinder_length=1600.,
-        bremsstrahlung="KelnerKokoulinPetrukhin",
-        photonuclear="AbramowiczLevinLevyMaor97ShadowButkevich"
+        bremsstrahlung="BremsKelnerKokoulinPetrukhin",
+        photonuclear="PhotoAbramowiczLevinLevyMaor97ShadowButkevich"
         ):
     """Create a muon propagator service.
 
@@ -136,20 +136,20 @@ def make_propagator(
         Nuclear shadowing parametrization to use
 
     """
-    if not hasattr(icecube.PROPOSAL.BremsstrahlungParametrization,
+    if not hasattr(icecube.PROPOSAL.CrossSectionParametrization,
                    bremsstrahlung):
-        bremsstrahlung = "KelnerKokoulinPetrukhin"
+        bremsstrahlung = "BremsKelnerKokoulinPetrukhin"
 
     bremsstrahlung_parametrization = getattr(
-        icecube.PROPOSAL.BremsstrahlungParametrization,
+        icecube.PROPOSAL.CrossSectionParametrization,
         bremsstrahlung)
 
-    if not hasattr(icecube.PROPOSAL.PhotonuclearParametrization,
+    if not hasattr(icecube.PROPOSAL.CrossSectionParametrization,
                    photonuclear):
-        photonuclear = "AbramowiczLevinLevyMaor97ShadowButkevich"
+        photonuclear = "PhotoAbramowiczLevinLevyMaor97ShadowButkevich"
 
     photonuclear_parametrization = getattr(
-        icecube.PROPOSAL.PhotonuclearParametrization,
+        icecube.PROPOSAL.CrossSectionParametrization,
         photonuclear)
 
 
