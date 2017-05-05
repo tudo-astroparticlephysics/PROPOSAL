@@ -660,7 +660,12 @@ void PROPOSALParticle::InitParticle(ParticleType::Enum type){
             lifetime_   =   0;
             break;
         case ParticleType::EPair:
-            name_ = "Epair";
+            name_ = "EPair";
+            mass_       =   0;
+            lifetime_   =   0;
+            break;
+        case ParticleType::MuPair:
+            name_ = "MuPair";
             mass_       =   0;
             lifetime_   =   0;
             break;
@@ -670,7 +675,56 @@ void PROPOSALParticle::InitParticle(ParticleType::Enum type){
             lifetime_   =   -1;
             charge_     =   CMON;
             break;
+        case ParticleType::Gamma:
+            name_ = "Gamma";
+            mass_       =   0;
+            lifetime_   =   -1;
+            charge_     =   0;
+            break;
+        case ParticleType::Pi0:
+            name_ = "Pi0";
+            mass_       =   MPI0;
+            lifetime_   =   LPI0;
+            charge_     =   0;
+            break;
+        case ParticleType::PiPlus:
+            name_ = "PiPlus";
+            mass_       =   MPI;
+            lifetime_   =   LPI;
+            charge_     =   1;
+            break;
+        case ParticleType::PiMinus:
+            name_ = "PiMinus";
+            mass_       =   MPI;
+            lifetime_   =   LPI;
+            charge_     =   -1;
+            break;
+        case ParticleType::KPlus:
+            name_ = "KPlus";
+            mass_       =   MKAON;
+            lifetime_   =   LKAON;
+            charge_     =   1;
+            break;
+        case ParticleType::KMinus:
+            name_ = "KMinus";
+            mass_       =   MKAON;
+            lifetime_   =   LKAON;
+            charge_     =   -1;
+            break;
+        case ParticleType::PPlus:
+            name_ = "PPlus";
+            mass_       =   MP;
+            lifetime_   =   -1;
+            charge_     =   1;
+            break;
+        case ParticleType::PMinus:
+            name_ = "PMinus";
+            mass_       =   MP;
+            lifetime_   =   -1;
+            charge_     =   -1;
+            break;
         default:
+            log_warn("The particle type '%i' is set to Unknown!", type);
             type = ParticleType::unknown;
             name_ = "Unkown";
             mass_ = 0;
