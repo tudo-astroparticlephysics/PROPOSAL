@@ -36,7 +36,7 @@ params = [
         pyPROPOSAL.ParametrizationType.PhotoKokoulinShadowBezrukovHard,
         pyPROPOSAL.ParametrizationType.PhotoRhodeShadowBezrukovHard,
         pyPROPOSAL.ParametrizationType.PhotoBezrukovBugaevShadowBezrukovHard,
-        pyPROPOSAL.ParametrizationType.PhotoZeusShadowBezrukovHard
+        pyPROPOSAL.ParametrizationType.PhotoZeusShadowBezrukovHard,
 ]
 
 for param in params:
@@ -79,7 +79,7 @@ for dEdx, param in zip(dEdx_photo, params):
     )
 
 ax.set_xlabel(r'$E$ / MeV')
-ax.set_ylabel(r'energyloss per energy / $\rm{g}^-1 \rm{cm}^2$')
+ax.set_ylabel(r'energyloss per energy / $\rm{g}^{-1} \rm{cm}^2$')
 
 ax.legend(loc='best')
 

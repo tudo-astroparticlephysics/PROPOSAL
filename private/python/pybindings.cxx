@@ -193,7 +193,7 @@ struct PairFromPythonList
                             boost::python::type_id<std::pair<T1, T2> >());
     }
 
-    // Determine if obj_ptr can be converted in a std::vector<T>
+    // Determine if obj_ptr can be converted in a std::pair
     static void* convertible(PyObject* obj_ptr)
     {
         if (!PyList_Check(obj_ptr))
@@ -204,17 +204,17 @@ struct PairFromPythonList
         return obj_ptr;
     }
 
-    // Convert obj_ptr into a std::vector<T>
+    // Convert obj_ptr into a std::pair<T>
     static void construct(PyObject* obj_ptr, boost::python::converter::rvalue_from_python_stage1_data* data)
     {
         // Use borrowed to construct the object so that a reference
         // count will be properly handled.
         boost::python::list python_list(boost::python::handle<>(boost::python::borrowed(obj_ptr)));
 
-        // Grab pointer to memory into which to construct the new std::vector<T>
+        // Grab pointer to memory into which to construct the new std::pair<T1, T2>
         void* storage = reinterpret_cast<boost::python::converter::rvalue_from_python_storage<std::pair<T1, T2> >*>(data)->storage.bytes;
 
-        // in-place construct the new std::vector<T> using the character data
+        // in-place construct the new std::pair<T1, T2> using the character data
         // extraced from the python object
         std::pair<T1, T2>& p = *(new (storage) std::pair<T1, T2>());
 
@@ -317,6 +317,8 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
         .value("PhotoAbramowiczLevinLevyMaor91ShadowButkevich", ParametrizationType::PhotoAbramowiczLevinLevyMaor91ShadowButkevich)
         .value("PhotoAbramowiczLevinLevyMaor97ShadowDutta",     ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowDutta)
         .value("PhotoAbramowiczLevinLevyMaor97ShadowButkevich", ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich)
+        .value("PhotoRenoSarcevicSuShadowDutta",                ParametrizationType::PhotoRenoSarcevicSuShadowDutta)
+        .value("PhotoRenoSarcevicSuShadowButkevich",            ParametrizationType::PhotoRenoSarcevicSuShadowButkevich)
         .value("EPairKelnerKokoulinPetrukhin",                  ParametrizationType::EPairKelnerKokoulinPetrukhin)
         .value("IonizBetheBloch",                               ParametrizationType::IonizBetheBloch)
     ;

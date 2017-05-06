@@ -68,9 +68,10 @@ protected:
     double ALLM91Parametrization(double v, int i);
     double ALLM97Parametrization(double v, int i);
     double ButkevichMikhailovParametrization(double v, int i);
+    double RSS_ALLM97Parametrization(double v, int i);
 
     double ParametrizationOfRealPhotonAssumption(double v, int i, double sgn);
-    
+
     double ShadowEffect(double x , double nu);
     double ShadowBezrukovBugaev(double sgn, double atomic_number);
 
@@ -88,6 +89,7 @@ protected:
     double FunctionToIntegralALLM91(double Q2);
     double FunctionToIntegralALLM97(double Q2);
     double FunctionToIntegralButMik(double Q2);
+    double FunctionToIntegralRSS(double Q2);
 
 
 //----------------------------------------------------------------------------//
