@@ -82,7 +82,7 @@ ENDIF(ROOT_FOUND)
 
 
 #################################################################
-#################           log4cpp     #########################
+#################           log4cplus     #######################
 #################################################################
 
 INCLUDE(resources/FindLog4cplus.cmake)
@@ -164,7 +164,10 @@ EXECUTE_PROCESS(COMMAND ln -s ${CMAKE_SOURCE_DIR}/resources ${CMAKE_BINARY_DIR}/
 ADD_EXECUTABLE(WriteSectorsFromDomList
         private/test/WriteSectorsFromDomList.cxx
 )
+
 TARGET_LINK_LIBRARIES(WriteSectorsFromDomList PROPOSAL)
+
+INSTALL(TARGETS PROPOSAL DESTINATION lib)
 
 #################################################################
 #################           Tests        ########################
@@ -242,7 +245,8 @@ IF(ADD_PYTHON)
 	IF(PYTHONLIBS_FOUND)
 		ADD_LIBRARY(pyPROPOSAL SHARED private/python/pybindings.cxx)
 		SET_TARGET_PROPERTIES(pyPROPOSAL PROPERTIES PREFIX "" COMPILE_FLAGS "${CMAKE_CXX_FLAGS}")
-		TARGET_LINK_LIBRARIES (pyPROPOSAL boost_python ${PYTHON_LIBRARIES} ${Boost_LIBRARIES} PROPOSAL)
+		TARGET_LINK_LIBRARIES(pyPROPOSAL boost_python ${PYTHON_LIBRARIES} ${Boost_LIBRARIES} PROPOSAL)
+		INSTALL(TARGETS pyPROPOSAL DESTINATION lib)
 	ENDIF(PYTHONLIBS_FOUND)
 ENDIF(ADD_PYTHON)
 
