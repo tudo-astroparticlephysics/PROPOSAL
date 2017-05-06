@@ -1,24 +1,3 @@
-	eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
-	e                                                                                              e
-	e      K#5z#zy   W#5z9#X,      zE9y    K#Xz#zW      XEEX      WGeGy      9yXK    EXG           e
-	e      Geeeeeeee eeeeeeeee  Weeeeeeee  eeeeeeeeD  eeeeeeee  ,eeeueeee   Weeee    eee           e
-	e      Xee   eee 9ee   Eee  eee    eee Dee   eee eee    eee Deee        ee eee   eee           e
-	e      Xeeeeeee  EeeeeeeX   eee    eee Deeeeeee  eee    eee   Weeeeez  eee  eey  eee           e
-	e      Xee,      9ee  eee,  eee   Weee Dee       eee    eee eee   eee  eeeeeeee  eee           e
-	e      eeee      eee9  eeeE  eeeeeeee  eeeD       eeeeeeee  KeeeeeeeW eee KuXeee eeeeeeee      e
-	e       uu        ,u     uz     uu      uK           uu        uWK    X      u z eeeeeeee      e
-	e                                                                                              e
-	e                                                                                              e
-	e                                         5   Ku                  yKKy#K                       e
-	e                    ee ee                ee  ee                eeeeeee#                       e
-	e                   9ee eee               e9  ee                   eD                          e
-	e                   eey                   e9  ee                   eK                          e
-	e                    eeeee5               eeeEDee                  eW 9                        e
-	e                     ,ED                 e                        eee#                        e
-	e                                         e                                                    e
-	e                                                                                              e
-	eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeze
-
 
 1.	The distribution of PROPOSAL in any form is not allowed except from hosts or persons where
 	the distribution was explicitly granted.
