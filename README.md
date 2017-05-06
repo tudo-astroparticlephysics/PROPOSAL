@@ -43,19 +43,19 @@ all these OS are UNIX based it should be fine to run and compile PROPOSAL on a U
 
 ## Installation ##
 
-#### Standalone ####
+### Standalone ###
 
 Install instruction for the standalone installation
 are found in [install](INSTALL.md).
 
 ---
 
-#### IceSim ####
+### IceSim ###
 
 Before installation of icesim, one should copy some files from the
 resources folder to other IceCube Simulation projects to provide compatibility:
 
-```bash
+```sh
 cp src/PROPOSAL/resources/MuonGun/MuonPropagator.* src/MuonGun/private/MuonGun/
 cp src/PROPOSAL/resources/simprod-scripts/PropagateMuons.py src/simprod-scripts/python/segments/
 cp src/PROPOSAL/resources/simprod-scripts/PropagateMuons.py src/simprod-scripts/python/segments/
