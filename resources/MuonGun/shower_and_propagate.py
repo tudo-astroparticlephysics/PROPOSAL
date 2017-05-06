@@ -57,8 +57,10 @@ def MMCFactory(length=10*I3Units.m, seed=12345, impl='mmc', mediadef=expandvars(
 		jvm = c2j_icetray.I3JavaVM(jvmOpts)
 		return mmc_icetray.I3PropagatorServiceMMC(jvm,mmcOpts)
 	else:
-		from icecube import PROPOSAL_icetray
-		return PROPOSAL_icetray.I3PropagatorServicePROPOSAL(mmcOpts)
+		from icecube import PROPOSAL
+		return PROPOSAL.I3PropagatorServicePROPOSAL(
+                mediadef=mediadef,
+                cylinderHeight=length)
 
 CORSIKA_CONFIG =\
 """
