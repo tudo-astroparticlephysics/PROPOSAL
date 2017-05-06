@@ -1271,6 +1271,45 @@ double Photonuclear::ButkevichMikhailovParametrization(double v, int i)
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
+
+
+double Photonuclear::RSS_ALLM97Parametrization(double v, int i)
+{
+    if(do_photo_interpolation_)
+    {
+        SetIntegralLimits(i);
+        if(v >= vUp_)
+        {
+            return max(photo_interpolant_.at(i)->Interpolate(particle_->GetEnergy(), log(v/vUp_)/log(vMax_/vUp_)), 0.0);
+        }
+    }
+
+    double aux, min, max;
+
+    component_ =   i;
+    v_         =   v;
+    min        =   particle_->GetMass()*v;
+    min        *=  min/(1-v);
+
+    if(particle_->GetMass() < MPI)
+    {
+        aux     =   particle_->GetMass()*particle_->GetMass()/particle_->GetEnergy();
+        min     -=  (aux*aux)/(2*(1-v));
+    }
+
+    max =   2*medium_->GetAverageNucleonWeight().at(i)*particle_->GetEnergy()*(v-vMin_);
+
+    if(min>max)
+    {
+        return 0;
+    }
+
+    return medium_->GetMolDensity()*medium_->GetAtomInMolecule().at(i)*particle_->GetCharge()*particle_->GetCharge()*integral_->Integrate(min, max, boost::bind(&Photonuclear::FunctionToIntegralRSS, this, _1),4);
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
 //----------------------Cross section / limit / private-----------------------//
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
@@ -1402,6 +1441,10 @@ double Photonuclear::PhotoN(double v, int i)
             return ButkevichMikhailovParametrization(v, i);
         case ParametrizationType::PhotoButkevichMikhailovShadowButkevich:
             return ButkevichMikhailovParametrization(v, i);
+        case ParametrizationType::PhotoRenoSarcevicSuShadowDutta:
+            return RSS_ALLM97Parametrization(v, i);
+        case ParametrizationType::PhotoRenoSarcevicSuShadowButkevich:
+            return RSS_ALLM97Parametrization(v, i);
         default:
             log_fatal("The photonuclear parametrization_ '%i' is not supported! Be careful 0 is returned",parametrization_);
             return 0;
@@ -2054,6 +2097,141 @@ double Photonuclear::FunctionToIntegralButMik(double Q2)
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
+
+
+double Photonuclear::FunctionToIntegralRSS(double Q2)
+{
+    //TODO(mario): Remove definition here Di 2016/10/25
+    // double x, aux, nu, G, F2, R2;
+    double x, aux, nu;
+
+    nu  =   v_*particle_->GetEnergy();
+    x   =   Q2/(2*medium_->GetAverageNucleonWeight().at(component_)*nu);
+
+    // -------------[ Evaluate shadowfactor ]---------------- //
+
+    double a;
+
+    if(medium_->GetNucCharge().at(component_)==1)
+    {
+        a   =   1;
+    }
+    else
+    {
+        a = ShadowEffect(x , nu);
+    }
+
+    double P;
+
+    aux =   x*x;
+    P   =   1 - 1.85*x + 2.45*aux - 2.35*aux*x + aux*aux;
+    // G   *=  (medium_->GetNucCharge().at(component_) + (medium_->GetAtomicNum().at(component_) - medium_->GetNucCharge().at(component_))*P);
+
+    // ---------[ Evaluate ALLM form factor F_2 ]------------ //
+    //
+    // F_2 = c_i(t) * x_i^{a_i(t)} * (1 - x)^{b_i(t)}; i = P,R
+    // ------------------------------------------------------ //
+
+    double cp1, cp2, cp3;
+    double cr1, cr2, cr3;
+
+    double ap1, ap2, ap3;
+    double ar1, ar2, ar3;
+
+    double bp1, bp2, bp3;
+    double br1, br2, br3;
+
+    double m2o, m2r, L2, m2p, Q2o;
+
+    cp1     =   0.28067;
+    cp2     =   0.22291;
+    cp3     =   2.1979;
+
+    cr1     =   0.80107;
+    cr2     =   0.97307;
+    cr3     =   3.4942;
+
+    ap1     =   -0.0808;
+    ap2     =   -0.44812;
+    ap3     =   1.1709;
+
+    ar1     =   0.58400;
+    ar2     =   0.37888;
+    ar3     =   2.6063;
+
+    bp1     =   0.60243;
+    bp2     =   1.3754;
+    bp3     =   1.8439;
+
+    br1     =   0.10711;
+    br2     =   1.9386;
+    br3     =   0.49338;
+
+    m2o     =   0.31985;
+    m2r     =   0.15052;
+    L2      =   0.06527;
+    m2p     =   49.457;
+    Q2o     =   0.46017;
+
+
+    // GeV -> MeV conversion
+    m2o     *=  1e6;
+    m2r     *=  1e6;
+    L2      *=  1e6;
+    m2p     *=  1e6;
+    Q2o     *=  1e6;
+
+    // these values are corrected according to the file f2allm.f from Halina Abramowicz
+    bp1     *=  bp1;
+    bp2     *=  bp2;
+    br1     *=  br1;
+    br2     *=  br2;
+    Q2o     +=  L2;
+
+    // R(x, Q^2) is approximated to 0
+    const double R = 0;
+
+    double cr, ar, cp, ap, br, bp, t;
+
+    t   =   log(log((Q2 + Q2o)/L2)/log(Q2o/L2));
+
+    if(t<0)
+    {
+        t=0;
+    }
+
+    cr  =   cr1 + cr2*pow(t, cr3);
+    ar  =   ar1 + ar2*pow(t, ar3);
+    cp  =   cp1 + (cp1 - cp2)*(1/(1 + pow(t, cp3)) - 1);
+    ap  =   ap1 + (ap1 - ap2)*(1/(1 + pow(t, ap3)) - 1);
+    br  =   br1 + br2*pow(t, br3);
+    bp  =   bp1 + bp2*pow(t, bp3);
+
+    double xp, xr, F2p, F2A, F2P, F2R, W2;
+
+    W2  =   medium_->GetAverageNucleonWeight().at(component_)*medium_->GetAverageNucleonWeight().at(component_)
+            - Q2 + 2*medium_->GetAverageNucleonWeight().at(component_)*particle_->GetEnergy()*v_;
+    xp  =   (Q2 + m2p)/(Q2 + m2p + W2 - medium_->GetAverageNucleonWeight().at(component_)*medium_->GetAverageNucleonWeight().at(component_));
+    xr  =   (Q2 + m2r)/(Q2 + m2r + W2 - medium_->GetAverageNucleonWeight().at(component_)*medium_->GetAverageNucleonWeight().at(component_));
+    F2P =   cp*pow(xp, ap)*pow(1 - x, bp);
+    F2R =   cr*pow(xr, ar)*pow(1 - x, br);
+    F2p =   (Q2/(Q2 + m2o))*(F2P + F2R);
+    F2A =   a*(medium_->GetNucCharge().at(component_) + (medium_->GetAtomicNum().at(component_) - medium_->GetNucCharge().at(component_))) *P*F2p;
+
+    // ---------[ Write together cross section ]------------- //
+
+    aux =   ME*RE/Q2;
+    aux *=  aux*(1 - v_ + 0.25*v_*v_ -
+                (1 + 4*particle_->GetMass()*particle_->GetMass()/Q2)*0.25*v_*v_ *
+                (1 + 4*medium_->GetAverageNucleonWeight().at(component_)*medium_->GetAverageNucleonWeight().at(component_)*x*x/Q2) /
+                (1 + R));
+                 // *v_*v_*(1 + 4*medium_->GetAverageNucleonWeight().at(component_)*medium_->GetAverageNucleonWeight().at(component_)*x*x/Q2)/R2);
+
+    return (4*PI*F2A/v_)*aux;
+}
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
 //---------------------------------Setter-------------------------------------//
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
@@ -2103,6 +2281,12 @@ void Photonuclear::SetParametrization(ParametrizationType::Enum parametrization)
             shadow_                 =   ShadowingType::Dutta;
             break;
         case ParametrizationType::PhotoButkevichMikhailovShadowButkevich:
+            shadow_                 =   ShadowingType::ButkevichMikhailov;
+            break;
+        case ParametrizationType::PhotoRenoSarcevicSuShadowDutta:
+            shadow_                 =   ShadowingType::Dutta;
+            break;
+        case ParametrizationType::PhotoRenoSarcevicSuShadowButkevich:
             shadow_                 =   ShadowingType::ButkevichMikhailov;
             break;
         default:
