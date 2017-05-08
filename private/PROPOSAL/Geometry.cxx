@@ -22,7 +22,7 @@ using namespace std;
 //----------------------------------------------------------------------------//
 
 
-void Geometry::InitBox(double x0, double y0, double z0, double x, double y, double z)
+Geometry* Geometry::InitBox(double x0, double y0, double z0, double x, double y, double z)
 {
     x0_     =   100*x0;
     y0_     =   100*y0;
@@ -33,13 +33,14 @@ void Geometry::InitBox(double x0, double y0, double z0, double x, double y, doub
     z_      =   100*z;
 
     object_ =   "box";
+    return this;
 }
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
 
-void Geometry::InitSphere(double x0, double y0, double z0, double radius, double inner_radius)
+Geometry* Geometry::InitSphere(double x0, double y0, double z0, double radius, double inner_radius)
 {
     x0_     =   100*x0;
     y0_     =   100*y0;
@@ -58,6 +59,7 @@ void Geometry::InitSphere(double x0, double y0, double z0, double radius, double
         log_error("Warning: Inner radius %f == radius %f (Volume is 0)",inner_radius_,radius_);
     }
     object_ =   "sphere";
+    return this;
 }
 
 
@@ -65,7 +67,7 @@ void Geometry::InitSphere(double x0, double y0, double z0, double radius, double
 //----------------------------------------------------------------------------//
 
 
-void Geometry::InitCylinder(double x0, double y0, double z0, double radius, double inner_radius, double z)
+Geometry* Geometry::InitCylinder(double x0, double y0, double z0, double radius, double inner_radius, double z)
 {
     x0_     =   100*x0;
     y0_     =   100*y0;
@@ -87,6 +89,7 @@ void Geometry::InitCylinder(double x0, double y0, double z0, double radius, doub
     z_      =   100*z;
 
     object_ =   "cylinder";
+    return this;
 }
 
 

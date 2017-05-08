@@ -117,15 +117,15 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    void InitBox(double x0, double y0, double z0, double x, double y, double z);
+    Geometry* InitBox(double x0, double y0, double z0, double x, double y, double z);
 
 //----------------------------------------------------------------------------//
 
-    void InitSphere(double x0, double y0, double z0, double radius, double inner_radius);
+    Geometry* InitSphere(double x0, double y0, double z0, double radius, double inner_radius);
 
 //----------------------------------------------------------------------------//
 
-    void InitCylinder(double x0, double y0, double z0, double radius, double inner_radius, double z);
+    Geometry* InitCylinder(double x0, double y0, double z0, double radius, double inner_radius, double z);
 
 //----------------------------------------------------------------------------//
 
