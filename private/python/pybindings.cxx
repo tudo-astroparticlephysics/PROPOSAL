@@ -483,6 +483,20 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
              arg("integrate") = false,
              arg("scattering_model") = 0
             )))
+        .def(init<
+             ParticleType::Enum,
+             std::string,
+             bool,
+             bool,
+             bool,
+             int>(
+            (arg("particle_type"),
+             arg("path_to_tables") = "",
+             arg("exact_time") = true,
+             arg("lpm") = true,
+             arg("integrate") = false,
+             arg("scattering_model") = 0
+            )))
         .def(init<const Propagator&>())
 
         .def("propagate", &Propagator::propagate, (arg("max_distance_cm") = 1e20))
@@ -490,15 +504,15 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
         .def("reset_particle", &Propagator::ResetParticle)
 
         // .add_property("particle", &Propagator::SetParticle)
-        .add_property("particle", make_function(&Propagator::GetParticle, return_value_policy<reference_existing_object>()), &Propagator::SetParticle)
+        .add_property("particle", make_function(&Propagator::GetParticle, return_internal_reference<>()), &Propagator::SetParticle)
         .add_property("seed",&Propagator::GetSeed ,&Propagator::SetSeed)
         .add_property("brems",&Propagator::GetBrems ,&Propagator::SetBrems)
         .add_property("photo",&Propagator::GetPhoto ,&Propagator::SetPhoto)
         .add_property("path_to_tables",&Propagator::GetPath_to_tables ,&Propagator::SetPath_to_tables)
         .add_property("stopping_decay",&Propagator::GetStopping_decay ,&Propagator::SetStopping_decay)
-        .add_property("current_collection",make_function(&Propagator::GetCurrentCollection, return_value_policy<reference_existing_object>()))
+        .add_property("current_collection",make_function(&Propagator::GetCurrentCollection, return_internal_reference<>()))
         .add_property("collections",&Propagator::GetCollections, &Propagator::SetCollections)
-        .add_property("detector", make_function(&Propagator::GetDetector, return_value_policy<reference_existing_object>()), &Propagator::SetDetector)
+        .add_property("detector", make_function(&Propagator::GetDetector, return_internal_reference<>()), &Propagator::SetDetector)
     ;
 
     // --------------------------------------------------------------------- //
@@ -513,11 +527,11 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
         .def(self_ns::str(self_ns::self))
         .def(self_ns::repr(self_ns::self))
 
-        .add_property("cut_setting", make_function(&CrossSections::GetEnergyCutSettings, return_value_policy<reference_existing_object>()), &CrossSections::SetEnergyCutSettings)
-        .add_property("medium", make_function(&CrossSections::GetMedium, return_value_policy<reference_existing_object>()), &CrossSections::SetMedium)
+        .add_property("cut_setting", make_function(&CrossSections::GetEnergyCutSettings, return_internal_reference<>()), &CrossSections::SetEnergyCutSettings)
+        .add_property("medium", make_function(&CrossSections::GetMedium, return_internal_reference<>()), &CrossSections::SetMedium)
         .add_property("parametrization", &CrossSections::GetParametrization, &CrossSections::SetParametrization)
         .add_property("name", &CrossSections::GetName)
-        .add_property("particle", make_function(&CrossSections::GetParticle, return_value_policy<reference_existing_object>()))
+        .add_property("particle", make_function(&CrossSections::GetParticle, return_internal_reference<>()))
 
         .def("calculate_dEdx", &CrossSections::CalculatedEdx, "Calculates dE/dx")
         .def("calculate_dNdx", CalculatedNdx, "Calculates dN/dx")
@@ -558,11 +572,11 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
         .def(self_ns::repr(self_ns::self))
 
         .add_property("cross_sections", &ProcessCollection::GetCrosssections, &ProcessCollection::SetCrosssections)
-        .add_property("cut_setting", make_function(&ProcessCollection::GetCutSettings, return_value_policy<reference_existing_object>()), &ProcessCollection::SetCutSettings)
+        .add_property("cut_setting", make_function(&ProcessCollection::GetCutSettings, return_internal_reference<>()), &ProcessCollection::SetCutSettings)
         .add_property("lpm_effect", &ProcessCollection::GetLpmEffectEnabled, &ProcessCollection::SetLpmEffectEnabled)
-        .add_property("medium", make_function(&ProcessCollection::GetMedium, return_value_policy<reference_existing_object>()), &ProcessCollection::SetMedium)
-        .add_property("geometry", make_function(&ProcessCollection::GetGeometry, return_value_policy<reference_existing_object>()), &ProcessCollection::SetGeometry)
-        .add_property("particle", make_function(&ProcessCollection::GetParticle, return_value_policy<reference_existing_object>()), &ProcessCollection::SetParticle)
+        .add_property("medium", make_function(&ProcessCollection::GetMedium, return_internal_reference<>()), &ProcessCollection::SetMedium)
+        .add_property("geometry", make_function(&ProcessCollection::GetGeometry, return_internal_reference<>()), &ProcessCollection::SetGeometry)
+        .add_property("particle", make_function(&ProcessCollection::GetParticle, return_internal_reference<>()), &ProcessCollection::SetParticle)
         .add_property("location", &ProcessCollection::GetLocation, &ProcessCollection::SetLocation)
         .add_property("density_correction", &ProcessCollection::GetDensityCorrection, &ProcessCollection::SetDensityCorrection)
         .add_property("enable_randomization", &ProcessCollection::GetEnableRandomization, &ProcessCollection::SetEnableRandomization)
@@ -579,7 +593,7 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
         .def(self_ns::str(self_ns::self))
         .def(self_ns::repr(self_ns::self))
 
-        .def("init_box", &Geometry::InitBox, "All units in [m]", (
+        .def("init_box", &Geometry::InitBox, return_internal_reference<>(), "All units in [m]", (
             arg("x0"),
             arg("y0"),
             arg("z0"),
@@ -587,14 +601,14 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
             arg("y"),
             arg("z")
         ))
-        .def("init_sphere", &Geometry::InitSphere, "All units in [m]", (
+        .def("init_sphere", &Geometry::InitSphere, return_internal_reference<>(), "All units in [m]", (
             arg("x0"),
             arg("y0"),
             arg("z0"),
             arg("radius"),
             arg("inner_radius")
         ))
-        .def("init_cylinder", &Geometry::InitCylinder, "All units in [m]", (
+        .def("init_cylinder", &Geometry::InitCylinder, return_internal_reference<>(), "All units in [m]", (
             arg("x0"),
             arg("y0"),
             arg("z0"),

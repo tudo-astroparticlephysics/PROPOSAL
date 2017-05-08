@@ -1428,6 +1428,72 @@ Propagator::Propagator()
     InitDefaultCollection(detector_);
 }
 
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+Propagator::Propagator(
+                       ParticleType::Enum particle_type,
+                       std::string path_to_tables,
+                       bool exact_time,
+                       bool lpm,
+                       bool integrate,
+                       int scattering_model)
+    :order_of_interpolation_    ( 5 )
+    ,debug_                     ( false )
+    ,particle_interaction_      ( false )
+    ,seed_                      ( 1 )
+    ,brems_                     ( ParametrizationType::BremsKelnerKokoulinPetrukhin )
+    ,photo_                     ( ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich )
+    ,lpm_                       ( lpm )
+    ,stopping_decay_            ( true )
+    ,do_exact_time_calulation_  ( exact_time )
+    ,integrate_                 ( integrate )
+    ,brems_multiplier_          ( 1 )
+    ,photo_multiplier_          ( 1 )
+    ,ioniz_multiplier_          ( 1 )
+    ,epair_multiplier_          ( 1 )
+    ,global_ecut_inside_        ( 500 )
+    ,global_ecut_infront_       ( -1 )
+    ,global_ecut_behind_        ( -1 )
+    ,global_vcut_inside_        ( -1 )
+    ,global_vcut_infront_       ( 0.001 )
+    ,global_vcut_behind_        ( -1 )
+    ,global_cont_inside_        ( false )
+    ,global_cont_infront_       ( true )
+    ,global_cont_behind_        ( false )
+    ,path_to_tables_            ( path_to_tables )
+    ,raw_                       ( false )
+    ,scattering_model_          ( scattering_model )
+    ,current_collection_        (NULL)
+{
+    particle_              = new PROPOSALParticle(particle_type);
+    backup_particle_       = new PROPOSALParticle(*particle_);
+    detector_              = new Geometry();
+    detector_->InitSphere(0,0,0,1e18,0);
+
+    if(scattering_model_ != -1)
+    {
+        switch(scattering_model_)
+        {
+            case 0:
+                moliere_ = true;
+                scattering_model_ = 0;
+                break;
+            case 1:
+                moliere_ = false;
+                scatteringFirstOrder_ =   new ScatteringFirstOrder();
+                break;
+            case 2:
+                moliere_ = false;
+                scatteringFirstOrderMoliere_ =   new ScatteringMoliere();
+                break;
+            default:
+                log_error("scattering model not known! defaulting to moliere!");
+                moliere_ = true;
+                scattering_model_ = 0;
+        }
+    }
+}
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
@@ -1512,7 +1578,7 @@ Propagator::Propagator(Medium* medium,
                 break;
             default:
                 log_error("scattering model not known! defaulting to moliere!");
-                moliere = true;
+                moliere_ = true;
                 scattering_model_ = 0;
         }
     }
