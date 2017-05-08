@@ -18,70 +18,80 @@ except ImportError:
 
 import math
 
-ptype = pyPROPOSAL.ParticleType.MuMinus
-mu = pyPROPOSAL.Particle(ptype)
-med = pyPROPOSAL.Medium()
-E_cut = pyPROPOSAL.EnergyCutSettings(-1, -1)
 
-photo = list()
-dEdx_photo = list()
-energy = list()
-energy_range = np.arange(0, 12, 0.2)
+if __name__ == "__main__":
 
-for log_E in energy_range:
-    E = mu.mass + math.pow(10, log_E)
-    energy.append(E)
+    ptype = pyPROPOSAL.ParticleType.MuMinus
+    mu = pyPROPOSAL.Particle(ptype)
+    med = pyPROPOSAL.Medium()
+    E_cut = pyPROPOSAL.EnergyCutSettings(-1, -1)
 
-params = [
+    photo = list()
+    dEdx_photo = list()
+    energy = list()
+    energy_range = np.arange(0, 12, 0.2)
+
+    for log_E in energy_range:
+        E = mu.mass + math.pow(10, log_E)
+        energy.append(E)
+
+    params = [
         pyPROPOSAL.ParametrizationType.PhotoKokoulinShadowBezrukovHard,
         pyPROPOSAL.ParametrizationType.PhotoRhodeShadowBezrukovHard,
         pyPROPOSAL.ParametrizationType.PhotoBezrukovBugaevShadowBezrukovHard,
         pyPROPOSAL.ParametrizationType.PhotoZeusShadowBezrukovHard,
-]
+    ]
 
-for param in params:
-    p = pyPROPOSAL.Photonuclear(mu, med, E_cut)
-    p.parametrization = param
+    for param in params:
+        p = pyPROPOSAL.Photonuclear(mu, med, E_cut)
+        p.parametrization = param
 
-    p.enable_dEdx_interpolation()
-    photo.append(p)
+        p.enable_dEdx_interpolation()
+        photo.append(p)
 
-    dEdx = list()
-    for E in energy:
-        mu.energy = E
-        dEdx.append(p.calculate_dEdx() / E)
+        dEdx = list()
+        for E in energy:
+            mu.energy = E
+            dEdx.append(p.calculate_dEdx() / E)
 
-    dEdx_photo.append(dEdx)
+        dEdx_photo.append(dEdx)
 
-# =========================================================
-# 	Plot
-# =========================================================
+    # =========================================================
+    # 	Plot
+    # =========================================================
 
+    inch_to_cm = 2.54
+    golden_ratio = 1.61803
+    width = 29.7  # cm
 
-inch_to_cm = 2.54
-golden_ratio = 1.61803
-width = 29.7  # cm
-
-fig = plt.figure(
-    figsize=(width / inch_to_cm, width / inch_to_cm / golden_ratio)
-)
-
-ax = fig.add_subplot(111)
-ax.set_prop_cycle(cycler('color', ['c', 'm', 'y', 'k']))
-ax.grid(which='both')
-
-for dEdx, param in zip(dEdx_photo, params):
-    ax.loglog(
-        energy,
-        dEdx,
-        linestyle='-',
-        label=param
+    fig = plt.figure(
+        figsize=(width / inch_to_cm, width / inch_to_cm / golden_ratio)
     )
 
-ax.set_xlabel(r'$E$ / MeV')
-ax.set_ylabel(r'energyloss per energy / $\rm{g}^{-1} \rm{cm}^2$')
+    fig.suptitle(
+        "energyloss of {} with mass {} MeV in {}".format(
+            mu.name,
+            mu.particle.mass,
+            med.name.lower()
+        )
+    )
 
-ax.legend(loc='best')
+    ax = fig.add_subplot(111)
+    ax.set_prop_cycle(cycler('color', ['c', 'm', 'y', 'k']))
+    ax.grid(which='both')
 
-fig.savefig('photo.pdf')
-plt.show()
+    for dEdx, param in zip(dEdx_photo, params):
+        ax.loglog(
+            energy,
+            dEdx,
+            linestyle='-',
+            label=param
+        )
+
+    ax.set_xlabel(r'$E$ / MeV')
+    ax.set_ylabel(r'energyloss per energy / $\rm{g}^{-1} \rm{cm}^2$')
+
+    ax.legend(loc='best')
+
+    fig.savefig('photo.pdf')
+    plt.show()
