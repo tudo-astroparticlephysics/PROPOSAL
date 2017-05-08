@@ -21,6 +21,15 @@
 
 # PROPOSAL #
 
+PROPOSAL (Propagator with optimal precision and optimized speed for all
+leptons) is presented as a public tool for muon propagation through transparent
+media. Up-to-date cross sections for ionization, bremsstrahlung, photonuclear
+interactions, electron pair production, Landau–Pomeranchuk–Migdal and
+Ter-Mikaelian effects, muon and tau decay, as well as Molière scattering are
+implemented for different parametrizations.
+The full Paper can be found
+[here](http://www.sciencedirect.com/science/article/pii/S0010465513001355)
+
 This is the restructured PROPOSAL Version 2, which should run in the IceCube Simulation.
 
 PROPOSAL was tested on Mac OS X V. 10.7.5, Ubuntu 12.04, SUSE Enterprise 10 and PCLinuxos. Since
@@ -73,15 +82,48 @@ The three following files have not been changed yet:
 
 ## Usage ##
 
-### Console ###
+### Deployment ###
 
-You can execute the PROPOSAL main from from the build directory. (e.g.
-`./bin/PROPOSALtest`) The main part of the configuration of the propagator
-routine are the configuration files which you can find in resources. The file
-is fully documented and should guide you through your configuration.  Even if
-you haven't installed root you should find some interesting code in the
-`root_examples`.  All particle coordinates take the detector as the origin of the
-coordinate system.
+PROPOSAL is build as library. So you can include this project in your own
+c++ project by including the header files. In the
+[root_examples](root_examples/) are many examples given how you can
+embed this library. The following snippet uses the
+[configuration](resources/configuration) to propagte muons and
+create a histogram with the distribution of the muon ranges.
+
+```c++
+#include "PROPOSAL/Propagator.h"
+#include "TH1D.h"  // ROOT
+
+Propagator *pr = new Propagator("resources/configuration");
+pr->RandomDouble();
+double range;
+
+TH1D *range_hist = new TH1D("Range","Range distribution",64,0,1.2e9);
+
+for(int i =0 ;i< 1e4; i++)
+{
+	PROPOSALParticle *p = new PROPOSALParticle(ParticleType::MuMinus);
+	p->SetEnergy(9e6);
+	pr->SetParticle(p);
+
+	pr->Propagate(p);
+	range = p->GetPropagatedDistance();
+
+	range_hist->Fill(range);
+}
+```
+
+
+<!-- ### Console ### -->
+<!--  -->
+<!-- You can execute the PROPOSAL main from from the build directory. (e.g. -->
+<!-- `./bin/PROPOSALtest`) The main part of the configuration of the propagator -->
+<!-- routine are the configuration files which you can find in resources. The file -->
+<!-- is fully documented and should guide you through your configuration.  Even if -->
+<!-- you haven't installed root you should find some interesting code in the -->
+<!-- `root_examples`.  All particle coordinates take the detector as the origin of the -->
+<!-- coordinate system. -->
 
 ### Python ###
 
