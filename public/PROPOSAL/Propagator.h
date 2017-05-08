@@ -85,7 +85,7 @@ private:
 
     /*!
     * Initalize a geomtry. Used when reading the values from config file
-    *
+    *,
     */
     void InitGeometry(Geometry* geometry, std::deque<std::string>* token , std::string first_token);
 //----------------------------------------------------------------------------//
@@ -105,6 +105,12 @@ public:
 
     //Constructors
     Propagator();
+    Propagator(ParticleType::Enum particle_type,
+               std::string path_to_tables,
+               bool exact_time = true,
+               bool lpm = true,
+               bool integrate = false,
+               int scattering_model = 0);
     Propagator(std::string config_file, bool DoApplyOptions=true);
     Propagator(std::string config_file, PROPOSALParticle* particle, bool DoApplyOptions=true);
     Propagator(Medium* medium,
