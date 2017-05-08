@@ -18,9 +18,10 @@ except ImportError:
 
 class ProgressBar(object):
 
-    def __init__(self, loops, bar_lenght=50, start=0):
+    def __init__(self, loops, bar_lenght=50, start=0, **keywords):
 
         self._bar_lenght = bar_lenght
+        self._bar = []
         self._loops = loops
         self._start = float(start)
         self._current_loop = start
@@ -28,10 +29,36 @@ class ProgressBar(object):
         self._started_process = False
         self._start_time = None
 
+        self._pacman = False
+
         self._status = ""
         self._text = "\rPercent: [{0}] {1}% Time: {2} Iteration: {3}/{4} {5}"
+
         self._bar_full = "="
         self._bar_empty = " "
+
+        for arg in keywords:
+            if arg is "pacman":
+                assert type(arg) is not bool
+                self._pacman = arg
+
+        if self._pacman:
+            self._bar_full = "-"
+            self._bar_empty = "o"
+
+            current = self._bar_empty
+            for i in range(self._bar_lenght):
+                if current is self._bar_empty:
+                    current = " "
+                    self._bar.append(current)
+                else:
+                    current = self._bar_empty
+                    self._bar.append(current)
+        else:
+            for i in range(self._bar_lenght):
+                self._bar.append(self._bar_empty)
+
+        self._current_pac_state = "c"
 
     def reset(self):
         self._current_loop = self._start
@@ -53,10 +80,22 @@ class ProgressBar(object):
         if progress >= 1.0:
             self._status = "Done..."
 
-        block = int(round(self._bar_lenght * progress))
+        if self._pacman:
+            block = int(round(self._bar_lenght * progress)) - 1
+            if self._current_pac_state is "c":
+                self._current_pac_state = "C"
+            else:
+                self._current_pac_state = "c"
+
+            self._bar[block] = '\033[1m' + "\033[93m" + \
+                               self._current_pac_state + '\033[0m'
+            self._bar[:block] = block * [self._bar_full]
+        else:
+            block = int(round(self._bar_lenght * progress))
+            self._bar[:block] = block * [self._bar_full]
 
         text = self._text.format(
-            self._bar_full*block + self._bar_empty*(self._bar_lenght - block),
+            "".join(self._bar),
             progress*100,
             str(datetime.timedelta(seconds=(time.time() - self._start_time))),
             int(self._current_loop),

@@ -80,7 +80,6 @@ def propagate():
         (list)     List of secondarys particles represeint interactions
     """
     ptype = pyPROPOSAL.ParticleType.MuMinus
-    mu = pyPROPOSAL.Particle(ptype)
 
     med = pyPROPOSAL.Medium("ice")
 
@@ -89,8 +88,6 @@ def propagate():
     cuts_behind = pyPROPOSAL.EnergyCutSettings(-1, 0.05)
 
     prop = pyPROPOSAL.Propagator(
-        med,
-        cuts_inside,
         ptype,
         "../../resources/tables"
     )
@@ -101,8 +98,7 @@ def propagate():
 
     mu_start = pyPROPOSAL.Particle(mu)
 
-    geo_detector = pyPROPOSAL.Geometry()
-    geo_detector.init_cylinder(
+    geo_detector = pyPROPOSAL.Geometry().init_cylinder(
         x0=0,
         y0=0,
         z0=0,
@@ -111,8 +107,7 @@ def propagate():
         z=1600
     )
 
-    geo_outside = pyPROPOSAL.Geometry()
-    geo_outside.init_box(
+    geo_outside = pyPROPOSAL.Geometry().init_box(
         x0=0,
         y0=0,
         z0=0,
