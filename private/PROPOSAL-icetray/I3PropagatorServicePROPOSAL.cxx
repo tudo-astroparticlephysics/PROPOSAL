@@ -383,7 +383,15 @@ static const bimap_ParticleType I3_PROPOSAL_ParticleType_bimap = boost::assign::
     (I3Particle::Hadrons,   ParticleType::Hadrons)
     (I3Particle::Monopole,  ParticleType::Monopole)
     (I3Particle::STauMinus, ParticleType::STauMinus)
-    (I3Particle::STauPlus,  ParticleType::STauPlus);
+    (I3Particle::STauPlus,  ParticleType::STauPlus)
+    (I3Particle::Gamma,     ParticleType::Gamma)
+    (I3Particle::Pi0,       ParticleType::Pi0)
+    (I3Particle::PiPlus,    ParticleType::PiPlus)
+    (I3Particle::PiMinus,   ParticleType::PiMinus)
+    (I3Particle::KPlus,     ParticleType::KPlus)
+    (I3Particle::KMinus,    ParticleType::KMinus)
+    (I3Particle::PPlus,     ParticleType::PPlus)
+    (I3Particle::PMinus,    ParticleType::PMinus);
 
 
 // ------------------------------------------------------------------------- //
@@ -505,7 +513,7 @@ I3MMCTrackPtr I3PropagatorServicePROPOSAL::propagate( I3Particle& p, vector<I3Pa
     log_trace("nParticles = %d", nParticles);
 
     I3MMCTrackPtr mmcTrack;
-    log_trace("javaClass_ == AMANDA");
+
     mmcTrack = GenerateMMCTrack(particle);
 
     if(mmcTrack)
@@ -552,9 +560,6 @@ I3MMCTrackPtr I3PropagatorServicePROPOSAL::propagate( I3Particle& p, vector<I3Pa
         new_particle.SetLength(l);
         new_particle.SetThetaPhi(theta,phi);
         new_particle.SetEnergy(e);
-
-        //TODO(mario): Damn hard hack Mi 2017/04/05
-        new_particle.SetSpeed(aobj_l.at(i)->GetParentParticleEnergy());
 
         // this is not the particle you're looking for
         // move along...and add it to the daughter list

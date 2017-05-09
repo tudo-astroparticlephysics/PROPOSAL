@@ -73,7 +73,7 @@
     #define E0 1.6021766208-19
 #endif
 
-#ifndef RM // classical Muon radius(cm) :   RM = (1.602176487*pow(10,-19))/(4*PI*8.854187817*pow(10,-12)*Mmu_)*pow(10,-4);
+#ifndef RM // classical Muon radius(cm): RM = (1.602176487*pow(10,-19))/(4*PI*8.854187817*pow(10,-12)*Mmu_)*pow(10,-4);
     #define RM 1.362849110866631e-15
 #endif
 
