@@ -168,6 +168,7 @@ ADD_EXECUTABLE(WriteSectorsFromDomList
 TARGET_LINK_LIBRARIES(WriteSectorsFromDomList PROPOSAL)
 
 INSTALL(TARGETS PROPOSAL DESTINATION lib)
+INSTALL(FILES public/PROPOSAL/Propagator.h DESTINATION include)
 
 #################################################################
 #################           Tests        ########################
