@@ -66,7 +66,6 @@ SimplePropagator::SimplePropagator(const std::string &medium, I3Particle::Partic
     ParametrizationType::Enum brems_param = ParametrizationType::BremsKelnerKokoulinPetrukhin;
     // Photonuclear: Abramowicz Levin Levy Maor 97 with Butkevich shadowing
     ParametrizationType::Enum photo_param = ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich;
-    // TODO: Implement a function old param -> new param or just do it in enums
 
    double brems_multiplier = 1.;
    double photo_multiplier = 1.;
@@ -143,7 +142,15 @@ static const bimap_ParticleType I3_PROPOSAL_ParticleType_bimap = boost::assign::
     (I3Particle::Hadrons,   ParticleType::Hadrons)
     (I3Particle::Monopole,  ParticleType::Monopole)
     (I3Particle::STauMinus, ParticleType::STauMinus)
-    (I3Particle::STauPlus,  ParticleType::STauPlus);
+    (I3Particle::STauPlus,  ParticleType::STauPlus)
+    (I3Particle::Gamma,     ParticleType::Gamma)
+    (I3Particle::Pi0,       ParticleType::Pi0)
+    (I3Particle::PiPlus,    ParticleType::PiPlus)
+    (I3Particle::PiMinus,   ParticleType::PiMinus)
+    (I3Particle::KPlus,     ParticleType::KPlus)
+    (I3Particle::KMinus,    ParticleType::KMinus)
+    (I3Particle::PPlus,     ParticleType::PPlus)
+    (I3Particle::PMinus,    ParticleType::PMinus);
 
 
 // ------------------------------------------------------------------------- //

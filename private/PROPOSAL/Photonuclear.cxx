@@ -2101,8 +2101,6 @@ double Photonuclear::FunctionToIntegralButMik(double Q2)
 
 double Photonuclear::FunctionToIntegralRSS(double Q2)
 {
-    //TODO(mario): Remove definition here Di 2016/10/25
-    // double x, aux, nu, G, F2, R2;
     double x, aux, nu;
 
     nu  =   v_*particle_->GetEnergy();
@@ -2125,7 +2123,6 @@ double Photonuclear::FunctionToIntegralRSS(double Q2)
 
     aux =   x*x;
     P   =   1 - 1.85*x + 2.45*aux - 2.35*aux*x + aux*aux;
-    // G   *=  (medium_->GetNucCharge().at(component_) + (medium_->GetAtomicNum().at(component_) - medium_->GetNucCharge().at(component_))*P);
 
     // ---------[ Evaluate ALLM form factor F_2 ]------------ //
     //

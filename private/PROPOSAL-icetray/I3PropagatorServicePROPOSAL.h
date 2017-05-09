@@ -76,8 +76,6 @@ public:
 
  private:
 
-  // TODO: Why is particleMass=NAN???
-
   Propagator *proposal;
   double particleMass_;
   PROPOSALParticle* particle_type;
