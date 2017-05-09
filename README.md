@@ -162,45 +162,6 @@ When you encounter any errors or misunderstandings don't hesitate and write a ma
 Tomasz.Fuchs@tu-dortmund.de
 Jan-Hendrik.Koehne@tu-dortmund.de
 
----
-CMake Error: The following variables are used in this project, but they are set to NOTFOUND.
-
-```
-Boost_INCLUDE_DIR (ADVANCED)
-   used as include directory in directory /home/tomasz/PROPOSALUpgrade/PROPOSALsrc
-   used as include directory in directory /home/tomasz/PROPOSALUpgrade/PROPOSALsrc
-   used as include directory in directory /home/tomasz/PROPOSALUpgrade/PROPOSALsrc
-```
-
-It seems that you have not installed boost or didn't set the include directory for it properly.
-To install boost following
-e.g. http://www.linuxfromscratch.org/blfs/view/svn/general/boost.html	(02.Jan.2014)
-
----
-CMake Error: The following variables are used in this project, but they are set to NOTFOUND.
-
-```
-LOG4CPLUS_INCLUDE_DIR (ADVANCED)
-   used as include directory in directory /home/tomasz/PROPOSALUpgrade/PROPOSALsrc
-   used as include directory in directory /home/tomasz/PROPOSALUpgrade/PROPOSALsrc
-   used as include directory in directory /home/tomasz/PROPOSALUpgrade/PROPOSALsrc
-LOG4CPLUS_LIBRARY (ADVANCED)
-	linked by target "PROPOSAL" in directory /home/tomasz/PROPOSALUpgrade/PROPOSALsrc
-```
-
-It seems that you have not installed log4cplus or didn't set the directorys for it properly.
-To install log4cplus use
-e.g. http://sourceforge.net/projects/log4cplus/files/log4cplus-stable/1.1.1/	(02.Jan.2014)
-
----
-CMake Error: The following variables are used in this project, but they are set to NOTFOUND.
-
-In general when some variables are not found by cmake you can have a look into the FindModules
-files of cmake to see what is actually happening.
-In Ubuntu they are located at /usr/share/cmake-2.8/Modules
-
-Some modules are found in the main source directory or in the resource folder.
-
 ## License ##
 
 [License](LICENSE.md)
