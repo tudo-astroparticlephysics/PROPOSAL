@@ -23,6 +23,21 @@ Here are all changes since Version 1.0 PROPOSAL.
 
 ------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------
+
+V.2.1 - xx.05.17
+
+    +   stau cross section
+    +   add SetMass, so one is able to change the mass of a particle
+    *   fix implementation bug for the real photon assumption parametrizations
+        in the inelastic nuclear scattering cross section
+    *   fix hard component bug
+    *   use modern constants from particle data group
+
+    +   add python wrapper pyPROPOSAL
+
+    +   add particle enums
+    +   add cross section enums
+
 ------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------
 
