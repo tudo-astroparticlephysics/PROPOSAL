@@ -41,7 +41,7 @@ public:
 
   /**
    * @param mediadef[in] Path the the media definition file. If unspecified, this will
-   *                     default to $I3_BUILD/PROPOSAL/resources/mediadef
+   *                     default to $I3_BUILD/PROPOSAL/resources/configuration
    * @param tabledir[in] Path to a directory in which to store interpolation
    *                     constants for cross-section integrals. If unspecified, this will
    *                     default to $I3_BUILD/PROPOSAL/resources/tables/
@@ -50,10 +50,8 @@ public:
    * @param type[in] Type of particle to propagate.
    * @param particleMass[in] Mass of the propagated particle in GeV. This is
    *                         only used if type is something exotic.
-   * @param bs[in] Parametrization of the bremsstrahlung cross-section to use
-   * @param ph[in] Family of photonuclear cross-section parametrization to use
-   * @param bb[in] Specific edition of the photonuclear cross-section parametrization to use
-   * @param sh[in] Nuclear shadowing parametrization to use.
+   * @param brems_param[in] Parametrization of the bremsstrahlung cross-section to use
+   * @param photo_param[in] Parametrization of the photonuclear cross-section to use.
    *
    * The choice of parametrizations is discussed in <a href="http://arxiv.org/abs/hep-ph/0407075">MMC paper</a>.
    */
@@ -63,8 +61,8 @@ public:
       , double cylinderHeight=1600*I3Units::m
       , I3Particle::ParticleType type=I3Particle::MuMinus
       , double particleMass=NAN
-      , ParametrizationType::Enum brems_param_ = ParametrizationType::BremsKelnerKokoulinPetrukhin
-      , ParametrizationType::Enum photo_param_ = ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich
+      , ParametrizationType::Enum brems_param = ParametrizationType::BremsKelnerKokoulinPetrukhin
+      , ParametrizationType::Enum photo_param = ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich
   );
 
 
@@ -75,8 +73,6 @@ public:
   void SetTearDownPerCall(bool f) { tearDownPerCall_ = f; }
 
  private:
-
-  // TODO: Why is particleMass=NAN???
 
   Propagator *proposal;
   double particleMass_;

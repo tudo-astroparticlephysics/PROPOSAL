@@ -543,11 +543,6 @@ void PROPOSALParticle::swap(PROPOSALParticle &particle)
 
 void PROPOSALParticle::InitParticle(ParticleType::Enum type){
 
-    //TODO(mario): Output Mo 2017/03/06
-    // log_debug("Particle initialized in InitByName: %s", aname.c_str());
-
-    // string name=aname.length()==0?"?":aname[0]=='a'?aname.substr(1):aname;
-
     switch (type)
     {
         case ParticleType::MuMinus:
@@ -586,7 +581,7 @@ void PROPOSALParticle::InitParticle(ParticleType::Enum type){
             lifetime_   =   LTAU;
             charge_     =   1;
             break;
-        case ParticleType::STauMinus: //TODO(mario): Handle different masses! Mo 2017/03/06
+        case ParticleType::STauMinus:
             name_ = "stau-";
             mass_       =   MSTAU;
             lifetime_   =   LSTAU;
