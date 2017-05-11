@@ -20,63 +20,73 @@
 // ----------------------------------------------------------------------------
 namespace ParticleType
 {
-    enum Enum // NB: These match the PDG codes. Keep it that way!
+    enum Enum
     {
+        // The numbering is after the Monte Carlo Particle Numbering Scheme
+        // of the Particle Data Group
+        // Chin. Phys. C, 40, 100001 (2016)
+
         unknown = 0,
 
-        EPlus = -11,
-        EMinus = 11,
-        MuPlus = -13,
-        MuMinus = 13,
-        TauPlus = -15,
-        TauMinus = 15,
-        NuE = 12,
-        NuEBar = -12,
-        NuMu = 14,
-        NuMuBar = -14,
-        NuTau = 16,
+        // Leptons
+        EMinus   =  11,
+        EPlus    = -11,
+        NuE      =  12,
+        NuEBar   = -12,
+        MuMinus  =  13,
+        MuPlus   = -13,
+        NuMu     =  14,
+        NuMuBar  = -14,
+        TauMinus =  15,
+        TauPlus  = -15,
+        NuTau    =  16,
         NuTauBar = -16,
 
-        // TODO: Ist das Kunst, oder kann das weg?
-        Gamma = 22,
+        // Gauge Bosons
+        Gamma  =  22,
+        Z0     =  23,
+        WPlus  =  24,
+        WMinus = -24,
         
-        Pi0 = 111,
-        PiPlus = 211,
+        // Mesons
+        Pi0     =  111,
+        PiPlus  =  211,
         PiMinus = -211,
+        KPlus   =  321,
+        KMinus  = -321,
         // K0_Long = 130,
-        KPlus = 321,
-        KMinus = -321,
-        // Neutron = 2112,
-        PPlus = 2212,
-        PMinus = -2212,
         // K0_Short = 310,
+        // K0 = 311
         // Eta = 221,
-        // Lambda = 3122,
-        // SigmaPlus = 3222,
-        // Sigma0 = 3212,
-        // SigmaMinus = 3112,
-        // Xi0 = 3322,
-        // XiMinus = 3312,
-        // OmegaMinus = 3334,
-        // NeutronBar = -2112,
-        // LambdaBar = -3122,
-        // SigmaMinusBar = -3222,
-        // Sigma0Bar = -3212,
-        // SigmaPlusBar = -3112,
-        // Xi0Bar = -3322,
-        // XiPlusBar = -3312,
-        // OmegaPlusBar = -3334,
         // DPlus = 411,
         // DMinus = -411,
         // D0 = 421,
         // D0Bar = -421,
         // DsPlus = 431,
         // DsMinusBar = -431,
-        // LambdacPlus = 4122,
-        // WPlus = 24,
-        // WMinus = -24,
-        // Z0 = 23,
 
+        // Baryons
+        PPlus   =  2212,
+        PMinus  = -2212,
+        Neutron =  2112,
+        // NeutronBar = -2112,
+        // Lambda = 3122,
+        // LambdaBar = -3122,
+        // SigmaPlus = 3222,
+        // SigmaPlusBar = -3112,
+        // Sigma0 = 3212,
+        // Sigma0Bar = -3212,
+        // SigmaMinus = 3112,
+        // SigmaMinusBar = -3222,
+        // Xi0 = 3322,
+        // Xi0Bar = -3322,
+        // XiMinus = 3312,
+        // XiPlusBar = -3312,
+        // OmegaMinus = 3334,
+        // OmegaPlusBar = -3334,
+        // LambdacPlus = 4122,
+
+        // Cross section types
         Brems = -1001,
         DeltaE = -1002,
         EPair = -1003,
@@ -84,9 +94,11 @@ namespace ParticleType
         MuPair = -1005,
         Hadrons = -1006,
         ContinuousEnergyLoss = -1111,
-        Monopole = -41,
-        STauPlus = -9131,
-        STauMinus = -9132
+
+        // Exotic particles
+        Monopole  = -41,
+        STauMinus =  1000015,
+        STauPlus  = -1000015
     };
 };
 

@@ -10,28 +10,30 @@
 #       seed                1     (if not specified, default 1 (int))
 #
 # Bremsstrahlung parametrization
-# 1 = Kelner-Kakoulin-Petrukhin
-# 2 = Andreev-Bezrukov-Bugaev
-# 3 = Petrukhin-Shestakov
-# 4 = Complete Screening Case
-#       brems               1     (if not specified, default 1 (int))
+# 11 = Kelner-Kakoulin-Petrukhin
+# 12 = Andreev-Bezrukov-Bugaev
+# 13 = Petrukhin-Shestakov
+# 14 = Complete Screening Case
+#       brems               11     (if not specified, default 1 (int))
 #
 # Photonuclear parametrization
-#  1 = Kokoulin
-#  2 = Kokoulin + hard component
-#  3 = Rhode
-#  4 = Rhode + hard component
-#  5 = Bezrukov/Bugaev
-#  6 = Bezrukov/Bugaev + hard component
-#  7 = Zeus
-#  8 = Zeus + hard component
-#  9 = shadow=1 ALLM 91
-# 10 = shadow=2 ALLM 91
-# 11 = shadow=1 ALLM 97
-# 12 = shadow=2 ALLM 97
-# 13 = shadow=1 Butkevich/Mikhailov
-# 14 = shadow=2 Butkevich/Mikhailov
-#       photo               12    (if not specified, default 12 (int))
+#  31 = Kokoulin
+# -31 = Kokoulin + hard component
+#  32 = Rhode
+# -32 = Rhode + hard component
+#  33 = Bezrukov/Bugaev
+# -33 = Bezrukov/Bugaev + hard component
+#  34 = Zeus
+# -34 = Zeus + hard component
+#  35 = ALLM 91 shadow=Dutta
+# -35 = ALLM 91 shadow=Butkevich
+#  36 = ALLM 97 shadow=Dutta
+# -36 = ALLM 97 shadow=Butkevich
+#  37 = Butkevich/Mikhailov shadow=Dutta
+# -37 = Butkevich/Mikhailov shadow=Butkevich
+#  38 = Reno/Sarcevic/Su shadow=Dutta
+# -38 = Reno/Sarcevic/Su shadow=Butkevich
+#       photo               -36    (if not specified, default -36 (int))
 #
 # To enable Landau-Pomeranchuk-Migdal supression of EM cross-sections give the following keyword
 #       lpm
@@ -81,8 +83,8 @@
 
 global
     seed                1
-    brems               1
-    photo               12
+    brems               11
+    photo               -36
     lpm
     scattering          firstOrdermoliere
     exact_time

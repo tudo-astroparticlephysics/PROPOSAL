@@ -32,57 +32,6 @@ using namespace std;
 
 class Output;
 
-// Now: parametrization_ = 1,  Former: photo_family=1 and photo_param=1 Kokoulin
-// Now: parametrization_ = 2,  Former: photo_family=2 and photo_param=1 Kokoulin + hard component
-// Now: parametrization_ = 3,  Former: photo_family=1 and photo_param=2 Rhode
-// Now: parametrization_ = 4,  Former: photo_family=2 and photo_param=2 Rhode + hard component
-// Now: parametrization_ = 5,  Former: photo_family=1 and photo_param=3 Bezrukov/Bugaev
-// Now: parametrization_ = 6,  Former: photo_family=2 and photo_param=3 Bezrukov/Bugaev + hard component
-// Now: parametrization_ = 7,  Former: photo_family=1 and photo_param=4 Zeus
-// Now: parametrization_ = 8,  Former: photo_family=2 and photo_param=4 Zeus + hard component
-// Now: parametrization_ = 9,  Former: photo_family=3 and photo_param=1 shadow=1 ALLM 91
-// Now: parametrization_ = 10, Former: photo_family=3 and photo_param=1 shadow=2 ALLM 91
-// Now: parametrization_ = 11, Former: photo_family=3 and photo_param=2 shadow=1 ALLM 97
-// Now: parametrization_ = 12, Former: photo_family=3 and photo_param=2 shadow=2 ALLM 97
-// Now: parametrization_ = 13, Former: photo_family=4 and photo_param=1 shadow=1 Butkevich/Mikhailov
-// Now: parametrization_ = 14, Former: photo_family=4 and photo_param=1 shadow=2 Butkevich/Mikhailov
-
-// ------------------------------------------------------------------------- //
-// int ConvertOldToNewPhotonuclearParametrization(int photo_family,int photo_param,int shadow)
-// {
-//     switch(photo_family*100+photo_param*10)
-//     {
-//         case 110:   return 1; break;
-//         case 210:   return 2; break;
-//         case 120:   return 3; break;
-//         case 220:   return 4; break;
-//         case 130:   return 5; break;
-//         case 230:   return 6; break;
-//         case 140:   return 7; break;
-//         case 240:   return 8; break;
-//     default:
-//         break;
-//     }
-
-//     switch(photo_family*100+photo_param*10+shadow)
-//     {
-//         case 311:   return 9; break;
-//         case 312:   return 10; break;
-//         case 321:   return 11; break;
-//         case 322:   return 12; break;
-//         case 411:   return 13; break;
-//         case 412:   return 14; break;
-//     default:
-//         break;
-//     }
-
-//     log_warn("No fitting parametrization %i found setting default! 322 / 12!",photo_family*100+photo_param*10+shadow);
-
-//     return 12;
-// }
-
-
-
 // ------------------------------------------------------------------------- //
 bool IsWritable(std::string table_dir)
 {
@@ -163,7 +112,6 @@ I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(
     proposal = new Propagator(mediadef_,particle, false);
 
     stringstream options;
-    // int photo = ConvertOldToNewPhotonuclearParametrization(photo_family_, photo_param_, shadow_);
 
     options << "You choose the following parameter by passing arguments:" << std::endl;
     options << "\tcylinderRadius = " << cylinderRadius_ << std::endl;
@@ -198,6 +146,12 @@ I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(
     proposal->ApplyOptions();
 
 	tearDownPerCall_ = false;
+}
+
+// ------------------------------------------------------------------------- //
+I3PropagatorServicePROPOSAL::~I3PropagatorServicePROPOSAL()
+{
+    delete proposal;
 }
 
 // ------------------------------------------------------------------------- //
@@ -293,12 +247,6 @@ void I3PropagatorServicePROPOSAL::SetRandomNumberGenerator(I3RandomServicePtr ra
 }
 
 // ------------------------------------------------------------------------- //
-I3PropagatorServicePROPOSAL::~I3PropagatorServicePROPOSAL()
-{
-    delete proposal;
-}
-
-// ------------------------------------------------------------------------- //
 std::vector<I3Particle> I3PropagatorServicePROPOSAL::Propagate(I3Particle& p, DiagnosticMapPtr frame){
     // saying where we are
     log_debug("Entering I3PropagatorServicePROPOSAL::Propagate()");
@@ -333,11 +281,12 @@ std::vector<I3Particle> I3PropagatorServicePROPOSAL::Propagate(I3Particle& p, Di
         // Apply Settings
         Geometry* geo = new Geometry();
         geo->InitCylinder(0,0,0,cylinderRadius_,0,cylinderHeight_);
-        proposal->SetDetector(geo); proposal->SetBrems(brems_param_);
-        // proposal->SetPhoto(ConvertOldToNewPhotonuclearParametrization(photo_family_, photo_param_, shadow_));
+        proposal->SetDetector(geo);
+        proposal->SetBrems(brems_param_);
         proposal->SetPhoto(photo_param_);
-        proposal->SetPath_to_tables(tabledir_); proposal->ApplyOptions();
+        proposal->SetPath_to_tables(tabledir_);
         // proposal->SetParticle(particle_type)
+        proposal->ApplyOptions();
 
         boost::function<double ()> f = boost::bind(&I3RandomService::Uniform, rng_, 0, 1);
         proposal->SetRandomNumberGenerator(f);
@@ -383,7 +332,15 @@ static const bimap_ParticleType I3_PROPOSAL_ParticleType_bimap = boost::assign::
     (I3Particle::Hadrons,   ParticleType::Hadrons)
     (I3Particle::Monopole,  ParticleType::Monopole)
     (I3Particle::STauMinus, ParticleType::STauMinus)
-    (I3Particle::STauPlus,  ParticleType::STauPlus);
+    (I3Particle::STauPlus,  ParticleType::STauPlus)
+    (I3Particle::Gamma,     ParticleType::Gamma)
+    (I3Particle::Pi0,       ParticleType::Pi0)
+    (I3Particle::PiPlus,    ParticleType::PiPlus)
+    (I3Particle::PiMinus,   ParticleType::PiMinus)
+    (I3Particle::KPlus,     ParticleType::KPlus)
+    (I3Particle::KMinus,    ParticleType::KMinus)
+    (I3Particle::PPlus,     ParticleType::PPlus)
+    (I3Particle::PMinus,    ParticleType::PMinus);
 
 
 // ------------------------------------------------------------------------- //
@@ -505,7 +462,7 @@ I3MMCTrackPtr I3PropagatorServicePROPOSAL::propagate( I3Particle& p, vector<I3Pa
     log_trace("nParticles = %d", nParticles);
 
     I3MMCTrackPtr mmcTrack;
-    log_trace("javaClass_ == AMANDA");
+
     mmcTrack = GenerateMMCTrack(particle);
 
     if(mmcTrack)
@@ -552,9 +509,6 @@ I3MMCTrackPtr I3PropagatorServicePROPOSAL::propagate( I3Particle& p, vector<I3Pa
         new_particle.SetLength(l);
         new_particle.SetThetaPhi(theta,phi);
         new_particle.SetEnergy(e);
-
-        //TODO(mario): Damn hard hack Mi 2017/04/05
-        new_particle.SetSpeed(aobj_l.at(i)->GetParentParticleEnergy());
 
         // this is not the particle you're looking for
         // move along...and add it to the daughter list
