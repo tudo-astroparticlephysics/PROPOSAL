@@ -23,34 +23,6 @@ void Output::SetLoggingConfigurationFile(std::string file)
 
 void Output::FillSecondaryVector(PROPOSALParticle *particle, int secondary_id, pair<double, ParticleType::Enum> energy_loss, double distance)
 {
-    // ParticleType::Enum secondary_type;
-    // string secondary_name;
-
-    // if(energy_loss.second.compare("Epairproduction")==0)
-    // {
-    //     secondary_type = ParticleType::EPair;
-    //     secondary_name  =    "epair";
-    // }
-    // else if(energy_loss.second.compare("Ionization")==0)
-    // {
-    //     secondary_type = ParticleType::DeltaE;
-    //     secondary_name  =    "delta";
-    // }
-    // else if(energy_loss.second.compare("Bremsstrahlung")==0)
-    // {
-    //     secondary_type = ParticleType::Brems;
-    //     secondary_name  =    "brems";
-    // }
-    // else if(energy_loss.second.compare("Photonuclear")==0)
-    // {
-    //     secondary_type = ParticleType::NuclInt;
-    //     secondary_name  =    "munu";
-    // }
-    // else  //decay
-    // {
-    //     secondary_type =
-    //     secondary_name  =   energy_loss.second;
-    // }
 
     PROPOSALParticle *particle_to_store = new PROPOSALParticle(
         particle->GetParentParticleId(),
@@ -493,31 +465,3 @@ void Output::Close()
 
         description.close();
      }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

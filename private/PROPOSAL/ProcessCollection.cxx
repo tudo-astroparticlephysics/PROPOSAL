@@ -22,7 +22,6 @@ using namespace std;
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-//Formerly: double CrossSections::getdx(double ei, double ef, double dist)
 double ProcessCollection::CalculateDisplacement(double ei, double ef, double dist)
 {
     if(do_interpolation_)
@@ -140,7 +139,6 @@ double ProcessCollection::CalculateFinalEnergy(double ei, double dist)
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-//Formerly: double Propagate::getef(double ei, double rnd, bool pint)
 double ProcessCollection::CalculateFinalEnergy(double ei, double rnd, bool particle_interaction)
 {
     if( do_interpolation_ )
