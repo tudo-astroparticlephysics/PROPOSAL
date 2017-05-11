@@ -57,8 +57,8 @@
     #define RY 13.605693009
 #endif
 
-#ifndef IONK // in the ionization formula (MeV*cm2/g)
-    #define IONK 0.307075
+#ifndef IONK // Ionization Constant (MeV*cm2/g)
+    #define IONK 0.307075 // 4*PI*NA*RE*RE*ME
 #endif
 
 #ifndef SPEED // speed of light (cm/s)
