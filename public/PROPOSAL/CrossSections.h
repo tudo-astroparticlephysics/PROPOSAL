@@ -17,6 +17,7 @@
 #include <string>
 #include <boost/program_options.hpp>
 
+namespace PROPOSAL{
 
 namespace ParametrizationType
 {
@@ -298,7 +299,7 @@ public:
     void SetBackup_particle(PROPOSALParticle *backup_particle);
     void RestoreBackup_particle();
 };
-
+};
 
 
 #endif //CrossSections_H
