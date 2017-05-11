@@ -16,6 +16,8 @@
 #include "boost/function.hpp"
 // #include "Output.h"
 
+namespace PROPOSAL{
+
 /**
  * This class provides routines for function integration using Romberg method.
  * Include the function to be integrated in a class that implements the interface FunctionOfx (defined below).
@@ -505,4 +507,6 @@ public:
 	void SetSavedResult(double savedResult);
 	void SetUseLog(bool useLog);
 };
+};
+
 #endif /*INTEGRAL_H_ */

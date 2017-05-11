@@ -11,6 +11,7 @@
 #include "PROPOSAL/RootFinder.h"
 #include "PROPOSAL/PROPOSALParticle.h"
 
+namespace PROPOSAL{
 
 /*! \class  Decay  Decay.h " Decay.h"
    \brief class contains functions necessary for the calculation of decay
@@ -126,6 +127,6 @@ public:
     void SetBackup_particle(PROPOSALParticle *backup_particle);
     void RestoreBackup_particle();
 };
-
+};
 
 #endif /* DECAY_H_ */
