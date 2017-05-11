@@ -1,7 +1,7 @@
 
 # Installation #
 
-1. 	Make a directory where the whole project will be, e.g:
+1. 	Make a directory where the whole project will be, e.g.:
 
 		mkdir PROPOSAL
 
@@ -9,15 +9,17 @@
 
 		mkdir PROPOSAL/src PROPOSAL/build
 
-3. 	Extract the sources from the homepage/gitlab to the folder, e.g.:
+3. 	Extract the sources from the
+	[hompage](http://app.tu-dortmund.de/cms/de/Projekte/PROPOSAL/) or
+	gitlab to the folder, e.g.:
 
 		unzip PROPOSAL.zip PROPOSAL/
 
 	or
 
-		git clone "..." PROPOSAL/src
+		git clone ... PROPOSAL/src
 
-4.	Move to the build directory and generate the MakeFile with cmake:
+4.	Move to the build directory and generate the Makefile with cmake:
 
 		cd PROPOSAL/build
 		cmake ../src

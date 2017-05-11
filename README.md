@@ -87,19 +87,16 @@ The three following files have not been changed yet:
 PROPOSAL is build as library. So you can include this project in your own
 c++ project by including the header files. In the
 [root_examples](root_examples/) are many examples given how you can
-embed this library. The following snippet uses the
+use this library. The following snippet uses the
 [configuration](resources/configuration) to propagte muons and
-create a histogram with the distribution of the muon ranges.
+store the muon ranges for further proceeds.
 
 ```c++
 #include "PROPOSAL/Propagator.h"
-#include "TH1D.h"  // ROOT
 
 Propagator *pr = new Propagator("resources/configuration");
 pr->RandomDouble();
-double range;
-
-TH1D *range_hist = new TH1D("Range","Range distribution",64,0,1.2e9);
+std::vector<double> ranges;
 
 for(int i =0 ;i< 1e4; i++)
 {
@@ -108,22 +105,38 @@ for(int i =0 ;i< 1e4; i++)
 	pr->SetParticle(p);
 
 	pr->Propagate(p);
-	range = p->GetPropagatedDistance();
-
-	range_hist->Fill(range);
+	ranges.push_back(p->GetPropagatedDistance());
 }
+
+// ... Do stuff with ranges, e.g. plot histogram
+
 ```
 
+Supposing this snippet is the content of `foo.cxx` within the
+following minimal code structure
 
-<!-- ### Console ### -->
-<!--  -->
-<!-- You can execute the PROPOSAL main from from the build directory. (e.g. -->
-<!-- `./bin/PROPOSALtest`) The main part of the configuration of the propagator -->
-<!-- routine are the configuration files which you can find in resources. The file -->
-<!-- is fully documented and should guide you through your configuration.  Even if -->
-<!-- you haven't installed root you should find some interesting code in the -->
-<!-- `root_examples`.  All particle coordinates take the detector as the origin of the -->
-<!-- coordinate system. -->
+	my_program
+	├── CMakeLists.txt
+	├── resources
+	│   ├── configuration
+	│   └── tables
+	└── source
+		└── foo.cpp
+
+the `CMakeLists.txt` could look like
+
+```
+cmake_minimum_required(VERSION 2.6)
+
+add_executable(foo source/foo.cpp)
+
+find_library(PROPOSAL_LIBRARIES REQUIRED NAMES PROPOSAL)
+
+if (PROPOSAL_LIBRARIES)
+  include_directories(${PROPOAL_INCLUDE_DIRS})
+  target_link_libraries (foo ${PROPOSAL_LIBRARIES})
+endif ()
+```
 
 ### Python ###
 
