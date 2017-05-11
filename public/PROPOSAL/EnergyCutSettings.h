@@ -12,6 +12,7 @@
 
 #include <iostream>
 
+namespace PROPOSAL{
 
 /**
  * \brief Class containing the energy cut such as ecut and vcut.
@@ -82,6 +83,7 @@ public:
     void SetEcut(double ecut);
     void SetVcut(double vcut);
 
+};
 };
 
 #endif /* ENERGYCUTSETTINGS_H_ */

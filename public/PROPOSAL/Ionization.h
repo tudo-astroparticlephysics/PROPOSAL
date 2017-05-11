@@ -5,6 +5,8 @@
 #include "PROPOSAL/Integral.h"
 #include "PROPOSAL/Interpolant.h"
 
+namespace PROPOSAL{
+
 class Ionization: public CrossSections
 {
 protected:
@@ -223,6 +225,7 @@ public:
     //Destructor
     ~Ionization(){}
 
+};
 };
 
 #endif //Ionization_H

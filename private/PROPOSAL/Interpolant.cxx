@@ -33,6 +33,7 @@
 
 
 using namespace std;
+using namespace PROPOSAL;
 
 const double Interpolant::bigNumber_   =   -300;
 const double Interpolant::aBigNumber_  =   -299;

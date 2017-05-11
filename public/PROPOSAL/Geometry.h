@@ -13,6 +13,8 @@
 #include <utility>
 #include <iostream>
 
+namespace PROPOSAL{
+
 class Geometry
 {
 private:
@@ -188,6 +190,7 @@ public:
 //----------------------------------------------------------------------------//
     //Destructor
     ~Geometry();
+};
 };
 
 #endif // GEOMETRY_H
