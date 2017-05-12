@@ -1,5 +1,10 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
+IF(APPLE)
+	# In newer version of cmake this will be the default
+	SET(CMAKE_MACOSX_RPATH 1)
+ENDIF(APPLE)
+
 ADD_DEFINITIONS(-DPROPOSAL_STANDALONE=1)
 
 SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -34,10 +39,10 @@ IF(ADD_PYTHON)
 	FIND_PACKAGE( PythonLibs 2.7 REQUIRED )
 
 	IF(PYTHONLIBS_FOUND)
-		include_directories( ${PYTHON_INCLUDE_DIRS} )
+		INCLUDE_DIRECTORIES( ${PYTHON_INCLUDE_DIRS} )
 	ENDIF(PYTHONLIBS_FOUND)
 ELSE(ADD_PYTHON)
-	message(STATUS "No python wrapper library will be build.")
+	MESSAGE(STATUS "No python wrapper library will be build.")
 ENDIF(ADD_PYTHON)
 
 #################################################################
@@ -51,11 +56,9 @@ INCLUDE(FindROOT.cmake)
 IF(ROOT_FOUND)
     ADD_DEFINITIONS(-DROOT_SUPPORT=1)
 
-    SET(INCLUDE_DIRECTORIES
-    ${ROOT_INCLUDE_DIR}
-    )
+    SET(INCLUDE_DIRECTORIES ${ROOT_INCLUDE_DIR})
 
-    INCLUDE_DIRECTORIES( ${INCLUDE_DIRECTORIES})
+    INCLUDE_DIRECTORIES(${INCLUDE_DIRECTORIES})
 
     SET(LINK_DIRECTORIES
     ${ROOT_LIBRARY_DIR}
@@ -102,7 +105,6 @@ FIND_PACKAGE(GTest)
 if (GTEST_FOUND)
 	INCLUDE_DIRECTORIES(${GTEST_INCLUDE_DIRS})
  	ENABLE_TESTING()
-	SET(DO_TESTING TRUE)
 else (GTEST_FOUND)
 	SET(DO_TESTING FALSE)
     MESSAGE(STATUS "No tests will be build.")
@@ -115,32 +117,7 @@ endif (GTEST_FOUND)
 INCLUDE_DIRECTORIES("${PROJECT_SOURCE_DIR}/public" "${PROJECT_SOURCE_DIR}" ${LOG4CPLUS_INCLUDE_DIR} ${Boost_INCLUDE_DIR} )
 
 FILE(GLOB SRC_FILES ${PROJECT_SOURCE_DIR}/private/PROPOSAL/*.cxx)
-ADD_LIBRARY(PROPOSAL SHARED
-		${SRC_FILES}
-        # private/PROPOSAL/Integral.cxx
-        # private/PROPOSAL/methods.cxx
-        # private/PROPOSAL/MathModel.cxx
-        # private/PROPOSAL/Bremsstrahlung.cxx
-        # private/PROPOSAL/CrossSections.cxx
-        # private/PROPOSAL/Decay.cxx
-        # private/PROPOSAL/Epairproduction.cxx
-        # private/PROPOSAL/Ionization.cxx
-        # private/PROPOSAL/Photonuclear.cxx
-        # private/PROPOSAL/Medium.cxx
-        # private/PROPOSAL/PROPOSALParticle.cxx
-        # private/PROPOSAL/EnergyCutSettings.cxx
-		# private/PROPOSAL/Interpolant.cxx
-        # private/PROPOSAL/StandardNormal.cxx
-        # private/PROPOSAL/RootFinder.cxx
-        # private/PROPOSAL/ProcessCollection.cxx
-        # private/PROPOSAL/Propagator.cxx
-        # private/PROPOSAL/ContinuousRandomization.cxx
-        # private/PROPOSAL/Geometry.cxx
-        # private/PROPOSAL/Scattering.cxx
-        # private/PROPOSAL/ScatteringFirstOrder.cxx
-        # private/PROPOSAL/ScatteringMoliere.cxx
-        # private/PROPOSAL/Output.cxx
-	)
+ADD_LIBRARY(PROPOSAL SHARED ${SRC_FILES})
 
 SET_TARGET_PROPERTIES(PROPOSAL PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -O2")# -Wextra -pedantic")
 TARGET_LINK_LIBRARIES(PROPOSAL ${LIBRARYS_TO_LINK})
@@ -195,22 +172,22 @@ IF(DO_TESTING)
   ADD_EXECUTABLE(UnitTest_ContinuousRandomization Test/ContinuousRandomization_TEST.cxx)
   ADD_EXECUTABLE(UnitTest_Geometry Test/Geometry_TEST.cxx)
 
-  TARGET_LINK_LIBRARIES(UnitTest_Scattering PROPOSAL gtest gtest_main)
-  TARGET_LINK_LIBRARIES(UnitTest_StandardNormal PROPOSAL gtest gtest_main)
-  TARGET_LINK_LIBRARIES(UnitTest_Integral PROPOSAL gtest gtest_main)
-  TARGET_LINK_LIBRARIES(UnitTest_Interpolant PROPOSAL gtest gtest_main)
-  TARGET_LINK_LIBRARIES(UnitTest_Ionization PROPOSAL gtest gtest_main)
-  TARGET_LINK_LIBRARIES(UnitTest_Bremsstrahlung PROPOSAL gtest gtest_main)
-  TARGET_LINK_LIBRARIES(UnitTest_Epairproduction PROPOSAL gtest gtest_main)
-  TARGET_LINK_LIBRARIES(UnitTest_Photonuclear PROPOSAL gtest gtest_main)
-  TARGET_LINK_LIBRARIES(UnitTest_RootFinder PROPOSAL gtest gtest_main)
-  TARGET_LINK_LIBRARIES(UnitTest_Medium PROPOSAL gtest gtest_main)
-  TARGET_LINK_LIBRARIES(UnitTest_Particle PROPOSAL gtest gtest_main)
-  TARGET_LINK_LIBRARIES(UnitTest_EnergyCutSettings PROPOSAL gtest gtest_main)
-  TARGET_LINK_LIBRARIES(UnitTest_Decay PROPOSAL gtest gtest_main)
-  TARGET_LINK_LIBRARIES(UnitTest_ProcessCollection PROPOSAL gtest gtest_main)
-  TARGET_LINK_LIBRARIES(UnitTest_ContinuousRandomization PROPOSAL gtest gtest_main)
-  TARGET_LINK_LIBRARIES(UnitTest_Geometry PROPOSAL gtest gtest_main)
+  TARGET_LINK_LIBRARIES(UnitTest_Scattering PROPOSAL ${GTEST_LIBRARIES})
+  TARGET_LINK_LIBRARIES(UnitTest_StandardNormal PROPOSAL ${GTEST_LIBRARIES})
+  TARGET_LINK_LIBRARIES(UnitTest_Integral PROPOSAL ${GTEST_LIBRARIES})
+  TARGET_LINK_LIBRARIES(UnitTest_Interpolant PROPOSAL ${GTEST_LIBRARIES})
+  TARGET_LINK_LIBRARIES(UnitTest_Ionization PROPOSAL ${GTEST_LIBRARIES})
+  TARGET_LINK_LIBRARIES(UnitTest_Bremsstrahlung PROPOSAL ${GTEST_LIBRARIES})
+  TARGET_LINK_LIBRARIES(UnitTest_Epairproduction PROPOSAL ${GTEST_LIBRARIES})
+  TARGET_LINK_LIBRARIES(UnitTest_Photonuclear PROPOSAL gtest ${GTEST_LIBRARIES})
+  TARGET_LINK_LIBRARIES(UnitTest_RootFinder PROPOSAL ${GTEST_LIBRARIES})
+  TARGET_LINK_LIBRARIES(UnitTest_Medium PROPOSAL ${GTEST_LIBRARIES})
+  TARGET_LINK_LIBRARIES(UnitTest_Particle PROPOSAL ${GTEST_LIBRARIES})
+  TARGET_LINK_LIBRARIES(UnitTest_EnergyCutSettings PROPOSAL ${GTEST_LIBRARIES})
+  TARGET_LINK_LIBRARIES(UnitTest_Decay PROPOSAL ${GTEST_LIBRARIES})
+  TARGET_LINK_LIBRARIES(UnitTest_ProcessCollection PROPOSAL ${GTEST_LIBRARIES})
+  TARGET_LINK_LIBRARIES(UnitTest_ContinuousRandomization PROPOSAL ${GTEST_LIBRARIES})
+  TARGET_LINK_LIBRARIES(UnitTest_Geometry PROPOSAL ${GTEST_LIBRARIES})
 
   ADD_TEST(UnitTest_Scattering bin/UnitTest_Scattering)
   ADD_TEST(UnitTest_ContinuousRandomization bin/UnitTest_ContinuousRandomization)
@@ -240,7 +217,14 @@ ENDIF(ROOT_FOUND)
 IF(ADD_PYTHON)
 	IF(PYTHONLIBS_FOUND)
 		ADD_LIBRARY(pyPROPOSAL SHARED private/python/pybindings.cxx)
-		SET_TARGET_PROPERTIES(pyPROPOSAL PROPERTIES PREFIX "" COMPILE_FLAGS "${CMAKE_CXX_FLAGS}")
+
+		# Python seems to have problems to import .dylib on OS X, so modify the suffix
+		IF(APPLE)
+			SET_TARGET_PROPERTIES(pyPROPOSAL PROPERTIES PREFIX "" SUFFIX ".so" COMPILE_FLAGS "${CMAKE_CXX_FLAGS}")
+		ELSE(APPLE)
+			SET_TARGET_PROPERTIES(pyPROPOSAL PROPERTIES PREFIX "" COMPILE_FLAGS "${CMAKE_CXX_FLAGS}")
+		ENDIF(APPLE)
+
 		TARGET_LINK_LIBRARIES(pyPROPOSAL boost_python ${PYTHON_LIBRARIES} ${Boost_LIBRARIES} PROPOSAL)
 		INSTALL(TARGETS pyPROPOSAL DESTINATION lib)
 	ENDIF(PYTHONLIBS_FOUND)
