@@ -18,6 +18,7 @@
 #include "PROPOSAL/Integral.h"
 #include "PROPOSAL/MathModel.h"
 
+namespace PROPOSAL{
 
 /**
   * \brief This class provides the scattering routine provided by moliere.
@@ -110,7 +111,7 @@ public:
     void RestoreBackup_particle();
 
 };
-
+};
 
 
 #endif //SCATTERING_H

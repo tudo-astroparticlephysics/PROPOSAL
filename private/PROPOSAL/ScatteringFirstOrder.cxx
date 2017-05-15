@@ -17,6 +17,7 @@
 #include "PROPOSAL/Output.h"
 
 using namespace std;
+using namespace PROPOSAL;
 
 
 //----------------------------------------------------------------------------//
