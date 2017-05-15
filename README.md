@@ -162,7 +162,7 @@ n_daughters = list()
 for i in range(1000):
     prop.reset_particle()
     prop.particle.energy = 1e8  # Unit in MeV
-    d = p.propagate()
+    d = prop.propagate()
 
     mu_length.append(prop.particle.propagated_distance / 100)
     n_daughters.append(len(d))
