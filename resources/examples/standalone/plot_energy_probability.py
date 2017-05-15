@@ -146,18 +146,16 @@ if __name__ == "__main__":
     #   POPOSAL
     # =========================================================
 
-    start_time = time.time()
+    # start_time = time.time()
 
     ptype = pyPROPOSAL.ParticleType.MuMinus
     mu = pyPROPOSAL.Particle(ptype)
+
     # ptype = pyPROPOSAL.ParticleType.STauMinus
     # mu = pyPROPOSAL.Particle(ptype)
     # mu.mass = 100000
     # mu.mass = 10000
-    # med = pyPROPOSAL.Medium("standard_rock")
-    # cuts = pyPROPOSAL.EnergyCutSettings()
 
-    # prop = pyPROPOSAL.Propagator(med, cuts, ptype, "../../resources/tables")
     prop = pyPROPOSAL.Propagator("resources/configuration_IceOnly", mu)
 
     statistics = 10
@@ -178,7 +176,7 @@ if __name__ == "__main__":
     length = []
     n_secondarys = []
 
-    progress = ProgressBar(statistics)
+    progress = ProgressBar(statistics, pacman=True)
     progress.start()
 
     for i in range(statistics):
@@ -368,7 +366,7 @@ if __name__ == "__main__":
     ))
 
     # write execution time
-    end_time = time.time()
+    # end_time = time.time()
 
-    with open("time_{}_stats_{}.txt".format(mu.name, statistics), "w") as f:
-        f.write("execution time: {}".format(end_time - start_time))
+    # with open("time_{}_stats_{}.txt".format(mu.name, statistics), "w") as f:
+    #     f.write("execution time: {}".format(end_time - start_time))

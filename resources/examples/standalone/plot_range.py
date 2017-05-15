@@ -30,14 +30,6 @@ if __name__ == "__main__":
         scattering_model=2
     )
 
-    # mu = pyPROPOSAL.Particle(ptype)
-    # mu.energy = energy
-    # mu.theta = 180
-    # p = pyPROPOSAL.Propagator(
-    #     config="resources/configuration",
-    #     particle=mu
-    # )
-
     mu_length = list()
     n_secondarys = list()
 

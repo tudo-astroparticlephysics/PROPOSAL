@@ -5,7 +5,6 @@ try:
     import matplotlib as mpl
     mpl.use('Agg')
     import matplotlib.pyplot as plt
-    from cycler import cycler
 except ImportError:
     raise ImportError("Matplotlib not installed!")
 
@@ -71,13 +70,12 @@ if __name__ == "__main__":
     fig.suptitle(
         "energyloss of {} with mass {} MeV in {}".format(
             mu.name,
-            mu.particle.mass,
+            mu.mass,
             med.name.lower()
         )
     )
 
     ax = fig.add_subplot(111)
-    ax.set_prop_cycle(cycler('color', ['c', 'm', 'y', 'k']))
     ax.grid(which='both')
 
     for dEdx, param in zip(dEdx_photo, params):
