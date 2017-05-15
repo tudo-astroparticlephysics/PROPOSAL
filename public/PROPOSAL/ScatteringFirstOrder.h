@@ -16,6 +16,8 @@
 #include "PROPOSAL/MathModel.h"
 #include "PROPOSAL/Medium.h"
 
+namespace PROPOSAL{
+
 /**
   * \brief This class provides the scattering routine provided by moliere.
   *
@@ -55,7 +57,7 @@ public:
 
 
 };
-
+};
 
 
 #endif //SCATTERING_FIRSTORDER_H

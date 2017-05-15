@@ -7,6 +7,7 @@
 #include "PROPOSAL/Interpolant.h"
 #include <vector>
 
+namespace PROPOSAL{
 
 namespace ShadowingType
 {
@@ -336,6 +337,7 @@ public:
     ~Photonuclear(){}
 
 
+};
 };
 
 #endif //Photonuclear_H

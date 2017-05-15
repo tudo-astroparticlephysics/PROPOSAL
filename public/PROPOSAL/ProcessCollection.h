@@ -26,6 +26,7 @@
 #include "PROPOSAL/Geometry.h"
 #include "PROPOSAL/Scattering.h"
 
+namespace PROPOSAL{
 
 /*! \class ProcessCollection ProcessCollection.h "CrossSections.h"
     \brief initializes all cross sections and keeps references to them
@@ -503,7 +504,7 @@ public:
     void SetBackup_particle(PROPOSALParticle *backup_particle);
     void RestoreBackup_particle();
 };
-
+};
 
 
 #endif //ProcessCollection_H
