@@ -30,18 +30,14 @@ SET(LIBRARYS_TO_LINK ${Boost_LIBRARIES})
 OPTION (ADD_PYTHON "Choose to compile the python wrapper library" ON)
 
 IF(ADD_PYTHON)
-	message(STATUS "Compile the python wrapper library.")
-	message(STATUS "Looking for python...")
+	MESSAGE(STATUS "Enabled to build the python wrapper library.")
 	FIND_PACKAGE( PythonLibs 2.7 REQUIRED )
 
 	IF(PYTHONLIBS_FOUND)
-		message(STATUS "Found Python version: ${PYTHONLIBS_VERSION_STRING}")
 		include_directories( ${PYTHON_INCLUDE_DIRS} )
-	ELSE(PYTHONLIBS_FOUND)
-		message(STATUS "Python not found...")
 	ENDIF(PYTHONLIBS_FOUND)
 ELSE(ADD_PYTHON)
-	message(STATUS "No python wrapper library will be build.")
+	MESSAGE(STATUS "No python wrapper library will be build.")
 ENDIF(ADD_PYTHON)
 
 #################################################################
@@ -91,10 +87,8 @@ IF(LOG4CPLUS_FOUND)
     ADD_DEFINITIONS(-DLOG4CPLUS_SUPPORT=1)
 	ADD_DEFINITIONS(-DLOG4CPLUS_CONFIG=\"${PROJECT_SOURCE_DIR}/resources/log4cplus.conf\")
     SET(LIBRARYS_TO_LINK ${LIBRARYS_TO_LINK} ${LOG4CPLUS_LIBRARIES})
-    MESSAGE(STATUS "Log4cplus found...")
 ELSE(LOG4CPLUS_FOUND)
     ADD_DEFINITIONS(-DLOG4CPLUS_SUPPORT=0)
-    MESSAGE(STATUS "Log4cplus not found...")
     MESSAGE(STATUS "No logging will be done.")
 ENDIF(LOG4CPLUS_FOUND)
 
@@ -103,50 +97,48 @@ ENDIF(LOG4CPLUS_FOUND)
 #################           GTest       #########################
 #################################################################
 
-IF(DEFINED ENV{GTEST_PATH})
-	ENABLE_TESTING()
-	#1. Path
-	#2. Path where the binarys will be copied to
-	ADD_SUBDIRECTORY($ENV{GTEST_PATH} ${CMAKE_CURRENT_BINARY_DIR}/gtestbin)
-	SET(GTEST_INCLUDE_DIR "$ENV{GTEST_PATH}/include")
-	SET(GTEST_LIBRARY_DIR $ENV{GTEST_PATH})
-	SET(LINK_DIRECTORIES $ENV{GTEST_PATH})
-	SET(DO_TESTING TRUE)
-	MESSAGE(STATUS "Found gtest-path")
-ELSE()
-    MESSAGE("GTEST_PATH is not defined.  To build testsuite you have to set GTEST_PATH to gtest root directory")
-ENDIF()
+FIND_PACKAGE(GTest)
+
+if (GTEST_FOUND)
+	INCLUDE_DIRECTORIES(${GTEST_INCLUDE_DIRS})
+ 	ENABLE_TESTING()
+else (GTEST_FOUND)
+	SET(DO_TESTING FALSE)
+    MESSAGE(STATUS "No tests will be build.")
+endif (GTEST_FOUND)
 
 #################################################################
 #################           Libraries    ########################
 #################################################################
 
-INCLUDE_DIRECTORIES("${PROJECT_SOURCE_DIR}/public" "${PROJECT_SOURCE_DIR}" ${GTEST_INCLUDE_DIR} ${LOG4CPLUS_INCLUDE_DIR} ${Boost_INCLUDE_DIR} )
+INCLUDE_DIRECTORIES("${PROJECT_SOURCE_DIR}/public" "${PROJECT_SOURCE_DIR}" ${LOG4CPLUS_INCLUDE_DIR} ${Boost_INCLUDE_DIR} )
 
+FILE(GLOB SRC_FILES ${PROJECT_SOURCE_DIR}/private/PROPOSAL/*.cxx)
 ADD_LIBRARY(PROPOSAL SHARED
-        private/PROPOSAL/Integral.cxx
-        private/PROPOSAL/methods.cxx
-        private/PROPOSAL/MathModel.cxx
-        private/PROPOSAL/Bremsstrahlung.cxx
-        private/PROPOSAL/CrossSections.cxx
-        private/PROPOSAL/Decay.cxx
-        private/PROPOSAL/Epairproduction.cxx
-        private/PROPOSAL/Ionization.cxx
-        private/PROPOSAL/Photonuclear.cxx
-        private/PROPOSAL/Medium.cxx
-        private/PROPOSAL/PROPOSALParticle.cxx
-        private/PROPOSAL/EnergyCutSettings.cxx
-		private/PROPOSAL/Interpolant.cxx
-        private/PROPOSAL/StandardNormal.cxx
-        private/PROPOSAL/RootFinder.cxx
-        private/PROPOSAL/ProcessCollection.cxx
-        private/PROPOSAL/Propagator.cxx
-        private/PROPOSAL/ContinuousRandomization.cxx
-        private/PROPOSAL/Geometry.cxx
-        private/PROPOSAL/Scattering.cxx
-        private/PROPOSAL/ScatteringFirstOrder.cxx
-        private/PROPOSAL/ScatteringMoliere.cxx
-        private/PROPOSAL/Output.cxx
+		${SRC_FILES}
+        # private/PROPOSAL/Integral.cxx
+        # private/PROPOSAL/methods.cxx
+        # private/PROPOSAL/MathModel.cxx
+        # private/PROPOSAL/Bremsstrahlung.cxx
+        # private/PROPOSAL/CrossSections.cxx
+        # private/PROPOSAL/Decay.cxx
+        # private/PROPOSAL/Epairproduction.cxx
+        # private/PROPOSAL/Ionization.cxx
+        # private/PROPOSAL/Photonuclear.cxx
+        # private/PROPOSAL/Medium.cxx
+        # private/PROPOSAL/PROPOSALParticle.cxx
+        # private/PROPOSAL/EnergyCutSettings.cxx
+		# private/PROPOSAL/Interpolant.cxx
+        # private/PROPOSAL/StandardNormal.cxx
+        # private/PROPOSAL/RootFinder.cxx
+        # private/PROPOSAL/ProcessCollection.cxx
+        # private/PROPOSAL/Propagator.cxx
+        # private/PROPOSAL/ContinuousRandomization.cxx
+        # private/PROPOSAL/Geometry.cxx
+        # private/PROPOSAL/Scattering.cxx
+        # private/PROPOSAL/ScatteringFirstOrder.cxx
+        # private/PROPOSAL/ScatteringMoliere.cxx
+        # private/PROPOSAL/Output.cxx
 	)
 
 SET_TARGET_PROPERTIES(PROPOSAL PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -O2")# -Wextra -pedantic")
@@ -168,7 +160,9 @@ ADD_EXECUTABLE(WriteSectorsFromDomList
 TARGET_LINK_LIBRARIES(WriteSectorsFromDomList PROPOSAL)
 
 INSTALL(TARGETS PROPOSAL DESTINATION lib)
-INSTALL(FILES public/PROPOSAL/Propagator.h DESTINATION include)
+
+FILE(GLOB INC_FILES ${PROJECT_SOURCE_DIR}/public/PROPOSAL/*.h)
+INSTALL(FILES ${INC_FILES} DESTINATION include/PROPOSAL)
 
 #################################################################
 #################           Tests        ########################

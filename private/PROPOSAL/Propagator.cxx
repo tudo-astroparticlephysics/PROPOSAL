@@ -14,6 +14,7 @@
 #include "PROPOSAL/Output.h"
 
 using namespace std;
+using namespace PROPOSAL;
 
 namespace po	= boost::program_options;
 

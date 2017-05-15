@@ -8,6 +8,8 @@
 #include "PROPOSAL/ScatteringMoliere.h"
 
 using namespace std;
+using namespace PROPOSAL;
+
 #define HBAR    6.58211928e-22                          //hbar in MeV*s
 #define C       0.577215664901532860606512090082402431	//Euler-Mascheroni constant
 

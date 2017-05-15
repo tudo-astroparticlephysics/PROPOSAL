@@ -83,6 +83,7 @@
 
 
 
+namespace PROPOSAL{
 
 class Output
 {
@@ -247,6 +248,7 @@ public:
     }
 
  };
+};
 
 #endif //ICECUBE
 
