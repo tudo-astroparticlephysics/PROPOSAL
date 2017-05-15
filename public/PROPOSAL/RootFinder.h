@@ -14,6 +14,8 @@
 
 #include "boost/function.hpp"
 
+namespace PROPOSAL{
+
 class RootFinder
 {
 private:
@@ -69,6 +71,7 @@ public:
 //----------------------------------------------------------------------------//
     //Destructor
     ~RootFinder();
+};
 };
 
 #endif // _ROOTFINDER_H

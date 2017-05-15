@@ -15,6 +15,8 @@
 #include "PROPOSAL/Interpolant.h"
 #include <cmath>
 
+namespace PROPOSAL{
+
 /**
  * \brief This class provides routines for evaluation of
  * random numbers distributed normally.
@@ -179,6 +181,7 @@ public:
 	void SetOrderOfInterpolation(int orderOfInterpolation);
 	void SetVal1(double val1);
 	void SetVal2(double val2);
+};
 };
 
 
