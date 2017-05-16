@@ -131,7 +131,7 @@ boost::assign::list_of<std::pair<ParticleType::Enum, I3Particle::ParticleType> >
 (ParticleType::NuTauBar, I3Particle::NuTauBar)
 (ParticleType::Brems, I3Particle::Brems)
 (ParticleType::DeltaE, I3Particle::DeltaE)
-(ParticleType::PairProd, I3Particle::PairProd)
+(ParticleType::EPair, I3Particle::PairProd)
 (ParticleType::NuclInt, I3Particle::NuclInt)
 (ParticleType::MuPair, I3Particle::MuPair)
 (ParticleType::Hadrons, I3Particle::Hadrons);
