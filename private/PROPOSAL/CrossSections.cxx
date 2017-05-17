@@ -131,6 +131,9 @@ bool CrossSections::operator!=(const CrossSections &crossSections) const
     return !(*this == crossSections);
 }
 
+namespace PROPOSAL
+{
+
 std::ostream& operator<<(std::ostream& os, CrossSections const &crossSections)
 {
     os<<"\tParametrization:\t" << crossSections.parametrization_ << std::endl;
@@ -170,6 +173,8 @@ std::ostream& operator<<(std::ostream& os, CrossSections const &crossSections)
     os<<"\t\tlpm_effect_enabled:\t\t"<<crossSections.lpm_effect_enabled_<<std::endl;
     return os;
 }
+
+}  // namespace PROPOSAL
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//

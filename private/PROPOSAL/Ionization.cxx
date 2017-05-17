@@ -655,6 +655,9 @@ void Ionization::swap(Ionization &ioniz)
 
 }
 
+namespace PROPOSAL
+{
+
 ostream& operator<<(std::ostream& os, Ionization const &ioniz)
 {
     os<<"---------------------------Ionization( "<<&ioniz<<" )---------------------------"<<std::endl;
@@ -675,6 +678,8 @@ ostream& operator<<(std::ostream& os, Ionization const &ioniz)
     os<<"-----------------------------------------------------------------------------------------------";
     return os;
 }
+
+}  // namespace PROPOSAL
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//

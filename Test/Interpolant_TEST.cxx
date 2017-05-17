@@ -4,6 +4,8 @@
 #include "string.h"
 #include "stdio.h"
 
+using namespace PROPOSAL;
+
 double X2(double x){
     return x*x*exp(x);
 }

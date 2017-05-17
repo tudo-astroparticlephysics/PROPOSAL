@@ -16,6 +16,8 @@
 #include "TLegend.h"
 #include "TPaveStats.h"
 
+using namespace PROPOSAL;
+
 class ProgressBar {
 private:
     unsigned long _steps;

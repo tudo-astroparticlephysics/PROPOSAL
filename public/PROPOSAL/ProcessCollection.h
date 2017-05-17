@@ -26,6 +26,13 @@
 #include "PROPOSAL/Geometry.h"
 #include "PROPOSAL/Scattering.h"
 
+namespace PROPOSAL
+{
+    class ProcessCollection;
+}
+
+std::ostream& operator<<(std::ostream& os, PROPOSAL::ProcessCollection const& collection);
+
 namespace PROPOSAL{
 
 /*! \class ProcessCollection ProcessCollection.h "CrossSections.h"

@@ -17,6 +17,13 @@
 #include "PROPOSAL/Integral.h"
 #include "PROPOSAL/Interpolant.h"
 
+namespace PROPOSAL
+{
+    class ContinuousRandomization;
+}
+
+std::ostream& operator<<(std::ostream& os, PROPOSAL::ContinuousRandomization const &continuous_randomization);
+
 namespace PROPOSAL{
 
 /**
