@@ -21,11 +21,8 @@
 #include <unistd.h> // check for write permissions
 
 #include "dataclasses/physics/I3Particle.h"
-#include "simclasses/I3MMCTrack.h"
 
 #include "PROPOSAL-icetray/I3PropagatorServicePROPOSAL.h"
-#include "PROPOSAL/Propagator.h"
-#include "PROPOSAL/PROPOSALParticle.h"
 #include "PROPOSAL/Output.h"
 
 using namespace std;
