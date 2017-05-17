@@ -8,20 +8,23 @@
 
 #include <vector>
 #include <boost/shared_ptr.hpp>
-#include <icetray/I3Logging.h>
-#include <simclasses/I3MMCTrack.h>
 #include <boost/utility.hpp>
+
+#include <icetray/I3Logging.h>
 #include <icetray/I3PointerTypedefs.h>
 #include <sim-services/I3PropagatorService.h>
+#include "simclasses/I3MMCTrack.h"
 
 #include "PROPOSAL/Propagator.h" //Tomasz
 #include "PROPOSAL/PROPOSALParticle.h"
-#include "PROPOSAL/Output.h"
+
 
 class I3Particle;
-class PROPOSALParticle;
-class Output;
-class Propagator; //Tomasz
+
+  // class PROPOSALParticle;
+  // class Output;
+  // class Propagator; //Tomasz
+
 
 /**
  * @version $Id: I3PropagatorService.h 68823 2010-11-22 15:14:19Z dima $
@@ -30,6 +33,9 @@ class Propagator; //Tomasz
  *
  * @author olivas
  */
+
+namespace PROPOSAL{
+
 class I3PropagatorServicePROPOSAL : public I3PropagatorService {
 public:
 
@@ -111,7 +117,7 @@ public:
   boost::shared_ptr<I3MMCTrack> propagate(I3Particle& p, std::vector<I3Particle>& daughters);
 
 };
-
 I3_POINTER_TYPEDEFS(I3PropagatorServicePROPOSAL);
+}
 
 #endif //I3PROPAGATORSERVICEPROPOSAL_H
