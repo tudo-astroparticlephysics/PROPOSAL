@@ -2,7 +2,7 @@
 #include <iostream>
 
 using namespace std;
-
+using namespace PROPOSAL;
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
@@ -138,6 +138,9 @@ bool EnergyCutSettings::operator!=(const EnergyCutSettings &energyCutSettings) c
 //----------------------------------------------------------------------------//
 
 
+namespace PROPOSAL
+{
+
 ostream& operator<<(ostream& os, EnergyCutSettings const& cut_settings)
 {
     os<<"--------EnergyCutSettings( "<<&cut_settings<<" )--------"<<endl;
@@ -147,6 +150,7 @@ ostream& operator<<(ostream& os, EnergyCutSettings const& cut_settings)
     return os;
 }
 
+}  // namespace PROPOSAL
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//

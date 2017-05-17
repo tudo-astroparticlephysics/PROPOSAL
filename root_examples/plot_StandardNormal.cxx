@@ -14,6 +14,7 @@
 #include "PROPOSAL/methods.h"
 
 using namespace std;
+using namespace PROPOSAL;
 
 int main()
 {

@@ -7,6 +7,13 @@
 #include "PROPOSAL/Interpolant.h"
 #include <vector>
 
+namespace PROPOSAL
+{
+    class Photonuclear;
+}
+
+std::ostream& operator<<(std::ostream& os, PROPOSAL::Photonuclear const &photo);
+
 namespace PROPOSAL{
 
 namespace ShadowingType

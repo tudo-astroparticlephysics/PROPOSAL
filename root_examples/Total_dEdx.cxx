@@ -27,6 +27,7 @@
 #include "TMultiGraph.h"
 
 using namespace std;
+using namespace PROPOSAL;
 
 int main()
 {
@@ -295,7 +296,7 @@ int main()
 
             mu_ice_graphs.push_back(new TGraph(graph_name.str().c_str(),graph_name.str().c_str()));
 
-            if(photo_parametrization_vector.at(j) == ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich 
+            if(photo_parametrization_vector.at(j) == ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich
                 && brems_parametrization_vector.at(k) == ParametrizationType::BremsKelnerKokoulinPetrukhin)
             {
                 mu_ice_graphs.back()->SetLineColor(kBlack);

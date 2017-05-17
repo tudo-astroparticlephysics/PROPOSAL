@@ -6,6 +6,7 @@
 #include "PROPOSAL/Output.h"
 
 using namespace std;
+using namespace PROPOSAL;
 
 class RndFromFile{
 private:
@@ -37,7 +38,7 @@ int ConvertOldToNewBremsstrahlungParametrization(int old_param)
 {
     switch (old_param)
     {
-        case 1: 
+        case 1:
             return ParametrizationType::BremsKelnerKokoulinPetrukhin;
             break;
         case 2:
