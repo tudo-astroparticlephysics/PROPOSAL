@@ -11,7 +11,6 @@
 
 #include "MuonGun/MuonPropagator.h"
 
-#include "PROPOSAL/Propagator.h"
 #include "PROPOSAL/PROPOSALParticle.h"
 #include "PROPOSAL/Medium.h"
 
@@ -19,8 +18,8 @@ namespace I3MuonGun {
 
 MuonPropagator::MuonPropagator(const std::string &medium, double ecut, double vcut, double rho)
 {
-	EnergyCutSettings* cutset = new EnergyCutSettings(ecut,vcut);
-    Medium* med = new Medium(medium,rho);
+	PROPOSAL::EnergyCutSettings* cutset = new PROPOSAL::EnergyCutSettings(ecut,vcut);
+    PROPOSAL::Medium* med = new PROPOSAL::Medium(medium,rho);
 
 
     bool sdec      = true; // stopped muon decay
@@ -34,9 +33,9 @@ MuonPropagator::MuonPropagator(const std::string &medium, double ecut, double vc
 	// LPM suppression
     bool lpm = true;
     // Bremsstrahlung: Kelner, Kokoulin, and Petrukhin parametrization
-    ParametrizationType::Enum brems_param = ParametrizationType::BremsKelnerKokoulinPetrukhin;
+    PROPOSAL::ParametrizationType::Enum brems_param = PROPOSAL::ParametrizationType::BremsKelnerKokoulinPetrukhin;
     // Photonuclear: Abramowicz Levin Levy Maor 97 with Butkevich shadowing
-    ParametrizationType::Enum photo_param = ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich;
+    PROPOSAL::ParametrizationType::Enum photo_param = PROPOSAL::ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich;
 
     double brems_multiplier = 1.;
     double photo_multiplier = 1.;
@@ -49,9 +48,9 @@ MuonPropagator::MuonPropagator(const std::string &medium, double ecut, double vc
 	prefix << getenv("I3_BUILD") << "/MuonGun/resources/tables/icecube";
 	//propagator_->interpolate("all", prefix.str());
 
-    propagator_ = new Propagator(med
+    propagator_ = new PROPOSAL::Propagator(med
         , cutset
-        , ParticleType::MuMinus
+        , PROPOSAL::ParticleType::MuMinus
         , prefix.str()
         , molieScat
         , contiCorr
@@ -75,19 +74,19 @@ MuonPropagator::~MuonPropagator()
 void
 MuonPropagator::SetSeed(int seed)
 {
-	MathModel::set_seed(seed);
+	PROPOSAL::MathModel::set_seed(seed);
 }
 
-ParticleType::Enum
+PROPOSAL::ParticleType::Enum
 GetPROPOSALType(I3Particle::ParticleType pt)
 {
-    ParticleType::Enum code;
+    PROPOSAL::ParticleType::Enum code;
     switch (pt) {
         case I3Particle::MuMinus:
-            code = ParticleType::MuMinus;
+            code = PROPOSAL::ParticleType::MuMinus;
             break;
         case I3Particle::MuPlus:
-            code = ParticleType::MuPlus;
+            code = PROPOSAL::ParticleType::MuPlus;
             break;
         default:
             log_fatal_stream("Unsupported particle type: " << pt);
@@ -98,46 +97,46 @@ GetPROPOSALType(I3Particle::ParticleType pt)
 std::string
 MuonPropagator::GetName(const I3Particle &p)
 {
-    return PROPOSALParticle::GetName(GetPROPOSALType(p.GetType()));
+    return PROPOSAL::PROPOSALParticle::GetName(GetPROPOSALType(p.GetType()));
 }
 
-typedef std::map<ParticleType::Enum, I3Particle::ParticleType> particle_type_conversion_t;
+typedef std::map<PROPOSAL::ParticleType::Enum, I3Particle::ParticleType> particle_type_conversion_t;
 
 static const particle_type_conversion_t fromRDMCTable =
-boost::assign::list_of<std::pair<ParticleType::Enum, I3Particle::ParticleType> >
-(ParticleType::EMinus, I3Particle::EPlus)
-(ParticleType::EMinus, I3Particle::EMinus)
-(ParticleType::MuPlus, I3Particle::MuPlus)
-(ParticleType::MuMinus, I3Particle::MuMinus)
-(ParticleType::TauPlus, I3Particle::TauPlus)
-(ParticleType::TauMinus, I3Particle::TauMinus)
+boost::assign::list_of<std::pair<PROPOSAL::ParticleType::Enum, I3Particle::ParticleType> >
+(PROPOSAL::ParticleType::EMinus, I3Particle::EPlus)
+(PROPOSAL::ParticleType::EMinus, I3Particle::EMinus)
+(PROPOSAL::ParticleType::MuPlus, I3Particle::MuPlus)
+(PROPOSAL::ParticleType::MuMinus, I3Particle::MuMinus)
+(PROPOSAL::ParticleType::TauPlus, I3Particle::TauPlus)
+(PROPOSAL::ParticleType::TauMinus, I3Particle::TauMinus)
 
 // (-100, I3Particle::unknown)
-(ParticleType::Gamma, I3Particle::Gamma)
-(ParticleType::Pi0, I3Particle::Pi0)
-(ParticleType::PiPlus, I3Particle::PiPlus)
-(ParticleType::PiMinus, I3Particle::PiMinus)
-(ParticleType::KPlus, I3Particle::KPlus)
-(ParticleType::KMinus, I3Particle::KMinus)
-(ParticleType::PPlus, I3Particle::PPlus)
-(ParticleType::PMinus, I3Particle::PMinus)
+(PROPOSAL::ParticleType::Gamma, I3Particle::Gamma)
+(PROPOSAL::ParticleType::Pi0, I3Particle::Pi0)
+(PROPOSAL::ParticleType::PiPlus, I3Particle::PiPlus)
+(PROPOSAL::ParticleType::PiMinus, I3Particle::PiMinus)
+(PROPOSAL::ParticleType::KPlus, I3Particle::KPlus)
+(PROPOSAL::ParticleType::KMinus, I3Particle::KMinus)
+(PROPOSAL::ParticleType::PPlus, I3Particle::PPlus)
+(PROPOSAL::ParticleType::PMinus, I3Particle::PMinus)
 
-(ParticleType::Monopole, I3Particle::Monopole)
-(ParticleType::NuE, I3Particle::NuE)
-(ParticleType::NuMu, I3Particle::NuMu)
-(ParticleType::NuTau, I3Particle::NuTau)
-(ParticleType::NuEBar, I3Particle::NuEBar)
-(ParticleType::NuMuBar, I3Particle::NuMuBar)
-(ParticleType::NuTauBar, I3Particle::NuTauBar)
-(ParticleType::Brems, I3Particle::Brems)
-(ParticleType::DeltaE, I3Particle::DeltaE)
-(ParticleType::EPair, I3Particle::PairProd)
-(ParticleType::NuclInt, I3Particle::NuclInt)
-(ParticleType::MuPair, I3Particle::MuPair)
-(ParticleType::Hadrons, I3Particle::Hadrons);
+(PROPOSAL::ParticleType::Monopole, I3Particle::Monopole)
+(PROPOSAL::ParticleType::NuE, I3Particle::NuE)
+(PROPOSAL::ParticleType::NuMu, I3Particle::NuMu)
+(PROPOSAL::ParticleType::NuTau, I3Particle::NuTau)
+(PROPOSAL::ParticleType::NuEBar, I3Particle::NuEBar)
+(PROPOSAL::ParticleType::NuMuBar, I3Particle::NuMuBar)
+(PROPOSAL::ParticleType::NuTauBar, I3Particle::NuTauBar)
+(PROPOSAL::ParticleType::Brems, I3Particle::Brems)
+(PROPOSAL::ParticleType::DeltaE, I3Particle::DeltaE)
+(PROPOSAL::ParticleType::EPair, I3Particle::PairProd)
+(PROPOSAL::ParticleType::NuclInt, I3Particle::NuclInt)
+(PROPOSAL::ParticleType::MuPair, I3Particle::MuPair)
+(PROPOSAL::ParticleType::Hadrons, I3Particle::Hadrons);
 
 inline I3Particle
-to_I3Particle(const PROPOSALParticle *pp)
+to_I3Particle(const PROPOSAL::PROPOSALParticle *pp)
 {
 	I3Particle p;
 	particle_type_conversion_t::const_iterator it =
