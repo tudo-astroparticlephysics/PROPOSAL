@@ -7,6 +7,7 @@ I3_PYTHON_MODULE(PROPOSAL)
 {
     load_project("PROPOSAL", false);
 
+    using namespace PROPOSAL;
     using namespace boost::python;
     import("icecube.dataclasses");
     import("icecube.sim_services");

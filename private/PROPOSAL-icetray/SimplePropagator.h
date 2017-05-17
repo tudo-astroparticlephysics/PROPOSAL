@@ -16,16 +16,19 @@
 #include "phys-services/I3RandomService.h"
 
 #include "PROPOSAL/PROPOSALParticle.h"
+#include "PROPOSAL/Propagator.h" //Mayo
 
-class Propagator;
 
-namespace PROPOSAL {
+// class Propagator;
 
 /**
  * @brief A simple muon energy-loss calculator
  *
  * This hides the nasty details of PROPOSAL (a C++ translation of MMC)
  */
+namespace PROPOSAL
+{
+
 class SimplePropagator {
 public:
 	/**
@@ -76,7 +79,5 @@ public:
 private:
 	Propagator *propagator_;
 };
-
 }
-
 #endif // PROPOSAL_SIMPLEPROPAGATOR_H_INCLUDED
