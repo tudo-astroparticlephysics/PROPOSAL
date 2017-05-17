@@ -17,6 +17,7 @@
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
 
+namespace PROPOSAL{
 
 /**
  *\class Interpolant
@@ -537,6 +538,7 @@ public:
     */
 
     ~Interpolant();
+};
 };
 
 #endif /* INTERPOLANT_H_ */

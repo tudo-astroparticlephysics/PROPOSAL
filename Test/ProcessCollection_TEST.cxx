@@ -8,7 +8,7 @@
 
 
 using namespace std;
-
+using namespace PROPOSAL;
 
 class RndFromFile{
 private:

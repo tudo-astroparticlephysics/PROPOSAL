@@ -9,6 +9,8 @@
 
 #include "PROPOSAL/MathModel.h"
 
+namespace PROPOSAL{
+
 class ScatteringMoliere
 {
 private:
@@ -117,6 +119,7 @@ public:
 
     // destructors
     ~ScatteringMoliere() {}
+};
 };
 
 #endif // SCATTERING_MOLIERE_H

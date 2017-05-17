@@ -11,6 +11,8 @@
 
 #include "boost/random.hpp"
 
+namespace PROPOSAL{
+
 class MathModel
 {
 
@@ -46,9 +48,10 @@ public:
 
 private:
         static double DefaultRandomDouble();
-	
+
 	boost::function<double ()> rng_;
 	static boost::mt19937 *default_rng_;
 };
+};
 
-#endif // MATHMODEL_H_ 
+#endif // MATHMODEL_H_

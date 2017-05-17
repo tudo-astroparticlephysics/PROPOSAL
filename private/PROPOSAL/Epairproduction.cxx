@@ -5,6 +5,7 @@
 
 
 using namespace std;
+using namespace PROPOSAL;
 
 namespace po	= boost::program_options;
 
@@ -920,6 +921,8 @@ void Epairproduction::swap(Epairproduction &epair)
 
 }
 
+namespace PROPOSAL
+{
 
 ostream& operator<<(std::ostream& os, Epairproduction const &epair)
 {
@@ -968,6 +971,8 @@ ostream& operator<<(std::ostream& os, Epairproduction const &epair)
     os<<"-----------------------------------------------------------------------------------------------";
     return os;
 }
+
+}  // namespace PROPOSAL
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//

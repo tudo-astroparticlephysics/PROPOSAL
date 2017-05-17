@@ -2,6 +2,8 @@
 #include "PROPOSAL/PROPOSALParticle.h"
 #include <iostream>
 
+using namespace PROPOSAL;
+
 TEST(Comparison , Comparison_equal ) {
     PROPOSALParticle A;
     PROPOSALParticle B;

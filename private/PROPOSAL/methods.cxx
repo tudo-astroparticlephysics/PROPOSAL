@@ -19,7 +19,8 @@
 
 using namespace std;
 
-
+namespace PROPOSAL
+{
 
 bool FileExist(string path)
 {
@@ -296,3 +297,4 @@ bool Compare(string name1, string name2 , bool output)
     }
 }
 
+}  // PROPOSAL

@@ -2,6 +2,8 @@
 #include "PROPOSAL/Medium.h"
 #include <iostream>
 
+using namespace PROPOSAL;
+
 TEST(Comparison , Comparison_equal ) {
     Medium A;
     Medium B;

@@ -15,6 +15,8 @@
 #include "TGraph.h"
 #include "TLegend.h"
 
+using namespace PROPOSAL;
+
 class ProgressBar {
 private:
     unsigned long _steps;
