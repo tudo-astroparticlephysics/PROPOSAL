@@ -14,6 +14,12 @@
 #include <string>
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
+namespace PROPOSAL
+{
+    class Medium;
+}
+
+std::ostream& operator<<(std::ostream& os, PROPOSAL::Medium const& medium);
 
 namespace PROPOSAL{
 
