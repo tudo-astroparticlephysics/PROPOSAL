@@ -13,6 +13,12 @@
 #include "vector"
 #include <string>
 
+namespace PROPOSAL
+{
+    class PROPOSALParticle;
+}
+
+std::ostream& operator<<(std::ostream& os, PROPOSAL::PROPOSALParticle const& particle);
 
 namespace PROPOSAL{
 

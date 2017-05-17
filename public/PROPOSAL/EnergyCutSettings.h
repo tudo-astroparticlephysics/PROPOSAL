@@ -12,6 +12,13 @@
 
 #include <iostream>
 
+namespace PROPOSAL
+{
+    class EnergyCutSettings;
+}
+
+std::ostream& operator<<(std::ostream& os, PROPOSAL::EnergyCutSettings const& cut_settings);
+
 namespace PROPOSAL{
 
 /**

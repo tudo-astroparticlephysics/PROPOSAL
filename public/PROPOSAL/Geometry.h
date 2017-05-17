@@ -13,6 +13,13 @@
 #include <utility>
 #include <iostream>
 
+namespace PROPOSAL
+{
+    class Geometry;
+}
+
+std::ostream& operator<<(std::ostream& os, PROPOSAL::Geometry const& geometry);
+
 namespace PROPOSAL{
 
 class Geometry

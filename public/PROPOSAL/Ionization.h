@@ -5,6 +5,14 @@
 #include "PROPOSAL/Integral.h"
 #include "PROPOSAL/Interpolant.h"
 
+
+namespace PROPOSAL
+{
+    class Ionization;
+}
+
+std::ostream& operator<<(std::ostream& os, PROPOSAL::Ionization const &ioniz);
+
 namespace PROPOSAL{
 
 class Ionization: public CrossSections

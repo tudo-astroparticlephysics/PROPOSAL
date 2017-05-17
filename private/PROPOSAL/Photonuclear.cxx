@@ -970,6 +970,9 @@ void Photonuclear::swap(Photonuclear &photo)
 
 }
 
+namespace PROPOSAL
+{
+
 ostream& operator<<(std::ostream& os, Photonuclear const &photo)
 {
     os<<"---------------------------Photonuclear( "<<&photo<<" )---------------------------"<<std::endl;
@@ -1030,6 +1033,8 @@ ostream& operator<<(std::ostream& os, Photonuclear const &photo)
     os<<"-----------------------------------------------------------------------------------------------";
     return os;
 }
+
+}  // namespace PROPOSAL
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//

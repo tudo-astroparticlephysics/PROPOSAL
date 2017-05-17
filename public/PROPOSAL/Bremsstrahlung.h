@@ -8,6 +8,13 @@
 #include "PROPOSAL/Medium.h"
 #include "PROPOSAL/PROPOSALParticle.h"
 
+namespace PROPOSAL
+{
+    class Bremsstrahlung;
+}
+
+std::ostream& operator<<(std::ostream& os, PROPOSAL::Bremsstrahlung const &brems);
+
 namespace PROPOSAL {
 
 class Bremsstrahlung: public CrossSections

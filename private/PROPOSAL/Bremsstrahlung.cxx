@@ -782,6 +782,9 @@ void Bremsstrahlung::swap(Bremsstrahlung &brems)
 
 }
 
+namespace PROPOSAL
+{
+
 ostream& operator<<(std::ostream& os, Bremsstrahlung const &brems)
 {
     os<<"---------------------------Bremsstrahlung( "<<&brems<<" )---------------------------"<<std::endl;
@@ -823,6 +826,8 @@ ostream& operator<<(std::ostream& os, Bremsstrahlung const &brems)
     os<<"-----------------------------------------------------------------------------------------------";
     return os;
 }
+
+}  // namespace PROPOSAL
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//

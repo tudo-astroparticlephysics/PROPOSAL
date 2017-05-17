@@ -7,6 +7,7 @@
 #include <iostream>
 
 using namespace std;
+using namespace PROPOSAL;
 
 TEST(Comparison , Comparison_equal ) {
     Scattering A;
