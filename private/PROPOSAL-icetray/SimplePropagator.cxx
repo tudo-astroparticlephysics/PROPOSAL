@@ -13,7 +13,6 @@
 
 #include "PROPOSAL-icetray/SimplePropagator.h"
 
-#include "PROPOSAL/Propagator.h"
 #include "PROPOSAL/Output.h"
 #include "PROPOSAL/Bremsstrahlung.h"
 #include "PROPOSAL/Photonuclear.h"
@@ -21,7 +20,8 @@
 
 #include "PROPOSAL/Medium.h"
 
-namespace PROPOSAL {
+
+using namespace PROPOSAL;
 
 
 ParticleType::Enum GetPROPOSALType(I3Particle::ParticleType pt)
@@ -268,6 +268,4 @@ SimplePropagator::propagate(const I3Particle &p, double distance, boost::shared_
 	}
 	*/ //Tomasz Old End
 	return endpoint;
-}
-
 }
