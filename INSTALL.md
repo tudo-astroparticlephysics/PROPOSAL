@@ -28,11 +28,22 @@
 
 		cmake ../src -DADD_PYTHON=OFF
 
-	To specify an installation location other than `/usr/local` use
+	To specify an installation prefix other than `/usr/local` use
 
-		cmake ../src -DCMAKE_INSTALL_PREFIX=/path/to/install
+		cmake ../src -DCMAKE_INSTALL_PREFIX=/custom/prefix
 
-	To show further installation options use `ccmake ../src`
+	The prefix is used to install PROPOSAL on your system (See
+	item 6).<br>
+	To show further installation options use `ccmake ../src` and/or
+	visit the [documentation](https://cmake.org/documentation/).
+
+	#### **Note** ####
+
+	The option `CMAKE_INSTALL_PREFIX` adds the given path also to the
+	include directories. So if you have installed PROPOSAL with
+	`CMAKE_INSTALL_PREFIX` and are modifying the header files, you will make
+	sure to uninstall PROPOSAL before the next build otherwise your local
+	changes won't be used.
 
 6.  Compile the project:
 
@@ -48,3 +59,21 @@
 7.	Install the library on your system
 
 		make install
+
+	or for e.g.
+
+		make install DESTDIR=$HOME
+
+	The latter command will install PROPOSAL in `$HOME/<prefix>`, where
+	the `prefix` was defined by `CMAKE_INSTALL_PREFIX` which defaults
+	to `usr/local`.
+
+
+# Uninstalling #
+
+It is also possible to uninstall PROPOSAL with
+
+	make uninstall
+
+This will remove all files listed in `install_mainfest.txt` which should
+have been created in your build directory after the installation.
