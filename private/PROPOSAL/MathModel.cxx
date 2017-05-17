@@ -12,6 +12,8 @@
 #include "boost/bind.hpp"
 #include "boost/generator_iterator.hpp"
 
+using namespace PROPOSAL;
+
 boost::mt19937* MathModel::default_rng_ = new boost::mt19937();
 
 //----------------------------------------------------------------------------//
@@ -95,7 +97,7 @@ MathModel& MathModel::operator=(const MathModel &model)
 		rng_ = model.rng_;
 	else
 		rng_ = &DefaultRandomDouble;
-	
+
 	return *this;
 }
 

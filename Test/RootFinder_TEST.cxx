@@ -4,6 +4,8 @@
 #include <string>
 #include <cmath>
 
+using namespace PROPOSAL;
+
 double Exp(double r){
     return exp(r) - exp(0);
 }

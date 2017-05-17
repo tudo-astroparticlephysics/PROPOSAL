@@ -19,6 +19,7 @@
 
 
 using namespace std;
+using namespace PROPOSAL;
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
@@ -446,6 +447,8 @@ bool PROPOSALParticle::operator!=(const PROPOSALParticle &particle) const {
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
+namespace PROPOSAL
+{
 
 ostream& operator<<(ostream& os, PROPOSALParticle const& particle)
 {
@@ -480,6 +483,7 @@ ostream& operator<<(ostream& os, PROPOSALParticle const& particle)
     return os;
 }
 
+}  // namespace PROPOSAL
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//

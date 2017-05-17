@@ -14,6 +14,7 @@
 #include "PROPOSAL/Output.h"
 
 using namespace std;
+using namespace PROPOSAL;
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
@@ -305,6 +306,9 @@ bool Geometry::operator!=(const Geometry &geometry) const
 //----------------------------------------------------------------------------//
 
 
+namespace PROPOSAL
+{
+
 ostream& operator<<(ostream& os, Geometry const& geometry)
 {
     os<<"--------Geometry( "<<&geometry<<" )--------"<<endl;
@@ -327,6 +331,7 @@ ostream& operator<<(ostream& os, Geometry const& geometry)
     return os;
 }
 
+}  // namespace PROPOSAL
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//

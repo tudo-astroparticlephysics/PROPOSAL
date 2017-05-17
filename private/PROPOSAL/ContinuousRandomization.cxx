@@ -12,6 +12,7 @@
 #include "PROPOSAL/methods.h"
 
 using namespace std;
+using namespace PROPOSAL;
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
@@ -670,6 +671,9 @@ void ContinuousRandomization::swap(ContinuousRandomization &continuous_randomiza
     }
 }
 
+namespace PROPOSAL
+{
+
 ostream& operator<<(ostream& os, ContinuousRandomization const& continuous_randomization)
 {
     os<<"---------------------------ContinuousRandomization( "<<&continuous_randomization<<" )---------------------------"<<endl;
@@ -713,6 +717,8 @@ ostream& operator<<(ostream& os, ContinuousRandomization const& continuous_rando
     os<<"-----------------------------------------------------------------------------------------------";
     return os;
 }
+
+}  // namespace PROPOSAL
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
