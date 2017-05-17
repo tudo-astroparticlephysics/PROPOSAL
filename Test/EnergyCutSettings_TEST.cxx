@@ -2,6 +2,8 @@
 #include "PROPOSAL/EnergyCutSettings.h"
 #include <iostream>
 
+using namespace PROPOSAL;
+
 TEST(Comparison , Comparison_equal ) {
     EnergyCutSettings A;
     EnergyCutSettings B;

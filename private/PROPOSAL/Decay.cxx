@@ -14,6 +14,7 @@
 #include "boost/bind.hpp"
 
 using namespace std;
+using namespace PROPOSAL;
 
 
 //----------------------------------------------------------------------------//

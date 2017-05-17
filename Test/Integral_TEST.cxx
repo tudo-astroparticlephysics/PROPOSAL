@@ -4,6 +4,8 @@
 #include "math.h"
 #include <iostream>
 
+using namespace PROPOSAL;
+
 double Testfkt(double r){
   return exp(r);
 }

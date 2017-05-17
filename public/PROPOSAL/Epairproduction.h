@@ -5,6 +5,15 @@
 #include "PROPOSAL/Integral.h"
 #include "PROPOSAL/Interpolant.h"
 
+namespace PROPOSAL
+{
+    class Epairproduction;
+}
+
+std::ostream& operator<<(std::ostream& os, PROPOSAL::Epairproduction const &epair);
+
+namespace PROPOSAL{
+
 class Epairproduction: public CrossSections
 {
 protected:
@@ -98,7 +107,7 @@ protected:
 //----------------------------------------------------------------------------//
     double FunctionToBuildDNdxInterpolant2D(double energy, double v);
 
-//----------------------------------------------------------------------------// 
+//----------------------------------------------------------------------------//
     double CalculateStochasticLoss(double rnd1);
 
 //----------------------------------------------------------------------------//
@@ -240,6 +249,7 @@ public:
     //Destructor
     ~Epairproduction();
 
+};
 };
 
 #endif //Epairproduction_H

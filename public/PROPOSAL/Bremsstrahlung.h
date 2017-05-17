@@ -8,6 +8,14 @@
 #include "PROPOSAL/Medium.h"
 #include "PROPOSAL/PROPOSALParticle.h"
 
+namespace PROPOSAL
+{
+    class Bremsstrahlung;
+}
+
+std::ostream& operator<<(std::ostream& os, PROPOSAL::Bremsstrahlung const &brems);
+
+namespace PROPOSAL {
 
 class Bremsstrahlung: public CrossSections
 {
@@ -247,6 +255,8 @@ public:
 	void SetLorenz(bool lorenz);
 	void SetLorenzCut(double lorenzCut);
 	void SetProbForComponent(std::vector<double> probForComponent);
+};
+
 };
 
 #endif //Bremsstrahlung_H

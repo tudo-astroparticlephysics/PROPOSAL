@@ -5,6 +5,7 @@
 #include <string>
 #include "PROPOSAL/Output.h"
 
+using namespace PROPOSAL;
 
 using namespace std;
 
