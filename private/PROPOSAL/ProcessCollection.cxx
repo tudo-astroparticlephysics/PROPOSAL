@@ -298,6 +298,11 @@ pair<double, ParticleType::Enum> ProcessCollection::MakeStochasticLoss(double rn
 
     }
 
+    if (total_rate == 0.)
+    {
+        log_fatal("The total rate in ProcessCollection is %f, so no cross section is chosen. Maybe its in the interpolation tables. Try to rebuild them.", total_rate);
+    }
+
     total_rate_weighted = total_rate*rnd1;
 
     log_debug("Total rate = %f, total rate weighted = %f",total_rate ,total_rate_weighted);
