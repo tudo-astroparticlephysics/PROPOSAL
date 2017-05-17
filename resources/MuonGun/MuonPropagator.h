@@ -14,6 +14,8 @@
 #include "MuonGun/I3MuonGun.h"
 #include "phys-services/surfaces/Surface.h"
 
+#include "PROPOSAL/Propagator.h"
+
 class Propagator;
 
 namespace I3MuonGun {
@@ -61,7 +63,7 @@ public:
 	double GetStochasticRate(double energy, double fraction, I3Particle::ParticleType type=I3Particle::MuMinus) const;
 	double GetTotalStochasticRate(double energy, I3Particle::ParticleType type=I3Particle::MuMinus) const;
 private:
-	Propagator *propagator_;
+	PROPOSAL::Propagator *propagator_;
 };
 
 /**
