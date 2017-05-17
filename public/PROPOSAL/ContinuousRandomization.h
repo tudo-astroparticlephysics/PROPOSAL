@@ -17,6 +17,15 @@
 #include "PROPOSAL/Integral.h"
 #include "PROPOSAL/Interpolant.h"
 
+namespace PROPOSAL
+{
+    class ContinuousRandomization;
+}
+
+std::ostream& operator<<(std::ostream& os, PROPOSAL::ContinuousRandomization const &continuous_randomization);
+
+namespace PROPOSAL{
+
 /**
  * \brief Class containing the functions to randomize the continuous energy losses
  *
@@ -132,6 +141,7 @@ public:
     void SetBackup_particle(PROPOSALParticle *backup_particle);
     void RestoreBackup_particle();
 
+};
 };
 
 #endif /* CONTINUOUSRANDOMIZATION_H_ */

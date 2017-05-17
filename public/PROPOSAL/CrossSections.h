@@ -17,6 +17,14 @@
 #include <string>
 #include <boost/program_options.hpp>
 
+namespace PROPOSAL
+{
+    class CrossSections;
+}
+
+std::ostream& operator<<(std::ostream& os, PROPOSAL::CrossSections const&crossSections);
+
+namespace PROPOSAL{
 
 namespace ParametrizationType
 {
@@ -299,6 +307,9 @@ public:
     void RestoreBackup_particle();
 };
 
+std::ostream& operator<<(std::ostream& os, CrossSections const&crossSections);
+
+};
 
 
 #endif //CrossSections_H

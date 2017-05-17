@@ -13,6 +13,15 @@
 #include <utility>
 #include <iostream>
 
+namespace PROPOSAL
+{
+    class Geometry;
+}
+
+std::ostream& operator<<(std::ostream& os, PROPOSAL::Geometry const& geometry);
+
+namespace PROPOSAL{
+
 class Geometry
 {
 private:
@@ -188,6 +197,7 @@ public:
 //----------------------------------------------------------------------------//
     //Destructor
     ~Geometry();
+};
 };
 
 #endif // GEOMETRY_H

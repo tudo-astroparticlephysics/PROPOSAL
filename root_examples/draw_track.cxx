@@ -8,6 +8,7 @@
 #include "TStyle.h"
 
 using namespace std;
+using namespace PROPOSAL;
 
 int main(int argc, char **argv)
 {
@@ -173,7 +174,7 @@ int main(int argc, char **argv)
                 break;
             }
 
-            case ParticleType::EMinus: 
+            case ParticleType::EMinus:
             case ParticleType::EPlus:
             {
                 TPolyMarker3D* m  = new TPolyMarker3D();

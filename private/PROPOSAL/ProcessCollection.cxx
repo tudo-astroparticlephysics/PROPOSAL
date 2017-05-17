@@ -14,6 +14,7 @@
 
 
 using namespace std;
+using namespace PROPOSAL;
 
 
 //----------------------------------------------------------------------------//
@@ -1423,6 +1424,8 @@ bool ProcessCollection::operator!=(const ProcessCollection &collection) const
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
+namespace PROPOSAL
+{
 
 ostream& operator<<(ostream& os, ProcessCollection const& collection)
 {
@@ -1449,6 +1452,7 @@ ostream& operator<<(ostream& os, ProcessCollection const& collection)
     return os;
 }
 
+}  // namespace PROPOSAL
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//

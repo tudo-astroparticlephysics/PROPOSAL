@@ -21,6 +21,9 @@
 #define FIXPREC 0.9999999999999999
 #define erfInv(x)   boost::math::erf_inv(FIXPREC*x)
 
+namespace PROPOSAL
+{
+
 bool FileExist(std::string path);
 
 //----------------------------------------------------------------------------//
@@ -64,6 +67,8 @@ bool Compare(std::string name1, std::string name2 , bool output);
 std::string NextToken(std::deque<std::string> *Tokens);
 
 //----------------------------------------------------------------------------//
+
+}
 
 #define SWAP(a, b,T) {T t; t = a; a = b; b = t;}
 

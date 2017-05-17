@@ -33,6 +33,8 @@
 #include "PROPOSAL/ScatteringFirstOrder.h"
 #include "PROPOSAL/ScatteringMoliere.h"
 
+namespace PROPOSAL{
+
 class Propagator :public MathModel
 {
 private:
@@ -275,6 +277,7 @@ public:
     void SetStopping_decay(bool stopping_decay);
     void RestoreBackup_particle();
     void ResetParticle();
+};
 };
 
 #endif // _PROPAGATOR_H

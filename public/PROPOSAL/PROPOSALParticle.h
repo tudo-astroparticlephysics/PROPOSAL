@@ -13,7 +13,14 @@
 #include "vector"
 #include <string>
 
+namespace PROPOSAL
+{
+    class PROPOSALParticle;
+}
 
+std::ostream& operator<<(std::ostream& os, PROPOSAL::PROPOSALParticle const& particle);
+
+namespace PROPOSAL{
 
 // ----------------------------------------------------------------------------
 /// @brief Particle enums
@@ -47,7 +54,7 @@ namespace ParticleType
         Z0     =  23,
         WPlus  =  24,
         WMinus = -24,
-        
+
         // Mesons
         Pi0     =  111,
         PiPlus  =  211,
@@ -455,7 +462,7 @@ public:
 
 
 };
-
+};
 
 
 #endif //PARTICLE_H

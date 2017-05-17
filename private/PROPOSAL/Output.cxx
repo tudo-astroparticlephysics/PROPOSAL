@@ -1,6 +1,7 @@
 #include "PROPOSAL/Output.h"
 
 using namespace std;
+using namespace PROPOSAL;
 
 vector<PROPOSALParticle*> Output::secondarys_;
 bool Output::store_in_root_trees_ =   false;

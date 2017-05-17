@@ -12,6 +12,14 @@
 
 #include <iostream>
 
+namespace PROPOSAL
+{
+    class EnergyCutSettings;
+}
+
+std::ostream& operator<<(std::ostream& os, PROPOSAL::EnergyCutSettings const& cut_settings);
+
+namespace PROPOSAL{
 
 /**
  * \brief Class containing the energy cut such as ecut and vcut.
@@ -82,6 +90,7 @@ public:
     void SetEcut(double ecut);
     void SetVcut(double vcut);
 
+};
 };
 
 #endif /* ENERGYCUTSETTINGS_H_ */

@@ -17,6 +17,7 @@
 #include "PROPOSAL/Ionization.h"
 #include "PROPOSAL/Geometry.h"
 
+using namespace PROPOSAL;
 
 // struct CrossSectionsWrap : CrossSections, boost::python::wrapper<CrossSections>
 // {
