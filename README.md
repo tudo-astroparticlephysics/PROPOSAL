@@ -171,8 +171,8 @@ for i in range(1000):
 ## Issues ##
 
 When you encounter any errors or misunderstandings don't hesitate and write a mail to
-Tomasz.Fuchs@tu-dortmund.de
-Jan-Hendrik.Koehne@tu-dortmund.de
+[Tomasz Fuchs](mailto:Tomasz.Fuchs@tu-dortmund.de) or
+[Jan-Hendrik Koehne](mailto:Jan-Hendrik.Koehne@tu-dortmund.de).
 
 ## License ##
 
