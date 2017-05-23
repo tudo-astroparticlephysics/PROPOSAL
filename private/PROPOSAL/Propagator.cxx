@@ -700,7 +700,16 @@ double Propagator::Propagate( double distance )
 
             if(particle_->GetType()==2)
             {
-                product_energy  =   current_collection_->GetDecay()->CalculateProductEnergy(RandomDouble(), 0.5, RandomDouble());
+                // --------------------------------------------------------------------- //
+                // Calculate random numbers before passing to a fuction, because
+                // the order of argument evaluation is unspecified in c++ standards and
+                // therfor depend on the compiler.
+                // --------------------------------------------------------------------- //
+
+                double rnd1 = RandomDouble();
+                double rnd2 = RandomDouble();
+
+                product_energy  =   current_collection_->GetDecay()->CalculateProductEnergy(rnd1, 0.5, rnd2);
             }
             else
             {
