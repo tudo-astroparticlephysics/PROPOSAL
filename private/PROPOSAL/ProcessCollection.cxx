@@ -244,7 +244,17 @@ double ProcessCollection::CalculateFinalEnergy(double ei, double rnd, bool parti
 
 pair<double, ParticleType::Enum> ProcessCollection::MakeStochasticLoss()
 {
-    return this->MakeStochasticLoss(MathModel::RandomDouble(),MathModel::RandomDouble(),MathModel::RandomDouble());
+    // --------------------------------------------------------------------- //
+    // Calculate random numbers before passing to a fuction, because
+    // the order of argument evaluation is unspecified in c++ standards and
+    // therfor depend on the compiler.
+    // --------------------------------------------------------------------- //
+
+    double rnd1 = MathModel::RandomDouble();
+    double rnd2 = MathModel::RandomDouble();
+    double rnd3 = MathModel::RandomDouble();
+
+    return this->MakeStochasticLoss(rnd1, rnd2, rnd3);
 }
 
 
@@ -259,7 +269,6 @@ pair<double, ParticleType::Enum> ProcessCollection::MakeStochasticLoss(double rn
     double rates_sum           =    0;
 
     //double decayS              =    0;
-
 
     pair<double, ParticleType::Enum> energy_loss;
 
@@ -340,7 +349,17 @@ pair<double, ParticleType::Enum> ProcessCollection::MakeStochasticLoss(double rn
 
 pair<double, ParticleType::Enum> ProcessCollection::MakeDecay()
 {
-    return MakeDecay(MathModel::RandomDouble(),MathModel::RandomDouble(),MathModel::RandomDouble());
+    // --------------------------------------------------------------------- //
+    // Calculate random numbers before passing to a fuction, because
+    // the order of argument evaluation is unspecified in c++ standards and
+    // therfor depend on the compiler.
+    // --------------------------------------------------------------------- //
+
+    double rnd1 = MathModel::RandomDouble();
+    double rnd2 = MathModel::RandomDouble();
+    double rnd3 = MathModel::RandomDouble();
+
+    return MakeDecay(rnd1, rnd2, rnd3);
 }
 
 
