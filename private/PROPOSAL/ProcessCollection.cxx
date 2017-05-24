@@ -309,7 +309,9 @@ pair<double, ParticleType::Enum> ProcessCollection::MakeStochasticLoss(double rn
 
     if (total_rate == 0.)
     {
-        log_fatal("The total rate in ProcessCollection is %f, so no cross section is chosen. Maybe its in the interpolation tables. Try to rebuild them.", total_rate);
+        log_fatal("The total rate in ProcessCollection is %f, so no cross section is chosen.\n"
+            "Maybe its because of the particle charge used in Scattering::CalculateTheta0 \n"
+            "OR try to rebuild the interpolation tables.\n", total_rate);
     }
 
     total_rate_weighted = total_rate*rnd1;
