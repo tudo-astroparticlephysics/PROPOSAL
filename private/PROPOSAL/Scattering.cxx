@@ -297,8 +297,10 @@ long double Scattering::CalculateTheta0(double dr, double ei, double ef)
     {
         aux = integral_->Integrate(ei, ef, boost::bind(&Scattering::FunctionToIntegral, this, _1),4);
     }
-
-    aux =   sqrt(max(aux, 0.0)/x0_) *particle_->GetCharge();
+    // take the abs of particle charge,
+    // because otherwise (and I don't know why) the MakeStochasticLoss sometimes connot get a crosssection
+    // (total_rate=0) which results in errors
+    aux =   sqrt(max(aux, 0.0)/x0_) * fabs(particle_->GetCharge());
     aux *=  max(1 + 0.038*log(dr/x0_), 0.0);
 
     return min(aux, cutoff);
