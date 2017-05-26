@@ -1290,7 +1290,7 @@ double Epairproduction::FunctionToIntegral(double r)
     aux1    =   (1 + s)*(1 + Ye);
     aux2    =   (2*ME*SQRTE*medium_log_constant*Z3) / (particle_energy*v_*(1 - r2));
     Le      =   log((medium_log_constant*Z3*sqrt(aux1)) / (1 + aux2*aux1)) - 0.5*log(1 + aux*aux*aux1);
-    Lm      =   log((*medium_log_constant/aux*Z3)/(1 + aux2*(1 + s)*(1 + Ym)));
+    Lm      =   log((medium_log_constant/aux*Z3)/(1 + aux2*(1 + s)*(1 + Ym)));
 
     if ( Le > 0 )
     {
