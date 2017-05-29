@@ -27,7 +27,6 @@
 #include "PROPOSAL/MathModel.h"
 #include "PROPOSAL/ProcessCollection.h"
 #include <utility>
-#include <boost/program_options.hpp>
 #include "PROPOSAL/Geometry.h"
 #include "PROPOSAL/Scattering.h"
 #include "PROPOSAL/ScatteringFirstOrder.h"
@@ -222,10 +221,6 @@ public:
      *          particle decay
      */
     std::pair<double,double> CalculateEnergyTillStochastic( double initial_energy );
-
-//----------------------------------------------------------------------------//
-
-    boost::program_options::options_description CreateOptions();
 
 //----------------------------------------------------------------------------//
     //Getter

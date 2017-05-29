@@ -15,7 +15,6 @@
 #include "PROPOSAL/Medium.h"
 #include "PROPOSAL/EnergyCutSettings.h"
 #include <string>
-#include <boost/program_options.hpp>
 
 namespace PROPOSAL
 {
@@ -210,9 +209,6 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    virtual boost::program_options::options_description CreateOptions() = 0;
-
-//----------------------------------------------------------------------------//
     virtual void ValidateOptions() = 0;
 
 //----------------------------------------------------------------------------//
