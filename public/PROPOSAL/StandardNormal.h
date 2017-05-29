@@ -11,9 +11,10 @@
 #ifndef STANDARDNORMAL_H_
 #define STANDARDNORMAL_H_
 
+#include <cmath>
+
 #include "PROPOSAL/Integral.h"
 #include "PROPOSAL/Interpolant.h"
-#include <cmath>
 
 namespace PROPOSAL{
 
