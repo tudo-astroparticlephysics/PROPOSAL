@@ -133,7 +133,13 @@ ADD_LIBRARY(PROPOSAL SHARED ${SRC_FILES})
 SET_TARGET_PROPERTIES(PROPOSAL PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -O2")# -Wextra -pedantic")
 TARGET_LINK_LIBRARIES(PROPOSAL ${LIBRARYS_TO_LINK})
 
-EXECUTE_PROCESS(COMMAND ln -s ${CMAKE_SOURCE_DIR}/resources ${CMAKE_BINARY_DIR}/resources)
+IF(IS_SYMLINK ${CMAKE_BINARY_DIR}/resources)
+	# Do nothing
+ELSE()
+	EXECUTE_PROCESS(COMMAND ln -sv ${CMAKE_SOURCE_DIR}/resources ${CMAKE_BINARY_DIR}/resources OUTPUT_VARIABLE link_msg OUTPUT_STRIP_TRAILING_WHITESPACE)
+	MESSAGE(STATUS "Symlink to resources created:")
+	MESSAGE(STATUS "  ${link_msg}")
+ENDIF()
 
 ADD_EXECUTABLE(WriteSectorsFromDomList
         private/test/WriteSectorsFromDomList.cxx
@@ -151,7 +157,7 @@ INSTALL(FILES ${INC_FILES} DESTINATION include/PROPOSAL)
 #################################################################
 
 IF(DO_TESTING)
-  EXECUTE_PROCESS(COMMAND mkdir ${PROPOSAL_BINARY_DIR}/bin/ OUTPUT_VARIABLE _output OUTPUT_STRIP_TRAILING_WHITESPACE)
+  EXECUTE_PROCESS(COMMAND mkdir -p ${PROPOSAL_BINARY_DIR}/bin/ OUTPUT_VARIABLE _output OUTPUT_STRIP_TRAILING_WHITESPACE)
 
   #create tar directory with "tar -czvf TestFiles.tar.Z TestFiles/" and put it in Test directory
   EXECUTE_PROCESS(COMMAND  tar -xvf ${PROJECT_SOURCE_DIR}/tests/TestFiles.tar.Z -C ${PROPOSAL_BINARY_DIR}/bin/
