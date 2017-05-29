@@ -44,10 +44,6 @@ std::deque<std::string>* SplitString(std::string args, std::string Delimiters);
 
 //----------------------------------------------------------------------------//
 
-bool EqualsIgnoreCase(std::string s1, std::string s2);
-
-//----------------------------------------------------------------------------//
-
 std::string ToLowerCase(std::string toConvert);
 
 //----------------------------------------------------------------------------//
