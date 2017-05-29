@@ -325,6 +325,26 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
     ;
 
     // --------------------------------------------------------------------- //
+    // MediumType
+    // --------------------------------------------------------------------- //
+
+    enum_<MediumType::Enum>("MediumType")
+        .value("Water"         , MediumType::Water)
+        .value("Ice"           , MediumType::Ice)
+        .value("Hydrogen"      , MediumType::Hydrogen)
+        .value("Iron"          , MediumType::Iron)
+        .value("Copper"        , MediumType::Copper)
+        .value("Lead"          , MediumType::Lead)
+        .value("Uranium"       , MediumType::Uranium)
+        .value("Air"           , MediumType::Air)
+        .value("AntaresWater"  , MediumType::AntaresWater)
+        .value("StandardRock"  , MediumType::StandardRock)
+        .value("FrejusRock"    , MediumType::FrejusRock)
+        .value("Salt"          , MediumType::Salt)
+        .value("MineralOil"    , MediumType::MineralOil)
+    ;
+
+    // --------------------------------------------------------------------- //
     // Particle
     // --------------------------------------------------------------------- //
 
@@ -405,7 +425,7 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
 
     class_<Medium, boost::shared_ptr<Medium> >("Medium", init<>())
 
-        .def(init<std::string, double>((arg("medium_type"), arg("rho") = 1.0)))
+        .def(init<MediumType::Enum, double>((arg("medium_type"), arg("rho") = 1.0)))
         .def(init<const Medium&>())
 
         .def(self_ns::str(self_ns::self))
@@ -434,6 +454,7 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
         .add_property("element_name", getNameMed, &Medium::SetElementName)
         .add_property("mol_density", &Medium::GetMolDensity, &Medium::SetMolDensity)
         .add_property("name", &Medium::GetName, &Medium::SetName)
+        .add_property("type", &Medium::GetType, &Medium::SetType)
         .add_property("MN", &Medium::GetMN, &Medium::SetMN)
         .add_property("MM", &Medium::GetMM, &Medium::SetMM)
         .add_property("sum_nucleons", &Medium::GetSumNucleons, &Medium::SetSumNucleons)

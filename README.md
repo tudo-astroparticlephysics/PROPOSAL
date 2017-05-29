@@ -151,7 +151,7 @@ import pyPROPOSAL
 
 ptype = pyPROPOSAL.ParticleType.MuMinus
 
-med = pyPROPOSAL.Medium("ice")
+med = pyPROPOSAL.MediumType.Ice
 E = pyPROPOSAL.EnergyCutSettings()
 prop = pyPROPOSAL.Propagator(med, E, ptype, "resources/tables")
 

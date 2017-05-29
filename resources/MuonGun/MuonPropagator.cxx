@@ -19,7 +19,7 @@ namespace I3MuonGun {
 MuonPropagator::MuonPropagator(const std::string &medium, double ecut, double vcut, double rho)
 {
 	PROPOSAL::EnergyCutSettings* cutset = new PROPOSAL::EnergyCutSettings(ecut,vcut);
-    PROPOSAL::Medium* med = new PROPOSAL::Medium(medium,rho);
+    PROPOSAL::Medium* med = new PROPOSAL::Medium(PROPOSAL::Medium::GetTypeFromName(medium),rho);
 
 
     bool sdec      = true; // stopped muon decay

@@ -983,48 +983,48 @@ ParticleType::Enum PROPOSALParticle::GetTypeFromName(std::string particle_name)
 
     if (StartsWith(particle_name,"mu"))
     {
-        if (particle_name.compare("mu-")) return ParticleType::MuMinus;
-        else if (particle_name.compare("mu+")) return ParticleType::MuPlus;
+        if (particle_name.compare("mu-") == 0) return ParticleType::MuMinus;
+        else if (particle_name.compare("mu+") == 0) return ParticleType::MuPlus;
         else return ParticleType::MuMinus;
     }
     else if (StartsWith(particle_name,"tau"))
     {
-        if (particle_name.compare("tau-")) return ParticleType::TauMinus;
-        else if (particle_name.compare("tau+")) return ParticleType::TauPlus;
+        if (particle_name.compare("tau-") == 0) return ParticleType::TauMinus;
+        else if (particle_name.compare("tau+") == 0) return ParticleType::TauPlus;
         else return ParticleType::TauMinus;
     }
     else if (StartsWith(particle_name,"e"))
     {
-        if (particle_name.compare("e-")) return ParticleType::EMinus;
-        else if (particle_name.compare("e+")) return ParticleType::EPlus;
+        if (particle_name.compare("e-") == 0) return ParticleType::EMinus;
+        else if (particle_name.compare("e+") == 0) return ParticleType::EPlus;
         else return ParticleType::EMinus;
     }
     else if (StartsWith(particle_name,"stau"))
     {
-        if (particle_name.compare("stau-")) return ParticleType::STauMinus;
-        else if (particle_name.compare("stau+")) return ParticleType::STauPlus;
+        if (particle_name.compare("stau-") == 0) return ParticleType::STauMinus;
+        else if (particle_name.compare("stau+") == 0) return ParticleType::STauPlus;
         else return ParticleType::STauMinus;
     }
-    else if (particle_name.compare("monopole")) return ParticleType::Monopole;
+    else if (particle_name.compare("monopole") == 0) return ParticleType::Monopole;
     else if (StartsWith(particle_name,"nu"))
     {
-        if (particle_name.compare("nu_mu")) return ParticleType::NuMu;
-        else if (particle_name.compare("nu_mu_bar")) return ParticleType::NuMuBar;
-        else if (particle_name.compare("nu_tau")) return ParticleType::NuTau;
-        else if (particle_name.compare("nu_tau_bar")) return ParticleType::NuTauBar;
-        else if (particle_name.compare("nu_e")) return ParticleType::NuE;
-        else if (particle_name.compare("nu_e_bar")) return ParticleType::NuEBar;
+        if (particle_name.compare("nu_mu") == 0) return ParticleType::NuMu;
+        else if (particle_name.compare("nu_mu_bar") == 0) return ParticleType::NuMuBar;
+        else if (particle_name.compare("nu_tau") == 0) return ParticleType::NuTau;
+        else if (particle_name.compare("nu_tau_bar") == 0) return ParticleType::NuTauBar;
+        else if (particle_name.compare("nu_e") == 0) return ParticleType::NuE;
+        else if (particle_name.compare("nu_e_bar") == 0) return ParticleType::NuEBar;
         else
         {
             log_fatal("the neutrino name '%s' is not correct it should be e.g. nu_mu_bar", particle_name.c_str());
         }
     }
-    else if (particle_name.compare("DeltaE")) return ParticleType::DeltaE;
-    else if (particle_name.compare("ContinuousEnergyLoss")) return ParticleType::ContinuousEnergyLoss;
-    else if (particle_name.compare("Brems")) return ParticleType::Brems;
-    else if (particle_name.compare("NuclInt")) return ParticleType::NuclInt;
-    else if (particle_name.compare("Hadrons")) return ParticleType::Hadrons;
-    else if (particle_name.compare("EPair")) return ParticleType::EPair;
+    else if (particle_name.compare("DeltaE") == 0) return ParticleType::DeltaE;
+    else if (particle_name.compare("ContinuousEnergyLoss") == 0) return ParticleType::ContinuousEnergyLoss;
+    else if (particle_name.compare("Brems") == 0) return ParticleType::Brems;
+    else if (particle_name.compare("NuclInt") == 0) return ParticleType::NuclInt;
+    else if (particle_name.compare("Hadrons") == 0) return ParticleType::Hadrons;
+    else if (particle_name.compare("EPair") == 0) return ParticleType::EPair;
     else
     {
         log_fatal("the particle name '%s' is not a PROPOSAL Particle", particle_name.c_str());

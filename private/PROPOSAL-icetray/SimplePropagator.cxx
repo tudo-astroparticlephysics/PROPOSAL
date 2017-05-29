@@ -47,10 +47,10 @@ ParticleType::Enum GetPROPOSALType(I3Particle::ParticleType pt)
 }
 
 
-SimplePropagator::SimplePropagator(const std::string &medium, I3Particle::ParticleType pt, double ecut, double vcut, double rho)
+SimplePropagator::SimplePropagator(MediumType::Enum medium_type, I3Particle::ParticleType pt, double ecut, double vcut, double rho)
 {
     EnergyCutSettings* cutset = new EnergyCutSettings(ecut,vcut);
-    Medium* med = new Medium(medium,rho);
+    Medium* med = new Medium(medium_type,rho);
 
     bool sdec      = true; // stopped muon decay
     bool exactTime = true; // exact local time

@@ -8,23 +8,23 @@ TEST(Comparison , Comparison_equal ) {
     Medium A;
     Medium B;
     EXPECT_TRUE(A==B);
-    Medium* C = new Medium("antares water",0.3);
-    Medium* D = new Medium("antares water",0.3);
+    Medium* C = new Medium(MediumType::AntaresWater,0.3);
+    Medium* D = new Medium(MediumType::AntaresWater,0.3);
     EXPECT_TRUE(*C==*D);
-    Medium* E = new Medium("water",1.);
+    Medium* E = new Medium(MediumType::Water,1.);
     EXPECT_TRUE(A==*E);
 
 }
 
 TEST(Comparison , Comparison_not_equal ) {
     Medium A;
-    Medium B("antares water",0.3);
+    Medium B(MediumType::AntaresWater,0.3);
     EXPECT_TRUE(A!=B);
-    Medium* C = new Medium("antares water",0.3);
-    Medium* D = new Medium("ice",0.3);
+    Medium* C = new Medium(MediumType::AntaresWater,0.3);
+    Medium* D = new Medium(MediumType::Ice,0.3);
     EXPECT_TRUE(*C!=*D);
-    Medium* E = new Medium("water",0.3);
-    Medium* F = new Medium("water",1);
+    Medium* E = new Medium(MediumType::Water,0.3);
+    Medium* F = new Medium(MediumType::Water,1);
     EXPECT_TRUE(*E!=*F);
 
 }
@@ -38,7 +38,7 @@ TEST(Assignment , Copyconstructor ) {
 }
 
 TEST(Assignment , Copyconstructor2 ) {
-    Medium A("uranium",1.3);
+    Medium A(MediumType::Uranium,1.3);
     Medium B(A);
 
     EXPECT_TRUE(A==B);
@@ -47,7 +47,7 @@ TEST(Assignment , Copyconstructor2 ) {
 
 TEST(Assignment , Operator ) {
     Medium A;
-    Medium B("ice",0.4);
+    Medium B(MediumType::Ice,0.4);
 
     EXPECT_TRUE(A!=B);
 
@@ -60,10 +60,10 @@ TEST(Assignment , Swap ) {
     Medium A;
     Medium B;
     EXPECT_TRUE(A==B);
-    Medium* C = new Medium("antares water",0.3);
-    Medium* D = new Medium("antares water",0.3);
+    Medium* C = new Medium(MediumType::AntaresWater,0.3);
+    Medium* D = new Medium(MediumType::AntaresWater,0.3);
     EXPECT_TRUE(*C==*D);
-    Medium* E = new Medium("water",1.);
+    Medium* E = new Medium(MediumType::Water,1.);
     EXPECT_TRUE(A==*E);
 
     A.swap(*C);
