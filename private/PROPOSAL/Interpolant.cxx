@@ -24,13 +24,15 @@
  * @author Dmitry Chirkin
  */
 
-#include "PROPOSAL/Interpolant.h"
-#include "PROPOSAL/methods.h"
-#include "PROPOSAL/Output.h"
 
 #include <algorithm>
 #include <sstream>
 
+#include <boost/bind.hpp>
+
+#include "PROPOSAL/Interpolant.h"
+#include "PROPOSAL/methods.h"
+#include "PROPOSAL/Output.h"
 
 using namespace std;
 using namespace PROPOSAL;
