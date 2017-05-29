@@ -22,7 +22,7 @@ if __name__ == "__main__":
 
     ptype = pyPROPOSAL.ParticleType.MuMinus
     mu = pyPROPOSAL.Particle(ptype)
-    med = pyPROPOSAL.Medium()
+    med = pyPROPOSAL.MediumType.Ice
     E_cut = pyPROPOSAL.EnergyCutSettings(-1, -1)
 
     photo = list()

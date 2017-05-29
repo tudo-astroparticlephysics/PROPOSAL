@@ -81,7 +81,7 @@ def propagate():
     """
     ptype = pyPROPOSAL.ParticleType.MuMinus
 
-    med = pyPROPOSAL.Medium("ice")
+    med = pyPROPOSAL.MediumType.Ice
 
     cuts_inside = pyPROPOSAL.EnergyCutSettings(500, -1)
     cuts_infront = pyPROPOSAL.EnergyCutSettings(-1, 0.05)
