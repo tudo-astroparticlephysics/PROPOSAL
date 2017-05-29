@@ -97,58 +97,6 @@ int RoundValue(double val)
 //----------------------------------------------------------------------------//
 
 
-// Compares strings case-insensitive
-
-bool EqualsIgnoreCase(std::string s1, std::string s2)
-{
-    if(s1.length()==s2.length())
-    {
-        for(int i=0; i<(int)s1.length(); i++)
-        {
-            char buffer;
-
-            if(s1.at(i)==s2.at(i))
-            {
-                continue;
-            }
-            else
-            {
-                buffer  =   (char)toupper(s1.at(i));
-
-                if(s2.at(i)==buffer)
-                {
-                    continue;
-                }
-                else
-                {
-                    buffer  =   (char)tolower(s1.at(i));
-
-                    if(s2.at(i)==buffer)
-                    {
-                        continue;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
-            }
-        }
-
-        return true;
-    }
-
-    else
-    {
-        return false;
-    }
-}
-
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
 
 string ToLowerCase(string toConvert)
 {
