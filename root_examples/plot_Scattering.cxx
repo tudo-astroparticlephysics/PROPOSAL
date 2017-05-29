@@ -17,7 +17,7 @@ using namespace PROPOSAL;
 int main()
 {
 
-    Medium* med = new Medium("ice",1.);
+    Medium* med = new Medium(MediumType::Ice, 1.);
     EnergyCutSettings* ecut = new EnergyCutSettings(10,1e-3);
     Propagator* prop = new Propagator(med, ecut, ParticleType::MuMinus, "resources/tables");//,false,true,true,true,1,12,1,1,1,1,false,2);
 

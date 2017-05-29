@@ -46,9 +46,9 @@ int main()
     PROPOSALParticle *tau   =   new PROPOSALParticle(ParticleType::TauMinus);
     PROPOSALParticle *e     =   new PROPOSALParticle(ParticleType::EMinus);
 
-    Medium  *med1   =   new Medium("hydrogen",1.);
-    Medium  *med2   =   new Medium("ice",1.);
-    Medium  *med3   =   new Medium("uranium",1.);
+    Medium  *med1   =   new Medium(MediumType::Hydrogen,1.);
+    Medium  *med2   =   new Medium(MediumType::Water,1.);
+    Medium  *med3   =   new Medium(MediumType::Uranium,1.);
 
     EnergyCutSettings*  cuts    =   new EnergyCutSettings(-1,-1);
 

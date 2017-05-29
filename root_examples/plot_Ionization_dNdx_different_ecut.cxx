@@ -22,7 +22,7 @@ int main()
     PROPOSALParticle *tau   =   new PROPOSALParticle(ParticleType::TauMinus);
     PROPOSALParticle *e     =   new PROPOSALParticle(ParticleType::EMinus);
 
-    Medium  *med    =   new Medium("water",1.);
+    Medium  *med   =   new Medium(MediumType::Water,1.);
 
     EnergyCutSettings*  cuts1    =   new EnergyCutSettings(e->GetMass(),-1);
     EnergyCutSettings*  cuts2    =   new EnergyCutSettings(1,-1);
