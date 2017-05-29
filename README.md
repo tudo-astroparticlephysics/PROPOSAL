@@ -49,6 +49,8 @@ all these OS are UNIX based it should be fine to run and compile PROPOSAL on a U
 
 - [ROOT](https://root.cern.ch/)
   (This is highly recommended since there are lots of example plots and you are able to save the output in an root file.)
+- [Boost.Python](http://www.boost.org/doc/libs/1_64_0/libs/python/doc/html/index.html)
+  (To build the python wrapper)
 
 ## Installation ##
 
