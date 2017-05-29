@@ -28,7 +28,7 @@ class Medium
 
 protected:
 
-    int numCompontents_;                	///< number of components
+    int numComponents_;                	///< number of components
     std::vector<double> nucCharge_;         ///< nucleus charge
     std::vector<double> atomicNum_;         ///< atomic number
     std::vector<double> atomInMolecule_;    ///< number of atoms in a molecule
@@ -240,7 +240,7 @@ public:
 
     int GetNumComponents() const
     {
-        return numCompontents_;
+        return numComponents_;
     }
 //----------------------------------------------------------------------------//
 
@@ -390,7 +390,7 @@ public:
 //----------------------------------------------------------------------------//
 
     // Setter
-    void SetNumComponents(int numCompontents);
+    void SetNumComponents(int numComponents);
     void SetNucCharge(std::vector<double> nucCharge);
     void SetAtomicNum(std::vector<double> atomicNum);
     void SetAtomInMolecule(std::vector<double> atomInMolecule);
