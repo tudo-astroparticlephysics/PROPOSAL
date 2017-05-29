@@ -85,7 +85,7 @@ double Photonuclear::CalculatedNdx(double rnd)
 
     // The random number will be stored to be able
     // to check if dNdx is already calculated for this random number.
-    // This avoids a second calculation in CalculateStochaticLoss
+    // This avoids a second calculation in CalculateStochasticLoss
 
     rnd_    =   rnd;
 
@@ -1020,111 +1020,92 @@ ostream& operator<<(std::ostream& os, Photonuclear const &photo)
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
-//----------------------------Parametrizations--------------------------------//
+//-----------------Photonuclear Parametrizations-------------------------------//
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
 
-double Photonuclear::KokoulinParametrization(double v, int i)
+double Photonuclear::ParametrizationOfRealPhotonAssumption(double v, int i)
 {
-    double nu, sgn, aux;
+    double aux, aum, k, G, t, sgn;
+    double nu = v*particle_->GetEnergy()*1.e-3;
 
-    nu =   v*particle_->GetEnergy();
-    nu *=  1.e-3;
-
-    if(nu<=200.)
+    switch (parametrization_)
     {
-        if(nu<=17.)
-        {
-            sgn =   96.1+82./sqrt(nu);
-        }
-        else
-        {
-            aux =   log(0.0213*nu);
-            sgn =   114.3 + 1.647*aux*aux;
-        }
+        case ParametrizationType::PhotoKokoulinShadowBezrukovSoft:
+        case ParametrizationType::PhotoKokoulinShadowBezrukovHard:
+            sgn = PhotoNucleusCrossSectionKokoulin(nu);
+            break;
+        case ParametrizationType::PhotoRhodeShadowBezrukovSoft:
+        case ParametrizationType::PhotoRhodeShadowBezrukovHard:
+            sgn = PhotoNucleusCrossSectionRhode(nu);
+            break;
+        case ParametrizationType::PhotoBezrukovBugaevShadowBezrukovSoft:
+        case ParametrizationType::PhotoBezrukovBugaevShadowBezrukovHard:
+            sgn = PhotoNucleusCrossSectionBezrukovBugaev(nu);
+            break;
+        case ParametrizationType::PhotoZeusShadowBezrukovSoft:
+        case ParametrizationType::PhotoZeusShadowBezrukovHard:
+            sgn = PhotoNucleusCrossSectionZeus(nu, medium_->GetAverageNucleonWeight().at(i));
+            break;
+        default:
+            log_fatal("The photonuclear Parametrization %i is not supported.\n", parametrization_);
+    }
+
+    const double m1 =   0.54;
+    const double m2 =   1.80;
+
+    double particle_charge = particle_->GetCharge();
+    double particle_mass = particle_->GetMass();
+    double atomic_number = medium_->GetAtomicNum().at(i);
+
+    k   =   1 - 2/v + 2/(v*v);
+
+    if(medium_->GetNucCharge().at(i)==1)
+    {
+        G   =   1;
     }
     else
     {
-        sgn =   49.2 + 11.1*log(nu) + 151.8/sqrt(nu);
+        G   =   ShadowBezrukovBugaev(sgn, atomic_number);
     }
 
-    return ParametrizationOfRealPhotonAssumption(v, i, sgn);
-}
+    G       *=  3;
+    aux     =   v*particle_mass*1.e-3;
+    t       =   aux*aux/(1-v);
+    aum     =   particle_mass*1.e-3;
+    aum     *=  aum;
+    aux     =   2*aum/t;
+    aux     =   G*((k + 4*aum/m1)*log(1 + m1/t) - (k*m1)/(m1 + t) - aux)
+                + ((k + 2*aum/m2)*log(1 + m2/t) - aux)
+                + aux*((G*(m1 - 4*t))/(m1 + t) + (m2/t)*log(1 + t/m2));
 
+    aux     *=  ALPHA/(8*PI)*atomic_number*v*sgn*1.e-30;
 
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-double Photonuclear::RhodeParametrization(double v, int i)
-{
-    double nu, sgn;
-
-    nu =   v*particle_->GetEnergy();
-    nu *=  1.e-3;
-
-    if(nu<=200.)
+    if(hard_component_)
     {
-        sgn =   MeasuredSgN(nu);
+        switch (particle_->GetType())
+        {
+            case ParticleType::MuMinus:
+            case ParticleType::MuPlus:
+            case ParticleType::TauMinus:
+            case ParticleType::TauPlus:
+                aux +=  atomic_number*1.e-30*HardBB(particle_->GetEnergy(), v);
+                break;
+            default:
+                break;
+        }
     }
-    else
-    {
-        sgn =   49.2 + 11.1*log(nu) + 151.8/sqrt(nu);
-    }
 
-    return ParametrizationOfRealPhotonAssumption(v, i, sgn);
+    return medium_->GetMolDensity()*medium_->GetAtomInMolecule().at(i)*particle_charge*particle_charge*aux;
 }
 
-
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-
-double Photonuclear::BezrukovBugaevParametrization(double v, int i)
+double Photonuclear::ParametrizationOfQ2Integration(double v, int i)
 {
-    double nu, sgn, aux;
-
-    nu =   v*particle_->GetEnergy();
-    nu *=  1.e-3;
-
-    aux =   log(0.0213*nu);
-    sgn =   114.3 + 1.647*aux*aux;
-
-    return ParametrizationOfRealPhotonAssumption(v, i, sgn);
-}
-
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-double Photonuclear::ZeusParametrization(double v, int i)
-{
-    double nu, sgn, aux;
-
-    nu =   v*particle_->GetEnergy();
-    nu *=  1.e-3;
-
-    aux =   nu*2.e-3*medium_->GetAverageNucleonWeight().at(i);
-    sgn =   63.5*pow(aux, 0.097) + 145*pow(aux , -0.5);
-
-    return ParametrizationOfRealPhotonAssumption(v, i, sgn);
-}
-
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-double Photonuclear::ALLM91Parametrization(double v, int i)
-{
-    double particle_charge, particle_mass, particle_energy;
-
-    particle_mass = particle_->GetMass();
-    particle_energy = particle_->GetEnergy();
-    particle_charge = particle_->GetCharge();
-    particle_charge *= particle_charge;
+    double particle_energy = particle_->GetEnergy();
 
     if(do_photo_interpolation_)
     {
@@ -1136,6 +1117,8 @@ double Photonuclear::ALLM91Parametrization(double v, int i)
     }
 
     double aux, min, max;
+    double particle_mass = particle_->GetMass();
+    double particle_charge = particle_->GetCharge();
 
     component_ =   i;
     v_         =   v;
@@ -1156,145 +1139,32 @@ double Photonuclear::ALLM91Parametrization(double v, int i)
         return 0;
     }
 
-    return medium_->GetMolDensity()*medium_->GetAtomInMolecule().at(i)*particle_charge*integral_->Integrate(min, max, boost::bind(&Photonuclear::FunctionToIntegralALLM91, this, _1),4);
+    aux = medium_->GetMolDensity()*medium_->GetAtomInMolecule().at(i)*particle_charge*particle_charge;
 
+    switch (parametrization_)
+    {
+        case ParametrizationType::PhotoAbramowiczLevinLevyMaor91ShadowDutta:
+        case ParametrizationType::PhotoAbramowiczLevinLevyMaor91ShadowButkevich:
+            aux *= integral_->Integrate(min, max, boost::bind(&Photonuclear::FunctionToIntegralALLM91, this, _1),4);
+            break;
+        case ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowDutta:
+        case ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich:
+            aux *= integral_->Integrate(min, max, boost::bind(&Photonuclear::FunctionToIntegralALLM97, this, _1),4);
+            break;
+        case ParametrizationType::PhotoButkevichMikhailovShadowDutta:
+        case ParametrizationType::PhotoButkevichMikhailovShadowButkevich:
+            aux *= integral_->Integrate(min, max, boost::bind(&Photonuclear::FunctionToIntegralButMik, this, _1),4);
+            break;
+        case ParametrizationType::PhotoRenoSarcevicSuShadowDutta:
+        case ParametrizationType::PhotoRenoSarcevicSuShadowButkevich:
+            aux *= integral_->Integrate(min, max, boost::bind(&Photonuclear::FunctionToIntegralRSS, this, _1),4);
+            break;
+        default:
+            log_fatal("The photonuclear Parametrization %i is not supported.\n", parametrization_);
+    }
+    
+    return aux;
 }
-
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-double Photonuclear::ALLM97Parametrization(double v, int i)
-{
-    double particle_charge, particle_mass, particle_energy;
-
-    particle_mass = particle_->GetMass();
-    particle_energy = particle_->GetEnergy();
-    particle_charge = particle_->GetCharge();
-    particle_charge *= particle_charge;
-
-    if(do_photo_interpolation_)
-    {
-        SetIntegralLimits(i);
-        if(v >= vUp_)
-        {
-            return max(photo_interpolant_.at(i)->Interpolate(particle_energy, log(v/vUp_)/log(vMax_/vUp_)), 0.0);
-        }
-    }
-
-    double aux, min, max;
-
-    component_ =   i;
-    v_         =   v;
-    min        =   particle_mass*v;
-    min        *=  min/(1-v);
-
-    if(particle_mass < MPI)
-    {
-        aux     =   particle_mass*particle_mass/particle_energy;
-        min     -=  (aux*aux)/(2*(1-v));
-    }
-
-    max =   2*medium_->GetAverageNucleonWeight().at(i)*particle_energy*(v-vMin_);
-
-    //  if(form==4) max=Math.min(max, 5.5e6);  // as requested in Butkevich and Mikheyev
-    if(min>max)
-    {
-        return 0;
-    }
-
-    return medium_->GetMolDensity()*medium_->GetAtomInMolecule().at(i)*particle_charge*integral_->Integrate(min, max, boost::bind(&Photonuclear::FunctionToIntegralALLM97, this, _1),4);
-
-}
-
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-double Photonuclear::ButkevichMikhailovParametrization(double v, int i)
-{
-    double particle_charge, particle_mass, particle_energy;
-
-    particle_mass = particle_->GetMass();
-    particle_energy = particle_->GetEnergy();
-    particle_charge = particle_->GetCharge();
-    particle_charge *= particle_charge;
-
-    if(do_photo_interpolation_)
-    {
-        SetIntegralLimits(i);
-        if(v >= vUp_)
-        {
-            return max(photo_interpolant_.at(i)->Interpolate(particle_energy, log(v/vUp_)/log(vMax_/vUp_)), 0.0);
-        }
-    }
-
-    double aux, min, max;
-
-    component_ =   i;
-    v_         =   v;
-    min        =   particle_mass*v;
-    min        *=  min/(1-v);
-
-    if(particle_mass < MPI)
-    {
-        aux     =   particle_mass*particle_mass/particle_energy;
-        min     -=  (aux*aux)/(2*(1-v));
-    }
-
-    max =   2*medium_->GetAverageNucleonWeight().at(i)*particle_energy*(v-vMin_);
-
-    //  if(form==4) max=Math.min(max, 5.5e6);  // as requested in Butkevich and Mikheyev
-    if(min>max)
-    {
-        return 0;
-    }
-
-    return medium_->GetMolDensity()*medium_->GetAtomInMolecule().at(i)*particle_charge*integral_->Integrate(min, max, boost::bind(&Photonuclear::FunctionToIntegralButMik, this, _1),4);
-
-}
-
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-double Photonuclear::RSS_ALLM97Parametrization(double v, int i)
-{
-    if(do_photo_interpolation_)
-    {
-        SetIntegralLimits(i);
-        if(v >= vUp_)
-        {
-            return max(photo_interpolant_.at(i)->Interpolate(particle_->GetEnergy(), log(v/vUp_)/log(vMax_/vUp_)), 0.0);
-        }
-    }
-
-    double aux, min, max;
-
-    component_ =   i;
-    v_         =   v;
-    min        =   particle_->GetMass()*v;
-    min        *=  min/(1-v);
-
-    if(particle_->GetMass() < MPI)
-    {
-        aux     =   particle_->GetMass()*particle_->GetMass()/particle_->GetEnergy();
-        min     -=  (aux*aux)/(2*(1-v));
-    }
-
-    max =   2*medium_->GetAverageNucleonWeight().at(i)*particle_->GetEnergy()*(v-vMin_);
-
-    if(min>max)
-    {
-        return 0;
-    }
-
-    return medium_->GetMolDensity()*medium_->GetAtomInMolecule().at(i)*particle_->GetCharge()*particle_->GetCharge()*integral_->Integrate(min, max, boost::bind(&Photonuclear::FunctionToIntegralRSS, this, _1),4);
-}
-
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
@@ -1402,43 +1272,110 @@ double Photonuclear::PhotoN(double v, int i)
     switch(parametrization_)
     {
         case ParametrizationType::PhotoKokoulinShadowBezrukovSoft:
-            return KokoulinParametrization(v, i);
         case ParametrizationType::PhotoKokoulinShadowBezrukovHard:
-            return KokoulinParametrization(v, i);
         case ParametrizationType::PhotoRhodeShadowBezrukovSoft:
-            return RhodeParametrization(v, i);
         case ParametrizationType::PhotoRhodeShadowBezrukovHard:
-            return RhodeParametrization(v, i);
         case ParametrizationType::PhotoBezrukovBugaevShadowBezrukovSoft:
-            return BezrukovBugaevParametrization(v, i);
         case ParametrizationType::PhotoBezrukovBugaevShadowBezrukovHard:
-            return BezrukovBugaevParametrization(v, i);
         case ParametrizationType::PhotoZeusShadowBezrukovSoft:
-            return ZeusParametrization(v, i);
         case ParametrizationType::PhotoZeusShadowBezrukovHard:
-            return ZeusParametrization(v, i);
+            return ParametrizationOfRealPhotonAssumption(v, i);
         case ParametrizationType::PhotoAbramowiczLevinLevyMaor91ShadowDutta:
-            return ALLM91Parametrization(v, i);
         case ParametrizationType::PhotoAbramowiczLevinLevyMaor91ShadowButkevich:
-            return ALLM91Parametrization(v, i);
         case ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowDutta:
-            return ALLM97Parametrization(v, i);
         case ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich:
-            return ALLM97Parametrization(v, i);
         case ParametrizationType::PhotoButkevichMikhailovShadowDutta:
-            return ButkevichMikhailovParametrization(v, i);
         case ParametrizationType::PhotoButkevichMikhailovShadowButkevich:
-            return ButkevichMikhailovParametrization(v, i);
         case ParametrizationType::PhotoRenoSarcevicSuShadowDutta:
-            return RSS_ALLM97Parametrization(v, i);
         case ParametrizationType::PhotoRenoSarcevicSuShadowButkevich:
-            return RSS_ALLM97Parametrization(v, i);
+            return ParametrizationOfQ2Integration(v, i);
         default:
-            log_fatal("The photonuclear parametrization_ '%i' is not supported! Be careful 0 is returned",parametrization_);
+            log_fatal("The photonuclear parametrization_ '%i' is not supported! Be careful 0 is returned. \n",parametrization_);
             return 0;
-
     }
 
+}
+
+
+//----------------------------------------------------------------------------//
+//-----------Photon Nucleus Cross Section Parametrizations--------------------//
+//----------------------------------------------------------------------------//
+
+
+double Photonuclear::PhotoNucleusCrossSectionCaldwell(double nu)
+{
+    return 49.2 + 11.1*log(nu) + 151.8/sqrt(nu);
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+double Photonuclear::PhotoNucleusCrossSectionKokoulin(double nu)
+{
+    if(nu<=200.)
+    {
+        if(nu<=17.)
+        {
+            return 96.1+82./sqrt(nu);
+        }
+        else
+        {
+            return PhotoNucleusCrossSectionBezrukovBugaev(nu);
+        }
+    }
+    else
+    {
+        return PhotoNucleusCrossSectionCaldwell(nu);
+    }
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+double Photonuclear::PhotoNucleusCrossSectionRhode(double nu)
+{
+    if(nu<=200.)
+    {
+        return MeasuredSgN(nu);
+    }
+    else
+    {
+        return PhotoNucleusCrossSectionCaldwell(nu);
+    }
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+double Photonuclear::PhotoNucleusCrossSectionBezrukovBugaev(double nu)
+{
+    double aux;
+
+    aux =   log(0.0213*nu);
+    aux =   114.3 + 1.647*aux*aux;
+
+    return aux;
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+double Photonuclear::PhotoNucleusCrossSectionZeus(double nu, double medium_average_nucleon_weight)
+{
+    double aux;
+
+    aux =   nu*2.e-3*medium_average_nucleon_weight;
+    aux =   63.5*pow(aux, 0.097) + 145*pow(aux , -0.5);
+
+    return aux;
 }
 
 
@@ -1497,6 +1434,7 @@ double Photonuclear::MeasuredSgN(double e)
 
 
 //----------------------------------------------------------------------------//
+//-------------------------Hard component-------------------------------------//
 //----------------------------------------------------------------------------//
 
 
@@ -1594,63 +1532,6 @@ double Photonuclear::HardBB(double e, double v)
 
 
 //----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-double Photonuclear::ParametrizationOfRealPhotonAssumption(double v, int i, double sgn)
-{
-    double aux, aum, k, G, t, particle_charge, atomic_number;
-
-    const double m1 =   0.54;
-    const double m2 =   1.80;
-
-    particle_charge = particle_->GetCharge();
-    particle_charge *= particle_charge;
-    atomic_number = medium_->GetAtomicNum().at(i);
-
-    k   =   1 - 2/v + 2/(v*v);
-
-    if(medium_->GetNucCharge().at(i)==1)
-    {
-        G   =   1;
-    }
-    else
-    {
-        G   =   ShadowBezrukovBugaev(sgn, atomic_number);
-    }
-
-    G       *=  3;
-    aux     =   v*particle_->GetMass()*1.e-3;
-    t       =   aux*aux/(1-v);
-    aum     =   particle_->GetMass()*1.e-3;
-    aum     *=  aum;
-    aux     =   2*aum/t;
-    aux     =   G*((k + 4*aum/m1)*log(1 + m1/t) - (k*m1)/(m1 + t) - aux)
-                + ((k + 2*aum/m2)*log(1 + m2/t) - aux)
-                + aux*((G*(m1 - 4*t))/(m1 + t) + (m2/t)*log(1 + t/m2));
-
-    aux     *=  ALPHA/(8*PI)*atomic_number*v*sgn*1.e-30;
-
-    if(hard_component_)
-    {
-        switch (particle_->GetType())
-        {
-            case ParticleType::MuMinus:
-            case ParticleType::MuPlus:
-            case ParticleType::TauMinus:
-            case ParticleType::TauPlus:
-                aux +=  atomic_number*1.e-30*HardBB(particle_->GetEnergy(), v);
-                break;
-            default:
-                break;
-        }
-    }
-
-    return medium_->GetMolDensity()*medium_->GetAtomInMolecule().at(i)*particle_charge*aux;
-}
-
-
-//----------------------------------------------------------------------------//
 //-------------------------Shadow Parametrizations----------------------------//
 //----------------------------------------------------------------------------//
 
@@ -1667,9 +1548,9 @@ double Photonuclear::ShadowBezrukovBugaev(double sgn, double atomic_number)
 
 double Photonuclear::ShadowEffect(double x , double nu)
 {
-    double G, atomic_number;
-
     if(medium_->GetNucCharge().at(component_)==1) return 1;
+
+    double G, atomic_number;
 
     atomic_number = medium_->GetAtomicNum().at(component_);
 
