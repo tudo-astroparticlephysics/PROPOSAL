@@ -39,7 +39,7 @@ double X0_inv(unsigned int Z, double M);
 
 
 Medium::Medium()
-    :numCompontents_    (0)
+    :numComponents_    (0)
     ,nucCharge_         ()
     ,atomicNum_         ()
     ,atomInMolecule_    ()
@@ -81,7 +81,7 @@ Medium::Medium()
 
 
 Medium::Medium(const Medium &medium)
-    :numCompontents_    (medium.numCompontents_)
+    :numComponents_    (medium.numComponents_)
     ,nucCharge_         (medium.nucCharge_ )
     ,atomicNum_         (medium.atomicNum_ )
     ,atomInMolecule_    (medium.atomInMolecule_ )
@@ -122,7 +122,7 @@ Medium::Medium(const Medium &medium)
 
 
 Medium::Medium(string w, double rho)
-    :numCompontents_    (0)
+    :numComponents_    (0)
     ,nucCharge_         ()
     ,atomicNum_         ()
     ,atomInMolecule_    ()
@@ -250,7 +250,7 @@ Medium& Medium::operator=(const Medium &medium)
 
 bool Medium::operator==(const Medium &medium) const
 {
-    if( numCompontents_   != medium.numCompontents_)return false;
+    if( numComponents_   != medium.numComponents_)return false;
     if( sumCharge_        != medium.sumCharge_)     return false;
     if( ZA_               != medium.ZA_)            return false;
     if( I_                != medium.I_)             return false;
@@ -349,7 +349,7 @@ ostream& operator<<(ostream& os, Medium const& medium)
 
     os<<"--------------------Medium( "<<&medium<<" )--------------------"<<endl;
     os<<medium.name_<<endl;
-    os<<"\tnumber of components:\t\t\t\t"<<medium.numCompontents_<<endl;
+    os<<"\tnumber of components:\t\t\t\t"<<medium.numComponents_<<endl;
     os<<"\tmass density [g/cm3]:\t\t\t\t"<<medium.massDensity_<<endl;
     os<<"\tmolecule density [number/cm3]:\t\t\t"<<medium.molDensity_<<endl;
     os<<"\t<Z/A>:\t\t\t\t\t\t"<<medium.ZA_<<endl;
@@ -363,7 +363,7 @@ ostream& operator<<(ostream& os, Medium const& medium)
 
     os<<"\n# | Name | atomic number | number of atoms in a molecule | nucleus charge | average nucleon weight in a nucleus [MeV]\n"<<endl;
 
-    for(int i = 0; i<medium.numCompontents_; i++)
+    for(int i = 0; i<medium.numComponents_; i++)
     {
         os<<fixed<<std::setprecision(6)<<"\t"<<i <<"\t"<<medium.elementName_.at(i)<<"\t"<<medium.atomicNum_.at(i)<<"\t"
           <<medium.atomInMolecule_.at(i)<<"\t"<<medium.nucCharge_.at(i)<<"\t"
@@ -384,7 +384,7 @@ void Medium::swap(Medium &medium)
 {
     using std::swap;
 
-    swap( numCompontents_   , medium.numCompontents_);
+    swap( numComponents_   , medium.numComponents_);
     swap( sumCharge_        , medium.sumCharge_);
     swap( ZA_               , medium.ZA_);
     swap( I_                , medium.I_);
@@ -429,15 +429,15 @@ void Medium::swap(Medium &medium)
 
 void Medium::Inita(int i)
 {
-    numCompontents_ =   i;
+    numComponents_ =   i;
 
-    nucCharge_.resize(numCompontents_);
-    atomicNum_.resize(numCompontents_);
-    atomInMolecule_.resize(numCompontents_);
-    logConstant_.resize(numCompontents_);
-    bPrime_.resize(numCompontents_);
-    M_.resize(numCompontents_);
-    elementName_.resize(numCompontents_);
+    nucCharge_.resize(numComponents_);
+    atomicNum_.resize(numComponents_);
+    atomInMolecule_.resize(numComponents_);
+    logConstant_.resize(numComponents_);
+    bPrime_.resize(numComponents_);
+    M_.resize(numComponents_);
+    elementName_.resize(numComponents_);
 }
 
 
@@ -454,7 +454,7 @@ void Medium::Initr()
     double aux3     =   0;
     massDensity_    *=  this->rho_;
 
-    for(i = 0 ; i < numCompontents_ ; i++)
+    for(i = 0 ; i < numComponents_ ; i++)
     {
         aux1                +=  atomInMolecule_.at(i)*nucCharge_.at(i);
         aux2                +=  atomInMolecule_.at(i)*atomicNum_.at(i);
@@ -482,9 +482,9 @@ void Medium::Initr()
 
     if(flag)
     {
-        mN_.resize(numCompontents_);
+        mN_.resize(numComponents_);
         Integral *integral = new Integral(IROMB, IMAXS, IPREC);
-        for(i=0; i<numCompontents_; i++)
+        for(i=0; i<numComponents_; i++)
         {
             if(nucCharge_.at(i)!=1)
             {
@@ -503,7 +503,7 @@ void Medium::Initr()
     //Calculation of the radiation length
     aux1 = 0;
     aux2 = 0;
-    for(i = 0 ; i < numCompontents_ ; i++)
+    for(i = 0 ; i < numComponents_ ; i++)
     {
         aux1 += X0_inv(nucCharge_.at(i),atomicNum_.at(i))*(atomInMolecule_.at(i)*atomicNum_.at(i));
         aux2 += atomInMolecule_.at(i)*atomicNum_.at(i);
@@ -1067,8 +1067,8 @@ double Medium::FunctionToIntegral(double r)
 //----------------------------------------------------------------------------//
 
 
-void Medium::SetNumComponents(int numCompontents){
-    numCompontents_ = numCompontents;
+void Medium::SetNumComponents(int numComponents){
+    numComponents_ = numComponents;
 }
 
 void Medium::SetNucCharge(std::vector<double> nucCharge){
