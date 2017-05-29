@@ -6,10 +6,10 @@
 
 #include "iostream"
 #include "fstream"
+
 #include "boost/function.hpp"
-
-
 #include "boost/random.hpp"
+
 
 namespace PROPOSAL{
 

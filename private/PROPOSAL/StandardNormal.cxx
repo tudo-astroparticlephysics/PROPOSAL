@@ -8,9 +8,12 @@
 */
 
 
-#include "PROPOSAL/StandardNormal.h"
 #include <algorithm>
 #include <sstream>
+
+#include <boost/bind.hpp>
+
+#include "PROPOSAL/StandardNormal.h"
 #include "PROPOSAL/Output.h"
 
 

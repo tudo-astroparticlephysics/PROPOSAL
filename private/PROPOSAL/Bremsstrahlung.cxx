@@ -1,16 +1,16 @@
-#include "PROPOSAL/Bremsstrahlung.h"
-#include "PROPOSAL/Constants.h"
 #include <iostream>
 #include <cmath>
 #include <algorithm>
-#include <boost/program_options.hpp>
 #include <sstream>
+
+#include <boost/bind.hpp>
+
+#include "PROPOSAL/Bremsstrahlung.h"
+#include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Output.h"
 
 using namespace std;
 using namespace PROPOSAL;
-
-namespace po	= boost::program_options;
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
@@ -485,29 +485,6 @@ void Bremsstrahlung::DisableDEdxInterpolation()
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 //--------------------------Set and validate options--------------------------//
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-boost::program_options::options_description Bremsstrahlung::CreateOptions()
-{
-    po::options_description bremsstrahlung("Bremsstrahlung options");
-    bremsstrahlung.add_options()
-        ("bremsstrahlung.lorenz",           po::value<bool>(&lorenz_)->implicit_value(false),                 "enable lorenz cut")
-        ("bremsstrahlung.lorenzCut",        po::value<double>(&lorenz_cut_)->default_value(1e6),              "lorenz cut in MeV")
-        // TODO
-        // ("bremsstrahlung.para",             po::value<int>(&parametrization_)->default_value(static_cast<int>(ParametrizationType::BremsKelnerKokoulinPetrukhin))
-        //     , "ParametrizationTypes: KelnerKokoulinPetrukhin \n AndreevBezrukovBugaev \n PetrukhinShestakov \n CompleteScreeningCase")
-        ("bremsstrahlung.lpm",              po::value<bool>(&lpm_effect_enabled_)->implicit_value(false),     "Enables   Landau-Pomeranchuk-Migdal supression")
-        ("bremsstrahlung.interpol_dedx",    po::value<bool>(&do_dedx_Interpolation_)->implicit_value(false),  "Enables interpolation for dEdx")
-        ("bremsstrahlung.interpol_dndx",    po::value<bool>(&do_dndx_Interpolation_)->implicit_value(false),  "Enables interpolation for dNdx")
-        ("bremsstrahlung.multiplier",       po::value<double>(&multiplier_)->default_value(1.),               "modify the cross section by this factor")
-        ("bremsstrahlung.interpol_order",   po::value<int>(&order_of_interpolation_)->default_value(5),       "number of interpolation points");
-
-   return bremsstrahlung;
-}
-
-
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 

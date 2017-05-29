@@ -12,6 +12,9 @@
 #include <cmath>
 #include <algorithm>
 #include <stdlib.h>
+
+#include <boost/bind.hpp>
+
 #include "PROPOSAL/methods.h"
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Scattering.h"
