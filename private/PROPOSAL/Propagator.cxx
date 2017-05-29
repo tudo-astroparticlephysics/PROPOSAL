@@ -1829,7 +1829,7 @@ void Propagator::MoveParticle(double distance)
 
 void Propagator::InitDefaultCollection(Geometry* geom)
 {
-    Medium* med             = new Medium("ice",1.);
+    Medium* med             = new Medium(MediumType::Ice,1.);
     EnergyCutSettings* cuts = new EnergyCutSettings(500,0.05);
     current_collection_     = new ProcessCollection(particle_ , med, cuts);
     current_collection_->SetGeometry(geom);
@@ -2053,7 +2053,7 @@ void Propagator::InitProcessCollections(ifstream &file)
                 density_correction = 1;
             }
 
-            Medium *med     =   new Medium(name,density_correction);
+            Medium *med     =   new Medium(Medium::GetTypeFromName(name),density_correction);
 
             if (particle_ == NULL)
             {

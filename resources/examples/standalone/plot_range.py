@@ -19,7 +19,7 @@ if __name__ == "__main__":
 
     ptype = pyPROPOSAL.ParticleType.MuMinus
 
-    med = pyPROPOSAL.Medium("ice")
+    med = pyPROPOSAL.MediumType.Ice
     E = pyPROPOSAL.EnergyCutSettings()
     p = pyPROPOSAL.Propagator(
         med,

@@ -55,9 +55,9 @@ int main()
     PROPOSALParticle *tau   =   new PROPOSALParticle(ParticleType::TauMinus);
     PROPOSALParticle *e     =   new PROPOSALParticle(ParticleType::EMinus);
 
-    Medium  *med1   =   new Medium("hydrogen",1.);
-    Medium  *med2   =   new Medium("water",1.);
-    Medium  *med3   =   new Medium("uranium",1.);
+    Medium  *med1   =   new Medium(MediumType::Hydrogen,1.);
+    Medium  *med2   =   new Medium(MediumType::Water,1.);
+    Medium  *med3   =   new Medium(MediumType::Uranium,1.);
 
     EnergyCutSettings*  cuts    =   new EnergyCutSettings(0.1,-1);
 
@@ -357,7 +357,7 @@ int main()
 
         if(brems.at(i)->GetParticle()->GetType() == ParticleType::MuMinus)
         {
-            if (brems.at(i)->GetMedium()->GetName().compare("water")==0)
+            if (brems.at(i)->GetMedium()->GetType() == MediumType::Water)
             {
                 muons_water_gr->Add(graphs.at(i),"P");
                 muons_leg_water->AddEntry(graphs.at(i),leg_entry.str().c_str(),"p");
@@ -379,7 +379,7 @@ int main()
                 }
             }
 
-            else if (brems.at(i)->GetMedium()->GetName().compare("hydrogen")==0)
+            else if (brems.at(i)->GetMedium()->GetType() == MediumType::Hydrogen)
             {
                 muons_hydrogen_gr->Add(graphs.at(i),"P");
                 muons_leg_hydrogen->AddEntry(graphs.at(i),leg_entry.str().c_str(),"p");
@@ -401,7 +401,7 @@ int main()
                 }
             }
 
-            else if (brems.at(i)->GetMedium()->GetName().compare("uranium")==0)
+            else if (brems.at(i)->GetMedium()->GetType() == MediumType::Uranium)
             {
                 muons_uranium_gr->Add(graphs.at(i),"P");
                 muons_leg_uranium->AddEntry(graphs.at(i),leg_entry.str().c_str(),"p");
@@ -426,7 +426,7 @@ int main()
 
         else if(brems.at(i)->GetParticle()->GetType() == ParticleType::TauMinus)
         {
-            if (brems.at(i)->GetMedium()->GetName().compare("water")==0)
+            if (brems.at(i)->GetMedium()->GetType() == MediumType::Water)
             {
                 taus_water_gr->Add(graphs.at(i),"P");
                 taus_leg_water->AddEntry(graphs.at(i),leg_entry.str().c_str(),"p");
@@ -448,7 +448,7 @@ int main()
                 }
             }
 
-            else if (brems.at(i)->GetMedium()->GetName().compare("hydrogen")==0)
+            else if (brems.at(i)->GetMedium()->GetType() == MediumType::Hydrogen)
             {
                 taus_hydrogen_gr->Add(graphs.at(i),"P");
                 taus_leg_hydrogen->AddEntry(graphs.at(i),leg_entry.str().c_str(),"p");
@@ -470,7 +470,7 @@ int main()
                 }
             }
 
-            else if (brems.at(i)->GetMedium()->GetName().compare("uranium")==0)
+            else if (brems.at(i)->GetMedium()->GetType() == MediumType::Uranium)
             {
                 taus_uranium_gr->Add(graphs.at(i),"P");
                 taus_leg_uranium->AddEntry(graphs.at(i),leg_entry.str().c_str(),"p");
@@ -495,7 +495,7 @@ int main()
 
         else if(brems.at(i)->GetParticle()->GetType() == ParticleType::EMinus)
         {
-            if (brems.at(i)->GetMedium()->GetName().compare("water")==0)
+            if (brems.at(i)->GetMedium()->GetType() == MediumType::Water)
             {
                 electrons_water_gr->Add(graphs.at(i),"P");
                 electrons_leg_water->AddEntry(graphs.at(i),leg_entry.str().c_str(),"p");
@@ -517,7 +517,7 @@ int main()
                 }
             }
 
-            else if (brems.at(i)->GetMedium()->GetName().compare("hydrogen")==0)
+            else if (brems.at(i)->GetMedium()->GetType() == MediumType::Hydrogen)
             {
                 electrons_hydrogen_gr->Add(graphs.at(i),"P");
                 electrons_leg_hydrogen->AddEntry(graphs.at(i),leg_entry.str().c_str(),"p");
@@ -539,7 +539,7 @@ int main()
                 }
             }
 
-            else if (brems.at(i)->GetMedium()->GetName().compare("uranium")==0)
+            else if (brems.at(i)->GetMedium()->GetType() == MediumType::Uranium)
             {
                 electrons_uranium_gr->Add(graphs.at(i),"P");
                 electrons_leg_uranium->AddEntry(graphs.at(i),leg_entry.str().c_str(),"p");
@@ -677,7 +677,7 @@ int main()
 
     for(unsigned int i = 0 ; i < graphs.size() ; i++)
     {
-        if(brems.at(i)->GetMedium()->GetName().compare("hydrogen")==0)
+        if(brems.at(i)->GetMedium()->GetType() == MediumType::Hydrogen)
         {
             switch (brems.at(i)->GetParametrization())
             {
@@ -751,7 +751,7 @@ int main()
             }
         }
 
-        else if(brems.at(i)->GetMedium()->GetName().compare("water")==0)
+        else if(brems.at(i)->GetMedium()->GetType() == MediumType::Water)
         {
             switch (brems.at(i)->GetParametrization())
             {
@@ -825,7 +825,7 @@ int main()
             }
         }
 
-        else if(brems.at(i)->GetMedium()->GetName().compare("uranium")==0)
+        else if(brems.at(i)->GetMedium()->GetType() == MediumType::Uranium)
         {
             switch (brems.at(i)->GetParametrization())
             {

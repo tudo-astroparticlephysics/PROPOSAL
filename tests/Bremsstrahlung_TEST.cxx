@@ -59,7 +59,7 @@ int ConvertOldToNewBremsstrahlungParametrization(int old_param)
 TEST(Comparison , Comparison_equal ) {
 
     double dEdx;
-    Medium *medium = new Medium("air",1.);
+    Medium *medium = new Medium(MediumType::Air,1.);
     PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
     Bremsstrahlung *A = new Bremsstrahlung(particle, medium, cuts);
@@ -88,8 +88,8 @@ TEST(Comparison , Comparison_equal ) {
 
 TEST(Comparison , Comparison_not_equal ) {
 
-    Medium *medium = new Medium("air",1.);
-    Medium *medium2 = new Medium("water",1.);
+    Medium *medium = new Medium(MediumType::Air,1.);
+    Medium *medium2 = new Medium(MediumType::Water,1.);
     PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,20,20,1e5,10);
     PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,20,20,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
@@ -121,7 +121,7 @@ TEST(Assignment , Copyconstructor ) {
 }
 
 TEST(Assignment , Copyconstructor2 ) {
-    Medium *medium = new Medium("air",1.);
+    Medium *medium = new Medium(MediumType::Air,1.);
     PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
 
@@ -133,7 +133,7 @@ TEST(Assignment , Copyconstructor2 ) {
 }
 
 TEST(Assignment , Operator ) {
-    Medium *medium = new Medium("air",1.);
+    Medium *medium = new Medium(MediumType::Air,1.);
     PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
     Bremsstrahlung A(particle, medium, cuts);
@@ -146,7 +146,7 @@ TEST(Assignment , Operator ) {
 
     EXPECT_TRUE(A==B);
 
-    Medium *medium2 = new Medium("water",1.);
+    Medium *medium2 = new Medium(MediumType::Water,1.);
     PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cuts2 = new EnergyCutSettings(200,-1);
     Bremsstrahlung *C = new Bremsstrahlung(particle2, medium2, cuts2);
@@ -159,8 +159,8 @@ TEST(Assignment , Operator ) {
 }
 
 TEST(Assignment , Swap ) {
-    Medium *medium = new Medium("air",1.);
-    Medium *medium2 = new Medium("air",1.);
+    Medium *medium = new Medium(MediumType::Air,1.);
+    Medium *medium2 = new Medium(MediumType::Air,1.);
     PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
     PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
@@ -171,8 +171,8 @@ TEST(Assignment , Swap ) {
     B.EnableDEdxInterpolation();
     EXPECT_TRUE(A==B);
 
-    Medium *medium3 = new Medium("water",1.);
-    Medium *medium4 = new Medium("water",1.);
+    Medium *medium3 = new Medium(MediumType::Water,1.);
+    Medium *medium4 = new Medium(MediumType::Water,1.);
     PROPOSALParticle *particle3 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,.20,20,1e5,10);
     PROPOSALParticle *particle4 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cuts3 = new EnergyCutSettings(200,-1);
@@ -201,7 +201,7 @@ TEST(Bremsstrahlung , Test_of_dEdx ) {
     double dEdx;
     double ecut;
     double vcut;
-    string med;
+    string mediumName;
     string particleName;
     bool lpm;
     int para;
@@ -211,9 +211,9 @@ TEST(Bremsstrahlung , Test_of_dEdx ) {
 
     while(in.good())
     {
-        in>>para>>ecut>>vcut>>lpm>>energy>>med>>particleName>>dEdx;
+        in>>para>>ecut>>vcut>>lpm>>energy>>mediumName>>particleName>>dEdx;
 
-        Medium *medium = new Medium(med,1.);
+        Medium *medium = new Medium(Medium::GetTypeFromName(mediumName),1.);
         PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10);
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
@@ -249,7 +249,7 @@ TEST(Bremsstrahlung , Test_of_dNdx ) {
     double energy;
     double ecut;
     double vcut;
-    string med;
+    string mediumName;
     string particleName;
     bool lpm;
     int para;
@@ -259,9 +259,9 @@ TEST(Bremsstrahlung , Test_of_dNdx ) {
 
     while(in.good())
     {
-        in>>para>>ecut>>vcut>>lpm>>energy>>med>>particleName>>dNdx;
+        in>>para>>ecut>>vcut>>lpm>>energy>>mediumName>>particleName>>dNdx;
 
-        Medium *medium = new Medium(med,1.);
+        Medium *medium = new Medium(Medium::GetTypeFromName(mediumName),1.);
         PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10);
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
@@ -298,7 +298,7 @@ TEST(Bremsstrahlung , Test_of_dNdxrnd ) {
     double energy;
     double ecut;
     double vcut;
-    string med;
+    string mediumName;
     string particleName;
     bool lpm;
     int para;
@@ -311,10 +311,10 @@ TEST(Bremsstrahlung , Test_of_dNdxrnd ) {
     bool first = true;
     while(in.good())
     {
-        if(first)in>>para>>ecut>>vcut>>lpm>>energy>>med>>particleName>>dNdxrnd;
+        if(first)in>>para>>ecut>>vcut>>lpm>>energy>>mediumName>>particleName>>dNdxrnd;
         first=false;
         energy_old = -1;
-        Medium *medium = new Medium(med,1.);
+        Medium *medium = new Medium(Medium::GetTypeFromName(mediumName),1.);
         PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10);
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
@@ -323,7 +323,7 @@ TEST(Bremsstrahlung , Test_of_dNdxrnd ) {
         brems->SetParametrization(static_cast<ParametrizationType::Enum>(ConvertOldToNewBremsstrahlungParametrization(para)));
         brems->EnableLpmEffect(lpm);
 
-        //cout << para << "\t" << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << med << "\t" << particleName<< "\t" << dNdx << endl;
+        //cout << para << "\t" << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << mediumName << "\t" << particleName<< "\t" << dNdx << endl;
 
         while(energy_old < energy){
             energy_old = energy;
@@ -360,7 +360,7 @@ TEST(Bremsstrahlung , Test_of_e ) {
     double energy;
     double ecut;
     double vcut;
-    string med;
+    string mediumName;
     string particleName;
     bool lpm;
     int para;
@@ -376,10 +376,10 @@ TEST(Bremsstrahlung , Test_of_e ) {
     bool first = true;
     while(in.good())
     {
-        if(first)in>>para>>ecut>>vcut>>lpm>>energy>>med>>particleName>>e;
+        if(first)in>>para>>ecut>>vcut>>lpm>>energy>>mediumName>>particleName>>e;
         first=false;
         energy_old = -1;
-        Medium *medium = new Medium(med,1.);
+        Medium *medium = new Medium(Medium::GetTypeFromName(mediumName),1.);
         PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10);
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
@@ -388,7 +388,7 @@ TEST(Bremsstrahlung , Test_of_e ) {
         brems->SetParametrization(static_cast<ParametrizationType::Enum>(ConvertOldToNewBremsstrahlungParametrization(para)));
         brems->EnableLpmEffect(lpm);
 
-        //cout << para << "\t" << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << med << "\t" << particleName<< "\t" << e << endl;
+        //cout << para << "\t" << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << mediumName << "\t" << particleName<< "\t" << e << endl;
 
         while(energy_old < energy){
             energy_old = energy;
@@ -400,7 +400,7 @@ TEST(Bremsstrahlung , Test_of_e ) {
             e_new=brems->CalculateStochasticLoss(rnd1,rnd2);
             ASSERT_NEAR(e_new, e, 1E-7*e);
 
-            in>>para>>ecut>>vcut>>lpm>>energy>>med>>particleName>>e;
+            in>>para>>ecut>>vcut>>lpm>>energy>>mediumName>>particleName>>e;
         }
 
         delete cuts;
@@ -424,7 +424,7 @@ TEST(Bremsstrahlung , Test_of_dEdx_Interpolant ) {
     double dEdx;
     double ecut;
     double vcut;
-    string med;
+    string mediumName;
     string particleName;
     bool lpm;
     int para;
@@ -436,13 +436,13 @@ TEST(Bremsstrahlung , Test_of_dEdx_Interpolant ) {
     double energy_old;
     while(in.good())
     {
-        if(first)in>>para>>ecut>>vcut>>lpm>>energy>>med>>particleName>>dEdx;
+        if(first)in>>para>>ecut>>vcut>>lpm>>energy>>mediumName>>particleName>>dEdx;
         first=false;
 
         precision = precisionOld;
         energy_old =-1;
 
-        Medium *medium = new Medium(med,1.);
+        Medium *medium = new Medium(Medium::GetTypeFromName(mediumName),1.);
         PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10);
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
@@ -462,7 +462,7 @@ TEST(Bremsstrahlung , Test_of_dEdx_Interpolant ) {
 
             ASSERT_NEAR(dEdx_new, dEdx, precision*dEdx);
 
-            in>>para>>ecut>>vcut>>lpm>>energy>>med>>particleName>>dEdx;
+            in>>para>>ecut>>vcut>>lpm>>energy>>mediumName>>particleName>>dEdx;
 
             precision = precisionOld;
 
@@ -492,7 +492,7 @@ TEST(Bremsstrahlung , Test_of_dNdx_Interpolant ) {
     double energy;
     double ecut;
     double vcut;
-    string med;
+    string mediumName;
     string particleName;
     bool lpm;
     int para;
@@ -503,10 +503,10 @@ TEST(Bremsstrahlung , Test_of_dNdx_Interpolant ) {
     bool first = true;
     while(in.good())
     {
-        if(first)in>>para>>ecut>>vcut>>lpm>>energy>>med>>particleName>>dNdx;
+        if(first)in>>para>>ecut>>vcut>>lpm>>energy>>mediumName>>particleName>>dNdx;
         first=false;
         energy_old = -1;
-        Medium *medium = new Medium(med,1.);
+        Medium *medium = new Medium(Medium::GetTypeFromName(mediumName),1.);
         PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10);
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
@@ -523,7 +523,7 @@ TEST(Bremsstrahlung , Test_of_dNdx_Interpolant ) {
 
             ASSERT_NEAR(dNdx_new, dNdx, 1E-6*dNdx);
 
-            in>>para>>ecut>>vcut>>lpm>>energy>>med>>particleName>>dNdx;
+            in>>para>>ecut>>vcut>>lpm>>energy>>mediumName>>particleName>>dNdx;
         }
 
 
@@ -548,7 +548,7 @@ return;
     double energy;
     double ecut;
     double vcut;
-    string med;
+    string mediumName;
     string particleName;
     bool lpm;
     int para;
@@ -565,10 +565,10 @@ return;
     bool first = true;
     while(in.good())
     {
-        if(first)in>>para>>ecut>>vcut>>lpm>>energy>>med>>particleName>>e;
+        if(first)in>>para>>ecut>>vcut>>lpm>>energy>>mediumName>>particleName>>e;
         first=false;
         energy_old = -1;
-        Medium *medium = new Medium(med,1.);
+        Medium *medium = new Medium(Medium::GetTypeFromName(mediumName),1.);
         PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10);
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
@@ -589,7 +589,7 @@ return;
 
             ASSERT_NEAR(e_new, e, 1*e);
 
-            in>>para>>ecut>>vcut>>lpm>>energy>>med>>particleName>>e;
+            in>>para>>ecut>>vcut>>lpm>>energy>>mediumName>>particleName>>e;
             precision = precision_old;
         }
 
