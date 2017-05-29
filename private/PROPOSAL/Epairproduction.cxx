@@ -1021,21 +1021,23 @@ void Epairproduction::SetIntegralLimits(int component)
 
     component_ = component;
     double aux;
+    double particle_energy = particle_->GetEnergy();
+    double particle_mass   = particle_->GetMass();
 
-    vMin_    =   4*ME/particle_->GetEnergy();
-    vMax_    =   1 - (3./4)*SQRTE*(particle_->GetMass()/particle_->GetEnergy())
+    vMin_    =   4*ME/particle_energy;
+    vMax_    =   1 - (3./4)*SQRTE*(particle_mass/particle_energy)
                 * pow(medium_->GetNucCharge().at(component) , 1./3);
-    aux      =   particle_->GetMass()/particle_->GetEnergy();
+    aux      =   particle_mass/particle_energy;
     aux      =   1-6*aux*aux;
     vMax_    =   min(vMax_, aux);
-    vMax_    =   min(vMax_, 1-particle_->GetMass()/particle_->GetEnergy());
+    vMax_    =   min(vMax_, 1-particle_mass/particle_energy);
 
     if(vMax_ < vMin_)
     {
         vMax_    =   vMin_;
     }
 
-    vUp_     =   min(vMax_, cut_settings_->GetCut(particle_->GetEnergy()));
+    vUp_     =   min(vMax_, cut_settings_->GetCut(particle_energy));
 
     if(vUp_ < vMin_)
     {
@@ -1055,18 +1057,20 @@ double Epairproduction::lpm(double r2, double b, double x)
 
     if(init_lpm_effect_)
     {
-        init_lpm_effect_        =   false;
-        double sum  =   0;
+        init_lpm_effect_ = false;
+        double sum = 0;
 
         for(int i=0; i<medium_->GetNumComponents(); i++)
         {
             sum +=  medium_->GetNucCharge().at(i)*medium_->GetNucCharge().at(i)
                     *log(3.25*medium_->GetLogConstant().at(i)*pow(medium_->GetNucCharge().at(i), -1./3));
         }
+        double particle_mass = particle_->GetMass();
+        double particle_charge = particle_->GetCharge();
 
-        eLpm_    =   particle_->GetMass()/(ME*RE);
-        eLpm_    *=  (eLpm_*eLpm_)*ALPHA*particle_->GetMass()
-                /(2*PI*medium_->GetMolDensity()*particle_->GetCharge()*particle_->GetCharge()*sum);
+        eLpm_    =   particle_mass/(ME*RE);
+        eLpm_    *=  (eLpm_*eLpm_)*ALPHA*particle_mass
+                /(2*PI*medium_->GetMolDensity()*particle_charge*particle_charge*sum);
     }
 
     double A, B, C, D, E, s;
@@ -1107,6 +1111,7 @@ double Epairproduction::lpm(double r2, double b, double x)
 
 double Epairproduction::EPair(double v, int component)
 {
+    double particle_energy = particle_->GetEnergy();
 
     if(do_epair_interpolation_)
     {
@@ -1114,16 +1119,18 @@ double Epairproduction::EPair(double v, int component)
 
         if(v>=vUp_)
         {
-            return max(epair_interpolant_.at(component)->Interpolate(particle_->GetEnergy(), log(v/vUp_)/log(vMax_/vUp_)), 0.0);
+            return max(epair_interpolant_.at(component)->Interpolate(particle_energy, log(v/vUp_)/log(vMax_/vUp_)), 0.0);
         }
     }
 
     double rMax, aux, aux2;
+    double particle_charge = particle_->GetCharge();
+    double particle_mass   = particle_->GetMass();
 
     component_  =   component;
     v_          =   v;
-    aux         =   1 - (4*ME)/(particle_->GetEnergy()*v_);
-    aux2        =   1 - (6*particle_->GetMass()*particle_->GetMass())/(particle_->GetEnergy()*particle_->GetEnergy()*(1 - v_));
+    aux         =   1 - (4*ME)/(particle_energy*v_);
+    aux2        =   1 - (6*particle_mass*particle_mass)/(particle_energy*particle_energy*(1 - v_));
 
     if(aux>0 && aux2>0)
     {
@@ -1137,7 +1144,7 @@ double Epairproduction::EPair(double v, int component)
     aux =   max(1 - rMax , COMPUTER_PRECISION);
 
     return medium_->GetMolDensity()*medium_->GetAtomInMolecule().at(component_)
-           *particle_->GetCharge()*particle_->GetCharge()
+           *particle_charge*particle_charge
            *(integral_->Integrate(1 - rMax, aux, boost::bind(&Epairproduction::FunctionToIntegral, this, _1),2)
                 + integral_->Integrate(aux, 1,  boost::bind(&Epairproduction::FunctionToIntegral, this, _1),4));
 
@@ -1243,29 +1250,35 @@ double Epairproduction::FunctionToDNdxIntegral(double variable)
 double Epairproduction::FunctionToIntegral(double r)
 {
 
-    double Fe, Fm, Le, Lm, Ye, Ym, s, b, k, g1, g2;
-    double aux, aux1, aux2, r2, Z3;
+    double Fe, Fm, Le, Lm, Ye, Ym, s, b, g1, g2;
+    double aux, aux1, aux2, r2, Z3, atomic_electron_contribution;
+    double particle_mass = particle_->GetMass();
+    double particle_charge = particle_->GetCharge();
+    double particle_energy = particle_->GetEnergy();
+    double medium_charge = medium_->GetNucCharge().at(component_);
+    double medium_log_constant = medium_->GetLogConstant().at(component_);
+
 
     r       =   1-r; // only for integral optimization - do not forget to swap integration limits!
     r2      =   r*r;
-    Z3      =   pow(medium_->GetNucCharge().at(component_) , -1./3);
-    aux     =   (particle_->GetMass()*v_)/(2*ME);
+    Z3      =   pow(medium_charge, -1./3);
+    aux     =   (particle_mass*v_)/(2*ME);
     aux     *=  aux;
     s       =   aux*(1 - r2)/(1 - v_);
     b       =   (v_*v_)/(2*(1 - v_));
     Ye      =   (5 - r2 + 4*b*(1 + r2))/(2*(1 + 3*b)*log(3 + 1/s) - r2 - 2*b*(2 - r2));
     Ym      =   (4 + r2 + 3*b*(1 + r2))/((1 + r2)*(1.5 + 2*b)*log(3 + s) + 1 - 1.5*r2);
-    aux     =   (1.5*ME)/(particle_->GetMass()*Z3);
-    aux     *=  aux;
+    aux     =   (1.5*ME)/(particle_mass*Z3);
     aux1    =   (1 + s)*(1 + Ye);
-    aux2    =   (2*ME*SQRTE*medium_->GetLogConstant().at(component_)*Z3) / (particle_->GetEnergy()*v_*(1 - r2));
-    Le      =   log((medium_->GetLogConstant().at(component_)*Z3*sqrt(aux1)) / (1 + aux2*aux1)) - 0.5*log(1 + aux*aux1);
-    Lm      =   log(((particle_->GetMass()/(1.5*ME))*medium_->GetLogConstant().at(component_)*Z3*Z3)/(1 + aux2*(1 + s)*(1 + Ym)));
+    aux2    =   (2*ME*SQRTE*medium_log_constant*Z3) / (particle_energy*v_*(1 - r2));
+    Le      =   log((medium_log_constant*Z3*sqrt(aux1)) / (1 + aux2*aux1)) - 0.5*log(1 + aux*aux*aux1);
+    Lm      =   log((medium_log_constant/aux*Z3)/(1 + aux2*(1 + s)*(1 + Ym)));
 
     if ( Le > 0 )
     {
         if (1/s < HALF_PRECISION)
         {
+            // TODO: where does this short expression come from?
             Fe = (1.5 - r2/2 + b*(1 + r2))/s*Le;
         }
         else
@@ -1278,7 +1291,7 @@ double Epairproduction::FunctionToIntegral(double r)
         Fe = 0;
     }
 
-    if ( Le > 0)
+    if ( Lm > 0)
     {
         Fm = (((1 + r2)*(1 + 1.5*b) - (1 + 2*b)*(1 - r2)/s)*log(1 + s) + s*(1 - r2 - b)/(1 + s) + (1 + 2*b)*(1 - r2))*Lm;
     }
@@ -1288,7 +1301,8 @@ double Epairproduction::FunctionToIntegral(double r)
         Fm = 0;
     }
 
-    if(medium_->GetNucCharge().at(component_)==1)
+    // Calculating the contribution of atomic electrons as scattering partner
+    if(medium_charge==1)
     {
         g1  =   4.4e-5;
         g2  =   4.8e-5;
@@ -1299,39 +1313,31 @@ double Epairproduction::FunctionToIntegral(double r)
         g2  =   5.3e-5;
     }
 
-    aux     =   particle_->GetEnergy()/particle_->GetMass();
-    k       =   0.058*log(aux/(1 + g2*aux/Z3)) - 0.14;
+    aux  = particle_energy/particle_mass;
+    aux1 = 0.073*log(aux/(1 + g1*aux/(Z3*Z3))) - 0.26;
+    aux2 = 0.058*log(aux/(1 + g2*aux/Z3)) - 0.14;
 
-    if(k<=0)
+    if(aux1 > 0 && aux2 > 0)
     {
-        k   =   0;
+        atomic_electron_contribution = aux1/aux2;
     }
-
     else
     {
-        k   =   (0.073*log(aux/(1 + g1*aux/(Z3*Z3))) - 0.26)/k;
-    }
-
-    if(k<0)
-    {
-        k   =   0;
+        atomic_electron_contribution = 0;
     }
 
     aux     =   ALPHA*RE;
     aux     *=  aux/(1.5*PI);
-    aux1    =   ME/particle_->GetMass();
+    aux1    =   ME/particle_mass*particle_charge;
     aux1    *=  aux1;
+    aux     *=  2*medium_charge*(medium_charge + atomic_electron_contribution)
+                *((1 - v_)/v_)*(Fe + aux1*Fm);
 
     if(lpm_effect_enabled_)
     {
-        aux     *=  2*medium_->GetNucCharge().at(component_)
-                *  (medium_->GetNucCharge().at(component_) + k)*((1 - v_)/v_)*lpm(r2, b, s)*(Fe + aux1*Fm);
+        aux *= lpm(r2, b, s);
     }
-    else
-    {
-        aux     *=  2*medium_->GetNucCharge().at(component_)
-                *  (medium_->GetNucCharge().at(component_) + k)*((1 - v_)/v_)*(Fe + aux1*Fm);
-    }
+
     if(aux<0)
     {
         aux =   0;
