@@ -8,11 +8,13 @@
 */
 
 #include <cmath>
+#include <iomanip>
+
+#include <boost/bind.hpp>
+
 #include "PROPOSAL/Medium.h"
 #include "PROPOSAL/methods.h"
 #include "PROPOSAL/Integral.h"
-#include "boost/bind.hpp"
-#include <iomanip>
 #include "PROPOSAL/Output.h"
 
 

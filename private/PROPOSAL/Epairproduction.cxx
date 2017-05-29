@@ -1,13 +1,13 @@
-#include "PROPOSAL/Epairproduction.h"
+
 #include <algorithm>
-#include "boost/bind.hpp"
+#include <boost/bind.hpp>
+
+#include "PROPOSAL/Epairproduction.h"
 #include "PROPOSAL/Output.h"
 
 
 using namespace std;
 using namespace PROPOSAL;
-
-namespace po	= boost::program_options;
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
@@ -633,24 +633,6 @@ void Epairproduction::DisableEpairInterpolation()
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 //--------------------------Set and validate options--------------------------//
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-boost::program_options::options_description Epairproduction::CreateOptions()
-{
-    po::options_description epairproduction("Epairproduction options");
-    epairproduction.add_options()
-        ("epairproduction.lpm",              po::value<bool>(&lpm_effect_enabled_)->implicit_value(false),     "Enables   Landau-Pomeranchuk-Migdal supression")
-        ("epairproduction.interpol_dedx",    po::value<bool>(&do_dedx_Interpolation_)->implicit_value(false),  "Enables interpolation for dEdx")
-        ("epairproduction.interpol_dndx",    po::value<bool>(&do_dndx_Interpolation_)->implicit_value(false),  "Enables interpolation for dNdx")
-        ("epairproduction.multiplier",       po::value<double>(&multiplier_)->default_value(1.),               "modify the cross section by this factor")
-        ("epairproduction.interpol_order",   po::value<int>(&order_of_interpolation_)->default_value(5),       "number of interpolation points");
-
-   return epairproduction;
-}
-
-
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
