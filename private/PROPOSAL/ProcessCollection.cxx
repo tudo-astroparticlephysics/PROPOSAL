@@ -5,10 +5,12 @@
  *      Author: koehne
  */
 
-#include "PROPOSAL/ProcessCollection.h"
 #include <cmath>
-#include "boost/function.hpp"
-#include "boost/bind.hpp"
+
+#include <boost/function.hpp>
+#include <boost/bind.hpp>
+
+#include "PROPOSAL/ProcessCollection.h"
 #include "PROPOSAL/MathModel.h"
 #include "PROPOSAL/Output.h"
 

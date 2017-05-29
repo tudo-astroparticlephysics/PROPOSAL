@@ -1,11 +1,11 @@
 #ifndef Photonuclear_H
 #define Photonuclear_H
 
+#include <vector>
 
-#include "CrossSections.h"
+#include "PROPOSAL/CrossSections.h"
 #include "PROPOSAL/Integral.h"
 #include "PROPOSAL/Interpolant.h"
-#include <vector>
 
 namespace PROPOSAL
 {
@@ -293,10 +293,6 @@ public:
 //----------------------------------------------------------------------------//
 
     double FunctionToDNdxIntegral(double variable);
-
-//----------------------------------------------------------------------------//
-
-    boost::program_options::options_description CreateOptions();
 
 //----------------------------------------------------------------------------//
 
