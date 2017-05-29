@@ -2,6 +2,7 @@
 #define Bremsstrahlung_H
 
 #include <vector>
+
 #include "PROPOSAL/CrossSections.h"
 #include "PROPOSAL/Integral.h"
 #include "PROPOSAL/Interpolant.h"
@@ -192,13 +193,12 @@ public:
 
     void swap(Bremsstrahlung &brems);
 
-//--------------------------------------------------------------------------- //
-
-    boost::program_options::options_description CreateOptions();
 //----------------------------------------------------------------------------//
+
     void ValidateOptions();
 
 //----------------------------------------------------------------------------//
+
     ~Bremsstrahlung();
 
 //----------------------------------------------------------------------------//

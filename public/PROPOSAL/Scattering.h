@@ -10,8 +10,10 @@
 
 #ifndef SCATTERING_H
 #define SCATTERING_H
-#include "vector"
+
+#include <vector>
 #include <string>
+
 #include "PROPOSAL/PROPOSALParticle.h"
 #include "PROPOSAL/CrossSections.h"
 #include "PROPOSAL/Interpolant.h"

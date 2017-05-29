@@ -1,11 +1,13 @@
-#include "PROPOSAL/Ionization.h"
 #include <algorithm>
+
+#include <boost/bind.hpp>
+
+#include "PROPOSAL/Ionization.h"
 #include "PROPOSAL/Output.h"
 
 using namespace std;
 using namespace PROPOSAL;
 
-namespace po	= boost::program_options;
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
@@ -399,23 +401,6 @@ void Ionization::DisableDEdxInterpolation()
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 //--------------------------Set and validate options--------------------------//
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-boost::program_options::options_description Ionization::CreateOptions()
-{
-    po::options_description ionization("Ionization options");
-    ionization.add_options()
-        ("ionization.interpol_dedx",    po::value<bool>(&do_dedx_Interpolation_)->implicit_value(false),  "Enables interpolation for dEdx")
-        ("ionization.interpol_dndx",    po::value<bool>(&do_dndx_Interpolation_)->implicit_value(false),  "Enables interpolation for dNdx")
-        ("ionization.multiplier",       po::value<double>(&multiplier_)->default_value(1.),               "modify the cross section by this factor")
-        ("ionization.interpol_order",   po::value<int>(&order_of_interpolation_)->default_value(5),       "number of interpolation points");
-
-   return ionization;
-}
-
-
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 

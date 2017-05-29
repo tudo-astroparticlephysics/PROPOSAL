@@ -8,6 +8,9 @@
 #ifndef ProcessCollection_H
 #define ProcessCollection_H
 
+#include <vector>
+#include <utility>
+
 #include "PROPOSAL/Integral.h"
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/PROPOSALParticle.h"
@@ -20,8 +23,6 @@
 #include "PROPOSAL/Medium.h"
 #include "PROPOSAL/EnergyCutSettings.h"
 #include "PROPOSAL/Interpolant.h"
-#include <vector>
-#include <utility>
 #include "PROPOSAL/ContinuousRandomization.h"
 #include "PROPOSAL/Geometry.h"
 #include "PROPOSAL/Scattering.h"

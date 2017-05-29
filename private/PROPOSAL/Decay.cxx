@@ -5,13 +5,15 @@
 *      Author: koehne
 */
 
+#include <algorithm>
+#include <cmath>
+
+#include <boost/bind.hpp>
+
 #include "PROPOSAL/Decay.h"
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/methods.h"
 #include "PROPOSAL/Output.h"
-#include <algorithm>
-#include <cmath>
-#include "boost/bind.hpp"
 
 using namespace std;
 using namespace PROPOSAL;

@@ -12,8 +12,7 @@
 
 #include <vector>
 #include <string>
-#include <boost/bind.hpp>
-#include <boost/function.hpp>
+
 namespace PROPOSAL
 {
     class Medium;
