@@ -55,20 +55,66 @@ protected:
 
 //----------------------------------------------------------------------------//
 
-    double KokoulinParametrization(double v, int i);
-    double RhodeParametrization(double v, int i);
-    double BezrukovBugaevParametrization(double v, int i);
-    double ZeusParametrization(double v, int i);
-    double ALLM91Parametrization(double v, int i);
-    double ALLM97Parametrization(double v, int i);
-    double ButkevichMikhailovParametrization(double v, int i);
-    double RSS_ALLM97Parametrization(double v, int i);
+    /*!
+     * parameterized inelastic nuclear scattering
+     * with two different approaches:
+     *
+     * 1. to assume that there is an interaction between a real photon with a nucleus
+     * Parameterizations using this strategy:
+     * Kokoulin and Petrukhin in Proc. Vulcano Workshop 1996
+     * Rhode in Nuclear Physics B (Proc. Suppl.) 35 1994
+     * Bezrukov and Bugaev in Sov.J.Nucl.Phys. 33 1981
+     * Derrick et al (ZEUS Collaboration) in Z.Phys. C 63 1994
+     *
+     * 2. to integrate over the momentum squared of the exchange photon Q2
+     * Parameterizations using this strategy:
+     * Abramowicz et al in Phys.Let. B 269 1991
+     * Abramowicz et al in DESY Reports 251 1997
+     * Butkevich and Mikheyev in JETP 95 2002
+     * Reno and Sarcevic and Su in Astrop. Phys. 24 2005
+     *
+     * \param   v   relative energy loss
+     * \param   i   crossection component
+     * \return  photonuclear cross section
+     */
 
-    double ParametrizationOfRealPhotonAssumption(double v, int i, double sgn);
+
+    double ParametrizationOfRealPhotonAssumption(double v, int i);
+    double ParametrizationOfQ2Integration(double v, int i);
+
+//----------------------------------------------------------------------------//
+
+    /*!
+     * shadowing effect parametrized by Dutta and Butkevich/Mikhailov
+     * for Parametrization with Q2 Integration
+     * and Bezrukov/Bugaev parametrization
+     * for Parametrization with real photon assumption
+     *
+     * \return  shadowing factor
+     */
 
     double ShadowEffect(double x , double nu);
     double ShadowBezrukovBugaev(double sgn, double atomic_number);
 
+//----------------------------------------------------------------------------//
+
+    /*!
+     * parametrized cross section of the interaction 
+     * between a nucleus and a real photon
+     * 
+     * a parametrization is used only for high energy transfer
+     * Caldwell in Phys.Rev.Let. 42 1979
+     *
+     * \param   nu  Energy of thr "real" photon
+     * \return  function value
+     */
+
+    double PhotoNucleusCrossSectionCaldwell(double nu);
+    
+    double PhotoNucleusCrossSectionKokoulin(double nu);
+    double PhotoNucleusCrossSectionRhode(double nu);
+    double PhotoNucleusCrossSectionBezrukovBugaev(double nu);
+    double PhotoNucleusCrossSectionZeus(double nu, double medium_average_nucleon_weight);
 
 //----------------------------------------------------------------------------//
 

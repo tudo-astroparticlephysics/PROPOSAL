@@ -174,7 +174,7 @@ double Bremsstrahlung::CalculateScatteringX0()
     delete integral_temp;
 
     X0  =   pow(particle_->GetCharge() , 2);
-    X0  =   pow(X0,2)/sum;
+    X0  =   X0*X0/sum;
     return X0;
 }
 
@@ -1143,7 +1143,7 @@ double Bremsstrahlung::ElasticBremsstrahlungCrossSection(double v, int i)
 
     double c2   =   pow(particle_->GetCharge() , 2);
 
-    return medium_->GetMolDensity()*medium_->GetAtomInMolecule().at(i)*pow(c2 , 2)*aux;
+    return medium_->GetMolDensity()*medium_->GetAtomInMolecule().at(i)*c2*c2*aux;
 }
 
 
