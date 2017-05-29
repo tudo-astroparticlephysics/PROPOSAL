@@ -1,11 +1,13 @@
-#include "PROPOSAL/Photonuclear.h"
+
 #include <algorithm>
+
+#include <boost/bind.hpp>
+
 #include "PROPOSAL/Output.h"
+#include "PROPOSAL/Photonuclear.h"
 
 using namespace std;
 using namespace PROPOSAL;
-
-namespace po	= boost::program_options;
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
@@ -591,26 +593,6 @@ void Photonuclear::DisablePhotoInterpolation()
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 //--------------------------Set and validate options--------------------------//
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-boost::program_options::options_description Photonuclear::CreateOptions()
-{
-    po::options_description photonuclear("Photonuclear options");
-    photonuclear.add_options()
-        // TODO
-        // ("photonuclear.para",             po::value<int>()->notifier(boost::bind(&Photonuclear::SetParametrization, this, _1)),
-        //     "Kokoulin \n Rhode \n BezrukovBugaev \n Zeus \n ALLM91 \n ALLM97 \n ButkevichMikhailov")
-        ("photonuclear.interpol_dedx",    po::value<bool>(&do_dedx_Interpolation_)->implicit_value(false),  "Enables interpolation for dEdx")
-        ("photonuclear.interpol_dndx",    po::value<bool>(&do_dndx_Interpolation_)->implicit_value(false),  "Enables interpolation for dNdx")
-        ("photonuclear.multiplier",       po::value<double>(&multiplier_)->default_value(1.),               "modify the cross section by this factor")
-        ("photonuclear.interpol_order",   po::value<int>(&order_of_interpolation_)->default_value(5),       "number of interpolation points");
-
-   return photonuclear;
-}
-
-
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 

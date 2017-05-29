@@ -19,19 +19,10 @@ ENDIF()
 
 SET(ICETRAY_INCLUDE_PATH "/home/koehne/Simulation/icesim4_candidate/V04-00-01-RC/icetray/public/")
 
-
-#################################################################
-#################           boost       #########################
-#################################################################
-
-FIND_PACKAGE( Boost COMPONENTS program_options REQUIRED )
-SET(LIBRARYS_TO_LINK ${Boost_LIBRARIES})
-
 #################################################################
 #################           python      #########################
 #################################################################
 
-# SET(ADD_PYTHON ON CACHE BOOL "Choose to compile the python wrapper library")
 OPTION (ADD_PYTHON "Choose to compile the python wrapper library" ON)
 
 IF(ADD_PYTHON)
@@ -44,6 +35,25 @@ IF(ADD_PYTHON)
 ELSE(ADD_PYTHON)
 	MESSAGE(STATUS "No python wrapper library will be build.")
 ENDIF(ADD_PYTHON)
+
+#################################################################
+#################           boost       #########################
+#################################################################
+
+IF(ADD_PYTHON)
+	# Libs for PROPOSAL
+	FIND_PACKAGE( Boost COMPONENTS REQUIRED QUIET )
+	# LIBRARY_TO_LINK is empty here. But provided for future additions.
+	SET(LIBRARYS_TO_LINK ${LIBRARYS_TO_LINK} ${Boost_LIBRARIES})
+
+	# Libs for pyPROPOSAL
+	FIND_PACKAGE( Boost COMPONENTS python REQUIRED )
+	SET(LIBRARYS_TO_LINK_PYPROPOSAL ${LIBRARYS_TO_LINK} ${Boost_LIBRARIES})
+ELSE(ADD_PYTHON)
+	FIND_PACKAGE( Boost REQUIRED )
+	SET(LIBRARYS_TO_LINK ${LIBRARYS_TO_LINK} ${Boost_LIBRARIES})
+ENDIF(ADD_PYTHON)
+
 
 #################################################################
 #################           ROOT        #########################
@@ -123,13 +133,6 @@ ADD_LIBRARY(PROPOSAL SHARED ${SRC_FILES})
 SET_TARGET_PROPERTIES(PROPOSAL PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -O2")# -Wextra -pedantic")
 TARGET_LINK_LIBRARIES(PROPOSAL ${LIBRARYS_TO_LINK})
 
-ADD_EXECUTABLE(PROPOSALtest
-        private/test/PROPOSAL.cxx
-)
-
-SET_TARGET_PROPERTIES(PROPOSALtest PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS}")
-TARGET_LINK_LIBRARIES(PROPOSALtest PROPOSAL)
-
 EXECUTE_PROCESS(COMMAND ln -s ${CMAKE_SOURCE_DIR}/resources ${CMAKE_BINARY_DIR}/resources)
 
 ADD_EXECUTABLE(WriteSectorsFromDomList
@@ -151,27 +154,27 @@ IF(DO_TESTING)
   EXECUTE_PROCESS(COMMAND mkdir ${PROPOSAL_BINARY_DIR}/bin/ OUTPUT_VARIABLE _output OUTPUT_STRIP_TRAILING_WHITESPACE)
 
   #create tar directory with "tar -czvf TestFiles.tar.Z TestFiles/" and put it in Test directory
-  EXECUTE_PROCESS(COMMAND  tar -xvf ${PROJECT_SOURCE_DIR}/Test/TestFiles.tar.Z -C ${PROPOSAL_BINARY_DIR}/bin/
+  EXECUTE_PROCESS(COMMAND  tar -xvf ${PROJECT_SOURCE_DIR}/tests/TestFiles.tar.Z -C ${PROPOSAL_BINARY_DIR}/bin/
                     OUTPUT_VARIABLE _output OUTPUT_STRIP_TRAILING_WHITESPACE)
-  EXECUTE_PROCESS(COMMAND  tar -xvf ${PROJECT_SOURCE_DIR}/Test/TestFiles2.tar.Z -C ${PROPOSAL_BINARY_DIR}/bin/
+  EXECUTE_PROCESS(COMMAND  tar -xvf ${PROJECT_SOURCE_DIR}/tests/TestFiles2.tar.Z -C ${PROPOSAL_BINARY_DIR}/bin/
                     OUTPUT_VARIABLE _output OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-  ADD_EXECUTABLE(UnitTest_Scattering Test/Scattering_TEST.cxx)
-  ADD_EXECUTABLE(UnitTest_StandardNormal Test/StandardNormal_Test.cxx)
-  ADD_EXECUTABLE(UnitTest_Photonuclear Test/Photonuclear_TEST.cxx)
-  ADD_EXECUTABLE(UnitTest_Integral Test/Integral_TEST.cxx)
-  ADD_EXECUTABLE(UnitTest_Interpolant Test/Interpolant_TEST.cxx)
-  ADD_EXECUTABLE(UnitTest_Bremsstrahlung Test/Bremsstrahlung_TEST.cxx)
-  ADD_EXECUTABLE(UnitTest_Epairproduction Test/Epairproduction_TEST.cxx)
-  ADD_EXECUTABLE(UnitTest_Ionization Test/Ionization_TEST.cxx)
-  ADD_EXECUTABLE(UnitTest_RootFinder Test/RootFinder_TEST.cxx)
-  ADD_EXECUTABLE(UnitTest_Medium Test/Medium_TEST.cxx)
-  ADD_EXECUTABLE(UnitTest_Particle Test/Particle_TEST.cxx)
-  ADD_EXECUTABLE(UnitTest_EnergyCutSettings Test/EnergyCutSettings_TEST.cxx)
-  ADD_EXECUTABLE(UnitTest_Decay Test/Decay_TEST.cxx)
-  ADD_EXECUTABLE(UnitTest_ProcessCollection Test/ProcessCollection_TEST.cxx)
-  ADD_EXECUTABLE(UnitTest_ContinuousRandomization Test/ContinuousRandomization_TEST.cxx)
-  ADD_EXECUTABLE(UnitTest_Geometry Test/Geometry_TEST.cxx)
+  ADD_EXECUTABLE(UnitTest_Scattering tests/Scattering_TEST.cxx)
+  ADD_EXECUTABLE(UnitTest_StandardNormal tests/StandardNormal_Test.cxx)
+  ADD_EXECUTABLE(UnitTest_Photonuclear tests/Photonuclear_TEST.cxx)
+  ADD_EXECUTABLE(UnitTest_Integral tests/Integral_TEST.cxx)
+  ADD_EXECUTABLE(UnitTest_Interpolant tests/Interpolant_TEST.cxx)
+  ADD_EXECUTABLE(UnitTest_Bremsstrahlung tests/Bremsstrahlung_TEST.cxx)
+  ADD_EXECUTABLE(UnitTest_Epairproduction tests/Epairproduction_TEST.cxx)
+  ADD_EXECUTABLE(UnitTest_Ionization tests/Ionization_TEST.cxx)
+  ADD_EXECUTABLE(UnitTest_RootFinder tests/RootFinder_TEST.cxx)
+  ADD_EXECUTABLE(UnitTest_Medium tests/Medium_TEST.cxx)
+  ADD_EXECUTABLE(UnitTest_Particle tests/Particle_TEST.cxx)
+  ADD_EXECUTABLE(UnitTest_EnergyCutSettings tests/EnergyCutSettings_TEST.cxx)
+  ADD_EXECUTABLE(UnitTest_Decay tests/Decay_TEST.cxx)
+  ADD_EXECUTABLE(UnitTest_ProcessCollection tests/ProcessCollection_TEST.cxx)
+  ADD_EXECUTABLE(UnitTest_ContinuousRandomization tests/ContinuousRandomization_TEST.cxx)
+  ADD_EXECUTABLE(UnitTest_Geometry tests/Geometry_TEST.cxx)
 
   TARGET_LINK_LIBRARIES(UnitTest_Scattering PROPOSAL ${GTEST_LIBRARIES})
   TARGET_LINK_LIBRARIES(UnitTest_StandardNormal PROPOSAL ${GTEST_LIBRARIES})
@@ -180,7 +183,7 @@ IF(DO_TESTING)
   TARGET_LINK_LIBRARIES(UnitTest_Ionization PROPOSAL ${GTEST_LIBRARIES})
   TARGET_LINK_LIBRARIES(UnitTest_Bremsstrahlung PROPOSAL ${GTEST_LIBRARIES})
   TARGET_LINK_LIBRARIES(UnitTest_Epairproduction PROPOSAL ${GTEST_LIBRARIES})
-  TARGET_LINK_LIBRARIES(UnitTest_Photonuclear PROPOSAL gtest ${GTEST_LIBRARIES})
+  TARGET_LINK_LIBRARIES(UnitTest_Photonuclear PROPOSAL ${GTEST_LIBRARIES})
   TARGET_LINK_LIBRARIES(UnitTest_RootFinder PROPOSAL ${GTEST_LIBRARIES})
   TARGET_LINK_LIBRARIES(UnitTest_Medium PROPOSAL ${GTEST_LIBRARIES})
   TARGET_LINK_LIBRARIES(UnitTest_Particle PROPOSAL ${GTEST_LIBRARIES})
@@ -226,7 +229,7 @@ IF(ADD_PYTHON)
 			SET_TARGET_PROPERTIES(pyPROPOSAL PROPERTIES PREFIX "" COMPILE_FLAGS "${CMAKE_CXX_FLAGS}")
 		ENDIF(APPLE)
 
-		TARGET_LINK_LIBRARIES(pyPROPOSAL boost_python ${PYTHON_LIBRARIES} ${Boost_LIBRARIES} PROPOSAL)
+		TARGET_LINK_LIBRARIES(pyPROPOSAL ${PYTHON_LIBRARIES} ${LIBRARYS_TO_LINK_PYPROPOSAL} PROPOSAL)
 		INSTALL(TARGETS pyPROPOSAL DESTINATION lib)
 	ENDIF(PYTHONLIBS_FOUND)
 ENDIF(ADD_PYTHON)

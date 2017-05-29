@@ -13,9 +13,9 @@
 #include <vector>
 #include <cmath>
 
-#include "PROPOSAL/MathModel.h"
-#include <boost/bind.hpp>
 #include <boost/function.hpp>
+
+#include "PROPOSAL/MathModel.h"
 
 namespace PROPOSAL{
 

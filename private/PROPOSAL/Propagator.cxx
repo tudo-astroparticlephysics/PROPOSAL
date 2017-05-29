@@ -9,14 +9,11 @@
 #include "PROPOSAL/Constants.h"
 #include <cmath>
 #include <utility>
-#include <boost/program_options.hpp>
 #include "boost/lexical_cast.hpp"
 #include "PROPOSAL/Output.h"
 
 using namespace std;
 using namespace PROPOSAL;
-
-namespace po	= boost::program_options;
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
@@ -1356,43 +1353,6 @@ void Propagator::DisableInterpolation()
         collections_.at(i)->DisableInterpolation();
     }
 }
-
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-//--------------------------Set and validate options--------------------------//
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-boost::program_options::options_description Propagator::CreateOptions()
-{
-
-    po::options_description general("General options");
-    general.add_options()
-        ("help,h",		"shows this message")
-        ("version,v",	"shows the version of the program");
-
-
-    po::options_description propagator("Propagator options");
-    propagator.add_options()
-        ("propagator.exact_time",           po::value<bool>(&do_exact_time_calulation_)->implicit_value(false), "Do exact particle time calculations")
-        ("propagator.interpol_order",       po::value<int>(&order_of_interpolation_)->default_value(5),         "number of interpolation points");
-
-
-    po::options_description all("All options");
-        all.add(general);
-        all.add(propagator);
-
-    for(unsigned int i =0 ; i < current_collection_->GetCrosssections().size(); i++)
-    {
-        all.add(current_collection_->GetCrosssections().at(i)->CreateOptions());
-    }
-
-    return all;
-
-}
-
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
