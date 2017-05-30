@@ -332,7 +332,7 @@ TEST(Bremsstrahlung , Test_of_dNdxrnd ) {
 
             ASSERT_NEAR(dNdxrnd_new, dNdxrnd, 1E-7*dNdxrnd);
 
-            in>>para>>ecut>>vcut>>lpm>>energy>>med>>particleName>>dNdxrnd;
+            in>>para>>ecut>>vcut>>lpm>>energy>>mediumName>>particleName>>dNdxrnd;
         }
 
 

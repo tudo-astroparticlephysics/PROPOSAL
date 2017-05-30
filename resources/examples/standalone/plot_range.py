@@ -17,14 +17,15 @@ if __name__ == "__main__":
     energy = 1e8  # MeV
     statistics = 10
 
-    ptype = pyPROPOSAL.ParticleType.MuMinus
+    particle_type = pyPROPOSAL.ParticleType.MuMinus
+    medium_type = pyPROPOSAL.MediumType.Ice
 
-    med = pyPROPOSAL.MediumType.Ice
+    med = pyPROPOSAL.Medium(medium_type)
     E = pyPROPOSAL.EnergyCutSettings()
     p = pyPROPOSAL.Propagator(
         med,
         E,
-        ptype,
+        particle_type,
         "resources/tables",
         moliere=False,
         scattering_model=2
