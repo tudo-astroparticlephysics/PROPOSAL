@@ -103,7 +103,7 @@ TEST(Scattering , Theta0 )
 //    double dEdx;
 //    double ecut;
 //    double vcut;
-//    string med;
+//    string mediumName;
 //    string particleName;
 //    bool lpm;
 //    int para;
@@ -115,11 +115,11 @@ TEST(Scattering , Theta0 )
 //    bool first = true;
 //    while(in.good())
 //    {
-//        if(first)in>>ecut>>vcut>>lpm>>med>>particleName>>dr>>energy>>ef>>Theta0;
+//        if(first)in>>ecut>>vcut>>lpm>>mediumName>>particleName>>dr>>energy>>ef>>Theta0;
 //        first=false;
 //        energy_old = -1;
 
-//        Medium *medium = new Medium(med,1.);
+//        Medium *medium = new Medium(Medium::GetTypeFromName(mediumName),1.);
 //        Particle *particle = new Particle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10);
 //        particle->SetEnergy(energy);
 //        EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
@@ -151,12 +151,12 @@ TEST(Scattering , Theta0 )
 //            Theta0_new = scat->CalculateTheta0(dr,energy,ef);
 
 
-//            //if(fabs(Theta0 -  Theta0_new)>1e-4*Theta0)cout << med << "\t" << particleName << "\t" << ecut << "\t" << vcut << endl;
+//            //if(fabs(Theta0 -  Theta0_new)>1e-4*Theta0)cout << mediumName << "\t" << particleName << "\t" << ecut << "\t" << vcut << endl;
 
 //            EXPECT_NEAR(Theta0, Theta0_new, 1e-2*Theta0);
 
 
-//            in>>ecut>>vcut>>lpm>>med>>particleName>>dr>>energy>>ef>>Theta0;
+//            in>>ecut>>vcut>>lpm>>mediumName>>particleName>>dr>>energy>>ef>>Theta0;
 //            if(in.good() == false)break;
 //        }
 
@@ -188,7 +188,7 @@ TEST(Scattering , Advance ) {
 //    double dEdx;
 //    double ecut;
 //    double vcut;
-//    string med;
+//    string mediumName;
 //    string particleName;
 //    bool lpm;
 //    int para;
@@ -202,11 +202,11 @@ TEST(Scattering , Advance ) {
 //    bool first = true;
 //    while(in.good())
 //    {
-//        if(first)in>>ecut>>vcut>>lpm>>med>>particleName>>dr>>energy>>ef>>x>>y>>z>>cosphi>>costheta;
+//        if(first)in>>ecut>>vcut>>lpm>>mediumName>>particleName>>dr>>energy>>ef>>x>>y>>z>>cosphi>>costheta;
 //        first=false;
 //        energy_old = -1;
 
-//        Medium *medium = new Medium(med,1.);
+//        Medium *medium = new Medium(Medium::GetTypeFromName(mediumName),1.);
 //        Particle *particle = new Particle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10);
 //        particle->SetEnergy(energy);
 //        EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
@@ -255,7 +255,7 @@ TEST(Scattering , Advance ) {
 //            cosphi_new = cos(phi_new);
 //            costheta_new = cos(theta_new);
 
-//            //if(fabs(x -  Theta0_new)>1e-4*Theta0)cout << med << "\t" << particleName << "\t" << ecut << "\t" << vcut << endl;
+//            //if(fabs(x -  Theta0_new)>1e-4*Theta0)cout << mediumName << "\t" << particleName << "\t" << ecut << "\t" << vcut << endl;
 
 //            ASSERT_NEAR(x, x_new, fabs(1e-4*x));
 //            ASSERT_NEAR(y, y_new, fabs(1e-4*y));
@@ -263,7 +263,7 @@ TEST(Scattering , Advance ) {
 //            ASSERT_NEAR(costheta, costheta_new, fabs(1e-8*costheta));
 //            ASSERT_NEAR(cosphi, cosphi_new, fabs(1e-4*cosphi));
 
-//            in>>ecut>>vcut>>lpm>>med>>particleName>>dr>>energy>>ef>>x>>y>>z>>cosphi>>costheta;
+//            in>>ecut>>vcut>>lpm>>mediumName>>particleName>>dr>>energy>>ef>>x>>y>>z>>cosphi>>costheta;
 //            if(in.good() == false)break;
 //        }
 
