@@ -76,9 +76,9 @@ int main()
     PROPOSALParticle *tau   =   new PROPOSALParticle(ParticleType::TauMinus);
     PROPOSALParticle *e     =   new PROPOSALParticle(ParticleType::EMinus);
 
-    Medium  *med1   =   new Medium("hydrogen",1.);
-    Medium  *med2   =   new Medium("water",1.);
-    Medium  *med3   =   new Medium("uranium",1.);
+    Medium  *med1   =   new Medium(MediumType::Hydrogen,1.);
+    Medium  *med2   =   new Medium(MediumType::Water,1.);
+    Medium  *med3   =   new Medium(MediumType::Uranium,1.);
 
     EnergyCutSettings*  cuts    =   new EnergyCutSettings(0.1,-1);
 
@@ -603,7 +603,7 @@ int main()
         }
         if(photo.at(i)->GetParticle()->GetType() == ParticleType::MuMinus)
         {
-            if (photo.at(i)->GetMedium()->GetName().compare("water")==0)
+            if (photo.at(i)->GetMedium()->GetType() == MediumType::Water)
             {
                 muons_water_gr->Add(graphs.at(i),"l");
                 graphs.at(i)->SetLineWidth(2);
@@ -669,7 +669,7 @@ int main()
                         break;
                 }
             }
-            else if(photo.at(i)->GetMedium()->GetName().compare("hydrogen")==0)
+            else if(photo.at(i)->GetMedium()->GetType() == MediumType::Hydrogen)
             {
                 muons_hydrogen_gr->Add(graphs.at(i),"l");
                 graphs.at(i)->SetLineWidth(2);
@@ -735,7 +735,7 @@ int main()
                         break;
                 }
             }
-            else if(photo.at(i)->GetMedium()->GetName().compare("uranium")==0)
+            else if(photo.at(i)->GetMedium()->GetType() == MediumType::Uranium)
             {
                 muons_uranium_gr->Add(graphs.at(i),"l");
                 graphs.at(i)->SetLineWidth(2);
@@ -804,7 +804,7 @@ int main()
         }
         else if(photo.at(i)->GetParticle()->GetType() == ParticleType::TauMinus)
         {
-            if (photo.at(i)->GetMedium()->GetName().compare("water")==0)
+            if (photo.at(i)->GetMedium()->GetType() == MediumType::Water)
             {
                 taus_water_gr->Add(graphs.at(i),"l");
                 graphs.at(i)->SetLineWidth(2);
@@ -870,7 +870,7 @@ int main()
                         break;
                 }
             }
-            else if(photo.at(i)->GetMedium()->GetName().compare("hydrogen")==0)
+            else if(photo.at(i)->GetMedium()->GetType() == MediumType::Hydrogen)
             {
                 taus_hydrogen_gr->Add(graphs.at(i),"l");
                 graphs.at(i)->SetLineWidth(2);
@@ -936,7 +936,7 @@ int main()
                         break;
                 }
             }
-            else if(photo.at(i)->GetMedium()->GetName().compare("uranium")==0)
+            else if(photo.at(i)->GetMedium()->GetType() == MediumType::Uranium)
             {
                 taus_uranium_gr->Add(graphs.at(i),"l");
                 graphs.at(i)->SetLineWidth(2);
@@ -1005,7 +1005,7 @@ int main()
         }
         else if(photo.at(i)->GetParticle()->GetType() == ParticleType::EMinus)
         {
-            if (photo.at(i)->GetMedium()->GetName().compare("water")==0)
+            if (photo.at(i)->GetMedium()->GetType() == MediumType::Water)
             {
                 electrons_water_gr->Add(graphs.at(i),"l");
                 graphs.at(i)->SetLineWidth(2);
@@ -1071,7 +1071,7 @@ int main()
                         break;
                 }
             }
-            else if(photo.at(i)->GetMedium()->GetName().compare("hydrogen")==0)
+            else if(photo.at(i)->GetMedium()->GetType() == MediumType::Hydrogen)
             {
                 electrons_hydrogen_gr->Add(graphs.at(i),"l");
                 graphs.at(i)->SetLineWidth(2);
@@ -1137,7 +1137,7 @@ int main()
                         break;
                 }
             }
-            else if(photo.at(i)->GetMedium()->GetName().compare("uranium")==0)
+            else if(photo.at(i)->GetMedium()->GetType() == MediumType::Uranium)
             {
                 electrons_uranium_gr->Add(graphs.at(i),"l");
                 graphs.at(i)->SetLineWidth(2);
