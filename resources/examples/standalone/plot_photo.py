@@ -20,9 +20,11 @@ import math
 
 if __name__ == "__main__":
 
-    ptype = pyPROPOSAL.ParticleType.MuMinus
-    mu = pyPROPOSAL.Particle(ptype)
-    med = pyPROPOSAL.Medium()
+    particle_type = pyPROPOSAL.ParticleType.MuMinus
+    medium_type = pyPROPOSAL.MediumType.Ice
+
+    mu = pyPROPOSAL.Particle(particle_type)
+    med = pyPROPOSAL.Medium(medium_type)
     E_cut = pyPROPOSAL.EnergyCutSettings(-1, -1)
 
     photo = list()

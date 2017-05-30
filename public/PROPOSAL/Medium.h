@@ -22,6 +22,27 @@ std::ostream& operator<<(std::ostream& os, PROPOSAL::Medium const& medium);
 
 namespace PROPOSAL{
 
+namespace MediumType
+{
+    enum Enum
+    {
+        Water        = 11,
+        Ice          = 12,
+        Hydrogen     = 13,
+        Iron         = 14,
+        Copper       = 15,
+        Lead         = 16,
+        Uranium      = 17,
+        Air          = 18,
+        AntaresWater = 19,
+        StandardRock = 20,
+        FrejusRock   = 21,
+        Salt         = 22,
+        MineralOil   = 23
+    };
+};
+
+
 class Medium
 {
 
@@ -50,6 +71,7 @@ protected:
     std::vector<double> M_;                 ///< average nucleon weight in a nucleus [MeV]
     std::vector<std::string> elementName_;  ///< element name
     std::string name_;                  	///< medium name
+    MediumType::Enum type_;                 ///< medium type
 
     double ecut_;                       	///< cutoff energy [MeV]
     double vcut_;                       	///< relative cutoff energy
@@ -90,7 +112,7 @@ protected:
      * \param   i       number of components
      */
 
-    void Inita(int i);
+    void InitMediumArrays(int i);
 
 //----------------------------------------------------------------------------//
     /*!
@@ -228,7 +250,7 @@ public:
      */
 
 
-    Medium(std::string w, double rho);
+    Medium(MediumType::Enum type, double rho);
 
 //----------------------------------------------------------------------------//
 
@@ -367,6 +389,11 @@ public:
         return name_;
     }
 //----------------------------------------------------------------------------//
+    MediumType::Enum GetType() const
+    {
+        return type_;
+    }
+//----------------------------------------------------------------------------//
     std::vector<double> GetMN() const
     {
         return mN_;
@@ -386,6 +413,10 @@ public:
     {
         return r0_;
     }
+//----------------------------------------------------------------------------//
+    
+    static MediumType::Enum GetTypeFromName(std::string particle_name);
+
 //----------------------------------------------------------------------------//
 
     // Setter
@@ -410,6 +441,7 @@ public:
     void SetAverageNucleonWeight(std::vector<double> M);
     void SetElementName(std::vector<std::string> E);
     void SetName(std::string name);
+    void SetType(MediumType::Enum type);
     void SetMN(std::vector<double> mN);
     void SetMM(double MM);
     void SetSumNucleons(double sumNucleons);

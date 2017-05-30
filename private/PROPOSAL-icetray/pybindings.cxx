@@ -34,6 +34,22 @@ I3_PYTHON_MODULE(PROPOSAL)
         .value("PhotoButkevichMikhailovShadowButkevich"        , ParametrizationType::PhotoButkevichMikhailovShadowButkevich)
     ;
 
+    enum_<MediumType::Enum>("Medium")
+        .value("Water"         , MediumType::Water)
+        .value("Ice"           , MediumType::Ice)
+        .value("Hydrogen"      , MediumType::Hydrogen)
+        .value("Iron"          , MediumType::Iron)
+        .value("Copper"        , MediumType::Copper)
+        .value("Lead"          , MediumType::Lead)
+        .value("Uranium"       , MediumType::Uranium)
+        .value("Air"           , MediumType::Air)
+        .value("AntaresWater"  , MediumType::AntaresWater)
+        .value("StandardRock"  , MediumType::StandardRock)
+        .value("FrejusRock"    , MediumType::FrejusRock)
+        .value("Salt"          , MediumType::Salt)
+        .value("MineralOil"    , MediumType::MineralOil)
+    ;
+
 
     class_<I3PropagatorServicePROPOSAL, boost::shared_ptr<I3PropagatorServicePROPOSAL>,
         bases<I3PropagatorService>, boost::noncopyable>(
@@ -66,8 +82,8 @@ I3_PYTHON_MODULE(PROPOSAL)
     class_<PROPOSAL::SimplePropagator, boost::shared_ptr<PROPOSAL::SimplePropagator>,
         boost::noncopyable>(
             "SimplePropagator",
-            init<std::string,I3Particle::ParticleType,double,double,double>(
-                (arg("medium")="ice",
+            init<MediumType::Enum,I3Particle::ParticleType,double,double,double>(
+                (arg("medium")=MediumType::Ice,
                  arg("type")=I3Particle::MuMinus,
                  arg("ecut")=-1.,
                  arg("vcut")=-1,
