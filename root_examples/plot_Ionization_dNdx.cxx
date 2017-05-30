@@ -47,9 +47,9 @@ int main()
     PROPOSALParticle *tau   =   new PROPOSALParticle(ParticleType::TauMinus);
     PROPOSALParticle *e     =   new PROPOSALParticle(ParticleType::EMinus);
 
-    Medium  *med1   =   new Medium("hydrogen",1.);
-    Medium  *med2   =   new Medium("water",1.);
-    Medium  *med3   =   new Medium("uranium",1.);
+    Medium  *med1   =   new Medium(MediumType::Hydrogen,1.);
+    Medium  *med2   =   new Medium(MediumType::Water,1.);
+    Medium  *med3   =   new Medium(MediumType::Uranium,1.);
 
     EnergyCutSettings*  cuts    =   new EnergyCutSettings(e->GetMass(),-1);
 
@@ -272,7 +272,7 @@ int main()
 
     for(unsigned int i = 0 ; i < graphs.size() ; i++)
     {
-        if(ioniz.at(i)->GetMedium()->GetName().compare("hydrogen")==0)
+        if(ioniz.at(i)->GetMedium()->GetType() == MediumType::Hydrogen)
         {
             hydrogen_gr->Add(graphs.at(i),"P");
             hydrogen_leg->AddEntry(graphs.at(i),ioniz.at(i)->GetParticle()->GetName().c_str(),"p");
@@ -290,7 +290,7 @@ int main()
                     break;
             }
         }
-        if(ioniz.at(i)->GetMedium()->GetName().compare("water")==0)
+        if(ioniz.at(i)->GetMedium()->GetType() == MediumType::Water)
         {
             water_gr->Add(graphs.at(i),"P");
             water_leg->AddEntry(graphs.at(i),ioniz.at(i)->GetParticle()->GetName().c_str(),"p");
@@ -308,7 +308,7 @@ int main()
                     break;
             }
         }
-        if(ioniz.at(i)->GetMedium()->GetName().compare("uranium")==0)
+        if(ioniz.at(i)->GetMedium()->GetType() == MediumType::Uranium)
         {
             uranium_gr->Add(graphs.at(i),"P");
             uranium_leg->AddEntry(graphs.at(i),ioniz.at(i)->GetParticle()->GetName().c_str(),"p");

@@ -151,7 +151,7 @@ int main(int argc, char** argv)
     string ecut_o;
 
     ss<<path << "EnergyLosses.root";
-    Medium *med = new Medium("ice",1.);
+    Medium *med = new Medium(MediumType::Ice,1.);
     EnergyCutSettings* cuts = new EnergyCutSettings(ecut,vcut);
 
     TFile *file     =   new TFile(ss.str().c_str(),"RECREATE");
