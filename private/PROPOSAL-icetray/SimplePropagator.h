@@ -32,15 +32,15 @@ namespace PROPOSAL
 class SimplePropagator {
 public:
 	/**
-	 * @param[in] medium The name of the medium, e.g. "ice"
-	 * @param[in] type   The family of particles to propagate
+	 * @param[in] medium The Type of the medium, e.g. MediumType::Ice
+	 * @param[in] type   The Type of particles to propagate e.g. I3Particle::MuMinus
 	 * @param[in] ecut   Absolute energy above which an energy
 	 *                   loss is considered stochastic @f$ [MeV] @f$
 	 * @param[in] vcut   Proportion of the current muon energy above
 	 *                   which an energy loss is considered stochastic
 	 * @param[in] rho    Density adjustment factor for the medium
 	 */
-	SimplePropagator(const std::string &medium, I3Particle::ParticleType type=I3Particle::MuMinus, double ecut=-1, double vcut=-1, double rho=1.0);
+	SimplePropagator(MediumType::Enum medium_type=MediumType::Ice, I3Particle::ParticleType type=I3Particle::MuMinus, double ecut=-1, double vcut=-1, double rho=1.0);
 	~SimplePropagator();
 	/**
 	 * @param[in] p        Muon to propagate
