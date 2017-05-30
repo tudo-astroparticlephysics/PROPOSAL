@@ -38,7 +38,7 @@ public:
 TEST(Comparison , Comparison_equal ) {
 
     double dEdx;
-    Medium *medium = new Medium("air",1.);
+    Medium *medium = new Medium(MediumType::Air,1.);
     PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
     Ionization *A = new Ionization(particle, medium, cuts);
@@ -67,8 +67,8 @@ TEST(Comparison , Comparison_equal ) {
 
 TEST(Comparison , Comparison_not_equal ) {
     double dEdx;
-    Medium *medium = new Medium("air",1.);
-    Medium *medium2 = new Medium("water",1.);
+    Medium *medium = new Medium(MediumType::Air,1.);
+    Medium *medium2 = new Medium(MediumType::Water,1.);
     PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,20,20,1e5,10);
     PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,20,20,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
@@ -102,7 +102,7 @@ TEST(Assignment , Copyconstructor ) {
 }
 
 TEST(Assignment , Copyconstructor2 ) {
-    Medium *medium = new Medium("air",1.);
+    Medium *medium = new Medium(MediumType::Air,1.);
     PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
 
@@ -114,7 +114,7 @@ TEST(Assignment , Copyconstructor2 ) {
 }
 
 TEST(Assignment , Operator ) {
-    Medium *medium = new Medium("air",1.);
+    Medium *medium = new Medium(MediumType::Air,1.);
     PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
     Ionization A(particle, medium, cuts);
@@ -127,7 +127,7 @@ TEST(Assignment , Operator ) {
 
     EXPECT_TRUE(A==B);
 
-    Medium *medium2 = new Medium("water",1.);
+    Medium *medium2 = new Medium(MediumType::Water,1.);
     PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cuts2 = new EnergyCutSettings(200,-1);
     Ionization *C = new Ionization(particle2, medium2, cuts2);
@@ -140,8 +140,8 @@ TEST(Assignment , Operator ) {
 }
 
 TEST(Assignment , Swap ) {
-    Medium *medium = new Medium("air",1.);
-    Medium *medium2 = new Medium("air",1.);
+    Medium *medium = new Medium(MediumType::Air,1.);
+    Medium *medium2 = new Medium(MediumType::Air,1.);
     PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
     PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
@@ -154,8 +154,8 @@ TEST(Assignment , Swap ) {
     B.EnableDNdxInterpolation();
     EXPECT_TRUE(A==B);
 
-    Medium *medium3 = new Medium("water",1.);
-    Medium *medium4 = new Medium("water",1.);
+    Medium *medium3 = new Medium(MediumType::Water,1.);
+    Medium *medium4 = new Medium(MediumType::Water,1.);
     PROPOSALParticle *particle3 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,.20,20,1e5,10);
     PROPOSALParticle *particle4 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cuts3 = new EnergyCutSettings(200,-1);
@@ -184,7 +184,7 @@ TEST(Ionization , Test_of_dEdx ) {
     double dEdx;
     double ecut;
     double vcut;
-    string med;
+    string mediumName;
     string particleName;
 
     cout.precision(16);
@@ -192,9 +192,9 @@ TEST(Ionization , Test_of_dEdx ) {
 
     while(in.good())
     {
-        in>>ecut>>vcut>>energy>>med>>particleName>>dEdx;
+        in>>ecut>>vcut>>energy>>mediumName>>particleName>>dEdx;
 
-        Medium *medium = new Medium(med,1.);
+        Medium *medium = new Medium(Medium::GetTypeFromName(mediumName),1.);
         PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10);
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
@@ -223,7 +223,7 @@ TEST(Ionization , Test_of_dNdx ) {
     double dNdx;
     double ecut;
     double vcut;
-    string med;
+    string mediumName;
     string particleName;
 
     cout.precision(16);
@@ -231,9 +231,9 @@ TEST(Ionization , Test_of_dNdx ) {
 
     while(in.good())
     {
-        in>>ecut>>vcut>>energy>>med>>particleName>>dNdx;
+        in>>ecut>>vcut>>energy>>mediumName>>particleName>>dNdx;
 
-        Medium *medium = new Medium(med,1.);
+        Medium *medium = new Medium(Medium::GetTypeFromName(mediumName),1.);
         PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10);
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
@@ -264,7 +264,7 @@ TEST(Ionization , Test_of_dNdxrnd ) {
     double energy;
     double ecut;
     double vcut;
-    string med;
+    string mediumName;
     string particleName;
     bool lpm;
     int para;
@@ -277,10 +277,10 @@ TEST(Ionization , Test_of_dNdxrnd ) {
     bool first = true;
     while(in.good())
     {
-        if(first)in>>ecut>>vcut>>energy>>med>>particleName>>dNdxrnd;
+        if(first)in>>ecut>>vcut>>energy>>mediumName>>particleName>>dNdxrnd;
         first = false;
         energy_old = -1;
-        Medium *medium = new Medium(med,1.);
+        Medium *medium = new Medium(Medium::GetTypeFromName(mediumName),1.);
         PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10);
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
@@ -294,7 +294,7 @@ TEST(Ionization , Test_of_dNdxrnd ) {
 
             ASSERT_NEAR(dNdxrnd_new, dNdxrnd, 1E-7*dNdxrnd);
 
-            in>>ecut>>vcut>>energy>>med>>particleName>>dNdxrnd;
+            in>>ecut>>vcut>>energy>>mediumName>>particleName>>dNdxrnd;
         }
 
 
@@ -319,7 +319,7 @@ TEST(Ionization , Test_of_e ) {
     double e_new;
     double ecut;
     double vcut;
-    string med;
+    string mediumName;
     string particleName;
 
     cout.precision(16);
@@ -336,11 +336,11 @@ TEST(Ionization , Test_of_e ) {
     bool first = true;
     while(in.good())
     {
-        if(first)in>>ecut>>vcut>>energy>>med>>particleName>>e;
+        if(first)in>>ecut>>vcut>>energy>>mediumName>>particleName>>e;
         first = false;
         energy_old = -1;
 
-        Medium *medium = new Medium(med,1.);
+        Medium *medium = new Medium(Medium::GetTypeFromName(mediumName),1.);
         PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10);
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
@@ -357,7 +357,7 @@ TEST(Ionization , Test_of_e ) {
 
             ASSERT_NEAR(e_new, e, precision*e);
 
-            in>>ecut>>vcut>>energy>>med>>particleName>>e;
+            in>>ecut>>vcut>>energy>>mediumName>>particleName>>e;
         }
         delete cuts;
         delete medium;
@@ -378,7 +378,7 @@ TEST(Ionization , Test_of_dEdx_Interpolant ) {
     double dEdx;
     double ecut;
     double vcut;
-    string med;
+    string mediumName;
     string particleName;
 
     cout.precision(16);
@@ -389,11 +389,11 @@ TEST(Ionization , Test_of_dEdx_Interpolant ) {
     bool first = true;
     while(in.good())
     {
-        if(first)in>>ecut>>vcut>>energy>>med>>particleName>>dEdx;
+        if(first)in>>ecut>>vcut>>energy>>mediumName>>particleName>>dEdx;
         first = false;
         energy_old = -1;
 
-        Medium *medium = new Medium(med,1.);
+        Medium *medium = new Medium(Medium::GetTypeFromName(mediumName),1.);
         PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10);
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
@@ -410,7 +410,7 @@ TEST(Ionization , Test_of_dEdx_Interpolant ) {
 
             ASSERT_NEAR(dEdx_new, dEdx, precision*dEdx);
 
-            in>>ecut>>vcut>>energy>>med>>particleName>>dEdx;
+            in>>ecut>>vcut>>energy>>mediumName>>particleName>>dEdx;
         }
         delete cuts;
         delete medium;
@@ -431,7 +431,7 @@ TEST(Ionization , Test_of_dNdx_Interpolant ) {
     double dNdx;
     double ecut;
     double vcut;
-    string med;
+    string mediumName;
     string particleName;
 
     cout.precision(16);
@@ -442,11 +442,11 @@ TEST(Ionization , Test_of_dNdx_Interpolant ) {
     bool first = true;
     while(in.good())
     {
-        if(first)in>>ecut>>vcut>>energy>>med>>particleName>>dNdx;
+        if(first)in>>ecut>>vcut>>energy>>mediumName>>particleName>>dNdx;
         first = false;
         energy_old = -1;
 
-        Medium *medium = new Medium(med,1.);
+        Medium *medium = new Medium(Medium::GetTypeFromName(mediumName),1.);
         PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10);
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
@@ -463,7 +463,7 @@ TEST(Ionization , Test_of_dNdx_Interpolant ) {
 
             ASSERT_NEAR(dNdx_new, dNdx, precision*dNdx);
 
-            in>>ecut>>vcut>>energy>>med>>particleName>>dNdx;
+            in>>ecut>>vcut>>energy>>mediumName>>particleName>>dNdx;
         }
         delete cuts;
         delete medium;
@@ -485,7 +485,7 @@ TEST(Ionization , Test_of_dNdxrnd_interpol ) {
     double energy;
     double ecut;
     double vcut;
-    string med;
+    string mediumName;
     string particleName;
 
     cout.precision(16);
@@ -496,10 +496,10 @@ TEST(Ionization , Test_of_dNdxrnd_interpol ) {
     bool first = true;
     while(in.good())
     {
-        if(first)in>>ecut>>vcut>>energy>>med>>particleName>>dNdxrnd;
+        if(first)in>>ecut>>vcut>>energy>>mediumName>>particleName>>dNdxrnd;
         first = false;
         energy_old = -1;
-        Medium *medium = new Medium(med,1.);
+        Medium *medium = new Medium(Medium::GetTypeFromName(mediumName),1.);
         PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10);
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
@@ -514,7 +514,7 @@ TEST(Ionization , Test_of_dNdxrnd_interpol ) {
 
             ASSERT_NEAR(dNdxrnd_new, dNdxrnd, 1E-5*dNdxrnd);
 
-            in>>ecut>>vcut>>energy>>med>>particleName>>dNdxrnd;
+            in>>ecut>>vcut>>energy>>mediumName>>particleName>>dNdxrnd;
         }
 
 
@@ -540,7 +540,7 @@ TEST(Ionization , Test_of_e_interpol ) {
     double e_new;
     double ecut;
     double vcut;
-    string med;
+    string mediumName;
     string particleName;
 
     cout.precision(16);
@@ -557,11 +557,11 @@ TEST(Ionization , Test_of_e_interpol ) {
     bool first = true;
     while(in.good())
     {
-        if(first)in>>ecut>>vcut>>energy>>med>>particleName>>e;
+        if(first)in>>ecut>>vcut>>energy>>mediumName>>particleName>>e;
         first = false;
         energy_old = -1;
 
-        Medium *medium = new Medium(med,1.);
+        Medium *medium = new Medium(Medium::GetTypeFromName(mediumName),1.);
         PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10);
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
@@ -580,13 +580,13 @@ TEST(Ionization , Test_of_e_interpol ) {
             e_new=ioniz->CalculateStochasticLoss(rnd1,rnd2);
 
             if(e!=0)if(log10(fabs(1-e_new/e))>-3){
-//                cout<< "\t" << ecut<< "\t" << vcut << "\t" << energy<< "\t" << med<< "\t" << particleName<<endl;
+//                cout<< "\t" << ecut<< "\t" << vcut << "\t" << energy<< "\t" << mediumName<< "\t" << particleName<<endl;
 //                cout << log10(fabs(1-e_new/e)) << endl;
             }
 
             ASSERT_NEAR(e_new, e, precision*e);
 
-            in>>ecut>>vcut>>energy>>med>>particleName>>e;
+            in>>ecut>>vcut>>energy>>mediumName>>particleName>>e;
         }
         delete cuts;
         delete medium;

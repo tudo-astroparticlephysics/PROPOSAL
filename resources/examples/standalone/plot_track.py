@@ -79,16 +79,17 @@ def propagate():
         (Geometry) Geometry of the detector
         (list)     List of secondarys particles represeint interactions
     """
-    ptype = pyPROPOSAL.ParticleType.MuMinus
+    particle_type = pyPROPOSAL.ParticleType.MuMinus
+    medium_type = pyPROPOSAL.MediumType.Ice
 
-    med = pyPROPOSAL.Medium("ice")
+    med = pyPROPOSAL.Medium(medium_type)
 
     cuts_inside = pyPROPOSAL.EnergyCutSettings(500, -1)
     cuts_infront = pyPROPOSAL.EnergyCutSettings(-1, 0.05)
     cuts_behind = pyPROPOSAL.EnergyCutSettings(-1, 0.05)
 
     prop = pyPROPOSAL.Propagator(
-        ptype,
+        particle_type,
         "../../resources/tables"
     )
     mu = prop.particle

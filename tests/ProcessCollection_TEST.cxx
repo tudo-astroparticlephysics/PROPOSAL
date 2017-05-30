@@ -45,7 +45,7 @@ std::vector<ProcessCollection*>         CombOfProcColl;
 TEST(Comparison , Comparison_equal ) {
     double dNdx;
 
-    Medium *medium = new Medium("hydrogen",1.);
+    Medium *medium = new Medium(MediumType::Hydrogen,1.);
     PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
     ProcessCollection *A = new ProcessCollection(particle, medium, cuts);
@@ -71,8 +71,8 @@ TEST(Comparison , Comparison_equal ) {
 
 TEST(Comparison , Comparison_not_equal ) {
     double dEdx;
-    Medium *medium = new Medium("air",1.);
-    Medium *medium2 = new Medium("water",1.);
+    Medium *medium = new Medium(MediumType::Air,1.);
+    Medium *medium2 = new Medium(MediumType::Water,1.);
     PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,20,20,1e5,10);
     PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,20,20,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
@@ -117,7 +117,7 @@ TEST(Assignment , Copyconstructor ) {
 }
 
 TEST(Assignment , Copyconstructor2 ) {
-    Medium *medium = new Medium("air",1.);
+    Medium *medium = new Medium(MediumType::Air,1.);
     PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
 
@@ -129,7 +129,7 @@ TEST(Assignment , Copyconstructor2 ) {
 }
 
 TEST(Assignment , Operator ) {
-    Medium *medium = new Medium("air",1.);
+    Medium *medium = new Medium(MediumType::Air,1.);
     PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
     ProcessCollection A(particle, medium, cuts);
@@ -142,7 +142,7 @@ TEST(Assignment , Operator ) {
 
     EXPECT_TRUE(A==B);
 
-    Medium *medium2 = new Medium("water",1.);
+    Medium *medium2 = new Medium(MediumType::Water,1.);
     PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cuts2 = new EnergyCutSettings(200,-1);
     ProcessCollection *C = new ProcessCollection(particle2, medium2, cuts2);
@@ -155,8 +155,8 @@ TEST(Assignment , Operator ) {
 }
 
 TEST(Assignment , Swap ) {
-    Medium *medium = new Medium("hydrogen",1.);
-    Medium *medium2 = new Medium("hydrogen",1.);
+    Medium *medium = new Medium(MediumType::Hydrogen,1.);
+    Medium *medium2 = new Medium(MediumType::Hydrogen,1.);
     PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
     PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
@@ -169,8 +169,8 @@ TEST(Assignment , Swap ) {
     B.EnableInterpolation();
     EXPECT_TRUE(A==B);
 
-    Medium *medium3 = new Medium("water",1.);
-    Medium *medium4 = new Medium("water",1.);
+    Medium *medium3 = new Medium(MediumType::Water,1.);
+    Medium *medium4 = new Medium(MediumType::Water,1.);
     PROPOSALParticle *particle3 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,.20,20,1e5,10);
     PROPOSALParticle *particle4 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cuts3 = new EnergyCutSettings(200,-1);
@@ -200,7 +200,7 @@ TEST(ProcessCollection , Set_Up ) {
     double energy;
     double ecut;
     double vcut;
-    string med;
+    string mediumName;
     string particleName;
     bool lpm;
 
@@ -213,12 +213,12 @@ TEST(ProcessCollection , Set_Up ) {
     int i = -1;
     while(in.good())
     {
-        if(first)in>>ecut>>vcut>>lpm>>energy>>med>>particleName>> IonizEvents >> BremsEvents >> PhotoEvents >> EpairEvents;
+        if(first)in>>ecut>>vcut>>lpm>>energy>>mediumName>>particleName>> IonizEvents >> BremsEvents >> PhotoEvents >> EpairEvents;
         first=false;
         energy_old = -1;
 
         i++;
-        CombOfMedium.push_back(new Medium(med,1.));
+        CombOfMedium.push_back(new Medium(Medium::GetTypeFromName(mediumName),1.));
         CombOfParticle.push_back(new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10));
         CombOfParticle.at(i)->SetEnergy(energy);
         CombOfEnergyCutSettings.push_back(new EnergyCutSettings(ecut,vcut));
@@ -237,11 +237,11 @@ TEST(ProcessCollection , Set_Up ) {
         }
 
         CombOfProcColl.at(i)->EnableInterpolation();
-        log_info("ecut = %f\tvcut = %f\tlpm = %s\tenergy = %f\tmed = %s\tparticleName = %s" ,ecut,vcut,(lpm)?"true":"false",energy,med.c_str(),particleName.c_str());
+        log_info("ecut = %f\tvcut = %f\tlpm = %s\tenergy = %f\tmed = %s\tparticleName = %s" ,ecut,vcut,(lpm)?"true":"false",energy,mediumName.c_str(),particleName.c_str());
         while(energy_old < energy)
         {
             energy_old = energy;
-            in>>ecut>>vcut>>lpm>>energy>>med>>particleName>> IonizEvents >> BremsEvents >> PhotoEvents >> EpairEvents;
+            in>>ecut>>vcut>>lpm>>energy>>mediumName>>particleName>> IonizEvents >> BremsEvents >> PhotoEvents >> EpairEvents;
         }
     }
 }
@@ -266,7 +266,7 @@ TEST(ProcessCollection , Stochasticity)
     double energy;
     double ecut;
     double vcut;
-    string med;
+    string mediumName;
     string particleName;
     bool lpm;
 
@@ -292,19 +292,19 @@ TEST(ProcessCollection , Stochasticity)
             ProcessCollection* ProcColl;
     while(in.good())
     {
-        if(first)in>>ecut>>vcut>>lpm>>energy>>med>>particleName>> IonizEvents >> BremsEvents >> PhotoEvents >> EpairEvents;
+        if(first)in>>ecut>>vcut>>lpm>>energy>>mediumName>>particleName>> IonizEvents >> BremsEvents >> PhotoEvents >> EpairEvents;
         first=false;
 
         NumberOfEvents = IonizEvents+BremsEvents+PhotoEvents+EpairEvents;
         energy_old = -1;
 
-        Medium *medium = new Medium(med,1.);
+        Medium *medium = new Medium(Medium::GetTypeFromName(mediumName),1.);
         PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10);
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
 
         int i=0;
-        //cout << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << med << "\t" << particleName <<  endl;
+        //cout << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << mediumName << "\t" << particleName <<  endl;
         while(i< CombOfProcColl.size())
         {
             if(         particle->GetType() != CombOfParticle.at(i)->GetType()
@@ -392,7 +392,7 @@ TEST(ProcessCollection , Stochasticity)
             ASSERT_NEAR(PhotoEvents, NewPhotoEvents, NSigmaPruf*DevPhotoEvents);
             ASSERT_NEAR(IonizEvents, NewIonizEvents, NSigmaPruf*DevIonizEvents);
             }
-            in>>ecut>>vcut>>lpm>>energy>>med>>particleName>> IonizEvents >> BremsEvents >> PhotoEvents >> EpairEvents;
+            in>>ecut>>vcut>>lpm>>energy>>mediumName>>particleName>> IonizEvents >> BremsEvents >> PhotoEvents >> EpairEvents;
         }
 
         delete cuts;
@@ -417,7 +417,7 @@ TEST(ProcessCollection , Displacement)
     double energy;
     double ecut;
     double vcut;
-    string med;
+    string mediumName;
     string particleName;
     bool lpm;
 
@@ -431,17 +431,17 @@ TEST(ProcessCollection , Displacement)
     double RelError = 1E-2;
     while(in.good())
     {
-        if(first)in>>ecut>>vcut>>lpm>>med>>particleName>>energy>>ef>>dx;
+        if(first)in>>ecut>>vcut>>lpm>>mediumName>>particleName>>energy>>ef>>dx;
         first=false;
 
         energy_old = -1;
-        Medium *medium = new Medium(med,1.);
+        Medium *medium = new Medium(Medium::GetTypeFromName(mediumName),1.);
         PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10);
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
 
         int i=0;
-        //cout << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << med << "\t" << particleName <<  endl;
+        //cout << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << mediumName << "\t" << particleName <<  endl;
         while(i< CombOfProcColl.size())
         {
             if(         particle->GetType() != CombOfParticle.at(i)->GetType()
@@ -470,12 +470,12 @@ TEST(ProcessCollection , Displacement)
 
 //            if(fabs(1-dx_new/dx) > 1E-2)
 //            {
-//                cout << ecut << "\t" << vcut << "\t" << lpm << "\t" << med << "\t" << particleName << "\t" << energy << "\t" << ef << "\t" << dx << endl;
+//                cout << ecut << "\t" << vcut << "\t" << lpm << "\t" << mediumName << "\t" << particleName << "\t" << energy << "\t" << ef << "\t" << dx << endl;
 //                cout << dx << "\t" << dx_new << "\t" << fabs(1-dx_new/dx) << endl;
 //            }
             ASSERT_NEAR(dx, dx_new, RelError*dx_new);
 
-            in>>ecut>>vcut>>lpm>>med>>particleName>>energy>>ef>>dx;
+            in>>ecut>>vcut>>lpm>>mediumName>>particleName>>energy>>ef>>dx;
         }
 
         delete cuts;
@@ -501,7 +501,7 @@ TEST(ProcessCollection , TrackingIntegral)
     double energy;
     double ecut;
     double vcut;
-    string med;
+    string mediumName;
     string particleName;
     bool lpm;
 
@@ -520,17 +520,17 @@ TEST(ProcessCollection , TrackingIntegral)
     double RelError = 1E-2;
     while(in.good())
     {
-        if(first)in>>ecut>>vcut>>lpm>>med>>particleName>> particle_interaction >> energy>>tracking;
+        if(first)in>>ecut>>vcut>>lpm>>mediumName>>particleName>> particle_interaction >> energy>>tracking;
         first=false;
 
         energy_old = -1;
-        Medium *medium = new Medium(med,1.);
+        Medium *medium = new Medium(Medium::GetTypeFromName(mediumName),1.);
         PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10);
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
 
         int i=0;
-        //cout << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << med << "\t" << particleName <<  endl;
+        //cout << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << mediumName << "\t" << particleName <<  endl;
         while(i< CombOfProcColl.size())
         {
             if(         particle->GetType() != CombOfParticle.at(i)->GetType()
@@ -560,12 +560,12 @@ TEST(ProcessCollection , TrackingIntegral)
 
 //            if(fabs(1-tracking_new/tracking) > 1E-5)
 //            {
-//                cout << ecut << "\t" << vcut << "\t" << lpm << "\t" << med << "\t" << particleName << "\t" << particle_interaction << "\t" << energy << "\t" << tracking << endl;
+//                cout << ecut << "\t" << vcut << "\t" << lpm << "\t" << mediumName << "\t" << particleName << "\t" << particle_interaction << "\t" << energy << "\t" << tracking << endl;
 //                cout << tracking << "\t" << tracking_new << "\t" << fabs(1-tracking_new/tracking)  << endl;
 //            }
             ASSERT_NEAR(tracking, tracking_new, RelError*tracking_new);
 
-            in>>ecut>>vcut>>lpm>>med>>particleName>> particle_interaction >> energy>>tracking;
+            in>>ecut>>vcut>>lpm>>mediumName>>particleName>> particle_interaction >> energy>>tracking;
         }
 
         delete cuts;
@@ -590,7 +590,7 @@ TEST(ProcessCollection , FinalEnergyDist)
     double energy;
     double ecut;
     double vcut;
-    string med;
+    string mediumName;
     string particleName;
     bool lpm;
 
@@ -608,17 +608,17 @@ TEST(ProcessCollection , FinalEnergyDist)
     double RelError = 1E-3;
     while(in.good())
     {
-        if(first)in>>ecut>>vcut>>lpm>>med>>particleName>> dist >> energy>> ef >> finalenergy;
+        if(first)in>>ecut>>vcut>>lpm>>mediumName>>particleName>> dist >> energy>> ef >> finalenergy;
         first=false;
 
         energy_old = -1;
-        Medium *medium = new Medium(med,1.);
+        Medium *medium = new Medium(Medium::GetTypeFromName(mediumName),1.);
         PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10);
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
 
         int i=0;
-        //cout << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << med << "\t" << particleName <<  endl;
+        //cout << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << mediumName << "\t" << particleName <<  endl;
         while(i< CombOfProcColl.size())
         {
             if(         particle->GetType() != CombOfParticle.at(i)->GetType()
@@ -650,12 +650,12 @@ TEST(ProcessCollection , FinalEnergyDist)
 
 //            if(fabs(1-finalenergy_new/finalenergy) > 1E-5)
 //            {
-//                cout << ecut << "\t" << vcut << "\t" << lpm << "\t" << med << "\t" << particleName << "\t" << dist << "\t" << energy << "\t" << finalenergy << endl;
+//                cout << ecut << "\t" << vcut << "\t" << lpm << "\t" << mediumName << "\t" << particleName << "\t" << dist << "\t" << energy << "\t" << finalenergy << endl;
 //                cout << finalenergy << "\t" << finalenergy_new << "\t" << fabs(1-finalenergy_new/finalenergy)  << endl;
 //            }
             ASSERT_NEAR(finalenergy, finalenergy_new, RelError*finalenergy_new);
 
-            in>>ecut>>vcut>>lpm>>med>>particleName>> dist >> energy>>ef>>finalenergy;
+            in>>ecut>>vcut>>lpm>>mediumName>>particleName>> dist >> energy>>ef>>finalenergy;
         }
 
         delete cuts;
@@ -680,7 +680,7 @@ TEST(ProcessCollection , MakeDecay)
     double energy;
     double ecut;
     double vcut;
-    string med;
+    string mediumName;
     string particleName;
     bool lpm;
 
@@ -699,18 +699,18 @@ TEST(ProcessCollection , MakeDecay)
     double rnd1,rnd2,rnd3;
     while(in.good())
     {
-        if(first)in>>ecut>>vcut>>lpm>>med>>particleName>> rnd1>>rnd2>>rnd3 >> energy>> Decay_old.first >> old_decay_second_string;
+        if(first)in>>ecut>>vcut>>lpm>>mediumName>>particleName>> rnd1>>rnd2>>rnd3 >> energy>> Decay_old.first >> old_decay_second_string;
         first=false;
         Decay_old.second = PROPOSALParticle::GetTypeFromName(old_decay_second_string);
 
         energy_old = -1;
-        Medium *medium = new Medium(med,1.);
+        Medium *medium = new Medium(Medium::GetTypeFromName(mediumName),1.);
         PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10);
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
 
         int i=0;
-        //cout << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << med << "\t" << particleName <<  endl;
+        //cout << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << mediumName << "\t" << particleName <<  endl;
         while(i< CombOfProcColl.size())
         {
             if(         particle->GetType() != CombOfParticle.at(i)->GetType()
@@ -739,7 +739,7 @@ TEST(ProcessCollection , MakeDecay)
 
 //            if(fabs(1-Decay_old.first/Decay_new.first) > 1E-16)
 //            {
-                //cout << ecut << "\t" << vcut << "\t" << lpm << "\t" << med << "\t" << particleName << "\t" << rnd1 << "\t" << rnd2 <<"\t" << rnd3 << "\t" << energy << "\t" <<  Decay_old.first << "\t" << Decay_old.second << endl;
+                //cout << ecut << "\t" << vcut << "\t" << lpm << "\t" << mediumName << "\t" << particleName << "\t" << rnd1 << "\t" << rnd2 <<"\t" << rnd3 << "\t" << energy << "\t" <<  Decay_old.first << "\t" << Decay_old.second << endl;
 
 //                cout << Decay_old.first << "\t" << Decay_new.first;
 //                if(Decay_new.first !=0)cout << "\t" << fabs(1-Decay_old.first/Decay_new.first);
@@ -751,7 +751,7 @@ TEST(ProcessCollection , MakeDecay)
             ASSERT_NEAR(Decay_new.first, Decay_old.first, RelError*Decay_new.first);
             ASSERT_FALSE(   Decay_old.second ==   Decay_new.second                );
 
-            in>>ecut>>vcut>>lpm>>med>>particleName>> rnd1>>rnd2>>rnd3 >> energy>> Decay_old.first >> old_decay_second_string;
+            in>>ecut>>vcut>>lpm>>mediumName>>particleName>> rnd1>>rnd2>>rnd3 >> energy>> Decay_old.first >> old_decay_second_string;
         }
 
         delete cuts;
@@ -776,7 +776,7 @@ TEST(ProcessCollection , FinalEnergyParticleInteraction)
     double energy;
     double ecut;
     double vcut;
-    string med;
+    string mediumName;
     string particleName;
     bool lpm;
 
@@ -795,17 +795,17 @@ TEST(ProcessCollection , FinalEnergyParticleInteraction)
     double RelError = 1E-2;
     while(in.good())
     {
-        if(first)in>>ecut>>vcut>>lpm>>med>>particleName>> energy>> particle_interaction >> rnd >> FinalEnergy;
+        if(first)in>>ecut>>vcut>>lpm>>mediumName>>particleName>> energy>> particle_interaction >> rnd >> FinalEnergy;
         first=false;
 
         energy_old = -1;
-        Medium *medium = new Medium(med,1.);
+        Medium *medium = new Medium(Medium::GetTypeFromName(mediumName),1.);
         PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10);
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
 
         int i=0;
-        //cout << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << med << "\t" << particleName <<  endl;
+        //cout << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << mediumName << "\t" << particleName <<  endl;
         while(i< CombOfProcColl.size())
         {
             if(         particle->GetType() != CombOfParticle.at(i)->GetType()
@@ -836,12 +836,12 @@ TEST(ProcessCollection , FinalEnergyParticleInteraction)
 
 //            if(fabs(1-FinalEnergy_new/FinalEnergy) > 1E-5)
 //            {
-//                cout << ecut << "\t" << vcut << "\t" << lpm << "\t" << med << "\t" << particleName << "\t" << particle_interaction << "\t" << rnd << "\t" << energy << "\t" << FinalEnergy << endl;
+//                cout << ecut << "\t" << vcut << "\t" << lpm << "\t" << mediumName << "\t" << particleName << "\t" << particle_interaction << "\t" << rnd << "\t" << energy << "\t" << FinalEnergy << endl;
 //                cout << FinalEnergy << "\t" << FinalEnergy_new << "\t" << fabs(1-FinalEnergy_new/FinalEnergy)  << endl;
 //            }
             ASSERT_NEAR(FinalEnergy, FinalEnergy_new, RelError*FinalEnergy_new);
 
-            in>>ecut>>vcut>>lpm>>med>>particleName>> energy>> particle_interaction >> rnd >> FinalEnergy;
+            in>>ecut>>vcut>>lpm>>mediumName>>particleName>> energy>> particle_interaction >> rnd >> FinalEnergy;
         }
 
         delete cuts;

@@ -11,6 +11,7 @@
 #include <iomanip>
 
 #include <boost/bind.hpp>
+#include <boost/algorithm/string.hpp> // case insensitive string compare for configuration file
 
 #include "PROPOSAL/Medium.h"
 #include "PROPOSAL/methods.h"
@@ -41,7 +42,7 @@ double X0_inv(unsigned int Z, double M);
 
 
 Medium::Medium()
-    :numComponents_    (0)
+    :numComponents_     (0)
     ,nucCharge_         ()
     ,atomicNum_         ()
     ,atomInMolecule_    ()
@@ -64,7 +65,8 @@ Medium::Medium()
     ,radiationLength_   (0)
     ,M_                 ()
     ,elementName_       ()
-    ,name_              ("water")
+    ,name_              ()
+    ,type_              (MediumType::Water)
     ,ecut_              (0)
     ,vcut_              (0)
     ,vCut_              (0)
@@ -107,6 +109,7 @@ Medium::Medium(const Medium &medium)
     ,M_                 (medium.M_ )
     ,elementName_       (medium.elementName_ )
     ,name_              (medium.name_ )
+    ,type_              (medium.type_ )
     ,ecut_              (medium.ecut_)
     ,vcut_              (medium.vcut_)
     ,vCut_              (medium.vCut_)
@@ -123,8 +126,8 @@ Medium::Medium(const Medium &medium)
 //----------------------------------------------------------------------------//
 
 
-Medium::Medium(string w, double rho)
-    :numComponents_    (0)
+Medium::Medium(MediumType::Enum type, double rho)
+    :numComponents_     (0)
     ,nucCharge_         ()
     ,atomicNum_         ()
     ,atomInMolecule_    ()
@@ -146,6 +149,7 @@ Medium::Medium(string w, double rho)
     ,radiationLength_   (0)
     ,M_                 ()
     ,elementName_       ()
+    ,name_              ()
     ,ecut_              (0)
     ,vcut_              (0)
     ,vCut_              (0)
@@ -154,7 +158,7 @@ Medium::Medium(string w, double rho)
     ,sumNucleons_       (0)
     ,r0_                (0)
 {
-    name_   =   w;
+    type_   =   type;
 
     if (rho > 0 )
     {
@@ -166,65 +170,53 @@ Medium::Medium(string w, double rho)
         rho_  =   1;
     }
 
-    if(EqualsIgnoreCase(w,"water"))
+    switch (type_)
     {
-        InitWater();
+        case MediumType::Water:
+            InitWater();
+            break;
+        case MediumType::Ice:
+            InitIce();
+            break;
+        case MediumType::Hydrogen:
+            InitHydrogen();
+            break;
+        case MediumType::Iron:
+            InitIron();
+            break;
+        case MediumType::Copper:
+            InitCopper();
+            break;
+        case MediumType::Lead:
+            InitLead();
+            break;
+        case MediumType::Uranium:
+            InitUranium();
+            break;
+        case MediumType::Air:
+            InitAir();
+            break;
+        case MediumType::AntaresWater:
+            InitAntaresWater();
+            break;
+        case MediumType::StandardRock:
+            InitStandardrock();
+            break;
+        case MediumType::FrejusRock:
+            InitFrejusrock();
+            break;
+        case MediumType::Salt:
+            InitSalt();
+            break;
+        case MediumType::MineralOil:
+            InitParaffin();
+            break;
+        default:
+            log_warn("Unknown medium type %i: set to the default type: water", type_);
+            type_   =   MediumType::Water;
+            InitWater();
+            break;
     }
-    else if(EqualsIgnoreCase(w,"ice"))
-    {
-        InitIce();
-    }
-    else if(EqualsIgnoreCase(w,"salt"))
-    {
-        InitSalt();
-    }
-    else if(EqualsIgnoreCase(w,"standard_rock"))
-    {
-        InitStandardrock();
-    }
-    else if(EqualsIgnoreCase(w,"frejus_rock"))
-    {
-        InitFrejusrock();
-    }
-    else if(EqualsIgnoreCase(w,"iron"))
-    {
-        InitIron();
-    }
-    else if(EqualsIgnoreCase(w,"hydrogen"))
-    {
-        InitHydrogen();
-    }
-    else if(EqualsIgnoreCase(w,"lead"))
-    {
-        InitLead();
-    }
-    else if(EqualsIgnoreCase(w,"copper"))
-    {
-        InitCopper();
-    }
-    else if(EqualsIgnoreCase(w,"uranium"))
-    {
-        InitUranium();
-    }
-    else if(EqualsIgnoreCase(w,"air"))
-    {
-        InitAir();
-    }
-    else if(EqualsIgnoreCase(w,"mineral_oil"))
-    {
-        InitParaffin();
-    }
-    else if(EqualsIgnoreCase(w,"antares_water"))
-    {
-        InitAntaresWater();
-    }
-    else
-    {
-        printf("Warning (in Medium/Medium): unknown medium: defaulting to water");
-        name_   =   "water";
-        InitWater();
-    }
-
 }
 
 
@@ -285,6 +277,7 @@ bool Medium::operator==(const Medium &medium) const
     if( elementName_.size()     != medium.elementName_.size() )     return false;
 
     if( name_.compare( medium.name_) != 0 ) return false;
+    if( type_ != medium.type_) return false;
     for(unsigned int i =    0; i < M_.size(); i++)
     {
         if(M_.at(i)             !=  medium.M_.at(i))            return false;
@@ -408,6 +401,7 @@ void Medium::swap(Medium &medium)
     swap( MM_               , medium.MM_);
     swap( sumNucleons_      , medium.sumNucleons_);
     swap( r0_               , medium.r0_);
+    swap( type_             , medium.type_ );
 
     M_.swap( medium.M_ );
     elementName_.swap( medium.elementName_ );
@@ -429,7 +423,7 @@ void Medium::swap(Medium &medium)
 //----------------------------------------------------------------------------//
 
 
-void Medium::Inita(int i)
+void Medium::InitMediumArrays(int i)
 {
     numComponents_ =   i;
 
@@ -590,10 +584,12 @@ void Medium::SetBPrime(int i)
 
 void Medium::InitWater()
 {
-    Inita(2);
+    name_ = "water";
 
-    elementName_.at(0)                =   "H";
-    elementName_.at(1)                =   "O";
+    InitMediumArrays(2);
+
+    elementName_.at(0)      =   "H";
+    elementName_.at(1)      =   "O";
     nucCharge_.at(0)        =   1; // H
     nucCharge_.at(1)        =   8; // O
     atomicNum_.at(0)        =   1.00794;
@@ -623,7 +619,9 @@ void Medium::InitWater()
 
 void Medium::InitIce()
 {
-    Inita(2);
+    name_ = "ice";
+
+    InitMediumArrays(2);
 
     elementName_.at(0)      =   "H";
     elementName_.at(1)      =   "O";
@@ -656,7 +654,9 @@ void Medium::InitIce()
 
 void Medium::InitSalt()
 {
-    Inita(2);
+    name_ = "salt";
+
+    InitMediumArrays(2);
 
     elementName_.at(0)      =   "Na";
     elementName_.at(1)      =   "Cl";
@@ -697,7 +697,9 @@ void Medium::InitSalt()
 
 void Medium::InitStandardrock()
 {
-    Inita(1);
+    name_ = "StandardRock";
+
+    InitMediumArrays(1);
     // Ionization potential and density corrections
     // are close to those of calcium carbonate
 
@@ -728,7 +730,9 @@ void Medium::InitStandardrock()
 
 void Medium::InitFrejusrock()
 {
-    Inita(1);
+    name_ = "FrejusRock";
+
+    InitMediumArrays(1);
 
     elementName_.at(0)      =   "Frejus_Rock";
     nucCharge_.at(0)        =   10.12;
@@ -757,7 +761,9 @@ void Medium::InitFrejusrock()
 
 void Medium::InitIron()
 {
-    Inita(1);
+    name_ = "Iron";
+
+    InitMediumArrays(1);
 
     elementName_.at(0)      =   "Fe";
     nucCharge_.at(0)        =   26;
@@ -786,7 +792,9 @@ void Medium::InitIron()
 
 void Medium::InitHydrogen()
 {
-    Inita(1);
+    name_ = "hydrogen";
+
+    InitMediumArrays(1);
 
     elementName_.at(0)      =   "H";
     nucCharge_.at(0)        =   1;
@@ -815,7 +823,9 @@ void Medium::InitHydrogen()
 
 void Medium::InitLead()
 {
-    Inita(1);
+    name_ = "lead";
+
+    InitMediumArrays(1);
 
     elementName_.at(0)      =   "Pb";
     nucCharge_.at(0)        =   82;
@@ -842,7 +852,9 @@ void Medium::InitLead()
 
 void Medium::InitCopper()
 {
-    Inita(1);
+    name_ = "copper";
+
+    InitMediumArrays(1);
 
     elementName_.at(0)      =   "Cu";
     nucCharge_.at(0)        =   29;
@@ -870,7 +882,9 @@ void Medium::InitCopper()
 
 void Medium::InitUranium()
 {
-    Inita(1);
+    name_ = "uranium";
+
+    InitMediumArrays(1);
 
     elementName_.at(0)      =   "U";
     nucCharge_.at(0)        =   92;
@@ -899,12 +913,14 @@ void Medium::InitUranium()
 
 void Medium::InitAir()
 {
+    name_ = "air";
+
     const double fr1        =   2*78.1;
     const double fr2        =   2*21.0;
     const double fr3        =   0.9;
     const double fra        =   fr1+fr2+fr3;
 
-    Inita(3);
+    InitMediumArrays(3);
 
     elementName_.at(0)      =   "N";
     elementName_.at(1)      =   "O";
@@ -941,7 +957,9 @@ void Medium::InitAir()
 
 void Medium::InitParaffin()
 {
-    Inita(2);
+    name_ = "MineralOil";
+
+    InitMediumArrays(2);
 
     elementName_.at(0)      =   "C";
     elementName_.at(1)      =   "H";
@@ -984,11 +1002,13 @@ void Medium::InitParaffin()
 
 void Medium::InitAntaresWater()
 {
+    name_ = "AntaresWater";
+
     // added by Claudine Colnard,
     // Institute Nikhef, The Netherlands,
     // ANTARES collaboration.
 
-    Inita(8);
+    InitMediumArrays(8);
 
     elementName_.at(0)      =   "H";
     elementName_.at(1)      =   "O";
@@ -1153,6 +1173,10 @@ void Medium::SetName(std::string name){
     name_ = name;
 }
 
+void Medium::SetType(MediumType::Enum type){
+    type_ = type;
+}
+
 void Medium::SetMN(std::vector<double> mN){
     mN_ = mN;
 }
@@ -1167,6 +1191,27 @@ void Medium::SetSumNucleons(double sumNucleons){
 
 void Medium::SetR0(double r0){
     r0_ = r0;
+}
+
+MediumType::Enum Medium::GetTypeFromName(std::string medium_name)
+{
+    if (boost::iequals(medium_name, "water")) return MediumType::Water;
+    else if (boost::iequals(medium_name, "ice")) return MediumType::Ice;
+    else if (boost::iequals(medium_name, "hydrogen")) return MediumType::Hydrogen;
+    else if (boost::iequals(medium_name, "iron")) return MediumType::Iron;
+    else if (boost::iequals(medium_name, "copper")) return MediumType::Copper;
+    else if (boost::iequals(medium_name, "lead")) return MediumType::Lead;
+    else if (boost::iequals(medium_name, "uranium")) return MediumType::Uranium;
+    else if (boost::iequals(medium_name, "air")) return MediumType::Air;
+    else if (boost::iequals(medium_name, "AntaresWater")) return MediumType::AntaresWater;
+    else if (boost::iequals(medium_name, "StandardRock")) return MediumType::StandardRock;
+    else if (boost::iequals(medium_name, "FrejusRock")) return MediumType::FrejusRock;
+    else if (boost::iequals(medium_name, "salt")) return MediumType::Salt;
+    else if (boost::iequals(medium_name, "MineralOil")) return MediumType::MineralOil;
+    else
+    {
+        log_fatal("the medium name '%s' is not supported", medium_name.c_str());
+    }
 }
 
 //----------------------------------------------------------------------------//
