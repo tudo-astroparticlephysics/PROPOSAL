@@ -190,7 +190,7 @@ sector
     infront -1    0.05  1
     behind  -1      -1  0
 
-    medium  Standard_Rock 1.
+    medium  StandardRock 1.
 
 
 # keyword detector must be followed by one line

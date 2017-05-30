@@ -97,58 +97,6 @@ int RoundValue(double val)
 //----------------------------------------------------------------------------//
 
 
-// Compares strings case-insensitive
-
-bool EqualsIgnoreCase(std::string s1, std::string s2)
-{
-    if(s1.length()==s2.length())
-    {
-        for(int i=0; i<(int)s1.length(); i++)
-        {
-            char buffer;
-
-            if(s1.at(i)==s2.at(i))
-            {
-                continue;
-            }
-            else
-            {
-                buffer  =   (char)toupper(s1.at(i));
-
-                if(s2.at(i)==buffer)
-                {
-                    continue;
-                }
-                else
-                {
-                    buffer  =   (char)tolower(s1.at(i));
-
-                    if(s2.at(i)==buffer)
-                    {
-                        continue;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
-            }
-        }
-
-        return true;
-    }
-
-    else
-    {
-        return false;
-    }
-}
-
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
 
 string ToLowerCase(string toConvert)
 {
@@ -249,52 +197,5 @@ string NextToken(deque<string> *Tokens)
 
 }
 
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-bool Compare(string name1, string name2 , bool output)
-{
-    ifstream file;
-    ifstream file2;
-    double zeile;
-    double zeile2;
-
-    int linenumber  =   1;
-    bool fail       =   false;
-
-    // open file
-    file.open(name1.c_str(), ios::in);
-    file2.open (name2.c_str(), ios::in);
-
-    while (file.good() && file2.good())
-    {
-        // read files line by line
-
-        file >> zeile;
-        file2 >> zeile2;
-
-        if(!file.eof() && !file2.eof())
-        {
-            if( zeile - zeile2 != 0)
-            {
-                if(output)
-                cout << "Problem in line " << linenumber << "\t Value in: "<<name1<<":" << zeile << "\t Value in "<<name2<<": " << zeile2 << endl;
-                fail=true;
-            }
-            ++linenumber;
-        }
-    } // end of while
-
-    if(fail==true)
-    {
-        return false;
-    }
-    else
-    {
-        return true;
-    }
-}
 
 }  // PROPOSAL

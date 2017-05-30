@@ -37,7 +37,7 @@ public:
 TEST(Comparison , Comparison_equal ) {
 
     double dEdx;
-    Medium *medium = new Medium("air",1.);
+    Medium *medium = new Medium(MediumType::Air,1.);
     PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
     Photonuclear *A = new Photonuclear(particle, medium, cuts);
@@ -67,8 +67,8 @@ TEST(Comparison , Comparison_equal ) {
 
 TEST(Comparison , Comparison_not_equal ) {
     double dEdx;
-    Medium *medium = new Medium("air",1.);
-    Medium *medium2 = new Medium("water",1.);
+    Medium *medium = new Medium(MediumType::Air,1.);
+    Medium *medium2 = new Medium(MediumType::Water,1.);
     PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,20,20,1e5,10);
     PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,20,20,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
@@ -102,7 +102,7 @@ TEST(Assignment , Copyconstructor ) {
 }
 
 TEST(Assignment , Copyconstructor2 ) {
-    Medium *medium = new Medium("air",1.);
+    Medium *medium = new Medium(MediumType::Air,1.);
     PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
 
@@ -114,7 +114,7 @@ TEST(Assignment , Copyconstructor2 ) {
 }
 
 TEST(Assignment , Operator ) {
-    Medium *medium = new Medium("air",1.);
+    Medium *medium = new Medium(MediumType::Air,1.);
     PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
     Photonuclear A(particle, medium, cuts);
@@ -126,7 +126,7 @@ TEST(Assignment , Operator ) {
 
     EXPECT_TRUE(A==B);
 
-    Medium *medium2 = new Medium("water",1.);
+    Medium *medium2 = new Medium(MediumType::Water,1.);
     PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cuts2 = new EnergyCutSettings(200,-1);
     Photonuclear *C = new Photonuclear(particle2, medium2, cuts2);
@@ -139,8 +139,8 @@ TEST(Assignment , Operator ) {
 }
 
 TEST(Assignment , Swap ) {
-    Medium *medium = new Medium("air",1.);
-    Medium *medium2 = new Medium("air",1.);
+    Medium *medium = new Medium(MediumType::Air,1.);
+    Medium *medium2 = new Medium(MediumType::Air,1.);
     PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,20,20,1e5,10);
     PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,20,20,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
@@ -155,8 +155,8 @@ TEST(Assignment , Swap ) {
     B.EnableDNdxInterpolation();
     EXPECT_TRUE(A==B);
 
-    Medium *medium3 = new Medium("water",1.);
-    Medium *medium4 = new Medium("water",1.);
+    Medium *medium3 = new Medium(MediumType::Water,1.);
+    Medium *medium4 = new Medium(MediumType::Water,1.);
     PROPOSALParticle *particle3 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,.20,20,1e5,10);
     PROPOSALParticle *particle4 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cuts3 = new EnergyCutSettings(200,-1);
@@ -175,7 +175,7 @@ TEST(Assignment , Swap ) {
 //----------------------------------------------------------------------------//
 
 std::vector<Medium*>                CombOfMedium;
-std::vector<PROPOSALParticle*>              CombOfParticle;
+std::vector<PROPOSALParticle*>      CombOfParticle;
 std::vector<EnergyCutSettings*>     CombOfEnergyCutSettings;
 std::vector<Photonuclear*>          CombOfPhoto;
 
@@ -191,7 +191,7 @@ TEST(Photonuclear , Set_Up ) {
     double dEdx;
     double ecut;
     double vcut;
-    string med;
+    string mediumName;
     string particleName;
     int shadow;
     int bb;
@@ -204,11 +204,11 @@ TEST(Photonuclear , Set_Up ) {
     bool first = true;
     while(in.good())
     {
-        if(first)in>>para>>bb>>shadow>>ecut>>vcut>>energy>>med>>particleName>>dEdx;
+        if(first)in>>para>>bb>>shadow>>ecut>>vcut>>energy>>mediumName>>particleName>>dEdx;
         energy_old  = -1;
 
         i++;
-        CombOfMedium.push_back(new Medium(med,1.));
+        CombOfMedium.push_back(new Medium(Medium::GetTypeFromName(mediumName),1.));
         CombOfParticle.push_back(new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10));
         CombOfParticle.at(i)->SetEnergy(energy);
         CombOfEnergyCutSettings.push_back(new EnergyCutSettings(ecut,vcut));
@@ -247,7 +247,7 @@ TEST(Photonuclear , Set_Up ) {
         while(energy_old < energy)
         {
             energy_old = energy;
-            in>>para>>bb>>shadow>>ecut>>vcut>>energy>>med>>particleName>>dEdx;
+            in>>para>>bb>>shadow>>ecut>>vcut>>energy>>mediumName>>particleName>>dEdx;
         }
     }
 }
@@ -265,7 +265,7 @@ TEST(Photonuclear , Test_of_e ) {
     double e;
     double ecut;
     double vcut;
-    string med;
+    string mediumName;
     string particleName;
     int shadow;
     int bb;
@@ -281,7 +281,7 @@ TEST(Photonuclear , Test_of_e ) {
     int i = -1;
     while(in.good())
     {
-        if(first)in>>para>>bb>>shadow>>ecut>>vcut>>energy>>med>>particleName>>e;
+        if(first)in>>para>>bb>>shadow>>ecut>>vcut>>energy>>mediumName>>particleName>>e;
         first = false;
         energy_old = -1;
 
@@ -304,14 +304,14 @@ TEST(Photonuclear , Test_of_e ) {
             if(e!=0){
                 if(log10(fabs(1-e_new/e))>-8)
                 {
-//                    cout <<ecut << "\t" << vcut<< "\t" << lpm<< "\t" << energy<< "\t" << med<< "\t" << particleName << endl;
+//                    cout <<ecut << "\t" << vcut<< "\t" << lpm<< "\t" << energy<< "\t" << mediumName<< "\t" << particleName << endl;
 //                    cout << energy << "\t" << log10(fabs(1-e_new/e)) << endl;
                 }
             }
 
             ASSERT_NEAR(e_new, e, precision*e);
 
-            in>>para>>bb>>shadow>>ecut>>vcut>>energy>>med>>particleName>>e;
+            in>>para>>bb>>shadow>>ecut>>vcut>>energy>>mediumName>>particleName>>e;
         }
     }
     delete Rand;
@@ -331,7 +331,7 @@ TEST(Photonuclear , Test_of_dNdxrnd ) {
     double dNdxrnd;
     double ecut;
     double vcut;
-    string med;
+    string mediumName;
     string particleName;
     int shadow;
     int bb;
@@ -345,7 +345,7 @@ TEST(Photonuclear , Test_of_dNdxrnd ) {
     int i=-1;
     while(in.good())
     {
-        if(first)in>>para>>bb>>shadow>>ecut>>vcut>>energy>>med>>particleName>>dNdxrnd;
+        if(first)in>>para>>bb>>shadow>>ecut>>vcut>>energy>>mediumName>>particleName>>dNdxrnd;
         first = false;
         energy_old = -1;
 
@@ -362,14 +362,14 @@ TEST(Photonuclear , Test_of_dNdxrnd ) {
             if(dNdxrnd!=0){
                 if(log10(fabs(1-dNdxrnd_new/dNdxrnd))>-14)
                 {
-//                    cout <<ecut << "\t" << vcut<< "\t" << lpm<< "\t" << energy<< "\t" << med<< "\t" << particleName << endl;
+//                    cout <<ecut << "\t" << vcut<< "\t" << lpm<< "\t" << energy<< "\t" << mediumName<< "\t" << particleName << endl;
 //                    cout << energy << "\t" << log10(fabs(1-dNdxrnd_new/dNdxrnd)) << endl;
                 }
             }
 
             ASSERT_NEAR(dNdxrnd_new, dNdxrnd, precision*dNdxrnd);
 
-            in>>para>>bb>>shadow>>ecut>>vcut>>energy>>med>>particleName>>dNdxrnd;
+            in>>para>>bb>>shadow>>ecut>>vcut>>energy>>mediumName>>particleName>>dNdxrnd;
         }
     }
     delete Rand;
@@ -389,7 +389,7 @@ TEST(Photonuclear , Test_of_dNdx ) {
     double dNdx;
     double ecut;
     double vcut;
-    string med;
+    string mediumName;
     string particleName;
     int shadow;
     int bb;
@@ -402,7 +402,7 @@ TEST(Photonuclear , Test_of_dNdx ) {
     int i=-1;
     while(in.good())
     {
-        if(first)in>>para>>bb>>shadow>>ecut>>vcut>>energy>>med>>particleName>>dNdx;
+        if(first)in>>para>>bb>>shadow>>ecut>>vcut>>energy>>mediumName>>particleName>>dNdx;
         first = false;
         energy_old = -1;
 
@@ -418,13 +418,13 @@ TEST(Photonuclear , Test_of_dNdx ) {
             {
                 if(log10(fabs(1-dNdx_new/dNdx))>-13)
                 {
-//                    cout <<ecut << "\t" << vcut<< "\t" << lpm<< "\t" << energy<< "\t" << med<< "\t" << particleName << endl;
+//                    cout <<ecut << "\t" << vcut<< "\t" << lpm<< "\t" << energy<< "\t" << mediumName<< "\t" << particleName << endl;
 //                    cout << energy << "\t" << log10(fabs(1-dNdx_new/dNdx)) << endl;
                 }
             }
             ASSERT_NEAR(dNdx_new, dNdx, precision*dNdx);
 
-            in>>para>>bb>>shadow>>ecut>>vcut>>energy>>med>>particleName>>dNdx;
+            in>>para>>bb>>shadow>>ecut>>vcut>>energy>>mediumName>>particleName>>dNdx;
         }
     }
 }
@@ -442,7 +442,7 @@ TEST(Photonuclear , Test_of_dEdx ) {
     double dEdx;
     double ecut;
     double vcut;
-    string med;
+    string mediumName;
     string particleName;
     int shadow;
     int bb;
@@ -455,7 +455,7 @@ TEST(Photonuclear , Test_of_dEdx ) {
     double energy_old;
     while(in.good())
     {
-        in>>para>>bb>>shadow>>ecut>>vcut>>energy>>med>>particleName>>dEdx;
+        in>>para>>bb>>shadow>>ecut>>vcut>>energy>>mediumName>>particleName>>dEdx;
         energy_old = -1;
         i++;
         while(energy_old < energy)
@@ -467,7 +467,7 @@ TEST(Photonuclear , Test_of_dEdx ) {
 
             ASSERT_NEAR(dEdx_new, dEdx, 1E-6*dEdx);
 
-            in>>para>>bb>>shadow>>ecut>>vcut>>energy>>med>>particleName>>dEdx;
+            in>>para>>bb>>shadow>>ecut>>vcut>>energy>>mediumName>>particleName>>dEdx;
         }
     }
 }
@@ -486,7 +486,7 @@ TEST(Photonuclear , Test_of_dEdx_interpol ) {
     double dEdx;
     double ecut;
     double vcut;
-    string med;
+    string mediumName;
     string particleName;
     int shadow;
     int bb;
@@ -498,7 +498,7 @@ TEST(Photonuclear , Test_of_dEdx_interpol ) {
     int i = -1;
     while(in.good())
     {
-        if(first)in>>para>>bb>>shadow>>ecut>>vcut>>energy>>med>>particleName>>dEdx;
+        if(first)in>>para>>bb>>shadow>>ecut>>vcut>>energy>>mediumName>>particleName>>dEdx;
         first = false;
         energy_old = -1;
 
@@ -515,7 +515,7 @@ TEST(Photonuclear , Test_of_dEdx_interpol ) {
 
             ASSERT_NEAR(dEdx_new, dEdx, precision*dEdx);
 
-            in>>para>>bb>>shadow>>ecut>>vcut>>energy>>med>>particleName>>dEdx;
+            in>>para>>bb>>shadow>>ecut>>vcut>>energy>>mediumName>>particleName>>dEdx;
         }
     }
 }
@@ -534,7 +534,7 @@ TEST(Photonuclear , Test_of_dNdx_interpol ) {
     double dNdx;
     double ecut;
     double vcut;
-    string med;
+    string mediumName;
     string particleName;
     int shadow;
     int bb;
@@ -547,7 +547,7 @@ TEST(Photonuclear , Test_of_dNdx_interpol ) {
     int i=-1;
     while(in.good())
     {
-        if(first)in>>para>>bb>>shadow>>ecut>>vcut>>energy>>med>>particleName>>dNdx;
+        if(first)in>>para>>bb>>shadow>>ecut>>vcut>>energy>>mediumName>>particleName>>dNdx;
         first = false;
         energy_old = -1;
 
@@ -565,13 +565,13 @@ TEST(Photonuclear , Test_of_dNdx_interpol ) {
             if(dNdx!=0)
                 if(log10(fabs(1-dNdx_new/dNdx))>-8)
                 {
-//                    cout <<ecut << "\t" << vcut<< "\t" << lpm<< "\t" << energy<< "\t" << med<< "\t" << particleName << endl;
+//                    cout <<ecut << "\t" << vcut<< "\t" << lpm<< "\t" << energy<< "\t" << mediumName<< "\t" << particleName << endl;
 //                    cout << energy << "\t" << log10(fabs(1-dNdx_new/dNdx)) << endl;
                 }
 
             ASSERT_NEAR(dNdx_new, dNdx, precision*dNdx);
 
-            in>>para>>bb>>shadow>>ecut>>vcut>>energy>>med>>particleName>>dNdx;
+            in>>para>>bb>>shadow>>ecut>>vcut>>energy>>mediumName>>particleName>>dNdx;
         }
     }
 }
@@ -589,7 +589,7 @@ TEST(Photonuclear , Test_of_dNdxrnd_interpol ) {
     double dNdxrnd;
     double ecut;
     double vcut;
-    string med;
+    string mediumName;
     string particleName;
     int shadow;
     int bb;
@@ -603,7 +603,7 @@ TEST(Photonuclear , Test_of_dNdxrnd_interpol ) {
     int i=-1;
     while(in.good())
     {
-        if(first)in>>para>>bb>>shadow>>ecut>>vcut>>energy>>med>>particleName>>dNdxrnd;
+        if(first)in>>para>>bb>>shadow>>ecut>>vcut>>energy>>mediumName>>particleName>>dNdxrnd;
         first = false;
         energy_old = -1;
 
@@ -621,14 +621,14 @@ TEST(Photonuclear , Test_of_dNdxrnd_interpol ) {
             if(dNdxrnd!=0){
                 if(log10(fabs(1-dNdxrnd_new/dNdxrnd))>-6)
                 {
-//                    cout <<ecut << "\t" << vcut<< "\t" << lpm<< "\t" << energy<< "\t" << med<< "\t" << particleName << endl;
+//                    cout <<ecut << "\t" << vcut<< "\t" << lpm<< "\t" << energy<< "\t" << mediumName<< "\t" << particleName << endl;
 //                    cout << energy << "\t" << log10(fabs(1-dNdxrnd_new/dNdxrnd)) << endl;
                 }
             }
 
             ASSERT_NEAR(dNdxrnd_new, dNdxrnd, precision*dNdxrnd);
 
-            in>>para>>bb>>shadow>>ecut>>vcut>>energy>>med>>particleName>>dNdxrnd;
+            in>>para>>bb>>shadow>>ecut>>vcut>>energy>>mediumName>>particleName>>dNdxrnd;
         }
     }
     delete Rand;
@@ -647,7 +647,7 @@ TEST(Photonuclear , Test_of_e_interpol ) {
     double e;
     double ecut;
     double vcut;
-    string med;
+    string mediumName;
     string particleName;
     int shadow;
     int bb;
@@ -663,7 +663,7 @@ TEST(Photonuclear , Test_of_e_interpol ) {
     int i=-1;
     while(in.good())
     {
-        if(first)in>>para>>bb>>shadow>>ecut>>vcut>>energy>>med>>particleName>>e;
+        if(first)in>>para>>bb>>shadow>>ecut>>vcut>>energy>>mediumName>>particleName>>e;
         first = false;
         energy_old = -1;
 
@@ -685,14 +685,14 @@ TEST(Photonuclear , Test_of_e_interpol ) {
             if(e!=0){
                 if(log10(fabs(1-e_new/e))>-14)
                 {
-//                    cout <<ecut << "\t" << vcut<< "\t" << lpm<< "\t" << energy<< "\t" << med<< "\t" << particleName << endl;
+//                    cout <<ecut << "\t" << vcut<< "\t" << lpm<< "\t" << energy<< "\t" << mediumName<< "\t" << particleName << endl;
 //                    cout << energy << "\t" << log10(fabs(1-e_new/e)) << endl;
                 }
             }
 
             ASSERT_NEAR(e_new, e, precision*e);
 
-            in>>para>>bb>>shadow>>ecut>>vcut>>energy>>med>>particleName>>e;
+            in>>para>>bb>>shadow>>ecut>>vcut>>energy>>mediumName>>particleName>>e;
         }
     }
     delete Rand;

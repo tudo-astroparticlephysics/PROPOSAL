@@ -44,10 +44,6 @@ std::deque<std::string>* SplitString(std::string args, std::string Delimiters);
 
 //----------------------------------------------------------------------------//
 
-bool EqualsIgnoreCase(std::string s1, std::string s2);
-
-//----------------------------------------------------------------------------//
-
 std::string ToLowerCase(std::string toConvert);
 
 //----------------------------------------------------------------------------//
@@ -57,10 +53,6 @@ std::string ReplaceAll(std::string toConvert, char oldChar, char newChar);
 //----------------------------------------------------------------------------//
 
 double Old_RandomDouble();
-
-//----------------------------------------------------------------------------//
-
-bool Compare(std::string name1, std::string name2 , bool output);
 
 //----------------------------------------------------------------------------//
 
