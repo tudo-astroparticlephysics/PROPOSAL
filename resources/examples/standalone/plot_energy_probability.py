@@ -37,10 +37,10 @@ class ProgressBar(object):
         self._bar_full = "="
         self._bar_empty = " "
 
-        for arg in keywords:
-            if arg is "pacman":
-                assert type(arg) is not bool
-                self._pacman = arg
+        for key, value in keywords.iteritems():
+            if key is "pacman":
+                assert type(value) is bool
+                self._pacman = value
 
         if self._pacman:
             self._bar_full = "-"
@@ -58,7 +58,8 @@ class ProgressBar(object):
             for i in range(self._bar_lenght):
                 self._bar.append(self._bar_empty)
 
-        self._current_pac_state = "c"
+        self._current_pac_state = "C"
+        self._current_pac_block = 0
 
     def reset(self):
         self._current_loop = self._start
@@ -78,20 +79,25 @@ class ProgressBar(object):
         progress = self._current_loop / self._loops
 
         if progress >= 1.0:
-            self._status = "Done..."
+            self._status = "Done...\n"
 
         if self._pacman:
-            block = int(round(self._bar_lenght * progress)) - 1
-            if self._current_pac_state is "c":
-                self._current_pac_state = "C"
+            block = int((self._bar_lenght - 1) * progress)
+
+            if self._current_pac_block < block:
+                self._current_pac_block = block
+                if self._current_pac_state is "c":
+                    self._current_pac_state = "C"
+                else:
+                    self._current_pac_state = "c"
             else:
-                self._current_pac_state = "c"
+                pass
 
             self._bar[block] = '\033[1m' + "\033[93m" + \
                                self._current_pac_state + '\033[0m'
             self._bar[:block] = block * [self._bar_full]
         else:
-            block = int(round(self._bar_lenght * progress))
+            block = int(self._bar_lenght * progress)
             self._bar[:block] = block * [self._bar_full]
 
         text = self._text.format(
