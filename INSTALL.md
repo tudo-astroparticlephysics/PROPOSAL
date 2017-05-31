@@ -1,6 +1,68 @@
 
 # Installation #
 
+## Install dependencies ##
+
+The following commands can be used to install the required and optional
+dependencies on your system.
+
+### Ubuntu 16.10 ###
+
+	apt install cmake \
+		doxygen \
+		liblog4cplus-dev
+		libgtest-dev \
+		libboost-dev \
+		libboost-python-dev \
+
+#### **Note** ####
+
+The package `libgtest-dev` only installs the source files.
+To create the gtest libraries you have compile these source files.
+Therefore you can use:
+
+	cd /usr/src/gtest
+	sudo cmake CMakeLists.txt
+	sudo make
+
+	# copy or symlink libgtest.a and libgtest_main.a to your /usr/lib folder
+	sudo cp *.a /usr/lib
+
+### Arch Linux ###
+
+	pacman -S cmake \
+		doxygen \
+		log4cplus \
+		gtest \
+		boost-libs
+
+### Mac OS X ###
+
+	brew install cmake \
+		doxygen \
+		log4cplus \
+		boost \
+		boost-python
+
+#### **Note** ####
+
+For Mac OS X `GTest` must be installed from source.
+Therefore clone the repo from
+[googletest](https://github.com/google/googletest)
+into a local build directory and install googletest:
+
+	cd && mkdir build
+	cd build && mkdir gtest
+	cd gtest && mkdir src build
+	git clone https://github.com/google/googletest src
+	cd build
+	cmake ../src
+	make
+	make install
+
+## Install PROPOSAL ##
+
+
 1. 	Make a directory where the whole project will be, e.g.:
 
 		mkdir PROPOSAL
