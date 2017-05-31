@@ -4,6 +4,7 @@
  *  Created on: 29.04.2013
  *      Author: koehne
  */
+#pragma once
 
 #ifndef ProcessCollection_H
 #define ProcessCollection_H
@@ -512,7 +513,8 @@ public:
     void SetBackup_particle(PROPOSALParticle *backup_particle);
     void RestoreBackup_particle();
 };
-};
+
+}
 
 
 #endif //ProcessCollection_H

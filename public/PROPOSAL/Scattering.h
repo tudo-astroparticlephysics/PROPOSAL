@@ -6,7 +6,7 @@
 *   \date   2013.08.19
 *   \author Tomasz Fuchs
 */
-
+#pragma once
 
 #ifndef SCATTERING_H
 #define SCATTERING_H
@@ -113,7 +113,8 @@ public:
     void RestoreBackup_particle();
 
 };
-};
+
+}
 
 
 #endif //SCATTERING_H

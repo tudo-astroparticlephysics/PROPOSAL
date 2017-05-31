@@ -6,7 +6,7 @@
 *   \date   18.04.2013
 *   \author Jan-Hendrik Koehne
 */
-
+#pragma once
 
 #ifndef STANDARDNORMAL_H_
 #define STANDARDNORMAL_H_
@@ -183,7 +183,8 @@ public:
 	void SetVal1(double val1);
 	void SetVal2(double val2);
 };
-};
+
+}
 
 
 #endif /* STANDARDNORMAL_H_ */

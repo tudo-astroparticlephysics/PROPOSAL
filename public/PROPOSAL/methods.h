@@ -6,6 +6,7 @@
 *   \date   21.06.2010
 *   \author Jan-Hendrik Koehne
 */
+#pragma once
 
 #ifndef METHODS_H_
 #define METHODS_H_

@@ -1,6 +1,8 @@
 /**
  * root of pure math functions
  */
+#pragma once
+
 #ifndef MATHMODEL_H_
 #define MATHMODEL_H_
 
@@ -52,6 +54,7 @@ private:
 	boost::function<double ()> rng_;
 	static boost::mt19937 *default_rng_;
 };
-};
+
+}
 
 #endif // MATHMODEL_H_

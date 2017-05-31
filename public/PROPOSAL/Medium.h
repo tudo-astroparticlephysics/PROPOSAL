@@ -6,6 +6,7 @@
 *   \date   21.06.2010
 *   \author Jan-Hendrik Koehne
 */
+#pragma once
 
 #ifndef Medium_H
 #define Medium_H
@@ -40,7 +41,7 @@ namespace MediumType
         Salt         = 22,
         MineralOil   = 23
     };
-};
+}
 
 
 class Medium
@@ -454,7 +455,8 @@ public:
     ~Medium();
 
 };
-};
+
+}
 
 
 #endif //Medium_H

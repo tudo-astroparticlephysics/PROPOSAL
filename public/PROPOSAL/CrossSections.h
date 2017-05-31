@@ -4,6 +4,7 @@
  *  Created on: 2013.03.12
  *      Author: Jan-Hendrik Köhne
  */
+#pragma once
 
 #ifndef CrossSections_H
 #define CrossSections_H
@@ -55,7 +56,7 @@ namespace ParametrizationType
 
         IonizBetheBloch  = 71
     };
-};
+}
 
 /*! \class CrossSections CrossSections.h "CrossSections.h"
  *  \brief This is a pure virtual class
@@ -305,7 +306,7 @@ public:
 
 std::ostream& operator<<(std::ostream& os, CrossSections const&crossSections);
 
-};
+}
 
 
 #endif //CrossSections_H

@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef Epairproduction_H
 #define Epairproduction_H
 
@@ -248,6 +250,7 @@ public:
     ~Epairproduction();
 
 };
-};
+
+}
 
 #endif //Epairproduction_H

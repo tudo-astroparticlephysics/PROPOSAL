@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef SCATTERING_MOLIERE_H
 #define SCATTERING_MOLIERE_H
 
@@ -120,6 +122,7 @@ public:
     // destructors
     ~ScatteringMoliere() {}
 };
-};
+
+}
 
 #endif // SCATTERING_MOLIERE_H
