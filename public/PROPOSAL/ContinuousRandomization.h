@@ -6,6 +6,7 @@
 *   \date   2013.05.28
 *   \author Jan-Hednrik Köhne
 */
+#pragma once
 
 #ifndef CONTINUOUSRANDOMIZATION_H_
 #define CONTINUOUSRANDOMIZATION_H_
@@ -142,6 +143,6 @@ public:
     void RestoreBackup_particle();
 
 };
-};
+}
 
 #endif /* CONTINUOUSRANDOMIZATION_H_ */

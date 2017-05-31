@@ -8,6 +8,7 @@
  * @author Dmitry Chirkin
  * Ported to C++ Jan-Hendrik Köhne
  */
+#pragma once
 
 #ifndef ROOTFINDER_H
 #define ROOTFINDER_H
@@ -72,6 +73,7 @@ public:
     //Destructor
     ~RootFinder();
 };
-};
+
+}
 
 #endif // _ROOTFINDER_H

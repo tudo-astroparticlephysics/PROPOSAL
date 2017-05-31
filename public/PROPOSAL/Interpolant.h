@@ -6,6 +6,7 @@
 *   \date   02.08.2010
 *   \author Jan-Hendrik Koehne
 */
+#pragma once
 
 #ifndef INTERPOLANT_H_
 #define INTERPOLANT_H_
@@ -539,6 +540,7 @@ public:
 
     ~Interpolant();
 };
-};
+
+}
 
 #endif /* INTERPOLANT_H_ */

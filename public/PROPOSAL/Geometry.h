@@ -4,6 +4,7 @@
  *
  * @author Jan-Hendrik Köhne
  */
+#pragma once
 
 #ifndef GEOMETRY_H
 #define GEOMETRY_H
@@ -198,6 +199,7 @@ public:
     //Destructor
     ~Geometry();
 };
-};
+
+}
 
 #endif // GEOMETRY_H
