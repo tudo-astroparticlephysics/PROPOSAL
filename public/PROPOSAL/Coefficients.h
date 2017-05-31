@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef COEFF_H
 #define COEFF_H
 
@@ -372,6 +374,7 @@ double C1large[50] =
 	-8.935672003232238e+59,
 	-4.333800921567636e+61
 };
-};
+
+}
 
 #endif

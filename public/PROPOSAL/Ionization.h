@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef Ionization_H
 #define Ionization_H
 
@@ -230,6 +232,7 @@ public:
     ~Ionization(){}
 
 };
-};
+
+}
 
 #endif //Ionization_H

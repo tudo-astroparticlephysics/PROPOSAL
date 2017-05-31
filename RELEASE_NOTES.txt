@@ -38,6 +38,7 @@ V.2.1 - xx.05.17
     +   put the the whole project into a namespace called PROPOSAL
     +   add particle enums
     +   add cross section enums
+    +   add medium enums
 
 ------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------

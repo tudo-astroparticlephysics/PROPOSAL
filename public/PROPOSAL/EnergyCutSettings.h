@@ -6,6 +6,7 @@
 *   \date   2013.03.15
 *   \author Jan-Hednrik Köhne
 */
+#pragma once
 
 #ifndef ENERGYCUTSETTINGS_H_
 #define ENERGYCUTSETTINGS_H_
@@ -91,6 +92,7 @@ public:
     void SetVcut(double vcut);
 
 };
-};
+
+}
 
 #endif /* ENERGYCUTSETTINGS_H_ */

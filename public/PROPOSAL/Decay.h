@@ -4,6 +4,7 @@
  *  Created on: 07.05.2013
  *      Author: koehne
  */
+#pragma once
 
 #ifndef DECAY_H_
 #define DECAY_H_
@@ -127,6 +128,7 @@ public:
     void SetBackup_particle(PROPOSALParticle *backup_particle);
     void RestoreBackup_particle();
 };
-};
+
+}
 
 #endif /* DECAY_H_ */
