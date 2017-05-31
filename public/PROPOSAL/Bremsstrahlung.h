@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef Bremsstrahlung_H
 #define Bremsstrahlung_H
 
@@ -257,6 +259,6 @@ public:
 	void SetProbForComponent(std::vector<double> probForComponent);
 };
 
-};
+}
 
 #endif //Bremsstrahlung_H

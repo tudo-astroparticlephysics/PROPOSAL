@@ -6,6 +6,7 @@
 *   \date   02.08.2010
 *   \author Jan-Hendrik Koehne
 */
+#pragma once
 
 #ifndef INTEGRAL_H_
 #define INTEGRAL_H_
@@ -507,6 +508,7 @@ public:
 	void SetSavedResult(double savedResult);
 	void SetUseLog(bool useLog);
 };
-};
+
+}
 
 #endif /*INTEGRAL_H_ */

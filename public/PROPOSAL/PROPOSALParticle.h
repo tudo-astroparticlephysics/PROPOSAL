@@ -6,7 +6,7 @@
 *   \date   2013.03.14
 *   \author Jan-Hendrik Köhne
 */
-
+#pragma once
 
 #ifndef Particle_H
 #define Particle_H
@@ -107,7 +107,7 @@ namespace ParticleType
         STauMinus =  1000015,
         STauPlus  = -1000015
     };
-};
+}
 
 
 /**
@@ -462,7 +462,8 @@ public:
 
 
 };
-};
+
+}
 
 
 #endif //PARTICLE_H

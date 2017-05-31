@@ -6,7 +6,7 @@
 *   \date   2013.06.13
 *   \author Tomasz Fuchs
 */
-
+#pragma once
 
 #ifndef SCATTERING_FIRSTORDER_H
 #define SCATTERING_FIRSTORDER_H
@@ -57,7 +57,8 @@ public:
 
 
 };
-};
+
+}
 
 
 #endif //SCATTERING_FIRSTORDER_H

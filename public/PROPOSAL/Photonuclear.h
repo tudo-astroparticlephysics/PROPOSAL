@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef Photonuclear_H
 #define Photonuclear_H
 
@@ -23,7 +25,7 @@ namespace ShadowingType
         Dutta               = 141,
         ButkevichMikhailov  = 142
     };
-};
+}
 
 class Photonuclear: public CrossSections
 {
@@ -387,6 +389,7 @@ public:
 
 
 };
-};
+
+}
 
 #endif //Photonuclear_H

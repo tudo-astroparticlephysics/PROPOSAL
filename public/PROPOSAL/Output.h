@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef OUTPUT_H
 #define OUTPUT_H
 #ifndef ICECUBE
@@ -248,31 +250,9 @@ public:
     }
 
  };
-};
+}
 
 #endif //ICECUBE
 
 #endif //OUTPUT_H
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

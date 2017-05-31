@@ -4,6 +4,8 @@
  *  Created on: 2013.05.06
  *      Author: Jan-Hendrik Köhne
  */
+#pragma once
+
 #ifndef PROPAGATOR_H
 #define PROPAGATOR_H
 
@@ -273,6 +275,7 @@ public:
     void RestoreBackup_particle();
     void ResetParticle();
 };
-};
+
+}
 
 #endif // _PROPAGATOR_H
