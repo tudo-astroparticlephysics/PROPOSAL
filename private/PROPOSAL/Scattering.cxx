@@ -84,7 +84,8 @@ Scattering::Scattering(std::vector<CrossSections*> crosssections)
 }
 
 Scattering::Scattering(const Scattering &scattering)
-    :x0_(scattering.x0_)
+    : MathModel(scattering)
+    ,x0_(scattering.x0_)
     ,do_interpolation_(scattering.do_interpolation_)
     ,particle_(scattering.particle_)
     ,crosssections_(scattering.crosssections_)

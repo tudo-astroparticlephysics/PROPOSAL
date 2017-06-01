@@ -1071,7 +1071,8 @@ ProcessCollection::ProcessCollection()
 
 //Copyconstructor
 ProcessCollection::ProcessCollection(const ProcessCollection &collection)
-    :order_of_interpolation_     ( collection.order_of_interpolation_ )
+    : MathModel(collection)
+    ,order_of_interpolation_     ( collection.order_of_interpolation_ )
     ,do_interpolation_           ( collection.do_interpolation_ )
     ,lpm_effect_enabled_         ( collection.lpm_effect_enabled_ )
     ,ini_                        ( collection.ini_ )
