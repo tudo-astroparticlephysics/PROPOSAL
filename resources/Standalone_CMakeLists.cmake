@@ -130,7 +130,11 @@ INCLUDE_DIRECTORIES("${PROJECT_SOURCE_DIR}/public" "${PROJECT_SOURCE_DIR}" ${LOG
 FILE(GLOB SRC_FILES ${PROJECT_SOURCE_DIR}/private/PROPOSAL/*.cxx)
 ADD_LIBRARY(PROPOSAL SHARED ${SRC_FILES})
 
-SET_TARGET_PROPERTIES(PROPOSAL PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -O2 -Wall -Wextra -Wnarrowing -pedantic -Wno-gnu-zero-variadic-macro-arguments -Wno-variadic-macros -Wno-c++11-long-long")
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+	SET_TARGET_PROPERTIES(PROPOSAL PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -O2 -Wall -Wextra -Wnarrowing -pedantic -Wno-gnu-zero-variadic-macro-arguments -Wno-variadic-macros -Wno-c++11-long-long")
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+	SET_TARGET_PROPERTIES(PROPOSAL PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -O2 -Wall -Wextra -Wnarrowing -Wpedantic -fdiagnostics-show-option")
+endif()
 # The following warnings are silenced, because they arise in the dependencies:
 # -Wno-c++11-long-long : "long long" only occurs in ROOT 5
 # -Wno-variadic-macros : only in output.h; has something todo with BOOST
