@@ -461,6 +461,8 @@ void Scattering::EnableInterpolation(string path)
         filename<<path<<"/Scattering"
                 <<"_"<<particle_name
                 <<"_mass_"<<particle_->GetMass()
+                <<"_charge_"<<particle_->GetCharge()
+                <<"_lifetime_"<<particle_->GetLifetime()
                 <<"_"<< crosssections_.at(0)->GetMedium()->GetName()
                 <<"_"<< crosssections_.at(0)->GetMedium()->GetMassDensity()
                 <<"_"<< crosssections_.at(0)->GetEnergyCutSettings()->GetEcut()
