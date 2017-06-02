@@ -490,6 +490,8 @@ void ProcessCollection::EnableInterpolation(std::string path, bool raw)
         filename<<path<<"/Collection"
                 <<"_"<<particle_name
                 <<"_mass_"<<particle_->GetMass()
+                <<"_charge_"<<particle_->GetCharge()
+                <<"_lifetime_"<<particle_->GetLifetime()
                 <<"_"<<medium_->GetName()
                 <<"_"<<medium_->GetMassDensity()
                 <<"_"<<cut_settings_->GetEcut()
@@ -781,6 +783,8 @@ void ProcessCollection::EnableParticleTimeInterpolation(std::string path, bool r
         filename<<path<<"/Time"
                 <<"_"<<particle_name
                 <<"_mass_"<<particle_->GetMass()
+                <<"_charge_"<<particle_->GetCharge()
+                <<"_lifetime_"<<particle_->GetLifetime()
                 <<"_"<<medium_->GetName()
                 <<"_"<<medium_->GetMassDensity()
                 <<"_"<<cut_settings_->GetEcut()
@@ -1071,7 +1075,8 @@ ProcessCollection::ProcessCollection()
 
 //Copyconstructor
 ProcessCollection::ProcessCollection(const ProcessCollection &collection)
-    :order_of_interpolation_     ( collection.order_of_interpolation_ )
+    : MathModel(collection)
+    ,order_of_interpolation_     ( collection.order_of_interpolation_ )
     ,do_interpolation_           ( collection.do_interpolation_ )
     ,lpm_effect_enabled_         ( collection.lpm_effect_enabled_ )
     ,ini_                        ( collection.ini_ )

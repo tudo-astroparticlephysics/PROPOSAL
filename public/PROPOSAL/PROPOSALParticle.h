@@ -105,7 +105,8 @@ namespace ParticleType
         // Exotic particles
         Monopole  = -41,
         STauMinus =  1000015,
-        STauPlus  = -1000015
+        STauPlus  = -1000015,
+        StableMassiveParticle   =  1000016
     };
 }
 
