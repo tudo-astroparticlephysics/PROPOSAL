@@ -187,6 +187,14 @@
     #define MMON 1.e5
 #endif
 
+#ifndef MSMP // Stable massive particle (MeV)
+    #define MSMP 1.e5
+#endif
+
+#ifndef LSMP // SMP lifetime (sec)
+    #define LSMP -1
+#endif
+
 #ifndef CMON // monopole charge (in units of e)
     #define CMON 68.51799988 //CMON=1/(2*ALPHA);
 #endif

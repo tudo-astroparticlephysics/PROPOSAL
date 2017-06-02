@@ -722,6 +722,12 @@ void PROPOSALParticle::InitParticle(ParticleType::Enum type){
             lifetime_   =   -1;
             charge_     =   -1;
             break;
+        case ParticleType::StableMassiveParticle:
+            name_ = "SMP";
+            mass_       =   MSMP;
+            lifetime_   =   LSMP;
+            charge_     =   -1;
+            break;
         default:
             log_warn("The particle type '%i' is set to Unknown!", type);
             type = ParticleType::unknown;
