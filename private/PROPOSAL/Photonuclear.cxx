@@ -171,6 +171,8 @@ void Photonuclear::EnableDNdxInterpolation(std::string path, bool raw)
         filename<<path<<"/Photo_dNdx"
                 <<"_particle_"<<particle_name
                 <<"_mass_"<<particle_->GetMass()
+                <<"_charge_"<<particle_->GetCharge()
+                <<"_lifetime_"<<particle_->GetLifetime()
                 <<"_para_"<<parametrization_
                 <<"_med_"<<medium_->GetName()
                 <<"_"<<medium_->GetMassDensity()
@@ -1162,7 +1164,7 @@ double Photonuclear::ParametrizationOfQ2Integration(double v, int i)
         default:
             log_fatal("The photonuclear Parametrization %i is not supported.\n", parametrization_);
     }
-    
+
     return aux;
 }
 

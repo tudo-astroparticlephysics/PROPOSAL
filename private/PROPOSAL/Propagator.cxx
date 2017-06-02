@@ -1637,7 +1637,8 @@ Propagator::Propagator(std::string config_file, PROPOSALParticle* particle, bool
 
 
 Propagator::Propagator(const Propagator &propagator)
-    :order_of_interpolation_    ( propagator.order_of_interpolation_ )
+    : MathModel(propagator)
+    ,order_of_interpolation_    ( propagator.order_of_interpolation_ )
     ,debug_                     ( propagator.debug_ )
     ,particle_interaction_      ( propagator.particle_interaction_ )
     ,seed_                      ( propagator.seed_ )
