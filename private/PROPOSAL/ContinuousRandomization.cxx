@@ -96,6 +96,8 @@ void ContinuousRandomization::EnableDE2dxInterpolation(std::string path, bool ra
         filename<<path<<"/Cont_dE2dx"
                 <<"_"<<particle_name
                 <<"_mass_"<<particle_->GetMass()
+                <<"_charge_"<<particle_->GetCharge()
+                <<"_lifetime_"<<particle_->GetLifetime()
                 <<"_"<<medium_->GetName()
                 <<"_"<<medium_->GetMassDensity();
 
