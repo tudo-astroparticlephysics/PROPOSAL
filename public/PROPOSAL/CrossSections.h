@@ -304,8 +304,6 @@ public:
     void RestoreBackup_particle();
 };
 
-std::ostream& operator<<(std::ostream& os, CrossSections const&crossSections);
-
 }
 
 
