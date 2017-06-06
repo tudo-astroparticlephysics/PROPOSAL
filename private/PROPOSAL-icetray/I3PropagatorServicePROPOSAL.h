@@ -67,6 +67,8 @@ public:
       , double cylinderHeight=1600*I3Units::m
       , I3Particle::ParticleType type=I3Particle::MuMinus
       , double particleMass=NAN
+      , double particleCharge_=NAN
+      , double particleLifetime_=NAN
       , ParametrizationType::Enum brems_param = ParametrizationType::BremsKelnerKokoulinPetrukhin
       , ParametrizationType::Enum photo_param = ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich
   );
@@ -82,6 +84,8 @@ public:
 
   Propagator *proposal;
   double particleMass_;
+  double particleCharge_;
+  double particleLifetime_;
   PROPOSALParticle* particle_type;
 
   std::string mediadef_;
