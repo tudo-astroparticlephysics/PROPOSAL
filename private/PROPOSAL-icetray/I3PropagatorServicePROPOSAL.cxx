@@ -64,6 +64,8 @@ I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(
                                                          , double cylinderHeight
                                                          , I3Particle::ParticleType type
                                                          , double particleMass
+                                                         , double particleCharge_
+                                                         , double particleLifetime_
                                                          , ParametrizationType::Enum brems_param
                                                          , ParametrizationType::Enum photo_param)
     : particleMass_(particleMass)
@@ -78,6 +80,8 @@ I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(
     I3Particle i3particle;
     i3particle.SetType(type);
     PROPOSALParticle* particle = new PROPOSALParticle(GeneratePROPOSALType(i3particle));
+
+    // Mass
     if (isnan(particleMass_) == false)
     {
         particle->SetMass(particleMass_);
@@ -85,6 +89,26 @@ I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(
     if (std::isinf(particleMass_))
     {
         log_fatal("You asked for Particle of non-finite mass %f", particleMass_);
+    }
+
+    // Charge
+    if (isnan(particleCharge_) == false)
+    {
+        particle->SetCharge(particleCharge_);
+    }
+    if (std::isinf(particleCharge_))
+    {
+        log_fatal("You asked for Particle of non-finite charge %f", particleCharge_);
+    }
+
+    // Lifetime
+    if (isnan(particleLifetime_) == false)
+    {
+        particle->SetLifetime(particleLifetime_);
+    }
+    if (std::isinf(particleLifetime_))
+    {
+        log_fatal("You asked for Particle of non-finite lifetime %f", particleLifetime_);
     }
 
     // ----[ Check table dir and mediadef ]------------------ //
