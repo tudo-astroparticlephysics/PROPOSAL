@@ -355,6 +355,7 @@ static const bimap_ParticleType I3_PROPOSAL_ParticleType_bimap = boost::assign::
     (I3Particle::Monopole,  ParticleType::Monopole)
     (I3Particle::STauMinus, ParticleType::STauMinus)
     (I3Particle::STauPlus,  ParticleType::STauPlus)
+    (I3Particle::SMP,       ParticleType::StableMassiveParticle)
     (I3Particle::Gamma,     ParticleType::Gamma)
     (I3Particle::Pi0,       ParticleType::Pi0)
     (I3Particle::PiPlus,    ParticleType::PiPlus)
