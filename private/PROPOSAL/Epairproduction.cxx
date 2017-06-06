@@ -362,6 +362,8 @@ void Epairproduction::EnableDEdxInterpolation(std::string path, bool raw)
         filename<<path<<"/Epair_dEdx"
                 <<"_particle_"<<particle_name
                 <<"_mass_"<<particle_->GetMass()
+                <<"_charge_"<<particle_->GetCharge()
+                <<"_lifetime_"<<particle_->GetLifetime()
                 <<"_med_"<<medium_->GetName()
                 <<"_"<<medium_->GetMassDensity()
                 <<"_ecut_"<<cut_settings_->GetEcut()
@@ -485,6 +487,8 @@ void Epairproduction::EnableEpairInterpolation(std::string path, bool raw)
         filename<<path<<"/Epair"
                 <<"_particle_"<<particle_name
                 <<"_mass_"<<particle_->GetMass()
+                <<"_charge_"<<particle_->GetCharge()
+                <<"_lifetime_"<<particle_->GetLifetime()
                 <<"_med_"<<medium_->GetName()
                 <<"_"<<medium_->GetMassDensity()
                 <<"_ecut_"<<cut_settings_->GetEcut()
