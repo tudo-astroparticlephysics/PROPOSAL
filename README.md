@@ -67,11 +67,13 @@ Before installation of icesim, one should copy some files from the
 resources folder to other IceCube Simulation projects to provide compatibility:
 
 ```sh
-cp src/PROPOSAL/resources/MuonGun/MuonPropagator.* src/MuonGun/private/MuonGun/
-cp src/PROPOSAL/resources/MuonGun/shower_and_propagate.py src/MuonGun/resources/scripts/
-cp src/PROPOSAL/resources/MuonGun/utils.py src/MuonGun/resources/scripts/
-cp src/PROPOSAL/resources/simprod-scripts/PropagateMuons.py src/simprod-scripts/python/segments/
-cp src/PROPOSAL/resources/clsim/PropagateMuons.py src/clsim/resources/scripts/photonPaths/
+cp src/PROPOSAL/resources/icesim/MuonGun/MuonPropagator.* src/MuonGun/private/MuonGun/
+cp src/PROPOSAL/resources/icesim/MuonGun/shower_and_propagate.py src/MuonGun/resources/scripts/
+cp src/PROPOSAL/resources/icesim/MuonGun/utils.py src/MuonGun/resources/scripts/
+cp src/PROPOSAL/resources/icesim/simprod-scripts/PropagateMuons.py src/simprod-scripts/python/segments/
+cp src/PROPOSAL/resources/icesim/clsim/PropagateMuons.py src/clsim/resources/scripts/photonPaths/
+cp src/PROPOSAL/resources/icesim/dataclasses/I3Particle.cxx src/dataclasses/private/dataclasses/physics/
+cp src/PROPOSAL/resources/icesim/dataclasses/I3Particle.h src/dataclasses/public/dataclasses/physics/
 ```
 ---
 
