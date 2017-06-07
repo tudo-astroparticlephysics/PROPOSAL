@@ -19,6 +19,9 @@ ENDIF()
 
 SET(ICETRAY_INCLUDE_PATH "/home/koehne/Simulation/icesim4_candidate/V04-00-01-RC/icetray/public/")
 
+# Option to set the build of the testfile generator
+OPTION (ADD_TESTFILE_GEN "Choose to build the testfile-generator." OFF)
+
 #################################################################
 #################           python      #########################
 #################################################################
@@ -150,16 +153,28 @@ ELSE()
 	MESSAGE(STATUS "  ${link_msg}")
 ENDIF()
 
-ADD_EXECUTABLE(WriteSectorsFromDomList
-        private/test/WriteSectorsFromDomList.cxx
-)
-
-TARGET_LINK_LIBRARIES(WriteSectorsFromDomList PROPOSAL)
 
 INSTALL(TARGETS PROPOSAL DESTINATION lib)
 
 FILE(GLOB INC_FILES ${PROJECT_SOURCE_DIR}/public/PROPOSAL/*.h)
 INSTALL(FILES ${INC_FILES} DESTINATION include/PROPOSAL)
+
+#################################################################
+#################           Executables        ##################
+#################################################################
+
+ADD_EXECUTABLE(WriteSectorsFromDomList
+        private/test/WriteSectorsFromDomList.cxx
+)
+TARGET_LINK_LIBRARIES(WriteSectorsFromDomList PROPOSAL)
+
+
+IF(ADD_TESTFILE_GEN)
+	ADD_EXECUTABLE(generate_testfiles
+			private/testfile_generator/testfile_generator.cxx
+	)
+	TARGET_LINK_LIBRARIES(generate_testfiles PROPOSAL)
+ENDIF(ADD_TESTFILE_GEN)
 
 #################################################################
 #################           Tests        ########################
