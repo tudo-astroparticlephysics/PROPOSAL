@@ -28,7 +28,7 @@ double Photonuclear::CalculatedEdx()
         return max(dedx_interpolant_->Interpolate(particle_->GetEnergy()), 0.0);
     }
 
-    double sum  =   0;
+    double sum = 0;
 
     for(int i=0; i < medium_->GetNumComponents(); i++)
     {
@@ -51,24 +51,22 @@ double Photonuclear::CalculatedNdx()
         return 0;
     }
 
-    sum_of_rates_    =   0;
+    sum_of_rates_ = 0;
 
     for(int i=0; i<medium_->GetNumComponents(); i++)
     {
-
         if(do_dndx_Interpolation_)
         {
-            sum_of_rates_    +=  max(dndx_interpolant_1d_.at(i)->Interpolate(particle_->GetEnergy()), 0.0);
+            prob_for_component_.at(i) = max(dndx_interpolant_1d_.at(i)->Interpolate(particle_->GetEnergy()), 0.);
         }
         else
         {
             SetIntegralLimits(i);
-            sum_of_rates_    +=  dndx_integral_.at(i)->Integrate(vUp_, vMax_, boost::bind(&Photonuclear::FunctionToDNdxIntegral, this, _1),4);
+            prob_for_component_.at(i) = dndx_integral_.at(i)->Integrate(vUp_, vMax_, boost::bind(&Photonuclear::FunctionToDNdxIntegral, this, _1),4);
         }
+        sum_of_rates_ += prob_for_component_.at(i);
     }
-
     return sum_of_rates_;
-
 }
 
 
@@ -87,24 +85,21 @@ double Photonuclear::CalculatedNdx(double rnd)
     // to check if dNdx is already calculated for this random number.
     // This avoids a second calculation in CalculateStochasticLoss
 
-    rnd_    =   rnd;
-
-    sum_of_rates_   =   0;
+    rnd_ = rnd;
+    sum_of_rates_ = 0;
 
     for(int i=0; i<medium_->GetNumComponents(); i++)
     {
-
         if(do_dndx_Interpolation_)
         {
-            prob_for_component_.at(i) = max(dndx_interpolant_1d_.at(i)->Interpolate(particle_->GetEnergy()), 0.0);
+            prob_for_component_.at(i) = max(dndx_interpolant_1d_.at(i)->Interpolate(particle_->GetEnergy()), 0.);
         }
         else
         {
             SetIntegralLimits(i);
-            prob_for_component_.at(i) = dndx_integral_.at(i)->IntegrateWithLog(vUp_,vMax_, boost::bind(&Photonuclear::FunctionToDNdxIntegral, this, _1),rnd);
+            prob_for_component_.at(i) = dndx_integral_.at(i)->IntegrateWithLog(vUp_, vMax_, boost::bind(&Photonuclear::FunctionToDNdxIntegral, this, _1),rnd);
         }
-
-        sum_of_rates_    +=  prob_for_component_.at(i);
+        sum_of_rates_ += prob_for_component_.at(i);
     }
 
     return sum_of_rates_;
@@ -241,8 +236,39 @@ void Photonuclear::EnableDNdxInterpolation(std::string path, bool raw)
                 {
                     component_ = i;
 
-                    dndx_interpolant_2d_.at(i) =    new Interpolant(NUM1, particle_->GetLow(), BIGENERGY,  NUM1, 0, 1, boost::bind(&Photonuclear::FunctionToBuildDNdxInterpolant2D, this, _1 , _2), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false, order_of_interpolation_, true, false, false);
-                    dndx_interpolant_1d_.at(i) =    new Interpolant(NUM1, particle_->GetLow(), BIGENERGY,  boost::bind(&Photonuclear::FunctionToBuildDNdxInterpolant1D, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, true, false, false);
+                    dndx_interpolant_2d_.at(i) = new Interpolant(NUM1
+                                                                , particle_->GetLow()
+                                                                , BIGENERGY
+                                                                , NUM1
+                                                                , 0
+                                                                , 1
+                                                                , boost::bind(&Photonuclear::FunctionToBuildDNdxInterpolant2D, this, _1 , _2)
+                                                                , order_of_interpolation_
+                                                                , false
+                                                                , false
+                                                                , true
+                                                                , order_of_interpolation_
+                                                                , false
+                                                                , false
+                                                                , false
+                                                                , order_of_interpolation_
+                                                                , true
+                                                                , false
+                                                                , false
+                                                                );
+                    dndx_interpolant_1d_.at(i) = new Interpolant(NUM1
+                                                                , particle_->GetLow()
+                                                                , BIGENERGY
+                                                                , boost::bind(&Photonuclear::FunctionToBuildDNdxInterpolant1D, this, _1)
+                                                                , order_of_interpolation_
+                                                                , false
+                                                                , false
+                                                                , true
+                                                                , order_of_interpolation_
+                                                                , true
+                                                                , false
+                                                                , false
+                                                                );
 
                     dndx_interpolant_2d_.at(i)->Save(output, raw);
                     dndx_interpolant_1d_.at(i)->Save(output, raw);
@@ -269,8 +295,39 @@ void Photonuclear::EnableDNdxInterpolation(std::string path, bool raw)
         for(int i=0; i<(medium_->GetNumComponents()); i++)
         {
             component_ = i;
-            dndx_interpolant_2d_.at(i) =    new Interpolant(NUM1, particle_->GetLow(), BIGENERGY,  NUM1, 0, 1, boost::bind(&Photonuclear::FunctionToBuildDNdxInterpolant2D, this, _1 , _2), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false, order_of_interpolation_, true, false, false);
-            dndx_interpolant_1d_.at(i) =    new Interpolant(NUM1, particle_->GetLow(), BIGENERGY,  boost::bind(&Photonuclear::FunctionToBuildDNdxInterpolant1D, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, true, false, false);
+            dndx_interpolant_2d_.at(i) =    new Interpolant(NUM1
+                                                        , particle_->GetLow()
+                                                        , BIGENERGY
+                                                        , NUM1
+                                                        , 0
+                                                        , 1
+                                                        , boost::bind(&Photonuclear::FunctionToBuildDNdxInterpolant2D, this, _1 , _2)
+                                                        , order_of_interpolation_
+                                                        , false
+                                                        , false
+                                                        , true
+                                                        , order_of_interpolation_
+                                                        , false
+                                                        , false
+                                                        , false
+                                                        , order_of_interpolation_
+                                                        , true
+                                                        , false
+                                                        , false
+                                                        );
+            dndx_interpolant_1d_.at(i) =    new Interpolant(NUM1
+                                                        , particle_->GetLow()
+                                                        , BIGENERGY
+                                                        , boost::bind(&Photonuclear::FunctionToBuildDNdxInterpolant1D, this, _1)
+                                                        , order_of_interpolation_
+                                                        , false
+                                                        , false
+                                                        , true
+                                                        , order_of_interpolation_
+                                                        , true
+                                                        , false
+                                                        , false
+                                                        );
         }
         particle_->SetEnergy(energy);
     }
@@ -507,7 +564,26 @@ void Photonuclear::EnablePhotoInterpolation(std::string path, bool raw)
                 {
                     component_ = i;
 
-                    photo_interpolant_.at(i)  = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, NUM1, 0., 1., boost::bind(&Photonuclear::FunctionToBuildPhotoInterpolant, this, _1, _2), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false, order_of_interpolation_, false, false, false);
+                    photo_interpolant_.at(i)  = new Interpolant(NUM1
+                                                            , particle_->GetLow()
+                                                            , BIGENERGY
+                                                            , NUM1
+                                                            , 0.
+                                                            , 1.
+                                                            , boost::bind(&Photonuclear::FunctionToBuildPhotoInterpolant, this, _1, _2)
+                                                            , order_of_interpolation_
+                                                            , false
+                                                            , false
+                                                            , true
+                                                            , order_of_interpolation_
+                                                            , false
+                                                            , false
+                                                            , false
+                                                            , order_of_interpolation_
+                                                            , false
+                                                            , false
+                                                            , false
+                                                            );
 
                     photo_interpolant_.at(i)->Save(output, raw);
 
@@ -532,7 +608,26 @@ void Photonuclear::EnablePhotoInterpolation(std::string path, bool raw)
         for(int i=0; i<medium_->GetNumComponents(); i++)
         {
             component_ = i;
-            photo_interpolant_.at(i)  = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, NUM1, 0., 1., boost::bind(&Photonuclear::FunctionToBuildPhotoInterpolant, this, _1, _2), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false, order_of_interpolation_, false, false, false);
+            photo_interpolant_.at(i)  = new Interpolant(NUM1
+                                                    , particle_->GetLow()
+                                                    , BIGENERGY
+                                                    , NUM1
+                                                    , 0.
+                                                    , 1.
+                                                    , boost::bind(&Photonuclear::FunctionToBuildPhotoInterpolant, this, _1, _2)
+                                                    , order_of_interpolation_
+                                                    , false
+                                                    , false
+                                                    , true
+                                                    , order_of_interpolation_
+                                                    , false
+                                                    , false
+                                                    , false
+                                                    , order_of_interpolation_
+                                                    , false
+                                                    , false
+                                                    , false
+                                                    );
 
         }
         particle_->SetEnergy(energy);
@@ -669,7 +764,8 @@ Photonuclear::Photonuclear()
 
     dndx_integral_.resize(medium_->GetNumComponents());
 
-    for(int i =0 ; i<medium_->GetNumComponents();i++){
+    for(int i =0 ; i<medium_->GetNumComponents();i++)
+    {
         dndx_integral_.at(i) = new Integral(IROMB, IMAXS, IPREC);
     }
 

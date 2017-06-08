@@ -21,9 +21,6 @@ using namespace PROPOSAL;
 
 double Bremsstrahlung::CalculatedEdx()
 {
-
-    double sum  =   0;
-
     if(multiplier_<=0)
     {
         return 0;
@@ -33,6 +30,8 @@ double Bremsstrahlung::CalculatedEdx()
     {
         return max(dedx_interpolant_->Interpolate(particle_->GetEnergy()), 0.0);
     }
+
+    double sum = 0;
 
     for(int i=0; i<(medium_->GetNumComponents()); i++)
     {
@@ -50,31 +49,26 @@ double Bremsstrahlung::CalculatedEdx()
 
 double Bremsstrahlung::CalculatedNdx()
 {
-
     if(multiplier_<=0)
     {
         return 0;
     }
 
-    sum_of_rates_    =   0;
+    sum_of_rates_ = 0;
 
-    for(int i=0; i<(medium_->GetNumComponents()); i++)
+    for(int i=0; i<medium_->GetNumComponents(); i++)
     {
-
         if(do_dndx_Interpolation_)
         {
-            prob_for_component_.at(i)    =  max( dndx_interpolant_1d_.at(i)->Interpolate(particle_->GetEnergy()) ,  0.0);
+            prob_for_component_.at(i) = max(dndx_interpolant_1d_.at(i)->Interpolate(particle_->GetEnergy()), 0.);
         }
         else
         {
             SetIntegralLimits(i);
-            prob_for_component_.at(i)    =  dndx_integral_.at(i)->Integrate(vUp_, vMax_, boost::bind(&Bremsstrahlung::FunctionToDNdxIntegral, this, _1),4);
+            prob_for_component_.at(i) = dndx_integral_.at(i)->Integrate(vUp_, vMax_, boost::bind(&Bremsstrahlung::FunctionToDNdxIntegral, this, _1),4);
         }
-        sum_of_rates_    +=  prob_for_component_.at(i);
-
-
+        sum_of_rates_ += prob_for_component_.at(i);
     }
-
     return sum_of_rates_;
 }
 
@@ -87,34 +81,31 @@ double Bremsstrahlung::CalculatedNdx(double rnd)
 {
     if(multiplier_<=0)
     {
-        return 0;
+        return 0.;
     }
 
     // The random number will be stored to be able
     // to check if dNdx is already calculated for this random number.
     // This avoids a second calculation in CalculateStochaticLoss
 
-    rnd_    =   rnd;
-
+    rnd_ = rnd;
     sum_of_rates_ = 0;
 
-    for(int i=0; i<(medium_->GetNumComponents()); i++)
+    for(int i=0; i<medium_->GetNumComponents(); i++)
     {
         if(do_dndx_Interpolation_)
         {
-            prob_for_component_.at(i)   =   max(dndx_interpolant_1d_.at(i)->Interpolate(particle_->GetEnergy()) , 0.0);
+            prob_for_component_.at(i) = max(dndx_interpolant_1d_.at(i)->Interpolate(particle_->GetEnergy()), 0.);
         }
         else
         {
             SetIntegralLimits(i);
-            prob_for_component_.at(i)   =   dndx_integral_.at(i)->IntegrateWithLog(vUp_, vMax_, boost::bind(&Bremsstrahlung::FunctionToDNdxIntegral, this, _1), rnd);
+            prob_for_component_.at(i) = dndx_integral_.at(i)->IntegrateWithLog(vUp_, vMax_, boost::bind(&Bremsstrahlung::FunctionToDNdxIntegral, this, _1), rnd);
         }
-        sum_of_rates_    +=  prob_for_component_.at(i);
-
+        sum_of_rates_ += prob_for_component_.at(i);
     }
 
     return sum_of_rates_;
-
 }
 
 
@@ -291,8 +282,39 @@ void Bremsstrahlung::EnableDNdxInterpolation(std::string path ,bool raw)
                 {
                     component_ = i;
 
-                    dndx_interpolant_2d_.at(i) = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY,  NUM1, 0, 1, boost::bind(&Bremsstrahlung::FunctionToBuildDNdxInterpolant2D, this, _1 , _2), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false, order_of_interpolation_, true, false, false);
-                    dndx_interpolant_1d_.at(i) = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, boost::bind(&Bremsstrahlung::FunctionToBuildDNdxInterpolant, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, true, false, false);
+                    dndx_interpolant_2d_.at(i) = new Interpolant(NUM1
+                                                                , particle_->GetLow()
+                                                                , BIGENERGY
+                                                                , NUM1
+                                                                , 0
+                                                                , 1
+                                                                , boost::bind(&Bremsstrahlung::FunctionToBuildDNdxInterpolant2D, this, _1 , _2)
+                                                                , order_of_interpolation_
+                                                                , false
+                                                                , false
+                                                                , true
+                                                                , order_of_interpolation_
+                                                                , false
+                                                                , false
+                                                                , false
+                                                                , order_of_interpolation_
+                                                                , true
+                                                                , false
+                                                                , false
+                                                                );
+                    dndx_interpolant_1d_.at(i) = new Interpolant(NUM1
+                                                                , particle_->GetLow()
+                                                                , BIGENERGY
+                                                                , boost::bind(&Bremsstrahlung::FunctionToBuildDNdxInterpolant, this, _1)
+                                                                , order_of_interpolation_
+                                                                , false
+                                                                , false
+                                                                , true
+                                                                , order_of_interpolation_
+                                                                , true
+                                                                , false
+                                                                , false
+                                                                );
 
                     dndx_interpolant_2d_.at(i)->Save(output,raw);
                     dndx_interpolant_1d_.at(i)->Save(output,raw);
@@ -316,8 +338,39 @@ void Bremsstrahlung::EnableDNdxInterpolation(std::string path ,bool raw)
         for(int i=0; i<(medium_->GetNumComponents()); i++)
         {
             component_ = i;
-            dndx_interpolant_2d_.at(i) = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY,  NUM1, 0, 1, boost::bind(&Bremsstrahlung::FunctionToBuildDNdxInterpolant2D, this, _1 , _2), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false, order_of_interpolation_, true, false, false);
-            dndx_interpolant_1d_.at(i) = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, boost::bind(&Bremsstrahlung::FunctionToBuildDNdxInterpolant, this, _1), order_of_interpolation_, false, false, true, order_of_interpolation_, true, false, false);
+            dndx_interpolant_2d_.at(i) = new Interpolant(NUM1
+                                                        , particle_->GetLow()
+                                                        , BIGENERGY
+                                                        ,  NUM1
+                                                        , 0
+                                                        , 1
+                                                        , boost::bind(&Bremsstrahlung::FunctionToBuildDNdxInterpolant2D, this, _1 , _2)
+                                                        , order_of_interpolation_
+                                                        , false
+                                                        , false
+                                                        , true
+                                                        , order_of_interpolation_
+                                                        , false
+                                                        , false
+                                                        , false
+                                                        , order_of_interpolation_
+                                                        , true
+                                                        , false
+                                                        , false
+                                                        );
+            dndx_interpolant_1d_.at(i) = new Interpolant(NUM1
+                                                        , particle_->GetLow()
+                                                        , BIGENERGY
+                                                        , boost::bind(&Bremsstrahlung::FunctionToBuildDNdxInterpolant, this, _1)
+                                                        , order_of_interpolation_
+                                                        , false
+                                                        , false
+                                                        , true
+                                                        , order_of_interpolation_
+                                                        , true
+                                                        , false
+                                                        , false
+                                                        );
 
         }
         particle_->SetEnergy(energy);
@@ -542,10 +595,11 @@ Bremsstrahlung::Bremsstrahlung( )
 
     dndx_integral_.resize(medium_->GetNumComponents());
 
-    for(int i =0; i<(medium_->GetNumComponents()); i++)
+    for(int i =0; i<medium_->GetNumComponents(); i++)
     {
-            dndx_integral_.at(i) =   new Integral(IROMB, IMAXS, IPREC);
+        dndx_integral_.at(i) = new Integral(IROMB, IMAXS, IPREC);
     }
+
     do_dedx_Interpolation_  = false;
     do_dndx_Interpolation_  = false;
     name_                   = "Bremsstrahlung";
