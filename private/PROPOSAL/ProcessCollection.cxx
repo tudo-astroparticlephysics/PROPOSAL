@@ -249,7 +249,7 @@ pair<double, ParticleType::Enum> ProcessCollection::MakeStochasticLoss()
     // --------------------------------------------------------------------- //
     // Calculate random numbers before passing to a fuction, because
     // the order of argument evaluation is unspecified in c++ standards and
-    // therfor depend on the compiler.
+    // therefore depend on the compiler.
     // --------------------------------------------------------------------- //
 
     double rnd1 = MathModel::RandomDouble();
@@ -270,9 +270,10 @@ pair<double, ParticleType::Enum> ProcessCollection::MakeStochasticLoss(double rn
     double total_rate_weighted =    0;
     double rates_sum           =    0;
 
-    //double decayS              =    0;
-
+    // return 0 and unknown, if there is no interaction
     pair<double, ParticleType::Enum> energy_loss;
+    energy_loss.first  = 0.;
+    energy_loss.second = ParticleType::unknown;
 
     std::vector<double> rates;
 
@@ -299,30 +300,19 @@ pair<double, ParticleType::Enum> ProcessCollection::MakeStochasticLoss(double rn
             do_weighting_           =   false;
         }
     }
-
+    // if (particle_->GetEnergy() < 650) printf("energy: %f\n", particle_->GetEnergy());
     for(unsigned int i = 0 ; i < GetCrosssections().size(); i++)
     {
         rates.at(i) =  crosssections_.at(i)->CalculatedNdx( rnd2 );
         total_rate  +=  rates.at(i);
-
+        // if (rates.at(i) == 0) printf("%i = 0, energy: %f\n", i, particle_->GetEnergy());
         log_debug("Rate for %s = %f",crosssections_.at(i)->GetName().c_str(), rates.at(i));
 
-    }
-
-    if (total_rate == 0.)
-    {
-        log_fatal("The total rate in ProcessCollection is %f, so no cross section is chosen.\n"
-            "Maybe its because of the particle charge used in Scattering::CalculateTheta0 \n"
-            "OR try to rebuild the interpolation tables.\n", total_rate);
     }
 
     total_rate_weighted = total_rate*rnd1;
 
     log_debug("Total rate = %f, total rate weighted = %f",total_rate ,total_rate_weighted);
-
-//        cerr<<" . rnd1 = "<<rnd1<<" rnd2 = "<<rnd2<<
-//            " rnd3 = "<<rnd3<<" decay = "<<decayS<<endl;
-
 
     for(unsigned int i = 0 ; i < rates.size(); i++)
     {
@@ -335,12 +325,6 @@ pair<double, ParticleType::Enum> ProcessCollection::MakeStochasticLoss(double rn
             break;
         }
     }
-
-//        else  // due to the parameterization of the cross section cutoffs
-//        {
-//            ei  =   ef;
-//            continue;
-//        }
 
     return energy_loss;
 
