@@ -54,7 +54,7 @@ I3_PYTHON_MODULE(PROPOSAL)
     class_<I3PropagatorServicePROPOSAL, boost::shared_ptr<I3PropagatorServicePROPOSAL>,
         bases<I3PropagatorService>, boost::noncopyable>(
             "I3PropagatorServicePROPOSAL",
-            init<std::string,std::string,double,double,I3Particle::ParticleType,double,
+            init<std::string,std::string,double,double,I3Particle::ParticleType,double, double, double,
             ParametrizationType::Enum,
             ParametrizationType::Enum>(
                 (arg("mediadef")=I3PropagatorServicePROPOSAL::GetDefaultMediaDef(),
@@ -63,6 +63,8 @@ I3_PYTHON_MODULE(PROPOSAL)
                  arg("cylinderHeight")=1600*I3Units::m,
                  arg("type")=I3Particle::MuMinus,
                  arg("particleMass")=NAN,
+                 arg("particleCharge")=NAN,
+                 arg("particleLifetime")=NAN,
                  arg("bremsstrahlungParametrization")=ParametrizationType::BremsKelnerKokoulinPetrukhin,
                  arg("photonuclearParametrization")=ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich
                 ),
@@ -92,7 +94,7 @@ I3_PYTHON_MODULE(PROPOSAL)
             )
         )
         .def("set_seed", &PROPOSAL::SimplePropagator::SetSeed)
-        .def("propagate", &PROPOSAL::SimplePropagator::propagate, 
+        .def("propagate", &PROPOSAL::SimplePropagator::propagate,
              (args("p"), arg("distance"), arg("secondaries")=boost::shared_ptr<std::vector<I3Particle> >())
             )
     ;

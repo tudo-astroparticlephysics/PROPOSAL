@@ -358,6 +358,8 @@ void Ionization::EnableDEdxInterpolation(std::string path, bool raw)
         filename<<path<<"/Ioniz_dEdx"
                 <<"_particle_"<<particle_name
                 <<"_mass_"<<particle_->GetMass()
+                <<"_charge_"<<particle_->GetCharge()
+                <<"_lifetime_"<<particle_->GetLifetime()
                 <<"_med_"<<medium_->GetName()
                 <<"_"<<medium_->GetMassDensity()
                 <<"_ecut_"<<cut_settings_->GetEcut()
