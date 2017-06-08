@@ -18,7 +18,6 @@ using namespace PROPOSAL;
 
 double Ionization::CalculatedEdx()
 {
-
     if(multiplier_<=0)
     {
         return 0;
@@ -66,12 +65,13 @@ double Ionization::CalculatedNdx()
 
     if(do_dndx_Interpolation_)
     {
-        return sum_of_rates_ = max(dndx_interpolant_1d_->Interpolate(particle_->GetEnergy()), 0.);
+        sum_of_rates_ = max(dndx_interpolant_1d_->Interpolate(particle_->GetEnergy()), 0.);
     }
     else{
         SetIntegralLimits(0);
-        return sum_of_rates_ = integral_->Integrate(vUp_,vMax_,boost::bind(&Ionization::FunctionToDNdxIntegral, this, _1),3,1);
+        sum_of_rates_ = integral_->Integrate(vUp_,vMax_,boost::bind(&Ionization::FunctionToDNdxIntegral, this, _1),3,1);
     }
+    return sum_of_rates_;
 }
 
 
@@ -88,19 +88,21 @@ double Ionization::CalculatedNdx(double rnd)
 
     // The random number will be stored to be able
     // to check if dNdx is already calculated for this random number.
-    // This avoids a second calculation in CalculateStochaticLoss
+    // This avoids a second calculation in CalculateStochasticLoss
 
     rnd_    =   rnd;
 
     if(do_dndx_Interpolation_)
     {
-        return sum_of_rates_ = max(dndx_interpolant_1d_->Interpolate(particle_->GetEnergy()), 0.);
+        sum_of_rates_ = max(dndx_interpolant_1d_->Interpolate(particle_->GetEnergy()), 0.);
     }
     else
     {
         SetIntegralLimits(0);
-        return sum_of_rates_ = integral_->IntegrateWithSubstitution(vUp_,vMax_,boost::bind(&Ionization::FunctionToDNdxIntegral, this, _1),1,rnd);
+        sum_of_rates_ = integral_->IntegrateWithSubstitution(vUp_,vMax_,boost::bind(&Ionization::FunctionToDNdxIntegral, this, _1),1,rnd);
     }
+
+    return sum_of_rates_;
 }
 
 
@@ -221,8 +223,39 @@ void Ionization::EnableDNdxInterpolation(std::string path, bool raw)
             {
                 output.precision(16);
 
-                dndx_interpolant_2d_ = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, NUM1, 0, 1, boost::bind(&Ionization::FunctionToBuildDNdxInterpolant2D, this, _1, _2),order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false, order_of_interpolation_, true, false, false);
-                dndx_interpolant_1d_ = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, boost::bind(&Ionization::FunctionToBuildDNdxInterpolant, this, _1),order_of_interpolation_, false, false, true, order_of_interpolation_, true, false, false);
+                dndx_interpolant_2d_ = new Interpolant(NUM1
+                                                    , particle_->GetLow()
+                                                    , BIGENERGY
+                                                    , NUM1
+                                                    , 0
+                                                    , 1
+                                                    , boost::bind(&Ionization::FunctionToBuildDNdxInterpolant2D, this, _1, _2)
+                                                    , order_of_interpolation_
+                                                    , false
+                                                    , false
+                                                    , true
+                                                    , order_of_interpolation_
+                                                    , false
+                                                    , false
+                                                    , false
+                                                    , order_of_interpolation_
+                                                    , true
+                                                    , false
+                                                    , false
+                                                    );
+                dndx_interpolant_1d_ = new Interpolant(NUM1
+                                                    , particle_->GetLow()
+                                                    , BIGENERGY
+                                                    , boost::bind(&Ionization::FunctionToBuildDNdxInterpolant, this, _1)
+                                                    , order_of_interpolation_
+                                                    , false
+                                                    , false
+                                                    , true
+                                                    , order_of_interpolation_
+                                                    , true
+                                                    , false
+                                                    , false
+                                                    );
 
                 dndx_interpolant_2d_->Save(output, raw);
                 dndx_interpolant_1d_->Save(output, raw);
@@ -243,8 +276,39 @@ void Ionization::EnableDNdxInterpolation(std::string path, bool raw)
 
         double energy = particle_->GetEnergy();
 
-        dndx_interpolant_2d_ = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, NUM1, 0, 1, boost::bind(&Ionization::FunctionToBuildDNdxInterpolant2D, this, _1, _2),order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false, order_of_interpolation_, true, false, false);
-        dndx_interpolant_1d_ = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, boost::bind(&Ionization::FunctionToBuildDNdxInterpolant, this, _1),order_of_interpolation_, false, false, true, order_of_interpolation_, true, false, false);
+        dndx_interpolant_2d_ = new Interpolant(NUM1
+                                            , particle_->GetLow()
+                                            , BIGENERGY
+                                            , NUM1
+                                            , 0
+                                            , 1
+                                            , boost::bind(&Ionization::FunctionToBuildDNdxInterpolant2D, this, _1, _2)
+                                            , order_of_interpolation_
+                                            , false
+                                            , false
+                                            , true
+                                            , order_of_interpolation_
+                                            , false
+                                            , false
+                                            , false
+                                            , order_of_interpolation_
+                                            , true
+                                            , false
+                                            , false
+                                            );
+        dndx_interpolant_1d_ = new Interpolant(NUM1
+                                            , particle_->GetLow()
+                                            , BIGENERGY
+                                            , boost::bind(&Ionization::FunctionToBuildDNdxInterpolant, this, _1)
+                                            , order_of_interpolation_
+                                            , false
+                                            , false
+                                            , true
+                                            , order_of_interpolation_
+                                            , true
+                                            , false
+                                            , false
+                                            );
 
         particle_->SetEnergy(energy);
     }
@@ -348,7 +412,19 @@ void Ionization::EnableDEdxInterpolation(std::string path, bool raw)
             {
                 output.precision(16);
 
-                dedx_interpolant_ = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, boost::bind(&Ionization::FunctionToBuildDEdxInterpolant, this, _1), order_of_interpolation_, true, false, true, order_of_interpolation_, false, false, true);
+                dedx_interpolant_ = new Interpolant(NUM1
+                                                , particle_->GetLow()
+                                                , BIGENERGY
+                                                , boost::bind(&Ionization::FunctionToBuildDEdxInterpolant, this, _1)
+                                                , order_of_interpolation_
+                                                , true
+                                                , false
+                                                , true
+                                                , order_of_interpolation_
+                                                , false
+                                                , false
+                                                , true
+                                                );
                 dedx_interpolant_->Save(output, raw);
             }
             else
@@ -364,7 +440,19 @@ void Ionization::EnableDEdxInterpolation(std::string path, bool raw)
     if(path.empty() || storing_failed)
     {
         double energy = particle_->GetEnergy();
-        dedx_interpolant_ = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, boost::bind(&Ionization::FunctionToBuildDEdxInterpolant, this, _1), order_of_interpolation_, true, false, true, order_of_interpolation_, false, false, true);
+        dedx_interpolant_ = new Interpolant(NUM1
+                                        , particle_->GetLow()
+                                        , BIGENERGY
+                                        , boost::bind(&Ionization::FunctionToBuildDEdxInterpolant, this, _1)
+                                        , order_of_interpolation_
+                                        , true
+                                        , false
+                                        , true
+                                        , order_of_interpolation_
+                                        , false
+                                        , false
+                                        , true
+                                        );
         particle_->SetEnergy(energy);
     }
 
