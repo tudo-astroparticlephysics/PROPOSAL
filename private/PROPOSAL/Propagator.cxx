@@ -564,7 +564,6 @@ double Propagator::Propagate( double distance )
     double  final_energy    =   particle_->GetEnergy();
 
     pair<double, ParticleType::Enum> decay;
-    // pair<double,string> energy_loss;
     pair<double, ParticleType::Enum> energy_loss;
 
 
@@ -655,6 +654,14 @@ double Propagator::Propagate( double distance )
         {
             NumInt++;//TOMASZ
             energy_loss     =   current_collection_->MakeStochasticLoss();
+            if (energy_loss.second == ParticleType::unknown)
+            {
+                // in this case, no cross section is chosen, so there is no interaction
+                // due to the parameterization of the cross section cutoffs
+                log_debug("no interaction due to the parameterization of the cross section cutoffs. final energy: %f\n", final_energy);
+                initial_energy = final_energy;
+                continue;
+            }
             final_energy    -=  energy_loss.first;
             log_debug("Energyloss: %f\t%s\t%f\t%f\t%f", energy_loss.first, PROPOSALParticle::GetName(energy_loss.second).c_str(), particle_->GetX(), particle_->GetY(), particle_->GetZ());
             secondary_id    =   particle_->GetParticleId() + 1;
