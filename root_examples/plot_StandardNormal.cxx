@@ -12,6 +12,7 @@
 #include "TRandom3.h"
 #include "TLegend.h"
 #include "PROPOSAL/methods.h"
+#include "PROPOSAL/StandardNormal.h"
 
 using namespace std;
 using namespace PROPOSAL;
