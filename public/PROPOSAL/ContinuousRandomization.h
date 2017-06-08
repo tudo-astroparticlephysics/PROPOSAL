@@ -14,7 +14,6 @@
 #include "PROPOSAL/PROPOSALParticle.h"
 #include "PROPOSAL/Medium.h"
 #include "PROPOSAL/CrossSections.h"
-#include "PROPOSAL/StandardNormal.h"
 #include "PROPOSAL/Integral.h"
 #include "PROPOSAL/Interpolant.h"
 
