@@ -95,11 +95,11 @@ protected:
 
     ParametrizationType::Enum  parametrization_;
 
-    bool        lpm_effect_enabled_;
-    bool        init_lpm_effect_;
+    bool    lpm_effect_enabled_;
+    bool    init_lpm_effect_;
 
-    int         order_of_interpolation_;
-    double      sum_of_rates_;
+    int     order_of_interpolation_;
+    double  sum_of_rates_;
 //----------------------------------------------------------------------------//
 
     virtual double FunctionToDEdxIntegral(double variable) = 0;
