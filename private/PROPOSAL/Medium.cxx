@@ -49,7 +49,6 @@ Medium::Medium()
     ,sumCharge_         (0)
     ,ZA_                (0)
     ,I_                 (0)
-    ,C1_                (0)
     ,C_                 (0)
     ,a_                 (0)
     ,m_                 (0)
@@ -92,7 +91,6 @@ Medium::Medium(const Medium &medium)
     ,sumCharge_         (medium.sumCharge_)
     ,ZA_                (medium.ZA_)
     ,I_                 (medium.I_)
-    ,C1_                (medium.C1_)
     ,C_                 (medium.C_)
     ,a_                 (medium.a_)
     ,m_                 (medium.m_)
@@ -134,7 +132,6 @@ Medium::Medium(MediumType::Enum type, double rho)
     ,sumCharge_         (0)
     ,ZA_                (0)
     ,I_                 (0)
-    ,C1_                (0)
     ,C_                 (0)
     ,a_                 (0)
     ,m_                 (0)
@@ -248,7 +245,6 @@ bool Medium::operator==(const Medium &medium) const
     if( sumCharge_        != medium.sumCharge_)     return false;
     if( ZA_               != medium.ZA_)            return false;
     if( I_                != medium.I_)             return false;
-    if( C1_               != medium.C1_)            return false;
     if( C_                != medium.C_)             return false;
     if( a_                != medium.a_)             return false;
     if( m_                != medium.m_)             return false;
@@ -383,7 +379,6 @@ void Medium::swap(Medium &medium)
     swap( sumCharge_        , medium.sumCharge_);
     swap( ZA_               , medium.ZA_);
     swap( I_                , medium.I_);
-    swap( C1_               , medium.C1_);
     swap( C_                , medium.C_);
     swap( a_                , medium.a_);
     swap( m_                , medium.m_);
@@ -473,7 +468,6 @@ void Medium::Initr()
     ZA_             =   aux1/aux2;
     molDensity_     =   massDensity_*NA/aux2;
     MM_             =   aux3/aux2;
-    C1_             =   2*LOG10;
     r_              =   1.31;                   // only for ice - change if needed (sea water: 1.35)
 
     if(flag)
@@ -1115,10 +1109,6 @@ void Medium::SetZA(double ZA){
 
 void Medium::SetI(double I){
     I_ = I;
-}
-
-void Medium::SetC1(double C1){
-    C1_ = C1;
 }
 
 void Medium::SetC(double C){
