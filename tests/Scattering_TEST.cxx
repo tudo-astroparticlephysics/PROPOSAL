@@ -16,7 +16,7 @@ TEST(Comparison , Comparison_equal ) {
     EXPECT_TRUE(A==B);
 /*
 
-    StandardNormal* standnorm = new StandardNormal();
+    StandardNormal* standnorm = new StandardNormal(); // StandardNormal is removed, now boost::erfinv is used
     Scattering* C = new Scattering(standnorm);
     Scattering* D = new Scattering(standnorm);
 
@@ -33,12 +33,12 @@ TEST(Comparison , Comparison_not_equal ) {
 
 //    Scattering A;
 
-//    StandardNormal* stdnrmNotDefault = new StandardNormal(2,12,1e-10);
+//    StandardNormal* stdnrmNotDefault = new StandardNormal(2,12,1e-10); // StandardNormal is removed, now boost::erfinv is used
 //    Scattering B(stdnrmNotDefault);
 
 //    EXPECT_TRUE(A!=B);
 
-//    Scattering C(B.GetStandardNormal());
+//    Scattering C(B.GetStandardNormal()); // StandardNormal is removed, now boost::erfinv is used
 
 //    EXPECT_TRUE(A!=C);
 //    EXPECT_TRUE(C==B);
