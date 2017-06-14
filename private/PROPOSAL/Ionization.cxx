@@ -843,12 +843,12 @@ double Ionization::Delta()
     }
     else if(X < medium_->GetX1())
     {
-        return medium_->GetC1() * X + medium_->GetC()
+        return 2*LOG10 * X + medium_->GetC()
                 + medium_->GetA() * pow(medium_->GetX1() - X , medium_->GetM());
     }
     else
     {
-        return medium_->GetC1()*X + medium_->GetC();
+        return 2*LOG10 * X + medium_->GetC();
     }
 }
 
