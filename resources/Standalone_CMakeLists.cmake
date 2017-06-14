@@ -174,6 +174,7 @@ IF(ADD_TESTFILE_GEN)
 			private/testfile_generator/testfile_generator.cxx
 	)
 	TARGET_LINK_LIBRARIES(generate_testfiles PROPOSAL)
+	INSTALL(TARGETS generate_testfiles DESTINATION bin)
 ENDIF(ADD_TESTFILE_GEN)
 
 #################################################################
