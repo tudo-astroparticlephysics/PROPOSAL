@@ -57,7 +57,7 @@ protected:
 
     double ZA_;                         	///< <Z/A>
     double I_;                          	///< ionization potential [eV]
-    double C1_, C_, a_;                 	///< ionization formula constants
+    double C_, a_;                          ///< ionization formula constants
     double m_, X0_, X1_, d0_;           	///< ionization formula constants (continued)
     double r_;                          	///< refraction index
 
@@ -300,11 +300,6 @@ public:
         return I_;
     }
 //----------------------------------------------------------------------------//
-    double GetC1() const
-    {
-        return C1_;
-    }
-//----------------------------------------------------------------------------//
     double GetC() const
     {
         return C_;
@@ -428,7 +423,6 @@ public:
     void SetSumCharge(double sumCharge);
     void SetZA(double ZA);
     void SetI(double I);
-    void SetC1(double C1);
     void SetC(double C);
     void SetA(double a);
     void SetM(double m);
