@@ -20,7 +20,6 @@ i3_add_library(PROPOSAL
         private/PROPOSAL/PROPOSALParticle.cxx
         private/PROPOSAL/EnergyCutSettings.cxx
         private/PROPOSAL/Interpolant.cxx
-        private/PROPOSAL/StandardNormal.cxx
         private/PROPOSAL/RootFinder.cxx
         private/PROPOSAL/ProcessCollection.cxx
         private/PROPOSAL/Propagator.cxx
