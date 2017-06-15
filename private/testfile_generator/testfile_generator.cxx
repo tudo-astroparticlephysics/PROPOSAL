@@ -17,7 +17,7 @@
 using namespace PROPOSAL;
 
 // ------------------------------------------------------------------------- //
-// Check if Directory exists
+// Check if Directory/File exists
 // ------------------------------------------------------------------------- //
 
 bool is_dir(std::string pathname)
@@ -25,6 +25,20 @@ bool is_dir(std::string pathname)
     struct stat sb;
 
     if (stat(pathname.c_str(), &sb) == 0 && S_ISDIR(sb.st_mode))
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool is_file(std::string pathname)
+{
+    struct stat sb;
+
+    if (stat(pathname.c_str(), &sb) == 0)
     {
         return true;
     }
@@ -102,32 +116,32 @@ namespace EvalutateFunction{
 //     return array;
 // }
 
-// class RndFromFile{
-//     private:
-//         double rnd_;
-//         std::string Path_;
-//         std::ifstream in_;
-//
-//     public:
-//         RndFromFile(std::string Path){
-//             Path_ = Path;
-//             in_.open(Path_.c_str(), std::ifstream::in);
-//             in_>>rnd_;
-//             if(!in_.good())printf("less than one rnd_number!");
-//         }
-//
-//         double rnd(){
-//             in_>>rnd_;
-//             if(!in_.good())
-//             {
-//                 in_.close();
-//                 in_.clear();
-//                 in_.open(Path_.c_str());
-//                 in_>>rnd_;
-//             }
-//             return rnd_;
-//         }
-// };
+class RndFromFile{
+    private:
+        double rnd_;
+        std::string Path_;
+        std::ifstream in_;
+
+    public:
+        RndFromFile(std::string Path){
+            Path_ = Path;
+            in_.open(Path_.c_str(), std::ifstream::in);
+            in_>>rnd_;
+            if(!in_.good())printf("less than one rnd_number!");
+        }
+
+        double rnd(){
+            in_>>rnd_;
+            if(!in_.good())
+            {
+                in_.close();
+                in_.clear();
+                in_.open(Path_.c_str());
+                in_>>rnd_;
+            }
+            return rnd_;
+        }
+};
 
 int ConvertOldToNewBremsstrahlungParametrization(int old_param)
 {
@@ -167,19 +181,20 @@ int Create_RandomNumbers(std::string filename)
         return -1;
     }
 
-    printf("Generate random number table in %s\n", filename.c_str());
+    std::cout << "Create tables for Random Numbers" << std::endl;
+    std::cout << "================================" << std::endl;
 
     std::mt19937 generator;
-    std::uniform_real_distribution<double> rand(0.0,1.0);
+    std::uniform_real_distribution<double> random_double(0.0,1.0);
 
     // You know 6264 is cool, right?
     for (int i = 0; i < 6264; ++i)
     {
-        out << rand(generator) << std::endl;
+        out << random_double(generator) << std::endl;
     }
 
     // Everthing ok
-    return -1;
+    return 0;
 }
 
 
@@ -188,7 +203,14 @@ int Create_RandomNumbers(std::string filename)
 // ------------------------------------------------------------------------- //
 
 
-int setting_loop(Interaction::Enum interaction, EvalutateFunction::Enum eval_func, Interpolation::Enum interpol, std::string& filename, std::string& header, std::string path_to_tables)
+int setting_loop(
+                 Interaction::Enum interaction,
+                 EvalutateFunction::Enum eval_func,
+                 Interpolation::Enum interpol,
+                 std::string& filename,
+                 std::string& header,
+                 std::string path_to_tables,
+                 std::string path_to_rnd)
 {
     std::ofstream out;
     out.open(filename, std::ofstream::out);
@@ -269,26 +291,27 @@ int setting_loop(Interaction::Enum interaction, EvalutateFunction::Enum eval_fun
             break;
     }
 
-    // RndFromFile* rand_gen1 = NULL;
-    // RndFromFile* rand_gen2 = NULL;
+    RndFromFile* rand_gen1 = NULL;
+    RndFromFile* rand_gen2 = NULL;
 
-    std::mt19937 generator;
-    std::uniform_real_distribution<double> random_double(0.0,1.0);
+    // std::mt19937 generator;
+    // std::uniform_real_distribution<double> random_double(0.0,1.0);
     // std::uniform_real_distribution<double>* rand_gen2 = NULL; // distribution(0.0,1.0);
 
-    // switch (eval_func)
-    // {
-    //     case EvalutateFunction::dNdxRnd:
-    //         rand_gen1 = new std::uniform_int_distribution<double>(0, 1);
-    //         rand_gen1 = new RndFromFile("bin/TestFiles/rnd.txt");
-    //         break;
-    //     case EvalutateFunction::StochasticLoss:
-    //         rand_gen1 = new RndFromFile("bin/TestFiles/rnd.txt");
-    //         rand_gen2 = new RndFromFile("bin/TestFiles/rnd.txt");
-    //         break;
-    //     default: // No random generator needed
-    //         break;
-    // }
+    switch (eval_func)
+    {
+        case EvalutateFunction::dNdxRnd:
+            // rand_gen1 = new std::uniform_int_distribution<double>(0, 1);
+            rand_gen1 = new RndFromFile(path_to_rnd);
+            break;
+        case EvalutateFunction::StochasticLoss:
+            rand_gen1 = new RndFromFile(path_to_rnd);
+            rand_gen2 = new RndFromFile(path_to_rnd);
+            rand_gen2->rnd(); // To ensure randoms are different
+            break;
+        default: // No random generator needed
+            break;
+    }
 
     std::vector<int> param;
 
@@ -454,26 +477,24 @@ int setting_loop(Interaction::Enum interaction, EvalutateFunction::Enum eval_fun
                             switch (eval_func)
                             {
                                 case EvalutateFunction::dEdx:
-                                    // aux = brems.CalculatedEdx();
                                     aux = cross->CalculatedEdx();
                                     break;
                                 case EvalutateFunction::dNdx:
-                                    // aux = brems.CalculatedNdx();
                                     aux = cross->CalculatedNdx();
                                     break;
                                 case EvalutateFunction::dNdxRnd:
                                     {
-                                        double rnd1 = random_double(generator);
-                                        // double rnd1 = rand_gen1->rnd();
+                                        // double rnd1 = random_double(generator);
+                                        double rnd1 = rand_gen1->rnd();
                                         aux = cross->CalculatedNdx(rnd1);
                                         break;
                                     }
                                 case EvalutateFunction::StochasticLoss:
                                     {
-                                        double rnd1 = random_double(generator);
-                                        double rnd2 = random_double(generator);
-                                        // double rnd1 = rand_gen1->rnd();
-                                        // double rnd2 = rand_gen2->rnd();
+                                        // double rnd1 = random_double(generator);
+                                        // double rnd2 = random_double(generator);
+                                        double rnd1 = rand_gen1->rnd();
+                                        double rnd2 = rand_gen2->rnd();
                                         // aux = brems.CalculateStochasticLoss(rnd1, rnd2);
                                         aux = cross->CalculateStochasticLoss(rnd1, rnd2);
                                         break;
@@ -621,74 +642,74 @@ int setting_loop(Interaction::Enum interaction, EvalutateFunction::Enum eval_fun
     }
 
 
-    // if (rand_gen1 != NULL)
-    // {
-    //     delete rand_gen1;
-    // }
-    // if (rand_gen2 != NULL)
-    // {
-    //     delete rand_gen2;
-    // }
+    if (rand_gen1 != NULL)
+    {
+        delete rand_gen1;
+    }
+    if (rand_gen2 != NULL)
+    {
+        delete rand_gen2;
+    }
 
     // Evering ok
     return 0;
 }
 
 // ------------------------------------------------------------------------- //
-int Bremsstrahlung_Test_of_dEdx(std::string filename, std::string header, std::string path_to_tables)
+int Bremsstrahlung_Test_of_dEdx(std::string filename, std::string header, std::string path_to_tables, std::string path_to_rnd)
 {
     printf("Generate Test of dEdx tables in %s\n", filename.c_str());
-    return setting_loop(Interaction::Bremsstrahlung, EvalutateFunction::dEdx, Interpolation::None, filename, header, path_to_tables);
+    return setting_loop(Interaction::Bremsstrahlung, EvalutateFunction::dEdx, Interpolation::None, filename, header, path_to_tables, path_to_rnd);
 }
 
 
 // ------------------------------------------------------------------------- //
-int Bremsstrahlung_Test_of_dNdx(std::string filename, std::string header, std::string path_to_tables)
+int Bremsstrahlung_Test_of_dNdx(std::string filename, std::string header, std::string path_to_tables, std::string path_to_rnd)
 {
     printf("Generate Test of dNdx tables in %s\n", filename.c_str());
-    return setting_loop(Interaction::Bremsstrahlung, EvalutateFunction::dNdx, Interpolation::None, filename, header, path_to_tables);
+    return setting_loop(Interaction::Bremsstrahlung, EvalutateFunction::dNdx, Interpolation::None, filename, header, path_to_tables, path_to_rnd);
 }
 
 // ------------------------------------------------------------------------- //
-int Bremsstrahlung_Test_of_dNdxrnd(std::string filename, std::string header, std::string path_to_tables)
+int Bremsstrahlung_Test_of_dNdxrnd(std::string filename, std::string header, std::string path_to_tables, std::string path_to_rnd)
 {
     printf("Generate Test of dNdx with random number tables in %s\n", filename.c_str());
-    return setting_loop(Interaction::Bremsstrahlung, EvalutateFunction::dNdxRnd, Interpolation::None, filename, header, path_to_tables);
+    return setting_loop(Interaction::Bremsstrahlung, EvalutateFunction::dNdxRnd, Interpolation::None, filename, header, path_to_tables, path_to_rnd);
 }
 
 // ------------------------------------------------------------------------- //
-int Bremsstrahlung_Test_of_e(std::string filename, std::string header, std::string path_to_tables)
+int Bremsstrahlung_Test_of_e(std::string filename, std::string header, std::string path_to_tables, std::string path_to_rnd)
 {
     printf("Generate Test of StochasticLoss tables in %s\n", filename.c_str());
-    return setting_loop(Interaction::Bremsstrahlung, EvalutateFunction::StochasticLoss, Interpolation::None, filename, header, path_to_tables);
+    return setting_loop(Interaction::Bremsstrahlung, EvalutateFunction::StochasticLoss, Interpolation::None, filename, header, path_to_tables, path_to_rnd);
 }
 
 // ------------------------------------------------------------------------- //
-int Bremsstrahlung_Test_of_dEdx_Interpolant(std::string filename, std::string header, std::string path_to_tables)
+int Bremsstrahlung_Test_of_dEdx_Interpolant(std::string filename, std::string header, std::string path_to_tables, std::string path_to_rnd)
 {
     printf("Generate Test of dEdx Interpolant tables in %s\n", filename.c_str());
-    return setting_loop(Interaction::Bremsstrahlung, EvalutateFunction::dEdx, Interpolation::dEdx, filename, header, path_to_tables);
+    return setting_loop(Interaction::Bremsstrahlung, EvalutateFunction::dEdx, Interpolation::dEdx, filename, header, path_to_tables, path_to_rnd);
 }
 
 // ------------------------------------------------------------------------- //
-int Bremsstrahlung_Test_of_dNdx_Interpolant(std::string filename, std::string header, std::string path_to_tables)
+int Bremsstrahlung_Test_of_dNdx_Interpolant(std::string filename, std::string header, std::string path_to_tables, std::string path_to_rnd)
 {
     printf("Generate Test of dNdx Interpolant tables in %s\n", filename.c_str());
-    return setting_loop(Interaction::Bremsstrahlung, EvalutateFunction::dNdx, Interpolation::dNdx, filename, header, path_to_tables);
+    return setting_loop(Interaction::Bremsstrahlung, EvalutateFunction::dNdx, Interpolation::dNdx, filename, header, path_to_tables, path_to_rnd);
 }
 
 // ------------------------------------------------------------------------- //
-int Bremsstrahlung_Test_of_dNdxrnd_Interpolant(std::string filename, std::string header, std::string path_to_tables)
+int Bremsstrahlung_Test_of_dNdxrnd_Interpolant(std::string filename, std::string header, std::string path_to_tables, std::string path_to_rnd)
 {
     printf("Generate Test of dNdxRnd Interpolant tables in %s\n", filename.c_str());
-    return setting_loop(Interaction::Bremsstrahlung, EvalutateFunction::dNdxRnd, Interpolation::dNdx, filename, header, path_to_tables);
+    return setting_loop(Interaction::Bremsstrahlung, EvalutateFunction::dNdxRnd, Interpolation::dNdx, filename, header, path_to_tables, path_to_rnd);
 }
 
 // ------------------------------------------------------------------------- //
-int Bremsstrahlung_Test_of_e_Interpolant(std::string filename, std::string header, std::string path_to_tables)
+int Bremsstrahlung_Test_of_e_Interpolant(std::string filename, std::string header, std::string path_to_tables, std::string path_to_rnd)
 {
     printf("Generate Test of StochasticLoss tables in %s\n", filename.c_str());
-    return setting_loop(Interaction::Bremsstrahlung, EvalutateFunction::StochasticLoss, Interpolation::dNdx, filename, header, path_to_tables);
+    return setting_loop(Interaction::Bremsstrahlung, EvalutateFunction::StochasticLoss, Interpolation::dNdx, filename, header, path_to_tables, path_to_rnd);
 }
 
 // ------------------------------------------------------------------------- //
@@ -696,59 +717,59 @@ int Bremsstrahlung_Test_of_e_Interpolant(std::string filename, std::string heade
 // ------------------------------------------------------------------------- //
 
 
-int Epairproduction_Test_of_dEdx(std::string filename, std::string header, std::string path_to_tables)
+int Epairproduction_Test_of_dEdx(std::string filename, std::string header, std::string path_to_tables, std::string path_to_rnd)
 {
     printf("Generate Test of dEdx tables in %s\n", filename.c_str());
-    return setting_loop(Interaction::Epairproduction, EvalutateFunction::dEdx, Interpolation::None, filename, header, path_to_tables);
+    return setting_loop(Interaction::Epairproduction, EvalutateFunction::dEdx, Interpolation::None, filename, header, path_to_tables, path_to_rnd);
 }
 
 // ------------------------------------------------------------------------- //
-int Epairproduction_Test_of_dNdx(std::string filename, std::string header, std::string path_to_tables)
+int Epairproduction_Test_of_dNdx(std::string filename, std::string header, std::string path_to_tables, std::string path_to_rnd)
 {
     printf("Generate Test of dNdx tables in %s\n", filename.c_str());
-    return setting_loop(Interaction::Epairproduction, EvalutateFunction::dNdx, Interpolation::None, filename, header, path_to_tables);
+    return setting_loop(Interaction::Epairproduction, EvalutateFunction::dNdx, Interpolation::None, filename, header, path_to_tables, path_to_rnd);
 }
 
 // ------------------------------------------------------------------------- //
-int Epairproduction_Test_of_dNdxrnd(std::string filename, std::string header, std::string path_to_tables)
+int Epairproduction_Test_of_dNdxrnd(std::string filename, std::string header, std::string path_to_tables, std::string path_to_rnd)
 {
     printf("Generate Test of dNdx with random number tables in %s\n", filename.c_str());
-    return setting_loop(Interaction::Epairproduction, EvalutateFunction::dNdxRnd, Interpolation::None, filename, header, path_to_tables);
+    return setting_loop(Interaction::Epairproduction, EvalutateFunction::dNdxRnd, Interpolation::None, filename, header, path_to_tables, path_to_rnd);
 }
 
 // ------------------------------------------------------------------------- //
-int Epairproduction_Test_of_e(std::string filename, std::string header, std::string path_to_tables)
+int Epairproduction_Test_of_e(std::string filename, std::string header, std::string path_to_tables, std::string path_to_rnd)
 {
     printf("Generate Test of StochasticLoss tables in %s\n", filename.c_str());
-    return setting_loop(Interaction::Epairproduction, EvalutateFunction::StochasticLoss, Interpolation::None, filename, header, path_to_tables);
+    return setting_loop(Interaction::Epairproduction, EvalutateFunction::StochasticLoss, Interpolation::None, filename, header, path_to_tables, path_to_rnd);
 }
 
 // ------------------------------------------------------------------------- //
-int Epairproduction_Test_of_dEdx_Interpolant(std::string filename, std::string header, std::string path_to_tables)
+int Epairproduction_Test_of_dEdx_Interpolant(std::string filename, std::string header, std::string path_to_tables, std::string path_to_rnd)
 {
     printf("Generate Test of dEdx Interpolant tables in %s\n", filename.c_str());
-    return setting_loop(Interaction::Epairproduction, EvalutateFunction::dEdx, Interpolation::dEdx, filename, header, path_to_tables);
+    return setting_loop(Interaction::Epairproduction, EvalutateFunction::dEdx, Interpolation::dEdx, filename, header, path_to_tables, path_to_rnd);
 }
 
 // ------------------------------------------------------------------------- //
-int Epairproduction_Test_of_dNdx_Interpolant(std::string filename, std::string header, std::string path_to_tables)
+int Epairproduction_Test_of_dNdx_Interpolant(std::string filename, std::string header, std::string path_to_tables, std::string path_to_rnd)
 {
     printf("Generate Test of dNdx Interpolant tables in %s\n", filename.c_str());
-    return setting_loop(Interaction::Epairproduction, EvalutateFunction::dNdx, Interpolation::dNdx, filename, header, path_to_tables);
+    return setting_loop(Interaction::Epairproduction, EvalutateFunction::dNdx, Interpolation::dNdx, filename, header, path_to_tables, path_to_rnd);
 }
 
 // ------------------------------------------------------------------------- //
-int Epairproduction_Test_of_dNdxrnd_Interpolant(std::string filename, std::string header, std::string path_to_tables)
+int Epairproduction_Test_of_dNdxrnd_Interpolant(std::string filename, std::string header, std::string path_to_tables, std::string path_to_rnd)
 {
     printf("Generate Test of dNdxRnd Interpolant tables in %s\n", filename.c_str());
-    return setting_loop(Interaction::Epairproduction, EvalutateFunction::dNdxRnd, Interpolation::dNdx, filename, header, path_to_tables);
+    return setting_loop(Interaction::Epairproduction, EvalutateFunction::dNdxRnd, Interpolation::dNdx, filename, header, path_to_tables, path_to_rnd);
 }
 
 // ------------------------------------------------------------------------- //
-int Epairproduction_Test_of_e_Interpolant(std::string filename, std::string header, std::string path_to_tables)
+int Epairproduction_Test_of_e_Interpolant(std::string filename, std::string header, std::string path_to_tables, std::string path_to_rnd)
 {
     printf("Generate Test of StochasticLoss tables in %s\n", filename.c_str());
-    return setting_loop(Interaction::Epairproduction, EvalutateFunction::StochasticLoss, Interpolation::Both, filename, header, path_to_tables);
+    return setting_loop(Interaction::Epairproduction, EvalutateFunction::StochasticLoss, Interpolation::Both, filename, header, path_to_tables, path_to_rnd);
 }
 
 // ------------------------------------------------------------------------- //
@@ -756,59 +777,59 @@ int Epairproduction_Test_of_e_Interpolant(std::string filename, std::string head
 // ------------------------------------------------------------------------- //
 
 
-int Ionization_Test_of_dEdx(std::string filename, std::string header, std::string path_to_tables)
+int Ionization_Test_of_dEdx(std::string filename, std::string header, std::string path_to_tables, std::string path_to_rnd)
 {
     printf("Generate Test of dEdx tables in %s\n", filename.c_str());
-    return setting_loop(Interaction::Ionization, EvalutateFunction::dEdx, Interpolation::None, filename, header, path_to_tables);
+    return setting_loop(Interaction::Ionization, EvalutateFunction::dEdx, Interpolation::None, filename, header, path_to_tables, path_to_rnd);
 }
 
 // ------------------------------------------------------------------------- //
-int Ionization_Test_of_dNdx(std::string filename, std::string header, std::string path_to_tables)
+int Ionization_Test_of_dNdx(std::string filename, std::string header, std::string path_to_tables, std::string path_to_rnd)
 {
     printf("Generate Test of dNdx tables in %s\n", filename.c_str());
-    return setting_loop(Interaction::Ionization, EvalutateFunction::dNdx, Interpolation::None, filename, header, path_to_tables);
+    return setting_loop(Interaction::Ionization, EvalutateFunction::dNdx, Interpolation::None, filename, header, path_to_tables, path_to_rnd);
 }
 
 // ------------------------------------------------------------------------- //
-int Ionization_Test_of_dNdxrnd(std::string filename, std::string header, std::string path_to_tables)
+int Ionization_Test_of_dNdxrnd(std::string filename, std::string header, std::string path_to_tables, std::string path_to_rnd)
 {
     printf("Generate Test of dNdx with random number tables in %s\n", filename.c_str());
-    return setting_loop(Interaction::Ionization, EvalutateFunction::dNdxRnd, Interpolation::None, filename, header, path_to_tables);
+    return setting_loop(Interaction::Ionization, EvalutateFunction::dNdxRnd, Interpolation::None, filename, header, path_to_tables, path_to_rnd);
 }
 
 // ------------------------------------------------------------------------- //
-int Ionization_Test_of_e(std::string filename, std::string header, std::string path_to_tables)
+int Ionization_Test_of_e(std::string filename, std::string header, std::string path_to_tables, std::string path_to_rnd)
 {
     printf("Generate Test of StochasticLoss tables in %s\n", filename.c_str());
-    return setting_loop(Interaction::Ionization, EvalutateFunction::StochasticLoss, Interpolation::None, filename, header, path_to_tables);
+    return setting_loop(Interaction::Ionization, EvalutateFunction::StochasticLoss, Interpolation::None, filename, header, path_to_tables, path_to_rnd);
 }
 
 // ------------------------------------------------------------------------- //
-int Ionization_Test_of_dEdx_Interpolant(std::string filename, std::string header, std::string path_to_tables)
+int Ionization_Test_of_dEdx_Interpolant(std::string filename, std::string header, std::string path_to_tables, std::string path_to_rnd)
 {
     printf("Generate Test of dEdx Interpolant tables in %s\n", filename.c_str());
-    return setting_loop(Interaction::Ionization, EvalutateFunction::dEdx, Interpolation::dEdx, filename, header, path_to_tables);
+    return setting_loop(Interaction::Ionization, EvalutateFunction::dEdx, Interpolation::dEdx, filename, header, path_to_tables, path_to_rnd);
 }
 
 // ------------------------------------------------------------------------- //
-int Ionization_Test_of_dNdx_Interpolant(std::string filename, std::string header, std::string path_to_tables)
+int Ionization_Test_of_dNdx_Interpolant(std::string filename, std::string header, std::string path_to_tables, std::string path_to_rnd)
 {
     printf("Generate Test of dNdx Interpolant tables in %s\n", filename.c_str());
-    return setting_loop(Interaction::Ionization, EvalutateFunction::dNdx, Interpolation::dNdx, filename, header, path_to_tables);
+    return setting_loop(Interaction::Ionization, EvalutateFunction::dNdx, Interpolation::dNdx, filename, header, path_to_tables, path_to_rnd);
 }
 
 // ------------------------------------------------------------------------- //
-int Ionization_Test_of_dNdxrnd_Interpolant(std::string filename, std::string header, std::string path_to_tables)
+int Ionization_Test_of_dNdxrnd_Interpolant(std::string filename, std::string header, std::string path_to_tables, std::string path_to_rnd)
 {
     printf("Generate Test of dNdxRnd Interpolant tables in %s\n", filename.c_str());
-    return setting_loop(Interaction::Ionization, EvalutateFunction::dNdxRnd, Interpolation::dNdx, filename, header, path_to_tables);
+    return setting_loop(Interaction::Ionization, EvalutateFunction::dNdxRnd, Interpolation::dNdx, filename, header, path_to_tables, path_to_rnd);
 }
 
 // ------------------------------------------------------------------------- //
-int Ionization_Test_of_e_Interpolant(std::string filename, std::string header, std::string path_to_tables)
+int Ionization_Test_of_e_Interpolant(std::string filename, std::string header, std::string path_to_tables, std::string path_to_rnd)
 {
     printf("Generate Test of StochasticLoss tables in %s\n", filename.c_str());
-    return setting_loop(Interaction::Ionization, EvalutateFunction::StochasticLoss, Interpolation::dEdx, filename, header, path_to_tables);
+    return setting_loop(Interaction::Ionization, EvalutateFunction::StochasticLoss, Interpolation::dEdx, filename, header, path_to_tables, path_to_rnd);
 }
 
 // ------------------------------------------------------------------------- //
@@ -816,59 +837,59 @@ int Ionization_Test_of_e_Interpolant(std::string filename, std::string header, s
 // ------------------------------------------------------------------------- //
 
 
-int Photonuclear_Test_of_dEdx(std::string filename, std::string header, std::string path_to_tables)
+int Photonuclear_Test_of_dEdx(std::string filename, std::string header, std::string path_to_tables, std::string path_to_rnd)
 {
     printf("Generate Test of dEdx tables in %s\n", filename.c_str());
-    return setting_loop(Interaction::Photonuclear, EvalutateFunction::dEdx, Interpolation::None, filename, header, path_to_tables);
+    return setting_loop(Interaction::Photonuclear, EvalutateFunction::dEdx, Interpolation::None, filename, header, path_to_tables, path_to_rnd);
 }
 
 // ------------------------------------------------------------------------- //
-int Photonuclear_Test_of_dNdx(std::string filename, std::string header, std::string path_to_tables)
+int Photonuclear_Test_of_dNdx(std::string filename, std::string header, std::string path_to_tables, std::string path_to_rnd)
 {
     printf("Generate Test of dNdx tables in %s\n", filename.c_str());
-    return setting_loop(Interaction::Photonuclear, EvalutateFunction::dNdx, Interpolation::None, filename, header, path_to_tables);
+    return setting_loop(Interaction::Photonuclear, EvalutateFunction::dNdx, Interpolation::None, filename, header, path_to_tables, path_to_rnd);
 }
 
 // ------------------------------------------------------------------------- //
-int Photonuclear_Test_of_dNdxrnd(std::string filename, std::string header, std::string path_to_tables)
+int Photonuclear_Test_of_dNdxrnd(std::string filename, std::string header, std::string path_to_tables, std::string path_to_rnd)
 {
     printf("Generate Test of dNdx with random number tables in %s\n", filename.c_str());
-    return setting_loop(Interaction::Photonuclear, EvalutateFunction::dNdxRnd, Interpolation::None, filename, header, path_to_tables);
+    return setting_loop(Interaction::Photonuclear, EvalutateFunction::dNdxRnd, Interpolation::None, filename, header, path_to_tables, path_to_rnd);
 }
 
 // ------------------------------------------------------------------------- //
-int Photonuclear_Test_of_e(std::string filename, std::string header, std::string path_to_tables)
+int Photonuclear_Test_of_e(std::string filename, std::string header, std::string path_to_tables, std::string path_to_rnd)
 {
     printf("Generate Test of StochasticLoss tables in %s\n", filename.c_str());
-    return setting_loop(Interaction::Photonuclear, EvalutateFunction::StochasticLoss, Interpolation::None, filename, header, path_to_tables);
+    return setting_loop(Interaction::Photonuclear, EvalutateFunction::StochasticLoss, Interpolation::None, filename, header, path_to_tables, path_to_rnd);
 }
 
 // ------------------------------------------------------------------------- //
-int Photonuclear_Test_of_dEdx_Interpolant(std::string filename, std::string header, std::string path_to_tables)
+int Photonuclear_Test_of_dEdx_Interpolant(std::string filename, std::string header, std::string path_to_tables, std::string path_to_rnd)
 {
     printf("Generate Test of dEdx Interpolant tables in %s\n", filename.c_str());
-    return setting_loop(Interaction::Photonuclear, EvalutateFunction::dEdx, Interpolation::dEdx, filename, header, path_to_tables);
+    return setting_loop(Interaction::Photonuclear, EvalutateFunction::dEdx, Interpolation::dEdx, filename, header, path_to_tables, path_to_rnd);
 }
 
 // ------------------------------------------------------------------------- //
-int Photonuclear_Test_of_dNdx_Interpolant(std::string filename, std::string header, std::string path_to_tables)
+int Photonuclear_Test_of_dNdx_Interpolant(std::string filename, std::string header, std::string path_to_tables, std::string path_to_rnd)
 {
     printf("Generate Test of dNdx Interpolant tables in %s\n", filename.c_str());
-    return setting_loop(Interaction::Photonuclear, EvalutateFunction::dNdx, Interpolation::dNdx, filename, header, path_to_tables);
+    return setting_loop(Interaction::Photonuclear, EvalutateFunction::dNdx, Interpolation::dNdx, filename, header, path_to_tables, path_to_rnd);
 }
 
 // ------------------------------------------------------------------------- //
-int Photonuclear_Test_of_dNdxrnd_Interpolant(std::string filename, std::string header, std::string path_to_tables)
+int Photonuclear_Test_of_dNdxrnd_Interpolant(std::string filename, std::string header, std::string path_to_tables, std::string path_to_rnd)
 {
     printf("Generate Test of dNdxRnd Interpolant tables in %s\n", filename.c_str());
-    return setting_loop(Interaction::Photonuclear, EvalutateFunction::dNdxRnd, Interpolation::dNdx, filename, header, path_to_tables);
+    return setting_loop(Interaction::Photonuclear, EvalutateFunction::dNdxRnd, Interpolation::dNdx, filename, header, path_to_tables, path_to_rnd);
 }
 
 // ------------------------------------------------------------------------- //
-int Photonuclear_Test_of_e_Interpolant(std::string filename, std::string header, std::string path_to_tables)
+int Photonuclear_Test_of_e_Interpolant(std::string filename, std::string header, std::string path_to_tables, std::string path_to_rnd)
 {
     printf("Generate Test of StochasticLoss tables in %s\n", filename.c_str());
-    return setting_loop(Interaction::Photonuclear, EvalutateFunction::StochasticLoss, Interpolation::dNdx, filename, header, path_to_tables);
+    return setting_loop(Interaction::Photonuclear, EvalutateFunction::StochasticLoss, Interpolation::dNdx, filename, header, path_to_tables, path_to_rnd);
 }
 
 // ------------------------------------------------------------------------- //
@@ -908,7 +929,6 @@ int setting_loop_contrand(std::string& filename)
         << ""
         << std::endl;
 
-    // RndFromFile rand_gen = RndFromFile("bin/TestFiles/rnd.txt");
     std::mt19937 generator;
     std::uniform_real_distribution<double> random_double(0.0,1.0);
 
@@ -1901,13 +1921,16 @@ int main(int argc, const char *argv[])
         std::cout << "==================================" << std::endl;
     }
 
+    // File with random numbers. Needed for many tests.
+    std::string path_to_rnd = path_to_save + "rnd.txt";
+
+    // --------------------------------------------------------------------- //
     // Tests
+    // --------------------------------------------------------------------- //
+
     if ((chosen_test == opt_rnd) || (chosen_test == opt_all))
     {
-        std::cout << "Create tables for Random Numbers" << std::endl;
-        std::cout << "================================" << std::endl;
-
-        Create_RandomNumbers(path_to_save + "rnd.txt");
+        Create_RandomNumbers(path_to_rnd);
     }
 
     if ((chosen_test == opt_brems) || (chosen_test == opt_all))
@@ -1915,14 +1938,19 @@ int main(int argc, const char *argv[])
         std::cout << "Create tables for Bremsstrahlung" << std::endl;
         std::cout << "================================" << std::endl;
 
-        Bremsstrahlung_Test_of_dEdx(path_to_save + "Brems_dEdx.txt", "dEdx", "");
-        Bremsstrahlung_Test_of_dNdx(path_to_save + "Brems_dNdx.txt", "dNdx", "");
-        Bremsstrahlung_Test_of_dNdxrnd(path_to_save + "Brems_Test_of_dNdxrnd.txt", "dNdxRnd", "");
-        Bremsstrahlung_Test_of_e(path_to_save + "Brems_e.txt", "StochasticLoss", "");
-        Bremsstrahlung_Test_of_dEdx_Interpolant(path_to_save + "Brems_dEdx_interpol.txt", "dEdx", path_to_tables);
-        Bremsstrahlung_Test_of_dNdx_Interpolant(path_to_save + "Brems_dNdx_interpol.txt", "dNdx", path_to_tables);
-        Bremsstrahlung_Test_of_dNdxrnd_Interpolant(path_to_save + "Bremsstrahlung_dNdxrnd_interpol.txt", "dNdxRnd", path_to_tables);
-        Bremsstrahlung_Test_of_e_Interpolant(path_to_save + "Brems_e_interpol.txt", "StochasticLoss", path_to_tables);
+        if (is_file(path_to_rnd) == false)
+        {
+            Create_RandomNumbers(path_to_rnd);
+        }
+
+        Bremsstrahlung_Test_of_dEdx(path_to_save + "Brems_dEdx.txt", "dEdx", "", "");
+        Bremsstrahlung_Test_of_dNdx(path_to_save + "Brems_dNdx.txt", "dNdx", "", "");
+        Bremsstrahlung_Test_of_dNdxrnd(path_to_save + "Brems_dNdxrnd.txt", "dNdxRnd", "", path_to_rnd);
+        Bremsstrahlung_Test_of_e(path_to_save + "Brems_e.txt", "StochasticLoss", "", path_to_rnd);
+        Bremsstrahlung_Test_of_dEdx_Interpolant(path_to_save + "Brems_dEdx_interpol.txt", "dEdx", path_to_tables, "");
+        Bremsstrahlung_Test_of_dNdx_Interpolant(path_to_save + "Brems_dNdx_interpol.txt", "dNdx", path_to_tables, "");
+        Bremsstrahlung_Test_of_dNdxrnd_Interpolant(path_to_save + "Bremsstrahlung_dNdxrnd_interpol.txt", "dNdxRnd", path_to_tables, path_to_rnd);
+        Bremsstrahlung_Test_of_e_Interpolant(path_to_save + "Brems_e_interpol.txt", "StochasticLoss", path_to_tables, path_to_rnd);
     }
 
     if ((chosen_test == opt_epair) || (chosen_test == opt_all))
@@ -1930,14 +1958,21 @@ int main(int argc, const char *argv[])
         std::cout << "Create tables for Epair Production" << std::endl;
         std::cout << "==================================" << std::endl;
 
-        Epairproduction_Test_of_dEdx(path_to_save + "Epair_dEdx.txt", "dEdx", "");
-        Epairproduction_Test_of_dNdx(path_to_save + "Epair_dNdx.txt", "dNdx", "");
-        Epairproduction_Test_of_dNdxrnd(path_to_save + "Epair_Test_of_dNdxrnd.txt", "dNdxRnd", "");
-        Epairproduction_Test_of_e(path_to_save + "Epair_e.txt", "StochasticLoss", "");
-        Epairproduction_Test_of_dEdx_Interpolant(path_to_save + "Epair_dEdx_interpol.txt", "dEdx", path_to_tables);
-        Epairproduction_Test_of_dNdx_Interpolant(path_to_save + "Epair_dNdx_interpol.txt", "dNdx", path_to_tables);
-        Epairproduction_Test_of_dNdxrnd_Interpolant(path_to_save + "Epair_dNdxrnd_interpol.txt", "dNdxRnd", path_to_tables);
-        Epairproduction_Test_of_e_Interpolant(path_to_save + "Epair_e_interpol.txt", "StochasticLoss", path_to_tables);
+        if (is_file(path_to_rnd) == false)
+        {
+            std::cout << path_to_rnd << std::endl;
+            Create_RandomNumbers(path_to_rnd);
+        }
+        std::cout << "out " << path_to_rnd << std::endl;
+
+        Epairproduction_Test_of_dEdx(path_to_save + "Epair_dEdx.txt", "dEdx", "", "");
+        Epairproduction_Test_of_dNdx(path_to_save + "Epair_dNdx.txt", "dNdx", "", "");
+        Epairproduction_Test_of_dNdxrnd(path_to_save + "Epair_dNdxrnd.txt", "dNdxRnd", "", path_to_rnd);
+        Epairproduction_Test_of_e(path_to_save + "Epair_e.txt", "StochasticLoss", "", path_to_rnd);
+        Epairproduction_Test_of_dEdx_Interpolant(path_to_save + "Epair_dEdx_interpol.txt", "dEdx", path_to_tables, "");
+        Epairproduction_Test_of_dNdx_Interpolant(path_to_save + "Epair_dNdx_interpol.txt", "dNdx", path_to_tables, "");
+        Epairproduction_Test_of_dNdxrnd_Interpolant(path_to_save + "Epair_dNdxrnd_interpol.txt", "dNdxRnd", path_to_tables, path_to_rnd);
+        Epairproduction_Test_of_e_Interpolant(path_to_save + "Epair_e_interpol.txt", "StochasticLoss", path_to_tables, path_to_rnd);
     }
 
     if ((chosen_test == opt_ioniz) || (chosen_test == opt_all))
@@ -1945,14 +1980,19 @@ int main(int argc, const char *argv[])
         std::cout << "Create tables for Ionization" << std::endl;
         std::cout << "============================" << std::endl;
 
-        Ionization_Test_of_dEdx(path_to_save + "Ioniz_dEdx.txt", "dEdx", "");
-        Ionization_Test_of_dNdx(path_to_save + "Ioniz_dNdx.txt", "dNdx", "");
-        Ionization_Test_of_dNdxrnd(path_to_save + "Ioniz_Test_of_dNdxrnd.txt", "dNdxRnd", "");
-        Ionization_Test_of_e(path_to_save + "Ioniz_e.txt", "StochasticLoss", "");
-        Ionization_Test_of_dEdx_Interpolant(path_to_save + "Ioniz_dEdx_interpol.txt", "dEdx", path_to_tables);
-        Ionization_Test_of_dNdx_Interpolant(path_to_save + "Ioniz_dNdx_interpol.txt", "dNdx", path_to_tables);
-        Ionization_Test_of_dNdxrnd_Interpolant(path_to_save + "Ionization_dNdxrnd_interpol.txt", "dNdxRnd", path_to_tables);
-        Ionization_Test_of_e_Interpolant(path_to_save + "Ioniz_e_interpol.txt", "StochasticLoss", path_to_tables);
+        if (is_file(path_to_rnd) == false)
+        {
+            Create_RandomNumbers(path_to_rnd);
+        }
+
+        Ionization_Test_of_dEdx(path_to_save + "Ioniz_dEdx.txt", "dEdx", "", "");
+        Ionization_Test_of_dNdx(path_to_save + "Ioniz_dNdx.txt", "dNdx", "", "");
+        Ionization_Test_of_dNdxrnd(path_to_save + "Ioniz_dNdxrnd.txt", "dNdxRnd", "", path_to_rnd);
+        Ionization_Test_of_e(path_to_save + "Ioniz_e.txt", "StochasticLoss", "", path_to_rnd);
+        Ionization_Test_of_dEdx_Interpolant(path_to_save + "Ioniz_dEdx_interpol.txt", "dEdx", path_to_tables, "");
+        Ionization_Test_of_dNdx_Interpolant(path_to_save + "Ioniz_dNdx_interpol.txt", "dNdx", path_to_tables, "");
+        Ionization_Test_of_dNdxrnd_Interpolant(path_to_save + "Ionization_dNdxrnd_interpol.txt", "dNdxRnd", path_to_tables, path_to_rnd);
+        Ionization_Test_of_e_Interpolant(path_to_save + "Ioniz_e_interpol.txt", "StochasticLoss", path_to_tables, path_to_rnd);
     }
 
     if ((chosen_test == opt_photo) || (chosen_test == opt_all))
@@ -1960,14 +2000,19 @@ int main(int argc, const char *argv[])
         std::cout << "Create tables for Photonuclear" << std::endl;
         std::cout << "==============================" << std::endl;
 
-        Photonuclear_Test_of_dEdx(path_to_save + "Photo_dEdx.txt", "dEdx", "");
-        Photonuclear_Test_of_dNdx(path_to_save + "Photo_dNdx.txt", "dNdx", "");
-        Photonuclear_Test_of_dNdxrnd(path_to_save + "Photo_Test_of_dNdxrnd.txt", "dNdxRnd", "");
-        Photonuclear_Test_of_e(path_to_save + "Photo_e.txt", "StochasticLoss", "");
-        Photonuclear_Test_of_dEdx_Interpolant(path_to_save + "Photo_dEdx_interpol.txt", "dEdx", path_to_tables);
-        Photonuclear_Test_of_dNdx_Interpolant(path_to_save + "Photo_dNdx_interpol.txt", "dNdx", path_to_tables);
-        Photonuclear_Test_of_dNdxrnd_Interpolant(path_to_save + "Photonuclear_dNdxrnd_interpol.txt", "dNdxRnd", path_to_tables);
-        Photonuclear_Test_of_e_Interpolant(path_to_save + "Photo_e_interpol.txt", "StochasticLoss", path_to_tables);
+        if (is_file(path_to_rnd) == false)
+        {
+            Create_RandomNumbers(path_to_rnd);
+        }
+
+        Photonuclear_Test_of_dEdx(path_to_save + "Photo_dEdx.txt", "dEdx", "", "");
+        Photonuclear_Test_of_dNdx(path_to_save + "Photo_dNdx.txt", "dNdx", "", "");
+        Photonuclear_Test_of_dNdxrnd(path_to_save + "Photo_dNdxrnd.txt", "dNdxRnd", "", path_to_rnd);
+        Photonuclear_Test_of_e(path_to_save + "Photo_e.txt", "StochasticLoss", "", path_to_rnd);
+        Photonuclear_Test_of_dEdx_Interpolant(path_to_save + "Photo_dEdx_interpol.txt", "dEdx", path_to_tables, "");
+        Photonuclear_Test_of_dNdx_Interpolant(path_to_save + "Photo_dNdx_interpol.txt", "dNdx", path_to_tables, "");
+        Photonuclear_Test_of_dNdxrnd_Interpolant(path_to_save + "Photonuclear_dNdxrnd_interpol.txt", "dNdxRnd", path_to_tables, path_to_rnd);
+        Photonuclear_Test_of_e_Interpolant(path_to_save + "Photo_e_interpol.txt", "StochasticLoss", path_to_tables, path_to_rnd);
     }
 
     if ((chosen_test == opt_cont) || (chosen_test == opt_all))
