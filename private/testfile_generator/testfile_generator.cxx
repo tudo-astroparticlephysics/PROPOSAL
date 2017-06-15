@@ -1884,7 +1884,7 @@ int main(int argc, const char *argv[])
         Bremsstrahlung_Test_of_e(path_to_save + "Brems_e.txt", "StochasticLoss", "");
         Bremsstrahlung_Test_of_dEdx_Interpolant(path_to_save + "Brems_dEdx_interpol.txt", "dEdx", path_to_tables);
         Bremsstrahlung_Test_of_dNdx_Interpolant(path_to_save + "Brems_dNdx_interpol.txt", "dNdx", path_to_tables);
-        Bremsstrahlung_Test_of_dNdxrnd_Interpolant(path_to_tables + "Bremsstrahlung_dNdxrnd_interpol.txt", "dNdxRnd", path_to_tables);
+        Bremsstrahlung_Test_of_dNdxrnd_Interpolant(path_to_save + "Bremsstrahlung_dNdxrnd_interpol.txt", "dNdxRnd", path_to_tables);
         Bremsstrahlung_Test_of_e_Interpolant(path_to_save + "Brems_e_interpol.txt", "StochasticLoss", path_to_tables);
     }
 
@@ -1899,7 +1899,7 @@ int main(int argc, const char *argv[])
         Epairproduction_Test_of_e(path_to_save + "Epair_e.txt", "StochasticLoss", "");
         Epairproduction_Test_of_dEdx_Interpolant(path_to_save + "Epair_dEdx_interpol.txt", "dEdx", path_to_tables);
         Epairproduction_Test_of_dNdx_Interpolant(path_to_save + "Epair_dNdx_interpol.txt", "dNdx", path_to_tables);
-        Epairproduction_Test_of_dNdxrnd_Interpolant(path_to_tables + "Epair_dNdxrnd_interpol.txt", "dNdxRnd", path_to_tables);
+        Epairproduction_Test_of_dNdxrnd_Interpolant(path_to_save + "Epair_dNdxrnd_interpol.txt", "dNdxRnd", path_to_tables);
         Epairproduction_Test_of_e_Interpolant(path_to_save + "Epair_e_interpol.txt", "StochasticLoss", path_to_tables);
     }
 
@@ -1914,7 +1914,7 @@ int main(int argc, const char *argv[])
         Ionization_Test_of_e(path_to_save + "Ioniz_e.txt", "StochasticLoss", "");
         Ionization_Test_of_dEdx_Interpolant(path_to_save + "Ioniz_dEdx_interpol.txt", "dEdx", path_to_tables);
         Ionization_Test_of_dNdx_Interpolant(path_to_save + "Ioniz_dNdx_interpol.txt", "dNdx", path_to_tables);
-        Ionization_Test_of_dNdxrnd_Interpolant(path_to_tables + "Ionization_dNdxrnd_interpol.txt", "dNdxRnd", path_to_tables);
+        Ionization_Test_of_dNdxrnd_Interpolant(path_to_save + "Ionization_dNdxrnd_interpol.txt", "dNdxRnd", path_to_tables);
         Ionization_Test_of_e_Interpolant(path_to_save + "Ioniz_e_interpol.txt", "StochasticLoss", path_to_tables);
     }
 
@@ -1929,7 +1929,7 @@ int main(int argc, const char *argv[])
         Photonuclear_Test_of_e(path_to_save + "Photo_e.txt", "StochasticLoss", "");
         Photonuclear_Test_of_dEdx_Interpolant(path_to_save + "Photo_dEdx_interpol.txt", "dEdx", path_to_tables);
         Photonuclear_Test_of_dNdx_Interpolant(path_to_save + "Photo_dNdx_interpol.txt", "dNdx", path_to_tables);
-        Photonuclear_Test_of_dNdxrnd_Interpolant(path_to_tables + "Photonuclear_dNdxrnd_interpol.txt", "dNdxRnd", path_to_tables);
+        Photonuclear_Test_of_dNdxrnd_Interpolant(path_to_save + "Photonuclear_dNdxrnd_interpol.txt", "dNdxRnd", path_to_tables);
         Photonuclear_Test_of_e_Interpolant(path_to_save + "Photo_e_interpol.txt", "StochasticLoss", path_to_tables);
     }
 
