@@ -173,6 +173,7 @@ IF(ADD_TESTFILE_GEN)
 	ADD_EXECUTABLE(generate_testfiles
 			private/testfile_generator/testfile_generator.cxx
 	)
+	SET_SOURCE_FILES_PROPERTIES(private/testfile_generator/testfile_generator.cxx PROPERTIES COMPILE_FLAGS -std=c++11)
 	TARGET_LINK_LIBRARIES(generate_testfiles PROPOSAL)
 	INSTALL(TARGETS generate_testfiles DESTINATION bin)
 ENDIF(ADD_TESTFILE_GEN)
