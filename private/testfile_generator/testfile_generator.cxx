@@ -1,5 +1,6 @@
 
 #include <iostream>
+#include <sys/stat.h>
 #include <string>
 #include <random>
 
@@ -14,6 +15,24 @@
 #include "PROPOSAL/Propagator.h"
 
 using namespace PROPOSAL;
+
+// ------------------------------------------------------------------------- //
+// Check if Directory exists
+// ------------------------------------------------------------------------- //
+
+bool is_dir(std::string pathname)
+{
+    struct stat sb;
+
+    if (stat(pathname.c_str(), &sb) == 0 && S_ISDIR(sb.st_mode))
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
 
 // ------------------------------------------------------------------------- //
 // Simple commandline parser
@@ -1804,8 +1823,16 @@ int main(int argc, const char *argv[])
 
     if (path_to_tables.empty())
     {
-        path_to_tables = "../resources/tables";
-        std::cout << "Warning: No path given! Path to tables is set to " << "\"" << path_to_tables << "\"" << std::endl;
+        // std::cout << "Warning: No path given! Path to tables is set to " << "\"" << path_to_tables << "\"" << std::endl;
+        std::cout << "Warning: No path given! Interplolation tables will be stored in memory." << std::endl;
+    }
+    else
+    {
+        if (is_dir(path_to_tables) == false)
+        {
+            std::cout << "Warning: Given path \""<< path_to_tables << "\" is not a directory! Interpolation tables will be stored in memory." << std::endl;
+            path_to_tables = "";
+        }
     }
 
     // Path to save tables
@@ -1814,7 +1841,7 @@ int main(int argc, const char *argv[])
     if (path_to_save.empty())
     {
         path_to_save = "";
-        std::cout << "Tables will be save to " << "\"" << "." << "\"" << std::endl;
+        std::cout << "Warning: No destination path given! Test tables will be save to " << "\"" << "." << "\"" << std::endl;
     }
     else
     {
@@ -1823,8 +1850,18 @@ int main(int argc, const char *argv[])
         {
             path_to_save.append("/");
         }
-        std::cout << "Tables will be save to " << "\"" << path_to_save << "\"" << std::endl;
+
+        if (is_dir(path_to_save) == false)
+        {
+            std::cout << "Warning: Given destination path \""<< path_to_save << "\" is not a directory! Test tables will be saved in \".\" ." << std::endl;
+            path_to_save = "";
+        }
+        else
+        {
+            std::cout << "Test tables will be save to " << "\"" << path_to_save << "\"" << std::endl;
+        }
     }
+
 
     // Test decision
     std::string opt_brems = "brems";
