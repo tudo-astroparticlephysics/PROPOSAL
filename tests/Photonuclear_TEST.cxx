@@ -193,8 +193,6 @@ TEST(Photonuclear , Set_Up ) {
     double vcut;
     string mediumName;
     string particleName;
-    int shadow;
-    int bb;
     int para;
 
     cout.precision(16);
@@ -204,7 +202,7 @@ TEST(Photonuclear , Set_Up ) {
     bool first = true;
     while(in.good())
     {
-        if(first)in>>para>>bb>>shadow>>ecut>>vcut>>energy>>mediumName>>particleName>>dEdx;
+        if(first)in>>para>>ecut>>vcut>>energy>>mediumName>>particleName>>dEdx;
         energy_old  = -1;
 
         i++;
@@ -214,40 +212,44 @@ TEST(Photonuclear , Set_Up ) {
         CombOfEnergyCutSettings.push_back(new EnergyCutSettings(ecut,vcut));
         CombOfPhoto.push_back(new Photonuclear(CombOfParticle.at(i), CombOfMedium.at(i), CombOfEnergyCutSettings.at(i)));
 
-        // Now: parametrization_ = 1,  Former: form=1 and bb=1 Kokoulin
-        // Now: parametrization_ = 2,  Former: form=2 and bb=1 Kokoulin + hard component
-        // Now: parametrization_ = 3,  Former: form=1 and bb=2 Rhode
-        // Now: parametrization_ = 4,  Former: form=2 and bb=2 Rhode + hard component
-        // Now: parametrization_ = 5,  Former: form=1 and bb=3 Bezrukov/Bugaev
-        // Now: parametrization_ = 6,  Former: form=2 and bb=3 Bezrukov/Bugaev + hard component
-        // Now: parametrization_ = 7,  Former: form=1 and bb=4 Zeus
-        // Now: parametrization_ = 8,  Former: form=2 and bb=4 Zeus + hard component
-        // Now: parametrization_ = 9,  Former: form=3 and bb=1 shadow=1 ALLM 91
-        // Now: parametrization_ = 10, Former: form=3 and bb=1 shadow=2 ALLM 91
-        // Now: parametrization_ = 11, Former: form=3 and bb=2 shadow=1 ALLM 97
-        // Now: parametrization_ = 12, Former: form=3 and bb=2 shadow=2 ALLM 97
-        // Now: parametrization_ = 13, Former: form=4 and bb=1 shadow=1 Butkevich/Mikhailov
-        // Now: parametrization_ = 14, Former: form=4 and bb=1 shadow=2 Butkevich/Mikhailov
+        // Now: parametrization_ =  31,  Former: form=1 and bb=1 Kokoulin
+        // Now: parametrization_ = -31,  Former: form=2 and bb=1 Kokoulin + hard component
+        // Now: parametrization_ =  32,  Former: form=1 and bb=2 Rhode
+        // Now: parametrization_ = -32,  Former: form=2 and bb=2 Rhode + hard component
+        // Now: parametrization_ =  33,  Former: form=1 and bb=3 Bezrukov/Bugaev
+        // Now: parametrization_ = -33,  Former: form=2 and bb=3 Bezrukov/Bugaev + hard component
+        // Now: parametrization_ =  34,  Former: form=1 and bb=4 Zeus
+        // Now: parametrization_ = -34,  Former: form=2 and bb=4 Zeus + hard component
+        // Now: parametrization_ =  35,  Former: form=3 and bb=1 shadow=1 ALLM 91
+        // Now: parametrization_ = -35, Former: form=3 and bb=1 shadow=2 ALLM 91
+        // Now: parametrization_ =  36, Former: form=3 and bb=2 shadow=1 ALLM 97
+        // Now: parametrization_ = -36, Former: form=3 and bb=2 shadow=2 ALLM 97
+        // Now: parametrization_ =  37, Former: form=4 and bb=1 shadow=1 Butkevich/Mikhailov
+        // Now: parametrization_ = -37, Former: form=4 and bb=1 shadow=2 Butkevich/Mikhailov
+        // Now: parametrization_ =  38, New parametrization for supersymmetric particles
+        // Now: parametrization_ = -38, New parametrization for supersymmetric particles
 
-        if(bb==1&&para==1)CombOfPhoto.at(i)->SetParametrization(ParametrizationType::PhotoKokoulinShadowBezrukovSoft);
-        if(bb==1&&para==2)CombOfPhoto.at(i)->SetParametrization(ParametrizationType::PhotoKokoulinShadowBezrukovHard);
-        if(bb==2&&para==1)CombOfPhoto.at(i)->SetParametrization(ParametrizationType::PhotoRhodeShadowBezrukovSoft);
-        if(bb==2&&para==2)CombOfPhoto.at(i)->SetParametrization(ParametrizationType::PhotoRhodeShadowBezrukovHard);
-        if(bb==3&&para==1)CombOfPhoto.at(i)->SetParametrization(ParametrizationType::PhotoBezrukovBugaevShadowBezrukovSoft);
-        if(bb==3&&para==2)CombOfPhoto.at(i)->SetParametrization(ParametrizationType::PhotoBezrukovBugaevShadowBezrukovHard);
-        if(bb==4&&para==1)CombOfPhoto.at(i)->SetParametrization(ParametrizationType::PhotoZeusShadowBezrukovSoft);
-        if(bb==4&&para==2)CombOfPhoto.at(i)->SetParametrization(ParametrizationType::PhotoZeusShadowBezrukovHard);
-        if(bb==1&&para==3&&shadow==1)CombOfPhoto.at(i)->SetParametrization(ParametrizationType::PhotoAbramowiczLevinLevyMaor91ShadowDutta);
-        if(bb==1&&para==3&&shadow==2)CombOfPhoto.at(i)->SetParametrization(ParametrizationType::PhotoAbramowiczLevinLevyMaor91ShadowButkevich);
-        if(bb==2&&para==3&&shadow==1)CombOfPhoto.at(i)->SetParametrization(ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowDutta);
-        if(bb==2&&para==3&&shadow==2)CombOfPhoto.at(i)->SetParametrization(ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich);
-        if(bb==1&&para==4&&shadow==1)CombOfPhoto.at(i)->SetParametrization(ParametrizationType::PhotoButkevichMikhailovShadowDutta);
-        if(bb==1&&para==4&&shadow==2)CombOfPhoto.at(i)->SetParametrization(ParametrizationType::PhotoButkevichMikhailovShadowButkevich);
+        if(para ==  31)CombOfPhoto.at(i)->SetParametrization(ParametrizationType::PhotoKokoulinShadowBezrukovSoft);
+        if(para == -31)CombOfPhoto.at(i)->SetParametrization(ParametrizationType::PhotoKokoulinShadowBezrukovHard);
+        if(para ==  32)CombOfPhoto.at(i)->SetParametrization(ParametrizationType::PhotoRhodeShadowBezrukovSoft);
+        if(para == -32)CombOfPhoto.at(i)->SetParametrization(ParametrizationType::PhotoRhodeShadowBezrukovHard);
+        if(para ==  33)CombOfPhoto.at(i)->SetParametrization(ParametrizationType::PhotoBezrukovBugaevShadowBezrukovSoft);
+        if(para == -33)CombOfPhoto.at(i)->SetParametrization(ParametrizationType::PhotoBezrukovBugaevShadowBezrukovHard);
+        if(para ==  34)CombOfPhoto.at(i)->SetParametrization(ParametrizationType::PhotoZeusShadowBezrukovSoft);
+        if(para == -34)CombOfPhoto.at(i)->SetParametrization(ParametrizationType::PhotoZeusShadowBezrukovHard);
+        if(para ==  35)CombOfPhoto.at(i)->SetParametrization(ParametrizationType::PhotoAbramowiczLevinLevyMaor91ShadowDutta);
+        if(para == -35)CombOfPhoto.at(i)->SetParametrization(ParametrizationType::PhotoAbramowiczLevinLevyMaor91ShadowButkevich);
+        if(para ==  36)CombOfPhoto.at(i)->SetParametrization(ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowDutta);
+        if(para == -36)CombOfPhoto.at(i)->SetParametrization(ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich);
+        if(para ==  37)CombOfPhoto.at(i)->SetParametrization(ParametrizationType::PhotoButkevichMikhailovShadowDutta);
+        if(para == -37)CombOfPhoto.at(i)->SetParametrization(ParametrizationType::PhotoButkevichMikhailovShadowButkevich);
+        if(para ==  38)CombOfPhoto.at(i)->SetParametrization(ParametrizationType::PhotoRenoSarcevicSuShadowDutta);
+        if(para == -38)CombOfPhoto.at(i)->SetParametrization(ParametrizationType::PhotoRenoSarcevicSuShadowButkevich);
 
         while(energy_old < energy)
         {
             energy_old = energy;
-            in>>para>>bb>>shadow>>ecut>>vcut>>energy>>mediumName>>particleName>>dEdx;
+            in>>para>>ecut>>vcut>>energy>>mediumName>>particleName>>dEdx;
         }
     }
 }
@@ -267,8 +269,6 @@ TEST(Photonuclear , Test_of_e ) {
     double vcut;
     string mediumName;
     string particleName;
-    int shadow;
-    int bb;
     int para;
     double precision = 1E-6;
 
@@ -281,7 +281,7 @@ TEST(Photonuclear , Test_of_e ) {
     int i = -1;
     while(in.good())
     {
-        if(first)in>>para>>bb>>shadow>>ecut>>vcut>>energy>>mediumName>>particleName>>e;
+        if(first)in>>para>>ecut>>vcut>>energy>>mediumName>>particleName>>e;
         first = false;
         energy_old = -1;
 
@@ -311,7 +311,7 @@ TEST(Photonuclear , Test_of_e ) {
 
             ASSERT_NEAR(e_new, e, precision*e);
 
-            in>>para>>bb>>shadow>>ecut>>vcut>>energy>>mediumName>>particleName>>e;
+            in>>para>>ecut>>vcut>>energy>>mediumName>>particleName>>e;
         }
     }
     delete Rand;
@@ -333,8 +333,6 @@ TEST(Photonuclear , Test_of_dNdxrnd ) {
     double vcut;
     string mediumName;
     string particleName;
-    int shadow;
-    int bb;
     int para;
     double precision = 1E-6;
 
@@ -345,7 +343,7 @@ TEST(Photonuclear , Test_of_dNdxrnd ) {
     int i=-1;
     while(in.good())
     {
-        if(first)in>>para>>bb>>shadow>>ecut>>vcut>>energy>>mediumName>>particleName>>dNdxrnd;
+        if(first)in>>para>>ecut>>vcut>>energy>>mediumName>>particleName>>dNdxrnd;
         first = false;
         energy_old = -1;
 
@@ -369,7 +367,7 @@ TEST(Photonuclear , Test_of_dNdxrnd ) {
 
             ASSERT_NEAR(dNdxrnd_new, dNdxrnd, precision*dNdxrnd);
 
-            in>>para>>bb>>shadow>>ecut>>vcut>>energy>>mediumName>>particleName>>dNdxrnd;
+            in>>para>>ecut>>vcut>>energy>>mediumName>>particleName>>dNdxrnd;
         }
     }
     delete Rand;
@@ -391,8 +389,6 @@ TEST(Photonuclear , Test_of_dNdx ) {
     double vcut;
     string mediumName;
     string particleName;
-    int shadow;
-    int bb;
     int para;
 
     double precision = 1E-6;
@@ -402,7 +398,7 @@ TEST(Photonuclear , Test_of_dNdx ) {
     int i=-1;
     while(in.good())
     {
-        if(first)in>>para>>bb>>shadow>>ecut>>vcut>>energy>>mediumName>>particleName>>dNdx;
+        if(first)in>>para>>ecut>>vcut>>energy>>mediumName>>particleName>>dNdx;
         first = false;
         energy_old = -1;
 
@@ -424,7 +420,7 @@ TEST(Photonuclear , Test_of_dNdx ) {
             }
             ASSERT_NEAR(dNdx_new, dNdx, precision*dNdx);
 
-            in>>para>>bb>>shadow>>ecut>>vcut>>energy>>mediumName>>particleName>>dNdx;
+            in>>para>>ecut>>vcut>>energy>>mediumName>>particleName>>dNdx;
         }
     }
 }
@@ -444,8 +440,6 @@ TEST(Photonuclear , Test_of_dEdx ) {
     double vcut;
     string mediumName;
     string particleName;
-    int shadow;
-    int bb;
     int para;
     double dEdx_new;
 
@@ -455,7 +449,7 @@ TEST(Photonuclear , Test_of_dEdx ) {
     double energy_old;
     while(in.good())
     {
-        in>>para>>bb>>shadow>>ecut>>vcut>>energy>>mediumName>>particleName>>dEdx;
+        in>>para>>ecut>>vcut>>energy>>mediumName>>particleName>>dEdx;
         energy_old = -1;
         i++;
         while(energy_old < energy)
@@ -467,7 +461,7 @@ TEST(Photonuclear , Test_of_dEdx ) {
 
             ASSERT_NEAR(dEdx_new, dEdx, 1E-6*dEdx);
 
-            in>>para>>bb>>shadow>>ecut>>vcut>>energy>>mediumName>>particleName>>dEdx;
+            in>>para>>ecut>>vcut>>energy>>mediumName>>particleName>>dEdx;
         }
     }
 }
@@ -488,8 +482,6 @@ TEST(Photonuclear , Test_of_dEdx_interpol ) {
     double vcut;
     string mediumName;
     string particleName;
-    int shadow;
-    int bb;
     int para;
     double precision = 1E-5;
 
@@ -498,7 +490,7 @@ TEST(Photonuclear , Test_of_dEdx_interpol ) {
     int i = -1;
     while(in.good())
     {
-        if(first)in>>para>>bb>>shadow>>ecut>>vcut>>energy>>mediumName>>particleName>>dEdx;
+        if(first)in>>para>>ecut>>vcut>>energy>>mediumName>>particleName>>dEdx;
         first = false;
         energy_old = -1;
 
@@ -515,7 +507,7 @@ TEST(Photonuclear , Test_of_dEdx_interpol ) {
 
             ASSERT_NEAR(dEdx_new, dEdx, precision*dEdx);
 
-            in>>para>>bb>>shadow>>ecut>>vcut>>energy>>mediumName>>particleName>>dEdx;
+            in>>para>>ecut>>vcut>>energy>>mediumName>>particleName>>dEdx;
         }
     }
 }
@@ -536,8 +528,6 @@ TEST(Photonuclear , Test_of_dNdx_interpol ) {
     double vcut;
     string mediumName;
     string particleName;
-    int shadow;
-    int bb;
     int para;
     double precision = 1E-2;
 
@@ -547,7 +537,7 @@ TEST(Photonuclear , Test_of_dNdx_interpol ) {
     int i=-1;
     while(in.good())
     {
-        if(first)in>>para>>bb>>shadow>>ecut>>vcut>>energy>>mediumName>>particleName>>dNdx;
+        if(first)in>>para>>ecut>>vcut>>energy>>mediumName>>particleName>>dNdx;
         first = false;
         energy_old = -1;
 
@@ -571,7 +561,7 @@ TEST(Photonuclear , Test_of_dNdx_interpol ) {
 
             ASSERT_NEAR(dNdx_new, dNdx, precision*dNdx);
 
-            in>>para>>bb>>shadow>>ecut>>vcut>>energy>>mediumName>>particleName>>dNdx;
+            in>>para>>ecut>>vcut>>energy>>mediumName>>particleName>>dNdx;
         }
     }
 }
@@ -591,8 +581,6 @@ TEST(Photonuclear , Test_of_dNdxrnd_interpol ) {
     double vcut;
     string mediumName;
     string particleName;
-    int shadow;
-    int bb;
     int para;
     double precision = 1E-2;
 
@@ -603,7 +591,7 @@ TEST(Photonuclear , Test_of_dNdxrnd_interpol ) {
     int i=-1;
     while(in.good())
     {
-        if(first)in>>para>>bb>>shadow>>ecut>>vcut>>energy>>mediumName>>particleName>>dNdxrnd;
+        if(first)in>>para>>ecut>>vcut>>energy>>mediumName>>particleName>>dNdxrnd;
         first = false;
         energy_old = -1;
 
@@ -628,7 +616,7 @@ TEST(Photonuclear , Test_of_dNdxrnd_interpol ) {
 
             ASSERT_NEAR(dNdxrnd_new, dNdxrnd, precision*dNdxrnd);
 
-            in>>para>>bb>>shadow>>ecut>>vcut>>energy>>mediumName>>particleName>>dNdxrnd;
+            in>>para>>ecut>>vcut>>energy>>mediumName>>particleName>>dNdxrnd;
         }
     }
     delete Rand;
@@ -649,8 +637,6 @@ TEST(Photonuclear , Test_of_e_interpol ) {
     double vcut;
     string mediumName;
     string particleName;
-    int shadow;
-    int bb;
     int para;
     double precision = 1E-2;
 
@@ -663,7 +649,7 @@ TEST(Photonuclear , Test_of_e_interpol ) {
     int i=-1;
     while(in.good())
     {
-        if(first)in>>para>>bb>>shadow>>ecut>>vcut>>energy>>mediumName>>particleName>>e;
+        if(first)in>>para>>ecut>>vcut>>energy>>mediumName>>particleName>>e;
         first = false;
         energy_old = -1;
 
@@ -692,7 +678,7 @@ TEST(Photonuclear , Test_of_e_interpol ) {
 
             ASSERT_NEAR(e_new, e, precision*e);
 
-            in>>para>>bb>>shadow>>ecut>>vcut>>energy>>mediumName>>particleName>>e;
+            in>>para>>ecut>>vcut>>energy>>mediumName>>particleName>>e;
         }
     }
     delete Rand;

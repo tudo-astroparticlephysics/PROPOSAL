@@ -731,7 +731,7 @@ void PROPOSALParticle::InitParticle(ParticleType::Enum type){
         default:
             log_warn("The particle type '%i' is set to Unknown!", type);
             type = ParticleType::unknown;
-            name_ = "Unkown";
+            name_ = "Unknown";
             mass_ = 0;
             lifetime_ = 0;
             break;
@@ -1031,6 +1031,7 @@ ParticleType::Enum PROPOSALParticle::GetTypeFromName(std::string particle_name)
     else if (particle_name.compare("NuclInt") == 0) return ParticleType::NuclInt;
     else if (particle_name.compare("Hadrons") == 0) return ParticleType::Hadrons;
     else if (particle_name.compare("EPair") == 0) return ParticleType::EPair;
+    else if (particle_name.compare("Unknown") == 0) return ParticleType::unknown;
     else
     {
         log_fatal("the particle name '%s' is not a PROPOSAL Particle", particle_name.c_str());
