@@ -195,8 +195,6 @@ TEST(ProcessCollection , Set_Up ) {
     char firstLine[256];
     in.getline(firstLine,256);
 
-    double e;
-    double e_new;
     double energy;
     double ecut;
     double vcut;
@@ -236,7 +234,7 @@ TEST(ProcessCollection , Set_Up ) {
             }
         }
 
-        CombOfProcColl.at(i)->EnableInterpolation();
+        CombOfProcColl.at(i)->EnableInterpolation("../resources/tables");
         log_info("ecut = %f\tvcut = %f\tlpm = %s\tenergy = %f\tmed = %s\tparticleName = %s" ,ecut,vcut,(lpm)?"true":"false",energy,mediumName.c_str(),particleName.c_str());
         while(energy_old < energy)
         {
@@ -261,8 +259,6 @@ TEST(ProcessCollection , Stochasticity)
     char firstLine[256];
     in.getline(firstLine,256);
 
-    double e;
-    double e_new;
     double energy;
     double ecut;
     double vcut;
@@ -273,23 +269,13 @@ TEST(ProcessCollection , Stochasticity)
     cout.precision(16);
     double energy_old=-1;
 
-    vector<ParticleType::Enum> XSecTypes;
-
-    XSecTypes.push_back(ParticleType::Brems);
-    XSecTypes.push_back(ParticleType::EPair);
-    XSecTypes.push_back(ParticleType::NuclInt);
-    XSecTypes.push_back(ParticleType::DeltaE);
-
     bool first = true;
     int NumberOfEvents, IonizEvents,BremsEvents,PhotoEvents,EpairEvents;
     int NewIonizEvents,NewBremsEvents,NewPhotoEvents,NewEpairEvents;
     int DevIonizEvents,DevBremsEvents,DevPhotoEvents,DevEpairEvents;
-    int foundXSecAt;
 
-    RndFromFile* Rand = new RndFromFile("bin/TestFiles/rnd.txt");
-    RndFromFile* Rand2 = new RndFromFile("bin/TestFiles/rnd.txt");
-    Rand2->rnd();
-            ProcessCollection* ProcColl;
+    ProcessCollection* ProcColl = NULL;
+
     while(in.good())
     {
         if(first)in>>ecut>>vcut>>lpm>>energy>>mediumName>>particleName>> IonizEvents >> BremsEvents >> PhotoEvents >> EpairEvents;
@@ -303,30 +289,52 @@ TEST(ProcessCollection , Stochasticity)
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
 
-        int i=0;
-        //cout << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << mediumName << "\t" << particleName <<  endl;
-        while(i< CombOfProcColl.size())
+        // int i=0;
+        // //cout << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << mediumName << "\t" << particleName <<  endl;
+        // while(i< CombOfProcColl.size())
+        // {
+        //     if(         particle->GetType() != CombOfParticle.at(i)->GetType()
+        //             &&  !medium->GetName().compare(CombOfMedium.at(i)->GetName())
+        //             &&  *cuts == *CombOfEnergyCutSettings.at(i))
+        //         break;
+        //     i++;
+        // }
+        //
+        // if(i<CombOfProcColl.size())
+        // {
+        //     ProcColl = CombOfProcColl.at(i);
+        //     //cout << "found cross Section!" << endl;
+        //     //cout << CombOfEnergyCutSettings.at(i)->GetEcut() << "\t" << CombOfEnergyCutSettings.at(i)->GetVcut() << "\t" << CombOfMedium.at(i)->GetName() << "\t" << CombOfParticle.at(i)->GetName() << endl;
+        // }
+        // else
+        // {
+        //     ProcColl = new ProcessCollection(particle, medium, cuts);
+        // }
+
+        bool found_ProcColl = false;
+
+        for (std::vector<ProcessCollection*>::iterator it = CombOfProcColl.begin(); it != CombOfProcColl.end(); ++it)
         {
-            if(         particle->GetType() != CombOfParticle.at(i)->GetType()
-                    &&  !medium->GetName().compare(CombOfMedium.at(i)->GetName())
-                    &&  *cuts == *CombOfEnergyCutSettings.at(i))
+            if (particle->GetType() == (*it)->GetParticle()->GetType() &&
+                medium->GetType() == (*it)->GetMedium()->GetType() &&
+                *cuts == *(*it)->GetCutSettings())
+            {
+                ProcColl = *it;
+                found_ProcColl = true;
                 break;
-            i++;
+            }
         }
 
-        if(i<CombOfProcColl.size())
-        {
-            ProcColl = CombOfProcColl.at(i);
-            //cout << "found cross Section!" << endl;
-            //cout << CombOfEnergyCutSettings.at(i)->GetEcut() << "\t" << CombOfEnergyCutSettings.at(i)->GetVcut() << "\t" << CombOfMedium.at(i)->GetName() << "\t" << CombOfParticle.at(i)->GetName() << endl;
-        }
-        else
+        if (!found_ProcColl)
         {
             ProcColl = new ProcessCollection(particle, medium, cuts);
+            ProcColl->EnableInterpolation("../resources/tables");
         }
 
         pair<double, ParticleType::Enum> LossReturn;
-        while(energy_old < energy){
+
+        while(energy_old < energy)
+        {
             energy_old = energy;
 
             NewIonizEvents=0;
@@ -336,65 +344,64 @@ TEST(ProcessCollection , Stochasticity)
 
             if(NumberOfEvents!=0)
             {
-            for(int i = 0; i< NumberOfEvents ; i++)
-            {
-                ProcColl->GetParticle()->SetEnergy(energy);
-                LossReturn = ProcColl->MakeStochasticLoss();
-                foundXSecAt = 0;
-                while(foundXSecAt < XSecTypes.size())
+                for(int i = 0; i< NumberOfEvents ; i++)
                 {
-                    if(LossReturn.second == XSecTypes.at(foundXSecAt))break;
-                    foundXSecAt++;
+                    ProcColl->GetParticle()->SetEnergy(energy);
+                    LossReturn = ProcColl->MakeStochasticLoss();
+
+                    switch (LossReturn.second)
+                    {
+                        case ParticleType::Brems:
+                            NewBremsEvents++;
+                            break;
+                        case ParticleType::EPair:
+                            NewEpairEvents++;
+                            break;
+                        case ParticleType::NuclInt:
+                            NewPhotoEvents++;
+                            break;
+                        case ParticleType::DeltaE:
+                            NewIonizEvents++;
+                            break;
+                        default: // Do nothing
+                            break;
+                    }
                 }
 
-                switch (foundXSecAt) {
-                case 0:
-                    NewBremsEvents++;
-                    break;
-                case 1:
-                    NewEpairEvents++;
-                    break;
-                case 2:
-                    NewPhotoEvents++;
-                    break;
-                case 3:
-                    NewIonizEvents++;
-                    break;
-                default:
-                    break;
-                }
-            }
+                DevBremsEvents = CalcDev(NumberOfEvents,NewBremsEvents);
+                DevEpairEvents = CalcDev(NumberOfEvents,NewEpairEvents);
+                DevPhotoEvents = CalcDev(NumberOfEvents,NewPhotoEvents);
+                DevIonizEvents = CalcDev(NumberOfEvents,NewIonizEvents);
 
-            DevBremsEvents = CalcDev(NumberOfEvents,NewBremsEvents);
-            DevEpairEvents = CalcDev(NumberOfEvents,NewEpairEvents);
-            DevPhotoEvents = CalcDev(NumberOfEvents,NewPhotoEvents);
-            DevIonizEvents = CalcDev(NumberOfEvents,NewIonizEvents);
+                DevBremsEvents += CalcDev(NumberOfEvents,BremsEvents);
+                DevEpairEvents += CalcDev(NumberOfEvents,EpairEvents);
+                DevPhotoEvents += CalcDev(NumberOfEvents,PhotoEvents);
+                DevIonizEvents += CalcDev(NumberOfEvents,IonizEvents);
 
-            DevBremsEvents += CalcDev(NumberOfEvents,BremsEvents);
-            DevEpairEvents += CalcDev(NumberOfEvents,EpairEvents);
-            DevPhotoEvents += CalcDev(NumberOfEvents,PhotoEvents);
-            DevIonizEvents += CalcDev(NumberOfEvents,IonizEvents);
+                int NSigmaPruf = 3;
+    //            int NSigmaCout = 1;
 
-            int NSigmaPruf = 3;
-//            int NSigmaCout = 1;
+    //            if(         fabs(BremsEvents-NewBremsEvents) > NSigmaCout*DevBremsEvents
+    //                    ||  fabs(EpairEvents-NewEpairEvents) > NSigmaCout*DevEpairEvents
+    //                    ||  fabs(PhotoEvents-NewPhotoEvents) > NSigmaCout*DevPhotoEvents
+    //                    ||  fabs(IonizEvents-NewIonizEvents) > NSigmaCout*DevIonizEvents)
+    //            {
+    //                cout << NewBremsEvents << "\t" << NewEpairEvents << "\t" << NewPhotoEvents << "\t" << NewIonizEvents << endl;
+    //                cout << BremsEvents << "\t" << EpairEvents << "\t" << PhotoEvents << "\t" << IonizEvents << endl;
+    //            }
 
-//            if(         fabs(BremsEvents-NewBremsEvents) > NSigmaCout*DevBremsEvents
-//                    ||  fabs(EpairEvents-NewEpairEvents) > NSigmaCout*DevEpairEvents
-//                    ||  fabs(PhotoEvents-NewPhotoEvents) > NSigmaCout*DevPhotoEvents
-//                    ||  fabs(IonizEvents-NewIonizEvents) > NSigmaCout*DevIonizEvents)
-//            {
-//                cout << NewBremsEvents << "\t" << NewEpairEvents << "\t" << NewPhotoEvents << "\t" << NewIonizEvents << endl;
-//                cout << BremsEvents << "\t" << EpairEvents << "\t" << PhotoEvents << "\t" << IonizEvents << endl;
-//            }
-
-            ASSERT_NEAR(BremsEvents, NewBremsEvents, NSigmaPruf*DevBremsEvents);
-            ASSERT_NEAR(EpairEvents, NewEpairEvents, NSigmaPruf*DevEpairEvents);
-            ASSERT_NEAR(PhotoEvents, NewPhotoEvents, NSigmaPruf*DevPhotoEvents);
-            ASSERT_NEAR(IonizEvents, NewIonizEvents, NSigmaPruf*DevIonizEvents);
+                ASSERT_NEAR(BremsEvents, NewBremsEvents, NSigmaPruf*DevBremsEvents);
+                ASSERT_NEAR(EpairEvents, NewEpairEvents, NSigmaPruf*DevEpairEvents);
+                ASSERT_NEAR(PhotoEvents, NewPhotoEvents, NSigmaPruf*DevPhotoEvents);
+                ASSERT_NEAR(IonizEvents, NewIonizEvents, NSigmaPruf*DevIonizEvents);
             }
             in>>ecut>>vcut>>lpm>>energy>>mediumName>>particleName>> IonizEvents >> BremsEvents >> PhotoEvents >> EpairEvents;
         }
 
+        if (!found_ProcColl)
+        {
+            delete ProcColl;
+        }
         delete cuts;
         delete medium;
         delete particle;
@@ -427,7 +434,7 @@ TEST(ProcessCollection , Displacement)
     bool first = true;
 
     double ef,dx,dx_new,dist=1;
-    ProcessCollection* ProcColl;
+    ProcessCollection* ProcColl = NULL;
     double RelError = 1E-2;
     while(in.good())
     {
@@ -440,26 +447,46 @@ TEST(ProcessCollection , Displacement)
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
 
-        int i=0;
-        //cout << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << mediumName << "\t" << particleName <<  endl;
-        while(i< CombOfProcColl.size())
+        // int i=0;
+        // //cout << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << mediumName << "\t" << particleName <<  endl;
+        // while(i< CombOfProcColl.size())
+        // {
+        //     if(         particle->GetType() != CombOfParticle.at(i)->GetType()
+        //             &&  !medium->GetName().compare(CombOfMedium.at(i)->GetName())
+        //             &&  *cuts == *CombOfEnergyCutSettings.at(i))
+        //         break;
+        //     i++;
+        // }
+        //
+        // if(i<CombOfProcColl.size())
+        // {
+        //     ProcColl = CombOfProcColl.at(i);
+        //     //cout << "found cross Section!" << endl;
+        //     //cout << CombOfEnergyCutSettings.at(i)->GetEcut() << "\t" << CombOfEnergyCutSettings.at(i)->GetVcut() << "\t" << CombOfMedium.at(i)->GetName() << "\t" << CombOfParticle.at(i)->GetName() << endl;
+        // }
+        // else
+        // {
+        //     ProcColl = new ProcessCollection(particle, medium, cuts);
+        // }
+
+        bool found_ProcColl = false;
+
+        for (std::vector<ProcessCollection*>::iterator it = CombOfProcColl.begin(); it != CombOfProcColl.end(); ++it)
         {
-            if(         particle->GetType() != CombOfParticle.at(i)->GetType()
-                    &&  !medium->GetName().compare(CombOfMedium.at(i)->GetName())
-                    &&  *cuts == *CombOfEnergyCutSettings.at(i))
+            if (particle->GetType() == (*it)->GetParticle()->GetType() &&
+                medium->GetType() == (*it)->GetMedium()->GetType() &&
+                *cuts == *(*it)->GetCutSettings())
+            {
+                ProcColl = *it;
+                found_ProcColl = true;
                 break;
-            i++;
+            }
         }
 
-        if(i<CombOfProcColl.size())
-        {
-            ProcColl = CombOfProcColl.at(i);
-            //cout << "found cross Section!" << endl;
-            //cout << CombOfEnergyCutSettings.at(i)->GetEcut() << "\t" << CombOfEnergyCutSettings.at(i)->GetVcut() << "\t" << CombOfMedium.at(i)->GetName() << "\t" << CombOfParticle.at(i)->GetName() << endl;
-        }
-        else
+        if (!found_ProcColl)
         {
             ProcColl = new ProcessCollection(particle, medium, cuts);
+            ProcColl->EnableInterpolation("../resources/tables");
         }
 
         while(energy_old < energy){
@@ -478,6 +505,10 @@ TEST(ProcessCollection , Displacement)
             in>>ecut>>vcut>>lpm>>mediumName>>particleName>>energy>>ef>>dx;
         }
 
+        if (!found_ProcColl)
+        {
+            delete ProcColl;
+        }
         delete cuts;
         delete medium;
         delete particle;
@@ -529,26 +560,46 @@ TEST(ProcessCollection , TrackingIntegral)
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
 
-        int i=0;
-        //cout << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << mediumName << "\t" << particleName <<  endl;
-        while(i< CombOfProcColl.size())
+        // int i=0;
+        // //cout << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << mediumName << "\t" << particleName <<  endl;
+        // while(i< CombOfProcColl.size())
+        // {
+        //     if(         particle->GetType() != CombOfParticle.at(i)->GetType()
+        //             &&  !medium->GetName().compare(CombOfMedium.at(i)->GetName())
+        //             &&  *cuts == *CombOfEnergyCutSettings.at(i))
+        //         break;
+        //     i++;
+        // }
+        //
+        // if(i<CombOfProcColl.size())
+        // {
+        //     ProcColl = CombOfProcColl.at(i);
+        //     //cout << "found cross Section!" << endl;
+        //     //cout << CombOfEnergyCutSettings.at(i)->GetEcut() << "\t" << CombOfEnergyCutSettings.at(i)->GetVcut() << "\t" << CombOfMedium.at(i)->GetName() << "\t" << CombOfParticle.at(i)->GetName() << endl;
+        // }
+        // else
+        // {
+        //     ProcColl = new ProcessCollection(particle, medium, cuts);
+        // }
+
+        bool found_ProcColl = false;
+
+        for (std::vector<ProcessCollection*>::iterator it = CombOfProcColl.begin(); it != CombOfProcColl.end(); ++it)
         {
-            if(         particle->GetType() != CombOfParticle.at(i)->GetType()
-                    &&  !medium->GetName().compare(CombOfMedium.at(i)->GetName())
-                    &&  *cuts == *CombOfEnergyCutSettings.at(i))
+            if (particle->GetType() == (*it)->GetParticle()->GetType() &&
+                medium->GetType() == (*it)->GetMedium()->GetType() &&
+                *cuts == *(*it)->GetCutSettings())
+            {
+                ProcColl = *it;
+                found_ProcColl = true;
                 break;
-            i++;
+            }
         }
 
-        if(i<CombOfProcColl.size())
-        {
-            ProcColl = CombOfProcColl.at(i);
-            //cout << "found cross Section!" << endl;
-            //cout << CombOfEnergyCutSettings.at(i)->GetEcut() << "\t" << CombOfEnergyCutSettings.at(i)->GetVcut() << "\t" << CombOfMedium.at(i)->GetName() << "\t" << CombOfParticle.at(i)->GetName() << endl;
-        }
-        else
+        if (!found_ProcColl)
         {
             ProcColl = new ProcessCollection(particle, medium, cuts);
+            ProcColl->EnableInterpolation("../resources/tables");
         }
 
         double rndtmp = 0.1;
@@ -568,6 +619,10 @@ TEST(ProcessCollection , TrackingIntegral)
             in>>ecut>>vcut>>lpm>>mediumName>>particleName>> particle_interaction >> energy>>tracking;
         }
 
+        if (!found_ProcColl)
+        {
+            delete ProcColl;
+        }
         delete cuts;
         delete medium;
         delete particle;
@@ -617,28 +672,47 @@ TEST(ProcessCollection , FinalEnergyDist)
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
 
-        int i=0;
-        //cout << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << mediumName << "\t" << particleName <<  endl;
-        while(i< CombOfProcColl.size())
+        // int i=0;
+        // //cout << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << mediumName << "\t" << particleName <<  endl;
+        // while(i< CombOfProcColl.size())
+        // {
+        //     if(         particle->GetType() != CombOfParticle.at(i)->GetType()
+        //             &&  !medium->GetName().compare(CombOfMedium.at(i)->GetName())
+        //             &&  *cuts == *CombOfEnergyCutSettings.at(i))
+        //         break;
+        //     i++;
+        // }
+        //
+        // if(i<CombOfProcColl.size())
+        // {
+        //     ProcColl = CombOfProcColl.at(i);
+        //     //cout << "found cross Section!" << endl;
+        //     //cout << CombOfEnergyCutSettings.at(i)->GetEcut() << "\t" << CombOfEnergyCutSettings.at(i)->GetVcut() << "\t" << CombOfMedium.at(i)->GetName() << "\t" << CombOfParticle.at(i)->GetName() << endl;
+        // }
+        // else
+        // {
+        //     ProcColl = new ProcessCollection(particle, medium, cuts);
+        // }
+
+        bool found_ProcColl = false;
+
+        for (std::vector<ProcessCollection*>::iterator it = CombOfProcColl.begin(); it != CombOfProcColl.end(); ++it)
         {
-            if(         particle->GetType() != CombOfParticle.at(i)->GetType()
-                    &&  !medium->GetName().compare(CombOfMedium.at(i)->GetName())
-                    &&  *cuts == *CombOfEnergyCutSettings.at(i))
+            if (particle->GetType() == (*it)->GetParticle()->GetType() &&
+                medium->GetType() == (*it)->GetMedium()->GetType() &&
+                *cuts == *(*it)->GetCutSettings())
+            {
+                ProcColl = *it;
+                found_ProcColl = true;
                 break;
-            i++;
+            }
         }
 
-        if(i<CombOfProcColl.size())
-        {
-            ProcColl = CombOfProcColl.at(i);
-            //cout << "found cross Section!" << endl;
-            //cout << CombOfEnergyCutSettings.at(i)->GetEcut() << "\t" << CombOfEnergyCutSettings.at(i)->GetVcut() << "\t" << CombOfMedium.at(i)->GetName() << "\t" << CombOfParticle.at(i)->GetName() << endl;
-        }
-        else
+        if (!found_ProcColl)
         {
             ProcColl = new ProcessCollection(particle, medium, cuts);
+            ProcColl->EnableInterpolation("../resources/tables");
         }
-
 
         while(energy_old < energy)
         {
@@ -658,6 +732,10 @@ TEST(ProcessCollection , FinalEnergyDist)
             in>>ecut>>vcut>>lpm>>mediumName>>particleName>> dist >> energy>>ef>>finalenergy;
         }
 
+        if (!found_ProcColl)
+        {
+            delete ProcColl;
+        }
         delete cuts;
         delete medium;
         delete particle;
@@ -709,26 +787,46 @@ TEST(ProcessCollection , MakeDecay)
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
 
-        int i=0;
-        //cout << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << mediumName << "\t" << particleName <<  endl;
-        while(i< CombOfProcColl.size())
+        // int i=0;
+        // //cout << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << mediumName << "\t" << particleName <<  endl;
+        // while(i< CombOfProcColl.size())
+        // {
+        //     if(         particle->GetType() != CombOfParticle.at(i)->GetType()
+        //             &&  !medium->GetName().compare(CombOfMedium.at(i)->GetName())
+        //             &&  *cuts == *CombOfEnergyCutSettings.at(i))
+        //         break;
+        //     i++;
+        // }
+        //
+        // if(i<CombOfProcColl.size())
+        // {
+        //     ProcColl = CombOfProcColl.at(i);
+        //     //cout << CombOfEnergyCutSettings.at(i)->GetEcut() << "\t" << CombOfEnergyCutSettings.at(i)->GetVcut() << "\t" << CombOfMedium.at(i)->GetName() << "\t" << CombOfParticle.at(i)->GetName() << endl;
+        // }
+        // else
+        // {
+        //     ProcColl = new ProcessCollection(particle, medium, cuts);
+        //     //ProcColl->EnableInterpolation();
+        // }
+
+        bool found_ProcColl = false;
+
+        for (std::vector<ProcessCollection*>::iterator it = CombOfProcColl.begin(); it != CombOfProcColl.end(); ++it)
         {
-            if(         particle->GetType() != CombOfParticle.at(i)->GetType()
-                    &&  !medium->GetName().compare(CombOfMedium.at(i)->GetName())
-                    &&  *cuts == *CombOfEnergyCutSettings.at(i))
+            if (particle->GetType() == (*it)->GetParticle()->GetType() &&
+                medium->GetType() == (*it)->GetMedium()->GetType() &&
+                *cuts == *(*it)->GetCutSettings())
+            {
+                ProcColl = *it;
+                found_ProcColl = true;
                 break;
-            i++;
+            }
         }
 
-        if(i<CombOfProcColl.size())
-        {
-            ProcColl = CombOfProcColl.at(i);
-            //cout << CombOfEnergyCutSettings.at(i)->GetEcut() << "\t" << CombOfEnergyCutSettings.at(i)->GetVcut() << "\t" << CombOfMedium.at(i)->GetName() << "\t" << CombOfParticle.at(i)->GetName() << endl;
-        }
-        else
+        if (!found_ProcColl)
         {
             ProcColl = new ProcessCollection(particle, medium, cuts);
-            //ProcColl->EnableInterpolation();
+            ProcColl->EnableInterpolation("../resources/tables");
         }
 
         while(energy_old <= energy && in.good()){
@@ -749,11 +847,16 @@ TEST(ProcessCollection , MakeDecay)
 //            }
 
             ASSERT_NEAR(Decay_new.first, Decay_old.first, RelError*Decay_new.first);
-            ASSERT_FALSE(   Decay_old.second ==   Decay_new.second                );
+            ASSERT_TRUE(   Decay_old.second ==   Decay_new.second                );
 
             in>>ecut>>vcut>>lpm>>mediumName>>particleName>> rnd1>>rnd2>>rnd3 >> energy>> Decay_old.first >> old_decay_second_string;
+            Decay_old.second = PROPOSALParticle::GetTypeFromName(old_decay_second_string);
         }
 
+        if (!found_ProcColl)
+        {
+            delete ProcColl;
+        }
         delete cuts;
         delete medium;
         delete particle;
@@ -804,27 +907,47 @@ TEST(ProcessCollection , FinalEnergyParticleInteraction)
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
 
-        int i=0;
-        //cout << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << mediumName << "\t" << particleName <<  endl;
-        while(i< CombOfProcColl.size())
+        // int i=0;
+        // //cout << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << mediumName << "\t" << particleName <<  endl;
+        // while(i< CombOfProcColl.size())
+        // {
+        //     if(         particle->GetType() != CombOfParticle.at(i)->GetType()
+        //             &&  !medium->GetName().compare(CombOfMedium.at(i)->GetName())
+        //             &&  *cuts == *CombOfEnergyCutSettings.at(i))
+        //         break;
+        //     i++;
+        // }
+        //
+        // if(i<CombOfProcColl.size())
+        // {
+        //     ProcColl = CombOfProcColl.at(i);
+        //     //cout << "found cross Section!" << endl;
+        //     //cout << CombOfEnergyCutSettings.at(i)->GetEcut() << "\t" << CombOfEnergyCutSettings.at(i)->GetVcut() << "\t" << CombOfMedium.at(i)->GetName() << "\t" << CombOfParticle.at(i)->GetName() << endl;
+        // }
+        // else
+        // {
+        //     ProcColl = new ProcessCollection(particle, medium, cuts);
+        //     ProcColl->EnableInterpolation();
+        // }
+
+        bool found_ProcColl = false;
+
+        for (std::vector<ProcessCollection*>::iterator it = CombOfProcColl.begin(); it != CombOfProcColl.end(); ++it)
         {
-            if(         particle->GetType() != CombOfParticle.at(i)->GetType()
-                    &&  !medium->GetName().compare(CombOfMedium.at(i)->GetName())
-                    &&  *cuts == *CombOfEnergyCutSettings.at(i))
+            if (particle->GetType() == (*it)->GetParticle()->GetType() &&
+                medium->GetType() == (*it)->GetMedium()->GetType() &&
+                *cuts == *(*it)->GetCutSettings())
+            {
+                ProcColl = *it;
+                found_ProcColl = true;
                 break;
-            i++;
+            }
         }
 
-        if(i<CombOfProcColl.size())
-        {
-            ProcColl = CombOfProcColl.at(i);
-            //cout << "found cross Section!" << endl;
-            //cout << CombOfEnergyCutSettings.at(i)->GetEcut() << "\t" << CombOfEnergyCutSettings.at(i)->GetVcut() << "\t" << CombOfMedium.at(i)->GetName() << "\t" << CombOfParticle.at(i)->GetName() << endl;
-        }
-        else
+        if (!found_ProcColl)
         {
             ProcColl = new ProcessCollection(particle, medium, cuts);
-            ProcColl->EnableInterpolation();
+            ProcColl->EnableInterpolation("../resources/tables");
         }
 
         while(energy_old < energy){
@@ -844,6 +967,10 @@ TEST(ProcessCollection , FinalEnergyParticleInteraction)
             in>>ecut>>vcut>>lpm>>mediumName>>particleName>> energy>> particle_interaction >> rnd >> FinalEnergy;
         }
 
+        if (!found_ProcColl)
+        {
+            delete ProcColl;
+        }
         delete cuts;
         delete medium;
         delete particle;
