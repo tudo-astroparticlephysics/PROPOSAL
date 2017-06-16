@@ -293,14 +293,9 @@ int setting_loop(
     RndFromFile* rand_gen1 = NULL;
     RndFromFile* rand_gen2 = NULL;
 
-    // std::mt19937 generator;
-    // std::uniform_real_distribution<double> random_double(0.0,1.0);
-    // std::uniform_real_distribution<double>* rand_gen2 = NULL; // distribution(0.0,1.0);
-
     switch (eval_func)
     {
         case EvalutateFunction::dNdxRnd:
-            // rand_gen1 = new std::uniform_int_distribution<double>(0, 1);
             rand_gen1 = new RndFromFile(path_to_rnd);
             break;
         case EvalutateFunction::StochasticLoss:
@@ -440,7 +435,7 @@ int setting_loop(
 
                     // lpm
                     int lpm_limit = 2;
-                    if (interaction == Interaction::Ionization || Interaction::Photonuclear)
+                    if (interaction == Interaction::Ionization || interaction == Interaction::Photonuclear)
                     {
                         lpm_limit = 1;
                     }
@@ -483,18 +478,14 @@ int setting_loop(
                                     break;
                                 case EvalutateFunction::dNdxRnd:
                                     {
-                                        // double rnd1 = random_double(generator);
                                         double rnd1 = rand_gen1->rnd();
                                         aux = cross->CalculatedNdx(rnd1);
                                         break;
                                     }
                                 case EvalutateFunction::StochasticLoss:
                                     {
-                                        // double rnd1 = random_double(generator);
-                                        // double rnd2 = random_double(generator);
                                         double rnd1 = rand_gen1->rnd();
                                         double rnd2 = rand_gen2->rnd();
-                                        // aux = brems.CalculateStochasticLoss(rnd1, rnd2);
                                         aux = cross->CalculateStochasticLoss(rnd1, rnd2);
                                         break;
                                     }
@@ -2005,12 +1996,12 @@ int main(int argc, const char *argv[])
         }
 
         Photonuclear_Test_of_dEdx(path_to_save + "Photo_dEdx.txt", "dEdx", "", "");
-        Photonuclear_Test_of_dNdx(path_to_save + "Photo_dNdx.txt", "dNdx", "", "");
-        Photonuclear_Test_of_dNdxrnd(path_to_save + "Photo_dNdxrnd.txt", "dNdxRnd", "", path_to_rnd);
-        Photonuclear_Test_of_e(path_to_save + "Photo_e.txt", "StochasticLoss", "", path_to_rnd);
-        Photonuclear_Test_of_dEdx_Interpolant(path_to_save + "Photo_dEdx_interpol.txt", "dEdx", path_to_tables, "");
-        Photonuclear_Test_of_dNdx_Interpolant(path_to_save + "Photo_dNdx_interpol.txt", "dNdx", path_to_tables, "");
-        Photonuclear_Test_of_dNdxrnd_Interpolant(path_to_save + "Photo_dNdxrnd_interpol.txt", "dNdxRnd", path_to_tables, path_to_rnd);
+        // Photonuclear_Test_of_dNdx(path_to_save + "Photo_dNdx.txt", "dNdx", "", "");
+        // Photonuclear_Test_of_dNdxrnd(path_to_save + "Photo_dNdxrnd.txt", "dNdxRnd", "", path_to_rnd);
+        // Photonuclear_Test_of_e(path_to_save + "Photo_e.txt", "StochasticLoss", "", path_to_rnd);
+        // Photonuclear_Test_of_dEdx_Interpolant(path_to_save + "Photo_dEdx_interpol.txt", "dEdx", path_to_tables, "");
+        // Photonuclear_Test_of_dNdx_Interpolant(path_to_save + "Photo_dNdx_interpol.txt", "dNdx", path_to_tables, "");
+        // Photonuclear_Test_of_dNdxrnd_Interpolant(path_to_save + "Photo_dNdxrnd_interpol.txt", "dNdxRnd", path_to_tables, path_to_rnd);
         Photonuclear_Test_of_e_Interpolant(path_to_save + "Photo_e_interpol.txt", "StochasticLoss", path_to_tables, path_to_rnd);
     }
 
