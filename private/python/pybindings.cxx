@@ -1,21 +1,22 @@
 #define BOOST_PYTHON_MAX_ARITY 17
 
+// #include <string>
+
 #include <boost/python.hpp>
 #include <boost/python/overloads.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
-#include <string>
 
-#include "PROPOSAL/PROPOSALParticle.h"
 #include "PROPOSAL/Propagator.h"
-#include "PROPOSAL/Medium.h"
-#include "PROPOSAL/EnergyCutSettings.h"
-#include "PROPOSAL/ProcessCollection.h"
-#include "PROPOSAL/CrossSections.h"
-#include "PROPOSAL/Photonuclear.h"
-#include "PROPOSAL/Bremsstrahlung.h"
-#include "PROPOSAL/Epairproduction.h"
-#include "PROPOSAL/Ionization.h"
-#include "PROPOSAL/Geometry.h"
+// #include "PROPOSAL/PROPOSALParticle.h"
+// #include "PROPOSAL/Medium.h"
+// #include "PROPOSAL/EnergyCutSettings.h"
+// #include "PROPOSAL/ProcessCollection.h"
+// #include "PROPOSAL/CrossSections.h"
+// #include "PROPOSAL/Photonuclear.h"
+// #include "PROPOSAL/Bremsstrahlung.h"
+// #include "PROPOSAL/Epairproduction.h"
+// #include "PROPOSAL/Ionization.h"
+// #include "PROPOSAL/Geometry.h"
 
 using namespace PROPOSAL;
 

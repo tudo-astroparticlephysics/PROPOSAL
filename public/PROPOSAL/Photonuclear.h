@@ -3,7 +3,7 @@
 #ifndef Photonuclear_H
 #define Photonuclear_H
 
-#include <vector>
+// #include <vector>
 
 #include "PROPOSAL/CrossSections.h"
 #include "PROPOSAL/Integral.h"

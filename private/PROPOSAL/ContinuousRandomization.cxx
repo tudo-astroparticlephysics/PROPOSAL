@@ -1,17 +1,17 @@
-#include <algorithm>
-#include <cmath>
+
+// #include <algorithm>
+// #include <cmath>
 
 #include <boost/bind.hpp>
 
-#include "PROPOSAL/CrossSections.h"
 #include "PROPOSAL/Bremsstrahlung.h"
 #include "PROPOSAL/Epairproduction.h"
 #include "PROPOSAL/Ionization.h"
 #include "PROPOSAL/Photonuclear.h"
 #include "PROPOSAL/ContinuousRandomization.h"
-#include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Output.h"
-#include "PROPOSAL/methods.h"
+// #include "PROPOSAL/Constants.h"
+// #include "PROPOSAL/methods.h"
 
 using namespace std;
 using namespace PROPOSAL;

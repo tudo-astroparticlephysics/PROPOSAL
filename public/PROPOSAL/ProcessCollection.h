@@ -9,24 +9,24 @@
 #ifndef ProcessCollection_H
 #define ProcessCollection_H
 
-#include <vector>
-#include <utility>
+// #include <vector>
+// #include <utility>
 
-#include "PROPOSAL/Integral.h"
-#include "PROPOSAL/Constants.h"
-#include "PROPOSAL/PROPOSALParticle.h"
-#include "PROPOSAL/CrossSections.h"
 #include "PROPOSAL/Bremsstrahlung.h"
 #include "PROPOSAL/Epairproduction.h"
 #include "PROPOSAL/Ionization.h"
 #include "PROPOSAL/Photonuclear.h"
 #include "PROPOSAL/Decay.h"
-#include "PROPOSAL/Medium.h"
-#include "PROPOSAL/EnergyCutSettings.h"
-#include "PROPOSAL/Interpolant.h"
 #include "PROPOSAL/ContinuousRandomization.h"
 #include "PROPOSAL/Geometry.h"
 #include "PROPOSAL/Scattering.h"
+// #include "PROPOSAL/Constants.h"
+// #include "PROPOSAL/EnergyCutSettings.h"
+// #include "PROPOSAL/PROPOSALParticle.h"
+// #include "PROPOSAL/Integral.h"
+// #include "PROPOSAL/Interpolant.h"
+// #include "PROPOSAL/Medium.h"
+// #include "PROPOSAL/CrossSections.h"
 
 namespace PROPOSAL
 {
