@@ -1,13 +1,14 @@
-#include <iostream>
-#include <cmath>
-#include <algorithm>
-#include <sstream>
+
+// #include <iostream>
+// #include <cmath>
+// #include <algorithm>
+// #include <sstream>
 
 #include <boost/bind.hpp>
 
 #include "PROPOSAL/Bremsstrahlung.h"
-#include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Output.h"
+// #include "PROPOSAL/Constants.h"
 
 using namespace std;
 using namespace PROPOSAL;

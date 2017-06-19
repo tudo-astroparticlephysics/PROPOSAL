@@ -1,8 +1,11 @@
+
+// #include <limits.h>
+// #include <math.h>
+// #include <iostream>
+
 #include "gtest/gtest.h"
-#include <limits.h>
+
 #include "PROPOSAL/Integral.h"
-#include "math.h"
-#include <iostream>
 
 using namespace PROPOSAL;
 

@@ -7,12 +7,10 @@
 *   \author Jan-Hendrik Koehne
 */
 
-
+// #include <cmath>
+// #include <math.h>
+// #include <algorithm>
 #include "PROPOSAL/Integral.h"
-#include <cmath>
-#include <math.h>
-#include <algorithm>
-#include "PROPOSAL/methods.h"
 #include "PROPOSAL/Output.h"
 
 using namespace std;

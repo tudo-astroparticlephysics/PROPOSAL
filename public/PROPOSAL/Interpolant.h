@@ -11,10 +11,10 @@
 #ifndef INTERPOLANT_H_
 #define INTERPOLANT_H_
 
-#include <vector>
-#include <cmath>
+// #include <vector>
+// #include <cmath>
 
-#include <boost/function.hpp>
+// #include <boost/function.hpp>
 
 #include "PROPOSAL/MathModel.h"
 
