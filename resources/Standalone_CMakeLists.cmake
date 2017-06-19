@@ -19,14 +19,14 @@ ENDIF()
 
 SET(ICETRAY_INCLUDE_PATH "/home/koehne/Simulation/icesim4_candidate/V04-00-01-RC/icetray/public/")
 
-# Option to set the build of the testfile generator
+# Some additional options
 OPTION (ADD_TESTFILE_GEN "Choose to build the testfile-generator." OFF)
+OPTION (ADD_PYTHON "Choose to compile the python wrapper library" ON)
+OPTION(ADD_ROOT "Choose to compile ROOT examples." ON)
 
 #################################################################
 #################           python      #########################
 #################################################################
-
-OPTION (ADD_PYTHON "Choose to compile the python wrapper library" ON)
 
 IF(ADD_PYTHON)
 	MESSAGE(STATUS "Enabled to build the python wrapper library.")
@@ -62,35 +62,27 @@ ENDIF(ADD_PYTHON)
 #################           ROOT        #########################
 #################################################################
 
-# Load some basic macros which are needed later on
-INCLUDE(FindROOT.cmake)
+IF(ADD_ROOT)
+	MESSAGE(STATUS "Enabled ROOT support.")
+	# Load some basic macros which are needed later on
+	INCLUDE(FindROOT.cmake)
 
-#if ROOT is found ROOT files with ROOT trees can be written
-IF(ROOT_FOUND)
-    ADD_DEFINITIONS(-DROOT_SUPPORT=1)
+	#if ROOT is found ROOT files with ROOT trees can be written
+	IF(ROOT_FOUND)
+		ADD_DEFINITIONS(-DROOT_SUPPORT=1)
 
-    SET(INCLUDE_DIRECTORIES ${ROOT_INCLUDE_DIR})
+		INCLUDE_DIRECTORIES(${ROOT_INCLUDE_DIR})
+		SET(LIBRARYS_TO_LINK ${LIBRARYS_TO_LINK} ${ROOT_LIBRARIES})
 
-    INCLUDE_DIRECTORIES(${INCLUDE_DIRECTORIES})
+	ELSE(ROOT_FOUND)
+		ADD_DEFINITIONS(-DROOT_SUPPORT=0)
 
-    SET(LINK_DIRECTORIES
-    ${ROOT_LIBRARY_DIR}
-    ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
-    )
-
-    LINK_DIRECTORIES( ${LINK_DIRECTORIES})
-    SET(LIBRARYS_TO_LINK ${LIBRARYS_TO_LINK} ${ROOT_LIBRARIES})
-
-ELSE(ROOT_FOUND)
-
-    ADD_DEFINITIONS(-DROOT_SUPPORT=0)
-
-    MESSAGE(STATUS "ROOT not found...")
-    MESSAGE(STATUS "ROOT examples will not be builded.")
-    MESSAGE(STATUS "No ROOT Output is available.")
-    MESSAGE(STATUS "Make sure you have ROOT installed and ROOTSYS is set.")
-
-ENDIF(ROOT_FOUND)
+		MESSAGE(STATUS "ROOT not found...")
+		MESSAGE(STATUS "ROOT examples will not be builded.")
+		MESSAGE(STATUS "No ROOT Output is available.")
+		MESSAGE(STATUS "Make sure you have ROOT installed and ROOTSYS is set.")
+	ENDIF(ROOT_FOUND)
+ENDIF(ADD_ROOT)
 
 
 #################################################################
@@ -127,6 +119,8 @@ endif (GTEST_FOUND)
 #################################################################
 #################           Libraries    ########################
 #################################################################
+
+SET(LIBRARYS_TO_LINK ${LIBRARYS_TO_LINK} ${CMAKE_THREAD_LIBS_INIT})
 
 INCLUDE_DIRECTORIES("${PROJECT_SOURCE_DIR}/public" "${PROJECT_SOURCE_DIR}" ${LOG4CPLUS_INCLUDE_DIR} ${Boost_INCLUDE_DIR} )
 
@@ -243,9 +237,9 @@ ENDIF()
 
 ADD_SUBDIRECTORY( doc )
 
-IF(ROOT_FOUND)
+IF(ROOT_FOUND AND ADD_ROOT)
     ADD_SUBDIRECTORY( root_examples )
-ENDIF(ROOT_FOUND)
+ENDIF()
 
 IF(ADD_PYTHON)
 	IF(PYTHONLIBS_FOUND)

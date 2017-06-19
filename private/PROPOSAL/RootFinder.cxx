@@ -6,7 +6,7 @@
  */
 
 // #include <stdio.h>
-// #include <cmath>
+#include <cmath>
 // #include <iostream>
 
 #include "PROPOSAL/RootFinder.h"
