@@ -13,6 +13,7 @@
 
 // #include <vector>
 
+#include <iostream>
 #include <boost/function.hpp>
 
 #include "PROPOSAL/Constants.h"
