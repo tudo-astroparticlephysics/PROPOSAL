@@ -10,10 +10,12 @@
 
 #ifndef SCATTERING_FIRSTORDER_H
 #define SCATTERING_FIRSTORDER_H
-#include "vector"
-#include <string>
-#include "PROPOSAL/PROPOSALParticle.h"
+
+// #include <vector>
+// #include <string>
+
 #include "PROPOSAL/MathModel.h"
+#include "PROPOSAL/PROPOSALParticle.h"
 #include "PROPOSAL/Medium.h"
 
 namespace PROPOSAL{

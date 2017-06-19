@@ -7,16 +7,16 @@
 *   \author Jan-Hendrik Koehne
 */
 
-#include <cmath>
-#include <iomanip>
+// #include <cmath>
+// #include <iomanip>
 
 #include <boost/bind.hpp>
 #include <boost/algorithm/string.hpp> // case insensitive string compare for configuration file
 
 #include "PROPOSAL/Medium.h"
-#include "PROPOSAL/methods.h"
 #include "PROPOSAL/Integral.h"
 #include "PROPOSAL/Output.h"
+// #include "PROPOSAL/methods.h"
 
 
 using namespace std;
