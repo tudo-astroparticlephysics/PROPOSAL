@@ -12,7 +12,7 @@
 #define Medium_H
 
 #include <vector>
-#include <string>
+// #include <string>
 
 namespace PROPOSAL
 {

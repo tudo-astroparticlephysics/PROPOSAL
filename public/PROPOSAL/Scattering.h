@@ -11,14 +11,14 @@
 #ifndef SCATTERING_H
 #define SCATTERING_H
 
-#include <vector>
-#include <string>
+// #include <vector>
+// #include <string>
 
-#include "PROPOSAL/PROPOSALParticle.h"
 #include "PROPOSAL/CrossSections.h"
 #include "PROPOSAL/Interpolant.h"
 #include "PROPOSAL/Integral.h"
-#include "PROPOSAL/MathModel.h"
+// #include "PROPOSAL/MathModel.h"
+// #include "PROPOSAL/PROPOSALParticle.h"
 
 namespace PROPOSAL{
 

@@ -5,12 +5,13 @@
  *      Author: koehne
  */
 
+// #include <cmath>
+
+#include <boost/lexical_cast.hpp>
+
 #include "PROPOSAL/Propagator.h"
-#include "PROPOSAL/Constants.h"
-#include <cmath>
-#include <utility>
-#include "boost/lexical_cast.hpp"
 #include "PROPOSAL/Output.h"
+// #include "PROPOSAL/Constants.h"
 
 using namespace std;
 using namespace PROPOSAL;
