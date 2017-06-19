@@ -5,10 +5,11 @@
  *      Author: koehne
  */
 
+// #include <stdio.h>
+// #include <cmath>
+// #include <iostream>
+
 #include "PROPOSAL/RootFinder.h"
-#include "stdio.h"
-#include <cmath>
-#include <iostream>
 #include "PROPOSAL/Output.h"
 
 using namespace std;

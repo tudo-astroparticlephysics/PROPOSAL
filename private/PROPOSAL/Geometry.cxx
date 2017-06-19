@@ -5,11 +5,10 @@
  *      Author: koehne
  */
 
+// #include <cmath>
+// #include <algorithm>
+// #include <vector>
 #include "PROPOSAL/Geometry.h"
-#include <iostream>
-#include <cmath>
-#include <algorithm>
-#include <vector>
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Output.h"
 

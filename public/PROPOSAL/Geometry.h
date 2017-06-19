@@ -9,10 +9,11 @@
 #ifndef GEOMETRY_H
 #define GEOMETRY_H
 
+// #include <string>
+// #include <utility>
+// #include <iostream>
+
 #include "PROPOSAL/PROPOSALParticle.h"
-#include <string>
-#include <utility>
-#include <iostream>
 
 namespace PROPOSAL
 {

@@ -1,8 +1,11 @@
+
+// #include <math.h>
+// #include <string.h>
+// #include <stdio.h>
+
 #include "gtest/gtest.h"
+
 #include "PROPOSAL/Interpolant.h"
-#include "math.h"
-#include "string.h"
-#include "stdio.h"
 
 using namespace PROPOSAL;
 

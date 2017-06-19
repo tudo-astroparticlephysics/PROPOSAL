@@ -10,7 +10,8 @@
 
 #ifndef Particle_H
 #define Particle_H
-#include "vector"
+
+// #include <vector>
 #include <string>
 
 namespace PROPOSAL

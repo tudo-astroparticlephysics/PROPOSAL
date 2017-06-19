@@ -8,13 +8,14 @@
 */
 
 
-#include <string>
-#include "PROPOSAL/methods.h"
-#include <cmath>
-#include <stdlib.h>
-#include "boost/random.hpp"
-#include "boost/generator_iterator.hpp"
+// #include <cmath>
+// #include <stdlib.h>
 #include <sys/stat.h>
+
+// #include <boost/random.hpp>
+// #include <boost/generator_iterator.hpp>
+
+#include "PROPOSAL/methods.h"
 
 
 using namespace std;
