@@ -5,7 +5,7 @@
  *      Author: koehne
  */
 
-// #include <cmath>
+#include <cmath>
 // #include <algorithm>
 // #include <vector>
 #include "PROPOSAL/Geometry.h"
