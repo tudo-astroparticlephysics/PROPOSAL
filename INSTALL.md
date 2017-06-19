@@ -133,9 +133,9 @@ into a local build directory and install googletest:
 
 # Additional Cmake options #
 
-| Option | Default value | Description
-| --- | --- |
-| `ADD_PYTHON` | ON | Choose to compile the python wrapper
+| Option | Default value | Description |
+| --- | --- | --- |
+| `ADD_PYTHON` | ON | Choose to compile the python wrapper |
 | `ADD_TESTFILE_GEN` | OFF | Choose to compiler the test file generator |
 
 The test file generator is useful ensure not break the basic
