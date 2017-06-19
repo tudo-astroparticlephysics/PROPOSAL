@@ -98,6 +98,7 @@ into a local build directory and install googletest:
 	item 6).<br>
 	To show further installation options use `ccmake ../src` and/or
 	visit the [documentation](https://cmake.org/documentation/).
+	Also have a look at the additional cmake option down below.
 
 	#### **Note** ####
 
@@ -130,6 +131,19 @@ into a local build directory and install googletest:
 	the `prefix` was defined by `CMAKE_INSTALL_PREFIX` which defaults
 	to `usr/local`.
 
+# Additional Cmake options #
+
+| Option | Default value | Description
+| --- | --- |
+| `ADD_PYTHON` | ON | Choose to compile the python wrapper
+| `ADD_TESTFILE_GEN` | OFF | Choose to compiler the test file generator |
+
+The test file generator is useful ensure not break the basic
+functionality, if use decide to modify the library.
+
+**Examples**
+
+	cmake -DADD_PYTHON=OFF <further options>
 
 # Uninstalling #
 
