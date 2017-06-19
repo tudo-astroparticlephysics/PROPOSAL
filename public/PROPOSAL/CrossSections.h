@@ -10,12 +10,13 @@
 #define CrossSections_H
 
 
+// #include <string>
+
 #include "PROPOSAL/MathModel.h"
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/PROPOSALParticle.h"
 #include "PROPOSAL/Medium.h"
 #include "PROPOSAL/EnergyCutSettings.h"
-#include <string>
 
 namespace PROPOSAL
 {

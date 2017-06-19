@@ -6,11 +6,10 @@
 #ifndef MATHMODEL_H_
 #define MATHMODEL_H_
 
-#include "iostream"
-#include "fstream"
+// #include <fstream>
 
-#include "boost/function.hpp"
-#include "boost/random.hpp"
+#include <boost/function.hpp>
+#include <boost/random.hpp>
 
 
 namespace PROPOSAL{

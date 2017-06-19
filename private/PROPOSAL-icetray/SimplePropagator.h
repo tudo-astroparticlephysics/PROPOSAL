@@ -15,8 +15,8 @@
 #include "dataclasses/physics/I3Particle.h"
 #include "phys-services/I3RandomService.h"
 
-#include "PROPOSAL/PROPOSALParticle.h"
 #include "PROPOSAL/Propagator.h" //Mayo
+// #include "PROPOSAL/PROPOSALParticle.h"
 
 
 // class Propagator;

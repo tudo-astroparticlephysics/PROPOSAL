@@ -12,18 +12,20 @@
  * @author Jan-Hendrik Köhne
  */
 
+// #include <cmath>
+// #include <sstream>
+
 #include "TGraph.h"
 #include "TCanvas.h"
-#include "PROPOSAL/Ionization.h"
-#include "PROPOSAL/PROPOSALParticle.h"
-#include "PROPOSAL/EnergyCutSettings.h"
-#include "PROPOSAL/Medium.h"
 #include "TFile.h"
 #include "TMultiGraph.h"
 #include "TLegend.h"
 #include "TAxis.h"
-#include <cmath>
-#include <sstream>
+
+#include "PROPOSAL/Ionization.h"
+// #include "PROPOSAL/PROPOSALParticle.h"
+// #include "PROPOSAL/EnergyCutSettings.h"
+// #include "PROPOSAL/Medium.h"
 
 using namespace std;
 using namespace PROPOSAL;

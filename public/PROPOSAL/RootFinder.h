@@ -13,7 +13,7 @@
 #ifndef ROOTFINDER_H
 #define ROOTFINDER_H
 
-#include "boost/function.hpp"
+#include <boost/function.hpp>
 
 namespace PROPOSAL{
 

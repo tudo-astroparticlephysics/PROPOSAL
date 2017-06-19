@@ -3,13 +3,13 @@
 #ifndef Bremsstrahlung_H
 #define Bremsstrahlung_H
 
-#include <vector>
+// #include <vector>
 
 #include "PROPOSAL/CrossSections.h"
 #include "PROPOSAL/Integral.h"
 #include "PROPOSAL/Interpolant.h"
-#include "PROPOSAL/Medium.h"
-#include "PROPOSAL/PROPOSALParticle.h"
+// #include "PROPOSAL/Medium.h"
+// #include "PROPOSAL/PROPOSALParticle.h"
 
 namespace PROPOSAL
 {

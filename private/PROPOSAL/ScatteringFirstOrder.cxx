@@ -8,9 +8,10 @@
 */
 
 
-#include <cmath>
-#include <algorithm>
-#include <stdlib.h>
+// #include <cmath>
+// #include <algorithm>
+// #include <stdlib.h>
+
 #include "PROPOSAL/methods.h"
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/ScatteringFirstOrder.h"

@@ -3,13 +3,12 @@
 #ifndef SCATTERING_MOLIERE_H
 #define SCATTERING_MOLIERE_H
 
-#include "vector"
-#include <cmath>
-
-#include "PROPOSAL/Medium.h"
-#include "PROPOSAL/PROPOSALParticle.h"
+// #include <vector>
+// #include <cmath>
 
 #include "PROPOSAL/MathModel.h"
+#include "PROPOSAL/PROPOSALParticle.h"
+#include "PROPOSAL/Medium.h"
 
 namespace PROPOSAL{
 
