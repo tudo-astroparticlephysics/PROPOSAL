@@ -11,11 +11,11 @@
 #ifndef CONTINUOUSRANDOMIZATION_H_
 #define CONTINUOUSRANDOMIZATION_H_
 
-#include "PROPOSAL/PROPOSALParticle.h"
-#include "PROPOSAL/Medium.h"
 #include "PROPOSAL/CrossSections.h"
 #include "PROPOSAL/Integral.h"
 #include "PROPOSAL/Interpolant.h"
+// #include "PROPOSAL/PROPOSALParticle.h"
+// #include "PROPOSAL/Medium.h"
 
 namespace PROPOSAL
 {

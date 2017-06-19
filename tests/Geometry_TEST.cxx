@@ -1,11 +1,14 @@
+
+// #include <iostream>
+// #include <string>
+// #include <cmath>
+
 #include "gtest/gtest.h"
+
 #include "PROPOSAL/Geometry.h"
-#include <iostream>
-#include <string>
-#include <cmath>
-#include "PROPOSAL/PROPOSALParticle.h"
 #include "PROPOSAL/MathModel.h"
 #include "PROPOSAL/Constants.h"
+// #include "PROPOSAL/PROPOSALParticle.h"
 
 using namespace std;
 using namespace PROPOSAL;

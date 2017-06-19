@@ -6,7 +6,7 @@
  * (c) 2013 IceCube Collaboration
  */
 
-#include <vector>
+// #include <vector>
 #include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
 
@@ -16,7 +16,7 @@
 #include "simclasses/I3MMCTrack.h"
 
 #include "PROPOSAL/Propagator.h" //Tomasz
-#include "PROPOSAL/PROPOSALParticle.h"
+// #include "PROPOSAL/PROPOSALParticle.h"
 
 
 class I3Particle;

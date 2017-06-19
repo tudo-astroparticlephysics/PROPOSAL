@@ -1,6 +1,9 @@
+
+// #include <iostream>
+
 #include "gtest/gtest.h"
+
 #include "PROPOSAL/EnergyCutSettings.h"
-#include <iostream>
 
 using namespace PROPOSAL;
 

@@ -8,14 +8,15 @@
 */
 
 
-#include <cmath>
-#include <algorithm>
-#include <stdlib.h>
+// #include <cmath>
+// #include <algorithm>
+// #include <stdlib.h>
+// #include <iomanip>
+
 #include "PROPOSAL/PROPOSALParticle.h"
 #include "PROPOSAL/methods.h"
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Output.h"
-#include <iomanip>
 
 
 using namespace std;

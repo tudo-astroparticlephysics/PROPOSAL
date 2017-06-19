@@ -1,10 +1,10 @@
 
-#include <algorithm>
+// #include <algorithm>
 
 #include <boost/bind.hpp>
 
-#include "PROPOSAL/Output.h"
 #include "PROPOSAL/Photonuclear.h"
+#include "PROPOSAL/Output.h"
 
 using namespace std;
 using namespace PROPOSAL;

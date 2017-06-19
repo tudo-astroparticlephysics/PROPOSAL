@@ -11,11 +11,12 @@
 #ifndef INTEGRAL_H_
 #define INTEGRAL_H_
 
-#include <vector>
+// #include <vector>
+
+#include <boost/function.hpp>
+
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/methods.h"
-#include "boost/function.hpp"
-// #include "Output.h"
 
 namespace PROPOSAL{
 

@@ -14,11 +14,10 @@
 #include "PROPOSAL-icetray/SimplePropagator.h"
 
 #include "PROPOSAL/Output.h"
-#include "PROPOSAL/Bremsstrahlung.h"
-#include "PROPOSAL/Photonuclear.h"
-#include "PROPOSAL/MathModel.h"
-
-#include "PROPOSAL/Medium.h"
+// #include "PROPOSAL/Bremsstrahlung.h"
+// #include "PROPOSAL/Photonuclear.h"
+// #include "PROPOSAL/MathModel.h"
+// #include "PROPOSAL/Medium.h"
 
 
 using namespace PROPOSAL;
