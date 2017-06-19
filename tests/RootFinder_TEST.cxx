@@ -1,8 +1,11 @@
-#include "gtest/gtest.h"
-#include "PROPOSAL/RootFinder.h"
-#include <iostream>
-#include <string>
+
+// #include <iostream>
+// #include <string>
 #include <cmath>
+
+#include "gtest/gtest.h"
+
+#include "PROPOSAL/RootFinder.h"
 
 using namespace PROPOSAL;
 

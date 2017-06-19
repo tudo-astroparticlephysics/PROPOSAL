@@ -25,14 +25,15 @@
  *
  */
 
-#include "PROPOSAL/PROPOSALParticle.h"
-#include "PROPOSAL/MathModel.h"
+// #include <utility>
+
 #include "PROPOSAL/ProcessCollection.h"
-#include <utility>
-#include "PROPOSAL/Geometry.h"
-#include "PROPOSAL/Scattering.h"
 #include "PROPOSAL/ScatteringFirstOrder.h"
 #include "PROPOSAL/ScatteringMoliere.h"
+// #include "PROPOSAL/MathModel.h"
+// #include "PROPOSAL/PROPOSALParticle.h"
+// #include "PROPOSAL/Geometry.h"
+// #include "PROPOSAL/Scattering.h"
 
 namespace PROPOSAL{
 

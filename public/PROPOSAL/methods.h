@@ -11,11 +11,12 @@
 #ifndef METHODS_H_
 #define METHODS_H_
 
-#include <string>
-#include <iostream>
-#include <fstream>
-#include <vector>
-#include "deque"
+// #include <string>
+// #include <iostream>
+// #include <fstream>
+// #include <vector>
+#include <deque>
+
 #include <boost/math/special_functions/erf.hpp>
 
 //necessary since the boost function does not work for [-1,1] but for (-1,1)

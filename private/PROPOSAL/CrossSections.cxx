@@ -1,5 +1,5 @@
+
 #include "PROPOSAL/CrossSections.h"
-#include "PROPOSAL/Constants.h"
 
 using namespace PROPOSAL;
 
