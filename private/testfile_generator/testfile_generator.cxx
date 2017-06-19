@@ -1997,12 +1997,12 @@ int main(int argc, const char *argv[])
         }
 
         Photonuclear_Test_of_dEdx(path_to_save + "Photo_dEdx.txt", "dEdx", "", "");
-        // Photonuclear_Test_of_dNdx(path_to_save + "Photo_dNdx.txt", "dNdx", "", "");
-        // Photonuclear_Test_of_dNdxrnd(path_to_save + "Photo_dNdxrnd.txt", "dNdxRnd", "", path_to_rnd);
-        // Photonuclear_Test_of_e(path_to_save + "Photo_e.txt", "StochasticLoss", "", path_to_rnd);
-        // Photonuclear_Test_of_dEdx_Interpolant(path_to_save + "Photo_dEdx_interpol.txt", "dEdx", path_to_tables, "");
-        // Photonuclear_Test_of_dNdx_Interpolant(path_to_save + "Photo_dNdx_interpol.txt", "dNdx", path_to_tables, "");
-        // Photonuclear_Test_of_dNdxrnd_Interpolant(path_to_save + "Photo_dNdxrnd_interpol.txt", "dNdxRnd", path_to_tables, path_to_rnd);
+        Photonuclear_Test_of_dNdx(path_to_save + "Photo_dNdx.txt", "dNdx", "", "");
+        Photonuclear_Test_of_dNdxrnd(path_to_save + "Photo_dNdxrnd.txt", "dNdxRnd", "", path_to_rnd);
+        Photonuclear_Test_of_e(path_to_save + "Photo_e.txt", "StochasticLoss", "", path_to_rnd);
+        Photonuclear_Test_of_dEdx_Interpolant(path_to_save + "Photo_dEdx_interpol.txt", "dEdx", path_to_tables, "");
+        Photonuclear_Test_of_dNdx_Interpolant(path_to_save + "Photo_dNdx_interpol.txt", "dNdx", path_to_tables, "");
+        Photonuclear_Test_of_dNdxrnd_Interpolant(path_to_save + "Photo_dNdxrnd_interpol.txt", "dNdxRnd", path_to_tables, path_to_rnd);
         Photonuclear_Test_of_e_Interpolant(path_to_save + "Photo_e_interpol.txt", "StochasticLoss", path_to_tables, path_to_rnd);
     }
 
