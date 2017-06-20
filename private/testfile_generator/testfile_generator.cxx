@@ -90,25 +90,6 @@ namespace EvalutateFunction{
 // Helper
 // ------------------------------------------------------------------------- //
 
-// std::vector<double> linspace(double a, double b, int n) {
-//     std::vector<double> array;
-//     double step = (b-a) / (n-1.0);
-//
-//     while(a < b && std::abs(b-a) > std::numeric_limits<double>::epsilon()) {
-//         array.push_back(a);
-//         a += step;           // could recode to better handle rounding errors
-//     }
-//     array.push_back(b);
-//
-//     for (std::vector<double>::iterator it = array.begin(); it != array.end(); ++it)
-//     {
-//         printf("array: %f\n", *it);
-//     }
-//     printf("\n");
-//
-//     return array;
-// }
-
 class RndFromFile{
     private:
         double rnd_;
@@ -135,29 +116,6 @@ class RndFromFile{
             return rnd_;
         }
 };
-
-int ConvertOldToNewBremsstrahlungParametrization(int old_param)
-{
-    switch (old_param)
-    {
-        case 1:
-            return ParametrizationType::BremsKelnerKokoulinPetrukhin;
-            break;
-        case 2:
-            return ParametrizationType::BremsAndreevBezrukovBugaev;
-            break;
-        case 3:
-            return ParametrizationType::BremsPetrukhinShestakov;
-            break;
-        case 4:
-            return ParametrizationType::BremsCompleteScreeningCase;
-            break;
-        default:
-            printf("Wrong Bremsstrahlung parametrization type '%i'. Default to BremsKelnerKokoulinPetrukhin."
-                , old_param);
-            return ParametrizationType::BremsKelnerKokoulinPetrukhin;
-    }
-}
 
 // ------------------------------------------------------------------------- //
 // Random numbers
