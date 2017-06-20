@@ -960,12 +960,24 @@ int setting_loop_contrand(std::string& filename)
                 std::vector<CrossSections*> crosssections;
 
                 crosssections.resize(4);
+
+                // Ionization ioniz(&particle, &medium, &cuts);
+                // Bremsstrahlung brems(&particle, &medium, &cuts);
+                // Photonuclear photo(&particle, &medium, &cuts);
+                // Epairproduction epair(&particle, &medium, &cuts);
+                //
+                // crosssections.push_back(&ioniz);
+                // crosssections.push_back(&brems);
+                // crosssections.push_back(&photo);
+                // crosssections.push_back(&photo);
+
                 crosssections.at(0) = new Ionization(&particle, &medium, &cuts);
                 crosssections.at(1) = new Bremsstrahlung(&particle, &medium, &cuts);
                 crosssections.at(2) = new Photonuclear(&particle, &medium, &cuts);
                 crosssections.at(3) = new Epairproduction(&particle, &medium, &cuts);
 
                 ContinuousRandomization cont(&particle, &medium, crosssections);
+
                 for(unsigned int i=0 ; i<crosssections.size();i++)
                 {
                     crosssections.at(i)->EnableDEdxInterpolation();
@@ -979,10 +991,7 @@ int setting_loop_contrand(std::string& filename)
                 // energy
                 for (std::vector<double>::iterator it_energy = energy.begin() ; it_energy != energy.end(); ++it_energy)
                 {
-                    // prop.GetParticle()->SetEnergy(*it_energy);
-                    // double final_energy = prop.Propagate(1000);
 
-                    // rnd = rand_gen.rnd();
                     rnd = random_double(generator);
 
                     out << rnd
@@ -1786,11 +1795,13 @@ int ProcColl_MakeDecay(std::string filename, std::string path_to_tables)
 void usage(const char *argv[])
 {
     std::cout << "Usage: "
-        << argv[0] << " -h | -f <PATH_TO_TABLES> | -t <TEST>\n"
+        << argv[0] << " -t <TEST> [-h | -f <PATH_TO_TABLES> | -s <PATH_TO_SAVE_FILES>] \n"
         << "\t"
         << "-h\thelp\n"
         << "\t"
         << "-f\tPath to interpolation tables\n"
+        << "\t"
+        << "-s\tPath where tables should be stored\n"
         << "\t"
         << "-t\t<TEST> specifies which tables should be created.\n\n"
         << "\t"
@@ -1890,6 +1901,7 @@ int main(int argc, const char *argv[])
     if (chosen_test.empty())
     {
         std::cout << "Warning: No test given! Abort! " << std::endl;
+        usage(argv);
         exit(0);
     }
     else if (std::find(tests.begin(), tests.end(), chosen_test) == tests.end())
