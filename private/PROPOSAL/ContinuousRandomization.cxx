@@ -1,6 +1,6 @@
 
 // #include <algorithm>
-// #include <cmath>
+#include <cmath>
 
 #include <boost/bind.hpp>
 
