@@ -764,7 +764,7 @@ void Propagator::AdvanceParticle(double dr, double ei, double ef)
 
     dist   +=  dr;
 
-    if(do_exact_time_calulation_)
+    if(do_exact_time_calculation_)
     {
         time   +=  current_collection_->CalculateParticleTime(ei, ef)/current_collection_->GetDensityCorrection();
     }
@@ -1255,7 +1255,7 @@ void Propagator::ReadConfigFile(string config_file, bool DoApplyOptions)
         // exact location time
         else if(ToLowerCase(taux).compare("exact_time")==0)
         {
-            do_exact_time_calulation_ =   true;
+            do_exact_time_calculation_ =   true;
         }
         // do not interpolate: intergrate everything
         else if(ToLowerCase(taux).compare("integrate")==0)
@@ -1379,7 +1379,7 @@ Propagator::Propagator()
     ,lpm_                       ( false )
     ,moliere_                   ( false )
     ,stopping_decay_            ( true )
-    ,do_exact_time_calulation_  ( false )
+    ,do_exact_time_calculation_ ( false )
     ,integrate_                 ( false )
     ,brems_multiplier_          ( 1 )
     ,photo_multiplier_          ( 1 )
@@ -1424,7 +1424,7 @@ Propagator::Propagator(
     ,photo_                     ( ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich )
     ,lpm_                       ( lpm )
     ,stopping_decay_            ( true )
-    ,do_exact_time_calulation_  ( exact_time )
+    ,do_exact_time_calculation_ ( exact_time )
     ,integrate_                 ( integrate )
     ,brems_multiplier_          ( 1 )
     ,photo_multiplier_          ( 1 )
@@ -1503,7 +1503,7 @@ Propagator::Propagator(Medium* medium,
     ,lpm_                       ( lpm )
     ,moliere_                   ( moliere )
     ,stopping_decay_            ( true )
-    ,do_exact_time_calulation_  ( exact_time )
+    ,do_exact_time_calculation_ ( exact_time )
     ,integrate_                 ( integrate )
     ,brems_multiplier_          ( brems_multiplier )
     ,photo_multiplier_          ( photo_multiplier )
@@ -1577,7 +1577,7 @@ Propagator::Propagator(string config_file, bool DoApplyOptions)
     ,lpm_                       ( false )
     ,moliere_                   ( false )
     ,stopping_decay_            ( true )
-    ,do_exact_time_calulation_  ( false )
+    ,do_exact_time_calculation_ ( false )
     ,integrate_                 ( false )
     ,brems_multiplier_          ( 1 )
     ,photo_multiplier_          ( 1 )
@@ -1615,7 +1615,7 @@ Propagator::Propagator(std::string config_file, PROPOSALParticle* particle, bool
     ,lpm_                       ( false )
     ,moliere_                   ( false )
     ,stopping_decay_            ( true )
-    ,do_exact_time_calulation_  ( false )
+    ,do_exact_time_calculation_ ( false )
     ,integrate_                 ( false )
     ,brems_multiplier_          ( 1 )
     ,photo_multiplier_          ( 1 )
@@ -1655,7 +1655,7 @@ Propagator::Propagator(const Propagator &propagator)
     ,lpm_                       ( propagator.lpm_ )
     ,moliere_                   ( propagator.moliere_ )
     ,stopping_decay_            ( propagator.stopping_decay_ )
-    ,do_exact_time_calulation_  ( propagator.do_exact_time_calulation_ )
+    ,do_exact_time_calculation_ ( propagator.do_exact_time_calculation_ )
     ,integrate_                 ( propagator.integrate_ )
     ,brems_multiplier_          ( propagator.brems_multiplier_ )
     ,photo_multiplier_          ( propagator.photo_multiplier_ )
@@ -1724,7 +1724,7 @@ bool Propagator::operator==(const Propagator &propagator) const
     if( lpm_                      != propagator.lpm_ )                    return false;
     if( moliere_                  != propagator.moliere_ )                return false;
     if( stopping_decay_           != propagator.stopping_decay_ )         return false;
-    if( do_exact_time_calulation_ != propagator.do_exact_time_calulation_ )return false;
+    if( do_exact_time_calculation_!= propagator.do_exact_time_calculation_ )return false;
     if( integrate_                != propagator.integrate_ )              return false;
     if( brems_multiplier_         != propagator.brems_multiplier_ )       return false;
     if( photo_multiplier_         != propagator.photo_multiplier_ )       return false;
@@ -1776,7 +1776,7 @@ void Propagator::swap(Propagator &propagator)
     swap( lpm_                      ,   propagator.lpm_ );
     swap( moliere_                  ,   propagator.moliere_ );
     swap( stopping_decay_           ,   propagator.stopping_decay_ );
-    swap( do_exact_time_calulation_ ,   propagator.do_exact_time_calulation_ );
+    swap( do_exact_time_calculation_,   propagator.do_exact_time_calculation_ );
     swap( integrate_                ,   propagator.integrate_ );
     swap( brems_multiplier_         ,   propagator.brems_multiplier_ );
     swap( photo_multiplier_         ,   propagator.photo_multiplier_ );
@@ -2844,7 +2844,7 @@ void Propagator::ApplyOptions()
         {
             collections_.at(j)->EnableScattering();
         }
-        if(do_exact_time_calulation_)
+        if(do_exact_time_calculation_)
         {
             collections_.at(j)->EnableExactTimeCalculation();
         }

@@ -50,7 +50,7 @@ private:
     bool    lpm_;                       //!< Landau-Pomeranchuk-Migdal supression of EM cross-sections enabled if true
     bool    moliere_;                   //!< Moliere scattering enabled if true
     bool    stopping_decay_;            //!< Do decay of particles. formarly sdec
-    bool    do_exact_time_calulation_;  //!< exact local time calculation enabled if true
+    bool    do_exact_time_calculation_; //!< exact local time calculation enabled if true
     bool    integrate_;                 //!< if true nothing will be interpolated
     double  brems_multiplier_;          //!< multiplier to in- or decrease the Bremsstrahlung cross-sections
     double  photo_multiplier_;          //!< multiplier to in- or decrease the Photonucler cross-sections
