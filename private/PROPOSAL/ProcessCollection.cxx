@@ -49,7 +49,7 @@ double ProcessCollection::CalculateDisplacement(double ei, double ef, double dis
     }
     else
     {
-        return integral_->IntegrateWithLog(ei, ef, boost::bind(&ProcessCollection::FunctionToIntegral, this, _1), -dist);
+        return integral_->IntegrateWithRandomRatio(ei, ef, boost::bind(&ProcessCollection::FunctionToIntegral, this, _1), 4, -dist);
     }
 
 }
@@ -100,11 +100,11 @@ double ProcessCollection::CalculateTrackingIntegal(double initial_energy, double
 
         if(particle_interaction)
         {
-            return prop_interaction_->IntegrateWithLog(initial_energy, particle_->GetLow(), boost::bind(&ProcessCollection::FunctionToPropIntegralInteraction, this, _1), -rnd);
+            return prop_interaction_->IntegrateWithRandomRatio(initial_energy, particle_->GetLow(), boost::bind(&ProcessCollection::FunctionToPropIntegralInteraction, this, _1), 4, -rnd);
         }
         else
         {
-            return prop_decay_->IntegrateWithLog(initial_energy, particle_->GetLow(), boost::bind(&ProcessCollection::FunctionToPropIntegralDecay, this, _1), -rnd);
+            return prop_decay_->IntegrateWithRandomRatio(initial_energy, particle_->GetLow(), boost::bind(&ProcessCollection::FunctionToPropIntegralDecay, this, _1), 4, -rnd);
         }
     }
 }
