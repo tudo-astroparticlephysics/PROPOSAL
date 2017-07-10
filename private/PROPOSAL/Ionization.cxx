@@ -100,7 +100,7 @@ double Ionization::CalculatedNdx(double rnd)
     else
     {
         SetIntegralLimits(0);
-        sum_of_rates_ = integral_->IntegrateWithSubstitution(vUp_,vMax_,boost::bind(&Ionization::FunctionToDNdxIntegral, this, _1),1,rnd);
+        sum_of_rates_ = integral_->IntegrateWithRandomRatio(vUp_,vMax_,boost::bind(&Ionization::FunctionToDNdxIntegral, this, _1),3,rnd,1);
     }
 
     return sum_of_rates_;
