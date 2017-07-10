@@ -33,18 +33,65 @@ using namespace PROPOSAL;
 
 double Integral::Integrate(double min, double max, boost::function<double (double)> integrand, int method, double powerOfSubstitution)
 {
+    if (min == 0. && max == 0. )
+    {
+        log_warn("the integration limits are both zero; return 0");
+        return 0.;
+    }
+
     switch (method)
     {
         case 1: return IntegrateClosed(min,max,integrand);
         case 2: return IntegrateOpened(min,max,integrand);
         case 3: return IntegrateWithSubstitution(min,max,integrand,powerOfSubstitution);
-        case 4: return IntegrateWithLog(min,max,integrand);
-        case 5: return IntegrateWithLogSubstitution(min,max,integrand,powerOfSubstitution);
-        default: log_error("Unknown integration method! 0 is returned!"); return 0;
+        case 4:
+            if (min <= 0. || max <= 0.)
+            {
+                log_warn("Can't integrate with log, because at least one of the limits is <= 0, min=%f, max=%f. Return 0", min, max);
+                return 0;
+            }
+            return IntegrateWithLog(min,max,integrand);
+        case 5:
+            if (min <= 0. || max <= 0.)
+            {
+                log_warn("Can't integrate with log, because at least one of the limits is <= 0, min=%f, max=%f. Return 0", min, max);
+                return 0;
+            }
+            return IntegrateWithLogSubstitution(min,max,integrand,powerOfSubstitution);
+        default:
+            log_fatal("Unknown integration method! 0 is returned!");
+            return 0;
 
     }
 }
 
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+double Integral::IntegrateWithRandomRatio(double min, double max, boost::function<double (double)> integrand, int method, double randomRatio, double powerOfSubstitution)
+{
+    if (min == 0. && max == 0. )
+    {
+        log_warn("the integration limits are both zero; return 0");
+        return 0.;
+    }
+
+    switch (method)
+    {
+        case 3: return IntegrateWithSubstitution(min,max,integrand,powerOfSubstitution, randomRatio);
+        case 4:
+            if (min <= 0. || max <= 0.)
+            {
+                log_warn("Can't integrate with log, because at least one of the limits is <= 0, min=%f, max=%f. Return 0", min, max);
+                return 0;
+            }
+            return IntegrateWithLog(min,max,integrand, randomRatio);
+        default:
+            log_fatal("Unknown integration method! 0 is returned!");
+            return 0;
+
+    }
+}
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
@@ -87,76 +134,6 @@ double Integral::GetUpperLimit()
         log_error("No previous call to upper limit functions was made!");
         return 0;
     }
-}
-
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-double Integral::IntegrateOpened(double min, double max, boost::function<double (double)> integrand, double randomRatio)
-{
-    double aux, result;
-
-    reverse_ =   false;
-    useLog_  =   false;
-
-    if(fabs(max-min)<=fabs(min)*COMPUTER_PRECISION)
-    {
-        this->min_   =   min;
-        this->max_   =   max;
-        randomDo_    =   true;
-        return 0;
-    }
-    else if(min>max)
-    {
-        SWAP(min,max,double);
-        aux     =   -1;
-        reverse_ =   !reverse_;
-    }
-    else
-    {
-        aux     =   1;
-    }
-
-    this->min_   =   min;
-    this->max_   =   max;
-
-    if(reverse_)
-    {
-        reverseX_    =   this->min_ + this->max_;
-    }
-
-    this->integrand_    =   integrand;
-    powerOfSubstitution_ =   0;
-
-    if(randomRatio>1)
-    {
-        randomRatio =   1;
-    }
-
-    randomNumber_    =   randomRatio;
-    result          =   RombergIntegrateOpened();
-
-    if(randomNumber_<0)
-    {
-        randomNumber_    /=  -fabs(result);
-
-        if(randomNumber_>1)
-        {
-            randomNumber_=1;
-        }
-
-        if(randomNumber_<0)
-        {
-            randomNumber_=0;
-        }
-    }
-    savedResult_ =   result;
-    randomDo_    =   true;
-
-
-    return aux*result;
 }
 
 
