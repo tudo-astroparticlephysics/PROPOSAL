@@ -1759,18 +1759,18 @@ void usage(const char *argv[])
         << "\t"
         << "-f\tPath to interpolation tables\n"
         << "\t"
-        << "-s\tPath where tables should be stored\n"
+        << "-s\tPath where test tables should be stored\n"
         << "\t"
-        << "-t\t<TEST> specifies which tables should be created.\n\n"
+        << "-t\t<TEST> specifies which test tables should be created.\n\n"
         << "\t"
         << "Choose <TEST> from:\n"
         << "\t\t brems\t Bremsstrahlung\n"
         << "\t\t epair\t Epair Production\n"
         << "\t\t ioniz\t Ionization\n"
         << "\t\t photo\t Photonuclear\n"
-        << "\t\t pcol\t ProcessCollection\n"
+        << "\t\t pcol\t Process Collection\n"
         << "\t\t cont\t Continous Randomization\n"
-        << "\t\t rnd\t Random numbers\n"
+        << "\t\t rnd\t Random Numbers\n"
         << "\t\t all\t All\n\n";
 }
 
