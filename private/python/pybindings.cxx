@@ -582,6 +582,27 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
         .def(self_ns::repr(self_ns::self))
     ;
 
+    // --------------------------------------------------------------------- //
+    // Decay
+    // --------------------------------------------------------------------- //
+
+    class_<Decay, boost::shared_ptr<Decay> >("Decay", init<>())
+
+        .def(init<const Decay&>())
+        .def(init<PROPOSALParticle*>((arg("particle"))))
+
+        // .def(self_ns::str(self_ns::self))
+        // .def(self_ns::repr(self_ns::self))
+
+        .add_property("out", &Decay::GetOut, &Decay::SetOut)
+        .add_property("particle", make_function(&Decay::GetParticle, return_internal_reference<>()), &Decay::SetParticle)
+        .add_property("store_neutrinos", &Decay::GetStoreNeutrinos, &Decay::SetStoreNeutrinos)
+        .add_property("multiplier", &Decay::GetMultiplier, &Decay::SetMultiplier)
+
+        .def("make_decay", &Decay::MakeDecay, "Cross section describing the decay.")
+        .def("calculate_product_energy", &Decay::CalculateProductEnergy, "Calculates the product energy.")
+    ;
+
     // ------------------------------------------------------------------------- //
     // ProcessCollection
     // ------------------------------------------------------------------------- //
