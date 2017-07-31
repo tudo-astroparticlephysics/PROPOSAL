@@ -101,7 +101,7 @@ double Bremsstrahlung::CalculatedNdx(double rnd)
         else
         {
             SetIntegralLimits(i);
-            prob_for_component_.at(i) = dndx_integral_.at(i)->IntegrateWithLog(vUp_, vMax_, boost::bind(&Bremsstrahlung::FunctionToDNdxIntegral, this, _1), rnd);
+            prob_for_component_.at(i) = dndx_integral_.at(i)->IntegrateWithRandomRatio(vUp_, vMax_, boost::bind(&Bremsstrahlung::FunctionToDNdxIntegral, this, _1), 4, rnd);
         }
         sum_of_rates_ += prob_for_component_.at(i);
     }
