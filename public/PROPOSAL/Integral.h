@@ -280,36 +280,6 @@ private:
    double IntegrateWithLogSubstitution(double min, double max, boost::function<double (double)> integrand, double powerOfSubstitution);
 
 //----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-public:
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-    /**
-     * initializes class with default settings
-     */
-    Integral();
-
-//----------------------------------------------------------------------------//
-
-    Integral(const Integral&);
-    Integral& operator=(const Integral&);
-    bool operator==(const Integral &integral) const;
-    bool operator!=(const Integral &integral) const;
-
-//----------------------------------------------------------------------------//
-
-    /*!
-     * initializes class - this is the main constructor, definition of the
-     * integration limits, setting of constants \f$romberg4refine\f$, \f$pOS\f$,
-     * definition whether log-integration or integration with
-     * substitution is used
-     */
-    Integral(int romberg, int maxSteps, double precision);
-
-//----------------------------------------------------------------------------//
     /*!
      * finds integral for opened intervals
      * and computes the value of the x(rand)
@@ -340,18 +310,35 @@ public:
     double IntegrateWithSubstitution(double min, double max, boost::function<double (double)> integrand, double powerOfSubstitution, double randomRatio);
 
 //----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+public:
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+    /**
+     * initializes class with default settings
+     */
+    Integral();
+
+//----------------------------------------------------------------------------//
+
+    Integral(const Integral&);
+    Integral& operator=(const Integral&);
+    bool operator==(const Integral &integral) const;
+    bool operator!=(const Integral &integral) const;
+
+//----------------------------------------------------------------------------//
 
     /*!
-     * finds integral for opened intervals
-     * and computes the value of the x(rand)
-     *
-     * \param   min             lower integration limit
-     * \param   max             upper integration limit
-     * \param   function2use    integrand
-     * \param   randomRatio     Random Ratio in which the old sum is weighted
-     * \return  Integration result
+     * initializes class - this is the main constructor, definition of the
+     * integration limits, setting of constants \f$romberg4refine\f$, \f$pOS\f$,
+     * definition whether log-integration or integration with
+     * substitution is used
      */
-    double IntegrateOpened(double min, double max, boost::function<double (double)> integrand, double randomRatio);
+    Integral(int romberg, int maxSteps, double precision);
+
 
 //----------------------------------------------------------------------------//
 
@@ -381,6 +368,24 @@ public:
      */
 
     double Integrate(double min, double max, boost::function<double (double)> integrand, int method, double powerOfSubstitution=0);
+
+ //----------------------------------------------------------------------------//
+
+    /*!
+     * finds integral: choose the in integration method with the last parameter
+     * like in Integrate but just for two cases
+     *   method = 3: IntegrateWithSubstitution
+     *   method = 4: IntegrateWithLog
+     *
+     * \param   min             lower integration limit
+     * \param   max             upper integration limit
+     * \param   function2use    integrand
+     * \param   method          integration method
+     * \param   randomRatio     Random Ratio in which the old sum is weighted
+     * \return  Integration result
+     */
+
+    double IntegrateWithRandomRatio(double min, double max, boost::function<double (double)> integrand, int method, double randomRatio, double powerOfSubstitution=0);
 
  //----------------------------------------------------------------------------//
 
