@@ -12,6 +12,8 @@
 // #include <algorithm>
 #include "PROPOSAL/Integral.h"
 #include "PROPOSAL/Output.h"
+#include "PROPOSAL/methods.h"
+#include "PROPOSAL/Constants.h"
 
 using namespace std;
 using namespace PROPOSAL;

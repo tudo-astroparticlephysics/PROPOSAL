@@ -4,6 +4,8 @@
 
 #include "PROPOSAL/Epairproduction.h"
 #include "PROPOSAL/Output.h"
+#include "PROPOSAL/Constants.h"
+#include "PROPOSAL/methods.h"
 
 
 using namespace std;

@@ -12,7 +12,8 @@
 
 #include "PROPOSAL/ProcessCollection.h"
 #include "PROPOSAL/Output.h"
-// #include "PROPOSAL/MathModel.h"
+#include "PROPOSAL/methods.h"
+#include "PROPOSAL/Constants.h"
 
 
 using namespace std;
