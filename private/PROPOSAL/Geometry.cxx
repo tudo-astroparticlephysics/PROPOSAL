@@ -15,89 +15,135 @@
 using namespace std;
 using namespace PROPOSAL;
 
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-//-------------------------public member functions----------------------------//
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
 
+// ------------------------------------------------------------------------- //
+// OStreams
+// ------------------------------------------------------------------------- //
 
-Geometry* Geometry::InitBox(double x0, double y0, double z0, double x, double y, double z)
+namespace PROPOSAL
 {
-    x0_     =   100*x0;
-    y0_     =   100*y0;
-    z0_     =   100*z0;
 
-    x_      =   100*x;
-    y_      =   100*y;
-    z_      =   100*z;
-
-    object_ =   "box";
-    return this;
+ostream& operator<<(ostream& os, Geometry const& geometry)
+{
+    os<<"--------Geometry( "<<&geometry<<" )--------"<<endl;
+    os<<"\t"<<geometry.object_<<endl;
+    os<<"\tOrigin (x,y,z):\t"<<geometry.x0_<<"\t"<<geometry.y0_<<"\t"<<geometry.z0_<<endl;
+    os<<"\tHirarchy:\t"<<geometry.hirarchy_ << endl;
+    return os;
 }
 
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-Geometry* Geometry::InitSphere(double x0, double y0, double z0, double radius, double inner_radius)
+ostream& operator<<(ostream& os, Sphere const& sphere)
 {
-    x0_     =   100*x0;
-    y0_     =   100*y0;
-    z0_     =   100*z0;
-
-    radius_         =   100*radius;
-    inner_radius_   =   100*inner_radius;
-
-    if(inner_radius > radius_)
-    {
-        log_error("Inner radius %f is greater then radius %f (will be swaped)",inner_radius_ ,radius_);
-        std::swap( inner_radius_ ,radius_ );
-    }
-    if(inner_radius == radius_)
-    {
-        log_error("Warning: Inner radius %f == radius %f (Volume is 0)",inner_radius_,radius_);
-    }
-    object_ =   "sphere";
-    return this;
+    os<< static_cast <const Geometry &>( sphere ) << endl;
+    os<<"\tRadius: "<<sphere.radius_<<"\tInner radius: "<<sphere.inner_radius_<<endl;
+    os<<"------------------------------------";
+    return os;
 }
 
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-Geometry* Geometry::InitCylinder(double x0, double y0, double z0, double radius, double inner_radius, double z)
+ostream& operator<<(ostream& os, Box const& box)
 {
-    x0_     =   100*x0;
-    y0_     =   100*y0;
-    z0_     =   100*z0;
-
-    radius_         =   100*radius;
-    inner_radius_   =   100*inner_radius;
-
-    if(inner_radius_ > radius_)
-    {
-        log_error("Inner radius %f is greater then radius %f (will be swaped)",inner_radius_ ,radius_);
-        std::swap( inner_radius_ ,radius_ );
-    }
-    if(inner_radius_ == radius_)
-    {
-        log_error("Warning: Inner radius %f == radius %f (Volume is 0)",inner_radius_,radius_);
-    }
-
-    z_      =   100*z;
-
-    object_ =   "cylinder";
-    return this;
+    os<< static_cast <const Geometry &>( box ) << endl;
+    os<<"\tWidth_x: "<<box.x_<<"\tWidth_y "<<box.y_<<"\tHeight: "<<box.z_<<endl;
+    os<<"------------------------------------";
+    return os;
 }
 
+ostream& operator<<(ostream& os, Cylinder const& cylinder)
+{
+    os<< static_cast <const Geometry &>( cylinder ) << endl;
+    os<<"\tRadius: "<<cylinder.radius_<<"\tInnner radius: "<<cylinder.inner_radius_<<" Height: "<<cylinder.z_<<endl;
+    os<<"------------------------------------";
+    return os;
+}
 
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
+}  // namespace PROPOSAL
+
+// ------------------------------------------------------------------------- //
+// Geometry
+// ------------------------------------------------------------------------- //
 
 
-bool Geometry::IsParticleInside(PROPOSALParticle* particle)
+Geometry::Geometry()
+    :x0_            ( 0. )
+    ,y0_            ( 0. )
+    ,z0_            ( 0. )
+    ,object_        ( "" )
+    ,hirarchy_      (0)
+{
+    // Nothing to do here
+}
+
+Geometry::Geometry(std::string object, double x, double y, double z)
+    :x0_            ( 100.0*x )
+    ,y0_            ( 100.0*y )
+    ,z0_            ( 100.0*z )
+    ,object_        ( object )
+    ,hirarchy_      (0)
+{
+    // Nothing to do here
+}
+
+Geometry::Geometry(const Geometry &geometry)
+    :x0_            ( geometry.x0_ )
+    ,y0_            ( geometry.y0_ )
+    ,z0_            ( geometry.z0_ )
+    ,object_        ( geometry.object_ )
+    ,hirarchy_      ( geometry.hirarchy_)
+{
+    // Nothing to do here
+}
+
+Geometry& Geometry::operator=(const Geometry& geometry)
+{
+    if (this != &geometry)
+    {
+        x0_ = geometry.x0_;
+        y0_ = geometry.y0_;
+        z0_ = geometry.z0_;
+        object_ = geometry.object_;
+        hirarchy_ = geometry.hirarchy_;
+    }
+
+    return *this;
+}
+
+// ------------------------------------------------------------------------- //
+void Geometry::swap(Geometry& geometry)
+{
+    using std::swap;
+
+    swap(x0_, geometry.x0_);
+    swap(y0_, geometry.y0_);
+    swap(z0_, geometry.z0_);
+    swap(hirarchy_, geometry.hirarchy_);
+
+    object_.swap( geometry.object_ );
+}
+
+// ------------------------------------------------------------------------- //
+bool Geometry::operator==(const Geometry &geometry) const
+{
+    if( x0_            != geometry.x0_ )            return false;
+    if( y0_            != geometry.y0_ )            return false;
+    if( z0_            != geometry.z0_ )            return false;
+    if( object_.compare(geometry.object_)!= 0 )     return false;
+    if( hirarchy_      != geometry.hirarchy_  )     return false;
+
+    return this->doCompare(geometry);
+}
+
+// ------------------------------------------------------------------------- //
+bool Geometry::operator!=(const Geometry &geometry) const
+{
+    return !(*this == geometry);
+}
+
+// ------------------------------------------------------------------------- //
+// Member functions
+// ------------------------------------------------------------------------- //
+
+
+bool Geometry::IsInside(PROPOSALParticle* particle)
 {
     bool is_inside  =   false;
 
@@ -110,12 +156,8 @@ bool Geometry::IsParticleInside(PROPOSALParticle* particle)
     return is_inside;
 }
 
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-bool Geometry::IsParticleInfront(PROPOSALParticle* particle)
+// ------------------------------------------------------------------------- //
+bool Geometry::IsInfront(PROPOSALParticle* particle)
 {
     bool is_infront  =   false;
 
@@ -128,12 +170,8 @@ bool Geometry::IsParticleInfront(PROPOSALParticle* particle)
     return is_infront;
 }
 
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-bool Geometry::IsParticleBehind(PROPOSALParticle* particle)
+// ------------------------------------------------------------------------- //
+bool Geometry::IsBehind(PROPOSALParticle* particle)
 {
     bool is_behind  =   false;
 
@@ -146,48 +184,7 @@ bool Geometry::IsParticleBehind(PROPOSALParticle* particle)
     return is_behind;
 }
 
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-pair<double,double> Geometry::DistanceToBorder(PROPOSALParticle* particle)
-{
-    //if( !IsParticleInside(particle) ) return 0;
-
-    pair<double,double> distance;
-
-    if( object_.compare("sphere")==0 )
-    {
-        distance    =   DistanceToBorderSphere(particle);
-
-    }
-    else if( object_.compare("box")==0 )
-    {
-        distance    =   DistanceToBorderBox(particle);
-
-    }
-    else if( object_.compare("cylinder")==0 )
-    {
-        distance    =   DistanceToBorderCylinder(particle);
-
-    }
-    else
-    {
-        log_error("geometry type is not recognized! (-1,-1) is returned");
-        distance.first  =   -1;
-        distance.second =   -1;
-    }
-
-    return distance;
-}
-
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
+// ------------------------------------------------------------------------- //
 double Geometry::DistanceToClosestApproach(PROPOSALParticle* particle)
 {
     double dir_vec_x = particle->GetCosPhi()*particle->GetSinTheta();
@@ -200,168 +197,93 @@ double Geometry::DistanceToClosestApproach(PROPOSALParticle* particle)
     return distance;
 }
 
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-//--------------------------------constructors--------------------------------//
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
+/******************************************************************************
+*                                   Sphere                                    *
+******************************************************************************/
 
 
-Geometry::Geometry()
-    :x0_            ( 0. )
-    ,y0_            ( 0. )
-    ,z0_            ( 0. )
-    ,inner_radius_  ( 0. )
-    ,radius_        ( 0. )
-    ,x_             ( 0. )
-    ,y_             ( 0. )
-    ,z_             ( 0. )
-    ,object_        ( "sphere" )
-    ,hirarchy_      (0)
+Sphere::Sphere()
+    :Geometry()
+    ,inner_radius_(0.0)
+    ,radius_(0.0)
 {
-
+    // Do nothing here
 }
 
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-Geometry::Geometry(const Geometry &geometry)
-    :x0_            ( geometry.x0_ )
-    ,y0_            ( geometry.y0_ )
-    ,z0_            ( geometry.z0_ )
-    ,inner_radius_  ( geometry.inner_radius_ )
-    ,radius_        ( geometry.radius_ )
-    ,x_             ( geometry.x_ )
-    ,y_             ( geometry.y_ )
-    ,z_             ( geometry.z_ )
-    ,object_        ( geometry.object_ )
-    ,hirarchy_      ( geometry.hirarchy_)
+Sphere::Sphere(double x0, double y0, double z0, double inner_radius, double radius)
+    :Geometry("Sphere", x0, y0, z0)
+    ,inner_radius_(100.0*inner_radius)
+    ,radius_(100.0*radius)
 {
-
-}
-
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-//-------------------------operators and swap function------------------------//
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-Geometry& Geometry::operator=(const Geometry &geometry)
-{
-    if (this != &geometry)
+    if(inner_radius_ > radius_)
     {
-      Geometry tmp(geometry);
-      swap(tmp);
+        log_error("Inner radius %f is greater then radius %f (will be swaped)",inner_radius_, radius_);
+        std::swap( inner_radius_, radius_ );
     }
+    if(inner_radius_ == radius_)
+    {
+        log_error("Warning: Inner radius %f == radius %f (Volume is 0)",inner_radius_, radius_);
+    }
+}
+
+Sphere::Sphere(const Sphere& sphere)
+    :Geometry(sphere)
+    ,inner_radius_( sphere.inner_radius_ )
+    ,radius_( sphere.radius_ )
+{
+    // Nothing to do here
+}
+
+// ------------------------------------------------------------------------- //
+Sphere& Sphere::operator=(const Sphere& sphere)
+{
+    Geometry::operator=(sphere);
+
+    if (this != &sphere)
+    {
+        inner_radius_ = sphere.inner_radius_;
+        radius_ =  sphere.radius_;
+    }
+
     return *this;
 }
 
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-bool Geometry::operator==(const Geometry &geometry) const
+// ------------------------------------------------------------------------- //
+void Sphere::swap(Sphere &sphere)
 {
-    if( x0_            != geometry.x0_ )            return false;
-    if( y0_            != geometry.y0_ )            return false;
-    if( z0_            != geometry.z0_ )            return false;
-    if( inner_radius_  != geometry.inner_radius_ )  return false;
-    if( radius_        != geometry.radius_ )        return false;
-    if( x_             != geometry.x_ )             return false;
-    if( y_             != geometry.y_ )             return false;
-    if( z_             != geometry.z_ )             return false;
+    using std::swap;
 
-    if( object_.compare(geometry.object_)!= 0 )     return false;
+    Geometry::swap(sphere);
 
-    if( hirarchy_      != geometry.hirarchy_  )     return false;
+    swap( inner_radius_  , sphere.inner_radius_ );
+    swap( radius_        , sphere.radius_ );
+}
+
+//------------------------------------------------------------------------- //
+// Sphere& Sphere::operator=(const Sphere &sphere)
+// {
+//     if (this != &sphere)
+//     {
+//       Sphere tmp(sphere);
+//       swap(tmp);
+//     }
+//     return *this;
+// }
+
+// ------------------------------------------------------------------------- //
+bool Sphere::doCompare(const Geometry& geometry) const
+{
+    const Sphere* sphere = dynamic_cast<const Sphere*>(&geometry);
+
+    if( inner_radius_  != sphere->inner_radius_ )  return false;
+    if( radius_        != sphere->radius_ )        return false;
 
     //else
     return true;
 }
 
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-bool Geometry::operator!=(const Geometry &geometry) const
-{
-    return !(*this == geometry);
-}
-
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-namespace PROPOSAL
-{
-
-ostream& operator<<(ostream& os, Geometry const& geometry)
-{
-    os<<"--------Geometry( "<<&geometry<<" )--------"<<endl;
-    os<<"\t"<<geometry.object_<<endl;
-    os<<"\tOrigin (x,y,z):\t"<<geometry.x0_<<"\t"<<geometry.y0_<<"\t"<<geometry.z0_<<endl;
-    os<<"\tHirarchy:\t"<<geometry.hirarchy_ << endl;
-    if(geometry.object_.compare("sphere")==0)
-    {
-        os<<"\tRadius: "<<geometry.radius_<<"\tInner radius: "<<geometry.inner_radius_<<endl;
-    }
-    if(geometry.object_.compare("cylinder")==0)
-    {
-        os<<"\tRadius: "<<geometry.radius_<<"\tInnner radius: "<<geometry.inner_radius_<<" Height: "<<geometry.z_<<endl;
-    }
-    if(geometry.object_.compare("box")==0)
-    {
-        os<<"\tWidth_x: "<<geometry.x_<<"\tWidth_y "<<geometry.y_<<"\tHeight: "<<geometry.z_<<endl;
-    }
-    os<<"------------------------------------";
-    return os;
-}
-
-}  // namespace PROPOSAL
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-void Geometry::swap(Geometry &geometry)
-{
-    using std::swap;
-
-    swap( x0_            , geometry.x0_ );
-    swap( y0_            , geometry.y0_ );
-    swap( z0_            , geometry.z0_ );
-    swap( inner_radius_  , geometry.inner_radius_ );
-    swap( radius_        , geometry.radius_ );
-    swap( x_             , geometry.x_ );
-    swap( y_             , geometry.y_ );
-    swap( z_             , geometry.z_ );
-    swap( hirarchy_      , geometry.hirarchy_ );
-
-    object_.swap( geometry.object_ );
-}
-
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-//-------------------------private member functions---------------------------//
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-pair<double,double> Geometry::DistanceToBorderSphere(PROPOSALParticle* particle)
+// ------------------------------------------------------------------------- //
+pair<double,double> Sphere::DistanceToBorder(PROPOSALParticle* particle)
 {
     // Calculate intersection of particle trajectory and the sphere
     // sphere (x1 + x0)^2 + (x2 + y0)^2 + (x3 + z0)^2 = radius^2
@@ -553,12 +475,80 @@ pair<double,double> Geometry::DistanceToBorderSphere(PROPOSALParticle* particle)
     return distance;
 }
 
+/******************************************************************************
+*                                    Box                                      *
+******************************************************************************/
 
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
 
+Box::Box()
+    :Geometry()
+    ,x_(0.0)
+    ,y_(0.0)
+    ,z_(0.0)
+{
+    // Do nothing here
+}
 
-pair<double,double> Geometry::DistanceToBorderBox(PROPOSALParticle* particle)
+Box::Box(double x0, double y0, double z0, double x, double y, double z)
+    :Geometry("Box", x0, y0, z0)
+    ,x_(100.0*x)
+    ,y_(100.0*y)
+    ,z_(100.0*z)
+{
+    // Do nothing here
+}
+
+Box::Box(const Box& box)
+    :Geometry(box)
+    ,x_( box.x_ )
+    ,y_( box.y_ )
+    ,z_( box.z_ )
+{
+    // Nothing to do here
+}
+
+// ------------------------------------------------------------------------- //
+Box& Box::operator=(const Box& box)
+{
+    Geometry::operator=(box);
+
+    if (this != &box)
+    {
+        x_ = box.x_;
+        y_ = box.y_;
+        z_ = box.z_;
+    }
+
+    return *this;
+}
+
+// ------------------------------------------------------------------------- //
+void Box::swap(Box& box)
+{
+    using std::swap;
+
+    Geometry::swap(box);
+
+    swap(x_, box.x_);
+    swap(y_, box.y_);
+    swap(z_, box.z_);
+}
+
+// ------------------------------------------------------------------------- //
+bool Box::doCompare(const Geometry& geometry) const
+{
+    const Box* box = dynamic_cast<const Box*>(&geometry);
+
+    if( x_             != box->x_ )             return false;
+    if( y_             != box->y_ )             return false;
+    if( z_             != box->z_ )             return false;
+
+    //else
+    return true;
+}
+
+// ------------------------------------------------------------------------- //
+pair<double,double> Box::DistanceToBorder(PROPOSALParticle* particle)
 {
     // Calculate intersection of particle trajectory and the box
     // Surface of the box is defined by six planes:
@@ -776,12 +766,88 @@ pair<double,double> Geometry::DistanceToBorderBox(PROPOSALParticle* particle)
     return distance;
 }
 
+/******************************************************************************
+*                                  Cylinder                                   *
+******************************************************************************/
 
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
 
+Cylinder::Cylinder()
+    :Geometry()
+    ,inner_radius_(0.0)
+    ,radius_(0.0)
+    ,z_(0.0)
+{
+    // Do nothing here
+}
 
-pair<double,double> Geometry::DistanceToBorderCylinder(PROPOSALParticle* particle)
+Cylinder::Cylinder(double x0, double y0, double z0, double inner_radius, double radius, double z)
+    :Geometry("Cylinder", x0, y0, z0)
+    ,inner_radius_(100*inner_radius)
+    ,radius_(100*radius)
+    ,z_(100*z)
+{
+    if(inner_radius_ > radius_)
+    {
+        log_error("Inner radius %f is greater then radius %f (will be swaped)",inner_radius_, radius_);
+        std::swap( inner_radius_, radius_ );
+    }
+    if(inner_radius_ == radius_)
+    {
+        log_error("Warning: Inner radius %f == radius %f (Volume is 0)",inner_radius_, radius_);
+    }
+}
+
+Cylinder::Cylinder(const Cylinder& cylinder)
+    :Geometry(cylinder)
+    ,inner_radius_(cylinder.inner_radius_)
+    ,radius_(cylinder.radius_)
+    ,z_(cylinder.z_)
+{
+    // Nothing to do here
+}
+
+// ------------------------------------------------------------------------- //
+Cylinder& Cylinder::operator=(const Cylinder& cylinder)
+{
+    Geometry::operator=(cylinder);
+
+    if (this != &cylinder)
+    {
+        inner_radius_ = cylinder.inner_radius_;
+        radius_       = cylinder.radius_;
+        z_            = cylinder.z_;
+    }
+
+    return *this;
+}
+
+// ------------------------------------------------------------------------- //
+void Cylinder::swap(Cylinder& cylinder)
+{
+    using std::swap;
+
+    Geometry::swap(cylinder);
+
+    swap(inner_radius_, cylinder.inner_radius_);
+    swap(radius_, cylinder.radius_);
+    swap(z_, cylinder.z_);
+}
+
+// ------------------------------------------------------------------------- //
+bool Cylinder::doCompare(const Geometry& geometry) const
+{
+    const Cylinder* cylinder = dynamic_cast<const Cylinder*>(&geometry);
+
+    if( inner_radius_ != cylinder->inner_radius_ ) return false;
+    if( radius_ != cylinder->radius_ ) return false;
+    if( z_ != cylinder->z_ ) return false;
+
+    //else
+    return true;
+}
+
+// ------------------------------------------------------------------------- //
+pair<double,double> Cylinder::DistanceToBorder(PROPOSALParticle* particle)
 {
     // Calculate intersection of particle trajectory and the cylinder
     // cylinder barrel (x1 + x0)^2 + (x2 + y0)^2  = radius^2 [ z0_-0.5*z_ < particle->z <z0_ - 0.5*z_ ]
@@ -1230,60 +1296,3 @@ pair<double,double> Geometry::DistanceToBorderCylinder(PROPOSALParticle* particl
 
     return distance;
 }
-
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-//---------------------------------Setter-------------------------------------//
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-void Geometry::SetX0(double x0) {
-    x0_ =   x0;
-}
-
-void Geometry::SetY0(double y0) {
-    y0_ =   y0;
-}
-
-void Geometry::SetZ0(double z0) {
-    z0_ =   z0;
-}
-
-void Geometry::SetX(double x) {
-    x_ =   x;
-}
-
-void Geometry::SetY(double y) {
-    y_ =   y;
-}
-
-void Geometry::SetZ(double z) {
-    z_ =   z;
-}
-
-void Geometry::SetInnerRadius(double inner_radius) {
-    inner_radius_ =   inner_radius;
-}
-
-void Geometry::SetRadius(double radius) {
-    radius_ =   radius;
-}
-
-void Geometry::SetObject(string object) {
-    object_ =   object;
-}
-
-void Geometry::SetHirarchy(unsigned int hirarchy) {
-    hirarchy_ =   hirarchy;
-}
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-//---------------------------------Destructor---------------------------------//
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-Geometry::~Geometry(){}
