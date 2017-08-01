@@ -12,8 +12,6 @@
 
 // #include <string>
 
-#include "PROPOSAL/MathModel.h"
-#include "PROPOSAL/Constants.h"
 #include "PROPOSAL/PROPOSALParticle.h"
 #include "PROPOSAL/Medium.h"
 #include "PROPOSAL/EnergyCutSettings.h"
@@ -163,7 +161,7 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    void SetParametrizationLimit(double ebig=BIGENERGY);
+    void SetParametrizationLimit(double ebig);
 
 //----------------------------------------------------------------------------//
 

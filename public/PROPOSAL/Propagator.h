@@ -26,6 +26,7 @@
  */
 
 // #include <utility>
+#include <deque>
 
 #include "PROPOSAL/ProcessCollection.h"
 #include "PROPOSAL/ScatteringFirstOrder.h"
