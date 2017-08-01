@@ -11,7 +11,8 @@
 
 #include "PROPOSAL/Propagator.h"
 #include "PROPOSAL/Output.h"
-// #include "PROPOSAL/Constants.h"
+#include "PROPOSAL/methods.h"
+#include "PROPOSAL/Constants.h"
 
 using namespace std;
 using namespace PROPOSAL;

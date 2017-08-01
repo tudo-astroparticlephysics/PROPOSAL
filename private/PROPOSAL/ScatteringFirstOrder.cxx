@@ -15,7 +15,7 @@
 #include "PROPOSAL/methods.h"
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/ScatteringFirstOrder.h"
-#include "PROPOSAL/Output.h"
+// #include "PROPOSAL/Output.h"
 
 using namespace std;
 using namespace PROPOSAL;
