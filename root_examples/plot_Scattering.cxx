@@ -12,6 +12,7 @@
 #include "TGraphErrors.h"
 
 #include "PROPOSAL/Propagator.h"
+#include "PROPOSAL/Constants.h"
 
 
 using namespace std;
