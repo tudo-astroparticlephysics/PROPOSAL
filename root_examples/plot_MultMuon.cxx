@@ -12,6 +12,7 @@
 
 #include "PROPOSAL/Propagator.h"
 #include "PROPOSAL/Output.h"
+#include "PROPOSAL/Constants.h"
 // #include "PROPOSAL/Bremsstrahlung.h"
 // #include "PROPOSAL/Integral.h"
 // #include "PROPOSAL/Medium.h"

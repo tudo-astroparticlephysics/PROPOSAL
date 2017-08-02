@@ -16,7 +16,8 @@
 #include "PROPOSAL/Medium.h"
 #include "PROPOSAL/Integral.h"
 #include "PROPOSAL/Output.h"
-// #include "PROPOSAL/methods.h"
+#include "PROPOSAL/Constants.h"
+#include "PROPOSAL/methods.h"
 
 
 using namespace std;

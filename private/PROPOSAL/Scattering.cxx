@@ -21,8 +21,8 @@
 #include "PROPOSAL/Epairproduction.h"
 #include "PROPOSAL/Photonuclear.h"
 #include "PROPOSAL/Output.h"
-// #include "PROPOSAL/methods.h"
-// #include "PROPOSAL/Constants.h"
+#include "PROPOSAL/methods.h"
+#include "PROPOSAL/Constants.h"
 
 using namespace std;
 using namespace PROPOSAL;
