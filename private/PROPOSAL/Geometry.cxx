@@ -129,7 +129,7 @@ bool Geometry::operator==(const Geometry &geometry) const
     if( object_.compare(geometry.object_)!= 0 )     return false;
     if( hirarchy_      != geometry.hirarchy_  )     return false;
 
-    return this->doCompare(geometry);
+    return this->compare(geometry);
 }
 
 // ------------------------------------------------------------------------- //
@@ -249,14 +249,21 @@ Sphere& Sphere::operator=(const Sphere& sphere)
 }
 
 // ------------------------------------------------------------------------- //
-void Sphere::swap(Sphere &sphere)
+void Sphere::swap(Geometry& geometry)
 {
     using std::swap;
 
-    Geometry::swap(sphere);
+    Sphere* sphere = dynamic_cast<Sphere*>(&geometry);
+    if (!sphere)
+    {
+        log_warn("Cannot swap Sphere!");
+        return;
+    }
 
-    swap( inner_radius_  , sphere.inner_radius_ );
-    swap( radius_        , sphere.radius_ );
+    Geometry::swap(*sphere);
+
+    swap( inner_radius_  , sphere->inner_radius_ );
+    swap( radius_        , sphere->radius_ );
 }
 
 //------------------------------------------------------------------------- //
@@ -271,12 +278,13 @@ void Sphere::swap(Sphere &sphere)
 // }
 
 // ------------------------------------------------------------------------- //
-bool Sphere::doCompare(const Geometry& geometry) const
+bool Sphere::compare(const Geometry& geometry) const
 {
     const Sphere* sphere = dynamic_cast<const Sphere*>(&geometry);
 
-    if( inner_radius_  != sphere->inner_radius_ )  return false;
-    if( radius_        != sphere->radius_ )        return false;
+    if (!sphere) return false;
+    if ( inner_radius_  != sphere->inner_radius_ )  return false;
+    if ( radius_        != sphere->radius_ )        return false;
 
     //else
     return true;
@@ -523,22 +531,30 @@ Box& Box::operator=(const Box& box)
 }
 
 // ------------------------------------------------------------------------- //
-void Box::swap(Box& box)
+void Box::swap(Geometry& geometry)
 {
     using std::swap;
 
-    Geometry::swap(box);
+    Box* box = dynamic_cast<Box*>(&geometry);
+    if (!box)
+    {
+        log_warn("Cannot swap Box!");
+        return;
+    }
 
-    swap(x_, box.x_);
-    swap(y_, box.y_);
-    swap(z_, box.z_);
+    Geometry::swap(*box);
+
+    swap(x_, box->x_);
+    swap(y_, box->y_);
+    swap(z_, box->z_);
 }
 
 // ------------------------------------------------------------------------- //
-bool Box::doCompare(const Geometry& geometry) const
+bool Box::compare(const Geometry& geometry) const
 {
     const Box* box = dynamic_cast<const Box*>(&geometry);
 
+    if (!box) return false;
     if( x_             != box->x_ )             return false;
     if( y_             != box->y_ )             return false;
     if( z_             != box->z_ )             return false;
@@ -822,22 +838,30 @@ Cylinder& Cylinder::operator=(const Cylinder& cylinder)
 }
 
 // ------------------------------------------------------------------------- //
-void Cylinder::swap(Cylinder& cylinder)
+void Cylinder::swap(Geometry& geometry)
 {
     using std::swap;
 
-    Geometry::swap(cylinder);
+    Cylinder* cylinder = dynamic_cast<Cylinder*>(&geometry);
+    if (!cylinder)
+    {
+        log_warn("Cannot swap Cylinder!");
+        return;
+    }
 
-    swap(inner_radius_, cylinder.inner_radius_);
-    swap(radius_, cylinder.radius_);
-    swap(z_, cylinder.z_);
+    Geometry::swap(*cylinder);
+
+    swap(inner_radius_, cylinder->inner_radius_);
+    swap(radius_, cylinder->radius_);
+    swap(z_, cylinder->z_);
 }
 
 // ------------------------------------------------------------------------- //
-bool Cylinder::doCompare(const Geometry& geometry) const
+bool Cylinder::compare(const Geometry& geometry) const
 {
     const Cylinder* cylinder = dynamic_cast<const Cylinder*>(&geometry);
 
+    if (!cylinder) return false;
     if( inner_radius_ != cylinder->inner_radius_ ) return false;
     if( radius_ != cylinder->radius_ ) return false;
     if( z_ != cylinder->z_ ) return false;

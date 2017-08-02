@@ -92,7 +92,7 @@ std::vector<PROPOSALParticle*> Propagator::propagate(double MaxDistance_cm)
     double energy_at_exit_point             =   0;
 
 
-    bool starts_in_detector     =   detector_->IsParticleInside(particle_);
+    bool starts_in_detector     =   detector_->IsInside(particle_);
     bool is_in_detector     =   false;
     bool was_in_detector    =   false;
 
@@ -118,7 +118,7 @@ std::vector<PROPOSALParticle*> Propagator::propagate(double MaxDistance_cm)
             if (particle_->GetType() != collections_.at(i)->GetParticle()->GetType())
                 continue;
 
-            if(detector_->IsParticleInfront(particle_))
+            if(detector_->IsInfront(particle_))
             {
                 if(collections_.at(i)->GetLocation() != 0)
                     continue;
@@ -135,7 +135,7 @@ std::vector<PROPOSALParticle*> Propagator::propagate(double MaxDistance_cm)
                 }
             }
 
-            else if(detector_->IsParticleInside(particle_))
+            else if(detector_->IsInside(particle_))
             {
                 if(collections_.at(i)->GetLocation() != 1)
                     continue;
@@ -150,7 +150,7 @@ std::vector<PROPOSALParticle*> Propagator::propagate(double MaxDistance_cm)
 
             }
 
-            else if(detector_->IsParticleBehind(particle_))
+            else if(detector_->IsBehind(particle_))
             {
                 if(collections_.at(i)->GetLocation() != 2)
                     continue;
@@ -242,7 +242,7 @@ std::vector<PROPOSALParticle*> Propagator::propagate(double MaxDistance_cm)
         }
 
 
-        is_in_detector  =   detector_->IsParticleInside(particle_);
+        is_in_detector  =   detector_->IsInside(particle_);
         // entry point of the detector
         if(!starts_in_detector && !was_in_detector && is_in_detector)
         {
@@ -338,7 +338,7 @@ vector<PROPOSALParticle*> Propagator::Propagate( PROPOSALParticle *particle, dou
     double energy_at_exit_point             =   0;
 
 
-    bool starts_in_detector     =   detector_->IsParticleInside(particle_);
+    bool starts_in_detector     =   detector_->IsInside(particle_);
     bool is_in_detector     =   false;
     bool was_in_detector    =   false;
 
@@ -363,7 +363,7 @@ vector<PROPOSALParticle*> Propagator::Propagate( PROPOSALParticle *particle, dou
             if (particle->GetType() != collections_.at(i)->GetParticle()->GetType())
                 continue;
 
-            if(detector_->IsParticleInfront(particle))
+            if(detector_->IsInfront(particle))
             {
                 if(collections_.at(i)->GetLocation() != 0)
                     continue;
@@ -380,7 +380,7 @@ vector<PROPOSALParticle*> Propagator::Propagate( PROPOSALParticle *particle, dou
                 }
             }
 
-            else if(detector_->IsParticleInside(particle))
+            else if(detector_->IsInside(particle))
             {
                 if(collections_.at(i)->GetLocation() != 1)
                     continue;
@@ -395,7 +395,7 @@ vector<PROPOSALParticle*> Propagator::Propagate( PROPOSALParticle *particle, dou
 
             }
 
-            else if(detector_->IsParticleBehind(particle))
+            else if(detector_->IsBehind(particle))
             {
                 if(collections_.at(i)->GetLocation() != 2)
                     continue;
@@ -487,7 +487,7 @@ vector<PROPOSALParticle*> Propagator::Propagate( PROPOSALParticle *particle, dou
         }
 
 
-        is_in_detector  =   detector_->IsParticleInside(particle_);
+        is_in_detector  =   detector_->IsInside(particle_);
         // entry point of the detector
         if(!starts_in_detector && !was_in_detector && is_in_detector)
         {
@@ -826,7 +826,7 @@ void Propagator::ChooseCurrentCollection(PROPOSALParticle* particle)
             continue;
         }
 
-        if(detector_->IsParticleInfront(particle))
+        if(detector_->IsInfront(particle))
         {
             if(collections_.at(i)->GetLocation() != 0)
             {
@@ -834,7 +834,7 @@ void Propagator::ChooseCurrentCollection(PROPOSALParticle* particle)
             }
             else
             {
-                if(collections_.at(i)->GetGeometry()->IsParticleInside(particle))
+                if(collections_.at(i)->GetGeometry()->IsInside(particle))
                 {
                     current_collection_ = collections_.at(i);
                     crossed_collections.push_back(i);
@@ -846,7 +846,7 @@ void Propagator::ChooseCurrentCollection(PROPOSALParticle* particle)
             }
         }
 
-        else if(detector_->IsParticleInside(particle))
+        else if(detector_->IsInside(particle))
         {
             if(collections_.at(i)->GetLocation() != 1)
             {
@@ -854,7 +854,7 @@ void Propagator::ChooseCurrentCollection(PROPOSALParticle* particle)
             }
             else
             {
-                if(collections_.at(i)->GetGeometry()->IsParticleInside(particle))
+                if(collections_.at(i)->GetGeometry()->IsInside(particle))
                 {
                     current_collection_ = collections_.at(i);
                     crossed_collections.push_back(i);
@@ -867,7 +867,7 @@ void Propagator::ChooseCurrentCollection(PROPOSALParticle* particle)
 
         }
 
-        else if(detector_->IsParticleBehind(particle))
+        else if(detector_->IsBehind(particle))
         {
             if(collections_.at(i)->GetLocation() != 2)
             {
@@ -875,7 +875,7 @@ void Propagator::ChooseCurrentCollection(PROPOSALParticle* particle)
             }
             else
             {
-                if(collections_.at(i)->GetGeometry()->IsParticleInside(particle))
+                if(collections_.at(i)->GetGeometry()->IsInside(particle))
                 {
                     current_collection_ = collections_.at(i);
                     crossed_collections.push_back(i);
@@ -1300,9 +1300,8 @@ void Propagator::ReadConfigFile(string config_file, bool DoApplyOptions)
                 }
             }
 
-            detector_   =   new Geometry();
-
-            InitGeometry(detector_,token,taux);
+            // detector_   =   new Geometry();
+            detector_ = InitGeometry(token,taux);
 
         }
 
@@ -1401,8 +1400,9 @@ Propagator::Propagator()
 {
     particle_              = new PROPOSALParticle(ParticleType::MuMinus);
     backup_particle_       = new PROPOSALParticle(*particle_);
-    detector_              = new Geometry();
-    detector_->InitSphere(0,0,0,1e18,0);
+    detector_              = new Sphere(0.0, 0.0, 0.0, 1e18, 0);
+    // detector_              = new Geometry();
+    // detector_->InitSphere(0,0,0,1e18,0);
     InitDefaultCollection(detector_);
 }
 
@@ -1446,8 +1446,9 @@ Propagator::Propagator(
 {
     particle_              = new PROPOSALParticle(particle_type);
     backup_particle_       = new PROPOSALParticle(*particle_);
-    detector_              = new Geometry();
-    detector_->InitSphere(0,0,0,1e18,0);
+    detector_              = new Sphere(0.0, 0.0, 0.0, 1e18, 0);
+    // detector_              = new Geometry();
+    // detector_->InitSphere(0,0,0,1e18,0);
 
     if(scattering_model_ != -1)
     {
@@ -1526,8 +1527,9 @@ Propagator::Propagator(Medium* medium,
     particle_              = new PROPOSALParticle(particle_type);
     backup_particle_       = new PROPOSALParticle(*particle_);
     current_collection_    = new ProcessCollection(particle_, medium, cuts);
-    detector_              = new Geometry();
-    detector_->InitSphere(0,0,0,1e18,0);
+    detector_              = new Sphere(0.0, 0.0, 0.0, 1e18, 0);
+    // detector_              = new Geometry();
+    // detector_->InitSphere(0,0,0,1e18,0);
     current_collection_->SetGeometry(detector_);
 
     current_collection_->SetLocation(1); // Inside the detector
@@ -1895,8 +1897,9 @@ void Propagator::InitProcessCollections(ifstream &file)
             }
         }
     }
-    Geometry *geometry  = new Geometry();
-    InitGeometry(geometry,token,taux);
+    // Geometry *geometry  = new Geometry();
+    Geometry* geometry = InitGeometry(token,taux);
+    // detector_->SetHirarchy(0);
     geometry->SetHirarchy(0);
 
     while(file.good())
@@ -2462,7 +2465,7 @@ void Propagator::ResetParticle()
     *particle_ = *backup_particle_;
 }
 
-void Propagator::InitGeometry(Geometry* geometry, std::deque<std::string>* token, string first_token)
+Geometry* Propagator::InitGeometry(std::deque<std::string>* token, string first_token)
 {
     string taux = first_token;
 
@@ -2589,7 +2592,8 @@ void Propagator::InitGeometry(Geometry* geometry, std::deque<std::string>* token
             exit(1);
         }
 
-        geometry->InitCylinder(origin_x,origin_y,origin_z,radius,inner_radius,height);
+        return new Cylinder(origin_x,origin_y,origin_z,radius,inner_radius,height);
+        // geometry->InitCylinder(origin_x,origin_y,origin_z,radius,inner_radius,height);
 
     }
     else if(ToLowerCase(taux).compare("sphere")==0)
@@ -2686,7 +2690,8 @@ void Propagator::InitGeometry(Geometry* geometry, std::deque<std::string>* token
             exit(1);
         }
 
-        geometry->InitSphere(origin_x,origin_y,origin_z,radius,inner_radius);
+        return new Sphere(origin_x,origin_y,origin_z,radius,inner_radius);
+        // geometry->InitSphere(origin_x,origin_y,origin_z,radius,inner_radius);
 
     }
     else if(ToLowerCase(taux).compare("box")==0)
@@ -2789,7 +2794,8 @@ void Propagator::InitGeometry(Geometry* geometry, std::deque<std::string>* token
             exit(1);
         }
 
-        geometry->InitBox(origin_x,origin_y,origin_z,width_x,width_y,width_z);
+        return new Box(origin_x,origin_y,origin_z,width_x,width_y,width_z);
+        // geometry->InitBox(origin_x,origin_y,origin_z,width_x,width_y,width_z);
 
     }
     else
