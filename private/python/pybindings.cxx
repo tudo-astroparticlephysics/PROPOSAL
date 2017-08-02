@@ -619,7 +619,7 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
         .add_property("cut_setting", make_function(&ProcessCollection::GetCutSettings, return_internal_reference<>()), &ProcessCollection::SetCutSettings)
         .add_property("lpm_effect", &ProcessCollection::GetLpmEffectEnabled, &ProcessCollection::SetLpmEffectEnabled)
         .add_property("medium", make_function(&ProcessCollection::GetMedium, return_internal_reference<>()), &ProcessCollection::SetMedium)
-        .add_property("geometry", make_function(&ProcessCollection::GetGeometry, return_internal_reference<>()), &ProcessCollection::SetGeometry)
+        // .add_property("geometry", make_function(&ProcessCollection::GetGeometry, return_internal_reference<>()), &ProcessCollection::SetGeometry)
         .add_property("particle", make_function(&ProcessCollection::GetParticle, return_internal_reference<>()), &ProcessCollection::SetParticle)
         .add_property("location", &ProcessCollection::GetLocation, &ProcessCollection::SetLocation)
         .add_property("density_correction", &ProcessCollection::GetDensityCorrection, &ProcessCollection::SetDensityCorrection)
@@ -630,50 +630,50 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
     // Geometry
     // ------------------------------------------------------------------------- //
 
-    class_<Geometry, boost::shared_ptr<Geometry> >("Geometry", init<>())
-
-        .def(init<const Geometry&>())
-
-        .def(self_ns::str(self_ns::self))
-        .def(self_ns::repr(self_ns::self))
-
-        .def("init_box", &Geometry::InitBox, return_internal_reference<>(), "All units in [m]", (
-            arg("x0"),
-            arg("y0"),
-            arg("z0"),
-            arg("x"),
-            arg("y"),
-            arg("z")
-        ))
-        .def("init_sphere", &Geometry::InitSphere, return_internal_reference<>(), "All units in [m]", (
-            arg("x0"),
-            arg("y0"),
-            arg("z0"),
-            arg("radius"),
-            arg("inner_radius")
-        ))
-        .def("init_cylinder", &Geometry::InitCylinder, return_internal_reference<>(), "All units in [m]", (
-            arg("x0"),
-            arg("y0"),
-            arg("z0"),
-            arg("radius"),
-            arg("inner_radius"),
-            arg("z")
-        ))
-        .def("is_particle_inside", &Geometry::IsParticleInside)
-        .def("is_particle_infront", &Geometry::IsParticleInfront)
-        .def("is_particle_behind", &Geometry::IsParticleBehind)
-        .def("distance_to_border", &Geometry::DistanceToBorder)
-
-        .add_property("x", &Geometry::GetX, &Geometry::SetX)
-        .add_property("y", &Geometry::GetY, &Geometry::SetY)
-        .add_property("z", &Geometry::GetZ, &Geometry::SetZ)
-        .add_property("x0", &Geometry::GetX0, &Geometry::SetX0)
-        .add_property("y0", &Geometry::GetY0, &Geometry::SetY0)
-        .add_property("z0", &Geometry::GetZ0, &Geometry::SetZ0)
-        .add_property("inner_radius", &Geometry::GetInnerRadius, &Geometry::SetInnerRadius)
-        .add_property("radius", &Geometry::GetRadius, &Geometry::SetRadius)
-        .add_property("object", &Geometry::GetObject, &Geometry::SetObject)
-        .add_property("hirachy", &Geometry::GetHirarchy, &Geometry::SetHirarchy)
-    ;
+//     class_<Geometry, boost::shared_ptr<Geometry> >("Geometry", init<>())
+//
+//         .def(init<const Geometry&>())
+//
+//         .def(self_ns::str(self_ns::self))
+//         .def(self_ns::repr(self_ns::self))
+//
+//         .def("init_box", &Geometry::InitBox, return_internal_reference<>(), "All units in [m]", (
+//             arg("x0"),
+//             arg("y0"),
+//             arg("z0"),
+//             arg("x"),
+//             arg("y"),
+//             arg("z")
+//         ))
+//         .def("init_sphere", &Geometry::InitSphere, return_internal_reference<>(), "All units in [m]", (
+//             arg("x0"),
+//             arg("y0"),
+//             arg("z0"),
+//             arg("radius"),
+//             arg("inner_radius")
+//         ))
+//         .def("init_cylinder", &Geometry::InitCylinder, return_internal_reference<>(), "All units in [m]", (
+//             arg("x0"),
+//             arg("y0"),
+//             arg("z0"),
+//             arg("radius"),
+//             arg("inner_radius"),
+//             arg("z")
+//         ))
+//         .def("is_particle_inside", &Geometry::IsParticleInside)
+//         .def("is_particle_infront", &Geometry::IsParticleInfront)
+//         .def("is_particle_behind", &Geometry::IsParticleBehind)
+//         .def("distance_to_border", &Geometry::DistanceToBorder)
+//
+//         .add_property("x", &Geometry::GetX, &Geometry::SetX)
+//         .add_property("y", &Geometry::GetY, &Geometry::SetY)
+//         .add_property("z", &Geometry::GetZ, &Geometry::SetZ)
+//         .add_property("x0", &Geometry::GetX0, &Geometry::SetX0)
+//         .add_property("y0", &Geometry::GetY0, &Geometry::SetY0)
+//         .add_property("z0", &Geometry::GetZ0, &Geometry::SetZ0)
+//         .add_property("inner_radius", &Geometry::GetInnerRadius, &Geometry::SetInnerRadius)
+//         .add_property("radius", &Geometry::GetRadius, &Geometry::SetRadius)
+//         .add_property("object", &Geometry::GetObject, &Geometry::SetObject)
+//         .add_property("hirachy", &Geometry::GetHirarchy, &Geometry::SetHirarchy)
+//     ;
 }
