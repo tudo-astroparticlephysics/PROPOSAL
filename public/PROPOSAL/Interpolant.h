@@ -11,12 +11,12 @@
 #ifndef INTERPOLANT_H_
 #define INTERPOLANT_H_
 
-// #include <vector>
+#include <vector>
 // #include <cmath>
 
-// #include <boost/function.hpp>
+#include <boost/function.hpp>
 
-#include "PROPOSAL/MathModel.h"
+// #include "PROPOSAL/MathModel.h"
 
 namespace PROPOSAL{
 
