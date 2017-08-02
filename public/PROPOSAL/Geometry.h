@@ -15,12 +15,6 @@
 
 #include "PROPOSAL/PROPOSALParticle.h"
 
-namespace PROPOSAL
-{
-    class Geometry;
-}
-
-std::ostream& operator<<(std::ostream& os, PROPOSAL::Geometry const& geometry);
 
 namespace PROPOSAL{
 
@@ -28,21 +22,21 @@ class Geometry
 {
     public:
 
-        Geometry(); //TODO(mario): Maybe not useful Tue 2017/08/01
-        Geometry(std::string object, double x, double y, double z);
+        Geometry(std::string); //TODO(mario): Maybe not useful Tue 2017/08/01
+        Geometry(std::string, double x, double y, double z);
         Geometry(const Geometry&);
+
         virtual Geometry* clone() const = 0; // virtual constructor idiom (used for deep copies)
+        virtual void swap(Geometry&);
+
         virtual ~Geometry() {};
 
         // Operators
-        Geometry& operator=(const Geometry&);
+        virtual Geometry& operator=(const Geometry&);
         bool operator==(const Geometry &geometry) const;
         bool operator!=(const Geometry &geometry) const;
-        friend std::ostream& operator<<(std::ostream& os, Geometry const& geometry);
+        friend std::ostream& operator<<(std::ostream&, Geometry const&);
 
-        // Implemented in child classes to be able to use equality operator
-        virtual bool compare(const Geometry&) const = 0;
-        virtual void swap(Geometry&);
 
         // ----------------------------------------------------------------- //
         // Member functions
@@ -89,7 +83,7 @@ class Geometry
         double GetZ0() const { return z0_; }
 
 
-        std::string GetObject() const    { return object_; }
+        std::string GetName() const    { return name_; }
         unsigned int GetHirarchy() const { return hirarchy_; }
 
         void SetX0(double x0) { x0_ = x0; };
@@ -100,11 +94,15 @@ class Geometry
 
     protected:
 
+        // Implemented in child classes to be able to use equality operator
+        virtual bool compare(const Geometry&) const = 0;
+        virtual void print(std::ostream&) const = 0;
+
         double x0_;             //!< x-coordinate of origin ( center of box, cylinder, sphere)
         double y0_;             //!< y-coordinate of origin ( center of box, cylinder, sphere)
         double z0_;             //!< z-coordinate of origin ( center of box, cylinder, sphere)
 
-        std::string object_;    //!< "box" , "cylinder" , "sphere" (sphere and cylinder might be hollow)
+        std::string name_;    //!< "box" , "cylinder" , "sphere" (sphere and cylinder might be hollow)
 
         unsigned int hirarchy_; //!< adds a hirarchy of geometry objects to allow crossing geometries
 
@@ -119,18 +117,18 @@ class Sphere: public Geometry
     public:
 
         Sphere();
-        Sphere(double x0, double y0, double z0, double inner_radius, double radius);
+        Sphere(double x0, double y0, double z0, double radius, double inner_radius);
         Sphere(const Sphere&);
 
         Geometry* clone() const { return new Sphere(*this); };
+        void swap(Geometry&);
+
         virtual ~Sphere() {}
 
         // Operators
-        Sphere& operator=(const Sphere&);
-        friend std::ostream& operator<<(std::ostream&, Sphere const&);
+        Sphere& operator=(const Geometry&);
+        // friend std::ostream& operator<<(std::ostream&, Sphere const&);
 
-        bool compare(const Geometry&) const;
-        void swap(Geometry&);
 
         // Methods
         std::pair<double,double> DistanceToBorder(PROPOSALParticle* particle);
@@ -144,8 +142,11 @@ class Sphere: public Geometry
 
     private:
 
-        double inner_radius_;   //!< for spherical shells or hollow cylinder (0 for sphere / cylinder)
+        bool compare(const Geometry&) const;
+        void print(std::ostream&) const;
+
         double radius_;         //!< the radius of the sphere/ cylinder
+        double inner_radius_;   //!< for spherical shells or hollow cylinder (0 for sphere / cylinder)
 };
 
 // ----------------------------------------------------------------------------
@@ -160,14 +161,13 @@ class Box: public Geometry
         Box(const Box&);
 
         Geometry* clone() const { return new Box(*this); };
+        void swap(Geometry&);
+
         virtual ~Box() {}
 
         // Operators
-        Box& operator=(const Box&);
-        friend std::ostream& operator<<(std::ostream&, Box const&);
-
-        bool compare(const Geometry&) const;
-        void swap(Geometry&);
+        Box& operator=(const Geometry&);
+        // friend std::ostream& operator<<(std::ostream&, Box const&);
 
         // Methods
         std::pair<double,double> DistanceToBorder(PROPOSALParticle* particle);
@@ -184,6 +184,10 @@ class Box: public Geometry
 
     private:
 
+        bool compare(const Geometry&) const;
+        void print(std::ostream&) const;
+
+
         double x_;              //!< width of box in x-direction
         double y_;              //!< width of box in y-direction
         double z_;              //!< width of box in z-direction
@@ -198,18 +202,17 @@ class Cylinder: public Geometry
     public:
 
         Cylinder();
-        Cylinder(double x0, double y0, double z0, double inner_radius, double radius, double z);
+        Cylinder(double x0, double y0, double z0, double radius, double inner_radius, double z);
         Cylinder(const Cylinder&);
 
         Geometry* clone() const { return new Cylinder(*this); };
+        void swap(Geometry&);
+
         virtual ~Cylinder() {}
 
         // Operators
-        Cylinder& operator=(const Cylinder&);
-        friend std::ostream& operator<<(std::ostream&, Cylinder const&);
-
-        bool compare(const Geometry&) const;
-        void swap(Geometry&);
+        Cylinder& operator=(const Geometry&);
+        // friend std::ostream& operator<<(std::ostream&, Cylinder const&);
 
         // Methods
         std::pair<double,double> DistanceToBorder(PROPOSALParticle* particle);
@@ -225,8 +228,11 @@ class Cylinder: public Geometry
 
     private:
 
-        double inner_radius_;   //!< for spherical shells or hollow cylinder (0 for sphere / cylinder)
+        bool compare(const Geometry&) const;
+        void print(std::ostream&) const;
+
         double radius_;         //!< the radius of the sphere/ cylinder
+        double inner_radius_;   //!< for spherical shells or hollow cylinder (0 for sphere / cylinder)
         double z_;              //!< height of box/cylinder
 };
 
