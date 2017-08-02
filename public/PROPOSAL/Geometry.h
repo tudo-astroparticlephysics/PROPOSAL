@@ -31,6 +31,7 @@ class Geometry
         Geometry(); //TODO(mario): Maybe not useful Tue 2017/08/01
         Geometry(std::string object, double x, double y, double z);
         Geometry(const Geometry&);
+        virtual Geometry* clone() const = 0; // virtual constructor idiom (used for deep copies)
         virtual ~Geometry() {};
 
         // Operators
@@ -40,8 +41,8 @@ class Geometry
         friend std::ostream& operator<<(std::ostream& os, Geometry const& geometry);
 
         // Implemented in child classes to be able to use equality operator
-        virtual bool doCompare(const Geometry&) const = 0;
-        void swap(Geometry&);
+        virtual bool compare(const Geometry&) const = 0;
+        virtual void swap(Geometry&);
 
         // ----------------------------------------------------------------- //
         // Member functions
@@ -120,14 +121,16 @@ class Sphere: public Geometry
         Sphere();
         Sphere(double x0, double y0, double z0, double inner_radius, double radius);
         Sphere(const Sphere&);
+
+        Geometry* clone() const { return new Sphere(*this); };
         virtual ~Sphere() {}
 
         // Operators
         Sphere& operator=(const Sphere&);
         friend std::ostream& operator<<(std::ostream&, Sphere const&);
 
-        bool doCompare(const Geometry&) const;
-        void swap(Sphere&);
+        bool compare(const Geometry&) const;
+        void swap(Geometry&);
 
         // Methods
         std::pair<double,double> DistanceToBorder(PROPOSALParticle* particle);
@@ -155,14 +158,16 @@ class Box: public Geometry
         Box();
         Box(double x0, double y0, double z0, double x, double y, double z);
         Box(const Box&);
+
+        Geometry* clone() const { return new Box(*this); };
         virtual ~Box() {}
 
         // Operators
         Box& operator=(const Box&);
         friend std::ostream& operator<<(std::ostream&, Box const&);
 
-        bool doCompare(const Geometry&) const;
-        void swap(Box&);
+        bool compare(const Geometry&) const;
+        void swap(Geometry&);
 
         // Methods
         std::pair<double,double> DistanceToBorder(PROPOSALParticle* particle);
@@ -195,14 +200,16 @@ class Cylinder: public Geometry
         Cylinder();
         Cylinder(double x0, double y0, double z0, double inner_radius, double radius, double z);
         Cylinder(const Cylinder&);
+
+        Geometry* clone() const { return new Cylinder(*this); };
         virtual ~Cylinder() {}
 
         // Operators
         Cylinder& operator=(const Cylinder&);
         friend std::ostream& operator<<(std::ostream&, Cylinder const&);
 
-        bool doCompare(const Geometry&) const;
-        void swap(Cylinder&);
+        bool compare(const Geometry&) const;
+        void swap(Geometry&);
 
         // Methods
         std::pair<double,double> DistanceToBorder(PROPOSALParticle* particle);
