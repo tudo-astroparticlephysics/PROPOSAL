@@ -1205,7 +1205,8 @@ ProcessCollection::ProcessCollection(const ProcessCollection &collection)
 
     if(collection.geometry_ != NULL)
     {
-        geometry_ = new Geometry(*collection.geometry_) ;
+        // geometry_ = new Geometry(*collection.geometry_) ;
+        geometry_ = collection.geometry_->clone();
     }
     else
     {
@@ -1558,12 +1559,14 @@ void ProcessCollection::swap(ProcessCollection &collection)
     }
     else if( geometry_ == NULL && collection.geometry_ != NULL)
     {
-        geometry_ = new Geometry(*collection.geometry_);
+        // geometry_ = new Geometry(*collection.geometry_);
+        geometry_ = collection.geometry_->clone();
         collection.geometry_ = NULL;
     }
     else if( geometry_ != NULL && collection.geometry_ == NULL)
     {
-        collection.geometry_ = new Geometry(*geometry_);
+        // collection.geometry_ = new Geometry(*geometry_);
+        geometry_ = collection.geometry_->clone();
         geometry_ = NULL;
     }
 
