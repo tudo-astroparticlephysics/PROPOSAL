@@ -1,5 +1,5 @@
 
-// #include <iostream>
+#include <iostream>
 // #include <string>
 // #include <cmath>
 
@@ -14,52 +14,73 @@ using namespace std;
 using namespace PROPOSAL;
 
 TEST(Comparison , Comparison_equal ) {
-    Geometry A;
-    Geometry B;
+    Sphere A;
+    Sphere B;
     EXPECT_TRUE(A==B);
-    Geometry* C = new Geometry();
-    Geometry* D = new Geometry();
-    C->InitSphere(0.,1.,2.,10.,0.);
-    D->InitSphere(0.,1.,2.,10.,0.);
-    EXPECT_TRUE(*C==*D);
-    D->InitSphere(0.,0.,0.,0.,0.);
-    EXPECT_TRUE(A==*D);
 
+    Sphere* C = new Sphere();
+    Sphere* D = new Sphere();
+    EXPECT_TRUE(*C==*D);
+
+    Geometry* E = new Sphere();
+    Geometry* F = new Sphere();
+    EXPECT_TRUE(*E==*F);
+
+    delete C;
+    delete D;
+    delete E;
+    delete F;
 }
 
 TEST(Comparison , Comparison_not_equal ) {
-    Geometry A;
-    Geometry B;
-    B.InitBox(1.,2.,3.,1.,3.,2.);
+    Sphere A;
+    Box B;
     EXPECT_TRUE(A!=B);
-    Geometry* C = new Geometry();
-    Geometry* D = new Geometry();
-    C->InitCylinder(1.,2.,3.,4.,3.,3.);
-    D->InitBox(1.,2.,3.,4.,5.,6.);
+
+    Sphere* C = new Sphere();
+    Box* D = new Box();
     EXPECT_TRUE(*C!=*D);
+
+    Geometry* E = new Sphere();
+    Geometry* F = new Box();
+    EXPECT_TRUE(*E!=*F);
+
+    delete C;
+    delete D;
+    delete E;
+    delete F;
 }
 
 TEST(Assignment , Copyconstructor ) {
-    Geometry A;
-    Geometry B =A;
+    Sphere A;
+    Sphere B = A;
 
     EXPECT_TRUE(A==B);
 
+    Geometry* C = new Sphere();
+    Geometry* D = new Box();
+
+    *D = *C;
+
+    EXPECT_FALSE(*C==*D);
+
+    Geometry* E = new Sphere(1.0, 0.0, 0.0, 20.0, 10.0);
+
+    *C = *E;
+
+    EXPECT_TRUE(*C==*E);
 }
 
 TEST(Assignment , Copyconstructor2 ) {
-    Geometry A;
-    A.InitBox(1.,2.,3.,4.,5.,6.);
-    Geometry B(A);
+    Sphere A;
+    Sphere B(A);
 
     EXPECT_TRUE(A==B);
-
 }
 
 TEST(Assignment , Operator ) {
-    Geometry A;
-    Geometry B;
-    A.InitSphere(1.,2.,3.,4.,3.);
+    Sphere A;
+    Sphere B(0.0, 0.0, 0.0, 2.0, 1.0);
 
     EXPECT_TRUE(A!=B);
 
@@ -69,13 +90,11 @@ TEST(Assignment , Operator ) {
 }
 
 TEST(Assignment , Swap ) {
-    Geometry A;
-    Geometry B;
+    Sphere A;
+    Sphere B;
     EXPECT_TRUE(A==B);
-    Geometry* C = new Geometry();
-    Geometry* D = new Geometry();
-    C->InitSphere(1.,2.,3.,4.,3.);
-    D->InitSphere(1.,2.,3.,4.,3.);
+    Geometry* C = new Sphere(1.0, 2.0, 3.0, 4.0, 3.0);
+    Geometry* D = new Sphere(1.0, 2.0, 3.0, 4.0, 3.0);
 
     EXPECT_TRUE(*C==*D);
 
@@ -87,7 +106,6 @@ TEST(Assignment , Swap ) {
 }
 
 TEST(IsInside , Box ) {
-    Geometry A;
 
     double x        =   0;
     double y        =   0;
@@ -146,7 +164,7 @@ TEST(IsInside , Box ) {
 
         // The values are divided by 100 to convert the units...
         // Init functions expects m but here everthing is in cm
-        A.InitBox(x0/100,y0/100,z0/100,width_x/100,width_y/100,height/100);
+        Box A(x0/100,y0/100,z0/100,width_x/100,width_y/100,height/100);
 
         volumia_ratio = width_x*width_y*height /( big_width_x*big_width_y*big_height);
         for(int j = 0; j<number_particles; j++)
@@ -182,12 +200,12 @@ TEST(IsInside , Box ) {
                 particle->GetZ() < z0 + 0.5*height )
             {
                 is_inside++;
-                EXPECT_TRUE(A.IsParticleInside(particle));
+                EXPECT_TRUE(A.IsInside(particle));
             }
             else
             {
                 is_outside++;
-                EXPECT_FALSE(A.IsParticleInside(particle));
+                EXPECT_FALSE(A.IsInside(particle));
             }
         }
         ASSERT_NEAR(1.*is_inside ,volumia_ratio*number_particles , 3*sqrt(volumia_ratio*number_particles) );
@@ -198,7 +216,7 @@ TEST(IsInside , Box ) {
 
     // The values are divided by 100 to convert the units...
     // Init functions expects m but here everthing is in cm
-    A.InitBox(0,0,0,width_x/100,width_y/100,height/100);
+    Box A(0,0,0,width_x/100,width_y/100,height/100);
 
     // Particle is on the top surface.
     // Theta 0° - 90° means particle is moving outside
@@ -219,9 +237,9 @@ TEST(IsInside , Box ) {
         particle->SetPhi(phi);
 
         if(theta < 90)
-            EXPECT_FALSE(A.IsParticleInside(particle));
+            EXPECT_FALSE(A.IsInside(particle));
         if(theta > 90)
-            EXPECT_TRUE(A.IsParticleInside(particle));
+            EXPECT_TRUE(A.IsInside(particle));
 
     }
 
@@ -243,9 +261,9 @@ TEST(IsInside , Box ) {
         particle->SetPhi(phi);
 
         if(theta > 90)
-            EXPECT_FALSE(A.IsParticleInside(particle));
+            EXPECT_FALSE(A.IsInside(particle));
         if(theta < 90)
-            EXPECT_TRUE(A.IsParticleInside(particle));
+            EXPECT_TRUE(A.IsInside(particle));
 
     }
 
@@ -265,9 +283,9 @@ TEST(IsInside , Box ) {
 
         // phi = 0 is in positive x direction
         if(phi < 90 || phi > 270)
-            EXPECT_FALSE(A.IsParticleInside(particle));
+            EXPECT_FALSE(A.IsInside(particle));
         else
-            EXPECT_TRUE(A.IsParticleInside(particle));
+            EXPECT_TRUE(A.IsInside(particle));
 
     }
     // Surface in negativ x direction
@@ -286,9 +304,9 @@ TEST(IsInside , Box ) {
 
         // phi = 0 is in positive x direction
         if(phi < 90 || phi > 270)
-            EXPECT_TRUE(A.IsParticleInside(particle));
+            EXPECT_TRUE(A.IsInside(particle));
         else
-            EXPECT_FALSE(A.IsParticleInside(particle));
+            EXPECT_FALSE(A.IsInside(particle));
 
     }
     // Surface in positiv y direction
@@ -307,9 +325,9 @@ TEST(IsInside , Box ) {
 
         // phi = 0 is in positive x direction
         if(phi < 180)
-            EXPECT_FALSE(A.IsParticleInside(particle));
+            EXPECT_FALSE(A.IsInside(particle));
         else
-            EXPECT_TRUE(A.IsParticleInside(particle));
+            EXPECT_TRUE(A.IsInside(particle));
 
     }
     // Surface in negativ y direction
@@ -328,9 +346,9 @@ TEST(IsInside , Box ) {
 
         // phi = 0 is in positive x direction
         if(phi < 180)
-            EXPECT_TRUE(A.IsParticleInside(particle));
+            EXPECT_TRUE(A.IsInside(particle));
         else
-            EXPECT_FALSE(A.IsParticleInside(particle));
+            EXPECT_FALSE(A.IsInside(particle));
 
     }
 
@@ -349,17 +367,15 @@ TEST(IsInside , Box ) {
         particle->SetPhi(phi);
 
         if(theta < 90 || phi <180 || phi > 270)
-            EXPECT_FALSE(A.IsParticleInside(particle));
+            EXPECT_FALSE(A.IsInside(particle));
         else
-            EXPECT_TRUE(A.IsParticleInside(particle));
+            EXPECT_TRUE(A.IsInside(particle));
 
     }
-
 }
 
 
 TEST(IsInside , Cylinder ) {
-    Geometry A;
 
     double x        =   0;
     double y        =   0;
@@ -425,7 +441,7 @@ TEST(IsInside , Cylinder ) {
 
         // The values are divided by 100 to convert the units...
         // Init functions expects m but here everthing is in cm
-        A.InitCylinder(x0/100,y0/100,z0/100,radius/100,inner_radius/100,height/100);
+        Cylinder A(x0/100,y0/100,z0/100,radius/100,inner_radius/100,height/100);
 
         volumia_ratio = height*PI*( pow(radius,2) - pow(inner_radius,2) )
                 /( big_width_x*big_width_y*big_height);
@@ -462,12 +478,12 @@ TEST(IsInside , Cylinder ) {
 
                 is_inside++;
 
-                EXPECT_TRUE(A.IsParticleInside(particle));
+                EXPECT_TRUE(A.IsInside(particle));
             }
             else
             {
                 is_outside++;
-                EXPECT_FALSE(A.IsParticleInside(particle));
+                EXPECT_FALSE(A.IsInside(particle));
             }
         }
         ASSERT_NEAR(1.*is_inside ,volumia_ratio*number_particles , 3*sqrt(volumia_ratio*number_particles) );
@@ -479,7 +495,7 @@ TEST(IsInside , Cylinder ) {
 
     // The values are divided by 100 to convert the units...
     // Init functions expects m but here everthing is in cm
-    A.InitSphere(0,0,0,radius/100,0);
+    Sphere B(0,0,0,radius/100,0);
 
     z=0;
     particle->SetZ(z);
@@ -517,9 +533,9 @@ TEST(IsInside , Cylinder ) {
         cos = (-x * dir_vec_x -y*dir_vec_y - z* dir_vec_z) / radius;
 
         if(cos < 1 && cos > 0)
-            EXPECT_TRUE(A.IsParticleInside(particle));
+            EXPECT_TRUE(B.IsInside(particle));
         else
-            EXPECT_FALSE(A.IsParticleInside(particle));
+            EXPECT_FALSE(B.IsInside(particle));
 
     }
 
@@ -534,7 +550,7 @@ TEST(IsInside , Cylinder ) {
 
     // The values are divided by 100 to convert the units...
     // Init functions expects m but here everthing is in cm
-    A.InitCylinder(0,0,0,radius/100,0,height/100);
+    Cylinder C(0,0,0,radius/100,0,height/100);
 
     for(int i = 0; i<1e4; i++)
     {
@@ -549,9 +565,9 @@ TEST(IsInside , Cylinder ) {
         if(x*x+y*y -inner_radius*inner_radius ==0 )
         {
             if(theta < 90)
-                EXPECT_FALSE(A.IsParticleInside(particle));
+                EXPECT_FALSE(C.IsInside(particle));
             if(theta > 90)
-                EXPECT_TRUE(A.IsParticleInside(particle));
+                EXPECT_TRUE(C.IsInside(particle));
         }
 
     }
@@ -573,9 +589,9 @@ TEST(IsInside , Cylinder ) {
         particle->SetPhi(phi);
 
         if(theta > 90)
-            EXPECT_FALSE(A.IsParticleInside(particle));
+            EXPECT_FALSE(C.IsInside(particle));
         if(theta < 90)
-            EXPECT_TRUE(A.IsParticleInside(particle));
+            EXPECT_TRUE(C.IsInside(particle));
 
     }
 
@@ -584,7 +600,7 @@ TEST(IsInside , Cylinder ) {
 
     // The values are divided by 100 to convert the units...
     // Init functions expects m but here everthing is in cm
-    A.InitCylinder(0,0,0,radius/100,inner_radius/100,height/100);
+    Cylinder A(0,0,0,radius/100,inner_radius/100,height/100);
 
     z=0;
     particle->SetZ(z);
@@ -618,9 +634,9 @@ TEST(IsInside , Cylinder ) {
         cos = (-x * dir_vec_x -y*dir_vec_y - z* dir_vec_z) / radius;
 
         if(cos < 1 && cos > 0)
-            EXPECT_FALSE(A.IsParticleInside(particle));
+            EXPECT_FALSE(A.IsInside(particle));
         else
-            EXPECT_TRUE(A.IsParticleInside(particle));
+            EXPECT_TRUE(A.IsInside(particle));
 
     }
 
@@ -666,8 +682,6 @@ TEST(IsInside , Sphere ) {
     int number_particles = 1e6;
     int number_volumina  = 1e1;
 
-    Geometry A;
-
     for(int i = 0; i<number_volumina; i++)
     {
         // Chose the origin of the box-geometry
@@ -687,7 +701,7 @@ TEST(IsInside , Sphere ) {
 
         // The values are divided by 100 to convert the units...
         // Init functions expects m but here everthing is in cm
-        A.InitSphere(x0/100,y0/100,z0/100,radius/100,inner_radius/100);
+        Sphere A(x0/100,y0/100,z0/100,radius/100,inner_radius/100);
 
         volumia_ratio = (4./3.*PI* ( pow(radius ,3)  - pow(inner_radius ,3) ) )
                         /( big_width_x*big_width_y*big_height);
@@ -721,12 +735,12 @@ TEST(IsInside , Sphere ) {
 
             {
                 is_inside++;
-                EXPECT_TRUE(A.IsParticleInside(particle));
+                EXPECT_TRUE(A.IsInside(particle));
             }
             else
             {
                 is_outside++;
-                EXPECT_FALSE(A.IsParticleInside(particle));
+                EXPECT_FALSE(A.IsInside(particle));
             }
         }
         ASSERT_NEAR(1.*is_inside ,volumia_ratio*number_particles , 3*sqrt(volumia_ratio*number_particles) );
@@ -738,7 +752,7 @@ TEST(IsInside , Sphere ) {
 
     // The values are divided by 100 to convert the units...
     // Init functions expects m but here everthing is in cm
-    A.InitSphere(0,0,0,radius/100,0);
+    Sphere A(0,0,0,radius/100,0);
 
     z=0;
     particle->SetZ(z);
@@ -776,9 +790,9 @@ TEST(IsInside , Sphere ) {
         cos = (-x * dir_vec_x -y*dir_vec_y - z* dir_vec_z) / radius;
 
         if(cos < 1 && cos > 0)
-            EXPECT_TRUE(A.IsParticleInside(particle));
+            EXPECT_TRUE(A.IsInside(particle));
         else
-            EXPECT_FALSE(A.IsParticleInside(particle));
+            EXPECT_FALSE(A.IsInside(particle));
 
     }
 
@@ -788,7 +802,7 @@ TEST(IsInside , Sphere ) {
 
     // The values are divided by 100 to convert the units...
     // Init functions expects m but here everthing is in cm
-    A.InitSphere(0,0,0,radius/100,inner_radius/100);
+    Sphere B(0,0,0,radius/100,inner_radius/100);
 
     z=0;
     particle->SetZ(z);
@@ -822,9 +836,9 @@ TEST(IsInside , Sphere ) {
         cos = (-x * dir_vec_x -y*dir_vec_y - z* dir_vec_z) / radius;
 
         if(cos < 1 && cos > 0)
-            EXPECT_FALSE(A.IsParticleInside(particle));
+            EXPECT_FALSE(B.IsInside(particle));
         else
-            EXPECT_TRUE(A.IsParticleInside(particle));
+            EXPECT_TRUE(B.IsInside(particle));
 
     }
 }
@@ -855,7 +869,6 @@ TEST(DistanceTo , Sphere ) {
     MathModel M;
     int number_particles = 1e5;
 
-    Geometry A;
     cout.precision(16);
 
     for(int i = 0; i < 11 ; i++)
@@ -871,7 +884,7 @@ TEST(DistanceTo , Sphere ) {
 
             // The values are divided by 100 to convert the units...
             // Init functions expects m but here everthing is in cm
-            A.InitSphere(0,0,0,radius/100,inner_radius/100);
+            Sphere A(0,0,0,radius/100,inner_radius/100);
 
             rnd_phi             = M.RandomDouble();
             rnd_theta           = M.RandomDouble();
@@ -963,7 +976,7 @@ TEST(DistanceTo , Sphere ) {
     }
 }
 
-
+//
 TEST(DistanceTo , Cylinder ) {
     double x        =   0;
     double y        =   0;
@@ -988,7 +1001,6 @@ TEST(DistanceTo , Cylinder ) {
     MathModel M;
     int number_particles = 1e5;
 
-    Geometry A;
     cout.precision(16);
 
     for(int i = 0; i < 10 ; i++)
@@ -1004,7 +1016,7 @@ TEST(DistanceTo , Cylinder ) {
 
             // The values are divided by 100 to convert the units...
             // Init functions expects m but here everthing is in cm
-            A.InitCylinder(0,0,0,radius/100,inner_radius/100,height/100);
+            Cylinder A(0,0,0,radius/100,inner_radius/100,height/100);
 
             rnd_phi             = M.RandomDouble();
 
@@ -1096,7 +1108,7 @@ TEST(DistanceTo , Cylinder ) {
 
     // The values are divided by 100 to convert the units...
     // Init functions expects m but here everthing is in cm
-    A.InitCylinder(0,0,0,radius/100,inner_radius/100,height/100);
+    Cylinder B(0,0,0,radius/100,inner_radius/100,height/100);
 
     // Chose particle location and angle
 
@@ -1110,7 +1122,7 @@ TEST(DistanceTo , Cylinder ) {
     particle->SetTheta(180);
     particle->SetPhi(0);
 
-    distance    =   A.DistanceToBorder(particle);
+    distance    =   B.DistanceToBorder(particle);
 
     ASSERT_NEAR(distance.first,z-0.5*height,1e-8*(z-0.5*height));
     ASSERT_NEAR(distance.second,z+0.5*height,1e-8*(z+0.5*height));
@@ -1122,7 +1134,7 @@ TEST(DistanceTo , Cylinder ) {
 
     // The values are divided by 100 to convert the units...
     // Init functions expects m but here everthing is in cm
-    A.InitCylinder(0,0,0,radius/100,inner_radius/100,height/100);
+    Cylinder A(0,0,0,radius/100,inner_radius/100,height/100);
 
     for(int j = 0; j<number_particles; j++)
     {
@@ -1264,7 +1276,6 @@ TEST(DistanceTo , Box ) {
     MathModel M;
     int number_particles = 1e5;
 
-    Geometry A;
     cout.precision(16);
 
     for(int j = 0; j<number_particles; j++)
@@ -1273,7 +1284,7 @@ TEST(DistanceTo , Box ) {
 
         // The values are divided by 100 to convert the units...
         // Init functions expects m but here everthing is in cm
-        A.InitBox(0,0,0,width/100,width/100,height/100);
+        Box A(0,0,0,width/100,width/100,height/100);
 
         phi     =   rnd_phi*2*PI;
         theta   =   0.5*PI;
@@ -1350,6 +1361,9 @@ TEST(DistanceTo , Box ) {
         }
 
     }
+
+    Box A(0,0,0,width/100,width/100,height/100);
+
     for(int i = 0; i < number_particles;i++)
     {
         rnd_phi =   M.RandomDouble();
