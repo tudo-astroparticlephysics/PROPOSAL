@@ -101,7 +101,7 @@ TEST(Comparison , Comparison_not_equal ) {
     E->GetCrosssections().at(2)->SetParametrization(ParametrizationType::PhotoBezrukovBugaevShadowBezrukovHard);
     EXPECT_TRUE(*D==*E);
 
-    Geometry *geo = new Geometry();
+    Geometry *geo = new Sphere();
 
     D->SetGeometry(geo);
     EXPECT_TRUE(*D!=*E);
