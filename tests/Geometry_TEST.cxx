@@ -1,5 +1,5 @@
 
-// #include <iostream>
+#include <iostream>
 // #include <string>
 // #include <cmath>
 
@@ -56,6 +56,19 @@ TEST(Assignment , Copyconstructor ) {
     Sphere B = A;
 
     EXPECT_TRUE(A==B);
+
+    Geometry* C = new Sphere();
+    Geometry* D = new Box();
+
+    *D = *C;
+
+    EXPECT_FALSE(*C==*D);
+
+    Geometry* E = new Sphere(1.0, 0.0, 0.0, 20.0, 10.0);
+
+    *C = *E;
+
+    EXPECT_TRUE(*C==*E);
 }
 
 TEST(Assignment , Copyconstructor2 ) {
@@ -67,7 +80,7 @@ TEST(Assignment , Copyconstructor2 ) {
 
 TEST(Assignment , Operator ) {
     Sphere A;
-    Sphere B(0.0, 0.0, 0.0, 1, 2);
+    Sphere B(0.0, 0.0, 0.0, 2.0, 1.0);
 
     EXPECT_TRUE(A!=B);
 
