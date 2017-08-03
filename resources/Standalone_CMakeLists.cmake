@@ -203,6 +203,7 @@ IF(DO_TESTING)
   ADD_EXECUTABLE(UnitTest_ProcessCollection tests/ProcessCollection_TEST.cxx)
   ADD_EXECUTABLE(UnitTest_ContinuousRandomization tests/ContinuousRandomization_TEST.cxx)
   ADD_EXECUTABLE(UnitTest_Geometry tests/Geometry_TEST.cxx)
+  ADD_EXECUTABLE(UnitTest_Vector3D tests/Vector3D_TEST.cxx)
 
   TARGET_LINK_LIBRARIES(UnitTest_Scattering PROPOSAL ${GTEST_LIBRARIES})
   TARGET_LINK_LIBRARIES(UnitTest_Integral PROPOSAL ${GTEST_LIBRARIES})
@@ -219,6 +220,7 @@ IF(DO_TESTING)
   TARGET_LINK_LIBRARIES(UnitTest_ProcessCollection PROPOSAL ${GTEST_LIBRARIES})
   TARGET_LINK_LIBRARIES(UnitTest_ContinuousRandomization PROPOSAL ${GTEST_LIBRARIES})
   TARGET_LINK_LIBRARIES(UnitTest_Geometry PROPOSAL ${GTEST_LIBRARIES})
+  TARGET_LINK_LIBRARIES(UnitTest_Vector3D PROPOSAL ${GTEST_LIBRARIES})
 
   ADD_TEST(UnitTest_Scattering bin/UnitTest_Scattering)
   ADD_TEST(UnitTest_ContinuousRandomization bin/UnitTest_ContinuousRandomization)
@@ -235,6 +237,7 @@ IF(DO_TESTING)
   ADD_TEST(UnitTest_Bremsstrahlung bin/UnitTest_Bremsstrahlung)
   ADD_TEST(UnitTest_Photonuclear bin/UnitTest_Photonuclear)
   ADD_TEST(UnitTest_Geometry bin/UnitTest_Geometry)
+  ADD_TEST(UnitTest_Vector3D bin/UnitTest_Vector3D)
 
 ENDIF()
 
