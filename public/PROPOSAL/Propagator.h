@@ -92,7 +92,7 @@ private:
     * Initalize a geomtry. Used when reading the values from config file
     *,
     */
-    void InitGeometry(Geometry* geometry, std::deque<std::string>* token , std::string first_token);
+    Geometry* InitGeometry(std::deque<std::string>* token , std::string first_token);
 //----------------------------------------------------------------------------//
     /*!
     * Init ProcessCollection from configuration file. When keyword sector is found in configuration
