@@ -41,9 +41,10 @@ void ScatteringMoliere::Scatter(double dr, PROPOSALParticle* part, Medium* med)
 
     for(int i = 0; i < numComp_; i++)
     {
-        Zi_.at(i)    =   medium_->GetNucCharge().at(i);
-        ki_.at(i)    =   medium_->GetAtomInMolecule().at(i);
-        Ai_.at(i)    =   medium_->GetAtomicNum().at(i);
+        Components::Component* component = medium_->GetComponents().at(i);
+        Zi_.at(i)    =   component->GetNucCharge();
+        ki_.at(i)    =   component->GetAtomInMolecule();
+        Ai_.at(i)    =   component->GetAtomicNum();
     }
 
     CalcBetaSq();
@@ -206,7 +207,7 @@ ScatteringMoliere::ScatteringMoliere(const ScatteringMoliere &scattering)
 
     if(scattering.medium_ != NULL)
     {
-        medium_ = new Medium(*scattering.medium_) ;
+        medium_ = scattering.medium_->clone();
     }
     else
     {
