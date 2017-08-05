@@ -10,6 +10,43 @@
 using namespace PROPOSAL;
 
 // ------------------------------------------------------------------------- //
+// Helper
+// ------------------------------------------------------------------------- //
+
+Medium* getMediumFromString(std::string medium)
+{
+            if (medium == "water")
+                return new Water();
+            else if (medium == "ice")
+                return new Ice();
+            else if (medium == "hydrogen")
+                return new Hydrogen();
+            else if (medium == "iron")
+                return new Iron();
+            else if (medium == "copper")
+                return new Copper();
+            else if (medium == "lead")
+                return new Lead();
+            else if (medium == "uranium")
+                return new Uranium();
+            else if (medium == "air")
+                return new Air();
+            else if (medium == "AntaresWater")
+                return new AntaresWater();
+            else if (medium == "StandardRock")
+                return new StandardRock();
+            else if (medium == "FrejusRock")
+                return new FrejusRock();
+            else if (medium == "salt")
+                return new Salt();
+            else
+            {
+                std::cout << "the medium name " << medium << " is not supported" << std::endl;
+                exit(1);
+            }
+}
+
+// ------------------------------------------------------------------------- //
 // Check if Directory/File exists
 // ------------------------------------------------------------------------- //
 
@@ -327,7 +364,7 @@ int setting_loop(
         // medium
         for (std::vector<std::string>::iterator it_medium = medium.begin() ; it_medium != medium.end(); ++it_medium)
         {
-            Medium medium(Medium::GetTypeFromName(*it_medium), 1.);
+            Medium* medium(getMediumFromString(*it_medium));
 
             // paricle
             for (std::vector<std::string>::iterator it_particle = particle.begin() ; it_particle != particle.end(); ++it_particle)
@@ -338,16 +375,16 @@ int setting_loop(
                 switch (interaction)
                 {
                     case Interaction::Bremsstrahlung:
-                        cross = new Bremsstrahlung(&particle, &medium, &cuts);
+                        cross = new Bremsstrahlung(&particle, medium, &cuts);
                         break;
                     case Interaction::Epairproduction:
-                        cross = new Epairproduction(&particle, &medium, &cuts);
+                        cross = new Epairproduction(&particle, medium, &cuts);
                         break;
                     case Interaction::Ionization:
-                        cross = new Ionization(&particle, &medium, &cuts);
+                        cross = new Ionization(&particle, medium, &cuts);
                         break;
                     case Interaction::Photonuclear:
-                        cross = new Photonuclear(&particle, &medium, &cuts);
+                        cross = new Photonuclear(&particle, medium, &cuts);
                         break;
                     default:
                         break;
@@ -906,7 +943,7 @@ int setting_loop_contrand(std::string& filename)
         // medium
         for (std::vector<std::string>::iterator it_medium = medium.begin() ; it_medium != medium.end(); ++it_medium)
         {
-            Medium medium(Medium::GetTypeFromName(*it_medium), 1.);
+            Medium* medium(getMediumFromString(*it_medium));
 
             // cuts
             for (std::vector<std::pair<int, double> >::iterator it_cut = cuts.begin() ; it_cut != cuts.end(); ++it_cut)
@@ -929,12 +966,12 @@ int setting_loop_contrand(std::string& filename)
                 // crosssections.push_back(&photo);
                 // crosssections.push_back(&photo);
 
-                crosssections.at(0) = new Ionization(&particle, &medium, &cuts);
-                crosssections.at(1) = new Bremsstrahlung(&particle, &medium, &cuts);
-                crosssections.at(2) = new Photonuclear(&particle, &medium, &cuts);
-                crosssections.at(3) = new Epairproduction(&particle, &medium, &cuts);
+                crosssections.at(0) = new Ionization(&particle, medium, &cuts);
+                crosssections.at(1) = new Bremsstrahlung(&particle, medium, &cuts);
+                crosssections.at(2) = new Photonuclear(&particle, medium, &cuts);
+                crosssections.at(3) = new Epairproduction(&particle, medium, &cuts);
 
-                ContinuousRandomization cont(&particle, &medium, crosssections);
+                ContinuousRandomization cont(&particle, medium, crosssections);
 
                 for(unsigned int i=0 ; i<crosssections.size();i++)
                 {
@@ -1058,14 +1095,14 @@ int ProcColl_Stochastics(std::string filename, std::string path_to_tables)
         // medium
         for (std::vector<std::string>::iterator it_medium = medium.begin() ; it_medium != medium.end(); ++it_medium)
         {
-            Medium medium(Medium::GetTypeFromName(*it_medium), 1.);
+            Medium* medium(getMediumFromString(*it_medium));
 
             // paricle
             for (std::vector<std::string>::iterator it_particle = particle.begin() ; it_particle != particle.end(); ++it_particle)
             {
                 PROPOSALParticle particle(PROPOSALParticle::GetTypeFromName(*it_particle),1.,1.,1,.20,20,1e5,10);
                 // Propagator prop(&medium, &cuts, particle.GetType(), "");
-                ProcessCollection proc_col(&particle, &medium, &cuts);
+                ProcessCollection proc_col(&particle, medium, &cuts);
                 proc_col.EnableInterpolation(path_to_tables);
 
                 // energy
@@ -1210,14 +1247,14 @@ int ProcColl_Displacement(std::string filename)
         // medium
         for (std::vector<std::string>::iterator it_medium = medium.begin() ; it_medium != medium.end(); ++it_medium)
         {
-            Medium medium(Medium::GetTypeFromName(*it_medium), 1.);
+            Medium* medium(getMediumFromString(*it_medium));
 
             // paricle
             for (std::vector<std::string>::iterator it_particle = particle.begin() ; it_particle != particle.end(); ++it_particle)
             {
                 PROPOSALParticle particle(PROPOSALParticle::GetTypeFromName(*it_particle),1.,1.,1,.20,20,1e5,10);
                 // Propagator prop(&medium, &cuts, particle.GetType(), "");
-                ProcessCollection proc_col(&particle, &medium, &cuts);
+                ProcessCollection proc_col(&particle, medium, &cuts);
                 proc_col.EnableInterpolation("../resources/tables");
 
                 // energy
@@ -1334,14 +1371,14 @@ int ProcColl_FinalEnergyDist(std::string filename, std::string path_to_tables)
         // medium
         for (std::vector<std::string>::iterator it_medium = medium.begin() ; it_medium != medium.end(); ++it_medium)
         {
-            Medium medium(Medium::GetTypeFromName(*it_medium), 1.);
+            Medium* medium(getMediumFromString(*it_medium));
 
             // paricle
             for (std::vector<std::string>::iterator it_particle = particle.begin() ; it_particle != particle.end(); ++it_particle)
             {
                 PROPOSALParticle particle(PROPOSALParticle::GetTypeFromName(*it_particle),1.,1.,1,.20,20,1e5,10);
                 // Propagator prop(&medium, &cuts, particle.GetType(), "");
-                ProcessCollection proc_col(&particle, &medium, &cuts);
+                ProcessCollection proc_col(&particle, medium, &cuts);
                 proc_col.EnableInterpolation(path_to_tables);
 
                 for (std::vector<double>::iterator it_dist = dist.begin(); it_dist != dist.end(); ++it_dist)
@@ -1451,14 +1488,14 @@ int ProcColl_FinalEnergyParticleInteraction(std::string filename, std::string pa
         // medium
         for (std::vector<std::string>::iterator it_medium = medium.begin() ; it_medium != medium.end(); ++it_medium)
         {
-            Medium medium(Medium::GetTypeFromName(*it_medium), 1.);
+            Medium* medium(getMediumFromString(*it_medium));
 
             // paricle
             for (std::vector<std::string>::iterator it_particle = particle.begin() ; it_particle != particle.end(); ++it_particle)
             {
                 PROPOSALParticle particle(PROPOSALParticle::GetTypeFromName(*it_particle),1.,1.,1,.20,20,1e5,10);
                 // Propagator prop(&medium, &cuts, particle.GetType(), "");
-                ProcessCollection proc_col(&particle, &medium, &cuts);
+                ProcessCollection proc_col(&particle, medium, &cuts);
                 proc_col.EnableInterpolation(path_to_tables);
 
                 // energy
@@ -1571,14 +1608,14 @@ int ProcColl_Tracking(std::string filename, std::string path_to_tables)
         // medium
         for (std::vector<std::string>::iterator it_medium = medium.begin() ; it_medium != medium.end(); ++it_medium)
         {
-            Medium medium(Medium::GetTypeFromName(*it_medium), 1.);
+            Medium* medium(getMediumFromString(*it_medium));
 
             // paricle
             for (std::vector<std::string>::iterator it_particle = particle.begin() ; it_particle != particle.end(); ++it_particle)
             {
                 PROPOSALParticle particle(PROPOSALParticle::GetTypeFromName(*it_particle),1.,1.,1,.20,20,1e5,10);
                 // Propagator prop(&medium, &cuts, particle.GetType(), "");
-                ProcessCollection proc_col(&particle, &medium, &cuts);
+                ProcessCollection proc_col(&particle, medium, &cuts);
                 proc_col.EnableInterpolation(path_to_tables);
 
                 // energy
@@ -1694,14 +1731,14 @@ int ProcColl_MakeDecay(std::string filename, std::string path_to_tables)
         // medium
         for (std::vector<std::string>::iterator it_medium = medium.begin() ; it_medium != medium.end(); ++it_medium)
         {
-            Medium medium(Medium::GetTypeFromName(*it_medium), 1.);
+            Medium* medium(getMediumFromString(*it_medium));
 
             // paricle
             for (std::vector<std::string>::iterator it_particle = particle.begin() ; it_particle != particle.end(); ++it_particle)
             {
                 PROPOSALParticle particle(PROPOSALParticle::GetTypeFromName(*it_particle),1.,1.,1,.20,20,1e5,10);
                 // Propagator prop(&medium, &cuts, particle.GetType(), "");
-                ProcessCollection proc_col(&particle, &medium, &cuts);
+                ProcessCollection proc_col(&particle, medium, &cuts);
                 proc_col.EnableInterpolation(path_to_tables);
 
                 // energy

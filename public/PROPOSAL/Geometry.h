@@ -127,8 +127,6 @@ class Sphere: public Geometry
 
         // Operators
         Sphere& operator=(const Geometry&);
-        // friend std::ostream& operator<<(std::ostream&, Sphere const&);
-
 
         // Methods
         std::pair<double,double> DistanceToBorder(PROPOSALParticle* particle);
@@ -167,7 +165,6 @@ class Box: public Geometry
 
         // Operators
         Box& operator=(const Geometry&);
-        // friend std::ostream& operator<<(std::ostream&, Box const&);
 
         // Methods
         std::pair<double,double> DistanceToBorder(PROPOSALParticle* particle);
@@ -212,7 +209,6 @@ class Cylinder: public Geometry
 
         // Operators
         Cylinder& operator=(const Geometry&);
-        // friend std::ostream& operator<<(std::ostream&, Cylinder const&);
 
         // Methods
         std::pair<double,double> DistanceToBorder(PROPOSALParticle* particle);

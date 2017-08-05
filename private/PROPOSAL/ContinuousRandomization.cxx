@@ -403,7 +403,7 @@ ContinuousRandomization::ContinuousRandomization()
     ,order_of_interpolation_    ( 5 )
 {
     particle_           =   new PROPOSALParticle();
-    medium_             =   new Medium();
+    medium_             =   new Water();
     dE2dx_integral_     =   new Integral(IROMB, IMAXS, IPREC);
     dE2de_integral_     =   new Integral(IROMB, IMAXS, IPREC2);
 
@@ -448,7 +448,7 @@ ContinuousRandomization::ContinuousRandomization(PROPOSALParticle* particle, Med
 
 ContinuousRandomization::ContinuousRandomization(const ContinuousRandomization &continuous_randomization)
     :particle_                  ( new PROPOSALParticle(*continuous_randomization.particle_) )
-    ,medium_                    ( new Medium( *continuous_randomization.medium_) )
+    ,medium_                    ( continuous_randomization.medium_->clone())
     ,do_dE2dx_Interpolation_    ( continuous_randomization.do_dE2dx_Interpolation_)
     ,do_dE2de_Interpolation_    ( continuous_randomization.do_dE2de_Interpolation_)
     ,dE2dx_integral_            ( new Integral(*continuous_randomization.dE2dx_integral_) )
@@ -609,10 +609,6 @@ void ContinuousRandomization::swap(ContinuousRandomization &continuous_randomiza
     PROPOSALParticle tmp_particle1(*continuous_randomization.particle_);
     PROPOSALParticle tmp_particle2(*particle_);
 
-    Medium tmp_medium1(*continuous_randomization.medium_);
-    Medium tmp_medium2(*medium_);
-
-
     particle_->swap(*continuous_randomization.particle_);
     medium_->swap(*continuous_randomization.medium_);
     dE2dx_integral_->swap( *continuous_randomization.dE2dx_integral_ );
@@ -629,8 +625,8 @@ void ContinuousRandomization::swap(ContinuousRandomization &continuous_randomiza
     SetParticle( new PROPOSALParticle(tmp_particle1) );
     continuous_randomization.SetParticle( new PROPOSALParticle(tmp_particle2) );
 
-    SetMedium( new Medium(tmp_medium1) );
-    continuous_randomization.SetMedium( new Medium(tmp_medium2) );
+    SetMedium( continuous_randomization.medium_->clone() );
+    continuous_randomization.SetMedium( continuous_randomization.medium_->clone() );
 
 
     if( dE2dx_interpolant_ != NULL && continuous_randomization.dE2dx_interpolant_ != NULL)
