@@ -8,6 +8,7 @@
 // #include <cmath>
 
 #include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string/predicate.hpp>
 
 #include "PROPOSAL/Propagator.h"
 #include "PROPOSAL/Output.h"
@@ -1841,7 +1842,7 @@ void Propagator::MoveParticle(double distance)
 
 void Propagator::InitDefaultCollection(Geometry* geom)
 {
-    Medium* med             = new Medium(MediumType::Ice,1.);
+    Medium* med             = new Ice();
     EnergyCutSettings* cuts = new EnergyCutSettings(500,0.05);
     current_collection_     = new ProcessCollection(particle_ , med, cuts);
     current_collection_->SetGeometry(geom);
@@ -2066,7 +2067,36 @@ void Propagator::InitProcessCollections(ifstream &file)
                 density_correction = 1;
             }
 
-            Medium *med     =   new Medium(Medium::GetTypeFromName(name),density_correction);
+            Medium* med;
+
+            if (boost::iequals(name, "water"))
+                med = new Water();
+            else if (boost::iequals(name, "ice"))
+                med = new Ice();
+            else if (boost::iequals(name, "hydrogen"))
+                med = new Hydrogen();
+            else if (boost::iequals(name, "iron"))
+                med = new Iron();
+            else if (boost::iequals(name, "copper"))
+                med = new Copper();
+            else if (boost::iequals(name, "lead"))
+                med = new Lead();
+            else if (boost::iequals(name, "uranium"))
+                med = new Uranium();
+            else if (boost::iequals(name, "air"))
+                med = new Air();
+            else if (boost::iequals(name, "AntaresWater"))
+                med = new AntaresWater();
+            else if (boost::iequals(name, "StandardRock"))
+                med = new StandardRock();
+            else if (boost::iequals(name, "FrejusRock"))
+                med = new FrejusRock();
+            else if (boost::iequals(name, "salt"))
+                med = new Salt();
+            else
+            {
+                log_fatal("the medium name '%s' is not supported", name.c_str());
+            }
 
             if (particle_ == NULL)
             {
@@ -2107,9 +2137,9 @@ void Propagator::InitProcessCollections(ifstream &file)
                 {
                     inside = new EnergyCutSettings(ecut_inside,vcut_inside);
 
-                    muminus_inside  = new ProcessCollection(new PROPOSALParticle(*muminus),new Medium(*med),new EnergyCutSettings(*inside));
-                    tauminus_inside = new ProcessCollection(new PROPOSALParticle(*tauminus),new Medium(*med),new EnergyCutSettings(*inside));
-                    eminus_inside   = new ProcessCollection(new PROPOSALParticle(*eminus),new Medium(*med),new EnergyCutSettings(*inside));
+                    muminus_inside  = new ProcessCollection(new PROPOSALParticle(*muminus),med->clone(),new EnergyCutSettings(*inside));
+                    tauminus_inside = new ProcessCollection(new PROPOSALParticle(*tauminus),med->clone(),new EnergyCutSettings(*inside));
+                    eminus_inside   = new ProcessCollection(new PROPOSALParticle(*eminus),med->clone(),new EnergyCutSettings(*inside));
                     // muplus_inside   = new ProcessCollection(new PROPOSALParticle(*muplus),new Medium(*med),new EnergyCutSettings(*inside));
                     // tauplus_inside  = new ProcessCollection(new PROPOSALParticle(*tauplus),new Medium(*med),new EnergyCutSettings(*inside));
                     // eplus_inside    = new ProcessCollection(new PROPOSALParticle(*eplus),new Medium(*med),new EnergyCutSettings(*inside));
@@ -2133,9 +2163,9 @@ void Propagator::InitProcessCollections(ifstream &file)
                 {
                     inside = new EnergyCutSettings(global_ecut_inside_,global_vcut_inside_);
 
-                    muminus_inside  = new ProcessCollection(new PROPOSALParticle(*muminus),new Medium(*med),new EnergyCutSettings(*inside));
-                    tauminus_inside = new ProcessCollection(new PROPOSALParticle(*tauminus),new Medium(*med),new EnergyCutSettings(*inside));
-                    eminus_inside   = new ProcessCollection(new PROPOSALParticle(*eminus),new Medium(*med),new EnergyCutSettings(*inside));
+                    muminus_inside  = new ProcessCollection(new PROPOSALParticle(*muminus),med->clone(),new EnergyCutSettings(*inside));
+                    tauminus_inside = new ProcessCollection(new PROPOSALParticle(*tauminus),med->clone(),new EnergyCutSettings(*inside));
+                    eminus_inside   = new ProcessCollection(new PROPOSALParticle(*eminus),med->clone(),new EnergyCutSettings(*inside));
                     // muplus_inside   = new ProcessCollection(new PROPOSALParticle(*muplus),new Medium(*med),new EnergyCutSettings(*inside));
                     // tauplus_inside  = new ProcessCollection(new PROPOSALParticle(*tauplus),new Medium(*med),new EnergyCutSettings(*inside));
                     // eplus_inside    = new ProcessCollection(new PROPOSALParticle(*eplus),new Medium(*med),new EnergyCutSettings(*inside));
@@ -2160,9 +2190,9 @@ void Propagator::InitProcessCollections(ifstream &file)
                 {
                     infront = new EnergyCutSettings(ecut_infront,vcut_infront);
 
-                    muminus_infront  = new ProcessCollection(new PROPOSALParticle(*muminus),new Medium(*med),new EnergyCutSettings(*infront));
-                    tauminus_infront = new ProcessCollection(new PROPOSALParticle(*tauminus),new Medium(*med),new EnergyCutSettings(*infront));
-                    eminus_infront   = new ProcessCollection(new PROPOSALParticle(*eminus),new Medium(*med),new EnergyCutSettings(*infront));
+                    muminus_infront  = new ProcessCollection(new PROPOSALParticle(*muminus),med->clone(),new EnergyCutSettings(*infront));
+                    tauminus_infront = new ProcessCollection(new PROPOSALParticle(*tauminus),med->clone(),new EnergyCutSettings(*infront));
+                    eminus_infront   = new ProcessCollection(new PROPOSALParticle(*eminus),med->clone(),new EnergyCutSettings(*infront));
                     // muplus_infront   = new ProcessCollection(new PROPOSALParticle(*muplus),new Medium(*med),new EnergyCutSettings(*infront));
                     // tauplus_infront  = new ProcessCollection(new PROPOSALParticle(*tauplus),new Medium(*med),new EnergyCutSettings(*infront));
                     // eplus_infront    = new ProcessCollection(new PROPOSALParticle(*eplus),new Medium(*med),new EnergyCutSettings(*infront));
@@ -2186,9 +2216,9 @@ void Propagator::InitProcessCollections(ifstream &file)
                 {
                     infront = new EnergyCutSettings(global_ecut_infront_,global_vcut_infront_);
 
-                    muminus_infront  = new ProcessCollection(new PROPOSALParticle(*muminus),new Medium(*med),new EnergyCutSettings(*infront));
-                    tauminus_infront = new ProcessCollection(new PROPOSALParticle(*tauminus),new Medium(*med),new EnergyCutSettings(*infront));
-                    eminus_infront   = new ProcessCollection(new PROPOSALParticle(*eminus),new Medium(*med),new EnergyCutSettings(*infront));
+                    muminus_infront  = new ProcessCollection(new PROPOSALParticle(*muminus),med->clone(),new EnergyCutSettings(*infront));
+                    tauminus_infront = new ProcessCollection(new PROPOSALParticle(*tauminus),med->clone(),new EnergyCutSettings(*infront));
+                    eminus_infront   = new ProcessCollection(new PROPOSALParticle(*eminus),med->clone(),new EnergyCutSettings(*infront));
                     // muplus_infront   = new ProcessCollection(new PROPOSALParticle(*muplus),new Medium(*med),new EnergyCutSettings(*infront));
                     // tauplus_infront  = new ProcessCollection(new PROPOSALParticle(*tauplus),new Medium(*med),new EnergyCutSettings(*infront));
                     // eplus_infront    = new ProcessCollection(new PROPOSALParticle(*eplus),new Medium(*med),new EnergyCutSettings(*infront));
@@ -2213,9 +2243,9 @@ void Propagator::InitProcessCollections(ifstream &file)
                 {
                     behind = new EnergyCutSettings(ecut_behind,vcut_behind);
 
-                    muminus_behind  = new ProcessCollection(new PROPOSALParticle(*muminus),new Medium(*med),new EnergyCutSettings(*behind));
-                    tauminus_behind = new ProcessCollection(new PROPOSALParticle(*tauminus),new Medium(*med),new EnergyCutSettings(*behind));
-                    eminus_behind   = new ProcessCollection(new PROPOSALParticle(*eminus),new Medium(*med),new EnergyCutSettings(*behind));
+                    muminus_behind  = new ProcessCollection(new PROPOSALParticle(*muminus),med->clone(),new EnergyCutSettings(*behind));
+                    tauminus_behind = new ProcessCollection(new PROPOSALParticle(*tauminus),med->clone(),new EnergyCutSettings(*behind));
+                    eminus_behind   = new ProcessCollection(new PROPOSALParticle(*eminus),med->clone(),new EnergyCutSettings(*behind));
                     // muplus_behind   = new ProcessCollection(new PROPOSALParticle(*muplus),new Medium(*med),new EnergyCutSettings(*behind));
                     // tauplus_behind  = new ProcessCollection(new PROPOSALParticle(*tauplus),new Medium(*med),new EnergyCutSettings(*behind));
                     // eplus_behind    = new ProcessCollection(new PROPOSALParticle(*eplus),new Medium(*med),new EnergyCutSettings(*behind));
@@ -2239,9 +2269,9 @@ void Propagator::InitProcessCollections(ifstream &file)
                 {
                     behind = new EnergyCutSettings(global_ecut_behind_,global_vcut_behind_);
 
-                    muminus_behind  = new ProcessCollection(new PROPOSALParticle(*muminus),new Medium(*med),new EnergyCutSettings(*behind));
-                    tauminus_behind = new ProcessCollection(new PROPOSALParticle(*tauminus),new Medium(*med),new EnergyCutSettings(*behind));
-                    eminus_behind   = new ProcessCollection(new PROPOSALParticle(*eminus),new Medium(*med),new EnergyCutSettings(*behind));
+                    muminus_behind  = new ProcessCollection(new PROPOSALParticle(*muminus),med->clone(),new EnergyCutSettings(*behind));
+                    tauminus_behind = new ProcessCollection(new PROPOSALParticle(*tauminus),med->clone(),new EnergyCutSettings(*behind));
+                    eminus_behind   = new ProcessCollection(new PROPOSALParticle(*eminus),med->clone(),new EnergyCutSettings(*behind));
                     // muplus_behind   = new ProcessCollection(new PROPOSALParticle(*muplus),new Medium(*med),new EnergyCutSettings(*behind));
                     // tauplus_behind  = new ProcessCollection(new PROPOSALParticle(*tauplus),new Medium(*med),new EnergyCutSettings(*behind));
                     // eplus_behind    = new ProcessCollection(new PROPOSALParticle(*eplus),new Medium(*med),new EnergyCutSettings(*behind));
@@ -2319,14 +2349,14 @@ void Propagator::InitProcessCollections(ifstream &file)
                 if(found_inside_cuts)
                 {
                     inside = new EnergyCutSettings(ecut_inside,vcut_inside);
-                    particle_inside  = new ProcessCollection(new PROPOSALParticle(*particle_),new Medium(*med),new EnergyCutSettings(*inside));
+                    particle_inside  = new ProcessCollection(new PROPOSALParticle(*particle_),med->clone(),new EnergyCutSettings(*inside));
                     particle_inside->SetEnableRandomization(cont_inside);
                     particle_inside->SetLocation(1);
                 }
                 else
                 {
                     inside = new EnergyCutSettings(global_ecut_inside_,global_vcut_inside_);
-                    particle_inside  = new ProcessCollection(new PROPOSALParticle(*particle_),new Medium(*med),new EnergyCutSettings(*inside));
+                    particle_inside  = new ProcessCollection(new PROPOSALParticle(*particle_),med->clone(),new EnergyCutSettings(*inside));
                     particle_inside->SetEnableRandomization(global_cont_inside_);
                     particle_inside->SetLocation(1);
                 }
@@ -2334,14 +2364,14 @@ void Propagator::InitProcessCollections(ifstream &file)
                 if (found_infront_cuts)
                 {
                     infront = new EnergyCutSettings(ecut_infront,vcut_infront);
-                    particle_infront  = new ProcessCollection(new PROPOSALParticle(*particle_),new Medium(*med),new EnergyCutSettings(*infront));
+                    particle_infront  = new ProcessCollection(new PROPOSALParticle(*particle_),med->clone(),new EnergyCutSettings(*infront));
                     particle_infront->SetEnableRandomization(cont_infront);
                     particle_infront->SetLocation(0);
                 }
                 else
                 {
                     infront = new EnergyCutSettings(global_ecut_infront_,global_vcut_infront_);
-                    particle_infront  = new ProcessCollection(new PROPOSALParticle(*particle_),new Medium(*med),new EnergyCutSettings(*infront));
+                    particle_infront  = new ProcessCollection(new PROPOSALParticle(*particle_),med->clone(),new EnergyCutSettings(*infront));
                     particle_infront->SetEnableRandomization(global_cont_infront_);
                     particle_infront->SetLocation(0);
                 }
@@ -2349,14 +2379,14 @@ void Propagator::InitProcessCollections(ifstream &file)
                 if(found_behind_cuts)
                 {
                     behind = new EnergyCutSettings(ecut_behind,vcut_behind);
-                    particle_behind  = new ProcessCollection(new PROPOSALParticle(*particle_),new Medium(*med),new EnergyCutSettings(*behind));
+                    particle_behind  = new ProcessCollection(new PROPOSALParticle(*particle_),med->clone(),new EnergyCutSettings(*behind));
                     particle_behind->SetEnableRandomization(cont_behind);
                     particle_behind->SetLocation(2);
                 }
                 else
                 {
                     behind = new EnergyCutSettings(global_ecut_behind_,global_vcut_behind_);
-                    particle_behind  = new ProcessCollection(new PROPOSALParticle(*particle_),new Medium(*med),new EnergyCutSettings(*behind));
+                    particle_behind  = new ProcessCollection(new PROPOSALParticle(*particle_),med->clone(),new EnergyCutSettings(*behind));
                     particle_behind->SetEnableRandomization(global_cont_behind_);
                     particle_behind->SetLocation(2);
                 }

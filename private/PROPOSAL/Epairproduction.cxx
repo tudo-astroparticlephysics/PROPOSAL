@@ -1162,7 +1162,7 @@ void Epairproduction::SetIntegralLimits(int component)
 
     vMin_    =   4*ME/particle_energy;
     vMax_    =   1 - (3./4)*SQRTE*(particle_mass/particle_energy)
-                * pow(medium_->GetNucCharge().at(component) , 1./3);
+                * pow(medium_->GetComponents().at(component)->GetNucCharge() , 1./3);
     aux      =   particle_mass/particle_energy;
     aux      =   1-6*aux*aux;
     vMax_    =   min(vMax_, aux);
@@ -1198,8 +1198,10 @@ double Epairproduction::lpm(double r2, double b, double x)
 
         for(int i=0; i<medium_->GetNumComponents(); i++)
         {
-            sum +=  medium_->GetNucCharge().at(i)*medium_->GetNucCharge().at(i)
-                    *log(3.25*medium_->GetLogConstant().at(i)*pow(medium_->GetNucCharge().at(i), -1./3));
+            Components::Component* component = medium_->GetComponents().at(i);
+
+            sum +=  component->GetNucCharge()*component->GetNucCharge()
+                    *log(3.25*component->GetLogConstant()*pow(component->GetNucCharge(), -1./3));
         }
         double particle_mass = particle_->GetMass();
         double particle_charge = particle_->GetCharge();
@@ -1279,7 +1281,7 @@ double Epairproduction::EPair(double v, int component)
 
     aux =   max(1 - rMax , COMPUTER_PRECISION);
 
-    return medium_->GetMolDensity()*medium_->GetAtomInMolecule().at(component_)
+    return medium_->GetMolDensity()*medium_->GetComponents().at(component_)->GetAtomInMolecule()
            *particle_charge*particle_charge
            *(integral_->Integrate(1 - rMax, aux, boost::bind(&Epairproduction::FunctionToIntegral, this, _1),2)
                 + integral_->Integrate(aux, 1,  boost::bind(&Epairproduction::FunctionToIntegral, this, _1),4));
@@ -1391,8 +1393,8 @@ double Epairproduction::FunctionToIntegral(double r)
     double particle_mass = particle_->GetMass();
     double particle_charge = particle_->GetCharge();
     double particle_energy = particle_->GetEnergy();
-    double medium_charge = medium_->GetNucCharge().at(component_);
-    double medium_log_constant = medium_->GetLogConstant().at(component_);
+    double medium_charge = medium_->GetComponents().at(component_)->GetNucCharge();
+    double medium_log_constant = medium_->GetComponents().at(component_)->GetLogConstant();
 
 
     r       =   1-r; // only for integral optimization - do not forget to swap integration limits!

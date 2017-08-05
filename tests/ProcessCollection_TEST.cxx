@@ -48,7 +48,7 @@ std::vector<ProcessCollection*>         CombOfProcColl;
 TEST(Comparison , Comparison_equal ) {
     double dNdx;
 
-    Medium *medium = new Medium(MediumType::Hydrogen,1.);
+    Medium *medium = new Hydrogen();
     PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
     ProcessCollection *A = new ProcessCollection(particle, medium, cuts);
@@ -74,8 +74,8 @@ TEST(Comparison , Comparison_equal ) {
 
 TEST(Comparison , Comparison_not_equal ) {
     double dEdx;
-    Medium *medium = new Medium(MediumType::Air,1.);
-    Medium *medium2 = new Medium(MediumType::Water,1.);
+    Medium *medium = new Air();
+    Medium *medium2 = new Water();
     PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,20,20,1e5,10);
     PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,20,20,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
@@ -120,7 +120,7 @@ TEST(Assignment , Copyconstructor ) {
 }
 
 TEST(Assignment , Copyconstructor2 ) {
-    Medium *medium = new Medium(MediumType::Air,1.);
+    Medium *medium = new Air();
     PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
 
@@ -132,7 +132,7 @@ TEST(Assignment , Copyconstructor2 ) {
 }
 
 TEST(Assignment , Operator ) {
-    Medium *medium = new Medium(MediumType::Air,1.);
+    Medium *medium = new Air();
     PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
     ProcessCollection A(particle, medium, cuts);
@@ -145,7 +145,7 @@ TEST(Assignment , Operator ) {
 
     EXPECT_TRUE(A==B);
 
-    Medium *medium2 = new Medium(MediumType::Water,1.);
+    Medium *medium2 = new Water();
     PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cuts2 = new EnergyCutSettings(200,-1);
     ProcessCollection *C = new ProcessCollection(particle2, medium2, cuts2);
@@ -158,8 +158,8 @@ TEST(Assignment , Operator ) {
 }
 
 TEST(Assignment , Swap ) {
-    Medium *medium = new Medium(MediumType::Hydrogen,1.);
-    Medium *medium2 = new Medium(MediumType::Hydrogen,1.);
+    Medium *medium = new Hydrogen();
+    Medium *medium2 = new Hydrogen();
     PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
     PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
@@ -172,8 +172,8 @@ TEST(Assignment , Swap ) {
     B.EnableInterpolation();
     EXPECT_TRUE(A==B);
 
-    Medium *medium3 = new Medium(MediumType::Water,1.);
-    Medium *medium4 = new Medium(MediumType::Water,1.);
+    Medium *medium3 = new Water();
+    Medium *medium4 = new Water();
     PROPOSALParticle *particle3 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,.20,20,1e5,10);
     PROPOSALParticle *particle4 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cuts3 = new EnergyCutSettings(200,-1);
@@ -219,7 +219,7 @@ TEST(ProcessCollection , Set_Up ) {
         energy_old = -1;
 
         i++;
-        CombOfMedium.push_back(new Medium(Medium::GetTypeFromName(mediumName),1.));
+        CombOfMedium.push_back(MediumFactory::Get()->CreateMedium(mediumName));
         CombOfParticle.push_back(new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10));
         CombOfParticle.at(i)->SetEnergy(energy);
         CombOfEnergyCutSettings.push_back(new EnergyCutSettings(ecut,vcut));
@@ -287,7 +287,7 @@ TEST(ProcessCollection , Stochasticity)
         NumberOfEvents = IonizEvents+BremsEvents+PhotoEvents+EpairEvents;
         energy_old = -1;
 
-        Medium *medium = new Medium(Medium::GetTypeFromName(mediumName),1.);
+        Medium *medium = MediumFactory::Get()->CreateMedium(mediumName);
         PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10);
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
@@ -319,7 +319,7 @@ TEST(ProcessCollection , Stochasticity)
         for (std::vector<ProcessCollection*>::iterator it = CombOfProcColl.begin(); it != CombOfProcColl.end(); ++it)
         {
             if (particle->GetType() == (*it)->GetParticle()->GetType() &&
-                medium->GetType() == (*it)->GetMedium()->GetType() &&
+                medium == (*it)->GetMedium() &&
                 *cuts == *(*it)->GetCutSettings())
             {
                 ProcColl = *it;
@@ -445,7 +445,7 @@ TEST(ProcessCollection , Displacement)
         first=false;
 
         energy_old = -1;
-        Medium *medium = new Medium(Medium::GetTypeFromName(mediumName),1.);
+        Medium *medium = MediumFactory::Get()->CreateMedium(mediumName);
         PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10);
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
@@ -477,7 +477,7 @@ TEST(ProcessCollection , Displacement)
         for (std::vector<ProcessCollection*>::iterator it = CombOfProcColl.begin(); it != CombOfProcColl.end(); ++it)
         {
             if (particle->GetType() == (*it)->GetParticle()->GetType() &&
-                medium->GetType() == (*it)->GetMedium()->GetType() &&
+                medium == (*it)->GetMedium() &&
                 *cuts == *(*it)->GetCutSettings())
             {
                 ProcColl = *it;
@@ -558,7 +558,7 @@ TEST(ProcessCollection , TrackingIntegral)
         first=false;
 
         energy_old = -1;
-        Medium *medium = new Medium(Medium::GetTypeFromName(mediumName),1.);
+        Medium *medium = MediumFactory::Get()->CreateMedium(mediumName);
         PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10);
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
@@ -590,7 +590,7 @@ TEST(ProcessCollection , TrackingIntegral)
         for (std::vector<ProcessCollection*>::iterator it = CombOfProcColl.begin(); it != CombOfProcColl.end(); ++it)
         {
             if (particle->GetType() == (*it)->GetParticle()->GetType() &&
-                medium->GetType() == (*it)->GetMedium()->GetType() &&
+                medium == (*it)->GetMedium() &&
                 *cuts == *(*it)->GetCutSettings())
             {
                 ProcColl = *it;
@@ -670,7 +670,7 @@ TEST(ProcessCollection , FinalEnergyDist)
         first=false;
 
         energy_old = -1;
-        Medium *medium = new Medium(Medium::GetTypeFromName(mediumName),1.);
+        Medium *medium = MediumFactory::Get()->CreateMedium(mediumName);
         PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10);
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
@@ -702,7 +702,7 @@ TEST(ProcessCollection , FinalEnergyDist)
         for (std::vector<ProcessCollection*>::iterator it = CombOfProcColl.begin(); it != CombOfProcColl.end(); ++it)
         {
             if (particle->GetType() == (*it)->GetParticle()->GetType() &&
-                medium->GetType() == (*it)->GetMedium()->GetType() &&
+                medium == (*it)->GetMedium() &&
                 *cuts == *(*it)->GetCutSettings())
             {
                 ProcColl = *it;
@@ -785,7 +785,7 @@ TEST(ProcessCollection , MakeDecay)
         Decay_old.second = PROPOSALParticle::GetTypeFromName(old_decay_second_string);
 
         energy_old = -1;
-        Medium *medium = new Medium(Medium::GetTypeFromName(mediumName),1.);
+        Medium *medium = MediumFactory::Get()->CreateMedium(mediumName);
         PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10);
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
@@ -817,7 +817,7 @@ TEST(ProcessCollection , MakeDecay)
         for (std::vector<ProcessCollection*>::iterator it = CombOfProcColl.begin(); it != CombOfProcColl.end(); ++it)
         {
             if (particle->GetType() == (*it)->GetParticle()->GetType() &&
-                medium->GetType() == (*it)->GetMedium()->GetType() &&
+                medium == (*it)->GetMedium() &&
                 *cuts == *(*it)->GetCutSettings())
             {
                 ProcColl = *it;
@@ -905,7 +905,7 @@ TEST(ProcessCollection , FinalEnergyParticleInteraction)
         first=false;
 
         energy_old = -1;
-        Medium *medium = new Medium(Medium::GetTypeFromName(mediumName),1.);
+        Medium *medium = MediumFactory::Get()->CreateMedium(mediumName);
         PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10);
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
@@ -938,7 +938,7 @@ TEST(ProcessCollection , FinalEnergyParticleInteraction)
         for (std::vector<ProcessCollection*>::iterator it = CombOfProcColl.begin(); it != CombOfProcColl.end(); ++it)
         {
             if (particle->GetType() == (*it)->GetParticle()->GetType() &&
-                medium->GetType() == (*it)->GetMedium()->GetType() &&
+                medium == (*it)->GetMedium() &&
                 *cuts == *(*it)->GetCutSettings())
             {
                 ProcColl = *it;
