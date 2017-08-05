@@ -1150,7 +1150,7 @@ double Photonuclear::ParametrizationOfRealPhotonAssumption(double v, int i)
             break;
         case ParametrizationType::PhotoZeusShadowBezrukovSoft:
         case ParametrizationType::PhotoZeusShadowBezrukovHard:
-            sgn = PhotoNucleusCrossSectionZeus(nu, medium_->GetAverageNucleonWeight().at(i));
+            sgn = PhotoNucleusCrossSectionZeus(nu, medium_->GetComponents().at(i)->GetAverageNucleonWeight());
             break;
         default:
             log_fatal("The photonuclear Parametrization %i is not supported.\n", parametrization_);
@@ -1161,11 +1161,11 @@ double Photonuclear::ParametrizationOfRealPhotonAssumption(double v, int i)
 
     double particle_charge = particle_->GetCharge();
     double particle_mass = particle_->GetMass();
-    double atomic_number = medium_->GetAtomicNum().at(i);
+    double atomic_number = medium_->GetComponents().at(i)->GetAtomicNum();
 
     k   =   1 - 2/v + 2/(v*v);
 
-    if(medium_->GetNucCharge().at(i)==1)
+    if(medium_->GetComponents().at(i)->GetNucCharge()==1)
     {
         G   =   1;
     }
@@ -1201,7 +1201,7 @@ double Photonuclear::ParametrizationOfRealPhotonAssumption(double v, int i)
         }
     }
 
-    return medium_->GetMolDensity()*medium_->GetAtomInMolecule().at(i)*particle_charge*particle_charge*aux;
+    return medium_->GetMolDensity()*medium_->GetComponents().at(i)->GetAtomInMolecule()*particle_charge*particle_charge*aux;
 }
 
 //----------------------------------------------------------------------------//
@@ -1235,7 +1235,7 @@ double Photonuclear::ParametrizationOfQ2Integration(double v, int i)
         min     -=  (aux*aux)/(2*(1-v));
     }
 
-    max =   2*medium_->GetAverageNucleonWeight().at(i)*particle_energy*(v-vMin_);
+    max =   2*medium_->GetComponents().at(i)->GetAverageNucleonWeight()*particle_energy*(v-vMin_);
 
     //  if(form==4) max=Math.min(max, 5.5e6);  // as requested in Butkevich and Mikheyev
     if(min > max)
@@ -1243,7 +1243,7 @@ double Photonuclear::ParametrizationOfQ2Integration(double v, int i)
         return 0;
     }
 
-    aux = medium_->GetMolDensity()*medium_->GetAtomInMolecule().at(i)*particle_charge*particle_charge;
+    aux = medium_->GetMolDensity()*medium_->GetComponents().at(i)->GetAtomInMolecule()*particle_charge*particle_charge;
 
     switch (parametrization_)
     {
@@ -1338,12 +1338,12 @@ void Photonuclear::SetIntegralLimits(int component)
     double aux;
 
     component_ = component;
-    vMin_    =   (MPI + (MPI*MPI)/(2*medium_->GetAverageNucleonWeight().at(component_)))/particle_->GetEnergy();
+    vMin_    =   (MPI + (MPI*MPI)/(2*medium_->GetComponents().at(component_)->GetAverageNucleonWeight()))/particle_->GetEnergy();
 
     if(particle_->GetMass() < MPI)
     {
-        aux     =   particle_->GetMass()/medium_->GetAverageNucleonWeight().at(component_);
-        vMax_    =   1 - medium_->GetAverageNucleonWeight().at(component_)*(1 + aux*aux)/(2*particle_->GetEnergy());
+        aux     =   particle_->GetMass()/medium_->GetComponents().at(component_)->GetAverageNucleonWeight();
+        vMax_    =   1 - medium_->GetComponents().at(component_)->GetAverageNucleonWeight()*(1 + aux*aux)/(2*particle_->GetEnergy());
     }
     else
     {
@@ -1652,11 +1652,11 @@ double Photonuclear::ShadowBezrukovBugaev(double sgn, double atomic_number)
 
 double Photonuclear::ShadowEffect(double x , double nu)
 {
-    if(medium_->GetNucCharge().at(component_)==1) return 1;
+    if(medium_->GetComponents().at(component_)->GetNucCharge()==1) return 1;
 
     double G, atomic_number;
 
-    atomic_number = medium_->GetAtomicNum().at(component_);
+    atomic_number = medium_->GetComponents().at(component_)->GetAtomicNum();
 
     if(shadow_ == ShadowingType::Dutta)
     {
@@ -1683,10 +1683,10 @@ double Photonuclear::ShadowEffect(double x , double nu)
 
             double mb, Aosc, mu, au, ac;
 
-            mb      =   Mb*medium_->GetMN().at(component_);
+            mb      =   Mb*medium_->GetComponents().at(component_)->GetMN();
             au      =   1/(1 - x);
             ac      =   1/(1 - x2);
-            mu      =   MPI/medium_->GetAverageNucleonWeight().at(component_);
+            mu      =   MPI/medium_->GetComponents().at(component_)->GetAverageNucleonWeight();
             Aosc    =   (1 - la*x)*((au - ac)-mu*(au*au - ac*ac));
             G       =   1 - mb*Aosc;
         }
@@ -1698,9 +1698,9 @@ double Photonuclear::ShadowEffect(double x , double nu)
 
             double m1, m2, m3, x0, sgn;
 
-            m1  =   M1*medium_->GetMN().at(component_);
-            m2  =   M2*medium_->GetMN().at(component_);
-            m3  =   M3*medium_->GetMN().at(component_);
+            m1  =   M1*medium_->GetComponents().at(component_)->GetMN();
+            m2  =   M2*medium_->GetComponents().at(component_)->GetMN();
+            m3  =   M3*medium_->GetComponents().at(component_)->GetMN();
             nu  *=  1.e-3;
             sgn =   112.2*(0.609*pow(nu, 0.0988) + 1.037*pow(nu, -0.5944));
             G   =   ShadowBezrukovBugaev(sgn, atomic_number);
@@ -1818,10 +1818,12 @@ double Photonuclear::FunctionToDNdxIntegral(double variable)
 
 double Photonuclear::FunctionToIntegralALLM91(double Q2)
 {
+    Components::Component* component = medium_->GetComponents().at(component_);
+
     double x, aux, nu, G, F2, R2;
 
     nu  =   v_*particle_->GetEnergy();
-    x   =   Q2/(2*medium_->GetAverageNucleonWeight().at(component_)*nu);
+    x   =   Q2/(2*medium_->GetComponents().at(component_)->GetAverageNucleonWeight()*nu);
 
     G = ShadowEffect(x , nu);
 
@@ -1830,9 +1832,9 @@ double Photonuclear::FunctionToIntegralALLM91(double Q2)
 
     aux =   x*x;
     P   =   1 - 1.85*x + 2.45*aux - 2.35*aux*x + aux*aux;
-    G   *=  (medium_->GetNucCharge().at(component_) + (medium_->GetAtomicNum().at(component_) - medium_->GetNucCharge().at(component_))*P);
-    W2  =   medium_->GetAverageNucleonWeight().at(component_)*medium_->GetAverageNucleonWeight().at(component_)
-            - Q2 + 2*medium_->GetAverageNucleonWeight().at(component_)*particle_->GetEnergy()*v_;
+    G   *=  (component->GetNucCharge() + (component->GetAtomicNum() - component->GetNucCharge())*P);
+    W2  =   component->GetAverageNucleonWeight()*component->GetAverageNucleonWeight()
+            - Q2 + 2*component->GetAverageNucleonWeight()*particle_->GetEnergy()*v_;
 
     double cp1, cp2, cp3, cr1, cr2, cr3, ap1, ap2, ap3, ar1, ar2, ar3;
     double bp1, bp2, bp3, br1, br2, br3, m2o, m2r, L2, m2p, Q2o;
@@ -1897,8 +1899,8 @@ double Photonuclear::FunctionToIntegralALLM91(double Q2)
 
     double xp, xr, F2p, F2r;
 
-    xp  =   (Q2 + m2p)/(Q2 + m2p + W2 - medium_->GetAverageNucleonWeight().at(component_)*medium_->GetAverageNucleonWeight().at(component_));
-    xr  =   (Q2 + m2r)/(Q2 + m2r + W2 - medium_->GetAverageNucleonWeight().at(component_)*medium_->GetAverageNucleonWeight().at(component_));
+    xp  =   (Q2 + m2p)/(Q2 + m2p + W2 - component->GetAverageNucleonWeight()*component->GetAverageNucleonWeight());
+    xr  =   (Q2 + m2r)/(Q2 + m2r + W2 - component->GetAverageNucleonWeight()*component->GetAverageNucleonWeight());
     F2p =   cp*pow(xp, ap)*pow(1 - x, bp);
     F2r =   cr*pow(xr, ar)*pow(1 - x, br);
     F2  =   (Q2/(Q2 + m2o))*(F2p + F2r)*G;
@@ -1907,9 +1909,9 @@ double Photonuclear::FunctionToIntegralALLM91(double Q2)
 
 
     aux =   ME*RE/Q2;
-    aux *=  aux*(1 - v_ - medium_->GetAverageNucleonWeight().at(component_)*x*v_/(2*particle_->GetEnergy()) +
+    aux *=  aux*(1 - v_ - component->GetAverageNucleonWeight()*x*v_/(2*particle_->GetEnergy()) +
                  (1 - 2*particle_->GetMass()*particle_->GetMass()/Q2)
-                 *v_*v_*(1 + 4*medium_->GetAverageNucleonWeight().at(component_)*medium_->GetAverageNucleonWeight().at(component_)*x*x/Q2)/R2);
+                 *v_*v_*(1 + 4*component->GetAverageNucleonWeight()*component->GetAverageNucleonWeight()*x*x/Q2)/R2);
 
     return (4*PI*F2/v_)*aux;
 }
@@ -1921,10 +1923,12 @@ double Photonuclear::FunctionToIntegralALLM91(double Q2)
 
 double Photonuclear::FunctionToIntegralALLM97(double Q2)
 {
+    Components::Component* component = medium_->GetComponents().at(component_);
+
     double x, aux, nu, G, F2, R2;
 
     nu  =   v_*particle_->GetEnergy();
-    x   =   Q2/(2*medium_->GetAverageNucleonWeight().at(component_)*nu);
+    x   =   Q2/(2*component->GetAverageNucleonWeight()*nu);
 
     G = ShadowEffect(x , nu);
 
@@ -1932,9 +1936,9 @@ double Photonuclear::FunctionToIntegralALLM97(double Q2)
 
     aux =   x*x;
     P   =   1 - 1.85*x + 2.45*aux - 2.35*aux*x + aux*aux;
-    G   *=  (medium_->GetNucCharge().at(component_) + (medium_->GetAtomicNum().at(component_) - medium_->GetNucCharge().at(component_))*P);
-    W2  =   medium_->GetAverageNucleonWeight().at(component_)*medium_->GetAverageNucleonWeight().at(component_)
-            - Q2 + 2*medium_->GetAverageNucleonWeight().at(component_)*particle_->GetEnergy()*v_;
+    G   *=  (component->GetNucCharge() + (component->GetAtomicNum() - component->GetNucCharge())*P);
+    W2  =   component->GetAverageNucleonWeight()*component->GetAverageNucleonWeight()
+            - Q2 + 2*component->GetAverageNucleonWeight()*particle_->GetEnergy()*v_;
 
     double cp1, cp2, cp3, cr1, cr2, cr3, ap1, ap2, ap3, ar1, ar2, ar3;
     double bp1, bp2, bp3, br1, br2, br3, m2o, m2r, L2, m2p, Q2o;
@@ -1999,17 +2003,17 @@ double Photonuclear::FunctionToIntegralALLM97(double Q2)
 
     double xp, xr, F2p, F2r;
 
-    xp  =   (Q2 + m2p)/(Q2 + m2p + W2 - medium_->GetAverageNucleonWeight().at(component_)*medium_->GetAverageNucleonWeight().at(component_));
-    xr  =   (Q2 + m2r)/(Q2 + m2r + W2 - medium_->GetAverageNucleonWeight().at(component_)*medium_->GetAverageNucleonWeight().at(component_));
+    xp  =   (Q2 + m2p)/(Q2 + m2p + W2 - component->GetAverageNucleonWeight()*component->GetAverageNucleonWeight());
+    xr  =   (Q2 + m2r)/(Q2 + m2r + W2 - component->GetAverageNucleonWeight()*component->GetAverageNucleonWeight());
     F2p =   cp*pow(xp, ap)*pow(1 - x, bp);
     F2r =   cr*pow(xr, ar)*pow(1 - x, br);
     F2  =   (Q2/(Q2 + m2o))*(F2p + F2r)*G;
     R2  =   (2*(1 + R));
 
     aux =   ME*RE/Q2;
-    aux *=  aux*(1 - v_ - medium_->GetAverageNucleonWeight().at(component_)*x*v_/(2*particle_->GetEnergy()) +
+    aux *=  aux*(1 - v_ - component->GetAverageNucleonWeight()*x*v_/(2*particle_->GetEnergy()) +
                  (1 - 2*particle_->GetMass()*particle_->GetMass()/Q2)
-                 *v_*v_*(1 + 4*medium_->GetAverageNucleonWeight().at(component_)*medium_->GetAverageNucleonWeight().at(component_)*x*x/Q2)/R2);
+                 *v_*v_*(1 + 4*component->GetAverageNucleonWeight()*component->GetAverageNucleonWeight()*x*x/Q2)/R2);
 
     return (4*PI*F2/v_)*aux;
 }
@@ -2022,10 +2026,12 @@ double Photonuclear::FunctionToIntegralALLM97(double Q2)
 
 double Photonuclear::FunctionToIntegralButMik(double Q2)
 {
+    Components::Component* component = medium_->GetComponents().at(component_);
+
     double x, aux, nu, G, F2, R2;
 
     nu  =   v_*particle_->GetEnergy();
-    x   =   Q2/(2*medium_->GetAverageNucleonWeight().at(component_)*nu);
+    x   =   Q2/(2*component->GetAverageNucleonWeight()*nu);
 
     G = ShadowEffect(x , nu);
 
@@ -2055,14 +2061,14 @@ double Photonuclear::FunctionToIntegralButMik(double Q2)
     FNn =   xUv/4 + xDv*4;
     F2p =   FSp + FNp;
     F2n =   FSn + FNn;
-    F2  =   G*(medium_->GetNucCharge().at(component_)*F2p + (medium_->GetAtomicNum().at(component_) - medium_->GetNucCharge().at(component_))*F2n);
+    F2  =   G*(component->GetNucCharge()*F2p + (component->GetAtomicNum() - component->GetNucCharge())*F2n);
     R2  =   (2*(1 + R));
 
 
     aux =   ME*RE/Q2;
-    aux *=  aux*(1 - v_ - medium_->GetAverageNucleonWeight().at(component_)*x*v_/(2*particle_->GetEnergy()) +
+    aux *=  aux*(1 - v_ - component->GetAverageNucleonWeight()*x*v_/(2*particle_->GetEnergy()) +
                  (1 - 2*particle_->GetMass()*particle_->GetMass()/Q2)
-                 *v_*v_*(1 + 4*medium_->GetAverageNucleonWeight().at(component_)*medium_->GetAverageNucleonWeight().at(component_)*x*x/Q2)/R2);
+                 *v_*v_*(1 + 4*component->GetAverageNucleonWeight()*component->GetAverageNucleonWeight()*x*x/Q2)/R2);
 
     return (4*PI*F2/v_)*aux;
 }
@@ -2074,16 +2080,18 @@ double Photonuclear::FunctionToIntegralButMik(double Q2)
 
 double Photonuclear::FunctionToIntegralRSS(double Q2)
 {
+    Components::Component* component = medium_->GetComponents().at(component_);
+
     double x, aux, nu;
 
     nu  =   v_*particle_->GetEnergy();
-    x   =   Q2/(2*medium_->GetAverageNucleonWeight().at(component_)*nu);
+    x   =   Q2/(2*component->GetAverageNucleonWeight()*nu);
 
     // -------------[ Evaluate shadowfactor ]---------------- //
 
     double a;
 
-    if(medium_->GetNucCharge().at(component_)==1)
+    if(component->GetNucCharge()==1)
     {
         a   =   1;
     }
@@ -2179,23 +2187,23 @@ double Photonuclear::FunctionToIntegralRSS(double Q2)
 
     double xp, xr, F2p, F2A, F2P, F2R, W2;
 
-    W2  =   medium_->GetAverageNucleonWeight().at(component_)*medium_->GetAverageNucleonWeight().at(component_)
-            - Q2 + 2*medium_->GetAverageNucleonWeight().at(component_)*particle_->GetEnergy()*v_;
-    xp  =   (Q2 + m2p)/(Q2 + m2p + W2 - medium_->GetAverageNucleonWeight().at(component_)*medium_->GetAverageNucleonWeight().at(component_));
-    xr  =   (Q2 + m2r)/(Q2 + m2r + W2 - medium_->GetAverageNucleonWeight().at(component_)*medium_->GetAverageNucleonWeight().at(component_));
+    W2  =   component->GetAverageNucleonWeight()*component->GetAverageNucleonWeight()
+            - Q2 + 2*component->GetAverageNucleonWeight()*particle_->GetEnergy()*v_;
+    xp  =   (Q2 + m2p)/(Q2 + m2p + W2 - component->GetAverageNucleonWeight()*component->GetAverageNucleonWeight());
+    xr  =   (Q2 + m2r)/(Q2 + m2r + W2 - component->GetAverageNucleonWeight()*component->GetAverageNucleonWeight());
     F2P =   cp*pow(xp, ap)*pow(1 - x, bp);
     F2R =   cr*pow(xr, ar)*pow(1 - x, br);
     F2p =   (Q2/(Q2 + m2o))*(F2P + F2R);
-    F2A =   a*(medium_->GetNucCharge().at(component_) + (medium_->GetAtomicNum().at(component_) - medium_->GetNucCharge().at(component_))) *P*F2p;
+    F2A =   a*(component->GetNucCharge() + (component->GetAtomicNum() - component->GetNucCharge())) *P*F2p;
 
     // ---------[ Write together cross section ]------------- //
 
     aux =   ME*RE/Q2;
     aux *=  aux*(1 - v_ + 0.25*v_*v_ -
                 (1 + 4*particle_->GetMass()*particle_->GetMass()/Q2)*0.25*v_*v_ *
-                (1 + 4*medium_->GetAverageNucleonWeight().at(component_)*medium_->GetAverageNucleonWeight().at(component_)*x*x/Q2) /
+                (1 + 4*component->GetAverageNucleonWeight()*component->GetAverageNucleonWeight()*x*x/Q2) /
                 (1 + R));
-                 // *v_*v_*(1 + 4*medium_->GetAverageNucleonWeight().at(component_)*medium_->GetAverageNucleonWeight().at(component_)*x*x/Q2)/R2);
+                 // *v_*v_*(1 + 4*component->GetAverageNucleonWeight()*component->GetAverageNucleonWeight()*x*x/Q2)/R2);
 
     return (4*PI*F2A/v_)*aux;
 }

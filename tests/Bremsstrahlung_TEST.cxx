@@ -41,7 +41,7 @@ public:
 TEST(Comparison , Comparison_equal ) {
 
     double dEdx;
-    Medium *medium = new Medium(MediumType::Air,1.);
+    Medium* medium = new Air();
     PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
     Bremsstrahlung *A = new Bremsstrahlung(particle, medium, cuts);
@@ -70,8 +70,8 @@ TEST(Comparison , Comparison_equal ) {
 
 TEST(Comparison , Comparison_not_equal ) {
 
-    Medium *medium = new Medium(MediumType::Air,1.);
-    Medium *medium2 = new Medium(MediumType::Water,1.);
+    Medium *medium = new Air();
+    Medium *medium2 = new Water();
     PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,20,20,1e5,10);
     PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,20,20,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
@@ -103,7 +103,7 @@ TEST(Assignment , Copyconstructor ) {
 }
 
 TEST(Assignment , Copyconstructor2 ) {
-    Medium *medium = new Medium(MediumType::Air,1.);
+    Medium *medium = new Air();
     PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
 
@@ -115,7 +115,7 @@ TEST(Assignment , Copyconstructor2 ) {
 }
 
 TEST(Assignment , Operator ) {
-    Medium *medium = new Medium(MediumType::Air,1.);
+    Medium *medium = new Air();
     PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
     Bremsstrahlung A(particle, medium, cuts);
@@ -128,7 +128,7 @@ TEST(Assignment , Operator ) {
 
     EXPECT_TRUE(A==B);
 
-    Medium *medium2 = new Medium(MediumType::Water,1.);
+    Medium *medium2 = new Water();
     PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cuts2 = new EnergyCutSettings(200,-1);
     Bremsstrahlung *C = new Bremsstrahlung(particle2, medium2, cuts2);
@@ -141,8 +141,8 @@ TEST(Assignment , Operator ) {
 }
 
 TEST(Assignment , Swap ) {
-    Medium *medium = new Medium(MediumType::Air,1.);
-    Medium *medium2 = new Medium(MediumType::Air,1.);
+    Medium *medium = new Air();
+    Medium *medium2 = new Air();
     PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
     PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
@@ -153,8 +153,8 @@ TEST(Assignment , Swap ) {
     B.EnableDEdxInterpolation();
     EXPECT_TRUE(A==B);
 
-    Medium *medium3 = new Medium(MediumType::Water,1.);
-    Medium *medium4 = new Medium(MediumType::Water,1.);
+    Medium *medium3 = new Water();
+    Medium *medium4 = new Water();
     PROPOSALParticle *particle3 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,.20,20,1e5,10);
     PROPOSALParticle *particle4 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cuts3 = new EnergyCutSettings(200,-1);
@@ -195,7 +195,7 @@ TEST(Bremsstrahlung , Test_of_dEdx ) {
     {
         in>>para>>ecut>>vcut>>lpm>>energy>>mediumName>>particleName>>dEdx;
 
-        Medium *medium = new Medium(Medium::GetTypeFromName(mediumName),1.);
+        Medium *medium = MediumFactory::Get()->CreateMedium(mediumName);
         PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10);
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
@@ -243,7 +243,7 @@ TEST(Bremsstrahlung , Test_of_dNdx ) {
     {
         in>>para>>ecut>>vcut>>lpm>>energy>>mediumName>>particleName>>dNdx;
 
-        Medium *medium = new Medium(Medium::GetTypeFromName(mediumName),1.);
+        Medium *medium = MediumFactory::Get()->CreateMedium(mediumName);
         PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10);
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
@@ -296,7 +296,7 @@ TEST(Bremsstrahlung , Test_of_dNdxrnd ) {
         if(first)in>>para>>ecut>>vcut>>lpm>>energy>>mediumName>>particleName>>dNdxrnd;
         first=false;
         energy_old = -1;
-        Medium *medium = new Medium(Medium::GetTypeFromName(mediumName),1.);
+        Medium *medium = MediumFactory::Get()->CreateMedium(mediumName);
         PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10);
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
@@ -361,7 +361,7 @@ TEST(Bremsstrahlung , Test_of_e ) {
         if(first)in>>para>>ecut>>vcut>>lpm>>energy>>mediumName>>particleName>>e;
         first=false;
         energy_old = -1;
-        Medium *medium = new Medium(Medium::GetTypeFromName(mediumName),1.);
+        Medium *medium = MediumFactory::Get()->CreateMedium(mediumName);
         PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10);
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
@@ -424,7 +424,7 @@ TEST(Bremsstrahlung , Test_of_dEdx_Interpolant ) {
         precision = precisionOld;
         energy_old =-1;
 
-        Medium *medium = new Medium(Medium::GetTypeFromName(mediumName),1.);
+        Medium *medium = MediumFactory::Get()->CreateMedium(mediumName);
         PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10);
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
@@ -488,7 +488,7 @@ TEST(Bremsstrahlung , Test_of_dNdx_Interpolant ) {
         if(first)in>>para>>ecut>>vcut>>lpm>>energy>>mediumName>>particleName>>dNdx;
         first=false;
         energy_old = -1;
-        Medium *medium = new Medium(Medium::GetTypeFromName(mediumName),1.);
+        Medium *medium = MediumFactory::Get()->CreateMedium(mediumName);
         PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10);
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
@@ -550,7 +550,7 @@ return;
         if(first)in>>para>>ecut>>vcut>>lpm>>energy>>mediumName>>particleName>>e;
         first=false;
         energy_old = -1;
-        Medium *medium = new Medium(Medium::GetTypeFromName(mediumName),1.);
+        Medium *medium = MediumFactory::Get()->CreateMedium(mediumName);
         PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10);
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);

@@ -1034,7 +1034,7 @@ ProcessCollection::ProcessCollection()
     interpolant_diff_               = NULL;
     particle_                       = new PROPOSALParticle();
     backup_particle_                = particle_;
-    medium_                         = new Medium();
+    medium_                         = new Water();
     integral_                       = new Integral();
     cut_settings_                   = new EnergyCutSettings();
     prop_decay_                     = new Integral();
@@ -1081,7 +1081,7 @@ ProcessCollection::ProcessCollection(const ProcessCollection &collection)
     ,storeDif_                   ( collection.storeDif_ )
     ,particle_                   ( new PROPOSALParticle(*collection.particle_) )
     ,backup_particle_            ( new PROPOSALParticle(*collection.backup_particle_) )
-    ,medium_                     ( new Medium( *collection.medium_) )
+    ,medium_                     ( collection.medium_->clone() )
     ,integral_                   ( new Integral(*collection.integral_) )
     ,cut_settings_               ( new EnergyCutSettings(*collection.cut_settings_) )
     ,decay_                      ( new Decay(*collection.decay_) )
@@ -1487,9 +1487,6 @@ void ProcessCollection::swap(ProcessCollection &collection)
     EnergyCutSettings tmp_cuts1(*collection.cut_settings_);
     EnergyCutSettings tmp_cuts2(*cut_settings_);
 
-    Medium tmp_medium1(*collection.medium_);
-    Medium tmp_medium2(*medium_);
-
     vector<CrossSections*> tmp_cross1(collection.crosssections_);
     vector<CrossSections*> tmp_cross2(crosssections_);
 
@@ -1576,8 +1573,8 @@ void ProcessCollection::swap(ProcessCollection &collection)
     SetParticle( new PROPOSALParticle(tmp_particle1) );
     collection.SetParticle( new PROPOSALParticle(tmp_particle2) );
 
-    SetMedium( new Medium(tmp_medium1) );
-    collection.SetMedium( new Medium(tmp_medium2) );
+    SetMedium( collection.medium_->clone());
+    collection.SetMedium(medium_->clone());
 
     SetCutSettings(  new EnergyCutSettings(tmp_cuts1) );
     collection.SetCutSettings( new EnergyCutSettings(tmp_cuts2) );
