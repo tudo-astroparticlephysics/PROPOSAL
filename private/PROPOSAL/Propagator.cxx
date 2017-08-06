@@ -2067,36 +2067,7 @@ void Propagator::InitProcessCollections(ifstream &file)
                 density_correction = 1;
             }
 
-            Medium* med;
-
-            if (boost::iequals(name, "water"))
-                med = new Water();
-            else if (boost::iequals(name, "ice"))
-                med = new Ice();
-            else if (boost::iequals(name, "hydrogen"))
-                med = new Hydrogen();
-            else if (boost::iequals(name, "iron"))
-                med = new Iron();
-            else if (boost::iequals(name, "copper"))
-                med = new Copper();
-            else if (boost::iequals(name, "lead"))
-                med = new Lead();
-            else if (boost::iequals(name, "uranium"))
-                med = new Uranium();
-            else if (boost::iequals(name, "air"))
-                med = new Air();
-            else if (boost::iequals(name, "AntaresWater"))
-                med = new AntaresWater();
-            else if (boost::iequals(name, "StandardRock"))
-                med = new StandardRock();
-            else if (boost::iequals(name, "FrejusRock"))
-                med = new FrejusRock();
-            else if (boost::iequals(name, "salt"))
-                med = new Salt();
-            else
-            {
-                log_fatal("the medium name '%s' is not supported", name.c_str());
-            }
+            Medium* med = MediumFactory::Get()->CreateMedium(name);
 
             if (particle_ == NULL)
             {
