@@ -435,7 +435,7 @@ void Medium::SetR0(double r0)
 ******************************************************************************/
 
 Water::Water(double rho)
-    : Medium("Water",
+    : MediumCopyable("Water",
              rho,
              75.0,    // I
              -3.5017, // C
@@ -451,23 +451,8 @@ Water::Water(double rho)
     init();
 }
 
-Water& Water::operator=(const Water& medium)
-{
-    if (this != &medium) {
-        const Water* med = dynamic_cast<const Water*>(&medium);
-        if (!med) {
-            log_warn("Cannot assign Water!");
-            return *this;
-        }
-
-        Water tmp(*med);
-        swap(tmp);
-    }
-    return *this;
-}
-
 Ice::Ice(double rho)
-    : Medium("Ice",
+    : MediumCopyable("Ice",
              rho,
              75.0,    // I
              -3.5017, // C
@@ -483,23 +468,8 @@ Ice::Ice(double rho)
     init();
 }
 
-Ice& Ice::operator=(const Ice& medium)
-{
-    if (this != &medium) {
-        const Ice* med = dynamic_cast<const Ice*>(&medium);
-        if (!med) {
-            log_warn("Cannot assign Ice!");
-            return *this;
-        }
-
-        Ice tmp(*med);
-        swap(tmp);
-    }
-    return *this;
-}
-
 Salt::Salt(double rho)
-    : Medium("Salt",
+    : MediumCopyable("Salt",
              rho,
              // Calculated by ESTAR detabase
              // (it could be 185 eV by the method of reference below)
@@ -517,23 +487,8 @@ Salt::Salt(double rho)
     init();
 }
 
-Salt& Salt::operator=(const Salt& medium)
-{
-    if (this != &medium) {
-        const Salt* med = dynamic_cast<const Salt*>(&medium);
-        if (!med) {
-            log_warn("Cannot assign Salt!");
-            return *this;
-        }
-
-        Salt tmp(*med);
-        swap(tmp);
-    }
-    return *this;
-}
-
 StandardRock::StandardRock(double rho)
-    : Medium("StandardRock",
+    : MediumCopyable("StandardRock",
              rho,
              136.4,   // I
              -3.7738, // C
@@ -548,23 +503,8 @@ StandardRock::StandardRock(double rho)
     init();
 }
 
-StandardRock& StandardRock::operator=(const StandardRock& medium)
-{
-    if (this != &medium) {
-        const StandardRock* med = dynamic_cast<const StandardRock*>(&medium);
-        if (!med) {
-            log_warn("Cannot assign StandardRock!");
-            return *this;
-        }
-
-        StandardRock tmp(*med);
-        swap(tmp);
-    }
-    return *this;
-}
-
 FrejusRock::FrejusRock(double rho)
-    : Medium("FrejusRock",
+    : MediumCopyable("FrejusRock",
              rho,
              149.0,  // I
              -5.053, // C
@@ -579,23 +519,8 @@ FrejusRock::FrejusRock(double rho)
     init();
 }
 
-FrejusRock& FrejusRock::operator=(const FrejusRock& medium)
-{
-    if (this != &medium) {
-        const FrejusRock* med = dynamic_cast<const FrejusRock*>(&medium);
-        if (!med) {
-            log_warn("Cannot assign FrejusRock!");
-            return *this;
-        }
-
-        FrejusRock tmp(*med);
-        swap(tmp);
-    }
-    return *this;
-}
-
 Iron::Iron(double rho)
-    : Medium("Iron",
+    : MediumCopyable("Iron",
              rho,
              286.0,   // I
              -4.2911, // C
@@ -610,23 +535,8 @@ Iron::Iron(double rho)
     init();
 }
 
-Iron& Iron::operator=(const Iron& medium)
-{
-    if (this != &medium) {
-        const Iron* med = dynamic_cast<const Iron*>(&medium);
-        if (!med) {
-            log_warn("Cannot assign Iron!");
-            return *this;
-        }
-
-        Iron tmp(*med);
-        swap(tmp);
-    }
-    return *this;
-}
-
 Hydrogen::Hydrogen(double rho)
-    : Medium("Hydrogen",
+    : MediumCopyable("Hydrogen",
              rho,
              21.8,    // I
              -3.0977, // C
@@ -641,23 +551,8 @@ Hydrogen::Hydrogen(double rho)
     init();
 }
 
-Hydrogen& Hydrogen::operator=(const Hydrogen& medium)
-{
-    if (this != &medium) {
-        const Hydrogen* med = dynamic_cast<const Hydrogen*>(&medium);
-        if (!med) {
-            log_warn("Cannot assign Hydrogen!");
-            return *this;
-        }
-
-        Hydrogen tmp(*med);
-        swap(tmp);
-    }
-    return *this;
-}
-
 Lead::Lead(double rho)
-    : Medium("Lead",
+    : MediumCopyable("Lead",
              rho,
              823.0,   // I
              -6.2018, // C
@@ -672,23 +567,8 @@ Lead::Lead(double rho)
     init();
 }
 
-Lead& Lead::operator=(const Lead& medium)
-{
-    if (this != &medium) {
-        const Lead* med = dynamic_cast<const Lead*>(&medium);
-        if (!med) {
-            log_warn("Cannot assign Lead!");
-            return *this;
-        }
-
-        Lead tmp(*med);
-        swap(tmp);
-    }
-    return *this;
-}
-
 Copper::Copper(double rho)
-    : Medium("Copper",
+    : MediumCopyable("Copper",
              rho,
              322.0,   // I
              -4.4190, // C
@@ -703,23 +583,8 @@ Copper::Copper(double rho)
     init();
 }
 
-Copper& Copper::operator=(const Copper& medium)
-{
-    if (this != &medium) {
-        const Copper* med = dynamic_cast<const Copper*>(&medium);
-        if (!med) {
-            log_warn("Cannot assign Copper!");
-            return *this;
-        }
-
-        Copper tmp(*med);
-        swap(tmp);
-    }
-    return *this;
-}
-
 Uranium::Uranium(double rho)
-    : Medium("Uranium",
+    : MediumCopyable("Uranium",
              rho,
              890.0,   // I
              -5.8694, // C
@@ -734,23 +599,8 @@ Uranium::Uranium(double rho)
     init();
 }
 
-Uranium& Uranium::operator=(const Uranium& medium)
-{
-if (this != &medium) {
-    const Uranium* med = dynamic_cast<const Uranium*>(&medium);
-    if (!med) {
-        log_warn("Cannot assign Uranium!");
-        return *this;
-    }
-
-    Uranium tmp(*med);
-    swap(tmp);
-}
-return *this;
-}
-
 Air::Air(double rho)
-    : Medium("Air",
+    : MediumCopyable("Air",
              rho,
              85.7,     // I
              -10.5961, // C
@@ -772,23 +622,8 @@ Air::Air(double rho)
     init();
 }
 
-Air& Air::operator=(const Air& medium)
-{
-    if (this != &medium) {
-        const Air* med = dynamic_cast<const Air*>(&medium);
-        if (!med) {
-            log_warn("Cannot assign Air!");
-            return *this;
-        }
-
-        Air tmp(*med);
-        swap(tmp);
-    }
-    return *this;
-}
-
 Paraffin::Paraffin(double rho)
-    : Medium("Paraffin",
+    : MediumCopyable("Paraffin",
              rho,
              55.9,    // I
              -2.9551, // C
@@ -804,23 +639,8 @@ Paraffin::Paraffin(double rho)
     init();
 }
 
-Paraffin& Paraffin::operator=(const Paraffin& medium)
-{
-    if (this != &medium) {
-        const Paraffin* med = dynamic_cast<const Paraffin*>(&medium);
-        if (!med) {
-            log_warn("Cannot assign Paraffin!");
-            return *this;
-        }
-
-        Paraffin tmp(*med);
-        swap(tmp);
-    }
-    return *this;
-}
-
 AntaresWater::AntaresWater(double rho)
-    : Medium("AntaresWater",
+    : MediumCopyable("AntaresWater",
              rho,
              75.0,    // I
              -3.5017, // C
@@ -861,20 +681,20 @@ AntaresWater::AntaresWater(double rho)
     // detector D = 2126 m (1.0391 g/cm^3)
 }
 
-AntaresWater& AntaresWater::operator=(const AntaresWater& medium)
-{
-    if (this != &medium) {
-        const AntaresWater* med = dynamic_cast<const AntaresWater*>(&medium);
-        if (!med) {
-            log_warn("Cannot assign AntaresWater!");
-            return *this;
-        }
-
-        AntaresWater tmp(*med);
-        swap(tmp);
-    }
-    return *this;
-}
+// AntaresWater& AntaresWater::operator=(const AntaresWater& medium)
+// {
+//     if (this != &medium) {
+//         const AntaresWater* med = dynamic_cast<const AntaresWater*>(&medium);
+//         if (!med) {
+//             log_warn("Cannot assign AntaresWater!");
+//             return *this;
+//         }
+//
+//         AntaresWater tmp(*med);
+//         swap(tmp);
+//     }
+//     return *this;
+// }
 
 /******************************************************************************
 *                               Medium Factory                                *

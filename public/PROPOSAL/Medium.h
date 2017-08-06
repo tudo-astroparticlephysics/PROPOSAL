@@ -24,8 +24,6 @@ namespace PROPOSAL {
 class Medium
 {
     public:
-    // Medium();
-    Medium(const Medium&);
     /*!
      * initialize medium by its name andby the
      * multiplicative density correction factor
@@ -43,9 +41,10 @@ class Medium
            double X1,
            double d0,
            double massDensity);
+    Medium(const Medium&);
 
     void swap(Medium& medium);
-    virtual Medium* clone() const = 0; // Virtual constructor idiom (used for deep copies)
+    virtual Medium* clone() const = 0; // Prototyping/Virtual constructor idiom (used for deep copies)
 
     // Operators
     Medium& operator=(const Medium&);
@@ -125,6 +124,7 @@ class Medium
     void SetR0(double r0);
 
     protected:
+
     std::string name_;
 
     int numComponents_;                              ///< number of components
@@ -153,20 +153,61 @@ class Medium
     double r0_;
 };
 
+/******************************************************************************
+*                               MediumCopyable                                *
+******************************************************************************/
+
+
+// ----------------------------------------------------------------------------
+/// @brief Template class for Medium
+///
+/// Provides a template to the assignment operator
+// ----------------------------------------------------------------------------
+template<typename T>
+class MediumCopyable: public Medium
+{
+    public:
+    MediumCopyable(std::string name,
+                   double rho,
+                   double I,
+                   double C,
+                   double a,
+                   double m,
+                   double X0,
+                   double X1,
+                   double d0,
+                   double massDensity)
+        : Medium(name, rho, I, C, a, m, X0, X1, d0, massDensity)
+    {
+    }
+
+    T& operator=(const Medium& medium)
+    {
+        if (this != &medium)
+        {
+            const T* med = dynamic_cast<T const&>(&medium);  // Throws on bad cast.
+
+            T tmp(*med);
+            swap(tmp);
+        }
+
+        return *this;
+    }
+};
+
 // #<{(|
 // * initialize water
 // |)}>#
-class Water : public Medium
+// class Water : public Medium
+class Water : public MediumCopyable<Water>
 {
     public:
     Water(double rho = 1.0);
     Water(const Water& medium)
-        : Medium(medium)
+        : MediumCopyable(medium)
     {
     }
     virtual ~Water() {}
-
-    Water& operator=(const Water&);
 
     Medium* clone() const { return new Water(*this); };
     static Medium* create() { return new Water(); };
@@ -175,17 +216,15 @@ class Water : public Medium
 // #<{(|
 // * initialize ice
 // |)}>#
-class Ice : public Medium
+class Ice : public MediumCopyable<Ice>
 {
     public:
     Ice(double rho = 1.0);
     Ice(const Ice& medium)
-        : Medium(medium)
+        : MediumCopyable(medium)
     {
     }
     virtual ~Ice() {}
-
-    Ice& operator=(const Ice&);
 
     Medium* clone() const { return new Ice(*this); };
     static Medium* create() { return new Ice(); };
@@ -194,17 +233,15 @@ class Ice : public Medium
 // #<{(|
 // * initialize salt (added by Ped)
 // |)}>#
-class Salt : public Medium
+class Salt : public MediumCopyable<Salt>
 {
     public:
     Salt(double rho = 1.0);
     Salt(const Salt& medium)
-        : Medium(medium)
+        : MediumCopyable(medium)
     {
     }
     virtual ~Salt() {}
-
-    Salt& operator=(const Salt&);
 
     Medium* clone() const { return new Salt(*this); };
     static Medium* create() { return new Salt(); };
@@ -213,17 +250,15 @@ class Salt : public Medium
 // #<{(|
 // * initialize standard rock
 // |)}>#
-class StandardRock : public Medium
+class StandardRock : public MediumCopyable<StandardRock>
 {
     public:
     StandardRock(double rho = 1.0);
     StandardRock(const StandardRock& medium)
-        : Medium(medium)
+        : MediumCopyable(medium)
     {
     }
     virtual ~StandardRock() {}
-
-    StandardRock& operator=(const StandardRock&);
 
     Medium* clone() const { return new StandardRock(*this); };
     static Medium* create() { return new StandardRock(); };
@@ -232,17 +267,15 @@ class StandardRock : public Medium
 // #<{(|
 // * initialize Frejus rock
 // |)}>#
-class FrejusRock : public Medium
+class FrejusRock : public MediumCopyable<FrejusRock>
 {
     public:
     FrejusRock(double rho = 1.0);
     FrejusRock(const FrejusRock& medium)
-        : Medium(medium)
+        : MediumCopyable(medium)
     {
     }
     virtual ~FrejusRock() {}
-
-    FrejusRock& operator=(const FrejusRock&);
 
     Medium* clone() const { return new FrejusRock(*this); };
     static Medium* create() { return new FrejusRock(); };
@@ -251,17 +284,15 @@ class FrejusRock : public Medium
 // #<{(|
 // * initialize iron
 // |)}>#
-class Iron : public Medium
+class Iron : public MediumCopyable<Iron>
 {
     public:
     Iron(double rho = 1.0);
     Iron(const Iron& medium)
-        : Medium(medium)
+        : MediumCopyable(medium)
     {
     }
     virtual ~Iron() {}
-
-    Iron& operator=(const Iron&);
 
     Medium* clone() const { return new Iron(*this); };
     static Medium* create() { return new Iron(); };
@@ -270,17 +301,15 @@ class Iron : public Medium
 // #<{(|
 // * initialize hydrogen
 // |)}>#
-class Hydrogen : public Medium
+class Hydrogen : public MediumCopyable<Hydrogen>
 {
     public:
     Hydrogen(double rho = 1.0);
     Hydrogen(const Hydrogen& medium)
-        : Medium(medium)
+        : MediumCopyable(medium)
     {
     }
     virtual ~Hydrogen() {}
-
-    Hydrogen& operator=(const Hydrogen&);
 
     Medium* clone() const { return new Hydrogen(*this); };
     static Medium* create() { return new Hydrogen(); };
@@ -289,17 +318,15 @@ class Hydrogen : public Medium
 // #<{(|
 // * initialize lead
 // |)}>#
-class Lead : public Medium
+class Lead : public MediumCopyable<Lead>
 {
     public:
     Lead(double rho = 1.0);
     Lead(const Lead& medium)
-        : Medium(medium)
+        : MediumCopyable(medium)
     {
     }
     virtual ~Lead() {}
-
-    Lead& operator=(const Lead&);
 
     Medium* clone() const { return new Lead(*this); };
     static Medium* create() { return new Lead(); };
@@ -308,17 +335,15 @@ class Lead : public Medium
 // #<{(|
 // * initialize copper
 // |)}>#
-class Copper : public Medium
+class Copper : public MediumCopyable<Copper>
 {
     public:
     Copper(double rho = 1.0);
     Copper(const Copper& medium)
-        : Medium(medium)
+        : MediumCopyable(medium)
     {
     }
     virtual ~Copper() {}
-
-    Copper& operator=(const Copper&);
 
     Medium* clone() const { return new Copper(*this); };
     static Medium* create() { return new Copper(); };
@@ -327,17 +352,15 @@ class Copper : public Medium
 // #<{(|
 // * initialize uranium
 // |)}>#
-class Uranium : public Medium
+class Uranium : public MediumCopyable<Uranium>
 {
     public:
     Uranium(double rho = 1.0);
     Uranium(const Uranium& medium)
-        : Medium(medium)
+        : MediumCopyable(medium)
     {
     }
     virtual ~Uranium() {}
-
-    Uranium& operator=(const Uranium&);
 
     Medium* clone() const { return new Uranium(*this); };
     static Medium* create() { return new Uranium(); };
@@ -346,17 +369,15 @@ class Uranium : public Medium
 // #<{(|
 // * initialize air
 // |)}>#
-class Air : public Medium
+class Air : public MediumCopyable<Air>
 {
     public:
     Air(double rho = 1.0);
     Air(const Air& medium)
-        : Medium(medium)
+        : MediumCopyable(medium)
     {
     }
     virtual ~Air() {}
-
-    Air& operator=(const Air&);
 
     Medium* clone() const { return new Air(*this); };
     static Medium* create() { return new Air(); };
@@ -365,17 +386,15 @@ class Air : public Medium
 // #<{(|
 // * initialize mineral oil or paraffin CH3(CH2)~23CH3 (added by Ped)
 // |)}>#
-class Paraffin : public Medium
+class Paraffin : public MediumCopyable<Paraffin>
 {
     public:
     Paraffin(double rho = 1.0);
     Paraffin(const Paraffin& medium)
-        : Medium(medium)
+        : MediumCopyable(medium)
     {
     }
     virtual ~Paraffin() {}
-
-    Paraffin& operator=(const Paraffin&);
 
     Medium* clone() const { return new Paraffin(*this); };
     static Medium* create() { return new Paraffin(); };
@@ -394,17 +413,15 @@ class Paraffin : public Medium
 // *  an error which comes from uncertainties with the muon cross-sections.
 // *==========================================================================
 // |)}>#
-class AntaresWater : public Medium
+class AntaresWater : public MediumCopyable<AntaresWater>
 {
     public:
     AntaresWater(double rho = 1.0);
     AntaresWater(const AntaresWater& medium)
-        : Medium(medium)
+        : MediumCopyable(medium)
     {
     }
     virtual ~AntaresWater() {}
-
-    AntaresWater& operator=(const AntaresWater&);
 
     Medium* clone() const { return new AntaresWater(*this); };
     static Medium* create() { return new AntaresWater(); };
