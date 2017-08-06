@@ -435,7 +435,7 @@ void Medium::SetR0(double r0)
 ******************************************************************************/
 
 Water::Water(double rho)
-    : MediumCopyable("Water",
+    : Medium("Water",
              rho,
              75.0,    // I
              -3.5017, // C
@@ -452,7 +452,7 @@ Water::Water(double rho)
 }
 
 Ice::Ice(double rho)
-    : MediumCopyable("Ice",
+    : Medium("Ice",
              rho,
              75.0,    // I
              -3.5017, // C
@@ -469,7 +469,7 @@ Ice::Ice(double rho)
 }
 
 Salt::Salt(double rho)
-    : MediumCopyable("Salt",
+    : Medium("Salt",
              rho,
              // Calculated by ESTAR detabase
              // (it could be 185 eV by the method of reference below)
@@ -488,7 +488,7 @@ Salt::Salt(double rho)
 }
 
 StandardRock::StandardRock(double rho)
-    : MediumCopyable("StandardRock",
+    : Medium("StandardRock",
              rho,
              136.4,   // I
              -3.7738, // C
@@ -504,7 +504,7 @@ StandardRock::StandardRock(double rho)
 }
 
 FrejusRock::FrejusRock(double rho)
-    : MediumCopyable("FrejusRock",
+    : Medium("FrejusRock",
              rho,
              149.0,  // I
              -5.053, // C
@@ -520,7 +520,7 @@ FrejusRock::FrejusRock(double rho)
 }
 
 Iron::Iron(double rho)
-    : MediumCopyable("Iron",
+    : Medium("Iron",
              rho,
              286.0,   // I
              -4.2911, // C
@@ -536,7 +536,7 @@ Iron::Iron(double rho)
 }
 
 Hydrogen::Hydrogen(double rho)
-    : MediumCopyable("Hydrogen",
+    : Medium("Hydrogen",
              rho,
              21.8,    // I
              -3.0977, // C
@@ -552,7 +552,7 @@ Hydrogen::Hydrogen(double rho)
 }
 
 Lead::Lead(double rho)
-    : MediumCopyable("Lead",
+    : Medium("Lead",
              rho,
              823.0,   // I
              -6.2018, // C
@@ -568,7 +568,7 @@ Lead::Lead(double rho)
 }
 
 Copper::Copper(double rho)
-    : MediumCopyable("Copper",
+    : Medium("Copper",
              rho,
              322.0,   // I
              -4.4190, // C
@@ -584,7 +584,7 @@ Copper::Copper(double rho)
 }
 
 Uranium::Uranium(double rho)
-    : MediumCopyable("Uranium",
+    : Medium("Uranium",
              rho,
              890.0,   // I
              -5.8694, // C
@@ -600,7 +600,7 @@ Uranium::Uranium(double rho)
 }
 
 Air::Air(double rho)
-    : MediumCopyable("Air",
+    : Medium("Air",
              rho,
              85.7,     // I
              -10.5961, // C
@@ -623,7 +623,7 @@ Air::Air(double rho)
 }
 
 Paraffin::Paraffin(double rho)
-    : MediumCopyable("Paraffin",
+    : Medium("Paraffin",
              rho,
              55.9,    // I
              -2.9551, // C
@@ -640,7 +640,7 @@ Paraffin::Paraffin(double rho)
 }
 
 AntaresWater::AntaresWater(double rho)
-    : MediumCopyable("AntaresWater",
+    : Medium("AntaresWater",
              rho,
              75.0,    // I
              -3.5017, // C
