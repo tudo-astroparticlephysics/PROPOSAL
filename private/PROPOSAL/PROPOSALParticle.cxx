@@ -404,7 +404,7 @@ void PROPOSALParticle::swap(PROPOSALParticle &particle)
     swap( propagated_distance_   , particle.propagated_distance_);
     position_.swap(particle.position_);
     swap( t_                     , particle.t_);
-    direction_.swap(direction_);
+    direction_.swap(particle.direction_);
     swap( momentum_              , particle.momentum_);
     swap( square_momentum_       , particle.square_momentum_);
     swap( energy_                , particle.energy_);
