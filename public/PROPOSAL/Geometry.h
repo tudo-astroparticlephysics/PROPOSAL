@@ -11,9 +11,9 @@
 
 // #include <string>
 // #include <utility>
-// #include <iostream>
+#include <iostream>
 
-#include "PROPOSAL/PROPOSALParticle.h"
+#include "PROPOSAL/Vector3D.h"
 
 
 namespace PROPOSAL{
@@ -23,7 +23,7 @@ class Geometry
     public:
 
         Geometry(std::string); //TODO(mario): Maybe not useful Tue 2017/08/01
-        Geometry(std::string, double x, double y, double z);
+        Geometry(std::string, Vector3D position);
         Geometry(const Geometry&);
 
         virtual Geometry* clone() const = 0; // virtual constructor idiom (used for deep copies)
@@ -42,13 +42,13 @@ class Geometry
         // Member functions
         // ----------------------------------------------------------------- //
 
-        bool IsInside(PROPOSALParticle* particle);
+        bool IsInside(Vector3D& position, Vector3D& direction);
 
 
-        bool IsInfront(PROPOSALParticle* particle);
+        bool IsInfront(Vector3D& position, Vector3D& direction);
 
 
-        bool IsBehind(PROPOSALParticle* particle);
+        bool IsBehind(Vector3D& position, Vector3D& direction);
 
         /*!
          * This function calculates the distance of the particle position
@@ -64,12 +64,12 @@ class Geometry
          * a particle on the geometry border which moves outside has no intersection.
          * Distances smaller then GEOMETRY_PRECISION (1e-9) are also set to -1
          */
-        virtual std::pair<double,double> DistanceToBorder(PROPOSALParticle* particle) = 0;
+        virtual std::pair<double,double> DistanceToBorder(Vector3D& position, Vector3D& direction) = 0;
 
         /*!
          * Calculates the distance to the closest approch to the geometry center
          */
-        double DistanceToClosestApproach(PROPOSALParticle* particle);
+        double DistanceToClosestApproach(Vector3D& position, Vector3D& direction);
 
 
         // void swap(Geometry &geometry);
@@ -78,17 +78,12 @@ class Geometry
         // Getter & Setter
         // ----------------------------------------------------------------- //
 
-        double GetX0() const { return x0_; }
-        double GetY0() const { return y0_; }
-        double GetZ0() const { return z0_; }
+        Vector3D GetPosition() const { return position_; }
 
-
-        std::string GetName() const    { return name_; }
+        std::string GetName() const { return name_; }
         unsigned int GetHirarchy() const { return hirarchy_; }
 
-        void SetX0(double x0) { x0_ = x0; };
-        void SetY0(double y0) { y0_ = y0; };
-        void SetZ0(double z0) { z0_ = z0; };
+        void SetPosition(Vector3D& position) { position_ = position; };
 
         void SetHirarchy(unsigned int hirarchy) { hirarchy_ = hirarchy; };
 
@@ -98,11 +93,9 @@ class Geometry
         virtual bool compare(const Geometry&) const = 0;
         virtual void print(std::ostream&) const = 0;
 
-        double x0_;             //!< x-coordinate of origin ( center of box, cylinder, sphere)
-        double y0_;             //!< y-coordinate of origin ( center of box, cylinder, sphere)
-        double z0_;             //!< z-coordinate of origin ( center of box, cylinder, sphere)
+        Vector3D position_;    //!< x,y,z-coordinate of origin ( center of box, cylinder, sphere)
 
-        std::string name_;    //!< "box" , "cylinder" , "sphere" (sphere and cylinder might be hollow)
+        std::string name_;      //!< "box" , "cylinder" , "sphere" (sphere and cylinder might be hollow)
 
         unsigned int hirarchy_; //!< adds a hirarchy of geometry objects to allow crossing geometries
 
@@ -117,7 +110,7 @@ class Sphere: public Geometry
     public:
 
         Sphere();
-        Sphere(double x0, double y0, double z0, double radius, double inner_radius);
+        Sphere(Vector3D position, double radius, double inner_radius);
         Sphere(const Sphere&);
 
         Geometry* clone() const { return new Sphere(*this); };
@@ -131,14 +124,14 @@ class Sphere: public Geometry
 
 
         // Methods
-        std::pair<double,double> DistanceToBorder(PROPOSALParticle* particle);
+        std::pair<double,double> DistanceToBorder(Vector3D& position, Vector3D& direction);
 
         // Getter & Setter
         double GetInnerRadius() const { return inner_radius_; }
-        double GetRadius() const      { return radius_; }
+        double GetRadius() const { return radius_; }
 
         void SetInnerRadius(double inner_radius) { inner_radius_ = inner_radius; };
-        void SetRadius(double radius)            { radius_ = radius; };
+        void SetRadius(double radius) { radius_ = radius; };
 
     private:
 
@@ -157,7 +150,7 @@ class Box: public Geometry
     public:
 
         Box();
-        Box(double x0, double y0, double z0, double x, double y, double z);
+        Box(Vector3D position, double x, double y, double z);
         Box(const Box&);
 
         Geometry* clone() const { return new Box(*this); };
@@ -170,7 +163,7 @@ class Box: public Geometry
         // friend std::ostream& operator<<(std::ostream&, Box const&);
 
         // Methods
-        std::pair<double,double> DistanceToBorder(PROPOSALParticle* particle);
+        std::pair<double,double> DistanceToBorder(Vector3D& position, Vector3D& direction);
 
         // Getter & Setter
         double GetX() const { return x_; }
@@ -202,7 +195,7 @@ class Cylinder: public Geometry
     public:
 
         Cylinder();
-        Cylinder(double x0, double y0, double z0, double radius, double inner_radius, double z);
+        Cylinder(Vector3D position, double radius, double inner_radius, double z);
         Cylinder(const Cylinder&);
 
         Geometry* clone() const { return new Cylinder(*this); };
@@ -215,7 +208,7 @@ class Cylinder: public Geometry
         // friend std::ostream& operator<<(std::ostream&, Cylinder const&);
 
         // Methods
-        std::pair<double,double> DistanceToBorder(PROPOSALParticle* particle);
+        std::pair<double,double> DistanceToBorder(Vector3D& position, Vector3D& direction);
 
         // Getter & Setter
         double GetInnerRadius() const { return inner_radius_; }

@@ -24,16 +24,15 @@ using namespace PROPOSAL;
 
 void ScatteringMoliere::Scatter(double dr, PROPOSALParticle* part, Medium* med)
 {
-    double rnd1, rnd2, sx, tx, sy, ty, sz, tz, ax, ay, az;
-    double x, y, z;
+    double rnd1, rnd2, sx, tx, sy, ty, sz, tz;
 
     dx_          =   dr;
     medium_      =   med;
 
     numComp_     =   medium_->GetNumComponents();
 
-    p_           =   part->GetMomentum();
-    m_           =   part->GetMass();
+    p_ =   part->GetMomentum();
+    m_ =   part->GetMass();
 
     Zi_.resize(numComp_);
     ki_.resize(numComp_);
@@ -95,85 +94,34 @@ void ScatteringMoliere::Scatter(double dr, PROPOSALParticle* part, Medium* med)
     }
 
 
-    double sinth, costh,sinph,cosph;
-    double theta, phi;
+    Vector3D position;
+    Vector3D direction;
+    double sinth, costh, sinph, cosph;
 
     sinth = part->GetSinTheta();
     costh = part->GetCosTheta();
     sinph = part->GetSinPhi();
     cosph = part->GetCosPhi();
 
-    x   = part->GetX();
-    y   = part->GetY();
-    z   = part->GetZ();
+    position = part->GetPosition();
 
+    // Rotation towards all tree axes
+    direction = sz*part->GetDirection();
+    direction = direction + sx*Vector3D(costh*cosph, costh*sinph, -sinth);
+    direction = direction + sy*Vector3D(-sinph, cosph, 0.);
 
-    ax      =   sinth*cosph*sz+costh*cosph*sx-sinph*sy;
-    ay      =   sinth*sinph*sz+costh*sinph*sx+cosph*sy;
-    az      =   costh*sz-sinth*sx;
+    position = position + dr*direction;
 
+    // Rotation towards all tree axes
+    direction = tz*part->GetDirection();
+    direction = direction + tx*Vector3D(costh*cosph, costh*sinph, -sinth);
+    direction = direction + ty*Vector3D(-sinph, cosph, 0.);
 
-    x       +=  ax*dr;
-    y       +=  ay*dr;
-    z       +=  az*dr;
+    direction.CalculateSphericalCoordinates();
 
+    part->SetPosition(position);
+    part->SetDirection(direction);
 
-    ax      =   sinth*cosph*tz+costh*cosph*tx-sinph*ty;
-    ay      =   sinth*sinph*tz+costh*sinph*tx+cosph*ty;
-    az      =   costh*tz-sinth*tx;
-
-
-
-    costh   =   az;
-    sinth   =   sqrt(max(1.-costh*costh, 0.));
-
-    if(sinth!=0.)
-    {
-        sinph   =   ay/sinth;
-        cosph   =   ax/sinth;
-    }
-
-    if(costh>1.)
-    {
-        theta   =   acos(1.)*180./PI;
-    }
-    else if(costh<-1.)
-    {
-        theta   =   acos(-1.)*180./PI;
-    }
-    else
-    {
-        theta   =   acos(costh)*180./PI;
-    }
-
-    if(cosph>1)
-    {
-        phi =   acos(1.)*180./PI;
-    }
-    else if(cosph<-1.)
-    {
-        phi =   acos(-1)*180./PI;
-    }
-    else
-    {
-        phi =   acos(cosph)*180./PI;
-    }
-
-    if(sinph<0.)
-    {
-        phi =   360.-phi;
-    }
-
-    if(phi>=360.)
-    {
-        phi -=  360.;
-    }
-
-    part->SetX(x);
-    part->SetY(y);
-    part->SetZ(z);
-    part->SetPhi(phi);
-    part->SetTheta(theta);
 }
 
 //----------------------------------------------------------------------------//

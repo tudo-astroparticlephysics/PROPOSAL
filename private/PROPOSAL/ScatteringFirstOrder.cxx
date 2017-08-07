@@ -30,104 +30,53 @@ using namespace PROPOSAL;
 
 void ScatteringFirstOrder::Scatter(double dr, PROPOSALParticle* part, Medium* med)
 {
-        double theta0, rnd1, rnd2, sx, tx, sy, ty, sz, tz, ax, ay, az;
-        double x,y,z;
+    double theta0, rnd1, rnd2, sx, tx, sy, ty, sz, tz;
 
-        theta0     =   CalculateTheta0(dr, part,med);
+    theta0     =   CalculateTheta0(dr, part,med);
 
-        rnd1 = SQRT2*theta0*erfInv( 2.*(RandomDouble()-0.5) );
-        rnd2 = SQRT2*theta0*erfInv( 2.*(RandomDouble()-0.5) );
+    rnd1 = SQRT2*theta0*erfInv( 2.*(RandomDouble()-0.5) );
+    rnd2 = SQRT2*theta0*erfInv( 2.*(RandomDouble()-0.5) );
 
-        sx      =   (rnd1/SQRT3+rnd2)/2;
-        tx      =   rnd2;
+    sx      =   (rnd1/SQRT3+rnd2)/2;
+    tx      =   rnd2;
 
-        rnd1 = SQRT2*theta0*erfInv(2*(RandomDouble()-0.5));
-        rnd2 = SQRT2*theta0*erfInv(2*(RandomDouble()-0.5));
+    rnd1 = SQRT2*theta0*erfInv(2*(RandomDouble()-0.5));
+    rnd2 = SQRT2*theta0*erfInv(2*(RandomDouble()-0.5));
 
-        sy      =   (rnd1/SQRT3+rnd2)/2;
-        ty      =   rnd2;
+    sy      =   (rnd1/SQRT3+rnd2)/2;
+    ty      =   rnd2;
 
-        sz      =   sqrt(max(1.-(sx*sx+sy*sy), 0.));
-        tz      =   sqrt(max(1.-(tx*tx+ty*ty), 0.));
+    sz      =   sqrt(max(1.-(sx*sx+sy*sy), 0.));
+    tz      =   sqrt(max(1.-(tx*tx+ty*ty), 0.));
 
-        double sinth, costh,sinph,cosph;
-        double theta, phi;
+    double sinth, costh,sinph,cosph;
+    Vector3D position;
+    Vector3D direction;
 
-        sinth = part->GetSinTheta();
-        costh = part->GetCosTheta();
-        sinph = part->GetSinPhi();
-        cosph = part->GetCosPhi();
+    sinth = part->GetSinTheta();
+    costh = part->GetCosTheta();
+    sinph = part->GetSinPhi();
+    cosph = part->GetCosPhi();
 
-        x   = part->GetX();
-        y   = part->GetY();
-        z   = part->GetZ();
+    position = part->GetPosition();
 
+    // Rotation towards all tree axes
+    direction = sz*part->GetDirection();
+    direction = direction + sx*Vector3D(costh*cosph, costh*sinph, -sinth);
+    direction = direction + sy*Vector3D(-sinph, cosph, 0.);
 
-        ax      =   sinth*cosph*sz+costh*cosph*sx-sinph*sy;
-        ay      =   sinth*sinph*sz+costh*sinph*sx+cosph*sy;
-        az      =   costh*sz-sinth*sx;
+    position = position + dr*direction;
 
-        x       +=  ax*dr;
-        y       +=  ay*dr;
-        z       +=  az*dr;
+    // Rotation towards all tree axes
+    direction = tz*part->GetDirection();
+    direction = direction + tx*Vector3D(costh*cosph, costh*sinph, -sinth);
+    direction = direction + ty*Vector3D(-sinph, cosph, 0.);
 
+    direction.CalculateSphericalCoordinates();
 
-        ax      =   sinth*cosph*tz+costh*cosph*tx-sinph*ty;
-        ay      =   sinth*sinph*tz+costh*sinph*tx+cosph*ty;
-        az      =   costh*tz-sinth*tx;
+    part->SetPosition(position);
+    part->SetDirection(direction);
 
-
-
-        costh   =   az;
-        sinth   =   sqrt(max(1-costh*costh, 0.));
-
-        if(sinth!=0)
-        {
-            sinph   =   ay/sinth;
-            cosph   =   ax/sinth;
-        }
-
-        if(costh>1)
-        {
-            theta   =   acos(1)*180./PI;
-        }
-        else if(costh<-1)
-        {
-            theta   =   acos(-1)*180./PI;
-        }
-        else
-        {
-            theta   =   acos(costh)*180./PI;
-        }
-
-        if(cosph>1)
-        {
-            phi =   acos(1)*180./PI;
-        }
-        else if(cosph<-1)
-        {
-            phi =   acos(-1)*180./PI;
-        }
-        else
-        {
-            phi =   acos(cosph)*180./PI;
-        }
-
-        if(sinph<0)
-        {
-            phi =   360.-phi;
-        }
-
-        if(phi>=360)
-        {
-            phi -=  360.;
-        }
-
-        part->SetX(x);
-        part->SetY(y);
-        part->SetZ(z);
-        part->SetPhi(phi);
-        part->SetTheta(theta);
 }
 
 
