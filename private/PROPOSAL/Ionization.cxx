@@ -776,7 +776,9 @@ double Ionization::CalculateStochasticLoss(double rnd)
     rsum=0;
 
     for(int i=0; i<medium_->GetNumComponents(); i++){
-        rsum+=medium_->GetAtomInMolecule().at(i)* medium_->GetNucCharge().at(i);
+
+        Components::Component* component = medium_->GetComponents().at(i);
+        rsum+=component->GetAtomInMolecule()* component->GetNucCharge();
 
         if(rsum>rand){
 

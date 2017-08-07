@@ -28,7 +28,7 @@ CrossSections::CrossSections( )
 {
     particle_       = new PROPOSALParticle();
     backup_particle_= particle_;
-    medium_         = new Medium();
+    medium_         = new Water();
     cut_settings_   = new EnergyCutSettings(-1,-1);
 }
 
@@ -83,7 +83,7 @@ CrossSections::CrossSections(const CrossSections& crossSections)
     ,sum_of_rates_             ( crossSections.sum_of_rates_ )
 {
     particle_                 = new PROPOSALParticle( *crossSections.particle_ );
-    medium_                   = new Medium( *crossSections.medium_ );
+    medium_                   = crossSections.medium_->clone();
     cut_settings_             = new EnergyCutSettings( *crossSections.cut_settings_ );
 }
 

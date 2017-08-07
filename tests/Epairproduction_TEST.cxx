@@ -1,6 +1,7 @@
 
 // #include <iostream>
 // #include <string>
+#include <math.h>
 
 #include "gtest/gtest.h"
 
@@ -41,7 +42,7 @@ public:
 TEST(Comparison , Comparison_equal ) {
 
     double dEdx;
-    Medium *medium = new Medium(MediumType::Air,1.);
+    Medium *medium = new Air();
     PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
     Epairproduction *A = new Epairproduction(particle, medium, cuts);
@@ -70,8 +71,8 @@ TEST(Comparison , Comparison_equal ) {
 
 TEST(Comparison , Comparison_not_equal ) {
     double dEdx;
-    Medium *medium = new Medium(MediumType::Air,1.);
-    Medium *medium2 = new Medium(MediumType::Water,1.);
+    Medium *medium = new Air();
+    Medium *medium2 = new Water();
     PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,20,20,1e5,10);
     PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,20,20,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
@@ -105,7 +106,7 @@ TEST(Assignment , Copyconstructor ) {
 }
 
 TEST(Assignment , Copyconstructor2 ) {
-    Medium *medium = new Medium(MediumType::Air,1.);
+    Medium *medium = new Air();
     PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
 
@@ -117,7 +118,7 @@ TEST(Assignment , Copyconstructor2 ) {
 }
 
 TEST(Assignment , Operator ) {
-    Medium *medium = new Medium(MediumType::Air,1.);
+    Medium *medium = new Air();
     PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
     Epairproduction A(particle, medium, cuts);
@@ -130,7 +131,7 @@ TEST(Assignment , Operator ) {
 
     EXPECT_TRUE(A==B);
 
-    Medium *medium2 = new Medium(MediumType::Water,1.);
+    Medium *medium2 = new Water();
     PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cuts2 = new EnergyCutSettings(200,-1);
     Epairproduction *C = new Epairproduction(particle2, medium2, cuts2);
@@ -143,8 +144,8 @@ TEST(Assignment , Operator ) {
 }
 
 TEST(Assignment , Swap ) {
-    Medium *medium = new Medium(MediumType::Air,1.);
-    Medium *medium2 = new Medium(MediumType::Air,1.);
+    Medium *medium = new Air();
+    Medium *medium2 = new Air();
     PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,20,20,1e5,10);
     PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,20,20,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
@@ -155,8 +156,8 @@ TEST(Assignment , Swap ) {
     B.EnableDEdxInterpolation();
     EXPECT_TRUE(A==B);
 
-    Medium *medium3 = new Medium(MediumType::Water,1.);
-    Medium *medium4 = new Medium(MediumType::Water,1.);
+    Medium *medium3 = new Water();
+    Medium *medium4 = new Water();
     PROPOSALParticle *particle3 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,.20,20,1e5,10);
     PROPOSALParticle *particle4 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cuts3 = new EnergyCutSettings(200,-1);
@@ -205,7 +206,7 @@ TEST(Epairproduction , Set_Up ) {
         energy_old  = -1;
 
         i++;
-        CombOfMedium.push_back(new Medium(Medium::GetTypeFromName(mediumName),1.));
+        CombOfMedium.push_back(MediumFactory::Get()->CreateMedium(mediumName));
         CombOfParticle.push_back(new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10));
         CombOfParticle.at(i)->SetEnergy(energy);
         CombOfEnergyCutSettings.push_back(new EnergyCutSettings(ecut,vcut));
