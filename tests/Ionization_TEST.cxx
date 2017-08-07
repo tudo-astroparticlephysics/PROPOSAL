@@ -7,6 +7,7 @@
 
 #include "PROPOSAL/Ionization.h"
 #include "PROPOSAL/Output.h"
+#include "PROPOSAL/Constants.h"
 // #include "PROPOSAL/CrossSections.h"
 
 using namespace PROPOSAL;
@@ -39,11 +40,16 @@ public:
     }
 };
 
+Vector3D position(1.,1.,1.);
+Vector3D direction(0.,0.,0.);
+
 TEST(Comparison , Comparison_equal ) {
+    direction.SetSphericalCoordinates(1,.20*PI/180.,20*PI/180.);
+    direction.CalculateCartesianFromSpherical();
 
     double dEdx;
     Medium *medium = new Air();
-    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,position,direction,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
     Ionization *A = new Ionization(particle, medium, cuts);
     Ionization *B = new Ionization(particle, medium, cuts);
@@ -70,11 +76,13 @@ TEST(Comparison , Comparison_equal ) {
 }
 
 TEST(Comparison , Comparison_not_equal ) {
+    direction.SetSphericalCoordinates(1,20*PI/180.,20*PI/180.);
+    direction.CalculateCartesianFromSpherical();
     double dEdx;
     Medium *medium = new Air();
     Medium *medium2 = new Water();
-    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,20,20,1e5,10);
-    PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,20,20,1e5,10);
+    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,position,direction,1e5,10);
+    PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::TauMinus,position,direction,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
     Ionization *A = new Ionization(particle, medium, cuts);
     Ionization *B = new Ionization(particle, medium2, cuts);
@@ -106,8 +114,10 @@ TEST(Assignment , Copyconstructor ) {
 }
 
 TEST(Assignment , Copyconstructor2 ) {
+    direction.SetSphericalCoordinates(1,.20*PI/180.,20*PI/180.);
+    direction.CalculateCartesianFromSpherical();
     Medium *medium = new Air();
-    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,position,direction,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
 
     Ionization A(particle, medium, cuts);
@@ -118,8 +128,10 @@ TEST(Assignment , Copyconstructor2 ) {
 }
 
 TEST(Assignment , Operator ) {
+    direction.SetSphericalCoordinates(1,.20*PI/180.,20*PI/180.);
+    direction.CalculateCartesianFromSpherical();
     Medium *medium = new Air();
-    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,position,direction,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
     Ionization A(particle, medium, cuts);
     Ionization B(particle, medium, cuts);
@@ -132,7 +144,7 @@ TEST(Assignment , Operator ) {
     EXPECT_TRUE(A==B);
 
     Medium *medium2 = new Water();
-    PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::TauMinus,position,direction,1e5,10);
     EnergyCutSettings *cuts2 = new EnergyCutSettings(200,-1);
     Ionization *C = new Ionization(particle2, medium2, cuts2);
     EXPECT_TRUE(A!=*C);
@@ -144,10 +156,12 @@ TEST(Assignment , Operator ) {
 }
 
 TEST(Assignment , Swap ) {
+    direction.SetSphericalCoordinates(1,.20*PI/180.,20*PI/180.);
+    direction.CalculateCartesianFromSpherical();
     Medium *medium = new Air();
     Medium *medium2 = new Air();
-    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
-    PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,position,direction,1e5,10);
+    PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::MuMinus,position,direction,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
     EnergyCutSettings *cuts2 = new EnergyCutSettings(500,-1);
     Ionization A(particle, medium, cuts);
@@ -160,8 +174,8 @@ TEST(Assignment , Swap ) {
 
     Medium *medium3 = new Water();
     Medium *medium4 = new Water();
-    PROPOSALParticle *particle3 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,.20,20,1e5,10);
-    PROPOSALParticle *particle4 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle3 = new PROPOSALParticle(ParticleType::TauMinus,position,direction,1e5,10);
+    PROPOSALParticle *particle4 = new PROPOSALParticle(ParticleType::TauMinus,position,direction,1e5,10);
     EnergyCutSettings *cuts3 = new EnergyCutSettings(200,-1);
     EnergyCutSettings *cuts4 = new EnergyCutSettings(200,-1);
     Ionization *C = new Ionization(particle3, medium3, cuts3);
@@ -177,6 +191,8 @@ TEST(Assignment , Swap ) {
 }
 
 TEST(Ionization , Test_of_dEdx ) {
+    direction.SetSphericalCoordinates(1,.20*PI/180.,20*PI/180.);
+    direction.CalculateCartesianFromSpherical();
 
     ifstream in;
     in.open("bin/TestFiles/Ioniz_dEdx.txt");
@@ -199,7 +215,7 @@ TEST(Ionization , Test_of_dEdx ) {
         in>>ecut>>vcut>>energy>>mediumName>>particleName>>dEdx;
 
         Medium *medium = MediumFactory::Get()->CreateMedium(mediumName);
-        PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10);
+        PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),position,direction,1e5,10);
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
 
@@ -216,6 +232,8 @@ TEST(Ionization , Test_of_dEdx ) {
 }
 
 TEST(Ionization , Test_of_dNdx ) {
+    direction.SetSphericalCoordinates(1,.20*PI/180.,20*PI/180.);
+    direction.CalculateCartesianFromSpherical();
 
     ifstream in;
     in.open("bin/TestFiles/Ioniz_dNdx.txt");
@@ -238,7 +256,7 @@ TEST(Ionization , Test_of_dNdx ) {
         in>>ecut>>vcut>>energy>>mediumName>>particleName>>dNdx;
 
         Medium *medium = MediumFactory::Get()->CreateMedium(mediumName);
-        PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10);
+        PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),position,direction,1e5,10);
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
 
@@ -256,6 +274,8 @@ TEST(Ionization , Test_of_dNdx ) {
 }
 
 TEST(Ionization , Test_of_dNdxrnd ) {
+    direction.SetSphericalCoordinates(1,.20*PI/180.,20*PI/180.);
+    direction.CalculateCartesianFromSpherical();
 
     ifstream in;
     in.open("bin/TestFiles/Ioniz_dNdxrnd.txt");
@@ -285,7 +305,7 @@ TEST(Ionization , Test_of_dNdxrnd ) {
         first = false;
         energy_old = -1;
         Medium *medium = MediumFactory::Get()->CreateMedium(mediumName);
-        PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10);
+        PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),position,direction,1e5,10);
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
 
@@ -312,6 +332,8 @@ TEST(Ionization , Test_of_dNdxrnd ) {
 }
 
 TEST(Ionization , Test_of_e ) {
+    direction.SetSphericalCoordinates(1,.20*PI/180.,20*PI/180.);
+    direction.CalculateCartesianFromSpherical();
 
     ifstream in;
     in.open("bin/TestFiles/Ioniz_e.txt");
@@ -345,7 +367,7 @@ TEST(Ionization , Test_of_e ) {
         energy_old = -1;
 
         Medium *medium = MediumFactory::Get()->CreateMedium(mediumName);
-        PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10);
+        PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),position,direction,1e5,10);
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
         CrossSections *ioniz = new Ionization(particle, medium, cuts);
@@ -371,6 +393,8 @@ TEST(Ionization , Test_of_e ) {
 }
 
 TEST(Ionization , Test_of_dEdx_Interpolant ) {
+    direction.SetSphericalCoordinates(1,.20*PI/180.,20*PI/180.);
+    direction.CalculateCartesianFromSpherical();
 
     ifstream in;
     in.open("bin/TestFiles/Ioniz_dEdx_interpol.txt");
@@ -398,7 +422,7 @@ TEST(Ionization , Test_of_dEdx_Interpolant ) {
         energy_old = -1;
 
         Medium *medium = MediumFactory::Get()->CreateMedium(mediumName);
-        PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10);
+        PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),position,direction,1e5,10);
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
         CrossSections *ioniz = new Ionization(particle, medium, cuts);
@@ -424,6 +448,8 @@ TEST(Ionization , Test_of_dEdx_Interpolant ) {
 }
 
 TEST(Ionization , Test_of_dNdx_Interpolant ) {
+    direction.SetSphericalCoordinates(1,.20*PI/180.,20*PI/180.);
+    direction.CalculateCartesianFromSpherical();
 
     ifstream in;
     in.open("bin/TestFiles/Ioniz_dNdx_interpol.txt");
@@ -451,7 +477,7 @@ TEST(Ionization , Test_of_dNdx_Interpolant ) {
         energy_old = -1;
 
         Medium *medium = MediumFactory::Get()->CreateMedium(mediumName);
-        PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10);
+        PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),position,direction,1e5,10);
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
         CrossSections *ioniz = new Ionization(particle, medium, cuts);
@@ -477,6 +503,8 @@ TEST(Ionization , Test_of_dNdx_Interpolant ) {
 }
 
 TEST(Ionization , Test_of_dNdxrnd_interpol ) {
+    direction.SetSphericalCoordinates(1,.20*PI/180.,20*PI/180.);
+    direction.CalculateCartesianFromSpherical();
 
     ifstream in;
     in.open("bin/TestFiles/Ioniz_dNdxrnd_interpol.txt");
@@ -504,7 +532,7 @@ TEST(Ionization , Test_of_dNdxrnd_interpol ) {
         first = false;
         energy_old = -1;
         Medium *medium = MediumFactory::Get()->CreateMedium(mediumName);
-        PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10);
+        PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),position,direction,1e5,10);
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
 
@@ -533,6 +561,8 @@ TEST(Ionization , Test_of_dNdxrnd_interpol ) {
 
 
 TEST(Ionization , Test_of_e_interpol ) {
+    direction.SetSphericalCoordinates(1,.20*PI/180.,20*PI/180.);
+    direction.CalculateCartesianFromSpherical();
 
     ifstream in;
     in.open("bin/TestFiles/Ioniz_e_interpol.txt");
@@ -566,7 +596,7 @@ TEST(Ionization , Test_of_e_interpol ) {
         energy_old = -1;
 
         Medium *medium = MediumFactory::Get()->CreateMedium(mediumName);
-        PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10);
+        PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),position,direction,1e5,10);
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
         CrossSections *ioniz = new Ionization(particle, medium, cuts);

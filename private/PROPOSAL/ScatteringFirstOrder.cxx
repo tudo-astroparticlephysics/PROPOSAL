@@ -49,14 +49,15 @@ void ScatteringFirstOrder::Scatter(double dr, PROPOSALParticle* part, Medium* me
     sz      =   sqrt(max(1.-(sx*sx+sy*sy), 0.));
     tz      =   sqrt(max(1.-(tx*tx+ty*ty), 0.));
 
-    double sinth, costh,sinph,cosph;
+
     Vector3D position;
     Vector3D direction;
 
-    sinth = part->GetSinTheta();
-    costh = part->GetCosTheta();
-    sinph = part->GetSinPhi();
-    cosph = part->GetCosPhi();
+    long double sinth, costh,sinph,cosph;
+    sinth = (long double) sin(part->GetDirection().GetTheta());
+    costh = (long double) cos(part->GetDirection().GetTheta());
+    sinph = (long double) sin(part->GetDirection().GetPhi());
+    cosph = (long double) cos(part->GetDirection().GetPhi());
 
     position = part->GetPosition();
 
