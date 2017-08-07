@@ -51,7 +51,7 @@ TEST(Comparison , Comparison_equal ) {
 
     double dNdx;
 
-    Medium *medium = new Medium(MediumType::Hydrogen,1.);
+    Medium *medium = new Hydrogen();
     PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cut_settings = new EnergyCutSettings(500,-1);
 
@@ -90,8 +90,8 @@ TEST(Comparison , Comparison_equal ) {
 }
 
 TEST(Comparison , Comparison_not_equal ) {
-    Medium *medium = new Medium(MediumType::Air,1.);
-    Medium *medium2 = new Medium(MediumType::Water,1.);
+    Medium *medium = new Air();
+    Medium *medium2 = new Water();
     PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,20,20,1e5,10);
     PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,20,20,1e5,10);
     EnergyCutSettings *cut_settings = new EnergyCutSettings(500,-1);
@@ -143,7 +143,7 @@ TEST(Assignment , Copyconstructor ) {
 }
 
 TEST(Assignment , Copyconstructor2 ) {
-    Medium *medium = new Medium(MediumType::Air,1.);
+    Medium *medium = new Air();
     PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cut_settings = new EnergyCutSettings(500,-1);
 
@@ -163,7 +163,7 @@ TEST(Assignment , Copyconstructor2 ) {
 }
 
 TEST(Assignment , Operator ) {
-    Medium *medium = new Medium(MediumType::Air,1.);
+    Medium *medium = new Air();
     PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cut_settings = new EnergyCutSettings(500,-1);
 
@@ -211,8 +211,8 @@ TEST(Assignment , Operator ) {
 }
 
 TEST(Assignment , Swap ) {
-    Medium *medium = new Medium(MediumType::Hydrogen,1.);
-    Medium *medium2 = new Medium(MediumType::Hydrogen,1.);
+    Medium *medium = new Hydrogen();
+    Medium *medium2 = new Hydrogen();
     PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
     PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cut_settings = new EnergyCutSettings(500,0.05);
@@ -256,8 +256,8 @@ TEST(Assignment , Swap ) {
     EXPECT_TRUE(A==B);
 
 
-    Medium *medium3 = new Medium(MediumType::Water,1.);
-    Medium *medium4 = new Medium(MediumType::Water,1.);
+    Medium *medium3 = new Water();
+    Medium *medium4 = new Water();
     PROPOSALParticle *particle3 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,.20,20,1e5,10);
     PROPOSALParticle *particle4 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,.20,20,1e5,10);
     EnergyCutSettings *cut_settings3 = new EnergyCutSettings(200,-1);
@@ -389,7 +389,7 @@ TEST(ContinuousRandomization , Randomize_interpol ) {
         first = false;
         energy_old = -1;
 
-        Medium *medium = new Medium(Medium::GetTypeFromName(mediumName),1.);
+        Medium *medium = MediumFactory::Get()->CreateMedium(mediumName);
         PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10);
         EnergyCutSettings *cut_settings = new EnergyCutSettings(ecut,vcut);
 
