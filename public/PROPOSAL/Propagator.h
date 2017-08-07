@@ -210,7 +210,7 @@ public:
      * Choose the current collection by particle type and location.
      */
 
-    void ChooseCurrentCollection(PROPOSALParticle* particle);
+    void ChooseCurrentCollection(Vector3D& particle_position, Vector3D& particle_direction);
 
 //----------------------------------------------------------------------------//
     /**

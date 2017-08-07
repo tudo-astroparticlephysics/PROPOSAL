@@ -31,12 +31,9 @@ using namespace PROPOSAL;
 
 PROPOSALParticle::PROPOSALParticle( )
     :propagated_distance_   ( 0 )
-    ,x_                     ( 0 )
-    ,y_                     ( 0 )
-    ,z_                     ( 0 )
+    ,position_              ( Vector3D() )
     ,t_                     ( 0 )
-    ,theta_                 ( 0 )
-    ,phi_                   ( 0 )
+    ,direction_             ( Vector3D() )
     ,costh_                 ( 1. )
     ,sinth_                 ( 0 )
     ,cosph_                 ( 1. )
@@ -53,19 +50,13 @@ PROPOSALParticle::PROPOSALParticle( )
     ,parent_particle_id_    ( 0 )
     ,parent_particle_energy_( 0 )
     ,particle_id_           ( 1 )
-    ,xi_                    ( 0 )
-    ,yi_                    ( 0 )
-    ,zi_                    ( 0 )
+    ,entry_point_           ( Vector3D() )
     ,ti_                    ( 0 )
     ,ei_                    ( 0 )
-    ,xf_                    ( 0 )
-    ,yf_                    ( 0 )
-    ,zf_                    ( 0 )
+    ,exit_point_            ( Vector3D() )
     ,tf_                    ( 0 )
     ,ef_                    ( 0 )
-    ,xc_                    ( 0 )
-    ,yc_                    ( 0 )
-    ,zc_                    ( 0 )
+    ,closest_approach_point_ ( Vector3D() )
     ,tc_                    ( 0 )
     ,ec_                    ( 0 )
     ,elost_                 ( 0 )
@@ -80,12 +71,9 @@ PROPOSALParticle::PROPOSALParticle( )
 
 PROPOSALParticle::PROPOSALParticle(const PROPOSALParticle& particle)
     :propagated_distance_   ( particle.propagated_distance_ )
-    ,x_                     ( particle.x_ )
-    ,y_                     ( particle.y_ )
-    ,z_                     ( particle.z_ )
+    ,position_              ( particle.position_ )
     ,t_                     ( particle.t_ )
-    ,theta_                 ( particle.theta_ )
-    ,phi_                   ( particle.phi_ )
+    ,direction_             ( particle.direction_ )
     ,costh_                 ( particle.costh_ )
     ,sinth_                 ( particle.sinth_ )
     ,cosph_                 ( particle.cosph_ )
@@ -102,19 +90,13 @@ PROPOSALParticle::PROPOSALParticle(const PROPOSALParticle& particle)
     ,parent_particle_id_    ( particle.parent_particle_id_ )
     ,parent_particle_energy_( particle.parent_particle_energy_  )
     ,particle_id_           ( particle.particle_id_ )
-    ,xi_                    ( particle.xi_ )
-    ,yi_                    ( particle.yi_ )
-    ,zi_                    ( particle.zi_ )
+    ,entry_point_           ( particle.entry_point_ )
     ,ti_                    ( particle.ti_ )
     ,ei_                    ( particle.ei_ )
-    ,xf_                    ( particle.xf_ )
-    ,yf_                    ( particle.yf_ )
-    ,zf_                    ( particle.zf_ )
+    ,exit_point_            ( particle.exit_point_ )
     ,tf_                    ( particle.tf_ )
     ,ef_                    ( particle.ef_ )
-    ,xc_                    ( particle.xc_ )
-    ,yc_                    ( particle.yc_ )
-    ,zc_                    ( particle.zc_ )
+    ,closest_approach_point_ ( particle.closest_approach_point_ )
     ,tc_                    ( particle.tc_ )
     ,ec_                    ( particle.ec_ )
     ,elost_                 ( particle.elost_ )
@@ -130,23 +112,17 @@ PROPOSALParticle::PROPOSALParticle(const PROPOSALParticle& particle)
 PROPOSALParticle::PROPOSALParticle(int parent_particle_id,
                    int particle_id,
                    ParticleType::Enum type,
-                   double x,
-                   double y,
-                   double z,
-                   double theta,
-                   double phi,
+                   Vector3D position,
+                   Vector3D direction,
                    double energy,
                    double t,
                    double prop_dist,
                    PROPOSALParticle *p)
 
     :propagated_distance_   ( prop_dist )
-    ,x_                     ( x )
-    ,y_                     ( y )
-    ,z_                     ( z )
+    ,position_              ( position )
     ,t_                     ( t )
-    ,theta_                 ( theta )
-    ,phi_                   ( phi )
+    ,direction_             (direction)
     ,momentum_              ( 0 )
     ,square_momentum_       ( 0 )
     ,energy_                ( 0 )
@@ -159,43 +135,31 @@ PROPOSALParticle::PROPOSALParticle(int parent_particle_id,
     ,parent_particle_id_    ( parent_particle_id )
     ,parent_particle_energy_( 0 )
     ,particle_id_           ( particle_id )
-    ,xi_                    ( 0 )
-    ,yi_                    ( 0 )
-    ,zi_                    ( 0 )
+    ,entry_point_           ( Vector3D() )
     ,ti_                    ( 0 )
     ,ei_                    ( 0 )
-    ,xf_                    ( 0 )
-    ,yf_                    ( 0 )
-    ,zf_                    ( 0 )
+    ,exit_point_            ( Vector3D() )
     ,tf_                    ( 0 )
     ,ef_                    ( 0 )
-    ,xc_                    ( 0 )
-    ,yc_                    ( 0 )
-    ,zc_                    ( 0 )
+    ,closest_approach_point_ ( Vector3D() )
     ,tc_                    ( 0 )
     ,ec_                    ( 0 )
     ,elost_                 ( 0 )
 {
     InitParticle(type);
     SetEnergy(energy);
-    Location(t, x, y, t, theta, phi);
+    Location(t, position, direction);
 
 
     if(p!=NULL)
     {
-        xi_      =   p->GetXi();
-        yi_      =   p->GetYi();
-        zi_      =   p->GetZi();
+        entry_point_ = p->GetEntryPoint();
         ti_      =   p->GetTi();
         ei_      =   p->GetEi();
-        xf_      =   p->GetXf();
-        yf_      =   p->GetYf();
-        zf_      =   p->GetZf();
+        exit_point_ = p->GetExitPoint();
         tf_      =   p->GetTf();
         ef_      =   p->GetEf();
-        xc_      =   p->GetXc();
-        yc_      =   p->GetYc();
-        zc_      =   p->GetZc();
+        closest_approach_point_ = p->GetClosestApproachPoint();
         tc_      =   p->GetTc();
         ec_      =   p->GetEc();
         elost_   =   p->GetElost();
@@ -210,23 +174,17 @@ PROPOSALParticle::PROPOSALParticle(int parent_particle_id,
 PROPOSALParticle::PROPOSALParticle(int parent_particle_id,
                    int particle_id,
                    ParticleType::Enum type,
-                   double x,
-                   double y,
-                   double z,
-                   double theta,
-                   double phi,
+                   Vector3D position,
+                   Vector3D direction,
                    double energy,
                    double t,
                    double prop_dist,
                    double prim_energy)
 
     :propagated_distance_   ( prop_dist )
-    ,x_                     ( x )
-    ,y_                     ( y )
-    ,z_                     ( z )
+    ,position_              ( position )
     ,t_                     ( t )
-    ,theta_                 ( theta )
-    ,phi_                   ( phi )
+    ,direction_             (direction)
     ,momentum_              ( 0 )
     ,square_momentum_       ( 0 )
     ,energy_                ( energy )
@@ -239,19 +197,13 @@ PROPOSALParticle::PROPOSALParticle(int parent_particle_id,
     ,parent_particle_id_    ( parent_particle_id )
     ,parent_particle_energy_( prim_energy )
     ,particle_id_           ( particle_id )
-    ,xi_                    ( 0 )
-    ,yi_                    ( 0 )
-    ,zi_                    ( 0 )
+    ,entry_point_           ( Vector3D() )
     ,ti_                    ( 0 )
     ,ei_                    ( 0 )
-    ,xf_                    ( 0 )
-    ,yf_                    ( 0 )
-    ,zf_                    ( 0 )
+    ,exit_point_            ( Vector3D() )
     ,tf_                    ( 0 )
     ,ef_                    ( 0 )
-    ,xc_                    ( 0 )
-    ,yc_                    ( 0 )
-    ,zc_                    ( 0 )
+    ,closest_approach_point_ ( Vector3D() )
     ,tc_                    ( 0 )
     ,ec_                    ( 0 )
     ,elost_                 ( 0 )
@@ -259,7 +211,7 @@ PROPOSALParticle::PROPOSALParticle(int parent_particle_id,
 {
     InitParticle(type);
     SetEnergy(energy);
-    Location(t, x, y, z, theta, phi);
+    Location(t, position, direction);
 }
 
 
@@ -269,21 +221,15 @@ PROPOSALParticle::PROPOSALParticle(int parent_particle_id,
 
 PROPOSALParticle::PROPOSALParticle(
                         ParticleType::Enum type,
-                        double x,
-                        double y,
-                        double z,
-                        double theta,
-                        double phi,
+                        Vector3D position,
+                        Vector3D direction,
                         double energy,
                         double t)
 
     :propagated_distance_   ( 0 )
-    ,x_                     ( x )
-    ,y_                     ( y )
-    ,z_                     ( z )
+    ,position_              ( position )
     ,t_                     ( t )
-    ,theta_                 ( theta )
-    ,phi_                   ( phi )
+    ,direction_             (direction)
     ,momentum_              ( 0 )
     ,square_momentum_       ( 0 )
     ,energy_                ( energy )
@@ -296,26 +242,20 @@ PROPOSALParticle::PROPOSALParticle(
     ,parent_particle_id_    ( 0 )
     ,parent_particle_energy_( 0 )
     ,particle_id_           ( 1 )
-    ,xi_                    ( 0 )
-    ,yi_                    ( 0 )
-    ,zi_                    ( 0 )
+    ,entry_point_           ( Vector3D() )
     ,ti_                    ( 0 )
     ,ei_                    ( 0 )
-    ,xf_                    ( 0 )
-    ,yf_                    ( 0 )
-    ,zf_                    ( 0 )
+    ,exit_point_            ( Vector3D() )
     ,tf_                    ( 0 )
     ,ef_                    ( 0 )
-    ,xc_                    ( 0 )
-    ,yc_                    ( 0 )
-    ,zc_                    ( 0 )
+    ,closest_approach_point_ ( Vector3D() )
     ,tc_                    ( 0 )
     ,ec_                    ( 0 )
     ,elost_                 ( 0 )
 {
     InitParticle(type);
     SetEnergy(energy);
-    Location(t, x, y, z, theta, phi);
+    Location(t, position, direction);
 }
 
 
@@ -325,12 +265,9 @@ PROPOSALParticle::PROPOSALParticle(
 
 PROPOSALParticle::PROPOSALParticle(ParticleType::Enum type)
     :propagated_distance_   ( 0 )
-    ,x_                     ( 0 )
-    ,y_                     ( 0 )
-    ,z_                     ( 0 )
+    ,position_              ( Vector3D() )
     ,t_                     ( 0 )
-    ,theta_                 ( 0 )
-    ,phi_                   ( 0 )
+    ,direction_             ( Vector3D() )
     ,momentum_              ( 0 )
     ,square_momentum_       ( 0 )
     ,energy_                ( 0 )
@@ -343,26 +280,20 @@ PROPOSALParticle::PROPOSALParticle(ParticleType::Enum type)
     ,parent_particle_id_    ( 0 )
     ,parent_particle_energy_( 0 )
     ,particle_id_           ( 1 )
-    ,xi_                    ( 0 )
-    ,yi_                    ( 0 )
-    ,zi_                    ( 0 )
+    ,entry_point_           ( Vector3D() )
     ,ti_                    ( 0 )
     ,ei_                    ( 0 )
-    ,xf_                    ( 0 )
-    ,yf_                    ( 0 )
-    ,zf_                    ( 0 )
+    ,exit_point_            ( Vector3D() )
     ,tf_                    ( 0 )
     ,ef_                    ( 0 )
-    ,xc_                    ( 0 )
-    ,yc_                    ( 0 )
-    ,zc_                    ( 0 )
+    ,closest_approach_point_ ( Vector3D() )
     ,tc_                    ( 0 )
     ,ec_                    ( 0 )
     ,elost_                 ( 0 )
 {
     InitParticle(type);
     SetEnergy(0);
-    Location(0, 0, 0, 0, 0, 0);
+    Location(0, position_, direction_);
 }
 
 
@@ -390,12 +321,9 @@ PROPOSALParticle& PROPOSALParticle::operator=(const PROPOSALParticle &particle){
 bool PROPOSALParticle::operator==(const PROPOSALParticle &particle) const
 {
     if(  propagated_distance_   != particle.propagated_distance_)   return false;
-    if(  x_                     != particle.x_)                     return false;
-    if(  y_                     != particle.y_)                     return false;
-    if(  z_                     != particle.z_)                     return false;
+    if( position_               != particle.position_)              return false;
     if(  t_                     != particle.t_)                     return false;
-    if(  theta_                 != particle.theta_)                 return false;
-    if(  phi_                   != particle.phi_)                   return false;
+    if(  direction_             != particle.direction_)             return false;
     if(  costh_                 != particle.costh_)                 return false;
     if(  sinth_                 != particle.sinth_)                 return false;
     if(  cosph_                 != particle.cosph_)                 return false;
@@ -411,19 +339,13 @@ bool PROPOSALParticle::operator==(const PROPOSALParticle &particle) const
     if(  parent_particle_id_    != particle.parent_particle_id_)    return false;
     if(  parent_particle_energy_!= particle.parent_particle_energy_)return false;
     if(  particle_id_           != particle.particle_id_)           return false;
-    if(  xi_                    != particle.xi_)                    return false;
-    if(  yi_                    != particle.yi_)                    return false;
-    if(  zi_                    != particle.zi_)                    return false;
+    if(  entry_point_           != particle.entry_point_)           return false;
     if(  ti_                    != particle.ti_)                    return false;
     if(  ei_                    != particle.ei_)                    return false;
-    if(  xf_                    != particle.xf_)                    return false;
-    if(  yf_                    != particle.yf_)                    return false;
-    if(  zf_                    != particle.zf_)                    return false;
+    if(  exit_point_            != particle.exit_point_)            return false;
     if(  tf_                    != particle.tf_)                    return false;
     if(  ef_                    != particle.ef_)                    return false;
-    if(  xc_                    != particle.xc_)                    return false;
-    if(  yc_                    != particle.yc_)                    return false;
-    if(  zc_                    != particle.zc_)                    return false;
+    if(  closest_approach_point_!= particle.closest_approach_point_)return false;
     if(  tc_                    != particle.tc_)                    return false;
     if(  ec_                    != particle.ec_)                    return false;
     if(  elost_                 != particle.elost_)                 return false;
@@ -462,11 +384,8 @@ ostream& operator<<(ostream& os, PROPOSALParticle const& particle)
     os<<"\tlifetime [s]:\t\t\t\t"<<particle.lifetime_<<setprecision(8)<<endl;
     os<<"\tmomentum [MeV]:\t\t\t\t"<<particle.momentum_<<endl;
     os<<"\tenergy [MeV]: \t\t\t\t"<<particle.energy_<<fixed<<setprecision(5)<<endl;
-    os<<"\tx [cm]:\t\t\t\t\t"<<particle.x_<<endl;
-    os<<"\ty [cm]:\t\t\t\t\t"<<particle.y_<<endl;
-    os<<"\tz [cm]:\t\t\t\t\t"<<particle.z_<<endl;
-    os<<"\ttheta [deg]:\t\t\t\t"<<particle.theta_<<endl;
-    os<<"\tphi [deg]:\t\t\t\t"<<particle.phi_<<endl;
+    os<<"\tposition [cm]:\t\t\t\t\t"<<particle.position_<<endl;
+    os<<"\tdirection :\t\t\t\t"<<particle.direction_<<endl;
     os<<"\tage [s]:\t\t\t\t"<<particle.t_<<endl;
     os<<"\tparticle id:\t\t\t\t"<<particle.particle_id_<<endl;
     os<<"\tparent particle id_:\t\t\t"<<particle.parent_particle_id_<<scientific<<endl;
@@ -475,11 +394,11 @@ ostream& operator<<(ostream& os, PROPOSALParticle const& particle)
     os<<"\tenergy lost in detector [MeV]:\t\t"<<particle.elost_<<endl;
 
     os<<"\n\tDetector entry point: x [cm] | y [cm] | z [cm] | time [s] | energy [MeV]"<<endl;
-    os<<"\t\t"<<particle.xi_<<"\t"<<particle.yi_<<"\t"<<particle.zi_<<scientific<<"\t"<<particle.ti_<<fixed<<"\t"<<particle.ei_<<endl;
+    os<<"\t\t"<<particle.entry_point_<<scientific<<"\t"<<particle.ti_<<fixed<<"\t"<<particle.ei_<<endl;
     os<<"\n\tDetector exit point: x [cm] | y [cm] | z [cm] | time [s] | energy [MeV]"<<endl;
-    os<<"\t\t"<<particle.xf_<<"\t"<<particle.yf_<<"\t"<<particle.zf_<<scientific<<"\t"<<particle.tf_<<fixed<<"\t"<<particle.ef_<<endl;
+    os<<"\t\t"<<particle.exit_point_<<scientific<<"\t"<<particle.tf_<<fixed<<"\t"<<particle.ef_<<endl;
     os<<"\n\tPoint of closest approach: x [cm] | y [cm] | z [cm] | time [s] | energy [MeV]"<<endl;
-    os<<"\t\t"<<particle.xc_<<"\t"<<particle.yc_<<"\t"<<particle.zc_<<scientific<<"\t"<<particle.tc_<<fixed<<"\t"<<particle.ec_<<endl;
+    os<<"\t\t"<<particle.closest_approach_point_<<scientific<<"\t"<<particle.tc_<<fixed<<"\t"<<particle.ec_<<endl;
     os<<"--------------------------------------------------------------------------";
     return os;
 }
@@ -495,12 +414,9 @@ void PROPOSALParticle::swap(PROPOSALParticle &particle)
     using std::swap;
 
     swap( propagated_distance_   , particle.propagated_distance_);
-    swap( x_                     , particle.x_);
-    swap( y_                     , particle.y_);
-    swap( z_                     , particle.z_);
+    position_.swap(particle.position_);
     swap( t_                     , particle.t_);
-    swap( theta_                 , particle.theta_);
-    swap( phi_                   , particle.phi_);
+    direction_.swap(direction_);
     swap( costh_                 , particle.costh_);
     swap( sinth_                 , particle.sinth_);
     swap( cosph_                 , particle.cosph_);
@@ -516,19 +432,13 @@ void PROPOSALParticle::swap(PROPOSALParticle &particle)
     swap( parent_particle_id_    , particle.parent_particle_id_);
     swap( parent_particle_energy_, particle.parent_particle_energy_);
     swap( particle_id_           , particle.particle_id_);
-    swap( xi_                    , particle.xi_);
-    swap( yi_                    , particle.yi_);
-    swap( zi_                    , particle.zi_);
+    entry_point_.swap(entry_point_);
     swap( ti_                    , particle.ti_);
     swap( ei_                    , particle.ei_);
-    swap( xf_                    , particle.xf_);
-    swap( yf_                    , particle.yf_);
-    swap( zf_                    , particle.zf_);
+    exit_point_.swap(exit_point_);
     swap( tf_                    , particle.tf_);
     swap( ef_                    , particle.ef_);
-    swap( xc_                    , particle.xc_);
-    swap( yc_                    , particle.yc_);
-    swap( zc_                    , particle.zc_);
+    closest_approach_point_.swap(closest_approach_point_);
     swap( tc_                    , particle.tc_);
     swap( ec_                    , particle.ec_);
     swap( elost_                 , particle.elost_);
@@ -748,25 +658,18 @@ void PROPOSALParticle::InitParticle(ParticleType::Enum type){
 
 
 void PROPOSALParticle::Location(double time,
-                        double x,
-                        double y,
-                        double z,
-                        double theta,
-                        double phi)
+                        Vector3D& position,
+                        Vector3D& direction)
 {
     //propagated_distance_ = 0; <--- seems to be wrong
     t_           =   time;
-    x_           =   x;
-    y_           =   y;
-    z_           =   z;
-    theta_       =   theta;
-    phi_         =   phi;
-    theta_       *=  (PI/180);
-    phi_         *=  (PI/180);
-    costh_       =   cos(theta_);
-    sinth_       =   sin(theta_);
-    cosph_       =   cos(phi_);
-    sinph_       =   sin(phi_);
+    position_    =   position;
+    direction_   =   direction;
+
+    costh_       =   cos(direction.GetTheta());
+    sinth_       =   sin(direction.GetTheta());
+    cosph_       =   cos(direction.GetPhi());
+    sinph_       =   sin(direction.GetPhi());
 }
 
 
@@ -776,58 +679,46 @@ void PROPOSALParticle::Location(double time,
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-void PROPOSALParticle::SetProperties(int parent_particle_id, int particle_id, double energy, double t,
-                             double x, double y, double z, double theta, double phi,
-                             double xi, double yi, double zi, double ti, double Ei,
-                             double xf, double yf, double zf, double tf, double Ef,
-                             double xc, double yc, double zc, double tc, double Ec)
-{
-    SetParentParticleId(parent_particle_id);
-    SetParticleId(particle_id);
-    SetEnergy(energy);
-    SetT(t);
-    SetX(x); SetY(y); SetZ(z); SetTheta(theta); SetPhi(phi);
-    SetXi(xi); SetYi(yi); SetZi(zi); SetTi(ti); SetEi(Ei);
-    SetXf(xf); SetYf(yf); SetZf(zf); SetTf(tf); SetEf(Ef);
-    SetXc(xc); SetYc(yc); SetZc(zc); SetTc(tc); SetEc(Ec);
-}
+// void PROPOSALParticle::SetProperties(int parent_particle_id, int particle_id, double energy, double t,
+//                                     Vector3D& position, Vector3D& direction,
+//                                     Vector3D& entry_point, double ti, double Ei,
+//                                     Vector3D& exit_point, double tf, double Ef,
+//                                     Vector3D& closest_approach_point, double tc, double Ec)
+// {
+//     SetParentParticleId(parent_particle_id);
+//     SetParticleId(particle_id);
+//     SetEnergy(energy);
+//     SetT(t);
+//     SetPosition(position);
+//     SetDirection(direction);
+//     SetEntryPoint(entry_point); SetTi(ti); SetEi(Ei);
+//     SetExitPoint(exit_point); SetTf(tf); SetEf(Ef);
+//     SetClosestApproachPoint(closest_approach_point); SetTc(tc); SetEc(Ec);
+// }
 
-void PROPOSALParticle::SetEnergy(double e)
+void PROPOSALParticle::SetEnergy(double energy)
 {
-    energy_             =   e;
+    energy_ = energy;
 
     if(energy_ < mass_) energy_ = mass_;
 
-    square_momentum_    =   e*e-mass_*mass_;
-    momentum_           =   sqrt(max(square_momentum_,0.0));
+    square_momentum_ = energy*energy-mass_*mass_;
+    momentum_ = sqrt(max(square_momentum_,0.0));
 }
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
 
-void PROPOSALParticle::SetTheta(double theta)
+void PROPOSALParticle::SetDirection(Vector3D& direction)
 {
-    theta_  =   theta;
-    theta_ *=   (PI/180);
+    direction_ = direction;
 
-    costh_  =   cos(theta_);
-    sinth_  =   sin(theta_);
+    costh_ = cos(direction.GetTheta());
+    sinth_ = sin(direction.GetTheta());
 
-}
-
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-void PROPOSALParticle::SetPhi(double phi)
-{
-    phi_   =    phi;
-    phi_  *=    (PI/180);
-
-    cosph_ =    cos(phi_);
-    sinph_ =    sin(phi_);
+    cosph_ = cos(direction.GetPhi());
+    sinph_ = sin(direction.GetPhi());
 }
 
 
@@ -851,16 +742,9 @@ void PROPOSALParticle::SetPropagatedDistance(double prop_dist){
     propagated_distance_ = prop_dist;
 }
 
-void PROPOSALParticle::SetX(double x){
-    x_ = x;
-}
-
-void PROPOSALParticle::SetY(double y){
-    y_ = y;
-}
-
-void PROPOSALParticle::SetZ(double z){
-    z_ = z;
+void PROPOSALParticle::SetPosition(Vector3D& position)
+{
+    position_ = position;
 }
 
 void PROPOSALParticle::SetT(double t){
@@ -912,16 +796,9 @@ void PROPOSALParticle::SetParticleId(int particle_id){
     particle_id_ = particle_id;
 }
 
-void PROPOSALParticle::SetXi(double xi){
-    xi_ = xi;
-}
-
-void PROPOSALParticle::SetYi(double yi){
-    yi_ = yi;
-}
-
-void PROPOSALParticle::SetZi(double zi){
-    zi_ = zi;
+void PROPOSALParticle::SetEntryPoint(Vector3D& entry_point)
+{
+    entry_point_ = entry_point;
 }
 
 void PROPOSALParticle::SetTi(double ti){
@@ -932,16 +809,9 @@ void PROPOSALParticle::SetEi(double ei){
     ei_ = ei;
 }
 
-void PROPOSALParticle::SetXf(double xf){
-    xf_ = xf;
-}
-
-void PROPOSALParticle::SetYf(double yf){
-    yf_ = yf;
-}
-
-void PROPOSALParticle::SetZf(double zf){
-    zf_ = zf;
+void PROPOSALParticle::SetExitPoint(Vector3D& exit_point)
+{
+    exit_point_ = exit_point;
 }
 
 void PROPOSALParticle::SetTf(double tf){
@@ -952,16 +822,9 @@ void PROPOSALParticle::SetEf(double ef){
     ef_ = ef;
 }
 
-void PROPOSALParticle::SetXc(double xc){
-    xc_ = xc;
-}
-
-void PROPOSALParticle::SetYc(double yc){
-    yc_ = yc;
-}
-
-void PROPOSALParticle::SetZc(double zc){
-    zc_ = zc;
+void PROPOSALParticle::SetClosestApproachPoint(Vector3D& closest_approach_point)
+{
+    closest_approach_point_ = closest_approach_point;
 }
 
 void PROPOSALParticle::SetTc(double tc){
