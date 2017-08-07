@@ -14,6 +14,7 @@
 using namespace std;
 using namespace PROPOSAL;
 
+
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 //-------------------------public member functions----------------------------//
@@ -880,16 +881,18 @@ double Bremsstrahlung::KelnerKokoulinPetrukhinParametrization(double v, int i)
     double Dn       =   0;
     double s1       =   0;
 
-    Z3  =   pow((medium_->GetNucCharge()).at(i), -1./3);
+    Components::Component* component = medium_->GetComponents().at(i);
+
+    Z3  =   pow(medium_->GetComponents().at(i)->GetNucCharge(), -1./3);
 
     int step;
     double d, da, dn, Fa, maxV;
 
     d       =   particle_->GetMass()*particle_->GetMass()
                 *v/(2*(particle_->GetEnergy())*(1-v));
-    s1      =   (medium_->GetLogConstant()).at(i)*Z3;
+    s1      =   (component->GetLogConstant())*Z3;
     da      =   log(1 + ME/(d*SQRTE*s1));
-    Dn      =   1.54*pow((medium_->GetAtomicNum()).at(i), 0.27);
+    Dn      =   1.54*pow((component->GetAtomicNum()), 0.27);
     s1      =   ME*Dn/((particle_->GetMass())*s1);
     dn      =   log(Dn/(1 + d*(Dn*SQRTE - 2)/particle_->GetMass()));
     maxV    =   ME*(particle_->GetEnergy() - particle_->GetMass())
@@ -899,14 +902,14 @@ double Bremsstrahlung::KelnerKokoulinPetrukhinParametrization(double v, int i)
     if(v<maxV)
     {
         Fa  =   log(((particle_->GetMass())/d)/(d*(particle_->GetMass())/(ME*ME) + SQRTE)) -
-                log(1 + ME/(d*SQRTE*medium_->GetBPrime().at(i)*(pow(medium_->GetNucCharge().at(i) , -2./3))));
+                log(1 + ME/(d*SQRTE*component->GetBPrime()*(pow(component->GetNucCharge() , -2./3))));
     }
     else
     {
         Fa  =   0;
     }
 
-    if((medium_->GetNucCharge()).at(i)==1)
+    if((component->GetNucCharge())==1)
     {
         step    =   0;
     }
@@ -919,7 +922,7 @@ double Bremsstrahlung::KelnerKokoulinPetrukhinParametrization(double v, int i)
 
     result = ((4./3)*(1-v) + v*v)
             *(log((particle_->GetMass())/d)
-              - 0.5 -da - dn + (dn*step + Fa)/(medium_->GetNucCharge().at(i)));
+              - 0.5 -da - dn + (dn*step + Fa)/(component->GetNucCharge()));
 
     return result;
 
@@ -933,11 +936,13 @@ double Bremsstrahlung::KelnerKokoulinPetrukhinParametrization(double v, int i)
 double Bremsstrahlung::AndreevBezrukovBugaevParametrization(double v, int i)
 {
 
+    Components::Component* component = medium_->GetComponents().at(i);
+
     double aux      =   0;
     double Z3       =   0;
     double result   =   0;
 
-    Z3 = pow((medium_->GetNucCharge()).at(i), -1./3);
+    Z3 = pow((component->GetNucCharge()), -1./3);
 
     double aux1, aux2, a1, a2,zeta, qc, qmin, x1, x2, d1,d2, psi1, psi2;
 
@@ -953,7 +958,7 @@ double Bremsstrahlung::AndreevBezrukovBugaevParametrization(double v, int i)
     x1      =   a1*qmin;
     x2      =   a2*qmin;
 
-    if((medium_->GetNucCharge()).at(i)==1)
+    if((component->GetNucCharge())==1)
     {
         d1  =   0;
         d2  =   0;
@@ -970,18 +975,18 @@ double Bremsstrahlung::AndreevBezrukovBugaevParametrization(double v, int i)
     aux1    =   log(pow(aux , 2)/(1 + pow(x1 , 2)));
     aux     =   (particle_->GetMass())*a2;
     aux2    =   log(pow(aux , 2)/(1 + pow(x2 , 2)));
-    psi1    =   (1+ aux1)/2 + (1 + aux2)/(2*(medium_->GetNucCharge()).at(i));
+    psi1    =   (1+ aux1)/2 + (1 + aux2)/(2*(component->GetNucCharge()));
     psi2    =   (2./3 + aux1)/2 +
-                (2./3 + aux2)/(2*(medium_->GetNucCharge()).at(i));
+                (2./3 + aux2)/(2*(component->GetNucCharge()));
 
     aux1    =   x1*atan(1/x1);
     aux2    =   x2*atan(1/x2);
-    psi1    -=  aux1 + aux2/(medium_->GetNucCharge().at(i));
+    psi1    -=  aux1 + aux2/(component->GetNucCharge());
     aux     =   pow(x1 , 2);
     psi2    +=  2*aux*(1 - aux1 + 3./4*log(aux/(1 + aux)));
     aux     =   pow(x2 , 2);
     psi2    +=  2*aux*(1 - aux2 + 3./4*log(aux/(1 + aux)))
-                /(medium_->GetNucCharge().at(i));
+                /(component->GetNucCharge());
 
     psi1    -=  d1;
     psi2    -=  d2;
@@ -1003,12 +1008,13 @@ double Bremsstrahlung::AndreevBezrukovBugaevParametrization(double v, int i)
 
 double Bremsstrahlung::PetrukhinShestakovParametrization(double v, int i)
 {
+    Components::Component* component = medium_->GetComponents().at(i);
 
     double Z3       =   0;
     double result   =   0;
     double d, Fd;
 
-    Z3  =   pow((medium_->GetNucCharge()).at(i), -1./3);
+    Z3  =   pow((component->GetNucCharge()), -1./3);
 
     d   =   pow((particle_->GetMass()) , 2)
             * v/(2*(particle_->GetEnergy())*(1-v));
@@ -1016,7 +1022,7 @@ double Bremsstrahlung::PetrukhinShestakovParametrization(double v, int i)
     Fd  =   189*Z3/ME;
     Fd  =   (particle_->GetMass())*Fd/(1 + SQRTE*d*Fd);
 
-    if((medium_->GetNucCharge()).at(i)>10)
+    if((component->GetNucCharge())>10)
     {
         Fd  *=  (2./3)*Z3;
     }
@@ -1034,20 +1040,21 @@ double Bremsstrahlung::PetrukhinShestakovParametrization(double v, int i)
 
 double Bremsstrahlung::CompleteScreeningCase(double v, int i)
 {
+    Components::Component* component = medium_->GetComponents().at(i);
 
     double aux      =   0;
     double Z3       =   0;
     double result   =   0;
     double Lr, fZ, Lp;
 
-    Z3  =   pow((medium_->GetNucCharge()).at(i) , -1./3);
+    Z3  =   pow((component->GetNucCharge()) , -1./3);
 
-    aux =   ALPHA*(medium_->GetNucCharge().at(i));
+    aux =   ALPHA*(component->GetNucCharge());
     aux *=  aux;
     fZ  =   aux*(1/(1 + aux) + 0.20206 + aux*(-0.0369 + aux*(0.0083 - 0.002*aux)));
 
     //check rounding
-    switch((int)((medium_->GetNucCharge()).at(i) + 0.5))
+    switch((int)((component->GetNucCharge()) + 0.5))
     {
 
         case 1:
@@ -1083,9 +1090,9 @@ double Bremsstrahlung::CompleteScreeningCase(double v, int i)
     }
 
     result = (((4./3)*(1-v) + pow(v , 2))*
-              ((medium_->GetNucCharge()).at(i)*(Lr - fZ) + Lp)
-             + (1./9)*(1-v)*((medium_->GetNucCharge()).at(i) + 1))
-            /(medium_->GetNucCharge()).at(i);
+              ((component->GetNucCharge())*(Lr - fZ) + Lp)
+             + (1./9)*(1-v)*((component->GetNucCharge()) + 1))
+            /(component->GetNucCharge());
 
     return result;
 
@@ -1158,6 +1165,7 @@ double Bremsstrahlung::CalculateStochasticLoss(double rnd)
 
 double Bremsstrahlung::ElasticBremsstrahlungCrossSection(double v, int i)
 {
+    Components::Component* component = medium_->GetComponents().at(i);
 
     double aux      =   0;
     double Z3       =   0;
@@ -1165,7 +1173,7 @@ double Bremsstrahlung::ElasticBremsstrahlungCrossSection(double v, int i)
     double Dn       =   0;
     double s1       =   0;
 
-    Z3  =   pow((medium_->GetNucCharge()).at(i), -1./3);
+    Z3  =   pow((component->GetNucCharge()), -1./3);
 
     switch(parametrization_)
     {
@@ -1187,15 +1195,15 @@ double Bremsstrahlung::ElasticBremsstrahlungCrossSection(double v, int i)
                 , parametrization_, ParametrizationType::BremsKelnerKokoulinPetrukhin);
     }
 
-    aux =   2*(medium_->GetNucCharge()).at(i)*(ME/particle_->GetMass())*RE;
+    aux =   2*(component->GetNucCharge())*(ME/particle_->GetMass())*RE;
     aux *=  (ALPHA/v)*aux*result;
 
     if(lpm_effect_enabled_)
     {
         if(parametrization_!=ParametrizationType::BremsKelnerKokoulinPetrukhin)
         {
-            s1  =   (medium_->GetLogConstant()).at(i)*Z3;
-            Dn  =   1.54*pow((medium_->GetAtomicNum()).at(i) , 0.27);
+            s1  =   (component->GetLogConstant())*Z3;
+            Dn  =   1.54*pow((component->GetAtomicNum()) , 0.27);
             s1  =   ME*Dn/((particle_->GetMass())*s1);
         }
         aux *=  lpm(v,s1);
@@ -1203,7 +1211,7 @@ double Bremsstrahlung::ElasticBremsstrahlungCrossSection(double v, int i)
 
     double c2   =   pow(particle_->GetCharge() , 2);
 
-    return medium_->GetMolDensity()*medium_->GetAtomInMolecule().at(i)*c2*c2*aux;
+    return medium_->GetMolDensity()*component->GetAtomInMolecule()*c2*c2*aux;
 }
 
 
@@ -1303,13 +1311,13 @@ double Bremsstrahlung::lpm(double v, double s1)
 //----------------------------------------------------------------------------//
 
 
-void Bremsstrahlung::SetIntegralLimits(int component)
+void Bremsstrahlung::SetIntegralLimits(int interaction_component)
 {
-
-    component_ = component;
+    component_ = interaction_component;
+    Components::Component* component = medium_->GetComponents().at(component_);
 
     vMax_   =   1 - (3./4)*SQRTE*(particle_->GetMass()/particle_->GetEnergy())
-                *pow((medium_->GetNucCharge().at(component_)) , 1./3);
+                *pow((component->GetNucCharge()) , 1./3);
 
     if(vMax_<0)
     {
