@@ -446,7 +446,7 @@ Water::Water(double rho)
              0,       // d0
              1.000)   // massDensitiy
 {
-    components_.push_back(new Components::Hydrogen());
+    components_.push_back(new Components::Hydrogen(2));
     components_.push_back(new Components::Oxygen());
     init();
 }
@@ -463,7 +463,7 @@ Ice::Ice(double rho)
              0,       // d0
              0.917)   // massDensitiy
 {
-    components_.push_back(new Components::Hydrogen());
+    components_.push_back(new Components::Hydrogen(2));
     components_.push_back(new Components::Oxygen());
     init();
 }
