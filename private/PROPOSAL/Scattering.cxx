@@ -334,12 +334,12 @@ void Scattering::Scatter(double dr, double ei, double ef)
 
     Vector3D position;
     Vector3D direction;
-    long double sinth, costh,sinph,cosph;
 
-    sinth = (long double)particle_->GetSinTheta();
-    costh = (long double)particle_->GetCosTheta();
-    sinph = (long double)particle_->GetSinPhi();
-    cosph = (long double)particle_->GetCosPhi();
+    long double sinth, costh,sinph,cosph;
+    sinth = (long double) sin(particle_->GetDirection().GetTheta());
+    costh = (long double) cos(particle_->GetDirection().GetTheta());
+    sinph = (long double) sin(particle_->GetDirection().GetPhi());
+    cosph = (long double) cos(particle_->GetDirection().GetPhi());
 
     position = particle_->GetPosition();
 
