@@ -310,105 +310,56 @@ long double Scattering::CalculateTheta0(double dr, double ei, double ef)
 
 void Scattering::Scatter(double dr, double ei, double ef)
 {
-    //    Implement the Molie Scattering here see PROPOSALParticle::advance of old version
-        double Theta0,rnd1,rnd2,sx,tx,sy,ty,sz,tz,ax,ay,az;
-        double x,y,z;
-        Theta0     =   CalculateTheta0(dr, ei, ef);
+    // Implement the Molie Scattering here see PROPOSALParticle::advance of old version
+    double Theta0,rnd1,rnd2,sx,tx,sy,ty,sz,tz;
 
-//        cerr << "scatter called" << endl;
+    Theta0     =   CalculateTheta0(dr, ei, ef);
 
-        rnd1 = SQRT2*Theta0*erfInv( 2.*(RandomDouble()-0.5) );
-        rnd2 = SQRT2*Theta0*erfInv( 2.*(RandomDouble()-0.5) );
+    // cerr << "scatter called" << endl;
 
-        sx      =   (rnd1/SQRT3+rnd2)/2;
-        tx      =   rnd2;
+    rnd1 = SQRT2*Theta0*erfInv( 2.*(RandomDouble()-0.5) );
+    rnd2 = SQRT2*Theta0*erfInv( 2.*(RandomDouble()-0.5) );
 
-        rnd1 = SQRT2*Theta0*erfInv(2*(RandomDouble()-0.5));
-        rnd2 = SQRT2*Theta0*erfInv(2*(RandomDouble()-0.5));
+    sx      =   (rnd1/SQRT3+rnd2)/2;
+    tx      =   rnd2;
 
-        sy      =   (rnd1/SQRT3+rnd2)/2;
-        ty      =   rnd2;
+    rnd1 = SQRT2*Theta0*erfInv(2*(RandomDouble()-0.5));
+    rnd2 = SQRT2*Theta0*erfInv(2*(RandomDouble()-0.5));
 
-        sz      =   sqrt(max(1.-(sx*sx+sy*sy), 0.));
-        tz      =   sqrt(max(1.-(tx*tx+ty*ty), 0.));
+    sy      =   (rnd1/SQRT3+rnd2)/2;
+    ty      =   rnd2;
 
+    sz      =   sqrt(max(1.-(sx*sx+sy*sy), 0.));
+    tz      =   sqrt(max(1.-(tx*tx+ty*ty), 0.));
 
-        long double sinth, costh,sinph,cosph;
-        long double theta,phi;
-        sinth = (long double)particle_->GetSinTheta();
-        costh = (long double)particle_->GetCosTheta();
-        sinph = (long double)particle_->GetSinPhi();
-        cosph = (long double)particle_->GetCosPhi();
-        x   = particle_->GetX();
-        y   = particle_->GetY();
-        z   = particle_->GetZ();
+    Vector3D position;
+    Vector3D direction;
+    long double sinth, costh,sinph,cosph;
 
+    sinth = (long double)particle_->GetSinTheta();
+    costh = (long double)particle_->GetCosTheta();
+    sinph = (long double)particle_->GetSinPhi();
+    cosph = (long double)particle_->GetCosPhi();
 
-        ax      =   sinth*cosph*sz+costh*cosph*sx-sinph*sy;
-        ay      =   sinth*sinph*sz+costh*sinph*sx+cosph*sy;
-        az      =   costh*sz-sinth*sx;
+    position = particle_->GetPosition();
 
-        x       +=  ax*dr;
-        y       +=  ay*dr;
-        z       +=  az*dr;
+    // Rotation towards all tree axes
+    direction = sz*particle_->GetDirection();
+    direction = direction + sx*Vector3D(costh*cosph, costh*sinph, -sinth);
+    direction = direction + sy*Vector3D(-sinph, cosph, 0.);
 
+    position = position + dr*direction;
 
-        ax      =   sinth*cosph*tz+costh*cosph*tx-sinph*ty;
-        ay      =   sinth*sinph*tz+costh*sinph*tx+cosph*ty;
-        az      =   costh*tz-sinth*tx;
+    // Rotation towards all tree axes
+    direction = tz*particle_->GetDirection();
+    direction = direction + tx*Vector3D(costh*cosph, costh*sinph, -sinth);
+    direction = direction + ty*Vector3D(-sinph, cosph, 0.);
 
+    direction.CalculateSphericalCoordinates();
 
+    particle_->SetPosition(position);
+    particle_->SetDirection(direction);
 
-        costh   =   az;
-        sinth   =   sqrt(max(1-costh*costh, (long double)0));
-
-        if(sinth!=0)
-        {
-            sinph   =   ay/sinth;
-            cosph   =   ax/sinth;
-        }
-
-        if(costh>1)
-        {
-            theta   =   acos(1)*180./PI;
-        }
-        else if(costh<-1)
-        {
-            theta   =   acos(-1)*180./PI;
-        }
-        else
-        {
-            theta   =   acos(costh)*180./PI;
-        }
-
-        if(cosph>1)
-        {
-            phi =   acos(1)*180./PI;
-        }
-        else if(cosph<-1)
-        {
-            phi =   acos(-1)*180./PI;
-        }
-        else
-        {
-            phi =   acos(cosph)*180./PI;
-        }
-
-        if(sinph<0)
-        {
-            phi =   360.-phi;
-        }
-
-        if(phi>=360)
-        {
-            phi -=  360.;
-        }
-
-        particle_->SetX(x);
-        particle_->SetY(y);
-        particle_->SetZ(z);
-        particle_->SetPhi(phi);
-        particle_->SetTheta(theta);
 }
 
 //----------------------------------------------------------------------------//
