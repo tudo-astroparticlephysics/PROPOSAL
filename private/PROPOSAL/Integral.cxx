@@ -37,7 +37,6 @@ double Integral::Integrate(double min, double max, boost::function<double (doubl
 {
     if (min == 0. && max == 0. )
     {
-        log_warn("the integration limits are both zero; return 0");
         return 0.;
     }
 
@@ -49,14 +48,12 @@ double Integral::Integrate(double min, double max, boost::function<double (doubl
         case 4:
             if (min <= 0. || max <= 0.)
             {
-                log_warn("Can't integrate with log, because at least one of the limits is <= 0, min=%f, max=%f. Return 0", min, max);
                 return 0;
             }
             return IntegrateWithLog(min,max,integrand);
         case 5:
             if (min <= 0. || max <= 0.)
             {
-                log_warn("Can't integrate with log, because at least one of the limits is <= 0, min=%f, max=%f. Return 0", min, max);
                 return 0;
             }
             return IntegrateWithLogSubstitution(min,max,integrand,powerOfSubstitution);
@@ -74,7 +71,6 @@ double Integral::IntegrateWithRandomRatio(double min, double max, boost::functio
 {
     if (min == 0. && max == 0. )
     {
-        log_warn("the integration limits are both zero; return 0");
         return 0.;
     }
 
@@ -84,7 +80,6 @@ double Integral::IntegrateWithRandomRatio(double min, double max, boost::functio
         case 4:
             if (min <= 0. || max <= 0.)
             {
-                log_warn("Can't integrate with log, because at least one of the limits is <= 0, min=%f, max=%f. Return 0", min, max);
                 return 0;
             }
             return IntegrateWithLog(min,max,integrand, randomRatio);
