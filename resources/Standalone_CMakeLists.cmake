@@ -183,10 +183,10 @@ IF(DO_TESTING)
   EXECUTE_PROCESS(COMMAND mkdir -p ${PROPOSAL_BINARY_DIR}/bin/ OUTPUT_VARIABLE _output OUTPUT_STRIP_TRAILING_WHITESPACE)
 
   #create tar directory with "tar -czvf TestFiles.tar.Z TestFiles/" and put it in Test directory
-  EXECUTE_PROCESS(COMMAND  tar -xvf ${PROJECT_SOURCE_DIR}/tests/TestFiles.tar.Z -C ${PROPOSAL_BINARY_DIR}/bin/
+  EXECUTE_PROCESS(COMMAND  tar -xvf ${PROJECT_SOURCE_DIR}/tests/TestFiles.tar.gz -C ${PROPOSAL_BINARY_DIR}/bin/
                     OUTPUT_VARIABLE _output OUTPUT_STRIP_TRAILING_WHITESPACE)
-  EXECUTE_PROCESS(COMMAND  tar -xvf ${PROJECT_SOURCE_DIR}/tests/TestFiles2.tar.Z -C ${PROPOSAL_BINARY_DIR}/bin/
-                    OUTPUT_VARIABLE _output OUTPUT_STRIP_TRAILING_WHITESPACE)
+  # EXECUTE_PROCESS(COMMAND  tar -xvf ${PROJECT_SOURCE_DIR}/tests/TestFiles2.tar.gz -C ${PROPOSAL_BINARY_DIR}/bin/
+  #                   OUTPUT_VARIABLE _output OUTPUT_STRIP_TRAILING_WHITESPACE)
 
   ADD_EXECUTABLE(UnitTest_Scattering tests/Scattering_TEST.cxx)
   ADD_EXECUTABLE(UnitTest_Photonuclear tests/Photonuclear_TEST.cxx)
