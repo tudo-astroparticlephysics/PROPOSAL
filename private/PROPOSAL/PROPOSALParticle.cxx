@@ -34,10 +34,6 @@ PROPOSALParticle::PROPOSALParticle( )
     ,position_              ( Vector3D() )
     ,t_                     ( 0 )
     ,direction_             ( Vector3D() )
-    ,costh_                 ( 1. )
-    ,sinth_                 ( 0 )
-    ,cosph_                 ( 1. )
-    ,sinph_                 ( 0. )
     ,momentum_              ( 0 )
     ,square_momentum_       ( 0 )
     ,energy_                ( 0 )
@@ -74,10 +70,6 @@ PROPOSALParticle::PROPOSALParticle(const PROPOSALParticle& particle)
     ,position_              ( particle.position_ )
     ,t_                     ( particle.t_ )
     ,direction_             ( particle.direction_ )
-    ,costh_                 ( particle.costh_ )
-    ,sinth_                 ( particle.sinth_ )
-    ,cosph_                 ( particle.cosph_ )
-    ,sinph_                 ( particle.sinph_ )
     ,momentum_              ( particle.momentum_ )
     ,square_momentum_       ( particle.square_momentum_ )
     ,energy_                ( particle.energy_ )
@@ -321,13 +313,9 @@ PROPOSALParticle& PROPOSALParticle::operator=(const PROPOSALParticle &particle){
 bool PROPOSALParticle::operator==(const PROPOSALParticle &particle) const
 {
     if(  propagated_distance_   != particle.propagated_distance_)   return false;
-    if( position_               != particle.position_)              return false;
+    if(  position_              != particle.position_)              return false;
     if(  t_                     != particle.t_)                     return false;
     if(  direction_             != particle.direction_)             return false;
-    if(  costh_                 != particle.costh_)                 return false;
-    if(  sinth_                 != particle.sinth_)                 return false;
-    if(  cosph_                 != particle.cosph_)                 return false;
-    if(  sinph_                 != particle.sinph_)                 return false;
     if(  momentum_              != particle.momentum_)              return false;
     if(  square_momentum_       != particle.square_momentum_)       return false;
     if(  energy_                != particle.energy_)                return false;
@@ -417,10 +405,6 @@ void PROPOSALParticle::swap(PROPOSALParticle &particle)
     position_.swap(particle.position_);
     swap( t_                     , particle.t_);
     direction_.swap(direction_);
-    swap( costh_                 , particle.costh_);
-    swap( sinth_                 , particle.sinth_);
-    swap( cosph_                 , particle.cosph_);
-    swap( sinph_                 , particle.sinph_);
     swap( momentum_              , particle.momentum_);
     swap( square_momentum_       , particle.square_momentum_);
     swap( energy_                , particle.energy_);
@@ -666,10 +650,10 @@ void PROPOSALParticle::Location(double time,
     position_    =   position;
     direction_   =   direction;
 
-    costh_       =   cos(direction.GetTheta());
-    sinth_       =   sin(direction.GetTheta());
-    cosph_       =   cos(direction.GetPhi());
-    sinph_       =   sin(direction.GetPhi());
+    // costh_       =   cos(direction.GetTheta());
+    // sinth_       =   sin(direction.GetTheta());
+    // cosph_       =   cos(direction.GetPhi());
+    // sinph_       =   sin(direction.GetPhi());
 }
 
 
@@ -714,11 +698,11 @@ void PROPOSALParticle::SetDirection(Vector3D& direction)
 {
     direction_ = direction;
 
-    costh_ = cos(direction.GetTheta());
-    sinth_ = sin(direction.GetTheta());
+    // costh_ = cos(direction.GetTheta());
+    // sinth_ = sin(direction.GetTheta());
 
-    cosph_ = cos(direction.GetPhi());
-    sinph_ = sin(direction.GetPhi());
+    // cosph_ = cos(direction.GetPhi());
+    // sinph_ = sin(direction.GetPhi());
 }
 
 

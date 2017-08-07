@@ -64,7 +64,7 @@ TEST(Assignment , Copyconstructor ) {
 
     EXPECT_FALSE(*C==*D);
 
-    Geometry* E = new Sphere(1.0, 0.0, 0.0, 20.0, 10.0);
+    Geometry* E = new Sphere(Vector3D(1.0, 0.0, 0.0), 20.0, 10.0);
 
     *C = *E;
 
@@ -80,7 +80,7 @@ TEST(Assignment , Copyconstructor2 ) {
 
 TEST(Assignment , Operator ) {
     Sphere A;
-    Sphere B(0.0, 0.0, 0.0, 2.0, 1.0);
+    Sphere B(Vector3D(0.0, 0.0, 0.0), 2.0, 1.0);
 
     EXPECT_TRUE(A!=B);
 
@@ -93,8 +93,8 @@ TEST(Assignment , Swap ) {
     Sphere A;
     Sphere B;
     EXPECT_TRUE(A==B);
-    Geometry* C = new Sphere(1.0, 2.0, 3.0, 4.0, 3.0);
-    Geometry* D = new Sphere(1.0, 2.0, 3.0, 4.0, 3.0);
+    Geometry* C = new Sphere(Vector3D(1.0, 2.0, 3.0), 4.0, 3.0);
+    Geometry* D = new Sphere(Vector3D(1.0, 2.0, 3.0), 4.0, 3.0);
 
     EXPECT_TRUE(*C==*D);
 
@@ -107,11 +107,8 @@ TEST(Assignment , Swap ) {
 
 TEST(IsInside , Box ) {
 
-    double x        =   0;
-    double y        =   0;
-    double z        =   0;
-    double theta    =   0;
-    double phi      =   0;
+    Vector3D particle_position(0,0,0);
+    Vector3D particle_direction(0,0,0);
 
     double rnd_x;
     double rnd_y;
@@ -132,11 +129,8 @@ TEST(IsInside , Box ) {
     double big_width_y  =   4*width_y;
     double big_height   =   4*height;
 
-    double x0   =   0;
-    double y0   =   0;
-    double z0   =   0;
+    Vector3D position_geometry(0,0,0);
 
-    PROPOSALParticle * particle = new PROPOSALParticle(ParticleType::MuMinus,x,y,z,theta,phi,0,0);
     int is_inside  =0;
     int is_outside =0;
 
@@ -158,13 +152,14 @@ TEST(IsInside , Box ) {
         rnd_y0  = M.RandomDouble();
         rnd_z0  = M.RandomDouble();
 
-        x0   =   ( 2 * rnd_x  - 1)* 0.5 *( big_width_x - width_x );
-        y0   =   ( 2 * rnd_y  - 1)* 0.5 *( big_width_y - width_y );
-        z0   =   ( 2 * rnd_z  - 1)* 0.5 *( big_height  - height  );
+        position_geometry.SetCartesianCoordinates( 
+            ( 2 * rnd_x  - 1)* 0.5 *( big_width_x - width_x ) ,
+            ( 2 * rnd_y  - 1)* 0.5 *( big_width_y - width_y ) ,
+            ( 2 * rnd_z  - 1)* 0.5 *( big_height  - height  ) );
 
         // The values are divided by 100 to convert the units...
         // Init functions expects m but here everthing is in cm
-        Box A(x0/100,y0/100,z0/100,width_x/100,width_y/100,height/100);
+        Box A(0.01*position_geometry,width_x/100,width_y/100,height/100);
 
         volumia_ratio = width_x*width_y*height /( big_width_x*big_width_y*big_height);
         for(int j = 0; j<number_particles; j++)
@@ -178,34 +173,29 @@ TEST(IsInside , Box ) {
             rnd_theta   = M.RandomDouble();
             rnd_phi     = M.RandomDouble();
 
-            theta   = rnd_theta*180;
-            phi     = rnd_phi*360;
+            particle_direction.SetSphericalCoordinates( 1, rnd_phi*2*PI, rnd_theta*PI );
+            particle_direction.CalculateCartesianFromSpherical();
 
-            x   =   ( 2 * rnd_x  - 1)* 0.5 * big_width_x;
-            y   =   ( 2 * rnd_y  - 1)* 0.5 * big_width_y;
-            z   =   ( 2 * rnd_z  - 1)* 0.5 * big_height;
-
-            particle->SetX(x);
-            particle->SetY(y);
-            particle->SetZ(z);
-            particle->SetTheta(theta);
-            particle->SetPhi(phi);
+            particle_position.SetCartesianCoordinates(
+                ( 2 * rnd_x  - 1)* 0.5 * big_width_x,
+                ( 2 * rnd_y  - 1)* 0.5 * big_width_y,
+                ( 2 * rnd_z  - 1)* 0.5 * big_height );
 
             // if this constraints are true the particle is inside the box geometry
-            if( particle->GetX() > x0 - 0.5*width_x &&
-                particle->GetX() < x0 + 0.5*width_x &&
-                particle->GetY() > y0 - 0.5*width_y &&
-                particle->GetY() < y0 + 0.5*width_y &&
-                particle->GetZ() > z0 - 0.5*height   &&
-                particle->GetZ() < z0 + 0.5*height )
+            if( particle_position.GetX() > position_geometry.GetX() - 0.5*width_x &&
+                particle_position.GetX() < position_geometry.GetX() + 0.5*width_x &&
+                particle_position.GetY() > position_geometry.GetY() - 0.5*width_y &&
+                particle_position.GetY() < position_geometry.GetY() + 0.5*width_y &&
+                particle_position.GetZ() > position_geometry.GetZ() - 0.5*height  &&
+                particle_position.GetZ() < position_geometry.GetZ() + 0.5*height )
             {
                 is_inside++;
-                EXPECT_TRUE(A.IsInside(particle));
+                EXPECT_TRUE(A.IsInside(particle_position,particle_direction));
             }
             else
             {
                 is_outside++;
-                EXPECT_FALSE(A.IsInside(particle));
+                EXPECT_FALSE(A.IsInside(particle_position,particle_direction));
             }
         }
         ASSERT_NEAR(1.*is_inside ,volumia_ratio*number_particles , 3*sqrt(volumia_ratio*number_particles) );
@@ -216,160 +206,132 @@ TEST(IsInside , Box ) {
 
     // The values are divided by 100 to convert the units...
     // Init functions expects m but here everthing is in cm
-    Box A(0,0,0,width_x/100,width_y/100,height/100);
+    Box A(Vector3D(0,0,0),width_x/100,width_y/100,height/100);
 
     // Particle is on the top surface.
     // Theta 0° - 90° means particle is moving outside
     // This should be treated as outside
     // Theta 90° - 180° means particle is moving inside (should be treated as inside)
     // The value of phi does not matter
-    particle->SetX(0);
-    particle->SetY(0);
-    particle->SetZ(0.5*height);
+    particle_position.SetCartesianCoordinates(0,0,0.5*height);
     for(int i = 0; i<1e4; i++)
     {
         rnd_theta   = M.RandomDouble();
         rnd_phi     = M.RandomDouble();
 
-        theta   = rnd_theta*180;
-        phi     = rnd_phi*360;
-        particle->SetTheta(theta);
-        particle->SetPhi(phi);
+        particle_direction.SetSphericalCoordinates( 1, rnd_phi*2*PI, rnd_theta*PI );
+        particle_direction.CalculateCartesianFromSpherical();
 
-        if(theta < 90)
-            EXPECT_FALSE(A.IsInside(particle));
-        if(theta > 90)
-            EXPECT_TRUE(A.IsInside(particle));
+        if(particle_direction.GetTheta() < 90)
+            EXPECT_FALSE(A.IsInside(particle_position,particle_direction));
+        if(particle_direction.GetTheta() > 90)
+            EXPECT_TRUE(A.IsInside(particle_position,particle_direction));
 
     }
 
     //Make this test for every surface of the box
 
     // bottom
-    particle->SetX(0);
-    particle->SetY(0);
-    particle->SetZ(-0.5*height);
-    particle->SetPhi(0);
+    particle_position.SetCartesianCoordinates(0,0,-0.5*height);
     for(int i = 0; i<1e4; i++)
     {
         rnd_theta   = M.RandomDouble();
         rnd_phi     = M.RandomDouble();
 
-        theta   = rnd_theta*180;
-        phi     = rnd_phi*360;
-        particle->SetTheta(theta);
-        particle->SetPhi(phi);
+        particle_direction.SetSphericalCoordinates( 1, rnd_phi*2*PI, rnd_theta*PI);
+        particle_direction.CalculateCartesianFromSpherical();
 
-        if(theta > 90)
-            EXPECT_FALSE(A.IsInside(particle));
-        if(theta < 90)
-            EXPECT_TRUE(A.IsInside(particle));
+        if(particle_direction.GetTheta() > 90)
+            EXPECT_FALSE(A.IsInside(particle_position,particle_direction));
+        if(particle_direction.GetTheta() < 90)
+            EXPECT_TRUE(A.IsInside(particle_position,particle_direction));
 
     }
 
     // Surface in positiv x direction
-    particle->SetX(0.5*width_x);
-    particle->SetY(0);
-    particle->SetZ(0);
+    particle_position.SetCartesianCoordinates(0.5*width_x,0,0);
     for(int i = 0; i<1e4; i++)
     {
         rnd_theta   = M.RandomDouble();
         rnd_phi     = M.RandomDouble();
 
-        theta   = rnd_theta*180;
-        phi     = rnd_phi*360;
-        particle->SetTheta(theta);
-        particle->SetPhi(phi);
+        particle_direction.SetSphericalCoordinates(1, rnd_phi*2*PI, rnd_theta*PI);
+        particle_direction.CalculateCartesianFromSpherical();
+
 
         // phi = 0 is in positive x direction
-        if(phi < 90 || phi > 270)
-            EXPECT_FALSE(A.IsInside(particle));
+        if(particle_direction.GetPhi() < 90 || particle_direction.GetPhi() > 270)
+            EXPECT_FALSE(A.IsInside(particle_position,particle_direction));
         else
-            EXPECT_TRUE(A.IsInside(particle));
+            EXPECT_TRUE(A.IsInside(particle_position,particle_direction));
 
     }
     // Surface in negativ x direction
-    particle->SetX(-0.5*width_x);
-    particle->SetY(0);
-    particle->SetZ(0);
+    particle_position.SetCartesianCoordinates(-0.5*width_x,0,0);
     for(int i = 0; i<1e4; i++)
     {
         rnd_theta   = M.RandomDouble();
         rnd_phi     = M.RandomDouble();
 
-        theta   = rnd_theta*180;
-        phi     = rnd_phi*360;
-        particle->SetTheta(theta);
-        particle->SetPhi(phi);
+        particle_direction.SetSphericalCoordinates(1, rnd_phi*2*PI, rnd_theta*PI);
+        particle_direction.CalculateCartesianFromSpherical();
 
         // phi = 0 is in positive x direction
-        if(phi < 90 || phi > 270)
-            EXPECT_TRUE(A.IsInside(particle));
+        if(particle_direction.GetPhi() < 90 || particle_direction.GetPhi() > 270)
+            EXPECT_TRUE(A.IsInside(particle_position,particle_direction));
         else
-            EXPECT_FALSE(A.IsInside(particle));
+            EXPECT_FALSE(A.IsInside(particle_position,particle_direction));
 
     }
     // Surface in positiv y direction
-    particle->SetX(0);
-    particle->SetY(0.5*width_y);
-    particle->SetZ(0);
+    particle_position.SetCartesianCoordinates(0,0.5*width_y,0);
     for(int i = 0; i<1e4; i++)
     {
         rnd_theta   = M.RandomDouble();
         rnd_phi     = M.RandomDouble();
 
-        theta   = rnd_theta*180;
-        phi     = rnd_phi*360;
-        particle->SetTheta(theta);
-        particle->SetPhi(phi);
+        particle_direction.SetSphericalCoordinates(1, rnd_phi*2*PI, rnd_theta*PI);
+        particle_direction.CalculateCartesianFromSpherical();
 
         // phi = 0 is in positive x direction
-        if(phi < 180)
-            EXPECT_FALSE(A.IsInside(particle));
+        if(particle_direction.GetPhi() < 180)
+            EXPECT_FALSE(A.IsInside(particle_position,particle_direction));
         else
-            EXPECT_TRUE(A.IsInside(particle));
+            EXPECT_TRUE(A.IsInside(particle_position,particle_direction));
 
     }
     // Surface in negativ y direction
-    particle->SetX(0);
-    particle->SetY(-0.5*width_y);
-    particle->SetZ(0);
+    particle_position.SetCartesianCoordinates(0,-0.5*width_y,0);
     for(int i = 0; i<1e4; i++)
     {
         rnd_theta   = M.RandomDouble();
         rnd_phi     = M.RandomDouble();
 
-        theta   = rnd_theta*180;
-        phi     = rnd_phi*360;
-        particle->SetTheta(theta);
-        particle->SetPhi(phi);
+        particle_direction.SetSphericalCoordinates(1, rnd_phi*2*PI, rnd_theta*PI);
+        particle_direction.CalculateCartesianFromSpherical();
 
         // phi = 0 is in positive x direction
-        if(phi < 180)
-            EXPECT_TRUE(A.IsInside(particle));
+        if(particle_direction.GetPhi() < 180)
+            EXPECT_TRUE(A.IsInside(particle_position,particle_direction));
         else
-            EXPECT_FALSE(A.IsInside(particle));
+            EXPECT_FALSE(A.IsInside(particle_position,particle_direction));
 
     }
 
     //For completness check one corner
-    particle->SetX(0.5*width_x);
-    particle->SetY(0.5*width_y);
-    particle->SetZ(0.5*height);
+    particle_position.SetCartesianCoordinates(0.5*width_x,0.5*width_y,0.5*height);
     for(int i = 0; i<1e4; i++)
     {
         rnd_theta   = M.RandomDouble();
         rnd_phi     = M.RandomDouble();
 
-        theta   = rnd_theta*180;
-        phi     = rnd_phi*360;
-        particle->SetTheta(theta);
-        particle->SetPhi(phi);
+        particle_direction.SetSphericalCoordinates(1, rnd_phi*2*PI, rnd_theta*PI);
+        particle_direction.CalculateCartesianFromSpherical();
 
-        if(theta < 90 || phi <180 || phi > 270)
-            EXPECT_FALSE(A.IsInside(particle));
+        if(particle_direction.GetTheta() < 90 || particle_direction.GetPhi() <180 || particle_direction.GetPhi() > 270)
+            EXPECT_FALSE(A.IsInside(particle_position,particle_direction));
         else
-            EXPECT_TRUE(A.IsInside(particle));
+            EXPECT_TRUE(A.IsInside(particle_position,particle_direction));
 
     }
 }
@@ -377,11 +339,8 @@ TEST(IsInside , Box ) {
 
 TEST(IsInside , Cylinder ) {
 
-    double x        =   0;
-    double y        =   0;
-    double z        =   0;
-    double theta    =   0;
-    double phi      =   0;
+    Vector3D particle_position(0,0,0);
+    Vector3D particle_direction(0,0,0);
 
     double rnd_x;
     double rnd_y;
@@ -403,11 +362,8 @@ TEST(IsInside , Cylinder ) {
     double big_width_y  =   4*radius;
     double big_height   =   4*height;
 
-    double x0   =   0;
-    double y0   =   0;
-    double z0   =   0;
+    Vector3D position_geometry(0,0,0);
 
-    PROPOSALParticle * particle = new PROPOSALParticle(ParticleType::MuMinus,x,y,z,theta,phi,0,0);
     int is_inside  =0;
     int is_outside =0;
 
@@ -427,13 +383,12 @@ TEST(IsInside , Cylinder ) {
         rnd_y0  = M.RandomDouble();
         rnd_z0  = M.RandomDouble();
 
-        x0   =   ( 2 * rnd_x0  - 1)* ( 0.5 * big_width_x - radius );
-        y0   =   ( 2 * rnd_y0  - 1)* ( 0.5 * big_width_y - radius );
-        z0   =   ( 2 * rnd_z0  - 1)* 0.5 *( big_height  - height  );
+        position_geometry.SetCartesianCoordinates(
+            ( 2 * rnd_x0  - 1)* ( 0.5 * big_width_x - radius ),
+            ( 2 * rnd_y0  - 1)* ( 0.5 * big_width_y - radius ),
+            ( 2 * rnd_z0  - 1)* 0.5 *( big_height  - height  ));
 
-        x0   =   0;
-        y0   =   0;
-        z0   =   0;
+        position_geometry.SetCartesianCoordinates(0,0,0);
 
         rnd_inner_radius    = M.RandomDouble();
 
@@ -441,7 +396,7 @@ TEST(IsInside , Cylinder ) {
 
         // The values are divided by 100 to convert the units...
         // Init functions expects m but here everthing is in cm
-        Cylinder A(x0/100,y0/100,z0/100,radius/100,inner_radius/100,height/100);
+        Cylinder A(0.01*position_geometry,radius/100,inner_radius/100,height/100);
 
         volumia_ratio = height*PI*( pow(radius,2) - pow(inner_radius,2) )
                 /( big_width_x*big_width_y*big_height);
@@ -456,34 +411,33 @@ TEST(IsInside , Cylinder ) {
             rnd_theta   = M.RandomDouble();
             rnd_phi     = M.RandomDouble();
 
-            theta   = rnd_theta*180;
-            phi     = rnd_phi*360;
 
-            x   =   ( 2 * rnd_x  - 1)* 0.5 * big_width_x;
-            y   =   ( 2 * rnd_y  - 1)* 0.5 * big_width_y;
-            z   =   ( 2 * rnd_z  - 1)* 0.5 * big_height;
+            particle_direction.SetSphericalCoordinates(1, rnd_phi*2*PI, rnd_theta*PI);
+            particle_direction.CalculateCartesianFromSpherical();
 
-            particle->SetX(x);
-            particle->SetY(y);
-            particle->SetZ(z);
-            particle->SetTheta(theta);
-            particle->SetPhi(phi);
+            particle_position.SetCartesianCoordinates(
+                ( 2 * rnd_x  - 1)* 0.5 * big_width_x,
+                ( 2 * rnd_y  - 1)* 0.5 * big_width_y,
+                ( 2 * rnd_z  - 1)* 0.5 * big_height);
+
 
             // if this constraints are true the particle is inside the cylinder geometry
-            if( sqrt( pow( (x-x0),2 ) + pow( (y-y0),2 ) ) < radius &&
-                sqrt( pow( (x-x0),2 ) + pow( (y-y0),2 ) ) > inner_radius &&
-                z > z0 - 0.5*height  &&
-                z < z0 + 0.5*height )
+            if( sqrt( pow( (particle_position.GetX()-position_geometry.GetX()),2 ) 
+                    + pow( (particle_position.GetY()-position_geometry.GetY()),2 ) ) < radius &&
+                sqrt( pow( (particle_position.GetX()-position_geometry.GetX()),2 ) 
+                    + pow( (particle_position.GetY()-position_geometry.GetY()),2 ) ) > inner_radius &&
+                particle_position.GetZ() > position_geometry.GetZ() - 0.5*height  &&
+                particle_position.GetZ() < position_geometry.GetZ() + 0.5*height )
             {
 
                 is_inside++;
 
-                EXPECT_TRUE(A.IsInside(particle));
+                EXPECT_TRUE(A.IsInside(particle_position,particle_direction));
             }
             else
             {
                 is_outside++;
-                EXPECT_FALSE(A.IsInside(particle));
+                EXPECT_FALSE(A.IsInside(particle_position,particle_direction));
             }
         }
         ASSERT_NEAR(1.*is_inside ,volumia_ratio*number_particles , 3*sqrt(volumia_ratio*number_particles) );
@@ -495,47 +449,36 @@ TEST(IsInside , Cylinder ) {
 
     // The values are divided by 100 to convert the units...
     // Init functions expects m but here everthing is in cm
-    Sphere B(0,0,0,radius/100,0);
+    Sphere B(Vector3D(0,0,0),radius/100,0);
 
-    z=0;
-    particle->SetZ(z);
 
     double cos;
-    double dir_vec_x;
-    double dir_vec_y;
-    double dir_vec_z;
 
     int excluded =0 ;
     for(int i = 0; i<1e4; i++)
     {
         rnd_x = M.RandomDouble();
 
-        x   =   radius * rnd_x;
-        y   =   radius *sqrt(1 - rnd_x*rnd_x);
-
-
-        particle->SetX(x);
-        particle->SetY(y);
+        particle_position.SetCartesianCoordinates( 
+            radius * rnd_x,
+            radius * sqrt(1 - rnd_x*rnd_x),
+            0 );
 
         rnd_theta   = M.RandomDouble();
         rnd_phi     = M.RandomDouble();
 
-        theta   = rnd_theta*180;
-        phi     = rnd_phi*360;
-        particle->SetTheta(theta);
-        particle->SetPhi(phi);
+        particle_direction.SetSphericalCoordinates(1, rnd_phi*2*PI, rnd_theta*PI);
+        particle_direction.CalculateCartesianFromSpherical();
 
-        dir_vec_x = particle->GetCosPhi()*particle->GetSinTheta();
-        dir_vec_y = particle->GetSinPhi()*particle->GetSinTheta();
-        dir_vec_z = particle->GetCosTheta();
+
 
         //cosine of angle between direction vector and position vector
-        cos = (-x * dir_vec_x -y*dir_vec_y - z* dir_vec_z) / radius;
+        cos = -scalar_product(particle_position, particle_direction) / radius;
 
         if(cos < 1 && cos > 0)
-            EXPECT_TRUE(B.IsInside(particle));
+            EXPECT_TRUE(B.IsInside(particle_position,particle_direction));
         else
-            EXPECT_FALSE(B.IsInside(particle));
+            EXPECT_FALSE(B.IsInside(particle_position,particle_direction));
 
     }
 
@@ -544,30 +487,29 @@ TEST(IsInside , Cylinder ) {
     // This should be treated as outside
     // Theta 90° - 180° means particle is moving inside (should be treated as inside)
     // The value of phi does not matter
-    particle->SetX(0);
-    particle->SetY(0);
-    particle->SetZ(0.5*height);
+    particle_position.SetCartesianCoordinates(0,0,0.5*height);
 
     // The values are divided by 100 to convert the units...
     // Init functions expects m but here everthing is in cm
-    Cylinder C(0,0,0,radius/100,0,height/100);
+    Cylinder C(Vector3D(0,0,0),radius/100,0,height/100);
 
     for(int i = 0; i<1e4; i++)
     {
         rnd_theta   = M.RandomDouble();
         rnd_phi     = M.RandomDouble();
 
-        theta   = rnd_theta*180;
-        phi     = rnd_phi*360;
-        particle->SetTheta(theta);
-        particle->SetPhi(phi);
+        particle_direction.SetSphericalCoordinates(1, rnd_phi*2*PI, rnd_theta*PI);
+        particle_direction.CalculateCartesianFromSpherical();
         // Computer precision controll
-        if(x*x+y*y -inner_radius*inner_radius ==0 )
+        if(particle_position.GetX()*particle_position.GetX()
+            + particle_position.GetY()*particle_position.GetY()
+            - inner_radius*inner_radius
+            ==0 )
         {
-            if(theta < 90)
-                EXPECT_FALSE(C.IsInside(particle));
-            if(theta > 90)
-                EXPECT_TRUE(C.IsInside(particle));
+            if(particle_direction.GetTheta() < PI/2.)
+                EXPECT_FALSE(C.IsInside(particle_position,particle_direction));
+            if(particle_direction.GetTheta() > PI/2.)
+                EXPECT_TRUE(C.IsInside(particle_position,particle_direction));
         }
 
     }
@@ -575,23 +517,19 @@ TEST(IsInside , Cylinder ) {
     //Make this test for every surface of the box
 
     // bottom
-    particle->SetX(0);
-    particle->SetY(0);
-    particle->SetZ(-0.5*height);
+    particle_position.SetCartesianCoordinates(0,0,-0.5*height);
     for(int i = 0; i<1e4; i++)
     {
         rnd_theta   = M.RandomDouble();
         rnd_phi     = M.RandomDouble();
 
-        theta   = rnd_theta*180;
-        phi     = rnd_phi*360;
-        particle->SetTheta(theta);
-        particle->SetPhi(phi);
+        particle_direction.SetSphericalCoordinates(1, rnd_phi*2*PI, rnd_theta*PI);
+        particle_direction.CalculateCartesianFromSpherical();
 
-        if(theta > 90)
-            EXPECT_FALSE(C.IsInside(particle));
-        if(theta < 90)
-            EXPECT_TRUE(C.IsInside(particle));
+        if(particle_direction.GetTheta() > PI/2.)
+            EXPECT_FALSE(C.IsInside(particle_position,particle_direction));
+        if(particle_direction.GetTheta() < PI/2.)
+            EXPECT_TRUE(C.IsInside(particle_position,particle_direction));
 
     }
 
@@ -600,10 +538,7 @@ TEST(IsInside , Cylinder ) {
 
     // The values are divided by 100 to convert the units...
     // Init functions expects m but here everthing is in cm
-    Cylinder A(0,0,0,radius/100,inner_radius/100,height/100);
-
-    z=0;
-    particle->SetZ(z);
+    Cylinder A(Vector3D(0,0,0),radius/100,inner_radius/100,height/100);
 
     excluded=0;
 
@@ -611,43 +546,34 @@ TEST(IsInside , Cylinder ) {
     {
         rnd_x = M.RandomDouble();
 
-        x   =   inner_radius * rnd_x;
-        y   =   inner_radius *sqrt(1 - rnd_x*rnd_x);
+        particle_position.SetCartesianCoordinates(
+            inner_radius * rnd_x,
+            inner_radius *sqrt(1 - rnd_x*rnd_x),
+            0);
 
-
-        particle->SetX(x);
-        particle->SetY(y);
 
         rnd_theta   = M.RandomDouble();
         rnd_phi     = M.RandomDouble();
 
-        theta   = rnd_theta*180;
-        phi     = rnd_phi*360;
-        particle->SetTheta(theta);
-        particle->SetPhi(phi);
-
-        dir_vec_x = particle->GetCosPhi()*particle->GetSinTheta();
-        dir_vec_y = particle->GetSinPhi()*particle->GetSinTheta();
-        dir_vec_z = particle->GetCosTheta();
+        particle_direction.SetSphericalCoordinates(1, rnd_phi*2*PI, rnd_theta*PI);
+        particle_direction.CalculateCartesianFromSpherical();
 
         //cosine of angle between direction vector and position vector
-        cos = (-x * dir_vec_x -y*dir_vec_y - z* dir_vec_z) / radius;
+        cos = -scalar_product(particle_position, particle_direction) / radius;
 
         if(cos < 1 && cos > 0)
-            EXPECT_FALSE(A.IsInside(particle));
+            EXPECT_FALSE(A.IsInside(particle_position,particle_direction));
         else
-            EXPECT_TRUE(A.IsInside(particle));
+            EXPECT_TRUE(A.IsInside(particle_position,particle_direction));
 
     }
 
 }
 
 TEST(IsInside , Sphere ) {
-    double x        =   0;
-    double y        =   0;
-    double z        =   0;
-    double theta    =   0;
-    double phi      =   0;
+
+    Vector3D particle_position(0,0,0);
+    Vector3D particle_direction(0,0,0);
 
     double rnd_x;
     double rnd_y;
@@ -668,11 +594,8 @@ TEST(IsInside , Sphere ) {
     double big_width_y  =   4*radius;
     double big_height   =   4*radius;
 
-    double x0   =   0;
-    double y0   =   0;
-    double z0   =   0;
+    Vector3D position_geometry(0,0,0);
 
-    PROPOSALParticle * particle = new PROPOSALParticle(ParticleType::MuMinus,x,y,z,theta,phi,0,0);
     int is_inside  =0;
     int is_outside =0;
 
@@ -691,17 +614,18 @@ TEST(IsInside , Sphere ) {
         rnd_y0  = M.RandomDouble();
         rnd_z0  = M.RandomDouble();
 
-        rnd_inner_radius    = M.RandomDouble();
+        rnd_inner_radius = M.RandomDouble();
 
-        x0   =   ( 2 * rnd_x  - 1)* ( 0.5 * big_width_x - radius );
-        y0   =   ( 2 * rnd_y  - 1)* ( 0.5 * big_width_y - radius );
-        z0   =   ( 2 * rnd_z  - 1)* ( 0.5 * big_height  - radius );
+        position_geometry.SetCartesianCoordinates(
+            ( 2 * rnd_x  - 1)* ( 0.5 * big_width_x - radius ),
+            ( 2 * rnd_y  - 1)* ( 0.5 * big_width_y - radius ),
+            ( 2 * rnd_z  - 1)* ( 0.5 * big_height  - radius ));
 
         inner_radius    = radius*rnd_inner_radius;
 
         // The values are divided by 100 to convert the units...
         // Init functions expects m but here everthing is in cm
-        Sphere A(x0/100,y0/100,z0/100,radius/100,inner_radius/100);
+        Sphere A(0.01*position_geometry,radius/100,inner_radius/100);
 
         volumia_ratio = (4./3.*PI* ( pow(radius ,3)  - pow(inner_radius ,3) ) )
                         /( big_width_x*big_width_y*big_height);
@@ -717,30 +641,25 @@ TEST(IsInside , Sphere ) {
             rnd_theta   = M.RandomDouble();
             rnd_phi     = M.RandomDouble();
 
-            theta   = rnd_theta*180;
-            phi     = rnd_phi*360;
+            particle_direction.SetSphericalCoordinates(1, rnd_phi*2*PI, rnd_theta*PI);
+            particle_direction.CalculateCartesianFromSpherical();
 
-            x   =   ( 2 * rnd_x  - 1)* 0.5 * big_width_x;
-            y   =   ( 2 * rnd_y  - 1)* 0.5 * big_width_y;
-            z   =   ( 2 * rnd_z  - 1)* 0.5 * big_height;
+            particle_position.SetCartesianCoordinates(
+                ( 2 * rnd_x  - 1)* 0.5 * big_width_x,
+                ( 2 * rnd_y  - 1)* 0.5 * big_width_y,
+                ( 2 * rnd_z  - 1)* 0.5 * big_height);
 
-            particle->SetX(x);
-            particle->SetY(y);
-            particle->SetZ(z);
-            particle->SetTheta(theta);
-            particle->SetPhi(phi);
 
-            if( sqrt( pow( (x-x0),2 ) + pow( (y-y0),2 ) + pow( (z-z0),2 ) ) < radius &&
-                sqrt( pow( (x-x0),2 ) + pow( (y-y0),2 ) + pow( (z-z0),2 ) ) > inner_radius )
-
+            if( (particle_position - position_geometry).magnitude() < radius &&
+                (particle_position - position_geometry).magnitude() > inner_radius )
             {
                 is_inside++;
-                EXPECT_TRUE(A.IsInside(particle));
+                EXPECT_TRUE(A.IsInside(particle_position,particle_direction));
             }
             else
             {
                 is_outside++;
-                EXPECT_FALSE(A.IsInside(particle));
+                EXPECT_FALSE(A.IsInside(particle_position,particle_direction));
             }
         }
         ASSERT_NEAR(1.*is_inside ,volumia_ratio*number_particles , 3*sqrt(volumia_ratio*number_particles) );
@@ -752,47 +671,34 @@ TEST(IsInside , Sphere ) {
 
     // The values are divided by 100 to convert the units...
     // Init functions expects m but here everthing is in cm
-    Sphere A(0,0,0,radius/100,0);
-
-    z=0;
-    particle->SetZ(z);
+    Sphere A(Vector3D(0,0,0),radius/100,0);
 
     double cos;
-    double dir_vec_x;
-    double dir_vec_y;
-    double dir_vec_z;
 
     int excluded =0 ;
     for(int i = 0; i<1e4; i++)
     {
         rnd_x = M.RandomDouble();
 
-        x   =   radius * rnd_x;
-        y   =   radius *sqrt(1 - rnd_x*rnd_x);
-
-
-        particle->SetX(x);
-        particle->SetY(y);
+        particle_position.SetCartesianCoordinates(
+            radius * rnd_x,
+            radius *sqrt(1 - rnd_x*rnd_x),
+            0);
 
         rnd_theta   = M.RandomDouble();
         rnd_phi     = M.RandomDouble();
 
-        theta   = rnd_theta*180;
-        phi     = rnd_phi*360;
-        particle->SetTheta(theta);
-        particle->SetPhi(phi);
 
-        dir_vec_x = particle->GetCosPhi()*particle->GetSinTheta();
-        dir_vec_y = particle->GetSinPhi()*particle->GetSinTheta();
-        dir_vec_z = particle->GetCosTheta();
+        particle_direction.SetSphericalCoordinates(1, rnd_phi*2*PI, rnd_theta*PI);
+        particle_direction.CalculateCartesianFromSpherical();
 
         //cosine of angle between direction vector and position vector
-        cos = (-x * dir_vec_x -y*dir_vec_y - z* dir_vec_z) / radius;
+        cos = -scalar_product(particle_position, particle_direction) / radius;
 
         if(cos < 1 && cos > 0)
-            EXPECT_TRUE(A.IsInside(particle));
+            EXPECT_TRUE(A.IsInside(particle_position,particle_direction));
         else
-            EXPECT_FALSE(A.IsInside(particle));
+            EXPECT_FALSE(A.IsInside(particle_position,particle_direction));
 
     }
 
@@ -802,10 +708,7 @@ TEST(IsInside , Sphere ) {
 
     // The values are divided by 100 to convert the units...
     // Init functions expects m but here everthing is in cm
-    Sphere B(0,0,0,radius/100,inner_radius/100);
-
-    z=0;
-    particle->SetZ(z);
+    Sphere B(Vector3D(0,0,0),radius/100,inner_radius/100);
 
     excluded=0;
 
@@ -813,32 +716,24 @@ TEST(IsInside , Sphere ) {
     {
         rnd_x = M.RandomDouble();
 
-        x   =   inner_radius * rnd_x;
-        y   =   inner_radius *sqrt(1 - rnd_x*rnd_x);
-
-
-        particle->SetX(x);
-        particle->SetY(y);
+        particle_position.SetCartesianCoordinates(
+            inner_radius * rnd_x,
+            inner_radius *sqrt(1 - rnd_x*rnd_x),
+            0);
 
         rnd_theta   = M.RandomDouble();
         rnd_phi     = M.RandomDouble();
 
-        theta   = rnd_theta*180;
-        phi     = rnd_phi*360;
-        particle->SetTheta(theta);
-        particle->SetPhi(phi);
-
-        dir_vec_x = particle->GetCosPhi()*particle->GetSinTheta();
-        dir_vec_y = particle->GetSinPhi()*particle->GetSinTheta();
-        dir_vec_z = particle->GetCosTheta();
+        particle_direction.SetSphericalCoordinates(1, rnd_phi*2*PI, rnd_theta*PI);
+        particle_direction.CalculateCartesianFromSpherical();
 
         //cosine of angle between direction vector and position vector
-        cos = (-x * dir_vec_x -y*dir_vec_y - z* dir_vec_z) / radius;
+        cos = -scalar_product(particle_position, particle_direction) / radius;
 
         if(cos < 1 && cos > 0)
-            EXPECT_FALSE(B.IsInside(particle));
+            EXPECT_FALSE(B.IsInside(particle_position,particle_direction));
         else
-            EXPECT_TRUE(B.IsInside(particle));
+            EXPECT_TRUE(B.IsInside(particle_position,particle_direction));
 
     }
 }
@@ -846,11 +741,8 @@ TEST(IsInside , Sphere ) {
 
 
 TEST(DistanceTo , Sphere ) {
-    double x        =   0;
-    double y        =   0;
-    double z        =   0;
-    double theta    =   0;
-    double phi      =   0;
+    Vector3D particle_position(0,0,0);
+    Vector3D particle_direction(0,0,0);
 
     double radius           =   10;
     double inner_radius     =   0;
@@ -862,9 +754,6 @@ TEST(DistanceTo , Sphere ) {
 
 
     pair<double,double> distance;
-
-    PROPOSALParticle * particle = new PROPOSALParticle(ParticleType::MuMinus,x,y,z,theta,phi,0,0);
-
 
     MathModel M;
     int number_particles = 1e5;
@@ -884,32 +773,21 @@ TEST(DistanceTo , Sphere ) {
 
             // The values are divided by 100 to convert the units...
             // Init functions expects m but here everthing is in cm
-            Sphere A(0,0,0,radius/100,inner_radius/100);
+            Sphere A(Vector3D(0,0,0),radius/100,inner_radius/100);
 
-            rnd_phi             = M.RandomDouble();
-            rnd_theta           = M.RandomDouble();
+            rnd_phi   = M.RandomDouble();
+            rnd_theta = M.RandomDouble();
 
-            phi     =   rnd_phi*2*PI;
-            theta   =   rnd_theta*PI;
-
+            particle_direction.SetSphericalCoordinates(1, rnd_phi*2*PI, rnd_theta*PI);
+            particle_direction.CalculateCartesianFromSpherical();
 
             // Chose particle location and angle
-
-            x   =   -1*particle_radius*cos(phi)*sin(theta);
-            y   =   -1*particle_radius*sin(phi)*sin(theta);
-            z   =   -1*particle_radius*cos(theta);
-
-            theta   = 180/PI*theta;
-            phi     = 180/PI*phi;
+            particle_position.SetSphericalCoordinates(particle_radius, rnd_phi*2*PI, rnd_theta*PI);
+            particle_position.CalculateCartesianFromSpherical();
+            particle_position = -particle_position;
 
 
-            particle->SetX(x);
-            particle->SetY(y);
-            particle->SetZ(z);
-            particle->SetTheta(theta);
-            particle->SetPhi(phi);
-
-            distance    =   A.DistanceToBorder(particle);
+            distance = A.DistanceToBorder(particle_position,particle_direction);
 
             if(particle_radius < radius && particle_radius > inner_radius)
             {
@@ -934,15 +812,10 @@ TEST(DistanceTo , Sphere ) {
 
             if(particle_radius >= radius)
             {
-                x   = -1*x;
-                y   = -1*y;
-                z   = -1*z;
-                particle->SetX(x);
-                particle->SetY(y);
-                particle->SetZ(z);
+                particle_position = -1*particle_position;
 
                 //Now the particle is moving away from the sphere so we expect no intersection
-                distance    =   A.DistanceToBorder(particle);
+                distance    =   A.DistanceToBorder(particle_position,particle_direction);
                 EXPECT_EQ(distance.first, -1.);
                 EXPECT_EQ(distance.second, -1.);
 
@@ -950,24 +823,11 @@ TEST(DistanceTo , Sphere ) {
             }
             if(particle_radius > 20)
             {
+                particle_position.SetSphericalCoordinates(inner_radius, rnd_phi*2*PI, rnd_theta*PI);
+                particle_position.CalculateCartesianFromSpherical();
+                particle_position = -particle_position;
 
-                theta   = PI/180*theta;
-                phi     = PI/180*phi;
-
-                x   =   -1*inner_radius*cos(phi)*sin(theta);
-                y   =   -1*inner_radius*sin(phi)*sin(theta);
-                z   =   -1*inner_radius*cos(theta);
-
-                theta   = 180/PI*theta;
-                phi     = 180/PI*phi;
-
-                particle->SetX(x);
-                particle->SetY(y);
-                particle->SetZ(z);
-                particle->SetTheta(theta);
-                particle->SetPhi(phi);
-
-                distance    =   A.DistanceToBorder(particle);
+                distance = A.DistanceToBorder(particle_position,particle_direction);
                 ASSERT_NEAR(distance.first, 2*inner_radius,1e-8*(2*inner_radius));
                 ASSERT_NEAR(distance.second, inner_radius+radius,1e-8*(inner_radius + radius));
 
@@ -978,11 +838,8 @@ TEST(DistanceTo , Sphere ) {
 
 //
 TEST(DistanceTo , Cylinder ) {
-    double x        =   0;
-    double y        =   0;
-    double z        =   0;
-    double theta    =   0;
-    double phi      =   0;
+    Vector3D particle_position(0,0,0);
+    Vector3D particle_direction(0,0,0);
 
     double height           =   10;
     double radius           =   10;
@@ -992,11 +849,9 @@ TEST(DistanceTo , Cylinder ) {
     double rnd_phi;
     double rnd_inner_radius;
 
+    double z;
 
     pair<double,double> distance;
-
-    PROPOSALParticle * particle = new PROPOSALParticle(ParticleType::MuMinus,x,y,z,theta,phi,0,0);
-
 
     MathModel M;
     int number_particles = 1e5;
@@ -1016,32 +871,23 @@ TEST(DistanceTo , Cylinder ) {
 
             // The values are divided by 100 to convert the units...
             // Init functions expects m but here everthing is in cm
-            Cylinder A(0,0,0,radius/100,inner_radius/100,height/100);
+            Cylinder A(Vector3D(0,0,0),radius/100,inner_radius/100,height/100);
 
-            rnd_phi             = M.RandomDouble();
+            rnd_phi = M.RandomDouble();
 
-            phi     =   rnd_phi*2*PI;
-            theta   =   0.5*PI;
-
+            particle_position.SetSphericalCoordinates(1, rnd_phi*2*PI, 0.5*PI);
+            particle_position.CalculateCartesianFromSpherical();
+            particle_position.SetCartesianCoordinates(
+                -1*particle_radius*particle_position.GetX(),
+                -1*particle_radius*particle_position.GetY(),
+                -1*0.5*height*particle_position.GetZ());
 
             // Chose particle location and angle
 
-            x   =   -1*particle_radius*cos(phi)*sin(theta);
-            y   =   -1*particle_radius*sin(phi)*sin(theta);
-            z   =   -1*0.5*height*cos(theta);
+            particle_direction.SetSphericalCoordinates(1, rnd_phi*2*PI, 0.5*PI);
+            particle_direction.CalculateCartesianFromSpherical();
 
-            theta   = 180/PI*theta;
-            phi     = 180/PI*phi;
-
-            //if(phi<0)phi=360+phi;
-
-            particle->SetX(x);
-            particle->SetY(y);
-            particle->SetZ(z);
-            particle->SetTheta(theta);
-            particle->SetPhi(phi);
-
-            distance    =   A.DistanceToBorder(particle);
+            distance    =   A.DistanceToBorder(particle_position,particle_direction);
 
             if(particle_radius < radius && particle_radius > inner_radius)
             {
@@ -1067,15 +913,10 @@ TEST(DistanceTo , Cylinder ) {
 
             if(particle_radius >= radius)
             {
-                x   = -1*x;
-                y   = -1*y;
-                z   = -1*z;
-                particle->SetX(x);
-                particle->SetY(y);
-                particle->SetZ(z);
+                particle_position = -particle_position;
 
                 //Now the particle is moving away from the sphere so we expect no intersection
-                distance    =   A.DistanceToBorder(particle);
+                distance    =   A.DistanceToBorder(particle_position,particle_direction);
                 EXPECT_EQ(distance.first, -1.);
                 EXPECT_EQ(distance.second, -1.);
 
@@ -1085,17 +926,10 @@ TEST(DistanceTo , Cylinder ) {
             {
                 particle_radius =   inner_radius;
 
-                x   =   -1*particle_radius*cos(phi)*sin(theta);
-                y   =   -1*particle_radius*sin(phi)*sin(theta);
-                z   =   -1*particle_radius*cos(theta);
+                particle_position.SetSphericalCoordinates(particle_radius, rnd_phi*2*PI, 0.5*PI);
+                particle_position = -particle_position;
 
-                particle->SetX(x);
-                particle->SetY(y);
-                particle->SetZ(z);
-                particle->SetTheta(theta);
-                particle->SetPhi(phi);
-
-                distance    =   A.DistanceToBorder(particle);
+                distance    =   A.DistanceToBorder(particle_position,particle_direction);
                 ASSERT_NEAR(distance.first, 2*inner_radius,1e-8*(2*inner_radius));
                 ASSERT_NEAR(distance.second, inner_radius+radius,1e-8*(inner_radius + radius));
 
@@ -1108,21 +942,18 @@ TEST(DistanceTo , Cylinder ) {
 
     // The values are divided by 100 to convert the units...
     // Init functions expects m but here everthing is in cm
-    Cylinder B(0,0,0,radius/100,inner_radius/100,height/100);
+    Cylinder B(Vector3D(0,0,0),radius/100,inner_radius/100,height/100);
 
     // Chose particle location and angle
 
-    x   =   0;
-    y   =   0;
-    z   =   height +10;
+    particle_position.SetCartesianCoordinates(0,0,height +10);
 
-    particle->SetX(x);
-    particle->SetY(y);
-    particle->SetZ(z);
-    particle->SetTheta(180);
-    particle->SetPhi(0);
+    particle_direction.SetSphericalCoordinates(1,180,0);
+    particle_direction.CalculateCartesianFromSpherical();
 
-    distance    =   B.DistanceToBorder(particle);
+    z = particle_position.GetZ();
+
+    distance    =   B.DistanceToBorder(particle_position,particle_direction);
 
     ASSERT_NEAR(distance.first,z-0.5*height,1e-8*(z-0.5*height));
     ASSERT_NEAR(distance.second,z+0.5*height,1e-8*(z+0.5*height));
@@ -1134,7 +965,7 @@ TEST(DistanceTo , Cylinder ) {
 
     // The values are divided by 100 to convert the units...
     // Init functions expects m but here everthing is in cm
-    Cylinder A(0,0,0,radius/100,inner_radius/100,height/100);
+    Cylinder A(Vector3D(0,0,0),radius/100,inner_radius/100,height/100);
 
     for(int j = 0; j<number_particles; j++)
     {
@@ -1148,23 +979,14 @@ TEST(DistanceTo , Cylinder ) {
 
         // Chose particle location and angle
 
-        x   =   0;
-        y   =   0;
-        z   =   height +0.5*height;
+        particle_position.SetCartesianCoordinates(0,0,height +0.5*height);
 
-        phi     = 360*rnd_phi;
-        theta   = 180 - 180/PI*alpha;
-
-        particle->SetX(x);
-        particle->SetY(y);
-        particle->SetZ(z);
-        particle->SetTheta(theta);
-        particle->SetPhi(phi);
+        particle_direction.SetSphericalCoordinates(1,rnd_phi, PI - alpha);
 
         double dist1 = inner_radius/sin(alpha);
         double dist2 = radius/sin(alpha);
 
-        distance    =   A.DistanceToBorder(particle);
+        distance    =   A.DistanceToBorder(particle_position,particle_direction);
 
         //  case 1 throught inner cylinder => no intersection
         //  ___  x    ___
@@ -1251,11 +1073,8 @@ TEST(DistanceTo , Cylinder ) {
 
 
 TEST(DistanceTo , Box ) {
-    double x        =   0;
-    double y        =   0;
-    double z        =   0;
-    double theta    =   0;
-    double phi      =   0;
+    Vector3D particle_position(0,0,0);
+    Vector3D particle_direction(0,0,0);
 
     double width    =   10;
     double height   =   width;
@@ -1263,15 +1082,13 @@ TEST(DistanceTo , Box ) {
     double rnd_phi;
     double rnd_theta;
 
+    double phi;
 
     double dist;
     double dist1;
     double dist2;
 
     pair<double,double> distance;
-
-    PROPOSALParticle * particle = new PROPOSALParticle(ParticleType::MuMinus,x,y,z,theta,phi,0,0);
-
 
     MathModel M;
     int number_particles = 1e5;
@@ -1284,26 +1101,14 @@ TEST(DistanceTo , Box ) {
 
         // The values are divided by 100 to convert the units...
         // Init functions expects m but here everthing is in cm
-        Box A(0,0,0,width/100,width/100,height/100);
+        Box A(Vector3D(0,0,0),width/100,width/100,height/100);
 
-        phi     =   rnd_phi*2*PI;
-        theta   =   0.5*PI;
+        particle_direction.SetSphericalCoordinates(1,rnd_phi*2*PI,0.5*PI);
+        particle_direction.CalculateCartesianFromSpherical();
 
+        distance = A.DistanceToBorder(particle_position,particle_direction);
 
-        // Chose particle location and angle
-
-
-        theta   = 180/PI*theta;
-        phi     = 180/PI*phi;
-
-        particle->SetX(x);
-        particle->SetY(y);
-        particle->SetZ(z);
-        particle->SetTheta(theta);
-        particle->SetPhi(phi);
-
-        distance    =   A.DistanceToBorder(particle);
-
+        phi = particle_direction.GetPhi()*180./PI;
         if( phi < 45)
         {
             dist = 0.5*width/cos(phi/180*PI);
@@ -1362,33 +1167,19 @@ TEST(DistanceTo , Box ) {
 
     }
 
-    Box A(0,0,0,width/100,width/100,height/100);
+    Box A(Vector3D(0,0,0),width/100,width/100,height/100);
 
     for(int i = 0; i < number_particles;i++)
     {
         rnd_phi =   M.RandomDouble();
 
-        phi     =   rnd_phi*0.5*PI;
-        theta   =   0.5*PI;
+        particle_direction.SetSphericalCoordinates(1,rnd_phi*0.5*PI,0.5*PI);
+        particle_direction.CalculateCartesianFromSpherical();
 
+        particle_position.SetCartesianCoordinates(-1*width,0,0);
 
-        // Chose particle location and angle
-
-        theta   = 180/PI*theta;
-        phi     = 180/PI*phi;
-
-        x= -1*width;
-        y=0;
-        z=0;
-
-        particle->SetX(x);
-        particle->SetY(y);
-        particle->SetZ(z);
-        particle->SetTheta(theta);
-        particle->SetPhi(phi);
-
-        phi =   phi/180*PI;
-        distance    =   A.DistanceToBorder(particle);
+        phi = particle_direction.GetPhi();
+        distance = A.DistanceToBorder(particle_position,particle_direction);
 
         //                       ________________           z|
         //                      |               |            |
@@ -1400,10 +1191,10 @@ TEST(DistanceTo , Box ) {
         //                      |               |
         //                      |_______________|
 
-        if( phi < atan(0.5*width/(0.5*width-x)) )
+        if( phi < atan(0.5*width/(0.5*width - particle_position.GetX())) )
         {
-            dist1   =   (-x-0.5*width)/cos(phi);
-            dist2   =   (0.5*width-x)/cos(phi);
+            dist1   =   (-particle_position.GetX()-0.5*width)/cos(phi);
+            dist2   =   (0.5*width-particle_position.GetX())/cos(phi);
             ASSERT_NEAR(distance.first, dist1,1e-8*(dist1));
             ASSERT_NEAR(distance.second, dist2,1e-8*(dist2));
 
@@ -1421,9 +1212,9 @@ TEST(DistanceTo , Box ) {
         //                      |               |
         //                      |_______________|
 
-        else if( phi < atan(width*0.5/(-x -0.5*width)))
+        else if( phi < atan(width*0.5/(-particle_position.GetX() -0.5*width)))
         {
-            dist1   =   (-x-0.5*width)/cos(phi);
+            dist1   =   (-particle_position.GetX()-0.5*width)/cos(phi);
             dist2   =   0.5*width/sin(phi);
             ASSERT_NEAR(distance.first, dist1,1e-8*(dist1));
             ASSERT_NEAR(distance.second, dist2,1e-8*(dist2));
@@ -1453,27 +1244,12 @@ TEST(DistanceTo , Box ) {
     {
         rnd_theta =   M.RandomDouble();
 
-        phi     =   0;
-        theta   =   rnd_theta*0.5*PI;;
+        particle_direction.SetSphericalCoordinates(1,0,rnd_theta*0.5*PI);
+        particle_direction.CalculateCartesianFromSpherical();
 
+        particle_position.SetCartesianCoordinates(0,0,-1*height);
 
-        // Chose particle location and angle
-
-        theta   = 180/PI*theta;
-        phi     = 180/PI*phi;
-
-        x=0;
-        y=0;
-        z=-1*height;
-
-        particle->SetX(x);
-        particle->SetY(y);
-        particle->SetZ(z);
-        particle->SetTheta(theta);
-        particle->SetPhi(phi);
-
-        theta =   theta/180*PI;
-        distance    =   A.DistanceToBorder(particle);
+        distance = A.DistanceToBorder(particle_position,particle_direction);
 
         //                       ________________       x|
         //                      |               |        |
@@ -1485,10 +1261,10 @@ TEST(DistanceTo , Box ) {
         //                      |               |
         //                      |_______________|
 
-        if( theta < atan(0.5*height/(0.5*height-z)) )
+        if( particle_direction.GetTheta() < atan(0.5*height/(0.5*height - particle_position.GetZ())) )
         {
-            dist1   =   (-z-0.5*height)/cos(theta);
-            dist2   =   (0.5*height-z)/cos(theta);
+            dist1   =   (-particle_position.GetZ()-0.5*height)/cos(particle_direction.GetTheta());
+            dist2   =   (0.5*height-particle_position.GetZ())/cos(particle_direction.GetTheta());
             ASSERT_NEAR(distance.first, dist1,1e-8*(dist1));
             ASSERT_NEAR(distance.second, dist2,1e-8*(dist2));
 
@@ -1506,10 +1282,10 @@ TEST(DistanceTo , Box ) {
         //                      |               |
         //                      |_______________|
 
-        else if( theta < atan(height*0.5/(-z -0.5*height)))
+        else if( particle_direction.GetTheta() < atan(height*0.5/(-particle_position.GetZ() -0.5*height)))
         {
-            dist1   =   (-z-0.5*height)/cos(theta);
-            dist2   =   0.5*height/sin(theta);
+            dist1   =   (-particle_position.GetZ()-0.5*height)/cos(particle_direction.GetTheta());
+            dist2   =   0.5*height/sin(particle_direction.GetTheta());
             ASSERT_NEAR(distance.first, dist1,1e-8*(dist1));
             ASSERT_NEAR(distance.second, dist2,1e-8*(dist2));
         }

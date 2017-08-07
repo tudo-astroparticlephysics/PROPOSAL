@@ -6,6 +6,7 @@
 #include "PROPOSAL/Decay.h"
 #include "PROPOSAL/CrossSections.h"
 #include "PROPOSAL/Output.h"
+#include "PROPOSAL/Constants.h"
 
 
 using namespace std;
@@ -37,9 +38,14 @@ public:
     }
 };
 
-TEST(Comparison , Comparison_equal ) {
+Vector3D position(1.,1.,1.);
+Vector3D direction(0.,0.,0.);
 
-    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
+TEST(Comparison , Comparison_equal ) {
+    direction.SetSphericalCoordinates(1,.20*PI/180.,20*PI/180.);
+    direction.CalculateCartesianFromSpherical();
+
+    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,position,direction,1e5,10);
     Decay *A = new Decay(particle);
     Decay *B = new Decay(particle);
     EXPECT_TRUE(*A==*B);
@@ -56,9 +62,11 @@ TEST(Comparison , Comparison_equal ) {
 }
 
 TEST(Comparison , Comparison_not_equal ) {
+    direction.SetSphericalCoordinates(1,20*PI/180.,20*PI/180.);
+    direction.CalculateCartesianFromSpherical();
 
-    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,20,20,1e5,10);
-    PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,20,20,1e5,10);
+    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,position,direction,1e5,10);
+    PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::TauMinus,position,direction,1e5,10);
     Decay *A = new Decay(particle);
     Decay *B = new Decay(particle2);
 
@@ -83,7 +91,9 @@ TEST(Assignment , Copyconstructor ) {
 }
 
 TEST(Assignment , Copyconstructor2 ) {
-    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
+    direction.SetSphericalCoordinates(1,.20*PI/180.,20*PI/180.);
+    direction.CalculateCartesianFromSpherical();
+    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,position,direction,1e5,10);
 
     Decay A(particle);
     Decay B(A);
@@ -93,8 +103,10 @@ TEST(Assignment , Copyconstructor2 ) {
 }
 
 TEST(Assignment , Operator ) {
-    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
-    PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,.20,20,1e5,10);
+    direction.SetSphericalCoordinates(1,.20*PI/180.,20*PI/180.);
+    direction.CalculateCartesianFromSpherical();
+    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,position,direction,1e5,10);
+    PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::TauMinus,position,direction,1e5,10);
     Decay A(particle);
     Decay B(particle2);
 
@@ -104,7 +116,7 @@ TEST(Assignment , Operator ) {
 
     EXPECT_TRUE(A==B);
 
-    PROPOSALParticle *particle3 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle3 = new PROPOSALParticle(ParticleType::TauMinus,position,direction,1e5,10);
     Decay *C = new Decay(particle3);
     EXPECT_TRUE(A!=*C);
 
@@ -115,16 +127,18 @@ TEST(Assignment , Operator ) {
 }
 
 TEST(Assignment , Swap ) {
+    direction.SetSphericalCoordinates(1,.20*PI/180.,20*PI/180.);
+    direction.CalculateCartesianFromSpherical();
 
-    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
-    PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,position,direction,1e5,10);
+    PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::MuMinus,position,direction,1e5,10);
 
     Decay A(particle);
     Decay B(particle2);
     EXPECT_TRUE(A==B);
 
-    PROPOSALParticle *particle3 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,.20,20,1e5,10);
-    PROPOSALParticle *particle4 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle3 = new PROPOSALParticle(ParticleType::TauMinus,position,direction,1e5,10);
+    PROPOSALParticle *particle4 = new PROPOSALParticle(ParticleType::TauMinus,position,direction,1e5,10);
 
     Decay *C = new Decay(particle3);
     Decay *D = new Decay(particle4);
@@ -142,6 +156,8 @@ TEST(Assignment , Swap ) {
 }
 
 TEST(Decay , decay ) {
+    direction.SetSphericalCoordinates(1,.20*PI/180.,20*PI/180.);
+    direction.CalculateCartesianFromSpherical();
 
     ifstream in;
     in.open("bin/TestFiles/Decay_decay.txt");
@@ -161,7 +177,7 @@ TEST(Decay , decay ) {
     {
         in>>particleName>>energy>>decay;
 
-        PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10);
+        PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),position,direction,1e5,10);
         particle->SetEnergy(energy);
 
         Decay* dec  = new Decay(particle);
@@ -177,6 +193,8 @@ TEST(Decay , decay ) {
 
 
 TEST(Decay , ProductEnergy ) {
+    direction.SetSphericalCoordinates(1,.20*PI/180.,20*PI/180.);
+    direction.CalculateCartesianFromSpherical();
 
     ifstream in;
     in.open("bin/TestFiles/Decay_ProductEnergy.txt");
@@ -205,7 +223,7 @@ TEST(Decay , ProductEnergy ) {
     {
         in>>particleName>>energy>>product_energy;
 
-        PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10);
+        PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),position,direction,1e5,10);
         particle->SetEnergy(energy);
 
         rnd1= Rand1->rnd();
