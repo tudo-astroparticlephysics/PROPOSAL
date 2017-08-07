@@ -65,7 +65,7 @@ Component::Component(std::string name, double nucCharge, double atomicNum, doubl
     SetLogConstant();
     SetBPrime();
 
-    M_ = nucCharge_ * MP + atomicNum_ - nucCharge_ * MN;
+    M_ =(nucCharge_ * MP + (atomicNum_ - nucCharge_) * MN) / atomicNum_;
 
     if (nucCharge != 1.0)
     {
