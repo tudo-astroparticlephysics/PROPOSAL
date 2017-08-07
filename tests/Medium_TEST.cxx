@@ -146,6 +146,14 @@ TEST(Assignment , Swap ) {
     A.swap(*C);
     C->swap(*E);
     EXPECT_TRUE(A==*C);
+
+    Medium* X = new Ice(0.3);
+    Medium* Y = new Copper(0.3);
+
+    X->swap(*Y);
+
+    Copper Z(0.3);
+    EXPECT_TRUE(*X == Z);
 }
 
 int main(int argc, char **argv) {
