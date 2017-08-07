@@ -1573,9 +1573,6 @@ void ProcessCollection::swap(ProcessCollection &collection)
     SetParticle( new PROPOSALParticle(tmp_particle1) );
     collection.SetParticle( new PROPOSALParticle(tmp_particle2) );
 
-    SetMedium( collection.medium_->clone());
-    collection.SetMedium(medium_->clone());
-
     SetCutSettings(  new EnergyCutSettings(tmp_cuts1) );
     collection.SetCutSettings( new EnergyCutSettings(tmp_cuts2) );
 
