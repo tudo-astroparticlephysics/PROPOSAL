@@ -90,17 +90,22 @@ std::vector<PROPOSALParticle*> Propagator::propagate(double MaxDistance_cm)
     // energy_at_entry_point is initialized with the current energy because this is a
     // reasonable value for particle which starts inside the detector
 
-    double energy_at_entry_point            =   particle_->GetEnergy();
-    double energy_at_exit_point             =   0;
+    double energy_at_entry_point = particle_->GetEnergy();
+    double energy_at_exit_point  = 0;
 
+    Vector3D particle_position = particle_->GetPosition();
+    Vector3D particle_direction = particle_->GetDirection();
 
-    bool starts_in_detector     =   detector_->IsInside(particle_);
+    bool starts_in_detector =   detector_->IsInside(particle_position, particle_direction);
     bool is_in_detector     =   false;
     bool was_in_detector    =   false;
 
     while(1)
     {
-        ChooseCurrentCollection(particle_);
+        particle_position = particle_->GetPosition();
+        particle_direction = particle_->GetDirection();
+
+        ChooseCurrentCollection(particle_position, particle_direction);
 
         if(current_collection_ == NULL)
         {
@@ -112,7 +117,7 @@ std::vector<PROPOSALParticle*> Propagator::propagate(double MaxDistance_cm)
         // or only to the collection border
 
         distance_to_collection_border =
-        current_collection_->GetGeometry()->DistanceToBorder(particle_).first;
+        current_collection_->GetGeometry()->DistanceToBorder(particle_position, particle_direction).first;
         double tmp_distance_to_border;
         for(unsigned int i = 0 ; i < collections_.size() ; i++)
         {
@@ -120,7 +125,7 @@ std::vector<PROPOSALParticle*> Propagator::propagate(double MaxDistance_cm)
             if (particle_->GetType() != collections_.at(i)->GetParticle()->GetType())
                 continue;
 
-            if(detector_->IsInfront(particle_))
+            if(detector_->IsInfront(particle_position, particle_direction))
             {
                 if(collections_.at(i)->GetLocation() != 0)
                     continue;
@@ -128,7 +133,7 @@ std::vector<PROPOSALParticle*> Propagator::propagate(double MaxDistance_cm)
                 {
                     if(collections_.at(i)->GetGeometry()->GetHirarchy() >= current_collection_->GetGeometry()->GetHirarchy())
                     {
-                        tmp_distance_to_border = collections_.at(i)->GetGeometry()->DistanceToBorder(particle_).first;
+                        tmp_distance_to_border = collections_.at(i)->GetGeometry()->DistanceToBorder(particle_position, particle_direction).first;
                         if(tmp_distance_to_border<=0)continue;
                         distance_to_collection_border = min(
                                       tmp_distance_to_border
@@ -137,13 +142,13 @@ std::vector<PROPOSALParticle*> Propagator::propagate(double MaxDistance_cm)
                 }
             }
 
-            else if(detector_->IsInside(particle_))
+            else if(detector_->IsInside(particle_position, particle_direction))
             {
                 if(collections_.at(i)->GetLocation() != 1)
                     continue;
                 else
                 {
-                    tmp_distance_to_border = collections_.at(i)->GetGeometry()->DistanceToBorder(particle_).first;
+                    tmp_distance_to_border = collections_.at(i)->GetGeometry()->DistanceToBorder(particle_position, particle_direction).first;
                     if(tmp_distance_to_border<=0)continue;
                     distance_to_collection_border = min(
                                   tmp_distance_to_border
@@ -152,7 +157,7 @@ std::vector<PROPOSALParticle*> Propagator::propagate(double MaxDistance_cm)
 
             }
 
-            else if(detector_->IsBehind(particle_))
+            else if(detector_->IsBehind(particle_position, particle_direction))
             {
                 if(collections_.at(i)->GetLocation() != 2)
                     continue;
@@ -160,7 +165,7 @@ std::vector<PROPOSALParticle*> Propagator::propagate(double MaxDistance_cm)
                 {
                     if(collections_.at(i)->GetGeometry()->GetHirarchy() >= current_collection_->GetGeometry()->GetHirarchy())
                     {
-                        tmp_distance_to_border = collections_.at(i)->GetGeometry()->DistanceToBorder(particle_).first;
+                        tmp_distance_to_border = collections_.at(i)->GetGeometry()->DistanceToBorder(particle_position, particle_direction).first;
                         if(tmp_distance_to_border<=0)continue;
                         distance_to_collection_border = min(
                                       tmp_distance_to_border
@@ -175,17 +180,13 @@ std::vector<PROPOSALParticle*> Propagator::propagate(double MaxDistance_cm)
             }
         }
 
-        distance_to_detector =
-        detector_->DistanceToBorder(particle_).first;
+        distance_to_detector = detector_->DistanceToBorder(particle_position, particle_direction).first;
 
-        distance_to_closest_approach  =
-        detector_->DistanceToClosestApproach(particle_);
+        distance_to_closest_approach = detector_->DistanceToClosestApproach(particle_position, particle_direction);
 
         if(abs(distance_to_closest_approach) < GEOMETRY_PRECISION )
         {
-            particle_->SetXc( particle_->GetX() );
-            particle_->SetYc( particle_->GetY() );
-            particle_->SetZc( particle_->GetZ() );
+            particle_->SetClosestApproachPoint(particle_position);
             particle_->SetEc( particle_->GetEnergy() );
             particle_->SetTc( particle_->GetT() );
 
@@ -244,40 +245,34 @@ std::vector<PROPOSALParticle*> Propagator::propagate(double MaxDistance_cm)
         }
 
 
-        is_in_detector  =   detector_->IsInside(particle_);
+        is_in_detector  =   detector_->IsInside(particle_position, particle_direction);
         // entry point of the detector
         if(!starts_in_detector && !was_in_detector && is_in_detector)
         {
-            particle_->SetXi( particle_->GetX() );
-            particle_->SetYi( particle_->GetY() );
-            particle_->SetZi( particle_->GetZ() );
+            particle_->SetEntryPoint(particle_position);
             particle_->SetEi( particle_->GetEnergy() );
             particle_->SetTi( particle_->GetT() );
 
-            energy_at_entry_point   =   particle_->GetEnergy();
+            energy_at_entry_point = particle_->GetEnergy();
 
-            was_in_detector =   true;
+            was_in_detector = true;
         }
         // exit point of the detector
         else if(was_in_detector && !is_in_detector)
         {
-            particle_->SetXf( particle_->GetX() );
-            particle_->SetYf( particle_->GetY() );
-            particle_->SetZf( particle_->GetZ() );
+            particle_->SetExitPoint(particle_position);
             particle_->SetEf( particle_->GetEnergy() );
             particle_->SetTf( particle_->GetT() );
 
-            energy_at_exit_point    =   particle_->GetEnergy();
+            energy_at_exit_point = particle_->GetEnergy();
             //we don't want to run in this case a second time so we set was_in_detector to false
-            was_in_detector =   false;
+            was_in_detector = false;
 
         }
         // if particle starts inside the detector we only ant to fill the exit point
         else if(starts_in_detector && !is_in_detector)
         {
-            particle_->SetXf( particle_->GetX() );
-            particle_->SetYf( particle_->GetY() );
-            particle_->SetZf( particle_->GetZ() );
+            particle_->SetExitPoint(particle_position);
             particle_->SetEf( particle_->GetEnergy() );
             particle_->SetTf( particle_->GetT() );
 
@@ -312,244 +307,244 @@ std::vector<PROPOSALParticle*> Propagator::propagate(double MaxDistance_cm)
 //----------------------------------------------------------------------------//
 
 
-vector<PROPOSALParticle*> Propagator::Propagate( PROPOSALParticle *particle, double MaxDistance_cm )
-{
-    Output::getInstance().ClearSecondaryVector();
+// vector<PROPOSALParticle*> Propagator::Propagate( PROPOSALParticle *particle, double MaxDistance_cm )
+// {
+//     Output::getInstance().ClearSecondaryVector();
 
-    Output::getInstance().GetSecondarys().reserve(1000);
+//     Output::getInstance().GetSecondarys().reserve(1000);
 
-    #if ROOT_SUPPORT
-        Output::getInstance().StorePrimaryInTree(particle);
-    #endif
+//     #if ROOT_SUPPORT
+//         Output::getInstance().StorePrimaryInTree(particle);
+//     #endif
 
-    if(Output::store_in_ASCII_file_)Output::getInstance().StorePrimaryInASCII(particle);
+//     if(Output::store_in_ASCII_file_)Output::getInstance().StorePrimaryInASCII(particle);
 
-    SetParticle(particle);
+//     SetParticle(particle);
 
-    double distance_to_collection_border    =   0;
-    double distance_to_detector             =   0;
-    double distance_to_closest_approach     =   0;
-    double distance                         =   0;
-    double result                           =   0;
+//     double distance_to_collection_border    =   0;
+//     double distance_to_detector             =   0;
+//     double distance_to_closest_approach     =   0;
+//     double distance                         =   0;
+//     double result                           =   0;
 
-    // These two variables are needed to calculate the energy loss inside the detector
-    // energy_at_entry_point is initialized with the current energy because this is a
-    // reasonable value for particle which starts inside the detector
+//     // These two variables are needed to calculate the energy loss inside the detector
+//     // energy_at_entry_point is initialized with the current energy because this is a
+//     // reasonable value for particle which starts inside the detector
 
-    double energy_at_entry_point            =   particle_->GetEnergy();
-    double energy_at_exit_point             =   0;
-
-
-    bool starts_in_detector     =   detector_->IsInside(particle_);
-    bool is_in_detector     =   false;
-    bool was_in_detector    =   false;
-
-    while(1)
-    {
-        ChooseCurrentCollection(particle_);
-        if(current_collection_ == NULL)
-        {
-            log_info("particle reached the border");
-            break;
-        }
-
-        // Check if have have to propagate the particle through the whole collection
-        // or only to the collection border
-
-        distance_to_collection_border =
-        current_collection_->GetGeometry()->DistanceToBorder(particle_).first;
-        double tmp_distance_to_border;
-        for(unsigned int i = 0 ; i < collections_.size() ; i++)
-        {
-
-            if (particle->GetType() != collections_.at(i)->GetParticle()->GetType())
-                continue;
-
-            if(detector_->IsInfront(particle))
-            {
-                if(collections_.at(i)->GetLocation() != 0)
-                    continue;
-                else
-                {
-                    if(collections_.at(i)->GetGeometry()->GetHirarchy() >= current_collection_->GetGeometry()->GetHirarchy())
-                    {
-                        tmp_distance_to_border = collections_.at(i)->GetGeometry()->DistanceToBorder(particle_).first;
-                        if(tmp_distance_to_border<=0)continue;
-                        distance_to_collection_border = min(
-                                      tmp_distance_to_border
-                                    , distance_to_collection_border);
-                    }
-                }
-            }
-
-            else if(detector_->IsInside(particle))
-            {
-                if(collections_.at(i)->GetLocation() != 1)
-                    continue;
-                else
-                {
-                    tmp_distance_to_border = collections_.at(i)->GetGeometry()->DistanceToBorder(particle_).first;
-                    if(tmp_distance_to_border<=0)continue;
-                    distance_to_collection_border = min(
-                                  tmp_distance_to_border
-                                , distance_to_collection_border);
-                }
-
-            }
-
-            else if(detector_->IsBehind(particle))
-            {
-                if(collections_.at(i)->GetLocation() != 2)
-                    continue;
-                else
-                {
-                    if(collections_.at(i)->GetGeometry()->GetHirarchy() >= current_collection_->GetGeometry()->GetHirarchy())
-                    {
-                        tmp_distance_to_border = collections_.at(i)->GetGeometry()->DistanceToBorder(particle_).first;
-                        if(tmp_distance_to_border<=0)continue;
-                        distance_to_collection_border = min(
-                                      tmp_distance_to_border
-                                    , distance_to_collection_border);
-                    }
-                    //The particle reached the border of all specified collections
-                    else
-                    {
-
-                    }
-                }
-            }
-        }
-
-        distance_to_detector =
-        detector_->DistanceToBorder(particle_).first;
-
-        distance_to_closest_approach  =
-        detector_->DistanceToClosestApproach(particle_);
-
-        if(abs(distance_to_closest_approach) < GEOMETRY_PRECISION )
-        {
-            particle_->SetXc( particle_->GetX() );
-            particle_->SetYc( particle_->GetY() );
-            particle_->SetZc( particle_->GetZ() );
-            particle_->SetEc( particle_->GetEnergy() );
-            particle_->SetTc( particle_->GetT() );
-
-            distance_to_closest_approach    =   0;
-
-        }
-
-        if(distance_to_detector > 0)
-        {
-            if(distance_to_closest_approach > 0)
-            {
-                if( distance_to_detector < distance_to_collection_border &&
-                    distance_to_detector < distance_to_closest_approach )
-                {
-                    distance    =   distance_to_detector;
-                }
-                else if( distance_to_closest_approach < distance_to_collection_border)
-                {
-                    distance    =   distance_to_closest_approach;
-                }
-                else
-                {
-                    distance    =   distance_to_collection_border;
-                }
-            }
-            else
-            {
-                if( distance_to_detector < distance_to_collection_border)
-                {
-                    distance    =   distance_to_detector;
-                }
-                else
-                {
-                    distance    =   distance_to_collection_border;
-                }
-            }
-
-        }
-        else
-        {
-            if(distance_to_closest_approach > 0)
-            {
-                if( distance_to_closest_approach < distance_to_collection_border)
-                {
-                    distance    =   distance_to_closest_approach;
-                }
-                else
-                {
-                    distance    =   distance_to_collection_border;
-                }
-            }
-            else
-            {
-                distance    =   distance_to_collection_border;
-            }
-        }
+//     double energy_at_entry_point            =   particle_->GetEnergy();
+//     double energy_at_exit_point             =   0;
 
 
-        is_in_detector  =   detector_->IsInside(particle_);
-        // entry point of the detector
-        if(!starts_in_detector && !was_in_detector && is_in_detector)
-        {
-            particle_->SetXi( particle_->GetX() );
-            particle_->SetYi( particle_->GetY() );
-            particle_->SetZi( particle_->GetZ() );
-            particle_->SetEi( particle_->GetEnergy() );
-            particle_->SetTi( particle_->GetT() );
+//     bool starts_in_detector     =   detector_->IsInside(particle_);
+//     bool is_in_detector     =   false;
+//     bool was_in_detector    =   false;
 
-            energy_at_entry_point   =   particle_->GetEnergy();
+//     while(1)
+//     {
+//         ChooseCurrentCollection(particle_);
+//         if(current_collection_ == NULL)
+//         {
+//             log_info("particle reached the border");
+//             break;
+//         }
 
-            was_in_detector =   true;
-        }
-        // exit point of the detector
-        else if(was_in_detector && !is_in_detector)
-        {
-            particle_->SetXf( particle_->GetX() );
-            particle_->SetYf( particle_->GetY() );
-            particle_->SetZf( particle_->GetZ() );
-            particle_->SetEf( particle_->GetEnergy() );
-            particle_->SetTf( particle_->GetT() );
+//         // Check if have have to propagate the particle through the whole collection
+//         // or only to the collection border
 
-            energy_at_exit_point    =   particle_->GetEnergy();
-            //we don't want to run in this case a second time so we set was_in_detector to false
-            was_in_detector =   false;
+//         distance_to_collection_border =
+//         current_collection_->GetGeometry()->DistanceToBorder(particle_).first;
+//         double tmp_distance_to_border;
+//         for(unsigned int i = 0 ; i < collections_.size() ; i++)
+//         {
 
-        }
-        // if particle starts inside the detector we only ant to fill the exit point
-        else if(starts_in_detector && !is_in_detector)
-        {
-            particle_->SetXf( particle_->GetX() );
-            particle_->SetYf( particle_->GetY() );
-            particle_->SetZf( particle_->GetZ() );
-            particle_->SetEf( particle_->GetEnergy() );
-            particle_->SetTf( particle_->GetT() );
+//             if (particle->GetType() != collections_.at(i)->GetParticle()->GetType())
+//                 continue;
 
-            energy_at_exit_point    =   particle_->GetEnergy();
-            //we don't want to run in this case a second time so we set starts_in_detector to false
-            starts_in_detector  =   false;
+//             if(detector_->IsInfront(particle))
+//             {
+//                 if(collections_.at(i)->GetLocation() != 0)
+//                     continue;
+//                 else
+//                 {
+//                     if(collections_.at(i)->GetGeometry()->GetHirarchy() >= current_collection_->GetGeometry()->GetHirarchy())
+//                     {
+//                         tmp_distance_to_border = collections_.at(i)->GetGeometry()->DistanceToBorder(particle_).first;
+//                         if(tmp_distance_to_border<=0)continue;
+//                         distance_to_collection_border = min(
+//                                       tmp_distance_to_border
+//                                     , distance_to_collection_border);
+//                     }
+//                 }
+//             }
 
-        }
-        if(MaxDistance_cm <= particle_->GetPropagatedDistance() + distance)
-        {
-            distance = MaxDistance_cm - particle_->GetPropagatedDistance();
-        }
-        result  =   Propagate(distance);
-        if(result<=0 || MaxDistance_cm <= particle_->GetPropagatedDistance()) break;
+//             else if(detector_->IsInside(particle))
+//             {
+//                 if(collections_.at(i)->GetLocation() != 1)
+//                     continue;
+//                 else
+//                 {
+//                     tmp_distance_to_border = collections_.at(i)->GetGeometry()->DistanceToBorder(particle_).first;
+//                     if(tmp_distance_to_border<=0)continue;
+//                     distance_to_collection_border = min(
+//                                   tmp_distance_to_border
+//                                 , distance_to_collection_border);
+//                 }
 
-    }
+//             }
 
-    particle_->SetElost(energy_at_entry_point - energy_at_exit_point);
+//             else if(detector_->IsBehind(particle))
+//             {
+//                 if(collections_.at(i)->GetLocation() != 2)
+//                     continue;
+//                 else
+//                 {
+//                     if(collections_.at(i)->GetGeometry()->GetHirarchy() >= current_collection_->GetGeometry()->GetHirarchy())
+//                     {
+//                         tmp_distance_to_border = collections_.at(i)->GetGeometry()->DistanceToBorder(particle_).first;
+//                         if(tmp_distance_to_border<=0)continue;
+//                         distance_to_collection_border = min(
+//                                       tmp_distance_to_border
+//                                     , distance_to_collection_border);
+//                     }
+//                     //The particle reached the border of all specified collections
+//                     else
+//                     {
 
-    #if ROOT_SUPPORT
-        Output::getInstance().StorePropagatedPrimaryInTree(particle);
-    #endif
-        if(Output::store_in_ASCII_file_)Output::getInstance().StorePropagatedPrimaryInASCII(particle);
+//                     }
+//                 }
+//             }
+//         }
 
-    return Output::getInstance().GetSecondarys();
+//         distance_to_detector =
+//         detector_->DistanceToBorder(particle_).first;
 
-}
+//         distance_to_closest_approach  =
+//         detector_->DistanceToClosestApproach(particle_);
+
+//         if(abs(distance_to_closest_approach) < GEOMETRY_PRECISION )
+//         {
+//             particle_->SetXc( particle_->GetX() );
+//             particle_->SetYc( particle_->GetY() );
+//             particle_->SetZc( particle_->GetZ() );
+//             particle_->SetEc( particle_->GetEnergy() );
+//             particle_->SetTc( particle_->GetT() );
+
+//             distance_to_closest_approach    =   0;
+
+//         }
+
+//         if(distance_to_detector > 0)
+//         {
+//             if(distance_to_closest_approach > 0)
+//             {
+//                 if( distance_to_detector < distance_to_collection_border &&
+//                     distance_to_detector < distance_to_closest_approach )
+//                 {
+//                     distance    =   distance_to_detector;
+//                 }
+//                 else if( distance_to_closest_approach < distance_to_collection_border)
+//                 {
+//                     distance    =   distance_to_closest_approach;
+//                 }
+//                 else
+//                 {
+//                     distance    =   distance_to_collection_border;
+//                 }
+//             }
+//             else
+//             {
+//                 if( distance_to_detector < distance_to_collection_border)
+//                 {
+//                     distance    =   distance_to_detector;
+//                 }
+//                 else
+//                 {
+//                     distance    =   distance_to_collection_border;
+//                 }
+//             }
+
+//         }
+//         else
+//         {
+//             if(distance_to_closest_approach > 0)
+//             {
+//                 if( distance_to_closest_approach < distance_to_collection_border)
+//                 {
+//                     distance    =   distance_to_closest_approach;
+//                 }
+//                 else
+//                 {
+//                     distance    =   distance_to_collection_border;
+//                 }
+//             }
+//             else
+//             {
+//                 distance    =   distance_to_collection_border;
+//             }
+//         }
+
+
+//         is_in_detector  =   detector_->IsInside(particle_);
+//         // entry point of the detector
+//         if(!starts_in_detector && !was_in_detector && is_in_detector)
+//         {
+//             particle_->SetXi( particle_->GetX() );
+//             particle_->SetYi( particle_->GetY() );
+//             particle_->SetZi( particle_->GetZ() );
+//             particle_->SetEi( particle_->GetEnergy() );
+//             particle_->SetTi( particle_->GetT() );
+
+//             energy_at_entry_point   =   particle_->GetEnergy();
+
+//             was_in_detector =   true;
+//         }
+//         // exit point of the detector
+//         else if(was_in_detector && !is_in_detector)
+//         {
+//             particle_->SetXf( particle_->GetX() );
+//             particle_->SetYf( particle_->GetY() );
+//             particle_->SetZf( particle_->GetZ() );
+//             particle_->SetEf( particle_->GetEnergy() );
+//             particle_->SetTf( particle_->GetT() );
+
+//             energy_at_exit_point    =   particle_->GetEnergy();
+//             //we don't want to run in this case a second time so we set was_in_detector to false
+//             was_in_detector =   false;
+
+//         }
+//         // if particle starts inside the detector we only ant to fill the exit point
+//         else if(starts_in_detector && !is_in_detector)
+//         {
+//             particle_->SetXf( particle_->GetX() );
+//             particle_->SetYf( particle_->GetY() );
+//             particle_->SetZf( particle_->GetZ() );
+//             particle_->SetEf( particle_->GetEnergy() );
+//             particle_->SetTf( particle_->GetT() );
+
+//             energy_at_exit_point    =   particle_->GetEnergy();
+//             //we don't want to run in this case a second time so we set starts_in_detector to false
+//             starts_in_detector  =   false;
+
+//         }
+//         if(MaxDistance_cm <= particle_->GetPropagatedDistance() + distance)
+//         {
+//             distance = MaxDistance_cm - particle_->GetPropagatedDistance();
+//         }
+//         result  =   Propagate(distance);
+//         if(result<=0 || MaxDistance_cm <= particle_->GetPropagatedDistance()) break;
+
+//     }
+
+//     particle_->SetElost(energy_at_entry_point - energy_at_exit_point);
+
+//     #if ROOT_SUPPORT
+//         Output::getInstance().StorePropagatedPrimaryInTree(particle);
+//     #endif
+//         if(Output::store_in_ASCII_file_)Output::getInstance().StorePropagatedPrimaryInASCII(particle);
+
+//     return Output::getInstance().GetSecondarys();
+
+// }
 
 
 //----------------------------------------------------------------------------//
@@ -666,7 +661,7 @@ double Propagator::Propagate( double distance )
                 continue;
             }
             final_energy    -=  energy_loss.first;
-            log_debug("Energyloss: %f\t%s\t%f\t%f\t%f", energy_loss.first, PROPOSALParticle::GetName(energy_loss.second).c_str(), particle_->GetX(), particle_->GetY(), particle_->GetZ());
+            log_debug("Energyloss: %f\t%s", energy_loss.first, PROPOSALParticle::GetName(energy_loss.second).c_str());
             secondary_id    =   particle_->GetParticleId() + 1;
             Output::getInstance().FillSecondaryVector(particle_, secondary_id, energy_loss, 0);
         }
@@ -760,9 +755,7 @@ void Propagator::AdvanceParticle(double dr, double ei, double ef)
 
     double dist = particle_->GetPropagatedDistance();
     double time = particle_->GetT();
-    double x    = particle_->GetX();
-    double y    = particle_->GetY();
-    double z    = particle_->GetZ();
+    Vector3D position = particle_->GetPosition();
 
     dist   +=  dr;
 
@@ -785,11 +778,11 @@ void Propagator::AdvanceParticle(double dr, double ei, double ef)
                 break;
 
             case 1:
-                scatteringFirstOrder_->Scatter(dr ,   particle_   ,   current_collection_->GetMedium());
+                scatteringFirstOrder_->Scatter(dr, particle_, current_collection_->GetMedium());
                 break;
 
             case 2:
-                scatteringFirstOrderMoliere_->Scatter(dr ,   particle_   ,   current_collection_->GetMedium());
+                scatteringFirstOrderMoliere_->Scatter(dr, particle_, current_collection_->GetMedium());
                 break;
             default:
                 log_error("Never should be here! scattering_model = %i !",scattering_model_);
@@ -798,12 +791,8 @@ void Propagator::AdvanceParticle(double dr, double ei, double ef)
     }
     else
     {
-        x   +=  particle_->GetSinTheta() * particle_->GetCosPhi() * dr;
-        y   +=  particle_->GetSinTheta() * particle_->GetSinPhi() * dr;
-        z   +=  particle_->GetCosTheta() * dr;
-        particle_->SetX(x);
-        particle_->SetY(y);
-        particle_->SetZ(z);
+        position = position + dr*particle_->GetDirection();
+        particle_->SetPosition(position);
     }
     particle_->SetPropagatedDistance(dist);
     particle_->SetT(time);
@@ -814,7 +803,7 @@ void Propagator::AdvanceParticle(double dr, double ei, double ef)
 //----------------------------------------------------------------------------//
 
 
-void Propagator::ChooseCurrentCollection(PROPOSALParticle* particle)
+void Propagator::ChooseCurrentCollection(Vector3D& particle_position, Vector3D& particle_direction)
 {
     vector<unsigned int> crossed_collections;
     crossed_collections.resize(0);
@@ -823,12 +812,12 @@ void Propagator::ChooseCurrentCollection(PROPOSALParticle* particle)
     {
         collections_.at(i)->RestoreBackup_particle();
 
-        if(particle->GetType() != collections_.at(i)->GetParticle()->GetType())
+        if(particle_->GetType() != collections_.at(i)->GetParticle()->GetType())
         {
             continue;
         }
 
-        if(detector_->IsInfront(particle))
+        if(detector_->IsInfront(particle_position, particle_direction))
         {
             if(collections_.at(i)->GetLocation() != 0)
             {
@@ -836,7 +825,7 @@ void Propagator::ChooseCurrentCollection(PROPOSALParticle* particle)
             }
             else
             {
-                if(collections_.at(i)->GetGeometry()->IsInside(particle))
+                if(collections_.at(i)->GetGeometry()->IsInside(particle_position, particle_direction))
                 {
                     current_collection_ = collections_.at(i);
                     crossed_collections.push_back(i);
@@ -848,7 +837,7 @@ void Propagator::ChooseCurrentCollection(PROPOSALParticle* particle)
             }
         }
 
-        else if(detector_->IsInside(particle))
+        else if(detector_->IsInside(particle_position, particle_direction))
         {
             if(collections_.at(i)->GetLocation() != 1)
             {
@@ -856,7 +845,7 @@ void Propagator::ChooseCurrentCollection(PROPOSALParticle* particle)
             }
             else
             {
-                if(collections_.at(i)->GetGeometry()->IsInside(particle))
+                if(collections_.at(i)->GetGeometry()->IsInside(particle_position, particle_direction))
                 {
                     current_collection_ = collections_.at(i);
                     crossed_collections.push_back(i);
@@ -869,7 +858,7 @@ void Propagator::ChooseCurrentCollection(PROPOSALParticle* particle)
 
         }
 
-        else if(detector_->IsBehind(particle))
+        else if(detector_->IsBehind(particle_position, particle_direction))
         {
             if(collections_.at(i)->GetLocation() != 2)
             {
@@ -877,7 +866,7 @@ void Propagator::ChooseCurrentCollection(PROPOSALParticle* particle)
             }
             else
             {
-                if(collections_.at(i)->GetGeometry()->IsInside(particle))
+                if(collections_.at(i)->GetGeometry()->IsInside(particle_position, particle_direction))
                 {
                     current_collection_ = collections_.at(i);
                     crossed_collections.push_back(i);
@@ -1402,7 +1391,7 @@ Propagator::Propagator()
 {
     particle_              = new PROPOSALParticle(ParticleType::MuMinus);
     backup_particle_       = new PROPOSALParticle(*particle_);
-    detector_              = new Sphere(0.0, 0.0, 0.0, 1e18, 0);
+    detector_              = new Sphere(Vector3D(), 1e18, 0);
     // detector_              = new Geometry();
     // detector_->InitSphere(0,0,0,1e18,0);
     InitDefaultCollection(detector_);
@@ -1448,7 +1437,7 @@ Propagator::Propagator(
 {
     particle_              = new PROPOSALParticle(particle_type);
     backup_particle_       = new PROPOSALParticle(*particle_);
-    detector_              = new Sphere(0.0, 0.0, 0.0, 1e18, 0);
+    detector_              = new Sphere(Vector3D(), 1e18, 0);
     // detector_              = new Geometry();
     // detector_->InitSphere(0,0,0,1e18,0);
 
@@ -1529,7 +1518,7 @@ Propagator::Propagator(Medium* medium,
     particle_              = new PROPOSALParticle(particle_type);
     backup_particle_       = new PROPOSALParticle(*particle_);
     current_collection_    = new ProcessCollection(particle_, medium, cuts);
-    detector_              = new Sphere(0.0, 0.0, 0.0, 1e18, 0);
+    detector_              = new Sphere(Vector3D(), 1e18, 0);
     // detector_              = new Geometry();
     // detector_->InitSphere(0,0,0,1e18,0);
     current_collection_->SetGeometry(detector_);
@@ -1822,18 +1811,13 @@ void Propagator::MoveParticle(double distance)
 
     double dist = particle_->GetPropagatedDistance();
 
-    double x    = particle_->GetX();
-    double y    = particle_->GetY();
-    double z    = particle_->GetZ();
+    Vector3D position = particle_->GetPosition();
 
     dist   +=  distance;
 
-    x   +=  particle_->GetSinTheta() * particle_->GetCosPhi() * distance;
-    y   +=  particle_->GetSinTheta() * particle_->GetSinPhi() * distance;
-    z   +=  particle_->GetCosTheta() * distance;
-    particle_->SetX(x);
-    particle_->SetY(y);
-    particle_->SetZ(z);
+    position = position + distance*particle_->GetDirection();
+    
+    particle_->SetPosition(position);
 
     particle_->SetPropagatedDistance(dist);
 
@@ -2471,9 +2455,10 @@ Geometry* Propagator::InitGeometry(std::deque<std::string>* token, string first_
 {
     string taux = first_token;
 
-    double origin_x =   0;
-    double origin_y =   0;
-    double origin_z =   0;
+    double x_coord = 0.;
+    double y_coord = 0.;
+    double z_coord = 0.;
+
     if(ToLowerCase(taux).compare("cylinder")==0)
     {
         double radius;
@@ -2531,34 +2516,34 @@ Geometry* Propagator::InitGeometry(std::deque<std::string>* token, string first_
                 exit(1);
             }
         }
-        // origin_x, origin_y, origin_z, radius, inner_radius and height are specified
+        // position vector, radius, inner_radius and height are specified
         else if(token->size()==6)
         {
             taux    =   NextToken(token);
             try {
-                origin_x  = boost::lexical_cast<double>(taux);
+                x_coord = boost::lexical_cast<double>(taux);
             }
             catch(boost::bad_lexical_cast&) {
-                log_warn("origin_x is set to %s but must be a double! Set to 0",taux.c_str());
-                origin_x    =   0;
+                log_warn("x position is set to %s but must be a double! Set to 0",taux.c_str());
+                x_coord = 0;
             }
 
             taux    =   NextToken(token);
             try {
-                origin_y  = boost::lexical_cast<double>(taux);
+                y_coord = boost::lexical_cast<double>(taux);
             }
             catch(boost::bad_lexical_cast&) {
-                log_warn("origin_y is set to %s but must be a double! Set to 0", taux.c_str());
-                origin_y    =   0;
+                log_warn("y position is set to %s but must be a double! Set to 0", taux.c_str());
+                y_coord = 0;
             }
 
             taux    =   NextToken(token);
             try {
-                origin_z  = boost::lexical_cast<double>(taux);
+                z_coord = boost::lexical_cast<double>(taux);
             }
             catch(boost::bad_lexical_cast&) {
-                log_warn("origin_z is set to %s but must be a double! Set to 0",taux.c_str());
-                origin_z    =   0;
+                log_warn("z position is set to %s but must be a double! Set to 0",taux.c_str());
+                z_coord = 0;
             }
 
             taux    =   NextToken(token);
@@ -2594,7 +2579,7 @@ Geometry* Propagator::InitGeometry(std::deque<std::string>* token, string first_
             exit(1);
         }
 
-        return new Cylinder(origin_x,origin_y,origin_z,radius,inner_radius,height);
+        return new Cylinder(Vector3D(x_coord, y_coord, z_coord),radius,inner_radius,height);
         // geometry->InitCylinder(origin_x,origin_y,origin_z,radius,inner_radius,height);
 
     }
@@ -2637,34 +2622,34 @@ Geometry* Propagator::InitGeometry(std::deque<std::string>* token, string first_
             }
 
         }
-        // origin_x, origin_y, origin_z, radius, inner_radius and height are specified
+        // position vector, radius, inner_radius and height are specified
         else if(token->size()==5)
         {
             taux    =   NextToken(token);
             try {
-                origin_x  = boost::lexical_cast<double>(taux);
+                x_coord = boost::lexical_cast<double>(taux);
             }
             catch(boost::bad_lexical_cast&) {
-                log_warn("origin_x is set to %s but must be a double! Set to 0", taux.c_str());
-                origin_x    =   0;
+                log_warn("x position is set to %s but must be a double! Set to 0", taux.c_str());
+                x_coord = 0;
             }
 
             taux    =   NextToken(token);
             try {
-                origin_y  = boost::lexical_cast<double>(taux);
+                y_coord = boost::lexical_cast<double>(taux);
             }
             catch(boost::bad_lexical_cast&) {
-                log_warn("origin_y is set to %s but must be a double! Set to 0", taux.c_str());
-                origin_y    =   0;
+                log_warn("y position is set to %s but must be a double! Set to 0", taux.c_str());
+                y_coord = 0;
             }
 
             taux    =   NextToken(token);
             try {
-                origin_z  = boost::lexical_cast<double>(taux);
+                z_coord = boost::lexical_cast<double>(taux);
             }
             catch(boost::bad_lexical_cast&) {
-                log_warn("origin_z is set to %s but must be a double! Set to 0", taux.c_str());
-                origin_z    =   0;
+                log_warn("z position is set to %s but must be a double! Set to 0", taux.c_str());
+                z_coord = 0;
             }
 
             taux    =   NextToken(token);
@@ -2692,7 +2677,7 @@ Geometry* Propagator::InitGeometry(std::deque<std::string>* token, string first_
             exit(1);
         }
 
-        return new Sphere(origin_x,origin_y,origin_z,radius,inner_radius);
+        return new Sphere(Vector3D(x_coord, y_coord, z_coord),radius,inner_radius);
         // geometry->InitSphere(origin_x,origin_y,origin_z,radius,inner_radius);
 
     }
@@ -2732,34 +2717,34 @@ Geometry* Propagator::InitGeometry(std::deque<std::string>* token, string first_
                 exit(1);
             }
         }
-        // origin_x, origin_y, origin_z, width_x,width_y and width_z are specified
+        // position vector, width_x,width_y and width_z are specified
         else if(token->size()==6)
         {
             taux    =   NextToken(token);
             try {
-                origin_x  = boost::lexical_cast<double>(taux);
+                x_coord = boost::lexical_cast<double>(taux);
             }
             catch(boost::bad_lexical_cast&) {
-                log_warn("origin_x is set to %s but must be a double! Set to 0", taux.c_str());
-                origin_x    =   0;
+                log_warn("x position is set to %s but must be a double! Set to 0", taux.c_str());
+                x_coord = 0;
             }
 
             taux    =   NextToken(token);
             try {
-                origin_y  = boost::lexical_cast<double>(taux);
+                y_coord = boost::lexical_cast<double>(taux);
             }
             catch(boost::bad_lexical_cast&) {
-                log_warn("origin_y is set to %s but must be a double! Set to 0", taux.c_str());
-                origin_y    =   0;
+                log_warn("y position is set to %s but must be a double! Set to 0", taux.c_str());
+                y_coord = 0;
             }
 
             taux    =   NextToken(token);
             try {
-                origin_z  = boost::lexical_cast<double>(taux);
+                z_coord = boost::lexical_cast<double>(taux);
             }
             catch(boost::bad_lexical_cast&) {
-                log_warn("origin_z is set to %s but must be a double! Set to 0", taux.c_str());
-                origin_z    =   0;
+                log_warn("z position is set to %s but must be a double! Set to 0", taux.c_str());
+                z_coord = 0;
             }
 
             taux    =   NextToken(token);
@@ -2796,7 +2781,7 @@ Geometry* Propagator::InitGeometry(std::deque<std::string>* token, string first_
             exit(1);
         }
 
-        return new Box(origin_x,origin_y,origin_z,width_x,width_y,width_z);
+        return new Box(Vector3D(x_coord, y_coord, z_coord),width_x,width_y,width_z);
         // geometry->InitBox(origin_x,origin_y,origin_z,width_x,width_y,width_z);
 
     }

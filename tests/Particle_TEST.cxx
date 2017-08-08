@@ -4,25 +4,33 @@
 #include "gtest/gtest.h"
 
 #include "PROPOSAL/PROPOSALParticle.h"
+#include "PROPOSAL/Constants.h"
 
 using namespace PROPOSAL;
 
+Vector3D position(1.,1.,1.);
+Vector3D direction(0.,0.,0.);
+
 TEST(Comparison , Comparison_equal ) {
+    direction.SetSphericalCoordinates(1,20*PI/180.,20*PI/180.);
+    direction.CalculateCartesianFromSpherical();
     PROPOSALParticle A;
     PROPOSALParticle B;
     EXPECT_TRUE(A==B);
-    PROPOSALParticle* C = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,20,20,1e5,10);
-    PROPOSALParticle* D = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,20,20,1e5,10);
+    PROPOSALParticle* C = new PROPOSALParticle(ParticleType::TauMinus,position,direction,1e5,10);
+    PROPOSALParticle* D = new PROPOSALParticle(ParticleType::TauMinus,position,direction,1e5,10);
     C->SetEnergy(1e6);
     D->SetEnergy(1e6);
     EXPECT_TRUE(*C==*D);
-    PROPOSALParticle* E = new PROPOSALParticle(ParticleType::MuMinus,0,0,0,0,0,0,0);
+    position = Vector3D();
+    direction = Vector3D();
+    PROPOSALParticle* E = new PROPOSALParticle(ParticleType::MuMinus,position,direction,0,0);
     EXPECT_TRUE(A==*E);
-    PROPOSALParticle F(1,2,ParticleType::MuMinus,0.,0.,0.,0.,0.,1e5,0.,5,E);
-    PROPOSALParticle G(1,2,ParticleType::MuMinus,0.,0.,0.,0.,0.,1e5,0.,5,E);
+    PROPOSALParticle F(1,2,ParticleType::MuMinus,position,direction,1e5,0.,5,E);
+    PROPOSALParticle G(1,2,ParticleType::MuMinus,position,direction,1e5,0.,5,E);
     EXPECT_TRUE(F==G);
-    PROPOSALParticle H(1,2,ParticleType::MuMinus,0.,0.,0.,0.,0.,1e5,0.,5);
-    PROPOSALParticle I(1,2,ParticleType::MuMinus,0.,0.,0.,0.,0.,1e5,0.,5);
+    PROPOSALParticle H(1,2,ParticleType::MuMinus,position,direction,1e5,0.,5);
+    PROPOSALParticle I(1,2,ParticleType::MuMinus,position,direction,1e5,0.,5);
     EXPECT_TRUE(H==I);
     PROPOSALParticle* J = new PROPOSALParticle(ParticleType::MuMinus);
     PROPOSALParticle* K = new PROPOSALParticle(ParticleType::MuMinus);
@@ -32,11 +40,13 @@ TEST(Comparison , Comparison_equal ) {
 }
 
 TEST(Comparison , Comparison_not_equal ) {
+    direction.SetSphericalCoordinates(1,20*PI/180.,20*PI/180.);
+    direction.CalculateCartesianFromSpherical();
     PROPOSALParticle A;
-    PROPOSALParticle B(ParticleType::TauMinus,1.,1.,1,20,20,1e5,10);
+    PROPOSALParticle B(ParticleType::TauMinus,position,direction,1e5,10);
     EXPECT_TRUE(A!=B);
-    PROPOSALParticle* C = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,20,20,1e5,10);
-    PROPOSALParticle* D = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,20,20,1e5,10);
+    PROPOSALParticle* C = new PROPOSALParticle(ParticleType::TauMinus,position,direction,1e5,10);
+    PROPOSALParticle* D = new PROPOSALParticle(ParticleType::TauMinus,position,direction,1e5,10);
     D->SetEnergy(1e6);
     EXPECT_TRUE(*C!=*D);
 
@@ -51,7 +61,9 @@ TEST(Assignment , Copyconstructor ) {
 }
 
 TEST(Assignment , Copyconstructor2 ) {
-    PROPOSALParticle A(ParticleType::TauMinus,1.,1.,1,20,20,1e5,10);
+    direction.SetSphericalCoordinates(1,20*PI/180.,20*PI/180.);
+    direction.CalculateCartesianFromSpherical();
+    PROPOSALParticle A(ParticleType::TauMinus,position,direction,1e5,10);
     PROPOSALParticle B(A);
 
     EXPECT_TRUE(A==B);
@@ -59,8 +71,10 @@ TEST(Assignment , Copyconstructor2 ) {
 }
 
 TEST(Assignment , Operator ) {
+    direction.SetSphericalCoordinates(1,20*PI/180.,20*PI/180.);
+    direction.CalculateCartesianFromSpherical();
     PROPOSALParticle A;
-    PROPOSALParticle B(ParticleType::TauMinus,1.,1.,1,20,20,1e5,10);
+    PROPOSALParticle B(ParticleType::TauMinus,position,direction,1e5,10);
 
     EXPECT_TRUE(A!=B);
 
@@ -78,15 +92,19 @@ TEST(Assignment , Operator ) {
 }
 
 TEST(Assignment , Swap ) {
+    direction.SetSphericalCoordinates(1,20*PI/180.,20*PI/180.);
+    direction.CalculateCartesianFromSpherical();
     PROPOSALParticle A;
     PROPOSALParticle B;
     EXPECT_TRUE(A==B);
-    PROPOSALParticle* C = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,20,20,1e5,10);
-    PROPOSALParticle* D = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,20,20,1e5,10);
+    PROPOSALParticle* C = new PROPOSALParticle(ParticleType::TauMinus,position,direction,1e5,10);
+    PROPOSALParticle* D = new PROPOSALParticle(ParticleType::TauMinus,position,direction,1e5,10);
     C->SetEnergy(1e6);
     D->SetEnergy(1e6);
     EXPECT_TRUE(*C==*D);
-    PROPOSALParticle* E = new PROPOSALParticle(ParticleType::MuMinus,0,0,0,0,0,0,0);
+    position = Vector3D();
+    direction = Vector3D();
+    PROPOSALParticle* E = new PROPOSALParticle(ParticleType::MuMinus,position,direction,0,0);
     EXPECT_TRUE(A==*E);
     D->swap(A);
     EXPECT_TRUE(*C==A);

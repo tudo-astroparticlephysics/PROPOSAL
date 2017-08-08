@@ -6,6 +6,7 @@
 
 #include "PROPOSAL/Bremsstrahlung.h"
 #include "PROPOSAL/Output.h"
+#include "PROPOSAL/Constants.h"
 // #include "PROPOSAL/CrossSections.h"
 
 using namespace std;
@@ -37,12 +38,16 @@ public:
     }
 };
 
+Vector3D position(1.,1.,1.);
+Vector3D direction(0.,0.,0.);
 
 TEST(Comparison , Comparison_equal ) {
+    direction.SetSphericalCoordinates(1,.20*PI/180.,20*PI/180.);
+    direction.CalculateCartesianFromSpherical();
 
     double dEdx;
     Medium* medium = new Air();
-    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,position,direction,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
     Bremsstrahlung *A = new Bremsstrahlung(particle, medium, cuts);
     Bremsstrahlung *B = new Bremsstrahlung(particle, medium, cuts);
@@ -69,11 +74,13 @@ TEST(Comparison , Comparison_equal ) {
 }
 
 TEST(Comparison , Comparison_not_equal ) {
+    direction.SetSphericalCoordinates(1,20*PI/180.,20*PI/180.);
+    direction.CalculateCartesianFromSpherical();
 
     Medium *medium = new Air();
     Medium *medium2 = new Water();
-    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,20,20,1e5,10);
-    PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,20,20,1e5,10);
+    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,position,direction,1e5,10);
+    PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::TauMinus,position,direction,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
     Bremsstrahlung *A = new Bremsstrahlung(particle, medium, cuts);
     Bremsstrahlung *B = new Bremsstrahlung(particle, medium2, cuts);
@@ -103,8 +110,10 @@ TEST(Assignment , Copyconstructor ) {
 }
 
 TEST(Assignment , Copyconstructor2 ) {
+    direction.SetSphericalCoordinates(1,.20*PI/180.,20*PI/180.);
+    direction.CalculateCartesianFromSpherical();
     Medium *medium = new Air();
-    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,position,direction,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
 
     Bremsstrahlung A(particle, medium, cuts);
@@ -115,8 +124,10 @@ TEST(Assignment , Copyconstructor2 ) {
 }
 
 TEST(Assignment , Operator ) {
+    direction.SetSphericalCoordinates(1,.20*PI/180.,20*PI/180.);
+    direction.CalculateCartesianFromSpherical();
     Medium *medium = new Air();
-    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,position,direction,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
     Bremsstrahlung A(particle, medium, cuts);
     Bremsstrahlung B(particle, medium, cuts);
@@ -129,7 +140,7 @@ TEST(Assignment , Operator ) {
     EXPECT_TRUE(A==B);
 
     Medium *medium2 = new Water();
-    PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::TauMinus,position,direction,1e5,10);
     EnergyCutSettings *cuts2 = new EnergyCutSettings(200,-1);
     Bremsstrahlung *C = new Bremsstrahlung(particle2, medium2, cuts2);
     EXPECT_TRUE(A!=*C);
@@ -141,10 +152,12 @@ TEST(Assignment , Operator ) {
 }
 
 TEST(Assignment , Swap ) {
+    direction.SetSphericalCoordinates(1,.20*PI/180.,20*PI/180.);
+    direction.CalculateCartesianFromSpherical();
     Medium *medium = new Air();
     Medium *medium2 = new Air();
-    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
-    PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,position,direction,1e5,10);
+    PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::MuMinus,position,direction,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
     EnergyCutSettings *cuts2 = new EnergyCutSettings(500,-1);
     Bremsstrahlung A(particle, medium, cuts);
@@ -155,8 +168,8 @@ TEST(Assignment , Swap ) {
 
     Medium *medium3 = new Water();
     Medium *medium4 = new Water();
-    PROPOSALParticle *particle3 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,.20,20,1e5,10);
-    PROPOSALParticle *particle4 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle3 = new PROPOSALParticle(ParticleType::TauMinus,position,direction,1e5,10);
+    PROPOSALParticle *particle4 = new PROPOSALParticle(ParticleType::TauMinus,position,direction,1e5,10);
     EnergyCutSettings *cuts3 = new EnergyCutSettings(200,-1);
     EnergyCutSettings *cuts4 = new EnergyCutSettings(200,-1);
     Bremsstrahlung *C = new Bremsstrahlung(particle3, medium3, cuts3);
@@ -172,6 +185,8 @@ TEST(Assignment , Swap ) {
 }
 
 TEST(Bremsstrahlung , Test_of_dEdx ) {
+    direction.SetSphericalCoordinates(1,.20*PI/180.,20*PI/180.);
+    direction.CalculateCartesianFromSpherical();
 
     ifstream in;
     in.open("bin/TestFiles/Brems_dEdx.txt");
@@ -196,7 +211,7 @@ TEST(Bremsstrahlung , Test_of_dEdx ) {
         in>>para>>ecut>>vcut>>lpm>>energy>>mediumName>>particleName>>dEdx;
 
         Medium *medium = MediumFactory::Get()->CreateMedium(mediumName);
-        PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10);
+        PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),position,direction,1e5,10);
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
 
@@ -220,6 +235,8 @@ TEST(Bremsstrahlung , Test_of_dEdx ) {
 }
 
 TEST(Bremsstrahlung , Test_of_dNdx ) {
+    direction.SetSphericalCoordinates(1,.20*PI/180.,20*PI/180.);
+    direction.CalculateCartesianFromSpherical();
 
     ifstream in;
     in.open("bin/TestFiles/Brems_dNdx.txt");
@@ -244,7 +261,7 @@ TEST(Bremsstrahlung , Test_of_dNdx ) {
         in>>para>>ecut>>vcut>>lpm>>energy>>mediumName>>particleName>>dNdx;
 
         Medium *medium = MediumFactory::Get()->CreateMedium(mediumName);
-        PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10);
+        PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),position,direction,1e5,10);
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
 
@@ -268,6 +285,8 @@ TEST(Bremsstrahlung , Test_of_dNdx ) {
 }
 
 TEST(Bremsstrahlung , Test_of_dNdxrnd ) {
+    direction.SetSphericalCoordinates(1,.20*PI/180.,20*PI/180.);
+    direction.CalculateCartesianFromSpherical();
 
     ifstream in;
     in.open("bin/TestFiles/Brems_dNdxrnd.txt");
@@ -297,7 +316,7 @@ TEST(Bremsstrahlung , Test_of_dNdxrnd ) {
         first=false;
         energy_old = -1;
         Medium *medium = MediumFactory::Get()->CreateMedium(mediumName);
-        PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10);
+        PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),position,direction,1e5,10);
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
 
@@ -330,6 +349,8 @@ TEST(Bremsstrahlung , Test_of_dNdxrnd ) {
 
 
 TEST(Bremsstrahlung , Test_of_e ) {
+    direction.SetSphericalCoordinates(1,.20*PI/180.,20*PI/180.);
+    direction.CalculateCartesianFromSpherical();
 
     ifstream in;
     in.open("bin/TestFiles/Brems_e.txt");
@@ -362,7 +383,7 @@ TEST(Bremsstrahlung , Test_of_e ) {
         first=false;
         energy_old = -1;
         Medium *medium = MediumFactory::Get()->CreateMedium(mediumName);
-        PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10);
+        PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),position,direction,1e5,10);
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
 
@@ -396,6 +417,8 @@ TEST(Bremsstrahlung , Test_of_e ) {
 
 
 TEST(Bremsstrahlung , Test_of_dEdx_Interpolant ) {
+    direction.SetSphericalCoordinates(1,.20*PI/180.,20*PI/180.);
+    direction.CalculateCartesianFromSpherical();
 
     ifstream in;
     in.open("bin/TestFiles/Brems_dEdx_interpol.txt");
@@ -425,7 +448,7 @@ TEST(Bremsstrahlung , Test_of_dEdx_Interpolant ) {
         energy_old =-1;
 
         Medium *medium = MediumFactory::Get()->CreateMedium(mediumName);
-        PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10);
+        PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),position,direction,1e5,10);
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
         CrossSections *brems = new Bremsstrahlung(particle, medium, cuts);
@@ -463,6 +486,8 @@ TEST(Bremsstrahlung , Test_of_dEdx_Interpolant ) {
 }
 
 TEST(Bremsstrahlung , Test_of_dNdx_Interpolant ) {
+    direction.SetSphericalCoordinates(1,.20*PI/180.,20*PI/180.);
+    direction.CalculateCartesianFromSpherical();
     ifstream in;
     in.open("bin/TestFiles/Brems_dNdx_interpol.txt");
 
@@ -489,7 +514,7 @@ TEST(Bremsstrahlung , Test_of_dNdx_Interpolant ) {
         first=false;
         energy_old = -1;
         Medium *medium = MediumFactory::Get()->CreateMedium(mediumName);
-        PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10);
+        PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),position,direction,1e5,10);
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
 
@@ -519,6 +544,8 @@ TEST(Bremsstrahlung , Test_of_dNdx_Interpolant ) {
 
 TEST(Bremsstrahlung , Test_of_e_interpol ) {
 return;
+    direction.SetSphericalCoordinates(1,.20*PI/180.,20*PI/180.);
+    direction.CalculateCartesianFromSpherical();
     ifstream in;
     in.open("bin/TestFiles/Brems_e_interpol.txt");
 
@@ -551,7 +578,7 @@ return;
         first=false;
         energy_old = -1;
         Medium *medium = MediumFactory::Get()->CreateMedium(mediumName);
-        PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10);
+        PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),position,direction,1e5,10);
         particle->SetEnergy(energy);
         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
 
