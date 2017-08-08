@@ -14,6 +14,8 @@
 // #include <vector>
 #include <string>
 
+#include "PROPOSAL/Vector3D.h"
+
 namespace PROPOSAL
 {
     class PROPOSALParticle;
@@ -122,17 +124,14 @@ class PROPOSALParticle
 private:
 
     double propagated_distance_; //!< propagation distance [cm]
-    double x_;                   //!< x-coordinate [cm]
-    double y_;                   //!< y-coordinate [cm]
-    double z_;                   //!< z-coordinate [cm]
+    Vector3D position_;         //!< position coordinates [cm]
     double t_;                   //!< age [sec]
-    double theta_;               //!< zenith of the momentum in [deg]
-    double phi_;                 //!< azimuth of the momentum in [deg]
+    Vector3D direction_;        //!< direction vector, angles in [rad]
 
-    long double costh_;          //!< cos(theta)
-    long double sinth_;          //!< sin(theta)
-    long double cosph_;          //!< cos(phi)
-    long double sinph_;          //!< sin(phi)
+    long double costh_;          //!< cos(direction.theta)
+    long double sinth_;          //!< sin(direction.theta)
+    long double cosph_;          //!< cos(direction.phi)
+    long double sinph_;          //!< sin(direction.phi)
 
     double momentum_;            //!< momentum [MeV]
     double square_momentum_;     //!< momentum square [MeV]
@@ -149,21 +148,15 @@ private:
     double parent_particle_energy_; //!< energy of the parent particle
     int particle_id_;               //!< particle id
 
-    double xi_;                  //!< x-coordinate entry Point [cm]
-    double yi_;                  //!< y-coordinate entry Point [cm]
-    double zi_;                  //!< z-coordinate entry Point [cm]
+    Vector3D entry_point_;      //!< entry point coordinates [cm]
     double ti_;                  //!< t-coordinate entry Point [sec]
     double ei_;                  //!< energy at entry point [MeV]
 
-    double xf_;                  //!< x-coordinate exit Point [cm]
-    double yf_;                  //!< y-coordinate exit Point [cm]
-    double zf_;                  //!< z-coordinate exit Point [cm]
+    Vector3D exit_point_;       //!< exit point coordinates [cm]
     double tf_;                  //!< t-coordinate exit Point [sec]
     double ef_;                  //!< energy at exit point [MeV]
 
-    double xc_;                  //!< x-coordinate at point of closest approach [cm]
-    double yc_;                  //!< y-coordinate at point of closest approach [cm]
-    double zc_;                  //!< z-coordinate at point of closest approach [cm]
+    Vector3D closest_approach_point_; // point of closest approach (to geometry center) [cm]
     double tc_;                  //!< t-coordinate at point of closest approach [sec]
     double ec_;                  //!< energy at at point of closest approach [MeV]
 
@@ -199,11 +192,8 @@ public:
      * \param parent_particle_id      parent particle id
      * \param particle_id             particle id
      * \param name                    particle name
-     * \param x                       x-coordinate
-     * \param y                       y-coordinate
-     * \param z                       z-coordinate
-     * \param theta                   theta angle
-     * \param phi                     phi angle
+     * \param position                position-coordinates
+     * \param direction               direction-coordinates (cartesian and spheric)
      * \param energy                  particle energy
      * \param t                       particle time
      * \param prop_dist               flight distance
@@ -213,11 +203,8 @@ public:
     PROPOSALParticle(int parent_particle_id,
              int particle_id,
              ParticleType::Enum type,
-             double x,
-             double y,
-             double z,
-             double theta,
-             double phi,
+             Vector3D position,
+             Vector3D direction,
              double energy,
              double t,
              double prop_dist,
@@ -232,11 +219,8 @@ public:
      * \param parent_particle_id      parent particle id
      * \param particle_id             particle id
      * \param name                    particle name
-     * \param x                       x-coordinate
-     * \param y                       y-coordinate
-     * \param z                       z-coordinate
-     * \param theta                   theta angle
-     * \param phi                     phi angle
+     * \param position                position-coordinates
+     * \param direction               direction-coordinates (cartesian and spheric)
      * \param energy                  particle energy
      * \param t                       particle time
      * \param prop_dist               flight distance
@@ -244,11 +228,8 @@ public:
     PROPOSALParticle(int parent_particle_id,
              int particle_id,
              ParticleType::Enum type,
-             double x,
-             double y,
-             double z,
-             double theta,
-             double phi,
+             Vector3D position,
+             Vector3D direction,
              double energy,
              double t,
              double prop_dist,
@@ -261,21 +242,15 @@ public:
      * This function ist mostly used to store particle information.
      *
      * \param aname     particle name
-     * \param x         x-coordinate
-     * \param y         y-coordinate
-     * \param z         z-coordinate
-     * \param theta     theta angle
-     * \param phi       phi angle
+     * \param position  position-coordinates
+     * \param direction direction-coordinates (cartesian and spheric)
      * \param energy    particle energy
      * \param t         particle time
      */
     PROPOSALParticle(
             ParticleType::Enum type,
-            double x,
-            double y,
-            double z,
-            double theta,
-            double phi,
+            Vector3D position,
+            Vector3D direction,
             double energy,
             double t);
 
@@ -310,19 +285,13 @@ public:
      * time in sec, x, y, z in cm, theta and phi in deg
      *
      * \param time      particle time
-     * \param x         x-coordinate
-     * \param y         y-coordinate
-     * \param z         z-coordinate
-     * \param theta     theta angle
-     * \param phi       phi angle
+     * \param position  position-coordinates
+     * \param direction direction-coordinates (cartesian and spheric)
      */
 
     void Location(double time,
-                  double x,
-                  double y,
-                  double z,
-                  double theta,
-                  double phi);
+                  Vector3D& position,
+                  Vector3D& direction);
 
 //----------------------------------------------------------------------------//
 
@@ -331,19 +300,16 @@ public:
 //----------------------------------------------------------------------------//
 
     //Setter
-    void SetProperties( int parent_particle_id = 0,  int particle_id = 0,    double energy = 0, double t=0,
-                        double x = 0,   double y = 0,   double z = 0,   double theta = 0,   double phi = 0,
-                        double xi = 0,  double yi= 0,   double zi= 0,   double ti = 0   ,   double Ei = 0,
-                        double xf = 0,  double yf= 0,   double zf= 0,   double tf = 0   ,   double Ef = 0,
-                        double xc = 0,  double yc= 0,   double zc= 0,   double tc = 0   ,   double Ec = 0);
-    void SetEnergy(double e);
+    // void SetProperties( int parent_particle_id = 0, int particle_id = 0, double energy = 0, double t=0,
+    //                     Vector3D& position = Vector3D, Vector3D& direction = Vector3D,
+    //                     Vector3D& entry_point = Vector3D, double ti = 0, double Ei = 0,
+    //                     Vector3D& exit_point = Vector3D, double tf = 0, double Ef = 0,
+    //                     Vector3D& closest_approach_point = Vector3D, double tc = 0, double Ec = 0);
+    void SetEnergy(double energy);
     void SetPropagatedDistance(double prop_dist);
-    void SetX(double x);
-    void SetY(double y);
-    void SetZ(double z);
+    void SetPosition(Vector3D& position);
     void SetT(double t);
-    void SetTheta(double theta);
-    void SetPhi(double phi);
+    void SetDirection(Vector3D& direction);
     void SetMomentum(double momentum);
     void SetMass(double mass);
     void SetLifetime(double lifetime);
@@ -354,21 +320,16 @@ public:
     void SetParentParticleId(int parent_particle_id);
     void SetParentParticleEnergy(double parent_particle_energy);
     void SetParticleId(int particle_id);
-    void SetXi(double xi);
-    void SetYi(double yi);
-    void SetZi(double zi);
+
+    void SetEntryPoint(Vector3D& entry_point);
     void SetTi(double ti);
     void SetEi(double ei);
 
-    void SetXf(double xf);
-    void SetYf(double yf);
-    void SetZf(double zf);
+    void SetExitPoint(Vector3D& exit_point);
     void SetTf(double tf);
     void SetEf(double ef);
 
-    void SetXc(double xc);
-    void SetYc(double yc);
-    void SetZc(double zc);
+    void SetClosestApproachPoint(Vector3D& closest_approach_point);
     void SetTc(double tc);
     void SetEc(double ec);
 
@@ -382,17 +343,11 @@ public:
 //----------------------------------------------------------------------------//
     double GetPropagatedDistance() const{return propagated_distance_;}
 //----------------------------------------------------------------------------//
-    double GetX() const{return x_;}
-//----------------------------------------------------------------------------//
-    double GetY() const{return y_;}
-//----------------------------------------------------------------------------//
-    double GetZ() const{return z_;}
+    Vector3D GetPosition() const{return position_;}
 //----------------------------------------------------------------------------//
     double GetT() const{return t_;}
 //----------------------------------------------------------------------------//
-    double GetTheta() const{return theta_;}
-//----------------------------------------------------------------------------//
-    double GetPhi() const{return phi_;}
+    Vector3D GetDirection() const{return direction_;}
 //----------------------------------------------------------------------------//
     double GetSinTheta() const{return sinth_;}
 //----------------------------------------------------------------------------//
@@ -426,31 +381,19 @@ public:
 //----------------------------------------------------------------------------//
     int GetParticleId() const{return particle_id_;}
 //----------------------------------------------------------------------------//
-    double GetXi() const{return xi_;}
-//----------------------------------------------------------------------------//
-    double GetYi() const{return yi_;}
-//----------------------------------------------------------------------------//
-    double GetZi() const{return zi_;}
+    Vector3D GetEntryPoint() const{return entry_point_;}
 //----------------------------------------------------------------------------//
     double GetTi() const{return ti_;}
 //----------------------------------------------------------------------------//
     double GetEi() const{return ei_;}
 //----------------------------------------------------------------------------//
-    double GetXf() const{return xf_;}
-//----------------------------------------------------------------------------//
-    double GetYf() const{return yf_;}
-//----------------------------------------------------------------------------//
-    double GetZf() const{return zf_;}
+    Vector3D GetExitPoint() const{return exit_point_;}
 //----------------------------------------------------------------------------//
     double GetTf() const{return tf_;}
 //----------------------------------------------------------------------------//
     double GetEf() const{return ef_;}
 //----------------------------------------------------------------------------//
-    double GetXc() const{return xc_;}
-//----------------------------------------------------------------------------//
-    double GetYc() const{return yc_;}
-//----------------------------------------------------------------------------//
-    double GetZc() const{return zc_;}
+    Vector3D GetClosestApproachPoint() const{return closest_approach_point_;}
 //----------------------------------------------------------------------------//
     double GetTc() const{return tc_;}
 //----------------------------------------------------------------------------//

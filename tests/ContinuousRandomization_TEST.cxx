@@ -11,6 +11,7 @@
 #include "PROPOSAL/Photonuclear.h"
 #include "PROPOSAL/Epairproduction.h"
 #include "PROPOSAL/Output.h"
+#include "PROPOSAL/Constants.h"
 // #include "PROPOSAL/CrossSections.h"
 // #include "PROPOSAL/PROPOSALParticle.h"
 // #include "PROPOSAL/Medium.h"
@@ -46,13 +47,17 @@ public:
     }
 };
 
+Vector3D position(1.,1.,1.);
+Vector3D direction(0.,0.,0.);
 
 TEST(Comparison , Comparison_equal ) {
+    direction.SetSphericalCoordinates(1,.20*PI/180.,20*PI/180.);
+    direction.CalculateCartesianFromSpherical();
 
     double dNdx;
 
     Medium *medium = new Hydrogen();
-    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,position,direction,1e5,10);
     EnergyCutSettings *cut_settings = new EnergyCutSettings(500,-1);
 
     vector<CrossSections*> crosssections;
@@ -90,10 +95,12 @@ TEST(Comparison , Comparison_equal ) {
 }
 
 TEST(Comparison , Comparison_not_equal ) {
+    direction.SetSphericalCoordinates(1,20*PI/180.,20*PI/180.);
+    direction.CalculateCartesianFromSpherical();
     Medium *medium = new Air();
     Medium *medium2 = new Water();
-    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,20,20,1e5,10);
-    PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,20,20,1e5,10);
+    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,position,direction,1e5,10);
+    PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::TauMinus,position,direction,1e5,10);
     EnergyCutSettings *cut_settings = new EnergyCutSettings(500,-1);
 
     vector<CrossSections*> crosssections;
@@ -143,8 +150,10 @@ TEST(Assignment , Copyconstructor ) {
 }
 
 TEST(Assignment , Copyconstructor2 ) {
+    direction.SetSphericalCoordinates(1,.20*PI/180.,20*PI/180.);
+    direction.CalculateCartesianFromSpherical();
     Medium *medium = new Air();
-    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,position,direction,1e5,10);
     EnergyCutSettings *cut_settings = new EnergyCutSettings(500,-1);
 
     vector<CrossSections*> crosssections;
@@ -163,8 +172,10 @@ TEST(Assignment , Copyconstructor2 ) {
 }
 
 TEST(Assignment , Operator ) {
+    direction.SetSphericalCoordinates(1,.20*PI/180.,20*PI/180.);
+    direction.CalculateCartesianFromSpherical();
     Medium *medium = new Air();
-    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,position,direction,1e5,10);
     EnergyCutSettings *cut_settings = new EnergyCutSettings(500,-1);
 
     vector<CrossSections*> crosssections;
@@ -211,10 +222,12 @@ TEST(Assignment , Operator ) {
 }
 
 TEST(Assignment , Swap ) {
+    direction.SetSphericalCoordinates(1,.20*PI/180.,20*PI/180.);
+    direction.CalculateCartesianFromSpherical();
     Medium *medium = new Hydrogen();
     Medium *medium2 = new Hydrogen();
-    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
-    PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,position,direction,1e5,10);
+    PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::MuMinus,position,direction,1e5,10);
     EnergyCutSettings *cut_settings = new EnergyCutSettings(500,0.05);
     EnergyCutSettings *cut_settings2 = new EnergyCutSettings(500,0.05);
 
@@ -258,8 +271,8 @@ TEST(Assignment , Swap ) {
 
     Medium *medium3 = new Water();
     Medium *medium4 = new Water();
-    PROPOSALParticle *particle3 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,.20,20,1e5,10);
-    PROPOSALParticle *particle4 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle3 = new PROPOSALParticle(ParticleType::TauMinus,position,direction,1e5,10);
+    PROPOSALParticle *particle4 = new PROPOSALParticle(ParticleType::TauMinus,position,direction,1e5,10);
     EnergyCutSettings *cut_settings3 = new EnergyCutSettings(200,-1);
     EnergyCutSettings *cut_settings4 = new EnergyCutSettings(200,-1);
 
@@ -360,6 +373,8 @@ TEST(Assignment , Swap ) {
 
 
 TEST(ContinuousRandomization , Randomize_interpol ) {
+    direction.SetSphericalCoordinates(1,.20*PI/180.,20*PI/180.);
+    direction.CalculateCartesianFromSpherical();
 
     ifstream in;
     in.open("bin/TestFiles/ContinuousRandomization_interpol.txt");
@@ -390,7 +405,7 @@ TEST(ContinuousRandomization , Randomize_interpol ) {
         energy_old = -1;
 
         Medium *medium = MediumFactory::Get()->CreateMedium(mediumName);
-        PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10);
+        PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),position,direction,1e5,10);
         EnergyCutSettings *cut_settings = new EnergyCutSettings(ecut,vcut);
 
         vector<CrossSections*> crosssections;
