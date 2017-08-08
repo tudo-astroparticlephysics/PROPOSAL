@@ -115,8 +115,8 @@ namespace PROPOSAL
 std::ostream& operator<<(std::ostream& os, Vector3D const &vector_3d)
 {
     os<<"----Vector3D( "<<&vector_3d<<" )----"<<std::endl;
-    os<<"\tCartesian Coordinates (x,y,z):\t"<<vector_3d.x_<<"\t"<<vector_3d.y_<<"\t"<<vector_3d.z_<<std::endl;
-    os<<"\tSpherical Coordinates (radius,azimut,zenith):\t"<<vector_3d.spheric_radius_<<"\t"<<vector_3d.spheric_azimuth_<<"\t"<<vector_3d.spheric_zenith_<<std::endl;
+    os<<"\tCartesian Coordinates (x[cm],y[cm],z[cm]):\t"<<vector_3d.x_<<"\t"<<vector_3d.y_<<"\t"<<vector_3d.z_<<std::endl;
+    os<<"\tSpherical Coordinates (radius[cm],azimut[rad],zenith[rad]):\t"<<vector_3d.spheric_radius_<<"\t"<<vector_3d.spheric_azimuth_<<"\t"<<vector_3d.spheric_zenith_<<std::endl;
     // os<<"\tCylindrical Coordinates (radius,azimut,height):\t"<<vector_3d.cylindric_radius_<<"\t"<<vector_3d.cylindric_azimuth_<<"\t"<<vector_3d.cylindric_height_<<std::endl;
     os<<"------------------------------------";
     return os;
