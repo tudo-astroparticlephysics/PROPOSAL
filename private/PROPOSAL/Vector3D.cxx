@@ -1,11 +1,10 @@
 
-#include <math.h>
+#include <cmath>
 #include <iostream>
-#include <string>
 
 #include "PROPOSAL/Vector3D.h"
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/Output.h"
+// #include "PROPOSAL/Output.h"
 
 using namespace PROPOSAL;
 
@@ -230,12 +229,12 @@ void Vector3D::CalculateSphericalCoordinates()
     }
     else if (spheric_radius_ == 0.)
     {
-        log_warn("If the radius is zero, the zenith is not defined! Zero is returned!");
+        // log_warn("If the radius is zero, the zenith is not defined! Zero is returned!");
         spheric_zenith_ = 0.;
     }
     else
     {
-        log_fatal("The radius is negativ, which is not possible!");
+        // log_fatal("The radius is negativ, which is not possible!");
     }
 }
 
@@ -288,11 +287,11 @@ double Vector3D::CalculateAzimuthFromCartesian()
         }
         else if (y_ == 0)
         {
-            log_warn("If x and y are zero, the azimuth is not defined! Zero is returned!");
+            // log_warn("If x and y are zero, the azimuth is not defined! Zero is returned!");
             return 0.;
         }
     }
-    log_fatal("never should be here; return zero.");
+    // log_fatal("never should be here; return zero.");
     return 0.;
 }
 

@@ -6,6 +6,7 @@
 #include <boost/bind.hpp>
 
 #include "PROPOSAL/Propagator.h"
+#include "PROPOSAL/Constants.h"
 
 using namespace PROPOSAL;
 
@@ -317,6 +318,10 @@ int setting_loop(
 
     double aux;
 
+    Vector3D particle_position(1.,1.,1.);
+    Vector3D particle_direction(0,0,0);
+    particle_direction.SetSphericalCoordinates(1, .20/180*PI, 20/180*PI);
+
     out.precision(16);
 
     // cuts
@@ -332,7 +337,7 @@ int setting_loop(
             // paricle
             for (std::vector<std::string>::iterator it_particle = particle.begin() ; it_particle != particle.end(); ++it_particle)
             {
-                PROPOSALParticle particle(PROPOSALParticle::GetTypeFromName(*it_particle),1.,1.,1,.20,20,1e5,10);
+                PROPOSALParticle particle(PROPOSALParticle::GetTypeFromName(*it_particle),particle_position,particle_direction,1e5,10);
 
                 CrossSections* cross = NULL;
                 switch (interaction)
@@ -898,10 +903,14 @@ int setting_loop_contrand(std::string& filename)
 
     out.precision(16);
 
+    Vector3D particle_position(1.,1.,1.);
+    Vector3D particle_direction(0,0,0);
+    particle_direction.SetSphericalCoordinates(1, .20/180*PI, 20/180*PI);
+
     // paricle
     for (std::vector<std::string>::iterator it_particle = particle.begin() ; it_particle != particle.end(); ++it_particle)
     {
-        PROPOSALParticle particle(PROPOSALParticle::GetTypeFromName(*it_particle),1.,1.,1,.20,20,1e5,10);
+        PROPOSALParticle particle(PROPOSALParticle::GetTypeFromName(*it_particle),particle_position,particle_direction,1e5,10);
 
         // medium
         for (std::vector<std::string>::iterator it_medium = medium.begin() ; it_medium != medium.end(); ++it_medium)
@@ -1051,6 +1060,10 @@ int ProcColl_Stochastics(std::string filename, std::string path_to_tables)
 
     out.precision(16);
 
+    Vector3D particle_position(1.,1.,1.);
+    Vector3D particle_direction(0,0,0);
+    particle_direction.SetSphericalCoordinates(1, .20/180*PI, 20/180*PI);
+
     // cuts
     for (std::vector<std::pair<int, double> >::iterator it_cut = cuts.begin() ; it_cut != cuts.end(); ++it_cut)
     {
@@ -1063,7 +1076,7 @@ int ProcColl_Stochastics(std::string filename, std::string path_to_tables)
             // paricle
             for (std::vector<std::string>::iterator it_particle = particle.begin() ; it_particle != particle.end(); ++it_particle)
             {
-                PROPOSALParticle particle(PROPOSALParticle::GetTypeFromName(*it_particle),1.,1.,1,.20,20,1e5,10);
+                PROPOSALParticle particle(PROPOSALParticle::GetTypeFromName(*it_particle),particle_position,particle_direction,1e5,10);
                 // Propagator prop(&medium, &cuts, particle.GetType(), "");
                 ProcessCollection proc_col(&particle, medium, &cuts);
                 proc_col.EnableInterpolation(path_to_tables);
@@ -1203,6 +1216,10 @@ int ProcColl_Displacement(std::string filename)
 
     out.precision(16);
 
+    Vector3D particle_position(1.,1.,1.);
+    Vector3D particle_direction(0,0,0);
+    particle_direction.SetSphericalCoordinates(1, .20/180*PI, 20/180*PI);
+
     // cuts
     for (std::vector<std::pair<int, double> >::iterator it_cut = cuts.begin() ; it_cut != cuts.end(); ++it_cut)
     {
@@ -1215,7 +1232,7 @@ int ProcColl_Displacement(std::string filename)
             // paricle
             for (std::vector<std::string>::iterator it_particle = particle.begin() ; it_particle != particle.end(); ++it_particle)
             {
-                PROPOSALParticle particle(PROPOSALParticle::GetTypeFromName(*it_particle),1.,1.,1,.20,20,1e5,10);
+                PROPOSALParticle particle(PROPOSALParticle::GetTypeFromName(*it_particle),particle_position,particle_direction,1e5,10);
                 // Propagator prop(&medium, &cuts, particle.GetType(), "");
                 ProcessCollection proc_col(&particle, medium, &cuts);
                 proc_col.EnableInterpolation("../resources/tables");
@@ -1327,6 +1344,10 @@ int ProcColl_FinalEnergyDist(std::string filename, std::string path_to_tables)
 
     out.precision(16);
 
+    Vector3D particle_position(1.,1.,1.);
+    Vector3D particle_direction(0,0,0);
+    particle_direction.SetSphericalCoordinates(1, .20/180*PI, 20/180*PI);
+
     // cuts
     for (std::vector<std::pair<int, double> >::iterator it_cut = cuts.begin() ; it_cut != cuts.end(); ++it_cut)
     {
@@ -1339,7 +1360,7 @@ int ProcColl_FinalEnergyDist(std::string filename, std::string path_to_tables)
             // paricle
             for (std::vector<std::string>::iterator it_particle = particle.begin() ; it_particle != particle.end(); ++it_particle)
             {
-                PROPOSALParticle particle(PROPOSALParticle::GetTypeFromName(*it_particle),1.,1.,1,.20,20,1e5,10);
+                PROPOSALParticle particle(PROPOSALParticle::GetTypeFromName(*it_particle),particle_position,particle_direction,1e5,10);
                 // Propagator prop(&medium, &cuts, particle.GetType(), "");
                 ProcessCollection proc_col(&particle, medium, &cuts);
                 proc_col.EnableInterpolation(path_to_tables);
@@ -1444,6 +1465,10 @@ int ProcColl_FinalEnergyParticleInteraction(std::string filename, std::string pa
 
     out.precision(16);
 
+    Vector3D particle_position(1.,1.,1.);
+    Vector3D particle_direction(0,0,0);
+    particle_direction.SetSphericalCoordinates(1, .20/180*PI, 20/180*PI);
+
     // cuts
     for (std::vector<std::pair<int, double> >::iterator it_cut = cuts.begin() ; it_cut != cuts.end(); ++it_cut)
     {
@@ -1456,7 +1481,7 @@ int ProcColl_FinalEnergyParticleInteraction(std::string filename, std::string pa
             // paricle
             for (std::vector<std::string>::iterator it_particle = particle.begin() ; it_particle != particle.end(); ++it_particle)
             {
-                PROPOSALParticle particle(PROPOSALParticle::GetTypeFromName(*it_particle),1.,1.,1,.20,20,1e5,10);
+                PROPOSALParticle particle(PROPOSALParticle::GetTypeFromName(*it_particle),particle_position,particle_direction,1e5,10);
                 // Propagator prop(&medium, &cuts, particle.GetType(), "");
                 ProcessCollection proc_col(&particle, medium, &cuts);
                 proc_col.EnableInterpolation(path_to_tables);
@@ -1564,6 +1589,10 @@ int ProcColl_Tracking(std::string filename, std::string path_to_tables)
 
     out.precision(16);
 
+    Vector3D particle_position(1.,1.,1.);
+    Vector3D particle_direction(0,0,0);
+    particle_direction.SetSphericalCoordinates(1, .20/180*PI, 20/180*PI);
+
     // cuts
     for (std::vector<std::pair<int, double> >::iterator it_cut = cuts.begin() ; it_cut != cuts.end(); ++it_cut)
     {
@@ -1576,7 +1605,7 @@ int ProcColl_Tracking(std::string filename, std::string path_to_tables)
             // paricle
             for (std::vector<std::string>::iterator it_particle = particle.begin() ; it_particle != particle.end(); ++it_particle)
             {
-                PROPOSALParticle particle(PROPOSALParticle::GetTypeFromName(*it_particle),1.,1.,1,.20,20,1e5,10);
+                PROPOSALParticle particle(PROPOSALParticle::GetTypeFromName(*it_particle),particle_position,particle_direction,1e5,10);
                 // Propagator prop(&medium, &cuts, particle.GetType(), "");
                 ProcessCollection proc_col(&particle, medium, &cuts);
                 proc_col.EnableInterpolation(path_to_tables);
@@ -1687,6 +1716,10 @@ int ProcColl_MakeDecay(std::string filename, std::string path_to_tables)
 
     out.precision(16);
 
+    Vector3D particle_position(1.,1.,1.);
+    Vector3D particle_direction(0,0,0);
+    particle_direction.SetSphericalCoordinates(1, .20/180*PI, 20/180*PI);
+
     // cuts
     for (std::vector<std::pair<int, double> >::iterator it_cut = cuts.begin() ; it_cut != cuts.end(); ++it_cut)
     {
@@ -1699,7 +1732,7 @@ int ProcColl_MakeDecay(std::string filename, std::string path_to_tables)
             // paricle
             for (std::vector<std::string>::iterator it_particle = particle.begin() ; it_particle != particle.end(); ++it_particle)
             {
-                PROPOSALParticle particle(PROPOSALParticle::GetTypeFromName(*it_particle),1.,1.,1,.20,20,1e5,10);
+                PROPOSALParticle particle(PROPOSALParticle::GetTypeFromName(*it_particle),particle_position,particle_direction,1e5,10);
                 // Propagator prop(&medium, &cuts, particle.GetType(), "");
                 ProcessCollection proc_col(&particle, medium, &cuts);
                 proc_col.EnableInterpolation(path_to_tables);
