@@ -27,8 +27,7 @@ ostream& operator<<(ostream& os, Geometry const& geometry)
 {
     os << "--------Geometry( " << &geometry << " )--------" << endl;
     os << "\t" << geometry.name_ << endl;
-    os << "\tOrigin (x,y,z):\t" << geometry.x0_ << "\t" << geometry.y0_ << "\t"
-       << geometry.z0_ << endl;
+    os << "\tPosition:\t" << geometry.position_ << endl;
     os << "\tHirarchy:\t" << geometry.hirarchy_ << endl;
 
     geometry.print(os);
@@ -44,33 +43,24 @@ ostream& operator<<(ostream& os, Geometry const& geometry)
 
 
 Geometry::Geometry(std::string name)
-    : x0_(0.)
-    , y0_(0.)
-    , z0_(0.)
+    : position_( Vector3D() )
     , name_(name)
     , hirarchy_(0)
 {
-    // Nothing to do here
 }
 
-Geometry::Geometry(std::string name, double x, double y, double z)
-    : x0_(100.0 * x)
-    , y0_(100.0 * y)
-    , z0_(100.0 * z)
+Geometry::Geometry(std::string name, Vector3D position)
+    : position_(100.*position)
     , name_(name)
     , hirarchy_(0)
 {
-    // Nothing to do here
 }
 
 Geometry::Geometry(const Geometry& geometry)
-    : x0_(geometry.x0_)
-    , y0_(geometry.y0_)
-    , z0_(geometry.z0_)
+    : position_(geometry.position_)
     , name_(geometry.name_)
     , hirarchy_(geometry.hirarchy_)
 {
-    // Nothing to do here
 }
 
 // ------------------------------------------------------------------------- //
@@ -78,21 +68,16 @@ void Geometry::swap(Geometry& geometry)
 {
     using std::swap;
 
-    swap(x0_, geometry.x0_);
-    swap(y0_, geometry.y0_);
-    swap(z0_, geometry.z0_);
-    swap(hirarchy_, geometry.hirarchy_);
-
+    position_.swap(geometry.position_);
     name_.swap(geometry.name_);
+    swap(hirarchy_, geometry.hirarchy_);
 }
 
 // ------------------------------------------------------------------------- //
 Geometry& Geometry::operator=(const Geometry& geometry)
 {
     if (this != &geometry) {
-        x0_ = geometry.x0_;
-        y0_ = geometry.y0_;
-        z0_ = geometry.z0_;
+        position_ = geometry.position_;
         name_ = geometry.name_;
         hirarchy_ = geometry.hirarchy_;
     }
@@ -103,11 +88,7 @@ Geometry& Geometry::operator=(const Geometry& geometry)
 // ------------------------------------------------------------------------- //
 bool Geometry::operator==(const Geometry& geometry) const
 {
-    if (x0_ != geometry.x0_)
-        return false;
-    else if (y0_ != geometry.y0_)
-        return false;
-    else if (z0_ != geometry.z0_)
+    if (position_ != geometry.position_)
         return false;
     else if (name_.compare(geometry.name_) != 0)
         return false;
@@ -127,11 +108,11 @@ bool Geometry::operator!=(const Geometry& geometry) const
 // Member functions
 // ------------------------------------------------------------------------- //
 
-bool Geometry::IsInside(PROPOSALParticle* particle)
+bool Geometry::IsInside(Vector3D& position, Vector3D& direction)
 {
     bool is_inside = false;
 
-    pair<double, double> dist = DistanceToBorder(particle);
+    pair<double, double> dist = DistanceToBorder(position, direction);
 
     if (dist.first > 0 && dist.second < 0) {
         is_inside = true;
@@ -140,11 +121,11 @@ bool Geometry::IsInside(PROPOSALParticle* particle)
 }
 
 // ------------------------------------------------------------------------- //
-bool Geometry::IsInfront(PROPOSALParticle* particle)
+bool Geometry::IsInfront(Vector3D& position, Vector3D& direction)
 {
     bool is_infront = false;
 
-    pair<double, double> dist = DistanceToBorder(particle);
+    pair<double, double> dist = DistanceToBorder(position, direction);
 
     if (dist.first > 0 && dist.second > 0) {
         is_infront = true;
@@ -153,11 +134,11 @@ bool Geometry::IsInfront(PROPOSALParticle* particle)
 }
 
 // ------------------------------------------------------------------------- //
-bool Geometry::IsBehind(PROPOSALParticle* particle)
+bool Geometry::IsBehind(Vector3D& position, Vector3D& direction)
 {
     bool is_behind = false;
 
-    pair<double, double> dist = DistanceToBorder(particle);
+    pair<double, double> dist = DistanceToBorder(position, direction);
 
     if (dist.first < 0 && dist.second < 0) {
         is_behind = true;
@@ -166,16 +147,9 @@ bool Geometry::IsBehind(PROPOSALParticle* particle)
 }
 
 // ------------------------------------------------------------------------- //
-double Geometry::DistanceToClosestApproach(PROPOSALParticle* particle)
+double Geometry::DistanceToClosestApproach(Vector3D& position, Vector3D& direction)
 {
-    double dir_vec_x = particle->GetCosPhi() * particle->GetSinTheta();
-    double dir_vec_y = particle->GetSinPhi() * particle->GetSinTheta();
-    double dir_vec_z = particle->GetCosTheta();
-
-    double distance = (x0_ - particle->GetX()) * dir_vec_x +
-                      (y0_ - particle->GetY()) * dir_vec_y +
-                      (z0_ - particle->GetZ()) * dir_vec_z;
-    return distance;
+    return scalar_product(position_ - position, direction);
 }
 
 /******************************************************************************
@@ -190,12 +164,10 @@ Sphere::Sphere()
     // Do nothing here
 }
 
-Sphere::Sphere(double x0,
-               double y0,
-               double z0,
+Sphere::Sphere(Vector3D position,
                double radius,
                double inner_radius)
-    : Geometry("Sphere", x0, y0, z0)
+    : Geometry("Sphere", position)
     , radius_(100.0 * radius)
     , inner_radius_(100.0 * inner_radius)
 {
@@ -277,7 +249,7 @@ void Sphere::print(std::ostream& os) const
 }
 
 // ------------------------------------------------------------------------- //
-pair<double, double> Sphere::DistanceToBorder(PROPOSALParticle* particle)
+pair<double, double> Sphere::DistanceToBorder(Vector3D& position, Vector3D& direction)
 {
     // Calculate intersection of particle trajectory and the sphere
     // sphere (x1 + x0)^2 + (x2 + y0)^2 + (x3 + z0)^2 = radius^2
@@ -289,28 +261,23 @@ pair<double, double> Sphere::DistanceToBorder(PROPOSALParticle* particle)
     // ( we want to find the intersection in direction of the particle
     // trajectory)
 
-    double A, B, t1, t2;
-    double dir_vec_x = particle->GetCosPhi() * particle->GetSinTheta();
-    double dir_vec_y = particle->GetSinPhi() * particle->GetSinTheta();
-    double dir_vec_z = particle->GetCosTheta();
+    double A, B, t1, t2, difference_length_squared;
 
     pair<double, double> distance;
 
     double determinant;
 
-    A = pow((particle->GetX() - x0_), 2) + pow((particle->GetY() - y0_), 2) +
-        pow((particle->GetZ() - z0_), 2) - pow(radius_, 2);
+    difference_length_squared= pow((position - position_).magnitude(), 2);
+    A = difference_length_squared - radius_*radius_;
 
-    B = 2 * ((particle->GetX() - x0_) * dir_vec_x +
-             (particle->GetY() - y0_) * dir_vec_y +
-             (particle->GetZ() - z0_) * dir_vec_z);
+    B = scalar_product(position - position_, direction);
 
-    determinant = pow(B / 2, 2) - A;
+    determinant = B*B - A;
 
     if (determinant > 0) // determinant == 0 (boundery point) is ignored
     {
-        t1 = -1 * B / 2 + sqrt(determinant);
-        t2 = -1 * B / 2 - sqrt(determinant);
+        t1 = -1 * B + sqrt(determinant);
+        t2 = -1 * B - sqrt(determinant);
 
         // Computer precision controll
         if (t1 > 0 && t1 < GEOMETRY_PRECISION)
@@ -338,13 +305,16 @@ pair<double, double> Sphere::DistanceToBorder(PROPOSALParticle* particle)
         // distance.first should be the smaller one
         if (distance.first < 0)
             std::swap(distance.first, distance.second);
-        if (distance.first > 0 && distance.second > 0) {
-            if (distance.second < distance.first) {
+        if (distance.first > 0 && distance.second > 0)
+        {
+            if (distance.second < distance.first)
+            {
                 std::swap(distance.first, distance.second);
             }
         }
 
-    } else // particle trajectory does not have an intersection with the sphere
+    }
+    else // particle trajectory does not have an intersection with the sphere
     {
         distance.first = -1;
         distance.second = -1;
@@ -360,21 +330,16 @@ pair<double, double> Sphere::DistanceToBorder(PROPOSALParticle* particle)
     // reached before.
     // So we caluculate the intersection with the inner sphere.
 
-    if (inner_radius_ > 0) {
-        A = pow((particle->GetX() - x0_), 2) +
-            pow((particle->GetY() - y0_), 2) +
-            pow((particle->GetZ() - z0_), 2) - pow(inner_radius_, 2);
+    if (inner_radius_ > 0)
+    {
+        A = difference_length_squared - inner_radius_*inner_radius_;
 
-        B = 2 * ((particle->GetX() - x0_) * dir_vec_x +
-                 (particle->GetY() - y0_) * dir_vec_y +
-                 (particle->GetZ() - z0_) * dir_vec_z);
-
-        determinant = pow(B / 2, 2) - A;
+        determinant = B*B - A;
 
         if (determinant > 0) // determinant == 0 (boundery point) is ignored
         {
-            t1 = -1 * B / 2 + sqrt(determinant);
-            t2 = -1 * B / 2 - sqrt(determinant);
+            t1 = -1 * B + sqrt(determinant);
+            t2 = -1 * B - sqrt(determinant);
 
             // Computer precision controll
             if (t1 > 0 && t1 < GEOMETRY_PRECISION)
@@ -469,8 +434,8 @@ Box::Box()
     // Do nothing here
 }
 
-Box::Box(double x0, double y0, double z0, double x, double y, double z)
-    : Geometry("Box", x0, y0, z0)
+Box::Box(Vector3D position, double x, double y, double z)
+    : Geometry("Box", position)
     , x_(100.0 * x)
     , y_(100.0 * y)
     , z_(100.0 * z)
@@ -547,25 +512,25 @@ void Box::print(std::ostream& os) const
 }
 
 // ------------------------------------------------------------------------- //
-pair<double, double> Box::DistanceToBorder(PROPOSALParticle* particle)
+pair<double, double> Box::DistanceToBorder(Vector3D& position, Vector3D& direction)
 {
     // Calculate intersection of particle trajectory and the box
     // Surface of the box is defined by six planes:
-    // E1: x1   =   x0_ + 0.5*x
-    // E2: x1   =   x0_ - 0.5*x
-    // E3: x2   =   y0_ + 0.5*y
-    // E4: x2   =   y0_ - 0.5*y
-    // E5: x3   =   z0_ + 0.5*z
-    // E6: x3   =   z0_ - 0.5*z
+    // E1: x1   =   position.GetX() + 0.5*x
+    // E2: x1   =   position.GetX() - 0.5*x
+    // E3: x2   =   position.GetY() + 0.5*y
+    // E4: x2   =   position.GetY() - 0.5*y
+    // E5: x3   =   position.GetZ() + 0.5*z
+    // E6: x3   =   position.GetZ() - 0.5*z
     // straight line (particle trajectory) g = vec(x,y,z) + t * dir_vec( cosph
     // *sinth, sinph *sinth , costh)
     // We are only interested in postive values of t
     // ( we want to find the intersection in direction of the particle
     // trajectory)
 
-    double dir_vec_x = particle->GetCosPhi() * particle->GetSinTheta();
-    double dir_vec_y = particle->GetSinPhi() * particle->GetSinTheta();
-    double dir_vec_z = particle->GetCosTheta();
+    double dir_vec_x = direction.GetX();
+    double dir_vec_y = direction.GetY();
+    double dir_vec_z = direction.GetZ();
 
     pair<double, double> distance;
     double t;
@@ -575,10 +540,17 @@ pair<double, double> Box::DistanceToBorder(PROPOSALParticle* particle)
 
     vector<double> dist;
 
+    double x_calc_pos = position_.GetX() + 0.5*x_;
+    double x_calc_neg = position_.GetX() - 0.5*x_;
+    double y_calc_pos = position_.GetY() + 0.5*y_;
+    double y_calc_neg = position_.GetY() - 0.5*y_;
+    double z_calc_pos = position_.GetZ() + 0.5*z_;
+    double z_calc_neg = position_.GetZ() - 0.5*z_;
+
     // intersection with E1
     if (dir_vec_x != 0) // if dir_vec == 0 particle trajectory is parallel to E1
     {
-        t = (x0_ + 0.5 * x_ - particle->GetX()) / dir_vec_x;
+        t = (x_calc_pos - position.GetX()) / dir_vec_x;
 
         // Computer precision controll
         if (t > 0 && t < GEOMETRY_PRECISION)
@@ -587,12 +559,13 @@ pair<double, double> Box::DistanceToBorder(PROPOSALParticle* particle)
         if (t > 0) // Interection is in particle trajectory direction
         {
             // Check if intersection is inside the box borders
-            intersection_y = particle->GetY() + t * dir_vec_y;
-            intersection_z = particle->GetZ() + t * dir_vec_z;
-            if (intersection_y >= (y0_ - 0.5 * y_) &&
-                intersection_y <= (y0_ + 0.5 * y_) &&
-                intersection_z >= (z0_ - 0.5 * z_) &&
-                intersection_z <= (z0_ + 0.5 * z_)) {
+            intersection_y = position.GetY() + t * dir_vec_y;
+            intersection_z = position.GetZ() + t * dir_vec_z;
+            if (intersection_y >= y_calc_neg &&
+                intersection_y <= y_calc_pos &&
+                intersection_z >= z_calc_neg &&
+                intersection_z <= z_calc_pos)
+            {
                 dist.push_back(t);
             }
         }
@@ -601,7 +574,7 @@ pair<double, double> Box::DistanceToBorder(PROPOSALParticle* particle)
     // intersection with E2
     if (dir_vec_x != 0) // if dir_vec == 0 particle trajectory is parallel to E2
     {
-        t = (x0_ - 0.5 * x_ - particle->GetX()) / dir_vec_x;
+        t = (x_calc_neg - position.GetX()) / dir_vec_x;
 
         // Computer precision controll
         if (t > 0 && t < GEOMETRY_PRECISION)
@@ -610,12 +583,13 @@ pair<double, double> Box::DistanceToBorder(PROPOSALParticle* particle)
         if (t > 0) // Interection is in particle trajectory direction
         {
             // Check if intersection is inside the box borders
-            intersection_y = particle->GetY() + t * dir_vec_y;
-            intersection_z = particle->GetZ() + t * dir_vec_z;
-            if (intersection_y >= (y0_ - 0.5 * y_) &&
-                intersection_y <= (y0_ + 0.5 * y_) &&
-                intersection_z >= (z0_ - 0.5 * z_) &&
-                intersection_z <= (z0_ + 0.5 * z_)) {
+            intersection_y = position.GetY() + t * dir_vec_y;
+            intersection_z = position.GetZ() + t * dir_vec_z;
+            if (intersection_y >= y_calc_neg &&
+                intersection_y <= y_calc_pos &&
+                intersection_z >= z_calc_neg &&
+                intersection_z <= z_calc_pos)
+            {
                 dist.push_back(t);
             }
         }
@@ -624,7 +598,7 @@ pair<double, double> Box::DistanceToBorder(PROPOSALParticle* particle)
     // intersection with E3
     if (dir_vec_y != 0) // if dir_vec == 0 particle trajectory is parallel to E3
     {
-        t = (y0_ + 0.5 * y_ - particle->GetY()) / dir_vec_y;
+        t = (y_calc_pos - position.GetY()) / dir_vec_y;
 
         // Computer precision controll
         if (t > 0 && t < GEOMETRY_PRECISION)
@@ -633,12 +607,13 @@ pair<double, double> Box::DistanceToBorder(PROPOSALParticle* particle)
         if (t > 0) // Interection is in particle trajectory direction
         {
             // Check if intersection is inside the box borders
-            intersection_x = particle->GetX() + t * dir_vec_x;
-            intersection_z = particle->GetZ() + t * dir_vec_z;
-            if (intersection_x >= (x0_ - 0.5 * x_) &&
-                intersection_x <= (x0_ + 0.5 * x_) &&
-                intersection_z >= (z0_ - 0.5 * z_) &&
-                intersection_z <= (z0_ + 0.5 * z_)) {
+            intersection_x = position.GetX() + t * dir_vec_x;
+            intersection_z = position.GetZ() + t * dir_vec_z;
+            if (intersection_x >= x_calc_neg &&
+                intersection_x <= x_calc_pos &&
+                intersection_z >= z_calc_neg &&
+                intersection_z <= z_calc_pos)
+            {
                 dist.push_back(t);
             }
         }
@@ -647,7 +622,7 @@ pair<double, double> Box::DistanceToBorder(PROPOSALParticle* particle)
     // intersection with E4
     if (dir_vec_y != 0) // if dir_vec == 0 particle trajectory is parallel to E4
     {
-        t = (y0_ - 0.5 * y_ - particle->GetY()) / dir_vec_y;
+        t = (y_calc_neg - position.GetY()) / dir_vec_y;
 
         // Computer precision controll
         if (t > 0 && t < GEOMETRY_PRECISION)
@@ -656,12 +631,13 @@ pair<double, double> Box::DistanceToBorder(PROPOSALParticle* particle)
         if (t > 0) // Interection is in particle trajectory direction
         {
             // Check if intersection is inside the box borders
-            intersection_x = particle->GetX() + t * dir_vec_x;
-            intersection_z = particle->GetZ() + t * dir_vec_z;
-            if (intersection_x >= (x0_ - 0.5 * x_) &&
-                intersection_x <= (x0_ + 0.5 * x_) &&
-                intersection_z >= (z0_ - 0.5 * z_) &&
-                intersection_z <= (z0_ + 0.5 * z_)) {
+            intersection_x = position.GetX() + t * dir_vec_x;
+            intersection_z = position.GetZ() + t * dir_vec_z;
+            if (intersection_x >= x_calc_neg &&
+                intersection_x <= x_calc_pos &&
+                intersection_z >= z_calc_neg &&
+                intersection_z <= z_calc_pos)
+            {
                 dist.push_back(t);
             }
         }
@@ -670,7 +646,7 @@ pair<double, double> Box::DistanceToBorder(PROPOSALParticle* particle)
     // intersection with E5
     if (dir_vec_z != 0) // if dir_vec == 0 particle trajectory is parallel to E5
     {
-        t = (z0_ + 0.5 * z_ - particle->GetZ()) / dir_vec_z;
+        t = (z_calc_pos - position.GetZ()) / dir_vec_z;
 
         // Computer precision controll
         if (t > 0 && t < GEOMETRY_PRECISION)
@@ -679,12 +655,13 @@ pair<double, double> Box::DistanceToBorder(PROPOSALParticle* particle)
         if (t > 0) // Interection is in particle trajectory direction
         {
             // Check if intersection is inside the box borders
-            intersection_x = particle->GetX() + t * dir_vec_x;
-            intersection_y = particle->GetY() + t * dir_vec_y;
-            if (intersection_x >= (x0_ - 0.5 * x_) &&
-                intersection_x <= (x0_ + 0.5 * x_) &&
-                intersection_y >= (y0_ - 0.5 * y_) &&
-                intersection_y <= (y0_ + 0.5 * y_)) {
+            intersection_x = position.GetX() + t * dir_vec_x;
+            intersection_y = position.GetY() + t * dir_vec_y;
+            if (intersection_x >= x_calc_neg &&
+                intersection_x <= x_calc_pos &&
+                intersection_y >= y_calc_neg &&
+                intersection_y <= y_calc_pos)
+            {
                 dist.push_back(t);
             }
         }
@@ -693,7 +670,7 @@ pair<double, double> Box::DistanceToBorder(PROPOSALParticle* particle)
     // intersection with E6
     if (dir_vec_z != 0) // if dir_vec == 0 particle trajectory is parallel to E6
     {
-        t = (z0_ - 0.5 * z_ - particle->GetZ()) / dir_vec_z;
+        t = (z_calc_neg - position.GetZ()) / dir_vec_z;
 
         // Computer precision controll
         if (t > 0 && t < GEOMETRY_PRECISION)
@@ -702,12 +679,12 @@ pair<double, double> Box::DistanceToBorder(PROPOSALParticle* particle)
         if (t > 0) // Interection is in particle trajectory direction
         {
             // Check if intersection is inside the box borders
-            intersection_x = particle->GetX() + t * dir_vec_x;
-            intersection_y = particle->GetY() + t * dir_vec_y;
-            if (intersection_x >= (x0_ - 0.5 * x_) &&
-                intersection_x <= (x0_ + 0.5 * x_) &&
-                intersection_y >= (y0_ - 0.5 * y_) &&
-                intersection_y <= (y0_ + 0.5 * y_)) {
+            intersection_x = position.GetX() + t * dir_vec_x;
+            intersection_y = position.GetY() + t * dir_vec_y;
+            if (intersection_x >= x_calc_neg &&
+                intersection_x <= x_calc_pos &&
+                intersection_y >= y_calc_neg &&
+                intersection_y <= y_calc_pos) {
                 dist.push_back(t);
             }
         }
@@ -768,13 +745,11 @@ Cylinder::Cylinder()
     // Do nothing here
 }
 
-Cylinder::Cylinder(double x0,
-                   double y0,
-                   double z0,
+Cylinder::Cylinder(Vector3D position,
                    double radius,
                    double inner_radius,
                    double z)
-    : Geometry("Cylinder", x0, y0, z0)
+    : Geometry("Cylinder", position)
     , radius_(100 * radius)
     , inner_radius_(100 * inner_radius)
     , z_(100 * z)
@@ -859,7 +834,7 @@ void Cylinder::print(std::ostream& os) const
 }
 
 // ------------------------------------------------------------------------- //
-pair<double, double> Cylinder::DistanceToBorder(PROPOSALParticle* particle)
+pair<double, double> Cylinder::DistanceToBorder(Vector3D& position, Vector3D& direction)
 {
     // Calculate intersection of particle trajectory and the cylinder
     // cylinder barrel (x1 + x0)^2 + (x2 + y0)^2  = radius^2 [ z0_-0.5*z_ <
@@ -881,9 +856,9 @@ pair<double, double> Cylinder::DistanceToBorder(PROPOSALParticle* particle)
     // inside
 
     double A, B, C, t1, t2, t;
-    double dir_vec_x = particle->GetCosPhi() * particle->GetSinTheta();
-    double dir_vec_y = particle->GetSinPhi() * particle->GetSinTheta();
-    double dir_vec_z = particle->GetCosTheta();
+    double dir_vec_x = direction.GetX();
+    double dir_vec_y = direction.GetY();
+    double dir_vec_z = direction.GetZ();
 
     double determinant;
 
@@ -895,16 +870,19 @@ pair<double, double> Cylinder::DistanceToBorder(PROPOSALParticle* particle)
 
     pair<double, double> distance;
 
+    double z_calc_pos = position_.GetZ() + 0.5*z_;
+    double z_calc_neg = position_.GetZ() - 0.5*z_;
+
     if (!(dir_vec_x == 0 && dir_vec_y == 0)) // Otherwise the particle
                                              // trajectory is parallel to
                                              // cylinder barrel
     {
 
-        A = pow((particle->GetX() - x0_), 2) +
-            pow((particle->GetY() - y0_), 2) - pow(radius_, 2);
+        A = pow((position.GetX() - position_.GetX()), 2) +
+            pow((position.GetY() - position_.GetY()), 2) - pow(radius_, 2);
 
-        B = 2 * ((particle->GetX() - x0_) * dir_vec_x +
-                 (particle->GetY() - y0_) * dir_vec_y);
+        B = 2 * ((position.GetX() - position_.GetX()) * dir_vec_x +
+                 (position.GetY() - position_.GetY()) * dir_vec_y);
 
         C = dir_vec_x * dir_vec_x + dir_vec_y * dir_vec_y;
 
@@ -925,19 +903,19 @@ pair<double, double> Cylinder::DistanceToBorder(PROPOSALParticle* particle)
                 t2 = 0;
 
             if (t1 > 0) {
-                intersection_z = particle->GetZ() + t1 * dir_vec_z;
+                intersection_z = position.GetZ() + t1 * dir_vec_z;
                 // is inside the borders
-                if (intersection_z > z0_ - 0.5 * z_ &&
-                    intersection_z < z0_ + 0.5 * z_) {
+                if (intersection_z > z_calc_neg &&
+                    intersection_z < z_calc_pos) {
                     dist.push_back(t1);
                 }
             }
 
             if (t2 > 0) {
-                intersection_z = particle->GetZ() + t2 * dir_vec_z;
+                intersection_z = position.GetZ() + t2 * dir_vec_z;
                 // is inside the borders
-                if (intersection_z > z0_ - 0.5 * z_ &&
-                    intersection_z < z0_ + 0.5 * z_) {
+                if (intersection_z > z_calc_neg &&
+                    intersection_z < z_calc_pos) {
                     dist.push_back(t2);
                 }
             }
@@ -947,25 +925,26 @@ pair<double, double> Cylinder::DistanceToBorder(PROPOSALParticle* particle)
     // if we have found already to intersections we don't have to check for
     // intersections
     // with top or bottom surface
-    if (dist.size() < 2) {
+    if (dist.size() < 2)
+    {
         // intersection with E1
         if (dir_vec_z != 0) // if dir_vec == 0 particle trajectory is parallel
                             // to E1 (Should not happen)
         {
-            t = (z0_ + 0.5 * z_ - particle->GetZ()) / dir_vec_z;
+            t = (z_calc_pos - position.GetZ()) / dir_vec_z;
             // Computer precision controll
             if (t > 0 && t < GEOMETRY_PRECISION)
                 t = 0;
 
             if (t > 0) // Interection is in particle trajectory direction
             {
-                intersection_x = particle->GetX() + t * dir_vec_x;
-                intersection_y = particle->GetY() + t * dir_vec_y;
+                intersection_x = position.GetX() + t * dir_vec_x;
+                intersection_y = position.GetY() + t * dir_vec_y;
 
-                if (sqrt(pow((intersection_x - x0_), 2) +
-                         pow((intersection_y - y0_), 2)) <= radius_ &&
-                    sqrt(pow((intersection_x - x0_), 2) +
-                         pow((intersection_y - y0_), 2)) >= inner_radius_) {
+                if (sqrt(pow((intersection_x - position_.GetX()), 2) +
+                         pow((intersection_y - position_.GetY()), 2)) <= radius_ &&
+                    sqrt(pow((intersection_x - position_.GetX()), 2) +
+                         pow((intersection_y - position_.GetY()), 2)) >= inner_radius_) {
                     dist.push_back(t);
                 }
             }
@@ -975,7 +954,7 @@ pair<double, double> Cylinder::DistanceToBorder(PROPOSALParticle* particle)
         if (dir_vec_z != 0) // if dir_vec == 0 particle trajectory is parallel
                             // to E2 (Should not happen)
         {
-            t = (z0_ - 0.5 * z_ - particle->GetZ()) / dir_vec_z;
+            t = (z_calc_neg - position.GetZ()) / dir_vec_z;
 
             // Computer precision controll
             if (t > 0 && t < GEOMETRY_PRECISION)
@@ -983,13 +962,13 @@ pair<double, double> Cylinder::DistanceToBorder(PROPOSALParticle* particle)
 
             if (t > 0) // Interection is in particle trajectory direction
             {
-                intersection_x = particle->GetX() + t * dir_vec_x;
-                intersection_y = particle->GetY() + t * dir_vec_y;
+                intersection_x = position.GetX() + t * dir_vec_x;
+                intersection_y = position.GetY() + t * dir_vec_y;
 
-                if (sqrt(pow((intersection_x - x0_), 2) +
-                         pow((intersection_y - y0_), 2)) <= radius_ &&
-                    sqrt(pow((intersection_x - x0_), 2) +
-                         pow((intersection_y - y0_), 2)) >= inner_radius_) {
+                if (sqrt(pow((intersection_x - position_.GetX()), 2) +
+                         pow((intersection_y - position_.GetY()), 2)) <= radius_ &&
+                    sqrt(pow((intersection_x - position_.GetX()), 2) +
+                         pow((intersection_y - position_.GetY()), 2)) >= inner_radius_) {
                     dist.push_back(t);
                 }
             }
@@ -1024,11 +1003,11 @@ pair<double, double> Cylinder::DistanceToBorder(PROPOSALParticle* particle)
     if (inner_radius_ > 0) {
         if (!(dir_vec_x == 0 && dir_vec_y == 0)) {
 
-            A = pow((particle->GetX() - x0_), 2) +
-                pow((particle->GetY() - y0_), 2) - pow(inner_radius_, 2);
+            A = pow((position.GetX() - position_.GetX()), 2) +
+                pow((position.GetY() - position_.GetY()), 2) - pow(inner_radius_, 2);
 
-            B = 2 * ((particle->GetX() - x0_) * dir_vec_x +
-                     (particle->GetY() - y0_) * dir_vec_y);
+            B = 2 * ((position.GetX() - position_.GetX()) * dir_vec_x +
+                     (position.GetY() - position_.GetY()) * dir_vec_y);
 
             C = dir_vec_x * dir_vec_x + dir_vec_y * dir_vec_y;
 
@@ -1058,20 +1037,20 @@ pair<double, double> Cylinder::DistanceToBorder(PROPOSALParticle* particle)
                 // the inner border)
                 if (distance.first > 0 && distance.second > 0) {
                     if (t1 > 0) {
-                        intersection_z = particle->GetZ() + t1 * dir_vec_z;
+                        intersection_z = position.GetZ() + t1 * dir_vec_z;
                         // is inside the borders
-                        if (intersection_z > z0_ - 0.5 * z_ &&
-                            intersection_z < z0_ + 0.5 * z_) {
+                        if (intersection_z > z_calc_neg &&
+                            intersection_z < z_calc_pos) {
                             if (t1 < distance.second)
                                 distance.second = t1;
                         }
                     }
 
                     if (t2 > 0) {
-                        intersection_z = particle->GetZ() + t2 * dir_vec_z;
+                        intersection_z = position.GetZ() + t2 * dir_vec_z;
                         // is inside the borders
-                        if (intersection_z > z0_ - 0.5 * z_ &&
-                            intersection_z < z0_ + 0.5 * z_) {
+                        if (intersection_z > z_calc_neg &&
+                            intersection_z < z_calc_pos) {
                             if (t2 < distance.second)
                                 distance.second = t2;
                         }
@@ -1092,18 +1071,18 @@ pair<double, double> Cylinder::DistanceToBorder(PROPOSALParticle* particle)
                 // |___|      |___|
                 else if (distance.first < 0 && distance.second < 0) {
                     if (t1 > 0) {
-                        intersection_z = particle->GetZ() + t1 * dir_vec_z;
+                        intersection_z = position.GetZ() + t1 * dir_vec_z;
                         // is inside the borders
-                        if (intersection_z > z0_ - 0.5 * z_ &&
-                            intersection_z < z0_ + 0.5 * z_) {
+                        if (intersection_z > z_calc_neg &&
+                            intersection_z < z_calc_pos) {
                             distance.first = t1;
                         }
                     }
                     if (t2 > 0) {
-                        intersection_z = particle->GetZ() + t2 * dir_vec_z;
+                        intersection_z = position.GetZ() + t2 * dir_vec_z;
                         // is inside the borders
-                        if (intersection_z > z0_ - 0.5 * z_ &&
-                            intersection_z < z0_ + 0.5 * z_) {
+                        if (intersection_z > z_calc_neg &&
+                            intersection_z < z_calc_pos) {
                             distance.first = t2;
                         }
                     }
@@ -1126,20 +1105,20 @@ pair<double, double> Cylinder::DistanceToBorder(PROPOSALParticle* particle)
                         // |     |      |     |
                         // |_____|      |_____|
                         //
-                        if (particle->GetZ() >= z0_ - 0.5 * z_ &&
-                            particle->GetZ() <= z0_ + 0.5 * z_ &&
-                            sqrt(pow((particle->GetX() - x0_), 2) +
-                                 pow((particle->GetY() - y0_), 2)) <=
+                        if (position.GetZ() >= z_calc_neg &&
+                            position.GetZ() <= z_calc_pos &&
+                            sqrt(pow((position.GetX() - position_.GetX()), 2) +
+                                 pow((position.GetY() - position_.GetY()), 2)) <=
                               radius_ + GEOMETRY_PRECISION &&
-                            sqrt(pow((particle->GetX() - x0_), 2) +
-                                 pow((particle->GetY() - y0_), 2)) >=
+                            sqrt(pow((position.GetX() - position_.GetX()), 2) +
+                                 pow((position.GetY() - position_.GetY()), 2)) >=
                               inner_radius_ - GEOMETRY_PRECISION) {
                             if (t1 < distance.first) {
                                 intersection_z =
-                                  particle->GetZ() + t1 * dir_vec_z;
+                                  position.GetZ() + t1 * dir_vec_z;
                                 // is inside the borders
-                                if (intersection_z > z0_ - 0.5 * z_ &&
-                                    intersection_z < z0_ + 0.5 * z_) {
+                                if (intersection_z > z_calc_neg &&
+                                    intersection_z < z_calc_pos) {
                                     // This case means particle is inside in
                                     // hits
                                     // inner cylinder first
@@ -1148,10 +1127,10 @@ pair<double, double> Cylinder::DistanceToBorder(PROPOSALParticle* particle)
                             }
                             if (t2 < distance.first) {
                                 intersection_z =
-                                  particle->GetZ() + t2 * dir_vec_z;
+                                  position.GetZ() + t2 * dir_vec_z;
                                 // is inside the borders
-                                if (intersection_z > z0_ - 0.5 * z_ &&
-                                    intersection_z < z0_ + 0.5 * z_) {
+                                if (intersection_z > z_calc_neg &&
+                                    intersection_z < z_calc_pos) {
                                     // This case means particle is inside in
                                     // hits
                                     // inner cylinder first
@@ -1173,10 +1152,10 @@ pair<double, double> Cylinder::DistanceToBorder(PROPOSALParticle* particle)
                         //    *
                         //   x
                         else {
-                            intersection_z = particle->GetZ() + t1 * dir_vec_z;
+                            intersection_z = position.GetZ() + t1 * dir_vec_z;
                             // is inside the borders
-                            if (intersection_z > z0_ - 0.5 * z_ &&
-                                intersection_z < z0_ + 0.5 * z_) {
+                            if (intersection_z > z_calc_neg &&
+                                intersection_z < z_calc_pos) {
                                 // This case means particle is inside in hits
                                 // inner cylinder first
                                 distance.second = t1;
@@ -1184,10 +1163,10 @@ pair<double, double> Cylinder::DistanceToBorder(PROPOSALParticle* particle)
 
                             if (distance.second < 0) {
                                 intersection_z =
-                                  particle->GetZ() + t2 * dir_vec_z;
+                                  position.GetZ() + t2 * dir_vec_z;
                                 // is inside the borders
-                                if (intersection_z > z0_ - 0.5 * z_ &&
-                                    intersection_z < z0_ + 0.5 * z_) {
+                                if (intersection_z > z_calc_neg &&
+                                    intersection_z < z_calc_pos) {
                                     // This case means particle is inside in
                                     // hits
                                     // inner cylinder first
@@ -1214,18 +1193,18 @@ pair<double, double> Cylinder::DistanceToBorder(PROPOSALParticle* particle)
                     //
                     if ((t1 > 0 && t2 < 0) || (t2 > 0 && t1 < 0)) {
                         if (t1 > 0) {
-                            intersection_z = particle->GetZ() + t1 * dir_vec_z;
+                            intersection_z = position.GetZ() + t1 * dir_vec_z;
                             // is inside the borders
-                            if (intersection_z > z0_ - 0.5 * z_ &&
-                                intersection_z < z0_ + 0.5 * z_) {
+                            if (intersection_z > z_calc_neg &&
+                                intersection_z < z_calc_pos) {
                                 std::swap(distance.first, distance.second);
                                 distance.first = t1;
                             }
                         } else {
-                            intersection_z = particle->GetZ() + t2 * dir_vec_z;
+                            intersection_z = position.GetZ() + t2 * dir_vec_z;
                             // is inside the borders
-                            if (intersection_z > z0_ - 0.5 * z_ &&
-                                intersection_z < z0_ + 0.5 * z_) {
+                            if (intersection_z > z_calc_neg &&
+                                intersection_z < z_calc_pos) {
                                 std::swap(distance.first, distance.second);
                                 distance.first = t2;
                             }
@@ -1236,10 +1215,10 @@ pair<double, double> Cylinder::DistanceToBorder(PROPOSALParticle* particle)
                     if (t1 == 0) {
                         // The particle is moving into the inner cylinder
                         if (t2 > 0) {
-                            intersection_z = particle->GetZ() + t2 * dir_vec_z;
+                            intersection_z = position.GetZ() + t2 * dir_vec_z;
                             // is inside the borders
-                            if (intersection_z > z0_ - 0.5 * z_ &&
-                                intersection_z < z0_ + 0.5 * z_) {
+                            if (intersection_z > z_calc_neg &&
+                                intersection_z < z_calc_pos) {
                                 std::swap(distance.first, distance.second);
                                 distance.first = t2;
                             }
@@ -1249,10 +1228,10 @@ pair<double, double> Cylinder::DistanceToBorder(PROPOSALParticle* particle)
                     if (t2 == 0) {
                         // The particle is moving into the inner sphere
                         if (t1 > 0) {
-                            intersection_z = particle->GetZ() + t1 * dir_vec_z;
+                            intersection_z = position.GetZ() + t1 * dir_vec_z;
                             // is inside the borders
-                            if (intersection_z > z0_ - 0.5 * z_ &&
-                                intersection_z < z0_ + 0.5 * z_) {
+                            if (intersection_z > z_calc_neg &&
+                                intersection_z < z_calc_pos) {
                                 std::swap(distance.first, distance.second);
                                 distance.first = t1;
                             }

@@ -8,6 +8,7 @@
 
 #include "PROPOSAL/Photonuclear.h"
 #include "PROPOSAL/Output.h"
+#include "PROPOSAL/Constants.h"
 // #include "PROPOSAL/CrossSections.h"
 
 using namespace std;
@@ -39,11 +40,16 @@ public:
     }
 };
 
+Vector3D position(1.,1.,1.);
+Vector3D direction(0.,0.,0.);
+
 TEST(Comparison , Comparison_equal ) {
+    direction.SetSphericalCoordinates(1,.20*PI/180.,20*PI/180.);
+    direction.CalculateCartesianFromSpherical();
 
     double dEdx;
     Medium *medium = new Air();
-    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,position,direction,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
     Photonuclear *A = new Photonuclear(particle, medium, cuts);
     Photonuclear *B = new Photonuclear(particle, medium, cuts);
@@ -71,11 +77,13 @@ TEST(Comparison , Comparison_equal ) {
 }
 
 TEST(Comparison , Comparison_not_equal ) {
+    direction.SetSphericalCoordinates(1,20*PI/180.,20*PI/180.);
+    direction.CalculateCartesianFromSpherical();
     double dEdx;
     Medium *medium = new Air();
     Medium *medium2 = new Air();
-    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,20,20,1e5,10);
-    PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,20,20,1e5,10);
+    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,position,direction,1e5,10);
+    PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::TauMinus,position,direction,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
     Photonuclear *A = new Photonuclear(particle, medium, cuts);
     Photonuclear *B = new Photonuclear(particle, medium2, cuts);
@@ -107,8 +115,10 @@ TEST(Assignment , Copyconstructor ) {
 }
 
 TEST(Assignment , Copyconstructor2 ) {
+    direction.SetSphericalCoordinates(1,.20*PI/180.,20*PI/180.);
+    direction.CalculateCartesianFromSpherical();
     Medium *medium = new Air();
-    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,position,direction,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
 
     Photonuclear A(particle, medium, cuts);
@@ -119,8 +129,10 @@ TEST(Assignment , Copyconstructor2 ) {
 }
 
 TEST(Assignment , Operator ) {
+    direction.SetSphericalCoordinates(1,.20*PI/180.,20*PI/180.);
+    direction.CalculateCartesianFromSpherical();
     Medium *medium = new Air();
-    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,position,direction,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
     Photonuclear A(particle, medium, cuts);
     Photonuclear B(particle, medium, cuts);
@@ -132,7 +144,7 @@ TEST(Assignment , Operator ) {
     EXPECT_TRUE(A==B);
 
     Medium *medium2 = new Water();
-    PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::TauMinus,position,direction,1e5,10);
     EnergyCutSettings *cuts2 = new EnergyCutSettings(200,-1);
     Photonuclear *C = new Photonuclear(particle2, medium2, cuts2);
     EXPECT_TRUE(A!=*C);
@@ -144,10 +156,12 @@ TEST(Assignment , Operator ) {
 }
 
 TEST(Assignment , Swap ) {
+    direction.SetSphericalCoordinates(1,20*PI/180.,20*PI/180.);
+    direction.CalculateCartesianFromSpherical();
     Medium *medium = new Air();
     Medium *medium2 = new Air();
-    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,20,20,1e5,10);
-    PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,20,20,1e5,10);
+    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,position,direction,1e5,10);
+    PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::MuMinus,position,direction,1e5,10);
     EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
     EnergyCutSettings *cuts2 = new EnergyCutSettings(500,-1);
     Photonuclear A(particle, medium, cuts);
@@ -160,10 +174,12 @@ TEST(Assignment , Swap ) {
     B.EnableDNdxInterpolation();
     EXPECT_TRUE(A==B);
 
+    direction.SetSphericalCoordinates(1,.20*PI/180.,20*PI/180.);
+    direction.CalculateCartesianFromSpherical();
     Medium *medium3 = new Water();
     Medium *medium4 = new Water();
-    PROPOSALParticle *particle3 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,.20,20,1e5,10);
-    PROPOSALParticle *particle4 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,.20,20,1e5,10);
+    PROPOSALParticle *particle3 = new PROPOSALParticle(ParticleType::TauMinus,position,direction,1e5,10);
+    PROPOSALParticle *particle4 = new PROPOSALParticle(ParticleType::TauMinus,position,direction,1e5,10);
     EnergyCutSettings *cuts3 = new EnergyCutSettings(200,-1);
     EnergyCutSettings *cuts4 = new EnergyCutSettings(200,-1);
     Photonuclear *C = new Photonuclear(particle3, medium3, cuts3);
@@ -187,6 +203,8 @@ std::vector<Photonuclear*>          CombOfPhoto;
 //----------------------------------------------------------------------------//
 
 TEST(Photonuclear , Set_Up ) {
+    direction.SetSphericalCoordinates(1,.20*PI/180.,20*PI/180.);
+    direction.CalculateCartesianFromSpherical();
     ifstream in;
     in.open("bin/TestFiles/Photo_dEdx.txt");
 
@@ -212,7 +230,7 @@ TEST(Photonuclear , Set_Up ) {
 
         i++;
         CombOfMedium.push_back(MediumFactory::Get()->CreateMedium(mediumName));
-        CombOfParticle.push_back(new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10));
+        CombOfParticle.push_back(new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),position,direction,1e5,10));
         CombOfParticle.at(i)->SetEnergy(energy);
         CombOfEnergyCutSettings.push_back(new EnergyCutSettings(ecut,vcut));
         CombOfPhoto.push_back(new Photonuclear(CombOfParticle.at(i), CombOfMedium.at(i), CombOfEnergyCutSettings.at(i)));
