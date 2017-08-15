@@ -133,6 +133,8 @@ class Medium
     double sumNucleons_; ///< sum of nucleons of all nuclei
 
     double r0_;
+
+    double X0_inv(unsigned int Z, double M);
 };
 
 /******************************************************************************
