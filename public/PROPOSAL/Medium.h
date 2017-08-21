@@ -44,6 +44,9 @@ class Medium
            double massDensity);
     Medium(const Medium&);
 
+    ///@brief Crush this Medium.
+    virtual ~Medium();
+
     void swap(Medium& medium);
     virtual Medium* clone() const = 0; // Prototyping/Virtual constructor idiom (used for deep copies)
 
@@ -54,9 +57,6 @@ class Medium
     friend std::ostream& operator<<(std::ostream& os, Medium const& medium);
 
     void init(); // Needed when not using c++11
-
-    ///@brief Crush this Medium.
-    virtual ~Medium();
 
     // ----------------------------------------------------------------- //
     // Getter & Setter
@@ -372,8 +372,6 @@ class AntaresWater : public MediumCopyable<Medium, AntaresWater>
 class MediumFactory
 {
     public:
-    virtual ~MediumFactory() { medium_map.clear(); }
-
     void Register(const std::string& name, Medium* (*)(void));
     Medium* CreateMedium(const std::string&);
 
@@ -385,6 +383,8 @@ class MediumFactory
 
     private:
     MediumFactory();
+    ~MediumFactory() { medium_map.clear(); }
+
     std::map<std::string, Medium* (*)(void)> medium_map;
 };
 
