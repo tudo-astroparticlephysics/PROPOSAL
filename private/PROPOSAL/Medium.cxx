@@ -69,38 +69,6 @@ double X0_inv(unsigned int Z, double M);
 *                                   Medium                                    *
 ******************************************************************************/
 
-Medium::Medium(const Medium& medium)
-    : name_(medium.name_)
-    , numComponents_(medium.numComponents_)
-    , sumCharge_(medium.sumCharge_)
-    , ZA_(medium.ZA_)
-    , I_(medium.I_)
-    , C_(medium.C_)
-    , a_(medium.a_)
-    , m_(medium.m_)
-    , X0_(medium.X0_)
-    , X1_(medium.X1_)
-    , d0_(medium.d0_)
-    , r_(medium.r_)
-    , rho_(medium.rho_)
-    , massDensity_(medium.massDensity_)
-    , molDensity_(medium.molDensity_)
-    , radiationLength_(medium.radiationLength_)
-    , ecut_(medium.ecut_)
-    , vcut_(medium.vcut_)
-    , vCut_(medium.vCut_)
-    , MM_(medium.MM_)
-    , sumNucleons_(medium.sumNucleons_)
-    , r0_(medium.r0_)
-{
-    // Deep copy of components
-    components_.resize(numComponents_);
-    for (unsigned int i = 0; i < components_.size(); ++i)
-    {
-        components_.at(i) = medium.components_.at(i)->clone();
-    }
-}
-
 Medium::Medium(std::string name,
                double rho,
                double I,
@@ -139,6 +107,38 @@ Medium::Medium(std::string name,
     } else
     {
         rho_ = 1;
+    }
+}
+
+Medium::Medium(const Medium& medium)
+    : name_(medium.name_)
+    , numComponents_(medium.numComponents_)
+    , sumCharge_(medium.sumCharge_)
+    , ZA_(medium.ZA_)
+    , I_(medium.I_)
+    , C_(medium.C_)
+    , a_(medium.a_)
+    , m_(medium.m_)
+    , X0_(medium.X0_)
+    , X1_(medium.X1_)
+    , d0_(medium.d0_)
+    , r_(medium.r_)
+    , rho_(medium.rho_)
+    , massDensity_(medium.massDensity_)
+    , molDensity_(medium.molDensity_)
+    , radiationLength_(medium.radiationLength_)
+    , ecut_(medium.ecut_)
+    , vcut_(medium.vcut_)
+    , vCut_(medium.vCut_)
+    , MM_(medium.MM_)
+    , sumNucleons_(medium.sumNucleons_)
+    , r0_(medium.r0_)
+{
+    // Deep copy of components
+    components_.resize(numComponents_);
+    for (unsigned int i = 0; i < components_.size(); ++i)
+    {
+        components_.at(i) = medium.components_.at(i)->clone();
     }
 }
 
