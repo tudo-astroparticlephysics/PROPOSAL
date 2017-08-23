@@ -1,11 +1,10 @@
 
-#include <math.h>
+#include <cmath>
 #include <iostream>
-#include <string>
 
 #include "PROPOSAL/Vector3D.h"
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/Output.h"
+// #include "PROPOSAL/Output.h"
 
 using namespace PROPOSAL;
 
@@ -115,8 +114,8 @@ namespace PROPOSAL
 std::ostream& operator<<(std::ostream& os, Vector3D const &vector_3d)
 {
     os<<"----Vector3D( "<<&vector_3d<<" )----"<<std::endl;
-    os<<"\tCartesian Coordinates (x,y,z):\t"<<vector_3d.x_<<"\t"<<vector_3d.y_<<"\t"<<vector_3d.z_<<std::endl;
-    os<<"\tSpherical Coordinates (radius,azimut,zenith):\t"<<vector_3d.spheric_radius_<<"\t"<<vector_3d.spheric_azimuth_<<"\t"<<vector_3d.spheric_zenith_<<std::endl;
+    os<<"\tCartesian Coordinates (x[cm],y[cm],z[cm]):\t"<<vector_3d.x_<<"\t"<<vector_3d.y_<<"\t"<<vector_3d.z_<<std::endl;
+    os<<"\tSpherical Coordinates (radius[cm],azimut[rad],zenith[rad]):\t"<<vector_3d.spheric_radius_<<"\t"<<vector_3d.spheric_azimuth_<<"\t"<<vector_3d.spheric_zenith_<<std::endl;
     // os<<"\tCylindrical Coordinates (radius,azimut,height):\t"<<vector_3d.cylindric_radius_<<"\t"<<vector_3d.cylindric_azimuth_<<"\t"<<vector_3d.cylindric_height_<<std::endl;
     os<<"------------------------------------";
     return os;
@@ -230,12 +229,12 @@ void Vector3D::CalculateSphericalCoordinates()
     }
     else if (spheric_radius_ == 0.)
     {
-        log_warn("If the radius is zero, the zenith is not defined! Zero is returned!");
+        // log_warn("If the radius is zero, the zenith is not defined! Zero is returned!");
         spheric_zenith_ = 0.;
     }
     else
     {
-        log_fatal("The radius is negativ, which is not possible!");
+        // log_fatal("The radius is negativ, which is not possible!");
     }
 }
 
@@ -288,11 +287,11 @@ double Vector3D::CalculateAzimuthFromCartesian()
         }
         else if (y_ == 0)
         {
-            log_warn("If x and y are zero, the azimuth is not defined! Zero is returned!");
+            // log_warn("If x and y are zero, the azimuth is not defined! Zero is returned!");
             return 0.;
         }
     }
-    log_fatal("never should be here; return zero.");
+    // log_fatal("never should be here; return zero.");
     return 0.;
 }
 
