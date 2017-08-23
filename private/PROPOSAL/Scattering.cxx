@@ -40,7 +40,7 @@ Scattering::Scattering( )
     ,integral_(  new Integral(IROMB, IMAXS, IPREC2) )
     ,interpolant_(NULL)
     ,interpolant_diff_(NULL)
-    ,particle_( new PROPOSALParticle(ParticleType::MuMinus) )
+    ,particle_( new PROPOSALParticle(MuMinusDef::Get()) )
 {
     crosssections_.push_back(new Ionization());
     crosssections_.push_back(new Bremsstrahlung());
@@ -378,25 +378,7 @@ void Scattering::EnableInterpolation(string path)
     // charged anti leptons have the same cross sections like charged leptons
     // (except of diffractive Bremsstrahlung, where one can analyse the interference term if implemented)
     // so they use the same interpolation tables
-    string particle_name;
-    switch (particle_->GetType())
-    {
-        case ParticleType::MuPlus:
-            particle_name = PROPOSALParticle::GetName(ParticleType::MuMinus);
-            break;
-        case ParticleType::TauPlus:
-            particle_name = PROPOSALParticle::GetName(ParticleType::TauMinus);
-            break;
-        case ParticleType::EPlus:
-            particle_name = PROPOSALParticle::GetName(ParticleType::EMinus);
-            break;
-        case ParticleType::STauPlus:
-            particle_name = PROPOSALParticle::GetName(ParticleType::STauMinus);
-            break;
-        default:
-            particle_name = particle_->GetName();
-            break;
-    }
+    string particle_name = particle_->GetName();
 
     if(!path.empty())
     {

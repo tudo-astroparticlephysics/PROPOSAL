@@ -142,25 +142,7 @@ void Photonuclear::EnableDNdxInterpolation(std::string path, bool raw)
 
     // charged anti leptons have the same cross sections like charged leptons
     // so they use the same interpolation tables
-    string particle_name;
-    switch (particle_->GetType())
-    {
-        case ParticleType::MuPlus:
-            particle_name = PROPOSALParticle::GetName(ParticleType::MuMinus);
-            break;
-        case ParticleType::TauPlus:
-            particle_name = PROPOSALParticle::GetName(ParticleType::TauMinus);
-            break;
-        case ParticleType::EPlus:
-            particle_name = PROPOSALParticle::GetName(ParticleType::EMinus);
-            break;
-        case ParticleType::STauPlus:
-            particle_name = PROPOSALParticle::GetName(ParticleType::STauMinus);
-            break;
-        default:
-            particle_name = particle_->GetName();
-            break;
-    }
+    string particle_name = particle_->GetName();
 
     if(!path.empty())
     {
@@ -354,25 +336,7 @@ void Photonuclear::EnableDEdxInterpolation(std::string path, bool raw)
 
     // charged anti leptons have the same cross sections like charged leptons
     // so they use the same interpolation tables
-    string particle_name;
-    switch (particle_->GetType())
-    {
-        case ParticleType::MuPlus:
-            particle_name = PROPOSALParticle::GetName(ParticleType::MuMinus);
-            break;
-        case ParticleType::TauPlus:
-            particle_name = PROPOSALParticle::GetName(ParticleType::TauMinus);
-            break;
-        case ParticleType::EPlus:
-            particle_name = PROPOSALParticle::GetName(ParticleType::EMinus);
-            break;
-        case ParticleType::STauPlus:
-            particle_name = PROPOSALParticle::GetName(ParticleType::STauMinus);
-            break;
-        default:
-            particle_name = particle_->GetName();
-            break;
-    }
+    string particle_name = particle_->GetName();
 
     if(!path.empty())
     {
@@ -477,25 +441,7 @@ void Photonuclear::EnablePhotoInterpolation(std::string path, bool raw)
 
     // charged anti leptons have the same cross sections like charged leptons
     // so they use the same interpolation tables
-    string particle_name;
-    switch (particle_->GetType())
-    {
-        case ParticleType::MuPlus:
-            particle_name = PROPOSALParticle::GetName(ParticleType::MuMinus);
-            break;
-        case ParticleType::TauPlus:
-            particle_name = PROPOSALParticle::GetName(ParticleType::TauMinus);
-            break;
-        case ParticleType::EPlus:
-            particle_name = PROPOSALParticle::GetName(ParticleType::EMinus);
-            break;
-        case ParticleType::STauPlus:
-            particle_name = PROPOSALParticle::GetName(ParticleType::STauMinus);
-            break;
-        default:
-            particle_name = particle_->GetName();
-            break;
-    }
+    string particle_name = particle_->GetName();
 
     if(!path.empty())
     {
@@ -1188,17 +1134,21 @@ double Photonuclear::ParametrizationOfRealPhotonAssumption(double v, int i)
 
     if(hard_component_)
     {
-        switch (particle_->GetType())
+        if (particle_->getHardBB() != NULL)
         {
-            case ParticleType::MuMinus:
-            case ParticleType::MuPlus:
-            case ParticleType::TauMinus:
-            case ParticleType::TauPlus:
                 aux +=  atomic_number*1.e-30*HardBB(particle_->GetEnergy(), v);
-                break;
-            default:
-                break;
         }
+        // switch (particle_->getHardBB().empty())
+        // {
+        //     case ParticleType::MuMinus:
+        //     case ParticleType::MuPlus:
+        //     case ParticleType::TauMinus:
+        //     case ParticleType::TauPlus:
+        //         aux +=  atomic_number*1.e-30*HardBB(particle_->GetEnergy(), v);
+        //         break;
+        //     default:
+        //         break;
+        // }
     }
 
     return medium_->GetMolDensity()*medium_->GetComponents().at(i)->GetAtomInMolecule()*particle_charge*particle_charge*aux;
@@ -1550,53 +1500,65 @@ void Photonuclear::EnableHardBB()
         double x_aux[]  =   {3, 4, 5, 6, 7, 8, 9};
 
 
-        double y_aux[][56][7]=
-        {
-            {
-                {7.174409e-4, 1.7132e-3, 4.082304e-3, 8.628455e-3, 0.01244159, 0.02204591, 0.03228755},
-                {-0.2436045, -0.5756682, -1.553973, -3.251305, -5.976818, -9.495636, -13.92918},
-                {-0.2942209, -0.68615, -2.004218, -3.999623, -6.855045, -10.05705, -14.37232},
-                {-0.1658391, -0.3825223, -1.207777, -2.33175, -3.88775, -5.636636, -8.418409},
-                {-0.05227727, -0.1196482, -0.4033373, -0.7614046, -1.270677, -1.883845, -2.948277},
-                {-9.328318e-3, -0.02124577, -0.07555636, -0.1402496, -0.2370768, -0.3614146, -0.5819409},
-                {-8.751909e-4, -1.987841e-3, -7.399682e-3, -0.01354059, -0.02325118, -0.03629659, -0.059275},
-                {-3.343145e-5, -7.584046e-5, -2.943396e-4, -5.3155e-4, -9.265136e-4, -1.473118e-3, -2.419946e-3}
-            },
-            {
-                {-1.269205e-4, -2.843877e-4, -5.761546e-4, -1.195445e-3, -1.317386e-3, -9.689228e-15, -6.4595e-15},
-                {-0.01563032, -0.03589573, -0.07768545, -0.157375, -0.2720009, -0.4186136, -0.8045046},
-                {0.04693954, 0.1162945, 0.3064255, 0.7041273, 1.440518, 2.533355, 3.217832},
-                {0.05338546, 0.130975, 0.3410341, 0.7529364, 1.425927, 2.284968, 2.5487},
-                {0.02240132, 0.05496, 0.144945, 0.3119032, 0.5576727, 0.8360727, 0.8085682},
-                {4.658909e-3, 0.01146659, 0.03090286, 0.06514455, 0.1109868, 0.1589677, 0.1344223},
-                {4.822364e-4, 1.193018e-3, 3.302773e-3, 6.843364e-3, 0.011191, 0.015614, 0.01173827},
-                {1.9837e-5, 4.940182e-5, 1.409573e-4, 2.877909e-4, 4.544877e-4, 6.280818e-4, 4.281932e-4}
-            }
-        };
+        // double y_aux[][56][7]=
+        // {
+        //     {
+        //         {7.174409e-4, 1.7132e-3, 4.082304e-3, 8.628455e-3, 0.01244159, 0.02204591, 0.03228755},
+        //         {-0.2436045, -0.5756682, -1.553973, -3.251305, -5.976818, -9.495636, -13.92918},
+        //         {-0.2942209, -0.68615, -2.004218, -3.999623, -6.855045, -10.05705, -14.37232},
+        //         {-0.1658391, -0.3825223, -1.207777, -2.33175, -3.88775, -5.636636, -8.418409},
+        //         {-0.05227727, -0.1196482, -0.4033373, -0.7614046, -1.270677, -1.883845, -2.948277},
+        //         {-9.328318e-3, -0.02124577, -0.07555636, -0.1402496, -0.2370768, -0.3614146, -0.5819409},
+        //         {-8.751909e-4, -1.987841e-3, -7.399682e-3, -0.01354059, -0.02325118, -0.03629659, -0.059275},
+        //         {-3.343145e-5, -7.584046e-5, -2.943396e-4, -5.3155e-4, -9.265136e-4, -1.473118e-3, -2.419946e-3}
+        //     },
+        //     {
+        //         {-1.269205e-4, -2.843877e-4, -5.761546e-4, -1.195445e-3, -1.317386e-3, -9.689228e-15, -6.4595e-15},
+        //         {-0.01563032, -0.03589573, -0.07768545, -0.157375, -0.2720009, -0.4186136, -0.8045046},
+        //         {0.04693954, 0.1162945, 0.3064255, 0.7041273, 1.440518, 2.533355, 3.217832},
+        //         {0.05338546, 0.130975, 0.3410341, 0.7529364, 1.425927, 2.284968, 2.5487},
+        //         {0.02240132, 0.05496, 0.144945, 0.3119032, 0.5576727, 0.8360727, 0.8085682},
+        //         {4.658909e-3, 0.01146659, 0.03090286, 0.06514455, 0.1109868, 0.1589677, 0.1344223},
+        //         {4.822364e-4, 1.193018e-3, 3.302773e-3, 6.843364e-3, 0.011191, 0.015614, 0.01173827},
+        //         {1.9837e-5, 4.940182e-5, 1.409573e-4, 2.877909e-4, 4.544877e-4, 6.280818e-4, 4.281932e-4}
+        //     }
+        // };
 
+        //TODO(mario): Must be cleared Tue 2017/08/08
         interpolant_hardBB_.resize(hmax_);
 
-        for(int i=0; i < hmax_; i++)
-        {
-            vector<double> x(x_aux, x_aux + sizeof(x_aux) / sizeof(double) );
+        const HardBBTables::VecType* y = particle_->getHardBB();
 
-            if (particle_->GetType() == ParticleType::MuMinus || particle_->GetType() == ParticleType::MuPlus)
+        if (y != NULL)
+        {
+            for(int i=0; i < hmax_; i++)
             {
-                vector<double> y(y_aux[0][i], y_aux[0][i] + sizeof(y_aux[0][i]) / sizeof(double) );
-                interpolant_hardBB_.at(i)    =   new Interpolant(x, y, 4, false, false) ;
-            }
-            else if (particle_->GetType() == ParticleType::TauMinus || particle_->GetType() == ParticleType::TauPlus)
-            {
-                vector<double> y(y_aux[1][i], y_aux[1][i] + sizeof(y_aux[1][i]) / sizeof(double) );
-                interpolant_hardBB_.at(i)    =   new Interpolant(x, y, 4, false, false) ;
-            }
-            else
-            {
-                vector<double> y(y_aux[0][i], y_aux[0][i] + sizeof(y_aux[0][i]) / sizeof(double) );
-                interpolant_hardBB_.at(i)    =   new Interpolant(x, y, 4, false, false) ;
-                log_warn("No hard component paraemtrization found for particle %s! Parametrization for muons are used. Be careful!", particle_->GetName().c_str());
+                vector<double> x(x_aux, x_aux + sizeof(x_aux) / sizeof(double) );
+                interpolant_hardBB_.at(i) = new Interpolant(x, y->at(i), 4, false, false);
             }
         }
+
+        // for(int i=0; i < hmax_; i++)
+        // {
+        //     vector<double> x(x_aux, x_aux + sizeof(x_aux) / sizeof(double) );
+        //
+        //     if (particle_->GetType() == ParticleType::MuMinus || particle_->GetType() == ParticleType::MuPlus)
+        //     {
+        //         vector<double> y(y_aux[0][i], y_aux[0][i] + sizeof(y_aux[0][i]) / sizeof(double) );
+        //         interpolant_hardBB_.at(i)    =   new Interpolant(x, y, 4, false, false) ;
+        //     }
+        //     else if (particle_->GetType() == ParticleType::TauMinus || particle_->GetType() == ParticleType::TauPlus)
+        //     {
+        //         vector<double> y(y_aux[1][i], y_aux[1][i] + sizeof(y_aux[1][i]) / sizeof(double) );
+        //         interpolant_hardBB_.at(i)    =   new Interpolant(x, y, 4, false, false) ;
+        //     }
+        //     else
+        //     {
+        //         vector<double> y(y_aux[0][i], y_aux[0][i] + sizeof(y_aux[0][i]) / sizeof(double) );
+        //         interpolant_hardBB_.at(i)    =   new Interpolant(x, y, 4, false, false) ;
+        //         log_warn("No hard component paraemtrization found for particle %s! Parametrization for muons are used. Be careful!", particle_->GetName().c_str());
+        //     }
+        // }
     }
 }
 

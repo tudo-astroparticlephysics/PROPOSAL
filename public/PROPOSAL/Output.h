@@ -178,6 +178,9 @@ public:
 
     void FillSecondaryVector(PROPOSALParticle *particle, int secondary_id, std::pair<double, ParticleType::Enum> energy_loss, double distance);
 
+    void FillSecondaryVector(PROPOSALParticle *particle, ParticleDef secondary, double energyloss, double distance);
+    void FillSecondaryVector(std::vector<PROPOSALParticle*>);
+
 //----------------------------------------------------------------------------//
 
     void ClearSecondaryVector();

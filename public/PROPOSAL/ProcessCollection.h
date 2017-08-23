@@ -297,9 +297,10 @@ public:
      *
      *  \return pair of product energy [MeV] and kind of product
      */
-    std::pair<double, ParticleType::Enum> MakeDecay();
+    // std::pair<double, ParticleType::Enum> MakeDecay();
+    // DecayChannel::DecayProducts MakeDecay();
 
-    std::pair<double, ParticleType::Enum> MakeDecay(double rnd1,double rnd2, double rnd3);
+    // std::pair<double, ParticleType::Enum> MakeDecay(double rnd1,double rnd2, double rnd3);
 //----------------------------------------------------------------------------//
     /**
      * Enables the Interpolation including dEdx and dNdx for
