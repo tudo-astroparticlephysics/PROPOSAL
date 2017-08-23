@@ -142,25 +142,7 @@ void Ionization::EnableDNdxInterpolation(std::string path, bool raw)
 
     // charged anti leptons have the same cross sections like charged leptons
     // so they use the same interpolation tables
-    string particle_name;
-    switch (particle_->GetType())
-    {
-        case ParticleType::MuPlus:
-            particle_name = PROPOSALParticle::GetName(ParticleType::MuMinus);
-            break;
-        case ParticleType::TauPlus:
-            particle_name = PROPOSALParticle::GetName(ParticleType::TauMinus);
-            break;
-        case ParticleType::EPlus:
-            particle_name = PROPOSALParticle::GetName(ParticleType::EMinus);
-            break;
-        case ParticleType::STauPlus:
-            particle_name = PROPOSALParticle::GetName(ParticleType::STauMinus);
-            break;
-        default:
-            particle_name = particle_->GetName();
-            break;
-    }
+    string particle_name = particle_->GetName();
 
     if(!path.empty())
     {
@@ -335,25 +317,7 @@ void Ionization::EnableDEdxInterpolation(std::string path, bool raw)
 
     // charged anti leptons have the same cross sections like charged leptons
     // so they use the same interpolation tables
-    string particle_name;
-    switch (particle_->GetType())
-    {
-        case ParticleType::MuPlus:
-            particle_name = PROPOSALParticle::GetName(ParticleType::MuMinus);
-            break;
-        case ParticleType::TauPlus:
-            particle_name = PROPOSALParticle::GetName(ParticleType::TauMinus);
-            break;
-        case ParticleType::EPlus:
-            particle_name = PROPOSALParticle::GetName(ParticleType::EMinus);
-            break;
-        case ParticleType::STauPlus:
-            particle_name = PROPOSALParticle::GetName(ParticleType::STauMinus);
-            break;
-        default:
-            particle_name = particle_->GetName();
-            break;
-    }
+    string particle_name = particle_->GetName();
 
     if(!path.empty())
     {

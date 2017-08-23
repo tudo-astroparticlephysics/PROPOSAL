@@ -54,6 +54,37 @@ private:
 	static boost::mt19937 *default_rng_;
 };
 
-}
+// ----------------------------------------------------------------------------
+/// @brief Random number generator
+// ----------------------------------------------------------------------------
+class RandomGenerator
+{
+    public:
+    static RandomGenerator& Get()
+    {
+        static RandomGenerator instance;
+        return instance;
+    }
+
+    double RandomDouble() { return var_real(); }
+    void SetSeed(int seed)
+    {
+        boost::mt19937::result_type s = static_cast<boost::mt19937::result_type>(seed);
+        rng_.seed(s);
+    }
+
+    private:
+    RandomGenerator()
+        : rng_()
+        , var_real(rng_, boost::uniform_real<>(0.0, 1.0))
+    {
+    }
+    virtual ~RandomGenerator() {}
+
+    boost::random::mt19937 rng_;
+    boost::variate_generator<boost::mt19937&, boost::uniform_real<> > var_real;
+};
+
+} // namespace PROPOSAL
 
 #endif // MATHMODEL_H_

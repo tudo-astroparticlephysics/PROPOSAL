@@ -335,21 +335,30 @@ pair<double, ParticleType::Enum> ProcessCollection::MakeStochasticLoss(double rn
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
+// DecayChannel::DecayProducts ProcessCollection::MakeDecay()
+// {
+//     const DecayChannel* mode = particle_->GetDecayTable().SelectChannel();
+//     return mode->Decay(particle_);
+// }
 
-pair<double, ParticleType::Enum> ProcessCollection::MakeDecay()
-{
-    // --------------------------------------------------------------------- //
-    // Calculate random numbers before passing to a fuction, because
-    // the order of argument evaluation is unspecified in c++ standards and
-    // therfor depend on the compiler.
-    // --------------------------------------------------------------------- //
-
-    double rnd1 = MathModel::RandomDouble();
-    double rnd2 = MathModel::RandomDouble();
-    double rnd3 = MathModel::RandomDouble();
-
-    return MakeDecay(rnd1, rnd2, rnd3);
-}
+// pair<double, ParticleType::Enum> ProcessCollection::MakeDecay()
+// {
+//     // --------------------------------------------------------------------- //
+//     // Calculate random numbers before passing to a fuction, because
+//     // the order of argument evaluation is unspecified in c++ standards and
+//     // therfor depend on the compiler.
+//     // --------------------------------------------------------------------- //
+//
+//     pair<double, ParticleType::Enum> decay_pair;
+//     const DecayChannel* mode = particle_->GetDecayTable().SelectChannel();
+//     decay_pair.first = mode->Decay(particle_);
+//
+//     // double rnd1 = MathModel::RandomDouble();
+//     // double rnd2 = MathModel::RandomDouble();
+//     // double rnd3 = MathModel::RandomDouble();
+//     //
+//     // return MakeDecay(rnd1, rnd2, rnd3);
+// }
 
 
 //----------------------------------------------------------------------------//
@@ -357,23 +366,23 @@ pair<double, ParticleType::Enum> ProcessCollection::MakeDecay()
 
 
 
-pair<double, ParticleType::Enum> ProcessCollection::MakeDecay(double rnd1,double rnd2, double rnd3)
-{
-    pair<double, ParticleType::Enum> decay;
-
-    if(particle_->GetType() == ParticleType::TauPlus || particle_->GetType() == ParticleType::TauMinus)
-    {
-        decay.first     =   decay_->CalculateProductEnergy(rnd1, rnd2, rnd3);
-    }
-    else
-    {
-        decay.first     =   decay_->CalculateProductEnergy(rnd2, rnd3, 0.5);
-    }
-
-    decay.second    =   decay_->GetOut();
-
-    return decay;
-}
+// pair<double, ParticleType::Enum> ProcessCollection::MakeDecay(double rnd1,double rnd2, double rnd3)
+// {
+//     pair<double, ParticleType::Enum> decay;
+//
+//     if(particle_->GetType() == ParticleType::TauPlus || particle_->GetType() == ParticleType::TauMinus)
+//     {
+//         decay.first     =   decay_->CalculateProductEnergy(rnd1, rnd2, rnd3);
+//     }
+//     else
+//     {
+//         decay.first     =   decay_->CalculateProductEnergy(rnd2, rnd3, 0.5);
+//     }
+//
+//     decay.second    =   decay_->GetOut();
+//
+//     return decay;
+// }
 
 
 //----------------------------------------------------------------------------//
@@ -449,25 +458,7 @@ void ProcessCollection::EnableInterpolation(std::string path, bool raw)
     // charged anti leptons have the same cross sections like charged leptons
     // (except of diffractive Bremsstrahlung, where one can analyse the interference term if implemented)
     // so they use the same interpolation tables
-    string particle_name;
-    switch (particle_->GetType())
-    {
-        case ParticleType::MuPlus:
-            particle_name = PROPOSALParticle::GetName(ParticleType::MuMinus);
-            break;
-        case ParticleType::TauPlus:
-            particle_name = PROPOSALParticle::GetName(ParticleType::TauMinus);
-            break;
-        case ParticleType::EPlus:
-            particle_name = PROPOSALParticle::GetName(ParticleType::EMinus);
-            break;
-        case ParticleType::STauPlus:
-            particle_name = PROPOSALParticle::GetName(ParticleType::STauMinus);
-            break;
-        default:
-            particle_name = particle_->GetName();
-            break;
-    }
+    string particle_name = particle_->GetName();
 
     if(!path.empty())
     {
@@ -742,25 +733,7 @@ void ProcessCollection::EnableParticleTimeInterpolation(std::string path, bool r
     // charged anti leptons have the same cross sections like charged leptons
     // (except of diffractive Bremsstrahlung, where one can analyse the interference term if implemented)
     // so they use the same interpolation tables
-    string particle_name;
-    switch (particle_->GetType())
-    {
-        case ParticleType::MuPlus:
-            particle_name = PROPOSALParticle::GetName(ParticleType::MuMinus);
-            break;
-        case ParticleType::TauPlus:
-            particle_name = PROPOSALParticle::GetName(ParticleType::TauMinus);
-            break;
-        case ParticleType::EPlus:
-            particle_name = PROPOSALParticle::GetName(ParticleType::EMinus);
-            break;
-        case ParticleType::STauPlus:
-            particle_name = PROPOSALParticle::GetName(ParticleType::STauMinus);
-            break;
-        default:
-            particle_name = particle_->GetName();
-            break;
-    }
+    string particle_name = particle_->GetName();
 
     if(!path.empty())
     {
@@ -1256,7 +1229,7 @@ ProcessCollection::ProcessCollection(PROPOSALParticle *particle, Medium *medium,
     crosssections_.at(2) = new Photonuclear(particle_, medium_, cut_settings_);
     crosssections_.at(3) = new Epairproduction(particle_, medium_, cut_settings_);
 
-    decay_               = new Decay(particle_);
+    decay_               = new Decay();
     time_particle_       = new Integral(IROMB, IMAXS, IPREC2);
 
     interpolant_                    = NULL;
@@ -1821,7 +1794,7 @@ double ProcessCollection::FunctionToPropIntegralDecay(double energy)
 
     aux =   FunctionToIntegral(energy);
 
-    decay  =   decay_->MakeDecay();
+    decay  =   decay_->MakeDecay(particle_);
 
     log_debug(" + %f",particle_->GetEnergy());
 
@@ -1924,7 +1897,6 @@ void ProcessCollection::SetParticle(PROPOSALParticle* particle)
 {
     particle_ = particle;
 
-    decay_->SetParticle(particle);
     for(unsigned int i = 0 ; i < crosssections_.size() ; i++)
     {
         crosssections_.at(i)->SetParticle(particle);
@@ -1953,7 +1925,6 @@ void ProcessCollection::RestoreBackup_particle()
 {
     particle_ = backup_particle_;
 
-    decay_->RestoreBackup_particle();
     for(unsigned int i = 0 ; i < crosssections_.size() ; i++)
     {
         crosssections_.at(i)->RestoreBackup_particle();
