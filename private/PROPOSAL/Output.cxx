@@ -22,51 +22,73 @@ void Output::SetLoggingConfigurationFile(std::string file)
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
+void Output::FillSecondaryVector(std::vector<PROPOSALParticle*> particles)
+{
+    for (std::vector<PROPOSALParticle*>::iterator iter = particles.begin(); iter != particles.end(); ++iter) {
+        secondarys_.push_back(new PROPOSALParticle(**iter));
+    }
+}
+
+void Output::FillSecondaryVector(PROPOSALParticle *particle, ParticleDef secondary, double energyloss, double distance)
+{
+    PROPOSALParticle* particle_to_store = new PROPOSALParticle(secondary);
+    particle_to_store->SetEnergy(energyloss);
+    particle_to_store->SetPosition(particle->GetPosition());
+    particle_to_store->SetDirection(particle->GetDirection());
+    particle_to_store->SetParticleId(particle->GetParticleId() + 1);
+    particle_to_store->SetParentParticleId(particle->GetParentParticleId());
+    particle_to_store->SetT(particle->GetT());
+    particle_to_store->SetParentParticleEnergy(particle->GetEnergy());
+    particle_to_store->SetPropagatedDistance(distance);
+
+    secondarys_.push_back(particle_to_store);
+}
+
 
 void Output::FillSecondaryVector(PROPOSALParticle *particle, int secondary_id, pair<double, ParticleType::Enum> energy_loss, double distance)
 {
 
-    PROPOSALParticle *particle_to_store = new PROPOSALParticle(
-        particle->GetParentParticleId(),
-        secondary_id,
-        energy_loss.second,
-        particle->GetPosition(),
-        particle->GetDirection(),
-        energy_loss.first,
-        particle->GetT(),
-        distance,
-        particle->GetEnergy()
-    );
-
-    secondarys_.push_back(particle_to_store);
-
-    #if ROOT_SUPPORT
-        if(store_in_root_trees_)
-        {
-            secondary_position_             =   particle_to_store->GetPosition();
-            secondary_t_                    =   particle_to_store->GetT();
-            secondary_direction_            =   particle_to_store->GetDirection();
-            secondary_energy_               =   particle_to_store->GetEnergy();
-            secondary_parent_particle_id_   =   particle_to_store->GetParentParticleId();
-            secondary_particle_id_          =   particle_to_store->GetParticleId();
-            secondary_name_                 =   particle_to_store->GetName();
-            current_primary_energy_         =   particle_to_store->GetParentParticleEnergy();
-
-            secondary_tree_->Fill();
-        }
-    #endif
-        if(store_in_ASCII_file_)
-        {
-            secondary_ascii_ <<
-            particle_to_store->GetPosition()<< "\t" <<
-            particle_to_store->GetT()<< "\t" <<
-            particle_to_store->GetDirection()<< "\t" <<
-            particle_to_store->GetEnergy()<< "\t" <<
-            particle_to_store->GetParentParticleId()<< "\t" <<
-            particle_to_store->GetParticleId()<< "\t" <<
-            particle_to_store->GetName() << "\t" <<
-            particle_to_store->GetParentParticleEnergy() << endl;
-        }
+    // PROPOSALParticle *particle_to_store = new PROPOSALParticle(
+    //     particle->GetParentParticleId(),
+    //     secondary_id,
+    //     energy_loss.second,
+    //     particle->GetPosition(),
+    //     particle->GetDirection(),
+    //     energy_loss.first,
+    //     particle->GetT(),
+    //     distance,
+    //     particle->GetEnergy()
+    // );
+    //
+    // secondarys_.push_back(particle_to_store);
+    //
+    // #if ROOT_SUPPORT
+    //     if(store_in_root_trees_)
+    //     {
+    //         secondary_position_             =   particle_to_store->GetPosition();
+    //         secondary_t_                    =   particle_to_store->GetT();
+    //         secondary_direction_            =   particle_to_store->GetDirection();
+    //         secondary_energy_               =   particle_to_store->GetEnergy();
+    //         secondary_parent_particle_id_   =   particle_to_store->GetParentParticleId();
+    //         secondary_particle_id_          =   particle_to_store->GetParticleId();
+    //         secondary_name_                 =   particle_to_store->GetName();
+    //         current_primary_energy_         =   particle_to_store->GetParentParticleEnergy();
+    //
+    //         secondary_tree_->Fill();
+    //     }
+    // #endif
+    //     if(store_in_ASCII_file_)
+    //     {
+    //         secondary_ascii_ <<
+    //         particle_to_store->GetPosition()<< "\t" <<
+    //         particle_to_store->GetT()<< "\t" <<
+    //         particle_to_store->GetDirection()<< "\t" <<
+    //         particle_to_store->GetEnergy()<< "\t" <<
+    //         particle_to_store->GetParentParticleId()<< "\t" <<
+    //         particle_to_store->GetParticleId()<< "\t" <<
+    //         particle_to_store->GetName() << "\t" <<
+    //         particle_to_store->GetParentParticleEnergy() << endl;
+    //     }
 }
 
 
