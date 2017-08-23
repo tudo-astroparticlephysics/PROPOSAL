@@ -56,14 +56,6 @@ ostream& operator<<(ostream& os, Medium const& medium)
 
 } // namespace PROPOSAL
 
-/******************************************************************************
-*                 Temp. Functions for radiation length calc.                  *
-******************************************************************************/
-
-double fZ(unsigned int Z);
-double Lrad(unsigned int Z);
-double Lrad_dash(unsigned int Z);
-double X0_inv(unsigned int Z, double M);
 
 /******************************************************************************
 *                                   Medium                                    *
@@ -739,50 +731,48 @@ Medium* MediumFactory::CreateMedium(const std::string& name)
 }
 
 /******************************************************************************
-*                              Helper Funcitons                               *
+*                        private Helper Funcitons                             *
 ******************************************************************************/
-
-double fZ(unsigned int Z)
-{
-    double a_sq = ALPHA * ALPHA * Z * Z;
-
-    return a_sq * (1. / (1. + a_sq) + 0.20206 - 0.0369 * a_sq + 0.0083 * a_sq * a_sq -
-                   0.002 * a_sq * a_sq * a_sq);
-}
-
-double Lrad(unsigned int Z)
-{
-    if (Z > 4)
-        return log(184.15 * pow(Z, -1. / 3.)); // Elements Z>4
-
-    if (Z == 1)
-        return 5.31; // Hydrogen
-    if (Z == 2)
-        return 4.79; // Helium
-    if (Z == 3)
-        return 4.74; // Lithium
-    if (Z == 4)
-        return 4.71; // Beryllium
-    return 0;
-}
-
-double Lrad_dash(unsigned int Z)
-{
-    if (Z > 4)
-        return log(1194. * pow(Z, -2. / 3.)); // Elements Z>4
-
-    if (Z == 1)
-        return 6.144; // Hydrogen
-    if (Z == 2)
-        return 5.621; // Helium
-    if (Z == 3)
-        return 5.805; // Lithium
-    if (Z == 4)
-        return 5.924; // Beryllium
-    return 0;
-}
 
 double X0_inv(unsigned int Z, double M)
 {
-    return 4. * ALPHA * RE * RE * NA / M * (Z * Z * (Lrad(Z) - fZ(Z)) + Z * Lrad_dash(Z));
+    double a_sq = 0.;
+    double fZ = 0.;
+    double Lrad = 0.;
+    double Lrad_dash = 0.;
+
+    a_sq = ALPHA * ALPHA * Z * Z;
+    fZ = a_sq * (1. / (1. + a_sq) + 0.20206 - 0.0369 * a_sq + 0.0083 * a_sq * a_sq
+        - 0.002 * a_sq * a_sq * a_sq);
+
+    // Get radiation logarithm from Tsai (Rev.Mod.Phys.46)
+    if (Z > 4) // Elements Z>4
+    {
+        // Thomas-Fermi-Moliere model (Tsai eq. B21)
+        Lrad = log(184.15 * pow(Z, -1. / 3.));
+        Lrad_dash = log(1194. * pow(Z, -2. / 3.));
+    }
+    // Tsai table B2
+    else if (Z == 1) // Hydrogen
+    {
+        Lrad = 5.31;
+        Lrad_dash = 6.144;
+    }
+    else if (Z == 2) // Helium
+    {
+        Lrad = 4.79;
+        Lrad_dash = 5.621;
+    }
+    else if (Z == 3) // Lithium
+    {
+        Lrad = 4.74;
+        Lrad_dash = 5.805;
+    }
+    else if (Z == 4) //Beryllium
+    {
+        Lrad = 4.71;
+        Lrad_dash = 5.924;
+    }
+    // Bremsstrahlung complete screening case
+    return 4. * ALPHA * RE * RE * NA / M * (Z * Z * (Lrad - fZ) + Z * Lrad_dash);
 }
