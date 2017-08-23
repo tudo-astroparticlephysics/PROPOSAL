@@ -734,7 +734,7 @@ Medium* MediumFactory::CreateMedium(const std::string& name)
 *                        private Helper Funcitons                             *
 ******************************************************************************/
 
-double X0_inv(unsigned int Z, double M)
+double Medium::X0_inv(unsigned int Z, double M)
 {
     double a_sq = 0.;
     double fZ = 0.;
