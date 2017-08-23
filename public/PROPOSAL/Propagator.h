@@ -110,7 +110,7 @@ public:
 
     //Constructors
     Propagator();
-    Propagator(ParticleType::Enum particle_type,
+    Propagator(ParticleDef,
                std::string path_to_tables,
                bool exact_time = true,
                bool lpm = true,
@@ -120,7 +120,7 @@ public:
     Propagator(std::string config_file, PROPOSALParticle* particle, bool DoApplyOptions=true);
     Propagator(Medium* medium,
                EnergyCutSettings* cuts,
-               ParticleType::Enum particle_type,
+               ParticleDef,
                std::string path_to_tables,
                bool moliere = true,
                bool continuous_rand = true,

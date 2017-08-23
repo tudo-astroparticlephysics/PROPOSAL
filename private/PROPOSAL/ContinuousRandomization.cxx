@@ -70,25 +70,26 @@ void ContinuousRandomization::EnableDE2dxInterpolation(std::string path, bool ra
     // charged anti leptons have the same cross sections like charged leptons
     // (except of diffractive Bremsstrahlung, where one can analyse the interference term if implemented)
     // so they use the same interpolation tables
-    string particle_name;
-    switch (particle_->GetType())
-    {
-        case ParticleType::MuPlus:
-            particle_name = PROPOSALParticle::GetName(ParticleType::MuMinus);
-            break;
-        case ParticleType::TauPlus:
-            particle_name = PROPOSALParticle::GetName(ParticleType::TauMinus);
-            break;
-        case ParticleType::EPlus:
-            particle_name = PROPOSALParticle::GetName(ParticleType::EMinus);
-            break;
-        case ParticleType::STauPlus:
-            particle_name = PROPOSALParticle::GetName(ParticleType::STauMinus);
-            break;
-        default:
-            particle_name = particle_->GetName();
-            break;
-    }
+    string particle_name = particle_->GetName();
+    // string particle_name;
+    // switch (particle_->GetType())
+    // {
+    //     case ParticleType::MuPlus:
+    //         particle_name = PROPOSALParticle::GetName(ParticleType::MuMinus);
+    //         break;
+    //     case ParticleType::TauPlus:
+    //         particle_name = PROPOSALParticle::GetName(ParticleType::TauMinus);
+    //         break;
+    //     case ParticleType::EPlus:
+    //         particle_name = PROPOSALParticle::GetName(ParticleType::EMinus);
+    //         break;
+    //     case ParticleType::STauPlus:
+    //         particle_name = PROPOSALParticle::GetName(ParticleType::STauMinus);
+    //         break;
+    //     default:
+    //         particle_name = particle_->GetName();
+    //         break;
+    // }
 
     if(!path.empty())
     {
@@ -223,25 +224,26 @@ void ContinuousRandomization::EnableDE2deInterpolation(std::string path, bool ra
     // charged anti leptons have the same cross sections like charged leptons
     // (except of diffractive Bremsstrahlung, where one can analyse the interference term if implemented)
     // so they use the same interpolation tables
-    string particle_name;
-    switch (particle_->GetType())
-    {
-        case ParticleType::MuPlus:
-            particle_name = PROPOSALParticle::GetName(ParticleType::MuMinus);
-            break;
-        case ParticleType::TauPlus:
-            particle_name = PROPOSALParticle::GetName(ParticleType::TauMinus);
-            break;
-        case ParticleType::EPlus:
-            particle_name = PROPOSALParticle::GetName(ParticleType::EMinus);
-            break;
-        case ParticleType::STauPlus:
-            particle_name = PROPOSALParticle::GetName(ParticleType::STauMinus);
-            break;
-        default:
-            particle_name = particle_->GetName();
-            break;
-    }
+    string particle_name = particle_->GetName();
+    // string particle_name;
+    // switch (particle_->GetType())
+    // {
+    //     case ParticleType::MuPlus:
+    //         particle_name = PROPOSALParticle::GetName(ParticleType::MuMinus);
+    //         break;
+    //     case ParticleType::TauPlus:
+    //         particle_name = PROPOSALParticle::GetName(ParticleType::TauMinus);
+    //         break;
+    //     case ParticleType::EPlus:
+    //         particle_name = PROPOSALParticle::GetName(ParticleType::EMinus);
+    //         break;
+    //     case ParticleType::STauPlus:
+    //         particle_name = PROPOSALParticle::GetName(ParticleType::STauMinus);
+    //         break;
+    //     default:
+    //         particle_name = particle_->GetName();
+    //         break;
+    // }
 
     if(!path.empty())
     {

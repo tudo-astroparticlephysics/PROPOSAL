@@ -122,8 +122,9 @@ std::vector<PROPOSALParticle*> Propagator::propagate(double MaxDistance_cm)
         for(unsigned int i = 0 ; i < collections_.size() ; i++)
         {
 
-            if (particle_->GetType() != collections_.at(i)->GetParticle()->GetType())
-                continue;
+            //TODO(mario): Is that ok to delete? Tue 2017/08/08
+            // if (particle_->GetType() != collections_.at(i)->GetParticle()->GetType())
+            //     continue;
 
             if(detector_->IsInfront(particle_position, particle_direction))
             {
@@ -562,6 +563,8 @@ double Propagator::Propagate( double distance )
     double  final_energy    =   particle_->GetEnergy();
 
     pair<double, ParticleType::Enum> decay;
+    std::vector<PROPOSALParticle*> decay_products;
+
     pair<double, ParticleType::Enum> energy_loss;
 
 
@@ -661,17 +664,23 @@ double Propagator::Propagate( double distance )
                 continue;
             }
             final_energy    -=  energy_loss.first;
-            log_debug("Energyloss: %f\t%s", energy_loss.first, PROPOSALParticle::GetName(energy_loss.second).c_str());
+            // log_debug("Energyloss: %f\t%s", energy_loss.first, PROPOSALParticle::GetName(energy_loss.second).c_str());
             secondary_id    =   particle_->GetParticleId() + 1;
             Output::getInstance().FillSecondaryVector(particle_, secondary_id, energy_loss, 0);
         }
         else
         {
-            decay           =   current_collection_->MakeDecay();
-            final_energy    =   0;
-            log_debug("Decay of particle: %s", particle_->GetName().c_str());
-            secondary_id    = particle_->GetParticleId()  +   1;
-            Output::getInstance().FillSecondaryVector(particle_, secondary_id, decay ,0);
+            DecayChannel* mode = &particle_->GetDecayTable().SelectChannel();
+            decay_products = mode->Decay(particle_);
+            Output::getInstance().FillSecondaryVector(decay_products);
+
+            //TODO(mario): Delete decay products Tue 2017/08/22
+
+            // decay           =   current_collection_->MakeDecay();
+            // final_energy    =   0;
+            // log_debug("Decay of particle: %s", particle_->GetName().c_str());
+            // secondary_id    = particle_->GetParticleId()  +   1;
+            // Output::getInstance().FillSecondaryVector(particle_, secondary_id, decay ,0);
 
         }
 
@@ -686,46 +695,46 @@ double Propagator::Propagate( double distance )
 
     }
 
-    if(stopping_decay_)
-    {
-        if(propagated_distance!=distance && final_energy!=0 && particle_->GetLifetime()>=0)
-        {
-            particle_->SetEnergy(particle_->GetMass());
-
-            double t    =   particle_->GetT() -particle_->GetLifetime()*log(RandomDouble());
-            double product_energy   =   0;
-
-            pair<double, ParticleType::Enum> decay_to_store;
-            secondary_id    =   particle_->GetParticleId() + 1;
-
-            particle_->SetT( t );
-
-            if(particle_->GetType()==2)
-            {
-                // --------------------------------------------------------------------- //
-                // Calculate random numbers before passing to a fuction, because
-                // the order of argument evaluation is unspecified in c++ standards and
-                // therfor depend on the compiler.
-                // --------------------------------------------------------------------- //
-
-                double rnd1 = RandomDouble();
-                double rnd2 = RandomDouble();
-
-                product_energy  =   current_collection_->GetDecay()->CalculateProductEnergy(rnd1, 0.5, rnd2);
-            }
-            else
-            {
-                product_energy  =   current_collection_->GetDecay()->CalculateProductEnergy(RandomDouble(), 0.5, 0.5);
-            }
-
-            decay_to_store.first    =   product_energy;
-            decay_to_store.second   =   current_collection_->GetDecay()->GetOut();
-
-            final_energy  =   0;
-
-            Output::getInstance().FillSecondaryVector(particle_,secondary_id, decay_to_store, final_energy);
-        }
-    }
+    // if(stopping_decay_)
+    // {
+    //     if(propagated_distance!=distance && final_energy!=0 && particle_->GetLifetime()>=0)
+    //     {
+    //         particle_->SetEnergy(particle_->GetMass());
+    //
+    //         double t    =   particle_->GetT() -particle_->GetLifetime()*log(RandomDouble());
+    //         double product_energy   =   0;
+    //
+    //         pair<double, ParticleType::Enum> decay_to_store;
+    //         secondary_id    =   particle_->GetParticleId() + 1;
+    //
+    //         particle_->SetT( t );
+    //
+    //         if(particle_->GetType()==2)
+    //         {
+    //             // --------------------------------------------------------------------- //
+    //             // Calculate random numbers before passing to a fuction, because
+    //             // the order of argument evaluation is unspecified in c++ standards and
+    //             // therfor depend on the compiler.
+    //             // --------------------------------------------------------------------- //
+    //
+    //             double rnd1 = RandomDouble();
+    //             double rnd2 = RandomDouble();
+    //
+    //             product_energy  =   current_collection_->GetDecay()->CalculateProductEnergy(rnd1, 0.5, rnd2);
+    //         }
+    //         else
+    //         {
+    //             product_energy  =   current_collection_->GetDecay()->CalculateProductEnergy(RandomDouble(), 0.5, 0.5);
+    //         }
+    //
+    //         decay_to_store.first    =   product_energy;
+    //         decay_to_store.second   =   current_collection_->GetDecay()->GetOut();
+    //
+    //         final_energy  =   0;
+    //
+    //         Output::getInstance().FillSecondaryVector(particle_,secondary_id, decay_to_store, final_energy);
+    //     }
+    // }
 
 
     //particle_->SetParticleId(NumInt); //TOMASZ: Hack to get the number of interactions
@@ -812,10 +821,11 @@ void Propagator::ChooseCurrentCollection(Vector3D& particle_position, Vector3D& 
     {
         collections_.at(i)->RestoreBackup_particle();
 
-        if(particle_->GetType() != collections_.at(i)->GetParticle()->GetType())
-        {
-            continue;
-        }
+        //TODO(mario): Is that ok to delete? Tue 2017/08/08
+        // if(particle_->GetType() != collections_.at(i)->GetParticle()->GetType())
+        // {
+        //     continue;
+        // }
 
         if(detector_->IsInfront(particle_position, particle_direction))
         {
@@ -1389,7 +1399,7 @@ Propagator::Propagator()
     ,scattering_model_          (-1)
     ,current_collection_        (NULL)
 {
-    particle_              = new PROPOSALParticle(ParticleType::MuMinus);
+    particle_              = new PROPOSALParticle(MuMinusDef::Get());
     backup_particle_       = new PROPOSALParticle(*particle_);
     detector_              = new Sphere(Vector3D(), 1e18, 0);
     // detector_              = new Geometry();
@@ -1401,7 +1411,7 @@ Propagator::Propagator()
 //----------------------------------------------------------------------------//
 
 Propagator::Propagator(
-                       ParticleType::Enum particle_type,
+                       ParticleDef particle_def,
                        std::string path_to_tables,
                        bool exact_time,
                        bool lpm,
@@ -1435,7 +1445,7 @@ Propagator::Propagator(
     ,scattering_model_          ( scattering_model )
     ,current_collection_        (NULL)
 {
-    particle_              = new PROPOSALParticle(particle_type);
+    particle_              = new PROPOSALParticle(particle_def);
     backup_particle_       = new PROPOSALParticle(*particle_);
     detector_              = new Sphere(Vector3D(), 1e18, 0);
     // detector_              = new Geometry();
@@ -1471,7 +1481,7 @@ Propagator::Propagator(
 
 Propagator::Propagator(Medium* medium,
                        EnergyCutSettings* cuts,
-                       ParticleType::Enum particle_type,
+                       ParticleDef particle_def,
                        string path_to_tables,
                        bool moliere,
                        bool continuous_rand,
@@ -1515,7 +1525,7 @@ Propagator::Propagator(Medium* medium,
     ,scattering_model_          (scattering_model)
     ,current_collection_        (NULL)
 {
-    particle_              = new PROPOSALParticle(particle_type);
+    particle_              = new PROPOSALParticle(particle_def);
     backup_particle_       = new PROPOSALParticle(*particle_);
     current_collection_    = new ProcessCollection(particle_, medium, cuts);
     detector_              = new Sphere(Vector3D(), 1e18, 0);
@@ -1816,7 +1826,7 @@ void Propagator::MoveParticle(double distance)
     dist   +=  distance;
 
     position = position + distance*particle_->GetDirection();
-    
+
     particle_->SetPosition(position);
 
     particle_->SetPropagatedDistance(dist);
@@ -2056,9 +2066,9 @@ void Propagator::InitProcessCollections(ifstream &file)
             if (particle_ == NULL)
             {
 
-                PROPOSALParticle *muminus    =   new PROPOSALParticle(ParticleType::MuMinus);
-                PROPOSALParticle *tauminus   =   new PROPOSALParticle(ParticleType::TauMinus);
-                PROPOSALParticle *eminus     =   new PROPOSALParticle(ParticleType::EMinus);
+                PROPOSALParticle *muminus    =   new PROPOSALParticle(MuMinusDef::Get());
+                PROPOSALParticle *tauminus   =   new PROPOSALParticle(TauMinusDef::Get());
+                PROPOSALParticle *eminus     =   new PROPOSALParticle(EMinusDef::Get());
                 // PROPOSALParticle *muplus    =   new PROPOSALParticle(ParticleType::MuPlus);
                 // PROPOSALParticle *tauplus   =   new PROPOSALParticle(ParticleType::TauPlus);
                 // PROPOSALParticle *eplus     =   new PROPOSALParticle(ParticleType::EPlus);

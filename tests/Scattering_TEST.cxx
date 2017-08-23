@@ -15,6 +15,8 @@ using namespace PROPOSAL;
 TEST(Comparison , Comparison_equal ) {
     Scattering A;
     Scattering B;
+    ParticleDef a = ParticleDef(StauMinusDef::Get());
+    PROPOSALParticle b(MuMinusDef::Get());
 
     EXPECT_TRUE(A==B);
 /*

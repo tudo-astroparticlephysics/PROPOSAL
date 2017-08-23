@@ -26,7 +26,7 @@ double RootFinder::FindRoot(double min,
                             double startX,
                             boost::function<double (double)> function,
                             boost::function<double (double)> differentiated_function,
-                            double rightSide)
+                            double rightSide) const
 {
 
     int i;
