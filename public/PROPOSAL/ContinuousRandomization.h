@@ -127,7 +127,7 @@ public:
 //----------------------------------------------------------------------------//
     //Setter
 
-    void SetParticle(PROPOSALParticle *particle);
+    // void SetParticle(PROPOSALParticle *particle);
 
 //----------------------------------------------------------------------------//
 
