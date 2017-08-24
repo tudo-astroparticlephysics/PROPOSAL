@@ -183,7 +183,7 @@ public:
     * \param    ef  final energy
     */
 
-    void AdvanceParticle(double dr, double ei, double ef);
+    // void AdvanceParticle(double dr, double ei, double ef);
 
 //----------------------------------------------------------------------------//
 

@@ -116,7 +116,7 @@ protected:
      *  \return Returns the probability [1/MeV]
      */
 
-    double FunctionToPropIntegralDecay(double energy);
+    double FunctionToPropIntegralDecay(PROPOSALParticle&, double energy);
 
 //----------------------------------------------------------------------------//
 
@@ -128,7 +128,7 @@ protected:
      *  \return Returns the probability [1/MeV]
      */
 
-    double FunctionToPropIntegralInteraction(double energy);
+    double FunctionToPropIntegralInteraction(PROPOSALParticle&, double energy);
 
 //----------------------------------------------------------------------------//
 
@@ -137,14 +137,14 @@ protected:
     *
     */
 
-    double FunctionToTimeIntegral(double E);
+    double FunctionToTimeIntegral(PROPOSALParticle&, double E);
 
 //----------------------------------------------------------------------------//
 
-    double InterpolTimeParticle(double energy);
+    // double InterpolTimeParticle(double energy);
 
 //----------------------------------------------------------------------------//
-    double InterpolTimeParticleDiff(double energy);
+    double InterpolTimeParticleDiff(PROPOSALParticle&, double energy);
 
 //----------------------------------------------------------------------------//
 
@@ -154,7 +154,7 @@ protected:
     e_{low} \f$ energy below which the particle is lost
     \param e energy [MeV]
     */
-    double FunctionToBuildInterpolant(double energy);
+    double FunctionToBuildInterpolant(PROPOSALParticle&, double energy);
 
 //----------------------------------------------------------------------------//
 
@@ -163,20 +163,20 @@ protected:
     \f[return=function(e)\f];
     \param e energy [MeV]
     */
-    double FunctionToBuildInterpolantDiff(double energy);
+    // double FunctionToBuildInterpolantDiff(double energy);
 
 //----------------------------------------------------------------------------//
 
-    double InterpolPropDecay(double energy);
+    double InterpolPropDecay(PROPOSALParticle&, double energy);
 
 //----------------------------------------------------------------------------//
-    double InterpolPropDecayDiff(double energy);
+    // double InterpolPropDecayDiff(double energy);
 
 //----------------------------------------------------------------------------//
-    double InterpolPropInteraction(double energy);
+    double InterpolPropInteraction(PROPOSALParticle&, double energy);
 
 //----------------------------------------------------------------------------//
-    double InterpolPropInteractionDiff(double energy);
+    // double InterpolPropInteractionDiff(double energy);
 
 
 //----------------------------------------------------------------------------//
@@ -228,7 +228,7 @@ public:
      *  \return energy at distance OR -(track length)
      */
 
-    double Propagate(PROPOSALParticle*, double distance);
+    double Propagate(PROPOSALParticle&, double distance);
 
     /**
      * Calculates the contiuous loss till the first stochastic loss happend
@@ -241,7 +241,7 @@ public:
      *  \return pair.first final energy befor first interaction pair.second decay energy at which the
      *          particle decay
      */
-    std::pair<double, double> CalculateEnergyTillStochastic(PROPOSALParticle*, double initial_energy);
+    std::pair<double, double> CalculateEnergyTillStochastic(PROPOSALParticle&, double initial_energy);
 
     /*!
     * advances the particle by the given distance
@@ -253,7 +253,7 @@ public:
     * \param    ef  final energy
     */
 
-    void AdvanceParticle(PROPOSALParticle*, double dr, double ei, double ef);
+    void AdvanceParticle(PROPOSALParticle&, double dr, double ei, double ef);
 
     /*!
     returns the value of the distance integral from ei to ef;
@@ -280,7 +280,7 @@ public:
     \param dist value of displacement
     */
 
-    double CalculateFinalEnergy(PROPOSALParticle*, double ei, double dist);
+    double CalculateFinalEnergy(PROPOSALParticle&, double ei, double dist);
 
 //----------------------------------------------------------------------------//
 
@@ -294,7 +294,7 @@ public:
      *  \return final energy due to continous energy losses [MeV]
      */
 
-    double CalculateFinalEnergy(PROPOSALParticle*, double ei, double rnd, bool particle_interaction);
+    double CalculateFinalEnergy(PROPOSALParticle&, double ei, double rnd, bool particle_interaction);
 
 //----------------------------------------------------------------------------//
     /**
@@ -306,7 +306,7 @@ public:
      *  \return value of the tracking integral [ 1 ]
      */
 
-    double CalculateTrackingIntegal(PROPOSALParticle*, double initial_energy, double rnd, bool particle_interaction);
+    double CalculateTrackingIntegal(PROPOSALParticle&, double initial_energy, double rnd, bool particle_interaction);
 
 //----------------------------------------------------------------------------//
     /**
@@ -325,7 +325,7 @@ public:
      *
      *  \return pair of energy loss [MeV] and kind of interaction
      */
-    std::pair<double, ParticleType::Enum> MakeStochasticLoss(PROPOSALParticle*);
+    std::pair<double, ParticleType::Enum> MakeStochasticLoss(PROPOSALParticle&);
 
     // std::pair<double, ParticleType::Enum> MakeStochasticLoss(double rnd1,double rnd2, double rnd3);
 //----------------------------------------------------------------------------//
@@ -344,21 +344,21 @@ public:
      * Enables the Interpolation including dEdx and dNdx for
      * every crosssection in vector crosssections_
      */
-    void EnableInterpolation(std::string path ="", bool raw=false);
+    void EnableInterpolation(PROPOSALParticle&, std::string path ="", bool raw=false);
 //----------------------------------------------------------------------------//
 
     /**
      * Enables the dEdx Interpolation for every crosssection in vector
      * crosssections_
      */
-    void EnableDEdxInterpolation(std::string path ="", bool raw=false);
+    void EnableDEdxInterpolation(PROPOSALParticle&, std::string path ="", bool raw=false);
 
 //----------------------------------------------------------------------------//
     /**
      * Enables the dNdx Interpolation for every crosssection in vector
      * crosssections_
      */
-    void EnableDNdxInterpolation(std::string path ="", bool raw=false);
+    void EnableDNdxInterpolation(PROPOSALParticle&, std::string path ="", bool raw=false);
 
 //----------------------------------------------------------------------------//
     /**
@@ -391,7 +391,7 @@ public:
     /**
      * Enables the Interpolation for calculation the exact particle time
      */
-    void EnableParticleTimeInterpolation(std::string path="", bool raw=false);
+    void EnableParticleTimeInterpolation(PROPOSALParticle&, std::string path="", bool raw=false);
 //----------------------------------------------------------------------------//
 
     void EnableLpmEffect();
@@ -433,7 +433,7 @@ public:
     * \param E energy [MeV]
     */
 
-    double FunctionToIntegral(double energy);
+    double FunctionToIntegral(PROPOSALParticle&, double energy);
 
 //----------------------------------------------------------------------------//
 

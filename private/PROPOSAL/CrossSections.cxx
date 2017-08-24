@@ -26,8 +26,8 @@ CrossSections::CrossSections( )
     ,order_of_interpolation_( 5 )
     ,sum_of_rates_          ( 0 )
 {
-    particle_       = new PROPOSALParticle();
-    backup_particle_= particle_;
+    // particle_       = new PROPOSALParticle();
+    // backup_particle_= particle_;
     medium_         = new Water();
     cut_settings_   = new EnergyCutSettings(-1,-1);
 }
@@ -37,8 +37,7 @@ CrossSections::CrossSections( )
 //----------------------------------------------------------------------------//
 
 
-CrossSections::CrossSections(PROPOSALParticle* particle,
-                             Medium* medium,
+CrossSections::CrossSections(Medium* medium,
                              EnergyCutSettings* cut_settings)
     :vMax_                  ( 0 )
     ,vUp_                   ( 0 )
@@ -54,8 +53,8 @@ CrossSections::CrossSections(PROPOSALParticle* particle,
     ,order_of_interpolation_( 5 )
     ,sum_of_rates_          ( 0 )
 {
-    particle_       = particle;
-    backup_particle_= particle_;
+    // particle_       = particle;
+    // backup_particle_= particle_;
     medium_         = medium;
     cut_settings_   = cut_settings;
 }
@@ -82,7 +81,7 @@ CrossSections::CrossSections(const CrossSections& crossSections)
     ,order_of_interpolation_   ( crossSections.order_of_interpolation_ )
     ,sum_of_rates_             ( crossSections.sum_of_rates_ )
 {
-    particle_                 = new PROPOSALParticle( *crossSections.particle_ );
+    // particle_                 = new PROPOSALParticle( *crossSections.particle_ );
     medium_                   = crossSections.medium_->clone();
     cut_settings_             = new EnergyCutSettings( *crossSections.cut_settings_ );
 }
@@ -110,7 +109,7 @@ bool CrossSections::operator==(const CrossSections &crossSections) const
     if( init_lpm_effect_          != crossSections.init_lpm_effect_ )       return false;
     if( order_of_interpolation_   != crossSections.order_of_interpolation_ )return false;
     if( *cut_settings_            != *crossSections.cut_settings_ )         return false;
-    if( *particle_                != *crossSections.particle_ )             return false;
+    // if( *particle_                != *crossSections.particle_ )             return false;
     if( *medium_                  != *crossSections.medium_ )               return false;
     if( sum_of_rates_             != crossSections.sum_of_rates_ )          return false;
     if( name_.compare(crossSections.name_) != 0 )                           return false;
@@ -141,13 +140,13 @@ std::ostream& operator<<(std::ostream& os, CrossSections const &crossSections)
     os<<"\tEbig:\t\t"<< crossSections.ebig_ << std::endl;
     os<<"\tMultiplier:\t\t"<<crossSections.multiplier_<<std::endl;
     os<<std::endl;
-    os<<"\tParticle:\t\t"<<crossSections.particle_<<std::endl;
-    if(crossSections.particle_!=NULL)
-    {
-        os<<"\t\tname:\t\t\t"<<crossSections.particle_->GetName()<<std::endl;
-        os<<"\t\tenergy:\t\t\t"<<crossSections.particle_->GetEnergy()<<std::endl;
-        os<<"\t\tdistance:\t\t\t"<<crossSections.particle_->GetPropagatedDistance()<<std::endl;
-    }
+    // os<<"\tParticle:\t\t"<<crossSections.particle_<<std::endl;
+    // if(crossSections.particle_!=NULL)
+    // {
+    //     os<<"\t\tname:\t\t\t"<<crossSections.particle_->GetName()<<std::endl;
+    //     os<<"\t\tenergy:\t\t\t"<<crossSections.particle_->GetEnergy()<<std::endl;
+    //     os<<"\t\tdistance:\t\t\t"<<crossSections.particle_->GetPropagatedDistance()<<std::endl;
+    // }
     os<<std::endl;
     os<<"\tMedium:\t\t"<<crossSections.medium_<<std::endl;
     if(crossSections.medium_!=NULL)
@@ -200,7 +199,7 @@ void CrossSections::swap(CrossSections &crossSections)
     swap( sum_of_rates_             , crossSections.sum_of_rates_ );
 
     cut_settings_->swap(*crossSections.cut_settings_);
-    particle_->swap(*crossSections.particle_);
+    // particle_->swap(*crossSections.particle_);
     medium_->swap(*crossSections.medium_);
 }
 
@@ -232,9 +231,9 @@ void CrossSections::SetVUp(double vUp){
     vUp_ = vUp;
 }
 
-void CrossSections::SetParticle(PROPOSALParticle *particle){
-    particle_ = particle;
-}
+// void CrossSections::SetParticle(PROPOSALParticle *particle){
+//     particle_ = particle;
+// }
 
 void CrossSections::SetMedium(Medium *medium){
     medium_ = medium;
@@ -250,17 +249,17 @@ void CrossSections::EnableLpmEffect(bool lpm_effect_enabled){
 
 
 
-PROPOSALParticle *CrossSections::GetBackup_particle() const
-{
-    return backup_particle_;
-}
+// PROPOSALParticle *CrossSections::GetBackup_particle() const
+// {
+//     return backup_particle_;
+// }
 
-void CrossSections::SetBackup_particle(PROPOSALParticle *backup_particle)
-{
-    backup_particle_ = backup_particle;
-}
+// void CrossSections::SetBackup_particle(PROPOSALParticle *backup_particle)
+// {
+//     backup_particle_ = backup_particle;
+// }
 
-void CrossSections::RestoreBackup_particle()
-{
-    particle_ = backup_particle_;
-}
+// void CrossSections::RestoreBackup_particle()
+// {
+//     particle_ = backup_particle_;
+// }

@@ -22,7 +22,7 @@ using namespace PROPOSAL;
 //----------------------------------------------------------------------------//
 
 
-double Bremsstrahlung::CalculatedEdx()
+double Bremsstrahlung::CalculatedEdx(PROPOSALParticle& particle)
 {
     if(multiplier_<=0)
     {
@@ -31,18 +31,18 @@ double Bremsstrahlung::CalculatedEdx()
 
     if(do_dedx_Interpolation_)
     {
-        return max(dedx_interpolant_->Interpolate(particle_->GetEnergy()), 0.0);
+        return max(dedx_interpolant_->Interpolate(particle.GetEnergy()), 0.0);
     }
 
     double sum = 0;
 
     for(int i=0; i<(medium_->GetNumComponents()); i++)
     {
-        SetIntegralLimits(i);
-        sum +=  dedx_integral_->Integrate(0, vUp_, boost::bind(&Bremsstrahlung::FunctionToDEdxIntegral, this, _1),2);
+        IntegralLimits limits = SetIntegralLimits(particle, i);
+        sum +=  dedx_integral_->Integrate(0, limits.vUp, boost::bind(&Bremsstrahlung::FunctionToDEdxIntegral, this, boost::ref(particle), _1),2);
     }
 
-    return multiplier_*particle_->GetEnergy()*sum;
+    return multiplier_*particle.GetEnergy()*sum;
 }
 
 
@@ -50,7 +50,7 @@ double Bremsstrahlung::CalculatedEdx()
 //----------------------------------------------------------------------------//
 
 
-double Bremsstrahlung::CalculatedNdx()
+double Bremsstrahlung::CalculatedNdx(PROPOSALParticle& particle)
 {
     if(multiplier_<=0)
     {
@@ -63,12 +63,12 @@ double Bremsstrahlung::CalculatedNdx()
     {
         if(do_dndx_Interpolation_)
         {
-            prob_for_component_.at(i) = max(dndx_interpolant_1d_.at(i)->Interpolate(particle_->GetEnergy()), 0.);
+            prob_for_component_.at(i) = max(dndx_interpolant_1d_.at(i)->Interpolate(particle.GetEnergy()), 0.);
         }
         else
         {
-            SetIntegralLimits(i);
-            prob_for_component_.at(i) = dndx_integral_.at(i)->Integrate(vUp_, vMax_, boost::bind(&Bremsstrahlung::FunctionToDNdxIntegral, this, _1),4);
+            IntegralLimits limits = SetIntegralLimits(particle, i);
+            prob_for_component_.at(i) = dndx_integral_.at(i)->Integrate(limits.vUp, limits.vMax, boost::bind(&Bremsstrahlung::FunctionToDNdxIntegral, this, boost::ref(particle), _1),4);
         }
         sum_of_rates_ += prob_for_component_.at(i);
     }
@@ -80,7 +80,7 @@ double Bremsstrahlung::CalculatedNdx()
 //----------------------------------------------------------------------------//
 
 
-double Bremsstrahlung::CalculatedNdx(double rnd)
+double Bremsstrahlung::CalculatedNdx(PROPOSALParticle& particle, double rnd)
 {
     if(multiplier_<=0)
     {
@@ -98,12 +98,12 @@ double Bremsstrahlung::CalculatedNdx(double rnd)
     {
         if(do_dndx_Interpolation_)
         {
-            prob_for_component_.at(i) = max(dndx_interpolant_1d_.at(i)->Interpolate(particle_->GetEnergy()), 0.);
+            prob_for_component_.at(i) = max(dndx_interpolant_1d_.at(i)->Interpolate(particle.GetEnergy()), 0.);
         }
         else
         {
-            SetIntegralLimits(i);
-            prob_for_component_.at(i) = dndx_integral_.at(i)->IntegrateWithRandomRatio(vUp_, vMax_, boost::bind(&Bremsstrahlung::FunctionToDNdxIntegral, this, _1), 4, rnd);
+            IntegralLimits limits = SetIntegralLimits(particle, i);
+            prob_for_component_.at(i) = dndx_integral_.at(i)->IntegrateWithRandomRatio(limits.vUp, limits.vMax, boost::bind(&Bremsstrahlung::FunctionToDNdxIntegral, this, boost::ref(particle), _1), 4, rnd);
         }
         sum_of_rates_ += prob_for_component_.at(i);
     }
@@ -116,14 +116,14 @@ double Bremsstrahlung::CalculatedNdx(double rnd)
 //----------------------------------------------------------------------------//
 
 
-double Bremsstrahlung::CalculateStochasticLoss(double rnd1, double rnd2)
+double Bremsstrahlung::CalculateStochasticLoss(PROPOSALParticle& particle, double rnd1, double rnd2)
 {
     if(rnd1 != rnd_ )
     {
-        CalculatedNdx(rnd1);
+        CalculatedNdx(particle, rnd1);
     }
 
-    return CalculateStochasticLoss(rnd2);
+    return CalculateStochasticLoss(particle, rnd2);
 
 }
 
@@ -133,7 +133,7 @@ double Bremsstrahlung::CalculateStochasticLoss(double rnd1, double rnd2)
 
 
 //formerlly in setlpm Calculates the radiation length of electrons
-double Bremsstrahlung::CalculateScatteringX0()
+double Bremsstrahlung::CalculateScatteringX0(PROPOSALParticle& particle)
 {
     double X0;
     Integral* integral_temp = new Integral(IROMB,IMAXS,IPREC);
@@ -142,32 +142,33 @@ double Bremsstrahlung::CalculateScatteringX0()
     lpm_effect_enabled_ = false;
 
     double sum      =   0;
-    double e        =   particle_->GetEnergy();
+    // double e        =   particle->GetEnergy();
 
     bool store_init_lpm_effect_ = init_lpm_effect_;
     init_lpm_effect_    =   false;
-    particle_->SetEnergy(BIGENERGY);
+    particle.SetEnergy(BIGENERGY);
 
     for(int i=0; i < medium_->GetNumComponents(); i++)
     {
 
-       SetIntegralLimits(i);
+       IntegralLimits limits = SetIntegralLimits(particle, i);
 
-       sum +=  integral_temp->Integrate(0, vUp_, boost::bind(&Bremsstrahlung::FunctionToDEdxIntegral, this, _1),2);
-       sum +=  integral_temp->Integrate(vUp_, vMax_, boost::bind(&Bremsstrahlung::FunctionToDEdxIntegral, this, _1),4);
+       sum +=  integral_temp->Integrate(0, limits.vUp, boost::bind(&Bremsstrahlung::FunctionToDEdxIntegral, this, boost::ref(particle), _1),2);
+       sum +=  integral_temp->Integrate(limits.vUp, limits.vMax, boost::bind(&Bremsstrahlung::FunctionToDEdxIntegral, this, boost::ref(particle), _1),4);
     }
 
-//    eLpm_        =   ALPHA*(particle_->GetMass());
+//    eLpm_        =   ALPHA*(particle->GetMass());
 //    eLpm_        *=  eLpm_/(4*PI*ME*RE*sum);
 
+    //TODO(mario): Check! Thu 2017/08/24
     //restore everything
-    particle_->SetEnergy(e);
-    SetIntegralLimits(0);
+    // particle->SetEnergy(e);
+    // SetIntegralLimits(0);
     lpm_effect_enabled_ = store_lpm_effect_enabled;
     init_lpm_effect_ = store_init_lpm_effect_;
     delete integral_temp;
 
-    X0  =   pow(particle_->GetCharge() , 2);
+    X0  =   pow(particle.GetCharge() , 2);
     X0  =   X0*X0/sum;
     return X0;
 }
@@ -179,7 +180,7 @@ double Bremsstrahlung::CalculateScatteringX0()
 //----------------------------------------------------------------------------//
 
 
-void Bremsstrahlung::EnableDNdxInterpolation(std::string path ,bool raw)
+void Bremsstrahlung::EnableDNdxInterpolation(PROPOSALParticle& particle, std::string path ,bool raw)
 {
     if(do_dndx_Interpolation_)return;
 
@@ -190,16 +191,16 @@ void Bremsstrahlung::EnableDNdxInterpolation(std::string path ,bool raw)
     // (except of diffractive Bremsstrahlung, where one can analyse the interference term if implemented)
     // so they use the same interpolation tables
 
-    string particle_name = particle_->GetName();
+    string particlename = particle.GetName();
 
     if(!path.empty())
     {
         stringstream filename;
         filename<<path<<"/Brems_dNdx"
-                <<"_particle_"<<particle_name
-                <<"_mass_"<<particle_->GetMass()
-                <<"_charge_"<<particle_->GetCharge()
-                <<"_lifetime_"<<particle_->GetLifetime()
+                <<"_particle"<<particlename
+                <<"_mass_"<<particle.GetMass()
+                <<"_charge_"<<particle.GetCharge()
+                <<"_lifetime_"<<particle.GetLifetime()
                 <<"_para_"<<parametrization_
                 <<"_med_"<<medium_->GetName()
                 <<"_"<<medium_->GetMassDensity()
@@ -247,7 +248,7 @@ void Bremsstrahlung::EnableDNdxInterpolation(std::string path ,bool raw)
 
             log_info("Info: Bremsstrahlungs parametrisation tables (dNdx) will be saved to file:\t%s",filename.str().c_str());
 
-            double energy = particle_->GetEnergy();
+            double energy = particle.GetEnergy();
 
             ofstream output;
 
@@ -268,39 +269,39 @@ void Bremsstrahlung::EnableDNdxInterpolation(std::string path ,bool raw)
                 {
                     component_ = i;
 
-                    dndx_interpolant_2d_.at(i) = new Interpolant(NUM1
-                                                                , particle_->GetLow()
-                                                                , BIGENERGY
-                                                                , NUM1
-                                                                , 0
-                                                                , 1
-                                                                , boost::bind(&Bremsstrahlung::FunctionToBuildDNdxInterpolant2D, this, _1 , _2)
-                                                                , order_of_interpolation_
-                                                                , false
-                                                                , false
-                                                                , true
-                                                                , order_of_interpolation_
-                                                                , false
-                                                                , false
-                                                                , false
-                                                                , order_of_interpolation_
-                                                                , true
-                                                                , false
-                                                                , false
-                                                                );
-                    dndx_interpolant_1d_.at(i) = new Interpolant(NUM1
-                                                                , particle_->GetLow()
-                                                                , BIGENERGY
-                                                                , boost::bind(&Bremsstrahlung::FunctionToBuildDNdxInterpolant, this, _1)
-                                                                , order_of_interpolation_
-                                                                , false
-                                                                , false
-                                                                , true
-                                                                , order_of_interpolation_
-                                                                , true
-                                                                , false
-                                                                , false
-                                                                );
+                    dndx_interpolant_2d_.at(i) =
+                        new Interpolant(NUM1,
+                                        particle.GetLow(),
+                                        BIGENERGY,
+                                        NUM1,
+                                        0,
+                                        1,
+                                        boost::bind(&Bremsstrahlung::FunctionToBuildDNdxInterpolant2D, this, boost::ref(particle), _1, _2),
+                                        order_of_interpolation_,
+                                        false,
+                                        false,
+                                        true,
+                                        order_of_interpolation_,
+                                        false,
+                                        false,
+                                        false,
+                                        order_of_interpolation_,
+                                        true,
+                                        false,
+                                        false);
+                    dndx_interpolant_1d_.at(i) =
+                        new Interpolant(NUM1,
+                                        particle.GetLow(),
+                                        BIGENERGY,
+                                        boost::bind(&Bremsstrahlung::FunctionToBuildDNdxInterpolant, this, _1),
+                                        order_of_interpolation_,
+                                        false,
+                                        false,
+                                        true,
+                                        order_of_interpolation_,
+                                        true,
+                                        false,
+                                        false);
 
                     dndx_interpolant_2d_.at(i)->Save(output,raw);
                     dndx_interpolant_1d_.at(i)->Save(output,raw);
@@ -312,65 +313,62 @@ void Bremsstrahlung::EnableDNdxInterpolation(std::string path ,bool raw)
                 storing_failed  =   true;
                 log_warn("Can not open file %s for writing! Table will not be stored!",filename.str().c_str());
             }
-            particle_->SetEnergy(energy);
+            particle.SetEnergy(energy);
             output.close();
         }
     }
     if(path.empty() || storing_failed)
     {
-        double energy = particle_->GetEnergy();
+        double energy = particle.GetEnergy();
         dndx_interpolant_1d_.resize( medium_->GetNumComponents() );
         dndx_interpolant_2d_.resize( medium_->GetNumComponents() );
         for(int i=0; i<(medium_->GetNumComponents()); i++)
         {
             component_ = i;
-            dndx_interpolant_2d_.at(i) = new Interpolant(NUM1
-                                                        , particle_->GetLow()
-                                                        , BIGENERGY
-                                                        ,  NUM1
-                                                        , 0
-                                                        , 1
-                                                        , boost::bind(&Bremsstrahlung::FunctionToBuildDNdxInterpolant2D, this, _1 , _2)
-                                                        , order_of_interpolation_
-                                                        , false
-                                                        , false
-                                                        , true
-                                                        , order_of_interpolation_
-                                                        , false
-                                                        , false
-                                                        , false
-                                                        , order_of_interpolation_
-                                                        , true
-                                                        , false
-                                                        , false
-                                                        );
-            dndx_interpolant_1d_.at(i) = new Interpolant(NUM1
-                                                        , particle_->GetLow()
-                                                        , BIGENERGY
-                                                        , boost::bind(&Bremsstrahlung::FunctionToBuildDNdxInterpolant, this, _1)
-                                                        , order_of_interpolation_
-                                                        , false
-                                                        , false
-                                                        , true
-                                                        , order_of_interpolation_
-                                                        , true
-                                                        , false
-                                                        , false
-                                                        );
-
+            dndx_interpolant_2d_.at(i) =
+                new Interpolant(NUM1,
+                                particle.GetLow(),
+                                BIGENERGY,
+                                NUM1,
+                                0,
+                                1,
+                                boost::bind(&Bremsstrahlung::FunctionToBuildDNdxInterpolant2D, this, boost::ref(particle), _1, _2),
+                                order_of_interpolation_,
+                                false,
+                                false,
+                                true,
+                                order_of_interpolation_,
+                                false,
+                                false,
+                                false,
+                                order_of_interpolation_,
+                                true,
+                                false,
+                                false);
+            dndx_interpolant_1d_.at(i) =
+                new Interpolant(NUM1,
+                                particle.GetLow(),
+                                BIGENERGY,
+                                boost::bind(&Bremsstrahlung::FunctionToBuildDNdxInterpolant, this, _1),
+                                order_of_interpolation_,
+                                false,
+                                false,
+                                true,
+                                order_of_interpolation_,
+                                true,
+                                false,
+                                false);
         }
-        particle_->SetEnergy(energy);
+        particle.SetEnergy(energy);
     }
 
-    do_dndx_Interpolation_=true;
+    do_dndx_Interpolation_ = true;
 }
 
-
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-
-void Bremsstrahlung::EnableDEdxInterpolation(std::string path, bool raw)
+void Bremsstrahlung::EnableDEdxInterpolation(PROPOSALParticle& particle, std::string path, bool raw)
 {
     if(do_dedx_Interpolation_)return;
 
@@ -380,16 +378,16 @@ void Bremsstrahlung::EnableDEdxInterpolation(std::string path, bool raw)
     // charged anti leptons have the same cross sections like charged leptons
     // (except of diffractive Bremsstrahlung, where one can analyse the interference term if implemented)
     // so they use the same interpolation tables
-    string particle_name = particle_->GetName();
+    string particlename = particle.GetName();
 
     if(!path.empty())
     {
         stringstream filename;
         filename<<path<<"/Brems_dEdx"
-                <<"_particle_"<<particle_name
-                <<"_mass_"<<particle_->GetMass()
-                <<"_charge_"<<particle_->GetCharge()
-                <<"_lifetime_"<<particle_->GetLifetime()
+                <<"_particle"<<particlename
+                <<"_mass_"<<particle.GetMass()
+                <<"_charge_"<<particle.GetCharge()
+                <<"_lifetime_"<<particle.GetLifetime()
                 <<"_para_"<<parametrization_
                 <<"_med_"<<medium_->GetName()
                 <<"_"<<medium_->GetMassDensity()
@@ -428,7 +426,7 @@ void Bremsstrahlung::EnableDEdxInterpolation(std::string path, bool raw)
 
             log_info("Bremsstrahlungs parametrisation tables (dEdx) will be saved to file:%s\t",filename.str().c_str());
 
-            double energy = particle_->GetEnergy();
+            double energy = particle.GetEnergy();
 
             ofstream output;
             if(raw)
@@ -443,7 +441,7 @@ void Bremsstrahlung::EnableDEdxInterpolation(std::string path, bool raw)
             {
                 output.precision(16);
 
-                dedx_interpolant_ = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, boost::bind(&Bremsstrahlung::FunctionToBuildDEdxInterpolant, this, _1),
+                dedx_interpolant_ = new Interpolant(NUM1, particle.GetLow(), BIGENERGY, boost::bind(&Bremsstrahlung::FunctionToBuildDEdxInterpolant, this, boost::ref(particle), _1),
                                                     order_of_interpolation_, true, false, true, order_of_interpolation_, false, false, true); //changed from ...,false,false,false)
                 dedx_interpolant_->Save(output,raw);
             }
@@ -452,18 +450,18 @@ void Bremsstrahlung::EnableDEdxInterpolation(std::string path, bool raw)
                 storing_failed  =   true;
                 log_warn("Can not open file %s for writing! Table will not be stored!",filename.str().c_str());
             }
-            particle_->SetEnergy(energy);
+            particle.SetEnergy(energy);
 
             output.close();
         }
     }
     if(path.empty() || storing_failed)
     {
-        double energy = particle_->GetEnergy();
-        dedx_interpolant_ = new Interpolant(NUM1, particle_->GetLow(), BIGENERGY, boost::bind(&Bremsstrahlung::FunctionToBuildDEdxInterpolant, this, _1),
+        double energy = particle.GetEnergy();
+        dedx_interpolant_ = new Interpolant(NUM1, particle.GetLow(), BIGENERGY, boost::bind(&Bremsstrahlung::FunctionToBuildDEdxInterpolant, this, boost::ref(particle), _1),
                                             order_of_interpolation_, true, false, true, order_of_interpolation_, false, false, true); //changed from ...,false,false,false)
 
-        particle_->SetEnergy(energy);
+        particle.SetEnergy(energy);
     }
 
     do_dedx_Interpolation_=true;
@@ -624,10 +622,9 @@ Bremsstrahlung::Bremsstrahlung(const Bremsstrahlung &brems)
 //----------------------------------------------------------------------------//
 
 
-Bremsstrahlung::Bremsstrahlung(PROPOSALParticle* particle,
-                             Medium* medium,
+Bremsstrahlung::Bremsstrahlung( Medium* medium,
                              EnergyCutSettings* cut_settings)
-    :CrossSections          ( particle, medium, cut_settings )
+    :CrossSections          (medium, cut_settings )
     ,lorenz_                ( false )
     ,lorenz_cut_            ( 1.e6 )
     ,dndx_integral_         ( )
@@ -839,7 +836,7 @@ ostream& operator<<(std::ostream& os, Bremsstrahlung const &brems)
 //----------------------------------------------------------------------------//
 
 
-double Bremsstrahlung::KelnerKokoulinPetrukhinParametrization(double v, int i)
+double Bremsstrahlung::KelnerKokoulinPetrukhinParametrization(PROPOSALParticle& particle, double v, int i)
 {
     double Z3       =   0;
     double result   =   0;
@@ -853,20 +850,20 @@ double Bremsstrahlung::KelnerKokoulinPetrukhinParametrization(double v, int i)
     int step;
     double d, da, dn, Fa, maxV;
 
-    d       =   particle_->GetMass()*particle_->GetMass()
-                *v/(2*(particle_->GetEnergy())*(1-v));
+    d       =   particle.GetMass()*particle.GetMass()
+                *v/(2*(particle.GetEnergy())*(1-v));
     s1      =   (component->GetLogConstant())*Z3;
     da      =   log(1 + ME/(d*SQRTE*s1));
     Dn      =   1.54*pow((component->GetAtomicNum()), 0.27);
-    s1      =   ME*Dn/((particle_->GetMass())*s1);
-    dn      =   log(Dn/(1 + d*(Dn*SQRTE - 2)/particle_->GetMass()));
-    maxV    =   ME*(particle_->GetEnergy() - particle_->GetMass())
-                /((particle_->GetEnergy())
-                  *(particle_->GetEnergy() - particle_->GetMomentum() + ME));
+    s1      =   ME*Dn/((particle.GetMass())*s1);
+    dn      =   log(Dn/(1 + d*(Dn*SQRTE - 2)/particle.GetMass()));
+    maxV    =   ME*(particle.GetEnergy() - particle.GetMass())
+                /((particle.GetEnergy())
+                  *(particle.GetEnergy() - particle.GetMomentum() + ME));
 
     if(v<maxV)
     {
-        Fa  =   log(((particle_->GetMass())/d)/(d*(particle_->GetMass())/(ME*ME) + SQRTE)) -
+        Fa  =   log(((particle.GetMass())/d)/(d*(particle.GetMass())/(ME*ME) + SQRTE)) -
                 log(1 + ME/(d*SQRTE*component->GetBPrime()*(pow(component->GetNucCharge() , -2./3))));
     }
     else
@@ -886,7 +883,7 @@ double Bremsstrahlung::KelnerKokoulinPetrukhinParametrization(double v, int i)
 
 
     result = ((4./3)*(1-v) + v*v)
-            *(log((particle_->GetMass())/d)
+            *(log((particle.GetMass())/d)
               - 0.5 -da - dn + (dn*step + Fa)/(component->GetNucCharge()));
 
     return result;
@@ -898,7 +895,7 @@ double Bremsstrahlung::KelnerKokoulinPetrukhinParametrization(double v, int i)
 //----------------------------------------------------------------------------//
 
 
-double Bremsstrahlung::AndreevBezrukovBugaevParametrization(double v, int i)
+double Bremsstrahlung::AndreevBezrukovBugaevParametrization(PROPOSALParticle& particle, double v, int i)
 {
 
     Components::Component* component = medium_->GetComponents().at(i);
@@ -914,11 +911,11 @@ double Bremsstrahlung::AndreevBezrukovBugaevParametrization(double v, int i)
     a1      =   111.7*Z3/ME;
     a2      =   724.2*Z3*Z3/ME;
     qc      =   1.9*MMU*Z3;
-    aux     =   2*(particle_->GetMass())/qc;
+    aux     =   2*(particle.GetMass())/qc;
     aux     *=  aux;
     zeta    =   sqrt(1+aux);
-    qmin    =   pow((particle_->GetMass()),2)
-                *v/((particle_->GetEnergy())*(1-v));
+    qmin    =   pow((particle.GetMass()),2)
+                *v/((particle.GetEnergy())*(1-v));
 
     x1      =   a1*qmin;
     x2      =   a2*qmin;
@@ -930,15 +927,15 @@ double Bremsstrahlung::AndreevBezrukovBugaevParametrization(double v, int i)
     }
     else
     {
-        aux1    =   log((particle_->GetMass())/qc);
+        aux1    =   log((particle.GetMass())/qc);
         aux2    =   (zeta/2)*log((zeta+1)/(zeta-1));
         d1      =   aux1 + aux2;
         d2      =   aux1 + ((3 - pow(zeta , 2))*aux2 + aux)/2;
     }
 
-    aux     =   (particle_->GetMass())*a1;
+    aux     =   (particle.GetMass())*a1;
     aux1    =   log(pow(aux , 2)/(1 + pow(x1 , 2)));
-    aux     =   (particle_->GetMass())*a2;
+    aux     =   (particle.GetMass())*a2;
     aux2    =   log(pow(aux , 2)/(1 + pow(x2 , 2)));
     psi1    =   (1+ aux1)/2 + (1 + aux2)/(2*(component->GetNucCharge()));
     psi2    =   (2./3 + aux1)/2 +
@@ -971,7 +968,7 @@ double Bremsstrahlung::AndreevBezrukovBugaevParametrization(double v, int i)
 //----------------------------------------------------------------------------//
 
 
-double Bremsstrahlung::PetrukhinShestakovParametrization(double v, int i)
+double Bremsstrahlung::PetrukhinShestakovParametrization(PROPOSALParticle& particle, double v, int i)
 {
     Components::Component* component = medium_->GetComponents().at(i);
 
@@ -981,11 +978,11 @@ double Bremsstrahlung::PetrukhinShestakovParametrization(double v, int i)
 
     Z3  =   pow((component->GetNucCharge()), -1./3);
 
-    d   =   pow((particle_->GetMass()) , 2)
-            * v/(2*(particle_->GetEnergy())*(1-v));
+    d   =   pow((particle.GetMass()) , 2)
+            * v/(2*(particle.GetEnergy())*(1-v));
 
     Fd  =   189*Z3/ME;
-    Fd  =   (particle_->GetMass())*Fd/(1 + SQRTE*d*Fd);
+    Fd  =   (particle.GetMass())*Fd/(1 + SQRTE*d*Fd);
 
     if((component->GetNucCharge())>10)
     {
@@ -1071,7 +1068,7 @@ double Bremsstrahlung::CompleteScreeningCase(double v, int i)
 //----------------------------------------------------------------------------//
 
 
-double Bremsstrahlung::CalculateStochasticLoss(double rnd)
+double Bremsstrahlung::CalculateStochasticLoss(PROPOSALParticle& particle, double rnd)
 {
 
     double rand;
@@ -1089,21 +1086,21 @@ double Bremsstrahlung::CalculateStochasticLoss(double rnd)
 
             if(do_dndx_Interpolation_)
             {
-                    SetIntegralLimits(i);
+                    IntegralLimits limits = SetIntegralLimits(particle, i);
 
                 if(vUp_==vMax_)
                 {
-                    return (particle_->GetEnergy())*vUp_;
+                    return (particle.GetEnergy())*limits.vUp;
                 }
 
-                return (particle_->GetEnergy())*(vUp_*exp(dndx_interpolant_2d_.at(i)->FindLimit((particle_->GetEnergy()), (rnd)*prob_for_component_.at(i))*log(vMax_/vUp_)));
+                return (particle.GetEnergy())*(vUp_*exp(dndx_interpolant_2d_.at(i)->FindLimit((particle.GetEnergy()), (rnd)*prob_for_component_.at(i))*log(vMax_/vUp_)));
             }
 
             else
             {
                 component_ = i;
 
-                return (particle_->GetEnergy())*dndx_integral_.at(i)->GetUpperLimit();
+                return (particle.GetEnergy())*dndx_integral_.at(i)->GetUpperLimit();
 
             }
         }
@@ -1113,8 +1110,8 @@ double Bremsstrahlung::CalculateStochasticLoss(double rnd)
     bool prob_for_all_comp_is_zero=true;
     for(int i=0; i<(medium_->GetNumComponents()); i++)
     {
-        SetIntegralLimits(i);
-        if(vUp_!=vMax_)prob_for_all_comp_is_zero=false;
+        IntegralLimits limits = SetIntegralLimits(particle, i);
+        if(limits.vUp!= limits.vMax) prob_for_all_comp_is_zero=false;
     }
     if(prob_for_all_comp_is_zero)return 0;
 
@@ -1128,7 +1125,7 @@ double Bremsstrahlung::CalculateStochasticLoss(double rnd)
 //----------------------------------------------------------------------------//
 
 
-double Bremsstrahlung::ElasticBremsstrahlungCrossSection(double v, int i)
+double Bremsstrahlung::ElasticBremsstrahlungCrossSection(PROPOSALParticle& particle, double v, int i)
 {
     Components::Component* component = medium_->GetComponents().at(i);
 
@@ -1143,13 +1140,13 @@ double Bremsstrahlung::ElasticBremsstrahlungCrossSection(double v, int i)
     switch(parametrization_)
     {
         case ParametrizationType::BremsKelnerKokoulinPetrukhin:
-            result  =   KelnerKokoulinPetrukhinParametrization(v, i);
+            result  =   KelnerKokoulinPetrukhinParametrization(particle, v, i);
             break;
         case ParametrizationType::BremsAndreevBezrukovBugaev:
-            result  =   AndreevBezrukovBugaevParametrization(v, i);
+            result  =   AndreevBezrukovBugaevParametrization(particle, v, i);
             break;
         case ParametrizationType::BremsPetrukhinShestakov:
-            result  =   PetrukhinShestakovParametrization(v, i);
+            result  =   PetrukhinShestakovParametrization(particle, v, i);
             break;
         case ParametrizationType::BremsCompleteScreeningCase:
             result  =   CompleteScreeningCase(v, i);
@@ -1160,7 +1157,7 @@ double Bremsstrahlung::ElasticBremsstrahlungCrossSection(double v, int i)
                 , parametrization_, ParametrizationType::BremsKelnerKokoulinPetrukhin);
     }
 
-    aux =   2*(component->GetNucCharge())*(ME/particle_->GetMass())*RE;
+    aux =   2*(component->GetNucCharge())*(ME/particle.GetMass())*RE;
     aux *=  (ALPHA/v)*aux*result;
 
     if(lpm_effect_enabled_)
@@ -1169,12 +1166,12 @@ double Bremsstrahlung::ElasticBremsstrahlungCrossSection(double v, int i)
         {
             s1  =   (component->GetLogConstant())*Z3;
             Dn  =   1.54*pow((component->GetAtomicNum()) , 0.27);
-            s1  =   ME*Dn/((particle_->GetMass())*s1);
+            s1  =   ME*Dn/((particle.GetMass())*s1);
         }
-        aux *=  lpm(v,s1);
+        aux *=  lpm(particle, v,s1);
     }
 
-    double c2   =   pow(particle_->GetCharge() , 2);
+    double c2   =   pow(particle.GetCharge() , 2);
 
     return medium_->GetMolDensity()*component->GetAtomInMolecule()*c2*c2*aux;
 }
@@ -1184,7 +1181,7 @@ double Bremsstrahlung::ElasticBremsstrahlungCrossSection(double v, int i)
 //----------------------------------------------------------------------------//
 
 
-double Bremsstrahlung::lpm(double v, double s1)
+double Bremsstrahlung::lpm(PROPOSALParticle& particle, double v, double s1)
 {
     if(init_lpm_effect_)
     {
@@ -1192,25 +1189,26 @@ double Bremsstrahlung::lpm(double v, double s1)
 
         lpm_effect_enabled_ = false;
         double sum      =   0;
-        double e        =   particle_->GetEnergy();
+        double e        =   particle.GetEnergy();
         init_lpm_effect_    =   false;
-        particle_->SetEnergy(BIGENERGY);
+        particle.SetEnergy(BIGENERGY);
 
         for(int i=0; i < medium_->GetNumComponents(); i++)
         {
 
-           SetIntegralLimits(i);
+           IntegralLimits limits = SetIntegralLimits(particle, i);
 
-           sum +=  integral_temp->Integrate(0, vUp_, boost::bind(&Bremsstrahlung::FunctionToDEdxIntegral, this, _1),2);
-           sum +=  integral_temp->Integrate(vUp_, vMax_, boost::bind(&Bremsstrahlung::FunctionToDEdxIntegral, this, _1),4);
+           sum +=  integral_temp->Integrate(0, limits.vUp, boost::bind(&Bremsstrahlung::FunctionToDEdxIntegral, this, boost::ref(particle), _1),2);
+           sum +=  integral_temp->Integrate(limits.vUp, limits.vMax, boost::bind(&Bremsstrahlung::FunctionToDEdxIntegral, this, boost::ref(particle), _1),4);
         }
 
-        eLpm_        =   ALPHA*(particle_->GetMass());
+        eLpm_        =   ALPHA*(particle.GetMass());
         eLpm_        *=  eLpm_/(4*PI*ME*RE*sum);
 
 
-        particle_->SetEnergy(e);
-        SetIntegralLimits(0);
+        particle.SetEnergy(e);
+        //TODO(mario): Ceck Thu 2017/08/24
+        // SetIntegralLimits(0);
         lpm_effect_enabled_=true;
         delete integral_temp;
 
@@ -1222,7 +1220,7 @@ double Bremsstrahlung::lpm(double v, double s1)
     const double G1     =   0.710390;
     const double G2     =   0.904912;
     s1                  *=  s1*SQRT2;
-    sp                  =   sqrt(eLpm_*v/(8*(particle_->GetEnergy())*(1-v)));
+    sp                  =   sqrt(eLpm_*v/(8*(particle.GetEnergy())*(1-v)));
     h                   =   log(sp)/log(s1);
 
     if(sp < s1)
@@ -1239,7 +1237,7 @@ double Bremsstrahlung::lpm(double v, double s1)
     }
 
     s       =   sp/sqrt(xi);
-    Gamma   =   RE*ME/(ALPHA*(particle_->GetMass())*v);
+    Gamma   =   RE*ME/(ALPHA*(particle.GetMass())*v);
     Gamma   =   1 +4*PI*(medium_->GetMolDensity())*(medium_->GetSumCharge())*RE*pow(Gamma,2);
     s       *=  Gamma;
     s2      =   pow(s,2);
@@ -1276,27 +1274,30 @@ double Bremsstrahlung::lpm(double v, double s1)
 //----------------------------------------------------------------------------//
 
 
-void Bremsstrahlung::SetIntegralLimits(int interaction_component)
+CrossSections::IntegralLimits Bremsstrahlung::SetIntegralLimits(PROPOSALParticle& particle, int interaction_component)
 {
     component_ = interaction_component;
     Components::Component* component = medium_->GetComponents().at(component_);
 
-    vMax_   =   1 - (3./4)*SQRTE*(particle_->GetMass()/particle_->GetEnergy())
+    IntegralLimits limits;
+
+    limits.vMax   =   1 - (3./4)*SQRTE*(particle.GetMass()/particle.GetEnergy())
                 *pow((component->GetNucCharge()) , 1./3);
 
-    if(vMax_<0)
+    if(limits.vMax<0)
     {
-        vMax_   =   0;
+        limits.vMax   =   0;
     }
 
     if(lorenz_)
     {
-        vMax_   =   min(vMax_, lorenz_cut_/(particle_->GetEnergy()));
+        limits.vMax   =   min(limits.vMax, lorenz_cut_/(particle.GetEnergy()));
     }
 
-    vMax_   =   min(vMax_, (1-(particle_->GetMass()/particle_->GetEnergy())));
-    vUp_    =   min(vMax_, cut_settings_->GetCut( particle_->GetEnergy()));
+    limits.vMax = min(limits.vMax, (1 - (particle.GetMass() / particle.GetEnergy())));
+    limits.vUp  = min(limits.vMax, cut_settings_->GetCut(particle.GetEnergy()));
 
+    return limits;
 }
 
 
@@ -1317,19 +1318,21 @@ double Bremsstrahlung::FunctionToBuildDNdxInterpolant(double energy)
 //----------------------------------------------------------------------------//
 
 
-double Bremsstrahlung::FunctionToBuildDNdxInterpolant2D(double energy , double v)
+double Bremsstrahlung::FunctionToBuildDNdxInterpolant2D(PROPOSALParticle& particle, double energy , double v)
 {
-    particle_->SetEnergy(energy);
-    SetIntegralLimits(component_);
+    PROPOSALParticle particle_tmp(particle);
+    particle_tmp.SetEnergy(energy);
 
-    if(vUp_==vMax_)
+    IntegralLimits limits = SetIntegralLimits(particle_tmp, component_);
+
+    if(limits.vUp== limits.vMax)
     {
         return 0;
     }
 
-    v   =   vUp_*exp(v*log(vMax_/vUp_));
+    v = limits.vUp * exp(v * log(limits.vMax / limits.vUp));
 
-    return dndx_integral_.at(component_)->Integrate(vUp_, v, boost::bind(&Bremsstrahlung::FunctionToDNdxIntegral, this, _1),4);
+    return dndx_integral_.at(component_)->Integrate(limits.vUp, v, boost::bind(&Bremsstrahlung::FunctionToDNdxIntegral, this, boost::ref(particle_tmp), _1),4);
 }
 
 
@@ -1337,10 +1340,12 @@ double Bremsstrahlung::FunctionToBuildDNdxInterpolant2D(double energy , double v
 //----------------------------------------------------------------------------//
 
 
-double Bremsstrahlung::FunctionToBuildDEdxInterpolant(double energy)
+double Bremsstrahlung::FunctionToBuildDEdxInterpolant(PROPOSALParticle& particle, double energy)
 {
-    particle_->SetEnergy(energy);
-    return CalculatedEdx();
+    PROPOSALParticle particle_tmp(particle);
+    particle_tmp.SetEnergy(energy);
+
+    return CalculatedEdx(particle_tmp);
 }
 
 
@@ -1351,9 +1356,9 @@ double Bremsstrahlung::FunctionToBuildDEdxInterpolant(double energy)
 //----------------------------------------------------------------------------//
 
 
-double Bremsstrahlung::FunctionToDEdxIntegral(double variable)
+double Bremsstrahlung::FunctionToDEdxIntegral(PROPOSALParticle& particle, double variable)
 {
-    return variable * ElasticBremsstrahlungCrossSection(variable, component_);
+    return variable * ElasticBremsstrahlungCrossSection(particle, variable, component_);
 }
 
 
@@ -1361,10 +1366,9 @@ double Bremsstrahlung::FunctionToDEdxIntegral(double variable)
 //----------------------------------------------------------------------------//
 
 
-double Bremsstrahlung::FunctionToDNdxIntegral(double variable)
+double Bremsstrahlung::FunctionToDNdxIntegral(PROPOSALParticle& particle, double variable)
 {
-    return multiplier_ * ElasticBremsstrahlungCrossSection(variable, component_);
-
+    return multiplier_ * ElasticBremsstrahlungCrossSection(particle, variable, component_);
 }
 
 
@@ -1375,37 +1379,37 @@ double Bremsstrahlung::FunctionToDNdxIntegral(double variable)
 //----------------------------------------------------------------------------//
 
 
-void Bremsstrahlung::SetParametrization(ParametrizationType::Enum parametrization)
-{
-    parametrization_ = parametrization;
-    switch (parametrization_)
-    {
-        case ParametrizationType::BremsKelnerKokoulinPetrukhin:
-        case ParametrizationType::BremsAndreevBezrukovBugaev:
-        case ParametrizationType::BremsPetrukhinShestakov:
-        case ParametrizationType::BremsCompleteScreeningCase:
-            break;
-        default:
-            log_warn("Bremsstrahlung: Parametrization type number '%i' is not vaild. \
-                Set to default parametrization of KelnerKokoulinPetrukhin with type number '%i' "
-                , parametrization, ParametrizationType::BremsKelnerKokoulinPetrukhin);
-            parametrization_ = ParametrizationType::BremsKelnerKokoulinPetrukhin;
-            break;
-    }
-
-    if(do_dedx_Interpolation_)
-    {
-        log_warn("dEdx-interpolation enabled before choosing the parametrization. Building the tables again");
-        DisableDEdxInterpolation();
-        EnableDEdxInterpolation();
-    }
-    if(do_dndx_Interpolation_)
-    {
-        log_warn("dNdx-interpolation enabled before choosing the parametrization. Building the tables again");
-        DisableDNdxInterpolation();
-        EnableDNdxInterpolation();
-    }
-}
+// void Bremsstrahlung::SetParametrization(ParametrizationType::Enum parametrization)
+// {
+//     parametrization_ = parametrization;
+//     switch (parametrization_)
+//     {
+//         case ParametrizationType::BremsKelnerKokoulinPetrukhin:
+//         case ParametrizationType::BremsAndreevBezrukovBugaev:
+//         case ParametrizationType::BremsPetrukhinShestakov:
+//         case ParametrizationType::BremsCompleteScreeningCase:
+//             break;
+//         default:
+//             log_warn("Bremsstrahlung: Parametrization type number '%i' is not vaild. \
+//                 Set to default parametrization of KelnerKokoulinPetrukhin with type number '%i' "
+//                 , parametrization, ParametrizationType::BremsKelnerKokoulinPetrukhin);
+//             parametrization_ = ParametrizationType::BremsKelnerKokoulinPetrukhin;
+//             break;
+//     }
+//
+//     if(do_dedx_Interpolation_)
+//     {
+//         log_warn("dEdx-interpolation enabled before choosing the parametrization. Building the tables again");
+//         DisableDEdxInterpolation();
+//         EnableDEdxInterpolation();
+//     }
+//     if(do_dndx_Interpolation_)
+//     {
+//         log_warn("dNdx-interpolation enabled before choosing the parametrization. Building the tables again");
+//         DisableDNdxInterpolation();
+//         EnableDNdxInterpolation();
+//     }
+// }
 
 void Bremsstrahlung::SetComponent(int component) {
     component_ = component;
