@@ -468,53 +468,53 @@ std::vector<PROPOSALParticle*> Propagator::propagate(double MaxDistance_cm)
 //----------------------------------------------------------------------------//
 
 
-void Propagator::AdvanceParticle(double dr, double ei, double ef)
-{
-
-    double dist = particle_->GetPropagatedDistance();
-    double time = particle_->GetT();
-    Vector3D position = particle_->GetPosition();
-
-    dist   +=  dr;
-
-    if(do_exact_time_calculation_)
-    {
-        time   +=  current_collection_->CalculateParticleTime(ei, ef)/current_collection_->GetDensityCorrection();
-    }
-    else
-    {
-        time   +=  dr/SPEED;
-    }
-
-
-    if(scattering_model_!=-1)
-    {
-        switch(scattering_model_)
-        {
-            case 0:
-                current_collection_->GetScattering()->Scatter(dr,ei,ef);
-                break;
-
-            case 1:
-                scatteringFirstOrder_->Scatter(dr, particle_, current_collection_->GetMedium());
-                break;
-
-            case 2:
-                scatteringFirstOrderMoliere_->Scatter(dr, particle_, current_collection_->GetMedium());
-                break;
-            default:
-                log_error("Never should be here! scattering_model = %i !",scattering_model_);
-        }
-
-    }
-    else
-    {
-        position = position + dr*particle_->GetDirection();
-        particle_->SetPosition(position);
-    }
-    particle_->SetPropagatedDistance(dist);
-    particle_->SetT(time);
-}
+// void Propagator::AdvanceParticle(double dr, double ei, double ef)
+// {
+//
+//     double dist = particle_->GetPropagatedDistance();
+//     double time = particle_->GetT();
+//     Vector3D position = particle_->GetPosition();
+//
+//     dist   +=  dr;
+//
+//     if(do_exact_time_calculation_)
+//     {
+//         time   +=  current_collection_->CalculateParticleTime(ei, ef)/current_collection_->GetDensityCorrection();
+//     }
+//     else
+//     {
+//         time   +=  dr/SPEED;
+//     }
+//
+//
+//     if(scattering_model_!=-1)
+//     {
+//         switch(scattering_model_)
+//         {
+//             case 0:
+//                 current_collection_->GetScattering()->Scatter(dr,ei,ef);
+//                 break;
+//
+//             case 1:
+//                 scatteringFirstOrder_->Scatter(dr, particle_, current_collection_->GetMedium());
+//                 break;
+//
+//             case 2:
+//                 scatteringFirstOrderMoliere_->Scatter(dr, particle_, current_collection_->GetMedium());
+//                 break;
+//             default:
+//                 log_error("Never should be here! scattering_model = %i !",scattering_model_);
+//         }
+//
+//     }
+//     else
+//     {
+//         position = position + dr*particle_->GetDirection();
+//         particle_->SetPosition(position);
+//     }
+//     particle_->SetPropagatedDistance(dist);
+//     particle_->SetT(time);
+// }
 
 
 //----------------------------------------------------------------------------//
