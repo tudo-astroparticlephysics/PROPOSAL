@@ -100,13 +100,6 @@ protected:
     int     order_of_interpolation_;
     double  sum_of_rates_;
 
-    struct IntegralLimits
-    {
-        double vMax;
-        double vUp;
-        double vMin;
-    };
-
 //----------------------------------------------------------------------------//
 
     virtual double FunctionToDEdxIntegral(PROPOSALParticle&, double variable) = 0;
@@ -118,6 +111,13 @@ protected:
 //----------------------------------------------------------------------------//
 
 public:
+
+    struct IntegralLimits
+    {
+        double vMax;
+        double vUp;
+        double vMin;
+    };
 
     //Constructor
     CrossSections();
@@ -177,7 +177,7 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    virtual IntegralLimits SetIntegralLimits(PROPOSALParticle&, int component) = 0;
+    virtual CrossSections::IntegralLimits SetIntegralLimits(PROPOSALParticle&, int component) = 0;
 
 //----------------------------------------------------------------------------//
 
@@ -188,7 +188,7 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    void SetParticle(PROPOSALParticle *particle);
+    // void SetParticle(PROPOSALParticle *particle);
 
 //----------------------------------------------------------------------------//
 

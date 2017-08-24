@@ -16,10 +16,10 @@
 #include <boost/bind.hpp>
 
 #include "PROPOSAL/Scattering.h"
-#include "PROPOSAL/Ionization.h"
+// #include "PROPOSAL/Ionization.h"
 #include "PROPOSAL/Bremsstrahlung.h"
-#include "PROPOSAL/Epairproduction.h"
-#include "PROPOSAL/Photonuclear.h"
+// #include "PROPOSAL/Epairproduction.h"
+// #include "PROPOSAL/Photonuclear.h"
 #include "PROPOSAL/Output.h"
 #include "PROPOSAL/methods.h"
 #include "PROPOSAL/Constants.h"
@@ -42,12 +42,12 @@ Scattering::Scattering( )
     ,interpolant_diff_(NULL)
     ,particle_( new PROPOSALParticle(MuMinusDef::Get()) )
 {
-    crosssections_.push_back(new Ionization());
+    // crosssections_.push_back(new Ionization());
     crosssections_.push_back(new Bremsstrahlung());
-    crosssections_.push_back(new Photonuclear());
-    crosssections_.push_back(new Epairproduction());
+    // crosssections_.push_back(new Photonuclear());
+    // crosssections_.push_back(new Epairproduction());
 
-    SetParticle(particle_);
+    // SetParticle(particle_);
 
 //    for(unsigned int i =0;i<crosssections_.size();i++)
 //    {
@@ -72,7 +72,9 @@ Scattering::Scattering(std::vector<CrossSections*> crosssections)
     ,particle_(NULL)
     ,crosssections_( crosssections)
 {
-    SetParticle(crosssections.at(0)->GetParticle());
+    // SetParticle(crosssections.at(0)->GetParticle());
+    //TODO(mario): Hack Thu 2017/08/24
+    particle_ = new PROPOSALParticle(MuMinusDef::Get());
 //    for(unsigned int i =0;i<crosssections_.size();i++)
 //    {
 //        if( crosssections_.at(i)->GetName().compare("Bremsstrahlung") ==0){
@@ -143,15 +145,15 @@ bool Scattering::operator==(const Scattering &scattering) const
             case ParticleType::Brems:
                 if( *(Bremsstrahlung*)crosssections_.at(i) !=  *(Bremsstrahlung*)scattering.crosssections_.at(i) ) return false;
                 break;
-            case ParticleType::DeltaE:
-                if( *(Ionization*)crosssections_.at(i) != *(Ionization*)scattering.crosssections_.at(i) ) return false;
-                break;
-            case ParticleType::EPair:
-                if( *(Epairproduction*)crosssections_.at(i) !=  *(Epairproduction*)scattering.crosssections_.at(i) ) return false;
-                break;
-            case ParticleType::NuclInt:
-                if( *(Photonuclear*)crosssections_.at(i) !=  *(Photonuclear*)scattering.crosssections_.at(i) )  return false;
-                break;
+            // case ParticleType::DeltaE:
+            //     if( *(Ionization*)crosssections_.at(i) != *(Ionization*)scattering.crosssections_.at(i) ) return false;
+            //     break;
+            // case ParticleType::EPair:
+            //     if( *(Epairproduction*)crosssections_.at(i) !=  *(Epairproduction*)scattering.crosssections_.at(i) ) return false;
+            //     break;
+            // case ParticleType::NuclInt:
+            //     if( *(Photonuclear*)crosssections_.at(i) !=  *(Photonuclear*)scattering.crosssections_.at(i) )  return false;
+            //     break;
             default:
                 log_fatal("In copy constructor of Scattering: Error: Unknown crossSection");
                 exit(1);
@@ -205,8 +207,8 @@ void Scattering::swap(Scattering &scattering)
     SetCrosssections(  tmp_cross1 );
     scattering.SetCrosssections(  tmp_cross2 );
 
-    SetParticle( new PROPOSALParticle(tmp_particle1) );
-    scattering.SetParticle( new PROPOSALParticle(tmp_particle2) );
+    // SetParticle( new PROPOSALParticle(tmp_particle1) );
+    // scattering.SetParticle( new PROPOSALParticle(tmp_particle2) );
 
     swap(x0_,scattering.x0_);
     swap(do_interpolation_,scattering.do_interpolation_);
@@ -256,7 +258,7 @@ double Scattering::FunctionToIntegral(double energy)
 
     for(unsigned int i =0;i<crosssections_.size();i++)
     {
-        aux     =   crosssections_.at(i)->CalculatedEdx();
+        aux     =   crosssections_.at(i)->CalculatedEdx(*particle_);
         result  +=  aux;
     }
 
@@ -384,8 +386,8 @@ void Scattering::EnableInterpolation(string path)
     {
         for(unsigned int i = 0; i< crosssections_.size(); i++)
         {
-            crosssections_.at(i)->EnableDEdxInterpolation(path);
-            crosssections_.at(i)->EnableDNdxInterpolation(path);
+            crosssections_.at(i)->EnableDEdxInterpolation(*particle_, path);
+            crosssections_.at(i)->EnableDNdxInterpolation(*particle_, path);
         }
 
         stringstream filename;
@@ -485,8 +487,8 @@ void Scattering::EnableInterpolation(string path)
 
         for(unsigned int i = 0; i< crosssections_.size(); i++)
         {
-            crosssections_.at(i)->EnableDEdxInterpolation(path);
-            crosssections_.at(i)->EnableDNdxInterpolation(path);
+            crosssections_.at(i)->EnableDEdxInterpolation(*particle_, path);
+            crosssections_.at(i)->EnableDNdxInterpolation(*particle_, path);
         }
 
         interpolant_ = new Interpolant(NUM2,particle_->GetLow() , BIGENERGY ,boost::bind(&Scattering::FunctionToBuildInterpolant, this, _1), order_of_interpolation_ , false, false, true, order_of_interpolation_, false, false, false );
@@ -519,17 +521,17 @@ void Scattering::DisableInterpolation()
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-void Scattering::SetParticle(PROPOSALParticle* particle)
-{
-    if(particle == NULL || particle == particle_)return;
-
-    for(unsigned int i = 0 ; i< crosssections_.size() ; i++)
-    {
-        crosssections_.at(i)->SetParticle(particle);
-    }
-
-    particle_ = particle;
-}
+// void Scattering::SetParticle(PROPOSALParticle* particle)
+// {
+//     if(particle == NULL || particle == particle_)return;
+//
+//     for(unsigned int i = 0 ; i< crosssections_.size() ; i++)
+//     {
+//         crosssections_.at(i)->SetParticle(particle);
+//     }
+//
+//     particle_ = particle;
+// }
 
 void Scattering::SetCrosssections(std::vector<CrossSections*> crosssections)
 {
