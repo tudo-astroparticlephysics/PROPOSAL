@@ -24,50 +24,6 @@ using namespace PROPOSAL;
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-
-std::pair<double,double> Propagator::CalculateEnergyTillStochastic( double initial_energy )
-{
-    double rndd    =-  log(RandomDouble());
-    double rndi    =-  log(RandomDouble());
-
-    double rndiMin = 0;
-    double rnddMin = 0;
-
-    pair<double,double> final;
-
-    //solving the tracking integral
-    if(particle_->GetLifetime() < 0)
-    {
-        rnddMin =   0;
-    }
-    else
-    {
-        rnddMin =   current_collection_->CalculateTrackingIntegal(initial_energy, rndd, false)/current_collection_->GetDensityCorrection();
-    }
-
-    rndiMin =   current_collection_->CalculateTrackingIntegal(initial_energy, rndi, true);
-    //evaluating the energy loss
-    if(rndd >= rnddMin || rnddMin<=0)
-    {
-        final.second =   particle_->GetLow();
-    }
-    else
-    {
-        final.second =   current_collection_->CalculateFinalEnergy( initial_energy, rndd*current_collection_->GetDensityCorrection(), false );
-    }
-
-    if(rndi >= rndiMin || rndiMin <= 0)
-    {
-        final.first =   particle_->GetLow();
-    }
-    else
-    {
-        final.first =   current_collection_->CalculateFinalEnergy( initial_energy, rndi, true );
-    }
-
-    return final;
-}
-
 std::vector<PROPOSALParticle*> Propagator::propagate(double MaxDistance_cm)
 {
     Output::getInstance().ClearSecondaryVector();
@@ -286,7 +242,9 @@ std::vector<PROPOSALParticle*> Propagator::propagate(double MaxDistance_cm)
         {
             distance = MaxDistance_cm - particle_->GetPropagatedDistance();
         }
-        result  =   Propagate(distance);
+
+        result  =   current_collection_->Propagate(particle_, distance);
+
         if(result<=0 || MaxDistance_cm <= particle_->GetPropagatedDistance()) break;
     }
 
@@ -303,456 +261,207 @@ std::vector<PROPOSALParticle*> Propagator::propagate(double MaxDistance_cm)
     return Output::getInstance().GetSecondarys();
 }
 
-
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
 
-// vector<PROPOSALParticle*> Propagator::Propagate( PROPOSALParticle *particle, double MaxDistance_cm )
+// double Propagator::Propagate( double distance )
 // {
-//     Output::getInstance().ClearSecondaryVector();
-
-//     Output::getInstance().GetSecondarys().reserve(1000);
-
-//     #if ROOT_SUPPORT
-//         Output::getInstance().StorePrimaryInTree(particle);
-//     #endif
-
-//     if(Output::store_in_ASCII_file_)Output::getInstance().StorePrimaryInASCII(particle);
-
-//     SetParticle(particle);
-
-//     double distance_to_collection_border    =   0;
-//     double distance_to_detector             =   0;
-//     double distance_to_closest_approach     =   0;
-//     double distance                         =   0;
-//     double result                           =   0;
-
-//     // These two variables are needed to calculate the energy loss inside the detector
-//     // energy_at_entry_point is initialized with the current energy because this is a
-//     // reasonable value for particle which starts inside the detector
-
-//     double energy_at_entry_point            =   particle_->GetEnergy();
-//     double energy_at_exit_point             =   0;
-
-
-//     bool starts_in_detector     =   detector_->IsInside(particle_);
-//     bool is_in_detector     =   false;
-//     bool was_in_detector    =   false;
-
-//     while(1)
+//     bool    flag;
+//     double  displacement;
+//
+//     double propagated_distance  =   0;
+//
+//     double  initial_energy  =   particle_->GetEnergy();
+//     double  final_energy    =   particle_->GetEnergy();
+//
+//     pair<double, ParticleType::Enum> decay;
+//     std::vector<PROPOSALParticle*> decay_products;
+//
+//     pair<double, ParticleType::Enum> energy_loss;
+//
+//
+//     int secondary_id    =   0;
+//
+//     //first: final energy befor first interaction second: energy at which the
+//     // particle decay
+//     //first and second are compared to decide if interaction happens or decay
+//     pair<double,double> energy_till_stochastic_;
+//
+//
+//     if(distance < 0)
 //     {
-//         ChooseCurrentCollection(particle_);
-//         if(current_collection_ == NULL)
+//         distance   =   0;
+//     }
+//
+//     if(initial_energy <= particle_->GetLow() || distance==0)
+//     {
+//         flag    =   false;
+//     }
+//     else
+//     {
+//         flag    =   true;
+//     }
+//
+//     while(flag)
+//     {
+//         energy_till_stochastic_ = current_collection_->CalculateEnergyTillStochastic(particle_, initial_energy );
+//         if(energy_till_stochastic_.first > energy_till_stochastic_.second)
 //         {
-//             log_info("particle reached the border");
-//             break;
-//         }
-
-//         // Check if have have to propagate the particle through the whole collection
-//         // or only to the collection border
-
-//         distance_to_collection_border =
-//         current_collection_->GetGeometry()->DistanceToBorder(particle_).first;
-//         double tmp_distance_to_border;
-//         for(unsigned int i = 0 ; i < collections_.size() ; i++)
-//         {
-
-//             if (particle->GetType() != collections_.at(i)->GetParticle()->GetType())
-//                 continue;
-
-//             if(detector_->IsInfront(particle))
-//             {
-//                 if(collections_.at(i)->GetLocation() != 0)
-//                     continue;
-//                 else
-//                 {
-//                     if(collections_.at(i)->GetGeometry()->GetHirarchy() >= current_collection_->GetGeometry()->GetHirarchy())
-//                     {
-//                         tmp_distance_to_border = collections_.at(i)->GetGeometry()->DistanceToBorder(particle_).first;
-//                         if(tmp_distance_to_border<=0)continue;
-//                         distance_to_collection_border = min(
-//                                       tmp_distance_to_border
-//                                     , distance_to_collection_border);
-//                     }
-//                 }
-//             }
-
-//             else if(detector_->IsInside(particle))
-//             {
-//                 if(collections_.at(i)->GetLocation() != 1)
-//                     continue;
-//                 else
-//                 {
-//                     tmp_distance_to_border = collections_.at(i)->GetGeometry()->DistanceToBorder(particle_).first;
-//                     if(tmp_distance_to_border<=0)continue;
-//                     distance_to_collection_border = min(
-//                                   tmp_distance_to_border
-//                                 , distance_to_collection_border);
-//                 }
-
-//             }
-
-//             else if(detector_->IsBehind(particle))
-//             {
-//                 if(collections_.at(i)->GetLocation() != 2)
-//                     continue;
-//                 else
-//                 {
-//                     if(collections_.at(i)->GetGeometry()->GetHirarchy() >= current_collection_->GetGeometry()->GetHirarchy())
-//                     {
-//                         tmp_distance_to_border = collections_.at(i)->GetGeometry()->DistanceToBorder(particle_).first;
-//                         if(tmp_distance_to_border<=0)continue;
-//                         distance_to_collection_border = min(
-//                                       tmp_distance_to_border
-//                                     , distance_to_collection_border);
-//                     }
-//                     //The particle reached the border of all specified collections
-//                     else
-//                     {
-
-//                     }
-//                 }
-//             }
-//         }
-
-//         distance_to_detector =
-//         detector_->DistanceToBorder(particle_).first;
-
-//         distance_to_closest_approach  =
-//         detector_->DistanceToClosestApproach(particle_);
-
-//         if(abs(distance_to_closest_approach) < GEOMETRY_PRECISION )
-//         {
-//             particle_->SetXc( particle_->GetX() );
-//             particle_->SetYc( particle_->GetY() );
-//             particle_->SetZc( particle_->GetZ() );
-//             particle_->SetEc( particle_->GetEnergy() );
-//             particle_->SetTc( particle_->GetT() );
-
-//             distance_to_closest_approach    =   0;
-
-//         }
-
-//         if(distance_to_detector > 0)
-//         {
-//             if(distance_to_closest_approach > 0)
-//             {
-//                 if( distance_to_detector < distance_to_collection_border &&
-//                     distance_to_detector < distance_to_closest_approach )
-//                 {
-//                     distance    =   distance_to_detector;
-//                 }
-//                 else if( distance_to_closest_approach < distance_to_collection_border)
-//                 {
-//                     distance    =   distance_to_closest_approach;
-//                 }
-//                 else
-//                 {
-//                     distance    =   distance_to_collection_border;
-//                 }
-//             }
-//             else
-//             {
-//                 if( distance_to_detector < distance_to_collection_border)
-//                 {
-//                     distance    =   distance_to_detector;
-//                 }
-//                 else
-//                 {
-//                     distance    =   distance_to_collection_border;
-//                 }
-//             }
-
+//             particle_interaction_   =   true;
+//             final_energy            =   energy_till_stochastic_.first;
 //         }
 //         else
 //         {
-//             if(distance_to_closest_approach > 0)
+//             particle_interaction_   =   false;
+//             final_energy            =   energy_till_stochastic_.second;
+//
+//         }
+//
+//         //Calculate the displacement according to initial energy initial_energy and final_energy
+//         displacement  =   current_collection_->CalculateDisplacement(
+//                     initial_energy,
+//                     final_energy,
+//                     current_collection_->GetDensityCorrection()*(distance - propagated_distance)) / current_collection_->GetDensityCorrection();
+//
+//         // The first interaction or decay happens behind the distance we want to propagate
+//         // So we calculate the final energy using only continuous losses
+//         if( displacement > distance - propagated_distance )
+//         {
+//             displacement  =   distance - propagated_distance;
+//
+//             final_energy  =   current_collection_->CalculateFinalEnergy(particle_, initial_energy, current_collection_->GetDensityCorrection()*displacement);
+//
+//         }
+//         //Advance the Particle according to the displacement
+//         //Initial energy and final energy are needed if Molier Scattering is enabled
+//         AdvanceParticle(displacement, initial_energy, final_energy);
+//
+//         propagated_distance +=  displacement;
+//
+//         if(abs(distance - propagated_distance) < abs(distance)*COMPUTER_PRECISION)
+//         {
+//             propagated_distance = distance;  // computer precision control
+//         }
+//         //Randomize the continuous energy loss if this option is enabled
+//         if( current_collection_->GetDoRandomization() )
+//         {
+//             if(final_energy != particle_->GetLow())
 //             {
-//                 if( distance_to_closest_approach < distance_to_collection_border)
-//                 {
-//                     distance    =   distance_to_closest_approach;
-//                 }
-//                 else
-//                 {
-//                     distance    =   distance_to_collection_border;
-//                 }
+//                 final_energy  = current_collection_->Randomize( initial_energy, final_energy );
 //             }
-//             else
+//
+//         }
+//         // Lower limit of particle energy is reached or
+//         // or complete particle is propagated the whole distance
+//         if( final_energy == particle_->GetLow() || propagated_distance == distance)
+//         {
+//             break;
+//         }
+//
+//         //Set the particle energy to the current energy before making
+//         //stochatic losses or decay
+//         particle_->SetEnergy( final_energy );
+//
+//         if(particle_interaction_)
+//         {
+//             energy_loss     =   current_collection_->MakeStochasticLoss(particle_);
+//             if (energy_loss.second == ParticleType::unknown)
 //             {
-//                 distance    =   distance_to_collection_border;
+//                 // in this case, no cross section is chosen, so there is no interaction
+//                 // due to the parameterization of the cross section cutoffs
+//                 log_debug("no interaction due to the parameterization of the cross section cutoffs. final energy: %f\n", final_energy);
+//                 initial_energy = final_energy;
+//                 continue;
 //             }
+//             final_energy    -=  energy_loss.first;
+//             // log_debug("Energyloss: %f\t%s", energy_loss.first, PROPOSALParticle::GetName(energy_loss.second).c_str());
+//             secondary_id    =   particle_->GetParticleId() + 1;
+//             Output::getInstance().FillSecondaryVector(particle_, secondary_id, energy_loss, 0);
 //         }
-
-
-//         is_in_detector  =   detector_->IsInside(particle_);
-//         // entry point of the detector
-//         if(!starts_in_detector && !was_in_detector && is_in_detector)
+//         else
 //         {
-//             particle_->SetXi( particle_->GetX() );
-//             particle_->SetYi( particle_->GetY() );
-//             particle_->SetZi( particle_->GetZ() );
-//             particle_->SetEi( particle_->GetEnergy() );
-//             particle_->SetTi( particle_->GetT() );
-
-//             energy_at_entry_point   =   particle_->GetEnergy();
-
-//             was_in_detector =   true;
+//             DecayChannel* mode = &particle_->GetDecayTable().SelectChannel();
+//             decay_products = mode->Decay(particle_);
+//             Output::getInstance().FillSecondaryVector(decay_products);
+//
+//             //TODO(mario): Delete decay products Tue 2017/08/22
+//
+//             // decay           =   current_collection_->MakeDecay();
+//             // final_energy    =   0;
+//             // log_debug("Decay of particle: %s", particle_->GetName().c_str());
+//             // secondary_id    = particle_->GetParticleId()  +   1;
+//             // Output::getInstance().FillSecondaryVector(particle_, secondary_id, decay ,0);
+//
 //         }
-//         // exit point of the detector
-//         else if(was_in_detector && !is_in_detector)
+//
+//         //break if the lower limit of particle energy is reached
+//         if(final_energy <= particle_->GetLow())
 //         {
-//             particle_->SetXf( particle_->GetX() );
-//             particle_->SetYf( particle_->GetY() );
-//             particle_->SetZf( particle_->GetZ() );
-//             particle_->SetEf( particle_->GetEnergy() );
-//             particle_->SetTf( particle_->GetT() );
-
-//             energy_at_exit_point    =   particle_->GetEnergy();
-//             //we don't want to run in this case a second time so we set was_in_detector to false
-//             was_in_detector =   false;
-
+//             break;
 //         }
-//         // if particle starts inside the detector we only ant to fill the exit point
-//         else if(starts_in_detector && !is_in_detector)
-//         {
-//             particle_->SetXf( particle_->GetX() );
-//             particle_->SetYf( particle_->GetY() );
-//             particle_->SetZf( particle_->GetZ() );
-//             particle_->SetEf( particle_->GetEnergy() );
-//             particle_->SetTf( particle_->GetT() );
-
-//             energy_at_exit_point    =   particle_->GetEnergy();
-//             //we don't want to run in this case a second time so we set starts_in_detector to false
-//             starts_in_detector  =   false;
-
-//         }
-//         if(MaxDistance_cm <= particle_->GetPropagatedDistance() + distance)
-//         {
-//             distance = MaxDistance_cm - particle_->GetPropagatedDistance();
-//         }
-//         result  =   Propagate(distance);
-//         if(result<=0 || MaxDistance_cm <= particle_->GetPropagatedDistance()) break;
-
+//
+//         //Next round: update the inital energy
+//         initial_energy  =   final_energy;
+//
 //     }
-
-//     particle_->SetElost(energy_at_entry_point - energy_at_exit_point);
-
-//     #if ROOT_SUPPORT
-//         Output::getInstance().StorePropagatedPrimaryInTree(particle);
-//     #endif
-//         if(Output::store_in_ASCII_file_)Output::getInstance().StorePropagatedPrimaryInASCII(particle);
-
-//     return Output::getInstance().GetSecondarys();
-
+//
+//     // if(stopping_decay_)
+//     // {
+//     //     if(propagated_distance!=distance && final_energy!=0 && particle_->GetLifetime()>=0)
+//     //     {
+//     //         particle_->SetEnergy(particle_->GetMass());
+//     //
+//     //         double t    =   particle_->GetT() -particle_->GetLifetime()*log(RandomDouble());
+//     //         double product_energy   =   0;
+//     //
+//     //         pair<double, ParticleType::Enum> decay_to_store;
+//     //         secondary_id    =   particle_->GetParticleId() + 1;
+//     //
+//     //         particle_->SetT( t );
+//     //
+//     //         if(particle_->GetType()==2)
+//     //         {
+//     //             // --------------------------------------------------------------------- //
+//     //             // Calculate random numbers before passing to a fuction, because
+//     //             // the order of argument evaluation is unspecified in c++ standards and
+//     //             // therfor depend on the compiler.
+//     //             // --------------------------------------------------------------------- //
+//     //
+//     //             double rnd1 = RandomDouble();
+//     //             double rnd2 = RandomDouble();
+//     //
+//     //             product_energy  =   current_collection_->GetDecay()->CalculateProductEnergy(rnd1, 0.5, rnd2);
+//     //         }
+//     //         else
+//     //         {
+//     //             product_energy  =   current_collection_->GetDecay()->CalculateProductEnergy(RandomDouble(), 0.5, 0.5);
+//     //         }
+//     //
+//     //         decay_to_store.first    =   product_energy;
+//     //         decay_to_store.second   =   current_collection_->GetDecay()->GetOut();
+//     //
+//     //         final_energy  =   0;
+//     //
+//     //         Output::getInstance().FillSecondaryVector(particle_,secondary_id, decay_to_store, final_energy);
+//     //     }
+//     // }
+//
+//     particle_->SetEnergy(final_energy);
+//
+//     //Particle reached the border, final energy is returned
+//     if(propagated_distance==distance)
+//     {
+//         return final_energy;
+//     }
+//     //The particle stopped/decayed, the propageted distance is return with a minus sign
+//     else
+//     {
+//         return -propagated_distance;
+//     }
+//     //Should never be here
+//     return 0;
 // }
-
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-double Propagator::Propagate( double distance )
-{
-    bool    flag;
-    double  displacement;
-
-    double propagated_distance  =   0;
-
-    double  initial_energy  =   particle_->GetEnergy();
-    double  final_energy    =   particle_->GetEnergy();
-
-    pair<double, ParticleType::Enum> decay;
-    std::vector<PROPOSALParticle*> decay_products;
-
-    pair<double, ParticleType::Enum> energy_loss;
-
-
-    int secondary_id    =   0;
-
-    //first: final energy befor first interaction second: energy at which the
-    // particle decay
-    //first and second are compared to decide if interaction happens or decay
-    pair<double,double> energy_till_stochastic_;
-
-
-    if(distance < 0)
-    {
-        distance   =   0;
-    }
-
-    if(initial_energy <= particle_->GetLow() || distance==0)
-    {
-        flag    =   false;
-    }
-    else
-    {
-        flag    =   true;
-    }
-
-    int NumInt = 0;
-    while(flag)
-    {
-        energy_till_stochastic_ = CalculateEnergyTillStochastic( initial_energy );
-        if(energy_till_stochastic_.first > energy_till_stochastic_.second)
-        {
-            particle_interaction_   =   true;
-            final_energy            =   energy_till_stochastic_.first;
-        }
-        else
-        {
-            particle_interaction_   =   false;
-            final_energy            =   energy_till_stochastic_.second;
-
-        }
-
-        //Calculate the displacement according to initial energy initial_energy and final_energy
-        displacement  =   current_collection_->CalculateDisplacement(
-                    initial_energy,
-                    final_energy,
-                    current_collection_->GetDensityCorrection()*(distance - propagated_distance)) / current_collection_->GetDensityCorrection();
-
-        // The first interaction or decay happens behind the distance we want to propagate
-        // So we calculate the final energy using only continuous losses
-        if( displacement > distance - propagated_distance )
-        {
-            displacement  =   distance - propagated_distance;
-
-            final_energy  =   current_collection_->CalculateFinalEnergy(initial_energy, current_collection_->GetDensityCorrection()*displacement);
-
-        }
-        //Advance the Particle according to the displacement
-        //Initial energy and final energy are needed if Molier Scattering is enabled
-        AdvanceParticle(displacement, initial_energy, final_energy);
-
-        propagated_distance +=  displacement;
-
-        if(abs(distance - propagated_distance) < abs(distance)*COMPUTER_PRECISION)
-        {
-            propagated_distance = distance;  // computer precision control
-        }
-        //Randomize the continuous energy loss if this option is enabled
-        if( current_collection_->GetDoRandomization() )
-        {
-            if(final_energy != particle_->GetLow())
-            {
-                final_energy  = current_collection_->Randomize( initial_energy, final_energy );
-            }
-
-        }
-        // Lower limit of particle energy is reached or
-        // or complete particle is propagated the whole distance
-        if( final_energy == particle_->GetLow() || propagated_distance == distance)
-        {
-            break;
-        }
-
-        //Set the particle energy to the current energy before making
-        //stochatic losses or decay
-        particle_->SetEnergy( final_energy );
-
-        if(particle_interaction_)
-        {
-            NumInt++;//TOMASZ
-            energy_loss     =   current_collection_->MakeStochasticLoss();
-            if (energy_loss.second == ParticleType::unknown)
-            {
-                // in this case, no cross section is chosen, so there is no interaction
-                // due to the parameterization of the cross section cutoffs
-                log_debug("no interaction due to the parameterization of the cross section cutoffs. final energy: %f\n", final_energy);
-                initial_energy = final_energy;
-                continue;
-            }
-            final_energy    -=  energy_loss.first;
-            // log_debug("Energyloss: %f\t%s", energy_loss.first, PROPOSALParticle::GetName(energy_loss.second).c_str());
-            secondary_id    =   particle_->GetParticleId() + 1;
-            Output::getInstance().FillSecondaryVector(particle_, secondary_id, energy_loss, 0);
-        }
-        else
-        {
-            DecayChannel* mode = &particle_->GetDecayTable().SelectChannel();
-            decay_products = mode->Decay(particle_);
-            Output::getInstance().FillSecondaryVector(decay_products);
-
-            //TODO(mario): Delete decay products Tue 2017/08/22
-
-            // decay           =   current_collection_->MakeDecay();
-            // final_energy    =   0;
-            // log_debug("Decay of particle: %s", particle_->GetName().c_str());
-            // secondary_id    = particle_->GetParticleId()  +   1;
-            // Output::getInstance().FillSecondaryVector(particle_, secondary_id, decay ,0);
-
-        }
-
-        //break if the lower limit of particle energy is reached
-        if(final_energy <= particle_->GetLow())
-        {
-            break;
-        }
-
-        //Next round: update the inital energy
-        initial_energy  =   final_energy;
-
-    }
-
-    // if(stopping_decay_)
-    // {
-    //     if(propagated_distance!=distance && final_energy!=0 && particle_->GetLifetime()>=0)
-    //     {
-    //         particle_->SetEnergy(particle_->GetMass());
-    //
-    //         double t    =   particle_->GetT() -particle_->GetLifetime()*log(RandomDouble());
-    //         double product_energy   =   0;
-    //
-    //         pair<double, ParticleType::Enum> decay_to_store;
-    //         secondary_id    =   particle_->GetParticleId() + 1;
-    //
-    //         particle_->SetT( t );
-    //
-    //         if(particle_->GetType()==2)
-    //         {
-    //             // --------------------------------------------------------------------- //
-    //             // Calculate random numbers before passing to a fuction, because
-    //             // the order of argument evaluation is unspecified in c++ standards and
-    //             // therfor depend on the compiler.
-    //             // --------------------------------------------------------------------- //
-    //
-    //             double rnd1 = RandomDouble();
-    //             double rnd2 = RandomDouble();
-    //
-    //             product_energy  =   current_collection_->GetDecay()->CalculateProductEnergy(rnd1, 0.5, rnd2);
-    //         }
-    //         else
-    //         {
-    //             product_energy  =   current_collection_->GetDecay()->CalculateProductEnergy(RandomDouble(), 0.5, 0.5);
-    //         }
-    //
-    //         decay_to_store.first    =   product_energy;
-    //         decay_to_store.second   =   current_collection_->GetDecay()->GetOut();
-    //
-    //         final_energy  =   0;
-    //
-    //         Output::getInstance().FillSecondaryVector(particle_,secondary_id, decay_to_store, final_energy);
-    //     }
-    // }
-
-
-    //particle_->SetParticleId(NumInt); //TOMASZ: Hack to get the number of interactions
-    particle_->SetEnergy(final_energy);
-
-    //Particle reached the border, final energy is returned
-    if(propagated_distance==distance)
-    {
-        return final_energy;
-    }
-    //The particle stopped/decayed, the propageted distance is return with a minus sign
-    else
-    {
-        return -propagated_distance;
-    }
-    //Should never be here
-    return 0;
-}
 
 
 //----------------------------------------------------------------------------//
