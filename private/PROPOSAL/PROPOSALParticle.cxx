@@ -121,40 +121,6 @@ PROPOSALParticle::PROPOSALParticle(ParticleDef particleDef)
 // Operators & swap
 // ------------------------------------------------------------------------- //
 
-// PROPOSALParticle& PROPOSALParticle::operator=(const PROPOSALParticle& particle)
-// {
-//     if (this != &particle)
-//     {
-//         propagated_distance_ = particle.propagated_distance_;
-//         position_ = particle.position_;
-//         t_ = particle.t_;
-//         direction_ = particle.direction_;
-//         momentum_ = particle.momentum_;
-//         square_momentum_ = particle.square_momentum_;
-//         energy_ = particle.energy_;
-//         mass_ = particle.mass_;
-//         low_ = particle.low_;
-//         lifetime_ = particle.lifetime_;
-//         charge_ = particle.charge_;
-//         name_ = particle.name_;
-//         parent_particle_id_ = particle.parent_particle_id_;
-//         parent_particle_energy_ = particle.parent_particle_energy_;
-//         particle_id_ = particle.particle_id_;
-//         entry_point_ = particle.entry_point_;
-//         ti_ = particle.ti_;
-//         ei_ = particle.ei_;
-//         exit_point_ = particle.exit_point_;
-//         tf_ = particle.tf_;
-//         ef_ = particle.ef_;
-//         closest_approach_point_ = particle.closest_approach_point_;
-//         tc_ = particle.tc_;
-//         ec_ = particle.ec_;
-//         elost_ = particle.elost_;
-//     }
-//
-//     return *this;
-// }
-
 PROPOSALParticle& PROPOSALParticle::operator=(const PROPOSALParticle &particle){
     if (this != &particle)
     {
