@@ -5,9 +5,9 @@
 #include <boost/bind.hpp>
 
 #include "PROPOSAL/Bremsstrahlung.h"
-#include "PROPOSAL/Epairproduction.h"
-#include "PROPOSAL/Ionization.h"
-#include "PROPOSAL/Photonuclear.h"
+// #include "PROPOSAL/Epairproduction.h"
+// #include "PROPOSAL/Ionization.h"
+// #include "PROPOSAL/Photonuclear.h"
 #include "PROPOSAL/ContinuousRandomization.h"
 #include "PROPOSAL/Output.h"
 #include "PROPOSAL/Constants.h"
@@ -414,10 +414,10 @@ ContinuousRandomization::ContinuousRandomization()
     dE2de_interpolant_diff_ =   NULL;
 
     EnergyCutSettings* cutsettings = new EnergyCutSettings(500,0.01);
-    cross_sections_.push_back(new Ionization(particle_,medium_,cutsettings));
-    cross_sections_.push_back(new Bremsstrahlung(particle_,medium_,cutsettings));
-    cross_sections_.push_back(new Epairproduction(particle_,medium_,cutsettings));
-    cross_sections_.push_back(new Photonuclear(particle_,medium_,cutsettings));
+    // cross_sections_.push_back(new Ionization(particle_,medium_,cutsettings));
+    cross_sections_.push_back(new Bremsstrahlung(medium_,cutsettings));
+    // cross_sections_.push_back(new Epairproduction(particle_,medium_,cutsettings));
+    // cross_sections_.push_back(new Photonuclear(particle_,medium_,cutsettings));
 
 }
 
@@ -467,15 +467,15 @@ ContinuousRandomization::ContinuousRandomization(const ContinuousRandomization &
             case ParticleType::Brems:
                 cross_sections_.at(i) = new Bremsstrahlung( *(Bremsstrahlung*)continuous_randomization.cross_sections_.at(i) );
                 break;
-            case ParticleType::DeltaE:
-                cross_sections_.at(i) = new Ionization( *(Ionization*)continuous_randomization.cross_sections_.at(i) );
-                break;
-            case ParticleType::EPair:
-                cross_sections_.at(i) = new Epairproduction( *(Epairproduction*)continuous_randomization.cross_sections_.at(i) );
-                break;
-            case ParticleType::NuclInt:
-                cross_sections_.at(i) = new Photonuclear( *(Photonuclear*)continuous_randomization.cross_sections_.at(i) );
-                break;
+            // case ParticleType::DeltaE:
+            //     cross_sections_.at(i) = new Ionization( *(Ionization*)continuous_randomization.cross_sections_.at(i) );
+            //     break;
+            // case ParticleType::EPair:
+            //     cross_sections_.at(i) = new Epairproduction( *(Epairproduction*)continuous_randomization.cross_sections_.at(i) );
+            //     break;
+            // case ParticleType::NuclInt:
+            //     cross_sections_.at(i) = new Photonuclear( *(Photonuclear*)continuous_randomization.cross_sections_.at(i) );
+            //     break;
             default:
                 log_fatal("Unknown cross section of type '%i' ", continuous_randomization.cross_sections_.at(i)->GetType());
         }
@@ -552,15 +552,15 @@ bool ContinuousRandomization::operator==(const ContinuousRandomization &continuo
             case ParticleType::Brems:
                 if( *(Bremsstrahlung*)cross_sections_.at(i) !=  *(Bremsstrahlung*)continuous_randomization.cross_sections_.at(i) ) return false;
                 break;
-            case ParticleType::DeltaE:
-                if( *(Ionization*)cross_sections_.at(i) != *(Ionization*)continuous_randomization.cross_sections_.at(i) ) return false;
-                break;
-            case ParticleType::EPair:
-                if( *(Epairproduction*)cross_sections_.at(i) !=  *(Epairproduction*)continuous_randomization.cross_sections_.at(i) ) return false;
-                break;
-            case ParticleType::NuclInt:
-                if( *(Photonuclear*)cross_sections_.at(i) !=  *(Photonuclear*)continuous_randomization.cross_sections_.at(i) )  return false;
-                break;
+            // case ParticleType::DeltaE:
+            //     if( *(Ionization*)cross_sections_.at(i) != *(Ionization*)continuous_randomization.cross_sections_.at(i) ) return false;
+            //     break;
+            // case ParticleType::EPair:
+            //     if( *(Epairproduction*)cross_sections_.at(i) !=  *(Epairproduction*)continuous_randomization.cross_sections_.at(i) ) return false;
+            //     break;
+            // case ParticleType::NuclInt:
+            //     if( *(Photonuclear*)cross_sections_.at(i) !=  *(Photonuclear*)continuous_randomization.cross_sections_.at(i) )  return false;
+            //     break;
             default:
                 log_fatal("Unknown cross section of type '%i' ", continuous_randomization.cross_sections_.at(i)->GetType());
                 return false;
@@ -624,8 +624,9 @@ void ContinuousRandomization::swap(ContinuousRandomization &continuous_randomiza
     swap( order_of_interpolation_, continuous_randomization.order_of_interpolation_);
 
     // Set pointers again (to many swapping above....)
-    SetParticle( new PROPOSALParticle(tmp_particle1) );
-    continuous_randomization.SetParticle( new PROPOSALParticle(tmp_particle2) );
+    //TODO(mario): hack Thu 2017/08/24
+    // SetParticle( new PROPOSALParticle(tmp_particle1) );
+    // continuous_randomization.SetParticle( new PROPOSALParticle(tmp_particle2) );
 
     SetMedium( continuous_randomization.medium_->clone() );
     continuous_randomization.SetMedium( continuous_randomization.medium_->clone() );
@@ -749,7 +750,7 @@ double ContinuousRandomization::DE2dx()
 
         for(int j=0 ; j < medium_->GetNumComponents() ; j++)
         {
-            cross_sections_.at(i)->SetIntegralLimits(j);
+            CrossSections::IntegralLimits limits = cross_sections_.at(i)->SetIntegralLimits(*particle_, j);
 
             if(cross_sections_.at(i)->GetType() == ParticleType::Brems)
             {
@@ -757,9 +758,9 @@ double ContinuousRandomization::DE2dx()
             }
             else
             {
-                min =   cross_sections_.at(i)->GetVMin();
+                min = limits.vMin;
             }
-            sum +=  dE2dx_integral_->Integrate (min, cross_sections_.at(i)->GetVUp(), boost::bind(&ContinuousRandomization::FunctionToDE2dxIntegral, this, _1) ,2);
+            sum +=  dE2dx_integral_->Integrate (min, limits.vUp, boost::bind(&ContinuousRandomization::FunctionToDE2dxIntegral, this, _1) ,2);
 
             if(cross_sections_.at(i)->GetType() == ParticleType::DeltaE)
             {
@@ -845,7 +846,7 @@ double ContinuousRandomization::FunctionToBuildDE2deInterplantDiff(double energy
 
 double ContinuousRandomization::FunctionToDE2dxIntegral(double v)
 {
-    return v*v*cross_sections_.at(which_cross_)->FunctionToDNdxIntegral(v);
+    return v*v*cross_sections_.at(which_cross_)->FunctionToDNdxIntegral(*particle_, v);
 }
 
 
@@ -864,7 +865,7 @@ double ContinuousRandomization::FunctionToDE2deIntegral(double energy)
 
     for(unsigned int i = 0 ; i<cross_sections_.size() ; i++)
     {
-        aux     =   cross_sections_.at(i)->CalculatedEdx();
+        aux     =   cross_sections_.at(i)->CalculatedEdx(*particle_);
         result  +=  aux;
     }
     return -1/result*DE2dx();
@@ -892,14 +893,14 @@ void ContinuousRandomization::SetMedium(Medium* medium)
 //----------------------------------------------------------------------------//
 
 
-void ContinuousRandomization::SetParticle(PROPOSALParticle* particle)
-{
-    particle_ = particle;
-    for(unsigned int i = 0 ; i < cross_sections_.size() ; i++)
-    {
-        cross_sections_.at(i)->SetParticle(particle);
-    }
-}
+// void ContinuousRandomization::SetParticle(PROPOSALParticle* particle)
+// {
+//     particle_ = particle;
+//     for(unsigned int i = 0 ; i < cross_sections_.size() ; i++)
+//     {
+//         cross_sections_.at(i)->SetParticle(particle);
+//     }
+// }
 
 
 //----------------------------------------------------------------------------//

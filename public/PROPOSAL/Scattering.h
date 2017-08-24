@@ -89,7 +89,7 @@ public:
 
     //Setter
 
-    void SetParticle(PROPOSALParticle* particle);
+    // void SetParticle(PROPOSALParticle* particle);
     void SetCrosssections(std::vector<CrossSections*> crosssections);
 //----------------------------------------------------------------------------//
     // Getter

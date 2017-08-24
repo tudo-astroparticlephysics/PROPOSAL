@@ -92,7 +92,7 @@ private:
     * Initalize a geomtry. Used when reading the values from config file
     *,
     */
-    Geometry* InitGeometry(std::deque<std::string>* token , std::string first_token);
+    // Geometry* InitGeometry(std::deque<std::string>* token , std::string first_token);
 //----------------------------------------------------------------------------//
     /*!
     * Init ProcessCollection from configuration file. When keyword sector is found in configuration
@@ -101,7 +101,7 @@ private:
     * 3 for taus inside/behind/infront
     * 3 for electrons inside/behind/infront
     */
-    void InitProcessCollections(std::ifstream &file);
+    // void InitProcessCollections(std::ifstream &file);
 
 
     void MoveParticle(double distance);
@@ -110,30 +110,30 @@ public:
 
     //Constructors
     Propagator();
-    Propagator(ParticleDef,
-               std::string path_to_tables,
-               bool exact_time = true,
-               bool lpm = true,
-               bool integrate = false,
-               int scattering_model = 0);
-    Propagator(std::string config_file, bool DoApplyOptions=true);
-    Propagator(std::string config_file, PROPOSALParticle* particle, bool DoApplyOptions=true);
-    Propagator(Medium* medium,
-               EnergyCutSettings* cuts,
-               ParticleDef,
-               std::string path_to_tables,
-               bool moliere = true,
-               bool continuous_rand = true,
-               bool exact_time = true,
-               bool lpm = true,
-               ParametrizationType::Enum brems = ParametrizationType::BremsKelnerKokoulinPetrukhin,
-               ParametrizationType::Enum photo = ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich,
-               double brems_multiplier = 1,
-               double photo_multiplier = 1,
-               double ioniz_multiplier = 1,
-               double epair_multiplier = 1,
-               bool integrate = false,
-               int scattering_model = 0);
+    // Propagator(ParticleDef,
+    //            std::string path_to_tables,
+    //            bool exact_time = true,
+    //            bool lpm = true,
+    //            bool integrate = false,
+    //            int scattering_model = 0);
+    // Propagator(std::string config_file, bool DoApplyOptions=true);
+    // Propagator(std::string config_file, PROPOSALParticle* particle, bool DoApplyOptions=true);
+    // Propagator(Medium* medium,
+    //            EnergyCutSettings* cuts,
+    //            ParticleDef,
+    //            std::string path_to_tables,
+    //            bool moliere = true,
+    //            bool continuous_rand = true,
+    //            bool exact_time = true,
+    //            bool lpm = true,
+    //            ParametrizationType::Enum brems = ParametrizationType::BremsKelnerKokoulinPetrukhin,
+    //            ParametrizationType::Enum photo = ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich,
+    //            double brems_multiplier = 1,
+    //            double photo_multiplier = 1,
+    //            double ioniz_multiplier = 1,
+    //            double epair_multiplier = 1,
+    //            bool integrate = false,
+    //            int scattering_model = 0);
     Propagator(const Propagator&);
     Propagator& operator=(const Propagator& propagator);
     bool operator==(const Propagator &propagator) const;
@@ -160,11 +160,11 @@ public:
      *  \return vector of secondarys
      */
 
-    std::vector<PROPOSALParticle*> Propagate( PROPOSALParticle *particle, double MaxDistance_cm = 1e20 );
+    // std::vector<PROPOSALParticle*> Propagate( PROPOSALParticle *particle, double MaxDistance_cm = 1e20 );
 
 
 //----------------------------------------------------------------------------//
-    std::vector<PROPOSALParticle*> propagate(double MaxDistance_cm = 1e20 ); //TODO(mario): Find new name Fr 2017/03/10
+    std::vector<PROPOSALParticle*> Propagate(double MaxDistance_cm = 1e20 ); //TODO(mario): Find new name Fr 2017/03/10
 
 //----------------------------------------------------------------------------//
         /*!
@@ -195,7 +195,7 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    void EnableInterpolation(std::string path ="",bool raw=false);
+    void EnableInterpolation(PROPOSALParticle&, std::string path ="",bool raw=false);
 
 //----------------------------------------------------------------------------//
 
@@ -203,7 +203,7 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    void ReadConfigFile(std::string config_file, bool DoApplyOptions=true);
+    // void ReadConfigFile(std::string config_file, bool DoApplyOptions=true);
 
 //----------------------------------------------------------------------------//
     /**
