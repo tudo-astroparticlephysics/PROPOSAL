@@ -98,21 +98,7 @@ struct ParticleDef
 // ------------------------------------------------------------------------- //
 
 
-class MuMinusDef : public ParticleDef
-{
-    public:
-    static const MuMinusDef& Get()
-    {
-        static const MuMinusDef instance;
-        return instance;
-    }
-
-    private:
-    MuMinusDef();
-    ~MuMinusDef();
-};
-
-// PARTICLE_DEF(MuMinus)
+PARTICLE_DEF(MuMinus)
 PARTICLE_DEF(MuPlus)
 
 PARTICLE_DEF(EMinus)
