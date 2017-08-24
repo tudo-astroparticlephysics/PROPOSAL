@@ -26,6 +26,249 @@ using namespace PROPOSAL;
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
+double ProcessCollection::Propagate(PROPOSALParticle* particle, double distance )
+{
+    bool    flag;
+    double  displacement;
+
+    double propagated_distance  =   0;
+
+    double  initial_energy  =   particle->GetEnergy();
+    double  final_energy    =   particle->GetEnergy();
+
+    bool particle_interaction = false;
+
+    pair<double, ParticleType::Enum> decay;
+    std::vector<PROPOSALParticle*> decay_products;
+
+    pair<double, ParticleType::Enum> energy_loss;
+
+
+    int secondary_id    =   0;
+
+    //first: final energy befor first interaction second: energy at which the
+    // particle decay
+    //first and second are compared to decide if interaction happens or decay
+    pair<double,double> energy_till_stochastic_;
+
+
+    if(distance < 0)
+    {
+        distance   =   0;
+    }
+
+    if(initial_energy <= particle->GetLow() || distance==0)
+    {
+        flag    =   false;
+    }
+    else
+    {
+        flag    =   true;
+    }
+
+    while(flag)
+    {
+        energy_till_stochastic_ = CalculateEnergyTillStochastic(particle, initial_energy );
+        if(energy_till_stochastic_.first > energy_till_stochastic_.second)
+        {
+            particle_interaction   =   true;
+            final_energy            =   energy_till_stochastic_.first;
+        }
+        else
+        {
+            particle_interaction   =   false;
+            final_energy            =   energy_till_stochastic_.second;
+
+        }
+
+        //Calculate the displacement according to initial energy initial_energy and final_energy
+        displacement  =   CalculateDisplacement(
+                    initial_energy,
+                    final_energy,
+                    density_correction_*(distance - propagated_distance)) / density_correction_;
+
+        // The first interaction or decay happens behind the distance we want to propagate
+        // So we calculate the final energy using only continuous losses
+        if( displacement > distance - propagated_distance )
+        {
+            displacement  =   distance - propagated_distance;
+
+            final_energy  =   CalculateFinalEnergy(particle, initial_energy, density_correction_*displacement);
+
+        }
+        //Advance the Particle according to the displacement
+        //Initial energy and final energy are needed if Molier Scattering is enabled
+        AdvanceParticle(particle, displacement, initial_energy, final_energy);
+
+        propagated_distance +=  displacement;
+
+        if(abs(distance - propagated_distance) < abs(distance)*COMPUTER_PRECISION)
+        {
+            propagated_distance = distance;  // computer precision control
+        }
+        //Randomize the continuous energy loss if this option is enabled
+        if( do_continuous_randomization_)
+        {
+            if(final_energy != particle->GetLow())
+            {
+                final_energy  = Randomize( initial_energy, final_energy );
+            }
+
+        }
+        // Lower limit of particle energy is reached or
+        // or complete particle is propagated the whole distance
+        if( final_energy == particle->GetLow() || propagated_distance == distance)
+        {
+            break;
+        }
+
+        //Set the particle energy to the current energy before making
+        //stochatic losses or decay
+        particle->SetEnergy( final_energy );
+
+        if(particle_interaction)
+        {
+            energy_loss     =   MakeStochasticLoss(particle);
+            if (energy_loss.second == ParticleType::unknown)
+            {
+                // in this case, no cross section is chosen, so there is no interaction
+                // due to the parameterization of the cross section cutoffs
+                log_debug("no interaction due to the parameterization of the cross section cutoffs. final energy: %f\n", final_energy);
+                initial_energy = final_energy;
+                continue;
+            }
+            final_energy    -=  energy_loss.first;
+            // log_debug("Energyloss: %f\t%s", energy_loss.first, PROPOSALParticle::GetName(energy_loss.second).c_str());
+            secondary_id    =   particle->GetParticleId() + 1;
+            Output::getInstance().FillSecondaryVector(particle, secondary_id, energy_loss, 0);
+        }
+        else
+        {
+            DecayChannel* mode = &particle->GetDecayTable().SelectChannel();
+            decay_products = mode->Decay(particle);
+            Output::getInstance().FillSecondaryVector(decay_products);
+
+            //TODO(mario): Delete decay products Tue 2017/08/22
+
+            // decay           =   current_collection_->MakeDecay();
+            // final_energy    =   0;
+            // log_debug("Decay of particle: %s", particle_->GetName().c_str());
+            // secondary_id    = particle_->GetParticleId()  +   1;
+            // Output::getInstance().FillSecondaryVector(particle_, secondary_id, decay ,0);
+
+        }
+
+        //break if the lower limit of particle energy is reached
+        if(final_energy <= particle->GetLow())
+        {
+            break;
+        }
+
+        //Next round: update the inital energy
+        initial_energy  =   final_energy;
+
+    }
+
+    // if(stopping_decay_)
+    // {
+    //     if(propagated_distance!=distance && final_energy!=0 && particle_->GetLifetime()>=0)
+    //     {
+    //         particle_->SetEnergy(particle_->GetMass());
+    //
+    //         double t    =   particle_->GetT() -particle_->GetLifetime()*log(RandomDouble());
+    //         double product_energy   =   0;
+    //
+    //         pair<double, ParticleType::Enum> decay_to_store;
+    //         secondary_id    =   particle_->GetParticleId() + 1;
+    //
+    //         particle_->SetT( t );
+    //
+    //         if(particle_->GetType()==2)
+    //         {
+    //             // --------------------------------------------------------------------- //
+    //             // Calculate random numbers before passing to a fuction, because
+    //             // the order of argument evaluation is unspecified in c++ standards and
+    //             // therfor depend on the compiler.
+    //             // --------------------------------------------------------------------- //
+    //
+    //             double rnd1 = RandomDouble();
+    //             double rnd2 = RandomDouble();
+    //
+    //             product_energy  =   current_collection_->GetDecay()->CalculateProductEnergy(rnd1, 0.5, rnd2);
+    //         }
+    //         else
+    //         {
+    //             product_energy  =   current_collection_->GetDecay()->CalculateProductEnergy(RandomDouble(), 0.5, 0.5);
+    //         }
+    //
+    //         decay_to_store.first    =   product_energy;
+    //         decay_to_store.second   =   current_collection_->GetDecay()->GetOut();
+    //
+    //         final_energy  =   0;
+    //
+    //         Output::getInstance().FillSecondaryVector(particle_,secondary_id, decay_to_store, final_energy);
+    //     }
+    // }
+
+    particle->SetEnergy(final_energy);
+
+    //Particle reached the border, final energy is returned
+    if(propagated_distance==distance)
+    {
+        return final_energy;
+    }
+    //The particle stopped/decayed, the propageted distance is return with a minus sign
+    else
+    {
+        return -propagated_distance;
+    }
+    //Should never be here
+    return 0;
+}
+
+std::pair<double,double> ProcessCollection::CalculateEnergyTillStochastic(PROPOSALParticle* particle, double initial_energy )
+{
+    double rndd    =-  log(RandomDouble());
+    double rndi    =-  log(RandomDouble());
+
+    double rndiMin = 0;
+    double rnddMin = 0;
+
+    pair<double,double> final;
+
+    //solving the tracking integral
+    if(particle->GetLifetime() < 0)
+    {
+        rnddMin =   0;
+    }
+    else
+    {
+        rnddMin =   CalculateTrackingIntegal(particle, initial_energy, rndd, false)/density_correction_;
+    }
+
+    rndiMin =   CalculateTrackingIntegal(particle, initial_energy, rndi, true);
+    //evaluating the energy loss
+    if(rndd >= rnddMin || rnddMin<=0)
+    {
+        final.second =   particle->GetLow();
+    }
+    else
+    {
+        final.second =   CalculateFinalEnergy(particle, initial_energy, rndd*density_correction_, false );
+    }
+
+    if(rndi >= rndiMin || rndiMin <= 0)
+    {
+        final.first =   particle->GetLow();
+    }
+    else
+    {
+        final.first =   CalculateFinalEnergy(particle, initial_energy, rndi, true );
+    }
+
+    return final;
+}
+
 double ProcessCollection::CalculateDisplacement(double ei, double ef, double dist)
 {
     if(do_interpolation_)
@@ -55,12 +298,64 @@ double ProcessCollection::CalculateDisplacement(double ei, double ef, double dis
 
 }
 
+void ProcessCollection::AdvanceParticle(PROPOSALParticle* particle, double dr, double ei, double ef)
+{
+
+    double dist = particle_->GetPropagatedDistance();
+    double time = particle_->GetT();
+    Vector3D position = particle_->GetPosition();
+
+    dist   +=  dr;
+
+    if(do_exact_time_calculation_)
+    {
+        time   +=  CalculateParticleTime(ei, ef)/ density_correction_;
+    }
+    else
+    {
+        time   +=  dr/SPEED;
+    }
+
+
+    //TODO(mario): Adjucst the whole scatteing class Thu 2017/08/24
+    scattering_->Scatter(dr, ei, ef);
+
+    // if(scattering_model_!=-1)
+    // {
+    //     switch(scattering_model_)
+    //     {
+    //         case 0:
+    //             current_collection_->GetScattering()->Scatter(dr,ei,ef);
+    //             break;
+    //
+    //         case 1:
+    //             scatteringFirstOrder_->Scatter(dr, particle_, current_collection_->GetMedium());
+    //             break;
+    //
+    //         case 2:
+    //             scatteringFirstOrderMoliere_->Scatter(dr, particle_, current_collection_->GetMedium());
+    //             break;
+    //         default:
+    //             log_error("Never should be here! scattering_model = %i !",scattering_model_);
+    //     }
+    //
+    // }
+    // else
+    // {
+    //     position = position + dr*particle_->GetDirection();
+    //     particle_->SetPosition(position);
+    // }
+
+    particle->SetPropagatedDistance(dist);
+    particle->SetT(time);
+}
+
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
 
-double ProcessCollection::CalculateTrackingIntegal(double initial_energy, double rnd, bool particle_interaction)
+double ProcessCollection::CalculateTrackingIntegal(PROPOSALParticle* particle, double initial_energy, double rnd, bool particle_interaction)
 {
     if(do_interpolation_)
     {
@@ -101,11 +396,11 @@ double ProcessCollection::CalculateTrackingIntegal(double initial_energy, double
 
         if(particle_interaction)
         {
-            return prop_interaction_->IntegrateWithRandomRatio(initial_energy, particle_->GetLow(), boost::bind(&ProcessCollection::FunctionToPropIntegralInteraction, this, _1), 4, -rnd);
+            return prop_interaction_->IntegrateWithRandomRatio(initial_energy, particle->GetLow(), boost::bind(&ProcessCollection::FunctionToPropIntegralInteraction, this, _1), 4, -rnd);
         }
         else
         {
-            return prop_decay_->IntegrateWithRandomRatio(initial_energy, particle_->GetLow(), boost::bind(&ProcessCollection::FunctionToPropIntegralDecay, this, _1), 4, -rnd);
+            return prop_decay_->IntegrateWithRandomRatio(initial_energy, particle->GetLow(), boost::bind(&ProcessCollection::FunctionToPropIntegralDecay, this, _1), 4, -rnd);
         }
     }
 }
@@ -115,7 +410,7 @@ double ProcessCollection::CalculateTrackingIntegal(double initial_energy, double
 //----------------------------------------------------------------------------//
 
 //Formerly: double CrossSections::getef(double ei, double dist)
-double ProcessCollection::CalculateFinalEnergy(double ei, double dist)
+double ProcessCollection::CalculateFinalEnergy(PROPOSALParticle* particle, double ei, double dist)
 {
     if(do_interpolation_)
     {
@@ -126,11 +421,11 @@ double ProcessCollection::CalculateFinalEnergy(double ei, double dist)
 
             if(fabs(aux) > fabs(ei)*HALF_PRECISION)
             {
-                return min( max(aux, particle_->GetLow()), ei);
+                return min( max(aux, particle->GetLow()), ei);
             }
         }
 
-        return min( max(ei+dist/interpolant_diff_->Interpolate(ei + dist/(2*interpolant_diff_->Interpolate(ei))), particle_->GetLow()), ei);
+        return min( max(ei+dist/interpolant_diff_->Interpolate(ei + dist/(2*interpolant_diff_->Interpolate(ei))), particle->GetLow()), ei);
     }
     else
     {
@@ -143,7 +438,7 @@ double ProcessCollection::CalculateFinalEnergy(double ei, double dist)
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-double ProcessCollection::CalculateFinalEnergy(double ei, double rnd, bool particle_interaction)
+double ProcessCollection::CalculateFinalEnergy(PROPOSALParticle* particle, double ei, double rnd, bool particle_interaction)
 {
     if( do_interpolation_ )
     {
@@ -177,7 +472,7 @@ double ProcessCollection::CalculateFinalEnergy(double ei, double rnd, bool parti
                 }
                 if(abs(ei-aux) > abs(ei)*HALF_PRECISION)
                 {
-                    return min(max(aux, particle_->GetLow()), ei);
+                    return min(max(aux, particle->GetLow()), ei);
                 }
             }
         }
@@ -212,18 +507,18 @@ double ProcessCollection::CalculateFinalEnergy(double ei, double rnd, bool parti
 
                 if(abs(ei-aux) > abs(ei)*HALF_PRECISION)
                 {
-                    return min(max(aux, particle_->GetLow()), ei);
+                    return min(max(aux, particle->GetLow()), ei);
                 }
             }
         }
 
         if(particle_interaction)
         {
-            return min(max(ei + rnd/interpol_prop_interaction_diff_->Interpolate(ei + rnd/(2*interpol_prop_interaction_diff_->Interpolate(ei))), particle_->GetLow()), ei);
+            return min(max(ei + rnd/interpol_prop_interaction_diff_->Interpolate(ei + rnd/(2*interpol_prop_interaction_diff_->Interpolate(ei))), particle->GetLow()), ei);
         }
         else
         {
-            return min(max(ei + rnd/interpol_prop_decay_diff_->Interpolate(ei + rnd/(2*interpol_prop_decay_diff_->Interpolate(ei))), particle_->GetLow()), ei);
+            return min(max(ei + rnd/interpol_prop_decay_diff_->Interpolate(ei + rnd/(2*interpol_prop_decay_diff_->Interpolate(ei))), particle->GetLow()), ei);
         }
     }
     else
@@ -245,28 +540,32 @@ double ProcessCollection::CalculateFinalEnergy(double ei, double rnd, bool parti
 //----------------------------------------------------------------------------//
 
 
-pair<double, ParticleType::Enum> ProcessCollection::MakeStochasticLoss()
-{
-    // --------------------------------------------------------------------- //
-    // Calculate random numbers before passing to a fuction, because
-    // the order of argument evaluation is unspecified in c++ standards and
-    // therefore depend on the compiler.
-    // --------------------------------------------------------------------- //
-
-    double rnd1 = MathModel::RandomDouble();
-    double rnd2 = MathModel::RandomDouble();
-    double rnd3 = MathModel::RandomDouble();
-
-    return this->MakeStochasticLoss(rnd1, rnd2, rnd3);
-}
+// pair<double, ParticleType::Enum> ProcessCollection::MakeStochasticLoss()
+// {
+//     // --------------------------------------------------------------------- //
+//     // Calculate random numbers before passing to a fuction, because
+//     // the order of argument evaluation is unspecified in c++ standards and
+//     // therefore depend on the compiler.
+//     // --------------------------------------------------------------------- //
+//
+//     double rnd1 = MathModel::RandomDouble();
+//     double rnd2 = MathModel::RandomDouble();
+//     double rnd3 = MathModel::RandomDouble();
+//
+//     return this->MakeStochasticLoss(rnd1, rnd2, rnd3);
+// }
 
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
 
-pair<double, ParticleType::Enum> ProcessCollection::MakeStochasticLoss(double rnd1,double rnd2, double rnd3)
+pair<double, ParticleType::Enum> ProcessCollection::MakeStochasticLoss(PROPOSALParticle* particle)
 {
+    double rnd1 = RandomGenerator::Get().RandomDouble();
+    double rnd2 = RandomGenerator::Get().RandomDouble();
+    double rnd3 = RandomGenerator::Get().RandomDouble();
+
     double total_rate          =    0;
     double total_rate_weighted =    0;
     double rates_sum           =    0;
@@ -282,7 +581,7 @@ pair<double, ParticleType::Enum> ProcessCollection::MakeStochasticLoss(double rn
 
     if(do_weighting_)
     {
-        if(particle_->GetPropagatedDistance() > weighting_starts_at_)
+        if(particle->GetPropagatedDistance() > weighting_starts_at_)
         {
             double exp      =   abs(weighting_order_);
             double power    =   pow(rnd2, exp);
@@ -297,7 +596,7 @@ pair<double, ParticleType::Enum> ProcessCollection::MakeStochasticLoss(double rn
             }
 
             weighting_order_        =   (1 + exp)*power;
-            weighting_starts_at_    =   particle_->GetPropagatedDistance();
+            weighting_starts_at_    =   particle->GetPropagatedDistance();
             do_weighting_           =   false;
         }
     }
@@ -632,7 +931,7 @@ void ProcessCollection::EnableInterpolation(std::string path, bool raw)
         randomizer_->EnableDE2deInterpolation(path,raw);
     }
 
-    if(do_exact_time_calulation_)
+    if(do_exact_time_calculation_)
     {
         EnableParticleTimeInterpolation(path,raw);
     }
@@ -958,7 +1257,7 @@ void ProcessCollection::EnableScattering()
 
 void ProcessCollection::EnableExactTimeCalculation()
 {
-    do_exact_time_calulation_   =   true;
+    do_exact_time_calculation_   =   true;
 }
 
 
@@ -968,7 +1267,7 @@ void ProcessCollection::EnableExactTimeCalculation()
 
 void ProcessCollection::DisableExactTimeCalculation()
 {
-    do_exact_time_calulation_   =   false;
+    do_exact_time_calculation_   =   false;
 }
 
 
@@ -996,7 +1295,7 @@ ProcessCollection::ProcessCollection()
     ,location_                   ( 0 )
     ,density_correction_         ( 1. )
     ,do_time_interpolation_      ( false )
-    ,do_exact_time_calulation_   ( false )
+    ,do_exact_time_calculation_   ( false )
     ,up_                         ( false )
     ,bigLow_                     ( 2,0 )
     ,storeDif_                   ( 2,0 )
@@ -1048,7 +1347,7 @@ ProcessCollection::ProcessCollection(const ProcessCollection &collection)
     ,location_                   ( collection.location_ )
     ,density_correction_         ( collection.density_correction_ )
     ,do_time_interpolation_      ( collection.do_time_interpolation_ )
-    ,do_exact_time_calulation_   ( collection.do_exact_time_calulation_ )
+    ,do_exact_time_calculation_   ( collection.do_exact_time_calculation_ )
     ,up_                         ( collection.up_)
     ,bigLow_                     ( collection.bigLow_ )
     ,storeDif_                   ( collection.storeDif_ )
@@ -1208,7 +1507,7 @@ ProcessCollection::ProcessCollection(PROPOSALParticle *particle, Medium *medium,
     ,location_                   ( 0 )
     ,density_correction_         ( 1. )
     ,do_time_interpolation_      ( false )
-    ,do_exact_time_calulation_   ( false )
+    ,do_exact_time_calculation_   ( false )
     ,up_                         ( false )
     ,bigLow_                     ( 2,0 )
     ,storeDif_                   ( 2,0 )
@@ -1290,7 +1589,7 @@ bool ProcessCollection::operator==(const ProcessCollection &collection) const
     if( do_scattering_              != collection.do_scattering_ )           return false;
     if( location_                   != collection.location_ )                return false;
     if( density_correction_         != collection.density_correction_ )      return false;
-    if( do_exact_time_calulation_   != collection.do_exact_time_calulation_ )return false;
+    if( do_exact_time_calculation_   != collection.do_exact_time_calculation_ )return false;
     if( do_time_interpolation_      != collection.do_time_interpolation_ )   return false;
     if( *time_particle_             != *collection.time_particle_ )          return false;
 
@@ -1429,7 +1728,7 @@ ostream& operator<<(ostream& os, ProcessCollection const& collection)
     os<<"Interpolation enabled:\t\t\t\t"<<collection.do_interpolation_<<endl;
     os<<"Continuous randomization enabled:\t\t"<<collection.do_continuous_randomization_<<endl;
     os<<"Moliere scattering enabled:\t\t\t"<<collection.do_scattering_<<endl;
-    os<<"Exact time calculation enabled:\t\t\t"<<collection.do_exact_time_calulation_<<endl;
+    os<<"Exact time calculation enabled:\t\t\t"<<collection.do_exact_time_calculation_<<endl;
     os<<"Location (0=infront, 1=inside, 2=behind)\t"<<collection.location_<<endl;
     os<<"Density correction factor:\t\t\t"<<collection.density_correction_<<endl;
 
@@ -1477,7 +1776,7 @@ void ProcessCollection::swap(ProcessCollection &collection)
     swap( location_                   , collection.location_ );
     swap( density_correction_         , collection.density_correction_ );
     swap( do_time_interpolation_      , collection.do_time_interpolation_ );
-    swap( do_exact_time_calulation_   , collection.do_exact_time_calulation_ );
+    swap( do_exact_time_calculation_   , collection.do_exact_time_calculation_ );
 
 
     particle_->swap( *collection.particle_ );       //particle pointer swap

@@ -152,7 +152,7 @@ public:
      *  \return energy at distance OR -(track length)
      */
 
-    double Propagate(double distance);
+    // double Propagate(double distance);
 
 //----------------------------------------------------------------------------//
     /**
@@ -211,20 +211,6 @@ public:
      */
 
     void ChooseCurrentCollection(Vector3D& particle_position, Vector3D& particle_direction);
-
-//----------------------------------------------------------------------------//
-    /**
-     * Calculates the contiuous loss till the first stochastic loss happend
-     * and subtract it from initial energy
-     * Also caluclate the energy at which the particle decay
-     * These to energys can be compared to decide if a decay or particle interaction
-     * happens
-     *
-     *  \param  initial_energy   initial energy
-     *  \return pair.first final energy befor first interaction pair.second decay energy at which the
-     *          particle decay
-     */
-    std::pair<double,double> CalculateEnergyTillStochastic( double initial_energy );
 
 //----------------------------------------------------------------------------//
     //Getter
