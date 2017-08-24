@@ -63,7 +63,7 @@ protected:
     double      density_correction_;          //!< density correction factor
 
     bool    do_time_interpolation_;     //!< If true, CalculateParticleTime is interpolated
-    bool    do_exact_time_calulation_;  //!< exact local time calculation enabled if true
+    bool    do_exact_time_calculation_;  //!< exact local time calculation enabled if true
 
 
     Geometry*   geometry_;
@@ -216,6 +216,44 @@ public:
     double CalculateParticleTime(double ei, double ef);
 
 //----------------------------------------------------------------------------//
+    //Memberfunctions
+    /**
+     * Propagates the particle of initial energy e to the distance r.
+     * Returns the final energy if the
+     * particle has survived or the track length to the
+     * point of disappearance with a minus sign otherwise.
+     *
+     *  \param  distance   maximum track length
+     *  \param  energy   initial energy
+     *  \return energy at distance OR -(track length)
+     */
+
+    double Propagate(PROPOSALParticle*, double distance);
+
+    /**
+     * Calculates the contiuous loss till the first stochastic loss happend
+     * and subtract it from initial energy
+     * Also caluclate the energy at which the particle decay
+     * These to energys can be compared to decide if a decay or particle interaction
+     * happens
+     *
+     *  \param  initial_energy   initial energy
+     *  \return pair.first final energy befor first interaction pair.second decay energy at which the
+     *          particle decay
+     */
+    std::pair<double, double> CalculateEnergyTillStochastic(PROPOSALParticle*, double initial_energy);
+
+    /*!
+    * advances the particle by the given distance
+    * Sets the x,y and z coordinates of particle_
+    * and its time and propagation distance
+    *
+    * \param    dr  flight distance
+    * \param    ei  initial energy
+    * \param    ef  final energy
+    */
+
+    void AdvanceParticle(PROPOSALParticle*, double dr, double ei, double ef);
 
     /*!
     returns the value of the distance integral from ei to ef;
@@ -242,7 +280,7 @@ public:
     \param dist value of displacement
     */
 
-    double CalculateFinalEnergy(double ei, double dist);
+    double CalculateFinalEnergy(PROPOSALParticle*, double ei, double dist);
 
 //----------------------------------------------------------------------------//
 
@@ -256,7 +294,7 @@ public:
      *  \return final energy due to continous energy losses [MeV]
      */
 
-    double CalculateFinalEnergy(double ei, double rnd, bool particle_interaction);
+    double CalculateFinalEnergy(PROPOSALParticle*, double ei, double rnd, bool particle_interaction);
 
 //----------------------------------------------------------------------------//
     /**
@@ -268,7 +306,7 @@ public:
      *  \return value of the tracking integral [ 1 ]
      */
 
-    double CalculateTrackingIntegal(double initial_energy, double rnd, bool particle_interaction);
+    double CalculateTrackingIntegal(PROPOSALParticle*, double initial_energy, double rnd, bool particle_interaction);
 
 //----------------------------------------------------------------------------//
     /**
@@ -287,9 +325,9 @@ public:
      *
      *  \return pair of energy loss [MeV] and kind of interaction
      */
-    std::pair<double, ParticleType::Enum> MakeStochasticLoss();
+    std::pair<double, ParticleType::Enum> MakeStochasticLoss(PROPOSALParticle*);
 
-    std::pair<double, ParticleType::Enum> MakeStochasticLoss(double rnd1,double rnd2, double rnd3);
+    // std::pair<double, ParticleType::Enum> MakeStochasticLoss(double rnd1,double rnd2, double rnd3);
 //----------------------------------------------------------------------------//
 
     /**
