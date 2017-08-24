@@ -51,7 +51,7 @@ private:
     \param i the nucleon in the medium on which the bremsstahlung occur
     \return  Calculates \f$ a_{1} \f$ see function Sel in this class
     */
-    double KelnerKokoulinPetrukhinParametrization(double v, int i);
+    double KelnerKokoulinPetrukhinParametrization(PROPOSALParticle&, double v, int i);
 
 //----------------------------------------------------------------------------//
     /*!
@@ -60,7 +60,7 @@ private:
     \return Calculates \f$ a_{1} \f$ see function Sel in this class
     */
 
-    double AndreevBezrukovBugaevParametrization(double v, int i);
+    double AndreevBezrukovBugaevParametrization(PROPOSALParticle&, double v, int i);
 
 //----------------------------------------------------------------------------//
     /*!
@@ -68,7 +68,7 @@ private:
     \param i the nucleon in the medium on which the bremsstahlung occur
     \return Calculates \f$ a_{1} \f$ see function Sel in this class
     */
-    double PetrukhinShestakovParametrization(double v, int i);
+    double PetrukhinShestakovParametrization(PROPOSALParticle&, double v, int i);
 
 //----------------------------------------------------------------------------//
     /*!
@@ -90,11 +90,11 @@ private:
     \return the lpm correction factor
     */
 
-    double lpm(double v, double s1);
+    double lpm(PROPOSALParticle&, double v, double s1);
 
 //----------------------------------------------------------------------------//
 
-    double FunctionToDEdxIntegral(double variable);
+    double FunctionToDEdxIntegral(PROPOSALParticle&, double variable);
 
 //----------------------------------------------------------------------------//
 
@@ -115,15 +115,15 @@ private:
     \return Elastic Bremsstrahlung Cross Section [1/cm]
     */
 
-    double ElasticBremsstrahlungCrossSection(double v, int i);
+    double ElasticBremsstrahlungCrossSection(PROPOSALParticle&, double v, int i);
 
 //----------------------------------------------------------------------------//
 
-    void SetIntegralLimits(int component);
+    IntegralLimits SetIntegralLimits(PROPOSALParticle&, int component);
 
 //----------------------------------------------------------------------------//
 
-    double FunctionToBuildDEdxInterpolant(double energy);
+    double FunctionToBuildDEdxInterpolant(PROPOSALParticle&, double energy);
 
 //----------------------------------------------------------------------------//
 
@@ -131,11 +131,11 @@ private:
 
 //----------------------------------------------------------------------------//
 
-    double FunctionToBuildDNdxInterpolant2D(double energy , double v);
+    double FunctionToBuildDNdxInterpolant2D(PROPOSALParticle&, double energy , double v);
 
 //----------------------------------------------------------------------------//
 
-    double CalculateStochasticLoss(double rnd1);
+    double CalculateStochasticLoss(PROPOSALParticle&, double rnd1);
 
 //----------------------------------------------------------------------------//
 
@@ -148,36 +148,36 @@ public:
     Bremsstrahlung& operator=(const Bremsstrahlung& brems);
     bool operator==(const Bremsstrahlung &brems) const;
     bool operator!=(const Bremsstrahlung &brems) const;
-    Bremsstrahlung(PROPOSALParticle* particle, Medium* medium, EnergyCutSettings* cut_settings);
+    Bremsstrahlung(Medium* medium, EnergyCutSettings* cut_settings);
     friend std::ostream& operator<<(std::ostream& os, Bremsstrahlung const &brems);
 
 //----------------------------------------------------------------------------//
 
-    double CalculatedEdx();
+    double CalculatedEdx(PROPOSALParticle&);
 
 //----------------------------------------------------------------------------//
 
-    double CalculatedNdx();
+    double CalculatedNdx(PROPOSALParticle& particle);
 
 //----------------------------------------------------------------------------//
 
-    double CalculatedNdx(double rnd);
+    double CalculatedNdx(PROPOSALParticle& particle, double rnd);
 
 //----------------------------------------------------------------------------//
 
-    double CalculateStochasticLoss(double rnd1, double rnd2);
+    double CalculateStochasticLoss(PROPOSALParticle&, double rnd1, double rnd2);
 
 //----------------------------------------------------------------------------//
 
-    double CalculateScatteringX0();
+    double CalculateScatteringX0(PROPOSALParticle&);
 
 //----------------------------------------------------------------------------//
 
-    void EnableDNdxInterpolation(std::string path ="", bool raw=false);
+    void EnableDNdxInterpolation(PROPOSALParticle&, std::string path ="", bool raw=false);
 
 //----------------------------------------------------------------------------//
 
-    void EnableDEdxInterpolation(std::string path ="", bool raw=false);
+    void EnableDEdxInterpolation(PROPOSALParticle&, std::string path ="", bool raw=false);
 
 //----------------------------------------------------------------------------//
 
@@ -189,7 +189,7 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    double FunctionToDNdxIntegral(double variable);
+    double FunctionToDNdxIntegral(PROPOSALParticle&, double variable);
 
 //----------------------------------------------------------------------------//
 
@@ -246,7 +246,7 @@ public:
 	}
 
 //----------------------------------------------------------------------------//
-    void SetParametrization(ParametrizationType::Enum parametrization = ParametrizationType::BremsKelnerKokoulinPetrukhin);
+    // void SetParametrization(ParametrizationType::Enum parametrization = ParametrizationType::BremsKelnerKokoulinPetrukhin);
 	void SetComponent(int component);
 	void SetDedxIntegral(Integral* dedxIntegral);
 	void SetDedxInterpolant(Interpolant* dedxInterpolant);

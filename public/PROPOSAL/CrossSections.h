@@ -69,8 +69,8 @@ protected:
     std::string name_;
     ParticleType::Enum type_;
 
-    PROPOSALParticle*   particle_;
-    PROPOSALParticle*   backup_particle_;
+    // PROPOSALParticle*   particle_;
+    // PROPOSALParticle*   backup_particle_;
     Medium*     medium_;
     EnergyCutSettings* cut_settings_;
 
@@ -99,13 +99,21 @@ protected:
 
     int     order_of_interpolation_;
     double  sum_of_rates_;
+
+    struct IntegralLimits
+    {
+        double vMax;
+        double vUp;
+        double vMin;
+    };
+
 //----------------------------------------------------------------------------//
 
-    virtual double FunctionToDEdxIntegral(double variable) = 0;
+    virtual double FunctionToDEdxIntegral(PROPOSALParticle&, double variable) = 0;
 
 //----------------------------------------------------------------------------//
 
-    virtual double CalculateStochasticLoss(double rnd1) = 0;
+    virtual double CalculateStochasticLoss(PROPOSALParticle&, double rnd1) = 0;
 
 //----------------------------------------------------------------------------//
 
@@ -115,7 +123,7 @@ public:
     CrossSections();
 //----------------------------------------------------------------------------//
 
-    CrossSections(PROPOSALParticle* particle, Medium* medium, EnergyCutSettings* cut_settings);
+    CrossSections(Medium* medium, EnergyCutSettings* cut_settings);
     CrossSections(const CrossSections& crossSections);
     bool operator==(const CrossSections &crossSections) const;
     bool operator!=(const CrossSections &crossSections) const;
@@ -129,27 +137,27 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    virtual double CalculatedEdx() = 0;
+    virtual double CalculatedEdx(PROPOSALParticle&) = 0;
 
 //----------------------------------------------------------------------------//
 
-    virtual double CalculatedNdx() = 0;
+    virtual double CalculatedNdx(PROPOSALParticle&) = 0;
 
 //----------------------------------------------------------------------------//
 
-    virtual double CalculatedNdx(double rnd) = 0;
+    virtual double CalculatedNdx(PROPOSALParticle&, double rnd) = 0;
 
 //----------------------------------------------------------------------------//
 
-    virtual double CalculateStochasticLoss(double rnd1, double rnd2) = 0;
+    virtual double CalculateStochasticLoss(PROPOSALParticle&, double rnd1, double rnd2) = 0;
 
 //----------------------------------------------------------------------------//
 
-    virtual void EnableDNdxInterpolation(std::string path ="", bool raw=false) = 0;
+    virtual void EnableDNdxInterpolation(PROPOSALParticle&, std::string path ="", bool raw=false) = 0;
 
 //----------------------------------------------------------------------------//
 
-    virtual void EnableDEdxInterpolation(std::string path ="", bool raw=false) = 0;
+    virtual void EnableDEdxInterpolation(PROPOSALParticle&, std::string path ="", bool raw=false) = 0;
 
 //----------------------------------------------------------------------------//
 
@@ -165,11 +173,11 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    virtual double FunctionToDNdxIntegral(double variable) = 0;
+    virtual double FunctionToDNdxIntegral(PROPOSALParticle&, double variable) = 0;
 
 //----------------------------------------------------------------------------//
 
-    virtual void SetIntegralLimits(int component) = 0;
+    virtual IntegralLimits SetIntegralLimits(PROPOSALParticle&, int component) = 0;
 
 //----------------------------------------------------------------------------//
 
@@ -200,8 +208,8 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    virtual void SetParametrization(
-        ParametrizationType::Enum parametrization = ParametrizationType::BremsKelnerKokoulinPetrukhin) = 0;
+    // virtual void SetParametrization(
+    //     ParametrizationType::Enum parametrization = ParametrizationType::BremsKelnerKokoulinPetrukhin) = 0;
 
 //----------------------------------------------------------------------------//
 
@@ -230,10 +238,10 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    PROPOSALParticle* GetParticle() const
-    {
-        return particle_;
-    }
+    // PROPOSALParticle* GetParticle() const
+    // {
+    //     return particle_;
+    // }
 
 //----------------------------------------------------------------------------//
     Medium* GetMedium() const
