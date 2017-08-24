@@ -13,9 +13,9 @@
 // #include <utility>
 
 #include "PROPOSAL/Bremsstrahlung.h"
-#include "PROPOSAL/Epairproduction.h"
-#include "PROPOSAL/Ionization.h"
-#include "PROPOSAL/Photonuclear.h"
+// #include "PROPOSAL/Epairproduction.h"
+// #include "PROPOSAL/Ionization.h"
+// #include "PROPOSAL/Photonuclear.h"
 #include "PROPOSAL/Decay.h"
 #include "PROPOSAL/ContinuousRandomization.h"
 #include "PROPOSAL/Geometry.h"
@@ -213,7 +213,7 @@ public:
     * \return   time delta
     */
 
-    double CalculateParticleTime(double ei, double ef);
+    double CalculateParticleTime(PROPOSALParticle&, double ei, double ef);
 
 //----------------------------------------------------------------------------//
     //Memberfunctions
@@ -265,7 +265,7 @@ public:
     \param ef upper integration limit (final energy)
     \param dist ???
     */
-    double CalculateDisplacement(double ei, double ef, double dist);
+    double CalculateDisplacement(PROPOSALParticle&, double ei, double ef, double dist);
 
 //----------------------------------------------------------------------------//
 
@@ -517,9 +517,9 @@ public:
 		return order_of_interpolation_;
 	}
 
-	PROPOSALParticle* GetParticle() const {
-		return particle_;
-	}
+	// PROPOSALParticle* GetParticle() const {
+	// 	return particle_;
+	// }
 
     Geometry* GetGeometry() const {
         return geometry_;
@@ -542,15 +542,15 @@ public:
 	void SetLpmEffectEnabled(bool lpmEffectEnabled);
 	void SetMedium(Medium* medium);
 	void SetOrderOfInterpolation(int orderOfInterpolation);
-	void SetParticle(PROPOSALParticle* particle);
+	// void SetParticle(PROPOSALParticle* particle);
     void SetLocation(int location);
     void SetGeometry(Geometry* geometry);
     void SetDensityCorrection(double density_correction);
     void SetEnableRandomization(bool enable_randomization);
 
-    PROPOSALParticle *GetBackup_particle() const;
-    void SetBackup_particle(PROPOSALParticle *backup_particle);
-    void RestoreBackup_particle();
+    // PROPOSALParticle *GetBackup_particle() const;
+    // void SetBackup_particle(PROPOSALParticle *backup_particle);
+    // void RestoreBackup_particle();
 };
 
 }

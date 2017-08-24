@@ -82,10 +82,10 @@ double ProcessCollection::Propagate(PROPOSALParticle& particle, double distance 
         }
 
         //Calculate the displacement according to initial energy initial_energy and final_energy
-        displacement  =   CalculateDisplacement(
-                    initial_energy,
-                    final_energy,
-                    density_correction_*(distance - propagated_distance)) / density_correction_;
+        displacement =
+            CalculateDisplacement(
+                particle, initial_energy, final_energy, density_correction_ * (distance - propagated_distance)) /
+            density_correction_;
 
         // The first interaction or decay happens behind the distance we want to propagate
         // So we calculate the final energy using only continuous losses
@@ -269,7 +269,7 @@ std::pair<double,double> ProcessCollection::CalculateEnergyTillStochastic(PROPOS
     return final;
 }
 
-double ProcessCollection::CalculateDisplacement(double ei, double ef, double dist)
+double ProcessCollection::CalculateDisplacement(PROPOSALParticle& particle, double ei, double ef, double dist)
 {
     if(do_interpolation_)
     {
@@ -293,7 +293,7 @@ double ProcessCollection::CalculateDisplacement(double ei, double ef, double dis
     }
     else
     {
-        return integral_->IntegrateWithRandomRatio(ei, ef, boost::bind(&ProcessCollection::FunctionToIntegral, this, _1), 4, -dist);
+        return integral_->IntegrateWithRandomRatio(ei, ef, boost::bind(&ProcessCollection::FunctionToIntegral, this, boost::ref(particle), _1), 4, -dist);
     }
 
 }
@@ -301,15 +301,15 @@ double ProcessCollection::CalculateDisplacement(double ei, double ef, double dis
 void ProcessCollection::AdvanceParticle(PROPOSALParticle& particle, double dr, double ei, double ef)
 {
 
-    double dist = particle_->GetPropagatedDistance();
-    double time = particle_->GetT();
-    Vector3D position = particle_->GetPosition();
+    double dist = particle.GetPropagatedDistance();
+    double time = particle.GetT();
+    Vector3D position = particle.GetPosition();
 
     dist   +=  dr;
 
     if(do_exact_time_calculation_)
     {
-        time   +=  CalculateParticleTime(ei, ef)/ density_correction_;
+        time   +=  CalculateParticleTime(particle, ei, ef)/ density_correction_;
     }
     else
     {
@@ -342,8 +342,8 @@ void ProcessCollection::AdvanceParticle(PROPOSALParticle& particle, double dr, d
     // }
     // else
     // {
-    //     position = position + dr*particle_->GetDirection();
-    //     particle_->SetPosition(position);
+    //     position = position + dr*particle.GetDirection();
+    //     particle.SetPosition(position);
     // }
 
     particle.SetPropagatedDistance(dist);
@@ -396,11 +396,11 @@ double ProcessCollection::CalculateTrackingIntegal(PROPOSALParticle& particle, d
 
         if(particle_interaction)
         {
-            return prop_interaction_->IntegrateWithRandomRatio(initial_energy, particle.GetLow(), boost::bind(&ProcessCollection::FunctionToPropIntegralInteraction, this, _1), 4, -rnd);
+            return prop_interaction_->IntegrateWithRandomRatio(initial_energy, particle.GetLow(), boost::bind(&ProcessCollection::FunctionToPropIntegralInteraction, this, boost::ref(particle), _1), 4, -rnd);
         }
         else
         {
-            return prop_decay_->IntegrateWithRandomRatio(initial_energy, particle.GetLow(), boost::bind(&ProcessCollection::FunctionToPropIntegralDecay, this, _1), 4, -rnd);
+            return prop_decay_->IntegrateWithRandomRatio(initial_energy, particle.GetLow(), boost::bind(&ProcessCollection::FunctionToPropIntegralDecay, this, boost::ref(particle), _1), 4, -rnd);
         }
     }
 }
@@ -688,7 +688,7 @@ pair<double, ParticleType::Enum> ProcessCollection::MakeStochasticLoss(PROPOSALP
 //----------------------------------------------------------------------------//
 
 
-double ProcessCollection::CalculateParticleTime(double ei, double ef)
+double ProcessCollection::CalculateParticleTime(PROPOSALParticle& particle, double ei, double ef)
 {
     if(do_time_interpolation_)
     {
@@ -707,7 +707,7 @@ double ProcessCollection::CalculateParticleTime(double ei, double ef)
     }
     else
     {
-        return time_particle_->Integrate(ei, ef, boost::bind(&ProcessCollection::FunctionToTimeIntegral, this, _1),4);
+        return time_particle_->Integrate(ei, ef, boost::bind(&ProcessCollection::FunctionToTimeIntegral, this, boost::ref(particle), _1),4);
     }
 }
 
@@ -1842,8 +1842,8 @@ void ProcessCollection::swap(ProcessCollection &collection)
 
 
     // Set pointers again (to many swapping above....)
-    SetParticle( new PROPOSALParticle(tmp_particle1) );
-    collection.SetParticle( new PROPOSALParticle(tmp_particle2) );
+    // SetParticle( new PROPOSALParticle(tmp_particle1) );
+    // collection.SetParticle( new PROPOSALParticle(tmp_particle2) );
 
     SetCutSettings(  new EnergyCutSettings(tmp_cuts1) );
     collection.SetCutSettings( new EnergyCutSettings(tmp_cuts2) );
@@ -1983,7 +1983,7 @@ void ProcessCollection::swap(ProcessCollection &collection)
 
 double ProcessCollection::FunctionToBuildInterpolant(PROPOSALParticle& particle, double energy)
 {
-    return integral_->Integrate(energy, particle_->GetLow(), boost::bind(&ProcessCollection::FunctionToIntegral, this, boost::ref(particle), _1),4);
+    return integral_->Integrate(energy, particle.GetLow(), boost::bind(&ProcessCollection::FunctionToIntegral, this, boost::ref(particle), _1),4);
 }
 
 
@@ -2026,7 +2026,7 @@ double ProcessCollection::InterpolPropInteraction(PROPOSALParticle& particle, do
 {
     if(up_)
     {
-        return prop_interaction_->Integrate(energy, particle_->GetLow(), boost::bind(&ProcessCollection::FunctionToPropIntegralInteraction, this, boost::ref(particle), _1),4);
+        return prop_interaction_->Integrate(energy, particle.GetLow(), boost::bind(&ProcessCollection::FunctionToPropIntegralInteraction, this, boost::ref(particle), _1),4);
     }
     else
     {
@@ -2061,7 +2061,7 @@ double ProcessCollection::InterpolPropInteraction(PROPOSALParticle& particle, do
 
 double ProcessCollection::InterpolTimeParticleDiff(PROPOSALParticle& particle, double energy)
 {
-    return time_particle_->Integrate(energy, particle_->GetLow(), boost::bind(&ProcessCollection::FunctionToTimeIntegral, this, boost::ref(particle), _1),4);
+    return time_particle_->Integrate(energy, particle.GetLow(), boost::bind(&ProcessCollection::FunctionToTimeIntegral, this, boost::ref(particle), _1),4);
 }
 
 
@@ -2077,7 +2077,7 @@ double ProcessCollection::FunctionToTimeIntegral(PROPOSALParticle& particle, dou
     double aux;
 
     aux     =   FunctionToIntegral(particle, energy);
-    aux     *=  particle_->GetEnergy()/(particle_->GetMomentum()*SPEED);
+    aux     *=  particle.GetEnergy()/(particle.GetMomentum()*SPEED);
     return aux;
 }
 
@@ -2093,9 +2093,9 @@ double ProcessCollection::FunctionToPropIntegralDecay(PROPOSALParticle& particle
 
     aux =   FunctionToIntegral(particle, energy);
 
-    decay  =   decay_->MakeDecay(particle_);
+    decay  =   decay_->MakeDecay(&particle);
 
-    log_debug(" + %f",particle_->GetEnergy());
+    log_debug(" + %f",particle.GetEnergy());
 
 
     return aux*decay;
@@ -2137,7 +2137,7 @@ double ProcessCollection::FunctionToIntegral(PROPOSALParticle& particle, double 
 
     double result;
     double aux;
-    particle_->SetEnergy(energy);
+    particle.SetEnergy(energy);
     result  =    0;
 
     for(unsigned int i =0;i<crosssections_.size();i++)
@@ -2145,7 +2145,7 @@ double ProcessCollection::FunctionToIntegral(PROPOSALParticle& particle, double 
         aux     =   crosssections_.at(i)->CalculatedEdx(particle);
         result  +=  aux;
 
-        log_debug("energy %f , dE/dx = %f",particle_->GetEnergy() ,aux);
+        log_debug("energy %f , dE/dx = %f",particle.GetEnergy() ,aux);
 
     }
 
@@ -2192,51 +2192,51 @@ void ProcessCollection::SetMedium(Medium* medium)
 //----------------------------------------------------------------------------//
 
 
-void ProcessCollection::SetParticle(PROPOSALParticle* particle)
-{
-    particle_ = particle;
+// void ProcessCollection::SetParticle(PROPOSALParticle* particle)
+// {
+//     particle_ = particle;
+//
+//     for(unsigned int i = 0 ; i < crosssections_.size() ; i++)
+//     {
+//         crosssections_.at(i)->SetParticle(particle);
+//     }
+//     if(do_continuous_randomization_)
+//     {
+//         randomizer_->SetParticle(particle_);
+//     }
+//     if(do_scattering_)
+//     {
+//         scattering_->SetParticle(particle_);
+//     }
+// }
 
-    for(unsigned int i = 0 ; i < crosssections_.size() ; i++)
-    {
-        crosssections_.at(i)->SetParticle(particle);
-    }
-    if(do_continuous_randomization_)
-    {
-        randomizer_->SetParticle(particle_);
-    }
-    if(do_scattering_)
-    {
-        scattering_->SetParticle(particle_);
-    }
-}
-
-PROPOSALParticle *ProcessCollection::GetBackup_particle() const
-{
-    return backup_particle_;
-}
-
-void ProcessCollection::SetBackup_particle(PROPOSALParticle *backup_particle)
-{
-    backup_particle_ = backup_particle;
-}
-
-void ProcessCollection::RestoreBackup_particle()
-{
-    particle_ = backup_particle_;
-
-    for(unsigned int i = 0 ; i < crosssections_.size() ; i++)
-    {
-        crosssections_.at(i)->RestoreBackup_particle();
-    }
-    if(do_continuous_randomization_)
-    {
-        randomizer_->RestoreBackup_particle();
-    }
-    if(do_scattering_)
-    {
-        scattering_->RestoreBackup_particle();
-    }
-}
+// PROPOSALParticle *ProcessCollection::GetBackup_particle() const
+// {
+//     return backup_particle_;
+// }
+//
+// void ProcessCollection::SetBackup_particle(PROPOSALParticle *backup_particle)
+// {
+//     backup_particle_ = backup_particle;
+// }
+//
+// void ProcessCollection::RestoreBackup_particle()
+// {
+//     particle_ = backup_particle_;
+//
+//     for(unsigned int i = 0 ; i < crosssections_.size() ; i++)
+//     {
+//         crosssections_.at(i)->RestoreBackup_particle();
+//     }
+//     if(do_continuous_randomization_)
+//     {
+//         randomizer_->RestoreBackup_particle();
+//     }
+//     if(do_scattering_)
+//     {
+//         scattering_->RestoreBackup_particle();
+//     }
+// }
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
