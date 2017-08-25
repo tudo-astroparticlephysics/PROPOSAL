@@ -245,6 +245,15 @@ std::vector<PROPOSALParticle*> Propagator::Propagate(double MaxDistance_cm)
 
         result  =   current_collection_->Propagate(*particle_, distance);
 
+        if (MaxDistance_cm <= particle_->GetPropagatedDistance())
+        {
+            std::cout << "max dist reached" << std::endl;
+        }
+        if (result < 0)
+        {
+            std::cout << "paricle must be decayed" << std::endl;
+        }
+
         if(result<=0 || MaxDistance_cm <= particle_->GetPropagatedDistance()) break;
     }
 

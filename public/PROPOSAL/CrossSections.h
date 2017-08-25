@@ -102,11 +102,11 @@ protected:
 
 //----------------------------------------------------------------------------//
 
-    virtual double FunctionToDEdxIntegral(PROPOSALParticle&, double variable) = 0;
+    virtual double FunctionToDEdxIntegral(const PROPOSALParticle&, double variable) = 0;
 
 //----------------------------------------------------------------------------//
 
-    virtual double CalculateStochasticLoss(PROPOSALParticle&, double rnd1) = 0;
+    virtual double CalculateStochasticLoss(const PROPOSALParticle&, double rnd1) = 0;
 
 //----------------------------------------------------------------------------//
 
@@ -137,19 +137,19 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    virtual double CalculatedEdx(PROPOSALParticle&) = 0;
+    virtual double CalculatedEdx(const PROPOSALParticle&) = 0;
 
 //----------------------------------------------------------------------------//
 
-    virtual double CalculatedNdx(PROPOSALParticle&) = 0;
+    virtual double CalculatedNdx(const PROPOSALParticle&) = 0;
 
 //----------------------------------------------------------------------------//
 
-    virtual double CalculatedNdx(PROPOSALParticle&, double rnd) = 0;
+    virtual double CalculatedNdx(const PROPOSALParticle&, double rnd) = 0;
 
 //----------------------------------------------------------------------------//
 
-    virtual double CalculateStochasticLoss(PROPOSALParticle&, double rnd1, double rnd2) = 0;
+    virtual double CalculateStochasticLoss(const PROPOSALParticle&, double rnd1, double rnd2) = 0;
 
 //----------------------------------------------------------------------------//
 
@@ -173,11 +173,11 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    virtual double FunctionToDNdxIntegral(PROPOSALParticle&, double variable) = 0;
+    virtual double FunctionToDNdxIntegral(const PROPOSALParticle&, double variable) = 0;
 
 //----------------------------------------------------------------------------//
 
-    virtual CrossSections::IntegralLimits SetIntegralLimits(PROPOSALParticle&, int component) = 0;
+    virtual CrossSections::IntegralLimits SetIntegralLimits(const PROPOSALParticle&, int component) = 0;
 
 //----------------------------------------------------------------------------//
 
