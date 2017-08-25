@@ -22,7 +22,7 @@ using namespace PROPOSAL;
 //----------------------------------------------------------------------------//
 
 
-double Bremsstrahlung::CalculatedEdx(PROPOSALParticle& particle)
+double Bremsstrahlung::CalculatedEdx(const PROPOSALParticle& particle)
 {
     if(multiplier_<=0)
     {
@@ -39,7 +39,7 @@ double Bremsstrahlung::CalculatedEdx(PROPOSALParticle& particle)
     for(int i=0; i<(medium_->GetNumComponents()); i++)
     {
         IntegralLimits limits = SetIntegralLimits(particle, i);
-        sum +=  dedx_integral_->Integrate(0, limits.vUp, boost::bind(&Bremsstrahlung::FunctionToDEdxIntegral, this, boost::ref(particle), _1),2);
+        sum +=  dedx_integral_->Integrate(0, limits.vUp, boost::bind(&Bremsstrahlung::FunctionToDEdxIntegral, this, boost::cref(particle), _1),2);
     }
 
     return multiplier_*particle.GetEnergy()*sum;
@@ -50,7 +50,7 @@ double Bremsstrahlung::CalculatedEdx(PROPOSALParticle& particle)
 //----------------------------------------------------------------------------//
 
 
-double Bremsstrahlung::CalculatedNdx(PROPOSALParticle& particle)
+double Bremsstrahlung::CalculatedNdx(const PROPOSALParticle& particle)
 {
     if(multiplier_<=0)
     {
@@ -68,7 +68,7 @@ double Bremsstrahlung::CalculatedNdx(PROPOSALParticle& particle)
         else
         {
             IntegralLimits limits = SetIntegralLimits(particle, i);
-            prob_for_component_.at(i) = dndx_integral_.at(i)->Integrate(limits.vUp, limits.vMax, boost::bind(&Bremsstrahlung::FunctionToDNdxIntegral, this, boost::ref(particle), _1),4);
+            prob_for_component_.at(i) = dndx_integral_.at(i)->Integrate(limits.vUp, limits.vMax, boost::bind(&Bremsstrahlung::FunctionToDNdxIntegral, this, boost::cref(particle), _1),4);
         }
         sum_of_rates_ += prob_for_component_.at(i);
     }
@@ -80,7 +80,7 @@ double Bremsstrahlung::CalculatedNdx(PROPOSALParticle& particle)
 //----------------------------------------------------------------------------//
 
 
-double Bremsstrahlung::CalculatedNdx(PROPOSALParticle& particle, double rnd)
+double Bremsstrahlung::CalculatedNdx(const PROPOSALParticle& particle, double rnd)
 {
     if(multiplier_<=0)
     {
@@ -103,7 +103,7 @@ double Bremsstrahlung::CalculatedNdx(PROPOSALParticle& particle, double rnd)
         else
         {
             IntegralLimits limits = SetIntegralLimits(particle, i);
-            prob_for_component_.at(i) = dndx_integral_.at(i)->IntegrateWithRandomRatio(limits.vUp, limits.vMax, boost::bind(&Bremsstrahlung::FunctionToDNdxIntegral, this, boost::ref(particle), _1), 4, rnd);
+            prob_for_component_.at(i) = dndx_integral_.at(i)->IntegrateWithRandomRatio(limits.vUp, limits.vMax, boost::bind(&Bremsstrahlung::FunctionToDNdxIntegral, this, boost::cref(particle), _1), 4, rnd);
         }
         sum_of_rates_ += prob_for_component_.at(i);
     }
@@ -116,7 +116,7 @@ double Bremsstrahlung::CalculatedNdx(PROPOSALParticle& particle, double rnd)
 //----------------------------------------------------------------------------//
 
 
-double Bremsstrahlung::CalculateStochasticLoss(PROPOSALParticle& particle, double rnd1, double rnd2)
+double Bremsstrahlung::CalculateStochasticLoss(const PROPOSALParticle& particle, double rnd1, double rnd2)
 {
     if(rnd1 != rnd_ )
     {
@@ -133,7 +133,7 @@ double Bremsstrahlung::CalculateStochasticLoss(PROPOSALParticle& particle, doubl
 
 
 //formerlly in setlpm Calculates the radiation length of electrons
-double Bremsstrahlung::CalculateScatteringX0(PROPOSALParticle& particle)
+double Bremsstrahlung::CalculateScatteringX0(const PROPOSALParticle& particle)
 {
     double X0;
     Integral* integral_temp = new Integral(IROMB,IMAXS,IPREC);
@@ -142,19 +142,19 @@ double Bremsstrahlung::CalculateScatteringX0(PROPOSALParticle& particle)
     lpm_effect_enabled_ = false;
 
     double sum      =   0;
-    // double e        =   particle->GetEnergy();
 
     bool store_init_lpm_effect_ = init_lpm_effect_;
     init_lpm_effect_    =   false;
-    particle.SetEnergy(BIGENERGY);
+
+    PROPOSALParticle particle_tmp = PROPOSALParticle(particle);
 
     for(int i=0; i < medium_->GetNumComponents(); i++)
     {
 
        IntegralLimits limits = SetIntegralLimits(particle, i);
 
-       sum +=  integral_temp->Integrate(0, limits.vUp, boost::bind(&Bremsstrahlung::FunctionToDEdxIntegral, this, boost::ref(particle), _1),2);
-       sum +=  integral_temp->Integrate(limits.vUp, limits.vMax, boost::bind(&Bremsstrahlung::FunctionToDEdxIntegral, this, boost::ref(particle), _1),4);
+       sum +=  integral_temp->Integrate(0, limits.vUp, boost::bind(&Bremsstrahlung::FunctionToDEdxIntegral, this, boost::cref(particle_tmp), _1),2);
+       sum +=  integral_temp->Integrate(limits.vUp, limits.vMax, boost::bind(&Bremsstrahlung::FunctionToDEdxIntegral, this, boost::cref(particle_tmp), _1),4);
     }
 
 //    eLpm_        =   ALPHA*(particle->GetMass());
@@ -162,7 +162,6 @@ double Bremsstrahlung::CalculateScatteringX0(PROPOSALParticle& particle)
 
     //TODO(mario): Check! Thu 2017/08/24
     //restore everything
-    // particle->SetEnergy(e);
     // SetIntegralLimits(0);
     lpm_effect_enabled_ = store_lpm_effect_enabled;
     init_lpm_effect_ = store_init_lpm_effect_;
@@ -276,7 +275,7 @@ void Bremsstrahlung::EnableDNdxInterpolation(PROPOSALParticle& particle, std::st
                                         NUM1,
                                         0,
                                         1,
-                                        boost::bind(&Bremsstrahlung::FunctionToBuildDNdxInterpolant2D, this, boost::ref(particle), _1, _2),
+                                        boost::bind(&Bremsstrahlung::FunctionToBuildDNdxInterpolant2D, this, boost::cref(particle), _1, _2),
                                         order_of_interpolation_,
                                         false,
                                         false,
@@ -332,7 +331,7 @@ void Bremsstrahlung::EnableDNdxInterpolation(PROPOSALParticle& particle, std::st
                                 NUM1,
                                 0,
                                 1,
-                                boost::bind(&Bremsstrahlung::FunctionToBuildDNdxInterpolant2D, this, boost::ref(particle), _1, _2),
+                                boost::bind(&Bremsstrahlung::FunctionToBuildDNdxInterpolant2D, this, boost::cref(particle), _1, _2),
                                 order_of_interpolation_,
                                 false,
                                 false,
@@ -441,7 +440,7 @@ void Bremsstrahlung::EnableDEdxInterpolation(PROPOSALParticle& particle, std::st
             {
                 output.precision(16);
 
-                dedx_interpolant_ = new Interpolant(NUM1, particle.GetLow(), BIGENERGY, boost::bind(&Bremsstrahlung::FunctionToBuildDEdxInterpolant, this, boost::ref(particle), _1),
+                dedx_interpolant_ = new Interpolant(NUM1, particle.GetLow(), BIGENERGY, boost::bind(&Bremsstrahlung::FunctionToBuildDEdxInterpolant, this, boost::cref(particle), _1),
                                                     order_of_interpolation_, true, false, true, order_of_interpolation_, false, false, true); //changed from ...,false,false,false)
                 dedx_interpolant_->Save(output,raw);
             }
@@ -458,7 +457,7 @@ void Bremsstrahlung::EnableDEdxInterpolation(PROPOSALParticle& particle, std::st
     if(path.empty() || storing_failed)
     {
         double energy = particle.GetEnergy();
-        dedx_interpolant_ = new Interpolant(NUM1, particle.GetLow(), BIGENERGY, boost::bind(&Bremsstrahlung::FunctionToBuildDEdxInterpolant, this, boost::ref(particle), _1),
+        dedx_interpolant_ = new Interpolant(NUM1, particle.GetLow(), BIGENERGY, boost::bind(&Bremsstrahlung::FunctionToBuildDEdxInterpolant, this, boost::cref(particle), _1),
                                             order_of_interpolation_, true, false, true, order_of_interpolation_, false, false, true); //changed from ...,false,false,false)
 
         particle.SetEnergy(energy);
@@ -836,7 +835,7 @@ ostream& operator<<(std::ostream& os, Bremsstrahlung const &brems)
 //----------------------------------------------------------------------------//
 
 
-double Bremsstrahlung::KelnerKokoulinPetrukhinParametrization(PROPOSALParticle& particle, double v, int i)
+double Bremsstrahlung::KelnerKokoulinPetrukhinParametrization(const PROPOSALParticle& particle, double v, int i)
 {
     double Z3       =   0;
     double result   =   0;
@@ -895,7 +894,7 @@ double Bremsstrahlung::KelnerKokoulinPetrukhinParametrization(PROPOSALParticle& 
 //----------------------------------------------------------------------------//
 
 
-double Bremsstrahlung::AndreevBezrukovBugaevParametrization(PROPOSALParticle& particle, double v, int i)
+double Bremsstrahlung::AndreevBezrukovBugaevParametrization(const PROPOSALParticle& particle, double v, int i)
 {
 
     Components::Component* component = medium_->GetComponents().at(i);
@@ -968,7 +967,7 @@ double Bremsstrahlung::AndreevBezrukovBugaevParametrization(PROPOSALParticle& pa
 //----------------------------------------------------------------------------//
 
 
-double Bremsstrahlung::PetrukhinShestakovParametrization(PROPOSALParticle& particle, double v, int i)
+double Bremsstrahlung::PetrukhinShestakovParametrization(const PROPOSALParticle& particle, double v, int i)
 {
     Components::Component* component = medium_->GetComponents().at(i);
 
@@ -1068,7 +1067,7 @@ double Bremsstrahlung::CompleteScreeningCase(double v, int i)
 //----------------------------------------------------------------------------//
 
 
-double Bremsstrahlung::CalculateStochasticLoss(PROPOSALParticle& particle, double rnd)
+double Bremsstrahlung::CalculateStochasticLoss(const PROPOSALParticle& particle, double rnd)
 {
 
     double rand;
@@ -1125,7 +1124,7 @@ double Bremsstrahlung::CalculateStochasticLoss(PROPOSALParticle& particle, doubl
 //----------------------------------------------------------------------------//
 
 
-double Bremsstrahlung::ElasticBremsstrahlungCrossSection(PROPOSALParticle& particle, double v, int i)
+double Bremsstrahlung::ElasticBremsstrahlungCrossSection(const PROPOSALParticle& particle, double v, int i)
 {
     Components::Component* component = medium_->GetComponents().at(i);
 
@@ -1181,7 +1180,7 @@ double Bremsstrahlung::ElasticBremsstrahlungCrossSection(PROPOSALParticle& parti
 //----------------------------------------------------------------------------//
 
 
-double Bremsstrahlung::lpm(PROPOSALParticle& particle, double v, double s1)
+double Bremsstrahlung::lpm(const PROPOSALParticle& particle, double v, double s1)
 {
     if(init_lpm_effect_)
     {
@@ -1189,24 +1188,24 @@ double Bremsstrahlung::lpm(PROPOSALParticle& particle, double v, double s1)
 
         lpm_effect_enabled_ = false;
         double sum      =   0;
-        double e        =   particle.GetEnergy();
         init_lpm_effect_    =   false;
-        particle.SetEnergy(BIGENERGY);
+
+        PROPOSALParticle particle_tmp = PROPOSALParticle(particle);
+        particle_tmp.SetEnergy(BIGENERGY);
 
         for(int i=0; i < medium_->GetNumComponents(); i++)
         {
 
            IntegralLimits limits = SetIntegralLimits(particle, i);
 
-           sum +=  integral_temp->Integrate(0, limits.vUp, boost::bind(&Bremsstrahlung::FunctionToDEdxIntegral, this, boost::ref(particle), _1),2);
-           sum +=  integral_temp->Integrate(limits.vUp, limits.vMax, boost::bind(&Bremsstrahlung::FunctionToDEdxIntegral, this, boost::ref(particle), _1),4);
+           sum +=  integral_temp->Integrate(0, limits.vUp, boost::bind(&Bremsstrahlung::FunctionToDEdxIntegral, this, boost::cref(particle_tmp), _1),2);
+           sum +=  integral_temp->Integrate(limits.vUp, limits.vMax, boost::bind(&Bremsstrahlung::FunctionToDEdxIntegral, this, boost::cref(particle_tmp), _1),4);
         }
 
         eLpm_        =   ALPHA*(particle.GetMass());
         eLpm_        *=  eLpm_/(4*PI*ME*RE*sum);
 
 
-        particle.SetEnergy(e);
         //TODO(mario): Ceck Thu 2017/08/24
         // SetIntegralLimits(0);
         lpm_effect_enabled_=true;
@@ -1274,7 +1273,7 @@ double Bremsstrahlung::lpm(PROPOSALParticle& particle, double v, double s1)
 //----------------------------------------------------------------------------//
 
 
-CrossSections::IntegralLimits Bremsstrahlung::SetIntegralLimits(PROPOSALParticle& particle, int interaction_component)
+CrossSections::IntegralLimits Bremsstrahlung::SetIntegralLimits(const PROPOSALParticle& particle, int interaction_component)
 {
     component_ = interaction_component;
     Components::Component* component = medium_->GetComponents().at(component_);
@@ -1318,7 +1317,7 @@ double Bremsstrahlung::FunctionToBuildDNdxInterpolant(double energy)
 //----------------------------------------------------------------------------//
 
 
-double Bremsstrahlung::FunctionToBuildDNdxInterpolant2D(PROPOSALParticle& particle, double energy , double v)
+double Bremsstrahlung::FunctionToBuildDNdxInterpolant2D(const PROPOSALParticle& particle, double energy , double v)
 {
     PROPOSALParticle particle_tmp(particle);
     particle_tmp.SetEnergy(energy);
@@ -1332,7 +1331,7 @@ double Bremsstrahlung::FunctionToBuildDNdxInterpolant2D(PROPOSALParticle& partic
 
     v = limits.vUp * exp(v * log(limits.vMax / limits.vUp));
 
-    return dndx_integral_.at(component_)->Integrate(limits.vUp, v, boost::bind(&Bremsstrahlung::FunctionToDNdxIntegral, this, boost::ref(particle_tmp), _1),4);
+    return dndx_integral_.at(component_)->Integrate(limits.vUp, v, boost::bind(&Bremsstrahlung::FunctionToDNdxIntegral, this, boost::cref(particle_tmp), _1),4);
 }
 
 
@@ -1340,7 +1339,7 @@ double Bremsstrahlung::FunctionToBuildDNdxInterpolant2D(PROPOSALParticle& partic
 //----------------------------------------------------------------------------//
 
 
-double Bremsstrahlung::FunctionToBuildDEdxInterpolant(PROPOSALParticle& particle, double energy)
+double Bremsstrahlung::FunctionToBuildDEdxInterpolant(const PROPOSALParticle& particle, double energy)
 {
     PROPOSALParticle particle_tmp(particle);
     particle_tmp.SetEnergy(energy);
@@ -1356,7 +1355,7 @@ double Bremsstrahlung::FunctionToBuildDEdxInterpolant(PROPOSALParticle& particle
 //----------------------------------------------------------------------------//
 
 
-double Bremsstrahlung::FunctionToDEdxIntegral(PROPOSALParticle& particle, double variable)
+double Bremsstrahlung::FunctionToDEdxIntegral(const PROPOSALParticle& particle, double variable)
 {
     return variable * ElasticBremsstrahlungCrossSection(particle, variable, component_);
 }
@@ -1366,7 +1365,7 @@ double Bremsstrahlung::FunctionToDEdxIntegral(PROPOSALParticle& particle, double
 //----------------------------------------------------------------------------//
 
 
-double Bremsstrahlung::FunctionToDNdxIntegral(PROPOSALParticle& particle, double variable)
+double Bremsstrahlung::FunctionToDNdxIntegral(const PROPOSALParticle& particle, double variable)
 {
     return multiplier_ * ElasticBremsstrahlungCrossSection(particle, variable, component_);
 }

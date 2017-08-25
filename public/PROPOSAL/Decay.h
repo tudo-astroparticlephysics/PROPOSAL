@@ -41,7 +41,7 @@ class Decay
     /**
     * this cross section describes decay
     */
-    double MakeDecay(PROPOSALParticle*);
+    double MakeDecay(const PROPOSALParticle&);
 
     // double CalculateProductEnergy( double ernd, double arnd, double srnd );
 
