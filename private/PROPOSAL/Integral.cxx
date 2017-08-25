@@ -1367,7 +1367,6 @@ double Integral::InitIntegralWithLog(double min, double max, boost::function<dou
 
 double Integral::IntegrateWithLog(double min, double max, boost::function<double (double)> integrand)
 {
-
     double aux;
 
     aux =InitIntegralWithLog(min, max, integrand);

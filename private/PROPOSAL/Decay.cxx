@@ -24,15 +24,15 @@ using namespace PROPOSAL;
 *                                   Decay                                     *
 ******************************************************************************/
 
-double Decay::MakeDecay(PROPOSALParticle* particle)
+double Decay::MakeDecay(const PROPOSALParticle& particle)
 {
 
-    if(multiplier_ <= 0 || particle->GetLifetime() < 0)
+    if(multiplier_ <= 0 || particle.GetLifetime() < 0)
     {
         return 0;
     }
 
-    return multiplier_/max((particle->GetMomentum()/particle->GetMass())*particle->GetLifetime()*SPEED, XRES);
+    return multiplier_/max((particle.GetMomentum()/particle.GetMass())*particle.GetLifetime()*SPEED, XRES);
 }
 
 

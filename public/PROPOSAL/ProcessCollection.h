@@ -116,7 +116,7 @@ protected:
      *  \return Returns the probability [1/MeV]
      */
 
-    double FunctionToPropIntegralDecay(PROPOSALParticle&, double energy);
+    double FunctionToPropIntegralDecay(const PROPOSALParticle&, double energy);
 
 //----------------------------------------------------------------------------//
 
@@ -128,7 +128,7 @@ protected:
      *  \return Returns the probability [1/MeV]
      */
 
-    double FunctionToPropIntegralInteraction(PROPOSALParticle&, double energy);
+    double FunctionToPropIntegralInteraction(const PROPOSALParticle&, double energy);
 
 //----------------------------------------------------------------------------//
 
@@ -137,14 +137,14 @@ protected:
     *
     */
 
-    double FunctionToTimeIntegral(PROPOSALParticle&, double E);
+    double FunctionToTimeIntegral(const PROPOSALParticle&, double E);
 
 //----------------------------------------------------------------------------//
 
     // double InterpolTimeParticle(double energy);
 
 //----------------------------------------------------------------------------//
-    double InterpolTimeParticleDiff(PROPOSALParticle&, double energy);
+    double InterpolTimeParticleDiff(const PROPOSALParticle&, double energy);
 
 //----------------------------------------------------------------------------//
 
@@ -154,7 +154,7 @@ protected:
     e_{low} \f$ energy below which the particle is lost
     \param e energy [MeV]
     */
-    double FunctionToBuildInterpolant(PROPOSALParticle&, double energy);
+    double FunctionToBuildInterpolant(const PROPOSALParticle&, double energy);
 
 //----------------------------------------------------------------------------//
 
@@ -167,13 +167,13 @@ protected:
 
 //----------------------------------------------------------------------------//
 
-    double InterpolPropDecay(PROPOSALParticle&, double energy);
+    double InterpolPropDecay(const PROPOSALParticle&, double energy);
 
 //----------------------------------------------------------------------------//
     // double InterpolPropDecayDiff(double energy);
 
 //----------------------------------------------------------------------------//
-    double InterpolPropInteraction(PROPOSALParticle&, double energy);
+    double InterpolPropInteraction(const PROPOSALParticle&, double energy);
 
 //----------------------------------------------------------------------------//
     // double InterpolPropInteractionDiff(double energy);
@@ -213,7 +213,7 @@ public:
     * \return   time delta
     */
 
-    double CalculateParticleTime(PROPOSALParticle&, double ei, double ef);
+    double CalculateParticleTime(const PROPOSALParticle&, double ei, double ef);
 
 //----------------------------------------------------------------------------//
     //Memberfunctions
@@ -241,7 +241,7 @@ public:
      *  \return pair.first final energy befor first interaction pair.second decay energy at which the
      *          particle decay
      */
-    std::pair<double, double> CalculateEnergyTillStochastic(PROPOSALParticle&, double initial_energy);
+    std::pair<double, double> CalculateEnergyTillStochastic(const PROPOSALParticle&, double initial_energy);
 
     /*!
     * advances the particle by the given distance
@@ -265,7 +265,7 @@ public:
     \param ef upper integration limit (final energy)
     \param dist ???
     */
-    double CalculateDisplacement(PROPOSALParticle&, double ei, double ef, double dist);
+    double CalculateDisplacement(const PROPOSALParticle&, double ei, double ef, double dist);
 
 //----------------------------------------------------------------------------//
 
@@ -280,7 +280,7 @@ public:
     \param dist value of displacement
     */
 
-    double CalculateFinalEnergy(PROPOSALParticle&, double ei, double dist);
+    double CalculateFinalEnergy(const PROPOSALParticle&, double ei, double dist);
 
 //----------------------------------------------------------------------------//
 
@@ -294,7 +294,7 @@ public:
      *  \return final energy due to continous energy losses [MeV]
      */
 
-    double CalculateFinalEnergy(PROPOSALParticle&, double ei, double rnd, bool particle_interaction);
+    double CalculateFinalEnergy(const PROPOSALParticle&, double ei, double rnd, bool particle_interaction);
 
 //----------------------------------------------------------------------------//
     /**
@@ -306,7 +306,7 @@ public:
      *  \return value of the tracking integral [ 1 ]
      */
 
-    double CalculateTrackingIntegal(PROPOSALParticle&, double initial_energy, double rnd, bool particle_interaction);
+    double CalculateTrackingIntegal(const PROPOSALParticle&, double initial_energy, double rnd, bool particle_interaction);
 
 //----------------------------------------------------------------------------//
     /**
@@ -325,7 +325,7 @@ public:
      *
      *  \return pair of energy loss [MeV] and kind of interaction
      */
-    std::pair<double, ParticleType::Enum> MakeStochasticLoss(PROPOSALParticle&);
+    std::pair<double, ParticleType::Enum> MakeStochasticLoss(const PROPOSALParticle&);
 
     // std::pair<double, ParticleType::Enum> MakeStochasticLoss(double rnd1,double rnd2, double rnd3);
 //----------------------------------------------------------------------------//
@@ -433,7 +433,7 @@ public:
     * \param E energy [MeV]
     */
 
-    double FunctionToIntegral(PROPOSALParticle&, double energy);
+    double FunctionToIntegral(const PROPOSALParticle&, double energy);
 
 //----------------------------------------------------------------------------//
 
