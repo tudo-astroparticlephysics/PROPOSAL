@@ -28,15 +28,17 @@
 // #include <utility>
 #include <deque>
 
-#include "PROPOSAL/ProcessCollection.h"
 #include "PROPOSAL/ScatteringFirstOrder.h"
 #include "PROPOSAL/ScatteringMoliere.h"
+#include "PROPOSAL/Collection.h"
 // #include "PROPOSAL/MathModel.h"
 // #include "PROPOSAL/PROPOSALParticle.h"
 // #include "PROPOSAL/Geometry.h"
 // #include "PROPOSAL/Scattering.h"
 
 namespace PROPOSAL{
+
+class Geometry;
 
 class Propagator :public MathModel
 {
@@ -70,7 +72,7 @@ private:
     std::string path_to_tables_;        //!< path to interpolation tables (if not empty tables are stored)
     bool    raw_;                       //!< if true interpolation tables will  be written binary if path is not empty
 
-    std::vector<ProcessCollection*> collections_;
+    std::vector<Collection*> collections_;
 
     PROPOSALParticle* particle_;
     //TODO(mario): decide to hold backup particle, because particle could be deleted and cause crashes.
@@ -81,7 +83,7 @@ private:
     //FirstOrderMoliere
     ScatteringMoliere* scatteringFirstOrderMoliere_;
     int scattering_model_;
-    ProcessCollection *current_collection_;
+    Collection *current_collection_;
 
     Geometry*    detector_;
 
@@ -215,13 +217,13 @@ public:
 //----------------------------------------------------------------------------//
     //Getter
 
-    ProcessCollection* GetCurrentCollection() const
+    Collection* GetCurrentCollection() const
     {
         return current_collection_;
     }
 //----------------------------------------------------------------------------//
 
-    std::vector<ProcessCollection*> GetCollections() const
+    std::vector<Collection*> GetCollections() const
     {
         return collections_;
     }
@@ -238,7 +240,7 @@ public:
     /**
      *  Sets the ProcessCollections. Need to execute AplyOptions() afterward.
      */
-    void SetCollections(std::vector<ProcessCollection*>);
+    void SetCollections(std::vector<Collection*>);
     /**
      *  Sets the particle for the Propagator and its current ProcessCollection
      */

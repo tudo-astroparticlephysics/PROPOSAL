@@ -11,6 +11,8 @@
 #include <boost/algorithm/string/predicate.hpp>
 
 #include "PROPOSAL/Propagator.h"
+#include "PROPOSAL/CollectionIntegral.h"
+#include "PROPOSAL/CollectionInterpolant.h"
 #include "PROPOSAL/Output.h"
 #include "PROPOSAL/methods.h"
 #include "PROPOSAL/Constants.h"
@@ -244,15 +246,6 @@ std::vector<PROPOSALParticle*> Propagator::Propagate(double MaxDistance_cm)
         }
 
         result  =   current_collection_->Propagate(*particle_, distance);
-
-        if (MaxDistance_cm <= particle_->GetPropagatedDistance())
-        {
-            std::cout << "max dist reached" << std::endl;
-        }
-        if (result < 0)
-        {
-            std::cout << "paricle must be decayed" << std::endl;
-        }
 
         if(result<=0 || MaxDistance_cm <= particle_->GetPropagatedDistance()) break;
     }
@@ -1054,14 +1047,14 @@ void Propagator::ChooseCurrentCollection(Vector3D& particle_position, Vector3D& 
 
 void Propagator::EnableInterpolation(PROPOSALParticle& particle, std::string path, bool raw)
 {
-    if(current_collection_ != NULL)
-    {
-        current_collection_->EnableInterpolation(particle, path,raw);
-    }
-    for(unsigned int i = 0 ; i < collections_.size() ; i++)
-    {
-        collections_.at(i)->EnableInterpolation(particle, path,raw);
-    }
+    // if(current_collection_ != NULL)
+    // {
+    //     current_collection_->EnableInterpolation(particle, path,raw);
+    // }
+    // for(unsigned int i = 0 ; i < collections_.size() ; i++)
+    // {
+    //     collections_.at(i)->EnableInterpolation(particle, path,raw);
+    // }
 }
 
 
@@ -1071,14 +1064,14 @@ void Propagator::EnableInterpolation(PROPOSALParticle& particle, std::string pat
 
 void Propagator::DisableInterpolation()
 {
-    if(current_collection_ != NULL)
-    {
-        current_collection_->DisableInterpolation();
-    }
-    for(unsigned int i = 0 ; i < collections_.size() ; i++)
-    {
-        collections_.at(i)->DisableInterpolation();
-    }
+    // if(current_collection_ != NULL)
+    // {
+    //     current_collection_->DisableInterpolation();
+    // }
+    // for(unsigned int i = 0 ; i < collections_.size() ; i++)
+    // {
+    //     collections_.at(i)->DisableInterpolation();
+    // }
 }
 
 //----------------------------------------------------------------------------//
@@ -1400,7 +1393,7 @@ Propagator::Propagator(const Propagator &propagator)
     ,scatteringFirstOrder_          ( propagator.scatteringFirstOrder_ )
     ,scatteringFirstOrderMoliere_   ( propagator.scatteringFirstOrderMoliere_ )
     ,scattering_model_          (propagator.scattering_model_)
-    ,current_collection_        ( new ProcessCollection(*propagator.current_collection_) )
+    // ,current_collection_        ( new Collection(*propagator.current_collection_) )
 
 {
 
@@ -1461,7 +1454,7 @@ bool Propagator::operator==(const Propagator &propagator) const
     if( global_cont_inside_       != propagator.global_cont_inside_ )     return false;
     if( global_cont_infront_      != propagator.global_cont_infront_ )    return false;
     if( global_cont_behind_       != propagator.global_cont_behind_ )     return false;
-    if( *current_collection_      != *propagator.current_collection_ )    return false;
+    // if( *current_collection_      != *propagator.current_collection_ )    return false;
     if( raw_                      != propagator.raw_ )                    return false;
 
     if( path_to_tables_.compare( propagator.path_to_tables_ )!=0 )        return false;
@@ -1524,7 +1517,7 @@ void Propagator::swap(Propagator &propagator)
 //    scatteringFirstOrderMoliere_->swap(*propagator.scatteringFirstOrderMoliere_);
     swap(scattering_model_ , propagator.scattering_model_);
 
-    current_collection_->swap( *propagator.current_collection_ );
+    // current_collection_->swap( *propagator.current_collection_ );
 }
 
 
@@ -1557,8 +1550,8 @@ void Propagator::InitDefaultCollection(Geometry* geom)
 {
     Medium* med             = new Ice();
     EnergyCutSettings* cuts = new EnergyCutSettings(500,0.05);
-    current_collection_     = new ProcessCollection(particle_ , med, cuts);
-    current_collection_->SetGeometry(geom);
+    current_collection_     = new CollectionInterpolant();
+    // current_collection_->SetGeometry(geom);
 
     current_collection_->SetLocation(1); // Inside the detector
     collections_.push_back(current_collection_);
@@ -2557,19 +2550,19 @@ void Propagator::ApplyOptions()
             }
         }
 
-        if(collections_.at(j)->GetEnableRandomization())
-        {
-            collections_.at(j)->EnableContinuousRandomization();
-        }
-
-        if(moliere_)
-        {
-            collections_.at(j)->EnableScattering();
-        }
-        if(do_exact_time_calculation_)
-        {
-            collections_.at(j)->EnableExactTimeCalculation();
-        }
+        // if(collections_.at(j)->GetEnableRandomization())
+        // {
+        //     collections_.at(j)->EnableContinuousRandomization();
+        // }
+        //
+        // if(moliere_)
+        // {
+        //     collections_.at(j)->EnableScattering();
+        // }
+        // if(do_exact_time_calculation_)
+        // {
+        //     collections_.at(j)->EnableExactTimeCalculation();
+        // }
 
     }
     if(!integrate_)
@@ -2606,7 +2599,7 @@ void Propagator::ApplyOptions()
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-void Propagator::SetCollections(std::vector<ProcessCollection*> collections)
+void Propagator::SetCollections(std::vector<Collection*> collections)
 {
     collections_ = collections;
 }
