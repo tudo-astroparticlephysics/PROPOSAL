@@ -179,7 +179,7 @@ double Bremsstrahlung::CalculateScatteringX0(const PROPOSALParticle& particle)
 //----------------------------------------------------------------------------//
 
 
-void Bremsstrahlung::EnableDNdxInterpolation(PROPOSALParticle& particle, std::string path ,bool raw)
+void Bremsstrahlung::EnableDNdxInterpolation(const PROPOSALParticle& particle, std::string path ,bool raw)
 {
     if(do_dndx_Interpolation_)return;
 
@@ -247,8 +247,6 @@ void Bremsstrahlung::EnableDNdxInterpolation(PROPOSALParticle& particle, std::st
 
             log_info("Info: Bremsstrahlungs parametrisation tables (dNdx) will be saved to file:\t%s",filename.str().c_str());
 
-            double energy = particle.GetEnergy();
-
             ofstream output;
 
             if(raw)
@@ -312,13 +310,11 @@ void Bremsstrahlung::EnableDNdxInterpolation(PROPOSALParticle& particle, std::st
                 storing_failed  =   true;
                 log_warn("Can not open file %s for writing! Table will not be stored!",filename.str().c_str());
             }
-            particle.SetEnergy(energy);
             output.close();
         }
     }
     if(path.empty() || storing_failed)
     {
-        double energy = particle.GetEnergy();
         dndx_interpolant_1d_.resize( medium_->GetNumComponents() );
         dndx_interpolant_2d_.resize( medium_->GetNumComponents() );
         for(int i=0; i<(medium_->GetNumComponents()); i++)
@@ -358,7 +354,6 @@ void Bremsstrahlung::EnableDNdxInterpolation(PROPOSALParticle& particle, std::st
                                 false,
                                 false);
         }
-        particle.SetEnergy(energy);
     }
 
     do_dndx_Interpolation_ = true;
@@ -367,7 +362,7 @@ void Bremsstrahlung::EnableDNdxInterpolation(PROPOSALParticle& particle, std::st
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-void Bremsstrahlung::EnableDEdxInterpolation(PROPOSALParticle& particle, std::string path, bool raw)
+void Bremsstrahlung::EnableDEdxInterpolation(const PROPOSALParticle& particle, std::string path, bool raw)
 {
     if(do_dedx_Interpolation_)return;
 
@@ -449,18 +444,14 @@ void Bremsstrahlung::EnableDEdxInterpolation(PROPOSALParticle& particle, std::st
                 storing_failed  =   true;
                 log_warn("Can not open file %s for writing! Table will not be stored!",filename.str().c_str());
             }
-            particle.SetEnergy(energy);
 
             output.close();
         }
     }
     if(path.empty() || storing_failed)
     {
-        double energy = particle.GetEnergy();
         dedx_interpolant_ = new Interpolant(NUM1, particle.GetLow(), BIGENERGY, boost::bind(&Bremsstrahlung::FunctionToBuildDEdxInterpolant, this, boost::cref(particle), _1),
                                             order_of_interpolation_, true, false, true, order_of_interpolation_, false, false, true); //changed from ...,false,false,false)
-
-        particle.SetEnergy(energy);
     }
 
     do_dedx_Interpolation_=true;

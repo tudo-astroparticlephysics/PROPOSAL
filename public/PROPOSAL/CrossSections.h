@@ -153,11 +153,11 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    virtual void EnableDNdxInterpolation(PROPOSALParticle&, std::string path ="", bool raw=false) = 0;
+    virtual void EnableDNdxInterpolation(const PROPOSALParticle&, std::string path ="", bool raw=false) = 0;
 
 //----------------------------------------------------------------------------//
 
-    virtual void EnableDEdxInterpolation(PROPOSALParticle&, std::string path ="", bool raw=false) = 0;
+    virtual void EnableDEdxInterpolation(const PROPOSALParticle&, std::string path ="", bool raw=false) = 0;
 
 //----------------------------------------------------------------------------//
 
