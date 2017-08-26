@@ -43,22 +43,18 @@ class Geometry;
 class Propagator :public MathModel
 {
 private:
-    int  order_of_interpolation_;
-    bool debug_;
-    bool particle_interaction_;     //!< particle interaction? (false = decay)
-
     int     seed_;                      //!< seed of the random number generator
-    ParametrizationType::Enum  brems_;                     //!< Bremsstrahlungs parametrization
-    ParametrizationType::Enum  photo_;                     //!< Photonuclear parametrization
-    bool    lpm_;                       //!< Landau-Pomeranchuk-Migdal supression of EM cross-sections enabled if true
-    bool    moliere_;                   //!< Moliere scattering enabled if true
-    bool    stopping_decay_;            //!< Do decay of particles. formarly sdec
-    bool    do_exact_time_calculation_; //!< exact local time calculation enabled if true
-    bool    integrate_;                 //!< if true nothing will be interpolated
-    double  brems_multiplier_;          //!< multiplier to in- or decrease the Bremsstrahlung cross-sections
-    double  photo_multiplier_;          //!< multiplier to in- or decrease the Photonucler cross-sections
-    double  ioniz_multiplier_;          //!< multiplier to in- or decrease the Ionization cross-sections
-    double  epair_multiplier_;          //!< multiplier to in- or decrease the Epairproduction cross-sections
+    // ParametrizationType::Enum  brems_;                     //!< Bremsstrahlungs parametrization
+    // ParametrizationType::Enum  photo_;                     //!< Photonuclear parametrization
+    // bool    lpm_;                       //!< Landau-Pomeranchuk-Migdal supression of EM cross-sections enabled if true
+    // bool    moliere_;                   //!< Moliere scattering enabled if true
+    // bool    stopping_decay_;            //!< Do decay of particles. formarly sdec
+    // bool    do_exact_time_calculation_; //!< exact local time calculation enabled if true
+    // bool    integrate_;                 //!< if true nothing will be interpolated
+    // double  brems_multiplier_;          //!< multiplier to in- or decrease the Bremsstrahlung cross-sections
+    // double  photo_multiplier_;          //!< multiplier to in- or decrease the Photonucler cross-sections
+    // double  ioniz_multiplier_;          //!< multiplier to in- or decrease the Ionization cross-sections
+    // double  epair_multiplier_;          //!< multiplier to in- or decrease the Epairproduction cross-sections
     double  global_ecut_inside_;        //!< ecut for inside the detector (it's used when not specified explicit for a sector in congiguration file)
     double  global_ecut_infront_;       //!< ecut for infront of the detector (it's used when not specified explicit for a sector in congiguration file)
     double  global_ecut_behind_;        //!< ecut for behind the detector (it's used when not specified explicit for a sector in congiguration file)
@@ -69,20 +65,22 @@ private:
     double  global_cont_infront_;       //!< continuous randominzation flag for infront of the detector (it's used when not specified explicit for a sector in congiguration file)
     double  global_cont_behind_;        //!< continuous randominzation flag for behind the detector (it's used when not specified explicit for a sector in congiguration file)
 
-    std::string path_to_tables_;        //!< path to interpolation tables (if not empty tables are stored)
-    bool    raw_;                       //!< if true interpolation tables will  be written binary if path is not empty
+    // std::string path_to_tables_;        //!< path to interpolation tables (if not empty tables are stored)
+    // bool    raw_;                       //!< if true interpolation tables will  be written binary if path is not empty
 
     std::vector<Collection*> collections_;
 
-    PROPOSALParticle* particle_;
+    // PROPOSALParticle* particle_;
     //TODO(mario): decide to hold backup particle, because particle could be deleted and cause crashes.
     // So this particle could be reinitialized at the end of propagate(). Di 2017/04/04
-    PROPOSALParticle* backup_particle_;
+    // PROPOSALParticle* backup_particle_;
     //FirstOrderScattering
-    ScatteringFirstOrder* scatteringFirstOrder_;
+    // ScatteringFirstOrder* scatteringFirstOrder_;
     //FirstOrderMoliere
-    ScatteringMoliere* scatteringFirstOrderMoliere_;
-    int scattering_model_;
+    // ScatteringMoliere* scatteringFirstOrderMoliere_;
+
+    // int scattering_model_;
+
     Collection *current_collection_;
 
     Geometry*    detector_;
@@ -106,12 +104,13 @@ private:
     // void InitProcessCollections(std::ifstream &file);
 
 
-    void MoveParticle(double distance);
+    // void MoveParticle(double distance);
 
 public:
 
     //Constructors
     Propagator();
+    Propagator(std::vector<Collection*>, const Geometry&);
     // Propagator(ParticleDef,
     //            std::string path_to_tables,
     //            bool exact_time = true,
@@ -166,7 +165,7 @@ public:
 
 
 //----------------------------------------------------------------------------//
-    std::vector<PROPOSALParticle*> Propagate(double MaxDistance_cm = 1e20 ); //TODO(mario): Find new name Fr 2017/03/10
+    std::vector<PROPOSALParticle*> Propagate(PROPOSALParticle&, double MaxDistance_cm = 1e20 ); //TODO(mario): Find new name Fr 2017/03/10
 
 //----------------------------------------------------------------------------//
         /*!
@@ -190,10 +189,6 @@ public:
 //----------------------------------------------------------------------------//
 
     void swap(Propagator &propagator);
-
-//----------------------------------------------------------------------------//
-
-    void InitDefaultCollection(Geometry* geom);
 
 //----------------------------------------------------------------------------//
 
@@ -229,10 +224,10 @@ public:
     }
 
 //----------------------------------------------------------------------------//
-    PROPOSALParticle* GetParticle() const
-    {
-        return particle_;
-    }
+    // PROPOSALParticle* GetParticle() const
+    // {
+    //     return particle_;
+    // }
 
 //----------------------------------------------------------------------------//
     //Setter
@@ -244,7 +239,7 @@ public:
     /**
      *  Sets the particle for the Propagator and its current ProcessCollection
      */
-    void SetParticle(PROPOSALParticle* particle);
+    // void SetParticle(PROPOSALParticle* particle);
 
 //----------------------------------------------------------------------------//
     //Destructor
@@ -252,18 +247,16 @@ public:
 
     int GetSeed() const;
     void SetSeed(int seed);
-    ParametrizationType::Enum GetBrems() const;
-    void SetBrems(ParametrizationType::Enum brems);
-    ParametrizationType::Enum GetPhoto() const;
-    void SetPhoto(ParametrizationType::Enum photo);
-    std::string GetPath_to_tables() const;
-    void SetPath_to_tables(const std::string &path_to_tables);
+    // ParametrizationType::Enum GetBrems() const;
+    // void SetBrems(ParametrizationType::Enum brems);
+    // ParametrizationType::Enum GetPhoto() const;
+    // void SetPhoto(ParametrizationType::Enum photo);
+    // std::string GetPath_to_tables() const;
+    // void SetPath_to_tables(const std::string &path_to_tables);
     Geometry *GetDetector() const;
-    void SetDetector(Geometry *detector);
-    bool GetStopping_decay() const;
-    void SetStopping_decay(bool stopping_decay);
-    void RestoreBackup_particle();
-    void ResetParticle();
+    // void SetDetector(Geometry *detector);
+    // bool GetStopping_decay() const;
+    // void SetStopping_decay(bool stopping_decay);
 };
 
 }

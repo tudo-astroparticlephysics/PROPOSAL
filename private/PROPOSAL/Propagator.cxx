@@ -26,7 +26,7 @@ using namespace PROPOSAL;
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-std::vector<PROPOSALParticle*> Propagator::Propagate(double MaxDistance_cm)
+std::vector<PROPOSALParticle*> Propagator::Propagate(PROPOSALParticle& particle, double MaxDistance_cm)
 {
     Output::getInstance().ClearSecondaryVector();
 
@@ -36,7 +36,7 @@ std::vector<PROPOSALParticle*> Propagator::Propagate(double MaxDistance_cm)
         Output::getInstance().StorePrimaryInTree(particle_);
     #endif
 
-    if(Output::store_in_ASCII_file_)Output::getInstance().StorePrimaryInASCII(particle_);
+    if(Output::store_in_ASCII_file_)Output::getInstance().StorePrimaryInASCII(&particle);
 
     double distance_to_collection_border    =   0;
     double distance_to_detector             =   0;
@@ -48,22 +48,22 @@ std::vector<PROPOSALParticle*> Propagator::Propagate(double MaxDistance_cm)
     // energy_at_entry_point is initialized with the current energy because this is a
     // reasonable value for particle which starts inside the detector
 
-    double energy_at_entry_point = particle_->GetEnergy();
+    double energy_at_entry_point = particle.GetEnergy();
     double energy_at_exit_point  = 0;
 
-    Vector3D particle_position = particle_->GetPosition();
-    Vector3D particle_direction = particle_->GetDirection();
+    Vector3D particleposition = particle.GetPosition();
+    Vector3D particledirection = particle.GetDirection();
 
-    bool starts_in_detector =   detector_->IsInside(particle_position, particle_direction);
+    bool starts_in_detector =   detector_->IsInside(particleposition, particledirection);
     bool is_in_detector     =   false;
     bool was_in_detector    =   false;
 
     while(1)
     {
-        particle_position = particle_->GetPosition();
-        particle_direction = particle_->GetDirection();
+        particleposition = particle.GetPosition();
+        particledirection = particle.GetDirection();
 
-        ChooseCurrentCollection(particle_position, particle_direction);
+        ChooseCurrentCollection(particleposition, particledirection);
 
         if(current_collection_ == NULL)
         {
@@ -75,16 +75,16 @@ std::vector<PROPOSALParticle*> Propagator::Propagate(double MaxDistance_cm)
         // or only to the collection border
 
         distance_to_collection_border =
-        current_collection_->GetGeometry()->DistanceToBorder(particle_position, particle_direction).first;
+        current_collection_->GetGeometry()->DistanceToBorder(particleposition, particledirection).first;
         double tmp_distance_to_border;
         for(unsigned int i = 0 ; i < collections_.size() ; i++)
         {
 
             //TODO(mario): Is that ok to delete? Tue 2017/08/08
-            // if (particle_->GetType() != collections_.at(i)->GetParticle()->GetType())
+            // if (particle.GetType() != collections_.at(i)->GetParticle()->GetType())
             //     continue;
 
-            if(detector_->IsInfront(particle_position, particle_direction))
+            if(detector_->IsInfront(particleposition, particledirection))
             {
                 if(collections_.at(i)->GetLocation() != 0)
                     continue;
@@ -92,7 +92,7 @@ std::vector<PROPOSALParticle*> Propagator::Propagate(double MaxDistance_cm)
                 {
                     if(collections_.at(i)->GetGeometry()->GetHirarchy() >= current_collection_->GetGeometry()->GetHirarchy())
                     {
-                        tmp_distance_to_border = collections_.at(i)->GetGeometry()->DistanceToBorder(particle_position, particle_direction).first;
+                        tmp_distance_to_border = collections_.at(i)->GetGeometry()->DistanceToBorder(particleposition, particledirection).first;
                         if(tmp_distance_to_border<=0)continue;
                         distance_to_collection_border = min(
                                       tmp_distance_to_border
@@ -101,13 +101,13 @@ std::vector<PROPOSALParticle*> Propagator::Propagate(double MaxDistance_cm)
                 }
             }
 
-            else if(detector_->IsInside(particle_position, particle_direction))
+            else if(detector_->IsInside(particleposition, particledirection))
             {
                 if(collections_.at(i)->GetLocation() != 1)
                     continue;
                 else
                 {
-                    tmp_distance_to_border = collections_.at(i)->GetGeometry()->DistanceToBorder(particle_position, particle_direction).first;
+                    tmp_distance_to_border = collections_.at(i)->GetGeometry()->DistanceToBorder(particleposition, particledirection).first;
                     if(tmp_distance_to_border<=0)continue;
                     distance_to_collection_border = min(
                                   tmp_distance_to_border
@@ -116,7 +116,7 @@ std::vector<PROPOSALParticle*> Propagator::Propagate(double MaxDistance_cm)
 
             }
 
-            else if(detector_->IsBehind(particle_position, particle_direction))
+            else if(detector_->IsBehind(particleposition, particledirection))
             {
                 if(collections_.at(i)->GetLocation() != 2)
                     continue;
@@ -124,7 +124,7 @@ std::vector<PROPOSALParticle*> Propagator::Propagate(double MaxDistance_cm)
                 {
                     if(collections_.at(i)->GetGeometry()->GetHirarchy() >= current_collection_->GetGeometry()->GetHirarchy())
                     {
-                        tmp_distance_to_border = collections_.at(i)->GetGeometry()->DistanceToBorder(particle_position, particle_direction).first;
+                        tmp_distance_to_border = collections_.at(i)->GetGeometry()->DistanceToBorder(particleposition, particledirection).first;
                         if(tmp_distance_to_border<=0)continue;
                         distance_to_collection_border = min(
                                       tmp_distance_to_border
@@ -139,15 +139,15 @@ std::vector<PROPOSALParticle*> Propagator::Propagate(double MaxDistance_cm)
             }
         }
 
-        distance_to_detector = detector_->DistanceToBorder(particle_position, particle_direction).first;
+        distance_to_detector = detector_->DistanceToBorder(particleposition, particledirection).first;
 
-        distance_to_closest_approach = detector_->DistanceToClosestApproach(particle_position, particle_direction);
+        distance_to_closest_approach = detector_->DistanceToClosestApproach(particleposition, particledirection);
 
         if(abs(distance_to_closest_approach) < GEOMETRY_PRECISION )
         {
-            particle_->SetClosestApproachPoint(particle_position);
-            particle_->SetEc( particle_->GetEnergy() );
-            particle_->SetTc( particle_->GetT() );
+            particle.SetClosestApproachPoint(particleposition);
+            particle.SetEc( particle.GetEnergy() );
+            particle.SetTc( particle.GetT() );
 
             distance_to_closest_approach    =   0;
 
@@ -204,26 +204,26 @@ std::vector<PROPOSALParticle*> Propagator::Propagate(double MaxDistance_cm)
         }
 
 
-        is_in_detector  =   detector_->IsInside(particle_position, particle_direction);
+        is_in_detector  =   detector_->IsInside(particleposition, particledirection);
         // entry point of the detector
         if(!starts_in_detector && !was_in_detector && is_in_detector)
         {
-            particle_->SetEntryPoint(particle_position);
-            particle_->SetEi( particle_->GetEnergy() );
-            particle_->SetTi( particle_->GetT() );
+            particle.SetEntryPoint(particleposition);
+            particle.SetEi( particle.GetEnergy() );
+            particle.SetTi( particle.GetT() );
 
-            energy_at_entry_point = particle_->GetEnergy();
+            energy_at_entry_point = particle.GetEnergy();
 
             was_in_detector = true;
         }
         // exit point of the detector
         else if(was_in_detector && !is_in_detector)
         {
-            particle_->SetExitPoint(particle_position);
-            particle_->SetEf( particle_->GetEnergy() );
-            particle_->SetTf( particle_->GetT() );
+            particle.SetExitPoint(particleposition);
+            particle.SetEf( particle.GetEnergy() );
+            particle.SetTf( particle.GetT() );
 
-            energy_at_exit_point = particle_->GetEnergy();
+            energy_at_exit_point = particle.GetEnergy();
             //we don't want to run in this case a second time so we set was_in_detector to false
             was_in_detector = false;
 
@@ -231,31 +231,31 @@ std::vector<PROPOSALParticle*> Propagator::Propagate(double MaxDistance_cm)
         // if particle starts inside the detector we only ant to fill the exit point
         else if(starts_in_detector && !is_in_detector)
         {
-            particle_->SetExitPoint(particle_position);
-            particle_->SetEf( particle_->GetEnergy() );
-            particle_->SetTf( particle_->GetT() );
+            particle.SetExitPoint(particleposition);
+            particle.SetEf( particle.GetEnergy() );
+            particle.SetTf( particle.GetT() );
 
-            energy_at_exit_point    =   particle_->GetEnergy();
+            energy_at_exit_point    =   particle.GetEnergy();
             //we don't want to run in this case a second time so we set starts_in_detector to false
             starts_in_detector  =   false;
 
         }
-        if(MaxDistance_cm <= particle_->GetPropagatedDistance() + distance)
+        if(MaxDistance_cm <= particle.GetPropagatedDistance() + distance)
         {
-            distance = MaxDistance_cm - particle_->GetPropagatedDistance();
+            distance = MaxDistance_cm - particle.GetPropagatedDistance();
         }
 
-        result  =   current_collection_->Propagate(*particle_, distance);
+        result  =   current_collection_->Propagate(particle, distance);
 
-        if(result<=0 || MaxDistance_cm <= particle_->GetPropagatedDistance()) break;
+        if(result<=0 || MaxDistance_cm <= particle.GetPropagatedDistance()) break;
     }
 
-    particle_->SetElost(energy_at_entry_point - energy_at_exit_point);
+    particle.SetElost(energy_at_entry_point - energy_at_exit_point);
 
     #if ROOT_SUPPORT
-        Output::getInstance().StorePropagatedPrimaryInTree(particle_);
+        Output::getInstance().StorePropagatedPrimaryInTree(particle);
     #endif
-        if(Output::store_in_ASCII_file_)Output::getInstance().StorePropagatedPrimaryInASCII(particle_);
+        if(Output::store_in_ASCII_file_)Output::getInstance().StorePropagatedPrimaryInASCII(&particle);
 
     //TODO(mario): undo backup Mo 2017/04/03
     // RestoreBackup_particle();
@@ -1080,23 +1080,61 @@ void Propagator::DisableInterpolation()
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-
 Propagator::Propagator()
-    :order_of_interpolation_    ( 5 )
-    ,debug_                     ( false )
-    ,particle_interaction_      ( false )
-    ,seed_                      ( 1 )
-    ,brems_                     ( ParametrizationType::BremsKelnerKokoulinPetrukhin )
-    ,photo_                     ( ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich )
-    ,lpm_                       ( false )
-    ,moliere_                   ( false )
-    ,stopping_decay_            ( true )
-    ,do_exact_time_calculation_ ( false )
-    ,integrate_                 ( false )
-    ,brems_multiplier_          ( 1 )
-    ,photo_multiplier_          ( 1 )
-    ,ioniz_multiplier_          ( 1 )
-    ,epair_multiplier_          ( 1 )
+    : seed_(1)
+    // ,brems_                     ( ParametrizationType::BremsKelnerKokoulinPetrukhin )
+    // ,photo_                     ( ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich )
+    // ,lpm_                       ( false )
+    // ,moliere_                   ( false )
+    // ,stopping_decay_            ( true )
+    // ,do_exact_time_calculation_ ( false )
+    // ,integrate_                 ( false )
+    // ,brems_multiplier_          ( 1 )
+    // ,photo_multiplier_          ( 1 )
+    // ,ioniz_multiplier_          ( 1 )
+    // ,epair_multiplier_          ( 1 )
+    , global_ecut_inside_(500)
+    , global_ecut_infront_(-1)
+    , global_ecut_behind_(-1)
+    , global_vcut_inside_(-1)
+    , global_vcut_infront_(0.001)
+    , global_vcut_behind_(-1)
+    , global_cont_inside_(false)
+    , global_cont_infront_(true)
+    , global_cont_behind_(false)
+    // ,path_to_tables_            ( "" )
+    // ,raw_                       ( false )
+    // ,scattering_model_          (-1)
+    , current_collection_(NULL)
+    , detector_(new Sphere(Vector3D(), 1e18, 0))
+{
+    // particle_              = new PROPOSALParticle(MuMinusDef::Get());
+    // backup_particle_       = new PROPOSALParticle(*particle_);
+    // detector_              = new Geometry();
+    // detector_->InitSphere(0,0,0,1e18,0);
+
+    CollectionDef col_def;
+    col_def.location = 1; // Inside the detector
+
+    current_collection_ = new CollectionInterpolant(Ice(), *detector_, EnergyCutSettings(500, 0.05), col_def);
+    // current_collection_->SetLocation(1); // Inside the detector
+
+    collections_.push_back(current_collection_);
+}
+
+Propagator::Propagator(std::vector<Collection*> collections, const Geometry& geometry)
+    :seed_                      ( 1 )
+    // ,brems_                     ( ParametrizationType::BremsKelnerKokoulinPetrukhin )
+    // ,photo_                     ( ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich )
+    // ,lpm_                       ( false )
+    // ,moliere_                   ( false )
+    // ,stopping_decay_            ( true )
+    // ,do_exact_time_calculation_ ( false )
+    // ,integrate_                 ( false )
+    // ,brems_multiplier_          ( 1 )
+    // ,photo_multiplier_          ( 1 )
+    // ,ioniz_multiplier_          ( 1 )
+    // ,epair_multiplier_          ( 1 )
     ,global_ecut_inside_        ( 500 )
     ,global_ecut_infront_       ( -1 )
     ,global_ecut_behind_        ( -1 )
@@ -1106,17 +1144,19 @@ Propagator::Propagator()
     ,global_cont_inside_        ( false )
     ,global_cont_infront_       ( true )
     ,global_cont_behind_        ( false )
-    ,path_to_tables_            ( "" )
-    ,raw_                       ( false )
-    ,scattering_model_          (-1)
+    // ,path_to_tables_            ( "" )
+    // ,raw_                       ( false )
+    // ,scattering_model_          (-1)
     ,current_collection_        (NULL)
+    ,detector_(geometry.clone())
 {
-    particle_              = new PROPOSALParticle(MuMinusDef::Get());
-    backup_particle_       = new PROPOSALParticle(*particle_);
-    detector_              = new Sphere(Vector3D(), 1e18, 0);
-    // detector_              = new Geometry();
-    // detector_->InitSphere(0,0,0,1e18,0);
-    InitDefaultCollection(detector_);
+    for (std::vector<Collection*>::const_iterator iter = collections.begin(); iter != collections.end(); ++iter)
+    {
+        collections_.push_back((*iter)->clone());
+    }
+    //TODO(mario): exeption if size = 0 Sat 2017/08/26
+    current_collection_ = collections_.at(0);
+
 }
 
 //----------------------------------------------------------------------------//
@@ -1131,7 +1171,6 @@ Propagator::Propagator()
 //                        int scattering_model)
 //     :order_of_interpolation_    ( 5 )
 //     ,debug_                     ( false )
-//     ,particle_interaction_      ( false )
 //     ,seed_                      ( 1 )
 //     ,brems_                     ( ParametrizationType::BremsKelnerKokoulinPetrukhin )
 //     ,photo_                     ( ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich )
@@ -1361,21 +1400,18 @@ Propagator::Propagator()
 
 Propagator::Propagator(const Propagator &propagator)
     : MathModel(propagator)
-    ,order_of_interpolation_    ( propagator.order_of_interpolation_ )
-    ,debug_                     ( propagator.debug_ )
-    ,particle_interaction_      ( propagator.particle_interaction_ )
     ,seed_                      ( propagator.seed_ )
-    ,brems_                     ( propagator.brems_ )
-    ,photo_                     ( propagator.photo_ )
-    ,lpm_                       ( propagator.lpm_ )
-    ,moliere_                   ( propagator.moliere_ )
-    ,stopping_decay_            ( propagator.stopping_decay_ )
-    ,do_exact_time_calculation_ ( propagator.do_exact_time_calculation_ )
-    ,integrate_                 ( propagator.integrate_ )
-    ,brems_multiplier_          ( propagator.brems_multiplier_ )
-    ,photo_multiplier_          ( propagator.photo_multiplier_ )
-    ,ioniz_multiplier_          ( propagator.ioniz_multiplier_ )
-    ,epair_multiplier_          ( propagator.epair_multiplier_ )
+    // ,brems_                     ( propagator.brems_ )
+    // ,photo_                     ( propagator.photo_ )
+    // ,lpm_                       ( propagator.lpm_ )
+    // ,moliere_                   ( propagator.moliere_ )
+    // ,stopping_decay_            ( propagator.stopping_decay_ )
+    // ,do_exact_time_calculation_ ( propagator.do_exact_time_calculation_ )
+    // ,integrate_                 ( propagator.integrate_ )
+    // ,brems_multiplier_          ( propagator.brems_multiplier_ )
+    // ,photo_multiplier_          ( propagator.photo_multiplier_ )
+    // ,ioniz_multiplier_          ( propagator.ioniz_multiplier_ )
+    // ,epair_multiplier_          ( propagator.epair_multiplier_ )
     ,global_ecut_inside_        ( propagator.global_ecut_inside_ )
     ,global_ecut_infront_       ( propagator.global_ecut_infront_ )
     ,global_ecut_behind_        ( propagator.global_ecut_behind_ )
@@ -1385,14 +1421,14 @@ Propagator::Propagator(const Propagator &propagator)
     ,global_cont_inside_        ( propagator.global_cont_inside_ )
     ,global_cont_infront_       ( propagator.global_cont_infront_ )
     ,global_cont_behind_        ( propagator.global_cont_behind_ )
-    ,path_to_tables_            ( propagator.path_to_tables_ )
-    ,raw_                       ( propagator.raw_ )
-    ,particle_                  ( propagator.particle_ )
-    ,backup_particle_           ( propagator.backup_particle_ )
+    // ,path_to_tables_            ( propagator.path_to_tables_ )
+    // ,raw_                       ( propagator.raw_ )
+    // ,particle_                  ( propagator.particle_ )
+    // ,backup_particle_           ( propagator.backup_particle_ )
     //FirstOrderScattering
-    ,scatteringFirstOrder_          ( propagator.scatteringFirstOrder_ )
-    ,scatteringFirstOrderMoliere_   ( propagator.scatteringFirstOrderMoliere_ )
-    ,scattering_model_          (propagator.scattering_model_)
+    // ,scatteringFirstOrder_          ( propagator.scatteringFirstOrder_ )
+    // ,scatteringFirstOrderMoliere_   ( propagator.scatteringFirstOrderMoliere_ )
+    // ,scattering_model_          (propagator.scattering_model_)
     // ,current_collection_        ( new Collection(*propagator.current_collection_) )
 
 {
@@ -1424,27 +1460,24 @@ Propagator& Propagator::operator=(const Propagator &propagator)
 
 bool Propagator::operator==(const Propagator &propagator) const
 {
-    if( order_of_interpolation_   != propagator.order_of_interpolation_ ) return false;
-    if( debug_                    != propagator.debug_ )                  return false;
-    if( particle_                 != propagator.particle_ )               return false;
+    // if( particle_                 != propagator.particle_ )               return false;
     //FirstOrderScattering
-    if( scatteringFirstOrder_           != propagator.scatteringFirstOrder_ )           return false;
-    if( scatteringFirstOrderMoliere_    != propagator.scatteringFirstOrderMoliere_ )    return false;
-    if( scattering_model_               != propagator.scattering_model_)                return false;
+    // if( scatteringFirstOrder_           != propagator.scatteringFirstOrder_ )           return false;
+    // if( scatteringFirstOrderMoliere_    != propagator.scatteringFirstOrderMoliere_ )    return false;
+    // if( scattering_model_               != propagator.scattering_model_)                return false;
 
-    if( particle_interaction_     != propagator.particle_interaction_ )   return false;
     if( seed_                     != propagator.seed_ )                   return false;
-    if( brems_                    != propagator.brems_ )                  return false;
-    if( photo_                    != propagator.photo_ )                  return false;
-    if( lpm_                      != propagator.lpm_ )                    return false;
-    if( moliere_                  != propagator.moliere_ )                return false;
-    if( stopping_decay_           != propagator.stopping_decay_ )         return false;
-    if( do_exact_time_calculation_!= propagator.do_exact_time_calculation_ )return false;
-    if( integrate_                != propagator.integrate_ )              return false;
-    if( brems_multiplier_         != propagator.brems_multiplier_ )       return false;
-    if( photo_multiplier_         != propagator.photo_multiplier_ )       return false;
-    if( ioniz_multiplier_         != propagator.ioniz_multiplier_ )       return false;
-    if( epair_multiplier_         != propagator.epair_multiplier_ )       return false;
+    // if( brems_                    != propagator.brems_ )                  return false;
+    // if( photo_                    != propagator.photo_ )                  return false;
+    // if( lpm_                      != propagator.lpm_ )                    return false;
+    // if( moliere_                  != propagator.moliere_ )                return false;
+    // if( stopping_decay_           != propagator.stopping_decay_ )         return false;
+    // if( do_exact_time_calculation_!= propagator.do_exact_time_calculation_ )return false;
+    // if( integrate_                != propagator.integrate_ )              return false;
+    // if( brems_multiplier_         != propagator.brems_multiplier_ )       return false;
+    // if( photo_multiplier_         != propagator.photo_multiplier_ )       return false;
+    // if( ioniz_multiplier_         != propagator.ioniz_multiplier_ )       return false;
+    // if( epair_multiplier_         != propagator.epair_multiplier_ )       return false;
     if( global_ecut_inside_       != propagator.global_ecut_inside_ )     return false;
     if( global_ecut_infront_      != propagator.global_ecut_infront_ )    return false;
     if( global_ecut_behind_       != propagator.global_ecut_behind_ )     return false;
@@ -1455,9 +1488,9 @@ bool Propagator::operator==(const Propagator &propagator) const
     if( global_cont_infront_      != propagator.global_cont_infront_ )    return false;
     if( global_cont_behind_       != propagator.global_cont_behind_ )     return false;
     // if( *current_collection_      != *propagator.current_collection_ )    return false;
-    if( raw_                      != propagator.raw_ )                    return false;
-
-    if( path_to_tables_.compare( propagator.path_to_tables_ )!=0 )        return false;
+    // if( raw_                      != propagator.raw_ )                    return false;
+    //
+    // if( path_to_tables_.compare( propagator.path_to_tables_ )!=0 )        return false;
 
     //else
     return true;
@@ -1482,21 +1515,18 @@ void Propagator::swap(Propagator &propagator)
 {
     using std::swap;
 
-    swap( order_of_interpolation_   ,   propagator.order_of_interpolation_ );
-    swap( debug_                    ,   propagator.debug_);
-    swap( particle_interaction_     ,   propagator.particle_interaction_);
     swap( seed_                     ,   propagator.seed_ );
-    swap( brems_                    ,   propagator.brems_ );
-    swap( photo_                    ,   propagator.photo_ );
-    swap( lpm_                      ,   propagator.lpm_ );
-    swap( moliere_                  ,   propagator.moliere_ );
-    swap( stopping_decay_           ,   propagator.stopping_decay_ );
-    swap( do_exact_time_calculation_,   propagator.do_exact_time_calculation_ );
-    swap( integrate_                ,   propagator.integrate_ );
-    swap( brems_multiplier_         ,   propagator.brems_multiplier_ );
-    swap( photo_multiplier_         ,   propagator.photo_multiplier_ );
-    swap( ioniz_multiplier_         ,   propagator.ioniz_multiplier_ );
-    swap( epair_multiplier_         ,   propagator.epair_multiplier_ );
+    // swap( brems_                    ,   propagator.brems_ );
+    // swap( photo_                    ,   propagator.photo_ );
+    // swap( lpm_                      ,   propagator.lpm_ );
+    // swap( moliere_                  ,   propagator.moliere_ );
+    // swap( stopping_decay_           ,   propagator.stopping_decay_ );
+    // swap( do_exact_time_calculation_,   propagator.do_exact_time_calculation_ );
+    // swap( integrate_                ,   propagator.integrate_ );
+    // swap( brems_multiplier_         ,   propagator.brems_multiplier_ );
+    // swap( photo_multiplier_         ,   propagator.photo_multiplier_ );
+    // swap( ioniz_multiplier_         ,   propagator.ioniz_multiplier_ );
+    // swap( epair_multiplier_         ,   propagator.epair_multiplier_ );
     swap( global_ecut_inside_       ,   propagator.global_ecut_inside_ );
     swap( global_ecut_infront_      ,   propagator.global_ecut_infront_ );
     swap( global_ecut_behind_       ,   propagator.global_ecut_behind_ );
@@ -1506,16 +1536,16 @@ void Propagator::swap(Propagator &propagator)
     swap( global_cont_inside_       ,   propagator.global_cont_inside_ );
     swap( global_cont_infront_      ,   propagator.global_cont_infront_ );
     swap( global_cont_behind_       ,   propagator.global_cont_behind_ );
-    swap( raw_                      ,   propagator.raw_ );
+    // swap( raw_                      ,   propagator.raw_ );
+    //
+    // path_to_tables_.swap( propagator.path_to_tables_ );
 
-    path_to_tables_.swap( propagator.path_to_tables_ );
-
-    particle_->swap( *propagator.particle_ );
-    backup_particle_->swap( *propagator.backup_particle_ );
+    // particle_->swap( *propagator.particle_ );
+    // backup_particle_->swap( *propagator.backup_particle_ );
     //FirstOrderScattering
-    swap<ScatteringFirstOrder*> (scatteringFirstOrder_ ,propagator.scatteringFirstOrder_);
+    // swap<ScatteringFirstOrder*> (scatteringFirstOrder_ ,propagator.scatteringFirstOrder_);
 //    scatteringFirstOrderMoliere_->swap(*propagator.scatteringFirstOrderMoliere_);
-    swap(scattering_model_ , propagator.scattering_model_);
+    // swap(scattering_model_ , propagator.scattering_model_);
 
     // current_collection_->swap( *propagator.current_collection_ );
 }
@@ -1528,34 +1558,31 @@ void Propagator::swap(Propagator &propagator)
 //----------------------------------------------------------------------------//
 
 
-void Propagator::MoveParticle(double distance)
-{
+// void Propagator::MoveParticle(double distance)
+// {
+//
+//     double dist = particle_->GetPropagatedDistance();
+//
+//     Vector3D position = particle_->GetPosition();
+//
+//     dist   +=  distance;
+//
+//     position = position + distance*particle_->GetDirection();
+//
+//     particle_->SetPosition(position);
+//
+//     particle_->SetPropagatedDistance(dist);
+//
+// }
 
-    double dist = particle_->GetPropagatedDistance();
 
-    Vector3D position = particle_->GetPosition();
-
-    dist   +=  distance;
-
-    position = position + distance*particle_->GetDirection();
-
-    particle_->SetPosition(position);
-
-    particle_->SetPropagatedDistance(dist);
-
-}
-
-
-void Propagator::InitDefaultCollection(Geometry* geom)
-{
-    Medium* med             = new Ice();
-    EnergyCutSettings* cuts = new EnergyCutSettings(500,0.05);
-    current_collection_     = new CollectionInterpolant();
-    // current_collection_->SetGeometry(geom);
-
-    current_collection_->SetLocation(1); // Inside the detector
-    collections_.push_back(current_collection_);
-}
+// void Propagator::InitDefaultCollection()
+// {
+//     Medium* med             = new Ice();
+//     EnergyCutSettings* cuts = new EnergyCutSettings(500,0.05);
+//     current_collection_ = new CollectionInterpolant(Ice(), Sphere(Vector3D(), 1e18, 0), EnergyCutSettings(500, 0.05));
+//     current_collection_->SetGeometry(geom);
+// }
 
 
 //----------------------------------------------------------------------------//
@@ -2112,66 +2139,66 @@ void Propagator::SetSeed(int seed)
     seed_ = seed;
 }
 
-ParametrizationType::Enum Propagator::GetBrems() const
-{
-    return brems_;
-}
+// ParametrizationType::Enum Propagator::GetBrems() const
+// {
+//     return brems_;
+// }
+//
+// void Propagator::SetBrems(ParametrizationType::Enum brems)
+// {
+//     brems_ = brems;
+// }
+//
+// ParametrizationType::Enum Propagator::GetPhoto() const
+// {
+//     return photo_;
+// }
+//
+// void Propagator::SetPhoto(ParametrizationType::Enum photo)
+// {
+//     photo_ = photo;
+// }
 
-void Propagator::SetBrems(ParametrizationType::Enum brems)
-{
-    brems_ = brems;
-}
-
-ParametrizationType::Enum Propagator::GetPhoto() const
-{
-    return photo_;
-}
-
-void Propagator::SetPhoto(ParametrizationType::Enum photo)
-{
-    photo_ = photo;
-}
-
-std::string Propagator::GetPath_to_tables() const
-{
-    return path_to_tables_;
-}
-
-void Propagator::SetPath_to_tables(const std::string &path_to_tables)
-{
-    path_to_tables_ = path_to_tables;
-}
+// std::string Propagator::GetPath_to_tables() const
+// {
+//     return path_to_tables_;
+// }
+//
+// void Propagator::SetPath_to_tables(const std::string &path_to_tables)
+// {
+//     path_to_tables_ = path_to_tables;
+// }
 
 Geometry *Propagator::GetDetector() const
 {
     return detector_;
 }
 
-void Propagator::SetDetector(Geometry *detector)
-{
-    detector_ = detector;
-}
+// void Propagator::SetDetector(Geometry *detector)
+// {
+//     detector_ = detector;
+// }
 
-bool Propagator::GetStopping_decay() const
-{
-    return stopping_decay_;
-}
+// bool Propagator::GetStopping_decay() const
+// {
+//     return stopping_decay_;
+// }
+//
+// void Propagator::SetStopping_decay(bool stopping_decay)
+// {
+//     stopping_decay_ = stopping_decay;
+// }
 
-void Propagator::SetStopping_decay(bool stopping_decay)
-{
-    stopping_decay_ = stopping_decay;
-}
+// void Propagator::RestoreBackup_particle()
+// {
+//     particle_ = new PROPOSALParticle(*backup_particle_);
+// }
 
-void Propagator::RestoreBackup_particle()
-{
-    particle_ = new PROPOSALParticle(*backup_particle_);
-}
-
-void Propagator::ResetParticle()
-{
-    // particle_ = new PROPOSALParticle(*backup_particle_);
-    *particle_ = *backup_particle_;
-}
+// void Propagator::ResetParticle()
+// {
+//     // particle_ = new PROPOSALParticle(*backup_particle_);
+//     *particle_ = *backup_particle_;
+// }
 
 // Geometry* Propagator::InitGeometry(std::deque<std::string>* token, string first_token)
 // {
@@ -2522,33 +2549,33 @@ void Propagator::ResetParticle()
 
 void Propagator::ApplyOptions()
 {
-    for(unsigned int j = 0 ; j < collections_.size() ; j++)
-    {
-        for(unsigned int i =0; i<collections_.at(j)->GetCrosssections().size(); i++)
-        {
-            switch (collections_.at(j)->GetCrosssections().at(i)->GetType())
-            {
-                case ParticleType::Brems:
-                    // collections_.at(j)->GetCrosssections().at(i)->SetParametrization(brems_);
-                    collections_.at(j)->GetCrosssections().at(i)->SetMultiplier(brems_multiplier_);
-                    collections_.at(j)->GetCrosssections().at(i)->EnableLpmEffect(lpm_);
-                    break;
-                case ParticleType::DeltaE:
-                    collections_.at(j)->GetCrosssections().at(i)->SetMultiplier(ioniz_multiplier_);
-                    break;
-                case ParticleType::EPair:
-                    collections_.at(j)->GetCrosssections().at(i)->SetMultiplier(epair_multiplier_);
-                    collections_.at(j)->GetCrosssections().at(i)->EnableLpmEffect(lpm_);
-                    break;
-                case ParticleType::NuclInt:
-                    // collections_.at(j)->GetCrosssections().at(i)->SetParametrization(photo_);
-                    collections_.at(j)->GetCrosssections().at(i)->SetMultiplier(photo_multiplier_);
-                    break;
-                default:
-                    log_fatal("Unknown cross section");
-                    exit(1);
-            }
-        }
+    // for(unsigned int j = 0 ; j < collections_.size() ; j++)
+    // {
+    //     for(unsigned int i =0; i<collections_.at(j)->GetCrosssections().size(); i++)
+    //     {
+    //         switch (collections_.at(j)->GetCrosssections().at(i)->GetType())
+    //         {
+    //             case ParticleType::Brems:
+    //                 // collections_.at(j)->GetCrosssections().at(i)->SetParametrization(brems_);
+    //                 collections_.at(j)->GetCrosssections().at(i)->SetMultiplier(brems_multiplier_);
+    //                 collections_.at(j)->GetCrosssections().at(i)->EnableLpmEffect(lpm_);
+    //                 break;
+    //             case ParticleType::DeltaE:
+    //                 collections_.at(j)->GetCrosssections().at(i)->SetMultiplier(ioniz_multiplier_);
+    //                 break;
+    //             case ParticleType::EPair:
+    //                 collections_.at(j)->GetCrosssections().at(i)->SetMultiplier(epair_multiplier_);
+    //                 collections_.at(j)->GetCrosssections().at(i)->EnableLpmEffect(lpm_);
+    //                 break;
+    //             case ParticleType::NuclInt:
+    //                 // collections_.at(j)->GetCrosssections().at(i)->SetParametrization(photo_);
+    //                 collections_.at(j)->GetCrosssections().at(i)->SetMultiplier(photo_multiplier_);
+    //                 break;
+    //             default:
+    //                 log_fatal("Unknown cross section");
+    //                 exit(1);
+    //         }
+    //     }
 
         // if(collections_.at(j)->GetEnableRandomization())
         // {
@@ -2564,15 +2591,15 @@ void Propagator::ApplyOptions()
         //     collections_.at(j)->EnableExactTimeCalculation();
         // }
 
-    }
-    if(!integrate_)
-    {
-        cout << "Starting Interpolation! This will take some time depending on the number of media you defined!\n";
-        cout.flush();
-        EnableInterpolation(*particle_, path_to_tables_, raw_);
-        cout << "Done!\n";
-    }
-
+    // }
+    // if(!integrate_)
+    // {
+    //     cout << "Starting Interpolation! This will take some time depending on the number of media you defined!\n";
+    //     cout.flush();
+    //     EnableInterpolation(*particle_, path_to_tables_, raw_);
+    //     cout << "Done!\n";
+    // }
+    //
 }
 
 
@@ -2604,18 +2631,18 @@ void Propagator::SetCollections(std::vector<Collection*> collections)
     collections_ = collections;
 }
 
-void Propagator::SetParticle(PROPOSALParticle* particle)
-{
-    particle_ = particle;
-
-    //TODO(mario): Remove when shared pointer are used Mi 2017/04/19
-    if (backup_particle_ != NULL)
-    {
-        delete backup_particle_;
-    }
-
-    backup_particle_ = new PROPOSALParticle(*particle_);
-}
+// void Propagator::SetParticle(PROPOSALParticle* particle)
+// {
+//     particle_ = particle;
+//
+//     //TODO(mario): Remove when shared pointer are used Mi 2017/04/19
+//     if (backup_particle_ != NULL)
+//     {
+//         delete backup_particle_;
+//     }
+//
+//     backup_particle_ = new PROPOSALParticle(*particle_);
+// }
 
 
 //----------------------------------------------------------------------------//

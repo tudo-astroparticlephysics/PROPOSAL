@@ -85,6 +85,7 @@ class StableChannel : public DecayChannel
 {
     public:
     StableChannel();
+    StableChannel(const StableChannel& mode);
     virtual ~StableChannel();
     // No copy and assignemnt -> done by clone
     StableChannel* clone() { return new StableChannel(*this); }
@@ -92,7 +93,6 @@ class StableChannel : public DecayChannel
     DecayProducts Decay(PROPOSALParticle*);
 
     private:
-    StableChannel(const StableChannel& mode);       // Not allowed
     StableChannel& operator=(const StableChannel&); // Undefined & not allowed
 
     bool compare(const DecayChannel&) const;
@@ -108,6 +108,7 @@ class LeptonicDecayChannel : public DecayChannel
 {
     public:
     LeptonicDecayChannel();
+    LeptonicDecayChannel(const LeptonicDecayChannel& mode);
     virtual ~LeptonicDecayChannel();
     // No copy and assignemnt -> done by clone
     LeptonicDecayChannel* clone() { return new LeptonicDecayChannel(*this); }
@@ -115,7 +116,6 @@ class LeptonicDecayChannel : public DecayChannel
     DecayProducts Decay(PROPOSALParticle*);
 
     private:
-    LeptonicDecayChannel(const LeptonicDecayChannel& mode); // Not allowed
     LeptonicDecayChannel& operator=(const LeptonicDecayChannel&); // Undefined & not allowed
 
     bool compare(const DecayChannel&) const;
@@ -140,6 +140,7 @@ class TwoBodyPhaseSpace : public DecayChannel
 {
     public:
     TwoBodyPhaseSpace(double m1, double m2);
+    TwoBodyPhaseSpace(const TwoBodyPhaseSpace& mode);
     virtual ~TwoBodyPhaseSpace();
     // No copy and assignemnt -> done by clone
     virtual TwoBodyPhaseSpace* clone() { return new TwoBodyPhaseSpace(*this); }
@@ -147,7 +148,6 @@ class TwoBodyPhaseSpace : public DecayChannel
     DecayProducts Decay(PROPOSALParticle*);
 
     private:
-    TwoBodyPhaseSpace(const TwoBodyPhaseSpace& mode); // Not allowed
     TwoBodyPhaseSpace& operator=(const TwoBodyPhaseSpace&); // Undefined & not allowed
 
     bool compare(const DecayChannel&) const;
