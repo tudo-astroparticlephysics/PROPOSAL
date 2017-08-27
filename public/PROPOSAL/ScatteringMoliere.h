@@ -21,7 +21,8 @@ class ScatteringMoliere : public Scattering
     ScatteringMoliere(const ScatteringMoliere&);
     ~ScatteringMoliere();
 
-    virtual Scattering* clone() const { return new ScatteringMoliere(*this); }
+    Scattering* clone() const { return new ScatteringMoliere(*this); }
+    static Scattering* create() { return new ScatteringMoliere(); }
 
     // ScatteringMoliere& operator=(const ScatteringMoliere&);
     // bool operator==(const ScatteringMoliere& scattering) const;

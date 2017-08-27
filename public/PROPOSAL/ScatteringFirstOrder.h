@@ -30,6 +30,7 @@ class ScatteringFirstOrder : public Scattering
     ~ScatteringFirstOrder();
 
     virtual Scattering* clone() const { return new ScatteringFirstOrder(*this); }
+    static Scattering* create() { return new ScatteringFirstOrder(); }
 
     void Scatter(PROPOSALParticle&, const std::vector<CrossSections*>&, double dr, double ei, double ef);
     // Do nothing, not interpolation for scattering moliere

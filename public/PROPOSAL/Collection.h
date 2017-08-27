@@ -5,6 +5,7 @@
 // #include <vector>
 
 #include "PROPOSAL/EnergyCutSettings.h"
+#include "PROPOSAL/Scattering.h"
 #include "PROPOSAL/PROPOSALParticle.h"
 
 // namespace PROPOSAL {
@@ -15,7 +16,6 @@
 //
 namespace PROPOSAL {
 
-class Scattering;
 class ContinuousRandomization;
 class CrossSections;
 class Medium;
@@ -29,6 +29,7 @@ struct CollectionDef
 
     // TODO(mario): must be removed Fri 2017/08/25
     bool do_scattering; //!< if true moliere scattering is enabled
+    ScatteringFactory::ScatteringModel::Enum scattering_model; //!< if true moliere scattering is enabled
     bool do_continuous_randomization_; //!< if true randomization of continuous energy losses is enabled
     bool lpm_effect_enabled;
     bool do_exact_time_calculation; //!< exact local time calculation enabled if true
