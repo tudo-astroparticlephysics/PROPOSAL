@@ -10,7 +10,7 @@
 #include "PROPOSAL/Ionization.h"
 #include "PROPOSAL/Output.h"
 #include "PROPOSAL/Photonuclear.h"
-#include "PROPOSAL/Scattering.h"
+// #include "PROPOSAL/Scattering.h"
 #include "PROPOSAL/ScatteringDefault.h"
 #include "PROPOSAL/ScatteringMoliere.h"
 #include "PROPOSAL/ScatteringFirstOrder.h"
@@ -27,6 +27,7 @@ CollectionDef::CollectionDef()
     : do_weighting(false)
     , weighting_order(0)
     , do_scattering(false)
+    , scattering_model(ScatteringFactory::ScatteringModel::Default)
     , do_continuous_randomization_(false)
     , lpm_effect_enabled(false)
     , do_exact_time_calculation(false)
@@ -74,10 +75,9 @@ Collection::Collection()
         randomizer_ = new ContinuousRandomization();
     }
 
-    //TODO(mario): Polymorphic initilaization in collections childs  Sun 2017/08/27
     if (collection_def_.do_scattering)
     {
-        scattering_ = new ScatteringDefault();
+        scattering_ = ScatteringFactory::Get().CreateScattering(collection_def_.scattering_model);
     }
 }
 
@@ -106,10 +106,9 @@ Collection::Collection(const Medium& medium,
         randomizer_ = new ContinuousRandomization();
     }
 
-    //TODO(mario): Polymorphic initilaization in collections childs  Sun 2017/08/27
     if (collection_def_.do_scattering)
     {
-        scattering_ = new ScatteringDefault();
+        scattering_ = ScatteringFactory::Get().CreateScattering(collection_def_.scattering_model);
     }
 }
 
