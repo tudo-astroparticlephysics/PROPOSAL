@@ -1,13 +1,11 @@
 
 #pragma once
 
-#include "PROPOSAL/Bremsstrahlung.h"
-#include "PROPOSAL/Epairproduction.h"
-#include "PROPOSAL/Ionization.h"
-#include "PROPOSAL/Photonuclear.h"
-#include "PROPOSAL/ContinuousRandomization.h"
-#include "PROPOSAL/Geometry.h"
-#include "PROPOSAL/Scattering.h"
+// #include <string>
+// #include <vector>
+
+#include "PROPOSAL/EnergyCutSettings.h"
+#include "PROPOSAL/PROPOSALParticle.h"
 
 // namespace PROPOSAL {
 // class ProcessCollection;
@@ -16,6 +14,13 @@
 // std::ostream& operator<<(std::ostream& os, PROPOSAL::ProcessCollection const& collection);
 //
 namespace PROPOSAL {
+
+class Scattering;
+class ContinuousRandomization;
+class CrossSections;
+class Medium;
+class EnergyCutSettings;
+class Geometry;
 
 struct CollectionDef
 {
