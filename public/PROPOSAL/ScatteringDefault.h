@@ -21,6 +21,7 @@ class ScatteringDefault: public Scattering
     ~ScatteringDefault() {}
 
     virtual Scattering* clone() const { return new ScatteringDefault(*this); }
+    static Scattering* create() { return new ScatteringDefault(); }
 
     // bool operator==(const ScatteringDefault& scattering) const;
     // bool operator!=(const ScatteringDefault& scattering) const;
