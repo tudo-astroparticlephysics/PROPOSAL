@@ -1,10 +1,20 @@
 #include <boost/bind.hpp>
 
+#include "PROPOSAL/Bremsstrahlung.h"
 #include "PROPOSAL/Collection.h"
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/Output.h"
-#include "PROPOSAL/methods.h"
+#include "PROPOSAL/ContinuousRandomization.h"
 #include "PROPOSAL/Decay.h"
+#include "PROPOSAL/Epairproduction.h"
+#include "PROPOSAL/Geometry.h"
+#include "PROPOSAL/Ionization.h"
+#include "PROPOSAL/Output.h"
+#include "PROPOSAL/Photonuclear.h"
+#include "PROPOSAL/Scattering.h"
+#include "PROPOSAL/ScatteringDefault.h"
+#include "PROPOSAL/ScatteringMoliere.h"
+#include "PROPOSAL/ScatteringFirstOrder.h"
+#include "PROPOSAL/methods.h"
 
 using namespace std;
 using namespace PROPOSAL;
@@ -67,7 +77,7 @@ Collection::Collection()
     //TODO(mario): Polymorphic initilaization in collections childs  Sun 2017/08/27
     if (collection_def_.do_scattering)
     {
-        scattering_ = new Scattering();
+        scattering_ = new ScatteringDefault();
     }
 }
 
@@ -99,7 +109,7 @@ Collection::Collection(const Medium& medium,
     //TODO(mario): Polymorphic initilaization in collections childs  Sun 2017/08/27
     if (collection_def_.do_scattering)
     {
-        scattering_ = new Scattering();
+        scattering_ = new ScatteringDefault();
     }
 }
 

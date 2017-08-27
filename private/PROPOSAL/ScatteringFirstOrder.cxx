@@ -13,35 +13,58 @@
 // #include <stdlib.h>
 
 #include "PROPOSAL/methods.h"
+#include "PROPOSAL/MathModel.h"
+#include "PROPOSAL/CrossSections.h"
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/ScatteringFirstOrder.h"
-// #include "PROPOSAL/Output.h"
+#include "PROPOSAL/Output.h"
 
 using namespace std;
 using namespace PROPOSAL;
 
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-//-------------------------public member functions----------------------------//
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
+// ------------------------------------------------------------------------- //
+// Constructor & Destructor
+// ------------------------------------------------------------------------- //
 
 
-void ScatteringFirstOrder::Scatter(double dr, PROPOSALParticle* part, Medium* med)
+ScatteringFirstOrder::ScatteringFirstOrder()
 {
+}
+
+ScatteringFirstOrder::ScatteringFirstOrder(const ScatteringFirstOrder& scattering)
+    : Scattering(scattering)
+{
+}
+
+ScatteringFirstOrder::~ScatteringFirstOrder()
+{
+}
+
+// ------------------------------------------------------------------------- //
+// Public methods
+// ------------------------------------------------------------------------- //
+
+void ScatteringFirstOrder::Scatter(PROPOSALParticle& particle,
+                                const std::vector<CrossSections*>& cross_sections,
+                                double dr,
+                                double ei,
+                                double ef)
+{
+    (void) ei;
+    (void) ef;
+
     double theta0, rnd1, rnd2, sx, tx, sy, ty, sz, tz;
 
-    theta0     =   CalculateTheta0(dr, part,med);
+    theta0     =   CalculateTheta0(particle, *cross_sections.at(0)->GetMedium(), dr);
 
-    rnd1 = SQRT2*theta0*erfInv( 2.*(RandomDouble()-0.5) );
-    rnd2 = SQRT2*theta0*erfInv( 2.*(RandomDouble()-0.5) );
+    rnd1 = SQRT2*theta0*erfInv( 2.*(RandomGenerator::Get().RandomDouble()-0.5) );
+    rnd2 = SQRT2*theta0*erfInv( 2.*(RandomGenerator::Get().RandomDouble()-0.5) );
 
     sx      =   (rnd1/SQRT3+rnd2)/2;
     tx      =   rnd2;
 
-    rnd1 = SQRT2*theta0*erfInv(2*(RandomDouble()-0.5));
-    rnd2 = SQRT2*theta0*erfInv(2*(RandomDouble()-0.5));
+    rnd1 = SQRT2*theta0*erfInv(2*(RandomGenerator::Get().RandomDouble()-0.5));
+    rnd2 = SQRT2*theta0*erfInv(2*(RandomGenerator::Get().RandomDouble()-0.5));
 
     sy      =   (rnd1/SQRT3+rnd2)/2;
     ty      =   rnd2;
@@ -54,69 +77,56 @@ void ScatteringFirstOrder::Scatter(double dr, PROPOSALParticle* part, Medium* me
     Vector3D direction;
 
     long double sinth, costh,sinph,cosph;
-    sinth = (long double) sin(part->GetDirection().GetTheta());
-    costh = (long double) cos(part->GetDirection().GetTheta());
-    sinph = (long double) sin(part->GetDirection().GetPhi());
-    cosph = (long double) cos(part->GetDirection().GetPhi());
+    sinth = (long double) sin(particle.GetDirection().GetTheta());
+    costh = (long double) cos(particle.GetDirection().GetTheta());
+    sinph = (long double) sin(particle.GetDirection().GetPhi());
+    cosph = (long double) cos(particle.GetDirection().GetPhi());
 
-    position = part->GetPosition();
+    position = particle.GetPosition();
 
     // Rotation towards all tree axes
-    direction = sz*part->GetDirection();
+    direction = sz*particle.GetDirection();
     direction = direction + sx*Vector3D(costh*cosph, costh*sinph, -sinth);
     direction = direction + sy*Vector3D(-sinph, cosph, 0.);
 
     position = position + dr*direction;
 
     // Rotation towards all tree axes
-    direction = tz*part->GetDirection();
+    direction = tz*particle.GetDirection();
     direction = direction + tx*Vector3D(costh*cosph, costh*sinph, -sinth);
     direction = direction + ty*Vector3D(-sinph, cosph, 0.);
 
     direction.CalculateSphericalCoordinates();
 
-    part->SetPosition(position);
-    part->SetDirection(direction);
-
+    particle.SetPosition(position);
+    particle.SetDirection(direction);
 }
 
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-//--------------------------------constructors--------------------------------//
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-ScatteringFirstOrder::ScatteringFirstOrder( )
+void ScatteringFirstOrder::EnableInterpolation(const PROPOSALParticle& particle,
+                                            const std::vector<CrossSections*>& cross_sections,
+                                            std::string filepath)
 {
+    (void)particle;
+    (void)cross_sections;
+    (void)filepath;
 
+    log_warn("No interpolation implemented for ScatteringFirstOrder");
 }
 
-
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-//------------------------private member functions----------------------------//
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-double ScatteringFirstOrder::CalculateTheta0(double dr, PROPOSALParticle* part, Medium* med)
+void ScatteringFirstOrder::DisableInterpolation()
 {
-    double y = dr/med->GetRadiationLength();
-    double beta = 1./sqrt(1 +  part->GetMass() * part->GetMass()/ (part->GetMomentum()*part->GetMomentum() ));
-    y = 13.6/(part->GetMomentum()* beta ) *sqrt(y)*( 1.+0.088*log10(y) );
+    log_warn("No interpolation implemented for ScatteringFirstOrder");
+}
+
+// ------------------------------------------------------------------------- //
+// Private methods
+// ------------------------------------------------------------------------- //
+
+double ScatteringFirstOrder::CalculateTheta0(const PROPOSALParticle& particle, const Medium& med, double dr)
+{
+    double y = dr/med.GetRadiationLength();
+    double beta = 1./sqrt(1 +  particle.GetMass() * particle.GetMass()/ (particle.GetMomentum()*particle.GetMomentum() ));
+    y = 13.6/(particle.GetMomentum()* beta ) *sqrt(y)*( 1.+0.088*log10(y) );
     return y;
 }
-
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-//---------------------------------Setter-------------------------------------//
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-
-
 

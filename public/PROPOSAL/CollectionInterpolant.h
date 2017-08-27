@@ -2,6 +2,7 @@
 #pragma once
 
 #include "PROPOSAL/Collection.h"
+#include "PROPOSAL/Interpolant.h"
 
 namespace PROPOSAL {
 

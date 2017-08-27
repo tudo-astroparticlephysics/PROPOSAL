@@ -8,6 +8,7 @@
 
 #include "PROPOSAL/Propagator.h"
 #include "PROPOSAL/CollectionInterpolant.h"
+#include "PROPOSAL/Geometry.h"
 // #include "PROPOSAL/PROPOSALParticle.h"
 
 using namespace std;

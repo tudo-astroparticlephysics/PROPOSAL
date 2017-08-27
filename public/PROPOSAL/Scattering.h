@@ -8,82 +8,26 @@
 */
 #pragma once
 
-#ifndef SCATTERING_H
-#define SCATTERING_H
+#include <vector>
+#include <string>
 
-// #include <vector>
-// #include <string>
+namespace PROPOSAL {
 
-#include "PROPOSAL/CrossSections.h"
-#include "PROPOSAL/Interpolant.h"
-#include "PROPOSAL/Integral.h"
-#include "PROPOSAL/MathModel.h"
-// #include "PROPOSAL/PROPOSALParticle.h"
+class PROPOSALParticle;
+class CrossSections;
 
-namespace PROPOSAL{
-
-/**
-  * \brief This class provides the scattering routine provided by moliere.
-  *
-  * More precise scattering angles will be added soon.
-  */
-
-
-class Scattering : public MathModel
+class Scattering
 {
-
-
-private:
-    bool do_interpolation_;
-    int order_of_interpolation_;
-
-    Integral* integral_;
-    Interpolant* interpolant_;
-    Interpolant* interpolant_diff_;
-
-public:
-
-    /**
-     * \brief Default Constructor
-     *
-     * Constructor which sets "default" settings.
-     */
+    public:
     Scattering();
+    virtual ~Scattering();
 
-//----------------------------------------------------------------------------//
+    virtual Scattering* clone() const = 0; // virtual constructor idiom (used for deep copies)
 
-//----------------------------------------------------------------------------//
+    virtual void Scatter(PROPOSALParticle&, const std::vector<CrossSections*>&, double dr, double ei, double ef) = 0;
 
-    Scattering(const Scattering&);
-    Scattering& operator=(const Scattering&);
-    bool operator==(const Scattering &scattering) const;
-    bool operator!=(const Scattering &scattering) const;
-//----------------------------------------------------------------------------//
-
-
-
-//----------------------------------------------------------------------------//
-    // Memberfunctions
-
-    void            Scatter(PROPOSALParticle&, const std::vector<CrossSections*>&, double dr, double ei, double ef);
-
-    long    double  CalculateTheta0(const PROPOSALParticle&, const std::vector<CrossSections*>&, double dr, double ei, double ef);
-    double          FunctionToIntegral(const PROPOSALParticle&, const std::vector<CrossSections*>&, double energy);
-    double          FunctionToBuildInterpolant(const PROPOSALParticle&, const std::vector<CrossSections*>&, double energy);
-
-    void            EnableInterpolation(const PROPOSALParticle&, const std::vector<CrossSections*>&, std::string path = "");
-    void            DisableInterpolation();
-
-//----------------------------------------------------------------------------//
-
-    void swap(Scattering &scattering);
-
-//----------------------------------------------------------------------------//
-    // destructors
-    ~Scattering() {}
+    virtual void EnableInterpolation(const PROPOSALParticle&, const std::vector<CrossSections*>&, std::string path = "") = 0;
+    virtual void DisableInterpolation() = 0;
 };
 
 }
-
-
-#endif //SCATTERING_H
