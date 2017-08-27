@@ -5,7 +5,7 @@
 #include "PROPOSAL/Epairproduction.h"
 #include "PROPOSAL/Ionization.h"
 #include "PROPOSAL/Photonuclear.h"
-// #include "PROPOSAL/ContinuousRandomization.h"
+#include "PROPOSAL/ContinuousRandomization.h"
 #include "PROPOSAL/Geometry.h"
 #include "PROPOSAL/Scattering.h"
 
@@ -24,6 +24,7 @@ struct CollectionDef
 
     // TODO(mario): must be removed Fri 2017/08/25
     bool do_scattering; //!< if true moliere scattering is enabled
+    bool do_continuous_randomization_; //!< if true randomization of continuous energy losses is enabled
     bool lpm_effect_enabled;
     bool do_exact_time_calculation; //!< exact local time calculation enabled if true
 
@@ -226,7 +227,7 @@ class Collection
     Geometry* GetGeometry() const { return geometry_; }
     const EnergyCutSettings& GetCutSettings() const { return cut_settings_; }
     std::vector<CrossSections*> GetCrosssections() const { return crosssections_; }
-    // ContinuousRandomization* GetContinuousRandomization() const { return randomizer_; }
+    ContinuousRandomization* GetContinuousRandomization() const { return randomizer_; }
 
     protected:
 
@@ -248,7 +249,6 @@ class Collection
     //
     // // bool enable_randomization_; //!< if true continuous randomization will be enabled (to remember if randomization
     //                             //!should be enable when cross sections are initalized)
-    // // bool do_continuous_randomization_; //!< if true randomization of continuous energy losses is enabled
     //
     // // //TODO(mario): must be removed Fri 2017/08/25
     // bool do_scattering_;               //!< if true moliere scattering is enabled
@@ -262,7 +262,7 @@ class Collection
     Medium* medium_;
     EnergyCutSettings cut_settings_;
 
-    // ContinuousRandomization* randomizer_;
+    ContinuousRandomization* randomizer_;
     Scattering* scattering_;
 
     std::vector<CrossSections*> crosssections_;

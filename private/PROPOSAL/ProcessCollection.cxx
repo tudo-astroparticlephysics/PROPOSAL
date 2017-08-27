@@ -725,7 +725,7 @@ double ProcessCollection::CalculateParticleTime(const PROPOSALParticle& particle
 double ProcessCollection::Randomize(double initial_energy, double final_energy)
 {
     double rnd = MathModel::RandomDouble();
-    return randomizer_->Randomize( initial_energy, final_energy, rnd );
+    return randomizer_->Randomize( *particle_, crosssections_, initial_energy, final_energy, rnd );
 }
 
 
@@ -934,8 +934,8 @@ void ProcessCollection::EnableInterpolation(PROPOSALParticle& particle, std::str
 
     if(do_continuous_randomization_)
     {
-        randomizer_->EnableDE2dxInterpolation(path ,raw);
-        randomizer_->EnableDE2deInterpolation(path,raw);
+        randomizer_->EnableDE2dxInterpolation(*particle_, crosssections_, path ,raw);
+        randomizer_->EnableDE2deInterpolation(*particle_, crosssections_, path,raw);
     }
 
     if(do_exact_time_calculation_)
@@ -1219,7 +1219,7 @@ void ProcessCollection::DisableLpmEffect()
 
 void ProcessCollection::EnableContinuousRandomization()
 {
-    randomizer_ =   new ContinuousRandomization(particle_,medium_,crosssections_);
+    randomizer_ =   new ContinuousRandomization();
     do_continuous_randomization_     =   true;
 }
 //----------------------------------------------------------------------------//
@@ -2191,10 +2191,10 @@ void ProcessCollection::SetMedium(Medium* medium)
     {
         crosssections_.at(i)->SetMedium(medium_);
     }
-    if(do_continuous_randomization_)
-    {
-        randomizer_->SetMedium(medium_);
-    }
+    // if(do_continuous_randomization_)
+    // {
+    //     randomizer_->SetMedium(medium_);
+    // }
 }
 
 
@@ -2255,10 +2255,10 @@ void ProcessCollection::SetMedium(Medium* medium)
 void ProcessCollection::SetCrosssections(
         std::vector<CrossSections*> crosssections) {
     crosssections_ = crosssections;
-    if(do_continuous_randomization_)
-    {
-        randomizer_->SetCrosssections(crosssections);
-    }
+    // if(do_continuous_randomization_)
+    // {
+    //     randomizer_->SetCrosssections(crosssections);
+    // }
     if(do_scattering_)
     {
         scattering_->SetCrosssections(crosssections);
