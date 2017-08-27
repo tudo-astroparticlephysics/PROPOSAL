@@ -5,9 +5,9 @@
 #include <boost/bind.hpp>
 
 #include "PROPOSAL/Bremsstrahlung.h"
-// #include "PROPOSAL/Epairproduction.h"
-// #include "PROPOSAL/Ionization.h"
-// #include "PROPOSAL/Photonuclear.h"
+#include "PROPOSAL/Epairproduction.h"
+#include "PROPOSAL/Ionization.h"
+#include "PROPOSAL/Photonuclear.h"
 #include "PROPOSAL/ContinuousRandomization.h"
 #include "PROPOSAL/Output.h"
 #include "PROPOSAL/Constants.h"
@@ -414,10 +414,10 @@ ContinuousRandomization::ContinuousRandomization()
     dE2de_interpolant_diff_ =   NULL;
 
     EnergyCutSettings* cutsettings = new EnergyCutSettings(500,0.01);
-    // cross_sections_.push_back(new Ionization(particle_,medium_,cutsettings));
+    cross_sections_.push_back(new Ionization(medium_,cutsettings));
     cross_sections_.push_back(new Bremsstrahlung(medium_,cutsettings));
-    // cross_sections_.push_back(new Epairproduction(particle_,medium_,cutsettings));
-    // cross_sections_.push_back(new Photonuclear(particle_,medium_,cutsettings));
+    cross_sections_.push_back(new Epairproduction(medium_,cutsettings));
+    cross_sections_.push_back(new Photonuclear(medium_,cutsettings));
 
 }
 
@@ -467,15 +467,15 @@ ContinuousRandomization::ContinuousRandomization(const ContinuousRandomization &
             case ParticleType::Brems:
                 cross_sections_.at(i) = new Bremsstrahlung( *(Bremsstrahlung*)continuous_randomization.cross_sections_.at(i) );
                 break;
-            // case ParticleType::DeltaE:
-            //     cross_sections_.at(i) = new Ionization( *(Ionization*)continuous_randomization.cross_sections_.at(i) );
-            //     break;
-            // case ParticleType::EPair:
-            //     cross_sections_.at(i) = new Epairproduction( *(Epairproduction*)continuous_randomization.cross_sections_.at(i) );
-            //     break;
-            // case ParticleType::NuclInt:
-            //     cross_sections_.at(i) = new Photonuclear( *(Photonuclear*)continuous_randomization.cross_sections_.at(i) );
-            //     break;
+            case ParticleType::DeltaE:
+                cross_sections_.at(i) = new Ionization( *(Ionization*)continuous_randomization.cross_sections_.at(i) );
+                break;
+            case ParticleType::EPair:
+                cross_sections_.at(i) = new Epairproduction( *(Epairproduction*)continuous_randomization.cross_sections_.at(i) );
+                break;
+            case ParticleType::NuclInt:
+                cross_sections_.at(i) = new Photonuclear( *(Photonuclear*)continuous_randomization.cross_sections_.at(i) );
+                break;
             default:
                 log_fatal("Unknown cross section of type '%i' ", continuous_randomization.cross_sections_.at(i)->GetType());
         }
@@ -552,15 +552,15 @@ bool ContinuousRandomization::operator==(const ContinuousRandomization &continuo
             case ParticleType::Brems:
                 if( *(Bremsstrahlung*)cross_sections_.at(i) !=  *(Bremsstrahlung*)continuous_randomization.cross_sections_.at(i) ) return false;
                 break;
-            // case ParticleType::DeltaE:
-            //     if( *(Ionization*)cross_sections_.at(i) != *(Ionization*)continuous_randomization.cross_sections_.at(i) ) return false;
-            //     break;
-            // case ParticleType::EPair:
-            //     if( *(Epairproduction*)cross_sections_.at(i) !=  *(Epairproduction*)continuous_randomization.cross_sections_.at(i) ) return false;
-            //     break;
-            // case ParticleType::NuclInt:
-            //     if( *(Photonuclear*)cross_sections_.at(i) !=  *(Photonuclear*)continuous_randomization.cross_sections_.at(i) )  return false;
-            //     break;
+            case ParticleType::DeltaE:
+                if( *(Ionization*)cross_sections_.at(i) != *(Ionization*)continuous_randomization.cross_sections_.at(i) ) return false;
+                break;
+            case ParticleType::EPair:
+                if( *(Epairproduction*)cross_sections_.at(i) !=  *(Epairproduction*)continuous_randomization.cross_sections_.at(i) ) return false;
+                break;
+            case ParticleType::NuclInt:
+                if( *(Photonuclear*)cross_sections_.at(i) !=  *(Photonuclear*)continuous_randomization.cross_sections_.at(i) )  return false;
+                break;
             default:
                 log_fatal("Unknown cross section of type '%i' ", continuous_randomization.cross_sections_.at(i)->GetType());
                 return false;

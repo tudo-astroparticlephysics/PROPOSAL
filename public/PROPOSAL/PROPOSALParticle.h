@@ -188,7 +188,7 @@ class PROPOSALParticle
     ///
     /// @return 2d double vector
     // ----------------------------------------------------------------------------
-    const HardBBTables::VecType* getHardBB() {return particle_def_->hardbb_table;}
+    const HardBBTables::VecType* getHardBB() const {return particle_def_->hardbb_table;}
 
     double GetParentParticleEnergy() const { return parent_particle_energy_; }
     int GetParentParticleId() const { return parent_particle_id_; }

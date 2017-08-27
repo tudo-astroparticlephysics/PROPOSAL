@@ -1384,9 +1384,9 @@ ProcessCollection::ProcessCollection(const ProcessCollection &collection)
             // case ParticleType::EPair:
             //     crosssections_.at(i) = new Epairproduction( *(Epairproduction*)collection.crosssections_.at(i) );
             //     break;
-            // case ParticleType::NuclInt:
-            //     crosssections_.at(i) = new Photonuclear( *(Photonuclear*)collection.crosssections_.at(i) );
-            //     break;
+            case ParticleType::NuclInt:
+                crosssections_.at(i) = new Photonuclear( *(Photonuclear*)collection.crosssections_.at(i) );
+                break;
             default:
                 log_fatal("Unknown cross section");
                 exit(1);
@@ -1631,9 +1631,9 @@ bool ProcessCollection::operator==(const ProcessCollection &collection) const
             // case ParticleType::EPair:
             //     if( *(Epairproduction*)crosssections_.at(i) !=  *(Epairproduction*)collection.crosssections_.at(i) ) return false;
             //     break;
-            // case ParticleType::NuclInt:
-            //     if( *(Photonuclear*)crosssections_.at(i) !=  *(Photonuclear*)collection.crosssections_.at(i) )  return false;
-            //     break;
+            case ParticleType::NuclInt:
+                if( *(Photonuclear*)crosssections_.at(i) !=  *(Photonuclear*)collection.crosssections_.at(i) )  return false;
+                break;
             default:
                 log_fatal("Unknown cross section");
                 exit(1);

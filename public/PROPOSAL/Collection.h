@@ -2,9 +2,9 @@
 #pragma once
 
 #include "PROPOSAL/Bremsstrahlung.h"
-// #include "PROPOSAL/Epairproduction.h"
-// #include "PROPOSAL/Ionization.h"
-// #include "PROPOSAL/Photonuclear.h"
+#include "PROPOSAL/Epairproduction.h"
+#include "PROPOSAL/Ionization.h"
+#include "PROPOSAL/Photonuclear.h"
 // #include "PROPOSAL/ContinuousRandomization.h"
 #include "PROPOSAL/Geometry.h"
 #include "PROPOSAL/Scattering.h"
@@ -50,7 +50,6 @@ class Collection
                const EnergyCutSettings&,
                const CollectionDef& def = CollectionDef());
     Collection(const Collection&);
-    // Collection(const Collection& collection);
     virtual ~Collection();
 
     virtual Collection* clone() const = 0; // virtual constructor idiom (used for deep copies)
@@ -202,17 +201,11 @@ class Collection
     // --------------------------------------------------------------------- //
 
     void EnableLpmEffect();
-
     void DisableLpmEffect();
-
     // void EnableContinuousRandomization();
-    //
     // void DisableContinuousRandomization();
-
     void EnableExactTimeCalculation();
-
     void DisableExactTimeCalculation();
-
     void SetLocation(int location) { collection_def_.location = location; }
 
     // --------------------------------------------------------------------- //
@@ -220,30 +213,20 @@ class Collection
     // --------------------------------------------------------------------- //
 
     int GetLocation() const { return collection_def_.location; }
-
-    std::vector<CrossSections*> GetCrosssections() const { return crosssections_; }
-
-    const EnergyCutSettings& GetCutSettings() const { return cut_settings_; }
-
-    // bool GetDoRandomization() const { return do_continuous_randomization_; }
+    double GetIni() const { return ini_; }
+    double GetDensityCorrection() const { return collection_def_.density_correction; }
 
     bool GetDoScattering() const { return collection_def_.do_scattering; }
-
-    double GetIni() const { return ini_; }
-
     bool GetLpmEffectEnabled() const { return collection_def_.lpm_effect_enabled; }
-
-    // ContinuousRandomization* GetContinuousRandomization() const { return randomizer_; }
-
-    Scattering* GetScattering() const { return scattering_; }
-
+    // bool GetDoRandomization() const { return do_continuous_randomization_; }
     // bool GetEnableRandomization() const { return enable_randomization_; }
 
+    Scattering* GetScattering() const { return scattering_; }
     Medium* GetMedium() const { return medium_; }
-
     Geometry* GetGeometry() const { return geometry_; }
-
-    double GetDensityCorrection() const { return collection_def_.density_correction; }
+    const EnergyCutSettings& GetCutSettings() const { return cut_settings_; }
+    std::vector<CrossSections*> GetCrosssections() const { return crosssections_; }
+    // ContinuousRandomization* GetContinuousRandomization() const { return randomizer_; }
 
     protected:
 
