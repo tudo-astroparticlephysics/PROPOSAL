@@ -2,6 +2,10 @@
 #include <boost/bind.hpp>
 
 #include "PROPOSAL/CollectionInterpolant.h"
+#include "PROPOSAL/CrossSections.h"
+#include "PROPOSAL/Scattering.h"
+#include "PROPOSAL/ContinuousRandomization.h"
+#include "PROPOSAL/Integral.h"
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Output.h"
 #include "PROPOSAL/methods.h"
