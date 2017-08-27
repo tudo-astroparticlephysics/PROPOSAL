@@ -323,7 +323,7 @@ void ProcessCollection::AdvanceParticle(PROPOSALParticle& particle, double dr, d
     //TODO(mario): Adjucst the whole scatteing class Thu 2017/08/24
     if(do_scattering_)
     {
-        scattering_->Scatter(dr, ei, ef);
+        scattering_->Scatter(*particle_, crosssections_, dr, ei, ef);
     }
 
     // if(scattering_model_!=-1)
@@ -934,8 +934,8 @@ void ProcessCollection::EnableInterpolation(PROPOSALParticle& particle, std::str
 
     if(do_continuous_randomization_)
     {
-        randomizer_->EnableDE2dxInterpolation(*particle_, crosssections_, path ,raw);
-        randomizer_->EnableDE2deInterpolation(*particle_, crosssections_, path,raw);
+        randomizer_->EnableDE2dxInterpolation(particle, crosssections_, path ,raw);
+        randomizer_->EnableDE2deInterpolation(particle, crosssections_, path,raw);
     }
 
     if(do_exact_time_calculation_)
@@ -945,7 +945,7 @@ void ProcessCollection::EnableInterpolation(PROPOSALParticle& particle, std::str
 
     if(do_scattering_)
     {
-        scattering_->EnableInterpolation(path);
+        scattering_->EnableInterpolation(particle, crosssections_, path);
     }
 
     bigLow_.at(0)=interpol_prop_decay_->Interpolate(particle.GetLow());
@@ -1253,7 +1253,7 @@ void ProcessCollection::DisableScattering()
 
 void ProcessCollection::EnableScattering()
 {
-    scattering_     =   new Scattering(crosssections_);
+    scattering_     =   new Scattering();
     do_scattering_      =   true;
 }
 
@@ -1476,7 +1476,7 @@ ProcessCollection::ProcessCollection(const ProcessCollection &collection)
 
     if(collection.scattering_ != NULL)
     {
-        scattering_ = new Scattering(*collection.scattering_) ;
+        scattering_ = new Scattering() ;
     }
     else
     {
@@ -2259,10 +2259,10 @@ void ProcessCollection::SetCrosssections(
     // {
     //     randomizer_->SetCrosssections(crosssections);
     // }
-    if(do_scattering_)
-    {
-        scattering_->SetCrosssections(crosssections);
-    }
+    // if(do_scattering_)
+    // {
+    //     scattering_->SetCrosssections(crosssections);
+    // }
 }
 
 void ProcessCollection::SetDebug(bool debug) {

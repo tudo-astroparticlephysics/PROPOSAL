@@ -506,7 +506,7 @@ void CollectionInterpolant::InitInterpolation(const PROPOSALParticle& particle, 
 
     if(collection_def_.do_scattering)
     {
-        scattering_->EnableInterpolation(filepath);
+        scattering_->EnableInterpolation(particle, crosssections_, filepath);
     }
 
     big_low_decay_        = interpol_prop_decay_->Interpolate(particle.GetLow());
