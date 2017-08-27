@@ -21,6 +21,7 @@ TEST(Propagation , Test_nan) {
     CollectionDef col_def;
     col_def.location = 1;
     col_def.do_continuous_randomization_ = true;
+    col_def.do_scattering = true;
 
     CollectionInterpolant col_interpol(Water(), Sphere(Vector3D(), 1e18, 0), EnergyCutSettings(500, 0.5), col_def);
 

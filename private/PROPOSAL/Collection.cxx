@@ -63,6 +63,12 @@ Collection::Collection()
     {
         randomizer_ = new ContinuousRandomization();
     }
+
+    //TODO(mario): Polymorphic initilaization in collections childs  Sun 2017/08/27
+    if (collection_def_.do_scattering)
+    {
+        scattering_ = new Scattering();
+    }
 }
 
 Collection::Collection(const Medium& medium,
@@ -88,6 +94,12 @@ Collection::Collection(const Medium& medium,
     if (collection_def_.do_continuous_randomization_)
     {
         randomizer_ = new ContinuousRandomization();
+    }
+
+    //TODO(mario): Polymorphic initilaization in collections childs  Sun 2017/08/27
+    if (collection_def_.do_scattering)
+    {
+        scattering_ = new Scattering();
     }
 }
 
@@ -402,7 +414,7 @@ void Collection::AdvanceParticle(PROPOSALParticle& particle, double dr, double e
     // TODO(mario): Adjucst the whole scatteing class Thu 2017/08/24
     if (collection_def_.do_scattering)
     {
-        scattering_->Scatter(dr, ei, ef);
+        scattering_->Scatter(particle, crosssections_, dr, ei, ef);
     }
 
     // if(scattering_model_!=-1)
