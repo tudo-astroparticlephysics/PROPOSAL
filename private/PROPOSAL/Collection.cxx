@@ -54,6 +54,9 @@ Collection::Collection()
     , crosssections_()
 {
     crosssections_.push_back(new Bremsstrahlung(medium_, &cut_settings_));
+    crosssections_.push_back(new Epairproduction(medium_, &cut_settings_));
+    crosssections_.push_back(new Photonuclear(medium_, &cut_settings_));
+    crosssections_.push_back(new Ionization(medium_, &cut_settings_));
     // randomizer_ = NULL;
 }
 
@@ -73,10 +76,9 @@ Collection::Collection(const Medium& medium,
     , crosssections_()
 {
     crosssections_.push_back(new Bremsstrahlung(medium_, &cut_settings_));
-    // crosssections_.at(0) = new Ionization(particle_, medium_, cut_settings_);
-    // crosssections_.at(1) = new Bremsstrahlung(medium_, cut_settings_);
-    // crosssections_.at(2) = new Photonuclear(particle_, medium_, cut_settings_);
-    // crosssections_.at(3) = new Epairproduction(particle_, medium_, cut_settings_);
+    crosssections_.push_back(new Ionization(medium_, &cut_settings_));
+    crosssections_.push_back(new Photonuclear(medium_, &cut_settings_));
+    crosssections_.push_back(new Epairproduction(medium_, &cut_settings_));
 
     // randomizer_ = NULL;
 }
@@ -100,15 +102,15 @@ Collection::Collection(const Collection& collection)
             case ParticleType::Brems:
                 crosssections_.at(i) = new Bremsstrahlung( *(Bremsstrahlung*)collection.crosssections_.at(i) );
                 break;
-            // case ParticleType::DeltaE:
-            //     crosssections_.at(i) = new Ionization( *(Ionization*)collection.crosssections_.at(i) );
-            //     break;
-            // case ParticleType::EPair:
-            //     crosssections_.at(i) = new Epairproduction( *(Epairproduction*)collection.crosssections_.at(i) );
-            //     break;
-            // case ParticleType::NuclInt:
-            //     crosssections_.at(i) = new Photonuclear( *(Photonuclear*)collection.crosssections_.at(i) );
-            //     break;
+            case ParticleType::DeltaE:
+                crosssections_.at(i) = new Ionization( *(Ionization*)collection.crosssections_.at(i) );
+                break;
+            case ParticleType::EPair:
+                crosssections_.at(i) = new Epairproduction( *(Epairproduction*)collection.crosssections_.at(i) );
+                break;
+            case ParticleType::NuclInt:
+                crosssections_.at(i) = new Photonuclear( *(Photonuclear*)collection.crosssections_.at(i) );
+                break;
             default:
                 log_fatal("Unknown cross section");
                 exit(1);
@@ -1221,8 +1223,8 @@ double Collection::FunctionToPropIntegralDecay(const PROPOSALParticle& particle,
 double Collection::FunctionToPropIntegralInteraction(const PROPOSALParticle& particle, double energy)
 {
     double aux;
-    double rate       = 0;
-    double total_rate = 0.5;
+    double rate       = 0.0;
+    double total_rate = 0.0;
 
     aux = FunctionToIntegral(particle, energy);
 
@@ -1248,7 +1250,7 @@ double Collection::FunctionToIntegral(const PROPOSALParticle& particle, double e
     PROPOSALParticle temp_particle(particle);
     temp_particle.SetEnergy(energy);
 
-    result = 0.5;
+    result = 0.0;
 
     for (unsigned int i = 0; i < crosssections_.size(); i++)
     {

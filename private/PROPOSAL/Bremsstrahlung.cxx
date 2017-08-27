@@ -146,15 +146,15 @@ double Bremsstrahlung::CalculateScatteringX0(const PROPOSALParticle& particle)
     bool store_init_lpm_effect_ = init_lpm_effect_;
     init_lpm_effect_    =   false;
 
-    PROPOSALParticle particle_tmp = PROPOSALParticle(particle);
+    PROPOSALParticle tmp_particle = PROPOSALParticle(particle);
 
     for(int i=0; i < medium_->GetNumComponents(); i++)
     {
 
        IntegralLimits limits = SetIntegralLimits(particle, i);
 
-       sum +=  integral_temp->Integrate(0, limits.vUp, boost::bind(&Bremsstrahlung::FunctionToDEdxIntegral, this, boost::cref(particle_tmp), _1),2);
-       sum +=  integral_temp->Integrate(limits.vUp, limits.vMax, boost::bind(&Bremsstrahlung::FunctionToDEdxIntegral, this, boost::cref(particle_tmp), _1),4);
+       sum +=  integral_temp->Integrate(0, limits.vUp, boost::bind(&Bremsstrahlung::FunctionToDEdxIntegral, this, boost::cref(tmp_particle), _1),2);
+       sum +=  integral_temp->Integrate(limits.vUp, limits.vMax, boost::bind(&Bremsstrahlung::FunctionToDEdxIntegral, this, boost::cref(tmp_particle), _1),4);
     }
 
 //    eLpm_        =   ALPHA*(particle->GetMass());
@@ -419,8 +419,6 @@ void Bremsstrahlung::EnableDEdxInterpolation(const PROPOSALParticle& particle, s
             }
 
             log_info("Bremsstrahlungs parametrisation tables (dEdx) will be saved to file:%s\t",filename.str().c_str());
-
-            double energy = particle.GetEnergy();
 
             ofstream output;
             if(raw)
@@ -1078,12 +1076,12 @@ double Bremsstrahlung::CalculateStochasticLoss(const PROPOSALParticle& particle,
             {
                     IntegralLimits limits = SetIntegralLimits(particle, i);
 
-                if(vUp_==vMax_)
+                if(limits.vUp == limits.vMax)
                 {
                     return (particle.GetEnergy())*limits.vUp;
                 }
 
-                return (particle.GetEnergy())*(vUp_*exp(dndx_interpolant_2d_.at(i)->FindLimit((particle.GetEnergy()), (rnd)*prob_for_component_.at(i))*log(vMax_/vUp_)));
+                return (particle.GetEnergy())*(limits.vUp*exp(dndx_interpolant_2d_.at(i)->FindLimit((particle.GetEnergy()), (rnd)*prob_for_component_.at(i))*log(limits.vMax/limits.vUp)));
             }
 
             else
@@ -1181,16 +1179,16 @@ double Bremsstrahlung::lpm(const PROPOSALParticle& particle, double v, double s1
         double sum      =   0;
         init_lpm_effect_    =   false;
 
-        PROPOSALParticle particle_tmp = PROPOSALParticle(particle);
-        particle_tmp.SetEnergy(BIGENERGY);
+        PROPOSALParticle tmp_particle = PROPOSALParticle(particle);
+        tmp_particle.SetEnergy(BIGENERGY);
 
         for(int i=0; i < medium_->GetNumComponents(); i++)
         {
 
            IntegralLimits limits = SetIntegralLimits(particle, i);
 
-           sum +=  integral_temp->Integrate(0, limits.vUp, boost::bind(&Bremsstrahlung::FunctionToDEdxIntegral, this, boost::cref(particle_tmp), _1),2);
-           sum +=  integral_temp->Integrate(limits.vUp, limits.vMax, boost::bind(&Bremsstrahlung::FunctionToDEdxIntegral, this, boost::cref(particle_tmp), _1),4);
+           sum +=  integral_temp->Integrate(0, limits.vUp, boost::bind(&Bremsstrahlung::FunctionToDEdxIntegral, this, boost::cref(tmp_particle), _1),2);
+           sum +=  integral_temp->Integrate(limits.vUp, limits.vMax, boost::bind(&Bremsstrahlung::FunctionToDEdxIntegral, this, boost::cref(tmp_particle), _1),4);
         }
 
         eLpm_        =   ALPHA*(particle.GetMass());
@@ -1310,10 +1308,10 @@ double Bremsstrahlung::FunctionToBuildDNdxInterpolant(double energy)
 
 double Bremsstrahlung::FunctionToBuildDNdxInterpolant2D(const PROPOSALParticle& particle, double energy , double v)
 {
-    PROPOSALParticle particle_tmp(particle);
-    particle_tmp.SetEnergy(energy);
+    PROPOSALParticle tmp_particle(particle);
+    tmp_particle.SetEnergy(energy);
 
-    IntegralLimits limits = SetIntegralLimits(particle_tmp, component_);
+    IntegralLimits limits = SetIntegralLimits(tmp_particle, component_);
 
     if(limits.vUp== limits.vMax)
     {
@@ -1322,7 +1320,7 @@ double Bremsstrahlung::FunctionToBuildDNdxInterpolant2D(const PROPOSALParticle& 
 
     v = limits.vUp * exp(v * log(limits.vMax / limits.vUp));
 
-    return dndx_integral_.at(component_)->Integrate(limits.vUp, v, boost::bind(&Bremsstrahlung::FunctionToDNdxIntegral, this, boost::cref(particle_tmp), _1),4);
+    return dndx_integral_.at(component_)->Integrate(limits.vUp, v, boost::bind(&Bremsstrahlung::FunctionToDNdxIntegral, this, boost::cref(tmp_particle), _1),4);
 }
 
 
@@ -1332,10 +1330,10 @@ double Bremsstrahlung::FunctionToBuildDNdxInterpolant2D(const PROPOSALParticle& 
 
 double Bremsstrahlung::FunctionToBuildDEdxInterpolant(const PROPOSALParticle& particle, double energy)
 {
-    PROPOSALParticle particle_tmp(particle);
-    particle_tmp.SetEnergy(energy);
+    PROPOSALParticle tmp_particle(particle);
+    tmp_particle.SetEnergy(energy);
 
-    return CalculatedEdx(particle_tmp);
+    return CalculatedEdx(tmp_particle);
 }
 
 
