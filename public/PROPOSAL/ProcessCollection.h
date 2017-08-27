@@ -15,7 +15,7 @@
 #include "PROPOSAL/Bremsstrahlung.h"
 // #include "PROPOSAL/Epairproduction.h"
 // #include "PROPOSAL/Ionization.h"
-// #include "PROPOSAL/Photonuclear.h"
+#include "PROPOSAL/Photonuclear.h"
 #include "PROPOSAL/Decay.h"
 #include "PROPOSAL/ContinuousRandomization.h"
 #include "PROPOSAL/Geometry.h"

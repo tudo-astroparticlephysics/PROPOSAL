@@ -16,10 +16,10 @@
 #include <boost/bind.hpp>
 
 #include "PROPOSAL/Scattering.h"
-// #include "PROPOSAL/Ionization.h"
+#include "PROPOSAL/Ionization.h"
 #include "PROPOSAL/Bremsstrahlung.h"
-// #include "PROPOSAL/Epairproduction.h"
-// #include "PROPOSAL/Photonuclear.h"
+#include "PROPOSAL/Epairproduction.h"
+#include "PROPOSAL/Photonuclear.h"
 #include "PROPOSAL/Output.h"
 #include "PROPOSAL/methods.h"
 #include "PROPOSAL/Constants.h"
@@ -42,10 +42,10 @@ Scattering::Scattering( )
     ,interpolant_diff_(NULL)
     ,particle_( new PROPOSALParticle(MuMinusDef::Get()) )
 {
-    // crosssections_.push_back(new Ionization());
+    crosssections_.push_back(new Ionization());
     crosssections_.push_back(new Bremsstrahlung());
-    // crosssections_.push_back(new Photonuclear());
-    // crosssections_.push_back(new Epairproduction());
+    crosssections_.push_back(new Photonuclear());
+    crosssections_.push_back(new Epairproduction());
 
     // SetParticle(particle_);
 
@@ -145,15 +145,15 @@ bool Scattering::operator==(const Scattering &scattering) const
             case ParticleType::Brems:
                 if( *(Bremsstrahlung*)crosssections_.at(i) !=  *(Bremsstrahlung*)scattering.crosssections_.at(i) ) return false;
                 break;
-            // case ParticleType::DeltaE:
-            //     if( *(Ionization*)crosssections_.at(i) != *(Ionization*)scattering.crosssections_.at(i) ) return false;
-            //     break;
-            // case ParticleType::EPair:
-            //     if( *(Epairproduction*)crosssections_.at(i) !=  *(Epairproduction*)scattering.crosssections_.at(i) ) return false;
-            //     break;
-            // case ParticleType::NuclInt:
-            //     if( *(Photonuclear*)crosssections_.at(i) !=  *(Photonuclear*)scattering.crosssections_.at(i) )  return false;
-            //     break;
+            case ParticleType::DeltaE:
+                if( *(Ionization*)crosssections_.at(i) != *(Ionization*)scattering.crosssections_.at(i) ) return false;
+                break;
+            case ParticleType::EPair:
+                if( *(Epairproduction*)crosssections_.at(i) !=  *(Epairproduction*)scattering.crosssections_.at(i) ) return false;
+                break;
+            case ParticleType::NuclInt:
+                if( *(Photonuclear*)crosssections_.at(i) !=  *(Photonuclear*)scattering.crosssections_.at(i) )  return false;
+                break;
             default:
                 log_fatal("In copy constructor of Scattering: Error: Unknown crossSection");
                 exit(1);
