@@ -8,13 +8,10 @@
 */
 #pragma once
 
-#ifndef SCATTERING_FIRSTORDER_H
-#define SCATTERING_FIRSTORDER_H
-
 // #include <vector>
 // #include <string>
 
-#include "PROPOSAL/MathModel.h"
+#include "PROPOSAL/Scattering.h"
 #include "PROPOSAL/PROPOSALParticle.h"
 #include "PROPOSAL/Medium.h"
 
@@ -25,42 +22,24 @@ namespace PROPOSAL{
   *
   * More precise scattering angles will be added soon.
   */
-
-
-class ScatteringFirstOrder : public MathModel
+class ScatteringFirstOrder : public Scattering
 {
-
-//----------------------------------------------------------------------------//
-
-public:
-
-    /**
-     * \brief Default Constructor
-     *
-     * Constructor which sets "default" settings.
-     */
+    public:
     ScatteringFirstOrder();
+    ScatteringFirstOrder(const ScatteringFirstOrder&);
+    ~ScatteringFirstOrder();
 
+    virtual Scattering* clone() const { return new ScatteringFirstOrder(*this); }
 
-//----------------------------------------------------------------------------//
+    void Scatter(PROPOSALParticle&, const std::vector<CrossSections*>&, double dr, double ei, double ef);
+    // Do nothing, not interpolation for scattering moliere
+    virtual void EnableInterpolation(const PROPOSALParticle&, const std::vector<CrossSections*>&, std::string path = "");
+    virtual void DisableInterpolation();
 
+    private:
+    ScatteringFirstOrder& operator=(const ScatteringFirstOrder&); // Undefined & not allowed
 
-
-//----------------------------------------------------------------------------//
-    // Memberfunctions
-
-    double  CalculateTheta0(double dr, PROPOSALParticle* part, Medium* med);
-    void    Scatter(double dr, PROPOSALParticle* part, Medium* med);
-
-
-//----------------------------------------------------------------------------//
-    // destructors
-    ~ScatteringFirstOrder() {}
-
-
+    double CalculateTheta0(const PROPOSALParticle&, const Medium&, double dr);
 };
 
 }
-
-
-#endif //SCATTERING_FIRSTORDER_H
