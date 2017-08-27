@@ -493,11 +493,11 @@ void CollectionInterpolant::InitInterpolation(const PROPOSALParticle& particle, 
 
     }
 
-    // if(do_continuous_randomization_)
-    // {
-    //     randomizer_->EnableDE2dxInterpolation(path ,raw);
-    //     randomizer_->EnableDE2deInterpolation(path,raw);
-    // }
+    if(collection_def_.do_continuous_randomization_)
+    {
+        randomizer_->EnableDE2dxInterpolation(particle, crosssections_, filepath ,raw);
+        randomizer_->EnableDE2deInterpolation(particle, crosssections_, filepath,raw);
+    }
 
     if(collection_def_.do_exact_time_calculation)
     {

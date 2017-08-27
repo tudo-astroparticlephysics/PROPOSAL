@@ -17,6 +17,7 @@ CollectionDef::CollectionDef()
     : do_weighting(false)
     , weighting_order(0)
     , do_scattering(false)
+    , do_continuous_randomization_(false)
     , lpm_effect_enabled(false)
     , do_exact_time_calculation(false)
     , location(0)
@@ -45,11 +46,10 @@ Collection::Collection()
     : ini_(0)
     , collection_def_()
     , weighting_starts_at_(0)
-    // , enable_randomization_(false)
-    // , do_continuous_randomization_(false)
     , geometry_(new Sphere(Vector3D(), 1e18, 0))
     , medium_(new Water())
     , cut_settings_()
+    , randomizer_(NULL)
     , scattering_(NULL)
     , crosssections_()
 {
@@ -57,7 +57,12 @@ Collection::Collection()
     crosssections_.push_back(new Epairproduction(medium_, &cut_settings_));
     crosssections_.push_back(new Photonuclear(medium_, &cut_settings_));
     crosssections_.push_back(new Ionization(medium_, &cut_settings_));
-    // randomizer_ = NULL;
+
+    //TODO(mario): Polymorphic initilaization in collections childs  Sun 2017/08/27
+    if (collection_def_.do_continuous_randomization_)
+    {
+        randomizer_ = new ContinuousRandomization();
+    }
 }
 
 Collection::Collection(const Medium& medium,
@@ -67,11 +72,10 @@ Collection::Collection(const Medium& medium,
     : ini_(0)
     , collection_def_(def)
     , weighting_starts_at_(0)
-    // , enable_randomization_(false)
-    // , do_continuous_randomization_(false)
     , geometry_(geometry.clone())
     , medium_(medium.clone())
     , cut_settings_(cut_settings)
+    , randomizer_(NULL)
     , scattering_(NULL)
     , crosssections_()
 {
@@ -80,7 +84,11 @@ Collection::Collection(const Medium& medium,
     crosssections_.push_back(new Photonuclear(medium_, &cut_settings_));
     crosssections_.push_back(new Epairproduction(medium_, &cut_settings_));
 
-    // randomizer_ = NULL;
+    //TODO(mario): Polymorphic initilaization in collections childs  Sun 2017/08/27
+    if (collection_def_.do_continuous_randomization_)
+    {
+        randomizer_ = new ContinuousRandomization();
+    }
 }
 
 Collection::Collection(const Collection& collection)
@@ -90,6 +98,7 @@ Collection::Collection(const Collection& collection)
     ,geometry_(collection.geometry_->clone())
     ,medium_(collection.medium_->clone())
     ,cut_settings_(collection.cut_settings_)
+    ,randomizer_(collection.randomizer_) //TODO(mario): ranomizer clone Sat 2017/08/26
     ,scattering_(collection.scattering_) //TODO(mario): scatter clone Sat 2017/08/26
 {
     crosssections_.resize(collection.crosssections_.size());
@@ -122,6 +131,12 @@ Collection::~Collection()
 {
     delete medium_;
     delete geometry_;
+
+    if (randomizer_)
+    {
+        delete randomizer_;
+    }
+
     //TODO(mario): delete scatter Sat 2017/08/26
 }
 
@@ -204,13 +219,15 @@ double Collection::Propagate(PROPOSALParticle& particle, double distance)
 
         //TODO(mario): Revert randomizer Fri 2017/08/25
         // Randomize the continuous energy loss if this option is enabled
-        // if (do_continuous_randomization_)
-        // {
-        //     if (final_energy != particle.GetLow())
-        //     {
-        //         final_energy = Randomize(initial_energy, final_energy);
-        //     }
-        // }
+        if (collection_def_.do_continuous_randomization_)
+        {
+            if (final_energy != particle.GetLow())
+            {
+                double rnd = RandomGenerator::Get().RandomDouble();
+                final_energy = randomizer_->Randomize(particle, crosssections_, initial_energy, final_energy, rnd);
+            }
+        }
+
         // Lower limit of particle energy is reached or
         // or complete particle is propagated the whole distance
         if (final_energy == particle.GetLow() || propagated_distance == distance)
