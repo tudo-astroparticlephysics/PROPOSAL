@@ -255,7 +255,10 @@ void Vector3D::CalculateSphericalCoordinates()
 // }
 
 
-// private member function
+//----------------------------------------------------------------------//
+//---------------------private member function--------------------------//
+//----------------------------------------------------------------------//
+
 // in principal its the std::atan2(y_, x_) function
 double Vector3D::CalculateAzimuthFromCartesian()
 {
@@ -293,67 +296,4 @@ double Vector3D::CalculateAzimuthFromCartesian()
     }
     // log_fatal("never should be here; return zero.");
     return 0.;
-}
-
-
-//----------------------------------------------------------------------//
-//----------------------------Setter------------------------------------//
-//----------------------------------------------------------------------//
-
-
-void Vector3D::SetCartesianCoordinates(const double x, const double y, const double z)
-{
-    x_ = x;
-    y_ = y;
-    z_ = z;
-}
-
-void Vector3D::SetSphericalCoordinates(const double radius, const double azimuth, const double zenith)
-{
-    spheric_radius_  = radius;
-    spheric_azimuth_ = azimuth;
-    spheric_zenith_  = zenith;
-}
-
-// void Vector3D::SetCylindricalCoordinates(const double radius, const double azimuth, const double height)
-// {
-//     cylindric_radius_  = radius;
-//     cylindric_azimuth_ = azimuth;
-//     cylindric_height_  = height;
-// }
-
-
-//----------------------------------------------------------------------//
-//----------------------------Setter------------------------------------//
-//----------------------------------------------------------------------//
-
-
-double Vector3D::GetX() const
-{
-    return x_;
-}
-
-double Vector3D::GetY() const
-{
-    return y_;
-}
-
-double Vector3D::GetZ() const
-{
-    return z_;
-}
-
-double Vector3D::GetRadius() const
-{
-    return spheric_radius_;
-}
-
-double Vector3D::GetPhi() const
-{
-    return spheric_azimuth_;
-}
-
-double Vector3D::GetTheta() const
-{
-    return spheric_zenith_;
 }
