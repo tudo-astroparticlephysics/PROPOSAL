@@ -8,9 +8,6 @@
 */
 #pragma once
 
-#ifndef ENERGYCUTSETTINGS_H_
-#define ENERGYCUTSETTINGS_H_
-
 #include <iostream>
 
 namespace PROPOSAL
@@ -94,5 +91,3 @@ public:
 };
 
 }
-
-#endif /* ENERGYCUTSETTINGS_H_ */

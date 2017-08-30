@@ -7,19 +7,28 @@
 
 // #include <cmath>
 
-#include <boost/lexical_cast.hpp>
-#include <boost/algorithm/string/predicate.hpp>
+// #include <boost/lexical_cast.hpp>
+// #include <boost/algorithm/string/predicate.hpp>
 
-#include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
 
 #include "PROPOSAL/Propagator.h"
-#include "PROPOSAL/CollectionIntegral.h"
-#include "PROPOSAL/CollectionInterpolant.h"
+
+#include "PROPOSAL/sector/Collection.h"
+#include "PROPOSAL/sector/CollectionIntegral.h"
+#include "PROPOSAL/sector/CollectionInterpolant.h"
+
+#include "PROPOSAL/medium/Medium.h"
+#include "PROPOSAL/medium/MediumFactory.h"
+
+#include "PROPOSAL/geometry/GeometryFactory.h"
+#include "PROPOSAL/geometry/Sphere.h"
+
 #include "PROPOSAL/Output.h"
-#include "PROPOSAL/methods.h"
+// #include "PROPOSAL/methods.h"
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/Geometry.h"
+// #include "PROPOSAL/Geometry.h"
 
 using namespace std;
 using namespace PROPOSAL;
@@ -1525,8 +1534,7 @@ void Propagator::DisableInterpolation()
 
 
 Propagator::Propagator(const Propagator &propagator)
-    : MathModel(propagator)
-    ,seed_                      ( propagator.seed_ )
+    :seed_                      ( propagator.seed_ )
     // ,brems_                     ( propagator.brems_ )
     // ,photo_                     ( propagator.photo_ )
     // ,lpm_                       ( propagator.lpm_ )
