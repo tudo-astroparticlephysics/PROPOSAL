@@ -1,13 +1,13 @@
 
 #include <boost/bind.hpp>
 
-#include "PROPOSAL/sector/CollectionIntegral.h"
+#include "PROPOSAL/sector/SectorIntegral.h"
 #include "PROPOSAL/Constants.h"
 
 using namespace PROPOSAL;
 
-CollectionIntegral::CollectionIntegral()
-    : Collection()
+SectorIntegral::SectorIntegral()
+    : Sector()
     , integral_(IROMB, IMAXS, IPREC2)
     , prop_interaction_(IROMB, IMAXS, IPREC2)
     , prop_decay_(IROMB, IMAXS, IPREC2)
@@ -15,11 +15,11 @@ CollectionIntegral::CollectionIntegral()
 {
 }
 
-CollectionIntegral::CollectionIntegral(const Medium& medium,
+SectorIntegral::SectorIntegral(const Medium& medium,
                                        const Geometry& geometry,
                                        const EnergyCutSettings& cut_settings,
-                                       const CollectionDef& def)
-    : Collection(medium, geometry, cut_settings, def)
+                                       const SectorDef& def)
+    : Sector(medium, geometry, cut_settings, def)
     , integral_(IROMB, IMAXS, IPREC2)
     , prop_interaction_(IROMB, IMAXS, IPREC2)
     , prop_decay_(IROMB, IMAXS, IPREC2)
@@ -27,8 +27,8 @@ CollectionIntegral::CollectionIntegral(const Medium& medium,
 {
 }
 
-CollectionIntegral::CollectionIntegral(const CollectionIntegral& collection)
-    : Collection(collection)
+SectorIntegral::SectorIntegral(const SectorIntegral& collection)
+    : Sector(collection)
     ,integral_(collection.integral_)
     ,prop_interaction_(collection.prop_interaction_)
     ,prop_decay_(collection.prop_decay_)
@@ -36,19 +36,19 @@ CollectionIntegral::CollectionIntegral(const CollectionIntegral& collection)
 {
 }
 
-CollectionIntegral::~CollectionIntegral()
+SectorIntegral::~SectorIntegral()
 {
 }
 
 // ------------------------------------------------------------------------- //
-double CollectionIntegral::CalculateDisplacement(const PROPOSALParticle& particle, double ei, double ef, double dist)
+double SectorIntegral::CalculateDisplacement(const PROPOSALParticle& particle, double ei, double ef, double dist)
 {
     return integral_.IntegrateWithRandomRatio(
-        ei, ef, boost::bind(&CollectionIntegral::FunctionToIntegral, this, boost::cref(particle), _1), 4, -dist);
+        ei, ef, boost::bind(&SectorIntegral::FunctionToIntegral, this, boost::cref(particle), _1), 4, -dist);
 }
 
 // ------------------------------------------------------------------------- //
-double CollectionIntegral::CalculateFinalEnergy(const PROPOSALParticle& particle, double ei, double dist)
+double SectorIntegral::CalculateFinalEnergy(const PROPOSALParticle& particle, double ei, double dist)
 {
     (void)particle;
     (void)ei;
@@ -58,7 +58,7 @@ double CollectionIntegral::CalculateFinalEnergy(const PROPOSALParticle& particle
 }
 
 // ------------------------------------------------------------------------- //
-double CollectionIntegral::CalculateFinalEnergy(const PROPOSALParticle& particle,
+double SectorIntegral::CalculateFinalEnergy(const PROPOSALParticle& particle,
                                                 double ei,
                                                 double rnd,
                                                 bool particle_interaction)
@@ -77,7 +77,7 @@ double CollectionIntegral::CalculateFinalEnergy(const PROPOSALParticle& particle
 }
 
 // ------------------------------------------------------------------------- //
-double CollectionIntegral::CalculateTrackingIntegal(const PROPOSALParticle& particle,
+double SectorIntegral::CalculateTrackingIntegal(const PROPOSALParticle& particle,
                                                     double initial_energy,
                                                     double rnd,
                                                     bool particle_interaction)
@@ -87,7 +87,7 @@ double CollectionIntegral::CalculateTrackingIntegal(const PROPOSALParticle& part
         return prop_interaction_.IntegrateWithRandomRatio(
             initial_energy,
             particle.GetLow(),
-            boost::bind(&CollectionIntegral::FunctionToPropIntegralInteraction, this, boost::cref(particle), _1),
+            boost::bind(&SectorIntegral::FunctionToPropIntegralInteraction, this, boost::cref(particle), _1),
             4,
             -rnd);
     } else
@@ -95,15 +95,15 @@ double CollectionIntegral::CalculateTrackingIntegal(const PROPOSALParticle& part
         return prop_decay_.IntegrateWithRandomRatio(
             initial_energy,
             particle.GetLow(),
-            boost::bind(&CollectionIntegral::FunctionToPropIntegralDecay, this, boost::cref(particle), _1),
+            boost::bind(&SectorIntegral::FunctionToPropIntegralDecay, this, boost::cref(particle), _1),
             4,
             -rnd);
     }
 }
 
 // ------------------------------------------------------------------------- //
-double CollectionIntegral::CalculateParticleTime(const PROPOSALParticle& particle, double ei, double ef)
+double SectorIntegral::CalculateParticleTime(const PROPOSALParticle& particle, double ei, double ef)
 {
     return time_particle_.Integrate(
-        ei, ef, boost::bind(&CollectionIntegral::FunctionToTimeIntegral, this, boost::cref(particle), _1), 4);
+        ei, ef, boost::bind(&SectorIntegral::FunctionToTimeIntegral, this, boost::cref(particle), _1), 4);
 }

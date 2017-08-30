@@ -1,23 +1,23 @@
 
 #pragma once
 
-#include "PROPOSAL/sector/Collection.h"
+#include "PROPOSAL/sector/Sector.h"
 #include "PROPOSAL/math/Integral.h"
 
 namespace PROPOSAL {
 
-class CollectionIntegral : public Collection
+class SectorIntegral : public Sector
 {
     public:
-    CollectionIntegral();
-    CollectionIntegral(const Medium&,
+    SectorIntegral();
+    SectorIntegral(const Medium&,
                        const Geometry&,
                        const EnergyCutSettings&,
-                       const CollectionDef& def = CollectionDef());
-    CollectionIntegral(const CollectionIntegral&);
-    virtual ~CollectionIntegral();
+                       const SectorDef& def = SectorDef());
+    SectorIntegral(const SectorIntegral&);
+    virtual ~SectorIntegral();
 
-    virtual Collection* clone() const { return new CollectionIntegral(*this); }
+    virtual Sector* clone() const { return new SectorIntegral(*this); }
 
     double CalculateDisplacement(const PROPOSALParticle&, double ei, double ef, double dist);
     double CalculateFinalEnergy(const PROPOSALParticle&, double ei, double dist);
@@ -30,7 +30,7 @@ class CollectionIntegral : public Collection
 
     private:
 
-    CollectionIntegral& operator=(const CollectionIntegral&); // Undefined & not allowed
+    SectorIntegral& operator=(const SectorIntegral&); // Undefined & not allowed
 
     Integral integral_;
     Integral prop_interaction_;
