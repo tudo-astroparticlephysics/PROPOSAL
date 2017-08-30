@@ -1,7 +1,7 @@
 
 #include <boost/bind.hpp>
 
-#include "PROPOSAL/sector/CollectionInterpolant.h"
+#include "PROPOSAL/sector/SectorInterpolant.h"
 // #include "PROPOSAL/crossection/CrossSections.h"
 #include "PROPOSAL/math/Integral.h"
 // #include "PROPOSAL/Scattering.h"
@@ -15,8 +15,8 @@
 using namespace PROPOSAL;
 using namespace std;
 
-CollectionInterpolant::CollectionInterpolant()
-    : Collection()
+SectorInterpolant::SectorInterpolant()
+    : Sector()
     , initialized_interpolation_(false)
     , up_(false)
     , big_low_interatction_(0)
@@ -33,11 +33,11 @@ CollectionInterpolant::CollectionInterpolant()
     , interpol_prop_interaction_diff_(NULL)
 {}
 
-CollectionInterpolant::CollectionInterpolant(const Medium& medium,
+SectorInterpolant::SectorInterpolant(const Medium& medium,
                                              const Geometry& geometry,
                                              const EnergyCutSettings& cut_settings,
-                                             const CollectionDef& def)
-    :Collection(medium, geometry, cut_settings, def)
+                                             const SectorDef& def)
+    :Sector(medium, geometry, cut_settings, def)
     , initialized_interpolation_(false)
     , up_(false)
     , big_low_interatction_(0)
@@ -55,7 +55,7 @@ CollectionInterpolant::CollectionInterpolant(const Medium& medium,
 {
 }
 
-CollectionInterpolant::~CollectionInterpolant()
+SectorInterpolant::~SectorInterpolant()
 {
     delete interpolant_;
     delete interpolant_diff_;
@@ -67,8 +67,8 @@ CollectionInterpolant::~CollectionInterpolant()
     delete interpol_prop_interaction_diff_;
 }
 
-CollectionInterpolant::CollectionInterpolant(const CollectionInterpolant& collection)
-    :Collection(collection)
+SectorInterpolant::SectorInterpolant(const SectorInterpolant& collection)
+    :Sector(collection)
      ,initialized_interpolation_(collection.initialized_interpolation_)
      ,up_(collection.up_)
      ,big_low_interatction_(collection.big_low_interatction_)
@@ -106,7 +106,7 @@ CollectionInterpolant::CollectionInterpolant(const CollectionInterpolant& collec
 }
 
 // ------------------------------------------------------------------------- //
-double CollectionInterpolant::Propagate(PROPOSALParticle& particle, double distance)
+double SectorInterpolant::Propagate(PROPOSALParticle& particle, double distance)
 {
     // Initialize Interpolants once first
     if (initialized_interpolation_ == false)
@@ -114,11 +114,11 @@ double CollectionInterpolant::Propagate(PROPOSALParticle& particle, double dista
         InitInterpolation(particle, collection_def_.path_to_tables, collection_def_.raw);
     }
 
-    return Collection::Propagate(particle, distance);
+    return Sector::Propagate(particle, distance);
 }
 
 // ------------------------------------------------------------------------- //
-double CollectionInterpolant::CalculateDisplacement(const PROPOSALParticle& particle, double ei, double ef, double dist)
+double SectorInterpolant::CalculateDisplacement(const PROPOSALParticle& particle, double ei, double ef, double dist)
 {
     (void)particle;
     (void)dist;
@@ -142,7 +142,7 @@ double CollectionInterpolant::CalculateDisplacement(const PROPOSALParticle& part
 }
 
 // ------------------------------------------------------------------------- //
-double CollectionInterpolant::CalculateFinalEnergy(const PROPOSALParticle& particle, double ei, double dist)
+double SectorInterpolant::CalculateFinalEnergy(const PROPOSALParticle& particle, double ei, double dist)
 {
     if (ini_ != 0)
     {
@@ -162,7 +162,7 @@ double CollectionInterpolant::CalculateFinalEnergy(const PROPOSALParticle& parti
 }
 
 // ------------------------------------------------------------------------- //
-double CollectionInterpolant::CalculateFinalEnergy(const PROPOSALParticle& particle,
+double SectorInterpolant::CalculateFinalEnergy(const PROPOSALParticle& particle,
                                                 double ei,
                                                 double rnd,
                                                 bool particle_interaction)
@@ -248,7 +248,7 @@ double CollectionInterpolant::CalculateFinalEnergy(const PROPOSALParticle& parti
 }
 
 // ------------------------------------------------------------------------- //
-double CollectionInterpolant::CalculateTrackingIntegal(const PROPOSALParticle& particle,
+double SectorInterpolant::CalculateTrackingIntegal(const PROPOSALParticle& particle,
                                                     double initial_energy,
                                                     double rnd,
                                                     bool particle_interaction)
@@ -290,7 +290,7 @@ double CollectionInterpolant::CalculateTrackingIntegal(const PROPOSALParticle& p
 }
 
 // ------------------------------------------------------------------------- //
-double CollectionInterpolant::CalculateParticleTime(const PROPOSALParticle& particle, double ei, double ef)
+double SectorInterpolant::CalculateParticleTime(const PROPOSALParticle& particle, double ei, double ef)
 {
     (void) particle;
 
@@ -309,7 +309,7 @@ double CollectionInterpolant::CalculateParticleTime(const PROPOSALParticle& part
 }
 
 // ------------------------------------------------------------------------- //
-void CollectionInterpolant::InitInterpolation(const PROPOSALParticle& particle, std::string filepath, bool raw)
+void SectorInterpolant::InitInterpolation(const PROPOSALParticle& particle, std::string filepath, bool raw)
 {
     Integral prop_interaction_(IROMB, IMAXS, IPREC2);
 
@@ -326,8 +326,8 @@ void CollectionInterpolant::InitInterpolation(const PROPOSALParticle& particle, 
     bool reading_worked =   true;
     bool storing_failed =   false;
 
-    double a = abs(-prop_interaction_.Integrate(particle.GetLow(), particle.GetLow()*10, boost::bind(&CollectionInterpolant::FunctionToPropIntegralInteraction, this, boost::cref(particle), _1),4));
-    double b = abs(-prop_interaction_.Integrate(BIGENERGY, BIGENERGY/10, boost::bind(&CollectionInterpolant::FunctionToPropIntegralInteraction, this, boost::cref(particle), _1),4));
+    double a = abs(-prop_interaction_.Integrate(particle.GetLow(), particle.GetLow()*10, boost::bind(&SectorInterpolant::FunctionToPropIntegralInteraction, this, boost::cref(particle), _1),4));
+    double b = abs(-prop_interaction_.Integrate(BIGENERGY, BIGENERGY/10, boost::bind(&SectorInterpolant::FunctionToPropIntegralInteraction, this, boost::cref(particle), _1),4));
 
     if( a < b)
     {
@@ -345,7 +345,7 @@ void CollectionInterpolant::InitInterpolation(const PROPOSALParticle& particle, 
     if(!filepath.empty())
     {
         std::stringstream filename;
-        filename<<filepath<<"/Collection"
+        filename<<filepath<<"/Sector"
                 <<"_"<<particle.GetName()
                 <<"_mass_"<<particle.GetMass()
                 <<"_charge_"<<particle.GetCharge()
@@ -389,7 +389,7 @@ void CollectionInterpolant::InitInterpolation(const PROPOSALParticle& particle, 
 
         if( FileExist(filename.str()) )
         {
-            log_info("ProcessCollection parametrisation tables will be read from file:\t%s",filename.str().c_str());
+            log_info("Sector parametrisation tables will be read from file:\t%s",filename.str().c_str());
             std::ifstream input;
 
             if(raw)
@@ -428,10 +428,10 @@ void CollectionInterpolant::InitInterpolation(const PROPOSALParticle& particle, 
                 log_info("File %s is corrupted! Write it again!",filename.str().c_str());
             }
 
-            log_info("ProcessCollection parametrisation tables will be saved to file:\t%s",filename.str().c_str());
+            log_info("Sector parametrisation tables will be saved to file:\t%s",filename.str().c_str());
 
-            if(abs(-prop_interaction_.Integrate(particle.GetLow(), particle.GetLow()*10, boost::bind(&CollectionInterpolant::FunctionToPropIntegralInteraction, this, boost::cref(particle), _1),4))
-                    < abs(-prop_interaction_.Integrate(BIGENERGY, BIGENERGY/10, boost::bind(&CollectionInterpolant::FunctionToPropIntegralInteraction, this, boost::cref(particle), _1),4)))
+            if(abs(-prop_interaction_.Integrate(particle.GetLow(), particle.GetLow()*10, boost::bind(&SectorInterpolant::FunctionToPropIntegralInteraction, this, boost::cref(particle), _1),4))
+                    < abs(-prop_interaction_.Integrate(BIGENERGY, BIGENERGY/10, boost::bind(&SectorInterpolant::FunctionToPropIntegralInteraction, this, boost::cref(particle), _1),4)))
             {
                 up_  =   true;
             }
@@ -457,13 +457,13 @@ void CollectionInterpolant::InitInterpolation(const PROPOSALParticle& particle, 
 
                 double order_of_interpolation = collection_def_.order_of_interpolation;
 
-                interpolant_        =   new Interpolant(NUM3, particle.GetLow(), BIGENERGY, boost::bind(&CollectionInterpolant::FunctionToBuildInterpolant, this, boost::cref(particle), _1), order_of_interpolation, false, false, true, order_of_interpolation, false, false, false);
-                interpolant_diff_   =   new Interpolant(NUM3, particle.GetLow(), BIGENERGY, boost::bind(&CollectionInterpolant::FunctionToIntegral, this, boost::cref(particle), _1), order_of_interpolation, false, false, true, order_of_interpolation, false, false, false);
+                interpolant_        =   new Interpolant(NUM3, particle.GetLow(), BIGENERGY, boost::bind(&SectorInterpolant::FunctionToBuildInterpolant, this, boost::cref(particle), _1), order_of_interpolation, false, false, true, order_of_interpolation, false, false, false);
+                interpolant_diff_   =   new Interpolant(NUM3, particle.GetLow(), BIGENERGY, boost::bind(&SectorInterpolant::FunctionToIntegral, this, boost::cref(particle), _1), order_of_interpolation, false, false, true, order_of_interpolation, false, false, false);
 
-                interpol_prop_decay_            =   new Interpolant(NUM3, particle.GetLow(), BIGENERGY, boost::bind(&CollectionInterpolant::InterpolPropDecay, this, boost::cref(particle), _1), order_of_interpolation, false, false, true, order_of_interpolation, false, false, false);
-                interpol_prop_decay_diff_       =   new Interpolant(NUM3, particle.GetLow(), BIGENERGY, boost::bind(&CollectionInterpolant::FunctionToPropIntegralDecay, this, boost::cref(particle), _1), order_of_interpolation, false, false, true, order_of_interpolation, false, false, false);
-                interpol_prop_interaction_      =   new Interpolant(NUM3, particle.GetLow(), BIGENERGY, boost::bind(&CollectionInterpolant::InterpolPropInteraction, this, boost::cref(particle), _1), order_of_interpolation, false, false, true, order_of_interpolation, false, false, false);
-                interpol_prop_interaction_diff_ =   new Interpolant(NUM3, particle.GetLow(), BIGENERGY, boost::bind(&CollectionInterpolant::FunctionToPropIntegralInteraction, this, boost::cref(particle), _1), order_of_interpolation, false, false, true, order_of_interpolation, false, false, false);
+                interpol_prop_decay_            =   new Interpolant(NUM3, particle.GetLow(), BIGENERGY, boost::bind(&SectorInterpolant::InterpolPropDecay, this, boost::cref(particle), _1), order_of_interpolation, false, false, true, order_of_interpolation, false, false, false);
+                interpol_prop_decay_diff_       =   new Interpolant(NUM3, particle.GetLow(), BIGENERGY, boost::bind(&SectorInterpolant::FunctionToPropIntegralDecay, this, boost::cref(particle), _1), order_of_interpolation, false, false, true, order_of_interpolation, false, false, false);
+                interpol_prop_interaction_      =   new Interpolant(NUM3, particle.GetLow(), BIGENERGY, boost::bind(&SectorInterpolant::InterpolPropInteraction, this, boost::cref(particle), _1), order_of_interpolation, false, false, true, order_of_interpolation, false, false, false);
+                interpol_prop_interaction_diff_ =   new Interpolant(NUM3, particle.GetLow(), BIGENERGY, boost::bind(&SectorInterpolant::FunctionToPropIntegralInteraction, this, boost::cref(particle), _1), order_of_interpolation, false, false, true, order_of_interpolation, false, false, false);
 
                 interpolant_->Save(output,raw);
                 interpolant_diff_->Save(output,raw);
@@ -484,18 +484,18 @@ void CollectionInterpolant::InitInterpolation(const PROPOSALParticle& particle, 
     }
     if(filepath.empty() || storing_failed)
     {
-        log_info("ProcessCollection parametrisation tables will be stored in memory!");
+        log_info("Sector parametrisation tables will be stored in memory!");
 
         double order_of_interpolation = collection_def_.order_of_interpolation;
 
-        interpolant_        =   new Interpolant(NUM3, particle.GetLow(), BIGENERGY, boost::bind(&CollectionInterpolant::FunctionToBuildInterpolant, this, boost::cref(particle), _1), order_of_interpolation, false, false, true, order_of_interpolation, false, false, false);
-        interpolant_diff_   =   new Interpolant(NUM3, particle.GetLow(), BIGENERGY, boost::bind(&CollectionInterpolant::FunctionToIntegral, this, boost::cref(particle), _1), order_of_interpolation, false, false, true, order_of_interpolation, false, false, false);
+        interpolant_        =   new Interpolant(NUM3, particle.GetLow(), BIGENERGY, boost::bind(&SectorInterpolant::FunctionToBuildInterpolant, this, boost::cref(particle), _1), order_of_interpolation, false, false, true, order_of_interpolation, false, false, false);
+        interpolant_diff_   =   new Interpolant(NUM3, particle.GetLow(), BIGENERGY, boost::bind(&SectorInterpolant::FunctionToIntegral, this, boost::cref(particle), _1), order_of_interpolation, false, false, true, order_of_interpolation, false, false, false);
 
 
-        interpol_prop_decay_            =   new Interpolant(NUM3, particle.GetLow(), BIGENERGY, boost::bind(&CollectionInterpolant::InterpolPropDecay, this, boost::cref(particle), _1), order_of_interpolation, false, false, true, order_of_interpolation, false, false, false);
-        interpol_prop_decay_diff_       =   new Interpolant(NUM3, particle.GetLow(), BIGENERGY, boost::bind(&CollectionInterpolant::FunctionToPropIntegralDecay, this, boost::cref(particle), _1), order_of_interpolation, false, false, true, order_of_interpolation, false, false, false);
-        interpol_prop_interaction_      =   new Interpolant(NUM3, particle.GetLow(), BIGENERGY, boost::bind(&CollectionInterpolant::InterpolPropInteraction, this, boost::cref(particle), _1), order_of_interpolation, false, false, true, order_of_interpolation, false, false, false);
-        interpol_prop_interaction_diff_ =   new Interpolant(NUM3, particle.GetLow(), BIGENERGY, boost::bind(&CollectionInterpolant::FunctionToPropIntegralInteraction, this, boost::cref(particle), _1), order_of_interpolation, false, false, true, order_of_interpolation, false, false, false);
+        interpol_prop_decay_            =   new Interpolant(NUM3, particle.GetLow(), BIGENERGY, boost::bind(&SectorInterpolant::InterpolPropDecay, this, boost::cref(particle), _1), order_of_interpolation, false, false, true, order_of_interpolation, false, false, false);
+        interpol_prop_decay_diff_       =   new Interpolant(NUM3, particle.GetLow(), BIGENERGY, boost::bind(&SectorInterpolant::FunctionToPropIntegralDecay, this, boost::cref(particle), _1), order_of_interpolation, false, false, true, order_of_interpolation, false, false, false);
+        interpol_prop_interaction_      =   new Interpolant(NUM3, particle.GetLow(), BIGENERGY, boost::bind(&SectorInterpolant::InterpolPropInteraction, this, boost::cref(particle), _1), order_of_interpolation, false, false, true, order_of_interpolation, false, false, false);
+        interpol_prop_interaction_diff_ =   new Interpolant(NUM3, particle.GetLow(), BIGENERGY, boost::bind(&SectorInterpolant::FunctionToPropIntegralInteraction, this, boost::cref(particle), _1), order_of_interpolation, false, false, true, order_of_interpolation, false, false, false);
 
     }
 
@@ -522,7 +522,7 @@ void CollectionInterpolant::InitInterpolation(const PROPOSALParticle& particle, 
 }
 
 // ------------------------------------------------------------------------- //
-void CollectionInterpolant::InitTimeInterpolation(const PROPOSALParticle& particle, std::string filepath, bool raw)
+void SectorInterpolant::InitTimeInterpolation(const PROPOSALParticle& particle, std::string filepath, bool raw)
 {
     bool reading_worked =   true;
     bool storing_failed =   false;
@@ -621,8 +621,8 @@ void CollectionInterpolant::InitTimeInterpolation(const PROPOSALParticle& partic
 
                 double order_of_interpolation = collection_def_.order_of_interpolation;
 
-                interpol_time_particle_         =   new Interpolant(NUM3, particle.GetLow(), BIGENERGY, boost::bind(&CollectionInterpolant::FunctionToTimeIntegral, this, boost::cref(particle), _1), order_of_interpolation, false, false, true, order_of_interpolation, false, false, false);
-                interpol_time_particle_diff_    =   new Interpolant(NUM3, particle.GetLow(), BIGENERGY, boost::bind(&CollectionInterpolant::FunctionToPropIntegralInteraction, this, boost::cref(particle), _1), order_of_interpolation, false, false, true, order_of_interpolation, false, false, false);
+                interpol_time_particle_         =   new Interpolant(NUM3, particle.GetLow(), BIGENERGY, boost::bind(&SectorInterpolant::FunctionToTimeIntegral, this, boost::cref(particle), _1), order_of_interpolation, false, false, true, order_of_interpolation, false, false, false);
+                interpol_time_particle_diff_    =   new Interpolant(NUM3, particle.GetLow(), BIGENERGY, boost::bind(&SectorInterpolant::FunctionToPropIntegralInteraction, this, boost::cref(particle), _1), order_of_interpolation, false, false, true, order_of_interpolation, false, false, false);
 
                 interpol_time_particle_->Save(output,raw);
                 interpol_time_particle_diff_->Save(output,raw);
@@ -641,8 +641,8 @@ void CollectionInterpolant::InitTimeInterpolation(const PROPOSALParticle& partic
     {
         double order_of_interpolation = collection_def_.order_of_interpolation;
 
-        interpol_time_particle_         =   new Interpolant(NUM3, particle.GetLow(), BIGENERGY, boost::bind(&CollectionInterpolant::FunctionToTimeIntegral, this, boost::cref(particle), _1), order_of_interpolation, false, false, true, order_of_interpolation, false, false, false);
-        interpol_time_particle_diff_    =   new Interpolant(NUM3, particle.GetLow(), BIGENERGY, boost::bind(&CollectionInterpolant::FunctionToPropIntegralInteraction, this, boost::cref(particle), _1), order_of_interpolation, false, false, true, order_of_interpolation, false, false, false);
+        interpol_time_particle_         =   new Interpolant(NUM3, particle.GetLow(), BIGENERGY, boost::bind(&SectorInterpolant::FunctionToTimeIntegral, this, boost::cref(particle), _1), order_of_interpolation, false, false, true, order_of_interpolation, false, false, false);
+        interpol_time_particle_diff_    =   new Interpolant(NUM3, particle.GetLow(), BIGENERGY, boost::bind(&SectorInterpolant::FunctionToPropIntegralInteraction, this, boost::cref(particle), _1), order_of_interpolation, false, false, true, order_of_interpolation, false, false, false);
 
     }
 }
@@ -652,41 +652,41 @@ void CollectionInterpolant::InitTimeInterpolation(const PROPOSALParticle& partic
 // ------------------------------------------------------------------------- //
 
 // ------------------------------------------------------------------------- //
-double CollectionInterpolant::FunctionToBuildInterpolant(const PROPOSALParticle& particle, double energy)
+double SectorInterpolant::FunctionToBuildInterpolant(const PROPOSALParticle& particle, double energy)
 {
     Integral integral(IROMB, IMAXS, IPREC2);
 
-    return integral.Integrate(energy, particle.GetLow(), boost::bind(&CollectionInterpolant::FunctionToIntegral, this, boost::cref(particle), _1),4);
+    return integral.Integrate(energy, particle.GetLow(), boost::bind(&SectorInterpolant::FunctionToIntegral, this, boost::cref(particle), _1),4);
 }
 
 // ------------------------------------------------------------------------- //
-double CollectionInterpolant::InterpolPropDecay(const PROPOSALParticle& particle, double energy)
+double SectorInterpolant::InterpolPropDecay(const PROPOSALParticle& particle, double energy)
 {
     Integral integral(IROMB, IMAXS, IPREC2);
 
-    return -integral.Integrate(energy, BIGENERGY, boost::bind(&CollectionInterpolant::FunctionToPropIntegralDecay, this, boost::cref(particle), _1),4);
+    return -integral.Integrate(energy, BIGENERGY, boost::bind(&SectorInterpolant::FunctionToPropIntegralDecay, this, boost::cref(particle), _1),4);
 }
 
 
 // ------------------------------------------------------------------------- //
-double CollectionInterpolant::InterpolPropInteraction(const PROPOSALParticle& particle, double energy)
+double SectorInterpolant::InterpolPropInteraction(const PROPOSALParticle& particle, double energy)
 {
     Integral integral(IROMB, IMAXS, IPREC2);
 
     if(up_)
     {
-        return integral.Integrate(energy, particle.GetLow(), boost::bind(&CollectionInterpolant::FunctionToPropIntegralInteraction, this, boost::cref(particle), _1),4);
+        return integral.Integrate(energy, particle.GetLow(), boost::bind(&SectorInterpolant::FunctionToPropIntegralInteraction, this, boost::cref(particle), _1),4);
     }
     else
     {
-        return -integral.Integrate(energy, BIGENERGY, boost::bind(&CollectionInterpolant::FunctionToPropIntegralInteraction, this, boost::cref(particle), _1),4);
+        return -integral.Integrate(energy, BIGENERGY, boost::bind(&SectorInterpolant::FunctionToPropIntegralInteraction, this, boost::cref(particle), _1),4);
     }
 }
 
 // ------------------------------------------------------------------------- //
-double CollectionInterpolant::InterpolTimeParticleDiff(const PROPOSALParticle& particle, double energy)
+double SectorInterpolant::InterpolTimeParticleDiff(const PROPOSALParticle& particle, double energy)
 {
     Integral integral(IROMB, IMAXS, IPREC2);
 
-    return integral.Integrate(energy, particle.GetLow(), boost::bind(&CollectionInterpolant::FunctionToTimeIntegral, this, boost::cref(particle), _1),4);
+    return integral.Integrate(energy, particle.GetLow(), boost::bind(&SectorInterpolant::FunctionToTimeIntegral, this, boost::cref(particle), _1),4);
 }

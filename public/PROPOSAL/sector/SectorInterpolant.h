@@ -1,23 +1,23 @@
 
 #pragma once
 
-#include "PROPOSAL/sector/Collection.h"
+#include "PROPOSAL/sector/Sector.h"
 #include "PROPOSAL/math/Interpolant.h"
 
 namespace PROPOSAL {
 
-class CollectionInterpolant : public Collection
+class SectorInterpolant : public Sector
 {
     public:
-    CollectionInterpolant();
-    CollectionInterpolant(const Medium&,
+    SectorInterpolant();
+    SectorInterpolant(const Medium&,
                           const Geometry&,
                           const EnergyCutSettings&,
-                          const CollectionDef& def = CollectionDef());
-    CollectionInterpolant(const CollectionInterpolant&);
-    virtual ~CollectionInterpolant();
+                          const SectorDef& def = SectorDef());
+    SectorInterpolant(const SectorInterpolant&);
+    virtual ~SectorInterpolant();
 
-    virtual Collection* clone() const { return new CollectionInterpolant(*this); }
+    virtual Sector* clone() const { return new SectorInterpolant(*this); }
 
 
     double Propagate(PROPOSALParticle&, double distance);
@@ -32,7 +32,7 @@ class CollectionInterpolant : public Collection
 
     private:
 
-    CollectionInterpolant& operator=(const CollectionInterpolant&); // Undefined & not allowed
+    SectorInterpolant& operator=(const SectorInterpolant&); // Undefined & not allowed
 
     // --------------------------------------------------------------------- //
     // Private methods
