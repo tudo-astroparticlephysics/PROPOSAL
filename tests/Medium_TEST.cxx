@@ -3,7 +3,8 @@
 
 #include "gtest/gtest.h"
 
-#include "PROPOSAL/Medium.h"
+#include "PROPOSAL/medium/Medium.h"
+#include "PROPOSAL/medium/MediumFactory.h"
 
 using namespace PROPOSAL;
 
