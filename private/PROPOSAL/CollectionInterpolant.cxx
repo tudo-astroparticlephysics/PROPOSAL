@@ -12,6 +12,7 @@
 // #include "PROPOSAL/Constants.h"
 
 using namespace PROPOSAL;
+using namespace std;
 
 CollectionInterpolant::CollectionInterpolant()
     : Collection()

@@ -32,12 +32,13 @@ class ScatteringFirstOrder : public Scattering
     virtual Scattering* clone() const { return new ScatteringFirstOrder(*this); }
     static Scattering* create() { return new ScatteringFirstOrder(); }
 
-    void Scatter(PROPOSALParticle&, const std::vector<CrossSections*>&, double dr, double ei, double ef);
     // Do nothing, not interpolation for scattering moliere
     virtual void EnableInterpolation(const PROPOSALParticle&, const std::vector<CrossSections*>&, std::string path = "");
     virtual void DisableInterpolation();
 
+
     private:
+    RandomAngles CalculateRandomAngle(const PROPOSALParticle&, const std::vector<CrossSections*>&, double dr, double ei, double ef);
     ScatteringFirstOrder& operator=(const ScatteringFirstOrder&); // Undefined & not allowed
 
     double CalculateTheta0(const PROPOSALParticle&, const Medium&, double dr);
