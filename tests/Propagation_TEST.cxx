@@ -8,7 +8,7 @@
 #include "gtest/gtest.h"
 
 #include "PROPOSAL/Propagator.h"
-#include "PROPOSAL/sector/CollectionInterpolant.h"
+#include "PROPOSAL/sector/SectorInterpolant.h"
 #include "PROPOSAL/geometry/Geometry.h"
 // #include "PROPOSAL/PROPOSALParticle.h"
 
