@@ -22,113 +22,114 @@ using namespace PROPOSAL;
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-void ScatteringMoliere::Scatter(PROPOSALParticle& particle,
-                                const std::vector<CrossSections*>& cross_sections,
-                                double dr,
-                                double ei,
-                                double ef)
+
+Scattering::RandomAngles ScatteringMoliere::CalculateRandomAngle(const PROPOSALParticle& particle, const std::vector<CrossSections*>& cross_sections, double dr, double ei, double ef)
 {
     (void)ei;
     (void)ef;
 
-    double rnd1, rnd2, sx, tx, sy, ty, sz, tz;
 
-    dx_         = dr;
-    Medium* med = cross_sections.at(0)->GetMedium();
+    double A = 0.;
 
-    numComp_ = med->GetNumComponents();
+    std::vector<double> ki;     // number of atoms in molecule of different components
+    std::vector<double> Ai;     // atomic number of different components
 
-    p_ = particle.GetMomentum();
-    m_ = particle.GetMass();
+    Medium* medium = cross_sections.at(0)->GetMedium();
 
+    double momentum = particle.GetMomentum();  // momentum in MeV/c
+    double mass = particle.GetMass();          // mass in MeV/c²
+
+    numComp_ = medium->GetNumComponents();
     Zi_.resize(numComp_);
-    ki_.resize(numComp_);
-    Ai_.resize(numComp_);
+    ki.resize(numComp_);
+    Ai.resize(numComp_);
 
     for (int i = 0; i < numComp_; i++)
     {
-        Components::Component* component = med->GetComponents().at(i);
-        Zi_.at(i)                        = component->GetNucCharge();
-        ki_.at(i)                        = component->GetAtomInMolecule();
-        Ai_.at(i)                        = component->GetAtomicNum();
+        Components::Component* component = medium->GetComponents().at(i);
+        Zi_.at(i) = component->GetNucCharge();
+        ki.at(i) = component->GetAtomInMolecule();
+        Ai.at(i) = component->GetAtomicNum();
+
+        A += ki.at(i)*Ai.at(i);
     }
 
-    CalcBetaSq();
+    double beta_Sq = 1./( 1.+mass*mass/(momentum*momentum) ); //beta² = v²/c²
+    double chi_0 = 0.;
+    double ZSq_average = 0.;
+    double A_average = 0.;
 
-    CalcWeight();
+    vector<double> chi_A_Sq; // screening angle² in rad²
+    chi_A_Sq.resize(numComp_);
+    weight_.resize(numComp_);
 
-    CalcChi0();
-    CalcChiASq();
-    CalcChiCSq(*med);
-    CalcB();
-
-    //----------------------------------------------------------------------------//
-
-    //  Check for inappropriate values of B. If B < 4.5 it is practical to assume no deviation.
-    bool checkB = true;
-
-    for (int i = 0; i < numComp_; i++)
+    for(int i = 0; i < numComp_; i++)
     {
-        if ((B_.at(i) < 4.5) || B_.at(i) != B_.at(i))
-            checkB = false;
+        weight_.at(i) = ki.at(i)*Ai.at(i)/A;
+
+        // Calculate Chi_0
+        chi_0 = ( ME*ALPHA*pow(Zi_.at(i)*128./(9.*PI*PI), 1./3.) )/momentum ;
+        // Calculate Chi_a^2
+        chi_A_Sq.at(i) = chi_0*chi_0*( 1.13+3.76*ALPHA*ALPHA*Zi_.at(i)*Zi_.at(i)/beta_Sq );
+
+        // Calculate A_average and Z^2_average for Chi_c^2
+        //if case of an electron, replace Z² by Z(Z+1) to into account scatterings
+        //on atomic electrons in the medium
+        if(mass == ME) ZSq_average += weight_.at(i)*Zi_.at(i)*(Zi_.at(i)+1.);
+        else ZSq_average += weight_.at(i)*Zi_.at(i)*Zi_.at(i);
+        A_average += weight_.at(i)*Ai.at(i);
+    }
+    // Calculate Chi_c^2
+    chiCSq_ = ( (4.*PI*NA*ALPHA*ALPHA*HBAR*HBAR*SPEED*SPEED)
+                * (medium->GetMassDensity()*medium->GetRho()*dr)
+                / (momentum*momentum*beta_Sq) )
+            * ( ZSq_average/A_average );
+
+    // Claculate B
+    B_.resize(numComp_);
+    Scattering::RandomAngles random_angles;
+    
+    for(int i = 0; i < numComp_; i++)
+    {
+        //calculate B-ln(B) = ln(chi_c^2/chi_a^2)+1-2*C via Newton-Raphson method
+        double xn = 15.;
+
+        for(int n = 0; n < 6; n++)
+        {
+            xn = xn*( (1.-log(xn)-log(chiCSq_/chi_A_Sq.at(i))-1.+2.*C)/(1.-xn) );
+        }
+
+        //  Check for inappropriate values of B. If B < 4.5 it is practical to assume no deviation.
+        if( (xn < 4.5) || xn != xn )
+        {
+            random_angles.sx = 0;
+            random_angles.sy = 0;
+            random_angles.tx = 0;
+            random_angles.ty = 0;
+            return random_angles;
+        }
+
+        B_.at(i) = xn;
     }
 
-    if (checkB)
-    {
-        rnd1 = GetRandom();
-        rnd2 = GetRandom();
+    double rnd1,rnd2;
 
-        sx = (rnd1 / SQRT3 + rnd2) / 2;
-        tx = rnd2;
+    rnd1 = GetRandom();
+    rnd2 = GetRandom();
 
-        rnd1 = GetRandom();
-        rnd2 = GetRandom();
+    random_angles.sx = (rnd1/SQRT3+rnd2)/2;
+    random_angles.tx = rnd2;
 
-        sy = (rnd1 / SQRT3 + rnd2) / 2;
-        ty = rnd2;
+    rnd1 = GetRandom();
+    rnd2 = GetRandom();
 
-        sz = sqrt(max(1. - (sx * sx + sy * sy), 0.));
-        tz = sqrt(max(1. - (tx * tx + ty * ty), 0.));
+    random_angles.sy = (rnd1/SQRT3+rnd2)/2;
+    random_angles.ty = rnd2;
 
-    } else
-    {
-        sx = 0.;
-        sy = 0.;
-        sz = 1.;
-
-        tx = 0.;
-        ty = 0.;
-        tz = 1.;
-    }
-
-    Vector3D position;
-    Vector3D direction;
-
-    long double sinth, costh, sinph, cosph;
-    sinth = (long double)sin(particle.GetDirection().GetTheta());
-    costh = (long double)cos(particle.GetDirection().GetTheta());
-    sinph = (long double)sin(particle.GetDirection().GetPhi());
-    cosph = (long double)cos(particle.GetDirection().GetPhi());
-
-    position = particle.GetPosition();
-
-    // Rotation towards all tree axes
-    direction = sz * particle.GetDirection();
-    direction = direction + sx * Vector3D(costh * cosph, costh * sinph, -sinth);
-    direction = direction + sy * Vector3D(-sinph, cosph, 0.);
-
-    position = position + dr * direction;
-
-    // Rotation towards all tree axes
-    direction = tz * particle.GetDirection();
-    direction = direction + tx * Vector3D(costh * cosph, costh * sinph, -sinth);
-    direction = direction + ty * Vector3D(-sinph, cosph, 0.);
-
-    direction.CalculateSphericalCoordinates();
-
-    particle.SetPosition(position);
-    particle.SetDirection(direction);
+    return random_angles;
 }
+
+
 
 void ScatteringMoliere::EnableInterpolation(const PROPOSALParticle& particle,
                                             const std::vector<CrossSections*>& cross_sections,
@@ -159,17 +160,9 @@ ScatteringMoliere::ScatteringMoliere()
 
 ScatteringMoliere::ScatteringMoliere(const ScatteringMoliere& scattering)
     : Scattering()
-    , dx_(scattering.dx_)
-    , betaSq_(scattering.betaSq_)
-    , p_(scattering.p_)
-    , m_(scattering.m_)
     , numComp_(scattering.numComp_)
     , Zi_(scattering.Zi_)
-    , ki_(scattering.ki_)
-    , Ai_(scattering.Ai_)
     , weight_(scattering.weight_)
-    , chi0_(scattering.chi0_)
-    , chiASq_(scattering.chiASq_)
     , chiCSq_(scattering.chiCSq_)
     , B_(scattering.B_)
 {
@@ -275,101 +268,6 @@ ScatteringMoliere::~ScatteringMoliere()
 //-------------------------private member functions---------------------------//
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
-
-//----------------------------------------------------------------------------//
-//---------------------------calculate parameters-----------------------------//
-//----------------------------------------------------------------------------//
-
-void ScatteringMoliere::CalcBetaSq()
-{
-    betaSq_ = 1. / (1. + m_ * m_ / (p_ * p_));
-}
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-void ScatteringMoliere::CalcWeight()
-{
-    weight_.resize(numComp_);
-
-    double A = 0.;
-
-    for (int i = 0; i < numComp_; i++)
-    {
-        A += ki_.at(i) * Ai_.at(i);
-    }
-
-    for (int i = 0; i < numComp_; i++)
-    {
-        weight_.at(i) = ki_.at(i) * Ai_.at(i) / A;
-    }
-}
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-void ScatteringMoliere::CalcChi0()
-{
-    chi0_.resize(numComp_);
-
-    for (int i = 0; i < numComp_; i++)
-    {
-        chi0_.at(i) = (ME * ALPHA * pow(Zi_.at(i) * 128. / (9. * PI * PI), 1. / 3.)) / p_;
-    }
-}
-
-//----------------------------------------------------------------------------//
-
-void ScatteringMoliere::CalcChiASq()
-{
-    chiASq_.resize(numComp_);
-
-    for (int i = 0; i < numComp_; i++)
-    {
-        chiASq_.at(i) = chi0_.at(i) * chi0_.at(i) * (1.13 + 3.76 * ALPHA * ALPHA * Zi_.at(i) * Zi_.at(i) / betaSq_);
-    }
-}
-
-//----------------------------------------------------------------------------//
-
-void ScatteringMoliere::CalcChiCSq(const Medium& med)
-{
-    double y1 = 0.;
-    double y2 = 0.;
-
-    for (int i = 0; i < numComp_; i++)
-    {
-        // if case of an electron, replace Z² by Z(Z+1) to into account scatterings
-        // on atomic electrons in the medium
-        if (m_ == ME)
-            y1 += weight_.at(i) * Zi_.at(i) * (Zi_.at(i) + 1.);
-        else
-            y1 += weight_.at(i) * Zi_.at(i) * Zi_.at(i);
-        y2 += weight_.at(i) * Ai_.at(i);
-    }
-
-    chiCSq_ = ((4. * PI * NA * ALPHA * ALPHA * HBAR * HBAR * SPEED * SPEED) *
-               (med.GetMassDensity() * med.GetRho() * dx_) / (p_ * p_ * betaSq_)) *
-              (y1 / y2);
-}
-
-void ScatteringMoliere::CalcB()
-{
-    B_.resize(numComp_);
-
-    for (int i = 0; i < numComp_; i++)
-    {
-        // calculate B-ln(B) = ln(chi_c^2/chi_a^2)+1-2*C via Newton-Raphson method
-        double xn = 15.;
-
-        for (int n = 0; n < 6; n++)
-        {
-            xn = xn * ((1. - log(xn) - log(chiCSq_ / chiASq_.at(i)) - 1. + 2. * C) / (1. - xn));
-        }
-
-        B_.at(i) = xn;
-    }
-}
 
 //----------------------------------------------------------------------------//
 //--------------------------calculate distribution----------------------------//
