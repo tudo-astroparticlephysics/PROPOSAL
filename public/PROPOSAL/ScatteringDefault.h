@@ -27,16 +27,17 @@ class ScatteringDefault: public Scattering
     // bool operator!=(const ScatteringDefault& scattering) const;
     // void swap(ScatteringDefault& scattering);
 
-    void Scatter(PROPOSALParticle&, const std::vector<CrossSections*>&, double dr, double ei, double ef);
+    void EnableInterpolation(const PROPOSALParticle&, const std::vector<CrossSections*>&, std::string path = "");
+    void DisableInterpolation();
+
+
+    private:
+    RandomAngles CalculateRandomAngle(const PROPOSALParticle&, const std::vector<CrossSections*>&, double dr, double ei, double ef);
     long double CalculateTheta0(const PROPOSALParticle&,
                                 const std::vector<CrossSections*>&,
                                 double dr,
                                 double ei,
                                 double ef);
-    void EnableInterpolation(const PROPOSALParticle&, const std::vector<CrossSections*>&, std::string path = "");
-    void DisableInterpolation();
-
-    private:
     ScatteringDefault& operator=(const ScatteringDefault&); // Undefined & not allowed
 
     double FunctionToIntegral(const PROPOSALParticle&, const std::vector<CrossSections*>&, double energy);

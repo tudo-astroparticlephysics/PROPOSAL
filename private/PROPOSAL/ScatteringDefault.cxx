@@ -213,57 +213,28 @@ long double ScatteringDefault::CalculateTheta0(const PROPOSALParticle& particle,
     return min(aux, cutoff);
 }
 
-void ScatteringDefault::Scatter(PROPOSALParticle& particle, const std::vector<CrossSections*>& cross_sections, double dr, double ei, double ef)
+//----------------------------------------------------------------------------//
+
+Scattering::RandomAngles ScatteringDefault::CalculateRandomAngle(const PROPOSALParticle& particle, const std::vector<CrossSections*>& cross_sections, double dr, double ei, double ef)
 {
-    // Implement the Molie ScatteringDefault here see PROPOSALParticle::advance of old version
-    double Theta0,rnd1,rnd2,sx,tx,sy,ty,sz,tz;
+    double Theta0,rnd1,rnd2;
+    Scattering::RandomAngles random_angles;
 
-    Theta0     =   CalculateTheta0(particle, cross_sections, dr, ei, ef);
-
-    // cerr << "scatter called" << endl;
+    Theta0 = CalculateTheta0(particle, cross_sections, dr, ei, ef);
 
     rnd1 = SQRT2*Theta0*erfInv( 2.*(RandomGenerator::Get().RandomDouble()-0.5) );
     rnd2 = SQRT2*Theta0*erfInv( 2.*(RandomGenerator::Get().RandomDouble()-0.5) );
 
-    sx      =   (rnd1/SQRT3+rnd2)/2;
-    tx      =   rnd2;
+    random_angles.sx = (rnd1/SQRT3+rnd2)/2;
+    random_angles.tx = rnd2;
 
     rnd1 = SQRT2*Theta0*erfInv(2*(RandomGenerator::Get().RandomDouble()-0.5));
     rnd2 = SQRT2*Theta0*erfInv(2*(RandomGenerator::Get().RandomDouble()-0.5));
 
-    sy      =   (rnd1/SQRT3+rnd2)/2;
-    ty      =   rnd2;
+    random_angles.sy = (rnd1/SQRT3+rnd2)/2;
+    random_angles.ty = rnd2;
 
-    sz      =   sqrt(max(1.-(sx*sx+sy*sy), 0.));
-    tz      =   sqrt(max(1.-(tx*tx+ty*ty), 0.));
-
-    Vector3D position;
-    Vector3D direction;
-
-    long double sinth, costh,sinph,cosph;
-    sinth = (long double) sin(particle.GetDirection().GetTheta());
-    costh = (long double) cos(particle.GetDirection().GetTheta());
-    sinph = (long double) sin(particle.GetDirection().GetPhi());
-    cosph = (long double) cos(particle.GetDirection().GetPhi());
-
-    position = particle.GetPosition();
-
-    // Rotation towards all tree axes
-    direction = sz*particle.GetDirection();
-    direction = direction + sx*Vector3D(costh*cosph, costh*sinph, -sinth);
-    direction = direction + sy*Vector3D(-sinph, cosph, 0.);
-
-    position = position + dr*direction;
-
-    // Rotation towards all tree axes
-    direction = tz*particle.GetDirection();
-    direction = direction + tx*Vector3D(costh*cosph, costh*sinph, -sinth);
-    direction = direction + ty*Vector3D(-sinph, cosph, 0.);
-
-    direction.CalculateSphericalCoordinates();
-
-    particle.SetPosition(position);
-    particle.SetDirection(direction);
+    return random_angles;
 }
 
 //----------------------------------------------------------------------------//
