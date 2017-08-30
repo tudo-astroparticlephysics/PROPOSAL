@@ -43,6 +43,10 @@ ScatteringFactory::ScatteringFactory()
     Register("moliere", &ScatteringMoliere::create);
     Register("moliere_first_order", &ScatteringFirstOrder::create);
 
+    Register("default", ScatteringModel::Default);
+    Register("moliere", ScatteringModel::Moliere);
+    Register("moliere_first_order", ScatteringModel::MoliereFirstOrder);
+
     Register(ScatteringModel::Default, &ScatteringDefault::create);
     Register(ScatteringModel::Moliere, &ScatteringMoliere::create);
     Register(ScatteringModel::MoliereFirstOrder, &ScatteringFirstOrder::create);
@@ -52,6 +56,7 @@ ScatteringFactory::~ScatteringFactory()
 {
     scattering_map_str_.clear();
     scattering_map_enum_.clear();
+    map_string_to_enum.clear();
 }
 
 void ScatteringFactory::Register(const std::string& name, RegisterFunction create)
@@ -62,6 +67,11 @@ void ScatteringFactory::Register(const std::string& name, RegisterFunction creat
 void ScatteringFactory::Register(ScatteringModel::Enum model, RegisterFunction create)
 {
     scattering_map_enum_[model] = create;
+}
+
+void ScatteringFactory::Register(const std::string& name, ScatteringModel::Enum model)
+{
+    map_string_to_enum[name] = model;
 }
 
 Scattering* ScatteringFactory::CreateScattering(const std::string& name)
@@ -89,5 +99,19 @@ Scattering* ScatteringFactory::CreateScattering(ScatteringModel::Enum model)
     } else
     {
         log_fatal("Scattering %s not registerd!", typeid(model).name());
+    }
+}
+
+ScatteringFactory::ScatteringModel::Enum ScatteringFactory::GetEnumFromString(const std::string& name)
+{
+    std::string name_lower = boost::algorithm::to_lower_copy(name);
+    MapStringToEnum::iterator it = map_string_to_enum.find(name_lower);
+
+    if (it != map_string_to_enum.end())
+    {
+        return it->second;
+    } else
+    {
+        log_fatal("Scattering %s not registerd!", name.c_str());
     }
 }

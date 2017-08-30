@@ -10,6 +10,9 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
+
 #include "PROPOSAL/Propagator.h"
 #include "PROPOSAL/CollectionIntegral.h"
 #include "PROPOSAL/CollectionInterpolant.h"
@@ -27,6 +30,204 @@ using namespace PROPOSAL;
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
+const double Propagator::global_ecut_inside_ = 500;
+const double Propagator::global_ecut_infront_ = -1;
+const double Propagator::global_ecut_behind_ = -1;
+const double Propagator::global_vcut_inside_ = -1;
+const double Propagator::global_vcut_infront_ = 0.001;
+const double Propagator::global_vcut_behind_ = -1;
+const double Propagator::global_cont_inside_ = false;
+const double Propagator::global_cont_infront_ = true;
+const double Propagator::global_cont_behind_ = false;
+
+// ------------------------------------------------------------------------- //
+// Constructors & destructor
+// ------------------------------------------------------------------------- //
+
+Propagator::Propagator()
+    : seed_(1)
+    , current_collection_(NULL)
+    , detector_(new Sphere(Vector3D(), 1e18, 0))
+{
+    CollectionDef col_def;
+    col_def.location = 1; // Inside the detector
+
+    current_collection_ = new CollectionInterpolant(
+        Ice(), *detector_, EnergyCutSettings(global_ecut_inside_, global_vcut_inside_), col_def);
+
+    collections_.push_back(current_collection_);
+}
+
+Propagator::Propagator(std::vector<Collection*>& collections, const Geometry& geometry)
+    : seed_(1)
+    , current_collection_(NULL)
+    , detector_(geometry.clone())
+{
+    for (std::vector<Collection*>::const_iterator iter = collections.begin(); iter != collections.end(); ++iter)
+    {
+        collections_.push_back((*iter)->clone());
+    }
+    // TODO(mario): exeption if size = 0 Sat 2017/08/26
+    current_collection_ = collections_.at(0);
+}
+
+Propagator::Propagator(const std::string& config_file)
+    : seed_(1)
+    , current_collection_(NULL)
+    , detector_(NULL)
+{
+    double global_ecut_inside  = global_ecut_inside_;
+    double global_ecut_infront = global_ecut_infront_;
+    double global_ecut_behind  = global_ecut_behind_;
+
+    double global_vcut_inside  = global_vcut_inside_;
+    double global_vcut_infront = global_vcut_infront_;
+    double global_vcut_behind  = global_vcut_behind_;
+
+    bool global_cont_inside  = global_cont_inside_;
+    bool global_cont_infront = global_cont_infront_;
+    bool global_cont_behind  = global_cont_behind_;
+
+    //TODO(mario): will be changend when x sectoin are polymorphic Tue 2017/08/29
+    int brems = 11;
+    int photo = -36;
+
+    bool interpolate = true;
+
+    std::string scattering = "moliere";
+
+    // Create the json parser
+    boost::property_tree::ptree pt_json;
+    boost::property_tree::json_parser::read_json(config_file, pt_json);
+
+    // Read in global options
+    SetMember(seed_, "global.seed", pt_json);
+    SetMember(global_ecut_inside, "global.ecut_inside", pt_json);
+    SetMember(global_ecut_infront, "global.ecut_infront", pt_json);
+    SetMember(global_ecut_behind, "global.ecut_behind", pt_json);
+    SetMember(global_vcut_inside, "global.vcut_inside", pt_json);
+    SetMember(global_vcut_infront, "global.vcut_infront", pt_json);
+    SetMember(global_vcut_behind, "global.vcut_behind", pt_json);
+    SetMember(global_cont_inside, "global.cont_inside", pt_json);
+    SetMember(global_cont_infront, "global.cont_infront", pt_json);
+    SetMember(global_cont_behind, "global.cont_behind", pt_json);
+
+    SetMember(brems, "global.brems", pt_json);
+    SetMember(photo, "global.photo", pt_json);
+
+    SetMember(interpolate, "global.interpolate", pt_json);
+
+    // Read in the detector geometry
+    detector_ = GeometryFactory::Get().CreateGeometry(pt_json.get_child("detector"));
+
+    // Read in global sector definition
+    CollectionDef col_def_global;
+
+    SetMember(col_def_global.brems_multiplier, "global.brems_multiplier", pt_json);
+    SetMember(col_def_global.photo_multiplier, "global.photo_multiplier", pt_json);
+    SetMember(col_def_global.ioniz_multiplier, "global.ioniz_multiplier", pt_json);
+    SetMember(col_def_global.epair_multiplier, "global.epair_multiplier", pt_json);
+    SetMember(col_def_global.lpm_effect_enabled, "global.lpm", pt_json);
+    SetMember(col_def_global.do_exact_time_calculation, "global.exact_time", pt_json);
+    SetMember(col_def_global.path_to_tables, "global.path_to_tables", pt_json);
+    SetMember(col_def_global.raw, "global.raw", pt_json);
+
+    col_def_global.scattering_model =
+        ScatteringFactory::Get().GetEnumFromString(pt_json.get<std::string>("global.scattering"));
+
+    // Read in all sector definitions
+    boost::property_tree::ptree sectors = pt_json.get_child("sectors");
+
+    for (boost::property_tree::ptree::const_iterator it = sectors.begin(); it != sectors.end(); ++it)
+    {
+        Medium* med        = MediumFactory::Get().CreateMedium(it->second.get<std::string>("medium"));
+        Geometry* geometry = GeometryFactory::Get().CreateGeometry(it->second.get_child("geometry"));
+        geometry->SetHirarchy(it->second.get<unsigned int>("hirarchy"));
+
+        // Use global options in case they will be not overriden
+        CollectionDef col_def_infront = col_def_global;
+        col_def_infront.location = 0;
+
+        CollectionDef col_def_inside  = col_def_global;
+        col_def_inside.location = 1;
+
+        CollectionDef col_def_behind  = col_def_global;
+        col_def_behind.location = 2;
+
+        double density_correction = it->second.get<double>("density_correction");
+
+        col_def_infront.density_correction = density_correction;
+        col_def_inside.density_correction  = density_correction;
+        col_def_behind.density_correction  = density_correction;
+
+        EnergyCutSettings cuts_infront;
+        EnergyCutSettings cuts_inside;
+        EnergyCutSettings cuts_behind;
+
+        boost::optional<const boost::property_tree::ptree&> child_cuts_infront =
+            it->second.get_child_optional("cuts_infront");
+        if (child_cuts_infront)
+        {
+            cuts_infront.SetEcut(child_cuts_infront.get().get<double>("e_cut"));
+            cuts_infront.SetVcut(child_cuts_infront.get().get<double>("v_cut"));
+            col_def_infront.do_continuous_randomization_ = child_cuts_infront.get().get<bool>("cont_rand");
+
+        } else
+        {
+            cuts_infront.SetEcut(global_ecut_infront);
+            cuts_infront.SetVcut(global_vcut_infront);
+            col_def_infront.do_continuous_randomization_ = global_cont_infront;
+        }
+
+        boost::optional<const boost::property_tree::ptree&> child_cuts_inside =
+            it->second.get_child_optional("cuts_inside");
+        if (child_cuts_inside)
+        {
+            cuts_inside.SetEcut(child_cuts_inside.get().get<double>("e_cut"));
+            cuts_inside.SetVcut(child_cuts_inside.get().get<double>("v_cut"));
+            col_def_inside.do_continuous_randomization_ = child_cuts_inside.get().get<bool>("cont_rand");
+
+        } else
+        {
+            cuts_inside.SetEcut(global_ecut_inside);
+            cuts_inside.SetVcut(global_vcut_inside);
+            col_def_inside.do_continuous_randomization_ = global_cont_inside;
+        }
+
+        boost::optional<const boost::property_tree::ptree&> child_cuts_behind =
+            it->second.get_child_optional("cuts_behind");
+        if (child_cuts_behind)
+        {
+            cuts_behind.SetEcut(child_cuts_behind.get().get<double>("e_cut"));
+            cuts_behind.SetVcut(child_cuts_behind.get().get<double>("v_cut"));
+            col_def_behind.do_continuous_randomization_ = child_cuts_behind.get().get<bool>("cont_rand");
+
+        } else
+        {
+            cuts_behind.SetEcut(global_ecut_behind);
+            cuts_behind.SetVcut(global_vcut_behind);
+            col_def_behind.do_continuous_randomization_ = global_cont_behind;
+        }
+
+        if (interpolate)
+        {
+            collections_.push_back(new CollectionInterpolant(*med, *geometry, cuts_infront, col_def_infront));
+            collections_.push_back(new CollectionInterpolant(*med, *geometry, cuts_inside, col_def_inside));
+            collections_.push_back(new CollectionInterpolant(*med, *geometry, cuts_behind, col_def_behind));
+        } else
+        {
+            collections_.push_back(new CollectionIntegral(*med, *geometry, cuts_infront, col_def_infront));
+            collections_.push_back(new CollectionIntegral(*med, *geometry, cuts_inside, col_def_inside));
+            collections_.push_back(new CollectionIntegral(*med, *geometry, cuts_behind, col_def_behind));
+        }
+    }
+}
+
+// ------------------------------------------------------------------------- //
+// Public member functions
+// ------------------------------------------------------------------------- //
+
+// ------------------------------------------------------------------------- //
 std::vector<PROPOSALParticle*> Propagator::Propagate(PROPOSALParticle& particle, double MaxDistance_cm)
 {
     Output::getInstance().ClearSecondaryVector();
@@ -263,6 +464,149 @@ std::vector<PROPOSALParticle*> Propagator::Propagate(PROPOSALParticle& particle,
 
     return Output::getInstance().GetSecondarys();
 }
+
+// ------------------------------------------------------------------------- //
+void Propagator::ChooseCurrentCollection(Vector3D& particle_position, Vector3D& particle_direction)
+{
+    vector<unsigned int> crossed_collections;
+    crossed_collections.resize(0);
+
+    for(unsigned int i = 0 ; i < collections_.size() ; i++)
+    {
+        // collections_.at(i)->RestoreBackup_particle();
+
+        //TODO(mario): Is that ok to delete? Tue 2017/08/08
+        // if(particle_->GetType() != collections_.at(i)->GetParticle()->GetType())
+        // {
+        //     continue;
+        // }
+
+        if(detector_->IsInfront(particle_position, particle_direction))
+        {
+            if(collections_.at(i)->GetLocation() != 0)
+            {
+                continue;
+            }
+            else
+            {
+                if(collections_.at(i)->GetGeometry()->IsInside(particle_position, particle_direction))
+                {
+                    current_collection_ = collections_.at(i);
+                    crossed_collections.push_back(i);
+                }
+                else
+                {
+
+                }
+            }
+        }
+
+        else if(detector_->IsInside(particle_position, particle_direction))
+        {
+            if(collections_.at(i)->GetLocation() != 1)
+            {
+                continue;
+            }
+            else
+            {
+                if(collections_.at(i)->GetGeometry()->IsInside(particle_position, particle_direction))
+                {
+                    current_collection_ = collections_.at(i);
+                    crossed_collections.push_back(i);
+                }
+                else
+                {
+
+                }
+            }
+
+        }
+
+        else if(detector_->IsBehind(particle_position, particle_direction))
+        {
+            if(collections_.at(i)->GetLocation() != 2)
+            {
+                continue;
+            }
+            else
+            {
+                if(collections_.at(i)->GetGeometry()->IsInside(particle_position, particle_direction))
+                {
+                    current_collection_ = collections_.at(i);
+                    crossed_collections.push_back(i);
+                }
+                //The particle reached the border of all specified collections
+                else
+                {
+
+                }
+            }
+        }
+    }
+
+    //No process collection was found
+    if(crossed_collections.size() == 0)
+    {
+        current_collection_ = NULL;
+        log_fatal("No Cross Section was found!!!");
+    }
+
+
+    //Choose current collection when multiple collections are crossed!
+    //
+    //Choose by hirarchy of Geometry
+    //If same hirarchys are available the denser one is choosen
+    //If hirarchy and density are the same then the first found is taken.
+    //
+    for(unsigned int i = 0  ; i < crossed_collections.size() ;i++)
+    {
+        unsigned int ColNow     = crossed_collections.at(i);
+
+        //Current Hirachy is bigger -> Nothing to do!
+        //
+        if(current_collection_->GetGeometry()->GetHirarchy() >
+                collections_.at(ColNow)->GetGeometry()->GetHirarchy() )
+        {
+            continue;
+        }
+        //Current Hirachy is equal -> Look at the density!
+        //
+        else if( current_collection_->GetGeometry()->GetHirarchy() ==
+                 collections_.at(ColNow)->GetGeometry()->GetHirarchy() )
+        {
+            //Current Density is bigger or same -> Nothing to do!
+            //
+
+            if( current_collection_->GetMedium()->GetMassDensity() >=
+                    collections_.at(ColNow)->GetMedium()->GetMassDensity() )
+            {
+                continue;
+            }
+
+            //Current Density is smaller -> Set the new collection!
+            //
+            else
+            {
+                current_collection_ =  collections_.at(ColNow);
+            }
+
+        }
+
+        //Current Hirachy is smaller -> Set the new collection!
+        //
+        else
+        {
+            current_collection_ =  collections_.at(ColNow);
+        }
+    }
+
+    //TODO(mario): Not needed anymore Thu 2017/08/24
+    // if(current_collection_ != NULL)
+    // {
+    //     current_collection_->SetParticle(particle_);
+    // }
+}
+
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
@@ -523,147 +867,6 @@ std::vector<PROPOSALParticle*> Propagator::Propagate(PROPOSALParticle& particle,
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-
-void Propagator::ChooseCurrentCollection(Vector3D& particle_position, Vector3D& particle_direction)
-{
-    vector<unsigned int> crossed_collections;
-    crossed_collections.resize(0);
-
-    for(unsigned int i = 0 ; i < collections_.size() ; i++)
-    {
-        // collections_.at(i)->RestoreBackup_particle();
-
-        //TODO(mario): Is that ok to delete? Tue 2017/08/08
-        // if(particle_->GetType() != collections_.at(i)->GetParticle()->GetType())
-        // {
-        //     continue;
-        // }
-
-        if(detector_->IsInfront(particle_position, particle_direction))
-        {
-            if(collections_.at(i)->GetLocation() != 0)
-            {
-                continue;
-            }
-            else
-            {
-                if(collections_.at(i)->GetGeometry()->IsInside(particle_position, particle_direction))
-                {
-                    current_collection_ = collections_.at(i);
-                    crossed_collections.push_back(i);
-                }
-                else
-                {
-
-                }
-            }
-        }
-
-        else if(detector_->IsInside(particle_position, particle_direction))
-        {
-            if(collections_.at(i)->GetLocation() != 1)
-            {
-                continue;
-            }
-            else
-            {
-                if(collections_.at(i)->GetGeometry()->IsInside(particle_position, particle_direction))
-                {
-                    current_collection_ = collections_.at(i);
-                    crossed_collections.push_back(i);
-                }
-                else
-                {
-
-                }
-            }
-
-        }
-
-        else if(detector_->IsBehind(particle_position, particle_direction))
-        {
-            if(collections_.at(i)->GetLocation() != 2)
-            {
-                continue;
-            }
-            else
-            {
-                if(collections_.at(i)->GetGeometry()->IsInside(particle_position, particle_direction))
-                {
-                    current_collection_ = collections_.at(i);
-                    crossed_collections.push_back(i);
-                }
-                //The particle reached the border of all specified collections
-                else
-                {
-
-                }
-            }
-        }
-    }
-
-    //No process collection was found
-    if(crossed_collections.size() == 0)
-    {
-        current_collection_ = NULL;
-        log_fatal("No Cross Section was found!!!");
-    }
-
-
-    //Choose current collection when multiple collections are crossed!
-    //
-    //Choose by hirarchy of Geometry
-    //If same hirarchys are available the denser one is choosen
-    //If hirarchy and density are the same then the first found is taken.
-    //
-    for(unsigned int i = 0  ; i < crossed_collections.size() ;i++)
-    {
-        unsigned int ColNow     = crossed_collections.at(i);
-
-        //Current Hirachy is bigger -> Nothing to do!
-        //
-        if(current_collection_->GetGeometry()->GetHirarchy() >
-                collections_.at(ColNow)->GetGeometry()->GetHirarchy() )
-        {
-            continue;
-        }
-        //Current Hirachy is equal -> Look at the density!
-        //
-        else if( current_collection_->GetGeometry()->GetHirarchy() ==
-                 collections_.at(ColNow)->GetGeometry()->GetHirarchy() )
-        {
-            //Current Density is bigger or same -> Nothing to do!
-            //
-
-            if( current_collection_->GetMedium()->GetMassDensity() >=
-                    collections_.at(ColNow)->GetMedium()->GetMassDensity() )
-            {
-                continue;
-            }
-
-            //Current Density is smaller -> Set the new collection!
-            //
-            else
-            {
-                current_collection_ =  collections_.at(ColNow);
-            }
-
-        }
-
-        //Current Hirachy is smaller -> Set the new collection!
-        //
-        else
-        {
-            current_collection_ =  collections_.at(ColNow);
-        }
-    }
-
-    //TODO(mario): Not needed anymore Thu 2017/08/24
-    // if(current_collection_ != NULL)
-    // {
-    //     current_collection_->SetParticle(particle_);
-    // }
-}
 
 
 //----------------------------------------------------------------------------//
@@ -1081,85 +1284,6 @@ void Propagator::DisableInterpolation()
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-Propagator::Propagator()
-    : seed_(1)
-    // ,brems_                     ( ParametrizationType::BremsKelnerKokoulinPetrukhin )
-    // ,photo_                     ( ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich )
-    // ,lpm_                       ( false )
-    // ,moliere_                   ( false )
-    // ,stopping_decay_            ( true )
-    // ,do_exact_time_calculation_ ( false )
-    // ,integrate_                 ( false )
-    // ,brems_multiplier_          ( 1 )
-    // ,photo_multiplier_          ( 1 )
-    // ,ioniz_multiplier_          ( 1 )
-    // ,epair_multiplier_          ( 1 )
-    , global_ecut_inside_(500)
-    , global_ecut_infront_(-1)
-    , global_ecut_behind_(-1)
-    , global_vcut_inside_(-1)
-    , global_vcut_infront_(0.001)
-    , global_vcut_behind_(-1)
-    , global_cont_inside_(false)
-    , global_cont_infront_(true)
-    , global_cont_behind_(false)
-    // ,path_to_tables_            ( "" )
-    // ,raw_                       ( false )
-    // ,scattering_model_          (-1)
-    , current_collection_(NULL)
-    , detector_(new Sphere(Vector3D(), 1e18, 0))
-{
-    // particle_              = new PROPOSALParticle(MuMinusDef::Get());
-    // backup_particle_       = new PROPOSALParticle(*particle_);
-    // detector_              = new Geometry();
-    // detector_->InitSphere(0,0,0,1e18,0);
-
-    CollectionDef col_def;
-    col_def.location = 1; // Inside the detector
-
-    current_collection_ = new CollectionInterpolant(Ice(), *detector_, EnergyCutSettings(500, 0.05), col_def);
-    // current_collection_->SetLocation(1); // Inside the detector
-
-    collections_.push_back(current_collection_);
-}
-
-Propagator::Propagator(std::vector<Collection*> collections, const Geometry& geometry)
-    :seed_                      ( 1 )
-    // ,brems_                     ( ParametrizationType::BremsKelnerKokoulinPetrukhin )
-    // ,photo_                     ( ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich )
-    // ,lpm_                       ( false )
-    // ,moliere_                   ( false )
-    // ,stopping_decay_            ( true )
-    // ,do_exact_time_calculation_ ( false )
-    // ,integrate_                 ( false )
-    // ,brems_multiplier_          ( 1 )
-    // ,photo_multiplier_          ( 1 )
-    // ,ioniz_multiplier_          ( 1 )
-    // ,epair_multiplier_          ( 1 )
-    ,global_ecut_inside_        ( 500 )
-    ,global_ecut_infront_       ( -1 )
-    ,global_ecut_behind_        ( -1 )
-    ,global_vcut_inside_        ( -1 )
-    ,global_vcut_infront_       ( 0.001 )
-    ,global_vcut_behind_        ( -1 )
-    ,global_cont_inside_        ( false )
-    ,global_cont_infront_       ( true )
-    ,global_cont_behind_        ( false )
-    // ,path_to_tables_            ( "" )
-    // ,raw_                       ( false )
-    // ,scattering_model_          (-1)
-    ,current_collection_        (NULL)
-    ,detector_(geometry.clone())
-{
-    for (std::vector<Collection*>::const_iterator iter = collections.begin(); iter != collections.end(); ++iter)
-    {
-        collections_.push_back((*iter)->clone());
-    }
-    //TODO(mario): exeption if size = 0 Sat 2017/08/26
-    current_collection_ = collections_.at(0);
-
-}
-
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
@@ -1413,15 +1537,15 @@ Propagator::Propagator(const Propagator &propagator)
     // ,photo_multiplier_          ( propagator.photo_multiplier_ )
     // ,ioniz_multiplier_          ( propagator.ioniz_multiplier_ )
     // ,epair_multiplier_          ( propagator.epair_multiplier_ )
-    ,global_ecut_inside_        ( propagator.global_ecut_inside_ )
-    ,global_ecut_infront_       ( propagator.global_ecut_infront_ )
-    ,global_ecut_behind_        ( propagator.global_ecut_behind_ )
-    ,global_vcut_inside_        ( propagator.global_vcut_inside_ )
-    ,global_vcut_infront_       ( propagator.global_vcut_infront_ )
-    ,global_vcut_behind_        ( propagator.global_vcut_behind_ )
-    ,global_cont_inside_        ( propagator.global_cont_inside_ )
-    ,global_cont_infront_       ( propagator.global_cont_infront_ )
-    ,global_cont_behind_        ( propagator.global_cont_behind_ )
+    // ,global_ecut_inside_        ( propagator.global_ecut_inside_ )
+    // ,global_ecut_infront_       ( propagator.global_ecut_infront_ )
+    // ,global_ecut_behind_        ( propagator.global_ecut_behind_ )
+    // ,global_vcut_inside_        ( propagator.global_vcut_inside_ )
+    // ,global_vcut_infront_       ( propagator.global_vcut_infront_ )
+    // ,global_vcut_behind_        ( propagator.global_vcut_behind_ )
+    // ,global_cont_inside_        ( propagator.global_cont_inside_ )
+    // ,global_cont_infront_       ( propagator.global_cont_infront_ )
+    // ,global_cont_behind_        ( propagator.global_cont_behind_ )
     // ,path_to_tables_            ( propagator.path_to_tables_ )
     // ,raw_                       ( propagator.raw_ )
     // ,particle_                  ( propagator.particle_ )
@@ -1479,15 +1603,15 @@ bool Propagator::operator==(const Propagator &propagator) const
     // if( photo_multiplier_         != propagator.photo_multiplier_ )       return false;
     // if( ioniz_multiplier_         != propagator.ioniz_multiplier_ )       return false;
     // if( epair_multiplier_         != propagator.epair_multiplier_ )       return false;
-    if( global_ecut_inside_       != propagator.global_ecut_inside_ )     return false;
-    if( global_ecut_infront_      != propagator.global_ecut_infront_ )    return false;
-    if( global_ecut_behind_       != propagator.global_ecut_behind_ )     return false;
-    if( global_vcut_inside_       != propagator.global_vcut_inside_ )     return false;
-    if( global_vcut_infront_      != propagator.global_vcut_infront_ )    return false;
-    if( global_vcut_behind_       != propagator.global_vcut_behind_ )     return false;
-    if( global_cont_inside_       != propagator.global_cont_inside_ )     return false;
-    if( global_cont_infront_      != propagator.global_cont_infront_ )    return false;
-    if( global_cont_behind_       != propagator.global_cont_behind_ )     return false;
+    // if( global_ecut_inside_       != propagator.global_ecut_inside_ )     return false;
+    // if( global_ecut_infront_      != propagator.global_ecut_infront_ )    return false;
+    // if( global_ecut_behind_       != propagator.global_ecut_behind_ )     return false;
+    // if( global_vcut_inside_       != propagator.global_vcut_inside_ )     return false;
+    // if( global_vcut_infront_      != propagator.global_vcut_infront_ )    return false;
+    // if( global_vcut_behind_       != propagator.global_vcut_behind_ )     return false;
+    // if( global_cont_inside_       != propagator.global_cont_inside_ )     return false;
+    // if( global_cont_infront_      != propagator.global_cont_infront_ )    return false;
+    // if( global_cont_behind_       != propagator.global_cont_behind_ )     return false;
     // if( *current_collection_      != *propagator.current_collection_ )    return false;
     // if( raw_                      != propagator.raw_ )                    return false;
     //
@@ -1528,15 +1652,15 @@ void Propagator::swap(Propagator &propagator)
     // swap( photo_multiplier_         ,   propagator.photo_multiplier_ );
     // swap( ioniz_multiplier_         ,   propagator.ioniz_multiplier_ );
     // swap( epair_multiplier_         ,   propagator.epair_multiplier_ );
-    swap( global_ecut_inside_       ,   propagator.global_ecut_inside_ );
-    swap( global_ecut_infront_      ,   propagator.global_ecut_infront_ );
-    swap( global_ecut_behind_       ,   propagator.global_ecut_behind_ );
-    swap( global_vcut_inside_       ,   propagator.global_vcut_inside_ );
-    swap( global_vcut_infront_      ,   propagator.global_vcut_infront_ );
-    swap( global_vcut_behind_       ,   propagator.global_vcut_behind_ );
-    swap( global_cont_inside_       ,   propagator.global_cont_inside_ );
-    swap( global_cont_infront_      ,   propagator.global_cont_infront_ );
-    swap( global_cont_behind_       ,   propagator.global_cont_behind_ );
+    // swap( global_ecut_inside_       ,   propagator.global_ecut_inside_ );
+    // swap( global_ecut_infront_      ,   propagator.global_ecut_infront_ );
+    // swap( global_ecut_behind_       ,   propagator.global_ecut_behind_ );
+    // swap( global_vcut_inside_       ,   propagator.global_vcut_inside_ );
+    // swap( global_vcut_infront_      ,   propagator.global_vcut_infront_ );
+    // swap( global_vcut_behind_       ,   propagator.global_vcut_behind_ );
+    // swap( global_cont_inside_       ,   propagator.global_cont_inside_ );
+    // swap( global_cont_infront_      ,   propagator.global_cont_infront_ );
+    // swap( global_cont_behind_       ,   propagator.global_cont_behind_ );
     // swap( raw_                      ,   propagator.raw_ );
     //
     // path_to_tables_.swap( propagator.path_to_tables_ );
@@ -2627,10 +2751,10 @@ void Propagator::ApplyOptions()
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-void Propagator::SetCollections(std::vector<Collection*> collections)
-{
-    collections_ = collections;
-}
+// void Propagator::SetCollections(std::vector<Collection*> collections)
+// {
+//     collections_ = collections;
+// }
 
 // void Propagator::SetParticle(PROPOSALParticle* particle)
 // {

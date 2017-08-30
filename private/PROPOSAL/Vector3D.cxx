@@ -4,7 +4,6 @@
 
 #include "PROPOSAL/Vector3D.h"
 #include "PROPOSAL/Constants.h"
-// #include "PROPOSAL/Output.h"
 
 using namespace PROPOSAL;
 
