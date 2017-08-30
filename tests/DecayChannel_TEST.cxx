@@ -1,7 +1,9 @@
 
 #include "gtest/gtest.h"
 
-#include "PROPOSAL/Decay.h"
+#include "PROPOSAL/decay/DecayChannel.h"
+#include "PROPOSAL/decay/LeptonicDecayChannel.h"
+#include "PROPOSAL/decay/TwoBodyPhaseSpace.h"
 
 using namespace PROPOSAL;
 

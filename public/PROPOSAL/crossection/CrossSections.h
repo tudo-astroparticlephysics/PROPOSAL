@@ -1,0 +1,310 @@
+/*
+ * CrossSections.h
+ *
+ *  Created on: 2013.03.12
+ *      Author: Jan-Hendrik Köhne
+ */
+#pragma once
+
+// #include <string>
+
+#include "PROPOSAL/particle/PROPOSALParticle.h"
+#include "PROPOSAL/medium/Medium.h"
+#include "PROPOSAL/EnergyCutSettings.h"
+
+namespace PROPOSAL
+{
+    class CrossSections;
+}
+
+std::ostream& operator<<(std::ostream& os, PROPOSAL::CrossSections const&crossSections);
+
+namespace PROPOSAL{
+
+namespace ParametrizationType
+{
+    enum Enum
+    {
+        BremsKelnerKokoulinPetrukhin  = 11,
+        BremsAndreevBezrukovBugaev    = 12,
+        BremsPetrukhinShestakov       = 13,
+        BremsCompleteScreeningCase    = 14,
+
+        PhotoKokoulinShadowBezrukovSoft                = 31,
+        PhotoKokoulinShadowBezrukovHard                = -31,
+        PhotoRhodeShadowBezrukovSoft                   = 32,
+        PhotoRhodeShadowBezrukovHard                   = -32,
+        PhotoBezrukovBugaevShadowBezrukovSoft          = 33,
+        PhotoBezrukovBugaevShadowBezrukovHard          = -33,
+        PhotoZeusShadowBezrukovSoft                    = 34,
+        PhotoZeusShadowBezrukovHard                    = -34,
+        PhotoAbramowiczLevinLevyMaor91ShadowDutta      = 35,
+        PhotoAbramowiczLevinLevyMaor91ShadowButkevich  = -35,
+        PhotoAbramowiczLevinLevyMaor97ShadowDutta      = 36,
+        PhotoAbramowiczLevinLevyMaor97ShadowButkevich  = -36,
+        PhotoButkevichMikhailovShadowDutta             = 37,
+        PhotoButkevichMikhailovShadowButkevich         = -37,
+        PhotoRenoSarcevicSuShadowDutta                 = 38,
+        PhotoRenoSarcevicSuShadowButkevich             = -38,
+
+        EPairKelnerKokoulinPetrukhin  = 51,
+
+        IonizBetheBloch  = 71
+    };
+}
+
+/*! \class CrossSections CrossSections.h "CrossSections.h"
+ *  \brief This is a pure virtual class
+ */
+class CrossSections
+{
+
+
+protected:
+
+    std::string name_;
+    ParticleType::Enum type_;
+
+    // PROPOSALParticle*   particle_;
+    // PROPOSALParticle*   backup_particle_;
+    Medium*     medium_;
+    EnergyCutSettings* cut_settings_;
+
+
+    //bounds of integration
+    double vMax_;   //!< upper bound of integration
+    double vUp_;    //!< lower bound of integration
+    double vMin_;   //!< lowest physical possible bound of integration
+
+    double ebig_;   //!< upper bound of parameterizations
+
+    double rnd_;    //!< This random number will be stored in CalculateDNdx to avoid calculate dNdx a second time in ClaculateSochasticLoss when it is already done
+
+
+    // Interpolation flags
+    bool do_dedx_Interpolation_;
+    bool do_dndx_Interpolation_;
+
+    //CrossSection multiplier
+    double multiplier_;
+
+    ParametrizationType::Enum  parametrization_;
+
+    bool    lpm_effect_enabled_;
+    bool    init_lpm_effect_;
+
+    int     order_of_interpolation_;
+    double  sum_of_rates_;
+
+//----------------------------------------------------------------------------//
+
+    virtual double FunctionToDEdxIntegral(const PROPOSALParticle&, double variable) = 0;
+
+//----------------------------------------------------------------------------//
+
+    virtual double CalculateStochasticLoss(const PROPOSALParticle&, double rnd1) = 0;
+
+//----------------------------------------------------------------------------//
+
+public:
+
+    struct IntegralLimits
+    {
+        double vMax;
+        double vUp;
+        double vMin;
+    };
+
+    //Constructor
+    CrossSections();
+//----------------------------------------------------------------------------//
+
+    CrossSections(Medium* medium, EnergyCutSettings* cut_settings);
+    CrossSections(const CrossSections& crossSections);
+    bool operator==(const CrossSections &crossSections) const;
+    bool operator!=(const CrossSections &crossSections) const;
+    friend std::ostream& operator<<(std::ostream& os, CrossSections const&crossSections);
+
+//----------------------------------------------------------------------------//
+
+    // Memberfunctions
+    void swap(CrossSections &crossSections);
+
+
+//----------------------------------------------------------------------------//
+
+    virtual double CalculatedEdx(const PROPOSALParticle&) = 0;
+
+//----------------------------------------------------------------------------//
+
+    virtual double CalculatedNdx(const PROPOSALParticle&) = 0;
+
+//----------------------------------------------------------------------------//
+
+    virtual double CalculatedNdx(const PROPOSALParticle&, double rnd) = 0;
+
+//----------------------------------------------------------------------------//
+
+    virtual double CalculateStochasticLoss(const PROPOSALParticle&, double rnd1, double rnd2) = 0;
+
+//----------------------------------------------------------------------------//
+
+    virtual void EnableDNdxInterpolation(const PROPOSALParticle&, std::string path ="", bool raw=false) = 0;
+
+//----------------------------------------------------------------------------//
+
+    virtual void EnableDEdxInterpolation(const PROPOSALParticle&, std::string path ="", bool raw=false) = 0;
+
+//----------------------------------------------------------------------------//
+
+    virtual void DisableDNdxInterpolation() = 0;
+
+//----------------------------------------------------------------------------//
+
+    virtual void DisableDEdxInterpolation() = 0;
+
+//----------------------------------------------------------------------------//
+
+    void SetParametrizationLimit(double ebig);
+
+//----------------------------------------------------------------------------//
+
+    virtual double FunctionToDNdxIntegral(const PROPOSALParticle&, double variable) = 0;
+
+//----------------------------------------------------------------------------//
+
+    virtual CrossSections::IntegralLimits SetIntegralLimits(const PROPOSALParticle&, int component) = 0;
+
+//----------------------------------------------------------------------------//
+
+    // Setter
+
+//----------------------------------------------------------------------------//
+    void SetMultiplier(double multiplier=1.);
+
+//----------------------------------------------------------------------------//
+
+    // void SetParticle(PROPOSALParticle *particle);
+
+//----------------------------------------------------------------------------//
+
+    void SetMedium(Medium *medium);
+
+//----------------------------------------------------------------------------//
+
+    void SetVMin(double vMin=0);
+
+//----------------------------------------------------------------------------//
+
+    void SetVMax(double vMax=0);
+
+//----------------------------------------------------------------------------//
+
+    void SetVUp(double vUp=0);
+
+//----------------------------------------------------------------------------//
+
+    // virtual void SetParametrization(
+    //     ParametrizationType::Enum parametrization = ParametrizationType::BremsKelnerKokoulinPetrukhin) = 0;
+
+//----------------------------------------------------------------------------//
+
+    void SetEnergyCutSettings(EnergyCutSettings *cuts);
+
+//----------------------------------------------------------------------------//
+
+    // virtual void ValidateOptions() = 0;
+
+//----------------------------------------------------------------------------//
+    // Getter
+    std::string GetName() const
+    {
+        return name_;
+    }
+
+    ParticleType::Enum GetType() const
+    {
+        return type_;
+    }
+//----------------------------------------------------------------------------//
+    double GetEbig() const
+    {
+        return ebig_;
+    }
+
+//----------------------------------------------------------------------------//
+
+    // PROPOSALParticle* GetParticle() const
+    // {
+    //     return particle_;
+    // }
+
+//----------------------------------------------------------------------------//
+    Medium* GetMedium() const
+    {
+        return medium_;
+    }
+
+//----------------------------------------------------------------------------//
+    double GetMultiplier() const
+    {
+        return multiplier_;
+    }
+
+//----------------------------------------------------------------------------//
+
+    double GetVMax() const
+    {
+        return vMax_;
+    }
+
+//----------------------------------------------------------------------------//
+
+    double GetVMin() const
+    {
+        return vMin_;
+    }
+
+//----------------------------------------------------------------------------//
+
+    double GetVUp() const
+    {
+        return vUp_;
+    }
+
+//----------------------------------------------------------------------------//
+
+    ParametrizationType::Enum GetParametrization() const
+    {
+        return parametrization_;
+    }
+
+//----------------------------------------------------------------------------//
+
+    bool GetLpmEffectEnabled() const
+    {
+        return lpm_effect_enabled_;
+    }
+//----------------------------------------------------------------------------//
+    EnergyCutSettings* GetEnergyCutSettings() const
+    {
+        return cut_settings_;
+    }
+
+//----------------------------------------------------------------------------//
+
+    void EnableLpmEffect(bool lpm_effect_enabled);
+
+//----------------------------------------------------------------------------//
+
+
+    // destructor
+
+    virtual ~CrossSections(){}
+
+    PROPOSALParticle *GetBackup_particle() const;
+    void SetBackup_particle(PROPOSALParticle *backup_particle);
+    void RestoreBackup_particle();
+};
+
+}

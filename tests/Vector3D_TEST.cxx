@@ -4,7 +4,7 @@
 
 #include "gtest/gtest.h"
 
-#include "PROPOSAL/Vector3D.h"
+#include "PROPOSAL/math/Vector3D.h"
 
 
 using namespace PROPOSAL;

@@ -3,12 +3,13 @@
 // #include <string>
 // #include <cmath>
 #include <vector>
+#include <cmath>
 
 #include "gtest/gtest.h"
 
 #include "PROPOSAL/Propagator.h"
-#include "PROPOSAL/CollectionInterpolant.h"
-#include "PROPOSAL/Geometry.h"
+#include "PROPOSAL/sector/CollectionInterpolant.h"
+#include "PROPOSAL/geometry/Geometry.h"
 // #include "PROPOSAL/PROPOSALParticle.h"
 
 using namespace std;
@@ -16,7 +17,7 @@ using namespace PROPOSAL;
 
 TEST(Propagation , Test_nan) {
 
-    int statistic = 1000;
+    int statistic = 100;
     int EmaxLog10 = 8;
 
     // CollectionDef col_def;
@@ -40,17 +41,25 @@ TEST(Propagation , Test_nan) {
 
     // pr->set_seed(seed);
 
+    std::vector<unsigned int> length_sec;
+
     for(int i =0;i<statistic;i++)
     {
         particle.SetEnergy(pow(10,EmaxLog10));
         particle.SetPropagatedDistance(0);
 
         std::vector<PROPOSALParticle*> sec = pr.Propagate(particle);
-        std::cout << particle.GetPropagatedDistance() / 100.0 << '\n';
+        length_sec.push_back(sec.size());
+        // std::cout << particle.GetPropagatedDistance() / 100.0 << '\n';
 
         // for (std::vector<PROPOSALParticle*>::iterator iter = sec.begin(); iter != sec.end(); ++iter) {
         //     std::cout << (*iter)->GetName() << std::endl;
         // }
+    }
+
+    for(std::vector<unsigned int>::iterator it = length_sec.begin(); it != length_sec.end(); ++it)
+    {
+        std::cout << "length of secondies: " << *it << std::endl;
     }
 }
 
