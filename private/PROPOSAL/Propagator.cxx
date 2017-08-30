@@ -129,6 +129,7 @@ Propagator::Propagator(const std::string& config_file)
     SetMember(col_def_global.epair_multiplier, "global.epair_multiplier", pt_json);
     SetMember(col_def_global.lpm_effect_enabled, "global.lpm", pt_json);
     SetMember(col_def_global.do_exact_time_calculation, "global.exact_time", pt_json);
+    SetMember(col_def_global.do_scattering, "global.do_scattering", pt_json);
     SetMember(col_def_global.path_to_tables, "global.path_to_tables", pt_json);
     SetMember(col_def_global.raw, "global.raw", pt_json);
 
