@@ -726,7 +726,7 @@ Medium* MediumFactory::CreateMedium(const std::string& name)
         return it->second();
     } else
     {
-        return NULL;
+        log_fatal("Medium %s not registerd!", name.c_str());
     }
 }
 

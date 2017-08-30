@@ -20,7 +20,7 @@ TEST(Comparison , Comparison_equal ) {
     Water D;
     EXPECT_TRUE(D==*C);
 
-    Medium* E = MediumFactory::Get()->CreateMedium("IcE");
+    Medium* E = MediumFactory::Get().CreateMedium("IcE");
     Ice F;
     EXPECT_TRUE(F==*E);
 
@@ -47,7 +47,7 @@ TEST(Comparison , Comparison_not_equal ) {
     Medium* F = new Water(1.0);
     EXPECT_TRUE(*E!=*F);
 
-    Medium* G = MediumFactory::Get()->CreateMedium("WaTeR");
+    Medium* G = MediumFactory::Get().CreateMedium("WaTeR");
     EXPECT_TRUE(*E!=*G);
 
     Components::Hydrogen a;
