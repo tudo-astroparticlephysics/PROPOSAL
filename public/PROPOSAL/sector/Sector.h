@@ -10,10 +10,10 @@
 #include "PROPOSAL/particle/PROPOSALParticle.h"
 
 // namespace PROPOSAL {
-// class ProcessCollection;
+// class ProcessSector;
 // }
 //
-// std::ostream& operator<<(std::ostream& os, PROPOSAL::ProcessCollection const& collection);
+// std::ostream& operator<<(std::ostream& os, PROPOSAL::ProcessSector const& collection);
 //
 namespace PROPOSAL {
 
@@ -23,7 +23,7 @@ class Medium;
 class EnergyCutSettings;
 class Geometry;
 
-struct CollectionDef
+struct SectorDef
 {
     bool do_weighting;      //!< Do weigthing? Set to false in constructor
     double weighting_order; //!< Re-weighting order. Set to 0 in constructor
@@ -48,30 +48,30 @@ struct CollectionDef
     bool raw;                   /// Determine if output format of interpolation tables is binary or txt.
     std::string path_to_tables; /// Path to interpolation tables
 
-    CollectionDef();
-    ~CollectionDef();
+    SectorDef();
+    ~SectorDef();
 };
 
-/*! \class ProcessCollection ProcessCollection.h "CrossSections.h"
+/*! \class ProcessSector ProcessSector.h "CrossSections.h"
     \brief initializes all cross sections and keeps references to them
  */
-class Collection
+class Sector
 {
     public:
-    Collection();
-    Collection(const Medium&,
+    Sector();
+    Sector(const Medium&,
                const Geometry&,
                const EnergyCutSettings&,
-               const CollectionDef& def = CollectionDef());
-    Collection(const Collection&);
-    virtual ~Collection();
+               const SectorDef& def = SectorDef());
+    Sector(const Sector&);
+    virtual ~Sector();
 
-    virtual Collection* clone() const = 0; // virtual constructor idiom (used for deep copies)
+    virtual Sector* clone() const = 0; // virtual constructor idiom (used for deep copies)
 
-    // Collection& operator=(const Collection& collection);
-    // bool operator==(const Collection& collection) const;
-    // bool operator!=(const Collection& collection) const;
-    // friend std::ostream& operator<<(std::ostream& os, Collection const& collection);
+    // Sector& operator=(const Sector& collection);
+    // bool operator==(const Sector& collection) const;
+    // bool operator!=(const Sector& collection) const;
+    // friend std::ostream& operator<<(std::ostream& os, Sector const& collection);
 
     // --------------------------------------------------------------------- //
     // Member functions
@@ -244,7 +244,7 @@ class Collection
 
     protected:
 
-    Collection& operator=(const Collection&); // Undefined & not allowed
+    Sector& operator=(const Sector&); // Undefined & not allowed
 
     // --------------------------------------------------------------------- //
     // Protected members
@@ -253,7 +253,7 @@ class Collection
     // Just a temporary to store -> bad design
     double ini_;
 
-    CollectionDef collection_def_;
+    SectorDef collection_def_;
 
     //TODO(mario): Do better weight enabling Fri 2017/08/25
     // bool do_weighting_;          //!< Do weigthing? Set to false in constructor

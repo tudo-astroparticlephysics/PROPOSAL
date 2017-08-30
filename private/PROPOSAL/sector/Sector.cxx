@@ -3,7 +3,7 @@
 #include "PROPOSAL/math/MathModel.h"
 #include "PROPOSAL/decay/DecayChannel.h"
 #include "PROPOSAL/crossection/Bremsstrahlung.h"
-#include "PROPOSAL/sector/Collection.h"
+#include "PROPOSAL/sector/Sector.h"
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/continous_randomization/ContinuousRandomization.h"
 #include "PROPOSAL/crossection/Epairproduction.h"
@@ -22,10 +22,10 @@ using namespace std;
 using namespace PROPOSAL;
 
 /******************************************************************************
-*                               CollectionDef                                *
+*                               SectorDef                                *
 ******************************************************************************/
 
-CollectionDef::CollectionDef()
+SectorDef::SectorDef()
     : do_weighting(false)
     , weighting_order(0)
     , brems_multiplier(1.0)
@@ -45,12 +45,12 @@ CollectionDef::CollectionDef()
 {
 }
 
-CollectionDef::~CollectionDef()
+SectorDef::~SectorDef()
 {
 }
 
 /******************************************************************************
-*                                 Collection                                 *
+*                                 Sector                                 *
 ******************************************************************************/
 
 
@@ -59,7 +59,7 @@ CollectionDef::~CollectionDef()
 // ------------------------------------------------------------------------- //
 
 // Standard constructor
-Collection::Collection()
+Sector::Sector()
     : ini_(0)
     , collection_def_()
     , weighting_starts_at_(0)
@@ -87,10 +87,10 @@ Collection::Collection()
     }
 }
 
-Collection::Collection(const Medium& medium,
+Sector::Sector(const Medium& medium,
                        const Geometry& geometry,
                        const EnergyCutSettings& cut_settings,
-                       const CollectionDef& def)
+                       const SectorDef& def)
     : ini_(0)
     , collection_def_(def)
     , weighting_starts_at_(0)
@@ -144,7 +144,7 @@ Collection::Collection(const Medium& medium,
     }
 }
 
-Collection::Collection(const Collection& collection)
+Sector::Sector(const Sector& collection)
     :ini_(collection.ini_)
     ,collection_def_(collection.collection_def_)
     ,weighting_starts_at_(collection.weighting_starts_at_)
@@ -180,7 +180,7 @@ Collection::Collection(const Collection& collection)
     }
 }
 
-Collection::~Collection()
+Sector::~Sector()
 {
     delete medium_;
     delete geometry_;
@@ -194,7 +194,7 @@ Collection::~Collection()
 }
 
 // ------------------------------------------------------------------------- //
-double Collection::Propagate(PROPOSALParticle& particle, double distance)
+double Sector::Propagate(PROPOSALParticle& particle, double distance)
 {
     bool flag;
     double displacement;
@@ -395,7 +395,7 @@ double Collection::Propagate(PROPOSALParticle& particle, double distance)
     return 0;
 }
 
-std::pair<double, double> Collection::CalculateEnergyTillStochastic(const PROPOSALParticle& particle,
+std::pair<double, double> Sector::CalculateEnergyTillStochastic(const PROPOSALParticle& particle,
                                                                     double initial_energy)
 {
     double rndd = -log(RandomGenerator::Get().RandomDouble());
@@ -437,7 +437,7 @@ std::pair<double, double> Collection::CalculateEnergyTillStochastic(const PROPOS
     return final;
 }
 
-void Collection::AdvanceParticle(PROPOSALParticle& particle, double dr, double ei, double ef)
+void Sector::AdvanceParticle(PROPOSALParticle& particle, double dr, double ei, double ef)
 {
 
     double dist       = particle.GetPropagatedDistance();
@@ -490,7 +490,7 @@ void Collection::AdvanceParticle(PROPOSALParticle& particle, double dr, double e
     particle.SetT(time);
 }
 
-pair<double, ParticleType::Enum> Collection::MakeStochasticLoss(const PROPOSALParticle& particle)
+pair<double, ParticleType::Enum> Sector::MakeStochasticLoss(const PROPOSALParticle& particle)
 {
     double rnd1 = RandomGenerator::Get().RandomDouble();
     double rnd2 = RandomGenerator::Get().RandomDouble();
@@ -557,7 +557,7 @@ pair<double, ParticleType::Enum> Collection::MakeStochasticLoss(const PROPOSALPa
     return energy_loss;
 }
 
-double Collection::MakeDecay(const PROPOSALParticle& particle)
+double Sector::MakeDecay(const PROPOSALParticle& particle)
 {
     // TODO(mario): multiplier? Was not used before Fri 2017/08/25
     // if(multiplier_ <= 0 || particle.GetLifetime() < 0)
@@ -577,13 +577,13 @@ double Collection::MakeDecay(const PROPOSALParticle& particle)
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-// DecayChannel::DecayProducts Collection::MakeDecay()
+// DecayChannel::DecayProducts Sector::MakeDecay()
 // {
 //     const DecayChannel* mode = particle_->GetDecayTable().SelectChannel();
 //     return mode->Decay(particle_);
 // }
 
-// pair<double, ParticleType::Enum> Collection::MakeDecay()
+// pair<double, ParticleType::Enum> Sector::MakeDecay()
 // {
 //     // --------------------------------------------------------------------- //
 //     // Calculate random numbers before passing to a fuction, because
@@ -605,7 +605,7 @@ double Collection::MakeDecay(const PROPOSALParticle& particle)
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-// pair<double, ParticleType::Enum> Collection::MakeDecay(double rnd1,double rnd2, double rnd3)
+// pair<double, ParticleType::Enum> Sector::MakeDecay(double rnd1,double rnd2, double rnd3)
 // {
 //     pair<double, ParticleType::Enum> decay;
 //
@@ -623,7 +623,7 @@ double Collection::MakeDecay(const PROPOSALParticle& particle)
 //     return decay;
 // }
 
-// double Collection::Randomize(double initial_energy, double final_energy)
+// double Sector::Randomize(double initial_energy, double final_energy)
 // {
 //     double rnd = RandomGenerator::Get().RandomDouble();
 //     return randomizer_->Randomize(initial_energy, final_energy, rnd);
@@ -634,7 +634,7 @@ double Collection::MakeDecay(const PROPOSALParticle& particle)
 // ------------------------------------------------------------------------- //
 
 
-void Collection::EnableLpmEffect()
+void Sector::EnableLpmEffect()
 {
     collection_def_.lpm_effect_enabled = true;
     for (unsigned int i = 0; i < crosssections_.size(); i++)
@@ -643,7 +643,7 @@ void Collection::EnableLpmEffect()
     }
 }
 
-void Collection::DisableLpmEffect()
+void Sector::DisableLpmEffect()
 {
     collection_def_.lpm_effect_enabled = false;
     for (unsigned int i = 0; i < crosssections_.size(); i++)
@@ -652,25 +652,25 @@ void Collection::DisableLpmEffect()
     }
 }
 
-// void Collection::EnableContinuousRandomization()
+// void Sector::EnableContinuousRandomization()
 // {
 //     randomizer_                  = new ContinuousRandomization(particle_, medium_, crosssections_);
 //     do_continuous_randomization_ = true;
 // }
 //
-// void Collection::DisableContinuousRandomization()
+// void Sector::DisableContinuousRandomization()
 // {
 //     delete randomizer_;
 //     randomizer_                  = NULL;
 //     do_continuous_randomization_ = false;
 // }
 
-void Collection::EnableExactTimeCalculation()
+void Sector::EnableExactTimeCalculation()
 {
     collection_def_.do_exact_time_calculation   =   true;
 }
 
-void Collection::DisableExactTimeCalculation()
+void Sector::DisableExactTimeCalculation()
 {
     collection_def_.do_exact_time_calculation   =   false;
 }
@@ -679,7 +679,7 @@ void Collection::DisableExactTimeCalculation()
 //----------------------------------------------------------------------------//
 
 // Copyconstructor
-// Collection::Collection(const Collection &collection)
+// Sector::Sector(const Sector &collection)
 //     : MathModel(collection)
 //     ,order_of_interpolation_     ( collection.order_of_interpolation_ )
 //     ,do_interpolation_           ( collection.do_interpolation_ )
@@ -840,11 +840,11 @@ void Collection::DisableExactTimeCalculation()
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-// Collection& Collection::operator=(const Collection &collection)
+// Sector& Sector::operator=(const Sector &collection)
 // {
 //     if (this != &collection)
 //     {
-//       Collection tmp(collection);
+//       Sector tmp(collection);
 //       swap(tmp);
 //     }
 //     return *this;
@@ -853,7 +853,7 @@ void Collection::DisableExactTimeCalculation()
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-// bool Collection::operator==(const Collection &collection) const
+// bool Sector::operator==(const Sector &collection) const
 // {
 //     if( order_of_interpolation_     != collection.order_of_interpolation_ )  return false;
 //     if( do_interpolation_           != collection.do_interpolation_ )        return false;
@@ -993,7 +993,7 @@ void Collection::DisableExactTimeCalculation()
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-// bool Collection::operator!=(const Collection &collection) const
+// bool Sector::operator!=(const Sector &collection) const
 // {
 //     return !(*this == collection);
 // }
@@ -1004,10 +1004,10 @@ void Collection::DisableExactTimeCalculation()
 // namespace PROPOSAL
 // {
 //
-// ostream& operator<<(ostream& os, Collection const& collection)
+// ostream& operator<<(ostream& os, Sector const& collection)
 // {
 //
-//     os<<"------------Collection( "<<&collection<<" )------------"<<endl;
+//     os<<"------------Sector( "<<&collection<<" )------------"<<endl;
 //     os<<"------------------------------------------------------"<<endl;
 //     os<<"Particle type:\t\t\t\t\t"<<collection.particle_->GetName()<<endl;
 //     os<<"Order of interpolation:\t\t\t\t"<<collection.order_of_interpolation_<<endl;
@@ -1034,7 +1034,7 @@ void Collection::DisableExactTimeCalculation()
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-// void Collection::swap(Collection &collection)
+// void Sector::swap(Sector &collection)
 // {
 //     using std::swap;
 //
@@ -1263,7 +1263,7 @@ void Collection::DisableExactTimeCalculation()
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-double Collection::FunctionToTimeIntegral(const PROPOSALParticle& particle, double energy)
+double Sector::FunctionToTimeIntegral(const PROPOSALParticle& particle, double energy)
 {
     double aux;
 
@@ -1275,7 +1275,7 @@ double Collection::FunctionToTimeIntegral(const PROPOSALParticle& particle, doub
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-double Collection::FunctionToPropIntegralDecay(const PROPOSALParticle& particle, double energy)
+double Sector::FunctionToPropIntegralDecay(const PROPOSALParticle& particle, double energy)
 {
     double aux;
     double decay;
@@ -1292,7 +1292,7 @@ double Collection::FunctionToPropIntegralDecay(const PROPOSALParticle& particle,
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-double Collection::FunctionToPropIntegralInteraction(const PROPOSALParticle& particle, double energy)
+double Sector::FunctionToPropIntegralInteraction(const PROPOSALParticle& particle, double energy)
 {
     double aux;
     double rate       = 0.0;
@@ -1314,7 +1314,7 @@ double Collection::FunctionToPropIntegralInteraction(const PROPOSALParticle& par
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-double Collection::FunctionToIntegral(const PROPOSALParticle& particle, double energy)
+double Sector::FunctionToIntegral(const PROPOSALParticle& particle, double energy)
 {
     double result;
     double aux;

@@ -38,7 +38,7 @@
 namespace PROPOSAL {
 
 class Geometry;
-class Collection;
+class Sector;
 class PROPOSALParticle;
 class Vector3D;
 
@@ -47,7 +47,7 @@ class Propagator
     public:
     // Constructors
     Propagator();
-    Propagator(std::vector<Collection*>&, const Geometry&);
+    Propagator(std::vector<Sector*>&, const Geometry&);
     Propagator(const std::string&);
     // Propagator(ParticleDef,
     //            std::string path_to_tables,
@@ -150,10 +150,10 @@ class Propagator
     //----------------------------------------------------------------------------//
     // Getter
 
-    Collection* GetCurrentCollection() const { return current_collection_; }
+    Sector* GetCurrentCollection() const { return current_collection_; }
     //----------------------------------------------------------------------------//
 
-    std::vector<Collection*> GetCollections() const { return collections_; }
+    std::vector<Sector*> GetCollections() const { return collections_; }
 
     //----------------------------------------------------------------------------//
     // PROPOSALParticle* GetParticle() const
@@ -228,9 +228,9 @@ class Propagator
                                  //!specified explicit for a sector in congiguration file)
 
 
-    std::vector<Collection*> collections_;
+    std::vector<Sector*> collections_;
 
-    Collection* current_collection_;
+    Sector* current_collection_;
     Geometry* detector_;
 
     //----------------------------------------------------------------------------//
