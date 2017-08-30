@@ -1,8 +1,5 @@
 #pragma once
 
-#ifndef VECTOR3D_H
-#define VECTOR3D_H
-
 // #include <sstream>
 
 
@@ -17,7 +14,7 @@ class Vector3D
         Vector3D(const Vector3D &vector_3d);
         ~Vector3D();
 
-        // operator functions and swap 
+        // operator functions and swap
         Vector3D& operator=(const Vector3D &vector_3d);
         bool operator==(const Vector3D &vector_3d) const;
         bool operator!=(const Vector3D &vector_3d) const;
@@ -63,5 +60,3 @@ class Vector3D
 };
 
 }
-
-#endif

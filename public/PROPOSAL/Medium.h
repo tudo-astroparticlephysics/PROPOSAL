@@ -377,10 +377,10 @@ class MediumFactory
     void Register(const std::string& name, Medium* (*)(void));
     Medium* CreateMedium(const std::string&);
 
-    static MediumFactory* Get()
+    static MediumFactory& Get()
     {
         static MediumFactory instance;
-        return &instance;
+        return instance;
     }
 
     private:

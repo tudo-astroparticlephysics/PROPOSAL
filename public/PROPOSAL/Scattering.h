@@ -50,12 +50,12 @@ class ScatteringFactory
     typedef boost::function<Scattering* (void)> RegisterFunction;
     typedef std::map<std::string, boost::function<Scattering* (void)> > ScatteringMapString;
     typedef std::map<ScatteringModel::Enum, boost::function<Scattering* (void)> > ScatteringMapEnum;
-
-    void Register(const std::string& name, RegisterFunction);
-    void Register(ScatteringModel::Enum, RegisterFunction);
+    typedef std::map<std::string, ScatteringModel::Enum> MapStringToEnum;
 
     Scattering* CreateScattering(const std::string&);
     Scattering* CreateScattering(const ScatteringModel::Enum);
+
+    ScatteringModel::Enum GetEnumFromString(const std::string&);
 
     static ScatteringFactory& Get()
     {
@@ -67,9 +67,14 @@ class ScatteringFactory
     ScatteringFactory();
     ~ScatteringFactory();
 
+    void Register(const std::string& name, RegisterFunction);
+    void Register(ScatteringModel::Enum, RegisterFunction);
+    void Register(const std::string&, ScatteringModel::Enum);
+
     // std::map<std::string, Scattering* (*)(void)> scattering_map;
     ScatteringMapString scattering_map_str_;
     ScatteringMapEnum scattering_map_enum_;
+    MapStringToEnum map_string_to_enum;
 };
 
 }
