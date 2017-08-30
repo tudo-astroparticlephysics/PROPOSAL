@@ -11,6 +11,9 @@
 
 // #include <string>
 // #include <utility>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/function.hpp>
+#include <map>
 #include <iostream>
 
 #include "PROPOSAL/Vector3D.h"
@@ -114,6 +117,7 @@ class Sphere: public Geometry
         Sphere(const Sphere&);
 
         Geometry* clone() const { return new Sphere(*this); };
+        static Geometry* create() { return new Sphere(); }
         void swap(Geometry&);
 
         virtual ~Sphere() {}
@@ -152,6 +156,7 @@ class Box: public Geometry
         Box(const Box&);
 
         Geometry* clone() const { return new Box(*this); };
+        static Geometry* create() { return new Box(); }
         void swap(Geometry&);
 
         virtual ~Box() {}
@@ -196,6 +201,7 @@ class Cylinder: public Geometry
         Cylinder(const Cylinder&);
 
         Geometry* clone() const { return new Cylinder(*this); };
+        static Geometry* create() { return new Cylinder(); }
         void swap(Geometry&);
 
         virtual ~Cylinder() {}
@@ -225,6 +231,36 @@ class Cylinder: public Geometry
         double z_;              //!< height of box/cylinder
 };
 
+class GeometryFactory
+{
+    public:
+
+    typedef boost::function<Geometry* (void)> RegisterFunction;
+    // typedef boost::function<Geometry* (boost::property_tree::ptree const&)> RegisterFunctionPTree;
+    typedef std::map<std::string, RegisterFunction> GeometryMap;
+    // typedef std::map<std::string, RegisterFunctionPTree> GeometryMapPTree;
+    // typedef std::map<ScatteringModel::Enum, boost::function<Scattering* (void)> > ScatteringMapEnum;
+
+    // void Register(const std::string& name, RegisterFunction);
+    void Register(const std::string& name, RegisterFunction);
+
+    Geometry* CreateGeometry(const std::string&);
+    Geometry* CreateGeometry(boost::property_tree::ptree const& pt);
+
+    static GeometryFactory& Get()
+    {
+        static GeometryFactory instance;
+        return instance;
+    }
+
+    private:
+    GeometryFactory();
+    ~GeometryFactory();
+
+    GeometryMap geometry_map;
+    // GeometryMapPTree geometry_map_ptree;
+    // ScatteringMapEnum scattering_map_enum_;
+};
 }
 
 #endif // GEOMETRY_H

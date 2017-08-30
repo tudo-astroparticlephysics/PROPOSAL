@@ -171,9 +171,9 @@
     #define DS2 6.9e-5
 #endif
 
-#ifndef TT2 // tan^2(th) of the mixing angle
-    #define TT2 0.43
-#endif
+// #ifndef TT2 // tan^2(th) of the mixing angle
+//     #define TT2 0.43
+// #endif
 
 #ifndef DE2 // Earth neutrino mass difference (eV^2)
     #define DE2 2.6e-3

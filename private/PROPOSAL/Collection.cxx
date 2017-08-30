@@ -26,11 +26,15 @@ using namespace PROPOSAL;
 CollectionDef::CollectionDef()
     : do_weighting(false)
     , weighting_order(0)
+    , brems_multiplier(1.0)
+    , photo_multiplier(1.0)
+    , ioniz_multiplier(1.0)
+    , epair_multiplier(1.0)
     , do_scattering(false)
     , scattering_model(ScatteringFactory::ScatteringModel::Default)
     , do_continuous_randomization_(false)
-    , lpm_effect_enabled(false)
     , do_exact_time_calculation(false)
+    , lpm_effect_enabled(false)
     , location(0)
     , density_correction(1.0)
     , order_of_interpolation(5)
@@ -99,6 +103,32 @@ Collection::Collection(const Medium& medium,
     crosssections_.push_back(new Ionization(medium_, &cut_settings_));
     crosssections_.push_back(new Photonuclear(medium_, &cut_settings_));
     crosssections_.push_back(new Epairproduction(medium_, &cut_settings_));
+
+    for(std::vector<CrossSections*>::iterator it = crosssections_.begin(); it != crosssections_.end(); ++it)
+    {
+        switch ((*it)->GetType())
+        {
+            case ParticleType::Brems:
+                // collections_.at(j)->GetCrosssections().at(i)->SetParametrization(brems_);
+                (*it)->SetMultiplier(collection_def_.brems_multiplier);
+                (*it)->EnableLpmEffect(collection_def_.lpm_effect_enabled);
+                break;
+            case ParticleType::DeltaE:
+                (*it)->SetMultiplier(collection_def_.ioniz_multiplier);
+                break;
+            case ParticleType::EPair:
+                (*it)->SetMultiplier(collection_def_.epair_multiplier);
+                (*it)->EnableLpmEffect(collection_def_.lpm_effect_enabled);
+                break;
+            case ParticleType::NuclInt:
+                // collections_.at(j)->GetCrosssections().at(i)->SetParametrization(photo_);
+                (*it)->SetMultiplier(collection_def_.photo_multiplier);
+                break;
+            default:
+                log_fatal("Unknown cross section");
+                exit(1);
+        }
+    }
 
     //TODO(mario): Polymorphic initilaization in collections childs  Sun 2017/08/27
     if (collection_def_.do_continuous_randomization_)
@@ -218,6 +248,7 @@ double Collection::Propagate(PROPOSALParticle& particle, double distance)
             CalculateDisplacement(
                 particle, initial_energy, final_energy, collection_def_.density_correction * (distance - propagated_distance)) /
             collection_def_.density_correction;
+
 
         // The first interaction or decay happens behind the distance we want to propagate
         // So we calculate the final energy using only continuous losses
@@ -383,6 +414,7 @@ std::pair<double, double> Collection::CalculateEnergyTillStochastic(const PROPOS
     }
 
     rndiMin = CalculateTrackingIntegal(particle, initial_energy, rndi, true);
+
     // evaluating the energy loss
     if (rndd >= rnddMin || rnddMin <= 0)
     {

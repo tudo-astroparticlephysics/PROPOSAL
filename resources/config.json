@@ -1,0 +1,164 @@
+{
+	"global":
+	{
+
+		"seed" : 1,
+		"brems" : 11,
+		"photo" : -36,
+		"lpm" : true,
+		"scattering" : "moliere_first_order",
+		"exact_time" : true,
+		"interpolate" : true,
+		"brems_multiplier" : 1,
+		"photo_multiplier" : 1,
+		"ioniz_multiplier" : 1,
+		"epair_multiplier" : 1,
+		"path_to_tables" : "resources/tables",
+		"ecut_inside" : 500,
+		"ecut_infront" : -1,
+		"ecut_behind" : -1,
+		"vcut_inside" : -1,
+		"vcut_infront" : 0.05,
+		"vcut_behind" : -1,
+		"cont_inside" : 0,
+		"cont_infront" : 1,
+		"cont_behind" : 0,
+		"raw" : false
+	},
+
+	"sectors": [
+		{
+			"medium": "air",
+			"density_correction": 0.673,
+			"hirarchy": 1,
+
+			"geometry":
+			{
+				"shape": "sphere",
+				"origin": [0, 0, -6372186],
+				"radius": 1000000000,
+				"inner_radius": 6374134
+			},
+			"cuts_inside":
+			{
+				"e_cut": 500,
+				"v_cut": -1,
+				"cont_rand": false
+			},
+			"cuts_infront":
+			{
+				"e_cut": -1,
+				"v_cut": 0.05,
+				"cont_rand": true
+			},
+			"cuts_behind":
+			{
+				"e_cut": -1,
+				"v_cut": -1,
+				"cont_rand": false
+			}
+		},
+		{
+			"medium": "ice",
+			"density_correction": 0.832,
+			"hirarchy": 1,
+
+			"geometry":
+			{
+				"shape": "sphere",
+				"origin": [0, 0, -6372186],
+				"radius": 6374134,
+				"inner_radius": 6373934
+			},
+			"cuts_inside":
+			{
+				"e_cut": 500,
+				"v_cut": -1,
+				"cont_rand": false
+			},
+			"cuts_infront":
+			{
+				"e_cut": -1,
+				"v_cut": 0.05,
+				"cont_rand": true
+			},
+			"cuts_behind":
+			{
+				"e_cut": -1,
+				"v_cut": -1,
+				"cont_rand": false
+			}
+		},
+		{
+			"medium": "ice",
+			"density_correction": 1.005,
+			"hirarchy": 1,
+
+			"geometry":
+			{
+				"shape": "sphere",
+				"origin": [0, 0, -6372186],
+				"radius": 6373934,
+				"inner_radius": 6371324
+			},
+			"cuts_inside":
+			{
+				"e_cut": 500,
+				"v_cut": -1,
+				"cont_rand": false
+			},
+			"cuts_infront":
+			{
+				"e_cut": -1,
+				"v_cut": 0.05,
+				"cont_rand": true
+			},
+			"cuts_behind":
+			{
+				"e_cut": -1,
+				"v_cut": -1,
+				"cont_rand": false
+			}
+		},
+		{
+			"medium": "standardrock",
+			"density_correction": 1.0,
+			"hirarchy": 1,
+
+			"geometry":
+			{
+				"shape": "sphere",
+				"origin": [0, 0, -6372186],
+				"radius": 6371324,
+				"inner_radius": 0
+			},
+			"cuts_inside":
+			{
+				"e_cut": 500,
+				"v_cut": -1,
+				"cont_rand": false
+			},
+			"cuts_infront":
+			{
+				"e_cut": -1,
+				"v_cut": 0.05,
+				"cont_rand": true
+			},
+			"cuts_behind":
+			{
+				"e_cut": -1,
+				"v_cut": -1,
+				"cont_rand": false
+			}
+		}
+	],
+
+	"detector":
+	{
+		"shape": "cylinder",
+		"origin" : [0, 0, 0],
+		"radius": 800,
+		"inner_radius": 0,
+		"z": 1600
+	}
+}
