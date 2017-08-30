@@ -5,7 +5,7 @@
 
 #include "gtest/gtest.h"
 
-#include "PROPOSAL/RootFinder.h"
+#include "PROPOSAL/math/RootFinder.h"
 
 using namespace PROPOSAL;
 

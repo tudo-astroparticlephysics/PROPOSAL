@@ -25,10 +25,10 @@
 // #include <utility>
 #include <boost/property_tree/ptree.hpp>
 #include <deque>
-
-#include "PROPOSAL/Collection.h"
-#include "PROPOSAL/ScatteringFirstOrder.h"
-#include "PROPOSAL/ScatteringMoliere.h"
+#include <vector>
+// #include "PROPOSAL/Collection.h"
+// #include "PROPOSAL/ScatteringFirstOrder.h"
+// #include "PROPOSAL/ScatteringMoliere.h"
 #include "PROPOSAL/Output.h"
 // #include "PROPOSAL/MathModel.h"
 // #include "PROPOSAL/PROPOSALParticle.h"
@@ -38,8 +38,11 @@
 namespace PROPOSAL {
 
 class Geometry;
+class Collection;
+class PROPOSALParticle;
+class Vector3D;
 
-class Propagator : public MathModel
+class Propagator
 {
     public:
     // Constructors
