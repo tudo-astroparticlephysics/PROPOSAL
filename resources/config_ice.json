@@ -6,6 +6,7 @@
 		"brems" : 11,
 		"photo" : -36,
 		"lpm" : true,
+		"do_scattering" : true,
 		"scattering" : "moliere_first_order",
 		"exact_time" : true,
 		"interpolate" : true,

@@ -5,7 +5,7 @@
 
 #include "gtest/gtest.h"
 
-#include "PROPOSAL/Interpolant.h"
+#include "PROPOSAL/math/Interpolant.h"
 
 using namespace PROPOSAL;
 
