@@ -1038,7 +1038,6 @@ double Epairproduction::CalculateStochasticLoss(const PROPOSALParticle& particle
         rsum    += prob_for_component_.at(i);
         if(rsum > rand)
         {
-
             if(do_dndx_Interpolation_)
             {
                 CrossSections::IntegralLimits limits = SetIntegralLimits(particle, i);;

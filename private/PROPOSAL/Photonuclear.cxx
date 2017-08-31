@@ -1214,10 +1214,10 @@ double Photonuclear::CalculateStochasticLoss(const PROPOSALParticle& particle, d
     rand    =   rnd*sum_of_rates_;
     rsum    =   0;
 
-
     for(int i=0; i<(medium_->GetNumComponents()); i++)
     {
         rsum    += prob_for_component_.at(i);
+
         if(rsum > rand)
         {
             if(do_dndx_Interpolation_)
