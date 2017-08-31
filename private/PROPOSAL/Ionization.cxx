@@ -720,12 +720,14 @@ double Ionization::CalculateStochasticLoss(const PROPOSALParticle& particle, dou
         Components::Component* component = medium_->GetComponents().at(i);
         rsum+=component->GetAtomInMolecule()* component->GetNucCharge();
 
-        if(rsum>rand){
-
+        if(rsum>rand)
+        {
             if(do_dndx_Interpolation_)
             {
-                CrossSections::IntegralLimits limits = SetIntegralLimits(particle, 0);;
-                if(limits.vUp==limits.vMax){
+                CrossSections::IntegralLimits limits = SetIntegralLimits(particle, 0);
+
+                if(limits.vUp==limits.vMax)
+                {
                     return particle.GetEnergy()*limits.vUp;
                 }
                 return particle.GetEnergy()*(limits.vUp*exp(dndx_interpolant_2d_->FindLimit(particle.GetEnergy(), rnd*sum_of_rates_)*log(limits.vMax/limits.vUp)));
