@@ -1,8 +1,11 @@
 
 #include "gtest/gtest.h"
 
-#include "PROPOSAL/PROPOSALParticle.h"
-#include "PROPOSAL/DecayTable.h"
+#include "PROPOSAL/particle/PROPOSALParticle.h"
+#include "PROPOSAL/decay/DecayTable.h"
+#include "PROPOSAL/decay/LeptonicDecayChannel.h"
+#include "PROPOSAL/decay/TwoBodyPhaseSpace.h"
+#include "PROPOSAL/decay/StableChannel.h"
 
 using namespace PROPOSAL;
 

@@ -7,19 +7,28 @@
 
 // #include <cmath>
 
-#include <boost/lexical_cast.hpp>
-#include <boost/algorithm/string/predicate.hpp>
+// #include <boost/lexical_cast.hpp>
+// #include <boost/algorithm/string/predicate.hpp>
 
-#include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
 
 #include "PROPOSAL/Propagator.h"
-#include "PROPOSAL/CollectionIntegral.h"
-#include "PROPOSAL/CollectionInterpolant.h"
+
+#include "PROPOSAL/sector/Sector.h"
+#include "PROPOSAL/sector/SectorIntegral.h"
+#include "PROPOSAL/sector/SectorInterpolant.h"
+
+#include "PROPOSAL/medium/Medium.h"
+#include "PROPOSAL/medium/MediumFactory.h"
+
+#include "PROPOSAL/geometry/GeometryFactory.h"
+#include "PROPOSAL/geometry/Sphere.h"
+
 #include "PROPOSAL/Output.h"
-#include "PROPOSAL/methods.h"
+// #include "PROPOSAL/methods.h"
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/Geometry.h"
+// #include "PROPOSAL/Geometry.h"
 
 using namespace std;
 using namespace PROPOSAL;
@@ -49,21 +58,21 @@ Propagator::Propagator()
     , current_collection_(NULL)
     , detector_(new Sphere(Vector3D(), 1e18, 0))
 {
-    CollectionDef col_def;
-    col_def.location = 1; // Inside the detector
+    SectorDef sector_def;
+    sector_def.location = 1; // Inside the detector
 
-    current_collection_ = new CollectionInterpolant(
-        Ice(), *detector_, EnergyCutSettings(global_ecut_inside_, global_vcut_inside_), col_def);
+    current_collection_ = new SectorInterpolant(
+        Ice(), *detector_, EnergyCutSettings(global_ecut_inside_, global_vcut_inside_), sector_def);
 
     collections_.push_back(current_collection_);
 }
 
-Propagator::Propagator(std::vector<Collection*>& collections, const Geometry& geometry)
+Propagator::Propagator(std::vector<Sector*>& sectors, const Geometry& geometry)
     : seed_(1)
     , current_collection_(NULL)
     , detector_(geometry.clone())
 {
-    for (std::vector<Collection*>::const_iterator iter = collections.begin(); iter != collections.end(); ++iter)
+    for (std::vector<Sector*>::const_iterator iter = sectors.begin(); iter != sectors.end(); ++iter)
     {
         collections_.push_back((*iter)->clone());
     }
@@ -121,18 +130,19 @@ Propagator::Propagator(const std::string& config_file)
     detector_ = GeometryFactory::Get().CreateGeometry(pt_json.get_child("detector"));
 
     // Read in global sector definition
-    CollectionDef col_def_global;
+    SectorDef sec_def_global;
 
-    SetMember(col_def_global.brems_multiplier, "global.brems_multiplier", pt_json);
-    SetMember(col_def_global.photo_multiplier, "global.photo_multiplier", pt_json);
-    SetMember(col_def_global.ioniz_multiplier, "global.ioniz_multiplier", pt_json);
-    SetMember(col_def_global.epair_multiplier, "global.epair_multiplier", pt_json);
-    SetMember(col_def_global.lpm_effect_enabled, "global.lpm", pt_json);
-    SetMember(col_def_global.do_exact_time_calculation, "global.exact_time", pt_json);
-    SetMember(col_def_global.path_to_tables, "global.path_to_tables", pt_json);
-    SetMember(col_def_global.raw, "global.raw", pt_json);
+    SetMember(sec_def_global.brems_multiplier, "global.brems_multiplier", pt_json);
+    SetMember(sec_def_global.photo_multiplier, "global.photo_multiplier", pt_json);
+    SetMember(sec_def_global.ioniz_multiplier, "global.ioniz_multiplier", pt_json);
+    SetMember(sec_def_global.epair_multiplier, "global.epair_multiplier", pt_json);
+    SetMember(sec_def_global.lpm_effect_enabled, "global.lpm", pt_json);
+    SetMember(sec_def_global.do_exact_time_calculation, "global.exact_time", pt_json);
+    SetMember(sec_def_global.do_scattering, "global.do_scattering", pt_json);
+    SetMember(sec_def_global.path_to_tables, "global.path_to_tables", pt_json);
+    SetMember(sec_def_global.raw, "global.raw", pt_json);
 
-    col_def_global.scattering_model =
+    sec_def_global.scattering_model =
         ScatteringFactory::Get().GetEnumFromString(pt_json.get<std::string>("global.scattering"));
 
     // Read in all sector definitions
@@ -145,20 +155,20 @@ Propagator::Propagator(const std::string& config_file)
         geometry->SetHirarchy(it->second.get<unsigned int>("hirarchy"));
 
         // Use global options in case they will be not overriden
-        CollectionDef col_def_infront = col_def_global;
-        col_def_infront.location = 0;
+        SectorDef sec_def_infront = sec_def_global;
+        sec_def_infront.location = 0;
 
-        CollectionDef col_def_inside  = col_def_global;
-        col_def_inside.location = 1;
+        SectorDef sec_def_inside  = sec_def_global;
+        sec_def_inside.location = 1;
 
-        CollectionDef col_def_behind  = col_def_global;
-        col_def_behind.location = 2;
+        SectorDef sec_def_behind  = sec_def_global;
+        sec_def_behind.location = 2;
 
         double density_correction = it->second.get<double>("density_correction");
 
-        col_def_infront.density_correction = density_correction;
-        col_def_inside.density_correction  = density_correction;
-        col_def_behind.density_correction  = density_correction;
+        sec_def_infront.density_correction = density_correction;
+        sec_def_inside.density_correction  = density_correction;
+        sec_def_behind.density_correction  = density_correction;
 
         EnergyCutSettings cuts_infront;
         EnergyCutSettings cuts_inside;
@@ -170,13 +180,13 @@ Propagator::Propagator(const std::string& config_file)
         {
             cuts_infront.SetEcut(child_cuts_infront.get().get<double>("e_cut"));
             cuts_infront.SetVcut(child_cuts_infront.get().get<double>("v_cut"));
-            col_def_infront.do_continuous_randomization_ = child_cuts_infront.get().get<bool>("cont_rand");
+            sec_def_infront.do_continuous_randomization_ = child_cuts_infront.get().get<bool>("cont_rand");
 
         } else
         {
             cuts_infront.SetEcut(global_ecut_infront);
             cuts_infront.SetVcut(global_vcut_infront);
-            col_def_infront.do_continuous_randomization_ = global_cont_infront;
+            sec_def_infront.do_continuous_randomization_ = global_cont_infront;
         }
 
         boost::optional<const boost::property_tree::ptree&> child_cuts_inside =
@@ -185,13 +195,13 @@ Propagator::Propagator(const std::string& config_file)
         {
             cuts_inside.SetEcut(child_cuts_inside.get().get<double>("e_cut"));
             cuts_inside.SetVcut(child_cuts_inside.get().get<double>("v_cut"));
-            col_def_inside.do_continuous_randomization_ = child_cuts_inside.get().get<bool>("cont_rand");
+            sec_def_inside.do_continuous_randomization_ = child_cuts_inside.get().get<bool>("cont_rand");
 
         } else
         {
             cuts_inside.SetEcut(global_ecut_inside);
             cuts_inside.SetVcut(global_vcut_inside);
-            col_def_inside.do_continuous_randomization_ = global_cont_inside;
+            sec_def_inside.do_continuous_randomization_ = global_cont_inside;
         }
 
         boost::optional<const boost::property_tree::ptree&> child_cuts_behind =
@@ -200,25 +210,25 @@ Propagator::Propagator(const std::string& config_file)
         {
             cuts_behind.SetEcut(child_cuts_behind.get().get<double>("e_cut"));
             cuts_behind.SetVcut(child_cuts_behind.get().get<double>("v_cut"));
-            col_def_behind.do_continuous_randomization_ = child_cuts_behind.get().get<bool>("cont_rand");
+            sec_def_behind.do_continuous_randomization_ = child_cuts_behind.get().get<bool>("cont_rand");
 
         } else
         {
             cuts_behind.SetEcut(global_ecut_behind);
             cuts_behind.SetVcut(global_vcut_behind);
-            col_def_behind.do_continuous_randomization_ = global_cont_behind;
+            sec_def_behind.do_continuous_randomization_ = global_cont_behind;
         }
 
         if (interpolate)
         {
-            collections_.push_back(new CollectionInterpolant(*med, *geometry, cuts_infront, col_def_infront));
-            collections_.push_back(new CollectionInterpolant(*med, *geometry, cuts_inside, col_def_inside));
-            collections_.push_back(new CollectionInterpolant(*med, *geometry, cuts_behind, col_def_behind));
+            collections_.push_back(new SectorInterpolant(*med, *geometry, cuts_infront, sec_def_infront));
+            collections_.push_back(new SectorInterpolant(*med, *geometry, cuts_inside, sec_def_inside));
+            collections_.push_back(new SectorInterpolant(*med, *geometry, cuts_behind, sec_def_behind));
         } else
         {
-            collections_.push_back(new CollectionIntegral(*med, *geometry, cuts_infront, col_def_infront));
-            collections_.push_back(new CollectionIntegral(*med, *geometry, cuts_inside, col_def_inside));
-            collections_.push_back(new CollectionIntegral(*med, *geometry, cuts_behind, col_def_behind));
+            collections_.push_back(new SectorIntegral(*med, *geometry, cuts_infront, sec_def_infront));
+            collections_.push_back(new SectorIntegral(*med, *geometry, cuts_inside, sec_def_inside));
+            collections_.push_back(new SectorIntegral(*med, *geometry, cuts_behind, sec_def_behind));
         }
     }
 }
@@ -1524,8 +1534,7 @@ void Propagator::DisableInterpolation()
 
 
 Propagator::Propagator(const Propagator &propagator)
-    : MathModel(propagator)
-    ,seed_                      ( propagator.seed_ )
+    :seed_                      ( propagator.seed_ )
     // ,brems_                     ( propagator.brems_ )
     // ,photo_                     ( propagator.photo_ )
     // ,lpm_                       ( propagator.lpm_ )

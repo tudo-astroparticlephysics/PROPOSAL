@@ -5,8 +5,11 @@
 
 #include "gtest/gtest.h"
 
-#include "PROPOSAL/Geometry.h"
-#include "PROPOSAL/MathModel.h"
+#include "PROPOSAL/geometry/Geometry.h"
+#include "PROPOSAL/geometry/Sphere.h"
+#include "PROPOSAL/geometry/Cylinder.h"
+#include "PROPOSAL/geometry/Box.h"
+#include "PROPOSAL/math/MathModel.h"
 #include "PROPOSAL/Constants.h"
 // #include "PROPOSAL/PROPOSALParticle.h"
 
@@ -152,7 +155,7 @@ TEST(IsInside , Box ) {
         rnd_y0  = M.RandomDouble();
         rnd_z0  = M.RandomDouble();
 
-        position_geometry.SetCartesianCoordinates( 
+        position_geometry.SetCartesianCoordinates(
             ( 2 * rnd_x0  - 1)* 0.5 *( big_width_x - width_x ) ,
             ( 2 * rnd_y0  - 1)* 0.5 *( big_width_y - width_y ) ,
             ( 2 * rnd_z0  - 1)* 0.5 *( big_height  - height  ) );
@@ -422,9 +425,9 @@ TEST(IsInside , Cylinder ) {
 
 
             // if this constraints are true the particle is inside the cylinder geometry
-            if( sqrt( pow( (particle_position.GetX()-position_geometry.GetX()),2 ) 
+            if( sqrt( pow( (particle_position.GetX()-position_geometry.GetX()),2 )
                     + pow( (particle_position.GetY()-position_geometry.GetY()),2 ) ) < radius &&
-                sqrt( pow( (particle_position.GetX()-position_geometry.GetX()),2 ) 
+                sqrt( pow( (particle_position.GetX()-position_geometry.GetX()),2 )
                     + pow( (particle_position.GetY()-position_geometry.GetY()),2 ) ) > inner_radius &&
                 particle_position.GetZ() > position_geometry.GetZ() - 0.5*height  &&
                 particle_position.GetZ() < position_geometry.GetZ() + 0.5*height )
@@ -459,7 +462,7 @@ TEST(IsInside , Cylinder ) {
     {
         rnd_x = M.RandomDouble();
 
-        particle_position.SetCartesianCoordinates( 
+        particle_position.SetCartesianCoordinates(
             radius * rnd_x,
             radius * sqrt(1 - rnd_x*rnd_x),
             0 );
