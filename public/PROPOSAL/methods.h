@@ -8,9 +8,6 @@
 */
 #pragma once
 
-#ifndef METHODS_H_
-#define METHODS_H_
-
 // #include <string>
 // #include <iostream>
 // #include <fstream>
@@ -65,5 +62,3 @@ std::string NextToken(std::deque<std::string> *Tokens);
 }
 
 #define SWAP(a, b,T) {T t; t = a; a = b; b = t;}
-
-#endif /* METHODS_H_ */

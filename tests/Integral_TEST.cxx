@@ -5,7 +5,7 @@
 
 #include "gtest/gtest.h"
 
-#include "PROPOSAL/Integral.h"
+#include "PROPOSAL/math/Integral.h"
 
 using namespace PROPOSAL;
 
