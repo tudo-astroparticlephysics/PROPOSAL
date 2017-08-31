@@ -1,7 +1,5 @@
 #pragma once
 
-#ifndef OUTPUT_H
-#define OUTPUT_H
 #ifndef ICECUBE
 
 
@@ -13,7 +11,7 @@
 // #include <sstream>
 #include <fstream>
 
-#include "PROPOSAL/PROPOSALParticle.h"
+#include "PROPOSAL/particle/PROPOSALParticle.h"
 
 #if ROOT_SUPPORT
     #include "TTree.h"
@@ -239,6 +237,3 @@ public:
 }
 
 #endif //ICECUBE
-
-#endif //OUTPUT_H
-
