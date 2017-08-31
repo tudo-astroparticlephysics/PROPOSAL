@@ -39,7 +39,7 @@ double Bremsstrahlung::CalculatedEdx(const PROPOSALParticle& particle)
     for(int i=0; i<(medium_->GetNumComponents()); i++)
     {
         IntegralLimits limits = SetIntegralLimits(particle, i);
-        sum +=  dedx_integral_->Integrate(0, limits.vUp, boost::bind(&Bremsstrahlung::FunctionToDEdxIntegral, this, boost::cref(particle), _1),2);
+        sum +=  dedx_integral_->Integrate(limits.vMin, limits.vUp, boost::bind(&Bremsstrahlung::FunctionToDEdxIntegral, this, boost::cref(particle), _1),2);
     }
 
     return multiplier_*particle.GetEnergy()*sum;
@@ -1071,10 +1071,9 @@ double Bremsstrahlung::CalculateStochasticLoss(const PROPOSALParticle& particle,
 
         if(rsum > rand)
         {
-
             if(do_dndx_Interpolation_)
             {
-                    IntegralLimits limits = SetIntegralLimits(particle, i);
+                IntegralLimits limits = SetIntegralLimits(particle, i);
 
                 if(limits.vUp == limits.vMax)
                 {
@@ -1269,7 +1268,8 @@ CrossSections::IntegralLimits Bremsstrahlung::SetIntegralLimits(const PROPOSALPa
 
     IntegralLimits limits;
 
-    limits.vMax   =   1 - (3./4)*SQRTE*(particle.GetMass()/particle.GetEnergy())
+    limits.vMin = 0.;
+    limits.vMax = 1 - (3./4)*SQRTE*(particle.GetMass()/particle.GetEnergy())
                 *pow((component->GetNucCharge()) , 1./3);
 
     if(limits.vMax<0)

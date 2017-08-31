@@ -474,10 +474,28 @@ Salt::Salt(double rho)
              0,       // d0
              2.323)   // Solid halite density
 {
-    components_.push_back(new Components::Natrium());
-    components_.push_back(new Components::Chloride());
+    components_.push_back(new Components::Sodium());
+    components_.push_back(new Components::Chlorine());
     init();
 }
+
+// CalciumCarbonate::CalciumCarbonate(double rho)
+//     : Medium("calciumcarbonate",
+//              rho,
+//              136.4,   // I
+//              -3.7738, // C
+//              0.08301, // a
+//              3.4120,  // m
+//              0.0492,  // X0
+//              3.0549,  // X1
+//              0,       // d0
+//              2.650)   // massDensity
+// {
+//     components_.push_back(new Components::Calcium());
+//     components_.push_back(new Components::Carbon());
+//     components_.push_back(new Components::Oxygen(3));
+//     init();
+// }
 
 StandardRock::StandardRock(double rho)
     : Medium("standardrock",
@@ -610,7 +628,7 @@ Air::Air(double rho)
 
     components_.push_back(new Components::Nitrogen(fr1 / fra));
     components_.push_back(new Components::Oxygen(fr2 / fra));
-    components_.push_back(new Components::Arsenic(fr3 / fra));
+    components_.push_back(new Components::Argon(fr3 / fra));
     init();
 }
 
@@ -659,7 +677,7 @@ AntaresWater::AntaresWater(double rho)
     components_.push_back(new Components::Potassium(0.000209));
     components_.push_back(new Components::Magnesium(0.001087));
     components_.push_back(new Components::Calcium(0.000209));
-    components_.push_back(new Components::Chloride(0.01106));
+    components_.push_back(new Components::Chlorine(0.01106));
     components_.push_back(new Components::Sulfur(0.00582));
     init();
 
