@@ -5,7 +5,6 @@
 // #include <vector>
 
 #include "PROPOSAL/EnergyCutSettings.h"
-// #include "PROPOSAL/scattering/Scattering.h"
 #include "PROPOSAL/scattering/ScatteringFactory.h"
 #include "PROPOSAL/particle/PROPOSALParticle.h"
 
@@ -23,46 +22,58 @@ class Medium;
 class EnergyCutSettings;
 class Geometry;
 
-struct SectorDef
-{
-    bool do_weighting;      //!< Do weigthing? Set to false in constructor
-    double weighting_order; //!< Re-weighting order. Set to 0 in constructor
-
-    double brems_multiplier; //!< multiplier to in- or decrease the Bremsstrahlung cross-sections
-    double photo_multiplier; //!< multiplier to in- or decrease the Photonucler cross-sections
-    double ioniz_multiplier; //!< multiplier to in- or decrease the Ionization cross-sections
-    double epair_multiplier; //!< multiplier to in- or decrease the Epairproduction cross-sections
-
-    // TODO(mario): must be removed Fri 2017/08/25
-    bool do_scattering;                                        //!< if true moliere scattering is enabled
-    ScatteringFactory::ScatteringModel::Enum scattering_model; //!< if true moliere scattering is enabled
-
-    bool do_continuous_randomization_; //!< if true randomization of continuous energy losses is enabled
-    bool do_exact_time_calculation; //!< exact local time calculation enabled if true
-    bool lpm_effect_enabled;
-
-    int location;              //!< 0 = infront of the detector, 1 = inside the detector, 2 = behind the detector
-    double density_correction; //!< density correction factor
-
-    double order_of_interpolation;
-    bool raw;                   /// Determine if output format of interpolation tables is binary or txt.
-    std::string path_to_tables; /// Path to interpolation tables
-
-    SectorDef();
-    ~SectorDef();
-};
-
 /*! \class ProcessSector ProcessSector.h "CrossSections.h"
     \brief initializes all cross sections and keeps references to them
  */
 class Sector
 {
     public:
+
+    struct ParticleLocation
+    {
+        enum Enum
+        {
+            InfrontDetector = 0,
+            InsideDetector,
+            BehindDetector
+        };
+    };
+
+    struct Definition
+    {
+        bool do_weighting;      //!< Do weigthing? Set to false in constructor
+        double weighting_order; //!< Re-weighting order. Set to 0 in constructor
+
+        double brems_multiplier; //!< multiplier to in- or decrease the Bremsstrahlung cross-sections
+        double photo_multiplier; //!< multiplier to in- or decrease the Photonucler cross-sections
+        double ioniz_multiplier; //!< multiplier to in- or decrease the Ionization cross-sections
+        double epair_multiplier; //!< multiplier to in- or decrease the Epairproduction cross-sections
+
+        // TODO(mario): must be removed Fri 2017/08/25
+        bool do_scattering;                                        //!< if true moliere scattering is enabled
+        ScatteringFactory::Enum scattering_model; //!< if true moliere scattering is enabled
+
+        bool do_continuous_randomization; //!< exact local time calculation enabled if true
+        bool do_exact_time_calculation; //!< exact local time calculation enabled if true
+        bool lpm_effect_enabled;
+
+        // int location;              //!< 0 = infront of the detector, 1 = inside the detector, 2 = behind the detector
+        Sector::ParticleLocation::Enum location;              //!< 0 = infront of the detector, 1 = inside the detector, 2 = behind the detector
+
+        double order_of_interpolation;
+        bool raw;                   /// Determine if output format of interpolation tables is binary or txt.
+        std::string path_to_tables; /// Path to interpolation tables
+
+        Definition();
+        ~Definition();
+    };
+
+    public:
     Sector();
     Sector(const Medium&,
                const Geometry&,
                const EnergyCutSettings&,
-               const SectorDef& def = SectorDef());
+               const Definition& def = Definition());
     Sector(const Sector&);
     virtual ~Sector();
 
@@ -220,15 +231,14 @@ class Sector
     // void DisableContinuousRandomization();
     void EnableExactTimeCalculation();
     void DisableExactTimeCalculation();
-    void SetLocation(int location) { collection_def_.location = location; }
+    void SetLocation(ParticleLocation::Enum location) { collection_def_.location = location; }
 
     // --------------------------------------------------------------------- //
     // Getter
     // --------------------------------------------------------------------- //
 
-    int GetLocation() const { return collection_def_.location; }
+    ParticleLocation::Enum GetLocation() const { return collection_def_.location; }
     double GetIni() const { return ini_; }
-    double GetDensityCorrection() const { return collection_def_.density_correction; }
 
     bool GetDoScattering() const { return collection_def_.do_scattering; }
     bool GetLpmEffectEnabled() const { return collection_def_.lpm_effect_enabled; }
@@ -253,7 +263,7 @@ class Sector
     // Just a temporary to store -> bad design
     double ini_;
 
-    SectorDef collection_def_;
+    Definition collection_def_;
 
     //TODO(mario): Do better weight enabling Fri 2017/08/25
     // bool do_weighting_;          //!< Do weigthing? Set to false in constructor

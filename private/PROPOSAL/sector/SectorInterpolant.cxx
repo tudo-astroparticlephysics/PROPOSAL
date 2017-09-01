@@ -36,7 +36,7 @@ SectorInterpolant::SectorInterpolant()
 SectorInterpolant::SectorInterpolant(const Medium& medium,
                                              const Geometry& geometry,
                                              const EnergyCutSettings& cut_settings,
-                                             const SectorDef& def)
+                                             const Definition& def)
     :Sector(medium, geometry, cut_settings, def)
     , initialized_interpolation_(false)
     , up_(false)
@@ -499,7 +499,7 @@ void SectorInterpolant::InitInterpolation(const PROPOSALParticle& particle, std:
 
     }
 
-    if(collection_def_.do_continuous_randomization_)
+    if(collection_def_.do_continuous_randomization)
     {
         randomizer_->EnableDE2dxInterpolation(particle, crosssections_, filepath ,raw);
         randomizer_->EnableDE2deInterpolation(particle, crosssections_, filepath,raw);

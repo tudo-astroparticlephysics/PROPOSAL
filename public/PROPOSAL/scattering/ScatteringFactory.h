@@ -16,25 +16,22 @@ class ScatteringFactory
 {
     public:
 
-    struct ScatteringModel
+    enum Enum
     {
-        enum Enum
-        {
-            Default = 0,
-            Moliere,
-            MoliereFirstOrder
-        };
+        Default = 0,
+        Moliere,
+        MoliereFirstOrder
     };
 
     typedef boost::function<Scattering* (void)> RegisterFunction;
     typedef std::map<std::string, boost::function<Scattering* (void)> > ScatteringMapString;
-    typedef std::map<ScatteringModel::Enum, boost::function<Scattering* (void)> > ScatteringMapEnum;
-    typedef std::map<std::string, ScatteringModel::Enum> MapStringToEnum;
+    typedef std::map<Enum, boost::function<Scattering* (void)> > ScatteringMapEnum;
+    typedef std::map<std::string, Enum> MapStringToEnum;
 
     Scattering* CreateScattering(const std::string&);
-    Scattering* CreateScattering(const ScatteringModel::Enum);
+    Scattering* CreateScattering(const Enum);
 
-    ScatteringModel::Enum GetEnumFromString(const std::string&);
+    Enum GetEnumFromString(const std::string&);
 
     static ScatteringFactory& Get()
     {
@@ -47,8 +44,8 @@ class ScatteringFactory
     ~ScatteringFactory();
 
     void Register(const std::string& name, RegisterFunction);
-    void Register(ScatteringModel::Enum, RegisterFunction);
-    void Register(const std::string&, ScatteringModel::Enum);
+    void Register(Enum, RegisterFunction);
+    void Register(const std::string&, Enum);
 
     // std::map<std::string, Scattering* (*)(void)> scattering_map;
     ScatteringMapString scattering_map_str_;

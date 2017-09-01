@@ -22,10 +22,10 @@ using namespace std;
 using namespace PROPOSAL;
 
 /******************************************************************************
-*                               SectorDef                                *
+*                                 Sector                                 *
 ******************************************************************************/
 
-SectorDef::SectorDef()
+Sector::Definition::Definition()
     : do_weighting(false)
     , weighting_order(0)
     , brems_multiplier(1.0)
@@ -33,26 +33,20 @@ SectorDef::SectorDef()
     , ioniz_multiplier(1.0)
     , epair_multiplier(1.0)
     , do_scattering(false)
-    , scattering_model(ScatteringFactory::ScatteringModel::Default)
-    , do_continuous_randomization_(false)
+    , scattering_model(ScatteringFactory::Default)
+    , do_continuous_randomization(false)
     , do_exact_time_calculation(false)
     , lpm_effect_enabled(false)
-    , location(0)
-    , density_correction(1.0)
+    , location(Sector::ParticleLocation::InsideDetector)
     , order_of_interpolation(5)
     , raw(true)
     , path_to_tables("")
 {
 }
 
-SectorDef::~SectorDef()
+Sector::Definition::~Definition()
 {
 }
-
-/******************************************************************************
-*                                 Sector                                 *
-******************************************************************************/
-
 
 // ------------------------------------------------------------------------- //
 // Constructors
@@ -76,7 +70,7 @@ Sector::Sector()
     crosssections_.push_back(new Ionization(medium_, &cut_settings_));
 
     //TODO(mario): Polymorphic initilaization in collections childs  Sun 2017/08/27
-    if (collection_def_.do_continuous_randomization_)
+    if (collection_def_.do_continuous_randomization)
     {
         randomizer_ = new ContinuousRandomization();
     }
@@ -90,7 +84,7 @@ Sector::Sector()
 Sector::Sector(const Medium& medium,
                        const Geometry& geometry,
                        const EnergyCutSettings& cut_settings,
-                       const SectorDef& def)
+                       const Definition& def)
     : ini_(0)
     , collection_def_(def)
     , weighting_starts_at_(0)
@@ -133,7 +127,7 @@ Sector::Sector(const Medium& medium,
     }
 
     //TODO(mario): Polymorphic initilaization in collections childs  Sun 2017/08/27
-    if (collection_def_.do_continuous_randomization_)
+    if (collection_def_.do_continuous_randomization)
     {
         randomizer_ = new ContinuousRandomization();
     }
@@ -248,8 +242,8 @@ double Sector::Propagate(PROPOSALParticle& particle, double distance)
         // Calculate the displacement according to initial energy initial_energy and final_energy
         displacement =
             CalculateDisplacement(
-                particle, initial_energy, final_energy, collection_def_.density_correction * (distance - propagated_distance)) /
-            collection_def_.density_correction;
+                particle, initial_energy, final_energy, medium_->GetDensityCorrection() * (distance - propagated_distance)) /
+            medium_->GetDensityCorrection();
 
 
         // The first interaction or decay happens behind the distance we want to propagate
@@ -258,7 +252,7 @@ double Sector::Propagate(PROPOSALParticle& particle, double distance)
         {
             displacement = distance - propagated_distance;
 
-            final_energy = CalculateFinalEnergy(particle, initial_energy, collection_def_.density_correction * displacement);
+            final_energy = CalculateFinalEnergy(particle, initial_energy, medium_->GetDensityCorrection() * displacement);
         }
         // Advance the Particle according to the displacement
         // Initial energy and final energy are needed if Molier Scattering is enabled
@@ -273,7 +267,7 @@ double Sector::Propagate(PROPOSALParticle& particle, double distance)
 
         //TODO(mario): Revert randomizer Fri 2017/08/25
         // Randomize the continuous energy loss if this option is enabled
-        if (collection_def_.do_continuous_randomization_)
+        if (collection_def_.do_continuous_randomization)
         {
             if (final_energy != particle.GetLow())
             {
@@ -412,7 +406,7 @@ std::pair<double, double> Sector::CalculateEnergyTillStochastic(const PROPOSALPa
         rnddMin = 0;
     } else
     {
-        rnddMin = CalculateTrackingIntegal(particle, initial_energy, rndd, false) / collection_def_.density_correction;
+        rnddMin = CalculateTrackingIntegal(particle, initial_energy, rndd, false) / medium_->GetDensityCorrection();
     }
 
     rndiMin = CalculateTrackingIntegal(particle, initial_energy, rndi, true);
@@ -423,7 +417,7 @@ std::pair<double, double> Sector::CalculateEnergyTillStochastic(const PROPOSALPa
         final.second = particle.GetLow();
     } else
     {
-        final.second = CalculateFinalEnergy(particle, initial_energy, rndd * collection_def_.density_correction, false);
+        final.second = CalculateFinalEnergy(particle, initial_energy, rndd * medium_->GetDensityCorrection(), false);
     }
 
     if (rndi >= rndiMin || rndiMin <= 0)
@@ -448,7 +442,7 @@ void Sector::AdvanceParticle(PROPOSALParticle& particle, double dr, double ei, d
 
     if (collection_def_.do_exact_time_calculation)
     {
-        time += CalculateParticleTime(particle, ei, ef) / collection_def_.density_correction;
+        time += CalculateParticleTime(particle, ei, ef) / medium_->GetDensityCorrection();
     } else
     {
         time += dr / SPEED;
