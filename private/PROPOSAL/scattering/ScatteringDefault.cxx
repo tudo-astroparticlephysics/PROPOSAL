@@ -205,9 +205,10 @@ long double ScatteringDefault::CalculateTheta0(const PROPOSALParticle& particle,
     {
         aux = integral_.Integrate(ei, ef, boost::bind(&ScatteringDefault::FunctionToIntegral, this, boost::cref(particle), boost::cref(cross_sections), _1),4);
     }
-    // TODO: check if one has to take the absolute value of the particle charge
+    // TODO: Decide if using RadiationLength calculated in Bremsstrahlung or Medium
     double radiation_lenght = cross_sections.at(0)->GetMedium()->GetRadiationLength();
 
+    // TODO: check if one has to take the absolute value of the particle charge
     aux =   sqrt(max(aux, 0.0) / radiation_lenght) * particle.GetCharge();
     aux *=  max(1 + 0.038*log(dr / radiation_lenght), 0.0);
 
