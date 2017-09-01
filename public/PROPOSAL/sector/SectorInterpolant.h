@@ -13,7 +13,7 @@ class SectorInterpolant : public Sector
     SectorInterpolant(const Medium&,
                           const Geometry&,
                           const EnergyCutSettings&,
-                          const SectorDef& def = SectorDef());
+                          const Definition& def = Definition());
     SectorInterpolant(const SectorInterpolant&);
     virtual ~SectorInterpolant();
 

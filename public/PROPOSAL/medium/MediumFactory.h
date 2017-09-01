@@ -1,6 +1,8 @@
 
 #pragma once
 
+#include <boost/function.hpp>
+
 #include "PROPOSAL/medium/Medium.h"
 
 namespace PROPOSAL
@@ -9,8 +11,33 @@ namespace PROPOSAL
 class MediumFactory
 {
     public:
-    void Register(const std::string& name, Medium* (*)(void));
-    Medium* CreateMedium(const std::string&);
+
+    enum Enum
+    {
+        Water = 0,
+        Ice,
+        Salt,
+        StandardRock,
+        FrejusRock,
+        Iron,
+        Hydrogen,
+        Lead,
+        Copper,
+        Uranium,
+        Air,
+        Paraffin,
+        AntaresWater
+    };
+
+    typedef boost::function<Medium* (double)> RegisterFunction;
+    typedef std::map<std::string, RegisterFunction > MediumMapString;
+    typedef std::map<Enum, RegisterFunction > MediumMapEnum;
+
+    void Register(const std::string& name, const Enum&, RegisterFunction);
+    // void Register(const Enum&, RegisterFunction);
+
+    Medium* CreateMedium(const std::string&, double density_correction=1.0);
+    Medium* CreateMedium(const Enum&, double density_correction=1.0);
 
     static MediumFactory& Get()
     {
@@ -20,9 +47,10 @@ class MediumFactory
 
     private:
     MediumFactory();
-    ~MediumFactory() { medium_map.clear(); }
+    ~MediumFactory();
 
-    std::map<std::string, Medium* (*)(void)> medium_map;
+    MediumMapString medium_map_str;
+    MediumMapEnum medium_map_enum;
 };
 
 } /* PROPOsAL */

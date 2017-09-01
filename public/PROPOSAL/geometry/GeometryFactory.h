@@ -13,16 +13,21 @@ class GeometryFactory
 {
     public:
 
-    typedef boost::function<Geometry* (void)> RegisterFunction;
-    // typedef boost::function<Geometry* (boost::property_tree::ptree const&)> RegisterFunctionPTree;
-    typedef std::map<std::string, RegisterFunction> GeometryMap;
-    // typedef std::map<std::string, RegisterFunctionPTree> GeometryMapPTree;
-    // typedef std::map<ScatteringModel::Enum, boost::function<Scattering* (void)> > ScatteringMapEnum;
+    enum Enum
+    {
+        Sphere = 0,
+        Box,
+        Cylinder,
+    };
 
-    // void Register(const std::string& name, RegisterFunction);
-    void Register(const std::string& name, RegisterFunction);
+    typedef boost::function<Geometry* (void)> RegisterFunction;
+    typedef std::map<std::string, RegisterFunction> GeometryMapString;
+    typedef std::map<Enum, RegisterFunction> GeometryMapEnum;
+
+    void Register(const std::string&, const Enum&, RegisterFunction);
 
     Geometry* CreateGeometry(const std::string&);
+    Geometry* CreateGeometry(const Enum&);
     Geometry* CreateGeometry(boost::property_tree::ptree const& pt);
 
     static GeometryFactory& Get()
@@ -35,7 +40,8 @@ class GeometryFactory
     GeometryFactory();
     ~GeometryFactory();
 
-    GeometryMap geometry_map;
+    GeometryMapString geometry_map_str;
+    GeometryMapEnum geometry_map_enum;
     // GeometryMapPTree geometry_map_ptree;
     // ScatteringMapEnum scattering_map_enum_;
 };

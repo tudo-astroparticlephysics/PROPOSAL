@@ -13,7 +13,7 @@ class SectorIntegral : public Sector
     SectorIntegral(const Medium&,
                        const Geometry&,
                        const EnergyCutSettings&,
-                       const SectorDef& def = SectorDef());
+                       const Definition& def = Definition());
     SectorIntegral(const SectorIntegral&);
     virtual ~SectorIntegral();
 

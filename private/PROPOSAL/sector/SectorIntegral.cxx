@@ -18,7 +18,7 @@ SectorIntegral::SectorIntegral()
 SectorIntegral::SectorIntegral(const Medium& medium,
                                        const Geometry& geometry,
                                        const EnergyCutSettings& cut_settings,
-                                       const SectorDef& def)
+                                       const Definition& def)
     : Sector(medium, geometry, cut_settings, def)
     , integral_(IROMB, IMAXS, IPREC2)
     , prop_interaction_(IROMB, IMAXS, IPREC2)

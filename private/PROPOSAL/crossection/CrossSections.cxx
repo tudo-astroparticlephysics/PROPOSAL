@@ -152,7 +152,7 @@ std::ostream& operator<<(std::ostream& os, CrossSections const &crossSections)
     if(crossSections.medium_!=NULL)
     {
         os<<"\t\tname:\t\t\t"<<crossSections.medium_->GetName()<<std::endl;
-        os<<"\t\trho:\t\t\t"<<crossSections.medium_->GetRho()<<std::endl;
+        os<<"\t\trho:\t\t\t"<<crossSections.medium_->GetDensityCorrection()<<std::endl;
     }
     os<<std::endl;
     os<<"\tCutSettings:\t"<<crossSections.cut_settings_<<std::endl;
