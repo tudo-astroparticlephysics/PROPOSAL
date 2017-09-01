@@ -12,10 +12,7 @@ using namespace PROPOSAL;
 
 
 CrossSections::CrossSections( )
-    :vMax_                  ( 0 )
-    ,vUp_                   ( 0 )
-    ,vMin_                  ( 0 )
-    ,ebig_                  ( BIGENERGY )
+    :ebig_                  ( BIGENERGY )
     ,rnd_                   ( 0 )
     ,do_dedx_Interpolation_ ( false )
     ,do_dndx_Interpolation_ ( false )
@@ -39,10 +36,7 @@ CrossSections::CrossSections( )
 
 CrossSections::CrossSections(Medium* medium,
                              EnergyCutSettings* cut_settings)
-    :vMax_                  ( 0 )
-    ,vUp_                   ( 0 )
-    ,vMin_                  ( 0 )
-    ,ebig_                  ( BIGENERGY )
+    :ebig_                  ( BIGENERGY )
     ,rnd_                   ( 0 )
     ,do_dedx_Interpolation_ ( false )
     ,do_dndx_Interpolation_ ( false )
@@ -67,9 +61,6 @@ CrossSections::CrossSections(Medium* medium,
 CrossSections::CrossSections(const CrossSections& crossSections)
     :name_                     ( crossSections.name_ )
     ,type_                     ( crossSections.type_ )
-    ,vMax_                     ( crossSections.vMax_ )
-    ,vUp_                      ( crossSections.vUp_ )
-    ,vMin_                     ( crossSections.vMin_ )
     ,ebig_                     ( crossSections.ebig_ )
     ,rnd_                      ( crossSections.rnd_ )
     ,do_dedx_Interpolation_    ( crossSections.do_dedx_Interpolation_ )
@@ -96,9 +87,6 @@ CrossSections::CrossSections(const CrossSections& crossSections)
 
 bool CrossSections::operator==(const CrossSections &crossSections) const
 {
-    if( vMax_                     != crossSections.vMax_ )                  return false;
-    if( vUp_                      != crossSections.vUp_ )                   return false;
-    if( vMin_                     != crossSections.vMin_ )                  return false;
     if( ebig_                     != crossSections.ebig_ )                  return false;
     if( rnd_                      != crossSections.rnd_ )                   return false;
     if( do_dedx_Interpolation_    != crossSections.do_dedx_Interpolation_ ) return false;
@@ -163,9 +151,6 @@ std::ostream& operator<<(std::ostream& os, CrossSections const &crossSections)
     }
     os<<std::endl;
     os<<"\tTemp. variables: " << std::endl;
-    os<<"\t\tvMax:\t\t\t"<<crossSections.vMax_<<std::endl;
-    os<<"\t\tvUp:\t\t\t"<<crossSections.vUp_<<std::endl;
-    os<<"\t\tvMin:\t\t\t"<<crossSections.vMin_<<std::endl;
     os<<"\t\trnd:\t\t\t"<<crossSections.rnd_<<std::endl;
     os<<"\t\torder_of_interpolation:\t"<<crossSections.order_of_interpolation_<<std::endl;
     os<<"\t\tsum_of_rates:\t\t"<<crossSections.sum_of_rates_<<std::endl;
@@ -184,9 +169,6 @@ void CrossSections::swap(CrossSections &crossSections)
 {
     using std::swap;
 
-    swap( vMax_                     , crossSections.vMax_ );
-    swap( vUp_                      , crossSections.vUp_ );
-    swap( vMin_                     , crossSections.vMin_ );
     swap( ebig_                     , crossSections.ebig_ );
     swap( rnd_                      , crossSections.rnd_ );
     swap( do_dedx_Interpolation_    , crossSections.do_dedx_Interpolation_ );
@@ -204,62 +186,3 @@ void CrossSections::swap(CrossSections &crossSections)
 }
 
 
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-//---------------------------------Setter-------------------------------------//
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-void CrossSections::SetParametrizationLimit(double ebig){
-    ebig_ = ebig;
-}
-
-void CrossSections::SetMultiplier(double multiplier){
-    multiplier_ = multiplier;
-}
-
-void CrossSections::SetVMin(double vMin){
-    vMin_ = vMin;
-}
-
-void CrossSections::SetVMax(double vMax){
-    vMax_ = vMax;
-}
-
-void CrossSections::SetVUp(double vUp){
-    vUp_ = vUp;
-}
-
-// void CrossSections::SetParticle(PROPOSALParticle *particle){
-//     particle_ = particle;
-// }
-
-void CrossSections::SetMedium(Medium *medium){
-    medium_ = medium;
-}
-
-void CrossSections::SetEnergyCutSettings(EnergyCutSettings *cuts){
-    cut_settings_ = cuts;
-}
-
-void CrossSections::EnableLpmEffect(bool lpm_effect_enabled){
-    lpm_effect_enabled_ = lpm_effect_enabled;
-}
-
-
-
-// PROPOSALParticle *CrossSections::GetBackup_particle() const
-// {
-//     return backup_particle_;
-// }
-
-// void CrossSections::SetBackup_particle(PROPOSALParticle *backup_particle)
-// {
-//     backup_particle_ = backup_particle;
-// }
-
-// void CrossSections::RestoreBackup_particle()
-// {
-//     particle_ = backup_particle_;
-// }

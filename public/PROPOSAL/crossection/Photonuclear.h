@@ -298,11 +298,29 @@ public:
     // void ValidateOptions();
 
 //----------------------------------------------------------------------------//
+//-----------------------------Getter and Setter------------------------------//
+//----------------------------------------------------------------------------//
     //Getter
 
-	int GetComponent() const {
-		return component_;
-	}
+    int GetComponent() const { return component_; }
+
+    int GetHmax() const { return hmax_; }
+
+    bool GetInitHardbb() const { return init_hardbb_; }
+
+    bool GetInitMeasured() const { return init_measured_; }
+
+    double GetV() const {
+        return v_;
+    }
+
+    ShadowingType::Enum GetShadow() const {
+        return shadow_;
+    }
+
+    bool GetHardComponent() const {
+        return hard_component_;
+    }
 
 	Interpolant* GetDedxInterpolant() const {
 		return dedx_interpolant_;
@@ -318,18 +336,6 @@ public:
 
 	std::vector<Interpolant*> GetDndxInterpolant2d() const {
 		return dndx_interpolant_2d_;
-	}
-
-	int GetHmax() const {
-		return hmax_;
-	}
-
-	bool GetInitHardbb() const {
-		return init_hardbb_;
-	}
-
-	bool GetInitMeasured() const {
-		return init_measured_;
 	}
 
 	Integral* GetIntegral() const {
@@ -352,33 +358,18 @@ public:
 		return prob_for_component_;
 	}
 
-	double GetV() const {
-		return v_;
-	}
-
-    ShadowingType::Enum GetShadow() const {
-        return shadow_;
-    }
-
-    bool GetHardComponent() const {
-        return hard_component_;
-    }
 //----------------------------------------------------------------------------//
     //Setter
+
+    void SetComponent(int component){ component_ = component; }
+
+	void SetHmax(int hmax){ hmax_ = hmax; }
+
+	void SetInitHardbb(bool initHardbb){ init_hardbb_ = initHardbb; }
+
+	void SetInitMeasured(bool initMeasured){ init_measured_ = initMeasured; }
+
     // void SetParametrization(ParametrizationType::Enum parametrization = ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich);
-	void SetComponent(int component);
-	void SetDedxInterpolant(Interpolant* dedxInterpolant);
-	void SetDndxIntegral(std::vector<Integral*> dndxIntegral);
-	void SetDndxInterpolant1d(std::vector<Interpolant*> dndxInterpolant1d);
-	void SetDndxInterpolant2d(std::vector<Interpolant*> dndxInterpolant2d);
-	void SetHmax(int hmax);
-	void SetInitHardbb(bool initHardbb);
-	void SetInitMeasured(bool initMeasured);
-	void SetIntegral(Integral* integral);
-	void SetIntegralForDEdx(Integral* integralForDEdx);
-	void SetInterpolantHardBb(std::vector<Interpolant*> interpolantHardBb);
-	void SetInterpolantMeasured(Interpolant* interpolantMeasured);
-	void SetProbForComponent(std::vector<double> probForComponent);
 
 //----------------------------------------------------------------------------//
     //Destructor

@@ -191,11 +191,9 @@ public:
     void ValidateOptions();
 
 //----------------------------------------------------------------------------//
+//-----------------------------Getter and Setter------------------------------//
+//----------------------------------------------------------------------------//
     //Getter
-
-	// double GetBeta() const {
-	// 	return beta_;
-	// }
 
 	const Interpolant* GetDedxInterpolant() const {
 		return dedx_interpolant_;
@@ -209,23 +207,15 @@ public:
 		return dndx_interpolant_2d_;
 	}
 
-	// double GetGamma() const {
-	// 	return gamma_;
-	// }
-
 	const Integral* GetIntegral() const {
 		return integral_;
 	}
 
 //----------------------------------------------------------------------------//
     //Setter
-    void SetParametrization(ParametrizationType::Enum parametrization = ParametrizationType::IonizBetheBloch);
-	// void SetBeta(double beta);
-	void SetDedxInterpolant(Interpolant* dedxInterpolant);
-	void SetDndxInterpolant1d(Interpolant* dndxInterpolant1d);
-	void SetDndxInterpolant2d(Interpolant* dndxInterpolant2d);
-	// void SetGamma(double gamma);
-	void SetIntegral(Integral* integral);
+
+    // void SetParametrization(ParametrizationType::Enum parametrization = ParametrizationType::IonizBetheBloch);
+
 
 //----------------------------------------------------------------------------//
     //Destructor
