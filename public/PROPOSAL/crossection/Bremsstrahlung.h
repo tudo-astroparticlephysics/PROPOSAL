@@ -204,10 +204,21 @@ public:
     ~Bremsstrahlung();
 
 //----------------------------------------------------------------------------//
+//-----------------------------Getter and Setter------------------------------//
+//----------------------------------------------------------------------------//
+    // Getter
 
-    int GetComponent() const {
-		return component_;
-	}
+    int GetComponent() const { return component_; }
+
+    double GetLpm() const { return eLpm_; }
+
+    bool GetLorenz() const { return lorenz_; }
+
+    double GetLorenzCut() const { return lorenz_cut_; }
+
+    std::vector<double> GetProbForComponent() const {
+        return prob_for_component_;
+    }
 
 	Integral* GetDedxIntegral() const {
 		return dedx_integral_;
@@ -229,34 +240,19 @@ public:
 		return dndx_interpolant_2d_;
 	}
 
-	double GetLpm() const {
-		return eLpm_;
-	}
-
-	bool GetLorenz() const {
-		return lorenz_;
-	}
-
-	double GetLorenzCut() const {
-		return lorenz_cut_;
-	}
-
-	std::vector<double> GetProbForComponent() const {
-		return prob_for_component_;
-	}
 
 //----------------------------------------------------------------------------//
+    // Setter
+
+    void SetComponent(const int component){ component_ = component; }
+
+    void SetLpm(const double lpm){ eLpm_ = lpm; }
+
+    void SetLorenz(const bool lorenz){ lorenz_ = lorenz; }
+
+    void SetLorenzCut(const double lorenzCut){ lorenz_cut_ = lorenzCut; }
+
     // void SetParametrization(ParametrizationType::Enum parametrization = ParametrizationType::BremsKelnerKokoulinPetrukhin);
-	void SetComponent(int component);
-	void SetDedxIntegral(Integral* dedxIntegral);
-	void SetDedxInterpolant(Interpolant* dedxInterpolant);
-	void SetDndxIntegral(std::vector<Integral*> dndxIntegral);
-	void SetDndxInterpolant1d(std::vector<Interpolant*> dndxInterpolant1d);
-	void SetDndxInterpolant2d(std::vector<Interpolant*> dndxInterpolant2d);
-	void SetLpm(double lpm);
-	void SetLorenz(bool lorenz);
-	void SetLorenzCut(double lorenzCut);
-	void SetProbForComponent(std::vector<double> probForComponent);
 };
 
 }

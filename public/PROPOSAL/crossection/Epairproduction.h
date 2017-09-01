@@ -185,11 +185,23 @@ public:
     void ValidateOptions();
 
 //----------------------------------------------------------------------------//
+//-----------------------------Getter and Setter------------------------------//
+//----------------------------------------------------------------------------//
     //Getter
 
-	int GetComponent() const {
-		return component_;
-	}
+    int GetComponent() const { return component_; }
+
+    double GetLpm() const { return eLpm_; }
+
+    bool GetReverse() const { return reverse_; }
+
+    std::vector<double> GetProbForComponent() const {
+        return prob_for_component_;
+    }
+
+    double GetV() const {
+        return v_;
+    }
 
 	Interpolant* GetDedxInterpolant() const {
 		return dedx_interpolant_;
@@ -207,10 +219,6 @@ public:
 		return dndx_interpolant_2d_;
 	}
 
-	double GetLpm() const {
-		return eLpm_;
-	}
-
 	Integral* GetIntegral() const {
 		return integral_;
 	}
@@ -219,31 +227,16 @@ public:
 		return integral_for_dEdx_;
 	}
 
-	std::vector<double> GetProbForComponent() const {
-		return prob_for_component_;
-	}
-
-	bool GetReverse() const {
-		return reverse_;
-	}
-
-	double GetV() const {
-		return v_;
-	}
 //----------------------------------------------------------------------------//
     //Setter
 
-    void SetParametrization(ParametrizationType::Enum parametrization = ParametrizationType::EPairKelnerKokoulinPetrukhin);
-	void SetComponent(int component);
-	void SetDedxInterpolant(Interpolant* dedxInterpolant);
-	void SetDndxIntegral(std::vector<Integral*> dndxIntegral);
-	void SetDndxInterpolant1d(std::vector<Interpolant*> dndxInterpolant1d);
-	void SetDndxInterpolant2d(std::vector<Interpolant*> dndxInterpolant2d);
-	void SetLpm(double lpm);
-	void SetIntegral(Integral* integral);
-	void SetIntegralForDEdx(Integral* integralForDEdx);
-	void SetProbForComponent(std::vector<double> probForComponent);
-	void SetReverse(bool reverse);
+    // void SetParametrization(ParametrizationType::Enum parametrization = ParametrizationType::EPairKelnerKokoulinPetrukhin);
+
+	void SetComponent(int component){ component_ = component; }
+
+	void SetLpm(double lpm){ eLpm_ = lpm; }
+
+	void SetReverse(bool reverse){ reverse_ = reverse; }
 
 //----------------------------------------------------------------------------//
     //Destructor
