@@ -809,9 +809,6 @@ Epairproduction::Epairproduction(Medium* medium, EnergyCutSettings* cut_settings
 {
     name_                       = "Epairproduction";
     type_                       = ParticleType::EPair;
-    vMax_                 = 0;
-    vUp_                 = 0;
-    vMin_                 = 0;
     ebig_                       = BIGENERGY;
     do_dedx_Interpolation_      = false;
     do_dndx_Interpolation_      = false;
@@ -1038,7 +1035,6 @@ double Epairproduction::CalculateStochasticLoss(const PROPOSALParticle& particle
         rsum    += prob_for_component_.at(i);
         if(rsum > rand)
         {
-
             if(do_dndx_Interpolation_)
             {
                 CrossSections::IntegralLimits limits = SetIntegralLimits(particle, i);;
@@ -1425,57 +1421,13 @@ double Epairproduction::FunctionToIntegral(const PROPOSALParticle& particle, dou
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-void Epairproduction::SetParametrization(ParametrizationType::Enum parametrization){
-    parametrization_ = parametrization;
-    log_warn("This has no effect. Till now only one parametrization for Epairproduction implemented");
-    if (parametrization_ != ParametrizationType::EPairKelnerKokoulinPetrukhin)
-        log_warn("The parametrization type number '%i' is different to the one that is implemented with type number '%i' "
-            , parametrization_, ParametrizationType::EPairKelnerKokoulinPetrukhin);
-}
-
-void Epairproduction::SetComponent(int component) {
-	component_ = component;
-}
-
-void Epairproduction::SetDedxInterpolant(Interpolant* dedxInterpolant) {
-	dedx_interpolant_ = dedxInterpolant;
-}
-
-void Epairproduction::SetDndxIntegral(std::vector<Integral*> dndxIntegral) {
-	dndx_integral_ = dndxIntegral;
-}
-
-void Epairproduction::SetDndxInterpolant1d(
-		std::vector<Interpolant*> dndxInterpolant1d) {
-	dndx_interpolant_1d_ = dndxInterpolant1d;
-}
-
-void Epairproduction::SetDndxInterpolant2d(
-		std::vector<Interpolant*> dndxInterpolant2d) {
-	dndx_interpolant_2d_ = dndxInterpolant2d;
-}
-
-void Epairproduction::SetLpm(double lpm) {
-	eLpm_ = lpm;
-}
-
-void Epairproduction::SetIntegral(Integral* integral) {
-	integral_ = integral;
-}
-
-void Epairproduction::SetIntegralForDEdx(Integral* integralForDEdx) {
-	integral_for_dEdx_ = integralForDEdx;
-}
-
-void Epairproduction::SetProbForComponent(
-		std::vector<double> probForComponent) {
-	prob_for_component_ = probForComponent;
-}
-
-void Epairproduction::SetReverse(bool reverse) {
-	reverse_ = reverse;
-}
-
+// void Epairproduction::SetParametrization(ParametrizationType::Enum parametrization){
+//     parametrization_ = parametrization;
+//     log_warn("This has no effect. Till now only one parametrization for Epairproduction implemented");
+//     if (parametrization_ != ParametrizationType::EPairKelnerKokoulinPetrukhin)
+//         log_warn("The parametrization type number '%i' is different to the one that is implemented with type number '%i' "
+//             , parametrization_, ParametrizationType::EPairKelnerKokoulinPetrukhin);
+// }
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//

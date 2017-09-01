@@ -71,11 +71,6 @@ protected:
     EnergyCutSettings* cut_settings_;
 
 
-    //bounds of integration
-    double vMax_;   //!< upper bound of integration
-    double vUp_;    //!< lower bound of integration
-    double vMin_;   //!< lowest physical possible bound of integration
-
     double ebig_;   //!< upper bound of parameterizations
 
     double rnd_;    //!< This random number will be stored in CalculateDNdx to avoid calculate dNdx a second time in ClaculateSochasticLoss when it is already done
@@ -108,11 +103,12 @@ protected:
 
 public:
 
+    //bounds of integration
     struct IntegralLimits
     {
-        double vMax;
-        double vUp;
-        double vMin;
+        double vMax; //!< upper bound of integration
+        double vUp;  //!< lower bound of integration
+        double vMin; //!< lowest physical possible bound of integration
     };
 
     //Constructor
@@ -165,8 +161,6 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    void SetParametrizationLimit(double ebig);
-
 //----------------------------------------------------------------------------//
 
     virtual double FunctionToDNdxIntegral(const PROPOSALParticle&, double variable) = 0;
@@ -175,125 +169,45 @@ public:
 
     virtual CrossSections::IntegralLimits SetIntegralLimits(const PROPOSALParticle&, int component) = 0;
 
-//----------------------------------------------------------------------------//
 
+//----------------------------------------------------------------------------//
+//-----------------------------Getter and Setter------------------------------//
+//----------------------------------------------------------------------------//
     // Setter
 
-//----------------------------------------------------------------------------//
-    void SetMultiplier(double multiplier=1.);
+    void SetParametrizationLimit(const double ebig){ ebig_ = ebig; }
 
-//----------------------------------------------------------------------------//
+    void SetMultiplier(const double multiplier){ multiplier_ = multiplier; }
 
-    // void SetParticle(PROPOSALParticle *particle);
+    void SetMedium(Medium* medium){ medium_ = medium; }
 
-//----------------------------------------------------------------------------//
+    void SetEnergyCutSettings(EnergyCutSettings* cuts){ cut_settings_ = cuts; }
 
-    void SetMedium(Medium *medium);
+    void EnableLpmEffect(const bool lpm_effect_enabled){ lpm_effect_enabled_ = lpm_effect_enabled; }
 
-//----------------------------------------------------------------------------//
-
-    void SetVMin(double vMin=0);
-
-//----------------------------------------------------------------------------//
-
-    void SetVMax(double vMax=0);
-
-//----------------------------------------------------------------------------//
-
-    void SetVUp(double vUp=0);
-
-//----------------------------------------------------------------------------//
-
-    // virtual void SetParametrization(
-    //     ParametrizationType::Enum parametrization = ParametrizationType::BremsKelnerKokoulinPetrukhin) = 0;
-
-//----------------------------------------------------------------------------//
-
-    void SetEnergyCutSettings(EnergyCutSettings *cuts);
-
-//----------------------------------------------------------------------------//
 
     // virtual void ValidateOptions() = 0;
 
 //----------------------------------------------------------------------------//
     // Getter
-    std::string GetName() const
-    {
-        return name_;
-    }
 
-    ParticleType::Enum GetType() const
-    {
-        return type_;
-    }
-//----------------------------------------------------------------------------//
-    double GetEbig() const
-    {
-        return ebig_;
-    }
+    std::string GetName() const { return name_; }
 
-//----------------------------------------------------------------------------//
+    ParticleType::Enum GetType() const { return type_; }
 
-    // PROPOSALParticle* GetParticle() const
-    // {
-    //     return particle_;
-    // }
+    double GetEbig() const { return ebig_; }
+
+    Medium* GetMedium() const { return medium_; }
+
+    double GetMultiplier() const { return multiplier_; }
+
+    ParametrizationType::Enum GetParametrization() const { return parametrization_; }
+
+    bool GetLpmEffectEnabled() const { return lpm_effect_enabled_; }
+
+    EnergyCutSettings* GetEnergyCutSettings() const { return cut_settings_; }
 
 //----------------------------------------------------------------------------//
-    Medium* GetMedium() const
-    {
-        return medium_;
-    }
-
-//----------------------------------------------------------------------------//
-    double GetMultiplier() const
-    {
-        return multiplier_;
-    }
-
-//----------------------------------------------------------------------------//
-
-    double GetVMax() const
-    {
-        return vMax_;
-    }
-
-//----------------------------------------------------------------------------//
-
-    double GetVMin() const
-    {
-        return vMin_;
-    }
-
-//----------------------------------------------------------------------------//
-
-    double GetVUp() const
-    {
-        return vUp_;
-    }
-
-//----------------------------------------------------------------------------//
-
-    ParametrizationType::Enum GetParametrization() const
-    {
-        return parametrization_;
-    }
-
-//----------------------------------------------------------------------------//
-
-    bool GetLpmEffectEnabled() const
-    {
-        return lpm_effect_enabled_;
-    }
-//----------------------------------------------------------------------------//
-    EnergyCutSettings* GetEnergyCutSettings() const
-    {
-        return cut_settings_;
-    }
-
-//----------------------------------------------------------------------------//
-
-    void EnableLpmEffect(bool lpm_effect_enabled);
 
 //----------------------------------------------------------------------------//
 

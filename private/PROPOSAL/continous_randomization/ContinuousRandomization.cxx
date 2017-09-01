@@ -677,7 +677,6 @@ double ContinuousRandomization::DE2dx(const PROPOSALParticle& particle, const st
     }
 
     double sum = 0;
-    double min = 0;
 
     for(unsigned int i = 0 ; i < cross_sections.size() ; i++)
     {
@@ -687,15 +686,7 @@ double ContinuousRandomization::DE2dx(const PROPOSALParticle& particle, const st
         {
             CrossSections::IntegralLimits limits = cross_sections.at(i)->SetIntegralLimits(particle, j);
 
-            if(cross_sections.at(i)->GetType() == ParticleType::Brems)
-            {
-                min =   0;
-            }
-            else
-            {
-                min = limits.vMin;
-            }
-            sum +=  dE2dx_integral_->Integrate (min, limits.vUp, boost::bind(&ContinuousRandomization::FunctionToDE2dxIntegral, this, boost::cref(particle), boost::cref(cross_sections), _1) ,2);
+            sum +=  dE2dx_integral_->Integrate (limits.vMin, limits.vUp, boost::bind(&ContinuousRandomization::FunctionToDE2dxIntegral, this, boost::cref(particle), boost::cref(cross_sections), _1) ,2);
 
             if(cross_sections.at(i)->GetType() == ParticleType::DeltaE)
             {
