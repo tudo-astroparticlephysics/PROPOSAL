@@ -218,6 +218,20 @@ class Salt : public MediumCopyable<Medium, Salt>
 };
 
 // ----------------------------------------------------------------------------
+/// @brief Implement Medium CalciumCarbonate (CaCO3)
+// ----------------------------------------------------------------------------
+class CalciumCarbonate : public MediumCopyable<Medium, CalciumCarbonate>
+{
+    public:
+    CalciumCarbonate(double rho = 1.0);
+    CalciumCarbonate(const Medium& medium)
+        : Medium(medium)
+    {
+    }
+    virtual ~CalciumCarbonate() {}
+};
+
+// ----------------------------------------------------------------------------
 /// @brief Implement Medium StandardRock
 // ----------------------------------------------------------------------------
 class StandardRock : public MediumCopyable<Medium, StandardRock>

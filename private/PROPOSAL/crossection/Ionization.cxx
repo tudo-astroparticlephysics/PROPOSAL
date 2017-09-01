@@ -535,9 +535,6 @@ Ionization::Ionization(Medium* medium, EnergyCutSettings* cut_settings)
 {
     name_                       = "Ionization";
     type_                       = ParticleType::DeltaE;
-    vMax_                       = 0;
-    vUp_                        = 0;
-    vMin_                       = 0;
     ebig_                       = BIGENERGY;
     do_dedx_Interpolation_      = false;
     do_dndx_Interpolation_      = false;
@@ -720,12 +717,14 @@ double Ionization::CalculateStochasticLoss(const PROPOSALParticle& particle, dou
         Components::Component* component = medium_->GetComponents().at(i);
         rsum+=component->GetAtomInMolecule()* component->GetNucCharge();
 
-        if(rsum>rand){
-
+        if(rsum>rand)
+        {
             if(do_dndx_Interpolation_)
             {
-                CrossSections::IntegralLimits limits = SetIntegralLimits(particle, 0);;
-                if(limits.vUp==limits.vMax){
+                CrossSections::IntegralLimits limits = SetIntegralLimits(particle, 0);
+
+                if(limits.vUp==limits.vMax)
+                {
                     return particle.GetEnergy()*limits.vUp;
                 }
                 return particle.GetEnergy()*(limits.vUp*exp(dndx_interpolant_2d_->FindLimit(particle.GetEnergy(), rnd*sum_of_rates_)*log(limits.vMax/limits.vUp)));
@@ -922,34 +921,11 @@ double Ionization::FunctionToDNdxIntegral(const PROPOSALParticle& particle, doub
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-void Ionization::SetParametrization(ParametrizationType::Enum parametrization){
-    parametrization_ = parametrization;
-    log_warn("This has no effect. Till now only one parametrization for Ionization implemented");
-    if (parametrization_ != ParametrizationType::IonizBetheBloch)
-        log_warn("The parametrization type number '%i' is different to the one that is implemented with type number '%i' "
-            , parametrization_, ParametrizationType::IonizBetheBloch);
-}
-
-// void Ionization::SetBeta(double beta) {
-//     beta_ = beta;
+// void Ionization::SetParametrization(ParametrizationType::Enum parametrization){
+//     parametrization_ = parametrization;
+//     log_warn("This has no effect. Till now only one parametrization for Ionization implemented");
+//     if (parametrization_ != ParametrizationType::IonizBetheBloch)
+//         log_warn("The parametrization type number '%i' is different to the one that is implemented with type number '%i' "
+//             , parametrization_, ParametrizationType::IonizBetheBloch);
 // }
 
-void Ionization::SetDedxInterpolant(Interpolant* dedxInterpolant) {
-    dedx_interpolant_ = dedxInterpolant;
-}
-
-void Ionization::SetDndxInterpolant1d(Interpolant* dndxInterpolant1d) {
-    dndx_interpolant_1d_ = dndxInterpolant1d;
-}
-
-void Ionization::SetDndxInterpolant2d(Interpolant* dndxInterpolant2d) {
-    dndx_interpolant_2d_ = dndxInterpolant2d;
-}
-
-// void Ionization::SetGamma(double gamma) {
-//     gamma_ = gamma;
-// }
-
-void Ionization::SetIntegral(Integral* integral) {
-    integral_ = integral;
-}
