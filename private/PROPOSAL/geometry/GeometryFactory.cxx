@@ -11,31 +11,21 @@ using namespace PROPOSAL;
 
 GeometryFactory::GeometryFactory()
 {
-    // Geometry* (*create_sphere) () = &Sphere::create;
-    // Geometry* (*create_box) () = &Box::create;
-    // Geometry* (*create_cylinder) () = &Cylinder::create;
-    //
-    // Geometry* (*create_sphere_ptree) (boost::property_tree::ptree const&) = &Sphere::create;
-    // Geometry* (*create_box_ptree) (boost::property_tree::ptree const&) = &Box::create;
-    // Geometry* (*create_cylinder_ptree) (boost::property_tree::ptree const&) = &Cylinder::create;
-
-    Register("sphere", &Sphere::create);
-    Register("box", &Box::create);
-    Register("cylinder", &Cylinder::create);
-
-    // Register(GeometryModel::Default, &GeometryDefault::create);
-    // Register(GeometryModel::Moliere, &GeometryMoliere::create);
-    // Register(GeometryModel::MoliereFirstOrder, &GeometryFirstOrder::create);
+    Register("sphere", Sphere, &Sphere::create);
+    Register("box", Box, &Box::create);
+    Register("cylinder", Cylinder, &Cylinder::create);
 }
 
 GeometryFactory::~GeometryFactory()
 {
-    geometry_map.clear();
+    geometry_map_str.clear();
+    geometry_map_enum.clear();
 }
 
-void GeometryFactory::Register(const std::string& name, RegisterFunction create)
+void GeometryFactory::Register(const std::string& name, const Enum& num, RegisterFunction create)
 {
-    geometry_map[name] = create;
+    geometry_map_str[name] = create;
+    geometry_map_enum[num] = create;
 }
 
 // void GeometryFactory::Register(GeometryModel::Enum model, RegisterFunction create)
@@ -47,14 +37,27 @@ Geometry* GeometryFactory::CreateGeometry(const std::string& name)
 {
     std::string name_lower = boost::algorithm::to_lower_copy(name);
 
-    GeometryMap::iterator it = geometry_map.find(name_lower);
+    GeometryMapString::iterator it = geometry_map_str.find(name_lower);
 
-    if (it != geometry_map.end())
+    if (it != geometry_map_str.end())
     {
         return it->second();
     } else
     {
         log_fatal("Geometry %s not registerd!", name.c_str());
+    }
+}
+
+Geometry* GeometryFactory::CreateGeometry(const Enum& num)
+{
+    GeometryMapEnum::iterator it = geometry_map_enum.find(num);
+
+    if (it != geometry_map_enum.end())
+    {
+        return it->second();
+    } else
+    {
+        log_fatal("Medium %s not registerd!", typeid(num).name());
     }
 }
 
@@ -107,7 +110,7 @@ Geometry* GeometryFactory::CreateGeometry(boost::property_tree::ptree const& pt)
     // Check type of geometry and set members
     // --------------------------------------------------------------------- //
 
-    if (Sphere* sphere = dynamic_cast<Sphere*>(geometry))
+    if (PROPOSAL::Sphere* sphere = dynamic_cast<PROPOSAL::Sphere*>(geometry))
     {
         double radius = pt.get<double>("radius");
         double inner_radius = pt.get<double>("inner_radius");
@@ -118,7 +121,7 @@ Geometry* GeometryFactory::CreateGeometry(boost::property_tree::ptree const& pt)
 
         return sphere;
     }
-    else if (Box* box = dynamic_cast<Box*>(geometry))
+    else if (PROPOSAL::Box* box = dynamic_cast<PROPOSAL::Box*>(geometry))
     {
         double x = pt.get<double>("x");
         double y = pt.get<double>("y");
@@ -131,7 +134,7 @@ Geometry* GeometryFactory::CreateGeometry(boost::property_tree::ptree const& pt)
 
         return box;
     }
-    else if (Cylinder* cylinder = dynamic_cast<Cylinder*>(geometry))
+    else if (PROPOSAL::Cylinder* cylinder = dynamic_cast<PROPOSAL::Cylinder*>(geometry))
     {
         double radius = pt.get<double>("radius");
         double inner_radius = pt.get<double>("inner_radius");
