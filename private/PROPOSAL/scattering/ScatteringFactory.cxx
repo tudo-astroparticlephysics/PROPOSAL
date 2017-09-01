@@ -17,13 +17,13 @@ ScatteringFactory::ScatteringFactory()
     Register("moliere", &ScatteringMoliere::create);
     Register("moliere_first_order", &ScatteringFirstOrder::create);
 
-    Register("default", ScatteringModel::Default);
-    Register("moliere", ScatteringModel::Moliere);
-    Register("moliere_first_order", ScatteringModel::MoliereFirstOrder);
+    Register("default", Default);
+    Register("moliere", Moliere);
+    Register("moliere_first_order", MoliereFirstOrder);
 
-    Register(ScatteringModel::Default, &ScatteringDefault::create);
-    Register(ScatteringModel::Moliere, &ScatteringMoliere::create);
-    Register(ScatteringModel::MoliereFirstOrder, &ScatteringFirstOrder::create);
+    Register(Default, &ScatteringDefault::create);
+    Register(Moliere, &ScatteringMoliere::create);
+    Register(MoliereFirstOrder, &ScatteringFirstOrder::create);
 }
 
 ScatteringFactory::~ScatteringFactory()
@@ -38,12 +38,12 @@ void ScatteringFactory::Register(const std::string& name, RegisterFunction creat
     scattering_map_str_[name] = create;
 }
 
-void ScatteringFactory::Register(ScatteringModel::Enum model, RegisterFunction create)
+void ScatteringFactory::Register(Enum model, RegisterFunction create)
 {
     scattering_map_enum_[model] = create;
 }
 
-void ScatteringFactory::Register(const std::string& name, ScatteringModel::Enum model)
+void ScatteringFactory::Register(const std::string& name, Enum model)
 {
     map_string_to_enum[name] = model;
 }
@@ -63,7 +63,7 @@ Scattering* ScatteringFactory::CreateScattering(const std::string& name)
     }
 }
 
-Scattering* ScatteringFactory::CreateScattering(ScatteringModel::Enum model)
+Scattering* ScatteringFactory::CreateScattering(Enum model)
 {
     ScatteringMapEnum::iterator it = scattering_map_enum_.find(model);
 
@@ -76,7 +76,7 @@ Scattering* ScatteringFactory::CreateScattering(ScatteringModel::Enum model)
     }
 }
 
-ScatteringFactory::ScatteringModel::Enum ScatteringFactory::GetEnumFromString(const std::string& name)
+ScatteringFactory::Enum ScatteringFactory::GetEnumFromString(const std::string& name)
 {
     std::string name_lower = boost::algorithm::to_lower_copy(name);
     MapStringToEnum::iterator it = map_string_to_enum.find(name_lower);

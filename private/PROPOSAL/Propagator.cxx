@@ -58,8 +58,8 @@ Propagator::Propagator()
     , current_collection_(NULL)
     , detector_(new Sphere(Vector3D(), 1e18, 0))
 {
-    SectorDef sector_def;
-    sector_def.location = 1; // Inside the detector
+    Sector::Definition sector_def;
+    sector_def.location = Sector::ParticleLocation::InsideDetector;
 
     current_collection_ = new SectorInterpolant(
         Ice(), *detector_, EnergyCutSettings(global_ecut_inside_, global_vcut_inside_), sector_def);
@@ -85,152 +85,152 @@ Propagator::Propagator(const std::string& config_file)
     , current_collection_(NULL)
     , detector_(NULL)
 {
-    double global_ecut_inside  = global_ecut_inside_;
-    double global_ecut_infront = global_ecut_infront_;
-    double global_ecut_behind  = global_ecut_behind_;
-
-    double global_vcut_inside  = global_vcut_inside_;
-    double global_vcut_infront = global_vcut_infront_;
-    double global_vcut_behind  = global_vcut_behind_;
-
-    bool global_cont_inside  = global_cont_inside_;
-    bool global_cont_infront = global_cont_infront_;
-    bool global_cont_behind  = global_cont_behind_;
-
-    //TODO(mario): will be changend when x sectoin are polymorphic Tue 2017/08/29
-    int brems = 11;
-    int photo = -36;
-
-    bool interpolate = true;
-
-    std::string scattering = "moliere";
-
-    // Create the json parser
-    boost::property_tree::ptree pt_json;
-    boost::property_tree::json_parser::read_json(config_file, pt_json);
-
-    // Read in global options
-    SetMember(seed_, "global.seed", pt_json);
-    SetMember(global_ecut_inside, "global.ecut_inside", pt_json);
-    SetMember(global_ecut_infront, "global.ecut_infront", pt_json);
-    SetMember(global_ecut_behind, "global.ecut_behind", pt_json);
-    SetMember(global_vcut_inside, "global.vcut_inside", pt_json);
-    SetMember(global_vcut_infront, "global.vcut_infront", pt_json);
-    SetMember(global_vcut_behind, "global.vcut_behind", pt_json);
-    SetMember(global_cont_inside, "global.cont_inside", pt_json);
-    SetMember(global_cont_infront, "global.cont_infront", pt_json);
-    SetMember(global_cont_behind, "global.cont_behind", pt_json);
-
-    SetMember(brems, "global.brems", pt_json);
-    SetMember(photo, "global.photo", pt_json);
-
-    SetMember(interpolate, "global.interpolate", pt_json);
-
-    // Read in the detector geometry
-    detector_ = GeometryFactory::Get().CreateGeometry(pt_json.get_child("detector"));
-
-    // Read in global sector definition
-    SectorDef sec_def_global;
-
-    SetMember(sec_def_global.brems_multiplier, "global.brems_multiplier", pt_json);
-    SetMember(sec_def_global.photo_multiplier, "global.photo_multiplier", pt_json);
-    SetMember(sec_def_global.ioniz_multiplier, "global.ioniz_multiplier", pt_json);
-    SetMember(sec_def_global.epair_multiplier, "global.epair_multiplier", pt_json);
-    SetMember(sec_def_global.lpm_effect_enabled, "global.lpm", pt_json);
-    SetMember(sec_def_global.do_exact_time_calculation, "global.exact_time", pt_json);
-    SetMember(sec_def_global.do_scattering, "global.do_scattering", pt_json);
-    SetMember(sec_def_global.path_to_tables, "global.path_to_tables", pt_json);
-    SetMember(sec_def_global.raw, "global.raw", pt_json);
-
-    sec_def_global.scattering_model =
-        ScatteringFactory::Get().GetEnumFromString(pt_json.get<std::string>("global.scattering"));
-
-    // Read in all sector definitions
-    boost::property_tree::ptree sectors = pt_json.get_child("sectors");
-
-    for (boost::property_tree::ptree::const_iterator it = sectors.begin(); it != sectors.end(); ++it)
-    {
-        Medium* med        = MediumFactory::Get().CreateMedium(it->second.get<std::string>("medium"));
-        Geometry* geometry = GeometryFactory::Get().CreateGeometry(it->second.get_child("geometry"));
-        geometry->SetHirarchy(it->second.get<unsigned int>("hirarchy"));
-
-        // Use global options in case they will be not overriden
-        SectorDef sec_def_infront = sec_def_global;
-        sec_def_infront.location = 0;
-
-        SectorDef sec_def_inside  = sec_def_global;
-        sec_def_inside.location = 1;
-
-        SectorDef sec_def_behind  = sec_def_global;
-        sec_def_behind.location = 2;
-
-        double density_correction = it->second.get<double>("density_correction");
-
-        sec_def_infront.density_correction = density_correction;
-        sec_def_inside.density_correction  = density_correction;
-        sec_def_behind.density_correction  = density_correction;
-
-        EnergyCutSettings cuts_infront;
-        EnergyCutSettings cuts_inside;
-        EnergyCutSettings cuts_behind;
-
-        boost::optional<const boost::property_tree::ptree&> child_cuts_infront =
-            it->second.get_child_optional("cuts_infront");
-        if (child_cuts_infront)
-        {
-            cuts_infront.SetEcut(child_cuts_infront.get().get<double>("e_cut"));
-            cuts_infront.SetVcut(child_cuts_infront.get().get<double>("v_cut"));
-            sec_def_infront.do_continuous_randomization_ = child_cuts_infront.get().get<bool>("cont_rand");
-
-        } else
-        {
-            cuts_infront.SetEcut(global_ecut_infront);
-            cuts_infront.SetVcut(global_vcut_infront);
-            sec_def_infront.do_continuous_randomization_ = global_cont_infront;
-        }
-
-        boost::optional<const boost::property_tree::ptree&> child_cuts_inside =
-            it->second.get_child_optional("cuts_inside");
-        if (child_cuts_inside)
-        {
-            cuts_inside.SetEcut(child_cuts_inside.get().get<double>("e_cut"));
-            cuts_inside.SetVcut(child_cuts_inside.get().get<double>("v_cut"));
-            sec_def_inside.do_continuous_randomization_ = child_cuts_inside.get().get<bool>("cont_rand");
-
-        } else
-        {
-            cuts_inside.SetEcut(global_ecut_inside);
-            cuts_inside.SetVcut(global_vcut_inside);
-            sec_def_inside.do_continuous_randomization_ = global_cont_inside;
-        }
-
-        boost::optional<const boost::property_tree::ptree&> child_cuts_behind =
-            it->second.get_child_optional("cuts_behind");
-        if (child_cuts_behind)
-        {
-            cuts_behind.SetEcut(child_cuts_behind.get().get<double>("e_cut"));
-            cuts_behind.SetVcut(child_cuts_behind.get().get<double>("v_cut"));
-            sec_def_behind.do_continuous_randomization_ = child_cuts_behind.get().get<bool>("cont_rand");
-
-        } else
-        {
-            cuts_behind.SetEcut(global_ecut_behind);
-            cuts_behind.SetVcut(global_vcut_behind);
-            sec_def_behind.do_continuous_randomization_ = global_cont_behind;
-        }
-
-        if (interpolate)
-        {
-            collections_.push_back(new SectorInterpolant(*med, *geometry, cuts_infront, sec_def_infront));
-            collections_.push_back(new SectorInterpolant(*med, *geometry, cuts_inside, sec_def_inside));
-            collections_.push_back(new SectorInterpolant(*med, *geometry, cuts_behind, sec_def_behind));
-        } else
-        {
-            collections_.push_back(new SectorIntegral(*med, *geometry, cuts_infront, sec_def_infront));
-            collections_.push_back(new SectorIntegral(*med, *geometry, cuts_inside, sec_def_inside));
-            collections_.push_back(new SectorIntegral(*med, *geometry, cuts_behind, sec_def_behind));
-        }
-    }
+    // double global_ecut_inside  = global_ecut_inside_;
+    // double global_ecut_infront = global_ecut_infront_;
+    // double global_ecut_behind  = global_ecut_behind_;
+    //
+    // double global_vcut_inside  = global_vcut_inside_;
+    // double global_vcut_infront = global_vcut_infront_;
+    // double global_vcut_behind  = global_vcut_behind_;
+    //
+    // bool global_cont_inside  = global_cont_inside_;
+    // bool global_cont_infront = global_cont_infront_;
+    // bool global_cont_behind  = global_cont_behind_;
+    //
+    // //TODO(mario): will be changend when x sectoin are polymorphic Tue 2017/08/29
+    // int brems = 11;
+    // int photo = -36;
+    //
+    // bool interpolate = true;
+    //
+    // std::string scattering = "moliere";
+    //
+    // // Create the json parser
+    // boost::property_tree::ptree pt_json;
+    // boost::property_tree::json_parser::read_json(config_file, pt_json);
+    //
+    // // Read in global options
+    // SetMember(seed_, "global.seed", pt_json);
+    // SetMember(global_ecut_inside, "global.ecut_inside", pt_json);
+    // SetMember(global_ecut_infront, "global.ecut_infront", pt_json);
+    // SetMember(global_ecut_behind, "global.ecut_behind", pt_json);
+    // SetMember(global_vcut_inside, "global.vcut_inside", pt_json);
+    // SetMember(global_vcut_infront, "global.vcut_infront", pt_json);
+    // SetMember(global_vcut_behind, "global.vcut_behind", pt_json);
+    // SetMember(global_cont_inside, "global.cont_inside", pt_json);
+    // SetMember(global_cont_infront, "global.cont_infront", pt_json);
+    // SetMember(global_cont_behind, "global.cont_behind", pt_json);
+    //
+    // SetMember(brems, "global.brems", pt_json);
+    // SetMember(photo, "global.photo", pt_json);
+    //
+    // SetMember(interpolate, "global.interpolate", pt_json);
+    //
+    // // Read in the detector geometry
+    // detector_ = GeometryFactory::Get().CreateGeometry(pt_json.get_child("detector"));
+    //
+    // // Read in global sector definition
+    // SectorDef sec_def_global;
+    //
+    // SetMember(sec_def_global.brems_multiplier, "global.brems_multiplier", pt_json);
+    // SetMember(sec_def_global.photo_multiplier, "global.photo_multiplier", pt_json);
+    // SetMember(sec_def_global.ioniz_multiplier, "global.ioniz_multiplier", pt_json);
+    // SetMember(sec_def_global.epair_multiplier, "global.epair_multiplier", pt_json);
+    // SetMember(sec_def_global.lpm_effect_enabled, "global.lpm", pt_json);
+    // SetMember(sec_def_global.do_exact_time_calculation, "global.exact_time", pt_json);
+    // SetMember(sec_def_global.do_scattering, "global.do_scattering", pt_json);
+    // SetMember(sec_def_global.path_to_tables, "global.path_to_tables", pt_json);
+    // SetMember(sec_def_global.raw, "global.raw", pt_json);
+    //
+    // sec_def_global.scattering_model =
+    //     ScatteringFactory::Get().GetEnumFromString(pt_json.get<std::string>("global.scattering"));
+    //
+    // // Read in all sector definitions
+    // boost::property_tree::ptree sectors = pt_json.get_child("sectors");
+    //
+    // for (boost::property_tree::ptree::const_iterator it = sectors.begin(); it != sectors.end(); ++it)
+    // {
+    //     Medium* med        = MediumFactory::Get().CreateMedium(it->second.get<std::string>("medium"));
+    //     Geometry* geometry = GeometryFactory::Get().CreateGeometry(it->second.get_child("geometry"));
+    //     geometry->SetHirarchy(it->second.get<unsigned int>("hirarchy"));
+    //
+    //     // Use global options in case they will be not overriden
+    //     SectorDef sec_def_infront = sec_def_global;
+    //     sec_def_infront.location = 0;
+    //
+    //     SectorDef sec_def_inside  = sec_def_global;
+    //     sec_def_inside.location = 1;
+    //
+    //     SectorDef sec_def_behind  = sec_def_global;
+    //     sec_def_behind.location = 2;
+    //
+    //     double density_correction = it->second.get<double>("density_correction");
+    //
+    //     sec_def_infront.density_correction = density_correction;
+    //     sec_def_inside.density_correction  = density_correction;
+    //     sec_def_behind.density_correction  = density_correction;
+    //
+    //     EnergyCutSettings cuts_infront;
+    //     EnergyCutSettings cuts_inside;
+    //     EnergyCutSettings cuts_behind;
+    //
+    //     boost::optional<const boost::property_tree::ptree&> child_cuts_infront =
+    //         it->second.get_child_optional("cuts_infront");
+    //     if (child_cuts_infront)
+    //     {
+    //         cuts_infront.SetEcut(child_cuts_infront.get().get<double>("e_cut"));
+    //         cuts_infront.SetVcut(child_cuts_infront.get().get<double>("v_cut"));
+    //         sec_def_infront.do_continuous_randomization_ = child_cuts_infront.get().get<bool>("cont_rand");
+    //
+    //     } else
+    //     {
+    //         cuts_infront.SetEcut(global_ecut_infront);
+    //         cuts_infront.SetVcut(global_vcut_infront);
+    //         sec_def_infront.do_continuous_randomization_ = global_cont_infront;
+    //     }
+    //
+    //     boost::optional<const boost::property_tree::ptree&> child_cuts_inside =
+    //         it->second.get_child_optional("cuts_inside");
+    //     if (child_cuts_inside)
+    //     {
+    //         cuts_inside.SetEcut(child_cuts_inside.get().get<double>("e_cut"));
+    //         cuts_inside.SetVcut(child_cuts_inside.get().get<double>("v_cut"));
+    //         sec_def_inside.do_continuous_randomization_ = child_cuts_inside.get().get<bool>("cont_rand");
+    //
+    //     } else
+    //     {
+    //         cuts_inside.SetEcut(global_ecut_inside);
+    //         cuts_inside.SetVcut(global_vcut_inside);
+    //         sec_def_inside.do_continuous_randomization_ = global_cont_inside;
+    //     }
+    //
+    //     boost::optional<const boost::property_tree::ptree&> child_cuts_behind =
+    //         it->second.get_child_optional("cuts_behind");
+    //     if (child_cuts_behind)
+    //     {
+    //         cuts_behind.SetEcut(child_cuts_behind.get().get<double>("e_cut"));
+    //         cuts_behind.SetVcut(child_cuts_behind.get().get<double>("v_cut"));
+    //         sec_def_behind.do_continuous_randomization_ = child_cuts_behind.get().get<bool>("cont_rand");
+    //
+    //     } else
+    //     {
+    //         cuts_behind.SetEcut(global_ecut_behind);
+    //         cuts_behind.SetVcut(global_vcut_behind);
+    //         sec_def_behind.do_continuous_randomization_ = global_cont_behind;
+    //     }
+    //
+    //     if (interpolate)
+    //     {
+    //         collections_.push_back(new SectorInterpolant(*med, *geometry, cuts_infront, sec_def_infront));
+    //         collections_.push_back(new SectorInterpolant(*med, *geometry, cuts_inside, sec_def_inside));
+    //         collections_.push_back(new SectorInterpolant(*med, *geometry, cuts_behind, sec_def_behind));
+    //     } else
+    //     {
+    //         collections_.push_back(new SectorIntegral(*med, *geometry, cuts_infront, sec_def_infront));
+    //         collections_.push_back(new SectorIntegral(*med, *geometry, cuts_inside, sec_def_inside));
+    //         collections_.push_back(new SectorIntegral(*med, *geometry, cuts_behind, sec_def_behind));
+    //     }
+    // }
 }
 
 // ------------------------------------------------------------------------- //

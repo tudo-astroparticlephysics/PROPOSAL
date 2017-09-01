@@ -75,7 +75,7 @@ class Medium
     double GetX1() const { return X1_; }
     double GetD0() const { return d0_; }
     double GetR() const { return r_; }
-    double GetRho() const { return rho_; }
+    double GetDensityCorrection() const { return rho_; }
     double GetMassDensity() const { return massDensity_; }
     double GetRadiationLength() const { return radiationLength_; }
     double GetMolDensity() const { return molDensity_; }
@@ -156,9 +156,9 @@ class MediumCopyable: virtual public Base
         return new Derived(static_cast<Derived> (*this));
     }
 
-    static  Base* create()
+    static  Base* create(double density_correction = 1.0)
     {
-        return new Derived();
+        return new Derived(density_correction);
     }
 
     Derived& operator=(const Medium& medium)
