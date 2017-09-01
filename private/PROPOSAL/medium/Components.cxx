@@ -301,23 +301,78 @@ double Component::FunctionToIntegral(double r)
 *                            Different Components                             *
 ******************************************************************************/
 
-Oxygen::Oxygen(double atomInMolecule)
-    : Component("O", 8.0, 15.9994, atomInMolecule)
-{
-}
-
 Hydrogen::Hydrogen(double atomInMolecule)
-    : Component("H", 1.0, 1.00794, atomInMolecule)
+    : Component("H", 1, 1.00794, atomInMolecule)
 {
 }
 
-Natrium::Natrium(double atomInMolecule)
+Carbon::Carbon(double atomInMolecule)
+    : Component("C", 6, 12.0011, atomInMolecule)
+{
+}
+
+Nitrogen::Nitrogen(double atomInMolecule)
+    : Component("N", 7, 14.0067, atomInMolecule)
+{
+}
+
+Oxygen::Oxygen(double atomInMolecule)
+    : Component("O", 8, 15.9994, atomInMolecule)
+{
+}
+
+Sodium::Sodium(double atomInMolecule)
+    : Component("Na", 11, 22.989770, atomInMolecule)
+{
+}
+
+Magnesium::Magnesium(double atomInMolecule)
+    : Component("Mg", 12, 24.31, atomInMolecule)
+{
+}
+
+Sulfur::Sulfur(double atomInMolecule)
+    : Component("S", 16, 32.07, atomInMolecule)
+{
+}
+
+Chlorine::Chlorine(double atomInMolecule)
     : Component("Cl", 17, 35.4527, atomInMolecule)
 {
 }
 
-Chloride::Chloride(double atomInMolecule)
-    : Component("Cl", 17, 35.4527, atomInMolecule)
+Argon::Argon(double atomInMolecule)
+    : Component("Ar", 18, 39.948, atomInMolecule)
+{
+}
+
+Potassium::Potassium(double atomInMolecule)
+    : Component("K", 19, 39.10, atomInMolecule)
+{
+}
+
+Calcium::Calcium(double atomInMolecule)
+    : Component("Ca", 20, 40.08, atomInMolecule)
+{
+}
+
+Iron::Iron(double atomInMolecule)
+    : Component("Fe", 26, 55.845, atomInMolecule)
+{
+}
+
+Copper::Copper(double atomInMolecule)
+    : Component("Cu", 29, 63.546, atomInMolecule)
+{
+}
+
+Lead::Lead(double atomInMolecule)
+    : Component("Pb", 82, 207.2, atomInMolecule)
+{
+}
+
+Uranium::Uranium(double atomInMolecule)
+    : Component("U", 92, 238.0289, atomInMolecule)
 {
 }
 
@@ -328,60 +383,5 @@ StandardRock::StandardRock(double atomInMolecule)
 
 FrejusRock::FrejusRock(double atomInMolecule)
     : Component("FrejusRock", 10.12, 20.34, atomInMolecule)
-{
-}
-
-Iron::Iron(double atomInMolecule)
-    : Component("Fe", 26, 55.845, atomInMolecule)
-{
-}
-
-Lead::Lead(double atomInMolecule)
-    : Component("Pb", 82, 207.2, atomInMolecule)
-{
-}
-
-Copper::Copper(double atomInMolecule)
-    : Component("Cu", 29, 63.546, atomInMolecule)
-{
-}
-
-Uranium::Uranium(double atomInMolecule)
-    : Component("U", 92, 238.0289, atomInMolecule)
-{
-}
-
-Nitrogen::Nitrogen(double atomInMolecule)
-    : Component("N", 7, 14.0067, atomInMolecule)
-{
-}
-
-Arsenic::Arsenic(double atomInMolecule)
-    : Component("Ar", 18, 39.948, atomInMolecule)
-{
-}
-
-Carbon::Carbon(double atomInMolecule)
-    : Component("C", 6, 12.0011, atomInMolecule)
-{
-}
-
-Potassium::Potassium(double atomInMolecule)
-    : Component("K", 19, 39.10, atomInMolecule)
-{
-}
-
-Magnesium::Magnesium(double atomInMolecule)
-    : Component("Mg", 12, 24.31, atomInMolecule)
-{
-}
-
-Calcium::Calcium(double atomInMolecule)
-    : Component("Ca", 20, 40.08, atomInMolecule)
-{
-}
-
-Sulfur::Sulfur(double atomInMolecule)
-    : Component("S", 16, 32.07, atomInMolecule)
 {
 }

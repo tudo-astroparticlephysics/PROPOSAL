@@ -30,7 +30,6 @@ class TwoBodyPhaseSpace : public DecayChannel
     double first_daughter_mass_;
     double second_daughter_mass_;
 };
-;
 
 } /* PROPOSAL */
 
