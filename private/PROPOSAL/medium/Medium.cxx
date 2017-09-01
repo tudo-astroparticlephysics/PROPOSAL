@@ -316,8 +316,12 @@ void Medium::init()
     ZA_ = aux1 / aux2;
     molDensity_ = massDensity_ * NA / aux2;
     MM_ = aux3 / aux2;
+
+    // TODO: this is never used; is that art or deletable
     r_ = 1.31; // only for ice - change if needed (sea water: 1.35)
 
+
+    // TODO: Compare to Bremsstrahlung::CalculateScatteringX0; just one (this or the Brems-thing) is needed
     // Calculation of the radiation length
     aux1 = 0;
     aux2 = 0;
@@ -671,7 +675,7 @@ AntaresWater::AntaresWater(double rho)
 
     components_.push_back(new Components::Hydrogen(2.0));
     components_.push_back(new Components::Oxygen(1.00884));
-    components_.push_back(new Components::Natrium(0.00943));
+    components_.push_back(new Components::Sodium(0.00943));
     components_.push_back(new Components::Potassium(0.000209));
     components_.push_back(new Components::Magnesium(0.001087));
     components_.push_back(new Components::Calcium(0.000209));
