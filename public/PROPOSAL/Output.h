@@ -3,12 +3,12 @@
 #ifndef ICECUBE
 
 
-// #include <iostream>
+#include <iostream>
 #include <vector>
-// #include <string>
-// #include <utility>
-// #include <iomanip>
-// #include <sstream>
+#include <string>
+#include <utility>
+#include <iomanip>
+#include <sstream>
 #include <fstream>
 
 #include "PROPOSAL/particle/PROPOSALParticle.h"
@@ -62,7 +62,7 @@
             LOG4CPLUS_NOTICE(Output::getInstance().logger, VA_ARG(0, __VA_ARGS__) ) , \
             LOG4CPLUS_NOTICE_FMT(Output::getInstance().logger, __VA_ARGS__ ) )
 
-        using namespace log4cplus;
+        // using namespace log4cplus;  // no using directives in header
     #else
         #ifndef log_error
             #define log_error(fmt, ...) (void)0
@@ -90,9 +90,9 @@ private:
     Output()
     {
         #if LOG4CPLUS_SUPPORT
-        // PropertyConfigurator::doConfigure(LOG4CPLUS_TEXT("resources/log4cplus.conf"));
-        PropertyConfigurator::doConfigure(LOG4CPLUS_TEXT(LOG4CPLUS_CONFIG));
-        logger = Logger::getInstance(LOG4CPLUS_TEXT("PROPOSAL"));
+        // log4cplus::PropertyConfigurator::doConfigure(LOG4CPLUS_TEXT("resources/log4cplus.conf"));
+        log4cplus::PropertyConfigurator::doConfigure(LOG4CPLUS_TEXT(LOG4CPLUS_CONFIG));
+        logger = log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("PROPOSAL"));
         #endif
     }
 
@@ -156,7 +156,7 @@ private:
 public:
 
     #if LOG4CPLUS_SUPPORT
-        Logger logger;
+        log4cplus::Logger logger;
     #endif
     //ASCII
     static bool store_in_ASCII_file_;
