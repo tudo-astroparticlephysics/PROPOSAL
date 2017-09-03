@@ -30,6 +30,7 @@
 // #include "PROPOSAL/ScatteringFirstOrder.h"
 // #include "PROPOSAL/ScatteringMoliere.h"
 #include "PROPOSAL/Output.h"
+#include "PROPOSAL/sector/SectorFactory.h"
 // #include "PROPOSAL/MathModel.h"
 // #include "PROPOSAL/PROPOSALParticle.h"
 // #include "PROPOSAL/Geometry.h"
@@ -47,8 +48,9 @@ class Propagator
     public:
     // Constructors
     Propagator();
-    Propagator(std::vector<Sector*>&, const Geometry&);
-    Propagator(const std::string&);
+    Propagator(const std::vector<Sector*>&, const Geometry&);
+    Propagator(const ParticleDef&, const std::vector<SectorFactory::Definition>&, const Geometry&);
+    Propagator(const ParticleDef&, const std::string&);
     // Propagator(ParticleDef,
     //            std::string path_to_tables,
     //            bool exact_time = true,
@@ -102,8 +104,7 @@ class Propagator
     // std::vector<PROPOSALParticle*> Propagate( PROPOSALParticle *particle, double MaxDistance_cm = 1e20 );
 
     //----------------------------------------------------------------------------//
-    std::vector<PROPOSALParticle*> Propagate(PROPOSALParticle&,
-                                             double MaxDistance_cm = 1e20); // TODO(mario): Find new name Fr 2017/03/10
+    std::vector<PROPOSALParticle*> Propagate( double MaxDistance_cm = 1e20);
 
     //----------------------------------------------------------------------------//
     /*!
@@ -186,6 +187,7 @@ class Propagator
     // std::string GetPath_to_tables() const;
     // void SetPath_to_tables(const std::string &path_to_tables);
     Geometry* GetDetector() const;
+    PROPOSALParticle& GetParticle();
     // void SetDetector(Geometry *detector);
     // bool GetStopping_decay() const;
     // void SetStopping_decay(bool stopping_decay);
@@ -229,8 +231,9 @@ class Propagator
 
 
     std::vector<Sector*> collections_;
-
     Sector* current_collection_;
+
+    PROPOSALParticle& particle_;
     Geometry* detector_;
 
     //----------------------------------------------------------------------------//

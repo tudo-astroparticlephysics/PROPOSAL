@@ -6,8 +6,8 @@
 
 using namespace PROPOSAL;
 
-SectorIntegral::SectorIntegral()
-    : Sector()
+SectorIntegral::SectorIntegral(PROPOSALParticle& particle)
+    : Sector(particle)
     , integral_(IROMB, IMAXS, IPREC2)
     , prop_interaction_(IROMB, IMAXS, IPREC2)
     , prop_decay_(IROMB, IMAXS, IPREC2)
@@ -15,11 +15,11 @@ SectorIntegral::SectorIntegral()
 {
 }
 
-SectorIntegral::SectorIntegral(const Medium& medium,
+SectorIntegral::SectorIntegral(PROPOSALParticle& particle, const Medium& medium,
                                        const Geometry& geometry,
                                        const EnergyCutSettings& cut_settings,
                                        const Definition& def)
-    : Sector(medium, geometry, cut_settings, def)
+    : Sector(particle, medium, geometry, cut_settings, def)
     , integral_(IROMB, IMAXS, IPREC2)
     , prop_interaction_(IROMB, IMAXS, IPREC2)
     , prop_decay_(IROMB, IMAXS, IPREC2)
@@ -41,16 +41,15 @@ SectorIntegral::~SectorIntegral()
 }
 
 // ------------------------------------------------------------------------- //
-double SectorIntegral::CalculateDisplacement(const PROPOSALParticle& particle, double ei, double ef, double dist)
+double SectorIntegral::CalculateDisplacement( double ei, double ef, double dist)
 {
     return integral_.IntegrateWithRandomRatio(
-        ei, ef, boost::bind(&SectorIntegral::FunctionToIntegral, this, boost::cref(particle), _1), 4, -dist);
+        ei, ef, boost::bind(&SectorIntegral::FunctionToIntegral, this,  _1), 4, -dist);
 }
 
 // ------------------------------------------------------------------------- //
-double SectorIntegral::CalculateFinalEnergy(const PROPOSALParticle& particle, double ei, double dist)
+double SectorIntegral::CalculateFinalEnergy( double ei, double dist)
 {
-    (void)particle;
     (void)ei;
     (void)dist;
 
@@ -58,12 +57,11 @@ double SectorIntegral::CalculateFinalEnergy(const PROPOSALParticle& particle, do
 }
 
 // ------------------------------------------------------------------------- //
-double SectorIntegral::CalculateFinalEnergy(const PROPOSALParticle& particle,
+double SectorIntegral::CalculateFinalEnergy(
                                                 double ei,
                                                 double rnd,
                                                 bool particle_interaction)
 {
-    (void)particle;
     (void)ei;
     (void)rnd;
 
@@ -77,7 +75,7 @@ double SectorIntegral::CalculateFinalEnergy(const PROPOSALParticle& particle,
 }
 
 // ------------------------------------------------------------------------- //
-double SectorIntegral::CalculateTrackingIntegal(const PROPOSALParticle& particle,
+double SectorIntegral::CalculateTrackingIntegal(
                                                     double initial_energy,
                                                     double rnd,
                                                     bool particle_interaction)
@@ -86,24 +84,24 @@ double SectorIntegral::CalculateTrackingIntegal(const PROPOSALParticle& particle
     {
         return prop_interaction_.IntegrateWithRandomRatio(
             initial_energy,
-            particle.GetLow(),
-            boost::bind(&SectorIntegral::FunctionToPropIntegralInteraction, this, boost::cref(particle), _1),
+            particle_.GetLow(),
+            boost::bind(&SectorIntegral::FunctionToPropIntegralInteraction, this,  _1),
             4,
             -rnd);
     } else
     {
         return prop_decay_.IntegrateWithRandomRatio(
             initial_energy,
-            particle.GetLow(),
-            boost::bind(&SectorIntegral::FunctionToPropIntegralDecay, this, boost::cref(particle), _1),
+            particle_.GetLow(),
+            boost::bind(&SectorIntegral::FunctionToPropIntegralDecay, this,  _1),
             4,
             -rnd);
     }
 }
 
 // ------------------------------------------------------------------------- //
-double SectorIntegral::CalculateParticleTime(const PROPOSALParticle& particle, double ei, double ef)
+double SectorIntegral::CalculateParticleTime( double ei, double ef)
 {
     return time_particle_.Integrate(
-        ei, ef, boost::bind(&SectorIntegral::FunctionToTimeIntegral, this, boost::cref(particle), _1), 4);
+        ei, ef, boost::bind(&SectorIntegral::FunctionToTimeIntegral, this,  _1), 4);
 }

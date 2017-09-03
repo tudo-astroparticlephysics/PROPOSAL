@@ -74,60 +74,60 @@ TEST(Assignment , Copyconstructor2 ) {
     EXPECT_TRUE(A==B);
 }
 
-TEST(Assignment , Operator ) {
-    direction.SetSphericalCoordinates(1,20*PI/180.,20*PI/180.);
-    direction.CalculateCartesianFromSpherical();
-    PROPOSALParticle A;
-    PROPOSALParticle B(TauMinusDef::Get());
-    B.SetPosition(position);
-    B.SetDirection(direction);
-
-    EXPECT_TRUE(A!=B);
-
-    B=A;
-
-    EXPECT_TRUE(A==B);
-
-    A.SetEnergy(1e12);
-
-    EXPECT_TRUE(A!=B);
-
-    B=A;
-
-    EXPECT_TRUE(A==B);
-}
-
-TEST(Assignment , Swap ) {
-    direction.SetSphericalCoordinates(1,20*PI/180.,20*PI/180.);
-    direction.CalculateCartesianFromSpherical();
-    PROPOSALParticle A;
-    PROPOSALParticle B;
-    EXPECT_TRUE(A==B);
-    PROPOSALParticle* C = new PROPOSALParticle(TauMinusDef::Get());
-    C->SetPosition(position);
-    C->SetDirection(direction);
-    PROPOSALParticle* D = new PROPOSALParticle(TauMinusDef::Get());
-    D->SetPosition(position);
-    D->SetDirection(direction);
-
-    C->SetEnergy(1e6);
-    D->SetEnergy(1e6);
-    EXPECT_TRUE(*C==*D);
-
-    position = Vector3D();
-    direction = Vector3D();
-    PROPOSALParticle* E = new PROPOSALParticle(MuMinusDef::Get());
-    E->SetPosition(position);
-    E->SetDirection(direction);
-    EXPECT_TRUE(A==*E);
-
-    D->swap(A);
-    EXPECT_TRUE(*C==A);
-    EXPECT_TRUE(*D==B);
-    D->swap(*E);
-    EXPECT_TRUE(B==*D);
-
-}
+// TEST(Assignment , Operator ) {
+//     direction.SetSphericalCoordinates(1,20*PI/180.,20*PI/180.);
+//     direction.CalculateCartesianFromSpherical();
+//     PROPOSALParticle A;
+//     PROPOSALParticle B(TauMinusDef::Get());
+//     B.SetPosition(position);
+//     B.SetDirection(direction);
+//
+//     EXPECT_TRUE(A!=B);
+//
+//     B=A;
+//
+//     EXPECT_TRUE(A==B);
+//
+//     A.SetEnergy(1e12);
+//
+//     EXPECT_TRUE(A!=B);
+//
+//     B=A;
+//
+//     EXPECT_TRUE(A==B);
+// }
+//
+// TEST(Assignment , Swap ) {
+//     direction.SetSphericalCoordinates(1,20*PI/180.,20*PI/180.);
+//     direction.CalculateCartesianFromSpherical();
+//     PROPOSALParticle A;
+//     PROPOSALParticle B;
+//     EXPECT_TRUE(A==B);
+//     PROPOSALParticle* C = new PROPOSALParticle(TauMinusDef::Get());
+//     C->SetPosition(position);
+//     C->SetDirection(direction);
+//     PROPOSALParticle* D = new PROPOSALParticle(TauMinusDef::Get());
+//     D->SetPosition(position);
+//     D->SetDirection(direction);
+//
+//     C->SetEnergy(1e6);
+//     D->SetEnergy(1e6);
+//     EXPECT_TRUE(*C==*D);
+//
+//     position = Vector3D();
+//     direction = Vector3D();
+//     PROPOSALParticle* E = new PROPOSALParticle(MuMinusDef::Get());
+//     E->SetPosition(position);
+//     E->SetDirection(direction);
+//     EXPECT_TRUE(A==*E);
+//
+//     D->swap(A);
+//     EXPECT_TRUE(*C==A);
+//     EXPECT_TRUE(*D==B);
+//     D->swap(*E);
+//     EXPECT_TRUE(B==*D);
+//
+// }
 
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);

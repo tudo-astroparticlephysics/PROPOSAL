@@ -87,6 +87,8 @@ std::ostream& operator<<(std::ostream& os, ParticleDef const& def)
     os << def.name << std::endl;
     os << "Mass:"
        << "\t\t" << def.mass << std::endl;
+    os << "Low:"
+       << "\t\t" << def.low << std::endl;
     os << "Lifetime:"
        << "\t" << def.lifetime << std::endl;
     os << "Charge:"
@@ -101,6 +103,7 @@ std::ostream& operator<<(std::ostream& os, ParticleDef const& def)
 ParticleDef::ParticleDef()
     : name("")
     , mass(0.0)
+    , low(0.0)
     , lifetime(0.0)
     , charge(0.0)
     , hardbb_table(NULL)
@@ -115,6 +118,7 @@ ParticleDef::ParticleDef(std::string name,
             const HardBBTables::VecType* table)
     : name(name)
     , mass(mass)
+    , low(mass)
     , lifetime(lifetime)
     , charge(charge)
     , hardbb_table(table)
@@ -130,6 +134,7 @@ ParticleDef::ParticleDef(const ParticleDef& def)
 {
     name = def.name;
     mass = def.mass;
+    low = def.low;
     lifetime = def.lifetime;
     charge = def.charge;
     hardbb_table = def.hardbb_table;
@@ -152,6 +157,7 @@ void ParticleDef::swap(ParticleDef& def)
 
     swap(name, def.name);
     swap(mass, def.mass);
+    swap(low, def.low);
     swap(lifetime, def.lifetime);
     swap(charge, def.charge);
     swap(hardbb_table, def.hardbb_table);
@@ -166,6 +172,10 @@ bool ParticleDef::operator==(const ParticleDef& def) const
         return false;
     }
     else if (mass != def.mass)
+    {
+        return false;
+    }
+    else if (low != def.low)
     {
         return false;
     }
@@ -205,6 +215,7 @@ MuMinusDef::MuMinusDef()
 {
     name = "MuMinus";
     mass = MMU;
+    low = MMU;
     lifetime = LMU;
     charge = -1.0;
     hardbb_table = &HardBBTables::MuonTable;
@@ -223,6 +234,7 @@ MuPlusDef::MuPlusDef()
 {
     name = "MuPlus";
     mass = MMU;
+    low = MMU;
     lifetime = LMU;
     charge = -1.0;
     hardbb_table = &HardBBTables::MuonTable;
@@ -241,6 +253,7 @@ TauMinusDef::TauMinusDef()
 {
     name = "TauMinus";
     mass = MMU;
+    low = MMU;
     lifetime = LMU;
     charge = -1.0;
     hardbb_table = &HardBBTables::TauTable;
@@ -279,6 +292,7 @@ TauPlusDef::TauPlusDef()
 {
     name = "TauPlus";
     mass = MMU;
+    low = MMU;
     lifetime = LMU;
     charge = -1.0;
     hardbb_table = &HardBBTables::TauTable;
