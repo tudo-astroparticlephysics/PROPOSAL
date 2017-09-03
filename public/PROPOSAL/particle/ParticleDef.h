@@ -69,6 +69,7 @@ struct ParticleDef
 {
     std::string name;
     double mass;
+    double low;       //!< energy below which the particle is lost [MeV]
     double lifetime;
     double charge;
     const HardBBTables::VecType* hardbb_table;

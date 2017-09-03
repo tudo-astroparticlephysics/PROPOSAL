@@ -53,10 +53,12 @@ Sector::Definition::~Definition()
 // ------------------------------------------------------------------------- //
 
 // Standard constructor
-Sector::Sector()
+Sector::Sector(PROPOSALParticle& particle)
     : ini_(0)
     , collection_def_()
     , weighting_starts_at_(0)
+      //TODO(mario): init different Fri 2017/09/01
+    , particle_(particle)
     , geometry_(new Sphere(Vector3D(), 1e18, 0))
     , medium_(new Water())
     , cut_settings_()
@@ -64,15 +66,15 @@ Sector::Sector()
     , scattering_(NULL)
     , crosssections_()
 {
-    crosssections_.push_back(new Bremsstrahlung(medium_, &cut_settings_));
-    crosssections_.push_back(new Epairproduction(medium_, &cut_settings_));
-    crosssections_.push_back(new Photonuclear(medium_, &cut_settings_));
-    crosssections_.push_back(new Ionization(medium_, &cut_settings_));
+    crosssections_.push_back(new Bremsstrahlung(particle_, medium_, &cut_settings_));
+    crosssections_.push_back(new Epairproduction(particle_, medium_, &cut_settings_));
+    crosssections_.push_back(new Photonuclear(particle_, medium_, &cut_settings_));
+    crosssections_.push_back(new Ionization(particle_, medium_, &cut_settings_));
 
     //TODO(mario): Polymorphic initilaization in collections childs  Sun 2017/08/27
     if (collection_def_.do_continuous_randomization)
     {
-        randomizer_ = new ContinuousRandomization();
+        randomizer_ = new ContinuousRandomization(particle_);
     }
 
     if (collection_def_.do_scattering)
@@ -81,13 +83,14 @@ Sector::Sector()
     }
 }
 
-Sector::Sector(const Medium& medium,
+Sector::Sector(PROPOSALParticle& particle, const Medium& medium,
                        const Geometry& geometry,
                        const EnergyCutSettings& cut_settings,
                        const Definition& def)
     : ini_(0)
     , collection_def_(def)
     , weighting_starts_at_(0)
+    , particle_(particle)
     , geometry_(geometry.clone())
     , medium_(medium.clone())
     , cut_settings_(cut_settings)
@@ -95,10 +98,10 @@ Sector::Sector(const Medium& medium,
     , scattering_(NULL)
     , crosssections_()
 {
-    crosssections_.push_back(new Bremsstrahlung(medium_, &cut_settings_));
-    crosssections_.push_back(new Ionization(medium_, &cut_settings_));
-    crosssections_.push_back(new Photonuclear(medium_, &cut_settings_));
-    crosssections_.push_back(new Epairproduction(medium_, &cut_settings_));
+    crosssections_.push_back(new Bremsstrahlung(particle_, medium_, &cut_settings_));
+    crosssections_.push_back(new Ionization(particle_, medium_, &cut_settings_));
+    crosssections_.push_back(new Photonuclear(particle_, medium_, &cut_settings_));
+    crosssections_.push_back(new Epairproduction(particle_, medium_, &cut_settings_));
 
     for(std::vector<CrossSections*>::iterator it = crosssections_.begin(); it != crosssections_.end(); ++it)
     {
@@ -129,7 +132,7 @@ Sector::Sector(const Medium& medium,
     //TODO(mario): Polymorphic initilaization in collections childs  Sun 2017/08/27
     if (collection_def_.do_continuous_randomization)
     {
-        randomizer_ = new ContinuousRandomization();
+        randomizer_ = new ContinuousRandomization(particle);
     }
 
     if (collection_def_.do_scattering)
@@ -142,6 +145,7 @@ Sector::Sector(const Sector& collection)
     :ini_(collection.ini_)
     ,collection_def_(collection.collection_def_)
     ,weighting_starts_at_(collection.weighting_starts_at_)
+    ,particle_(collection.particle_)
     ,geometry_(collection.geometry_->clone())
     ,medium_(collection.medium_->clone())
     ,cut_settings_(collection.cut_settings_)
@@ -188,15 +192,15 @@ Sector::~Sector()
 }
 
 // ------------------------------------------------------------------------- //
-double Sector::Propagate(PROPOSALParticle& particle, double distance)
+double Sector::Propagate(double distance)
 {
     bool flag;
     double displacement;
 
     double propagated_distance = 0;
 
-    double initial_energy = particle.GetEnergy();
-    double final_energy   = particle.GetEnergy();
+    double initial_energy = particle_.GetEnergy();
+    double final_energy   = particle_.GetEnergy();
 
     bool particle_interaction = false;
 
@@ -218,7 +222,7 @@ double Sector::Propagate(PROPOSALParticle& particle, double distance)
         distance = 0;
     }
 
-    if (initial_energy <= particle.GetLow() || distance == 0)
+    if (initial_energy <= particle_.GetLow() || distance == 0)
     {
         flag = false;
     } else
@@ -228,7 +232,7 @@ double Sector::Propagate(PROPOSALParticle& particle, double distance)
 
     while (flag)
     {
-        energy_till_stochastic_ = CalculateEnergyTillStochastic(particle, initial_energy);
+        energy_till_stochastic_ = CalculateEnergyTillStochastic( initial_energy);
         if (energy_till_stochastic_.first > energy_till_stochastic_.second)
         {
             particle_interaction = true;
@@ -242,9 +246,8 @@ double Sector::Propagate(PROPOSALParticle& particle, double distance)
         // Calculate the displacement according to initial energy initial_energy and final_energy
         displacement =
             CalculateDisplacement(
-                particle, initial_energy, final_energy, medium_->GetDensityCorrection() * (distance - propagated_distance)) /
+                 initial_energy, final_energy, medium_->GetDensityCorrection() * (distance - propagated_distance)) /
             medium_->GetDensityCorrection();
-
 
         // The first interaction or decay happens behind the distance we want to propagate
         // So we calculate the final energy using only continuous losses
@@ -252,11 +255,11 @@ double Sector::Propagate(PROPOSALParticle& particle, double distance)
         {
             displacement = distance - propagated_distance;
 
-            final_energy = CalculateFinalEnergy(particle, initial_energy, medium_->GetDensityCorrection() * displacement);
+            final_energy = CalculateFinalEnergy( initial_energy, medium_->GetDensityCorrection() * displacement);
         }
         // Advance the Particle according to the displacement
         // Initial energy and final energy are needed if Molier Scattering is enabled
-        AdvanceParticle(particle, displacement, initial_energy, final_energy);
+        AdvanceParticle( displacement, initial_energy, final_energy);
 
         propagated_distance += displacement;
 
@@ -269,27 +272,27 @@ double Sector::Propagate(PROPOSALParticle& particle, double distance)
         // Randomize the continuous energy loss if this option is enabled
         if (collection_def_.do_continuous_randomization)
         {
-            if (final_energy != particle.GetLow())
+            if (final_energy != particle_.GetLow())
             {
                 double rnd = RandomGenerator::Get().RandomDouble();
-                final_energy = randomizer_->Randomize(particle, crosssections_, initial_energy, final_energy, rnd);
+                final_energy = randomizer_->Randomize(crosssections_, initial_energy, final_energy, rnd);
             }
         }
 
         // Lower limit of particle energy is reached or
         // or complete particle is propagated the whole distance
-        if (final_energy == particle.GetLow() || propagated_distance == distance)
+        if (final_energy == particle_.GetLow() || propagated_distance == distance)
         {
             break;
         }
 
         // Set the particle energy to the current energy before making
         // stochatic losses or decay
-        particle.SetEnergy(final_energy);
+        particle_.SetEnergy(final_energy);
 
         if (particle_interaction)
         {
-            energy_loss = MakeStochasticLoss(particle);
+            energy_loss = MakeStochasticLoss();
             if (energy_loss.second == ParticleType::unknown)
             {
                 // in this case, no cross section is chosen, so there is no interaction
@@ -303,13 +306,14 @@ double Sector::Propagate(PROPOSALParticle& particle, double distance)
             // log_debug("Energyloss: %f\t%s", energy_loss.first,
             // PROPOSALParticle::GetName(energy_loss.second).c_str());
             // //TODO(mario): hack Thu 2017/08/24
-            Output::getInstance().FillSecondaryVector(&particle, ParticleDef(BremsDef::Get()), energy_loss.first, 0);
-            // secondary_id    =   particle.GetParticleId() + 1;
-            // Output::getInstance().FillSecondaryVector(&particle, secondary_id, energy_loss, 0);
+            Output::getInstance().FillSecondaryVector(&particle_, ParticleDef(BremsDef::Get()), energy_loss.first, 0);
+            // secondary_id    =   particle_.GetParticleId() + 1;
+            // Output::getInstance().FillSecondaryVector(& secondary_id, energy_loss, 0);
         } else
         {
-            DecayChannel* mode = &particle.GetDecayTable().SelectChannel();
-            decay_products     = mode->Decay(&particle);
+            energy_loss = MakeStochasticLoss();
+            DecayChannel* mode = &particle_.GetDecayTable().SelectChannel();
+            decay_products     = mode->Decay(&particle_);
             Output::getInstance().FillSecondaryVector(decay_products);
 
             // TODO(mario): Delete decay products Tue 2017/08/22
@@ -322,7 +326,7 @@ double Sector::Propagate(PROPOSALParticle& particle, double distance)
         }
 
         // break if the lower limit of particle energy is reached
-        if (final_energy <= particle.GetLow())
+        if (final_energy <= particle_.GetLow())
         {
             break;
         }
@@ -373,7 +377,7 @@ double Sector::Propagate(PROPOSALParticle& particle, double distance)
     //     }
     // }
 
-    particle.SetEnergy(final_energy);
+    particle_.SetEnergy(final_energy);
 
     // Particle reached the border, final energy is returned
     if (propagated_distance == distance)
@@ -389,7 +393,7 @@ double Sector::Propagate(PROPOSALParticle& particle, double distance)
     return 0;
 }
 
-std::pair<double, double> Sector::CalculateEnergyTillStochastic(const PROPOSALParticle& particle,
+std::pair<double, double> Sector::CalculateEnergyTillStochastic(
                                                                     double initial_energy)
 {
     double rndd = -log(RandomGenerator::Get().RandomDouble());
@@ -401,48 +405,48 @@ std::pair<double, double> Sector::CalculateEnergyTillStochastic(const PROPOSALPa
     pair<double, double> final;
 
     // solving the tracking integral
-    if (particle.GetLifetime() < 0)
+    if (particle_.GetLifetime() < 0)
     {
         rnddMin = 0;
     } else
     {
-        rnddMin = CalculateTrackingIntegal(particle, initial_energy, rndd, false) / medium_->GetDensityCorrection();
+        rnddMin = CalculateTrackingIntegal( initial_energy, rndd, false) / medium_->GetDensityCorrection();
     }
 
-    rndiMin = CalculateTrackingIntegal(particle, initial_energy, rndi, true);
+    rndiMin = CalculateTrackingIntegal( initial_energy, rndi, true);
 
     // evaluating the energy loss
     if (rndd >= rnddMin || rnddMin <= 0)
     {
-        final.second = particle.GetLow();
+        final.second = particle_.GetLow();
     } else
     {
-        final.second = CalculateFinalEnergy(particle, initial_energy, rndd * medium_->GetDensityCorrection(), false);
+        final.second = CalculateFinalEnergy( initial_energy, rndd * medium_->GetDensityCorrection(), false);
     }
 
     if (rndi >= rndiMin || rndiMin <= 0)
     {
-        final.first = particle.GetLow();
+        final.first = particle_.GetLow();
     } else
     {
-        final.first = CalculateFinalEnergy(particle, initial_energy, rndi, true);
+        final.first = CalculateFinalEnergy( initial_energy, rndi, true);
     }
 
     return final;
 }
 
-void Sector::AdvanceParticle(PROPOSALParticle& particle, double dr, double ei, double ef)
+void Sector::AdvanceParticle(double dr, double ei, double ef)
 {
 
-    double dist       = particle.GetPropagatedDistance();
-    double time       = particle.GetT();
-    Vector3D position = particle.GetPosition();
+    double dist       = particle_.GetPropagatedDistance();
+    double time       = particle_.GetT();
+    Vector3D position = particle_.GetPosition();
 
     dist += dr;
 
     if (collection_def_.do_exact_time_calculation)
     {
-        time += CalculateParticleTime(particle, ei, ef) / medium_->GetDensityCorrection();
+        time += CalculateParticleTime( ei, ef) / medium_->GetDensityCorrection();
     } else
     {
         time += dr / SPEED;
@@ -451,7 +455,7 @@ void Sector::AdvanceParticle(PROPOSALParticle& particle, double dr, double ei, d
     // TODO(mario): Adjucst the whole scatteing class Thu 2017/08/24
     if (collection_def_.do_scattering)
     {
-        scattering_->Scatter(particle, crosssections_, dr, ei, ef);
+        scattering_->Scatter(particle_, crosssections_, dr, ei, ef);
     }
 
     // if(scattering_model_!=-1)
@@ -476,15 +480,15 @@ void Sector::AdvanceParticle(PROPOSALParticle& particle, double dr, double ei, d
     // }
     // else
     // {
-    //     position = position + dr*particle.GetDirection();
-    //     particle.SetPosition(position);
+    //     position = position + dr*particle_.GetDirection();
+    //     particle_.SetPosition(position);
     // }
 
-    particle.SetPropagatedDistance(dist);
-    particle.SetT(time);
+    particle_.SetPropagatedDistance(dist);
+    particle_.SetT(time);
 }
 
-pair<double, ParticleType::Enum> Sector::MakeStochasticLoss(const PROPOSALParticle& particle)
+pair<double, ParticleType::Enum> Sector::MakeStochasticLoss()
 {
     double rnd1 = RandomGenerator::Get().RandomDouble();
     double rnd2 = RandomGenerator::Get().RandomDouble();
@@ -505,7 +509,7 @@ pair<double, ParticleType::Enum> Sector::MakeStochasticLoss(const PROPOSALPartic
 
     if (collection_def_.do_weighting)
     {
-        if (particle.GetPropagatedDistance() > weighting_starts_at_)
+        if (particle_.GetPropagatedDistance() > weighting_starts_at_)
         {
             double exp   = abs(collection_def_.weighting_order);
             double power = pow(rnd2, exp);
@@ -519,14 +523,14 @@ pair<double, ParticleType::Enum> Sector::MakeStochasticLoss(const PROPOSALPartic
             }
 
             collection_def_.weighting_order     = (1 + exp) * power;
-            weighting_starts_at_ = particle.GetPropagatedDistance();
+            weighting_starts_at_ = particle_.GetPropagatedDistance();
             collection_def_.do_weighting        = false;
         }
     }
     // if (particle_->GetEnergy() < 650) printf("energy: %f\n", particle_->GetEnergy());
     for (unsigned int i = 0; i < GetCrosssections().size(); i++)
     {
-        rates.at(i) = crosssections_.at(i)->CalculatedNdx(particle, rnd2);
+        rates.at(i) = crosssections_.at(i)->CalculatedNdx(particle_.GetEnergy(), rnd2);
         total_rate += rates.at(i);
         // if (rates.at(i) == 0) printf("%i = 0, energy: %f\n", i, particle_->GetEnergy());
         log_debug("Rate for %s = %f", crosssections_.at(i)->GetName().c_str(), rates.at(i));
@@ -542,7 +546,7 @@ pair<double, ParticleType::Enum> Sector::MakeStochasticLoss(const PROPOSALPartic
 
         if (rates_sum > total_rate_weighted)
         {
-            energy_loss.first  = crosssections_.at(i)->CalculateStochasticLoss(particle, rnd2, rnd3);
+            energy_loss.first  = crosssections_.at(i)->CalculateStochasticLoss(particle_.GetEnergy(), rnd2, rnd3);
             energy_loss.second = crosssections_.at(i)->GetType();
             break;
         }
@@ -551,21 +555,26 @@ pair<double, ParticleType::Enum> Sector::MakeStochasticLoss(const PROPOSALPartic
     return energy_loss;
 }
 
-double Sector::MakeDecay(const PROPOSALParticle& particle)
+double Sector::MakeDecay(double energy)
 {
     // TODO(mario): multiplier? Was not used before Fri 2017/08/25
-    // if(multiplier_ <= 0 || particle.GetLifetime() < 0)
+    // if(multiplier_ <= 0 || particle_.GetLifetime() < 0)
     // {
     //     return 0;
     // }
     //
-    // return multiplier_/max((particle.GetMomentum()/particle.GetMass())*particle.GetLifetime()*SPEED, XRES);
-    if (particle.GetLifetime() < 0)
+    // return multiplier_/max((particle_.GetMomentum()/particle_.GetMass())*particle_.GetLifetime()*SPEED, XRES);
+    if (particle_.GetLifetime() < 0)
     {
         return 0;
     }
 
-    return max((particle.GetMomentum() / particle.GetMass()) * particle.GetLifetime() * SPEED, XRES);
+    //TODO(mario): Better way? Sat 2017/09/02
+    double square_momentum = energy * energy - particle_.GetMass() * particle_.GetMass();
+    double particle_momentum = sqrt(max(square_momentum, 0.0));
+
+    // return multiplier / max((particle_momentum / particle_.GetMass()) * particle_.GetLifetime() * SPEED, XRES);
+    return 1.0 / max((particle_momentum / particle_.GetMass()) * particle_.GetLifetime() * SPEED, XRES);
 }
 
 //----------------------------------------------------------------------------//
@@ -669,616 +678,32 @@ void Sector::DisableExactTimeCalculation()
     collection_def_.do_exact_time_calculation   =   false;
 }
 
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
+// ------------------------------------------------------------------------- //
+// Integral functions
+// ------------------------------------------------------------------------- //
 
-// Copyconstructor
-// Sector::Sector(const Sector &collection)
-//     : MathModel(collection)
-//     ,order_of_interpolation_     ( collection.order_of_interpolation_ )
-//     ,do_interpolation_           ( collection.do_interpolation_ )
-//     ,lpm_effect_enabled_         ( collection.lpm_effect_enabled_ )
-//     ,ini_                        ( collection.ini_ )
-//     ,do_weighting_               ( collection.do_weighting_ )
-//     ,weighting_order_            ( collection.weighting_order_ )
-//     ,weighting_starts_at_        ( collection.weighting_starts_at_ )
-//     ,enable_randomization_       ( collection.enable_randomization_ )
-//     ,do_continuous_randomization_( collection.do_continuous_randomization_ )
-//     ,do_scattering_              ( collection.do_scattering_ )
-//     ,location_                   ( collection.location_ )
-//     ,density_correction_         ( collection.density_correction_ )
-//     ,do_time_interpolation_      ( collection.do_time_interpolation_ )
-//     ,do_exact_time_calculation_   ( collection.do_exact_time_calculation_ )
-//     ,up_                         ( collection.up_)
-//     ,bigLow_                     ( collection.bigLow_ )
-//     ,storeDif_                   ( collection.storeDif_ )
-//     ,particle_                   ( new PROPOSALParticle(*collection.particle_) )
-//     ,backup_particle_            ( new PROPOSALParticle(*collection.backup_particle_) )
-//     ,medium_                     ( collection.medium_->clone() )
-//     ,integral_                   ( new Integral(*collection.integral_) )
-//     ,cut_settings_               ( new EnergyCutSettings(*collection.cut_settings_) )
-//     ,decay_                      ( new Decay(*collection.decay_) )
-//     ,prop_decay_                 ( new Integral(*collection.prop_decay_) )
-//     ,prop_interaction_           ( new Integral(*collection.prop_interaction_) )
-//     ,time_particle_              ( new Integral(*collection.time_particle_) )
-//
-// {
-//     crosssections_.resize(collection.crosssections_.size());
-//
-//     for(unsigned int i =0; i<collection.crosssections_.size(); i++)
-//     {
-//         switch (collection.crosssections_.at(i)->GetType())
-//         {
-//             case ParticleType::Brems:
-//                 crosssections_.at(i) = new Bremsstrahlung( *(Bremsstrahlung*)collection.crosssections_.at(i) );
-//                 break;
-//             // case ParticleType::DeltaE:
-//             //     crosssections_.at(i) = new Ionization( *(Ionization*)collection.crosssections_.at(i) );
-//             //     break;
-//             // case ParticleType::EPair:
-//             //     crosssections_.at(i) = new Epairproduction( *(Epairproduction*)collection.crosssections_.at(i) );
-//             //     break;
-//             // case ParticleType::NuclInt:
-//             //     crosssections_.at(i) = new Photonuclear( *(Photonuclear*)collection.crosssections_.at(i) );
-//             //     break;
-//             default:
-//                 log_fatal("Unknown cross section");
-//                 exit(1);
-//         }
-//     }
-//
-//     if(collection.interpolant_ != NULL)
-//     {
-//         interpolant_ = new Interpolant(*collection.interpolant_) ;
-//     }
-//     else
-//     {
-//         interpolant_ = NULL;
-//     }
-//
-//     if(collection.interpolant_diff_ != NULL)
-//     {
-//         interpolant_diff_ = new Interpolant(*collection.interpolant_diff_) ;
-//     }
-//     else
-//     {
-//         interpolant_diff_ = NULL;
-//     }
-//
-//     if(collection.interpol_prop_decay_ != NULL)
-//     {
-//         interpol_prop_decay_ = new Interpolant(*collection.interpol_prop_decay_) ;
-//     }
-//     else
-//     {
-//         interpol_prop_decay_ = NULL;
-//     }
-//
-//     if(collection.interpol_prop_decay_diff_ != NULL)
-//     {
-//         interpol_prop_decay_diff_ = new Interpolant(*collection.interpol_prop_decay_diff_) ;
-//     }
-//     else
-//     {
-//         interpol_prop_decay_diff_ = NULL;
-//     }
-//
-//     if(collection.interpol_prop_interaction_ != NULL)
-//     {
-//         interpol_prop_interaction_ = new Interpolant(*collection.interpol_prop_interaction_) ;
-//     }
-//     else
-//     {
-//         interpol_prop_interaction_ = NULL;
-//     }
-//
-//     if(collection.interpol_prop_interaction_diff_ != NULL)
-//     {
-//         interpol_prop_interaction_diff_ = new Interpolant(*collection.interpol_prop_interaction_diff_) ;
-//     }
-//     else
-//     {
-//         interpol_prop_interaction_diff_ = NULL;
-//     }
-//
-//     if(collection.interpol_time_particle_ != NULL)
-//     {
-//         interpol_time_particle_ = new Interpolant(*collection.interpol_time_particle_) ;
-//     }
-//     else
-//     {
-//         interpol_time_particle_ = NULL;
-//     }
-//
-//     if(collection.interpol_time_particle_diff_ != NULL)
-//     {
-//         interpol_time_particle_diff_ = new Interpolant(*collection.interpol_time_particle_diff_) ;
-//     }
-//     else
-//     {
-//         interpol_time_particle_diff_ = NULL;
-//     }
-//
-//     if(collection.randomizer_ != NULL)
-//     {
-//         randomizer_ = new ContinuousRandomization(*collection.randomizer_) ;
-//     }
-//     else
-//     {
-//         randomizer_ = NULL;
-//     }
-//
-//     if(collection.scattering_ != NULL)
-//     {
-//         scattering_ = new Scattering(*collection.scattering_) ;
-//     }
-//     else
-//     {
-//         scattering_ = NULL;
-//     }
-//
-//     if(collection.geometry_ != NULL)
-//     {
-//         // geometry_ = new Geometry(*collection.geometry_) ;
-//         geometry_ = collection.geometry_->clone();
-//     }
-//     else
-//     {
-//         geometry_ = NULL;
-//     }
-// }
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-//-------------------------operators and swap function------------------------//
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-// Sector& Sector::operator=(const Sector &collection)
-// {
-//     if (this != &collection)
-//     {
-//       Sector tmp(collection);
-//       swap(tmp);
-//     }
-//     return *this;
-// }
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-// bool Sector::operator==(const Sector &collection) const
-// {
-//     if( order_of_interpolation_     != collection.order_of_interpolation_ )  return false;
-//     if( do_interpolation_           != collection.do_interpolation_ )        return false;
-//     if( lpm_effect_enabled_         != collection.lpm_effect_enabled_ )      return false;
-//     if( ini_                        != collection.ini_ )                     return false;
-//     if( *particle_                  != *collection.particle_ )               return false;
-//     if( *medium_                    != *collection.medium_ )                 return false;
-//     if( *integral_                  != *collection.integral_ )               return false;
-//     if( *cut_settings_              != *collection.cut_settings_ )           return false;
-//     if( *prop_decay_                != *collection.prop_decay_ )             return false;
-//     if( *prop_interaction_          != *collection.prop_interaction_ )       return false;
-//     if( up_                         != collection.up_)                       return false;
-//     if( do_weighting_               != collection.do_weighting_ )            return false;
-//     if( weighting_order_            != collection.weighting_order_ )         return false;
-//     if( weighting_starts_at_        != collection.weighting_starts_at_ )     return false;
-//     if( enable_randomization_       != collection.enable_randomization_ )    return false;
-//     if( do_continuous_randomization_!= collection.do_continuous_randomization_ )return false;
-//     if( do_scattering_              != collection.do_scattering_ )           return false;
-//     if( location_                   != collection.location_ )                return false;
-//     if( density_correction_         != collection.density_correction_ )      return false;
-//     if( do_exact_time_calculation_   != collection.do_exact_time_calculation_ )return false;
-//     if( do_time_interpolation_      != collection.do_time_interpolation_ )   return false;
-//     if( *time_particle_             != *collection.time_particle_ )          return false;
-//
-//     if( *decay_                     != *collection.decay_ )                  return false;
-//
-//     if( crosssections_.size()       != collection.crosssections_.size() )    return false;
-//     if( bigLow_.size()              != collection.bigLow_.size() )           return false;
-//     if( storeDif_.size()            != collection.storeDif_.size() )         return false;
-//
-//     for(unsigned int i =0; i<collection.bigLow_.size(); i++)
-//     {
-//         if( bigLow_.at(i) !=  collection.bigLow_.at(i) )        return false;
-//     }
-//
-//     for(unsigned int i =0; i<collection.storeDif_.size(); i++)
-//     {
-//         if( storeDif_.at(i) !=  collection.storeDif_.at(i) )    return false;
-//     }
-//
-//     for(unsigned int i =0; i<collection.crosssections_.size(); i++)
-//     {
-//         switch (collection.crosssections_.at(i)->GetType())
-//         {
-//             case ParticleType::Brems:
-//                 if( *(Bremsstrahlung*)crosssections_.at(i) !=  *(Bremsstrahlung*)collection.crosssections_.at(i) )
-//                 return false;
-//                 break;
-//             // case ParticleType::DeltaE:
-//             //     if( *(Ionization*)crosssections_.at(i) != *(Ionization*)collection.crosssections_.at(i) ) return
-//             false;
-//             //     break;
-//             // case ParticleType::EPair:
-//             //     if( *(Epairproduction*)crosssections_.at(i) !=  *(Epairproduction*)collection.crosssections_.at(i)
-//             ) return false;
-//             //     break;
-//             // case ParticleType::NuclInt:
-//             //     if( *(Photonuclear*)crosssections_.at(i) !=  *(Photonuclear*)collection.crosssections_.at(i) )
-//             return false;
-//             //     break;
-//             default:
-//                 log_fatal("Unknown cross section");
-//                 exit(1);
-//         }
-//     }
-//
-//     if( interpolant_ != NULL && collection.interpolant_ != NULL)
-//     {
-//         if( *interpolant_   != *collection.interpolant_)                                        return false;
-//     }
-//     else if( interpolant_ != collection.interpolant_)                                           return false;
-//
-//     if( interpolant_diff_ != NULL && collection.interpolant_diff_ != NULL)
-//     {
-//         if( *interpolant_diff_   != *collection.interpolant_diff_)                              return false;
-//     }
-//     else if( interpolant_diff_ != collection.interpolant_diff_)                                 return false;
-//
-//     if( interpol_prop_decay_ != NULL && collection.interpol_prop_decay_ != NULL)
-//     {
-//         if( *interpol_prop_decay_   != *collection.interpol_prop_decay_)                        return false;
-//     }
-//     else if( interpol_prop_decay_ != collection.interpol_prop_decay_)                           return false;
-//
-//     if( interpol_prop_decay_diff_ != NULL && collection.interpol_prop_decay_diff_ != NULL)
-//     {
-//         if( *interpol_prop_decay_diff_   != *collection.interpol_prop_decay_diff_)              return false;
-//     }
-//     else if( interpol_prop_decay_diff_ != collection.interpol_prop_decay_diff_)                 return false;
-//
-//     if( interpol_prop_interaction_ != NULL && collection.interpol_prop_interaction_ != NULL)
-//     {
-//         if( *interpol_prop_interaction_   != *collection.interpol_prop_interaction_)            return false;
-//     }
-//     else if( interpol_prop_interaction_ != collection.interpol_prop_interaction_)               return false;
-//
-//     if( interpol_prop_interaction_diff_ != NULL && collection.interpol_prop_interaction_diff_ != NULL)
-//     {
-//         if( *interpol_prop_interaction_diff_   != *collection.interpol_prop_interaction_diff_)  return false;
-//     }
-//     else if( interpol_prop_interaction_diff_ != collection.interpol_prop_interaction_diff_)     return false;
-//
-//     if( interpol_time_particle_diff_ != NULL && collection.interpol_time_particle_diff_ != NULL)
-//     {
-//         if( *interpol_time_particle_diff_   != *collection.interpol_time_particle_diff_)        return false;
-//     }
-//     else if( interpol_time_particle_diff_ != collection.interpol_time_particle_diff_)           return false;
-//
-//     if( interpol_time_particle_ != NULL && collection.interpol_time_particle_ != NULL)
-//     {
-//         if( *interpol_time_particle_   != *collection.interpol_time_particle_)                  return false;
-//     }
-//     else if( interpol_time_particle_ != collection.interpol_time_particle_)                     return false;
-//
-//     if( randomizer_ != NULL && collection.randomizer_ != NULL)
-//     {
-//         if( *randomizer_   != *collection.randomizer_)                                        return false;
-//     }
-//     else if( randomizer_ != collection.randomizer_)                                           return false;
-//
-//     if( scattering_ != NULL && collection.scattering_ != NULL)
-//     {
-//         if( *scattering_   != *collection.scattering_)                                        return false;
-//     }
-//     else if( scattering_ != collection.scattering_)                                           return false;
-//
-//     if( geometry_ != NULL && collection.geometry_ != NULL)
-//     {
-//         if( *geometry_   != *collection.geometry_)                                        return false;
-//     }
-//     else if( geometry_ != collection.geometry_)                                           return false;
-//
-//     //else
-//     return true;
-// }
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-// bool Sector::operator!=(const Sector &collection) const
-// {
-//     return !(*this == collection);
-// }
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-// namespace PROPOSAL
-// {
-//
-// ostream& operator<<(ostream& os, Sector const& collection)
-// {
-//
-//     os<<"------------Sector( "<<&collection<<" )------------"<<endl;
-//     os<<"------------------------------------------------------"<<endl;
-//     os<<"Particle type:\t\t\t\t\t"<<collection.particle_->GetName()<<endl;
-//     os<<"Order of interpolation:\t\t\t\t"<<collection.order_of_interpolation_<<endl;
-//     os<<"Interpolation enabled:\t\t\t\t"<<collection.do_interpolation_<<endl;
-//     os<<"Continuous randomization enabled:\t\t"<<collection.do_continuous_randomization_<<endl;
-//     os<<"Moliere scattering enabled:\t\t\t"<<collection.do_scattering_<<endl;
-//     os<<"Exact time calculation enabled:\t\t\t"<<collection.do_exact_time_calculation_<<endl;
-//     os<<"Location (0=infront, 1=inside, 2=behind)\t"<<collection.location_<<endl;
-//     os<<"Density correction factor:\t\t\t"<<collection.density_correction_<<endl;
-//
-//     os<<"\n"<<*collection.medium_<<"\n"<<endl;
-//     os<<*collection.cut_settings_<<"\n"<<endl;
-//
-//     if(collection.geometry_ != NULL)
-//         os<<*collection.geometry_<<"\n"<<endl;
-//
-//     os<<"------------------------------------------------------"<<endl;
-//     os<<"------------------------------------------------------"<<endl;
-//     return os;
-// }
-//
-// }  // namespace PROPOSAL
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-// void Sector::swap(Sector &collection)
-// {
-//     using std::swap;
-//
-//     PROPOSALParticle tmp_particle1(*collection.particle_);
-//     PROPOSALParticle tmp_particle2(*particle_);
-//
-//     EnergyCutSettings tmp_cuts1(*collection.cut_settings_);
-//     EnergyCutSettings tmp_cuts2(*cut_settings_);
-//
-//     vector<CrossSections*> tmp_cross1(collection.crosssections_);
-//     vector<CrossSections*> tmp_cross2(crosssections_);
-//
-//     swap( order_of_interpolation_     , collection.order_of_interpolation_ );
-//     swap( do_interpolation_           , collection.do_interpolation_ );
-//     swap( lpm_effect_enabled_         , collection.lpm_effect_enabled_ );
-//     swap( ini_                        , collection.ini_ );
-//     swap( up_                         , collection.up_ );
-//     swap( do_weighting_               , collection.do_weighting_ );
-//     swap( weighting_order_            , collection.weighting_order_ );
-//     swap( weighting_starts_at_        , collection.weighting_starts_at_ );
-//     swap( do_continuous_randomization_, collection.do_continuous_randomization_ );
-//     swap( enable_randomization_       , collection.enable_randomization_ );
-//     swap( location_                   , collection.location_ );
-//     swap( density_correction_         , collection.density_correction_ );
-//     swap( do_time_interpolation_      , collection.do_time_interpolation_ );
-//     swap( do_exact_time_calculation_   , collection.do_exact_time_calculation_ );
-//
-//
-//     particle_->swap( *collection.particle_ );       //particle pointer swap
-//     medium_->swap( *collection.medium_ );
-//     integral_->swap( *collection.integral_ );
-//     cut_settings_->swap( *collection.cut_settings_ );
-//     crosssections_.swap(collection.crosssections_); //particle pointer swap
-//     prop_decay_->swap( *collection.prop_decay_ );
-//     prop_interaction_->swap( *collection.prop_interaction_ );
-//     decay_->swap(*collection.decay_);               //particle pointer swap
-//
-//     time_particle_->swap(*collection.time_particle_ );
-//
-//     storeDif_.swap(collection.storeDif_);
-//     bigLow_.swap(collection.bigLow_);
-//
-//     if( randomizer_ != NULL && collection.randomizer_ != NULL)
-//     {
-//         randomizer_->swap(*collection.randomizer_);
-//     }
-//     else if( randomizer_ == NULL && collection.randomizer_ != NULL)
-//     {
-//         randomizer_ = new ContinuousRandomization(*collection.randomizer_);
-//         collection.randomizer_ = NULL;
-//     }
-//     else if( randomizer_ != NULL && collection.randomizer_ == NULL)
-//     {
-//         collection.randomizer_ = new ContinuousRandomization(*randomizer_);
-//         randomizer_ = NULL;
-//     }
-//
-//     if( scattering_ != NULL && collection.scattering_ != NULL)
-//     {
-//         scattering_->swap(*collection.scattering_);
-//     }
-//     else if( scattering_ == NULL && collection.scattering_ != NULL)
-//     {
-//         scattering_ = new Scattering(*collection.scattering_);
-//         collection.scattering_ = NULL;
-//     }
-//     else if( scattering_ != NULL && collection.scattering_ == NULL)
-//     {
-//         collection.scattering_ = new Scattering(*scattering_);
-//         scattering_ = NULL;
-//     }
-//
-//     if( geometry_ != NULL && collection.geometry_ != NULL)
-//     {
-//         geometry_->swap(*collection.geometry_);
-//     }
-//     else if( geometry_ == NULL && collection.geometry_ != NULL)
-//     {
-//         // geometry_ = new Geometry(*collection.geometry_);
-//         geometry_ = collection.geometry_->clone();
-//         collection.geometry_ = NULL;
-//     }
-//     else if( geometry_ != NULL && collection.geometry_ == NULL)
-//     {
-//         // collection.geometry_ = new Geometry(*geometry_);
-//         geometry_ = collection.geometry_->clone();
-//         geometry_ = NULL;
-//     }
-//
-//
-//     // Set pointers again (to many swapping above....)
-//     // SetParticle( new PROPOSALParticle(tmp_particle1) );
-//     // collection.SetParticle( new PROPOSALParticle(tmp_particle2) );
-//
-//     SetCutSettings(  new EnergyCutSettings(tmp_cuts1) );
-//     collection.SetCutSettings( new EnergyCutSettings(tmp_cuts2) );
-//
-//     SetCrosssections(  tmp_cross1 );
-//     collection.SetCrosssections(  tmp_cross2 );
-//
-//     if( interpolant_ != NULL && collection.interpolant_ != NULL)
-//     {
-//         interpolant_->swap(*collection.interpolant_);
-//     }
-//     else if( interpolant_ == NULL && collection.interpolant_ != NULL)
-//     {
-//         interpolant_ = new Interpolant(*collection.interpolant_);
-//         collection.interpolant_ = NULL;
-//     }
-//     else if( interpolant_ != NULL && collection.interpolant_ == NULL)
-//     {
-//         collection.interpolant_ = new Interpolant(*interpolant_);
-//         interpolant_ = NULL;
-//     }
-//
-//     if( interpolant_diff_ != NULL && collection.interpolant_diff_ != NULL)
-//     {
-//         interpolant_diff_->swap(*collection.interpolant_diff_);
-//     }
-//     else if( interpolant_diff_ == NULL && collection.interpolant_diff_ != NULL)
-//     {
-//         interpolant_diff_ = new Interpolant(*collection.interpolant_diff_);
-//         collection.interpolant_diff_ = NULL;
-//     }
-//     else if( interpolant_diff_ != NULL && collection.interpolant_diff_ == NULL)
-//     {
-//         collection.interpolant_diff_ = new Interpolant(*interpolant_diff_);
-//         interpolant_diff_ = NULL;
-//     }
-//
-//     if( interpol_prop_decay_ != NULL && collection.interpol_prop_decay_ != NULL)
-//     {
-//         interpol_prop_decay_->swap(*collection.interpol_prop_decay_);
-//     }
-//     else if( interpol_prop_decay_ == NULL && collection.interpol_prop_decay_ != NULL)
-//     {
-//         interpol_prop_decay_ = new Interpolant(*collection.interpol_prop_decay_);
-//         collection.interpol_prop_decay_ = NULL;
-//     }
-//     else if( interpol_prop_decay_ != NULL && collection.interpol_prop_decay_ == NULL)
-//     {
-//         collection.interpol_prop_decay_ = new Interpolant(*interpol_prop_decay_);
-//         interpol_prop_decay_ = NULL;
-//     }
-//
-//     if( interpol_prop_decay_diff_ != NULL && collection.interpol_prop_decay_diff_ != NULL)
-//     {
-//         interpol_prop_decay_diff_->swap(*collection.interpol_prop_decay_diff_);
-//     }
-//     else if( interpol_prop_decay_diff_ == NULL && collection.interpol_prop_decay_diff_ != NULL)
-//     {
-//         interpol_prop_decay_diff_ = new Interpolant(*collection.interpol_prop_decay_diff_);
-//         collection.interpol_prop_decay_diff_ = NULL;
-//     }
-//     else if( interpol_prop_decay_diff_ != NULL && collection.interpol_prop_decay_diff_ == NULL)
-//     {
-//         collection.interpol_prop_decay_diff_ = new Interpolant(*interpol_prop_decay_diff_);
-//         interpol_prop_decay_diff_ = NULL;
-//     }
-//
-//     if( interpol_prop_interaction_ != NULL && collection.interpol_prop_interaction_ != NULL)
-//     {
-//         interpol_prop_interaction_->swap(*collection.interpol_prop_interaction_);
-//     }
-//     else if( interpol_prop_interaction_ == NULL && collection.interpol_prop_interaction_ != NULL)
-//     {
-//         interpol_prop_interaction_ = new Interpolant(*collection.interpol_prop_interaction_);
-//         collection.interpol_prop_interaction_ = NULL;
-//     }
-//     else if( interpol_prop_interaction_ != NULL && collection.interpol_prop_interaction_ == NULL)
-//     {
-//         collection.interpol_prop_interaction_ = new Interpolant(*interpol_prop_interaction_);
-//         interpol_prop_interaction_ = NULL;
-//     }
-//
-//     if( interpol_prop_interaction_diff_ != NULL && collection.interpol_prop_interaction_diff_ != NULL)
-//     {
-//         interpol_prop_interaction_diff_->swap(*collection.interpol_prop_interaction_diff_);
-//     }
-//     else if( interpol_prop_interaction_diff_ == NULL && collection.interpol_prop_interaction_diff_ != NULL)
-//     {
-//         interpol_prop_interaction_diff_ = new Interpolant(*collection.interpol_prop_interaction_diff_);
-//         collection.interpol_prop_interaction_diff_ = NULL;
-//     }
-//     else if( interpol_prop_interaction_diff_ != NULL && collection.interpol_prop_interaction_diff_ == NULL)
-//     {
-//         collection.interpol_prop_interaction_diff_ = new Interpolant(*interpol_prop_interaction_diff_);
-//         interpol_prop_interaction_diff_ = NULL;
-//     }
-//
-//     if( interpol_time_particle_ != NULL && collection.interpol_time_particle_ != NULL)
-//     {
-//         interpol_time_particle_->swap(*collection.interpol_time_particle_);
-//     }
-//     else if( interpol_time_particle_ == NULL && collection.interpol_time_particle_ != NULL)
-//     {
-//         interpol_time_particle_ = new Interpolant(*collection.interpol_time_particle_);
-//         collection.interpol_time_particle_ = NULL;
-//     }
-//     else if( interpol_time_particle_ != NULL && collection.interpol_time_particle_ == NULL)
-//     {
-//         collection.interpol_time_particle_ = new Interpolant(*interpol_time_particle_);
-//         interpol_time_particle_ = NULL;
-//     }
-//
-//     if( interpol_time_particle_diff_ != NULL && collection.interpol_time_particle_diff_ != NULL)
-//     {
-//         interpol_time_particle_diff_->swap(*collection.interpol_time_particle_diff_);
-//     }
-//     else if( interpol_time_particle_diff_ == NULL && collection.interpol_time_particle_diff_ != NULL)
-//     {
-//         interpol_time_particle_diff_ = new Interpolant(*collection.interpol_time_particle_diff_);
-//         collection.interpol_time_particle_diff_ = NULL;
-//     }
-//     else if( interpol_time_particle_diff_ != NULL && collection.interpol_time_particle_diff_ == NULL)
-//     {
-//         collection.interpol_time_particle_diff_ = new Interpolant(*interpol_time_particle_diff_);
-//         interpol_time_particle_diff_ = NULL;
-//     }
-//
-// }
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-//--------------------------Functions to integrate----------------------------//
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-double Sector::FunctionToTimeIntegral(const PROPOSALParticle& particle, double energy)
+double Sector::FunctionToTimeIntegral(double energy)
 {
     double aux;
 
-    aux = FunctionToIntegral(particle, energy);
-    aux *= particle.GetEnergy() / (particle.GetMomentum() * SPEED);
+    aux = FunctionToIntegral( energy);
+    aux *= particle_.GetEnergy() / (particle_.GetMomentum() * SPEED);
     return aux;
 }
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-double Sector::FunctionToPropIntegralDecay(const PROPOSALParticle& particle, double energy)
+double Sector::FunctionToPropIntegralDecay( double energy)
 {
     double aux;
     double decay;
 
-    aux = FunctionToIntegral(particle, energy);
+    aux = FunctionToIntegral(energy);
 
-    decay = MakeDecay(particle);
+    decay = MakeDecay(energy);
 
-    log_debug(" + %f", particle.GetEnergy());
+    log_debug(" + %f", particle_.GetEnergy());
 
     return aux * decay;
 }
@@ -1286,17 +711,17 @@ double Sector::FunctionToPropIntegralDecay(const PROPOSALParticle& particle, dou
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-double Sector::FunctionToPropIntegralInteraction(const PROPOSALParticle& particle, double energy)
+double Sector::FunctionToPropIntegralInteraction( double energy)
 {
     double aux;
     double rate       = 0.0;
     double total_rate = 0.0;
 
-    aux = FunctionToIntegral(particle, energy);
+    aux = FunctionToIntegral( energy);
 
     for (unsigned int i = 0; i < crosssections_.size(); i++)
     {
-        rate = crosssections_.at(i)->CalculatedNdx(particle);
+        rate = crosssections_.at(i)->CalculatedNdx(energy);
 
         log_debug("Rate for %s = %f", crosssections_.at(i)->GetName().c_str(), rate);
 
@@ -1308,22 +733,19 @@ double Sector::FunctionToPropIntegralInteraction(const PROPOSALParticle& particl
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-double Sector::FunctionToIntegral(const PROPOSALParticle& particle, double energy)
+double Sector::FunctionToIntegral( double energy)
 {
     double result;
     double aux;
-
-    PROPOSALParticle temp_particle(particle);
-    temp_particle.SetEnergy(energy);
 
     result = 0.0;
 
     for (unsigned int i = 0; i < crosssections_.size(); i++)
     {
-        aux = crosssections_.at(i)->CalculatedEdx(temp_particle);
+        aux = crosssections_.at(i)->CalculatedEdx(energy);
         result += aux;
 
-        log_debug("energy %f , dE/dx = %f", particle.GetEnergy(), aux);
+        log_debug("energy %f , dE/dx = %f", particle_.GetEnergy(), aux);
     }
 
     return -1 / result;
