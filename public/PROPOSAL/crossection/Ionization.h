@@ -41,7 +41,7 @@ protected:
      * \f$v_{up}=min(v_{Max}, v_{Cut})\f$
      */
 
-    CrossSections::IntegralLimits SetIntegralLimits(const PROPOSALParticle&, int component);
+    CrossSections::IntegralLimits SetIntegralLimits(double energy, int component);
 
 //----------------------------------------------------------------------------//
     /*!
@@ -55,7 +55,7 @@ protected:
      */
 
 
-    double FunctionToDEdxIntegral(const PROPOSALParticle&, double variable);
+    double FunctionToDEdxIntegral(double energy, double variable);
 
 //----------------------------------------------------------------------------//
 
@@ -85,7 +85,7 @@ protected:
      * \return  d2N/dvdx
      */
 
-    double D2Ndvdx(const PROPOSALParticle&, double v);
+    double D2Ndvdx(double energy, double v);
 
 //----------------------------------------------------------------------------//
     /*!
@@ -100,11 +100,11 @@ protected:
      * \return  \f[\Delta_{inelastic}\f]
      */
 
-    double InelCorrection(const PROPOSALParticle&, double v);
+    double InelCorrection(double energy, double v);
 
 //----------------------------------------------------------------------------//
 
-    double FunctionToBuildDEdxInterpolant(const PROPOSALParticle&, double energy);
+    double FunctionToBuildDEdxInterpolant( double energy);
 
 //----------------------------------------------------------------------------//
 
@@ -112,11 +112,11 @@ protected:
 
 //----------------------------------------------------------------------------//
 
-    double FunctionToBuildDNdxInterpolant2D(const PROPOSALParticle&, double energy , double v);
+    double FunctionToBuildDNdxInterpolant2D( double energy , double v);
 
 //----------------------------------------------------------------------------//
 
-    double CalculateStochasticLoss(const PROPOSALParticle&, double rnd1);
+    double CalculateStochasticLoss(double energy, double rnd1);
 
 //----------------------------------------------------------------------------//
 
@@ -126,7 +126,7 @@ public:
 
     Ionization();
     Ionization(const Ionization&);
-    Ionization(Medium* medium, EnergyCutSettings* cut_settings);
+    Ionization(PROPOSALParticle&, Medium* medium, EnergyCutSettings* cut_settings);
     Ionization& operator=(const Ionization&);
     bool operator==(const Ionization &ioniz) const;
     bool operator!=(const Ionization &ioniz) const;
@@ -151,28 +151,28 @@ public:
      * \return dE/dx [E/cm]
      */
 
-    double CalculatedEdx(const PROPOSALParticle&);
+    double CalculatedEdx(double energy);
 
 //----------------------------------------------------------------------------//
 
-    double CalculatedNdx(const PROPOSALParticle&);
+    double CalculatedNdx(double energy);
 
 
 //----------------------------------------------------------------------------//
 
-    double CalculatedNdx(const PROPOSALParticle&, double rnd);
+    double CalculatedNdx(double energy, double rnd);
 
 //----------------------------------------------------------------------------//
 
-    double CalculateStochasticLoss(const PROPOSALParticle&, double rnd1, double rnd2);
+    double CalculateStochasticLoss(double energy, double rnd1, double rnd2);
 
 //----------------------------------------------------------------------------//
 
-    void EnableDNdxInterpolation(const PROPOSALParticle&, std::string path ="", bool raw=false);
+    void EnableDNdxInterpolation( std::string path ="", bool raw=false);
 
 //----------------------------------------------------------------------------//
 
-    void EnableDEdxInterpolation(const PROPOSALParticle&, std::string path ="", bool raw=false);
+    void EnableDEdxInterpolation( std::string path ="", bool raw=false);
 
 //----------------------------------------------------------------------------//
 
@@ -184,7 +184,7 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    double FunctionToDNdxIntegral(const PROPOSALParticle&, double variable);
+    double FunctionToDNdxIntegral(double energy, double variable);
 
 //----------------------------------------------------------------------------//
 

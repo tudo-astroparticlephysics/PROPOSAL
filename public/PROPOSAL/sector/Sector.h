@@ -5,8 +5,8 @@
 // #include <vector>
 
 #include "PROPOSAL/EnergyCutSettings.h"
-#include "PROPOSAL/scattering/ScatteringFactory.h"
 #include "PROPOSAL/particle/PROPOSALParticle.h"
+#include "PROPOSAL/scattering/ScatteringFactory.h"
 
 // namespace PROPOSAL {
 // class ProcessSector;
@@ -28,7 +28,6 @@ class Geometry;
 class Sector
 {
     public:
-
     struct ParticleLocation
     {
         enum Enum
@@ -50,15 +49,16 @@ class Sector
         double epair_multiplier; //!< multiplier to in- or decrease the Epairproduction cross-sections
 
         // TODO(mario): must be removed Fri 2017/08/25
-        bool do_scattering;                                        //!< if true moliere scattering is enabled
+        bool do_scattering;                       //!< if true moliere scattering is enabled
         ScatteringFactory::Enum scattering_model; //!< if true moliere scattering is enabled
 
         bool do_continuous_randomization; //!< exact local time calculation enabled if true
-        bool do_exact_time_calculation; //!< exact local time calculation enabled if true
+        bool do_exact_time_calculation;   //!< exact local time calculation enabled if true
         bool lpm_effect_enabled;
 
         // int location;              //!< 0 = infront of the detector, 1 = inside the detector, 2 = behind the detector
-        Sector::ParticleLocation::Enum location;              //!< 0 = infront of the detector, 1 = inside the detector, 2 = behind the detector
+        Sector::ParticleLocation::Enum
+            location; //!< 0 = infront of the detector, 1 = inside the detector, 2 = behind the detector
 
         double order_of_interpolation;
         bool raw;                   /// Determine if output format of interpolation tables is binary or txt.
@@ -69,11 +69,8 @@ class Sector
     };
 
     public:
-    Sector();
-    Sector(const Medium&,
-               const Geometry&,
-               const EnergyCutSettings&,
-               const Definition& def = Definition());
+    Sector(PROPOSALParticle&);
+    Sector(PROPOSALParticle&, const Medium&, const Geometry&, const EnergyCutSettings&, const Definition& def = Definition());
     Sector(const Sector&);
     virtual ~Sector();
 
@@ -99,7 +96,7 @@ class Sector
      *  \return energy at distance OR -(track length)
      */
 
-    virtual double Propagate(PROPOSALParticle&, double distance);
+    virtual double Propagate(double distance);
 
     /**
      * Calculates the contiuous loss till the first stochastic loss happend
@@ -112,7 +109,7 @@ class Sector
      *  \return pair.first final energy befor first interaction pair.second decay energy at which the
      *          particle decay
      */
-    virtual std::pair<double, double> CalculateEnergyTillStochastic(const PROPOSALParticle&, double initial_energy);
+    virtual std::pair<double, double> CalculateEnergyTillStochastic(double initial_energy);
 
     /*!
     * advances the particle by the given distance
@@ -124,21 +121,21 @@ class Sector
     * \param    ef  final energy
     */
 
-    void AdvanceParticle(PROPOSALParticle&, double dr, double ei, double ef);
+    void AdvanceParticle(double dr, double ei, double ef);
 
     /**
      *  Makes Stochastic Energyloss
      *
      *  \return pair of energy loss [MeV] and kind of interaction
      */
-    virtual std::pair<double, ParticleType::Enum> MakeStochasticLoss(const PROPOSALParticle&);
+    virtual std::pair<double, ParticleType::Enum> MakeStochasticLoss();
 
     /**
      *  Makes Decay
      *
      *  \return pair of energy loss [MeV] and kind of interaction
      */
-    double MakeDecay(const PROPOSALParticle&);
+    double MakeDecay(double energy);
 
     /*!
     returns the value of the distance integral from ei to ef;
@@ -150,7 +147,7 @@ class Sector
     \param ef upper integration limit (final energy)
     \param dist ???
     */
-    virtual double CalculateDisplacement(const PROPOSALParticle&, double ei, double ef, double dist) = 0;
+    virtual double CalculateDisplacement(double ei, double ef, double dist) = 0;
 
     /*!
     final energy, corresponding to the given value of displacement dist;
@@ -163,7 +160,7 @@ class Sector
     \param dist value of displacement
     */
 
-    virtual double CalculateFinalEnergy(const PROPOSALParticle&, double ei, double dist) = 0;
+    virtual double CalculateFinalEnergy(double ei, double dist) = 0;
 
     /**
      * final energy, corresponding to the given value rnd of the
@@ -175,7 +172,7 @@ class Sector
      *  \return final energy due to continous energy losses [MeV]
      */
 
-    virtual double CalculateFinalEnergy(const PROPOSALParticle&, double ei, double rnd, bool particle_interaction) = 0;
+    virtual double CalculateFinalEnergy(double ei, double rnd, bool particle_interaction) = 0;
 
     /**
      * Calculates the value of the tracking integral
@@ -186,10 +183,7 @@ class Sector
      *  \return value of the tracking integral [ 1 ]
      */
 
-    virtual double CalculateTrackingIntegal(const PROPOSALParticle&,
-                                            double initial_energy,
-                                            double rnd,
-                                            bool particle_interaction) = 0;
+    virtual double CalculateTrackingIntegal(double initial_energy, double rnd, bool particle_interaction) = 0;
 
     /*!
     * time delta, corresponding to the given propagation distance
@@ -199,7 +193,7 @@ class Sector
     * \return   time delta
     */
 
-    virtual double CalculateParticleTime(const PROPOSALParticle&, double ei, double ef) = 0;
+    virtual double CalculateParticleTime(double ei, double ef) = 0;
 
     /*!
     * function for range calculation for given energy - interface to Integral;
@@ -209,7 +203,7 @@ class Sector
     * \param E energy [MeV]
     */
 
-    virtual double FunctionToIntegral(const PROPOSALParticle&, double energy);
+    virtual double FunctionToIntegral(double energy);
 
     /**
      * randomize the continuous energy loss
@@ -219,7 +213,6 @@ class Sector
      */
 
     // virtual double Randomize(double initial_energy, double final_energy);
-
 
     // --------------------------------------------------------------------- //
     // Enable options & Setter
@@ -247,13 +240,13 @@ class Sector
 
     Scattering* GetScattering() const { return scattering_; }
     Medium* GetMedium() const { return medium_; }
+    PROPOSALParticle& GetParticle() const { return particle_; }
     Geometry* GetGeometry() const { return geometry_; }
     const EnergyCutSettings& GetCutSettings() const { return cut_settings_; }
     std::vector<CrossSections*> GetCrosssections() const { return crosssections_; }
     ContinuousRandomization* GetContinuousRandomization() const { return randomizer_; }
 
     protected:
-
     Sector& operator=(const Sector&); // Undefined & not allowed
 
     // --------------------------------------------------------------------- //
@@ -265,12 +258,13 @@ class Sector
 
     Definition collection_def_;
 
-    //TODO(mario): Do better weight enabling Fri 2017/08/25
+    // TODO(mario): Do better weight enabling Fri 2017/08/25
     // bool do_weighting_;          //!< Do weigthing? Set to false in constructor
     // double weighting_order_;     //!< Re-weighting order. Set to 0 in constructor
     double weighting_starts_at_; //!< Distance at which re-weighting starts. Set to 0 in constructor
     //
-    // // bool enable_randomization_; //!< if true continuous randomization will be enabled (to remember if randomization
+    // // bool enable_randomization_; //!< if true continuous randomization will be enabled (to remember if
+    // randomization
     //                             //!should be enable when cross sections are initalized)
     //
     // // //TODO(mario): must be removed Fri 2017/08/25
@@ -281,6 +275,7 @@ class Sector
     // int location_; //!< 0 = infront of the detector, 1 = inside the detector, 2 = behind the detector
     // double density_correction_; //!< density correction factor
 
+    PROPOSALParticle& particle_;
     Geometry* geometry_;
     Medium* medium_;
     EnergyCutSettings cut_settings_;
@@ -289,7 +284,6 @@ class Sector
     Scattering* scattering_;
 
     std::vector<CrossSections*> crosssections_;
-
 
     // --------------------------------------------------------------------- //
     // Protected member functions
@@ -303,7 +297,7 @@ class Sector
      *  \return Returns the probability [1/MeV]
      */
 
-    virtual double FunctionToPropIntegralDecay(const PROPOSALParticle&, double energy);
+    virtual double FunctionToPropIntegralDecay(double energy);
 
     //----------------------------------------------------------------------------//
 
@@ -315,7 +309,7 @@ class Sector
      *  \return Returns the probability [1/MeV]
      */
 
-    virtual double FunctionToPropIntegralInteraction(const PROPOSALParticle&, double energy);
+    virtual double FunctionToPropIntegralInteraction(double energy);
 
     //----------------------------------------------------------------------------//
 
@@ -324,6 +318,6 @@ class Sector
     *
     */
 
-    virtual double FunctionToTimeIntegral(const PROPOSALParticle&, double E);
+    virtual double FunctionToTimeIntegral(double energy);
 };
 }

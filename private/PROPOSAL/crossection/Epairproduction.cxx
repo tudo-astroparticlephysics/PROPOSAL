@@ -17,7 +17,7 @@ using namespace PROPOSAL;
 //----------------------------------------------------------------------------//
 
 
-double Epairproduction::CalculatedEdx(const PROPOSALParticle& particle)
+double Epairproduction::CalculatedEdx(double energy)
 {
     if(multiplier_<=0)
     {
@@ -26,21 +26,21 @@ double Epairproduction::CalculatedEdx(const PROPOSALParticle& particle)
 
     if(do_dedx_Interpolation_)
     {
-        return max(dedx_interpolant_->Interpolate(particle.GetEnergy()), 0.0);
+        return max(dedx_interpolant_->Interpolate(energy), 0.0);
     }
 
     double sum = 0;
 
     for(int i=0; i<medium_->GetNumComponents(); i++)
     {
-        CrossSections::IntegralLimits limits = SetIntegralLimits(particle, i);;
+        CrossSections::IntegralLimits limits = SetIntegralLimits(energy, i);;
         double r1   =   0.8;
         double rUp  =   limits.vUp*(1-HALF_PRECISION);
         bool rflag  =   false;
 
         if(r1<rUp)
         {
-            if(2*FunctionToDEdxIntegral(particle, r1) < FunctionToDEdxIntegral(particle, rUp))
+            if(2*FunctionToDEdxIntegral(energy, r1) < FunctionToDEdxIntegral(energy, rUp))
             {
                 rflag   =   true;
             }
@@ -58,7 +58,7 @@ double Epairproduction::CalculatedEdx(const PROPOSALParticle& particle)
                 r1  =   limits.vMin;
             }
 
-            sum         +=  integral_for_dEdx_->Integrate(limits.vMin, r1, boost::bind(&Epairproduction::FunctionToDEdxIntegral, this, boost::cref(particle), _1),4);
+            sum         +=  integral_for_dEdx_->Integrate(limits.vMin, r1, boost::bind(&Epairproduction::FunctionToDEdxIntegral, this, energy,  _1),4);
             reverse_    =   true;
             double r2   =   max(1-limits.vUp, COMPUTER_PRECISION);
 
@@ -67,19 +67,19 @@ double Epairproduction::CalculatedEdx(const PROPOSALParticle& particle)
                 r2  =   1-r1;
             }
 
-            sum         +=  integral_for_dEdx_->Integrate(1-limits.vUp, r2, boost::bind(&Epairproduction::FunctionToDEdxIntegral, this, boost::cref(particle), _1),2)
-                        +   integral_for_dEdx_->Integrate(r2, 1-r1, boost::bind(&Epairproduction::FunctionToDEdxIntegral, this, boost::cref(particle), _1),4);
+            sum         +=  integral_for_dEdx_->Integrate(1-limits.vUp, r2, boost::bind(&Epairproduction::FunctionToDEdxIntegral, this, energy, _1),2)
+                        +   integral_for_dEdx_->Integrate(r2, 1-r1, boost::bind(&Epairproduction::FunctionToDEdxIntegral, this, energy, _1),4);
 
             reverse_    =   false;
         }
 
         else
         {
-            sum +=  integral_for_dEdx_->Integrate(limits.vMin, limits.vUp, boost::bind(&Epairproduction::FunctionToDEdxIntegral, this, boost::cref(particle), _1),4);
+            sum +=  integral_for_dEdx_->Integrate(limits.vMin, limits.vUp, boost::bind(&Epairproduction::FunctionToDEdxIntegral, this, energy, _1),4);
         }
     }
 
-    return multiplier_*particle.GetEnergy()*sum;
+    return multiplier_*energy*sum;
 }
 
 
@@ -87,7 +87,7 @@ double Epairproduction::CalculatedEdx(const PROPOSALParticle& particle)
 //----------------------------------------------------------------------------//
 
 
-double Epairproduction::CalculatedNdx(const PROPOSALParticle& particle)
+double Epairproduction::CalculatedNdx(double energy)
 {
     if(multiplier_<=0)
     {
@@ -100,12 +100,12 @@ double Epairproduction::CalculatedNdx(const PROPOSALParticle& particle)
     {
         if(do_dndx_Interpolation_)
         {
-            prob_for_component_.at(i) = max(dndx_interpolant_1d_.at(i)->Interpolate(particle.GetEnergy()), 0.);
+            prob_for_component_.at(i) = max(dndx_interpolant_1d_.at(i)->Interpolate(energy), 0.);
         }
         else
         {
-            CrossSections::IntegralLimits limits = SetIntegralLimits(particle, i);;
-            prob_for_component_.at(i) = dndx_integral_.at(i)->Integrate(limits.vUp, limits.vMax, boost::bind(&Epairproduction::FunctionToDNdxIntegral, this, boost::cref(particle), _1),4);
+            CrossSections::IntegralLimits limits = SetIntegralLimits(energy, i);;
+            prob_for_component_.at(i) = dndx_integral_.at(i)->Integrate(limits.vUp, limits.vMax, boost::bind(&Epairproduction::FunctionToDNdxIntegral, this, energy,  _1),4);
         }
         sum_of_rates_ += prob_for_component_.at(i);
     }
@@ -117,7 +117,7 @@ double Epairproduction::CalculatedNdx(const PROPOSALParticle& particle)
 //----------------------------------------------------------------------------//
 
 
-double Epairproduction::CalculatedNdx(const PROPOSALParticle& particle, double rnd)
+double Epairproduction::CalculatedNdx(double energy, double rnd)
 {
     if(multiplier_<=0)
     {
@@ -135,12 +135,12 @@ double Epairproduction::CalculatedNdx(const PROPOSALParticle& particle, double r
     {
         if(do_dndx_Interpolation_)
         {
-            prob_for_component_.at(i) = max(dndx_interpolant_1d_.at(i)->Interpolate(particle.GetEnergy()), 0.);
+            prob_for_component_.at(i) = max(dndx_interpolant_1d_.at(i)->Interpolate(energy), 0.);
         }
         else
         {
-            CrossSections::IntegralLimits limits = SetIntegralLimits(particle, i);;
-            prob_for_component_.at(i) = dndx_integral_.at(i)->IntegrateWithRandomRatio(limits.vUp, limits.vMax, boost::bind(&Epairproduction::FunctionToDNdxIntegral, this, boost::cref(particle), _1),4,rnd);
+            CrossSections::IntegralLimits limits = SetIntegralLimits(energy, i);;
+            prob_for_component_.at(i) = dndx_integral_.at(i)->IntegrateWithRandomRatio(limits.vUp, limits.vMax, boost::bind(&Epairproduction::FunctionToDNdxIntegral, this, energy, _1),4,rnd);
         }
         sum_of_rates_ += prob_for_component_.at(i);
     }
@@ -153,15 +153,15 @@ double Epairproduction::CalculatedNdx(const PROPOSALParticle& particle, double r
 //----------------------------------------------------------------------------//
 
 
-double Epairproduction::CalculateStochasticLoss(const PROPOSALParticle& particle, double rnd1, double rnd2)
+double Epairproduction::CalculateStochasticLoss(double energy, double rnd1, double rnd2)
 {
     if(rnd1 != rnd_ )
     {
-        CalculatedNdx(particle, rnd1);
+        CalculatedNdx(energy, rnd1);
         log_warn("CalculatedNdx was not called! rnd1 and rnd_ don´t match! \n Calculating again with rnd1=%f \t rnd2=%f",rnd1,rnd2);
     }
 
-    return CalculateStochasticLoss(particle, rnd2);
+    return CalculateStochasticLoss(energy, rnd2);
 }
 
 
@@ -172,28 +172,28 @@ double Epairproduction::CalculateStochasticLoss(const PROPOSALParticle& particle
 //----------------------------------------------------------------------------//
 
 
-void Epairproduction::EnableDNdxInterpolation(const PROPOSALParticle& particle, std::string path, bool raw)
+void Epairproduction::EnableDNdxInterpolation( std::string path, bool raw)
 {
 
     if(do_dndx_Interpolation_)return;
 
-    EnableEpairInterpolation(particle, path,raw);
+    EnableEpairInterpolation( path,raw);
 
     bool storing_failed =   false;
     bool reading_worked =   true;
 
     // charged anti leptons have the same cross sections like charged leptons
     // so they use the same interpolation tables
-    string particle_name = particle.GetName();
+    string particle_def_name = particle_def_.name;
 
     if(!path.empty())
     {
         stringstream filename;
         filename<<path<<"/Epair_dNdx"
-                <<"_particle_"<<particle_name
-                <<"_mass_"<<particle.GetMass()
-                <<"_charge_"<<particle.GetCharge()
-                <<"_lifetime_"<<particle.GetLifetime()
+                <<"_particle_def_"<<particle_def_name
+                <<"_mass_"<<particle_def_.mass
+                <<"_charge_"<<particle_def_.charge
+                <<"_lifetime_"<<particle_def_.lifetime
                 <<"_med_"<<medium_->GetName()
                 <<"_"<<medium_->GetMassDensity()
                 <<"_ecut_"<<cut_settings_->GetEcut()
@@ -261,12 +261,12 @@ void Epairproduction::EnableDNdxInterpolation(const PROPOSALParticle& particle, 
                     component_ = i;
 
                     dndx_interpolant_2d_.at(i) = new Interpolant(NUM1
-                                                                , particle.GetLow()
+                                                                , particle_def_.low
                                                                 , BIGENERGY
                                                                 , NUM1
                                                                 , 0
                                                                 , 1
-                                                                , boost::bind(&Epairproduction::FunctionToBuildDNdxInterpolant2D, this, boost::cref(particle), _1 , _2)
+                                                                , boost::bind(&Epairproduction::FunctionToBuildDNdxInterpolant2D, this,  _1 , _2)
                                                                 , order_of_interpolation_
                                                                 , false
                                                                 , false
@@ -281,7 +281,7 @@ void Epairproduction::EnableDNdxInterpolation(const PROPOSALParticle& particle, 
                                                                 , false
                                                                 );
                     dndx_interpolant_1d_.at(i) = new Interpolant(NUM1
-                                                                , particle.GetLow()
+                                                                , particle_def_.low
                                                                 , BIGENERGY
                                                                 ,  boost::bind(&Epairproduction::FunctionToBuildDNdxInterpolant1D, this, _1)
                                                                 , order_of_interpolation_
@@ -316,12 +316,12 @@ void Epairproduction::EnableDNdxInterpolation(const PROPOSALParticle& particle, 
         {
             component_ = i;
             dndx_interpolant_2d_.at(i) = new Interpolant(NUM1
-                                                        , particle.GetLow()
+                                                        , particle_def_.low
                                                         , BIGENERGY
                                                         , NUM1
                                                         , 0
                                                         , 1
-                                                        , boost::bind(&Epairproduction::FunctionToBuildDNdxInterpolant2D, this, boost::cref(particle), _1 , _2)
+                                                        , boost::bind(&Epairproduction::FunctionToBuildDNdxInterpolant2D, this,  _1 , _2)
                                                         , order_of_interpolation_
                                                         , false
                                                         , false
@@ -336,7 +336,7 @@ void Epairproduction::EnableDNdxInterpolation(const PROPOSALParticle& particle, 
                                                         , false
                                                         );
             dndx_interpolant_1d_.at(i) = new Interpolant(NUM1
-                                                        , particle.GetLow()
+                                                        , particle_def_.low
                                                         , BIGENERGY
                                                         , boost::bind(&Epairproduction::FunctionToBuildDNdxInterpolant1D, this, _1)
                                                         , order_of_interpolation_
@@ -361,28 +361,28 @@ void Epairproduction::EnableDNdxInterpolation(const PROPOSALParticle& particle, 
 //----------------------------------------------------------------------------//
 
 
-void Epairproduction::EnableDEdxInterpolation(const PROPOSALParticle& particle, std::string path, bool raw)
+void Epairproduction::EnableDEdxInterpolation( std::string path, bool raw)
 {
 
     if(do_dedx_Interpolation_)return;
 
-    EnableEpairInterpolation(particle, path,raw);
+    EnableEpairInterpolation( path,raw);
 
     bool reading_worked =   true;
     bool storing_failed =   false;
 
     // charged anti leptons have the same cross sections like charged leptons
     // so they use the same interpolation tables
-    string particle_name = particle.GetName();
+    string particle_def_name = particle_def_.name;
 
     if(!path.empty())
     {
         stringstream filename;
         filename<<path<<"/Epair_dEdx"
-                <<"_particle_"<<particle_name
-                <<"_mass_"<<particle.GetMass()
-                <<"_charge_"<<particle.GetCharge()
-                <<"_lifetime_"<<particle.GetLifetime()
+                <<"_particle_def_"<<particle_def_name
+                <<"_mass_"<<particle_def_.mass
+                <<"_charge_"<<particle_def_.charge
+                <<"_lifetime_"<<particle_def_.lifetime
                 <<"_med_"<<medium_->GetName()
                 <<"_"<<medium_->GetMassDensity()
                 <<"_ecut_"<<cut_settings_->GetEcut()
@@ -437,9 +437,9 @@ void Epairproduction::EnableDEdxInterpolation(const PROPOSALParticle& particle, 
                 output.precision(16);
 
                 dedx_interpolant_ = new Interpolant(NUM1
-                                                    , particle.GetLow()
+                                                    , particle_def_.low
                                                     , BIGENERGY
-                                                    , boost::bind(&Epairproduction::FunctionToBuildDEdxInterpolant, this, boost::cref(particle), _1)
+                                                    , boost::bind(&Epairproduction::FunctionToBuildDEdxInterpolant, this,  _1)
                                                     , order_of_interpolation_
                                                     , true
                                                     , false
@@ -464,9 +464,9 @@ void Epairproduction::EnableDEdxInterpolation(const PROPOSALParticle& particle, 
     if(path.empty() || storing_failed)
     {
         dedx_interpolant_ = new Interpolant(NUM1
-                                            , particle.GetLow()
+                                            , particle_def_.low
                                             , BIGENERGY
-                                            , boost::bind(&Epairproduction::FunctionToBuildDEdxInterpolant, this, boost::cref(particle), _1)
+                                            , boost::bind(&Epairproduction::FunctionToBuildDEdxInterpolant, this,  _1)
                                             , order_of_interpolation_
                                             , true
                                             , false
@@ -488,7 +488,7 @@ void Epairproduction::EnableDEdxInterpolation(const PROPOSALParticle& particle, 
 //----------------------------------------------------------------------------//
 
 
-void Epairproduction::EnableEpairInterpolation(const PROPOSALParticle& particle, std::string path, bool raw)
+void Epairproduction::EnableEpairInterpolation( std::string path, bool raw)
 {
 
     if(do_epair_interpolation_)return;
@@ -498,16 +498,16 @@ void Epairproduction::EnableEpairInterpolation(const PROPOSALParticle& particle,
 
     // charged anti leptons have the same cross sections like charged leptons
     // so they use the same interpolation tables
-    string particle_name = particle.GetName();
+    string particle_def_name = particle_def_.name;
 
     if(!path.empty())
     {
         stringstream filename;
         filename<<path<<"/Epair"
-                <<"_particle_"<<particle_name
-                <<"_mass_"<<particle.GetMass()
-                <<"_charge_"<<particle.GetCharge()
-                <<"_lifetime_"<<particle.GetLifetime()
+                <<"_particle_def_"<<particle_def_name
+                <<"_mass_"<<particle_def_.mass
+                <<"_charge_"<<particle_def_.charge
+                <<"_lifetime_"<<particle_def_.lifetime
                 <<"_med_"<<medium_->GetName()
                 <<"_"<<medium_->GetMassDensity()
                 <<"_ecut_"<<cut_settings_->GetEcut()
@@ -572,12 +572,12 @@ void Epairproduction::EnableEpairInterpolation(const PROPOSALParticle& particle,
                     component_ = i;
 
                     epair_interpolant_.at(i)   = new Interpolant(NUM1
-                                                                , particle.GetLow()
+                                                                , particle_def_.low
                                                                 , BIGENERGY
                                                                 , NUM1
                                                                 , 0.
                                                                 , 1.
-                                                                , boost::bind(&Epairproduction::FunctionToBuildEpairInterpolant, this, boost::cref(particle), _1 , _2)
+                                                                , boost::bind(&Epairproduction::FunctionToBuildEpairInterpolant, this,  _1 , _2)
                                                                 , order_of_interpolation_
                                                                 , false
                                                                 , false
@@ -613,12 +613,12 @@ void Epairproduction::EnableEpairInterpolation(const PROPOSALParticle& particle,
         {
             component_ = i;
             epair_interpolant_.at(i)   = new Interpolant(NUM1
-                                                        , particle.GetLow()
+                                                        , particle_def_.low
                                                         , BIGENERGY
                                                         , NUM1
                                                         , 0.
                                                         , 1.
-                                                        , boost::bind(&Epairproduction::FunctionToBuildEpairInterpolant, this, boost::cref(particle), _1 , _2)
+                                                        , boost::bind(&Epairproduction::FunctionToBuildEpairInterpolant, this,  _1 , _2)
                                                         , order_of_interpolation_
                                                         , false
                                                         , false
@@ -795,8 +795,8 @@ Epairproduction::Epairproduction(const Epairproduction &epair)
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-Epairproduction::Epairproduction(Medium* medium, EnergyCutSettings* cut_settings)
-    : CrossSections(medium, cut_settings)
+Epairproduction::Epairproduction(PROPOSALParticle& particle, Medium* medium, EnergyCutSettings* cut_settings)
+    : CrossSections(particle, medium, cut_settings)
     , v_(0)
     , reverse_(false)
     , eLpm_(0)
@@ -1021,7 +1021,7 @@ ostream& operator<<(std::ostream& os, Epairproduction const &epair)
 //----------------------------------------------------------------------------//
 
 
-double Epairproduction::CalculateStochasticLoss(const PROPOSALParticle& particle, double rnd)
+double Epairproduction::CalculateStochasticLoss(double energy, double rnd)
 {
 
     double rand;
@@ -1037,20 +1037,20 @@ double Epairproduction::CalculateStochasticLoss(const PROPOSALParticle& particle
         {
             if(do_dndx_Interpolation_)
             {
-                CrossSections::IntegralLimits limits = SetIntegralLimits(particle, i);;
+                CrossSections::IntegralLimits limits = SetIntegralLimits(energy, i);;
 
                 if(limits.vUp==limits.vMax)
                 {
-                    return (particle.GetEnergy())*limits.vUp;
+                    return (energy)*limits.vUp;
                 }
 
-                return (particle.GetEnergy())*(limits.vUp*exp(dndx_interpolant_2d_.at(i)->FindLimit((particle.GetEnergy()), (rnd_)*prob_for_component_.at(i))*log(limits.vMax/limits.vUp)));
+                return (energy)*(limits.vUp*exp(dndx_interpolant_2d_.at(i)->FindLimit((energy), (rnd_)*prob_for_component_.at(i))*log(limits.vMax/limits.vUp)));
             }
 
             else
             {
                 component_ = i;
-                return (particle.GetEnergy())*dndx_integral_.at(i)->GetUpperLimit();
+                return (energy)*dndx_integral_.at(i)->GetUpperLimit();
             }
         }
     }
@@ -1059,7 +1059,7 @@ double Epairproduction::CalculateStochasticLoss(const PROPOSALParticle& particle
     bool prob_for_all_comp_is_zero=true;
     for(int i=0; i<(medium_->GetNumComponents()); i++)
     {
-        CrossSections::IntegralLimits limits = SetIntegralLimits(particle, i);;
+        CrossSections::IntegralLimits limits = SetIntegralLimits(energy, i);;
         if(limits.vUp!=limits.vMax)prob_for_all_comp_is_zero=false;
     }
     if(prob_for_all_comp_is_zero)return 0;
@@ -1073,15 +1073,15 @@ double Epairproduction::CalculateStochasticLoss(const PROPOSALParticle& particle
 //----------------------------------------------------------------------------//
 
 
-CrossSections::IntegralLimits Epairproduction::SetIntegralLimits(const PROPOSALParticle& particle, int component)
+CrossSections::IntegralLimits Epairproduction::SetIntegralLimits(double energy, int component)
 {
 
     component_ = component;
     CrossSections::IntegralLimits limits;
 
     double aux;
-    double particle_energy = particle.GetEnergy();
-    double particle_mass   = particle.GetMass();
+    double particle_energy = energy;
+    double particle_mass   = particle_def_.mass;
 
     limits.vMin    =   4*ME/particle_energy;
     limits.vMax    =   1 - (3./4)*SQRTE*(particle_mass/particle_energy)
@@ -1111,7 +1111,7 @@ CrossSections::IntegralLimits Epairproduction::SetIntegralLimits(const PROPOSALP
 //----------------------------------------------------------------------------//
 
 
-double Epairproduction::lpm(const PROPOSALParticle& particle, double r2, double b, double x)
+double Epairproduction::lpm(double energy, double r2, double b, double x)
 {
 
 
@@ -1127,8 +1127,8 @@ double Epairproduction::lpm(const PROPOSALParticle& particle, double r2, double 
             sum +=  component->GetNucCharge()*component->GetNucCharge()
                     *log(3.25*component->GetLogConstant()*pow(component->GetNucCharge(), -1./3));
         }
-        double particle_mass = particle.GetMass();
-        double particle_charge = particle.GetCharge();
+        double particle_mass = particle_def_.mass;
+        double particle_charge = particle_def_.charge;
 
         eLpm_    =   particle_mass/(ME*RE);
         eLpm_    *=  (eLpm_*eLpm_)*ALPHA*particle_mass
@@ -1138,7 +1138,7 @@ double Epairproduction::lpm(const PROPOSALParticle& particle, double r2, double 
     double A, B, C, D, E, s;
     double s2, s36, s6, d1, d2, atan_, log1, log2;
 
-    s       =   sqrt(eLpm_/(particle.GetEnergy()*v_*(1 - r2)))/4;
+    s       =   sqrt(eLpm_/(energy*v_*(1 - r2)))/4;
     s6      =   6*s;
     atan_   =   s6*(x + 1);
 
@@ -1171,13 +1171,13 @@ double Epairproduction::lpm(const PROPOSALParticle& particle, double r2, double 
 //----------------------------------------------------------------------------//
 
 
-double Epairproduction::EPair(const PROPOSALParticle& particle, double v, int component)
+double Epairproduction::EPair(double energy, double v, int component)
 {
-    double particle_energy = particle.GetEnergy();
+    double particle_energy = energy;
 
     if(do_epair_interpolation_)
     {
-        CrossSections::IntegralLimits limits = SetIntegralLimits(particle, component);
+        CrossSections::IntegralLimits limits = SetIntegralLimits(energy, component);
 
         if(v>=limits.vUp)
         {
@@ -1186,8 +1186,8 @@ double Epairproduction::EPair(const PROPOSALParticle& particle, double v, int co
     }
 
     double rMax, aux, aux2;
-    double particle_charge = particle.GetCharge();
-    double particle_mass   = particle.GetMass();
+    double particle_charge = particle_def_.charge;
+    double particle_mass   = particle_def_.mass;
 
     component_  =   component;
     v_          =   v;
@@ -1207,8 +1207,8 @@ double Epairproduction::EPair(const PROPOSALParticle& particle, double v, int co
 
     return medium_->GetMolDensity()*medium_->GetComponents().at(component_)->GetAtomInMolecule()
            *particle_charge*particle_charge
-           *(integral_->Integrate(1 - rMax, aux, boost::bind(&Epairproduction::FunctionToIntegral, this, boost::cref(particle), _1),2)
-                + integral_->Integrate(aux, 1,  boost::bind(&Epairproduction::FunctionToIntegral, this, boost::cref(particle), _1),4));
+           *(integral_->Integrate(1 - rMax, aux, boost::bind(&Epairproduction::FunctionToIntegral, this, energy, _1),2)
+                + integral_->Integrate(aux, 1,  boost::bind(&Epairproduction::FunctionToIntegral, this, energy, _1),4));
 
 }
 //----------------------------------------------------------------------------//
@@ -1229,12 +1229,9 @@ double Epairproduction::FunctionToBuildDNdxInterpolant1D(double energy)
 //----------------------------------------------------------------------------//
 
 
-double Epairproduction::FunctionToBuildDNdxInterpolant2D(const PROPOSALParticle& particle, double energy, double v)
+double Epairproduction::FunctionToBuildDNdxInterpolant2D( double energy, double v)
 {
-    PROPOSALParticle tmp_particle(particle);
-    tmp_particle.SetEnergy(energy);
-
-    CrossSections::IntegralLimits limits = SetIntegralLimits(tmp_particle, component_);;
+    CrossSections::IntegralLimits limits = SetIntegralLimits(energy, component_);;
 
     if(limits.vUp==limits.vMax)
     {
@@ -1243,7 +1240,7 @@ double Epairproduction::FunctionToBuildDNdxInterpolant2D(const PROPOSALParticle&
 
     v   =   limits.vUp*exp(v*log(limits.vMax/limits.vUp));
 
-    return dndx_integral_.at(component_)->Integrate(limits.vUp,v, boost::bind(&Epairproduction::FunctionToDNdxIntegral, this, boost::cref(tmp_particle), _1),4);
+    return dndx_integral_.at(component_)->Integrate(limits.vUp,v, boost::bind(&Epairproduction::FunctionToDNdxIntegral, this, energy,  _1),4);
 }
 
 
@@ -1251,12 +1248,9 @@ double Epairproduction::FunctionToBuildDNdxInterpolant2D(const PROPOSALParticle&
 //----------------------------------------------------------------------------//
 
 
-double Epairproduction::FunctionToBuildDEdxInterpolant(const PROPOSALParticle& particle, double energy)
+double Epairproduction::FunctionToBuildDEdxInterpolant( double energy)
 {
-    PROPOSALParticle tmp_particle(particle);
-    tmp_particle.SetEnergy(energy);
-
-    return CalculatedEdx(tmp_particle);
+    return CalculatedEdx(energy);
 }
 
 
@@ -1264,12 +1258,9 @@ double Epairproduction::FunctionToBuildDEdxInterpolant(const PROPOSALParticle& p
 //----------------------------------------------------------------------------//
 
 
-double Epairproduction::FunctionToBuildEpairInterpolant(const PROPOSALParticle& particle, double energy , double v)
+double Epairproduction::FunctionToBuildEpairInterpolant( double energy , double v)
 {
-    PROPOSALParticle tmp_particle(particle);
-    tmp_particle.SetEnergy(energy);
-
-    CrossSections::IntegralLimits limits = SetIntegralLimits(tmp_particle, component_);;
+    CrossSections::IntegralLimits limits = SetIntegralLimits(energy, component_);;
 
     if(limits.vUp==limits.vMax)
     {
@@ -1278,7 +1269,7 @@ double Epairproduction::FunctionToBuildEpairInterpolant(const PROPOSALParticle& 
 
     v   =   limits.vUp*exp(v*log(limits.vMax/limits.vUp));
 
-    return EPair(tmp_particle, v, component_);
+    return EPair(energy, v, component_);
 }
 
 
@@ -1289,7 +1280,7 @@ double Epairproduction::FunctionToBuildEpairInterpolant(const PROPOSALParticle& 
 //----------------------------------------------------------------------------//
 
 
-double Epairproduction::FunctionToDEdxIntegral(const PROPOSALParticle& particle, double variable)
+double Epairproduction::FunctionToDEdxIntegral(double energy, double variable)
 {
 
     if(reverse_)
@@ -1297,7 +1288,7 @@ double Epairproduction::FunctionToDEdxIntegral(const PROPOSALParticle& particle,
         variable   =   1-variable;
     }
 
-    return variable*EPair(particle, variable, component_);
+    return variable*EPair(energy, variable, component_);
 }
 
 
@@ -1305,9 +1296,9 @@ double Epairproduction::FunctionToDEdxIntegral(const PROPOSALParticle& particle,
 //----------------------------------------------------------------------------//
 
 
-double Epairproduction::FunctionToDNdxIntegral(const PROPOSALParticle& particle, double variable)
+double Epairproduction::FunctionToDNdxIntegral(double energy, double variable)
 {
-    return  multiplier_ * EPair(particle, variable, component_);
+    return  multiplier_ * EPair(energy, variable, component_);
 }
 
 
@@ -1315,14 +1306,14 @@ double Epairproduction::FunctionToDNdxIntegral(const PROPOSALParticle& particle,
 //----------------------------------------------------------------------------//
 
 
-double Epairproduction::FunctionToIntegral(const PROPOSALParticle& particle, double r)
+double Epairproduction::FunctionToIntegral(double energy, double r)
 {
 
     double Fe, Fm, Le, Lm, Ye, Ym, s, b, g1, g2;
     double aux, aux1, aux2, r2, Z3, atomic_electron_contribution;
-    double particle_mass = particle.GetMass();
-    double particle_charge = particle.GetCharge();
-    double particle_energy = particle.GetEnergy();
+    double particle_mass = particle_def_.mass;
+    double particle_charge = particle_def_.charge;
+    double particle_energy = energy;
     double medium_charge = medium_->GetComponents().at(component_)->GetNucCharge();
     double medium_log_constant = medium_->GetComponents().at(component_)->GetLogConstant();
 
@@ -1403,7 +1394,7 @@ double Epairproduction::FunctionToIntegral(const PROPOSALParticle& particle, dou
 
     if(lpm_effect_enabled_)
     {
-        aux *= lpm(particle, r2, b, s);
+        aux *= lpm(energy, r2, b, s);
     }
 
     if(aux<0)

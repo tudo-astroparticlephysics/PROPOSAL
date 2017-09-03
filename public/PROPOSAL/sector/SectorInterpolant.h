@@ -9,8 +9,8 @@ namespace PROPOSAL {
 class SectorInterpolant : public Sector
 {
     public:
-    SectorInterpolant();
-    SectorInterpolant(const Medium&,
+    SectorInterpolant(PROPOSALParticle&);
+    SectorInterpolant(PROPOSALParticle&, const Medium&,
                           const Geometry&,
                           const EnergyCutSettings&,
                           const Definition& def = Definition());
@@ -20,15 +20,14 @@ class SectorInterpolant : public Sector
     virtual Sector* clone() const { return new SectorInterpolant(*this); }
 
 
-    double Propagate(PROPOSALParticle&, double distance);
-    double CalculateDisplacement(const PROPOSALParticle&, double ei, double ef, double dist);
-    double CalculateFinalEnergy(const PROPOSALParticle&, double ei, double dist);
-    double CalculateFinalEnergy(const PROPOSALParticle&, double ei, double rnd, bool particle_interaction);
-    double CalculateTrackingIntegal(const PROPOSALParticle&,
+    double CalculateDisplacement( double ei, double ef, double dist);
+    double CalculateFinalEnergy( double ei, double dist);
+    double CalculateFinalEnergy( double ei, double rnd, bool particle_interaction);
+    double CalculateTrackingIntegal(
                                     double initial_energy,
                                     double rnd,
                                     bool particle_interaction);
-    double CalculateParticleTime(const PROPOSALParticle&, double ei, double ef);
+    double CalculateParticleTime( double ei, double ef);
 
     private:
 
@@ -38,13 +37,13 @@ class SectorInterpolant : public Sector
     // Private methods
     // --------------------------------------------------------------------- //
 
-    void InitInterpolation(const PROPOSALParticle&, std::string filename, bool raw);
-    void InitTimeInterpolation(const PROPOSALParticle&, std::string filename, bool raw);
+    void InitInterpolation( std::string filename, bool raw);
+    void InitTimeInterpolation( std::string filename, bool raw);
 
-    double FunctionToBuildInterpolant(const PROPOSALParticle&, double);
-    double InterpolPropDecay(const PROPOSALParticle&, double);
-    double InterpolPropInteraction(const PROPOSALParticle& particle, double);
-    double InterpolTimeParticleDiff(const PROPOSALParticle&, double);
+    double FunctionToBuildInterpolant( double);
+    double InterpolPropDecay( double);
+    double InterpolPropInteraction( double);
+    double InterpolTimeParticleDiff( double);
 
     // --------------------------------------------------------------------- //
     // Private members
