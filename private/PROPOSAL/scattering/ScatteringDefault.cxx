@@ -160,7 +160,7 @@ double ScatteringDefault::FunctionToIntegral(const PROPOSALParticle& particle, c
 
     for(unsigned int i =0;i<cross_sections.size();i++)
     {
-        aux     =   cross_sections.at(i)->CalculatedEdx(particle);
+        aux     =   cross_sections.at(i)->CalculatedEdx(particle.GetEnergy());
         result  +=  aux;
     }
 

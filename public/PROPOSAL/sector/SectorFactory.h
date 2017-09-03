@@ -37,7 +37,7 @@ class SectorFactory
         ~Definition();
     };
 
-    Sector* CreateSector(const Definition&);
+    Sector* CreateSector(PROPOSALParticle&, const Definition&);
 
     static SectorFactory& Get()
     {

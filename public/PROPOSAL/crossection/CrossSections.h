@@ -67,6 +67,7 @@ protected:
 
     // PROPOSALParticle*   particle_;
     // PROPOSALParticle*   backup_particle_;
+    ParticleDef particle_def_;
     Medium*     medium_;
     EnergyCutSettings* cut_settings_;
 
@@ -93,11 +94,11 @@ protected:
 
 //----------------------------------------------------------------------------//
 
-    virtual double FunctionToDEdxIntegral(const PROPOSALParticle&, double variable) = 0;
+    virtual double FunctionToDEdxIntegral(double energy, double variable) = 0;
 
 //----------------------------------------------------------------------------//
 
-    virtual double CalculateStochasticLoss(const PROPOSALParticle&, double rnd1) = 0;
+    virtual double CalculateStochasticLoss(double energy, double rnd1) = 0;
 
 //----------------------------------------------------------------------------//
 
@@ -115,7 +116,7 @@ public:
     CrossSections();
 //----------------------------------------------------------------------------//
 
-    CrossSections(Medium* medium, EnergyCutSettings* cut_settings);
+    CrossSections(PROPOSALParticle&, Medium* medium, EnergyCutSettings* cut_settings);
     CrossSections(const CrossSections& crossSections);
     bool operator==(const CrossSections &crossSections) const;
     bool operator!=(const CrossSections &crossSections) const;
@@ -129,27 +130,27 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    virtual double CalculatedEdx(const PROPOSALParticle&) = 0;
+    virtual double CalculatedEdx(double energy) = 0;
 
 //----------------------------------------------------------------------------//
 
-    virtual double CalculatedNdx(const PROPOSALParticle&) = 0;
+    virtual double CalculatedNdx(double energy) = 0;
 
 //----------------------------------------------------------------------------//
 
-    virtual double CalculatedNdx(const PROPOSALParticle&, double rnd) = 0;
+    virtual double CalculatedNdx(double energy, double rnd) = 0;
 
 //----------------------------------------------------------------------------//
 
-    virtual double CalculateStochasticLoss(const PROPOSALParticle&, double rnd1, double rnd2) = 0;
+    virtual double CalculateStochasticLoss(double energy, double rnd1, double rnd2) = 0;
 
 //----------------------------------------------------------------------------//
 
-    virtual void EnableDNdxInterpolation(const PROPOSALParticle&, std::string path ="", bool raw=false) = 0;
+    virtual void EnableDNdxInterpolation( std::string path ="", bool raw=false) = 0;
 
 //----------------------------------------------------------------------------//
 
-    virtual void EnableDEdxInterpolation(const PROPOSALParticle&, std::string path ="", bool raw=false) = 0;
+    virtual void EnableDEdxInterpolation( std::string path ="", bool raw=false) = 0;
 
 //----------------------------------------------------------------------------//
 
@@ -163,11 +164,11 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    virtual double FunctionToDNdxIntegral(const PROPOSALParticle&, double variable) = 0;
+    virtual double FunctionToDNdxIntegral(double energy, double variable) = 0;
 
 //----------------------------------------------------------------------------//
 
-    virtual CrossSections::IntegralLimits SetIntegralLimits(const PROPOSALParticle&, int component) = 0;
+    virtual CrossSections::IntegralLimits SetIntegralLimits(double energy,  int component) = 0;
 
 
 //----------------------------------------------------------------------------//

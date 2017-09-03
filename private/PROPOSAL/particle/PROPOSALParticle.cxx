@@ -32,10 +32,10 @@ ostream& operator<<(ostream& os, PROPOSALParticle const& particle)
 {
     os<<"---------------------------Particle( "<<&particle<<" )---------------------------"<<endl;
     os<<fixed<<setprecision(5);
-    os<<"\tname:\t\t\t\t\t"<<particle.particle_def_->name<<endl;
-    os<<"\tmass [MeV]:\t\t\t\t"<<particle.particle_def_->mass<<fixed<<endl;
-    os<<"\tcharge:\t\t\t\t\t"<<particle.particle_def_->charge<<scientific<<endl;
-    os<<"\tlifetime [s]:\t\t\t\t"<<particle.particle_def_->lifetime<<setprecision(8)<<endl;
+    os<<"\tname:\t\t\t\t\t"<<particle.particle_def_.name<<endl;
+    os<<"\tmass [MeV]:\t\t\t\t"<<particle.particle_def_.mass<<fixed<<endl;
+    os<<"\tcharge:\t\t\t\t\t"<<particle.particle_def_.charge<<scientific<<endl;
+    os<<"\tlifetime [s]:\t\t\t\t"<<particle.particle_def_.lifetime<<setprecision(8)<<endl;
     os<<"\tmomentum [MeV]:\t\t\t\t"<<particle.momentum_<<endl;
     os<<"\tenergy [MeV]: \t\t\t\t"<<particle.energy_<<fixed<<setprecision(5)<<endl;
     os<<"\tposition [cm]:\t\t\t\t\t"<<particle.position_<<endl;
@@ -43,7 +43,7 @@ ostream& operator<<(ostream& os, PROPOSALParticle const& particle)
     os<<"\tage [s]:\t\t\t\t"<<particle.t_<<endl;
     os<<"\tparticle id:\t\t\t\t"<<particle.particle_id_<<endl;
     os<<"\tparent particle id_:\t\t\t"<<particle.parent_particle_id_<<scientific<<endl;
-    os<<"\tenergy below paricle is lost [MeV]:\t"<<particle.low_<<fixed<<endl;
+    os<<"\tenergy below paricle is lost [MeV]:\t"<<particle.particle_def_.low<<fixed<<endl;
     os<<"\tpropagated distance [cm]:\t\t"<<particle.propagated_distance_<<endl;
     os<<"\tenergy lost in detector [MeV]:\t\t"<<particle.elost_<<endl;
 
@@ -64,12 +64,11 @@ ostream& operator<<(ostream& os, PROPOSALParticle const& particle)
 ******************************************************************************/
 
 PROPOSALParticle::PROPOSALParticle()
-    : particle_def_(new ParticleDef(MuMinusDef::Get()))
+    : particle_def_(MuMinusDef::Get())
     , propagated_distance_(0)
     , momentum_(0)
     , square_momentum_(0)
     , energy_(0)
-    , low_(particle_def_->mass)
     , parent_particle_id_(0)
     , parent_particle_energy_(0)
     , particle_id_(1)
@@ -90,13 +89,12 @@ PROPOSALParticle::PROPOSALParticle()
     SetEnergy(energy_);
 }
 
-PROPOSALParticle::PROPOSALParticle(ParticleDef particleDef)
-    : particle_def_(new ParticleDef(particleDef))
+PROPOSALParticle::PROPOSALParticle(const ParticleDef& particleDef)
+    : particle_def_(particleDef)
     , propagated_distance_(0)
     , momentum_(0)
     , square_momentum_(0)
     , energy_(0)
-    , low_(particleDef.mass)
     , parent_particle_id_(0)
     , parent_particle_energy_(0)
     , particle_id_(1)
@@ -121,14 +119,14 @@ PROPOSALParticle::PROPOSALParticle(ParticleDef particleDef)
 // Operators & swap
 // ------------------------------------------------------------------------- //
 
-PROPOSALParticle& PROPOSALParticle::operator=(const PROPOSALParticle &particle){
-    if (this != &particle)
-    {
-      PROPOSALParticle tmp(particle);
-      swap(tmp);
-    }
-    return *this;
-}
+// PROPOSALParticle& PROPOSALParticle::operator=(const PROPOSALParticle &particle){
+//     if (this != &particle)
+//     {
+//       PROPOSALParticle tmp(particle);
+//       swap(tmp);
+//     }
+//     return *this;
+// }
 
 // ------------------------------------------------------------------------- //
 bool PROPOSALParticle::operator==(const PROPOSALParticle &particle) const
@@ -146,8 +144,6 @@ bool PROPOSALParticle::operator==(const PROPOSALParticle &particle) const
     if (square_momentum_ != particle.square_momentum_)
         return false;
     if (energy_ != particle.energy_)
-        return false;
-    if (low_ != particle.low_)
         return false;
     if (parent_particle_id_ != particle.parent_particle_id_)
         return false;
@@ -175,7 +171,7 @@ bool PROPOSALParticle::operator==(const PROPOSALParticle &particle) const
         return false;
     if (elost_ != particle.elost_)
         return false;
-    if (*particle_def_ != *particle.particle_def_)
+    if (particle_def_ != particle.particle_def_)
     {
         return false;
     }
@@ -191,33 +187,32 @@ bool PROPOSALParticle::operator!=(const PROPOSALParticle &particle) const {
 }
 
 // ------------------------------------------------------------------------- //
-void PROPOSALParticle::swap(PROPOSALParticle &particle)
-{
-    using std::swap;
-
-    swap( propagated_distance_   , particle.propagated_distance_);
-    position_.swap(particle.position_);
-    swap( t_                     , particle.t_);
-    direction_.swap(particle.direction_);
-    swap( momentum_              , particle.momentum_);
-    swap( square_momentum_       , particle.square_momentum_);
-    swap( energy_                , particle.energy_);
-    swap( low_                   , particle.low_);
-    swap( parent_particle_id_    , particle.parent_particle_id_);
-    swap( parent_particle_energy_, particle.parent_particle_energy_);
-    swap( particle_id_           , particle.particle_id_);
-    entry_point_.swap(entry_point_);
-    swap( ti_                    , particle.ti_);
-    swap( ei_                    , particle.ei_);
-    exit_point_.swap(exit_point_);
-    swap( tf_                    , particle.tf_);
-    swap( ef_                    , particle.ef_);
-    closest_approach_point_.swap(closest_approach_point_);
-    swap( tc_                    , particle.tc_);
-    swap( ec_                    , particle.ec_);
-    swap( elost_                 , particle.elost_);
-    swap(particle_def_, particle.particle_def_);
-}
+// void PROPOSALParticle::swap(PROPOSALParticle &particle)
+// {
+//     using std::swap;
+//
+//     swap( propagated_distance_   , particle.propagated_distance_);
+//     position_.swap(particle.position_);
+//     swap( t_                     , particle.t_);
+//     direction_.swap(particle.direction_);
+//     swap( momentum_              , particle.momentum_);
+//     swap( square_momentum_       , particle.square_momentum_);
+//     swap( energy_                , particle.energy_);
+//     swap( parent_particle_id_    , particle.parent_particle_id_);
+//     swap( parent_particle_energy_, particle.parent_particle_energy_);
+//     swap( particle_id_           , particle.particle_id_);
+//     entry_point_.swap(entry_point_);
+//     swap( ti_                    , particle.ti_);
+//     swap( ei_                    , particle.ei_);
+//     exit_point_.swap(exit_point_);
+//     swap( tf_                    , particle.tf_);
+//     swap( ef_                    , particle.ef_);
+//     closest_approach_point_.swap(closest_approach_point_);
+//     swap( tc_                    , particle.tc_);
+//     swap( ec_                    , particle.ec_);
+//     swap( elost_                 , particle.elost_);
+//     swap(particle_def_, particle.particle_def_);
+// }
 
 
 // ------------------------------------------------------------------------- //
@@ -228,10 +223,10 @@ void PROPOSALParticle::SetEnergy(double energy)
 {
     energy_ = energy;
 
-    if (energy_ < particle_def_->mass)
-        energy_ = particle_def_->mass;
+    if (energy_ < particle_def_.mass)
+        energy_ = particle_def_.mass;
 
-    square_momentum_ = energy * energy - particle_def_->mass * particle_def_->mass;
+    square_momentum_ = energy * energy - particle_def_.mass * particle_def_.mass;
     momentum_ = sqrt(max(square_momentum_, 0.0));
 }
 
@@ -246,7 +241,7 @@ void PROPOSALParticle::SetMomentum(double momentum)
 {
     momentum_ = momentum;
     square_momentum_ = momentum_ * momentum_;
-    energy_ = sqrt(square_momentum_ + particle_def_->mass * particle_def_->mass);
+    energy_ = sqrt(square_momentum_ + particle_def_.mass * particle_def_.mass);
 }
 
 // ------------------------------------------------------------------------- //
@@ -266,17 +261,17 @@ void PROPOSALParticle::SetT(double t){
 }
 
 // ------------------------------------------------------------------------- //
-void PROPOSALParticle::SetLow(double low){
-    if (low < particle_def_->mass)
-    {
-        low_ = particle_def_->mass;
-        log_warn("Low is lower than mass! Set low to mass.");
-    }
-    else
-    {
-        low_ = low;
-    }
-}
+// void PROPOSALParticle::SetLow(double low){
+//     if (low < particle_def_.mass)
+//     {
+//         low_ = particle_def_.mass;
+//         log_warn("Low is lower than mass! Set low to mass.");
+//     }
+//     else
+//     {
+//         low_ = low;
+//     }
+// }
 
 // ------------------------------------------------------------------------- //
 void PROPOSALParticle::SetParentParticleId(int parent_particle_id){

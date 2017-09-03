@@ -18,7 +18,7 @@ using namespace PROPOSAL;
 //----------------------------------------------------------------------------//
 
 
-double Photonuclear::CalculatedEdx(const PROPOSALParticle& particle)
+double Photonuclear::CalculatedEdx(double energy)
 {
     if(multiplier_<=0)
     {
@@ -27,18 +27,18 @@ double Photonuclear::CalculatedEdx(const PROPOSALParticle& particle)
 
     if(do_dedx_Interpolation_)
     {
-        return max(dedx_interpolant_->Interpolate(particle.GetEnergy()), 0.0);
+        return max(dedx_interpolant_->Interpolate(energy), 0.0);
     }
 
     double sum = 0;
 
     for(int i=0; i < medium_->GetNumComponents(); i++)
     {
-        CrossSections::IntegralLimits limits = SetIntegralLimits(particle, i);
-        sum +=  integral_for_dEdx_->Integrate(limits.vMin, limits.vUp, boost::bind(&Photonuclear::FunctionToDEdxIntegral, this, boost::cref(particle), _1),4);
+        CrossSections::IntegralLimits limits = SetIntegralLimits(energy, i);
+        sum +=  integral_for_dEdx_->Integrate(limits.vMin, limits.vUp, boost::bind(&Photonuclear::FunctionToDEdxIntegral, this, energy, _1),4);
     }
 
-    return multiplier_*particle.GetEnergy()*sum;
+    return multiplier_*energy*sum;
 }
 
 
@@ -46,7 +46,7 @@ double Photonuclear::CalculatedEdx(const PROPOSALParticle& particle)
 //----------------------------------------------------------------------------//
 
 
-double Photonuclear::CalculatedNdx(const PROPOSALParticle& particle)
+double Photonuclear::CalculatedNdx(double energy)
 {
     if(multiplier_<=0)
     {
@@ -59,12 +59,12 @@ double Photonuclear::CalculatedNdx(const PROPOSALParticle& particle)
     {
         if(do_dndx_Interpolation_)
         {
-            prob_for_component_.at(i) = max(dndx_interpolant_1d_.at(i)->Interpolate(particle.GetEnergy()), 0.);
+            prob_for_component_.at(i) = max(dndx_interpolant_1d_.at(i)->Interpolate(energy), 0.);
         }
         else
         {
-            CrossSections::IntegralLimits limits = SetIntegralLimits(particle, i);
-            prob_for_component_.at(i) = dndx_integral_.at(i)->Integrate(limits.vUp, limits.vMax, boost::bind(&Photonuclear::FunctionToDNdxIntegral, this, boost::cref(particle), _1),4);
+            CrossSections::IntegralLimits limits = SetIntegralLimits(energy, i);
+            prob_for_component_.at(i) = dndx_integral_.at(i)->Integrate(limits.vUp, limits.vMax, boost::bind(&Photonuclear::FunctionToDNdxIntegral, this, energy, _1),4);
         }
         sum_of_rates_ += prob_for_component_.at(i);
     }
@@ -76,7 +76,7 @@ double Photonuclear::CalculatedNdx(const PROPOSALParticle& particle)
 //----------------------------------------------------------------------------//
 
 
-double Photonuclear::CalculatedNdx(const PROPOSALParticle& particle, double rnd)
+double Photonuclear::CalculatedNdx(double energy, double rnd)
 {
     if(multiplier_<=0)
     {
@@ -94,12 +94,12 @@ double Photonuclear::CalculatedNdx(const PROPOSALParticle& particle, double rnd)
     {
         if(do_dndx_Interpolation_)
         {
-            prob_for_component_.at(i) = max(dndx_interpolant_1d_.at(i)->Interpolate(particle.GetEnergy()), 0.);
+            prob_for_component_.at(i) = max(dndx_interpolant_1d_.at(i)->Interpolate(energy), 0.);
         }
         else
         {
-            CrossSections::IntegralLimits limits = SetIntegralLimits(particle, i);
-            prob_for_component_.at(i) = dndx_integral_.at(i)->IntegrateWithRandomRatio(limits.vUp, limits.vMax, boost::bind(&Photonuclear::FunctionToDNdxIntegral, this, boost::cref(particle), _1),4,rnd);
+            CrossSections::IntegralLimits limits = SetIntegralLimits(energy, i);
+            prob_for_component_.at(i) = dndx_integral_.at(i)->IntegrateWithRandomRatio(limits.vUp, limits.vMax, boost::bind(&Photonuclear::FunctionToDNdxIntegral, this, energy, _1),4,rnd);
         }
         sum_of_rates_ += prob_for_component_.at(i);
     }
@@ -112,14 +112,14 @@ double Photonuclear::CalculatedNdx(const PROPOSALParticle& particle, double rnd)
 //----------------------------------------------------------------------------//
 
 
-double Photonuclear::CalculateStochasticLoss(const PROPOSALParticle& particle, double rnd1, double rnd2)
+double Photonuclear::CalculateStochasticLoss(double energy, double rnd1, double rnd2)
 {
     if(rnd1 != rnd_ )
     {
-        CalculatedNdx(particle, rnd1);
+        CalculatedNdx(energy, rnd1);
     }
 
-    return CalculateStochasticLoss(particle, rnd2);
+    return CalculateStochasticLoss(energy, rnd2);
 
 }
 
@@ -131,11 +131,11 @@ double Photonuclear::CalculateStochasticLoss(const PROPOSALParticle& particle, d
 //----------------------------------------------------------------------------//
 
 
-void Photonuclear::EnableDNdxInterpolation(const PROPOSALParticle& particle, std::string path, bool raw)
+void Photonuclear::EnableDNdxInterpolation( std::string path, bool raw)
 {
     if(do_dndx_Interpolation_)return;
 
-    EnablePhotoInterpolation(particle, path,raw);
+    EnablePhotoInterpolation( path,raw);
 
     bool storing_failed =   false;
     bool reading_worked =   true;
@@ -147,10 +147,10 @@ void Photonuclear::EnableDNdxInterpolation(const PROPOSALParticle& particle, std
     {
         stringstream filename;
         filename<<path<<"/Photo_dNdx"
-                <<"_particle_"<<particle.GetName()
-                <<"_mass_"<<particle.GetMass()
-                <<"_charge_"<<particle.GetCharge()
-                <<"_lifetime_"<<particle.GetLifetime()
+                <<"_particle_"<<particle_def_.name
+                <<"_mass_"<<particle_def_.mass
+                <<"_charge_"<<particle_def_.charge
+                <<"_lifetime_"<<particle_def_.lifetime
                 <<"_para_"<<parametrization_
                 <<"_med_"<<medium_->GetName()
                 <<"_"<<medium_->GetMassDensity()
@@ -218,12 +218,12 @@ void Photonuclear::EnableDNdxInterpolation(const PROPOSALParticle& particle, std
                     component_ = i;
 
                     dndx_interpolant_2d_.at(i) = new Interpolant(NUM1
-                                                                , particle.GetLow()
+                                                                , particle_def_.low
                                                                 , BIGENERGY
                                                                 , NUM1
                                                                 , 0
                                                                 , 1
-                                                                , boost::bind(&Photonuclear::FunctionToBuildDNdxInterpolant2D, this, boost::cref(particle), _1 , _2)
+                                                                , boost::bind(&Photonuclear::FunctionToBuildDNdxInterpolant2D, this,  _1 , _2)
                                                                 , order_of_interpolation_
                                                                 , false
                                                                 , false
@@ -238,7 +238,7 @@ void Photonuclear::EnableDNdxInterpolation(const PROPOSALParticle& particle, std
                                                                 , false
                                                                 );
                     dndx_interpolant_1d_.at(i) = new Interpolant(NUM1
-                                                                , particle.GetLow()
+                                                                , particle_def_.low
                                                                 , BIGENERGY
                                                                 , boost::bind(&Photonuclear::FunctionToBuildDNdxInterpolant1D, this, _1)
                                                                 , order_of_interpolation_
@@ -267,7 +267,7 @@ void Photonuclear::EnableDNdxInterpolation(const PROPOSALParticle& particle, std
     }
     if(path.empty() || storing_failed)
     {
-        EnablePhotoInterpolation(particle, path);
+        EnablePhotoInterpolation( path);
 
         dndx_interpolant_1d_.resize(medium_->GetNumComponents());
         dndx_interpolant_2d_.resize(medium_->GetNumComponents());
@@ -275,12 +275,12 @@ void Photonuclear::EnableDNdxInterpolation(const PROPOSALParticle& particle, std
         {
             component_ = i;
             dndx_interpolant_2d_.at(i) =    new Interpolant(NUM1
-                                                        , particle.GetLow()
+                                                        , particle_def_.low
                                                         , BIGENERGY
                                                         , NUM1
                                                         , 0
                                                         , 1
-                                                        , boost::bind(&Photonuclear::FunctionToBuildDNdxInterpolant2D, this, boost::cref(particle), _1 , _2)
+                                                        , boost::bind(&Photonuclear::FunctionToBuildDNdxInterpolant2D, this,  _1 , _2)
                                                         , order_of_interpolation_
                                                         , false
                                                         , false
@@ -295,7 +295,7 @@ void Photonuclear::EnableDNdxInterpolation(const PROPOSALParticle& particle, std
                                                         , false
                                                         );
             dndx_interpolant_1d_.at(i) =    new Interpolant(NUM1
-                                                        , particle.GetLow()
+                                                        , particle_def_.low
                                                         , BIGENERGY
                                                         , boost::bind(&Photonuclear::FunctionToBuildDNdxInterpolant1D, this, _1)
                                                         , order_of_interpolation_
@@ -319,11 +319,11 @@ void Photonuclear::EnableDNdxInterpolation(const PROPOSALParticle& particle, std
 //----------------------------------------------------------------------------//
 
 
-void Photonuclear::EnableDEdxInterpolation(const PROPOSALParticle& particle, std::string path, bool raw)
+void Photonuclear::EnableDEdxInterpolation( std::string path, bool raw)
 {
     if(do_dedx_Interpolation_)return;
 
-    EnablePhotoInterpolation(particle, path,raw);
+    EnablePhotoInterpolation( path,raw);
 
     bool reading_worked =   true;
     bool storing_failed =   false;
@@ -335,10 +335,10 @@ void Photonuclear::EnableDEdxInterpolation(const PROPOSALParticle& particle, std
     {
         stringstream filename;
         filename<<path<<"/Photo_dEdx"
-                <<"_particle_"<<particle.GetName()
-                <<"_mass_"<<particle.GetMass()
-                <<"_charge_"<<particle.GetCharge()
-                <<"_lifetime_"<<particle.GetLifetime()
+                <<"_particle_"<<particle_def_.name
+                <<"_mass_"<<particle_def_.mass
+                <<"_charge_"<<particle_def_.charge
+                <<"_lifetime_"<<particle_def_.lifetime
                 <<"_para_"<<parametrization_
                 <<"_med_"<<medium_->GetName()
                 <<"_"<<medium_->GetMassDensity()
@@ -392,7 +392,7 @@ void Photonuclear::EnableDEdxInterpolation(const PROPOSALParticle& particle, std
             {
                 output.precision(16);
 
-                dedx_interpolant_ = new Interpolant(NUM1, particle.GetLow(), BIGENERGY, boost::bind(&Photonuclear::FunctionToBuildDEdxInterpolant, this, boost::cref(particle), _1),
+                dedx_interpolant_ = new Interpolant(NUM1, particle_def_.low, BIGENERGY, boost::bind(&Photonuclear::FunctionToBuildDEdxInterpolant, this,  _1),
                                                     order_of_interpolation_, true, false, true, order_of_interpolation_, false, false, false);
                 dedx_interpolant_->Save(output, raw);
             }
@@ -407,7 +407,7 @@ void Photonuclear::EnableDEdxInterpolation(const PROPOSALParticle& particle, std
     }
     if(path.empty() || storing_failed)
     {
-        dedx_interpolant_ = new Interpolant(NUM1, particle.GetLow(), BIGENERGY, boost::bind(&Photonuclear::FunctionToBuildDEdxInterpolant, this, boost::cref(particle), _1),
+        dedx_interpolant_ = new Interpolant(NUM1, particle_def_.low, BIGENERGY, boost::bind(&Photonuclear::FunctionToBuildDEdxInterpolant, this,  _1),
                                             order_of_interpolation_, true, false, true, order_of_interpolation_, false, false, false);
 
     }
@@ -420,7 +420,7 @@ void Photonuclear::EnableDEdxInterpolation(const PROPOSALParticle& particle, std
 //----------------------------------------------------------------------------//
 
 
-void Photonuclear::EnablePhotoInterpolation(const PROPOSALParticle& particle, std::string path, bool raw)
+void Photonuclear::EnablePhotoInterpolation( std::string path, bool raw)
 {
     if(do_photo_interpolation_)return;
 
@@ -434,10 +434,10 @@ void Photonuclear::EnablePhotoInterpolation(const PROPOSALParticle& particle, st
     {
         stringstream filename;
         filename<<path<<"/Photo"
-                <<"_particle_"<< particle.GetName()
-                <<"_mass_"<<particle.GetMass()
-                <<"_charge_"<<particle.GetCharge()
-                <<"_lifetime_"<<particle.GetLifetime()
+                <<"_particle_"<< particle_def_.name
+                <<"_mass_"<<particle_def_.mass
+                <<"_charge_"<<particle_def_.charge
+                <<"_lifetime_"<<particle_def_.lifetime
                 <<"_para_"<<parametrization_
                 <<"_med_"<<medium_->GetName()
                 <<"_"<<medium_->GetMassDensity()
@@ -502,12 +502,12 @@ void Photonuclear::EnablePhotoInterpolation(const PROPOSALParticle& particle, st
                     component_ = i;
 
                     photo_interpolant_.at(i)  = new Interpolant(NUM1
-                                                            , particle.GetLow()
+                                                            , particle_def_.low
                                                             , BIGENERGY
                                                             , NUM1
                                                             , 0.
                                                             , 1.
-                                                            , boost::bind(&Photonuclear::FunctionToBuildPhotoInterpolant, this, boost::cref(particle), _1, _2)
+                                                            , boost::bind(&Photonuclear::FunctionToBuildPhotoInterpolant, this,  _1, _2)
                                                             , order_of_interpolation_
                                                             , false
                                                             , false
@@ -543,12 +543,12 @@ void Photonuclear::EnablePhotoInterpolation(const PROPOSALParticle& particle, st
         {
             component_ = i;
             photo_interpolant_.at(i)  = new Interpolant(NUM1
-                                                    , particle.GetLow()
+                                                    , particle_def_.low
                                                     , BIGENERGY
                                                     , NUM1
                                                     , 0.
                                                     , 1.
-                                                    , boost::bind(&Photonuclear::FunctionToBuildPhotoInterpolant, this, boost::cref(particle), _1, _2)
+                                                    , boost::bind(&Photonuclear::FunctionToBuildPhotoInterpolant, this,  _1, _2)
                                                     , order_of_interpolation_
                                                     , false
                                                     , false
@@ -777,8 +777,8 @@ Photonuclear::Photonuclear(const Photonuclear &photo)
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-Photonuclear::Photonuclear(Medium* medium, EnergyCutSettings* cut_settings)
-    : CrossSections(medium, cut_settings)
+Photonuclear::Photonuclear(PROPOSALParticle& particle, Medium* medium, EnergyCutSettings* cut_settings)
+    : CrossSections(particle, medium, cut_settings)
     , component_(0)
     , init_measured_(true)
     , init_hardbb_(true)
@@ -812,8 +812,6 @@ Photonuclear::Photonuclear(Medium* medium, EnergyCutSettings* cut_settings)
     prob_for_component_.resize(medium_->GetNumComponents());
     dedx_interpolant_     = NULL;
     interpolant_measured_ = NULL;
-
-
 }
 
 
@@ -1052,10 +1050,10 @@ ostream& operator<<(std::ostream& os, Photonuclear const &photo)
 //----------------------------------------------------------------------------//
 
 
-double Photonuclear::ParametrizationOfRealPhotonAssumption(const PROPOSALParticle& particle, double v, int i)
+double Photonuclear::ParametrizationOfRealPhotonAssumption(double energy, double v, int i)
 {
     double aux, aum, k, G, t, sgn;
-    double nu = v*particle.GetEnergy()*1.e-3;
+    double nu = v*energy*1.e-3;
 
     switch (parametrization_)
     {
@@ -1082,8 +1080,8 @@ double Photonuclear::ParametrizationOfRealPhotonAssumption(const PROPOSALParticl
     const double m1 =   0.54;
     const double m2 =   1.80;
 
-    double particle_charge = particle.GetCharge();
-    double particle_mass = particle.GetMass();
+    double particle_charge = particle_def_.charge;
+    double particle_mass = particle_def_.mass;
     double atomic_number = medium_->GetComponents().at(i)->GetAtomicNum();
 
     k   =   1 - 2/v + 2/(v*v);
@@ -1111,17 +1109,17 @@ double Photonuclear::ParametrizationOfRealPhotonAssumption(const PROPOSALParticl
 
     if(hard_component_)
     {
-        if (particle.getHardBB() != NULL)
+        if (particle_def_.hardbb_table != NULL)
         {
-                aux +=  atomic_number*1.e-30*HardBB(particle, v);
+                aux +=  atomic_number*1.e-30*HardBB(energy, v);
         }
-        // switch (particle.getHardBB().empty())
+        // switch (particle_.getHardBB().empty())
         // {
         //     case ParticleType::MuMinus:
         //     case ParticleType::MuPlus:
         //     case ParticleType::TauMinus:
         //     case ParticleType::TauPlus:
-        //         aux +=  atomic_number*1.e-30*HardBB(particle.GetEnergy(), v);
+        //         aux +=  atomic_number*1.e-30*HardBB(energy, v);
         //         break;
         //     default:
         //         break;
@@ -1134,11 +1132,11 @@ double Photonuclear::ParametrizationOfRealPhotonAssumption(const PROPOSALParticl
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-double Photonuclear::ParametrizationOfQ2Integration(const PROPOSALParticle& particle, double v, int i)
+double Photonuclear::ParametrizationOfQ2Integration(double energy, double v, int i)
 {
-    double particle_energy = particle.GetEnergy();
+    double particle_energy = energy;
 
-    CrossSections::IntegralLimits limits = SetIntegralLimits(particle, i);
+    CrossSections::IntegralLimits limits = SetIntegralLimits(energy, i);
 
     if(do_photo_interpolation_)
     {
@@ -1149,8 +1147,8 @@ double Photonuclear::ParametrizationOfQ2Integration(const PROPOSALParticle& part
     }
 
     double aux, min, max;
-    double particle_mass = particle.GetMass();
-    double particle_charge = particle.GetCharge();
+    double particle_mass = particle_def_.mass;
+    double particle_charge = particle_def_.charge;
 
     component_ =   i;
     v_         =   v;
@@ -1177,19 +1175,19 @@ double Photonuclear::ParametrizationOfQ2Integration(const PROPOSALParticle& part
     {
         case ParametrizationType::PhotoAbramowiczLevinLevyMaor91ShadowDutta:
         case ParametrizationType::PhotoAbramowiczLevinLevyMaor91ShadowButkevich:
-            aux *= integral_->Integrate(min, max, boost::bind(&Photonuclear::FunctionToIntegralALLM91, this, boost::cref(particle), _1),4);
+            aux *= integral_->Integrate(min, max, boost::bind(&Photonuclear::FunctionToIntegralALLM91, this, energy, _1),4);
             break;
         case ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowDutta:
         case ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich:
-            aux *= integral_->Integrate(min, max, boost::bind(&Photonuclear::FunctionToIntegralALLM97, this, boost::cref(particle), _1),4);
+            aux *= integral_->Integrate(min, max, boost::bind(&Photonuclear::FunctionToIntegralALLM97, this, energy, _1),4);
             break;
         case ParametrizationType::PhotoButkevichMikhailovShadowDutta:
         case ParametrizationType::PhotoButkevichMikhailovShadowButkevich:
-            aux *= integral_->Integrate(min, max, boost::bind(&Photonuclear::FunctionToIntegralButMik, this, boost::cref(particle), _1),4);
+            aux *= integral_->Integrate(min, max, boost::bind(&Photonuclear::FunctionToIntegralButMik, this, energy, _1),4);
             break;
         case ParametrizationType::PhotoRenoSarcevicSuShadowDutta:
         case ParametrizationType::PhotoRenoSarcevicSuShadowButkevich:
-            aux *= integral_->Integrate(min, max, boost::bind(&Photonuclear::FunctionToIntegralRSS, this, boost::cref(particle), _1),4);
+            aux *= integral_->Integrate(min, max, boost::bind(&Photonuclear::FunctionToIntegralRSS, this, energy, _1),4);
             break;
         default:
             log_fatal("The photonuclear Parametrization %i is not supported.\n", parametrization_);
@@ -1205,11 +1203,11 @@ double Photonuclear::ParametrizationOfQ2Integration(const PROPOSALParticle& part
 //----------------------------------------------------------------------------//
 
 
-double Photonuclear::CalculateStochasticLoss(const PROPOSALParticle& particle, double rnd)
+double Photonuclear::CalculateStochasticLoss(double energy, double rnd)
 {
     double rand, rsum, particle_energy;
 
-    particle_energy = particle.GetEnergy();
+    particle_energy = energy;
 
     rand    =   rnd*sum_of_rates_;
     rsum    =   0;
@@ -1222,7 +1220,7 @@ double Photonuclear::CalculateStochasticLoss(const PROPOSALParticle& particle, d
         {
             if(do_dndx_Interpolation_)
             {
-                CrossSections::IntegralLimits limits = SetIntegralLimits(particle, i);
+                CrossSections::IntegralLimits limits = SetIntegralLimits(energy, i);
 
                 if(limits.vUp == limits.vMax)
                 {
@@ -1245,7 +1243,7 @@ double Photonuclear::CalculateStochasticLoss(const PROPOSALParticle& particle, d
     bool prob_for_all_comp_is_zero=true;
     for(int i=0; i<(medium_->GetNumComponents()); i++)
     {
-        CrossSections::IntegralLimits limits = SetIntegralLimits(particle, i);
+        CrossSections::IntegralLimits limits = SetIntegralLimits(energy, i);
         if(limits.vUp != limits.vMax)
             prob_for_all_comp_is_zero=false;
     }
@@ -1261,7 +1259,7 @@ double Photonuclear::CalculateStochasticLoss(const PROPOSALParticle& particle, d
 //----------------------------------------------------------------------------//
 
 
-CrossSections::IntegralLimits Photonuclear::SetIntegralLimits(const PROPOSALParticle& particle, int component)
+CrossSections::IntegralLimits Photonuclear::SetIntegralLimits(double energy, int component)
 {
 
     double aux;
@@ -1269,26 +1267,26 @@ CrossSections::IntegralLimits Photonuclear::SetIntegralLimits(const PROPOSALPart
     component_ = component;
     IntegralLimits limits;
 
-    limits.vMin    =   (MPI + (MPI*MPI)/(2*medium_->GetComponents().at(component_)->GetAverageNucleonWeight()))/particle.GetEnergy();
+    limits.vMin    =   (MPI + (MPI*MPI)/(2*medium_->GetComponents().at(component_)->GetAverageNucleonWeight()))/energy;
 
-    if(particle.GetMass() < MPI)
+    if(particle_def_.mass < MPI)
     {
-        aux     =   particle.GetMass()/medium_->GetComponents().at(component_)->GetAverageNucleonWeight();
-        limits.vMax    =   1 - medium_->GetComponents().at(component_)->GetAverageNucleonWeight()*(1 + aux*aux)/(2*particle.GetEnergy());
+        aux     =   particle_def_.mass/medium_->GetComponents().at(component_)->GetAverageNucleonWeight();
+        limits.vMax    =   1 - medium_->GetComponents().at(component_)->GetAverageNucleonWeight()*(1 + aux*aux)/(2*energy);
     }
     else
     {
         limits.vMax    =   1;
     }
 
-    limits.vMax    =   min(limits.vMax, 1-particle.GetMass()/particle.GetEnergy());
+    limits.vMax    =   min(limits.vMax, 1-particle_def_.mass/energy);
 
     if(limits.vMax < limits.vMin)
     {
         limits.vMax    =   limits.vMin;
     }
 
-    limits.vUp     =   min(limits.vMax, cut_settings_->GetCut(particle.GetEnergy()));
+    limits.vUp     =   min(limits.vMax, cut_settings_->GetCut(energy));
 
     if(limits.vUp < limits.vMin)
     {
@@ -1303,7 +1301,7 @@ CrossSections::IntegralLimits Photonuclear::SetIntegralLimits(const PROPOSALPart
 //----------------------------------------------------------------------------//
 
 
-double Photonuclear::PhotoN(const PROPOSALParticle& particle, double v, int i)
+double Photonuclear::PhotoN(double energy, double v, int i)
 {
     switch(parametrization_)
     {
@@ -1315,7 +1313,7 @@ double Photonuclear::PhotoN(const PROPOSALParticle& particle, double v, int i)
         case ParametrizationType::PhotoBezrukovBugaevShadowBezrukovHard:
         case ParametrizationType::PhotoZeusShadowBezrukovSoft:
         case ParametrizationType::PhotoZeusShadowBezrukovHard:
-            return ParametrizationOfRealPhotonAssumption(particle, v, i);
+            return ParametrizationOfRealPhotonAssumption(energy, v, i);
         case ParametrizationType::PhotoAbramowiczLevinLevyMaor91ShadowDutta:
         case ParametrizationType::PhotoAbramowiczLevinLevyMaor91ShadowButkevich:
         case ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowDutta:
@@ -1324,7 +1322,7 @@ double Photonuclear::PhotoN(const PROPOSALParticle& particle, double v, int i)
         case ParametrizationType::PhotoButkevichMikhailovShadowButkevich:
         case ParametrizationType::PhotoRenoSarcevicSuShadowDutta:
         case ParametrizationType::PhotoRenoSarcevicSuShadowButkevich:
-            return ParametrizationOfQ2Integration(particle, v, i);
+            return ParametrizationOfQ2Integration(energy, v, i);
         default:
             log_fatal("The photonuclear parametrization_ '%i' is not supported! Be careful 0 is returned. \n",parametrization_);
             return 0;
@@ -1474,7 +1472,7 @@ double Photonuclear::MeasuredSgN(double e)
 //----------------------------------------------------------------------------//
 
 
-void Photonuclear::EnableHardBB(const PROPOSALParticle& particle)
+void Photonuclear::EnableHardBB()
 {
     if(init_hardbb_)
     {
@@ -1509,7 +1507,7 @@ void Photonuclear::EnableHardBB(const PROPOSALParticle& particle)
         //TODO(mario): Must be cleared Tue 2017/08/08
         interpolant_hardBB_.resize(hmax_);
 
-        const HardBBTables::VecType* y = particle.getHardBB();
+        const HardBBTables::VecType* y = particle_def_.hardbb_table;
 
         if (y != NULL)
         {
@@ -1549,10 +1547,10 @@ void Photonuclear::EnableHardBB(const PROPOSALParticle& particle)
 //----------------------------------------------------------------------------//
 
 
-double Photonuclear::HardBB(const PROPOSALParticle& particle, double v)
+double Photonuclear::HardBB(double energy, double v)
 {
-    EnableHardBB(particle);
-    double e = particle.GetEnergy();
+    EnableHardBB();
+    double e = energy;
 
     if(e<1.e5 || v<1.e-7)
     {
@@ -1677,12 +1675,9 @@ double Photonuclear::ShadowEffect(double x , double nu)
 //----------------------------------------------------------------------------//
 
 
-double Photonuclear::FunctionToBuildDEdxInterpolant(const PROPOSALParticle& particle,  double energy)
+double Photonuclear::FunctionToBuildDEdxInterpolant(  double energy)
 {
-    PROPOSALParticle tmp_particle(particle);
-    tmp_particle.SetEnergy(energy);
-
-    return CalculatedEdx(tmp_particle);
+    return CalculatedEdx(energy);
 }
 
 
@@ -1700,12 +1695,9 @@ double Photonuclear::FunctionToBuildDNdxInterpolant1D(double energy)
 //----------------------------------------------------------------------------//
 
 
-double Photonuclear::FunctionToBuildDNdxInterpolant2D(const PROPOSALParticle& particle, double energy, double v)
+double Photonuclear::FunctionToBuildDNdxInterpolant2D( double energy, double v)
 {
-    PROPOSALParticle tmp_particle(particle);
-    tmp_particle.SetEnergy(energy);
-
-    CrossSections::IntegralLimits limits = SetIntegralLimits(tmp_particle, component_);
+    CrossSections::IntegralLimits limits = SetIntegralLimits(energy, component_);
     if(limits.vUp == limits.vMax)
     {
         return 0;
@@ -1713,7 +1705,9 @@ double Photonuclear::FunctionToBuildDNdxInterpolant2D(const PROPOSALParticle& pa
 
     v   =   limits.vUp*exp(v*log(limits.vMax / limits.vUp));
 
-    return dndx_integral_.at(component_)->Integrate(limits.vUp, v, boost::bind(&Photonuclear::FunctionToDNdxIntegral, this, boost::cref(tmp_particle), _1) ,4);
+    double dNdx = dndx_integral_.at(component_)->Integrate(limits.vUp, v, boost::bind(&Photonuclear::FunctionToDNdxIntegral, this, energy, _1) ,4);
+
+    return dNdx;
 }
 
 
@@ -1721,12 +1715,9 @@ double Photonuclear::FunctionToBuildDNdxInterpolant2D(const PROPOSALParticle& pa
 //----------------------------------------------------------------------------//
 
 
-double Photonuclear::FunctionToBuildPhotoInterpolant(const PROPOSALParticle& particle, double energy, double v)
+double Photonuclear::FunctionToBuildPhotoInterpolant( double energy, double v)
 {
-    PROPOSALParticle tmp_particle(particle);
-    tmp_particle.SetEnergy(energy);
-
-    CrossSections::IntegralLimits limits = SetIntegralLimits(particle, component_);
+    CrossSections::IntegralLimits limits = SetIntegralLimits(energy, component_);
 
     if(limits.vUp == limits.vMax)
     {
@@ -1735,7 +1726,7 @@ double Photonuclear::FunctionToBuildPhotoInterpolant(const PROPOSALParticle& par
 
     v   =   limits.vUp*exp(v*log(limits.vMax / limits.vUp));
 
-    return PhotoN(particle, v, component_);
+    return PhotoN(energy, v, component_);
 }
 
 
@@ -1746,9 +1737,9 @@ double Photonuclear::FunctionToBuildPhotoInterpolant(const PROPOSALParticle& par
 //----------------------------------------------------------------------------//
 
 
-double Photonuclear::FunctionToDEdxIntegral(const PROPOSALParticle& particle, double variable)
+double Photonuclear::FunctionToDEdxIntegral(double energy, double variable)
 {
-    return variable*PhotoN(particle, variable, component_);
+    return variable*PhotoN(energy, variable, component_);
 }
 
 
@@ -1756,9 +1747,9 @@ double Photonuclear::FunctionToDEdxIntegral(const PROPOSALParticle& particle, do
 //----------------------------------------------------------------------------//
 
 
-double Photonuclear::FunctionToDNdxIntegral(const PROPOSALParticle& particle, double variable)
+double Photonuclear::FunctionToDNdxIntegral(double energy, double variable)
 {
-    return multiplier_*PhotoN(particle, variable, component_);
+    return multiplier_*PhotoN(energy, variable, component_);
 }
 
 
@@ -1766,13 +1757,13 @@ double Photonuclear::FunctionToDNdxIntegral(const PROPOSALParticle& particle, do
 //----------------------------------------------------------------------------//
 
 
-double Photonuclear::FunctionToIntegralALLM91(const PROPOSALParticle& particle, double Q2)
+double Photonuclear::FunctionToIntegralALLM91(double energy, double Q2)
 {
     Components::Component* component = medium_->GetComponents().at(component_);
 
     double x, aux, nu, G, F2, R2;
 
-    nu  =   v_*particle.GetEnergy();
+    nu  =   v_*energy;
     x   =   Q2/(2*medium_->GetComponents().at(component_)->GetAverageNucleonWeight()*nu);
 
     G = ShadowEffect(x , nu);
@@ -1784,7 +1775,7 @@ double Photonuclear::FunctionToIntegralALLM91(const PROPOSALParticle& particle, 
     P   =   1 - 1.85*x + 2.45*aux - 2.35*aux*x + aux*aux;
     G   *=  (component->GetNucCharge() + (component->GetAtomicNum() - component->GetNucCharge())*P);
     W2  =   component->GetAverageNucleonWeight()*component->GetAverageNucleonWeight()
-            - Q2 + 2*component->GetAverageNucleonWeight()*particle.GetEnergy()*v_;
+            - Q2 + 2*component->GetAverageNucleonWeight()*energy*v_;
 
     double cp1, cp2, cp3, cr1, cr2, cr3, ap1, ap2, ap3, ar1, ar2, ar3;
     double bp1, bp2, bp3, br1, br2, br3, m2o, m2r, L2, m2p, Q2o;
@@ -1859,8 +1850,8 @@ double Photonuclear::FunctionToIntegralALLM91(const PROPOSALParticle& particle, 
 
 
     aux =   ME*RE/Q2;
-    aux *=  aux*(1 - v_ - component->GetAverageNucleonWeight()*x*v_/(2*particle.GetEnergy()) +
-                 (1 - 2*particle.GetMass()*particle.GetMass()/Q2)
+    aux *=  aux*(1 - v_ - component->GetAverageNucleonWeight()*x*v_/(2*energy) +
+                 (1 - 2*particle_def_.mass*particle_def_.mass/Q2)
                  *v_*v_*(1 + 4*component->GetAverageNucleonWeight()*component->GetAverageNucleonWeight()*x*x/Q2)/R2);
 
     return (4*PI*F2/v_)*aux;
@@ -1871,13 +1862,13 @@ double Photonuclear::FunctionToIntegralALLM91(const PROPOSALParticle& particle, 
 //----------------------------------------------------------------------------//
 
 
-double Photonuclear::FunctionToIntegralALLM97(const PROPOSALParticle& particle, double Q2)
+double Photonuclear::FunctionToIntegralALLM97(double energy, double Q2)
 {
     Components::Component* component = medium_->GetComponents().at(component_);
 
     double x, aux, nu, G, F2, R2;
 
-    nu  =   v_*particle.GetEnergy();
+    nu  =   v_*energy;
     x   =   Q2/(2*component->GetAverageNucleonWeight()*nu);
 
     G = ShadowEffect(x , nu);
@@ -1888,7 +1879,7 @@ double Photonuclear::FunctionToIntegralALLM97(const PROPOSALParticle& particle, 
     P   =   1 - 1.85*x + 2.45*aux - 2.35*aux*x + aux*aux;
     G   *=  (component->GetNucCharge() + (component->GetAtomicNum() - component->GetNucCharge())*P);
     W2  =   component->GetAverageNucleonWeight()*component->GetAverageNucleonWeight()
-            - Q2 + 2*component->GetAverageNucleonWeight()*particle.GetEnergy()*v_;
+            - Q2 + 2*component->GetAverageNucleonWeight()*energy*v_;
 
     double cp1, cp2, cp3, cr1, cr2, cr3, ap1, ap2, ap3, ar1, ar2, ar3;
     double bp1, bp2, bp3, br1, br2, br3, m2o, m2r, L2, m2p, Q2o;
@@ -1961,8 +1952,8 @@ double Photonuclear::FunctionToIntegralALLM97(const PROPOSALParticle& particle, 
     R2  =   (2*(1 + R));
 
     aux =   ME*RE/Q2;
-    aux *=  aux*(1 - v_ - component->GetAverageNucleonWeight()*x*v_/(2*particle.GetEnergy()) +
-                 (1 - 2*particle.GetMass()*particle.GetMass()/Q2)
+    aux *=  aux*(1 - v_ - component->GetAverageNucleonWeight()*x*v_/(2*energy) +
+                 (1 - 2*particle_def_.mass*particle_def_.mass/Q2)
                  *v_*v_*(1 + 4*component->GetAverageNucleonWeight()*component->GetAverageNucleonWeight()*x*x/Q2)/R2);
 
     return (4*PI*F2/v_)*aux;
@@ -1974,13 +1965,13 @@ double Photonuclear::FunctionToIntegralALLM97(const PROPOSALParticle& particle, 
 
 
 
-double Photonuclear::FunctionToIntegralButMik(const PROPOSALParticle& particle, double Q2)
+double Photonuclear::FunctionToIntegralButMik(double energy, double Q2)
 {
     Components::Component* component = medium_->GetComponents().at(component_);
 
     double x, aux, nu, G, F2, R2;
 
-    nu  =   v_*particle.GetEnergy();
+    nu  =   v_*energy;
     x   =   Q2/(2*component->GetAverageNucleonWeight()*nu);
 
     G = ShadowEffect(x , nu);
@@ -2016,8 +2007,8 @@ double Photonuclear::FunctionToIntegralButMik(const PROPOSALParticle& particle, 
 
 
     aux =   ME*RE/Q2;
-    aux *=  aux*(1 - v_ - component->GetAverageNucleonWeight()*x*v_/(2*particle.GetEnergy()) +
-                 (1 - 2*particle.GetMass()*particle.GetMass()/Q2)
+    aux *=  aux*(1 - v_ - component->GetAverageNucleonWeight()*x*v_/(2*energy) +
+                 (1 - 2*particle_def_.mass*particle_def_.mass/Q2)
                  *v_*v_*(1 + 4*component->GetAverageNucleonWeight()*component->GetAverageNucleonWeight()*x*x/Q2)/R2);
 
     return (4*PI*F2/v_)*aux;
@@ -2028,13 +2019,13 @@ double Photonuclear::FunctionToIntegralButMik(const PROPOSALParticle& particle, 
 //----------------------------------------------------------------------------//
 
 
-double Photonuclear::FunctionToIntegralRSS(const PROPOSALParticle& particle, double Q2)
+double Photonuclear::FunctionToIntegralRSS(double energy, double Q2)
 {
     Components::Component* component = medium_->GetComponents().at(component_);
 
     double x, aux, nu;
 
-    nu  =   v_*particle.GetEnergy();
+    nu  =   v_*energy;
     x   =   Q2/(2*component->GetAverageNucleonWeight()*nu);
 
     // -------------[ Evaluate shadowfactor ]---------------- //
@@ -2138,7 +2129,7 @@ double Photonuclear::FunctionToIntegralRSS(const PROPOSALParticle& particle, dou
     double xp, xr, F2p, F2A, F2P, F2R, W2;
 
     W2  =   component->GetAverageNucleonWeight()*component->GetAverageNucleonWeight()
-            - Q2 + 2*component->GetAverageNucleonWeight()*particle.GetEnergy()*v_;
+            - Q2 + 2*component->GetAverageNucleonWeight()*energy*v_;
     xp  =   (Q2 + m2p)/(Q2 + m2p + W2 - component->GetAverageNucleonWeight()*component->GetAverageNucleonWeight());
     xr  =   (Q2 + m2r)/(Q2 + m2r + W2 - component->GetAverageNucleonWeight()*component->GetAverageNucleonWeight());
     F2P =   cp*pow(xp, ap)*pow(1 - x, bp);
@@ -2150,7 +2141,7 @@ double Photonuclear::FunctionToIntegralRSS(const PROPOSALParticle& particle, dou
 
     aux =   ME*RE/Q2;
     aux *=  aux*(1 - v_ + 0.25*v_*v_ -
-                (1 + 4*particle.GetMass()*particle.GetMass()/Q2)*0.25*v_*v_ *
+                (1 + 4*particle_def_.mass*particle_def_.mass/Q2)*0.25*v_*v_ *
                 (1 + 4*component->GetAverageNucleonWeight()*component->GetAverageNucleonWeight()*x*x/Q2) /
                 (1 + R));
                  // *v_*v_*(1 + 4*component->GetAverageNucleonWeight()*component->GetAverageNucleonWeight()*x*x/Q2)/R2);

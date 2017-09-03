@@ -30,7 +30,7 @@ SectorFactory::Definition::~Definition()
 {
 }
 
-Sector* SectorFactory::CreateSector(const Definition& def)
+Sector* SectorFactory::CreateSector(PROPOSALParticle& particle, const Definition& def)
 {
     Medium* med = MediumFactory::Get().CreateMedium(def.medium, def.density_correction);
     Geometry* geometry = GeometryFactory::Get().CreateGeometry(def.geometry);
@@ -65,11 +65,11 @@ Sector* SectorFactory::CreateSector(const Definition& def)
 
     if (def.do_interpolation)
     {
-        sec = new SectorInterpolant(*med, *geometry, cuts, def);
+        sec = new SectorInterpolant(particle, *med, *geometry, cuts, def);
     }
     else
     {
-        sec = new SectorIntegral(*med, *geometry, cuts, def);
+        sec = new SectorIntegral(particle, *med, *geometry, cuts, def);
     }
 
     delete med;
