@@ -64,7 +64,7 @@ public:
      * \param   energy      energy of the particle
      * \return  cut
      */
-    double GetCut(double energy);
+    double GetCut(double energy) const;
 
 //----------------------------------------------------------------------------//
 
