@@ -81,7 +81,7 @@ Scattering::RandomAngles ScatteringMoliere::CalculateRandomAngle(const PROPOSALP
     }
     // Calculate Chi_c^2
     chiCSq_ = ( (4.*PI*NA*ALPHA*ALPHA*HBAR*HBAR*SPEED*SPEED)
-                * (medium->GetMassDensity()*medium->GetRho()*dr)
+                * (medium->GetMassDensity()*medium->GetDensityCorrection()*dr)
                 / (momentum*momentum*beta_Sq) )
             * ( ZSq_average/A_average );
 
