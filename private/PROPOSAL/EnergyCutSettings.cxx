@@ -11,7 +11,7 @@ using namespace PROPOSAL;
 //----------------------------------------------------------------------------//
 
 
-double EnergyCutSettings::GetCut(double energy)
+double EnergyCutSettings::GetCut(double energy) const
 {
 
     double aux;
