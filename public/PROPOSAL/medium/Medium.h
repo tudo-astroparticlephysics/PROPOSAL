@@ -64,7 +64,7 @@ class Medium
 
     // Getter
     int GetNumComponents() const { return numComponents_; }
-    std::vector<Components::Component*>& GetComponents() { return components_; }
+    const std::vector<Components::Component*>& GetComponents() const { return components_; }
     double GetSumCharge() const { return sumCharge_; }
     double GetZA() const { return ZA_; }
     double GetI() const { return I_; }
