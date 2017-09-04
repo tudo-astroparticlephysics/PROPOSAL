@@ -38,8 +38,6 @@ class Component
     double GetLogConstant() const { return logConstant_; }
     double GetBPrime() const { return bPrime_; }
     double GetAverageNucleonWeight() const { return M_; }
-    double GetMN() const { return mN_; }
-    double GetR0() const { return r0_; }
 
     protected:
     /*!
@@ -64,7 +62,7 @@ class Component
      * \param   r
      * \return  value of the Woods-Saxon potential
      */
-    double FunctionToIntegral(double r);
+    // double FunctionToIntegral(double r);
 
     // Passed to constructor
     std::string name_;
@@ -76,8 +74,6 @@ class Component
     double logConstant_; ///< radiation logarithm constant B
     double bPrime_;      ///< radiation logarithm constant bPrime
     double M_;           ///< average nucleon weight in a nucleus [MeV]
-    double mN_;          ///< Woods-Saxon potential factor
-    double r0_;          // //TODO(mario): Must really be stored? Thu 2017/08/03
 };
 
 class Hydrogen : public Component

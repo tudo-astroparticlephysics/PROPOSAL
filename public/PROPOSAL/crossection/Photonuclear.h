@@ -51,6 +51,8 @@ protected:
 
     std::vector<double> prob_for_component_; //!< probability for each medium component to interact with the particle (formerly H_)
 
+    std::vector<double> woodSaxonPotential_; //!< Woods-Saxon potential factor
+
 
 //----------------------------------------------------------------------------//
 
@@ -236,6 +238,14 @@ protected:
 
 //----------------------------------------------------------------------------//
 
+    void CalculateWoodSaxonPotential();
+
+//----------------------------------------------------------------------------//
+
+    double FunctionToWoodSaxonPotentialIntegral(const double r0, double r);
+
+//----------------------------------------------------------------------------//
+
 public:
 
 //----------------------------------------------------------------------------//
@@ -357,6 +367,10 @@ public:
 	std::vector<double> GetProbForComponent() const {
 		return prob_for_component_;
 	}
+
+    std::vector<double> GetWoodSaxonPotential() const {
+        return woodSaxonPotential_;
+    }
 
 //----------------------------------------------------------------------------//
     //Setter
