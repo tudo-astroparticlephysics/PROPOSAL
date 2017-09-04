@@ -56,181 +56,223 @@ const double Propagator::global_cont_behind_ = false;
 Propagator::Propagator()
     : seed_(1)
     , current_collection_(NULL)
+    // , particle_(MuMinusDef::Get())
+    , particle_(*new PROPOSALParticle(MuMinusDef::Get()))
     , detector_(new Sphere(Vector3D(), 1e18, 0))
 {
-    SectorDef sector_def;
-    sector_def.location = 1; // Inside the detector
+    Sector::Definition sector_def;
+    sector_def.location = Sector::ParticleLocation::InsideDetector;
 
     current_collection_ = new SectorInterpolant(
-        Ice(), *detector_, EnergyCutSettings(global_ecut_inside_, global_vcut_inside_), sector_def);
+        particle_, Ice(), *detector_, EnergyCutSettings(global_ecut_inside_, global_vcut_inside_), sector_def);
 
     collections_.push_back(current_collection_);
 }
 
-Propagator::Propagator(std::vector<Sector*>& sectors, const Geometry& geometry)
-    : seed_(1)
+Propagator::Propagator(const std::vector<Sector*>& sectors, const Geometry& geometry)
+    try : seed_(1)
     , current_collection_(NULL)
+    , particle_(sectors.at(0)->GetParticle())
     , detector_(geometry.clone())
 {
+    // --------------------------------------------------------------------- //
+    // Check if all ParticleDefs are the same
+    // --------------------------------------------------------------------- //
+
     for (std::vector<Sector*>::const_iterator iter = sectors.begin(); iter != sectors.end(); ++iter)
     {
-        collections_.push_back((*iter)->clone());
+        if ((*iter)->GetParticle().GetParticleDef() != particle_.GetParticleDef())
+        {
+            log_fatal("The particle definitions of the sectors must be identical for proper propagation!");
+        }
+        else
+        {
+            collections_.push_back((*iter)->clone());
+        }
     }
-    // TODO(mario): exeption if size = 0 Sat 2017/08/26
+
     current_collection_ = collections_.at(0);
 }
+catch (const std::out_of_range& ex)
+{
+    log_fatal("No Sectors are provided for the Propagator!");
+}
 
-Propagator::Propagator(const std::string& config_file)
+Propagator::Propagator(const ParticleDef& particle_def, const std::vector<SectorFactory::Definition>& sectors, const Geometry& geometry)
     : seed_(1)
     , current_collection_(NULL)
+    // , particle_(particle_def)
+    , particle_(*new PROPOSALParticle(particle_def))
+    , detector_(geometry.clone())
+{
+    for (std::vector<SectorFactory::Definition>::const_iterator iter = sectors.begin(); iter != sectors.end(); ++iter)
+    {
+        collections_.push_back(SectorFactory::Get().CreateSector(particle_, *iter));
+    }
+
+    try
+    {
+        current_collection_ = collections_.at(0);
+    }
+    catch (const std::out_of_range& ex)
+    {
+        log_fatal("No Sectors Definitions are provided for the Propagator!");
+    }
+}
+
+Propagator::Propagator(const ParticleDef& particle_def, const std::string& config_file)
+    : seed_(1)
+    , current_collection_(NULL)
+    // , particle_(particle_def)
+    , particle_(*new PROPOSALParticle(particle_def))
     , detector_(NULL)
 {
-    double global_ecut_inside  = global_ecut_inside_;
-    double global_ecut_infront = global_ecut_infront_;
-    double global_ecut_behind  = global_ecut_behind_;
-
-    double global_vcut_inside  = global_vcut_inside_;
-    double global_vcut_infront = global_vcut_infront_;
-    double global_vcut_behind  = global_vcut_behind_;
-
-    bool global_cont_inside  = global_cont_inside_;
-    bool global_cont_infront = global_cont_infront_;
-    bool global_cont_behind  = global_cont_behind_;
-
-    //TODO(mario): will be changend when x sectoin are polymorphic Tue 2017/08/29
-    int brems = 11;
-    int photo = -36;
-
-    bool interpolate = true;
-
-    std::string scattering = "moliere";
-
-    // Create the json parser
-    boost::property_tree::ptree pt_json;
-    boost::property_tree::json_parser::read_json(config_file, pt_json);
-
-    // Read in global options
-    SetMember(seed_, "global.seed", pt_json);
-    SetMember(global_ecut_inside, "global.ecut_inside", pt_json);
-    SetMember(global_ecut_infront, "global.ecut_infront", pt_json);
-    SetMember(global_ecut_behind, "global.ecut_behind", pt_json);
-    SetMember(global_vcut_inside, "global.vcut_inside", pt_json);
-    SetMember(global_vcut_infront, "global.vcut_infront", pt_json);
-    SetMember(global_vcut_behind, "global.vcut_behind", pt_json);
-    SetMember(global_cont_inside, "global.cont_inside", pt_json);
-    SetMember(global_cont_infront, "global.cont_infront", pt_json);
-    SetMember(global_cont_behind, "global.cont_behind", pt_json);
-
-    SetMember(brems, "global.brems", pt_json);
-    SetMember(photo, "global.photo", pt_json);
-
-    SetMember(interpolate, "global.interpolate", pt_json);
-
-    // Read in the detector geometry
-    detector_ = GeometryFactory::Get().CreateGeometry(pt_json.get_child("detector"));
-
-    // Read in global sector definition
-    SectorDef sec_def_global;
-
-    SetMember(sec_def_global.brems_multiplier, "global.brems_multiplier", pt_json);
-    SetMember(sec_def_global.photo_multiplier, "global.photo_multiplier", pt_json);
-    SetMember(sec_def_global.ioniz_multiplier, "global.ioniz_multiplier", pt_json);
-    SetMember(sec_def_global.epair_multiplier, "global.epair_multiplier", pt_json);
-    SetMember(sec_def_global.lpm_effect_enabled, "global.lpm", pt_json);
-    SetMember(sec_def_global.do_exact_time_calculation, "global.exact_time", pt_json);
-    SetMember(sec_def_global.do_scattering, "global.do_scattering", pt_json);
-    SetMember(sec_def_global.path_to_tables, "global.path_to_tables", pt_json);
-    SetMember(sec_def_global.raw, "global.raw", pt_json);
-
-    sec_def_global.scattering_model =
-        ScatteringFactory::Get().GetEnumFromString(pt_json.get<std::string>("global.scattering"));
-
-    // Read in all sector definitions
-    boost::property_tree::ptree sectors = pt_json.get_child("sectors");
-
-    for (boost::property_tree::ptree::const_iterator it = sectors.begin(); it != sectors.end(); ++it)
-    {
-        Medium* med        = MediumFactory::Get().CreateMedium(it->second.get<std::string>("medium"));
-        Geometry* geometry = GeometryFactory::Get().CreateGeometry(it->second.get_child("geometry"));
-        geometry->SetHirarchy(it->second.get<unsigned int>("hirarchy"));
-
-        // Use global options in case they will be not overriden
-        SectorDef sec_def_infront = sec_def_global;
-        sec_def_infront.location = 0;
-
-        SectorDef sec_def_inside  = sec_def_global;
-        sec_def_inside.location = 1;
-
-        SectorDef sec_def_behind  = sec_def_global;
-        sec_def_behind.location = 2;
-
-        double density_correction = it->second.get<double>("density_correction");
-
-        sec_def_infront.density_correction = density_correction;
-        sec_def_inside.density_correction  = density_correction;
-        sec_def_behind.density_correction  = density_correction;
-
-        EnergyCutSettings cuts_infront;
-        EnergyCutSettings cuts_inside;
-        EnergyCutSettings cuts_behind;
-
-        boost::optional<const boost::property_tree::ptree&> child_cuts_infront =
-            it->second.get_child_optional("cuts_infront");
-        if (child_cuts_infront)
-        {
-            cuts_infront.SetEcut(child_cuts_infront.get().get<double>("e_cut"));
-            cuts_infront.SetVcut(child_cuts_infront.get().get<double>("v_cut"));
-            sec_def_infront.do_continuous_randomization_ = child_cuts_infront.get().get<bool>("cont_rand");
-
-        } else
-        {
-            cuts_infront.SetEcut(global_ecut_infront);
-            cuts_infront.SetVcut(global_vcut_infront);
-            sec_def_infront.do_continuous_randomization_ = global_cont_infront;
-        }
-
-        boost::optional<const boost::property_tree::ptree&> child_cuts_inside =
-            it->second.get_child_optional("cuts_inside");
-        if (child_cuts_inside)
-        {
-            cuts_inside.SetEcut(child_cuts_inside.get().get<double>("e_cut"));
-            cuts_inside.SetVcut(child_cuts_inside.get().get<double>("v_cut"));
-            sec_def_inside.do_continuous_randomization_ = child_cuts_inside.get().get<bool>("cont_rand");
-
-        } else
-        {
-            cuts_inside.SetEcut(global_ecut_inside);
-            cuts_inside.SetVcut(global_vcut_inside);
-            sec_def_inside.do_continuous_randomization_ = global_cont_inside;
-        }
-
-        boost::optional<const boost::property_tree::ptree&> child_cuts_behind =
-            it->second.get_child_optional("cuts_behind");
-        if (child_cuts_behind)
-        {
-            cuts_behind.SetEcut(child_cuts_behind.get().get<double>("e_cut"));
-            cuts_behind.SetVcut(child_cuts_behind.get().get<double>("v_cut"));
-            sec_def_behind.do_continuous_randomization_ = child_cuts_behind.get().get<bool>("cont_rand");
-
-        } else
-        {
-            cuts_behind.SetEcut(global_ecut_behind);
-            cuts_behind.SetVcut(global_vcut_behind);
-            sec_def_behind.do_continuous_randomization_ = global_cont_behind;
-        }
-
-        if (interpolate)
-        {
-            collections_.push_back(new SectorInterpolant(*med, *geometry, cuts_infront, sec_def_infront));
-            collections_.push_back(new SectorInterpolant(*med, *geometry, cuts_inside, sec_def_inside));
-            collections_.push_back(new SectorInterpolant(*med, *geometry, cuts_behind, sec_def_behind));
-        } else
-        {
-            collections_.push_back(new SectorIntegral(*med, *geometry, cuts_infront, sec_def_infront));
-            collections_.push_back(new SectorIntegral(*med, *geometry, cuts_inside, sec_def_inside));
-            collections_.push_back(new SectorIntegral(*med, *geometry, cuts_behind, sec_def_behind));
-        }
-    }
+    // double global_ecut_inside  = global_ecut_inside_;
+    // double global_ecut_infront = global_ecut_infront_;
+    // double global_ecut_behind  = global_ecut_behind_;
+    //
+    // double global_vcut_inside  = global_vcut_inside_;
+    // double global_vcut_infront = global_vcut_infront_;
+    // double global_vcut_behind  = global_vcut_behind_;
+    //
+    // bool global_cont_inside  = global_cont_inside_;
+    // bool global_cont_infront = global_cont_infront_;
+    // bool global_cont_behind  = global_cont_behind_;
+    //
+    // //TODO(mario): will be changend when x sectoin are polymorphic Tue 2017/08/29
+    // int brems = 11;
+    // int photo = -36;
+    //
+    // bool interpolate = true;
+    //
+    // std::string scattering = "moliere";
+    //
+    // // Create the json parser
+    // boost::property_tree::ptree pt_json;
+    // boost::property_tree::json_parser::read_json(config_file, pt_json);
+    //
+    // // Read in global options
+    // SetMember(seed_, "global.seed", pt_json);
+    // SetMember(global_ecut_inside, "global.ecut_inside", pt_json);
+    // SetMember(global_ecut_infront, "global.ecut_infront", pt_json);
+    // SetMember(global_ecut_behind, "global.ecut_behind", pt_json);
+    // SetMember(global_vcut_inside, "global.vcut_inside", pt_json);
+    // SetMember(global_vcut_infront, "global.vcut_infront", pt_json);
+    // SetMember(global_vcut_behind, "global.vcut_behind", pt_json);
+    // SetMember(global_cont_inside, "global.cont_inside", pt_json);
+    // SetMember(global_cont_infront, "global.cont_infront", pt_json);
+    // SetMember(global_cont_behind, "global.cont_behind", pt_json);
+    //
+    // SetMember(brems, "global.brems", pt_json);
+    // SetMember(photo, "global.photo", pt_json);
+    //
+    // SetMember(interpolate, "global.interpolate", pt_json);
+    //
+    // // Read in the detector geometry
+    // detector_ = GeometryFactory::Get().CreateGeometry(pt_json.get_child("detector"));
+    //
+    // // Read in global sector definition
+    // SectorDef sec_def_global;
+    //
+    // SetMember(sec_def_global.brems_multiplier, "global.brems_multiplier", pt_json);
+    // SetMember(sec_def_global.photo_multiplier, "global.photo_multiplier", pt_json);
+    // SetMember(sec_def_global.ioniz_multiplier, "global.ioniz_multiplier", pt_json);
+    // SetMember(sec_def_global.epair_multiplier, "global.epair_multiplier", pt_json);
+    // SetMember(sec_def_global.lpm_effect_enabled, "global.lpm", pt_json);
+    // SetMember(sec_def_global.do_exact_time_calculation, "global.exact_time", pt_json);
+    // SetMember(sec_def_global.do_scattering, "global.do_scattering", pt_json);
+    // SetMember(sec_def_global.path_to_tables, "global.path_to_tables", pt_json);
+    // SetMember(sec_def_global.raw, "global.raw", pt_json);
+    //
+    // sec_def_global.scattering_model =
+    //     ScatteringFactory::Get().GetEnumFromString(pt_json.get<std::string>("global.scattering"));
+    //
+    // // Read in all sector definitions
+    // boost::property_tree::ptree sectors = pt_json.get_child("sectors");
+    //
+    // for (boost::property_tree::ptree::const_iterator it = sectors.begin(); it != sectors.end(); ++it)
+    // {
+    //     Medium* med        = MediumFactory::Get().CreateMedium(it->second.get<std::string>("medium"));
+    //     Geometry* geometry = GeometryFactory::Get().CreateGeometry(it->second.get_child("geometry"));
+    //     geometry->SetHirarchy(it->second.get<unsigned int>("hirarchy"));
+    //
+    //     // Use global options in case they will be not overriden
+    //     SectorDef sec_def_infront = sec_def_global;
+    //     sec_def_infront.location = 0;
+    //
+    //     SectorDef sec_def_inside  = sec_def_global;
+    //     sec_def_inside.location = 1;
+    //
+    //     SectorDef sec_def_behind  = sec_def_global;
+    //     sec_def_behind.location = 2;
+    //
+    //     double density_correction = it->second.get<double>("density_correction");
+    //
+    //     sec_def_infront.density_correction = density_correction;
+    //     sec_def_inside.density_correction  = density_correction;
+    //     sec_def_behind.density_correction  = density_correction;
+    //
+    //     EnergyCutSettings cuts_infront;
+    //     EnergyCutSettings cuts_inside;
+    //     EnergyCutSettings cuts_behind;
+    //
+    //     boost::optional<const boost::property_tree::ptree&> child_cuts_infront =
+    //         it->second.get_child_optional("cuts_infront");
+    //     if (child_cuts_infront)
+    //     {
+    //         cuts_infront.SetEcut(child_cuts_infront.get().get<double>("e_cut"));
+    //         cuts_infront.SetVcut(child_cuts_infront.get().get<double>("v_cut"));
+    //         sec_def_infront.do_continuous_randomization_ = child_cuts_infront.get().get<bool>("cont_rand");
+    //
+    //     } else
+    //     {
+    //         cuts_infront.SetEcut(global_ecut_infront);
+    //         cuts_infront.SetVcut(global_vcut_infront);
+    //         sec_def_infront.do_continuous_randomization_ = global_cont_infront;
+    //     }
+    //
+    //     boost::optional<const boost::property_tree::ptree&> child_cuts_inside =
+    //         it->second.get_child_optional("cuts_inside");
+    //     if (child_cuts_inside)
+    //     {
+    //         cuts_inside.SetEcut(child_cuts_inside.get().get<double>("e_cut"));
+    //         cuts_inside.SetVcut(child_cuts_inside.get().get<double>("v_cut"));
+    //         sec_def_inside.do_continuous_randomization_ = child_cuts_inside.get().get<bool>("cont_rand");
+    //
+    //     } else
+    //     {
+    //         cuts_inside.SetEcut(global_ecut_inside);
+    //         cuts_inside.SetVcut(global_vcut_inside);
+    //         sec_def_inside.do_continuous_randomization_ = global_cont_inside;
+    //     }
+    //
+    //     boost::optional<const boost::property_tree::ptree&> child_cuts_behind =
+    //         it->second.get_child_optional("cuts_behind");
+    //     if (child_cuts_behind)
+    //     {
+    //         cuts_behind.SetEcut(child_cuts_behind.get().get<double>("e_cut"));
+    //         cuts_behind.SetVcut(child_cuts_behind.get().get<double>("v_cut"));
+    //         sec_def_behind.do_continuous_randomization_ = child_cuts_behind.get().get<bool>("cont_rand");
+    //
+    //     } else
+    //     {
+    //         cuts_behind.SetEcut(global_ecut_behind);
+    //         cuts_behind.SetVcut(global_vcut_behind);
+    //         sec_def_behind.do_continuous_randomization_ = global_cont_behind;
+    //     }
+    //
+    //     if (interpolate)
+    //     {
+    //         collections_.push_back(new SectorInterpolant(*med, *geometry, cuts_infront, sec_def_infront));
+    //         collections_.push_back(new SectorInterpolant(*med, *geometry, cuts_inside, sec_def_inside));
+    //         collections_.push_back(new SectorInterpolant(*med, *geometry, cuts_behind, sec_def_behind));
+    //     } else
+    //     {
+    //         collections_.push_back(new SectorIntegral(*med, *geometry, cuts_infront, sec_def_infront));
+    //         collections_.push_back(new SectorIntegral(*med, *geometry, cuts_inside, sec_def_inside));
+    //         collections_.push_back(new SectorIntegral(*med, *geometry, cuts_behind, sec_def_behind));
+    //     }
+    // }
 }
 
 // ------------------------------------------------------------------------- //
@@ -238,17 +280,17 @@ Propagator::Propagator(const std::string& config_file)
 // ------------------------------------------------------------------------- //
 
 // ------------------------------------------------------------------------- //
-std::vector<PROPOSALParticle*> Propagator::Propagate(PROPOSALParticle& particle, double MaxDistance_cm)
+std::vector<PROPOSALParticle*> Propagator::Propagate(double MaxDistance_cm)
 {
     Output::getInstance().ClearSecondaryVector();
 
     Output::getInstance().GetSecondarys().reserve(1000);
 
     #if ROOT_SUPPORT
-        Output::getInstance().StorePrimaryInTree(particle_);
+        Output::getInstance().StorePrimaryInTree(particle__);
     #endif
 
-    if(Output::store_in_ASCII_file_)Output::getInstance().StorePrimaryInASCII(&particle);
+    if(Output::store_in_ASCII_file_)Output::getInstance().StorePrimaryInASCII(&particle_);
 
     double distance_to_collection_border    =   0;
     double distance_to_detector             =   0;
@@ -258,45 +300,45 @@ std::vector<PROPOSALParticle*> Propagator::Propagate(PROPOSALParticle& particle,
 
     // These two variables are needed to calculate the energy loss inside the detector
     // energy_at_entry_point is initialized with the current energy because this is a
-    // reasonable value for particle which starts inside the detector
+    // reasonable value for particle_ which starts inside the detector
 
-    double energy_at_entry_point = particle.GetEnergy();
+    double energy_at_entry_point = particle_.GetEnergy();
     double energy_at_exit_point  = 0;
 
-    Vector3D particleposition = particle.GetPosition();
-    Vector3D particledirection = particle.GetDirection();
+    Vector3D particle_position = particle_.GetPosition();
+    Vector3D particle_direction = particle_.GetDirection();
 
-    bool starts_in_detector =   detector_->IsInside(particleposition, particledirection);
+    bool starts_in_detector =   detector_->IsInside(particle_position, particle_direction);
     bool is_in_detector     =   false;
     bool was_in_detector    =   false;
 
     while(1)
     {
-        particleposition = particle.GetPosition();
-        particledirection = particle.GetDirection();
+        particle_position = particle_.GetPosition();
+        particle_direction = particle_.GetDirection();
 
-        ChooseCurrentCollection(particleposition, particledirection);
+        ChooseCurrentCollection(particle_position, particle_direction);
 
         if(current_collection_ == NULL)
         {
-            log_info("particle reached the border");
+            log_info("particle_ reached the border");
             break;
         }
 
-        // Check if have have to propagate the particle through the whole collection
+        // Check if have have to propagate the particle_ through the whole collection
         // or only to the collection border
 
         distance_to_collection_border =
-        current_collection_->GetGeometry()->DistanceToBorder(particleposition, particledirection).first;
+        current_collection_->GetGeometry()->DistanceToBorder(particle_position, particle_direction).first;
         double tmp_distance_to_border;
         for(unsigned int i = 0 ; i < collections_.size() ; i++)
         {
 
             //TODO(mario): Is that ok to delete? Tue 2017/08/08
-            // if (particle.GetType() != collections_.at(i)->GetParticle()->GetType())
+            // if (particle_.GetType() != collections_.at(i)->Getparticle_()->GetType())
             //     continue;
 
-            if(detector_->IsInfront(particleposition, particledirection))
+            if(detector_->IsInfront(particle_position, particle_direction))
             {
                 if(collections_.at(i)->GetLocation() != 0)
                     continue;
@@ -304,7 +346,7 @@ std::vector<PROPOSALParticle*> Propagator::Propagate(PROPOSALParticle& particle,
                 {
                     if(collections_.at(i)->GetGeometry()->GetHirarchy() >= current_collection_->GetGeometry()->GetHirarchy())
                     {
-                        tmp_distance_to_border = collections_.at(i)->GetGeometry()->DistanceToBorder(particleposition, particledirection).first;
+                        tmp_distance_to_border = collections_.at(i)->GetGeometry()->DistanceToBorder(particle_position, particle_direction).first;
                         if(tmp_distance_to_border<=0)continue;
                         distance_to_collection_border = min(
                                       tmp_distance_to_border
@@ -313,13 +355,13 @@ std::vector<PROPOSALParticle*> Propagator::Propagate(PROPOSALParticle& particle,
                 }
             }
 
-            else if(detector_->IsInside(particleposition, particledirection))
+            else if(detector_->IsInside(particle_position, particle_direction))
             {
                 if(collections_.at(i)->GetLocation() != 1)
                     continue;
                 else
                 {
-                    tmp_distance_to_border = collections_.at(i)->GetGeometry()->DistanceToBorder(particleposition, particledirection).first;
+                    tmp_distance_to_border = collections_.at(i)->GetGeometry()->DistanceToBorder(particle_position, particle_direction).first;
                     if(tmp_distance_to_border<=0)continue;
                     distance_to_collection_border = min(
                                   tmp_distance_to_border
@@ -328,7 +370,7 @@ std::vector<PROPOSALParticle*> Propagator::Propagate(PROPOSALParticle& particle,
 
             }
 
-            else if(detector_->IsBehind(particleposition, particledirection))
+            else if(detector_->IsBehind(particle_position, particle_direction))
             {
                 if(collections_.at(i)->GetLocation() != 2)
                     continue;
@@ -336,13 +378,13 @@ std::vector<PROPOSALParticle*> Propagator::Propagate(PROPOSALParticle& particle,
                 {
                     if(collections_.at(i)->GetGeometry()->GetHirarchy() >= current_collection_->GetGeometry()->GetHirarchy())
                     {
-                        tmp_distance_to_border = collections_.at(i)->GetGeometry()->DistanceToBorder(particleposition, particledirection).first;
+                        tmp_distance_to_border = collections_.at(i)->GetGeometry()->DistanceToBorder(particle_position, particle_direction).first;
                         if(tmp_distance_to_border<=0)continue;
                         distance_to_collection_border = min(
                                       tmp_distance_to_border
                                     , distance_to_collection_border);
                     }
-                    //The particle reached the border of all specified collections
+                    //The particle_ reached the border of all specified collections
                     else
                     {
 
@@ -351,15 +393,15 @@ std::vector<PROPOSALParticle*> Propagator::Propagate(PROPOSALParticle& particle,
             }
         }
 
-        distance_to_detector = detector_->DistanceToBorder(particleposition, particledirection).first;
+        distance_to_detector = detector_->DistanceToBorder(particle_position, particle_direction).first;
 
-        distance_to_closest_approach = detector_->DistanceToClosestApproach(particleposition, particledirection);
+        distance_to_closest_approach = detector_->DistanceToClosestApproach(particle_position, particle_direction);
 
         if(abs(distance_to_closest_approach) < GEOMETRY_PRECISION )
         {
-            particle.SetClosestApproachPoint(particleposition);
-            particle.SetEc( particle.GetEnergy() );
-            particle.SetTc( particle.GetT() );
+            particle_.SetClosestApproachPoint(particle_position);
+            particle_.SetEc( particle_.GetEnergy() );
+            particle_.SetTc( particle_.GetT() );
 
             distance_to_closest_approach    =   0;
 
@@ -416,58 +458,58 @@ std::vector<PROPOSALParticle*> Propagator::Propagate(PROPOSALParticle& particle,
         }
 
 
-        is_in_detector  =   detector_->IsInside(particleposition, particledirection);
+        is_in_detector  =   detector_->IsInside(particle_position, particle_direction);
         // entry point of the detector
         if(!starts_in_detector && !was_in_detector && is_in_detector)
         {
-            particle.SetEntryPoint(particleposition);
-            particle.SetEi( particle.GetEnergy() );
-            particle.SetTi( particle.GetT() );
+            particle_.SetEntryPoint(particle_position);
+            particle_.SetEi( particle_.GetEnergy() );
+            particle_.SetTi( particle_.GetT() );
 
-            energy_at_entry_point = particle.GetEnergy();
+            energy_at_entry_point = particle_.GetEnergy();
 
             was_in_detector = true;
         }
         // exit point of the detector
         else if(was_in_detector && !is_in_detector)
         {
-            particle.SetExitPoint(particleposition);
-            particle.SetEf( particle.GetEnergy() );
-            particle.SetTf( particle.GetT() );
+            particle_.SetExitPoint(particle_position);
+            particle_.SetEf( particle_.GetEnergy() );
+            particle_.SetTf( particle_.GetT() );
 
-            energy_at_exit_point = particle.GetEnergy();
+            energy_at_exit_point = particle_.GetEnergy();
             //we don't want to run in this case a second time so we set was_in_detector to false
             was_in_detector = false;
 
         }
-        // if particle starts inside the detector we only ant to fill the exit point
+        // if particle_ starts inside the detector we only ant to fill the exit point
         else if(starts_in_detector && !is_in_detector)
         {
-            particle.SetExitPoint(particleposition);
-            particle.SetEf( particle.GetEnergy() );
-            particle.SetTf( particle.GetT() );
+            particle_.SetExitPoint(particle_position);
+            particle_.SetEf( particle_.GetEnergy() );
+            particle_.SetTf( particle_.GetT() );
 
-            energy_at_exit_point    =   particle.GetEnergy();
+            energy_at_exit_point    =   particle_.GetEnergy();
             //we don't want to run in this case a second time so we set starts_in_detector to false
             starts_in_detector  =   false;
 
         }
-        if(MaxDistance_cm <= particle.GetPropagatedDistance() + distance)
+        if(MaxDistance_cm <= particle_.GetPropagatedDistance() + distance)
         {
-            distance = MaxDistance_cm - particle.GetPropagatedDistance();
+            distance = MaxDistance_cm - particle_.GetPropagatedDistance();
         }
 
-        result  =   current_collection_->Propagate(particle, distance);
+        result  =   current_collection_->Propagate(distance);
 
-        if(result<=0 || MaxDistance_cm <= particle.GetPropagatedDistance()) break;
+        if(result<=0 || MaxDistance_cm <= particle_.GetPropagatedDistance()) break;
     }
 
-    particle.SetElost(energy_at_entry_point - energy_at_exit_point);
+    particle_.SetElost(energy_at_entry_point - energy_at_exit_point);
 
     #if ROOT_SUPPORT
-        Output::getInstance().StorePropagatedPrimaryInTree(particle);
+        Output::getInstance().StorePropagatedPrimaryInTree(particle_);
     #endif
-        if(Output::store_in_ASCII_file_)Output::getInstance().StorePropagatedPrimaryInASCII(&particle);
+        if(Output::store_in_ASCII_file_)Output::getInstance().StorePropagatedPrimaryInASCII(&particle_);
 
     //TODO(mario): undo backup Mo 2017/04/03
     // RestoreBackup_particle();
@@ -1535,6 +1577,7 @@ void Propagator::DisableInterpolation()
 
 Propagator::Propagator(const Propagator &propagator)
     :seed_                      ( propagator.seed_ )
+    ,particle_                      ( propagator.particle_ )
     // ,brems_                     ( propagator.brems_ )
     // ,photo_                     ( propagator.photo_ )
     // ,lpm_                       ( propagator.lpm_ )
@@ -2306,6 +2349,11 @@ void Propagator::SetSeed(int seed)
 Geometry *Propagator::GetDetector() const
 {
     return detector_;
+}
+
+PROPOSALParticle& Propagator::GetParticle()
+{
+    return particle_;
 }
 
 // void Propagator::SetDetector(Geometry *detector)

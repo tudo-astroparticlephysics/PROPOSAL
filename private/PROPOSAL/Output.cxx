@@ -11,7 +11,7 @@ bool Output::store_in_ASCII_file_ =   false;
 void Output::SetLoggingConfigurationFile(std::string file)
 {
     #if LOG4CPLUS_SUPPORT
-    PropertyConfigurator::doConfigure(LOG4CPLUS_TEXT(file));
+    log4cplus::PropertyConfigurator::doConfigure(LOG4CPLUS_TEXT(file));
     #else
     cout << "Log4cplus not found! No log messages will be shown!" << endl;
     #endif

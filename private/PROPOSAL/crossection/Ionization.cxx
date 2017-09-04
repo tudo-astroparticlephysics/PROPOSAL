@@ -19,7 +19,7 @@ using namespace PROPOSAL;
 //----------------------------------------------------------------------------//
 
 
-double Ionization::CalculatedEdx(const PROPOSALParticle& particle)
+double Ionization::CalculatedEdx(double energy)
 {
     if(multiplier_<=0)
     {
@@ -28,18 +28,21 @@ double Ionization::CalculatedEdx(const PROPOSALParticle& particle)
 
     if(do_dedx_Interpolation_)
     {
-        return max(dedx_interpolant_->Interpolate(particle.GetEnergy()), 0.);
+        return max(dedx_interpolant_->Interpolate(energy), 0.);
     }
 
     double result, aux;
 
-    CrossSections::IntegralLimits limits = SetIntegralLimits(particle, 0);;
+    CrossSections::IntegralLimits limits = SetIntegralLimits(energy, 0);;
 
-    double beta    =   particle.GetMomentum()/particle.GetEnergy();
-    double gamma   =   particle.GetEnergy()/particle.GetMass();
+    //TODO(mario): Better way? Sat 2017/09/02
+    double square_momentum = energy * energy - particle_def_.mass * particle_def_.mass;
+    double particle_momentum = sqrt(max(square_momentum, 0.0));
+    double beta    =   particle_momentum/energy;
+    double gamma   =   energy/particle_def_.mass;
 
     aux     =   beta*gamma/(1.e-6*medium_->GetI());
-    result  =   log(limits.vUp*(2*ME*particle.GetEnergy()))+2*log(aux);
+    result  =   log(limits.vUp*(2*ME*energy))+2*log(aux);
     aux     =   limits.vUp/(2*(1 + 1/gamma));
     result  +=  aux*aux;
     aux     =   beta*beta;
@@ -47,14 +50,14 @@ double Ionization::CalculatedEdx(const PROPOSALParticle& particle)
 
     if(result>0)
     {
-        result*=IONK*particle.GetCharge()*particle.GetCharge()*medium_->GetZA()/(2*aux);
+        result*=IONK*particle_def_.charge*particle_def_.charge*medium_->GetZA()/(2*aux);
     }
     else
     {
         result=0;
     }
     return multiplier_*(medium_->GetMassDensity()*result
-                        + particle.GetEnergy()*(integral_->Integrate(limits.vMin, limits.vUp, boost::bind(&Ionization::FunctionToDEdxIntegral, this, boost::cref(particle), _1),4)));
+                        + energy*(integral_->Integrate(limits.vMin, limits.vUp, boost::bind(&Ionization::FunctionToDEdxIntegral, this, energy, _1),4)));
 }
 
 
@@ -62,7 +65,7 @@ double Ionization::CalculatedEdx(const PROPOSALParticle& particle)
 //----------------------------------------------------------------------------//
 
 
-double Ionization::CalculatedNdx(const PROPOSALParticle& particle)
+double Ionization::CalculatedNdx(double energy)
 {
     if(multiplier_<=0)
     {
@@ -71,11 +74,11 @@ double Ionization::CalculatedNdx(const PROPOSALParticle& particle)
 
     if(do_dndx_Interpolation_)
     {
-        sum_of_rates_ = max(dndx_interpolant_1d_->Interpolate(particle.GetEnergy()), 0.);
+        sum_of_rates_ = max(dndx_interpolant_1d_->Interpolate(energy), 0.);
     }
     else{
-        CrossSections::IntegralLimits limits = SetIntegralLimits(particle, 0);;
-        sum_of_rates_ = integral_->Integrate(limits.vUp,limits.vMax,boost::bind(&Ionization::FunctionToDNdxIntegral, this, boost::cref(particle), _1),3,1);
+        CrossSections::IntegralLimits limits = SetIntegralLimits(energy, 0);;
+        sum_of_rates_ = integral_->Integrate(limits.vUp,limits.vMax,boost::bind(&Ionization::FunctionToDNdxIntegral, this, energy, _1),3,1);
     }
     return sum_of_rates_;
 }
@@ -85,7 +88,7 @@ double Ionization::CalculatedNdx(const PROPOSALParticle& particle)
 //----------------------------------------------------------------------------//
 
 
-double Ionization::CalculatedNdx(const PROPOSALParticle& particle, double rnd)
+double Ionization::CalculatedNdx(double energy, double rnd)
 {
     if(multiplier_<=0)
     {
@@ -100,12 +103,12 @@ double Ionization::CalculatedNdx(const PROPOSALParticle& particle, double rnd)
 
     if(do_dndx_Interpolation_)
     {
-        sum_of_rates_ = max(dndx_interpolant_1d_->Interpolate(particle.GetEnergy()), 0.);
+        sum_of_rates_ = max(dndx_interpolant_1d_->Interpolate(energy), 0.);
     }
     else
     {
-        CrossSections::IntegralLimits limits = SetIntegralLimits(particle, 0);;
-        sum_of_rates_ = integral_->IntegrateWithRandomRatio(limits.vUp,limits.vMax,boost::bind(&Ionization::FunctionToDNdxIntegral, this, boost::cref(particle), _1),3,rnd,1);
+        CrossSections::IntegralLimits limits = SetIntegralLimits(energy, 0);;
+        sum_of_rates_ = integral_->IntegrateWithRandomRatio(limits.vUp,limits.vMax,boost::bind(&Ionization::FunctionToDNdxIntegral, this, energy, _1),3,rnd,1);
     }
 
     return sum_of_rates_;
@@ -116,14 +119,14 @@ double Ionization::CalculatedNdx(const PROPOSALParticle& particle, double rnd)
 //----------------------------------------------------------------------------//
 
 
-double Ionization::CalculateStochasticLoss(const PROPOSALParticle& particle, double rnd1, double rnd2)
+double Ionization::CalculateStochasticLoss(double energy, double rnd1, double rnd2)
 {
     if(rnd1 != rnd_ )
     {
-        CalculatedNdx(particle, rnd1);
+        CalculatedNdx( rnd1);
     }
 
-    return CalculateStochasticLoss(particle, rnd2);
+    return CalculateStochasticLoss(energy, rnd2);
 }
 
 
@@ -135,7 +138,7 @@ double Ionization::CalculateStochasticLoss(const PROPOSALParticle& particle, dou
 //----------------------------------------------------------------------------//
 
 
-void Ionization::EnableDNdxInterpolation(const PROPOSALParticle& particle, std::string path, bool raw)
+void Ionization::EnableDNdxInterpolation( std::string path, bool raw)
 {
 
     if(do_dndx_Interpolation_)return;
@@ -145,16 +148,16 @@ void Ionization::EnableDNdxInterpolation(const PROPOSALParticle& particle, std::
 
     // charged anti leptons have the same cross sections like charged leptons
     // so they use the same interpolation tables
-    string particle_name = particle.GetName();
+    string particle_name = particle_def_.name;
 
     if(!path.empty())
     {
         stringstream filename;
         filename<<path<<"/Ioniz_dNdx"
                 <<"_particle_"<<particle_name
-                <<"_mass_"<<particle.GetMass()
-                <<"_charge_"<<particle.GetCharge()
-                <<"_lifetime_"<<particle.GetLifetime()
+                <<"_mass_"<<particle_def_.mass
+                <<"_charge_"<<particle_def_.charge
+                <<"_lifetime_"<<particle_def_.lifetime
                 <<"_med_"<<medium_->GetName()
                 <<"_"<<medium_->GetMassDensity()
                 <<"_ecut_"<<cut_settings_->GetEcut()
@@ -210,12 +213,12 @@ void Ionization::EnableDNdxInterpolation(const PROPOSALParticle& particle, std::
                 output.precision(16);
 
                 dndx_interpolant_2d_ = new Interpolant(NUM1
-                                                    , particle.GetLow()
+                                                    , particle_def_.low
                                                     , BIGENERGY
                                                     , NUM1
                                                     , 0
                                                     , 1
-                                                    , boost::bind(&Ionization::FunctionToBuildDNdxInterpolant2D, this, boost::cref(particle), _1, _2)
+                                                    , boost::bind(&Ionization::FunctionToBuildDNdxInterpolant2D, this,  _1, _2)
                                                     , order_of_interpolation_
                                                     , false
                                                     , false
@@ -230,7 +233,7 @@ void Ionization::EnableDNdxInterpolation(const PROPOSALParticle& particle, std::
                                                     , false
                                                     );
                 dndx_interpolant_1d_ = new Interpolant(NUM1
-                                                    , particle.GetLow()
+                                                    , particle_def_.low
                                                     , BIGENERGY
                                                     , boost::bind(&Ionization::FunctionToBuildDNdxInterpolant, this, _1)
                                                     , order_of_interpolation_
@@ -260,12 +263,12 @@ void Ionization::EnableDNdxInterpolation(const PROPOSALParticle& particle, std::
     {
 
         dndx_interpolant_2d_ = new Interpolant(NUM1
-                                            , particle.GetLow()
+                                            , particle_def_.low
                                             , BIGENERGY
                                             , NUM1
                                             , 0
                                             , 1
-                                            , boost::bind(&Ionization::FunctionToBuildDNdxInterpolant2D, this, boost::cref(particle), _1, _2)
+                                            , boost::bind(&Ionization::FunctionToBuildDNdxInterpolant2D, this,  _1, _2)
                                             , order_of_interpolation_
                                             , false
                                             , false
@@ -280,7 +283,7 @@ void Ionization::EnableDNdxInterpolation(const PROPOSALParticle& particle, std::
                                             , false
                                             );
         dndx_interpolant_1d_ = new Interpolant(NUM1
-                                            , particle.GetLow()
+                                            , particle_def_.low
                                             , BIGENERGY
                                             , boost::bind(&Ionization::FunctionToBuildDNdxInterpolant, this, _1)
                                             , order_of_interpolation_
@@ -303,7 +306,7 @@ void Ionization::EnableDNdxInterpolation(const PROPOSALParticle& particle, std::
 //----------------------------------------------------------------------------//
 
 
-void Ionization::EnableDEdxInterpolation(const PROPOSALParticle& particle, std::string path, bool raw)
+void Ionization::EnableDEdxInterpolation( std::string path, bool raw)
 {
 
     if(do_dedx_Interpolation_)return;
@@ -313,16 +316,16 @@ void Ionization::EnableDEdxInterpolation(const PROPOSALParticle& particle, std::
 
     // charged anti leptons have the same cross sections like charged leptons
     // so they use the same interpolation tables
-    string particle_name = particle.GetName();
+    string particle_name = particle_def_.name;
 
     if(!path.empty())
     {
         stringstream filename;
         filename<<path<<"/Ioniz_dEdx"
                 <<"_particle_"<<particle_name
-                <<"_mass_"<<particle.GetMass()
-                <<"_charge_"<<particle.GetCharge()
-                <<"_lifetime_"<<particle.GetLifetime()
+                <<"_mass_"<<particle_def_.mass
+                <<"_charge_"<<particle_def_.charge
+                <<"_lifetime_"<<particle_def_.lifetime
                 <<"_med_"<<medium_->GetName()
                 <<"_"<<medium_->GetMassDensity()
                 <<"_ecut_"<<cut_settings_->GetEcut()
@@ -376,9 +379,9 @@ void Ionization::EnableDEdxInterpolation(const PROPOSALParticle& particle, std::
                 output.precision(16);
 
                 dedx_interpolant_ = new Interpolant(NUM1
-                                                , particle.GetLow()
+                                                , particle_def_.low
                                                 , BIGENERGY
-                                                , boost::bind(&Ionization::FunctionToBuildDEdxInterpolant, this, boost::cref(particle), _1)
+                                                , boost::bind(&Ionization::FunctionToBuildDEdxInterpolant, this,  _1)
                                                 , order_of_interpolation_
                                                 , true
                                                 , false
@@ -402,9 +405,9 @@ void Ionization::EnableDEdxInterpolation(const PROPOSALParticle& particle, std::
     if(path.empty() || storing_failed)
     {
         dedx_interpolant_ = new Interpolant(NUM1
-                                        , particle.GetLow()
+                                        , particle_def_.low
                                         , BIGENERGY
-                                        , boost::bind(&Ionization::FunctionToBuildDEdxInterpolant, this, boost::cref(particle), _1)
+                                        , boost::bind(&Ionization::FunctionToBuildDEdxInterpolant, this,  _1)
                                         , order_of_interpolation_
                                         , true
                                         , false
@@ -530,8 +533,8 @@ Ionization::Ionization(const Ionization &ioniz)
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-Ionization::Ionization(Medium* medium, EnergyCutSettings* cut_settings)
-    : CrossSections(medium, cut_settings)
+Ionization::Ionization(PROPOSALParticle& particle, Medium* medium, EnergyCutSettings* cut_settings)
+    : CrossSections(particle, medium, cut_settings)
 {
     name_                       = "Ionization";
     type_                       = ParticleType::DeltaE;
@@ -705,7 +708,7 @@ ostream& operator<<(std::ostream& os, Ionization const &ioniz)
 //----------------------------------------------------------------------------//
 
 
-double Ionization::CalculateStochasticLoss(const PROPOSALParticle& particle, double rnd)
+double Ionization::CalculateStochasticLoss(double energy, double rnd)
 {
     double rand, rsum;
 
@@ -721,17 +724,17 @@ double Ionization::CalculateStochasticLoss(const PROPOSALParticle& particle, dou
         {
             if(do_dndx_Interpolation_)
             {
-                CrossSections::IntegralLimits limits = SetIntegralLimits(particle, 0);
+                CrossSections::IntegralLimits limits = SetIntegralLimits(energy, 0);
 
                 if(limits.vUp==limits.vMax)
                 {
-                    return particle.GetEnergy()*limits.vUp;
+                    return energy*limits.vUp;
                 }
-                return particle.GetEnergy()*(limits.vUp*exp(dndx_interpolant_2d_->FindLimit(particle.GetEnergy(), rnd*sum_of_rates_)*log(limits.vMax/limits.vUp)));
+                return energy*(limits.vUp*exp(dndx_interpolant_2d_->FindLimit(energy, rnd*sum_of_rates_)*log(limits.vMax/limits.vUp)));
             }
             else
             {
-                return particle.GetEnergy()*integral_->GetUpperLimit();
+                return energy*integral_->GetUpperLimit();
             }
         }
     }
@@ -746,26 +749,26 @@ double Ionization::CalculateStochasticLoss(const PROPOSALParticle& particle, dou
 //----------------------------------------------------------------------------//
 
 
-CrossSections::IntegralLimits Ionization::SetIntegralLimits(const PROPOSALParticle& particle, int component)
+CrossSections::IntegralLimits Ionization::SetIntegralLimits(double energy, int component)
 {
     double aux;
 
     (void) component;
     CrossSections::IntegralLimits limits;
 
-    double gamma   =   particle.GetEnergy()/particle.GetMass();
+    double gamma   =   energy/particle_def_.mass;
 
-    limits.vMin    =   (1.e-6*medium_->GetI())/particle.GetEnergy();
-    aux      =   ME/particle.GetMass();
-    limits.vMax    =   2*ME*(gamma*gamma-1)/((1 + 2*gamma*aux + aux*aux)*particle.GetEnergy());
-    limits.vMax    =   min(limits.vMax, 1. - particle.GetMass()/particle.GetEnergy());
+    limits.vMin    =   (1.e-6*medium_->GetI())/energy;
+    aux      =   ME/particle_def_.mass;
+    limits.vMax    =   2*ME*(gamma*gamma-1)/((1 + 2*gamma*aux + aux*aux)*energy);
+    limits.vMax    =   min(limits.vMax, 1. - particle_def_.mass/energy);
 
     if(limits.vMax<limits.vMin)
     {
         limits.vMax    =   limits.vMin;
     }
 
-    limits.vUp =   min(limits.vMax, cut_settings_->GetCut(particle.GetEnergy()));
+    limits.vUp =   min(limits.vMax, cut_settings_->GetCut(energy));
 
     if(limits.vUp<limits.vMin)
     {
@@ -805,21 +808,24 @@ double Ionization::Delta(double beta, double gamma)
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-double Ionization::D2Ndvdx(const PROPOSALParticle& particle, double v)
+double Ionization::D2Ndvdx(double energy, double v)
 {
     double result, aux, aux2;
 
-    CrossSections::IntegralLimits limits = SetIntegralLimits(particle, 0);
+    CrossSections::IntegralLimits limits = SetIntegralLimits(energy, 0);
 
-    double beta    =   particle.GetMomentum()/particle.GetEnergy();
-    double gamma   =   particle.GetEnergy()/particle.GetMass();
+    //TODO(mario): Better way? Sat 2017/09/02
+    double square_momentum = energy * energy - particle_def_.mass * particle_def_.mass;
+    double particle_momentum = sqrt(max(square_momentum, 0.0));
+    double beta    =   particle_momentum/energy;
+    double gamma   =   energy/particle_def_.mass;
 
     aux  = beta * beta;
     aux2 = v / (1 + 1 / gamma);
     aux2 *= 0.5 * aux2;
     result = 1 - aux * (v / limits.vMax) + aux2;
-    result *= IONK * particle.GetCharge() * particle.GetCharge() * medium_->GetZA() /
-              (2 * aux * particle.GetEnergy() * v * v);
+    result *= IONK * particle_def_.charge * particle_def_.charge * medium_->GetZA() /
+              (2 * aux * energy * v * v);
 
     return medium_->GetMassDensity() * result;
 }
@@ -829,16 +835,16 @@ double Ionization::D2Ndvdx(const PROPOSALParticle& particle, double v)
 //----------------------------------------------------------------------------//
 
 
-double Ionization::InelCorrection(const PROPOSALParticle& particle, double v)
+double Ionization::InelCorrection(double energy, double v)
 {
     double result, a, b, c;
-    CrossSections::IntegralLimits limits = SetIntegralLimits(particle, 0);
+    CrossSections::IntegralLimits limits = SetIntegralLimits(energy, 0);
 
-    double gamma = particle.GetEnergy() / particle.GetMass();
+    double gamma = energy / particle_def_.mass;
 
-    a      = log(1 + 2 * v * particle.GetEnergy() / ME);
+    a      = log(1 + 2 * v * energy / ME);
     b      = log((1 - v / limits.vMax) / (1 - v));
-    c      = log((2 * gamma * (1 - v) * ME) / (particle.GetMass() * v));
+    c      = log((2 * gamma * (1 - v) * ME) / (particle_def_.mass * v));
     result = a * (2 * b + c) - b * b;
 
     return (ALPHA / (2 * PI)) * result;
@@ -852,12 +858,9 @@ double Ionization::InelCorrection(const PROPOSALParticle& particle, double v)
 //----------------------------------------------------------------------------//
 
 
-double Ionization::FunctionToBuildDEdxInterpolant(const PROPOSALParticle& particle, double energy)
+double Ionization::FunctionToBuildDEdxInterpolant( double energy)
 {
-    PROPOSALParticle tmp_particle(particle);
-    tmp_particle.SetEnergy(energy);
-
-    return CalculatedEdx(tmp_particle);
+    return CalculatedEdx(energy);
 }
 
 
@@ -875,19 +878,19 @@ double Ionization::FunctionToBuildDNdxInterpolant(double energy)
 //----------------------------------------------------------------------------//
 
 
-double Ionization::FunctionToBuildDNdxInterpolant2D(const PROPOSALParticle& particle, double energy , double v)
+double Ionization::FunctionToBuildDNdxInterpolant2D( double energy , double v)
 {
-    PROPOSALParticle tmp_particle(particle);
-    tmp_particle.SetEnergy(energy);
-
-    CrossSections::IntegralLimits limits = SetIntegralLimits(tmp_particle, 0);;
+    CrossSections::IntegralLimits limits = SetIntegralLimits(energy, 0);;
 
     if(limits.vUp==limits.vMax){
         return 0;
     }
+
     v=limits.vUp*exp(v*log(limits.vMax/limits.vUp));
 
-    return integral_->Integrate(limits.vUp, v,boost::bind(&Ionization::FunctionToDNdxIntegral, this, boost::cref(tmp_particle), _1),3,1);
+    double dNdx = integral_->Integrate(limits.vUp, v,boost::bind(&Ionization::FunctionToDNdxIntegral, this,  energy, _1),3,1);
+
+    return dNdx;
 }
 
 
@@ -898,9 +901,9 @@ double Ionization::FunctionToBuildDNdxInterpolant2D(const PROPOSALParticle& part
 //----------------------------------------------------------------------------//
 
 
-double Ionization::FunctionToDEdxIntegral(const PROPOSALParticle& particle, double variable)
+double Ionization::FunctionToDEdxIntegral(double energy, double variable)
 {
-    return variable*D2Ndvdx(particle, variable)*InelCorrection(particle, variable);
+    return variable*D2Ndvdx(energy, variable)*InelCorrection(energy, variable);
 }
 
 
@@ -908,9 +911,9 @@ double Ionization::FunctionToDEdxIntegral(const PROPOSALParticle& particle, doub
 //----------------------------------------------------------------------------//
 
 
-double Ionization::FunctionToDNdxIntegral(const PROPOSALParticle& particle, double variable)
+double Ionization::FunctionToDNdxIntegral(double energy, double variable)
 {
-    return multiplier_ * D2Ndvdx(particle, variable) * (1+InelCorrection(particle, variable));
+    return multiplier_ * D2Ndvdx(energy, variable) * (1+InelCorrection(energy, variable));
 }
 
 

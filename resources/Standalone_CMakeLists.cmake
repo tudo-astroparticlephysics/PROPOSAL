@@ -14,7 +14,7 @@ SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 SET(DEBUG OFF)
 OPTION (DEBUG "DEBUG" OFF)
 IF(DEBUG)
-        SET( CMAKE_CXX_FLAGS "-g -pg -O0" )
+        SET( CMAKE_CXX_FLAGS "-g -O0" )
 ENDIF()
 
 SET(ICETRAY_INCLUDE_PATH "/home/koehne/Simulation/icesim4_candidate/V04-00-01-RC/icetray/public/")
@@ -129,9 +129,9 @@ FILE(GLOB_RECURSE SRC_FILES ${PROJECT_SOURCE_DIR}/private/PROPOSAL/*)
 ADD_LIBRARY(PROPOSAL SHARED ${SRC_FILES})
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-	SET_TARGET_PROPERTIES(PROPOSAL PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -O2 -Wall -Wextra -Wnarrowing -pedantic -Wno-gnu-zero-variadic-macro-arguments -Wno-variadic-macros -Wno-c++11-long-long")
+	SET_TARGET_PROPERTIES(PROPOSAL PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -O2 -g -Wall -Wextra -Wnarrowing -pedantic -Wno-gnu-zero-variadic-macro-arguments -Wno-variadic-macros -Wno-c++11-long-long")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-	SET_TARGET_PROPERTIES(PROPOSAL PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -O2 -Wall -Wextra -Wnarrowing -Wpedantic -fdiagnostics-show-option")
+	SET_TARGET_PROPERTIES(PROPOSAL PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -O2 -g -Wall -Wextra -Wnarrowing -Wpedantic -fdiagnostics-show-option")
 endif()
 # The following warnings are silenced, because they arise in the dependencies:
 # -Wno-c++11-long-long : "long long" only occurs in ROOT 5
