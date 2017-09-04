@@ -12,7 +12,9 @@ using namespace PROPOSAL;
 
 
 CrossSections::CrossSections( )
-    :ebig_                  ( BIGENERGY )
+  //TODO(mario): init different Fri 2017/09/01
+  : particle_def_(MuMinusDef::Get())
+    ,ebig_                  ( BIGENERGY )
     ,rnd_                   ( 0 )
     ,do_dedx_Interpolation_ ( false )
     ,do_dndx_Interpolation_ ( false )
@@ -33,19 +35,18 @@ CrossSections::CrossSections( )
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-
-CrossSections::CrossSections(Medium* medium,
-                             EnergyCutSettings* cut_settings)
-    :ebig_                  ( BIGENERGY )
-    ,rnd_                   ( 0 )
-    ,do_dedx_Interpolation_ ( false )
-    ,do_dndx_Interpolation_ ( false )
-    ,multiplier_            ( 1. )
-    ,parametrization_       ( ParametrizationType::BremsKelnerKokoulinPetrukhin )
-    ,lpm_effect_enabled_    ( false )
-    ,init_lpm_effect_       ( true )
-    ,order_of_interpolation_( 5 )
-    ,sum_of_rates_          ( 0 )
+CrossSections::CrossSections(PROPOSALParticle& particle, Medium* medium, EnergyCutSettings* cut_settings)
+    : particle_def_(particle.GetParticleDef())
+    , ebig_(BIGENERGY)
+    , rnd_(0)
+    , do_dedx_Interpolation_(false)
+    , do_dndx_Interpolation_(false)
+    , multiplier_(1.)
+    , parametrization_(ParametrizationType::BremsKelnerKokoulinPetrukhin)
+    , lpm_effect_enabled_(false)
+    , init_lpm_effect_(true)
+    , order_of_interpolation_(5)
+    , sum_of_rates_(0)
 {
     // particle_       = particle;
     // backup_particle_= particle_;
@@ -57,26 +58,25 @@ CrossSections::CrossSections(Medium* medium,
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-
 CrossSections::CrossSections(const CrossSections& crossSections)
-    :name_                     ( crossSections.name_ )
-    ,type_                     ( crossSections.type_ )
-    ,ebig_                     ( crossSections.ebig_ )
-    ,rnd_                      ( crossSections.rnd_ )
-    ,do_dedx_Interpolation_    ( crossSections.do_dedx_Interpolation_ )
-    ,do_dndx_Interpolation_    ( crossSections.do_dndx_Interpolation_ )
-    ,multiplier_               ( crossSections.multiplier_ )
-    ,parametrization_          ( crossSections.parametrization_ )
-    ,lpm_effect_enabled_       ( crossSections.lpm_effect_enabled_ )
-    ,init_lpm_effect_          ( crossSections.init_lpm_effect_ )
-    ,order_of_interpolation_   ( crossSections.order_of_interpolation_ )
-    ,sum_of_rates_             ( crossSections.sum_of_rates_ )
+    : name_(crossSections.name_)
+    , type_(crossSections.type_)
+    , particle_def_(crossSections.particle_def_)
+    , ebig_(crossSections.ebig_)
+    , rnd_(crossSections.rnd_)
+    , do_dedx_Interpolation_(crossSections.do_dedx_Interpolation_)
+    , do_dndx_Interpolation_(crossSections.do_dndx_Interpolation_)
+    , multiplier_(crossSections.multiplier_)
+    , parametrization_(crossSections.parametrization_)
+    , lpm_effect_enabled_(crossSections.lpm_effect_enabled_)
+    , init_lpm_effect_(crossSections.init_lpm_effect_)
+    , order_of_interpolation_(crossSections.order_of_interpolation_)
+    , sum_of_rates_(crossSections.sum_of_rates_)
 {
     // particle_                 = new PROPOSALParticle( *crossSections.particle_ );
-    medium_                   = crossSections.medium_->clone();
-    cut_settings_             = new EnergyCutSettings( *crossSections.cut_settings_ );
+    medium_       = crossSections.medium_->clone();
+    cut_settings_ = new EnergyCutSettings(*crossSections.cut_settings_);
 }
-
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
@@ -140,7 +140,7 @@ std::ostream& operator<<(std::ostream& os, CrossSections const &crossSections)
     if(crossSections.medium_!=NULL)
     {
         os<<"\t\tname:\t\t\t"<<crossSections.medium_->GetName()<<std::endl;
-        os<<"\t\trho:\t\t\t"<<crossSections.medium_->GetRho()<<std::endl;
+        os<<"\t\trho:\t\t\t"<<crossSections.medium_->GetDensityCorrection()<<std::endl;
     }
     os<<std::endl;
     os<<"\tCutSettings:\t"<<crossSections.cut_settings_<<std::endl;

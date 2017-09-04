@@ -22,7 +22,7 @@ using namespace PROPOSAL;
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-double ContinuousRandomization::Randomize(const PROPOSALParticle& particle, const std::vector<CrossSections*>& cross_sections, double initial_energy, double final_energy, double rnd)
+double ContinuousRandomization::Randomize( const std::vector<CrossSections*>& cross_sections, double initial_energy, double final_energy, double rnd)
 {
     double sigma,xhi,xlo,rndtmp;
 
@@ -34,7 +34,7 @@ double ContinuousRandomization::Randomize(const PROPOSALParticle& particle, cons
         return final_energy;
     }
 
-    sigma   =   sqrt( DE2de(particle, cross_sections, initial_energy, final_energy) );
+    sigma   =   sqrt( DE2de( cross_sections, initial_energy, final_energy) );
 
 //It is not drawn from the real gaus distribution but rather from the
 //area which is possible due to the limits of the initial energy and the
@@ -43,7 +43,7 @@ double ContinuousRandomization::Randomize(const PROPOSALParticle& particle, cons
 //
 //calculate the allowed region
     xhi     =   0.5+boost::math::erf((initial_energy        -final_energy)  /(SQRT2*sigma))/2;
-    xlo     =   0.5+boost::math::erf((particle.GetLow()   -final_energy)  /(SQRT2*sigma))/2;
+    xlo     =   0.5+boost::math::erf((particle_def_.low   -final_energy)  /(SQRT2*sigma))/2;
 
 //draw random number from the allowed region.
     rndtmp =  xlo + (xhi-xlo)*rnd;
@@ -60,7 +60,7 @@ double ContinuousRandomization::Randomize(const PROPOSALParticle& particle, cons
 //----------------------------------------------------------------------------//
 
 
-void ContinuousRandomization::EnableDE2dxInterpolation(const PROPOSALParticle& particle, const std::vector<CrossSections*>& cross_sections, std::string path, bool raw)
+void ContinuousRandomization::EnableDE2dxInterpolation( const std::vector<CrossSections*>& cross_sections, std::string path, bool raw)
 {
     if(do_dE2dx_Interpolation_)return;
 
@@ -70,9 +70,9 @@ void ContinuousRandomization::EnableDE2dxInterpolation(const PROPOSALParticle& p
     // charged anti leptons have the same cross sections like charged leptons
     // (except of diffractive Bremsstrahlung, where one can analyse the interference term if implemented)
     // so they use the same interpolation tables
-    string particle_name = particle.GetName();
+    string particle_name = particle_def_.name;
     // string particle_name;
-    // switch (particle.GetType())
+    // switch (particle_.GetType())
     // {
     //     case ParticleType::MuPlus:
     //         particle_name = PROPOSALParticle::GetName(ParticleType::MuMinus);
@@ -87,7 +87,7 @@ void ContinuousRandomization::EnableDE2dxInterpolation(const PROPOSALParticle& p
     //         particle_name = PROPOSALParticle::GetName(ParticleType::STauMinus);
     //         break;
     //     default:
-    //         particle_name = particle.GetName();
+    //         particle_name = particle_def_.name;
     //         break;
     // }
 
@@ -96,11 +96,10 @@ void ContinuousRandomization::EnableDE2dxInterpolation(const PROPOSALParticle& p
         stringstream filename;
         filename<<path<<"/Cont_dE2dx"
                 <<"_"<<particle_name
-                <<"_mass_"<<particle.GetMass()
-                <<"_charge_"<<particle.GetCharge()
-                <<"_lifetime_"<<particle.GetLifetime()
-                <<"_charge_"<<particle.GetCharge()
-                <<"_lifetime_"<<particle.GetLifetime()
+                <<"_mass_"<<particle_def_.mass
+                <<"_charge_"<<particle_def_.charge
+                <<"_lifetime_"<<particle_def_.lifetime
+                <<"_charge_"<<particle_def_.charge
                 <<"_"<<cross_sections.at(0)->GetMedium()->GetName()
                 <<"_"<<cross_sections.at(0)->GetMedium()->GetMassDensity();
 
@@ -179,7 +178,7 @@ void ContinuousRandomization::EnableDE2dxInterpolation(const PROPOSALParticle& p
             {
                 output.precision(16);
 
-                dE2dx_interpolant_    =   new Interpolant(NUM2, particle.GetLow(), BIGENERGY, boost::bind(&ContinuousRandomization::FunctionToBuildDE2dxInterplant, this, boost::cref(particle), boost::cref(cross_sections), _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
+                dE2dx_interpolant_    =   new Interpolant(NUM2, particle_def_.low, BIGENERGY, boost::bind(&ContinuousRandomization::FunctionToBuildDE2dxInterplant, this,  boost::cref(cross_sections), _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
 
                 dE2dx_interpolant_->Save(output,raw);
 
@@ -195,7 +194,7 @@ void ContinuousRandomization::EnableDE2dxInterpolation(const PROPOSALParticle& p
     }
     if(path.empty() || storing_failed)
     {
-        dE2dx_interpolant_    =   new Interpolant(NUM2, particle.GetLow(), BIGENERGY, boost::bind(&ContinuousRandomization::FunctionToBuildDE2dxInterplant, this, boost::cref(particle), boost::cref(cross_sections), _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
+        dE2dx_interpolant_    =   new Interpolant(NUM2, particle_def_.low, BIGENERGY, boost::bind(&ContinuousRandomization::FunctionToBuildDE2dxInterplant, this,  boost::cref(cross_sections), _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
 
     }
 
@@ -207,7 +206,7 @@ void ContinuousRandomization::EnableDE2dxInterpolation(const PROPOSALParticle& p
 //----------------------------------------------------------------------------//
 
 
-void ContinuousRandomization::EnableDE2deInterpolation(const PROPOSALParticle& particle, const std::vector<CrossSections*>& cross_sections, std::string path, bool raw)
+void ContinuousRandomization::EnableDE2deInterpolation( const std::vector<CrossSections*>& cross_sections, std::string path, bool raw)
 {
     if(do_dE2de_Interpolation_)return;
 
@@ -217,9 +216,9 @@ void ContinuousRandomization::EnableDE2deInterpolation(const PROPOSALParticle& p
     // charged anti leptons have the same cross sections like charged leptons
     // (except of diffractive Bremsstrahlung, where one can analyse the interference term if implemented)
     // so they use the same interpolation tables
-    string particle_name = particle.GetName();
+    string particle_name = particle_def_.name;
     // string particle_name;
-    // switch (particle.GetType())
+    // switch (particle_.GetType())
     // {
     //     case ParticleType::MuPlus:
     //         particle_name = PROPOSALParticle::GetName(ParticleType::MuMinus);
@@ -234,7 +233,7 @@ void ContinuousRandomization::EnableDE2deInterpolation(const PROPOSALParticle& p
     //         particle_name = PROPOSALParticle::GetName(ParticleType::STauMinus);
     //         break;
     //     default:
-    //         particle_name = particle.GetName();
+    //         particle_name = particle_.GetName();
     //         break;
     // }
 
@@ -243,9 +242,9 @@ void ContinuousRandomization::EnableDE2deInterpolation(const PROPOSALParticle& p
         stringstream filename;
         filename<<path<<"/Cont_dE2de"
                 <<"_"<<particle_name
-                <<"_mass_"<<particle.GetMass()
-                <<"_charge_"<<particle.GetCharge()
-                <<"_lifetime_"<<particle.GetLifetime()
+                <<"_mass_"<<particle_def_.mass
+                <<"_charge_"<<particle_def_.charge
+                <<"_lifetime_"<<particle_def_.lifetime
                 <<"_"<<cross_sections.at(0)->GetMedium()->GetName()
                 <<"_"<<cross_sections.at(0)->GetMedium()->GetMassDensity();
 
@@ -325,8 +324,8 @@ void ContinuousRandomization::EnableDE2deInterpolation(const PROPOSALParticle& p
             {
                 output.precision(16);
 
-                dE2de_interpolant_       =   new Interpolant(NUM2, particle.GetLow(), BIGENERGY, boost::bind(&ContinuousRandomization::FunctionToBuildDE2deInterplant, this, boost::cref(particle), boost::cref(cross_sections), _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
-                dE2de_interpolant_diff_  =   new Interpolant(NUM2, particle.GetLow(), BIGENERGY, boost::bind(&ContinuousRandomization::FunctionToBuildDE2deInterplantDiff, this, boost::cref(particle), boost::cref(cross_sections), _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
+                dE2de_interpolant_       =   new Interpolant(NUM2, particle_def_.low, BIGENERGY, boost::bind(&ContinuousRandomization::FunctionToBuildDE2deInterplant, this,  boost::cref(cross_sections), _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
+                dE2de_interpolant_diff_  =   new Interpolant(NUM2, particle_def_.low, BIGENERGY, boost::bind(&ContinuousRandomization::FunctionToBuildDE2deInterplantDiff, this,  boost::cref(cross_sections), _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
 
                 dE2de_interpolant_->Save(output,raw);
                 dE2de_interpolant_diff_->Save(output,raw);
@@ -342,8 +341,8 @@ void ContinuousRandomization::EnableDE2deInterpolation(const PROPOSALParticle& p
     }
     if(path.empty() || storing_failed)
     {
-        dE2de_interpolant_       =   new Interpolant(NUM2, particle.GetLow(), BIGENERGY, boost::bind(&ContinuousRandomization::FunctionToBuildDE2deInterplant, this, boost::cref(particle), boost::cref(cross_sections), _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
-        dE2de_interpolant_diff_  =   new Interpolant(NUM2, particle.GetLow(), BIGENERGY, boost::bind(&ContinuousRandomization::FunctionToBuildDE2deInterplantDiff, this, boost::cref(particle), boost::cref(cross_sections), _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
+        dE2de_interpolant_       =   new Interpolant(NUM2, particle_def_.low, BIGENERGY, boost::bind(&ContinuousRandomization::FunctionToBuildDE2deInterplant, this,  boost::cref(cross_sections), _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
+        dE2de_interpolant_diff_  =   new Interpolant(NUM2, particle_def_.low, BIGENERGY, boost::bind(&ContinuousRandomization::FunctionToBuildDE2deInterplantDiff, this,  boost::cref(cross_sections), _1), order_of_interpolation_, false, false, true, order_of_interpolation_, false, false, false);
     }
 
     do_dE2de_Interpolation_=true;
@@ -380,8 +379,9 @@ void ContinuousRandomization::DisableDE2deInterpolation()
 //----------------------------------------------------------------------------//
 
 
-ContinuousRandomization::ContinuousRandomization()
-    : do_dE2dx_Interpolation_    ( false )
+ContinuousRandomization::ContinuousRandomization(PROPOSALParticle& particle)
+    : particle_def_(particle.GetParticleDef())
+    , do_dE2dx_Interpolation_    ( false )
     ,do_dE2de_Interpolation_    ( false )
     ,which_cross_               ( 0 )
     ,order_of_interpolation_    ( 5 )
@@ -399,7 +399,7 @@ ContinuousRandomization::ContinuousRandomization()
 //----------------------------------------------------------------------------//
 
 
-// ContinuousRandomization::ContinuousRandomization(PROPOSALParticle* particle, Medium* medium, std::vector<CrossSections*> cross_sections)
+// ContinuousRandomization::ContinuousRandomization(PROPOSALParticle*  Medium* medium, std::vector<CrossSections*> cross_sections)
 //     :particle_                  ( particle )
 //     ,medium_                    ( medium )
 //     ,cross_sections_            ( cross_sections )
@@ -669,11 +669,11 @@ ostream& operator<<(ostream& os, ContinuousRandomization const& continuous_rando
 //----------------------------------------------------------------------------//
 
 
-double ContinuousRandomization::DE2dx(const PROPOSALParticle& particle, const std::vector<CrossSections*>& cross_sections)
+double ContinuousRandomization::DE2dx(const std::vector<CrossSections*>& cross_sections, double energy)
 {
     if(do_dE2dx_Interpolation_)
     {
-        return max( dE2dx_interpolant_->Interpolate(particle.GetEnergy()) , 0.0 );
+        return max( dE2dx_interpolant_->Interpolate(energy) , 0.0 );
     }
 
     double sum = 0;
@@ -684,9 +684,9 @@ double ContinuousRandomization::DE2dx(const PROPOSALParticle& particle, const st
 
         for(int j=0 ; j < cross_sections.at(i)->GetMedium()->GetNumComponents() ; j++)
         {
-            CrossSections::IntegralLimits limits = cross_sections.at(i)->SetIntegralLimits(particle, j);
+            CrossSections::IntegralLimits limits = cross_sections.at(i)->SetIntegralLimits(energy, j);
 
-            sum +=  dE2dx_integral_->Integrate (limits.vMin, limits.vUp, boost::bind(&ContinuousRandomization::FunctionToDE2dxIntegral, this, boost::cref(particle), boost::cref(cross_sections), _1) ,2);
+            sum +=  dE2dx_integral_->Integrate (limits.vMin, limits.vUp, boost::bind(&ContinuousRandomization::FunctionToDE2dxIntegral, this,  boost::cref(cross_sections), energy, _1) ,2);
 
             if(cross_sections.at(i)->GetType() == ParticleType::DeltaE)
             {
@@ -695,7 +695,7 @@ double ContinuousRandomization::DE2dx(const PROPOSALParticle& particle, const st
         }
     }
 
-    return particle.GetEnergy()*particle.GetEnergy()*sum;
+    return energy*energy*sum;
 }
 
 
@@ -703,7 +703,7 @@ double ContinuousRandomization::DE2dx(const PROPOSALParticle& particle, const st
 //----------------------------------------------------------------------------//
 
 
-double ContinuousRandomization::DE2de(const PROPOSALParticle& particle, const std::vector<CrossSections*>& cross_sections, double ei, double ef )
+double ContinuousRandomization::DE2de( const std::vector<CrossSections*>& cross_sections, double ei, double ef )
 {
     if( do_dE2de_Interpolation_ )
     {
@@ -725,7 +725,7 @@ double ContinuousRandomization::DE2de(const PROPOSALParticle& particle, const st
 
     }
 
-    return dE2de_integral_->Integrate(ei, ef, boost::bind(&ContinuousRandomization::FunctionToDE2deIntegral, this, boost::cref(particle), boost::cref(cross_sections), _1), 4);
+    return dE2de_integral_->Integrate(ei, ef, boost::bind(&ContinuousRandomization::FunctionToDE2deIntegral, this,  boost::cref(cross_sections), _1), 4);
 }
 
 
@@ -736,12 +736,9 @@ double ContinuousRandomization::DE2de(const PROPOSALParticle& particle, const st
 //----------------------------------------------------------------------------//
 
 
-double ContinuousRandomization::FunctionToBuildDE2dxInterplant(const PROPOSALParticle& particle, const std::vector<CrossSections*>& cross_sections, double energy)
+double ContinuousRandomization::FunctionToBuildDE2dxInterplant( const std::vector<CrossSections*>& cross_sections, double energy)
 {
-    PROPOSALParticle tmp_particle(particle);
-    tmp_particle.SetEnergy(energy);
-
-    return DE2dx(tmp_particle, cross_sections);
+    return DE2dx(cross_sections, energy);
 }
 
 
@@ -749,9 +746,9 @@ double ContinuousRandomization::FunctionToBuildDE2dxInterplant(const PROPOSALPar
 //----------------------------------------------------------------------------//
 
 
-double ContinuousRandomization::FunctionToBuildDE2deInterplant(const PROPOSALParticle& particle, const std::vector<CrossSections*>& cross_sections, double energy)
+double ContinuousRandomization::FunctionToBuildDE2deInterplant( const std::vector<CrossSections*>& cross_sections, double energy)
 {
-    return dE2de_integral_->Integrate(energy, particle.GetLow(), boost::bind(&ContinuousRandomization::FunctionToDE2deIntegral, this, boost::cref(particle), boost::cref(cross_sections), _1) , 4);
+    return dE2de_integral_->Integrate(energy, particle_def_.low, boost::bind(&ContinuousRandomization::FunctionToDE2deIntegral, this,  boost::cref(cross_sections), _1) , 4);
 }
 
 
@@ -759,9 +756,9 @@ double ContinuousRandomization::FunctionToBuildDE2deInterplant(const PROPOSALPar
 //----------------------------------------------------------------------------//
 
 
-double ContinuousRandomization::FunctionToBuildDE2deInterplantDiff(const PROPOSALParticle& particle, const std::vector<CrossSections*>& cross_sections, double energy)
+double ContinuousRandomization::FunctionToBuildDE2deInterplantDiff( const std::vector<CrossSections*>& cross_sections, double energy)
 {
-    return FunctionToDE2deIntegral(particle, cross_sections, energy);
+    return FunctionToDE2deIntegral( cross_sections, energy);
 }
 
 
@@ -772,9 +769,9 @@ double ContinuousRandomization::FunctionToBuildDE2deInterplantDiff(const PROPOSA
 //----------------------------------------------------------------------------//
 
 
-double ContinuousRandomization::FunctionToDE2dxIntegral(const PROPOSALParticle& particle, const std::vector<CrossSections*>& cross_sections, double v)
+double ContinuousRandomization::FunctionToDE2dxIntegral(const std::vector<CrossSections*>& cross_sections, double energy, double v)
 {
-    return v*v*cross_sections.at(which_cross_)->FunctionToDNdxIntegral(particle, v);
+    return v*v*cross_sections.at(which_cross_)->FunctionToDNdxIntegral(energy, v);
 }
 
 
@@ -782,21 +779,18 @@ double ContinuousRandomization::FunctionToDE2dxIntegral(const PROPOSALParticle& 
 //----------------------------------------------------------------------------//
 
 
-double ContinuousRandomization::FunctionToDE2deIntegral(const PROPOSALParticle& particle, const std::vector<CrossSections*>& cross_sections, double energy)
+double ContinuousRandomization::FunctionToDE2deIntegral( const std::vector<CrossSections*>& cross_sections, double energy)
 {
 
     double result = 0.0;
     double aux;
 
-    PROPOSALParticle tmp_particle(particle);
-    tmp_particle.SetEnergy(energy);
-
     for(unsigned int i = 0 ; i<cross_sections.size() ; i++)
     {
-        aux     =   cross_sections.at(i)->CalculatedEdx(particle);
+        aux     =   cross_sections.at(i)->CalculatedEdx(energy);
         result  +=  aux;
     }
-    return -1/result*DE2dx(particle, cross_sections);
+    return -1/result*DE2dx( cross_sections, energy);
 }
 
 

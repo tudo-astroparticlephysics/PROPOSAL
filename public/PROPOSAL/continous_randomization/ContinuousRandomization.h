@@ -39,6 +39,7 @@ private:
     // Medium*     medium_;
     // std::vector<CrossSections*> cross_sections_;
 
+    ParticleDef particle_def_;
     bool do_dE2dx_Interpolation_; //!< Enables the interpolation of -dE2/dx
     bool do_dE2de_Interpolation_; //!< Enables the interpolation of -dE2/de
 
@@ -49,15 +50,15 @@ private:
     Interpolant* dE2de_interpolant_;
     Interpolant* dE2de_interpolant_diff_;
 
-    double FunctionToDE2dxIntegral(const PROPOSALParticle&, const std::vector<CrossSections*>&, double v);
-    double FunctionToDE2deIntegral(const PROPOSALParticle&, const std::vector<CrossSections*>&, double energy);
+    double FunctionToDE2dxIntegral( const std::vector<CrossSections*>&, double energy, double v);
+    double FunctionToDE2deIntegral( const std::vector<CrossSections*>&, double energy);
 
-    double FunctionToBuildDE2dxInterplant(const PROPOSALParticle&, const std::vector<CrossSections*>&, double energy);
-    double FunctionToBuildDE2deInterplant(const PROPOSALParticle&, const std::vector<CrossSections*>&, double energy);
-    double FunctionToBuildDE2deInterplantDiff(const PROPOSALParticle&, const std::vector<CrossSections*>&, double energy);
+    double FunctionToBuildDE2dxInterplant( const std::vector<CrossSections*>&, double energy);
+    double FunctionToBuildDE2deInterplant( const std::vector<CrossSections*>&, double energy);
+    double FunctionToBuildDE2deInterplantDiff( const std::vector<CrossSections*>&, double energy);
 
-    double DE2de(const PROPOSALParticle&, const std::vector<CrossSections*>&, double ei, double ef );
-    double DE2dx(const PROPOSALParticle&, const std::vector<CrossSections*>&);
+    double DE2de(const std::vector<CrossSections*>&, double ei, double ef );
+    double DE2dx(const std::vector<CrossSections*>&, double energy);
 
     int which_cross_;
     int order_of_interpolation_;
@@ -68,7 +69,7 @@ public:
  //----------------------------------------------------------------------------//
     // Constructors
 
-    ContinuousRandomization();
+    ContinuousRandomization(PROPOSALParticle&);
     // ContinuousRandomization(PROPOSALParticle* particle, Medium* medium, std::vector<CrossSections*> cross_sections);
     // ContinuousRandomization(const ContinuousRandomization&);
     // ContinuousRandomization& operator=(const ContinuousRandomization& continuous_randomization);
@@ -79,7 +80,7 @@ public:
 
     //Memberfunction
 
-    double Randomize(const PROPOSALParticle&, const std::vector<CrossSections*>&, double initial_energy, double final_energy, double rnd);
+    double Randomize( const std::vector<CrossSections*>&, double initial_energy, double final_energy, double rnd);
 
 //----------------------------------------------------------------------------//
 
@@ -87,11 +88,11 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    void EnableDE2dxInterpolation(const PROPOSALParticle&, const std::vector<CrossSections*>&, std::string path ="", bool raw=false);
+    void EnableDE2dxInterpolation( const std::vector<CrossSections*>&, std::string path ="", bool raw=false);
 
 //----------------------------------------------------------------------------//
 
-    void EnableDE2deInterpolation(const PROPOSALParticle&, const std::vector<CrossSections*>&, std::string path ="", bool raw=false);
+    void EnableDE2deInterpolation( const std::vector<CrossSections*>&, std::string path ="", bool raw=false);
 
 //----------------------------------------------------------------------------//
 

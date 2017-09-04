@@ -9,24 +9,23 @@ namespace PROPOSAL {
 class SectorIntegral : public Sector
 {
     public:
-    SectorIntegral();
-    SectorIntegral(const Medium&,
+    SectorIntegral(PROPOSALParticle&);
+    SectorIntegral(PROPOSALParticle&, const Medium&,
                        const Geometry&,
                        const EnergyCutSettings&,
-                       const SectorDef& def = SectorDef());
+                       const Definition& def = Definition());
     SectorIntegral(const SectorIntegral&);
     virtual ~SectorIntegral();
 
     virtual Sector* clone() const { return new SectorIntegral(*this); }
 
-    double CalculateDisplacement(const PROPOSALParticle&, double ei, double ef, double dist);
-    double CalculateFinalEnergy(const PROPOSALParticle&, double ei, double dist);
-    double CalculateFinalEnergy(const PROPOSALParticle&, double ei, double rnd, bool particle_interaction);
-    double CalculateTrackingIntegal(const PROPOSALParticle&,
-                                    double initial_energy,
+    double CalculateDisplacement(double ei, double ef, double dist);
+    double CalculateFinalEnergy(double ei, double dist);
+    double CalculateFinalEnergy(double ei, double rnd, bool particle_interaction);
+    double CalculateTrackingIntegal(double initial_energy,
                                     double rnd,
                                     bool particle_interaction);
-    double CalculateParticleTime(const PROPOSALParticle&, double ei, double ef);
+    double CalculateParticleTime(double ei, double ef);
 
     private:
 

@@ -117,15 +117,14 @@ class PROPOSALParticle
     public:
 
     PROPOSALParticle();
-    PROPOSALParticle(ParticleDef);
+    PROPOSALParticle(const ParticleDef&);
 
     // destructors
     virtual ~PROPOSALParticle() {}
 
-    void swap(PROPOSALParticle& particle);
+    // void swap(PROPOSALParticle& particle);
 
     // Operators
-    PROPOSALParticle& operator=(const PROPOSALParticle&);
     bool operator==(const PROPOSALParticle& particle) const;
     bool operator!=(const PROPOSALParticle& particle) const;
     friend std::ostream& operator<<(std::ostream& os, PROPOSALParticle const& particle);
@@ -164,19 +163,19 @@ class PROPOSALParticle
     void SetElost(double elost);
 
     // Getter
-    const ParticleDef& GetParticleDef() const { return *particle_def_; }
-    const DecayTable& GetDecayTable() const { return particle_def_->decay_table; }
+    const ParticleDef& GetParticleDef() const { return particle_def_; }
+    const DecayTable& GetDecayTable() const { return particle_def_.decay_table; }
     double GetPropagatedDistance() const { return propagated_distance_; }
 
     double GetT() const { return t_; }
     double GetMomentum() const { return momentum_; }
     double GetEnergy() const { return energy_; }
-    double GetLow() const { return low_; }
+    double GetLow() const { return particle_def_.low; }
 
-    double GetMass() const { return particle_def_->mass; }
-    double GetLifetime() const { return particle_def_->lifetime; }
-    double GetCharge() const { return particle_def_->charge; }
-    std::string GetName() const { return particle_def_->name; }
+    double GetMass() const { return particle_def_.mass; }
+    double GetLifetime() const { return particle_def_.lifetime; }
+    double GetCharge() const { return particle_def_.charge; }
+    std::string GetName() const { return particle_def_.name; }
 
     Vector3D GetPosition() const { return position_; }
     Vector3D GetDirection() const { return direction_; }
@@ -188,7 +187,7 @@ class PROPOSALParticle
     ///
     /// @return 2d double vector
     // ----------------------------------------------------------------------------
-    const HardBBTables::VecType* getHardBB() const {return particle_def_->hardbb_table;}
+    const HardBBTables::VecType* getHardBB() const {return particle_def_.hardbb_table;}
 
     double GetParentParticleEnergy() const { return parent_particle_energy_; }
     int GetParentParticleId() const { return parent_particle_id_; }
@@ -208,16 +207,16 @@ class PROPOSALParticle
 
     double GetElost() const { return elost_; }
 
-    protected:
+    private:
+    PROPOSALParticle& operator=(const PROPOSALParticle&);
 
-    const ParticleDef* particle_def_; //!< static defenitions of the particle
+    const ParticleDef particle_def_; //!< static defenitions of the particle
 
     double propagated_distance_; //!< propagation distance [cm]
 
     double momentum_;        //!< momentum [MeV]
     double square_momentum_; //!< momentum square [MeV]
     double energy_;          //!< energy [MeV]
-    double low_;       //!< energy below which the particle is lost [MeV]
 
     int parent_particle_id_;        //!< parent particle id
     double parent_particle_energy_; //!< energy of the parent particle

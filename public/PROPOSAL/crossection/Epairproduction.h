@@ -50,7 +50,7 @@ protected:
     \frac{1-v}{v}lpm(r^2,b,s)(F_e+\frac{m_e^2}{m_p^2}F_m)\f]
     */
 
-    double FunctionToIntegral(const PROPOSALParticle&, double variable);
+    double FunctionToIntegral(double energy, double variable);
 
 //----------------------------------------------------------------------------//
 
@@ -62,7 +62,7 @@ protected:
     +x(3+r^2)]\ln\Big(1+\frac{1}{x}\Big)+\frac{1-r^2-b}{1+x}-(3+r^2)}\f]
     */
 
-    double lpm(const PROPOSALParticle&, double r2, double b, double x);
+    double lpm(double energy, double r2, double b, double x);
 
 //----------------------------------------------------------------------------//
 
@@ -74,7 +74,7 @@ protected:
     \sqrt{1-\frac{4m_e}{E_p v}}\Big(1-\frac{6m_p^2}{E_p^2(1-v)}\Big)\f$
     */
 
-    double EPair(const PROPOSALParticle&, double v, int component);
+    double EPair(double energy, double v, int component);
 
 //----------------------------------------------------------------------------//
 
@@ -83,7 +83,7 @@ protected:
     \f[ return= v\cdot e_{Pair}(v, components)\f]
     */
 
-    double FunctionToDEdxIntegral(const PROPOSALParticle&, double variable);
+    double FunctionToDEdxIntegral(double energy, double variable);
 
 //----------------------------------------------------------------------------//
 
@@ -95,22 +95,22 @@ protected:
     and \f$v_{Up}=max( v_{max} , v_{Cut}(E_p))\f$
     */
 
-    CrossSections::IntegralLimits SetIntegralLimits(const PROPOSALParticle&, int component);
+    CrossSections::IntegralLimits SetIntegralLimits(double energy, int component);
 //----------------------------------------------------------------------------//
 
-    double FunctionToBuildEpairInterpolant(const PROPOSALParticle&, double energy , double v);
+    double FunctionToBuildEpairInterpolant( double energy , double v);
 
 //----------------------------------------------------------------------------//
-    double FunctionToBuildDEdxInterpolant(const PROPOSALParticle&, double energy);
+    double FunctionToBuildDEdxInterpolant( double energy);
 
 //----------------------------------------------------------------------------//
     double FunctionToBuildDNdxInterpolant1D(double energy);
 
 //----------------------------------------------------------------------------//
-    double FunctionToBuildDNdxInterpolant2D(const PROPOSALParticle&, double energy, double v);
+    double FunctionToBuildDNdxInterpolant2D( double energy, double v);
 
 //----------------------------------------------------------------------------//
-    double CalculateStochasticLoss(const PROPOSALParticle&, double rnd1);
+    double CalculateStochasticLoss(double energy, double rnd1);
 
 //----------------------------------------------------------------------------//
 
@@ -120,7 +120,7 @@ public:
 
     Epairproduction();
     Epairproduction(const Epairproduction&);
-    Epairproduction(Medium* medium, EnergyCutSettings* cut_settings);
+    Epairproduction(PROPOSALParticle&, Medium* medium, EnergyCutSettings* cut_settings);
     bool operator==(const Epairproduction &epair) const;
     bool operator!=(const Epairproduction &epair) const;
     Epairproduction& operator=(const Epairproduction&);
@@ -134,31 +134,31 @@ public:
     \return [E/cm]
     */
 
-    double CalculatedEdx(const PROPOSALParticle&);
+    double CalculatedEdx(double energy);
 
 //----------------------------------------------------------------------------//
 
-    double CalculatedNdx(const PROPOSALParticle&);
+    double CalculatedNdx(double energy);
 
 //----------------------------------------------------------------------------//
 
-    double CalculatedNdx(const PROPOSALParticle&, double rnd);
+    double CalculatedNdx(double energy, double rnd);
 
 //----------------------------------------------------------------------------//
 
-    double CalculateStochasticLoss(const PROPOSALParticle&, double rnd1, double rnd2);
+    double CalculateStochasticLoss(double energy, double rnd1, double rnd2);
 
 //----------------------------------------------------------------------------//
 
-    void EnableDNdxInterpolation(const PROPOSALParticle&, std::string path ="", bool raw=false);
+    void EnableDNdxInterpolation( std::string path ="", bool raw=false);
 
 //----------------------------------------------------------------------------//
 
-    void EnableDEdxInterpolation(const PROPOSALParticle&, std::string path ="", bool raw=false);
+    void EnableDEdxInterpolation( std::string path ="", bool raw=false);
 
 //----------------------------------------------------------------------------//
 
-    void EnableEpairInterpolation(const PROPOSALParticle&, std::string path ="", bool raw=false);
+    void EnableEpairInterpolation( std::string path ="", bool raw=false);
 
 //----------------------------------------------------------------------------//
 
@@ -174,7 +174,7 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    double FunctionToDNdxIntegral(const PROPOSALParticle&, double variable);
+    double FunctionToDNdxIntegral(double energy, double variable);
 
 //----------------------------------------------------------------------------//
 
