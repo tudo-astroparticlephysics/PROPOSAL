@@ -296,14 +296,14 @@ void SectorInterpolant::InitInterpolation( std::string filepath, bool raw)
 {
     Integral prop_interaction_(IROMB, IMAXS, IPREC2);
 
-    for(unsigned int i =0 ; i < crosssections_.size() ; i++)
+    for(std::vector<CrossSections*>::iterator iter = crosssections_.begin(); iter != crosssections_.end(); ++iter)
     {
-        crosssections_.at(i)->EnableDEdxInterpolation( filepath,raw);
+        (*iter)->EnableDEdxInterpolation( filepath,raw);
     }
 
-    for(unsigned int i =0 ; i < crosssections_.size() ; i++)
+    for(std::vector<CrossSections*>::iterator iter = crosssections_.begin(); iter != crosssections_.end(); ++iter)
     {
-        crosssections_.at(i)->EnableDNdxInterpolation( filepath,raw);
+        (*iter)->EnableDNdxInterpolation( filepath,raw);
     }
 
     bool reading_worked =   true;
@@ -338,33 +338,33 @@ void SectorInterpolant::InitInterpolation( std::string filepath, bool raw)
                 <<"_"<<cut_settings_.GetEcut()
                 <<"_"<<cut_settings_.GetVcut();
 
-        for(unsigned int i =0; i<crosssections_.size(); i++)
+        for(std::vector<CrossSections*>::iterator iter = crosssections_.begin(); iter != crosssections_.end(); ++iter)
         {
-            switch (crosssections_.at(i)->GetType())
+            switch ((*iter)->GetType())
             {
                 case ParticleType::Brems:
                     filename << "_b"
-                        << "_" << crosssections_.at(i)->GetParametrization()
-                        << "_" << crosssections_.at(i)->GetLpmEffectEnabled();
+                        << "_" << (*iter)->GetParametrization()
+                        << "_" << (*iter)->GetLpmEffectEnabled();
                     break;
                 case ParticleType::DeltaE:
                     filename << "_i";
                     break;
                 case ParticleType::EPair:
                     filename << "_e"
-                        << "_" << crosssections_.at(i)->GetLpmEffectEnabled();
+                        << "_" << (*iter)->GetLpmEffectEnabled();
                     break;
                 case ParticleType::NuclInt:
                     filename << "_p"
-                        << "_" << crosssections_.at(i)->GetParametrization();
+                        << "_" << (*iter)->GetParametrization();
                     break;
                 default:
                     log_fatal("Unknown cross section");
                     exit(1);
             }
-            filename<< "_" << crosssections_.at(i)->GetMultiplier()
-                    << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetEcut()
-                    << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetVcut();
+            filename<< "_" << (*iter)->GetMultiplier()
+                    << "_" << (*iter)->GetEnergyCutSettings()->GetEcut()
+                    << "_" << (*iter)->GetEnergyCutSettings()->GetVcut();
         }
 
         if(!raw)
@@ -523,33 +523,33 @@ void SectorInterpolant::InitTimeInterpolation( std::string filepath, bool raw)
                  << "_lifetime_" << particle_.GetLifetime() << "_" << medium_->GetName() << "_"
                  << medium_->GetMassDensity() << "_" << cut_settings_.GetEcut() << "_" << cut_settings_.GetVcut();
 
-        for(unsigned int i =0; i<crosssections_.size(); i++)
+        for(std::vector<CrossSections*>::iterator iter = crosssections_.begin(); iter != crosssections_.end(); ++iter)
         {
-            switch (crosssections_.at(i)->GetType())
+            switch ((*iter)->GetType())
             {
                 case ParticleType::Brems:
                     filename << "_b"
-                        << "_" << crosssections_.at(i)->GetParametrization()
-                        << "_" << crosssections_.at(i)->GetLpmEffectEnabled();
+                        << "_" << (*iter)->GetParametrization()
+                        << "_" << (*iter)->GetLpmEffectEnabled();
                     break;
                 case ParticleType::DeltaE:
                     filename << "_i";
                     break;
                 case ParticleType::EPair:
                     filename << "_e"
-                        << "_" << crosssections_.at(i)->GetLpmEffectEnabled();
+                        << "_" << (*iter)->GetLpmEffectEnabled();
                     break;
                 case ParticleType::NuclInt:
                     filename << "_p"
-                        << "_" << crosssections_.at(i)->GetParametrization();
+                        << "_" << (*iter)->GetParametrization();
                     break;
                 default:
                     log_fatal("Unknown cross section");
                     exit(1);
             }
-            filename<< "_" << crosssections_.at(i)->GetMultiplier()
-                    << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetEcut()
-                    << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetVcut();
+            filename<< "_" << (*iter)->GetMultiplier()
+                    << "_" << (*iter)->GetEnergyCutSettings()->GetEcut()
+                    << "_" << (*iter)->GetEnergyCutSettings()->GetVcut();
 
         }
 

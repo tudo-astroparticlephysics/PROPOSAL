@@ -51,7 +51,7 @@ protected:
 
     std::vector<double> prob_for_component_; //!< probability for each medium component to interact with the particle (formerly H_)
 
-    std::vector<double> woodSaxonPotential_; //!< Woods-Saxon potential factor
+    std::vector<double> woodSaxonPotential_; //!< Wood-Saxon potential factor (needed for Butkevich Shadowing)
 
 
 //----------------------------------------------------------------------------//
