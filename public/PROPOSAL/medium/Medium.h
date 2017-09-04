@@ -82,7 +82,6 @@ class Medium
     std::string GetName() const { return name_; }
     double GetMM() const { return MM_; }
     double GetSumNucleons() const { return sumNucleons_; }
-    double GetR0() const { return r0_; }
 
     // Setter
     void SetNumComponents(int numComponents);
@@ -103,7 +102,6 @@ class Medium
     void SetComponents(std::vector<Components::Component*>);
     void SetMM(double MM);
     void SetSumNucleons(double sumNucleons);
-    void SetR0(double r0);
 
     protected:
 
@@ -131,8 +129,6 @@ class Medium
 
     double MM_;          ///< average all-component nucleon weight
     double sumNucleons_; ///< sum of nucleons of all nuclei
-
-    double r0_;
 
     double X0_inv(unsigned int Z, double M);
 };
