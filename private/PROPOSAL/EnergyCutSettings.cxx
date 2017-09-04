@@ -1,7 +1,6 @@
 
 #include "PROPOSAL/EnergyCutSettings.h"
 
-using namespace std;
 using namespace PROPOSAL;
 
 //----------------------------------------------------------------------------//
@@ -11,44 +10,34 @@ using namespace PROPOSAL;
 //----------------------------------------------------------------------------//
 
 
-double EnergyCutSettings::GetCut(double energy)
+double EnergyCutSettings::GetCut(const double energy)
 {
 
     double aux;
-    double vCut;
-
-    aux =   ecut_/energy;
+    aux = ecut_/energy;
 
     if(ecut_>0)
     {
         if(vcut_>0 && vcut_<=1)
         {
-            if(aux<vcut_)
-            {
-                vCut   =   aux;
-            }
-            else
-            {
-                vCut   =   vcut_;
-            }
+            return std::min(aux, vcut_);
         }
         else
         {
-            vCut   =   aux;
+            return aux;
         }
     }
     else
     {
         if(vcut_>0 && vcut_<=1)
         {
-            vCut   =   vcut_;
+            return vcut_;
         }
         else
         {
-            vCut   =   1.;
+            return 1.;
         }
     }
-    return vCut;
 }
 
 
@@ -83,7 +72,7 @@ EnergyCutSettings::EnergyCutSettings(const EnergyCutSettings &cuts)
 //----------------------------------------------------------------------------//
 
 
-EnergyCutSettings::EnergyCutSettings(double ecut, double vcut)
+EnergyCutSettings::EnergyCutSettings(const double ecut, const double vcut)
     :ecut_  ( ecut )
     ,vcut_  ( vcut )
 {
@@ -141,11 +130,11 @@ bool EnergyCutSettings::operator!=(const EnergyCutSettings &energyCutSettings) c
 namespace PROPOSAL
 {
 
-ostream& operator<<(ostream& os, EnergyCutSettings const& cut_settings)
+std::ostream& operator<<(std::ostream& os, EnergyCutSettings const& cut_settings)
 {
-    os<<"--------EnergyCutSettings( "<<&cut_settings<<" )--------"<<endl;
-    os<<"\tEcut: "<<cut_settings.ecut_<<endl;
-    os<<"\tVcut: "<<cut_settings.vcut_<<endl;
+    os<<"--------EnergyCutSettings( "<<&cut_settings<<" )--------"<<std::endl;
+    os<<"\tEcut: "<<cut_settings.ecut_<<std::endl;
+    os<<"\tVcut: "<<cut_settings.vcut_<<std::endl;
     os<<"------------------------------------";
     return os;
 }
@@ -158,24 +147,6 @@ ostream& operator<<(ostream& os, EnergyCutSettings const& cut_settings)
 
 void EnergyCutSettings::swap(EnergyCutSettings &energyCutSettings)
 {
-    using std::swap;
-
-    swap( ecut_   , energyCutSettings.ecut_);
-    swap( vcut_   , energyCutSettings.vcut_);
-}
-
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-//---------------------------------Setter-------------------------------------//
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-void EnergyCutSettings::SetEcut(double ecut){
-    ecut_ = ecut;
-}
-
-void EnergyCutSettings::SetVcut(double vcut){
-    vcut_ = vcut;
+    std::swap( ecut_, energyCutSettings.ecut_);
+    std::swap( vcut_, energyCutSettings.vcut_);
 }
