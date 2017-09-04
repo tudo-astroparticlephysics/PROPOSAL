@@ -100,7 +100,7 @@ void Output::ClearSecondaryVector()
 {
     for(unsigned int i = 0 ; i< secondarys_.size() ; i++)
     {
-        delete secondarys_.at(i);
+        delete secondarys_[i];
     }
     secondarys_.clear();
 }

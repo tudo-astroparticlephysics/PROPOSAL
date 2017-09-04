@@ -103,25 +103,25 @@ Sector::Sector(PROPOSALParticle& particle, const Medium& medium,
     crosssections_.push_back(new Photonuclear(particle_, medium_, &cut_settings_));
     crosssections_.push_back(new Epairproduction(particle_, medium_, &cut_settings_));
 
-    for(std::vector<CrossSections*>::iterator it = crosssections_.begin(); it != crosssections_.end(); ++it)
+    for(std::vector<CrossSections*>::iterator iter = crosssections_.begin(); iter != crosssections_.end(); ++iter)
     {
-        switch ((*it)->GetType())
+        switch ((*iter)->GetType())
         {
             case ParticleType::Brems:
                 // collections_.at(j)->GetCrosssections().at(i)->SetParametrization(brems_);
-                (*it)->SetMultiplier(collection_def_.brems_multiplier);
-                (*it)->EnableLpmEffect(collection_def_.lpm_effect_enabled);
+                (*iter)->SetMultiplier(collection_def_.brems_multiplier);
+                (*iter)->EnableLpmEffect(collection_def_.lpm_effect_enabled);
                 break;
             case ParticleType::DeltaE:
-                (*it)->SetMultiplier(collection_def_.ioniz_multiplier);
+                (*iter)->SetMultiplier(collection_def_.ioniz_multiplier);
                 break;
             case ParticleType::EPair:
-                (*it)->SetMultiplier(collection_def_.epair_multiplier);
-                (*it)->EnableLpmEffect(collection_def_.lpm_effect_enabled);
+                (*iter)->SetMultiplier(collection_def_.epair_multiplier);
+                (*iter)->EnableLpmEffect(collection_def_.lpm_effect_enabled);
                 break;
             case ParticleType::NuclInt:
                 // collections_.at(j)->GetCrosssections().at(i)->SetParametrization(photo_);
-                (*it)->SetMultiplier(collection_def_.photo_multiplier);
+                (*iter)->SetMultiplier(collection_def_.photo_multiplier);
                 break;
             default:
                 log_fatal("Unknown cross section");
@@ -157,19 +157,19 @@ Sector::Sector(const Sector& collection)
     //TODO(mario): clone Sat 2017/08/26
     for(unsigned int i =0; i<collection.crosssections_.size(); i++)
     {
-        switch (collection.crosssections_.at(i)->GetType())
+        switch (collection.crosssections_[i]->GetType())
         {
             case ParticleType::Brems:
-                crosssections_.at(i) = new Bremsstrahlung( *(Bremsstrahlung*)collection.crosssections_.at(i) );
+                crosssections_[i] = new Bremsstrahlung( *(Bremsstrahlung*)collection.crosssections_[i] );
                 break;
             case ParticleType::DeltaE:
-                crosssections_.at(i) = new Ionization( *(Ionization*)collection.crosssections_.at(i) );
+                crosssections_[i] = new Ionization( *(Ionization*)collection.crosssections_[i] );
                 break;
             case ParticleType::EPair:
-                crosssections_.at(i) = new Epairproduction( *(Epairproduction*)collection.crosssections_.at(i) );
+                crosssections_[i] = new Epairproduction( *(Epairproduction*)collection.crosssections_[i] );
                 break;
             case ParticleType::NuclInt:
-                crosssections_.at(i) = new Photonuclear( *(Photonuclear*)collection.crosssections_.at(i) );
+                crosssections_[i] = new Photonuclear( *(Photonuclear*)collection.crosssections_[i] );
                 break;
             default:
                 log_fatal("Unknown cross section");
@@ -530,10 +530,10 @@ pair<double, ParticleType::Enum> Sector::MakeStochasticLoss()
     // if (particle_->GetEnergy() < 650) printf("energy: %f\n", particle_->GetEnergy());
     for (unsigned int i = 0; i < GetCrosssections().size(); i++)
     {
-        rates.at(i) = crosssections_.at(i)->CalculatedNdx(particle_.GetEnergy(), rnd2);
-        total_rate += rates.at(i);
-        // if (rates.at(i) == 0) printf("%i = 0, energy: %f\n", i, particle_->GetEnergy());
-        log_debug("Rate for %s = %f", crosssections_.at(i)->GetName().c_str(), rates.at(i));
+        rates[i] = crosssections_[i]->CalculatedNdx(particle_.GetEnergy(), rnd2);
+        total_rate += rates[i];
+        // if (rates[i] == 0) printf("%i = 0, energy: %f\n", i, particle_->GetEnergy());
+        log_debug("Rate for %s = %f", crosssections_[i]->GetName().c_str(), rates[i]);
     }
 
     total_rate_weighted = total_rate * rnd1;
@@ -542,12 +542,12 @@ pair<double, ParticleType::Enum> Sector::MakeStochasticLoss()
 
     for (unsigned int i = 0; i < rates.size(); i++)
     {
-        rates_sum += rates.at(i);
+        rates_sum += rates[i];
 
         if (rates_sum > total_rate_weighted)
         {
-            energy_loss.first  = crosssections_.at(i)->CalculateStochasticLoss(particle_.GetEnergy(), rnd2, rnd3);
-            energy_loss.second = crosssections_.at(i)->GetType();
+            energy_loss.first  = crosssections_[i]->CalculateStochasticLoss(particle_.GetEnergy(), rnd2, rnd3);
+            energy_loss.second = crosssections_[i]->GetType();
             break;
         }
     }
@@ -640,18 +640,18 @@ double Sector::MakeDecay(double energy)
 void Sector::EnableLpmEffect()
 {
     collection_def_.lpm_effect_enabled = true;
-    for (unsigned int i = 0; i < crosssections_.size(); i++)
+    for(std::vector<CrossSections*>::iterator iter = crosssections_.begin(); iter != crosssections_.end(); ++iter)
     {
-        crosssections_.at(i)->EnableLpmEffect(collection_def_.lpm_effect_enabled);
+        (*iter)->EnableLpmEffect(collection_def_.lpm_effect_enabled);
     }
 }
 
 void Sector::DisableLpmEffect()
 {
     collection_def_.lpm_effect_enabled = false;
-    for (unsigned int i = 0; i < crosssections_.size(); i++)
+    for(std::vector<CrossSections*>::iterator iter = crosssections_.begin(); iter != crosssections_.end(); ++iter)
     {
-        crosssections_.at(i)->EnableLpmEffect(collection_def_.lpm_effect_enabled);
+        (*iter)->EnableLpmEffect(collection_def_.lpm_effect_enabled);
     }
 }
 
@@ -719,11 +719,11 @@ double Sector::FunctionToPropIntegralInteraction( double energy)
 
     aux = FunctionToIntegral( energy);
 
-    for (unsigned int i = 0; i < crosssections_.size(); i++)
+    for(std::vector<CrossSections*>::iterator iter = crosssections_.begin(); iter != crosssections_.end(); ++iter)
     {
-        rate = crosssections_.at(i)->CalculatedNdx(energy);
+        rate = (*iter)->CalculatedNdx(energy);
 
-        log_debug("Rate for %s = %f", crosssections_.at(i)->GetName().c_str(), rate);
+        log_debug("Rate for %s = %f", (*iter)->GetName().c_str(), rate);
 
         total_rate += rate;
     }
@@ -740,9 +740,9 @@ double Sector::FunctionToIntegral( double energy)
 
     result = 0.0;
 
-    for (unsigned int i = 0; i < crosssections_.size(); i++)
+    for(std::vector<CrossSections*>::iterator iter = crosssections_.begin(); iter != crosssections_.end(); ++iter)
     {
-        aux = crosssections_.at(i)->CalculatedEdx(energy);
+        aux = (*iter)->CalculatedEdx(energy);
         result += aux;
 
         log_debug("energy %f , dE/dx = %f", particle_.GetEnergy(), aux);

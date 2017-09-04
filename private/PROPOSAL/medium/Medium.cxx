@@ -126,7 +126,7 @@ Medium::Medium(const Medium& medium)
     components_.resize(numComponents_);
     for (unsigned int i = 0; i < components_.size(); ++i)
     {
-        components_.at(i) = medium.components_.at(i)->clone();
+        components_[i] = medium.components_[i]->clone();
     }
 }
 
@@ -207,7 +207,7 @@ Medium& Medium::operator=(const Medium& medium)
 
         for (unsigned int i = 0; i < components_.size(); ++i)
         {
-            components_.at(i) = medium.components_.at(i)->clone();
+            components_[i] = medium.components_[i]->clone();
         }
     }
 
@@ -264,7 +264,7 @@ bool Medium::operator==(const Medium& medium) const
         bool Return = true;
         for (unsigned int i = 0; i < components_.size(); ++i)
         {
-            if (*components_.at(i) != *medium.components_.at(i))
+            if (*components_[i] != *medium.components_[i])
             {
                 Return = false;
             }
