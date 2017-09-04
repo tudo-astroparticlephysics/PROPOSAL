@@ -686,6 +686,7 @@ Photonuclear::Photonuclear()
     ,dndx_interpolant_2d_   ( )
     ,photo_interpolant_     ( )
     ,prob_for_component_    ( )
+    ,woodSaxonPotential_    ( )
 
 {
     name_   =   "Photonuclear";
@@ -705,6 +706,8 @@ Photonuclear::Photonuclear()
     prob_for_component_.resize(medium_->GetNumComponents());
     dedx_interpolant_     = NULL;
     interpolant_measured_ = NULL;
+
+    CalculateWoodSaxonPotential();
 }
 
 
@@ -725,6 +728,7 @@ Photonuclear::Photonuclear(const Photonuclear &photo)
     ,integral_                          ( new Integral(*photo.integral_) )
     ,integral_for_dEdx_                 ( new Integral(*photo.integral_for_dEdx_) )
     ,prob_for_component_                ( photo.prob_for_component_ )
+    ,woodSaxonPotential_                ( photo.woodSaxonPotential_ )
 {
 
     if(photo.dedx_interpolant_ != NULL)
@@ -793,6 +797,7 @@ Photonuclear::Photonuclear(Medium* medium, EnergyCutSettings* cut_settings)
     , dndx_interpolant_2d_()
     , photo_interpolant_()
     , prob_for_component_()
+    , woodSaxonPotential_()
 
 {
     name_       = "Photonuclear";
@@ -813,7 +818,7 @@ Photonuclear::Photonuclear(Medium* medium, EnergyCutSettings* cut_settings)
     dedx_interpolant_     = NULL;
     interpolant_measured_ = NULL;
 
-
+    CalculateWoodSaxonPotential();
 }
 
 
@@ -856,6 +861,7 @@ bool Photonuclear::operator==(const Photonuclear &photo) const
     if( *integral_                  != *photo.integral_)                    return false;
     if( *integral_for_dEdx_         != *photo.integral_for_dEdx_)           return false;
     if( prob_for_component_.size()  !=  photo.prob_for_component_.size())   return false;
+    if( woodSaxonPotential_.size()  !=  photo.woodSaxonPotential_.size())   return false;
     if( dndx_integral_.size()       !=  photo.dndx_integral_.size())        return false;
     if( dndx_interpolant_1d_.size() !=  photo.dndx_interpolant_1d_.size())  return false;
     if( dndx_interpolant_2d_.size() !=  photo.dndx_interpolant_2d_.size())  return false;
@@ -878,6 +884,10 @@ bool Photonuclear::operator==(const Photonuclear &photo) const
     for(unsigned int i =0; i<photo.prob_for_component_.size(); i++)
     {
         if( prob_for_component_.at(i) != photo.prob_for_component_.at(i) )      return false;
+    }
+    for(unsigned int i =0; i<photo.woodSaxonPotential_.size(); i++)
+    {
+        if( woodSaxonPotential_.at(i) != photo.woodSaxonPotential_.at(i) )      return false;
     }
     for(unsigned int i =0; i<photo.interpolant_hardBB_.size(); i++)
     {
@@ -939,6 +949,7 @@ void Photonuclear::swap(Photonuclear &photo)
     integral_->swap(*photo.integral_);
 
     prob_for_component_.swap(photo.prob_for_component_);
+    woodSaxonPotential_.swap(photo.woodSaxonPotential_);
     dndx_integral_.swap(photo.dndx_integral_);
     dndx_interpolant_1d_.swap(photo.dndx_interpolant_1d_);
     dndx_interpolant_2d_.swap(photo.dndx_interpolant_2d_);
@@ -1038,6 +1049,11 @@ ostream& operator<<(std::ostream& os, Photonuclear const &photo)
     for(unsigned int i=0;i<photo.prob_for_component_.size();i++)
     {
         os<<"\t\t\tvalue:\t\t"<<photo.prob_for_component_.at(i)<<endl;
+    }
+    os<<"\t\twoodSaxonPotential:\t"<<photo.woodSaxonPotential_.size()<<endl;
+    for(unsigned int i=0;i<photo.woodSaxonPotential_.size();i++)
+    {
+        os<<"\t\t\tvalue:\t\t"<<photo.woodSaxonPotential_.at(i)<<endl;
     }
     os<<"-----------------------------------------------------------------------------------------------";
     return os;
@@ -1628,7 +1644,7 @@ double Photonuclear::ShadowEffect(double x , double nu)
 
             double mb, Aosc, mu, au, ac;
 
-            mb      =   Mb*medium_->GetComponents().at(component_)->GetMN();
+            mb      =   Mb*woodSaxonPotential_.at(component_);
             au      =   1/(1 - x);
             ac      =   1/(1 - x2);
             mu      =   MPI/medium_->GetComponents().at(component_)->GetAverageNucleonWeight();
@@ -1643,9 +1659,9 @@ double Photonuclear::ShadowEffect(double x , double nu)
 
             double m1, m2, m3, x0, sgn;
 
-            m1  =   M1*medium_->GetComponents().at(component_)->GetMN();
-            m2  =   M2*medium_->GetComponents().at(component_)->GetMN();
-            m3  =   M3*medium_->GetComponents().at(component_)->GetMN();
+            m1  =   M1*woodSaxonPotential_.at(component_);
+            m2  =   M2*woodSaxonPotential_.at(component_);
+            m3  =   M3*woodSaxonPotential_.at(component_);
             nu  *=  1.e-3;
             sgn =   112.2*(0.609*pow(nu, 0.0988) + 1.037*pow(nu, -0.5944));
             G   =   ShadowBezrukovBugaev(sgn, atomic_number);
@@ -1669,6 +1685,49 @@ double Photonuclear::ShadowEffect(double x , double nu)
     return G;
 }
 
+
+//----------------------------------------------------------------------------//
+//--------------Wood-Saxon (for Butkevich-Mikheyev Shadowing)-----------------//
+//----------------------------------------------------------------------------//
+
+
+void Photonuclear::CalculateWoodSaxonPotential()
+{
+    woodSaxonPotential_.resize( medium_->GetNumComponents() );
+
+    for(int i=0; i<(medium_->GetNumComponents()); i++)
+    {
+        if (medium_->GetComponents().at(i)->GetNucCharge() != 1.0)
+        {
+            Integral integral(IROMB, IMAXS, IPREC);
+
+            double r0;
+            r0 = pow(medium_->GetComponents().at(i)->GetAtomicNum(), 1.0 / 3.0);
+            r0 = 1.12 * r0 - 0.86 / r0;
+
+            woodSaxonPotential_.at(i) = 1.0 -
+                  4.0 * PI * 0.17 *
+                      integral.Integrate(
+                          r0, -1.0,
+                          boost::bind(&Photonuclear::FunctionToWoodSaxonPotentialIntegral, this, r0, _1),
+                          3, 2.0) /
+                      medium_->GetComponents().at(i)->GetAtomicNum();
+        }
+        else
+        {
+            woodSaxonPotential_.at(i) = 0.;
+        }
+    }
+}
+
+// ------------------------------------------------------------------------- //
+
+double Photonuclear::FunctionToWoodSaxonPotentialIntegral(const double r0, double r)
+{
+    const double a = 0.54;
+
+    return r * r / (1 + exp((r - r0) / a));
+}
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
