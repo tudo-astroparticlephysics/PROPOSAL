@@ -80,7 +80,7 @@ class Geometry
         std::string GetName() const { return name_; }
         unsigned int GetHirarchy() const { return hirarchy_; }
 
-        void SetPosition(Vector3D& position) { position_ = position; };
+        void SetPosition(const Vector3D& position) { position_ = position; };
 
         void SetHirarchy(unsigned int hirarchy) { hirarchy_ = hirarchy; };
 

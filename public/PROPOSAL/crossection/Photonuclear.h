@@ -80,8 +80,8 @@ protected:
      */
 
 
-    double ParametrizationOfRealPhotonAssumption(const PROPOSALParticle&, double v, int i);
-    double ParametrizationOfQ2Integration(const PROPOSALParticle&, double v, int i);
+    double ParametrizationOfRealPhotonAssumption(double energy, double v, int i);
+    double ParametrizationOfQ2Integration(double energy, double v, int i);
 
 //----------------------------------------------------------------------------//
 
@@ -126,10 +126,10 @@ protected:
      * \return  function value
      */
 
-    double FunctionToIntegralALLM91(const PROPOSALParticle&, double Q2);
-    double FunctionToIntegralALLM97(const PROPOSALParticle&, double Q2);
-    double FunctionToIntegralButMik(const PROPOSALParticle&, double Q2);
-    double FunctionToIntegralRSS(const PROPOSALParticle&, double Q2);
+    double FunctionToIntegralALLM91(double energy, double Q2);
+    double FunctionToIntegralALLM97(double energy, double Q2);
+    double FunctionToIntegralButMik(double energy, double Q2);
+    double FunctionToIntegralRSS(double energy, double Q2);
 
 
 //----------------------------------------------------------------------------//
@@ -146,12 +146,12 @@ protected:
      *
      * \param   i   crossection component
      */
-    CrossSections::IntegralLimits SetIntegralLimits(const PROPOSALParticle&, int component);
+    CrossSections::IntegralLimits SetIntegralLimits(double energy, int component);
 
 //----------------------------------------------------------------------------//
 
 
-    double FunctionToDEdxIntegral(const PROPOSALParticle&, double variable);
+    double FunctionToDEdxIntegral(double energy, double variable);
 
 //----------------------------------------------------------------------------//
 
@@ -177,7 +177,7 @@ protected:
      * \return  \f$\rho_{mol}N(z^2)^2 \int_{min}^{max} \frac{d\sigma}{dv} dv\f$
      */
 
-    double PhotoN(const PROPOSALParticle&, double v, int i);
+    double PhotoN(double energy, double v, int i);
 
 
 //----------------------------------------------------------------------------//
@@ -207,7 +207,7 @@ protected:
      * parametrization calculation
      */
 
-    void EnableHardBB(const PROPOSALParticle&);
+    void EnableHardBB();
 
 //----------------------------------------------------------------------------//
     /*!
@@ -218,23 +218,23 @@ protected:
      * \return  hard part of bb cross section
      */
 
-    double HardBB(const PROPOSALParticle&, double v);
+    double HardBB(double energy, double v);
 
 //----------------------------------------------------------------------------//
-    double FunctionToBuildDEdxInterpolant(const PROPOSALParticle&, double energy);
+    double FunctionToBuildDEdxInterpolant( double energy);
 
 //----------------------------------------------------------------------------//
 
-    double FunctionToBuildPhotoInterpolant(const PROPOSALParticle&, double energy , double v);
+    double FunctionToBuildPhotoInterpolant( double energy , double v);
 
 //----------------------------------------------------------------------------//
     double FunctionToBuildDNdxInterpolant1D(double energy);
 
 //----------------------------------------------------------------------------//
-    double FunctionToBuildDNdxInterpolant2D(const PROPOSALParticle&, double energy, double v);
+    double FunctionToBuildDNdxInterpolant2D( double energy, double v);
 
 //----------------------------------------------------------------------------//
-    double CalculateStochasticLoss(const PROPOSALParticle&, double rnd1);
+    double CalculateStochasticLoss(double energy, double rnd1);
 
 //----------------------------------------------------------------------------//
 
@@ -252,41 +252,41 @@ public:
 
     Photonuclear();
     Photonuclear(const Photonuclear&);
+    Photonuclear(PROPOSALParticle&, Medium* medium, EnergyCutSettings* cut_settings);
     Photonuclear& operator=(const Photonuclear&);
     bool operator==(const Photonuclear &photo) const;
     bool operator!=(const Photonuclear &photo) const;
-    Photonuclear(Medium* medium, EnergyCutSettings* cut_settings);
     friend std::ostream& operator<<(std::ostream& os, Photonuclear const &photo);
 
 //----------------------------------------------------------------------------//
     void swap(Photonuclear &photo);
 
 //----------------------------------------------------------------------------//
-    double CalculatedEdx(const PROPOSALParticle&);
+    double CalculatedEdx(double energy);
 
 //----------------------------------------------------------------------------//
 
-    double CalculatedNdx(const PROPOSALParticle&);
+    double CalculatedNdx(double energy);
 
 //----------------------------------------------------------------------------//
 
-    double CalculatedNdx(const PROPOSALParticle&, double rnd);
+    double CalculatedNdx(double energy, double rnd);
 
 //----------------------------------------------------------------------------//
 
-    double CalculateStochasticLoss(const PROPOSALParticle&, double rnd1, double rnd2);
+    double CalculateStochasticLoss(double energy, double rnd1, double rnd2);
 
 //----------------------------------------------------------------------------//
 
-    void EnableDNdxInterpolation(const PROPOSALParticle&, std::string path ="", bool raw=false);
+    void EnableDNdxInterpolation( std::string path ="", bool raw=false);
 
 //----------------------------------------------------------------------------//
 
-    void EnableDEdxInterpolation(const PROPOSALParticle&, std::string path ="", bool raw=false);
+    void EnableDEdxInterpolation( std::string path ="", bool raw=false);
 
 //----------------------------------------------------------------------------//
 
-    void EnablePhotoInterpolation(const PROPOSALParticle&, std::string path ="", bool raw=false);
+    void EnablePhotoInterpolation( std::string path ="", bool raw=false);
 
 //----------------------------------------------------------------------------//
 
@@ -301,7 +301,7 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    double FunctionToDNdxIntegral(const PROPOSALParticle&, double variable);
+    double FunctionToDNdxIntegral(double energy, double variable);
 
 //----------------------------------------------------------------------------//
 
