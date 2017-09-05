@@ -90,6 +90,22 @@ double CrossSectionIntegral::CalculateStochasticLoss(double energy,  double rnd1
     return CalculateStochasticLoss(energy, rnd2);
 }
 
+// ------------------------------------------------------------------------- //
+double CrossSectionIntegral::FunctionToBuildDNdxInterpolant(double energy, int component)
+{
+    (void) energy;
+    (void) component;
+    // Empty, no interpolation needed
+}
+
+// ------------------------------------------------------------------------- //
+double CrossSectionIntegral::FunctionToBuildDNdxInterpolant2D(double energy, double v, int component)
+{
+    (void) energy;
+    (void) v;
+    (void) component;
+    // Empty, no interpolation needed
+}
 
 // ------------------------------------------------------------------------- //
 // Private methods
