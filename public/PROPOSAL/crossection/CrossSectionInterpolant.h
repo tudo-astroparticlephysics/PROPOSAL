@@ -21,6 +21,10 @@ class CrossSectionInterpolant: public CrossSection
         virtual double CalculatedNdx(double energy, double rnd);
         virtual double CalculateStochasticLoss(double energy, double rnd1, double rnd2);
 
+        // Needed to initialize interpolation
+        virtual double FunctionToBuildDNdxInterpolant(double energy, int component);
+        virtual double FunctionToBuildDNdxInterpolant2D(double energy, double v, int component);
+
     protected:
         typedef std::vector<Interpolant*> InterpolantVec;
 
