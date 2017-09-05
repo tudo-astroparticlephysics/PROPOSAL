@@ -46,8 +46,10 @@ class Parametrization
 
         virtual double DifferentialCrossSection(double energy, double v) = 0;
         virtual double CalculateParametrization(double energy, double v) = 0;
+
         virtual double FunctionToDEdxIntegral(double energy, double v) = 0;
         virtual double FunctionToDNdxIntegral(double energy, double v) = 0;
+
         virtual IntegralLimits GetIntegralLimits(double energy) = 0;
 
         // ----------------------------------------------------------------- //
@@ -57,6 +59,7 @@ class Parametrization
         const ParticleDef& GetParticleDef() const { return particle_def_; }
         const Medium& GetMedium() const { return *medium_; }
         const EnergyCutSettings& GetEnergyCuts() const { return cut_settings_; }
+        const Definition& GetDefinition() const { return param_def_; }
         double GetMultiplier() const { return param_def_.multiplier; }
 
         // ----------------------------------------------------------------- //
