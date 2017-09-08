@@ -1,0 +1,32 @@
+
+#pragma once
+
+
+#include "PROPOSAL/crossection/CrossSectionIntegral.h"
+
+namespace PROPOSAL
+{
+
+class IonizIntegral: public CrossSectionIntegral
+{
+    public:
+        IonizIntegral(Parametrization&);
+        IonizIntegral(const IonizIntegral&);
+        virtual ~IonizIntegral();
+
+        CrossSection* clone() const { return new IonizIntegral(*this); }
+
+        // ----------------------------------------------------------------- //
+        // Public methods
+        // ----------------------------------------------------------------- //
+
+        double CalculatedEdx(double energy);
+        virtual double CalculatedNdx(double energy);
+        virtual double CalculatedNdx(double energy, double rnd);
+
+    private:
+        virtual double CalculateStochasticLoss(double energy, double rnd1);
+        double Delta(double beta, double gamma);
+};
+
+} /* PROPOSAL */

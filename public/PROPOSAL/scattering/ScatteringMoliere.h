@@ -32,7 +32,7 @@ class ScatteringMoliere : public Scattering
     // Memberfunctions
 
     // Do nothing, not interpolation for scattering moliere
-    virtual void EnableInterpolation(const PROPOSALParticle&, const std::vector<CrossSections*>&, std::string path = "");
+    virtual void EnableInterpolation(const PROPOSALParticle&, const std::vector<CrossSection*>&, std::string path = "");
     virtual void DisableInterpolation();
 
     //----------------------------------------------------------------------------//
@@ -74,7 +74,7 @@ class ScatteringMoliere : public Scattering
 
     private:
 
-    RandomAngles CalculateRandomAngle(const PROPOSALParticle&, const std::vector<CrossSections*>&, double dr, double ei, double ef);
+    RandomAngles CalculateRandomAngle(const PROPOSALParticle&, const std::vector<CrossSection*>&, double dr, double ei, double ef);
 
     ScatteringMoliere& operator=(const ScatteringMoliere&); // Undefined & not allowed
 
