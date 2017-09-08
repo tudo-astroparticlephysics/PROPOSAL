@@ -42,7 +42,7 @@ double CrossSectionIntegral::CalculatedNdx(double energy)
     const ComponentVec& components = parametrization_.GetMedium().GetComponents();
     for(size_t i = 0; i < components.size(); ++i)
     {
-        parametrization_.SetCurrentComponent(components[i]);
+        parametrization_.SetCurrentComponent(i);
         Parametrization::IntegralLimits limits = parametrization_.GetIntegralLimits(energy);
 
         prob_for_component_[i] = dndx_integral_[i].Integrate(limits.vUp, limits.vMax, boost::bind(&Parametrization::FunctionToDNdxIntegral, &parametrization_, energy,  _1),4);
@@ -69,7 +69,7 @@ double CrossSectionIntegral::CalculatedNdx(double energy, double rnd)
     const ComponentVec& components = parametrization_.GetMedium().GetComponents();
     for(size_t i = 0; i < components.size(); ++i)
     {
-        parametrization_.SetCurrentComponent(components[i]);
+        parametrization_.SetCurrentComponent(i);
         Parametrization::IntegralLimits limits = parametrization_.GetIntegralLimits(energy);
 
         prob_for_component_.at(i) = dndx_integral_[i].IntegrateWithRandomRatio(limits.vUp, limits.vMax, boost::bind(&Parametrization::FunctionToDNdxIntegral, &parametrization_, energy,  _1), 4, rnd);
@@ -135,7 +135,7 @@ double CrossSectionIntegral::CalculateStochasticLoss(double energy, double rnd1)
 
         if(rsum > rnd)
         {
-            parametrization_.SetCurrentComponent(components[i]);
+            parametrization_.SetCurrentComponent(i);
             return energy * dndx_integral_[i].GetUpperLimit();
         }
     }
@@ -144,7 +144,7 @@ double CrossSectionIntegral::CalculateStochasticLoss(double energy, double rnd1)
     bool prob_for_all_comp_is_zero=true;
     for(size_t i = 0; i < components.size(); ++i)
     {
-        parametrization_.SetCurrentComponent(components[i]);
+        parametrization_.SetCurrentComponent(i);
         Parametrization::IntegralLimits limits = parametrization_.GetIntegralLimits(energy);
 
         if (limits.vUp != limits.vMax)

@@ -95,13 +95,13 @@ class EpairProductionRhoIntegral : public EpairProduction
 
     Parametrization* clone() const { return new EpairProductionRhoIntegral(*this); }
 
-    double DifferentialCrossSection(double energy, double v);
+    virtual double DifferentialCrossSection(double energy, double v);
 
     private:
     Integral integral_;
 };
 
-class EpairProductionRhoInterpolant : public EpairProduction
+class EpairProductionRhoInterpolant : public EpairProductionRhoIntegral
 {
     public:
     EpairProductionRhoInterpolant(const ParticleDef&, const Medium&, const EnergyCutSettings&, Definition = Definition());
@@ -113,7 +113,7 @@ class EpairProductionRhoInterpolant : public EpairProduction
     double DifferentialCrossSection(double energy, double v);
 
     private:
-    double FunctionToBuildEpairInterpolant(double energy, double v);
+    double FunctionToBuildEpairInterpolant(double energy, double v, int component);
 
     std::vector<Interpolant*> interpolant_; //!< Interpolates function used by dNdx and dEdx
 };

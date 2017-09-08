@@ -199,7 +199,7 @@ double CrossSectionInterpolant::CalculateStochasticLoss(double energy, double rn
 
         if(rsum > rnd)
         {
-            parametrization_.SetCurrentComponent(components_[i]);
+            parametrization_.SetCurrentComponent(i);
             Parametrization::IntegralLimits limits = parametrization_.GetIntegralLimits(energy);
 
             if(limits.vUp == limits.vMax)
@@ -215,7 +215,7 @@ double CrossSectionInterpolant::CalculateStochasticLoss(double energy, double rn
     bool prob_for_all_comp_is_zero=true;
     for(size_t i = 0; i < components_.size(); ++i)
     {
-        parametrization_.SetCurrentComponent(components_[i]);
+        parametrization_.SetCurrentComponent(i);
         Parametrization::IntegralLimits limits = parametrization_.GetIntegralLimits(energy);
 
         if (limits.vUp != limits.vMax)
@@ -243,7 +243,7 @@ double CrossSectionInterpolant::FunctionToBuildDNdxInterpolant(double energy, in
 //----------------------------------------------------------------------------//
 double CrossSectionInterpolant::FunctionToBuildDNdxInterpolant2D(double energy, double v, int component)
 {
-    parametrization_.SetCurrentComponent(components_[component]);
+    parametrization_.SetCurrentComponent(component);
     Parametrization::IntegralLimits limits = parametrization_.GetIntegralLimits(energy);
 
     if (limits.vUp == limits.vMax)
