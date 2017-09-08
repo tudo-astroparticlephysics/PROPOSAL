@@ -12,8 +12,10 @@
 
 #include "PROPOSAL/crossection/BremsInterpolant.h"
 #include "PROPOSAL/crossection/IonizInterpolant.h"
+#include "PROPOSAL/crossection/EpairInterpolant.h"
 #include "PROPOSAL/crossection/parametrization/Bremsstrahlung.h"
 #include "PROPOSAL/crossection/parametrization/Ionization.h"
+#include "PROPOSAL/crossection/parametrization/EpairProduction.h"
 // #include "PROPOSAL/crossection/Epairproduction.h"
 // #include "PROPOSAL/crossection/Ionization.h"
 // #include "PROPOSAL/crossection/Photonuclear.h"
@@ -109,16 +111,18 @@ Sector::Sector(PROPOSALParticle& particle, const Medium& medium,
     Parametrization::Definition param_def;
     param_def.path_to_tables = "../src/resources/tables";
     param_def.raw = false;
-    BremsKelnerKokoulinPetrukhin* bparam = new BremsKelnerKokoulinPetrukhin(particle_.GetParticleDef(), *medium_, cut_settings_, param_def);
-    // BremsAndreevBezrukovBugaev* param = new BremsAndreevBezrukovBugaev(particle_.GetParticleDef(), *medium_, cut_settings_, param_def);
 
+    BremsKelnerKokoulinPetrukhin* bparam = new BremsKelnerKokoulinPetrukhin(particle_.GetParticleDef(), *medium_, cut_settings_, param_def);
     Ionization* iparam = new Ionization(particle_.GetParticleDef(), *medium_, cut_settings_, param_def);
+    EpairProductionRhoInterpolant* eparam = new EpairProductionRhoInterpolant(particle_.GetParticleDef(), *medium_, cut_settings_, param_def);
 
     CrossSectionInterpolant* brems = new BremsInterpolant(*bparam);
     CrossSectionInterpolant* ioniz = new IonizInterpolant(*iparam);
+    CrossSectionInterpolant* epair = new EpairInterpolant(*eparam);
 
     crosssections_.push_back(brems);
     crosssections_.push_back(ioniz);
+    crosssections_.push_back(epair);
     // crosssections_.push_back(new BremsInterpolant(*param));
     // crosssections_.push_back(new Ionization(particle_, medium_, &cut_settings_));
     // crosssections_.push_back(new Photonuclear(particle_, medium_, &cut_settings_));

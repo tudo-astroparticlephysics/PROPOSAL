@@ -2,8 +2,14 @@
 #include <boost/bind.hpp>
 #include <cmath>
 
-#include "PROPOSAL/Constants.h"
 #include "PROPOSAL/crossection/parametrization/EpairProduction.h"
+
+#include "PROPOSAL/math//Interpolant.h"
+#include "PROPOSAL/math//InterpolantBuilder.h"
+
+#include "PROPOSAL/methods.h"
+#include "PROPOSAL/Constants.h"
+#include "PROPOSAL/Output.h"
 
 using namespace PROPOSAL;
 
@@ -71,7 +77,7 @@ Parametrization::IntegralLimits EpairProduction::GetIntegralLimits(double energy
 
     limits.vMin = 4 * ME / particle_energy;
     limits.vMax =
-        1 - (3. / 4) * SQRTE * (particle_mass / particle_energy) * pow(current_component_->GetNucCharge(), 1. / 3);
+        1 - (3. / 4) * SQRTE * (particle_mass / particle_energy) * pow(components_[component_index_]->GetNucCharge(), 1. / 3);
     aux         = particle_mass / particle_energy;
     aux         = 1 - 6 * aux * aux;
     limits.vMax = std::min(limits.vMax, aux);
@@ -101,8 +107,8 @@ double EpairProduction::FunctionToIntegral(double energy, double r)
     double particle_mass       = particle_def_.mass;
     double particle_charge     = particle_def_.charge;
     double particle_energy     = energy;
-    double medium_charge       = current_component_->GetNucCharge();
-    double medium_log_constant = current_component_->GetLogConstant();
+    double medium_charge       = components_[component_index_]->GetNucCharge();
+    double medium_log_constant = components_[component_index_]->GetLogConstant();
 
     r   = 1 - r; // only for integral optimization - do not forget to swap integration limits!
     r2  = r * r;
@@ -296,7 +302,7 @@ double EpairProductionRhoIntegral::DifferentialCrossSection(double energy, doubl
 
     aux = std::max(1 - rMax, COMPUTER_PRECISION);
 
-    return medium_->GetMolDensity() * current_component_->GetAtomInMolecule() * particle_charge * particle_charge *
+    return medium_->GetMolDensity() * components_[component_index_]->GetAtomInMolecule() * particle_charge * particle_charge *
            (integral_.Integrate(1 - rMax, aux, boost::bind(&EpairProductionRhoIntegral::FunctionToIntegral, this, energy, _1), 2) +
             integral_.Integrate(aux, 1, boost::bind(&EpairProductionRhoIntegral::FunctionToIntegral, this, energy, _1), 4));
 }
@@ -313,13 +319,47 @@ EpairProductionRhoInterpolant::EpairProductionRhoInterpolant(const ParticleDef& 
                                  const Medium& medium,
                                  const EnergyCutSettings& cuts,
                                  Definition param_def)
-    : EpairProduction(particle_def, medium, cuts, param_def)
+    : EpairProductionRhoIntegral(particle_def, medium, cuts, param_def)
     , interpolant_(medium_->GetNumComponents(), NULL)
 {
+    std::vector<Interpolant2DBuilder> builder2d(components_.size());
+    Helper::InterpolantBuilderContainer builder_container2d(components_.size());
+
+    for (unsigned int i = 0; i < components_.size(); ++i)
+    {
+        builder2d[i].SetMax1(NUM1)
+            .SetX1Min(particle_def_.low)
+            .SetX1Max(BIGENERGY)
+            .SetMax2(NUM1)
+            .SetX2Min(0.0)
+            .SetX2Max(1.0)
+            .SetRomberg1(param_def.order_of_interpolation)
+            .SetRational1(false)
+            .SetRelative1(false)
+            .SetIsLog1(true)
+            .SetRomberg2(param_def.order_of_interpolation)
+            .SetRational2(false)
+            .SetRelative2(false)
+            .SetIsLog2(false)
+            .SetRombergY(param_def.order_of_interpolation)
+            .SetRationalY(false)
+            .SetRelativeY(false)
+            .SetLogSubst(false)
+            .SetFunction2D(boost::bind(&EpairProductionRhoInterpolant::FunctionToBuildEpairInterpolant, this, _1, _2, i));
+
+        builder_container2d[i].first = &builder2d[i];
+        builder_container2d[i].second = &interpolant_[i];
+    }
+
+    log_info("Initialize Epair for %s", typeid(this).name());
+    Helper::InitializeInterpolation("Epair",
+                                    builder_container2d,
+                                    std::vector<Parametrization*>(1, this));
+    log_info("Initialize dNdx for %s done!", typeid(this).name());
 }
 
 EpairProductionRhoInterpolant::EpairProductionRhoInterpolant(const EpairProductionRhoInterpolant& epair)
-    : EpairProduction(epair)
+    : EpairProductionRhoIntegral(epair)
     , interpolant_(epair.interpolant_)
 {
 }
@@ -340,15 +380,19 @@ double EpairProductionRhoInterpolant::DifferentialCrossSection(double energy, do
     if (v >= limits.vUp)
     {
         return std::max(
-            interpolant_.at(component)->Interpolate(energy, log(v / limits.vUp) / log(limits.vMax / limits.vUp)), 0.0);
+            interpolant_.at(component_index_)->Interpolate(energy, log(v / limits.vUp) / log(limits.vMax / limits.vUp)), 0.0);
+    }
+    else
+    {
+        return EpairProductionRhoIntegral::DifferentialCrossSection(energy, v);
     }
 }
 
 // ------------------------------------------------------------------------- //
-double EpairProductionRhoInterpolant::FunctionToBuildEpairInterpolant(double energy, double v)
+double EpairProductionRhoInterpolant::FunctionToBuildEpairInterpolant(double energy, double v, int component)
 {
+    component_index_ = component;
     Parametrization::IntegralLimits limits = GetIntegralLimits(energy);
-    ;
 
     if (limits.vUp == limits.vMax)
     {
@@ -357,5 +401,5 @@ double EpairProductionRhoInterpolant::FunctionToBuildEpairInterpolant(double ene
 
     v = limits.vUp * exp(v * log(limits.vMax / limits.vUp));
 
-    return DifferentialCrossSection(energy, v);
+    return EpairProductionRhoIntegral::DifferentialCrossSection(energy, v);
 }
