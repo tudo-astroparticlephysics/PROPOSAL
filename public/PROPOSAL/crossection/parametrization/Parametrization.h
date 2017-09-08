@@ -66,7 +66,8 @@ class Parametrization
         // Setter
         // ----------------------------------------------------------------- //
 
-        void SetCurrentComponent(Components::Component* component) {current_component_ = component;}
+        // void SetCurrentComponent(Components::Component* component) {current_component_ = component;}
+        void SetCurrentComponent(int index) {component_index_ = index;}
 
     protected:
         typedef std::vector<Components::Component*> ComponentVec;
@@ -75,7 +76,9 @@ class Parametrization
         const Medium* medium_;
         const EnergyCutSettings cut_settings_;
 
-        const Components::Component* current_component_;
+        // const Components::Component* current_component_;
+        const ComponentVec& components_;
+        int component_index_;
 
         Definition param_def_;
         bool init_lpm_effect_;

@@ -33,7 +33,7 @@ double BremsIntegral::CalculatedEdx(double energy)
 
     for (int i = 0; i < (parametrization_.GetMedium().GetNumComponents()); i++)
     {
-        parametrization_.SetCurrentComponent(components_[i]);
+        parametrization_.SetCurrentComponent(i);
         Parametrization::IntegralLimits limits = parametrization_.GetIntegralLimits(energy);
 
         sum += dedx_integral_.Integrate(
