@@ -79,8 +79,6 @@ class Parametrization
 
         Definition param_def_;
         bool init_lpm_effect_;
-        // double multiplier_;
-        // bool lpm_effect_enabled_;
 };
 
 } /* PROPOSAL */

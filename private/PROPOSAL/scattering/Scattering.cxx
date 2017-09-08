@@ -32,7 +32,7 @@ Scattering::~Scattering()
 {
 }
 
-void Scattering::Scatter(PROPOSALParticle& particle, const std::vector<CrossSections*>& cross_sections, double dr, double ei, double ef)
+void Scattering::Scatter(PROPOSALParticle& particle, const std::vector<CrossSection*>& cross_sections, double dr, double ei, double ef)
 {
     double sz,tz;
 

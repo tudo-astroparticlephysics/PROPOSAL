@@ -1,17 +1,23 @@
 #include <boost/bind.hpp>
 
-#include "PROPOSAL/math/MathModel.h"
-#include "PROPOSAL/decay/DecayChannel.h"
-#include "PROPOSAL/crossection/Bremsstrahlung.h"
-#include "PROPOSAL/sector/Sector.h"
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/continous_randomization/ContinuousRandomization.h"
-#include "PROPOSAL/crossection/Epairproduction.h"
+#include "PROPOSAL/Output.h"
+// #include "PROPOSAL/continous_randomization/ContinuousRandomization.h"
+#include "PROPOSAL/decay/DecayChannel.h"
 #include "PROPOSAL/geometry/Geometry.h"
 #include "PROPOSAL/geometry/Sphere.h"
-#include "PROPOSAL/crossection/Ionization.h"
-#include "PROPOSAL/Output.h"
-#include "PROPOSAL/crossection/Photonuclear.h"
+#include "PROPOSAL/math/MathModel.h"
+#include "PROPOSAL/sector/Sector.h"
+#include "PROPOSAL/medium/Medium.h"
+
+#include "PROPOSAL/crossection/BremsInterpolant.h"
+#include "PROPOSAL/crossection/IonizInterpolant.h"
+#include "PROPOSAL/crossection/parametrization/Bremsstrahlung.h"
+#include "PROPOSAL/crossection/parametrization/Ionization.h"
+// #include "PROPOSAL/crossection/Epairproduction.h"
+// #include "PROPOSAL/crossection/Ionization.h"
+// #include "PROPOSAL/crossection/Photonuclear.h"
+
 // #include "PROPOSAL/Scattering.h"
 // #include "PROPOSAL/scattering/ScatteringDefault.h"
 // #include "PROPOSAL/scattering/ScatteringMoliere.h"
@@ -62,20 +68,22 @@ Sector::Sector(PROPOSALParticle& particle)
     , geometry_(new Sphere(Vector3D(), 1e18, 0))
     , medium_(new Water())
     , cut_settings_()
-    , randomizer_(NULL)
+    // , randomizer_(NULL)
     , scattering_(NULL)
     , crosssections_()
 {
-    crosssections_.push_back(new Bremsstrahlung(particle_, medium_, &cut_settings_));
-    crosssections_.push_back(new Epairproduction(particle_, medium_, &cut_settings_));
-    crosssections_.push_back(new Photonuclear(particle_, medium_, &cut_settings_));
-    crosssections_.push_back(new Ionization(particle_, medium_, &cut_settings_));
+    BremsKelnerKokoulinPetrukhin* param = new BremsKelnerKokoulinPetrukhin(particle_.GetParticleDef(), *medium_, cut_settings_);
+    crosssections_.push_back(new BremsInterpolant(*param));
+    // crosssections_.push_back(new Bremsstrahlung(particle_, medium_, &cut_settings_));
+    // crosssections_.push_back(new Epairproduction(particle_, medium_, &cut_settings_));
+    // crosssections_.push_back(new Photonuclear(particle_, medium_, &cut_settings_));
+    // crosssections_.push_back(new Ionization(particle_, medium_, &cut_settings_));
 
     //TODO(mario): Polymorphic initilaization in collections childs  Sun 2017/08/27
-    if (collection_def_.do_continuous_randomization)
-    {
-        randomizer_ = new ContinuousRandomization(particle_);
-    }
+    // if (collection_def_.do_continuous_randomization)
+    // {
+    //     randomizer_ = new ContinuousRandomization(particle_);
+    // }
 
     if (collection_def_.do_scattering)
     {
@@ -94,46 +102,59 @@ Sector::Sector(PROPOSALParticle& particle, const Medium& medium,
     , geometry_(geometry.clone())
     , medium_(medium.clone())
     , cut_settings_(cut_settings)
-    , randomizer_(NULL)
+    // , randomizer_(NULL)
     , scattering_(NULL)
     , crosssections_()
 {
-    crosssections_.push_back(new Bremsstrahlung(particle_, medium_, &cut_settings_));
-    crosssections_.push_back(new Ionization(particle_, medium_, &cut_settings_));
-    crosssections_.push_back(new Photonuclear(particle_, medium_, &cut_settings_));
-    crosssections_.push_back(new Epairproduction(particle_, medium_, &cut_settings_));
+    Parametrization::Definition param_def;
+    param_def.path_to_tables = "../src/resources/tables";
+    param_def.raw = false;
+    BremsKelnerKokoulinPetrukhin* bparam = new BremsKelnerKokoulinPetrukhin(particle_.GetParticleDef(), *medium_, cut_settings_, param_def);
+    // BremsAndreevBezrukovBugaev* param = new BremsAndreevBezrukovBugaev(particle_.GetParticleDef(), *medium_, cut_settings_, param_def);
 
-    for(std::vector<CrossSections*>::iterator it = crosssections_.begin(); it != crosssections_.end(); ++it)
-    {
-        switch ((*it)->GetType())
-        {
-            case ParticleType::Brems:
-                // collections_.at(j)->GetCrosssections().at(i)->SetParametrization(brems_);
-                (*it)->SetMultiplier(collection_def_.brems_multiplier);
-                (*it)->EnableLpmEffect(collection_def_.lpm_effect_enabled);
-                break;
-            case ParticleType::DeltaE:
-                (*it)->SetMultiplier(collection_def_.ioniz_multiplier);
-                break;
-            case ParticleType::EPair:
-                (*it)->SetMultiplier(collection_def_.epair_multiplier);
-                (*it)->EnableLpmEffect(collection_def_.lpm_effect_enabled);
-                break;
-            case ParticleType::NuclInt:
-                // collections_.at(j)->GetCrosssections().at(i)->SetParametrization(photo_);
-                (*it)->SetMultiplier(collection_def_.photo_multiplier);
-                break;
-            default:
-                log_fatal("Unknown cross section");
-                exit(1);
-        }
-    }
+    Ionization* iparam = new Ionization(particle_.GetParticleDef(), *medium_, cut_settings_, param_def);
+
+    CrossSectionInterpolant* brems = new BremsInterpolant(*bparam);
+    CrossSectionInterpolant* ioniz = new IonizInterpolant(*iparam);
+
+    crosssections_.push_back(brems);
+    crosssections_.push_back(ioniz);
+    // crosssections_.push_back(new BremsInterpolant(*param));
+    // crosssections_.push_back(new Ionization(particle_, medium_, &cut_settings_));
+    // crosssections_.push_back(new Photonuclear(particle_, medium_, &cut_settings_));
+    // crosssections_.push_back(new Epairproduction(particle_, medium_, &cut_settings_));
+
+    // for(std::vector<CrossSection*>::iterator it = crosssections_.begin(); it != crosssections_.end(); ++it)
+    // {
+    //     switch ((*it)->GetType())
+    //     {
+    //         case ParticleType::Brems:
+    //             // collections_.at(j)->GetCrosssections().at(i)->SetParametrization(brems_);
+    //             (*it)->SetMultiplier(collection_def_.brems_multiplier);
+    //             (*it)->EnableLpmEffect(collection_def_.lpm_effect_enabled);
+    //             break;
+    //         case ParticleType::DeltaE:
+    //             (*it)->SetMultiplier(collection_def_.ioniz_multiplier);
+    //             break;
+    //         case ParticleType::EPair:
+    //             (*it)->SetMultiplier(collection_def_.epair_multiplier);
+    //             (*it)->EnableLpmEffect(collection_def_.lpm_effect_enabled);
+    //             break;
+    //         case ParticleType::NuclInt:
+    //             // collections_.at(j)->GetCrosssections().at(i)->SetParametrization(photo_);
+    //             (*it)->SetMultiplier(collection_def_.photo_multiplier);
+    //             break;
+    //         default:
+    //             log_fatal("Unknown cross section");
+    //             exit(1);
+    //     }
+    // }
 
     //TODO(mario): Polymorphic initilaization in collections childs  Sun 2017/08/27
-    if (collection_def_.do_continuous_randomization)
-    {
-        randomizer_ = new ContinuousRandomization(particle);
-    }
+    // if (collection_def_.do_continuous_randomization)
+    // {
+    //     randomizer_ = new ContinuousRandomization(particle);
+    // }
 
     if (collection_def_.do_scattering)
     {
@@ -149,33 +170,33 @@ Sector::Sector(const Sector& collection)
     ,geometry_(collection.geometry_->clone())
     ,medium_(collection.medium_->clone())
     ,cut_settings_(collection.cut_settings_)
-    ,randomizer_(collection.randomizer_) //TODO(mario): ranomizer clone Sat 2017/08/26
+    // ,randomizer_(collection.randomizer_) //TODO(mario): ranomizer clone Sat 2017/08/26
     ,scattering_(collection.scattering_) //TODO(mario): scatter clone Sat 2017/08/26
 {
     crosssections_.resize(collection.crosssections_.size());
 
     //TODO(mario): clone Sat 2017/08/26
-    for(unsigned int i =0; i<collection.crosssections_.size(); i++)
-    {
-        switch (collection.crosssections_.at(i)->GetType())
-        {
-            case ParticleType::Brems:
-                crosssections_.at(i) = new Bremsstrahlung( *(Bremsstrahlung*)collection.crosssections_.at(i) );
-                break;
-            case ParticleType::DeltaE:
-                crosssections_.at(i) = new Ionization( *(Ionization*)collection.crosssections_.at(i) );
-                break;
-            case ParticleType::EPair:
-                crosssections_.at(i) = new Epairproduction( *(Epairproduction*)collection.crosssections_.at(i) );
-                break;
-            case ParticleType::NuclInt:
-                crosssections_.at(i) = new Photonuclear( *(Photonuclear*)collection.crosssections_.at(i) );
-                break;
-            default:
-                log_fatal("Unknown cross section");
-                exit(1);
-        }
-    }
+    // for(unsigned int i =0; i<collection.crosssections_.size(); i++)
+    // {
+    //     switch (collection.crosssections_.at(i)->GetType())
+    //     {
+    //         case ParticleType::Brems:
+    //             crosssections_.at(i) = new Bremsstrahlung( *(Bremsstrahlung*)collection.crosssections_.at(i) );
+    //             break;
+    //         case ParticleType::DeltaE:
+    //             crosssections_.at(i) = new Ionization( *(Ionization*)collection.crosssections_.at(i) );
+    //             break;
+    //         case ParticleType::EPair:
+    //             crosssections_.at(i) = new Epairproduction( *(Epairproduction*)collection.crosssections_.at(i) );
+    //             break;
+    //         case ParticleType::NuclInt:
+    //             crosssections_.at(i) = new Photonuclear( *(Photonuclear*)collection.crosssections_.at(i) );
+    //             break;
+    //         default:
+    //             log_fatal("Unknown cross section");
+    //             exit(1);
+    //     }
+    // }
 }
 
 Sector::~Sector()
@@ -183,10 +204,10 @@ Sector::~Sector()
     delete medium_;
     delete geometry_;
 
-    if (randomizer_)
-    {
-        delete randomizer_;
-    }
+    // if (randomizer_)
+    // {
+    //     delete randomizer_;
+    // }
 
     //TODO(mario): delete scatter Sat 2017/08/26
 }
@@ -270,14 +291,14 @@ double Sector::Propagate(double distance)
 
         //TODO(mario): Revert randomizer Fri 2017/08/25
         // Randomize the continuous energy loss if this option is enabled
-        if (collection_def_.do_continuous_randomization)
-        {
-            if (final_energy != particle_.GetLow())
-            {
-                double rnd = RandomGenerator::Get().RandomDouble();
-                final_energy = randomizer_->Randomize(crosssections_, initial_energy, final_energy, rnd);
-            }
-        }
+        // if (collection_def_.do_continuous_randomization)
+        // {
+        //     if (final_energy != particle_.GetLow())
+        //     {
+        //         double rnd = RandomGenerator::Get().RandomDouble();
+        //         final_energy = randomizer_->Randomize(crosssections_, initial_energy, final_energy, rnd);
+        //     }
+        // }
 
         // Lower limit of particle energy is reached or
         // or complete particle is propagated the whole distance
@@ -533,7 +554,7 @@ pair<double, ParticleType::Enum> Sector::MakeStochasticLoss()
         rates.at(i) = crosssections_.at(i)->CalculatedNdx(particle_.GetEnergy(), rnd2);
         total_rate += rates.at(i);
         // if (rates.at(i) == 0) printf("%i = 0, energy: %f\n", i, particle_->GetEnergy());
-        log_debug("Rate for %s = %f", crosssections_.at(i)->GetName().c_str(), rates.at(i));
+        // log_debug("Rate for %s = %f", crosssections_.at(i)->GetName().c_str(), rates.at(i));
     }
 
     total_rate_weighted = total_rate * rnd1;
@@ -547,7 +568,7 @@ pair<double, ParticleType::Enum> Sector::MakeStochasticLoss()
         if (rates_sum > total_rate_weighted)
         {
             energy_loss.first  = crosssections_.at(i)->CalculateStochasticLoss(particle_.GetEnergy(), rnd2, rnd3);
-            energy_loss.second = crosssections_.at(i)->GetType();
+            // energy_loss.second = crosssections_.at(i)->GetType();
             break;
         }
     }
@@ -637,12 +658,13 @@ double Sector::MakeDecay(double energy)
 // ------------------------------------------------------------------------- //
 
 
+//TODO(mario): lpm enable Wed 2017/09/06
 void Sector::EnableLpmEffect()
 {
     collection_def_.lpm_effect_enabled = true;
     for (unsigned int i = 0; i < crosssections_.size(); i++)
     {
-        crosssections_.at(i)->EnableLpmEffect(collection_def_.lpm_effect_enabled);
+        // crosssections_.at(i)->EnableLpmEffect(collection_def_.lpm_effect_enabled);
     }
 }
 
@@ -651,7 +673,7 @@ void Sector::DisableLpmEffect()
     collection_def_.lpm_effect_enabled = false;
     for (unsigned int i = 0; i < crosssections_.size(); i++)
     {
-        crosssections_.at(i)->EnableLpmEffect(collection_def_.lpm_effect_enabled);
+        // crosssections_.at(i)->EnableLpmEffect(collection_def_.lpm_effect_enabled);
     }
 }
 
@@ -723,7 +745,8 @@ double Sector::FunctionToPropIntegralInteraction( double energy)
     {
         rate = crosssections_.at(i)->CalculatedNdx(energy);
 
-        log_debug("Rate for %s = %f", crosssections_.at(i)->GetName().c_str(), rate);
+        //TODO(mario): name Wed 2017/09/06
+        // log_debug("Rate for %s = %f", crosssections_.at(i)->GetName().c_str(), rate);
 
         total_rate += rate;
     }

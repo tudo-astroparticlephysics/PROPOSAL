@@ -21,8 +21,9 @@ class CrossSectionIntegral: public CrossSection
         double CalculateStochasticLoss(double energy, double rnd1, double rnd2);
 
         // Needed to initialize interpolation
-        virtual double FunctionToBuildDNdxInterpolant(double energy, int component) = 0;
-        virtual double FunctionToBuildDNdxInterpolant2D(double energy, double v, int component) = 0;
+        // double FunctionToBuildDEdxInterpolant(double energy);
+        double FunctionToBuildDNdxInterpolant(double energy, int component);
+        double FunctionToBuildDNdxInterpolant2D(double energy, double v, int component);
 
     protected:
         virtual double CalculateStochasticLoss(double energy, double rnd1);

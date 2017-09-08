@@ -2,7 +2,8 @@
 #include <boost/math/special_functions/erf.hpp>
 
 #include "PROPOSAL/scattering/Coefficients.h" //coefficients for calculating the power series approximation of the moliere function
-#include "PROPOSAL/crossection/CrossSections.h"
+#include "PROPOSAL/crossection/CrossSection.h"
+#include "PROPOSAL/crossection/parametrization/Parametrization.h"
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Output.h"
 #include "PROPOSAL/scattering/ScatteringMoliere.h"
@@ -23,7 +24,7 @@ using namespace PROPOSAL;
 //----------------------------------------------------------------------------//
 
 
-Scattering::RandomAngles ScatteringMoliere::CalculateRandomAngle(const PROPOSALParticle& particle, const std::vector<CrossSections*>& cross_sections, double dr, double ei, double ef)
+Scattering::RandomAngles ScatteringMoliere::CalculateRandomAngle(const PROPOSALParticle& particle, const std::vector<CrossSection*>& cross_sections, double dr, double ei, double ef)
 {
     (void)ei;
     (void)ef;
@@ -34,19 +35,19 @@ Scattering::RandomAngles ScatteringMoliere::CalculateRandomAngle(const PROPOSALP
     std::vector<double> ki;     // number of atoms in molecule of different components
     std::vector<double> Ai;     // atomic number of different components
 
-    Medium* medium = cross_sections.at(0)->GetMedium();
+    const Medium& medium = cross_sections.at(0)->GetParametrization().GetMedium();
 
     double momentum = particle.GetMomentum();  // momentum in MeV/c
     double mass = particle.GetMass();          // mass in MeV/c²
 
-    numComp_ = medium->GetNumComponents();
+    numComp_ = medium.GetNumComponents();
     Zi_.resize(numComp_);
     ki.resize(numComp_);
     Ai.resize(numComp_);
 
     for (int i = 0; i < numComp_; i++)
     {
-        Components::Component* component = medium->GetComponents().at(i);
+        Components::Component* component = medium.GetComponents().at(i);
         Zi_.at(i) = component->GetNucCharge();
         ki.at(i) = component->GetAtomInMolecule();
         Ai.at(i) = component->GetAtomicNum();
@@ -81,7 +82,7 @@ Scattering::RandomAngles ScatteringMoliere::CalculateRandomAngle(const PROPOSALP
     }
     // Calculate Chi_c^2
     chiCSq_ = ( (4.*PI*NA*ALPHA*ALPHA*HBAR*HBAR*SPEED*SPEED)
-                * (medium->GetMassDensity()*medium->GetDensityCorrection()*dr)
+                * (medium.GetMassDensity()*medium.GetDensityCorrection()*dr)
                 / (momentum*momentum*beta_Sq) )
             * ( ZSq_average/A_average );
 
@@ -132,7 +133,7 @@ Scattering::RandomAngles ScatteringMoliere::CalculateRandomAngle(const PROPOSALP
 
 
 void ScatteringMoliere::EnableInterpolation(const PROPOSALParticle& particle,
-                                            const std::vector<CrossSections*>& cross_sections,
+                                            const std::vector<CrossSection*>& cross_sections,
                                             std::string filepath)
 {
     (void)particle;

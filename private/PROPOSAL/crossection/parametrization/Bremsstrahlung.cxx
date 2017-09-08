@@ -16,7 +16,9 @@
     Brems##param::Brems##param(const Brems##param& brems)                                                              \
         : Bremsstrahlung(brems)                                                                                        \
     {                                                                                                                  \
-    }
+    }                                                                                                                  \
+                                                                                                                       \
+    Brems##param::~Brems##param() {}
 
 using namespace PROPOSAL;
 
@@ -48,6 +50,10 @@ Bremsstrahlung::Bremsstrahlung(const Bremsstrahlung& brems)
 {
 }
 
+Bremsstrahlung::~Bremsstrahlung()
+{
+}
+
 // ------------------------------------------------------------------------- //
 // Public methods
 // ------------------------------------------------------------------------- //
@@ -56,11 +62,7 @@ Bremsstrahlung::Bremsstrahlung(const Bremsstrahlung& brems)
 double Bremsstrahlung::DifferentialCrossSection(double energy, double v)
 {
     double aux      =   0;
-    double Z3       =   0;
     double result   =   0;
-    double s1       =   0;
-
-    Z3  =   pow((current_component_->GetNucCharge()), -1./3);
 
     result = CalculateParametrization(energy, v);
 
@@ -69,13 +71,7 @@ double Bremsstrahlung::DifferentialCrossSection(double energy, double v)
 
     if(param_def_.lpm_effect_enabled)
     {
-        // if(parametrization_!=ParametrizationType::BremsKelnerKokoulinPetrukhin)
-        // {
-        //     s1  =   (current_component_->GetLogConstant())*Z3;
-        //     Dn  =   1.54*pow((current_component_->GetAtomicNum()) , 0.27);
-        //     s1  =   ME*Dn/((particle_def_.mass)*s1);
-        // }
-        aux *=  lpm(energy, v,s1);
+        aux *=  lpm(energy, v);
     }
 
     double c2   =   pow(particle_def_.charge , 2);
@@ -121,7 +117,7 @@ Parametrization::IntegralLimits Bremsstrahlung::GetIntegralLimits(double energy)
 }
 
 // ------------------------------------------------------------------------- //
-double Bremsstrahlung::lpm(double energy, double v, double s1)
+double Bremsstrahlung::lpm(double energy, double v)
 {
     if(init_lpm_effect_)
     {
@@ -154,11 +150,18 @@ double Bremsstrahlung::lpm(double energy, double v, double s1)
         param_def_.lpm_effect_enabled = true;
     }
 
-    double G, fi, xi, sp, h, s, s2, s3, ps, Gamma;
+    double G, fi, xi, sp, h, s, s2, s3, ps, Gamma, Z3, Dn, s1;
 
     const double fi1 = 1.54954;
     const double G1  = 0.710390;
     const double G2  = 0.904912;
+
+    Z3  =   pow((current_component_->GetNucCharge()), -1./3);
+
+    s1  =   (current_component_->GetLogConstant())*Z3;
+    Dn  =   1.54*pow((current_component_->GetAtomicNum()) , 0.27);
+    s1  =   ME*Dn/((particle_def_.mass)*s1);
+
     s1 *= s1 * SQRT2;
     sp = sqrt(eLpm_ * v / (8 * (energy) * (1 - v)));
     h  = log(sp) / log(s1);
@@ -271,7 +274,6 @@ double BremsKelnerKokoulinPetrukhin::CalculateParametrization(double energy, dou
     s1      =   (current_component_->GetLogConstant())*Z3;
     da      =   log(1 + ME/(d*SQRTE*s1));
     Dn      =   1.54*pow((current_component_->GetAtomicNum()), 0.27);
-    s1      =   ME*Dn/((particle_def_.mass)*s1);
     dn      =   log(Dn/(1 + d*(Dn*SQRTE - 2)/particle_def_.mass));
     maxV    =   ME*(energy - particle_def_.mass)
                 /((energy)

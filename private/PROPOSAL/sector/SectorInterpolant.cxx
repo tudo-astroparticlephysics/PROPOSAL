@@ -5,11 +5,12 @@
 // #include "PROPOSAL/crossection/CrossSections.h"
 #include "PROPOSAL/math/Integral.h"
 // #include "PROPOSAL/Scattering.h"
-#include "PROPOSAL/continous_randomization/ContinuousRandomization.h"
+// #include "PROPOSAL/continous_randomization/ContinuousRandomization.h"
 // #include "PROPOSAL/Integral.h"
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Output.h"
 #include "PROPOSAL/methods.h"
+#include "PROPOSAL/medium/Medium.h"
 // #include "PROPOSAL/Constants.h"
 
 using namespace PROPOSAL;
@@ -296,20 +297,22 @@ void SectorInterpolant::InitInterpolation( std::string filepath, bool raw)
 {
     Integral prop_interaction_(IROMB, IMAXS, IPREC2);
 
-    for(unsigned int i =0 ; i < crosssections_.size() ; i++)
-    {
-        crosssections_.at(i)->EnableDEdxInterpolation( filepath,raw);
-    }
-
-    for(unsigned int i =0 ; i < crosssections_.size() ; i++)
-    {
-        crosssections_.at(i)->EnableDNdxInterpolation( filepath,raw);
-    }
+    // for(unsigned int i =0 ; i < crosssections_.size() ; i++)
+    // {
+    //     crosssections_.at(i)->EnableDEdxInterpolation( filepath,raw);
+    // }
+    //
+    // for(unsigned int i =0 ; i < crosssections_.size() ; i++)
+    // {
+    //     crosssections_.at(i)->EnableDNdxInterpolation( filepath,raw);
+    // }
 
     bool reading_worked =   true;
     bool storing_failed =   false;
 
+    std::cout << "infornt a" << std::endl;
     double a = abs(-prop_interaction_.Integrate(particle_.GetLow(), particle_.GetLow()*10, boost::bind(&SectorInterpolant::FunctionToPropIntegralInteraction, this,  _1),4));
+    std::cout << "behind a" << std::endl;
     double b = abs(-prop_interaction_.Integrate(BIGENERGY, BIGENERGY/10, boost::bind(&SectorInterpolant::FunctionToPropIntegralInteraction, this,  _1),4));
 
     if( a < b)
@@ -340,31 +343,31 @@ void SectorInterpolant::InitInterpolation( std::string filepath, bool raw)
 
         for(unsigned int i =0; i<crosssections_.size(); i++)
         {
-            switch (crosssections_.at(i)->GetType())
-            {
-                case ParticleType::Brems:
-                    filename << "_b"
-                        << "_" << crosssections_.at(i)->GetParametrization()
-                        << "_" << crosssections_.at(i)->GetLpmEffectEnabled();
-                    break;
-                case ParticleType::DeltaE:
-                    filename << "_i";
-                    break;
-                case ParticleType::EPair:
-                    filename << "_e"
-                        << "_" << crosssections_.at(i)->GetLpmEffectEnabled();
-                    break;
-                case ParticleType::NuclInt:
-                    filename << "_p"
-                        << "_" << crosssections_.at(i)->GetParametrization();
-                    break;
-                default:
-                    log_fatal("Unknown cross section");
-                    exit(1);
-            }
-            filename<< "_" << crosssections_.at(i)->GetMultiplier()
-                    << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetEcut()
-                    << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetVcut();
+            // switch (crosssections_.at(i)->GetType())
+            // {
+            //     case ParticleType::Brems:
+            //         filename << "_b"
+            //             << "_" << crosssections_.at(i)->GetParametrization()
+            //             << "_" << crosssections_.at(i)->GetLpmEffectEnabled();
+            //         break;
+            //     case ParticleType::DeltaE:
+            //         filename << "_i";
+            //         break;
+            //     case ParticleType::EPair:
+            //         filename << "_e"
+            //             << "_" << crosssections_.at(i)->GetLpmEffectEnabled();
+            //         break;
+            //     case ParticleType::NuclInt:
+            //         filename << "_p"
+            //             << "_" << crosssections_.at(i)->GetParametrization();
+            //         break;
+            //     default:
+            //         log_fatal("Unknown cross section");
+            //         exit(1);
+            // }
+            // filename<< "_" << crosssections_.at(i)->GetMultiplier()
+            //         << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetEcut()
+            //         << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetVcut();
         }
 
         if(!raw)
@@ -482,11 +485,11 @@ void SectorInterpolant::InitInterpolation( std::string filepath, bool raw)
 
     }
 
-    if(collection_def_.do_continuous_randomization)
-    {
-        randomizer_->EnableDE2dxInterpolation( crosssections_, filepath ,raw);
-        randomizer_->EnableDE2deInterpolation( crosssections_, filepath,raw);
-    }
+    // if(collection_def_.do_continuous_randomization)
+    // {
+    //     randomizer_->EnableDE2dxInterpolation( crosssections_, filepath ,raw);
+    //     randomizer_->EnableDE2deInterpolation( crosssections_, filepath,raw);
+    // }
 
     if(collection_def_.do_exact_time_calculation)
     {
@@ -525,31 +528,31 @@ void SectorInterpolant::InitTimeInterpolation( std::string filepath, bool raw)
 
         for(unsigned int i =0; i<crosssections_.size(); i++)
         {
-            switch (crosssections_.at(i)->GetType())
-            {
-                case ParticleType::Brems:
-                    filename << "_b"
-                        << "_" << crosssections_.at(i)->GetParametrization()
-                        << "_" << crosssections_.at(i)->GetLpmEffectEnabled();
-                    break;
-                case ParticleType::DeltaE:
-                    filename << "_i";
-                    break;
-                case ParticleType::EPair:
-                    filename << "_e"
-                        << "_" << crosssections_.at(i)->GetLpmEffectEnabled();
-                    break;
-                case ParticleType::NuclInt:
-                    filename << "_p"
-                        << "_" << crosssections_.at(i)->GetParametrization();
-                    break;
-                default:
-                    log_fatal("Unknown cross section");
-                    exit(1);
-            }
-            filename<< "_" << crosssections_.at(i)->GetMultiplier()
-                    << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetEcut()
-                    << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetVcut();
+            // switch (crosssections_.at(i)->GetType())
+            // {
+            //     case ParticleType::Brems:
+            //         filename << "_b"
+            //             << "_" << crosssections_.at(i)->GetParametrization()
+            //             << "_" << crosssections_.at(i)->GetLpmEffectEnabled();
+            //         break;
+            //     case ParticleType::DeltaE:
+            //         filename << "_i";
+            //         break;
+            //     case ParticleType::EPair:
+            //         filename << "_e"
+            //             << "_" << crosssections_.at(i)->GetLpmEffectEnabled();
+            //         break;
+            //     case ParticleType::NuclInt:
+            //         filename << "_p"
+            //             << "_" << crosssections_.at(i)->GetParametrization();
+            //         break;
+            //     default:
+            //         log_fatal("Unknown cross section");
+            //         exit(1);
+            // }
+            // filename<< "_" << crosssections_.at(i)->GetMultiplier()
+            //         << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetEcut()
+            //         << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetVcut();
 
         }
 
