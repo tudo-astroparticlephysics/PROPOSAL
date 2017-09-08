@@ -15,6 +15,8 @@
 #include <deque>
 
 #include <boost/math/special_functions/erf.hpp>
+// #include <utility>
+#include <vector>
 
 //necessary since the boost function does not work for [-1,1] but for (-1,1)
 #define FIXPREC 0.9999999999999999
@@ -59,6 +61,33 @@ std::string NextToken(std::deque<std::string> *Tokens);
 
 //----------------------------------------------------------------------------//
 
-}
+class ParticleDef;
+class Medium;
+class EnergyCutSettings;
+class Parametrization;
+class Interpolant;
+class InterpolantBuilder;
+
+namespace  Helper
+{
+
+// typedef std::vector<std::pair<InterpolantBuilder*, std::vector<Interpolant*> > > InterpolantBuilderContainer;
+typedef std::vector<std::pair<InterpolantBuilder*, Interpolant** > > InterpolantBuilderContainer;
+
+// ------------------------------------------------------------------------- //
+void InitializeInterpolation(const std::string name,
+                             // const std::string pathname,
+                             // bool raw,
+                             // const ParticleDef&,
+                             // const Medium&,
+                             // const EnergyCutSettings&,
+                             InterpolantBuilderContainer&,
+                             // InterpolantBuilderContainer&,
+                             const std::vector<Parametrization*>&);
+
+} /*  Helper */
+
+
+} /* PROPOSAL */
 
 #define SWAP(a, b,T) {T t; t = a; a = b; b = t;}
