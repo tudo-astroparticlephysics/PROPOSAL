@@ -18,13 +18,23 @@
 // #include "PROPOSAL/geometry/Geometry.h"
 // #include "PROPOSAL/PROPOSALParticle.h"
 
+#include "PROPOSAL/crossection/parametrization/Bremsstrahlung.h"
+#include "PROPOSAL/crossection/BremsInterpolant.h"
+
 using namespace std;
 using namespace PROPOSAL;
 
 TEST(Propagation , Test_nan) {
 
-    int statistic = 100;
+    int statistic = 10;
     int EmaxLog10 = 8;
+
+    // Parametrization::Definition def;
+    // def.path_to_tables = "../src/resources/tables";
+    // def.raw = false;
+    // def.lpm_effect_enabled = false;
+    // BremsKelnerKokoulinPetrukhin param(MuMinusDef::Get(), Ice(1.0), EnergyCutSettings(500, 0.05), def);
+    // BremsInterpolant brems(param);
 
     // SectorDef col_def;
     // col_def.location = 1;
@@ -70,6 +80,7 @@ TEST(Propagation , Test_nan) {
     sec_def.do_continuous_randomization = true;
     sec_def.do_exact_time_calculation = true;
     sec_def.do_scattering = true;
+    sec_def.lpm_effect_enabled = false;
 
     sec_def.scattering_model = ScatteringFactory::MoliereFirstOrder;
     sec_def.density_correction = 0.98;
@@ -81,7 +92,10 @@ TEST(Propagation , Test_nan) {
     sec_def.inner_radius = 0.0;
     sec_def.radius = 1e18;
 
+    sec_def.medium = MediumFactory::Ice;
+
     Sector* sec2 = SectorFactory::Get().CreateSector(particle, sec_def);
+    std::cout << "Got sector" << std::endl;
 
     collections.push_back(sec2);
 
@@ -89,34 +103,37 @@ TEST(Propagation , Test_nan) {
     // Create Propagator
     // --------------------------------------------------------------------- //
 
-    Propagator pr(collections, Sphere(Vector3D(), 1e18, 0));
+    // Propagator pr(collections, Sphere(Vector3D(), 1e18, 0));
+    // std::cout << "Propagagtor created" << std::endl;
+
     // Propagator pr("../resources/config_ice.json");
     // pr->EnableInterpolation(*pr->GetParticle());
 
     // pr->set_seed(seed);
 
-    std::vector<unsigned int> length_sec;
-
-    for(int i =0;i<statistic;i++)
-    {
-        particle.SetEnergy(pow(10,EmaxLog10));
-        particle.SetPropagatedDistance(0);
-        particle.SetPosition(Vector3D(0, 0, 0));
-        particle.SetDirection(Vector3D(0, 0, -1));
-
-        std::vector<PROPOSALParticle*> sec = pr.Propagate();
-
-        length_sec.push_back(sec.size());
-
-        // for (std::vector<PROPOSALParticle*>::iterator iter = sec.begin(); iter != sec.end(); ++iter) {
-        //     std::cout << (*iter)->GetName() << std::endl;
-        // }
-    }
-
-    for(std::vector<unsigned int>::iterator it = length_sec.begin(); it != length_sec.end(); ++it)
-    {
-        std::cout << "length of secondies: " << *it << std::endl;
-    }
+    // std::vector<unsigned int> length_sec;
+    //
+    // for(int i =0;i<statistic;i++)
+    // {
+    //     std::cout << "loop: " << i << std::endl;
+    //     particle.SetEnergy(pow(10,EmaxLog10));
+    //     particle.SetPropagatedDistance(0);
+    //     particle.SetPosition(Vector3D(0, 0, 0));
+    //     particle.SetDirection(Vector3D(0, 0, -1));
+    //
+    //     std::vector<PROPOSALParticle*> sec = pr.Propagate();
+    //
+    //     length_sec.push_back(sec.size());
+    //
+    //     // for (std::vector<PROPOSALParticle*>::iterator iter = sec.begin(); iter != sec.end(); ++iter) {
+    //     //     std::cout << (*iter)->GetName() << std::endl;
+    //     // }
+    // }
+    //
+    // for(std::vector<unsigned int>::iterator it = length_sec.begin(); it != length_sec.end(); ++it)
+    // {
+    //     std::cout << "length of secondies: " << *it << std::endl;
+    // }
 }
 
 int main(int argc, char **argv) {

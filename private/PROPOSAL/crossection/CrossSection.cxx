@@ -10,12 +10,12 @@ using namespace PROPOSAL;
 // ------------------------------------------------------------------------- //
 
 CrossSection::CrossSection(Parametrization& param)
-    : parametrization(param)
+    : parametrization_(param)
     , prob_for_component_(param.GetMedium().GetNumComponents(), 0)
     , sum_of_rates_(0)
     , dedx_integral_(IROMB, IMAXS, IPREC)
     , dndx_integral_(param.GetMedium().GetNumComponents(), Integral(IROMB, IMAXS, IPREC))
-    , components(param.GetMedium().GetComponents())
+    , components_(param.GetMedium().GetComponents())
     , rnd_(0)
 {
 
@@ -32,12 +32,12 @@ CrossSection::CrossSection(Parametrization& param)
 }
 
 CrossSection::CrossSection(const CrossSection& cross_section)
-    :parametrization(cross_section.parametrization)
+    :parametrization_(cross_section.parametrization_)
     , prob_for_component_(cross_section.prob_for_component_)
     , sum_of_rates_(cross_section.sum_of_rates_)
     , dedx_integral_(cross_section.dedx_integral_)
     , dndx_integral_(cross_section.dndx_integral_)
-    , components(cross_section.components)
+    , components_(cross_section.components_)
     , rnd_(cross_section.rnd_)
 {
 }

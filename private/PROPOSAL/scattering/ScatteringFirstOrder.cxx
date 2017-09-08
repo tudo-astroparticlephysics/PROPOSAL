@@ -14,7 +14,8 @@
 
 #include "PROPOSAL/methods.h"
 #include "PROPOSAL/math/MathModel.h"
-#include "PROPOSAL/crossection/CrossSections.h"
+#include "PROPOSAL/crossection/CrossSection.h"
+#include "PROPOSAL/crossection/parametrization/Parametrization.h"
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/scattering/ScatteringFirstOrder.h"
 #include "PROPOSAL/Output.h"
@@ -46,7 +47,7 @@ ScatteringFirstOrder::~ScatteringFirstOrder()
 
 
 void ScatteringFirstOrder::EnableInterpolation(const PROPOSALParticle& particle,
-                                            const std::vector<CrossSections*>& cross_sections,
+                                            const std::vector<CrossSection*>& cross_sections,
                                             std::string filepath)
 {
     (void)particle;
@@ -75,7 +76,7 @@ double ScatteringFirstOrder::CalculateTheta0(const PROPOSALParticle& particle, c
 
 //----------------------------------------------------------------------------//
 
-Scattering::RandomAngles ScatteringFirstOrder::CalculateRandomAngle(const PROPOSALParticle& particle, const std::vector<CrossSections*>& cross_sections, double dr, double ei, double ef)
+Scattering::RandomAngles ScatteringFirstOrder::CalculateRandomAngle(const PROPOSALParticle& particle, const std::vector<CrossSection*>& cross_sections, double dr, double ei, double ef)
 {
     (void)ei;
     (void)ef;
@@ -83,7 +84,7 @@ Scattering::RandomAngles ScatteringFirstOrder::CalculateRandomAngle(const PROPOS
     double Theta0,rnd1,rnd2;
     Scattering::RandomAngles random_angles;
 
-    Theta0 = CalculateTheta0(particle, *cross_sections.at(0)->GetMedium(), dr);
+    Theta0 = CalculateTheta0(particle, cross_sections.at(0)->GetParametrization().GetMedium(), dr);
 
     rnd1 = SQRT2*Theta0*erfInv( 2.*(RandomGenerator::Get().RandomDouble()-0.5) );
     rnd2 = SQRT2*Theta0*erfInv( 2.*(RandomGenerator::Get().RandomDouble()-0.5) );

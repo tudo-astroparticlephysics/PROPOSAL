@@ -44,7 +44,7 @@ class Bremsstrahlung : public Parametrization
     // Protected methods
     // ----------------------------------------------------------------- //
 
-    double lpm(double energy, double v, double s1);
+    double lpm(double energy, double v);
 
     // ----------------------------------------------------------------- //
     // Protected member

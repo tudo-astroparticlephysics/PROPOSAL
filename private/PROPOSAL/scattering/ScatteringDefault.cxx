@@ -3,11 +3,13 @@
 
 #include "PROPOSAL/math/MathModel.h"
 #include "PROPOSAL/scattering/ScatteringDefault.h"
-#include "PROPOSAL/crossection/CrossSections.h"
-#include "PROPOSAL/crossection/Ionization.h"
-#include "PROPOSAL/crossection/Bremsstrahlung.h"
-#include "PROPOSAL/crossection/Epairproduction.h"
-#include "PROPOSAL/crossection/Photonuclear.h"
+#include "PROPOSAL/crossection/CrossSection.h"
+#include "PROPOSAL/crossection/parametrization/Parametrization.h"
+// #include "PROPOSAL/crossection/CrossSections.h"
+// #include "PROPOSAL/crossection/Ionization.h"
+// #include "PROPOSAL/crossection/Bremsstrahlung.h"
+// #include "PROPOSAL/crossection/Epairproduction.h"
+// #include "PROPOSAL/crossection/Photonuclear.h"
 #include "PROPOSAL/Output.h"
 #include "PROPOSAL/methods.h"
 #include "PROPOSAL/Constants.h"
@@ -146,7 +148,7 @@ ScatteringDefault::ScatteringDefault(const ScatteringDefault &scattering)
 //----------------------------------------------------------------------------//
 
 
-double ScatteringDefault::FunctionToIntegral(const PROPOSALParticle& particle, const std::vector<CrossSections*>& cross_sections, double energy)
+double ScatteringDefault::FunctionToIntegral(const PROPOSALParticle& particle, const std::vector<CrossSection*>& cross_sections, double energy)
 {
     double aux, aux2;
     double result;
@@ -175,7 +177,7 @@ double ScatteringDefault::FunctionToIntegral(const PROPOSALParticle& particle, c
 
 //----------------------------------------------------------------------------//
 
-long double ScatteringDefault::CalculateTheta0(const PROPOSALParticle& particle, const std::vector<CrossSections*>& cross_sections, double dr, double ei, double ef)
+long double ScatteringDefault::CalculateTheta0(const PROPOSALParticle& particle, const std::vector<CrossSection*>& cross_sections, double dr, double ei, double ef)
 {
 
     double aux=-1;
@@ -206,7 +208,7 @@ long double ScatteringDefault::CalculateTheta0(const PROPOSALParticle& particle,
         aux = integral_.Integrate(ei, ef, boost::bind(&ScatteringDefault::FunctionToIntegral, this, boost::cref(particle), boost::cref(cross_sections), _1),4);
     }
     // TODO: Decide if using RadiationLength calculated in Bremsstrahlung or Medium
-    double radiation_lenght = cross_sections.at(0)->GetMedium()->GetRadiationLength();
+    double radiation_lenght = cross_sections.at(0)->GetParametrization().GetMedium().GetRadiationLength();
 
     // TODO: check if one has to take the absolute value of the particle charge
     aux =   sqrt(max(aux, 0.0) / radiation_lenght) * particle.GetCharge();
@@ -217,7 +219,7 @@ long double ScatteringDefault::CalculateTheta0(const PROPOSALParticle& particle,
 
 //----------------------------------------------------------------------------//
 
-Scattering::RandomAngles ScatteringDefault::CalculateRandomAngle(const PROPOSALParticle& particle, const std::vector<CrossSections*>& cross_sections, double dr, double ei, double ef)
+Scattering::RandomAngles ScatteringDefault::CalculateRandomAngle(const PROPOSALParticle& particle, const std::vector<CrossSection*>& cross_sections, double dr, double ei, double ef)
 {
     double Theta0,rnd1,rnd2;
     Scattering::RandomAngles random_angles;
@@ -241,121 +243,121 @@ Scattering::RandomAngles ScatteringDefault::CalculateRandomAngle(const PROPOSALP
 
 //----------------------------------------------------------------------------//
 
-double ScatteringDefault::FunctionToBuildInterpolant(const PROPOSALParticle& particle, const std::vector<CrossSections*>& cross_sections, double energy)
+double ScatteringDefault::FunctionToBuildInterpolant(const PROPOSALParticle& particle, const std::vector<CrossSection*>& cross_sections, double energy)
 {
         return integral_.Integrate(energy, BIGENERGY, boost::bind(&ScatteringDefault::FunctionToIntegral, this, boost::cref(particle), boost::cref(cross_sections), _1),4);
 }
 
-void ScatteringDefault::EnableInterpolation(const PROPOSALParticle& particle, const std::vector<CrossSections*>& cross_sections, std::string path)
+void ScatteringDefault::EnableInterpolation(const PROPOSALParticle& particle, const std::vector<CrossSection*>& cross_sections, std::string path)
 {
-    if(do_interpolation_)return;
-
-    bool reading_worked=true, storing_failed=false;
-
-    // charged anti leptons have the same cross sections like charged leptons
-    // (except of diffractive Bremsstrahlung, where one can analyse the interference term if implemented)
-    // so they use the same interpolation tables
-    string particle_name = particle.GetName();
-
-    if(!path.empty())
-    {
-        stringstream filename;
-        filename<<path<<"/ScatteringDefault"
-                <<"_"<<particle_name
-                <<"_mass_"<<particle.GetMass()
-                <<"_charge_"<<particle.GetCharge()
-                <<"_lifetime_"<<particle.GetLifetime()
-                <<"_"<< cross_sections.at(0)->GetMedium()->GetName()
-                <<"_"<< cross_sections.at(0)->GetMedium()->GetMassDensity()
-                <<"_"<< cross_sections.at(0)->GetEnergyCutSettings()->GetEcut()
-                <<"_"<< cross_sections.at(0)->GetEnergyCutSettings()->GetVcut();
-
-        for(unsigned int i =0; i<cross_sections.size(); i++)
-        {
-            switch (cross_sections.at(i)->GetType())
-            {
-                case ParticleType::Brems:
-                    filename << "_b"
-                        << "_" << cross_sections.at(i)->GetParametrization()
-                        << "_" << cross_sections.at(i)->GetLpmEffectEnabled();
-                    break;
-                case ParticleType::DeltaE:
-                    filename << "_i";
-                    break;
-                case ParticleType::EPair:
-                    filename << "_e"
-                        << "_" << cross_sections.at(i)->GetLpmEffectEnabled();
-                    break;
-                case ParticleType::NuclInt:
-                    filename << "_p"
-                        << "_" << cross_sections.at(i)->GetParametrization();
-                    break;
-                default:
-                    log_fatal("Unknown cross section");
-                    exit(1);
-            }
-            filename<< "_" << cross_sections.at(i)->GetMultiplier()
-                    << "_" << cross_sections.at(i)->GetEnergyCutSettings()->GetEcut()
-                    << "_" << cross_sections.at(i)->GetEnergyCutSettings()->GetVcut();
-
-        }
-
-
-        if( FileExist(filename.str()) )
-        {
-            log_debug( "ScatteringDefault tables will be read from file:\t%s",filename.str().c_str());
-            ifstream input;
-
-            input.open(filename.str().c_str());
-
-            interpolant_ = new Interpolant();
-            interpolant_diff_ = new Interpolant();
-            reading_worked = interpolant_->Load(input);
-            reading_worked = reading_worked && interpolant_diff_->Load(input);
-
-            input.close();
-        }
-
-        if(!FileExist(filename.str()) || !reading_worked )
-        {
-            if(!reading_worked)
-            {
-                log_info( "File %s is corrupted! Write it again!",filename.str().c_str());
-            }
-
-            log_info("ScatteringDefault tables will be saved to file:\t%s",filename.str().c_str());
-
-            ofstream output;
-
-            output.open(filename.str().c_str());
-
-            if(output.good())
-            {
-                output.precision(16);
-
-                interpolant_ = new Interpolant(NUM2,particle.GetLow() , BIGENERGY ,boost::bind(&ScatteringDefault::FunctionToBuildInterpolant, this, boost::cref(particle), boost::cref(cross_sections), _1), order_of_interpolation_ , false, false, true, order_of_interpolation_, false, false, false );
-                interpolant_diff_ = new Interpolant(NUM2,particle.GetLow() , BIGENERGY ,boost::bind(&ScatteringDefault::FunctionToIntegral, this, boost::cref(particle), boost::cref(cross_sections), _1), order_of_interpolation_ , false, false, true, order_of_interpolation_, false, false, false );
-
-                interpolant_->Save(output);
-                interpolant_diff_->Save(output);
-            }
-            else
-            {
-                storing_failed  =   true;
-                log_warn("Can not open file %s for writing! Table will not be stored!",filename.str().c_str());
-            }
-
-            output.close();
-        }
-    }
-    if(path.empty() || storing_failed)
-    {
-        interpolant_ = new Interpolant(NUM2,particle.GetLow() , BIGENERGY ,boost::bind(&ScatteringDefault::FunctionToBuildInterpolant, this, boost::cref(particle), boost::cref(cross_sections), _1), order_of_interpolation_ , false, false, true, order_of_interpolation_, false, false, false );
-        interpolant_diff_ = new Interpolant(NUM2,particle.GetLow() , BIGENERGY ,boost::bind(&ScatteringDefault::FunctionToIntegral, this, boost::cref(particle), boost::cref(cross_sections), _1), order_of_interpolation_ , false, false, true, order_of_interpolation_, false, false, false );
-    }
-
-
-    do_interpolation_ = true;
+    // if(do_interpolation_)return;
+    //
+    // bool reading_worked=true, storing_failed=false;
+    //
+    // // charged anti leptons have the same cross sections like charged leptons
+    // // (except of diffractive Bremsstrahlung, where one can analyse the interference term if implemented)
+    // // so they use the same interpolation tables
+    // string particle_name = particle.GetName();
+    //
+    // if(!path.empty())
+    // {
+    //     stringstream filename;
+    //     filename<<path<<"/ScatteringDefault"
+    //             <<"_"<<particle_name
+    //             <<"_mass_"<<particle.GetMass()
+    //             <<"_charge_"<<particle.GetCharge()
+    //             <<"_lifetime_"<<particle.GetLifetime()
+    //             <<"_"<< cross_sections.at(0)->GetMedium()->GetName()
+    //             <<"_"<< cross_sections.at(0)->GetMedium()->GetMassDensity()
+    //             <<"_"<< cross_sections.at(0)->GetEnergyCutSettings()->GetEcut()
+    //             <<"_"<< cross_sections.at(0)->GetEnergyCutSettings()->GetVcut();
+    //
+    //     for(unsigned int i =0; i<cross_sections.size(); i++)
+    //     {
+    //         switch (cross_sections.at(i)->GetType())
+    //         {
+    //             case ParticleType::Brems:
+    //                 filename << "_b"
+    //                     << "_" << cross_sections.at(i)->GetParametrization()
+    //                     << "_" << cross_sections.at(i)->GetLpmEffectEnabled();
+    //                 break;
+    //             case ParticleType::DeltaE:
+    //                 filename << "_i";
+    //                 break;
+    //             case ParticleType::EPair:
+    //                 filename << "_e"
+    //                     << "_" << cross_sections.at(i)->GetLpmEffectEnabled();
+    //                 break;
+    //             case ParticleType::NuclInt:
+    //                 filename << "_p"
+    //                     << "_" << cross_sections.at(i)->GetParametrization();
+    //                 break;
+    //             default:
+    //                 log_fatal("Unknown cross section");
+    //                 exit(1);
+    //         }
+    //         filename<< "_" << cross_sections.at(i)->GetMultiplier()
+    //                 << "_" << cross_sections.at(i)->GetEnergyCutSettings()->GetEcut()
+    //                 << "_" << cross_sections.at(i)->GetEnergyCutSettings()->GetVcut();
+    //
+    //     }
+    //
+    //
+    //     if( FileExist(filename.str()) )
+    //     {
+    //         log_debug( "ScatteringDefault tables will be read from file:\t%s",filename.str().c_str());
+    //         ifstream input;
+    //
+    //         input.open(filename.str().c_str());
+    //
+    //         interpolant_ = new Interpolant();
+    //         interpolant_diff_ = new Interpolant();
+    //         reading_worked = interpolant_->Load(input);
+    //         reading_worked = reading_worked && interpolant_diff_->Load(input);
+    //
+    //         input.close();
+    //     }
+    //
+    //     if(!FileExist(filename.str()) || !reading_worked )
+    //     {
+    //         if(!reading_worked)
+    //         {
+    //             log_info( "File %s is corrupted! Write it again!",filename.str().c_str());
+    //         }
+    //
+    //         log_info("ScatteringDefault tables will be saved to file:\t%s",filename.str().c_str());
+    //
+    //         ofstream output;
+    //
+    //         output.open(filename.str().c_str());
+    //
+    //         if(output.good())
+    //         {
+    //             output.precision(16);
+    //
+    //             interpolant_ = new Interpolant(NUM2,particle.GetLow() , BIGENERGY ,boost::bind(&ScatteringDefault::FunctionToBuildInterpolant, this, boost::cref(particle), boost::cref(cross_sections), _1), order_of_interpolation_ , false, false, true, order_of_interpolation_, false, false, false );
+    //             interpolant_diff_ = new Interpolant(NUM2,particle.GetLow() , BIGENERGY ,boost::bind(&ScatteringDefault::FunctionToIntegral, this, boost::cref(particle), boost::cref(cross_sections), _1), order_of_interpolation_ , false, false, true, order_of_interpolation_, false, false, false );
+    //
+    //             interpolant_->Save(output);
+    //             interpolant_diff_->Save(output);
+    //         }
+    //         else
+    //         {
+    //             storing_failed  =   true;
+    //             log_warn("Can not open file %s for writing! Table will not be stored!",filename.str().c_str());
+    //         }
+    //
+    //         output.close();
+    //     }
+    // }
+    // if(path.empty() || storing_failed)
+    // {
+    //     interpolant_ = new Interpolant(NUM2,particle.GetLow() , BIGENERGY ,boost::bind(&ScatteringDefault::FunctionToBuildInterpolant, this, boost::cref(particle), boost::cref(cross_sections), _1), order_of_interpolation_ , false, false, true, order_of_interpolation_, false, false, false );
+    //     interpolant_diff_ = new Interpolant(NUM2,particle.GetLow() , BIGENERGY ,boost::bind(&ScatteringDefault::FunctionToIntegral, this, boost::cref(particle), boost::cref(cross_sections), _1), order_of_interpolation_ , false, false, true, order_of_interpolation_, false, false, false );
+    // }
+    //
+    //
+    // do_interpolation_ = true;
 }
 
 void ScatteringDefault::DisableInterpolation()

@@ -30,8 +30,15 @@ class CrossSection
         virtual double CalculateStochasticLoss(double energy, double rnd1, double rnd2) = 0;
 
         // Needed to initialize interpolation
+        // virtual double FunctionToBuildDEdxInterpolant(double energy) = 0;
         virtual double FunctionToBuildDNdxInterpolant(double energy, int component) = 0;
         virtual double FunctionToBuildDNdxInterpolant2D(double energy, double v, int component) = 0;
+
+        // ----------------------------------------------------------------- //
+        // Getter
+        // ----------------------------------------------------------------- //
+
+        Parametrization& GetParametrization() const { return parametrization_;}
 
     protected:
         typedef std::vector<Integral> IntegralVec;
@@ -47,7 +54,7 @@ class CrossSection
         // Protected member
         // ----------------------------------------------------------------- //
 
-        Parametrization& parametrization;
+        Parametrization& parametrization_;
 
         std::vector<double> prob_for_component_; //!< probability for each medium component to interact with the particle (formerly h_)
         double sum_of_rates_;
@@ -55,7 +62,7 @@ class CrossSection
         Integral dedx_integral_;
         IntegralVec  dndx_integral_;
 
-        const ComponentVec& components;
+        const ComponentVec& components_;
 
         double rnd_;    //!< This random number will be stored in CalculateDNdx to avoid calculate dNdx a second time in ClaculateSochasticLoss when it is already done
 };

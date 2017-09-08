@@ -8,16 +8,10 @@
 #include "PROPOSAL/particle/PROPOSALParticle.h"
 #include "PROPOSAL/scattering/ScatteringFactory.h"
 
-// namespace PROPOSAL {
-// class ProcessSector;
-// }
-//
-// std::ostream& operator<<(std::ostream& os, PROPOSAL::ProcessSector const& collection);
-//
 namespace PROPOSAL {
 
-class ContinuousRandomization;
-class CrossSections;
+// class ContinuousRandomization;
+class CrossSection;
 class Medium;
 class EnergyCutSettings;
 class Geometry;
@@ -243,8 +237,8 @@ class Sector
     PROPOSALParticle& GetParticle() const { return particle_; }
     Geometry* GetGeometry() const { return geometry_; }
     const EnergyCutSettings& GetCutSettings() const { return cut_settings_; }
-    std::vector<CrossSections*> GetCrosssections() const { return crosssections_; }
-    ContinuousRandomization* GetContinuousRandomization() const { return randomizer_; }
+    std::vector<CrossSection*> GetCrosssections() const { return crosssections_; }
+    // ContinuousRandomization* GetContinuousRandomization() const { return randomizer_; }
 
     protected:
     Sector& operator=(const Sector&); // Undefined & not allowed
@@ -280,10 +274,10 @@ class Sector
     Medium* medium_;
     EnergyCutSettings cut_settings_;
 
-    ContinuousRandomization* randomizer_;
+    // ContinuousRandomization* randomizer_;
     Scattering* scattering_;
 
-    std::vector<CrossSections*> crosssections_;
+    std::vector<CrossSection*> crosssections_;
 
     // --------------------------------------------------------------------- //
     // Protected member functions
