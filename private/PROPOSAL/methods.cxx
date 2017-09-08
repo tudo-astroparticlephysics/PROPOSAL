@@ -25,6 +25,7 @@
 //TODO(mario): remove Thu 2017/09/07
 #include "PROPOSAL/crossection/parametrization/Ionization.h"
 #include "PROPOSAL/crossection/parametrization/Bremsstrahlung.h"
+#include "PROPOSAL/crossection/parametrization/EpairProduction.h"
 
 #include "PROPOSAL/math/InterpolantBuilder.h"
 #include "PROPOSAL/medium/Medium.h"
@@ -259,6 +260,10 @@ void InitializeInterpolation(const std::string name,
         else if (dynamic_cast<BremsKelnerKokoulinPetrukhin*>(parametrizations.at(0)))
         {
             param_name = "brems";
+        }
+        else if (dynamic_cast<EpairProductionRhoInterpolant*>(parametrizations.at(0)))
+        {
+            param_name = "epair";
         }
         // std::string param_name =
         //     parametrizations.size() == 1 ? std::string(typeid(parametrizations[0]).name()) : "";
