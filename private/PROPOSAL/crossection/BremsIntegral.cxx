@@ -6,7 +6,7 @@
 
 using namespace PROPOSAL;
 
-BremsIntegral::BremsIntegral(Parametrization& param): CrossSectionIntegral(param)
+BremsIntegral::BremsIntegral(const Parametrization& param): CrossSectionIntegral(param)
 {
 }
 
@@ -24,21 +24,21 @@ BremsIntegral::~BremsIntegral()
 
 double BremsIntegral::CalculatedEdx(double energy)
 {
-    if (parametrization_.GetMultiplier() <= 0)
+    if (parametrization_->GetMultiplier() <= 0)
     {
         return 0;
     }
 
     double sum = 0;
 
-    for (int i = 0; i < (parametrization_.GetMedium().GetNumComponents()); i++)
+    for (int i = 0; i < (parametrization_->GetMedium().GetNumComponents()); i++)
     {
-        parametrization_.SetCurrentComponent(i);
-        Parametrization::IntegralLimits limits = parametrization_.GetIntegralLimits(energy);
+        parametrization_->SetCurrentComponent(i);
+        Parametrization::IntegralLimits limits = parametrization_->GetIntegralLimits(energy);
 
         sum += dedx_integral_.Integrate(
-            limits.vMin, limits.vUp, boost::bind(&Parametrization::FunctionToDEdxIntegral, &parametrization_, energy, _1), 2);
+            limits.vMin, limits.vUp, boost::bind(&Parametrization::FunctionToDEdxIntegral, parametrization_, energy, _1), 2);
     }
 
-    return parametrization_.GetMultiplier() * energy * sum;
+    return parametrization_->GetMultiplier() * energy * sum;
 }

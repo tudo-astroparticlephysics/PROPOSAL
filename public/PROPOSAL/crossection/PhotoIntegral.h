@@ -1,4 +1,3 @@
-
 #pragma once
 
 
@@ -7,14 +6,14 @@
 namespace PROPOSAL
 {
 
-class BremsIntegral: public CrossSectionIntegral
+class PhotoIntegral: public CrossSectionIntegral
 {
     public:
-        BremsIntegral(const Parametrization&);
-        BremsIntegral(const BremsIntegral&);
-        virtual ~BremsIntegral();
+        PhotoIntegral(const Parametrization&);
+        PhotoIntegral(const PhotoIntegral&);
+        virtual ~PhotoIntegral();
 
-        CrossSection* clone() const { return new BremsIntegral(*this); }
+        CrossSection* clone() const { return new PhotoIntegral(*this); }
 
         // ----------------------------------------------------------------- //
         // Public methods

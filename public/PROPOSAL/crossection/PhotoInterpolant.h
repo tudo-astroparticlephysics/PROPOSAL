@@ -6,14 +6,14 @@
 namespace PROPOSAL
 {
 
-class EpairInterpolant: public CrossSectionInterpolant
+class PhotoInterpolant: public CrossSectionInterpolant
 {
     public:
-        EpairInterpolant(const Parametrization&);
-        EpairInterpolant(const EpairInterpolant&);
-        virtual ~EpairInterpolant();
+        PhotoInterpolant(const Parametrization&);
+        PhotoInterpolant(const PhotoInterpolant&);
+        virtual ~PhotoInterpolant();
 
-        CrossSection* clone() const { return new EpairInterpolant(*this); }
+        CrossSection* clone() const { return new PhotoInterpolant(*this); }
 
         // ----------------------------------------------------------------- //
         // Public methods
