@@ -18,7 +18,6 @@ class Ionization : public Parametrization
     // ----------------------------------------------------------------- //
 
     double DifferentialCrossSection(double energy, double v);
-    double CalculateParametrization(double energy, double v);
 
     double FunctionToDEdxIntegral(double energy, double v);
     double FunctionToDNdxIntegral(double energy, double v);
