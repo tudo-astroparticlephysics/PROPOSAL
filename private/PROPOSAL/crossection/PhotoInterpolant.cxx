@@ -1,8 +1,8 @@
 
 #include <boost/bind.hpp>
 
-#include "PROPOSAL/crossection/EpairInterpolant.h"
-#include "PROPOSAL/crossection/EpairIntegral.h"
+#include "PROPOSAL/crossection/PhotoInterpolant.h"
+#include "PROPOSAL/crossection/PhotoIntegral.h"
 #include "PROPOSAL/crossection/parametrization/Parametrization.h"
 
 #include "PROPOSAL/math/InterpolantBuilder.h"
@@ -13,14 +13,14 @@
 
 using namespace PROPOSAL;
 
-EpairInterpolant::EpairInterpolant(const Parametrization& param): CrossSectionInterpolant(param)
+PhotoInterpolant::PhotoInterpolant(const Parametrization& param): CrossSectionInterpolant(param)
 {
     Parametrization::Definition param_def = parametrization_->GetDefinition();
     Interpolant1DBuilder builder1d;
     Helper::InterpolantBuilderContainer builder_container;
 
     // Needed for CalculatedEdx integration
-    EpairIntegral epair(param);
+    PhotoIntegral photo(param);
 
     builder1d.SetMax(NUM1)
         .SetXMin(param.GetParticleDef().low)
@@ -32,8 +32,8 @@ EpairInterpolant::EpairInterpolant(const Parametrization& param): CrossSectionIn
         .SetRombergY(param_def.order_of_interpolation)
         .SetRationalY(false)
         .SetRelativeY(false)
-        .SetLogSubst(true)
-        .SetFunction1D(boost::bind(&CrossSection::CalculatedEdx, &epair, _1));
+        .SetLogSubst(false)
+        .SetFunction1D(boost::bind(&CrossSection::CalculatedEdx, &photo, _1));
 
     builder_container.push_back(std::make_pair(&builder1d, &dedx_interpolant_));
 
@@ -44,11 +44,11 @@ EpairInterpolant::EpairInterpolant(const Parametrization& param): CrossSectionIn
     log_info("Initialization dEdx for %s done!", typeid(parametrization_).name());
 }
 
-EpairInterpolant::EpairInterpolant(const EpairInterpolant& epair): CrossSectionInterpolant(epair)
+PhotoInterpolant::PhotoInterpolant(const PhotoInterpolant& epair): CrossSectionInterpolant(epair)
 {
 }
 
-EpairInterpolant::~EpairInterpolant()
+PhotoInterpolant::~PhotoInterpolant()
 {
 }
 
@@ -57,7 +57,7 @@ EpairInterpolant::~EpairInterpolant()
 // ----------------------------------------------------------------- //
 
 // ------------------------------------------------------------------------- //
-double EpairInterpolant::CalculatedEdx(double energy)
+double PhotoInterpolant::CalculatedEdx(double energy)
 {
     if (parametrization_->GetMultiplier() <= 0)
     {

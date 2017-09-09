@@ -7,7 +7,7 @@
 
 using namespace PROPOSAL;
 
-EpairIntegral::EpairIntegral(Parametrization& param): CrossSectionIntegral(param)
+EpairIntegral::EpairIntegral(const Parametrization& param): CrossSectionIntegral(param)
 {
 }
 
@@ -25,17 +25,17 @@ EpairIntegral::~EpairIntegral()
 
 double EpairIntegral::CalculatedEdx(double energy)
 {
-    if (parametrization_.GetMultiplier() <= 0)
+    if (parametrization_->GetMultiplier() <= 0)
     {
         return 0;
     }
 
     double sum = 0;
 
-    for(int i=0; i<parametrization_.GetMedium().GetNumComponents(); i++)
+    for(int i=0; i<parametrization_->GetMedium().GetNumComponents(); i++)
     {
-        parametrization_.SetCurrentComponent(i);
-        Parametrization::IntegralLimits limits = parametrization_.GetIntegralLimits(energy);
+        parametrization_->SetCurrentComponent(i);
+        Parametrization::IntegralLimits limits = parametrization_->GetIntegralLimits(energy);
 
         double r1   =   0.8;
         double rUp  =   limits.vUp*(1-HALF_PRECISION);
@@ -43,7 +43,7 @@ double EpairIntegral::CalculatedEdx(double energy)
 
         if(r1<rUp)
         {
-            if(2*parametrization_.FunctionToDEdxIntegral(energy, r1) < parametrization_.FunctionToDEdxIntegral(energy, rUp))
+            if(2*parametrization_->FunctionToDEdxIntegral(energy, r1) < parametrization_->FunctionToDEdxIntegral(energy, rUp))
             {
                 rflag   =   true;
             }
@@ -61,7 +61,7 @@ double EpairIntegral::CalculatedEdx(double energy)
                 r1  =   limits.vMin;
             }
 
-            sum         +=  dedx_integral_.Integrate(limits.vMin, r1, boost::bind(&Parametrization::FunctionToDEdxIntegral, &parametrization_, energy,  _1),4);
+            sum         +=  dedx_integral_.Integrate(limits.vMin, r1, boost::bind(&Parametrization::FunctionToDEdxIntegral, parametrization_, energy,  _1),4);
             // reverse_    =   true;
             double r2   =   std::max(1-limits.vUp, COMPUTER_PRECISION);
 
@@ -80,15 +80,15 @@ double EpairIntegral::CalculatedEdx(double energy)
 
         else
         {
-            sum +=  dedx_integral_.Integrate(limits.vMin, limits.vUp, boost::bind(&Parametrization::FunctionToDEdxIntegral, &parametrization_, energy, _1),4);
+            sum +=  dedx_integral_.Integrate(limits.vMin, limits.vUp, boost::bind(&Parametrization::FunctionToDEdxIntegral, parametrization_, energy, _1),4);
         }
     }
 
-    return parametrization_.GetMultiplier()*energy*sum;
+    return parametrization_->GetMultiplier()*energy*sum;
 }
 
 // ------------------------------------------------------------------------- //
 double EpairIntegral::FunctionToDEdxIntegralReverse(double energy, double v)
 {
-    return (1 - v) * parametrization_.DifferentialCrossSection(energy, v);
+    return (1 - v) * parametrization_->DifferentialCrossSection(energy, v);
 }

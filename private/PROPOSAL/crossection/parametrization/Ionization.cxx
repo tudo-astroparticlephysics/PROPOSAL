@@ -62,14 +62,6 @@ double Ionization::DifferentialCrossSection(double energy, double v)
 }
 
 // ------------------------------------------------------------------------- //
-double Ionization::CalculateParametrization(double energy, double v)
-{
-    (void)energy;
-    (void)v;
-    // Empty, no interpolation needed
-}
-
-// ------------------------------------------------------------------------- //
 double Ionization::FunctionToDEdxIntegral(double energy, double variable)
 {
     return variable * DifferentialCrossSection(energy, variable) * InelCorrection(energy, variable);

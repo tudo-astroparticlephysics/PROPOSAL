@@ -11,7 +11,7 @@
 
 using namespace PROPOSAL;
 
-IonizIntegral::IonizIntegral(Parametrization& param): CrossSectionIntegral(param)
+IonizIntegral::IonizIntegral(const Parametrization& param): CrossSectionIntegral(param)
 {
 }
 
@@ -29,16 +29,16 @@ IonizIntegral::~IonizIntegral()
 
 double IonizIntegral::CalculatedEdx(double energy)
 {
-    if (parametrization_.GetMultiplier() <= 0)
+    if (parametrization_->GetMultiplier() <= 0)
     {
         return 0;
     }
 
     double result, aux;
 
-    Parametrization::IntegralLimits limits = parametrization_.GetIntegralLimits(energy);;
-    ParticleDef particle_def = parametrization_.GetParticleDef();
-    const Medium& medium = parametrization_.GetMedium();
+    Parametrization::IntegralLimits limits = parametrization_->GetIntegralLimits(energy);;
+    ParticleDef particle_def = parametrization_->GetParticleDef();
+    const Medium& medium = parametrization_->GetMedium();
 
     //TODO(mario): Better way? Sat 2017/09/02
     double square_momentum = energy * energy - particle_def.mass * particle_def.mass;
@@ -61,20 +61,20 @@ double IonizIntegral::CalculatedEdx(double energy)
     {
         result=0;
     }
-    return parametrization_.GetMultiplier() *(medium.GetMassDensity()*result
-                        + energy*(dedx_integral_.Integrate(limits.vMin, limits.vUp, boost::bind(&Parametrization::FunctionToDEdxIntegral, &parametrization_, energy, _1),4)));
+    return parametrization_->GetMultiplier() *(medium.GetMassDensity()*result
+                        + energy*(dedx_integral_.Integrate(limits.vMin, limits.vUp, boost::bind(&Parametrization::FunctionToDEdxIntegral, parametrization_, energy, _1),4)));
 }
 
 // ------------------------------------------------------------------------- //
 double IonizIntegral::CalculatedNdx(double energy)
 {
-    if (parametrization_.GetMultiplier() <= 0)
+    if (parametrization_->GetMultiplier() <= 0)
     {
         return 0;
     }
 
-    Parametrization::IntegralLimits limits = parametrization_.GetIntegralLimits(energy);;
-    sum_of_rates_ = dndx_integral_[0].Integrate(limits.vUp,limits.vMax,boost::bind(&Parametrization::FunctionToDNdxIntegral, &parametrization_, energy, _1),3,1);
+    Parametrization::IntegralLimits limits = parametrization_->GetIntegralLimits(energy);;
+    sum_of_rates_ = dndx_integral_[0].Integrate(limits.vUp,limits.vMax,boost::bind(&Parametrization::FunctionToDNdxIntegral, parametrization_, energy, _1),3,1);
 
     return sum_of_rates_;
 }
@@ -82,15 +82,15 @@ double IonizIntegral::CalculatedNdx(double energy)
 // ------------------------------------------------------------------------- //
 double IonizIntegral::CalculatedNdx(double energy, double rnd)
 {
-    if (parametrization_.GetMultiplier() <= 0)
+    if (parametrization_->GetMultiplier() <= 0)
     {
         return 0;
     }
 
     rnd_    =   rnd;
 
-    Parametrization::IntegralLimits limits = parametrization_.GetIntegralLimits(energy);;
-    sum_of_rates_ = dndx_integral_[0].IntegrateWithRandomRatio(limits.vUp,limits.vMax,boost::bind(&Parametrization::FunctionToDNdxIntegral, &parametrization_, energy, _1),3,rnd,1);
+    Parametrization::IntegralLimits limits = parametrization_->GetIntegralLimits(energy);;
+    sum_of_rates_ = dndx_integral_[0].IntegrateWithRandomRatio(limits.vUp,limits.vMax,boost::bind(&Parametrization::FunctionToDNdxIntegral, parametrization_, energy, _1),3,rnd,1);
 
     return sum_of_rates_;
 }
@@ -99,7 +99,7 @@ double IonizIntegral::CalculatedNdx(double energy, double rnd)
 double IonizIntegral::CalculateStochasticLoss(double energy, double rnd1)
 {
     double rnd, rsum;
-    const Medium& medium = parametrization_.GetMedium();
+    const Medium& medium = parametrization_->GetMedium();
 
     rnd = medium.GetSumCharge() * rnd1;
     rsum = 0;
@@ -122,7 +122,7 @@ double IonizIntegral::CalculateStochasticLoss(double energy, double rnd1)
 // ------------------------------------------------------------------------- //
 double IonizIntegral::Delta(double beta, double gamma)
 {
-    const Medium& medium = parametrization_.GetMedium();
+    const Medium& medium = parametrization_->GetMedium();
     double X;
 
     X   =   log(beta * gamma)/log(10);

@@ -9,7 +9,7 @@ namespace PROPOSAL
 class EpairIntegral: public CrossSectionIntegral
 {
     public:
-        EpairIntegral(Parametrization&);
+        EpairIntegral(const Parametrization&);
         EpairIntegral(const EpairIntegral&);
         virtual ~EpairIntegral();
 
