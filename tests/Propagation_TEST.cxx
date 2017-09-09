@@ -21,6 +21,9 @@
 #include "PROPOSAL/crossection/parametrization/Bremsstrahlung.h"
 #include "PROPOSAL/crossection/BremsInterpolant.h"
 
+#include "PROPOSAL/crossection/parametrization/PhotoRealPhotonAssumption.h"
+#include "PROPOSAL/crossection/parametrization/PhotoQ2Integration.h"
+
 using namespace std;
 using namespace PROPOSAL;
 
@@ -28,6 +31,18 @@ TEST(Propagation , Test_nan) {
 
     int statistic = 10;
     int EmaxLog10 = 8;
+
+    ParticleDef pdef = MuMinusDef::Get();
+
+    PhotoRhode rhode(pdef, Ice(), EnergyCutSettings(500, 0.5), HardBB(pdef));
+    PhotoZeus zeus(MuMinusDef::Get(), Ice(), EnergyCutSettings(500, 0.5), HardBB(pdef));
+    PhotoBezrukovBugaev bezrukov(MuMinusDef::Get(), Ice(), EnergyCutSettings(500, 0.5), SoftBB());
+    PhotoKokoulin kokoulin(MuMinusDef::Get(), Ice(), EnergyCutSettings(500, 0.5), SoftBB());
+
+    // PhotoAbramowiczLevinLevyMaor97Interpolant allm(MuMinusDef::Get(), Ice(), EnergyCutSettings(500, 0.5), ShadowDutta());
+    PhotoQ2Interpolant<PhotoAbramowiczLevinLevyMaor97> allm2(MuMinusDef::Get(), Ice(), EnergyCutSettings(500, 0.5), ShadowDutta());
+
+    std::cout << "Result: " << allm2.DifferentialCrossSection(1e4, 0.01) << std::endl;
 
     // Parametrization::Definition def;
     // def.path_to_tables = "../src/resources/tables";

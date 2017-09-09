@@ -10,7 +10,7 @@ namespace PROPOSAL
 class IonizInterpolant: public CrossSectionInterpolant
 {
     public:
-        IonizInterpolant(Parametrization&);
+        IonizInterpolant(const Parametrization&);
         IonizInterpolant(const IonizInterpolant&);
         virtual ~IonizInterpolant();
 
@@ -25,14 +25,11 @@ class IonizInterpolant: public CrossSectionInterpolant
         virtual double CalculatedNdx(double energy, double rnd);
 
         // Needed to initialize interpolation
-        // double FunctionToBuildDEdxInterpolant(double energy);
         double FunctionToBuildDNdxInterpolant(double energy, int component);
-        double FunctionToBuildDNdxInterpolant2D(double energy, double v, int component);
+        virtual double FunctionToBuildDNdxInterpolant2D(double energy, double v, Integral&, int component);
 
     private:
         virtual double CalculateStochasticLoss(double energy, double rnd1);
-        //TODO(mario): Remove here Thu 2017/09/07
-        // double Delta(double beta, double gamma);
 };
 
 } /* PROPOSAL */

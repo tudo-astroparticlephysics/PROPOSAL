@@ -26,7 +26,7 @@ EpairProduction::EpairProduction(const ParticleDef& particle_def,
                                  const EnergyCutSettings& cuts,
                                  Definition param_def)
     : Parametrization(particle_def, medium, cuts, param_def)
-    , v_(0) // TODO(mario): make it use to enable Mon 2017/09/04
+    , v_(0)
     , eLpm_(0)
 {
 }
@@ -45,14 +45,6 @@ EpairProduction::~EpairProduction()
 // ------------------------------------------------------------------------- //
 // Public methods
 // ------------------------------------------------------------------------- //
-
-// ------------------------------------------------------------------------- //
-double EpairProduction::CalculateParametrization(double energy, double v)
-{
-    (void)energy;
-    (void)v;
-    // Empty, Not needed for EpairProduction
-}
 
 // ------------------------------------------------------------------------- //
 double EpairProduction::FunctionToDEdxIntegral(double energy, double variable)

@@ -10,7 +10,7 @@ namespace PROPOSAL
 class IonizIntegral: public CrossSectionIntegral
 {
     public:
-        IonizIntegral(Parametrization&);
+        IonizIntegral(const Parametrization&);
         IonizIntegral(const IonizIntegral&);
         virtual ~IonizIntegral();
 

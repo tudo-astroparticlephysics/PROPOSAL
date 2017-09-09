@@ -2,15 +2,17 @@
 #pragma once
 
 #include "PROPOSAL/crossection/CrossSection.h"
-#include "PROPOSAL/math/Interpolant.h"
+#include "PROPOSAL/math/Integral.h"
 
 namespace PROPOSAL
 {
 
+class Interpolant;
+
 class CrossSectionInterpolant: public CrossSection
 {
     public:
-        CrossSectionInterpolant(Parametrization&);
+        CrossSectionInterpolant(const Parametrization&);
         CrossSectionInterpolant(const CrossSectionInterpolant&);
         virtual ~CrossSectionInterpolant();
 
@@ -22,15 +24,13 @@ class CrossSectionInterpolant: public CrossSection
         virtual double CalculateStochasticLoss(double energy, double rnd1, double rnd2);
 
         // Needed to initialize interpolation
-        // virtual double FunctionToBuildDEdxInterpolant(double energy) = 0;
         virtual double FunctionToBuildDNdxInterpolant(double energy, int component);
-        virtual double FunctionToBuildDNdxInterpolant2D(double energy, double v, int component);
+        virtual double FunctionToBuildDNdxInterpolant2D(double energy, double v, Integral&, int component);
 
     protected:
         typedef std::vector<Interpolant*> InterpolantVec;
 
         virtual double CalculateStochasticLoss(double energy, double rnd1);
-        // void InitInterpolation(std::string filename, bool raw);
 
         Interpolant* dedx_interpolant_;
         InterpolantVec dndx_interpolant_1d_; //Stochastic dNdx()

@@ -1,21 +1,9 @@
 
 #pragma once
 
-#include "PROPOSAL/crossection/parametrization/Parametrization.h"
-#include "PROPOSAL/math/Interpolant.h"
+#include <cmath>
 
-// #define BREMSSTRAHLUNG_DEF(param)                                                                                      \
-//     class Brems##param : public Bremsstrahlung                                                                         \
-//     {                                                                                                                  \
-//         public:                                                                                                        \
-//         Brems##param(const ParticleDef&, const Medium&, const EnergyCutSettings&, Definition = Definition());          \
-//         Brems##param(const Brems##param&);                                                                             \
-//         ~Brems##param();                                                                                               \
-//                                                                                                                        \
-//         Parametrization* clone() const { return new Brems##param(*this); }                                             \
-//                                                                                                                        \
-//         double CalculateParametrization(double energy, double v);                                                      \
-//     };
+#include "PROPOSAL/crossection/parametrization/Parametrization.h"
 
 namespace PROPOSAL {
 
@@ -23,19 +11,45 @@ namespace PROPOSAL {
 *                                   HardBB                                    *
 ******************************************************************************/
 
-class HardBB
+class Interpolant;
+
+class RealPhoton
+{
+    public:
+        RealPhoton() {}
+        RealPhoton(const RealPhoton&) {}
+        virtual ~RealPhoton() {}
+
+        virtual RealPhoton* clone() const = 0;
+
+        virtual double CalculateHardBB(double energy, double v) = 0;
+};
+
+class SoftBB: public RealPhoton
+{
+    public:
+        SoftBB() {}
+        SoftBB(const SoftBB&) {}
+        virtual ~SoftBB() {}
+
+        RealPhoton* clone() const { return new SoftBB(*this); }
+
+        virtual double CalculateHardBB(double energy, double v);
+};
+
+class HardBB: public RealPhoton
 {
     public:
         HardBB(const ParticleDef&);
         HardBB(const HardBB&);
         virtual ~HardBB();
 
+        RealPhoton* clone() const { return new HardBB(*this); }
+
         double CalculateHardBB(double energy, double v);
 
     private:
-        static std::vector<const double> x;
-
-        const ParticleDef particle_def_;
+        static std::vector<double> x;
         std::vector<Interpolant*> interpolant_;
 
 };
@@ -48,7 +62,10 @@ class ShadowEffect
 {
     public:
         ShadowEffect() {}
+        ShadowEffect(const ShadowEffect&) {}
         virtual ~ShadowEffect() {}
+
+        virtual ShadowEffect* clone() const = 0;
 
         virtual double CalculateShadowEffect(const Components::Component&, double x, double nu) = 0;
 };
@@ -57,7 +74,10 @@ class ShadowDutta: public ShadowEffect
 {
     public:
         ShadowDutta() {}
+        ShadowDutta(const ShadowDutta&) {}
         virtual ~ShadowDutta() {}
+
+        ShadowEffect* clone() const { return new ShadowDutta(*this); }
 
         double CalculateShadowEffect(const Components::Component&, double x, double nu);
 };
@@ -66,7 +86,10 @@ class ShadowButkevichMikhailov: public ShadowEffect
 {
     public:
         ShadowButkevichMikhailov() {}
+        ShadowButkevichMikhailov(const ShadowDutta&) {}
         virtual ~ShadowButkevichMikhailov() {}
+
+        ShadowEffect* clone() const { return new ShadowButkevichMikhailov(*this); }
 
         double CalculateShadowEffect(const Components::Component&, double x, double nu);
 };
@@ -88,34 +111,12 @@ class Photonuclear : public Parametrization
     // Public methods
     // ----------------------------------------------------------------- //
 
-    virtual double DifferentialCrossSection(double energy, double v);
-    virtual double CalculateParametrization(double energy, double v) = 0;
+    virtual double DifferentialCrossSection(double energy, double v) = 0;
 
     virtual double FunctionToDEdxIntegral(double energy, double v);
     virtual double FunctionToDNdxIntegral(double energy, double v);
 
     virtual IntegralLimits GetIntegralLimits(double energy);
-
-    protected:
-
-    // ----------------------------------------------------------------- //
-    // Protected methods
-    // ----------------------------------------------------------------- //
-
-    // ----------------------------------------------------------------- //
-    // Protected member
-    // ----------------------------------------------------------------- //
-
 };
-
-// ------------------------------------------------------------------------- //
-// Declare the specific parametrizations
-// ------------------------------------------------------------------------- //
-
-// BREMSSTRAHLUNG_DEF(PetrukhinShestakov)
-// BREMSSTRAHLUNG_DEF(KelnerKokoulinPetrukhin)
-// BREMSSTRAHLUNG_DEF(CompleteScreening)
-// BREMSSTRAHLUNG_DEF(AndreevBezrukovBugaev)
-// #undef BREMSSTRAHLUNG_DEF
 
 } /* PROPOSAL */

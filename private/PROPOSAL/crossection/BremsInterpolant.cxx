@@ -13,9 +13,9 @@
 
 using namespace PROPOSAL;
 
-BremsInterpolant::BremsInterpolant(Parametrization& param): CrossSectionInterpolant(param)
+BremsInterpolant::BremsInterpolant(const Parametrization& param): CrossSectionInterpolant(param)
 {
-    Parametrization::Definition param_def = parametrization_.GetDefinition();
+    Parametrization::Definition param_def = parametrization_->GetDefinition();
     Interpolant1DBuilder builder1d;
     Helper::InterpolantBuilderContainer builder_container;
 
@@ -33,14 +33,14 @@ BremsInterpolant::BremsInterpolant(Parametrization& param): CrossSectionInterpol
         .SetRationalY(false)
         .SetRelativeY(false)
         .SetLogSubst(true)
-        .SetFunction1D(boost::bind(&CrossSection::CalculatedEdx, brems, _1));
+        .SetFunction1D(boost::bind(&CrossSection::CalculatedEdx, &brems, _1));
 
     builder_container.push_back(std::make_pair(&builder1d, &dedx_interpolant_));
 
     log_info("Initialize dEdx for %s", typeid(parametrization_).name());
     Helper::InitializeInterpolation("dEdx",
                                     builder_container,
-                                    std::vector<Parametrization*>(1, &parametrization_));
+                                    std::vector<Parametrization*>(1, parametrization_));
     log_info("Initialization dEdx for %s done!", typeid(parametrization_).name());
 }
 
@@ -59,7 +59,7 @@ BremsInterpolant::~BremsInterpolant()
 // ------------------------------------------------------------------------- //
 double BremsInterpolant::CalculatedEdx(double energy)
 {
-    if (parametrization_.GetMultiplier() <= 0)
+    if (parametrization_->GetMultiplier() <= 0)
     {
         return 0;
     }

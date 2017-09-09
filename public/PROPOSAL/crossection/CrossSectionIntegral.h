@@ -2,6 +2,7 @@
 #pragma once
 
 #include "PROPOSAL/crossection/CrossSection.h"
+#include "PROPOSAL/math/Integral.h"
 
 namespace PROPOSAL
 {
@@ -9,7 +10,10 @@ namespace PROPOSAL
 class CrossSectionIntegral: public CrossSection
 {
     public:
-        CrossSectionIntegral(Parametrization&);
+        typedef std::vector<Integral> IntegralVec;
+
+    public:
+        CrossSectionIntegral(const Parametrization&);
         CrossSectionIntegral(const CrossSectionIntegral&);
         virtual ~CrossSectionIntegral();
 
@@ -20,12 +24,10 @@ class CrossSectionIntegral: public CrossSection
         virtual double CalculatedNdx(double energy, double rnd);
         double CalculateStochasticLoss(double energy, double rnd1, double rnd2);
 
-        // Needed to initialize interpolation
-        // double FunctionToBuildDEdxInterpolant(double energy);
-        double FunctionToBuildDNdxInterpolant(double energy, int component);
-        double FunctionToBuildDNdxInterpolant2D(double energy, double v, int component);
-
     protected:
+        Integral dedx_integral_;
+        IntegralVec  dndx_integral_;
+
         virtual double CalculateStochasticLoss(double energy, double rnd1);
 };
 

@@ -33,9 +33,6 @@ class EpairProduction : public Parametrization
     // ----------------------------------------------------------------------------
     virtual double DifferentialCrossSection(double energy, double v) = 0;
 
-    virtual double CalculateParametrization(double energy, double v);
-
-
     // ----------------------------------------------------------------------------
     /// @brief Pair production energy losses - interface to Integral
     ///
@@ -46,13 +43,6 @@ class EpairProduction : public Parametrization
     virtual double FunctionToDNdxIntegral(double energy, double v);
 
     virtual IntegralLimits GetIntegralLimits(double energy);
-
-    protected:
-
-    // ----------------------------------------------------------------- //
-    // Protected methods
-    // ----------------------------------------------------------------- //
-
 
     // ----------------------------------------------------------------------------
     /// @brief This is the calculation of the d2Sigma/dvdRo - interface to Integral
@@ -74,9 +64,7 @@ class EpairProduction : public Parametrization
     // ----------------------------------------------------------------------------
     double lpm(double energy, double r2, double b, double x);
 
-    // ----------------------------------------------------------------- //
-    // Protected member
-    // ----------------------------------------------------------------- //
+    protected:
 
     double v_;
     double eLpm_;
