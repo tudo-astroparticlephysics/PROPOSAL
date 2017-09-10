@@ -71,13 +71,13 @@
     #define RE 2.8179403227e-13
 #endif
 
-#ifndef E0 //charge of an electron in A*s (SI)
-    #define E0 1.6021766208-19
-#endif
+// #ifndef E0 //charge of an electron in A*s (SI)
+//     #define E0 1.6021766208-19
+// #endif
 
-#ifndef RM // classical Muon radius(cm): RM = (1.602176487*pow(10,-19))/(4*PI*8.854187817*pow(10,-12)*Mmu_)*pow(10,-4);
-    #define RM 1.362849110866631e-15
-#endif
+// #ifndef RM // classical Muon radius(cm): RM = (1.602176487*pow(10,-19))/(4*PI*8.854187817*pow(10,-12)*Mmu_)*pow(10,-4);
+//     #define RM 1.362849110866631e-15
+// #endif
 
 #ifndef NA // Avogadro's number (1/mol)
     #define NA 6.022140857e23
@@ -143,45 +143,45 @@
     #define MRS 1465
 #endif
 
-#ifndef GF // Fermi coupling const staticant (MeV^-2)
-    #define GF 1.1663787e-11
-#endif
+// #ifndef GF // Fermi coupling const staticant (MeV^-2)
+//     #define GF 1.1663787e-11
+// #endif
 
-#ifndef MW // W+- boson mass (MeV)
-    #define MW 80385.
-#endif
+// #ifndef MW // W+- boson mass (MeV)
+//     #define MW 80385.
+// #endif
 
-#ifndef MZ // Z0 boson mass (MeV)
-    #define MZ 91187.6
-#endif
+// #ifndef MZ // Z0 boson mass (MeV)
+//     #define MZ 91187.6
+// #endif
 
-#ifndef XW // sin^2(mixing angle at Mz)
-    #define XW 0.23117
-#endif
+// #ifndef XW // sin^2(mixing angle at Mz)
+//     #define XW 0.23117
+// #endif
 
-#ifndef GW // W+- boson width (MeV)
-    #define GW 2085.
-#endif
+// #ifndef GW // W+- boson width (MeV)
+//     #define GW 2085.
+// #endif
 
-#ifndef GZ // Z0 boson width (MeV)
-    #define GZ 2495.2
-#endif
+// #ifndef GZ // Z0 boson width (MeV)
+//     #define GZ 2495.2
+// #endif
 
-#ifndef DS2 // Sun neutrino mass difference (eV^2)
-    #define DS2 6.9e-5
-#endif
+// #ifndef DS2 // Sun neutrino mass difference (eV^2)
+//     #define DS2 6.9e-5
+// #endif
 
 // #ifndef TT2 // tan^2(th) of the mixing angle
 //     #define TT2 0.43
 // #endif
 
-#ifndef DE2 // Earth neutrino mass difference (eV^2)
-    #define DE2 2.6e-3
-#endif
+// #ifndef DE2 // Earth neutrino mass difference (eV^2)
+//     #define DE2 2.6e-3
+// #endif
 
-#ifndef ST2 // sin^2(2 th) of the mixing angle
-    #define ST2 1.0
-#endif
+// #ifndef ST2 // sin^2(2 th) of the mixing angle
+//     #define ST2 1.0
+// #endif
 
 #ifndef MMON // monopole mass (MeV)
     #define MMON 1.e5

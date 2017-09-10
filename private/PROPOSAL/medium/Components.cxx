@@ -37,7 +37,7 @@ std::ostream& operator<<(std::ostream& os, Component const& component)
        << "\t\t" << component.GetNucCharge() << std::endl;
     os << "AverageNucleonWeight:"
        << "\t" << component.GetAverageNucleonWeight() << std::endl;
-    os << std::defaultfloat;
+    // os << std::defaultfloat; // TODO: std::defaultfloat just works since gcc-5 or Clang
     os << "------------------------------------------------------------------";
     return os;
 }
