@@ -333,8 +333,8 @@ std::vector<PROPOSALParticle*> Propagator::Propagate(double MaxDistance_cm)
         if(!starts_in_detector && !was_in_detector && is_in_detector)
         {
             particle_.SetEntryPoint(particle_position);
-            particle_.SetEi( particle_.GetEnergy() );
-            particle_.SetTi( particle_.GetT() );
+            particle_.SetEntryEnergy( particle_.GetEnergy() );
+            particle_.SetEntryTime( particle_.GetTime() );
 
             energy_at_entry_point = particle_.GetEnergy();
 
@@ -344,8 +344,8 @@ std::vector<PROPOSALParticle*> Propagator::Propagate(double MaxDistance_cm)
         else if(was_in_detector && !is_in_detector)
         {
             particle_.SetExitPoint(particle_position);
-            particle_.SetEf( particle_.GetEnergy() );
-            particle_.SetTf( particle_.GetT() );
+            particle_.SetExitEnergy( particle_.GetEnergy() );
+            particle_.SetExitTime( particle_.GetTime() );
 
             energy_at_exit_point = particle_.GetEnergy();
             //we don't want to run in this case a second time so we set was_in_detector to false
@@ -356,8 +356,8 @@ std::vector<PROPOSALParticle*> Propagator::Propagate(double MaxDistance_cm)
         else if(starts_in_detector && !is_in_detector)
         {
             particle_.SetExitPoint(particle_position);
-            particle_.SetEf( particle_.GetEnergy() );
-            particle_.SetTf( particle_.GetT() );
+            particle_.SetExitEnergy( particle_.GetEnergy() );
+            particle_.SetExitTime( particle_.GetTime() );
 
             energy_at_exit_point    =   particle_.GetEnergy();
             //we don't want to run in this case a second time so we set starts_in_detector to false
@@ -604,8 +604,8 @@ double Propagator::CalculateEffectiveDistance(Vector3D& particle_position, Vecto
     if(abs(distance_to_closest_approach) < GEOMETRY_PRECISION )
     {
         particle_.SetClosestApproachPoint(particle_position);
-        particle_.SetEc( particle_.GetEnergy() );
-        particle_.SetTc( particle_.GetT() );
+        particle_.SetClosestApproachEnergy( particle_.GetEnergy() );
+        particle_.SetClosestApproachTime( particle_.GetTime() );
 
         distance_to_closest_approach = 0;
 

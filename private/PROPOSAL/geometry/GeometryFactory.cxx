@@ -99,6 +99,9 @@ Geometry* GeometryFactory::CreateGeometry(boost::property_tree::ptree const& pt)
                 z = coord;
                 break;
             default:
+                x = 0;
+                y = 0;
+                z = 0;
                 break;
         }
         ++i;
