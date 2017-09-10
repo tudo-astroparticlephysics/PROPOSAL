@@ -134,40 +134,40 @@ class PROPOSALParticle
     // --------------------------------------------------------------------- //
 
     // Setter
-    void SetPropagatedDistance(double prop_dist);
+    void SetPropagatedDistance(const double prop_dist){ propagated_distance_ = prop_dist; }
     void SetMomentum(double momentum);
     void SetEnergy(double energy);
     void SetLow(double low);
 
-    void SetParentParticleId(int parent_particle_id);
-    void SetParentParticleEnergy(double parent_particle_energy);
-    void SetParticleId(int particle_id);
+    void SetParentParticleId(const int parent_particle_id){ parent_particle_id_ = parent_particle_id; }
+    void SetParentParticleEnergy(const double parent_particle_energy) { parent_particle_energy_ = parent_particle_energy; }
+    void SetParticleId(const int particle_id){ particle_id_ = particle_id; }
 
-    void SetPosition(const Vector3D& position);
-    void SetT(double t);
+    void SetPosition(const Vector3D& position){ position_ = position; }
+    void SetTime(const double t){ time_ = t; }
 
-    void SetDirection(const Vector3D& direction);
+    void SetDirection(const Vector3D& direction){ direction_ = direction; }
 
-    void SetEntryPoint(Vector3D& entry_point);
-    void SetTi(double ti);
-    void SetEi(double ei);
+    void SetEntryPoint(const Vector3D& entry_point){ entry_point_ = entry_point; }
+    void SetEntryTime(const double entry_time){ entry_time_ = entry_time; }
+    void SetEntryEnergy(const double entry_energy){ entry_energy_ = entry_energy; }
 
-    void SetExitPoint(Vector3D& exit_point);
-    void SetTf(double tf);
-    void SetEf(double ef);
+    void SetExitPoint(const Vector3D& exit_point){ exit_point_ = exit_point; }
+    void SetExitTime(const double exit_time){ exit_time_ = exit_time; }
+    void SetExitEnergy(const double exit_energy){ exit_energy_ = exit_energy; }
 
-    void SetClosestApproachPoint(Vector3D& closest_approach_point);
-    void SetTc(double tc);
-    void SetEc(double ec);
+    void SetClosestApproachPoint(const Vector3D& closest_approach_point){ closest_approach_point_ = closest_approach_point; }
+    void SetClosestApproachTime(const double closest_approach_time){ closest_approach_time_ = closest_approach_time; }
+    void SetClosestApproachEnergy(const double closest_approach_energy){ closest_approach_energy_ = closest_approach_energy; }
 
-    void SetElost(double elost);
+    void SetElost(const double elost){ elost_ = elost; }
 
     // Getter
     const ParticleDef& GetParticleDef() const { return particle_def_; }
     const DecayTable& GetDecayTable() const { return particle_def_.decay_table; }
     double GetPropagatedDistance() const { return propagated_distance_; }
 
-    double GetT() const { return t_; }
+    double GetTime() const { return time_; }
     double GetMomentum() const { return momentum_; }
     double GetEnergy() const { return energy_; }
     double GetLow() const { return particle_def_.low; }
@@ -194,18 +194,20 @@ class PROPOSALParticle
     int GetParticleId() const { return particle_id_; }
 
     Vector3D GetEntryPoint() const { return entry_point_; }
-    double GetTi() const { return ti_; }
-    double GetEi() const { return ei_; }
+    double GetEntryTime() const { return entry_time_; }
+    double GetEntryEnergy() const { return entry_energy_; }
 
     Vector3D GetExitPoint() const { return exit_point_; }
-    double GetTf() const { return tf_; }
-    double GetEf() const { return ef_; }
+    double GetExitTime() const { return exit_time_; }
+    double GetExitEnergy() const { return exit_energy_; }
 
     Vector3D GetClosestApproachPoint() const { return closest_approach_point_; }
-    double GetTc() const { return tc_; }
-    double GetEc() const { return ec_; }
+    double GetClosestApproachTime() const { return closest_approach_time_; }
+    double GetClosestApproachEnergy() const { return closest_approach_energy_; }
 
     double GetElost() const { return elost_; }
+
+    // --------------------------------------------------------------------- //
 
     private:
     PROPOSALParticle& operator=(const PROPOSALParticle&);
@@ -222,22 +224,22 @@ class PROPOSALParticle
     double parent_particle_energy_; //!< energy of the parent particle
     int particle_id_;               //!< particle id
 
-    Vector3D position_;          //!< position coordinates [cm]
-    double t_;                   //!< age [sec]
+    Vector3D position_;  //!< position coordinates [cm]
+    Vector3D direction_; //!< direction vector, angles in [rad]
+    double time_;        //!< age [sec]
 
-    Vector3D direction_;         //!< direction vector, angles in [rad]
 
     Vector3D entry_point_; //!< entry point coordinates [cm]
-    double ti_;            //!< t-coordinate entry Point [sec]
-    double ei_;            //!< energy at entry point [MeV]
+    double entry_time_;    //!< time-coordinate entry Point [sec]
+    double entry_energy_;  //!< energy at entry point [MeV]
 
     Vector3D exit_point_; //!< exit point coordinates [cm]
-    double tf_;           //!< t-coordinate exit Point [sec]
-    double ef_;           //!< energy at exit point [MeV]
+    double exit_time_;    //!< time-coordinate exit Point [sec]
+    double exit_energy_;  //!< energy at exit point [MeV]
 
     Vector3D closest_approach_point_; // point of closest approach (to geometry center) [cm]
-    double tc_;                       //!< t-coordinate at point of closest approach [sec]
-    double ec_;                       //!< energy at at point of closest approach [MeV]
+    double closest_approach_time_;    //!< time-coordinate at point of closest approach [sec]
+    double closest_approach_energy_;  //!< energy at at point of closest approach [MeV]
 
     double elost_; //!< energy lost in the detector volume [MeV]
 };

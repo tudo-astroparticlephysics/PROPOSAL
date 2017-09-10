@@ -341,13 +341,13 @@ double Sector::Propagate(double distance)
     //     {
     //         particle_->SetEnergy(particle_->GetMass());
     //
-    //         double t    =   particle_->GetT() -particle_->GetLifetime()*log(RandomDouble());
+    //         double t    =   particle_->GetTime() -particle_->GetLifetime()*log(RandomDouble());
     //         double product_energy   =   0;
     //
     //         pair<double, ParticleType::Enum> decay_to_store;
     //         secondary_id    =   particle_->GetParticleId() + 1;
     //
-    //         particle_->SetT( t );
+    //         particle_->SetTime( t );
     //
     //         if(particle_->GetType()==2)
     //         {
@@ -439,7 +439,7 @@ void Sector::AdvanceParticle(double dr, double ei, double ef)
 {
 
     double dist       = particle_.GetPropagatedDistance();
-    double time       = particle_.GetT();
+    double time       = particle_.GetTime();
     Vector3D position = particle_.GetPosition();
 
     dist += dr;
@@ -485,7 +485,7 @@ void Sector::AdvanceParticle(double dr, double ei, double ef)
     // }
 
     particle_.SetPropagatedDistance(dist);
-    particle_.SetT(time);
+    particle_.SetTime(time);
 }
 
 pair<double, ParticleType::Enum> Sector::MakeStochasticLoss()
