@@ -19,10 +19,13 @@
 // #include "PROPOSAL/PROPOSALParticle.h"
 
 #include "PROPOSAL/crossection/parametrization/Bremsstrahlung.h"
+#include "PROPOSAL/crossection/BremsstrahlungFactory.h"
 #include "PROPOSAL/crossection/BremsInterpolant.h"
 
 #include "PROPOSAL/crossection/parametrization/PhotoRealPhotonAssumption.h"
 #include "PROPOSAL/crossection/parametrization/PhotoQ2Integration.h"
+#include "PROPOSAL/crossection/PhotonuclearFactory.h"
+#include "PROPOSAL/crossection/PhotoInterpolant.h"
 
 using namespace std;
 using namespace PROPOSAL;
@@ -34,22 +37,38 @@ TEST(Propagation , Test_nan) {
 
     ParticleDef pdef = MuMinusDef::Get();
 
-    PhotoRhode rhode(pdef, Ice(), EnergyCutSettings(500, 0.5), HardBB(pdef));
-    PhotoZeus zeus(MuMinusDef::Get(), Ice(), EnergyCutSettings(500, 0.5), HardBB(pdef));
-    PhotoBezrukovBugaev bezrukov(MuMinusDef::Get(), Ice(), EnergyCutSettings(500, 0.5), SoftBB());
-    PhotoKokoulin kokoulin(MuMinusDef::Get(), Ice(), EnergyCutSettings(500, 0.5), SoftBB());
+    Parametrization::Definition def;
+    // def.path_to_tables = "../src/resources/tables";
+    PhotoRhode rhode(pdef, Ice(), EnergyCutSettings(500, 0.5), HardBB(pdef), def);
+    // PhotoZeus zeus(MuMinusDef::Get(), Ice(), EnergyCutSettings(500, 0.5), HardBB(pdef));
+    // PhotoBezrukovBugaev bezrukov(MuMinusDef::Get(), Ice(), EnergyCutSettings(500, 0.5), SoftBB());
+    // PhotoKokoulin kokoulin(MuMinusDef::Get(), Ice(), EnergyCutSettings(500, 0.5), SoftBB());
 
     // PhotoAbramowiczLevinLevyMaor97Interpolant allm(MuMinusDef::Get(), Ice(), EnergyCutSettings(500, 0.5), ShadowDutta());
     PhotoQ2Interpolant<PhotoAbramowiczLevinLevyMaor97> allm2(MuMinusDef::Get(), Ice(), EnergyCutSettings(500, 0.5), ShadowDutta());
 
-    std::cout << "Result: " << allm2.DifferentialCrossSection(1e4, 0.01) << std::endl;
+    // std::cout << "Result: " << allm2.DifferentialCrossSection(1e4, 0.01) << std::endl;
+
+    PhotoInterpolant photo(rhode);
+    std::cout << "Dedx: " << photo.CalculatedEdx(1000) << std::endl;
+
+    PhotoInterpolant photo2(allm2);
+    std::cout << "DNdx: " << photo2.CalculatedNdx(0.23, 0.2) << std::endl;
+
+    // CrossSection* cross = BremsstrahlungFactory::Get().CreateBremsstrahlung(
+    //     BremsstrahlungFactory::KelnerKokoulinPetrukhin, MuMinusDef::Get(), Ice(), EnergyCutSettings(), Parametrization::Definition());
+
+    // CrossSection* cross2 = PhotonuclearFactory::Get().CreatePhotoQ2Integral(
+    //     PhotonuclearFactory::AbramowiczLevinLevyMaor97, MuMinusDef::Get(), Ice(), EnergyCutSettings(), ShadowDutta(), Parametrization::Definition());
+    //
+    // std::cout << "dedx = " << cross2->CalculatedEdx(500000) << std::endl;
 
     // Parametrization::Definition def;
     // def.path_to_tables = "../src/resources/tables";
     // def.raw = false;
     // def.lpm_effect_enabled = false;
-    // BremsKelnerKokoulinPetrukhin param(MuMinusDef::Get(), Ice(1.0), EnergyCutSettings(500, 0.05), def);
-    // BremsInterpolant brems(param);
+    BremsKelnerKokoulinPetrukhin param(MuMinusDef::Get(), Ice(1.0), EnergyCutSettings(500, 0.05), def);
+    BremsInterpolant brems(param);
 
     // SectorDef col_def;
     // col_def.location = 1;
@@ -118,37 +137,31 @@ TEST(Propagation , Test_nan) {
     // Create Propagator
     // --------------------------------------------------------------------- //
 
-    // Propagator pr(collections, Sphere(Vector3D(), 1e18, 0));
-    // std::cout << "Propagagtor created" << std::endl;
+    Propagator pr(collections, Sphere(Vector3D(), 1e18, 0));
+    std::cout << "Propagagtor created" << std::endl;
 
-    // Propagator pr("../resources/config_ice.json");
-    // pr->EnableInterpolation(*pr->GetParticle());
+    std::vector<unsigned int> length_sec;
 
-    // pr->set_seed(seed);
+    for(int i =0;i<statistic;i++)
+    {
+        particle.SetEnergy(pow(10,EmaxLog10));
+        particle.SetPropagatedDistance(0);
+        particle.SetPosition(Vector3D(0, 0, 0));
+        particle.SetDirection(Vector3D(0, 0, -1));
 
-    // std::vector<unsigned int> length_sec;
-    //
-    // for(int i =0;i<statistic;i++)
-    // {
-    //     std::cout << "loop: " << i << std::endl;
-    //     particle.SetEnergy(pow(10,EmaxLog10));
-    //     particle.SetPropagatedDistance(0);
-    //     particle.SetPosition(Vector3D(0, 0, 0));
-    //     particle.SetDirection(Vector3D(0, 0, -1));
-    //
-    //     std::vector<PROPOSALParticle*> sec = pr.Propagate();
-    //
-    //     length_sec.push_back(sec.size());
-    //
-    //     // for (std::vector<PROPOSALParticle*>::iterator iter = sec.begin(); iter != sec.end(); ++iter) {
-    //     //     std::cout << (*iter)->GetName() << std::endl;
-    //     // }
-    // }
-    //
-    // for(std::vector<unsigned int>::iterator it = length_sec.begin(); it != length_sec.end(); ++it)
-    // {
-    //     std::cout << "length of secondies: " << *it << std::endl;
-    // }
+        std::vector<PROPOSALParticle*> sec = pr.Propagate();
+
+        length_sec.push_back(sec.size());
+
+        // for (std::vector<PROPOSALParticle*>::iterator iter = sec.begin(); iter != sec.end(); ++iter) {
+        //     std::cout << (*iter)->GetName() << std::endl;
+        // }
+    }
+
+    for(std::vector<unsigned int>::iterator it = length_sec.begin(); it != length_sec.end(); ++it)
+    {
+        std::cout << "length of secondies: " << *it << std::endl;
+    }
 }
 
 int main(int argc, char **argv) {

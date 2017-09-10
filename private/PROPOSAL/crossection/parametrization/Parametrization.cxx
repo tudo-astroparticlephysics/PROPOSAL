@@ -43,7 +43,7 @@ Parametrization::Parametrization(const Parametrization& param)
     : particle_def_(param.particle_def_)
     , medium_(param.medium_->clone())
     , cut_settings_(param.cut_settings_)
-    , components_(param.components_)
+    , components_(medium_->GetComponents())
     , component_index_(param.component_index_) // //TODO(mario): Check better way Mon 2017/09/04
     , param_def_(param.param_def_)
     , init_lpm_effect_(param.init_lpm_effect_)
