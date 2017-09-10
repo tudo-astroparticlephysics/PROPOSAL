@@ -13,18 +13,27 @@
 #include "PROPOSAL/methods.h"
 
 #define Q2_PHOTO_PARAM_INTEGRAL_DEC(param)                                                                             \
-    class Photo##param : public PhotoQ2Integral                                                              \
+    class Photo##param : public PhotoQ2Integral                                                                        \
     {                                                                                                                  \
         public:                                                                                                        \
-        Photo##param(const ParticleDef&,                                                                     \
-                               const Medium&,                                                                          \
-                               const EnergyCutSettings&,                                                               \
-                               const ShadowEffect& shadow_effect,                                                      \
-                               Definition = Definition());                                                             \
-        Photo##param(const Photo##param&);                                                         \
-        virtual ~Photo##param();                                                                             \
+        Photo##param(const ParticleDef&,                                                                               \
+                     const Medium&,                                                                                    \
+                     const EnergyCutSettings&,                                                                         \
+                     const ShadowEffect& shadow_effect,                                                                \
+                     Definition = Definition());                                                                       \
+        Photo##param(const Photo##param&);                                                                             \
+        virtual ~Photo##param();                                                                                       \
                                                                                                                        \
-        virtual Parametrization* clone() const { return new Photo##param(*this); }                           \
+        virtual Parametrization* clone() const { return new Photo##param(*this); }                                     \
+                                                                                                                       \
+        static Parametrization* create(const ParticleDef& particle_def,                                                \
+                                       const Medium& medium,                                                           \
+                                       const EnergyCutSettings& cuts,                                                  \
+                                       const ShadowEffect& shadow_effect,                                              \
+                                       Definition def)                                                                 \
+        {                                                                                                              \
+            return new Photo##param(particle_def, medium, cuts, shadow_effect, def);                                   \
+        }                                                                                                              \
                                                                                                                        \
         double FunctionToQ2Integral(double energy, double v, double Q2);                                               \
     };
@@ -91,7 +100,15 @@ class PhotoQ2Interpolant : public Param
     PhotoQ2Interpolant(const PhotoQ2Interpolant&);
     virtual ~PhotoQ2Interpolant();
 
-    virtual Parametrization* clone() const { return new PhotoQ2Interpolant<Param>(*this); }
+    Parametrization* clone() const { return new PhotoQ2Interpolant<Param>(*this); }
+    static Parametrization* create(const ParticleDef& particle_def,
+                                   const Medium& medium,
+                                   const EnergyCutSettings& cuts,
+                                   const ShadowEffect& shadow_effect,
+                                   Parametrization::Definition def = Parametrization::Definition())
+    {
+        return new PhotoQ2Interpolant<Param>(particle_def, medium, cuts, shadow_effect, def);
+    }
 
     double DifferentialCrossSection(double energy, double v);
 
@@ -149,7 +166,14 @@ PhotoQ2Interpolant<Param>::PhotoQ2Interpolant(const ParticleDef& particle_def,
 template <class Param>
 PhotoQ2Interpolant<Param>::PhotoQ2Interpolant(const PhotoQ2Interpolant& photo)
     : Param(photo)
+    , interpolant_()
 {
+    interpolant_.resize(photo.interpolant_.size());
+
+    for(unsigned int i = 0; i < photo.interpolant_.size(); ++i)
+    {
+        interpolant_[i] = new Interpolant(*photo.interpolant_[i]);
+    }
 }
 
 template <class Param>

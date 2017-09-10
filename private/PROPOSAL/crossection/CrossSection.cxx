@@ -29,7 +29,7 @@ CrossSection::CrossSection(const Parametrization& param)
 }
 
 CrossSection::CrossSection(const CrossSection& cross_section)
-    :parametrization_(cross_section.parametrization_->clone())
+    : parametrization_(cross_section.parametrization_->clone())
     , prob_for_component_(cross_section.prob_for_component_)
     , sum_of_rates_(cross_section.sum_of_rates_)
     , components_(parametrization_->GetMedium().GetComponents())

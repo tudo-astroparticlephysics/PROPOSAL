@@ -101,17 +101,19 @@ CrossSectionInterpolant::CrossSectionInterpolant(const CrossSectionInterpolant& 
 
     int num_components = cross_section.parametrization_->GetMedium().GetNumComponents();
 
-    dndx_interpolant_1d_.resize(num_components);
-    for(InterpolantVec::iterator iter = dndx_interpolant_1d_.begin(); iter != dndx_interpolant_1d_.end(); ++iter)
+    dndx_interpolant_1d_.reserve(num_components);
+    std::cout << "lenght: " << dndx_interpolant_1d_.size() << std::endl;
+    for(InterpolantVec::const_iterator iter = cross_section.dndx_interpolant_1d_.begin(); iter != cross_section.dndx_interpolant_1d_.end(); ++iter)
     {
         if (*iter != NULL)
         {
             dndx_interpolant_1d_.push_back(new Interpolant(**iter));
         }
     }
+    std::cout << "lenght after: " << dndx_interpolant_1d_.size() << std::endl;
 
-    dndx_interpolant_2d_.resize(num_components);
-    for(InterpolantVec::iterator iter = dndx_interpolant_2d_.begin(); iter != dndx_interpolant_2d_.end(); ++iter)
+    dndx_interpolant_2d_.reserve(num_components);
+    for(InterpolantVec::const_iterator iter = cross_section.dndx_interpolant_2d_.begin(); iter != cross_section.dndx_interpolant_2d_.end(); ++iter)
     {
         if (*iter != NULL)
         {

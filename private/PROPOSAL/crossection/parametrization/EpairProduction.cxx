@@ -352,8 +352,14 @@ EpairProductionRhoInterpolant::EpairProductionRhoInterpolant(const ParticleDef& 
 
 EpairProductionRhoInterpolant::EpairProductionRhoInterpolant(const EpairProductionRhoInterpolant& epair)
     : EpairProductionRhoIntegral(epair)
-    , interpolant_(epair.interpolant_)
+    , interpolant_()
 {
+    interpolant_.resize(epair.interpolant_.size());
+
+    for(unsigned int i = 0; i < epair.interpolant_.size(); ++i)
+    {
+        interpolant_[i] = new Interpolant(*epair.interpolant_[i]);
+    }
 }
 
 EpairProductionRhoInterpolant::~EpairProductionRhoInterpolant()
