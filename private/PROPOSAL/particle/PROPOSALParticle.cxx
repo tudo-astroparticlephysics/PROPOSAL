@@ -40,7 +40,7 @@ ostream& operator<<(ostream& os, PROPOSALParticle const& particle)
     os<<"\tenergy [MeV]: \t\t\t\t"<<particle.energy_<<fixed<<setprecision(5)<<endl;
     os<<"\tposition [cm]:\t\t\t\t\t"<<particle.position_<<endl;
     os<<"\tdirection :\t\t\t\t"<<particle.direction_<<endl;
-    os<<"\tage [s]:\t\t\t\t"<<particle.t_<<endl;
+    os<<"\tage [s]:\t\t\t\t"<<particle.time_<<endl;
     os<<"\tparticle id:\t\t\t\t"<<particle.particle_id_<<endl;
     os<<"\tparent particle id_:\t\t\t"<<particle.parent_particle_id_<<scientific<<endl;
     os<<"\tenergy below paricle is lost [MeV]:\t"<<particle.particle_def_.low<<fixed<<endl;
@@ -48,11 +48,11 @@ ostream& operator<<(ostream& os, PROPOSALParticle const& particle)
     os<<"\tenergy lost in detector [MeV]:\t\t"<<particle.elost_<<endl;
 
     os<<"\n\tDetector entry point: x [cm] | y [cm] | z [cm] | time [s] | energy [MeV]"<<endl;
-    os<<"\t\t"<<particle.entry_point_<<scientific<<"\t"<<particle.ti_<<fixed<<"\t"<<particle.ei_<<endl;
+    os<<"\t\t"<<particle.entry_point_<<scientific<<"\t"<<particle.entry_time_<<fixed<<"\t"<<particle.entry_energy_<<endl;
     os<<"\n\tDetector exit point: x [cm] | y [cm] | z [cm] | time [s] | energy [MeV]"<<endl;
-    os<<"\t\t"<<particle.exit_point_<<scientific<<"\t"<<particle.tf_<<fixed<<"\t"<<particle.ef_<<endl;
+    os<<"\t\t"<<particle.exit_point_<<scientific<<"\t"<<particle.exit_time_<<fixed<<"\t"<<particle.exit_energy_<<endl;
     os<<"\n\tPoint of closest approach: x [cm] | y [cm] | z [cm] | time [s] | energy [MeV]"<<endl;
-    os<<"\t\t"<<particle.closest_approach_point_<<scientific<<"\t"<<particle.tc_<<fixed<<"\t"<<particle.ec_<<endl;
+    os<<"\t\t"<<particle.closest_approach_point_<<scientific<<"\t"<<particle.closest_approach_time_<<fixed<<"\t"<<particle.closest_approach_energy_<<endl;
     os<<"--------------------------------------------------------------------------";
     return os;
 }
@@ -73,17 +73,17 @@ PROPOSALParticle::PROPOSALParticle()
     , parent_particle_energy_(0)
     , particle_id_(1)
     , position_(Vector3D())
-    , t_(0)
     , direction_(Vector3D())
+    , time_(0)
     , entry_point_(Vector3D())
-    , ti_(0)
-    , ei_(0)
+    , entry_time_(0)
+    , entry_energy_(0)
     , exit_point_(Vector3D())
-    , tf_(0)
-    , ef_(0)
+    , exit_time_(0)
+    , exit_energy_(0)
     , closest_approach_point_(Vector3D())
-    , tc_(0)
-    , ec_(0)
+    , closest_approach_time_(0)
+    , closest_approach_energy_(0)
     , elost_(0)
 {
     SetEnergy(energy_);
@@ -99,17 +99,17 @@ PROPOSALParticle::PROPOSALParticle(const ParticleDef& particleDef)
     , parent_particle_energy_(0)
     , particle_id_(1)
     , position_(Vector3D())
-    , t_(0)
     , direction_(Vector3D())
+    , time_(0)
     , entry_point_(Vector3D())
-    , ti_(0)
-    , ei_(0)
+    , entry_time_(0)
+    , entry_energy_(0)
     , exit_point_(Vector3D())
-    , tf_(0)
-    , ef_(0)
+    , exit_time_(0)
+    , exit_energy_(0)
     , closest_approach_point_(Vector3D())
-    , tc_(0)
-    , ec_(0)
+    , closest_approach_time_(0)
+    , closest_approach_energy_(0)
     , elost_(0)
 {
     SetEnergy(energy_);
@@ -135,9 +135,9 @@ bool PROPOSALParticle::operator==(const PROPOSALParticle &particle) const
         return false;
     if (position_ != particle.position_)
         return false;
-    if (t_ != particle.t_)
-        return false;
     if (direction_ != particle.direction_)
+        return false;
+    if (time_ != particle.time_)
         return false;
     if (momentum_ != particle.momentum_)
         return false;
@@ -153,21 +153,21 @@ bool PROPOSALParticle::operator==(const PROPOSALParticle &particle) const
         return false;
     if (entry_point_ != particle.entry_point_)
         return false;
-    if (ti_ != particle.ti_)
+    if (entry_time_ != particle.entry_time_)
         return false;
-    if (ei_ != particle.ei_)
+    if (entry_energy_ != particle.entry_energy_)
         return false;
     if (exit_point_ != particle.exit_point_)
         return false;
-    if (tf_ != particle.tf_)
+    if (exit_time_ != particle.exit_time_)
         return false;
-    if (ef_ != particle.ef_)
+    if (exit_energy_ != particle.exit_energy_)
         return false;
     if (closest_approach_point_ != particle.closest_approach_point_)
         return false;
-    if (tc_ != particle.tc_)
+    if (closest_approach_time_ != particle.closest_approach_time_)
         return false;
-    if (ec_ != particle.ec_)
+    if (closest_approach_energy_ != particle.closest_approach_energy_)
         return false;
     if (elost_ != particle.elost_)
         return false;
@@ -193,8 +193,8 @@ bool PROPOSALParticle::operator!=(const PROPOSALParticle &particle) const {
 //
 //     swap( propagated_distance_   , particle.propagated_distance_);
 //     position_.swap(particle.position_);
-//     swap( t_                     , particle.t_);
 //     direction_.swap(particle.direction_);
+//     swap( time_                  , particle.time_);
 //     swap( momentum_              , particle.momentum_);
 //     swap( square_momentum_       , particle.square_momentum_);
 //     swap( energy_                , particle.energy_);
@@ -202,14 +202,14 @@ bool PROPOSALParticle::operator!=(const PROPOSALParticle &particle) const {
 //     swap( parent_particle_energy_, particle.parent_particle_energy_);
 //     swap( particle_id_           , particle.particle_id_);
 //     entry_point_.swap(entry_point_);
-//     swap( ti_                    , particle.ti_);
-//     swap( ei_                    , particle.ei_);
+//     swap( entry_time_            , particle.entry_time_);
+//     swap( entry_energy_          , particle.entry_energy_);
 //     exit_point_.swap(exit_point_);
-//     swap( tf_                    , particle.tf_);
-//     swap( ef_                    , particle.ef_);
+//     swap( exit_time_             , particle.exit_time_);
+//     swap( exit_energy_           , particle.exit_energy_);
 //     closest_approach_point_.swap(closest_approach_point_);
-//     swap( tc_                    , particle.tc_);
-//     swap( ec_                    , particle.ec_);
+//     swap( closest_approach_time_ , particle.closest_approach_time_);
+//     swap( closest_approach_energy_ , particle.closest_approach_energy_);
 //     swap( elost_                 , particle.elost_);
 //     swap(particle_def_, particle.particle_def_);
 // }
@@ -230,11 +230,6 @@ void PROPOSALParticle::SetEnergy(double energy)
     momentum_ = sqrt(max(square_momentum_, 0.0));
 }
 
-// ------------------------------------------------------------------------- //
-void PROPOSALParticle::SetDirection(const Vector3D& direction)
-{
-    direction_ = direction;
-}
 
 // ------------------------------------------------------------------------- //
 void PROPOSALParticle::SetMomentum(double momentum)
@@ -244,21 +239,6 @@ void PROPOSALParticle::SetMomentum(double momentum)
     energy_ = sqrt(square_momentum_ + particle_def_.mass * particle_def_.mass);
 }
 
-// ------------------------------------------------------------------------- //
-void PROPOSALParticle::SetPropagatedDistance(double prop_dist){
-    propagated_distance_ = prop_dist;
-}
-
-// ------------------------------------------------------------------------- //
-void PROPOSALParticle::SetPosition(const Vector3D& position)
-{
-    position_ = position;
-}
-
-// ------------------------------------------------------------------------- //
-void PROPOSALParticle::SetT(double t){
-    t_ = t;
-}
 
 // ------------------------------------------------------------------------- //
 // void PROPOSALParticle::SetLow(double low){
@@ -273,73 +253,7 @@ void PROPOSALParticle::SetT(double t){
 //     }
 // }
 
-// ------------------------------------------------------------------------- //
-void PROPOSALParticle::SetParentParticleId(int parent_particle_id){
-    parent_particle_id_ = parent_particle_id;
-}
 
-// ------------------------------------------------------------------------- //
-void PROPOSALParticle::SetParentParticleEnergy(double parent_particle_energy){
-    parent_particle_energy_ = parent_particle_energy;
-}
-
-// ------------------------------------------------------------------------- //
-void PROPOSALParticle::SetParticleId(int particle_id){
-    particle_id_ = particle_id;
-}
-
-// ------------------------------------------------------------------------- //
-void PROPOSALParticle::SetEntryPoint(Vector3D& entry_point)
-{
-    entry_point_ = entry_point;
-}
-
-// ------------------------------------------------------------------------- //
-void PROPOSALParticle::SetTi(double ti){
-    ti_ = ti;
-}
-
-// ------------------------------------------------------------------------- //
-void PROPOSALParticle::SetEi(double ei){
-    ei_ = ei;
-}
-
-// ------------------------------------------------------------------------- //
-void PROPOSALParticle::SetExitPoint(Vector3D& exit_point)
-{
-    exit_point_ = exit_point;
-}
-
-// ------------------------------------------------------------------------- //
-void PROPOSALParticle::SetTf(double tf){
-    tf_ = tf;
-}
-
-// ------------------------------------------------------------------------- //
-void PROPOSALParticle::SetEf(double ef){
-    ef_ = ef;
-}
-
-// ------------------------------------------------------------------------- //
-void PROPOSALParticle::SetClosestApproachPoint(Vector3D& closest_approach_point)
-{
-    closest_approach_point_ = closest_approach_point;
-}
-
-// ------------------------------------------------------------------------- //
-void PROPOSALParticle::SetTc(double tc){
-    tc_ = tc;
-}
-
-// ------------------------------------------------------------------------- //
-void PROPOSALParticle::SetEc(double ec){
-    ec_ = ec;
-}
-
-// ------------------------------------------------------------------------- //
-void PROPOSALParticle::SetElost(double elost){
-    elost_ = elost;
-}
 
 // ParticleType::Enum PROPOSALParticle::GetTypeFromName(std::string particle_name)
 // {

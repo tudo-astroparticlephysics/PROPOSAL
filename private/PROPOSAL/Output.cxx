@@ -37,7 +37,7 @@ void Output::FillSecondaryVector(PROPOSALParticle *particle, ParticleDef seconda
     particle_to_store->SetDirection(particle->GetDirection());
     particle_to_store->SetParticleId(particle->GetParticleId() + 1);
     particle_to_store->SetParentParticleId(particle->GetParentParticleId());
-    particle_to_store->SetT(particle->GetT());
+    particle_to_store->SetTime(particle->GetTime());
     particle_to_store->SetParentParticleEnergy(particle->GetEnergy());
     particle_to_store->SetPropagatedDistance(distance);
 
@@ -55,7 +55,7 @@ void Output::FillSecondaryVector(PROPOSALParticle *particle, int secondary_id, p
     //     particle->GetPosition(),
     //     particle->GetDirection(),
     //     energy_loss.first,
-    //     particle->GetT(),
+    //     particle->GetTime(),
     //     distance,
     //     particle->GetEnergy()
     // );
@@ -66,7 +66,7 @@ void Output::FillSecondaryVector(PROPOSALParticle *particle, int secondary_id, p
     //     if(store_in_root_trees_)
     //     {
     //         secondary_position_             =   particle_to_store->GetPosition();
-    //         secondary_t_                    =   particle_to_store->GetT();
+    //         secondary_t_                    =   particle_to_store->GetTime();
     //         secondary_direction_            =   particle_to_store->GetDirection();
     //         secondary_energy_               =   particle_to_store->GetEnergy();
     //         secondary_parent_particle_id_   =   particle_to_store->GetParentParticleId();
@@ -81,7 +81,7 @@ void Output::FillSecondaryVector(PROPOSALParticle *particle, int secondary_id, p
     //     {
     //         secondary_ascii_ <<
     //         particle_to_store->GetPosition()<< "\t" <<
-    //         particle_to_store->GetT()<< "\t" <<
+    //         particle_to_store->GetTime()<< "\t" <<
     //         particle_to_store->GetDirection()<< "\t" <<
     //         particle_to_store->GetEnergy()<< "\t" <<
     //         particle_to_store->GetParentParticleId()<< "\t" <<
@@ -211,7 +211,7 @@ void Output::Close()
         if(store_in_root_trees_)
         {
             primary_position_             =   primary->GetPosition();
-            primary_t_                    =   primary->GetT();
+            primary_t_                    =   primary->GetTime();
             primary_direction_            =   primary->GetDirection();
             primary_energy_               =   primary->GetEnergy();
             primary_parent_particle_id_   =   primary->GetParentParticleId();
@@ -231,21 +231,21 @@ void Output::Close()
         if(store_in_root_trees_)
         {
             prop_primary_position_             =   prop_primary->GetPosition();
-            prop_primary_t_                    =   prop_primary->GetT();
+            prop_primary_t_                    =   prop_primary->GetTime();
             prop_primary_direction_            =   prop_primary->GetDirection();
             prop_primary_energy_               =   prop_primary->GetEnergy();
             prop_primary_parent_particle_id_   =   prop_primary->GetParentParticleId();
             prop_primary_particle_id_          =   prop_primary->GetParticleId();
             prop_primary_name_                 =   prop_primary->GetName();
             prop_primary_entry_point_          =   prop_primary->GetEntryPoint();
-            prop_primary_ti_                   =   prop_primary->GetTi();
-            prop_primary_ei_                   =   prop_primary->GetEi();
+            prop_primary_ti_                   =   prop_primary->GetEntryTime();
+            prop_primary_ei_                   =   prop_primary->GetEntryEnergy();
             prop_primary_exit_point_           =   prop_primary->GetExitPoint();
-            prop_primary_tf_                   =   prop_primary->GetTf();
-            prop_primary_ef_                   =   prop_primary->GetEf();
+            prop_primary_tf_                   =   prop_primary->GetExitTime();
+            prop_primary_ef_                   =   prop_primary->GetExitEnergy();
             prop_primary_closest_approach_point_ = prop_primary->GetClosestApproachPoint();
-            prop_primary_tc_                   =   prop_primary->GetTc();
-            prop_primary_ec_                   =   prop_primary->GetEc();
+            prop_primary_tc_                   =   prop_primary->GetClosestApproachTime();
+            prop_primary_ec_                   =   prop_primary->GetClosestApproachEnergy();
             prop_primary_propagated_distance_  =   prop_primary->GetPropagatedDistance();
             prop_primary_elost_                =   prop_primary->GetElost();
 
@@ -339,7 +339,7 @@ void Output::Close()
          {
              primary_ascii_ <<
              primary->GetPosition()<< "\t" <<
-             primary->GetT()<< "\t" <<
+             primary->GetTime()<< "\t" <<
              primary->GetDirection()<< "\t" <<
              primary->GetEnergy()<< "\t" <<
              primary->GetParentParticleId()<< "\t" <<
@@ -358,21 +358,21 @@ void Output::Close()
          {
              propagated_primary_ascii_ <<
              prop_primary->GetPosition()<< "\t" <<
-             prop_primary->GetT()<< "\t" <<
+             prop_primary->GetTime()<< "\t" <<
              prop_primary->GetDirection()<< "\t" <<
              prop_primary->GetEnergy()<< "\t" <<
              prop_primary->GetParentParticleId()<< "\t" <<
              prop_primary->GetParticleId()<< "\t" <<
              prop_primary->GetName()<< "\t" <<
              prop_primary->GetEntryPoint()<< "\t" <<
-             prop_primary->GetTi()<< "\t" <<
-             prop_primary->GetEi()<< "\t" <<
+             prop_primary->GetEntryTime()<< "\t" <<
+             prop_primary->GetEntryEnergy()<< "\t" <<
              prop_primary->GetExitPoint()<< "\t" <<
-             prop_primary->GetTf()<< "\t" <<
-             prop_primary->GetEf()<< "\t" <<
+             prop_primary->GetExitTime()<< "\t" <<
+             prop_primary->GetExitEnergy()<< "\t" <<
              prop_primary->GetClosestApproachPoint()<< "\t" <<
-             prop_primary->GetTc()<< "\t" <<
-             prop_primary->GetEc()<< "\t" <<
+             prop_primary->GetClosestApproachTime()<< "\t" <<
+             prop_primary->GetClosestApproachEnergy()<< "\t" <<
              prop_primary->GetPropagatedDistance()<< "\t" <<
              prop_primary->GetElost()<< endl;
          }
