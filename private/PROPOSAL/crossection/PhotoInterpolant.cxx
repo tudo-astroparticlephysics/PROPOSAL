@@ -44,7 +44,7 @@ PhotoInterpolant::PhotoInterpolant(const Parametrization& param): CrossSectionIn
     log_info("Initialization dEdx for %s done!", typeid(parametrization_).name());
 }
 
-PhotoInterpolant::PhotoInterpolant(const PhotoInterpolant& epair): CrossSectionInterpolant(epair)
+PhotoInterpolant::PhotoInterpolant(const PhotoInterpolant& photo): CrossSectionInterpolant(photo)
 {
 }
 

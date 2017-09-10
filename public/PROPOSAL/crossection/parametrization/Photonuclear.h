@@ -86,7 +86,7 @@ class ShadowButkevichMikhailov: public ShadowEffect
 {
     public:
         ShadowButkevichMikhailov() {}
-        ShadowButkevichMikhailov(const ShadowDutta&) {}
+        ShadowButkevichMikhailov(const ShadowButkevichMikhailov&) {}
         virtual ~ShadowButkevichMikhailov() {}
 
         ShadowEffect* clone() const { return new ShadowButkevichMikhailov(*this); }

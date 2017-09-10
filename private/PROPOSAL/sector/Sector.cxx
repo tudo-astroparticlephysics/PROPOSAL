@@ -13,9 +13,12 @@
 #include "PROPOSAL/crossection/BremsInterpolant.h"
 #include "PROPOSAL/crossection/IonizInterpolant.h"
 #include "PROPOSAL/crossection/EpairInterpolant.h"
+#include "PROPOSAL/crossection/PhotoInterpolant.h"
 #include "PROPOSAL/crossection/parametrization/Bremsstrahlung.h"
 #include "PROPOSAL/crossection/parametrization/Ionization.h"
 #include "PROPOSAL/crossection/parametrization/EpairProduction.h"
+#include "PROPOSAL/crossection/parametrization/PhotoRealPhotonAssumption.h"
+#include "PROPOSAL/crossection/parametrization/PhotoQ2Integration.h"
 // #include "PROPOSAL/crossection/Epairproduction.h"
 // #include "PROPOSAL/crossection/Ionization.h"
 // #include "PROPOSAL/crossection/Photonuclear.h"
@@ -115,14 +118,17 @@ Sector::Sector(PROPOSALParticle& particle, const Medium& medium,
     BremsKelnerKokoulinPetrukhin* bparam = new BremsKelnerKokoulinPetrukhin(particle_.GetParticleDef(), *medium_, cut_settings_, param_def);
     Ionization* iparam = new Ionization(particle_.GetParticleDef(), *medium_, cut_settings_, param_def);
     EpairProductionRhoInterpolant* eparam = new EpairProductionRhoInterpolant(particle_.GetParticleDef(), *medium_, cut_settings_, param_def);
+    PhotoQ2Interpolant<PhotoAbramowiczLevinLevyMaor97>* pparam = new PhotoQ2Interpolant<PhotoAbramowiczLevinLevyMaor97>(particle_.GetParticleDef(), *medium_, cut_settings_, ShadowButkevichMikhailov(), param_def);
 
     CrossSectionInterpolant* brems = new BremsInterpolant(*bparam);
     CrossSectionInterpolant* ioniz = new IonizInterpolant(*iparam);
     CrossSectionInterpolant* epair = new EpairInterpolant(*eparam);
+    CrossSectionInterpolant* photo = new PhotoInterpolant(*pparam);
 
     crosssections_.push_back(brems);
     crosssections_.push_back(ioniz);
     crosssections_.push_back(epair);
+    crosssections_.push_back(photo);
     // crosssections_.push_back(new BremsInterpolant(*param));
     // crosssections_.push_back(new Ionization(particle_, medium_, &cut_settings_));
     // crosssections_.push_back(new Photonuclear(particle_, medium_, &cut_settings_));
@@ -179,28 +185,10 @@ Sector::Sector(const Sector& collection)
 {
     crosssections_.resize(collection.crosssections_.size());
 
-    //TODO(mario): clone Sat 2017/08/26
-    // for(unsigned int i =0; i<collection.crosssections_.size(); i++)
-    // {
-    //     switch (collection.crosssections_.at(i)->GetType())
-    //     {
-    //         case ParticleType::Brems:
-    //             crosssections_.at(i) = new Bremsstrahlung( *(Bremsstrahlung*)collection.crosssections_.at(i) );
-    //             break;
-    //         case ParticleType::DeltaE:
-    //             crosssections_.at(i) = new Ionization( *(Ionization*)collection.crosssections_.at(i) );
-    //             break;
-    //         case ParticleType::EPair:
-    //             crosssections_.at(i) = new Epairproduction( *(Epairproduction*)collection.crosssections_.at(i) );
-    //             break;
-    //         case ParticleType::NuclInt:
-    //             crosssections_.at(i) = new Photonuclear( *(Photonuclear*)collection.crosssections_.at(i) );
-    //             break;
-    //         default:
-    //             log_fatal("Unknown cross section");
-    //             exit(1);
-    //     }
-    // }
+    for (unsigned int i = 0; i < crosssections_.size(); ++i)
+    {
+        crosssections_[i] = collection.crosssections_[i]->clone();
+    }
 }
 
 Sector::~Sector()
@@ -553,10 +541,10 @@ pair<double, ParticleType::Enum> Sector::MakeStochasticLoss()
         }
     }
     // if (particle_->GetEnergy() < 650) printf("energy: %f\n", particle_->GetEnergy());
-    for (unsigned int i = 0; i < GetCrosssections().size(); i++)
+    for (unsigned int i = 0; i < crosssections_.size(); i++)
     {
-        rates.at(i) = crosssections_.at(i)->CalculatedNdx(particle_.GetEnergy(), rnd2);
-        total_rate += rates.at(i);
+        rates[i] = crosssections_[i]->CalculatedNdx(particle_.GetEnergy(), rnd2);
+        total_rate += rates[i];
         // if (rates.at(i) == 0) printf("%i = 0, energy: %f\n", i, particle_->GetEnergy());
         // log_debug("Rate for %s = %f", crosssections_.at(i)->GetName().c_str(), rates.at(i));
     }

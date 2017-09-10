@@ -12,6 +12,13 @@
         ~Brems##param();                                                                                               \
                                                                                                                        \
         Parametrization* clone() const { return new Brems##param(*this); }                                             \
+        static Parametrization* create(const ParticleDef& particle_def,                                                \
+                                       const Medium& medium,                                                           \
+                                       const EnergyCutSettings& cuts,                                                  \
+                                       Definition def = Definition())                                                  \
+        {                                                                                                              \
+            return new Brems##param(particle_def, medium, cuts, def);                                                  \
+        }                                                                                                              \
                                                                                                                        \
         double CalculateParametrization(double energy, double v);                                                      \
     };

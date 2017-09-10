@@ -13,7 +13,7 @@
 
 using namespace PROPOSAL;
 
-#define Q2_PHOTO_PARAM_INTEGRAL_IMPL(param)                                                                                    \
+#define Q2_PHOTO_PARAM_INTEGRAL_IMPL(param)                                                                            \
     Photo##param::Photo##param(const ParticleDef& particle_def,                                                        \
                                const Medium& medium,                                                                   \
                                const EnergyCutSettings& cuts,                                                          \
@@ -30,8 +30,8 @@ using namespace PROPOSAL;
                                                                                                                        \
     Photo##param::~Photo##param() {}
 
-/******************************************************************************                                        \
-*                            Photo Q2 Integration                            *                                         \
+/******************************************************************************
+*                            Photo Q2 Integration                            *
 ******************************************************************************/
 
 PhotoQ2Integral::PhotoQ2Integral(const ParticleDef& particle_def,
@@ -47,6 +47,7 @@ PhotoQ2Integral::PhotoQ2Integral(const ParticleDef& particle_def,
 
 PhotoQ2Integral::PhotoQ2Integral(const PhotoQ2Integral& photo)
     : Photonuclear(photo)
+    , shadow_effect_(photo.shadow_effect_->clone())
     , integral_(photo.integral_)
 {
 }

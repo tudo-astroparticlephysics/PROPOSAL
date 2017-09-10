@@ -25,6 +25,7 @@ PhotoRealPhotonAssumption::PhotoRealPhotonAssumption(const ParticleDef& particle
 
 PhotoRealPhotonAssumption::PhotoRealPhotonAssumption(const PhotoRealPhotonAssumption& photo)
     : Photonuclear(photo)
+    , hardBB_(photo.hardBB_->clone())
 {
 }
 
@@ -108,6 +109,15 @@ PhotoZeus::~PhotoZeus()
 {
 }
 
+Parametrization* PhotoZeus::create(const ParticleDef& particle_def,
+                        const Medium& medium,
+                        const EnergyCutSettings& cuts,
+                        const RealPhoton& hardBB,
+                        Definition def)
+{
+    return new PhotoZeus(particle_def, medium, cuts, hardBB, def);
+}
+
 // ------------------------------------------------------------------------- //
 double PhotoZeus::CalculateParametrization(double nu)
 {
@@ -140,6 +150,15 @@ PhotoBezrukovBugaev::PhotoBezrukovBugaev(const PhotoBezrukovBugaev& photo)
 
 PhotoBezrukovBugaev::~PhotoBezrukovBugaev()
 {
+}
+
+Parametrization* PhotoBezrukovBugaev::create(const ParticleDef& particle_def,
+                        const Medium& medium,
+                        const EnergyCutSettings& cuts,
+                        const RealPhoton& hardBB,
+                        Definition def)
+{
+    return new PhotoBezrukovBugaev(particle_def, medium, cuts, hardBB, def);
 }
 
 // ------------------------------------------------------------------------- //
@@ -187,15 +206,25 @@ PhotoRhode::PhotoRhode(const ParticleDef& particle_def,
     interpolant_ = new Interpolant(x, y, 4, false, false);
 }
 
-PhotoRhode::PhotoRhode(const PhotoRhode& brems)
-    : PhotoRealPhotonAssumption(brems)
-    , interpolant_(new Interpolant(*brems.interpolant_))
+PhotoRhode::PhotoRhode(const PhotoRhode& photo)
+    : PhotoRealPhotonAssumption(photo)
+    , interpolant_(new Interpolant(*photo.interpolant_))
 {
 }
 
 PhotoRhode::~PhotoRhode()
 {
     delete interpolant_;
+}
+
+
+Parametrization* PhotoRhode::create(const ParticleDef& particle_def,
+                        const Medium& medium,
+                        const EnergyCutSettings& cuts,
+                        const RealPhoton& hardBB,
+                        Definition def)
+{
+    return new PhotoRhode(particle_def, medium, cuts, hardBB, def);
 }
 
 // ------------------------------------------------------------------------- //
@@ -237,6 +266,15 @@ PhotoKokoulin::PhotoKokoulin(const PhotoKokoulin& brems)
 
 PhotoKokoulin::~PhotoKokoulin()
 {
+}
+
+Parametrization* PhotoKokoulin::create(const ParticleDef& particle_def,
+                        const Medium& medium,
+                        const EnergyCutSettings& cuts,
+                        const RealPhoton& hardBB,
+                        Definition def)
+{
+    return new PhotoKokoulin(particle_def, medium, cuts, hardBB, def);
 }
 
 // ------------------------------------------------------------------------- //

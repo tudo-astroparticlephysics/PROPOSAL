@@ -125,7 +125,7 @@ double ShadowDutta::CalculateShadowEffect(const Components::Component& component
 }
 
 // ------------------------------------------------------------------------- //
-double ShadowEffect::CalculateShadowEffect(const Components::Component& component, double x, double nu)
+double ShadowButkevichMikhailov::CalculateShadowEffect(const Components::Component& component, double x, double nu)
 {
     if(component.GetNucCharge()==1) return 1;
 

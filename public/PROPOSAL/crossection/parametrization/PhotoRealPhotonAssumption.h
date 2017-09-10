@@ -50,7 +50,12 @@ class PhotoZeus: public PhotoRealPhotonAssumption
     PhotoZeus(const PhotoZeus&);
     virtual ~PhotoZeus();
 
-    virtual Parametrization* clone() const { return new PhotoZeus(*this); }
+    Parametrization* clone() const { return new PhotoZeus(*this); }
+    static Parametrization* create(const ParticleDef&,
+                            const Medium&,
+                            const EnergyCutSettings&,
+                            const RealPhoton&,
+                            Definition def = Definition());
 
     virtual double CalculateParametrization(double nu);
 };
@@ -70,7 +75,12 @@ class PhotoBezrukovBugaev: public PhotoRealPhotonAssumption
     PhotoBezrukovBugaev(const PhotoBezrukovBugaev&);
     virtual ~PhotoBezrukovBugaev();
 
-    virtual Parametrization* clone() const { return new PhotoBezrukovBugaev(*this); }
+    Parametrization* clone() const { return new PhotoBezrukovBugaev(*this); }
+    static Parametrization* create(const ParticleDef&,
+                            const Medium&,
+                            const EnergyCutSettings&,
+                            const RealPhoton&,
+                            Definition def = Definition());
 
     virtual double CalculateParametrization(double nu);
 };
@@ -90,9 +100,14 @@ class PhotoRhode : public PhotoRealPhotonAssumption
     PhotoRhode(const PhotoRhode&);
     virtual ~PhotoRhode();
 
-    virtual Parametrization* clone() const { return new PhotoRhode(*this); }
+    Parametrization* clone() const { return new PhotoRhode(*this); }
+    static Parametrization* create(const ParticleDef&,
+                            const Medium&,
+                            const EnergyCutSettings&,
+                            const RealPhoton&,
+                            Definition def = Definition());
 
-    virtual double CalculateParametrization(double nu);
+    double CalculateParametrization(double nu);
 
     private:
     double MeasuredSgN(double e);
@@ -115,9 +130,14 @@ class PhotoKokoulin : public PhotoBezrukovBugaev
     PhotoKokoulin(const PhotoKokoulin&);
     virtual ~PhotoKokoulin();
 
-    virtual Parametrization* clone() const { return new PhotoKokoulin(*this); }
+    Parametrization* clone() const { return new PhotoKokoulin(*this); }
+    static Parametrization* create(const ParticleDef&,
+                            const Medium&,
+                            const EnergyCutSettings&,
+                            const RealPhoton&,
+                            Definition def = Definition());
 
-    virtual double CalculateParametrization(double nu);
+    double CalculateParametrization(double nu);
 };
 
 } /* PROPOSAL */
