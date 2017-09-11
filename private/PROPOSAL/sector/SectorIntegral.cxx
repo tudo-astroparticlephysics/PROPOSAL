@@ -4,6 +4,11 @@
 #include "PROPOSAL/sector/SectorIntegral.h"
 #include "PROPOSAL/Constants.h"
 
+#include "PROPOSAL/crossection/IonizIntegral.h"
+#include "PROPOSAL/crossection/EpairIntegral.h"
+#include "PROPOSAL/crossection/parametrization/Ionization.h"
+#include "PROPOSAL/crossection/parametrization/EpairProduction.h"
+
 using namespace PROPOSAL;
 
 SectorIntegral::SectorIntegral(PROPOSALParticle& particle)
@@ -25,6 +30,35 @@ SectorIntegral::SectorIntegral(PROPOSALParticle& particle, const Medium& medium,
     , prop_decay_(IROMB, IMAXS, IPREC2)
     , time_particle_(IROMB, IMAXS, IPREC2)
 {
+    Parametrization::Definition param_def;
+
+    param_def.multiplier         = collection_def_.brems_multiplier;
+    param_def.lpm_effect_enabled = collection_def_.lpm_effect_enabled;
+
+    crosssections_.push_back(BremsstrahlungFactory::Get().CreateBremsstrahlung(
+        collection_def_.brems_parametrization, particle_.GetParticleDef(), *medium_, cut_settings_, param_def, false));
+
+    param_def.multiplier = def.photo_multiplier;
+
+    crosssections_.push_back(PhotonuclearFactory::Get().CreatePhotonuclear(
+        collection_def_.photo_parametrization,
+        particle_.GetParticleDef(),
+        *medium_,
+        cut_settings_,
+        collection_def_.photo_shadow,
+        collection_def_.hardbb_enabled,
+        param_def,
+        false));
+
+    param_def.multiplier = collection_def_.ioniz_multiplier;
+
+    crosssections_.push_back(
+        new IonizIntegral(Ionization(particle_.GetParticleDef(), *medium_, cut_settings_, param_def)));
+
+    param_def.multiplier = collection_def_.epair_multiplier;
+
+    crosssections_.push_back(
+        new EpairIntegral(EpairProductionRhoIntegral(particle_.GetParticleDef(), *medium_, cut_settings_, param_def)));
 }
 
 SectorIntegral::SectorIntegral(const SectorIntegral& collection)

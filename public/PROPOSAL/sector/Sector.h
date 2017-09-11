@@ -7,6 +7,8 @@
 #include "PROPOSAL/EnergyCutSettings.h"
 #include "PROPOSAL/particle/PROPOSALParticle.h"
 #include "PROPOSAL/scattering/ScatteringFactory.h"
+#include "PROPOSAL/crossection/PhotonuclearFactory.h"
+#include "PROPOSAL/crossection/BremsstrahlungFactory.h"
 
 namespace PROPOSAL {
 
@@ -41,6 +43,12 @@ class Sector
         double photo_multiplier; //!< multiplier to in- or decrease the Photonucler cross-sections
         double ioniz_multiplier; //!< multiplier to in- or decrease the Ionization cross-sections
         double epair_multiplier; //!< multiplier to in- or decrease the Epairproduction cross-sections
+
+        PhotonuclearFactory::Enum photo_parametrization;
+        PhotonuclearFactory::Shadow photo_shadow;
+        bool hardbb_enabled;
+
+        BremsstrahlungFactory::Enum brems_parametrization;
 
         // TODO(mario): must be removed Fri 2017/08/25
         bool do_scattering;                       //!< if true moliere scattering is enabled

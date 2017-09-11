@@ -36,9 +36,17 @@ class PhotonuclearFactory
         RenoSarcevicSu
     };
 
+    enum Shadow
+    {
+        ShadowDutta,
+        ShadowButkevichMikhailov
+    };
+
     // --------------------------------------------------------------------- //
     // Typedefs for readablitiy
     // --------------------------------------------------------------------- //
+
+    typedef boost::function<ShadowEffect*(void)> RegisterShadowEffectFunction;
 
     typedef boost::function<
         Parametrization*(const ParticleDef&, const Medium&, const EnergyCutSettings&, const RealPhoton&, Parametrization::Definition)>
@@ -47,6 +55,9 @@ class PhotonuclearFactory
     typedef boost::function<
         Parametrization*(const ParticleDef&, const Medium&, const EnergyCutSettings&, const ShadowEffect&, Parametrization::Definition)>
         RegisterQ2Function;
+
+    typedef std::map<std::string, RegisterShadowEffectFunction > PhotoShadowEffectMapString;
+    typedef std::map<Shadow, RegisterShadowEffectFunction > PhotoShadowEffectMapEnum;
 
     typedef std::map<std::string, RegisterRealPhotonFunction > PhotoRealPhotonMapString;
     typedef std::map<Enum, RegisterRealPhotonFunction > PhotoRealPhotonMapEnum;
@@ -60,25 +71,36 @@ class PhotonuclearFactory
     // Create functions
     // --------------------------------------------------------------------- //
 
+    // --------------------------------------------------------------------- //
+    // Shadow effect
+    // --------------------------------------------------------------------- //
+
+    ShadowEffect* CreateShadowEffect(const std::string&);
+    ShadowEffect* CreateShadowEffect(const Shadow&);
+
+    // --------------------------------------------------------------------- //
+    // Real Photon
+    // --------------------------------------------------------------------- //
+
     Parametrization* CreatePhotoRealPhotonParam(const std::string&,
                                                 const ParticleDef& particle_def,
                                                 const Medium& medium,
                                                 const EnergyCutSettings& cuts,
-                                                const RealPhoton&,
+                                                bool,
                                                 Parametrization::Definition def) const;
 
     Parametrization* CreatePhotoRealPhotonParam(const Enum,
                                                 const ParticleDef& particle_def,
                                                 const Medium& medium,
                                                 const EnergyCutSettings& cuts,
-                                                const RealPhoton&,
+                                                bool,
                                                 Parametrization::Definition def) const;
 
     CrossSection* CreatePhotoRealPhoton(const std::string&,
                                         const ParticleDef& particle_def,
                                         const Medium& medium,
                                         const EnergyCutSettings& cuts,
-                                        const RealPhoton&,
+                                        bool,
                                         Parametrization::Definition def,
                                         bool interpolate = true) const;
 
@@ -86,41 +108,58 @@ class PhotonuclearFactory
                                         const ParticleDef& particle_def,
                                         const Medium& medium,
                                         const EnergyCutSettings& cuts,
-                                        const RealPhoton&,
+                                        bool,
                                         Parametrization::Definition def,
                                         bool interpolate = true) const;
 
+    // --------------------------------------------------------------------- //
+    // Q2 Integration
+    // --------------------------------------------------------------------- //
+
     Parametrization* CreatePhotoQ2IntegralParam(const std::string&,
-                                                const ParticleDef& particle_def,
-                                                const Medium& medium,
-                                                const EnergyCutSettings& cuts,
-                                                const ShadowEffect&,
-                                                Parametrization::Definition def,
+                                                const ParticleDef&,
+                                                const Medium&,
+                                                const EnergyCutSettings&,
+                                                const Shadow&,
+                                                Parametrization::Definition,
                                                 bool interpolate = true) const;
 
     Parametrization* CreatePhotoQ2IntegralParam(const Enum,
-                                                const ParticleDef& particle_def,
-                                                const Medium& medium,
-                                                const EnergyCutSettings& cuts,
-                                                const ShadowEffect&,
-                                                Parametrization::Definition def,
+                                                const ParticleDef&,
+                                                const Medium&,
+                                                const EnergyCutSettings&,
+                                                const Shadow&,
+                                                Parametrization::Definition,
                                                 bool interpolate = true) const;
 
     CrossSection* CreatePhotoQ2Integral(const std::string&,
-                                        const ParticleDef& particle_def,
-                                        const Medium& medium,
-                                        const EnergyCutSettings& cuts,
-                                        const ShadowEffect&,
-                                        Parametrization::Definition def,
+                                        const ParticleDef&,
+                                        const Medium&,
+                                        const EnergyCutSettings&,
+                                        const Shadow&,
+                                        Parametrization::Definition,
                                         bool interpolate = true) const;
 
     CrossSection* CreatePhotoQ2Integral(const Enum,
-                                        const ParticleDef& particle_def,
-                                        const Medium& medium,
-                                        const EnergyCutSettings& cuts,
-                                        const ShadowEffect&,
-                                        Parametrization::Definition def,
+                                        const ParticleDef&,
+                                        const Medium&,
+                                        const EnergyCutSettings&,
+                                        const Shadow&,
+                                        Parametrization::Definition,
                                         bool interpolate = true) const;
+
+    // --------------------------------------------------------------------- //
+    // Most general creation
+    // --------------------------------------------------------------------- //
+
+    CrossSection* CreatePhotonuclear(const Enum,
+                                     const ParticleDef&,
+                                     const Medium&,
+                                     const EnergyCutSettings&,
+                                     const Shadow&,
+                                     bool hardbb,
+                                     Parametrization::Definition,
+                                     bool interpolate = true) const;
 
     // ----------------------------------------------------------------------------
     /// @brief Enum string conversation
@@ -129,13 +168,22 @@ class PhotonuclearFactory
 
 
     // ----------------------------------------------------------------------------
+    /// @brief Register ShadowEffect used for Q2 integration parametrizations
+    ///
+    /// @param name
+    /// @param Enum
+    /// @param std::pair
+    // ----------------------------------------------------------------------------
+    void RegisterShadowEffect(const std::string& name, const Shadow&, RegisterShadowEffectFunction);
+
+    // ----------------------------------------------------------------------------
     /// @brief Register Photonuclear parametrizations
     ///
     /// @param name
     /// @param Enum
     /// @param RegisterRealPhotonFunction
     // ----------------------------------------------------------------------------
-    void Register(const std::string& name, Enum, RegisterRealPhotonFunction);
+    void RegisterRealPhoton(const std::string& name, Enum, RegisterRealPhotonFunction);
 
     // ----------------------------------------------------------------------------
     /// @brief Register Photonuclear parametrizations
@@ -160,6 +208,8 @@ class PhotonuclearFactory
     PhotonuclearFactory();
     ~PhotonuclearFactory();
 
+    PhotoShadowEffectMapString photo_shadow_map_str_;
+    PhotoShadowEffectMapEnum photo_shadow_map_enum_;
 
     PhotoRealPhotonMapString photo_real_map_str_;
     PhotoRealPhotonMapEnum photo_real_map_enum_;
