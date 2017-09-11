@@ -13,8 +13,8 @@ using namespace PROPOSAL;
 // Constructor & Destructor
 // ------------------------------------------------------------------------- //
 
-CrossSectionIntegral::CrossSectionIntegral(const Parametrization& param)
-    : CrossSection(param)
+CrossSectionIntegral::CrossSectionIntegral(const DynamicData::Type& type, const Parametrization& param)
+    : CrossSection(type, param)
     , dedx_integral_(IROMB, IMAXS, IPREC)
     , dndx_integral_(param.GetMedium().GetNumComponents(), Integral(IROMB, IMAXS, IPREC))
 {

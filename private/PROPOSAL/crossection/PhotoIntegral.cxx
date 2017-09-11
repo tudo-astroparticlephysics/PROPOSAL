@@ -7,7 +7,7 @@
 
 using namespace PROPOSAL;
 
-PhotoIntegral::PhotoIntegral(const Parametrization& param): CrossSectionIntegral(param)
+PhotoIntegral::PhotoIntegral(const Parametrization& param): CrossSectionIntegral(DynamicData::NuclInt, param)
 {
 }
 

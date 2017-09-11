@@ -104,7 +104,7 @@ class Propagator
     // std::vector<PROPOSALParticle*> Propagate( PROPOSALParticle *particle, double MaxDistance_cm = 1e20 );
 
     //----------------------------------------------------------------------------//
-    std::vector<PROPOSALParticle*> Propagate( double MaxDistance_cm = 1e20);
+    std::vector<DynamicData*> Propagate( double MaxDistance_cm = 1e20);
 
     //----------------------------------------------------------------------------//
     /*!

@@ -99,7 +99,7 @@ private:
     Output(Output const&);         // Don't Implement.
     void operator=(Output const&); // Don't implement
 
-    static std::vector<PROPOSALParticle*> secondarys_;
+    static std::vector<DynamicData*> secondarys_;
 
     static bool store_in_root_trees_;
 
@@ -176,8 +176,8 @@ public:
 
     void FillSecondaryVector(PROPOSALParticle *particle, int secondary_id, std::pair<double, ParticleType::Enum> energy_loss, double distance);
 
-    void FillSecondaryVector(PROPOSALParticle *particle, ParticleDef secondary, double energyloss, double distance);
-    void FillSecondaryVector(std::vector<PROPOSALParticle*>);
+    void FillSecondaryVector(const PROPOSALParticle& particle, const DynamicData::Type& secondary, double energyloss, double distance);
+    void FillSecondaryVector(std::vector<PROPOSALParticle*>&);
 
 //----------------------------------------------------------------------------//
 
@@ -228,7 +228,7 @@ public:
 
 
     //Getter
-    std::vector<PROPOSALParticle*> GetSecondarys() const
+    std::vector<DynamicData*> GetSecondarys() const
     {
         return secondarys_;
     }

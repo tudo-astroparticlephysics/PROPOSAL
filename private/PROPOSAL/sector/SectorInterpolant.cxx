@@ -310,18 +310,16 @@ void SectorInterpolant::InitInterpolation( std::string filepath, bool raw)
     bool reading_worked =   true;
     bool storing_failed =   false;
 
-    std::cout << "infornt a" << std::endl;
     double a = abs(-prop_interaction_.Integrate(particle_.GetLow(), particle_.GetLow()*10, boost::bind(&SectorInterpolant::FunctionToPropIntegralInteraction, this,  _1),4));
-    std::cout << "behind a" << std::endl;
     double b = abs(-prop_interaction_.Integrate(BIGENERGY, BIGENERGY/10, boost::bind(&SectorInterpolant::FunctionToPropIntegralInteraction, this,  _1),4));
 
-    if( a < b)
+    if (a < b)
     {
-        up_  =   true;
+        up_ = true;
     }
     else
     {
-        up_  =   false;
+        up_ = false;
     }
 
     // charged anti leptons have the same cross sections like charged leptons

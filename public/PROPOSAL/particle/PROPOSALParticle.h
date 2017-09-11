@@ -106,13 +106,70 @@ namespace ParticleType
     };
 }
 
+class DynamicData
+{
+    public:
+        enum Type
+        {
+            None = 0,
+            Particle,
+            Brems,
+            DeltaE,
+            Epair,
+            NuclInt,
+            MuPair,
+            Hadrons,
+            ContinuousEnergyLoss
+        };
+
+    public:
+    DynamicData(DynamicData::Type);
+    DynamicData(const DynamicData&);
+    virtual ~DynamicData();
+
+    // --------------------------------------------------------------------- //
+    // Getter & Setter
+    // --------------------------------------------------------------------- //
+
+    // Setter
+    void SetPosition(const Vector3D&);
+    void SetDirection(const Vector3D&);
+
+    virtual void SetEnergy(double);
+    void SetParentParticleEnergy(double);
+    void SetT(double t);
+    void SetPropagatedDistance(double);
+
+    // Getter
+    Type GetTypeId() const { return type_id_; }
+
+    Vector3D GetPosition() const { return position_; }
+    Vector3D GetDirection() const { return direction_; }
+
+    double GetEnergy() const { return energy_; }
+    double GetParentParticleEnergy() const { return parent_particle_energy_; }
+    double GetT() const { return t_; }
+    double GetPropagatedDistance() const { return propagated_distance_; }
+
+    protected:
+    const Type type_id_;
+
+    Vector3D position_;          //!< position coordinates [cm]
+    Vector3D direction_;         //!< direction vector, angles in [rad]
+
+    double energy_;          //!< energy [MeV]
+    double parent_particle_energy_; //!< energy of the parent particle
+    double t_;                   //!< age [sec]
+    double propagated_distance_; //!< propagation distance [cm]
+
+};
 
 // ----------------------------------------------------------------------------
 /// @brief This class provides the main particle properties and functions.
 ///
 /// All coordinates, angles and physical values are stored in this class.
 // ----------------------------------------------------------------------------
-class PROPOSALParticle
+class PROPOSALParticle : public DynamicData
 {
     public:
 
@@ -134,19 +191,11 @@ class PROPOSALParticle
     // --------------------------------------------------------------------- //
 
     // Setter
-    void SetPropagatedDistance(double prop_dist);
-    void SetMomentum(double momentum);
     void SetEnergy(double energy);
-    void SetLow(double low);
+    void SetMomentum(double momentum);
 
     void SetParentParticleId(int parent_particle_id);
-    void SetParentParticleEnergy(double parent_particle_energy);
     void SetParticleId(int particle_id);
-
-    void SetPosition(const Vector3D& position);
-    void SetT(double t);
-
-    void SetDirection(const Vector3D& direction);
 
     void SetEntryPoint(Vector3D& entry_point);
     void SetTi(double ti);
@@ -165,20 +214,14 @@ class PROPOSALParticle
     // Getter
     const ParticleDef& GetParticleDef() const { return particle_def_; }
     const DecayTable& GetDecayTable() const { return particle_def_.decay_table; }
-    double GetPropagatedDistance() const { return propagated_distance_; }
 
-    double GetT() const { return t_; }
     double GetMomentum() const { return momentum_; }
-    double GetEnergy() const { return energy_; }
     double GetLow() const { return particle_def_.low; }
 
     double GetMass() const { return particle_def_.mass; }
     double GetLifetime() const { return particle_def_.lifetime; }
     double GetCharge() const { return particle_def_.charge; }
     std::string GetName() const { return particle_def_.name; }
-
-    Vector3D GetPosition() const { return position_; }
-    Vector3D GetDirection() const { return direction_; }
 
     // ----------------------------------------------------------------------------
     /// @brief Return interpolation tables used for Photonuclear Crossection
@@ -189,7 +232,6 @@ class PROPOSALParticle
     // ----------------------------------------------------------------------------
     const HardBBTables::VecType* getHardBB() const {return particle_def_.hardbb_table;}
 
-    double GetParentParticleEnergy() const { return parent_particle_energy_; }
     int GetParentParticleId() const { return parent_particle_id_; }
     int GetParticleId() const { return particle_id_; }
 
@@ -212,20 +254,11 @@ class PROPOSALParticle
 
     const ParticleDef particle_def_; //!< static defenitions of the particle
 
-    double propagated_distance_; //!< propagation distance [cm]
-
     double momentum_;        //!< momentum [MeV]
     double square_momentum_; //!< momentum square [MeV]
-    double energy_;          //!< energy [MeV]
 
     int parent_particle_id_;        //!< parent particle id
-    double parent_particle_energy_; //!< energy of the parent particle
     int particle_id_;               //!< particle id
-
-    Vector3D position_;          //!< position coordinates [cm]
-    double t_;                   //!< age [sec]
-
-    Vector3D direction_;         //!< direction vector, angles in [rad]
 
     Vector3D entry_point_; //!< entry point coordinates [cm]
     double ti_;            //!< t-coordinate entry Point [sec]

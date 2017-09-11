@@ -280,7 +280,7 @@ Propagator::Propagator(const ParticleDef& particle_def, const std::string& confi
 // ------------------------------------------------------------------------- //
 
 // ------------------------------------------------------------------------- //
-std::vector<PROPOSALParticle*> Propagator::Propagate(double MaxDistance_cm)
+std::vector<DynamicData*> Propagator::Propagate(double MaxDistance_cm)
 {
     Output::getInstance().ClearSecondaryVector();
 

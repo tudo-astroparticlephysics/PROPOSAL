@@ -18,8 +18,8 @@ using namespace PROPOSAL;
 // Constructor & Destructor
 // ------------------------------------------------------------------------- //
 
-CrossSectionInterpolant::CrossSectionInterpolant(const Parametrization& param)
-    : CrossSection(param)
+CrossSectionInterpolant::CrossSectionInterpolant(const DynamicData::Type& type, const Parametrization& param)
+    : CrossSection(type, param)
     , dedx_interpolant_(NULL)
     , dndx_interpolant_1d_(param.GetMedium().GetNumComponents(), NULL)
     , dndx_interpolant_2d_(param.GetMedium().GetNumComponents(), NULL)
@@ -102,7 +102,6 @@ CrossSectionInterpolant::CrossSectionInterpolant(const CrossSectionInterpolant& 
     int num_components = cross_section.parametrization_->GetMedium().GetNumComponents();
 
     dndx_interpolant_1d_.reserve(num_components);
-    std::cout << "lenght: " << dndx_interpolant_1d_.size() << std::endl;
     for(InterpolantVec::const_iterator iter = cross_section.dndx_interpolant_1d_.begin(); iter != cross_section.dndx_interpolant_1d_.end(); ++iter)
     {
         if (*iter != NULL)
@@ -110,7 +109,6 @@ CrossSectionInterpolant::CrossSectionInterpolant(const CrossSectionInterpolant& 
             dndx_interpolant_1d_.push_back(new Interpolant(**iter));
         }
     }
-    std::cout << "lenght after: " << dndx_interpolant_1d_.size() << std::endl;
 
     dndx_interpolant_2d_.reserve(num_components);
     for(InterpolantVec::const_iterator iter = cross_section.dndx_interpolant_2d_.begin(); iter != cross_section.dndx_interpolant_2d_.end(); ++iter)

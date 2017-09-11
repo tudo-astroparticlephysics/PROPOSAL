@@ -13,7 +13,7 @@
 
 using namespace PROPOSAL;
 
-BremsInterpolant::BremsInterpolant(const Parametrization& param): CrossSectionInterpolant(param)
+BremsInterpolant::BremsInterpolant(const Parametrization& param): CrossSectionInterpolant(DynamicData::Brems, param)
 {
     Parametrization::Definition param_def = parametrization_->GetDefinition();
     Interpolant1DBuilder builder1d;
