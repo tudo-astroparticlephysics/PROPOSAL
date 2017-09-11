@@ -13,7 +13,7 @@ class CrossSectionIntegral: public CrossSection
         typedef std::vector<Integral> IntegralVec;
 
     public:
-        CrossSectionIntegral(const Parametrization&);
+        CrossSectionIntegral(const DynamicData::Type&, const Parametrization&);
         CrossSectionIntegral(const CrossSectionIntegral&);
         virtual ~CrossSectionIntegral();
 

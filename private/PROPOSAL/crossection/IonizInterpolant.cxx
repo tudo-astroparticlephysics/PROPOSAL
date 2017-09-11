@@ -16,7 +16,7 @@
 using namespace PROPOSAL;
 
 IonizInterpolant::IonizInterpolant(const Parametrization& param)
-    : CrossSectionInterpolant(param)
+    : CrossSectionInterpolant(DynamicData::DeltaE, param)
 {
     Parametrization::Definition param_def = parametrization_->GetDefinition();
     Interpolant1DBuilder builder1d;
