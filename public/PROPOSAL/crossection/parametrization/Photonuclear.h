@@ -78,6 +78,7 @@ class ShadowDutta: public ShadowEffect
         virtual ~ShadowDutta() {}
 
         ShadowEffect* clone() const { return new ShadowDutta(*this); }
+        static ShadowEffect* create() { return new ShadowDutta(); }
 
         double CalculateShadowEffect(const Components::Component&, double x, double nu);
 };
@@ -90,6 +91,7 @@ class ShadowButkevichMikhailov: public ShadowEffect
         virtual ~ShadowButkevichMikhailov() {}
 
         ShadowEffect* clone() const { return new ShadowButkevichMikhailov(*this); }
+        static ShadowEffect* create() { return new ShadowButkevichMikhailov(); }
 
         double CalculateShadowEffect(const Components::Component&, double x, double nu);
 };
