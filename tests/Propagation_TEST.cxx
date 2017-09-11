@@ -35,51 +35,6 @@ TEST(Propagation , Test_nan) {
     int statistic = 10;
     int EmaxLog10 = 8;
 
-    ParticleDef pdef = MuMinusDef::Get();
-
-    Parametrization::Definition def;
-    // def.path_to_tables = "../src/resources/tables";
-    PhotoRhode rhode(pdef, Ice(), EnergyCutSettings(500, 0.5), HardBB(pdef), def);
-    // PhotoZeus zeus(MuMinusDef::Get(), Ice(), EnergyCutSettings(500, 0.5), HardBB(pdef));
-    // PhotoBezrukovBugaev bezrukov(MuMinusDef::Get(), Ice(), EnergyCutSettings(500, 0.5), SoftBB());
-    // PhotoKokoulin kokoulin(MuMinusDef::Get(), Ice(), EnergyCutSettings(500, 0.5), SoftBB());
-
-    // PhotoAbramowiczLevinLevyMaor97Interpolant allm(MuMinusDef::Get(), Ice(), EnergyCutSettings(500, 0.5), ShadowDutta());
-    PhotoQ2Interpolant<PhotoAbramowiczLevinLevyMaor97> allm2(MuMinusDef::Get(), Ice(), EnergyCutSettings(500, 0.5), ShadowDutta());
-
-    // std::cout << "Result: " << allm2.DifferentialCrossSection(1e4, 0.01) << std::endl;
-
-    PhotoInterpolant photo(rhode);
-    std::cout << "Dedx: " << photo.CalculatedEdx(1000) << std::endl;
-
-    PhotoInterpolant photo2(allm2);
-    std::cout << "DNdx: " << photo2.CalculatedNdx(0.23, 0.2) << std::endl;
-
-    // CrossSection* cross = BremsstrahlungFactory::Get().CreateBremsstrahlung(
-    //     BremsstrahlungFactory::KelnerKokoulinPetrukhin, MuMinusDef::Get(), Ice(), EnergyCutSettings(), Parametrization::Definition());
-
-    // CrossSection* cross2 = PhotonuclearFactory::Get().CreatePhotoQ2Integral(
-    //     PhotonuclearFactory::AbramowiczLevinLevyMaor97, MuMinusDef::Get(), Ice(), EnergyCutSettings(), ShadowDutta(), Parametrization::Definition());
-    //
-    // std::cout << "dedx = " << cross2->CalculatedEdx(500000) << std::endl;
-
-    // Parametrization::Definition def;
-    // def.path_to_tables = "../src/resources/tables";
-    // def.raw = false;
-    // def.lpm_effect_enabled = false;
-    BremsKelnerKokoulinPetrukhin param(MuMinusDef::Get(), Ice(1.0), EnergyCutSettings(500, 0.05), def);
-    BremsInterpolant brems(param);
-
-    // SectorDef col_def;
-    // col_def.location = 1;
-    // col_def.do_continuous_randomization_ = true;
-    // col_def.do_scattering = true;
-    // col_def.scattering_model = ScatteringFactory::ScatteringModel::MoliereFirstOrder;
-    //
-    //
-    // SectorInterpolant col_interpol(Water(0.98), Sphere(Vector3D(), 1e18, 0), EnergyCutSettings(500, 0.5), col_def);
-    //
-    //
     std::vector<Sector*> collections;
 
     // --------------------------------------------------------------------- //

@@ -10,23 +10,8 @@
 #include "PROPOSAL/sector/Sector.h"
 #include "PROPOSAL/medium/Medium.h"
 
-#include "PROPOSAL/crossection/BremsInterpolant.h"
-#include "PROPOSAL/crossection/IonizInterpolant.h"
-#include "PROPOSAL/crossection/EpairInterpolant.h"
-#include "PROPOSAL/crossection/PhotoInterpolant.h"
-#include "PROPOSAL/crossection/parametrization/Bremsstrahlung.h"
-#include "PROPOSAL/crossection/parametrization/Ionization.h"
-#include "PROPOSAL/crossection/parametrization/EpairProduction.h"
-#include "PROPOSAL/crossection/parametrization/PhotoRealPhotonAssumption.h"
-#include "PROPOSAL/crossection/parametrization/PhotoQ2Integration.h"
-// #include "PROPOSAL/crossection/Epairproduction.h"
-// #include "PROPOSAL/crossection/Ionization.h"
-// #include "PROPOSAL/crossection/Photonuclear.h"
+#include "PROPOSAL/crossection/CrossSection.h"
 
-// #include "PROPOSAL/Scattering.h"
-// #include "PROPOSAL/scattering/ScatteringDefault.h"
-// #include "PROPOSAL/scattering/ScatteringMoliere.h"
-// #include "PROPOSAL/scattering/ScatteringFirstOrder.h"
 #include "PROPOSAL/methods.h"
 
 using namespace std;
@@ -43,6 +28,10 @@ Sector::Definition::Definition()
     , photo_multiplier(1.0)
     , ioniz_multiplier(1.0)
     , epair_multiplier(1.0)
+    , photo_parametrization(PhotonuclearFactory::AbramowiczLevinLevyMaor97)
+    , photo_shadow(PhotonuclearFactory::ShadowButkevichMikhailov)
+    , hardbb_enabled(true)
+    , brems_parametrization(BremsstrahlungFactory::KelnerKokoulinPetrukhin)
     , do_scattering(false)
     , scattering_model(ScatteringFactory::Default)
     , do_continuous_randomization(false)
@@ -77,8 +66,6 @@ Sector::Sector(PROPOSALParticle& particle)
     , scattering_(NULL)
     , crosssections_()
 {
-    BremsKelnerKokoulinPetrukhin* param = new BremsKelnerKokoulinPetrukhin(particle_.GetParticleDef(), *medium_, cut_settings_);
-    crosssections_.push_back(new BremsInterpolant(*param));
     // crosssections_.push_back(new Bremsstrahlung(particle_, medium_, &cut_settings_));
     // crosssections_.push_back(new Epairproduction(particle_, medium_, &cut_settings_));
     // crosssections_.push_back(new Photonuclear(particle_, medium_, &cut_settings_));
@@ -111,54 +98,6 @@ Sector::Sector(PROPOSALParticle& particle, const Medium& medium,
     , scattering_(NULL)
     , crosssections_()
 {
-    Parametrization::Definition param_def;
-    param_def.path_to_tables = "../src/resources/tables";
-    param_def.raw = false;
-
-    BremsKelnerKokoulinPetrukhin* bparam = new BremsKelnerKokoulinPetrukhin(particle_.GetParticleDef(), *medium_, cut_settings_, param_def);
-    Ionization* iparam = new Ionization(particle_.GetParticleDef(), *medium_, cut_settings_, param_def);
-    EpairProductionRhoInterpolant* eparam = new EpairProductionRhoInterpolant(particle_.GetParticleDef(), *medium_, cut_settings_, param_def);
-    PhotoQ2Interpolant<PhotoAbramowiczLevinLevyMaor97>* pparam = new PhotoQ2Interpolant<PhotoAbramowiczLevinLevyMaor97>(particle_.GetParticleDef(), *medium_, cut_settings_, ShadowButkevichMikhailov(), param_def);
-
-    CrossSectionInterpolant* brems = new BremsInterpolant(*bparam);
-    CrossSectionInterpolant* ioniz = new IonizInterpolant(*iparam);
-    CrossSectionInterpolant* epair = new EpairInterpolant(*eparam);
-    CrossSectionInterpolant* photo = new PhotoInterpolant(*pparam);
-
-    crosssections_.push_back(brems);
-    crosssections_.push_back(ioniz);
-    crosssections_.push_back(epair);
-    crosssections_.push_back(photo);
-    // crosssections_.push_back(new BremsInterpolant(*param));
-    // crosssections_.push_back(new Ionization(particle_, medium_, &cut_settings_));
-    // crosssections_.push_back(new Photonuclear(particle_, medium_, &cut_settings_));
-    // crosssections_.push_back(new Epairproduction(particle_, medium_, &cut_settings_));
-
-    // for(std::vector<CrossSection*>::iterator it = crosssections_.begin(); it != crosssections_.end(); ++it)
-    // {
-    //     switch ((*it)->GetType())
-    //     {
-    //         case ParticleType::Brems:
-    //             // collections_.at(j)->GetCrosssections().at(i)->SetParametrization(brems_);
-    //             (*it)->SetMultiplier(collection_def_.brems_multiplier);
-    //             (*it)->EnableLpmEffect(collection_def_.lpm_effect_enabled);
-    //             break;
-    //         case ParticleType::DeltaE:
-    //             (*it)->SetMultiplier(collection_def_.ioniz_multiplier);
-    //             break;
-    //         case ParticleType::EPair:
-    //             (*it)->SetMultiplier(collection_def_.epair_multiplier);
-    //             (*it)->EnableLpmEffect(collection_def_.lpm_effect_enabled);
-    //             break;
-    //         case ParticleType::NuclInt:
-    //             // collections_.at(j)->GetCrosssections().at(i)->SetParametrization(photo_);
-    //             (*it)->SetMultiplier(collection_def_.photo_multiplier);
-    //             break;
-    //         default:
-    //             log_fatal("Unknown cross section");
-    //             exit(1);
-    //     }
-    // }
 
     //TODO(mario): Polymorphic initilaization in collections childs  Sun 2017/08/27
     // if (collection_def_.do_continuous_randomization)
