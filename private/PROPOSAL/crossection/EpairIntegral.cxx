@@ -7,7 +7,7 @@
 
 using namespace PROPOSAL;
 
-EpairIntegral::EpairIntegral(const Parametrization& param): CrossSectionIntegral(param)
+EpairIntegral::EpairIntegral(const Parametrization& param): CrossSectionIntegral(DynamicData::Epair, param)
 {
 }
 

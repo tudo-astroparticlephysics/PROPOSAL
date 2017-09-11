@@ -13,7 +13,7 @@
 
 using namespace PROPOSAL;
 
-EpairInterpolant::EpairInterpolant(const Parametrization& param): CrossSectionInterpolant(param)
+EpairInterpolant::EpairInterpolant(const Parametrization& param): CrossSectionInterpolant(DynamicData::Epair, param)
 {
     Parametrization::Definition param_def = parametrization_->GetDefinition();
     Interpolant1DBuilder builder1d;

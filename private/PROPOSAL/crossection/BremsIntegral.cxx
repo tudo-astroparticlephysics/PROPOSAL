@@ -6,7 +6,7 @@
 
 using namespace PROPOSAL;
 
-BremsIntegral::BremsIntegral(const Parametrization& param): CrossSectionIntegral(param)
+BremsIntegral::BremsIntegral(const Parametrization& param): CrossSectionIntegral(DynamicData::Brems, param)
 {
 }
 

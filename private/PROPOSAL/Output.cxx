@@ -4,7 +4,7 @@
 using namespace std;
 using namespace PROPOSAL;
 
-vector<PROPOSALParticle*> Output::secondarys_;
+vector<DynamicData*> Output::secondarys_;
 bool Output::store_in_root_trees_ =   false;
 bool Output::store_in_ASCII_file_ =   false;
 
@@ -22,26 +22,37 @@ void Output::SetLoggingConfigurationFile(std::string file)
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-void Output::FillSecondaryVector(std::vector<PROPOSALParticle*> particles)
+void Output::FillSecondaryVector(std::vector<PROPOSALParticle*>& particles)
 {
     for (std::vector<PROPOSALParticle*>::iterator iter = particles.begin(); iter != particles.end(); ++iter) {
-        secondarys_.push_back(new PROPOSALParticle(**iter));
+        secondarys_.push_back(new DynamicData(**iter));
     }
 }
 
-void Output::FillSecondaryVector(PROPOSALParticle *particle, ParticleDef secondary, double energyloss, double distance)
+void Output::FillSecondaryVector(const PROPOSALParticle& particle, const DynamicData::Type& secondary, double energyloss, double distance)
 {
-    PROPOSALParticle* particle_to_store = new PROPOSALParticle(secondary);
-    particle_to_store->SetEnergy(energyloss);
-    particle_to_store->SetPosition(particle->GetPosition());
-    particle_to_store->SetDirection(particle->GetDirection());
-    particle_to_store->SetParticleId(particle->GetParticleId() + 1);
-    particle_to_store->SetParentParticleId(particle->GetParentParticleId());
-    particle_to_store->SetT(particle->GetT());
-    particle_to_store->SetParentParticleEnergy(particle->GetEnergy());
-    particle_to_store->SetPropagatedDistance(distance);
+    DynamicData* data = NULL;
 
-    secondarys_.push_back(particle_to_store);
+    if (secondary == DynamicData::Particle)
+    {
+        data = new PROPOSALParticle(particle);
+    }
+    else
+    {
+        data = new DynamicData(secondary);
+
+        data->SetEnergy(energyloss);
+        data->SetPosition(particle.GetPosition());
+        data->SetDirection(particle.GetDirection());
+        //TODO(mario): dedcide to have an id Mon 2017/09/11
+        // data->SetParticleId(particle->GetParticleId() + 1);
+        // data->SetParentParticleId(particle->GetParentParticleId());
+        data->SetT(particle.GetT());
+        data->SetParentParticleEnergy(particle.GetEnergy());
+        data->SetPropagatedDistance(distance);
+    }
+
+    secondarys_.push_back(data);
 }
 
 

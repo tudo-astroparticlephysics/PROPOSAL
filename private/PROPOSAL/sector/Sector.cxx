@@ -220,7 +220,7 @@ double Sector::Propagate(double distance)
     pair<double, ParticleType::Enum> decay;
     std::vector<PROPOSALParticle*> decay_products;
 
-    pair<double, ParticleType::Enum> energy_loss;
+    pair<double, DynamicData::Type> energy_loss;
 
     // TODO(mario): check Fri 2017/08/25
     // int secondary_id    =   0;
@@ -306,7 +306,7 @@ double Sector::Propagate(double distance)
         if (particle_interaction)
         {
             energy_loss = MakeStochasticLoss();
-            if (energy_loss.second == ParticleType::unknown)
+            if (energy_loss.second == DynamicData::None)
             {
                 // in this case, no cross section is chosen, so there is no interaction
                 // due to the parameterization of the cross section cutoffs
@@ -319,7 +319,7 @@ double Sector::Propagate(double distance)
             // log_debug("Energyloss: %f\t%s", energy_loss.first,
             // PROPOSALParticle::GetName(energy_loss.second).c_str());
             // //TODO(mario): hack Thu 2017/08/24
-            Output::getInstance().FillSecondaryVector(&particle_, ParticleDef(BremsDef::Get()), energy_loss.first, 0);
+            Output::getInstance().FillSecondaryVector(particle_, energy_loss.second, energy_loss.first, 0);
             // secondary_id    =   particle_.GetParticleId() + 1;
             // Output::getInstance().FillSecondaryVector(& secondary_id, energy_loss, 0);
         } else
@@ -501,7 +501,7 @@ void Sector::AdvanceParticle(double dr, double ei, double ef)
     particle_.SetT(time);
 }
 
-pair<double, ParticleType::Enum> Sector::MakeStochasticLoss()
+pair<double, DynamicData::Type> Sector::MakeStochasticLoss()
 {
     double rnd1 = RandomGenerator::Get().RandomDouble();
     double rnd2 = RandomGenerator::Get().RandomDouble();
@@ -512,9 +512,9 @@ pair<double, ParticleType::Enum> Sector::MakeStochasticLoss()
     double rates_sum           = 0;
 
     // return 0 and unknown, if there is no interaction
-    pair<double, ParticleType::Enum> energy_loss;
+    pair<double, DynamicData::Type> energy_loss;
     energy_loss.first  = 0.;
-    energy_loss.second = ParticleType::unknown;
+    energy_loss.second = DynamicData::None;
 
     std::vector<double> rates;
 
@@ -560,7 +560,7 @@ pair<double, ParticleType::Enum> Sector::MakeStochasticLoss()
         if (rates_sum > total_rate_weighted)
         {
             energy_loss.first  = crosssections_.at(i)->CalculateStochasticLoss(particle_.GetEnergy(), rnd2, rnd3);
-            // energy_loss.second = crosssections_.at(i)->GetType();
+            energy_loss.second = crosssections_.at(i)->GetTypeId();
             break;
         }
     }
