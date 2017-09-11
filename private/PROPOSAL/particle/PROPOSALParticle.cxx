@@ -60,21 +60,80 @@ ostream& operator<<(ostream& os, PROPOSALParticle const& particle)
 }  // namespace PROPOSAL
 
 /******************************************************************************
+*                              Dynamic Particle                              *
+******************************************************************************/
+
+DynamicData::DynamicData(DynamicData::Type type)
+    : type_id_(type)
+    , position_(Vector3D())
+    , direction_(Vector3D())
+    , energy_(0)
+    , parent_particle_energy_(0)
+    , t_(0)
+    , propagated_distance_(0)
+{
+}
+
+
+DynamicData::DynamicData(const DynamicData& data)
+    : type_id_(data.type_id_)
+    , position_(data.position_)
+    , direction_(data.direction_)
+    , energy_(data.energy_)
+    , parent_particle_energy_(data.parent_particle_energy_)
+    , t_(data.t_)
+    , propagated_distance_(data.propagated_distance_)
+{
+}
+
+DynamicData::~DynamicData()
+{
+}
+
+// ------------------------------------------------------------------------- //
+void DynamicData::SetPosition(const Vector3D& position)
+{
+    position_ = position;
+}
+
+// ------------------------------------------------------------------------- //
+void DynamicData::SetDirection(const Vector3D& direction)
+{
+    direction_ = direction;
+}
+
+// ------------------------------------------------------------------------- //
+void DynamicData::SetEnergy(double energy)
+{
+    energy_ = energy;
+}
+
+// ------------------------------------------------------------------------- //
+void DynamicData::SetParentParticleEnergy(double parent_particle_energy){
+    parent_particle_energy_ = parent_particle_energy;
+}
+
+// ------------------------------------------------------------------------- //
+void DynamicData::SetT(double t){
+    t_ = t;
+}
+
+// ------------------------------------------------------------------------- //
+void DynamicData::SetPropagatedDistance(double prop_dist){
+    propagated_distance_ = prop_dist;
+}
+
+/******************************************************************************
 *                              PROPOSALParticle                               *
 ******************************************************************************/
 
 PROPOSALParticle::PROPOSALParticle()
-    : particle_def_(MuMinusDef::Get())
-    , propagated_distance_(0)
+    : DynamicData(DynamicData::Particle)
+    , particle_def_(MuMinusDef::Get())
     , momentum_(0)
     , square_momentum_(0)
-    , energy_(0)
     , parent_particle_id_(0)
-    , parent_particle_energy_(0)
     , particle_id_(1)
-    , position_(Vector3D())
-    , t_(0)
-    , direction_(Vector3D())
     , entry_point_(Vector3D())
     , ti_(0)
     , ei_(0)
@@ -90,17 +149,12 @@ PROPOSALParticle::PROPOSALParticle()
 }
 
 PROPOSALParticle::PROPOSALParticle(const ParticleDef& particleDef)
-    : particle_def_(particleDef)
-    , propagated_distance_(0)
+    : DynamicData(DynamicData::Particle)
+    , particle_def_(particleDef)
     , momentum_(0)
     , square_momentum_(0)
-    , energy_(0)
     , parent_particle_id_(0)
-    , parent_particle_energy_(0)
     , particle_id_(1)
-    , position_(Vector3D())
-    , t_(0)
-    , direction_(Vector3D())
     , entry_point_(Vector3D())
     , ti_(0)
     , ei_(0)
@@ -231,12 +285,6 @@ void PROPOSALParticle::SetEnergy(double energy)
 }
 
 // ------------------------------------------------------------------------- //
-void PROPOSALParticle::SetDirection(const Vector3D& direction)
-{
-    direction_ = direction;
-}
-
-// ------------------------------------------------------------------------- //
 void PROPOSALParticle::SetMomentum(double momentum)
 {
     momentum_ = momentum;
@@ -245,42 +293,8 @@ void PROPOSALParticle::SetMomentum(double momentum)
 }
 
 // ------------------------------------------------------------------------- //
-void PROPOSALParticle::SetPropagatedDistance(double prop_dist){
-    propagated_distance_ = prop_dist;
-}
-
-// ------------------------------------------------------------------------- //
-void PROPOSALParticle::SetPosition(const Vector3D& position)
-{
-    position_ = position;
-}
-
-// ------------------------------------------------------------------------- //
-void PROPOSALParticle::SetT(double t){
-    t_ = t;
-}
-
-// ------------------------------------------------------------------------- //
-// void PROPOSALParticle::SetLow(double low){
-//     if (low < particle_def_.mass)
-//     {
-//         low_ = particle_def_.mass;
-//         log_warn("Low is lower than mass! Set low to mass.");
-//     }
-//     else
-//     {
-//         low_ = low;
-//     }
-// }
-
-// ------------------------------------------------------------------------- //
 void PROPOSALParticle::SetParentParticleId(int parent_particle_id){
     parent_particle_id_ = parent_particle_id;
-}
-
-// ------------------------------------------------------------------------- //
-void PROPOSALParticle::SetParentParticleEnergy(double parent_particle_energy){
-    parent_particle_energy_ = parent_particle_energy;
 }
 
 // ------------------------------------------------------------------------- //

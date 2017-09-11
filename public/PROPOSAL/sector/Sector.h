@@ -122,7 +122,7 @@ class Sector
      *
      *  \return pair of energy loss [MeV] and kind of interaction
      */
-    virtual std::pair<double, ParticleType::Enum> MakeStochasticLoss();
+    virtual std::pair<double, DynamicData::Type> MakeStochasticLoss();
 
     /**
      *  Makes Decay

@@ -149,7 +149,7 @@ TEST(Propagation , Test_nan) {
         particle.SetPosition(Vector3D(0, 0, 0));
         particle.SetDirection(Vector3D(0, 0, -1));
 
-        std::vector<PROPOSALParticle*> sec = pr.Propagate();
+        std::vector<DynamicData*> sec = pr.Propagate();
 
         length_sec.push_back(sec.size());
 

@@ -13,7 +13,7 @@
 
 using namespace PROPOSAL;
 
-PhotoInterpolant::PhotoInterpolant(const Parametrization& param): CrossSectionInterpolant(param)
+PhotoInterpolant::PhotoInterpolant(const Parametrization& param): CrossSectionInterpolant(DynamicData::NuclInt, param)
 {
     Parametrization::Definition param_def = parametrization_->GetDefinition();
     Interpolant1DBuilder builder1d;

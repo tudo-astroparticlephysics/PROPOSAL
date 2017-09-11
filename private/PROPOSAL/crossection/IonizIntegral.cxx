@@ -11,7 +11,7 @@
 
 using namespace PROPOSAL;
 
-IonizIntegral::IonizIntegral(const Parametrization& param): CrossSectionIntegral(param)
+IonizIntegral::IonizIntegral(const Parametrization& param): CrossSectionIntegral(DynamicData::DeltaE, param)
 {
 }
 
