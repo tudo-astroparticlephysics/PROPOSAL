@@ -11,7 +11,11 @@
 #include "PROPOSAL/Output.h"
 #include "PROPOSAL/methods.h"
 #include "PROPOSAL/medium/Medium.h"
-// #include "PROPOSAL/Constants.h"
+
+#include "PROPOSAL/crossection/IonizInterpolant.h"
+#include "PROPOSAL/crossection/EpairInterpolant.h"
+#include "PROPOSAL/crossection/parametrization/Ionization.h"
+#include "PROPOSAL/crossection/parametrization/EpairProduction.h"
 
 using namespace PROPOSAL;
 using namespace std;
@@ -56,6 +60,39 @@ SectorInterpolant::SectorInterpolant(PROPOSALParticle& particle,  const Medium& 
     , interpol_prop_interaction_(NULL)
     , interpol_prop_interaction_diff_(NULL)
 {
+    Parametrization::Definition param_def;
+
+    param_def.multiplier             = collection_def_.brems_multiplier;
+    param_def.path_to_tables         = collection_def_.path_to_tables;
+    param_def.raw                    = def.raw;
+    param_def.lpm_effect_enabled     = collection_def_.lpm_effect_enabled;
+    param_def.order_of_interpolation = collection_def_.order_of_interpolation;
+
+    crosssections_.push_back(BremsstrahlungFactory::Get().CreateBremsstrahlung(
+        collection_def_.brems_parametrization, particle_.GetParticleDef(), *medium_, cut_settings_, param_def, true));
+
+    param_def.multiplier = collection_def_.photo_multiplier;
+
+    crosssections_.push_back(PhotonuclearFactory::Get().CreatePhotonuclear(
+        collection_def_.photo_parametrization,
+        particle_.GetParticleDef(),
+        *medium_,
+        cut_settings_,
+        collection_def_.photo_shadow,
+        collection_def_.hardbb_enabled,
+        param_def,
+        true));
+
+    param_def.multiplier = collection_def_.ioniz_multiplier;
+
+    crosssections_.push_back(
+        new IonizInterpolant(Ionization(particle_.GetParticleDef(), *medium_, cut_settings_, param_def)));
+
+    param_def.multiplier = collection_def_.epair_multiplier;
+
+    crosssections_.push_back(new EpairInterpolant(
+        EpairProductionRhoInterpolant(particle_.GetParticleDef(), *medium_, cut_settings_, param_def)));
+
     InitInterpolation(def.path_to_tables, def.raw);
 }
 
