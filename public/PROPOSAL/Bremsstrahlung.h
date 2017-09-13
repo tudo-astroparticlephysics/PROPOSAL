@@ -90,7 +90,7 @@ private:
     \return the lpm correction factor
     */
 
-    double lpm(double v, double s1);
+    double lpm(double v, double s1, int i);
 
 //----------------------------------------------------------------------------//
 
