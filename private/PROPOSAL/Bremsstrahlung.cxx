@@ -1191,13 +1191,13 @@ double Bremsstrahlung::ElasticBremsstrahlungCrossSection(double v, int i)
 
     if(lpm_effect_enabled_)
     {
-        if(parametrization_!=ParametrizationType::BremsKelnerKokoulinPetrukhin)
-        {
-            s1  =   (medium_->GetLogConstant()).at(i)*Z3;
-            Dn  =   1.54*pow((medium_->GetAtomicNum()).at(i) , 0.27);
-            s1  =   ME*Dn/((particle_->GetMass())*s1);
-        }
-        aux *=  lpm(v,s1);
+        // if(parametrization_!=ParametrizationType::BremsKelnerKokoulinPetrukhin)
+        // {
+        //     s1  =   (medium_->GetLogConstant()).at(i)*Z3;
+        //     Dn  =   1.54*pow((medium_->GetAtomicNum()).at(i) , 0.27);
+        //     s1  =   ME*Dn/((particle_->GetMass())*s1);
+        // }
+        aux *=  lpm(v,s1, i);
     }
 
     double c2   =   pow(particle_->GetCharge() , 2);
@@ -1210,7 +1210,7 @@ double Bremsstrahlung::ElasticBremsstrahlungCrossSection(double v, int i)
 //----------------------------------------------------------------------------//
 
 
-double Bremsstrahlung::lpm(double v, double s1)
+double Bremsstrahlung::lpm(double v, double s1, int i)
 {
     if(init_lpm_effect_)
     {
@@ -1242,11 +1242,18 @@ double Bremsstrahlung::lpm(double v, double s1)
 
     }
 
-    double G, fi, xi, sp, h, s, s2, s3, ps, Gamma;
+    double G, fi, xi, sp, h, s, s2, s3, ps, Gamma, Z3, Dn;
 
     const double fi1    =   1.54954;
     const double G1     =   0.710390;
     const double G2     =   0.904912;
+
+    Z3  =   pow((medium_->GetNucCharge()).at(i), -1./3);
+
+    s1  =   (medium_->GetLogConstant()).at(i)*Z3;
+    Dn  =   1.54*pow((medium_->GetAtomicNum()).at(i) , 0.27);
+    s1  =   ME*Dn/((particle_->GetMass())*s1);
+
     s1                  *=  s1*SQRT2;
     sp                  =   sqrt(eLpm_*v/(8*(particle_->GetEnergy())*(1-v)));
     h                   =   log(sp)/log(s1);
