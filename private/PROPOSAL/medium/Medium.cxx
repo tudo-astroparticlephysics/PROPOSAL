@@ -89,7 +89,6 @@ Medium::Medium(std::string name,
     , vCut_(0)
     , MM_(0)
     , sumNucleons_(0)
-    , r0_(0)
 {
     if (rho > 0)
     {
@@ -122,13 +121,12 @@ Medium::Medium(const Medium& medium)
     , vCut_(medium.vCut_)
     , MM_(medium.MM_)
     , sumNucleons_(medium.sumNucleons_)
-    , r0_(medium.r0_)
 {
     // Deep copy of components
     components_.resize(numComponents_);
     for (unsigned int i = 0; i < components_.size(); ++i)
     {
-        components_.at(i) = medium.components_.at(i)->clone();
+        components_[i] = medium.components_[i]->clone();
     }
 }
 
@@ -175,7 +173,6 @@ void Medium::swap(Medium& medium)
     swap(vCut_, medium.vCut_);
     swap(MM_, medium.MM_);
     swap(sumNucleons_, medium.sumNucleons_);
-    swap(r0_, medium.r0_);
 
     components_.swap(medium.components_);
 }
@@ -204,14 +201,13 @@ Medium& Medium::operator=(const Medium& medium)
         vCut_ = medium.vCut_;
         MM_ = medium.MM_;
         sumNucleons_ = medium.sumNucleons_;
-        r0_ = medium.r0_;
 
         components_.clear();
         components_.resize(numComponents_);
 
         for (unsigned int i = 0; i < components_.size(); ++i)
         {
-            components_.at(i) = medium.components_.at(i)->clone();
+            components_[i] = medium.components_[i]->clone();
         }
     }
 
@@ -263,14 +259,12 @@ bool Medium::operator==(const Medium& medium) const
         return false;
     else if (sumNucleons_ != medium.sumNucleons_)
         return false;
-    else if (r0_ != medium.r0_)
-        return false;
     else
     {
         bool Return = true;
         for (unsigned int i = 0; i < components_.size(); ++i)
         {
-            if (*components_.at(i) != *medium.components_.at(i))
+            if (*components_[i] != *medium.components_[i])
             {
                 Return = false;
             }
@@ -417,11 +411,6 @@ void Medium::SetMM(double MM)
 void Medium::SetSumNucleons(double sumNucleons)
 {
     sumNucleons_ = sumNucleons;
-}
-
-void Medium::SetR0(double r0)
-{
-    r0_ = r0;
 }
 
 /******************************************************************************

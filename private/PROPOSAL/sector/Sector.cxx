@@ -98,7 +98,6 @@ Sector::Sector(PROPOSALParticle& particle, const Medium& medium,
     , scattering_(NULL)
     , crosssections_()
 {
-
     //TODO(mario): Polymorphic initilaization in collections childs  Sun 2017/08/27
     // if (collection_def_.do_continuous_randomization)
     // {
@@ -293,13 +292,13 @@ double Sector::Propagate(double distance)
     //     {
     //         particle_->SetEnergy(particle_->GetMass());
     //
-    //         double t    =   particle_->GetT() -particle_->GetLifetime()*log(RandomDouble());
+    //         double t    =   particle_->GetTime() -particle_->GetLifetime()*log(RandomDouble());
     //         double product_energy   =   0;
     //
     //         pair<double, ParticleType::Enum> decay_to_store;
     //         secondary_id    =   particle_->GetParticleId() + 1;
     //
-    //         particle_->SetT( t );
+    //         particle_->SetTime( t );
     //
     //         if(particle_->GetType()==2)
     //         {
@@ -391,7 +390,7 @@ void Sector::AdvanceParticle(double dr, double ei, double ef)
 {
 
     double dist       = particle_.GetPropagatedDistance();
-    double time       = particle_.GetT();
+    double time       = particle_.GetTime();
     Vector3D position = particle_.GetPosition();
 
     dist += dr;
@@ -437,7 +436,7 @@ void Sector::AdvanceParticle(double dr, double ei, double ef)
     // }
 
     particle_.SetPropagatedDistance(dist);
-    particle_.SetT(time);
+    particle_.SetTime(time);
 }
 
 pair<double, DynamicData::Type> Sector::MakeStochasticLoss()
@@ -494,7 +493,7 @@ pair<double, DynamicData::Type> Sector::MakeStochasticLoss()
 
     for (unsigned int i = 0; i < rates.size(); i++)
     {
-        rates_sum += rates.at(i);
+        rates_sum += rates[i];
 
         if (rates_sum > total_rate_weighted)
         {
@@ -592,20 +591,20 @@ double Sector::MakeDecay(double energy)
 //TODO(mario): lpm enable Wed 2017/09/06
 void Sector::EnableLpmEffect()
 {
-    collection_def_.lpm_effect_enabled = true;
-    for (unsigned int i = 0; i < crosssections_.size(); i++)
-    {
-        // crosssections_.at(i)->EnableLpmEffect(collection_def_.lpm_effect_enabled);
-    }
+    // collection_def_.lpm_effect_enabled = true;
+    // for(std::vector<CrossSection*>::iterator iter = crosssections_.begin(); iter != crosssections_.end(); ++iter)
+    // {
+    //     (*iter)->EnableLpmEffect(collection_def_.lpm_effect_enabled);
+    // }
 }
 
 void Sector::DisableLpmEffect()
 {
-    collection_def_.lpm_effect_enabled = false;
-    for (unsigned int i = 0; i < crosssections_.size(); i++)
-    {
-        // crosssections_.at(i)->EnableLpmEffect(collection_def_.lpm_effect_enabled);
-    }
+    // collection_def_.lpm_effect_enabled = false;
+    // for(std::vector<CrossSections*>::iterator iter = crosssections_.begin(); iter != crosssections_.end(); ++iter)
+    // {
+    //     (*iter)->EnableLpmEffect(collection_def_.lpm_effect_enabled);
+    // }
 }
 
 // void Sector::EnableContinuousRandomization()
@@ -672,9 +671,9 @@ double Sector::FunctionToPropIntegralInteraction( double energy)
 
     aux = FunctionToIntegral( energy);
 
-    for (unsigned int i = 0; i < crosssections_.size(); i++)
+    for(std::vector<CrossSection*>::iterator iter = crosssections_.begin(); iter != crosssections_.end(); ++iter)
     {
-        rate = crosssections_.at(i)->CalculatedNdx(energy);
+        rate = (*iter)->CalculatedNdx(energy);
 
         //TODO(mario): name Wed 2017/09/06
         // log_debug("Rate for %s = %f", crosssections_.at(i)->GetName().c_str(), rate);
@@ -694,9 +693,9 @@ double Sector::FunctionToIntegral( double energy)
 
     result = 0.0;
 
-    for (unsigned int i = 0; i < crosssections_.size(); i++)
+    for(std::vector<CrossSection*>::iterator iter = crosssections_.begin(); iter != crosssections_.end(); ++iter)
     {
-        aux = crosssections_.at(i)->CalculatedEdx(energy);
+        aux = (*iter)->CalculatedEdx(energy);
         result += aux;
 
         log_debug("energy %f , dE/dx = %f", particle_.GetEnergy(), aux);

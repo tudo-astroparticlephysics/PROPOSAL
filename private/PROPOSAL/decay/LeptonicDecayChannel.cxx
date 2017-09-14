@@ -78,7 +78,7 @@ DecayChannel::DecayProducts LeptonicDecayChannel::Decay(PROPOSALParticle* partic
     product_particle->SetDirection(particle->GetDirection());
     product_particle->SetParticleId(particle->GetParticleId() + 1);
     product_particle->SetParentParticleId(particle->GetParentParticleId());
-    product_particle->SetT(particle->GetT());
+    product_particle->SetTime(particle->GetTime());
     product_particle->SetParentParticleEnergy(particle->GetEnergy());
 
     DecayProducts decay_products;
