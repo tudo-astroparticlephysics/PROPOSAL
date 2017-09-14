@@ -376,7 +376,7 @@ void SectorInterpolant::InitInterpolation( std::string filepath, bool raw)
                 <<"_"<<cut_settings_.GetEcut()
                 <<"_"<<cut_settings_.GetVcut();
 
-        for(unsigned int i =0; i<crosssections_.size(); i++)
+        for(std::vector<CrossSection*>::iterator iter = crosssections_.begin(); iter != crosssections_.end(); ++iter)
         {
             // switch (crosssections_.at(i)->GetType())
             // {
@@ -561,7 +561,7 @@ void SectorInterpolant::InitTimeInterpolation( std::string filepath, bool raw)
                  << "_lifetime_" << particle_.GetLifetime() << "_" << medium_->GetName() << "_"
                  << medium_->GetMassDensity() << "_" << cut_settings_.GetEcut() << "_" << cut_settings_.GetVcut();
 
-        for(unsigned int i =0; i<crosssections_.size(); i++)
+        for(std::vector<CrossSection*>::iterator iter = crosssections_.begin(); iter != crosssections_.end(); ++iter)
         {
             // switch (crosssections_.at(i)->GetType())
             // {
@@ -588,7 +588,6 @@ void SectorInterpolant::InitTimeInterpolation( std::string filepath, bool raw)
             // filename<< "_" << crosssections_.at(i)->GetMultiplier()
             //         << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetEcut()
             //         << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetVcut();
-
         }
 
         if(!raw)

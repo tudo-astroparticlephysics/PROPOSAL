@@ -17,7 +17,7 @@ class GeometryFactory
     {
         Sphere = 0,
         Box,
-        Cylinder,
+        Cylinder
     };
 
     typedef boost::function<Geometry* (void)> RegisterFunction;

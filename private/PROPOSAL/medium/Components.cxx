@@ -11,7 +11,6 @@
 
 #include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/math/Integral.h"
 #include "PROPOSAL/methods.h"
 
 using namespace PROPOSAL;
@@ -38,7 +37,7 @@ std::ostream& operator<<(std::ostream& os, Component const& component)
        << "\t\t" << component.GetNucCharge() << std::endl;
     os << "AverageNucleonWeight:"
        << "\t" << component.GetAverageNucleonWeight() << std::endl;
-    os << std::defaultfloat;
+    // os << std::defaultfloat; // TODO: std::defaultfloat just works since gcc-5 or Clang
     os << "------------------------------------------------------------------";
     return os;
 }
@@ -59,27 +58,12 @@ Component::Component(std::string name, double nucCharge, double atomicNum, doubl
     , logConstant_(0.0)
     , bPrime_(0.0)
     , M_(0.0)
-    , mN_(0.0)
-    , r0_(0.0)
 {
     SetLogConstant();
     SetBPrime();
 
     M_ =(nucCharge_ * MP + (atomicNum_ - nucCharge_) * MN) / atomicNum_;
 
-    if (nucCharge != 1.0)
-    {
-        Integral integral(IROMB, IMAXS, IPREC);
-
-        r0_ = pow(atomicNum, 1.0 / 3.0);
-        r0_ = 1.12 * r0_ - 0.86 / r0_;
-
-        mN_ = 1.0 -
-              4.0 * PI * 0.17 *
-                  integral.Integrate(
-                      r0_, -1.0, boost::bind(&Component::FunctionToIntegral, this, _1), 3, 2.0) /
-                  atomicNum_;
-    }
 }
 
 Component::Component(const Component& component)
@@ -90,8 +74,6 @@ Component::Component(const Component& component)
     , logConstant_(component.logConstant_)
     , bPrime_(component.bPrime_)
     , M_(component.M_)
-    , mN_(component.mN_)
-    , r0_(component.r0_)
 {
 }
 
@@ -111,8 +93,6 @@ void Component::swap(Component& component)
     swap(logConstant_, component.logConstant_);
     swap(bPrime_, component.bPrime_);
     swap(M_, component.M_);
-    swap(mN_, component.mN_);
-    swap(r0_, component.r0_);
 }
 
 // ------------------------------------------------------------------------- //
@@ -127,8 +107,6 @@ Component& Component::operator=(const Component& component)
         logConstant_ = component.logConstant_;
         bPrime_ = component.bPrime_;
         M_ = component.M_;
-        mN_ = component.mN_;
-        r0_ = component.r0_;
     }
 
     return *this;
@@ -150,10 +128,6 @@ bool Component::operator==(const Component& component) const
     else if (bPrime_ != component.bPrime_)
         return false;
     else if (M_ != component.M_)
-        return false;
-    else if (mN_ != component.mN_)
-        return false;
-    else if (r0_ != component.r0_)
         return false;
     else
         return true;
@@ -289,13 +263,6 @@ void Component::SetBPrime()
     }
 }
 
-// ------------------------------------------------------------------------- //
-double Component::FunctionToIntegral(double r)
-{
-    const double a = 0.54;
-
-    return r * r / (1 + exp((r - r0_) / a));
-}
 
 /******************************************************************************
 *                            Different Components                             *
