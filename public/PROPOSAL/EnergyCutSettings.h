@@ -79,8 +79,8 @@ public:
 //----------------------------------------------------------------------------//
     //Setter
 
-    void SetEcut(const double ecut){ ecut_ = ecut; }
-    void SetVcut(const double vcut){ vcut_ = vcut; }
+    void SetEcut(double ecut){ ecut_ = ecut; }
+    void SetVcut(double vcut){ vcut_ = vcut; }
 
 };
 
