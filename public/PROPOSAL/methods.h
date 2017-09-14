@@ -20,7 +20,7 @@
 
 //necessary since the boost function does not work for [-1,1] but for (-1,1)
 #define FIXPREC 0.9999999999999999
-#define erfInv(x)   boost::math::erf_inv(FIXPREC*x)
+#define erfInv(x) boost::math::erf_inv(FIXPREC*x)
 
 namespace PROPOSAL
 {
@@ -29,11 +29,11 @@ bool FileExist(std::string path);
 
 //----------------------------------------------------------------------------//
 
-bool StartsWith(const std::string& text,const std::string& token);
+// bool StartsWith(const std::string& text,const std::string& token);
 
 //----------------------------------------------------------------------------//
 
-bool EndsWith(const std::string& text,const std::string& token);
+// bool EndsWith(const std::string& text,const std::string& token);
 
 //----------------------------------------------------------------------------//
 
@@ -41,23 +41,23 @@ int RoundValue(double val);
 
 //----------------------------------------------------------------------------//
 
-std::deque<std::string>* SplitString(std::string args, std::string Delimiters);
+// std::deque<std::string>* SplitString(std::string args, std::string Delimiters);
 
 //----------------------------------------------------------------------------//
 
-std::string ToLowerCase(std::string toConvert);
+// std::string ToLowerCase(std::string toConvert);
 
 //----------------------------------------------------------------------------//
 
-std::string ReplaceAll(std::string toConvert, char oldChar, char newChar);
+// std::string ReplaceAll(std::string toConvert, char oldChar, char newChar);
 
 //----------------------------------------------------------------------------//
 
-double Old_RandomDouble();
+// double Old_RandomDouble();
 
 //----------------------------------------------------------------------------//
 
-std::string NextToken(std::deque<std::string> *Tokens);
+// std::string NextToken(std::deque<std::string> *Tokens);
 
 //----------------------------------------------------------------------------//
 

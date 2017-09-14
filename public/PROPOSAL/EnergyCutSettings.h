@@ -47,7 +47,7 @@ public:
     EnergyCutSettings();
     EnergyCutSettings(const EnergyCutSettings&);
     EnergyCutSettings& operator=(const EnergyCutSettings& energyCutSettings);
-    EnergyCutSettings(double ecut, double vcut);
+    EnergyCutSettings(const double ecut, const double vcut);
     bool operator==(const EnergyCutSettings &energyCutSettings) const;
     bool operator!=(const EnergyCutSettings &energyCutSettings) const;
     friend std::ostream& operator<<(std::ostream& os, EnergyCutSettings const& cut_settings);
@@ -73,20 +73,14 @@ public:
  //----------------------------------------------------------------------------//
     //Getter
 
-    double GetEcut() const
-    {
-        return ecut_;
-    }
-//----------------------------------------------------------------------------//
-    double GetVcut() const
-    {
-        return vcut_;
-    }
-//----------------------------------------------------------------------------//
+    double GetEcut() const { return ecut_; }
+    double GetVcut() const { return vcut_; }
 
+//----------------------------------------------------------------------------//
     //Setter
-    void SetEcut(double ecut);
-    void SetVcut(double vcut);
+
+    void SetEcut(const double ecut){ ecut_ = ecut; }
+    void SetVcut(const double vcut){ vcut_ = vcut; }
 
 };
 

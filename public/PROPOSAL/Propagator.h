@@ -141,12 +141,6 @@ class Propagator
 
     // void ReadConfigFile(std::string config_file, bool DoApplyOptions=true);
 
-    //----------------------------------------------------------------------------//
-    /**
-     * Choose the current collection by particle type and location.
-     */
-
-    void ChooseCurrentCollection(Vector3D& particle_position, Vector3D& particle_direction);
 
     //----------------------------------------------------------------------------//
     // Getter
@@ -235,6 +229,22 @@ class Propagator
 
     PROPOSALParticle& particle_;
     Geometry* detector_;
+
+    //----------------------------------------------------------------------------//
+    /**
+     * Choose the current collection by particle type and location.
+     */
+
+    void ChooseCurrentCollection(Vector3D& particle_position, Vector3D& particle_direction);
+
+    //----------------------------------------------------------------------------//
+    /**
+     * Calculate the distance to propagate and
+     * choose if the particle has to propagate through the whole sector
+     * or only to the collection border
+     */
+
+    double CalculateEffectiveDistance(Vector3D& particle_position, Vector3D& particle_direction);
 
     //----------------------------------------------------------------------------//
 

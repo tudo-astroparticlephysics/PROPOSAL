@@ -34,12 +34,12 @@
 #include "PROPOSAL/particle/ParticleDef.h"
 #include "PROPOSAL/Output.h"
 
-using namespace std;
+// using namespace std;
 
 namespace PROPOSAL
 {
 
-bool FileExist(string path)
+bool FileExist(std::string path)
 {
     struct stat dummy_stat_return_val;
 
@@ -60,25 +60,25 @@ bool FileExist(string path)
 
 // returns true if text starts with token, false otherwise
 
-bool StartsWith(const std::string& text,const std::string& token)
-{
+// bool StartsWith(const std::string& text,const std::string& token)
+// {
 
-    if(text.length() < token.length())
-    {
-        return false;
-    }
-	return (text.compare(0, token.length(), token) == 0);
-}
+//     if(text.length() < token.length())
+//     {
+//         return false;
+//     }
+// 	return (text.compare(0, token.length(), token) == 0);
+// }
 
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
 
-bool EndsWith(const std::string& text,const std::string& token)
-{
-	return (text.compare(text.length()-1,token.length(),token) ==0);
-}
+// bool EndsWith(const std::string& text,const std::string& token)
+// {
+// 	return (text.compare(text.length()-1,token.length(),token) ==0);
+// }
 
 
 //----------------------------------------------------------------------------//
@@ -115,42 +115,42 @@ int RoundValue(double val)
 
 
 
-string ToLowerCase(string toConvert)
-{
-    string buffer;
+// string ToLowerCase(string toConvert)
+// {
+//     string buffer;
 
-    for(int i=0; i<(int)toConvert.length(); i++)
-    {
-        buffer  +=  (char)tolower(toConvert.at(i));
-    }
+//     for(int i=0; i<(int)toConvert.length(); i++)
+//     {
+//         buffer  +=  (char)tolower(toConvert.at(i));
+//     }
 
 
-    return buffer;
-}
+//     return buffer;
+// }
 
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
 
-string ReplaceAll(string toConvert, const char oldChar, const char newChar)
-{
-    string buffer="";
+// string ReplaceAll(string toConvert, const char oldChar, const char newChar)
+// {
+//     string buffer="";
 
-    for(int i =0; i<(int)toConvert.size(); i++)
-    {
-        if(toConvert.at(i)==oldChar)
-        {
-            buffer  +=  newChar;
-        }
-        else
-        {
-            buffer  +=  toConvert.at(i);
-        }
-    }
+//     for(int i =0; i<(int)toConvert.size(); i++)
+//     {
+//         if(toConvert.at(i)==oldChar)
+//         {
+//             buffer  +=  newChar;
+//         }
+//         else
+//         {
+//             buffer  +=  toConvert.at(i);
+//         }
+//     }
 
-    return buffer;
-}
+//     return buffer;
+// }
 
 
 //----------------------------------------------------------------------------//
@@ -159,60 +159,60 @@ string ReplaceAll(string toConvert, const char oldChar, const char newChar)
 
 // returns a random Double
 
-double Old_RandomDouble()
-{
-	double result;
+// double Old_RandomDouble()
+// {
+// 	double result;
 
-    result  =   rand() + 0.0;
-    result  =   result / RAND_MAX;
+//     result  =   rand() + 0.0;
+//     result  =   result / RAND_MAX;
 
-	return result;
-}
-
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-deque<string>* SplitString(string args, string Delimiters)
-{
-
-    deque<string> *Tokens   =   new deque<string>;
-    string::size_type Next, EndNext =   0;
-
-    while (EndNext != string::npos)
-    {
-        // Find next token
-        Next    =   args.find_first_not_of(Delimiters, EndNext);
-        EndNext =   args.find_first_of(Delimiters, Next);
-
-        // Stop if end of string reached
-        if (Next == string::npos)
-        {
-            break;
-        }
-
-        // Add token to vector.
-        Tokens->push_back(args.substr(Next, EndNext - Next));
-    }
-
-    return Tokens;
-}
+// 	return result;
+// }
 
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
 
-string NextToken(deque<string> *Tokens)
-{
-    string next;
-    next    =   Tokens->front();
-    Tokens->pop_front();
+// deque<string>* SplitString(string args, string Delimiters)
+// {
 
-    return next;
+//     deque<string> *Tokens   =   new deque<string>;
+//     string::size_type Next, EndNext =   0;
 
-}
+//     while (EndNext != string::npos)
+//     {
+//         // Find next token
+//         Next    =   args.find_first_not_of(Delimiters, EndNext);
+//         EndNext =   args.find_first_of(Delimiters, Next);
+
+//         // Stop if end of string reached
+//         if (Next == string::npos)
+//         {
+//             break;
+//         }
+
+//         // Add token to vector.
+//         Tokens->push_back(args.substr(Next, EndNext - Next));
+//     }
+
+//     return Tokens;
+// }
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+// string NextToken(deque<string> *Tokens)
+// {
+//     string next;
+//     next    =   Tokens->front();
+//     Tokens->pop_front();
+
+//     return next;
+
+// }
 
 namespace Helper
 {
