@@ -275,6 +275,7 @@ Propagator::Propagator(const ParticleDef& particle_def, const std::string& confi
     // }
 }
 
+
 // ------------------------------------------------------------------------- //
 // Public member functions
 // ------------------------------------------------------------------------- //
@@ -287,16 +288,13 @@ std::vector<DynamicData*> Propagator::Propagate(double MaxDistance_cm)
     Output::getInstance().GetSecondarys().reserve(1000);
 
     #if ROOT_SUPPORT
-        Output::getInstance().StorePrimaryInTree(particle__);
+        Output::getInstance().StorePrimaryInTree(&particle_);
     #endif
 
     if(Output::store_in_ASCII_file_)Output::getInstance().StorePrimaryInASCII(&particle_);
 
-    double distance_to_collection_border    =   0;
-    double distance_to_detector             =   0;
-    double distance_to_closest_approach     =   0;
-    double distance                         =   0;
-    double result                           =   0;
+    double distance = 0;
+    double result   = 0;
 
     // These two variables are needed to calculate the energy loss inside the detector
     // energy_at_entry_point is initialized with the current energy because this is a
@@ -325,146 +323,18 @@ std::vector<DynamicData*> Propagator::Propagate(double MaxDistance_cm)
             break;
         }
 
-        // Check if have have to propagate the particle_ through the whole collection
+        // Check if have to propagate the particle_ through the whole collection
         // or only to the collection border
-
-        distance_to_collection_border =
-        current_collection_->GetGeometry()->DistanceToBorder(particle_position, particle_direction).first;
-        double tmp_distance_to_border;
-        for(unsigned int i = 0 ; i < collections_.size() ; i++)
-        {
-
-            //TODO(mario): Is that ok to delete? Tue 2017/08/08
-            // if (particle_.GetType() != collections_.at(i)->Getparticle_()->GetType())
-            //     continue;
-
-            if(detector_->IsInfront(particle_position, particle_direction))
-            {
-                if(collections_.at(i)->GetLocation() != 0)
-                    continue;
-                else
-                {
-                    if(collections_.at(i)->GetGeometry()->GetHirarchy() >= current_collection_->GetGeometry()->GetHirarchy())
-                    {
-                        tmp_distance_to_border = collections_.at(i)->GetGeometry()->DistanceToBorder(particle_position, particle_direction).first;
-                        if(tmp_distance_to_border<=0)continue;
-                        distance_to_collection_border = min(
-                                      tmp_distance_to_border
-                                    , distance_to_collection_border);
-                    }
-                }
-            }
-
-            else if(detector_->IsInside(particle_position, particle_direction))
-            {
-                if(collections_.at(i)->GetLocation() != 1)
-                    continue;
-                else
-                {
-                    tmp_distance_to_border = collections_.at(i)->GetGeometry()->DistanceToBorder(particle_position, particle_direction).first;
-                    if(tmp_distance_to_border<=0)continue;
-                    distance_to_collection_border = min(
-                                  tmp_distance_to_border
-                                , distance_to_collection_border);
-                }
-
-            }
-
-            else if(detector_->IsBehind(particle_position, particle_direction))
-            {
-                if(collections_.at(i)->GetLocation() != 2)
-                    continue;
-                else
-                {
-                    if(collections_.at(i)->GetGeometry()->GetHirarchy() >= current_collection_->GetGeometry()->GetHirarchy())
-                    {
-                        tmp_distance_to_border = collections_.at(i)->GetGeometry()->DistanceToBorder(particle_position, particle_direction).first;
-                        if(tmp_distance_to_border<=0)continue;
-                        distance_to_collection_border = min(
-                                      tmp_distance_to_border
-                                    , distance_to_collection_border);
-                    }
-                    //The particle_ reached the border of all specified collections
-                    else
-                    {
-
-                    }
-                }
-            }
-        }
-
-        distance_to_detector = detector_->DistanceToBorder(particle_position, particle_direction).first;
-
-        distance_to_closest_approach = detector_->DistanceToClosestApproach(particle_position, particle_direction);
-
-        if(abs(distance_to_closest_approach) < GEOMETRY_PRECISION )
-        {
-            particle_.SetClosestApproachPoint(particle_position);
-            particle_.SetEc( particle_.GetEnergy() );
-            particle_.SetTc( particle_.GetT() );
-
-            distance_to_closest_approach    =   0;
-
-        }
-
-        if(distance_to_detector > 0)
-        {
-            if(distance_to_closest_approach > 0)
-            {
-                if( distance_to_detector < distance_to_collection_border &&
-                    distance_to_detector < distance_to_closest_approach )
-                {
-                    distance    =   distance_to_detector;
-                }
-                else if( distance_to_closest_approach < distance_to_collection_border)
-                {
-                    distance    =   distance_to_closest_approach;
-                }
-                else
-                {
-                    distance    =   distance_to_collection_border;
-                }
-            }
-            else
-            {
-                if( distance_to_detector < distance_to_collection_border)
-                {
-                    distance    =   distance_to_detector;
-                }
-                else
-                {
-                    distance    =   distance_to_collection_border;
-                }
-            }
-
-        }
-        else
-        {
-            if(distance_to_closest_approach > 0)
-            {
-                if( distance_to_closest_approach < distance_to_collection_border)
-                {
-                    distance    =   distance_to_closest_approach;
-                }
-                else
-                {
-                    distance    =   distance_to_collection_border;
-                }
-            }
-            else
-            {
-                distance    =   distance_to_collection_border;
-            }
-        }
+        distance = CalculateEffectiveDistance(particle_position, particle_direction);
 
 
-        is_in_detector  =   detector_->IsInside(particle_position, particle_direction);
+        is_in_detector = detector_->IsInside(particle_position, particle_direction);
         // entry point of the detector
         if(!starts_in_detector && !was_in_detector && is_in_detector)
         {
             particle_.SetEntryPoint(particle_position);
-            particle_.SetEi( particle_.GetEnergy() );
-            particle_.SetTi( particle_.GetT() );
+            particle_.SetEntryEnergy( particle_.GetEnergy() );
+            particle_.SetEntryTime( particle_.GetTime() );
 
             energy_at_entry_point = particle_.GetEnergy();
 
@@ -474,8 +344,8 @@ std::vector<DynamicData*> Propagator::Propagate(double MaxDistance_cm)
         else if(was_in_detector && !is_in_detector)
         {
             particle_.SetExitPoint(particle_position);
-            particle_.SetEf( particle_.GetEnergy() );
-            particle_.SetTf( particle_.GetT() );
+            particle_.SetExitEnergy( particle_.GetEnergy() );
+            particle_.SetExitTime( particle_.GetTime() );
 
             energy_at_exit_point = particle_.GetEnergy();
             //we don't want to run in this case a second time so we set was_in_detector to false
@@ -486,8 +356,8 @@ std::vector<DynamicData*> Propagator::Propagate(double MaxDistance_cm)
         else if(starts_in_detector && !is_in_detector)
         {
             particle_.SetExitPoint(particle_position);
-            particle_.SetEf( particle_.GetEnergy() );
-            particle_.SetTf( particle_.GetT() );
+            particle_.SetExitEnergy( particle_.GetEnergy() );
+            particle_.SetExitTime( particle_.GetTime() );
 
             energy_at_exit_point    =   particle_.GetEnergy();
             //we don't want to run in this case a second time so we set starts_in_detector to false
@@ -507,7 +377,7 @@ std::vector<DynamicData*> Propagator::Propagate(double MaxDistance_cm)
     particle_.SetElost(energy_at_entry_point - energy_at_exit_point);
 
     #if ROOT_SUPPORT
-        Output::getInstance().StorePropagatedPrimaryInTree(particle_);
+        Output::getInstance().StorePropagatedPrimaryInTree(&particle_);
     #endif
         if(Output::store_in_ASCII_file_)Output::getInstance().StorePropagatedPrimaryInASCII(&particle_);
 
@@ -518,32 +388,33 @@ std::vector<DynamicData*> Propagator::Propagate(double MaxDistance_cm)
 }
 
 // ------------------------------------------------------------------------- //
+
 void Propagator::ChooseCurrentCollection(Vector3D& particle_position, Vector3D& particle_direction)
 {
-    vector<unsigned int> crossed_collections;
+    vector<int> crossed_collections;
     crossed_collections.resize(0);
 
-    for(unsigned int i = 0 ; i < collections_.size() ; i++)
+    for(int i = 0; i < collections_.size(); i++)
     {
-        // collections_.at(i)->RestoreBackup_particle();
+        // collections_[i]->RestoreBackup_particle();
 
         //TODO(mario): Is that ok to delete? Tue 2017/08/08
-        // if(particle_->GetType() != collections_.at(i)->GetParticle()->GetType())
+        // if(particle_->GetType() != collections_[i]->GetParticle()->GetType())
         // {
         //     continue;
         // }
 
         if(detector_->IsInfront(particle_position, particle_direction))
         {
-            if(collections_.at(i)->GetLocation() != 0)
+            if(collections_[i]->GetLocation() != 0)
             {
                 continue;
             }
             else
             {
-                if(collections_.at(i)->GetGeometry()->IsInside(particle_position, particle_direction))
+                if(collections_[i]->GetGeometry()->IsInside(particle_position, particle_direction))
                 {
-                    current_collection_ = collections_.at(i);
+                    current_collection_ = collections_[i];
                     crossed_collections.push_back(i);
                 }
                 else
@@ -555,15 +426,15 @@ void Propagator::ChooseCurrentCollection(Vector3D& particle_position, Vector3D& 
 
         else if(detector_->IsInside(particle_position, particle_direction))
         {
-            if(collections_.at(i)->GetLocation() != 1)
+            if(collections_[i]->GetLocation() != 1)
             {
                 continue;
             }
             else
             {
-                if(collections_.at(i)->GetGeometry()->IsInside(particle_position, particle_direction))
+                if(collections_[i]->GetGeometry()->IsInside(particle_position, particle_direction))
                 {
-                    current_collection_ = collections_.at(i);
+                    current_collection_ = collections_[i];
                     crossed_collections.push_back(i);
                 }
                 else
@@ -576,15 +447,15 @@ void Propagator::ChooseCurrentCollection(Vector3D& particle_position, Vector3D& 
 
         else if(detector_->IsBehind(particle_position, particle_direction))
         {
-            if(collections_.at(i)->GetLocation() != 2)
+            if(collections_[i]->GetLocation() != 2)
             {
                 continue;
             }
             else
             {
-                if(collections_.at(i)->GetGeometry()->IsInside(particle_position, particle_direction))
+                if(collections_[i]->GetGeometry()->IsInside(particle_position, particle_direction))
                 {
-                    current_collection_ = collections_.at(i);
+                    current_collection_ = collections_[i];
                     crossed_collections.push_back(i);
                 }
                 //The particle reached the border of all specified collections
@@ -610,27 +481,26 @@ void Propagator::ChooseCurrentCollection(Vector3D& particle_position, Vector3D& 
     //If same hirarchys are available the denser one is choosen
     //If hirarchy and density are the same then the first found is taken.
     //
-    for(unsigned int i = 0  ; i < crossed_collections.size() ;i++)
-    {
-        unsigned int ColNow     = crossed_collections.at(i);
 
+    for(std::vector<int>::iterator iter = crossed_collections.begin(); iter != crossed_collections.end(); ++iter)
+    {
         //Current Hirachy is bigger -> Nothing to do!
         //
         if(current_collection_->GetGeometry()->GetHirarchy() >
-                collections_.at(ColNow)->GetGeometry()->GetHirarchy() )
+                collections_[*iter]->GetGeometry()->GetHirarchy() )
         {
             continue;
         }
         //Current Hirachy is equal -> Look at the density!
         //
         else if( current_collection_->GetGeometry()->GetHirarchy() ==
-                 collections_.at(ColNow)->GetGeometry()->GetHirarchy() )
+                 collections_[*iter]->GetGeometry()->GetHirarchy() )
         {
             //Current Density is bigger or same -> Nothing to do!
             //
 
             if( current_collection_->GetMedium()->GetMassDensity() >=
-                    collections_.at(ColNow)->GetMedium()->GetMassDensity() )
+                    collections_[*iter]->GetMedium()->GetMassDensity() )
             {
                 continue;
             }
@@ -639,7 +509,7 @@ void Propagator::ChooseCurrentCollection(Vector3D& particle_position, Vector3D& 
             //
             else
             {
-                current_collection_ =  collections_.at(ColNow);
+                current_collection_ =  collections_[*iter];
             }
 
         }
@@ -648,7 +518,7 @@ void Propagator::ChooseCurrentCollection(Vector3D& particle_position, Vector3D& 
         //
         else
         {
-            current_collection_ =  collections_.at(ColNow);
+            current_collection_ =  collections_[*iter];
         }
     }
 
@@ -657,6 +527,112 @@ void Propagator::ChooseCurrentCollection(Vector3D& particle_position, Vector3D& 
     // {
     //     current_collection_->SetParticle(particle_);
     // }
+}
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+double Propagator::CalculateEffectiveDistance(Vector3D& particle_position, Vector3D& particle_direction)
+{
+    double distance_to_collection_border = 0;
+    double distance_to_detector          = 0;
+    double distance_to_closest_approach  = 0;
+
+    distance_to_collection_border = current_collection_->GetGeometry()->DistanceToBorder(particle_position, particle_direction).first;
+    double tmp_distance_to_border;
+
+    for(std::vector<Sector*>::iterator iter = collections_.begin(); iter != collections_.end(); ++iter)
+    {
+        //TODO(mario): Is that ok to delete? Tue 2017/08/08
+        // if (particle_.GetType() != (*iter)->Getparticle_()->GetType())
+        //     continue;
+
+        if(detector_->IsInfront(particle_position, particle_direction))
+        {
+            if((*iter)->GetLocation() != 0)
+                continue;
+            else
+            {
+                if((*iter)->GetGeometry()->GetHirarchy() >= current_collection_->GetGeometry()->GetHirarchy())
+                {
+                    tmp_distance_to_border = (*iter)->GetGeometry()->DistanceToBorder(particle_position, particle_direction).first;
+                    if(tmp_distance_to_border<=0)continue;
+                    distance_to_collection_border = min(tmp_distance_to_border, distance_to_collection_border);
+                }
+            }
+        }
+
+        else if(detector_->IsInside(particle_position, particle_direction))
+        {
+            if((*iter)->GetLocation() != 1)
+                continue;
+            else
+            {
+                tmp_distance_to_border = (*iter)->GetGeometry()->DistanceToBorder(particle_position, particle_direction).first;
+                if(tmp_distance_to_border<=0)continue;
+                distance_to_collection_border = min(tmp_distance_to_border, distance_to_collection_border);
+            }
+
+        }
+
+        else if(detector_->IsBehind(particle_position, particle_direction))
+        {
+            if((*iter)->GetLocation() != 2)
+                continue;
+            else
+            {
+                if((*iter)->GetGeometry()->GetHirarchy() >= current_collection_->GetGeometry()->GetHirarchy())
+                {
+                    tmp_distance_to_border = (*iter)->GetGeometry()->DistanceToBorder(particle_position, particle_direction).first;
+                    if(tmp_distance_to_border<=0)continue;
+                    distance_to_collection_border = min(tmp_distance_to_border, distance_to_collection_border);
+                }
+                //The particle_ reached the border of all specified collections
+                else
+                {
+
+                }
+            }
+        }
+    }
+
+    distance_to_detector = detector_->DistanceToBorder(particle_position, particle_direction).first;
+
+    distance_to_closest_approach = detector_->DistanceToClosestApproach(particle_position, particle_direction);
+
+    if(abs(distance_to_closest_approach) < GEOMETRY_PRECISION )
+    {
+        particle_.SetClosestApproachPoint(particle_position);
+        particle_.SetClosestApproachEnergy( particle_.GetEnergy() );
+        particle_.SetClosestApproachTime( particle_.GetTime() );
+
+        distance_to_closest_approach = 0;
+
+    }
+
+    if(distance_to_detector > 0)
+    {
+        if(distance_to_closest_approach > 0)
+        {
+            return min(distance_to_detector, min(distance_to_collection_border, distance_to_closest_approach ));
+        }
+        else
+        {
+            return min(distance_to_detector, distance_to_collection_border);
+        }
+    }
+    else
+    {
+        if(distance_to_closest_approach > 0)
+        {
+            return min(distance_to_closest_approach, distance_to_collection_border);
+        }
+        else
+        {
+            return distance_to_collection_border;
+        }
+    }
 }
 
 
