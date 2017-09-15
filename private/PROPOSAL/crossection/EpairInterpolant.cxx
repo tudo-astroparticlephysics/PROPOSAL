@@ -37,11 +37,9 @@ EpairInterpolant::EpairInterpolant(const Parametrization& param): CrossSectionIn
 
     builder_container.push_back(std::make_pair(&builder1d, &dedx_interpolant_));
 
-    log_info("Initialize dEdx for %s", typeid(parametrization_).name());
     Helper::InitializeInterpolation("dEdx",
                                     builder_container,
                                     std::vector<Parametrization*>(1, parametrization_));
-    log_info("Initialization dEdx for %s done!", typeid(parametrization_).name());
 }
 
 EpairInterpolant::EpairInterpolant(const EpairInterpolant& epair): CrossSectionInterpolant(epair)

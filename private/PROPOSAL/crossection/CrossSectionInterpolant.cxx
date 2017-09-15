@@ -84,11 +84,9 @@ CrossSectionInterpolant::CrossSectionInterpolant(const DynamicData::Type& type, 
     builder_return.insert(builder_return.end(), builder_container1d.begin(), builder_container1d.end());
     // builder2d.insert(builder2d.end(), builder1d.begin(), builder1d.end());
 
-    log_info("Initialize dNdx for %s", typeid(parametrization_).name());
     Helper::InitializeInterpolation("dNdx",
                                     builder_return,
                                     std::vector<Parametrization*>(1, parametrization_));
-    log_info("Initialize dNdx for %s done!", typeid(parametrization_).name());
 }
 
 CrossSectionInterpolant::CrossSectionInterpolant(const CrossSectionInterpolant& cross_section)

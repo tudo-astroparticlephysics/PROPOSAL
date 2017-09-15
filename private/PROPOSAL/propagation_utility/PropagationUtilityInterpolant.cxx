@@ -13,12 +13,13 @@
 #include "PROPOSAL/crossection/parametrization/Ionization.h"
 #include "PROPOSAL/crossection/parametrization/EpairProduction.h"
 
+#include "PROPOSAL/math/InterpolantBuilder.h"
+
 using namespace PROPOSAL;
 using namespace std;
 
 PropagationUtilityInterpolant::PropagationUtilityInterpolant(const ParticleDef& particle_def)
     : PropagationUtility(particle_def)
-    , initialized_interpolation_(false)
     , up_(false)
     , big_low_interatction_(0)
     , big_low_decay_(0)
@@ -33,14 +34,13 @@ PropagationUtilityInterpolant::PropagationUtilityInterpolant(const ParticleDef& 
     , interpol_prop_interaction_(NULL)
     , interpol_prop_interaction_diff_(NULL)
 {
-    InitInterpolation(utility_def_.path_to_tables, utility_def_.raw);
+    InitInterpolation();
 }
 
 PropagationUtilityInterpolant::PropagationUtilityInterpolant(const ParticleDef& particle,  const Medium& medium,
                                              const EnergyCutSettings& cut_settings,
                                              const Definition& def)
     :PropagationUtility(particle, medium, cut_settings, def)
-    , initialized_interpolation_(false)
     , up_(false)
     , big_low_interatction_(0)
     , big_low_decay_(0)
@@ -88,7 +88,7 @@ PropagationUtilityInterpolant::PropagationUtilityInterpolant(const ParticleDef& 
     crosssections_.push_back(new EpairInterpolant(
         EpairProductionRhoInterpolant(particle_def_, *medium_, cut_settings_, param_def)));
 
-    InitInterpolation(def.path_to_tables, def.raw);
+    InitInterpolation();
 }
 
 PropagationUtilityInterpolant::~PropagationUtilityInterpolant()
@@ -105,7 +105,6 @@ PropagationUtilityInterpolant::~PropagationUtilityInterpolant()
 
 PropagationUtilityInterpolant::PropagationUtilityInterpolant(const PropagationUtilityInterpolant& collection)
     :PropagationUtility(collection)
-     ,initialized_interpolation_(collection.initialized_interpolation_)
      ,up_(collection.up_)
      ,big_low_interatction_(collection.big_low_interatction_)
      ,big_low_decay_(collection.big_low_decay_)
@@ -127,6 +126,10 @@ PropagationUtilityInterpolant::PropagationUtilityInterpolant(const PropagationUt
     if (collection.interpol_prop_interaction_diff_ != NULL)
         interpol_prop_interaction_diff_ = new Interpolant(*collection.interpol_prop_interaction_diff_);
 }
+
+// ------------------------------------------------------------------------- //
+// Public methods
+// ------------------------------------------------------------------------- //
 
 // ------------------------------------------------------------------------- //
 double PropagationUtilityInterpolant::CalculateDisplacement( double ei, double ef, double dist)
@@ -316,339 +319,6 @@ double PropagationUtilityInterpolant::CalculateParticleTime( double ei, double e
 }
 
 // ------------------------------------------------------------------------- //
-void PropagationUtilityInterpolant::InitInterpolation( std::string filepath, bool raw)
-{
-    Integral prop_interaction_(IROMB, IMAXS, IPREC2);
-
-    // for(unsigned int i =0 ; i < crosssections_.size() ; i++)
-    // {
-    //     crosssections_.at(i)->EnableDEdxInterpolation( filepath,raw);
-    // }
-    //
-    // for(unsigned int i =0 ; i < crosssections_.size() ; i++)
-    // {
-    //     crosssections_.at(i)->EnableDNdxInterpolation( filepath,raw);
-    // }
-
-    bool reading_worked =   true;
-    bool storing_failed =   false;
-
-    double a = abs(-prop_interaction_.Integrate(particle_def_.low, particle_def_.low*10, boost::bind(&PropagationUtilityInterpolant::FunctionToPropIntegralInteraction, this,  _1),4));
-    double b = abs(-prop_interaction_.Integrate(BIGENERGY, BIGENERGY/10, boost::bind(&PropagationUtilityInterpolant::FunctionToPropIntegralInteraction, this,  _1),4));
-
-    if (a < b)
-    {
-        up_ = true;
-    }
-    else
-    {
-        up_ = false;
-    }
-
-    // charged anti leptons have the same cross sections like charged leptons
-    // (except of diffractive Bremsstrahlung, where one can analyse the interference term if implemented)
-    // so they use the same interpolation tables
-
-    if(!filepath.empty())
-    {
-        std::stringstream filename;
-        filename<<filepath<<"/PropagationUtility"
-                <<"_"<<particle_def_.name
-                <<"_mass_"<<particle_def_.mass
-                <<"_charge_"<<particle_def_.charge
-                <<"_lifetime_"<<particle_def_.lifetime
-                <<"_"<<medium_->GetName()
-                <<"_"<<medium_->GetMassDensity()
-                <<"_"<<cut_settings_.GetEcut()
-                <<"_"<<cut_settings_.GetVcut();
-
-        for(std::vector<CrossSection*>::iterator iter = crosssections_.begin(); iter != crosssections_.end(); ++iter)
-        {
-            // switch (crosssections_.at(i)->GetType())
-            // {
-            //     case ParticleType::Brems:
-            //         filename << "_b"
-            //             << "_" << crosssections_.at(i)->GetParametrization()
-            //             << "_" << crosssections_.at(i)->GetLpmEffectEnabled();
-            //         break;
-            //     case ParticleType::DeltaE:
-            //         filename << "_i";
-            //         break;
-            //     case ParticleType::EPair:
-            //         filename << "_e"
-            //             << "_" << crosssections_.at(i)->GetLpmEffectEnabled();
-            //         break;
-            //     case ParticleType::NuclInt:
-            //         filename << "_p"
-            //             << "_" << crosssections_.at(i)->GetParametrization();
-            //         break;
-            //     default:
-            //         log_fatal("Unknown cross section");
-            //         exit(1);
-            // }
-            // filename<< "_" << crosssections_.at(i)->GetMultiplier()
-            //         << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetEcut()
-            //         << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetVcut();
-        }
-
-        if(!raw)
-            filename<<".txt";
-
-        if( FileExist(filename.str()) )
-        {
-            log_info("PropagationUtility parametrisation tables will be read from file:\t%s",filename.str().c_str());
-            std::ifstream input;
-
-            if(raw)
-            {
-                input.open(filename.str().c_str(), std::ios::binary);
-            }
-            else
-            {
-                input.open(filename.str().c_str());
-            }
-
-            interpolant_        =   new Interpolant();
-            interpolant_diff_   =   new Interpolant();
-
-            reading_worked = interpolant_->Load(input,raw);
-            reading_worked = interpolant_diff_->Load(input,raw);
-
-
-            interpol_prop_decay_            =   new Interpolant();
-            interpol_prop_decay_diff_       =   new Interpolant();
-            interpol_prop_interaction_      =   new Interpolant();
-            interpol_prop_interaction_diff_ =   new Interpolant();
-
-            reading_worked = interpol_prop_decay_->Load(input,raw);
-            reading_worked = interpol_prop_decay_diff_->Load(input,raw);
-            reading_worked = interpol_prop_interaction_->Load(input,raw);
-            reading_worked = interpol_prop_interaction_diff_->Load(input,raw);
-
-            input.close();
-        }
-        if(!FileExist(filename.str()) || !reading_worked )
-        {
-
-            if(!reading_worked)
-            {
-                log_info("File %s is corrupted! Write it again!",filename.str().c_str());
-            }
-
-            log_info("PropagationUtility parametrisation tables will be saved to file:\t%s",filename.str().c_str());
-
-            if(abs(-prop_interaction_.Integrate(particle_def_.low, particle_def_.low*10, boost::bind(&PropagationUtilityInterpolant::FunctionToPropIntegralInteraction, this,  _1),4))
-                    < abs(-prop_interaction_.Integrate(BIGENERGY, BIGENERGY/10, boost::bind(&PropagationUtilityInterpolant::FunctionToPropIntegralInteraction, this,  _1),4)))
-            {
-                up_  =   true;
-            }
-            else
-            {
-                up_  =   false;
-            }
-
-            std::ofstream output;
-
-            if(raw)
-            {
-                output.open(filename.str().c_str(), std::ios::binary);
-            }
-            else
-            {
-                output.open(filename.str().c_str());
-            }
-
-            if(output.good())
-            {
-                output.precision(16);
-
-                double order_of_interpolation = utility_def_.order_of_interpolation;
-
-                interpolant_        =   new Interpolant(NUM3, particle_def_.low, BIGENERGY, boost::bind(&PropagationUtilityInterpolant::FunctionToBuildInterpolant, this,  _1), order_of_interpolation, false, false, true, order_of_interpolation, false, false, false);
-                interpolant_diff_   =   new Interpolant(NUM3, particle_def_.low, BIGENERGY, boost::bind(&PropagationUtilityInterpolant::FunctionToIntegral, this,  _1), order_of_interpolation, false, false, true, order_of_interpolation, false, false, false);
-
-                interpol_prop_decay_            =   new Interpolant(NUM3, particle_def_.low, BIGENERGY, boost::bind(&PropagationUtilityInterpolant::InterpolPropDecay, this,  _1), order_of_interpolation, false, false, true, order_of_interpolation, false, false, false);
-                interpol_prop_decay_diff_       =   new Interpolant(NUM3, particle_def_.low, BIGENERGY, boost::bind(&PropagationUtilityInterpolant::FunctionToPropIntegralDecay, this,  _1), order_of_interpolation, false, false, true, order_of_interpolation, false, false, false);
-                interpol_prop_interaction_      =   new Interpolant(NUM3, particle_def_.low, BIGENERGY, boost::bind(&PropagationUtilityInterpolant::InterpolPropInteraction, this,  _1), order_of_interpolation, false, false, true, order_of_interpolation, false, false, false);
-                interpol_prop_interaction_diff_ =   new Interpolant(NUM3, particle_def_.low, BIGENERGY, boost::bind(&PropagationUtilityInterpolant::FunctionToPropIntegralInteraction, this,  _1), order_of_interpolation, false, false, true, order_of_interpolation, false, false, false);
-
-                interpolant_->Save(output,raw);
-                interpolant_diff_->Save(output,raw);
-                interpol_prop_decay_->Save(output,raw);
-                interpol_prop_decay_diff_->Save(output,raw);
-                interpol_prop_interaction_->Save(output,raw);
-                interpol_prop_interaction_diff_->Save(output,raw);
-
-            }
-            else
-            {
-                storing_failed  =   true;
-                log_warn("Can not open file %s for writing! Table will not be stored!",filename.str().c_str());
-            }
-
-            output.close();
-        }
-    }
-    if(filepath.empty() || storing_failed)
-    {
-        log_info("PropagationUtility parametrisation tables will be stored in memory!");
-
-        double order_of_interpolation = utility_def_.order_of_interpolation;
-
-        interpolant_        =   new Interpolant(NUM3, particle_def_.low, BIGENERGY, boost::bind(&PropagationUtilityInterpolant::FunctionToBuildInterpolant, this,  _1), order_of_interpolation, false, false, true, order_of_interpolation, false, false, false);
-        interpolant_diff_   =   new Interpolant(NUM3, particle_def_.low, BIGENERGY, boost::bind(&PropagationUtilityInterpolant::FunctionToIntegral, this,  _1), order_of_interpolation, false, false, true, order_of_interpolation, false, false, false);
-
-
-        interpol_prop_decay_            =   new Interpolant(NUM3, particle_def_.low, BIGENERGY, boost::bind(&PropagationUtilityInterpolant::InterpolPropDecay, this,  _1), order_of_interpolation, false, false, true, order_of_interpolation, false, false, false);
-        interpol_prop_decay_diff_       =   new Interpolant(NUM3, particle_def_.low, BIGENERGY, boost::bind(&PropagationUtilityInterpolant::FunctionToPropIntegralDecay, this,  _1), order_of_interpolation, false, false, true, order_of_interpolation, false, false, false);
-        interpol_prop_interaction_      =   new Interpolant(NUM3, particle_def_.low, BIGENERGY, boost::bind(&PropagationUtilityInterpolant::InterpolPropInteraction, this,  _1), order_of_interpolation, false, false, true, order_of_interpolation, false, false, false);
-        interpol_prop_interaction_diff_ =   new Interpolant(NUM3, particle_def_.low, BIGENERGY, boost::bind(&PropagationUtilityInterpolant::FunctionToPropIntegralInteraction, this,  _1), order_of_interpolation, false, false, true, order_of_interpolation, false, false, false);
-
-    }
-
-    // if(utility_def_.do_continuous_randomization)
-    // {
-    //     randomizer_->EnableDE2dxInterpolation( crosssections_, filepath ,raw);
-    //     randomizer_->EnableDE2deInterpolation( crosssections_, filepath,raw);
-    // }
-
-    if(utility_def_.do_exact_time_calculation)
-    {
-        InitTimeInterpolation( filepath,raw);
-    }
-
-    big_low_decay_        = interpol_prop_decay_->Interpolate(particle_def_.low);
-    big_low_interatction_ = interpol_prop_interaction_->Interpolate(particle_def_.low);
-
-    initialized_interpolation_ = true;
-}
-
-// ------------------------------------------------------------------------- //
-void PropagationUtilityInterpolant::InitTimeInterpolation( std::string filepath, bool raw)
-{
-    bool reading_worked =   true;
-    bool storing_failed =   false;
-
-    // charged anti leptons have the same cross sections like charged leptons
-    // (except of diffractive Bremsstrahlung, where one can analyse the interference term if implemented)
-    // so they use the same interpolation tables
-    std::string particle_name = particle_def_.name;
-
-    if(!filepath.empty())
-    {
-        std::stringstream filename;
-        filename << filepath << "/Time"
-                 << "_" << particle_name << "_mass_" << particle_def_.mass << "_charge_" << particle_def_.charge
-                 << "_lifetime_" << particle_def_.lifetime << "_" << medium_->GetName() << "_"
-                 << medium_->GetMassDensity() << "_" << cut_settings_.GetEcut() << "_" << cut_settings_.GetVcut();
-
-        for(std::vector<CrossSection*>::iterator iter = crosssections_.begin(); iter != crosssections_.end(); ++iter)
-        {
-            // switch (crosssections_.at(i)->GetType())
-            // {
-            //     case ParticleType::Brems:
-            //         filename << "_b"
-            //             << "_" << crosssections_.at(i)->GetParametrization()
-            //             << "_" << crosssections_.at(i)->GetLpmEffectEnabled();
-            //         break;
-            //     case ParticleType::DeltaE:
-            //         filename << "_i";
-            //         break;
-            //     case ParticleType::EPair:
-            //         filename << "_e"
-            //             << "_" << crosssections_.at(i)->GetLpmEffectEnabled();
-            //         break;
-            //     case ParticleType::NuclInt:
-            //         filename << "_p"
-            //             << "_" << crosssections_.at(i)->GetParametrization();
-            //         break;
-            //     default:
-            //         log_fatal("Unknown cross section");
-            //         exit(1);
-            // }
-            // filename<< "_" << crosssections_.at(i)->GetMultiplier()
-            //         << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetEcut()
-            //         << "_" << crosssections_.at(i)->GetEnergyCutSettings()->GetVcut();
-        }
-
-        if(!raw)
-            filename<<".txt";
-
-        if( FileExist(filename.str()) )
-        {
-            log_debug("Particle time parametrisation tables will be read from file:\t%s",filename.str().c_str());
-            std::ifstream input;
-
-            if(raw)
-            {
-                input.open(filename.str().c_str(), std::ios::binary);
-            }
-            else
-            {
-                input.open(filename.str().c_str());
-            }
-
-            interpol_time_particle_         = new Interpolant();
-            interpol_time_particle_diff_    = new Interpolant();
-
-            reading_worked = interpol_time_particle_->Load(input,raw);
-            reading_worked = interpol_time_particle_diff_->Load(input,raw);
-
-            input.close();
-        }
-        if(!FileExist(filename.str()) || !reading_worked )
-        {
-            if(!reading_worked)
-            {
-                log_info("File %s is corrupted! Write it again!",filename.str().c_str());
-            }
-
-            log_info("Particle time parametrisation tables will be saved to file:\t%s",filename.str().c_str());
-
-            std::ofstream output;
-
-            if(raw)
-            {
-                output.open(filename.str().c_str(), std::ios::binary);
-            }
-            else
-            {
-                output.open(filename.str().c_str());
-            }
-
-            if(output.good())
-            {
-                output.precision(16);
-
-                double order_of_interpolation = utility_def_.order_of_interpolation;
-
-                interpol_time_particle_         =   new Interpolant(NUM3, particle_def_.low, BIGENERGY, boost::bind(&PropagationUtilityInterpolant::FunctionToIntegral, this,  _1), order_of_interpolation, false, false, true, order_of_interpolation, false, false, false);
-                interpol_time_particle_diff_    =   new Interpolant(NUM3, particle_def_.low, BIGENERGY, boost::bind(&PropagationUtilityInterpolant::FunctionToPropIntegralInteraction, this,  _1), order_of_interpolation, false, false, true, order_of_interpolation, false, false, false);
-
-                interpol_time_particle_->Save(output,raw);
-                interpol_time_particle_diff_->Save(output,raw);
-
-            }
-            else
-            {
-                storing_failed  =   true;
-                log_warn("Can not open file %s for writing! Table will not be stored!",filename.str().c_str());
-            }
-
-            output.close();
-        }
-    }
-    if(filepath.empty() || storing_failed)
-    {
-        double order_of_interpolation = utility_def_.order_of_interpolation;
-
-        interpol_time_particle_         =   new Interpolant(NUM3, particle_def_.low, BIGENERGY, boost::bind(&PropagationUtilityInterpolant::FunctionToIntegral, this,  _1), order_of_interpolation, false, false, true, order_of_interpolation, false, false, false);
-        interpol_time_particle_diff_    =   new Interpolant(NUM3, particle_def_.low, BIGENERGY, boost::bind(&PropagationUtilityInterpolant::FunctionToPropIntegralInteraction, this,  _1), order_of_interpolation, false, false, true, order_of_interpolation, false, false, false);
-
-    }
-}
-
-// ------------------------------------------------------------------------- //
 // Helper functions to init interpolation
 // ------------------------------------------------------------------------- //
 
@@ -691,3 +361,121 @@ double PropagationUtilityInterpolant::InterpolTimeParticleDiff( double energy)
 
     return integral.Integrate(energy, particle_def_.low, boost::bind(&PropagationUtilityInterpolant::FunctionToIntegral, this,  _1),4);
 }
+
+// ------------------------------------------------------------------------- //
+// Init methods
+// ------------------------------------------------------------------------- //
+
+// ------------------------------------------------------------------------- //
+void PropagationUtilityInterpolant::InitInterpolation()
+{
+    Integral integral(IROMB, IMAXS, IPREC2);
+
+    double a = abs(-integral.Integrate(particle_def_.low, particle_def_.low*10, boost::bind(&PropagationUtilityInterpolant::FunctionToPropIntegralInteraction, this,  _1),4));
+    double b = abs(-integral.Integrate(BIGENERGY, BIGENERGY/10, boost::bind(&PropagationUtilityInterpolant::FunctionToPropIntegralInteraction, this,  _1),4));
+
+    if (a < b)
+    {
+        up_ = true;
+    }
+    else
+    {
+        up_ = false;
+    }
+
+    std::vector<std::pair<Interpolant**, boost::function<double(double)> > > interpolants;
+
+    interpolants.push_back(std::make_pair(&interpolant_, boost::bind(&PropagationUtilityInterpolant::FunctionToBuildInterpolant, this, _1)));
+    interpolants.push_back(std::make_pair(&interpolant_diff_, boost::bind(&PropagationUtilityInterpolant::FunctionToIntegral, this, _1)));
+    interpolants.push_back(std::make_pair(&interpol_prop_decay_, boost::bind(&PropagationUtilityInterpolant::InterpolPropDecay, this, _1)));
+    interpolants.push_back(std::make_pair(&interpol_prop_decay_diff_, boost::bind(&PropagationUtilityInterpolant::FunctionToPropIntegralDecay, this, _1)));
+    interpolants.push_back(std::make_pair(&interpol_prop_interaction_, boost::bind(&PropagationUtilityInterpolant::InterpolPropInteraction, this, _1)));
+    interpolants.push_back(std::make_pair(&interpol_prop_interaction_diff_, boost::bind(&PropagationUtilityInterpolant::FunctionToPropIntegralInteraction, this, _1)));
+
+    unsigned int number_of_interpolants = interpolants.size();
+
+    std::vector<Interpolant1DBuilder> builder_vec(number_of_interpolants);
+
+    Helper::InterpolantBuilderContainer builder_container(number_of_interpolants);
+
+    for (unsigned int i = 0; i < number_of_interpolants; ++i)
+    {
+        builder_vec[i]
+            .SetMax(NUM3)
+            .SetXMin(particle_def_.low)
+            .SetXMax(BIGENERGY)
+            .SetRomberg(utility_def_.order_of_interpolation)
+            .SetRational(false)
+            .SetRelative(false)
+            .SetIsLog(true)
+            .SetRombergY(utility_def_.order_of_interpolation)
+            .SetRationalY(false)
+            .SetRelativeY(false)
+            .SetLogSubst(false)
+            .SetFunction1D(interpolants[i].second);
+
+        builder_container[i] = std::make_pair(&builder_vec[i], interpolants[i].first);
+    }
+
+    std::vector<Parametrization*> params(crosssections_.size(), NULL);
+    for (unsigned int i = 0; i < crosssections_.size(); ++i)
+    {
+        params[i] = &crosssections_[i]->GetParametrization();
+    }
+
+    Helper::InitializeInterpolation("utility",
+                                    builder_container,
+                                    params);
+
+    if(utility_def_.do_exact_time_calculation)
+    {
+        InitTimeInterpolation();
+    }
+
+    big_low_decay_        = interpol_prop_decay_->Interpolate(particle_def_.low);
+    big_low_interatction_ = interpol_prop_interaction_->Interpolate(particle_def_.low);
+}
+
+// ------------------------------------------------------------------------- //
+void PropagationUtilityInterpolant::InitTimeInterpolation()
+{
+    std::vector<std::pair<Interpolant**, boost::function<double(double)> > > interpolants;
+
+    interpolants.push_back(std::make_pair(&interpol_time_particle_, boost::bind(&PropagationUtilityInterpolant::FunctionToIntegral, this, _1)));
+    interpolants.push_back(std::make_pair(&interpol_time_particle_diff_, boost::bind(&PropagationUtilityInterpolant::FunctionToPropIntegralInteraction, this, _1)));
+
+    unsigned int number_of_interpolants = interpolants.size();
+
+    std::vector<Interpolant1DBuilder> builder_vec(number_of_interpolants);
+
+    Helper::InterpolantBuilderContainer builder_container(number_of_interpolants);
+
+    for (unsigned int i = 0; i < number_of_interpolants; ++i)
+    {
+        builder_vec[i].SetMax(NUM3)
+            .SetXMin(particle_def_.low)
+            .SetXMax(BIGENERGY)
+            .SetRomberg(utility_def_.order_of_interpolation)
+            .SetRational(false)
+            .SetRelative(false)
+            .SetIsLog(true)
+            .SetRombergY(utility_def_.order_of_interpolation)
+            .SetRationalY(false)
+            .SetRelativeY(false)
+            .SetLogSubst(false)
+            .SetFunction1D(interpolants[i].second);
+
+        builder_container[i] = std::make_pair(&builder_vec[i], interpolants[i].first);
+    }
+
+    std::vector<Parametrization*> params(crosssections_.size(), NULL);
+    for (unsigned int i = 0; i < crosssections_.size(); ++i)
+    {
+        params[i] = &crosssections_[i]->GetParametrization();
+    }
+
+    Helper::InitializeInterpolation("time",
+                                    builder_container,
+                                    params);
+}
+

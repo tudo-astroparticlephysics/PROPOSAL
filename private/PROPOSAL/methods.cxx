@@ -218,16 +218,12 @@ namespace Helper
 {
 
 void InitializeInterpolation(const std::string name,
-                             // const std::string pathname,
-                             // bool raw,
-                             // const ParticleDef& particle_def,
-                             // const Medium& medium,
-                             // const EnergyCutSettings& cut_settings,
                              InterpolantBuilderContainer& builder_container,
-                             // InterpolantBuilderContainer& builder_container_comp,
                              const std::vector<Parametrization*>& parametrizations)
 {
     using namespace std;
+
+    log_info("Initialize %s interpolation.", name.c_str());
 
     bool storing_failed =   false;
     bool reading_worked =   true;
@@ -249,7 +245,6 @@ void InitializeInterpolation(const std::string name,
         const EnergyCutSettings& cut_settings = parametrizations.at(0)->GetEnergyCuts();
 
         pathname = parametrizations.at(0)->GetDefinition().path_to_tables;
-        std::cout << "Pathname: " << pathname << std::endl;
         raw = parametrizations.at(0)->GetDefinition().raw;
 
         //TODO(mario): remove when enums are introduced Wed 2017/09/06
