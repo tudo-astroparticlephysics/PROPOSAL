@@ -343,11 +343,9 @@ EpairProductionRhoInterpolant::EpairProductionRhoInterpolant(const ParticleDef& 
         builder_container2d[i].second = &interpolant_[i];
     }
 
-    log_info("Initialize Epair for %s", typeid(this).name());
     Helper::InitializeInterpolation("Epair",
                                     builder_container2d,
                                     std::vector<Parametrization*>(1, this));
-    log_info("Initialize dNdx for %s done!", typeid(this).name());
 }
 
 EpairProductionRhoInterpolant::EpairProductionRhoInterpolant(const EpairProductionRhoInterpolant& epair)

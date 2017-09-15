@@ -158,9 +158,7 @@ PhotoQ2Interpolant<Param>::PhotoQ2Interpolant(const ParticleDef& particle_def,
         builder_container2d[i].second = &interpolant_[i];
     }
 
-    log_info("Initialize Photo for %s", typeid(this).name());
     Helper::InitializeInterpolation("Photo", builder_container2d, std::vector<Parametrization*>(1, this));
-    log_info("Initialize Photo for %s done!", typeid(this).name());
 }
 
 template <class Param>
