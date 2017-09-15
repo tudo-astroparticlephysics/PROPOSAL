@@ -33,19 +33,18 @@ class PropagationUtilityInterpolant : public PropagationUtility
     // Private methods
     // --------------------------------------------------------------------- //
 
-    void InitInterpolation( std::string filename, bool raw);
-    void InitTimeInterpolation( std::string filename, bool raw);
-
+    // Helper functions to init interpolation
     double FunctionToBuildInterpolant( double);
     double InterpolPropDecay( double);
     double InterpolPropInteraction( double);
     double InterpolTimeParticleDiff( double);
 
+    void InitInterpolation();
+    void InitTimeInterpolation();
+
     // --------------------------------------------------------------------- //
     // Private members
     // --------------------------------------------------------------------- //
-
-    bool initialized_interpolation_; /// Stores if Interplation tables are already created or loaded.
 
     // ----------------------------------------------------------------------------
     /// @brief indicates if the interpolated function is increasing or decreasing.
