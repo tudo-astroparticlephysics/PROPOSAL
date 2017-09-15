@@ -95,8 +95,37 @@ PropagationUtility::PropagationUtility(const PropagationUtility& collection)
 PropagationUtility::~PropagationUtility()
 {
     delete medium_;
+
+    for (unsigned int i = 0; i < crosssections_.size(); ++i)
+    {
+        delete crosssections_[i];
+    }
+
+    crosssections_.clear();
 }
 
+// ------------------------------------------------------------------------- //
+double PropagationUtility::MakeDecay(double energy)
+{
+    // TODO(mario): multiplier? Was not used before Fri 2017/08/25
+    // if(multiplier_ <= 0 || particle_.GetLifetime() < 0)
+    // {
+    //     return 0;
+    // }
+    //
+    // return multiplier_/max((particle_.GetMomentum()/particle_.GetMass())*particle_.GetLifetime()*SPEED, XRES);
+    if (particle_def_.lifetime < 0)
+    {
+        return 0;
+    }
+
+    //TODO(mario): Better way? Sat 2017/09/02
+    double square_momentum = energy * energy - particle_def_.mass * particle_def_.mass;
+    double particle_momentum = sqrt(max(square_momentum, 0.0));
+
+    // return multiplier / max((particle_momentum / particle_.GetMass()) * particle_.GetLifetime() * SPEED, XRES);
+    return 1.0 / max((particle_momentum / particle_def_.mass) * particle_def_.lifetime * SPEED, XRES);
+}
 
 // ------------------------------------------------------------------------- //
 // Integral functions
