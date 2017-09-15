@@ -4,13 +4,16 @@
 #include "PROPOSAL/Output.h"
 // #include "PROPOSAL/continous_randomization/ContinuousRandomization.h"
 #include "PROPOSAL/decay/DecayChannel.h"
+#include "PROPOSAL/crossection/CrossSection.h"
+
+#include "PROPOSAL/scattering/ScatteringDefault.h"
+
 #include "PROPOSAL/geometry/Geometry.h"
 #include "PROPOSAL/geometry/Sphere.h"
+
 #include "PROPOSAL/math/MathModel.h"
 #include "PROPOSAL/sector/Sector.h"
 #include "PROPOSAL/medium/Medium.h"
-
-#include "PROPOSAL/crossection/CrossSection.h"
 
 #include "PROPOSAL/methods.h"
 
@@ -22,25 +25,12 @@ using namespace PROPOSAL;
 ******************************************************************************/
 
 Sector::Definition::Definition()
-    : do_weighting(false)
+    : PropagationUtility::Definition()
+    , do_interpolation(true)
+    , do_weighting(false)
     , weighting_order(0)
-    , brems_multiplier(1.0)
-    , photo_multiplier(1.0)
-    , ioniz_multiplier(1.0)
-    , epair_multiplier(1.0)
-    , photo_parametrization(PhotonuclearFactory::AbramowiczLevinLevyMaor97)
-    , photo_shadow(PhotonuclearFactory::ShadowButkevichMikhailov)
-    , hardbb_enabled(true)
-    , brems_parametrization(BremsstrahlungFactory::KelnerKokoulinPetrukhin)
-    , do_scattering(false)
-    , scattering_model(ScatteringFactory::Default)
     , do_continuous_randomization(false)
-    , do_exact_time_calculation(false)
-    , lpm_effect_enabled(false)
     , location(Sector::ParticleLocation::InsideDetector)
-    , order_of_interpolation(5)
-    , raw(true)
-    , path_to_tables("")
 {
 }
 
@@ -55,84 +45,69 @@ Sector::Definition::~Definition()
 // Standard constructor
 Sector::Sector(PROPOSALParticle& particle)
     : ini_(0)
-    , collection_def_()
+    , sector_def_()
     , weighting_starts_at_(0)
       //TODO(mario): init different Fri 2017/09/01
     , particle_(particle)
     , geometry_(new Sphere(Vector3D(), 1e18, 0))
-    , medium_(new Water())
-    , cut_settings_()
     // , randomizer_(NULL)
-    , scattering_(NULL)
-    , crosssections_()
+    , utility(new PropagationUtilityInterpolant(particle.GetParticleDef(), Water(), EnergyCutSettings(), sector_def_))
+    , scattering_(new ScatteringDefault())
 {
-    // crosssections_.push_back(new Bremsstrahlung(particle_, medium_, &cut_settings_));
-    // crosssections_.push_back(new Epairproduction(particle_, medium_, &cut_settings_));
-    // crosssections_.push_back(new Photonuclear(particle_, medium_, &cut_settings_));
-    // crosssections_.push_back(new Ionization(particle_, medium_, &cut_settings_));
-
-    //TODO(mario): Polymorphic initilaization in collections childs  Sun 2017/08/27
-    // if (collection_def_.do_continuous_randomization)
-    // {
-    //     randomizer_ = new ContinuousRandomization(particle_);
-    // }
-
-    if (collection_def_.do_scattering)
-    {
-        scattering_ = ScatteringFactory::Get().CreateScattering(collection_def_.scattering_model);
-    }
 }
 
 Sector::Sector(PROPOSALParticle& particle, const Medium& medium,
                        const Geometry& geometry,
                        const EnergyCutSettings& cut_settings,
+                       const Scattering& scattering,
                        const Definition& def)
     : ini_(0)
-    , collection_def_(def)
+    , sector_def_(def)
     , weighting_starts_at_(0)
     , particle_(particle)
     , geometry_(geometry.clone())
-    , medium_(medium.clone())
-    , cut_settings_(cut_settings)
     // , randomizer_(NULL)
-    , scattering_(NULL)
-    , crosssections_()
+    , utility(NULL)
+    , scattering_(scattering.clone())
 {
+    if (def.do_interpolation)
+    {
+        utility = new PropagationUtilityInterpolant(particle_.GetParticleDef(), medium, cut_settings, def);
+    }
+    else
+    {
+        utility = new PropagationUtilityIntegral(particle_.GetParticleDef(), medium, cut_settings, def);
+    }
+
     //TODO(mario): Polymorphic initilaization in collections childs  Sun 2017/08/27
-    // if (collection_def_.do_continuous_randomization)
+    // if (sector_def_.do_continuous_randomization)
     // {
     //     randomizer_ = new ContinuousRandomization(particle);
     // }
 
-    if (collection_def_.do_scattering)
-    {
-        scattering_ = ScatteringFactory::Get().CreateScattering(collection_def_.scattering_model);
-    }
+    // if (sector_def_.do_scattering)
+    // {
+    //     scattering_ = ScatteringFactory::Get().CreateScattering(sector_def_.scattering_model);
+    // }
 }
 
 Sector::Sector(const Sector& collection)
     :ini_(collection.ini_)
-    ,collection_def_(collection.collection_def_)
+    ,sector_def_(collection.sector_def_)
     ,weighting_starts_at_(collection.weighting_starts_at_)
     ,particle_(collection.particle_)
     ,geometry_(collection.geometry_->clone())
-    ,medium_(collection.medium_->clone())
-    ,cut_settings_(collection.cut_settings_)
     // ,randomizer_(collection.randomizer_) //TODO(mario): ranomizer clone Sat 2017/08/26
-    ,scattering_(collection.scattering_) //TODO(mario): scatter clone Sat 2017/08/26
+    ,utility(collection.utility->clone())
+    ,scattering_(collection.scattering_->clone())
 {
-    crosssections_.resize(collection.crosssections_.size());
-
-    for (unsigned int i = 0; i < crosssections_.size(); ++i)
-    {
-        crosssections_[i] = collection.crosssections_[i]->clone();
-    }
 }
 
 Sector::~Sector()
 {
-    delete medium_;
     delete geometry_;
+    delete utility;
+    delete scattering_;
 
     // if (randomizer_)
     // {
@@ -195,10 +170,11 @@ double Sector::Propagate(double distance)
         }
 
         // Calculate the displacement according to initial energy initial_energy and final_energy
-        displacement =
-            CalculateDisplacement(
-                 initial_energy, final_energy, medium_->GetDensityCorrection() * (distance - propagated_distance)) /
-            medium_->GetDensityCorrection();
+        displacement = utility->CalculateDisplacement(initial_energy,
+                                                      final_energy,
+                                                      utility->GetMedium().GetDensityCorrection() *
+                                                          (distance - propagated_distance)) /
+                       utility->GetMedium().GetDensityCorrection();
 
         // The first interaction or decay happens behind the distance we want to propagate
         // So we calculate the final energy using only continuous losses
@@ -206,7 +182,7 @@ double Sector::Propagate(double distance)
         {
             displacement = distance - propagated_distance;
 
-            final_energy = CalculateFinalEnergy( initial_energy, medium_->GetDensityCorrection() * displacement);
+            final_energy = utility->CalculateFinalEnergy( initial_energy, utility->GetMedium().GetDensityCorrection() * displacement);
         }
         // Advance the Particle according to the displacement
         // Initial energy and final energy are needed if Molier Scattering is enabled
@@ -221,7 +197,7 @@ double Sector::Propagate(double distance)
 
         //TODO(mario): Revert randomizer Fri 2017/08/25
         // Randomize the continuous energy loss if this option is enabled
-        // if (collection_def_.do_continuous_randomization)
+        // if (sector_def_.do_continuous_randomization)
         // {
         //     if (final_energy != particle_.GetLow())
         //     {
@@ -361,10 +337,10 @@ std::pair<double, double> Sector::CalculateEnergyTillStochastic(
         rnddMin = 0;
     } else
     {
-        rnddMin = CalculateTrackingIntegal( initial_energy, rndd, false) / medium_->GetDensityCorrection();
+        rnddMin = utility->CalculateTrackingIntegal( initial_energy, rndd, false) / utility->GetMedium().GetDensityCorrection();
     }
 
-    rndiMin = CalculateTrackingIntegal( initial_energy, rndi, true);
+    rndiMin = utility->CalculateTrackingIntegal( initial_energy, rndi, true);
 
     // evaluating the energy loss
     if (rndd >= rnddMin || rnddMin <= 0)
@@ -372,7 +348,7 @@ std::pair<double, double> Sector::CalculateEnergyTillStochastic(
         final.second = particle_.GetLow();
     } else
     {
-        final.second = CalculateFinalEnergy( initial_energy, rndd * medium_->GetDensityCorrection(), false);
+        final.second = utility->CalculateFinalEnergy( initial_energy, rndd * utility->GetMedium().GetDensityCorrection(), false);
     }
 
     if (rndi >= rndiMin || rndiMin <= 0)
@@ -380,7 +356,7 @@ std::pair<double, double> Sector::CalculateEnergyTillStochastic(
         final.first = particle_.GetLow();
     } else
     {
-        final.first = CalculateFinalEnergy( initial_energy, rndi, true);
+        final.first = utility->CalculateFinalEnergy( initial_energy, rndi, true);
     }
 
     return final;
@@ -395,19 +371,16 @@ void Sector::AdvanceParticle(double dr, double ei, double ef)
 
     dist += dr;
 
-    if (collection_def_.do_exact_time_calculation)
+    if (sector_def_.do_exact_time_calculation)
     {
-        time += CalculateParticleTime( ei, ef) / medium_->GetDensityCorrection();
+        time += utility->CalculateParticleTime( ei, ef) / utility->GetMedium().GetDensityCorrection();
     } else
     {
         time += dr / SPEED;
     }
 
     // TODO(mario): Adjucst the whole scatteing class Thu 2017/08/24
-    if (collection_def_.do_scattering)
-    {
-        scattering_->Scatter(particle_, crosssections_, dr, ei, ef);
-    }
+    scattering_->Scatter(particle_, utility->GetCrosssections(), dr, ei, ef);
 
     // if(scattering_model_!=-1)
     // {
@@ -449,6 +422,8 @@ pair<double, DynamicData::Type> Sector::MakeStochasticLoss()
     double total_rate_weighted = 0;
     double rates_sum           = 0;
 
+    std::vector<CrossSection*> cross_sections = utility->GetCrosssections();
+
     // return 0 and unknown, if there is no interaction
     pair<double, DynamicData::Type> energy_loss;
     energy_loss.first  = 0.;
@@ -456,16 +431,16 @@ pair<double, DynamicData::Type> Sector::MakeStochasticLoss()
 
     std::vector<double> rates;
 
-    rates.resize(crosssections_.size());
+    rates.resize(cross_sections.size());
 
-    if (collection_def_.do_weighting)
+    if (sector_def_.do_weighting)
     {
         if (particle_.GetPropagatedDistance() > weighting_starts_at_)
         {
-            double exp   = abs(collection_def_.weighting_order);
+            double exp   = abs(sector_def_.weighting_order);
             double power = pow(rnd2, exp);
 
-            if (collection_def_.weighting_order > 0)
+            if (sector_def_.weighting_order > 0)
             {
                 rnd2 = 1 - power * rnd2;
             } else
@@ -473,15 +448,15 @@ pair<double, DynamicData::Type> Sector::MakeStochasticLoss()
                 rnd2 = power * rnd2;
             }
 
-            collection_def_.weighting_order     = (1 + exp) * power;
+            sector_def_.weighting_order     = (1 + exp) * power;
             weighting_starts_at_ = particle_.GetPropagatedDistance();
-            collection_def_.do_weighting        = false;
+            sector_def_.do_weighting        = false;
         }
     }
     // if (particle_->GetEnergy() < 650) printf("energy: %f\n", particle_->GetEnergy());
-    for (unsigned int i = 0; i < crosssections_.size(); i++)
+    for (unsigned int i = 0; i < cross_sections.size(); i++)
     {
-        rates[i] = crosssections_[i]->CalculatedNdx(particle_.GetEnergy(), rnd2);
+        rates[i] = cross_sections[i]->CalculatedNdx(particle_.GetEnergy(), rnd2);
         total_rate += rates[i];
         // if (rates.at(i) == 0) printf("%i = 0, energy: %f\n", i, particle_->GetEnergy());
         // log_debug("Rate for %s = %f", crosssections_.at(i)->GetName().c_str(), rates.at(i));
@@ -497,35 +472,13 @@ pair<double, DynamicData::Type> Sector::MakeStochasticLoss()
 
         if (rates_sum > total_rate_weighted)
         {
-            energy_loss.first  = crosssections_.at(i)->CalculateStochasticLoss(particle_.GetEnergy(), rnd2, rnd3);
-            energy_loss.second = crosssections_.at(i)->GetTypeId();
+            energy_loss.first  = cross_sections[i]->CalculateStochasticLoss(particle_.GetEnergy(), rnd2, rnd3);
+            energy_loss.second = cross_sections[i]->GetTypeId();
             break;
         }
     }
 
     return energy_loss;
-}
-
-double Sector::MakeDecay(double energy)
-{
-    // TODO(mario): multiplier? Was not used before Fri 2017/08/25
-    // if(multiplier_ <= 0 || particle_.GetLifetime() < 0)
-    // {
-    //     return 0;
-    // }
-    //
-    // return multiplier_/max((particle_.GetMomentum()/particle_.GetMass())*particle_.GetLifetime()*SPEED, XRES);
-    if (particle_.GetLifetime() < 0)
-    {
-        return 0;
-    }
-
-    //TODO(mario): Better way? Sat 2017/09/02
-    double square_momentum = energy * energy - particle_.GetMass() * particle_.GetMass();
-    double particle_momentum = sqrt(max(square_momentum, 0.0));
-
-    // return multiplier / max((particle_momentum / particle_.GetMass()) * particle_.GetLifetime() * SPEED, XRES);
-    return 1.0 / max((particle_momentum / particle_.GetMass()) * particle_.GetLifetime() * SPEED, XRES);
 }
 
 //----------------------------------------------------------------------------//
@@ -588,25 +541,6 @@ double Sector::MakeDecay(double energy)
 // ------------------------------------------------------------------------- //
 
 
-//TODO(mario): lpm enable Wed 2017/09/06
-void Sector::EnableLpmEffect()
-{
-    // collection_def_.lpm_effect_enabled = true;
-    // for(std::vector<CrossSection*>::iterator iter = crosssections_.begin(); iter != crosssections_.end(); ++iter)
-    // {
-    //     (*iter)->EnableLpmEffect(collection_def_.lpm_effect_enabled);
-    // }
-}
-
-void Sector::DisableLpmEffect()
-{
-    // collection_def_.lpm_effect_enabled = false;
-    // for(std::vector<CrossSections*>::iterator iter = crosssections_.begin(); iter != crosssections_.end(); ++iter)
-    // {
-    //     (*iter)->EnableLpmEffect(collection_def_.lpm_effect_enabled);
-    // }
-}
-
 // void Sector::EnableContinuousRandomization()
 // {
 //     randomizer_                  = new ContinuousRandomization(particle_, medium_, crosssections_);
@@ -619,87 +553,3 @@ void Sector::DisableLpmEffect()
 //     randomizer_                  = NULL;
 //     do_continuous_randomization_ = false;
 // }
-
-void Sector::EnableExactTimeCalculation()
-{
-    collection_def_.do_exact_time_calculation   =   true;
-}
-
-void Sector::DisableExactTimeCalculation()
-{
-    collection_def_.do_exact_time_calculation   =   false;
-}
-
-// ------------------------------------------------------------------------- //
-// Integral functions
-// ------------------------------------------------------------------------- //
-
-double Sector::FunctionToTimeIntegral(double energy)
-{
-    double aux;
-
-    aux = FunctionToIntegral( energy);
-    aux *= particle_.GetEnergy() / (particle_.GetMomentum() * SPEED);
-    return aux;
-}
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-double Sector::FunctionToPropIntegralDecay( double energy)
-{
-    double aux;
-    double decay;
-
-    aux = FunctionToIntegral(energy);
-
-    decay = MakeDecay(energy);
-
-    log_debug(" + %f", particle_.GetEnergy());
-
-    return aux * decay;
-}
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-double Sector::FunctionToPropIntegralInteraction( double energy)
-{
-    double aux;
-    double rate       = 0.0;
-    double total_rate = 0.0;
-
-    aux = FunctionToIntegral( energy);
-
-    for(std::vector<CrossSection*>::iterator iter = crosssections_.begin(); iter != crosssections_.end(); ++iter)
-    {
-        rate = (*iter)->CalculatedNdx(energy);
-
-        //TODO(mario): name Wed 2017/09/06
-        // log_debug("Rate for %s = %f", crosssections_.at(i)->GetName().c_str(), rate);
-
-        total_rate += rate;
-    }
-    return aux * total_rate;
-}
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-double Sector::FunctionToIntegral( double energy)
-{
-    double result;
-    double aux;
-
-    result = 0.0;
-
-    for(std::vector<CrossSection*>::iterator iter = crosssections_.begin(); iter != crosssections_.end(); ++iter)
-    {
-        aux = (*iter)->CalculatedEdx(energy);
-        result += aux;
-
-        log_debug("energy %f , dE/dx = %f", particle_.GetEnergy(), aux);
-    }
-
-    return -1 / result;
-}

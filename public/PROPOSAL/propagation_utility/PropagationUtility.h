@@ -174,10 +174,10 @@ class PropagationUtility
 
     double GetIni() const { return ini_; }
 
-    Medium* GetMedium() const { return medium_; }
+    const Medium& GetMedium() const { return *medium_; }
     const ParticleDef& GetParticleDef() const { return particle_def_; }
     const EnergyCutSettings& GetCutSettings() const { return cut_settings_; }
-    std::vector<CrossSection*> GetCrosssections() const { return crosssections_; }
+    const std::vector<CrossSection*>& GetCrosssections() const { return crosssections_; }
 
     protected:
     PropagationUtility& operator=(const PropagationUtility&); // Undefined & not allowed

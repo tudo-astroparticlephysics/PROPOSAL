@@ -16,8 +16,6 @@
 #include "PROPOSAL/Propagator.h"
 
 #include "PROPOSAL/sector/Sector.h"
-#include "PROPOSAL/sector/SectorIntegral.h"
-#include "PROPOSAL/sector/SectorInterpolant.h"
 
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/medium/MediumFactory.h"
@@ -63,8 +61,7 @@ Propagator::Propagator()
     Sector::Definition sector_def;
     sector_def.location = Sector::ParticleLocation::InsideDetector;
 
-    current_collection_ = new SectorInterpolant(
-        particle_, Ice(), *detector_, EnergyCutSettings(global_ecut_inside_, global_vcut_inside_), sector_def);
+    current_collection_ = new Sector(particle_);
 
     collections_.push_back(current_collection_);
 }
@@ -87,7 +84,7 @@ Propagator::Propagator(const std::vector<Sector*>& sectors, const Geometry& geom
         }
         else
         {
-            collections_.push_back((*iter)->clone());
+            collections_.push_back(new Sector(**iter));
         }
     }
 
@@ -394,7 +391,7 @@ void Propagator::ChooseCurrentCollection(Vector3D& particle_position, Vector3D& 
     vector<int> crossed_collections;
     crossed_collections.resize(0);
 
-    for(int i = 0; i < collections_.size(); i++)
+    for(unsigned int i = 0; i < collections_.size(); i++)
     {
         // collections_[i]->RestoreBackup_particle();
 

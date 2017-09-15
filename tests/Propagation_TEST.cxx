@@ -68,7 +68,6 @@ TEST(Propagation , Test_nan) {
     sec_def.do_interpolation = true;
     sec_def.do_continuous_randomization = true;
     sec_def.do_exact_time_calculation = true;
-    sec_def.do_scattering = true;
     sec_def.lpm_effect_enabled = false;
 
     sec_def.scattering_model = ScatteringFactory::MoliereFirstOrder;

@@ -6,8 +6,6 @@
 #include <string>
 
 #include "PROPOSAL/sector/Sector.h"
-#include "PROPOSAL/sector/SectorIntegral.h"
-#include "PROPOSAL/sector/SectorInterpolant.h"
 #include "PROPOSAL/medium/MediumFactory.h"
 #include "PROPOSAL/geometry/GeometryFactory.h"
 
@@ -23,6 +21,7 @@ class SectorFactory
         double e_cut;
         double v_cut;
         bool do_interpolation;
+        ScatteringFactory::Enum scattering_model; //!< if true moliere scattering is enabled
         MediumFactory::Enum medium;
         double density_correction;
         GeometryFactory::Enum geometry;
