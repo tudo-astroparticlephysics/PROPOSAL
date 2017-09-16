@@ -24,18 +24,14 @@ using namespace PROPOSAL;
 //----------------------------------------------------------------------------//
 
 
-Scattering::RandomAngles ScatteringMoliere::CalculateRandomAngle(const PROPOSALParticle& particle, const std::vector<CrossSection*>& cross_sections, double dr, double ei, double ef)
+Scattering::RandomAngles ScatteringMoliere::CalculateRandomAngle(const PROPOSALParticle& particle, const Medium& medium, double dr, double disp)
 {
-    (void)ei;
-    (void)ef;
-
+    (void) disp;
 
     double A = 0.;
 
     std::vector<double> ki;     // number of atoms in molecule of different components
     std::vector<double> Ai;     // atomic number of different components
-
-    const Medium& medium = cross_sections.at(0)->GetParametrization().GetMedium();
 
     double momentum = particle.GetMomentum();  // momentum in MeV/c
     double mass = particle.GetMass();          // mass in MeV/c²
@@ -128,24 +124,6 @@ Scattering::RandomAngles ScatteringMoliere::CalculateRandomAngle(const PROPOSALP
     random_angles.ty = rnd2;
 
     return random_angles;
-}
-
-
-
-void ScatteringMoliere::EnableInterpolation(const PROPOSALParticle& particle,
-                                            const std::vector<CrossSection*>& cross_sections,
-                                            std::string filepath)
-{
-    (void)particle;
-    (void)cross_sections;
-    (void)filepath;
-
-    log_warn("No interpolation implemented for ScatteringMoliere");
-}
-
-void ScatteringMoliere::DisableInterpolation()
-{
-    log_warn("No interpolation implemented for ScatteringMoliere");
 }
 
 //----------------------------------------------------------------------------//

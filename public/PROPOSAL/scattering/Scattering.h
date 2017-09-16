@@ -14,7 +14,7 @@
 namespace PROPOSAL {
 
 class PROPOSALParticle;
-class CrossSection;
+class Medium;
 
 class Scattering
 {
@@ -24,10 +24,7 @@ class Scattering
 
     virtual Scattering* clone() const = 0; // virtual constructor idiom (used for deep copies)
 
-    void Scatter(PROPOSALParticle&, const std::vector<CrossSection*>&, double dr, double ei, double ef);
-
-    virtual void EnableInterpolation(const PROPOSALParticle&, const std::vector<CrossSection*>&, std::string path = "") = 0;
-    virtual void DisableInterpolation() = 0;
+    void Scatter(PROPOSALParticle&, const Medium&, double dr, double disp);
 
     protected:
     struct RandomAngles
@@ -35,7 +32,7 @@ class Scattering
         double sx, sy, tx, ty;
     };
 
-    virtual RandomAngles CalculateRandomAngle(const PROPOSALParticle&, const std::vector<CrossSection*>&, double dr, double ei, double ef) = 0;
+    virtual RandomAngles CalculateRandomAngle(const PROPOSALParticle&, const Medium&, double dr, double disp) = 0;
 };
 
 }

@@ -32,11 +32,11 @@ Scattering::~Scattering()
 {
 }
 
-void Scattering::Scatter(PROPOSALParticle& particle, const std::vector<CrossSection*>& cross_sections, double dr, double ei, double ef)
+void Scattering::Scatter(PROPOSALParticle& particle, const Medium& medium, double dr, double disp)
 {
     double sz,tz;
 
-    RandomAngles random_angles = CalculateRandomAngle(particle, cross_sections, dr, ei, ef);
+    RandomAngles random_angles = CalculateRandomAngle(particle, medium, dr, disp);
 
     sz = sqrt(std::max(1.-(random_angles.sx*random_angles.sx+random_angles.sy*random_angles.sy), 0.));
     tz = sqrt(std::max(1.-(random_angles.tx*random_angles.tx+random_angles.ty*random_angles.ty), 0.));
