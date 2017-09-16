@@ -197,6 +197,16 @@ double PropagationUtility::FunctionToPropIntegralInteraction( double energy)
 }
 
 // ------------------------------------------------------------------------- //
+double PropagationUtility::FunctionToTimeIntegral(double energy)
+{
+    //TODO(mario): Better way? Sat 2017/09/02
+    double square_momentum = energy * energy - particle_def_.mass * particle_def_.mass;
+    double particle_momentum = sqrt(max(square_momentum, 0.0));
+
+    return energy * SPEED / particle_momentum * FunctionToIntegral(energy);
+}
+
+// ------------------------------------------------------------------------- //
 double PropagationUtility::FunctionToDE2deIntegral(double energy)
 {
     double sum = 0.0;

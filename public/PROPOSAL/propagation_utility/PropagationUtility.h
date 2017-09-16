@@ -187,6 +187,13 @@ class PropagationUtility
     virtual double FunctionToPropIntegralInteraction(double energy);
 
 
+    /*!
+    * function for time delta calculation - interface to Integral
+    *
+    */
+    virtual double FunctionToTimeIntegral(double energy);
+
+
     /**
      * function for continous randomization calculation - interface to Integral
      *
