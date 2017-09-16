@@ -33,6 +33,8 @@ PropagationUtilityInterpolant::PropagationUtilityInterpolant(const ParticleDef& 
     , interpol_prop_decay_diff_(NULL)
     , interpol_prop_interaction_(NULL)
     , interpol_prop_interaction_diff_(NULL)
+    , dE2de_interpolant_(NULL)
+    , dE2de_interpolant_diff_(NULL)
 {
     InitInterpolation();
 }
@@ -54,6 +56,8 @@ PropagationUtilityInterpolant::PropagationUtilityInterpolant(const ParticleDef& 
     , interpol_prop_decay_diff_(NULL)
     , interpol_prop_interaction_(NULL)
     , interpol_prop_interaction_diff_(NULL)
+    , dE2de_interpolant_(NULL)
+    , dE2de_interpolant_diff_(NULL)
 {
     Parametrization::Definition param_def;
 
@@ -101,13 +105,27 @@ PropagationUtilityInterpolant::~PropagationUtilityInterpolant()
     delete interpol_prop_decay_diff_;
     delete interpol_prop_interaction_;
     delete interpol_prop_interaction_diff_;
+    delete dE2de_interpolant_;
+    delete dE2de_interpolant_diff_;
 }
 
 PropagationUtilityInterpolant::PropagationUtilityInterpolant(const PropagationUtilityInterpolant& collection)
-    :PropagationUtility(collection)
-     ,up_(collection.up_)
-     ,big_low_interatction_(collection.big_low_interatction_)
-     ,big_low_decay_(collection.big_low_decay_)
+    : PropagationUtility(collection)
+    , up_(collection.up_)
+    , big_low_interatction_(collection.big_low_interatction_)
+    , big_low_decay_(collection.big_low_decay_)
+    , store_dif_interaction_(collection.store_dif_interaction_)
+    , store_dif_decay_(collection.store_dif_decay_)
+    , interpolant_(NULL)
+    , interpolant_diff_(NULL)
+    , interpol_time_particle_(NULL)
+    , interpol_time_particle_diff_(NULL)
+    , interpol_prop_decay_(NULL)
+    , interpol_prop_decay_diff_(NULL)
+    , interpol_prop_interaction_(NULL)
+    , interpol_prop_interaction_diff_(NULL)
+    , dE2de_interpolant_(NULL)
+    , dE2de_interpolant_diff_(NULL)
 {
     if (collection.interpolant_ != NULL)
         interpolant_ = new Interpolant(*collection.interpolant_);
@@ -125,6 +143,10 @@ PropagationUtilityInterpolant::PropagationUtilityInterpolant(const PropagationUt
         interpol_prop_interaction_ = new Interpolant(*collection.interpol_prop_interaction_);
     if (collection.interpol_prop_interaction_diff_ != NULL)
         interpol_prop_interaction_diff_ = new Interpolant(*collection.interpol_prop_interaction_diff_);
+    if (collection.dE2de_interpolant_ != NULL)
+        dE2de_interpolant_ = new Interpolant(*collection.dE2de_interpolant_);
+    if (collection.dE2de_interpolant_diff_ != NULL)
+        dE2de_interpolant_diff_ = new Interpolant(*collection.dE2de_interpolant_diff_);
 }
 
 // ------------------------------------------------------------------------- //
@@ -319,6 +341,26 @@ double PropagationUtilityInterpolant::CalculateParticleTime( double ei, double e
 }
 
 // ------------------------------------------------------------------------- //
+double PropagationUtilityInterpolant::CalculateDE2de(double ei, double ef)
+{
+    if (abs(ei - ef) > abs(ei) * HALF_PRECISION)
+    {
+        double aux  = dE2de_interpolant_->Interpolate(ei);
+        double aux2 = aux - dE2de_interpolant_->Interpolate(ef);
+
+        if (abs(aux2) > abs(aux) * HALF_PRECISION)
+        {
+            return max(aux2, 0.0);
+        }
+    }
+
+    else
+    {
+        return max(dE2de_interpolant_diff_->Interpolate((ei + ef) / 2) * (ef - ei), 0.0);
+    }
+}
+
+// ------------------------------------------------------------------------- //
 // Helper functions to init interpolation
 // ------------------------------------------------------------------------- //
 
@@ -360,6 +402,12 @@ double PropagationUtilityInterpolant::InterpolTimeParticleDiff( double energy)
     Integral integral(IROMB, IMAXS, IPREC2);
 
     return integral.Integrate(energy, particle_def_.low, boost::bind(&PropagationUtilityInterpolant::FunctionToIntegral, this,  _1),4);
+}
+
+// ------------------------------------------------------------------------- //
+double PropagationUtilityInterpolant::FunctionToBuildDE2deInterpolant(double energy, Integral& integral)
+{
+    return integral.Integrate(energy, particle_def_.low, boost::bind(&PropagationUtilityInterpolant::FunctionToDE2deIntegral, this, _1) , 4);
 }
 
 // ------------------------------------------------------------------------- //
@@ -432,6 +480,11 @@ void PropagationUtilityInterpolant::InitInterpolation()
         InitTimeInterpolation();
     }
 
+    if(utility_def_.do_continuous_randomization)
+    {
+        InitRandomizeInterpolation();
+    }
+
     big_low_decay_        = interpol_prop_decay_->Interpolate(particle_def_.low);
     big_low_interatction_ = interpol_prop_interaction_->Interpolate(particle_def_.low);
 }
@@ -479,3 +532,51 @@ void PropagationUtilityInterpolant::InitTimeInterpolation()
                                     params);
 }
 
+// ------------------------------------------------------------------------- //
+void PropagationUtilityInterpolant::InitRandomizeInterpolation()
+{
+    std::vector<std::pair<Interpolant**, boost::function<double(double)> > > interpolants;
+
+    Integral integral(IROMB, IMAXS, IPREC2);
+
+    interpolants.push_back(
+        std::make_pair(&dE2de_interpolant_, boost::bind(&PropagationUtilityInterpolant::FunctionToBuildDE2deInterpolant, this, _1, boost::ref(integral))));
+
+    interpolants.push_back(std::make_pair(
+        &dE2de_interpolant_diff_,
+        boost::bind(&PropagationUtilityInterpolant::FunctionToDE2deIntegral, this, _1)));
+
+    unsigned int number_of_interpolants = interpolants.size();
+
+    std::vector<Interpolant1DBuilder> builder_vec(number_of_interpolants);
+    Helper::InterpolantBuilderContainer builder_container(number_of_interpolants);
+
+
+    for (unsigned int i = 0; i < number_of_interpolants; ++i)
+    {
+        builder_vec[i].SetMax(NUM2)
+            .SetXMin(particle_def_.low)
+            .SetXMax(BIGENERGY)
+            .SetRomberg(utility_def_.order_of_interpolation)
+            .SetRational(false)
+            .SetRelative(false)
+            .SetIsLog(true)
+            .SetRombergY(utility_def_.order_of_interpolation)
+            .SetRationalY(false)
+            .SetRelativeY(false)
+            .SetLogSubst(false)
+            .SetFunction1D(interpolants[i].second);
+
+        builder_container[i] = std::make_pair(&builder_vec[i], interpolants[i].first);
+    }
+
+    std::vector<Parametrization*> params(crosssections_.size(), NULL);
+    for (unsigned int i = 0; i < crosssections_.size(); ++i)
+    {
+        params[i] = &crosssections_[i]->GetParametrization();
+    }
+
+    Helper::InitializeInterpolation("cont",
+                                    builder_container,
+                                    params);
+}

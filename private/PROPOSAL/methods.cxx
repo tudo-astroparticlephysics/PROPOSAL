@@ -300,7 +300,6 @@ void InitializeInterpolation(const std::string name,
                 // clang-format off
                 std::string param_name = std::string(typeid(*it).name()).substr(0, 1);
                 filename << "_" << param_name
-                         << "_" << typeid(*it).name()
                          << "_lpm_" << (*it)->GetDefinition().lpm_effect_enabled
                          << "_multiplier_" << (*it)->GetDefinition().multiplier;
                 // clang-format on

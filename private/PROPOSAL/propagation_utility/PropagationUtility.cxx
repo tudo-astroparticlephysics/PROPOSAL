@@ -15,7 +15,7 @@ using namespace std;
 using namespace PROPOSAL;
 
 /******************************************************************************
-*                                 Sector                                 *
+*                            Propagation utility                              *
 ******************************************************************************/
 
 PropagationUtility::Definition::Definition()
@@ -28,6 +28,8 @@ PropagationUtility::Definition::Definition()
     , hardbb_enabled(true)
     , brems_parametrization(BremsstrahlungFactory::KelnerKokoulinPetrukhin)
     , lpm_effect_enabled(false)
+    , do_exact_time_calculation(false)
+    , do_continuous_randomization(false)
     , order_of_interpolation(5)
     , raw(true)
     , path_to_tables("")
@@ -52,17 +54,6 @@ PropagationUtility::PropagationUtility(const ParticleDef& particle_def)
     , cut_settings_()
     , crosssections_()
 {
-    // crosssections_.push_back(new Bremsstrahlung(particle_, medium_, &cut_settings_));
-    // crosssections_.push_back(new Epairproduction(particle_, medium_, &cut_settings_));
-    // crosssections_.push_back(new Photonuclear(particle_, medium_, &cut_settings_));
-    // crosssections_.push_back(new Ionization(particle_, medium_, &cut_settings_));
-
-    //TODO(mario): Polymorphic initilaization in collections childs  Sun 2017/08/27
-    // if (utility_def_.do_continuous_randomization)
-    // {
-    //     randomizer_ = new ContinuousRandomization(particle_);
-    // }
-
 }
 
 PropagationUtility::PropagationUtility(const ParticleDef& particle_def, const Medium& medium,
@@ -96,13 +87,17 @@ PropagationUtility::~PropagationUtility()
 {
     delete medium_;
 
-    for (unsigned int i = 0; i < crosssections_.size(); ++i)
+    for(std::vector<CrossSection*>::const_iterator iter = crosssections_.begin(); iter != crosssections_.end(); ++iter)
     {
-        delete crosssections_[i];
+        delete *iter;
     }
 
     crosssections_.clear();
 }
+
+// ------------------------------------------------------------------------- //
+// Public already defined member functions
+// ------------------------------------------------------------------------- //
 
 // ------------------------------------------------------------------------- //
 double PropagationUtility::MakeDecay(double energy)
@@ -125,6 +120,36 @@ double PropagationUtility::MakeDecay(double energy)
 
     // return multiplier / max((particle_momentum / particle_.GetMass()) * particle_.GetLifetime() * SPEED, XRES);
     return 1.0 / max((particle_momentum / particle_def_.mass) * particle_def_.lifetime * SPEED, XRES);
+}
+
+double PropagationUtility::Randomize(double initial_energy, double final_energy, double rnd)
+{
+    double sigma, xhi, xlo, rndtmp;
+
+    // this happens if small distances are propagated and the
+    // energy loss is so small that it is smaller than the precision
+    // which is checked for in during the calculation.
+    if (initial_energy == final_energy)
+    {
+        return final_energy;
+    }
+
+    sigma = sqrt(CalculateDE2de(initial_energy, final_energy));
+
+    // It is not drawn from the real gaus distribution but rather from the
+    // area which is possible due to the limits of the initial energy and the
+    // particle mass. Another possibility would be to draw again but that would be
+    // more expensive.
+    //
+    // calculate the allowed region
+    xhi = 0.5 + boost::math::erf((initial_energy - final_energy) / (SQRT2 * sigma)) / 2;
+    xlo = 0.5 + boost::math::erf((particle_def_.low - final_energy) / (SQRT2 * sigma)) / 2;
+
+    // draw random number from the allowed region.
+    rndtmp = xlo + (xhi - xlo) * rnd;
+
+    // Calculate and return the needed value.
+    return SQRT2 * sigma * erfInv(2 * (rndtmp - 0.5)) + final_energy;
 }
 
 // ------------------------------------------------------------------------- //
@@ -169,4 +194,17 @@ double PropagationUtility::FunctionToPropIntegralInteraction( double energy)
     }
 
     return FunctionToIntegral(energy) * total_rate;
+}
+
+// ------------------------------------------------------------------------- //
+double PropagationUtility::FunctionToDE2deIntegral(double energy)
+{
+    double sum = 0.0;
+
+    for(std::vector<CrossSection*>::iterator iter = crosssections_.begin(); iter != crosssections_.end(); ++iter)
+    {
+        sum += (*iter)->CalculatedE2dx(energy);
+    }
+
+    return FunctionToIntegral(energy) * sum;
 }

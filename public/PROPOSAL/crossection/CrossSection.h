@@ -25,6 +25,7 @@ class CrossSection
     // ----------------------------------------------------------------- //
 
     virtual double CalculatedEdx(double energy) = 0;
+    virtual double CalculatedE2dx(double energy) = 0;
     virtual double CalculatedNdx(double energy) = 0;
     virtual double CalculatedNdx(double energy, double rnd) = 0;
     virtual double CalculateStochasticLoss(double energy, double rnd1, double rnd2) = 0;

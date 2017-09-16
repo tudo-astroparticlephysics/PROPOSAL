@@ -46,8 +46,9 @@ class Parametrization
 
         virtual double DifferentialCrossSection(double energy, double v) = 0;
 
-        virtual double FunctionToDEdxIntegral(double energy, double v) = 0;
-        virtual double FunctionToDNdxIntegral(double energy, double v) = 0;
+        virtual double FunctionToDEdxIntegral(double energy, double v);
+        virtual double FunctionToDE2dxIntegral(double energy, double v);
+        virtual double FunctionToDNdxIntegral(double energy, double v);
 
         virtual IntegralLimits GetIntegralLimits(double energy) = 0;
 
