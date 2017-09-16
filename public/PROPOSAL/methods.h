@@ -76,13 +76,7 @@ typedef std::vector<std::pair<InterpolantBuilder*, Interpolant** > > Interpolant
 
 // ------------------------------------------------------------------------- //
 void InitializeInterpolation(const std::string name,
-                             // const std::string pathname,
-                             // bool raw,
-                             // const ParticleDef&,
-                             // const Medium&,
-                             // const EnergyCutSettings&,
                              InterpolantBuilderContainer&,
-                             // InterpolantBuilderContainer&,
                              const std::vector<Parametrization*>&);
 
 } /*  Helper */

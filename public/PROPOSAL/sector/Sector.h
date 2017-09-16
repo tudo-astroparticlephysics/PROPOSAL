@@ -41,8 +41,6 @@ class Sector
         bool do_weighting;      //!< Do weigthing? Set to false in constructor
         double weighting_order; //!< Re-weighting order. Set to 0 in constructor
 
-        bool do_continuous_randomization; //!< exact local time calculation enabled if true
-
         // int location;              //!< 0 = infront of the detector, 1 = inside the detector, 2 = behind the detector
         Sector::ParticleLocation::Enum
             location; //!< 0 = infront of the detector, 1 = inside the detector, 2 = behind the detector

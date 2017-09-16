@@ -19,6 +19,7 @@ class CrossSectionInterpolant: public CrossSection
         virtual CrossSection* clone() const = 0;
 
         virtual double CalculatedEdx(double energy) = 0;
+        virtual double CalculatedE2dx(double energy);
         virtual double CalculatedNdx(double energy);
         virtual double CalculatedNdx(double energy, double rnd);
         virtual double CalculateStochasticLoss(double energy, double rnd1, double rnd2);
@@ -33,6 +34,7 @@ class CrossSectionInterpolant: public CrossSection
         virtual double CalculateStochasticLoss(double energy, double rnd1);
 
         Interpolant* dedx_interpolant_;
+        Interpolant* de2dx_interpolant_;
         InterpolantVec dndx_interpolant_1d_; //Stochastic dNdx()
         InterpolantVec dndx_interpolant_2d_; //Stochastic dNdx()
 };

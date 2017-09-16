@@ -20,12 +20,14 @@ class CrossSectionIntegral: public CrossSection
         virtual CrossSection* clone() const = 0;
 
         virtual double CalculatedEdx(double energy) = 0;
+        virtual double CalculatedE2dx(double energy);
         virtual double CalculatedNdx(double energy);
         virtual double CalculatedNdx(double energy, double rnd);
         double CalculateStochasticLoss(double energy, double rnd1, double rnd2);
 
     protected:
         Integral dedx_integral_;
+        Integral de2dx_integral_;
         IntegralVec  dndx_integral_;
 
         virtual double CalculateStochasticLoss(double energy, double rnd1);
