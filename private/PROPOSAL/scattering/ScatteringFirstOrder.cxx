@@ -42,27 +42,6 @@ ScatteringFirstOrder::~ScatteringFirstOrder()
 }
 
 // ------------------------------------------------------------------------- //
-// Public methods
-// ------------------------------------------------------------------------- //
-
-
-void ScatteringFirstOrder::EnableInterpolation(const PROPOSALParticle& particle,
-                                            const std::vector<CrossSection*>& cross_sections,
-                                            std::string filepath)
-{
-    (void)particle;
-    (void)cross_sections;
-    (void)filepath;
-
-    log_warn("No interpolation implemented for ScatteringFirstOrder");
-}
-
-void ScatteringFirstOrder::DisableInterpolation()
-{
-    log_warn("No interpolation implemented for ScatteringFirstOrder");
-}
-
-// ------------------------------------------------------------------------- //
 // Private methods
 // ------------------------------------------------------------------------- //
 
@@ -76,15 +55,14 @@ double ScatteringFirstOrder::CalculateTheta0(const PROPOSALParticle& particle, c
 
 //----------------------------------------------------------------------------//
 
-Scattering::RandomAngles ScatteringFirstOrder::CalculateRandomAngle(const PROPOSALParticle& particle, const std::vector<CrossSection*>& cross_sections, double dr, double ei, double ef)
+Scattering::RandomAngles ScatteringFirstOrder::CalculateRandomAngle(const PROPOSALParticle& particle, const Medium& medium, double dr, double disp)
 {
-    (void)ei;
-    (void)ef;
+    (void) disp;
 
     double Theta0,rnd1,rnd2;
     Scattering::RandomAngles random_angles;
 
-    Theta0 = CalculateTheta0(particle, cross_sections.at(0)->GetParametrization().GetMedium(), dr);
+    Theta0 = CalculateTheta0(particle, medium, dr);
 
     rnd1 = SQRT2*Theta0*erfInv( 2.*(RandomGenerator::Get().RandomDouble()-0.5) );
     rnd2 = SQRT2*Theta0*erfInv( 2.*(RandomGenerator::Get().RandomDouble()-0.5) );
