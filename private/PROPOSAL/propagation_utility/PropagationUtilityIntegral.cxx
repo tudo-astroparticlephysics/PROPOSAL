@@ -17,6 +17,7 @@ PropagationUtilityIntegral::PropagationUtilityIntegral(const ParticleDef& partic
     , prop_interaction_(IROMB, IMAXS, IPREC2)
     , prop_decay_(IROMB, IMAXS, IPREC2)
     , time_particle_(IROMB, IMAXS, IPREC2)
+    , dE2de_integral_(IROMB, IMAXS, IPREC2)
 {
 }
 
@@ -29,6 +30,7 @@ PropagationUtilityIntegral::PropagationUtilityIntegral(const ParticleDef& partic
     , prop_interaction_(IROMB, IMAXS, IPREC2)
     , prop_decay_(IROMB, IMAXS, IPREC2)
     , time_particle_(IROMB, IMAXS, IPREC2)
+    , dE2de_integral_(IROMB, IMAXS, IPREC2)
 {
     Parametrization::Definition param_def;
 
@@ -67,6 +69,7 @@ PropagationUtilityIntegral::PropagationUtilityIntegral(const PropagationUtilityI
     ,prop_interaction_(collection.prop_interaction_)
     ,prop_decay_(collection.prop_decay_)
     ,time_particle_(collection.time_particle_)
+    ,dE2de_integral_(collection.dE2de_integral_)
 {
 }
 
@@ -139,4 +142,10 @@ double PropagationUtilityIntegral::CalculateParticleTime( double ei, double ef)
     //TODO(mario): Prefactor Fri 2017/09/15
     return time_particle_.Integrate(
         ei, ef, boost::bind(&PropagationUtilityIntegral::FunctionToIntegral, this,  _1), 4);
+}
+
+// ------------------------------------------------------------------------- //
+double PropagationUtilityIntegral::CalculateDE2de(double ei, double ef)
+{
+    return dE2de_integral_.Integrate(ei, ef, boost::bind(&PropagationUtilityIntegral::FunctionToDE2deIntegral, this, _1), 4);
 }

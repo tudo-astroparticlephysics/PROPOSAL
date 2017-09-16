@@ -6,6 +6,8 @@
 
 namespace PROPOSAL {
 
+class Integral;
+
 class PropagationUtilityInterpolant : public PropagationUtility
 {
     public:
@@ -24,6 +26,7 @@ class PropagationUtilityInterpolant : public PropagationUtility
     double CalculateFinalEnergy(double ei, double rnd, bool particle_interaction);
     double CalculateTrackingIntegal(double initial_energy, double rnd, bool particle_interaction);
     double CalculateParticleTime(double ei, double ef);
+    double CalculateDE2de(double ei, double ef);
 
     private:
 
@@ -38,9 +41,11 @@ class PropagationUtilityInterpolant : public PropagationUtility
     double InterpolPropDecay( double);
     double InterpolPropInteraction( double);
     double InterpolTimeParticleDiff( double);
+    double FunctionToBuildDE2deInterpolant(double, Integral&);
 
     void InitInterpolation();
     void InitTimeInterpolation();
+    void InitRandomizeInterpolation();
 
     // --------------------------------------------------------------------- //
     // Private members
@@ -70,6 +75,9 @@ class PropagationUtilityInterpolant : public PropagationUtility
     Interpolant* interpol_prop_decay_diff_;      //!< Interpolant object of the function FunctionToPropIntegralDecay
     Interpolant* interpol_prop_interaction_;     //!< Interpolant object of the Integral of the function FunctionToPropIntegralInteraction
     Interpolant* interpol_prop_interaction_diff_;//!< Interpolant object of the function FunctionToPropIntegralInteraction
+
+    Interpolant* dE2de_interpolant_;
+    Interpolant* dE2de_interpolant_diff_;
 
 };
 

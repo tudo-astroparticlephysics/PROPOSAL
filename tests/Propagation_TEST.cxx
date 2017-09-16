@@ -82,8 +82,10 @@ TEST(Propagation , Test_nan) {
 
     sec_def.medium = MediumFactory::Ice;
 
+    sec_def.path_to_tables = "../src/resources/tables";
+    sec_def.raw = false;
+
     Sector* sec2 = SectorFactory::Get().CreateSector(particle, sec_def);
-    std::cout << "Got sector" << std::endl;
 
     collections.push_back(sec2);
 

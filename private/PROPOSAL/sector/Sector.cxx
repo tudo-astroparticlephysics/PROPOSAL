@@ -29,7 +29,6 @@ Sector::Definition::Definition()
     , do_interpolation(true)
     , do_weighting(false)
     , weighting_order(0)
-    , do_continuous_randomization(false)
     , location(Sector::ParticleLocation::InsideDetector)
 {
 }
@@ -197,14 +196,13 @@ double Sector::Propagate(double distance)
 
         //TODO(mario): Revert randomizer Fri 2017/08/25
         // Randomize the continuous energy loss if this option is enabled
-        // if (sector_def_.do_continuous_randomization)
-        // {
-        //     if (final_energy != particle_.GetLow())
-        //     {
-        //         double rnd = RandomGenerator::Get().RandomDouble();
-        //         final_energy = randomizer_->Randomize(crosssections_, initial_energy, final_energy, rnd);
-        //     }
-        // }
+        if (sector_def_.do_continuous_randomization)
+        {
+            if (final_energy != particle_.GetLow())
+            {
+                final_energy = utility->Randomize(initial_energy, final_energy, RandomGenerator::Get().RandomDouble());
+            }
+        }
 
         // Lower limit of particle energy is reached or
         // or complete particle is propagated the whole distance

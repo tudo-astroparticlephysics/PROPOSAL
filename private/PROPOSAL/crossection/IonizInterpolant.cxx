@@ -19,6 +19,11 @@ IonizInterpolant::IonizInterpolant(const Parametrization& param)
     : CrossSectionInterpolant(DynamicData::DeltaE, param)
 {
     Parametrization::Definition param_def = parametrization_->GetDefinition();
+
+    // --------------------------------------------------------------------- //
+    // Builder for DEdx
+    // --------------------------------------------------------------------- //
+
     Interpolant1DBuilder builder1d;
     Helper::InterpolantBuilderContainer builder_container;
 
@@ -39,9 +44,34 @@ IonizInterpolant::IonizInterpolant(const Parametrization& param)
 
     builder_container.push_back(std::make_pair(&builder1d, &dedx_interpolant_));
 
-    log_info("Initialize dEdx for %s", typeid(parametrization_).name());
-    Helper::InitializeInterpolation("dEdx", builder_container, std::vector<Parametrization*>(1, parametrization_));
-    log_info("Initialization dEdx for %s done!", typeid(parametrization_).name());
+    // --------------------------------------------------------------------- //
+    // Builder for DE2dx
+    // --------------------------------------------------------------------- //
+
+    Interpolant1DBuilder builder_de2dx;
+    Helper::InterpolantBuilderContainer builder_container_de2dx;
+
+    builder_de2dx.SetMax(NUM2)
+        .SetXMin(param.GetParticleDef().low)
+        .SetXMax(BIGENERGY)
+        .SetRomberg(param_def.order_of_interpolation)
+        .SetRational(false)
+        .SetRelative(false)
+        .SetIsLog(true)
+        .SetRombergY(param_def.order_of_interpolation)
+        .SetRationalY(false)
+        .SetRelativeY(false)
+        .SetLogSubst(false)
+        .SetFunction1D(boost::bind(&CrossSection::CalculatedE2dx, &ioniz, _1));
+
+    builder_container_de2dx.push_back(std::make_pair(&builder_de2dx, &de2dx_interpolant_));
+
+    Helper::InitializeInterpolation("dEdx",
+                                    builder_container,
+                                    std::vector<Parametrization*>(1, parametrization_));
+    Helper::InitializeInterpolation("dE2dx",
+                                    builder_container_de2dx,
+                                    std::vector<Parametrization*>(1, parametrization_));
 }
 
 IonizInterpolant::IonizInterpolant(const IonizInterpolant& brems): CrossSectionInterpolant(brems)

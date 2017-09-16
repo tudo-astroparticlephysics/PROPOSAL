@@ -21,8 +21,9 @@ class IonizIntegral: public CrossSectionIntegral
         // ----------------------------------------------------------------- //
 
         double CalculatedEdx(double energy);
-        virtual double CalculatedNdx(double energy);
-        virtual double CalculatedNdx(double energy, double rnd);
+        double CalculatedE2dx(double energy);
+        double CalculatedNdx(double energy);
+        double CalculatedNdx(double energy, double rnd);
 
     private:
         virtual double CalculateStochasticLoss(double energy, double rnd1);

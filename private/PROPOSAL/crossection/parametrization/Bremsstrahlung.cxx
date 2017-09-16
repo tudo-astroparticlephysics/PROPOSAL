@@ -80,18 +80,6 @@ double Bremsstrahlung::DifferentialCrossSection(double energy, double v)
 }
 
 // ------------------------------------------------------------------------- //
-double Bremsstrahlung::FunctionToDEdxIntegral(double energy, double variable)
-{
-    return variable * DifferentialCrossSection(energy, variable);
-}
-
-//----------------------------------------------------------------------------//
-double Bremsstrahlung::FunctionToDNdxIntegral(double energy, double variable)
-{
-    return param_def_.multiplier * DifferentialCrossSection(energy, variable);
-}
-
-// ------------------------------------------------------------------------- //
 Parametrization::IntegralLimits Bremsstrahlung::GetIntegralLimits(double energy)
 {
     IntegralLimits limits;

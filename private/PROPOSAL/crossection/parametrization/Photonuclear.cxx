@@ -207,18 +207,6 @@ Photonuclear::~Photonuclear()
 // ------------------------------------------------------------------------- //
 
 // ------------------------------------------------------------------------- //
-double Photonuclear::FunctionToDEdxIntegral(double energy, double variable)
-{
-    return variable * DifferentialCrossSection(energy, variable);
-}
-
-//----------------------------------------------------------------------------//
-double Photonuclear::FunctionToDNdxIntegral(double energy, double variable)
-{
-    return param_def_.multiplier * DifferentialCrossSection(energy, variable);
-}
-
-// ------------------------------------------------------------------------- //
 Parametrization::IntegralLimits Photonuclear::GetIntegralLimits(double energy)
 {
     double aux;
