@@ -139,9 +139,8 @@ double PropagationUtilityIntegral::CalculateTrackingIntegal(
 // ------------------------------------------------------------------------- //
 double PropagationUtilityIntegral::CalculateParticleTime( double ei, double ef)
 {
-    //TODO(mario): Prefactor Fri 2017/09/15
     return time_particle_.Integrate(
-        ei, ef, boost::bind(&PropagationUtilityIntegral::FunctionToIntegral, this,  _1), 4);
+        ei, ef, boost::bind(&PropagationUtilityIntegral::FunctionToTimeIntegral, this,  _1), 4);
 }
 
 // ------------------------------------------------------------------------- //

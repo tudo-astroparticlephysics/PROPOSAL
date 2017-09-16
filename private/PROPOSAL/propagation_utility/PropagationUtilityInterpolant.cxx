@@ -401,7 +401,7 @@ double PropagationUtilityInterpolant::InterpolTimeParticleDiff( double energy)
 {
     Integral integral(IROMB, IMAXS, IPREC2);
 
-    return integral.Integrate(energy, particle_def_.low, boost::bind(&PropagationUtilityInterpolant::FunctionToIntegral, this,  _1),4);
+    return integral.Integrate(energy, particle_def_.low, boost::bind(&PropagationUtilityInterpolant::FunctionToTimeIntegral, this,  _1),4);
 }
 
 // ------------------------------------------------------------------------- //
@@ -494,8 +494,8 @@ void PropagationUtilityInterpolant::InitTimeInterpolation()
 {
     std::vector<std::pair<Interpolant**, boost::function<double(double)> > > interpolants;
 
-    interpolants.push_back(std::make_pair(&interpol_time_particle_, boost::bind(&PropagationUtilityInterpolant::FunctionToIntegral, this, _1)));
-    interpolants.push_back(std::make_pair(&interpol_time_particle_diff_, boost::bind(&PropagationUtilityInterpolant::FunctionToPropIntegralInteraction, this, _1)));
+    interpolants.push_back(std::make_pair(&interpol_time_particle_, boost::bind(&PropagationUtilityInterpolant::FunctionToTimeIntegral, this, _1)));
+    interpolants.push_back(std::make_pair(&interpol_time_particle_diff_, boost::bind(&PropagationUtilityInterpolant::InterpolTimeParticleDiff, this, _1)));
 
     unsigned int number_of_interpolants = interpolants.size();
 
