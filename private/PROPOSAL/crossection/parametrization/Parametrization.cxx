@@ -54,3 +54,25 @@ Parametrization::~Parametrization()
 {
     delete medium_;
 }
+
+// ------------------------------------------------------------------------- //
+// Public methods
+// ------------------------------------------------------------------------- //
+
+// ------------------------------------------------------------------------- //
+double Parametrization::FunctionToDEdxIntegral(double energy, double variable)
+{
+    return variable * DifferentialCrossSection(energy, variable);
+}
+
+// ------------------------------------------------------------------------- //
+double Parametrization::FunctionToDE2dxIntegral(double energy, double variable)
+{
+    return variable * variable * FunctionToDNdxIntegral(energy, variable);
+}
+
+//----------------------------------------------------------------------------//
+double Parametrization::FunctionToDNdxIntegral(double energy, double variable)
+{
+    return param_def_.multiplier * DifferentialCrossSection(energy, variable);
+}

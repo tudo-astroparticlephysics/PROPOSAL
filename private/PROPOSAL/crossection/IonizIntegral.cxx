@@ -66,6 +66,19 @@ double IonizIntegral::CalculatedEdx(double energy)
 }
 
 // ------------------------------------------------------------------------- //
+double IonizIntegral::CalculatedE2dx(double energy)
+{
+    if(parametrization_->GetMultiplier() <= 0)
+    {
+        return 0;
+    }
+
+    Parametrization::IntegralLimits limits = parametrization_->GetIntegralLimits(energy);
+
+    return de2dx_integral_.Integrate(limits.vMin, limits.vUp, boost::bind(&Parametrization::FunctionToDE2dxIntegral, parametrization_, energy,  _1), 2);
+}
+
+// ------------------------------------------------------------------------- //
 double IonizIntegral::CalculatedNdx(double energy)
 {
     if (parametrization_->GetMultiplier() <= 0)

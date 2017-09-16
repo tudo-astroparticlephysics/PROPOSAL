@@ -33,15 +33,6 @@ class EpairProduction : public Parametrization
     // ----------------------------------------------------------------------------
     virtual double DifferentialCrossSection(double energy, double v) = 0;
 
-    // ----------------------------------------------------------------------------
-    /// @brief Pair production energy losses - interface to Integral
-    ///
-    /// \f[ return= v\cdot e_{Pair}(v, components)\f]
-    // ----------------------------------------------------------------------------
-    virtual double FunctionToDEdxIntegral(double energy, double v);
-
-    virtual double FunctionToDNdxIntegral(double energy, double v);
-
     virtual IntegralLimits GetIntegralLimits(double energy);
 
     // ----------------------------------------------------------------------------

@@ -25,6 +25,7 @@ class PropagationUtilityIntegral : public PropagationUtility
                                     double rnd,
                                     bool particle_interaction);
     double CalculateParticleTime(double ei, double ef);
+    double CalculateDE2de(double ei, double ef);
 
     private:
 
@@ -34,6 +35,7 @@ class PropagationUtilityIntegral : public PropagationUtility
     Integral prop_interaction_;
     Integral prop_decay_;
     Integral time_particle_;
+    Integral dE2de_integral_;
 };
 
 } /* PROPOSAL */

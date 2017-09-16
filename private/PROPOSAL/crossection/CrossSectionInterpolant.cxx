@@ -21,10 +21,15 @@ using namespace PROPOSAL;
 CrossSectionInterpolant::CrossSectionInterpolant(const DynamicData::Type& type, const Parametrization& param)
     : CrossSection(type, param)
     , dedx_interpolant_(NULL)
+    , de2dx_interpolant_(NULL)
     , dndx_interpolant_1d_(param.GetMedium().GetNumComponents(), NULL)
     , dndx_interpolant_2d_(param.GetMedium().GetNumComponents(), NULL)
 {
     Parametrization::Definition param_def = parametrization_->GetDefinition();
+
+    // --------------------------------------------------------------------- //
+    // Builder for dNdx
+    // --------------------------------------------------------------------- //
 
     std::vector<Interpolant1DBuilder> builder1d(components_.size());
     std::vector<Interpolant2DBuilder> builder2d(components_.size());
@@ -97,6 +102,11 @@ CrossSectionInterpolant::CrossSectionInterpolant(const CrossSectionInterpolant& 
         dedx_interpolant_ = new Interpolant(*cross_section.dedx_interpolant_);
     }
 
+    if (cross_section.de2dx_interpolant_ != NULL)
+    {
+        de2dx_interpolant_ = new Interpolant(*cross_section.de2dx_interpolant_);
+    }
+
     int num_components = cross_section.parametrization_->GetMedium().GetNumComponents();
 
     dndx_interpolant_1d_.reserve(num_components);
@@ -120,11 +130,27 @@ CrossSectionInterpolant::CrossSectionInterpolant(const CrossSectionInterpolant& 
 
 CrossSectionInterpolant::~CrossSectionInterpolant()
 {
+    delete dedx_interpolant_;
+    delete de2dx_interpolant_;
+
+    for (InterpolantVec::const_iterator iter = dndx_interpolant_1d_.begin(); iter != dndx_interpolant_1d_.end(); ++iter) {
+        delete *iter;
+    }
+
+    for (InterpolantVec::const_iterator iter = dndx_interpolant_2d_.begin(); iter != dndx_interpolant_2d_.end(); ++iter) {
+        delete *iter;
+    }
 }
 
 // ------------------------------------------------------------------------- //
 // Pulblic methods
 // ------------------------------------------------------------------------- //
+
+// ------------------------------------------------------------------------- //
+double CrossSectionInterpolant::CalculatedE2dx(double energy)
+{
+    return std::max(de2dx_interpolant_->Interpolate(energy), 0.0);
+}
 
 // ------------------------------------------------------------------------- //
 double CrossSectionInterpolant::CalculatedNdx(double energy)

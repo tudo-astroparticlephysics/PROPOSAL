@@ -47,18 +47,6 @@ EpairProduction::~EpairProduction()
 // ------------------------------------------------------------------------- //
 
 // ------------------------------------------------------------------------- //
-double EpairProduction::FunctionToDEdxIntegral(double energy, double variable)
-{
-    return variable * DifferentialCrossSection(energy, variable);
-}
-
-//----------------------------------------------------------------------------//
-double EpairProduction::FunctionToDNdxIntegral(double energy, double variable)
-{
-    return param_def_.multiplier * DifferentialCrossSection(energy, variable);
-}
-
-// ------------------------------------------------------------------------- //
 Parametrization::IntegralLimits EpairProduction::GetIntegralLimits(double energy)
 {
     IntegralLimits limits;

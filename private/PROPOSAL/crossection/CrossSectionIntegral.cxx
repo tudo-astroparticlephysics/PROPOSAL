@@ -16,6 +16,7 @@ using namespace PROPOSAL;
 CrossSectionIntegral::CrossSectionIntegral(const DynamicData::Type& type, const Parametrization& param)
     : CrossSection(type, param)
     , dedx_integral_(IROMB, IMAXS, IPREC)
+    , de2dx_integral_(IROMB, IMAXS, IPREC)
     , dndx_integral_(param.GetMedium().GetNumComponents(), Integral(IROMB, IMAXS, IPREC))
 {
 }
@@ -23,6 +24,7 @@ CrossSectionIntegral::CrossSectionIntegral(const DynamicData::Type& type, const 
 CrossSectionIntegral::CrossSectionIntegral(const CrossSectionIntegral& cross_section)
     : CrossSection(cross_section)
     , dedx_integral_(cross_section.dedx_integral_)
+    , de2dx_integral_(cross_section.de2dx_integral_)
     , dndx_integral_(cross_section.dndx_integral_)
 {
 }
@@ -36,6 +38,27 @@ CrossSectionIntegral::~CrossSectionIntegral()
 // ------------------------------------------------------------------------- //
 
 // ------------------------------------------------------------------------- //
+double CrossSectionIntegral::CalculatedE2dx(double energy)
+{
+    if(parametrization_->GetMultiplier() <= 0)
+    {
+        return 0;
+    }
+
+    double sum = 0;
+
+    for(size_t i = 0; i < components_.size(); ++i)
+    {
+        parametrization_->SetCurrentComponent(i);
+        Parametrization::IntegralLimits limits = parametrization_->GetIntegralLimits(energy);
+
+        sum += de2dx_integral_.Integrate(limits.vMin, limits.vUp, boost::bind(&Parametrization::FunctionToDE2dxIntegral, parametrization_, energy,  _1), 2);
+    }
+
+    return energy * energy * sum;
+}
+
+// ------------------------------------------------------------------------- //
 double CrossSectionIntegral::CalculatedNdx(double energy)
 {
     if(parametrization_->GetMultiplier() <= 0)
@@ -45,8 +68,7 @@ double CrossSectionIntegral::CalculatedNdx(double energy)
 
     sum_of_rates_ = 0;
 
-    const ComponentVec& components = parametrization_->GetMedium().GetComponents();
-    for(size_t i = 0; i < components.size(); ++i)
+    for(size_t i = 0; i < components_.size(); ++i)
     {
         parametrization_->SetCurrentComponent(i);
         Parametrization::IntegralLimits limits = parametrization_->GetIntegralLimits(energy);
@@ -72,8 +94,7 @@ double CrossSectionIntegral::CalculatedNdx(double energy, double rnd)
 
     sum_of_rates_ = 0;
 
-    const ComponentVec& components = parametrization_->GetMedium().GetComponents();
-    for(size_t i = 0; i < components.size(); ++i)
+    for(size_t i = 0; i < components_.size(); ++i)
     {
         parametrization_->SetCurrentComponent(i);
         Parametrization::IntegralLimits limits = parametrization_->GetIntegralLimits(energy);
@@ -110,8 +131,7 @@ double CrossSectionIntegral::CalculateStochasticLoss(double energy, double rnd1)
     rnd    =   rnd1*sum_of_rates_;
     rsum    =   0;
 
-    const ComponentVec& components = parametrization_->GetMedium().GetComponents();
-    for(size_t i = 0; i < components.size(); ++i)
+    for(size_t i = 0; i < components_.size(); ++i)
     {
         rsum    += prob_for_component_[i];
 
@@ -124,7 +144,7 @@ double CrossSectionIntegral::CalculateStochasticLoss(double energy, double rnd1)
 
     //sometime everything is fine, just the probability for interaction is zero
     bool prob_for_all_comp_is_zero=true;
-    for(size_t i = 0; i < components.size(); ++i)
+    for(size_t i = 0; i < components_.size(); ++i)
     {
         parametrization_->SetCurrentComponent(i);
         Parametrization::IntegralLimits limits = parametrization_->GetIntegralLimits(energy);

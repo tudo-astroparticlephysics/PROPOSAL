@@ -41,6 +41,7 @@ class PropagationUtility
         bool lpm_effect_enabled;
 
         bool do_exact_time_calculation;   //!< exact local time calculation enabled if true
+        bool do_continuous_randomization; //!< exact local time calculation enabled if true
 
         double order_of_interpolation;
         bool raw;                   /// Determine if output format of interpolation tables is binary or txt.
@@ -73,6 +74,14 @@ class PropagationUtility
      *  \return pair of energy loss [MeV] and kind of interaction
      */
     double MakeDecay(double energy);
+
+
+    /**
+     *  Randomize the continous energy losses
+     *
+     *  \return randomized energy
+     */
+    double Randomize(double initial_energy, double final_energy, double rnd);
 
     /*!
     * returns the value of the distance integral from ei to ef;
@@ -137,6 +146,15 @@ class PropagationUtility
     virtual double CalculateParticleTime(double ei, double ef) = 0;
 
     /*!
+    * Quantitiy need for randomization
+    *
+    * \param    ei  initial energy
+    * \param    ef  final energy
+    * \return   \int_{E_i}^{E_f} \frac{d^2E}{d\epsilon^2} dE
+    */
+    virtual double CalculateDE2de(double ei, double ef) = 0;
+
+    /*!
     * function for range calculation for given energy - interface to Integral;
     * \f[f(E) =- \frac{1}{ \frac{dE}{dx}\big|_{Ioniz} +\frac{dE}{dx}\big|
     * _{Brems}+\frac{dE}{dx}\big|_{PhotoNuc}+\frac{dE}{dx}\big|_{epair}  }\f]
@@ -167,6 +185,16 @@ class PropagationUtility
      */
 
     virtual double FunctionToPropIntegralInteraction(double energy);
+
+
+    /**
+     * function for continous randomization calculation - interface to Integral
+     *
+     *  \param  energy particle energy
+     *  \return //TODO(mario):  Sat 2017/09/16
+     */
+    double FunctionToDE2deIntegral(double energy);
+
 
     // --------------------------------------------------------------------- //
     // Getter
