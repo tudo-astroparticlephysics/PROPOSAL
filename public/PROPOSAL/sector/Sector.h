@@ -34,12 +34,13 @@ class Sector
         };
     };
 
-    struct Definition : PropagationUtility::Definition
+    struct Definition : Utility::Definition
     {
-        bool do_interpolation;
-
         bool do_weighting;      //!< Do weigthing? Set to false in constructor
         double weighting_order; //!< Re-weighting order. Set to 0 in constructor
+
+        bool do_continuous_randomization;
+        bool do_exact_time_calculation;
 
         // int location;              //!< 0 = infront of the detector, 1 = inside the detector, 2 = behind the detector
         Sector::ParticleLocation::Enum
@@ -120,8 +121,6 @@ class Sector
     // --------------------------------------------------------------------- //
 
     ParticleLocation::Enum GetLocation() const { return sector_def_.location; }
-    double GetIni() const { return ini_; }
-
     bool GetLpmEffectEnabled() const { return sector_def_.lpm_effect_enabled; }
     // bool GetDoRandomization() const { return do_continuous_randomization_; }
     // bool GetEnableRandomization() const { return enable_randomization_; }
@@ -129,7 +128,7 @@ class Sector
     Scattering* GetScattering() const { return scattering_; }
     PROPOSALParticle& GetParticle() const { return particle_; }
     Geometry* GetGeometry() const { return geometry_; }
-    const Medium* GetMedium() const { return &utility->GetMedium(); }
+    const Medium* GetMedium() const { return &utility_.GetMedium(); }
     // ContinuousRandomization* GetContinuousRandomization() const { return randomizer_; }
 
     protected:
@@ -139,9 +138,6 @@ class Sector
     // Protected members
     // --------------------------------------------------------------------- //
 
-    // Just a temporary to store -> bad design
-    double ini_;
-
     Definition sector_def_;
 
     // TODO(mario): Do better weight enabling Fri 2017/08/25
@@ -149,10 +145,15 @@ class Sector
 
     PROPOSALParticle& particle_;
     Geometry* geometry_;
-    PropagationUtility* utility;
+
+    Utility utility_;
+    UtilityDecorator* displacement_calculator_;
+    UtilityDecorator* interaction_calculator_;
+    UtilityDecorator* decay_calculator_;
+    UtilityDecorator* exact_time_calculator_;
+    UtilityDecorator* cont_rand_calculator_;
 
     // ContinuousRandomization* randomizer_;
     Scattering* scattering_;
-
 };
 }

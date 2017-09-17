@@ -14,15 +14,14 @@
 namespace  PROPOSAL
 {
 
-class PropagationUtilityFactory
+class UtilityFactory
 {
     public:
 
-    struct Definition : PropagationUtility::Definition
+    struct Definition : Utility::Definition
     {
         double e_cut;
         double v_cut;
-        bool do_interpolation;
         MediumFactory::Enum medium;
         double density_correction;
 
@@ -30,17 +29,17 @@ class PropagationUtilityFactory
         ~Definition();
     };
 
-    PropagationUtility* CreatePropagationUtility(const ParticleDef&, const Definition&);
+    Utility* CreateUtility(const ParticleDef&, const Definition&);
 
-    static PropagationUtilityFactory& Get()
+    static UtilityFactory& Get()
     {
-        static PropagationUtilityFactory instance;
+        static UtilityFactory instance;
         return instance;
     }
 
     private:
-    PropagationUtilityFactory(){};
-    ~PropagationUtilityFactory(){};
+    UtilityFactory(){};
+    ~UtilityFactory(){};
 };
 
 } /*  PROPOSAL */
