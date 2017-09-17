@@ -25,18 +25,20 @@ namespace PROPOSAL{
 class ScatteringFirstOrder : public Scattering
 {
     public:
-    ScatteringFirstOrder();
+    ScatteringFirstOrder(PROPOSALParticle&, const Medium&);
     ScatteringFirstOrder(const ScatteringFirstOrder&);
     ~ScatteringFirstOrder();
 
     virtual Scattering* clone() const { return new ScatteringFirstOrder(*this); }
-    static Scattering* create() { return new ScatteringFirstOrder(); }
+    static Scattering* create(PROPOSALParticle& particle, const Medium& medium) { return new ScatteringFirstOrder(particle, medium); }
 
     private:
     ScatteringFirstOrder& operator=(const ScatteringFirstOrder&); // Undefined & not allowed
 
-    RandomAngles CalculateRandomAngle(const PROPOSALParticle&, const Medium&, double dr, double disp);
-    double CalculateTheta0(const PROPOSALParticle&, const Medium&, double dr);
+    RandomAngles CalculateRandomAngle(double dr, double ei, double ef);
+    double CalculateTheta0(double dr);
+
+    const Medium* medium_;
 };
 
 }

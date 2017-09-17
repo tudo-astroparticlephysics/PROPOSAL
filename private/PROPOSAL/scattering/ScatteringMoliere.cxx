@@ -24,32 +24,13 @@ using namespace PROPOSAL;
 //----------------------------------------------------------------------------//
 
 
-Scattering::RandomAngles ScatteringMoliere::CalculateRandomAngle(const PROPOSALParticle& particle, const Medium& medium, double dr, double disp)
+Scattering::RandomAngles ScatteringMoliere::CalculateRandomAngle(double dr, double ei, double ef)
 {
-    (void) disp;
+    (void)ei;
+    (void)ef;
 
-    double A = 0.;
-
-    std::vector<double> ki;     // number of atoms in molecule of different components
-    std::vector<double> Ai;     // atomic number of different components
-
-    double momentum = particle.GetMomentum();  // momentum in MeV/c
-    double mass = particle.GetMass();          // mass in MeV/c²
-
-    numComp_ = medium.GetNumComponents();
-    Zi_.resize(numComp_);
-    ki.resize(numComp_);
-    Ai.resize(numComp_);
-
-    for (int i = 0; i < numComp_; i++)
-    {
-        Components::Component* component = medium.GetComponents().at(i);
-        Zi_.at(i) = component->GetNucCharge();
-        ki.at(i) = component->GetAtomInMolecule();
-        Ai.at(i) = component->GetAtomicNum();
-
-        A += ki.at(i)*Ai.at(i);
-    }
+    double momentum = particle_.GetMomentum();  // momentum in MeV/c
+    double mass = particle_.GetMass();          // mass in MeV/c²
 
     double beta_Sq = 1./( 1.+mass*mass/(momentum*momentum) ); //beta² = v²/c²
     double chi_0 = 0.;
@@ -62,8 +43,6 @@ Scattering::RandomAngles ScatteringMoliere::CalculateRandomAngle(const PROPOSALP
 
     for(int i = 0; i < numComp_; i++)
     {
-        weight_.at(i) = ki.at(i)*Ai.at(i)/A;
-
         // Calculate Chi_0
         chi_0 = ( ME*ALPHA*pow(Zi_.at(i)*128./(9.*PI*PI), 1./3.) )/momentum ;
         // Calculate Chi_a^2
@@ -74,11 +53,11 @@ Scattering::RandomAngles ScatteringMoliere::CalculateRandomAngle(const PROPOSALP
         //on atomic electrons in the medium
         if(mass == ME) ZSq_average += weight_.at(i)*Zi_.at(i)*(Zi_.at(i)+1.);
         else ZSq_average += weight_.at(i)*Zi_.at(i)*Zi_.at(i);
-        A_average += weight_.at(i)*Ai.at(i);
+        A_average += weight_.at(i)*Ai_.at(i);
     }
     // Calculate Chi_c^2
     chiCSq_ = ( (4.*PI*NA*ALPHA*ALPHA*HBAR*HBAR*SPEED*SPEED)
-                * (medium.GetMassDensity()*medium.GetDensityCorrection()*dr)
+                * (medium_->GetMassDensity()*medium_->GetDensityCorrection()*dr)
                 / (momentum*momentum*beta_Sq) )
             * ( ZSq_average/A_average );
 
@@ -126,21 +105,47 @@ Scattering::RandomAngles ScatteringMoliere::CalculateRandomAngle(const PROPOSALP
     return random_angles;
 }
 
+
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 //--------------------------------constructors--------------------------------//
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-ScatteringMoliere::ScatteringMoliere()
-    : Scattering()
+ScatteringMoliere::ScatteringMoliere(PROPOSALParticle& particle, const Medium& medium)
+    : Scattering(particle)
+    , medium_(medium.clone())
+    , numComp_(medium_->GetNumComponents())
+    , Zi_(numComp_)
+    , ki_(numComp_)
+    , Ai_(numComp_)
+    , A_(0.0)
+    , weight_(numComp_)
 {
+    for (int i = 0; i < numComp_; i++)
+    {
+        Components::Component* component = medium_->GetComponents().at(i);
+        Zi_[i] = component->GetNucCharge();
+        ki_[i] = component->GetAtomInMolecule();
+        Ai_[i] = component->GetAtomicNum();
+
+        A_ += ki_[i]*Ai_[i];
+    }
+
+    for(int i = 0; i < numComp_; i++)
+    {
+        weight_[i] = ki_[i]*Ai_[i]/A_;
+    }
 }
 
 ScatteringMoliere::ScatteringMoliere(const ScatteringMoliere& scattering)
-    : Scattering()
+    : Scattering(scattering)
+    , medium_(scattering.medium_->clone())
     , numComp_(scattering.numComp_)
     , Zi_(scattering.Zi_)
+    , ki_(scattering.ki_)
+    , Ai_(scattering.Ai_)
+    , A_(scattering.A_)
     , weight_(scattering.weight_)
     , chiCSq_(scattering.chiCSq_)
     , B_(scattering.B_)
@@ -149,6 +154,7 @@ ScatteringMoliere::ScatteringMoliere(const ScatteringMoliere& scattering)
 
 ScatteringMoliere::~ScatteringMoliere()
 {
+    delete medium_;
 }
 
 //----------------------------------------------------------------------------//

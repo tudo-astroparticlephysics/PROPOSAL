@@ -7,7 +7,8 @@
 
 namespace PROPOSAL {
 
-class CrossSection;
+class Utility;
+class UtilityDecorator;
 /**
   * \brief This class provides the scattering routine provided by moliere.
   *
@@ -16,12 +17,12 @@ class CrossSection;
 class ScatteringDefault: public Scattering
 {
     public:
-    ScatteringDefault();
+    ScatteringDefault(PROPOSALParticle&, Utility&);
     ScatteringDefault(const ScatteringDefault&);
     ~ScatteringDefault() {}
 
     virtual Scattering* clone() const { return new ScatteringDefault(*this); }
-    static Scattering* create() { return new ScatteringDefault(); }
+    static Scattering* create(PROPOSALParticle& particle, Utility& utility) { return new ScatteringDefault(particle, utility); }
 
     // bool operator==(const ScatteringDefault& scattering) const;
     // bool operator!=(const ScatteringDefault& scattering) const;
@@ -30,12 +31,12 @@ class ScatteringDefault: public Scattering
     private:
     ScatteringDefault& operator=(const ScatteringDefault&); // Undefined & not allowed
 
-    RandomAngles CalculateRandomAngle(const PROPOSALParticle&, const Medium&, double dr, double disp);
-    long double CalculateTheta0(const PROPOSALParticle&,
-                                const Medium&,
-                                double dr,
-                                double disp);
+    RandomAngles CalculateRandomAngle(double dr, double ei, double ef);
+    long double CalculateTheta0(double dr,
+                                double ei,
+                                double ef);
 
+    UtilityDecorator* scatter;
 };
 
 }

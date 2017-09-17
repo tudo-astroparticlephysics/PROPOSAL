@@ -12,6 +12,9 @@
 namespace  PROPOSAL
 {
 
+class Medium;
+class Utility;
+
 class ScatteringFactory
 {
     public:
@@ -23,13 +26,19 @@ class ScatteringFactory
         MoliereFirstOrder
     };
 
-    typedef boost::function<Scattering* (void)> RegisterFunction;
-    typedef std::map<std::string, boost::function<Scattering* (void)> > ScatteringMapString;
-    typedef std::map<Enum, boost::function<Scattering* (void)> > ScatteringMapEnum;
+    typedef boost::function<Scattering* (PROPOSALParticle&, const Medium&)> RegisterFunction;
+    typedef boost::function<Scattering* (PROPOSALParticle&, Utility&)> RegisterFunctionUtility;
+
+    typedef std::map<std::string, RegisterFunction> ScatteringMapString;
+    typedef std::map<Enum, RegisterFunction> ScatteringMapEnum;
+
+    typedef std::map<std::string, RegisterFunctionUtility> ScatteringMapUtiltiyString;
+    typedef std::map<Enum, RegisterFunctionUtility> ScatteringMapUtiltiyEnum;
+
     typedef std::map<std::string, Enum> MapStringToEnum;
 
-    Scattering* CreateScattering(const std::string&);
-    Scattering* CreateScattering(const Enum);
+    Scattering* CreateScattering(const std::string&, PROPOSALParticle&, Utility&);
+    Scattering* CreateScattering(const Enum, PROPOSALParticle&, Utility&);
 
     Enum GetEnumFromString(const std::string&);
 
@@ -43,13 +52,16 @@ class ScatteringFactory
     ScatteringFactory();
     ~ScatteringFactory();
 
-    void Register(const std::string& name, RegisterFunction);
-    void Register(Enum, RegisterFunction);
-    void Register(const std::string&, Enum);
+    void Register(const std::string& name, Enum, RegisterFunction);
+    void RegisterUtility(const std::string& name, Enum, RegisterFunctionUtility);
 
     // std::map<std::string, Scattering* (*)(void)> scattering_map;
     ScatteringMapString scattering_map_str_;
     ScatteringMapEnum scattering_map_enum_;
+
+    ScatteringMapUtiltiyString scattering_map_utility_str_;
+    ScatteringMapUtiltiyEnum scattering_map_utility_enum_;
+
     MapStringToEnum map_string_to_enum;
 };
 
