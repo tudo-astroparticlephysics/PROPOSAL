@@ -14,25 +14,29 @@
 namespace PROPOSAL {
 
 class PROPOSALParticle;
-class Medium;
 
 class Scattering
 {
     public:
-    Scattering();
+    Scattering(PROPOSALParticle&);
+    Scattering(const Scattering&);
     virtual ~Scattering();
 
     virtual Scattering* clone() const = 0; // virtual constructor idiom (used for deep copies)
 
-    void Scatter(PROPOSALParticle&, const Medium&, double dr, double disp);
+    void Scatter(double dr, double ei, double ef);
 
     protected:
+    Scattering& operator=(const Scattering&); // Undefined & not allowed
+
     struct RandomAngles
     {
         double sx, sy, tx, ty;
     };
 
-    virtual RandomAngles CalculateRandomAngle(const PROPOSALParticle&, const Medium&, double dr, double disp) = 0;
+    virtual RandomAngles CalculateRandomAngle(double dr, double ei, double ef) = 0;
+
+    PROPOSALParticle& particle_;
 };
 
 }

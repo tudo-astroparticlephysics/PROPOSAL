@@ -86,6 +86,8 @@ class UtilityDecorator
     virtual double Calculate(double ei, double ef, double rnd) = 0;
     virtual double GetUpperLimit(double ei, double rnd) = 0;
 
+    const Utility& GetUtility() const { return utility_; }
+
     protected:
     UtilityDecorator& operator=(const UtilityDecorator&); // Undefined & not allowed
 
