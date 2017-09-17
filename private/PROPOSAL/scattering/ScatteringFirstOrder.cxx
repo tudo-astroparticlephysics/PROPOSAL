@@ -28,41 +28,46 @@ using namespace PROPOSAL;
 // ------------------------------------------------------------------------- //
 
 
-ScatteringFirstOrder::ScatteringFirstOrder()
+ScatteringFirstOrder::ScatteringFirstOrder(PROPOSALParticle& particle, const Medium& medium)
+    : Scattering(particle)
+    , medium_(medium.clone())
 {
 }
 
 ScatteringFirstOrder::ScatteringFirstOrder(const ScatteringFirstOrder& scattering)
     : Scattering(scattering)
+    , medium_(scattering.medium_->clone())
 {
 }
 
 ScatteringFirstOrder::~ScatteringFirstOrder()
 {
+    delete medium_;
 }
 
 // ------------------------------------------------------------------------- //
 // Private methods
 // ------------------------------------------------------------------------- //
 
-double ScatteringFirstOrder::CalculateTheta0(const PROPOSALParticle& particle, const Medium& med, double dr)
+double ScatteringFirstOrder::CalculateTheta0(double dr)
 {
-    double y = dr/med.GetRadiationLength();
-    double beta = 1./sqrt(1 +  particle.GetMass() * particle.GetMass()/ (particle.GetMomentum()*particle.GetMomentum() ));
-    y = 13.6/(particle.GetMomentum()* beta ) *sqrt(y)*( 1.+0.088*log10(y) );
+    double y = dr/medium_->GetRadiationLength();
+    double beta = 1./sqrt(1 +  particle_.GetMass() * particle_.GetMass()/ (particle_.GetMomentum()*particle_.GetMomentum() ));
+    y = 13.6/(particle_.GetMomentum()* beta ) *sqrt(y)*( 1.+0.088*log10(y) );
     return y;
 }
 
 //----------------------------------------------------------------------------//
 
-Scattering::RandomAngles ScatteringFirstOrder::CalculateRandomAngle(const PROPOSALParticle& particle, const Medium& medium, double dr, double disp)
+Scattering::RandomAngles ScatteringFirstOrder::CalculateRandomAngle(double dr, double ei, double ef)
 {
-    (void) disp;
+    (void)ei;
+    (void)ef;
 
     double Theta0,rnd1,rnd2;
     Scattering::RandomAngles random_angles;
 
-    Theta0 = CalculateTheta0(particle, medium, dr);
+    Theta0 = CalculateTheta0(dr);
 
     rnd1 = SQRT2*Theta0*erfInv( 2.*(RandomGenerator::Get().RandomDouble()-0.5) );
     rnd2 = SQRT2*Theta0*erfInv( 2.*(RandomGenerator::Get().RandomDouble()-0.5) );

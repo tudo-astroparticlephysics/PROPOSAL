@@ -20,8 +20,6 @@ class SectorFactory
     {
         double e_cut;
         double v_cut;
-        bool do_interpolation;
-        ScatteringFactory::Enum scattering_model; //!< if true moliere scattering is enabled
         MediumFactory::Enum medium;
         double density_correction;
         GeometryFactory::Enum geometry;

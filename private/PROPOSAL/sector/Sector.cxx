@@ -56,7 +56,7 @@ Sector::Sector(PROPOSALParticle& particle)
     , decay_calculator_(NULL)
     , exact_time_calculator_(NULL)
     , cont_rand_calculator_(NULL)
-    , scattering_(new ScatteringDefault())
+    , scattering_(ScatteringFactory::Get().CreateScattering(sector_def_.scattering_model, particle_, utility_))
 {
     if (utility_.GetDefinition().do_interpolation)
     {
@@ -95,20 +95,19 @@ Sector::Sector(PROPOSALParticle& particle)
 Sector::Sector(PROPOSALParticle& particle, const Medium& medium,
                        const Geometry& geometry,
                        const EnergyCutSettings& cut_settings,
-                       const Scattering& scattering,
                        const Definition& def)
     : sector_def_(def)
     , weighting_starts_at_(0)
     , particle_(particle)
     , geometry_(geometry.clone())
     // , randomizer_(NULL)
-    , utility_(particle_.GetParticleDef(), medium, cut_settings, def)
+    , utility_(particle_.GetParticleDef(), medium, cut_settings, sector_def_)
     , displacement_calculator_(NULL)
     , interaction_calculator_(NULL)
     , decay_calculator_(NULL)
     , exact_time_calculator_(NULL)
     , cont_rand_calculator_(NULL)
-    , scattering_(scattering.clone())
+    , scattering_(ScatteringFactory::Get().CreateScattering(sector_def_.scattering_model, particle_, utility_))
 {
     if (utility_.GetDefinition().do_interpolation)
     {
