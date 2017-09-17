@@ -4,38 +4,65 @@
 #include "PROPOSAL/propagation_utility/PropagationUtility.h"
 #include "PROPOSAL/math/Integral.h"
 
+#define UTILITY_INTEGRAL_DEC(cls)                                                                                      \
+    class UtilityIntegral##cls : public UtilityIntegral                                                                \
+    {                                                                                                                  \
+        public:                                                                                                        \
+        UtilityIntegral##cls(const Utility&);                                                                          \
+        UtilityIntegral##cls(const UtilityIntegral##cls&);                                                             \
+        virtual ~UtilityIntegral##cls();                                                                               \
+                                                                                                                       \
+        virtual UtilityDecorator* clone() const { return new UtilityIntegral##cls(*this); }                            \
+                                                                                                                       \
+        double FunctionToIntegral(double energy);                                                                      \
+        virtual double Calculate(double ei, double ef, double rnd);                                                    \
+                                                                                                                       \
+        private:                                                                                                       \
+        UtilityDecorator& operator=(const UtilityDecorator&);                                                          \
+    };
+
 namespace PROPOSAL {
 
-class PropagationUtilityIntegral : public PropagationUtility
+class UtilityIntegral : public UtilityDecorator
 {
     public:
-    PropagationUtilityIntegral(const ParticleDef&);
-    PropagationUtilityIntegral(const ParticleDef&, const Medium&,
-                       const EnergyCutSettings&,
-                       const Definition& def = Definition());
-    PropagationUtilityIntegral(const PropagationUtilityIntegral&);
-    virtual ~PropagationUtilityIntegral();
+    UtilityIntegral(const Utility&);
+    UtilityIntegral(const UtilityIntegral&);
+    virtual ~UtilityIntegral();
 
-    virtual PropagationUtility* clone() const { return new PropagationUtilityIntegral(*this); }
+    virtual UtilityDecorator* clone() const = 0;
 
-    double CalculateDisplacement(double ei, double ef, double dist);
-    double CalculateFinalEnergy(double ei, double dist);
-    double CalculateFinalEnergy(double ei, double rnd, bool particle_interaction);
-    double CalculateTrackingIntegal(double initial_energy,
-                                    double rnd,
-                                    bool particle_interaction);
-    double CalculateParticleTime(double ei, double ef);
-    double CalculateDE2de(double ei, double ef);
+    virtual double Calculate(double ei, double ef, double rnd) = 0;
+    virtual double GetUpperLimit(double ei, double rnd);
 
-    private:
-
-    PropagationUtilityIntegral& operator=(const PropagationUtilityIntegral&); // Undefined & not allowed
+    protected:
+    UtilityIntegral& operator=(const UtilityIntegral&); // Undefined & not allowed
 
     Integral integral_;
-    Integral prop_interaction_;
-    Integral prop_decay_;
-    Integral time_particle_;
-    Integral dE2de_integral_;
+
 };
+
+class UtilityIntegralDisplacement: public UtilityIntegral
+{
+    public:
+    UtilityIntegralDisplacement(const Utility&);
+    UtilityIntegralDisplacement(const UtilityIntegralDisplacement&);
+    virtual ~UtilityIntegralDisplacement();
+
+    virtual UtilityDecorator* clone() const { return new UtilityIntegralDisplacement(*this); }
+
+    virtual double Calculate(double ei, double ef, double rnd);
+
+    private:
+    UtilityDecorator& operator=(const UtilityDecorator&); // Undefined & not allowed
+};
+
+UTILITY_INTEGRAL_DEC(Interaction)
+UTILITY_INTEGRAL_DEC(Decay)
+UTILITY_INTEGRAL_DEC(Time)
+UTILITY_INTEGRAL_DEC(ContRand)
+UTILITY_INTEGRAL_DEC(Scattering)
+
+#undef UTILITY_INTEGRAL_DEC
 
 } /* PROPOSAL */

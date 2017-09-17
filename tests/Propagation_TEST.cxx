@@ -66,7 +66,7 @@ TEST(Propagation , Test_nan) {
     sec_def.location = Sector::ParticleLocation::InsideDetector;
 
     sec_def.do_interpolation = true;
-    sec_def.do_continuous_randomization = true;
+    sec_def.do_continuous_randomization = false;
     sec_def.do_exact_time_calculation = true;
     sec_def.lpm_effect_enabled = false;
 
