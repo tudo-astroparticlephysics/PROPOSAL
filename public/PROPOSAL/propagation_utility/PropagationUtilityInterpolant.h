@@ -2,83 +2,103 @@
 #pragma once
 
 #include "PROPOSAL/propagation_utility/PropagationUtility.h"
+#include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
 #include "PROPOSAL/math/Interpolant.h"
+
+#define UTILITY_INTERPOLANT_DEC(cls)                                                                                   \
+    class UtilityInterpolant##cls : public UtilityInterpolant                                                          \
+    {                                                                                                                  \
+        public:                                                                                                        \
+        UtilityInterpolant##cls(const Utility&);                                                                       \
+        UtilityInterpolant##cls(const UtilityInterpolant##cls&);                                                       \
+        virtual ~UtilityInterpolant##cls();                                                                            \
+                                                                                                                       \
+        virtual UtilityDecorator* clone() const { return new UtilityInterpolant##cls(*this); }                         \
+                                                                                                                       \
+        double Calculate(double ei, double ef, double rnd);                                                            \
+        double GetUpperLimit(double ei, double rnd);                                                                   \
+                                                                                                                       \
+        private:                                                                                                       \
+        UtilityInterpolant##cls& operator=(const UtilityInterpolant##cls&);                                            \
+                                                                                                                       \
+        virtual double BuildInterpolant(double, UtilityIntegral&, Integral&);                                          \
+        virtual void InitInterpolation(const std::string&, UtilityIntegral&);                                          \
+    };
 
 namespace PROPOSAL {
 
 class Integral;
 
-class PropagationUtilityInterpolant : public PropagationUtility
+class UtilityInterpolant : public UtilityDecorator
 {
     public:
-    PropagationUtilityInterpolant(const ParticleDef&);
-    PropagationUtilityInterpolant(const ParticleDef&,
-                                  const Medium&,
-                                  const EnergyCutSettings&,
-                                  const Definition& def = Definition());
-    PropagationUtilityInterpolant(const PropagationUtilityInterpolant&);
-    virtual ~PropagationUtilityInterpolant();
+    UtilityInterpolant(const Utility&);
+    UtilityInterpolant(const UtilityInterpolant&);
+    virtual ~UtilityInterpolant();
 
-    virtual PropagationUtility* clone() const { return new PropagationUtilityInterpolant(*this); }
+    virtual UtilityDecorator* clone() const = 0;
 
-    double CalculateDisplacement(double ei, double ef, double dist);
-    double CalculateFinalEnergy(double ei, double dist);
-    double CalculateFinalEnergy(double ei, double rnd, bool particle_interaction);
-    double CalculateTrackingIntegal(double initial_energy, double rnd, bool particle_interaction);
-    double CalculateParticleTime(double ei, double ef);
-    double CalculateDE2de(double ei, double ef);
+    virtual double Calculate(double ei, double ef, double rnd) = 0;
+    virtual double GetUpperLimit(double ei, double rnd);
 
-    private:
+    protected:
+    UtilityInterpolant& operator=(const UtilityInterpolant&); // Undefined & not allowed
 
-    PropagationUtilityInterpolant& operator=(const PropagationUtilityInterpolant&); // Undefined & not allowed
+    virtual double BuildInterpolant(double, UtilityIntegral&, Integral&) = 0;
+    virtual void InitInterpolation(const std::string&, UtilityIntegral&) = 0;
 
-    // --------------------------------------------------------------------- //
-    // Private methods
-    // --------------------------------------------------------------------- //
-
-    // Helper functions to init interpolation
-    double FunctionToBuildInterpolant( double);
-    double InterpolPropDecay( double);
-    double InterpolPropInteraction( double);
-    double InterpolTimeParticleDiff( double);
-    double FunctionToBuildDE2deInterpolant(double, Integral&);
-
-    void InitInterpolation();
-    void InitTimeInterpolation();
-    void InitRandomizeInterpolation();
-
-    // --------------------------------------------------------------------- //
-    // Private members
-    // --------------------------------------------------------------------- //
-
-    // ----------------------------------------------------------------------------
-    /// @brief indicates if the interpolated function is increasing or decreasing.
-    ///
-    /// True  =   Interpolated function is increasing. \n
-    /// False =   Interpolated function is decreasing. BigLow is set to f(x_min)
-    ///           and the interpolation points that are saved are BigLow-f(x).
-    // ----------------------------------------------------------------------------
-    bool up_;
-
-    double big_low_interatction_; //!< See the describtion of the variable up.
-    double big_low_decay_;
-    double store_dif_interaction_; //!< Stores the interpolated values for farther calculations
-    double store_dif_decay_;
-
+    double stored_result_;
     Interpolant* interpolant_;
     Interpolant* interpolant_diff_;
-
-    Interpolant* interpol_time_particle_;
-    Interpolant* interpol_time_particle_diff_;
-
-    Interpolant* interpol_prop_decay_;           //!< Interpolant object of the Integral of the function FunctionToPropIntegralDecay
-    Interpolant* interpol_prop_decay_diff_;      //!< Interpolant object of the function FunctionToPropIntegralDecay
-    Interpolant* interpol_prop_interaction_;     //!< Interpolant object of the Integral of the function FunctionToPropIntegralInteraction
-    Interpolant* interpol_prop_interaction_diff_;//!< Interpolant object of the function FunctionToPropIntegralInteraction
-
-    Interpolant* dE2de_interpolant_;
-    Interpolant* dE2de_interpolant_diff_;
-
 };
+
+class UtilityInterpolantInteraction: public UtilityInterpolant
+{
+    public:
+    UtilityInterpolantInteraction(const Utility&);
+    UtilityInterpolantInteraction(const UtilityInterpolantInteraction&);
+    virtual ~UtilityInterpolantInteraction();
+
+    virtual UtilityInterpolant* clone() const { return new UtilityInterpolantInteraction(*this); }
+
+    double Calculate(double ei, double ef, double rnd);
+    double GetUpperLimit(double ei, double rnd);
+
+    private:
+    UtilityInterpolantInteraction& operator=(const UtilityInterpolantInteraction&); // Undefined & not allowed
+
+    virtual double BuildInterpolant(double, UtilityIntegral&, Integral&);
+    virtual void InitInterpolation(const std::string&, UtilityIntegral&);
+
+    double big_low_;
+    double up_;
+};
+
+class UtilityInterpolantDecay: public UtilityInterpolant
+{
+    public:
+    UtilityInterpolantDecay(const Utility&);
+    UtilityInterpolantDecay(const UtilityInterpolantDecay&);
+    virtual ~UtilityInterpolantDecay();
+
+    virtual UtilityInterpolant* clone() const { return new UtilityInterpolantDecay(*this); }
+
+    double Calculate(double ei, double ef, double rnd);
+    double GetUpperLimit(double ei, double rnd);
+
+    private:
+    UtilityInterpolantDecay& operator=(const UtilityInterpolantDecay&); // Undefined & not allowed
+
+    virtual double BuildInterpolant(double, UtilityIntegral&, Integral&);
+    virtual void InitInterpolation(const std::string&, UtilityIntegral&);
+
+    double big_low_;
+    double up_;
+};
+
+UTILITY_INTERPOLANT_DEC(Displacement)
+UTILITY_INTERPOLANT_DEC(Time)
+UTILITY_INTERPOLANT_DEC(ContRand)
+UTILITY_INTERPOLANT_DEC(Scattering)
 
 } /* PROPOSAL */
