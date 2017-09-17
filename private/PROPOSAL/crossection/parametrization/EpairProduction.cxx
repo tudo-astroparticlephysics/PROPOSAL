@@ -63,24 +63,21 @@ Parametrization::IntegralLimits EpairProduction::GetIntegralLimits(double energy
 {
     IntegralLimits limits;
 
-    double aux;
-    double particle_energy = energy;
-    double particle_mass   = particle_def_.mass;
+    double aux = particle_def_.mass / energy;
 
-    limits.vMin = 4 * ME / particle_energy;
-    limits.vMax =
-        1 - (3. / 4) * SQRTE * (particle_mass / particle_energy) * pow(components_[component_index_]->GetNucCharge(), 1. / 3);
-    aux         = particle_mass / particle_energy;
-    aux         = 1 - 6 * aux * aux;
+    limits.vMin = 4 * ME / energy;
+    limits.vMax = 1 - 0.75 * SQRTE * aux * pow(components_[component_index_]->GetNucCharge(), 1. / 3);
+
+    aux = 1 - 6 * aux * aux;
     limits.vMax = std::min(limits.vMax, aux);
-    limits.vMax = std::min(limits.vMax, 1 - particle_mass / particle_energy);
+    // limits.vMax = std::min(limits.vMax, 1 - particle_mass / particle_energy);
 
     if (limits.vMax < limits.vMin)
     {
         limits.vMax = limits.vMin;
     }
 
-    limits.vUp = std::min(limits.vMax, cut_settings_.GetCut(particle_energy));
+    limits.vUp = std::min(limits.vMax, cut_settings_.GetCut(energy));
 
     if (limits.vUp < limits.vMin)
     {
@@ -91,92 +88,113 @@ Parametrization::IntegralLimits EpairProduction::GetIntegralLimits(double energy
 }
 
 // ------------------------------------------------------------------------- //
-double EpairProduction::FunctionToIntegral(double energy, double r)
+double EpairProduction::FunctionToIntegral(double particle_energy, double r)
 {
+    // Parametrization of Kelner/Kokoulin/Petrukhin
+    // Proc. 12th ICCR (1971), 2436
+    //
+    // there are two pair production diagrams taking into account here
+    // where an electron (or positron) couples to the nucleus (marked with xx_e)
+    // and where the muon couples to the nucleus (marked with xx_mu)
+    //
+    // an additional contribution comes from the scattering on atomic electrons
+    // this is described below
 
-    double Fe, Fm, Le, Lm, Ye, Ym, s, b, g1, g2;
-    double aux, aux1, aux2, r2, Z3, atomic_electron_contribution;
-    double particle_mass       = particle_def_.mass;
-    double particle_charge     = particle_def_.charge;
-    double particle_energy     = energy;
+    double g1, g2;
+    double aux, aux1, aux2, r2;
+    double diagram_e, diagram_mu, atomic_electron_contribution;
     double medium_charge       = components_[component_index_]->GetNucCharge();
     double medium_log_constant = components_[component_index_]->GetLogConstant();
 
     r   = 1 - r; // only for integral optimization - do not forget to swap integration limits!
     r2  = r * r;
-    Z3  = pow(medium_charge, -1. / 3);
-    aux = (particle_mass * v_) / (2 * ME);
-    aux *= aux;
-    s    = aux * (1 - r2) / (1 - v_);
-    b    = (v_ * v_) / (2 * (1 - v_));
-    Ye   = (5 - r2 + 4 * b * (1 + r2)) / (2 * (1 + 3 * b) * log(3 + 1 / s) - r2 - 2 * b * (2 - r2));
-    Ym   = (4 + r2 + 3 * b * (1 + r2)) / ((1 + r2) * (1.5 + 2 * b) * log(3 + s) + 1 - 1.5 * r2);
-    aux  = (1.5 * ME) / (particle_mass * Z3);
-    aux1 = (1 + s) * (1 + Ye);
-    aux2 = (2 * ME * SQRTE * medium_log_constant * Z3) / (particle_energy * v_ * (1 - r2));
-    Le   = log((medium_log_constant * Z3 * sqrt(aux1)) / (1 + aux2 * aux1)) - 0.5 * log(1 + aux * aux * aux1);
-    Lm   = log((medium_log_constant / aux * Z3) / (1 + aux2 * (1 + s) * (1 + Ym)));
+    double Z3  = pow(medium_charge, -1. / 3);
+    aux = (particle_def_.mass * v_) / (2 * ME);
+    double xi = aux * aux * (1 - r2) / (1 - v_);
+    double beta = (v_ * v_) / (2 * (1 - v_));
 
-    if (Le > 0)
+    // these are the Y_e and Y_mu expressions in the original paper
+    diagram_e  = (5 - r2 + 4 * beta * (1 + r2))
+                / (2 * (1 + 3 * beta) * log(3 + 1 / xi) - r2 - 2 * beta * (2 - r2));
+    diagram_mu = (4 + r2 + 3 * beta * (1 + r2))
+                / ((1 + r2) * (1.5 + 2 * beta) * log(3 + xi) + 1 - 1.5 * r2);
+    
+    // these arae the L_e and L_mu expressions
+    aux  = (1.5 * ME) / (particle_def_.mass * Z3);
+    aux1 = (1 + xi) * (1 + diagram_e);
+    aux2 = (2 * ME * SQRTE * medium_log_constant * Z3) / (particle_energy * v_ * (1 - r2));
+    diagram_e  = log((medium_log_constant * Z3 * sqrt(aux1)) / (1 + aux2 * aux1)) 
+                - 0.5 * log(1 + aux * aux * aux1);
+    diagram_mu = log((medium_log_constant / aux * Z3) / (1 + aux2 * (1 + xi) * (1 + diagram_mu)));
+
+    // these are the Phi_e and Phi_mu expressions
+    // if the logarithms above are below zero, the contribution of the diagram is set to zero
+    // if lpm supression is taken into account, Phi_e is changed
+    if (diagram_e > 0)
     {
-        if (1 / s < HALF_PRECISION)
+        if (param_def_.lpm_effect_enabled)
+        {
+            diagram_e = lpm(particle_energy, r2, beta, xi) * diagram_e;
+        }
+        else if (1 / xi < HALF_PRECISION)
         {
             // TODO: where does this short expression come from?
-            Fe = (1.5 - r2 / 2 + b * (1 + r2)) / s * Le;
-        } else
-        {
-            Fe = (((2 + r2) * (1 + b) + s * (3 + r2)) * log(1 + 1 / s) + (1 - r2 - b) / (1 + s) - (3 + r2)) * Le;
+            diagram_e = (1.5 - r2 / 2 + beta * (1 + r2)) / xi * diagram_e;
         }
-    } else
-    {
-        Fe = 0;
+        else
+        {
+            diagram_e = (((2 + r2) * (1 + beta) + xi * (3 + r2)) * log(1 + 1 / xi) 
+                        + (1 - r2 - beta) / (1 + xi) - (3 + r2)) * diagram_e;
+        }
     }
-
-    if (Lm > 0)
-    {
-        Fm = (((1 + r2) * (1 + 1.5 * b) - (1 + 2 * b) * (1 - r2) / s) * log(1 + s) + s * (1 - r2 - b) / (1 + s) +
-              (1 + 2 * b) * (1 - r2)) *
-             Lm;
-    }
-
     else
     {
-        Fm = 0;
+        diagram_e = 0;
     }
 
+    if (diagram_mu > 0)
+    {
+        diagram_mu = (((1 + r2) * (1 + 1.5 * beta) - (1 + 2 * beta) * (1 - r2) / xi) * log(1 + xi)
+                    + xi * (1 - r2 - beta) / (1 + xi) + (1 + 2 * beta) * (1 - r2)) * diagram_mu;
+    }
+    else
+    {
+        diagram_mu = 0;
+    }
+
+
     // Calculating the contribution of atomic electrons as scattering partner
+    // Phys. Atom. Nucl. 61 (1998), 448
     if (medium_charge == 1)
     {
         g1 = 4.4e-5;
         g2 = 4.8e-5;
-    } else
+    }
+    else
     {
         g1 = 1.95e-5;
         g2 = 5.3e-5;
     }
 
-    aux  = particle_energy / particle_mass;
+    aux  = particle_energy / particle_def_.mass;
     aux1 = 0.073 * log(aux / (1 + g1 * aux / (Z3 * Z3))) - 0.26;
     aux2 = 0.058 * log(aux / (1 + g2 * aux / Z3)) - 0.14;
 
     if (aux1 > 0 && aux2 > 0)
     {
         atomic_electron_contribution = aux1 / aux2;
-    } else
+    }
+    else
     {
         atomic_electron_contribution = 0;
     }
 
-    aux = ALPHA * RE;
-    aux *= aux / (1.5 * PI);
-    aux1 = ME / particle_mass * particle_charge;
-    aux1 *= aux1;
-    aux *= 2 * medium_charge * (medium_charge + atomic_electron_contribution) * ((1 - v_) / v_) * (Fe + aux1 * Fm);
 
-    if (param_def_.lpm_effect_enabled)
-    {
-        aux *= lpm(energy, r2, b, s);
-    }
+    // combining the results
+    aux = ALPHA * RE * particle_def_.charge;;
+    aux *= aux / (1.5 * PI) * 2 * medium_charge * (medium_charge + atomic_electron_contribution);
+    aux1 = ME / particle_def_.mass * particle_def_.charge;;
+    aux *=  (1 - v_) / v_ * (diagram_e + aux1*aux1 * diagram_mu);
 
     if (aux < 0)
     {
@@ -186,7 +204,10 @@ double EpairProduction::FunctionToIntegral(double energy, double r)
     return aux;
 }
 
+
 // ------------------------------------------------------------------------- //
+
+
 double EpairProduction::lpm(double energy, double r2, double b, double x)
 {
     if (init_lpm_effect_)
@@ -194,6 +215,11 @@ double EpairProduction::lpm(double energy, double r2, double b, double x)
         init_lpm_effect_ = false;
         double sum       = 0;
 
+        // for (std::vector<Components::Component*>::iterator iter = medium_->GetComponents().begin() ; iter != medium_->GetComponents().end() ; ++iter)
+        // {
+        //     sum += (*iter)->GetNucCharge() * (*iter)->GetNucCharge() *
+        //            log(3.25 * (*iter)->GetLogConstant() * pow((*iter)->GetNucCharge(), -1. / 3));
+        // }
         for (int i = 0; i < medium_->GetNumComponents(); i++)
         {
             Components::Component* component = medium_->GetComponents().at(i);
@@ -201,18 +227,16 @@ double EpairProduction::lpm(double energy, double r2, double b, double x)
             sum += component->GetNucCharge() * component->GetNucCharge() *
                    log(3.25 * component->GetLogConstant() * pow(component->GetNucCharge(), -1. / 3));
         }
-        double particle_mass   = particle_def_.mass;
-        double particle_charge = particle_def_.charge;
 
-        eLpm_ = particle_mass / (ME * RE);
-        eLpm_ *= (eLpm_ * eLpm_) * ALPHA * particle_mass /
-                 (2 * PI * medium_->GetMolDensity() * particle_charge * particle_charge * sum);
+        eLpm_ = particle_def_.mass / (ME * RE);
+        eLpm_ *= (eLpm_ * eLpm_) * ALPHA * particle_def_.mass /
+                 (2 * PI * medium_->GetMolDensity() * particle_def_.charge * particle_def_.charge * sum);
     }
 
     double A, B, C, D, E, s;
-    double s2, s36, s6, d1, d2, atan_, log1, log2;
+    double s36, s6, d1, d2, atan_, log1, log2;
 
-    s     = sqrt(eLpm_ / (energy * v_ * (1 - r2))) / 4;
+    s     = 0.25 * sqrt(eLpm_ / (energy * v_ * (1 - r2)));
     s6    = 6 * s;
     atan_ = s6 * (x + 1);
 
@@ -221,8 +245,7 @@ double EpairProduction::lpm(double energy, double r2, double b, double x)
         return 1;
     }
 
-    s2    = s * s;
-    s36   = 36 * s2;
+    s36   = 36 * s * s;
     d1    = s6 / (s6 + 1);
     d2    = s36 / (s36 + 1);
     atan_ = atan(atan_) - PI / 2;
@@ -234,8 +257,7 @@ double EpairProduction::lpm(double energy, double r2, double b, double x)
     D     = d1 - d1 * d1 * x * log2;
     E     = -s6 * atan_;
 
-    return ((1 + b) * (A + (1 + r2) * B) + b * (C + (1 + r2) * D) + (1 - r2) * E) /
-           (((2 + r2) * (1 + b) + x * (3 + r2)) * log(1 + 1 / x) + (1 - r2 - b) / (1 + x) - (3 + r2));
+    return ((1 + b) * (A + (1 + r2) * B) + b * (C + (1 + r2) * D) + (1 - r2) * E);
 }
 
 
@@ -274,15 +296,11 @@ EpairProductionRhoIntegral::~EpairProductionRhoIntegral()
 // ------------------------------------------------------------------------- //
 double EpairProductionRhoIntegral::DifferentialCrossSection(double energy, double v)
 {
-    double particle_energy = energy;
-
     double rMax, aux, aux2;
-    double particle_charge = particle_def_.charge;
-    double particle_mass   = particle_def_.mass;
 
     v_   = v;
-    aux  = 1 - (4 * ME) / (particle_energy * v_);
-    aux2 = 1 - (6 * particle_mass * particle_mass) / (particle_energy * particle_energy * (1 - v_));
+    aux  = 1 - (4 * ME) / (energy * v_);
+    aux2 = 1 - (6 * particle_def_.mass * particle_def_.mass) / (energy * energy * (1 - v_));
 
     if (aux > 0 && aux2 > 0)
     {
@@ -294,7 +312,7 @@ double EpairProductionRhoIntegral::DifferentialCrossSection(double energy, doubl
 
     aux = std::max(1 - rMax, COMPUTER_PRECISION);
 
-    return medium_->GetMolDensity() * components_[component_index_]->GetAtomInMolecule() * particle_charge * particle_charge *
+    return medium_->GetMolDensity() * components_[component_index_]->GetAtomInMolecule() * particle_def_.charge * particle_def_.charge *
            (integral_.Integrate(1 - rMax, aux, boost::bind(&EpairProductionRhoIntegral::FunctionToIntegral, this, energy, _1), 2) +
             integral_.Integrate(aux, 1, boost::bind(&EpairProductionRhoIntegral::FunctionToIntegral, this, energy, _1), 4));
 }
