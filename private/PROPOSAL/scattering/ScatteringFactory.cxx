@@ -7,23 +7,17 @@
 #include "PROPOSAL/scattering/ScatteringMoliere.h"
 #include "PROPOSAL/scattering/ScatteringFirstOrder.h"
 
+#include "PROPOSAL/propagation_utility/PropagationUtility.h"
+
 using namespace PROPOSAL;
 
 ScatteringFactory::ScatteringFactory()
 {
     // Register all media in lower case!
 
-    Register("default", &ScatteringDefault::create);
-    Register("moliere", &ScatteringMoliere::create);
-    Register("moliere_first_order", &ScatteringFirstOrder::create);
-
-    Register("default", Default);
-    Register("moliere", Moliere);
-    Register("moliere_first_order", MoliereFirstOrder);
-
-    Register(Default, &ScatteringDefault::create);
-    Register(Moliere, &ScatteringMoliere::create);
-    Register(MoliereFirstOrder, &ScatteringFirstOrder::create);
+    RegisterUtility("default", Default, &ScatteringDefault::create);
+    Register("moliere", Moliere, &ScatteringMoliere::create);
+    Register("moliere_first_order", MoliereFirstOrder, &ScatteringFirstOrder::create);
 }
 
 ScatteringFactory::~ScatteringFactory()
@@ -33,44 +27,57 @@ ScatteringFactory::~ScatteringFactory()
     map_string_to_enum.clear();
 }
 
-void ScatteringFactory::Register(const std::string& name, RegisterFunction create)
+void ScatteringFactory::Register(const std::string& name, Enum model, RegisterFunction create)
 {
     scattering_map_str_[name] = create;
-}
-
-void ScatteringFactory::Register(Enum model, RegisterFunction create)
-{
     scattering_map_enum_[model] = create;
-}
 
-void ScatteringFactory::Register(const std::string& name, Enum model)
-{
     map_string_to_enum[name] = model;
 }
 
-Scattering* ScatteringFactory::CreateScattering(const std::string& name)
+void ScatteringFactory::RegisterUtility(const std::string& name, Enum model, RegisterFunctionUtility create)
+{
+    scattering_map_utility_str_[name] = create;
+    scattering_map_utility_enum_[model] = create;
+
+    map_string_to_enum[name] = model;
+}
+
+Scattering* ScatteringFactory::CreateScattering(const std::string& name, PROPOSALParticle& particle, Utility& utility)
 {
     std::string name_lower = boost::algorithm::to_lower_copy(name);
 
     ScatteringMapString::iterator it = scattering_map_str_.find(name_lower);
+    ScatteringMapUtiltiyString::iterator it_utility = scattering_map_utility_str_.find(name_lower);
 
     if (it != scattering_map_str_.end())
     {
-        return it->second();
-    } else
+        return it->second(particle, utility.GetMedium());
+    }
+    else if (it_utility != scattering_map_utility_str_.end())
+    {
+        return it_utility->second(particle, utility);
+    }
+    else
     {
         log_fatal("Scattering %s not registerd!", name.c_str());
     }
 }
 
-Scattering* ScatteringFactory::CreateScattering(Enum model)
+Scattering* ScatteringFactory::CreateScattering(Enum model, PROPOSALParticle& particle, Utility& utility)
 {
     ScatteringMapEnum::iterator it = scattering_map_enum_.find(model);
+    ScatteringMapUtiltiyEnum::iterator it_utility = scattering_map_utility_enum_.find(model);
 
     if (it != scattering_map_enum_.end())
     {
-        return it->second();
-    } else
+        return it->second(particle, utility.GetMedium());
+    }
+    else if (it_utility != scattering_map_utility_enum_.end())
+    {
+        return it_utility->second(particle, utility);
+    }
+    else
     {
         log_fatal("Scattering %s not registerd!", typeid(model).name());
     }

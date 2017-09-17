@@ -17,12 +17,12 @@ class ScatteringMoliere : public Scattering
 {
     public:
     // constructor
-    ScatteringMoliere();
+    ScatteringMoliere(PROPOSALParticle&, const Medium&);
     ScatteringMoliere(const ScatteringMoliere&);
     ~ScatteringMoliere();
 
     Scattering* clone() const { return new ScatteringMoliere(*this); }
-    static Scattering* create() { return new ScatteringMoliere(); }
+    static Scattering* create(PROPOSALParticle& particle, const Medium& medium) { return new ScatteringMoliere(particle, medium); }
 
     // ScatteringMoliere& operator=(const ScatteringMoliere&);
     // bool operator==(const ScatteringMoliere& scattering) const;
@@ -30,10 +30,6 @@ class ScatteringMoliere : public Scattering
     //----------------------------------------------------------------------------//
 
     // Memberfunctions
-
-    // Do nothing, not interpolation for scattering moliere
-    virtual void EnableInterpolation(const PROPOSALParticle&, const std::vector<CrossSection*>&, std::string path = "");
-    virtual void DisableInterpolation();
 
     //----------------------------------------------------------------------------//
 
@@ -73,10 +69,11 @@ class ScatteringMoliere : public Scattering
     // destructors
 
     private:
-
-    RandomAngles CalculateRandomAngle(const PROPOSALParticle&, const std::vector<CrossSection*>&, double dr, double ei, double ef);
-
     ScatteringMoliere& operator=(const ScatteringMoliere&); // Undefined & not allowed
+
+    RandomAngles CalculateRandomAngle(double dr, double ei, double ef);
+
+    const Medium* medium_;
 
     // double dx_;     // traversing thickness in cm
     // double betaSq_; // beta² = v²/c²
@@ -87,8 +84,9 @@ class ScatteringMoliere : public Scattering
     // Medium* medium_;
     int numComp_;                // number of components in medium
     std::vector<double> Zi_;     // nuclear charge of different components
-    // std::vector<double> ki_;     // number of atoms in molecule of different components
-    // std::vector<double> Ai_;     // atomic number of different components
+    std::vector<double> ki_;     // number of atoms in molecule of different components
+    std::vector<double> Ai_;     // atomic number of different components
+    double A_;
     std::vector<double> weight_; // mass weights of different components
 
     // scattering parameters

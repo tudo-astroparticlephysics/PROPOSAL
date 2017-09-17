@@ -41,6 +41,7 @@ class Sector
 
         bool do_continuous_randomization;
         bool do_exact_time_calculation;
+        ScatteringFactory::Enum scattering_model; //!< if true moliere scattering is enabled
 
         // int location;              //!< 0 = infront of the detector, 1 = inside the detector, 2 = behind the detector
         Sector::ParticleLocation::Enum
@@ -52,7 +53,7 @@ class Sector
 
     public:
     Sector(PROPOSALParticle&);
-    Sector(PROPOSALParticle&, const Medium&, const Geometry&, const EnergyCutSettings&, const Scattering&, const Definition& def = Definition());
+    Sector(PROPOSALParticle&, const Medium&, const Geometry&, const EnergyCutSettings&, const Definition& def = Definition());
     Sector(const Sector&);
     virtual ~Sector();
 
