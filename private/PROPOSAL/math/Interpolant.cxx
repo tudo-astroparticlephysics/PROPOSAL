@@ -66,8 +66,7 @@ double Interpolant::Interpolate(double x)
     {
         starti_  =   0;
     }
-
-    if(starti_>=max_)
+    else if(starti_>=max_)
     {
         starti_  =   max_-1;
     }
@@ -78,8 +77,7 @@ double Interpolant::Interpolate(double x)
     {
         start   =   0;
     }
-
-    if(start+romberg_>max_ || start>max_)
+    else if(start+romberg_>max_ || start>max_)
     {
         start   =   max_ - romberg_;
     }
@@ -120,8 +118,7 @@ double Interpolant::Interpolate(double x1, double x2)
     {
         starti_  =   0;
     }
-
-    if(starti_>=max_)
+    else if(starti_>=max_)
     {
         starti_  =   max_ - 1;
     }
@@ -132,8 +129,7 @@ double Interpolant::Interpolate(double x1, double x2)
     {
         start   =   0;
     }
-
-    if(start+romberg_>max_ || start>max_)
+    else if(start+romberg_>max_ || start>max_)
     {
         start   =   max_ - romberg_;
     }
