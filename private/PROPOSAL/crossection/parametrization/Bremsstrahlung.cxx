@@ -61,22 +61,24 @@ Bremsstrahlung::~Bremsstrahlung()
 // ------------------------------------------------------------------------- //
 double Bremsstrahlung::DifferentialCrossSection(double energy, double v)
 {
-    double aux      =   0;
-    double result   =   0;
+    // $\frac{\alpha}{v} (2 Z_{nucl} z_{particle}^2 r_e \frac{m_e}{m_{particle}})^2$
+    // is the typical Bremsstrahlung prefactor used in every Parametrization
+
+    double aux    = 0;
+    double result = 0;
 
     result = CalculateParametrization(energy, v);
 
-    aux =   2*(components_[component_index_]->GetNucCharge())*(ME/particle_def_.mass)*RE;
-    aux *=  (ALPHA/v)*aux*result;
+    aux = 2 * particle_def_.charge * particle_def_.charge * (ME/particle_def_.mass) * RE
+            * components_[component_index_]->GetNucCharge();
+    aux *= aux * (ALPHA/v) * result;
 
     if(param_def_.lpm_effect_enabled)
     {
-        aux *=  lpm(energy, v);
+        aux *= lpm(energy, v);
     }
 
-    double c2   =   pow(particle_def_.charge , 2);
-
-    return medium_->GetMolDensity()*components_[component_index_]->GetAtomInMolecule()*c2*c2*aux;
+    return medium_->GetMolDensity()*components_[component_index_]->GetAtomInMolecule()*aux;
 }
 
 // ------------------------------------------------------------------------- //
@@ -97,20 +99,25 @@ Parametrization::IntegralLimits Bremsstrahlung::GetIntegralLimits(double energy)
     IntegralLimits limits;
 
     limits.vMin = 0.;
-    limits.vMax =
-        1 - (3. / 4) * SQRTE * (particle_def_.mass / energy) * pow((components_[component_index_]->GetNucCharge()), 1. / 3);
+
+    // The limit is taken from the Petrukhin/Shestakov Parametrization
+    limits.vMax = 1 - 0.75 * SQRTE * (particle_def_.mass / energy) 
+                    * pow(components_[component_index_]->GetNucCharge(), 1. / 3);
 
     if (limits.vMax < 0)
     {
         limits.vMax = 0;
     }
-
-    if (lorenz_)
+    else if (lorenz_)
     {
-        limits.vMax = std::min(limits.vMax, lorenz_cut_ / (energy));
+        limits.vMax = std::min(limits.vMax, lorenz_cut_ / energy);
     }
 
-    limits.vMax = std::min(limits.vMax, (1 - (particle_def_.mass / energy)));
+    //TODO: 1 - a*x is always smaller than 1 - x if a > 1
+    // and 0.75*\sqrt{e}*Z^{1/3} > 1
+    // so the next line will never be called, or?
+    // limits.vMax = std::min(limits.vMax, 1 - particle_def_.mass / energy);
+
     limits.vUp  = std::min(limits.vMax, cut_settings_.GetCut(energy));
 
     return limits;
@@ -122,9 +129,9 @@ double Bremsstrahlung::lpm(double energy, double v)
     if(init_lpm_effect_)
     {
         param_def_.lpm_effect_enabled = false;
-        init_lpm_effect_    =   false;
+        init_lpm_effect_ = false;
 
-        double sum      =   0;
+        double sum = 0;
 
         Integral integral_temp = Integral(IROMB,IMAXS,IPREC);
 
@@ -154,11 +161,11 @@ double Bremsstrahlung::lpm(double energy, double v)
     const double G1  = 0.710390;
     const double G2  = 0.904912;
 
-    Z3  =   pow((components_[component_index_]->GetNucCharge()), -1./3);
+    Z3  =   pow(components_[component_index_]->GetNucCharge(), -1./3);
 
-    s1  =   (components_[component_index_]->GetLogConstant())*Z3;
+    s1  =   components_[component_index_]->GetLogConstant()*Z3;
     Dn  =   1.54*pow((components_[component_index_]->GetAtomicNum()) , 0.27);
-    s1  =   ME*Dn/((particle_def_.mass)*s1);
+    s1  =   ME*Dn/(particle_def_.mass*s1);
 
     s1 *= s1 * SQRT2;
     sp = sqrt(eLpm_ * v / (8 * (energy) * (1 - v)));
@@ -221,92 +228,94 @@ BREMSSTRAHLUNG_IMPL(AndreevBezrukovBugaev)
 
 // ------------------------------------------------------------------------- //
 // PetrukhinShestakov parametrization
+// Canad. J. Phys. 46 (1968), 377
 // ------------------------------------------------------------------------- //
 
 double BremsPetrukhinShestakov::CalculateParametrization(double energy, double v)
 {
-    double Z3       =   0;
-    double result   =   0;
-    double d, Fd;
+    double result = 0;
+    double Fd = 0;
 
-    Z3  =   pow((components_[component_index_]->GetNucCharge()), -1./3);
+    double Z3 = pow(components_[component_index_]->GetNucCharge(), -1./3);
+    // least momentum transferred to the nucleus (eq. 2)
+    double delta = particle_def_.mass*particle_def_.mass * v/(2 * energy * (1 - v));
 
-    d   =   pow((particle_def_.mass) , 2)
-            * v/(2*(energy)*(1-v));
+    // influence of atomic form factor
+    // for nuclear charge smaller 10, the nucleus is reated pointlike
+    // eq. 10
+    Fd = 189*Z3/ME;
+    Fd = (particle_def_.mass)*Fd/(1 + SQRTE*delta*Fd);
+    // 189 is the radiation logarithm
 
-    Fd  =   189*Z3/ME;
-    Fd  =   (particle_def_.mass)*Fd/(1 + SQRTE*d*Fd);
-
+    // for nuclear charge greater 10, a correction for the nuclear form factor
+    // is taken into account (eq.11)
     if((components_[component_index_]->GetNucCharge())>10)
     {
-        Fd  *=  (2./3)*Z3;
+        Fd *= (2./3)*Z3;
     }
 
-    result  =   ((4./3)*(1-v) + pow(v , 2))*log(Fd);
+    // eq. 3
+    result = ((4./3)*(1-v) + v*v)*log(Fd);
 
     return result;
 }
 
 // ------------------------------------------------------------------------- //
 // BremsKelnerKokoulinPetrukhin parametrization
+// Moscow:Preprint/MEPhI 024-95 (1995)
 // ------------------------------------------------------------------------- //
 
 double BremsKelnerKokoulinPetrukhin::CalculateParametrization(double energy, double v)
 {
-    double Z3       =   0;
-    double result   =   0;
-    double Dn       =   0;
-    double s1       =   0;
+    double formfactor_atomic_inelastic = 0.;
+    double formfactor_nuclear_inelastic = 0.;
+    double result = 0.;
 
-    Z3  =   pow(components_[component_index_]->GetNucCharge(), -1./3);
+    // least momentum transferred to the nucleus (eq. 7)
+    double delta = particle_def_.mass*particle_def_.mass * v/(2 * energy * (1 - v));
 
-    int step;
-    double d, da, dn, Fa, maxV;
+    double Z3 = pow(components_[component_index_]->GetNucCharge(), -1./3);
+    double Dn = 1.54*pow((components_[component_index_]->GetAtomicNum()), 0.27);
+    // elastic atomic form factor (eq. 14)
+    double formfactor_atomic_elastic  = log(1 + ME/(delta*SQRTE*components_[component_index_]->GetLogConstant()*Z3));
+    // elastic nuclear form factor (eq. 18)
+    double formfactor_nuclear_elastic = log(Dn/(1 + delta*(Dn*SQRTE - 2)/particle_def_.mass));
 
     //TODO(mario): Better way? Sat 2017/09/02
     double square_momentum = energy * energy - particle_def_.mass * particle_def_.mass;
     double particle_momentum = sqrt(std::max(square_momentum, 0.0));
-
-    d       =   particle_def_.mass*particle_def_.mass
-                *v/(2*(energy)*(1-v));
-    s1      =   (components_[component_index_]->GetLogConstant())*Z3;
-    da      =   log(1 + ME/(d*SQRTE*s1));
-    Dn      =   1.54*pow((components_[component_index_]->GetAtomicNum()), 0.27);
-    dn      =   log(Dn/(1 + d*(Dn*SQRTE - 2)/particle_def_.mass));
-    maxV    =   ME*(energy - particle_def_.mass)
-                /((energy)
-                  *(energy - particle_momentum + ME));
+    double maxV = ME*(energy - particle_def_.mass)/(energy*(energy - particle_momentum + ME));
 
     if(v<maxV)
     {
-        Fa  =   log(((particle_def_.mass)/d)/(d*(particle_def_.mass)/(ME*ME) + SQRTE)) -
-                log(1 + ME/(d*SQRTE*components_[component_index_]->GetBPrime()*(pow(components_[component_index_]->GetNucCharge() , -2./3))));
+        // inelastic atomic contribution (eq. 26)
+        formfactor_atomic_inelastic = log(particle_def_.mass/(delta*(delta*particle_def_.mass/(ME*ME) + SQRTE))) -
+            log(1 + ME/(delta*SQRTE*components_[component_index_]->GetBPrime()*Z3*Z3));
     }
-    else
+
+    if(components_[component_index_]->GetNucCharge() != 1)
     {
-        Fa  =   0;
+        // inelastic nuclear contribution (eq. 28)
+        formfactor_nuclear_inelastic = formfactor_nuclear_elastic;
+        // the inelastic nuclear form factor describes the scattering at single nucleons in a nucleus
+        // for Hydrogen this doesn't make sense
+        // or more explicit: the min required energy to excite a proton is much higher 
+        // than to excite a nucleus with more then just one nucleon
     }
 
-    if((components_[component_index_]->GetNucCharge())==1)
-    {
-        step    =   0;
-    }
-
-    else
-    {
-        step    =   1;
-    }
-
-
+    // eq. 2
     result = ((4./3)*(1-v) + v*v)
-            *(log((particle_def_.mass)/d)
-              - 0.5 -da - dn + (dn*step + Fa)/(components_[component_index_]->GetNucCharge()));
+            *(log(particle_def_.mass/delta) - 0.5 // eq.3
+              - formfactor_atomic_elastic - formfactor_nuclear_elastic 
+              + (formfactor_nuclear_inelastic + formfactor_atomic_inelastic)/components_[component_index_]->GetNucCharge());
 
     return result;
 }
 
 // ------------------------------------------------------------------------- //
-// CompleteScreening parametrization
+// CompleteScreening parametrization (by Tsai)
+// Rev. Mod. Phys. 46 (1974), 815
+// eq. 3.83
 // ------------------------------------------------------------------------- //
 
 double BremsCompleteScreening::CalculateParametrization(double energy, double v)
@@ -314,18 +323,17 @@ double BremsCompleteScreening::CalculateParametrization(double energy, double v)
     (void) energy;
 
     double aux      =   0;
-    double Z3       =   0;
     double result   =   0;
     double Lr, fZ, Lp;
 
-    Z3  =   pow((components_[component_index_]->GetNucCharge()) , -1./3);
+    double Z3 = pow(components_[component_index_]->GetNucCharge() , -1./3);
 
-    aux =   ALPHA*(components_[component_index_]->GetNucCharge());
+    aux =   ALPHA*components_[component_index_]->GetNucCharge();
     aux *=  aux;
     fZ  =   aux*(1/(1 + aux) + 0.20206 + aux*(-0.0369 + aux*(0.0083 - 0.002*aux)));
 
     //check rounding
-    switch((int)((components_[component_index_]->GetNucCharge()) + 0.5))
+    switch((int)(components_[component_index_]->GetNucCharge() + 0.5))
     {
 
         case 1:
@@ -355,14 +363,14 @@ double BremsCompleteScreening::CalculateParametrization(double energy, double v)
         default:
         {
             Lr  =   log(184.15*Z3);
-            Lp  =   log (1194*pow(Z3 , 2));
+            Lp  =   log (1194*Z3*Z3);
         }break;
 
     }
 
-    result = (((4./3)*(1-v) + pow(v , 2))*
-              ((components_[component_index_]->GetNucCharge())*(Lr - fZ) + Lp)
-             + (1./9)*(1-v)*((components_[component_index_]->GetNucCharge()) + 1))
+    result = (((4./3)*(1-v) + v*v)*
+              (components_[component_index_]->GetNucCharge()*(Lr - fZ) + Lp)
+             + (1./9)*(1-v)*(components_[component_index_]->GetNucCharge() + 1))
             /(components_[component_index_]->GetNucCharge());
 
     return result;
@@ -370,29 +378,30 @@ double BremsCompleteScreening::CalculateParametrization(double energy, double v)
 
 // ------------------------------------------------------------------------- //
 // AndreevBezrukovBugaev parametrization
+// Phys. Atom. Nucl. 57 (1994), 2066
 // ------------------------------------------------------------------------- //
 
 double BremsAndreevBezrukovBugaev::CalculateParametrization(double energy, double v)
 {
     double aux      =   0;
-    double Z3       =   0;
     double result   =   0;
 
-    Z3 = pow((components_[component_index_]->GetNucCharge()), -1./3);
+    // least momentum transferred to the nucleus (eq. 7)
+    double delta = particle_def_.mass*particle_def_.mass * v/(2 * energy * (1 - v));
 
-    double aux1, aux2, a1, a2,zeta, qc, qmin, x1, x2, d1,d2, psi1, psi2;
+    double Z3 = pow(components_[component_index_]->GetNucCharge(), -1./3);
 
-    a1      =   111.7*Z3/ME;
-    a2      =   724.2*Z3*Z3/ME;
-    qc      =   1.9*MMU*Z3;
-    aux     =   2*(particle_def_.mass)/qc;
-    aux     *=  aux;
-    zeta    =   sqrt(1+aux);
-    qmin    =   pow((particle_def_.mass),2)
-                *v/((energy)*(1-v));
+    double aux1, aux2, d1, d2, psi1, psi2;
 
-    x1      =   a1*qmin;
-    x2      =   a2*qmin;
+    double a1 = 184.15/SQRTE*Z3/ME; // eq 2.18
+    double a2 = 1194/SQRTE*Z3*Z3/ME; // eq.2.19
+    double qc = 1.9*MMU*Z3;
+    aux =  2*(particle_def_.mass)/qc;
+    aux *= aux;
+    double zeta = sqrt(1+aux);
+
+    double x1 = a1*delta;
+    double x2 = a2*delta;
 
     if((components_[component_index_]->GetNucCharge())==1)
     {
