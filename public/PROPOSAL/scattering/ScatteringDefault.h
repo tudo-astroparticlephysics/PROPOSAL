@@ -19,7 +19,7 @@ class ScatteringDefault: public Scattering
     public:
     ScatteringDefault(PROPOSALParticle&, Utility&);
     ScatteringDefault(const ScatteringDefault&);
-    ~ScatteringDefault() {}
+    ~ScatteringDefault();
 
     virtual Scattering* clone() const { return new ScatteringDefault(*this); }
     static Scattering* create(PROPOSALParticle& particle, Utility& utility) { return new ScatteringDefault(particle, utility); }

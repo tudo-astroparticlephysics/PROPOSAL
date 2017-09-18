@@ -42,6 +42,11 @@ ScatteringDefault::ScatteringDefault(const ScatteringDefault& scattering)
 {
 }
 
+ScatteringDefault::~ScatteringDefault()
+{
+    delete scatter;
+}
+
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 //-------------------------operators and swap function------------------------//
