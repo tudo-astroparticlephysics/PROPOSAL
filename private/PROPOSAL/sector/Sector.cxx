@@ -55,19 +55,19 @@ Sector::Sector(PROPOSALParticle& particle)
     , interaction_calculator_(NULL)
     , decay_calculator_(NULL)
     , exact_time_calculator_(NULL)
-    , cont_rand_calculator_(NULL)
+    , cont_rand_(NULL)
     , scattering_(ScatteringFactory::Get().CreateScattering(sector_def_.scattering_model, particle_, utility_))
 {
+    if (sector_def_.do_continuous_randomization)
+    {
+        cont_rand_= new ContinuousRandomizer(utility_);
+    }
+
     if (utility_.GetDefinition().do_interpolation)
     {
         displacement_calculator_ = new UtilityInterpolantDisplacement(utility_);
         interaction_calculator_ = new UtilityInterpolantInteraction(utility_);
         decay_calculator_ = new UtilityInterpolantDecay(utility_);
-
-        if (sector_def_.do_continuous_randomization)
-        {
-            cont_rand_calculator_ = new UtilityInterpolantContRand(utility_);
-        }
 
         if (sector_def_.do_exact_time_calculation)
         {
@@ -79,11 +79,6 @@ Sector::Sector(PROPOSALParticle& particle)
         displacement_calculator_ = new UtilityIntegralDisplacement(utility_);
         interaction_calculator_ = new UtilityIntegralInteraction(utility_);
         decay_calculator_ = new UtilityIntegralDecay(utility_);
-
-        if (sector_def_.do_continuous_randomization)
-        {
-            cont_rand_calculator_ = new UtilityIntegralContRand(utility_);
-        }
 
         if (sector_def_.do_exact_time_calculation)
         {
@@ -106,19 +101,19 @@ Sector::Sector(PROPOSALParticle& particle, const Medium& medium,
     , interaction_calculator_(NULL)
     , decay_calculator_(NULL)
     , exact_time_calculator_(NULL)
-    , cont_rand_calculator_(NULL)
+    , cont_rand_(NULL)
     , scattering_(ScatteringFactory::Get().CreateScattering(sector_def_.scattering_model, particle_, utility_))
 {
+    if (sector_def_.do_continuous_randomization)
+    {
+        cont_rand_= new ContinuousRandomizer(utility_);
+    }
+
     if (utility_.GetDefinition().do_interpolation)
     {
         displacement_calculator_ = new UtilityInterpolantDisplacement(utility_);
         interaction_calculator_ = new UtilityInterpolantInteraction(utility_);
         decay_calculator_ = new UtilityInterpolantDecay(utility_);
-
-        if (sector_def_.do_continuous_randomization)
-        {
-            cont_rand_calculator_ = new UtilityInterpolantContRand(utility_);
-        }
 
         if (sector_def_.do_exact_time_calculation)
         {
@@ -130,11 +125,6 @@ Sector::Sector(PROPOSALParticle& particle, const Medium& medium,
         displacement_calculator_ = new UtilityIntegralDisplacement(utility_);
         interaction_calculator_ = new UtilityIntegralInteraction(utility_);
         decay_calculator_ = new UtilityIntegralDecay(utility_);
-
-        if (sector_def_.do_continuous_randomization)
-        {
-            cont_rand_calculator_ = new UtilityIntegralContRand(utility_);
-        }
 
         if (sector_def_.do_exact_time_calculation)
         {
@@ -165,7 +155,7 @@ Sector::Sector(const Sector& collection)
     , interaction_calculator_(collection.interaction_calculator_->clone())
     , decay_calculator_(collection.decay_calculator_->clone())
     , exact_time_calculator_(NULL)
-    , cont_rand_calculator_(NULL)
+    , cont_rand_(NULL)
     , scattering_(collection.scattering_->clone())
 {
     if (collection.exact_time_calculator_ != NULL)
@@ -173,9 +163,9 @@ Sector::Sector(const Sector& collection)
         exact_time_calculator_ = collection.exact_time_calculator_->clone();
     }
 
-    if (collection.cont_rand_calculator_ != NULL)
+    if (collection.cont_rand_!= NULL)
     {
-        cont_rand_calculator_ = collection.cont_rand_calculator_->clone();
+        cont_rand_= new ContinuousRandomizer(*collection.cont_rand_);
     }
 }
 
@@ -193,17 +183,10 @@ Sector::~Sector()
         delete exact_time_calculator_;
     }
 
-    if (cont_rand_calculator_)
+    if (cont_rand_)
     {
-        delete cont_rand_calculator_;
+        delete cont_rand_;
     }
-
-    // if (randomizer_)
-    // {
-    //     delete randomizer_;
-    // }
-
-    //TODO(mario): delete scatter Sat 2017/08/26
 }
 
 // ------------------------------------------------------------------------- //
@@ -280,13 +263,11 @@ double Sector::Propagate(double distance)
             propagated_distance = distance; // computer precision control
         }
 
-        //TODO(mario): Revert randomizer Fri 2017/08/25
-        // Randomize the continuous energy loss if this option is enabled
-        if (cont_rand_calculator_)
+        if (cont_rand_)
         {
             if (final_energy != particle_.GetLow())
             {
-                final_energy = cont_rand_calculator_->Calculate(initial_energy, final_energy, RandomGenerator::Get().RandomDouble());
+                final_energy = cont_rand_->Randomize(initial_energy, final_energy, RandomGenerator::Get().RandomDouble());
             }
         }
 
