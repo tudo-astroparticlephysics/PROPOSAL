@@ -9,6 +9,7 @@
 #include "PROPOSAL/scattering/ScatteringFactory.h"
 
 #include "PROPOSAL/propagation_utility/PropagationUtilityFactory.h"
+#include "PROPOSAL/propagation_utility/ContinuousRandomizer.h"
 
 namespace PROPOSAL {
 
@@ -152,9 +153,8 @@ class Sector
     UtilityDecorator* interaction_calculator_;
     UtilityDecorator* decay_calculator_;
     UtilityDecorator* exact_time_calculator_;
-    UtilityDecorator* cont_rand_calculator_;
 
-    // ContinuousRandomization* randomizer_;
+    ContinuousRandomizer* cont_rand_;
     Scattering* scattering_;
 };
 }
