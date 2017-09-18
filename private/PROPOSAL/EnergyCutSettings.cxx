@@ -12,19 +12,24 @@ using namespace PROPOSAL;
 
 double EnergyCutSettings::GetCut(double energy) const
 {
-
-    double aux;
-    aux = ecut_/energy;
+    // if both ecut and vcut are setted (in their bounds), the minimum is used
+    //
+    // if just one of them is setted, this is used
+    //
+    // if both are setted out of their bound (usually -1, -1),
+    // then 1 (which is the max. energy transfer) is returned,
+    // which is always greater than v_max
+    // that means, just continuous losses are calculated, no stochastic ones
 
     if(ecut_>0)
     {
         if(vcut_>0 && vcut_<=1)
         {
-            return std::min(aux, vcut_);
+            return std::min(ecut_/energy, vcut_);
         }
         else
         {
-            return aux;
+            return ecut_/energy;
         }
     }
     else
@@ -105,8 +110,8 @@ EnergyCutSettings& EnergyCutSettings::operator=(const EnergyCutSettings &energyC
 
 bool EnergyCutSettings::operator==(const EnergyCutSettings &energyCutSettings) const
 {
-    if( ecut_   != energyCutSettings.ecut_)  return false;
-    if( vcut_   != energyCutSettings.vcut_)  return false;
+    if( ecut_ != energyCutSettings.ecut_) return false;
+    if( vcut_ != energyCutSettings.vcut_) return false;
 
     //else
     return true;
