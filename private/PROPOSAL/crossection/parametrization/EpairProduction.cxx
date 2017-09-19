@@ -88,6 +88,11 @@ Parametrization::IntegralLimits EpairProduction::GetIntegralLimits(double energy
 }
 
 // ------------------------------------------------------------------------- //
+// Parametrization of Kelner/Kokoulin/Petrukhin
+// Proc. 12th ICCR (1971), 2436
+// ------------------------------------------------------------------------- //
+
+
 double EpairProduction::FunctionToIntegral(double particle_energy, double r)
 {
     // Parametrization of Kelner/Kokoulin/Petrukhin
@@ -206,6 +211,9 @@ double EpairProduction::FunctionToIntegral(double particle_energy, double r)
 
 
 // ------------------------------------------------------------------------- //
+// LPM Supression by Polityko, Takahashi, Kato, Yamada, Misaki
+// J. Phys. G: Nucl Part. Phys. 28 (2002) 427
+// ------------------------------------------------------------------------- //
 
 
 double EpairProduction::lpm(double energy, double r2, double b, double x)
@@ -228,15 +236,17 @@ double EpairProduction::lpm(double energy, double r2, double b, double x)
                    log(3.25 * component->GetLogConstant() * pow(component->GetNucCharge(), -1. / 3));
         }
 
+        // eq. 29
         eLpm_ = particle_def_.mass / (ME * RE);
         eLpm_ *= (eLpm_ * eLpm_) * ALPHA * particle_def_.mass /
                  (2 * PI * medium_->GetMolDensity() * particle_def_.charge * particle_def_.charge * sum);
     }
 
+    // Ternovskii functions calculated in appendix (eq. A.2)
     double A, B, C, D, E, s;
     double s36, s6, d1, d2, atan_, log1, log2;
 
-    s     = 0.25 * sqrt(eLpm_ / (energy * v_ * (1 - r2)));
+    s     = 0.25 * sqrt(eLpm_ / (energy * v_ * (1 - r2))); // eq. 29
     s6    = 6 * s;
     atan_ = s6 * (x + 1);
 
