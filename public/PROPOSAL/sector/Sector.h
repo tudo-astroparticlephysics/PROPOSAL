@@ -35,26 +35,26 @@ class Sector
         };
     };
 
-    struct Definition : Utility::Definition
+    struct Definition
     {
         bool do_weighting;      //!< Do weigthing? Set to false in constructor
         double weighting_order; //!< Re-weighting order. Set to 0 in constructor
 
         bool do_continuous_randomization;
         bool do_exact_time_calculation;
-        ScatteringFactory::Enum scattering_model; //!< if true moliere scattering is enabled
 
-        // int location;              //!< 0 = infront of the detector, 1 = inside the detector, 2 = behind the detector
-        Sector::ParticleLocation::Enum
-            location; //!< 0 = infront of the detector, 1 = inside the detector, 2 = behind the detector
+        ScatteringFactory::Enum scattering_model;
+
+        Sector::ParticleLocation::Enum location;
 
         Definition();
         ~Definition();
     };
 
     public:
-    Sector(PROPOSALParticle&);
-    Sector(PROPOSALParticle&, const Medium&, const Geometry&, const EnergyCutSettings&, const Definition& def = Definition());
+    // Sector(PROPOSALParticle&);
+    Sector(PROPOSALParticle&, const Medium&, const EnergyCutSettings&, const Geometry&, const Utility::Definition, const Definition& = Definition());
+    // Sector(PROPOSALParticle&, const Geometry&, const Utility&, const Scattering&, bool do_interpolation, const Definition& def = Definition());
     Sector(const Sector&);
     virtual ~Sector();
 
@@ -123,7 +123,6 @@ class Sector
     // --------------------------------------------------------------------- //
 
     ParticleLocation::Enum GetLocation() const { return sector_def_.location; }
-    bool GetLpmEffectEnabled() const { return sector_def_.lpm_effect_enabled; }
     // bool GetDoRandomization() const { return do_continuous_randomization_; }
     // bool GetEnableRandomization() const { return enable_randomization_; }
 

@@ -9,6 +9,8 @@
 
 #include "PROPOSAL/crossection/parametrization/Parametrization.h"
 
+#include "PROPOSAL/methods.h"
+
 namespace  PROPOSAL
 {
 
@@ -30,12 +32,26 @@ class BremsstrahlungFactory
         AndreevBezrukovBugaev
     };
 
+    struct Definition
+    {
+        Definition()
+            : parametrization(KelnerKokoulinPetrukhin)
+            , lpm_effect(true)
+            , multiplier(1.0)
+        {
+        }
+
+        Enum parametrization;
+        bool lpm_effect;
+        double multiplier;
+    };
+
     // --------------------------------------------------------------------- //
     // Typedefs for readablitiy
     // --------------------------------------------------------------------- //
 
     typedef boost::function<
-        Parametrization*(const ParticleDef&, const Medium&, const EnergyCutSettings&, Parametrization::Definition)>
+        Parametrization*(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier, bool lpm)>
         RegisterFunction;
 
     typedef std::map<std::string, RegisterFunction > BremsstrahlungMapString;
@@ -46,32 +62,55 @@ class BremsstrahlungFactory
     // Create functions
     // --------------------------------------------------------------------- //
 
-    Parametrization* CreateParametrization(const std::string&,
-                                           const ParticleDef& particle_def,
-                                           const Medium& medium,
-                                           const EnergyCutSettings& cuts,
-                                           Parametrization::Definition def) const;
-
-    Parametrization* CreateParametrization(const Enum,
-                                           const ParticleDef& particle_def,
-                                           const Medium& medium,
-                                           const EnergyCutSettings& cuts,
-                                           Parametrization::Definition def) const;
-
-    CrossSection* CreateBremsstrahlung(const std::string&,
+    CrossSection* CreateBremsstrahlungIntegral(const std::string&,
                                        const ParticleDef& particle_def,
                                        const Medium& medium,
                                        const EnergyCutSettings& cuts,
-                                       Parametrization::Definition def,
-                                       bool interpolate = true) const;
+                                       double multiplier,
+                                       bool lpm) const;
+
+    CrossSection* CreateBremsstrahlungIntegral(const Enum,
+                                       const ParticleDef& particle_def,
+                                       const Medium& medium,
+                                       const EnergyCutSettings& cuts,
+                                       double multiplier,
+                                       bool lpm) const;
+
+    CrossSection* CreateBremsstrahlungInterpolant(const std::string&,
+                                       const ParticleDef& particle_def,
+                                       const Medium& medium,
+                                       const EnergyCutSettings& cuts,
+                                       double multiplier,
+                                       bool lpm,
+                                       InterpolationDef) const;
+
+    CrossSection* CreateBremsstrahlungInterpolant(const Enum,
+                                       const ParticleDef& particle_def,
+                                       const Medium& medium,
+                                       const EnergyCutSettings& cuts,
+                                       double multiplier,
+                                       bool lpm,
+                                       InterpolationDef) const;
+
+    // --------------------------------------------------------------------- //
+    // Most general creation
+    // --------------------------------------------------------------------- //
 
     CrossSection* CreateBremsstrahlung(const Enum,
-                                       const ParticleDef& particle_def,
-                                       const Medium& medium,
-                                       const EnergyCutSettings& cuts,
-                                       Parametrization::Definition def,
-                                       bool interpolate = true) const;
+                                       const ParticleDef&,
+                                       const Medium&,
+                                       const EnergyCutSettings&,
+                                       double multiplier,
+                                       bool lpm,
+                                       bool interpolate,
+                                       InterpolationDef = InterpolationDef()) const;
 
+    CrossSection* CreateBremsstrahlung(const ParticleDef&,
+                                       const Medium&,
+                                       const EnergyCutSettings&,
+                                       const Definition&,
+                                       bool interpolate,
+                                       InterpolationDef = InterpolationDef()) const;
 
     // ----------------------------------------------------------------------------
     /// @brief Enum string conversation

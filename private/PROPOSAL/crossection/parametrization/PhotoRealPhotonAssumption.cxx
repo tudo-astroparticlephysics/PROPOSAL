@@ -17,8 +17,8 @@ PhotoRealPhotonAssumption::PhotoRealPhotonAssumption(const ParticleDef& particle
                                                      const Medium& medium,
                                                      const EnergyCutSettings& cuts,
                                                      const RealPhoton& hardBB,
-                                                     Definition param_def)
-    : Photonuclear(particle_def, medium, cuts, param_def)
+                                                     double multiplier)
+    : Photonuclear(particle_def, medium, cuts, multiplier)
     , hardBB_(hardBB.clone())
 {
 }
@@ -95,8 +95,8 @@ PhotoZeus::PhotoZeus(const ParticleDef& particle_def,
                      const Medium& medium,
                      const EnergyCutSettings& cuts,
                      const RealPhoton& hardBB,
-                     Definition param_def)
-    : PhotoRealPhotonAssumption(particle_def, medium, cuts, hardBB, param_def)
+                     double multiplier)
+    : PhotoRealPhotonAssumption(particle_def, medium, cuts, hardBB, multiplier)
 {
 }
 
@@ -113,9 +113,9 @@ Parametrization* PhotoZeus::create(const ParticleDef& particle_def,
                         const Medium& medium,
                         const EnergyCutSettings& cuts,
                         const RealPhoton& hardBB,
-                        Definition def)
+                        double multiplier)
 {
-    return new PhotoZeus(particle_def, medium, cuts, hardBB, def);
+    return new PhotoZeus(particle_def, medium, cuts, hardBB, multiplier);
 }
 
 // ------------------------------------------------------------------------- //
@@ -138,8 +138,8 @@ PhotoBezrukovBugaev::PhotoBezrukovBugaev(const ParticleDef& particle_def,
                      const Medium& medium,
                      const EnergyCutSettings& cuts,
                      const RealPhoton& hardBB,
-                     Definition param_def)
-    : PhotoRealPhotonAssumption(particle_def, medium, cuts, hardBB, param_def)
+                     double multiplier)
+    : PhotoRealPhotonAssumption(particle_def, medium, cuts, hardBB, multiplier)
 {
 }
 
@@ -156,9 +156,9 @@ Parametrization* PhotoBezrukovBugaev::create(const ParticleDef& particle_def,
                         const Medium& medium,
                         const EnergyCutSettings& cuts,
                         const RealPhoton& hardBB,
-                        Definition def)
+                        double multiplier)
 {
-    return new PhotoBezrukovBugaev(particle_def, medium, cuts, hardBB, def);
+    return new PhotoBezrukovBugaev(particle_def, medium, cuts, hardBB, multiplier);
 }
 
 // ------------------------------------------------------------------------- //
@@ -180,8 +180,8 @@ PhotoRhode::PhotoRhode(const ParticleDef& particle_def,
                        const Medium& medium,
                        const EnergyCutSettings& cuts,
                        const RealPhoton& hardBB,
-                       Definition param_def)
-    : PhotoRealPhotonAssumption(particle_def, medium, cuts, hardBB, param_def)
+                       double multiplier)
+    : PhotoRealPhotonAssumption(particle_def, medium, cuts, hardBB, multiplier)
     , interpolant_(NULL)
 {
     double x_aux[] = { 0,           0.1,         0.144544,   0.20893,     0.301995,    0.436516,    0.630957,
@@ -222,9 +222,9 @@ Parametrization* PhotoRhode::create(const ParticleDef& particle_def,
                         const Medium& medium,
                         const EnergyCutSettings& cuts,
                         const RealPhoton& hardBB,
-                        Definition def)
+                        double multiplier)
 {
-    return new PhotoRhode(particle_def, medium, cuts, hardBB, def);
+    return new PhotoRhode(particle_def, medium, cuts, hardBB, multiplier);
 }
 
 // ------------------------------------------------------------------------- //
@@ -254,8 +254,8 @@ PhotoKokoulin::PhotoKokoulin(const ParticleDef& particle_def,
                              const Medium& medium,
                              const EnergyCutSettings& cuts,
                              const RealPhoton& hardBB,
-                             Definition param_def)
-    : PhotoBezrukovBugaev(particle_def, medium, cuts, hardBB, param_def)
+                             double multiplier)
+    : PhotoBezrukovBugaev(particle_def, medium, cuts, hardBB, multiplier)
 {
 }
 
@@ -272,9 +272,9 @@ Parametrization* PhotoKokoulin::create(const ParticleDef& particle_def,
                         const Medium& medium,
                         const EnergyCutSettings& cuts,
                         const RealPhoton& hardBB,
-                        Definition def)
+                        double multiplier)
 {
-    return new PhotoKokoulin(particle_def, medium, cuts, hardBB, def);
+    return new PhotoKokoulin(particle_def, medium, cuts, hardBB, multiplier);
 }
 
 // ------------------------------------------------------------------------- //

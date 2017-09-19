@@ -9,11 +9,11 @@
     class UtilityInterpolant##cls : public UtilityInterpolant                                                          \
     {                                                                                                                  \
         public:                                                                                                        \
-        UtilityInterpolant##cls(const Utility&);                                                                       \
+        UtilityInterpolant##cls(const Utility&, InterpolationDef = InterpolationDef());                                \
         UtilityInterpolant##cls(const UtilityInterpolant##cls&);                                                       \
-        virtual ~UtilityInterpolant##cls();                                                                            \
+        ~UtilityInterpolant##cls();                                                                                    \
                                                                                                                        \
-        virtual UtilityDecorator* clone() const { return new UtilityInterpolant##cls(*this); }                         \
+        UtilityDecorator* clone() const { return new UtilityInterpolant##cls(*this); }                                 \
                                                                                                                        \
         double Calculate(double ei, double ef, double rnd);                                                            \
         double GetUpperLimit(double ei, double rnd);                                                                   \
@@ -21,8 +21,8 @@
         private:                                                                                                       \
         UtilityInterpolant##cls& operator=(const UtilityInterpolant##cls&);                                            \
                                                                                                                        \
-        virtual double BuildInterpolant(double, UtilityIntegral&, Integral&);                                          \
-        virtual void InitInterpolation(const std::string&, UtilityIntegral&);                                          \
+        double BuildInterpolant(double, UtilityIntegral&, Integral&);                                                  \
+        void InitInterpolation(const std::string&, UtilityIntegral&);                                                  \
     };
 
 namespace PROPOSAL {
@@ -32,7 +32,7 @@ class Integral;
 class UtilityInterpolant : public UtilityDecorator
 {
     public:
-    UtilityInterpolant(const Utility&);
+    UtilityInterpolant(const Utility&, InterpolationDef = InterpolationDef());
     UtilityInterpolant(const UtilityInterpolant&);
     virtual ~UtilityInterpolant();
 
@@ -50,12 +50,14 @@ class UtilityInterpolant : public UtilityDecorator
     double stored_result_;
     Interpolant* interpolant_;
     Interpolant* interpolant_diff_;
+
+    InterpolationDef interpolation_def_;
 };
 
 class UtilityInterpolantInteraction: public UtilityInterpolant
 {
     public:
-    UtilityInterpolantInteraction(const Utility&);
+    UtilityInterpolantInteraction(const Utility&, InterpolationDef = InterpolationDef());
     UtilityInterpolantInteraction(const UtilityInterpolantInteraction&);
     virtual ~UtilityInterpolantInteraction();
 
@@ -67,8 +69,8 @@ class UtilityInterpolantInteraction: public UtilityInterpolant
     private:
     UtilityInterpolantInteraction& operator=(const UtilityInterpolantInteraction&); // Undefined & not allowed
 
-    virtual double BuildInterpolant(double, UtilityIntegral&, Integral&);
-    virtual void InitInterpolation(const std::string&, UtilityIntegral&);
+    double BuildInterpolant(double, UtilityIntegral&, Integral&);
+    void InitInterpolation(const std::string&, UtilityIntegral&);
 
     double big_low_;
     double up_;
@@ -77,7 +79,7 @@ class UtilityInterpolantInteraction: public UtilityInterpolant
 class UtilityInterpolantDecay: public UtilityInterpolant
 {
     public:
-    UtilityInterpolantDecay(const Utility&);
+    UtilityInterpolantDecay(const Utility&, InterpolationDef = InterpolationDef());
     UtilityInterpolantDecay(const UtilityInterpolantDecay&);
     virtual ~UtilityInterpolantDecay();
 
@@ -89,8 +91,8 @@ class UtilityInterpolantDecay: public UtilityInterpolant
     private:
     UtilityInterpolantDecay& operator=(const UtilityInterpolantDecay&); // Undefined & not allowed
 
-    virtual double BuildInterpolant(double, UtilityIntegral&, Integral&);
-    virtual void InitInterpolation(const std::string&, UtilityIntegral&);
+    double BuildInterpolant(double, UtilityIntegral&, Integral&);
+    void InitInterpolation(const std::string&, UtilityIntegral&);
 
     double big_low_;
     double up_;

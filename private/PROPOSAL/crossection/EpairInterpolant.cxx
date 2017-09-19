@@ -13,10 +13,8 @@
 
 using namespace PROPOSAL;
 
-EpairInterpolant::EpairInterpolant(const Parametrization& param): CrossSectionInterpolant(DynamicData::Epair, param)
+EpairInterpolant::EpairInterpolant(const Parametrization& param, InterpolationDef def): CrossSectionInterpolant(DynamicData::Epair, param, def)
 {
-    Parametrization::Definition param_def = parametrization_->GetDefinition();
-
     // --------------------------------------------------------------------- //
     // Builder for DEdx
     // --------------------------------------------------------------------- //
@@ -30,11 +28,11 @@ EpairInterpolant::EpairInterpolant(const Parametrization& param): CrossSectionIn
     builder1d.SetMax(NUM1)
         .SetXMin(param.GetParticleDef().low)
         .SetXMax(BIGENERGY)
-        .SetRomberg(param_def.order_of_interpolation)
+        .SetRomberg(def.order_of_interpolation)
         .SetRational(true)
         .SetRelative(false)
         .SetIsLog(true)
-        .SetRombergY(param_def.order_of_interpolation)
+        .SetRombergY(def.order_of_interpolation)
         .SetRationalY(false)
         .SetRelativeY(false)
         .SetLogSubst(true)
@@ -52,11 +50,11 @@ EpairInterpolant::EpairInterpolant(const Parametrization& param): CrossSectionIn
     builder_de2dx.SetMax(NUM2)
         .SetXMin(param.GetParticleDef().low)
         .SetXMax(BIGENERGY)
-        .SetRomberg(param_def.order_of_interpolation)
+        .SetRomberg(def.order_of_interpolation)
         .SetRational(false)
         .SetRelative(false)
         .SetIsLog(true)
-        .SetRombergY(param_def.order_of_interpolation)
+        .SetRombergY(def.order_of_interpolation)
         .SetRationalY(false)
         .SetRelativeY(false)
         .SetLogSubst(false)

@@ -9,7 +9,7 @@ namespace PROPOSAL
 class EpairInterpolant: public CrossSectionInterpolant
 {
     public:
-        EpairInterpolant(const Parametrization&);
+        EpairInterpolant(const Parametrization&, InterpolationDef = InterpolationDef());
         EpairInterpolant(const EpairInterpolant&);
         virtual ~EpairInterpolant();
 

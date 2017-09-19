@@ -155,3 +155,33 @@ Geometry* GeometryFactory::CreateGeometry(boost::property_tree::ptree const& pt)
         log_fatal("GeometryFactory could not create %s with its properties!", name.c_str());
     }
 }
+
+Geometry* GeometryFactory::CreateGeometry(const Definition& def)
+{
+    Geometry* geometry = CreateGeometry(def.shape);
+
+    if (PROPOSAL::Sphere* sphere = dynamic_cast<PROPOSAL::Sphere*>(geometry))
+    {
+        sphere->SetPosition(def.position);
+        sphere->SetRadius(def.radius);
+        sphere->SetInnerRadius(def.inner_radius);
+    }
+    else if (PROPOSAL::Box* box = dynamic_cast<PROPOSAL::Box*>(geometry))
+    {
+        box->SetPosition(def.position);
+        box->SetX(def.width);
+        box->SetY(def.height);
+        box->SetZ(def.depth);
+    }
+
+    else if (PROPOSAL::Cylinder* cylinder = dynamic_cast<PROPOSAL::Cylinder*>(geometry))
+    {
+        cylinder->SetPosition(def.position);
+        cylinder->SetRadius(def.radius);
+        cylinder->SetInnerRadius(def.inner_radius);
+    }
+    else
+    {
+        log_fatal("Geometry %s not registerd!", typeid(geometry).name());
+    }
+}
