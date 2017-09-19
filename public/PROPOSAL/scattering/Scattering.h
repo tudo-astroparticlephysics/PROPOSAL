@@ -26,6 +26,8 @@ class Scattering
 
     void Scatter(double dr, double ei, double ef);
 
+    const PROPOSALParticle& GetParticle() const { return particle_; }
+
     protected:
     Scattering& operator=(const Scattering&); // Undefined & not allowed
 

@@ -3,6 +3,7 @@
 
 #include "PROPOSAL/crossection/CrossSection.h"
 #include "PROPOSAL/math/Integral.h"
+#include "PROPOSAL/methods.h"
 
 namespace PROPOSAL
 {
@@ -12,7 +13,7 @@ class Interpolant;
 class CrossSectionInterpolant: public CrossSection
 {
     public:
-        CrossSectionInterpolant(const DynamicData::Type&, const Parametrization&);
+        CrossSectionInterpolant(const DynamicData::Type&, const Parametrization&, InterpolationDef);
         CrossSectionInterpolant(const CrossSectionInterpolant&);
         virtual ~CrossSectionInterpolant();
 

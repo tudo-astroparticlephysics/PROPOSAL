@@ -8,6 +8,7 @@
 #include <string>
 
 #include "PROPOSAL/crossection/parametrization/Parametrization.h"
+#include "PROPOSAL/methods.h"
 
 namespace  PROPOSAL
 {
@@ -42,6 +43,22 @@ class PhotonuclearFactory
         ShadowButkevichMikhailov
     };
 
+    struct Definition
+    {
+        Definition()
+            : parametrization(AbramowiczLevinLevyMaor97)
+            , shadow(ShadowButkevichMikhailov)
+            , hardbb(true)
+            , multiplier(1.0)
+        {
+        }
+
+        Enum parametrization;
+        Shadow shadow;
+        bool hardbb;
+        double multiplier;
+    };
+
     // --------------------------------------------------------------------- //
     // Typedefs for readablitiy
     // --------------------------------------------------------------------- //
@@ -49,12 +66,16 @@ class PhotonuclearFactory
     typedef boost::function<ShadowEffect*(void)> RegisterShadowEffectFunction;
 
     typedef boost::function<
-        Parametrization*(const ParticleDef&, const Medium&, const EnergyCutSettings&, const RealPhoton&, Parametrization::Definition)>
+        Parametrization*(const ParticleDef&, const Medium&, const EnergyCutSettings&, const RealPhoton&, double multiplier)>
         RegisterRealPhotonFunction;
 
     typedef boost::function<
-        Parametrization*(const ParticleDef&, const Medium&, const EnergyCutSettings&, const ShadowEffect&, Parametrization::Definition)>
+        Parametrization*(const ParticleDef&, const Medium&, const EnergyCutSettings&, const ShadowEffect&, double multiplier)>
         RegisterQ2Function;
+
+    typedef boost::function<
+        Parametrization*(const ParticleDef&, const Medium&, const EnergyCutSettings&, const ShadowEffect&, double multiplier, InterpolationDef)>
+        RegisterQ2FunctionInterpolant;
 
     typedef std::map<std::string, RegisterShadowEffectFunction > PhotoShadowEffectMapString;
     typedef std::map<Shadow, RegisterShadowEffectFunction > PhotoShadowEffectMapEnum;
@@ -62,8 +83,8 @@ class PhotonuclearFactory
     typedef std::map<std::string, RegisterRealPhotonFunction > PhotoRealPhotonMapString;
     typedef std::map<Enum, RegisterRealPhotonFunction > PhotoRealPhotonMapEnum;
 
-    typedef std::map<std::string, std::pair<RegisterQ2Function, RegisterQ2Function> > PhotoQ2MapString;
-    typedef std::map<Enum, std::pair<RegisterQ2Function, RegisterQ2Function> > PhotoQ2MapEnum;
+    typedef std::map<std::string, std::pair<RegisterQ2Function, RegisterQ2FunctionInterpolant> > PhotoQ2MapString;
+    typedef std::map<Enum, std::pair<RegisterQ2Function, RegisterQ2FunctionInterpolant> > PhotoQ2MapEnum;
 
     typedef std::map<std::string, Enum> MapStringToEnum;
 
@@ -82,71 +103,69 @@ class PhotonuclearFactory
     // Real Photon
     // --------------------------------------------------------------------- //
 
-    Parametrization* CreatePhotoRealPhotonParam(const std::string&,
-                                                const ParticleDef& particle_def,
-                                                const Medium& medium,
-                                                const EnergyCutSettings& cuts,
-                                                bool,
-                                                Parametrization::Definition def) const;
-
-    Parametrization* CreatePhotoRealPhotonParam(const Enum,
-                                                const ParticleDef& particle_def,
-                                                const Medium& medium,
-                                                const EnergyCutSettings& cuts,
-                                                bool,
-                                                Parametrization::Definition def) const;
-
-    CrossSection* CreatePhotoRealPhoton(const std::string&,
+    CrossSection* CreatePhotoRealPhotonIntegral(const std::string&,
                                         const ParticleDef& particle_def,
                                         const Medium& medium,
                                         const EnergyCutSettings& cuts,
-                                        bool,
-                                        Parametrization::Definition def,
-                                        bool interpolate = true) const;
+                                        double multiplier,
+                                        bool hardbb) const;
 
-    CrossSection* CreatePhotoRealPhoton(const Enum,
+    CrossSection* CreatePhotoRealPhotonIntegral(const Enum,
                                         const ParticleDef& particle_def,
                                         const Medium& medium,
                                         const EnergyCutSettings& cuts,
-                                        bool,
-                                        Parametrization::Definition def,
-                                        bool interpolate = true) const;
+                                        double multiplier,
+                                        bool hardbb) const;
+
+    CrossSection* CreatePhotoRealPhotonInterpolant(const std::string&,
+                                        const ParticleDef& particle_def,
+                                        const Medium& medium,
+                                        const EnergyCutSettings& cuts,
+                                        double multiplier,
+                                        bool hardbb,
+                                        InterpolationDef = InterpolationDef()) const;
+
+    CrossSection* CreatePhotoRealPhotonInterpolant(const Enum,
+                                        const ParticleDef& particle_def,
+                                        const Medium& medium,
+                                        const EnergyCutSettings& cuts,
+                                        double multiplier,
+                                        bool hardbb,
+                                        InterpolationDef = InterpolationDef()) const;
 
     // --------------------------------------------------------------------- //
     // Q2 Integration
     // --------------------------------------------------------------------- //
 
-    Parametrization* CreatePhotoQ2IntegralParam(const std::string&,
-                                                const ParticleDef&,
-                                                const Medium&,
-                                                const EnergyCutSettings&,
-                                                const Shadow&,
-                                                Parametrization::Definition,
-                                                bool interpolate = true) const;
-
-    Parametrization* CreatePhotoQ2IntegralParam(const Enum,
-                                                const ParticleDef&,
-                                                const Medium&,
-                                                const EnergyCutSettings&,
-                                                const Shadow&,
-                                                Parametrization::Definition,
-                                                bool interpolate = true) const;
-
     CrossSection* CreatePhotoQ2Integral(const std::string&,
                                         const ParticleDef&,
                                         const Medium&,
                                         const EnergyCutSettings&,
-                                        const Shadow&,
-                                        Parametrization::Definition,
-                                        bool interpolate = true) const;
+                                        double multiplier,
+                                        const Shadow&) const;
 
     CrossSection* CreatePhotoQ2Integral(const Enum,
                                         const ParticleDef&,
                                         const Medium&,
                                         const EnergyCutSettings&,
+                                        double multiplier,
+                                        const Shadow&) const;
+
+    CrossSection* CreatePhotoQ2Interpolant(const std::string&,
+                                        const ParticleDef&,
+                                        const Medium&,
+                                        const EnergyCutSettings&,
+                                        double multiplier,
                                         const Shadow&,
-                                        Parametrization::Definition,
-                                        bool interpolate = true) const;
+                                        InterpolationDef = InterpolationDef()) const;
+
+    CrossSection* CreatePhotoQ2Interpolant(const Enum,
+                                        const ParticleDef&,
+                                        const Medium&,
+                                        const EnergyCutSettings&,
+                                        double multiplier,
+                                        const Shadow&,
+                                        InterpolationDef = InterpolationDef()) const;
 
     // --------------------------------------------------------------------- //
     // Most general creation
@@ -156,10 +175,18 @@ class PhotonuclearFactory
                                      const ParticleDef&,
                                      const Medium&,
                                      const EnergyCutSettings&,
+                                     double multiplier,
                                      const Shadow&,
                                      bool hardbb,
-                                     Parametrization::Definition,
-                                     bool interpolate = true) const;
+                                     bool interpolate,
+                                     InterpolationDef = InterpolationDef()) const;
+
+    CrossSection* CreatePhotonuclear(const ParticleDef&,
+                                     const Medium&,
+                                     const EnergyCutSettings&,
+                                     const Definition&,
+                                     bool interpolate,
+                                     InterpolationDef = InterpolationDef()) const;
 
     // ----------------------------------------------------------------------------
     /// @brief Enum string conversation
@@ -192,7 +219,7 @@ class PhotonuclearFactory
     /// @param Enum
     /// @param RegisterQ2Function
     // ----------------------------------------------------------------------------
-    void RegisterQ2(const std::string& name, Enum, std::pair<RegisterQ2Function, RegisterQ2Function>);
+    void RegisterQ2(const std::string& name, Enum, std::pair<RegisterQ2Function, RegisterQ2FunctionInterpolant>);
 
     // --------------------------------------------------------------------- //
     // Singleton pattern

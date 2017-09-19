@@ -22,11 +22,12 @@ using namespace std;
 *                              Utility Integral                              *
 ******************************************************************************/
 
-UtilityInterpolant::UtilityInterpolant(const Utility& utility)
+UtilityInterpolant::UtilityInterpolant(const Utility& utility, InterpolationDef def)
     : UtilityDecorator(utility)
     , stored_result_(0)
     , interpolant_(NULL)
     , interpolant_diff_(NULL)
+    , interpolation_def_(def)
 {
 }
 
@@ -73,11 +74,11 @@ void UtilityInterpolant::InitInterpolation(const std::string& name, UtilityInteg
             .SetMax(NUM3)
             .SetXMin(particle_def.low)
             .SetXMax(BIGENERGY)
-            .SetRomberg(utility_.GetDefinition().order_of_interpolation)
+            .SetRomberg(interpolation_def_.order_of_interpolation)
             .SetRational(false)
             .SetRelative(false)
             .SetIsLog(true)
-            .SetRombergY(utility_.GetDefinition().order_of_interpolation)
+            .SetRombergY(interpolation_def_.order_of_interpolation)
             .SetRationalY(false)
             .SetRelativeY(false)
             .SetLogSubst(false)
@@ -103,8 +104,8 @@ void UtilityInterpolant::InitInterpolation(const std::string& name, UtilityInteg
 *                            Utility Displacement                            *
 ******************************************************************************/
 
-UtilityInterpolantDisplacement::UtilityInterpolantDisplacement(const Utility& utility)
-    : UtilityInterpolant(utility)
+UtilityInterpolantDisplacement::UtilityInterpolantDisplacement(const Utility& utility, InterpolationDef def)
+    : UtilityInterpolant(utility, def)
 {
     UtilityIntegralDisplacement utility_disp(utility_);
     InitInterpolation("displacement", utility_disp);
@@ -172,8 +173,8 @@ void UtilityInterpolantDisplacement::InitInterpolation(const std::string& name, 
 *                            Utility Ineraction                            *
 ******************************************************************************/
 
-UtilityInterpolantInteraction::UtilityInterpolantInteraction(const Utility& utility)
-    : UtilityInterpolant(utility)
+UtilityInterpolantInteraction::UtilityInterpolantInteraction(const Utility& utility, InterpolationDef def)
+    : UtilityInterpolant(utility, def)
     , big_low_(0)
     , up_(0)
 {
@@ -272,8 +273,8 @@ void UtilityInterpolantInteraction::InitInterpolation(const std::string& name, U
 *                            Utility Decay                            *
 ******************************************************************************/
 
-UtilityInterpolantDecay::UtilityInterpolantDecay(const Utility& utility)
-    : UtilityInterpolant(utility)
+UtilityInterpolantDecay::UtilityInterpolantDecay(const Utility& utility, InterpolationDef def)
+    : UtilityInterpolant(utility, def)
     , big_low_(0)
     , up_(0)
 {
@@ -359,8 +360,8 @@ void UtilityInterpolantDecay::InitInterpolation(const std::string& name, Utility
 *                            Utility Time                            *
 ******************************************************************************/
 
-UtilityInterpolantTime::UtilityInterpolantTime(const Utility& utility)
-    : UtilityInterpolant(utility)
+UtilityInterpolantTime::UtilityInterpolantTime(const Utility& utility, InterpolationDef def)
+    : UtilityInterpolant(utility, def)
 {
     UtilityIntegralTime utility_time(utility_);
     InitInterpolation("time", utility_time);
@@ -417,8 +418,8 @@ void UtilityInterpolantTime::InitInterpolation(const std::string& name, UtilityI
 *                            Utility ContRand                            *
 ******************************************************************************/
 
-UtilityInterpolantContRand::UtilityInterpolantContRand(const Utility& utility)
-    : UtilityInterpolant(utility)
+UtilityInterpolantContRand::UtilityInterpolantContRand(const Utility& utility, InterpolationDef def)
+    : UtilityInterpolant(utility, def)
 {
     UtilityIntegralContRand utility_contrand(utility_);
     InitInterpolation("contrand", utility_contrand);
@@ -478,8 +479,8 @@ void UtilityInterpolantContRand::InitInterpolation(const std::string& name, Util
 *                            Utility Scattering                            *
 ******************************************************************************/
 
-UtilityInterpolantScattering::UtilityInterpolantScattering(const Utility& utility)
-    : UtilityInterpolant(utility)
+UtilityInterpolantScattering::UtilityInterpolantScattering(const Utility& utility, InterpolationDef def)
+    : UtilityInterpolant(utility, def)
 {
     UtilityIntegralScattering utility_scattering(utility_);
     InitInterpolation("scattering", utility_scattering);

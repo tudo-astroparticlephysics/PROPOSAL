@@ -103,7 +103,7 @@ class ShadowButkevichMikhailov: public ShadowEffect
 class Photonuclear : public Parametrization
 {
     public:
-    Photonuclear(const ParticleDef&, const Medium&, const EnergyCutSettings&, Definition = Definition());
+    Photonuclear(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier);
     Photonuclear(const Photonuclear&);
     virtual ~Photonuclear();
 

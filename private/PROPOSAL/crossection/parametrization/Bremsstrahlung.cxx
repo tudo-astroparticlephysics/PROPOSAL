@@ -7,9 +7,12 @@
 #include "PROPOSAL/Constants.h"
 
 #define BREMSSTRAHLUNG_IMPL(param)                                                                                     \
-    Brems##param::Brems##param(                                                                                        \
-        const ParticleDef& particle_def, const Medium& medium, const EnergyCutSettings& cuts, Definition param_def)    \
-        : Bremsstrahlung(particle_def, medium, cuts, param_def)                                                        \
+    Brems##param::Brems##param(const ParticleDef& particle_def,                                                        \
+                               const Medium& medium,                                                                   \
+                               const EnergyCutSettings& cuts,                                                          \
+                               double multiplier,                                                                      \
+                               bool lpm)                                                                               \
+        : Bremsstrahlung(particle_def, medium, cuts, multiplier, lpm)                                                  \
     {                                                                                                                  \
     }                                                                                                                  \
                                                                                                                        \
@@ -34,10 +37,13 @@ using namespace PROPOSAL;
 Bremsstrahlung::Bremsstrahlung(const ParticleDef& particle_def,
                                const Medium& medium,
                                const EnergyCutSettings& cuts,
-                               Definition param_def)
-    : Parametrization(particle_def, medium, cuts, param_def)
+                               double multiplier,
+                               bool lpm)
+    : Parametrization(particle_def, medium, cuts, multiplier)
     , lorenz_(false) //TODO(mario): make it use to enable Mon 2017/09/04
     , lorenz_cut_(1e6)
+    , init_lpm_effect_(true)
+    , lpm_(lpm)
     , eLpm_(0)
 {
 }
@@ -46,6 +52,8 @@ Bremsstrahlung::Bremsstrahlung(const Bremsstrahlung& brems)
     : Parametrization(brems)
     , lorenz_(brems.lorenz_)
     , lorenz_cut_(brems.lorenz_cut_)
+    , init_lpm_effect_(true)
+    , lpm_(true)
     , eLpm_(brems.eLpm_)
 {
 }
@@ -69,7 +77,7 @@ double Bremsstrahlung::DifferentialCrossSection(double energy, double v)
     aux =   2*(components_[component_index_]->GetNucCharge())*(ME/particle_def_.mass)*RE;
     aux *=  (ALPHA/v)*aux*result;
 
-    if(param_def_.lpm_effect_enabled)
+    if(lpm_)
     {
         aux *=  lpm(energy, v);
     }
@@ -109,7 +117,7 @@ double Bremsstrahlung::lpm(double energy, double v)
 {
     if(init_lpm_effect_)
     {
-        param_def_.lpm_effect_enabled = false;
+        lpm_ = false;
         init_lpm_effect_    =   false;
 
         double sum      =   0;
@@ -133,7 +141,7 @@ double Bremsstrahlung::lpm(double energy, double v)
         eLpm_ *= eLpm_ / (4 * PI * ME * RE * sum);
 
         component_index_ = tmp_index;
-        param_def_.lpm_effect_enabled = true;
+        lpm_ = true;
     }
 
     double G, fi, xi, sp, h, s, s2, s3, ps, Gamma, Z3, Dn, s1;

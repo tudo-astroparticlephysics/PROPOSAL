@@ -16,7 +16,7 @@ class PhotoRealPhotonAssumption : public Photonuclear
                               const Medium&,
                               const EnergyCutSettings&,
                               const RealPhoton&,
-                              Definition = Definition());
+                              double multiplier);
     PhotoRealPhotonAssumption(const PhotoRealPhotonAssumption&);
     virtual ~PhotoRealPhotonAssumption();
 
@@ -46,7 +46,7 @@ class PhotoZeus: public PhotoRealPhotonAssumption
               const Medium&,
               const EnergyCutSettings&,
               const RealPhoton& hardBB,
-              Definition = Definition());
+              double multiplier);
     PhotoZeus(const PhotoZeus&);
     virtual ~PhotoZeus();
 
@@ -55,7 +55,7 @@ class PhotoZeus: public PhotoRealPhotonAssumption
                             const Medium&,
                             const EnergyCutSettings&,
                             const RealPhoton&,
-                            Definition def = Definition());
+                            double multiplier);
 
     virtual double CalculateParametrization(double nu);
 };
@@ -71,7 +71,7 @@ class PhotoBezrukovBugaev: public PhotoRealPhotonAssumption
                         const Medium&,
                         const EnergyCutSettings&,
                         const RealPhoton& hardBB,
-                        Definition = Definition());
+                        double multiplier);
     PhotoBezrukovBugaev(const PhotoBezrukovBugaev&);
     virtual ~PhotoBezrukovBugaev();
 
@@ -80,7 +80,7 @@ class PhotoBezrukovBugaev: public PhotoRealPhotonAssumption
                             const Medium&,
                             const EnergyCutSettings&,
                             const RealPhoton&,
-                            Definition def = Definition());
+                            double multiplier);
 
     virtual double CalculateParametrization(double nu);
 };
@@ -96,7 +96,7 @@ class PhotoRhode : public PhotoRealPhotonAssumption
                const Medium&,
                const EnergyCutSettings&,
                const RealPhoton& hardBB,
-               Definition = Definition());
+               double multiplier);
     PhotoRhode(const PhotoRhode&);
     virtual ~PhotoRhode();
 
@@ -105,7 +105,7 @@ class PhotoRhode : public PhotoRealPhotonAssumption
                             const Medium&,
                             const EnergyCutSettings&,
                             const RealPhoton&,
-                            Definition def = Definition());
+                            double multiplier);
 
     double CalculateParametrization(double nu);
 
@@ -126,7 +126,7 @@ class PhotoKokoulin : public PhotoBezrukovBugaev
                   const Medium&,
                   const EnergyCutSettings&,
                   const RealPhoton& hardBB,
-                  Definition = Definition());
+                  double multiplier);
     PhotoKokoulin(const PhotoKokoulin&);
     virtual ~PhotoKokoulin();
 
@@ -135,7 +135,7 @@ class PhotoKokoulin : public PhotoBezrukovBugaev
                             const Medium&,
                             const EnergyCutSettings&,
                             const RealPhoton&,
-                            Definition def = Definition());
+                            double multiplier);
 
     double CalculateParametrization(double nu);
 };
