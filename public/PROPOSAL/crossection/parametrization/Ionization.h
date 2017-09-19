@@ -7,7 +7,7 @@ namespace PROPOSAL {
 class Ionization : public Parametrization
 {
     public:
-    Ionization(const ParticleDef&, const Medium&, const EnergyCutSettings&, Definition = Definition());
+    Ionization(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier);
     Ionization(const Ionization&);
     virtual ~Ionization();
 

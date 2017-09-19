@@ -24,9 +24,12 @@ using namespace PROPOSAL;
 EpairProduction::EpairProduction(const ParticleDef& particle_def,
                                  const Medium& medium,
                                  const EnergyCutSettings& cuts,
-                                 Definition param_def)
-    : Parametrization(particle_def, medium, cuts, param_def)
+                                 double multiplier,
+                                 bool lpm)
+    : Parametrization(particle_def, medium, cuts, multiplier)
     , v_(0)
+    , init_lpm_effect_(true)
+    , lpm_(lpm)
     , eLpm_(0)
 {
 }
@@ -34,6 +37,8 @@ EpairProduction::EpairProduction(const ParticleDef& particle_def,
 EpairProduction::EpairProduction(const EpairProduction& epair)
     : Parametrization(epair)
     , v_(epair.v_)
+    , init_lpm_effect_(true)
+    , lpm_(true)
     , eLpm_(epair.eLpm_)
 {
 }
@@ -161,7 +166,7 @@ double EpairProduction::FunctionToIntegral(double energy, double r)
     aux1 *= aux1;
     aux *= 2 * medium_charge * (medium_charge + atomic_electron_contribution) * ((1 - v_) / v_) * (Fe + aux1 * Fm);
 
-    if (param_def_.lpm_effect_enabled)
+    if (lpm_)
     {
         aux *= lpm(energy, r2, b, s);
     }
@@ -239,8 +244,9 @@ double EpairProduction::lpm(double energy, double r2, double b, double x)
 EpairProductionRhoIntegral::EpairProductionRhoIntegral(const ParticleDef& particle_def,
                                  const Medium& medium,
                                  const EnergyCutSettings& cuts,
-                                 Definition param_def)
-    : EpairProduction(particle_def, medium, cuts, param_def)
+                                 double multiplier,
+                                 bool lpm)
+    : EpairProduction(particle_def, medium, cuts, multiplier, lpm)
     , integral_(IROMB, IMAXS, IPREC)
 {
 }
@@ -298,8 +304,10 @@ double EpairProductionRhoIntegral::DifferentialCrossSection(double energy, doubl
 EpairProductionRhoInterpolant::EpairProductionRhoInterpolant(const ParticleDef& particle_def,
                                  const Medium& medium,
                                  const EnergyCutSettings& cuts,
-                                 Definition param_def)
-    : EpairProductionRhoIntegral(particle_def, medium, cuts, param_def)
+                                 double multiplier,
+                                 bool lpm,
+                                 InterpolationDef def)
+    : EpairProductionRhoIntegral(particle_def, medium, cuts, multiplier, lpm)
     , interpolant_(medium_->GetNumComponents(), NULL)
 {
     std::vector<Interpolant2DBuilder> builder2d(components_.size());
@@ -313,15 +321,15 @@ EpairProductionRhoInterpolant::EpairProductionRhoInterpolant(const ParticleDef& 
             .SetMax2(NUM1)
             .SetX2Min(0.0)
             .SetX2Max(1.0)
-            .SetRomberg1(param_def.order_of_interpolation)
+            .SetRomberg1(def.order_of_interpolation)
             .SetRational1(false)
             .SetRelative1(false)
             .SetIsLog1(true)
-            .SetRomberg2(param_def.order_of_interpolation)
+            .SetRomberg2(def.order_of_interpolation)
             .SetRational2(false)
             .SetRelative2(false)
             .SetIsLog2(false)
-            .SetRombergY(param_def.order_of_interpolation)
+            .SetRombergY(def.order_of_interpolation)
             .SetRationalY(false)
             .SetRelativeY(false)
             .SetLogSubst(false)

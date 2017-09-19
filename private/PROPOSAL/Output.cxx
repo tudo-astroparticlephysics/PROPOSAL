@@ -18,10 +18,7 @@ void Output::SetLoggingConfigurationFile(std::string file)
 
 }
 
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
+// ------------------------------------------------------------------------- //
 void Output::FillSecondaryVector(std::vector<PROPOSALParticle*>& particles)
 {
     for (std::vector<PROPOSALParticle*>::iterator iter = particles.begin(); iter != particles.end(); ++iter) {
@@ -29,6 +26,7 @@ void Output::FillSecondaryVector(std::vector<PROPOSALParticle*>& particles)
     }
 }
 
+// ------------------------------------------------------------------------- //
 void Output::FillSecondaryVector(const PROPOSALParticle& particle, const DynamicData::Type& secondary, double energyloss, double distance)
 {
     DynamicData* data = NULL;

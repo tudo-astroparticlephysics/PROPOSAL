@@ -9,7 +9,7 @@ namespace PROPOSAL
 class PhotoInterpolant: public CrossSectionInterpolant
 {
     public:
-        PhotoInterpolant(const Parametrization&);
+        PhotoInterpolant(const Parametrization&, InterpolationDef = InterpolationDef());
         PhotoInterpolant(const PhotoInterpolant&);
         virtual ~PhotoInterpolant();
 

@@ -15,11 +15,9 @@
 
 using namespace PROPOSAL;
 
-IonizInterpolant::IonizInterpolant(const Parametrization& param)
-    : CrossSectionInterpolant(DynamicData::DeltaE, param)
+IonizInterpolant::IonizInterpolant(const Parametrization& param, InterpolationDef def)
+    : CrossSectionInterpolant(DynamicData::DeltaE, param, def)
 {
-    Parametrization::Definition param_def = parametrization_->GetDefinition();
-
     // --------------------------------------------------------------------- //
     // Builder for DEdx
     // --------------------------------------------------------------------- //
@@ -32,11 +30,11 @@ IonizInterpolant::IonizInterpolant(const Parametrization& param)
     builder1d.SetMax(NUM1)
         .SetXMin(param.GetParticleDef().low)
         .SetXMax(BIGENERGY)
-        .SetRomberg(param_def.order_of_interpolation)
+        .SetRomberg(def.order_of_interpolation)
         .SetRational(true)
         .SetRelative(false)
         .SetIsLog(true)
-        .SetRombergY(param_def.order_of_interpolation)
+        .SetRombergY(def.order_of_interpolation)
         .SetRationalY(false)
         .SetRelativeY(false)
         .SetLogSubst(true)
@@ -54,11 +52,11 @@ IonizInterpolant::IonizInterpolant(const Parametrization& param)
     builder_de2dx.SetMax(NUM2)
         .SetXMin(param.GetParticleDef().low)
         .SetXMax(BIGENERGY)
-        .SetRomberg(param_def.order_of_interpolation)
+        .SetRomberg(def.order_of_interpolation)
         .SetRational(false)
         .SetRelative(false)
         .SetIsLog(true)
-        .SetRombergY(param_def.order_of_interpolation)
+        .SetRombergY(def.order_of_interpolation)
         .SetRationalY(false)
         .SetRelativeY(false)
         .SetLogSubst(false)

@@ -10,7 +10,7 @@ namespace PROPOSAL
 class IonizInterpolant: public CrossSectionInterpolant
 {
     public:
-        IonizInterpolant(const Parametrization&);
+        IonizInterpolant(const Parametrization&, InterpolationDef = InterpolationDef());
         IonizInterpolant(const IonizInterpolant&);
         virtual ~IonizInterpolant();
 

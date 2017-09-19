@@ -7,7 +7,7 @@
     class Brems##param : public Bremsstrahlung                                                                         \
     {                                                                                                                  \
         public:                                                                                                        \
-        Brems##param(const ParticleDef&, const Medium&, const EnergyCutSettings&, Definition = Definition());          \
+        Brems##param(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier, bool lpm);        \
         Brems##param(const Brems##param&);                                                                             \
         ~Brems##param();                                                                                               \
                                                                                                                        \
@@ -15,9 +15,10 @@
         static Parametrization* create(const ParticleDef& particle_def,                                                \
                                        const Medium& medium,                                                           \
                                        const EnergyCutSettings& cuts,                                                  \
-                                       Definition def = Definition())                                                  \
+                                       double multiplier,                                                              \
+                                       bool lpm)                                                                       \
         {                                                                                                              \
-            return new Brems##param(particle_def, medium, cuts, def);                                                  \
+            return new Brems##param(particle_def, medium, cuts, multiplier, lpm);                                      \
         }                                                                                                              \
                                                                                                                        \
         double CalculateParametrization(double energy, double v);                                                      \
@@ -27,7 +28,7 @@ namespace PROPOSAL {
 class Bremsstrahlung : public Parametrization
 {
     public:
-    Bremsstrahlung(const ParticleDef&, const Medium&, const EnergyCutSettings&, Definition = Definition());
+    Bremsstrahlung(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier, bool lpm);
     Bremsstrahlung(const Bremsstrahlung&);
     virtual ~Bremsstrahlung();
 
@@ -56,6 +57,8 @@ class Bremsstrahlung : public Parametrization
 
     bool lorenz_;       /// enable lorenz cut
     double lorenz_cut_; /// in [MeV] // - set to 1.e6 in Constructor
+    bool init_lpm_effect_;
+    bool lpm_;
     double eLpm_;
 };
 

@@ -58,12 +58,13 @@ Propagator::Propagator()
     , particle_(*new PROPOSALParticle(MuMinusDef::Get()))
     , detector_(new Sphere(Vector3D(), 1e18, 0))
 {
-    Sector::Definition sector_def;
-    sector_def.location = Sector::ParticleLocation::InsideDetector;
-
-    current_collection_ = new Sector(particle_);
-
-    collections_.push_back(current_collection_);
+    //TODO(mario): set defaults Tue 2017/09/19
+    // Sector::Definition sector_def;
+    // sector_def.location = Sector::ParticleLocation::InsideDetector;
+    //
+    // current_collection_ = new Sector(particle_);
+    //
+    // collections_.push_back(current_collection_);
 }
 
 Propagator::Propagator(const std::vector<Sector*>& sectors, const Geometry& geometry)

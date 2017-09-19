@@ -21,8 +21,8 @@ using namespace PROPOSAL;
 Ionization::Ionization(const ParticleDef& particle_def,
                        const Medium& medium,
                        const EnergyCutSettings& cuts,
-                       Definition param_def)
-    : Parametrization(particle_def, medium, cuts, param_def)
+                       double multiplier)
+    : Parametrization(particle_def, medium, cuts, multiplier)
 {
 }
 
@@ -70,7 +70,7 @@ double Ionization::FunctionToDEdxIntegral(double energy, double variable)
 //----------------------------------------------------------------------------//
 double Ionization::FunctionToDNdxIntegral(double energy, double variable)
 {
-    return param_def_.multiplier * DifferentialCrossSection(energy, variable) * (1 + InelCorrection(energy, variable));
+    return multiplier_ * DifferentialCrossSection(energy, variable) * (1 + InelCorrection(energy, variable));
 }
 
 // ------------------------------------------------------------------------- //

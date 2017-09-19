@@ -25,11 +25,11 @@ using namespace PROPOSAL;
 ******************************************************************************/
 
 Sector::Definition::Definition()
-    : Utility::Definition()
-    , do_weighting(false)
+    : do_weighting(false)
     , weighting_order(0)
     , do_continuous_randomization(true)
     , do_exact_time_calculation(true)
+    , scattering_model(ScatteringFactory::Moliere)
     , location(Sector::ParticleLocation::InsideDetector)
 {
 }
@@ -43,60 +43,61 @@ Sector::Definition::~Definition()
 // ------------------------------------------------------------------------- //
 
 // Standard constructor
-Sector::Sector(PROPOSALParticle& particle)
-    : sector_def_()
-    , weighting_starts_at_(0)
-      //TODO(mario): init different Fri 2017/09/01
-    , particle_(particle)
-    , geometry_(new Sphere(Vector3D(), 1e18, 0))
-    // , randomizer_(NULL)
-    , utility_(particle.GetParticleDef(), Water(), EnergyCutSettings(), sector_def_)
-    , displacement_calculator_(NULL)
-    , interaction_calculator_(NULL)
-    , decay_calculator_(NULL)
-    , exact_time_calculator_(NULL)
-    , cont_rand_(NULL)
-    , scattering_(ScatteringFactory::Get().CreateScattering(sector_def_.scattering_model, particle_, utility_))
-{
-    if (sector_def_.do_continuous_randomization)
-    {
-        cont_rand_= new ContinuousRandomizer(utility_);
-    }
+// Sector::Sector(PROPOSALParticle& particle)
+//     : sector_def_()
+//     , weighting_starts_at_(0)
+//       //TODO(mario): init different Fri 2017/09/01
+//     , particle_(particle)
+//     , geometry_(new Sphere(Vector3D(), 1e18, 0))
+//     // , randomizer_(NULL)
+//     , utility_(particle.GetParticleDef(), Water(), EnergyCutSettings(), sector_def_)
+//     , displacement_calculator_(NULL)
+//     , interaction_calculator_(NULL)
+//     , decay_calculator_(NULL)
+//     , exact_time_calculator_(NULL)
+//     , cont_rand_(NULL)
+//     , scattering_(ScatteringFactory::Get().CreateScattering(sector_def_.scattering_model, particle_, utility_))
+// {
+//     if (sector_def_.do_continuous_randomization)
+//     {
+//         cont_rand_= new ContinuousRandomizer(utility_);
+//     }
+//
+//     if (utility_.GetDefinition().do_interpolation)
+//     {
+//         displacement_calculator_ = new UtilityInterpolantDisplacement(utility_);
+//         interaction_calculator_ = new UtilityInterpolantInteraction(utility_);
+//         decay_calculator_ = new UtilityInterpolantDecay(utility_);
+//
+//         if (sector_def_.do_exact_time_calculation)
+//         {
+//             exact_time_calculator_ = new UtilityInterpolantTime(utility_);
+//         }
+//     }
+//     else
+//     {
+//         displacement_calculator_ = new UtilityIntegralDisplacement(utility_);
+//         interaction_calculator_ = new UtilityIntegralInteraction(utility_);
+//         decay_calculator_ = new UtilityIntegralDecay(utility_);
+//
+//         if (sector_def_.do_exact_time_calculation)
+//         {
+//             exact_time_calculator_ = new UtilityIntegralTime(utility_);
+//         }
+//     }
+// }
 
-    if (utility_.GetDefinition().do_interpolation)
-    {
-        displacement_calculator_ = new UtilityInterpolantDisplacement(utility_);
-        interaction_calculator_ = new UtilityInterpolantInteraction(utility_);
-        decay_calculator_ = new UtilityInterpolantDecay(utility_);
-
-        if (sector_def_.do_exact_time_calculation)
-        {
-            exact_time_calculator_ = new UtilityInterpolantTime(utility_);
-        }
-    }
-    else
-    {
-        displacement_calculator_ = new UtilityIntegralDisplacement(utility_);
-        interaction_calculator_ = new UtilityIntegralInteraction(utility_);
-        decay_calculator_ = new UtilityIntegralDecay(utility_);
-
-        if (sector_def_.do_exact_time_calculation)
-        {
-            exact_time_calculator_ = new UtilityIntegralTime(utility_);
-        }
-    }
-}
-
-Sector::Sector(PROPOSALParticle& particle, const Medium& medium,
-                       const Geometry& geometry,
-                       const EnergyCutSettings& cut_settings,
-                       const Definition& def)
-    : sector_def_(def)
+Sector::Sector(PROPOSALParticle& particle,
+               const Medium& medium,
+               const EnergyCutSettings& cuts,
+               const Geometry& geometry,
+               const Utility::Definition utility_def,
+               const Definition& sector_def)
+    : sector_def_(sector_def)
     , weighting_starts_at_(0)
     , particle_(particle)
     , geometry_(geometry.clone())
-    // , randomizer_(NULL)
-    , utility_(particle_.GetParticleDef(), medium, cut_settings, sector_def_)
+    , utility_(particle_.GetParticleDef(), medium, cuts, utility_def)
     , displacement_calculator_(NULL)
     , interaction_calculator_(NULL)
     , decay_calculator_(NULL)
@@ -104,12 +105,7 @@ Sector::Sector(PROPOSALParticle& particle, const Medium& medium,
     , cont_rand_(NULL)
     , scattering_(ScatteringFactory::Get().CreateScattering(sector_def_.scattering_model, particle_, utility_))
 {
-    if (sector_def_.do_continuous_randomization)
-    {
-        cont_rand_= new ContinuousRandomizer(utility_);
-    }
-
-    if (utility_.GetDefinition().do_interpolation)
+    if (utility_def.do_interpolation)
     {
         displacement_calculator_ = new UtilityInterpolantDisplacement(utility_);
         interaction_calculator_ = new UtilityInterpolantInteraction(utility_);
@@ -131,25 +127,76 @@ Sector::Sector(PROPOSALParticle& particle, const Medium& medium,
             exact_time_calculator_ = new UtilityIntegralTime(utility_);
         }
     }
-
-    //TODO(mario): Polymorphic initilaization in collections childs  Sun 2017/08/27
-    // if (sector_def_.do_continuous_randomization)
-    // {
-    //     randomizer_ = new ContinuousRandomization(particle);
-    // }
-
-    // if (sector_def_.do_scattering)
-    // {
-    //     scattering_ = ScatteringFactory::Get().CreateScattering(sector_def_.scattering_model);
-    // }
 }
+
+// Sector::Sector(PROPOSALParticle& particle,
+//                const Geometry& geometry,
+//                const Utility& utility,
+//                const Scattering& scattering,
+//                const Definition& def)
+//     : sector_def_(def)
+//     , weighting_starts_at_(0)
+//     , particle_(particle)
+//     , geometry_(geometry.clone())
+//     // , randomizer_(NULL)
+//     , utility_(utility)
+//     , displacement_calculator_(NULL)
+//     , interaction_calculator_(NULL)
+//     , decay_calculator_(NULL)
+//     , exact_time_calculator_(NULL)
+//     , cont_rand_(NULL)
+//     , scattering_(scattering.clone())
+//     // , scattering_(ScatteringFactory::Get().CreateScattering(sector_def_.scattering_model, particle_, utility_))
+// {
+//     if (particle != scattering.GetParticle())
+//     {
+//         log_fatal("The given particle doesn't match the particle of scattering!");
+//     }
+//
+//     // Check equality of particle definitions
+//     ParticleDef a = particle_.GetParticleDef();
+//     ParticleDef b = scattering.GetParticle().GetParticleDef();
+//     ParticleDef c = utility_.GetParticleDef();
+//
+//     if ((a != b) || (b != c))
+//     {
+//         log_fatal("The given particle definitions doesn't match!");
+//     }
+//
+//     if (sector_def_.do_continuous_randomization)
+//     {
+//         cont_rand_= new ContinuousRandomizer(utility_);
+//     }
+//
+//     if (sector_def_.do_interpolation)
+//     {
+//         displacement_calculator_ = new UtilityInterpolantDisplacement(utility_);
+//         interaction_calculator_ = new UtilityInterpolantInteraction(utility_);
+//         decay_calculator_ = new UtilityInterpolantDecay(utility_);
+//
+//         if (sector_def_.do_exact_time_calculation)
+//         {
+//             exact_time_calculator_ = new UtilityInterpolantTime(utility_);
+//         }
+//     }
+//     else
+//     {
+//         displacement_calculator_ = new UtilityIntegralDisplacement(utility_);
+//         interaction_calculator_ = new UtilityIntegralInteraction(utility_);
+//         decay_calculator_ = new UtilityIntegralDecay(utility_);
+//
+//         if (sector_def_.do_exact_time_calculation)
+//         {
+//             exact_time_calculator_ = new UtilityIntegralTime(utility_);
+//         }
+//     }
+// }
 
 Sector::Sector(const Sector& collection)
     : sector_def_(collection.sector_def_)
     , weighting_starts_at_(collection.weighting_starts_at_)
     , particle_(collection.particle_)
     , geometry_(collection.geometry_->clone())
-    // ,randomizer_(collection.randomizer_) //TODO(mario): ranomizer clone Sat 2017/08/26
     , utility_(collection.utility_)
     , displacement_calculator_(collection.displacement_calculator_->clone())
     , interaction_calculator_(collection.interaction_calculator_->clone())
@@ -158,6 +205,7 @@ Sector::Sector(const Sector& collection)
     , cont_rand_(NULL)
     , scattering_(collection.scattering_->clone())
 {
+    // These are optional, therfore check NULL
     if (collection.exact_time_calculator_ != NULL)
     {
         exact_time_calculator_ = collection.exact_time_calculator_->clone();
@@ -178,6 +226,7 @@ Sector::~Sector()
     delete interaction_calculator_;
     delete decay_calculator_;
 
+    // These are optional, therfore check NULL
     if (exact_time_calculator_)
     {
         delete exact_time_calculator_;

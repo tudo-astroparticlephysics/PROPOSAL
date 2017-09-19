@@ -3,6 +3,7 @@
 
 #include "PROPOSAL/crossection/parametrization/Parametrization.h"
 #include "PROPOSAL/math/Integral.h"
+#include "PROPOSAL/methods.h"
 
 
 namespace PROPOSAL {
@@ -12,7 +13,7 @@ class Interpolant;
 class EpairProduction : public Parametrization
 {
     public:
-    EpairProduction(const ParticleDef&, const Medium&, const EnergyCutSettings&, Definition = Definition());
+    EpairProduction(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier, bool lpm);
     EpairProduction(const EpairProduction&);
     virtual ~EpairProduction();
 
@@ -58,6 +59,8 @@ class EpairProduction : public Parametrization
     protected:
 
     double v_;
+    bool init_lpm_effect_;
+    bool lpm_;
     double eLpm_;
 };
 
@@ -68,7 +71,7 @@ class EpairProduction : public Parametrization
 class EpairProductionRhoIntegral : public EpairProduction
 {
     public:
-    EpairProductionRhoIntegral(const ParticleDef&, const Medium&, const EnergyCutSettings&, Definition = Definition());
+    EpairProductionRhoIntegral(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier, bool lpm);
     EpairProductionRhoIntegral(const EpairProductionRhoIntegral&);
     virtual ~EpairProductionRhoIntegral();
 
@@ -83,7 +86,7 @@ class EpairProductionRhoIntegral : public EpairProduction
 class EpairProductionRhoInterpolant : public EpairProductionRhoIntegral
 {
     public:
-    EpairProductionRhoInterpolant(const ParticleDef&, const Medium&, const EnergyCutSettings&, Definition = Definition());
+    EpairProductionRhoInterpolant(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier, bool lpm, InterpolationDef = InterpolationDef());
     EpairProductionRhoInterpolant(const EpairProductionRhoInterpolant&);
     virtual ~EpairProductionRhoInterpolant();
 
