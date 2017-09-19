@@ -188,8 +188,8 @@ double ShadowButkevichMikhailov::CalculateShadowEffect(const Components::Compone
 Photonuclear::Photonuclear(const ParticleDef& particle_def,
                            const Medium& medium,
                            const EnergyCutSettings& cuts,
-                           Definition param_def)
-    : Parametrization(particle_def, medium, cuts, param_def)
+                           double multiplier)
+    : Parametrization(particle_def, medium, cuts, multiplier)
 {
 }
 

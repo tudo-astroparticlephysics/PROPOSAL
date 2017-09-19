@@ -18,8 +18,8 @@ using namespace PROPOSAL;
                                const Medium& medium,                                                                   \
                                const EnergyCutSettings& cuts,                                                          \
                                const ShadowEffect& shadow_effect,                                                      \
-                               Definition param_def)                                                                   \
-        : PhotoQ2Integral(particle_def, medium, cuts, shadow_effect, param_def)                                        \
+                               double multiplier)                                                                      \
+        : PhotoQ2Integral(particle_def, medium, cuts, shadow_effect, multiplier)                                       \
     {                                                                                                                  \
     }                                                                                                                  \
                                                                                                                        \
@@ -38,8 +38,8 @@ PhotoQ2Integral::PhotoQ2Integral(const ParticleDef& particle_def,
                                  const Medium& medium,
                                  const EnergyCutSettings& cuts,
                                  const ShadowEffect& shadow_effect,
-                                 Definition param_def)
-    : Photonuclear(particle_def, medium, cuts, param_def)
+                                 double multiplier)
+    : Photonuclear(particle_def, medium, cuts, multiplier)
     , shadow_effect_(shadow_effect.clone())
     , integral_(IROMB, IMAXS, IPREC)
 {

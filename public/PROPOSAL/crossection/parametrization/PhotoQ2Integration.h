@@ -20,19 +20,18 @@
                      const Medium&,                                                                                    \
                      const EnergyCutSettings&,                                                                         \
                      const ShadowEffect& shadow_effect,                                                                \
-                     Definition = Definition());                                                                       \
+                     double multiplier);                                                                               \
         Photo##param(const Photo##param&);                                                                             \
         virtual ~Photo##param();                                                                                       \
                                                                                                                        \
         virtual Parametrization* clone() const { return new Photo##param(*this); }                                     \
-                                                                                                                       \
         static Parametrization* create(const ParticleDef& particle_def,                                                \
                                        const Medium& medium,                                                           \
                                        const EnergyCutSettings& cuts,                                                  \
                                        const ShadowEffect& shadow_effect,                                              \
-                                       Definition def)                                                                 \
+                                       double multiplier)                                                              \
         {                                                                                                              \
-            return new Photo##param(particle_def, medium, cuts, shadow_effect, def);                                   \
+            return new Photo##param(particle_def, medium, cuts, shadow_effect, multiplier);                            \
         }                                                                                                              \
                                                                                                                        \
         double FunctionToQ2Integral(double energy, double v, double Q2);                                               \
@@ -53,7 +52,7 @@ class PhotoQ2Integral : public Photonuclear
                     const Medium&,
                     const EnergyCutSettings&,
                     const ShadowEffect&,
-                    Definition = Definition());
+                    double multiplier);
     PhotoQ2Integral(const PhotoQ2Integral&);
     virtual ~PhotoQ2Integral();
 
@@ -96,7 +95,8 @@ class PhotoQ2Interpolant : public Param
                               const Medium&,
                               const EnergyCutSettings&,
                               const ShadowEffect&,
-                              Parametrization::Definition = Parametrization::Definition());
+                              double multiplier,
+                              InterpolationDef def = InterpolationDef());
     PhotoQ2Interpolant(const PhotoQ2Interpolant&);
     virtual ~PhotoQ2Interpolant();
 
@@ -105,9 +105,10 @@ class PhotoQ2Interpolant : public Param
                                    const Medium& medium,
                                    const EnergyCutSettings& cuts,
                                    const ShadowEffect& shadow_effect,
-                                   Parametrization::Definition def = Parametrization::Definition())
+                                   double multiplier,
+                                   InterpolationDef def = InterpolationDef())
     {
-        return new PhotoQ2Interpolant<Param>(particle_def, medium, cuts, shadow_effect, def);
+        return new PhotoQ2Interpolant<Param>(particle_def, medium, cuts, shadow_effect, multiplier, def);
     }
 
     double DifferentialCrossSection(double energy, double v);
@@ -123,8 +124,9 @@ PhotoQ2Interpolant<Param>::PhotoQ2Interpolant(const ParticleDef& particle_def,
                                                      const Medium& medium,
                                                      const EnergyCutSettings& cuts,
                                                      const ShadowEffect& shadow_effect,
-                                                     Parametrization::Definition param_def)
-    : Param(particle_def, medium, cuts, shadow_effect, param_def)
+                                                     double multiplier,
+                                                     InterpolationDef def)
+    : Param(particle_def, medium, cuts, shadow_effect, multiplier)
     , interpolant_(this->medium_->GetNumComponents(), NULL)
 {
     std::vector<Interpolant2DBuilder> builder2d(this->components_.size());
@@ -139,15 +141,15 @@ PhotoQ2Interpolant<Param>::PhotoQ2Interpolant(const ParticleDef& particle_def,
             .SetMax2(NUM1)
             .SetX2Min(0.0)
             .SetX2Max(1.0)
-            .SetRomberg1(param_def.order_of_interpolation)
+            .SetRomberg1(def.order_of_interpolation)
             .SetRational1(false)
             .SetRelative1(false)
             .SetIsLog1(true)
-            .SetRomberg2(param_def.order_of_interpolation)
+            .SetRomberg2(def.order_of_interpolation)
             .SetRational2(false)
             .SetRelative2(false)
             .SetIsLog2(false)
-            .SetRombergY(param_def.order_of_interpolation)
+            .SetRombergY(def.order_of_interpolation)
             .SetRationalY(false)
             .SetRelativeY(false)
             .SetLogSubst(false)

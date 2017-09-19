@@ -49,7 +49,7 @@ class UtilityIntegralDisplacement: public UtilityIntegral
     UtilityIntegralDisplacement(const UtilityIntegralDisplacement&);
     virtual ~UtilityIntegralDisplacement();
 
-    virtual UtilityDecorator* clone() const { return new UtilityIntegralDisplacement(*this); }
+    virtual UtilityIntegral* clone() const { return new UtilityIntegralDisplacement(*this); }
 
     virtual double Calculate(double ei, double ef, double rnd);
 

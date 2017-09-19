@@ -6,14 +6,22 @@
 
 #include "PROPOSAL/EnergyCutSettings.h"
 #include "PROPOSAL/particle/ParticleDef.h"
-#include "PROPOSAL/scattering/ScatteringFactory.h"
-#include "PROPOSAL/crossection/PhotonuclearFactory.h"
-#include "PROPOSAL/crossection/BremsstrahlungFactory.h"
+#include "PROPOSAL/methods.h"
+// #include "PROPOSAL/scattering/ScatteringFactory.h"
+#include "PROPOSAL/crossection/factories/PhotonuclearFactory.h"
+#include "PROPOSAL/crossection/factories/BremsstrahlungFactory.h"
+#include "PROPOSAL/crossection/factories/EpairProductionFactory.h"
+#include "PROPOSAL/crossection/factories/IonizationFactory.h"
 
 namespace PROPOSAL {
 
 // class ContinuousRandomization;
 class CrossSection;
+class Photonuclear;
+class Bremsstrahlung;
+class Ionization;
+class EpairProduction;
+
 class Medium;
 class EnergyCutSettings;
 class Geometry;
@@ -24,35 +32,28 @@ class Utility
     struct Definition
     {
         bool do_interpolation;
+        InterpolationDef interpolation_def;
 
-        double brems_multiplier; //!< multiplier to in- or decrease the Bremsstrahlung cross-sections
-        double photo_multiplier; //!< multiplier to in- or decrease the Photonucler cross-sections
-        double ioniz_multiplier; //!< multiplier to in- or decrease the Ionization cross-sections
-        double epair_multiplier; //!< multiplier to in- or decrease the Epairproduction cross-sections
-
-        PhotonuclearFactory::Enum photo_parametrization;
-        PhotonuclearFactory::Shadow photo_shadow;
-        bool hardbb_enabled;
-
-        BremsstrahlungFactory::Enum brems_parametrization;
-
-        bool lpm_effect_enabled;
-
-        double order_of_interpolation;
-        bool raw;                   /// Determine if output format of interpolation tables is binary or txt.
-        std::string path_to_tables; /// Path to interpolation tables
+        BremsstrahlungFactory::Definition brems_def;
+        PhotonuclearFactory::Definition photo_def;
+        EpairProductionFactory::Definition epair_def;
+        IonizationFactory::Definition ioniz_def;
 
         Definition();
         ~Definition();
     };
 
     public:
-    Utility(const ParticleDef&);
-    Utility(const ParticleDef&, const Medium&, const EnergyCutSettings&, const Definition& def = Definition());
+    // Utility(const ParticleDef&);
+    Utility(const ParticleDef&,
+            const Medium&,
+            const EnergyCutSettings&,
+            Definition);
+    Utility(const std::vector<CrossSection*>&);
     Utility(const Utility&);
     virtual ~Utility();
 
-    const Definition& GetDefinition() const { return utility_def_; }
+    // const Definition& GetDefinition() const { return utility_def_; }
     const ParticleDef& GetParticleDef() const { return particle_def_; }
     const Medium& GetMedium() const { return *medium_; }
     const std::vector<CrossSection*>& GetCrosssections() const { return crosssections_; }
@@ -64,7 +65,7 @@ class Utility
     // Protected members
     // --------------------------------------------------------------------- //
 
-    Definition utility_def_;
+    // Definition utility_def_;
 
     ParticleDef particle_def_;
     Medium* medium_;

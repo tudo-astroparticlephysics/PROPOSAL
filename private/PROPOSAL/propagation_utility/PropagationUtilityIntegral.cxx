@@ -9,12 +9,12 @@
 
 #define UTILITY_INTEGRAL_IMPL(cls)                                                                                     \
     UtilityIntegral##cls::UtilityIntegral##cls(const Utility& utility)                                                 \
-        : UtilityIntegral(utility)                                                                                     \
+        : UtilityDecoratorIntegral(utility)                                                                            \
     {                                                                                                                  \
     }                                                                                                                  \
                                                                                                                        \
     UtilityIntegral##cls::UtilityIntegral##cls(const UtilityIntegral##cls& decorator)                                  \
-        : UtilityIntegral(decorator.utility_)                                                                          \
+        : UtilityDecoratorIntegral(decorator.utility_)                                                                 \
     {                                                                                                                  \
     }                                                                                                                  \
                                                                                                                        \
@@ -26,23 +26,23 @@ using namespace PROPOSAL;
 *                              Utility Integral                              *
 ******************************************************************************/
 
-UtilityIntegral::UtilityIntegral(const Utility& utility)
+UtilityDecoratorIntegral::UtilityDecoratorIntegral(const Utility& utility)
     : UtilityDecorator(utility)
     , integral_(IROMB, IMAXS, IPREC2)
 {
 }
 
-UtilityIntegral::UtilityIntegral(const UtilityIntegral& collection)
+UtilityDecoratorIntegral::UtilityDecoratorIntegral(const UtilityDecoratorIntegral& collection)
     : UtilityDecorator(collection)
     , integral_(collection.integral_)
 {
 }
 
-UtilityIntegral::~UtilityIntegral()
+UtilityDecoratorIntegral::~UtilityDecoratorIntegral()
 {
 }
 
-double UtilityIntegral::GetUpperLimit(double ei, double rnd)
+double UtilityDecoratorIntegral::GetUpperLimit(double ei, double rnd)
 {
     (void)ei;
     (void)rnd;
@@ -203,15 +203,13 @@ UTILITY_INTEGRAL_IMPL(Scattering)
 // ------------------------------------------------------------------------- //
 double UtilityIntegralScattering::FunctionToIntegral(double energy)
 {
-    double aux, aux2;
+    double aux2;
 
     //TODO(mario): Better way? Sat 2017/09/02
     double square_momentum = energy * energy - utility_.GetParticleDef().mass * utility_.GetParticleDef().mass;
-
     aux2    =   RY* energy / square_momentum;
-    aux     *=  aux2*aux2;
 
-    return UtilityDecorator::FunctionToIntegral(energy) * aux;
+    return UtilityDecorator::FunctionToIntegral(energy) * aux2 * aux2;
 }
 
 // ------------------------------------------------------------------------- //

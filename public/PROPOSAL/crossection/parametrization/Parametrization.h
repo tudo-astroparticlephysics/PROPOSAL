@@ -12,21 +12,7 @@ namespace PROPOSAL
 class Parametrization
 {
     public:
-    struct Definition
-    {
-        double multiplier; //!< multiplier to in- or decrease the Epairproduction cross-sections
-
-        bool lpm_effect_enabled;
-        double order_of_interpolation;
-        std::string path_to_tables; /// Path to interpolation tables
-        bool raw;                   /// Determine if output format of interpolation tables is binary or txt.
-
-        Definition();
-        ~Definition();
-    };
-
-    public:
-        Parametrization(const ParticleDef&, const Medium&, const EnergyCutSettings&, Definition = Definition());
+        Parametrization(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier);
         Parametrization(const Parametrization&);
         virtual ~Parametrization();
 
@@ -59,8 +45,7 @@ class Parametrization
         const ParticleDef& GetParticleDef() const { return particle_def_; }
         const Medium& GetMedium() const { return *medium_; }
         const EnergyCutSettings& GetEnergyCuts() const { return cut_settings_; }
-        const Definition& GetDefinition() const { return param_def_; }
-        double GetMultiplier() const { return param_def_.multiplier; }
+        double GetMultiplier() const { return multiplier_; }
 
         // ----------------------------------------------------------------- //
         // Setter
@@ -80,8 +65,7 @@ class Parametrization
         const ComponentVec& components_;
         int component_index_;
 
-        Definition param_def_;
-        bool init_lpm_effect_;
+        double multiplier_;
 };
 
 } /* PROPOSAL */

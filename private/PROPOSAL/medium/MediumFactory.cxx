@@ -68,3 +68,16 @@ Medium* MediumFactory::CreateMedium(const Enum& med, double density_correction)
         log_fatal("Medium %s not registerd!", typeid(med).name());
     }
 }
+
+Medium* MediumFactory::CreateMedium(Definition def)
+{
+    MediumMapEnum::iterator it = medium_map_enum.find(def.type);
+
+    if (it != medium_map_enum.end())
+    {
+        return it->second(def.density_correction);
+    } else
+    {
+        log_fatal("Medium %s not registerd!", typeid(def.type).name());
+    }
+}

@@ -18,15 +18,13 @@ using namespace PROPOSAL;
 // Constructor & Destructor
 // ------------------------------------------------------------------------- //
 
-CrossSectionInterpolant::CrossSectionInterpolant(const DynamicData::Type& type, const Parametrization& param)
+CrossSectionInterpolant::CrossSectionInterpolant(const DynamicData::Type& type, const Parametrization& param, InterpolationDef def)
     : CrossSection(type, param)
     , dedx_interpolant_(NULL)
     , de2dx_interpolant_(NULL)
     , dndx_interpolant_1d_(param.GetMedium().GetNumComponents(), NULL)
     , dndx_interpolant_2d_(param.GetMedium().GetNumComponents(), NULL)
 {
-    Parametrization::Definition param_def = parametrization_->GetDefinition();
-
     // --------------------------------------------------------------------- //
     // Builder for dNdx
     // --------------------------------------------------------------------- //
@@ -51,15 +49,15 @@ CrossSectionInterpolant::CrossSectionInterpolant(const DynamicData::Type& type, 
             .SetMax2(NUM1)
             .SetX2Min(0.0)
             .SetX2Max(1.0)
-            .SetRomberg1(param_def.order_of_interpolation)
+            .SetRomberg1(def.order_of_interpolation)
             .SetRational1(false)
             .SetRelative1(false)
             .SetIsLog1(true)
-            .SetRomberg2(param_def.order_of_interpolation)
+            .SetRomberg2(def.order_of_interpolation)
             .SetRational2(false)
             .SetRelative2(false)
             .SetIsLog2(false)
-            .SetRombergY(param_def.order_of_interpolation)
+            .SetRombergY(def.order_of_interpolation)
             .SetRationalY(true)
             .SetRelativeY(false)
             .SetLogSubst(false)
@@ -71,11 +69,11 @@ CrossSectionInterpolant::CrossSectionInterpolant(const DynamicData::Type& type, 
         builder1d[i].SetMax(NUM1)
             .SetXMin(param.GetParticleDef().low)
             .SetXMax(BIGENERGY)
-            .SetRomberg(param_def.order_of_interpolation)
+            .SetRomberg(def.order_of_interpolation)
             .SetRational(false)
             .SetRelative(false)
             .SetIsLog(true)
-            .SetRombergY(param_def.order_of_interpolation)
+            .SetRombergY(def.order_of_interpolation)
             .SetRationalY(true)
             .SetRelativeY(false)
             .SetLogSubst(false)
