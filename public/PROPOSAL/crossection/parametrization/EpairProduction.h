@@ -56,7 +56,14 @@ class EpairProduction : public Parametrization
     // ----------------------------------------------------------------------------
     double lpm(double energy, double r2, double b, double x);
 
+    // --------------------------------------------------------------------- //
+    // Getter
+    // --------------------------------------------------------------------- //
+
+    const std::string& GetName() { return name_; }
+
     protected:
+    static const std::string name_;
 
     double v_;
     bool init_lpm_effect_;

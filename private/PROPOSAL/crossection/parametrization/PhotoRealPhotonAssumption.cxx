@@ -7,6 +7,34 @@
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/math/Interpolant.h"
 
+#define PHOTO_PARAM_REAL_IMPL(param, parent)                                                                           \
+    Photo##param::Photo##param(const ParticleDef& particle_def,                                                              \
+                         const Medium& medium,                                                                         \
+                         const EnergyCutSettings& cuts,                                                                \
+                         const RealPhoton& hardBB,                                                                     \
+                         double multiplier)                                                                            \
+        : Photo##parent(particle_def, medium, cuts, hardBB, multiplier)                                    \
+    {                                                                                                                  \
+    }                                                                                                                  \
+                                                                                                                       \
+    Photo##param::Photo##param(const Photo##param& photo)                                                                       \
+        : Photo##parent(photo)                                                                             \
+    {                                                                                                                  \
+    }                                                                                                                  \
+                                                                                                                       \
+    Photo##param::~Photo##param() {}                                                                                         \
+                                                                                                                       \
+    Parametrization* Photo##param::create(const ParticleDef& particle_def,                                                \
+                                       const Medium& medium,                                                           \
+                                       const EnergyCutSettings& cuts,                                                  \
+                                       const RealPhoton& hardBB,                                                       \
+                                       double multiplier)                                                              \
+    {                                                                                                                  \
+        return new Photo##param(particle_def, medium, cuts, hardBB, multiplier);                                          \
+    }                                                                                                                  \
+                                                                                                                       \
+    const std::string Photo##param::name_ = "Photo" #param;
+
 using namespace PROPOSAL;
 
 /******************************************************************************
@@ -90,33 +118,40 @@ double PhotoRealPhotonAssumption::NucleusCrossSectionCaldwell(double nu)
 *                            Zeus Parametrization                            *
 ******************************************************************************/
 
+// Signature: (new class, parent class)
+PHOTO_PARAM_REAL_IMPL(Zeus, RealPhotonAssumption)
+PHOTO_PARAM_REAL_IMPL(BezrukovBugaev, RealPhotonAssumption)
+PHOTO_PARAM_REAL_IMPL(Kokoulin, BezrukovBugaev)
+
 // ------------------------------------------------------------------------- //
-PhotoZeus::PhotoZeus(const ParticleDef& particle_def,
-                     const Medium& medium,
-                     const EnergyCutSettings& cuts,
-                     const RealPhoton& hardBB,
-                     double multiplier)
-    : PhotoRealPhotonAssumption(particle_def, medium, cuts, hardBB, multiplier)
-{
-}
-
-PhotoZeus::PhotoZeus(const PhotoZeus& photo)
-    : PhotoRealPhotonAssumption(photo)
-{
-}
-
-PhotoZeus::~PhotoZeus()
-{
-}
-
-Parametrization* PhotoZeus::create(const ParticleDef& particle_def,
-                        const Medium& medium,
-                        const EnergyCutSettings& cuts,
-                        const RealPhoton& hardBB,
-                        double multiplier)
-{
-    return new PhotoZeus(particle_def, medium, cuts, hardBB, multiplier);
-}
+// PhotoZeus::PhotoZeus(const ParticleDef& particle_def,
+//                      const Medium& medium,
+//                      const EnergyCutSettings& cuts,
+//                      const RealPhoton& hardBB,
+//                      double multiplier)
+//     : PhotoRealPhotonAssumption(particle_def, medium, cuts, hardBB, multiplier)
+// {
+// }
+//
+// PhotoZeus::PhotoZeus(const PhotoZeus& photo)
+//     : PhotoRealPhotonAssumption(photo)
+// {
+// }
+//
+// PhotoZeus::~PhotoZeus()
+// {
+// }
+//
+// Parametrization* PhotoZeus::create(const ParticleDef& particle_def,
+//                         const Medium& medium,
+//                         const EnergyCutSettings& cuts,
+//                         const RealPhoton& hardBB,
+//                         double multiplier)
+// {
+//     return new PhotoZeus(particle_def, medium, cuts, hardBB, multiplier);
+// }
+//
+// const std::string PhotoZeus::name_ = "EpairProduction";
 
 // ------------------------------------------------------------------------- //
 double PhotoZeus::CalculateParametrization(double nu)
@@ -129,37 +164,39 @@ double PhotoZeus::CalculateParametrization(double nu)
     return aux;
 }
 
+
+
 /******************************************************************************
 *                      Bezrukov Bugaev Parametrization                       *
 ******************************************************************************/
 
 // ------------------------------------------------------------------------- //
-PhotoBezrukovBugaev::PhotoBezrukovBugaev(const ParticleDef& particle_def,
-                     const Medium& medium,
-                     const EnergyCutSettings& cuts,
-                     const RealPhoton& hardBB,
-                     double multiplier)
-    : PhotoRealPhotonAssumption(particle_def, medium, cuts, hardBB, multiplier)
-{
-}
-
-PhotoBezrukovBugaev::PhotoBezrukovBugaev(const PhotoBezrukovBugaev& photo)
-    : PhotoRealPhotonAssumption(photo)
-{
-}
-
-PhotoBezrukovBugaev::~PhotoBezrukovBugaev()
-{
-}
-
-Parametrization* PhotoBezrukovBugaev::create(const ParticleDef& particle_def,
-                        const Medium& medium,
-                        const EnergyCutSettings& cuts,
-                        const RealPhoton& hardBB,
-                        double multiplier)
-{
-    return new PhotoBezrukovBugaev(particle_def, medium, cuts, hardBB, multiplier);
-}
+// PhotoBezrukovBugaev::PhotoBezrukovBugaev(const ParticleDef& particle_def,
+//                      const Medium& medium,
+//                      const EnergyCutSettings& cuts,
+//                      const RealPhoton& hardBB,
+//                      double multiplier)
+//     : PhotoRealPhotonAssumption(particle_def, medium, cuts, hardBB, multiplier)
+// {
+// }
+//
+// PhotoBezrukovBugaev::PhotoBezrukovBugaev(const PhotoBezrukovBugaev& photo)
+//     : PhotoRealPhotonAssumption(photo)
+// {
+// }
+//
+// PhotoBezrukovBugaev::~PhotoBezrukovBugaev()
+// {
+// }
+//
+// Parametrization* PhotoBezrukovBugaev::create(const ParticleDef& particle_def,
+//                         const Medium& medium,
+//                         const EnergyCutSettings& cuts,
+//                         const RealPhoton& hardBB,
+//                         double multiplier)
+// {
+//     return new PhotoBezrukovBugaev(particle_def, medium, cuts, hardBB, multiplier);
+// }
 
 // ------------------------------------------------------------------------- //
 double PhotoBezrukovBugaev::CalculateParametrization(double nu)
@@ -245,37 +282,39 @@ double PhotoRhode::CalculateParametrization(double nu)
     }
 }
 
+const std::string PhotoRhode::name_ = "PhotoRhode";
+
 /******************************************************************************
 *                          Kokoulin Parametrization                           *
 ******************************************************************************/
 
 // ------------------------------------------------------------------------- //
-PhotoKokoulin::PhotoKokoulin(const ParticleDef& particle_def,
-                             const Medium& medium,
-                             const EnergyCutSettings& cuts,
-                             const RealPhoton& hardBB,
-                             double multiplier)
-    : PhotoBezrukovBugaev(particle_def, medium, cuts, hardBB, multiplier)
-{
-}
-
-PhotoKokoulin::PhotoKokoulin(const PhotoKokoulin& brems)
-    : PhotoBezrukovBugaev(brems)
-{
-}
-
-PhotoKokoulin::~PhotoKokoulin()
-{
-}
-
-Parametrization* PhotoKokoulin::create(const ParticleDef& particle_def,
-                        const Medium& medium,
-                        const EnergyCutSettings& cuts,
-                        const RealPhoton& hardBB,
-                        double multiplier)
-{
-    return new PhotoKokoulin(particle_def, medium, cuts, hardBB, multiplier);
-}
+// PhotoKokoulin::PhotoKokoulin(const ParticleDef& particle_def,
+//                              const Medium& medium,
+//                              const EnergyCutSettings& cuts,
+//                              const RealPhoton& hardBB,
+//                              double multiplier)
+//     : PhotoBezrukovBugaev(particle_def, medium, cuts, hardBB, multiplier)
+// {
+// }
+//
+// PhotoKokoulin::PhotoKokoulin(const PhotoKokoulin& brems)
+//     : PhotoBezrukovBugaev(brems)
+// {
+// }
+//
+// PhotoKokoulin::~PhotoKokoulin()
+// {
+// }
+//
+// Parametrization* PhotoKokoulin::create(const ParticleDef& particle_def,
+//                         const Medium& medium,
+//                         const EnergyCutSettings& cuts,
+//                         const RealPhoton& hardBB,
+//                         double multiplier)
+// {
+//     return new PhotoKokoulin(particle_def, medium, cuts, hardBB, multiplier);
+// }
 
 // ------------------------------------------------------------------------- //
 double PhotoKokoulin::CalculateParametrization(double nu)

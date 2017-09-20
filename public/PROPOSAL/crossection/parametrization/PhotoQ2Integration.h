@@ -35,6 +35,11 @@
         }                                                                                                              \
                                                                                                                        \
         double FunctionToQ2Integral(double energy, double v, double Q2);                                               \
+                                                                                                                       \
+        const std::string& GetName() { return name_; }                                                                 \
+                                                                                                                       \
+        protected:                                                                                                     \
+        static const std::string name_;                                                                                \
     };
 
 namespace PROPOSAL {
