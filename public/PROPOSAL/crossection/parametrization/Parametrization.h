@@ -42,6 +42,8 @@ class Parametrization
         // Getter
         // ----------------------------------------------------------------- //
 
+        virtual const std::string& GetName() = 0; //{ return name_; }
+
         const ParticleDef& GetParticleDef() const { return particle_def_; }
         const Medium& GetMedium() const { return *medium_; }
         const EnergyCutSettings& GetEnergyCuts() const { return cut_settings_; }
@@ -56,6 +58,8 @@ class Parametrization
 
     protected:
         typedef std::vector<Components::Component*> ComponentVec;
+
+        // const std::string name_;
 
         const ParticleDef particle_def_;
         const Medium* medium_;
