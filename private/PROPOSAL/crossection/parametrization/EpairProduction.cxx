@@ -231,6 +231,11 @@ double EpairProduction::lpm(double energy, double r2, double b, double x)
            (((2 + r2) * (1 + b) + x * (3 + r2)) * log(1 + 1 / x) + (1 - r2 - b) / (1 + x) - (3 + r2));
 }
 
+// ------------------------------------------------------------------------- //
+// Getter
+// ------------------------------------------------------------------------- //
+
+const std::string EpairProduction::name_ = "EpairProduction";
 
 /******************************************************************************
 *                         EpairProductionRhoIntegral                         *

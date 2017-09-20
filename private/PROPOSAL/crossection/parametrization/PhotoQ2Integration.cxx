@@ -28,7 +28,9 @@ using namespace PROPOSAL;
     {                                                                                                                  \
     }                                                                                                                  \
                                                                                                                        \
-    Photo##param::~Photo##param() {}
+    Photo##param::~Photo##param() {}\
+                                                                                                                       \
+    const std::string Photo##param::name_ = "Photo" #param;
 
 /******************************************************************************
 *                            Photo Q2 Integration                            *

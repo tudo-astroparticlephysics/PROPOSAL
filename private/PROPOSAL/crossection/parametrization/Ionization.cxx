@@ -116,3 +116,9 @@ double Ionization::InelCorrection(double energy, double v)
 
     return (ALPHA / (2 * PI)) * result;
 }
+
+// ------------------------------------------------------------------------- //
+// Getter
+// ------------------------------------------------------------------------- //
+
+const std::string Ionization::name_ = "Ionization";

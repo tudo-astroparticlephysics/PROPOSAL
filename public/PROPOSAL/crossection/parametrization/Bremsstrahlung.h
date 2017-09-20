@@ -22,6 +22,11 @@
         }                                                                                                              \
                                                                                                                        \
         double CalculateParametrization(double energy, double v);                                                      \
+                                                                                                                       \
+        const std::string& GetName() { return name_; }                                                                 \
+                                                                                                                       \
+        private:                                                                                                       \
+        static const std::string name_;                                                                                \
     };
 
 namespace PROPOSAL {
