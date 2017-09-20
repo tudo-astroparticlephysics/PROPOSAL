@@ -21,7 +21,9 @@
     {                                                                                                                  \
     }                                                                                                                  \
                                                                                                                        \
-    Brems##param::~Brems##param() {}
+    Brems##param::~Brems##param() {}                                                                                   \
+                                                                                                                       \
+    const std::string Brems##param::name_ = "Brems" #param;
 
 using namespace PROPOSAL;
 

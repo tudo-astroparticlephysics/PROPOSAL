@@ -25,6 +25,15 @@ class Ionization : public Parametrization
     IntegralLimits GetIntegralLimits(double energy);
 
     double InelCorrection(double energy, double v);
+
+    // --------------------------------------------------------------------- //
+    // Getter
+    // --------------------------------------------------------------------- //
+
+    const std::string& GetName() { return name_; }
+
+    private:
+    static const std::string& name_;
 };
 
 
