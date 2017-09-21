@@ -36,6 +36,7 @@ UtilityInterpolant::UtilityInterpolant(const UtilityInterpolant& collection)
     , stored_result_(collection.stored_result_)
     , interpolant_(new Interpolant(*collection.interpolant_))
     , interpolant_diff_(new Interpolant(*collection.interpolant_diff_))
+    , interpolation_def_(collection.interpolation_def_)
 {
 }
 
@@ -95,9 +96,7 @@ void UtilityInterpolant::InitInterpolation(const std::string& name, UtilityInteg
         params[i] = &crosssections[i]->GetParametrization();
     }
 
-    Helper::InitializeInterpolation(name,
-                                    builder_container,
-                                    params);
+    Helper::InitializeInterpolation(name, builder_container, params, interpolation_def_);
 }
 
 /******************************************************************************
@@ -452,6 +451,7 @@ double UtilityInterpolantContRand::Calculate(double ei, double ef, double rnd)
     {
         return max(interpolant_diff_->Interpolate((ei + ef) / 2) * (ef - ei), 0.0);
     }
+    //TODO(mario): return Thu 2017/09/21
 }
 
 // ------------------------------------------------------------------------- //

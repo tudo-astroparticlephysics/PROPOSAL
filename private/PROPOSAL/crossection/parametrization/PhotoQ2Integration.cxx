@@ -1,5 +1,6 @@
 
 #include <boost/bind.hpp>
+#include <boost/functional/hash.hpp>
 #include <cmath>
 
 #include "PROPOSAL/crossection/parametrization/PhotoQ2Integration.h"
@@ -91,6 +92,19 @@ double PhotoQ2Integral::DifferentialCrossSection(double energy, double v)
            particle_charge;
 
     return aux;
+}
+
+// ------------------------------------------------------------------------- //
+// Getter
+// ------------------------------------------------------------------------- //
+
+// ------------------------------------------------------------------------- //
+size_t PhotoQ2Integral::GetHash() const
+{
+    size_t seed = Parametrization::GetHash();
+    boost::hash_combine(seed, shadow_effect_->GetHash());
+
+    return seed;
 }
 
 /******************************************************************************

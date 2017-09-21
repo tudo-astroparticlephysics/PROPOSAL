@@ -40,7 +40,7 @@ class EpairProductionFactory
                                          const EnergyCutSettings&,
                                          bool lpm,
                                          double multiplier,
-                                         InterpolationDef = InterpolationDef()) const;
+                                         InterpolationDef) const;
 
     // --------------------------------------------------------------------- //
     // Most general creation
@@ -49,17 +49,13 @@ class EpairProductionFactory
     CrossSection* CreateEpairProduction(const ParticleDef&,
                                         const Medium&,
                                         const EnergyCutSettings&,
-                                        bool lpm,
-                                        double multiplier,
-                                        bool interpolate,
-                                        InterpolationDef = InterpolationDef()) const;
+                                        const Definition&) const;
 
     CrossSection* CreateEpairProduction(const ParticleDef&,
                                         const Medium&,
                                         const EnergyCutSettings&,
                                         const Definition&,
-                                        bool interpolate,
-                                        InterpolationDef = InterpolationDef()) const;
+                                        InterpolationDef) const;
 
     // --------------------------------------------------------------------- //
     // Singleton pattern

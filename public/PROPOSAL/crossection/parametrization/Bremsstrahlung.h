@@ -23,7 +23,7 @@
                                                                                                                        \
         double CalculateParametrization(double energy, double v);                                                      \
                                                                                                                        \
-        const std::string& GetName() { return name_; }                                                                 \
+        const std::string& GetName() const { return name_; }                                                           \
                                                                                                                        \
         private:                                                                                                       \
         static const std::string name_;                                                                                \
@@ -47,6 +47,12 @@ class Bremsstrahlung : public Parametrization
     virtual double CalculateParametrization(double energy, double v) = 0;
 
     virtual IntegralLimits GetIntegralLimits(double energy);
+
+    // ----------------------------------------------------------------- //
+    // Getter
+    // ----------------------------------------------------------------- //
+
+    virtual size_t GetHash() const;
 
     protected:
 

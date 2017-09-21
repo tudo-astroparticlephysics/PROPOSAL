@@ -38,7 +38,7 @@ CrossSection* EpairProductionFactory::CreateEpairInterpolant(const ParticleDef& 
                                                              double multiplier,
                                                              InterpolationDef def) const
 {
-    return new EpairInterpolant(EpairProductionRhoInterpolant(particle_def, medium, cuts, lpm, multiplier), def);
+    return new EpairInterpolant(EpairProductionRhoInterpolant(particle_def, medium, cuts, lpm, multiplier, def), def);
 }
 
 
@@ -47,36 +47,18 @@ CrossSection* EpairProductionFactory::CreateEpairInterpolant(const ParticleDef& 
 // ------------------------------------------------------------------------- //
 
 CrossSection* EpairProductionFactory::CreateEpairProduction(const ParticleDef& particle_def,
-                                                          const Medium& medium,
-                                                          const EnergyCutSettings& cuts,
-                                                          bool lpm,
-                                                          double multiplier,
-                                                          bool interpolate,
-                                                          InterpolationDef def) const
+                                                            const Medium& medium,
+                                                            const EnergyCutSettings& cuts,
+                                                            const Definition& def) const
 {
-    if (interpolate)
-    {
-       return CreateEpairInterpolant(particle_def, medium, cuts, lpm, multiplier, def);
-    }
-    else
-    {
-       return CreateEpairIntegral(particle_def, medium, cuts, lpm, multiplier);
-    }
+    return CreateEpairIntegral(particle_def, medium, cuts, def.lpm_effect, def.multiplier);
 }
 
 CrossSection* EpairProductionFactory::CreateEpairProduction(const ParticleDef& particle_def,
                                                             const Medium& medium,
                                                             const EnergyCutSettings& cuts,
                                                             const Definition& def,
-                                                            bool interpolate,
                                                             InterpolationDef interpolation_def) const
 {
-    if (interpolate)
-    {
-       return CreateEpairInterpolant(particle_def, medium, cuts, def.lpm_effect, def.multiplier, interpolation_def);
-    }
-    else
-    {
-       return CreateEpairIntegral(particle_def, medium, cuts, def.lpm_effect, def.multiplier);
-    }
+    return CreateEpairInterpolant(particle_def, medium, cuts, def.lpm_effect, def.multiplier, interpolation_def);
 }

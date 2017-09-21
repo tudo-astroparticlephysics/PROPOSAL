@@ -31,9 +31,6 @@ class Utility
     public:
     struct Definition
     {
-        bool do_interpolation;
-        InterpolationDef interpolation_def;
-
         BremsstrahlungFactory::Definition brems_def;
         PhotonuclearFactory::Definition photo_def;
         EpairProductionFactory::Definition epair_def;
@@ -49,11 +46,16 @@ class Utility
             const Medium&,
             const EnergyCutSettings&,
             Definition);
+    Utility(const ParticleDef&,
+            const Medium&,
+            const EnergyCutSettings&,
+            Definition,
+            const InterpolationDef&);
     Utility(const std::vector<CrossSection*>&);
     Utility(const Utility&);
     virtual ~Utility();
 
-    // const Definition& GetDefinition() const { return utility_def_; }
+    const Definition& GetDefinition() const { return utility_def_; }
     const ParticleDef& GetParticleDef() const { return particle_def_; }
     const Medium& GetMedium() const { return *medium_; }
     const std::vector<CrossSection*>& GetCrosssections() const { return crosssections_; }
@@ -65,13 +67,13 @@ class Utility
     // Protected members
     // --------------------------------------------------------------------- //
 
-    // Definition utility_def_;
-
     ParticleDef particle_def_;
     Medium* medium_;
     EnergyCutSettings cut_settings_;
 
     std::vector<CrossSection*> crosssections_;
+
+    Definition utility_def_;
 };
 
 class UtilityDecorator

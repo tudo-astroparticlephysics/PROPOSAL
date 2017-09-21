@@ -10,7 +10,7 @@ namespace PROPOSAL
 class BremsInterpolant: public CrossSectionInterpolant
 {
     public:
-        BremsInterpolant(const Parametrization&, InterpolationDef = InterpolationDef());
+        BremsInterpolant(const Parametrization&, InterpolationDef);
         BremsInterpolant(const BremsInterpolant&);
         virtual ~BremsInterpolant();
 

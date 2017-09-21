@@ -8,6 +8,7 @@ namespace PROPOSAL {
 
 class Utility;
 class UtilityDecorator;
+struct InterpolationDef;
 
 
 /**
@@ -18,6 +19,7 @@ class ContinuousRandomizer
 {
     public:
     ContinuousRandomizer(Utility&);
+    ContinuousRandomizer(Utility&, InterpolationDef);
     ContinuousRandomizer(const ContinuousRandomizer&);
     ~ContinuousRandomizer();
 

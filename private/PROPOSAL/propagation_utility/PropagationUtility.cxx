@@ -34,9 +34,9 @@ using namespace PROPOSAL;
 ******************************************************************************/
 
 Utility::Definition::Definition()
-    : do_interpolation(true)
-    , interpolation_def()
-    , brems_def()
+    // : do_interpolation(true)
+    // , interpolation_def()
+    : brems_def()
     , photo_def()
     , epair_def()
     , ioniz_def()
@@ -69,34 +69,69 @@ Utility::Utility(const ParticleDef& particle_def,
     , medium_(medium.clone())
     , cut_settings_(cut_settings)
     , crosssections_()
+    , utility_def_(utility_def)
 {
     crosssections_.push_back(BremsstrahlungFactory::Get().CreateBremsstrahlung(particle_def_,
                                                                                *medium_,
                                                                                cut_settings_,
                                                                                utility_def.brems_def,
-                                                                               utility_def.do_interpolation,
-                                                                               utility_def.interpolation_def));
+                                                                               false));
 
     crosssections_.push_back(PhotonuclearFactory::Get().CreatePhotonuclear(particle_def_,
                                                                            *medium_,
                                                                            cut_settings_,
                                                                            utility_def.photo_def,
-                                                                           utility_def.do_interpolation,
-                                                                           utility_def.interpolation_def));
+                                                                           false));
 
     crosssections_.push_back(EpairProductionFactory::Get().CreateEpairProduction(particle_def_,
                                                                                  *medium_,
                                                                                  cut_settings_,
-                                                                                 utility_def.epair_def,
-                                                                                 utility_def.do_interpolation,
-                                                                                 utility_def.interpolation_def));
+                                                                                 utility_def.epair_def));
 
     crosssections_.push_back(IonizationFactory::Get().CreateIonization(particle_def_,
                                                                        *medium_,
                                                                        cut_settings_,
                                                                        utility_def.ioniz_def,
-                                                                       utility_def.do_interpolation,
-                                                                       utility_def.interpolation_def));
+                                                                       false));
+}
+
+Utility::Utility(const ParticleDef& particle_def,
+                 const Medium& medium,
+                 const EnergyCutSettings& cut_settings,
+                 Definition utility_def,
+                 const InterpolationDef& interpolation_def)
+    : particle_def_(particle_def)
+    , medium_(medium.clone())
+    , cut_settings_(cut_settings)
+    , crosssections_()
+    , utility_def_(utility_def)
+{
+    crosssections_.push_back(BremsstrahlungFactory::Get().CreateBremsstrahlung(particle_def_,
+                                                                               *medium_,
+                                                                               cut_settings_,
+                                                                               utility_def.brems_def,
+                                                                               true,
+                                                                               interpolation_def));
+
+    crosssections_.push_back(PhotonuclearFactory::Get().CreatePhotonuclear(particle_def_,
+                                                                           *medium_,
+                                                                           cut_settings_,
+                                                                           utility_def.photo_def,
+                                                                           true,
+                                                                           interpolation_def));
+
+    crosssections_.push_back(EpairProductionFactory::Get().CreateEpairProduction(particle_def_,
+                                                                                 *medium_,
+                                                                                 cut_settings_,
+                                                                                 utility_def.epair_def,
+                                                                                 interpolation_def));
+
+    crosssections_.push_back(IonizationFactory::Get().CreateIonization(particle_def_,
+                                                                       *medium_,
+                                                                       cut_settings_,
+                                                                       utility_def.ioniz_def,
+                                                                       true,
+                                                                       interpolation_def));
 }
 
 Utility::Utility(const std::vector<CrossSection*>& crosssections)
@@ -111,17 +146,17 @@ Utility::Utility(const std::vector<CrossSection*>& crosssections)
         {
             if ((*it)->GetParametrization().GetParticleDef() != particle_def)
             {
-                log_fatal("Particle definition of the cross section must be equal!")
+                log_fatal("Particle definition of the cross section must be equal!");
             }
 
             if ((*it)->GetParametrization().GetMedium() != medium)
             {
-                log_fatal("Medium of the cross section must be equal!")
+                log_fatal("Medium of the cross section must be equal!");
             }
 
             if ((*it)->GetParametrization().GetEnergyCuts() != cuts)
             {
-                log_fatal("Energy cuts of the cross section must be equal!")
+                log_fatal("Energy cuts of the cross section must be equal!");
             }
 
             crosssections_.push_back((*it)->clone());
