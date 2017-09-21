@@ -53,25 +53,26 @@ const double Propagator::global_cont_behind_ = false;
 
 Propagator::Propagator()
     : seed_(1)
-    , current_collection_(NULL)
+    , current_sector_(NULL)
     // , particle_(MuMinusDef::Get())
     , particle_(*new PROPOSALParticle(MuMinusDef::Get()))
     , detector_(new Sphere(Vector3D(), 1e18, 0))
 {
-    //TODO(mario): set defaults Tue 2017/09/19
+    // TODO(mario): set defaults Tue 2017/09/19
     // Sector::Definition sector_def;
     // sector_def.location = Sector::ParticleLocation::InsideDetector;
     //
-    // current_collection_ = new Sector(particle_);
+    // current_sector_ = new Sector(particle_);
     //
-    // collections_.push_back(current_collection_);
+    // sectors_.push_back(current_sector_);
 }
 
-Propagator::Propagator(const std::vector<Sector*>& sectors, const Geometry& geometry)
-    try : seed_(1)
-    , current_collection_(NULL)
-    , particle_(sectors.at(0)->GetParticle())
-    , detector_(geometry.clone())
+// ------------------------------------------------------------------------- //
+Propagator::Propagator(const std::vector<Sector*>& sectors, const Geometry& geometry) try
+    : seed_(1),
+      current_sector_(NULL),
+      particle_(sectors.at(0)->GetParticle()),
+      detector_(geometry.clone())
 {
     // --------------------------------------------------------------------- //
     // Check if all ParticleDefs are the same
@@ -85,32 +86,81 @@ Propagator::Propagator(const std::vector<Sector*>& sectors, const Geometry& geom
         }
         else
         {
-            collections_.push_back(new Sector(**iter));
+            sectors_.push_back(new Sector(**iter));
         }
     }
 
-    current_collection_ = collections_.at(0);
-}
-catch (const std::out_of_range& ex)
+    current_sector_ = sectors_.at(0);
+} catch (const std::out_of_range& ex)
 {
     log_fatal("No Sectors are provided for the Propagator!");
 }
 
+// ------------------------------------------------------------------------- //
+Propagator::Propagator(PROPOSALParticle& particle,
+                       const std::vector<SectorFactory::Definition>& sector_defs,
+                       const Geometry& geometry)
+    : seed_(1)
+    , particle_(particle)
+    , detector_(geometry.clone())
+{
+    for (std::vector<SectorFactory::Definition>::const_iterator iter = sector_defs.begin(); iter != sector_defs.end();
+         ++iter)
+    {
+        sectors_.push_back(SectorFactory::Get().CreateSector(particle_, *iter));
+    }
+
+    try
+    {
+        current_sector_ = sectors_.at(0);
+    }
+    catch (const std::out_of_range& ex)
+    {
+        log_fatal("No Sectors are provided for the Propagator!");
+    }
+}
+
+// ------------------------------------------------------------------------- //
+Propagator::Propagator(PROPOSALParticle& particle,
+                       const std::vector<SectorFactory::Definition>& sector_defs,
+                       const Geometry& geometry,
+                       const InterpolationDef& interpolation_def)
+    : seed_(1)
+    , particle_(particle)
+    , detector_(geometry.clone())
+{
+    for (std::vector<SectorFactory::Definition>::const_iterator iter = sector_defs.begin(); iter != sector_defs.end();
+         ++iter)
+    {
+        sectors_.push_back(SectorFactory::Get().CreateSector(particle_, *iter, interpolation_def));
+    }
+
+    try
+    {
+        current_sector_ = sectors_.at(0);
+    }
+    catch (const std::out_of_range& ex)
+    {
+        log_fatal("No Sectors are provided for the Propagator!");
+    }
+}
+
+
 // Propagator::Propagator(const ParticleDef& particle_def, const std::vector<SectorFactory::Definition>& sectors, const Geometry& geometry)
 //     : seed_(1)
-//     , current_collection_(NULL)
+//     , current_sector_(NULL)
 //     // , particle_(particle_def)
 //     , particle_(*new PROPOSALParticle(particle_def))
 //     , detector_(geometry.clone())
 // {
 //     for (std::vector<SectorFactory::Definition>::const_iterator iter = sectors.begin(); iter != sectors.end(); ++iter)
 //     {
-//         collections_.push_back(SectorFactory::Get().CreateSector(particle_, *iter));
+//         sectors_.push_back(SectorFactory::Get().CreateSector(particle_, *iter));
 //     }
 //
 //     try
 //     {
-//         current_collection_ = collections_.at(0);
+//         current_sector_ = sectors_.at(0);
 //     }
 //     catch (const std::out_of_range& ex)
 //     {
@@ -120,7 +170,7 @@ catch (const std::out_of_range& ex)
 
 Propagator::Propagator(const ParticleDef& particle_def, const std::string& config_file)
     : seed_(1)
-    , current_collection_(NULL)
+    , current_sector_(NULL)
     // , particle_(particle_def)
     , particle_(*new PROPOSALParticle(particle_def))
     , detector_(NULL)
@@ -261,18 +311,29 @@ Propagator::Propagator(const ParticleDef& particle_def, const std::string& confi
     //
     //     if (interpolate)
     //     {
-    //         collections_.push_back(new SectorInterpolant(*med, *geometry, cuts_infront, sec_def_infront));
-    //         collections_.push_back(new SectorInterpolant(*med, *geometry, cuts_inside, sec_def_inside));
-    //         collections_.push_back(new SectorInterpolant(*med, *geometry, cuts_behind, sec_def_behind));
+    //         sectors_.push_back(new SectorInterpolant(*med, *geometry, cuts_infront, sec_def_infront));
+    //         sectors_.push_back(new SectorInterpolant(*med, *geometry, cuts_inside, sec_def_inside));
+    //         sectors_.push_back(new SectorInterpolant(*med, *geometry, cuts_behind, sec_def_behind));
     //     } else
     //     {
-    //         collections_.push_back(new SectorIntegral(*med, *geometry, cuts_infront, sec_def_infront));
-    //         collections_.push_back(new SectorIntegral(*med, *geometry, cuts_inside, sec_def_inside));
-    //         collections_.push_back(new SectorIntegral(*med, *geometry, cuts_behind, sec_def_behind));
+    //         sectors_.push_back(new SectorIntegral(*med, *geometry, cuts_infront, sec_def_infront));
+    //         sectors_.push_back(new SectorIntegral(*med, *geometry, cuts_inside, sec_def_inside));
+    //         sectors_.push_back(new SectorIntegral(*med, *geometry, cuts_behind, sec_def_behind));
     //     }
     // }
 }
 
+Propagator::~Propagator()
+{
+    for (std::vector<Sector*>::const_iterator iter = sectors_.begin(); iter != sectors_.end(); ++iter)
+    {
+        delete *iter;
+    }
+
+    sectors_.clear();
+
+    delete detector_;
+}
 
 // ------------------------------------------------------------------------- //
 // Public member functions
@@ -315,7 +376,7 @@ std::vector<DynamicData*> Propagator::Propagate(double MaxDistance_cm)
 
         ChooseCurrentCollection(particle_position, particle_direction);
 
-        if(current_collection_ == NULL)
+        if(current_sector_ == NULL)
         {
             log_info("particle_ reached the border");
             break;
@@ -367,7 +428,7 @@ std::vector<DynamicData*> Propagator::Propagate(double MaxDistance_cm)
             distance = MaxDistance_cm - particle_.GetPropagatedDistance();
         }
 
-        result  =   current_collection_->Propagate(distance);
+        result  =   current_sector_->Propagate(distance);
 
         if(result<=0 || MaxDistance_cm <= particle_.GetPropagatedDistance()) break;
     }
@@ -392,27 +453,27 @@ void Propagator::ChooseCurrentCollection(Vector3D& particle_position, Vector3D& 
     vector<int> crossed_collections;
     crossed_collections.resize(0);
 
-    for(unsigned int i = 0; i < collections_.size(); i++)
+    for(unsigned int i = 0; i < sectors_.size(); i++)
     {
-        // collections_[i]->RestoreBackup_particle();
+        // sectors_[i]->RestoreBackup_particle();
 
         //TODO(mario): Is that ok to delete? Tue 2017/08/08
-        // if(particle_->GetType() != collections_[i]->GetParticle()->GetType())
+        // if(particle_->GetType() != sectors_[i]->GetParticle()->GetType())
         // {
         //     continue;
         // }
 
         if(detector_->IsInfront(particle_position, particle_direction))
         {
-            if(collections_[i]->GetLocation() != 0)
+            if(sectors_[i]->GetLocation() != 0)
             {
                 continue;
             }
             else
             {
-                if(collections_[i]->GetGeometry()->IsInside(particle_position, particle_direction))
+                if(sectors_[i]->GetGeometry()->IsInside(particle_position, particle_direction))
                 {
-                    current_collection_ = collections_[i];
+                    current_sector_ = sectors_[i];
                     crossed_collections.push_back(i);
                 }
                 else
@@ -424,15 +485,15 @@ void Propagator::ChooseCurrentCollection(Vector3D& particle_position, Vector3D& 
 
         else if(detector_->IsInside(particle_position, particle_direction))
         {
-            if(collections_[i]->GetLocation() != 1)
+            if(sectors_[i]->GetLocation() != 1)
             {
                 continue;
             }
             else
             {
-                if(collections_[i]->GetGeometry()->IsInside(particle_position, particle_direction))
+                if(sectors_[i]->GetGeometry()->IsInside(particle_position, particle_direction))
                 {
-                    current_collection_ = collections_[i];
+                    current_sector_ = sectors_[i];
                     crossed_collections.push_back(i);
                 }
                 else
@@ -445,15 +506,15 @@ void Propagator::ChooseCurrentCollection(Vector3D& particle_position, Vector3D& 
 
         else if(detector_->IsBehind(particle_position, particle_direction))
         {
-            if(collections_[i]->GetLocation() != 2)
+            if(sectors_[i]->GetLocation() != 2)
             {
                 continue;
             }
             else
             {
-                if(collections_[i]->GetGeometry()->IsInside(particle_position, particle_direction))
+                if(sectors_[i]->GetGeometry()->IsInside(particle_position, particle_direction))
                 {
-                    current_collection_ = collections_[i];
+                    current_sector_ = sectors_[i];
                     crossed_collections.push_back(i);
                 }
                 //The particle reached the border of all specified collections
@@ -468,7 +529,7 @@ void Propagator::ChooseCurrentCollection(Vector3D& particle_position, Vector3D& 
     //No process collection was found
     if(crossed_collections.size() == 0)
     {
-        current_collection_ = NULL;
+        current_sector_ = NULL;
         log_fatal("No Cross Section was found!!!");
     }
 
@@ -484,21 +545,21 @@ void Propagator::ChooseCurrentCollection(Vector3D& particle_position, Vector3D& 
     {
         //Current Hirachy is bigger -> Nothing to do!
         //
-        if(current_collection_->GetGeometry()->GetHirarchy() >
-                collections_[*iter]->GetGeometry()->GetHirarchy() )
+        if(current_sector_->GetGeometry()->GetHirarchy() >
+                sectors_[*iter]->GetGeometry()->GetHirarchy() )
         {
             continue;
         }
         //Current Hirachy is equal -> Look at the density!
         //
-        else if( current_collection_->GetGeometry()->GetHirarchy() ==
-                 collections_[*iter]->GetGeometry()->GetHirarchy() )
+        else if( current_sector_->GetGeometry()->GetHirarchy() ==
+                 sectors_[*iter]->GetGeometry()->GetHirarchy() )
         {
             //Current Density is bigger or same -> Nothing to do!
             //
 
-            if( current_collection_->GetMedium()->GetMassDensity() >=
-                    collections_[*iter]->GetMedium()->GetMassDensity() )
+            if( current_sector_->GetMedium()->GetMassDensity() >=
+                    sectors_[*iter]->GetMedium()->GetMassDensity() )
             {
                 continue;
             }
@@ -507,7 +568,7 @@ void Propagator::ChooseCurrentCollection(Vector3D& particle_position, Vector3D& 
             //
             else
             {
-                current_collection_ =  collections_[*iter];
+                current_sector_ =  sectors_[*iter];
             }
 
         }
@@ -516,14 +577,14 @@ void Propagator::ChooseCurrentCollection(Vector3D& particle_position, Vector3D& 
         //
         else
         {
-            current_collection_ =  collections_[*iter];
+            current_sector_ =  sectors_[*iter];
         }
     }
 
     //TODO(mario): Not needed anymore Thu 2017/08/24
-    // if(current_collection_ != NULL)
+    // if(current_sector_ != NULL)
     // {
-    //     current_collection_->SetParticle(particle_);
+    //     current_sector_->SetParticle(particle_);
     // }
 }
 
@@ -537,10 +598,10 @@ double Propagator::CalculateEffectiveDistance(Vector3D& particle_position, Vecto
     double distance_to_detector          = 0;
     double distance_to_closest_approach  = 0;
 
-    distance_to_collection_border = current_collection_->GetGeometry()->DistanceToBorder(particle_position, particle_direction).first;
+    distance_to_collection_border = current_sector_->GetGeometry()->DistanceToBorder(particle_position, particle_direction).first;
     double tmp_distance_to_border;
 
-    for(std::vector<Sector*>::iterator iter = collections_.begin(); iter != collections_.end(); ++iter)
+    for(std::vector<Sector*>::iterator iter = sectors_.begin(); iter != sectors_.end(); ++iter)
     {
         //TODO(mario): Is that ok to delete? Tue 2017/08/08
         // if (particle_.GetType() != (*iter)->Getparticle_()->GetType())
@@ -552,7 +613,7 @@ double Propagator::CalculateEffectiveDistance(Vector3D& particle_position, Vecto
                 continue;
             else
             {
-                if((*iter)->GetGeometry()->GetHirarchy() >= current_collection_->GetGeometry()->GetHirarchy())
+                if((*iter)->GetGeometry()->GetHirarchy() >= current_sector_->GetGeometry()->GetHirarchy())
                 {
                     tmp_distance_to_border = (*iter)->GetGeometry()->DistanceToBorder(particle_position, particle_direction).first;
                     if(tmp_distance_to_border<=0)continue;
@@ -580,7 +641,7 @@ double Propagator::CalculateEffectiveDistance(Vector3D& particle_position, Vecto
                 continue;
             else
             {
-                if((*iter)->GetGeometry()->GetHirarchy() >= current_collection_->GetGeometry()->GetHirarchy())
+                if((*iter)->GetGeometry()->GetHirarchy() >= current_sector_->GetGeometry()->GetHirarchy())
                 {
                     tmp_distance_to_border = (*iter)->GetGeometry()->DistanceToBorder(particle_position, particle_direction).first;
                     if(tmp_distance_to_border<=0)continue;
@@ -678,7 +739,7 @@ double Propagator::CalculateEffectiveDistance(Vector3D& particle_position, Vecto
 //
 //     while(flag)
 //     {
-//         energy_till_stochastic_ = current_collection_->CalculateEnergyTillStochastic(particle_, initial_energy );
+//         energy_till_stochastic_ = current_sector_->CalculateEnergyTillStochastic(particle_, initial_energy );
 //         if(energy_till_stochastic_.first > energy_till_stochastic_.second)
 //         {
 //             particle_interaction_   =   true;
@@ -692,10 +753,10 @@ double Propagator::CalculateEffectiveDistance(Vector3D& particle_position, Vecto
 //         }
 //
 //         //Calculate the displacement according to initial energy initial_energy and final_energy
-//         displacement  =   current_collection_->CalculateDisplacement(
+//         displacement  =   current_sector_->CalculateDisplacement(
 //                     initial_energy,
 //                     final_energy,
-//                     current_collection_->GetDensityCorrection()*(distance - propagated_distance)) / current_collection_->GetDensityCorrection();
+//                     current_sector_->GetDensityCorrection()*(distance - propagated_distance)) / current_sector_->GetDensityCorrection();
 //
 //         // The first interaction or decay happens behind the distance we want to propagate
 //         // So we calculate the final energy using only continuous losses
@@ -703,7 +764,7 @@ double Propagator::CalculateEffectiveDistance(Vector3D& particle_position, Vecto
 //         {
 //             displacement  =   distance - propagated_distance;
 //
-//             final_energy  =   current_collection_->CalculateFinalEnergy(particle_, initial_energy, current_collection_->GetDensityCorrection()*displacement);
+//             final_energy  =   current_sector_->CalculateFinalEnergy(particle_, initial_energy, current_sector_->GetDensityCorrection()*displacement);
 //
 //         }
 //         //Advance the Particle according to the displacement
@@ -717,11 +778,11 @@ double Propagator::CalculateEffectiveDistance(Vector3D& particle_position, Vecto
 //             propagated_distance = distance;  // computer precision control
 //         }
 //         //Randomize the continuous energy loss if this option is enabled
-//         if( current_collection_->GetDoRandomization() )
+//         if( current_sector_->GetDoRandomization() )
 //         {
 //             if(final_energy != particle_->GetLow())
 //             {
-//                 final_energy  = current_collection_->Randomize( initial_energy, final_energy );
+//                 final_energy  = current_sector_->Randomize( initial_energy, final_energy );
 //             }
 //
 //         }
@@ -738,7 +799,7 @@ double Propagator::CalculateEffectiveDistance(Vector3D& particle_position, Vecto
 //
 //         if(particle_interaction_)
 //         {
-//             energy_loss     =   current_collection_->MakeStochasticLoss(particle_);
+//             energy_loss     =   current_sector_->MakeStochasticLoss(particle_);
 //             if (energy_loss.second == ParticleType::unknown)
 //             {
 //                 // in this case, no cross section is chosen, so there is no interaction
@@ -760,7 +821,7 @@ double Propagator::CalculateEffectiveDistance(Vector3D& particle_position, Vecto
 //
 //             //TODO(mario): Delete decay products Tue 2017/08/22
 //
-//             // decay           =   current_collection_->MakeDecay();
+//             // decay           =   current_sector_->MakeDecay();
 //             // final_energy    =   0;
 //             // log_debug("Decay of particle: %s", particle_->GetName().c_str());
 //             // secondary_id    = particle_->GetParticleId()  +   1;
@@ -804,15 +865,15 @@ double Propagator::CalculateEffectiveDistance(Vector3D& particle_position, Vecto
 //     //             double rnd1 = RandomDouble();
 //     //             double rnd2 = RandomDouble();
 //     //
-//     //             product_energy  =   current_collection_->GetDecay()->CalculateProductEnergy(rnd1, 0.5, rnd2);
+//     //             product_energy  =   current_sector_->GetDecay()->CalculateProductEnergy(rnd1, 0.5, rnd2);
 //     //         }
 //     //         else
 //     //         {
-//     //             product_energy  =   current_collection_->GetDecay()->CalculateProductEnergy(RandomDouble(), 0.5, 0.5);
+//     //             product_energy  =   current_sector_->GetDecay()->CalculateProductEnergy(RandomDouble(), 0.5, 0.5);
 //     //         }
 //     //
 //     //         decay_to_store.first    =   product_energy;
-//     //         decay_to_store.second   =   current_collection_->GetDecay()->GetOut();
+//     //         decay_to_store.second   =   current_sector_->GetDecay()->GetOut();
 //     //
 //     //         final_energy  =   0;
 //     //
@@ -852,7 +913,7 @@ double Propagator::CalculateEffectiveDistance(Vector3D& particle_position, Vecto
 //
 //     if(do_exact_time_calculation_)
 //     {
-//         time   +=  current_collection_->CalculateParticleTime(ei, ef)/current_collection_->GetDensityCorrection();
+//         time   +=  current_sector_->CalculateParticleTime(ei, ef)/current_sector_->GetDensityCorrection();
 //     }
 //     else
 //     {
@@ -865,15 +926,15 @@ double Propagator::CalculateEffectiveDistance(Vector3D& particle_position, Vecto
 //         switch(scattering_model_)
 //         {
 //             case 0:
-//                 current_collection_->GetScattering()->Scatter(dr,ei,ef);
+//                 current_sector_->GetScattering()->Scatter(dr,ei,ef);
 //                 break;
 //
 //             case 1:
-//                 scatteringFirstOrder_->Scatter(dr, particle_, current_collection_->GetMedium());
+//                 scatteringFirstOrder_->Scatter(dr, particle_, current_sector_->GetMedium());
 //                 break;
 //
 //             case 2:
-//                 scatteringFirstOrderMoliere_->Scatter(dr, particle_, current_collection_->GetMedium());
+//                 scatteringFirstOrderMoliere_->Scatter(dr, particle_, current_sector_->GetMedium());
 //                 break;
 //             default:
 //                 log_error("Never should be here! scattering_model = %i !",scattering_model_);
@@ -1270,42 +1331,6 @@ double Propagator::CalculateEffectiveDistance(Vector3D& particle_position, Vecto
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
-//-----------------------Enable and disable interpolation---------------------//
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-void Propagator::EnableInterpolation(PROPOSALParticle& particle, std::string path, bool raw)
-{
-    // if(current_collection_ != NULL)
-    // {
-    //     current_collection_->EnableInterpolation(particle, path,raw);
-    // }
-    // for(unsigned int i = 0 ; i < collections_.size() ; i++)
-    // {
-    //     collections_.at(i)->EnableInterpolation(particle, path,raw);
-    // }
-}
-
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-void Propagator::DisableInterpolation()
-{
-    // if(current_collection_ != NULL)
-    // {
-    //     current_collection_->DisableInterpolation();
-    // }
-    // for(unsigned int i = 0 ; i < collections_.size() ; i++)
-    // {
-    //     collections_.at(i)->DisableInterpolation();
-    // }
-}
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
 //--------------------------------constructors--------------------------------//
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
@@ -1345,7 +1370,7 @@ void Propagator::DisableInterpolation()
 //     ,path_to_tables_            ( path_to_tables )
 //     ,raw_                       ( false )
 //     ,scattering_model_          ( scattering_model )
-//     ,current_collection_        (NULL)
+//     ,current_sector_        (NULL)
 // {
 //     particle_              = new PROPOSALParticle(particle_def);
 //     backup_particle_       = new PROPOSALParticle(*particle_);
@@ -1425,22 +1450,22 @@ void Propagator::DisableInterpolation()
 //     ,path_to_tables_            ( path_to_tables )
 //     ,raw_                       ( true )
 //     ,scattering_model_          (scattering_model)
-//     ,current_collection_        (NULL)
+//     ,current_sector_        (NULL)
 // {
 //     particle_              = new PROPOSALParticle(particle_def);
 //     backup_particle_       = new PROPOSALParticle(*particle_);
-//     current_collection_    = new ProcessCollection(particle_, medium, cuts);
+//     current_sector_    = new ProcessCollection(particle_, medium, cuts);
 //     detector_              = new Sphere(Vector3D(), 1e18, 0);
 //     // detector_              = new Geometry();
 //     // detector_->InitSphere(0,0,0,1e18,0);
-//     current_collection_->SetGeometry(detector_);
+//     current_sector_->SetGeometry(detector_);
 //
-//     current_collection_->SetLocation(1); // Inside the detector
-//     collections_.push_back(current_collection_);
+//     current_sector_->SetLocation(1); // Inside the detector
+//     sectors_.push_back(current_sector_);
 //
 //     if(continuous_rand)
 //     {
-//         current_collection_->EnableContinuousRandomization();
+//         current_sector_->EnableContinuousRandomization();
 //     }
 //
 //     if(scattering_model_ != -1)
@@ -1502,7 +1527,7 @@ void Propagator::DisableInterpolation()
 //     ,particle_                  (NULL)
 //     ,backup_particle_           (NULL)
 //     ,scattering_model_          (-1)
-//     ,current_collection_        (NULL)
+//     ,current_sector_        (NULL)
 // {
 //     ReadConfigFile(config_file, DoApplyOptions);
 // }
@@ -1538,7 +1563,7 @@ void Propagator::DisableInterpolation()
 //     ,path_to_tables_            ( "" )
 //     ,raw_                       ( false )
 //     ,scattering_model_          (-1)
-//     ,current_collection_        (NULL)
+//     ,current_sector_        (NULL)
 // {
 //     particle_        = new PROPOSALParticle(*particle);
 //     backup_particle_ = new PROPOSALParticle(*particle_);
@@ -1580,7 +1605,7 @@ Propagator::Propagator(const Propagator &propagator)
     // ,scatteringFirstOrder_          ( propagator.scatteringFirstOrder_ )
     // ,scatteringFirstOrderMoliere_   ( propagator.scatteringFirstOrderMoliere_ )
     // ,scattering_model_          (propagator.scattering_model_)
-    // ,current_collection_        ( new Collection(*propagator.current_collection_) )
+    // ,current_sector_        ( new Collection(*propagator.current_sector_) )
 
 {
 
@@ -1638,7 +1663,7 @@ bool Propagator::operator==(const Propagator &propagator) const
     // if( global_cont_inside_       != propagator.global_cont_inside_ )     return false;
     // if( global_cont_infront_      != propagator.global_cont_infront_ )    return false;
     // if( global_cont_behind_       != propagator.global_cont_behind_ )     return false;
-    // if( *current_collection_      != *propagator.current_collection_ )    return false;
+    // if( *current_sector_      != *propagator.current_sector_ )    return false;
     // if( raw_                      != propagator.raw_ )                    return false;
     //
     // if( path_to_tables_.compare( propagator.path_to_tables_ )!=0 )        return false;
@@ -1698,7 +1723,7 @@ void Propagator::swap(Propagator &propagator)
 //    scatteringFirstOrderMoliere_->swap(*propagator.scatteringFirstOrderMoliere_);
     // swap(scattering_model_ , propagator.scattering_model_);
 
-    // current_collection_->swap( *propagator.current_collection_ );
+    // current_sector_->swap( *propagator.current_sector_ );
 }
 
 
@@ -1731,8 +1756,8 @@ void Propagator::swap(Propagator &propagator)
 // {
 //     Medium* med             = new Ice();
 //     EnergyCutSettings* cuts = new EnergyCutSettings(500,0.05);
-//     current_collection_ = new CollectionInterpolant(Ice(), Sphere(Vector3D(), 1e18, 0), EnergyCutSettings(500, 0.05));
-//     current_collection_->SetGeometry(geom);
+//     current_sector_ = new CollectionInterpolant(Ice(), Sphere(Vector3D(), 1e18, 0), EnergyCutSettings(500, 0.05));
+//     current_sector_->SetGeometry(geom);
 // }
 
 
@@ -2148,33 +2173,33 @@ void Propagator::swap(Propagator &propagator)
 //                 }
 //
 //
-//                 int former_size =collections_.size();
+//                 int former_size =sectors_.size();
 //
-//                 collections_.push_back( muminus_infront );
-//                 collections_.push_back( muminus_inside );
-//                 collections_.push_back( muminus_behind );
-//                 // collections_.push_back( muplus_infront );
-//                 // collections_.push_back( muplus_inside );
-//                 // collections_.push_back( muplus_behind );
+//                 sectors_.push_back( muminus_infront );
+//                 sectors_.push_back( muminus_inside );
+//                 sectors_.push_back( muminus_behind );
+//                 // sectors_.push_back( muplus_infront );
+//                 // sectors_.push_back( muplus_inside );
+//                 // sectors_.push_back( muplus_behind );
 //
-//                 collections_.push_back( tauminus_infront );
-//                 collections_.push_back( tauminus_inside );
-//                 collections_.push_back( tauminus_behind );
-//                 // collections_.push_back( tauplus_infront );
-//                 // collections_.push_back( tauplus_inside );
-//                 // collections_.push_back( tauplus_behind );
+//                 sectors_.push_back( tauminus_infront );
+//                 sectors_.push_back( tauminus_inside );
+//                 sectors_.push_back( tauminus_behind );
+//                 // sectors_.push_back( tauplus_infront );
+//                 // sectors_.push_back( tauplus_inside );
+//                 // sectors_.push_back( tauplus_behind );
 //
-//                 collections_.push_back( eminus_infront );
-//                 collections_.push_back( eminus_inside );
-//                 collections_.push_back( eminus_behind );
-//                 // collections_.push_back( eplus_infront );
-//                 // collections_.push_back( eplus_inside );
-//                 // collections_.push_back( eplus_behind );
+//                 sectors_.push_back( eminus_infront );
+//                 sectors_.push_back( eminus_inside );
+//                 sectors_.push_back( eminus_behind );
+//                 // sectors_.push_back( eplus_infront );
+//                 // sectors_.push_back( eplus_inside );
+//                 // sectors_.push_back( eplus_behind );
 //
-//                 for(unsigned int i = former_size ;i<collections_.size(); i++)
+//                 for(unsigned int i = former_size ;i<sectors_.size(); i++)
 //                 {
-//                     collections_.at(i)->SetGeometry(geometry);
-//                     collections_.at(i)->SetDensityCorrection(density_correction);
+//                     sectors_.at(i)->SetGeometry(geometry);
+//                     sectors_.at(i)->SetDensityCorrection(density_correction);
 //                 }
 //
 //                 delete med;
@@ -2246,15 +2271,15 @@ void Propagator::swap(Propagator &propagator)
 //                     particle_behind->SetLocation(2);
 //                 }
 //
-//                 int former_size =collections_.size();
-//                 collections_.push_back( particle_infront );
-//                 collections_.push_back( particle_inside );
-//                 collections_.push_back( particle_behind );
+//                 int former_size =sectors_.size();
+//                 sectors_.push_back( particle_infront );
+//                 sectors_.push_back( particle_inside );
+//                 sectors_.push_back( particle_behind );
 //
-//                 for(unsigned int i = former_size ;i<collections_.size(); i++)
+//                 for(unsigned int i = former_size ;i<sectors_.size(); i++)
 //                 {
-//                     collections_.at(i)->SetGeometry(geometry);
-//                     collections_.at(i)->SetDensityCorrection(density_correction);
+//                     sectors_.at(i)->SetGeometry(geometry);
+//                     sectors_.at(i)->SetDensityCorrection(density_correction);
 //                 }
 //
 //                 delete med;
@@ -2697,115 +2722,3 @@ PROPOSALParticle& Propagator::GetParticle()
 //     }
 //
 // }
-
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-void Propagator::ApplyOptions()
-{
-    // for(unsigned int j = 0 ; j < collections_.size() ; j++)
-    // {
-    //     for(unsigned int i =0; i<collections_.at(j)->GetCrosssections().size(); i++)
-    //     {
-    //         switch (collections_.at(j)->GetCrosssections().at(i)->GetType())
-    //         {
-    //             case ParticleType::Brems:
-    //                 // collections_.at(j)->GetCrosssections().at(i)->SetParametrization(brems_);
-    //                 collections_.at(j)->GetCrosssections().at(i)->SetMultiplier(brems_multiplier_);
-    //                 collections_.at(j)->GetCrosssections().at(i)->EnableLpmEffect(lpm_);
-    //                 break;
-    //             case ParticleType::DeltaE:
-    //                 collections_.at(j)->GetCrosssections().at(i)->SetMultiplier(ioniz_multiplier_);
-    //                 break;
-    //             case ParticleType::EPair:
-    //                 collections_.at(j)->GetCrosssections().at(i)->SetMultiplier(epair_multiplier_);
-    //                 collections_.at(j)->GetCrosssections().at(i)->EnableLpmEffect(lpm_);
-    //                 break;
-    //             case ParticleType::NuclInt:
-    //                 // collections_.at(j)->GetCrosssections().at(i)->SetParametrization(photo_);
-    //                 collections_.at(j)->GetCrosssections().at(i)->SetMultiplier(photo_multiplier_);
-    //                 break;
-    //             default:
-    //                 log_fatal("Unknown cross section");
-    //                 exit(1);
-    //         }
-    //     }
-
-        // if(collections_.at(j)->GetEnableRandomization())
-        // {
-        //     collections_.at(j)->EnableContinuousRandomization();
-        // }
-        //
-        // if(moliere_)
-        // {
-        //     collections_.at(j)->EnableScattering();
-        // }
-        // if(do_exact_time_calculation_)
-        // {
-        //     collections_.at(j)->EnableExactTimeCalculation();
-        // }
-
-    // }
-    // if(!integrate_)
-    // {
-    //     cout << "Starting Interpolation! This will take some time depending on the number of media you defined!\n";
-    //     cout.flush();
-    //     EnableInterpolation(*particle_, path_to_tables_, raw_);
-    //     cout << "Done!\n";
-    // }
-    //
-}
-
-
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-//-------------------------Functions to interpolate---------------------------//
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-//--------------------------Functions to integrate----------------------------//
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-//---------------------------------Setter-------------------------------------//
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-// void Propagator::SetCollections(std::vector<Collection*> collections)
-// {
-//     collections_ = collections;
-// }
-
-// void Propagator::SetParticle(PROPOSALParticle* particle)
-// {
-//     particle_ = particle;
-//
-//     //TODO(mario): Remove when shared pointer are used Mi 2017/04/19
-//     if (backup_particle_ != NULL)
-//     {
-//         delete backup_particle_;
-//     }
-//
-//     backup_particle_ = new PROPOSALParticle(*particle_);
-// }
-
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-//---------------------------------Destructor---------------------------------//
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-Propagator::~Propagator(){}
-

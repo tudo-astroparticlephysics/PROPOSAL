@@ -138,25 +138,19 @@ Sector::Sector(PROPOSALParticle& particle,
     , cont_rand_(NULL)
     , scattering_(ScatteringFactory::Get().CreateScattering(sector_def_.scattering_model, particle_, utility_, interpolation_def))
 {
-    std::cout << "displacement" << std::endl;
     displacement_calculator_ = new UtilityInterpolantDisplacement(utility_, interpolation_def);
-    std::cout << "interaction" << std::endl;
     interaction_calculator_ = new UtilityInterpolantInteraction(utility_, interpolation_def);
-    std::cout << "decay" << std::endl;
     decay_calculator_ = new UtilityInterpolantDecay(utility_, interpolation_def);
 
-    std::cout << "exact time" << std::endl;
     if (sector_def_.do_exact_time_calculation)
     {
         exact_time_calculator_ = new UtilityInterpolantTime(utility_, interpolation_def);
     }
 
-    std::cout << "random" << std::endl;
     if (sector_def_.do_continuous_randomization)
     {
         cont_rand_ = new ContinuousRandomizer(utility_, interpolation_def);
     }
-    std::cout << "Created sector" << std::endl;
 }
 
 // Sector::Sector(PROPOSALParticle& particle,
