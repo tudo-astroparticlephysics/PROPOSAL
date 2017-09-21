@@ -155,7 +155,7 @@ double Bremsstrahlung::lpm(double energy, double v)
         param_def_.lpm_effect_enabled = true;
     }
 
-    double G, fi, xi, ps, Gamma;
+    double G, fi, xi, ps, Gamma, s1;
 
     const double fi1 = 1.54954;
     const double G1  = 0.710390;
@@ -164,7 +164,8 @@ double Bremsstrahlung::lpm(double energy, double v)
     double Z3 = pow(components_[component_index_]->GetNucCharge(), -1./3);
 
     double Dn = 1.54*pow(components_[component_index_]->GetAtomicNum(), 0.27);
-    double s1 = SQRT2*ME*Dn/(particle_def_.mass*Z3*components_[component_index_]->GetLogConstant());
+    s1 = ME*Dn/(particle_def_.mass*Z3*components_[component_index_]->GetLogConstant());
+    s1 *= s1*SQRT2;
 
     // Calc xi(s') from Stanev, Vankow, Streitmatter, Ellsworth, Bowen
     // Phys. Rev. D 25 (1982), 1291
