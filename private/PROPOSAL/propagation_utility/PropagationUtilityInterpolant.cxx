@@ -53,7 +53,7 @@ double UtilityInterpolant::GetUpperLimit(double ei, double rnd)
 }
 
 // ------------------------------------------------------------------------- //
-void UtilityInterpolant::InitInterpolation(const std::string& name, UtilityIntegral& utility)
+void UtilityInterpolant::InitInterpolation(const std::string& name, UtilityIntegral& utility, int number_of_sampling_points)
 {
     Integral integral(IROMB, IMAXS, IPREC2);
     const ParticleDef& particle_def = utility_.GetParticleDef();
@@ -72,7 +72,7 @@ void UtilityInterpolant::InitInterpolation(const std::string& name, UtilityInteg
     for (unsigned int i = 0; i < number_of_interpolants; ++i)
     {
         builder_vec[i]
-            .SetMax(NUM3)
+            .SetMax(number_of_sampling_points)
             .SetXMin(particle_def.low)
             .SetXMax(BIGENERGY)
             .SetRomberg(interpolation_def_.order_of_interpolation)
@@ -107,7 +107,7 @@ UtilityInterpolantDisplacement::UtilityInterpolantDisplacement(const Utility& ut
     : UtilityInterpolant(utility, def)
 {
     UtilityIntegralDisplacement utility_disp(utility_);
-    InitInterpolation("displacement", utility_disp);
+    InitInterpolation("displacement", utility_disp, NUM3);
 }
 
 UtilityInterpolantDisplacement::UtilityInterpolantDisplacement(const UtilityInterpolantDisplacement& collection)
@@ -163,9 +163,9 @@ double UtilityInterpolantDisplacement::BuildInterpolant(double energy, UtilityIn
 }
 
 // ------------------------------------------------------------------------- //
-void UtilityInterpolantDisplacement::InitInterpolation(const std::string& name, UtilityIntegral& utility)
+void UtilityInterpolantDisplacement::InitInterpolation(const std::string& name, UtilityIntegral& utility, int number_of_sampling_points)
 {
-    UtilityInterpolant::InitInterpolation(name, utility);
+    UtilityInterpolant::InitInterpolation(name, utility, number_of_sampling_points);
 }
 
 /******************************************************************************
@@ -178,7 +178,7 @@ UtilityInterpolantInteraction::UtilityInterpolantInteraction(const Utility& util
     , up_(0)
 {
     UtilityIntegralInteraction utility_int(utility_);
-    InitInterpolation("interaction", utility_int);
+    InitInterpolation("interaction", utility_int, NUM3);
 }
 
 UtilityInterpolantInteraction::UtilityInterpolantInteraction(const UtilityInterpolantInteraction& collection)
@@ -246,7 +246,7 @@ double UtilityInterpolantInteraction::BuildInterpolant(double energy, UtilityInt
 }
 
 // ------------------------------------------------------------------------- //
-void UtilityInterpolantInteraction::InitInterpolation(const std::string& name, UtilityIntegral& utility)
+void UtilityInterpolantInteraction::InitInterpolation(const std::string& name, UtilityIntegral& utility, int number_of_sampling_points)
 {
     Integral integral(IROMB, IMAXS, IPREC2);
     const ParticleDef& particle_def = utility_.GetParticleDef();
@@ -263,7 +263,7 @@ void UtilityInterpolantInteraction::InitInterpolation(const std::string& name, U
         up_ = false;
     }
 
-    UtilityInterpolant::InitInterpolation(name, utility);
+    UtilityInterpolant::InitInterpolation(name, utility, number_of_sampling_points);
 
     big_low_= interpolant_->Interpolate(particle_def.low);
 }
@@ -278,7 +278,7 @@ UtilityInterpolantDecay::UtilityInterpolantDecay(const Utility& utility, Interpo
     , up_(0)
 {
     UtilityIntegralDecay utility_decay(utility_);
-    InitInterpolation("decay", utility_decay);
+    InitInterpolation("decay", utility_decay, NUM3);
 }
 
 UtilityInterpolantDecay::UtilityInterpolantDecay(const UtilityInterpolantDecay& collection)
@@ -332,7 +332,7 @@ double UtilityInterpolantDecay::BuildInterpolant(double energy, UtilityIntegral&
 }
 
 // ------------------------------------------------------------------------- //
-void UtilityInterpolantDecay::InitInterpolation(const std::string& name, UtilityIntegral& utility)
+void UtilityInterpolantDecay::InitInterpolation(const std::string& name, UtilityIntegral& utility, int number_of_sampling_points)
 {
     Integral integral(IROMB, IMAXS, IPREC2);
     const ParticleDef& particle_def = utility_.GetParticleDef();
@@ -349,7 +349,7 @@ void UtilityInterpolantDecay::InitInterpolation(const std::string& name, Utility
         up_ = false;
     }
 
-    UtilityInterpolant::InitInterpolation(name, utility);
+    UtilityInterpolant::InitInterpolation(name, utility, number_of_sampling_points);
 
     big_low_= interpolant_->Interpolate(particle_def.low);
 }
@@ -363,7 +363,7 @@ UtilityInterpolantTime::UtilityInterpolantTime(const Utility& utility, Interpola
     : UtilityInterpolant(utility, def)
 {
     UtilityIntegralTime utility_time(utility_);
-    InitInterpolation("time", utility_time);
+    InitInterpolation("time", utility_time, NUM3);
 }
 
 UtilityInterpolantTime::UtilityInterpolantTime(const UtilityInterpolantTime& collection)
@@ -408,9 +408,9 @@ double UtilityInterpolantTime::BuildInterpolant(double energy, UtilityIntegral& 
 }
 
 // ------------------------------------------------------------------------- //
-void UtilityInterpolantTime::InitInterpolation(const std::string& name, UtilityIntegral& utility)
+void UtilityInterpolantTime::InitInterpolation(const std::string& name, UtilityIntegral& utility, int number_of_sampling_points)
 {
-    UtilityInterpolant::InitInterpolation(name, utility);
+    UtilityInterpolant::InitInterpolation(name, utility, number_of_sampling_points);
 }
 
 /******************************************************************************
@@ -421,7 +421,7 @@ UtilityInterpolantContRand::UtilityInterpolantContRand(const Utility& utility, I
     : UtilityInterpolant(utility, def)
 {
     UtilityIntegralContRand utility_contrand(utility_);
-    InitInterpolation("contrand", utility_contrand);
+    InitInterpolation("contrand", utility_contrand, NUM2);
 }
 
 UtilityInterpolantContRand::UtilityInterpolantContRand(const UtilityInterpolantContRand& collection)
@@ -469,9 +469,9 @@ double UtilityInterpolantContRand::BuildInterpolant(double energy, UtilityIntegr
 }
 
 // ------------------------------------------------------------------------- //
-void UtilityInterpolantContRand::InitInterpolation(const std::string& name, UtilityIntegral& utility)
+void UtilityInterpolantContRand::InitInterpolation(const std::string& name, UtilityIntegral& utility, int number_of_sampling_points)
 {
-    UtilityInterpolant::InitInterpolation(name, utility);
+    UtilityInterpolant::InitInterpolation(name, utility, number_of_sampling_points);
 }
 
 
@@ -483,7 +483,7 @@ UtilityInterpolantScattering::UtilityInterpolantScattering(const Utility& utilit
     : UtilityInterpolant(utility, def)
 {
     UtilityIntegralScattering utility_scattering(utility_);
-    InitInterpolation("scattering", utility_scattering);
+    InitInterpolation("scattering", utility_scattering, NUM2);
 }
 
 UtilityInterpolantScattering::UtilityInterpolantScattering(const UtilityInterpolantScattering& collection)
@@ -534,7 +534,7 @@ double UtilityInterpolantScattering::BuildInterpolant(double energy, UtilityInte
 }
 
 // ------------------------------------------------------------------------- //
-void UtilityInterpolantScattering::InitInterpolation(const std::string& name, UtilityIntegral& utility)
+void UtilityInterpolantScattering::InitInterpolation(const std::string& name, UtilityIntegral& utility, int number_of_sampling_points)
 {
-    UtilityInterpolant::InitInterpolation(name, utility);
+    UtilityInterpolant::InitInterpolation(name, utility, number_of_sampling_points);
 }
