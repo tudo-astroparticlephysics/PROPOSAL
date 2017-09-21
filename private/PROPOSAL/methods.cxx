@@ -10,6 +10,8 @@
 
 // #include <cmath>
 // #include <stdlib.h>
+#include <boost/functional/hash.hpp>
+
 #include <sys/stat.h>
 #include <string>
 #include <sstream>
@@ -214,12 +216,160 @@ int RoundValue(double val)
 
 // }
 
+
+// ----------------------------------------------------------------------------
+/// @brief Helper to initialize Interpolants with interpolation tables
+// ----------------------------------------------------------------------------
+// class InitInterpolationHelper
+// {
+//     public:
+//
+//     bool FileExist(std::string path);
+//
+//     static InitInterpolationHelper& Get()
+//     {
+//         static InitInterpolationHelper instance;
+//         return instance;
+//     }
+//
+//     private:
+//     InitInterpolationHelper(){};
+//     ~InitInterpolationHelper(){};
+// };
+//
+// bool InitInterpolationHelper::FileExist(std::string path)
+// {
+//     struct stat dummy_stat_return_val;
+//
+//     if (stat(path.c_str(), &dummy_stat_return_val) != 0)
+//     {
+//         return false;
+//     }
+//     else
+//     {
+//         return true;
+//     }
+// }
+
 namespace Helper
 {
 
+// ------------------------------------------------------------------------- //
+bool FileExist(std::string path)
+{
+    struct stat dummy_stat_return_val;
+
+    if (stat(path.c_str(), &dummy_stat_return_val) != 0)
+    {
+        return false;
+    }
+    else
+    {
+        return true;
+    }
+}
+
+// void ParseParametrizations(const std::vector<Parametrization*> parametrizations)
+// {
+//     if (parametrizations.empty())
+//     {
+//         log_fatal("At least one parametrization is needed for interpolation initialization!");
+//     }
+//
+//     if (parametrizations.size() == 1)
+//     {
+//         Parametrization* param = parametrizations.at(0);
+//         const ParticleDef& particle_def = param->GetParticleDef();
+//         const Medium& medium = param->GetMedium();
+//         const EnergyCutSettings& cut_settings = param->GetEnergyCuts();
+//
+//         std::string param_name;
+//
+//         BremsPetrukhinShestakov* brems = dynamic_cast<BremsPetrukhinShestakov*>(param);
+//         if (brems)
+//         {
+//             param_name = "B_PS";
+//         }
+//         BremsKelnerKokoulinPetrukhin* brems;
+//         BremsCompleteScreening* brems;
+//         BremsAndreevBezrukovBugaev* brems;
+//     }
+//
+//     const ParticleDef& particle_def = parametrizations.at(0)->GetParticleDef();
+//     const Medium& medium = parametrizations.at(0)->GetMedium();
+//     const EnergyCutSettings& cut_settings = parametrizations.at(0)->GetEnergyCuts();
+//
+//     std::string param_name;
+//     if (dynamic_cast<Ionization*>(parametrizations.at(0)))
+//     {
+//         param_name = "ioniz";
+//     }
+//     else if (dynamic_cast<Bremsstrahlung*>(parametrizations.at(0)))
+//     {
+//         param_name = "brems";
+//     }
+//     else if (dynamic_cast<EpairProduction*>(parametrizations.at(0)))
+//     {
+//         param_name = "epair";
+//     }
+//     else if (dynamic_cast<Photonuclear*>(parametrizations.at(0)))
+//     {
+//         param_name = "photo";
+//     }
+//     // std::string param_name =
+//     //     parametrizations.size() == 1 ? std::string(typeid(parametrizations[0]).name()) : "";
+//
+//     // clang-format off
+//     filename << pathname
+//              << "/"
+//              << name
+//              << "_"
+//              << param_name
+//              << "_particle_" << particle_def.name
+//              << "_mass_" << particle_def.mass
+//              << "_charge_" << particle_def.charge
+//              << "_lifetime_" << particle_def.lifetime
+//              //  <<"_para_"<<parametrization_
+//              << "_med_" << medium.GetName()
+//              << "_" << medium.GetMassDensity()
+//              << "_ecut_" << cut_settings.GetEcut()
+//              << "_vcut_" << cut_settings.GetVcut();
+//     // clang-format on
+//
+//     if (parametrizations.size() == 1)
+//     {
+//         // clang-format off
+//         filename << "_param_" << typeid(parametrizations[0]).name()
+//                  << "_lpm_"<<parametrizations[0]->GetDefinition().lpm_effect_enabled
+//                  <<"_multiplier_"<< parametrizations[0]->GetDefinition().multiplier;
+//         // clang-format on
+//     }
+//     else
+//     {
+//         for(std::vector<Parametrization*>::const_iterator it = parametrizations.begin(); it != parametrizations.end(); ++it)
+//         {
+//             // clang-format off
+//             std::string param_name = std::string(typeid(*it).name()).substr(0, 1);
+//             filename << "_" << param_name
+//                      << "_lpm_" << (*it)->GetDefinition().lpm_effect_enabled
+//                      << "_multiplier_" << (*it)->GetDefinition().multiplier;
+//             // clang-format on
+//
+//         }
+//     }
+//
+//     if(!raw)
+//     {
+//         filename << ".txt";
+//     }
+// }
+// }
+
+// ------------------------------------------------------------------------- //
 void InitializeInterpolation(const std::string name,
                              InterpolantBuilderContainer& builder_container,
-                             const std::vector<Parametrization*>& parametrizations)
+                             const std::vector<Parametrization*>& parametrizations,
+                             InterpolationDef interpolation_def)
 {
     using namespace std;
 
@@ -228,93 +378,32 @@ void InitializeInterpolation(const std::string name,
     bool storing_failed =   false;
     bool reading_worked =   true;
 
-    std::string pathname = "";
-    bool raw = true;
-
-    stringstream filename;
+    std::string pathname = interpolation_def.path_to_tables;
+    bool raw = interpolation_def.raw;
 
     // --------------------------------------------------------------------- //
-    // Read in data from parametrization and create the filename
+    // Create filename out of hash
     // --------------------------------------------------------------------- //
+    size_t hash_digest = 0;
 
-    try
+    if (parametrizations.size() == 1)
     {
-        //TODO(mario): Maybe check if all data are equal Wed 2017/09/06
-        const ParticleDef& particle_def = parametrizations.at(0)->GetParticleDef();
-        const Medium& medium = parametrizations.at(0)->GetMedium();
-        const EnergyCutSettings& cut_settings = parametrizations.at(0)->GetEnergyCuts();
-
-        pathname = parametrizations.at(0)->GetDefinition().path_to_tables;
-        raw = parametrizations.at(0)->GetDefinition().raw;
-
-        //TODO(mario): remove when enums are introduced Wed 2017/09/06
-        std::string param_name;
-        if (dynamic_cast<Ionization*>(parametrizations.at(0)))
+        hash_digest = parametrizations.at(0)->GetHash();
+    }
+    else
+    {
+        for(std::vector<Parametrization*>::const_iterator it = parametrizations.begin(); it != parametrizations.end(); ++it)
         {
-            param_name = "ioniz";
-        }
-        else if (dynamic_cast<Bremsstrahlung*>(parametrizations.at(0)))
-        {
-            param_name = "brems";
-        }
-        else if (dynamic_cast<EpairProduction*>(parametrizations.at(0)))
-        {
-            param_name = "epair";
-        }
-        else if (dynamic_cast<Photonuclear*>(parametrizations.at(0)))
-        {
-            param_name = "photo";
-        }
-        // std::string param_name =
-        //     parametrizations.size() == 1 ? std::string(typeid(parametrizations[0]).name()) : "";
-
-        // clang-format off
-        filename << pathname
-                 << "/"
-                 << name
-                 << "_"
-                 << param_name
-                 << "_particle_" << particle_def.name
-                 << "_mass_" << particle_def.mass
-                 << "_charge_" << particle_def.charge
-                 << "_lifetime_" << particle_def.lifetime
-                 //  <<"_para_"<<parametrization_
-                 << "_med_" << medium.GetName()
-                 << "_" << medium.GetMassDensity()
-                 << "_ecut_" << cut_settings.GetEcut()
-                 << "_vcut_" << cut_settings.GetVcut();
-        // clang-format on
-
-        if (parametrizations.size() == 1)
-        {
-            // clang-format off
-            filename << "_param_" << typeid(parametrizations[0]).name()
-                     << "_lpm_"<<parametrizations[0]->GetDefinition().lpm_effect_enabled
-                     <<"_multiplier_"<< parametrizations[0]->GetDefinition().multiplier;
-            // clang-format on
-        }
-        else
-        {
-            for(std::vector<Parametrization*>::const_iterator it = parametrizations.begin(); it != parametrizations.end(); ++it)
-            {
-                // clang-format off
-                std::string param_name = std::string(typeid(*it).name()).substr(0, 1);
-                filename << "_" << param_name
-                         << "_lpm_" << (*it)->GetDefinition().lpm_effect_enabled
-                         << "_multiplier_" << (*it)->GetDefinition().multiplier;
-                // clang-format on
-
-            }
-        }
-
-        if(!raw)
-        {
-            filename << ".txt";
+            boost::hash_combine(hash_digest, (*it)->GetHash());
         }
     }
-    catch (const std::out_of_range& e)
+
+    stringstream filename;
+    filename << pathname << "/" << name << "_" << hash_digest;
+
+    if(!raw)
     {
-        log_fatal("At least one parametrization is needed for initializing interpolations.");
+        filename << ".txt";
     }
 
     if(!pathname.empty())
@@ -324,7 +413,7 @@ void InitializeInterpolation(const std::string name,
 
         if( FileExist(filename.str()) )
         {
-            log_debug("Bremsstrahlungs parametrisation tables (dNdx) will be read from file:\t%s",filename.str().c_str());
+            log_info("%s tables will be read from file: %s", name.c_str(), filename.str().c_str());
 
             std::ifstream input;
 
@@ -358,7 +447,7 @@ void InitializeInterpolation(const std::string name,
                 log_info("file %s is corrupted! Write it again!",filename.str().c_str());
             }
 
-            log_info("Info: Bremsstrahlungs parametrisation tables (dNdx) will be saved to file:\t%s",filename.str().c_str());
+            log_info("%s tables will be saved to file: %s",name.c_str(), filename.str().c_str());
 
             ofstream output;
 
@@ -407,7 +496,201 @@ void InitializeInterpolation(const std::string name,
             // }
         }
     }
+
+    log_info("Initialize %s interpolation done.", name.c_str());
 }
+// ------------------------------------------------------------------------- //
+// void InitializeInterpolation(const std::string name,
+//                              InterpolantBuilderContainer& builder_container,
+//                              size_t hash_digest)
+// {
+//     using namespace std;
+//
+//     log_info("Initialize %s interpolation.", name.c_str());
+//
+//     bool storing_failed =   false;
+//     bool reading_worked =   true;
+//
+//     std::string pathname = "";
+//     bool raw = true;
+//
+//     stringstream filename;
+//
+//     // --------------------------------------------------------------------- //
+//     // Read in data from parametrization and create the filename
+//     // --------------------------------------------------------------------- //
+//
+//     try
+//     {
+//         //TODO(mario): Maybe check if all data are equal Wed 2017/09/06
+//         const ParticleDef& particle_def = parametrizations.at(0)->GetParticleDef();
+//         const Medium& medium = parametrizations.at(0)->GetMedium();
+//         const EnergyCutSettings& cut_settings = parametrizations.at(0)->GetEnergyCuts();
+//
+//         pathname = parametrizations.at(0)->GetDefinition().path_to_tables;
+//         raw = parametrizations.at(0)->GetDefinition().raw;
+//
+//         //TODO(mario): remove when enums are introduced Wed 2017/09/06
+//         std::string param_name;
+//         if (dynamic_cast<Ionization*>(parametrizations.at(0)))
+//         {
+//             param_name = "ioniz";
+//         }
+//         else if (dynamic_cast<Bremsstrahlung*>(parametrizations.at(0)))
+//         {
+//             param_name = "brems";
+//         }
+//         else if (dynamic_cast<EpairProduction*>(parametrizations.at(0)))
+//         {
+//             param_name = "epair";
+//         }
+//         else if (dynamic_cast<Photonuclear*>(parametrizations.at(0)))
+//         {
+//             param_name = "photo";
+//         }
+//         // std::string param_name =
+//         //     parametrizations.size() == 1 ? std::string(typeid(parametrizations[0]).name()) : "";
+//
+//         // clang-format off
+//         filename << pathname
+//                  << "/"
+//                  << name
+//                  << "_"
+//                  << param_name
+//                  << "_particle_" << particle_def.name
+//                  << "_mass_" << particle_def.mass
+//                  << "_charge_" << particle_def.charge
+//                  << "_lifetime_" << particle_def.lifetime
+//                  //  <<"_para_"<<parametrization_
+//                  << "_med_" << medium.GetName()
+//                  << "_" << medium.GetMassDensity()
+//                  << "_ecut_" << cut_settings.GetEcut()
+//                  << "_vcut_" << cut_settings.GetVcut();
+//         // clang-format on
+//
+//         if (parametrizations.size() == 1)
+//         {
+//             // clang-format off
+//             filename << "_param_" << typeid(parametrizations[0]).name()
+//                      << "_lpm_"<<parametrizations[0]->GetDefinition().lpm_effect_enabled
+//                      <<"_multiplier_"<< parametrizations[0]->GetDefinition().multiplier;
+//             // clang-format on
+//         }
+//         else
+//         {
+//             for(std::vector<Parametrization*>::const_iterator it = parametrizations.begin(); it != parametrizations.end(); ++it)
+//             {
+//                 // clang-format off
+//                 std::string param_name = std::string(typeid(*it).name()).substr(0, 1);
+//                 filename << "_" << param_name
+//                          << "_lpm_" << (*it)->GetDefinition().lpm_effect_enabled
+//                          << "_multiplier_" << (*it)->GetDefinition().multiplier;
+//                 // clang-format on
+//
+//             }
+//         }
+//
+//         if(!raw)
+//         {
+//             filename << ".txt";
+//         }
+//     }
+//     catch (const std::out_of_range& e)
+//     {
+//         log_fatal("At least one parametrization is needed for initializing interpolations.");
+//     }
+//
+//     if(!pathname.empty())
+//     {
+//         // dndx_interpolant_1d_.resize( medium.GetNumComponents() );
+//         // dndx_interpolant_2d_.resize( medium.GetNumComponents() );
+//
+//         if( FileExist(filename.str()) )
+//         {
+//             log_debug("Bremsstrahlungs parametrisation tables (dNdx) will be read from file:\t%s",filename.str().c_str());
+//
+//             std::ifstream input;
+//
+//             if(raw)
+//             {
+//                 input.open(filename.str().c_str(), ios::binary);
+//             }
+//             else
+//             {
+//                 input.open(filename.str().c_str());
+//             }
+//
+//             for (InterpolantBuilderContainer::iterator builder_it = builder_container.begin(); builder_it != builder_container.end(); ++builder_it)
+//             {
+//                 //TODO(mario): read check Tue 2017/09/05
+//                 (*builder_it->second) = new Interpolant();
+//                 (*builder_it->second)->Load(input, raw);
+//
+//                 // for (std::vector<Interpolant*>::iterator interpol_it = builder_it->second.begin(); interpol_it != builder_it->second.end(); ++interpol_it)
+//                 // {
+//                 // }
+//             }
+//
+//             input.close();
+//         }
+//
+//         if(!FileExist(filename.str()) || !reading_worked )
+//         {
+//             if(!reading_worked)
+//             {
+//                 log_info("file %s is corrupted! Write it again!",filename.str().c_str());
+//             }
+//
+//             log_info("Info: Bremsstrahlungs parametrisation tables (dNdx) will be saved to file:\t%s",filename.str().c_str());
+//
+//             ofstream output;
+//
+//             if(raw)
+//             {
+//                 output.open(filename.str().c_str(), ios::binary);
+//             }
+//             else
+//             {
+//                 output.open(filename.str().c_str());
+//             }
+//
+//             if(output.good())
+//             {
+//                 output.precision(16);
+//
+//                 for (InterpolantBuilderContainer::iterator builder_it = builder_container.begin(); builder_it != builder_container.end(); ++builder_it)
+//                 {
+//                     (*builder_it->second) = builder_it->first->build();
+//                     (*builder_it->second)->Save(output, raw);
+//                     // for (std::vector<Interpolant*>::iterator interpol_it = builder_it->second.begin(); interpol_it != builder_it->second.end(); ++interpol_it)
+//                     // {
+//                     //     *interpol_it = builder_it->first->build();
+//                     //     (*interpol_it)->Save(output, raw);
+//                     // }
+//                 }
+//             }
+//             else
+//             {
+//                 storing_failed  =   true;
+//                 log_warn("Can not open file %s for writing! Table will not be stored!",filename.str().c_str());
+//             }
+//             output.close();
+//         }
+//     }
+//
+//     if(pathname.empty() || storing_failed)
+//     {
+//         for (InterpolantBuilderContainer::iterator builder_it = builder_container.begin(); builder_it != builder_container.end(); ++builder_it)
+//         {
+//             (*builder_it->second) = builder_it->first->build();
+//
+//             // for (std::vector<Interpolant*>::iterator interpol_it = builder_it->second.begin(); interpol_it != builder_it->second.end(); ++interpol_it)
+//             // {
+//             //     *interpol_it = builder_it->first->build();
+//             // }
+//         }
+//     }
+// }
 
 } /* Helper */
 

@@ -1,5 +1,6 @@
 
 #include <boost/bind.hpp>
+#include <boost/functional/hash.hpp>
 #include <cmath>
 
 #include "PROPOSAL/crossection/parametrization/Bremsstrahlung.h"
@@ -202,6 +203,19 @@ double Bremsstrahlung::lpm(double energy, double v)
 
     return ((xi / 3) * ((v * v) * G / (Gamma * Gamma) + 2 * (1 + (1 - v) * (1 - v)) * fi / Gamma)) /
            ((4. / 3) * (1 - v) + v * v);
+}
+
+// ------------------------------------------------------------------------- //
+// Getter
+// ------------------------------------------------------------------------- //
+
+size_t Bremsstrahlung::GetHash() const
+{
+    size_t seed = Parametrization::GetHash();
+    boost::hash_combine(seed, lpm_);
+    boost::hash_combine(seed, lorenz_);
+
+    return seed;
 }
 
 /******************************************************************************

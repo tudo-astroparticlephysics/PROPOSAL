@@ -89,7 +89,7 @@ CrossSectionInterpolant::CrossSectionInterpolant(const DynamicData::Type& type, 
 
     Helper::InitializeInterpolation("dNdx",
                                     builder_return,
-                                    std::vector<Parametrization*>(1, parametrization_));
+                                    std::vector<Parametrization*>(1, parametrization_), def);
 }
 
 CrossSectionInterpolant::CrossSectionInterpolant(const CrossSectionInterpolant& cross_section)

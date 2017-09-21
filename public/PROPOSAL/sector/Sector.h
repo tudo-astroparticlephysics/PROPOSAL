@@ -47,13 +47,16 @@ class Sector
 
         Sector::ParticleLocation::Enum location;
 
+        Utility::Definition utility_def;
+
         Definition();
         ~Definition();
     };
 
     public:
     // Sector(PROPOSALParticle&);
-    Sector(PROPOSALParticle&, const Medium&, const EnergyCutSettings&, const Geometry&, const Utility::Definition, const Definition& = Definition());
+    Sector(PROPOSALParticle&, const Medium&, const EnergyCutSettings&, const Geometry&, const Definition&);
+    Sector(PROPOSALParticle&, const Medium&, const EnergyCutSettings&, const Geometry&, const Definition&, const InterpolationDef&);
     // Sector(PROPOSALParticle&, const Geometry&, const Utility&, const Scattering&, bool do_interpolation, const Definition& def = Definition());
     Sector(const Sector&);
     virtual ~Sector();

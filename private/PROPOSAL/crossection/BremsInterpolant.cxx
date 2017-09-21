@@ -62,12 +62,8 @@ BremsInterpolant::BremsInterpolant(const Parametrization& param, InterpolationDe
 
     builder_container_de2dx.push_back(std::make_pair(&builder_de2dx, &de2dx_interpolant_));
 
-    Helper::InitializeInterpolation("dEdx",
-                                    builder_container,
-                                    std::vector<Parametrization*>(1, parametrization_));
-    Helper::InitializeInterpolation("dE2dx",
-                                    builder_container_de2dx,
-                                    std::vector<Parametrization*>(1, parametrization_));
+    Helper::InitializeInterpolation("dEdx", builder_container, std::vector<Parametrization*>(1, parametrization_), def);
+    Helper::InitializeInterpolation("dE2dx", builder_container_de2dx, std::vector<Parametrization*>(1, parametrization_), def);
 }
 
 BremsInterpolant::BremsInterpolant(const BremsInterpolant& brems): CrossSectionInterpolant(brems)

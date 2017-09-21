@@ -25,15 +25,14 @@ using namespace std;
 
 ScatteringDefault::ScatteringDefault(PROPOSALParticle& particle, Utility& utility)
     : Scattering(particle)
+    , scatter(new UtilityIntegralScattering(utility))
 {
-    if (utility.GetDefinition().do_interpolation)
-    {
-        scatter = new UtilityInterpolantScattering(utility);
-    }
-    else
-    {
-        scatter = new UtilityIntegralScattering(utility);
-    }
+}
+
+ScatteringDefault::ScatteringDefault(PROPOSALParticle& particle, Utility& utility, InterpolationDef interpolation_def)
+    : Scattering(particle)
+    , scatter(new UtilityInterpolantScattering(utility, interpolation_def))
+{
 }
 
 ScatteringDefault::ScatteringDefault(const ScatteringDefault& scattering)

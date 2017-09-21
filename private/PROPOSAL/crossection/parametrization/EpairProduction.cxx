@@ -1,5 +1,6 @@
 
 #include <boost/bind.hpp>
+#include <boost/functional/hash.hpp>
 #include <cmath>
 
 #include "PROPOSAL/crossection/parametrization/EpairProduction.h"
@@ -235,7 +236,17 @@ double EpairProduction::lpm(double energy, double r2, double b, double x)
 // Getter
 // ------------------------------------------------------------------------- //
 
+// ------------------------------------------------------------------------- //
 const std::string EpairProduction::name_ = "EpairProduction";
+
+// ------------------------------------------------------------------------- //
+size_t EpairProduction::GetHash() const
+{
+    size_t seed = Parametrization::GetHash();
+    boost::hash_combine(seed, lpm_);
+
+    return seed;
+}
 
 /******************************************************************************
 *                         EpairProductionRhoIntegral                         *
@@ -346,7 +357,8 @@ EpairProductionRhoInterpolant::EpairProductionRhoInterpolant(const ParticleDef& 
 
     Helper::InitializeInterpolation("Epair",
                                     builder_container2d,
-                                    std::vector<Parametrization*>(1, this));
+                                    std::vector<Parametrization*>(1, this),
+                                    def);
 }
 
 EpairProductionRhoInterpolant::EpairProductionRhoInterpolant(const EpairProductionRhoInterpolant& epair)
@@ -363,6 +375,12 @@ EpairProductionRhoInterpolant::EpairProductionRhoInterpolant(const EpairProducti
 
 EpairProductionRhoInterpolant::~EpairProductionRhoInterpolant()
 {
+    for(unsigned int i = 0; i < interpolant_.size(); ++i)
+    {
+        delete interpolant_[i];
+    }
+
+    interpolant_.clear();
 }
 
 // ------------------------------------------------------------------------- //

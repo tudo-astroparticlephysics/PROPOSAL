@@ -1,6 +1,7 @@
 
 #include <boost/assign.hpp>
 #include <boost/bind.hpp>
+#include <boost/functional/hash.hpp>
 #include <cmath>
 
 #include "PROPOSAL/crossection/parametrization/Photonuclear.h"
@@ -125,6 +126,15 @@ double ShadowDutta::CalculateShadowEffect(const Components::Component& component
 }
 
 // ------------------------------------------------------------------------- //
+size_t ShadowDutta::GetHash() const
+{
+    size_t seed = 0;
+    boost::hash_combine(seed, "ShadowDutta");
+
+    return seed;
+}
+
+// ------------------------------------------------------------------------- //
 double ShadowButkevichMikhailov::CalculateShadowEffect(const Components::Component& component, double x, double nu)
 {
     if(component.GetNucCharge()==1) return 1;
@@ -174,6 +184,15 @@ double ShadowButkevichMikhailov::CalculateShadowEffect(const Components::Compone
     }
 
     return G;
+}
+
+// ------------------------------------------------------------------------- //
+size_t ShadowButkevichMikhailov::GetHash() const
+{
+    size_t seed = 0;
+    boost::hash_combine(seed, "ShadowButkevichMikhailov");
+
+    return seed;
 }
 
 /******************************************************************************
