@@ -49,6 +49,8 @@ class Propagator
     // Constructors
     Propagator();
     Propagator(const std::vector<Sector*>&, const Geometry&);
+    Propagator(PROPOSALParticle&, const std::vector<SectorFactory::Definition>&, const Geometry&);
+    Propagator(PROPOSALParticle&, const std::vector<SectorFactory::Definition>&, const Geometry&, const InterpolationDef&);
     // Propagator(const ParticleDef&, const std::vector<SectorFactory::Definition>&, const Geometry&);
     Propagator(const ParticleDef&, const std::string&);
     // Propagator(ParticleDef,
@@ -108,12 +110,6 @@ class Propagator
 
     //----------------------------------------------------------------------------//
     /*!
-     *  Apply options which are read from configuration file to ProcessCollections
-    */
-    void ApplyOptions();
-
-    //----------------------------------------------------------------------------//
-    /*!
     * advances the particle by the given distance
     * Sets the x,y and z coordinates of particle_
     * and its time and propagation distance
@@ -129,26 +125,16 @@ class Propagator
 
     void swap(Propagator& propagator);
 
-    //----------------------------------------------------------------------------//
-
-    void EnableInterpolation(PROPOSALParticle&, std::string path = "", bool raw = false);
-
-    //----------------------------------------------------------------------------//
-
-    void DisableInterpolation();
-
-    //----------------------------------------------------------------------------//
-
     // void ReadConfigFile(std::string config_file, bool DoApplyOptions=true);
 
 
     //----------------------------------------------------------------------------//
     // Getter
 
-    Sector* GetCurrentCollection() const { return current_collection_; }
+    const Sector* GetCurrentCollection() const { return current_sector_; }
     //----------------------------------------------------------------------------//
 
-    std::vector<Sector*> GetCollections() const { return collections_; }
+    std::vector<Sector*> GetCollections() const { return sectors_; }
 
     //----------------------------------------------------------------------------//
     // PROPOSALParticle* GetParticle() const
@@ -224,8 +210,8 @@ class Propagator
                                  //!specified explicit for a sector in congiguration file)
 
 
-    std::vector<Sector*> collections_;
-    Sector* current_collection_;
+    std::vector<Sector*> sectors_;
+    Sector* current_sector_;
 
     PROPOSALParticle& particle_;
     Geometry* detector_;
@@ -245,25 +231,6 @@ class Propagator
      */
 
     double CalculateEffectiveDistance(Vector3D& particle_position, Vector3D& particle_direction);
-
-    //----------------------------------------------------------------------------//
-
-    /*!
-    * Initalize a geomtry. Used when reading the values from config file
-    *,
-    */
-    // Geometry* InitGeometry(std::deque<std::string>* token , std::string first_token);
-    //----------------------------------------------------------------------------//
-    /*!
-    * Init ProcessCollection from configuration file. When keyword sector is found in configuration
-    * file this function is called and inits ProcessCollections:
-    * 3 for muons inside/behind/infront
-    * 3 for taus inside/behind/infront
-    * 3 for electrons inside/behind/infront
-    */
-    // void InitProcessCollections(std::ifstream &file);
-
-    // void MoveParticle(double distance);
 };
 
 }

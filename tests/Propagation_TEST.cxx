@@ -7,25 +7,7 @@
 
 #include "gtest/gtest.h"
 
-#include "PROPOSAL/Propagator.h"
-#include "PROPOSAL/geometry/Sphere.h"
-#include "PROPOSAL/geometry/Box.h"
-// #include "PROPOSAL/sector/Sector.h"
-
-// #include "PROPOSAL/sector/SectorInterpolant.h"
-#include "PROPOSAL/sector/SectorFactory.h"
-#include "PROPOSAL/propagation_utility/PropagationUtilityFactory.h"
-#include "PROPOSAL/medium/Medium.h"
-// #include "PROPOSAL/geometry/Geometry.h"
-// #include "PROPOSAL/PROPOSALParticle.h"
-
-#include "PROPOSAL/crossection/parametrization/Bremsstrahlung.h"
-#include "PROPOSAL/crossection/BremsInterpolant.h"
-
-#include "PROPOSAL/crossection/parametrization/PhotoRealPhotonAssumption.h"
-#include "PROPOSAL/crossection/parametrization/PhotoQ2Integration.h"
-#include "PROPOSAL/crossection/factories/PhotonuclearFactory.h"
-#include "PROPOSAL/crossection/PhotoInterpolant.h"
+#include "PROPOSAL/PROPOSAL.h"
 
 using namespace std;
 using namespace PROPOSAL;
@@ -36,6 +18,7 @@ TEST(Propagation , Test_nan) {
     int EmaxLog10 = 8;
 
     std::vector<Sector*> collections;
+    std::vector<SectorFactory::Definition> sector_defintions;
 
     // --------------------------------------------------------------------- //
     // Builder Pattern
@@ -64,7 +47,7 @@ TEST(Propagation , Test_nan) {
     // ----[ Interpolation ]--------------------------------- //
 
     InterpolationDef interpolation_def;
-    // interpolation_def.path_to_tables =  "../src/resources/tables";
+    interpolation_def.path_to_tables =  "../src/resources/tables";
     interpolation_def.raw = true;
 
     // ----[ Sector ]---------------------------------------- //
@@ -91,6 +74,8 @@ TEST(Propagation , Test_nan) {
     sec_def.medium_def.type = MediumFactory::Ice;
     sec_def.medium_def.density_correction = 0.98;
 
+    sector_defintions.push_back(sec_def);
+
     Sector* sec2 = SectorFactory::Get().CreateSector(particle, sec_def, interpolation_def);
 
     collections.push_back(sec2);
@@ -100,6 +85,7 @@ TEST(Propagation , Test_nan) {
     // --------------------------------------------------------------------- //
 
     Propagator pr(collections, Sphere(Vector3D(), 1e18, 0));
+    // Propagator pr(particle, sector_defintions, Sphere(Vector3D(), 1e18, 0), interpolation_def);
     std::cout << "Propagagtor created" << std::endl;
 
     std::vector<unsigned int> length_sec;
