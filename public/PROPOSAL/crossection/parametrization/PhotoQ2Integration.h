@@ -36,7 +36,7 @@
                                                                                                                        \
         double FunctionToQ2Integral(double energy, double v, double Q2);                                               \
                                                                                                                        \
-        const std::string& GetName() { return name_; }                                                                 \
+        const std::string& GetName() const { return name_; }                                                           \
                                                                                                                        \
         protected:                                                                                                     \
         static const std::string name_;                                                                                \
@@ -70,6 +70,12 @@ class PhotoQ2Integral : public Photonuclear
     virtual double DifferentialCrossSection(double energy, double v);
 
     virtual double FunctionToQ2Integral(double energy, double v, double Q2) = 0;
+
+    // --------------------------------------------------------------------- //
+    // Getter
+    // --------------------------------------------------------------------- //
+
+    virtual size_t GetHash() const;
 
     protected:
     ShadowEffect* shadow_effect_;
@@ -165,7 +171,7 @@ PhotoQ2Interpolant<Param>::PhotoQ2Interpolant(const ParticleDef& particle_def,
         builder_container2d[i].second = &interpolant_[i];
     }
 
-    Helper::InitializeInterpolation("Photo", builder_container2d, std::vector<Parametrization*>(1, this));
+    Helper::InitializeInterpolation("Photo", builder_container2d, std::vector<Parametrization*>(1, this), def);
 }
 
 template <class Param>

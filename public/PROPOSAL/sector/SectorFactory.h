@@ -20,21 +20,16 @@ class SectorFactory
     {
         double e_cut;
         double v_cut;
-        MediumFactory::Enum medium;
-        double density_correction;
-        GeometryFactory::Enum geometry;
-        Vector3D position;
-        double inner_radius;
-        double radius;
-        double width;
-        double height;
-        double depth;
+
+        MediumFactory::Definition medium_def;
+        GeometryFactory::Definition geometry_def;
 
         Definition();
         ~Definition();
     };
 
     Sector* CreateSector(PROPOSALParticle&, const Definition&);
+    Sector* CreateSector(PROPOSALParticle&, const Definition&, const InterpolationDef&);
 
     static SectorFactory& Get()
     {

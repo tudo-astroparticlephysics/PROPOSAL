@@ -96,27 +96,27 @@ catch (const std::out_of_range& ex)
     log_fatal("No Sectors are provided for the Propagator!");
 }
 
-Propagator::Propagator(const ParticleDef& particle_def, const std::vector<SectorFactory::Definition>& sectors, const Geometry& geometry)
-    : seed_(1)
-    , current_collection_(NULL)
-    // , particle_(particle_def)
-    , particle_(*new PROPOSALParticle(particle_def))
-    , detector_(geometry.clone())
-{
-    for (std::vector<SectorFactory::Definition>::const_iterator iter = sectors.begin(); iter != sectors.end(); ++iter)
-    {
-        collections_.push_back(SectorFactory::Get().CreateSector(particle_, *iter));
-    }
-
-    try
-    {
-        current_collection_ = collections_.at(0);
-    }
-    catch (const std::out_of_range& ex)
-    {
-        log_fatal("No Sectors Definitions are provided for the Propagator!");
-    }
-}
+// Propagator::Propagator(const ParticleDef& particle_def, const std::vector<SectorFactory::Definition>& sectors, const Geometry& geometry)
+//     : seed_(1)
+//     , current_collection_(NULL)
+//     // , particle_(particle_def)
+//     , particle_(*new PROPOSALParticle(particle_def))
+//     , detector_(geometry.clone())
+// {
+//     for (std::vector<SectorFactory::Definition>::const_iterator iter = sectors.begin(); iter != sectors.end(); ++iter)
+//     {
+//         collections_.push_back(SectorFactory::Get().CreateSector(particle_, *iter));
+//     }
+//
+//     try
+//     {
+//         current_collection_ = collections_.at(0);
+//     }
+//     catch (const std::out_of_range& ex)
+//     {
+//         log_fatal("No Sectors Definitions are provided for the Propagator!");
+//     }
+// }
 
 Propagator::Propagator(const ParticleDef& particle_def, const std::string& config_file)
     : seed_(1)

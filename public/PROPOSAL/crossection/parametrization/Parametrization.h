@@ -42,12 +42,14 @@ class Parametrization
         // Getter
         // ----------------------------------------------------------------- //
 
-        virtual const std::string& GetName() = 0; //{ return name_; }
+        virtual const std::string& GetName() const = 0; //{ return name_; }
 
         const ParticleDef& GetParticleDef() const { return particle_def_; }
         const Medium& GetMedium() const { return *medium_; }
         const EnergyCutSettings& GetEnergyCuts() const { return cut_settings_; }
         double GetMultiplier() const { return multiplier_; }
+
+        virtual size_t GetHash() const;
 
         // ----------------------------------------------------------------- //
         // Setter

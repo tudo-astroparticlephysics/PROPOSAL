@@ -64,10 +64,10 @@ PhotoInterpolant::PhotoInterpolant(const Parametrization& param, InterpolationDe
 
     Helper::InitializeInterpolation("dEdx",
                                     builder_container,
-                                    std::vector<Parametrization*>(1, parametrization_));
+                                    std::vector<Parametrization*>(1, parametrization_), def);
     Helper::InitializeInterpolation("dE2dx",
                                     builder_container_de2dx,
-                                    std::vector<Parametrization*>(1, parametrization_));
+                                    std::vector<Parametrization*>(1, parametrization_), def);
 }
 
 PhotoInterpolant::PhotoInterpolant(const PhotoInterpolant& photo): CrossSectionInterpolant(photo)

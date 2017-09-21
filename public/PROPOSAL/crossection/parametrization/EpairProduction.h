@@ -60,7 +60,8 @@ class EpairProduction : public Parametrization
     // Getter
     // --------------------------------------------------------------------- //
 
-    const std::string& GetName() { return name_; }
+    const std::string& GetName() const { return name_; }
+    virtual size_t GetHash() const;
 
     protected:
     static const std::string name_;

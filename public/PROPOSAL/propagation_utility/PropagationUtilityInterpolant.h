@@ -9,7 +9,7 @@
     class UtilityInterpolant##cls : public UtilityInterpolant                                                          \
     {                                                                                                                  \
         public:                                                                                                        \
-        UtilityInterpolant##cls(const Utility&, InterpolationDef = InterpolationDef());                                \
+        UtilityInterpolant##cls(const Utility&, InterpolationDef);                                                     \
         UtilityInterpolant##cls(const UtilityInterpolant##cls&);                                                       \
         ~UtilityInterpolant##cls();                                                                                    \
                                                                                                                        \
@@ -32,7 +32,7 @@ class Integral;
 class UtilityInterpolant : public UtilityDecorator
 {
     public:
-    UtilityInterpolant(const Utility&, InterpolationDef = InterpolationDef());
+    UtilityInterpolant(const Utility&, InterpolationDef);
     UtilityInterpolant(const UtilityInterpolant&);
     virtual ~UtilityInterpolant();
 
@@ -57,7 +57,7 @@ class UtilityInterpolant : public UtilityDecorator
 class UtilityInterpolantInteraction: public UtilityInterpolant
 {
     public:
-    UtilityInterpolantInteraction(const Utility&, InterpolationDef = InterpolationDef());
+    UtilityInterpolantInteraction(const Utility&, InterpolationDef);
     UtilityInterpolantInteraction(const UtilityInterpolantInteraction&);
     virtual ~UtilityInterpolantInteraction();
 
@@ -79,7 +79,7 @@ class UtilityInterpolantInteraction: public UtilityInterpolant
 class UtilityInterpolantDecay: public UtilityInterpolant
 {
     public:
-    UtilityInterpolantDecay(const Utility&, InterpolationDef = InterpolationDef());
+    UtilityInterpolantDecay(const Utility&, InterpolationDef);
     UtilityInterpolantDecay(const UtilityInterpolantDecay&);
     virtual ~UtilityInterpolantDecay();
 

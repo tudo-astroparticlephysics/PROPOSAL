@@ -9,6 +9,7 @@ namespace PROPOSAL {
 
 class Utility;
 class UtilityDecorator;
+struct InterpolationDef;
 /**
   * \brief This class provides the scattering routine provided by moliere.
   *
@@ -18,6 +19,8 @@ class ScatteringDefault: public Scattering
 {
     public:
     ScatteringDefault(PROPOSALParticle&, Utility&);
+    ScatteringDefault(PROPOSALParticle&, Utility&, InterpolationDef);
+
     ScatteringDefault(const ScatteringDefault&);
     ~ScatteringDefault();
 

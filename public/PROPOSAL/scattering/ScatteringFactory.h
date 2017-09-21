@@ -1,10 +1,10 @@
 
 #pragma once
 
-#include <boost/function.hpp>
+// #include <boost/function.hpp>
 
 #include <vector>
-#include <map>
+// #include <map>
 #include <string>
 
 #include "PROPOSAL/scattering/Scattering.h"
@@ -14,6 +14,7 @@ namespace  PROPOSAL
 
 class Medium;
 class Utility;
+struct InterpolationDef;
 
 class ScatteringFactory
 {
@@ -26,19 +27,27 @@ class ScatteringFactory
         MoliereFirstOrder
     };
 
-    typedef boost::function<Scattering* (PROPOSALParticle&, const Medium&)> RegisterFunction;
-    typedef boost::function<Scattering* (PROPOSALParticle&, Utility&)> RegisterFunctionUtility;
+    // typedef boost::function<Scattering* (PROPOSALParticle&, const Medium&)> RegisterFunction;
+    // typedef boost::function<Scattering* (PROPOSALParticle&, Utility&)> RegisterFunctionUtility;
+    // typedef boost::function<Scattering* (PROPOSALParticle&, Utility&)> RegisterFunctionUtilityInterpolant;
+    //
+    // typedef std::map<std::string, RegisterFunction> ScatteringMapString;
+    // typedef std::map<Enum, RegisterFunction> ScatteringMapEnum;
+    //
+    // typedef std::map<std::string, std::pair<RegisterFunctionUtility, RegisterFunctionUtilityInterpolant> > ScatteringMapUtiltiyString;
+    // typedef std::map<Enum, std::pair<RegisterFunctionUtility, RegisterFunctionUtilityInterpolant> > ScatteringMapUtiltiyEnum;
+    //
+    // typedef std::map<std::string, Enum> MapStringToEnum;
 
-    typedef std::map<std::string, RegisterFunction> ScatteringMapString;
-    typedef std::map<Enum, RegisterFunction> ScatteringMapEnum;
+    // Scattering* CreateScattering(const std::string&, PROPOSALParticle&, Utility&);
 
-    typedef std::map<std::string, RegisterFunctionUtility> ScatteringMapUtiltiyString;
-    typedef std::map<Enum, RegisterFunctionUtility> ScatteringMapUtiltiyEnum;
-
-    typedef std::map<std::string, Enum> MapStringToEnum;
+    Scattering* CreateScattering(const std::string&, PROPOSALParticle&, Utility&, const InterpolationDef&);
+    Scattering* CreateScattering(const Enum, PROPOSALParticle&, Utility&, const InterpolationDef&);
 
     Scattering* CreateScattering(const std::string&, PROPOSALParticle&, Utility&);
     Scattering* CreateScattering(const Enum, PROPOSALParticle&, Utility&);
+
+    // Scattering* CreateScattering(const Enum, PROPOSALParticle&, Utility&);
 
     Enum GetEnumFromString(const std::string&);
 
@@ -52,17 +61,21 @@ class ScatteringFactory
     ScatteringFactory();
     ~ScatteringFactory();
 
-    void Register(const std::string& name, Enum, RegisterFunction);
-    void RegisterUtility(const std::string& name, Enum, RegisterFunctionUtility);
+    void Register(const std::string& name, Enum);
+
+    std::vector<Enum> registerd_enum;
+    std::vector<std::string> registerd_str;
+    // void Register(const std::string& name, Enum, RegisterFunction);
+    // void RegisterUtility(const std::string& name, Enum, std::pair<RegisterFunctionUtility, RegisterFunctionUtilityInterpolant> RegisterFunctionUtility);
 
     // std::map<std::string, Scattering* (*)(void)> scattering_map;
-    ScatteringMapString scattering_map_str_;
-    ScatteringMapEnum scattering_map_enum_;
-
-    ScatteringMapUtiltiyString scattering_map_utility_str_;
-    ScatteringMapUtiltiyEnum scattering_map_utility_enum_;
-
-    MapStringToEnum map_string_to_enum;
+    // ScatteringMapString scattering_map_str_;
+    // ScatteringMapEnum scattering_map_enum_;
+    //
+    // ScatteringMapUtiltiyString scattering_map_utility_str_;
+    // ScatteringMapUtiltiyEnum scattering_map_utility_enum_;
+    //
+    // MapStringToEnum map_string_to_enum;
 };
 
 } /*  PROPOSAL */

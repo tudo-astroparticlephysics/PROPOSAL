@@ -66,10 +66,10 @@ IonizInterpolant::IonizInterpolant(const Parametrization& param, InterpolationDe
 
     Helper::InitializeInterpolation("dEdx",
                                     builder_container,
-                                    std::vector<Parametrization*>(1, parametrization_));
+                                    std::vector<Parametrization*>(1, parametrization_), def);
     Helper::InitializeInterpolation("dE2dx",
                                     builder_container_de2dx,
-                                    std::vector<Parametrization*>(1, parametrization_));
+                                    std::vector<Parametrization*>(1, parametrization_), def);
 }
 
 IonizInterpolant::IonizInterpolant(const IonizInterpolant& brems): CrossSectionInterpolant(brems)
