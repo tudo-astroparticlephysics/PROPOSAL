@@ -22,7 +22,7 @@
         UtilityInterpolant##cls& operator=(const UtilityInterpolant##cls&);                                            \
                                                                                                                        \
         double BuildInterpolant(double, UtilityIntegral&, Integral&);                                                  \
-        void InitInterpolation(const std::string&, UtilityIntegral&);                                                  \
+        void InitInterpolation(const std::string&, UtilityIntegral&, int number_of_sampling_points);                   \
     };
 
 namespace PROPOSAL {
@@ -45,7 +45,7 @@ class UtilityInterpolant : public UtilityDecorator
     UtilityInterpolant& operator=(const UtilityInterpolant&); // Undefined & not allowed
 
     virtual double BuildInterpolant(double, UtilityIntegral&, Integral&) = 0;
-    virtual void InitInterpolation(const std::string&, UtilityIntegral&) = 0;
+    virtual void InitInterpolation(const std::string&, UtilityIntegral&, int number_of_sampling_points) = 0;
 
     double stored_result_;
     Interpolant* interpolant_;
@@ -70,7 +70,7 @@ class UtilityInterpolantInteraction: public UtilityInterpolant
     UtilityInterpolantInteraction& operator=(const UtilityInterpolantInteraction&); // Undefined & not allowed
 
     double BuildInterpolant(double, UtilityIntegral&, Integral&);
-    void InitInterpolation(const std::string&, UtilityIntegral&);
+    void InitInterpolation(const std::string&, UtilityIntegral&, int number_of_sampling_points);
 
     double big_low_;
     double up_;
@@ -92,7 +92,7 @@ class UtilityInterpolantDecay: public UtilityInterpolant
     UtilityInterpolantDecay& operator=(const UtilityInterpolantDecay&); // Undefined & not allowed
 
     double BuildInterpolant(double, UtilityIntegral&, Integral&);
-    void InitInterpolation(const std::string&, UtilityIntegral&);
+    void InitInterpolation(const std::string&, UtilityIntegral&, int number_of_sampling_points);
 
     double big_low_;
     double up_;
