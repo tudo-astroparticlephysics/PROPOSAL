@@ -61,39 +61,57 @@ class HardBB: public RealPhoton
 class ShadowEffect
 {
     public:
-        ShadowEffect() {}
-        ShadowEffect(const ShadowEffect&) {}
-        virtual ~ShadowEffect() {}
+    ShadowEffect() {}
+    ShadowEffect(const ShadowEffect&) {}
+    virtual ~ShadowEffect() {}
 
-        virtual ShadowEffect* clone() const = 0;
+    virtual ShadowEffect* clone() const = 0;
 
-        virtual double CalculateShadowEffect(const Components::Component&, double x, double nu) = 0;
+    virtual double CalculateShadowEffect(const Components::Component&, double x, double nu) = 0;
+
+    // --------------------------------------------------------------------- //
+    // Getter
+    // --------------------------------------------------------------------- //
+
+    virtual size_t GetHash() const = 0;
 };
 
 class ShadowDutta: public ShadowEffect
 {
     public:
-        ShadowDutta() {}
-        ShadowDutta(const ShadowDutta&) {}
-        virtual ~ShadowDutta() {}
+    ShadowDutta() {}
+    ShadowDutta(const ShadowDutta&) {}
+    virtual ~ShadowDutta() {}
 
-        ShadowEffect* clone() const { return new ShadowDutta(*this); }
-        static ShadowEffect* create() { return new ShadowDutta(); }
+    ShadowEffect* clone() const { return new ShadowDutta(*this); }
+    static ShadowEffect* create() { return new ShadowDutta(); }
 
-        double CalculateShadowEffect(const Components::Component&, double x, double nu);
+    double CalculateShadowEffect(const Components::Component&, double x, double nu);
+
+    // --------------------------------------------------------------------- //
+    // Getter
+    // --------------------------------------------------------------------- //
+
+    virtual size_t GetHash() const;
 };
 
 class ShadowButkevichMikhailov: public ShadowEffect
 {
     public:
-        ShadowButkevichMikhailov() {}
-        ShadowButkevichMikhailov(const ShadowButkevichMikhailov&) {}
-        virtual ~ShadowButkevichMikhailov() {}
+    ShadowButkevichMikhailov() {}
+    ShadowButkevichMikhailov(const ShadowButkevichMikhailov&) {}
+    virtual ~ShadowButkevichMikhailov() {}
 
-        ShadowEffect* clone() const { return new ShadowButkevichMikhailov(*this); }
-        static ShadowEffect* create() { return new ShadowButkevichMikhailov(); }
+    ShadowEffect* clone() const { return new ShadowButkevichMikhailov(*this); }
+    static ShadowEffect* create() { return new ShadowButkevichMikhailov(); }
 
-        double CalculateShadowEffect(const Components::Component&, double x, double nu);
+    double CalculateShadowEffect(const Components::Component&, double x, double nu);
+
+    // --------------------------------------------------------------------- //
+    // Getter
+    // --------------------------------------------------------------------- //
+
+    virtual size_t GetHash() const;
 };
 
 /******************************************************************************

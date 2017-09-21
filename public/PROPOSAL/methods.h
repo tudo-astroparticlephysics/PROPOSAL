@@ -61,9 +61,51 @@ int RoundValue(double val);
 
 //----------------------------------------------------------------------------//
 
-class ParticleDef;
-class Medium;
-class EnergyCutSettings;
+
+// // ----------------------------------------------------------------------------
+// /// @brief CTRP to add name to a class
+// // ----------------------------------------------------------------------------
+// template <class Base, class Derivied>
+// class NamedClass: virtual public Base
+// {
+//     public:
+//     const std::string GetName() { return name_; }
+//
+//     private:
+//     static const std::string name_;
+// };
+//
+// // ----------------------------------------------------------------------------
+// /// @brief Clone CTRP
+// // ----------------------------------------------------------------------------
+// template <class Base, class Derivied>
+// class Clonable: virtual public Base
+// {
+//     public:
+//     Base* clone() { return Derivied(static_cast<Derivied>(*this)); }
+// };
+
+
+// ----------------------------------------------------------------------------
+/// @brief Definition needed to initialize interpolation
+// ----------------------------------------------------------------------------
+struct InterpolationDef
+{
+    InterpolationDef()
+        : order_of_interpolation(5)
+        , path_to_tables("")
+        , raw(true)
+    {
+    }
+
+    int order_of_interpolation;
+    std::string path_to_tables;
+    bool raw;
+};
+
+// class ParticleDef;
+// class Medium;
+// class EnergyCutSettings;
 class Parametrization;
 class Interpolant;
 class InterpolantBuilder;
@@ -71,13 +113,23 @@ class InterpolantBuilder;
 namespace  Helper
 {
 
-// typedef std::vector<std::pair<InterpolantBuilder*, std::vector<Interpolant*> > > InterpolantBuilderContainer;
 typedef std::vector<std::pair<InterpolantBuilder*, Interpolant** > > InterpolantBuilderContainer;
 
 // ------------------------------------------------------------------------- //
+// ----------------------------------------------------------------------------
+/// @brief Helper for interpolation initialization
+///
+/// @param name
+/// @param InterpolantBuilderContainer
+/// @param std::vector
+// ----------------------------------------------------------------------------
 void InitializeInterpolation(const std::string name,
                              InterpolantBuilderContainer&,
-                             const std::vector<Parametrization*>&);
+                             const std::vector<Parametrization*>&,
+                             InterpolationDef);
+// void InitializeInterpolation(const std::string name,
+//                              InterpolantBuilderContainer&,
+//                              const std::vector<Parametrization*>&);
 
 } /*  Helper */
 

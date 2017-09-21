@@ -9,12 +9,12 @@
 
 #define UTILITY_INTEGRAL_IMPL(cls)                                                                                     \
     UtilityIntegral##cls::UtilityIntegral##cls(const Utility& utility)                                                 \
-        : UtilityDecoratorIntegral(utility)                                                                            \
+        : UtilityIntegral(utility)                                                                                     \
     {                                                                                                                  \
     }                                                                                                                  \
                                                                                                                        \
     UtilityIntegral##cls::UtilityIntegral##cls(const UtilityIntegral##cls& decorator)                                  \
-        : UtilityDecoratorIntegral(decorator.utility_)                                                                 \
+        : UtilityIntegral(decorator.utility_)                                                                          \
     {                                                                                                                  \
     }                                                                                                                  \
                                                                                                                        \
@@ -26,23 +26,23 @@ using namespace PROPOSAL;
 *                              Utility Integral                              *
 ******************************************************************************/
 
-UtilityDecoratorIntegral::UtilityDecoratorIntegral(const Utility& utility)
+UtilityIntegral::UtilityIntegral(const Utility& utility)
     : UtilityDecorator(utility)
     , integral_(IROMB, IMAXS, IPREC2)
 {
 }
 
-UtilityDecoratorIntegral::UtilityDecoratorIntegral(const UtilityDecoratorIntegral& collection)
+UtilityIntegral::UtilityIntegral(const UtilityIntegral& collection)
     : UtilityDecorator(collection)
     , integral_(collection.integral_)
 {
 }
 
-UtilityDecoratorIntegral::~UtilityDecoratorIntegral()
+UtilityIntegral::~UtilityIntegral()
 {
 }
 
-double UtilityDecoratorIntegral::GetUpperLimit(double ei, double rnd)
+double UtilityIntegral::GetUpperLimit(double ei, double rnd)
 {
     (void)ei;
     (void)rnd;

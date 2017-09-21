@@ -184,4 +184,6 @@ Geometry* GeometryFactory::CreateGeometry(const Definition& def)
     {
         log_fatal("Geometry %s not registerd!", typeid(geometry).name());
     }
+
+    return geometry;
 }

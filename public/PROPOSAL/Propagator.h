@@ -49,7 +49,7 @@ class Propagator
     // Constructors
     Propagator();
     Propagator(const std::vector<Sector*>&, const Geometry&);
-    Propagator(const ParticleDef&, const std::vector<SectorFactory::Definition>&, const Geometry&);
+    // Propagator(const ParticleDef&, const std::vector<SectorFactory::Definition>&, const Geometry&);
     Propagator(const ParticleDef&, const std::string&);
     // Propagator(ParticleDef,
     //            std::string path_to_tables,

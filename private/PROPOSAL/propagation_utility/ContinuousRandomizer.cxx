@@ -19,14 +19,12 @@ using namespace PROPOSAL;
 
 ContinuousRandomizer::ContinuousRandomizer(Utility& utility)
 {
-    if (utility.GetDefinition().do_interpolation)
-    {
-        DE2de = new UtilityInterpolantContRand(utility);
-    }
-    else
-    {
-        DE2de = new UtilityInterpolantContRand(utility);
-    }
+    DE2de = new UtilityIntegralContRand(utility);
+}
+
+ContinuousRandomizer::ContinuousRandomizer(Utility& utility, InterpolationDef interpolation_def)
+{
+    DE2de = new UtilityInterpolantContRand(utility, interpolation_def);
 }
 
 ContinuousRandomizer::ContinuousRandomizer(const ContinuousRandomizer& randomizer)

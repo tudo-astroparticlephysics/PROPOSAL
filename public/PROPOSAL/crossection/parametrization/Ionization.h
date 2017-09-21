@@ -30,10 +30,10 @@ class Ionization : public Parametrization
     // Getter
     // --------------------------------------------------------------------- //
 
-    const std::string& GetName() { return name_; }
+    const std::string& GetName() const { return name_; }
 
     private:
-    static const std::string& name_;
+    static const std::string name_;
 };
 
 

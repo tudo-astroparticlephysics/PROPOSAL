@@ -36,11 +36,7 @@ void MediumFactory::Register(const std::string& name, const Enum& num, RegisterF
     medium_map_enum[num] = create;
 }
 
-// void MediumFactory::Register(const Enum& name, RegisterFunction create)
-// {
-//     medium_map_enum[name] = create;
-// }
-
+// ------------------------------------------------------------------------- //
 Medium* MediumFactory::CreateMedium(const std::string& name, double density_correction)
 {
     std::string name_lower = boost::algorithm::to_lower_copy(name);
@@ -56,6 +52,7 @@ Medium* MediumFactory::CreateMedium(const std::string& name, double density_corr
     }
 }
 
+// ------------------------------------------------------------------------- //
 Medium* MediumFactory::CreateMedium(const Enum& med, double density_correction)
 {
     MediumMapEnum::iterator it = medium_map_enum.find(med);
@@ -69,6 +66,7 @@ Medium* MediumFactory::CreateMedium(const Enum& med, double density_correction)
     }
 }
 
+// ------------------------------------------------------------------------- //
 Medium* MediumFactory::CreateMedium(Definition def)
 {
     MediumMapEnum::iterator it = medium_map_enum.find(def.type);
