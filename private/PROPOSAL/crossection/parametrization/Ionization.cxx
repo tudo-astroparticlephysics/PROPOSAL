@@ -40,9 +40,14 @@ Ionization::~Ionization()
 // ------------------------------------------------------------------------- //
 
 // ------------------------------------------------------------------------- //
+// knonk-on electrons (delta rays)
+// distribution of secondary electrons with kinetic energy = v*E
+// PDG, Chin. Phys. C 40 (2016), 100001
+// eq. 33.8
+// ------------------------------------------------------------------------- //
 double Ionization::DifferentialCrossSection(double energy, double v)
 {
-    double result, aux, aux2;
+    double result, aux;
 
     IntegralLimits limits = GetIntegralLimits(energy);
 
@@ -51,12 +56,17 @@ double Ionization::DifferentialCrossSection(double energy, double v)
     double particle_momentum = sqrt(std::max(square_momentum, 0.0));
     double beta              = particle_momentum / energy;
     double gamma             = energy / particle_def_.mass;
+    beta *= beta;
 
-    aux  = beta * beta;
-    aux2 = v / (1 + 1 / gamma);
-    aux2 *= 0.5 * aux2;
-    result = 1 - aux * (v / limits.vMax) + aux2;
-    result *= IONK * particle_def_.charge * particle_def_.charge * medium_->GetZA() / (2 * aux * energy * v * v);
+    // additional term for spin 1/2 particles
+    // Rossi, 1952
+    // High Enegy Particles
+    // Prentice-Hall, Inc., Englewood Cliffs, N.J.
+    // chapter 2, eq. 7
+    double spin_1_2_contribution = v / (1 + 1 / gamma);
+    spin_1_2_contribution *= 0.5 * spin_1_2_contribution;
+    result = 1 - beta * (v / limits.vMax) + spin_1_2_contribution;
+    result *= IONK * particle_def_.charge * particle_def_.charge * medium_->GetZA() / (2 * beta * energy * v * v);
 
     return medium_->GetMassDensity() * result;
 }
@@ -78,12 +88,17 @@ Parametrization::IntegralLimits Ionization::GetIntegralLimits(double energy)
 {
     IntegralLimits limits;
 
-    double aux;
+    double mass_ration = ME / particle_def_.mass;;
     double gamma = energy / particle_def_.mass;
 
     limits.vMin = (1.e-6 * medium_->GetI()) / energy;
-    aux         = ME / particle_def_.mass;
-    limits.vMax = 2 * ME * (gamma * gamma - 1) / ((1 + 2 * gamma * aux + aux * aux) * energy);
+
+    // PDG
+    // eq. 33.4
+    // v_{max} = \frac{1}{E} \frac{2 m_e \beta^2 \gamma^2}
+    //          {1 + 2 \gamma \frac{m_e}{m_{particle} + (\frac{m_e}{m_{particle})^2 }
+    limits.vMax = 2 * ME * (gamma * gamma - 1) 
+                / ((1 + 2 * gamma * mass_ration + mass_ration * mass_ration) * energy);
     limits.vMax = std::min(limits.vMax, 1. - particle_def_.mass / energy);
 
     if (limits.vMax < limits.vMin)
@@ -102,6 +117,18 @@ Parametrization::IntegralLimits Ionization::GetIntegralLimits(double energy)
 }
 
 // ------------------------------------------------------------------------- //
+// Bremststrahlung when scattering at atomic electrons 
+// and the atomic electrons emit the Bremsstrahlung photon
+// because of the v^{-2} dependency, it is treated together with Ionization
+// Kelner Kokoulin Petrukhin
+// Phys. Atom. Nucl. 60 (1997), 657
+// eq. 30
+// \Delta \frac{d \sigma}{d v} = \frac{d \sigma}{d v}_{I_0}
+//     \frac{\alpha}{2 \pi} \cdot
+//        (\log(1 + \frac{2vE}{m_e}) 
+//        (2 \log(\frac{1 - \frac{v}{v_{max}}}{1 - v}))
+//        \log(\frac{2 \gamma (1 - v) m_e}{m_{particle}v})
+// ------------------------------------------------------------------------- //
 double Ionization::InelCorrection(double energy, double v)
 {
     double result, a, b, c;
@@ -109,10 +136,10 @@ double Ionization::InelCorrection(double energy, double v)
 
     double gamma = energy / particle_def_.mass;
 
-    a      = log(1 + 2 * v * energy / ME);
-    b      = log((1 - v / limits.vMax) / (1 - v));
-    c      = log((2 * gamma * (1 - v) * ME) / (particle_def_.mass * v));
+    a = log(1 + 2 * v * energy / ME);
+    b = log((1 - v / limits.vMax) / (1 - v));
+    c = log((2 * gamma * (1 - v) * ME) / (particle_def_.mass * v));
     result = a * (2 * b + c) - b * b;
 
-    return (ALPHA / (2 * PI)) * result;
+    return ALPHA / (2 * PI) * result;
 }
