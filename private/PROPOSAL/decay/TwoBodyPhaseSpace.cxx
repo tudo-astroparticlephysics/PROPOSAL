@@ -7,7 +7,8 @@
 using namespace PROPOSAL;
 
 TwoBodyPhaseSpace::TwoBodyPhaseSpace(double m1, double m2)
-    : first_daughter_mass_(m1)
+    : DecayChannel()
+    , first_daughter_mass_(m1)
     , second_daughter_mass_(m2)
 {
 }
