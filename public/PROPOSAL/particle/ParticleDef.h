@@ -142,4 +142,5 @@ PARTICLE_DEF(Monopole)
 PARTICLE_DEF(Gamma)
 PARTICLE_DEF(StableMassiveParticle)
 
+#undef PARTICLE_DEF
 } // namespace PROPOSAL
