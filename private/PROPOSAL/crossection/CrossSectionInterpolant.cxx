@@ -25,6 +25,12 @@ CrossSectionInterpolant::CrossSectionInterpolant(const DynamicData::Type& type, 
     , dndx_interpolant_1d_(param.GetMedium().GetNumComponents(), NULL)
     , dndx_interpolant_2d_(param.GetMedium().GetNumComponents(), NULL)
 {
+    // InitdNdxInerpolation(def);
+}
+
+// ------------------------------------------------------------------------- //
+void CrossSectionInterpolant::InitdNdxInerpolation(const InterpolationDef& def)
+{
     // --------------------------------------------------------------------- //
     // Builder for dNdx
     // --------------------------------------------------------------------- //
@@ -44,7 +50,7 @@ CrossSectionInterpolant::CrossSectionInterpolant(const DynamicData::Type& type, 
         // Order of builder matter because the functions needed for 1d interpolation
         // needs the already intitialized 2d interpolants.
         builder2d[i].SetMax1(NUM1)
-            .SetX1Min(param.GetParticleDef().low)
+            .SetX1Min(parametrization_->GetParticleDef().low)
             .SetX1Max(BIGENERGY)
             .SetMax2(NUM1)
             .SetX2Min(0.0)
@@ -67,7 +73,7 @@ CrossSectionInterpolant::CrossSectionInterpolant(const DynamicData::Type& type, 
         builder_container2d[i].second = &dndx_interpolant_2d_[i];
 
         builder1d[i].SetMax(NUM1)
-            .SetXMin(param.GetParticleDef().low)
+            .SetXMin(parametrization_->GetParticleDef().low)
             .SetXMax(BIGENERGY)
             .SetRomberg(def.order_of_interpolation)
             .SetRational(false)

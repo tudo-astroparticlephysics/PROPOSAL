@@ -17,7 +17,7 @@ Parametrization::Parametrization(const ParticleDef& particle_def,
     : particle_def_(particle_def)
     , medium_(medium.clone())
     , cut_settings_(cuts)
-    , components_(medium.GetComponents())
+    , components_(medium_->GetComponents())
     , component_index_(0)
     , multiplier_(multiplier)
 {
