@@ -33,6 +33,7 @@ class CrossSectionInterpolant: public CrossSection
         typedef std::vector<Interpolant*> InterpolantVec;
 
         virtual double CalculateStochasticLoss(double energy, double rnd1);
+        virtual void InitdNdxInerpolation(const InterpolationDef& def);
 
         Interpolant* dedx_interpolant_;
         Interpolant* de2dx_interpolant_;

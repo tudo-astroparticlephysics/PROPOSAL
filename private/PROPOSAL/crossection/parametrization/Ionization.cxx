@@ -26,8 +26,8 @@ Ionization::Ionization(const ParticleDef& particle_def,
 {
 }
 
-Ionization::Ionization(const Ionization& brems)
-    : Parametrization(brems)
+Ionization::Ionization(const Ionization& ioniz)
+    : Parametrization(ioniz)
 {
 }
 
