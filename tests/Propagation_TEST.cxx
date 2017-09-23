@@ -14,7 +14,7 @@ using namespace PROPOSAL;
 
 TEST(Propagation , Test_nan) {
 
-    int statistic = 1000;
+    int statistic = 100;
     int EmaxLog10 = 8;
 
     std::vector<Sector*> collections;
@@ -47,7 +47,7 @@ TEST(Propagation , Test_nan) {
     // ----[ Interpolation ]--------------------------------- //
 
     InterpolationDef interpolation_def;
-    interpolation_def.path_to_tables =  "../src/resources/tables";
+    // interpolation_def.path_to_tables =  "../src/resources/tables";
     interpolation_def.raw = true;
 
     // ----[ Sector ]---------------------------------------- //
@@ -76,16 +76,16 @@ TEST(Propagation , Test_nan) {
 
     sector_defintions.push_back(sec_def);
 
-    Sector* sec2 = SectorFactory::Get().CreateSector(particle, sec_def, interpolation_def);
-
-    collections.push_back(sec2);
+    // Sector* sec2 = SectorFactory::Get().CreateSector(particle, sec_def, interpolation_def);
+    //
+    // collections.push_back(sec2);
 
     // --------------------------------------------------------------------- //
     // Create Propagator
     // --------------------------------------------------------------------- //
 
-    Propagator pr(collections, Sphere(Vector3D(), 1e18, 0));
-    // Propagator pr(particle, sector_defintions, Sphere(Vector3D(), 1e18, 0), interpolation_def);
+    // Propagator pr(collections, Sphere(Vector3D(), 1e18, 0));
+    Propagator pr(particle, sector_defintions, Sphere(Vector3D(), 1e18, 0), interpolation_def);
     std::cout << "Propagagtor created" << std::endl;
 
     std::vector<unsigned int> length_sec;
