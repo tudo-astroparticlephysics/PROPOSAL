@@ -376,9 +376,7 @@ double Sector::Propagate(double distance)
             // Output::getInstance().FillSecondaryVector(& secondary_id, energy_loss, 0);
         } else
         {
-            energy_loss = MakeStochasticLoss();
-            DecayChannel* mode = &particle_.GetDecayTable().SelectChannel();
-            decay_products     = mode->Decay(&particle_);
+            decay_products = particle_.GetDecayTable().SelectChannel().Decay(&particle_);
             Output::getInstance().FillSecondaryVector(decay_products);
 
             // TODO(mario): Delete decay products Tue 2017/08/22
@@ -595,6 +593,23 @@ pair<double, DynamicData::Type> Sector::MakeStochasticLoss()
     for (unsigned int i = 0; i < cross_sections.size(); i++)
     {
         rates[i] = cross_sections[i]->CalculatedNdx(particle_.GetEnergy(), rnd2);
+        // switch (cross_sections[i]->GetTypeId())
+        // {
+        //     case DynamicData::DeltaE:
+        //         std::cout << "ioniz dndx:" << rates[i] << std::endl;
+        //         break;
+        //     case DynamicData::Brems:
+        //         std::cout << "brems dndx:" << rates[i] << std::endl;
+        //         break;
+        //     case DynamicData::Epair:
+        //         std::cout << "epair dndx:" << rates[i] << std::endl;
+        //         break;
+        //     case DynamicData::NuclInt:
+        //         std::cout << "photo dndx:" << rates[i] << std::endl;
+        //         break;
+        //     default:
+        //         break;
+        // }
         total_rate += rates[i];
         // if (rates.at(i) == 0) printf("%i = 0, energy: %f\n", i, particle_->GetEnergy());
         // log_debug("Rate for %s = %f", crosssections_.at(i)->GetName().c_str(), rates.at(i));
@@ -612,6 +627,25 @@ pair<double, DynamicData::Type> Sector::MakeStochasticLoss()
         {
             energy_loss.first  = cross_sections[i]->CalculateStochasticLoss(particle_.GetEnergy(), rnd2, rnd3);
             energy_loss.second = cross_sections[i]->GetTypeId();
+            // switch (cross_sections[i]->GetTypeId())
+            // {
+            //     case DynamicData::DeltaE:
+            //         std::cout << "ioniz rates_sum: " << rates_sum  << "\t" << total_rate << "\t" << total_rate_weighted << std::endl;
+            //         std::cout << "ioniz particle energy: " << particle_.GetEnergy() << std::endl;
+            //         std::cout << "ioniz energyloss: " << energy_loss.first << std::endl;
+            //         break;
+            //     // case DynamicData::Brems:
+            //     //     std::cout << "brems dndx:" << rates[i] << std::endl;
+            //     //     break;
+            //     // case DynamicData::Epair:
+            //     //     std::cout << "epair dndx:" << rates[i] << std::endl;
+            //     //     break;
+            //     // case DynamicData::NuclInt:
+            //     //     std::cout << "photo dndx:" << rates[i] << std::endl;
+            //     //     break;
+            //     default:
+            //         break;
+            // }
             break;
         }
     }
