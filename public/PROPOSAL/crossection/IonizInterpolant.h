@@ -30,6 +30,7 @@ class IonizInterpolant: public CrossSectionInterpolant
 
     private:
         virtual double CalculateStochasticLoss(double energy, double rnd1);
+        virtual void InitdNdxInerpolation(const InterpolationDef& def);
 };
 
 } /* PROPOSAL */
