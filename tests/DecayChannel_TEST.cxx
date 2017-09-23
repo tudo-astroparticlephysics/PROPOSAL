@@ -53,7 +53,7 @@ TEST(Comparison , Comparison_not_equal ) {
 
 TEST(Assignment , Copyconstructor ) {
     LeptonicDecayChannel A;
-    LeptonicDecayChannel* B = A.clone();
+    DecayChannel* B = A.clone();
 
     EXPECT_TRUE(A==*B);
 
@@ -68,7 +68,7 @@ TEST(Assignment , Copyconstructor ) {
     delete D;
 
     TwoBodyPhaseSpace E(1, 2);
-    TwoBodyPhaseSpace* F = E.clone();
+    DecayChannel* F = E.clone();
 
     EXPECT_TRUE(E==*F);
 

@@ -19,7 +19,7 @@ class StableChannel : public DecayChannel
     StableChannel(const StableChannel& mode);
     virtual ~StableChannel();
     // No copy and assignemnt -> done by clone
-    StableChannel* clone() { return new StableChannel(*this); }
+    DecayChannel* clone() { return new StableChannel(*this); }
 
     DecayProducts Decay(PROPOSALParticle*);
 
