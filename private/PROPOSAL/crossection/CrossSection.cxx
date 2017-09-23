@@ -13,7 +13,7 @@ CrossSection::CrossSection(const DynamicData::Type& type, const Parametrization&
     , parametrization_(param.clone())
     , prob_for_component_(param.GetMedium().GetNumComponents(), 0)
     , sum_of_rates_(0)
-    , components_(param.GetMedium().GetComponents())
+    , components_(parametrization_->GetMedium().GetComponents())
     , rnd_(0)
 {
 
