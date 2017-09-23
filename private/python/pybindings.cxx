@@ -6,7 +6,19 @@
 #include <boost/python/overloads.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 
-#include "PROPOSAL/Propagator.h"
+#include <map>
+
+// #include "PROPOSAL/Propagator.h"
+#include "PROPOSAL/PROPOSAL.h"
+
+#define PARTICLE_DEF(cls)                                                                                              \
+    class_<cls##Def, boost::shared_ptr<cls##Def>, bases<ParticleDef>, boost::noncopyable>(#cls "Def", no_init)         \
+                                                                                                                       \
+        .def("get", make_function(&MuMinusDef::Get, return_value_policy<reference_existing_object>()))                 \
+        .staticmethod("get");
+
+using namespace PROPOSAL;
+
 // #include "PROPOSAL/PROPOSALParticle.h"
 // #include "PROPOSAL/Medium.h"
 // #include "PROPOSAL/EnergyCutSettings.h"
@@ -73,91 +85,92 @@
 //     }
 // };
 //
-// template<typename T>
-// struct VectorToPythonList
-// {
-//     static PyObject* convert(std::vector<T> const& vec)
-//     {
-//         boost::python::list python_list;
-//         typename std::vector<T>::const_iterator iter;
-//
-//         for(iter = vec.begin(); iter != vec.end(); ++iter)
-//         {
-//             python_list.append(boost::python::object(*iter));
-//         }
-//
-//         return boost::python::incref(python_list.ptr());
-//     }
-// };
-//
-// template<typename T>
-// struct PVectorToPythonList
-// {
-//     static PyObject* convert(std::vector<T> const& vec)
-//     {
-//         boost::python::list python_list;
-//         typename std::vector<T>::const_iterator iter;
-//
-//         for(iter = vec.begin(); iter != vec.end(); ++iter)
-//         {
-//             python_list.append(boost::python::ptr(*iter));
-//         }
-//
-//         return boost::python::incref(python_list.ptr());
-//     }
-// };
-//
-//
-// template<typename T>
-// struct VectorFromPythonList
-// {
-//
-//     VectorFromPythonList()
-//     {
-//         boost::python::converter::registry::push_back(&VectorFromPythonList<T>::convertible,
-//                             &VectorFromPythonList<T>::construct,
-//                             boost::python::type_id<std::vector<T> >());
-//     }
-//
-//     // Determine if obj_ptr can be converted in a std::vector<T>
-//     static void* convertible(PyObject* obj_ptr)
-//     {
-//         if (!PyList_Check(obj_ptr))
-//         {
-//             return 0;
-//         }
-//
-//         return obj_ptr;
-//     }
-//
-//     // Convert obj_ptr into a std::vector<T>
-//     static void construct(PyObject* obj_ptr, boost::python::converter::rvalue_from_python_stage1_data* data)
-//     {
-//         // Use borrowed to construct the object so that a reference
-//         // count will be properly handled.
-//         boost::python::list python_list(boost::python::handle<>(boost::python::borrowed(obj_ptr)));
-//
-//         // Grab pointer to memory into which to construct the new std::vector<T>
-//         void* storage = reinterpret_cast<boost::python::converter::rvalue_from_python_storage<std::vector<T> >*>(data)->storage.bytes;
-//
-//         // in-place construct the new std::vector<T> using the character data
-//         // extraced from the python object
-//         std::vector<T>& vec = *(new (storage) std::vector<T>());
-//
-//         // populate the vector from list contains !!!
-//         int lenght = boost::python::len(python_list);
-//         vec.resize(lenght);
-//
-//         for(int i = 0; i != lenght; ++i)
-//         {
-//             vec[i] = boost::python::extract<T>(python_list[i]);
-//         }
-//
-//         // Stash the memory chunk pointer for later use by boost.python
-//         data->convertible = storage;
-//     }
-// };
-//
+
+template<typename T>
+struct VectorToPythonList
+{
+    static PyObject* convert(std::vector<T> const& vec)
+    {
+        boost::python::list python_list;
+        typename std::vector<T>::const_iterator iter;
+
+        for(iter = vec.begin(); iter != vec.end(); ++iter)
+        {
+            python_list.append(boost::python::object(*iter));
+        }
+
+        return boost::python::incref(python_list.ptr());
+    }
+};
+
+template<typename T>
+struct PVectorToPythonList
+{
+    static PyObject* convert(std::vector<T> const& vec)
+    {
+        boost::python::list python_list;
+        typename std::vector<T>::const_iterator iter;
+
+        for(iter = vec.begin(); iter != vec.end(); ++iter)
+        {
+            python_list.append(boost::python::ptr(*iter));
+        }
+
+        return boost::python::incref(python_list.ptr());
+    }
+};
+
+
+template<typename T>
+struct VectorFromPythonList
+{
+
+    VectorFromPythonList()
+    {
+        boost::python::converter::registry::push_back(&VectorFromPythonList<T>::convertible,
+                            &VectorFromPythonList<T>::construct,
+                            boost::python::type_id<std::vector<T> >());
+    }
+
+    // Determine if obj_ptr can be converted in a std::vector<T>
+    static void* convertible(PyObject* obj_ptr)
+    {
+        if (!PyList_Check(obj_ptr))
+        {
+            return 0;
+        }
+
+        return obj_ptr;
+    }
+
+    // Convert obj_ptr into a std::vector<T>
+    static void construct(PyObject* obj_ptr, boost::python::converter::rvalue_from_python_stage1_data* data)
+    {
+        // Use borrowed to construct the object so that a reference
+        // count will be properly handled.
+        boost::python::list python_list(boost::python::handle<>(boost::python::borrowed(obj_ptr)));
+
+        // Grab pointer to memory into which to construct the new std::vector<T>
+        void* storage = reinterpret_cast<boost::python::converter::rvalue_from_python_storage<std::vector<T> >*>(data)->storage.bytes;
+
+        // in-place construct the new std::vector<T> using the character data
+        // extraced from the python object
+        std::vector<T>& vec = *(new (storage) std::vector<T>());
+
+        // populate the vector from list contains !!!
+        int lenght = boost::python::len(python_list);
+        vec.resize(lenght);
+
+        for(int i = 0; i != lenght; ++i)
+        {
+            vec[i] = boost::python::extract<T>(python_list[i]);
+        }
+
+        // Stash the memory chunk pointer for later use by boost.python
+        data->convertible = storage;
+    }
+};
+
 // // ------------------------------------------------------------------------- //
 // // Pair
 // // ------------------------------------------------------------------------- //
@@ -234,446 +247,509 @@
 // #<{(|*****************************************************************************
 // *                               Python Module                                 *
 // *****************************************************************************|)}>#
-//
-// BOOST_PYTHON_MODULE(pyPROPOSAL)
-// {
-//
-//     using namespace boost::python;
-//
-//     docstring_options doc_options(true, true, false);
-//
-//     // --------------------------------------------------------------------- //
-//     // Vector classes
-//     // --------------------------------------------------------------------- //
-//
-//     // register the to-python converter
-//     to_python_converter< std::vector<double>, VectorToPythonList<double> >();
-//     to_python_converter< std::vector<std::string>, VectorToPythonList<std::string> >();
-//     to_python_converter< std::vector<PROPOSALParticle*>, PVectorToPythonList<PROPOSALParticle*> >();
-//     to_python_converter< std::vector<ProcessCollection*>, PVectorToPythonList<ProcessCollection*> >();
-//
-//     to_python_converter<std::vector<CrossSections*>, CrossSectionToPython>();
-//
-//     to_python_converter<std::pair<double, double>, PairToPythonList<double, double> >();
-//
-//     // register the from-python converter
-//     VectorFromPythonList<double>();
-//     VectorFromPythonList<std::string>();
-//     VectorFromPythonList<PROPOSALParticle*>();
-//     VectorFromPythonList<CrossSections*>();
-//     VectorFromPythonList<ProcessCollection*>();
-//
-//     PairFromPythonList<double, double>();
-//
-//     // class_<std::vector<CrossSections*> >("CrossSections")
-//     //         .def(vector_indexing_suite<std::vector<CrossSections*> >())
-//     //     ;
-//
-//     // --------------------------------------------------------------------- //
-//     // ParticleType::Enum
-//     // --------------------------------------------------------------------- //
-//
-//     enum_<ParticleType::Enum>("ParticleType")
-//         .value("EPlus",                 ParticleType::EPlus)
-//         .value("EMinus",                ParticleType::EPlus)
-//         .value("MuPlus",                ParticleType::MuPlus)
-//         .value("MuMinus",               ParticleType::MuMinus)
-//         .value("TauPlus",               ParticleType::TauPlus)
-//         .value("TauMinus",              ParticleType::TauMinus)
-//         .value("NuE",                   ParticleType::NuE)
-//         .value("NuEBar",                ParticleType::NuEBar)
-//         .value("NuMu",                  ParticleType::NuMu)
-//         .value("NuMuBar",               ParticleType::NuMuBar)
-//         .value("NuTau",                 ParticleType::NuTau)
-//         .value("NuTauBar",              ParticleType::NuTauBar)
-//         .value("Brems",                 ParticleType::Brems)
-//         .value("DeltaE",                ParticleType::DeltaE)
-//         .value("EPair",                 ParticleType::EPair)
-//         .value("NuclInt",               ParticleType::NuclInt)
-//         .value("MuPair",                ParticleType::MuPair)
-//         .value("Hadrons",               ParticleType::Hadrons)
-//         .value("ContinuousEnergyLoss",  ParticleType::ContinuousEnergyLoss)
-//         .value("Monopole",              ParticleType::Monopole)
-//         .value("STauPlus",              ParticleType::STauPlus)
-//         .value("STauMinus",             ParticleType::STauMinus)
-//         .value("StableMassiveParticle", ParticleType::StableMassiveParticle)
-//     ;
-//
-//     // --------------------------------------------------------------------- //
-//     // ParametrizationType
-//     // --------------------------------------------------------------------- //
-//
-//     enum_<ParametrizationType::Enum>("ParametrizationType")
-//         .value("BremsKelnerKokoulinPetrukhin",                  ParametrizationType::BremsKelnerKokoulinPetrukhin)
-//         .value("BremsAndreevBezrukovBugaev",                    ParametrizationType::BremsAndreevBezrukovBugaev)
-//         .value("BremsPetrukhinShestakov",                       ParametrizationType::BremsPetrukhinShestakov)
-//         .value("BremsCompleteScreeningCase",                    ParametrizationType::BremsCompleteScreeningCase)
-//         .value("PhotoKokoulinShadowBezrukovSoft",               ParametrizationType::PhotoKokoulinShadowBezrukovSoft)
-//         .value("PhotoKokoulinShadowBezrukovHard",               ParametrizationType::PhotoKokoulinShadowBezrukovHard)
-//         .value("PhotoRhodeShadowBezrukovSoft",                  ParametrizationType::PhotoRhodeShadowBezrukovSoft)
-//         .value("PhotoRhodeShadowBezrukovHard",                  ParametrizationType::PhotoRhodeShadowBezrukovHard)
-//         .value("PhotoBezrukovBugaevShadowBezrukovSoft",         ParametrizationType::PhotoBezrukovBugaevShadowBezrukovSoft)
-//         .value("PhotoBezrukovBugaevShadowBezrukovHard",         ParametrizationType::PhotoBezrukovBugaevShadowBezrukovHard)
-//         .value("PhotoZeusShadowBezrukovSoft",                   ParametrizationType::PhotoZeusShadowBezrukovSoft)
-//         .value("PhotoZeusShadowBezrukovHard",                   ParametrizationType::PhotoZeusShadowBezrukovHard)
-//         .value("PhotoAbramowiczLevinLevyMaor91ShadowDutta",     ParametrizationType::PhotoAbramowiczLevinLevyMaor91ShadowDutta)
-//         .value("PhotoAbramowiczLevinLevyMaor91ShadowButkevich", ParametrizationType::PhotoAbramowiczLevinLevyMaor91ShadowButkevich)
-//         .value("PhotoAbramowiczLevinLevyMaor97ShadowDutta",     ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowDutta)
-//         .value("PhotoAbramowiczLevinLevyMaor97ShadowButkevich", ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich)
-//         .value("PhotoRenoSarcevicSuShadowDutta",                ParametrizationType::PhotoRenoSarcevicSuShadowDutta)
-//         .value("PhotoRenoSarcevicSuShadowButkevich",            ParametrizationType::PhotoRenoSarcevicSuShadowButkevich)
-//         .value("EPairKelnerKokoulinPetrukhin",                  ParametrizationType::EPairKelnerKokoulinPetrukhin)
-//         .value("IonizBetheBloch",                               ParametrizationType::IonizBetheBloch)
-//     ;
-//
-//     // --------------------------------------------------------------------- //
-//     // MediumType
-//     // --------------------------------------------------------------------- //
-//
-//     enum_<MediumType::Enum>("MediumType")
-//         .value("Water"         , MediumType::Water)
-//         .value("Ice"           , MediumType::Ice)
-//         .value("Hydrogen"      , MediumType::Hydrogen)
-//         .value("Iron"          , MediumType::Iron)
-//         .value("Copper"        , MediumType::Copper)
-//         .value("Lead"          , MediumType::Lead)
-//         .value("Uranium"       , MediumType::Uranium)
-//         .value("Air"           , MediumType::Air)
-//         .value("AntaresWater"  , MediumType::AntaresWater)
-//         .value("StandardRock"  , MediumType::StandardRock)
-//         .value("FrejusRock"    , MediumType::FrejusRock)
-//         .value("Salt"          , MediumType::Salt)
-//         .value("MineralOil"    , MediumType::MineralOil)
-//     ;
-//
-//     // --------------------------------------------------------------------- //
-//     // Particle
-//     // --------------------------------------------------------------------- //
-//
-//     std::string (PROPOSALParticle::*getNameParticle)() const = &PROPOSALParticle::GetName;
-//
-//     class_<PROPOSALParticle, boost::shared_ptr<PROPOSALParticle> >("Particle",
-//                                                                   init<ParticleType::Enum>(
-//                                                                   (arg("particle_type") = ParticleType::MuMinus)))
-//
-//         .def(init<const PROPOSALParticle&>())
-//
-//         .def(self_ns::str(self_ns::self))
-//         .def(self_ns::repr(self_ns::self))
-//
-//         .add_property("energy", &PROPOSALParticle::GetEnergy, &PROPOSALParticle::SetEnergy)
-//         .add_property("propagated_distance", &PROPOSALParticle::GetPropagatedDistance, &PROPOSALParticle::SetPropagatedDistance)
-//         .add_property("X", &PROPOSALParticle::GetX, &PROPOSALParticle::SetX)
-//         .add_property("Y", &PROPOSALParticle::GetY, &PROPOSALParticle::SetY)
-//         .add_property("Z", &PROPOSALParticle::GetZ, &PROPOSALParticle::SetZ)
-//         .add_property("T", &PROPOSALParticle::GetT, &PROPOSALParticle::SetT)
-//         .add_property("theta", &PROPOSALParticle::GetTheta, &PROPOSALParticle::SetTheta)
-//         .add_property("phi", &PROPOSALParticle::GetPhi, &PROPOSALParticle::SetPhi)
-//         .add_property("momentum", &PROPOSALParticle::GetMomentum, &PROPOSALParticle::SetMomentum)
-//         .add_property("mass", &PROPOSALParticle::GetMass, &PROPOSALParticle::SetMass)
-//         .add_property("lifetime", &PROPOSALParticle::GetLifetime, &PROPOSALParticle::SetLifetime)
-//         .add_property("charge", &PROPOSALParticle::GetCharge, &PROPOSALParticle::SetCharge)
-//         .add_property("name", getNameParticle)
-//         .add_property("low", &PROPOSALParticle::GetLow, &PROPOSALParticle::SetLow)
-//         .add_property("type", &PROPOSALParticle::GetType, &PROPOSALParticle::SetType)
-//         .add_property("parent_particle_id", &PROPOSALParticle::GetParentParticleId, &PROPOSALParticle::SetParentParticleId)
-//         .add_property("parent_particle_energy", &PROPOSALParticle::GetParentParticleEnergy, &PROPOSALParticle::SetParentParticleEnergy)
-//         .add_property("particle_id", &PROPOSALParticle::GetParticleId, &PROPOSALParticle::SetParticleId)
-//
-//         .add_property("Xi", &PROPOSALParticle::GetXi, &PROPOSALParticle::SetXi)
-//         .add_property("Yi", &PROPOSALParticle::GetYi, &PROPOSALParticle::SetYi)
-//         .add_property("Zi", &PROPOSALParticle::GetZi, &PROPOSALParticle::SetZi)
-//         .add_property("Ti", &PROPOSALParticle::GetTi, &PROPOSALParticle::SetTi)
-//         .add_property("Ei", &PROPOSALParticle::GetEi, &PROPOSALParticle::SetEi)
-//
-//         .add_property("Xf", &PROPOSALParticle::GetXf, &PROPOSALParticle::SetXf)
-//         .add_property("Yf", &PROPOSALParticle::GetYf, &PROPOSALParticle::SetYf)
-//         .add_property("Zf", &PROPOSALParticle::GetZf, &PROPOSALParticle::SetZf)
-//         .add_property("Tf", &PROPOSALParticle::GetTf, &PROPOSALParticle::SetTf)
-//         .add_property("Ef", &PROPOSALParticle::GetEf, &PROPOSALParticle::SetEf)
-//
-//         .add_property("Xc", &PROPOSALParticle::GetXc, &PROPOSALParticle::SetXc)
-//         .add_property("Yc", &PROPOSALParticle::GetYc, &PROPOSALParticle::SetYc)
-//         .add_property("Zc", &PROPOSALParticle::GetZc, &PROPOSALParticle::SetZc)
-//         .add_property("Tc", &PROPOSALParticle::GetTc, &PROPOSALParticle::SetTc)
-//         .add_property("Ec", &PROPOSALParticle::GetEc, &PROPOSALParticle::SetEc)
-//
-//         .add_property("energy_lost", &PROPOSALParticle::GetElost, &PROPOSALParticle::SetElost)
-//     ;
-//
-//     // --------------------------------------------------------------------- //
-//     // EnergyCutSettings
-//     // --------------------------------------------------------------------- //
-//
-//     class_<EnergyCutSettings, boost::shared_ptr<EnergyCutSettings> >("EnergyCutSettings", init<>())
-//
-//         .def(init<double, double>((arg("ecut"), arg("vcut"))))
-//         .def(init<const EnergyCutSettings&>())
-//
-//         .def(self_ns::str(self_ns::self))
-//         .def(self_ns::repr(self_ns::self))
-//
-//         .add_property("ecut", &EnergyCutSettings::GetEcut, &EnergyCutSettings::SetEcut)
-//         .add_property("vcut", &EnergyCutSettings::GetVcut, &EnergyCutSettings::SetVcut)
-//
-//         .def("get_cut", &EnergyCutSettings::GetCut, "Return the lower from E*v = e")
-//     ;
-//
-//     // --------------------------------------------------------------------- //
-//     // Medium
-//     // --------------------------------------------------------------------- //
-//
-//     std::vector<std::string> (Medium::*getNameMed)() const = &Medium::GetElementName;
-//
-//     class_<Medium, boost::shared_ptr<Medium> >("Medium", init<>())
-//
-//         .def(init<MediumType::Enum, double>((arg("medium_type"), arg("rho") = 1.0)))
-//         .def(init<const Medium&>())
-//
-//         .def(self_ns::str(self_ns::self))
-//         .def(self_ns::repr(self_ns::self))
-//
-//         .add_property("num_components", &Medium::GetNumComponents, &Medium::SetNumComponents)
-//         .add_property("nuc_charge", &Medium::GetNucCharge, &Medium::SetNucCharge)
-//         .add_property("atomic_num", &Medium::GetAtomicNum, &Medium::SetAtomicNum)
-//         .add_property("atom_in_molecule", &Medium::GetAtomInMolecule, &Medium::SetAtomInMolecule)
-//         .add_property("sum_charge", &Medium::GetSumCharge, &Medium::SetSumCharge)
-//         .add_property("ZA", &Medium::GetZA, &Medium::SetZA)
-//         .add_property("I", &Medium::GetI, &Medium::SetI)
-//         .add_property("C", &Medium::GetC, &Medium::SetC)
-//         .add_property("A", &Medium::GetA, &Medium::SetA)
-//         .add_property("M", &Medium::GetM, &Medium::SetM)
-//         .add_property("X0", &Medium::GetX0, &Medium::SetX0)
-//         .add_property("X1", &Medium::GetX1, &Medium::SetX1)
-//         .add_property("D0", &Medium::GetD0, &Medium::SetD0)
-//         .add_property("R", &Medium::GetR, &Medium::SetR)
-//         .add_property("log_constant", &Medium::GetLogConstant)
-//         .add_property("b_prime", &Medium::GetBPrime)
-//         .add_property("rho", &Medium::GetRho, &Medium::SetRho)
-//         .add_property("mass_density", &Medium::GetMassDensity, &Medium::SetMassDensity)
-//         .add_property("average_nucleon_weight", &Medium::GetAverageNucleonWeight, &Medium::SetAverageNucleonWeight)
-//         .add_property("element_name", getNameMed, &Medium::SetElementName)
-//         .add_property("mol_density", &Medium::GetMolDensity, &Medium::SetMolDensity)
-//         .add_property("name", &Medium::GetName, &Medium::SetName)
-//         .add_property("type", &Medium::GetType, &Medium::SetType)
-//         .add_property("MN", &Medium::GetMN, &Medium::SetMN)
-//         .add_property("MM", &Medium::GetMM, &Medium::SetMM)
-//         .add_property("sum_nucleons", &Medium::GetSumNucleons, &Medium::SetSumNucleons)
-//         .add_property("R0", &Medium::GetR0, &Medium::SetR0)
-//     ;
-//
-//     // --------------------------------------------------------------------- //
-//     // Propagator
-//     // --------------------------------------------------------------------- //
-//
-//     class_<Propagator, boost::shared_ptr<Propagator> >("Propagator",
-//                                                       init<std::string, PROPOSALParticle*, bool>(
-//                                                       (arg("config"),
-//                                                        arg("particle"),
-//                                                        arg("applyoptions") = true)))
-//
-//         .def(init<
-//              Medium*,
-//              EnergyCutSettings*,
-//              ParticleType::Enum,
-//              std::string,
-//              bool,
-//              bool,
-//              bool,
-//              bool,
-//              ParametrizationType::Enum,
-//              ParametrizationType::Enum,
-//              double,
-//              double,
-//              double,
-//              double,
-//              bool,
-//              int>(
-//             (arg("medium"),
-//              arg("energy_cuts"),
-//              arg("particle_type"),
-//              arg("path_to_tables") = "",
-//              arg("moliere") = true,
-//              arg("continuous_rand") = true,
-//              arg("exact_time") = true,
-//              arg("lpm") = true,
-//              arg("brems") = ParametrizationType::BremsKelnerKokoulinPetrukhin,
-//              arg("photo") = ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich,
-//              arg("brems_multiplier") = 1,
-//              arg("photo_multiplier") = 1,
-//              arg("ioniz_multiplier") = 1,
-//              arg("epair_multiplier") = 1,
-//              arg("integrate") = false,
-//              arg("scattering_model") = 0
-//             )))
-//         .def(init<
-//              ParticleType::Enum,
-//              std::string,
-//              bool,
-//              bool,
-//              bool,
-//              int>(
-//             (arg("particle_type"),
-//              arg("path_to_tables") = "",
-//              arg("exact_time") = true,
-//              arg("lpm") = true,
-//              arg("integrate") = false,
-//              arg("scattering_model") = 0
-//             )))
-//         .def(init<const Propagator&>())
-//
-//         .def("propagate", &Propagator::propagate, (arg("max_distance_cm") = 1e20))
-//         .def("apply_options", &Propagator::ApplyOptions)
-//         .def("reset_particle", &Propagator::ResetParticle)
-//
-//         // .add_property("particle", &Propagator::SetParticle)
-//         .add_property("particle", make_function(&Propagator::GetParticle, return_internal_reference<>()), &Propagator::SetParticle)
-//         .add_property("seed",&Propagator::GetSeed ,&Propagator::SetSeed)
-//         .add_property("brems",&Propagator::GetBrems ,&Propagator::SetBrems)
-//         .add_property("photo",&Propagator::GetPhoto ,&Propagator::SetPhoto)
-//         .add_property("path_to_tables",&Propagator::GetPath_to_tables ,&Propagator::SetPath_to_tables)
-//         .add_property("stopping_decay",&Propagator::GetStopping_decay ,&Propagator::SetStopping_decay)
-//         .add_property("current_collection",make_function(&Propagator::GetCurrentCollection, return_internal_reference<>()))
-//         .add_property("collections",&Propagator::GetCollections, &Propagator::SetCollections)
-//         .add_property("detector", make_function(&Propagator::GetDetector, return_internal_reference<>()), &Propagator::SetDetector)
-//     ;
-//
-//     // --------------------------------------------------------------------- //
-//     // Cross sections
-//     // --------------------------------------------------------------------- //
-//
-//     double (CrossSections::*CalculatedNdx)() = &CrossSections::CalculatedNdx;
-//     double (CrossSections::*CalculatedNdxRnd)(double) = &CrossSections::CalculatedNdx;
-//
-//     class_<CrossSections, boost::shared_ptr<CrossSections>, boost::noncopyable>("CrossSections", no_init)
-//
-//         .def(self_ns::str(self_ns::self))
-//         .def(self_ns::repr(self_ns::self))
-//
-//         .add_property("cut_setting", make_function(&CrossSections::GetEnergyCutSettings, return_internal_reference<>()), &CrossSections::SetEnergyCutSettings)
-//         .add_property("medium", make_function(&CrossSections::GetMedium, return_internal_reference<>()), &CrossSections::SetMedium)
-//         .add_property("parametrization", &CrossSections::GetParametrization, &CrossSections::SetParametrization)
-//         .add_property("name", &CrossSections::GetName)
-//         .add_property("particle", make_function(&CrossSections::GetParticle, return_internal_reference<>()))
-//
-//         .def("calculate_dEdx", &CrossSections::CalculatedEdx, "Calculates dE/dx")
-//         .def("calculate_dNdx", CalculatedNdx, "Calculates dN/dx")
-//         .def("calculate_dNdx", CalculatedNdxRnd, "Calculates dN/dx with random number rnd")
-//         .def("enable_dEdx_interpolation", &CrossSections::EnableDEdxInterpolation, (arg("path") = "", arg("raw") = false))
-//         .def("enable_dNdx_interpolation", &CrossSections::EnableDNdxInterpolation, (arg("path") = "", arg("raw") = false))
-//         .def("disable_dEdx_interpolation", &CrossSections::DisableDEdxInterpolation)
-//         .def("disable_dNdx_interpolation", &CrossSections::DisableDNdxInterpolation)
-//     ;
-//
-//     class_<Photonuclear, boost::shared_ptr<Photonuclear>, bases<CrossSections> >("Photonuclear", init<PROPOSALParticle*, Medium*, EnergyCutSettings*>())
-//         .def(self_ns::str(self_ns::self))
-//         .def(self_ns::repr(self_ns::self))
-//     ;
-//     class_<Epairproduction, boost::shared_ptr<Epairproduction>, bases<CrossSections> >("Epairproduction", init<PROPOSALParticle*, Medium*, EnergyCutSettings*>())
-//         .def(self_ns::str(self_ns::self))
-//         .def(self_ns::repr(self_ns::self))
-//     ;
-//     class_<Bremsstrahlung, boost::shared_ptr<Bremsstrahlung>, bases<CrossSections> >("Bremsstrahlung", init<PROPOSALParticle*, Medium*, EnergyCutSettings*>())
-//         .def(self_ns::str(self_ns::self))
-//         .def(self_ns::repr(self_ns::self))
-//     ;
-//     class_<Ionization, boost::shared_ptr<Ionization>, bases<CrossSections> >("Ionization", init<PROPOSALParticle*, Medium*, EnergyCutSettings*>())
-//         .def(self_ns::str(self_ns::self))
-//         .def(self_ns::repr(self_ns::self))
-//     ;
-//
-//     // --------------------------------------------------------------------- //
-//     // Decay
-//     // --------------------------------------------------------------------- //
-//
-//     class_<Decay, boost::shared_ptr<Decay> >("Decay", init<>())
-//
-//         .def(init<const Decay&>())
-//         .def(init<PROPOSALParticle*>((arg("particle"))))
-//
-//         // .def(self_ns::str(self_ns::self))
-//         // .def(self_ns::repr(self_ns::self))
-//
-//         .add_property("out", &Decay::GetOut, &Decay::SetOut)
-//         .add_property("particle", make_function(&Decay::GetParticle, return_internal_reference<>()), &Decay::SetParticle)
-//         .add_property("store_neutrinos", &Decay::GetStoreNeutrinos, &Decay::SetStoreNeutrinos)
-//         .add_property("multiplier", &Decay::GetMultiplier, &Decay::SetMultiplier)
-//
-//         .def("make_decay", &Decay::MakeDecay, "Cross section describing the decay.")
-//         .def("calculate_product_energy", &Decay::CalculateProductEnergy, "Calculates the product energy.")
-//     ;
-//
-//     // ------------------------------------------------------------------------- //
-//     // ProcessCollection
-//     // ------------------------------------------------------------------------- //
-//
-//     class_<ProcessCollection, boost::shared_ptr<ProcessCollection> >("ProcessCollection", init<>())
-//
-//         .def(init<const ProcessCollection&>())
-//         .def(init<PROPOSALParticle*, Medium*, EnergyCutSettings*>((arg("particle"), arg("medium"), arg("energy_cut"))))
-//
-//         .def(self_ns::str(self_ns::self))
-//         .def(self_ns::repr(self_ns::self))
-//
-//         .add_property("cross_sections", &ProcessCollection::GetCrosssections, &ProcessCollection::SetCrosssections)
-//         .add_property("cut_setting", make_function(&ProcessCollection::GetCutSettings, return_internal_reference<>()), &ProcessCollection::SetCutSettings)
-//         .add_property("lpm_effect", &ProcessCollection::GetLpmEffectEnabled, &ProcessCollection::SetLpmEffectEnabled)
-//         .add_property("medium", make_function(&ProcessCollection::GetMedium, return_internal_reference<>()), &ProcessCollection::SetMedium)
-//         // .add_property("geometry", make_function(&ProcessCollection::GetGeometry, return_internal_reference<>()), &ProcessCollection::SetGeometry)
-//         .add_property("particle", make_function(&ProcessCollection::GetParticle, return_internal_reference<>()), &ProcessCollection::SetParticle)
-//         .add_property("location", &ProcessCollection::GetLocation, &ProcessCollection::SetLocation)
-//         .add_property("density_correction", &ProcessCollection::GetDensityCorrection, &ProcessCollection::SetDensityCorrection)
-//         .add_property("enable_randomization", &ProcessCollection::GetEnableRandomization, &ProcessCollection::SetEnableRandomization)
-//     ;
-//
-//     // ------------------------------------------------------------------------- //
-//     // Geometry
-//     // ------------------------------------------------------------------------- //
-//
-//     class_<Geometry, boost::shared_ptr<Geometry> >("Geometry", init<>())
-//
-//         .def(init<const Geometry&>())
-//
-//         .def(self_ns::str(self_ns::self))
-//         .def(self_ns::repr(self_ns::self))
-//
-//         .def("init_box", &Geometry::InitBox, return_internal_reference<>(), "All units in [m]", (
-//             arg("x0"),
-//             arg("y0"),
-//             arg("z0"),
-//             arg("x"),
-//             arg("y"),
-//             arg("z")
-//         ))
-//         .def("init_sphere", &Geometry::InitSphere, return_internal_reference<>(), "All units in [m]", (
-//             arg("x0"),
-//             arg("y0"),
-//             arg("z0"),
-//             arg("radius"),
-//             arg("inner_radius")
-//         ))
-//         .def("init_cylinder", &Geometry::InitCylinder, return_internal_reference<>(), "All units in [m]", (
-//             arg("x0"),
-//             arg("y0"),
-//             arg("z0"),
-//             arg("radius"),
-//             arg("inner_radius"),
-//             arg("z")
-//         ))
-//         .def("is_particle_inside", &Geometry::IsParticleInside)
-//         .def("is_particle_infront", &Geometry::IsParticleInfront)
-//         .def("is_particle_behind", &Geometry::IsParticleBehind)
-//         .def("distance_to_border", &Geometry::DistanceToBorder)
-//
-//         .add_property("x", &Geometry::GetX, &Geometry::SetX)
-//         .add_property("y", &Geometry::GetY, &Geometry::SetY)
-//         .add_property("z", &Geometry::GetZ, &Geometry::SetZ)
-//         .add_property("x0", &Geometry::GetX0, &Geometry::SetX0)
-//         .add_property("y0", &Geometry::GetY0, &Geometry::SetY0)
-//         .add_property("z0", &Geometry::GetZ0, &Geometry::SetZ0)
-//         .add_property("inner_radius", &Geometry::GetInnerRadius, &Geometry::SetInnerRadius)
-//         .add_property("radius", &Geometry::GetRadius, &Geometry::SetRadius)
-//         .add_property("object", &Geometry::GetObject, &Geometry::SetObject)
-//         .add_property("hirachy", &Geometry::GetHirarchy, &Geometry::SetHirarchy)
-//     ;
-// }
+
+class PythonHardBBTables {};
+
+BOOST_PYTHON_MODULE(pyPROPOSAL)
+{
+    using namespace boost::python;
+
+    docstring_options doc_options(true, true, false);
+
+    // --------------------------------------------------------------------- //
+    // Vector classes
+    // --------------------------------------------------------------------- //
+
+    // register the to-python converter
+    to_python_converter< std::vector<double>, VectorToPythonList<double> >();
+    to_python_converter< std::vector<std::vector<double> >, VectorToPythonList<std::vector<double> > > ();
+
+    to_python_converter< std::vector<std::string>, VectorToPythonList<std::string> >();
+
+    to_python_converter< std::vector<DynamicData*>, PVectorToPythonList<DynamicData*> >();
+    to_python_converter< std::vector<PROPOSALParticle*>, PVectorToPythonList<PROPOSALParticle*> >();
+
+    to_python_converter< std::vector<SectorFactory::Definition>, VectorToPythonList<SectorFactory::Definition> >();
+
+    // register the from-python converter
+    VectorFromPythonList<double>();
+    VectorFromPythonList<std::vector<double> >();
+    VectorFromPythonList<std::string>();
+
+    VectorFromPythonList<DynamicData*>();
+    VectorFromPythonList<PROPOSALParticle*>();
+
+    VectorFromPythonList<SectorFactory::Definition>();
+
+    // --------------------------------------------------------------------- //
+    // PROPOSAL Vector
+    // --------------------------------------------------------------------- //
+
+    class_<Vector3D, boost::shared_ptr<Vector3D> >("Vector3D", init<>())
+
+        .def(init<double, double, double>((arg("x"), arg("y"), arg("z"))))
+        .def(init<const Vector3D&>())
+
+        .def(self_ns::str(self_ns::self))
+        // .def(self_ns::repr(self_ns::self))
+
+        .add_property("x", &Vector3D::GetX)
+        .add_property("y", &Vector3D::GetY)
+        .add_property("z", &Vector3D::GetZ)
+        .add_property("radius", &Vector3D::GetRadius)
+        .add_property("phi", &Vector3D::GetPhi)
+        .add_property("theta", &Vector3D::GetTheta)
+
+        .def("set_cartesian_coordinates", &Vector3D::SetCartesianCoordinates)
+        .def("set_spherical_coordinates", &Vector3D::SetSphericalCoordinates)
+        .def("normalize", &Vector3D::normalise)
+        .def("magnitude", &Vector3D::magnitude)
+        .def("cartesian_from_spherical", &Vector3D::CalculateCartesianFromSpherical)
+        .def("spherical_from_cartesian", &Vector3D::CalculateSphericalCoordinates)
+    ;
+
+    // --------------------------------------------------------------------- //
+    // EnergyCutSettings
+    // --------------------------------------------------------------------- //
+
+    class_<EnergyCutSettings, boost::shared_ptr<EnergyCutSettings> >("EnergyCutSettings", init<>())
+
+        .def(init<double, double>((arg("ecut"), arg("vcut"))))
+        .def(init<const EnergyCutSettings&>())
+
+        .def(self_ns::str(self_ns::self))
+        .def(self_ns::repr(self_ns::self))
+
+        .add_property("ecut", &EnergyCutSettings::GetEcut, &EnergyCutSettings::SetEcut)
+        .add_property("vcut", &EnergyCutSettings::GetVcut, &EnergyCutSettings::SetVcut)
+
+        .def("get_cut", &EnergyCutSettings::GetCut, "Return the lower from E*v = e")
+    ;
+
+    // --------------------------------------------------------------------- //
+    // DecayChannel
+    // --------------------------------------------------------------------- //
+
+    class_<DecayChannel, boost::shared_ptr<DecayChannel>, boost::noncopyable >("DecayChannel", no_init)
+
+        // .def(self_ns::str(self_ns::self))
+        .def("decay", &DecayChannel::Decay, "Decay the given paritcle")
+        // .def("Clone", make_function(&DecayChannel::clone, return_value_policy<manage_new_object>()), "Decay the given paritcle")
+    ;
+
+    class_<LeptonicDecayChannel, boost::shared_ptr<LeptonicDecayChannel>, bases<DecayChannel> >("LeptonicDecayChannel", init<>())
+
+        // .def(init<const LeptonicDecayChannel&>())
+    ;
+
+    class_<TwoBodyPhaseSpace, boost::shared_ptr<TwoBodyPhaseSpace>, bases<DecayChannel> >("TwoBodyPhaseSpace", init<double, double>())
+
+        // .def(init<const TwoBodyPhaseSpace&>())
+    ;
+
+    class_<StableChannel, boost::shared_ptr<StableChannel>, bases<DecayChannel> >("StableChannel", init<>())
+
+        // .def(init<const StableChannel&>())
+    ;
+
+    // --------------------------------------------------------------------- //
+    // DecayTable
+    // --------------------------------------------------------------------- //
+
+    enum_<DecayTable::Mode>("DecayMode")
+        .value("LeptonicDecay", DecayTable::LeptonicDecay)
+        .value("TwoBodyDecay", DecayTable::TwoBodyDecay)
+        .value("Stable", DecayTable::Stable);
+
+    // void (DecayTable::*addChannelFactory)(double, DecayTable::Mode, double, const std::vector<double>&) = &DecayTable::addChannel;
+    // void (DecayTable::*addChannel)(double, DecayChannel&);
+
+    class_<DecayTable, boost::shared_ptr<DecayTable> >("DecayTable", init<>())
+
+        .def(init<const DecayTable&>())
+
+        // .def(self_ns::str(self_ns::self))
+
+        // .def("add_channel_factory", addChannelFactory, "Add an decay channel")
+        // .def("add_channel", addChannel, "Add an decay channel")
+        .def("add_channel", &DecayTable::addChannel, "Add an decay channel")
+        .def("select_channel", make_function(&DecayTable::SelectChannel, return_internal_reference<>()), "Select an decay channel according to given branching ratios")
+        .def("set_stable", &DecayTable::SetStable, "Define decay table for stable particles")
+    ;
+
+    // --------------------------------------------------------------------- //
+    // ParticleDef
+    // --------------------------------------------------------------------- //
+
+
+    class_<ParticleDef, boost::shared_ptr<ParticleDef> >("ParticleDef", init<>())
+
+        .def(init<const ParticleDef&>())
+
+        .def(self_ns::str(self_ns::self))
+
+        .def_readwrite("name", &ParticleDef::name)
+        .def_readwrite("mass", &ParticleDef::mass)
+        .def_readwrite("low", &ParticleDef::low)
+        .def_readwrite("charge", &ParticleDef::charge)
+        .def_readwrite("decay_table", &ParticleDef::decay_table)
+        // .def_readwrite("hardbb_table", &ParticleDef::hardbb_table) //TODO(mario): hardbb Fri 2017/09/22
+    ;
+
+    class_<MuMinusDef, boost::shared_ptr<MuMinusDef>, bases<ParticleDef>, boost::noncopyable >("MuMinusDef", no_init)
+
+        .def("get", make_function(&MuMinusDef::Get, return_value_policy<reference_existing_object>()))
+        .staticmethod("get")
+        ;
+
+    PARTICLE_DEF(MuPlus)
+
+    PARTICLE_DEF(EMinus)
+    PARTICLE_DEF(EPlus)
+
+    PARTICLE_DEF(TauMinus)
+    PARTICLE_DEF(TauPlus)
+
+    PARTICLE_DEF(StauMinus)
+    PARTICLE_DEF(StauPlus)
+
+    PARTICLE_DEF(P0)
+    PARTICLE_DEF(PiMinus)
+    PARTICLE_DEF(PiPlus)
+
+    PARTICLE_DEF(KMinus)
+    PARTICLE_DEF(KPlus)
+
+    PARTICLE_DEF(PMinus)
+    PARTICLE_DEF(PPlus)
+
+    PARTICLE_DEF(NuE)
+    PARTICLE_DEF(NuEBar)
+
+    PARTICLE_DEF(NuMu)
+    PARTICLE_DEF(NuMuBar)
+
+    PARTICLE_DEF(NuTau)
+    PARTICLE_DEF(NuTauBar)
+
+    PARTICLE_DEF(Monopole)
+    PARTICLE_DEF(Gamma)
+    PARTICLE_DEF(StableMassiveParticle)
+
+    // --------------------------------------------------------------------- //
+    // DynamicData
+    // --------------------------------------------------------------------- //
+
+    enum_<DynamicData::Type>("Data")
+        .value("None", DynamicData::None)
+        .value("Particle", DynamicData::Particle)
+        .value("Brems", DynamicData::Brems)
+        .value("DeltaE", DynamicData::DeltaE)
+        .value("Epair", DynamicData::Epair)
+        .value("NuclInt", DynamicData::NuclInt)
+        .value("MuPair", DynamicData::MuPair)
+        .value("Hadrons", DynamicData::Hadrons)
+        .value("ContinuousEnergyLoss", DynamicData::ContinuousEnergyLoss);
+
+    class_<DynamicData, boost::shared_ptr<DynamicData> >("DynamicData", init<DynamicData::Type>())
+
+        .def(init<const DynamicData&>())
+
+        // .def(self_ns::str(self_ns::self))
+
+        .add_property("id", &DynamicData::GetTypeId)
+        .add_property("position", &DynamicData::GetPosition, &DynamicData::SetPosition)
+        .add_property("direction", &DynamicData::GetDirection, &DynamicData::SetDirection)
+        .add_property("energy", &DynamicData::GetEnergy, &DynamicData::SetEnergy)
+        .add_property("parent_particle_energy", &DynamicData::GetParentParticleEnergy, &DynamicData::SetParentParticleEnergy)
+        .add_property("time", &DynamicData::GetTime, &DynamicData::SetTime)
+        .add_property("propagated_distance", &DynamicData::GetPropagatedDistance, &DynamicData::SetPropagatedDistance)
+    ;
+
+    // --------------------------------------------------------------------- //
+    // PROPOSALParticle
+    // --------------------------------------------------------------------- //
+
+    class_<PROPOSALParticle, boost::shared_ptr<PROPOSALParticle>, bases<DynamicData> >("Particle", init<>())
+
+        .def(init<const ParticleDef&>())
+        .def(init<const PROPOSALParticle&>())
+
+        // .def(self_ns::str(self_ns::self))
+
+        .add_property("momentum", &PROPOSALParticle::GetMomentum, &PROPOSALParticle::SetMomentum)
+        .add_property("particle_def", make_function(&PROPOSALParticle::GetParticleDef, return_value_policy<reference_existing_object>()))
+    ;
+
+    // --------------------------------------------------------------------- //
+    // Medium Definition
+    // --------------------------------------------------------------------- //
+
+    enum_<MediumFactory::Enum>("MediumType")
+        .value("Water", MediumFactory::Water)
+        .value("Ice", MediumFactory::Ice)
+        .value("Salt", MediumFactory::Salt)
+        .value("StandardRock", MediumFactory::StandardRock)
+        .value("FrejusRock", MediumFactory::FrejusRock)
+        .value("Iron", MediumFactory::Iron)
+        .value("Hydrogen", MediumFactory::Hydrogen)
+        .value("Lead", MediumFactory::Lead)
+        .value("Copper", MediumFactory::Copper)
+        .value("Air", MediumFactory::Air)
+        .value("Paraffin", MediumFactory::Paraffin)
+        .value("AntaresWater", MediumFactory::AntaresWater);
+
+    class_<MediumFactory::Definition, boost::shared_ptr<MediumFactory::Definition> >("MediumDefinition", init<>())
+
+        // .def(self_ns::str(self_ns::self))
+
+        .def_readwrite("type", &MediumFactory::Definition::type)
+        .def_readwrite("density_correction", &MediumFactory::Definition::density_correction)
+    ;
+
+    // --------------------------------------------------------------------- //
+    // Geometry Definition
+    // --------------------------------------------------------------------- //
+
+    enum_<GeometryFactory::Enum>("Shape")
+        .value("Sphere", GeometryFactory::Sphere)
+        .value("Box", GeometryFactory::Box)
+        .value("Cylinder", GeometryFactory::Cylinder);
+
+    class_<GeometryFactory::Definition, boost::shared_ptr<GeometryFactory::Definition> >("GeometryDefinition", init<>())
+
+        // .def(self_ns::str(self_ns::self))
+
+        .def_readwrite("shape", &GeometryFactory::Definition::shape)
+        .def_readwrite("position", &GeometryFactory::Definition::position)
+        .def_readwrite("inner_radius", &GeometryFactory::Definition::inner_radius)
+        .def_readwrite("radius", &GeometryFactory::Definition::radius)
+        .def_readwrite("width", &GeometryFactory::Definition::width)
+        .def_readwrite("height", &GeometryFactory::Definition::height)
+        .def_readwrite("depth", &GeometryFactory::Definition::depth)
+    ;
+
+    // --------------------------------------------------------------------- //
+    // Geometry
+    // --------------------------------------------------------------------- //
+
+    class_<Geometry, boost::shared_ptr<Geometry>, boost::noncopyable>("Geometry", no_init)
+
+        .def(self_ns::str(self_ns::self))
+
+        .def("is_infront", &Geometry::IsInfront)
+        .def("is_inside", &Geometry::IsInside)
+        .def("is_behind", &Geometry::IsBehind)
+        .def("distance_to_border", &Geometry::DistanceToBorder)
+        .def("distance_to_closet_approach", &Geometry::DistanceToClosestApproach)
+
+        .add_property("name", &Geometry::GetName)
+        .add_property("position", &Geometry::GetPosition, &Geometry::SetPosition)
+        .add_property("hirarchy", &Geometry::GetHirarchy, &Geometry::SetHirarchy)
+    ;
+
+    class_<Sphere, boost::shared_ptr<Sphere>, bases<Geometry> >("Sphere", init<>())
+
+        .def(init<Vector3D, double, double>())
+        .def(init<const Sphere&>())
+
+        // .def(self_ns::str(self_ns::self))
+
+        .add_property("inner_radius", &Sphere::GetInnerRadius, &Sphere::SetInnerRadius)
+        .add_property("radius", &Sphere::GetRadius, &Sphere::SetRadius)
+    ;
+
+    class_<Box, boost::shared_ptr<Box>, bases<Geometry> >("Box", init<>())
+
+        .def(init<Vector3D, double, double, double>())
+        .def(init<const Box&>())
+
+        // .def(self_ns::str(self_ns::self))
+
+        .add_property("width", &Box::GetX, &Box::SetX)
+        .add_property("height", &Box::GetY, &Box::SetY)
+        .add_property("depth", &Box::GetZ, &Box::SetZ)
+    ;
+
+    class_<Cylinder, boost::shared_ptr<Cylinder>, bases<Geometry> >("Cylinder", init<>())
+
+        .def(init<Vector3D, double, double, double>())
+        .def(init<const Cylinder&>())
+
+        // .def(self_ns::str(self_ns::self))
+
+        .add_property("inner_radius", &Cylinder::GetInnerRadius, &Cylinder::SetInnerRadius)
+        .add_property("radius", &Cylinder::GetRadius, &Cylinder::SetRadius)
+        .add_property("height", &Cylinder::GetZ, &Cylinder::SetZ)
+    ;
+
+    // --------------------------------------------------------------------- //
+    // Scattering Definition
+    // --------------------------------------------------------------------- //
+
+    enum_<ScatteringFactory::Enum>("ScatteringModel")
+        .value("default", ScatteringFactory::Default)
+        .value("moliere", ScatteringFactory::Moliere)
+        .value("moliere_first_order", ScatteringFactory::MoliereFirstOrder);
+
+    // --------------------------------------------------------------------- //
+    // Bremsstrahlung Definition
+    // --------------------------------------------------------------------- //
+
+    enum_<BremsstrahlungFactory::Enum>("BremsParametrization")
+        .value("PetrukhinShestakov", BremsstrahlungFactory::PetrukhinShestakov)
+        .value("KelnerKokoulinPetrukhin", BremsstrahlungFactory::KelnerKokoulinPetrukhin)
+        .value("CompleteScreening", BremsstrahlungFactory::CompleteScreening)
+        .value("AndreevBezrukovBugaev", BremsstrahlungFactory::AndreevBezrukovBugaev);
+
+    class_<BremsstrahlungFactory::Definition, boost::shared_ptr<BremsstrahlungFactory::Definition> >("BremsDefinition", init<>())
+
+        .def_readwrite("parametrization", &BremsstrahlungFactory::Definition::parametrization)
+        .def_readwrite("lpm_effect", &BremsstrahlungFactory::Definition::lpm_effect)
+        .def_readwrite("multiplier", &BremsstrahlungFactory::Definition::multiplier)
+    ;
+
+    // --------------------------------------------------------------------- //
+    // Photonuclear  Definition
+    // --------------------------------------------------------------------- //
+
+    enum_<PhotonuclearFactory::Enum>("PhotoParametrization")
+        .value("Zeus", PhotonuclearFactory::Zeus)
+        .value("BezrukovBugaev", PhotonuclearFactory::BezrukovBugaev)
+        .value("Rhode", PhotonuclearFactory::Rhode)
+        .value("Kokoulin", PhotonuclearFactory::Kokoulin)
+        .value("AbramowiczLevinLevyMaor91", PhotonuclearFactory::AbramowiczLevinLevyMaor91)
+        .value("AbramowiczLevinLevyMaor97", PhotonuclearFactory::AbramowiczLevinLevyMaor97)
+        .value("ButkevichMikhailov", PhotonuclearFactory::ButkevichMikhailov)
+        .value("RenoSarcevicSu", PhotonuclearFactory::RenoSarcevicSu);
+
+    enum_<PhotonuclearFactory::Shadow>("PhotoShadow")
+        .value("Dutta", PhotonuclearFactory::ShadowDutta)
+        .value("ButkevichMikhailov", PhotonuclearFactory::ShadowButkevichMikhailov);
+
+
+    class_<PhotonuclearFactory::Definition, boost::shared_ptr<PhotonuclearFactory::Definition> >("PhotoDefinition", init<>())
+
+        .def_readwrite("parametrization", &PhotonuclearFactory::Definition::parametrization)
+        .def_readwrite("shadow", &PhotonuclearFactory::Definition::shadow)
+        .def_readwrite("hardbb", &PhotonuclearFactory::Definition::hardbb)
+        .def_readwrite("multiplier", &PhotonuclearFactory::Definition::multiplier)
+    ;
+
+    // --------------------------------------------------------------------- //
+    // EpairProduction Definition
+    // --------------------------------------------------------------------- //
+
+    class_<EpairProductionFactory::Definition, boost::shared_ptr<EpairProductionFactory::Definition> >("EpairDefinition", init<>())
+
+        .def_readwrite("lpm_effect", &EpairProductionFactory::Definition::lpm_effect)
+        .def_readwrite("multiplier", &EpairProductionFactory::Definition::multiplier)
+    ;
+
+    // --------------------------------------------------------------------- //
+    // Ionization Definition
+    // --------------------------------------------------------------------- //
+
+    class_<IonizationFactory::Definition, boost::shared_ptr<IonizationFactory::Definition> >("IonizationDefinition", init<>())
+
+        .def_readwrite("multiplier", &IonizationFactory::Definition::multiplier)
+    ;
+
+    // --------------------------------------------------------------------- //
+    // Utility Definition
+    // --------------------------------------------------------------------- //
+
+
+    class_<Utility::Definition, boost::shared_ptr<Utility::Definition> >("UtilityDefinition", init<>())
+
+        .def_readwrite("brems_def", &Utility::Definition::brems_def)
+        .def_readwrite("photo_def", &Utility::Definition::photo_def)
+        .def_readwrite("epair_def", &Utility::Definition::epair_def)
+        .def_readwrite("ioniz_def", &Utility::Definition::ioniz_def)
+    ;
+
+    // --------------------------------------------------------------------- //
+    // Sector Definition
+    // --------------------------------------------------------------------- //
+
+    // ----[ Location ]-------------------------------------- //
+
+    enum_<Sector::ParticleLocation::Enum>("ParticleLocation")
+        .value("infront_detector", Sector::ParticleLocation::InfrontDetector)
+        .value("inside_detector", Sector::ParticleLocation::InsideDetector)
+        .value("behind_detector", Sector::ParticleLocation::BehindDetector);
+
+    class_<SectorFactory::Definition, boost::shared_ptr<SectorFactory::Definition> >("SectorDefinition", init<>())
+
+        // .def(self_ns::str(self_ns::self))
+
+        .def_readwrite("e_cut", &SectorFactory::Definition::e_cut)
+        .def_readwrite("v_cut", &SectorFactory::Definition::v_cut)
+        .def_readwrite("medium_def", &SectorFactory::Definition::medium_def)
+        .def_readwrite("geometry_def", &SectorFactory::Definition::geometry_def)
+        .def_readwrite("do_weighting", &SectorFactory::Definition::do_weighting)
+        .def_readwrite("weighting_order", &SectorFactory::Definition::weighting_order)
+        .def_readwrite("do_continuous_randomization", &SectorFactory::Definition::do_continuous_randomization)
+        .def_readwrite("do_exact_time_calculation", &SectorFactory::Definition::do_exact_time_calculation)
+        .def_readwrite("scattering_model", &SectorFactory::Definition::scattering_model)
+        .def_readwrite("particle_location", &SectorFactory::Definition::location)
+        .def_readwrite("crosssection_defs", &SectorFactory::Definition::utility_def)
+    ;
+
+    // {
+    //     // Change the current scope
+    //     scope outer = class_<foo>("foo");
+    //
+    //     // Define a class Y in the current scope, X
+    //     class_<foo::bar>("bar")
+    //         .def_readwrite("a", &foo::bar::a);
+    // }
+
+    // class_<foo::bar, boost::shared_ptr<foo::bar> >("foobar", init<>())
+    //
+    //     // .def(self_ns::str(self_ns::self))
+    //
+    //     .def_readwrite("a", &foo::bar::a)
+    // ;
+
+    // --------------------------------------------------------------------- //
+    // Interpolation Definition
+    // --------------------------------------------------------------------- //
+
+    class_<InterpolationDef, boost::shared_ptr<InterpolationDef> >("InterpolationDef", init<>())
+
+        // .def(self_ns::str(self_ns::self))
+
+        .def_readwrite("order_of_interpolation", &InterpolationDef::order_of_interpolation)
+        .def_readwrite("path_to_tables", &InterpolationDef::path_to_tables)
+        .def_readwrite("raw", &InterpolationDef::raw)
+    ;
+
+
+    // --------------------------------------------------------------------- //
+    // Propagator
+    // --------------------------------------------------------------------- //
+
+    class_<Propagator, boost::shared_ptr<Propagator> >(
+        "Propagator", init<PROPOSALParticle&, const std::vector<SectorFactory::Definition>&, const Geometry&>((arg("partcle"), arg("sector_defs"), arg("detector"))))
+
+        .def(init<PROPOSALParticle&,
+                  const std::vector<SectorFactory::Definition>&,
+                  const Geometry&,
+                  const InterpolationDef&>((
+            arg("particle"), arg("sector_defs"), arg("detector"), arg("interpolation_def"))))
+
+        // .def(self_ns::str(self_ns::self))
+
+        .def("propagate", &Propagator::Propagate, (arg("max_distance_cm") = 1e20));
+
+    // --------------------------------------------------------------------- //
+    // HardBBTable
+    // --------------------------------------------------------------------- //
+
+    boost::python::scope hardbb = class_<PythonHardBBTables>("HardBBTables");
+    hardbb.attr("MuonTable") = HardBBTables::MuonTable;
+    hardbb.attr("TauTable") = HardBBTables::TauTable;
+}
+
+#undef PARTICLE_DEF
