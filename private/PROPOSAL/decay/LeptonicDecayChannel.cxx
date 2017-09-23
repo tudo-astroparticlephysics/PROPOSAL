@@ -21,6 +21,7 @@ LeptonicDecayChannel::~LeptonicDecayChannel()
 
 LeptonicDecayChannel::LeptonicDecayChannel(const LeptonicDecayChannel& mode)
     : DecayChannel(mode)
+    , root_finder_(mode.root_finder_)
 {
 }
 
