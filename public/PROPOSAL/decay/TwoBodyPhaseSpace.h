@@ -18,7 +18,7 @@ class TwoBodyPhaseSpace : public DecayChannel
     TwoBodyPhaseSpace(const TwoBodyPhaseSpace& mode);
     virtual ~TwoBodyPhaseSpace();
     // No copy and assignemnt -> done by clone
-    virtual TwoBodyPhaseSpace* clone() { return new TwoBodyPhaseSpace(*this); }
+    DecayChannel* clone() { return new TwoBodyPhaseSpace(*this); }
 
     DecayProducts Decay(PROPOSALParticle*);
 

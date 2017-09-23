@@ -16,7 +16,7 @@ class DecayChannel
     public:
     typedef std::vector<PROPOSALParticle*> DecayProducts;
 
-    // DecayChannel();
+    DecayChannel() {}
     virtual ~DecayChannel() {}
 
     bool operator==(const DecayChannel&) const;
