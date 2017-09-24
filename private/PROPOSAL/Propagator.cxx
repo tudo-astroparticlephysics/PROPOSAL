@@ -58,7 +58,7 @@ Propagator::Propagator()
     : seed_(1)
     , current_sector_(NULL)
     // , particle_(MuMinusDef::Get())
-    , particle_(*new PROPOSALParticle(MuMinusDef::Get()))
+    , particle_(MuMinusDef::Get())
     , detector_(new Sphere(Vector3D(), 1e18, 0))
 {
     // TODO(mario): set defaults Tue 2017/09/19
@@ -100,11 +100,11 @@ Propagator::Propagator(const std::vector<Sector*>& sectors, const Geometry& geom
 }
 
 // ------------------------------------------------------------------------- //
-Propagator::Propagator(PROPOSALParticle& particle,
+Propagator::Propagator(const ParticleDef& particle_def,
                        const std::vector<SectorFactory::Definition>& sector_defs,
                        const Geometry& geometry)
     : seed_(1)
-    , particle_(particle)
+    , particle_(particle_def)
     , detector_(geometry.clone())
 {
     for (std::vector<SectorFactory::Definition>::const_iterator iter = sector_defs.begin(); iter != sector_defs.end();
@@ -124,12 +124,12 @@ Propagator::Propagator(PROPOSALParticle& particle,
 }
 
 // ------------------------------------------------------------------------- //
-Propagator::Propagator(PROPOSALParticle& particle,
+Propagator::Propagator(const ParticleDef& particle_def,
                        const std::vector<SectorFactory::Definition>& sector_defs,
                        const Geometry& geometry,
                        const InterpolationDef& interpolation_def)
     : seed_(1)
-    , particle_(particle)
+    , particle_(particle_def)
     , detector_(geometry.clone())
 {
     for (std::vector<SectorFactory::Definition>::const_iterator iter = sector_defs.begin(); iter != sector_defs.end();
@@ -148,34 +148,12 @@ Propagator::Propagator(PROPOSALParticle& particle,
     }
 }
 
-
-// Propagator::Propagator(const ParticleDef& particle_def, const std::vector<SectorFactory::Definition>& sectors, const Geometry& geometry)
-//     : seed_(1)
-//     , current_sector_(NULL)
-//     // , particle_(particle_def)
-//     , particle_(*new PROPOSALParticle(particle_def))
-//     , detector_(geometry.clone())
-// {
-//     for (std::vector<SectorFactory::Definition>::const_iterator iter = sectors.begin(); iter != sectors.end(); ++iter)
-//     {
-//         sectors_.push_back(SectorFactory::Get().CreateSector(particle_, *iter));
-//     }
-//
-//     try
-//     {
-//         current_sector_ = sectors_.at(0);
-//     }
-//     catch (const std::out_of_range& ex)
-//     {
-//         log_fatal("No Sectors Definitions are provided for the Propagator!");
-//     }
-// }
-
+// ------------------------------------------------------------------------- //
 Propagator::Propagator(const ParticleDef& particle_def, const std::string& config_file)
     : seed_(1)
     , current_sector_(NULL)
     // , particle_(particle_def)
-    , particle_(*new PROPOSALParticle(particle_def))
+    , particle_(particle_def)
     , detector_(NULL)
 {
     double global_ecut_inside  = global_ecut_inside_;

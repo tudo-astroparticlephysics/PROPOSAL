@@ -49,8 +49,8 @@ class Propagator
     // Constructors
     Propagator();
     Propagator(const std::vector<Sector*>&, const Geometry&);
-    Propagator(PROPOSALParticle&, const std::vector<SectorFactory::Definition>&, const Geometry&);
-    Propagator(PROPOSALParticle&, const std::vector<SectorFactory::Definition>&, const Geometry&, const InterpolationDef&);
+    Propagator(const ParticleDef&, const std::vector<SectorFactory::Definition>&, const Geometry&);
+    Propagator(const ParticleDef&, const std::vector<SectorFactory::Definition>&, const Geometry&, const InterpolationDef&);
     // Propagator(const ParticleDef&, const std::vector<SectorFactory::Definition>&, const Geometry&);
     Propagator(const ParticleDef&, const std::string&);
     // Propagator(ParticleDef,
@@ -213,7 +213,7 @@ class Propagator
     std::vector<Sector*> sectors_;
     Sector* current_sector_;
 
-    PROPOSALParticle& particle_;
+    PROPOSALParticle particle_;
     Geometry* detector_;
 
     //----------------------------------------------------------------------------//

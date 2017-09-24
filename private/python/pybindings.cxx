@@ -731,17 +731,22 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
     // --------------------------------------------------------------------- //
 
     class_<Propagator, boost::shared_ptr<Propagator> >(
-        "Propagator", init<PROPOSALParticle&, const std::vector<SectorFactory::Definition>&, const Geometry&>((arg("partcle"), arg("sector_defs"), arg("detector"))))
+        "Propagator", init<const ParticleDef&, const std::vector<SectorFactory::Definition>&, const Geometry&>((arg("partcle_def"), arg("sector_defs"), arg("detector"))))
 
-        .def(init<PROPOSALParticle&,
+        .def(init<const ParticleDef&,
                   const std::vector<SectorFactory::Definition>&,
                   const Geometry&,
                   const InterpolationDef&>((
-            arg("particle"), arg("sector_defs"), arg("detector"), arg("interpolation_def"))))
+            arg("particle_def"), arg("sector_defs"), arg("detector"), arg("interpolation_def"))))
+
+        .def(init<const ParticleDef&,
+                  const std::string&>((
+            arg("particle_def"), arg("config_file"))))
 
         // .def(self_ns::str(self_ns::self))
 
-        .def("propagate", &Propagator::Propagate, (arg("max_distance_cm") = 1e20));
+        .def("propagate", &Propagator::Propagate, (arg("max_distance_cm") = 1e20))
+        .add_property("particle", make_function(&Propagator::GetParticle, return_internal_reference<>()), "Get the internal created particle to modify its properties");
 
     // --------------------------------------------------------------------- //
     // HardBBTable
