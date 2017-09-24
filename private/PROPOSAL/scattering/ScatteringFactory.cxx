@@ -16,6 +16,7 @@ using namespace PROPOSAL;
 ScatteringFactory::ScatteringFactory()
     : registerd_enum()
     , registerd_str()
+    , map_string_to_enum()
 {
     Register("default", Default);
     Register("moliere", Moliere);
@@ -26,12 +27,14 @@ ScatteringFactory::~ScatteringFactory()
 {
     registerd_enum.clear();
     registerd_str.clear();
+    map_string_to_enum.clear();
 }
 
 void ScatteringFactory::Register(const std::string& name, Enum model)
 {
     registerd_str.push_back(name);
     registerd_enum.push_back(model);
+    map_string_to_enum[name] = model;
 }
 
 // ------------------------------------------------------------------------- //
@@ -162,6 +165,21 @@ Scattering* ScatteringFactory::CreateScattering(const Enum model, PROPOSALPartic
     }
 }
 
+// ------------------------------------------------------------------------- //
+ScatteringFactory::Enum ScatteringFactory::GetEnumFromString(const std::string& name)
+{
+    std::string name_lower = boost::algorithm::to_lower_copy(name);
+    MapStringToEnum::iterator it = map_string_to_enum.find(name_lower);
+
+    if (it != map_string_to_enum.end())
+    {
+        return it->second;
+    } else
+    {
+        log_fatal("Scattering %s not registerd!", name.c_str());
+    }
+}
+
 // ScatteringFactory::ScatteringFactory()
 // {
 //     // Register all media in lower case!
@@ -261,20 +279,5 @@ Scattering* ScatteringFactory::CreateScattering(const Enum model, PROPOSALPartic
 //     else
 //     {
 //         log_fatal("Scattering %s not registerd!", typeid(model).name());
-//     }
-// }
-//
-// // ------------------------------------------------------------------------- //
-// ScatteringFactory::Enum ScatteringFactory::GetEnumFromString(const std::string& name)
-// {
-//     std::string name_lower = boost::algorithm::to_lower_copy(name);
-//     MapStringToEnum::iterator it = map_string_to_enum.find(name_lower);
-//
-//     if (it != map_string_to_enum.end())
-//     {
-//         return it->second;
-//     } else
-//     {
-//         log_fatal("Scattering %s not registerd!", name.c_str());
 //     }
 // }
