@@ -3,11 +3,10 @@
 	{
 
 		"seed" : 1,
-		"brems" : 11,
-		"photo" : -36,
+		"brems" : 1,
+		"photo" : 5,
 		"lpm" : true,
-		"do_scattering" : true,
-		"scattering" : "moliere_first_order",
+		"scattering" : "moliere",
 		"exact_time" : true,
 		"interpolate" : true,
 		"brems_multiplier" : 1,
