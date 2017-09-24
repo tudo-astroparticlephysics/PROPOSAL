@@ -17,6 +17,12 @@
         .def("get", make_function(&MuMinusDef::Get, return_value_policy<reference_existing_object>()))                 \
         .staticmethod("get");
 
+#define COMPONENT_DEF(cls)\
+    class_<Components::cls, boost::shared_ptr<Components::cls>, bases<Components::Component> >( #cls, init<double>());
+
+#define MEDIUM_DEF(cls)\
+    class_<cls, boost::shared_ptr<cls>, bases<Medium> >( #cls, init<double>());
+
 using namespace PROPOSAL;
 
 // #include "PROPOSAL/PROPOSALParticle.h"
@@ -248,11 +254,100 @@ struct VectorFromPythonList
 // *                               Python Module                                 *
 // *****************************************************************************|)}>#
 
+// ------------------------------------------------------------------------- //
+// Components sub module
+// ------------------------------------------------------------------------- //
+
+void export_components()
+{
+    using namespace boost::python;
+    // map the Util namespace to a sub-module
+    // make "from mypackage.Util import <whatever>" work
+    object componentsModule(handle<>(borrowed(PyImport_AddModule("pyPROPOSAL.Components"))));
+    // make "from mypackage import Util" work
+    scope().attr("Components") = componentsModule;
+    // set the current scope to the new sub-module
+    scope components_scope = componentsModule;
+    // export stuff in the Util namespace
+
+    class_<Components::Component, boost::shared_ptr<Components::Component>, boost::noncopyable >("Component", no_init)
+
+        .def(self_ns::str(self_ns::self))
+
+        .add_property("name", &Components::Component::GetName)
+        .add_property("nuclear_charge", &Components::Component::GetNucCharge)
+        .add_property("atomic_number", &Components::Component::GetAtomicNum)
+        .add_property("atoms_in_molecule", &Components::Component::GetAtomInMolecule)
+        .add_property("log_constant", &Components::Component::GetLogConstant)
+        .add_property("bprime", &Components::Component::GetBPrime)
+        .add_property("average_nucleon_weight", &Components::Component::GetAverageNucleonWeight)
+        .add_property("mn", &Components::Component::GetMN)
+        .add_property("r0", &Components::Component::GetR0);
+
+    // class_<Components::Hydrogen, boost::shared_ptr<Components::Hydrogen>, bases<Components::Component> >( "Hydrogen", init<double>());
+    COMPONENT_DEF(Hydrogen)
+    COMPONENT_DEF(Carbon)
+    COMPONENT_DEF(Nitrogen)
+    COMPONENT_DEF(Oxygen)
+    COMPONENT_DEF(Sodium)
+    COMPONENT_DEF(Magnesium)
+    COMPONENT_DEF(Sulfur)
+    COMPONENT_DEF(Argon)
+    COMPONENT_DEF(Potassium)
+    COMPONENT_DEF(Calcium)
+    COMPONENT_DEF(Iron)
+    COMPONENT_DEF(Copper)
+    COMPONENT_DEF(Lead)
+    COMPONENT_DEF(Uranium)
+    COMPONENT_DEF(StandardRock)
+    COMPONENT_DEF(FrejusRock)
+}
+
+
+void export_medium()
+{
+    using namespace boost::python;
+    // map the Util namespace to a sub-module
+    // make "from mypackage.Util import <whatever>" work
+    object mediumModule(handle<>(borrowed(PyImport_AddModule("pyPROPOSAL.Medium"))));
+    // make "from mypackage import Util" work
+    scope().attr("Medium") = mediumModule;
+    // set the current scope to the new sub-module
+    scope medium_scope = mediumModule;
+    // export stuff in the Util namespace
+
+    class_<Medium, boost::shared_ptr<Medium>, boost::noncopyable >("Medium", no_init)
+
+        .def(self_ns::str(self_ns::self))
+
+        .add_property("name", &Medium::GetName);
+
+    MEDIUM_DEF(Water)
+    MEDIUM_DEF(Ice)
+    MEDIUM_DEF(Salt)
+    // MEDIUM_DEF(CalciumCarbonate) //TODO(mario): Whats going on here??? symbol not found at runtime Sun 2017/09/24
+    MEDIUM_DEF(StandardRock)
+    MEDIUM_DEF(FrejusRock)
+    MEDIUM_DEF(Iron)
+    MEDIUM_DEF(Hydrogen)
+    MEDIUM_DEF(Lead)
+    MEDIUM_DEF(Copper)
+    MEDIUM_DEF(Uranium)
+    MEDIUM_DEF(Air)
+    MEDIUM_DEF(Paraffin)
+    MEDIUM_DEF(AntaresWater)
+}
+
 class PythonHardBBTables {};
 
 BOOST_PYTHON_MODULE(pyPROPOSAL)
 {
     using namespace boost::python;
+    object package = scope();
+    package.attr("__path__") = "pyPROPOSAL";
+
+    export_components();
+    export_medium();
 
     docstring_options doc_options(true, true, false);
 
@@ -260,7 +355,8 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
     // Vector classes
     // --------------------------------------------------------------------- //
 
-    // register the to-python converter
+    // ----[ Register the to-python converter ]-------------- //
+
     to_python_converter< std::vector<double>, VectorToPythonList<double> >();
     to_python_converter< std::vector<std::vector<double> >, VectorToPythonList<std::vector<double> > > ();
 
@@ -271,7 +367,8 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
 
     to_python_converter< std::vector<SectorFactory::Definition>, VectorToPythonList<SectorFactory::Definition> >();
 
-    // register the from-python converter
+    // ----[ Register the from-python converter ]------------ //
+
     VectorFromPythonList<double>();
     VectorFromPythonList<std::vector<double> >();
     VectorFromPythonList<std::string>();
@@ -281,9 +378,9 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
 
     VectorFromPythonList<SectorFactory::Definition>();
 
-    // --------------------------------------------------------------------- //
-    // PROPOSAL Vector
-    // --------------------------------------------------------------------- //
+    /**************************************************************************
+    *                                Vector3D                                *
+    **************************************************************************/
 
     class_<Vector3D, boost::shared_ptr<Vector3D> >("Vector3D", init<>())
 
@@ -308,9 +405,9 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
         .def("spherical_from_cartesian", &Vector3D::CalculateSphericalCoordinates)
     ;
 
-    // --------------------------------------------------------------------- //
-    // EnergyCutSettings
-    // --------------------------------------------------------------------- //
+    /**************************************************************************
+    *                               EnergyCuts                                *
+    **************************************************************************/
 
     class_<EnergyCutSettings, boost::shared_ptr<EnergyCutSettings> >("EnergyCutSettings", init<>())
 
@@ -326,43 +423,29 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
         .def("get_cut", &EnergyCutSettings::GetCut, "Return the lower from E*v = e")
     ;
 
-    // --------------------------------------------------------------------- //
-    // DecayChannel
-    // --------------------------------------------------------------------- //
+    /**************************************************************************
+    *                              DecayChannel                               *
+    **************************************************************************/
 
     class_<DecayChannel, boost::shared_ptr<DecayChannel>, boost::noncopyable >("DecayChannel", no_init)
 
-        // .def(self_ns::str(self_ns::self))
         .def("decay", &DecayChannel::Decay, "Decay the given paritcle")
-        // .def("Clone", make_function(&DecayChannel::clone, return_value_policy<manage_new_object>()), "Decay the given paritcle")
     ;
 
-    class_<LeptonicDecayChannel, boost::shared_ptr<LeptonicDecayChannel>, bases<DecayChannel> >("LeptonicDecayChannel", init<>())
+    class_<LeptonicDecayChannel, boost::shared_ptr<LeptonicDecayChannel>, bases<DecayChannel> >("LeptonicDecayChannel", init<>());
 
-        // .def(init<const LeptonicDecayChannel&>())
-    ;
+    class_<TwoBodyPhaseSpace, boost::shared_ptr<TwoBodyPhaseSpace>, bases<DecayChannel> >("TwoBodyPhaseSpace", init<double, double>());
 
-    class_<TwoBodyPhaseSpace, boost::shared_ptr<TwoBodyPhaseSpace>, bases<DecayChannel> >("TwoBodyPhaseSpace", init<double, double>())
+    class_<StableChannel, boost::shared_ptr<StableChannel>, bases<DecayChannel> >("StableChannel", init<>());
 
-        // .def(init<const TwoBodyPhaseSpace&>())
-    ;
-
-    class_<StableChannel, boost::shared_ptr<StableChannel>, bases<DecayChannel> >("StableChannel", init<>())
-
-        // .def(init<const StableChannel&>())
-    ;
-
-    // --------------------------------------------------------------------- //
-    // DecayTable
-    // --------------------------------------------------------------------- //
+    /**************************************************************************
+    *                               DecayTable                                *
+    **************************************************************************/
 
     enum_<DecayTable::Mode>("DecayMode")
         .value("LeptonicDecay", DecayTable::LeptonicDecay)
         .value("TwoBodyDecay", DecayTable::TwoBodyDecay)
         .value("Stable", DecayTable::Stable);
-
-    // void (DecayTable::*addChannelFactory)(double, DecayTable::Mode, double, const std::vector<double>&) = &DecayTable::addChannel;
-    // void (DecayTable::*addChannel)(double, DecayChannel&);
 
     class_<DecayTable, boost::shared_ptr<DecayTable> >("DecayTable", init<>())
 
@@ -370,17 +453,14 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
 
         // .def(self_ns::str(self_ns::self))
 
-        // .def("add_channel_factory", addChannelFactory, "Add an decay channel")
-        // .def("add_channel", addChannel, "Add an decay channel")
         .def("add_channel", &DecayTable::addChannel, "Add an decay channel")
         .def("select_channel", make_function(&DecayTable::SelectChannel, return_internal_reference<>()), "Select an decay channel according to given branching ratios")
         .def("set_stable", &DecayTable::SetStable, "Define decay table for stable particles")
     ;
 
-    // --------------------------------------------------------------------- //
-    // ParticleDef
-    // --------------------------------------------------------------------- //
-
+    /**************************************************************************
+    *                              ParticleDef                                *
+    **************************************************************************/
 
     class_<ParticleDef, boost::shared_ptr<ParticleDef> >("ParticleDef", init<>())
 
@@ -436,9 +516,10 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
     PARTICLE_DEF(Gamma)
     PARTICLE_DEF(StableMassiveParticle)
 
-    // --------------------------------------------------------------------- //
-    // DynamicData
-    // --------------------------------------------------------------------- //
+    /**************************************************************************
+    *                              Dynamic Data                               *
+    **************************************************************************/
+
 
     enum_<DynamicData::Type>("Data")
         .value("None", DynamicData::None)
@@ -466,9 +547,9 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
         .add_property("propagated_distance", &DynamicData::GetPropagatedDistance, &DynamicData::SetPropagatedDistance)
     ;
 
-    // --------------------------------------------------------------------- //
-    // PROPOSALParticle
-    // --------------------------------------------------------------------- //
+    /**************************************************************************
+    *                                Particle                                 *
+    **************************************************************************/
 
     class_<PROPOSALParticle, boost::shared_ptr<PROPOSALParticle>, bases<DynamicData> >("Particle", init<>())
 
@@ -480,6 +561,46 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
         .add_property("momentum", &PROPOSALParticle::GetMomentum, &PROPOSALParticle::SetMomentum)
         .add_property("particle_def", make_function(&PROPOSALParticle::GetParticleDef, return_value_policy<reference_existing_object>()))
     ;
+
+    /**************************************************************************
+    *                               Components                               *
+    **************************************************************************/
+
+    // class_<Components::Component, boost::shared_ptr<Components::Component>, boost::noncopyable >("Component", no_init)
+    //
+    //     .def(self_ns::str(self_ns::self))
+    //
+    //     .add_property("name", &Components::Component::GetName)
+    //     .add_property("nuclear_charge", &Components::Component::GetNucCharge)
+    //     .add_property("atomic_number", &Components::Component::GetAtomicNum)
+    //     .add_property("atoms_in_molecule", &Components::Component::GetAtomInMolecule)
+    //     .add_property("log_constant", &Components::Component::GetLogConstant)
+    //     .add_property("bprime", &Components::Component::GetBPrime)
+    //     .add_property("average_nucleon_weight", &Components::Component::GetAverageNucleonWeight)
+    //     .add_property("mn", &Components::Component::GetMN)
+    //     .add_property("r0", &Components::Component::GetR0);
+    //
+    // // class_<Components::Hydrogen, boost::shared_ptr<Components::Hydrogen>, bases<Components::Component> >( "Hydrogen", init<double>());
+    // COMPONENT_DEF(Hydrogen)
+    // COMPONENT_DEF(Carbon)
+    // COMPONENT_DEF(Nitrogen)
+    // COMPONENT_DEF(Oxygen)
+    // COMPONENT_DEF(Sodium)
+    // COMPONENT_DEF(Magnesium)
+    // COMPONENT_DEF(Sulfur)
+    // COMPONENT_DEF(Argon)
+    // COMPONENT_DEF(Potassium)
+    // COMPONENT_DEF(Calcium)
+    // COMPONENT_DEF(Iron)
+    // COMPONENT_DEF(Copper)
+    // COMPONENT_DEF(Lead)
+    // COMPONENT_DEF(Uranium)
+    // COMPONENT_DEF(StandardRock)
+    // COMPONENT_DEF(FrejusRock)
+
+    /**************************************************************************
+    *                                 Medium                                 *
+    **************************************************************************/
 
     // --------------------------------------------------------------------- //
     // Medium Definition
@@ -506,6 +627,10 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
         .def_readwrite("type", &MediumFactory::Definition::type)
         .def_readwrite("density_correction", &MediumFactory::Definition::density_correction)
     ;
+
+    /**************************************************************************
+    *                                Geometry                                 *
+    **************************************************************************/
 
     // --------------------------------------------------------------------- //
     // Geometry Definition
@@ -696,22 +821,6 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
         .def_readwrite("crosssection_defs", &SectorFactory::Definition::utility_def)
     ;
 
-    // {
-    //     // Change the current scope
-    //     scope outer = class_<foo>("foo");
-    //
-    //     // Define a class Y in the current scope, X
-    //     class_<foo::bar>("bar")
-    //         .def_readwrite("a", &foo::bar::a);
-    // }
-
-    // class_<foo::bar, boost::shared_ptr<foo::bar> >("foobar", init<>())
-    //
-    //     // .def(self_ns::str(self_ns::self))
-    //
-    //     .def_readwrite("a", &foo::bar::a)
-    // ;
-
     // --------------------------------------------------------------------- //
     // Interpolation Definition
     // --------------------------------------------------------------------- //
@@ -748,6 +857,42 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
         .def("propagate", &Propagator::Propagate, (arg("max_distance_cm") = 1e20))
         .add_property("particle", make_function(&Propagator::GetParticle, return_internal_reference<>()), "Get the internal created particle to modify its properties");
 
+    /**************************************************************************
+    *                       Bind all Parametrizations                         *
+    **************************************************************************/
+
+    class_<Parametrization::IntegralLimits, boost::shared_ptr<Parametrization::IntegralLimits> >("IntegralLimits")
+
+        .def_readwrite("v_max", &Parametrization::IntegralLimits::vMax)
+        .def_readwrite("v_up", &Parametrization::IntegralLimits::vUp)
+        .def_readwrite("v_min", &Parametrization::IntegralLimits::vMin);
+
+    class_<Parametrization, boost::shared_ptr<Parametrization>, boost::noncopyable>("Parametrization", no_init)
+
+        .def(self_ns::str(self_ns::self))
+
+        .def("differntial_crosssection", &Parametrization::DifferentialCrossSection)
+        .def("dEdx_integrand", &Parametrization::FunctionToDEdxIntegral)
+        .def("dE2dx_integrand", &Parametrization::FunctionToDE2dxIntegral)
+        .def("dNdx_integrand", &Parametrization::FunctionToDNdxIntegral)
+
+        .add_property("integral_limits", &Parametrization::GetIntegralLimits)
+        .add_property("name", make_function(&Parametrization::GetName, return_internal_reference<>()))
+        .add_property("particle_def", make_function(&Parametrization::GetParticleDef, return_internal_reference<>()))
+        .add_property("medium", make_function(&Parametrization::GetMedium, return_internal_reference<>()))
+        .add_property("energy_cuts", make_function(&Parametrization::GetEnergyCuts, return_internal_reference<>()))
+        // .add_property("medium", &Parametrization::GetMedium)
+        // .add_property("energy_cuts", &Parametrization::GetEnergyCuts)
+        .add_property("multiplier", &Parametrization::GetMultiplier)
+        .add_property("hash", &Parametrization::GetHash);
+
+    class_<Bremsstrahlung, boost::shared_ptr<Bremsstrahlung>, bases<Parametrization>, boost::noncopyable>("Bremsstrahlung", no_init);
+    class_<BremsKelnerKokoulinPetrukhin, boost::shared_ptr<BremsKelnerKokoulinPetrukhin>, bases<Bremsstrahlung> >(
+        "BremsKelnerKokoulinPetrukhin",
+        init<const ParticleDef&, const Medium&, const EnergyCutSettings&, double, bool>());
+
+
+
     // --------------------------------------------------------------------- //
     // HardBBTable
     // --------------------------------------------------------------------- //
@@ -758,3 +903,5 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
 }
 
 #undef PARTICLE_DEF
+#undef COMPONENT_DEF
+#undef MEDIUM_DEF

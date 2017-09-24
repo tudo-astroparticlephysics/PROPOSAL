@@ -18,6 +18,8 @@ class Parametrization
 
         virtual Parametrization* clone() const = 0;
 
+        friend std::ostream& operator<<(std::ostream&, Parametrization const&);
+
         //bounds of integration
         struct IntegralLimits
         {
@@ -60,6 +62,8 @@ class Parametrization
 
     protected:
         typedef std::vector<Components::Component*> ComponentVec;
+
+        virtual void print(std::ostream&) const {};
 
         // const std::string name_;
 
