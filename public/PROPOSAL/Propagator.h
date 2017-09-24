@@ -183,7 +183,7 @@ class Propagator
         }
         catch(std::exception& ex)
         {
-            log_fatal("%s! Use default: %i", ex.what(), var);
+            log_warn("%s! Use default: %i", ex.what(), var);
         }
     }
 
