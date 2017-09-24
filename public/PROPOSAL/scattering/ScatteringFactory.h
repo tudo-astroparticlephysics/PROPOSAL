@@ -4,7 +4,7 @@
 // #include <boost/function.hpp>
 
 #include <vector>
-// #include <map>
+#include <map>
 #include <string>
 
 #include "PROPOSAL/scattering/Scattering.h"
@@ -37,7 +37,7 @@ class ScatteringFactory
     // typedef std::map<std::string, std::pair<RegisterFunctionUtility, RegisterFunctionUtilityInterpolant> > ScatteringMapUtiltiyString;
     // typedef std::map<Enum, std::pair<RegisterFunctionUtility, RegisterFunctionUtilityInterpolant> > ScatteringMapUtiltiyEnum;
     //
-    // typedef std::map<std::string, Enum> MapStringToEnum;
+    typedef std::map<std::string, Enum> MapStringToEnum;
 
     // Scattering* CreateScattering(const std::string&, PROPOSALParticle&, Utility&);
 
@@ -65,6 +65,7 @@ class ScatteringFactory
 
     std::vector<Enum> registerd_enum;
     std::vector<std::string> registerd_str;
+    MapStringToEnum map_string_to_enum;
     // void Register(const std::string& name, Enum, RegisterFunction);
     // void RegisterUtility(const std::string& name, Enum, std::pair<RegisterFunctionUtility, RegisterFunctionUtilityInterpolant> RegisterFunctionUtility);
 
@@ -75,7 +76,6 @@ class ScatteringFactory
     // ScatteringMapUtiltiyString scattering_map_utility_str_;
     // ScatteringMapUtiltiyEnum scattering_map_utility_enum_;
     //
-    // MapStringToEnum map_string_to_enum;
 };
 
 } /*  PROPOSAL */
