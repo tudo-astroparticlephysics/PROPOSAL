@@ -38,6 +38,21 @@ Parametrization::~Parametrization()
     delete medium_;
 }
 
+std::ostream& PROPOSAL::operator<<(std::ostream& os, Parametrization const& param)
+{
+    os << "---------------------------Parametrization( "<<&param<<" )---------------------------"<<std::endl;
+
+    param.print(os);
+
+    os << "multiplier: " << param.multiplier_ << '\n';
+    os << "current component index: " << param.component_index_ << '\n';
+    os << param.particle_def_ << '\n';
+    os << param.medium_ << '\n';
+    os << param.cut_settings_ << '\n';
+    os<<"-----------------------------------------------------------------------------------------------";
+    return os;
+}
+
 // ------------------------------------------------------------------------- //
 // Public methods
 // ------------------------------------------------------------------------- //
