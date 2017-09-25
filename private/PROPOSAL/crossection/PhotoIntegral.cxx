@@ -40,5 +40,5 @@ double PhotoIntegral::CalculatedEdx(double energy)
         sum +=  dedx_integral_.Integrate(limits.vMin, limits.vUp, boost::bind(&Parametrization::FunctionToDEdxIntegral, parametrization_, energy, _1),4);
     }
 
-    return parametrization_->GetMultiplier()*energy*sum;
+    return energy * sum;
 }

@@ -58,7 +58,7 @@ double Ionization::DifferentialCrossSection(double energy, double v)
     result = 1 - aux * (v / limits.vMax) + aux2;
     result *= IONK * particle_def_.charge * particle_def_.charge * medium_->GetZA() / (2 * aux * energy * v * v);
 
-    return medium_->GetMassDensity() * result;
+    return multiplier_ * medium_->GetMassDensity() * result;
 }
 
 // ------------------------------------------------------------------------- //
@@ -70,7 +70,7 @@ double Ionization::FunctionToDEdxIntegral(double energy, double variable)
 //----------------------------------------------------------------------------//
 double Ionization::FunctionToDNdxIntegral(double energy, double variable)
 {
-    return multiplier_ * DifferentialCrossSection(energy, variable) * (1 + InelCorrection(energy, variable));
+    return DifferentialCrossSection(energy, variable) * (1 + InelCorrection(energy, variable));
 }
 
 // ------------------------------------------------------------------------- //
