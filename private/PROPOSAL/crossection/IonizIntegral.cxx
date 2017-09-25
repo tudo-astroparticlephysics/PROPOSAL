@@ -61,8 +61,8 @@ double IonizIntegral::CalculatedEdx(double energy)
     {
         result=0;
     }
-    return parametrization_->GetMultiplier() *(medium.GetMassDensity()*result
-                        + energy*(dedx_integral_.Integrate(limits.vMin, limits.vUp, boost::bind(&Parametrization::FunctionToDEdxIntegral, parametrization_, energy, _1),4)));
+    return parametrization_->GetMultiplier() * medium.GetMassDensity() * result
+        + energy * dedx_integral_.Integrate(limits.vMin, limits.vUp, boost::bind(&Parametrization::FunctionToDEdxIntegral, parametrization_, energy, _1),4);
 }
 
 // ------------------------------------------------------------------------- //
