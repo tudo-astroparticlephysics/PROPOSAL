@@ -100,6 +100,10 @@ double SoftBB::CalculateHardBB(double energy, double v)
 ******************************************************************************/
 
 // ------------------------------------------------------------------------- //
+// Dutta, Reno, SArcevic, Seckel
+// Phys Rev D 63 (2001), 094020
+// eq. 3.10
+// ------------------------------------------------------------------------- //
 double ShadowDutta::CalculateShadowEffect(const Components::Component& component, double x, double nu)
 {
     (void) nu;
@@ -107,22 +111,18 @@ double ShadowDutta::CalculateShadowEffect(const Components::Component& component
     if (component.GetNucCharge() == 1)
         return 1;
 
-    double G;
-
-    if(x<0.0014)
+    if(x < 0.0014)
     {
-        G   =   pow(component.GetAtomicNum(), -0.1);
+        return pow(component.GetAtomicNum(), -0.1);
     }
-    else if(x<0.04)
+    else if(x < 0.04)
     {
-        G   =   pow(component.GetAtomicNum(), 0.069*log(x)/LOG10+0.097);
+        return pow(component.GetAtomicNum(), 0.069 * log(x) / LOG10 + 0.097);
     }
     else
     {
-        G   =   1;
+        return 1;
     }
-
-    return G;
 }
 
 // ------------------------------------------------------------------------- //
@@ -134,6 +134,8 @@ size_t ShadowDutta::GetHash() const
     return seed;
 }
 
+// Butkevich, Mikheyev
+// JETP 95 (2002), 11
 // ------------------------------------------------------------------------- //
 double ShadowButkevichMikhailov::CalculateShadowEffect(const Components::Component& component, double x, double nu)
 {
@@ -141,45 +143,47 @@ double ShadowButkevichMikhailov::CalculateShadowEffect(const Components::Compone
 
     double G;
 
-    if(x>0.3)
+    if(x > 0.3)
     {
-        const double Mb =   0.437;
-        const double la =   0.5;
-        const double x2 =   0.278;
+        const double Mb = 0.437;
+        const double la = 0.5;
+        const double x2 = 0.278;
 
-        double mb, Aosc, mu, au, ac;
-
-        mb      =   Mb*component.GetMN();
-        au      =   1/(1 - x);
-        ac      =   1/(1 - x2);
-        mu      =   MPI/component.GetAverageNucleonWeight();
-        Aosc    =   (1 - la*x)*((au - ac)-mu*(au*au - ac*ac));
-        G       =   1 - mb*Aosc;
+        double au = 1 / (1 - x);
+        double ac = 1 / (1 - x2);
+        // eq. 48
+        double Aosc = (1 - la*x) * (au - ac
+                - MPI / component.GetAverageNucleonWeight() * (au * au - ac * ac));
+        // eq. 44
+        G    = 1 - Mb * component.GetMN() * Aosc;
     }
     else
     {
-        const double M1 =   0.129;
-        const double M2 =   0.456;
-        const double M3 =   0.553;
+        const double M1 = 0.129;
+        const double M2 = 0.456;
+        const double M3 = 0.553;
 
         double m1, m2, m3, x0, sgn, tmp;
 
-        m1  =   M1*component.GetMN();
-        m2  =   M2*component.GetMN();
-        m3  =   M3*component.GetMN();
-        nu  *=  1.e-3;
-        sgn =   112.2*(0.609*pow(nu, 0.0988) + 1.037*pow(nu, -0.5944));
+        m1 = M1 * component.GetMN();
+        m2 = M2 * component.GetMN();
+        m3 = M3 * component.GetMN();
+        nu *= 1.e-3;
+        // eq. 53
+        sgn = 112.2 * (0.609 * pow(nu, 0.0988) + 1.037 * pow(nu, -0.5944));
 
         // Bezrukav Bugaev shadow
-        tmp =   0.00282*pow(component.GetAtomicNum(), 1./3)*sgn;
-        G   =   (3/tmp)*(0.5 + ((1 + tmp)*exp(-tmp) - 1)/(tmp*tmp));
+        tmp = 0.00282*pow(component.GetAtomicNum(), 1. / 3) * sgn;
+        G   = (3 /tmp) * (0.5 + ((1 + tmp) * exp(-tmp) - 1) / (tmp * tmp));
 
-        G   =   0.75*G + 0.25;
-        x0  =   pow(G/(1+m2), 1/m1);
+        // eq. 55
+        G   = 0.75 * G + 0.25;
+        x0  = pow(G / (1 + m2), 1 / m1);
 
         if(x>=x0)
         {
-            G   =   pow(x, m1)*(1+m2)*(1-m3*x);
+            // eq. 49
+            G = pow(x, m1) * (1 + m2) * (1 - m3 * x);
         }
     }
 
@@ -232,30 +236,33 @@ Parametrization::IntegralLimits Photonuclear::GetIntegralLimits(double energy)
 
     IntegralLimits limits;
 
-    limits.vMin    =   (MPI + (MPI*MPI)/(2*components_[component_index_]->GetAverageNucleonWeight()))/energy;
+    limits.vMin = (MPI + MPI * MPI / (2 * components_[component_index_]->GetAverageNucleonWeight())) / energy;
 
     if(particle_def_.mass < MPI)
     {
-        aux     =   particle_def_.mass/components_[component_index_]->GetAverageNucleonWeight();
-        limits.vMax    =   1 - components_[component_index_]->GetAverageNucleonWeight()*(1 + aux*aux)/(2*energy);
+        aux = particle_def_.mass/components_[component_index_]->GetAverageNucleonWeight();
+        limits.vMax = 1 - components_[component_index_]->GetAverageNucleonWeight() * (1 + aux * aux) / (2 * energy);
     }
     else
     {
-        limits.vMax    =   1;
+        limits.vMax = 1;
     }
 
-    limits.vMax    =   std::min(limits.vMax, 1-particle_def_.mass/energy);
+    // vMax calculated above is always smaller than 1-m/E
+    // in comparison, the following inequality arise
+    // (M-m)^2 >= 0
+    // limits.vMax = std::min(limits.vMax, 1 - particle_def_.mass/energy);
 
     if(limits.vMax < limits.vMin)
     {
-        limits.vMax    =   limits.vMin;
+        limits.vMax = limits.vMin;
     }
 
-    limits.vUp     =   std::min(limits.vMax, cut_settings_.GetCut(energy));
+    limits.vUp = std::min(limits.vMax, cut_settings_.GetCut(energy));
 
     if(limits.vUp < limits.vMin)
     {
-        limits.vUp =   limits.vMin;
+        limits.vUp = limits.vMin;
     }
 
     return limits;
