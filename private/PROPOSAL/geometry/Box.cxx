@@ -17,7 +17,7 @@ Box::Box()
     // Do nothing here
 }
 
-Box::Box(Vector3D position, double x, double y, double z)
+Box::Box(const Vector3D position, double x, double y, double z)
     : Geometry("Box", position)
     , x_(100.0 * x)
     , y_(100.0 * y)
@@ -95,7 +95,7 @@ void Box::print(std::ostream& os) const
 }
 
 // ------------------------------------------------------------------------- //
-pair<double, double> Box::DistanceToBorder(Vector3D& position, Vector3D& direction)
+pair<double, double> Box::DistanceToBorder(const Vector3D& position, const Vector3D& direction)
 {
     // Calculate intersection of particle trajectory and the box
     // Surface of the box is defined by six planes:

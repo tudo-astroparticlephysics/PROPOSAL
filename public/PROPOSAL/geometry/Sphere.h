@@ -11,7 +11,7 @@ class Sphere: public Geometry
     public:
 
         Sphere();
-        Sphere(Vector3D position, double radius, double inner_radius);
+        Sphere(const Vector3D position, double radius, double inner_radius);
         Sphere(const Sphere&);
 
         Geometry* clone() const { return new Sphere(*this); };
@@ -24,7 +24,7 @@ class Sphere: public Geometry
         Sphere& operator=(const Geometry&);
 
         // Methods
-        std::pair<double,double> DistanceToBorder(Vector3D& position, Vector3D& direction);
+        std::pair<double,double> DistanceToBorder(const Vector3D& position, const Vector3D& direction);
 
         // Getter & Setter
         double GetInnerRadius() const { return inner_radius_; }
