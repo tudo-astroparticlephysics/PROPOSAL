@@ -28,9 +28,9 @@ class RealPhoton
 class SoftBB: public RealPhoton
 {
     public:
-        SoftBB() {}
-        SoftBB(const SoftBB&) {}
-        virtual ~SoftBB() {}
+        SoftBB();
+        SoftBB(const SoftBB& bb);
+        virtual ~SoftBB();
 
         RealPhoton* clone() const { return new SoftBB(*this); }
 

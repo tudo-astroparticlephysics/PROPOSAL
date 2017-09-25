@@ -2,12 +2,12 @@
 #include <boost/bind.hpp>
 
 #include "PROPOSAL/crossection/EpairIntegral.h"
-#include "PROPOSAL/crossection/parametrization/Parametrization.h"
+#include "PROPOSAL/crossection/parametrization/EpairProduction.h"
 #include "PROPOSAL/Constants.h"
 
 using namespace PROPOSAL;
 
-EpairIntegral::EpairIntegral(const Parametrization& param): CrossSectionIntegral(DynamicData::Epair, param)
+EpairIntegral::EpairIntegral(const EpairProduction& param): CrossSectionIntegral(DynamicData::Epair, param)
 {
 }
 

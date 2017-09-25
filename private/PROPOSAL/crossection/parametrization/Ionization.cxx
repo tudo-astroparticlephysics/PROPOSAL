@@ -47,7 +47,7 @@ Ionization::~Ionization()
 // ------------------------------------------------------------------------- //
 double Ionization::DifferentialCrossSection(double energy, double v)
 {
-    double result, aux;
+    double result;
 
     IntegralLimits limits = GetIntegralLimits(energy);
 
@@ -97,7 +97,7 @@ Parametrization::IntegralLimits Ionization::GetIntegralLimits(double energy)
     // eq. 33.4
     // v_{max} = \frac{1}{E} \frac{2 m_e \beta^2 \gamma^2}
     //          {1 + 2 \gamma \frac{m_e}{m_{particle} + (\frac{m_e}{m_{particle})^2 }
-    limits.vMax = 2 * ME * (gamma * gamma - 1) 
+    limits.vMax = 2 * ME * (gamma * gamma - 1)
                 / ((1 + 2 * gamma * mass_ration + mass_ration * mass_ration) * energy);
     limits.vMax = std::min(limits.vMax, 1. - particle_def_.mass / energy);
 
@@ -117,7 +117,7 @@ Parametrization::IntegralLimits Ionization::GetIntegralLimits(double energy)
 }
 
 // ------------------------------------------------------------------------- //
-// Bremststrahlung when scattering at atomic electrons 
+// Bremststrahlung when scattering at atomic electrons
 // and the atomic electrons emit the Bremsstrahlung photon
 // because of the v^{-2} dependency, it is treated together with Ionization
 // Kelner Kokoulin Petrukhin
@@ -125,7 +125,7 @@ Parametrization::IntegralLimits Ionization::GetIntegralLimits(double energy)
 // eq. 30
 // \Delta \frac{d \sigma}{d v} = \frac{d \sigma}{d v}_{I_0}
 //     \frac{\alpha}{2 \pi} \cdot
-//        (\log(1 + \frac{2vE}{m_e}) 
+//        (\log(1 + \frac{2vE}{m_e})
 //        (2 \log(\frac{1 - \frac{v}{v_{max}}}{1 - v}))
 //        \log(\frac{2 \gamma (1 - v) m_e}{m_{particle}v})
 // ------------------------------------------------------------------------- //

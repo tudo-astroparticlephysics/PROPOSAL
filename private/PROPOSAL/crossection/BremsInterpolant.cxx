@@ -3,7 +3,7 @@
 
 #include "PROPOSAL/crossection/BremsInterpolant.h"
 #include "PROPOSAL/crossection/BremsIntegral.h"
-#include "PROPOSAL/crossection/parametrization/Parametrization.h"
+#include "PROPOSAL/crossection/parametrization/Bremsstrahlung.h"
 
 #include "PROPOSAL/math/InterpolantBuilder.h"
 
@@ -13,7 +13,7 @@
 
 using namespace PROPOSAL;
 
-BremsInterpolant::BremsInterpolant(const Parametrization& param, InterpolationDef def): CrossSectionInterpolant(DynamicData::Brems, param, def)
+BremsInterpolant::BremsInterpolant(const Bremsstrahlung& param, InterpolationDef def): CrossSectionInterpolant(DynamicData::Brems, param, def)
 {
     // Use parent CrossSecition dNdx interpolation
     InitdNdxInerpolation(def);

@@ -4,14 +4,14 @@
 #include <cmath>
 
 #include "PROPOSAL/crossection/IonizIntegral.h"
-#include "PROPOSAL/crossection/parametrization/Parametrization.h"
+#include "PROPOSAL/crossection/parametrization/Ionization.h"
 
 #include "PROPOSAL/Output.h"
 #include "PROPOSAL/Constants.h"
 
 using namespace PROPOSAL;
 
-IonizIntegral::IonizIntegral(const Parametrization& param): CrossSectionIntegral(DynamicData::DeltaE, param)
+IonizIntegral::IonizIntegral(const Ionization& param): CrossSectionIntegral(DynamicData::DeltaE, param)
 {
 }
 

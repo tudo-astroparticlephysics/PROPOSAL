@@ -86,6 +86,19 @@ double HardBB::CalculateHardBB(double energy, double v)
 *                                   SoftBB                                    *
 ******************************************************************************/
 
+SoftBB::SoftBB()
+{
+}
+
+SoftBB::SoftBB(const SoftBB& bb)
+    : RealPhoton(bb)
+{
+}
+
+SoftBB::~SoftBB()
+{
+}
+
 double SoftBB::CalculateHardBB(double energy, double v)
 {
     (void) energy;
