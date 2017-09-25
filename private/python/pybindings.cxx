@@ -23,6 +23,39 @@
 #define MEDIUM_DEF(cls)\
     class_<cls, boost::shared_ptr<cls>, bases<Medium> >( #cls, init<double>());
 
+#define BREMS_DEF(cls)                                                                                                 \
+    class_<Brems##cls, boost::shared_ptr<Brems##cls>, bases<Bremsstrahlung> >(                                         \
+        #cls,                                                                                                          \
+        init<const ParticleDef&, const Medium&, const EnergyCutSettings&, double, bool>(                               \
+            (arg("particle_def"), arg("medium"), arg("energy_cuts"), arg("multiplier"), arg("lpm"))));                  \
+
+#define PHOTO_REAL_DEF(cls, parent)                                                                                    \
+    class_<Photo##cls, boost::shared_ptr<Photo##cls>, bases<Photo##parent> >(                                          \
+        #cls,                                                                                                          \
+        init<const ParticleDef&, const Medium&, const EnergyCutSettings&, const RealPhoton&, double>(                  \
+            (arg("particle_def"), arg("medium"), arg("energy_cuts"), arg("real_photon"), arg("multiplier"))));
+
+#define PHOTO_Q2_DEF(cls)                                                                                              \
+    class_<Photo##cls, boost::shared_ptr<Photo##cls>, bases<PhotoQ2Integral> >(                                        \
+        #cls,                                                                                                          \
+        init<const ParticleDef&, const Medium&, const EnergyCutSettings&, const ShadowEffect&, double>(                \
+            (arg("particle_def"), arg("medium"), arg("energy_cuts"), arg("shadow_effect"), arg("multiplier"))));
+
+#define PHOTO_Q2_INTERPOL_DEF(cls)                                                                                     \
+    class_<PhotoQ2Interpolant<Photo##cls>, boost::shared_ptr<PhotoQ2Interpolant<Photo##cls> >, bases<Photo##cls> >(    \
+        #cls "Interpolant",                                                                                            \
+        init<const ParticleDef&,                                                                                       \
+             const Medium&,                                                                                            \
+             const EnergyCutSettings&,                                                                                 \
+             const ShadowEffect&,                                                                                      \
+             double,                                                                                                   \
+             InterpolationDef>((arg("particle_def"),                                                                   \
+                                arg("medium"),                                                                         \
+                                arg("energy_cuts"),                                                                    \
+                                arg("shadow_effect"),                                                                  \
+                                arg("multiplier"),                                                                     \
+                                arg("interpolation_def"))));
+
 using namespace PROPOSAL;
 
 // #include "PROPOSAL/PROPOSALParticle.h"
@@ -338,6 +371,207 @@ void export_medium()
     MEDIUM_DEF(AntaresWater)
 }
 
+void export_bremsstrahlung()
+{
+    using namespace boost::python;
+    // map the Util namespace to a sub-module
+    // make "from mypackage.Util import <whatever>" work
+    object bremsstrahlungModule(handle<>(borrowed(PyImport_AddModule("pyPROPOSAL.Bremsstrahlung"))));
+    // make "from mypackage import Util" work
+    scope().attr("Bremsstrahlung") = bremsstrahlungModule;
+    // set the current scope to the new sub-module
+    scope bremsstrahlung_scope = bremsstrahlungModule;
+    // export stuff in the Util namespace
+
+    /**************************************************************************
+    *                       Bind all Parametrizations                         *
+    **************************************************************************/
+
+    class_<Bremsstrahlung, boost::shared_ptr<Bremsstrahlung>, bases<Parametrization>, boost::noncopyable>("Bremsstrahlung", no_init);
+
+    BREMS_DEF(KelnerKokoulinPetrukhin)
+    BREMS_DEF(PetrukhinShestakov)
+    BREMS_DEF(CompleteScreening)
+    BREMS_DEF(AndreevBezrukovBugaev)
+}
+
+void export_photo()
+{
+    using namespace boost::python;
+    // map the Util namespace to a sub-module
+    // make "from mypackage.Util import <whatever>" work
+    object photoModule(handle<>(borrowed(PyImport_AddModule("pyPROPOSAL.Photonuclear"))));
+    // make "from mypackage import Util" work
+    scope().attr("Photonuclear") = photoModule;
+    // set the current scope to the new sub-module
+    scope photo_scope = photoModule;
+    // export stuff in the Util namespace
+
+    /**************************************************************************
+    *                       Bind all Parametrizations                         *
+    **************************************************************************/
+
+    // Shadow Effect
+    class_<ShadowEffect, boost::shared_ptr<ShadowEffect>, bases<Parametrization>, boost::noncopyable>("ShadowEffect", no_init)
+        .def("calculate_shadow_effect", &ShadowEffect::CalculateShadowEffect);
+
+    class_<ShadowDutta, boost::shared_ptr<ShadowDutta>, bases<ShadowEffect> >("ShadowDutta", init<>());
+    class_<ShadowButkevichMikhailov, boost::shared_ptr<ShadowButkevichMikhailov>, bases<ShadowEffect> >("ShadowButkevichMikhailov", init<>());
+
+    // Real Photon
+    class_<RealPhoton, boost::shared_ptr<RealPhoton>, boost::noncopyable>("RealPhoton", no_init)
+        .def("calculate_hardbb", &RealPhoton::CalculateHardBB);
+
+    class_<SoftBB, boost::shared_ptr<SoftBB>, bases<RealPhoton> >("SoftBB", init<>());
+    class_<HardBB, boost::shared_ptr<HardBB>, bases<RealPhoton> >("HardBB", init<const ParticleDef&>((arg("particle_def"))));
+
+    // Photnuclear
+    class_<Photonuclear, boost::shared_ptr<Photonuclear>, bases<Parametrization>, boost::noncopyable>("Photonuclear", no_init);
+    class_<PhotoRealPhotonAssumption, boost::shared_ptr<PhotoRealPhotonAssumption>, bases<Photonuclear>, boost::noncopyable>("PhotoRealPhotonAssumption", no_init);
+    class_<PhotoQ2Integral, boost::shared_ptr<PhotoQ2Integral>, bases<Photonuclear>, boost::noncopyable>("PhotoQ2Integral", no_init);
+
+    PHOTO_REAL_DEF(Zeus, RealPhotonAssumption)
+    PHOTO_REAL_DEF(BezrukovBugaev, RealPhotonAssumption)
+    PHOTO_REAL_DEF(Rhode, RealPhotonAssumption)
+    PHOTO_REAL_DEF(Kokoulin, BezrukovBugaev) // Kokoulin derives from BezrukovBugaev
+
+    PHOTO_Q2_DEF(AbramowiczLevinLevyMaor91)
+    PHOTO_Q2_DEF(AbramowiczLevinLevyMaor97)
+    PHOTO_Q2_DEF(ButkevichMikhailov)
+    PHOTO_Q2_DEF(RenoSarcevicSu)
+
+    PHOTO_Q2_INTERPOL_DEF(AbramowiczLevinLevyMaor91)
+    PHOTO_Q2_INTERPOL_DEF(AbramowiczLevinLevyMaor97)
+    PHOTO_Q2_INTERPOL_DEF(ButkevichMikhailov)
+    PHOTO_Q2_INTERPOL_DEF(RenoSarcevicSu)
+}
+
+void export_epair()
+{
+    using namespace boost::python;
+    // map the Util namespace to a sub-module
+    // make "from mypackage.Util import <whatever>" work
+    object epairModule(handle<>(borrowed(PyImport_AddModule("pyPROPOSAL.EpairProduction"))));
+    // make "from mypackage import Util" work
+    scope().attr("EpairProduction") = epairModule;
+    // set the current scope to the new sub-module
+    scope epair_scope = epairModule;
+    // export stuff in the Util namespace
+
+    /**************************************************************************
+    *                       Bind all Parametrizations                         *
+    **************************************************************************/
+
+    class_<EpairProduction, boost::shared_ptr<EpairProduction>, bases<Parametrization>, boost::noncopyable>("EpairProduction", no_init);
+
+    class_<EpairProductionRhoIntegral, boost::shared_ptr<EpairProductionRhoIntegral>, bases<EpairProduction> >(
+        "EpairProductionRhoIntegral",
+        init<const ParticleDef&, const Medium&, const EnergyCutSettings&, double, bool>());
+            // (arg("particle_def"), arg("medium"), arg("energy_cuts"), arg("multiplier"), arg("lpm"))));
+
+    class_<EpairProductionRhoInterpolant, boost::shared_ptr<EpairProductionRhoInterpolant>, bases<EpairProductionRhoIntegral> >(
+        "EpairProductionRhoInterpolant",
+        init<const ParticleDef&, const Medium&, const EnergyCutSettings&, double, bool, InterpolationDef>(
+            (arg("particle_def"), arg("medium"), arg("energy_cuts"), arg("multiplier"), arg("lpm"), arg("interpolation_def"))));
+
+}
+
+void export_parametrizations()
+{
+    using namespace boost::python;
+    // map the Util namespace to a sub-module
+    // make "from mypackage.Util import <whatever>" work
+    object parametrizationModule(handle<>(borrowed(PyImport_AddModule("pyPROPOSAL.Parametrization"))));
+    // make "from mypackage import Util" work
+    scope().attr("Parametrization") = parametrizationModule;
+    // set the current scope to the new sub-module
+    scope parametrization_scope = parametrizationModule;
+    // export stuff in the Util namespace
+
+    /**************************************************************************
+    *                       Bind all Parametrizations                         *
+    **************************************************************************/
+
+    class_<Parametrization::IntegralLimits, boost::shared_ptr<Parametrization::IntegralLimits> >("IntegralLimits")
+
+        .def_readwrite("v_max", &Parametrization::IntegralLimits::vMax)
+        .def_readwrite("v_up", &Parametrization::IntegralLimits::vUp)
+        .def_readwrite("v_min", &Parametrization::IntegralLimits::vMin);
+
+    class_<Parametrization, boost::shared_ptr<Parametrization>, boost::noncopyable>("Parametrization", no_init)
+
+        .def(self_ns::str(self_ns::self))
+
+        .def("differntial_crosssection", &Parametrization::DifferentialCrossSection)
+        .def("dEdx_integrand", &Parametrization::FunctionToDEdxIntegral)
+        .def("dE2dx_integrand", &Parametrization::FunctionToDE2dxIntegral)
+        .def("dNdx_integrand", &Parametrization::FunctionToDNdxIntegral)
+
+        .add_property("name", make_function(&Parametrization::GetName, return_value_policy<copy_const_reference>()))
+        .add_property("integral_limits", &Parametrization::GetIntegralLimits)
+        .add_property("particle_def", make_function(&Parametrization::GetParticleDef, return_internal_reference<>()))
+        .add_property("medium", make_function(&Parametrization::GetMedium, return_internal_reference<>()))
+        .add_property("energy_cuts", make_function(&Parametrization::GetEnergyCuts, return_internal_reference<>()))
+        // .add_property("medium", &Parametrization::GetMedium)
+        // .add_property("energy_cuts", &Parametrization::GetEnergyCuts)
+        .add_property("multiplier", &Parametrization::GetMultiplier)
+        .add_property("hash", &Parametrization::GetHash);
+
+    class_<Ionization, boost::shared_ptr<Ionization>, bases<Parametrization> >(
+        "Ionization",
+        init<const ParticleDef&, const Medium&, const EnergyCutSettings&, double>());
+
+    export_epair();
+    export_bremsstrahlung();
+    export_photo();
+}
+
+void export_crosssections()
+{
+    using namespace boost::python;
+    // map the Util namespace to a sub-module
+    // make "from mypackage.Util import <whatever>" work
+    object crosssectionModule(handle<>(borrowed(PyImport_AddModule("pyPROPOSAL.CrossSection"))));
+    // make "from mypackage import Util" work
+    scope().attr("Crosssection") = crosssectionModule;
+    // set the current scope to the new sub-module
+    scope crosssection_scope = crosssectionModule;
+    // export stuff in the Util namespace
+
+
+    /**************************************************************************
+    *                        Bind all cross sections                          *
+    **************************************************************************/
+
+    double (CrossSection::*dndx)(double) = &CrossSection::CalculatedNdx;
+    double (CrossSection::*stochastic)(double, double, double) = &CrossSection::CalculateStochasticLoss;
+
+    class_<CrossSection, boost::shared_ptr<CrossSection>, boost::noncopyable>("CrossSection", no_init)
+
+        // .def(self_ns::str(self_ns::self))
+
+        .def("calculate_dEdx", &CrossSection::CalculatedEdx)
+        .def("calculate_dE2dx", &CrossSection::CalculatedE2dx)
+        .def("calculate_dNdx", dndx)
+        .def("calculate_stochastic_loss", stochastic)
+
+        .add_property("id", &CrossSection::GetTypeId)
+        .add_property("parametrization", make_function(&CrossSection::GetParametrization, return_internal_reference<>()));
+
+    class_<CrossSectionIntegral, boost::shared_ptr<CrossSectionIntegral>, bases<CrossSection>, boost::noncopyable>("CrossSectionIntegral", no_init);
+    class_<CrossSectionInterpolant, boost::shared_ptr<CrossSectionInterpolant>, bases<CrossSection>, boost::noncopyable>("CrossSectionInterpolant", no_init);
+
+    class_<BremsIntegral, boost::shared_ptr<BremsIntegral>, bases<CrossSectionIntegral> >("BremsIntegral", init<const Parametrization&>((arg("parametrization"))));
+    class_<EpairIntegral, boost::shared_ptr<EpairIntegral>, bases<CrossSectionIntegral> >("EpairIntegral", init<const Parametrization&>((arg("parametrization"))));
+    class_<PhotoIntegral, boost::shared_ptr<PhotoIntegral>, bases<CrossSectionIntegral> >("PhotoIntegral", init<const Parametrization&>((arg("parametrization"))));
+    class_<IonizIntegral, boost::shared_ptr<IonizIntegral>, bases<CrossSectionIntegral> >("IonizIntegral", init<const Parametrization&>((arg("parametrization"))));
+
+    class_<BremsInterpolant, boost::shared_ptr<BremsInterpolant>, bases<CrossSectionInterpolant> >("BremsInterpolant", init<const Parametrization&, InterpolationDef>((arg("parametrization"), arg("interpolation_def"))));
+    class_<EpairInterpolant, boost::shared_ptr<EpairInterpolant>, bases<CrossSectionInterpolant> >("EpairInterpolant", init<const Parametrization&, InterpolationDef>((arg("parametrization"), arg("interpolation_def"))));
+    class_<PhotoInterpolant, boost::shared_ptr<PhotoInterpolant>, bases<CrossSectionInterpolant> >("PhotoInterpolant", init<const Parametrization&, InterpolationDef>((arg("parametrization"), arg("interpolation_def"))));
+    class_<IonizInterpolant, boost::shared_ptr<IonizInterpolant>, bases<CrossSectionInterpolant> >("IonizInterpolant", init<const Parametrization&, InterpolationDef>((arg("parametrization"), arg("interpolation_def"))));
+}
+
 class PythonHardBBTables {};
 
 BOOST_PYTHON_MODULE(pyPROPOSAL)
@@ -348,6 +582,8 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
 
     export_components();
     export_medium();
+    export_parametrizations();
+    export_crosssections();
 
     docstring_options doc_options(true, true, false);
 
@@ -857,42 +1093,6 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
         .def("propagate", &Propagator::Propagate, (arg("max_distance_cm") = 1e20))
         .add_property("particle", make_function(&Propagator::GetParticle, return_internal_reference<>()), "Get the internal created particle to modify its properties");
 
-    /**************************************************************************
-    *                       Bind all Parametrizations                         *
-    **************************************************************************/
-
-    class_<Parametrization::IntegralLimits, boost::shared_ptr<Parametrization::IntegralLimits> >("IntegralLimits")
-
-        .def_readwrite("v_max", &Parametrization::IntegralLimits::vMax)
-        .def_readwrite("v_up", &Parametrization::IntegralLimits::vUp)
-        .def_readwrite("v_min", &Parametrization::IntegralLimits::vMin);
-
-    class_<Parametrization, boost::shared_ptr<Parametrization>, boost::noncopyable>("Parametrization", no_init)
-
-        .def(self_ns::str(self_ns::self))
-
-        .def("differntial_crosssection", &Parametrization::DifferentialCrossSection)
-        .def("dEdx_integrand", &Parametrization::FunctionToDEdxIntegral)
-        .def("dE2dx_integrand", &Parametrization::FunctionToDE2dxIntegral)
-        .def("dNdx_integrand", &Parametrization::FunctionToDNdxIntegral)
-
-        .add_property("integral_limits", &Parametrization::GetIntegralLimits)
-        .add_property("name", make_function(&Parametrization::GetName, return_internal_reference<>()))
-        .add_property("particle_def", make_function(&Parametrization::GetParticleDef, return_internal_reference<>()))
-        .add_property("medium", make_function(&Parametrization::GetMedium, return_internal_reference<>()))
-        .add_property("energy_cuts", make_function(&Parametrization::GetEnergyCuts, return_internal_reference<>()))
-        // .add_property("medium", &Parametrization::GetMedium)
-        // .add_property("energy_cuts", &Parametrization::GetEnergyCuts)
-        .add_property("multiplier", &Parametrization::GetMultiplier)
-        .add_property("hash", &Parametrization::GetHash);
-
-    class_<Bremsstrahlung, boost::shared_ptr<Bremsstrahlung>, bases<Parametrization>, boost::noncopyable>("Bremsstrahlung", no_init);
-    class_<BremsKelnerKokoulinPetrukhin, boost::shared_ptr<BremsKelnerKokoulinPetrukhin>, bases<Bremsstrahlung> >(
-        "BremsKelnerKokoulinPetrukhin",
-        init<const ParticleDef&, const Medium&, const EnergyCutSettings&, double, bool>());
-
-
-
     // --------------------------------------------------------------------- //
     // HardBBTable
     // --------------------------------------------------------------------- //
@@ -905,3 +1105,7 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
 #undef PARTICLE_DEF
 #undef COMPONENT_DEF
 #undef MEDIUM_DEF
+#undef BREMS_DEF
+#undef PHOTO_REAL_DEF
+#undef PHOTO_Q2_DEF
+#undef PHOTO_Q2_INTERPOL_DEF
