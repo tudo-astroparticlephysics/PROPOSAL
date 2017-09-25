@@ -25,15 +25,6 @@
                                                                                                                        \
     Photo##param::~Photo##param() {}                                                                                   \
                                                                                                                        \
-    Parametrization* Photo##param::create(const ParticleDef& particle_def,                                             \
-                                          const Medium& medium,                                                        \
-                                          const EnergyCutSettings& cuts,                                               \
-                                          const RealPhoton& hardBB,                                                    \
-                                          double multiplier)                                                           \
-    {                                                                                                                  \
-        return new Photo##param(particle_def, medium, cuts, hardBB, multiplier);                                       \
-    }                                                                                                                  \
-                                                                                                                       \
     const std::string Photo##param::name_ = "Photo" #param;
 
 using namespace PROPOSAL;
@@ -255,7 +246,7 @@ PhotoRhode::~PhotoRhode()
 }
 
 
-Parametrization* PhotoRhode::create(const ParticleDef& particle_def,
+Photonuclear* PhotoRhode::create(const ParticleDef& particle_def,
                         const Medium& medium,
                         const EnergyCutSettings& cuts,
                         const RealPhoton& hardBB,

@@ -2,11 +2,11 @@
 #include <boost/bind.hpp>
 
 #include "PROPOSAL/crossection/BremsIntegral.h"
-#include "PROPOSAL/crossection/parametrization/Parametrization.h"
+#include "PROPOSAL/crossection/parametrization/Bremsstrahlung.h"
 
 using namespace PROPOSAL;
 
-BremsIntegral::BremsIntegral(const Parametrization& param): CrossSectionIntegral(DynamicData::Brems, param)
+BremsIntegral::BremsIntegral(const Bremsstrahlung& param): CrossSectionIntegral(DynamicData::Brems, param)
 {
 }
 

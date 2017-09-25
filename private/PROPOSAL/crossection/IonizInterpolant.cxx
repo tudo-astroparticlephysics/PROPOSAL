@@ -5,7 +5,7 @@
 
 #include "PROPOSAL/crossection/IonizInterpolant.h"
 #include "PROPOSAL/crossection/IonizIntegral.h"
-#include "PROPOSAL/crossection/parametrization/Parametrization.h"
+#include "PROPOSAL/crossection/parametrization/Ionization.h"
 
 #include "PROPOSAL/math/InterpolantBuilder.h"
 
@@ -15,7 +15,7 @@
 
 using namespace PROPOSAL;
 
-IonizInterpolant::IonizInterpolant(const Parametrization& param, InterpolationDef def)
+IonizInterpolant::IonizInterpolant(const Ionization& param, InterpolationDef def)
     : CrossSectionInterpolant(DynamicData::DeltaE, param, def)
 {
     // Use overwritten dNdx interpolation
