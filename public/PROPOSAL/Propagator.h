@@ -221,7 +221,7 @@ class Propagator
      * Choose the current collection by particle type and location.
      */
 
-    void ChooseCurrentCollection(Vector3D& particle_position, Vector3D& particle_direction);
+    void ChooseCurrentCollection(const Vector3D& particle_position, const Vector3D& particle_direction);
 
     //----------------------------------------------------------------------------//
     /**
@@ -230,7 +230,7 @@ class Propagator
      * or only to the collection border
      */
 
-    double CalculateEffectiveDistance(Vector3D& particle_position, Vector3D& particle_direction);
+    double CalculateEffectiveDistance(const Vector3D& particle_position, const Vector3D& particle_direction);
 };
 
 }

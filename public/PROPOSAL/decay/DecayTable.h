@@ -19,7 +19,7 @@ class DecayTable
         {
             LeptonicDecay = 0,
             TwoBodyDecay = 0,
-            Stable = 0,
+            Stable = 0
         };
 
     public:

@@ -88,8 +88,8 @@ double PhotoQ2Integral::DifferentialCrossSection(double energy, double v)
 
     aux = integral_.Integrate(min, max, boost::bind(&PhotoQ2Integral::FunctionToQ2Integral, this, energy, v, _1), 4);
 
-    aux *= medium_->GetMolDensity() * components_[component_index_]->GetAtomInMolecule() * particle_charge *
-           particle_charge;
+    aux *= multiplier_ * medium_->GetMolDensity() * components_[component_index_]->GetAtomInMolecule()
+         * particle_charge * particle_charge;
 
     return aux;
 }

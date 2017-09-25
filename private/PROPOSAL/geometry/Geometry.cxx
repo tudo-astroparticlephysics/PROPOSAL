@@ -44,14 +44,14 @@ ostream& operator<<(ostream& os, Geometry const& geometry)
 ******************************************************************************/
 
 
-Geometry::Geometry(std::string name)
+Geometry::Geometry(const std::string name)
     : position_( Vector3D() )
     , name_(name)
     , hirarchy_(0)
 {
 }
 
-Geometry::Geometry(std::string name, Vector3D position)
+Geometry::Geometry(const std::string name, const Vector3D position)
     : position_(100.*position)
     , name_(name)
     , hirarchy_(0)
@@ -110,7 +110,7 @@ bool Geometry::operator!=(const Geometry& geometry) const
 // Member functions
 // ------------------------------------------------------------------------- //
 
-bool Geometry::IsInside(Vector3D& position, Vector3D& direction)
+bool Geometry::IsInside(const Vector3D& position, const Vector3D& direction)
 {
     bool is_inside = false;
 
@@ -123,7 +123,7 @@ bool Geometry::IsInside(Vector3D& position, Vector3D& direction)
 }
 
 // ------------------------------------------------------------------------- //
-bool Geometry::IsInfront(Vector3D& position, Vector3D& direction)
+bool Geometry::IsInfront(const Vector3D& position, const Vector3D& direction)
 {
     bool is_infront = false;
 
@@ -136,7 +136,7 @@ bool Geometry::IsInfront(Vector3D& position, Vector3D& direction)
 }
 
 // ------------------------------------------------------------------------- //
-bool Geometry::IsBehind(Vector3D& position, Vector3D& direction)
+bool Geometry::IsBehind(const Vector3D& position, const Vector3D& direction)
 {
     bool is_behind = false;
 
@@ -149,7 +149,7 @@ bool Geometry::IsBehind(Vector3D& position, Vector3D& direction)
 }
 
 // ------------------------------------------------------------------------- //
-double Geometry::DistanceToClosestApproach(Vector3D& position, Vector3D& direction)
+double Geometry::DistanceToClosestApproach(const Vector3D& position, const Vector3D& direction)
 {
     return scalar_product(position_ - position, direction);
 }
