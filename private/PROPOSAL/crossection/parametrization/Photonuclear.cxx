@@ -32,7 +32,7 @@ HardBB::HardBB(const ParticleDef& particle_def)
     }
     else
     {
-        log_fatal("No HardBB tables provided for the given particle %s", particle_def.name);
+        log_fatal("No HardBB tables provided for the given particle %s", particle_def.name.c_str());
     }
 }
 
