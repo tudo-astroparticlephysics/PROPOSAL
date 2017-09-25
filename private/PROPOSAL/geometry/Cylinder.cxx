@@ -17,7 +17,7 @@ Cylinder::Cylinder()
     // Do nothing here
 }
 
-Cylinder::Cylinder(Vector3D position,
+Cylinder::Cylinder(const Vector3D position,
                    double radius,
                    double inner_radius,
                    double z)
@@ -106,7 +106,7 @@ void Cylinder::print(std::ostream& os) const
 }
 
 // ------------------------------------------------------------------------- //
-pair<double, double> Cylinder::DistanceToBorder(Vector3D& position, Vector3D& direction)
+pair<double, double> Cylinder::DistanceToBorder(const Vector3D& position, const Vector3D& direction)
 {
     // Calculate intersection of particle trajectory and the cylinder
     // cylinder barrel (x1 + x0)^2 + (x2 + y0)^2  = radius^2 [ z0_-0.5*z_ <

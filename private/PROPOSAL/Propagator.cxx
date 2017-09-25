@@ -444,7 +444,7 @@ std::vector<DynamicData*> Propagator::Propagate(double MaxDistance_cm)
 
 // ------------------------------------------------------------------------- //
 
-void Propagator::ChooseCurrentCollection(Vector3D& particle_position, Vector3D& particle_direction)
+void Propagator::ChooseCurrentCollection(const Vector3D& particle_position, const Vector3D& particle_direction)
 {
     vector<int> crossed_collections;
     crossed_collections.resize(0);
@@ -588,7 +588,7 @@ void Propagator::ChooseCurrentCollection(Vector3D& particle_position, Vector3D& 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-double Propagator::CalculateEffectiveDistance(Vector3D& particle_position, Vector3D& particle_direction)
+double Propagator::CalculateEffectiveDistance(const Vector3D& particle_position, const Vector3D& particle_direction)
 {
     double distance_to_collection_border = 0;
     double distance_to_detector          = 0;
