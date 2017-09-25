@@ -64,51 +64,64 @@ PhotoRealPhotonAssumption::~PhotoRealPhotonAssumption()
 }
 
 // ------------------------------------------------------------------------- //
+// Bezrukov, Bugaev
+// Sov. J. Nucl. Phys. 33 (1981), 635
+// eq. 23
+// ------------------------------------------------------------------------- //
 double PhotoRealPhotonAssumption::DifferentialCrossSection(double energy, double v)
 {
-    double aux, aum, k, G, t, sgn, tmp;
+    double aux, aum, G, t;
 
     double nu = v * energy * 1.e-3;
 
-    sgn = CalculateParametrization(nu);
+    double sgn = CalculateParametrization(nu);
 
-    const double m1 = 0.54;
-    const double m2 = 1.80;
+    const double m1 = 0.54; // in GeV^2
+    const double m2 = 1.80; // in GeV^2
 
-    double particle_charge = particle_def_.charge;
-    double particle_mass   = particle_def_.mass;
-    double atomic_number   = components_[component_index_]->GetAtomicNum();
+    double kappa = 1 - 2 / v + 2 / (v * v);
 
-    k = 1 - 2 / v + 2 / (v * v);
-
+    // calculate the shadowing factor
     if (components_[component_index_]->GetNucCharge() == 1)
     {
         G = 1;
-    } else
+    }
+    else
     {
-
-        tmp = 0.00282 * pow(atomic_number, 1. / 3) * sgn;
-        G   = (3 / tmp) * (0.5 + ((1 + tmp) * exp(-tmp) - 1) / (tmp * tmp));
+        // eq. 18
+        double tmp = 0.00282 * pow(components_[component_index_]->GetAtomicNum(), 1. / 3) * sgn;
+        // eq. 3
+        G = (3 / tmp) * (0.5 + ((1 + tmp) * exp(-tmp) - 1) / (tmp * tmp));
     }
 
+    // enhanced formula by Bugaev Shelpin
+    // Phys. Rev. D 67 (2003), 034027
+    // eq. 4.6
     G *= 3;
-    aux = v * particle_mass * 1.e-3;
+    aux = v * particle_def_.mass * 1.e-3;
     t   = aux * aux / (1 - v);
-    aum = particle_mass * 1.e-3;
+    aum = particle_def_.mass * 1.e-3;
     aum *= aum;
     aux = 2 * aum / t;
-    aux = G * ((k + 4 * aum / m1) * log(1 + m1 / t) - (k * m1) / (m1 + t) - aux) +
-          ((k + 2 * aum / m2) * log(1 + m2 / t) - aux) +
-          aux * ((G * (m1 - 4 * t)) / (m1 + t) + (m2 / t) * log(1 + t / m2));
+    aux = G * ((kappa + 4 * aum / m1) * log(1 + m1 / t) - (kappa * m1) / (m1 + t) - aux)
+        + ((kappa + 2 * aum / m2) * log(1 + m2 / t) - aux)
+        + aux * (G * (m1 - 4 * t) / (m1 + t) + (m2 / t) * log(1 + t / m2));
 
-    aux *= ALPHA / (8 * PI) * atomic_number * v * sgn * 1.e-30;
+    aux *= ALPHA / (8 * PI) * components_[component_index_]->GetAtomicNum() * v * sgn * 1.e-30;
 
+    // hard component by Bugaev, Montaruli, Shelpin, Sokalski
+    // Astrop. Phys. 21 (2004), 491
+    // in the appendix
     aux += components_[component_index_]->GetAtomicNum() * 1.e-30 * hardBB_->CalculateHardBB(energy, v);
 
     return multiplier_ * medium_->GetMolDensity() * components_[component_index_]->GetAtomInMolecule()
-        * particle_charge * particle_charge * aux;
+            * particle_def_.charge * particle_def_.charge * aux;
 }
 
+// ------------------------------------------------------------------------- //
+// fit of Caldwell at al.
+// Phys. Rev Let. 42 (1979), 553
+// Table 1
 // ------------------------------------------------------------------------- //
 double PhotoRealPhotonAssumption::NucleusCrossSectionCaldwell(double nu)
 {
@@ -155,6 +168,11 @@ double PhotoZeus::CalculateParametrization(double nu)
 // Signature: (new class, parent class)
 PHOTO_PARAM_REAL_IMPL(BezrukovBugaev, RealPhotonAssumption)
 
+// ------------------------------------------------------------------------- //
+// Bezrukov, Bugaev
+// Sov. J. Nucl. Phys. 33 (1981), 635
+// eq. 17
+// TODO: look at Sov. J. Nucl. Phys. 32 (1980), 847
 // ------------------------------------------------------------------------- //
 double PhotoBezrukovBugaev::CalculateParametrization(double nu)
 {
