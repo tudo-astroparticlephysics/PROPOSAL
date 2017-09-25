@@ -2,12 +2,12 @@
 #include <boost/bind.hpp>
 
 #include "PROPOSAL/crossection/PhotoIntegral.h"
-#include "PROPOSAL/crossection/parametrization/Parametrization.h"
+#include "PROPOSAL/crossection/parametrization/Photonuclear.h"
 #include "PROPOSAL/Constants.h"
 
 using namespace PROPOSAL;
 
-PhotoIntegral::PhotoIntegral(const Parametrization& param): CrossSectionIntegral(DynamicData::NuclInt, param)
+PhotoIntegral::PhotoIntegral(const Photonuclear& param): CrossSectionIntegral(DynamicData::NuclInt, param)
 {
 }
 

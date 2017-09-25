@@ -6,10 +6,12 @@
 namespace PROPOSAL
 {
 
+class Photonuclear;
+
 class PhotoInterpolant: public CrossSectionInterpolant
 {
     public:
-        PhotoInterpolant(const Parametrization&, InterpolationDef);
+        PhotoInterpolant(const Photonuclear&, InterpolationDef);
         PhotoInterpolant(const PhotoInterpolant&);
         virtual ~PhotoInterpolant();
 

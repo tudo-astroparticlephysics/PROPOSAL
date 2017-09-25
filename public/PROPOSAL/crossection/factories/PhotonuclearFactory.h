@@ -7,7 +7,7 @@
 #include <map>
 #include <string>
 
-#include "PROPOSAL/crossection/parametrization/Parametrization.h"
+#include "PROPOSAL/crossection/parametrization/Photonuclear.h"
 #include "PROPOSAL/methods.h"
 
 namespace  PROPOSAL
@@ -66,15 +66,15 @@ class PhotonuclearFactory
     typedef boost::function<ShadowEffect*(void)> RegisterShadowEffectFunction;
 
     typedef boost::function<
-        Parametrization*(const ParticleDef&, const Medium&, const EnergyCutSettings&, const RealPhoton&, double multiplier)>
+        Photonuclear*(const ParticleDef&, const Medium&, const EnergyCutSettings&, const RealPhoton&, double multiplier)>
         RegisterRealPhotonFunction;
 
     typedef boost::function<
-        Parametrization*(const ParticleDef&, const Medium&, const EnergyCutSettings&, const ShadowEffect&, double multiplier)>
+        Photonuclear*(const ParticleDef&, const Medium&, const EnergyCutSettings&, const ShadowEffect&, double multiplier)>
         RegisterQ2Function;
 
     typedef boost::function<
-        Parametrization*(const ParticleDef&, const Medium&, const EnergyCutSettings&, const ShadowEffect&, double multiplier, InterpolationDef)>
+        Photonuclear*(const ParticleDef&, const Medium&, const EnergyCutSettings&, const ShadowEffect&, double multiplier, InterpolationDef)>
         RegisterQ2FunctionInterpolant;
 
     typedef std::map<std::string, RegisterShadowEffectFunction > PhotoShadowEffectMapString;

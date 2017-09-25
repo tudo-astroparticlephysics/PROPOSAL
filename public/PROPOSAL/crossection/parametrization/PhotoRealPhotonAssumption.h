@@ -16,11 +16,14 @@
         virtual ~Photo##param();                                                                                       \
                                                                                                                        \
         Parametrization* clone() const { return new Photo##param(*this); }                                             \
-        static Parametrization* create(const ParticleDef&,                                                             \
-                                       const Medium&,                                                                  \
-                                       const EnergyCutSettings&,                                                       \
-                                       const RealPhoton&,                                                              \
-                                       double multiplier);                                                             \
+        static Photonuclear* create(const ParticleDef& particle_def,                                                   \
+                                    const Medium& medium,                                                              \
+                                    const EnergyCutSettings& cuts,                                                     \
+                                    const RealPhoton& hardBB,                                                          \
+                                    double multiplier)                                                                 \
+        {                                                                                                              \
+            return new Photo##param(particle_def, medium, cuts, hardBB, multiplier);                                   \
+        }                                                                                                              \
                                                                                                                        \
         virtual double CalculateParametrization(double nu);                                                            \
                                                                                                                        \
@@ -93,7 +96,7 @@ class PhotoRhode : public PhotoRealPhotonAssumption
     virtual ~PhotoRhode();
 
     Parametrization* clone() const { return new PhotoRhode(*this); }
-    static Parametrization* create(const ParticleDef&,
+    static Photonuclear* create(const ParticleDef&,
                             const Medium&,
                             const EnergyCutSettings&,
                             const RealPhoton&,

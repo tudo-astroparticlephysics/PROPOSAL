@@ -6,10 +6,12 @@
 namespace PROPOSAL
 {
 
+class Photonuclear;
+
 class PhotoIntegral: public CrossSectionIntegral
 {
     public:
-        PhotoIntegral(const Parametrization&);
+        PhotoIntegral(const Photonuclear&);
         PhotoIntegral(const PhotoIntegral&);
         virtual ~PhotoIntegral();
 
