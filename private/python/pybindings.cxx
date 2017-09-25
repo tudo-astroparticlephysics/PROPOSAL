@@ -14,7 +14,7 @@
 #define PARTICLE_DEF(cls)                                                                                              \
     class_<cls##Def, boost::shared_ptr<cls##Def>, bases<ParticleDef>, boost::noncopyable>(#cls "Def", no_init)         \
                                                                                                                        \
-        .def("get", make_function(&MuMinusDef::Get, return_value_policy<reference_existing_object>()))                 \
+        .def("get", make_function(&cls##Def::Get, return_value_policy<reference_existing_object>()))                   \
         .staticmethod("get");
 
 #define COMPONENT_DEF(cls)\
@@ -27,7 +27,7 @@
     class_<Brems##cls, boost::shared_ptr<Brems##cls>, bases<Bremsstrahlung> >(                                         \
         #cls,                                                                                                          \
         init<const ParticleDef&, const Medium&, const EnergyCutSettings&, double, bool>(                               \
-            (arg("particle_def"), arg("medium"), arg("energy_cuts"), arg("multiplier"), arg("lpm"))));                  \
+            (arg("particle_def"), arg("medium"), arg("energy_cuts"), arg("multiplier"), arg("lpm"))));
 
 #define PHOTO_REAL_DEF(cls, parent)                                                                                    \
     class_<Photo##cls, boost::shared_ptr<Photo##cls>, bases<Photo##parent> >(                                          \
