@@ -3,7 +3,7 @@
 
 #include "PROPOSAL/crossection/PhotoInterpolant.h"
 #include "PROPOSAL/crossection/PhotoIntegral.h"
-#include "PROPOSAL/crossection/parametrization/Parametrization.h"
+#include "PROPOSAL/crossection/parametrization/Photonuclear.h"
 
 #include "PROPOSAL/math/InterpolantBuilder.h"
 
@@ -13,7 +13,7 @@
 
 using namespace PROPOSAL;
 
-PhotoInterpolant::PhotoInterpolant(const Parametrization& param, InterpolationDef def): CrossSectionInterpolant(DynamicData::NuclInt, param, def)
+PhotoInterpolant::PhotoInterpolant(const Photonuclear& param, InterpolationDef def): CrossSectionInterpolant(DynamicData::NuclInt, param, def)
 {
     // Use parent CrossSecition dNdx interpolation
     InitdNdxInerpolation(def);

@@ -6,10 +6,12 @@
 namespace PROPOSAL
 {
 
+class EpairProduction;
+
 class EpairInterpolant: public CrossSectionInterpolant
 {
     public:
-        EpairInterpolant(const Parametrization&, InterpolationDef);
+        EpairInterpolant(const EpairProduction&, InterpolationDef);
         EpairInterpolant(const EpairInterpolant&);
         virtual ~EpairInterpolant();
 

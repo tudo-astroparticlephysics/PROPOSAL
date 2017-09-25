@@ -561,15 +561,15 @@ void export_crosssections()
     class_<CrossSectionIntegral, boost::shared_ptr<CrossSectionIntegral>, bases<CrossSection>, boost::noncopyable>("CrossSectionIntegral", no_init);
     class_<CrossSectionInterpolant, boost::shared_ptr<CrossSectionInterpolant>, bases<CrossSection>, boost::noncopyable>("CrossSectionInterpolant", no_init);
 
-    class_<BremsIntegral, boost::shared_ptr<BremsIntegral>, bases<CrossSectionIntegral> >("BremsIntegral", init<const Parametrization&>((arg("parametrization"))));
-    class_<EpairIntegral, boost::shared_ptr<EpairIntegral>, bases<CrossSectionIntegral> >("EpairIntegral", init<const Parametrization&>((arg("parametrization"))));
-    class_<PhotoIntegral, boost::shared_ptr<PhotoIntegral>, bases<CrossSectionIntegral> >("PhotoIntegral", init<const Parametrization&>((arg("parametrization"))));
-    class_<IonizIntegral, boost::shared_ptr<IonizIntegral>, bases<CrossSectionIntegral> >("IonizIntegral", init<const Parametrization&>((arg("parametrization"))));
+    class_<BremsIntegral, boost::shared_ptr<BremsIntegral>, bases<CrossSectionIntegral> >("BremsIntegral", init<const Bremsstrahlung&>((arg("parametrization"))));
+    class_<EpairIntegral, boost::shared_ptr<EpairIntegral>, bases<CrossSectionIntegral> >("EpairIntegral", init<const EpairProduction&>((arg("parametrization"))));
+    class_<PhotoIntegral, boost::shared_ptr<PhotoIntegral>, bases<CrossSectionIntegral> >("PhotoIntegral", init<const Photonuclear&>((arg("parametrization"))));
+    class_<IonizIntegral, boost::shared_ptr<IonizIntegral>, bases<CrossSectionIntegral> >("IonizIntegral", init<const Ionization&>((arg("parametrization"))));
 
-    class_<BremsInterpolant, boost::shared_ptr<BremsInterpolant>, bases<CrossSectionInterpolant> >("BremsInterpolant", init<const Parametrization&, InterpolationDef>((arg("parametrization"), arg("interpolation_def"))));
-    class_<EpairInterpolant, boost::shared_ptr<EpairInterpolant>, bases<CrossSectionInterpolant> >("EpairInterpolant", init<const Parametrization&, InterpolationDef>((arg("parametrization"), arg("interpolation_def"))));
-    class_<PhotoInterpolant, boost::shared_ptr<PhotoInterpolant>, bases<CrossSectionInterpolant> >("PhotoInterpolant", init<const Parametrization&, InterpolationDef>((arg("parametrization"), arg("interpolation_def"))));
-    class_<IonizInterpolant, boost::shared_ptr<IonizInterpolant>, bases<CrossSectionInterpolant> >("IonizInterpolant", init<const Parametrization&, InterpolationDef>((arg("parametrization"), arg("interpolation_def"))));
+    class_<BremsInterpolant, boost::shared_ptr<BremsInterpolant>, bases<CrossSectionInterpolant> >("BremsInterpolant", init<const Bremsstrahlung&, InterpolationDef>((arg("parametrization"), arg("interpolation_def"))));
+    class_<EpairInterpolant, boost::shared_ptr<EpairInterpolant>, bases<CrossSectionInterpolant> >("EpairInterpolant", init<const EpairProduction&, InterpolationDef>((arg("parametrization"), arg("interpolation_def"))));
+    class_<PhotoInterpolant, boost::shared_ptr<PhotoInterpolant>, bases<CrossSectionInterpolant> >("PhotoInterpolant", init<const Photonuclear&, InterpolationDef>((arg("parametrization"), arg("interpolation_def"))));
+    class_<IonizInterpolant, boost::shared_ptr<IonizInterpolant>, bases<CrossSectionInterpolant> >("IonizInterpolant", init<const Ionization&, InterpolationDef>((arg("parametrization"), arg("interpolation_def"))));
 }
 
 class PythonHardBBTables {};

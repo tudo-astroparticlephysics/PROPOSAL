@@ -12,11 +12,11 @@
         ~Brems##param();                                                                                               \
                                                                                                                        \
         Parametrization* clone() const { return new Brems##param(*this); }                                             \
-        static Parametrization* create(const ParticleDef& particle_def,                                                \
-                                       const Medium& medium,                                                           \
-                                       const EnergyCutSettings& cuts,                                                  \
-                                       double multiplier,                                                              \
-                                       bool lpm)                                                                       \
+        static Bremsstrahlung* create(const ParticleDef& particle_def,                                                 \
+                                      const Medium& medium,                                                            \
+                                      const EnergyCutSettings& cuts,                                                   \
+                                      double multiplier,                                                               \
+                                      bool lpm)                                                                        \
         {                                                                                                              \
             return new Brems##param(particle_def, medium, cuts, multiplier, lpm);                                      \
         }                                                                                                              \

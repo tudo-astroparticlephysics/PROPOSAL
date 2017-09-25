@@ -7,7 +7,7 @@
 #include <map>
 #include <string>
 
-#include "PROPOSAL/crossection/parametrization/Parametrization.h"
+#include "PROPOSAL/crossection/parametrization/Bremsstrahlung.h"
 
 #include "PROPOSAL/methods.h"
 
@@ -51,7 +51,7 @@ class BremsstrahlungFactory
     // --------------------------------------------------------------------- //
 
     typedef boost::function<
-        Parametrization*(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier, bool lpm)>
+        Bremsstrahlung*(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier, bool lpm)>
         RegisterFunction;
 
     typedef std::map<std::string, RegisterFunction > BremsstrahlungMapString;

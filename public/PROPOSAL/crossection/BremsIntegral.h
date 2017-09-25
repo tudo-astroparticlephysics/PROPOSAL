@@ -7,10 +7,12 @@
 namespace PROPOSAL
 {
 
+class Bremsstrahlung;
+
 class BremsIntegral: public CrossSectionIntegral
 {
     public:
-        BremsIntegral(const Parametrization&);
+        BremsIntegral(const Bremsstrahlung&);
         BremsIntegral(const BremsIntegral&);
         virtual ~BremsIntegral();
 

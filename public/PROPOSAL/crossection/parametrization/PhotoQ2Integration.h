@@ -25,11 +25,11 @@
         virtual ~Photo##param();                                                                                       \
                                                                                                                        \
         virtual Parametrization* clone() const { return new Photo##param(*this); }                                     \
-        static Parametrization* create(const ParticleDef& particle_def,                                                \
-                                       const Medium& medium,                                                           \
-                                       const EnergyCutSettings& cuts,                                                  \
-                                       const ShadowEffect& shadow_effect,                                              \
-                                       double multiplier)                                                              \
+        static Photonuclear* create(const ParticleDef& particle_def,                                                   \
+                                    const Medium& medium,                                                              \
+                                    const EnergyCutSettings& cuts,                                                     \
+                                    const ShadowEffect& shadow_effect,                                                 \
+                                    double multiplier)                                                                 \
         {                                                                                                              \
             return new Photo##param(particle_def, medium, cuts, shadow_effect, multiplier);                            \
         }                                                                                                              \
@@ -112,12 +112,12 @@ class PhotoQ2Interpolant : public Param
     virtual ~PhotoQ2Interpolant();
 
     Parametrization* clone() const { return new PhotoQ2Interpolant<Param>(*this); }
-    static Parametrization* create(const ParticleDef& particle_def,
-                                   const Medium& medium,
-                                   const EnergyCutSettings& cuts,
-                                   const ShadowEffect& shadow_effect,
-                                   double multiplier,
-                                   InterpolationDef def = InterpolationDef())
+    static Photonuclear* create(const ParticleDef& particle_def,
+                                const Medium& medium,
+                                const EnergyCutSettings& cuts,
+                                const ShadowEffect& shadow_effect,
+                                double multiplier,
+                                InterpolationDef def = InterpolationDef())
     {
         return new PhotoQ2Interpolant<Param>(particle_def, medium, cuts, shadow_effect, multiplier, def);
     }

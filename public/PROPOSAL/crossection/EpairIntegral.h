@@ -6,10 +6,12 @@
 namespace PROPOSAL
 {
 
+class EpairProduction;
+
 class EpairIntegral: public CrossSectionIntegral
 {
     public:
-        EpairIntegral(const Parametrization&);
+        EpairIntegral(const EpairProduction&);
         EpairIntegral(const EpairIntegral&);
         virtual ~EpairIntegral();
 
