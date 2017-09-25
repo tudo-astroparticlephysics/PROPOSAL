@@ -87,7 +87,7 @@ double Bremsstrahlung::DifferentialCrossSection(double energy, double v)
 
     double c2   =   pow(particle_def_.charge , 2);
 
-    return medium_->GetMolDensity()*components_[component_index_]->GetAtomInMolecule()*c2*c2*aux;
+    return multiplier_ * medium_->GetMolDensity()*components_[component_index_]->GetAtomInMolecule()*c2*c2*aux;
 }
 
 // ------------------------------------------------------------------------- //

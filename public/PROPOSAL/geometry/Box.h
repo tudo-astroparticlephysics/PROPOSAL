@@ -11,7 +11,7 @@ class Box: public Geometry
     public:
 
         Box();
-        Box(Vector3D position, double x, double y, double z);
+        Box(const Vector3D position, double x, double y, double z);
         Box(const Box&);
 
         Geometry* clone() const { return new Box(*this); };
@@ -24,7 +24,7 @@ class Box: public Geometry
         Box& operator=(const Geometry&);
 
         // Methods
-        std::pair<double,double> DistanceToBorder(Vector3D& position, Vector3D& direction);
+        std::pair<double,double> DistanceToBorder(const Vector3D& position, const Vector3D& direction);
 
         // Getter & Setter
         double GetX() const { return x_; }

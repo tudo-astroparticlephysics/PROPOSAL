@@ -304,7 +304,7 @@ double EpairProductionRhoIntegral::DifferentialCrossSection(double energy, doubl
 
     aux = std::max(1 - rMax, COMPUTER_PRECISION);
 
-    return medium_->GetMolDensity() * components_[component_index_]->GetAtomInMolecule() * particle_charge * particle_charge *
+    return multiplier_ * medium_->GetMolDensity() * components_[component_index_]->GetAtomInMolecule() * particle_charge * particle_charge *
            (integral_.Integrate(1 - rMax, aux, boost::bind(&EpairProductionRhoIntegral::FunctionToIntegral, this, energy, _1), 2) +
             integral_.Integrate(aux, 1, boost::bind(&EpairProductionRhoIntegral::FunctionToIntegral, this, energy, _1), 4));
 }

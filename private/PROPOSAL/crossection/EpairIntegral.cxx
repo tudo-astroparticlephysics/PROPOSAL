@@ -84,7 +84,7 @@ double EpairIntegral::CalculatedEdx(double energy)
         }
     }
 
-    return parametrization_->GetMultiplier()*energy*sum;
+    return energy * sum;
 }
 
 // ------------------------------------------------------------------------- //

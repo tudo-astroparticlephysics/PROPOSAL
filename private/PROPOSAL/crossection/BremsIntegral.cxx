@@ -40,5 +40,5 @@ double BremsIntegral::CalculatedEdx(double energy)
             limits.vMin, limits.vUp, boost::bind(&Parametrization::FunctionToDEdxIntegral, parametrization_, energy, _1), 2);
     }
 
-    return parametrization_->GetMultiplier() * energy * sum;
+    return energy * sum;
 }
