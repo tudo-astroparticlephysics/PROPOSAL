@@ -41,6 +41,7 @@ Parametrization::~Parametrization()
 std::ostream& PROPOSAL::operator<<(std::ostream& os, Parametrization const& param)
 {
     os << "---------------------------Parametrization( "<<&param<<" )---------------------------"<<std::endl;
+    os << "name: " << param.GetName() << '\n';
 
     param.print(os);
 
