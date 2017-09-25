@@ -19,8 +19,8 @@ class Geometry
 {
     public:
 
-        Geometry(std::string); //TODO(mario): Maybe not useful Tue 2017/08/01
-        Geometry(std::string, Vector3D position);
+        Geometry(const std::string); //TODO(mario): Maybe not useful Tue 2017/08/01
+        Geometry(const std::string, const Vector3D position);
         Geometry(const Geometry&);
 
         virtual Geometry* clone() const = 0; // virtual constructor idiom (used for deep copies)
@@ -39,13 +39,13 @@ class Geometry
         // Member functions
         // ----------------------------------------------------------------- //
 
-        bool IsInside(Vector3D& position, Vector3D& direction);
+        bool IsInside(const Vector3D& position, const Vector3D& direction);
 
 
-        bool IsInfront(Vector3D& position, Vector3D& direction);
+        bool IsInfront(const Vector3D& position, const Vector3D& direction);
 
 
-        bool IsBehind(Vector3D& position, Vector3D& direction);
+        bool IsBehind(const Vector3D& position, const Vector3D& direction);
 
         /*!
          * This function calculates the distance of the particle position
@@ -61,12 +61,12 @@ class Geometry
          * a particle on the geometry border which moves outside has no intersection.
          * Distances smaller then GEOMETRY_PRECISION (1e-9) are also set to -1
          */
-        virtual std::pair<double,double> DistanceToBorder(Vector3D& position, Vector3D& direction) = 0;
+        virtual std::pair<double,double> DistanceToBorder(const Vector3D& position, const Vector3D& direction) = 0;
 
         /*!
          * Calculates the distance to the closest approch to the geometry center
          */
-        double DistanceToClosestApproach(Vector3D& position, Vector3D& direction);
+        double DistanceToClosestApproach(const Vector3D& position, const Vector3D& direction);
 
 
         // void swap(Geometry &geometry);

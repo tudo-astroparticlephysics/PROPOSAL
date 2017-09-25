@@ -11,7 +11,7 @@ class Cylinder: public Geometry
     public:
 
         Cylinder();
-        Cylinder(Vector3D position, double radius, double inner_radius, double z);
+        Cylinder(const Vector3D position, double radius, double inner_radius, double z);
         Cylinder(const Cylinder&);
 
         Geometry* clone() const { return new Cylinder(*this); };
@@ -24,7 +24,7 @@ class Cylinder: public Geometry
         Cylinder& operator=(const Geometry&);
 
         // Methods
-        std::pair<double,double> DistanceToBorder(Vector3D& position, Vector3D& direction);
+        std::pair<double,double> DistanceToBorder(const Vector3D& position, const Vector3D& direction);
 
         // Getter & Setter
         double GetInnerRadius() const { return inner_radius_; }
