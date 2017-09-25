@@ -39,21 +39,20 @@ Scattering::RandomAngles ScatteringMoliere::CalculateRandomAngle(double dr, doub
 
     vector<double> chi_A_Sq; // screening angle² in rad²
     chi_A_Sq.resize(numComp_);
-    weight_.resize(numComp_);
 
     for(int i = 0; i < numComp_; i++)
     {
         // Calculate Chi_0
-        chi_0 = ( ME*ALPHA*pow(Zi_.at(i)*128./(9.*PI*PI), 1./3.) )/momentum ;
+        chi_0 = ( ME * ALPHA * pow(Zi_[i] * 128. / (9. * PI * PI), 1./3.) )/momentum ;
         // Calculate Chi_a^2
-        chi_A_Sq.at(i) = chi_0*chi_0*( 1.13+3.76*ALPHA*ALPHA*Zi_.at(i)*Zi_.at(i)/beta_Sq );
+        chi_A_Sq[i] = chi_0 * chi_0 * ( 1.13 + 3.76 * ALPHA * ALPHA * Zi_[i] * Zi_[i] / beta_Sq );
 
         // Calculate A_average and Z^2_average for Chi_c^2
         //if case of an electron, replace Z² by Z(Z+1) to into account scatterings
         //on atomic electrons in the medium
-        if(mass == ME) ZSq_average += weight_.at(i)*Zi_.at(i)*(Zi_.at(i)+1.);
-        else ZSq_average += weight_.at(i)*Zi_.at(i)*Zi_.at(i);
-        A_average += weight_.at(i)*Ai_.at(i);
+        if(mass == ME) ZSq_average += weight_[i] * Zi_[i] * (Zi_[i] + 1.);
+        else ZSq_average += weight_[i] * Zi_[i] * Zi_[i];
+        A_average += weight_[i] * Ai_[i];
     }
     // Calculate Chi_c^2
     chiCSq_ = ( (4.*PI*NA*ALPHA*ALPHA*HBAR*HBAR*SPEED*SPEED)
@@ -61,8 +60,7 @@ Scattering::RandomAngles ScatteringMoliere::CalculateRandomAngle(double dr, doub
                 / (momentum*momentum*beta_Sq) )
             * ( ZSq_average/A_average );
 
-    // Claculate B
-    B_.resize(numComp_);
+    // Calculate B
     Scattering::RandomAngles random_angles;
 
     for(int i = 0; i < numComp_; i++)
@@ -72,7 +70,7 @@ Scattering::RandomAngles ScatteringMoliere::CalculateRandomAngle(double dr, doub
 
         for(int n = 0; n < 6; n++)
         {
-            xn = xn*( (1.-log(xn)-log(chiCSq_/chi_A_Sq.at(i))-1.+2.*C)/(1.-xn) );
+            xn = xn * ( (1. - log(xn) - log(chiCSq_ / chi_A_Sq[i]) - 1. + 2. * C) / (1. - xn) );
         }
 
         //  Check for inappropriate values of B. If B < 4.5 it is practical to assume no deviation.
@@ -85,7 +83,7 @@ Scattering::RandomAngles ScatteringMoliere::CalculateRandomAngle(double dr, doub
             return random_angles;
         }
 
-        B_.at(i) = xn;
+        B_[i] = xn;
     }
 
     double rnd1,rnd2;
@@ -121,6 +119,7 @@ ScatteringMoliere::ScatteringMoliere(PROPOSALParticle& particle, const Medium& m
     , Ai_(numComp_)
     , A_(0.0)
     , weight_(numComp_)
+    , B_(numComp_)
 {
     for (int i = 0; i < numComp_; i++)
     {
@@ -129,12 +128,12 @@ ScatteringMoliere::ScatteringMoliere(PROPOSALParticle& particle, const Medium& m
         ki_[i] = component->GetAtomInMolecule();
         Ai_[i] = component->GetAtomicNum();
 
-        A_ += ki_[i]*Ai_[i];
+        A_ += ki_[i] * Ai_[i];
     }
 
     for(int i = 0; i < numComp_; i++)
     {
-        weight_[i] = ki_[i]*Ai_[i]/A_;
+        weight_[i] = ki_[i] * Ai_[i] / A_;
     }
 }
 
