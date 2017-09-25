@@ -15,7 +15,7 @@ Sphere::Sphere()
     // Do nothing here
 }
 
-Sphere::Sphere(Vector3D position,
+Sphere::Sphere(const Vector3D position,
                double radius,
                double inner_radius)
     : Geometry("Sphere", position)
@@ -100,7 +100,7 @@ void Sphere::print(std::ostream& os) const
 }
 
 // ------------------------------------------------------------------------- //
-pair<double, double> Sphere::DistanceToBorder(Vector3D& position, Vector3D& direction)
+pair<double, double> Sphere::DistanceToBorder(const Vector3D& position, const Vector3D& direction)
 {
     // Calculate intersection of particle trajectory and the sphere
     // sphere (x1 + x0)^2 + (x2 + y0)^2 + (x3 + z0)^2 = radius^2
