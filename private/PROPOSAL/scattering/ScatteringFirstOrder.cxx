@@ -14,8 +14,6 @@
 
 #include "PROPOSAL/methods.h"
 #include "PROPOSAL/math/MathModel.h"
-#include "PROPOSAL/crossection/CrossSection.h"
-#include "PROPOSAL/crossection/parametrization/Parametrization.h"
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/scattering/ScatteringFirstOrder.h"
 #include "PROPOSAL/Output.h"
