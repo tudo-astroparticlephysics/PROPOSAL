@@ -90,38 +90,6 @@ DynamicData::~DynamicData()
 {
 }
 
-// ------------------------------------------------------------------------- //
-void DynamicData::SetPosition(const Vector3D& position)
-{
-    position_ = position;
-}
-
-// ------------------------------------------------------------------------- //
-void DynamicData::SetDirection(const Vector3D& direction)
-{
-    direction_ = direction;
-}
-
-// ------------------------------------------------------------------------- //
-void DynamicData::SetEnergy(double energy)
-{
-    energy_ = energy;
-}
-
-// ------------------------------------------------------------------------- //
-void DynamicData::SetParentParticleEnergy(double parent_particle_energy){
-    parent_particle_energy_ = parent_particle_energy;
-}
-
-// ------------------------------------------------------------------------- //
-void DynamicData::SetTime(double t){
-    time_ = t;
-}
-
-// ------------------------------------------------------------------------- //
-void DynamicData::SetPropagatedDistance(double prop_dist){
-    propagated_distance_ = prop_dist;
-}
 
 /******************************************************************************
 *                              PROPOSALParticle                               *
@@ -288,16 +256,6 @@ void PROPOSALParticle::SetMomentum(double momentum)
     momentum_ = momentum;
     square_momentum_ = momentum_ * momentum_;
     energy_ = sqrt(square_momentum_ + particle_def_.mass * particle_def_.mass);
-}
-
-// ------------------------------------------------------------------------- //
-void PROPOSALParticle::SetParentParticleId(int parent_particle_id){
-    parent_particle_id_ = parent_particle_id;
-}
-
-// ------------------------------------------------------------------------- //
-void PROPOSALParticle::SetParticleId(int particle_id){
-    particle_id_ = particle_id;
 }
 
 
