@@ -47,7 +47,7 @@ Ionization::~Ionization()
 // ------------------------------------------------------------------------- //
 double Ionization::DifferentialCrossSection(double energy, double v)
 {
-    double result, aux;
+    double result;
 
     IntegralLimits limits = GetIntegralLimits(energy);
 
@@ -68,19 +68,13 @@ double Ionization::DifferentialCrossSection(double energy, double v)
     result = 1 - beta * (v / limits.vMax) + spin_1_2_contribution;
     result *= IONK * particle_def_.charge * particle_def_.charge * medium_->GetZA() / (2 * beta * energy * v * v);
 
-    return multiplier_ * medium_->GetMassDensity() * result;
+    return multiplier_ * medium_->GetMassDensity() * result * (1 + InelCorrection(energy, v));;
 }
 
 // ------------------------------------------------------------------------- //
 double Ionization::FunctionToDEdxIntegral(double energy, double variable)
 {
-    return variable * DifferentialCrossSection(energy, variable) * InelCorrection(energy, variable);
-}
-
-//----------------------------------------------------------------------------//
-double Ionization::FunctionToDNdxIntegral(double energy, double variable)
-{
-    return DifferentialCrossSection(energy, variable) * (1 + InelCorrection(energy, variable));
+    return variable * CrossSectionWithoutInelasticCorrection(energy, variable) * InelCorrection(energy, variable);
 }
 
 // ------------------------------------------------------------------------- //
@@ -142,6 +136,37 @@ double Ionization::InelCorrection(double energy, double v)
     result = a * (2 * b + c) - b * b;
 
     return ALPHA / (2 * PI) * result;
+}
+
+// ------------------------------------------------------------------------- //
+// CrossSection without inelastic correction
+// needed for the dEdx Integral
+// ------------------------------------------------------------------------- //
+
+double Ionization::CrossSectionWithoutInelasticCorrection(double energy, double v)
+{
+    double result;
+
+    IntegralLimits limits = GetIntegralLimits(energy);
+
+    // TODO(mario): Better way? Sat 2017/09/02
+    double square_momentum   = energy * energy - particle_def_.mass * particle_def_.mass;
+    double particle_momentum = sqrt(std::max(square_momentum, 0.0));
+    double beta              = particle_momentum / energy;
+    double gamma             = energy / particle_def_.mass;
+    beta *= beta;
+
+    // additional term for spin 1/2 particles
+    // Rossi, 1952
+    // High Enegy Particles
+    // Prentice-Hall, Inc., Englewood Cliffs, N.J.
+    // chapter 2, eq. 7
+    double spin_1_2_contribution = v / (1 + 1 / gamma);
+    spin_1_2_contribution *= 0.5 * spin_1_2_contribution;
+    result = 1 - beta * (v / limits.vMax) + spin_1_2_contribution;
+    result *= IONK * particle_def_.charge * particle_def_.charge * medium_->GetZA() / (2 * beta * energy * v * v);
+
+    return multiplier_ * medium_->GetMassDensity() * result;
 }
 
 // ------------------------------------------------------------------------- //
