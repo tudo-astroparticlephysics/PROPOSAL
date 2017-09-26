@@ -1,9 +1,8 @@
 
 #include <boost/math/special_functions/erf.hpp>
 
+#include "PROPOSAL/math/MathModel.h"
 #include "PROPOSAL/scattering/Coefficients.h" //coefficients for calculating the power series approximation of the moliere function
-#include "PROPOSAL/crossection/CrossSection.h"
-#include "PROPOSAL/crossection/parametrization/Parametrization.h"
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Output.h"
 #include "PROPOSAL/scattering/ScatteringMoliere.h"
