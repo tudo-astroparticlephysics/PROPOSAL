@@ -3,8 +3,6 @@
 
 #include <vector>
 
-#include "PROPOSAL/math/RootFinder.h"
-
 namespace PROPOSAL
 {
 
