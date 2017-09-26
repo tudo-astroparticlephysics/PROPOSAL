@@ -5,12 +5,12 @@
 
 #include "PROPOSAL/crossection/parametrization/PhotoQ2Integration.h"
 
-#include "PROPOSAL/math/Integral.h"
+// #include "PROPOSAL/math/Integral.h"
 #include "PROPOSAL/math/Interpolant.h"
-#include "PROPOSAL/math/InterpolantBuilder.h"
+// #include "PROPOSAL/math/InterpolantBuilder.h"
 
-#include "PROPOSAL/Constants.h"
-#include "PROPOSAL/methods.h"
+// #include "PROPOSAL/Constants.h"
+// #include "PROPOSAL/methods.h"
 
 using namespace PROPOSAL;
 

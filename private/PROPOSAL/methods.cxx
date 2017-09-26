@@ -25,10 +25,10 @@
 #include "PROPOSAL/crossection/parametrization/Parametrization.h"
 
 //TODO(mario): remove Thu 2017/09/07
-#include "PROPOSAL/crossection/parametrization/Ionization.h"
-#include "PROPOSAL/crossection/parametrization/Bremsstrahlung.h"
-#include "PROPOSAL/crossection/parametrization/EpairProduction.h"
-#include "PROPOSAL/crossection/parametrization/PhotoRealPhotonAssumption.h"
+// #include "PROPOSAL/crossection/parametrization/Ionization.h"
+// #include "PROPOSAL/crossection/parametrization/Bremsstrahlung.h"
+// #include "PROPOSAL/crossection/parametrization/EpairProduction.h"
+// #include "PROPOSAL/crossection/parametrization/PhotoRealPhotonAssumption.h"
 
 #include "PROPOSAL/math/InterpolantBuilder.h"
 #include "PROPOSAL/medium/Medium.h"
