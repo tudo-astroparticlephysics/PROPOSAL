@@ -20,11 +20,8 @@ class Ionization : public Parametrization
     double DifferentialCrossSection(double energy, double v);
 
     double FunctionToDEdxIntegral(double energy, double v);
-    double FunctionToDNdxIntegral(double energy, double v);
 
     IntegralLimits GetIntegralLimits(double energy);
-
-    double InelCorrection(double energy, double v);
 
     // --------------------------------------------------------------------- //
     // Getter
@@ -34,6 +31,9 @@ class Ionization : public Parametrization
 
     private:
     static const std::string name_;
+
+    double InelCorrection(double energy, double v);
+    double CrossSectionWithoutInelasticCorrection(double energy, double v);
 };
 
 
