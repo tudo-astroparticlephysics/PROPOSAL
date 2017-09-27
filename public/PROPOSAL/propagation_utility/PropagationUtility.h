@@ -6,7 +6,7 @@
 
 #include "PROPOSAL/EnergyCutSettings.h"
 #include "PROPOSAL/particle/ParticleDef.h"
-#include "PROPOSAL/methods.h"
+// #include "PROPOSAL/methods.h"
 // #include "PROPOSAL/scattering/ScatteringFactory.h"
 #include "PROPOSAL/crossection/factories/PhotonuclearFactory.h"
 #include "PROPOSAL/crossection/factories/BremsstrahlungFactory.h"
