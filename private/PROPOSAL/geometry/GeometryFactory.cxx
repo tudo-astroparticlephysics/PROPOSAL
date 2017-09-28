@@ -74,7 +74,10 @@ Geometry* GeometryFactory::CreateGeometry(boost::property_tree::ptree const& pt)
     // Get the position vector from the property tree
     // --------------------------------------------------------------------- //
 
-    double x, y, z;
+    double x = 0;
+    double y = 0;
+    double z = 0;
+
     boost::property_tree::ptree child = pt.get_child("origin");
 
     if (child.size() != 3)
@@ -99,9 +102,7 @@ Geometry* GeometryFactory::CreateGeometry(boost::property_tree::ptree const& pt)
                 z = coord;
                 break;
             default:
-                x = 0;
-                y = 0;
-                z = 0;
+                // Do nothing
                 break;
         }
         ++i;
