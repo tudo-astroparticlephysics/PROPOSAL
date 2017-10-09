@@ -121,8 +121,8 @@ double UtilityIntegralDecay::FunctionToIntegral(double energy)
     double square_momentum = energy * energy - particle_def.mass * particle_def.mass;
     double particle_momentum = sqrt(std::max(square_momentum, 0.0));
 
-    // return multiplier / max((particle_momentum / particle_.GetMass()) * particle_.GetLifetime() * SPEED, XRES);
-    aux =  1.0 / std::max((particle_momentum / particle_def.mass) * particle_def.lifetime * SPEED, XRES);
+    // return multiplier / max((particle_momentum / particle_.GetMass()) * particle_.GetLifetime() * SPEED, PARTICLE_POSITION_RESOLUTION);
+    aux =  1.0 / std::max((particle_momentum / particle_def.mass) * particle_def.lifetime * SPEED, PARTICLE_POSITION_RESOLUTION);
 
     return UtilityDecorator::FunctionToIntegral(energy) * aux;
 }
