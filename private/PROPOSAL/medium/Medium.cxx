@@ -7,13 +7,13 @@
 *   \author Jan-Hendrik Koehne
 */
 
-// #include <cmath>
+#include <cmath>
 // #include <iomanip>
 
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/Output.h"
-#include "PROPOSAL/methods.h"
+// #include "PROPOSAL/methods.h"
 
 using namespace std;
 using namespace PROPOSAL;
