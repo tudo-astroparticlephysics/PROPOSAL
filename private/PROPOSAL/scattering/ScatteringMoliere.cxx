@@ -151,6 +151,20 @@ ScatteringMoliere::ScatteringMoliere(const ScatteringMoliere& scattering)
 {
 }
 
+ScatteringMoliere::ScatteringMoliere(PROPOSALParticle& particle, const ScatteringMoliere& scattering)
+    : Scattering(particle)
+    , medium_(scattering.medium_->clone())
+    , numComp_(scattering.numComp_)
+    , Zi_(scattering.Zi_)
+    , ki_(scattering.ki_)
+    , Ai_(scattering.Ai_)
+    , A_(scattering.A_)
+    , weight_(scattering.weight_)
+    , chiCSq_(scattering.chiCSq_)
+    , B_(scattering.B_)
+{
+}
+
 ScatteringMoliere::~ScatteringMoliere()
 {
     delete medium_;

@@ -163,6 +163,11 @@ ADD_EXECUTABLE(WriteSectorsFromDomList
 )
 TARGET_LINK_LIBRARIES(WriteSectorsFromDomList PROPOSAL)
 
+ADD_EXECUTABLE(example
+        private/test/example.cxx
+)
+TARGET_LINK_LIBRARIES(example PROPOSAL)
+
 
 IF(ADD_TESTFILE_GEN)
 	ADD_EXECUTABLE(generate_testfiles

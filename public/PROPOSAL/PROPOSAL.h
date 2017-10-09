@@ -72,3 +72,4 @@
 #include "PROPOSAL/methods.h"
 #include "PROPOSAL/Output.h"
 #include "PROPOSAL/Propagator.h"
+#include "PROPOSAL/PropagatorService.h"

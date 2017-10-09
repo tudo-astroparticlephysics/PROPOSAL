@@ -153,6 +153,31 @@ Sector::Sector(PROPOSALParticle& particle,
     }
 }
 
+Sector::Sector(PROPOSALParticle& particle, const Sector& sector)
+    : sector_def_(sector.sector_def_)
+    , weighting_starts_at_(sector.weighting_starts_at_)
+    , particle_(particle)
+    , geometry_(sector.geometry_->clone())
+    , utility_(sector.utility_)
+    , displacement_calculator_(sector.displacement_calculator_->clone())
+    , interaction_calculator_(sector.interaction_calculator_->clone())
+    , decay_calculator_(sector.decay_calculator_->clone())
+    , exact_time_calculator_(NULL)
+    , cont_rand_(NULL)
+    , scattering_(sector.scattering_->clone(particle_))
+{
+    // These are optional, therfore check NULL
+    if (sector.exact_time_calculator_ != NULL)
+    {
+        exact_time_calculator_ = sector.exact_time_calculator_->clone();
+    }
+
+    if (sector.cont_rand_!= NULL)
+    {
+        cont_rand_= new ContinuousRandomizer(*sector.cont_rand_);
+    }
+}
+
 // Sector::Sector(PROPOSALParticle& particle,
 //                const Geometry& geometry,
 //                const Utility& utility,
