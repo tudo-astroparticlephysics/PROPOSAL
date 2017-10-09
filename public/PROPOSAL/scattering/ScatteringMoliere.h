@@ -18,10 +18,12 @@ class ScatteringMoliere : public Scattering
     public:
     // constructor
     ScatteringMoliere(PROPOSALParticle&, const Medium&);
+    ScatteringMoliere(PROPOSALParticle&, const ScatteringMoliere&);
     ScatteringMoliere(const ScatteringMoliere&);
     ~ScatteringMoliere();
 
     Scattering* clone() const { return new ScatteringMoliere(*this); }
+    virtual Scattering* clone(PROPOSALParticle& particle) const { return new ScatteringMoliere(particle, *this); }
     static Scattering* create(PROPOSALParticle& particle, const Medium& medium) { return new ScatteringMoliere(particle, medium); }
 
     // ScatteringMoliere& operator=(const ScatteringMoliere&);

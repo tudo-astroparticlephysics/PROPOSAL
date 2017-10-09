@@ -9,6 +9,8 @@
 
 #pragma once
 
+#include <boost/functional/hash.hpp>
+
 #include <string>
 #include <vector>
 
@@ -93,6 +95,14 @@ struct ParticleDef
 
     friend std::ostream& operator<<(std::ostream&, ParticleDef const&);
 };
+
+
+// ----------------------------------------------------------------------------
+/// @brief Used to hash ParticleDefs in PropagatorService hash table
+//
+/// Hash will currently only done by mass, lifetime and charge
+// ----------------------------------------------------------------------------
+std::size_t hash_value(ParticleDef const& particle_def);
 
 // ------------------------------------------------------------------------- //
 // Create default particle definitions

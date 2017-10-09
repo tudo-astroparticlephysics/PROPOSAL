@@ -796,6 +796,18 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
 
         .add_property("momentum", &PROPOSALParticle::GetMomentum, &PROPOSALParticle::SetMomentum)
         .add_property("particle_def", make_function(&PROPOSALParticle::GetParticleDef, return_value_policy<reference_existing_object>()))
+
+        .add_property("entry_point", &PROPOSALParticle::GetEntryPoint, &PROPOSALParticle::SetEntryPoint)
+        .add_property("entry_time", &PROPOSALParticle::GetEntryTime, &PROPOSALParticle::SetEntryTime)
+        .add_property("entry_energy", &PROPOSALParticle::GetEntryEnergy, &PROPOSALParticle::SetEntryEnergy)
+        .add_property("exit_point", &PROPOSALParticle::GetExitPoint, &PROPOSALParticle::SetExitPoint)
+        .add_property("exit_time", &PROPOSALParticle::GetExitTime, &PROPOSALParticle::SetExitTime)
+        .add_property("exit_energy", &PROPOSALParticle::GetExitEnergy, &PROPOSALParticle::SetExitEnergy)
+        .add_property("closet_approach_point", &PROPOSALParticle::GetClosestApproachPoint, &PROPOSALParticle::SetClosestApproachPoint)
+        .add_property("closet_approach_time", &PROPOSALParticle::GetClosestApproachTime, &PROPOSALParticle::SetClosestApproachTime)
+        .add_property("closet_approach_energy", &PROPOSALParticle::GetClosestApproachEnergy, &PROPOSALParticle::SetClosestApproachEnergy)
+
+        .add_property("e_lost", &PROPOSALParticle::GetElost, &PROPOSALParticle::SetElost)
     ;
 
     /**************************************************************************
@@ -1092,6 +1104,18 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
 
         .def("propagate", &Propagator::Propagate, (arg("max_distance_cm") = 1e20))
         .add_property("particle", make_function(&Propagator::GetParticle, return_internal_reference<>()), "Get the internal created particle to modify its properties");
+
+    // --------------------------------------------------------------------- //
+    // PropagatorService
+    // --------------------------------------------------------------------- //
+
+    class_<PropagatorService, boost::shared_ptr<PropagatorService> >(
+        "PropagatorService", init<>())
+
+        // .def(self_ns::str(self_ns::self))
+
+        .def("propagate", &PropagatorService::Propagate, (arg("particle")))
+        .def("register_propagator", &PropagatorService::RegisterPropagator, (arg("propagator")));
 
     // --------------------------------------------------------------------- //
     // HardBBTable

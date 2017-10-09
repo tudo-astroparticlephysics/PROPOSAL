@@ -26,10 +26,12 @@ class ScatteringFirstOrder : public Scattering
 {
     public:
     ScatteringFirstOrder(PROPOSALParticle&, const Medium&);
+    ScatteringFirstOrder(PROPOSALParticle&, const ScatteringFirstOrder&);
     ScatteringFirstOrder(const ScatteringFirstOrder&);
     ~ScatteringFirstOrder();
 
     virtual Scattering* clone() const { return new ScatteringFirstOrder(*this); }
+    virtual Scattering* clone(PROPOSALParticle& particle) const { return new ScatteringFirstOrder(particle, *this); }
     static Scattering* create(PROPOSALParticle& particle, const Medium& medium) { return new ScatteringFirstOrder(particle, medium); }
 
     private:
