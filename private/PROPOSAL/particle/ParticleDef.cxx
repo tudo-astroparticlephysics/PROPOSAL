@@ -8,6 +8,7 @@
 */
 
 #include <string>
+
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/particle/ParticleDef.h"
 #include "PROPOSAL/decay/LeptonicDecayChannel.h"
@@ -204,6 +205,14 @@ bool ParticleDef::operator==(const ParticleDef& def) const
 bool ParticleDef::operator!=(const ParticleDef& def) const
 {
     return !(*this == def);
+}
+
+std::size_t PROPOSAL::hash_value(ParticleDef const& particle_def) {
+    std::size_t seed = 0;
+    boost::hash_combine(seed, particle_def.mass);
+    boost::hash_combine(seed, particle_def.lifetime);
+    boost::hash_combine(seed, particle_def.charge);
+    return seed;
 }
 
 // ------------------------------------------------------------------------- //

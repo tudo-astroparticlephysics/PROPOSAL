@@ -149,6 +149,26 @@ Propagator::Propagator(const ParticleDef& particle_def,
 }
 
 // ------------------------------------------------------------------------- //
+Propagator::Propagator(const Propagator& propagator)
+    : seed_(propagator.seed_)
+    , sectors_(propagator.sectors_.size(), NULL)
+    , current_sector_(NULL)
+    , particle_(propagator.particle_)
+    , detector_(propagator.detector_->clone())
+{
+    for(unsigned int i = 0; i < propagator.sectors_.size(); ++i)
+    {
+        sectors_[i] = new Sector(particle_, *propagator.sectors_[i]);
+
+        if (propagator.sectors_[i] == propagator.current_sector_)
+        {
+            current_sector_ = sectors_[i];
+        }
+    }
+}
+
+
+// ------------------------------------------------------------------------- //
 Propagator::Propagator(const ParticleDef& particle_def, const std::string& config_file)
     : seed_(1)
     , current_sector_(NULL)
@@ -1568,44 +1588,6 @@ double Propagator::CalculateEffectiveDistance(const Vector3D& particle_position,
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
-
-
-Propagator::Propagator(const Propagator &propagator)
-    :seed_                      ( propagator.seed_ )
-    ,particle_                      ( propagator.particle_ )
-    // ,brems_                     ( propagator.brems_ )
-    // ,photo_                     ( propagator.photo_ )
-    // ,lpm_                       ( propagator.lpm_ )
-    // ,moliere_                   ( propagator.moliere_ )
-    // ,stopping_decay_            ( propagator.stopping_decay_ )
-    // ,do_exact_time_calculation_ ( propagator.do_exact_time_calculation_ )
-    // ,integrate_                 ( propagator.integrate_ )
-    // ,brems_multiplier_          ( propagator.brems_multiplier_ )
-    // ,photo_multiplier_          ( propagator.photo_multiplier_ )
-    // ,ioniz_multiplier_          ( propagator.ioniz_multiplier_ )
-    // ,epair_multiplier_          ( propagator.epair_multiplier_ )
-    // ,global_ecut_inside_        ( propagator.global_ecut_inside_ )
-    // ,global_ecut_infront_       ( propagator.global_ecut_infront_ )
-    // ,global_ecut_behind_        ( propagator.global_ecut_behind_ )
-    // ,global_vcut_inside_        ( propagator.global_vcut_inside_ )
-    // ,global_vcut_infront_       ( propagator.global_vcut_infront_ )
-    // ,global_vcut_behind_        ( propagator.global_vcut_behind_ )
-    // ,global_cont_inside_        ( propagator.global_cont_inside_ )
-    // ,global_cont_infront_       ( propagator.global_cont_infront_ )
-    // ,global_cont_behind_        ( propagator.global_cont_behind_ )
-    // ,path_to_tables_            ( propagator.path_to_tables_ )
-    // ,raw_                       ( propagator.raw_ )
-    // ,particle_                  ( propagator.particle_ )
-    // ,backup_particle_           ( propagator.backup_particle_ )
-    //FirstOrderScattering
-    // ,scatteringFirstOrder_          ( propagator.scatteringFirstOrder_ )
-    // ,scatteringFirstOrderMoliere_   ( propagator.scatteringFirstOrderMoliere_ )
-    // ,scattering_model_          (propagator.scattering_model_)
-    // ,current_sector_        ( new Collection(*propagator.current_sector_) )
-
-{
-
-}
 
 
 //----------------------------------------------------------------------------//

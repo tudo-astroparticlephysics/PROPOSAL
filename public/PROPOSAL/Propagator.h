@@ -128,19 +128,15 @@ class Propagator
     // void ReadConfigFile(std::string config_file, bool DoApplyOptions=true);
 
 
-    //----------------------------------------------------------------------------//
+    // --------------------------------------------------------------------- //
     // Getter
+    // --------------------------------------------------------------------- //
 
+    // --------------------------------------------------------------------- //
     const Sector* GetCurrentCollection() const { return current_sector_; }
-    //----------------------------------------------------------------------------//
-
-    std::vector<Sector*> GetCollections() const { return sectors_; }
 
     //----------------------------------------------------------------------------//
-    // PROPOSALParticle* GetParticle() const
-    // {
-    //     return particle_;
-    // }
+    std::vector<Sector*> GetSectors() const { return sectors_; }
 
     //----------------------------------------------------------------------------//
     // Setter

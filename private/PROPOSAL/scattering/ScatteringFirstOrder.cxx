@@ -40,6 +40,12 @@ ScatteringFirstOrder::ScatteringFirstOrder(const ScatteringFirstOrder& scatterin
 {
 }
 
+ScatteringFirstOrder::ScatteringFirstOrder(PROPOSALParticle& particle, const ScatteringFirstOrder& scattering)
+    : Scattering(particle)
+    , medium_(scattering.medium_->clone())
+{
+}
+
 ScatteringFirstOrder::~ScatteringFirstOrder()
 {
     delete medium_;
