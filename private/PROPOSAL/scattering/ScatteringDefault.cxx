@@ -3,8 +3,6 @@
 
 #include "PROPOSAL/math/MathModel.h"
 #include "PROPOSAL/scattering/ScatteringDefault.h"
-#include "PROPOSAL/crossection/CrossSection.h"
-#include "PROPOSAL/crossection/parametrization/Parametrization.h"
 #include "PROPOSAL/Output.h"
 #include "PROPOSAL/methods.h"
 #include "PROPOSAL/Constants.h"

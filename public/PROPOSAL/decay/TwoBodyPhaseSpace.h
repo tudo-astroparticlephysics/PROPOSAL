@@ -4,7 +4,6 @@
 #include <vector>
 
 #include "PROPOSAL/decay/DecayChannel.h"
-#include "PROPOSAL/math/RootFinder.h"
 
 namespace PROPOSAL
 {

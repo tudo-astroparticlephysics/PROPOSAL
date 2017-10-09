@@ -1,8 +1,6 @@
 
 #pragma once
 
-#include "PROPOSAL/math/Integral.h"
-#include "PROPOSAL/math/Interpolant.h"
 
 namespace PROPOSAL {
 
