@@ -25,16 +25,17 @@
  */
 
 
-// #include <algorithm>
+#include <cmath>
+#include <algorithm>
 // #include <sstream>
 
 #include <boost/bind.hpp>
 
 #include "PROPOSAL/math/Interpolant.h"
-#include "PROPOSAL/methods.h"
+// #include "PROPOSAL/methods.h"
 #include "PROPOSAL/Output.h"
 
-using namespace std;
+// using namespace std;
 using namespace PROPOSAL;
 
 const double Interpolant::bigNumber_   =   -300;
@@ -270,14 +271,14 @@ double Interpolant::FindLimit(double y)
     iX_.swap(iY_);
     if(!fast_)
     {
-        SWAP(precision_,precisionY_,double);
-        SWAP(worstX_,worstY_,double);
+        std::swap(precision_,precisionY_);
+        std::swap(worstX_,worstY_);
 
         rat         =   rational_;
         rational_    =   rationalY_;
     }
 
-    SWAP(romberg_,rombergY_,double);
+    std::swap(romberg_,rombergY_);
 
     rel         =   relative_;
     relative_    =   relativeY_;
@@ -317,13 +318,13 @@ double Interpolant::FindLimit(double y)
 
     if(!fast_)
     {
-        SWAP(precision_,precisionY_,double);
-        SWAP(worstX_,worstY_,double);
+        std::swap(precision_,precisionY_);
+        std::swap(worstX_,worstY_);
 
         rational_    =   rat;
     }
 
-    SWAP(romberg_,rombergY_,double);
+    std::swap(romberg_,rombergY_);
 
     relative_    =   rel;
 
@@ -409,13 +410,13 @@ double Interpolant::FindLimit(double x1, double y)
 
     if(!fast_)
     {
-        SWAP(precision_, precisionY_, double);
-        SWAP(worstX_,worstY_,double);
-        SWAP(rational_,rationalY_,double);
+        std::swap(precision_, precisionY_);
+        std::swap(worstX_,worstY_);
+        std::swap(rational_,rationalY_);
     }
 
-    SWAP(romberg_, rombergY_,double);
-    SWAP(relative_,relativeY_,double);
+    std::swap(romberg_, rombergY_);
+    std::swap(relative_,relativeY_);
 
     if(i+1<max_)
     {
@@ -460,13 +461,13 @@ double Interpolant::FindLimit(double x1, double y)
 
     if(!fast_)
     {
-        SWAP(precision_, precisionY_, double);
-        SWAP(worstX_,worstY_,double);
-        SWAP(rational_,rationalY_,double);
+        std::swap(precision_, precisionY_);
+        std::swap(worstX_,worstY_);
+        std::swap(rational_,rationalY_);
     }
 
-    SWAP(romberg_, rombergY_,double);
-    SWAP(relative_,relativeY_,double);
+    std::swap(romberg_, rombergY_);
+    std::swap(relative_,relativeY_);
 
     if(result<xmin_)
     {
@@ -513,13 +514,13 @@ double Interpolant::FindLimit(double x1, double y)
 //----------------------------------------------------------------------------//
 
 
-bool Interpolant::Save(string Path, bool raw)
+bool Interpolant::Save(std::string Path, bool raw)
 {
-    ofstream out;
+    std::ofstream out;
 
     if(!raw)
     {
-        stringstream ss;
+        std::stringstream ss;
         ss<<Path<<".txt";
 
         out.open(ss.str().c_str());
@@ -535,7 +536,7 @@ bool Interpolant::Save(string Path, bool raw)
     else
     {
 
-        out.open(Path.c_str() , ios::binary);
+        out.open(Path.c_str() , std::ios::binary);
 
         if(!out.good())
         {
@@ -556,7 +557,7 @@ bool Interpolant::Save(string Path, bool raw)
 //----------------------------------------------------------------------------//
 
 
-bool Interpolant::Save(ofstream& out, bool raw)
+bool Interpolant::Save(std::ofstream& out, bool raw)
 {
     if(!out.good())
     {
@@ -638,23 +639,23 @@ bool Interpolant::Save(ofstream& out, bool raw)
     }
     else
     {
-        out << D2 << endl;
+        out << D2 << std::endl;
 
         if(D2)
         {
             if(isLog_)
             {
-                out << max_ << "\t" << exp(xmin_) << "\t" << exp(xmax_) << endl;
+                out << max_ << "\t" << exp(xmin_) << "\t" << exp(xmax_) << std::endl;
             }
             else
             {
-                out << max_ << "\t" << xmin_ << "\t" << xmax_ << endl;
+                out << max_ << "\t" << xmin_ << "\t" << xmax_ << std::endl;
             }
-            out << romberg_ << "\t" << rational_ << "\t" << relative_ << "\t" << isLog_ << endl;
-            out << rombergY_ << "\t" << rationalY_ << "\t" << relativeY_ << "\t" << logSubst_ << endl;
+            out << romberg_ << "\t" << rational_ << "\t" << relative_ << "\t" << isLog_ << std::endl;
+            out << rombergY_ << "\t" << rationalY_ << "\t" << relativeY_ << "\t" << logSubst_ << std::endl;
 
             for(int i =0; i<max_ ;i++){
-                out << iX_.at(i) << endl;
+                out << iX_.at(i) << std::endl;
                 Interpolant_.at(i)->Save(out,raw);
             }
         }
@@ -662,17 +663,17 @@ bool Interpolant::Save(ofstream& out, bool raw)
         {
             if(isLog_)
             {
-                out << max_ << "\t" << exp(xmin_) << "\t" << exp(xmax_) << endl;
+                out << max_ << "\t" << exp(xmin_) << "\t" << exp(xmax_) << std::endl;
             }
             else
             {
-                out << max_ << "\t" << xmin_ << "\t" << xmax_ << endl;
+                out << max_ << "\t" << xmin_ << "\t" << xmax_ << std::endl;
             }
-            out << romberg_ << "\t" << rational_ << "\t" << relative_ << "\t" << isLog_ << endl;
-            out << rombergY_ << "\t" << rationalY_ << "\t" << relativeY_ << "\t" << logSubst_ << endl;
+            out << romberg_ << "\t" << rational_ << "\t" << relative_ << "\t" << isLog_ << std::endl;
+            out << rombergY_ << "\t" << rationalY_ << "\t" << relativeY_ << "\t" << logSubst_ << std::endl;
 
             for(int i =0; i<max_ ;i++){
-                out << iX_.at(i) << "\t" << iY_.at(i) << endl;
+                out << iX_.at(i) << "\t" << iY_.at(i) << std::endl;
             }
         }
     }
@@ -688,18 +689,18 @@ bool Interpolant::Save(ofstream& out, bool raw)
 bool Interpolant::Load(std::string Path, bool raw)
 {
     bool success;
-    ifstream in;
+    std::ifstream in;
 
     if(!raw)
     {
-        stringstream ss;
+        std::stringstream ss;
         ss<<Path<<".txt";
 
         in.open(ss.str().c_str());
     }
     else
     {
-        in.open(Path.c_str() ,ios::binary);
+        in.open(Path.c_str() ,std::ios::binary);
 
     }
 
@@ -714,7 +715,7 @@ bool Interpolant::Load(std::string Path, bool raw)
 //----------------------------------------------------------------------------//
 
 
-bool Interpolant::Load(ifstream& in, bool raw)
+bool Interpolant::Load(std::ifstream& in, bool raw)
 {
     bool D2;
 
@@ -1079,7 +1080,7 @@ Interpolant::Interpolant(int max1, double x1min, double x1max, int max2, double 
 //----------------------------------------------------------------------------//
 
 
-Interpolant::Interpolant(vector<double> x, vector<double> y, int romberg, bool rational, bool relative)
+Interpolant::Interpolant(std::vector<double> x, std::vector<double> y, int romberg, bool rational, bool relative)
     :romberg_      ( 1. )
     ,rombergY_     ( 1. )
     ,iX_           ( )
@@ -1114,7 +1115,7 @@ Interpolant::Interpolant(vector<double> x, vector<double> y, int romberg, bool r
     ,x_save_       ( 1 )
     ,y_save_       ( 0 )
 {
-    InitInterpolant(min(x.size(), y.size()), x.at(0), x.at(x.size()-1),
+    InitInterpolant(std::min(x.size(), y.size()), x.at(0), x.at(x.size()-1),
                     romberg, rational, relative, false,
                     romberg, rational, relative, false);
 
@@ -1320,7 +1321,7 @@ void Interpolant::InitInterpolant(int max, double xmin, double xmax,
     }
     else if(xmin>xmax)
     {
-        SWAP(xmin,xmax,double);
+        std::swap(xmin,xmax);
     }
 
     if(romberg<=0)

@@ -7,15 +7,15 @@
 *   \author Jan-Hendrik Koehne
 */
 
-// #include <cmath>
+#include <cmath>
 // #include <math.h>
-// #include <algorithm>
+#include <algorithm>
 #include "PROPOSAL/math/Integral.h"
 #include "PROPOSAL/Output.h"
-#include "PROPOSAL/methods.h"
+// #include "PROPOSAL/methods.h"
 #include "PROPOSAL/Constants.h"
 
-using namespace std;
+// using namespace std;
 using namespace PROPOSAL;
 
 
@@ -154,7 +154,7 @@ double Integral::IntegrateWithSubstitution(double min, double max, boost::functi
     }
     else if(min>max)
     {
-        SWAP(min,max,double);
+        std::swap(min,max);
         aux     =   -1;
         reverse_ =   !reverse_;
     }
@@ -266,7 +266,7 @@ double Integral::IntegrateWithLog(double min, double max, boost::function<double
     }
     else if(min>max)
     {
-        SWAP(min,max,double);
+        std::swap(min,max);
         aux     =   -1;
         reverse_ =   !reverse_;
     }
@@ -1047,7 +1047,7 @@ double Integral::InitIntegralOpenedAndClosed(double min, double max, boost::func
 
     if(min>max)
     {
-        SWAP(min,max,double);
+        std::swap(min,max);
         aux =   -1;
     }
     else
@@ -1113,7 +1113,7 @@ double Integral::InitIntegralWithSubstitution(double min, double max, boost::fun
 
     if(min>max)
     {
-        SWAP(min,max,double);
+        std::swap(min,max);
         aux =   -1;
     }
     else
@@ -1223,8 +1223,8 @@ void Integral::RefineUpperLimit(double result)
 
     if(flow>0)
     {
-            SWAP(xlow,xhi,double);
-            SWAP(flow,fhi,double);
+            std::swap(xlow,xhi);
+            std::swap(flow,fhi);
     }
 
     deltaX      =   max_-min_;
@@ -1303,7 +1303,7 @@ void Integral::RefineUpperLimit(double result)
 
         if(min_>max_)
         {
-            SWAP(min_,max_,double);
+            std::swap(min_,max_);
             aux=-1;
         }
         else
@@ -1340,7 +1340,7 @@ double Integral::InitIntegralWithLog(double min, double max, boost::function<dou
 
     if(min>max)
     {
-        SWAP(min,max,double);
+        std::swap(min,max);
         aux =   -1;
 
     }
@@ -1399,7 +1399,7 @@ double Integral::InitIntegralWithLogSubstitution(double min, double max, boost::
     }
     else if(min>max)
     {
-        SWAP(min,max,double);
+        std::swap(min,max);
         aux=-1;
     }
     else
