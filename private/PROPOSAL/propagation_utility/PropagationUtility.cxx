@@ -177,9 +177,9 @@ Utility::Utility(const Utility& collection)
     :particle_def_(collection.particle_def_)
     ,medium_(collection.medium_->clone())
     ,cut_settings_(collection.cut_settings_)
+    ,crosssections_(collection.crosssections_.size(), NULL)
+    ,utility_def_(collection.utility_def_)
 {
-    crosssections_.resize(collection.crosssections_.size());
-
     for (unsigned int i = 0; i < crosssections_.size(); ++i)
     {
         crosssections_[i] = collection.crosssections_[i]->clone();

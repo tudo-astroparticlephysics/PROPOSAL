@@ -41,6 +41,12 @@ ScatteringDefault::ScatteringDefault(const ScatteringDefault& scattering)
 {
 }
 
+ScatteringDefault::ScatteringDefault(PROPOSALParticle& particle, const ScatteringDefault& scattering)
+    : Scattering(particle)
+    , scatter(scattering.scatter->clone())
+{
+}
+
 ScatteringDefault::~ScatteringDefault()
 {
     delete scatter;

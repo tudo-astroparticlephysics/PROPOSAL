@@ -23,6 +23,7 @@ class Scattering
     virtual ~Scattering();
 
     virtual Scattering* clone() const = 0; // virtual constructor idiom (used for deep copies)
+    virtual Scattering* clone(PROPOSALParticle&) const = 0; // virtual constructor idiom (used for deep copies)
 
     void Scatter(double dr, double ei, double ef);
 

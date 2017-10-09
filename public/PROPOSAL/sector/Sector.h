@@ -57,6 +57,7 @@ class Sector
     // Sector(PROPOSALParticle&);
     Sector(PROPOSALParticle&, const Medium&, const EnergyCutSettings&, const Geometry&, const Definition&);
     Sector(PROPOSALParticle&, const Medium&, const EnergyCutSettings&, const Geometry&, const Definition&, const InterpolationDef&);
+    Sector(PROPOSALParticle&, const Sector&);
     // Sector(PROPOSALParticle&, const Geometry&, const Utility&, const Scattering&, bool do_interpolation, const Definition& def = Definition());
     Sector(const Sector&);
     virtual ~Sector();
