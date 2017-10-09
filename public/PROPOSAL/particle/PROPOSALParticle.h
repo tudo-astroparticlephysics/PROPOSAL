@@ -132,13 +132,13 @@ class DynamicData
     // --------------------------------------------------------------------- //
 
     // Setter
-    void SetPosition(const Vector3D&);
-    void SetDirection(const Vector3D&);
+    void SetPosition(const Vector3D& position) { position_ = position; }
+    void SetDirection(const Vector3D& direction) { direction_ = direction; }
 
-    virtual void SetEnergy(double);
-    void SetParentParticleEnergy(double);
-    void SetTime(double t);
-    void SetPropagatedDistance(double);
+    virtual void SetEnergy(double energy) { energy_ = energy; }
+    void SetParentParticleEnergy(double parent_particle_energy) { parent_particle_energy_ = parent_particle_energy; }
+    void SetTime(double time) { time_ = time; }
+    void SetPropagatedDistance(double prop_dist) { propagated_distance_ = prop_dist; }
 
     // Getter
     Type GetTypeId() const { return type_id_; }
@@ -194,12 +194,12 @@ class PROPOSALParticle : public DynamicData
     void SetEnergy(double energy);
     void SetMomentum(double momentum);
 
-    void SetParentParticleId(int parent_particle_id);
-    void SetParticleId(int particle_id);
+    void SetParentParticleId(int parent_particle_id) { parent_particle_id_ = parent_particle_id; }
+    void SetParticleId(int particle_id) { particle_id_ = particle_id; }
 
     void SetEntryPoint(const Vector3D& entry_point) { entry_point_ = entry_point; }
-    void SetEntryTime(double ti) { entry_time_ = ti; }
-    void SetEntryEnergy(double ei) { entry_energy_ = ei; }
+    void SetEntryTime(double entry_time) { entry_time_ = entry_time; }
+    void SetEntryEnergy(double entry_energy) { entry_energy_ = entry_energy; }
 
     void SetExitPoint(const Vector3D& exit_point){ exit_point_ = exit_point; }
     void SetExitTime(const double exit_time){ exit_time_ = exit_time; }

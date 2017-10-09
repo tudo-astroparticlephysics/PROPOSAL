@@ -58,6 +58,12 @@ std::ostream& PROPOSAL::operator<<(std::ostream& os, Parametrization const& para
 // Public methods
 // ------------------------------------------------------------------------- //
 
+//----------------------------------------------------------------------------//
+double Parametrization::FunctionToDNdxIntegral(double energy, double variable)
+{
+    return DifferentialCrossSection(energy, variable);
+}
+
 // ------------------------------------------------------------------------- //
 double Parametrization::FunctionToDEdxIntegral(double energy, double variable)
 {
@@ -68,12 +74,6 @@ double Parametrization::FunctionToDEdxIntegral(double energy, double variable)
 double Parametrization::FunctionToDE2dxIntegral(double energy, double variable)
 {
     return variable * variable * DifferentialCrossSection(energy, variable);
-}
-
-//----------------------------------------------------------------------------//
-double Parametrization::FunctionToDNdxIntegral(double energy, double variable)
-{
-    return DifferentialCrossSection(energy, variable);
 }
 
 // ------------------------------------------------------------------------- //
