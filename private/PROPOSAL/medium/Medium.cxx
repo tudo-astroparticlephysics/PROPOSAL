@@ -13,7 +13,7 @@
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/Output.h"
-// #include "PROPOSAL/methods.h"
+#include "PROPOSAL/methods.h"
 
 using namespace std;
 using namespace PROPOSAL;
@@ -27,19 +27,22 @@ namespace PROPOSAL {
 ostream& operator<<(ostream& os, Medium const& medium)
 {
 
-    os << "=================== Medium( " << &medium << " ) ===================" << endl;
+    std::stringstream ss;
+    ss << " Medium (" << &medium << ") ";
+    os << Helper::Centered(60, ss.str()) << '\n';
+
     os << medium.name_ << endl;
-    os << "\tnumber of components:\t\t\t\t" << medium.numComponents_ << endl;
-    os << "\tmass density [g/cm3]:\t\t\t\t" << medium.massDensity_ << endl;
-    os << "\tmolecule density [number/cm3]:\t\t\t" << medium.molDensity_ << endl;
-    os << "\t<Z/A>:\t\t\t\t\t\t" << medium.ZA_ << endl;
-    os << "\tsum of nucleons of all nuclei:\t\t\t" << medium.sumNucleons_ << endl;
-    os << "\tionization potential [eV]:\t\t\t" << medium.I_ << endl;
-    os << "\trefraction index:\t\t\t\t" << medium.r_ << endl;
-    os << "\taverage all-component nucleon weight [MeV]:\t" << medium.MM_ << endl;
-    os << "\tmultiplicative density correction factor:\t" << medium.rho_ << endl;
-    os << "\tsum of charges of all nuclei:\t\t\t" << medium.sumCharge_ << endl;
-    os << "\tradiation Length:\t\t" << medium.radiationLength_ << endl;
+    os << "number of components:\t\t\t\t" << medium.numComponents_ << endl;
+    os << "mass density [g/cm3]:\t\t\t\t" << medium.massDensity_ << endl;
+    os << "molecule density [number/cm3]:\t\t\t" << medium.molDensity_ << endl;
+    os << "<Z/A>:\t\t\t\t\t\t" << medium.ZA_ << endl;
+    os << "sum of nucleons of all nuclei:\t\t\t" << medium.sumNucleons_ << endl;
+    os << "ionization potential [eV]:\t\t\t" << medium.I_ << endl;
+    os << "refraction index:\t\t\t\t" << medium.r_ << endl;
+    os << "average all-component nucleon weight [MeV]:\t" << medium.MM_ << endl;
+    os << "multiplicative density correction factor:\t" << medium.rho_ << endl;
+    os << "sum of charges of all nuclei:\t\t\t" << medium.sumCharge_ << endl;
+    os << "radiation Length:\t\t" << medium.radiationLength_ << endl;
 
     for (std::vector<Components::Component*>::const_iterator iter = medium.components_.begin();
          iter != medium.components_.end();
@@ -48,7 +51,7 @@ ostream& operator<<(ostream& os, Medium const& medium)
         os << **iter << endl;
     }
 
-    os << "=================================================================";
+    os << Helper::Centered(60, "");
     return os;
 }
 
