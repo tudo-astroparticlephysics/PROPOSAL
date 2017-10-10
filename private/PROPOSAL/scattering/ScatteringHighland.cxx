@@ -1,5 +1,5 @@
-/*! \file   ScatteringFirstOrder.cxx
-*   \brief  Source file for the ScatteringFirstOrder routines.
+/*! \file   ScatteringHighland.cxx
+*   \brief  Source file for the ScatteringHighland routines.
 *
 *   For more details see the class documentation.
 *
@@ -15,10 +15,8 @@
 #include "PROPOSAL/methods.h"
 #include "PROPOSAL/math/MathModel.h"
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/scattering/ScatteringFirstOrder.h"
-#include "PROPOSAL/Output.h"
+#include "PROPOSAL/scattering/ScatteringHighland.h"
 
-using namespace std;
 using namespace PROPOSAL;
 
 // ------------------------------------------------------------------------- //
@@ -26,25 +24,25 @@ using namespace PROPOSAL;
 // ------------------------------------------------------------------------- //
 
 
-ScatteringFirstOrder::ScatteringFirstOrder(PROPOSALParticle& particle, const Medium& medium)
+ScatteringHighland::ScatteringHighland(PROPOSALParticle& particle, const Medium& medium)
     : Scattering(particle)
     , medium_(medium.clone())
 {
 }
 
-ScatteringFirstOrder::ScatteringFirstOrder(const ScatteringFirstOrder& scattering)
+ScatteringHighland::ScatteringHighland(const ScatteringHighland& scattering)
     : Scattering(scattering)
     , medium_(scattering.medium_->clone())
 {
 }
 
-ScatteringFirstOrder::ScatteringFirstOrder(PROPOSALParticle& particle, const ScatteringFirstOrder& scattering)
+ScatteringHighland::ScatteringHighland(PROPOSALParticle& particle, const ScatteringHighland& scattering)
     : Scattering(particle)
     , medium_(scattering.medium_->clone())
 {
 }
 
-ScatteringFirstOrder::~ScatteringFirstOrder()
+ScatteringHighland::~ScatteringHighland()
 {
     delete medium_;
 }
@@ -53,7 +51,7 @@ ScatteringFirstOrder::~ScatteringFirstOrder()
 // Private methods
 // ------------------------------------------------------------------------- //
 
-double ScatteringFirstOrder::CalculateTheta0(double dr)
+double ScatteringHighland::CalculateTheta0(double dr)
 {
     double y = dr/medium_->GetRadiationLength();
     double beta = 1./sqrt(1 +  particle_.GetMass() * particle_.GetMass()/ (particle_.GetMomentum()*particle_.GetMomentum() ));
@@ -63,7 +61,7 @@ double ScatteringFirstOrder::CalculateTheta0(double dr)
 
 //----------------------------------------------------------------------------//
 
-Scattering::RandomAngles ScatteringFirstOrder::CalculateRandomAngle(double dr, double ei, double ef)
+Scattering::RandomAngles ScatteringHighland::CalculateRandomAngle(double dr, double ei, double ef)
 {
     (void)ei;
     (void)ef;

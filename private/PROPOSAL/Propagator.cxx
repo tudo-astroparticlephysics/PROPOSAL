@@ -741,16 +741,11 @@ Propagator& Propagator::operator=(const Propagator &propagator)
 bool Propagator::operator==(const Propagator &propagator) const
 {
     // if( particle_                 != propagator.particle_ )               return false;
-    //FirstOrderScattering
-    // if( scatteringFirstOrder_           != propagator.scatteringFirstOrder_ )           return false;
-    // if( scatteringFirstOrderMoliere_    != propagator.scatteringFirstOrderMoliere_ )    return false;
-    // if( scattering_model_               != propagator.scattering_model_)                return false;
 
     if( seed_                     != propagator.seed_ )                   return false;
     // if( brems_                    != propagator.brems_ )                  return false;
     // if( photo_                    != propagator.photo_ )                  return false;
     // if( lpm_                      != propagator.lpm_ )                    return false;
-    // if( moliere_                  != propagator.moliere_ )                return false;
     // if( stopping_decay_           != propagator.stopping_decay_ )         return false;
     // if( do_exact_time_calculation_!= propagator.do_exact_time_calculation_ )return false;
     // if( integrate_                != propagator.integrate_ )              return false;
@@ -799,7 +794,6 @@ void Propagator::swap(Propagator &propagator)
     // swap( brems_                    ,   propagator.brems_ );
     // swap( photo_                    ,   propagator.photo_ );
     // swap( lpm_                      ,   propagator.lpm_ );
-    // swap( moliere_                  ,   propagator.moliere_ );
     // swap( stopping_decay_           ,   propagator.stopping_decay_ );
     // swap( do_exact_time_calculation_,   propagator.do_exact_time_calculation_ );
     // swap( integrate_                ,   propagator.integrate_ );
@@ -822,10 +816,6 @@ void Propagator::swap(Propagator &propagator)
 
     // particle_->swap( *propagator.particle_ );
     // backup_particle_->swap( *propagator.backup_particle_ );
-    //FirstOrderScattering
-    // swap<ScatteringFirstOrder*> (scatteringFirstOrder_ ,propagator.scatteringFirstOrder_);
-//    scatteringFirstOrderMoliere_->swap(*propagator.scatteringFirstOrderMoliere_);
-    // swap(scattering_model_ , propagator.scattering_model_);
 
     // current_sector_->swap( *propagator.current_sector_ );
 }

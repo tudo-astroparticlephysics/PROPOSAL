@@ -60,7 +60,8 @@
 #include "PROPOSAL/scattering/Scattering.h"
 #include "PROPOSAL/scattering/ScatteringDefault.h"
 #include "PROPOSAL/scattering/ScatteringMoliere.h"
-#include "PROPOSAL/scattering/ScatteringFirstOrder.h"
+#include "PROPOSAL/scattering/ScatteringHighland.h"
+#include "PROPOSAL/scattering/ScatteringNoScattering.h"
 #include "PROPOSAL/scattering/ScatteringFactory.h"
 #include "PROPOSAL/scattering/Coefficients.h"
 
