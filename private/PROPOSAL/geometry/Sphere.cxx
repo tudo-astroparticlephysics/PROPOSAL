@@ -94,9 +94,8 @@ bool Sphere::compare(const Geometry& geometry) const
 // ------------------------------------------------------------------------- //
 void Sphere::print(std::ostream& os) const
 {
-    os << "\tRadius: " << radius_ << "\tInner radius: " << inner_radius_
-       << endl;
-    os << "------------------------------------";
+    os << "Radius: " << radius_ << "\tInner radius: " << inner_radius_
+       << '\n';
 }
 
 // ------------------------------------------------------------------------- //

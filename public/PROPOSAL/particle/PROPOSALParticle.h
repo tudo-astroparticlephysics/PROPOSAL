@@ -127,6 +127,8 @@ class DynamicData
     DynamicData(const DynamicData&);
     virtual ~DynamicData();
 
+    friend std::ostream& operator<<(std::ostream&, DynamicData const&);
+
     // --------------------------------------------------------------------- //
     // Getter & Setter
     // --------------------------------------------------------------------- //
@@ -142,6 +144,7 @@ class DynamicData
 
     // Getter
     Type GetTypeId() const { return type_id_; }
+    static std::string GetNameFromType(Type);
 
     Vector3D GetPosition() const { return position_; }
     Vector3D GetDirection() const { return direction_; }
@@ -152,16 +155,17 @@ class DynamicData
     double GetPropagatedDistance() const { return propagated_distance_; }
 
     protected:
+    virtual void print(std::ostream&) const {}
+
     const Type type_id_;
 
     Vector3D position_;          //!< position coordinates [cm]
     Vector3D direction_;         //!< direction vector, angles in [rad]
 
-    double energy_;          //!< energy [MeV]
+    double energy_;                 //!< energy [MeV]
     double parent_particle_energy_; //!< energy of the parent particle
     double time_;                   //!< age [sec]
-    double propagated_distance_; //!< propagation distance [cm]
-
+    double propagated_distance_;    //!< propagation distance [cm]
 };
 
 // ----------------------------------------------------------------------------
@@ -184,7 +188,6 @@ class PROPOSALParticle : public DynamicData
     // Operators
     bool operator==(const PROPOSALParticle& particle) const;
     bool operator!=(const PROPOSALParticle& particle) const;
-    friend std::ostream& operator<<(std::ostream& os, PROPOSALParticle const& particle);
 
     // --------------------------------------------------------------------- //
     // Getter & Setter
@@ -253,6 +256,7 @@ class PROPOSALParticle : public DynamicData
 
     private:
     PROPOSALParticle& operator=(const PROPOSALParticle&);
+    virtual void print(std::ostream&) const;
 
     const ParticleDef particle_def_; //!< static defenitions of the particle
 

@@ -1,5 +1,6 @@
 
 #include "PROPOSAL/EnergyCutSettings.h"
+#include "PROPOSAL/methods.h"
 
 using namespace PROPOSAL;
 
@@ -137,10 +138,14 @@ namespace PROPOSAL
 
 std::ostream& operator<<(std::ostream& os, EnergyCutSettings const& cut_settings)
 {
-    os<<"--------EnergyCutSettings( "<<&cut_settings<<" )--------"<<std::endl;
-    os<<"\tEcut: "<<cut_settings.ecut_<<std::endl;
-    os<<"\tVcut: "<<cut_settings.vcut_<<std::endl;
-    os<<"------------------------------------";
+    std::stringstream ss;
+    ss << " EnergyCutSettings (" << &cut_settings << ") ";
+    os << Helper::Centered(60, ss.str()) << '\n';
+
+    os << "Ecut: "<<cut_settings.ecut_<<std::endl;
+    os << "Vcut: "<<cut_settings.vcut_<<std::endl;
+
+    os << Helper::Centered(60, "");
     return os;
 }
 
