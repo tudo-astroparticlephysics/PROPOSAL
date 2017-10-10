@@ -268,9 +268,9 @@ TauMinusDef::TauMinusDef()
     : ParticleDef()
 {
     name = "TauMinus";
-    mass = MMU;
-    low = MMU;
-    lifetime = LMU;
+    mass = MTAU;
+    low = MTAU;
+    lifetime = LTAU;
     charge = -1.0;
     hardbb_table = &HardBBTables::TauTable;
 
