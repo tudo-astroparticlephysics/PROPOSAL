@@ -415,7 +415,7 @@ double BremsAndreevBezrukovBugaev::CalculateParametrization(double energy, doubl
 
     // calculating the contribution of elastic nuclear and atomic form factors
     // eq. 2.30
-    double qc = 1.9 * MMU * Z3;
+    double qc = 1.9 * particle_def_.mass * Z3;
     aux =  2 * particle_def_.mass / qc;
     double zeta = sqrt(1 + aux * aux);
 
