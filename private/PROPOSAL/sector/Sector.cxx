@@ -541,7 +541,7 @@ void Sector::AdvanceParticle(double dr, double ei, double ef)
     }
 
     // TODO(mario): Adjucst the whole scatteing class Thu 2017/08/24
-    // scattering_->Scatter(particle_, utility->GetCrosssections(), dr, ei, ef);
+    scattering_->Scatter(dr, ei, ef);
 
     // if(scattering_model_!=-1)
     // {

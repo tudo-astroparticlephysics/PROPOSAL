@@ -548,7 +548,7 @@ void export_crosssections()
 
     class_<CrossSection, boost::shared_ptr<CrossSection>, boost::noncopyable>("CrossSection", no_init)
 
-        // .def(self_ns::str(self_ns::self))
+        .def(self_ns::str(self_ns::self))
 
         .def("calculate_dEdx", &CrossSection::CalculatedEdx)
         .def("calculate_dE2dx", &CrossSection::CalculatedE2dx)
@@ -624,7 +624,6 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
         .def(init<const Vector3D&>())
 
         .def(self_ns::str(self_ns::self))
-        // .def(self_ns::repr(self_ns::self))
 
         .add_property("x", &Vector3D::GetX)
         .add_property("y", &Vector3D::GetY)
@@ -651,7 +650,6 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
         .def(init<const EnergyCutSettings&>())
 
         .def(self_ns::str(self_ns::self))
-        .def(self_ns::repr(self_ns::self))
 
         .add_property("ecut", &EnergyCutSettings::GetEcut, &EnergyCutSettings::SetEcut)
         .add_property("vcut", &EnergyCutSettings::GetVcut, &EnergyCutSettings::SetVcut)
@@ -772,7 +770,7 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
 
         .def(init<const DynamicData&>())
 
-        // .def(self_ns::str(self_ns::self))
+        .def(self_ns::str(self_ns::self))
 
         .add_property("id", &DynamicData::GetTypeId)
         .add_property("position", &DynamicData::GetPosition, &DynamicData::SetPosition)
@@ -792,8 +790,6 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
         .def(init<const ParticleDef&>())
         .def(init<const PROPOSALParticle&>())
 
-        // .def(self_ns::str(self_ns::self))
-
         .add_property("momentum", &PROPOSALParticle::GetMomentum, &PROPOSALParticle::SetMomentum)
         .add_property("particle_def", make_function(&PROPOSALParticle::GetParticleDef, return_value_policy<reference_existing_object>()))
 
@@ -809,42 +805,6 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
 
         .add_property("e_lost", &PROPOSALParticle::GetElost, &PROPOSALParticle::SetElost)
     ;
-
-    /**************************************************************************
-    *                               Components                               *
-    **************************************************************************/
-
-    // class_<Components::Component, boost::shared_ptr<Components::Component>, boost::noncopyable >("Component", no_init)
-    //
-    //     .def(self_ns::str(self_ns::self))
-    //
-    //     .add_property("name", &Components::Component::GetName)
-    //     .add_property("nuclear_charge", &Components::Component::GetNucCharge)
-    //     .add_property("atomic_number", &Components::Component::GetAtomicNum)
-    //     .add_property("atoms_in_molecule", &Components::Component::GetAtomInMolecule)
-    //     .add_property("log_constant", &Components::Component::GetLogConstant)
-    //     .add_property("bprime", &Components::Component::GetBPrime)
-    //     .add_property("average_nucleon_weight", &Components::Component::GetAverageNucleonWeight)
-    //     .add_property("mn", &Components::Component::GetMN)
-    //     .add_property("r0", &Components::Component::GetR0);
-    //
-    // // class_<Components::Hydrogen, boost::shared_ptr<Components::Hydrogen>, bases<Components::Component> >( "Hydrogen", init<double>());
-    // COMPONENT_DEF(Hydrogen)
-    // COMPONENT_DEF(Carbon)
-    // COMPONENT_DEF(Nitrogen)
-    // COMPONENT_DEF(Oxygen)
-    // COMPONENT_DEF(Sodium)
-    // COMPONENT_DEF(Magnesium)
-    // COMPONENT_DEF(Sulfur)
-    // COMPONENT_DEF(Argon)
-    // COMPONENT_DEF(Potassium)
-    // COMPONENT_DEF(Calcium)
-    // COMPONENT_DEF(Iron)
-    // COMPONENT_DEF(Copper)
-    // COMPONENT_DEF(Lead)
-    // COMPONENT_DEF(Uranium)
-    // COMPONENT_DEF(StandardRock)
-    // COMPONENT_DEF(FrejusRock)
 
     /**************************************************************************
     *                                 Medium                                 *
@@ -870,8 +830,6 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
 
     class_<MediumFactory::Definition, boost::shared_ptr<MediumFactory::Definition> >("MediumDefinition", init<>())
 
-        // .def(self_ns::str(self_ns::self))
-
         .def_readwrite("type", &MediumFactory::Definition::type)
         .def_readwrite("density_correction", &MediumFactory::Definition::density_correction)
     ;
@@ -890,8 +848,6 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
         .value("Cylinder", GeometryFactory::Cylinder);
 
     class_<GeometryFactory::Definition, boost::shared_ptr<GeometryFactory::Definition> >("GeometryDefinition", init<>())
-
-        // .def(self_ns::str(self_ns::self))
 
         .def_readwrite("shape", &GeometryFactory::Definition::shape)
         .def_readwrite("position", &GeometryFactory::Definition::position)
@@ -926,8 +882,6 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
         .def(init<Vector3D, double, double>())
         .def(init<const Sphere&>())
 
-        // .def(self_ns::str(self_ns::self))
-
         .add_property("inner_radius", &Sphere::GetInnerRadius, &Sphere::SetInnerRadius)
         .add_property("radius", &Sphere::GetRadius, &Sphere::SetRadius)
     ;
@@ -936,8 +890,6 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
 
         .def(init<Vector3D, double, double, double>())
         .def(init<const Box&>())
-
-        // .def(self_ns::str(self_ns::self))
 
         .add_property("width", &Box::GetX, &Box::SetX)
         .add_property("height", &Box::GetY, &Box::SetY)
@@ -948,8 +900,6 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
 
         .def(init<Vector3D, double, double, double>())
         .def(init<const Cylinder&>())
-
-        // .def(self_ns::str(self_ns::self))
 
         .add_property("inner_radius", &Cylinder::GetInnerRadius, &Cylinder::SetInnerRadius)
         .add_property("radius", &Cylinder::GetRadius, &Cylinder::SetRadius)
@@ -1055,8 +1005,6 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
 
     class_<SectorFactory::Definition, boost::shared_ptr<SectorFactory::Definition> >("SectorDefinition", init<>())
 
-        // .def(self_ns::str(self_ns::self))
-
         .def_readwrite("e_cut", &SectorFactory::Definition::e_cut)
         .def_readwrite("v_cut", &SectorFactory::Definition::v_cut)
         .def_readwrite("medium_def", &SectorFactory::Definition::medium_def)
@@ -1112,8 +1060,6 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
 
     class_<PropagatorService, boost::shared_ptr<PropagatorService> >(
         "PropagatorService", init<>())
-
-        // .def(self_ns::str(self_ns::self))
 
         .def("propagate", &PropagatorService::Propagate, (arg("particle")))
         .def("register_propagator", &PropagatorService::RegisterPropagator, (arg("propagator")));
