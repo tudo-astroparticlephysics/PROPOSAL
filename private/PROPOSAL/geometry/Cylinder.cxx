@@ -100,9 +100,8 @@ bool Cylinder::compare(const Geometry& geometry) const
 
 void Cylinder::print(std::ostream& os) const
 {
-    os << "\tRadius: " << radius_ << "\tInnner radius: " << inner_radius_
-       << " Height: " << z_ << endl;
-    os << "------------------------------------";
+    os << "Radius: " << radius_ << "\tInnner radius: " << inner_radius_
+       << " Height: " << z_ << '\n';
 }
 
 // ------------------------------------------------------------------------- //

@@ -1,6 +1,7 @@
 
 #include "PROPOSAL/crossection/CrossSection.h"
 #include "PROPOSAL/crossection/parametrization/Parametrization.h"
+#include "PROPOSAL/methods.h"
 
 using namespace PROPOSAL;
 
@@ -42,4 +43,36 @@ CrossSection::CrossSection(const CrossSection& cross_section)
 CrossSection::~CrossSection()
 {
     delete parametrization_;
+}
+
+// ------------------------------------------------------------------------- //
+std::ostream& PROPOSAL::operator<<(std::ostream& os, CrossSection const& cross)
+{
+    std::string name;
+    switch (cross.type_id_)
+    {
+        case DynamicData::Brems:
+            name = "Bremsstrahlung";
+            break;
+        case DynamicData::Epair:
+            name = "EPairProduction";
+            break;
+        case DynamicData::DeltaE:
+            name = "Ionization";
+            break;
+        case DynamicData::NuclInt:
+            name = "PhotoNuclear";
+            break;
+        default:
+            break;
+    }
+    std::stringstream ss;
+    ss << " CrossSection (" << &cross << ") ";
+    os << Helper::Centered(80, ss.str()) << '\n';
+
+    os << "type: " << name << '\n';
+    os << *cross.parametrization_ << '\n';
+
+    os << Helper::Centered(80, "");
+    return os;
 }

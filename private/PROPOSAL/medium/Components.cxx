@@ -27,8 +27,12 @@ namespace Components {
 
 std::ostream& operator<<(std::ostream& os, Component const& component)
 {
-    os << "-----------------Component( " << &component << " )--------------------" << std::endl;
+    std::stringstream ss;
+    ss << " Component (" << &component << ") ";
+    os << Helper::Centered(60, ss.str()) << '\n';
+
     os << std::fixed << std::setprecision(6);
+
     os << component.GetName() << std::endl;
     os << "AtomicNuc:"
        << "\t\t" << component.GetAtomicNum() << std::endl;
@@ -39,7 +43,8 @@ std::ostream& operator<<(std::ostream& os, Component const& component)
     os << "AverageNucleonWeight:"
        << "\t" << component.GetAverageNucleonWeight() << std::endl;
     os << std::defaultfloat;
-    os << "------------------------------------------------------------------";
+
+    os << Helper::Centered(60, "");
     return os;
 }
 

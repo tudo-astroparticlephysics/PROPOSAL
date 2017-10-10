@@ -64,6 +64,9 @@ class EpairProduction : public Parametrization
     virtual size_t GetHash() const;
 
     protected:
+
+    virtual void print(std::ostream&) const;
+
     static const std::string name_;
 
     double v_;
