@@ -1,33 +1,42 @@
 
 #include "PROPOSAL/Constants.h"
 
-// using namespace PROPOSAL;
-
+// numbers
 const double PROPOSAL::PI = 3.141592653589793;
 const double PROPOSAL::LOG10 = 2.302585092994046; // log(10)
 const double PROPOSAL::SQRT2 = 1.414213562373095; // sqrt(2)
 const double PROPOSAL::SQRT3 = 1.732050807568877; // sqrt(3)
 const double PROPOSAL::SQRTE = 1.648721270700128; // sqrt(e)
+const double PROPOSAL::EULER_MASCHERONI = 0.577215664901532860606512090082402431; // Euler-Mascheroni constant
 
+// integration parameters
 const int PROPOSAL::IROMB = 5; // romb # for integration
 const int PROPOSAL::IMAXS = 40; // max number of int. steps
 const double PROPOSAL::IPREC = 1.e-6; // integration precision
 const double PROPOSAL::IPREC2 = 1.e-6*10; // integration precision
 
+// interpolation parameters
 const int PROPOSAL::NUM1 = 100; // number of interpolation in cross section
 const int PROPOSAL::NUM2 = 200; // number of interpolation in continuous randomization
 const int PROPOSAL::NUM3 = 1000; // number of interpolation in propagate
 
+const double PROPOSAL::BIGENERGY = 1.e14; // upper energy bound for Interpolation (MeV)
+
+// precision parameters
 const double PROPOSAL::COMPUTER_PRECISION = 1.e-10;
 const double PROPOSAL::HALF_PRECISION = 1.e-5; //std::sqrt(computerPrecision);
 const double PROPOSAL::GEOMETRY_PRECISION = 1.e-9;
 const double PROPOSAL::PARTICLE_POSITION_RESOLUTION = 1.e-3; // resolution of particle position (cm)
 
+// physical constants
 const double PROPOSAL::ALPHA = 0.0072973525664; // fine structure constant
 const double PROPOSAL::RY = 13.605693009; // Rydberg energy (eV)
 const double PROPOSAL::NA = 6.022140857e23; // Avogadro's number (1/mol)
 const double PROPOSAL::SPEED = 2.99792458e10; // speed of light (cm/s)
 const double PROPOSAL::IONK = 0.307075; // Ionization Constant = 4*PI*NA*RE*RE*ME (MeV*cm2/g)
+const double PROPOSAL::HBAR = 6.58211928e-22; // hbar in MeV*s
+
+// particle constants
 
 const double PROPOSAL::MP = 938.2720813; // proton mass (MeV)
 const double PROPOSAL::MN = 939.565413; // neutron mass (MeV)
@@ -61,5 +70,3 @@ const double PROPOSAL::MSMP = 1.e5; // Stable massive particle mass (MeV)
 const double PROPOSAL::MSTAU = 1.e5; // stau mass (MeV)
 
 const double PROPOSAL::STABLE_PARTICLE = -1.; // lifetime of stable particle, -1 because of history
-
-const double PROPOSAL::BIGENERGY = 1.e14; // upper energy bound for Interpolation (MeV)
