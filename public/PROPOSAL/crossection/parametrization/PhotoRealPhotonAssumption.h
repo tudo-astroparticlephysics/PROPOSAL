@@ -68,6 +68,8 @@ class PhotoRealPhotonAssumption : public Photonuclear
     virtual size_t GetHash() const;
 
     protected:
+    virtual void print(std::ostream&) const;
+
     RealPhoton* hardBB_;
 };
 

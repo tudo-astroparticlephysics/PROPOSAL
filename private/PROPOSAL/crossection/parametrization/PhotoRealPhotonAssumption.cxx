@@ -132,6 +132,14 @@ size_t PhotoRealPhotonAssumption::GetHash() const
     return seed;
 }
 
+// ------------------------------------------------------------------------- //
+// Print
+// ------------------------------------------------------------------------- //
+
+void PhotoRealPhotonAssumption::print(std::ostream& os) const
+{
+    os << "hardBB enabled: " << (dynamic_cast<HardBB*>(hardBB_)? 1 : 0) << '\n';
+}
 /******************************************************************************
 *                            Zeus Parametrization                            *
 ******************************************************************************/

@@ -118,6 +118,17 @@ class InterpolantBuilder;
 namespace  Helper
 {
 
+// ----------------------------------------------------------------------------
+/// @brief Center string
+///
+/// @param width
+/// @param str
+/// @param fill
+///
+/// @return
+// ----------------------------------------------------------------------------
+std::string Centered(int width, const std::string& str, char fill = '=');
+
 typedef std::vector<std::pair<InterpolantBuilder*, Interpolant** > > InterpolantBuilderContainer;
 
 // ------------------------------------------------------------------------- //
@@ -132,13 +143,8 @@ void InitializeInterpolation(const std::string name,
                              InterpolantBuilderContainer&,
                              const std::vector<Parametrization*>&,
                              InterpolationDef);
-// void InitializeInterpolation(const std::string name,
-//                              InterpolantBuilderContainer&,
-//                              const std::vector<Parametrization*>&);
 
 } /*  Helper */
 
 
 } /* PROPOSAL */
-
-// #define SWAP(a, b,T) {T t; t = a; a = b; b = t;}

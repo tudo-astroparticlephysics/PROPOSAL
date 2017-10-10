@@ -14,6 +14,8 @@
 #include "PROPOSAL/geometry/Geometry.h"
 #include "PROPOSAL/Output.h"
 
+#include "PROPOSAL/methods.h"
+
 using namespace std;
 using namespace PROPOSAL;
 
@@ -27,12 +29,17 @@ namespace PROPOSAL {
 
 ostream& operator<<(ostream& os, Geometry const& geometry)
 {
-    os << "--------Geometry( " << &geometry << " )--------" << endl;
-    os << "\t" << geometry.name_ << endl;
-    os << "\tPosition:\t" << geometry.position_ << endl;
-    os << "\tHirarchy:\t" << geometry.hirarchy_ << endl;
+    std::stringstream ss;
+    ss << " Geometry (" << &geometry << ") ";
+    os << Helper::Centered(60, ss.str()) << '\n';
+
+    os << geometry.name_ << endl;
+    os << "Position:\n" << geometry.position_ << '\n';
+    os << "Hirarchy:\t" << geometry.hirarchy_ << '\n';
 
     geometry.print(os);
+
+    os << Helper::Centered(60, "");
 
     return os;
 }
