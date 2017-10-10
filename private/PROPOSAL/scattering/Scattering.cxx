@@ -9,13 +9,10 @@
 
 #include <cmath>
 
-#include "PROPOSAL/Output.h"
+// #include "PROPOSAL/Output.h"
 #include "PROPOSAL/math/Vector3D.h"
 #include "PROPOSAL/particle/PROPOSALParticle.h"
 #include "PROPOSAL/scattering/Scattering.h"
-#include "PROPOSAL/scattering/ScatteringDefault.h"
-#include "PROPOSAL/scattering/ScatteringMoliere.h"
-#include "PROPOSAL/scattering/ScatteringFirstOrder.h"
 
 using namespace PROPOSAL;
 

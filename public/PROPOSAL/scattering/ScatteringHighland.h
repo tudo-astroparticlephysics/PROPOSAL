@@ -8,8 +8,6 @@
 */
 #pragma once
 
-// #include <vector>
-// #include <string>
 
 #include "PROPOSAL/scattering/Scattering.h"
 #include "PROPOSAL/particle/PROPOSALParticle.h"
@@ -22,20 +20,20 @@ namespace PROPOSAL{
   *
   * More precise scattering angles will be added soon.
   */
-class ScatteringFirstOrder : public Scattering
+class ScatteringHighland : public Scattering
 {
     public:
-    ScatteringFirstOrder(PROPOSALParticle&, const Medium&);
-    ScatteringFirstOrder(PROPOSALParticle&, const ScatteringFirstOrder&);
-    ScatteringFirstOrder(const ScatteringFirstOrder&);
-    ~ScatteringFirstOrder();
+    ScatteringHighland(PROPOSALParticle&, const Medium&);
+    ScatteringHighland(PROPOSALParticle&, const ScatteringHighland&);
+    ScatteringHighland(const ScatteringHighland&);
+    ~ScatteringHighland();
 
-    virtual Scattering* clone() const { return new ScatteringFirstOrder(*this); }
-    virtual Scattering* clone(PROPOSALParticle& particle) const { return new ScatteringFirstOrder(particle, *this); }
-    static Scattering* create(PROPOSALParticle& particle, const Medium& medium) { return new ScatteringFirstOrder(particle, medium); }
+    virtual Scattering* clone() const { return new ScatteringHighland(*this); }
+    virtual Scattering* clone(PROPOSALParticle& particle) const { return new ScatteringHighland(particle, *this); }
+    static Scattering* create(PROPOSALParticle& particle, const Medium& medium) { return new ScatteringHighland(particle, medium); }
 
     private:
-    ScatteringFirstOrder& operator=(const ScatteringFirstOrder&); // Undefined & not allowed
+    ScatteringHighland& operator=(const ScatteringHighland&); // Undefined & not allowed
 
     RandomAngles CalculateRandomAngle(double dr, double ei, double ef);
     double CalculateTheta0(double dr);
