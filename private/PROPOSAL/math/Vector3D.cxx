@@ -4,6 +4,7 @@
 
 #include "PROPOSAL/math/Vector3D.h"
 #include "PROPOSAL/Constants.h"
+#include "PROPOSAL/methods.h"
 
 using namespace PROPOSAL;
 
@@ -112,11 +113,15 @@ namespace PROPOSAL
 {
 std::ostream& operator<<(std::ostream& os, Vector3D const &vector_3d)
 {
-    os<<"----Vector3D( "<<&vector_3d<<" )----"<<std::endl;
-    os<<"\tCartesian Coordinates (x[cm],y[cm],z[cm]):\t"<<vector_3d.x_<<"\t"<<vector_3d.y_<<"\t"<<vector_3d.z_<<std::endl;
-    os<<"\tSpherical Coordinates (radius[cm],azimut[rad],zenith[rad]):\t"<<vector_3d.spheric_radius_<<"\t"<<vector_3d.spheric_azimuth_<<"\t"<<vector_3d.spheric_zenith_<<std::endl;
+    std::stringstream ss;
+    ss << " Vector3D (" << &vector_3d << ") ";
+    os << Helper::Centered(60, ss.str()) << '\n';
+
+    os << "Cartesian Coordinates (x[cm],y[cm],z[cm]):\n"<<vector_3d.x_<<"\t"<<vector_3d.y_<<"\t"<<vector_3d.z_<<std::endl;
+    os << "Spherical Coordinates (radius[cm],azimut[rad],zenith[rad]):\n"<<vector_3d.spheric_radius_<<"\t"<<vector_3d.spheric_azimuth_<<"\t"<<vector_3d.spheric_zenith_<<std::endl;
     // os<<"\tCylindrical Coordinates (radius,azimut,height):\t"<<vector_3d.cylindric_radius_<<"\t"<<vector_3d.cylindric_azimuth_<<"\t"<<vector_3d.cylindric_height_<<std::endl;
-    os<<"------------------------------------";
+
+    os << Helper::Centered(60, "");
     return os;
 }
 } // namespace PROPOSAL

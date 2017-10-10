@@ -55,6 +55,7 @@ class Bremsstrahlung : public Parametrization
     virtual size_t GetHash() const;
 
     protected:
+    virtual void print(std::ostream&) const;
 
     // ----------------------------------------------------------------- //
     // Protected methods

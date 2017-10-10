@@ -20,6 +20,8 @@ class CrossSection
 
     virtual CrossSection* clone() const = 0;
 
+    friend std::ostream& operator<<(std::ostream&, CrossSection const&);
+
     // ----------------------------------------------------------------- //
     // Public methods
     // ----------------------------------------------------------------- //

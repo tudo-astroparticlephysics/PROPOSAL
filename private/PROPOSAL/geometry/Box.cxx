@@ -89,9 +89,8 @@ bool Box::compare(const Geometry& geometry) const
 // ------------------------------------------------------------------------- //
 void Box::print(std::ostream& os) const
 {
-    os << "\tWidth_x: " << x_ << "\tWidth_y " << y_ << "\tHeight: " << z_
-       << endl;
-    os << "------------------------------------";
+    os << "Width_x: " << x_ << "\tWidth_y " << y_ << "\tHeight: " << z_
+       << '\n';
 }
 
 // ------------------------------------------------------------------------- //

@@ -2,6 +2,7 @@
 #include <boost/functional/hash.hpp>
 
 #include "PROPOSAL/crossection/parametrization/Parametrization.h"
+#include "PROPOSAL/methods.h"
 
 
 using namespace PROPOSAL;
@@ -40,7 +41,10 @@ Parametrization::~Parametrization()
 
 std::ostream& PROPOSAL::operator<<(std::ostream& os, Parametrization const& param)
 {
-    os << "---------------------------Parametrization( "<<&param<<" )---------------------------"<<std::endl;
+    std::stringstream ss;
+    ss << " Parametrization (" << &param << ") ";
+    os << Helper::Centered(80, ss.str()) << '\n';
+
     os << "name: " << param.GetName() << '\n';
 
     param.print(os);
@@ -48,9 +52,9 @@ std::ostream& PROPOSAL::operator<<(std::ostream& os, Parametrization const& para
     os << "multiplier: " << param.multiplier_ << '\n';
     os << "current component index: " << param.component_index_ << '\n';
     os << param.particle_def_ << '\n';
-    os << param.medium_ << '\n';
+    os << *param.medium_ << '\n';
     os << param.cut_settings_ << '\n';
-    os<<"-----------------------------------------------------------------------------------------------";
+    os << Helper::Centered(80, "");
     return os;
 }
 
