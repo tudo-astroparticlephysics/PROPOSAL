@@ -15,6 +15,8 @@
 #include "PROPOSAL/decay/TwoBodyPhaseSpace.h"
 #include "PROPOSAL/decay/StableChannel.h"
 
+#include "PROPOSAL/methods.h"
+
 #define PARTICLE_IMP(cls, MASS, LIFETIME, CHARGE)                                                                      \
     cls##Def::cls##Def()                                                                                               \
         : ParticleDef()                                                                                                \
@@ -84,17 +86,22 @@ namespace PROPOSAL
 
 std::ostream& operator<<(std::ostream& os, ParticleDef const& def)
 {
-    os << "-----------------ParticleDef( " << &def << " )--------------------" << std::endl;
-    os << def.name << std::endl;
+    std::stringstream ss;
+    ss << " ParticleDef (" << &def << ") ";
+
+    os << Helper::Centered(60, ss.str()) << '\n';
+
+    os << def.name << '\n';
     os << "Mass:"
-       << "\t\t" << def.mass << std::endl;
+       << "\t\t" << def.mass << '\n';
     os << "Low:"
-       << "\t\t" << def.low << std::endl;
+       << "\t\t" << def.low << '\n';
     os << "Lifetime:"
-       << "\t" << def.lifetime << std::endl;
+       << "\t" << def.lifetime << '\n';
     os << "Charge:"
-       << "\t\t" << def.charge << std::endl;
-    os << "------------------------------------------------------------------";
+       << "\t\t" << def.charge << '\n';
+
+    os << Helper::Centered(60, "");
     return os;
 }
 
@@ -261,9 +268,9 @@ TauMinusDef::TauMinusDef()
     : ParticleDef()
 {
     name = "TauMinus";
-    mass = MMU;
-    low = MMU;
-    lifetime = LMU;
+    mass = MTAU;
+    low = MTAU;
+    lifetime = LTAU;
     charge = -1.0;
     hardbb_table = &HardBBTables::TauTable;
 

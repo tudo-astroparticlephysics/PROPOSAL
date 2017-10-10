@@ -105,6 +105,15 @@ size_t PhotoQ2Integral::GetHash() const
     return seed;
 }
 
+// ------------------------------------------------------------------------- //
+// Print
+// ------------------------------------------------------------------------- //
+
+void PhotoQ2Integral::print(std::ostream& os) const
+{
+    os << "shadow effect: " << (dynamic_cast<ShadowDutta*>(shadow_effect_) ? "Dutta" : "ButkevichMikhailov") << '\n';
+}
+
 /******************************************************************************
 *                          Specifc Parametrizations                           *
 ******************************************************************************/
