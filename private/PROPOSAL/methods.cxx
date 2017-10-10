@@ -302,6 +302,21 @@ namespace Helper
 {
 
 // ------------------------------------------------------------------------- //
+std::string Centered(int width, const std::string& str, char fill)
+{
+    int len = str.length();
+    if (width < len)
+    {
+        return str;
+    }
+
+    int diff = width - len;
+    int pad1 = diff / 2;
+    int pad2 = diff - pad1;
+    return std::string(pad1, fill) + str + std::string(pad2, fill);
+}
+
+// ------------------------------------------------------------------------- //
 bool FileExist(std::string path)
 {
     struct stat dummy_stat_return_val;
