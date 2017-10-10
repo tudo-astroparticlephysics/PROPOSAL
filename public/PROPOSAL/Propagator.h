@@ -27,8 +27,6 @@
 #include <deque>
 #include <vector>
 // #include "PROPOSAL/Collection.h"
-// #include "PROPOSAL/ScatteringFirstOrder.h"
-// #include "PROPOSAL/ScatteringMoliere.h"
 #include "PROPOSAL/Output.h"
 #include "PROPOSAL/sector/SectorFactory.h"
 // #include "PROPOSAL/MathModel.h"
@@ -179,7 +177,7 @@ class Propagator
         }
         catch(std::exception& ex)
         {
-            log_warn("%s! Use default: %i", ex.what(), var);
+            // log_warn("%s! Use default: %i", ex.what(), var);
         }
     }
 

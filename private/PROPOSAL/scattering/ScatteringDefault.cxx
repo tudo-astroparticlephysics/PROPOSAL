@@ -3,7 +3,7 @@
 
 #include "PROPOSAL/math/MathModel.h"
 #include "PROPOSAL/scattering/ScatteringDefault.h"
-#include "PROPOSAL/Output.h"
+// #include "PROPOSAL/Output.h"
 #include "PROPOSAL/methods.h"
 #include "PROPOSAL/Constants.h"
 

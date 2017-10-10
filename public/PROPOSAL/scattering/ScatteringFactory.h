@@ -24,7 +24,8 @@ class ScatteringFactory
     {
         Default = 0,
         Moliere,
-        MoliereFirstOrder
+        Highland,
+        NoScattering
     };
 
     // typedef boost::function<Scattering* (PROPOSALParticle&, const Medium&)> RegisterFunction;
