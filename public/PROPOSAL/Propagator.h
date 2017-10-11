@@ -29,7 +29,6 @@
 // #include "PROPOSAL/Collection.h"
 #include "PROPOSAL/Output.h"
 #include "PROPOSAL/sector/SectorFactory.h"
-// #include "PROPOSAL/MathModel.h"
 // #include "PROPOSAL/PROPOSALParticle.h"
 // #include "PROPOSAL/Geometry.h"
 // #include "PROPOSAL/Scattering.h"
