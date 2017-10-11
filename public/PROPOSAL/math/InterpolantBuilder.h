@@ -1,10 +1,12 @@
 
 #pragma once
 
-#include "PROPOSAL/math/Interpolant.h"
+#include <boost/function.hpp>
 
 namespace PROPOSAL
 {
+
+class Interpolant;
 
 // ----------------------------------------------------------------------------
 /// @brief Base class for interpolantBuilder

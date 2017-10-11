@@ -1,6 +1,7 @@
 
 #include <boost/algorithm/string.hpp> // case insensitive string compare for configuration file
 
+#include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/medium/MediumFactory.h"
 #include "PROPOSAL/Output.h"
 
