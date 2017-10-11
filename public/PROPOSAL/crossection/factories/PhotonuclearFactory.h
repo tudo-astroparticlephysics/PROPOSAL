@@ -3,7 +3,6 @@
 
 #include <boost/function.hpp>
 
-#include <vector>
 #include <map>
 #include <string>
 

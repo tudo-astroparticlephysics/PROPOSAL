@@ -6,6 +6,7 @@
 #include "PROPOSAL/crossection/parametrization/Photonuclear.h"
 #include "PROPOSAL/math/Integral.h"
 #include "PROPOSAL/math/InterpolantBuilder.h"
+#include "PROPOSAL/math/Interpolant.h"
 
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/methods.h"
@@ -42,7 +43,7 @@
 
 namespace PROPOSAL {
 
-class Interpolant;
+// class Interpolant;
 
 /******************************************************************************
 *                            Photo Q2 Integration                            *

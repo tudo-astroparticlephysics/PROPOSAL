@@ -3,7 +3,7 @@
 
 #include "PROPOSAL/propagation_utility/PropagationUtility.h"
 #include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
-#include "PROPOSAL/math/Interpolant.h"
+// #include "PROPOSAL/math/Interpolant.h"
 
 #define UTILITY_INTERPOLANT_DEC(cls)                                                                                   \
     class UtilityInterpolant##cls : public UtilityInterpolant                                                          \
@@ -27,7 +27,7 @@
 
 namespace PROPOSAL {
 
-class Integral;
+class Interpolant;
 
 class UtilityInterpolant : public UtilityDecorator
 {

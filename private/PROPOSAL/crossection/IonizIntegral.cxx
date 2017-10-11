@@ -5,6 +5,8 @@
 
 #include "PROPOSAL/crossection/IonizIntegral.h"
 #include "PROPOSAL/crossection/parametrization/Ionization.h"
+#include "PROPOSAL/medium/Medium.h"
+#include "PROPOSAL/medium/Components.h"
 
 #include "PROPOSAL/Output.h"
 #include "PROPOSAL/Constants.h"

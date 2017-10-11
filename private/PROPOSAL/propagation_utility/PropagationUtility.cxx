@@ -5,6 +5,8 @@
 #include "PROPOSAL/math/MathModel.h"
 #include "PROPOSAL/medium/Medium.h"
 
+#include "PROPOSAL/particle/ParticleDef.h"
+#include "PROPOSAL/EnergyCutSettings.h"
 #include "PROPOSAL/propagation_utility/PropagationUtility.h"
 
 #include "PROPOSAL/crossection/CrossSection.h"
@@ -24,7 +26,6 @@
 #include "PROPOSAL/crossection/parametrization/Ionization.h"
 #include "PROPOSAL/crossection/parametrization/EpairProduction.h"
 
-#include "PROPOSAL/methods.h"
 
 using namespace std;
 using namespace PROPOSAL;

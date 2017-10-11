@@ -15,6 +15,7 @@ int main()
 
     // One Propagator for each particle definition
     // medium/detector configuration
+
     // Propagator prop_mu(mu.GetParticleDef(), "resources/config_ice.json");
     Propagator prop_tau(tau.GetParticleDef(), "resources/config_ice.json");
 

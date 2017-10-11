@@ -2,7 +2,7 @@
 #include <boost/bind.hpp>
 
 #include "PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h"
-#include "PROPOSAL/math/Integral.h"
+#include "PROPOSAL/math/Interpolant.h"
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Output.h"
 #include "PROPOSAL/methods.h"

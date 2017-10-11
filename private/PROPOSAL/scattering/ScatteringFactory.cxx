@@ -7,7 +7,8 @@
 #include "PROPOSAL/scattering/ScatteringFactory.h"
 #include "PROPOSAL/scattering/ScatteringDefault.h"
 #include "PROPOSAL/scattering/ScatteringMoliere.h"
-#include "PROPOSAL/scattering/ScatteringFirstOrder.h"
+#include "PROPOSAL/scattering/ScatteringHighland.h"
+#include "PROPOSAL/scattering/ScatteringNoScattering.h"
 
 #include "PROPOSAL/propagation_utility/PropagationUtility.h"
 
@@ -20,7 +21,8 @@ ScatteringFactory::ScatteringFactory()
 {
     Register("default", Default);
     Register("moliere", Moliere);
-    Register("moliere_first_order", MoliereFirstOrder);
+    Register("highland", Highland);
+    Register("noScattering", NoScattering);
 }
 
 ScatteringFactory::~ScatteringFactory()
@@ -55,9 +57,13 @@ Scattering* ScatteringFactory::CreateScattering(const std::string& name, PROPOSA
         {
             return new ScatteringMoliere(particle, utility.GetMedium());
         }
-        else if (*iter == "moliere_first_order")
+        else if (*iter == "highland")
         {
-            return new ScatteringFirstOrder(particle, utility.GetMedium());
+            return new ScatteringHighland(particle, utility.GetMedium());
+        }
+        else if (*iter == "noScattering")
+        {
+            return new ScatteringNoScattering(particle, utility.GetMedium());
         }
         else
         {
@@ -86,9 +92,13 @@ Scattering* ScatteringFactory::CreateScattering(const Enum model, PROPOSALPartic
         {
             return new ScatteringMoliere(particle, utility.GetMedium());
         }
-        else if (*iter == MoliereFirstOrder)
+        else if (*iter == Highland)
         {
-            return new ScatteringFirstOrder(particle, utility.GetMedium());
+            return new ScatteringHighland(particle, utility.GetMedium());
+        }
+        else if (*iter == NoScattering)
+        {
+            return new ScatteringNoScattering(particle, utility.GetMedium());
         }
         else
         {
@@ -119,9 +129,13 @@ Scattering* ScatteringFactory::CreateScattering(const std::string& name, PROPOSA
         {
             return new ScatteringMoliere(particle, utility.GetMedium());
         }
-        else if (*iter == "moliere_first_order")
+        else if (*iter == "highland")
         {
-            return new ScatteringFirstOrder(particle, utility.GetMedium());
+            return new ScatteringHighland(particle, utility.GetMedium());
+        }
+        else if (*iter == "noScattering")
+        {
+            return new ScatteringNoScattering(particle, utility.GetMedium());
         }
         else
         {
@@ -150,9 +164,13 @@ Scattering* ScatteringFactory::CreateScattering(const Enum model, PROPOSALPartic
         {
             return new ScatteringMoliere(particle, utility.GetMedium());
         }
-        else if (*iter == MoliereFirstOrder)
+        else if (*iter == Highland)
         {
-            return new ScatteringFirstOrder(particle, utility.GetMedium());
+            return new ScatteringHighland(particle, utility.GetMedium());
+        }
+        else if (*iter == NoScattering)
+        {
+            return new ScatteringNoScattering(particle, utility.GetMedium());
         }
         else
         {
