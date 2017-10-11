@@ -15,7 +15,7 @@
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/particle/PROPOSALParticle.h"
 #include "PROPOSAL/methods.h"
-#include "PROPOSAL/math/MathModel.h"
+#include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/scattering/ScatteringHighland.h"
 

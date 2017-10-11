@@ -3,7 +3,7 @@
 #include <cmath>
 
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/math/MathModel.h"
+#include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/decay/LeptonicDecayChannel.h"
 #include "PROPOSAL/particle/PROPOSALParticle.h"
 

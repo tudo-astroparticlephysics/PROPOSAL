@@ -11,7 +11,7 @@
 #include "PROPOSAL/geometry/Geometry.h"
 #include "PROPOSAL/geometry/Sphere.h"
 
-#include "PROPOSAL/math/MathModel.h"
+#include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/sector/Sector.h"
 #include "PROPOSAL/medium/Medium.h"
 
