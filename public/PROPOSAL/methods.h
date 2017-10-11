@@ -30,8 +30,6 @@ namespace PROPOSAL
 // double NormalCDFInverse(double p);
 float myErfInv2(float x);
 
-bool FileExist(std::string path);
-
 //----------------------------------------------------------------------------//
 
 // bool StartsWith(const std::string& text,const std::string& token);
@@ -95,19 +93,19 @@ int RoundValue(double val);
 // ----------------------------------------------------------------------------
 /// @brief Error class for system path checks
 // ----------------------------------------------------------------------------
-class InvalidPath : public std::exception
-{
-    public:
-    explicit InvalidPath(const char* pathname, const char* err);
-    explicit InvalidPath(const std::string& pathname, const char* err);
-
-    virtual ~InvalidPath() throw() {}
-    virtual const char* what() const throw();
-
-    private:
-    std::string pathname_;
-    std::string msg_;
-};
+// class InvalidPath : public std::exception
+// {
+//     public:
+//     explicit InvalidPath(const char* pathname, const char* err);
+//     explicit InvalidPath(const std::string& pathname, const char* err);
+//
+//     virtual ~InvalidPath() throw() {}
+//     virtual const char* what() const throw();
+//
+//     private:
+//     std::string pathname_;
+//     std::string msg_;
+// };
 
 // ----------------------------------------------------------------------------
 /// @brief Definition needed to initialize interpolation
@@ -135,6 +133,20 @@ class InterpolantBuilder;
 
 namespace  Helper
 {
+
+// ----------------------------------------------------------------------------
+/// @brief Resolve given path
+//
+/// Environment variables are tried to expand and relative path will be
+/// converted to absolute paths.
+///
+/// @param std::string path
+///
+/// @return resolved path or empty path if errors occured.
+// ----------------------------------------------------------------------------
+std::string ResolvePath(const std::string&);
+
+bool FileExist(std::string path);
 
 // ----------------------------------------------------------------------------
 /// @brief Center string
