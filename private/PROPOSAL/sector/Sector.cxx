@@ -15,6 +15,9 @@
 #include "PROPOSAL/sector/Sector.h"
 #include "PROPOSAL/medium/Medium.h"
 
+#include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
+#include "PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h"
+#include "PROPOSAL/propagation_utility/ContinuousRandomizer.h"
 #include "PROPOSAL/methods.h"
 
 using namespace std;
@@ -542,32 +545,6 @@ void Sector::AdvanceParticle(double dr, double ei, double ef)
 
     // TODO(mario): Adjucst the whole scatteing class Thu 2017/08/24
     scattering_->Scatter(dr, ei, ef);
-
-    // if(scattering_model_!=-1)
-    // {
-    //     switch(scattering_model_)
-    //     {
-    //         case 0:
-    //             current_collection_->GetScattering()->Scatter(dr,ei,ef);
-    //             break;
-    //
-    //         case 1:
-    //             scatteringFirstOrder_->Scatter(dr, particle_, current_collection_->GetMedium());
-    //             break;
-    //
-    //         case 2:
-    //             scatteringFirstOrderMoliere_->Scatter(dr, particle_, current_collection_->GetMedium());
-    //             break;
-    //         default:
-    //             log_error("Never should be here! scattering_model = %i !",scattering_model_);
-    //     }
-    //
-    // }
-    // else
-    // {
-    //     position = position + dr*particle_.GetDirection();
-    //     particle_.SetPosition(position);
-    // }
 
     particle_.SetPropagatedDistance(dist);
     particle_.SetTime(time);

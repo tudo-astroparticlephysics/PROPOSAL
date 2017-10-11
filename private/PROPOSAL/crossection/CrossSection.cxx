@@ -1,6 +1,7 @@
 
 #include "PROPOSAL/crossection/CrossSection.h"
 #include "PROPOSAL/crossection/parametrization/Parametrization.h"
+#include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/methods.h"
 
 using namespace PROPOSAL;

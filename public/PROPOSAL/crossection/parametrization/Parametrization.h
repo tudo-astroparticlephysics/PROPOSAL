@@ -1,13 +1,18 @@
 
 #pragma once
 
-#include "PROPOSAL/particle/PROPOSALParticle.h"
 #include "PROPOSAL/particle/ParticleDef.h"
-#include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/EnergyCutSettings.h"
 
 namespace PROPOSAL
 {
+
+namespace Components
+{
+    class Component;
+}
+
+class Medium;
 
 class Parametrization
 {

@@ -7,6 +7,8 @@
 *   \author 
 */
 
+#include "PROPOSAL/particle/PROPOSALParticle.h"
+#include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/scattering/ScatteringNoScattering.h"
 
 

@@ -3,10 +3,12 @@
 
 #include <boost/function.hpp>
 
-#include "PROPOSAL/medium/Medium.h"
+#include <map>
 
 namespace PROPOSAL
 {
+
+class Medium;
 
 class MediumFactory
 {

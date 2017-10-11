@@ -6,6 +6,8 @@
 #include "PROPOSAL/crossection/parametrization/Bremsstrahlung.h"
 #include "PROPOSAL/math/Integral.h"
 #include "PROPOSAL/Constants.h"
+#include "PROPOSAL/medium/Medium.h"
+#include "PROPOSAL/medium/Components.h"
 
 #define BREMSSTRAHLUNG_IMPL(param)                                                                                     \
     Brems##param::Brems##param(const ParticleDef& particle_def,                                                        \
