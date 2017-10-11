@@ -23,6 +23,8 @@
 #include "PROPOSAL/crossection/parametrization/Parametrization.h"
 
 #include "PROPOSAL/math/InterpolantBuilder.h"
+#include "PROPOSAL/math/Interpolant.h"
+
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/methods.h"
 #include "PROPOSAL/particle/ParticleDef.h"
