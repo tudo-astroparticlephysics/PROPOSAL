@@ -7,11 +7,8 @@
 */
 
 
-// #include <iostream>
 
-// #include <boost/generator_iterator.hpp>
-
-#include "PROPOSAL/math/MathModel.h"
+#include "PROPOSAL/math/RandomGenerator.h"
 
 using namespace PROPOSAL;
 

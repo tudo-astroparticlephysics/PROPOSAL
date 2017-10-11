@@ -1,7 +1,7 @@
 
 #include <boost/bind.hpp>
 
-#include "PROPOSAL/math/MathModel.h"
+#include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/scattering/ScatteringDefault.h"
 // #include "PROPOSAL/Output.h"
 #include "PROPOSAL/methods.h"
