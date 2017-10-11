@@ -1,6 +1,5 @@
 
 #include "PROPOSAL/decay/DecayChannel.h"
-// #include "PROPOSAL/math/RootFinder.h"
 
 using namespace PROPOSAL;
 

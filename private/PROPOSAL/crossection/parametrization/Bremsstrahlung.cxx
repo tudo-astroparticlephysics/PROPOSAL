@@ -6,6 +6,8 @@
 #include "PROPOSAL/crossection/parametrization/Bremsstrahlung.h"
 #include "PROPOSAL/math/Integral.h"
 #include "PROPOSAL/Constants.h"
+#include "PROPOSAL/medium/Medium.h"
+#include "PROPOSAL/medium/Components.h"
 
 #define BREMSSTRAHLUNG_IMPL(param)                                                                                     \
     Brems##param::Brems##param(const ParticleDef& particle_def,                                                        \
@@ -426,7 +428,7 @@ double BremsAndreevBezrukovBugaev::CalculateParametrization(double energy, doubl
 
     // calculating the contribution of elastic nuclear and atomic form factors
     // eq. 2.30
-    double qc = 1.9 * MMU * Z3;
+    double qc = 1.9 * particle_def_.mass * Z3;
     aux =  2 * particle_def_.mass / qc;
     double zeta = sqrt(1 + aux * aux);
 

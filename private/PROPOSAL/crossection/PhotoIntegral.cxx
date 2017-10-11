@@ -4,6 +4,7 @@
 #include "PROPOSAL/crossection/PhotoIntegral.h"
 #include "PROPOSAL/crossection/parametrization/Photonuclear.h"
 #include "PROPOSAL/Constants.h"
+#include "PROPOSAL/medium/Medium.h"
 
 using namespace PROPOSAL;
 
@@ -32,7 +33,7 @@ double PhotoIntegral::CalculatedEdx(double energy)
 
     double sum = 0;
 
-    for(unsigned int i=0; i < components_.size(); i++)
+    for(int i=0; i < parametrization_->GetMedium().GetNumComponents(); i++)
     {
         parametrization_->SetCurrentComponent(i);
         Parametrization::IntegralLimits limits = parametrization_->GetIntegralLimits(energy);

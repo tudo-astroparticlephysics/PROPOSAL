@@ -5,6 +5,7 @@
 #include "PROPOSAL/geometry/Box.h"
 #include "PROPOSAL/geometry/Cylinder.h"
 #include "PROPOSAL/Output.h"
+#include "PROPOSAL/medium/Medium.h"
 
 using namespace PROPOSAL;
 
