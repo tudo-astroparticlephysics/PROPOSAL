@@ -15,101 +15,36 @@
 
 using namespace PROPOSAL;
 
-boost::mt19937* MathModel::default_rng_ = new boost::mt19937();
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-//-------------------------public member functions----------------------------//
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
+boost::random::mt19937 RandomGenerator::rng_;
+boost::variate_generator<boost::mt19937&, boost::uniform_real<> > RandomGenerator::variate_real(RandomGenerator::rng_, boost::uniform_real<>(0.0, 1.0));
 
 
+RandomGenerator::RandomGenerator()
+    : random_function(&RandomGenerator::DefaultRandomDouble)
+{
+}
 
-void MathModel::set_seed(int seed)
+RandomGenerator::~RandomGenerator()
+{
+}
+
+double RandomGenerator::RandomDouble()
+{
+    return random_function();
+}
+
+void RandomGenerator::SetSeed(int seed)
 {
     boost::mt19937::result_type s = static_cast<boost::mt19937::result_type>(seed);
-    default_rng_->seed(s);
+    rng_.seed(s);
 }
 
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-double MathModel::RandomDouble(){
-    return rng_();
-}
-
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-double MathModel::DefaultRandomDouble(){
-    // throw std::runtime_error("Don't call me *ever*!");
-    boost::uniform_real<> dist(0, 1);
-    boost::variate_generator<boost::mt19937&, boost::uniform_real<> > die(*default_rng_, dist);
-    double x = die();
-    return x;
-}
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-void MathModel::SetRandomNumberGenerator(boost::function<double ()> &f){
-    if (f)
-        rng_ = f;
-}
-
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-//--------------------------------constructors--------------------------------//
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-MathModel::MathModel()
+void RandomGenerator::SetRandomNumberGenerator(boost::function<double ()> &f)
 {
-	rng_ = &MathModel::DefaultRandomDouble;
+    random_function = f;
 }
 
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-MathModel::MathModel(const MathModel &model)
+double RandomGenerator::DefaultRandomDouble()
 {
-	*this = model;
+    return variate_real();
 }
-
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-//----------------------------------operators---------------------------------//
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-MathModel& MathModel::operator=(const MathModel &model)
-{
-	if (model.rng_)
-		rng_ = model.rng_;
-	else
-		rng_ = &DefaultRandomDouble;
-
-	return *this;
-}
-
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-//---------------------------------Destructor---------------------------------//
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-MathModel::~MathModel() {}
-
-
