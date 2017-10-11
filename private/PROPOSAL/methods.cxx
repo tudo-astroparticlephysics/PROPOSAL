@@ -19,16 +19,12 @@
 #include <iostream>
 #include <wordexp.h> // Used to expand path with environment variables
 
-#include "PROPOSAL/EnergyCutSettings.h"
 #include "PROPOSAL/crossection/parametrization/Parametrization.h"
 
-#include "PROPOSAL/math/Interpolant.h"
 #include "PROPOSAL/math/InterpolantBuilder.h"
 #include "PROPOSAL/math/Interpolant.h"
 
-#include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/methods.h"
-#include "PROPOSAL/particle/ParticleDef.h"
 #include "PROPOSAL/Output.h"
 
 // using namespace std;
