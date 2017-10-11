@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include <vector>
+// #include <vector>
 
 #include "PROPOSAL/decay/DecayChannel.h"
 #include "PROPOSAL/math/RootFinder.h"

@@ -7,6 +7,7 @@
 #include "PROPOSAL/Output.h"
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/math/Integral.h"
+#include "PROPOSAL/medium/Medium.h"
 
 using namespace PROPOSAL;
 

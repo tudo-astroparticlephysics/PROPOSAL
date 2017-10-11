@@ -4,10 +4,14 @@
 #include <vector>
 
 #include "PROPOSAL/particle/PROPOSALParticle.h"
-#include "PROPOSAL/medium/Components.h"
 
 namespace PROPOSAL
 {
+
+namespace Components
+{
+    class Component;
+}
 
 class Parametrization;
 

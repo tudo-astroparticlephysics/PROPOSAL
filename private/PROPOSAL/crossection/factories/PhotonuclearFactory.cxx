@@ -7,6 +7,7 @@
 #include "PROPOSAL/crossection/parametrization/PhotoRealPhotonAssumption.h"
 #include "PROPOSAL/crossection/parametrization/PhotoQ2Integration.h"
 #include "PROPOSAL/crossection/factories/PhotonuclearFactory.h"
+#include "PROPOSAL/medium/Medium.h"
 
 #include "PROPOSAL/Output.h"
 

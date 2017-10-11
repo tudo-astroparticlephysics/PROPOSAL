@@ -9,7 +9,6 @@
 #pragma once
 
 #include <string>
-#include <vector>
 
 #include "PROPOSAL/particle/ParticleDef.h"
 #include "PROPOSAL/math/Vector3D.h"

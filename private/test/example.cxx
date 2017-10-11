@@ -15,8 +15,8 @@ int main()
 
     // One Propagator for each particle definition
     // medium/detector configuration
-    Propagator prop_mu(mu.GetParticleDef(), "config.json");
-    Propagator prop_tau(tau.GetParticleDef(), "config.json");
+    Propagator prop_mu(mu.GetParticleDef(), "resources/config.json");
+    Propagator prop_tau(tau.GetParticleDef(), "resources/config.json");
 
     // Possibility to register propagator in a service
     PropagatorService prop_service;

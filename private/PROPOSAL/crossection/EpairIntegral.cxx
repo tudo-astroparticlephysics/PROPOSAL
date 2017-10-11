@@ -4,6 +4,7 @@
 #include "PROPOSAL/crossection/EpairIntegral.h"
 #include "PROPOSAL/crossection/parametrization/EpairProduction.h"
 #include "PROPOSAL/Constants.h"
+#include "PROPOSAL/medium/Medium.h"
 
 using namespace PROPOSAL;
 

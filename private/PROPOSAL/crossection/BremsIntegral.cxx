@@ -3,6 +3,7 @@
 
 #include "PROPOSAL/crossection/BremsIntegral.h"
 #include "PROPOSAL/crossection/parametrization/Bremsstrahlung.h"
+#include "PROPOSAL/medium/Medium.h"
 
 using namespace PROPOSAL;
 

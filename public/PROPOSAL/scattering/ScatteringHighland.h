@@ -10,10 +10,11 @@
 
 
 #include "PROPOSAL/scattering/Scattering.h"
-#include "PROPOSAL/particle/PROPOSALParticle.h"
-#include "PROPOSAL/medium/Medium.h"
 
 namespace PROPOSAL{
+
+// class PROPSALParticle;
+// class Medium;
 
 /**
   * \brief This class provides the scattering routine provided by moliere.

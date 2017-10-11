@@ -2,10 +2,8 @@
 #pragma once
 
 // #include <string>
-// #include <vector>
+#include <vector>
 
-#include "PROPOSAL/EnergyCutSettings.h"
-#include "PROPOSAL/particle/ParticleDef.h"
 // #include "PROPOSAL/methods.h"
 // #include "PROPOSAL/scattering/ScatteringFactory.h"
 #include "PROPOSAL/crossection/factories/PhotonuclearFactory.h"
@@ -15,16 +13,11 @@
 
 namespace PROPOSAL {
 
-// class ContinuousRandomization;
 class CrossSection;
-class Photonuclear;
-class Bremsstrahlung;
-class Ionization;
-class EpairProduction;
-
 class Medium;
-class EnergyCutSettings;
-class Geometry;
+
+struct InterpolationDef;
+
 
 class Utility
 {

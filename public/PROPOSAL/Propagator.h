@@ -177,7 +177,9 @@ class Propagator
         }
         catch(std::exception& ex)
         {
-            // log_warn("%s! Use default: %i", ex.what(), var);
+            std::stringstream ss;
+            ss<<ex.what()<<"! Use default: "<<var;
+            log_warn("%s", ss.str().c_str());
         }
     }
 
