@@ -9,8 +9,6 @@
 #pragma once
 
 #include "PROPOSAL/scattering/Scattering.h"
-#include "PROPOSAL/particle/PROPOSALParticle.h"
-#include "PROPOSAL/medium/Medium.h"
 
 namespace PROPOSAL{
 

@@ -30,6 +30,7 @@
 // #include "PROPOSAL/crossection/parametrization/EpairProduction.h"
 // #include "PROPOSAL/crossection/parametrization/PhotoRealPhotonAssumption.h"
 
+#include "PROPOSAL/math/Interpolant.h"
 #include "PROPOSAL/math/InterpolantBuilder.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/methods.h"

@@ -6,6 +6,8 @@
 // #include "PROPOSAL/Output.h"
 #include "PROPOSAL/methods.h"
 #include "PROPOSAL/Constants.h"
+#include "PROPOSAL/particle/PROPOSALParticle.h"
+#include "PROPOSAL/medium/Medium.h"
 
 #include "PROPOSAL/propagation_utility/PropagationUtility.h"
 #include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"

@@ -6,11 +6,14 @@
 // #include <vector>
 // #include <cmath>
 
-#include "PROPOSAL/medium/Medium.h"
-#include "PROPOSAL/particle/PROPOSALParticle.h"
+// #include "PROPOSAL/medium/Medium.h"
+// #include "PROPOSAL/particle/PROPOSALParticle.h"
 #include "PROPOSAL/scattering/Scattering.h"
 
 namespace PROPOSAL {
+
+// class PROPOSALParticle;
+// class Medium;
 
 class ScatteringMoliere : public Scattering
 {

@@ -1,6 +1,7 @@
 
 #pragma once
 
+#include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/medium/MediumFactory.h"
 

@@ -3,6 +3,7 @@
 
 #include "PROPOSAL/crossection/CrossSectionIntegral.h"
 #include "PROPOSAL/crossection/parametrization/Parametrization.h"
+#include "PROPOSAL/medium/Medium.h"
 
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Output.h"
