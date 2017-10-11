@@ -91,6 +91,24 @@ int RoundValue(double val);
 // };
 
 
+
+// ----------------------------------------------------------------------------
+/// @brief Error class for system path checks
+// ----------------------------------------------------------------------------
+class InvalidPath : public std::exception
+{
+    public:
+    explicit InvalidPath(const char* pathname, const char* err);
+    explicit InvalidPath(const std::string& pathname, const char* err);
+
+    virtual ~InvalidPath() throw() {}
+    virtual const char* what() const throw();
+
+    private:
+    std::string pathname_;
+    std::string msg_;
+};
+
 // ----------------------------------------------------------------------------
 /// @brief Definition needed to initialize interpolation
 // ----------------------------------------------------------------------------
