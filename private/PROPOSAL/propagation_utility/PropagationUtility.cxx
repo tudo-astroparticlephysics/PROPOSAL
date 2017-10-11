@@ -2,7 +2,6 @@
 
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Output.h"
-#include "PROPOSAL/math/MathModel.h"
 #include "PROPOSAL/medium/Medium.h"
 
 #include "PROPOSAL/particle/ParticleDef.h"
