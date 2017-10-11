@@ -139,7 +139,7 @@ TEST(IsInside , Box ) {
 
     double volumia_ratio =0;
 
-    MathModel M;
+    // MathModel M;
     int number_particles = 1e6;
     int number_volumina  = 1e1;
 
@@ -151,9 +151,9 @@ TEST(IsInside , Box ) {
         // Chose the origin of the box-geometry
         // This box should be inside the big box in which the particle
         // will be located
-        rnd_x0  = M.RandomDouble();
-        rnd_y0  = M.RandomDouble();
-        rnd_z0  = M.RandomDouble();
+        rnd_x0  = RandomGenerator::Get().RandomDouble();
+        rnd_y0  = RandomGenerator::Get().RandomDouble();
+        rnd_z0  = RandomGenerator::Get().RandomDouble();
 
         position_geometry.SetCartesianCoordinates(
             ( 2 * rnd_x0  - 1)* 0.5 *( big_width_x - width_x ) ,
@@ -169,12 +169,12 @@ TEST(IsInside , Box ) {
         {
 
             // Chose particle location and angle
-            rnd_x = M.RandomDouble();
-            rnd_y = M.RandomDouble();
-            rnd_z = M.RandomDouble();
+            rnd_x = RandomGenerator::Get().RandomDouble();
+            rnd_y = RandomGenerator::Get().RandomDouble();
+            rnd_z = RandomGenerator::Get().RandomDouble();
 
-            rnd_theta = M.RandomDouble();
-            rnd_phi   = M.RandomDouble();
+            rnd_theta = RandomGenerator::Get().RandomDouble();
+            rnd_phi   = RandomGenerator::Get().RandomDouble();
 
             particle_direction.SetSphericalCoordinates( 1, rnd_phi*2*PI, rnd_theta*PI );
             particle_direction.CalculateCartesianFromSpherical();
@@ -219,8 +219,8 @@ TEST(IsInside , Box ) {
     particle_position.SetCartesianCoordinates(0,0,0.5*height);
     for(int i = 0; i<1e4; i++)
     {
-        rnd_theta   = M.RandomDouble();
-        rnd_phi     = M.RandomDouble();
+        rnd_theta   = RandomGenerator::Get().RandomDouble();
+        rnd_phi     = RandomGenerator::Get().RandomDouble();
 
         particle_direction.SetSphericalCoordinates( 1, rnd_phi*2*PI, rnd_theta*PI );
         particle_direction.CalculateCartesianFromSpherical();
@@ -238,8 +238,8 @@ TEST(IsInside , Box ) {
     particle_position.SetCartesianCoordinates(0,0,-0.5*height);
     for(int i = 0; i<1e4; i++)
     {
-        rnd_theta   = M.RandomDouble();
-        rnd_phi     = M.RandomDouble();
+        rnd_theta   = RandomGenerator::Get().RandomDouble();
+        rnd_phi     = RandomGenerator::Get().RandomDouble();
 
         particle_direction.SetSphericalCoordinates( 1, rnd_phi*2*PI, rnd_theta*PI);
         particle_direction.CalculateCartesianFromSpherical();
@@ -255,8 +255,8 @@ TEST(IsInside , Box ) {
     particle_position.SetCartesianCoordinates(0.5*width_x,0,0);
     for(int i = 0; i<1e4; i++)
     {
-        rnd_theta   = M.RandomDouble();
-        rnd_phi     = M.RandomDouble();
+        rnd_theta   = RandomGenerator::Get().RandomDouble();
+        rnd_phi     = RandomGenerator::Get().RandomDouble();
 
         particle_direction.SetSphericalCoordinates(1, rnd_phi*2*PI, rnd_theta*PI);
         particle_direction.CalculateCartesianFromSpherical();
@@ -273,8 +273,8 @@ TEST(IsInside , Box ) {
     particle_position.SetCartesianCoordinates(-0.5*width_x,0,0);
     for(int i = 0; i<1e4; i++)
     {
-        rnd_theta   = M.RandomDouble();
-        rnd_phi     = M.RandomDouble();
+        rnd_theta   = RandomGenerator::Get().RandomDouble();
+        rnd_phi     = RandomGenerator::Get().RandomDouble();
 
         particle_direction.SetSphericalCoordinates(1, rnd_phi*2*PI, rnd_theta*PI);
         particle_direction.CalculateCartesianFromSpherical();
@@ -290,8 +290,8 @@ TEST(IsInside , Box ) {
     particle_position.SetCartesianCoordinates(0,0.5*width_y,0);
     for(int i = 0; i<1e4; i++)
     {
-        rnd_theta   = M.RandomDouble();
-        rnd_phi     = M.RandomDouble();
+        rnd_theta   = RandomGenerator::Get().RandomDouble();
+        rnd_phi     = RandomGenerator::Get().RandomDouble();
 
         particle_direction.SetSphericalCoordinates(1, rnd_phi*2*PI, rnd_theta*PI);
         particle_direction.CalculateCartesianFromSpherical();
@@ -307,8 +307,8 @@ TEST(IsInside , Box ) {
     particle_position.SetCartesianCoordinates(0,-0.5*width_y,0);
     for(int i = 0; i<1e4; i++)
     {
-        rnd_theta   = M.RandomDouble();
-        rnd_phi     = M.RandomDouble();
+        rnd_theta   = RandomGenerator::Get().RandomDouble();
+        rnd_phi     = RandomGenerator::Get().RandomDouble();
 
         particle_direction.SetSphericalCoordinates(1, rnd_phi*2*PI, rnd_theta*PI);
         particle_direction.CalculateCartesianFromSpherical();
@@ -325,8 +325,8 @@ TEST(IsInside , Box ) {
     particle_position.SetCartesianCoordinates(0.5*width_x,0.5*width_y,0.5*height);
     for(int i = 0; i<1e4; i++)
     {
-        rnd_theta   = M.RandomDouble();
-        rnd_phi     = M.RandomDouble();
+        rnd_theta   = RandomGenerator::Get().RandomDouble();
+        rnd_phi     = RandomGenerator::Get().RandomDouble();
 
         particle_direction.SetSphericalCoordinates(1, rnd_phi*2*PI, rnd_theta*PI);
         particle_direction.CalculateCartesianFromSpherical();
@@ -372,7 +372,7 @@ TEST(IsInside , Cylinder ) {
 
     double volumia_ratio =0;
 
-    MathModel M;
+    // MathModel M;
     int number_particles = 1e6;
     int number_volumina  = 1e1;
 
@@ -382,9 +382,9 @@ TEST(IsInside , Cylinder ) {
         // Chose the origin of the cylinder-geometry
         // This cylinder should be inside the big box in which the particle
         // will be located
-        rnd_x0  = M.RandomDouble();
-        rnd_y0  = M.RandomDouble();
-        rnd_z0  = M.RandomDouble();
+        rnd_x0  = RandomGenerator::Get().RandomDouble();
+        rnd_y0  = RandomGenerator::Get().RandomDouble();
+        rnd_z0  = RandomGenerator::Get().RandomDouble();
 
         position_geometry.SetCartesianCoordinates(
             ( 2 * rnd_x0  - 1)* ( 0.5 * big_width_x - radius ),
@@ -393,7 +393,7 @@ TEST(IsInside , Cylinder ) {
 
         // position_geometry.SetCartesianCoordinates(0,0,0);
 
-        rnd_inner_radius    = M.RandomDouble();
+        rnd_inner_radius    = RandomGenerator::Get().RandomDouble();
 
         inner_radius    = radius*rnd_inner_radius;
 
@@ -407,12 +407,12 @@ TEST(IsInside , Cylinder ) {
         {
 
             // Chose particle location and angle
-            rnd_x   = M.RandomDouble();
-            rnd_y   = M.RandomDouble();
-            rnd_z   = M.RandomDouble();
+            rnd_x   = RandomGenerator::Get().RandomDouble();
+            rnd_y   = RandomGenerator::Get().RandomDouble();
+            rnd_z   = RandomGenerator::Get().RandomDouble();
 
-            rnd_theta   = M.RandomDouble();
-            rnd_phi     = M.RandomDouble();
+            rnd_theta   = RandomGenerator::Get().RandomDouble();
+            rnd_phi     = RandomGenerator::Get().RandomDouble();
 
 
             particle_direction.SetSphericalCoordinates(1, rnd_phi*2*PI, rnd_theta*PI);
@@ -460,15 +460,15 @@ TEST(IsInside , Cylinder ) {
     int excluded =0 ;
     for(int i = 0; i<1e4; i++)
     {
-        rnd_x = M.RandomDouble();
+        rnd_x = RandomGenerator::Get().RandomDouble();
 
         particle_position.SetCartesianCoordinates(
             radius * rnd_x,
             radius * sqrt(1 - rnd_x*rnd_x),
             0 );
 
-        rnd_theta   = M.RandomDouble();
-        rnd_phi     = M.RandomDouble();
+        rnd_theta   = RandomGenerator::Get().RandomDouble();
+        rnd_phi     = RandomGenerator::Get().RandomDouble();
 
         particle_direction.SetSphericalCoordinates(1, rnd_phi*2*PI, rnd_theta*PI);
         particle_direction.CalculateCartesianFromSpherical();
@@ -498,8 +498,8 @@ TEST(IsInside , Cylinder ) {
 
     for(int i = 0; i<1e4; i++)
     {
-        rnd_theta   = M.RandomDouble();
-        rnd_phi     = M.RandomDouble();
+        rnd_theta   = RandomGenerator::Get().RandomDouble();
+        rnd_phi     = RandomGenerator::Get().RandomDouble();
 
         particle_direction.SetSphericalCoordinates(1, rnd_phi*2*PI, rnd_theta*PI);
         particle_direction.CalculateCartesianFromSpherical();
@@ -523,8 +523,8 @@ TEST(IsInside , Cylinder ) {
     particle_position.SetCartesianCoordinates(0,0,-0.5*height);
     for(int i = 0; i<1e4; i++)
     {
-        rnd_theta   = M.RandomDouble();
-        rnd_phi     = M.RandomDouble();
+        rnd_theta   = RandomGenerator::Get().RandomDouble();
+        rnd_phi     = RandomGenerator::Get().RandomDouble();
 
         particle_direction.SetSphericalCoordinates(1, rnd_phi*2*PI, rnd_theta*PI);
         particle_direction.CalculateCartesianFromSpherical();
@@ -547,7 +547,7 @@ TEST(IsInside , Cylinder ) {
 
     for(int i = 0; i<1e4; i++)
     {
-        rnd_x = M.RandomDouble();
+        rnd_x = RandomGenerator::Get().RandomDouble();
 
         particle_position.SetCartesianCoordinates(
             inner_radius * rnd_x,
@@ -555,8 +555,8 @@ TEST(IsInside , Cylinder ) {
             0);
 
 
-        rnd_theta   = M.RandomDouble();
-        rnd_phi     = M.RandomDouble();
+        rnd_theta   = RandomGenerator::Get().RandomDouble();
+        rnd_phi     = RandomGenerator::Get().RandomDouble();
 
         particle_direction.SetSphericalCoordinates(1, rnd_phi*2*PI, rnd_theta*PI);
         particle_direction.CalculateCartesianFromSpherical();
@@ -604,7 +604,7 @@ TEST(IsInside , Sphere ) {
 
     double volumia_ratio =0;
 
-    MathModel M;
+    // MathModel M;
     int number_particles = 1e6;
     int number_volumina  = 1e1;
 
@@ -613,11 +613,11 @@ TEST(IsInside , Sphere ) {
         // Chose the origin of the box-geometry
         // This box should be inside the big box in which the particle
         // will be located
-        rnd_x0  = M.RandomDouble();
-        rnd_y0  = M.RandomDouble();
-        rnd_z0  = M.RandomDouble();
+        rnd_x0  = RandomGenerator::Get().RandomDouble();
+        rnd_y0  = RandomGenerator::Get().RandomDouble();
+        rnd_z0  = RandomGenerator::Get().RandomDouble();
 
-        rnd_inner_radius = M.RandomDouble();
+        rnd_inner_radius = RandomGenerator::Get().RandomDouble();
 
         position_geometry.SetCartesianCoordinates(
             ( 2 * rnd_x0  - 1)* ( 0.5 * big_width_x - radius ),
@@ -637,12 +637,12 @@ TEST(IsInside , Sphere ) {
         {
 
             // Chose particle location and angle
-            rnd_x   = M.RandomDouble();
-            rnd_y   = M.RandomDouble();
-            rnd_z   = M.RandomDouble();
+            rnd_x   = RandomGenerator::Get().RandomDouble();
+            rnd_y   = RandomGenerator::Get().RandomDouble();
+            rnd_z   = RandomGenerator::Get().RandomDouble();
 
-            rnd_theta   = M.RandomDouble();
-            rnd_phi     = M.RandomDouble();
+            rnd_theta   = RandomGenerator::Get().RandomDouble();
+            rnd_phi     = RandomGenerator::Get().RandomDouble();
 
             particle_direction.SetSphericalCoordinates(1, rnd_phi*2*PI, rnd_theta*PI);
             particle_direction.CalculateCartesianFromSpherical();
@@ -681,15 +681,15 @@ TEST(IsInside , Sphere ) {
     int excluded =0 ;
     for(int i = 0; i<1e4; i++)
     {
-        rnd_x = M.RandomDouble();
+        rnd_x = RandomGenerator::Get().RandomDouble();
 
         particle_position.SetCartesianCoordinates(
             radius * rnd_x,
             radius *sqrt(1 - rnd_x*rnd_x),
             0);
 
-        rnd_theta   = M.RandomDouble();
-        rnd_phi     = M.RandomDouble();
+        rnd_theta   = RandomGenerator::Get().RandomDouble();
+        rnd_phi     = RandomGenerator::Get().RandomDouble();
 
 
         particle_direction.SetSphericalCoordinates(1, rnd_phi*2*PI, rnd_theta*PI);
@@ -717,15 +717,15 @@ TEST(IsInside , Sphere ) {
 
     for(int i = 0; i<1e4; i++)
     {
-        rnd_x = M.RandomDouble();
+        rnd_x = RandomGenerator::Get().RandomDouble();
 
         particle_position.SetCartesianCoordinates(
             inner_radius * rnd_x,
             inner_radius *sqrt(1 - rnd_x*rnd_x),
             0);
 
-        rnd_theta   = M.RandomDouble();
-        rnd_phi     = M.RandomDouble();
+        rnd_theta   = RandomGenerator::Get().RandomDouble();
+        rnd_phi     = RandomGenerator::Get().RandomDouble();
 
         particle_direction.SetSphericalCoordinates(1, rnd_phi*2*PI, rnd_theta*PI);
         particle_direction.CalculateCartesianFromSpherical();
@@ -758,7 +758,7 @@ TEST(DistanceTo , Sphere ) {
 
     pair<double,double> distance;
 
-    MathModel M;
+    // MathModel M;
     int number_particles = 1e5;
 
     cout.precision(16);
@@ -771,15 +771,15 @@ TEST(DistanceTo , Sphere ) {
         for(int j = 0; j<number_particles; j++)
         {
 
-            rnd_inner_radius    = M.RandomDouble();
+            rnd_inner_radius    = RandomGenerator::Get().RandomDouble();
             inner_radius        = radius*rnd_inner_radius;
 
             // The values are divided by 100 to convert the units...
             // Init functions expects m but here everthing is in cm
             Sphere A(Vector3D(0,0,0),radius/100,inner_radius/100);
 
-            rnd_phi   = M.RandomDouble();
-            rnd_theta = M.RandomDouble();
+            rnd_phi   = RandomGenerator::Get().RandomDouble();
+            rnd_theta = RandomGenerator::Get().RandomDouble();
 
             particle_direction.SetSphericalCoordinates(1, rnd_phi*2*PI, rnd_theta*PI);
             particle_direction.CalculateCartesianFromSpherical();
@@ -856,7 +856,7 @@ TEST(DistanceTo , Cylinder ) {
 
     pair<double,double> distance;
 
-    MathModel M;
+    // MathModel M;
     int number_particles = 1e5;
 
     cout.precision(16);
@@ -869,14 +869,14 @@ TEST(DistanceTo , Cylinder ) {
         for(int j = 0; j<number_particles; j++)
         {
 
-            rnd_inner_radius    = M.RandomDouble();
+            rnd_inner_radius    = RandomGenerator::Get().RandomDouble();
             inner_radius        = radius*rnd_inner_radius;
 
             // The values are divided by 100 to convert the units...
             // Init functions expects m but here everthing is in cm
             Cylinder A(Vector3D(0,0,0),radius/100,inner_radius/100,height/100);
 
-            rnd_phi = M.RandomDouble();
+            rnd_phi = RandomGenerator::Get().RandomDouble();
 
             // Chose particle location and angle
             particle_position.SetSphericalCoordinates(1, rnd_phi*2*PI, 0.5*PI);
@@ -974,9 +974,9 @@ TEST(DistanceTo , Cylinder ) {
     for(int j = 0; j<number_particles; j++)
     {
 
-        rnd_alpha = M.RandomDouble();
+        rnd_alpha = RandomGenerator::Get().RandomDouble();
 
-        rnd_phi   = M.RandomDouble();
+        rnd_phi   = RandomGenerator::Get().RandomDouble();
 
         alpha   =   0.3*PI*rnd_alpha;
 
@@ -1096,14 +1096,14 @@ TEST(DistanceTo , Box ) {
 
     pair<double,double> distance;
 
-    MathModel M;
+    // MathModel M;
     int number_particles = 1e5;
 
     cout.precision(16);
 
     for(int j = 0; j<number_particles; j++)
     {
-        rnd_phi =   M.RandomDouble();
+        rnd_phi =   RandomGenerator::Get().RandomDouble();
 
         // The values are divided by 100 to convert the units...
         // Init functions expects m but here everthing is in cm
@@ -1177,7 +1177,7 @@ TEST(DistanceTo , Box ) {
 
     for(int i = 0; i < number_particles;i++)
     {
-        rnd_phi =   M.RandomDouble();
+        rnd_phi =   RandomGenerator::Get().RandomDouble();
 
         particle_direction.SetSphericalCoordinates(1,rnd_phi*0.5*PI,0.5*PI);
         particle_direction.CalculateCartesianFromSpherical();
@@ -1248,7 +1248,7 @@ TEST(DistanceTo , Box ) {
     //and one test for z surfaces
     for(int i = 0; i < number_particles;i++)
     {
-        rnd_theta =   M.RandomDouble();
+        rnd_theta =   RandomGenerator::Get().RandomDouble();
 
         particle_direction.SetSphericalCoordinates(1,0,rnd_theta*0.5*PI);
         particle_direction.CalculateCartesianFromSpherical();
