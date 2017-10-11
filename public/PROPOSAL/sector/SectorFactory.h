@@ -1,9 +1,6 @@
 
 #pragma once
 
-#include <vector>
-#include <map>
-#include <string>
 
 #include "PROPOSAL/sector/Sector.h"
 #include "PROPOSAL/medium/MediumFactory.h"

@@ -1,9 +1,6 @@
 
 #pragma once
 
-#include <vector>
-#include <map>
-#include <string>
 
 #include "PROPOSAL/crossection/parametrization/Parametrization.h"
 #include "PROPOSAL/methods.h"

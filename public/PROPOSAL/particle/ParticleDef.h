@@ -33,6 +33,8 @@
 
 namespace PROPOSAL {
 
+// class DecayTable;
+
 namespace HardBBTables {
 
 typedef std::vector<std::vector<double> > VecType;

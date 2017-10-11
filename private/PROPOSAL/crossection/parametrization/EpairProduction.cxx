@@ -7,6 +7,8 @@
 
 #include "PROPOSAL/math//Interpolant.h"
 #include "PROPOSAL/math//InterpolantBuilder.h"
+#include "PROPOSAL/medium/Medium.h"
+#include "PROPOSAL/medium/Components.h"
 
 // #include "PROPOSAL/methods.h"
 #include "PROPOSAL/Constants.h"

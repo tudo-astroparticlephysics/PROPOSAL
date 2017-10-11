@@ -1,9 +1,6 @@
 
 #include "PROPOSAL/propagation_utility/PropagationUtilityFactory.h"
-#include "PROPOSAL/propagation_utility/PropagationUtility.h"
-#include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
-#include "PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h"
-#include "PROPOSAL/Output.h"
+#include "PROPOSAL/medium/Medium.h"
 
 using namespace PROPOSAL;
 

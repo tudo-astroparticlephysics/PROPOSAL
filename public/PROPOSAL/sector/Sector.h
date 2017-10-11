@@ -4,19 +4,17 @@
 // #include <string>
 // #include <vector>
 
-#include "PROPOSAL/EnergyCutSettings.h"
-#include "PROPOSAL/particle/PROPOSALParticle.h"
 #include "PROPOSAL/scattering/ScatteringFactory.h"
+#include "PROPOSAL/particle/PROPOSALParticle.h"
 
-#include "PROPOSAL/propagation_utility/PropagationUtilityFactory.h"
-#include "PROPOSAL/propagation_utility/ContinuousRandomizer.h"
+#include "PROPOSAL/propagation_utility/PropagationUtility.h"
 
 namespace PROPOSAL {
 
-// class ContinuousRandomization;
-class CrossSection;
-class Medium;
-class EnergyCutSettings;
+class ContinuousRandomizer;
+// class CrossSection;
+// class Medium;
+// class EnergyCutSettings;
 class Geometry;
 
 /*! \class ProcessSector ProcessSector.h "CrossSections.h"

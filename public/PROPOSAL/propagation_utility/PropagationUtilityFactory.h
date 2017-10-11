@@ -1,15 +1,9 @@
 
 #pragma once
 
-#include <vector>
-#include <map>
-#include <string>
 
 #include "PROPOSAL/propagation_utility/PropagationUtility.h"
-#include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
-#include "PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h"
 #include "PROPOSAL/medium/MediumFactory.h"
-#include "PROPOSAL/geometry/GeometryFactory.h"
 
 namespace  PROPOSAL
 {

@@ -12,6 +12,8 @@
 // #include <algorithm>
 // #include <stdlib.h>
 
+#include "PROPOSAL/medium/Medium.h"
+#include "PROPOSAL/particle/PROPOSALParticle.h"
 #include "PROPOSAL/methods.h"
 #include "PROPOSAL/math/MathModel.h"
 #include "PROPOSAL/Constants.h"

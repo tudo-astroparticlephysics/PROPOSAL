@@ -1,5 +1,5 @@
 
-#include "PROPOSAL/Constants.h"
+// #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/math/MathModel.h"
 #include "PROPOSAL/decay/TwoBodyPhaseSpace.h"
 #include "PROPOSAL/particle/PROPOSALParticle.h"
