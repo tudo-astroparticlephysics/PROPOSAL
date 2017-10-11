@@ -6,11 +6,14 @@
 // #include <vector>
 // #include <cmath>
 
-#include "PROPOSAL/medium/Medium.h"
-#include "PROPOSAL/particle/PROPOSALParticle.h"
+// #include "PROPOSAL/medium/Medium.h"
+// #include "PROPOSAL/particle/PROPOSALParticle.h"
 #include "PROPOSAL/scattering/Scattering.h"
 
 namespace PROPOSAL {
+
+// class PROPOSALParticle;
+// class Medium;
 
 class ScatteringMoliere : public Scattering
 {
@@ -82,6 +85,15 @@ class ScatteringMoliere : public Scattering
     double GetRandom();
 
     //----------------------------------------------------------------------------//
+    //-----------------------------Coefficients-----------------------------------//
+    //---for calculating the power series approximation of the moliere function---//
+
+    // static const double c1[100];
+    // static const double c2[100];
+    // static const double c2large[50];
+    // static const double s2large[50];
+    // static const double C1large[50];
+
 };
 }
 

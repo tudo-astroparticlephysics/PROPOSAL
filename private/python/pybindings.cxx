@@ -913,7 +913,8 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
     enum_<ScatteringFactory::Enum>("ScatteringModel")
         .value("default", ScatteringFactory::Default)
         .value("moliere", ScatteringFactory::Moliere)
-        .value("moliere_first_order", ScatteringFactory::MoliereFirstOrder);
+        .value("highland", ScatteringFactory::Highland)
+        .value("noScattering", ScatteringFactory::NoScattering);
 
     // --------------------------------------------------------------------- //
     // Bremsstrahlung Definition

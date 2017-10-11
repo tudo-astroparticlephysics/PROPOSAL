@@ -7,6 +7,8 @@
 
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/math/Interpolant.h"
+#include "PROPOSAL/medium/Medium.h"
+#include "PROPOSAL/medium/Components.h"
 
 #define PHOTO_PARAM_REAL_IMPL(param, parent)                                                                           \
     Photo##param::Photo##param(const ParticleDef& particle_def,                                                        \

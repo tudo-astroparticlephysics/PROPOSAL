@@ -9,13 +9,17 @@
 
 #pragma once
 
-#include <map>
 #include <string>
 #include <vector>
 
-#include "PROPOSAL/medium/Components.h"
 
 namespace PROPOSAL {
+
+namespace Components
+{
+    class Component;
+}
+
 
 /******************************************************************************
 *                                   Medium                                    *
