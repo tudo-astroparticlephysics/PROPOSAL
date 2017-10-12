@@ -2,7 +2,6 @@
 #pragma once
 
 
-#include "PROPOSAL/crossection/parametrization/Parametrization.h"
 #include "PROPOSAL/methods.h"
 
 namespace  PROPOSAL

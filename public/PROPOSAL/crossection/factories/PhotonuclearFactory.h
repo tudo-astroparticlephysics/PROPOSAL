@@ -6,7 +6,6 @@
 #include <map>
 #include <string>
 
-#include "PROPOSAL/crossection/parametrization/Photonuclear.h"
 #include "PROPOSAL/methods.h"
 
 namespace  PROPOSAL
@@ -15,6 +14,10 @@ namespace  PROPOSAL
 class CrossSection;
 class RealPhoton;
 class ShadowEffect;
+class Photonuclear;
+struct ParticleDef;
+class EnergyCutSettings;
+class Medium;
 
 class PhotonuclearFactory
 {
