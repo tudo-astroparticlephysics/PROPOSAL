@@ -2,16 +2,11 @@
 #include <boost/bind.hpp>
 
 #include "PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h"
+#include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
 #include "PROPOSAL/math/Interpolant.h"
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/Output.h"
-#include "PROPOSAL/methods.h"
-#include "PROPOSAL/medium/Medium.h"
 
-#include "PROPOSAL/crossection/IonizInterpolant.h"
-#include "PROPOSAL/crossection/EpairInterpolant.h"
-#include "PROPOSAL/crossection/parametrization/Ionization.h"
-#include "PROPOSAL/crossection/parametrization/EpairProduction.h"
+#include "PROPOSAL/crossection/CrossSection.h"
 
 #include "PROPOSAL/math/InterpolantBuilder.h"
 

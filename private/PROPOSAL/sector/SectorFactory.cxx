@@ -1,10 +1,10 @@
 
 #include "PROPOSAL/sector/SectorFactory.h"
 #include "PROPOSAL/sector/Sector.h"
-#include "PROPOSAL/geometry/Sphere.h"
-#include "PROPOSAL/geometry/Box.h"
-#include "PROPOSAL/geometry/Cylinder.h"
-#include "PROPOSAL/Output.h"
+// #include "PROPOSAL/geometry/Sphere.h"
+// #include "PROPOSAL/geometry/Box.h"
+// #include "PROPOSAL/geometry/Cylinder.h"
+// #include "PROPOSAL/Output.h"
 #include "PROPOSAL/medium/Medium.h"
 
 using namespace PROPOSAL;

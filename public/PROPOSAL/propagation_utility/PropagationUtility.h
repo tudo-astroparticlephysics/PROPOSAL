@@ -4,12 +4,14 @@
 // #include <string>
 #include <vector>
 
-// #include "PROPOSAL/methods.h"
-// #include "PROPOSAL/scattering/ScatteringFactory.h"
+
 #include "PROPOSAL/crossection/factories/PhotonuclearFactory.h"
 #include "PROPOSAL/crossection/factories/BremsstrahlungFactory.h"
 #include "PROPOSAL/crossection/factories/EpairProductionFactory.h"
 #include "PROPOSAL/crossection/factories/IonizationFactory.h"
+
+#include "PROPOSAL/particle/ParticleDef.h"
+#include "PROPOSAL/EnergyCutSettings.h"
 
 namespace PROPOSAL {
 
