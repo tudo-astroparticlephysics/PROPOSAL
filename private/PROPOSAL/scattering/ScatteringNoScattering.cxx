@@ -7,7 +7,7 @@
 *   \author 
 */
 
-#include "PROPOSAL/particle/PROPOSALParticle.h"
+#include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/scattering/ScatteringNoScattering.h"
 
@@ -19,7 +19,7 @@ using namespace PROPOSAL;
 // ------------------------------------------------------------------------- //
 
 
-ScatteringNoScattering::ScatteringNoScattering(PROPOSALParticle& particle, const Medium& medium)
+ScatteringNoScattering::ScatteringNoScattering(Particle& particle, const Medium& medium)
     : Scattering(particle)
     , medium_(medium.clone())
 {
@@ -31,7 +31,7 @@ ScatteringNoScattering::ScatteringNoScattering(const ScatteringNoScattering& sca
 {
 }
 
-ScatteringNoScattering::ScatteringNoScattering(PROPOSALParticle& particle, const ScatteringNoScattering& scattering)
+ScatteringNoScattering::ScatteringNoScattering(Particle& particle, const ScatteringNoScattering& scattering)
     : Scattering(particle)
     , medium_(scattering.medium_->clone())
 {

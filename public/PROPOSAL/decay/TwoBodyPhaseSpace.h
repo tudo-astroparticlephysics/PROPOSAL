@@ -8,7 +8,7 @@
 namespace PROPOSAL
 {
 
-class PROPOSALParticle;
+class Particle;
 
 class TwoBodyPhaseSpace : public DecayChannel
 {
@@ -19,7 +19,7 @@ class TwoBodyPhaseSpace : public DecayChannel
     // No copy and assignemnt -> done by clone
     DecayChannel* clone() { return new TwoBodyPhaseSpace(*this); }
 
-    DecayProducts Decay(PROPOSALParticle*);
+    DecayProducts Decay(Particle*);
 
     private:
     TwoBodyPhaseSpace& operator=(const TwoBodyPhaseSpace&); // Undefined & not allowed

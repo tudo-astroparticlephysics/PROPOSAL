@@ -9,7 +9,7 @@
 namespace PROPOSAL
 {
 
-class PROPOSALParticle;
+class Particle;
 
 class LeptonicDecayChannel : public DecayChannel
 {
@@ -20,7 +20,7 @@ class LeptonicDecayChannel : public DecayChannel
     // No copy and assignemnt -> done by clone
     DecayChannel* clone() { return new LeptonicDecayChannel(*this); }
 
-    DecayProducts Decay(PROPOSALParticle*);
+    DecayProducts Decay(Particle*);
 
     private:
     LeptonicDecayChannel& operator=(const LeptonicDecayChannel&); // Undefined & not allowed

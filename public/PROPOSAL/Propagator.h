@@ -34,7 +34,7 @@ namespace PROPOSAL {
 
 // class Geometry;
 // class Sector;
-// class PROPOSALParticle;
+// class Particle;
 // class Vector3D;
 
 class Propagator
@@ -54,7 +54,7 @@ class Propagator
     //            bool integrate = false,
     //            int scattering_model = 0);
     // Propagator(std::string config_file, bool DoApplyOptions=true);
-    // Propagator(std::string config_file, PROPOSALParticle* particle, bool DoApplyOptions=true);
+    // Propagator(std::string config_file, Particle* particle, bool DoApplyOptions=true);
     // Propagator(Medium* medium,
     //            EnergyCutSettings* cuts,
     //            ParticleDef,
@@ -97,7 +97,7 @@ class Propagator
      *  \return vector of secondarys
      */
 
-    // std::vector<PROPOSALParticle*> Propagate( PROPOSALParticle *particle, double MaxDistance_cm = 1e20 );
+    // std::vector<Particle*> Propagate( Particle *particle, double MaxDistance_cm = 1e20 );
 
     //----------------------------------------------------------------------------//
     std::vector<DynamicData*> Propagate( double MaxDistance_cm = 1e20);
@@ -142,7 +142,7 @@ class Propagator
     /**
      *  Sets the particle for the Propagator and its current ProcessCollection
      */
-    // void SetParticle(PROPOSALParticle* particle);
+    // void SetParticle(Particle* particle);
 
     //----------------------------------------------------------------------------//
     // Destructor
@@ -157,7 +157,7 @@ class Propagator
     // std::string GetPath_to_tables() const;
     // void SetPath_to_tables(const std::string &path_to_tables);
     Geometry* GetDetector() const;
-    PROPOSALParticle& GetParticle();
+    Particle& GetParticle();
     // void SetDetector(Geometry *detector);
     // bool GetStopping_decay() const;
     // void SetStopping_decay(bool stopping_decay);
@@ -205,7 +205,7 @@ class Propagator
     std::vector<Sector*> sectors_;
     Sector* current_sector_;
 
-    PROPOSALParticle particle_;
+    Particle particle_;
     Geometry* detector_;
 
     //----------------------------------------------------------------------------//

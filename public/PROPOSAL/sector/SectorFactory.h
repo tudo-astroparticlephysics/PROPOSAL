@@ -25,8 +25,8 @@ class SectorFactory
         ~Definition();
     };
 
-    Sector* CreateSector(PROPOSALParticle&, const Definition&);
-    Sector* CreateSector(PROPOSALParticle&, const Definition&, const InterpolationDef&);
+    Sector* CreateSector(Particle&, const Definition&);
+    Sector* CreateSector(Particle&, const Definition&, const InterpolationDef&);
 
     static SectorFactory& Get()
     {

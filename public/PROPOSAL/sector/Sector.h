@@ -5,7 +5,7 @@
 // #include <vector>
 
 #include "PROPOSAL/scattering/ScatteringFactory.h"
-#include "PROPOSAL/particle/PROPOSALParticle.h"
+#include "PROPOSAL/particle/Particle.h"
 
 #include "PROPOSAL/propagation_utility/PropagationUtility.h"
 
@@ -52,11 +52,11 @@ class Sector
     };
 
     public:
-    // Sector(PROPOSALParticle&);
-    Sector(PROPOSALParticle&, const Medium&, const EnergyCutSettings&, const Geometry&, const Definition&);
-    Sector(PROPOSALParticle&, const Medium&, const EnergyCutSettings&, const Geometry&, const Definition&, const InterpolationDef&);
-    Sector(PROPOSALParticle&, const Sector&);
-    // Sector(PROPOSALParticle&, const Geometry&, const Utility&, const Scattering&, bool do_interpolation, const Definition& def = Definition());
+    // Sector(Particle&);
+    Sector(Particle&, const Medium&, const EnergyCutSettings&, const Geometry&, const Definition&);
+    Sector(Particle&, const Medium&, const EnergyCutSettings&, const Geometry&, const Definition&, const InterpolationDef&);
+    Sector(Particle&, const Sector&);
+    // Sector(Particle&, const Geometry&, const Utility&, const Scattering&, bool do_interpolation, const Definition& def = Definition());
     Sector(const Sector&);
     virtual ~Sector();
 
@@ -129,7 +129,7 @@ class Sector
     // bool GetEnableRandomization() const { return enable_randomization_; }
 
     Scattering* GetScattering() const { return scattering_; }
-    PROPOSALParticle& GetParticle() const { return particle_; }
+    Particle& GetParticle() const { return particle_; }
     Geometry* GetGeometry() const { return geometry_; }
     const Medium* GetMedium() const { return &utility_.GetMedium(); }
     // ContinuousRandomization* GetContinuousRandomization() const { return randomizer_; }
@@ -146,7 +146,7 @@ class Sector
     // TODO(mario): Do better weight enabling Fri 2017/08/25
     double weighting_starts_at_; //!< Distance at which re-weighting starts. Set to 0 in constructor
 
-    PROPOSALParticle& particle_;
+    Particle& particle_;
     Geometry* geometry_;
 
     Utility utility_;
