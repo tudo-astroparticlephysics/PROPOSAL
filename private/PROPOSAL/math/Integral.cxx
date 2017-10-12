@@ -328,8 +328,6 @@ Integral::Integral()
     ,precision_  (1.e-6)
     ,max_        (1)
     ,min_        (0)
-    ,integralValue_(0)
-    ,integralError_(0)
     ,iX_()
     ,iY_()
     ,c_()
@@ -382,8 +380,6 @@ Integral::Integral(const Integral &integral)
     ,precision_(integral.precision_)
     ,max_(integral.max_)
     ,min_(integral.min_)
-    ,integralValue_(integral.integralValue_)
-    ,integralError_(integral.integralError_)
     ,iX_(integral.iX_)
     ,iY_(integral.iY_)
     ,c_(integral.c_)
@@ -409,8 +405,6 @@ Integral::Integral(const Integral &integral)
 Integral::Integral(int  romberg, int maxSteps, double precision)
     :max_          (1)
     ,min_          (0)
-    ,integralValue_(0)
-    ,integralError_(0)
     ,iX_()
     ,iY_()
     ,c_()
@@ -509,8 +503,6 @@ bool Integral::operator==(const Integral &integral) const
     if(precision_       != integral.precision_)     return false;
     if(max_             != integral.max_)           return false;
     if(min_             != integral.min_)           return false;
-    if(integralValue_   != integral.integralValue_) return false;
-    if(integralError_   != integral.integralError_) return false;
     if(romberg4refine_  != integral.romberg4refine_)return false;
     if(randomDo_        != integral.randomDo_)      return false;
     if(useLog_          != integral.useLog_)        return false;
@@ -550,10 +542,6 @@ void Integral::swap(Integral &integral)
     swap(precision_,integral.precision_);
     swap(max_,integral.max_);
     swap(min_,integral.min_);
-
-
-    swap(integralValue_,integral.integralValue_);
-    swap(integralError_,integral.integralError_);
 
     iX_.swap(integral.iX_);
     iY_.swap(integral.iY_);
@@ -786,12 +774,13 @@ double Integral::Trapezoid3S(int n, double oldSum, int stepNumber)
 //----------------------------------------------------------------------------//
 
 
-void Integral::Interpolate(int start, double x)
+Integral::InterpolationResults Integral::Interpolate(int start, double x)
 {
     int num, i, k;
     bool dd;
     double error=0, result=0;
     double aux, aux2, dx1, dx2;
+    Integral::InterpolationResults interpolation_results;
 
     num =   0;
     aux =   fabs(x-iX_[start+0]);
@@ -876,8 +865,9 @@ void Integral::Interpolate(int start, double x)
         result  +=  error;
     }
 
-    integralError_   =   error;
-    integralValue_   =   result;
+    interpolation_results.Error = error;
+    interpolation_results.Value = result;
+    return interpolation_results;
 }
 
 
@@ -890,6 +880,8 @@ double Integral::RombergIntegrateClosed()
     double k = 1;
     double n = 1;
     double error, result, value;
+    Integral::InterpolationResults interpolation_results;
+
 
     value   =   0;
     result  =   0;
@@ -902,10 +894,10 @@ double Integral::RombergIntegrateClosed()
 
         if(i>=romberg_-1)
         {
-            Interpolate(i-(romberg_-1), 0);
+            interpolation_results = Interpolate(i-(romberg_-1), 0);
 
-            error   =   integralError_;
-            value   =   integralValue_;
+            error   =   interpolation_results.Error;
+            value   =   interpolation_results.Value;
 
             if(value!=0)
             {
@@ -936,6 +928,7 @@ double Integral::RombergIntegrateOpened()
     int i, k;
     double n;
     double error, result, value;
+    Integral::InterpolationResults interpolation_results;
 
     k       =   1;
     n       =   1;
@@ -969,9 +962,9 @@ double Integral::RombergIntegrateOpened()
         iY_[i]   =   result;
         if(i>=romberg_-1)
         {
-            Interpolate(i-(romberg_-1), 0);
-            error=integralError_;
-            value=integralValue_;
+            interpolation_results = Interpolate(i-(romberg_-1), 0);
+            error = interpolation_results.Error;
+            value = interpolation_results.Value;
 
             if(value!=0)
             {
@@ -1002,6 +995,7 @@ double Integral::RombergIntegrateOpened(double bigValue)
     int i, k;
     double n;
     double error, result, value;
+    InterpolationResults interpolation_results;
 
     k       =   1;
     n       =   1;
@@ -1015,11 +1009,11 @@ double Integral::RombergIntegrateOpened(double bigValue)
         iY_[i]   =   result;
         if(i>=romberg_-1)
         {
-            Interpolate(i-(romberg_-1), 0);
-
-            error   =   integralError_;
-            value   =   integralValue_;
+            interpolation_results = Interpolate(i-(romberg_-1), 0);
+            error = interpolation_results.Error;
+            value = interpolation_results.Value;
             error   /=  bigValue;
+
             if(fabs(error)<precision_)
             {
                 return value;
@@ -1484,32 +1478,8 @@ double Integral::IntegrateWithLogSubstitution(double min, double max, boost::fun
 //----------------------------------------------------------------------------//
 
 
-void Integral::SetC(std::vector<double> c) {
-	c_ = c;
-}
-
-void Integral::SetD(std::vector<double> d) {
-	d_ = d;
-}
-
-void Integral::SetIntegralError(double integralError) {
-	integralError_ = integralError;
-}
-
-void Integral::SetIntegralValue(double integralValue) {
-	integralValue_ = integralValue;
-}
-
 void Integral::SetIntegrand(boost::function<double(double)> integrand) {
 	integrand_ = integrand;
-}
-
-void Integral::SetX(std::vector<double> x) {
-	iX_ = x;
-}
-
-void Integral::SetY(std::vector<double> y) {
-	iY_ = y;
 }
 
 void Integral::SetMax(double max) {
