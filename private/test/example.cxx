@@ -10,8 +10,8 @@ int main()
     // Define Particles
     ParticleDef particle_def = MuMinusDef::Get();
     particle_def.mass = 1000; // [MeV]
-    // PROPOSALParticle mu(MuMinusDef::Get());
-    PROPOSALParticle tau(TauMinusDef::Get());
+    // Particle mu(MuMinusDef::Get());
+    Particle tau(TauMinusDef::Get());
 
     // One Propagator for each particle definition
     // medium/detector configuration
@@ -44,7 +44,7 @@ int main()
     // Using propagator directly
 
     // Therefor its needed to get the internal created particle first
-    PROPOSALParticle& particle = prop_tau.GetParticle();
+    Particle& particle = prop_tau.GetParticle();
 
     particle.SetEnergy(1e8); // [MeV]
     particle.SetPropagatedDistance(0);

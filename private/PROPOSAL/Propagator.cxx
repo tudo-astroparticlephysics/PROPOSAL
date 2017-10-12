@@ -893,7 +893,7 @@ Geometry *Propagator::GetDetector() const
     return detector_;
 }
 
-PROPOSALParticle& Propagator::GetParticle()
+Particle& Propagator::GetParticle()
 {
     return particle_;
 }
@@ -915,12 +915,12 @@ PROPOSALParticle& Propagator::GetParticle()
 
 // void Propagator::RestoreBackup_particle()
 // {
-//     particle_ = new PROPOSALParticle(*backup_particle_);
+//     particle_ = new Particle(*backup_particle_);
 // }
 
 // void Propagator::ResetParticle()
 // {
-//     // particle_ = new PROPOSALParticle(*backup_particle_);
+//     // particle_ = new Particle(*backup_particle_);
 //     *particle_ = *backup_particle_;
 // }
 

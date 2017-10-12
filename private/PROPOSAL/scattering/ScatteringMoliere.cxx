@@ -3,7 +3,7 @@
 
 #include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/medium/Medium.h"
-#include "PROPOSAL/particle/PROPOSALParticle.h"
+#include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/scattering/Coefficients.h"
 #include "PROPOSAL/Constants.h"
@@ -108,7 +108,7 @@ Scattering::RandomAngles ScatteringMoliere::CalculateRandomAngle(double dr, doub
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-ScatteringMoliere::ScatteringMoliere(PROPOSALParticle& particle, const Medium& medium)
+ScatteringMoliere::ScatteringMoliere(Particle& particle, const Medium& medium)
     : Scattering(particle)
     , medium_(medium.clone())
     , numComp_(medium_->GetNumComponents())
@@ -149,7 +149,7 @@ ScatteringMoliere::ScatteringMoliere(const ScatteringMoliere& scattering)
 {
 }
 
-ScatteringMoliere::ScatteringMoliere(PROPOSALParticle& particle, const ScatteringMoliere& scattering)
+ScatteringMoliere::ScatteringMoliere(Particle& particle, const ScatteringMoliere& scattering)
     : Scattering(particle)
     , medium_(scattering.medium_->clone())
     , numComp_(scattering.numComp_)

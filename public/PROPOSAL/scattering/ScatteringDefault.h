@@ -16,16 +16,16 @@ struct InterpolationDef;
 class ScatteringDefault: public Scattering
 {
     public:
-    ScatteringDefault(PROPOSALParticle&, Utility&);
-    ScatteringDefault(PROPOSALParticle&, Utility&, InterpolationDef);
-    ScatteringDefault(PROPOSALParticle&, const ScatteringDefault&);
+    ScatteringDefault(Particle&, Utility&);
+    ScatteringDefault(Particle&, Utility&, InterpolationDef);
+    ScatteringDefault(Particle&, const ScatteringDefault&);
 
     ScatteringDefault(const ScatteringDefault&);
     ~ScatteringDefault();
 
     virtual Scattering* clone() const { return new ScatteringDefault(*this); }
-    virtual Scattering* clone(PROPOSALParticle& particle) const { return new ScatteringDefault(particle, *this); }
-    static Scattering* create(PROPOSALParticle& particle, Utility& utility) { return new ScatteringDefault(particle, utility); }
+    virtual Scattering* clone(Particle& particle) const { return new ScatteringDefault(particle, *this); }
+    static Scattering* create(Particle& particle, Utility& utility) { return new ScatteringDefault(particle, utility); }
 
     // bool operator==(const ScatteringDefault& scattering) const;
     // bool operator!=(const ScatteringDefault& scattering) const;

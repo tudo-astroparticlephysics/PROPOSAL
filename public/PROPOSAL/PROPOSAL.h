@@ -50,7 +50,7 @@
 #include "PROPOSAL/math/Vector3D.h"
 
 #include "PROPOSAL/particle/ParticleDef.h"
-#include "PROPOSAL/particle/PROPOSALParticle.h"
+#include "PROPOSAL/particle/Particle.h"
 
 #include "PROPOSAL/propagation_utility/PropagationUtility.h"
 #include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
