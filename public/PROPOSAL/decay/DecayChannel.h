@@ -6,13 +6,13 @@
 namespace PROPOSAL
 {
 
-class PROPOSALParticle;
+class Particle;
 
 class DecayChannel
 {
 
     public:
-    typedef std::vector<PROPOSALParticle*> DecayProducts;
+    typedef std::vector<Particle*> DecayProducts;
 
     DecayChannel() {}
     virtual ~DecayChannel() {}
@@ -22,7 +22,7 @@ class DecayChannel
 
     virtual DecayChannel* clone() = 0;
 
-    virtual DecayProducts Decay(PROPOSALParticle*) = 0;
+    virtual DecayProducts Decay(Particle*) = 0;
 
     protected:
     virtual bool compare(const DecayChannel&) const = 0;

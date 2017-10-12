@@ -33,7 +33,7 @@ void PropagatorService::RegisterPropagator(Propagator& propagator)
 
 }
 
-std::vector<DynamicData*> PropagatorService::Propagate(PROPOSALParticle& particle)
+std::vector<DynamicData*> PropagatorService::Propagate(Particle& particle)
 {
     ParticleDef particle_def = particle.GetParticleDef();
 
@@ -43,7 +43,7 @@ std::vector<DynamicData*> PropagatorService::Propagate(PROPOSALParticle& particl
     {
         Propagator* propagator = it->second;
 
-        PROPOSALParticle& prop_particle = propagator->GetParticle();
+        Particle& prop_particle = propagator->GetParticle();
         prop_particle.SetEnergy(particle.GetEnergy());
         prop_particle.SetParentParticleEnergy(particle.GetParentParticleEnergy());
         prop_particle.SetPosition(particle.GetPosition());

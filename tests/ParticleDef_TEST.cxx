@@ -1,8 +1,7 @@
 
 #include "gtest/gtest.h"
 
-#include "PROPOSAL/particle/PROPOSALParticle.h"
-#include "PROPOSAL/Constants.h"
+#include "PROPOSAL/particle/ParticleDef.h"
 
 using namespace PROPOSAL;
 

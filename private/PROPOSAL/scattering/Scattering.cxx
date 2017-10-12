@@ -11,7 +11,7 @@
 
 // #include "PROPOSAL/Output.h"
 #include "PROPOSAL/math/Vector3D.h"
-#include "PROPOSAL/particle/PROPOSALParticle.h"
+#include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/scattering/Scattering.h"
 
 using namespace PROPOSAL;
@@ -21,7 +21,7 @@ using namespace PROPOSAL;
 ******************************************************************************/
 
 
-Scattering::Scattering(PROPOSALParticle& particle)
+Scattering::Scattering(Particle& particle)
     : particle_(particle)
 {
 }

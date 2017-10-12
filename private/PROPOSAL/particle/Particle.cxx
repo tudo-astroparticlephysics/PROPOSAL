@@ -13,7 +13,7 @@
 // #include <stdlib.h>
 // #include <iomanip>
 
-#include "PROPOSAL/particle/PROPOSALParticle.h"
+#include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/methods.h"
 #include "PROPOSAL/Output.h"
 
@@ -113,10 +113,10 @@ std::string DynamicData::GetNameFromType(Type type)
 }
 
 /******************************************************************************
-*                              PROPOSALParticle                               *
+*                              Particle                               *
 ******************************************************************************/
 
-PROPOSALParticle::PROPOSALParticle()
+Particle::Particle()
     : DynamicData(DynamicData::Particle)
     , particle_def_(MuMinusDef::Get())
     , momentum_(0)
@@ -137,7 +137,7 @@ PROPOSALParticle::PROPOSALParticle()
     SetEnergy(energy_);
 }
 
-PROPOSALParticle::PROPOSALParticle(const ParticleDef& particleDef)
+Particle::Particle(const ParticleDef& particleDef)
     : DynamicData(DynamicData::Particle)
     , particle_def_(particleDef)
     , momentum_(0)
@@ -162,17 +162,17 @@ PROPOSALParticle::PROPOSALParticle(const ParticleDef& particleDef)
 // Operators & swap
 // ------------------------------------------------------------------------- //
 
-// PROPOSALParticle& PROPOSALParticle::operator=(const PROPOSALParticle &particle){
+// Particle& Particle::operator=(const Particle &particle){
 //     if (this != &particle)
 //     {
-//       PROPOSALParticle tmp(particle);
+//       Particle tmp(particle);
 //       swap(tmp);
 //     }
 //     return *this;
 // }
 
 // ------------------------------------------------------------------------- //
-bool PROPOSALParticle::operator==(const PROPOSALParticle &particle) const
+bool Particle::operator==(const Particle &particle) const
 {
     if (propagated_distance_ != particle.propagated_distance_)
         return false;
@@ -223,7 +223,7 @@ bool PROPOSALParticle::operator==(const PROPOSALParticle &particle) const
 
 
 // ------------------------------------------------------------------------- //
-bool PROPOSALParticle::operator!=(const PROPOSALParticle &particle) const {
+bool Particle::operator!=(const Particle &particle) const {
   return !(*this == particle);
 }
 
@@ -232,7 +232,7 @@ bool PROPOSALParticle::operator!=(const PROPOSALParticle &particle) const {
 // Setter
 // ------------------------------------------------------------------------- //
 
-void PROPOSALParticle::SetEnergy(double energy)
+void Particle::SetEnergy(double energy)
 {
     energy_ = energy;
 
@@ -244,7 +244,7 @@ void PROPOSALParticle::SetEnergy(double energy)
 }
 
 // ------------------------------------------------------------------------- //
-void PROPOSALParticle::SetMomentum(double momentum)
+void Particle::SetMomentum(double momentum)
 {
     momentum_ = momentum;
     square_momentum_ = momentum_ * momentum_;
@@ -255,7 +255,7 @@ void PROPOSALParticle::SetMomentum(double momentum)
 // Print
 // ------------------------------------------------------------------------- //
 
-void PROPOSALParticle::print(std::ostream& os) const
+void Particle::print(std::ostream& os) const
 {
     os << "definition:" << '\n';
     os << particle_def_ << '\n';
