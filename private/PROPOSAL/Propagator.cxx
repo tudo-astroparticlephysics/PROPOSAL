@@ -14,22 +14,9 @@
 #include <boost/property_tree/ptree.hpp>
 
 #include "PROPOSAL/Propagator.h"
-
-// #include "PROPOSAL/sector/Sector.h"
-
 #include "PROPOSAL/medium/Medium.h"
-// #include "PROPOSAL/medium/MediumFactory.h"
-
-// #include "PROPOSAL/geometry/GeometryFactory.h"
 #include "PROPOSAL/geometry/Sphere.h"
-
-// #include "PROPOSAL/crossection/factories/BremsstrahlungFactory.h"
-// #include "PROPOSAL/crossection/factories/PhotonuclearFactory.h"
-
-// #include "PROPOSAL/Output.h"
-// #include "PROPOSAL/methods.h"
 #include "PROPOSAL/Constants.h"
-// #include "PROPOSAL/Geometry.h"
 
 using namespace std;
 using namespace PROPOSAL;

@@ -1,30 +1,12 @@
 #include <boost/bind.hpp>
 
-#include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Output.h"
 #include "PROPOSAL/medium/Medium.h"
 
-#include "PROPOSAL/particle/ParticleDef.h"
-#include "PROPOSAL/EnergyCutSettings.h"
 #include "PROPOSAL/propagation_utility/PropagationUtility.h"
 
 #include "PROPOSAL/crossection/CrossSection.h"
-
-#include "PROPOSAL/crossection/BremsIntegral.h"
-#include "PROPOSAL/crossection/PhotoIntegral.h"
-#include "PROPOSAL/crossection/IonizIntegral.h"
-#include "PROPOSAL/crossection/EpairIntegral.h"
-
-#include "PROPOSAL/crossection/BremsInterpolant.h"
-#include "PROPOSAL/crossection/PhotoInterpolant.h"
-#include "PROPOSAL/crossection/IonizInterpolant.h"
-#include "PROPOSAL/crossection/EpairInterpolant.h"
-
-#include "PROPOSAL/crossection/parametrization/Bremsstrahlung.h"
-#include "PROPOSAL/crossection/parametrization/Photonuclear.h"
-#include "PROPOSAL/crossection/parametrization/Ionization.h"
-#include "PROPOSAL/crossection/parametrization/EpairProduction.h"
-
+#include "PROPOSAL/crossection/parametrization/Parametrization.h"
 
 using namespace std;
 using namespace PROPOSAL;

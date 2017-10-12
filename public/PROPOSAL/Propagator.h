@@ -26,19 +26,16 @@
 #include <boost/property_tree/ptree.hpp>
 #include <deque>
 #include <vector>
-// #include "PROPOSAL/Collection.h"
+
 #include "PROPOSAL/Output.h"
 #include "PROPOSAL/sector/SectorFactory.h"
-// #include "PROPOSAL/PROPOSALParticle.h"
-// #include "PROPOSAL/Geometry.h"
-// #include "PROPOSAL/Scattering.h"
 
 namespace PROPOSAL {
 
-class Geometry;
-class Sector;
-class PROPOSALParticle;
-class Vector3D;
+// class Geometry;
+// class Sector;
+// class PROPOSALParticle;
+// class Vector3D;
 
 class Propagator
 {
