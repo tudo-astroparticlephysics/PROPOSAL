@@ -47,7 +47,7 @@ Sector::Definition::~Definition()
 // ------------------------------------------------------------------------- //
 
 // Standard constructor
-// Sector::Sector(PROPOSALParticle& particle)
+// Sector::Sector(Particle& particle)
 //     : sector_def_()
 //     , weighting_starts_at_(0)
 //       //TODO(mario): init different Fri 2017/09/01
@@ -91,7 +91,7 @@ Sector::Definition::~Definition()
 //     }
 // }
 
-Sector::Sector(PROPOSALParticle& particle,
+Sector::Sector(Particle& particle,
                const Medium& medium,
                const EnergyCutSettings& cuts,
                const Geometry& geometry,
@@ -123,7 +123,7 @@ Sector::Sector(PROPOSALParticle& particle,
     }
 }
 
-Sector::Sector(PROPOSALParticle& particle,
+Sector::Sector(Particle& particle,
                const Medium& medium,
                const EnergyCutSettings& cuts,
                const Geometry& geometry,
@@ -156,7 +156,7 @@ Sector::Sector(PROPOSALParticle& particle,
     }
 }
 
-Sector::Sector(PROPOSALParticle& particle, const Sector& sector)
+Sector::Sector(Particle& particle, const Sector& sector)
     : sector_def_(sector.sector_def_)
     , weighting_starts_at_(sector.weighting_starts_at_)
     , particle_(particle)
@@ -181,7 +181,7 @@ Sector::Sector(PROPOSALParticle& particle, const Sector& sector)
     }
 }
 
-// Sector::Sector(PROPOSALParticle& particle,
+// Sector::Sector(Particle& particle,
 //                const Geometry& geometry,
 //                const Utility& utility,
 //                const Scattering& scattering,
@@ -304,7 +304,7 @@ double Sector::Propagate(double distance)
     bool particle_interaction = false;
 
     pair<double, ParticleType::Enum> decay;
-    std::vector<PROPOSALParticle*> decay_products;
+    std::vector<Particle*> decay_products;
 
     pair<double, DynamicData::Type> energy_loss;
 
@@ -397,7 +397,7 @@ double Sector::Propagate(double distance)
             }
             final_energy -= energy_loss.first;
             // log_debug("Energyloss: %f\t%s", energy_loss.first,
-            // PROPOSALParticle::GetName(energy_loss.second).c_str());
+            // Particle::GetName(energy_loss.second).c_str());
             // //TODO(mario): hack Thu 2017/08/24
             Output::getInstance().FillSecondaryVector(particle_, energy_loss.second, energy_loss.first, 0);
             // secondary_id    =   particle_.GetParticleId() + 1;

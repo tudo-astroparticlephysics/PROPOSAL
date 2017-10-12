@@ -21,7 +21,7 @@ SectorFactory::Definition::~Definition()
 {
 }
 
-Sector* SectorFactory::CreateSector(PROPOSALParticle& particle, const Definition& def)
+Sector* SectorFactory::CreateSector(Particle& particle, const Definition& def)
 {
     Medium* med = MediumFactory::Get().CreateMedium(def.medium_def);
     Geometry* geometry = GeometryFactory::Get().CreateGeometry(def.geometry_def);
@@ -35,7 +35,7 @@ Sector* SectorFactory::CreateSector(PROPOSALParticle& particle, const Definition
     return sec;
 }
 
-Sector* SectorFactory::CreateSector(PROPOSALParticle& particle, const Definition& def, const InterpolationDef& interpolation_def)
+Sector* SectorFactory::CreateSector(Particle& particle, const Definition& def, const InterpolationDef& interpolation_def)
 {
     Medium* med = MediumFactory::Get().CreateMedium(def.medium_def);
     Geometry* geometry = GeometryFactory::Get().CreateGeometry(def.geometry_def);

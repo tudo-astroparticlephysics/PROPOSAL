@@ -13,7 +13,7 @@
 // #include <stdlib.h>
 
 #include "PROPOSAL/medium/Medium.h"
-#include "PROPOSAL/particle/PROPOSALParticle.h"
+#include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/methods.h"
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/Constants.h"
@@ -26,7 +26,7 @@ using namespace PROPOSAL;
 // ------------------------------------------------------------------------- //
 
 
-ScatteringHighland::ScatteringHighland(PROPOSALParticle& particle, const Medium& medium)
+ScatteringHighland::ScatteringHighland(Particle& particle, const Medium& medium)
     : Scattering(particle)
     , medium_(medium.clone())
 {
@@ -38,7 +38,7 @@ ScatteringHighland::ScatteringHighland(const ScatteringHighland& scattering)
 {
 }
 
-ScatteringHighland::ScatteringHighland(PROPOSALParticle& particle, const ScatteringHighland& scattering)
+ScatteringHighland::ScatteringHighland(Particle& particle, const ScatteringHighland& scattering)
     : Scattering(particle)
     , medium_(scattering.medium_->clone())
 {

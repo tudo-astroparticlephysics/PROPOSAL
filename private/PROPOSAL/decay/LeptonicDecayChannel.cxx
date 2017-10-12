@@ -5,7 +5,7 @@
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/decay/LeptonicDecayChannel.h"
-#include "PROPOSAL/particle/PROPOSALParticle.h"
+#include "PROPOSAL/particle/Particle.h"
 
 using namespace PROPOSAL;
 
@@ -47,7 +47,7 @@ double LeptonicDecayChannel::DifferentialDecayRate(double x)
     return (3 - 2*x) * x*x;
 }
 
-DecayChannel::DecayProducts LeptonicDecayChannel::Decay(PROPOSALParticle* particle)
+DecayChannel::DecayProducts LeptonicDecayChannel::Decay(Particle* particle)
 {
     double emax, x0, f0, el, pl, final_energy;
     double lm  =   ME;
@@ -73,7 +73,7 @@ DecayChannel::DecayProducts LeptonicDecayChannel::Decay(PROPOSALParticle* partic
     final_energy = el * (particle->GetEnergy()/parent_mass) + pl * (particle->GetMomentum()/parent_mass) * (2*arnd - 1);
 
     // Create products
-    PROPOSALParticle* product_particle = new PROPOSALParticle(EMinusDef::Get());
+    Particle* product_particle = new Particle(EMinusDef::Get());
     product_particle->SetEnergy(final_energy);
     product_particle->SetPosition(particle->GetPosition());
     product_particle->SetDirection(particle->GetDirection());

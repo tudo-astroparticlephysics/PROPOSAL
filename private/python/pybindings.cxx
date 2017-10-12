@@ -58,7 +58,7 @@
 
 using namespace PROPOSAL;
 
-// #include "PROPOSAL/PROPOSALParticle.h"
+// #include "PROPOSAL/Particle.h"
 // #include "PROPOSAL/Medium.h"
 // #include "PROPOSAL/EnergyCutSettings.h"
 // #include "PROPOSAL/ProcessCollection.h"
@@ -599,7 +599,7 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
     to_python_converter< std::vector<std::string>, VectorToPythonList<std::string> >();
 
     to_python_converter< std::vector<DynamicData*>, PVectorToPythonList<DynamicData*> >();
-    to_python_converter< std::vector<PROPOSALParticle*>, PVectorToPythonList<PROPOSALParticle*> >();
+    to_python_converter< std::vector<Particle*>, PVectorToPythonList<Particle*> >();
 
     to_python_converter< std::vector<SectorFactory::Definition>, VectorToPythonList<SectorFactory::Definition> >();
 
@@ -610,7 +610,7 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
     VectorFromPythonList<std::string>();
 
     VectorFromPythonList<DynamicData*>();
-    VectorFromPythonList<PROPOSALParticle*>();
+    VectorFromPythonList<Particle*>();
 
     VectorFromPythonList<SectorFactory::Definition>();
 
@@ -785,25 +785,25 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
     *                                Particle                                 *
     **************************************************************************/
 
-    class_<PROPOSALParticle, boost::shared_ptr<PROPOSALParticle>, bases<DynamicData> >("Particle", init<>())
+    class_<Particle, boost::shared_ptr<Particle>, bases<DynamicData> >("Particle", init<>())
 
         .def(init<const ParticleDef&>())
-        .def(init<const PROPOSALParticle&>())
+        .def(init<const Particle&>())
 
-        .add_property("momentum", &PROPOSALParticle::GetMomentum, &PROPOSALParticle::SetMomentum)
-        .add_property("particle_def", make_function(&PROPOSALParticle::GetParticleDef, return_value_policy<reference_existing_object>()))
+        .add_property("momentum", &Particle::GetMomentum, &Particle::SetMomentum)
+        .add_property("particle_def", make_function(&Particle::GetParticleDef, return_value_policy<reference_existing_object>()))
 
-        .add_property("entry_point", &PROPOSALParticle::GetEntryPoint, &PROPOSALParticle::SetEntryPoint)
-        .add_property("entry_time", &PROPOSALParticle::GetEntryTime, &PROPOSALParticle::SetEntryTime)
-        .add_property("entry_energy", &PROPOSALParticle::GetEntryEnergy, &PROPOSALParticle::SetEntryEnergy)
-        .add_property("exit_point", &PROPOSALParticle::GetExitPoint, &PROPOSALParticle::SetExitPoint)
-        .add_property("exit_time", &PROPOSALParticle::GetExitTime, &PROPOSALParticle::SetExitTime)
-        .add_property("exit_energy", &PROPOSALParticle::GetExitEnergy, &PROPOSALParticle::SetExitEnergy)
-        .add_property("closet_approach_point", &PROPOSALParticle::GetClosestApproachPoint, &PROPOSALParticle::SetClosestApproachPoint)
-        .add_property("closet_approach_time", &PROPOSALParticle::GetClosestApproachTime, &PROPOSALParticle::SetClosestApproachTime)
-        .add_property("closet_approach_energy", &PROPOSALParticle::GetClosestApproachEnergy, &PROPOSALParticle::SetClosestApproachEnergy)
+        .add_property("entry_point", &Particle::GetEntryPoint, &Particle::SetEntryPoint)
+        .add_property("entry_time", &Particle::GetEntryTime, &Particle::SetEntryTime)
+        .add_property("entry_energy", &Particle::GetEntryEnergy, &Particle::SetEntryEnergy)
+        .add_property("exit_point", &Particle::GetExitPoint, &Particle::SetExitPoint)
+        .add_property("exit_time", &Particle::GetExitTime, &Particle::SetExitTime)
+        .add_property("exit_energy", &Particle::GetExitEnergy, &Particle::SetExitEnergy)
+        .add_property("closet_approach_point", &Particle::GetClosestApproachPoint, &Particle::SetClosestApproachPoint)
+        .add_property("closet_approach_time", &Particle::GetClosestApproachTime, &Particle::SetClosestApproachTime)
+        .add_property("closet_approach_energy", &Particle::GetClosestApproachEnergy, &Particle::SetClosestApproachEnergy)
 
-        .add_property("e_lost", &PROPOSALParticle::GetElost, &PROPOSALParticle::SetElost)
+        .add_property("e_lost", &Particle::GetElost, &Particle::SetElost)
     ;
 
     /**************************************************************************

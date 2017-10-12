@@ -28,9 +28,9 @@ class ScatteringFactory
         NoScattering
     };
 
-    // typedef boost::function<Scattering* (PROPOSALParticle&, const Medium&)> RegisterFunction;
-    // typedef boost::function<Scattering* (PROPOSALParticle&, Utility&)> RegisterFunctionUtility;
-    // typedef boost::function<Scattering* (PROPOSALParticle&, Utility&)> RegisterFunctionUtilityInterpolant;
+    // typedef boost::function<Scattering* (Particle&, const Medium&)> RegisterFunction;
+    // typedef boost::function<Scattering* (Particle&, Utility&)> RegisterFunctionUtility;
+    // typedef boost::function<Scattering* (Particle&, Utility&)> RegisterFunctionUtilityInterpolant;
     //
     // typedef std::map<std::string, RegisterFunction> ScatteringMapString;
     // typedef std::map<Enum, RegisterFunction> ScatteringMapEnum;
@@ -40,15 +40,15 @@ class ScatteringFactory
     //
     typedef std::map<std::string, Enum> MapStringToEnum;
 
-    // Scattering* CreateScattering(const std::string&, PROPOSALParticle&, Utility&);
+    // Scattering* CreateScattering(const std::string&, Particle&, Utility&);
 
-    Scattering* CreateScattering(const std::string&, PROPOSALParticle&, Utility&, const InterpolationDef&);
-    Scattering* CreateScattering(const Enum, PROPOSALParticle&, Utility&, const InterpolationDef&);
+    Scattering* CreateScattering(const std::string&, Particle&, Utility&, const InterpolationDef&);
+    Scattering* CreateScattering(const Enum, Particle&, Utility&, const InterpolationDef&);
 
-    Scattering* CreateScattering(const std::string&, PROPOSALParticle&, Utility&);
-    Scattering* CreateScattering(const Enum, PROPOSALParticle&, Utility&);
+    Scattering* CreateScattering(const std::string&, Particle&, Utility&);
+    Scattering* CreateScattering(const Enum, Particle&, Utility&);
 
-    // Scattering* CreateScattering(const Enum, PROPOSALParticle&, Utility&);
+    // Scattering* CreateScattering(const Enum, Particle&, Utility&);
 
     Enum GetEnumFromString(const std::string&);
 
