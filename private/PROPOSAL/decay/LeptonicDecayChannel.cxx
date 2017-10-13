@@ -2,6 +2,8 @@
 #include <boost/bind.hpp>
 #include <cmath>
 
+#include <boost/math/tools/roots.hpp>
+
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/decay/LeptonicDecayChannel.h"
@@ -35,11 +37,11 @@ bool LeptonicDecayChannel::compare(const DecayChannel& channel) const
         return true;
 }
 
-double LeptonicDecayChannel::DecayRate(double x)
+double LeptonicDecayChannel::DecayRate(double x, double right_side)
 {
     double x2;
     x2  =   x*x;
-    return  x*x2 - x2*x2/2;
+    return  x*x2 - x2*x2/2 - right_side;
 }
 
 double LeptonicDecayChannel::DifferentialDecayRate(double x)
@@ -47,9 +49,31 @@ double LeptonicDecayChannel::DifferentialDecayRate(double x)
     return (3 - 2*x) * x*x;
 }
 
+std::pair<double, double> LeptonicDecayChannel::function_and_derivative(double x, double right_side)
+{
+    return std::make_pair (DecayRate(x, right_side), DifferentialDecayRate(x));
+}
+
+double LeptonicDecayChannel::FindRootBoost(double min, double right_side)
+{
+    double max = 1;
+    double x_start = 0.5;
+    int binary_digits = 6;
+    // int max_steps = 20;
+
+    return boost::math::tools::newton_raphson_iterate(
+        boost::bind(&LeptonicDecayChannel::function_and_derivative, this, _1, right_side)
+        , x_start
+        , min
+        , max
+        , binary_digits
+        );
+}
+
+
 DecayChannel::DecayProducts LeptonicDecayChannel::Decay(Particle* particle)
 {
-    double emax, x0, f0, el, pl, final_energy;
+    double emax, x0, f0, el, pl, final_energy, right_side;
     double lm  =   ME;
     double parent_mass = particle->GetMass();
 
@@ -60,15 +84,19 @@ DecayChannel::DecayProducts LeptonicDecayChannel::Decay(Particle* particle)
     x0      =   lm/emax;
     f0      =   x0*x0;
     f0      =   f0*x0 - f0*f0/2;
-    el      =   std::max(root_finder_.FindRoot(
-                        x0, 1.0, 0.5,
-                        // &LeptonicDecayChannel::DecayRate,
-                        // &LeptonicDecayChannel::DifferentialDecayRate,
-                        boost::bind(&LeptonicDecayChannel::DecayRate, this, _1),
-                        boost::bind(&LeptonicDecayChannel::DifferentialDecayRate, this, _1),
-                        f0+(0.5-f0)*ernd) *emax
-                    , lm);
-    pl      =   sqrt(el*el - lm*lm);
+    right_side = f0+(0.5-f0)*ernd;
+
+    double find_root_old = root_finder_.FindRoot(
+            x0, 1.0, 0.5,
+            boost::bind(&LeptonicDecayChannel::DecayRate, this, _1, right_side),
+            boost::bind(&LeptonicDecayChannel::DifferentialDecayRate, this, _1));
+    
+    double find_root_new = FindRootBoost(x0, right_side);
+
+    printf("%f %f\n", find_root_old, find_root_new);
+
+    el = std::max(find_root_new *emax, lm);
+    pl = sqrt(el*el - lm*lm);
 
     final_energy = el * (particle->GetEnergy()/parent_mass) + pl * (particle->GetMomentum()/parent_mass) * (2*arnd - 1);
 

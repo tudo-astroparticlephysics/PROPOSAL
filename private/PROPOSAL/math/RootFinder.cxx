@@ -25,8 +25,7 @@ double RootFinder::FindRoot(double min,
                             double max,
                             double startX,
                             boost::function<double (double)> function,
-                            boost::function<double (double)> differentiated_function,
-                            double rightSide) const
+                            boost::function<double (double)> differentiated_function) const
 {
 
     int i;
@@ -34,8 +33,8 @@ double RootFinder::FindRoot(double min,
     double f, df, fmin, fmax, result, xdiff;
 
 
-    fmin    =   function(min)-rightSide;
-    fmax    =   function(max)-rightSide;
+    fmin    =   function(min);
+    fmax    =   function(max);
 
     if(fmin==0)
     {
@@ -73,7 +72,7 @@ double RootFinder::FindRoot(double min,
     }
 
     currentX    =   min*(1 - startX) + max*startX;
-    f           =   function(currentX) - rightSide;
+    f           =   function(currentX);
     df          =   differentiated_function(currentX);
 
     for(i=0; i<maxSteps_; i++)
@@ -119,7 +118,7 @@ double RootFinder::FindRoot(double min,
             break;
         }
 
-        f   =   function(currentX)-rightSide;
+        f   =   function(currentX);
         df  =   differentiated_function(currentX);
     }
 

@@ -30,12 +30,16 @@ class LeptonicDecayChannel : public DecayChannel
     // ----------------------------------------------------------------------------
     /// @brief Function for electron energy calculation - interface to FindRoot
     // ----------------------------------------------------------------------------
-    double DecayRate(double);
+    double DecayRate(double, double);
 
     // ----------------------------------------------------------------------------
     /// @brief Function for electron energy calculation - interface to FindRoot
     // ----------------------------------------------------------------------------
     double DifferentialDecayRate(double);
+
+    std::pair<double, double> function_and_derivative(double x, double right_side);
+
+    double FindRootBoost(double min, double right_side);
 
     RootFinder root_finder_;
 };
