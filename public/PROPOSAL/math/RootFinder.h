@@ -48,8 +48,7 @@ public:
                     double max,
                     double startX,
                     boost::function<double (double)> function,
-                    boost::function<double (double)> differentiated_function,
-                    double rightSide) const;
+                    boost::function<double (double)> differentiated_function) const;
 
 //----------------------------------------------------------------------------//
 
