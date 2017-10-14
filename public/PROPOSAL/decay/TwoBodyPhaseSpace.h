@@ -21,13 +21,18 @@ class TwoBodyPhaseSpace : public DecayChannel
 
     DecayProducts Decay(PROPOSALParticle*);
 
+    const std::string& GetName() const { return name_; }
+
     private:
     TwoBodyPhaseSpace& operator=(const TwoBodyPhaseSpace&); // Undefined & not allowed
 
     bool compare(const DecayChannel&) const;
+    void print(std::ostream&) const;
 
     double first_daughter_mass_;
     double second_daughter_mass_;
+
+    static const std::string name_;
 };
 
 } /* PROPOSAL */

@@ -1,7 +1,10 @@
 
+#include <ostream>
 #include "PROPOSAL/decay/StableChannel.h"
 
 using namespace PROPOSAL;
+
+const std::string StableChannel::name_ = "StableChannel";
 
 StableChannel::StableChannel()
     : DecayChannel()

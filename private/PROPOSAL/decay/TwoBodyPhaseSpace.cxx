@@ -6,6 +6,8 @@
 
 using namespace PROPOSAL;
 
+const std::string TwoBodyPhaseSpace::name_ = "TwoBodyPhaseSpace";
+
 TwoBodyPhaseSpace::TwoBodyPhaseSpace(double m1, double m2)
     : DecayChannel()
     , first_daughter_mass_(m1)
@@ -50,7 +52,7 @@ DecayChannel::DecayProducts TwoBodyPhaseSpace::Decay(PROPOSALParticle* particle)
 
     // return el;
     // Create products
-    PROPOSALParticle* product_particle = new PROPOSALParticle(EMinusDef::Get());
+    PROPOSALParticle* product_particle = new PROPOSALParticle(ParticleDef::Builder().SetEMinus().build());
     product_particle->SetEnergy(final_energy);
     product_particle->SetPosition(particle->GetPosition());
     product_particle->SetDirection(particle->GetDirection());
@@ -63,4 +65,15 @@ DecayChannel::DecayProducts TwoBodyPhaseSpace::Decay(PROPOSALParticle* particle)
     decay_products.push_back(product_particle);
 
     return decay_products;
+}
+
+// ------------------------------------------------------------------------- //
+// Print
+// ------------------------------------------------------------------------- //
+
+void TwoBodyPhaseSpace::print(std::ostream& os) const
+{
+    os << "Used masses:" << '\n';
+    os << "First daughter mass: " << first_daughter_mass_ << '\n';
+    os << "Second daughter mass: " << second_daughter_mass_ << '\n';
 }
