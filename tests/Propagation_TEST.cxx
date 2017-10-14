@@ -18,8 +18,8 @@ TEST(Propagation , Test_nan) {
     int EmaxLog10 = 8;
 
     // Define Particles
-    PROPOSALParticle mu(MuMinusDef::Get());
-    PROPOSALParticle tau(TauMinusDef::Get());
+    PROPOSALParticle mu(ParticleDef::Builder().SetMuMinus().build());
+    PROPOSALParticle tau(ParticleDef::Builder().SetTauMinus().build());
 
     // One Propagator for each particle definition
     // medium/detector configuration

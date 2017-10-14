@@ -19,10 +19,10 @@ TEST(Comparison , Comparison_equal ) {
     PROPOSALParticle B;
     EXPECT_TRUE(A==B);
 
-    PROPOSALParticle* C = new PROPOSALParticle(TauMinusDef::Get());
+    PROPOSALParticle* C = new PROPOSALParticle(ParticleDef::Builder().SetTauMinus().build());
     C->SetPosition(position);
     C->SetDirection(direction);
-    PROPOSALParticle* D = new PROPOSALParticle(TauMinusDef::Get());
+    PROPOSALParticle* D = new PROPOSALParticle(ParticleDef::Builder().SetTauMinus().build());
     D->SetPosition(position);
     D->SetDirection(direction);
 
@@ -32,7 +32,7 @@ TEST(Comparison , Comparison_equal ) {
 
     position = Vector3D();
     direction = Vector3D();
-    PROPOSALParticle* E = new PROPOSALParticle(MuMinusDef::Get());
+    PROPOSALParticle* E = new PROPOSALParticle(ParticleDef::Builder().SetMuMinus().build());
     E->SetPosition(position);
     E->SetDirection(direction);
     EXPECT_TRUE(A==*E);
@@ -43,13 +43,13 @@ TEST(Comparison , Comparison_not_equal ) {
     direction.CalculateCartesianFromSpherical();
 
     PROPOSALParticle A;
-    PROPOSALParticle B(TauMinusDef::Get());
+    PROPOSALParticle B(ParticleDef::Builder().SetTauMinus().build());
     EXPECT_TRUE(A!=B);
 
-    PROPOSALParticle* C = new PROPOSALParticle(TauMinusDef::Get());
+    PROPOSALParticle* C = new PROPOSALParticle(ParticleDef::Builder().SetTauMinus().build());
     C->SetPosition(position);
     C->SetDirection(direction);
-    PROPOSALParticle* D = new PROPOSALParticle(TauMinusDef::Get());
+    PROPOSALParticle* D = new PROPOSALParticle(ParticleDef::Builder().SetTauMinus().build());
     D->SetPosition(position);
     D->SetDirection(direction);
     D->SetEnergy(1e6);
@@ -66,7 +66,7 @@ TEST(Assignment , Copyconstructor ) {
 TEST(Assignment , Copyconstructor2 ) {
     direction.SetSphericalCoordinates(1,20*PI/180.,20*PI/180.);
     direction.CalculateCartesianFromSpherical();
-    PROPOSALParticle A(TauMinusDef::Get());
+    PROPOSALParticle A(ParticleDef::Builder().SetTauMinus().build());
     A.SetPosition(position);
     A.SetDirection(direction);
     PROPOSALParticle B(A);
