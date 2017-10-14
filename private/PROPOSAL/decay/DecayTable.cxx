@@ -5,7 +5,9 @@
 #include "PROPOSAL/decay/LeptonicDecayChannel.h"
 #include "PROPOSAL/decay/TwoBodyPhaseSpace.h"
 #include "PROPOSAL/math/MathModel.h"
+
 #include "PROPOSAL/Output.h"
+#include "PROPOSAL/methods.h"
 
 using namespace PROPOSAL;
 
@@ -50,15 +52,15 @@ DecayTable& DecayTable::operator=(const DecayTable& table)
     if (this != &table)
     {
       DecayTable tmp(table);
-      swap(tmp);
+      swap(*this, tmp);
     }
     return *this;
 }
 
-void DecayTable::swap(DecayTable& table)
+void PROPOSAL::swap(DecayTable& first, DecayTable& second)
 {
     using std::swap;
-    swap(channels_, table.channels_);
+    swap(first.channels_, second.channels_);
 }
 
 bool DecayTable::operator==(const DecayTable& table) const
@@ -90,6 +92,22 @@ bool DecayTable::operator!=(const DecayTable& def) const
     return !(*this == def);
 }
 
+// ------------------------------------------------------------------------- //
+std::ostream& PROPOSAL::operator<<(std::ostream& os, DecayTable const& table)
+{
+    std::stringstream ss;
+    ss << " DecayTable (" << &table << ") ";
+
+    os << Helper::Centered(60, ss.str()) << '\n';
+
+    os << "Branching Ratio" << "\t\t"  << "Channel" << '\n';
+    for (DecayTable::DecayMap::const_iterator iter = table.channels_.begin(); iter != table.channels_.end(); ++iter) {
+        os << iter->first << "\t\t" << iter->second->GetName() << '\n';
+    }
+
+    os << Helper::Centered(60, "");
+    return os;
+}
 // ------------------------------------------------------------------------- //
 // Methods
 // ------------------------------------------------------------------------- //
