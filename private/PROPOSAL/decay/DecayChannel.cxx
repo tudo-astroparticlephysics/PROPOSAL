@@ -3,7 +3,7 @@
 #include <cmath>
 
 #include "PROPOSAL/decay/DecayChannel.h"
-#include "PROPOSAL/particle/PROPOSALParticle.h"
+#include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/math/Vector3D.h"
 
 #include "PROPOSAL/methods.h"
@@ -36,7 +36,7 @@ std::ostream& PROPOSAL::operator<<(std::ostream& os, DecayChannel const& channel
 }
 
 // ------------------------------------------------------------------------- //
-void DecayChannel::Boost(PROPOSALParticle* particle, const Vector3D& direction_unnormalized, double beta)
+void DecayChannel::Boost(Particle* particle, const Vector3D& direction_unnormalized, double beta)
 {
     Vector3D direction = direction_unnormalized;
     direction.normalise();
