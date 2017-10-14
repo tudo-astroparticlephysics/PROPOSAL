@@ -9,13 +9,13 @@ namespace PROPOSAL
 
 class Vector3D;
 class DynamicData;
-class PROPOSALParticle;
+class Particle;
 
 class DecayChannel
 {
 
     public:
-    typedef std::vector<PROPOSALParticle*> DecayProducts;
+    typedef std::vector<Particle*> DecayProducts;
 
     DecayChannel() {}
     virtual ~DecayChannel() {}
@@ -27,8 +27,8 @@ class DecayChannel
 
     virtual DecayChannel* clone() = 0;
 
-    virtual DecayProducts Decay(PROPOSALParticle*) = 0;
-    static void Boost(PROPOSALParticle*, const Vector3D& direction, double beta);
+    virtual DecayProducts Decay(Particle*) = 0;
+    static void Boost(Particle*, const Vector3D& direction, double beta);
 
     virtual const std::string& GetName() const = 0;
 

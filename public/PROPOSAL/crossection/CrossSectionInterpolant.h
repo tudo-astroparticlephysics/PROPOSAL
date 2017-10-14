@@ -2,12 +2,12 @@
 #pragma once
 
 #include "PROPOSAL/crossection/CrossSection.h"
-#include "PROPOSAL/math/Integral.h"
 #include "PROPOSAL/methods.h"
 
 namespace PROPOSAL
 {
 
+class Integral;
 class Interpolant;
 
 class CrossSectionInterpolant: public CrossSection

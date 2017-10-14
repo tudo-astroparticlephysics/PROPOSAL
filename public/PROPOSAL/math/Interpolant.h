@@ -16,7 +16,6 @@
 
 #include <boost/function.hpp>
 
-// #include "PROPOSAL/MathModel.h"
 
 namespace PROPOSAL{
 

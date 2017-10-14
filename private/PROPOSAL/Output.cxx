@@ -19,21 +19,21 @@ void Output::SetLoggingConfigurationFile(std::string file)
 }
 
 // ------------------------------------------------------------------------- //
-void Output::FillSecondaryVector(std::vector<PROPOSALParticle*>& particles)
+void Output::FillSecondaryVector(std::vector<Particle*>& particles)
 {
-    for (std::vector<PROPOSALParticle*>::iterator iter = particles.begin(); iter != particles.end(); ++iter) {
+    for (std::vector<Particle*>::iterator iter = particles.begin(); iter != particles.end(); ++iter) {
         secondarys_.push_back(new DynamicData(**iter));
     }
 }
 
 // ------------------------------------------------------------------------- //
-void Output::FillSecondaryVector(const PROPOSALParticle& particle, const DynamicData::Type& secondary, double energyloss, double distance)
+void Output::FillSecondaryVector(const Particle& particle, const DynamicData::Type& secondary, double energyloss, double distance)
 {
     DynamicData* data = NULL;
 
     if (secondary == DynamicData::Particle)
     {
-        data = new PROPOSALParticle(particle);
+        data = new Particle(particle);
     }
     else
     {
@@ -54,10 +54,10 @@ void Output::FillSecondaryVector(const PROPOSALParticle& particle, const Dynamic
 }
 
 
-void Output::FillSecondaryVector(PROPOSALParticle *particle, int secondary_id, pair<double, ParticleType::Enum> energy_loss, double distance)
+void Output::FillSecondaryVector(Particle *particle, int secondary_id, pair<double, ParticleType::Enum> energy_loss, double distance)
 {
 
-    // PROPOSALParticle *particle_to_store = new PROPOSALParticle(
+    // Particle *particle_to_store = new Particle(
     //     particle->GetParentParticleId(),
     //     secondary_id,
     //     energy_loss.second,
@@ -215,7 +215,7 @@ void Output::Close()
 //----------------------------------------------------------------------------//
 
 #if ROOT_SUPPORT
-    void Output::StorePrimaryInTree(PROPOSALParticle *primary)
+    void Output::StorePrimaryInTree(Particle *primary)
     {
         if(store_in_root_trees_)
         {
@@ -235,7 +235,7 @@ void Output::Close()
     //----------------------------------------------------------------------------//
     //----------------------------------------------------------------------------//
 
-    void Output::StorePropagatedPrimaryInTree(PROPOSALParticle *prop_primary)
+    void Output::StorePropagatedPrimaryInTree(Particle *prop_primary)
     {
         if(store_in_root_trees_)
         {
@@ -342,7 +342,7 @@ void Output::Close()
  //----------------------------------------------------------------------------//
 
 
-     void Output::StorePrimaryInASCII(PROPOSALParticle *primary)
+     void Output::StorePrimaryInASCII(Particle *primary)
      {
          if(store_in_ASCII_file_)
          {
@@ -361,7 +361,7 @@ void Output::Close()
  //----------------------------------------------------------------------------//
  //----------------------------------------------------------------------------//
 
-     void Output::StorePropagatedPrimaryInASCII(PROPOSALParticle *prop_primary)
+     void Output::StorePropagatedPrimaryInASCII(Particle *prop_primary)
      {
          if(store_in_ASCII_file_)
          {

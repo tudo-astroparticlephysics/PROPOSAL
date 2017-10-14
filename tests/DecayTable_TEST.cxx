@@ -1,7 +1,7 @@
 
 #include "gtest/gtest.h"
 
-#include "PROPOSAL/particle/PROPOSALParticle.h"
+#include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/decay/DecayTable.h"
 #include "PROPOSAL/decay/LeptonicDecayChannel.h"
 #include "PROPOSAL/decay/TwoBodyPhaseSpace.h"
@@ -116,7 +116,7 @@ TEST(Assignment , Swap ) {
 TEST(SelectChannel , Muon ) {
 
     // Leptinic decay channel in muon case
-    PROPOSALParticle muon;
+    Particle muon;
     DecayChannel& dc_muon = muon.GetDecayTable().SelectChannel();
 
     LeptonicDecayChannel leptonic_channel;
@@ -126,7 +126,7 @@ TEST(SelectChannel , Muon ) {
 
 TEST(SelectChannel , Electron ) {
     // Leptinic decay channel in electron case
-    PROPOSALParticle electron(ParticleDef::Builder().SetEMinus().build());
+    Particle electron(ParticleDef::Builder().SetEMinus().build());
     DecayChannel& dc_electron = electron.GetDecayTable().SelectChannel();
 
     StableChannel stable_channel;
@@ -136,7 +136,7 @@ TEST(SelectChannel , Electron ) {
 
 TEST(SelectChannel , Tau ) {
     // tauon decay channels
-    PROPOSALParticle tau(ParticleDef::Builder().SetTauMinus().build());
+    Particle tau(ParticleDef::Builder().SetTauMinus().build());
 
     int leptonic_count = 0;
     int twobody_count = 0;

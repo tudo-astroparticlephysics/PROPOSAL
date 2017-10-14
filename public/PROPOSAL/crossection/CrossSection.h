@@ -3,7 +3,7 @@
 
 #include <vector>
 
-#include "PROPOSAL/particle/PROPOSALParticle.h"
+#include "PROPOSAL/particle/Particle.h"
 
 namespace PROPOSAL
 {

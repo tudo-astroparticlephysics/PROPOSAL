@@ -1,4 +1,4 @@
-/*! \file   PROPOSALParticle.h
+/*! \file   Particle.h
 *   \brief  Header file for the Particle routines.
 *
 *   For more details see the class documentation.
@@ -172,21 +172,21 @@ class DynamicData
 ///
 /// All coordinates, angles and physical values are stored in this class.
 // ----------------------------------------------------------------------------
-class PROPOSALParticle : public DynamicData
+class Particle : public DynamicData
 {
     public:
 
-    PROPOSALParticle();
-    PROPOSALParticle(const ParticleDef&);
+    Particle();
+    Particle(const ParticleDef&);
 
     // destructors
-    virtual ~PROPOSALParticle() {}
+    virtual ~Particle() {}
 
-    // void swap(PROPOSALParticle& particle);
+    // void swap(Particle& particle);
 
     // Operators
-    bool operator==(const PROPOSALParticle& particle) const;
-    bool operator!=(const PROPOSALParticle& particle) const;
+    bool operator==(const Particle& particle) const;
+    bool operator!=(const Particle& particle) const;
 
     // --------------------------------------------------------------------- //
     // Getter & Setter
@@ -254,7 +254,7 @@ class PROPOSALParticle : public DynamicData
     // --------------------------------------------------------------------- //
 
     private:
-    PROPOSALParticle& operator=(const PROPOSALParticle&);
+    Particle& operator=(const Particle&);
     virtual void print(std::ostream&) const;
 
     const ParticleDef particle_def_; //!< static defenitions of the particle

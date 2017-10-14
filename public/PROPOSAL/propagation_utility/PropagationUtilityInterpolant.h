@@ -2,8 +2,11 @@
 #pragma once
 
 #include "PROPOSAL/propagation_utility/PropagationUtility.h"
-#include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
-// #include "PROPOSAL/math/Interpolant.h"
+
+namespace PROPOSAL{
+    class Integral;
+    class UtilityIntegral;
+}
 
 #define UTILITY_INTERPOLANT_DEC(cls)                                                                                   \
     class UtilityInterpolant##cls : public UtilityInterpolant                                                          \
