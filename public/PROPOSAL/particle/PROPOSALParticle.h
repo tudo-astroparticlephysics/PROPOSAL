@@ -232,7 +232,7 @@ class PROPOSALParticle : public DynamicData
     ///
     /// @return 2d double vector
     // ----------------------------------------------------------------------------
-    const HardBBTables::VecType* getHardBB() const {return particle_def_.hardbb_table;}
+    const HardBBTables::VecType& getHardBB() const {return particle_def_.hardbb_table;}
 
     int GetParentParticleId() const { return parent_particle_id_; }
     int GetParticleId() const { return particle_id_; }

@@ -108,7 +108,7 @@ TEST(Assignment , Swap ) {
     DecayTable C = A;
     DecayTable D = B;
 
-    B.swap(A);
+    swap(B, A);
     EXPECT_TRUE(C==B);
     EXPECT_TRUE(D==A);
 }
@@ -126,7 +126,7 @@ TEST(SelectChannel , Muon ) {
 
 TEST(SelectChannel , Electron ) {
     // Leptinic decay channel in electron case
-    PROPOSALParticle electron(EMinusDef::Get());
+    PROPOSALParticle electron(ParticleDef::Builder().SetEMinus().build());
     DecayChannel& dc_electron = electron.GetDecayTable().SelectChannel();
 
     StableChannel stable_channel;
@@ -136,7 +136,7 @@ TEST(SelectChannel , Electron ) {
 
 TEST(SelectChannel , Tau ) {
     // tauon decay channels
-    PROPOSALParticle tau(TauMinusDef::Get());
+    PROPOSALParticle tau(ParticleDef::Builder().SetTauMinus().build());
 
     int leptonic_count = 0;
     int twobody_count = 0;

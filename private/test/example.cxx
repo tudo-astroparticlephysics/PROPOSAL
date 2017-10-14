@@ -8,10 +8,10 @@ using namespace PROPOSAL;
 int main()
 {
     // Define Particles
-    ParticleDef particle_def = MuMinusDef::Get();
-    particle_def.mass = 1000; // [MeV]
+    ParticleDef particle_def = ParticleDef::Builder().SetMuMinus().build();
+    // particle_def.mass = 1000; // [MeV]
     // PROPOSALParticle mu(MuMinusDef::Get());
-    PROPOSALParticle tau(TauMinusDef::Get());
+    PROPOSALParticle tau(ParticleDef::Builder().SetTauMinus().build());
 
     // One Propagator for each particle definition
     // medium/detector configuration
