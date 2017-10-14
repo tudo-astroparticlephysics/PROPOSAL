@@ -9,9 +9,8 @@
 #include "PROPOSAL/geometry/Sphere.h"
 #include "PROPOSAL/geometry/Cylinder.h"
 #include "PROPOSAL/geometry/Box.h"
-#include "PROPOSAL/math/MathModel.h"
+#include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/Constants.h"
-// #include "PROPOSAL/PROPOSALParticle.h"
 
 using namespace std;
 using namespace PROPOSAL;

@@ -6,14 +6,15 @@
 #include <map>
 #include <string>
 
-#include "PROPOSAL/crossection/parametrization/Bremsstrahlung.h"
-
 #include "PROPOSAL/methods.h"
 
 namespace  PROPOSAL
 {
 
 class CrossSection;
+class Bremsstrahlung;
+struct ParticleDef;
+class EnergyCutSettings;
 
 class BremsstrahlungFactory
 {

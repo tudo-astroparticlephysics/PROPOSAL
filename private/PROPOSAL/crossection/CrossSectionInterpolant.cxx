@@ -6,6 +6,7 @@
 #include "PROPOSAL/crossection/parametrization/Parametrization.h"
 #include "PROPOSAL/medium/Medium.h"
 
+#include "PROPOSAL/math/Integral.h"
 #include "PROPOSAL/math/Interpolant.h"
 
 #include "PROPOSAL/Output.h"

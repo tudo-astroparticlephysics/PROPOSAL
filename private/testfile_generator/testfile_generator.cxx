@@ -337,7 +337,7 @@ int setting_loop(
             // paricle
             for (std::vector<std::string>::iterator it_particle = particle.begin() ; it_particle != particle.end(); ++it_particle)
             {
-                PROPOSALParticle particle(PROPOSALParticle::GetTypeFromName(*it_particle),particle_position,particle_direction,1e5,10);
+                Particle particle(Particle::GetTypeFromName(*it_particle),particle_position,particle_direction,1e5,10);
 
                 CrossSections* cross = NULL;
                 switch (interaction)
@@ -910,7 +910,7 @@ int setting_loop_contrand(std::string& filename)
     // paricle
     for (std::vector<std::string>::iterator it_particle = particle.begin() ; it_particle != particle.end(); ++it_particle)
     {
-        PROPOSALParticle particle(PROPOSALParticle::GetTypeFromName(*it_particle),particle_position,particle_direction,1e5,10);
+        Particle particle(Particle::GetTypeFromName(*it_particle),particle_position,particle_direction,1e5,10);
 
         // medium
         for (std::vector<std::string>::iterator it_medium = medium.begin() ; it_medium != medium.end(); ++it_medium)
@@ -1076,7 +1076,7 @@ int ProcColl_Stochastics(std::string filename, std::string path_to_tables)
             // paricle
             for (std::vector<std::string>::iterator it_particle = particle.begin() ; it_particle != particle.end(); ++it_particle)
             {
-                PROPOSALParticle particle(PROPOSALParticle::GetTypeFromName(*it_particle),particle_position,particle_direction,1e5,10);
+                Particle particle(Particle::GetTypeFromName(*it_particle),particle_position,particle_direction,1e5,10);
                 // Propagator prop(&medium, &cuts, particle.GetType(), "");
                 ProcessCollection proc_col(&particle, medium, &cuts);
                 proc_col.EnableInterpolation(path_to_tables);
@@ -1232,7 +1232,7 @@ int ProcColl_Displacement(std::string filename)
             // paricle
             for (std::vector<std::string>::iterator it_particle = particle.begin() ; it_particle != particle.end(); ++it_particle)
             {
-                PROPOSALParticle particle(PROPOSALParticle::GetTypeFromName(*it_particle),particle_position,particle_direction,1e5,10);
+                Particle particle(Particle::GetTypeFromName(*it_particle),particle_position,particle_direction,1e5,10);
                 // Propagator prop(&medium, &cuts, particle.GetType(), "");
                 ProcessCollection proc_col(&particle, medium, &cuts);
                 proc_col.EnableInterpolation("../resources/tables");
@@ -1360,7 +1360,7 @@ int ProcColl_FinalEnergyDist(std::string filename, std::string path_to_tables)
             // paricle
             for (std::vector<std::string>::iterator it_particle = particle.begin() ; it_particle != particle.end(); ++it_particle)
             {
-                PROPOSALParticle particle(PROPOSALParticle::GetTypeFromName(*it_particle),particle_position,particle_direction,1e5,10);
+                Particle particle(Particle::GetTypeFromName(*it_particle),particle_position,particle_direction,1e5,10);
                 // Propagator prop(&medium, &cuts, particle.GetType(), "");
                 ProcessCollection proc_col(&particle, medium, &cuts);
                 proc_col.EnableInterpolation(path_to_tables);
@@ -1481,7 +1481,7 @@ int ProcColl_FinalEnergyParticleInteraction(std::string filename, std::string pa
             // paricle
             for (std::vector<std::string>::iterator it_particle = particle.begin() ; it_particle != particle.end(); ++it_particle)
             {
-                PROPOSALParticle particle(PROPOSALParticle::GetTypeFromName(*it_particle),particle_position,particle_direction,1e5,10);
+                Particle particle(Particle::GetTypeFromName(*it_particle),particle_position,particle_direction,1e5,10);
                 // Propagator prop(&medium, &cuts, particle.GetType(), "");
                 ProcessCollection proc_col(&particle, medium, &cuts);
                 proc_col.EnableInterpolation(path_to_tables);
@@ -1605,7 +1605,7 @@ int ProcColl_Tracking(std::string filename, std::string path_to_tables)
             // paricle
             for (std::vector<std::string>::iterator it_particle = particle.begin() ; it_particle != particle.end(); ++it_particle)
             {
-                PROPOSALParticle particle(PROPOSALParticle::GetTypeFromName(*it_particle),particle_position,particle_direction,1e5,10);
+                Particle particle(Particle::GetTypeFromName(*it_particle),particle_position,particle_direction,1e5,10);
                 // Propagator prop(&medium, &cuts, particle.GetType(), "");
                 ProcessCollection proc_col(&particle, medium, &cuts);
                 proc_col.EnableInterpolation(path_to_tables);
@@ -1732,7 +1732,7 @@ int ProcColl_MakeDecay(std::string filename, std::string path_to_tables)
             // paricle
             for (std::vector<std::string>::iterator it_particle = particle.begin() ; it_particle != particle.end(); ++it_particle)
             {
-                PROPOSALParticle particle(PROPOSALParticle::GetTypeFromName(*it_particle),particle_position,particle_direction,1e5,10);
+                Particle particle(Particle::GetTypeFromName(*it_particle),particle_position,particle_direction,1e5,10);
                 // Propagator prop(&medium, &cuts, particle.GetType(), "");
                 ProcessCollection proc_col(&particle, medium, &cuts);
                 proc_col.EnableInterpolation(path_to_tables);
@@ -1770,7 +1770,7 @@ int ProcColl_MakeDecay(std::string filename, std::string path_to_tables)
                             << "\t"
                             << decay_out.first
                             << "\t"
-                            << PROPOSALParticle::GetName(decay_out.second)
+                            << Particle::GetName(decay_out.second)
                             << std::endl;
                     }
                 }

@@ -24,14 +24,14 @@ namespace PROPOSAL{
 class ScatteringHighland : public Scattering
 {
     public:
-    ScatteringHighland(PROPOSALParticle&, const Medium&);
-    ScatteringHighland(PROPOSALParticle&, const ScatteringHighland&);
+    ScatteringHighland(Particle&, const Medium&);
+    ScatteringHighland(Particle&, const ScatteringHighland&);
     ScatteringHighland(const ScatteringHighland&);
     ~ScatteringHighland();
 
     virtual Scattering* clone() const { return new ScatteringHighland(*this); }
-    virtual Scattering* clone(PROPOSALParticle& particle) const { return new ScatteringHighland(particle, *this); }
-    static Scattering* create(PROPOSALParticle& particle, const Medium& medium) { return new ScatteringHighland(particle, medium); }
+    virtual Scattering* clone(Particle& particle) const { return new ScatteringHighland(particle, *this); }
+    static Scattering* create(Particle& particle, const Medium& medium) { return new ScatteringHighland(particle, medium); }
 
     private:
     ScatteringHighland& operator=(const ScatteringHighland&); // Undefined & not allowed
