@@ -3,6 +3,7 @@
 // #include <string>
 
 #include <boost/python.hpp>
+#include <boost/python/stl_iterator.hpp>
 #include <boost/python/overloads.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 
@@ -10,12 +11,6 @@
 
 // #include "PROPOSAL/Propagator.h"
 #include "PROPOSAL/PROPOSAL.h"
-
-#define PARTICLE_DEF(cls)                                                                                              \
-    class_<cls##Def, boost::shared_ptr<cls##Def>, bases<ParticleDef>, boost::noncopyable>(#cls "Def", no_init)         \
-                                                                                                                       \
-        .def("get", make_function(&cls##Def::Get, return_value_policy<reference_existing_object>()))                   \
-        .staticmethod("get");
 
 #define COMPONENT_DEF(cls)\
     class_<Components::cls, boost::shared_ptr<Components::cls>, bases<Components::Component> >( #cls, init<double>());
@@ -143,6 +138,32 @@ struct VectorToPythonList
 };
 
 template<typename T>
+struct Vector2DToPythonList
+{
+    static PyObject* convert(std::vector<std::vector<T> > const& vec)
+    {
+        boost::python::list python_list;
+        typename std::vector<std::vector<T> >::const_iterator iter;
+        typename std::vector<T>::const_iterator iter_inner;
+
+        for(iter = vec.begin(); iter != vec.end(); ++iter)
+        {
+            boost::python::list python_list_inner;
+
+            for(iter_inner = iter->begin(); iter_inner != iter->end(); ++iter_inner)
+            {
+                python_list_inner.append(boost::python::object(*iter_inner));
+            }
+
+            python_list.append(python_list_inner);
+            boost::python::incref(python_list_inner.ptr());
+        }
+
+        return boost::python::incref(python_list.ptr());
+    }
+};
+
+template<typename T>
 struct PVectorToPythonList
 {
     static PyObject* convert(std::vector<T> const& vec)
@@ -210,6 +231,57 @@ struct VectorFromPythonList
     }
 };
 
+/// @brief Type that allows for registration of conversions from
+///        python iterable types.
+struct iterable_converter
+{
+    /// @note Registers converter from a python interable type to the
+    ///       provided type.
+    template<typename Container>
+    iterable_converter& from_python()
+    {
+        boost::python::converter::registry::push_back(&iterable_converter::convertible,
+                                                      &iterable_converter::construct<Container>,
+                                                      boost::python::type_id<Container>());
+
+        // Support chaining.
+        return *this;
+    }
+
+    /// @brief Check if PyObject is iterable.
+    static void* convertible(PyObject* object) { return PyObject_GetIter(object) ? object : NULL; }
+
+    /// @brief Convert iterable PyObject to C++ container type.
+    ///
+    /// Container Concept requirements:
+    ///
+    ///   * Container::value_type is CopyConstructable.
+    ///   * Container can be constructed and populated with two iterators.
+    ///     I.e. Container(begin, end)
+    template<typename Container>
+    static void construct(PyObject* object, boost::python::converter::rvalue_from_python_stage1_data* data)
+    {
+        namespace python = boost::python;
+        // Object is a borrowed reference, so create a handle indicting it is
+        // borrowed for proper reference counting.
+        python::handle<> handle(python::borrowed(object));
+
+        // Obtain a handle to the memory block that the converter has allocated
+        // for the C++ type.
+        typedef python::converter::rvalue_from_python_storage<Container> storage_type;
+        void* storage = reinterpret_cast<storage_type*>(data)->storage.bytes;
+
+        typedef python::stl_input_iterator<typename Container::value_type> iterator;
+
+        // Allocate the C++ type into the converter's memory block, and assign
+        // its handle to the converter's convertible variable.  The C++
+        // container is populated by passing the begin and end iterators of
+        // the python object to the container's constructor.
+        new (storage) Container(iterator(python::object(handle)), // begin
+                                iterator());                      // end
+        data->convertible = storage;
+    }
+};
 // // ------------------------------------------------------------------------- //
 // // Pair
 // // ------------------------------------------------------------------------- //
@@ -283,9 +355,10 @@ struct VectorFromPythonList
 //     }
 // };
 //
-// #<{(|*****************************************************************************
-// *                               Python Module                                 *
-// *****************************************************************************|)}>#
+
+/******************************************************************************
+*                               Python Module                                 *
+******************************************************************************/
 
 // ------------------------------------------------------------------------- //
 // Components sub module
@@ -572,18 +645,28 @@ void export_crosssections()
     class_<IonizInterpolant, boost::shared_ptr<IonizInterpolant>, bases<CrossSectionInterpolant> >("IonizInterpolant", init<const Ionization&, InterpolationDef>((arg("parametrization"), arg("interpolation_def"))));
 }
 
-class PythonHardBBTables {};
+void export_harbb_tables()
+{
+    using namespace boost::python;
+
+    // map the Util namespace to a sub-module
+    // make "from mypackage.Util import <whatever>" work
+    object hardbbModule(handle<>(borrowed(PyImport_AddModule("pyPROPOSAL.HardBBTables"))));
+    // make "from mypackage import Util" work
+    scope().attr("HardBBTables") = hardbbModule;
+    // set the current scope to the new sub-module
+    scope hardbb_scope = hardbbModule;
+    // export stuff in the Util namespace
+
+    hardbb_scope.attr("MuonTable") = HardBBTables::MuonTable;
+    hardbb_scope.attr("TauTable") = HardBBTables::TauTable;
+}
 
 BOOST_PYTHON_MODULE(pyPROPOSAL)
 {
     using namespace boost::python;
     object package = scope();
     package.attr("__path__") = "pyPROPOSAL";
-
-    export_components();
-    export_medium();
-    export_parametrizations();
-    export_crosssections();
 
     docstring_options doc_options(true, true, false);
 
@@ -595,8 +678,10 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
 
     to_python_converter< std::vector<double>, VectorToPythonList<double> >();
     to_python_converter< std::vector<std::vector<double> >, VectorToPythonList<std::vector<double> > > ();
+    // to_python_converter< std::vector<std::vector<double> >, Vector2DToPythonList<double> > ();
 
     to_python_converter< std::vector<std::string>, VectorToPythonList<std::string> >();
+    to_python_converter< std::vector<ParticleDef>, VectorToPythonList<ParticleDef> >();
 
     to_python_converter< std::vector<DynamicData*>, PVectorToPythonList<DynamicData*> >();
     to_python_converter< std::vector<PROPOSALParticle*>, PVectorToPythonList<PROPOSALParticle*> >();
@@ -605,14 +690,35 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
 
     // ----[ Register the from-python converter ]------------ //
 
-    VectorFromPythonList<double>();
-    VectorFromPythonList<std::vector<double> >();
-    VectorFromPythonList<std::string>();
+    // Register interable conversions.
+    iterable_converter()
+        // Build-in type.
+        // .from_python<std::vector<double> >()
+        .from_python<std::vector<double> >()
+        .from_python<std::vector<std::vector<double> > >()
+        .from_python<std::vector<DynamicData*> >()
+        .from_python<std::vector<ParticleDef> >()
+        .from_python<std::vector<PROPOSALParticle*> >()
+        .from_python<std::vector<SectorFactory::Definition> >();
 
-    VectorFromPythonList<DynamicData*>();
-    VectorFromPythonList<PROPOSALParticle*>();
+    // VectorFromPythonList<double>();
+    // VectorFromPythonList<std::vector<double> >();
+    // VectorFromPythonList<std::string>();
+    //
+    // VectorFromPythonList<DynamicData*>();
+    // VectorFromPythonList<PROPOSALParticle*>();
+    //
+    // VectorFromPythonList<SectorFactory::Definition>();
 
-    VectorFromPythonList<SectorFactory::Definition>();
+    /**************************************************************************
+    *                            Separate Modules                             *
+    **************************************************************************/
+
+    export_components();
+    export_medium();
+    export_parametrizations();
+    export_crosssections();
+    export_harbb_tables();
 
     /**************************************************************************
     *                                Vector3D                                *
@@ -663,12 +769,17 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
 
     class_<DecayChannel, boost::shared_ptr<DecayChannel>, boost::noncopyable >("DecayChannel", no_init)
 
-        .def("decay", &DecayChannel::Decay, "Decay the given paritcle")
+        .def(self_ns::str(self_ns::self))
+        .def("decay", &DecayChannel::Decay, "Decay the given particle")
+        .def("boost", &DecayChannel::Boost, "Boost the particle along a direction")
+        .staticmethod("boost")
     ;
 
     class_<LeptonicDecayChannel, boost::shared_ptr<LeptonicDecayChannel>, bases<DecayChannel> >("LeptonicDecayChannel", init<>());
 
     class_<TwoBodyPhaseSpace, boost::shared_ptr<TwoBodyPhaseSpace>, bases<DecayChannel> >("TwoBodyPhaseSpace", init<double, double>());
+
+    class_<ManyBodyPhaseSpace, boost::shared_ptr<ManyBodyPhaseSpace>, bases<DecayChannel> >("ManyBodyPhaseSpace", init<std::vector<ParticleDef> >());
 
     class_<StableChannel, boost::shared_ptr<StableChannel>, bases<DecayChannel> >("StableChannel", init<>());
 
@@ -685,7 +796,7 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
 
         .def(init<const DecayTable&>())
 
-        // .def(self_ns::str(self_ns::self))
+        .def(self_ns::str(self_ns::self))
 
         .def("add_channel", &DecayTable::addChannel, "Add an decay channel")
         .def("select_channel", make_function(&DecayTable::SelectChannel, return_internal_reference<>()), "Select an decay channel according to given branching ratios")
@@ -698,57 +809,91 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
 
     class_<ParticleDef, boost::shared_ptr<ParticleDef> >("ParticleDef", init<>())
 
+        .def(init<std::string, double, double, double, double, const HardBBTables::VecType&, const DecayTable&>(
+            (arg("name"), arg("mass"), arg("low"), arg("lifetime"), arg("charge"), arg("hardbb"), arg("decay_table"))))
         .def(init<const ParticleDef&>())
 
         .def(self_ns::str(self_ns::self))
 
-        .def_readwrite("name", &ParticleDef::name)
-        .def_readwrite("mass", &ParticleDef::mass)
-        .def_readwrite("low", &ParticleDef::low)
-        .def_readwrite("charge", &ParticleDef::charge)
-        .def_readwrite("decay_table", &ParticleDef::decay_table)
-        // .def_readwrite("hardbb_table", &ParticleDef::hardbb_table) //TODO(mario): hardbb Fri 2017/09/22
-    ;
-
-    class_<MuMinusDef, boost::shared_ptr<MuMinusDef>, bases<ParticleDef>, boost::noncopyable >("MuMinusDef", no_init)
-
-        .def("get", make_function(&MuMinusDef::Get, return_value_policy<reference_existing_object>()))
-        .staticmethod("get")
+        .def_readonly("name", &ParticleDef::name)
+        .def_readonly("mass", &ParticleDef::mass)
+        .def_readonly("low", &ParticleDef::low)
+        .def_readonly("charge", &ParticleDef::charge)
+        .def_readonly("decay_table", &ParticleDef::decay_table)
+        // .add_property("hardbb_table", make_function(&get_hardbb, return_internal_reference<>())) //TODO(mario): shit Fri 2017/10/13
         ;
 
-    PARTICLE_DEF(MuPlus)
+    class_<ParticleDef::Builder, boost::shared_ptr<ParticleDef::Builder> >("ParticleDefBuilder", init<>())
 
-    PARTICLE_DEF(EMinus)
-    PARTICLE_DEF(EPlus)
+        .def("SetName", make_function(&ParticleDef::Builder::SetName, return_internal_reference<>()))
+        .def("SetMass", make_function(&ParticleDef::Builder::SetMass, return_internal_reference<>()))
+        .def("SetLow", make_function(&ParticleDef::Builder::SetLow, return_internal_reference<>()))
+        .def("SetLifetime", make_function(&ParticleDef::Builder::SetLifetime, return_internal_reference<>()))
+        .def("SetCharge", make_function(&ParticleDef::Builder::SetCharge, return_internal_reference<>()))
+        .def("SetDecayTable", make_function(&ParticleDef::Builder::SetDecayTable, return_internal_reference<>()))
+        .def("MuMinus", make_function(&ParticleDef::Builder::SetMuMinus, return_internal_reference<>()))
+        .def("MuPlus", make_function(&ParticleDef::Builder::SetMuPlus, return_internal_reference<>()))
+        .def("EMinus", make_function(&ParticleDef::Builder::SetEMinus, return_internal_reference<>()))
+        .def("EPlus", make_function(&ParticleDef::Builder::SetEPlus, return_internal_reference<>()))
+        .def("TauMinus", make_function(&ParticleDef::Builder::SetTauMinus, return_internal_reference<>()))
+        .def("TauPlus", make_function(&ParticleDef::Builder::SetTauPlus, return_internal_reference<>()))
+        .def("STauMinus", make_function(&ParticleDef::Builder::SetStauMinus, return_internal_reference<>()))
+        .def("STauPlus", make_function(&ParticleDef::Builder::SetStauPlus, return_internal_reference<>()))
+        .def("P0", make_function(&ParticleDef::Builder::SetP0, return_internal_reference<>()))
+        .def("PiMinus", make_function(&ParticleDef::Builder::SetPiMinus, return_internal_reference<>()))
+        .def("PiPlus", make_function(&ParticleDef::Builder::SetPiPlus, return_internal_reference<>()))
+        .def("KMinus", make_function(&ParticleDef::Builder::SetKMinus, return_internal_reference<>()))
+        .def("KPlus", make_function(&ParticleDef::Builder::SetKPlus, return_internal_reference<>()))
+        .def("PMinus", make_function(&ParticleDef::Builder::SetPMinus, return_internal_reference<>()))
+        .def("PPlus", make_function(&ParticleDef::Builder::SetPPlus, return_internal_reference<>()))
+        .def("NuE", make_function(&ParticleDef::Builder::SetNuE, return_internal_reference<>()))
+        .def("NuEBar", make_function(&ParticleDef::Builder::SetNuEBar, return_internal_reference<>()))
+        .def("NuMu", make_function(&ParticleDef::Builder::SetNuMu, return_internal_reference<>()))
+        .def("NuMuBar", make_function(&ParticleDef::Builder::SetNuMuBar, return_internal_reference<>()))
+        .def("NuTau", make_function(&ParticleDef::Builder::SetNuTau, return_internal_reference<>()))
+        .def("NuTauBar", make_function(&ParticleDef::Builder::SetNuTauBar, return_internal_reference<>()))
+        .def("build", &ParticleDef::Builder::build)
+        ;
 
-    PARTICLE_DEF(TauMinus)
-    PARTICLE_DEF(TauPlus)
-
-    PARTICLE_DEF(StauMinus)
-    PARTICLE_DEF(StauPlus)
-
-    PARTICLE_DEF(P0)
-    PARTICLE_DEF(PiMinus)
-    PARTICLE_DEF(PiPlus)
-
-    PARTICLE_DEF(KMinus)
-    PARTICLE_DEF(KPlus)
-
-    PARTICLE_DEF(PMinus)
-    PARTICLE_DEF(PPlus)
-
-    PARTICLE_DEF(NuE)
-    PARTICLE_DEF(NuEBar)
-
-    PARTICLE_DEF(NuMu)
-    PARTICLE_DEF(NuMuBar)
-
-    PARTICLE_DEF(NuTau)
-    PARTICLE_DEF(NuTauBar)
-
-    PARTICLE_DEF(Monopole)
-    PARTICLE_DEF(Gamma)
-    PARTICLE_DEF(StableMassiveParticle)
+    // class_<MuMinusDef, boost::shared_ptr<MuMinusDef>, bases<ParticleDef>, boost::noncopyable >("MuMinusDef", no_init)
+    //
+    //     .def("get", make_function(&MuMinusDef::Get, return_value_policy<reference_existing_object>()))
+    //     .staticmethod("get")
+    //     ;
+    //
+    // PARTICLE_DEF(MuPlus)
+    //
+    // PARTICLE_DEF(EMinus)
+    // PARTICLE_DEF(EPlus)
+    //
+    // PARTICLE_DEF(TauMinus)
+    // PARTICLE_DEF(TauPlus)
+    //
+    // PARTICLE_DEF(StauMinus)
+    // PARTICLE_DEF(StauPlus)
+    //
+    // PARTICLE_DEF(P0)
+    // PARTICLE_DEF(PiMinus)
+    // PARTICLE_DEF(PiPlus)
+    //
+    // PARTICLE_DEF(KMinus)
+    // PARTICLE_DEF(KPlus)
+    //
+    // PARTICLE_DEF(PMinus)
+    // PARTICLE_DEF(PPlus)
+    //
+    // PARTICLE_DEF(NuE)
+    // PARTICLE_DEF(NuEBar)
+    //
+    // PARTICLE_DEF(NuMu)
+    // PARTICLE_DEF(NuMuBar)
+    //
+    // PARTICLE_DEF(NuTau)
+    // PARTICLE_DEF(NuTauBar)
+    //
+    // PARTICLE_DEF(Monopole)
+    // PARTICLE_DEF(Gamma)
+    // PARTICLE_DEF(StableMassiveParticle)
 
     /**************************************************************************
     *                              Dynamic Data                               *
@@ -790,8 +935,10 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
         .def(init<const ParticleDef&>())
         .def(init<const PROPOSALParticle&>())
 
+        .add_property("name", &PROPOSALParticle::GetName)
         .add_property("momentum", &PROPOSALParticle::GetMomentum, &PROPOSALParticle::SetMomentum)
         .add_property("particle_def", make_function(&PROPOSALParticle::GetParticleDef, return_value_policy<reference_existing_object>()))
+        .add_property("decay_table", make_function(&PROPOSALParticle::GetDecayTable, return_internal_reference<>()))
 
         .add_property("entry_point", &PROPOSALParticle::GetEntryPoint, &PROPOSALParticle::SetEntryPoint)
         .add_property("entry_time", &PROPOSALParticle::GetEntryTime, &PROPOSALParticle::SetEntryTime)
@@ -1063,17 +1210,8 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
 
         .def("propagate", &PropagatorService::Propagate, (arg("particle")))
         .def("register_propagator", &PropagatorService::RegisterPropagator, (arg("propagator")));
-
-    // --------------------------------------------------------------------- //
-    // HardBBTable
-    // --------------------------------------------------------------------- //
-
-    boost::python::scope hardbb = class_<PythonHardBBTables>("HardBBTables");
-    hardbb.attr("MuonTable") = HardBBTables::MuonTable;
-    hardbb.attr("TauTable") = HardBBTables::TauTable;
 }
 
-#undef PARTICLE_DEF
 #undef COMPONENT_DEF
 #undef MEDIUM_DEF
 #undef BREMS_DEF

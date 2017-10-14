@@ -9,6 +9,8 @@
 
 using namespace PROPOSAL;
 
+const std::string LeptonicDecayChannel::name_ = "LeptonicDecayChannel";
+
 LeptonicDecayChannel::LeptonicDecayChannel()
     : DecayChannel()
     , root_finder_(IMAXS, IPREC)
@@ -73,7 +75,7 @@ DecayChannel::DecayProducts LeptonicDecayChannel::Decay(PROPOSALParticle* partic
     final_energy = el * (particle->GetEnergy()/parent_mass) + pl * (particle->GetMomentum()/parent_mass) * (2*arnd - 1);
 
     // Create products
-    PROPOSALParticle* product_particle = new PROPOSALParticle(EMinusDef::Get());
+    PROPOSALParticle* product_particle = new PROPOSALParticle(ParticleDef::Builder().SetEMinus().build());
     product_particle->SetEnergy(final_energy);
     product_particle->SetPosition(particle->GetPosition());
     product_particle->SetDirection(particle->GetDirection());
@@ -86,4 +88,13 @@ DecayChannel::DecayProducts LeptonicDecayChannel::Decay(PROPOSALParticle* partic
     decay_products.push_back(product_particle);
 
     return decay_products;
+}
+
+// ------------------------------------------------------------------------- //
+// Print
+// ------------------------------------------------------------------------- //
+
+void LeptonicDecayChannel::print(std::ostream& os) const
+{
+    os << "Lepton mass: " << '\n';
 }
