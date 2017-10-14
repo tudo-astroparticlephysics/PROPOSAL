@@ -22,10 +22,14 @@ class StableChannel : public DecayChannel
 
     DecayProducts Decay(PROPOSALParticle*);
 
+    const std::string& GetName() const { return name_; }
+
     private:
     StableChannel& operator=(const StableChannel&); // Undefined & not allowed
 
     bool compare(const DecayChannel&) const;
+
+    static const std::string name_;
 };
 
 } /* PROPOSAL */

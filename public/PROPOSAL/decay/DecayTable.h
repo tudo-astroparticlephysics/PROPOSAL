@@ -1,7 +1,7 @@
 
 #pragma once
 
-// #include <iostream>
+#include <ostream>
 #include <vector>
 #include <map>
 
@@ -28,10 +28,12 @@ class DecayTable
         virtual ~DecayTable();
 
         DecayTable& operator=(const DecayTable&);
-        void swap(DecayTable&);
+        friend void swap(DecayTable&, DecayTable&);
 
         bool operator==(const DecayTable&) const;
         bool operator!=(const DecayTable&) const;
+
+        friend std::ostream& operator<<(std::ostream&, DecayTable const&);
 
         // ----------------------------------------------------------------------------
         /// @brief Get a decay channel

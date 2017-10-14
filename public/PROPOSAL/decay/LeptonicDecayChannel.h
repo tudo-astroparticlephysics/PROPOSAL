@@ -22,10 +22,13 @@ class LeptonicDecayChannel : public DecayChannel
 
     DecayProducts Decay(PROPOSALParticle*);
 
+    const std::string& GetName() const { return name_; }
+
     private:
     LeptonicDecayChannel& operator=(const LeptonicDecayChannel&); // Undefined & not allowed
 
     bool compare(const DecayChannel&) const;
+    void print(std::ostream&) const;
 
     // ----------------------------------------------------------------------------
     /// @brief Function for electron energy calculation - interface to FindRoot
@@ -38,6 +41,7 @@ class LeptonicDecayChannel : public DecayChannel
     double DifferentialDecayRate(double);
 
     RootFinder root_finder_;
+    static const std::string name_;
 };
 
 } /* PROPOSAL */
