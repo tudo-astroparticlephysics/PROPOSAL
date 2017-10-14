@@ -3,9 +3,9 @@
 
 #include <algorithm>    // std::sort
 
-#include "PROPOSAL/math/MathModel.h"
+#include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/decay/ManyBodyPhaseSpace.h"
-#include "PROPOSAL/particle/PROPOSALParticle.h"
+#include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Output.h"
 
@@ -61,7 +61,7 @@ bool ManyBodyPhaseSpace::compare(const DecayChannel& channel) const
     }
 }
 
-DecayChannel::DecayProducts ManyBodyPhaseSpace::Decay(PROPOSALParticle* particle)
+DecayChannel::DecayProducts ManyBodyPhaseSpace::Decay(Particle* particle)
 {
     double parent_mass = particle->GetMass();
     std::vector<double> virtual_masses;
@@ -69,12 +69,12 @@ DecayChannel::DecayProducts ManyBodyPhaseSpace::Decay(PROPOSALParticle* particle
     std::vector<double> randoms;
     randoms.reserve(daughters_.size());
 
-    std::vector<PROPOSALParticle*> daughters;
+    std::vector<Particle*> daughters;
     daughters.reserve(daughters_.size());
 
     for (std::vector<ParticleDef>::const_iterator iter = daughters_.begin(); iter != daughters_.end(); ++iter)
     {
-        daughters.push_back(new PROPOSALParticle(*iter));
+        daughters.push_back(new Particle(*iter));
     }
 
     // Create sorted random numbers
@@ -131,14 +131,14 @@ DecayChannel::DecayProducts ManyBodyPhaseSpace::Decay(PROPOSALParticle* particle
 
     // Boost all daughters to parent frame
     double beta = particle->GetMomentum() / particle->GetEnergy();
-    for (std::vector<PROPOSALParticle*>::const_iterator iter = daughters.begin(); iter != daughters.end(); ++iter)
+    for (std::vector<Particle*>::const_iterator iter = daughters.begin(); iter != daughters.end(); ++iter)
     {
         this->Boost(*iter, particle->GetDirection(), beta);
     }
 
     // Create products
     int id = 1;
-    for (std::vector<PROPOSALParticle*>::iterator iter = daughters.begin(); iter != daughters.end(); ++iter)
+    for (std::vector<Particle*>::iterator iter = daughters.begin(); iter != daughters.end(); ++iter)
     {
         (*iter)->SetPosition(particle->GetPosition());
         (*iter)->SetTime(particle->GetTime());
