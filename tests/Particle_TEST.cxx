@@ -3,7 +3,7 @@
 
 #include "gtest/gtest.h"
 
-#include "PROPOSAL/particle/PROPOSALParticle.h"
+#include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/Constants.h"
 
 using namespace PROPOSAL;
@@ -15,14 +15,14 @@ TEST(Comparison , Comparison_equal ) {
     direction.SetSphericalCoordinates(1,20*PI/180.,20*PI/180.);
     direction.CalculateCartesianFromSpherical();
 
-    PROPOSALParticle A;
-    PROPOSALParticle B;
+    Particle A;
+    Particle B;
     EXPECT_TRUE(A==B);
 
-    PROPOSALParticle* C = new PROPOSALParticle(ParticleDef::Builder().SetTauMinus().build());
+    Particle* C = new Particle(ParticleDef::Builder().SetTauMinus().build());
     C->SetPosition(position);
     C->SetDirection(direction);
-    PROPOSALParticle* D = new PROPOSALParticle(ParticleDef::Builder().SetTauMinus().build());
+    Particle* D = new Particle(ParticleDef::Builder().SetTauMinus().build());
     D->SetPosition(position);
     D->SetDirection(direction);
 
@@ -32,7 +32,7 @@ TEST(Comparison , Comparison_equal ) {
 
     position = Vector3D();
     direction = Vector3D();
-    PROPOSALParticle* E = new PROPOSALParticle(ParticleDef::Builder().SetMuMinus().build());
+    Particle* E = new Particle(ParticleDef::Builder().SetMuMinus().build());
     E->SetPosition(position);
     E->SetDirection(direction);
     EXPECT_TRUE(A==*E);
@@ -42,14 +42,15 @@ TEST(Comparison , Comparison_not_equal ) {
     direction.SetSphericalCoordinates(1,20*PI/180.,20*PI/180.);
     direction.CalculateCartesianFromSpherical();
 
-    PROPOSALParticle A;
-    PROPOSALParticle B(ParticleDef::Builder().SetTauMinus().build());
+    Particle A;
+    Particle B(ParticleDef::Builder().SetTauMinus().build());
     EXPECT_TRUE(A!=B);
 
-    PROPOSALParticle* C = new PROPOSALParticle(ParticleDef::Builder().SetTauMinus().build());
+    Particle* C = new Particle(ParticleDef::Builder().SetTauMinus().build());
     C->SetPosition(position);
     C->SetDirection(direction);
-    PROPOSALParticle* D = new PROPOSALParticle(ParticleDef::Builder().SetTauMinus().build());
+    Particle* D = new Particle(ParticleDef::Builder().SetTauMinus().build());
+
     D->SetPosition(position);
     D->SetDirection(direction);
     D->SetEnergy(1e6);
@@ -57,8 +58,8 @@ TEST(Comparison , Comparison_not_equal ) {
 }
 
 TEST(Assignment , Copyconstructor ) {
-    PROPOSALParticle A;
-    PROPOSALParticle B = A;
+    Particle A;
+    Particle B = A;
 
     EXPECT_TRUE(A==B);
 }
@@ -66,10 +67,10 @@ TEST(Assignment , Copyconstructor ) {
 TEST(Assignment , Copyconstructor2 ) {
     direction.SetSphericalCoordinates(1,20*PI/180.,20*PI/180.);
     direction.CalculateCartesianFromSpherical();
-    PROPOSALParticle A(ParticleDef::Builder().SetTauMinus().build());
+    Particle A(ParticleDef::Builder().SetTauMinus().build());
     A.SetPosition(position);
     A.SetDirection(direction);
-    PROPOSALParticle B(A);
+    Particle B(A);
 
     EXPECT_TRUE(A==B);
 }
@@ -77,8 +78,8 @@ TEST(Assignment , Copyconstructor2 ) {
 // TEST(Assignment , Operator ) {
 //     direction.SetSphericalCoordinates(1,20*PI/180.,20*PI/180.);
 //     direction.CalculateCartesianFromSpherical();
-//     PROPOSALParticle A;
-//     PROPOSALParticle B(TauMinusDef::Get());
+//     Particle A;
+//     Particle B(TauMinusDef::Get());
 //     B.SetPosition(position);
 //     B.SetDirection(direction);
 //
@@ -100,13 +101,13 @@ TEST(Assignment , Copyconstructor2 ) {
 // TEST(Assignment , Swap ) {
 //     direction.SetSphericalCoordinates(1,20*PI/180.,20*PI/180.);
 //     direction.CalculateCartesianFromSpherical();
-//     PROPOSALParticle A;
-//     PROPOSALParticle B;
+//     Particle A;
+//     Particle B;
 //     EXPECT_TRUE(A==B);
-//     PROPOSALParticle* C = new PROPOSALParticle(TauMinusDef::Get());
+//     Particle* C = new Particle(TauMinusDef::Get());
 //     C->SetPosition(position);
 //     C->SetDirection(direction);
-//     PROPOSALParticle* D = new PROPOSALParticle(TauMinusDef::Get());
+//     Particle* D = new Particle(TauMinusDef::Get());
 //     D->SetPosition(position);
 //     D->SetDirection(direction);
 //
@@ -116,7 +117,7 @@ TEST(Assignment , Copyconstructor2 ) {
 //
 //     position = Vector3D();
 //     direction = Vector3D();
-//     PROPOSALParticle* E = new PROPOSALParticle(MuMinusDef::Get());
+//     Particle* E = new Particle(MuMinusDef::Get());
 //     E->SetPosition(position);
 //     E->SetDirection(direction);
 //     EXPECT_TRUE(A==*E);

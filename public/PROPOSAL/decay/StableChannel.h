@@ -8,7 +8,7 @@
 namespace PROPOSAL
 {
 
-class PROPOSALParticle;
+class Particle;
 
 
 class StableChannel : public DecayChannel
@@ -20,7 +20,7 @@ class StableChannel : public DecayChannel
     // No copy and assignemnt -> done by clone
     DecayChannel* clone() { return new StableChannel(*this); }
 
-    DecayProducts Decay(PROPOSALParticle*);
+    DecayProducts Decay(Particle*);
 
     const std::string& GetName() const { return name_; }
 

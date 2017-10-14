@@ -18,8 +18,8 @@ TEST(Propagation , Test_nan) {
     int EmaxLog10 = 8;
 
     // Define Particles
-    PROPOSALParticle mu(ParticleDef::Builder().SetMuMinus().build());
-    PROPOSALParticle tau(ParticleDef::Builder().SetTauMinus().build());
+    Particle mu(ParticleDef::Builder().SetMuMinus().build());
+    Particle tau(ParticleDef::Builder().SetTauMinus().build());
 
     // One Propagator for each particle definition
     // medium/detector configuration
@@ -59,7 +59,7 @@ TEST(Propagation , Test_nan) {
         // ----------------------------------------------------------------- //
 
         // Therefor its needed to get the internal created particle first
-        PROPOSALParticle& particle = prop_mu.GetParticle();
+        Particle& particle = prop_mu.GetParticle();
 
         particle.SetEnergy(pow(10,EmaxLog10));
         particle.SetPropagatedDistance(0);

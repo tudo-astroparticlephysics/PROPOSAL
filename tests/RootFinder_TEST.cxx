@@ -22,7 +22,7 @@ double Polynom(double r){
 }
 
 double DiffPolynom(double r){
-    return 2*r;
+    return 2*r - 4;
 }
 
 double Polynom2(double r){
@@ -34,7 +34,7 @@ double DiffPolynom2(double r){
 }
 
 double Polynom3(double r){
-    return -r*r;
+    return -r*r -4;
 }
 
 double DiffPolynom3(double r){
@@ -114,25 +114,25 @@ TEST(Assignment , Swap ) {
 
 TEST(RootFinder , e_to_x_minus_e ) {
     RootFinder *finder = new RootFinder();
-    ASSERT_NEAR(finder->FindRoot(-2,2,1, Exp, DiffExp,0.0) ,0, 1E-10);
+    ASSERT_NEAR(finder->FindRoot(-2,2,1, Exp, DiffExp) ,0, 1E-10);
     delete finder;
 }
 
 TEST(RootFinder , x_times_x_intersection_with_4 ) {
     RootFinder *finder = new RootFinder();
-    ASSERT_NEAR(finder->FindRoot(-2,2,1, Polynom, DiffPolynom,4.0) ,-2., 1E-6*0);
+    ASSERT_NEAR(finder->FindRoot(-2,2,1, Polynom, DiffPolynom) ,-2., 1E-6*0);
     delete finder;
 }
 
 TEST(RootFinder , x_times_x_minus_4 ) {
     RootFinder *finder = new RootFinder();
-    ASSERT_NEAR(finder->FindRoot(-3,3,1, Polynom2, DiffPolynom2,0.0) ,-2, 0.);
+    ASSERT_NEAR(finder->FindRoot(-3,3,1, Polynom2, DiffPolynom2) ,-2, 0.);
     delete finder;
 }
 
 TEST(RootFinder , minus_x_times_x_intersection_with_minus4 ) {
     RootFinder *finder = new RootFinder();
-    ASSERT_NEAR(finder->FindRoot(-2,2,0, Polynom3, DiffPolynom3,-4.0) ,-2., 1E-6*0);
+    ASSERT_NEAR(finder->FindRoot(-2,2,0, Polynom3, DiffPolynom3) ,-2., 1E-6*0);
     delete finder;
 }
 

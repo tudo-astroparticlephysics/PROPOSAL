@@ -11,7 +11,7 @@
 #include <sstream>
 #include <fstream>
 
-#include "PROPOSAL/particle/PROPOSALParticle.h"
+#include "PROPOSAL/particle/Particle.h"
 
 #if ROOT_SUPPORT
     #include "TTree.h"
@@ -174,10 +174,10 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    void FillSecondaryVector(PROPOSALParticle *particle, int secondary_id, std::pair<double, ParticleType::Enum> energy_loss, double distance);
+    void FillSecondaryVector(Particle *particle, int secondary_id, std::pair<double, ParticleType::Enum> energy_loss, double distance);
 
-    void FillSecondaryVector(const PROPOSALParticle& particle, const DynamicData::Type& secondary, double energyloss, double distance);
-    void FillSecondaryVector(std::vector<PROPOSALParticle*>&);
+    void FillSecondaryVector(const Particle& particle, const DynamicData::Type& secondary, double energyloss, double distance);
+    void FillSecondaryVector(std::vector<Particle*>&);
 
 //----------------------------------------------------------------------------//
 
@@ -199,11 +199,11 @@ public:
 
 //----------------------------------------------------------------------------//
     #if ROOT_SUPPORT
-        void StorePrimaryInTree(PROPOSALParticle *primary);
+        void StorePrimaryInTree(Particle *primary);
 
 //----------------------------------------------------------------------------//
 
-        void StorePropagatedPrimaryInTree(PROPOSALParticle *prop_primary);
+        void StorePropagatedPrimaryInTree(Particle *prop_primary);
 
     #endif
 
@@ -216,11 +216,11 @@ public:
 
      //----------------------------------------------------------------------------//
 
-         void StorePrimaryInASCII(PROPOSALParticle *primary);
+         void StorePrimaryInASCII(Particle *primary);
 
      //----------------------------------------------------------------------------//
 
-         void StorePropagatedPrimaryInASCII(PROPOSALParticle *prop_primary);
+         void StorePropagatedPrimaryInASCII(Particle *prop_primary);
 
      //----------------------------------------------------------------------------//
 

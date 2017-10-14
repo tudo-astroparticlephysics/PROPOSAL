@@ -4,8 +4,7 @@
 #include "PROPOSAL/decay/StableChannel.h"
 #include "PROPOSAL/decay/LeptonicDecayChannel.h"
 #include "PROPOSAL/decay/TwoBodyPhaseSpace.h"
-#include "PROPOSAL/math/MathModel.h"
-
+#include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/Output.h"
 #include "PROPOSAL/methods.h"
 

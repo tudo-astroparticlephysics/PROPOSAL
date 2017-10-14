@@ -7,26 +7,26 @@
 // #include <cmath>
 
 // #include "PROPOSAL/medium/Medium.h"
-// #include "PROPOSAL/particle/PROPOSALParticle.h"
+// #include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/scattering/Scattering.h"
 
 namespace PROPOSAL {
 
-// class PROPOSALParticle;
+// class Particle;
 // class Medium;
 
 class ScatteringMoliere : public Scattering
 {
     public:
     // constructor
-    ScatteringMoliere(PROPOSALParticle&, const Medium&);
-    ScatteringMoliere(PROPOSALParticle&, const ScatteringMoliere&);
+    ScatteringMoliere(Particle&, const Medium&);
+    ScatteringMoliere(Particle&, const ScatteringMoliere&);
     ScatteringMoliere(const ScatteringMoliere&);
     ~ScatteringMoliere();
 
     Scattering* clone() const { return new ScatteringMoliere(*this); }
-    virtual Scattering* clone(PROPOSALParticle& particle) const { return new ScatteringMoliere(particle, *this); }
-    static Scattering* create(PROPOSALParticle& particle, const Medium& medium) { return new ScatteringMoliere(particle, medium); }
+    virtual Scattering* clone(Particle& particle) const { return new ScatteringMoliere(particle, *this); }
+    static Scattering* create(Particle& particle, const Medium& medium) { return new ScatteringMoliere(particle, medium); }
 
     // ScatteringMoliere& operator=(const ScatteringMoliere&);
     // bool operator==(const ScatteringMoliere& scattering) const;

@@ -1,12 +1,12 @@
 
 #include <boost/bind.hpp>
 
-#include "PROPOSAL/math/MathModel.h"
+#include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/scattering/ScatteringDefault.h"
 // #include "PROPOSAL/Output.h"
 #include "PROPOSAL/methods.h"
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/particle/PROPOSALParticle.h"
+#include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/medium/Medium.h"
 
 #include "PROPOSAL/propagation_utility/PropagationUtility.h"
@@ -23,13 +23,13 @@ using namespace std;
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-ScatteringDefault::ScatteringDefault(PROPOSALParticle& particle, Utility& utility)
+ScatteringDefault::ScatteringDefault(Particle& particle, Utility& utility)
     : Scattering(particle)
     , scatter(new UtilityIntegralScattering(utility))
 {
 }
 
-ScatteringDefault::ScatteringDefault(PROPOSALParticle& particle, Utility& utility, InterpolationDef interpolation_def)
+ScatteringDefault::ScatteringDefault(Particle& particle, Utility& utility, InterpolationDef interpolation_def)
     : Scattering(particle)
     , scatter(new UtilityInterpolantScattering(utility, interpolation_def))
 {
@@ -41,7 +41,7 @@ ScatteringDefault::ScatteringDefault(const ScatteringDefault& scattering)
 {
 }
 
-ScatteringDefault::ScatteringDefault(PROPOSALParticle& particle, const ScatteringDefault& scattering)
+ScatteringDefault::ScatteringDefault(Particle& particle, const ScatteringDefault& scattering)
     : Scattering(particle)
     , scatter(scattering.scatter->clone())
 {
