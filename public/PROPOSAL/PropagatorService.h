@@ -3,7 +3,7 @@
 
 #include <boost/unordered_map.hpp>
 
-#include "PROPOSAL/particle/PROPOSALParticle.h"
+#include "PROPOSAL/particle/Particle.h"
 
 namespace PROPOSAL
 {
@@ -33,11 +33,11 @@ class PropagatorService
         ///
         /// The given particle will hold the information after propagation.
         ///
-        /// @param PROPOSALParticle
+        /// @param Particle
         ///
         /// @return vector of secondary data
         // ----------------------------------------------------------------------------
-        std::vector<DynamicData*> Propagate(PROPOSALParticle&);
+        std::vector<DynamicData*> Propagate(Particle&);
 
     private:
         PropagatorMap propagator_map_;

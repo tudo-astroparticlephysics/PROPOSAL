@@ -46,6 +46,13 @@ namespace PROPOSAL{
 class Integral{
 
 private:
+    struct InterpolationResults
+    {
+        double Value;
+        double Error;
+    };
+
+private:
 
     int     maxSteps_;
     int     romberg_;
@@ -53,8 +60,8 @@ private:
     double  max_, min_;
 
 
-    double  integralValue_;
-    double  integralError_;
+    // double  integralValue_;
+    // double  integralError_;
 
     std::vector<double> iX_;
     std::vector<double> iY_;
@@ -141,9 +148,9 @@ private:
     *
     * \param   start   Starting point of the interpolation
     * \param   x       Searched function value for f(x)
-    * \return  Interpolated result for f(x)
+    * \return  Interpolated result and error as struct for f(x)
     */
-   void Interpolate(int start, double x);
+   Integral::InterpolationResults Interpolate(int start, double x);
 
 //----------------------------------------------------------------------------//
 
@@ -411,30 +418,6 @@ public:
 
 // Getters
 
-	std::vector<double> GetC() const {
-		return c_;
-	}
-
-	std::vector<double> GetD() const {
-		return d_;
-	}
-
-	double GetIntegralError() const {
-		return integralError_;
-	}
-
-	double GetIntegralValue() const {
-		return integralValue_;
-	}
-
-	std::vector<double> GetX() const {
-		return iX_;
-	}
-
-	std::vector<double> GetY() const {
-		return iY_;
-	}
-
 	double GetMax() const {
 		return max_;
 	}
@@ -491,13 +474,7 @@ public:
 		return useLog_;
 	}
 
-	void SetC(std::vector<double> c);
-	void SetD(std::vector<double> d);
-	void SetIntegralError(double integralError);
-	void SetIntegralValue(double integralValue);
 	void SetIntegrand(boost::function<double(double)> integrand);
-	void SetX(std::vector<double> x);
-	void SetY(std::vector<double> y);
 	void SetMax(double max);
 	void SetMaxSteps(int maxSteps);
 	void SetMin(double min);

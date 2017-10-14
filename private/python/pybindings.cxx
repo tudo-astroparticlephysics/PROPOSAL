@@ -53,7 +53,7 @@
 
 using namespace PROPOSAL;
 
-// #include "PROPOSAL/PROPOSALParticle.h"
+// #include "PROPOSAL/Particle.h"
 // #include "PROPOSAL/Medium.h"
 // #include "PROPOSAL/EnergyCutSettings.h"
 // #include "PROPOSAL/ProcessCollection.h"
@@ -684,7 +684,7 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
     to_python_converter< std::vector<ParticleDef>, VectorToPythonList<ParticleDef> >();
 
     to_python_converter< std::vector<DynamicData*>, PVectorToPythonList<DynamicData*> >();
-    to_python_converter< std::vector<PROPOSALParticle*>, PVectorToPythonList<PROPOSALParticle*> >();
+    to_python_converter< std::vector<Particle*>, PVectorToPythonList<Particle*> >();
 
     to_python_converter< std::vector<SectorFactory::Definition>, VectorToPythonList<SectorFactory::Definition> >();
 
@@ -698,7 +698,7 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
         .from_python<std::vector<std::vector<double> > >()
         .from_python<std::vector<DynamicData*> >()
         .from_python<std::vector<ParticleDef> >()
-        .from_python<std::vector<PROPOSALParticle*> >()
+        .from_python<std::vector<Particle*> >()
         .from_python<std::vector<SectorFactory::Definition> >();
 
     // VectorFromPythonList<double>();
@@ -769,188 +769,187 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
 
     class_<DecayChannel, boost::shared_ptr<DecayChannel>, boost::noncopyable >("DecayChannel", no_init)
 
-        .def(self_ns::str(self_ns::self))
-        .def("decay", &DecayChannel::Decay, "Decay the given particle")
-        .def("boost", &DecayChannel::Boost, "Boost the particle along a direction")
-        .staticmethod("boost")
+    .def(self_ns::str(self_ns::self))
+    .def("decay", &DecayChannel::Decay, "Decay the given particle")
+    .def("boost", &DecayChannel::Boost, "Boost the particle along a direction")
+    .staticmethod("boost")
+;
+
+class_<LeptonicDecayChannel, boost::shared_ptr<LeptonicDecayChannel>, bases<DecayChannel> >("LeptonicDecayChannel", init<>());
+
+class_<TwoBodyPhaseSpace, boost::shared_ptr<TwoBodyPhaseSpace>, bases<DecayChannel> >("TwoBodyPhaseSpace", init<double, double>());
+
+class_<ManyBodyPhaseSpace, boost::shared_ptr<ManyBodyPhaseSpace>, bases<DecayChannel> >("ManyBodyPhaseSpace", init<std::vector<ParticleDef> >());
+
+class_<StableChannel, boost::shared_ptr<StableChannel>, bases<DecayChannel> >("StableChannel", init<>());
+
+/**************************************************************************
+*                               DecayTable                                *
+**************************************************************************/
+
+enum_<DecayTable::Mode>("DecayMode")
+    .value("LeptonicDecay", DecayTable::LeptonicDecay)
+    .value("TwoBodyDecay", DecayTable::TwoBodyDecay)
+    .value("Stable", DecayTable::Stable);
+
+class_<DecayTable, boost::shared_ptr<DecayTable> >("DecayTable", init<>())
+
+    .def(init<const DecayTable&>())
+
+    .def(self_ns::str(self_ns::self))
+
+    .def("add_channel", &DecayTable::addChannel, "Add an decay channel")
+    .def("select_channel", make_function(&DecayTable::SelectChannel, return_internal_reference<>()), "Select an decay channel according to given branching ratios")
+    .def("set_stable", &DecayTable::SetStable, "Define decay table for stable particles")
+;
+
+/**************************************************************************
+*                              ParticleDef                                *
+**************************************************************************/
+
+class_<ParticleDef, boost::shared_ptr<ParticleDef> >("ParticleDef", init<>())
+
+    .def(init<std::string, double, double, double, double, const HardBBTables::VecType&, const DecayTable&>(
+        (arg("name"), arg("mass"), arg("low"), arg("lifetime"), arg("charge"), arg("hardbb"), arg("decay_table"))))
+    .def(init<const ParticleDef&>())
+
+    .def(self_ns::str(self_ns::self))
+
+    .def_readonly("name", &ParticleDef::name)
+    .def_readonly("mass", &ParticleDef::mass)
+    .def_readonly("low", &ParticleDef::low)
+    .def_readonly("charge", &ParticleDef::charge)
+    .def_readonly("decay_table", &ParticleDef::decay_table)
+    // .add_property("hardbb_table", make_function(&get_hardbb, return_internal_reference<>())) //TODO(mario): shit Fri 2017/10/13
     ;
 
-    class_<LeptonicDecayChannel, boost::shared_ptr<LeptonicDecayChannel>, bases<DecayChannel> >("LeptonicDecayChannel", init<>());
+class_<ParticleDef::Builder, boost::shared_ptr<ParticleDef::Builder> >("ParticleDefBuilder", init<>())
 
-    class_<TwoBodyPhaseSpace, boost::shared_ptr<TwoBodyPhaseSpace>, bases<DecayChannel> >("TwoBodyPhaseSpace", init<double, double>());
-
-    class_<ManyBodyPhaseSpace, boost::shared_ptr<ManyBodyPhaseSpace>, bases<DecayChannel> >("ManyBodyPhaseSpace", init<std::vector<ParticleDef> >());
-
-    class_<StableChannel, boost::shared_ptr<StableChannel>, bases<DecayChannel> >("StableChannel", init<>());
-
-    /**************************************************************************
-    *                               DecayTable                                *
-    **************************************************************************/
-
-    enum_<DecayTable::Mode>("DecayMode")
-        .value("LeptonicDecay", DecayTable::LeptonicDecay)
-        .value("TwoBodyDecay", DecayTable::TwoBodyDecay)
-        .value("Stable", DecayTable::Stable);
-
-    class_<DecayTable, boost::shared_ptr<DecayTable> >("DecayTable", init<>())
-
-        .def(init<const DecayTable&>())
-
-        .def(self_ns::str(self_ns::self))
-
-        .def("add_channel", &DecayTable::addChannel, "Add an decay channel")
-        .def("select_channel", make_function(&DecayTable::SelectChannel, return_internal_reference<>()), "Select an decay channel according to given branching ratios")
-        .def("set_stable", &DecayTable::SetStable, "Define decay table for stable particles")
+    .def("SetName", make_function(&ParticleDef::Builder::SetName, return_internal_reference<>()))
+    .def("SetMass", make_function(&ParticleDef::Builder::SetMass, return_internal_reference<>()))
+    .def("SetLow", make_function(&ParticleDef::Builder::SetLow, return_internal_reference<>()))
+    .def("SetLifetime", make_function(&ParticleDef::Builder::SetLifetime, return_internal_reference<>()))
+    .def("SetCharge", make_function(&ParticleDef::Builder::SetCharge, return_internal_reference<>()))
+    .def("SetDecayTable", make_function(&ParticleDef::Builder::SetDecayTable, return_internal_reference<>()))
+    .def("MuMinus", make_function(&ParticleDef::Builder::SetMuMinus, return_internal_reference<>()))
+    .def("MuPlus", make_function(&ParticleDef::Builder::SetMuPlus, return_internal_reference<>()))
+    .def("EMinus", make_function(&ParticleDef::Builder::SetEMinus, return_internal_reference<>()))
+    .def("EPlus", make_function(&ParticleDef::Builder::SetEPlus, return_internal_reference<>()))
+    .def("TauMinus", make_function(&ParticleDef::Builder::SetTauMinus, return_internal_reference<>()))
+    .def("TauPlus", make_function(&ParticleDef::Builder::SetTauPlus, return_internal_reference<>()))
+    .def("STauMinus", make_function(&ParticleDef::Builder::SetStauMinus, return_internal_reference<>()))
+    .def("STauPlus", make_function(&ParticleDef::Builder::SetStauPlus, return_internal_reference<>()))
+    .def("P0", make_function(&ParticleDef::Builder::SetP0, return_internal_reference<>()))
+    .def("PiMinus", make_function(&ParticleDef::Builder::SetPiMinus, return_internal_reference<>()))
+    .def("PiPlus", make_function(&ParticleDef::Builder::SetPiPlus, return_internal_reference<>()))
+    .def("KMinus", make_function(&ParticleDef::Builder::SetKMinus, return_internal_reference<>()))
+    .def("KPlus", make_function(&ParticleDef::Builder::SetKPlus, return_internal_reference<>()))
+    .def("PMinus", make_function(&ParticleDef::Builder::SetPMinus, return_internal_reference<>()))
+    .def("PPlus", make_function(&ParticleDef::Builder::SetPPlus, return_internal_reference<>()))
+    .def("NuE", make_function(&ParticleDef::Builder::SetNuE, return_internal_reference<>()))
+    .def("NuEBar", make_function(&ParticleDef::Builder::SetNuEBar, return_internal_reference<>()))
+    .def("NuMu", make_function(&ParticleDef::Builder::SetNuMu, return_internal_reference<>()))
+    .def("NuMuBar", make_function(&ParticleDef::Builder::SetNuMuBar, return_internal_reference<>()))
+    .def("NuTau", make_function(&ParticleDef::Builder::SetNuTau, return_internal_reference<>()))
+    .def("NuTauBar", make_function(&ParticleDef::Builder::SetNuTauBar, return_internal_reference<>()))
+    .def("build", &ParticleDef::Builder::build)
     ;
 
-    /**************************************************************************
-    *                              ParticleDef                                *
-    **************************************************************************/
+// class_<MuMinusDef, boost::shared_ptr<MuMinusDef>, bases<ParticleDef>, boost::noncopyable >("MuMinusDef", no_init)
+//
+//     .def("get", make_function(&MuMinusDef::Get, return_value_policy<reference_existing_object>()))
+//     .staticmethod("get")
+//     ;
+//
+// PARTICLE_DEF(MuPlus)
+//
+// PARTICLE_DEF(EMinus)
+// PARTICLE_DEF(EPlus)
+//
+// PARTICLE_DEF(TauMinus)
+// PARTICLE_DEF(TauPlus)
+//
+// PARTICLE_DEF(StauMinus)
+// PARTICLE_DEF(StauPlus)
+//
+// PARTICLE_DEF(P0)
+// PARTICLE_DEF(PiMinus)
+// PARTICLE_DEF(PiPlus)
+//
+// PARTICLE_DEF(KMinus)
+// PARTICLE_DEF(KPlus)
+//
+// PARTICLE_DEF(PMinus)
+// PARTICLE_DEF(PPlus)
+//
+// PARTICLE_DEF(NuE)
+// PARTICLE_DEF(NuEBar)
+//
+// PARTICLE_DEF(NuMu)
+// PARTICLE_DEF(NuMuBar)
+//
+// PARTICLE_DEF(NuTau)
+// PARTICLE_DEF(NuTauBar)
+//
+// PARTICLE_DEF(Monopole)
+// PARTICLE_DEF(Gamma)
+// PARTICLE_DEF(StableMassiveParticle)
 
-    class_<ParticleDef, boost::shared_ptr<ParticleDef> >("ParticleDef", init<>())
-
-        .def(init<std::string, double, double, double, double, const HardBBTables::VecType&, const DecayTable&>(
-            (arg("name"), arg("mass"), arg("low"), arg("lifetime"), arg("charge"), arg("hardbb"), arg("decay_table"))))
-        .def(init<const ParticleDef&>())
-
-        .def(self_ns::str(self_ns::self))
-
-        .def_readonly("name", &ParticleDef::name)
-        .def_readonly("mass", &ParticleDef::mass)
-        .def_readonly("low", &ParticleDef::low)
-        .def_readonly("charge", &ParticleDef::charge)
-        .def_readonly("decay_table", &ParticleDef::decay_table)
-        // .add_property("hardbb_table", make_function(&get_hardbb, return_internal_reference<>())) //TODO(mario): shit Fri 2017/10/13
-        ;
-
-    class_<ParticleDef::Builder, boost::shared_ptr<ParticleDef::Builder> >("ParticleDefBuilder", init<>())
-
-        .def("SetName", make_function(&ParticleDef::Builder::SetName, return_internal_reference<>()))
-        .def("SetMass", make_function(&ParticleDef::Builder::SetMass, return_internal_reference<>()))
-        .def("SetLow", make_function(&ParticleDef::Builder::SetLow, return_internal_reference<>()))
-        .def("SetLifetime", make_function(&ParticleDef::Builder::SetLifetime, return_internal_reference<>()))
-        .def("SetCharge", make_function(&ParticleDef::Builder::SetCharge, return_internal_reference<>()))
-        .def("SetDecayTable", make_function(&ParticleDef::Builder::SetDecayTable, return_internal_reference<>()))
-        .def("MuMinus", make_function(&ParticleDef::Builder::SetMuMinus, return_internal_reference<>()))
-        .def("MuPlus", make_function(&ParticleDef::Builder::SetMuPlus, return_internal_reference<>()))
-        .def("EMinus", make_function(&ParticleDef::Builder::SetEMinus, return_internal_reference<>()))
-        .def("EPlus", make_function(&ParticleDef::Builder::SetEPlus, return_internal_reference<>()))
-        .def("TauMinus", make_function(&ParticleDef::Builder::SetTauMinus, return_internal_reference<>()))
-        .def("TauPlus", make_function(&ParticleDef::Builder::SetTauPlus, return_internal_reference<>()))
-        .def("STauMinus", make_function(&ParticleDef::Builder::SetStauMinus, return_internal_reference<>()))
-        .def("STauPlus", make_function(&ParticleDef::Builder::SetStauPlus, return_internal_reference<>()))
-        .def("P0", make_function(&ParticleDef::Builder::SetP0, return_internal_reference<>()))
-        .def("PiMinus", make_function(&ParticleDef::Builder::SetPiMinus, return_internal_reference<>()))
-        .def("PiPlus", make_function(&ParticleDef::Builder::SetPiPlus, return_internal_reference<>()))
-        .def("KMinus", make_function(&ParticleDef::Builder::SetKMinus, return_internal_reference<>()))
-        .def("KPlus", make_function(&ParticleDef::Builder::SetKPlus, return_internal_reference<>()))
-        .def("PMinus", make_function(&ParticleDef::Builder::SetPMinus, return_internal_reference<>()))
-        .def("PPlus", make_function(&ParticleDef::Builder::SetPPlus, return_internal_reference<>()))
-        .def("NuE", make_function(&ParticleDef::Builder::SetNuE, return_internal_reference<>()))
-        .def("NuEBar", make_function(&ParticleDef::Builder::SetNuEBar, return_internal_reference<>()))
-        .def("NuMu", make_function(&ParticleDef::Builder::SetNuMu, return_internal_reference<>()))
-        .def("NuMuBar", make_function(&ParticleDef::Builder::SetNuMuBar, return_internal_reference<>()))
-        .def("NuTau", make_function(&ParticleDef::Builder::SetNuTau, return_internal_reference<>()))
-        .def("NuTauBar", make_function(&ParticleDef::Builder::SetNuTauBar, return_internal_reference<>()))
-        .def("build", &ParticleDef::Builder::build)
-        ;
-
-    // class_<MuMinusDef, boost::shared_ptr<MuMinusDef>, bases<ParticleDef>, boost::noncopyable >("MuMinusDef", no_init)
-    //
-    //     .def("get", make_function(&MuMinusDef::Get, return_value_policy<reference_existing_object>()))
-    //     .staticmethod("get")
-    //     ;
-    //
-    // PARTICLE_DEF(MuPlus)
-    //
-    // PARTICLE_DEF(EMinus)
-    // PARTICLE_DEF(EPlus)
-    //
-    // PARTICLE_DEF(TauMinus)
-    // PARTICLE_DEF(TauPlus)
-    //
-    // PARTICLE_DEF(StauMinus)
-    // PARTICLE_DEF(StauPlus)
-    //
-    // PARTICLE_DEF(P0)
-    // PARTICLE_DEF(PiMinus)
-    // PARTICLE_DEF(PiPlus)
-    //
-    // PARTICLE_DEF(KMinus)
-    // PARTICLE_DEF(KPlus)
-    //
-    // PARTICLE_DEF(PMinus)
-    // PARTICLE_DEF(PPlus)
-    //
-    // PARTICLE_DEF(NuE)
-    // PARTICLE_DEF(NuEBar)
-    //
-    // PARTICLE_DEF(NuMu)
-    // PARTICLE_DEF(NuMuBar)
-    //
-    // PARTICLE_DEF(NuTau)
-    // PARTICLE_DEF(NuTauBar)
-    //
-    // PARTICLE_DEF(Monopole)
-    // PARTICLE_DEF(Gamma)
-    // PARTICLE_DEF(StableMassiveParticle)
-
-    /**************************************************************************
-    *                              Dynamic Data                               *
-    **************************************************************************/
+/**************************************************************************
+*                              Dynamic Data                               *
+**************************************************************************/
 
 
-    enum_<DynamicData::Type>("Data")
-        .value("None", DynamicData::None)
-        .value("Particle", DynamicData::Particle)
-        .value("Brems", DynamicData::Brems)
-        .value("DeltaE", DynamicData::DeltaE)
-        .value("Epair", DynamicData::Epair)
-        .value("NuclInt", DynamicData::NuclInt)
-        .value("MuPair", DynamicData::MuPair)
-        .value("Hadrons", DynamicData::Hadrons)
-        .value("ContinuousEnergyLoss", DynamicData::ContinuousEnergyLoss);
+enum_<DynamicData::Type>("Data")
+    .value("None", DynamicData::None)
+    .value("Particle", DynamicData::Particle)
+    .value("Brems", DynamicData::Brems)
+    .value("DeltaE", DynamicData::DeltaE)
+    .value("Epair", DynamicData::Epair)
+    .value("NuclInt", DynamicData::NuclInt)
+    .value("MuPair", DynamicData::MuPair)
+    .value("Hadrons", DynamicData::Hadrons)
+    .value("ContinuousEnergyLoss", DynamicData::ContinuousEnergyLoss);
 
-    class_<DynamicData, boost::shared_ptr<DynamicData> >("DynamicData", init<DynamicData::Type>())
+class_<DynamicData, boost::shared_ptr<DynamicData> >("DynamicData", init<DynamicData::Type>())
 
-        .def(init<const DynamicData&>())
+    .def(init<const DynamicData&>())
 
-        .def(self_ns::str(self_ns::self))
+    .def(self_ns::str(self_ns::self))
 
-        .add_property("id", &DynamicData::GetTypeId)
-        .add_property("position", &DynamicData::GetPosition, &DynamicData::SetPosition)
-        .add_property("direction", &DynamicData::GetDirection, &DynamicData::SetDirection)
-        .add_property("energy", &DynamicData::GetEnergy, &DynamicData::SetEnergy)
-        .add_property("parent_particle_energy", &DynamicData::GetParentParticleEnergy, &DynamicData::SetParentParticleEnergy)
-        .add_property("time", &DynamicData::GetTime, &DynamicData::SetTime)
-        .add_property("propagated_distance", &DynamicData::GetPropagatedDistance, &DynamicData::SetPropagatedDistance)
-    ;
+    .add_property("id", &DynamicData::GetTypeId)
+    .add_property("position", &DynamicData::GetPosition, &DynamicData::SetPosition)
+    .add_property("direction", &DynamicData::GetDirection, &DynamicData::SetDirection)
+    .add_property("energy", &DynamicData::GetEnergy, &DynamicData::SetEnergy)
+    .add_property("parent_particle_energy", &DynamicData::GetParentParticleEnergy, &DynamicData::SetParentParticleEnergy)
+    .add_property("time", &DynamicData::GetTime, &DynamicData::SetTime)
+    .add_property("propagated_distance", &DynamicData::GetPropagatedDistance, &DynamicData::SetPropagatedDistance)
+;
 
-    /**************************************************************************
-    *                                Particle                                 *
-    **************************************************************************/
+/**************************************************************************
+*                                Particle                                 *
+**************************************************************************/
 
-    class_<PROPOSALParticle, boost::shared_ptr<PROPOSALParticle>, bases<DynamicData> >("Particle", init<>())
+class_<Particle, boost::shared_ptr<Particle>, bases<DynamicData> >("Particle", init<>())
 
-        .def(init<const ParticleDef&>())
-        .def(init<const PROPOSALParticle&>())
+    .def(init<const ParticleDef&>())
+        .def(init<const Particle&>())
 
-        .add_property("name", &PROPOSALParticle::GetName)
-        .add_property("momentum", &PROPOSALParticle::GetMomentum, &PROPOSALParticle::SetMomentum)
-        .add_property("particle_def", make_function(&PROPOSALParticle::GetParticleDef, return_value_policy<reference_existing_object>()))
-        .add_property("decay_table", make_function(&PROPOSALParticle::GetDecayTable, return_internal_reference<>()))
+        .add_property("momentum", &Particle::GetMomentum, &Particle::SetMomentum)
+        .add_property("particle_def", make_function(&Particle::GetParticleDef, return_value_policy<reference_existing_object>()))
+        .add_property("decay_table", make_function(&Particle::GetDecayTable, return_internal_reference<>()))
 
-        .add_property("entry_point", &PROPOSALParticle::GetEntryPoint, &PROPOSALParticle::SetEntryPoint)
-        .add_property("entry_time", &PROPOSALParticle::GetEntryTime, &PROPOSALParticle::SetEntryTime)
-        .add_property("entry_energy", &PROPOSALParticle::GetEntryEnergy, &PROPOSALParticle::SetEntryEnergy)
-        .add_property("exit_point", &PROPOSALParticle::GetExitPoint, &PROPOSALParticle::SetExitPoint)
-        .add_property("exit_time", &PROPOSALParticle::GetExitTime, &PROPOSALParticle::SetExitTime)
-        .add_property("exit_energy", &PROPOSALParticle::GetExitEnergy, &PROPOSALParticle::SetExitEnergy)
-        .add_property("closet_approach_point", &PROPOSALParticle::GetClosestApproachPoint, &PROPOSALParticle::SetClosestApproachPoint)
-        .add_property("closet_approach_time", &PROPOSALParticle::GetClosestApproachTime, &PROPOSALParticle::SetClosestApproachTime)
-        .add_property("closet_approach_energy", &PROPOSALParticle::GetClosestApproachEnergy, &PROPOSALParticle::SetClosestApproachEnergy)
+        .add_property("entry_point", &Particle::GetEntryPoint, &Particle::SetEntryPoint)
+        .add_property("entry_time", &Particle::GetEntryTime, &Particle::SetEntryTime)
+        .add_property("entry_energy", &Particle::GetEntryEnergy, &Particle::SetEntryEnergy)
+        .add_property("exit_point", &Particle::GetExitPoint, &Particle::SetExitPoint)
+        .add_property("exit_time", &Particle::GetExitTime, &Particle::SetExitTime)
+        .add_property("exit_energy", &Particle::GetExitEnergy, &Particle::SetExitEnergy)
+        .add_property("closet_approach_point", &Particle::GetClosestApproachPoint, &Particle::SetClosestApproachPoint)
+        .add_property("closet_approach_time", &Particle::GetClosestApproachTime, &Particle::SetClosestApproachTime)
+        .add_property("closet_approach_energy", &Particle::GetClosestApproachEnergy, &Particle::SetClosestApproachEnergy)
 
-        .add_property("e_lost", &PROPOSALParticle::GetElost, &PROPOSALParticle::SetElost)
+        .add_property("e_lost", &Particle::GetElost, &Particle::SetElost)
     ;
 
     /**************************************************************************

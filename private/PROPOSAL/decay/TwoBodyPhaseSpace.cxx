@@ -1,8 +1,7 @@
 
-// #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/math/MathModel.h"
+#include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/decay/TwoBodyPhaseSpace.h"
-#include "PROPOSAL/particle/PROPOSALParticle.h"
+#include "PROPOSAL/particle/Particle.h"
 
 using namespace PROPOSAL;
 
@@ -40,7 +39,7 @@ bool TwoBodyPhaseSpace::compare(const DecayChannel& channel) const
         return true;
 }
 
-DecayChannel::DecayProducts TwoBodyPhaseSpace::Decay(PROPOSALParticle* particle)
+DecayChannel::DecayProducts TwoBodyPhaseSpace::Decay(Particle* particle)
 {
     double parent_mass = particle->GetMass();
     double el = (parent_mass * parent_mass + first_daughter_mass_ * first_daughter_mass_) / (2 * parent_mass);
@@ -52,7 +51,7 @@ DecayChannel::DecayProducts TwoBodyPhaseSpace::Decay(PROPOSALParticle* particle)
 
     // return el;
     // Create products
-    PROPOSALParticle* product_particle = new PROPOSALParticle(ParticleDef::Builder().SetEMinus().build());
+    Particle* product_particle = new Particle(ParticleDef::Builder().SetEMinus().build());
     product_particle->SetEnergy(final_energy);
     product_particle->SetPosition(particle->GetPosition());
     product_particle->SetDirection(particle->GetDirection());

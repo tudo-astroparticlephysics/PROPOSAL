@@ -9,7 +9,7 @@
 namespace PROPOSAL
 {
 
-class PROPOSALParticle;
+class Particle;
 
 class LeptonicDecayChannel : public DecayChannel
 {
@@ -20,7 +20,7 @@ class LeptonicDecayChannel : public DecayChannel
     // No copy and assignemnt -> done by clone
     DecayChannel* clone() { return new LeptonicDecayChannel(*this); }
 
-    DecayProducts Decay(PROPOSALParticle*);
+    DecayProducts Decay(Particle*);
 
     const std::string& GetName() const { return name_; }
 
@@ -33,12 +33,16 @@ class LeptonicDecayChannel : public DecayChannel
     // ----------------------------------------------------------------------------
     /// @brief Function for electron energy calculation - interface to FindRoot
     // ----------------------------------------------------------------------------
-    double DecayRate(double);
+    double DecayRate(double, double);
 
     // ----------------------------------------------------------------------------
     /// @brief Function for electron energy calculation - interface to FindRoot
     // ----------------------------------------------------------------------------
     double DifferentialDecayRate(double);
+
+    std::pair<double, double> function_and_derivative(double x, double right_side);
+
+    double FindRootBoost(double min, double right_side);
 
     RootFinder root_finder_;
     static const std::string name_;

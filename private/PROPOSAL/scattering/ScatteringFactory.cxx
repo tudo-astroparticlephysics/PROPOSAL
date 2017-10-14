@@ -40,7 +40,7 @@ void ScatteringFactory::Register(const std::string& name, Enum model)
 }
 
 // ------------------------------------------------------------------------- //
-Scattering* ScatteringFactory::CreateScattering(const std::string& name, PROPOSALParticle& particle, Utility& utility, const InterpolationDef& interpolation_def)
+Scattering* ScatteringFactory::CreateScattering(const std::string& name, Particle& particle, Utility& utility, const InterpolationDef& interpolation_def)
 {
     std::string name_lower = boost::algorithm::to_lower_copy(name);
 
@@ -77,7 +77,7 @@ Scattering* ScatteringFactory::CreateScattering(const std::string& name, PROPOSA
 }
 
 // ------------------------------------------------------------------------- //
-Scattering* ScatteringFactory::CreateScattering(const Enum model, PROPOSALParticle& particle, Utility& utility, const InterpolationDef& interpolation_def)
+Scattering* ScatteringFactory::CreateScattering(const Enum model, Particle& particle, Utility& utility, const InterpolationDef& interpolation_def)
 {
     std::vector<Enum>::const_iterator iter;
     iter = std::find(registerd_enum.begin(), registerd_enum.end(), model);
@@ -112,7 +112,7 @@ Scattering* ScatteringFactory::CreateScattering(const Enum model, PROPOSALPartic
 }
 
 // ------------------------------------------------------------------------- //
-Scattering* ScatteringFactory::CreateScattering(const std::string& name, PROPOSALParticle& particle, Utility& utility)
+Scattering* ScatteringFactory::CreateScattering(const std::string& name, Particle& particle, Utility& utility)
 {
     std::string name_lower = boost::algorithm::to_lower_copy(name);
 
@@ -149,7 +149,7 @@ Scattering* ScatteringFactory::CreateScattering(const std::string& name, PROPOSA
 }
 
 // ------------------------------------------------------------------------- //
-Scattering* ScatteringFactory::CreateScattering(const Enum model, PROPOSALParticle& particle, Utility& utility)
+Scattering* ScatteringFactory::CreateScattering(const Enum model, Particle& particle, Utility& utility)
 {
     std::vector<Enum>::const_iterator iter;
     iter = std::find(registerd_enum.begin(), registerd_enum.end(), model);
@@ -239,7 +239,7 @@ ScatteringFactory::Enum ScatteringFactory::GetEnumFromString(const std::string& 
 // ------------------------------------------------------------------------- //
 
 // // ------------------------------------------------------------------------- //
-// Scattering* ScatteringFactory::CreateScattering(const std::string& name, PROPOSALParticle& particle, Utility& utility)
+// Scattering* ScatteringFactory::CreateScattering(const std::string& name, Particle& particle, Utility& utility)
 // {
 //     std::string name_lower = boost::algorithm::to_lower_copy(name);
 //
@@ -260,7 +260,7 @@ ScatteringFactory::Enum ScatteringFactory::GetEnumFromString(const std::string& 
 //     }
 // }
 //
-// Scattering* ScatteringFactory::CreateScattering(const std::string& name, PROPOSALParticle& particle, Utility& utility, const InterpolationDef& interpolation_def)
+// Scattering* ScatteringFactory::CreateScattering(const std::string& name, Particle& particle, Utility& utility, const InterpolationDef& interpolation_def)
 // {
 //     std::string name_lower = boost::algorithm::to_lower_copy(name);
 //
@@ -281,7 +281,7 @@ ScatteringFactory::Enum ScatteringFactory::GetEnumFromString(const std::string& 
 //     }
 // }
 //
-// Scattering* ScatteringFactory::CreateScattering(Enum model, PROPOSALParticle& particle, Utility& utility)
+// Scattering* ScatteringFactory::CreateScattering(Enum model, Particle& particle, Utility& utility)
 // {
 //     ScatteringMapEnum::iterator it = scattering_map_enum_.find(model);
 //     ScatteringMapUtiltiyEnum::iterator it_utility = scattering_map_utility_enum_.find(model);
