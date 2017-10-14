@@ -11,10 +11,6 @@ TEST(Comparison , Comparison_equal ) {
     ParticleDef B;
     EXPECT_TRUE(A==B);
 
-    A.mass = 100;
-    B.mass = 100;
-    EXPECT_TRUE(A==B);
-
     ParticleDef* C = new ParticleDef();
     ParticleDef* D = new ParticleDef();
 
@@ -22,15 +18,15 @@ TEST(Comparison , Comparison_equal ) {
     delete C;
     delete D;
 
-    C = new ParticleDef(MuMinusDef::Get());
-    D = new ParticleDef(MuMinusDef::Get());
+    C = new ParticleDef(ParticleDef::Builder().SetMuMinus().build());
+    D = new ParticleDef(ParticleDef::Builder().SetMuMinus().build());
 
     EXPECT_TRUE(*C==*D);
     delete C;
     delete D;
 
-    C = new ParticleDef(TauMinusDef::Get());
-    D = new ParticleDef(TauMinusDef::Get());
+    C = new ParticleDef(ParticleDef::Builder().SetTauMinus().build());
+    D = new ParticleDef(ParticleDef::Builder().SetTauMinus().build());
 
     EXPECT_TRUE(*C==*D);
     delete C;
@@ -42,19 +38,11 @@ TEST(Comparison , Comparison_not_equal ) {
     ParticleDef B;
     EXPECT_TRUE(A==B);
 
-    A.mass = 100;
-    EXPECT_TRUE(A!=B);
+    ParticleDef AA = ParticleDef::Builder().SetMass(100).build();
+    EXPECT_TRUE(AA!=B);
 
-    ParticleDef* C = new ParticleDef();
-    ParticleDef* D = new ParticleDef();
-    C->lifetime = 2.0;
-
-    EXPECT_TRUE(*C!=*D);
-    delete C;
-    delete D;
-
-    C = new ParticleDef(MuMinusDef::Get());
-    D = new ParticleDef(TauMinusDef::Get());
+    ParticleDef* C = new ParticleDef(ParticleDef::Builder().SetMuMinus().build());
+    ParticleDef* D = new ParticleDef(ParticleDef::Builder().SetTauMinus().build());
 
     EXPECT_TRUE(*C!=*D);
     delete C;
@@ -69,54 +57,9 @@ TEST(Assignment , Copyconstructor ) {
 }
 
 TEST(Assignment , Copyconstructor2 ) {
-    ParticleDef A(TauMinusDef::Get());
+    ParticleDef A(ParticleDef::Builder().SetMuMinus().build());
     ParticleDef B(A);
     EXPECT_TRUE(A==B);
-}
-
-TEST(Assignment , Operator ) {
-    ParticleDef A;
-    ParticleDef B(TauMinusDef::Get());
-    std::cout << A << std::endl;
-    std::cout << B << std::endl;
-
-
-    EXPECT_TRUE(A!=B);
-
-    B=A;
-
-    EXPECT_TRUE(A==B);
-
-    A.charge = 2.0;
-
-    EXPECT_TRUE(A!=B);
-
-    B=A;
-
-    EXPECT_TRUE(A==B);
-}
-
-TEST(Assignment , Swap ) {
-    ParticleDef A(MuMinusDef::Get());
-    ParticleDef B(MuMinusDef::Get());
-    EXPECT_TRUE(A==B);
-    ParticleDef* C = new ParticleDef(TauMinusDef::Get());
-    ParticleDef* D = new ParticleDef(TauMinusDef::Get());
-
-    C->lifetime = 2.0;
-    D->lifetime = 2.0;
-    EXPECT_TRUE(*C==*D);
-
-    ParticleDef* E = new ParticleDef(MuMinusDef::Get());
-    EXPECT_TRUE(A==*E);
-
-    D->swap(A);
-    EXPECT_TRUE(*C==A);
-    EXPECT_TRUE(*D==B);
-
-    D->swap(*E);
-    EXPECT_TRUE(B==*D);
-
 }
 
 int main(int argc, char **argv) {

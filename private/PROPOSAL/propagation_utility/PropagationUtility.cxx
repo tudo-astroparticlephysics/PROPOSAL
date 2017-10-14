@@ -135,42 +135,34 @@ Utility::Utility(const ParticleDef& particle_def,
                                                                        interpolation_def));
 }
 
-Utility::Utility(const std::vector<CrossSection*>& crosssections)
+Utility::Utility(const std::vector<CrossSection*>& crosssections) try
+    : particle_def_(crosssections.at(0)->GetParametrization().GetParticleDef())
+    , medium_(crosssections.at(0)->GetParametrization().GetMedium().clone())
+    , cut_settings_(crosssections.at(0)->GetParametrization().GetEnergyCuts())
 {
-    try
-    {
-        const ParticleDef& particle_def = crosssections.at(0)->GetParametrization().GetParticleDef();
-        const Medium& medium = crosssections.at(0)->GetParametrization().GetMedium();
-        const EnergyCutSettings& cuts = crosssections.at(0)->GetParametrization().GetEnergyCuts();
-
         for (std::vector<CrossSection*>::const_iterator it = crosssections.begin(); it != crosssections.end(); ++it)
         {
-            if ((*it)->GetParametrization().GetParticleDef() != particle_def)
+            if ((*it)->GetParametrization().GetParticleDef() != particle_def_)
             {
                 log_fatal("Particle definition of the cross section must be equal!");
             }
 
-            if ((*it)->GetParametrization().GetMedium() != medium)
+            if ((*it)->GetParametrization().GetMedium() != *medium_)
             {
                 log_fatal("Medium of the cross section must be equal!");
             }
 
-            if ((*it)->GetParametrization().GetEnergyCuts() != cuts)
+            if ((*it)->GetParametrization().GetEnergyCuts() != cut_settings_)
             {
                 log_fatal("Energy cuts of the cross section must be equal!");
             }
 
             crosssections_.push_back((*it)->clone());
         }
-
-        particle_def_ = particle_def;
-        medium_ = medium.clone();
-        cut_settings_ = cuts;
-    }
-    catch (const std::out_of_range& e)
-    {
-        log_fatal("At least one cross section is needed for initializing utility.");
-    }
+}
+catch (const std::out_of_range& e)
+{
+    log_fatal("At least one cross section is needed for initializing utility.");
 }
 
 
