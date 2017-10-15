@@ -4,6 +4,7 @@
 // #include <vector>
 
 #include "PROPOSAL/decay/DecayChannel.h"
+#include "PROPOSAL/particle/ParticleDef.h"
 #include "PROPOSAL/math/RootFinder.h"
 
 namespace PROPOSAL
@@ -43,6 +44,10 @@ class LeptonicDecayChannel : public DecayChannel
     std::pair<double, double> function_and_derivative(double x, double right_side);
 
     double FindRootBoost(double min, double right_side);
+
+    // ParticleDef massive_lepton_;
+    // ParticleDef first_neutrino_;
+    // ParticleDef second_neutrino_;
 
     RootFinder root_finder_;
     static const std::string name_;
