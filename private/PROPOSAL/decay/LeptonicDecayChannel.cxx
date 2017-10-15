@@ -73,11 +73,11 @@ double LeptonicDecayChannel::FindRootBoost(double min, double right_side)
 }
 
 
-DecayChannel::DecayProducts LeptonicDecayChannel::Decay(Particle* particle)
+DecayChannel::DecayProducts LeptonicDecayChannel::Decay(Particle& particle)
 {
     double emax, x0, f0, el, pl, final_energy, right_side;
     double lm  =   ME;
-    double parent_mass = particle->GetMass();
+    double parent_mass = particle.GetMass();
 
     double ernd = RandomGenerator::Get().RandomDouble();
     double arnd = RandomGenerator::Get().RandomDouble();
@@ -100,17 +100,17 @@ DecayChannel::DecayProducts LeptonicDecayChannel::Decay(Particle* particle)
     el = std::max(find_root_new *emax, lm);
     pl = sqrt(el*el - lm*lm);
 
-    final_energy = el * (particle->GetEnergy()/parent_mass) + pl * (particle->GetMomentum()/parent_mass) * (2*arnd - 1);
+    final_energy = el * (particle.GetEnergy()/parent_mass) + pl * (particle.GetMomentum()/parent_mass) * (2*arnd - 1);
 
     // Create products
     Particle* product_particle = new Particle(ParticleDef::Builder().SetEMinus().build());
     product_particle->SetEnergy(final_energy);
-    product_particle->SetPosition(particle->GetPosition());
-    product_particle->SetDirection(particle->GetDirection());
-    product_particle->SetParticleId(particle->GetParticleId() + 1);
-    product_particle->SetParentParticleId(particle->GetParentParticleId());
-    product_particle->SetTime(particle->GetTime());
-    product_particle->SetParentParticleEnergy(particle->GetEnergy());
+    product_particle->SetPosition(particle.GetPosition());
+    product_particle->SetDirection(particle.GetDirection());
+    product_particle->SetParticleId(particle.GetParticleId() + 1);
+    product_particle->SetParentParticleId(particle.GetParentParticleId());
+    product_particle->SetTime(particle.GetTime());
+    product_particle->SetParentParticleEnergy(particle.GetEnergy());
 
     DecayProducts decay_products;
     decay_products.push_back(product_particle);
