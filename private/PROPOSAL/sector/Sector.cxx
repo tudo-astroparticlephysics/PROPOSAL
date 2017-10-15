@@ -404,7 +404,7 @@ double Sector::Propagate(double distance)
             // Output::getInstance().FillSecondaryVector(& secondary_id, energy_loss, 0);
         } else
         {
-            decay_products = particle_.GetDecayTable().SelectChannel().Decay(&particle_);
+            decay_products = particle_.GetDecayTable().SelectChannel().Decay(particle_);
             Output::getInstance().FillSecondaryVector(decay_products);
 
             // TODO(mario): Delete decay products Tue 2017/08/22

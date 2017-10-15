@@ -61,20 +61,20 @@ bool ManyBodyPhaseSpace::compare(const DecayChannel& channel) const
     }
 }
 
-DecayChannel::DecayProducts ManyBodyPhaseSpace::Decay(Particle* particle)
+DecayChannel::DecayProducts ManyBodyPhaseSpace::Decay(Particle& particle)
 {
-    double parent_mass = particle->GetMass();
+    double parent_mass = particle.GetMass();
     std::vector<double> virtual_masses;
 
     std::vector<double> randoms;
     randoms.reserve(daughters_.size());
 
-    std::vector<Particle*> daughters;
-    daughters.reserve(daughters_.size());
+    DecayProducts products;
+    products.reserve(daughters_.size());
 
     for (std::vector<ParticleDef>::const_iterator iter = daughters_.begin(); iter != daughters_.end(); ++iter)
     {
-        daughters.push_back(new Particle(*iter));
+        products.push_back(new Particle(*iter));
     }
 
     // Create sorted random numbers
@@ -103,11 +103,11 @@ DecayChannel::DecayProducts ManyBodyPhaseSpace::Decay(Particle* particle)
     double momentum  = Momentum(virtual_masses[i], virtual_masses[i - 1], daughter_masses_[i]);
     Vector3D direction = GenerateRandomDirection();
 
-    daughters[i]->SetDirection(direction);
-    daughters[i]->SetMomentum(momentum);
+    products[i]->SetDirection(direction);
+    products[i]->SetMomentum(momentum);
 
-    daughters[i - 1]->SetDirection(-direction);
-    daughters[i - 1]->SetMomentum(momentum);
+    products[i - 1]->SetDirection(-direction);
+    products[i - 1]->SetMomentum(momentum);
 
     for (unsigned int i = 2; i < daughter_masses_.size(); ++i)
     {
@@ -115,8 +115,8 @@ DecayChannel::DecayProducts ManyBodyPhaseSpace::Decay(Particle* particle)
 
         double momentum  = Momentum(virtual_masses[i], virtual_masses[i - 1], daughter_masses_[i]);
 
-        daughters[i]->SetDirection(GenerateRandomDirection());
-        daughters[i]->SetMomentum(momentum);
+        products[i]->SetDirection(GenerateRandomDirection());
+        products[i]->SetMomentum(momentum);
 
         // Boost previous particles to new frame
 
@@ -125,54 +125,16 @@ DecayChannel::DecayProducts ManyBodyPhaseSpace::Decay(Particle* particle)
 
         for (unsigned int s = 0; s < i; ++s)
         {
-            this->Boost(daughters[s], daughters[i]->GetDirection(), beta);
+            Boost(*products[s], products[i]->GetDirection(), beta);
         }
     }
 
     // Boost all daughters to parent frame
-    double beta = particle->GetMomentum() / particle->GetEnergy();
-    for (std::vector<Particle*>::const_iterator iter = daughters.begin(); iter != daughters.end(); ++iter)
-    {
-        this->Boost(*iter, particle->GetDirection(), beta);
-    }
+    Boost(products, particle.GetDirection(), particle.GetMomentum() / particle.GetEnergy());
 
-    // Create products
-    int id = 1;
-    for (std::vector<Particle*>::iterator iter = daughters.begin(); iter != daughters.end(); ++iter)
-    {
-        (*iter)->SetPosition(particle->GetPosition());
-        (*iter)->SetTime(particle->GetTime());
-        (*iter)->SetParentParticleEnergy(particle->GetEnergy());
-        (*iter)->SetParticleId(particle->GetParticleId() + id);
-        (*iter)->SetParentParticleId(particle->GetParticleId());
+    CopyParticleProperties(products, particle);
 
-        id++;
-    }
-
-    return daughters;
-}
-
-double ManyBodyPhaseSpace::Momentum(double m1, double m2, double m3)
-{
-    double kaellen = (m1 - m2 - m3)*(m1 + m2 + m3)*(m1 - m2 + m3)*(m1 + m2 - m3);
-
-    if (kaellen > 0.0)
-    {
-        return std::sqrt(kaellen) / (2.0 * m1);
-    }
-    else
-    {
-        log_fatal("Kaellen function is negative. Cannot caluclate momentum");
-    }
-}
-
-Vector3D ManyBodyPhaseSpace::GenerateRandomDirection()
-{
-    double phi       = 2.0 * PI * RandomGenerator::Get().RandomDouble();
-    double cos_theta = 2.0 * RandomGenerator::Get().RandomDouble() - 1.0;
-    double sin_theta = std::sqrt((1.0 - cos_theta) * (1.0 + cos_theta));
-
-    return Vector3D(sin_theta * std::sin(phi), sin_theta * std::cos(phi), cos_theta);
+    return products;
 }
 
 // ------------------------------------------------------------------------- //

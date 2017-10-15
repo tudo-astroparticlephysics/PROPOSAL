@@ -29,7 +29,7 @@ class ManyBodyPhaseSpace : public DecayChannel
     ///
     /// @return Vector of particles, the decay products
     // ----------------------------------------------------------------------------
-    DecayProducts Decay(Particle*);
+    DecayProducts Decay(Particle&);
 
     const std::string& GetName() const { return name_; }
 
@@ -38,9 +38,6 @@ class ManyBodyPhaseSpace : public DecayChannel
 
     bool compare(const DecayChannel&) const;
     void print(std::ostream&) const;
-
-    double Momentum(double m1, double m2, double m3);
-    Vector3D GenerateRandomDirection();
 
     std::vector<ParticleDef> daughters_;
     std::vector<double> daughter_masses_;

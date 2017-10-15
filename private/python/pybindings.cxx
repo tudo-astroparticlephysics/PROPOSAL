@@ -767,17 +767,19 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
     *                              DecayChannel                               *
     **************************************************************************/
 
+    void (*Boost)(Particle&, const Vector3D&, double) = &DecayChannel::Boost;
+
     class_<DecayChannel, boost::shared_ptr<DecayChannel>, boost::noncopyable >("DecayChannel", no_init)
 
     .def(self_ns::str(self_ns::self))
     .def("decay", &DecayChannel::Decay, "Decay the given particle")
-    .def("boost", &DecayChannel::Boost, "Boost the particle along a direction")
+    .def("boost", Boost, "Boost the particle along a direction")
     .staticmethod("boost")
 ;
 
 class_<LeptonicDecayChannel, boost::shared_ptr<LeptonicDecayChannel>, bases<DecayChannel> >("LeptonicDecayChannel", init<>());
 
-class_<TwoBodyPhaseSpace, boost::shared_ptr<TwoBodyPhaseSpace>, bases<DecayChannel> >("TwoBodyPhaseSpace", init<double, double>());
+class_<TwoBodyPhaseSpace, boost::shared_ptr<TwoBodyPhaseSpace>, bases<DecayChannel> >("TwoBodyPhaseSpace", init<ParticleDef, ParticleDef>());
 
 class_<ManyBodyPhaseSpace, boost::shared_ptr<ManyBodyPhaseSpace>, bases<DecayChannel> >("ManyBodyPhaseSpace", init<std::vector<ParticleDef> >());
 

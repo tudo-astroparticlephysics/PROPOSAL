@@ -4,6 +4,7 @@
 // #include <vector>
 
 #include "PROPOSAL/decay/DecayChannel.h"
+#include "PROPOSAL/particle/ParticleDef.h"
 
 namespace PROPOSAL
 {
@@ -13,13 +14,13 @@ class Particle;
 class TwoBodyPhaseSpace : public DecayChannel
 {
     public:
-    TwoBodyPhaseSpace(double m1, double m2);
+    TwoBodyPhaseSpace(const ParticleDef&, const ParticleDef&);
     TwoBodyPhaseSpace(const TwoBodyPhaseSpace& mode);
     virtual ~TwoBodyPhaseSpace();
     // No copy and assignemnt -> done by clone
     DecayChannel* clone() { return new TwoBodyPhaseSpace(*this); }
 
-    DecayProducts Decay(Particle*);
+    DecayProducts Decay(Particle&);
 
     const std::string& GetName() const { return name_; }
 
@@ -29,8 +30,8 @@ class TwoBodyPhaseSpace : public DecayChannel
     bool compare(const DecayChannel&) const;
     void print(std::ostream&) const;
 
-    double first_daughter_mass_;
-    double second_daughter_mass_;
+    ParticleDef first_daughter_;
+    ParticleDef second_daughter_;
 
     static const std::string name_;
 };
