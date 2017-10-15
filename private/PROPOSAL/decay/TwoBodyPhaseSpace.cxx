@@ -7,10 +7,10 @@ using namespace PROPOSAL;
 
 const std::string TwoBodyPhaseSpace::name_ = "TwoBodyPhaseSpace";
 
-TwoBodyPhaseSpace::TwoBodyPhaseSpace(double m1, double m2)
+TwoBodyPhaseSpace::TwoBodyPhaseSpace(const ParticleDef& first, const ParticleDef& second)
     : DecayChannel()
-    , first_daughter_mass_(m1)
-    , second_daughter_mass_(m2)
+    , first_daughter_(first)
+    , second_daughter_(second)
 {
 }
 
@@ -20,8 +20,8 @@ TwoBodyPhaseSpace::~TwoBodyPhaseSpace()
 
 TwoBodyPhaseSpace::TwoBodyPhaseSpace(const TwoBodyPhaseSpace& mode)
     : DecayChannel(mode)
-    , first_daughter_mass_(mode.first_daughter_mass_)
-    , second_daughter_mass_(mode.second_daughter_mass_)
+    , first_daughter_(mode.first_daughter_)
+    , second_daughter_(mode.second_daughter_)
 {
 }
 
@@ -31,39 +31,34 @@ bool TwoBodyPhaseSpace::compare(const DecayChannel& channel) const
 
     if (!two_body)
         return false;
-    else if (first_daughter_mass_ != two_body->first_daughter_mass_)
+    else if (first_daughter_!= two_body->first_daughter_)
         return false;
-    else if (second_daughter_mass_ != two_body->second_daughter_mass_)
+    else if (second_daughter_!= two_body->second_daughter_)
         return false;
     else
         return true;
 }
 
-DecayChannel::DecayProducts TwoBodyPhaseSpace::Decay(Particle* particle)
+DecayChannel::DecayProducts TwoBodyPhaseSpace::Decay(Particle& particle)
 {
-    double parent_mass = particle->GetMass();
-    double el = (parent_mass * parent_mass + first_daughter_mass_ * first_daughter_mass_) / (2 * parent_mass);
+    DecayProducts products;
+    products.push_back(new Particle(first_daughter_));
+    products.push_back(new Particle(second_daughter_));
 
-    double arnd = RandomGenerator::Get().RandomDouble();
+    double momentum  = Momentum(particle.GetMass(), first_daughter_.mass, second_daughter_.mass);
+    Vector3D direction = GenerateRandomDirection();
 
-    double final_energy = el * (particle->GetEnergy() / particle->GetMass()) +
-         sqrt(el * el - first_daughter_mass_ * first_daughter_mass_) * (particle->GetMomentum() / particle->GetMass()) * (2 * arnd - 1);
+    products[0]->SetDirection(direction);
+    products[0]->SetMomentum(momentum);
 
-    // return el;
-    // Create products
-    Particle* product_particle = new Particle(ParticleDef::Builder().SetEMinus().build());
-    product_particle->SetEnergy(final_energy);
-    product_particle->SetPosition(particle->GetPosition());
-    product_particle->SetDirection(particle->GetDirection());
-    product_particle->SetParticleId(particle->GetParticleId() + 1);
-    product_particle->SetParentParticleId(particle->GetParentParticleId());
-    product_particle->SetTime(particle->GetTime());
-    product_particle->SetParentParticleEnergy(particle->GetEnergy());
+    products[1]->SetDirection(-direction);
+    products[1]->SetMomentum(momentum);
 
-    DecayProducts decay_products;
-    decay_products.push_back(product_particle);
+    Boost(products, particle.GetDirection(), particle.GetMomentum() / particle.GetEnergy());
 
-    return decay_products;
+    CopyParticleProperties(products, particle);
+
+    return products;
 }
 
 // ------------------------------------------------------------------------- //
@@ -73,6 +68,6 @@ DecayChannel::DecayProducts TwoBodyPhaseSpace::Decay(Particle* particle)
 void TwoBodyPhaseSpace::print(std::ostream& os) const
 {
     os << "Used masses:" << '\n';
-    os << "First daughter mass: " << first_daughter_mass_ << '\n';
-    os << "Second daughter mass: " << second_daughter_mass_ << '\n';
+    os << "First daughter:\n" << first_daughter_<< '\n';
+    os << "Second daughter:\n" << second_daughter_<< '\n';
 }

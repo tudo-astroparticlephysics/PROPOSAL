@@ -30,9 +30,8 @@ bool StableChannel::compare(const DecayChannel& channel) const
         return true;
 }
 
-DecayChannel::DecayProducts StableChannel::Decay(Particle*)
+DecayChannel::DecayProducts StableChannel::Decay(Particle&)
 {
     // return empty vector;
-    DecayProducts products;
-    return products;
+    return DecayProducts();
 }

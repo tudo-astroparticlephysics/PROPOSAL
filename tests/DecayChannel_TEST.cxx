@@ -7,13 +7,16 @@
 
 using namespace PROPOSAL;
 
+ParticleDef mu = ParticleDef::Builder().SetMuMinus().build();
+ParticleDef tau = ParticleDef::Builder().SetTauMinus().build();
+
 TEST(Comparison , Comparison_equal ) {
     LeptonicDecayChannel A;
     LeptonicDecayChannel B;
     EXPECT_TRUE(A==B);
 
-    TwoBodyPhaseSpace C(1, 2);
-    TwoBodyPhaseSpace D(1, 2);
+    TwoBodyPhaseSpace C(mu, tau);
+    TwoBodyPhaseSpace D(mu, tau);
     EXPECT_TRUE(C==D);
 
     DecayChannel* E = new LeptonicDecayChannel();
@@ -23,8 +26,8 @@ TEST(Comparison , Comparison_equal ) {
     delete E;
     delete F;
 
-    E = new TwoBodyPhaseSpace(1, 2);
-    F = new TwoBodyPhaseSpace(1, 2);
+    E = new TwoBodyPhaseSpace(mu, tau);
+    F = new TwoBodyPhaseSpace(mu, tau);
 
     EXPECT_TRUE(*E==*F);
     delete E;
@@ -33,18 +36,18 @@ TEST(Comparison , Comparison_equal ) {
 
 TEST(Comparison , Comparison_not_equal ) {
     LeptonicDecayChannel A;
-    TwoBodyPhaseSpace B(1, 2);
+    TwoBodyPhaseSpace B(mu, tau);
     EXPECT_TRUE(A!=B);
 
     DecayChannel* E = new LeptonicDecayChannel();
-    DecayChannel* F = new TwoBodyPhaseSpace(1, 2);
+    DecayChannel* F = new TwoBodyPhaseSpace(mu, tau);
 
     EXPECT_TRUE(*E!=*F);
     delete E;
     delete F;
 
-    E = new TwoBodyPhaseSpace(1, 4);
-    F = new TwoBodyPhaseSpace(1, 2);
+    E = new TwoBodyPhaseSpace(mu, mu);
+    F = new TwoBodyPhaseSpace(mu, tau);
 
     EXPECT_TRUE(*E!=*F);
     delete E;
@@ -67,14 +70,14 @@ TEST(Assignment , Copyconstructor ) {
     delete C;
     delete D;
 
-    TwoBodyPhaseSpace E(1, 2);
+    TwoBodyPhaseSpace E(mu, tau);
     DecayChannel* F = E.clone();
 
     EXPECT_TRUE(E==*F);
 
     delete F;
 
-    DecayChannel* G = new TwoBodyPhaseSpace(1, 2);
+    DecayChannel* G = new TwoBodyPhaseSpace(mu, tau);
     DecayChannel* H = G->clone();
 
     EXPECT_TRUE(*G==*H);

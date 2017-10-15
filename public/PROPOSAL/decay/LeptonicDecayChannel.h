@@ -20,7 +20,7 @@ class LeptonicDecayChannel : public DecayChannel
     // No copy and assignemnt -> done by clone
     DecayChannel* clone() { return new LeptonicDecayChannel(*this); }
 
-    DecayProducts Decay(Particle*);
+    DecayProducts Decay(Particle&);
 
     const std::string& GetName() const { return name_; }
 

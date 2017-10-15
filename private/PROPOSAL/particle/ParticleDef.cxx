@@ -293,14 +293,15 @@ ParticleDef::Builder& ParticleDef::Builder::SetTauMinus()
     decay_table.addChannel(0.1783, *mode);
     delete mode;
 
-    std::vector<ParticleDef> particle_defs;
-    particle_defs.push_back(ParticleDef::Builder().SetPiMinus().build());
-    particle_defs.push_back(ParticleDef::Builder().SetNuTau().build());
-    mode = new ManyBodyPhaseSpace(particle_defs);
+    // std::vector<ParticleDef> particle_defs;
+    // particle_defs.push_back(ParticleDef::Builder().SetPiMinus().build());
+    // particle_defs.push_back(ParticleDef::Builder().SetNuTau().build());
+    mode = new TwoBodyPhaseSpace(ParticleDef::Builder().SetPiMinus().build(), ParticleDef::Builder().SetNuTau().build());
     decay_table.addChannel(0.1109, *mode);
     delete mode;
 
-    particle_defs.clear();
+    std::vector<ParticleDef> particle_defs;
+    // particle_defs.clear();
     particle_defs.push_back(ParticleDef::Builder().SetPiMinus().build());
     particle_defs.push_back(ParticleDef::Builder().SetPiMinus().build());
     particle_defs.push_back(ParticleDef::Builder().SetNuTau().build());

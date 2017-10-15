@@ -9,6 +9,9 @@
 
 using namespace PROPOSAL;
 
+ParticleDef mu = ParticleDef::Builder().SetMuMinus().build();
+ParticleDef tau = ParticleDef::Builder().SetTauMinus().build();
+
 TEST(Comparison , Comparison_equal ) {
     DecayTable A;
     DecayTable B;
@@ -16,7 +19,7 @@ TEST(Comparison , Comparison_equal ) {
 
     LeptonicDecayChannel x;
     LeptonicDecayChannel y;
-    TwoBodyPhaseSpace z(1, 2);
+    TwoBodyPhaseSpace z(mu, tau);
 
     A.addChannel(0.5, x);
     B.addChannel(0.5, x);
@@ -38,8 +41,8 @@ TEST(Comparison , Comparison_not_equal ) {
 
     LeptonicDecayChannel x;
     LeptonicDecayChannel y;
-    TwoBodyPhaseSpace z(1, 2);
-    TwoBodyPhaseSpace u(2, 2);
+    TwoBodyPhaseSpace z(mu, tau);
+    TwoBodyPhaseSpace u(mu, mu);
 
     A.addChannel(0.5, x);
     EXPECT_TRUE(A!=B);
@@ -75,7 +78,7 @@ TEST(Assignment , Operator ) {
     DecayTable B;
 
     LeptonicDecayChannel x;
-    TwoBodyPhaseSpace y(1, 2);
+    TwoBodyPhaseSpace y(mu, tau);
 
     A.addChannel(1.0, x);
 
@@ -100,7 +103,7 @@ TEST(Assignment , Swap ) {
     EXPECT_TRUE(A==B);
 
     LeptonicDecayChannel x;
-    TwoBodyPhaseSpace y(1, 2);
+    TwoBodyPhaseSpace y(mu, tau);
 
     A.addChannel(1.0, x);
     A.addChannel(1.0, y);
