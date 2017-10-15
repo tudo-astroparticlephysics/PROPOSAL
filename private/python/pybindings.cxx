@@ -1159,6 +1159,7 @@ class_<Particle, boost::shared_ptr<Particle>, bases<DynamicData> >("Particle", i
         .def_readwrite("geometry_def", &SectorFactory::Definition::geometry_def)
         .def_readwrite("do_weighting", &SectorFactory::Definition::do_weighting)
         .def_readwrite("weighting_order", &SectorFactory::Definition::weighting_order)
+        .def_readwrite("stopping_decay", &SectorFactory::Definition::stopping_decay)
         .def_readwrite("do_continuous_randomization", &SectorFactory::Definition::do_continuous_randomization)
         .def_readwrite("do_exact_time_calculation", &SectorFactory::Definition::do_exact_time_calculation)
         .def_readwrite("scattering_model", &SectorFactory::Definition::scattering_model)
