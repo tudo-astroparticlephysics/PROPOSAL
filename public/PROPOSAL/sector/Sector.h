@@ -37,6 +37,7 @@ class Sector
     {
         bool do_weighting;      //!< Do weigthing? Set to false in constructor
         double weighting_order; //!< Re-weighting order. Set to 0 in constructor
+        double stopping_decay; //!< Let particle decay if elow is reached but no decay was sampled
 
         bool do_continuous_randomization;
         bool do_exact_time_calculation;
