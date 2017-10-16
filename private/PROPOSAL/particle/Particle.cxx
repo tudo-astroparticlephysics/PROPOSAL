@@ -118,7 +118,7 @@ std::string DynamicData::GetNameFromType(Type type)
 
 Particle::Particle()
     : DynamicData(DynamicData::Particle)
-    , particle_def_(ParticleDef::Builder().SetMuMinus().build())
+    , particle_def_(MuMinusDef::Get())
     , momentum_(0)
     , square_momentum_(0)
     , parent_particle_id_(0)

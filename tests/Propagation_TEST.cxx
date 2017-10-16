@@ -18,10 +18,10 @@ TEST(Propagation , Test_nan) {
     int EmaxLog10 = 8;
 
     // Define Particles
-    Particle mu(ParticleDef::Builder().SetMuMinus().build());
-    Particle tau(ParticleDef::Builder().SetTauMinus().build());
+    Particle mu(MuMinusDef::Get());
+    Particle tau(TauMinusDef::Get());
 
-    // One Propagator for each particle definition
+    // one propagator for each particle definition
     // medium/detector configuration
     Propagator prop_mu(mu.GetParticleDef(), "../src/resources/config_ice.json");
     Propagator prop_tau(tau.GetParticleDef(), "../src/resources/config_ice.json");

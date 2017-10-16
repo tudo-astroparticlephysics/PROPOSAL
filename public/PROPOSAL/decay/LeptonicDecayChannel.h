@@ -19,7 +19,7 @@ class LeptonicDecayChannel : public DecayChannel
     LeptonicDecayChannel(const LeptonicDecayChannel& mode);
     virtual ~LeptonicDecayChannel();
     // No copy and assignemnt -> done by clone
-    DecayChannel* clone() { return new LeptonicDecayChannel(*this); }
+    DecayChannel* clone() const { return new LeptonicDecayChannel(*this); }
 
     DecayProducts Decay(Particle&);
 

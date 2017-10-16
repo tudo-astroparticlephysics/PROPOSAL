@@ -9,8 +9,8 @@
 
 using namespace PROPOSAL;
 
-ParticleDef mu = ParticleDef::Builder().SetMuMinus().build();
-ParticleDef tau = ParticleDef::Builder().SetTauMinus().build();
+ParticleDef mu = MuMinusDef::Get();
+ParticleDef tau = TauMinusDef::Get();
 
 TEST(Comparison , Comparison_equal ) {
     DecayTable A;
@@ -129,7 +129,7 @@ TEST(SelectChannel , Muon ) {
 
 TEST(SelectChannel , Electron ) {
     // Leptinic decay channel in electron case
-    Particle electron(ParticleDef::Builder().SetEMinus().build());
+    Particle electron(EMinusDef::Get());
     DecayChannel& dc_electron = electron.GetDecayTable().SelectChannel();
 
     StableChannel stable_channel;
@@ -139,7 +139,7 @@ TEST(SelectChannel , Electron ) {
 
 TEST(SelectChannel , Tau ) {
     // tauon decay channels
-    Particle tau(ParticleDef::Builder().SetTauMinus().build());
+    Particle tau(TauMinusDef::Get());
 
     int leptonic_count = 0;
     int twobody_count = 0;

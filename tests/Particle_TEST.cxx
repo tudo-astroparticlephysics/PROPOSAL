@@ -19,10 +19,10 @@ TEST(Comparison , Comparison_equal ) {
     Particle B;
     EXPECT_TRUE(A==B);
 
-    Particle* C = new Particle(ParticleDef::Builder().SetTauMinus().build());
+    Particle* C = new Particle(TauMinusDef::Get());
     C->SetPosition(position);
     C->SetDirection(direction);
-    Particle* D = new Particle(ParticleDef::Builder().SetTauMinus().build());
+    Particle* D = new Particle(TauMinusDef::Get());
     D->SetPosition(position);
     D->SetDirection(direction);
 
@@ -32,7 +32,7 @@ TEST(Comparison , Comparison_equal ) {
 
     position = Vector3D();
     direction = Vector3D();
-    Particle* E = new Particle(ParticleDef::Builder().SetMuMinus().build());
+    Particle* E = new Particle(MuMinusDef::Get());
     E->SetPosition(position);
     E->SetDirection(direction);
     EXPECT_TRUE(A==*E);
@@ -43,13 +43,13 @@ TEST(Comparison , Comparison_not_equal ) {
     direction.CalculateCartesianFromSpherical();
 
     Particle A;
-    Particle B(ParticleDef::Builder().SetTauMinus().build());
+    Particle B(TauMinusDef::Get());
     EXPECT_TRUE(A!=B);
 
-    Particle* C = new Particle(ParticleDef::Builder().SetTauMinus().build());
+    Particle* C = new Particle(TauMinusDef::Get());
     C->SetPosition(position);
     C->SetDirection(direction);
-    Particle* D = new Particle(ParticleDef::Builder().SetTauMinus().build());
+    Particle* D = new Particle(TauMinusDef::Get());
 
     D->SetPosition(position);
     D->SetDirection(direction);
@@ -67,7 +67,7 @@ TEST(Assignment , Copyconstructor ) {
 TEST(Assignment , Copyconstructor2 ) {
     direction.SetSphericalCoordinates(1,20*PI/180.,20*PI/180.);
     direction.CalculateCartesianFromSpherical();
-    Particle A(ParticleDef::Builder().SetTauMinus().build());
+    Particle A(TauMinusDef::Get());
     A.SetPosition(position);
     A.SetDirection(direction);
     Particle B(A);
