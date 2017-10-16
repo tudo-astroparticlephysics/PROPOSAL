@@ -7,8 +7,8 @@
 
 using namespace PROPOSAL;
 
-ParticleDef mu = ParticleDef::Builder().SetMuMinus().build();
-ParticleDef tau = ParticleDef::Builder().SetTauMinus().build();
+ParticleDef mu = MuMinusDef::Get();
+ParticleDef tau = TauMinusDef::Get();
 
 TEST(Comparison , Comparison_equal ) {
     LeptonicDecayChannel A;

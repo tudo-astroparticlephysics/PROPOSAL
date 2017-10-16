@@ -45,7 +45,7 @@ Propagator::Propagator()
     : seed_(1)
     , current_sector_(NULL)
     // , particle_(MuMinusDef::Get())
-    , particle_(ParticleDef::Builder().SetMuMinus().build())
+    , particle_(MuMinusDef::Get())
     , detector_(new Sphere(Vector3D(), 1e18, 0))
 {
     // TODO(mario): set defaults Tue 2017/09/19

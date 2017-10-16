@@ -14,11 +14,14 @@ class PROPOSALParticle;
 class ManyBodyPhaseSpace : public DecayChannel
 {
     public:
+        class Builder;
+
+    public:
     ManyBodyPhaseSpace(std::vector<ParticleDef> daughters);
     ManyBodyPhaseSpace(const ManyBodyPhaseSpace& mode);
     virtual ~ManyBodyPhaseSpace();
     // No copy and assignemnt -> done by clone
-    DecayChannel* clone() { return new ManyBodyPhaseSpace(*this); }
+    DecayChannel* clone() const { return new ManyBodyPhaseSpace(*this); }
 
     // ----------------------------------------------------------------------------
     /// @brief Many body phase space decay
@@ -44,6 +47,26 @@ class ManyBodyPhaseSpace : public DecayChannel
     double sum_daughter_masses_;
 
     static const std::string name_;
+};
+
+class ManyBodyPhaseSpace::Builder
+{
+    public:
+
+    Builder();
+    Builder(const Builder&);
+    ~Builder();
+
+    // --------------------------------------------------------------------- //
+    // Setter
+    // --------------------------------------------------------------------- //
+
+    Builder& addDaughter(const ParticleDef& daughter);
+    ManyBodyPhaseSpace build();
+
+    private:
+    std::vector<ParticleDef> daughters_;
+
 };
 
 } /* PROPOSAL */

@@ -150,3 +150,34 @@ void ManyBodyPhaseSpace::print(std::ostream& os) const
     }
     os << "Sum of masses: " << sum_daughter_masses_ << '\n';
 }
+
+/******************************************************************************
+*                                  Builder                                    *
+******************************************************************************/
+
+ManyBodyPhaseSpace::Builder::Builder()
+    : daughters_()
+{
+}
+
+ManyBodyPhaseSpace::Builder::Builder(const Builder& builder)
+    :daughters_(builder.daughters_)
+{
+}
+
+ManyBodyPhaseSpace::Builder::~Builder()
+{
+}
+
+// ------------------------------------------------------------------------- //
+ManyBodyPhaseSpace::Builder& ManyBodyPhaseSpace::Builder::addDaughter(const ParticleDef& daughter)
+{
+    daughters_.push_back(daughter);
+    return *this;
+}
+
+// ------------------------------------------------------------------------- //
+ManyBodyPhaseSpace ManyBodyPhaseSpace::Builder::build()
+{
+    return ManyBodyPhaseSpace(daughters_);
+}

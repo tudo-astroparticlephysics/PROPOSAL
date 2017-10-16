@@ -19,22 +19,36 @@
 
 #include "PROPOSAL/methods.h"
 
+// #define PARTICLE_IMP(cls, MASS, LIFETIME, CHARGE)                                                                      \
+//     ParticleDef::Builder& ParticleDef::Builder::Set##cls()                                                             \
+//     {                                                                                                                  \
+//         name     = #cls;                                                                                               \
+//         mass     = MASS;                                                                                               \
+//         low      = MASS;                                                                                               \
+//         lifetime = LIFETIME;                                                                                           \
+//         charge   = CHARGE;                                                                                             \
+//                                                                                                                        \
+//         if (lifetime < -1)                                                                                             \
+//         {                                                                                                              \
+//             decay_table.SetStable();                                                                                   \
+//         }                                                                                                              \
+//                                                                                                                        \
+//         return *this;                                                                                                  \
+//     }
+
 #define PARTICLE_IMP(cls, MASS, LIFETIME, CHARGE)                                                                      \
-    ParticleDef::Builder& ParticleDef::Builder::Set##cls()                                                             \
+    cls##Def::cls##Def()                                                                                               \
+        : ParticleDef(#cls,                                                                                            \
+                      MASS,                                                                                            \
+                      MASS,                                                                                            \
+                      LIFETIME,                                                                                        \
+                      CHARGE,                                                                                          \
+                      HardBBTables::EmptyTable,                                                                        \
+                      DecayTable().addChannel(1.1, StableChannel()))                                                   \
     {                                                                                                                  \
-        name     = #cls;                                                                                               \
-        mass     = MASS;                                                                                               \
-        low      = MASS;                                                                                               \
-        lifetime = LIFETIME;                                                                                           \
-        charge   = CHARGE;                                                                                             \
+    }                                                                                                                  \
                                                                                                                        \
-        if (lifetime < -1)                                                                                             \
-        {                                                                                                              \
-            decay_table.SetStable();                                                                                   \
-        }                                                                                                              \
-                                                                                                                       \
-        return *this;                                                                                                  \
-    }
+    cls##Def::~cls##Def() {}
 
 using namespace PROPOSAL;
 
@@ -255,85 +269,80 @@ const double      ParticleDef::Builder::default_charge = -1;
 const HardBBTables::VecType* ParticleDef::Builder::default_hardbb_table = &HardBBTables::EmptyTable;
 // const DecayTable ParticleDef::Builder::default_decay_table;
 
-ParticleDef::Builder& ParticleDef::Builder::SetMuMinus()
+// ------------------------------------------------------------------------- //
+// Special Particle definitions
+// ------------------------------------------------------------------------- //
+
+MuMinusDef::MuMinusDef()
+    : ParticleDef("MuMinus",
+                  MMU,
+                  MMU,
+                  LMU,
+                  -1.0,
+                  HardBBTables::MuonTable,
+                  DecayTable().addChannel(1.0, LeptonicDecayChannel()))
 {
-    name = "MuMinus";
-    mass = MMU;
-    low = MMU;
-    lifetime = LMU;
-    charge = -1.0;
-    hardbb_table = &HardBBTables::MuonTable;
-
-    // Decay modes
-    LeptonicDecayChannel mode;
-    decay_table.addChannel(1.0, mode);
-
-    return *this;
 }
 
-ParticleDef::Builder& ParticleDef::Builder::SetMuPlus()
+MuMinusDef::~MuMinusDef()
 {
-    return this->SetMuMinus().SetName("MuPlus").SetCharge(1.0);
 }
 
-ParticleDef::Builder& ParticleDef::Builder::SetTauMinus()
+MuPlusDef::MuPlusDef()
+    : ParticleDef(ParticleDef::Builder().SetParticleDef(MuMinusDef::Get()).SetName("MuPlus").SetCharge(-1.0).build())
 {
-    name = "TauMinus";
-    mass = MTAU;
-    low = MTAU;
-    lifetime = LTAU;
-    charge = -1.0;
-    hardbb_table = &HardBBTables::TauTable;
-
-    // Decay modes
-    DecayChannel* mode = new LeptonicDecayChannel();
-
-    //TODO(mario): Different leptonic modes Mon 2017/08/21
-    decay_table.addChannel(0.1737, *mode);
-    decay_table.addChannel(0.1783, *mode);
-    delete mode;
-
-    // std::vector<ParticleDef> particle_defs;
-    // particle_defs.push_back(ParticleDef::Builder().SetPiMinus().build());
-    // particle_defs.push_back(ParticleDef::Builder().SetNuTau().build());
-    mode = new TwoBodyPhaseSpace(ParticleDef::Builder().SetPiMinus().build(), ParticleDef::Builder().SetNuTau().build());
-    decay_table.addChannel(0.1109, *mode);
-    delete mode;
-
-    std::vector<ParticleDef> particle_defs;
-    // particle_defs.clear();
-    particle_defs.push_back(ParticleDef::Builder().SetPiMinus().build());
-    particle_defs.push_back(ParticleDef::Builder().SetPiMinus().build());
-    particle_defs.push_back(ParticleDef::Builder().SetNuTau().build());
-    mode = new ManyBodyPhaseSpace(particle_defs);
-    decay_table.addChannel(0.2540, *mode);
-    delete mode;
-
-    particle_defs.clear();
-    particle_defs.push_back(ParticleDef::Builder().SetPiMinus().build());
-    particle_defs.push_back(ParticleDef::Builder().SetPiMinus().build());
-    particle_defs.push_back(ParticleDef::Builder().SetPiMinus().build());
-    particle_defs.push_back(ParticleDef::Builder().SetNuTau().build());
-    mode = new ManyBodyPhaseSpace(particle_defs);
-    decay_table.addChannel(0.1826, *mode);
-    delete mode;
-
-    particle_defs.clear();
-    particle_defs.push_back(ParticleDef::Builder().SetPiMinus().build());
-    particle_defs.push_back(ParticleDef::Builder().SetPiMinus().build());
-    particle_defs.push_back(ParticleDef::Builder().SetPiMinus().build());
-    particle_defs.push_back(ParticleDef::Builder().SetPiMinus().build());
-    particle_defs.push_back(ParticleDef::Builder().SetNuTau().build());
-    mode = new ManyBodyPhaseSpace(particle_defs);
-    decay_table.addChannel(1.0, *mode); // Else
-    delete mode;
-
-    return *this;
 }
 
-ParticleDef::Builder& ParticleDef::Builder::SetTauPlus()
+MuPlusDef::~MuPlusDef()
 {
-    return this->SetTauMinus().SetName("TauPlus").SetCharge(1.0);
+}
+
+TauMinusDef::TauMinusDef()
+    : ParticleDef("TauMinus",
+                  MTAU,
+                  MTAU,
+                  LTAU,
+                  -1.0,
+                  HardBBTables::TauTable,
+                  DecayTable()
+                      .addChannel(0.1737, LeptonicDecayChannel())
+                      .addChannel(0.1783, LeptonicDecayChannel())
+                      .addChannel(0.1109, TwoBodyPhaseSpace(PiMinusDef::Get(), NuTauDef::Get()))
+                      .addChannel(0.2540,
+                                  ManyBodyPhaseSpace::Builder()
+                                      .addDaughter(PiMinusDef::Get())
+                                      .addDaughter(PiMinusDef::Get())
+                                      .addDaughter(NuTauDef::Get())
+                                      .build())
+                      .addChannel(0.1826,
+                                  ManyBodyPhaseSpace::Builder()
+                                      .addDaughter(PiMinusDef::Get())
+                                      .addDaughter(PiMinusDef::Get())
+                                      .addDaughter(PiMinusDef::Get())
+                                      .addDaughter(NuTauDef::Get())
+                                      .build())
+                      .addChannel(1.0,
+                                  ManyBodyPhaseSpace::Builder()
+                                      .addDaughter(PiMinusDef::Get())
+                                      .addDaughter(PiMinusDef::Get())
+                                      .addDaughter(PiMinusDef::Get())
+                                      .addDaughter(PiMinusDef::Get())
+                                      .addDaughter(NuTauDef::Get())
+                                      .build()))
+{
+}
+
+TauMinusDef::~TauMinusDef()
+{
+}
+
+TauPlusDef::TauPlusDef()
+    : ParticleDef(ParticleDef::Builder().SetParticleDef(TauMinusDef::Get()).SetName("TauPlus").SetCharge(-1.0).build())
+{
+}
+
+TauPlusDef::~TauPlusDef()
+{
 }
 
 // ------------------------------------------------------------------------- //
@@ -367,5 +376,9 @@ PARTICLE_IMP(NuMuBar, 0.0, STABLE_PARTICLE, 0.0)
 
 PARTICLE_IMP(NuTau, 0.0, STABLE_PARTICLE, 0.0)
 PARTICLE_IMP(NuTauBar, 0.0, STABLE_PARTICLE, 0.0)
+
+PARTICLE_IMP(Monopole, MMON, STABLE_PARTICLE, CMON)
+PARTICLE_IMP(Gamma, 0.0, STABLE_PARTICLE, 0.0)
+PARTICLE_IMP(StableMassiveParticle, MSMP, STABLE_PARTICLE, -1.0)
 
 #undef PARTICLE_IMP
