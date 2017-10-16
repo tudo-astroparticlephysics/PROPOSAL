@@ -17,15 +17,15 @@ TEST(Comparison , Comparison_equal ) {
     delete C;
     delete D;
 
-    C = new ParticleDef(ParticleDef::Builder().SetMuMinus().build());
-    D = new ParticleDef(ParticleDef::Builder().SetMuMinus().build());
+    C = new ParticleDef(MuMinusDef::Get());
+    D = new ParticleDef(MuMinusDef::Get());
 
     EXPECT_TRUE(*C==*D);
     delete C;
     delete D;
 
-    C = new ParticleDef(ParticleDef::Builder().SetTauMinus().build());
-    D = new ParticleDef(ParticleDef::Builder().SetTauMinus().build());
+    C = new ParticleDef(TauMinusDef::Get());
+    D = new ParticleDef(TauMinusDef::Get());
 
     EXPECT_TRUE(*C==*D);
     delete C;
@@ -40,8 +40,8 @@ TEST(Comparison , Comparison_not_equal ) {
     ParticleDef AA = ParticleDef::Builder().SetMass(100).build();
     EXPECT_TRUE(AA!=B);
 
-    ParticleDef* C = new ParticleDef(ParticleDef::Builder().SetMuMinus().build());
-    ParticleDef* D = new ParticleDef(ParticleDef::Builder().SetTauMinus().build());
+    ParticleDef* C = new ParticleDef(MuMinusDef::Get());
+    ParticleDef* D = new ParticleDef(TauMinusDef::Get());
 
     EXPECT_TRUE(*C!=*D);
     delete C;
@@ -56,7 +56,7 @@ TEST(Assignment , Copyconstructor ) {
 }
 
 TEST(Assignment , Copyconstructor2 ) {
-    ParticleDef A(ParticleDef::Builder().SetMuMinus().build());
+    ParticleDef A(MuMinusDef::Get());
     ParticleDef B(A);
     EXPECT_TRUE(A==B);
 }

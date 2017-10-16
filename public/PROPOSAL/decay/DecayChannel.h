@@ -21,7 +21,7 @@ class DecayChannel
     DecayChannel(const DecayChannel&);
     virtual ~DecayChannel();
 
-    virtual DecayChannel* clone() = 0;
+    virtual DecayChannel* clone() const = 0;
 
     bool operator==(const DecayChannel&) const;
     bool operator!=(const DecayChannel&) const;

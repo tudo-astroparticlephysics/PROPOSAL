@@ -53,7 +53,7 @@ class DecayTable
         /// @param Br Branching ration of the channel
         /// @param dc the decay channel
         // ----------------------------------------------------------------------------
-        void addChannel(double Br, DecayChannel& dc);
+        DecayTable& addChannel(double Br, const DecayChannel& dc);
 
         // ----------------------------------------------------------------------------
         /// @brief Add decay channels to the decay table
