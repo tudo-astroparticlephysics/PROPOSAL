@@ -141,9 +141,10 @@ void DecayTable::SetStable()
 }
 
 // ------------------------------------------------------------------------- //
-void DecayTable::addChannel(double Br, DecayChannel& dc)
+DecayTable& DecayTable::addChannel(double Br, const DecayChannel& dc)
 {
     channels_[Br] = dc.clone();
+    return *this;
 }
 
 // ------------------------------------------------------------------------- //

@@ -12,6 +12,13 @@
 // #include "PROPOSAL/Propagator.h"
 #include "PROPOSAL/PROPOSAL.h"
 
+
+#define PARTICLE_DEF(cls)                                                                                              \
+    class_<cls##Def, boost::shared_ptr<cls##Def>, bases<ParticleDef>, boost::noncopyable>(#cls "Def", no_init)         \
+                                                                                                                       \
+        .def("get", make_function(&cls##Def::Get, return_value_policy<reference_existing_object>()))                   \
+        .staticmethod("get");
+
 #define COMPONENT_DEF(cls)\
     class_<Components::cls, boost::shared_ptr<Components::cls>, bases<Components::Component> >( #cls, init<double>());
 
@@ -800,7 +807,7 @@ class_<DecayTable, boost::shared_ptr<DecayTable> >("DecayTable", init<>())
 
     .def(self_ns::str(self_ns::self))
 
-    .def("add_channel", &DecayTable::addChannel, "Add an decay channel")
+    .def("add_channel", make_function(&DecayTable::addChannel, return_internal_reference<>()), "Add an decay channel")
     .def("select_channel", make_function(&DecayTable::SelectChannel, return_internal_reference<>()), "Select an decay channel according to given branching ratios")
     .def("set_stable", &DecayTable::SetStable, "Define decay table for stable particles")
 ;
@@ -833,69 +840,44 @@ class_<ParticleDef::Builder, boost::shared_ptr<ParticleDef::Builder> >("Particle
     .def("SetLifetime", make_function(&ParticleDef::Builder::SetLifetime, return_internal_reference<>()))
     .def("SetCharge", make_function(&ParticleDef::Builder::SetCharge, return_internal_reference<>()))
     .def("SetDecayTable", make_function(&ParticleDef::Builder::SetDecayTable, return_internal_reference<>()))
-    .def("MuMinus", make_function(&ParticleDef::Builder::SetMuMinus, return_internal_reference<>()))
-    .def("MuPlus", make_function(&ParticleDef::Builder::SetMuPlus, return_internal_reference<>()))
-    .def("EMinus", make_function(&ParticleDef::Builder::SetEMinus, return_internal_reference<>()))
-    .def("EPlus", make_function(&ParticleDef::Builder::SetEPlus, return_internal_reference<>()))
-    .def("TauMinus", make_function(&ParticleDef::Builder::SetTauMinus, return_internal_reference<>()))
-    .def("TauPlus", make_function(&ParticleDef::Builder::SetTauPlus, return_internal_reference<>()))
-    .def("STauMinus", make_function(&ParticleDef::Builder::SetStauMinus, return_internal_reference<>()))
-    .def("STauPlus", make_function(&ParticleDef::Builder::SetStauPlus, return_internal_reference<>()))
-    .def("P0", make_function(&ParticleDef::Builder::SetP0, return_internal_reference<>()))
-    .def("PiMinus", make_function(&ParticleDef::Builder::SetPiMinus, return_internal_reference<>()))
-    .def("PiPlus", make_function(&ParticleDef::Builder::SetPiPlus, return_internal_reference<>()))
-    .def("KMinus", make_function(&ParticleDef::Builder::SetKMinus, return_internal_reference<>()))
-    .def("KPlus", make_function(&ParticleDef::Builder::SetKPlus, return_internal_reference<>()))
-    .def("PMinus", make_function(&ParticleDef::Builder::SetPMinus, return_internal_reference<>()))
-    .def("PPlus", make_function(&ParticleDef::Builder::SetPPlus, return_internal_reference<>()))
-    .def("NuE", make_function(&ParticleDef::Builder::SetNuE, return_internal_reference<>()))
-    .def("NuEBar", make_function(&ParticleDef::Builder::SetNuEBar, return_internal_reference<>()))
-    .def("NuMu", make_function(&ParticleDef::Builder::SetNuMu, return_internal_reference<>()))
-    .def("NuMuBar", make_function(&ParticleDef::Builder::SetNuMuBar, return_internal_reference<>()))
-    .def("NuTau", make_function(&ParticleDef::Builder::SetNuTau, return_internal_reference<>()))
-    .def("NuTauBar", make_function(&ParticleDef::Builder::SetNuTauBar, return_internal_reference<>()))
+    .def("SetParticleDef", make_function(&ParticleDef::Builder::SetParticleDef, return_internal_reference<>()))
     .def("build", &ParticleDef::Builder::build)
     ;
 
-// class_<MuMinusDef, boost::shared_ptr<MuMinusDef>, bases<ParticleDef>, boost::noncopyable >("MuMinusDef", no_init)
-//
-//     .def("get", make_function(&MuMinusDef::Get, return_value_policy<reference_existing_object>()))
-//     .staticmethod("get")
-//     ;
-//
-// PARTICLE_DEF(MuPlus)
-//
-// PARTICLE_DEF(EMinus)
-// PARTICLE_DEF(EPlus)
-//
-// PARTICLE_DEF(TauMinus)
-// PARTICLE_DEF(TauPlus)
-//
-// PARTICLE_DEF(StauMinus)
-// PARTICLE_DEF(StauPlus)
-//
-// PARTICLE_DEF(P0)
-// PARTICLE_DEF(PiMinus)
-// PARTICLE_DEF(PiPlus)
-//
-// PARTICLE_DEF(KMinus)
-// PARTICLE_DEF(KPlus)
-//
-// PARTICLE_DEF(PMinus)
-// PARTICLE_DEF(PPlus)
-//
-// PARTICLE_DEF(NuE)
-// PARTICLE_DEF(NuEBar)
-//
-// PARTICLE_DEF(NuMu)
-// PARTICLE_DEF(NuMuBar)
-//
-// PARTICLE_DEF(NuTau)
-// PARTICLE_DEF(NuTauBar)
-//
-// PARTICLE_DEF(Monopole)
-// PARTICLE_DEF(Gamma)
-// PARTICLE_DEF(StableMassiveParticle)
+PARTICLE_DEF(MuMinus)
+PARTICLE_DEF(MuPlus)
+
+PARTICLE_DEF(EMinus)
+PARTICLE_DEF(EPlus)
+
+PARTICLE_DEF(TauMinus)
+PARTICLE_DEF(TauPlus)
+
+PARTICLE_DEF(StauMinus)
+PARTICLE_DEF(StauPlus)
+
+PARTICLE_DEF(P0)
+PARTICLE_DEF(PiMinus)
+PARTICLE_DEF(PiPlus)
+
+PARTICLE_DEF(KMinus)
+PARTICLE_DEF(KPlus)
+
+PARTICLE_DEF(PMinus)
+PARTICLE_DEF(PPlus)
+
+PARTICLE_DEF(NuE)
+PARTICLE_DEF(NuEBar)
+
+PARTICLE_DEF(NuMu)
+PARTICLE_DEF(NuMuBar)
+
+PARTICLE_DEF(NuTau)
+PARTICLE_DEF(NuTauBar)
+
+PARTICLE_DEF(Monopole)
+PARTICLE_DEF(Gamma)
+PARTICLE_DEF(StableMassiveParticle)
 
 /**************************************************************************
 *                              Dynamic Data                               *
@@ -1214,6 +1196,7 @@ class_<Particle, boost::shared_ptr<Particle>, bases<DynamicData> >("Particle", i
         .def("register_propagator", &PropagatorService::RegisterPropagator, (arg("propagator")));
 }
 
+#undef PARTICLE_DEF
 #undef COMPONENT_DEF
 #undef MEDIUM_DEF
 #undef BREMS_DEF

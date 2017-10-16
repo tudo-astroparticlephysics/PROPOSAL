@@ -80,9 +80,9 @@ DecayChannel::DecayProducts LeptonicDecayChannel::Decay(Particle& particle)
     double parent_mass = particle.GetMass();
 
     DecayProducts products;
-    products.push_back(new Particle(ParticleDef::Builder().SetEMinus().build()));
-    products.push_back(new Particle(ParticleDef::Builder().SetNuMu().build()));
-    products.push_back(new Particle(ParticleDef::Builder().SetNuMuBar().build()));
+    products.push_back(new Particle(EMinusDef::Get()));
+    products.push_back(new Particle(NuMuDef::Get()));
+    products.push_back(new Particle(NuMuBarDef::Get()));
 
     // Sample energy from decay rate
     double ernd = RandomGenerator::Get().RandomDouble();

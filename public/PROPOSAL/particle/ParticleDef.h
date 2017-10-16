@@ -16,6 +16,21 @@
 
 #include "PROPOSAL/decay/DecayTable.h"
 
+#define PARTICLE_DEF(cls)                                                                                              \
+    class cls##Def : public ParticleDef                                                                                \
+    {                                                                                                                  \
+        public:                                                                                                        \
+        static const cls##Def& Get()                                                                                   \
+        {                                                                                                              \
+            static const cls##Def instance;                                                                            \
+            return instance;                                                                                           \
+        }                                                                                                              \
+                                                                                                                       \
+        private:                                                                                                       \
+        cls##Def();                                                                                                    \
+        ~cls##Def();                                                                                                   \
+};
+
 namespace PROPOSAL {
 
 // class DecayTable;
@@ -149,41 +164,17 @@ class ParticleDef::Builder
         decay_table = var;
         return *this;
     }
-
-    // --------------------------------------------------------------------- //
-    // Predefined particle
-    // --------------------------------------------------------------------- //
-
-    Builder& SetMuMinus();
-    Builder& SetMuPlus();
-
-    Builder& SetEMinus();
-    Builder& SetEPlus();
-
-    Builder& SetTauMinus();
-    Builder& SetTauPlus();
-
-    Builder& SetStauMinus();
-    Builder& SetStauPlus();
-
-    Builder& SetP0();
-    Builder& SetPiMinus();
-    Builder& SetPiPlus();
-
-    Builder& SetKMinus();
-    Builder& SetKPlus();
-
-    Builder& SetPMinus();
-    Builder& SetPPlus();
-
-    Builder& SetNuE();
-    Builder& SetNuEBar();
-
-    Builder& SetNuMu();
-    Builder& SetNuMuBar();
-
-    Builder& SetNuTau();
-    Builder& SetNuTauBar();
+    Builder& SetParticleDef(const ParticleDef& var)
+    {
+        name = var.name;
+        mass = var.mass;
+        low = var.low;
+        lifetime = var.lifetime;
+        charge = var.charge;
+        hardbb_table = &var.hardbb_table;
+        decay_table = var.decay_table;
+        return *this;
+    }
 
     ParticleDef build()
     {
@@ -213,4 +204,45 @@ class ParticleDef::Builder
 // ----------------------------------------------------------------------------
 std::size_t hash_value(ParticleDef const& particle_def);
 
+// ------------------------------------------------------------------------- //
+// Predefined particle definitions
+// ------------------------------------------------------------------------- //
+
+PARTICLE_DEF(MuMinus)
+PARTICLE_DEF(MuPlus)
+
+PARTICLE_DEF(EMinus)
+PARTICLE_DEF(EPlus)
+
+PARTICLE_DEF(TauMinus)
+PARTICLE_DEF(TauPlus)
+
+PARTICLE_DEF(StauMinus)
+PARTICLE_DEF(StauPlus)
+
+PARTICLE_DEF(P0)
+PARTICLE_DEF(PiMinus)
+PARTICLE_DEF(PiPlus)
+
+PARTICLE_DEF(KMinus)
+PARTICLE_DEF(KPlus)
+
+PARTICLE_DEF(PMinus)
+PARTICLE_DEF(PPlus)
+
+PARTICLE_DEF(NuE)
+PARTICLE_DEF(NuEBar)
+
+PARTICLE_DEF(NuMu)
+PARTICLE_DEF(NuMuBar)
+
+PARTICLE_DEF(NuTau)
+PARTICLE_DEF(NuTauBar)
+
+PARTICLE_DEF(Monopole)
+PARTICLE_DEF(Gamma)
+PARTICLE_DEF(StableMassiveParticle)
+
 } // namespace PROPOSAL
+
+#undef PARTICLE_DEF
