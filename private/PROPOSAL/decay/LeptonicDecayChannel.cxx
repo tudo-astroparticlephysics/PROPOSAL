@@ -9,12 +9,23 @@
 #include "PROPOSAL/decay/LeptonicDecayChannel.h"
 #include "PROPOSAL/particle/Particle.h"
 
+#include "PROPOSAL/Output.h"
+
 using namespace PROPOSAL;
 
 const std::string LeptonicDecayChannel::name_ = "LeptonicDecayChannel";
 
-LeptonicDecayChannel::LeptonicDecayChannel()
+LeptonicDecayChannel::LeptonicDecayChannel(const ParticleDef& lepton,
+                                           const ParticleDef& neutrino,
+                                           const ParticleDef& anti_neutrino)
     : DecayChannel()
+    , massive_lepton_(lepton)
+    // , neutrino_()
+    // , anti_neutrino_()
+    , neutrino_(neutrino)
+    , anti_neutrino_(anti_neutrino)
+    // , neutrino_(GetNeutrino(massive_lepton_))
+    // , anti_neutrino_(GetAntiNeutrino(massive_lepton_))
     , root_finder_(IMAXS, IPREC)
 {
 }
@@ -25,6 +36,9 @@ LeptonicDecayChannel::~LeptonicDecayChannel()
 
 LeptonicDecayChannel::LeptonicDecayChannel(const LeptonicDecayChannel& mode)
     : DecayChannel(mode)
+    , massive_lepton_(mode.massive_lepton_)
+    , neutrino_(mode.neutrino_)
+    , anti_neutrino_(mode.anti_neutrino_)
     , root_finder_(mode.root_finder_)
 {
 }
@@ -34,6 +48,12 @@ bool LeptonicDecayChannel::compare(const DecayChannel& channel) const
     const LeptonicDecayChannel* leptonic = dynamic_cast<const LeptonicDecayChannel*>(&channel);
 
     if (!leptonic)
+        return false;
+    else if (massive_lepton_ != leptonic->massive_lepton_)
+        return false;
+    else if (neutrino_ != leptonic->neutrino_)
+        return false;
+    else if (anti_neutrino_ != leptonic->anti_neutrino_)
         return false;
     else
         return true;
@@ -80,9 +100,9 @@ DecayChannel::DecayProducts LeptonicDecayChannel::Decay(Particle& particle)
     double parent_mass = particle.GetMass();
 
     DecayProducts products;
-    products.push_back(new Particle(EMinusDef::Get()));
-    products.push_back(new Particle(NuMuDef::Get()));
-    products.push_back(new Particle(NuMuBarDef::Get()));
+    products.push_back(new Particle(massive_lepton_));
+    products.push_back(new Particle(neutrino_));
+    products.push_back(new Particle(anti_neutrino_));
 
     // Sample energy from decay rate
     double ernd = RandomGenerator::Get().RandomDouble();
@@ -141,5 +161,7 @@ DecayChannel::DecayProducts LeptonicDecayChannel::Decay(Particle& particle)
 
 void LeptonicDecayChannel::print(std::ostream& os) const
 {
-    os << "Lepton mass: " << '\n';
+    os << "Massive lepton:\n" << massive_lepton_ << '\n';
+    os << "Neutrino:\n" << neutrino_ << '\n';
+    os << "Anti neutrino:\n" << anti_neutrino_ << '\n';
 }

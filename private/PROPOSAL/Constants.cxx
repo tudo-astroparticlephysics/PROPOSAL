@@ -56,6 +56,7 @@ const double PROPOSAL::LPI = 2.6033e-8; // charged pion lifetime (sec)
 const double PROPOSAL::MPI0 = 134.9766; // pion 0 mass (MeV)
 const double PROPOSAL::LPI0 = 8.52e-17; // pion 0 lifetime (sec)
 
+const double PROPOSAL::MKAON0 = 497.614; // uncharged kaon mass (MeV)
 const double PROPOSAL::MKAON = 493.677; // charged kaon mass (MeV)
 const double PROPOSAL::LKAON = 1.2380e-8; // charged kaon lifetime (sec)
 
