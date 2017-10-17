@@ -6,6 +6,7 @@
 #include "PROPOSAL/decay/TwoBodyPhaseSpace.h"
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/Output.h"
+#include "PROPOSAL/methods.h"
 
 using namespace PROPOSAL;
 
@@ -50,15 +51,15 @@ DecayTable& DecayTable::operator=(const DecayTable& table)
     if (this != &table)
     {
       DecayTable tmp(table);
-      swap(tmp);
+      swap(*this, tmp);
     }
     return *this;
 }
 
-void DecayTable::swap(DecayTable& table)
+void PROPOSAL::swap(DecayTable& first, DecayTable& second)
 {
     using std::swap;
-    swap(channels_, table.channels_);
+    swap(first.channels_, second.channels_);
 }
 
 bool DecayTable::operator==(const DecayTable& table) const
@@ -91,6 +92,22 @@ bool DecayTable::operator!=(const DecayTable& def) const
 }
 
 // ------------------------------------------------------------------------- //
+std::ostream& PROPOSAL::operator<<(std::ostream& os, DecayTable const& table)
+{
+    std::stringstream ss;
+    ss << " DecayTable (" << &table << ") ";
+
+    os << Helper::Centered(60, ss.str()) << '\n';
+
+    os << "Branching Ratio" << "\t\t"  << "Channel" << '\n';
+    for (DecayTable::DecayMap::const_iterator iter = table.channels_.begin(); iter != table.channels_.end(); ++iter) {
+        os << iter->first << "\t\t" << iter->second->GetName() << '\n';
+    }
+
+    os << Helper::Centered(60, "");
+    return os;
+}
+// ------------------------------------------------------------------------- //
 // Methods
 // ------------------------------------------------------------------------- //
 
@@ -100,11 +117,12 @@ DecayChannel& DecayTable::SelectChannel() const
     for (int i = 0; i < 1000; ++i)
     {
         double sumBranchingRatio = 0.0;
+        double random = RandomGenerator::Get().RandomDouble();
         for (DecayMap::const_iterator iter = channels_.begin(); iter != channels_.end(); ++iter)
         {
             sumBranchingRatio += iter->first;
 
-            if (RandomGenerator::Get().RandomDouble() < sumBranchingRatio)
+            if (random < sumBranchingRatio)
             {
                 return *iter->second;
             }
@@ -124,9 +142,10 @@ void DecayTable::SetStable()
 }
 
 // ------------------------------------------------------------------------- //
-void DecayTable::addChannel(double Br, DecayChannel& dc)
+DecayTable& DecayTable::addChannel(double Br, const DecayChannel& dc)
 {
     channels_[Br] = dc.clone();
+    return *this;
 }
 
 // ------------------------------------------------------------------------- //
