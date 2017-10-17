@@ -117,11 +117,12 @@ DecayChannel& DecayTable::SelectChannel() const
     for (int i = 0; i < 1000; ++i)
     {
         double sumBranchingRatio = 0.0;
+        double random = RandomGenerator::Get().RandomDouble();
         for (DecayMap::const_iterator iter = channels_.begin(); iter != channels_.end(); ++iter)
         {
             sumBranchingRatio += iter->first;
 
-            if (RandomGenerator::Get().RandomDouble() < sumBranchingRatio)
+            if (random < sumBranchingRatio)
             {
                 return *iter->second;
             }
