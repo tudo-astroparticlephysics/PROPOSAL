@@ -1,7 +1,10 @@
 
+#include <ostream>
 #include "PROPOSAL/decay/StableChannel.h"
 
 using namespace PROPOSAL;
+
+const std::string StableChannel::name_ = "StableChannel";
 
 StableChannel::StableChannel()
     : DecayChannel()
@@ -27,9 +30,8 @@ bool StableChannel::compare(const DecayChannel& channel) const
         return true;
 }
 
-DecayChannel::DecayProducts StableChannel::Decay(Particle*)
+DecayChannel::DecayProducts StableChannel::Decay(Particle&)
 {
     // return empty vector;
-    DecayProducts products;
-    return products;
+    return DecayProducts();
 }

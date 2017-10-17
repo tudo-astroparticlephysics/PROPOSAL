@@ -23,13 +23,13 @@ std::vector<double> HardBB::x = boost::assign::list_of(3)(4)(5)(6)(7)(8)(9);
 HardBB::HardBB(const ParticleDef& particle_def)
     : interpolant_()
 {
-    const HardBBTables::VecType* y = particle_def.hardbb_table;
+    const HardBBTables::VecType& y = particle_def.hardbb_table;
 
-    if (y != NULL)
+    if (!y.empty())
     {
-        for(unsigned int i=0; i < y->size(); i++)
+        for(unsigned int i=0; i < y.size(); i++)
         {
-            interpolant_.push_back(new Interpolant(x, y->at(i), 4, false, false));
+            interpolant_.push_back(new Interpolant(x, y.at(i), 4, false, false));
         }
     }
     else

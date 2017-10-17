@@ -30,6 +30,7 @@ using namespace PROPOSAL;
 Sector::Definition::Definition()
     : do_weighting(false)
     , weighting_order(0)
+    , stopping_decay(true)
     , do_continuous_randomization(true)
     , do_exact_time_calculation(true)
     , scattering_model(ScatteringFactory::Moliere)
@@ -404,7 +405,7 @@ double Sector::Propagate(double distance)
             // Output::getInstance().FillSecondaryVector(& secondary_id, energy_loss, 0);
         } else
         {
-            decay_products = particle_.GetDecayTable().SelectChannel().Decay(&particle_);
+            decay_products = particle_.GetDecayTable().SelectChannel().Decay(particle_);
             Output::getInstance().FillSecondaryVector(decay_products);
 
             // TODO(mario): Delete decay products Tue 2017/08/22
@@ -426,47 +427,11 @@ double Sector::Propagate(double distance)
         initial_energy = final_energy;
     }
 
-    // if(stopping_decay_)
-    // {
-    //     if(propagated_distance!=distance && final_energy!=0 && particle_->GetLifetime()>=0)
-    //     {
-    //         particle_->SetEnergy(particle_->GetMass());
-    //
-    //         double t    =   particle_->GetTime() -particle_->GetLifetime()*log(RandomDouble());
-    //         double product_energy   =   0;
-    //
-    //         pair<double, ParticleType::Enum> decay_to_store;
-    //         secondary_id    =   particle_->GetParticleId() + 1;
-    //
-    //         particle_->SetTime( t );
-    //
-    //         if(particle_->GetType()==2)
-    //         {
-    //             // --------------------------------------------------------------------- //
-    //             // Calculate random numbers before passing to a fuction, because
-    //             // the order of argument evaluation is unspecified in c++ standards and
-    //             // therfor depend on the compiler.
-    //             // --------------------------------------------------------------------- //
-    //
-    //             double rnd1 = RandomDouble();
-    //             double rnd2 = RandomDouble();
-    //
-    //             product_energy  =   current_collection_->GetDecay()->CalculateProductEnergy(rnd1, 0.5, rnd2);
-    //         }
-    //         else
-    //         {
-    //             product_energy  =   current_collection_->GetDecay()->CalculateProductEnergy(RandomDouble(), 0.5,
-    //             0.5);
-    //         }
-    //
-    //         decay_to_store.first    =   product_energy;
-    //         decay_to_store.second   =   current_collection_->GetDecay()->GetOut();
-    //
-    //         final_energy  =   0;
-    //
-    //         Output::getInstance().FillSecondaryVector(particle_,secondary_id, decay_to_store, final_energy);
-    //     }
-    // }
+    if(sector_def_.stopping_decay)
+    {
+        decay_products = particle_.GetDecayTable().SelectChannel().Decay(particle_);
+        Output::getInstance().FillSecondaryVector(decay_products);
+    }
 
     particle_.SetEnergy(final_energy);
 
