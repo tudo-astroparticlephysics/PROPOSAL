@@ -224,6 +224,19 @@ PARTICLE_DEF(P0)
 PARTICLE_DEF(PiMinus)
 PARTICLE_DEF(PiPlus)
 
+
+// ----------------------------------------------------------------------------
+/// @brief Particle definition of K0
+///
+/// K0 is defined with a liftime of -1, meaning stable.
+/// The reason is, that PROPOSAL uses this particle soly as
+/// return value from decays and does therefore not decide between
+/// K short and K long.
+///
+/// Used to construct Particles
+// ----------------------------------------------------------------------------
+PARTICLE_DEF(K0)
+
 PARTICLE_DEF(KMinus)
 PARTICLE_DEF(KPlus)
 
