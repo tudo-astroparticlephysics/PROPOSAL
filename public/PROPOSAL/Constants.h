@@ -57,6 +57,7 @@ namespace PROPOSAL
     extern const double MPI0; // pion 0 mass (MeV)
     extern const double LPI0; // pion 0 lifetime (sec)
 
+    extern const double MKAON0; // uncharged kaon mass (MeV)
     extern const double MKAON; // charged kaon mass (MeV)
     extern const double LKAON; // charged kaon lifetime (sec)
 

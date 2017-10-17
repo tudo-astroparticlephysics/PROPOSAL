@@ -50,6 +50,7 @@ TEST(Comparison , Comparison_not_equal ) {
     C->SetPosition(position);
     C->SetDirection(direction);
     Particle* D = new Particle(TauMinusDef::Get());
+
     D->SetPosition(position);
     D->SetDirection(direction);
     D->SetEnergy(1e6);

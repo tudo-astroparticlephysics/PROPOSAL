@@ -7,24 +7,27 @@
 
 using namespace PROPOSAL;
 
+ParticleDef mu = MuMinusDef::Get();
+ParticleDef tau = TauMinusDef::Get();
+
 TEST(Comparison , Comparison_equal ) {
-    LeptonicDecayChannel A;
-    LeptonicDecayChannel B;
+    LeptonicDecayChannel A(EMinusDef::Get(), NuEDef::Get(), NuEBarDef::Get());
+    LeptonicDecayChannel B(EMinusDef::Get(), NuEDef::Get(), NuEBarDef::Get());
     EXPECT_TRUE(A==B);
 
-    TwoBodyPhaseSpace C(1, 2);
-    TwoBodyPhaseSpace D(1, 2);
+    TwoBodyPhaseSpace C(mu, tau);
+    TwoBodyPhaseSpace D(mu, tau);
     EXPECT_TRUE(C==D);
 
-    DecayChannel* E = new LeptonicDecayChannel();
-    DecayChannel* F = new LeptonicDecayChannel();
+    DecayChannel* E = new LeptonicDecayChannel(EMinusDef::Get(), NuEDef::Get(), NuEBarDef::Get());
+    DecayChannel* F = new LeptonicDecayChannel(EMinusDef::Get(), NuEDef::Get(), NuEBarDef::Get());
 
     EXPECT_TRUE(*E==*F);
     delete E;
     delete F;
 
-    E = new TwoBodyPhaseSpace(1, 2);
-    F = new TwoBodyPhaseSpace(1, 2);
+    E = new TwoBodyPhaseSpace(mu, tau);
+    F = new TwoBodyPhaseSpace(mu, tau);
 
     EXPECT_TRUE(*E==*F);
     delete E;
@@ -32,19 +35,19 @@ TEST(Comparison , Comparison_equal ) {
 }
 
 TEST(Comparison , Comparison_not_equal ) {
-    LeptonicDecayChannel A;
-    TwoBodyPhaseSpace B(1, 2);
+    LeptonicDecayChannel A(EMinusDef::Get(), NuEDef::Get(), NuEBarDef::Get());
+    TwoBodyPhaseSpace B(mu, tau);
     EXPECT_TRUE(A!=B);
 
-    DecayChannel* E = new LeptonicDecayChannel();
-    DecayChannel* F = new TwoBodyPhaseSpace(1, 2);
+    DecayChannel* E = new LeptonicDecayChannel(EMinusDef::Get(), NuEDef::Get(), NuEBarDef::Get());
+    DecayChannel* F = new TwoBodyPhaseSpace(mu, tau);
 
     EXPECT_TRUE(*E!=*F);
     delete E;
     delete F;
 
-    E = new TwoBodyPhaseSpace(1, 4);
-    F = new TwoBodyPhaseSpace(1, 2);
+    E = new TwoBodyPhaseSpace(mu, mu);
+    F = new TwoBodyPhaseSpace(mu, tau);
 
     EXPECT_TRUE(*E!=*F);
     delete E;
@@ -52,14 +55,14 @@ TEST(Comparison , Comparison_not_equal ) {
 }
 
 TEST(Assignment , Copyconstructor ) {
-    LeptonicDecayChannel A;
+    LeptonicDecayChannel A(EMinusDef::Get(), NuEDef::Get(), NuEBarDef::Get());
     DecayChannel* B = A.clone();
 
     EXPECT_TRUE(A==*B);
 
     delete B;
 
-    DecayChannel* C = new LeptonicDecayChannel();
+    DecayChannel* C = new LeptonicDecayChannel(EMinusDef::Get(), NuEDef::Get(), NuEBarDef::Get());
     DecayChannel* D = C->clone();
 
     EXPECT_TRUE(*C==*D);
@@ -67,14 +70,14 @@ TEST(Assignment , Copyconstructor ) {
     delete C;
     delete D;
 
-    TwoBodyPhaseSpace E(1, 2);
+    TwoBodyPhaseSpace E(mu, tau);
     DecayChannel* F = E.clone();
 
     EXPECT_TRUE(E==*F);
 
     delete F;
 
-    DecayChannel* G = new TwoBodyPhaseSpace(1, 2);
+    DecayChannel* G = new TwoBodyPhaseSpace(mu, tau);
     DecayChannel* H = G->clone();
 
     EXPECT_TRUE(*G==*H);

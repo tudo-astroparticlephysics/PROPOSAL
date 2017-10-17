@@ -21,7 +21,7 @@ TEST(Propagation , Test_nan) {
     Particle mu(MuMinusDef::Get());
     Particle tau(TauMinusDef::Get());
 
-    // One Propagator for each particle definition
+    // one propagator for each particle definition
     // medium/detector configuration
     Propagator prop_mu(mu.GetParticleDef(), "../src/resources/config_ice.json");
     Propagator prop_tau(tau.GetParticleDef(), "../src/resources/config_ice.json");
