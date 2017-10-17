@@ -17,8 +17,8 @@ TEST(Comparison , Comparison_equal ) {
     DecayTable B;
     EXPECT_TRUE(A==B);
 
-    LeptonicDecayChannel x;
-    LeptonicDecayChannel y;
+    LeptonicDecayChannel x(EMinusDef::Get(), NuEDef::Get(), NuEBarDef::Get());
+    LeptonicDecayChannel y(EMinusDef::Get(), NuEDef::Get(), NuEBarDef::Get());
     TwoBodyPhaseSpace z(mu, tau);
 
     A.addChannel(0.5, x);
@@ -39,8 +39,8 @@ TEST(Comparison , Comparison_not_equal ) {
     DecayTable B;
     EXPECT_TRUE(A==B);
 
-    LeptonicDecayChannel x;
-    LeptonicDecayChannel y;
+    LeptonicDecayChannel x(EMinusDef::Get(), NuEDef::Get(), NuEBarDef::Get());
+    LeptonicDecayChannel y(EMinusDef::Get(), NuEDef::Get(), NuEBarDef::Get());
     TwoBodyPhaseSpace z(mu, tau);
     TwoBodyPhaseSpace u(mu, mu);
 
@@ -77,7 +77,7 @@ TEST(Assignment , Operator ) {
     DecayTable A;
     DecayTable B;
 
-    LeptonicDecayChannel x;
+    LeptonicDecayChannel x(EMinusDef::Get(), NuEDef::Get(), NuEBarDef::Get());
     TwoBodyPhaseSpace y(mu, tau);
 
     A.addChannel(1.0, x);
@@ -102,7 +102,7 @@ TEST(Assignment , Swap ) {
     DecayTable B;
     EXPECT_TRUE(A==B);
 
-    LeptonicDecayChannel x;
+    LeptonicDecayChannel x(EMinusDef::Get(), NuEDef::Get(), NuEBarDef::Get());
     TwoBodyPhaseSpace y(mu, tau);
 
     A.addChannel(1.0, x);
@@ -122,7 +122,7 @@ TEST(SelectChannel , Muon ) {
     Particle muon;
     DecayChannel& dc_muon = muon.GetDecayTable().SelectChannel();
 
-    LeptonicDecayChannel leptonic_channel;
+    LeptonicDecayChannel leptonic_channel(EMinusDef::Get(), NuEDef::Get(), NuEBarDef::Get());
 
     EXPECT_TRUE(dc_muon == leptonic_channel);
 }
