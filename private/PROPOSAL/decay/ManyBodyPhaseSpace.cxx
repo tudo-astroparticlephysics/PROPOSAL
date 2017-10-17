@@ -125,7 +125,8 @@ DecayChannel::DecayProducts ManyBodyPhaseSpace::Decay(Particle& particle)
 
         for (unsigned int s = 0; s < i; ++s)
         {
-            Boost(*products[s], products[i]->GetDirection(), beta);
+            // Boost in -p_i direction
+            Boost(*products[s], products[i]->GetDirection(), -beta);
         }
     }
 
