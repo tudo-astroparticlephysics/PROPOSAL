@@ -15,7 +15,7 @@ class Particle;
 class LeptonicDecayChannel : public DecayChannel
 {
     public:
-    LeptonicDecayChannel();
+    LeptonicDecayChannel(const ParticleDef&, const ParticleDef&, const ParticleDef&);
     LeptonicDecayChannel(const LeptonicDecayChannel& mode);
     virtual ~LeptonicDecayChannel();
     // No copy and assignemnt -> done by clone
@@ -45,9 +45,9 @@ class LeptonicDecayChannel : public DecayChannel
 
     double FindRootBoost(double min, double right_side);
 
-    // ParticleDef massive_lepton_;
-    // ParticleDef first_neutrino_;
-    // ParticleDef second_neutrino_;
+    ParticleDef massive_lepton_;
+    ParticleDef neutrino_;
+    ParticleDef anti_neutrino_;
 
     RootFinder root_finder_;
     static const std::string name_;
