@@ -9,14 +9,17 @@
 
 using namespace PROPOSAL;
 
+ParticleDef mu = MuMinusDef::Get();
+ParticleDef tau = TauMinusDef::Get();
+
 TEST(Comparison , Comparison_equal ) {
     DecayTable A;
     DecayTable B;
     EXPECT_TRUE(A==B);
 
-    LeptonicDecayChannel x;
-    LeptonicDecayChannel y;
-    TwoBodyPhaseSpace z(1, 2);
+    LeptonicDecayChannel x(EMinusDef::Get(), NuEDef::Get(), NuEBarDef::Get());
+    LeptonicDecayChannel y(EMinusDef::Get(), NuEDef::Get(), NuEBarDef::Get());
+    TwoBodyPhaseSpace z(mu, tau);
 
     A.addChannel(0.5, x);
     B.addChannel(0.5, x);
@@ -36,10 +39,10 @@ TEST(Comparison , Comparison_not_equal ) {
     DecayTable B;
     EXPECT_TRUE(A==B);
 
-    LeptonicDecayChannel x;
-    LeptonicDecayChannel y;
-    TwoBodyPhaseSpace z(1, 2);
-    TwoBodyPhaseSpace u(2, 2);
+    LeptonicDecayChannel x(EMinusDef::Get(), NuEDef::Get(), NuEBarDef::Get());
+    LeptonicDecayChannel y(EMinusDef::Get(), NuEDef::Get(), NuEBarDef::Get());
+    TwoBodyPhaseSpace z(mu, tau);
+    TwoBodyPhaseSpace u(mu, mu);
 
     A.addChannel(0.5, x);
     EXPECT_TRUE(A!=B);
@@ -74,8 +77,8 @@ TEST(Assignment , Operator ) {
     DecayTable A;
     DecayTable B;
 
-    LeptonicDecayChannel x;
-    TwoBodyPhaseSpace y(1, 2);
+    LeptonicDecayChannel x(EMinusDef::Get(), NuEDef::Get(), NuEBarDef::Get());
+    TwoBodyPhaseSpace y(mu, tau);
 
     A.addChannel(1.0, x);
 
@@ -99,8 +102,8 @@ TEST(Assignment , Swap ) {
     DecayTable B;
     EXPECT_TRUE(A==B);
 
-    LeptonicDecayChannel x;
-    TwoBodyPhaseSpace y(1, 2);
+    LeptonicDecayChannel x(EMinusDef::Get(), NuEDef::Get(), NuEBarDef::Get());
+    TwoBodyPhaseSpace y(mu, tau);
 
     A.addChannel(1.0, x);
     A.addChannel(1.0, y);
@@ -108,7 +111,7 @@ TEST(Assignment , Swap ) {
     DecayTable C = A;
     DecayTable D = B;
 
-    B.swap(A);
+    swap(B, A);
     EXPECT_TRUE(C==B);
     EXPECT_TRUE(D==A);
 }
@@ -119,7 +122,7 @@ TEST(SelectChannel , Muon ) {
     Particle muon;
     DecayChannel& dc_muon = muon.GetDecayTable().SelectChannel();
 
-    LeptonicDecayChannel leptonic_channel;
+    LeptonicDecayChannel leptonic_channel(EMinusDef::Get(), NuEDef::Get(), NuEBarDef::Get());
 
     EXPECT_TRUE(dc_muon == leptonic_channel);
 }

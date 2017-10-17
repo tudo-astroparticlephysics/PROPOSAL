@@ -29,7 +29,7 @@
         private:                                                                                                       \
         cls##Def();                                                                                                    \
         ~cls##Def();                                                                                                   \
-    };
+};
 
 namespace PROPOSAL {
 
@@ -62,6 +62,15 @@ extern const VecType MuonTable;
 // ----------------------------------------------------------------------------
 extern const VecType TauTable;
 
+// ----------------------------------------------------------------------------
+/// @brief Table used for photonuclear interaction
+///
+/// Used in parametrizations with real photon assumption.
+/// This table is empty and indicates to do no hardbb calculations.
+///
+// ----------------------------------------------------------------------------
+extern const VecType EmptyTable;
+
 } // namespace HardBBTable
 
 // ----------------------------------------------------------------------------
@@ -71,26 +80,30 @@ extern const VecType TauTable;
 // ----------------------------------------------------------------------------
 struct ParticleDef
 {
-    std::string name;
-    double mass;
-    double low;       //!< energy below which the particle is lost [MeV]
-    double lifetime;
-    double charge;
-    const HardBBTables::VecType* hardbb_table;
-    DecayTable decay_table;
+    class Builder;
+
+    const std::string name;
+    const double mass;
+    const double low;       //!< energy below which the particle is lost [MeV]
+    const double lifetime;
+    const double charge;
+    const HardBBTables::VecType& hardbb_table;
+    const DecayTable decay_table;
 
     ParticleDef();
     ParticleDef(std::string name,
                 double mass,
+                double low,
                 double lifetime,
                 double charge,
-                const HardBBTables::VecType* table = NULL);
+                const HardBBTables::VecType& table,
+                const DecayTable&);
 
     ParticleDef(const ParticleDef&);
     virtual ~ParticleDef();
 
-    ParticleDef& operator=(const ParticleDef&);
-    void swap(ParticleDef&);
+    // ParticleDef& operator=(const ParticleDef&);
+    // void swap(ParticleDef&);
 
     bool operator==(const ParticleDef&) const;
     bool operator!=(const ParticleDef&) const;
@@ -98,6 +111,91 @@ struct ParticleDef
     friend std::ostream& operator<<(std::ostream&, ParticleDef const&);
 };
 
+class ParticleDef::Builder
+{
+    public:
+    // default values for variables
+    static const std::string default_name;
+    static const double default_mass;
+    static const double default_low;
+    static const double default_lifetime;
+    static const double default_charge;
+    static const HardBBTables::VecType* default_hardbb_table;
+    // static const DecayTable default_decay_table;
+
+    Builder();
+
+    // --------------------------------------------------------------------- //
+    // Setter
+    // --------------------------------------------------------------------- //
+
+    Builder& SetName(const std::string var)
+    {
+        name = var;
+        return *this;
+    }
+    Builder& SetMass(const double var)
+    {
+        mass = var;
+        return *this;
+    }
+    Builder& SetLow(const double var)
+    {
+        low = var;
+        return *this;
+    }
+    Builder& SetLifetime(const double var)
+    {
+        lifetime = var;
+        return *this;
+    }
+    Builder& SetCharge(const double var)
+    {
+        charge = var;
+        return *this;
+    }
+    Builder& SetHardBBTable(const HardBBTables::VecType& var)
+    {
+        hardbb_table = &var;
+        return *this;
+    }
+    Builder& SetDecayTable(const DecayTable& var)
+    {
+        decay_table = var;
+        return *this;
+    }
+    Builder& SetParticleDef(const ParticleDef& var)
+    {
+        name = var.name;
+        mass = var.mass;
+        low = var.low;
+        lifetime = var.lifetime;
+        charge = var.charge;
+        hardbb_table = &var.hardbb_table;
+        decay_table = var.decay_table;
+        return *this;
+    }
+
+    ParticleDef build()
+    {
+
+        if (low < mass)
+        {
+            low = mass;
+        }
+
+        return ParticleDef(name, mass, low, lifetime, charge, *hardbb_table, decay_table);
+    }
+
+    private:
+    std::string name;
+    double mass;
+    double low;
+    double lifetime;
+    double charge;
+    const HardBBTables::VecType* hardbb_table;
+    DecayTable decay_table;
+};
 
 // ----------------------------------------------------------------------------
 /// @brief Used to hash ParticleDefs in PropagatorService hash table
@@ -107,9 +205,8 @@ struct ParticleDef
 std::size_t hash_value(ParticleDef const& particle_def);
 
 // ------------------------------------------------------------------------- //
-// Create default particle definitions
+// Predefined particle definitions
 // ------------------------------------------------------------------------- //
-
 
 PARTICLE_DEF(MuMinus)
 PARTICLE_DEF(MuPlus)
@@ -127,6 +224,19 @@ PARTICLE_DEF(P0)
 PARTICLE_DEF(PiMinus)
 PARTICLE_DEF(PiPlus)
 
+
+// ----------------------------------------------------------------------------
+/// @brief Particle definition of K0
+///
+/// K0 is defined with a liftime of -1, meaning stable.
+/// The reason is, that PROPOSAL uses this particle soly as
+/// return value from decays and does therefore not decide between
+/// K short and K long.
+///
+/// Used to construct Particles
+// ----------------------------------------------------------------------------
+PARTICLE_DEF(K0)
+
 PARTICLE_DEF(KMinus)
 PARTICLE_DEF(KPlus)
 
@@ -142,17 +252,10 @@ PARTICLE_DEF(NuMuBar)
 PARTICLE_DEF(NuTau)
 PARTICLE_DEF(NuTauBar)
 
-PARTICLE_DEF(DeltaE)
-PARTICLE_DEF(Brems)
-PARTICLE_DEF(NuclInt)
-PARTICLE_DEF(Hadrons)
-PARTICLE_DEF(Epair)
-PARTICLE_DEF(Mupair)
-
-PARTICLE_DEF(ContinuousEnergyLoss)
 PARTICLE_DEF(Monopole)
 PARTICLE_DEF(Gamma)
 PARTICLE_DEF(StableMassiveParticle)
 
-#undef PARTICLE_DEF
 } // namespace PROPOSAL
+
+#undef PARTICLE_DEF
