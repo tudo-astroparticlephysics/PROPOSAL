@@ -17,10 +17,10 @@ BremsstrahlungFactory::BremsstrahlungFactory()
 {
     // Register all bremsstrahlung parametrizations in lower case!
 
-    Register("petrukhinshestakov", PetrukhinShestakov, &BremsPetrukhinShestakov::create);
-    Register("kelnerkokoulinpetrukhin", KelnerKokoulinPetrukhin, &BremsKelnerKokoulinPetrukhin::create);
-    Register("completescreening", CompleteScreening, &BremsCompleteScreening::create);
-    Register("andreevbezrukovbugaev", AndreevBezrukovBugaev, &BremsAndreevBezrukovBugaev::create);
+    Register("petrukhin-shestakov", PetrukhinShestakov, &BremsPetrukhinShestakov::create);
+    Register("kelner-kokoulin-petrukhin", KelnerKokoulinPetrukhin, &BremsKelnerKokoulinPetrukhin::create);
+    Register("complete-screening", CompleteScreening, &BremsCompleteScreening::create);
+    Register("andreev-bezrukov-bugaev", AndreevBezrukovBugaev, &BremsAndreevBezrukovBugaev::create);
 }
 
 BremsstrahlungFactory::~BremsstrahlungFactory()
