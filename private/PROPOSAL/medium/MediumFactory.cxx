@@ -8,6 +8,9 @@
 using namespace PROPOSAL;
 
 MediumFactory::MediumFactory()
+    : medium_map_str()
+    , medium_map_enum()
+    , string_enum_()
 {
     // Register all media in lower case!
 
@@ -29,12 +32,14 @@ MediumFactory::~MediumFactory()
 {
     medium_map_str.clear();
     medium_map_enum.clear();
+    string_enum_.clear();
 }
 
-void MediumFactory::Register(const std::string& name, const Enum& num, RegisterFunction create)
+void MediumFactory::Register(const std::string& name, const Enum& enum_t, RegisterFunction create)
 {
     medium_map_str[name] = create;
-    medium_map_enum[num] = create;
+    medium_map_enum[enum_t] = create;
+    string_enum_.insert(BimapStringEnum::value_type(name, enum_t));
 }
 
 // ------------------------------------------------------------------------- //
@@ -78,5 +83,33 @@ Medium* MediumFactory::CreateMedium(Definition def)
     } else
     {
         log_fatal("Medium %s not registerd!", typeid(def.type).name());
+    }
+}
+
+// ------------------------------------------------------------------------- //
+MediumFactory::Enum MediumFactory::GetEnumFromString(const std::string& name)
+{
+    std::string name_lower = boost::algorithm::to_lower_copy(name);
+
+    BimapStringEnum::left_const_iterator it = string_enum_.left.find(name_lower);
+    if (it != string_enum_.left.end())
+    {
+        return it->second;
+    } else
+    {
+        log_fatal("Medium %s not registerd!", name.c_str());
+    }
+}
+
+// ------------------------------------------------------------------------- //
+std::string MediumFactory::GetStringFromEnum(const MediumFactory::Enum& enum_t)
+{
+    BimapStringEnum::right_const_iterator it = string_enum_.right.find(enum_t);
+    if (it != string_enum_.right.end())
+    {
+        return it->second;
+    } else
+    {
+        log_fatal("Medium %s not registerd!", typeid(enum_t).name());
     }
 }
