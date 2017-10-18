@@ -122,7 +122,7 @@ TEST(SelectChannel , Muon ) {
     Particle muon;
     DecayChannel& dc_muon = muon.GetDecayTable().SelectChannel();
 
-    LeptonicDecayChannel leptonic_channel(EMinusDef::Get(), NuEDef::Get(), NuEBarDef::Get());
+    LeptonicDecayChannel leptonic_channel(EMinusDef::Get(), NuMuDef::Get(), NuEBarDef::Get());
 
     EXPECT_TRUE(dc_muon == leptonic_channel);
 }
