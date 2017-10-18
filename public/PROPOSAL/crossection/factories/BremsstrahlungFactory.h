@@ -2,6 +2,7 @@
 #pragma once
 
 #include <boost/function.hpp>
+#include <boost/bimap.hpp>
 
 #include <map>
 #include <string>
@@ -56,7 +57,7 @@ class BremsstrahlungFactory
 
     typedef std::map<std::string, RegisterFunction > BremsstrahlungMapString;
     typedef std::map<Enum, RegisterFunction > BremsstrahlungMapEnum;
-    typedef std::map<std::string, Enum> MapStringToEnum;
+    typedef boost::bimap<std::string, Enum> BimapStringEnum;
 
     // --------------------------------------------------------------------- //
     // Create functions
@@ -113,9 +114,14 @@ class BremsstrahlungFactory
                                        InterpolationDef = InterpolationDef()) const;
 
     // ----------------------------------------------------------------------------
-    /// @brief Enum string conversation
+    /// @brief string to enum conversation for photo parametrizations
     // ----------------------------------------------------------------------------
     Enum GetEnumFromString(const std::string&);
+
+    // ----------------------------------------------------------------------------
+    /// @brief enum to string conversation for photo parametrizations
+    // ----------------------------------------------------------------------------
+    std::string GetStringFromEnum(const Enum&);
 
 
     // ----------------------------------------------------------------------------
@@ -144,7 +150,7 @@ class BremsstrahlungFactory
 
     BremsstrahlungMapString bremsstrahlung_map_str_;
     BremsstrahlungMapEnum bremsstrahlung_map_enum_;
-    MapStringToEnum map_string_to_enum;
+    BimapStringEnum string_enum_;
 };
 
 } /*  PROPOSAL */
