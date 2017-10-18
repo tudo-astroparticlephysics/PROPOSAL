@@ -493,14 +493,16 @@ void export_photo()
 
     // Shadow Effect
     class_<ShadowEffect, boost::shared_ptr<ShadowEffect>, bases<Parametrization>, boost::noncopyable>("ShadowEffect", no_init)
-        .def("calculate_shadow_effect", &ShadowEffect::CalculateShadowEffect);
+        .def("calculate_shadow_effect", &ShadowEffect::CalculateShadowEffect)
+        .add_property("name", make_function(&ShadowEffect::GetName, return_value_policy<copy_const_reference>()));
 
     class_<ShadowDutta, boost::shared_ptr<ShadowDutta>, bases<ShadowEffect> >("ShadowDutta", init<>());
     class_<ShadowButkevichMikhailov, boost::shared_ptr<ShadowButkevichMikhailov>, bases<ShadowEffect> >("ShadowButkevichMikhailov", init<>());
 
     // Real Photon
     class_<RealPhoton, boost::shared_ptr<RealPhoton>, boost::noncopyable>("RealPhoton", no_init)
-        .def("calculate_hardbb", &RealPhoton::CalculateHardBB);
+        .def("calculate_hardbb", &RealPhoton::CalculateHardBB)
+        .add_property("name", make_function(&RealPhoton::GetName, return_value_policy<copy_const_reference>()));
 
     class_<SoftBB, boost::shared_ptr<SoftBB>, bases<RealPhoton> >("SoftBB", init<>());
     class_<HardBB, boost::shared_ptr<HardBB>, bases<RealPhoton> >("HardBB", init<const ParticleDef&>((arg("particle_def"))));
