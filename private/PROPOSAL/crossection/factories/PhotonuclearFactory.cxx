@@ -26,26 +26,26 @@ PhotonuclearFactory::PhotonuclearFactory()
     // Register all photonuclear parametrizations in lower case!
 
     RegisterShadowEffect("dutta", ShadowDutta, &ShadowDutta::create);
-    RegisterShadowEffect("butkevichmikhailov", ShadowButkevichMikhailov, &ShadowButkevichMikhailov::create);
+    RegisterShadowEffect("butkevich-mikhailov", ShadowButkevichMikhailov, &ShadowButkevichMikhailov::create);
 
     RegisterRealPhoton("zeus", Zeus, &PhotoZeus::create);
-    RegisterRealPhoton("bezrukovbugaev", BezrukovBugaev, &PhotoBezrukovBugaev::create);
+    RegisterRealPhoton("bezrukov-bugaev", BezrukovBugaev, &PhotoBezrukovBugaev::create);
     RegisterRealPhoton("rhode", Rhode, &PhotoRhode::create);
     RegisterRealPhoton("kokoulin", Kokoulin, &PhotoKokoulin::create);
 
-    RegisterQ2("abramowiczlevinlevymaor91",
+    RegisterQ2("allm91",
              AbramowiczLevinLevyMaor91,
              std::make_pair(&PhotoAbramowiczLevinLevyMaor91::create,
                             &PhotoQ2Interpolant<PhotoAbramowiczLevinLevyMaor91>::create));
-    RegisterQ2("abramowiczlevinlevymaor97",
+    RegisterQ2("allm97",
              AbramowiczLevinLevyMaor97,
              std::make_pair(&PhotoAbramowiczLevinLevyMaor97::create,
                             &PhotoQ2Interpolant<PhotoAbramowiczLevinLevyMaor97>::create));
-    RegisterQ2("butkevichmikhailov",
+    RegisterQ2("butkevich-mikhailov",
              ButkevichMikhailov,
              std::make_pair(&PhotoButkevichMikhailov::create,
                             &PhotoQ2Interpolant<PhotoButkevichMikhailov>::create));
-    RegisterQ2("renosarcevicsu",
+    RegisterQ2("reno-sarcevic-su",
              RenoSarcevicSu,
              std::make_pair(&PhotoRenoSarcevicSu::create,
                             &PhotoQ2Interpolant<PhotoRenoSarcevicSu>::create));

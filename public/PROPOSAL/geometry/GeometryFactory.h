@@ -3,6 +3,7 @@
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/function.hpp>
+#include <map>
 
 #include "PROPOSAL/geometry/Geometry.h"
 
