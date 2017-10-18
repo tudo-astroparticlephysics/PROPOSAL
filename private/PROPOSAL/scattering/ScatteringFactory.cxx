@@ -19,10 +19,10 @@ ScatteringFactory::ScatteringFactory()
     , registerd_str()
     , string_enum_()
 {
-    Register("default", Default);
+    Register("highland-integral", Default);
     Register("moliere", Moliere);
     Register("highland", Highland);
-    Register("noScattering", NoScattering);
+    Register("no-scattering", NoScattering);
 }
 
 ScatteringFactory::~ScatteringFactory()

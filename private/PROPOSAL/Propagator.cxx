@@ -230,7 +230,7 @@ Propagator::Propagator(const ParticleDef& particle_def, const std::string& confi
     SetMember(shadow, "global.photo_shadow", pt_json);
     sec_def_global.utility_def.photo_def.shadow = PhotonuclearFactory::Get().GetShadowEnumFromString(shadow);
 
-    SetMember(sec_def_global.utility_def.photo_def.hardbb, "global.photo_hardbb", pt_json);
+    SetMember(sec_def_global.utility_def.photo_def.hardbb, "global.photo_hard_component", pt_json);
 
     // Read in all sector definitions
     boost::property_tree::ptree sectors = pt_json.get_child("sectors");

@@ -116,7 +116,7 @@ Geometry* GeometryFactory::CreateGeometry(boost::property_tree::ptree const& pt)
 
     if (PROPOSAL::Sphere* sphere = dynamic_cast<PROPOSAL::Sphere*>(geometry))
     {
-        double radius = pt.get<double>("radius");
+        double radius = pt.get<double>("outer_radius");
         double inner_radius = pt.get<double>("inner_radius");
 
         sphere->SetPosition(vec);
@@ -127,9 +127,9 @@ Geometry* GeometryFactory::CreateGeometry(boost::property_tree::ptree const& pt)
     }
     else if (PROPOSAL::Box* box = dynamic_cast<PROPOSAL::Box*>(geometry))
     {
-        double x = pt.get<double>("x");
-        double y = pt.get<double>("y");
-        double z = pt.get<double>("z");
+        double x = pt.get<double>("lenght");
+        double y = pt.get<double>("width");
+        double z = pt.get<double>("height");
 
         box->SetPosition(vec);
         box->SetX(x);
@@ -140,7 +140,7 @@ Geometry* GeometryFactory::CreateGeometry(boost::property_tree::ptree const& pt)
     }
     else if (PROPOSAL::Cylinder* cylinder = dynamic_cast<PROPOSAL::Cylinder*>(geometry))
     {
-        double radius = pt.get<double>("radius");
+        double radius = pt.get<double>("outer_radius");
         double inner_radius = pt.get<double>("inner_radius");
         double z = pt.get<double>("z");
 
