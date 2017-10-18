@@ -15,17 +15,19 @@
 
 #include "PROPOSAL/Propagator.h"
 #include "PROPOSAL/medium/Medium.h"
+
 #include "PROPOSAL/geometry/Sphere.h"
+#include "PROPOSAL/geometry/Box.h"
+#include "PROPOSAL/geometry/Cylinder.h"
+
 #include "PROPOSAL/Constants.h"
 
 using namespace std;
 using namespace PROPOSAL;
 
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-//-------------------------public member functions----------------------------//
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
+// ------------------------------------------------------------------------- //
+// Global defaults
+// ------------------------------------------------------------------------- //
 
 const double Propagator::global_ecut_inside_ = 500;
 const double Propagator::global_ecut_infront_ = -1;
@@ -155,7 +157,6 @@ Propagator::Propagator(const Propagator& propagator)
     }
 }
 
-
 // ------------------------------------------------------------------------- //
 Propagator::Propagator(const ParticleDef& particle_def, const std::string& config_file)
     : seed_(1)
@@ -201,7 +202,8 @@ Propagator::Propagator(const ParticleDef& particle_def, const std::string& confi
     SetMember(interpolation_def.raw, "global.raw", pt_json);
 
     // Read in the detector geometry
-    detector_ = GeometryFactory::Get().CreateGeometry(pt_json.get_child("detector"));
+    // detector_ = GeometryFactory::Get().CreateGeometry(pt_json.get_child("detector"));
+    detector_ = ParseGeometryConifg(pt_json.get_child("detector"));
 
     // Read in global sector definition
     SectorFactory::Definition sec_def_global;
@@ -248,7 +250,7 @@ Propagator::Propagator(const ParticleDef& particle_def, const std::string& confi
         Medium* med = MediumFactory::Get().CreateMedium(medium_name, medium_def.density_correction);
 
         // Create Geometry
-        Geometry* geometry = GeometryFactory::Get().CreateGeometry(it->second.get_child("geometry"));
+        Geometry* geometry = ParseGeometryConifg(subtree.get_child("geometry"));
 
         double hirarchy = geometry->GetHirarchy();
         SetMember(hirarchy, "hirarchy", subtree);
@@ -343,6 +345,45 @@ Propagator::~Propagator()
     sectors_.clear();
 
     delete detector_;
+}
+
+// ------------------------------------------------------------------------- //
+// Operators & swap
+// ------------------------------------------------------------------------- //
+
+// ------------------------------------------------------------------------- //
+Propagator& Propagator::operator=(const Propagator &propagator)
+{
+    if (this != &propagator)
+    {
+      Propagator tmp(propagator);
+      swap(tmp);
+    }
+    return *this;
+}
+
+// ------------------------------------------------------------------------- //
+bool Propagator::operator==(const Propagator &propagator) const
+{
+    if (seed_ != propagator.seed_)
+        return false;
+    return true;
+}
+
+
+// ------------------------------------------------------------------------- //
+bool Propagator::operator!=(const Propagator &propagator) const
+{
+    return !(*this == propagator);
+}
+
+
+// ------------------------------------------------------------------------- //
+void Propagator::swap(Propagator &propagator)
+{
+    using std::swap;
+
+    swap(seed_, propagator.seed_);
 }
 
 // ------------------------------------------------------------------------- //
@@ -457,7 +498,6 @@ std::vector<DynamicData*> Propagator::Propagate(double MaxDistance_cm)
 }
 
 // ------------------------------------------------------------------------- //
-
 void Propagator::ChooseCurrentCollection(const Vector3D& particle_position, const Vector3D& particle_direction)
 {
     vector<int> crossed_collections;
@@ -598,10 +638,7 @@ void Propagator::ChooseCurrentCollection(const Vector3D& particle_position, cons
     // }
 }
 
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
+// ------------------------------------------------------------------------- //
 double Propagator::CalculateEffectiveDistance(const Vector3D& particle_position, const Vector3D& particle_direction)
 {
     double distance_to_collection_border = 0;
@@ -704,231 +741,197 @@ double Propagator::CalculateEffectiveDistance(const Vector3D& particle_position,
     }
 }
 
+// ------------------------------------------------------------------------- //
+// Private member functions
+// ------------------------------------------------------------------------- //
 
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-//-------------------------operators and swap function------------------------//
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-Propagator& Propagator::operator=(const Propagator &propagator)
+// ------------------------------------------------------------------------- //
+Geometry* Propagator::ParseGeometryConifg(boost::property_tree::ptree& pt)
 {
-    if (this != &propagator)
+
+    std::string origin_str = "origin";
+    std::string outer_radius_str = "outer_radius";
+    std::string inner_radius_str = "inner_radius";
+    std::string lenght_str = "lenght";
+    std::string width_str = "width";
+    std::string height_str = "height";
+
+    std::string warning_str = "Geometry %s needs to specify \"%s\" in the config file!";
+
+    // --------------------------------------------------------------------- //
+    // Get geometry from default constructor
+    // --------------------------------------------------------------------- //
+
+    Geometry* geometry = NULL;
+
+    try
     {
-      Propagator tmp(propagator);
-      swap(tmp);
+        std::string name = pt.get<std::string>("shape");
+        geometry = GeometryFactory::Get().CreateGeometry(name);
     }
-    return *this;
+    catch(const std::exception& e)
+    {
+        log_fatal(warning_str.c_str(),  "", "shape");
+    }
+
+    // --------------------------------------------------------------------- //
+    // Get the position vector from the property tree
+    // --------------------------------------------------------------------- //
+
+    double x = 0;
+    double y = 0;
+    double z = 0;
+
+    try
+    {
+        boost::property_tree::ptree child = pt.get_child(origin_str);
+
+        if (child.size() != 3)
+        {
+            log_fatal("Cannot initialize Vector3D by Property Tree!");
+        }
+
+        int i = 0;
+        for(boost::property_tree::ptree::const_iterator it = child.begin(); it != child.end(); ++it)
+        {
+            double coord = it->second.get_value<double>();
+
+            switch (i)
+            {
+                case 0:
+                    x = coord;
+                    break;
+                case 1:
+                    y = coord;
+                    break;
+                case 2:
+                    z = coord;
+                    break;
+                default:
+                    // Do nothing
+                    break;
+            }
+            ++i;
+        }
+    }
+    catch(const std::exception& e)
+    {
+        log_fatal(warning_str.c_str(),  "", origin_str.c_str());
+    }
+
+    Vector3D vec(x, y, z);
+
+    // --------------------------------------------------------------------- //
+    // Check type of geometry and set members
+    // --------------------------------------------------------------------- //
+
+    if (PROPOSAL::Sphere* sphere = dynamic_cast<PROPOSAL::Sphere*>(geometry))
+    {
+        double radius, inner_radius;
+
+        try
+        {
+            radius = pt.get<double>(outer_radius_str);
+        }
+        catch(const std::exception& e)
+        {
+            log_fatal(warning_str.c_str(),  sphere->GetName().c_str(), outer_radius_str.c_str());
+        }
+
+        try
+        {
+            inner_radius = pt.get<double>(inner_radius_str);
+        }
+        catch(const std::exception& e)
+        {
+            log_fatal(warning_str.c_str(), sphere->GetName().c_str(), inner_radius_str.c_str());
+        }
+
+        sphere->SetPosition(vec);
+        sphere->SetRadius(radius);
+        sphere->SetInnerRadius(inner_radius);
+
+
+        return sphere;
+    }
+    else if (PROPOSAL::Box* box = dynamic_cast<PROPOSAL::Box*>(geometry))
+    {
+        double x, y, z;
+
+        try
+        {
+            x = pt.get<double>(lenght_str);
+        }
+        catch(const std::exception& e)
+        {
+            log_fatal(warning_str.c_str(), box->GetName().c_str(), lenght_str.c_str());
+        }
+
+        try
+        {
+            y = pt.get<double>(width_str);
+        }
+        catch(const std::exception& e)
+        {
+            log_fatal(warning_str.c_str(), box->GetName().c_str(), width_str.c_str());
+        }
+
+        try
+        {
+            z = pt.get<double>(height_str);
+        }
+        catch(const std::exception& e)
+        {
+            log_fatal(warning_str.c_str(), box->GetName().c_str(), height_str.c_str());
+        }
+
+        box->SetPosition(vec);
+        box->SetX(x);
+        box->SetY(y);
+        box->SetZ(z);
+
+        return box;
+    }
+    else if (PROPOSAL::Cylinder* cylinder = dynamic_cast<PROPOSAL::Cylinder*>(geometry))
+    {
+        double radius, inner_radius, z;
+
+        try
+        {
+            radius = pt.get<double>(outer_radius_str);
+        }
+        catch(const std::exception& e)
+        {
+            log_fatal(warning_str.c_str(), cylinder->GetName().c_str(), outer_radius_str.c_str());
+        }
+
+        try
+        {
+            inner_radius = pt.get<double>(inner_radius_str);
+        }
+        catch(const std::exception& e)
+        {
+            log_fatal(warning_str.c_str(), cylinder->GetName().c_str(), inner_radius_str.c_str());
+        }
+        try
+        {
+            z = pt.get<double>(height_str);
+        }
+        catch(const std::exception& e)
+        {
+            log_fatal(warning_str.c_str(), cylinder->GetName().c_str(), height_str.c_str());
+        }
+
+        cylinder->SetPosition(vec);
+        cylinder->SetRadius(radius);
+        cylinder->SetInnerRadius(inner_radius);
+        cylinder->SetZ(z);
+
+        return cylinder;
+    }
+    else
+    {
+        log_fatal("Dynamic casts of Geometries failed. Should not end here!");
+        return NULL;
+    }
 }
-
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-bool Propagator::operator==(const Propagator &propagator) const
-{
-    // if( particle_                 != propagator.particle_ )               return false;
-
-    if( seed_                     != propagator.seed_ )                   return false;
-    // if( brems_                    != propagator.brems_ )                  return false;
-    // if( photo_                    != propagator.photo_ )                  return false;
-    // if( lpm_                      != propagator.lpm_ )                    return false;
-    // if( stopping_decay_           != propagator.stopping_decay_ )         return false;
-    // if( do_exact_time_calculation_!= propagator.do_exact_time_calculation_ )return false;
-    // if( integrate_                != propagator.integrate_ )              return false;
-    // if( brems_multiplier_         != propagator.brems_multiplier_ )       return false;
-    // if( photo_multiplier_         != propagator.photo_multiplier_ )       return false;
-    // if( ioniz_multiplier_         != propagator.ioniz_multiplier_ )       return false;
-    // if( epair_multiplier_         != propagator.epair_multiplier_ )       return false;
-    // if( global_ecut_inside_       != propagator.global_ecut_inside_ )     return false;
-    // if( global_ecut_infront_      != propagator.global_ecut_infront_ )    return false;
-    // if( global_ecut_behind_       != propagator.global_ecut_behind_ )     return false;
-    // if( global_vcut_inside_       != propagator.global_vcut_inside_ )     return false;
-    // if( global_vcut_infront_      != propagator.global_vcut_infront_ )    return false;
-    // if( global_vcut_behind_       != propagator.global_vcut_behind_ )     return false;
-    // if( global_cont_inside_       != propagator.global_cont_inside_ )     return false;
-    // if( global_cont_infront_      != propagator.global_cont_infront_ )    return false;
-    // if( global_cont_behind_       != propagator.global_cont_behind_ )     return false;
-    // if( *current_sector_      != *propagator.current_sector_ )    return false;
-    // if( raw_                      != propagator.raw_ )                    return false;
-    //
-    // if( path_to_tables_.compare( propagator.path_to_tables_ )!=0 )        return false;
-
-    //else
-    return true;
-}
-
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-bool Propagator::operator!=(const Propagator &propagator) const
-{
-    return !(*this == propagator);
-}
-
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-void Propagator::swap(Propagator &propagator)
-{
-    using std::swap;
-
-    swap( seed_                     ,   propagator.seed_ );
-    // swap( brems_                    ,   propagator.brems_ );
-    // swap( photo_                    ,   propagator.photo_ );
-    // swap( lpm_                      ,   propagator.lpm_ );
-    // swap( stopping_decay_           ,   propagator.stopping_decay_ );
-    // swap( do_exact_time_calculation_,   propagator.do_exact_time_calculation_ );
-    // swap( integrate_                ,   propagator.integrate_ );
-    // swap( brems_multiplier_         ,   propagator.brems_multiplier_ );
-    // swap( photo_multiplier_         ,   propagator.photo_multiplier_ );
-    // swap( ioniz_multiplier_         ,   propagator.ioniz_multiplier_ );
-    // swap( epair_multiplier_         ,   propagator.epair_multiplier_ );
-    // swap( global_ecut_inside_       ,   propagator.global_ecut_inside_ );
-    // swap( global_ecut_infront_      ,   propagator.global_ecut_infront_ );
-    // swap( global_ecut_behind_       ,   propagator.global_ecut_behind_ );
-    // swap( global_vcut_inside_       ,   propagator.global_vcut_inside_ );
-    // swap( global_vcut_infront_      ,   propagator.global_vcut_infront_ );
-    // swap( global_vcut_behind_       ,   propagator.global_vcut_behind_ );
-    // swap( global_cont_inside_       ,   propagator.global_cont_inside_ );
-    // swap( global_cont_infront_      ,   propagator.global_cont_infront_ );
-    // swap( global_cont_behind_       ,   propagator.global_cont_behind_ );
-    // swap( raw_                      ,   propagator.raw_ );
-    //
-    // path_to_tables_.swap( propagator.path_to_tables_ );
-
-    // particle_->swap( *propagator.particle_ );
-    // backup_particle_->swap( *propagator.backup_particle_ );
-
-    // current_sector_->swap( *propagator.current_sector_ );
-}
-
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-//------------------------private member functions----------------------------//
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-// void Propagator::MoveParticle(double distance)
-// {
-//
-//     double dist = particle_->GetPropagatedDistance();
-//
-//     Vector3D position = particle_->GetPosition();
-//
-//     dist   +=  distance;
-//
-//     position = position + distance*particle_->GetDirection();
-//
-//     particle_->SetPosition(position);
-//
-//     particle_->SetPropagatedDistance(dist);
-//
-// }
-
-
-// void Propagator::InitDefaultCollection()
-// {
-//     Medium* med             = new Ice();
-//     EnergyCutSettings* cuts = new EnergyCutSettings(500,0.05);
-//     current_sector_ = new CollectionInterpolant(Ice(), Sphere(Vector3D(), 1e18, 0), EnergyCutSettings(500, 0.05));
-//     current_sector_->SetGeometry(geom);
-// }
-
-
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-
-int Propagator::GetSeed() const
-{
-    return seed_;
-}
-
-void Propagator::SetSeed(int seed)
-{
-    seed_ = seed;
-}
-
-// ParametrizationType::Enum Propagator::GetBrems() const
-// {
-//     return brems_;
-// }
-//
-// void Propagator::SetBrems(ParametrizationType::Enum brems)
-// {
-//     brems_ = brems;
-// }
-//
-// ParametrizationType::Enum Propagator::GetPhoto() const
-// {
-//     return photo_;
-// }
-//
-// void Propagator::SetPhoto(ParametrizationType::Enum photo)
-// {
-//     photo_ = photo;
-// }
-
-// std::string Propagator::GetPath_to_tables() const
-// {
-//     return path_to_tables_;
-// }
-//
-// void Propagator::SetPath_to_tables(const std::string &path_to_tables)
-// {
-//     path_to_tables_ = path_to_tables;
-// }
-
-Geometry *Propagator::GetDetector() const
-{
-    return detector_;
-}
-
-Particle& Propagator::GetParticle()
-{
-    return particle_;
-}
-
-// void Propagator::SetDetector(Geometry *detector)
-// {
-//     detector_ = detector;
-// }
-
-// bool Propagator::GetStopping_decay() const
-// {
-//     return stopping_decay_;
-// }
-//
-// void Propagator::SetStopping_decay(bool stopping_decay)
-// {
-//     stopping_decay_ = stopping_decay;
-// }
-
-// void Propagator::RestoreBackup_particle()
-// {
-//     particle_ = new Particle(*backup_particle_);
-// }
-
-// void Propagator::ResetParticle()
-// {
-//     // particle_ = new Particle(*backup_particle_);
-//     *particle_ = *backup_particle_;
-// }
-
-
