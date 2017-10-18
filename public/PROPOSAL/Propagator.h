@@ -108,10 +108,10 @@ class Propagator
     //----------------------------------------------------------------------------//
     std::vector<Sector*> GetSectors() const { return sectors_; }
 
-    int GetSeed() const;
-    void SetSeed(int seed);
-    Geometry* GetDetector() const;
-    Particle& GetParticle();
+    int GetSeed() const { return seed_; };
+    void SetSeed(int seed) { seed_ = seed; };
+    Geometry& GetDetector() const { return *detector_; };
+    Particle& GetParticle() { return particle_; };
     // void SetDetector(Geometry *detector);
     // bool GetStopping_decay() const;
     // void SetStopping_decay(bool stopping_decay);
@@ -141,17 +141,16 @@ class Propagator
             ss << "Option " << option << " not set! Use default: " << var;
             log_warn("%s", ss.str().c_str());
         }
-        // try
-        // {
-        //     var = pt.get<T>(option);
-        // }
-        // catch(std::exception& ex)
-        // {
-        //     std::stringstream ss;
-        //     ss<<ex.what()<<"! Use default: "<<var;
-        //     log_warn("%s", ss.str().c_str());
-        // }
     }
+
+    // ----------------------------------------------------------------------------
+    /// @brief Create geometry from json config file
+    ///
+    /// @param pt boost property tree
+    ///
+    /// @return new Geometry
+    // ----------------------------------------------------------------------------
+    Geometry* ParseGeometryConifg(boost::property_tree::ptree& pt);
 
     // ----------------------------------------------------------------------------
     /// @brief Choose the current collection the particle is in.
