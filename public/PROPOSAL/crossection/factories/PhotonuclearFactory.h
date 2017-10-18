@@ -2,6 +2,7 @@
 #pragma once
 
 #include <boost/function.hpp>
+#include <boost/bimap.hpp>
 
 #include <map>
 #include <string>
@@ -88,7 +89,8 @@ class PhotonuclearFactory
     typedef std::map<std::string, std::pair<RegisterQ2Function, RegisterQ2FunctionInterpolant> > PhotoQ2MapString;
     typedef std::map<Enum, std::pair<RegisterQ2Function, RegisterQ2FunctionInterpolant> > PhotoQ2MapEnum;
 
-    typedef std::map<std::string, Enum> MapStringToEnum;
+    typedef boost::bimap<std::string, Enum> BimapStringEnum;
+    typedef boost::bimap<std::string, Shadow> BimapStringShadowEnum;
 
     // --------------------------------------------------------------------- //
     // Create functions
@@ -191,10 +193,24 @@ class PhotonuclearFactory
                                      InterpolationDef = InterpolationDef()) const;
 
     // ----------------------------------------------------------------------------
-    /// @brief Enum string conversation
+    /// @brief string to enum conversation for photo parametrizations
     // ----------------------------------------------------------------------------
     Enum GetEnumFromString(const std::string&);
 
+    // ----------------------------------------------------------------------------
+    /// @brief enum to string conversation for photo parametrizations
+    // ----------------------------------------------------------------------------
+    std::string GetStringFromEnum(const Enum&);
+
+    // ----------------------------------------------------------------------------
+    /// @brief Enum string conversation for shadow effect
+    // ----------------------------------------------------------------------------
+    Shadow GetShadowEnumFromString(const std::string&);
+
+    // ----------------------------------------------------------------------------
+    /// @brief enum to string conversation for shadow effect
+    // ----------------------------------------------------------------------------
+    std::string GetStringFromShadowEnum(const Shadow&);
 
     // ----------------------------------------------------------------------------
     /// @brief Register ShadowEffect used for Q2 integration parametrizations
@@ -246,7 +262,8 @@ class PhotonuclearFactory
     PhotoQ2MapString photo_q2_map_str_;
     PhotoQ2MapEnum photo_q2_map_enum_;
 
-    MapStringToEnum map_string_to_enum;
+    BimapStringEnum string_enum_;
+    BimapStringShadowEnum string_shadow_enum_;
 };
 
 } /*  PROPOSAL */

@@ -36,6 +36,7 @@ const double Propagator::global_vcut_behind_ = -1;
 const double Propagator::global_cont_inside_ = false;
 const double Propagator::global_cont_infront_ = true;
 const double Propagator::global_cont_behind_ = false;
+const bool Propagator::interpolate_ = true;  //!< Enable interpolation
 
 // ------------------------------------------------------------------------- //
 // Constructors & destructor
@@ -159,7 +160,6 @@ Propagator::Propagator(const Propagator& propagator)
 Propagator::Propagator(const ParticleDef& particle_def, const std::string& config_file)
     : seed_(1)
     , current_sector_(NULL)
-    // , particle_(particle_def)
     , particle_(particle_def)
     , detector_(NULL)
 {
@@ -175,22 +175,13 @@ Propagator::Propagator(const ParticleDef& particle_def, const std::string& confi
     bool global_cont_infront = global_cont_infront_;
     bool global_cont_behind  = global_cont_behind_;
 
-    //TODO(mario): Set to global options Sun 2017/09/24
-    int brems = static_cast<int>(BremsstrahlungFactory::KelnerKokoulinPetrukhin);
-    int photo = static_cast<int>(PhotonuclearFactory::AbramowiczLevinLevyMaor97);
-    //TODO(mario): add shadow Sun 2017/09/24
-    int photo_shadow = static_cast<int>(PhotonuclearFactory::ShadowButkevichMikhailov);
-    bool photo_hardbb = true;
-
-    bool interpolate = true;
-
-    std::string scattering = "moliere";
+    bool interpolate = interpolate_;
 
     // Create the json parser
     boost::property_tree::ptree pt_json;
     boost::property_tree::json_parser::read_json(config_file, pt_json);
 
-    // Read in global options
+    // Read in global cut and continous randomization options
     SetMember(seed_, "global.seed", pt_json);
     SetMember(global_ecut_inside, "global.ecut_inside", pt_json);
     SetMember(global_ecut_infront, "global.ecut_infront", pt_json);
@@ -202,20 +193,18 @@ Propagator::Propagator(const ParticleDef& particle_def, const std::string& confi
     SetMember(global_cont_infront, "global.cont_infront", pt_json);
     SetMember(global_cont_behind, "global.cont_behind", pt_json);
 
-    SetMember(brems, "global.brems", pt_json);
-    SetMember(photo, "global.photo", pt_json);
-    SetMember(photo_shadow, "global.photo_shadow", pt_json);
-    SetMember(photo_hardbb, "global.photo_hardbb", pt_json);
+    // Read in interpolation options
+    InterpolationDef interpolation_def;
 
     SetMember(interpolate, "global.interpolate", pt_json);
+    SetMember(interpolation_def.path_to_tables, "global.path_to_tables", pt_json);
+    SetMember(interpolation_def.raw, "global.raw", pt_json);
 
     // Read in the detector geometry
     detector_ = GeometryFactory::Get().CreateGeometry(pt_json.get_child("detector"));
 
     // Read in global sector definition
-    // SectorDef sec_def_global;
     SectorFactory::Definition sec_def_global;
-    InterpolationDef interpolation_def;
 
     SetMember(sec_def_global.utility_def.brems_def.multiplier, "global.brems_multiplier", pt_json);
     SetMember(sec_def_global.utility_def.photo_def.multiplier, "global.photo_multiplier", pt_json);
@@ -224,40 +213,56 @@ Propagator::Propagator(const ParticleDef& particle_def, const std::string& confi
     SetMember(sec_def_global.utility_def.epair_def.lpm_effect, "global.lpm", pt_json);
     SetMember(sec_def_global.utility_def.brems_def.lpm_effect, "global.lpm", pt_json);
     SetMember(sec_def_global.do_exact_time_calculation, "global.exact_time", pt_json);
-    SetMember(interpolation_def.path_to_tables, "global.path_to_tables", pt_json);
-    SetMember(interpolation_def.raw, "global.raw", pt_json);
 
-    sec_def_global.scattering_model = ScatteringFactory::Get().GetEnumFromString(pt_json.get<std::string>("global.scattering"));
-    sec_def_global.utility_def.brems_def.parametrization = static_cast<BremsstrahlungFactory::Enum>(brems);
-    sec_def_global.utility_def.photo_def.parametrization = static_cast<PhotonuclearFactory::Enum>(photo);
-    sec_def_global.utility_def.photo_def.shadow = static_cast<PhotonuclearFactory::Shadow>(photo_shadow);
-    sec_def_global.utility_def.photo_def.hardbb = photo_hardbb;
+    std::string scattering = ScatteringFactory::Get().GetStringFromEnum(sec_def_global.scattering_model);
+    SetMember(scattering, "global.scattering", pt_json);
+    sec_def_global.scattering_model = ScatteringFactory::Get().GetEnumFromString(scattering);
+
+    std::string brems = BremsstrahlungFactory::Get().GetStringFromEnum(sec_def_global.utility_def.brems_def.parametrization);
+    SetMember(brems, "global.brems", pt_json);
+    sec_def_global.utility_def.brems_def.parametrization = BremsstrahlungFactory::Get().GetEnumFromString(brems);
+
+    std::string photo = PhotonuclearFactory::Get().GetStringFromEnum(sec_def_global.utility_def.photo_def.parametrization);
+    SetMember(photo, "global.photo", pt_json);
+    sec_def_global.utility_def.photo_def.parametrization = PhotonuclearFactory::Get().GetEnumFromString(photo);
+
+    std::string shadow = PhotonuclearFactory::Get().GetStringFromShadowEnum(sec_def_global.utility_def.photo_def.shadow);
+    SetMember(shadow, "global.photo_shadow", pt_json);
+    sec_def_global.utility_def.photo_def.shadow = PhotonuclearFactory::Get().GetShadowEnumFromString(shadow);
+
+    SetMember(sec_def_global.utility_def.photo_def.hardbb, "global.photo_hardbb", pt_json);
 
     // Read in all sector definitions
     boost::property_tree::ptree sectors = pt_json.get_child("sectors");
 
     for (boost::property_tree::ptree::const_iterator it = sectors.begin(); it != sectors.end(); ++it)
     {
-        Medium* med        = MediumFactory::Get().CreateMedium(it->second.get<std::string>("medium"));
+        boost::property_tree::ptree subtree = it->second;
 
+        // Create medium
+        MediumFactory::Definition medium_def;
+        SetMember(medium_def.density_correction, "density_correction", subtree);
+
+        std::string medium_name = MediumFactory::Get().GetStringFromEnum(medium_def.type);
+        SetMember(medium_name, "medium", subtree);
+        Medium* med = MediumFactory::Get().CreateMedium(medium_name, medium_def.density_correction);
+
+        // Create Geometry
         Geometry* geometry = GeometryFactory::Get().CreateGeometry(it->second.get_child("geometry"));
-        geometry->SetHirarchy(it->second.get<unsigned int>("hirarchy"));
+
+        double hirarchy = geometry->GetHirarchy();
+        SetMember(hirarchy, "hirarchy", subtree);
+        geometry->SetHirarchy(hirarchy);
 
         // Use global options in case they will not be overriden
-        SectorFactory::Definition sec_def_infront = sec_def_global;
+        Sector::Definition sec_def_infront = sec_def_global;
         sec_def_infront.location = Sector::ParticleLocation::InfrontDetector;
 
-        SectorFactory::Definition sec_def_inside  = sec_def_global;
+        Sector::Definition sec_def_inside  = sec_def_global;
         sec_def_inside.location = Sector::ParticleLocation::InsideDetector;
 
-        SectorFactory::Definition sec_def_behind  = sec_def_global;
+        Sector::Definition sec_def_behind  = sec_def_global;
         sec_def_behind.location = Sector::ParticleLocation::BehindDetector;
-
-        double density_correction = it->second.get<double>("density_correction");
-
-        sec_def_infront.medium_def.density_correction = density_correction;
-        sec_def_inside.medium_def.density_correction  = density_correction;
-        sec_def_behind.medium_def.density_correction  = density_correction;
 
         EnergyCutSettings cuts_infront;
         EnergyCutSettings cuts_inside;
@@ -265,6 +270,7 @@ Propagator::Propagator(const ParticleDef& particle_def, const std::string& confi
 
         boost::optional<const boost::property_tree::ptree&> child_cuts_infront =
             it->second.get_child_optional("cuts_infront");
+
         if (child_cuts_infront)
         {
             cuts_infront.SetEcut(child_cuts_infront.get().get<double>("e_cut"));
@@ -280,6 +286,7 @@ Propagator::Propagator(const ParticleDef& particle_def, const std::string& confi
 
         boost::optional<const boost::property_tree::ptree&> child_cuts_inside =
             it->second.get_child_optional("cuts_inside");
+
         if (child_cuts_inside)
         {
             cuts_inside.SetEcut(child_cuts_inside.get().get<double>("e_cut"));
