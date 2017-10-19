@@ -16,6 +16,7 @@ class CrossSection;
 class Bremsstrahlung;
 struct ParticleDef;
 class EnergyCutSettings;
+class Medium;
 
 class BremsstrahlungFactory
 {
@@ -60,58 +61,19 @@ class BremsstrahlungFactory
     typedef boost::bimap<std::string, Enum> BimapStringEnum;
 
     // --------------------------------------------------------------------- //
-    // Create functions
-    // --------------------------------------------------------------------- //
-
-    CrossSection* CreateBremsstrahlungIntegral(const std::string&,
-                                       const ParticleDef& particle_def,
-                                       const Medium& medium,
-                                       const EnergyCutSettings& cuts,
-                                       double multiplier,
-                                       bool lpm) const;
-
-    CrossSection* CreateBremsstrahlungIntegral(const Enum,
-                                       const ParticleDef& particle_def,
-                                       const Medium& medium,
-                                       const EnergyCutSettings& cuts,
-                                       double multiplier,
-                                       bool lpm) const;
-
-    CrossSection* CreateBremsstrahlungInterpolant(const std::string&,
-                                       const ParticleDef& particle_def,
-                                       const Medium& medium,
-                                       const EnergyCutSettings& cuts,
-                                       double multiplier,
-                                       bool lpm,
-                                       InterpolationDef) const;
-
-    CrossSection* CreateBremsstrahlungInterpolant(const Enum,
-                                       const ParticleDef& particle_def,
-                                       const Medium& medium,
-                                       const EnergyCutSettings& cuts,
-                                       double multiplier,
-                                       bool lpm,
-                                       InterpolationDef) const;
-
-    // --------------------------------------------------------------------- //
     // Most general creation
     // --------------------------------------------------------------------- //
 
-    CrossSection* CreateBremsstrahlung(const Enum,
-                                       const ParticleDef&,
+    CrossSection* CreateBremsstrahlung(const ParticleDef&,
                                        const Medium&,
                                        const EnergyCutSettings&,
-                                       double multiplier,
-                                       bool lpm,
-                                       bool interpolate,
-                                       InterpolationDef = InterpolationDef()) const;
+                                       const Definition&) const;
 
     CrossSection* CreateBremsstrahlung(const ParticleDef&,
                                        const Medium&,
                                        const EnergyCutSettings&,
                                        const Definition&,
-                                       bool interpolate,
-                                       InterpolationDef = InterpolationDef()) const;
+                                       InterpolationDef) const;
 
     // ----------------------------------------------------------------------------
     /// @brief string to enum conversation for photo parametrizations
@@ -123,15 +85,6 @@ class BremsstrahlungFactory
     // ----------------------------------------------------------------------------
     std::string GetStringFromEnum(const Enum&);
 
-
-    // ----------------------------------------------------------------------------
-    /// @brief Register Bremsstrahlung parametrizations
-    ///
-    /// @param name
-    /// @param Enum
-    /// @param RegisterFunction
-    // ----------------------------------------------------------------------------
-    void Register(const std::string& name, Enum, RegisterFunction);
 
     // --------------------------------------------------------------------- //
     // Singleton pattern
@@ -147,6 +100,14 @@ class BremsstrahlungFactory
     BremsstrahlungFactory();
     ~BremsstrahlungFactory();
 
+    // ----------------------------------------------------------------------------
+    /// @brief Register Bremsstrahlung parametrizations
+    ///
+    /// @param name
+    /// @param Enum
+    /// @param RegisterFunction
+    // ----------------------------------------------------------------------------
+    void Register(const std::string& name, Enum, RegisterFunction);
 
     BremsstrahlungMapString bremsstrahlung_map_str_;
     BremsstrahlungMapEnum bremsstrahlung_map_enum_;

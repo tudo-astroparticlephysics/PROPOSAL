@@ -93,10 +93,6 @@ class PhotonuclearFactory
     typedef boost::bimap<std::string, Shadow> BimapStringShadowEnum;
 
     // --------------------------------------------------------------------- //
-    // Create functions
-    // --------------------------------------------------------------------- //
-
-    // --------------------------------------------------------------------- //
     // Shadow effect
     // --------------------------------------------------------------------- //
 
@@ -104,93 +100,19 @@ class PhotonuclearFactory
     ShadowEffect* CreateShadowEffect(const Shadow&);
 
     // --------------------------------------------------------------------- //
-    // Real Photon
-    // --------------------------------------------------------------------- //
-
-    CrossSection* CreatePhotoRealPhotonIntegral(const std::string&,
-                                        const ParticleDef& particle_def,
-                                        const Medium& medium,
-                                        const EnergyCutSettings& cuts,
-                                        double multiplier,
-                                        bool hardbb) const;
-
-    CrossSection* CreatePhotoRealPhotonIntegral(const Enum,
-                                        const ParticleDef& particle_def,
-                                        const Medium& medium,
-                                        const EnergyCutSettings& cuts,
-                                        double multiplier,
-                                        bool hardbb) const;
-
-    CrossSection* CreatePhotoRealPhotonInterpolant(const std::string&,
-                                        const ParticleDef& particle_def,
-                                        const Medium& medium,
-                                        const EnergyCutSettings& cuts,
-                                        double multiplier,
-                                        bool hardbb,
-                                        InterpolationDef = InterpolationDef()) const;
-
-    CrossSection* CreatePhotoRealPhotonInterpolant(const Enum,
-                                        const ParticleDef& particle_def,
-                                        const Medium& medium,
-                                        const EnergyCutSettings& cuts,
-                                        double multiplier,
-                                        bool hardbb,
-                                        InterpolationDef = InterpolationDef()) const;
-
-    // --------------------------------------------------------------------- //
-    // Q2 Integration
-    // --------------------------------------------------------------------- //
-
-    CrossSection* CreatePhotoQ2Integral(const std::string&,
-                                        const ParticleDef&,
-                                        const Medium&,
-                                        const EnergyCutSettings&,
-                                        double multiplier,
-                                        const Shadow&) const;
-
-    CrossSection* CreatePhotoQ2Integral(const Enum,
-                                        const ParticleDef&,
-                                        const Medium&,
-                                        const EnergyCutSettings&,
-                                        double multiplier,
-                                        const Shadow&) const;
-
-    CrossSection* CreatePhotoQ2Interpolant(const std::string&,
-                                        const ParticleDef&,
-                                        const Medium&,
-                                        const EnergyCutSettings&,
-                                        double multiplier,
-                                        const Shadow&,
-                                        InterpolationDef = InterpolationDef()) const;
-
-    CrossSection* CreatePhotoQ2Interpolant(const Enum,
-                                        const ParticleDef&,
-                                        const Medium&,
-                                        const EnergyCutSettings&,
-                                        double multiplier,
-                                        const Shadow&,
-                                        InterpolationDef = InterpolationDef()) const;
-
-    // --------------------------------------------------------------------- //
     // Most general creation
     // --------------------------------------------------------------------- //
 
-    CrossSection* CreatePhotonuclear(const Enum,
-                                     const ParticleDef&,
+    CrossSection* CreatePhotonuclear(const ParticleDef&,
                                      const Medium&,
                                      const EnergyCutSettings&,
-                                     double multiplier,
-                                     const Shadow&,
-                                     bool hardbb,
-                                     bool interpolate,
-                                     InterpolationDef = InterpolationDef()) const;
+                                     const Definition&) const;
 
     CrossSection* CreatePhotonuclear(const ParticleDef&,
                                      const Medium&,
                                      const EnergyCutSettings&,
                                      const Definition&,
-                                     bool interpolate,
-                                     InterpolationDef = InterpolationDef()) const;
+                                     InterpolationDef) const;
 
     // ----------------------------------------------------------------------------
     /// @brief string to enum conversation for photo parametrizations
@@ -211,6 +133,20 @@ class PhotonuclearFactory
     /// @brief enum to string conversation for shadow effect
     // ----------------------------------------------------------------------------
     std::string GetStringFromShadowEnum(const Shadow&);
+
+    // --------------------------------------------------------------------- //
+    // Singleton pattern
+    // --------------------------------------------------------------------- //
+
+    static PhotonuclearFactory& Get()
+    {
+        static PhotonuclearFactory instance;
+        return instance;
+    }
+
+    private:
+    PhotonuclearFactory();
+    ~PhotonuclearFactory();
 
     // ----------------------------------------------------------------------------
     /// @brief Register ShadowEffect used for Q2 integration parametrizations
@@ -238,20 +174,6 @@ class PhotonuclearFactory
     /// @param RegisterQ2Function
     // ----------------------------------------------------------------------------
     void RegisterQ2(const std::string& name, Enum, std::pair<RegisterQ2Function, RegisterQ2FunctionInterpolant>);
-
-    // --------------------------------------------------------------------- //
-    // Singleton pattern
-    // --------------------------------------------------------------------- //
-
-    static PhotonuclearFactory& Get()
-    {
-        static PhotonuclearFactory instance;
-        return instance;
-    }
-
-    private:
-    PhotonuclearFactory();
-    ~PhotonuclearFactory();
 
     PhotoShadowEffectMapString photo_shadow_map_str_;
     PhotoShadowEffectMapEnum photo_shadow_map_enum_;
