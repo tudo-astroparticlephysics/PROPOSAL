@@ -25,19 +25,6 @@ class EpairProductionFactory
         double multiplier;
     };
 
-    CrossSection* CreateEpairIntegral(const ParticleDef&,
-                                      const Medium&,
-                                      const EnergyCutSettings&,
-                                      bool lpm,
-                                      double multiplier) const;
-
-    CrossSection* CreateEpairInterpolant(const ParticleDef&,
-                                         const Medium&,
-                                         const EnergyCutSettings&,
-                                         bool lpm,
-                                         double multiplier,
-                                         InterpolationDef) const;
-
     // --------------------------------------------------------------------- //
     // Most general creation
     // --------------------------------------------------------------------- //

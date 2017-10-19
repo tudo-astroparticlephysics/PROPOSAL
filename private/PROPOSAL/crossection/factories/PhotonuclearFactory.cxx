@@ -66,6 +66,7 @@ PhotonuclearFactory::~PhotonuclearFactory()
     string_shadow_enum_.clear();
 }
 
+// ------------------------------------------------------------------------- //
 void PhotonuclearFactory::RegisterShadowEffect(const std::string& name, const Shadow& shadow, RegisterShadowEffectFunction create)
 {
     photo_shadow_map_str_[name] = create;
@@ -73,6 +74,7 @@ void PhotonuclearFactory::RegisterShadowEffect(const std::string& name, const Sh
     string_shadow_enum_.insert(BimapStringShadowEnum::value_type(name, shadow));
 }
 
+// ------------------------------------------------------------------------- //
 void PhotonuclearFactory::RegisterRealPhoton(const std::string& name, Enum enum_t, RegisterRealPhotonFunction create)
 {
     photo_real_map_str_[name] = create;
@@ -80,6 +82,7 @@ void PhotonuclearFactory::RegisterRealPhoton(const std::string& name, Enum enum_
     string_enum_.insert(BimapStringEnum::value_type(name, enum_t));
 }
 
+// ------------------------------------------------------------------------- //
 void PhotonuclearFactory::RegisterQ2(const std::string& name, Enum enum_t, std::pair<RegisterQ2Function, RegisterQ2FunctionInterpolant> create)
 {
     photo_q2_map_str_[name] = create;
@@ -118,284 +121,27 @@ ShadowEffect* PhotonuclearFactory::CreateShadowEffect(const Shadow& shadow)
 }
 
 // ------------------------------------------------------------------------- //
-// RealPhoton
-// ------------------------------------------------------------------------- //
-
-CrossSection* PhotonuclearFactory::CreatePhotoRealPhotonIntegral(const std::string& name,
-                                    const ParticleDef& particle_def,
-                                    const Medium& medium,
-                                    const EnergyCutSettings& cuts,
-                                    double multiplier,
-                                    bool hardbb) const
-{
-    std::string name_lower = boost::algorithm::to_lower_copy(name);
-
-    PhotoRealPhotonMapString::const_iterator it = photo_real_map_str_.find(name_lower);
-
-    if (it != photo_real_map_str_.end())
-    {
-        RealPhoton* real_photon;
-
-        if (hardbb)
-        {
-            real_photon = new HardBB(particle_def);
-        }
-        else
-        {
-            real_photon = new SoftBB();
-        }
-
-        PhotoIntegral* photo = new PhotoIntegral(*it->second(particle_def, medium, cuts, *real_photon, multiplier));
-        delete real_photon;
-        return photo;
-    }
-    else
-    {
-        log_fatal("Photonuclear %s not registerd!", name.c_str());
-    }
-}
-
-CrossSection* PhotonuclearFactory::CreatePhotoRealPhotonIntegral(const Enum enum_t,
-                                    const ParticleDef& particle_def,
-                                    const Medium& medium,
-                                    const EnergyCutSettings& cuts,
-                                    double multiplier,
-                                    bool hardbb) const
-{
-    PhotoRealPhotonMapEnum::const_iterator it = photo_real_map_enum_.find(enum_t);
-
-    if (it != photo_real_map_enum_.end())
-    {
-        RealPhoton* real_photon;
-
-        if (hardbb)
-        {
-            real_photon = new HardBB(particle_def);
-        }
-        else
-        {
-            real_photon = new SoftBB();
-        }
-
-        PhotoIntegral* photo = new PhotoIntegral(*it->second(particle_def, medium, cuts, *real_photon, multiplier));
-        delete real_photon;
-        return photo;
-    }
-    else
-    {
-        log_fatal("Photonuclear %s not registerd!", typeid(enum_t).name());
-    }
-}
-
-CrossSection* PhotonuclearFactory::CreatePhotoRealPhotonInterpolant(const std::string& name,
-                                    const ParticleDef& particle_def,
-                                    const Medium& medium,
-                                    const EnergyCutSettings& cuts,
-                                    double multiplier,
-                                    bool hardbb,
-                                    InterpolationDef def) const
-{
-    std::string name_lower = boost::algorithm::to_lower_copy(name);
-
-    PhotoRealPhotonMapString::const_iterator it = photo_real_map_str_.find(name_lower);
-
-    if (it != photo_real_map_str_.end())
-    {
-        RealPhoton* real_photon;
-
-        if (hardbb)
-        {
-            real_photon = new HardBB(particle_def);
-        }
-        else
-        {
-            real_photon = new SoftBB();
-        }
-
-        PhotoInterpolant* photo = new PhotoInterpolant(*it->second(particle_def, medium, cuts, *real_photon, multiplier), def);
-        delete real_photon;
-        return photo;
-    }
-    else
-    {
-        log_fatal("Photonuclear %s not registerd!", name.c_str());
-    }
-}
-
-CrossSection* PhotonuclearFactory::CreatePhotoRealPhotonInterpolant(const Enum enum_t,
-                                    const ParticleDef& particle_def,
-                                    const Medium& medium,
-                                    const EnergyCutSettings& cuts,
-                                    double multiplier,
-                                    bool hardbb,
-                                    InterpolationDef def) const
-{
-    PhotoRealPhotonMapEnum::const_iterator it = photo_real_map_enum_.find(enum_t);
-
-    if (it != photo_real_map_enum_.end())
-    {
-        RealPhoton* real_photon;
-
-        if (hardbb)
-        {
-            real_photon = new HardBB(particle_def);
-        }
-        else
-        {
-            real_photon = new SoftBB();
-        }
-
-        PhotoInterpolant* photo = new PhotoInterpolant(*it->second(particle_def, medium, cuts, *real_photon, multiplier), def);
-        delete real_photon;
-        return photo;
-    }
-    else
-    {
-        log_fatal("Photonuclear %s not registerd!", typeid(enum_t).name());
-    }
-}
-
-// ------------------------------------------------------------------------- //
-// PhotoQ2
-// ------------------------------------------------------------------------- //
-
-CrossSection* PhotonuclearFactory::CreatePhotoQ2Integral(const std::string& name,
-                                                         const ParticleDef& particle_def,
-                                                         const Medium& medium,
-                                                         const EnergyCutSettings& cuts,
-                                                         double multiplier,
-                                                         const Shadow& shadow_effect) const
-{
-    std::string name_lower = boost::algorithm::to_lower_copy(name);
-
-    PhotoQ2MapString::const_iterator it = photo_q2_map_str_.find(name_lower);
-
-    if (it != photo_q2_map_str_.end())
-    {
-        ShadowEffect* shadow = Get().CreateShadowEffect(shadow_effect);
-
-        PhotoIntegral* photo =  new PhotoIntegral(*it->second.first(particle_def, medium, cuts, *shadow, multiplier));
-        delete shadow;
-        return photo;
-    }
-    else
-    {
-        log_fatal("Photonuclear %s not registerd!", name.c_str());
-    }
-}
-
-CrossSection* PhotonuclearFactory::CreatePhotoQ2Integral(const Enum enum_t,
-                                                         const ParticleDef& particle_def,
-                                                         const Medium& medium,
-                                                         const EnergyCutSettings& cuts,
-                                                         double multiplier,
-                                                         const Shadow& shadow_effect) const
-{
-    PhotoQ2MapEnum::const_iterator it = photo_q2_map_enum_.find(enum_t);
-
-    if (it != photo_q2_map_enum_.end())
-    {
-        ShadowEffect* shadow = Get().CreateShadowEffect(shadow_effect);
-
-        PhotoIntegral* photo =  new PhotoIntegral(*it->second.first(particle_def, medium, cuts, *shadow, multiplier));
-        delete shadow;
-        return photo;
-    }
-    else
-    {
-        log_fatal("Photonuclear %s not registerd!", typeid(enum_t).name());
-    }
-}
-
-CrossSection* PhotonuclearFactory::CreatePhotoQ2Interpolant(const std::string& name,
-                                                            const ParticleDef& particle_def,
-                                                            const Medium& medium,
-                                                            const EnergyCutSettings& cuts,
-                                                            double multiplier,
-                                                            const Shadow& shadow_effect,
-                                                            InterpolationDef def) const
-{
-    std::string name_lower = boost::algorithm::to_lower_copy(name);
-
-    PhotoQ2MapString::const_iterator it = photo_q2_map_str_.find(name_lower);
-
-    if (it != photo_q2_map_str_.end())
-    {
-        ShadowEffect* shadow = Get().CreateShadowEffect(shadow_effect);
-
-        PhotoInterpolant* photo =  new PhotoInterpolant(*it->second.second(particle_def, medium, cuts, *shadow, multiplier, def), def);
-        delete shadow;
-        return photo;
-    }
-    else
-    {
-        log_fatal("Photonuclear %s not registerd!", name.c_str());
-    }
-}
-
-CrossSection* PhotonuclearFactory::CreatePhotoQ2Interpolant(const Enum enum_t,
-                                                            const ParticleDef& particle_def,
-                                                            const Medium& medium,
-                                                            const EnergyCutSettings& cuts,
-                                                            double multiplier,
-                                                            const Shadow& shadow_effect,
-                                                            InterpolationDef def) const
-{
-    PhotoQ2MapEnum::const_iterator it = photo_q2_map_enum_.find(enum_t);
-
-    if (it != photo_q2_map_enum_.end())
-    {
-        ShadowEffect* shadow = Get().CreateShadowEffect(shadow_effect);
-
-        PhotoInterpolant* photo =  new PhotoInterpolant(*it->second.second(particle_def, medium, cuts, *shadow, multiplier, def), def);
-        delete shadow;
-        return photo;
-    }
-    else
-    {
-        log_fatal("Photonuclear %s not registerd!", typeid(enum_t).name());
-    }
-}
-
-// ------------------------------------------------------------------------- //
-// Most general creator
-// ------------------------------------------------------------------------- //
-
-CrossSection* PhotonuclearFactory::CreatePhotonuclear(const Enum enum_t,
-                                                      const ParticleDef& particle_def,
+CrossSection* PhotonuclearFactory::CreatePhotonuclear(const ParticleDef& particle_def,
                                                       const Medium& medium,
                                                       const EnergyCutSettings& cuts,
-                                                      double multiplier,
-                                                      const Shadow& shadow_effect,
-                                                      bool hardbb,
-                                                      bool interpolate,
-                                                      InterpolationDef def) const
+                                                      const Definition& def) const
 {
-    PhotoQ2MapEnum::const_iterator it_q2 = photo_q2_map_enum_.find(enum_t);
-    PhotoRealPhotonMapEnum::const_iterator it_real = photo_real_map_enum_.find(enum_t);
+    PhotoQ2MapEnum::const_iterator it_q2 = photo_q2_map_enum_.find(def.parametrization);
+    PhotoRealPhotonMapEnum::const_iterator it_photo = photo_real_map_enum_.find(def.parametrization);
 
     if (it_q2 != photo_q2_map_enum_.end())
     {
-        ShadowEffect* shadow = Get().CreateShadowEffect(shadow_effect);
+        ShadowEffect* shadow = Get().CreateShadowEffect(def.shadow);
 
-        if (interpolate)
-        {
-            PhotoInterpolant* photo =  new PhotoInterpolant(*it_q2->second.second(particle_def, medium, cuts, *shadow, multiplier, def), def);
-            delete shadow;
-            return photo;
-        }
-        else
-        {
-            PhotoIntegral* photo =  new PhotoIntegral(*it_q2->second.first(particle_def, medium, cuts, *shadow, multiplier));
-            delete shadow;
-            return photo;
-        }
+        PhotoIntegral* photo =  new PhotoIntegral(*it_q2->second.first(particle_def, medium, cuts, *shadow, def.multiplier));
+        delete shadow;
+        return photo;
     }
-    else if (it_real != photo_real_map_enum_.end())
+    else if (it_photo != photo_real_map_enum_.end())
     {
         RealPhoton* real_photon;
 
-        if (hardbb)
+        if (def.hardbb)
         {
             real_photon = new HardBB(particle_def);
         }
@@ -404,41 +150,55 @@ CrossSection* PhotonuclearFactory::CreatePhotonuclear(const Enum enum_t,
             real_photon = new SoftBB();
         }
 
-        if (interpolate)
-        {
-            PhotoInterpolant* photo = new PhotoInterpolant(*it_real->second(particle_def, medium, cuts, *real_photon, multiplier), def);
-            delete real_photon;
-            return photo;
-        }
-        else
-        {
-            PhotoIntegral* photo = new PhotoIntegral(*it_real->second(particle_def, medium, cuts, *real_photon, multiplier));
-            delete real_photon;
-            return photo;
-        }
+        PhotoIntegral* photo = new PhotoIntegral(*it_photo->second(particle_def, medium, cuts, *real_photon, def.multiplier));
+        delete real_photon;
+        return photo;
     }
     else
     {
-        log_fatal("Photonuclear %s not registerd!", typeid(enum_t).name());
+        log_fatal("Photonuclear %s not registerd!", typeid(def.parametrization).name());
     }
 }
 
+// ------------------------------------------------------------------------- //
 CrossSection* PhotonuclearFactory::CreatePhotonuclear(const ParticleDef& particle_def,
                                                       const Medium& medium,
                                                       const EnergyCutSettings& cuts,
                                                       const Definition& def,
-                                                      bool interpolate,
                                                       InterpolationDef interpolation_def) const
 {
-    return CreatePhotonuclear(def.parametrization,
-                              particle_def,
-                              medium,
-                              cuts,
-                              def.multiplier,
-                              def.shadow,
-                              def.hardbb,
-                              interpolate,
-                              interpolation_def);
+    PhotoQ2MapEnum::const_iterator it_q2 = photo_q2_map_enum_.find(def.parametrization);
+    PhotoRealPhotonMapEnum::const_iterator it_photo = photo_real_map_enum_.find(def.parametrization);
+
+    if (it_q2 != photo_q2_map_enum_.end())
+    {
+        ShadowEffect* shadow = Get().CreateShadowEffect(def.shadow);
+
+        PhotoInterpolant* photo =  new PhotoInterpolant(*it_q2->second.second(particle_def, medium, cuts, *shadow, def.multiplier, interpolation_def), interpolation_def);
+        delete shadow;
+        return photo;
+    }
+    else if (it_photo != photo_real_map_enum_.end())
+    {
+        RealPhoton* real_photon;
+
+        if (def.hardbb)
+        {
+            real_photon = new HardBB(particle_def);
+        }
+        else
+        {
+            real_photon = new SoftBB();
+        }
+
+        PhotoInterpolant* photo = new PhotoInterpolant(*it_photo->second(particle_def, medium, cuts, *real_photon, def.multiplier), interpolation_def);
+        delete real_photon;
+        return photo;
+    }
+    else
+    {
+        log_fatal("Photonuclear %s not registerd!", typeid(def.parametrization).name());
+    }
 }
 
 // ------------------------------------------------------------------------- //
