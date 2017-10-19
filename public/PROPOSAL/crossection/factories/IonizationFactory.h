@@ -8,6 +8,9 @@ namespace  PROPOSAL
 {
 
 class CrossSection;
+struct ParticleDef;
+class Medium;
+class EnergyCutSettings;
 
 class IonizationFactory
 {
@@ -23,34 +26,20 @@ class IonizationFactory
         double multiplier;
     };
 
-    CrossSection* CreateIonizationIntegral(const ParticleDef&,
-                                      const Medium&,
-                                      const EnergyCutSettings&,
-                                      double multiplier) const;
-
-    CrossSection* CreateIonizationInterpolant(const ParticleDef&,
-                                         const Medium&,
-                                         const EnergyCutSettings&,
-                                         double multiplier,
-                                         InterpolationDef = InterpolationDef()) const;
-
     // --------------------------------------------------------------------- //
     // Most general creation
     // --------------------------------------------------------------------- //
 
     CrossSection* CreateIonization(const ParticleDef&,
-                                        const Medium&,
-                                        const EnergyCutSettings&,
-                                        double multiplier,
-                                        bool interpolate,
-                                        InterpolationDef = InterpolationDef()) const;
+                                   const Medium&,
+                                   const EnergyCutSettings&,
+                                   const Definition&) const;
 
     CrossSection* CreateIonization(const ParticleDef&,
-                                        const Medium&,
-                                        const EnergyCutSettings&,
-                                        const Definition&,
-                                        bool interpolate,
-                                        InterpolationDef = InterpolationDef()) const;
+                                   const Medium&,
+                                   const EnergyCutSettings&,
+                                   const Definition&,
+                                   InterpolationDef) const;
 
     // --------------------------------------------------------------------- //
     // Singleton pattern

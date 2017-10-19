@@ -19,46 +19,26 @@ EpairProductionFactory::~EpairProductionFactory()
 }
 
 // ------------------------------------------------------------------------- //
-// PhotoQ2
-// ------------------------------------------------------------------------- //
-
-CrossSection* EpairProductionFactory::CreateEpairIntegral(const ParticleDef& particle_def,
-                                                          const Medium& medium,
-                                                          const EnergyCutSettings& cuts,
-                                                          bool lpm,
-                                                          double multiplier) const
-{
-    return new EpairIntegral(EpairProductionRhoIntegral(particle_def, medium, cuts, lpm, multiplier));
-}
-
-CrossSection* EpairProductionFactory::CreateEpairInterpolant(const ParticleDef& particle_def,
-                                                             const Medium& medium,
-                                                             const EnergyCutSettings& cuts,
-                                                             bool lpm,
-                                                             double multiplier,
-                                                             InterpolationDef def) const
-{
-    return new EpairInterpolant(EpairProductionRhoInterpolant(particle_def, medium, cuts, lpm, multiplier, def), def);
-}
-
-
-// ------------------------------------------------------------------------- //
 // Most general creator
 // ------------------------------------------------------------------------- //
 
+// ------------------------------------------------------------------------- //
 CrossSection* EpairProductionFactory::CreateEpairProduction(const ParticleDef& particle_def,
                                                             const Medium& medium,
                                                             const EnergyCutSettings& cuts,
                                                             const Definition& def) const
 {
-    return CreateEpairIntegral(particle_def, medium, cuts, def.lpm_effect, def.multiplier);
+    return new EpairIntegral(EpairProductionRhoIntegral(particle_def, medium, cuts, def.lpm_effect, def.multiplier));
 }
 
+// ------------------------------------------------------------------------- //
 CrossSection* EpairProductionFactory::CreateEpairProduction(const ParticleDef& particle_def,
                                                             const Medium& medium,
                                                             const EnergyCutSettings& cuts,
                                                             const Definition& def,
                                                             InterpolationDef interpolation_def) const
 {
-    return CreateEpairInterpolant(particle_def, medium, cuts, def.lpm_effect, def.multiplier, interpolation_def);
+    return new EpairInterpolant(
+        EpairProductionRhoInterpolant(particle_def, medium, cuts, def.lpm_effect, def.multiplier, interpolation_def),
+        interpolation_def);
 }
