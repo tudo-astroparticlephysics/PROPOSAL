@@ -56,14 +56,12 @@ Utility::Utility(const ParticleDef& particle_def,
     crosssections_.push_back(BremsstrahlungFactory::Get().CreateBremsstrahlung(particle_def_,
                                                                                *medium_,
                                                                                cut_settings_,
-                                                                               utility_def.brems_def,
-                                                                               false));
+                                                                               utility_def.brems_def));
 
     crosssections_.push_back(PhotonuclearFactory::Get().CreatePhotonuclear(particle_def_,
                                                                            *medium_,
                                                                            cut_settings_,
-                                                                           utility_def.photo_def,
-                                                                           false));
+                                                                           utility_def.photo_def));
 
     crosssections_.push_back(EpairProductionFactory::Get().CreateEpairProduction(particle_def_,
                                                                                  *medium_,
@@ -73,8 +71,7 @@ Utility::Utility(const ParticleDef& particle_def,
     crosssections_.push_back(IonizationFactory::Get().CreateIonization(particle_def_,
                                                                        *medium_,
                                                                        cut_settings_,
-                                                                       utility_def.ioniz_def,
-                                                                       false));
+                                                                       utility_def.ioniz_def));
 }
 
 Utility::Utility(const ParticleDef& particle_def,
@@ -92,14 +89,12 @@ Utility::Utility(const ParticleDef& particle_def,
                                                                                *medium_,
                                                                                cut_settings_,
                                                                                utility_def.brems_def,
-                                                                               true,
                                                                                interpolation_def));
 
     crosssections_.push_back(PhotonuclearFactory::Get().CreatePhotonuclear(particle_def_,
                                                                            *medium_,
                                                                            cut_settings_,
                                                                            utility_def.photo_def,
-                                                                           true,
                                                                            interpolation_def));
 
     crosssections_.push_back(EpairProductionFactory::Get().CreateEpairProduction(particle_def_,
@@ -112,7 +107,6 @@ Utility::Utility(const ParticleDef& particle_def,
                                                                        *medium_,
                                                                        cut_settings_,
                                                                        utility_def.ioniz_def,
-                                                                       true,
                                                                        interpolation_def));
 }
 

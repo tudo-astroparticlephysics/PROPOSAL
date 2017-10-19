@@ -23,6 +23,7 @@ BremsstrahlungFactory::BremsstrahlungFactory()
     Register("andreev-bezrukov-bugaev", AndreevBezrukovBugaev, &BremsAndreevBezrukovBugaev::create);
 }
 
+// ------------------------------------------------------------------------- //
 BremsstrahlungFactory::~BremsstrahlungFactory()
 {
     bremsstrahlung_map_str_.clear();
@@ -30,6 +31,7 @@ BremsstrahlungFactory::~BremsstrahlungFactory()
     string_enum_.clear();
 }
 
+// ------------------------------------------------------------------------- //
 void BremsstrahlungFactory::Register(const std::string& name, Enum enum_t, RegisterFunction create)
 {
     bremsstrahlung_map_str_[name] = create;
@@ -37,134 +39,45 @@ void BremsstrahlungFactory::Register(const std::string& name, Enum enum_t, Regis
     string_enum_.insert(BimapStringEnum::value_type(name, enum_t));
 }
 
-// ------------------------------------------------------------------------- //
-CrossSection* BremsstrahlungFactory::CreateBremsstrahlungIntegral(const std::string& name,
-                                                          const ParticleDef& particle_def,
-                                                          const Medium& medium,
-                                                          const EnergyCutSettings& cuts,
-                                                          double multiplier,
-                                                          bool lpm) const
-{
-    std::string name_lower = boost::algorithm::to_lower_copy(name);
-
-    BremsstrahlungMapString::const_iterator it = bremsstrahlung_map_str_.find(name);
-
-    if (it != bremsstrahlung_map_str_.end())
-    {
-        return new BremsIntegral(*it->second(particle_def, medium, cuts, multiplier, lpm));
-    }
-    else
-    {
-        log_fatal("Photonuclear %s not registerd!", name.c_str());
-    }
-}
-
-
-// ------------------------------------------------------------------------- //
-CrossSection* BremsstrahlungFactory::CreateBremsstrahlungIntegral(Enum enum_t,
-                                                          const ParticleDef& particle_def,
-                                                          const Medium& medium,
-                                                          const EnergyCutSettings& cuts,
-                                                          double multiplier,
-                                                          bool lpm) const
-{
-    BremsstrahlungMapEnum::const_iterator it = bremsstrahlung_map_enum_.find(enum_t);
-
-    if (it != bremsstrahlung_map_enum_.end())
-    {
-        return new BremsIntegral(*it->second(particle_def, medium, cuts, multiplier, lpm));
-    }
-    else
-    {
-        log_fatal("Bremsstrahlung %s not registerd!", typeid(enum_t).name());
-    }
-}
-
-// ------------------------------------------------------------------------- //
-CrossSection* BremsstrahlungFactory::CreateBremsstrahlungInterpolant(const std::string& name,
-                                                          const ParticleDef& particle_def,
-                                                          const Medium& medium,
-                                                          const EnergyCutSettings& cuts,
-                                                          double multiplier,
-                                                          bool lpm,
-                                                          InterpolationDef def) const
-{
-    std::string name_lower = boost::algorithm::to_lower_copy(name);
-
-    BremsstrahlungMapString::const_iterator it = bremsstrahlung_map_str_.find(name);
-
-    if (it != bremsstrahlung_map_str_.end())
-    {
-        return new BremsInterpolant(*it->second(particle_def, medium, cuts, multiplier, lpm), def);
-    }
-    else
-    {
-        log_fatal("Photonuclear %s not registerd!", name.c_str());
-    }
-}
-
-
-// ------------------------------------------------------------------------- //
-CrossSection* BremsstrahlungFactory::CreateBremsstrahlungInterpolant(Enum enum_t,
-                                                          const ParticleDef& particle_def,
-                                                          const Medium& medium,
-                                                          const EnergyCutSettings& cuts,
-                                                          double multiplier,
-                                                          bool lpm,
-                                                          InterpolationDef def) const
-{
-    BremsstrahlungMapEnum::const_iterator it = bremsstrahlung_map_enum_.find(enum_t);
-
-    if (it != bremsstrahlung_map_enum_.end())
-    {
-        return new BremsInterpolant(*it->second(particle_def, medium, cuts, multiplier, lpm), def);
-    }
-    else
-    {
-        log_fatal("Bremsstrahlung %s not registerd!", typeid(enum_t).name());
-    }
-}
-
 // --------------------------------------------------------------------- //
 // Most general creation
 // --------------------------------------------------------------------- //
 
-CrossSection* BremsstrahlungFactory::CreateBremsstrahlung(const Enum enum_t,
-                                 const ParticleDef& particle_def,
-                                 const Medium& medium,
-                                 const EnergyCutSettings& cuts,
-                                 double multiplier,
-                                 bool lpm,
-                                 bool interpolate,
-                                 InterpolationDef def) const
+// ------------------------------------------------------------------------- //
+CrossSection* BremsstrahlungFactory::CreateBremsstrahlung(const ParticleDef& particle_def,
+                                                          const Medium& medium,
+                                                          const EnergyCutSettings& cuts,
+                                                          const Definition& def) const
 {
-    BremsstrahlungMapEnum::const_iterator it = bremsstrahlung_map_enum_.find(enum_t);
+    BremsstrahlungMapEnum::const_iterator it = bremsstrahlung_map_enum_.find(def.parametrization);
 
     if (it != bremsstrahlung_map_enum_.end())
     {
-        if (interpolate)
-        {
-            return new BremsInterpolant(*it->second(particle_def, medium, cuts, multiplier, lpm), def);
-        }
-        else
-        {
-            return new BremsIntegral(*it->second(particle_def, medium, cuts, multiplier, lpm));
-        }
+        return new BremsIntegral(*it->second(particle_def, medium, cuts, def.multiplier, def.lpm_effect));
     }
     else
     {
-        log_fatal("Bremsstrahlung %s not registerd!", typeid(enum_t).name());
+        log_fatal("Bremsstrahlung %s not registerd!", typeid(def.parametrization).name());
     }
 }
 
+// ------------------------------------------------------------------------- //
 CrossSection* BremsstrahlungFactory::CreateBremsstrahlung(const ParticleDef& particle_def,
                                                           const Medium& medium,
                                                           const EnergyCutSettings& cuts,
                                                           const Definition& def,
-                                                          bool interpolate,
                                                           InterpolationDef interpolation_def) const
 {
-    return CreateBremsstrahlung(def.parametrization, particle_def, medium, cuts, def.multiplier, def.lpm_effect, interpolate, interpolation_def);
+    BremsstrahlungMapEnum::const_iterator it = bremsstrahlung_map_enum_.find(def.parametrization);
+
+    if (it != bremsstrahlung_map_enum_.end())
+    {
+        return new BremsInterpolant(*it->second(particle_def, medium, cuts, def.multiplier, def.lpm_effect), interpolation_def);
+    }
+    else
+    {
+        log_fatal("Bremsstrahlung %s not registerd!", typeid(def.parametrization).name());
+    }
 }
 
 // ------------------------------------------------------------------------- //
