@@ -114,14 +114,6 @@ struct ParticleDef
 class ParticleDef::Builder
 {
     public:
-    // default values for variables
-    static const std::string default_name;
-    static const double default_mass;
-    static const double default_low;
-    static const double default_lifetime;
-    static const double default_charge;
-    static const HardBBTables::VecType* default_hardbb_table;
-    // static const DecayTable default_decay_table;
 
     Builder();
 
