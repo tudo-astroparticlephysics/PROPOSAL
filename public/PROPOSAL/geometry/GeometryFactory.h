@@ -3,6 +3,7 @@
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/function.hpp>
+#include <map>
 
 #include "PROPOSAL/geometry/Geometry.h"
 
@@ -51,7 +52,6 @@ class GeometryFactory
     Geometry* CreateGeometry(const std::string&);
     Geometry* CreateGeometry(const Enum&);
     Geometry* CreateGeometry(const Definition&);
-    Geometry* CreateGeometry(boost::property_tree::ptree const& pt);
 
     static GeometryFactory& Get()
     {

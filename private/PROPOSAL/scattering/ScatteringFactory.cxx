@@ -17,26 +17,27 @@ using namespace PROPOSAL;
 ScatteringFactory::ScatteringFactory()
     : registerd_enum()
     , registerd_str()
-    , map_string_to_enum()
+    , string_enum_()
 {
-    Register("default", Default);
+    Register("highland-integral", Default);
     Register("moliere", Moliere);
     Register("highland", Highland);
-    Register("noScattering", NoScattering);
+    Register("no-scattering", NoScattering);
 }
 
 ScatteringFactory::~ScatteringFactory()
 {
-    registerd_enum.clear();
-    registerd_str.clear();
-    map_string_to_enum.clear();
+    // registerd_enum.clear();
+    // registerd_str.clear();
+    string_enum_.clear();
 }
 
 void ScatteringFactory::Register(const std::string& name, Enum model)
 {
     registerd_str.push_back(name);
     registerd_enum.push_back(model);
-    map_string_to_enum[name] = model;
+    string_enum_.insert(BimapStringEnum::value_type(name, model));
+    // map_string_to_enum[name] = model;
 }
 
 // ------------------------------------------------------------------------- //
@@ -187,14 +188,27 @@ Scattering* ScatteringFactory::CreateScattering(const Enum model, Particle& part
 ScatteringFactory::Enum ScatteringFactory::GetEnumFromString(const std::string& name)
 {
     std::string name_lower = boost::algorithm::to_lower_copy(name);
-    MapStringToEnum::iterator it = map_string_to_enum.find(name_lower);
 
-    if (it != map_string_to_enum.end())
+    BimapStringEnum::left_const_iterator it = string_enum_.left.find(name_lower);
+    if (it != string_enum_.left.end())
     {
         return it->second;
     } else
     {
-        log_fatal("Scattering %s not registerd!", name.c_str());
+        log_fatal("Scattering model %s not registerd!", name.c_str());
+    }
+}
+
+// ------------------------------------------------------------------------- //
+std::string ScatteringFactory::GetStringFromEnum(const Enum& enum_t)
+{
+    BimapStringEnum::right_const_iterator it = string_enum_.right.find(enum_t);
+    if (it != string_enum_.right.end())
+    {
+        return it->second;
+    } else
+    {
+        log_fatal("Scattering model %s not registerd!", typeid(enum_t).name());
     }
 }
 
