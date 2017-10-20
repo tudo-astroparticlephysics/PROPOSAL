@@ -105,7 +105,6 @@ class Sector
     * \param    ei  initial energy
     * \param    ef  final energy
     */
-
     void AdvanceParticle(double dr, double ei, double ef);
 
     /**

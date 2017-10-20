@@ -47,51 +47,6 @@ Sector::Definition::~Definition()
 // Constructors
 // ------------------------------------------------------------------------- //
 
-// Standard constructor
-// Sector::Sector(Particle& particle)
-//     : sector_def_()
-//     , weighting_starts_at_(0)
-//       //TODO(mario): init different Fri 2017/09/01
-//     , particle_(particle)
-//     , geometry_(new Sphere(Vector3D(), 1e18, 0))
-//     // , randomizer_(NULL)
-//     , utility_(particle.GetParticleDef(), Water(), EnergyCutSettings(), sector_def_)
-//     , displacement_calculator_(NULL)
-//     , interaction_calculator_(NULL)
-//     , decay_calculator_(NULL)
-//     , exact_time_calculator_(NULL)
-//     , cont_rand_(NULL)
-//     , scattering_(ScatteringFactory::Get().CreateScattering(sector_def_.scattering_model, particle_, utility_))
-// {
-//     if (sector_def_.do_continuous_randomization)
-//     {
-//         cont_rand_= new ContinuousRandomizer(utility_);
-//     }
-//
-//     if (utility_.GetDefinition().do_interpolation)
-//     {
-//         displacement_calculator_ = new UtilityInterpolantDisplacement(utility_);
-//         interaction_calculator_ = new UtilityInterpolantInteraction(utility_);
-//         decay_calculator_ = new UtilityInterpolantDecay(utility_);
-//
-//         if (sector_def_.do_exact_time_calculation)
-//         {
-//             exact_time_calculator_ = new UtilityInterpolantTime(utility_);
-//         }
-//     }
-//     else
-//     {
-//         displacement_calculator_ = new UtilityIntegralDisplacement(utility_);
-//         interaction_calculator_ = new UtilityIntegralInteraction(utility_);
-//         decay_calculator_ = new UtilityIntegralDecay(utility_);
-//
-//         if (sector_def_.do_exact_time_calculation)
-//         {
-//             exact_time_calculator_ = new UtilityIntegralTime(utility_);
-//         }
-//     }
-// }
-
 Sector::Sector(Particle& particle,
                const Medium& medium,
                const EnergyCutSettings& cuts,
@@ -102,17 +57,14 @@ Sector::Sector(Particle& particle,
     , particle_(particle)
     , geometry_(geometry.clone())
     , utility_(particle_.GetParticleDef(), medium, cuts, sector_def.utility_def)
-    , displacement_calculator_(NULL)
-    , interaction_calculator_(NULL)
-    , decay_calculator_(NULL)
+    , displacement_calculator_(new UtilityIntegralDisplacement(utility_))
+    , interaction_calculator_(new UtilityIntegralInteraction(utility_))
+    , decay_calculator_(new UtilityIntegralDecay(utility_))
     , exact_time_calculator_(NULL)
     , cont_rand_(NULL)
     , scattering_(ScatteringFactory::Get().CreateScattering(sector_def_.scattering_model, particle_, utility_))
 {
-    displacement_calculator_ = new UtilityIntegralDisplacement(utility_);
-    interaction_calculator_ = new UtilityIntegralInteraction(utility_);
-    decay_calculator_ = new UtilityIntegralDecay(utility_);
-
+    // These are optional, therfore check NULL
     if (sector_def_.do_exact_time_calculation)
     {
         exact_time_calculator_ = new UtilityIntegralTime(utility_);
@@ -135,17 +87,14 @@ Sector::Sector(Particle& particle,
     , particle_(particle)
     , geometry_(geometry.clone())
     , utility_(particle_.GetParticleDef(), medium, cuts, sector_def.utility_def, interpolation_def)
-    , displacement_calculator_(NULL)
-    , interaction_calculator_(NULL)
-    , decay_calculator_(NULL)
+    , displacement_calculator_(new UtilityInterpolantDisplacement(utility_, interpolation_def))
+    , interaction_calculator_(new UtilityInterpolantInteraction(utility_, interpolation_def))
+    , decay_calculator_(new UtilityInterpolantDecay(utility_, interpolation_def))
     , exact_time_calculator_(NULL)
     , cont_rand_(NULL)
     , scattering_(ScatteringFactory::Get().CreateScattering(sector_def_.scattering_model, particle_, utility_, interpolation_def))
 {
-    displacement_calculator_ = new UtilityInterpolantDisplacement(utility_, interpolation_def);
-    interaction_calculator_ = new UtilityInterpolantInteraction(utility_, interpolation_def);
-    decay_calculator_ = new UtilityInterpolantDecay(utility_, interpolation_def);
-
+    // These are optional, therfore check NULL
     if (sector_def_.do_exact_time_calculation)
     {
         exact_time_calculator_ = new UtilityInterpolantTime(utility_, interpolation_def);
@@ -163,22 +112,27 @@ Sector::Sector(Particle& particle, const Sector& sector)
     , particle_(particle)
     , geometry_(sector.geometry_->clone())
     , utility_(sector.utility_)
-    , displacement_calculator_(sector.displacement_calculator_->clone())
-    , interaction_calculator_(sector.interaction_calculator_->clone())
-    , decay_calculator_(sector.decay_calculator_->clone())
+    , displacement_calculator_(sector.displacement_calculator_->clone(utility_))
+    , interaction_calculator_(sector.interaction_calculator_->clone(utility_))
+    , decay_calculator_(sector.decay_calculator_->clone(utility_))
     , exact_time_calculator_(NULL)
     , cont_rand_(NULL)
-    , scattering_(sector.scattering_->clone(particle_))
+    , scattering_(sector.scattering_->clone(particle_, utility_))
 {
+    if (particle.GetParticleDef() != sector.GetParticle().GetParticleDef())
+    {
+        log_fatal("Particle definition should be equal to the sector paricle definition!");
+    }
+
     // These are optional, therfore check NULL
     if (sector.exact_time_calculator_ != NULL)
     {
-        exact_time_calculator_ = sector.exact_time_calculator_->clone();
+        exact_time_calculator_ = sector.exact_time_calculator_->clone(utility_);
     }
 
     if (sector.cont_rand_!= NULL)
     {
-        cont_rand_= new ContinuousRandomizer(*sector.cont_rand_);
+        cont_rand_= new ContinuousRandomizer(utility_, *sector.cont_rand_);
     }
 }
 
@@ -251,9 +205,9 @@ Sector::Sector(const Sector& collection)
     , particle_(collection.particle_)
     , geometry_(collection.geometry_->clone())
     , utility_(collection.utility_)
-    , displacement_calculator_(collection.displacement_calculator_->clone())
-    , interaction_calculator_(collection.interaction_calculator_->clone())
-    , decay_calculator_(collection.decay_calculator_->clone())
+    , displacement_calculator_(collection.displacement_calculator_->clone(utility_))
+    , interaction_calculator_(collection.interaction_calculator_->clone(utility_))
+    , decay_calculator_(collection.decay_calculator_->clone(utility_))
     , exact_time_calculator_(NULL)
     , cont_rand_(NULL)
     , scattering_(collection.scattering_->clone())
@@ -261,12 +215,12 @@ Sector::Sector(const Sector& collection)
     // These are optional, therfore check NULL
     if (collection.exact_time_calculator_ != NULL)
     {
-        exact_time_calculator_ = collection.exact_time_calculator_->clone();
+        exact_time_calculator_ = collection.exact_time_calculator_->clone(utility_);
     }
 
     if (collection.cont_rand_!= NULL)
     {
-        cont_rand_= new ContinuousRandomizer(*collection.cont_rand_);
+        cont_rand_= new ContinuousRandomizer(utility_, *collection.cont_rand_);
     }
 }
 

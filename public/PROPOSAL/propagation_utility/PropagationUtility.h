@@ -75,11 +75,14 @@ class UtilityDecorator
 {
     public:
     UtilityDecorator(const Utility&);
+
+    // Copy constructors
     UtilityDecorator(const UtilityDecorator&);
+    virtual UtilityDecorator* clone(const Utility&) const = 0;
+
     virtual ~UtilityDecorator();
 
-    virtual UtilityDecorator* clone() const = 0;
-
+    // Methods
     virtual double FunctionToIntegral(double energy);
     virtual double Calculate(double ei, double ef, double rnd) = 0;
     virtual double GetUpperLimit(double ei, double rnd) = 0;
