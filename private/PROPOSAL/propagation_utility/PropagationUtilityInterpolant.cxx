@@ -26,6 +26,15 @@ UtilityInterpolant::UtilityInterpolant(const Utility& utility, InterpolationDef 
 {
 }
 
+UtilityInterpolant::UtilityInterpolant(const Utility& utility, const UtilityInterpolant& collection)
+    : UtilityDecorator(utility)
+    , stored_result_(collection.stored_result_)
+    , interpolant_(new Interpolant(*collection.interpolant_))
+    , interpolant_diff_(new Interpolant(*collection.interpolant_diff_))
+    , interpolation_def_(collection.interpolation_def_)
+{
+}
+
 UtilityInterpolant::UtilityInterpolant(const UtilityInterpolant& collection)
     : UtilityDecorator(collection)
     , stored_result_(collection.stored_result_)
@@ -105,6 +114,11 @@ UtilityInterpolantDisplacement::UtilityInterpolantDisplacement(const Utility& ut
     InitInterpolation("displacement", utility_disp, NUM3);
 }
 
+UtilityInterpolantDisplacement::UtilityInterpolantDisplacement(const Utility& utility, const UtilityInterpolantDisplacement& collection)
+    : UtilityInterpolant(utility, collection)
+{
+}
+
 UtilityInterpolantDisplacement::UtilityInterpolantDisplacement(const UtilityInterpolantDisplacement& collection)
     : UtilityInterpolant(collection)
 {
@@ -174,6 +188,13 @@ UtilityInterpolantInteraction::UtilityInterpolantInteraction(const Utility& util
 {
     UtilityIntegralInteraction utility_int(utility_);
     InitInterpolation("interaction", utility_int, NUM3);
+}
+
+UtilityInterpolantInteraction::UtilityInterpolantInteraction(const Utility& utility, const UtilityInterpolantInteraction& collection)
+    : UtilityInterpolant(utility, collection)
+    , big_low_(collection.big_low_)
+    , up_(collection.up_)
+{
 }
 
 UtilityInterpolantInteraction::UtilityInterpolantInteraction(const UtilityInterpolantInteraction& collection)
@@ -276,6 +297,13 @@ UtilityInterpolantDecay::UtilityInterpolantDecay(const Utility& utility, Interpo
     InitInterpolation("decay", utility_decay, NUM3);
 }
 
+UtilityInterpolantDecay::UtilityInterpolantDecay(const Utility& utility, const UtilityInterpolantDecay& collection)
+    : UtilityInterpolant(utility, collection)
+    , big_low_(collection.big_low_)
+    , up_(collection.up_)
+{
+}
+
 UtilityInterpolantDecay::UtilityInterpolantDecay(const UtilityInterpolantDecay& collection)
     : UtilityInterpolant(collection)
     , big_low_(collection.big_low_)
@@ -361,6 +389,11 @@ UtilityInterpolantTime::UtilityInterpolantTime(const Utility& utility, Interpola
     InitInterpolation("time", utility_time, NUM3);
 }
 
+UtilityInterpolantTime::UtilityInterpolantTime(const Utility& utility, const UtilityInterpolantTime& collection)
+    : UtilityInterpolant(utility, collection)
+{
+}
+
 UtilityInterpolantTime::UtilityInterpolantTime(const UtilityInterpolantTime& collection)
     : UtilityInterpolant(collection)
 {
@@ -417,6 +450,11 @@ UtilityInterpolantContRand::UtilityInterpolantContRand(const Utility& utility, I
 {
     UtilityIntegralContRand utility_contrand(utility_);
     InitInterpolation("contrand", utility_contrand, NUM2);
+}
+
+UtilityInterpolantContRand::UtilityInterpolantContRand(const Utility& utility, const UtilityInterpolantContRand& collection)
+    : UtilityInterpolant(utility, collection)
+{
 }
 
 UtilityInterpolantContRand::UtilityInterpolantContRand(const UtilityInterpolantContRand& collection)
@@ -479,6 +517,11 @@ UtilityInterpolantScattering::UtilityInterpolantScattering(const Utility& utilit
 {
     UtilityIntegralScattering utility_scattering(utility_);
     InitInterpolation("scattering", utility_scattering, NUM2);
+}
+
+UtilityInterpolantScattering::UtilityInterpolantScattering(const Utility& utility, const UtilityInterpolantScattering& collection)
+    : UtilityInterpolant(utility, collection)
+{
 }
 
 UtilityInterpolantScattering::UtilityInterpolantScattering(const UtilityInterpolantScattering& collection)

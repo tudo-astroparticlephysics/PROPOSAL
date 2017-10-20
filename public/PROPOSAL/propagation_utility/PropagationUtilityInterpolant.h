@@ -13,10 +13,12 @@ namespace PROPOSAL{
     {                                                                                                                  \
         public:                                                                                                        \
         UtilityInterpolant##cls(const Utility&, InterpolationDef);                                                     \
-        UtilityInterpolant##cls(const UtilityInterpolant##cls&);                                                       \
-        ~UtilityInterpolant##cls();                                                                                    \
                                                                                                                        \
-        UtilityDecorator* clone() const { return new UtilityInterpolant##cls(*this); }                                 \
+        UtilityInterpolant##cls(const Utility&, const UtilityInterpolant##cls&);                                       \
+        UtilityInterpolant##cls(const UtilityInterpolant##cls&);                                                       \
+        UtilityDecorator* clone(const Utility& utility) const { return new UtilityInterpolant##cls(utility, *this); }  \
+                                                                                                                       \
+        ~UtilityInterpolant##cls();                                                                                    \
                                                                                                                        \
         double Calculate(double ei, double ef, double rnd);                                                            \
         double GetUpperLimit(double ei, double rnd);                                                                   \
@@ -36,11 +38,15 @@ class UtilityInterpolant : public UtilityDecorator
 {
     public:
     UtilityInterpolant(const Utility&, InterpolationDef);
+
+    // Copy constructors
+    UtilityInterpolant(const Utility&, const UtilityInterpolant&);
     UtilityInterpolant(const UtilityInterpolant&);
+    virtual UtilityDecorator* clone(const Utility&) const = 0;
+
     virtual ~UtilityInterpolant();
 
-    virtual UtilityDecorator* clone() const = 0;
-
+    // Methods
     virtual double Calculate(double ei, double ef, double rnd) = 0;
     virtual double GetUpperLimit(double ei, double rnd);
 
@@ -61,11 +67,16 @@ class UtilityInterpolantInteraction: public UtilityInterpolant
 {
     public:
     UtilityInterpolantInteraction(const Utility&, InterpolationDef);
+
+    // Copy constructors
+    UtilityInterpolantInteraction(const Utility&, const UtilityInterpolantInteraction&);
     UtilityInterpolantInteraction(const UtilityInterpolantInteraction&);
+    virtual UtilityInterpolant* clone(const Utility& utility) const { return new UtilityInterpolantInteraction(utility, *this); }
+
     virtual ~UtilityInterpolantInteraction();
 
-    virtual UtilityInterpolant* clone() const { return new UtilityInterpolantInteraction(*this); }
 
+    // Methods
     double Calculate(double ei, double ef, double rnd);
     double GetUpperLimit(double ei, double rnd);
 
@@ -83,11 +94,15 @@ class UtilityInterpolantDecay: public UtilityInterpolant
 {
     public:
     UtilityInterpolantDecay(const Utility&, InterpolationDef);
+
+    // Copy constructors
+    UtilityInterpolantDecay(const Utility&, const UtilityInterpolantDecay&);
     UtilityInterpolantDecay(const UtilityInterpolantDecay&);
+    virtual UtilityInterpolant* clone(const Utility& utility) const { return new UtilityInterpolantDecay(utility, *this); }
+
     virtual ~UtilityInterpolantDecay();
 
-    virtual UtilityInterpolant* clone() const { return new UtilityInterpolantDecay(*this); }
-
+    // Methods
     double Calculate(double ei, double ef, double rnd);
     double GetUpperLimit(double ei, double rnd);
 

@@ -18,13 +18,14 @@ class ScatteringDefault: public Scattering
     public:
     ScatteringDefault(Particle&, Utility&);
     ScatteringDefault(Particle&, Utility&, InterpolationDef);
-    ScatteringDefault(Particle&, const ScatteringDefault&);
 
+    // Copy constructor
+    ScatteringDefault(Particle&, const Utility&, const ScatteringDefault&);
     ScatteringDefault(const ScatteringDefault&);
     ~ScatteringDefault();
 
     virtual Scattering* clone() const { return new ScatteringDefault(*this); }
-    virtual Scattering* clone(Particle& particle) const { return new ScatteringDefault(particle, *this); }
+    virtual Scattering* clone(Particle& particle, const Utility& utility) const { return new ScatteringDefault(particle, utility, *this); }
     static Scattering* create(Particle& particle, Utility& utility) { return new ScatteringDefault(particle, utility); }
 
     // bool operator==(const ScatteringDefault& scattering) const;

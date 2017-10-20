@@ -3,14 +3,16 @@
 *
 *   For more details see the class documentation.
 *
-*   \date   
-*   \author 
+*   \date
+*   \author
 */
 #pragma once
 
 #include "PROPOSAL/scattering/Scattering.h"
 
 namespace PROPOSAL{
+
+class Medium;
 
 /**
   * \brief This class provides the scattering routine provided by moliere.
@@ -26,7 +28,7 @@ class ScatteringNoScattering : public Scattering
     ~ScatteringNoScattering();
 
     virtual Scattering* clone() const { return new ScatteringNoScattering(*this); }
-    virtual Scattering* clone(Particle& particle) const { return new ScatteringNoScattering(particle, *this); }
+    virtual Scattering* clone(Particle& particle, const Utility& utility) const { (void) utility; return new ScatteringNoScattering(particle, *this); }
     static Scattering* create(Particle& particle, const Medium& medium) { return new ScatteringNoScattering(particle, medium); }
 
     private:

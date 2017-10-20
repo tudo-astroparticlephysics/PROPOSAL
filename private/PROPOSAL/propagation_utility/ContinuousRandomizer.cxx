@@ -27,8 +27,13 @@ ContinuousRandomizer::ContinuousRandomizer(Utility& utility, InterpolationDef in
     DE2de = new UtilityInterpolantContRand(utility, interpolation_def);
 }
 
+ContinuousRandomizer::ContinuousRandomizer(const Utility& utility, const ContinuousRandomizer& randomizer)
+    : DE2de(randomizer.DE2de->clone(utility))
+{
+}
+
 ContinuousRandomizer::ContinuousRandomizer(const ContinuousRandomizer& randomizer)
-    : DE2de(randomizer.DE2de->clone())
+    : DE2de(randomizer.DE2de->clone(randomizer.DE2de->GetUtility()))
 {
 }
 

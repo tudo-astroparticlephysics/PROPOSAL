@@ -13,6 +13,11 @@
     {                                                                                                                  \
     }                                                                                                                  \
                                                                                                                        \
+    UtilityIntegral##cls::UtilityIntegral##cls(const Utility& utility, const UtilityIntegral##cls& decorator)          \
+        : UtilityIntegral(utility, decorator)                                                                          \
+    {                                                                                                                  \
+    }                                                                                                                  \
+                                                                                                                       \
     UtilityIntegral##cls::UtilityIntegral##cls(const UtilityIntegral##cls& decorator)                                  \
         : UtilityIntegral(decorator.utility_)                                                                          \
     {                                                                                                                  \
@@ -29,6 +34,12 @@ using namespace PROPOSAL;
 UtilityIntegral::UtilityIntegral(const Utility& utility)
     : UtilityDecorator(utility)
     , integral_(IROMB, IMAXS, IPREC2)
+{
+}
+
+UtilityIntegral::UtilityIntegral(const Utility& utility, const UtilityIntegral& collection)
+    : UtilityDecorator(utility)
+    , integral_(collection.integral_)
 {
 }
 
