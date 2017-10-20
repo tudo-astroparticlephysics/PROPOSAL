@@ -14,7 +14,7 @@
 namespace PROPOSAL{
 
 // class PROPSALParticle;
-// class Medium;
+class Medium;
 
 /**
   * \brief This class provides the scattering routine provided by moliere.
@@ -30,7 +30,7 @@ class ScatteringHighland : public Scattering
     ~ScatteringHighland();
 
     virtual Scattering* clone() const { return new ScatteringHighland(*this); }
-    virtual Scattering* clone(Particle& particle) const { return new ScatteringHighland(particle, *this); }
+    virtual Scattering* clone(Particle& particle, const Utility& utility) const { (void) utility; return new ScatteringHighland(particle, *this); }
     static Scattering* create(Particle& particle, const Medium& medium) { return new ScatteringHighland(particle, medium); }
 
     private:

@@ -5,6 +5,8 @@
 #include "PROPOSAL/scattering/ScatteringDefault.h"
 // #include "PROPOSAL/Output.h"
 #include "PROPOSAL/methods.h"
+#include "PROPOSAL/Output.h"
+
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/medium/Medium.h"
@@ -37,14 +39,18 @@ ScatteringDefault::ScatteringDefault(Particle& particle, Utility& utility, Inter
 
 ScatteringDefault::ScatteringDefault(const ScatteringDefault& scattering)
     : Scattering(scattering)
-    , scatter(scattering.scatter->clone())
+    , scatter(scattering.scatter->clone(scattering.scatter->GetUtility()))
 {
 }
 
-ScatteringDefault::ScatteringDefault(Particle& particle, const ScatteringDefault& scattering)
+ScatteringDefault::ScatteringDefault(Particle& particle, const Utility& utility, const ScatteringDefault& scattering)
     : Scattering(particle)
-    , scatter(scattering.scatter->clone())
+    , scatter(scattering.scatter->clone(utility))
 {
+    if (particle.GetParticleDef() != scattering.GetParticle().GetParticleDef())
+    {
+        log_fatal("Particle definition should be equal to the scattering paricle definition!");
+    }
 }
 
 ScatteringDefault::~ScatteringDefault()
