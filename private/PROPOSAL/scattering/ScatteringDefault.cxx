@@ -51,6 +51,10 @@ ScatteringDefault::ScatteringDefault(Particle& particle, const Utility& utility,
     {
         log_fatal("Particle definition should be equal to the scattering paricle definition!");
     }
+    if (utility != scattering.scatter_->GetUtility())
+    {
+        log_fatal("Utilities of the ScatteringDefault should have same values!");
+    }
 }
 
 ScatteringDefault::~ScatteringDefault()
