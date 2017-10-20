@@ -251,23 +251,15 @@ std::size_t PROPOSAL::hash_value(ParticleDef const& particle_def) {
 ******************************************************************************/
 
 ParticleDef::Builder::Builder()
-    : name(default_name)
-    , mass(default_mass)
-    , low(default_low)
-    , lifetime(default_lifetime)
-    , charge(default_charge)
-    , hardbb_table(default_hardbb_table)
+    : name("")
+    , mass(0)
+    , low(0)
+    , lifetime(-1)
+    , charge(-1)
+    , hardbb_table(NULL)
     , decay_table()
 {
 }
-
-const std::string ParticleDef::Builder::default_name = "";
-const double      ParticleDef::Builder::default_mass = 0;
-const double      ParticleDef::Builder::default_low = 0;
-const double      ParticleDef::Builder::default_lifetime = -1;
-const double      ParticleDef::Builder::default_charge = -1;
-const HardBBTables::VecType* ParticleDef::Builder::default_hardbb_table = &HardBBTables::EmptyTable;
-// const DecayTable ParticleDef::Builder::default_decay_table;
 
 // ------------------------------------------------------------------------- //
 // Special Particle definitions
