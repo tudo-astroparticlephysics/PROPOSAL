@@ -8,6 +8,7 @@
 #include "PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h"
 
 #include "PROPOSAL/Constants.h"
+#include "PROPOSAL/Output.h"
 
 using namespace PROPOSAL;
 
@@ -30,6 +31,10 @@ ContinuousRandomizer::ContinuousRandomizer(Utility& utility, InterpolationDef in
 ContinuousRandomizer::ContinuousRandomizer(const Utility& utility, const ContinuousRandomizer& randomizer)
     : DE2de(randomizer.DE2de->clone(utility))
 {
+    if (utility != randomizer.DE2de->GetUtility())
+    {
+        log_fatal("Utilities of the ContinuousRandomizer should have same values!");
+    }
 }
 
 ContinuousRandomizer::ContinuousRandomizer(const ContinuousRandomizer& randomizer)
