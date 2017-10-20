@@ -20,6 +20,9 @@ class Scattering
     Scattering(const Scattering&);
     virtual ~Scattering();
 
+    bool operator==(const Scattering& scattering) const;
+    bool operator!=(const Scattering& scattering) const;
+
     virtual Scattering* clone() const = 0; // virtual constructor idiom (used for deep copies)
     virtual Scattering* clone(Particle&, const Utility&) const = 0; // virtual constructor idiom (used for deep copies)
 
@@ -29,6 +32,9 @@ class Scattering
 
     protected:
     Scattering& operator=(const Scattering&); // Undefined & not allowed
+
+    // Implemented in child classes to be able to use equality operator
+    virtual bool compare(const Scattering&) const = 0;
 
     struct RandomAngles
     {

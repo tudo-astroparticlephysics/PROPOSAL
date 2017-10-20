@@ -22,6 +22,9 @@ class CrossSection
     CrossSection(const CrossSection&);
     virtual ~CrossSection();
 
+    bool operator==(const CrossSection& cross_section) const;
+    bool operator!=(const CrossSection& cross_section) const;
+
     virtual CrossSection* clone() const = 0;
 
     friend std::ostream& operator<<(std::ostream&, CrossSection const&);
@@ -44,6 +47,9 @@ class CrossSection
     Parametrization& GetParametrization() const { return *parametrization_; }
 
     protected:
+
+    virtual bool compare(const CrossSection&) const = 0;
+
     typedef std::vector<Components::Component*> ComponentVec;
 
     // ----------------------------------------------------------------- //

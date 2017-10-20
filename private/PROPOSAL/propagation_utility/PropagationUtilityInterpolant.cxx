@@ -50,6 +50,26 @@ UtilityInterpolant::~UtilityInterpolant()
     delete interpolant_diff_;
 }
 
+bool UtilityInterpolant::compare(const UtilityDecorator& utility_decorator) const
+{
+    const UtilityInterpolant* utility_interpolant = dynamic_cast<const UtilityInterpolant*>(&utility_decorator);
+
+    if (!utility_interpolant)
+        return false;
+    else if (stored_result_ != utility_interpolant->stored_result_)
+        return false;
+    else if (*interpolant_ != *utility_interpolant->interpolant_)
+        return false;
+    else if (*interpolant_diff_ != *utility_interpolant->interpolant_diff_)
+        return false;
+    // Interpolation definition is just a struct and doesn't have to be compared
+    // else if (interpolation_def_ != utility_interpolant->interpolation_def_)
+    //     return false;
+    else
+        return true;
+        // return this->compare_interpolant(utility_interpolant);
+}
+
 // ------------------------------------------------------------------------- //
 double UtilityInterpolant::GetUpperLimit(double ei, double rnd)
 {
@@ -208,6 +228,20 @@ UtilityInterpolantInteraction::~UtilityInterpolantInteraction()
 {
 }
 
+// bool UtilityInterpolantInteraction::compare_interpolant(const UtilityInterpolant& untility_interpolant) const
+// {
+//     const UtilityInterpolantInteraction* utility_interpolant_interaction = dynamic_cast<const UtilityInterpolantInteraction*>(&untility_interpolant);
+
+//     if (!utility_interpolant_interaction)
+//         return false;
+//     else if (big_low_ != utility_interpolant_interaction->big_low_)
+//         return false;
+//     else if (up_ != utility_interpolant_interaction->up_)
+//         return false;
+//     else
+//         return true;
+// }
+
 double UtilityInterpolantInteraction::Calculate(double ei, double ef, double rnd)
 {
     (void) rnd;
@@ -314,6 +348,20 @@ UtilityInterpolantDecay::UtilityInterpolantDecay(const UtilityInterpolantDecay& 
 UtilityInterpolantDecay::~UtilityInterpolantDecay()
 {
 }
+
+// bool UtilityInterpolantDecay::compare_interpolant(const UtilityInterpolant& untility_interpolant) const
+// {
+//     const UtilityInterpolantDecay* utility_interpolant_decay = dynamic_cast<const UtilityInterpolantDecay*>(&untility_interpolant);
+
+//     if (!utility_interpolant_decay)
+//         return false;
+//     else if (big_low_ != utility_interpolant_decay->big_low_)
+//         return false;
+//     else if (up_ != utility_interpolant_decay->up_)
+//         return false;
+//     else
+//         return true;
+// }
 
 double UtilityInterpolantDecay::Calculate(double ei, double ef, double rnd)
 {

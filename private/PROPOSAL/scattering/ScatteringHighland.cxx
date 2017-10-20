@@ -49,6 +49,18 @@ ScatteringHighland::~ScatteringHighland()
     delete medium_;
 }
 
+bool ScatteringHighland::compare(const Scattering& scattering) const
+{
+    const ScatteringHighland* scatteringHighland = dynamic_cast<const ScatteringHighland*>(&scattering);
+
+    if (!scatteringHighland)
+        return false;
+    else if (*medium_ != *scatteringHighland->medium_)
+        return false;
+    else
+        return true;
+}
+
 // ------------------------------------------------------------------------- //
 // Private methods
 // ------------------------------------------------------------------------- //

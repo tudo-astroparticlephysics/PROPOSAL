@@ -47,6 +47,8 @@ class UtilityIntegral : public UtilityDecorator
     protected:
     UtilityIntegral& operator=(const UtilityIntegral&); // Undefined & not allowed
 
+    bool compare(const UtilityDecorator&) const;
+
     Integral integral_;
 
 };
