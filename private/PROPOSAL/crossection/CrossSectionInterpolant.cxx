@@ -29,6 +29,24 @@ CrossSectionInterpolant::CrossSectionInterpolant(const DynamicData::Type& type, 
     // InitdNdxInerpolation(def);
 }
 
+bool CrossSectionInterpolant::compare(const CrossSection& cross_section) const
+{
+    const CrossSectionInterpolant* cross_section_interpolant = dynamic_cast<const CrossSectionInterpolant*>(&cross_section);
+
+    if (!cross_section_interpolant)
+        return false;
+    else if (*dedx_interpolant_ != *cross_section_interpolant->dedx_interpolant_)
+        return false;
+    else if (*de2dx_interpolant_ != *cross_section_interpolant->de2dx_interpolant_)
+        return false;
+    else if (dndx_interpolant_1d_ != cross_section_interpolant->dndx_interpolant_1d_)
+        return false;
+    else if (dndx_interpolant_2d_ != cross_section_interpolant->dndx_interpolant_2d_)
+        return false;
+    else
+        return true;
+}
+
 // ------------------------------------------------------------------------- //
 void CrossSectionInterpolant::InitdNdxInerpolation(const InterpolationDef& def)
 {

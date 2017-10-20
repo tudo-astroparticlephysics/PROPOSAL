@@ -46,6 +46,29 @@ CrossSection::~CrossSection()
     delete parametrization_;
 }
 
+bool CrossSection::operator==(const CrossSection& cross_section) const
+{
+    // if (type_id_ != cross_section.type_id_)
+    //     return false;
+    if (parametrization_ != cross_section.parametrization_)
+        return false;
+    else if (prob_for_component_ != cross_section.prob_for_component_)
+        return false;
+    else if (sum_of_rates_ != cross_section.sum_of_rates_)
+        return false;
+    // else if (components_ != cross_section.components_)
+    //     return false;
+    else if (rnd_ != cross_section.rnd_)
+        return false;
+    else
+        return this->compare(cross_section);
+}
+
+bool CrossSection::operator!=(const CrossSection& cross_section) const
+{
+    return !(*this == cross_section);
+}
+
 // ------------------------------------------------------------------------- //
 std::ostream& PROPOSAL::operator<<(std::ostream& os, CrossSection const& cross)
 {

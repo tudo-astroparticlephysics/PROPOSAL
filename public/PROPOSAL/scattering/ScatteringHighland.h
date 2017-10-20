@@ -36,6 +36,8 @@ class ScatteringHighland : public Scattering
     private:
     ScatteringHighland& operator=(const ScatteringHighland&); // Undefined & not allowed
 
+    bool compare(const Scattering&) const;
+
     RandomAngles CalculateRandomAngle(double dr, double ei, double ef);
     double CalculateTheta0(double dr);
 

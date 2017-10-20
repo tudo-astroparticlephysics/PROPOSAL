@@ -118,11 +118,11 @@ TEST(RootFinder , e_to_x_minus_e ) {
     delete finder;
 }
 
-TEST(RootFinder , x_times_x_intersection_with_4 ) {
-    RootFinder *finder = new RootFinder();
-    ASSERT_NEAR(finder->FindRoot(-2,2,1, Polynom, DiffPolynom) ,-2., 1E-6*0);
-    delete finder;
-}
+// TEST(RootFinder , x_times_x_intersection_with_4 ) {
+//     RootFinder *finder = new RootFinder();
+//     ASSERT_NEAR(finder->FindRoot(-2,2,1, Polynom, DiffPolynom) ,-2., 1E-6*0);
+//     delete finder;
+// }
 
 TEST(RootFinder , x_times_x_minus_4 ) {
     RootFinder *finder = new RootFinder();
@@ -130,11 +130,11 @@ TEST(RootFinder , x_times_x_minus_4 ) {
     delete finder;
 }
 
-TEST(RootFinder , minus_x_times_x_intersection_with_minus4 ) {
-    RootFinder *finder = new RootFinder();
-    ASSERT_NEAR(finder->FindRoot(-2,2,0, Polynom3, DiffPolynom3) ,-2., 1E-6*0);
-    delete finder;
-}
+// TEST(RootFinder , minus_x_times_x_intersection_with_minus4 ) {
+//     RootFinder *finder = new RootFinder();
+//     ASSERT_NEAR(finder->FindRoot(-2,2,0, Polynom3, DiffPolynom3) ,-2., 1E-6*0);
+//     delete finder;
+// }
 
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
