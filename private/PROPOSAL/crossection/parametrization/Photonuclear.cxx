@@ -20,6 +20,9 @@ using namespace PROPOSAL;
 
 std::vector<double> HardBB::x = boost::assign::list_of(3)(4)(5)(6)(7)(8)(9);
 
+const std::string HardBB::name_ = "HardBB";
+const std::string SoftBB::name_ = "SoftBB";
+
 HardBB::HardBB(const ParticleDef& particle_def)
     : interpolant_()
 {
@@ -113,6 +116,9 @@ double SoftBB::CalculateHardBB(double energy, double v)
 /******************************************************************************
 *                                ShadowEffect                                *
 ******************************************************************************/
+
+const std::string ShadowDutta::name_ = "ShadowDutta";
+const std::string ShadowButkevichMikhailov::name_ = "ButkevichMikhailov";
 
 // ------------------------------------------------------------------------- //
 // Dutta, Reno, SArcevic, Seckel

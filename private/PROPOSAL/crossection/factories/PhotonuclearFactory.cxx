@@ -14,30 +14,38 @@
 using namespace PROPOSAL;
 
 PhotonuclearFactory::PhotonuclearFactory()
+    : photo_shadow_map_str_()
+    , photo_shadow_map_enum_()
+    , photo_real_map_str_()
+    , photo_real_map_enum_()
+    , photo_q2_map_str_()
+    , photo_q2_map_enum_()
+    , string_enum_()
+    , string_shadow_enum_()
 {
     // Register all photonuclear parametrizations in lower case!
 
     RegisterShadowEffect("dutta", ShadowDutta, &ShadowDutta::create);
-    RegisterShadowEffect("butkevichmikhailov", ShadowButkevichMikhailov, &ShadowButkevichMikhailov::create);
+    RegisterShadowEffect("butkevich-mikhailov", ShadowButkevichMikhailov, &ShadowButkevichMikhailov::create);
 
     RegisterRealPhoton("zeus", Zeus, &PhotoZeus::create);
-    RegisterRealPhoton("bezrukovbugaev", BezrukovBugaev, &PhotoBezrukovBugaev::create);
+    RegisterRealPhoton("bezrukov-bugaev", BezrukovBugaev, &PhotoBezrukovBugaev::create);
     RegisterRealPhoton("rhode", Rhode, &PhotoRhode::create);
     RegisterRealPhoton("kokoulin", Kokoulin, &PhotoKokoulin::create);
 
-    RegisterQ2("abramowiczlevinlevymaor91",
+    RegisterQ2("allm91",
              AbramowiczLevinLevyMaor91,
              std::make_pair(&PhotoAbramowiczLevinLevyMaor91::create,
                             &PhotoQ2Interpolant<PhotoAbramowiczLevinLevyMaor91>::create));
-    RegisterQ2("abramowiczlevinlevymaor97",
+    RegisterQ2("allm97",
              AbramowiczLevinLevyMaor97,
              std::make_pair(&PhotoAbramowiczLevinLevyMaor97::create,
                             &PhotoQ2Interpolant<PhotoAbramowiczLevinLevyMaor97>::create));
-    RegisterQ2("butkevichmikhailov",
+    RegisterQ2("butkevich-mikhailov",
              ButkevichMikhailov,
              std::make_pair(&PhotoButkevichMikhailov::create,
                             &PhotoQ2Interpolant<PhotoButkevichMikhailov>::create));
-    RegisterQ2("renosarcevicsu",
+    RegisterQ2("reno-sarcevic-su",
              RenoSarcevicSu,
              std::make_pair(&PhotoRenoSarcevicSu::create,
                             &PhotoQ2Interpolant<PhotoRenoSarcevicSu>::create));
@@ -54,27 +62,29 @@ PhotonuclearFactory::~PhotonuclearFactory()
     photo_q2_map_str_.clear();
     photo_q2_map_enum_.clear();
 
-    map_string_to_enum.clear();
+    string_enum_.clear();
+    string_shadow_enum_.clear();
 }
 
 void PhotonuclearFactory::RegisterShadowEffect(const std::string& name, const Shadow& shadow, RegisterShadowEffectFunction create)
 {
     photo_shadow_map_str_[name] = create;
     photo_shadow_map_enum_[shadow] = create;
+    string_shadow_enum_.insert(BimapStringShadowEnum::value_type(name, shadow));
 }
 
 void PhotonuclearFactory::RegisterRealPhoton(const std::string& name, Enum enum_t, RegisterRealPhotonFunction create)
 {
     photo_real_map_str_[name] = create;
     photo_real_map_enum_[enum_t] = create;
-    map_string_to_enum[name] = enum_t;
+    string_enum_.insert(BimapStringEnum::value_type(name, enum_t));
 }
 
 void PhotonuclearFactory::RegisterQ2(const std::string& name, Enum enum_t, std::pair<RegisterQ2Function, RegisterQ2FunctionInterpolant> create)
 {
     photo_q2_map_str_[name] = create;
     photo_q2_map_enum_[enum_t] = create;
-    map_string_to_enum[name] = enum_t;
+    string_enum_.insert(BimapStringEnum::value_type(name, enum_t));
 }
 
 // ------------------------------------------------------------------------- //
@@ -436,13 +446,54 @@ PhotonuclearFactory::Enum PhotonuclearFactory::GetEnumFromString(const std::stri
 {
     std::string name_lower = boost::algorithm::to_lower_copy(name);
 
-    MapStringToEnum::iterator it = map_string_to_enum.find(name_lower);
-
-    if (it != map_string_to_enum.end())
+    BimapStringEnum::left_const_iterator it = string_enum_.left.find(name_lower);
+    if (it != string_enum_.left.end())
     {
         return it->second;
     } else
     {
         log_fatal("Photonuclear %s not registerd!", name.c_str());
+    }
+}
+
+// ------------------------------------------------------------------------- //
+std::string PhotonuclearFactory::GetStringFromEnum(const PhotonuclearFactory::Enum& enum_t)
+{
+    BimapStringEnum::right_const_iterator it = string_enum_.right.find(enum_t);
+    if (it != string_enum_.right.end())
+    {
+        return it->second;
+    } else
+    {
+        log_fatal("Photonuclear %s not registerd!", typeid(enum_t).name());
+    }
+}
+
+// ------------------------------------------------------------------------- //
+PhotonuclearFactory::Shadow PhotonuclearFactory::GetShadowEnumFromString(const std::string& name)
+{
+    std::string name_lower = boost::algorithm::to_lower_copy(name);
+
+    BimapStringShadowEnum::left_const_iterator it = string_shadow_enum_.left.find(name_lower);
+    if (it != string_shadow_enum_.left.end())
+    {
+        return it->second;
+    } else
+    {
+        log_fatal("Photonuclear %s not registerd!", name.c_str());
+    }
+}
+
+// ------------------------------------------------------------------------- //
+std::string PhotonuclearFactory::GetStringFromShadowEnum(const Shadow& shadow)
+{
+
+    BimapStringShadowEnum::right_const_iterator it = string_shadow_enum_.right.find(shadow);
+    if (it != string_shadow_enum_.right.end())
+    {
+        return it->second;
+    } else
+    {
+        log_fatal("Photonuclear %s not registerd!", typeid(shadow).name());
     }
 }
