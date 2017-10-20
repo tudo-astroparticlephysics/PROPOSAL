@@ -2,90 +2,115 @@
 // #include <iostream>
 
 #include "gtest/gtest.h"
+#include "PROPOSAL/medium/Components.h"
+#include "PROPOSAL/medium/Medium.h"
+#include "PROPOSAL/medium/MediumFactory.h"
+#include "PROPOSAL/particle/Particle.h"
 
-#include "PROPOSAL/Scattering.h"
-#include "PROPOSAL/Ionization.h"
-#include "PROPOSAL/Bremsstrahlung.h"
-#include "PROPOSAL/Epairproduction.h"
-#include "PROPOSAL/Photonuclear.h"
+#include "PROPOSAL/scattering/ScatteringNoScattering.h"
+#include "PROPOSAL/scattering/ScatteringHighland.h"
+#include "PROPOSAL/scattering/ScatteringMoliere.h"
+#include "PROPOSAL/scattering/ScatteringDefault.h"
+// #include "PROPOSAL/Scattering.h"
+// #include "PROPOSAL/Ionization.h"
+// #include "PROPOSAL/Bremsstrahlung.h"
+// #include "PROPOSAL/Epairproduction.h"
+// #include "PROPOSAL/Photonuclear.h"
+#include "PROPOSAL/propagation_utility/PropagationUtility.h"
 
 using namespace std;
 using namespace PROPOSAL;
 
-TEST(Comparison , Comparison_equal ) {
-    Scattering A;
-    Scattering B;
-    ParticleDef a = ParticleDef(StauMinusDef::Get());
-    PROPOSALParticle b(MuMinusDef::Get());
+TEST(Comparison , Comparison_equal )
+{
+    Particle mu = Particle(MuMinusDef::Get());
+    Water water(1.0);
 
-    EXPECT_TRUE(A==B);
-/*
+    EnergyCutSettings ecuts;
+    Utility::Definition utility_defs;
+    Utility utils(MuMinusDef::Get(), water, ecuts, utility_defs);
 
-    StandardNormal* standnorm = new StandardNormal(); // StandardNormal is removed, now boost::erfinv is used
-    Scattering* C = new Scattering(standnorm);
-    Scattering* D = new Scattering(standnorm);
+    ScatteringNoScattering noScat1(mu, water);
+    ScatteringNoScattering noScat2(mu, water);
 
-    EXPECT_TRUE(*C == *D);
+    ScatteringMoliere moliere1(mu, water);
+    ScatteringMoliere moliere2(mu, water);
 
+    ScatteringHighland high1(mu, water);
+    ScatteringHighland high2(mu, water);
 
-    Scattering* E = new Scattering(A);
-    EXPECT_TRUE(A==*E);
-    */
+    ScatteringDefault default1(mu, utils);
+    ScatteringDefault default2(mu, utils);
+    // Scattering A = ScatteringFactory::Get().CreateScattering(ScatteringFactory::Moliere, particle_, utility_)
+    // Scattering B(mu);
+
+    EXPECT_TRUE(noScat1==noScat2);
+    EXPECT_TRUE(moliere1==moliere2);
+    EXPECT_TRUE(high1==high2);
+    EXPECT_TRUE(default1==default2);
 
 }
 
 TEST(Comparison , Comparison_not_equal ) {
 
-//    Scattering A;
+    Particle mu = Particle(MuMinusDef::Get());
+    Particle tau = Particle(TauMinusDef::Get());
+    Water water(1.0);
 
-//    StandardNormal* stdnrmNotDefault = new StandardNormal(2,12,1e-10); // StandardNormal is removed, now boost::erfinv is used
-//    Scattering B(stdnrmNotDefault);
+    EnergyCutSettings ecuts;
+    Utility::Definition utility_defs;
+    Utility utils(MuMinusDef::Get(), water, ecuts, utility_defs);
 
-//    EXPECT_TRUE(A!=B);
+    ScatteringNoScattering noScat1(mu, water);
+    ScatteringNoScattering noScat2(tau, water);
 
-//    Scattering C(B.GetStandardNormal()); // StandardNormal is removed, now boost::erfinv is used
+    ScatteringMoliere moliere1(mu, water);
+    ScatteringMoliere moliere2(tau, water);
 
-//    EXPECT_TRUE(A!=C);
-//    EXPECT_TRUE(C==B);
+    ScatteringHighland high1(mu, water);
+    ScatteringHighland high2(tau, water);
 
-//    Scattering D(A);
+    ScatteringDefault default1(mu, utils);
+    ScatteringDefault default2(tau, utils);
 
-//    EXPECT_TRUE(D!=B);
-//    EXPECT_TRUE(D==A);
-
-
-}
-
-TEST(Assignment , Swap ) {
-    Scattering A;
-    Scattering B;
-    Scattering *C = new Scattering();
-    Scattering *D = new Scattering(*C);
-
-    EXPECT_TRUE(A==B);
-    EXPECT_TRUE(*C == *D);
-
-    A.swap(*C);
-    EXPECT_TRUE(A == *D);
-    EXPECT_TRUE(B == *C);
-}
-
-TEST(Assignment , Copyconstructor ) {
-    Scattering A;
-    Scattering B;
-
-    A=B;
-    EXPECT_TRUE(A==B);
-}
-
-TEST(Assignment , Copyconstructor2 ) {
-    Scattering A;
-    Scattering B(A);
-
-    EXPECT_TRUE(A==B);
+    EXPECT_TRUE(noScat1!=noScat2);
+    EXPECT_TRUE(moliere1!=moliere2);
+    EXPECT_TRUE(high1!=high2);
+    EXPECT_TRUE(default1!=default2);
 
 
 }
+
+// TEST(Assignment , Swap ) {
+//     Scattering A;
+//     Scattering B;
+//     Scattering *C = new Scattering();
+//     Scattering *D = new Scattering(*C);
+
+//     EXPECT_TRUE(A==B);
+//     EXPECT_TRUE(*C == *D);
+
+//     A.swap(*C);
+//     EXPECT_TRUE(A == *D);
+//     EXPECT_TRUE(B == *C);
+// }
+
+// TEST(Assignment , Copyconstructor ) {
+//     Scattering A;
+//     Scattering B;
+
+//     A=B;
+//     EXPECT_TRUE(A==B);
+// }
+
+// TEST(Assignment , Copyconstructor2 ) {
+//     Scattering A;
+//     Scattering B(A);
+
+//     EXPECT_TRUE(A==B);
+
+
+// }
 
 
 TEST(Scattering , Theta0 )
