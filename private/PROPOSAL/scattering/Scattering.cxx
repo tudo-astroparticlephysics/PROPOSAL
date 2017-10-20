@@ -35,6 +35,19 @@ Scattering::~Scattering()
 {
 }
 
+bool Scattering::operator==(const Scattering& scattering) const
+{
+    if (particle_ != scattering.particle_)
+        return false;
+    else
+        return this->compare(scattering);
+}
+
+bool Scattering::operator!=(const Scattering& scattering) const
+{
+    return !(*this == scattering);
+}
+
 void Scattering::Scatter(double dr, double ei, double ef)
 {
     double sz,tz;

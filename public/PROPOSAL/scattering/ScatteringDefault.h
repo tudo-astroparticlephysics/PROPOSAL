@@ -27,19 +27,19 @@ class ScatteringDefault: public Scattering
     virtual Scattering* clone(Particle& particle) const { return new ScatteringDefault(particle, *this); }
     static Scattering* create(Particle& particle, Utility& utility) { return new ScatteringDefault(particle, utility); }
 
-    // bool operator==(const ScatteringDefault& scattering) const;
-    // bool operator!=(const ScatteringDefault& scattering) const;
     // void swap(ScatteringDefault& scattering);
 
     private:
     ScatteringDefault& operator=(const ScatteringDefault&); // Undefined & not allowed
+
+    bool compare(const Scattering&) const;
 
     RandomAngles CalculateRandomAngle(double dr, double ei, double ef);
     long double CalculateTheta0(double dr,
                                 double ei,
                                 double ef);
 
-    UtilityDecorator* scatter;
+    UtilityDecorator* scatter_;
 };
 
 }

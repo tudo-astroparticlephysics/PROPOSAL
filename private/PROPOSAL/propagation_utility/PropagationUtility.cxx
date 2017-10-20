@@ -29,6 +29,11 @@ Utility::Definition::~Definition()
 {
 }
 
+// bool Utility::Definition::operator==(const Definition& definition) const
+// {
+//     if ()
+// }
+
 // ------------------------------------------------------------------------- //
 // Constructors
 // ------------------------------------------------------------------------- //
@@ -51,7 +56,6 @@ Utility::Utility(const ParticleDef& particle_def,
     , medium_(medium.clone())
     , cut_settings_(cut_settings)
     , crosssections_()
-    , utility_def_(utility_def)
 {
     crosssections_.push_back(BremsstrahlungFactory::Get().CreateBremsstrahlung(particle_def_,
                                                                                *medium_,
@@ -86,7 +90,6 @@ Utility::Utility(const ParticleDef& particle_def,
     , medium_(medium.clone())
     , cut_settings_(cut_settings)
     , crosssections_()
-    , utility_def_(utility_def)
 {
     crosssections_.push_back(BremsstrahlungFactory::Get().CreateBremsstrahlung(particle_def_,
                                                                                *medium_,
@@ -152,7 +155,6 @@ Utility::Utility(const Utility& collection)
     ,medium_(collection.medium_->clone())
     ,cut_settings_(collection.cut_settings_)
     ,crosssections_(collection.crosssections_.size(), NULL)
-    ,utility_def_(collection.utility_def_)
 {
     for (unsigned int i = 0; i < crosssections_.size(); ++i)
     {
@@ -170,6 +172,25 @@ Utility::~Utility()
     }
 
     crosssections_.clear();
+}
+
+bool Utility::operator==(const Utility& utility) const
+{
+    if (particle_def_ != utility.particle_def_)
+        return false;
+    else if (*medium_ != *utility.medium_)
+        return false;
+    else if (cut_settings_ != utility.cut_settings_)
+        return false;
+    else if (crosssections_ != utility.crosssections_)
+        return false;
+    else
+        return true;
+}
+
+bool Utility::operator!=(const Utility& utility) const
+{
+    return !(*this == utility);
 }
 
 /******************************************************************************
@@ -257,6 +278,19 @@ UtilityDecorator::UtilityDecorator(const UtilityDecorator& decorator)
 
 UtilityDecorator::~UtilityDecorator()
 {
+}
+
+bool UtilityDecorator::operator==(const UtilityDecorator& utility_decorator) const
+{
+    if (utility_ != utility_decorator.utility_)
+        return false;
+    else
+        return this->compare(utility_decorator);
+}
+
+bool UtilityDecorator::operator!=(const UtilityDecorator& utility_decorator) const
+{
+    return !(*this == utility_decorator);
 }
 
 // ------------------------------------------------------------------------- //
