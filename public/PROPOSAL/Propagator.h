@@ -45,33 +45,11 @@ class Propagator
     Propagator(const std::vector<Sector*>&, const Geometry&);
     Propagator(const ParticleDef&, const std::vector<SectorFactory::Definition>&, const Geometry&);
     Propagator(const ParticleDef&, const std::vector<SectorFactory::Definition>&, const Geometry&, const InterpolationDef&);
-    // Propagator(const ParticleDef&, const std::vector<SectorFactory::Definition>&, const Geometry&);
     Propagator(const ParticleDef&, const std::string&);
-    // Propagator(ParticleDef,
-    //            std::string path_to_tables,
-    //            bool exact_time = true,
-    //            bool lpm = true,
-    //            bool integrate = false,
-    //            int scattering_model = 0);
-    // Propagator(std::string config_file, bool DoApplyOptions=true);
-    // Propagator(std::string config_file, Particle* particle, bool DoApplyOptions=true);
-    // Propagator(Medium* medium,
-    //            EnergyCutSettings* cuts,
-    //            ParticleDef,
-    //            std::string path_to_tables,
-    //            bool moliere = true,
-    //            bool continuous_rand = true,
-    //            bool exact_time = true,
-    //            bool lpm = true,
-    //            ParametrizationType::Enum brems = ParametrizationType::BremsKelnerKokoulinPetrukhin,
-    //            ParametrizationType::Enum photo = ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich,
-    //            double brems_multiplier = 1,
-    //            double photo_multiplier = 1,
-    //            double ioniz_multiplier = 1,
-    //            double epair_multiplier = 1,
-    //            bool integrate = false,
-    //            int scattering_model = 0);
+
     Propagator(const Propagator&);
+    ~Propagator();
+
     Propagator& operator=(const Propagator& propagator);
     bool operator==(const Propagator& propagator) const;
     bool operator!=(const Propagator& propagator) const;
@@ -91,15 +69,13 @@ class Propagator
 
     // double Propagate(double distance);
 
-    //----------------------------------------------------------------------------//
-    /**
-     * Propagates the particle through the current set of ProcessCollections
-     *  \return vector of secondarys
-     */
-
-    // std::vector<Particle*> Propagate( Particle *particle, double MaxDistance_cm = 1e20 );
-
-    //----------------------------------------------------------------------------//
+    // ----------------------------------------------------------------------------
+    /// @brief Propagates the particle through the current set of Sectors
+    ///
+    /// @param MaxDistance_cm
+    ///
+    /// @return Secondary data
+    // ----------------------------------------------------------------------------
     std::vector<DynamicData*> Propagate( double MaxDistance_cm = 1e20);
 
     //----------------------------------------------------------------------------//
@@ -132,52 +108,71 @@ class Propagator
     //----------------------------------------------------------------------------//
     std::vector<Sector*> GetSectors() const { return sectors_; }
 
-    //----------------------------------------------------------------------------//
-    // Setter
-
-    /**
-     *  Sets the ProcessCollections. Need to execute AplyOptions() afterward.
-     */
-    // void SetCollections(std::vector<Collection*>);
-    /**
-     *  Sets the particle for the Propagator and its current ProcessCollection
-     */
-    // void SetParticle(Particle* particle);
-
-    //----------------------------------------------------------------------------//
-    // Destructor
-    ~Propagator();
-
-    int GetSeed() const;
-    void SetSeed(int seed);
-    // ParametrizationType::Enum GetBrems() const;
-    // void SetBrems(ParametrizationType::Enum brems);
-    // ParametrizationType::Enum GetPhoto() const;
-    // void SetPhoto(ParametrizationType::Enum photo);
-    // std::string GetPath_to_tables() const;
-    // void SetPath_to_tables(const std::string &path_to_tables);
-    Geometry* GetDetector() const;
-    Particle& GetParticle();
+    int GetSeed() const { return seed_; };
+    void SetSeed(int seed) { seed_ = seed; };
+    Geometry& GetDetector() const { return *detector_; };
+    Particle& GetParticle() { return particle_; };
     // void SetDetector(Geometry *detector);
     // bool GetStopping_decay() const;
     // void SetStopping_decay(bool stopping_decay);
 
     private:
 
+    // ----------------------------------------------------------------------------
+    /// @brief Simple wrapper to initialize propagator from config file
+    ///
+    /// The value of var will be treated as a default value.
+    ///
+    /// @param var: the variable to initialize
+    /// @param option: option in the property_tree
+    /// @param property_tree
+    // ----------------------------------------------------------------------------
     template<class T>
     void SetMember(T& var, std::string option, boost::property_tree::ptree& pt)
     {
-        try
+        boost::optional<T> optional_param = pt.get_optional<T>(option);
+        if (optional_param)
         {
-            var = pt.get<T>(option);
+            var = optional_param.get();
         }
-        catch(std::exception& ex)
+        else
         {
             std::stringstream ss;
-            ss<<ex.what()<<"! Use default: "<<var;
+            ss << "Option " << option << " not set! Use default: " << var;
             log_warn("%s", ss.str().c_str());
         }
     }
+
+    // ----------------------------------------------------------------------------
+    /// @brief Create geometry from json config file
+    ///
+    /// @param pt boost property tree
+    ///
+    /// @return new Geometry
+    // ----------------------------------------------------------------------------
+    Geometry* ParseGeometryConifg(boost::property_tree::ptree& pt);
+
+    // ----------------------------------------------------------------------------
+    /// @brief Choose the current collection the particle is in.
+    ///
+    /// @param particle_position
+    /// @param particle_direction
+    // ----------------------------------------------------------------------------
+    void ChooseCurrentCollection(const Vector3D& particle_position, const Vector3D& particle_direction);
+
+    // ----------------------------------------------------------------------------
+    /// @brief Calculate the distance to propagate
+    ///
+    /// Calculate the distance to propagate and
+    /// choose if the particle has to propagate through the whole sector
+    /// or only to the collection border
+    ///
+    /// @param particle_position
+    /// @param particle_direction
+    ///
+    /// @return distance
+    // ----------------------------------------------------------------------------
+    double CalculateEffectiveDistance(const Vector3D& particle_position, const Vector3D& particle_direction);
 
     int seed_; //!< seed of the random number generator
     // ParametrizationType::Enum  brems_;                     //!< Bremsstrahlungs parametrization
@@ -200,29 +195,13 @@ class Propagator
     //!specified explicit for a sector in congiguration file)
     static const double global_cont_behind_;  //!< continuous randominzation flag for behind the detector (it's used when not
                                  //!specified explicit for a sector in congiguration file)
-
+    static const bool interpolate_;  //!< Enable interpolation
 
     std::vector<Sector*> sectors_;
     Sector* current_sector_;
 
     Particle particle_;
     Geometry* detector_;
-
-    //----------------------------------------------------------------------------//
-    /**
-     * Choose the current collection by particle type and location.
-     */
-
-    void ChooseCurrentCollection(const Vector3D& particle_position, const Vector3D& particle_direction);
-
-    //----------------------------------------------------------------------------//
-    /**
-     * Calculate the distance to propagate and
-     * choose if the particle has to propagate through the whole sector
-     * or only to the collection border
-     */
-
-    double CalculateEffectiveDistance(const Vector3D& particle_position, const Vector3D& particle_direction);
 };
 
 }
