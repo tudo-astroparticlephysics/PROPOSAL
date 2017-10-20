@@ -53,8 +53,7 @@ class UtilityInterpolant : public UtilityDecorator
     protected:
     UtilityInterpolant& operator=(const UtilityInterpolant&); // Undefined & not allowed
 
-    bool compare(const UtilityDecorator&) const;
-    // virtual bool compare_interpolant(const UtilityInterpolant&) const = 0;
+    virtual bool compare(const UtilityDecorator&) const;
 
     virtual double BuildInterpolant(double, UtilityIntegral&, Integral&) = 0;
     virtual void InitInterpolation(const std::string&, UtilityIntegral&, int number_of_sampling_points) = 0;
@@ -86,6 +85,8 @@ class UtilityInterpolantInteraction: public UtilityInterpolant
     private:
     UtilityInterpolantInteraction& operator=(const UtilityInterpolantInteraction&); // Undefined & not allowed
 
+    virtual bool compare(const UtilityDecorator&) const;
+
     // bool compare_interpolant(const UtilityInterpolant&) const;
 
     double BuildInterpolant(double, UtilityIntegral&, Integral&);
@@ -113,6 +114,8 @@ class UtilityInterpolantDecay: public UtilityInterpolant
 
     private:
     UtilityInterpolantDecay& operator=(const UtilityInterpolantDecay&); // Undefined & not allowed
+
+    virtual bool compare(const UtilityDecorator&) const;
 
     // bool compare_interpolant(const UtilityInterpolant&) const;
 

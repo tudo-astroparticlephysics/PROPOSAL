@@ -52,13 +52,9 @@ EpairProduction::~EpairProduction()
 
 bool EpairProduction::compare(const Parametrization& parametrization) const
 {
-    const EpairProduction* pairproduction = dynamic_cast<const EpairProduction*>(&parametrization);
+    const EpairProduction* pairproduction = static_cast<const EpairProduction*>(&parametrization);
 
-    if (!pairproduction)
-        return false;
-    else if (name_.compare(pairproduction->name_) != 0)
-        return false;
-    else if (v_ != pairproduction->v_)
+    if (v_ != pairproduction->v_)
         return false;
     else if (init_lpm_effect_ != pairproduction->init_lpm_effect_)
         return false;
@@ -67,7 +63,7 @@ bool EpairProduction::compare(const Parametrization& parametrization) const
     else if (eLpm_ != pairproduction->eLpm_)
         return false;
     else
-        return true;
+        return Parametrization::compare(parametrization);
 }
 
 // ------------------------------------------------------------------------- //
@@ -340,6 +336,16 @@ EpairProductionRhoIntegral::~EpairProductionRhoIntegral()
 {
 }
 
+bool EpairProductionRhoIntegral::compare(const Parametrization& parametrization) const
+{
+    const EpairProductionRhoIntegral* pairproduction = static_cast<const EpairProductionRhoIntegral*>(&parametrization);
+
+    if (integral_ != pairproduction->integral_)
+        return false;
+    else
+        return EpairProduction::compare(parametrization);
+}
+
 // ------------------------------------------------------------------------- //
 // Crosssection
 // ------------------------------------------------------------------------- //
@@ -440,6 +446,26 @@ EpairProductionRhoInterpolant::~EpairProductionRhoInterpolant()
     }
 
     interpolant_.clear();
+}
+
+bool EpairProductionRhoInterpolant::compare(const Parametrization& parametrization) const
+{
+    const EpairProductionRhoInterpolant* pairproduction = static_cast<const EpairProductionRhoInterpolant*>(&parametrization);
+
+    if (interpolant_.size() != pairproduction->interpolant_.size())
+        return false;
+    else if (interpolant_.size() == pairproduction->interpolant_.size())
+    {
+        for (unsigned int i = 0; i < interpolant_.size(); ++i)
+        {
+            if (interpolant_[i] != pairproduction->interpolant_[i])
+            {
+                return false;
+            }
+        }
+    }
+    else
+        return EpairProduction::compare(parametrization);
 }
 
 // ------------------------------------------------------------------------- //

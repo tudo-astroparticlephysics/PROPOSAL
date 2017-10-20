@@ -156,8 +156,8 @@ class Photonuclear : public Parametrization
     virtual IntegralLimits GetIntegralLimits(double energy);
 
     protected:
-    bool compare(const Parametrization&) const;
-    
+    virtual bool compare(const Parametrization&) const;
+
 };
 
 } /* PROPOSAL */
