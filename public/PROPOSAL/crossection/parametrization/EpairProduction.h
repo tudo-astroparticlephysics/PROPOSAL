@@ -64,8 +64,8 @@ class EpairProduction : public Parametrization
     virtual size_t GetHash() const;
 
     protected:
-    bool compare(const Parametrization&) const;
 
+    bool compare(const Parametrization&) const;
     virtual void print(std::ostream&) const;
 
     static const std::string name_;
@@ -92,6 +92,9 @@ class EpairProductionRhoIntegral : public EpairProduction
     virtual double DifferentialCrossSection(double energy, double v);
 
     private:
+
+    bool compare(const Parametrization&) const;
+
     Integral integral_;
 };
 
@@ -107,6 +110,8 @@ class EpairProductionRhoInterpolant : public EpairProductionRhoIntegral
     double DifferentialCrossSection(double energy, double v);
 
     private:
+    bool compare(const Parametrization&) const;
+
     double FunctionToBuildEpairInterpolant(double energy, double v, int component);
 
     std::vector<Interpolant*> interpolant_; //!< Interpolates function used by dNdx and dEdx
