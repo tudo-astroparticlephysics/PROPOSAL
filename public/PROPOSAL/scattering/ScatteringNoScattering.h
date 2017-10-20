@@ -32,6 +32,8 @@ class ScatteringNoScattering : public Scattering
     private:
     ScatteringNoScattering& operator=(const ScatteringNoScattering&); // Undefined & not allowed
 
+    bool compare(const Scattering&) const;
+
     RandomAngles CalculateRandomAngle(double dr, double ei, double ef);
 
     const Medium* medium_;

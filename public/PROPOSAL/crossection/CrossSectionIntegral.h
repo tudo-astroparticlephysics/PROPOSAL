@@ -26,6 +26,8 @@ class CrossSectionIntegral: public CrossSection
         double CalculateStochasticLoss(double energy, double rnd1, double rnd2);
 
     protected:
+        bool compare(const CrossSection&) const;
+
         Integral dedx_integral_;
         Integral de2dx_integral_;
         IntegralVec  dndx_integral_;

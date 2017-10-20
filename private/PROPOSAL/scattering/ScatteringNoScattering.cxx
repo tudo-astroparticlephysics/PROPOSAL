@@ -42,6 +42,15 @@ ScatteringNoScattering::~ScatteringNoScattering()
     delete medium_;
 }
 
+bool ScatteringNoScattering::compare(const Scattering& scattering) const
+{
+    const ScatteringNoScattering* scatteringNoScattering = dynamic_cast<const ScatteringNoScattering*>(&scattering);
+
+    if (!scatteringNoScattering)
+        return false;
+    else
+        return true;
+}
 
 //----------------------------------------------------------------------------//
 
