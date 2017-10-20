@@ -240,6 +240,16 @@ Photonuclear::~Photonuclear()
 {
 }
 
+bool Photonuclear::compare(const Parametrization& parametrization) const
+{
+    const Photonuclear* photonuclear = dynamic_cast<const Photonuclear*>(&parametrization);
+
+    if (!photonuclear)
+        return false;
+    else
+        return true;
+}
+
 // ------------------------------------------------------------------------- //
 // Public methods
 // ------------------------------------------------------------------------- //
