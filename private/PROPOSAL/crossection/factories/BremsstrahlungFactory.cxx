@@ -11,27 +11,30 @@
 using namespace PROPOSAL;
 
 BremsstrahlungFactory::BremsstrahlungFactory()
+    : bremsstrahlung_map_str_()
+    , bremsstrahlung_map_enum_()
+    , string_enum_()
 {
     // Register all bremsstrahlung parametrizations in lower case!
 
-    Register("PetrukhinShestakov", PetrukhinShestakov, &BremsPetrukhinShestakov::create);
-    Register("KelnerKokoulinPetrukhin", KelnerKokoulinPetrukhin, &BremsKelnerKokoulinPetrukhin::create);
-    Register("CompleteScreening", CompleteScreening, &BremsCompleteScreening::create);
-    Register("AndreevBezrukovBugaev", AndreevBezrukovBugaev, &BremsAndreevBezrukovBugaev::create);
+    Register("petrukhin-shestakov", PetrukhinShestakov, &BremsPetrukhinShestakov::create);
+    Register("kelner-kokoulin-petrukhin", KelnerKokoulinPetrukhin, &BremsKelnerKokoulinPetrukhin::create);
+    Register("complete-screening", CompleteScreening, &BremsCompleteScreening::create);
+    Register("andreev-bezrukov-bugaev", AndreevBezrukovBugaev, &BremsAndreevBezrukovBugaev::create);
 }
 
 BremsstrahlungFactory::~BremsstrahlungFactory()
 {
     bremsstrahlung_map_str_.clear();
     bremsstrahlung_map_enum_.clear();
-    map_string_to_enum.clear();
+    string_enum_.clear();
 }
 
 void BremsstrahlungFactory::Register(const std::string& name, Enum enum_t, RegisterFunction create)
 {
     bremsstrahlung_map_str_[name] = create;
     bremsstrahlung_map_enum_[enum_t] = create;
-    map_string_to_enum[name] = enum_t;
+    string_enum_.insert(BimapStringEnum::value_type(name, enum_t));
 }
 
 // ------------------------------------------------------------------------- //
@@ -169,13 +172,25 @@ BremsstrahlungFactory::Enum BremsstrahlungFactory::GetEnumFromString(const std::
 {
     std::string name_lower = boost::algorithm::to_lower_copy(name);
 
-    MapStringToEnum::iterator it = map_string_to_enum.find(name_lower);
-
-    if (it != map_string_to_enum.end())
+    BimapStringEnum::left_const_iterator it = string_enum_.left.find(name_lower);
+    if (it != string_enum_.left.end())
     {
         return it->second;
     } else
     {
         log_fatal("Bremsstrahlung %s not registerd!", name.c_str());
+    }
+}
+
+// ------------------------------------------------------------------------- //
+std::string BremsstrahlungFactory::GetStringFromEnum(const BremsstrahlungFactory::Enum& enum_t)
+{
+    BimapStringEnum::right_const_iterator it = string_enum_.right.find(enum_t);
+    if (it != string_enum_.right.end())
+    {
+        return it->second;
+    } else
+    {
+        log_fatal("Bremsstrahlung %s not registerd!", typeid(enum_t).name());
     }
 }

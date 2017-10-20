@@ -3,17 +3,17 @@
 	{
 
 		"seed" : 1,
-		"brems" : 1,
-		"photo" : 5,
+		"brems" : "Kelner-Kokoulin-Petrukhin",
+		"photo" : "ALLM97",
 		"lpm" : true,
-		"scattering" : "moliere",
+		"scattering" : "Moliere",
 		"exact_time" : true,
 		"interpolate" : true,
 		"brems_multiplier" : 1,
 		"photo_multiplier" : 1,
 		"ioniz_multiplier" : 1,
 		"epair_multiplier" : 1,
-		"path_to_tables" : "resources/tables",
+		"path_to_tables" : "~/.local/share/PROPOSAL/tables",
 		"ecut_inside" : 500,
 		"ecut_infront" : -1,
 		"ecut_behind" : -1,
@@ -29,14 +29,13 @@
 	"sectors": [
 		{
 			"medium": "ice",
-			"density_correction": 1.0,
 			"hirarchy": 0,
 
 			"geometry":
 			{
 				"shape": "sphere",
 				"origin": [0, 0, -6372186],
-				"radius": 6374134000000,
+				"outer_radius": 6374134000000,
 				"inner_radius": 0
 			},
 			"cuts_inside":
@@ -64,7 +63,7 @@
 	{
 		"shape": "sphere",
 		"origin" : [0, 0, 0],
-		"radius": 6374134000000,
+		"outer_radius": 6374134000000,
 		"inner_radius": 0
 	}
 }

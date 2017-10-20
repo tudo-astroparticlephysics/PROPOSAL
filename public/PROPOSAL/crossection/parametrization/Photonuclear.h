@@ -23,6 +23,8 @@ class RealPhoton
         virtual RealPhoton* clone() const = 0;
 
         virtual double CalculateHardBB(double energy, double v) = 0;
+
+        virtual const std::string& GetName() const = 0;
 };
 
 class SoftBB: public RealPhoton
@@ -35,6 +37,11 @@ class SoftBB: public RealPhoton
         RealPhoton* clone() const { return new SoftBB(*this); }
 
         virtual double CalculateHardBB(double energy, double v);
+
+        virtual const std::string& GetName() const { return name_; }
+
+    private:
+        static const std::string name_;
 };
 
 class HardBB: public RealPhoton
@@ -48,9 +55,13 @@ class HardBB: public RealPhoton
 
         double CalculateHardBB(double energy, double v);
 
+        virtual const std::string& GetName() const { return name_; }
+
     private:
         static std::vector<double> x;
         std::vector<Interpolant*> interpolant_;
+
+        static const std::string name_;
 
 };
 
@@ -73,6 +84,7 @@ class ShadowEffect
     // Getter
     // --------------------------------------------------------------------- //
 
+    virtual const std::string& GetName() const = 0;
     virtual size_t GetHash() const = 0;
 };
 
@@ -92,7 +104,11 @@ class ShadowDutta: public ShadowEffect
     // Getter
     // --------------------------------------------------------------------- //
 
+    virtual const std::string& GetName() const { return name_; }
     virtual size_t GetHash() const;
+
+    private:
+    static const std::string name_;
 };
 
 class ShadowButkevichMikhailov: public ShadowEffect
@@ -111,7 +127,11 @@ class ShadowButkevichMikhailov: public ShadowEffect
     // Getter
     // --------------------------------------------------------------------- //
 
+    virtual const std::string& GetName() const { return name_; }
     virtual size_t GetHash() const;
+
+    private:
+    static const std::string name_;
 };
 
 /******************************************************************************
