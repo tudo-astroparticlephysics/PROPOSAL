@@ -18,7 +18,11 @@ class ContinuousRandomizer
     public:
     ContinuousRandomizer(Utility&);
     ContinuousRandomizer(Utility&, InterpolationDef);
+
+    // Copy constructors
+    ContinuousRandomizer(const Utility&, const ContinuousRandomizer&);
     ContinuousRandomizer(const ContinuousRandomizer&);
+
     ~ContinuousRandomizer();
 
     // bool operator==(const ContinuousRandomizer& scattering) const;

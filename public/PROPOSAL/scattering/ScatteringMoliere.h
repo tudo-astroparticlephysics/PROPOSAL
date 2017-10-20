@@ -13,7 +13,7 @@
 namespace PROPOSAL {
 
 // class Particle;
-// class Medium;
+class Medium;
 
 class ScatteringMoliere : public Scattering
 {
@@ -25,7 +25,7 @@ class ScatteringMoliere : public Scattering
     ~ScatteringMoliere();
 
     Scattering* clone() const { return new ScatteringMoliere(*this); }
-    virtual Scattering* clone(Particle& particle) const { return new ScatteringMoliere(particle, *this); }
+    virtual Scattering* clone(Particle& particle, const Utility& utility) const { (void) utility; return new ScatteringMoliere(particle, *this); }
     static Scattering* create(Particle& particle, const Medium& medium) { return new ScatteringMoliere(particle, medium); }
 
     // ScatteringMoliere& operator=(const ScatteringMoliere&);

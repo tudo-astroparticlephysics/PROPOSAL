@@ -9,10 +9,15 @@
     {                                                                                                                  \
         public:                                                                                                        \
         UtilityIntegral##cls(const Utility&);                                                                          \
+                                                                                                                       \
+        UtilityIntegral##cls(const Utility&, const UtilityIntegral##cls&);                                             \
         UtilityIntegral##cls(const UtilityIntegral##cls&);                                                             \
         virtual ~UtilityIntegral##cls();                                                                               \
                                                                                                                        \
-        virtual UtilityDecorator* clone() const { return new UtilityIntegral##cls(*this); }                            \
+        virtual UtilityDecorator* clone(const Utility& utility) const                                                  \
+        {                                                                                                              \
+            return new UtilityIntegral##cls(utility, *this);                                                           \
+        }                                                                                                              \
                                                                                                                        \
         double FunctionToIntegral(double energy);                                                                      \
         virtual double Calculate(double ei, double ef, double rnd);                                                    \
@@ -27,11 +32,15 @@ class UtilityIntegral : public UtilityDecorator
 {
     public:
     UtilityIntegral(const Utility&);
+
+    // Copy constructors
+    UtilityIntegral(const Utility&, const UtilityIntegral&);
     UtilityIntegral(const UtilityIntegral&);
+    virtual UtilityDecorator* clone(const Utility&) const = 0;
+
     virtual ~UtilityIntegral();
 
-    virtual UtilityDecorator* clone() const = 0;
-
+    // Methods
     virtual double Calculate(double ei, double ef, double rnd) = 0;
     virtual double GetUpperLimit(double ei, double rnd);
 
@@ -46,11 +55,15 @@ class UtilityIntegralDisplacement: public UtilityIntegral
 {
     public:
     UtilityIntegralDisplacement(const Utility&);
+
+    // Copy constructors
+    UtilityIntegralDisplacement(const Utility&, const UtilityIntegralDisplacement&);
     UtilityIntegralDisplacement(const UtilityIntegralDisplacement&);
+    virtual UtilityIntegral* clone(const Utility& utility) const { return new UtilityIntegralDisplacement(utility, *this); }
+
     virtual ~UtilityIntegralDisplacement();
 
-    virtual UtilityIntegral* clone() const { return new UtilityIntegralDisplacement(*this); }
-
+    // Methods
     virtual double Calculate(double ei, double ef, double rnd);
 
     private:
