@@ -6,6 +6,7 @@
 #include "PROPOSAL/crossection/CrossSection.h"
 
 #include "PROPOSAL/Constants.h"
+#include "PROPOSAL/Output.h"
 
 #define UTILITY_INTEGRAL_IMPL(cls)                                                                                     \
     UtilityIntegral##cls::UtilityIntegral##cls(const Utility& utility)                                                 \
@@ -41,6 +42,10 @@ UtilityIntegral::UtilityIntegral(const Utility& utility, const UtilityIntegral& 
     : UtilityDecorator(utility)
     , integral_(collection.integral_)
 {
+    if (utility != collection.GetUtility())
+    {
+        log_fatal("Utilities of the decorators should have same values!");
+    }
 }
 
 UtilityIntegral::UtilityIntegral(const UtilityIntegral& collection)

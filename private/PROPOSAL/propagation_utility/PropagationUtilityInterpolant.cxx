@@ -4,7 +4,9 @@
 #include "PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h"
 #include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
 #include "PROPOSAL/math/Interpolant.h"
+
 #include "PROPOSAL/Constants.h"
+#include "PROPOSAL/Output.h"
 
 #include "PROPOSAL/crossection/CrossSection.h"
 
@@ -33,6 +35,10 @@ UtilityInterpolant::UtilityInterpolant(const Utility& utility, const UtilityInte
     , interpolant_diff_(new Interpolant(*collection.interpolant_diff_))
     , interpolation_def_(collection.interpolation_def_)
 {
+    if (utility != collection.GetUtility())
+    {
+        log_fatal("Utilities of the decorators should have same values!");
+    }
 }
 
 UtilityInterpolant::UtilityInterpolant(const UtilityInterpolant& collection)
