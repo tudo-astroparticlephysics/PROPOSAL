@@ -134,6 +134,10 @@ class Photonuclear : public Parametrization
     virtual double DifferentialCrossSection(double energy, double v) = 0;
 
     virtual IntegralLimits GetIntegralLimits(double energy);
+
+    protected:
+    bool compare(const Parametrization&) const;
+    
 };
 
 } /* PROPOSAL */

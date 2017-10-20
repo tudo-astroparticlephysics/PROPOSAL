@@ -41,27 +41,19 @@ class ScatteringMoliere : public Scattering
     private:
     ScatteringMoliere& operator=(const ScatteringMoliere&); // Undefined & not allowed
 
+    bool compare(const Scattering&) const;
+
     RandomAngles CalculateRandomAngle(double dr, double ei, double ef);
+    // dr is the traversing thickness in cm
 
     const Medium* medium_;
 
-    // double dx_;     // traversing thickness in cm
-    // double betaSq_; // beta² = v²/c²
-    // double p_;      // momentum in MeV/c
-    // double m_;      // mass in MeV/c²
-
-    // medium
-    // Medium* medium_;
     int numComp_;                // number of components in medium
+    double A_average_;
     std::vector<double> Zi_;     // nuclear charge of different components
-    std::vector<double> ki_;     // number of atoms in molecule of different components
-    std::vector<double> Ai_;     // atomic number of different components
-    double A_;
     std::vector<double> weight_; // mass weights of different components
 
     // scattering parameters
-    // std::vector<double> chi0_;
-    // std::vector<double> chiASq_; // screening angle² in rad²
     double chiCSq_;              // characteristic angle² in rad²
     std::vector<double> B_;
 

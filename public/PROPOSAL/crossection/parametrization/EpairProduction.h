@@ -64,6 +64,7 @@ class EpairProduction : public Parametrization
     virtual size_t GetHash() const;
 
     protected:
+    bool compare(const Parametrization&) const;
 
     virtual void print(std::ostream&) const;
 

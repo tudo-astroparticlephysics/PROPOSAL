@@ -21,6 +21,9 @@ class Parametrization
         Parametrization(const Parametrization&);
         virtual ~Parametrization();
 
+        bool operator==(const Parametrization& parametrization) const;
+        bool operator!=(const Parametrization& parametrization) const;
+
         virtual Parametrization* clone() const = 0;
 
         friend std::ostream& operator<<(std::ostream&, Parametrization const&);
@@ -66,6 +69,8 @@ class Parametrization
         void SetCurrentComponent(int index) {component_index_ = index;}
 
     protected:
+        virtual bool compare(const Parametrization&) const = 0;
+
         typedef std::vector<Components::Component*> ComponentVec;
 
         virtual void print(std::ostream&) const {};

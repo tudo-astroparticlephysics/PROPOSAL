@@ -23,8 +23,8 @@ TEST(Propagation , Test_nan) {
 
     // one propagator for each particle definition
     // medium/detector configuration
-    Propagator prop_mu(mu.GetParticleDef(), "../src/resources/config_ice.json");
-    Propagator prop_tau(tau.GetParticleDef(), "../src/resources/config_ice.json");
+    Propagator prop_mu(mu.GetParticleDef(), "resources/config_ice.json");
+    Propagator prop_tau(tau.GetParticleDef(), "resources/config_ice.json");
 
     // Possibility to register propagator in a service
     PropagatorService prop_service;
