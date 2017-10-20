@@ -36,6 +36,18 @@ Ionization::~Ionization()
 {
 }
 
+bool Ionization::compare(const Parametrization& parametrization) const
+{
+    const Ionization* ionization = dynamic_cast<const Ionization*>(&parametrization);
+
+    if (!ionization)
+        return false;
+    else if (name_.compare(ionization->name_) != 0)
+        return false;
+    else
+        return true;
+}
+
 // ------------------------------------------------------------------------- //
 // Public methods
 // ------------------------------------------------------------------------- //

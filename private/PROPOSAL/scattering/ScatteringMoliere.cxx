@@ -33,7 +33,6 @@ Scattering::RandomAngles ScatteringMoliere::CalculateRandomAngle(double dr, doub
     double beta_Sq = 1./( 1.+mass*mass/(momentum*momentum) ); //beta² = v²/c²
     double chi_0 = 0.;
     double ZSq_average = 0.;
-    double A_average = 0.;
 
     vector<double> chi_A_Sq; // screening angle² in rad²
     chi_A_Sq.resize(numComp_);
@@ -45,18 +44,17 @@ Scattering::RandomAngles ScatteringMoliere::CalculateRandomAngle(double dr, doub
         // Calculate Chi_a^2
         chi_A_Sq[i] = chi_0 * chi_0 * ( 1.13 + 3.76 * ALPHA * ALPHA * Zi_[i] * Zi_[i] / beta_Sq );
 
-        // Calculate A_average and Z^2_average for Chi_c^2
+        // Calculate Z^2_average for Chi_c^2
         //if case of an electron, replace Z² by Z(Z+1) to into account scatterings
         //on atomic electrons in the medium
         if(mass == ME) ZSq_average += weight_[i] * Zi_[i] * (Zi_[i] + 1.);
         else ZSq_average += weight_[i] * Zi_[i] * Zi_[i];
-        A_average += weight_[i] * Ai_[i];
     }
     // Calculate Chi_c^2
     chiCSq_ = ( (4.*PI*NA*ALPHA*ALPHA*HBAR*HBAR*SPEED*SPEED)
                 * (medium_->GetMassDensity()*medium_->GetDensityCorrection()*dr)
                 / (momentum*momentum*beta_Sq) )
-            * ( ZSq_average/A_average );
+            * ( ZSq_average/A_average_ );
 
     // Calculate B
     Scattering::RandomAngles random_angles;
@@ -112,26 +110,32 @@ ScatteringMoliere::ScatteringMoliere(Particle& particle, const Medium& medium)
     : Scattering(particle)
     , medium_(medium.clone())
     , numComp_(medium_->GetNumComponents())
+    , A_average_(0.0)
     , Zi_(numComp_)
-    , ki_(numComp_)
-    , Ai_(numComp_)
-    , A_(0.0)
     , weight_(numComp_)
+    , chiCSq_(0.0)
     , B_(numComp_)
 {
+    std::vector<double> Ai(numComp_, 0); // atomic number of different components
+    std::vector<double> ki(numComp_, 0); // number of atoms in molecule of different components
+    double A = 0.;
+
     for (int i = 0; i < numComp_; i++)
     {
         Components::Component* component = medium_->GetComponents().at(i);
         Zi_[i] = component->GetNucCharge();
-        ki_[i] = component->GetAtomInMolecule();
-        Ai_[i] = component->GetAtomicNum();
+        ki[i] = component->GetAtomInMolecule();
+        Ai[i] = component->GetAtomicNum();
 
-        A_ += ki_[i] * Ai_[i];
+        A += ki[i] * Ai[i];
     }
+
+    double A_average_ = 0.;
 
     for(int i = 0; i < numComp_; i++)
     {
-        weight_[i] = ki_[i] * Ai_[i] / A_;
+        weight_[i] = ki[i] * Ai[i] / A;
+        A_average_ += weight_[i] * Ai[i];
     }
 }
 
@@ -139,10 +143,8 @@ ScatteringMoliere::ScatteringMoliere(const ScatteringMoliere& scattering)
     : Scattering(scattering)
     , medium_(scattering.medium_->clone())
     , numComp_(scattering.numComp_)
+    , A_average_(scattering.A_average_)
     , Zi_(scattering.Zi_)
-    , ki_(scattering.ki_)
-    , Ai_(scattering.Ai_)
-    , A_(scattering.A_)
     , weight_(scattering.weight_)
     , chiCSq_(scattering.chiCSq_)
     , B_(scattering.B_)
@@ -153,10 +155,8 @@ ScatteringMoliere::ScatteringMoliere(Particle& particle, const ScatteringMoliere
     : Scattering(particle)
     , medium_(scattering.medium_->clone())
     , numComp_(scattering.numComp_)
+    , A_average_(scattering.A_average_)
     , Zi_(scattering.Zi_)
-    , ki_(scattering.ki_)
-    , Ai_(scattering.Ai_)
-    , A_(scattering.A_)
     , weight_(scattering.weight_)
     , chiCSq_(scattering.chiCSq_)
     , B_(scattering.B_)
@@ -186,46 +186,29 @@ ScatteringMoliere::~ScatteringMoliere()
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-// bool ScatteringMoliere::operator==(const ScatteringMoliere& scattering) const
-// {
-//     if (this->Ai_ != scattering.Ai_)
-//         return false;
-//     if (this->B_ != scattering.B_)
-//         return false;
-//     if (this->chi0_ != scattering.chi0_)
-//         return false;
-//     if (this->chiASq_ != scattering.chiASq_)
-//         return false;
-//     if (this->ki_ != scattering.ki_)
-//         return false;
-//     if (this->weight_ != scattering.weight_)
-//         return false;
-//     if (this->Zi_ != scattering.Zi_)
-//         return false;
-//
-//     if (this->dx_ != scattering.dx_)
-//         return false;
-//     if (this->betaSq_ != scattering.betaSq_)
-//         return false;
-//     if (this->p_ != scattering.p_)
-//         return false;
-//     if (this->m_ != scattering.m_)
-//         return false;
-//     if (this->numComp_ != scattering.numComp_)
-//         return false;
-//     if (this->chiCSq_ != scattering.chiCSq_)
-//         return false;
-//
-//     return true;
-// }
-//
-// //----------------------------------------------------------------------------//
-// //----------------------------------------------------------------------------//
-//
-// bool ScatteringMoliere::operator!=(const ScatteringMoliere& scattering) const
-// {
-//     return !(*this == scattering);
-// }
+bool ScatteringMoliere::compare(const Scattering& scattering) const
+{
+    const ScatteringMoliere* scatteringMoliere = dynamic_cast<const ScatteringMoliere*>(&scattering);
+
+    if (!scatteringMoliere)
+        return false;
+    else if (*medium_ != *scatteringMoliere->medium_)
+        return false;
+    else if (numComp_ != scatteringMoliere->numComp_)
+        return false;
+    else if (A_average_ != scatteringMoliere->A_average_)
+        return false;
+    else if (Zi_ != scatteringMoliere->Zi_)
+        return false;
+    else if (weight_ != scatteringMoliere->weight_)
+        return false;
+    else if (chiCSq_ != scatteringMoliere->chiCSq_)
+        return false;
+    else if (B_ != scatteringMoliere->B_)
+        return false;
+    else
+        return true;
+}
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//

@@ -50,7 +50,9 @@ class Utility
     Utility(const Utility&);
     virtual ~Utility();
 
-    const Definition& GetDefinition() const { return utility_def_; }
+    bool operator==(const Utility& utility) const;
+    bool operator!=(const Utility& utility) const;
+
     const ParticleDef& GetParticleDef() const { return particle_def_; }
     const Medium& GetMedium() const { return *medium_; }
     const std::vector<CrossSection*>& GetCrosssections() const { return crosssections_; }
@@ -68,7 +70,6 @@ class Utility
 
     std::vector<CrossSection*> crosssections_;
 
-    Definition utility_def_;
 };
 
 class UtilityDecorator
@@ -82,6 +83,9 @@ class UtilityDecorator
 
     virtual ~UtilityDecorator();
 
+    bool operator==(const UtilityDecorator& utility_decorator) const;
+    bool operator!=(const UtilityDecorator& utility_decorator) const;
+
     // Methods
     virtual double FunctionToIntegral(double energy);
     virtual double Calculate(double ei, double ef, double rnd) = 0;
@@ -91,6 +95,9 @@ class UtilityDecorator
 
     protected:
     UtilityDecorator& operator=(const UtilityDecorator&); // Undefined & not allowed
+
+    // Implemented in child classes to be able to use equality operator
+    virtual bool compare(const UtilityDecorator&) const = 0;
 
     const Utility& utility_;
 };

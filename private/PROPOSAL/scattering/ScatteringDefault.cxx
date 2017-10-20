@@ -27,25 +27,25 @@ using namespace std;
 
 ScatteringDefault::ScatteringDefault(Particle& particle, Utility& utility)
     : Scattering(particle)
-    , scatter(new UtilityIntegralScattering(utility))
+    , scatter_(new UtilityIntegralScattering(utility))
 {
 }
 
 ScatteringDefault::ScatteringDefault(Particle& particle, Utility& utility, InterpolationDef interpolation_def)
     : Scattering(particle)
-    , scatter(new UtilityInterpolantScattering(utility, interpolation_def))
+    , scatter_(new UtilityInterpolantScattering(utility, interpolation_def))
 {
 }
 
 ScatteringDefault::ScatteringDefault(const ScatteringDefault& scattering)
     : Scattering(scattering)
-    , scatter(scattering.scatter->clone(scattering.scatter->GetUtility()))
+    , scatter_(scattering.scatter_->clone(scattering.scatter_->GetUtility()))
 {
 }
 
 ScatteringDefault::ScatteringDefault(Particle& particle, const Utility& utility, const ScatteringDefault& scattering)
     : Scattering(particle)
-    , scatter(scattering.scatter->clone(utility))
+    , scatter_(scattering.scatter_->clone(utility))
 {
     if (particle.GetParticleDef() != scattering.GetParticle().GetParticleDef())
     {
@@ -55,7 +55,7 @@ ScatteringDefault::ScatteringDefault(Particle& particle, const Utility& utility,
 
 ScatteringDefault::~ScatteringDefault()
 {
-    delete scatter;
+    delete scatter_;
 }
 
 //----------------------------------------------------------------------------//
@@ -78,35 +78,17 @@ ScatteringDefault::~ScatteringDefault()
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
+bool ScatteringDefault::compare(const Scattering& scattering) const
+{
+    const ScatteringDefault* scatteringDefault = dynamic_cast<const ScatteringDefault*>(&scattering);
 
-// bool ScatteringDefault::operator==(const ScatteringDefault &scattering) const
-// {
-//     if( interpolant_ != NULL && scattering.interpolant_ != NULL)
-//     {
-//         if( *interpolant_   != *scattering.interpolant_) return false;
-//     }
-//
-//     if( interpolant_diff_ != NULL && scattering.interpolant_diff_ != NULL)
-//     {
-//         if( *interpolant_diff_   != *scattering.interpolant_diff_) return false;
-//     }
-//
-//     if( integral_   != scattering.integral_) return false;
-//
-//     //else
-//     return true;
-//
-// }
-//
-//
-// //----------------------------------------------------------------------------//
-// //----------------------------------------------------------------------------//
-//
-//
-// bool ScatteringDefault::operator!=(const ScatteringDefault &scattering) const {
-//   return !(*this == scattering);
-// }
-
+    if (!scatteringDefault)
+        return false;
+    else if (*scatter_ != *scatteringDefault->scatter_)
+        return false;
+    else
+        return true;
+}
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
@@ -150,9 +132,9 @@ ScatteringDefault::~ScatteringDefault()
 //----------------------------------------------------------------------------//
 long double ScatteringDefault::CalculateTheta0(double dr, double ei, double ef)
 {
-    double aux              = scatter->Calculate(ei, ef, 0.0);
+    double aux              = scatter_->Calculate(ei, ef, 0.0);
     double cutoff           = 1;
-    double radiation_lenght = scatter->GetUtility().GetMedium().GetRadiationLength();
+    double radiation_lenght = scatter_->GetUtility().GetMedium().GetRadiationLength();
 
     // TODO: check if one has to take the absolute value of the particle charge
     aux = sqrt(max(aux, 0.0) / radiation_lenght) * particle_.GetCharge();

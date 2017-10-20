@@ -50,6 +50,26 @@ EpairProduction::~EpairProduction()
 {
 }
 
+bool EpairProduction::compare(const Parametrization& parametrization) const
+{
+    const EpairProduction* pairproduction = dynamic_cast<const EpairProduction*>(&parametrization);
+
+    if (!pairproduction)
+        return false;
+    else if (name_.compare(pairproduction->name_) != 0)
+        return false;
+    else if (v_ != pairproduction->v_)
+        return false;
+    else if (init_lpm_effect_ != pairproduction->init_lpm_effect_)
+        return false;
+    else if (lpm_ != pairproduction->lpm_)
+        return false;
+    else if (eLpm_ != pairproduction->eLpm_)
+        return false;
+    else
+        return true;
+}
+
 // ------------------------------------------------------------------------- //
 // Public methods
 // ------------------------------------------------------------------------- //
