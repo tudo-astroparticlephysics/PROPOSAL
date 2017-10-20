@@ -30,8 +30,6 @@ class Ionization : public Parametrization
     const std::string& GetName() const { return name_; }
 
     private:
-    bool compare(const Parametrization&) const;
-
     static const std::string name_;
 
     double InelCorrection(double energy, double v);

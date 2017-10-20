@@ -56,6 +56,16 @@ PhotoRealPhotonAssumption::~PhotoRealPhotonAssumption()
     delete hardBB_;
 }
 
+bool PhotoRealPhotonAssumption::compare(const Parametrization& parametrization) const
+{
+    const PhotoRealPhotonAssumption* photo = static_cast<const PhotoRealPhotonAssumption*>(&parametrization);
+
+    if (typeid(hardBB_) != typeid(photo->hardBB_))
+        return false;
+    else
+        return Photonuclear::compare(parametrization);
+}
+
 // ------------------------------------------------------------------------- //
 // Bezrukov, Bugaev
 // Sov. J. Nucl. Phys. 33 (1981), 635
@@ -142,6 +152,7 @@ void PhotoRealPhotonAssumption::print(std::ostream& os) const
 {
     os << "hardBB enabled: " << (dynamic_cast<HardBB*>(hardBB_)? 1 : 0) << '\n';
 }
+
 /******************************************************************************
 *                            Zeus Parametrization                            *
 ******************************************************************************/
@@ -263,6 +274,16 @@ Photonuclear* PhotoRhode::create(const ParticleDef& particle_def,
                         double multiplier)
 {
     return new PhotoRhode(particle_def, medium, cuts, hardBB, multiplier);
+}
+
+bool PhotoRhode::compare(const Parametrization& parametrization) const
+{
+    const PhotoRhode* photo = static_cast<const PhotoRhode*>(&parametrization);
+
+    if (interpolant_ != photo->interpolant_)
+        return false;
+    else
+        return PhotoRealPhotonAssumption::compare(parametrization);
 }
 
 // ------------------------------------------------------------------------- //

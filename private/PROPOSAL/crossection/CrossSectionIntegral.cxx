@@ -36,11 +36,9 @@ CrossSectionIntegral::~CrossSectionIntegral()
 
 bool CrossSectionIntegral::compare(const CrossSection& cross_section) const
 {
-    const CrossSectionIntegral* cross_section_integral = dynamic_cast<const CrossSectionIntegral*>(&cross_section);
+    const CrossSectionIntegral* cross_section_integral = static_cast<const CrossSectionIntegral*>(&cross_section);
 
-    if (!cross_section_integral)
-        return false;
-    else if (dedx_integral_ != cross_section_integral->dedx_integral_)
+    if (dedx_integral_ != cross_section_integral->dedx_integral_)
         return false;
     else if (de2dx_integral_ != cross_section_integral->de2dx_integral_)
         return false;

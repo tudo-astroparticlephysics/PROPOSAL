@@ -18,17 +18,6 @@ CrossSection::CrossSection(const DynamicData::Type& type, const Parametrization&
     , components_(parametrization_->GetMedium().GetComponents())
     , rnd_(0)
 {
-
-    // int number_of_components = param.GetMedium().GetNumComponents();
-    //
-    // dndx_integral_.resize(number_of_components);
-    //
-    // for(IntegralVec::iterator it = dndx_integral_.begin(); it != dndx_integral_.end(); ++it)
-    // {
-    //         *it =  new Integral(IROMB, IMAXS, IPREC);
-    // }
-
-    // prob_for_component_.resize(number_of_components);
 }
 
 CrossSection::CrossSection(const CrossSection& cross_section)
@@ -48,16 +37,17 @@ CrossSection::~CrossSection()
 
 bool CrossSection::operator==(const CrossSection& cross_section) const
 {
-    // if (type_id_ != cross_section.type_id_)
-    //     return false;
-    if (parametrization_ != cross_section.parametrization_)
+
+    if (typeid(*this) == typeid(cross_section))
+        return false;
+    if (type_id_ != cross_section.type_id_)
+        return false;
+    else if (*parametrization_ != *cross_section.parametrization_)
         return false;
     else if (prob_for_component_ != cross_section.prob_for_component_)
         return false;
     else if (sum_of_rates_ != cross_section.sum_of_rates_)
         return false;
-    // else if (components_ != cross_section.components_)
-    //     return false;
     else if (rnd_ != cross_section.rnd_)
         return false;
     else

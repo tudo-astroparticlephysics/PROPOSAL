@@ -176,8 +176,18 @@ bool Utility::operator==(const Utility& utility) const
         return false;
     else if (cut_settings_ != utility.cut_settings_)
         return false;
-    else if (crosssections_ != utility.crosssections_)
+    else if (crosssections_.size() != utility.crosssections_.size())
         return false;
+    else if (crosssections_.size() == utility.crosssections_.size())
+    {
+        for (unsigned int i = 0; i < crosssections_.size(); ++i)
+        {
+            if (crosssections_[i] != utility.crosssections_[i])
+            {
+                return false;
+            }
+        }
+    }
     else
         return true;
 }
@@ -276,6 +286,8 @@ UtilityDecorator::~UtilityDecorator()
 
 bool UtilityDecorator::operator==(const UtilityDecorator& utility_decorator) const
 {
+    if (typeid(*this) == typeid(utility_decorator))
+        return false;
     if (utility_ != utility_decorator.utility_)
         return false;
     else

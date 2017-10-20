@@ -68,6 +68,7 @@ class PhotoRealPhotonAssumption : public Photonuclear
     virtual size_t GetHash() const;
 
     protected:
+    virtual bool compare(const Parametrization&) const;
     virtual void print(std::ostream&) const;
 
     RealPhoton* hardBB_;
@@ -109,10 +110,11 @@ class PhotoRhode : public PhotoRealPhotonAssumption
     const std::string& GetName() const { return name_; }
 
     private:
-    static const std::string name_;
+    virtual bool compare(const Parametrization&) const;
 
     double MeasuredSgN(double e);
 
+    static const std::string name_;
     Interpolant* interpolant_;
 };
 

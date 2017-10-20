@@ -42,26 +42,31 @@ Parametrization::~Parametrization()
 
 bool Parametrization::operator==(const Parametrization& parametrization) const
 {
-    // if (particle_def_ != parametrization.particle_def_)
-    //     return false;
+    if (typeid(*this) == typeid(parametrization))
+        return false;
+    else
+        return this->compare(parametrization);
+}
+
+bool Parametrization::operator!=(const Parametrization& parametrization) const
+{
+    return !(*this == parametrization);
+}
+
+bool Parametrization::compare(const Parametrization& parametrization) const
+{
+    if (particle_def_ != parametrization.particle_def_)
+        return false;
     if (*medium_ != *parametrization.medium_)
         return false;
     else if (cut_settings_ != parametrization.cut_settings_)
         return false;
-    // else if (components_ != parametrization.components_)
-    //     return false;
     else if (component_index_ != parametrization.component_index_)
         return false;
     else if (multiplier_ != parametrization.multiplier_)
         return false;
     else
         return true;
-        // return this->compare(parametrization);
-}
-
-bool Parametrization::operator!=(const Parametrization& parametrization) const
-{
-    return !(*this == parametrization);
 }
 
 std::ostream& PROPOSAL::operator<<(std::ostream& os, Parametrization const& param)
