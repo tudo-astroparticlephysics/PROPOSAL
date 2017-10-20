@@ -55,11 +55,9 @@ UtilityIntegral::~UtilityIntegral()
 
 bool UtilityIntegral::compare(const UtilityDecorator& utility_decorator) const
 {
-    const UtilityIntegral* utility_integral = dynamic_cast<const UtilityIntegral*>(&utility_decorator);
+    const UtilityIntegral* utility_integral = static_cast<const UtilityIntegral*>(&utility_decorator);
 
-    if (!utility_integral)
-        return false;
-    else if (integral_ != utility_integral->integral_)
+    if (integral_ != utility_integral->integral_)
         return false;
     else
         return true;

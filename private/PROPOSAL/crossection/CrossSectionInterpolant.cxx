@@ -31,18 +31,36 @@ CrossSectionInterpolant::CrossSectionInterpolant(const DynamicData::Type& type, 
 
 bool CrossSectionInterpolant::compare(const CrossSection& cross_section) const
 {
-    const CrossSectionInterpolant* cross_section_interpolant = dynamic_cast<const CrossSectionInterpolant*>(&cross_section);
+    const CrossSectionInterpolant* cross_section_interpolant = static_cast<const CrossSectionInterpolant*>(&cross_section);
 
-    if (!cross_section_interpolant)
-        return false;
-    else if (*dedx_interpolant_ != *cross_section_interpolant->dedx_interpolant_)
+    if (*dedx_interpolant_ != *cross_section_interpolant->dedx_interpolant_)
         return false;
     else if (*de2dx_interpolant_ != *cross_section_interpolant->de2dx_interpolant_)
         return false;
-    else if (dndx_interpolant_1d_ != cross_section_interpolant->dndx_interpolant_1d_)
+    else if (dndx_interpolant_1d_.size() != cross_section_interpolant->dndx_interpolant_1d_.size())
         return false;
-    else if (dndx_interpolant_2d_ != cross_section_interpolant->dndx_interpolant_2d_)
+    else if (dndx_interpolant_1d_.size() == cross_section_interpolant->dndx_interpolant_1d_.size())
+    {
+        for (unsigned int i = 0; i < dndx_interpolant_1d_.size(); ++i)
+        {
+            if (dndx_interpolant_1d_[i] != cross_section_interpolant->dndx_interpolant_1d_[i])
+            {
+                return false;
+            }
+        }
+    }
+    else if (dndx_interpolant_2d_.size() != cross_section_interpolant->dndx_interpolant_2d_.size())
         return false;
+    else if (dndx_interpolant_2d_.size() == cross_section_interpolant->dndx_interpolant_2d_.size())
+    {
+        for (unsigned int i = 0; i < dndx_interpolant_2d_.size(); ++i)
+        {
+            if (dndx_interpolant_2d_[i] != cross_section_interpolant->dndx_interpolant_2d_[i])
+            {
+                return false;
+            }
+        }
+    }
     else
         return true;
 }

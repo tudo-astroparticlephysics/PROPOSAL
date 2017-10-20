@@ -69,11 +69,9 @@ Bremsstrahlung::~Bremsstrahlung()
 
 bool Bremsstrahlung::compare(const Parametrization& parametrization) const
 {
-    const Bremsstrahlung* bremsstrahlung = dynamic_cast<const Bremsstrahlung*>(&parametrization);
+    const Bremsstrahlung* bremsstrahlung = static_cast<const Bremsstrahlung*>(&parametrization);
 
-    if (!bremsstrahlung)
-        return false;
-    else if (lorenz_ != bremsstrahlung->lorenz_)
+    if (lorenz_ != bremsstrahlung->lorenz_)
         return false;
     else if (lorenz_cut_ != bremsstrahlung->lorenz_cut_)
         return false;
@@ -84,7 +82,7 @@ bool Bremsstrahlung::compare(const Parametrization& parametrization) const
     else if (eLpm_ != bremsstrahlung->eLpm_)
         return false;
     else
-        return true;
+        return Parametrization::compare(parametrization);
 }
 
 // ------------------------------------------------------------------------- //

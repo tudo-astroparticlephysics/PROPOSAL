@@ -69,7 +69,7 @@ class Parametrization
         void SetCurrentComponent(int index) {component_index_ = index;}
 
     protected:
-        virtual bool compare(const Parametrization&) const = 0;
+        virtual bool compare(const Parametrization&) const;
 
         typedef std::vector<Components::Component*> ComponentVec;
 

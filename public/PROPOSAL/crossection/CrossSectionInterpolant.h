@@ -30,7 +30,7 @@ class CrossSectionInterpolant: public CrossSection
         virtual double FunctionToBuildDNdxInterpolant2D(double energy, double v, Integral&, int component);
 
     protected:
-        bool compare(const CrossSection&) const;
+        virtual bool compare(const CrossSection&) const;
 
         typedef std::vector<Interpolant*> InterpolantVec;
 

@@ -77,6 +77,7 @@ class PhotoQ2Integral : public Photonuclear
     virtual size_t GetHash() const;
 
     protected:
+    virtual bool compare(const Parametrization&) const;
     virtual void print(std::ostream&) const;
 
     ShadowEffect* shadow_effect_;
@@ -126,6 +127,7 @@ class PhotoQ2Interpolant : public Param
     double DifferentialCrossSection(double energy, double v);
 
     protected:
+    virtual bool compare(const Parametrization&) const;
     double FunctionToBuildPhotoInterpolant(double energy, double v, int component);
 
     InterpolantVec interpolant_;
@@ -191,6 +193,27 @@ PhotoQ2Interpolant<Param>::PhotoQ2Interpolant(const PhotoQ2Interpolant& photo)
 template <class Param>
 PhotoQ2Interpolant<Param>::~PhotoQ2Interpolant()
 {
+}
+
+template <class Param>
+bool PhotoQ2Interpolant<Param>::compare(const Parametrization& parametrization) const
+{
+    const PhotoQ2Interpolant<Param>* photo = static_cast<const PhotoQ2Interpolant<Param> *>(&parametrization);
+
+    if (interpolant_.size() != photo->interpolant_.size())
+        return false;
+    else if (interpolant_.size() == photo->interpolant_.size())
+    {
+        for (unsigned int i = 0; i < interpolant_.size(); ++i)
+        {
+            if (interpolant_[i] != photo->interpolant_[i])
+            {
+                return false;
+            }
+        }
+    }
+    else
+        return Photonuclear::compare(parametrization);
 }
 
 template <class Param>
