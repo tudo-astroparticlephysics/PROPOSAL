@@ -38,7 +38,7 @@ CrossSection::~CrossSection()
 bool CrossSection::operator==(const CrossSection& cross_section) const
 {
 
-    if (typeid(*this) == typeid(cross_section))
+    if (typeid(*this) != typeid(cross_section))
         return false;
     if (type_id_ != cross_section.type_id_)
         return false;
