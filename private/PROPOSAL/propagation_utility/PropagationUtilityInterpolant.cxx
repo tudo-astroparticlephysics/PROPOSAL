@@ -520,9 +520,7 @@ double UtilityInterpolantContRand::Calculate(double ei, double ef, double rnd)
         double aux2 = aux - interpolant_->Interpolate(ef);
 
         if (abs(aux2) > abs(aux) * HALF_PRECISION)
-        {
             return max(aux2, 0.0);
-        }
     }
     else
     {
