@@ -42,7 +42,7 @@ Parametrization::~Parametrization()
 
 bool Parametrization::operator==(const Parametrization& parametrization) const
 {
-    if (typeid(*this) == typeid(parametrization))
+    if (typeid(*this) != typeid(parametrization))
         return false;
     else
         return this->compare(parametrization);
