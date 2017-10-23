@@ -286,7 +286,7 @@ UtilityDecorator::~UtilityDecorator()
 
 bool UtilityDecorator::operator==(const UtilityDecorator& utility_decorator) const
 {
-    if (typeid(*this) == typeid(utility_decorator))
+    if (typeid(*this) != typeid(utility_decorator))
         return false;
     if (utility_ != utility_decorator.utility_)
         return false;
