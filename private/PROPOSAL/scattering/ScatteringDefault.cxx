@@ -29,12 +29,20 @@ ScatteringDefault::ScatteringDefault(Particle& particle, Utility& utility)
     : Scattering(particle)
     , scatter_(new UtilityIntegralScattering(utility))
 {
+    if (particle.GetParticleDef() != utility.GetParticleDef())
+    {
+        log_fatal("Particle definition should be equal to the utility paricle definition!");
+    }
 }
 
 ScatteringDefault::ScatteringDefault(Particle& particle, Utility& utility, InterpolationDef interpolation_def)
     : Scattering(particle)
     , scatter_(new UtilityInterpolantScattering(utility, interpolation_def))
 {
+    if (particle.GetParticleDef() != utility.GetParticleDef())
+    {
+        log_fatal("Particle definition should be equal to the utility paricle definition!");
+    }
 }
 
 ScatteringDefault::ScatteringDefault(const ScatteringDefault& scattering)
