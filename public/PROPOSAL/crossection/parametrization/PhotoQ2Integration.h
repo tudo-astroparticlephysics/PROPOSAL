@@ -202,18 +202,14 @@ bool PhotoQ2Interpolant<Param>::compare(const Parametrization& parametrization) 
 
     if (interpolant_.size() != photo->interpolant_.size())
         return false;
-    else if (interpolant_.size() == photo->interpolant_.size())
+
+    for (unsigned int i = 0; i < interpolant_.size(); ++i)
     {
-        for (unsigned int i = 0; i < interpolant_.size(); ++i)
-        {
-            if (interpolant_[i] != photo->interpolant_[i])
-            {
-                return false;
-            }
-        }
+        if (interpolant_[i] != photo->interpolant_[i])
+            return false;
     }
-    else
-        return Photonuclear::compare(parametrization);
+    
+    return Photonuclear::compare(parametrization);
 }
 
 template <class Param>
