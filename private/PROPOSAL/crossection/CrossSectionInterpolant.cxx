@@ -39,30 +39,21 @@ bool CrossSectionInterpolant::compare(const CrossSection& cross_section) const
         return false;
     else if (dndx_interpolant_1d_.size() != cross_section_interpolant->dndx_interpolant_1d_.size())
         return false;
-    else if (dndx_interpolant_1d_.size() == cross_section_interpolant->dndx_interpolant_1d_.size())
-    {
-        for (unsigned int i = 0; i < dndx_interpolant_1d_.size(); ++i)
-        {
-            if (dndx_interpolant_1d_[i] != cross_section_interpolant->dndx_interpolant_1d_[i])
-            {
-                return false;
-            }
-        }
-    }
     else if (dndx_interpolant_2d_.size() != cross_section_interpolant->dndx_interpolant_2d_.size())
         return false;
-    else if (dndx_interpolant_2d_.size() == cross_section_interpolant->dndx_interpolant_2d_.size())
+
+    for (unsigned int i = 0; i < dndx_interpolant_1d_.size(); ++i)
     {
-        for (unsigned int i = 0; i < dndx_interpolant_2d_.size(); ++i)
-        {
-            if (dndx_interpolant_2d_[i] != cross_section_interpolant->dndx_interpolant_2d_[i])
-            {
-                return false;
-            }
-        }
+        if (dndx_interpolant_1d_[i] != cross_section_interpolant->dndx_interpolant_1d_[i])
+            return false;
     }
-    else
-        return true;
+    for (unsigned int i = 0; i < dndx_interpolant_2d_.size(); ++i)
+    {
+        if (dndx_interpolant_2d_[i] != cross_section_interpolant->dndx_interpolant_2d_[i])
+            return false;
+    }
+
+    return true;
 }
 
 // ------------------------------------------------------------------------- //
