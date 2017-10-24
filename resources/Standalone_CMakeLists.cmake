@@ -199,6 +199,7 @@ IF(DO_TESTING)
   # EXECUTE_PROCESS(COMMAND  tar -xvf ${PROJECT_SOURCE_DIR}/tests/TestFiles2.tar.gz -C ${PROPOSAL_BINARY_DIR}/bin/
   #                   OUTPUT_VARIABLE _output OUTPUT_STRIP_TRAILING_WHITESPACE)
 
+  ADD_EXECUTABLE(UnitTest_Utility tests/Utility_TEST.cxx)
   ADD_EXECUTABLE(UnitTest_Scattering tests/Scattering_TEST.cxx)
   # ADD_EXECUTABLE(UnitTest_Photonuclear tests/Photonuclear_TEST.cxx)
   ADD_EXECUTABLE(UnitTest_Integral tests/Integral_TEST.cxx)
@@ -220,6 +221,7 @@ IF(DO_TESTING)
   ADD_EXECUTABLE(UnitTest_Vector3D tests/Vector3D_TEST.cxx)
   ADD_EXECUTABLE(UnitTest_Propagation tests/Propagation_TEST.cxx)
 
+  TARGET_LINK_LIBRARIES(UnitTest_Utility PROPOSAL ${GTEST_LIBRARIES})
   TARGET_LINK_LIBRARIES(UnitTest_Scattering PROPOSAL ${GTEST_LIBRARIES})
   TARGET_LINK_LIBRARIES(UnitTest_Integral PROPOSAL ${GTEST_LIBRARIES})
   TARGET_LINK_LIBRARIES(UnitTest_Interpolant PROPOSAL ${GTEST_LIBRARIES})
@@ -241,6 +243,7 @@ IF(DO_TESTING)
   TARGET_LINK_LIBRARIES(UnitTest_Vector3D PROPOSAL ${GTEST_LIBRARIES})
   TARGET_LINK_LIBRARIES(UnitTest_Propagation PROPOSAL ${GTEST_LIBRARIES})
 
+  ADD_TEST(UnitTest_Utility bin/UnitTest_Utility)
   ADD_TEST(UnitTest_Scattering bin/UnitTest_Scattering)
   # ADD_TEST(UnitTest_ContinuousRandomization bin/UnitTest_ContinuousRandomization)
   # ADD_TEST(UnitTest_ProcessCollection bin/UnitTest_ProcessCollection)
