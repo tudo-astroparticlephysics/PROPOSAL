@@ -178,18 +178,14 @@ bool Utility::operator==(const Utility& utility) const
         return false;
     else if (crosssections_.size() != utility.crosssections_.size())
         return false;
-    else if (crosssections_.size() == utility.crosssections_.size())
+
+    for (unsigned int i = 0; i < crosssections_.size(); ++i)
     {
-        for (unsigned int i = 0; i < crosssections_.size(); ++i)
-        {
-            if (crosssections_[i] != utility.crosssections_[i])
-            {
-                return false;
-            }
-        }
+        if (*crosssections_[i] != *utility.crosssections_[i])
+            return false;
     }
-    else
-        return true;
+
+    return true;
 }
 
 bool Utility::operator!=(const Utility& utility) const
