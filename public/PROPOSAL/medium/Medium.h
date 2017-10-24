@@ -348,3 +348,5 @@ class Air : public MediumCopyable<Medium, Air>
 MEDIUM_DEF(AntaresWater)
 
 } // namespace PROPOSAL
+
+#undef MEDIUM_DEF
