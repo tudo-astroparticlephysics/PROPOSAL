@@ -454,18 +454,14 @@ bool EpairProductionRhoInterpolant::compare(const Parametrization& parametrizati
 
     if (interpolant_.size() != pairproduction->interpolant_.size())
         return false;
-    else if (interpolant_.size() == pairproduction->interpolant_.size())
+
+    for (unsigned int i = 0; i < interpolant_.size(); ++i)
     {
-        for (unsigned int i = 0; i < interpolant_.size(); ++i)
-        {
-            if (interpolant_[i] != pairproduction->interpolant_[i])
-            {
-                return false;
-            }
-        }
+        if (interpolant_[i] != pairproduction->interpolant_[i])
+            return false;
     }
-    else
-        return EpairProduction::compare(parametrization);
+
+    return EpairProduction::compare(parametrization);
 }
 
 // ------------------------------------------------------------------------- //
