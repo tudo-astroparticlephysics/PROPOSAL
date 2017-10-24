@@ -11,11 +11,6 @@
 #include "PROPOSAL/scattering/ScatteringHighland.h"
 #include "PROPOSAL/scattering/ScatteringMoliere.h"
 #include "PROPOSAL/scattering/ScatteringDefault.h"
-// #include "PROPOSAL/Scattering.h"
-// #include "PROPOSAL/Ionization.h"
-// #include "PROPOSAL/Bremsstrahlung.h"
-// #include "PROPOSAL/Epairproduction.h"
-// #include "PROPOSAL/Photonuclear.h"
 #include "PROPOSAL/propagation_utility/PropagationUtility.h"
 
 using namespace std;
@@ -26,27 +21,28 @@ TEST(Comparison , Comparison_equal )
     Particle mu = Particle(MuMinusDef::Get());
     Water water(1.0);
 
-    EnergyCutSettings ecuts;
-    Utility::Definition utility_defs;
-    Utility utils(MuMinusDef::Get(), water, ecuts, utility_defs);
-
     ScatteringNoScattering noScat1(mu, water);
     ScatteringNoScattering noScat2(mu, water);
+
+    EXPECT_TRUE(noScat1==noScat2);
 
     ScatteringMoliere moliere1(mu, water);
     ScatteringMoliere moliere2(mu, water);
 
+    EXPECT_TRUE(moliere1==moliere2);
+
     ScatteringHighland high1(mu, water);
     ScatteringHighland high2(mu, water);
 
+    EXPECT_TRUE(high1==high2);
+
+    EnergyCutSettings ecuts;
+    Utility::Definition utility_defs;
+    Utility utils(MuMinusDef::Get(), water, ecuts, utility_defs);
+
     ScatteringDefault default1(mu, utils);
     ScatteringDefault default2(mu, utils);
-    // Scattering A = ScatteringFactory::Get().CreateScattering(ScatteringFactory::Moliere, particle_, utility_)
-    // Scattering B(mu);
 
-    EXPECT_TRUE(noScat1==noScat2);
-    EXPECT_TRUE(moliere1==moliere2);
-    EXPECT_TRUE(high1==high2);
     EXPECT_TRUE(default1==default2);
 
 }
@@ -56,27 +52,45 @@ TEST(Comparison , Comparison_not_equal ) {
     Particle mu = Particle(MuMinusDef::Get());
     Particle tau = Particle(TauMinusDef::Get());
     Water water(1.0);
-
-    EnergyCutSettings ecuts;
-    Utility::Definition utility_defs;
-    Utility utils(MuMinusDef::Get(), water, ecuts, utility_defs);
+    Ice ice;
 
     ScatteringNoScattering noScat1(mu, water);
     ScatteringNoScattering noScat2(tau, water);
+    ScatteringNoScattering noScat3(mu, ice);
+
+    EXPECT_TRUE(noScat1!=noScat2);
+    EXPECT_TRUE(noScat1!=noScat3);
 
     ScatteringMoliere moliere1(mu, water);
     ScatteringMoliere moliere2(tau, water);
+    ScatteringMoliere moliere3(mu, ice);
+
+    EXPECT_TRUE(moliere1!=moliere2);
+    EXPECT_TRUE(moliere1!=moliere3);
 
     ScatteringHighland high1(mu, water);
     ScatteringHighland high2(tau, water);
+    ScatteringHighland high3(mu, ice);
 
-    ScatteringDefault default1(mu, utils);
-    ScatteringDefault default2(tau, utils);
-
-    EXPECT_TRUE(noScat1!=noScat2);
-    EXPECT_TRUE(moliere1!=moliere2);
     EXPECT_TRUE(high1!=high2);
+    EXPECT_TRUE(high1!=high3);
+
+    EnergyCutSettings ecuts1;
+    EnergyCutSettings ecuts2(200, 0.01);
+    Utility::Definition utility_defs;
+    Utility utils1(MuMinusDef::Get(), water, ecuts1, utility_defs);
+    Utility utils2(TauMinusDef::Get(), water, ecuts1, utility_defs);
+    Utility utils3(MuMinusDef::Get(), ice, ecuts1, utility_defs);
+    Utility utils4(MuMinusDef::Get(), water, ecuts2, utility_defs);
+
+    ScatteringDefault default1(mu, utils1);
+    ScatteringDefault default2(tau, utils2);
+    ScatteringDefault default3(mu, utils3);
+    ScatteringDefault default4(mu, utils4);
+
     EXPECT_TRUE(default1!=default2);
+    EXPECT_TRUE(default1!=default3);
+    EXPECT_TRUE(default1!=default4);
 
 
 }

@@ -48,6 +48,8 @@ bool ScatteringNoScattering::compare(const Scattering& scattering) const
 
     if (!scatteringNoScattering)
         return false;
+    else if (*medium_ != *scatteringNoScattering->medium_)
+        return false;
     else
         return true;
 }
