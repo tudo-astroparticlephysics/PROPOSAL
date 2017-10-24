@@ -12,14 +12,21 @@
 #include <string>
 #include <vector>
 
+#include "PROPOSAL/medium/Components.h"
+
+#define MEDIUM_DEF(cls)                                                                                                \
+    class cls : public MediumCopyable<Medium, cls>                                                                     \
+    {                                                                                                                  \
+        public:                                                                                                        \
+        cls(double rho = 1.0);                                                                                         \
+        cls(const Medium& medium)                                                                                      \
+            : Medium(medium)                                                                                           \
+        {                                                                                                              \
+        }                                                                                                              \
+        virtual ~cls() {}                                                                                              \
+    };
 
 namespace PROPOSAL {
-
-namespace Components
-{
-    class Component;
-}
-
 
 /******************************************************************************
 *                                   Medium                                    *
@@ -28,13 +35,9 @@ namespace Components
 class Medium
 {
     public:
-    /*!
-     * initialize medium by its name andby the
-     * multiplicative density correction factor
-     * \param   w       medium to create
-     * \param   rho     multiplicative density correction factor
-     */
-    // TODO(mario): Doc string Thu 2017/08/03
+    class Builder;
+
+    public:
     Medium() {}
     Medium(std::string name,
            double rho,
@@ -45,14 +48,15 @@ class Medium
            double X0,
            double X1,
            double d0,
-           double massDensity);
+           double massDensity,
+           const std::vector<Components::Component*>&);
     Medium(const Medium&);
+    virtual Medium* clone() const { return new Medium(*this); }; // Prototyping/Virtual constructor idiom (used for deep copies)
 
     ///@brief Crush this Medium.
     virtual ~Medium();
 
     void swap(Medium& medium);
-    virtual Medium* clone() const = 0; // Prototyping/Virtual constructor idiom (used for deep copies)
 
     // Operators
     Medium& operator=(const Medium&);
@@ -60,7 +64,6 @@ class Medium
     bool operator!=(const Medium& medium) const;
     friend std::ostream& operator<<(std::ostream& os, Medium const& medium);
 
-    void init(); // Needed when not using c++11
 
     // ----------------------------------------------------------------- //
     // Getter & Setter
@@ -109,6 +112,11 @@ class Medium
 
     protected:
 
+    // Methods
+    void init();
+    double X0_inv(unsigned int Z, double M);
+
+    // Protected member
     std::string name_;
 
     int numComponents_;                              ///< number of components
@@ -134,7 +142,124 @@ class Medium
     double MM_;          ///< average all-component nucleon weight
     double sumNucleons_; ///< sum of nucleons of all nuclei
 
-    double X0_inv(unsigned int Z, double M);
+};
+
+/******************************************************************************
+*                                  Builder                                    *
+******************************************************************************/
+
+class Medium::Builder
+{
+    public:
+    Builder();
+
+    // --------------------------------------------------------------------- //
+    // Setter
+    // --------------------------------------------------------------------- //
+
+    Builder& SetName(const std::string& var)
+    {
+        this->name_ = var;
+        return *this;
+    }
+    Builder& SetRho(double var)
+    {
+        rho_ = var;
+        return *this;
+    }
+    Builder& SetI(double var)
+    {
+        I_ = var;
+        return *this;
+    }
+    Builder& SetC(double var)
+    {
+        C_ = var;
+        return *this;
+    }
+    Builder& SetA(double var)
+    {
+        a_ = var;
+        return *this;
+    }
+    Builder& SetM(double var)
+    {
+        m_ = var;
+        return *this;
+    }
+    Builder& SetX0(double var)
+    {
+        X0_ = var;
+        return *this;
+    }
+    Builder& SetX1(double var)
+    {
+        X1_ = var;
+        return *this;
+    }
+    Builder& SetD0(double var)
+    {
+        d0_ = var;
+        return *this;
+    }
+    Builder& SetMassDensity(double var)
+    {
+        massDensity_ = var;
+        return *this;
+    }
+    Builder& addComponent(const Components::Component& var)
+    {
+        components_.push_back(var.clone());
+        return *this;
+    }
+
+    Builder& SetMedium(const Medium& var)
+    {
+        name_ = var.GetName();
+        rho_ = var.GetDensityCorrection();
+        I_ = var.GetI();
+        C_ = var.GetC();
+        a_ = var.GetA();
+        m_ = var.GetM();
+        X0_ = var.GetX0();
+        X1_ = var.GetX1();
+        d0_ = var.GetD0();
+        massDensity_ = var.GetMassDensity();
+
+        components_ = var.GetComponents();
+        return *this;
+    }
+
+    Medium build()
+    {
+        return Medium(
+            name_,
+            rho_,
+            I_,
+            C_,
+            a_,
+            m_,
+            X0_,
+            X1_,
+            d0_,
+            massDensity_,
+            components_
+        );
+    }
+
+    private:
+    std::string name_;
+    double rho_;
+    double I_;
+    double C_;
+    double a_;
+    double m_;
+    double X0_;
+    double X1_;
+    double d0_;
+    double massDensity_;
+
+    std::vector<Components::Component*> components_;
 };
 
 /******************************************************************************
@@ -175,165 +300,29 @@ class MediumCopyable: virtual public Base
     }
 };
 
-// ----------------------------------------------------------------------------
-/// @brief Implement Medium Water
-// ----------------------------------------------------------------------------
-class Water : public MediumCopyable<Medium, Water>
-{
-    public:
-    Water(double rho = 1.0);
-    Water(const Medium& medium)
-        : Medium(medium)
-    {
-    }
-    virtual ~Water() {}
-};
+MEDIUM_DEF(Water)
+MEDIUM_DEF(Ice)
+MEDIUM_DEF(Salt)
+MEDIUM_DEF(CalciumCarbonate)
+MEDIUM_DEF(StandardRock)
+MEDIUM_DEF(FrejusRock)
+MEDIUM_DEF(Iron)
+MEDIUM_DEF(Hydrogen)
+MEDIUM_DEF(Lead)
+MEDIUM_DEF(Copper)
+MEDIUM_DEF(Uranium)
+// MEDIUM_DEF(Air)
+MEDIUM_DEF(Paraffin)
 
-// ----------------------------------------------------------------------------
-/// @brief Implement Medium Ice
-// ----------------------------------------------------------------------------
-class Ice : public MediumCopyable<Medium, Ice>
-{
-    public:
-    Ice(double rho = 1.0);
-    Ice(const Medium& medium)
-        : Medium(medium)
-    {
-    }
-    virtual ~Ice() {}
-};
 
-// ----------------------------------------------------------------------------
-/// @brief Implement Medium Salt
-// ----------------------------------------------------------------------------
-class Salt : public MediumCopyable<Medium, Salt>
-{
-    public:
-    Salt(double rho = 1.0);
-    Salt(const Medium& medium)
-        : Medium(medium)
-    {
-    }
-    virtual ~Salt() {}
-};
-
-// ----------------------------------------------------------------------------
-/// @brief Implement Medium CalciumCarbonate (CaCO3)
-// ----------------------------------------------------------------------------
-class CalciumCarbonate : public MediumCopyable<Medium, CalciumCarbonate>
-{
-    public:
-    CalciumCarbonate(double rho = 1.0);
-    CalciumCarbonate(const Medium& medium)
-        : Medium(medium)
-    {
-    }
-    virtual ~CalciumCarbonate() {}
-};
-
-// ----------------------------------------------------------------------------
-/// @brief Implement Medium StandardRock
-// ----------------------------------------------------------------------------
-class StandardRock : public MediumCopyable<Medium, StandardRock>
-{
-    public:
-    StandardRock(double rho = 1.0);
-    StandardRock(const Medium& medium)
-        : Medium(medium)
-    {
-    }
-    virtual ~StandardRock() {}
-};
-
-// ----------------------------------------------------------------------------
-/// @brief Implement Medium FrejusRock
-// ----------------------------------------------------------------------------
-class FrejusRock : public MediumCopyable<Medium, FrejusRock>
-{
-    public:
-    FrejusRock(double rho = 1.0);
-    FrejusRock(const Medium& medium)
-        : Medium(medium)
-    {
-    }
-    virtual ~FrejusRock() {}
-};
-
-// ----------------------------------------------------------------------------
-/// @brief Implement Medium Iron
-// ----------------------------------------------------------------------------
-class Iron : public MediumCopyable<Medium, Iron>
-{
-    public:
-    Iron(double rho = 1.0);
-    Iron(const Medium& medium)
-        : Medium(medium)
-    {
-    }
-    virtual ~Iron() {}
-};
-
-// ----------------------------------------------------------------------------
-/// @brief Implement Medium Hydrogen
-// ----------------------------------------------------------------------------
-class Hydrogen : public MediumCopyable<Medium, Hydrogen>
-{
-    public:
-    Hydrogen(double rho = 1.0);
-    Hydrogen(const Medium& medium)
-        : Medium(medium)
-    {
-    }
-    virtual ~Hydrogen() {}
-};
-
-// ----------------------------------------------------------------------------
-/// @brief Implement Medium Lead
-// ----------------------------------------------------------------------------
-class Lead : public MediumCopyable<Medium, Lead>
-{
-    public:
-    Lead(double rho = 1.0);
-    Lead(const Medium& medium)
-        : Medium(medium)
-    {
-    }
-    virtual ~Lead() {}
-};
-
-// ----------------------------------------------------------------------------
-/// @brief Implement Medium Copper
-// ----------------------------------------------------------------------------
-class Copper : public MediumCopyable<Medium, Copper>
-{
-    public:
-    Copper(double rho = 1.0);
-    Copper(const Medium& medium)
-        : Medium(medium)
-    {
-    }
-    virtual ~Copper() {}
-};
-
-// ----------------------------------------------------------------------------
-/// @brief Implement Medium Uranium
-// ----------------------------------------------------------------------------
-class Uranium : public MediumCopyable<Medium, Uranium>
-{
-    public:
-    Uranium(double rho = 1.0);
-    Uranium(const Medium& medium)
-        : Medium(medium)
-    {
-    }
-    virtual ~Uranium() {}
-};
-
-// ----------------------------------------------------------------------------
-/// @brief Implement Medium Air
-// ----------------------------------------------------------------------------
 class Air : public MediumCopyable<Medium, Air>
 {
+    public:
+        static const double fraction_N;
+        static const double fraction_O;
+        static const double fraction_Ar;
+        static const double fraction_sum;
+
     public:
     Air(double rho = 1.0);
     Air(const Medium& medium)
@@ -341,20 +330,6 @@ class Air : public MediumCopyable<Medium, Air>
     {
     }
     virtual ~Air() {}
-};
-
-// ----------------------------------------------------------------------------
-/// @brief Implement Medium Paraffin
-// ----------------------------------------------------------------------------
-class Paraffin : public MediumCopyable<Medium, Paraffin>
-{
-    public:
-    Paraffin(double rho = 1.0);
-    Paraffin(const Medium& medium)
-        : Medium(medium)
-    {
-    }
-    virtual ~Paraffin() {}
 };
 
 // #<{(|
@@ -370,15 +345,8 @@ class Paraffin : public MediumCopyable<Medium, Paraffin>
 // *  an error which comes from uncertainties with the muon cross-sections.
 // *==========================================================================
 // |)}>#
-class AntaresWater : public MediumCopyable<Medium, AntaresWater>
-{
-    public:
-    AntaresWater(double rho = 1.0);
-    AntaresWater(const Medium& medium)
-        : Medium(medium)
-    {
-    }
-    virtual ~AntaresWater() {}
-};
+MEDIUM_DEF(AntaresWater)
 
 } // namespace PROPOSAL
+
+#undef MEDIUM_DEF
