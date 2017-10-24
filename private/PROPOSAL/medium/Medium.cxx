@@ -8,7 +8,9 @@
 */
 
 #include <cmath>
+
 // #include <iomanip>
+#include <boost/assign.hpp>
 
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/medium/Components.h"
@@ -63,6 +65,46 @@ ostream& operator<<(ostream& os, Medium const& medium)
 *                                   Medium                                    *
 ******************************************************************************/
 
+// Medium::Medium(std::string name,
+//                double rho,
+//                double I,
+//                double C,
+//                double a,
+//                double m,
+//                double X0,
+//                double X1,
+//                double d0,
+//                double massDensity)
+//     : name_(name)
+//     , numComponents_(0)
+//     , sumCharge_(0)
+//     , ZA_(0)
+//     , I_(I)
+//     , C_(C)
+//     , a_(a)
+//     , m_(m)
+//     , X0_(X0)
+//     , X1_(X1)
+//     , d0_(d0)
+//     , r_(0)
+//     , massDensity_(massDensity)
+//     , molDensity_(0)
+//     , radiationLength_(0)
+//     , ecut_(0)
+//     , vcut_(0)
+//     , vCut_(0)
+//     , MM_(0)
+//     , sumNucleons_(0)
+// {
+//     if (rho > 0)
+//     {
+//         rho_ = rho;
+//     } else
+//     {
+//         rho_ = 1;
+//     }
+// }
+
 Medium::Medium(std::string name,
                double rho,
                double I,
@@ -72,9 +114,10 @@ Medium::Medium(std::string name,
                double X0,
                double X1,
                double d0,
-               double massDensity)
+               double massDensity,
+               const std::vector<Components::Component*>& components)
     : name_(name)
-    , numComponents_(0)
+    , numComponents_(components.size())
     , sumCharge_(0)
     , ZA_(0)
     , I_(I)
@@ -101,6 +144,14 @@ Medium::Medium(std::string name,
     {
         rho_ = 1;
     }
+
+    components_.reserve(numComponents_);
+    for (int i = 0; i < numComponents_; ++i)
+    {
+        components_.push_back(components[i]->clone());
+    }
+
+    init();
 }
 
 Medium::Medium(const Medium& medium)
@@ -418,6 +469,24 @@ void Medium::SetSumNucleons(double sumNucleons)
 }
 
 /******************************************************************************
+*                                  Builder                                    *
+******************************************************************************/
+
+Medium::Builder::Builder()
+    : name_("")
+    , I_(0.0)
+    , C_(0.0)
+    , a_(0.0)
+    , m_(0.0)
+    , X0_(0.0)
+    , X1_(0.0)
+    , d0_(0.0)
+    , massDensity_(0.0)
+    , components_()
+{
+}
+
+/******************************************************************************
 *                              Different Media                                *
 ******************************************************************************/
 
@@ -431,11 +500,9 @@ Water::Water(double rho)
              0.2400,  // X0
              2.8004,  // X1
              0,       // d0
-             1.000)   // massDensitiy
+             1.000,   // massDensitiy
+             boost::assign::list_of<Components::Component*>(new Components::Hydrogen(2))(new Components::Oxygen()))
 {
-    components_.push_back(new Components::Hydrogen(2));
-    components_.push_back(new Components::Oxygen());
-    init();
 }
 
 Ice::Ice(double rho)
@@ -448,11 +515,9 @@ Ice::Ice(double rho)
              0.2400,  // X0
              2.8004,  // X1
              0,       // d0
-             0.917)   // massDensitiy
+             0.917,   // massDensitiy
+             boost::assign::list_of<Components::Component*>(new Components::Hydrogen(2))(new Components::Oxygen()))
 {
-    components_.push_back(new Components::Hydrogen(2));
-    components_.push_back(new Components::Oxygen());
-    init();
 }
 
 Salt::Salt(double rho)
@@ -467,30 +532,25 @@ Salt::Salt(double rho)
              0.2,     // X0
              3.0,     // X1
              0,       // d0
-             2.323)   // Solid halite density
+             2.323,   // Solid halite density
+             boost::assign::list_of<Components::Component*>(new Components::Sodium())(new Components::Chlorine()))
 {
-    components_.push_back(new Components::Sodium());
-    components_.push_back(new Components::Chlorine());
-    init();
 }
 
-// CalciumCarbonate::CalciumCarbonate(double rho)
-//     : Medium("calciumcarbonate",
-//              rho,
-//              136.4,   // I
-//              -3.7738, // C
-//              0.08301, // a
-//              3.4120,  // m
-//              0.0492,  // X0
-//              3.0549,  // X1
-//              0,       // d0
-//              2.650)   // massDensity
-// {
-//     components_.push_back(new Components::Calcium());
-//     components_.push_back(new Components::Carbon());
-//     components_.push_back(new Components::Oxygen(3));
-//     init();
-// }
+CalciumCarbonate::CalciumCarbonate(double rho)
+    : Medium("calciumcarbonate",
+             rho,
+             136.4,   // I
+             -3.7738, // C
+             0.08301, // a
+             3.4120,  // m
+             0.0492,  // X0
+             3.0549,  // X1
+             0,       // d0
+             2.650,   // massDensity
+             boost::assign::list_of<Components::Component*>(new Components::Calcium())(new Components::Carbon())(new Components::Oxygen(3)))
+{
+}
 
 StandardRock::StandardRock(double rho)
     : Medium("standardrock",
@@ -502,10 +562,9 @@ StandardRock::StandardRock(double rho)
              0.0492,  // X0
              3.0549,  // X1
              0,       // d0
-             2.650)   // massDensity
+             2.650,   // massDensity
+             boost::assign::list_of<Components::Component*>(new Components::StandardRock()))
 {
-    components_.push_back(new Components::StandardRock());
-    init();
 }
 
 FrejusRock::FrejusRock(double rho)
@@ -518,10 +577,9 @@ FrejusRock::FrejusRock(double rho)
              0.288,  // X0
              3.196,  // X1
              0,      // d0
-             2.740)  // massDensity
+             2.740,  // massDensity
+             boost::assign::list_of<Components::Component*>(new Components::FrejusRock()))
 {
-    components_.push_back(new Components::FrejusRock());
-    init();
 }
 
 Iron::Iron(double rho)
@@ -534,10 +592,9 @@ Iron::Iron(double rho)
              -0.0012, // X0
              3.1531,  // X1
              0.12,    // d0
-             7.874)   // massDensity
+             7.874,   // massDensity
+             boost::assign::list_of<Components::Component*>(new Components::Iron()))
 {
-    components_.push_back(new Components::Iron());
-    init();
 }
 
 Hydrogen::Hydrogen(double rho)
@@ -550,10 +607,9 @@ Hydrogen::Hydrogen(double rho)
              0.4400,  // X0
              1.8856,  // X1
              0,       // d0
-             0.07080) // massDensity
+             0.07080, // massDensity
+             boost::assign::list_of<Components::Component*>(new Components::Hydrogen()))
 {
-    components_.push_back(new Components::Hydrogen());
-    init();
 }
 
 Lead::Lead(double rho)
@@ -566,10 +622,9 @@ Lead::Lead(double rho)
              0.3776,  // X0
              3.8073,  // X1
              0.14,    // d0
-             11.350)  // massDensity
+             11.350,  // massDensity
+             boost::assign::list_of<Components::Component*>(new Components::Lead()))
 {
-    components_.push_back(new Components::Lead());
-    init();
 }
 
 Copper::Copper(double rho)
@@ -582,10 +637,9 @@ Copper::Copper(double rho)
              -0.0254, // X0
              3.2792,  // X1
              0.08,    // d0
-             8.960)   // massDensity
+             8.960,   // massDensity
+             boost::assign::list_of<Components::Component*>(new Components::Copper()))
 {
-    components_.push_back(new Components::Copper());
-    init();
 }
 
 Uranium::Uranium(double rho)
@@ -598,11 +652,15 @@ Uranium::Uranium(double rho)
              0.2260,  // X0
              3.3721,  // X1
              0.14,    // d0
-             18.950)  // massDensity
+             18.950,  // massDensity
+             boost::assign::list_of<Components::Component*>(new Components::Uranium()))
 {
-    components_.push_back(new Components::Uranium());
-    init();
 }
+
+const double Air::fraction_N = 2 * 78.1;
+const double Air::fraction_O = 2 * 21.0;
+const double Air::fraction_Ar = 0.9;
+const double Air::fraction_sum = Air::fraction_N + Air::fraction_O + Air::fraction_Ar;
 
 Air::Air(double rho)
     : Medium("air",
@@ -614,17 +672,12 @@ Air::Air(double rho)
              1.7418,   // X0
              4.2759,   // X1
              0,        // d0
-             1.205e-3) // dry, 1 atm massDensity
+             1.205e-3, // dry, 1 atm massDensity
+             boost::assign::list_of<Components::Component*>
+             (new Components::Nitrogen(fraction_N / fraction_sum))
+             (new Components::Oxygen(fraction_O / fraction_sum))
+             (new Components::Argon(fraction_Ar / fraction_sum)))
 {
-    const double fr1 = 2 * 78.1;
-    const double fr2 = 2 * 21.0;
-    const double fr3 = 0.9;
-    const double fra = fr1 + fr2 + fr3;
-
-    components_.push_back(new Components::Nitrogen(fr1 / fra));
-    components_.push_back(new Components::Oxygen(fr2 / fra));
-    components_.push_back(new Components::Argon(fr3 / fra));
-    init();
 }
 
 Paraffin::Paraffin(double rho)
@@ -637,11 +690,9 @@ Paraffin::Paraffin(double rho)
              0.1289,  // X0
              2.5084,  // X1
              0,       // d0
-             0.93)    // massDensity
+             0.93,    // massDensity
+             boost::assign::list_of<Components::Component*>(new Components::Carbon(25.0))(new Components::Hydrogen(52.0)))
 {
-    components_.push_back(new Components::Carbon(25.0));
-    components_.push_back(new Components::Hydrogen(52.0));
-    init();
 }
 
 AntaresWater::AntaresWater(double rho)
@@ -654,7 +705,16 @@ AntaresWater::AntaresWater(double rho)
              0.2400,  // X0
              2.8004,  // X1
              0,       // d0
-             1.03975) // massDensity
+             1.03975, // massDensity
+             boost::assign::list_of<Components::Component*>
+            (new Components::Hydrogen(2.0))
+            (new Components::Oxygen(1.00884))
+            (new Components::Sodium(0.00943))
+            (new Components::Potassium(0.000209))
+            (new Components::Magnesium(0.001087))
+            (new Components::Calcium(0.000209))
+            (new Components::Chlorine(0.01106))
+            (new Components::Sulfur(0.00582)))
 {
     //  Chemical composition of the seawater
     //  according to
@@ -666,16 +726,6 @@ AntaresWater::AntaresWater(double rho)
     //  instead of 35.0 g/kg as cited in A.Okada, ...
     //  (so, n[2-7] have been just multiplied by 1.098)
 
-    components_.push_back(new Components::Hydrogen(2.0));
-    components_.push_back(new Components::Oxygen(1.00884));
-    components_.push_back(new Components::Sodium(0.00943));
-    components_.push_back(new Components::Potassium(0.000209));
-    components_.push_back(new Components::Magnesium(0.001087));
-    components_.push_back(new Components::Calcium(0.000209));
-    components_.push_back(new Components::Chlorine(0.01106));
-    components_.push_back(new Components::Sulfur(0.00582));
-    init();
-
     // J.Brunner, ANTARES-Site/2000-001, the mean value
     // for sea water density at the ANTARES place between
     // sea bed D = 2400 m (1.0404 g/cm^3) and middle of
@@ -685,21 +735,6 @@ AntaresWater::AntaresWater(double rho)
     // surface D = 0 m (1.0291 g/cm^3) and middle of
     // detector D = 2126 m (1.0391 g/cm^3)
 }
-
-// AntaresWater& AntaresWater::operator=(const AntaresWater& medium)
-// {
-//     if (this != &medium) {
-//         const AntaresWater* med = dynamic_cast<const AntaresWater*>(&medium);
-//         if (!med) {
-//             log_warn("Cannot assign AntaresWater!");
-//             return *this;
-//         }
-//
-//         AntaresWater tmp(*med);
-//         swap(tmp);
-//     }
-//     return *this;
-// }
 
 /******************************************************************************
 *                        private Helper Funcitons                             *

@@ -17,6 +17,17 @@
 using namespace PROPOSAL;
 using namespace PROPOSAL::Components;
 
+#define COMPONENT_IMPL(cls, SYMBOL, ATOMICNUM, NUCCHARGE)                                                              \
+    cls::cls(double atomInMolecule)                                                                                    \
+        : Component(#SYMBOL, ATOMICNUM, NUCCHARGE, atomInMolecule)                                                     \
+    {                                                                                                                  \
+    }                                                                                                                  \
+                                                                                                                       \
+    cls::cls(const cls& component)                                                                                     \
+        : Component(component)                                                                                         \
+    {                                                                                                                  \
+    }
+
 /******************************************************************************
 *                                  OStream                                    *
 ******************************************************************************/
@@ -142,6 +153,8 @@ Component& Component::operator=(const Component& component)
 // ------------------------------------------------------------------------- //
 bool Component::operator==(const Component& component) const
 {
+    if (typeid(*this) != typeid(component))
+        return false;
     if (name_ != component.name_)
         return false;
     else if (nucCharge_ != component.nucCharge_)
@@ -306,87 +319,20 @@ double Component::FunctionToIntegral(double r)
 *                            Different Components                             *
 ******************************************************************************/
 
-Hydrogen::Hydrogen(double atomInMolecule)
-    : Component("H", 1, 1.00794, atomInMolecule)
-{
-}
-
-Carbon::Carbon(double atomInMolecule)
-    : Component("C", 6, 12.0011, atomInMolecule)
-{
-}
-
-Nitrogen::Nitrogen(double atomInMolecule)
-    : Component("N", 7, 14.0067, atomInMolecule)
-{
-}
-
-Oxygen::Oxygen(double atomInMolecule)
-    : Component("O", 8, 15.9994, atomInMolecule)
-{
-}
-
-Sodium::Sodium(double atomInMolecule)
-    : Component("Na", 11, 22.989770, atomInMolecule)
-{
-}
-
-Magnesium::Magnesium(double atomInMolecule)
-    : Component("Mg", 12, 24.31, atomInMolecule)
-{
-}
-
-Sulfur::Sulfur(double atomInMolecule)
-    : Component("S", 16, 32.07, atomInMolecule)
-{
-}
-
-Chlorine::Chlorine(double atomInMolecule)
-    : Component("Cl", 17, 35.4527, atomInMolecule)
-{
-}
-
-Argon::Argon(double atomInMolecule)
-    : Component("Ar", 18, 39.948, atomInMolecule)
-{
-}
-
-Potassium::Potassium(double atomInMolecule)
-    : Component("K", 19, 39.10, atomInMolecule)
-{
-}
-
-Calcium::Calcium(double atomInMolecule)
-    : Component("Ca", 20, 40.08, atomInMolecule)
-{
-}
-
-Iron::Iron(double atomInMolecule)
-    : Component("Fe", 26, 55.845, atomInMolecule)
-{
-}
-
-Copper::Copper(double atomInMolecule)
-    : Component("Cu", 29, 63.546, atomInMolecule)
-{
-}
-
-Lead::Lead(double atomInMolecule)
-    : Component("Pb", 82, 207.2, atomInMolecule)
-{
-}
-
-Uranium::Uranium(double atomInMolecule)
-    : Component("U", 92, 238.0289, atomInMolecule)
-{
-}
-
-StandardRock::StandardRock(double atomInMolecule)
-    : Component("StandardRock", 11, 22.0, atomInMolecule)
-{
-}
-
-FrejusRock::FrejusRock(double atomInMolecule)
-    : Component("FrejusRock", 10.12, 20.34, atomInMolecule)
-{
-}
+COMPONENT_IMPL(Hydrogen, H, 1, 1.00794)
+COMPONENT_IMPL(Carbon, C, 6, 12.0011)
+COMPONENT_IMPL(Nitrogen, N, 7, 14.0067)
+COMPONENT_IMPL(Oxygen, O, 8, 15.9994)
+COMPONENT_IMPL(Sodium, Na, 11, 22.989770)
+COMPONENT_IMPL(Magnesium, Mg, 12, 24.31)
+COMPONENT_IMPL(Sulfur, S, 16, 32.07)
+COMPONENT_IMPL(Chlorine, Cl, 17, 35.4527)
+COMPONENT_IMPL(Argon, Ar, 18, 39.948)
+COMPONENT_IMPL(Potassium, K, 19, 39.10)
+COMPONENT_IMPL(Calcium, Ca, 20, 40.08)
+COMPONENT_IMPL(Iron, Fe, 26, 55.845)
+COMPONENT_IMPL(Copper, Cu, 29, 63.546)
+COMPONENT_IMPL(Lead, Pb, 82, 207.2)
+COMPONENT_IMPL(Uranium, U, 92, 238.0289)
+COMPONENT_IMPL(StandardRock, StandardRock, 11, 22.0)
+COMPONENT_IMPL(FrejusRock, FrejusRock, 10.12, 20.34)
