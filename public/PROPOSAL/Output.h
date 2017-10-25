@@ -176,7 +176,7 @@ public:
 
     void FillSecondaryVector(Particle *particle, int secondary_id, std::pair<double, ParticleType::Enum> energy_loss, double distance);
 
-    void FillSecondaryVector(const Particle& particle, const DynamicData::Type& secondary, double energyloss, double distance);
+    void FillSecondaryVector(const Particle& particle, const DynamicData::Type& secondary, double energyloss);
     void FillSecondaryVector(std::vector<Particle*>&);
 
 //----------------------------------------------------------------------------//
