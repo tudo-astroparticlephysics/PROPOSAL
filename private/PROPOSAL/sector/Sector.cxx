@@ -354,7 +354,7 @@ double Sector::Propagate(double distance)
             // log_debug("Energyloss: %f\t%s", energy_loss.first,
             // Particle::GetName(energy_loss.second).c_str());
             // //TODO(mario): hack Thu 2017/08/24
-            Output::getInstance().FillSecondaryVector(particle_, energy_loss.second, energy_loss.first, 0);
+            Output::getInstance().FillSecondaryVector(particle_, energy_loss.second, energy_loss.first);
             // secondary_id    =   particle_.GetParticleId() + 1;
             // Output::getInstance().FillSecondaryVector(& secondary_id, energy_loss, 0);
         } else
