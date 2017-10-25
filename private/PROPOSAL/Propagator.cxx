@@ -280,7 +280,7 @@ Propagator::Propagator(const ParticleDef& particle_def, const std::string& confi
 
         try
         {
-            boost::property_tree::ptree& geometry_tree = pt_json.get_child("geometry");
+            boost::property_tree::ptree& geometry_tree = subtree.get_child("geometry");
             geometry = ParseGeometryConifg(geometry_tree);
         }
         catch(const boost::property_tree::ptree_error &e)
