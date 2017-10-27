@@ -189,8 +189,9 @@ Propagator::Propagator(const ParticleDef& particle_def, const std::string& confi
         log_fatal("Unable parse \"%s\" as json file", config_file.c_str());
     }
 
-    // Read in global cut and continous randomization options
     SetMember(seed_, "global.seed", pt_json);
+
+    // Read in global cut and continous randomization options
     SetMember(global_ecut_inside, "global.ecut_inside", pt_json);
     SetMember(global_ecut_infront, "global.ecut_infront", pt_json);
     SetMember(global_ecut_behind, "global.ecut_behind", pt_json);
