@@ -20,10 +20,10 @@
 #include <sstream>
 #include <unistd.h> // check for write permissions
 
-#include "dataclasses/physics/I3Particle.h"
+#include <dataclasses/physics/I3Particle.h>
 
+// #include "PROPOSAL/src/PROPOSAL-icetray/I3PropagatorServicePROPOSAL.h"
 #include "PROPOSAL-icetray/I3PropagatorServicePROPOSAL.h"
-#include "PROPOSAL/Output.h"
 
 using namespace std;
 using namespace PROPOSAL;
@@ -57,206 +57,29 @@ bool IsWritable(std::string table_dir)
 }
 
 // ------------------------------------------------------------------------- //
-I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(
-                                                         std::string mediadef
-                                                         , std::string tabledir
-                                                         , double cylinderRadius
-                                                         , double cylinderHeight
-                                                         , I3Particle::ParticleType type
-                                                         , double particleMass
-                                                         , double particleCharge_
-                                                         , double particleLifetime_
-                                                         , ParametrizationType::Enum brems_param
-                                                         , ParametrizationType::Enum photo_param)
-    : particleMass_(particleMass)
-    , mediadef_(mediadef)
-    , tabledir_(tabledir)
-    , cylinderRadius_(cylinderRadius)
-    , cylinderHeight_(cylinderHeight)
-    , brems_param_(brems_param)
-    , photo_param_(photo_param)
+I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL( I3Particle& p, std::string configfile)
+    : tearDownPerCall_(false)
+    , particle_def_(GeneratePROPOSALParticleDef(p))
+    , config_file_(configfile.empty() || !boost::filesystem::exists(configfile) ? GetDefaultConfigFile() : configfile)
+    , proposal_(new Propagator(particle_def_, config_file_))
 {
-
-    I3Particle i3particle;
-    i3particle.SetType(type);
-    PROPOSALParticle* particle = new PROPOSALParticle(GeneratePROPOSALType(i3particle));
-
-    // Mass
-    if (isnan(particleMass_) == false)
-    {
-        particle->SetMass(particleMass_);
-    }
-    if (std::isinf(particleMass_))
-    {
-        log_fatal("You asked for Particle of non-finite mass %f", particleMass_);
-    }
-
-    // Charge
-    if (isnan(particleCharge_) == false)
-    {
-        particle->SetCharge(particleCharge_);
-    }
-    if (std::isinf(particleCharge_))
-    {
-        log_fatal("You asked for Particle of non-finite charge %f", particleCharge_);
-    }
-
-    // Lifetime
-    if (isnan(particleLifetime_) == false)
-    {
-        particle->SetLifetime(particleLifetime_);
-    }
-    if (std::isinf(particleLifetime_))
-    {
-        log_fatal("You asked for Particle of non-finite lifetime %f", particleLifetime_);
-    }
-
-    // ----[ Check table dir and mediadef ]------------------ //
-
-    if (mediadef_.empty())
-        mediadef_ = GetDefaultMediaDef();
-    if (tabledir_.empty())
-        tabledir_ = GetDefaultTableDir();
-
-    namespace fs = boost::filesystem;
-
-    if (!fs::exists(mediadef_))
-        log_fatal("The mediadef file '%s' can't be read!", mediadef_.c_str());
-    if (!fs::is_directory(tabledir_))
-        log_fatal("The table directory '%s' doesn't exist!", tabledir_.c_str());
-
-
-    // ----[ Check, apply options ]-------------------------- //
-
-
-    // Define propagator but do not apply option yet
-    // proposal = new Propagator(mediadef_, false);
-    proposal = new Propagator(mediadef_,particle, false);
-
-    stringstream options;
-
-    options << "You choose the following parameter by passing arguments:" << std::endl;
-    options << "\tcylinderRadius = " << cylinderRadius_ << std::endl;
-    options << "\tcylinderHeight = " << cylinderHeight_ << std::endl;
-    options << "\tBremsstrahlungParametrization = " << brems_param_ << std::endl;
-    options << "\tPhotonuclearParametrization = " << photo_param_ << std::endl;
-
-    if (brems_param_ != proposal->GetBrems())
-    {
-        options << "\tChosen BremsstrahlungParametrization differs from parametrization in config file!" << std::endl;
-        options << "Passed parametrization will be used: " << brems_param_ << std::endl;
-    }
-
-    if (photo_param_ != proposal->GetPhoto())
-    {
-        options << "\tChosen PhotonuclearParametrization differs from parametrization in config file!" << std::endl;
-        options << "Passed parametrization will be used: " << photo_param_ << std::endl;
-    }
-
-    log_info("%s", options.str().c_str());
-
-
-    Geometry* geo = new Geometry();
-    geo->InitCylinder(0,0,0,cylinderRadius_,0,cylinderHeight_);
-    proposal->SetDetector(geo);
-    proposal->SetBrems(brems_param_);
-    proposal->SetPhoto(photo_param_);
-    proposal->SetPath_to_tables(tabledir_);
-
-    // proposal->SetParticle(particle_type)
-
-    proposal->ApplyOptions();
-
-	tearDownPerCall_ = false;
 }
 
 // ------------------------------------------------------------------------- //
 I3PropagatorServicePROPOSAL::~I3PropagatorServicePROPOSAL()
 {
-    delete proposal;
+    delete proposal_;
 }
 
 // ------------------------------------------------------------------------- //
-std::string I3PropagatorServicePROPOSAL::GetDefaultMediaDef()
+std::string I3PropagatorServicePROPOSAL::GetDefaultConfigFile()
 {
 	const char *I3_BUILD = getenv("I3_BUILD");
 	if (!I3_BUILD)
 		log_fatal("$I3_BUILD is not set!");
 	std::string s(I3_BUILD);
 
-    return s + "/PROPOSAL/resources/configuration";
-}
-
-// ------------------------------------------------------------------------- //
-std::string I3PropagatorServicePROPOSAL::GetDefaultTableDir()
-{
-    std::string append_string  = "/PROPOSAL/resources/tables";
-    std::string append_string2 = "/PROPOSAL/tables";
-
-    // --------------------------------------------------------------------- //
-    // Environment variable set?
-    // --------------------------------------------------------------------- //
-
-    // Initializing a std::string with a NULL ptr is undefined behavior.
-    // Why it doens't just return an empty string, I have no idea.
-    std::string table_dir(getenv("PROPOSALTABLEDIR") ? getenv("PROPOSALTABLEDIR") : "");
-
-    if (table_dir.empty())
-    {
-        log_info("$PROPOSALTABLEDIR is not set in env variables. Falling back to defaults.");
-    }
-    else
-    {
-        if(IsWritable(table_dir)) return table_dir;
-    }
-
-    // --------------------------------------------------------------------- //
-    // Writable in I3_TESTDATA?
-    // --------------------------------------------------------------------- //
-
-    table_dir = std::string(getenv("I3_TESTDATA") ? getenv("I3_TESTDATA") : "");
-
-    if (table_dir.empty())
-    {
-        log_warn("$I3_TESTDATA is not set, falling back to build folder!");
-    }
-    else
-    {
-        if (IsWritable(table_dir + append_string))
-        {
-            return table_dir + append_string;
-        }
-        else
-        {
-            log_warn("Falling back to build folder!");
-        }
-    }
-
-    // --------------------------------------------------------------------- //
-    // Fall back to I3_BUID
-    // --------------------------------------------------------------------- //
-
-    table_dir = std::string(getenv("I3_BUILD") ? getenv("I3_BUILD") : "");
-
-    if (table_dir.empty())
-    {
-        log_fatal("$I3_BUILD is not set");
-    }
-    else
-    {
-        if (IsWritable(table_dir + append_string))
-        {
-            return table_dir + append_string;
-        }
-        else if (IsWritable(table_dir + append_string2))
-        {
-            return table_dir + append_string2;
-        }
-        else
-        {
-            log_fatal("No folder availble to fall back! Abort search for table directory.");
-        }
-    }
+    return s + "/PROPOSAL/resources/config.json";
 }
 
 // ------------------------------------------------------------------------- //
@@ -265,7 +88,7 @@ void I3PropagatorServicePROPOSAL::SetRandomNumberGenerator(I3RandomServicePtr ra
     rng_ = random;
     boost::function<double ()> f = boost::bind(&I3RandomService::Uniform, random, 0, 1);
 
-    proposal->SetRandomNumberGenerator(f);
+    PROPOSAL::RandomGenerator::Get().SetRandomNumberGenerator(f);
 }
 
 // ------------------------------------------------------------------------- //
@@ -296,23 +119,24 @@ std::vector<I3Particle> I3PropagatorServicePROPOSAL::Propagate(I3Particle& p, Di
         p.GetLength()/I3Units::m
     );
 
-    if (tearDownPerCall_)
-    {
-        delete proposal;
-        proposal = new Propagator(mediadef_,false);
-        // Apply Settings
-        Geometry* geo = new Geometry();
-        geo->InitCylinder(0,0,0,cylinderRadius_,0,cylinderHeight_);
-        proposal->SetDetector(geo);
-        proposal->SetBrems(brems_param_);
-        proposal->SetPhoto(photo_param_);
-        proposal->SetPath_to_tables(tabledir_);
-        // proposal->SetParticle(particle_type)
-        proposal->ApplyOptions();
-
-        boost::function<double ()> f = boost::bind(&I3RandomService::Uniform, rng_, 0, 1);
-        proposal->SetRandomNumberGenerator(f);
-    }
+    //TODO(mario):  Thu 2017/09/28
+    // if (tearDownPerCall_)
+    // {
+    //     delete proposal;
+    //     proposal = new Propagator(mediadef_,false);
+    //     // Apply Settings
+    //     Geometry* geo = new Geometry();
+    //     geo->InitCylinder(0,0,0,cylinderRadius_,0,cylinderHeight_);
+    //     proposal->SetDetector(geo);
+    //     proposal->SetBrems(brems_param_);
+    //     proposal->SetPhoto(photo_param_);
+    //     proposal->SetPath_to_tables(tabledir_);
+    //     // proposal->SetParticle(particle_type)
+    //     proposal->ApplyOptions();
+    //
+    //     boost::function<double ()> f = boost::bind(&I3RandomService::Uniform, rng_, 0, 1);
+    //     proposal->SetRandomNumberGenerator(f);
+    // }
 
     I3MMCTrackPtr mmcTrack = propagate(p, daughters);
 
@@ -355,7 +179,7 @@ static const bimap_ParticleType I3_PROPOSAL_ParticleType_bimap = boost::assign::
     (I3Particle::Monopole,  ParticleType::Monopole)
     (I3Particle::STauMinus, ParticleType::STauMinus)
     (I3Particle::STauPlus,  ParticleType::STauPlus)
-    (I3Particle::SMP,       ParticleType::StableMassiveParticle)
+    // (I3Particle::SMP,       ParticleType::StableMassiveParticle)
     (I3Particle::Gamma,     ParticleType::Gamma)
     (I3Particle::Pi0,       ParticleType::Pi0)
     (I3Particle::PiPlus,    ParticleType::PiPlus)
@@ -367,60 +191,83 @@ static const bimap_ParticleType I3_PROPOSAL_ParticleType_bimap = boost::assign::
 
 
 // ------------------------------------------------------------------------- //
-ParticleType::Enum I3PropagatorServicePROPOSAL::GeneratePROPOSALType(const I3Particle& p)
+PROPOSAL::ParticleDef I3PropagatorServicePROPOSAL::GeneratePROPOSALParticleDef(const I3Particle& p)
 {
     I3Particle::ParticleType ptype_I3 = p.GetType();
-    ParticleType::Enum ptype_PROPOSAL;
 
-    bimap_ParticleType::left_const_iterator i3_iterator = I3_PROPOSAL_ParticleType_bimap.left.find(ptype_I3);
-    if (i3_iterator == I3_PROPOSAL_ParticleType_bimap.left.end())
+    if (ptype_I3 == I3Particle::MuMinus) return MuMinusDef::Get();
+    else if (ptype_I3 == I3Particle::MuPlus) return MuPlusDef::Get();
+    else if (ptype_I3 == I3Particle::EMinus) return EMinusDef::Get();
+    else if (ptype_I3 == I3Particle::EPlus) return EPlusDef::Get();
+    else if (ptype_I3 == I3Particle::TauMinus) return TauMinusDef::Get();
+    else if (ptype_I3 == I3Particle::TauPlus) return TauPlusDef::Get();
+    else
     {
         log_fatal("The I3Particle '%s' with type '%i' can not be converted to a PROPOSALParticle"
             , p.GetTypeString().c_str(), ptype_I3);
     }
-
-    ptype_PROPOSAL = I3_PROPOSAL_ParticleType_bimap.left.find(ptype_I3) -> second;
-
-    return ptype_PROPOSAL;
 }
 
-I3Particle::ParticleType I3PropagatorServicePROPOSAL::GenerateI3Type(ParticleType::Enum ptype_PROPOSAL)
+I3Particle::ParticleType I3PropagatorServicePROPOSAL::GenerateI3Type(const PROPOSAL::DynamicData& secondary)
 {
-    I3Particle::ParticleType ptype_I3;
+    DynamicData::Type type = secondary.GetTypeId();
 
-    bimap_ParticleType::right_const_iterator proposal_iterator = I3_PROPOSAL_ParticleType_bimap.right.find(ptype_PROPOSAL);
-    if (proposal_iterator == I3_PROPOSAL_ParticleType_bimap.right.end())
+    if (type == DynamicData::Particle)
     {
-        log_fatal("The PROPOSALParticle '%s' with type '%i' can not be converted to a I3Particle"
-            , PROPOSALParticle::GetName(ptype_PROPOSAL).c_str(), ptype_PROPOSAL);
+        const PROPOSAL::Particle& particle = static_cast<const PROPOSAL::Particle&>(secondary);
+        ParticleDef particle_def = particle.GetParticleDef();
+        if (particle_def == MuMinusDef::Get()) return I3Particle::MuMinus;
+        else if (particle_def == MuPlusDef::Get()) return I3Particle::MuPlus;
+        else if (particle_def == EMinusDef::Get()) return I3Particle::EMinus;
+        else if (particle_def == EPlusDef::Get()) return I3Particle::EPlus;
+        else if (particle_def == TauMinusDef::Get()) return I3Particle::TauMinus;
+        else if (particle_def == TauPlusDef::Get()) return I3Particle::TauPlus;
+        else
+        {
+            log_fatal("PROPOSALParticle '%s' can not be converted to a I3Particle" , particle_def.name.c_str());
+        }
+    }
+    else if(type == DynamicData::Brems) return I3Particle::Brems;
+    else if(type == DynamicData::Epair) return I3Particle::PairProd;
+    else if(type == DynamicData::DeltaE) return I3Particle::DeltaE;
+    else if(type == DynamicData::NuclInt) return I3Particle::NuclInt;
+    else
+    {
+        log_fatal("PROPOSALParticle can not be converted to a I3Particle");
     }
 
-    ptype_I3 = I3_PROPOSAL_ParticleType_bimap.right.find(ptype_PROPOSAL) -> second;
 
-    return ptype_I3;
+    // bimap_ParticleType::right_const_iterator proposal_iterator = I3_PROPOSAL_ParticleType_bimap.right.find(ptype_PROPOSAL);
+    // if (proposal_iterator == I3_PROPOSAL_ParticleType_bimap.right.end())
+    // {
+    //     log_fatal("The PROPOSALParticle '%s' with type '%i' can not be converted to a I3Particle"
+    //         , PROPOSALParticle::GetName(ptype_PROPOSAL).c_str(), ptype_PROPOSAL);
+    // }
+
+    // ptype_I3 = I3_PROPOSAL_ParticleType_bimap.right.find(ptype_PROPOSAL) -> second;
 }
 
 // ------------------------------------------------------------------------- //
-I3MMCTrackPtr I3PropagatorServicePROPOSAL::GenerateMMCTrack(PROPOSALParticle* particle){
+I3MMCTrackPtr I3PropagatorServicePROPOSAL::GenerateMMCTrack(PROPOSAL::Particle* particle){
 
     //explicitly specifying the units from MMC
-    double xi = particle->GetXi() * I3Units::m;
-    double yi = particle->GetYi() * I3Units::m;
-    double zi = particle->GetZi() * I3Units::m;
-    double ti = particle->GetTi() * I3Units::second;
-    double Ei = particle->GetEi() * I3Units::GeV;
+    double xi = particle->GetEntryPoint().GetX() * I3Units::m;
+    double yi = particle->GetEntryPoint().GetY() * I3Units::m;
+    double zi = particle->GetEntryPoint().GetZ() * I3Units::m;
+    double ti = particle->GetEntryTime() * I3Units::second;
+    double Ei = particle->GetEntryEnergy() * I3Units::GeV;
 
-    double xf = particle->GetXf() * I3Units::m;
-    double yf = particle->GetYf() * I3Units::m;
-    double zf = particle->GetZf() * I3Units::m;
-    double tf = particle->GetTf() * I3Units::second;
-    double Ef = particle->GetEf() * I3Units::GeV;
+    double xf = particle->GetExitPoint().GetX() * I3Units::m;
+    double yf = particle->GetExitPoint().GetY() * I3Units::m;
+    double zf = particle->GetExitPoint().GetZ() * I3Units::m;
+    double tf = particle->GetExitTime() * I3Units::second;
+    double Ef = particle->GetExitEnergy() * I3Units::GeV;
 
-    double xc = particle->GetXc() * I3Units::m;
-    double yc = particle->GetYc() * I3Units::m;
-    double zc = particle->GetZc() * I3Units::m;
-    double tc = particle->GetTc() * I3Units::second;
-    double Ec = particle->GetEc() * I3Units::GeV;
+    double xc = particle->GetClosestApproachPoint().GetX() * I3Units::m;
+    double yc = particle->GetClosestApproachPoint().GetY() * I3Units::m;
+    double zc = particle->GetClosestApproachPoint().GetZ() * I3Units::m;
+    double tc = particle->GetClosestApproachTime() * I3Units::second;
+    double Ec = particle->GetClosestApproachEnergy() * I3Units::GeV;
 
     I3MMCTrackPtr mmcTrack( new I3MMCTrack);
     mmcTrack->SetEnter(xi,yi,zi,ti,Ei);
@@ -453,40 +300,35 @@ I3MMCTrackPtr I3PropagatorServicePROPOSAL::propagate( I3Particle& p, vector<I3Pa
     double e_0 = p.GetEnergy()/I3Units::MeV;  // [MeV]
     double t_0 = p.GetTime()/I3Units::s;     // [s]
 
-    log_debug("Name of particle to propagate: %s", PROPOSALParticle::GetName(GeneratePROPOSALType(p)).c_str());
+    // log_debug("Name of particle to propagate: %s", PROPOSALParticle::GetName(GeneratePROPOSALType(p)).c_str());
 
 
-    // PROPOSALParticle* particle = new PROPOSALParticle(GeneratePROPOSALType(p), x_0, y_0, z_0, theta_0, phi_0, e_0, t_0);
-    proposal->ResetParticle();
-    PROPOSALParticle* particle = proposal->GetParticle();
+    PROPOSAL::Particle& particle = proposal_->GetParticle();
 
-    if (particle == NULL)
-        log_fatal("Error calling the Particle constructor");
+    particle.SetPosition(PROPOSAL::Vector3D(x_0, y_0, z_0));
 
-    particle->SetX(x_0);
-    particle->SetY(y_0);
-    particle->SetZ(z_0);
-    particle->SetTheta(theta_0);
-    particle->SetPhi(phi_0);
-    particle->SetEnergy(e_0);
-    particle->SetT(t_0);
+    PROPOSAL::Vector3D direction;
+    direction.SetSphericalCoordinates(1.0, phi_0, theta_0);
+    direction.CalculateCartesianFromSpherical();
+    particle.SetDirection(direction);
+    particle.SetEnergy(e_0);
+    particle.SetTime(t_0);
 
-    proposal->propagate();
-    // proposal->Propagate(particle);
+    proposal_->Propagate();
 
-    vector<PROPOSALParticle*> aobj_l = Output::getInstance().GetSecondarys();
+    std::vector<DynamicData*> secondaries = Output::getInstance().GetSecondarys();
     //get the propagated length of the particle
-    double length = particle->GetPropagatedDistance();
+    double length = particle.GetPropagatedDistance();
 
     p.SetLength( length * I3Units::cm );
     log_trace(" length = %f cm ", length );
 
-    int nParticles =  aobj_l.size();
+    int nParticles =  secondaries.size();
     log_trace("nParticles = %d", nParticles);
 
     I3MMCTrackPtr mmcTrack;
 
-    mmcTrack = GenerateMMCTrack(particle);
+    mmcTrack = GenerateMMCTrack(&particle);
 
     if(mmcTrack)
         mmcTrack->SetParticle( p );
@@ -495,36 +337,33 @@ I3MMCTrackPtr I3PropagatorServicePROPOSAL::propagate( I3Particle& p, vector<I3Pa
     {
         //Tomasz
         //in mmc the particle relationships are stored
-        ParticleType::Enum type = aobj_l.at(i)->GetType();
-        double x = aobj_l.at(i)->GetX() * I3Units::cm;
-        double y = aobj_l.at(i)->GetY() * I3Units::cm;
-        double z = aobj_l.at(i)->GetZ() * I3Units::cm;
-        double theta = aobj_l.at(i)->GetTheta() * I3Units::deg;
-        double phi = aobj_l.at(i)->GetPhi() * I3Units::deg;
-        double t = aobj_l.at(i)->GetT() * I3Units::s;
-        double e = aobj_l.at(i)->GetEnergy() * I3Units::MeV;
-        double l = aobj_l.at(i)->GetPropagatedDistance() * I3Units::cm;
+        double x = secondaries.at(i)->GetPosition().GetX() * I3Units::cm;
+        double y = secondaries.at(i)->GetPosition().GetY() * I3Units::cm;
+        double z = secondaries.at(i)->GetPosition().GetZ() * I3Units::cm;
+        double theta = secondaries.at(i)->GetDirection().GetTheta() * I3Units::deg;
+        double phi = secondaries.at(i)->GetDirection().GetPhi() * I3Units::deg;
+        double t = secondaries.at(i)->GetTime() * I3Units::s;
+        double e = secondaries.at(i)->GetEnergy() * I3Units::MeV;
+        double l = secondaries.at(i)->GetPropagatedDistance() * I3Units::cm;
 
-        log_trace("MMC DEBUG SEC  \n    type=%d pos=(%g,%g,%g) ang=(%g,%g)  e=%g t=%g  l=%g",
-                  type, x, y, z, theta, phi, e, t, l);
+        log_trace("MMC DEBUG SEC  \n    pos=(%g,%g,%g) ang=(%g,%g)  e=%g t=%g  l=%g",
+                  x, y, z, theta, phi, e, t, l);
 
         //this should be a stochastic
         I3Particle new_particle;
 
-
-        if (GeneratePROPOSALType(p) == ParticleType::EMinus
-            || GeneratePROPOSALType(p) == ParticleType::EPlus
-            || GeneratePROPOSALType(p) == ParticleType::Hadrons)
+        ParticleDef particle_def = GeneratePROPOSALParticleDef(p);
+        if (particle_def == EMinusDef::Get()
+            || particle_def == EPlusDef::Get())
+            // || particle_def == ParticleType::Hadrons) //TODO(mario):  Wed 2017/10/25
         {
             if (p.GetShape() != I3Particle::TopShower)
             {
-                log_fatal("The particle '%s' has no TopShower shape, but 'e-', 'e+' and 'Hadrons' need that. I don't know why?",
-                    PROPOSALParticle::GetName(GeneratePROPOSALType(p)).c_str());
+                log_fatal("The particle '%s' has no TopShower shape, but 'e-', 'e+' and 'Hadrons' need that. I don't know why?", particle_def.name.c_str());
             }
         }
 
-
-        new_particle.SetType(GenerateI3Type(type));
+        new_particle.SetType(GenerateI3Type(*secondaries.at(i)));
 
         new_particle.SetLocationType(I3Particle::InIce);
         new_particle.SetPos(x, y, z);
@@ -536,13 +375,9 @@ I3MMCTrackPtr I3PropagatorServicePROPOSAL::propagate( I3Particle& p, vector<I3Pa
         // this is not the particle you're looking for
         // move along...and add it to the daughter list
         daughters.push_back(new_particle);
-
-        //we're done with eobj
-        //delete aobj_l.at(i); //Tomasz
     }
 
     Output::getInstance().ClearSecondaryVector(); //Tomasz
-    // delete particle; //Mario
 
     return mmcTrack;
 }
