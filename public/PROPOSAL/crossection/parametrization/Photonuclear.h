@@ -88,15 +88,15 @@ class ShadowEffect
     virtual size_t GetHash() const = 0;
 };
 
-class ShadowDutta: public ShadowEffect
+class ShadowDuttaRenoSarcevicSeckel: public ShadowEffect
 {
     public:
-    ShadowDutta() {}
-    ShadowDutta(const ShadowDutta&) {}
-    virtual ~ShadowDutta() {}
+    ShadowDuttaRenoSarcevicSeckel() {}
+    ShadowDuttaRenoSarcevicSeckel(const ShadowDuttaRenoSarcevicSeckel&) {}
+    virtual ~ShadowDuttaRenoSarcevicSeckel() {}
 
-    ShadowEffect* clone() const { return new ShadowDutta(*this); }
-    static ShadowEffect* create() { return new ShadowDutta(); }
+    ShadowEffect* clone() const { return new ShadowDuttaRenoSarcevicSeckel(*this); }
+    static ShadowEffect* create() { return new ShadowDuttaRenoSarcevicSeckel(); }
 
     double CalculateShadowEffect(const Components::Component&, double x, double nu);
 
