@@ -21,13 +21,16 @@ void Output::SetLoggingConfigurationFile(std::string file)
 // ------------------------------------------------------------------------- //
 void Output::FillSecondaryVector(std::vector<Particle*>& particles)
 {
-    for (std::vector<Particle*>::iterator iter = particles.begin(); iter != particles.end(); ++iter) {
-        secondarys_.push_back(new DynamicData(**iter));
-    }
+    // Do not copy values. This method is used to store particles from the ouput of
+    // the decay channel. The decay channel creates new particle. So the output becomes the owner
+    secondarys_.insert(secondarys_.end(), particles.begin(), particles.end());
+    // for (std::vector<Particle*>::iterator iter = particles.begin(); iter != particles.end(); ++iter) {
+    //     secondarys_.push_back(new Particle(**iter));
+    // }
 }
 
 // ------------------------------------------------------------------------- //
-void Output::FillSecondaryVector(const Particle& particle, const DynamicData::Type& secondary, double energyloss, double distance)
+void Output::FillSecondaryVector(const Particle& particle, const DynamicData::Type& secondary, double energyloss)
 {
     DynamicData* data = NULL;
 
@@ -47,7 +50,7 @@ void Output::FillSecondaryVector(const Particle& particle, const DynamicData::Ty
         // data->SetParentParticleId(particle->GetParentParticleId());
         data->SetTime(particle.GetTime());
         data->SetParentParticleEnergy(particle.GetEnergy());
-        data->SetPropagatedDistance(distance);
+        data->SetPropagatedDistance(particle.GetPropagatedDistance());
     }
 
     secondarys_.push_back(data);
