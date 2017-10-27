@@ -174,10 +174,26 @@ public:
 
 //----------------------------------------------------------------------------//
 
-    void FillSecondaryVector(Particle *particle, int secondary_id, std::pair<double, ParticleType::Enum> energy_loss, double distance);
-
-    void FillSecondaryVector(const Particle& particle, const DynamicData::Type& secondary, double energyloss);
+    // ----------------------------------------------------------------------------
+    /// @brief Fill secondary data
+    ///
+    /// This method is used to store decay products.
+    ///
+    /// @param std::vector
+    // ----------------------------------------------------------------------------
     void FillSecondaryVector(std::vector<Particle*>&);
+
+    // ----------------------------------------------------------------------------
+    /// @brief Fill secondary data
+    ///
+    /// New DynamicData is create with information of the given particle, type of
+    /// DynamicData and the energyloss
+    ///
+    /// @param particle
+    /// @param secondary
+    /// @param energyloss
+    // ----------------------------------------------------------------------------
+    void FillSecondaryVector(const Particle& particle, const DynamicData::Type& secondary, double energyloss);
 
 //----------------------------------------------------------------------------//
 
