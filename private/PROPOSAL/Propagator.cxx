@@ -180,7 +180,14 @@ Propagator::Propagator(const ParticleDef& particle_def, const std::string& confi
 
     // Create the json parser
     boost::property_tree::ptree pt_json;
-    boost::property_tree::json_parser::read_json(config_file, pt_json);
+    try
+    {
+        boost::property_tree::json_parser::read_json(config_file, pt_json);
+    }
+    catch(const boost::property_tree::ptree_error &e)
+    {
+        log_fatal("Unable parse \"%s\" as json file", config_file.c_str());
+    }
 
     // Read in global cut and continous randomization options
     SetMember(seed_, "global.seed", pt_json);
@@ -203,7 +210,17 @@ Propagator::Propagator(const ParticleDef& particle_def, const std::string& confi
 
     // Read in the detector geometry
     // detector_ = GeometryFactory::Get().CreateGeometry(pt_json.get_child("detector"));
-    detector_ = ParseGeometryConifg(pt_json.get_child("detector"));
+
+    try
+    {
+        boost::property_tree::ptree& detector = pt_json.get_child("detector");
+        detector_ = ParseGeometryConifg(detector);
+    }
+    catch(const boost::property_tree::ptree_error &e)
+    {
+        log_fatal("You need to specify a detector geometry: %s", e.what());
+    }
+    // detector_ = ParseGeometryConifg(pt_json.get_child("detector"));
 
     // Read in global sector definition
     SectorFactory::Definition sec_def_global;
@@ -215,6 +232,7 @@ Propagator::Propagator(const ParticleDef& particle_def, const std::string& confi
     SetMember(sec_def_global.utility_def.epair_def.lpm_effect, "global.lpm", pt_json);
     SetMember(sec_def_global.utility_def.brems_def.lpm_effect, "global.lpm", pt_json);
     SetMember(sec_def_global.do_exact_time_calculation, "global.exact_time", pt_json);
+    SetMember(sec_def_global.stopping_decay, "global.stopping_decay", pt_json);
 
     std::string scattering = ScatteringFactory::Get().GetStringFromEnum(sec_def_global.scattering_model);
     SetMember(scattering, "global.scattering", pt_json);
@@ -235,9 +253,18 @@ Propagator::Propagator(const ParticleDef& particle_def, const std::string& confi
     SetMember(sec_def_global.utility_def.photo_def.hardbb, "global.photo_hard_component", pt_json);
 
     // Read in all sector definitions
-    boost::property_tree::ptree sectors = pt_json.get_child("sectors");
+    boost::property_tree::ptree* sectors = NULL;
 
-    for (boost::property_tree::ptree::const_iterator it = sectors.begin(); it != sectors.end(); ++it)
+    try
+    {
+        sectors = &pt_json.get_child("sectors");
+    }
+    catch(const boost::property_tree::ptree_error &e)
+    {
+        log_fatal("You need to specify at least one sector: %s", e.what());
+    }
+
+    for (boost::property_tree::ptree::const_iterator it = sectors->begin(); it != sectors->end(); ++it)
     {
         boost::property_tree::ptree subtree = it->second;
 
@@ -250,7 +277,17 @@ Propagator::Propagator(const ParticleDef& particle_def, const std::string& confi
         Medium* med = MediumFactory::Get().CreateMedium(medium_name, medium_def.density_correction);
 
         // Create Geometry
-        Geometry* geometry = ParseGeometryConifg(subtree.get_child("geometry"));
+        Geometry* geometry = NULL;
+
+        try
+        {
+            boost::property_tree::ptree& geometry_tree = subtree.get_child("geometry");
+            geometry = ParseGeometryConifg(geometry_tree);
+        }
+        catch(const boost::property_tree::ptree_error &e)
+        {
+            log_fatal("You need to specify a geometry for each sector: %s", e.what());
+        }
 
         double hirarchy = geometry->GetHirarchy();
         SetMember(hirarchy, "hirarchy", subtree);
