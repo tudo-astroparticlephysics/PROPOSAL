@@ -148,11 +148,16 @@ ELSE()
 	MESSAGE(STATUS "  ${link_msg}")
 ENDIF()
 
-
 INSTALL(TARGETS PROPOSAL DESTINATION lib)
 
-FILE(GLOB INC_FILES ${PROJECT_SOURCE_DIR}/public/PROPOSAL/*.h)
-INSTALL(FILES ${INC_FILES} DESTINATION include/PROPOSAL)
+FILE(GLOB_RECURSE INC_FILES ${PROJECT_SOURCE_DIR}/public/PROPOSAL/*.h)
+# INSTALL(FILES ${INC_FILES} DESTINATION include/PROPOSAL)
+
+foreach(INC_FILE ${INC_FILES})
+	file(RELATIVE_PATH REL_FILE ${PROJECT_SOURCE_DIR}/public ${INC_FILE})
+	GET_FILENAME_COMPONENT(DIR "${REL_FILE}" DIRECTORY)
+	INSTALL(FILES "public/${REL_FILE}" DESTINATION include/${DIR})
+endforeach()
 
 #################################################################
 #################           Executables        ##################

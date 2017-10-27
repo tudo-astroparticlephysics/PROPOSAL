@@ -11,6 +11,17 @@
 
 #include <string>
 
+#define COMPONENT_DEC(cls, ATOMS)                                                                                      \
+    class cls : public Component                                                                                       \
+    {                                                                                                                  \
+        public:                                                                                                        \
+        cls(double atomInMolecule = ATOMS);                                                                            \
+        cls(const cls&);                                                                                               \
+        virtual ~cls() {}                                                                                              \
+                                                                                                                       \
+        virtual Component* clone() const { return new cls(*this); };                                                   \
+    };
+
 namespace PROPOSAL {
 
 namespace Components {
@@ -23,7 +34,7 @@ class Component
     virtual ~Component(){};
 
     void swap(Component&);
-    virtual Component* clone() const = 0;
+    virtual Component* clone() const { return new Component(*this); }; // Prototyping/Virtual constructor idiom (used for deep copies)
 
     Component& operator=(const Component&);
     bool operator==(const Component&) const;
@@ -80,159 +91,26 @@ class Component
     double r0_;          // //TODO(mario): Must really be stored? Thu 2017/08/03
 };
 
-class Hydrogen : public Component
-{
-    public:
-    Hydrogen(double atomInMolecule = 2.0);
-    virtual ~Hydrogen() {}
-
-    Component* clone() const { return new Hydrogen(*this); };
-};
-
-class Carbon : public Component
-{
-    public:
-    Carbon(double atomInMolecule = 1.0);
-    virtual ~Carbon() {}
-
-    Component* clone() const { return new Carbon(*this); };
-};
-
-class Nitrogen : public Component
-{
-    public:
-    Nitrogen(double atomInMolecule = 1.0);
-    virtual ~Nitrogen() {}
-
-    Component* clone() const { return new Nitrogen(*this); };
-};
-
-class Oxygen : public Component
-{
-    public:
-    Oxygen(double atomInMolecule = 1.0);
-    virtual ~Oxygen() {}
-
-    Component* clone() const { return new Oxygen(*this); };
-};
-
-class Sodium : public Component
-{
-    public:
-    Sodium(double atomInMolecule = 1.0);
-    virtual ~Sodium() {}
-
-    Component* clone() const { return new Sodium(*this); };
-};
-
-class Magnesium : public Component
-{
-    public:
-    Magnesium(double atomInMolecule = 1.0);
-    virtual ~Magnesium() {}
-
-    Component* clone() const { return new Magnesium(*this); };
-};
-
-class Sulfur : public Component
-{
-    public:
-    Sulfur(double atomInMolecule = 1.0);
-    virtual ~Sulfur() {}
-
-    Component* clone() const { return new Sulfur(*this); };
-};
-
-class Chlorine : public Component
-{
-    public:
-    Chlorine(double atomInMolecule = 1.0);
-    virtual ~Chlorine() {}
-
-    Component* clone() const { return new Chlorine(*this); };
-};
-
-class Argon : public Component
-{
-    public:
-    Argon(double atomInMolecule = 1.0);
-    virtual ~Argon() {}
-
-    Component* clone() const { return new Argon(*this); };
-};
-
-class Potassium : public Component
-{
-    public:
-    Potassium(double atomInMolecule = 1.0);
-    virtual ~Potassium() {}
-
-    Component* clone() const { return new Potassium(*this); };
-};
-
-class Calcium : public Component
-{
-    public:
-    Calcium(double atomInMolecule = 1.0);
-    virtual ~Calcium() {}
-
-    Component* clone() const { return new Calcium(*this); };
-};
-
-class Iron : public Component
-{
-    public:
-    Iron(double atomInMolecule = 1.0);
-    virtual ~Iron() {}
-
-    Component* clone() const { return new Iron(*this); };
-};
-
-class Copper : public Component
-{
-    public:
-    Copper(double atomInMolecule = 1.0);
-    virtual ~Copper() {}
-
-    Component* clone() const { return new Copper(*this); };
-};
-
-class Lead : public Component
-{
-    public:
-    Lead(double atomInMolecule = 1.0);
-    virtual ~Lead() {}
-
-    Component* clone() const { return new Lead(*this); };
-};
-
-class Uranium : public Component
-{
-    public:
-    Uranium(double atomInMolecule = 1.0);
-    virtual ~Uranium() {}
-
-    Component* clone() const { return new Uranium(*this); };
-};
-
-class StandardRock : public Component
-{
-    public:
-    StandardRock(double atomInMolecule = 1.0);
-    virtual ~StandardRock() {}
-
-    Component* clone() const { return new StandardRock(*this); };
-};
-
-class FrejusRock : public Component
-{
-    public:
-    FrejusRock(double atomInMolecule = 1.0);
-    virtual ~FrejusRock() {}
-
-    Component* clone() const { return new FrejusRock(*this); };
-};
+COMPONENT_DEC(Hydrogen, 2.0)
+COMPONENT_DEC(Carbon, 1.0)
+COMPONENT_DEC(Nitrogen, 1.0)
+COMPONENT_DEC(Oxygen, 1.0)
+COMPONENT_DEC(Sodium, 1.0)
+COMPONENT_DEC(Magnesium, 1.0)
+COMPONENT_DEC(Sulfur, 1.0)
+COMPONENT_DEC(Chlorine, 1.0)
+COMPONENT_DEC(Argon, 1.0)
+COMPONENT_DEC(Potassium, 1.0)
+COMPONENT_DEC(Calcium, 1.0)
+COMPONENT_DEC(Iron, 1.0)
+COMPONENT_DEC(Copper, 1.0)
+COMPONENT_DEC(Lead, 1.0)
+COMPONENT_DEC(Uranium, 1.0)
+COMPONENT_DEC(StandardRock, 1.0)
+COMPONENT_DEC(FrejusRock, 1.0)
 
 } // namesapce Components
 
 } // namesapce PROPOSAL
+
+#undef COMPONENT_DEC
