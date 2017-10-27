@@ -4,33 +4,16 @@
 #  LOG4CPLUS_INCLUDE_DIRS - The Log4cplus include directories
 #  LOG4CPLUS_LIBRARIES - The libraries needed to use Log4cplus
     add_definitions(-DPROPOSAL_STANDALONE=0)
+# file(GLOB_RECURSE PROPOSAL_SRC_FILES ${PROJECT_SOURCE_DIR}/PROPOSAL/private/PROPOSAL/*)
+# message(STATUS ${PROPOSAL_SRC_FILES})
 i3_project(PROPOSAL)
 
+file(GLOB_RECURSE PROPOSAL_SRC_FILES ${PROJECT_SOURCE_DIR}/private/PROPOSAL/*)
+file(GLOB_RECURSE I3_PROPOSAL_SRC_FILES ${PROJECT_SOURCE_DIR}/private/PROPOSAL-icetray/*)
+
 i3_add_library(PROPOSAL
-        private/PROPOSAL/Integral.cxx
-        private/PROPOSAL/methods.cxx
-        private/PROPOSAL/MathModel.cxx
-        private/PROPOSAL/Bremsstrahlung.cxx
-        private/PROPOSAL/CrossSections.cxx
-        private/PROPOSAL/Decay.cxx
-        private/PROPOSAL/Epairproduction.cxx
-        private/PROPOSAL/Ionization.cxx
-        private/PROPOSAL/Photonuclear.cxx
-        private/PROPOSAL/Medium.cxx
-        private/PROPOSAL/PROPOSALParticle.cxx
-        private/PROPOSAL/EnergyCutSettings.cxx
-        private/PROPOSAL/Interpolant.cxx
-        private/PROPOSAL/RootFinder.cxx
-        private/PROPOSAL/ProcessCollection.cxx
-        private/PROPOSAL/Propagator.cxx
-        private/PROPOSAL/ContinuousRandomization.cxx
-        private/PROPOSAL/Geometry.cxx
-        private/PROPOSAL/Scattering.cxx
-        private/PROPOSAL/ScatteringFirstOrder.cxx
-        private/PROPOSAL/ScatteringMoliere.cxx
-        private/PROPOSAL/Output.cxx
-        private/PROPOSAL-icetray/I3PropagatorServicePROPOSAL.cxx
-        private/PROPOSAL-icetray/SimplePropagator.cxx
+		${PROPOSAL_SRC_FILES}
+		${I3_PROPOSAL_SRC_FILES}
 
         USE_TOOLS boost
         USE_PROJECTS icetray serialization dataclasses sim-services simclasses phys-services
