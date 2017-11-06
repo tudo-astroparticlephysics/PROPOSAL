@@ -15,69 +15,66 @@
 #include "dataclasses/physics/I3Particle.h"
 #include "phys-services/I3RandomService.h"
 
-#include "PROPOSAL/Propagator.h" //Mayo
-// #include "PROPOSAL/PROPOSALParticle.h"
-
-
-// class Propagator;
+#include "PROPOSAL/PROPOSAL.h"
 
 /**
  * @brief A simple muon energy-loss calculator
  *
  * This hides the nasty details of PROPOSAL (a C++ translation of MMC)
  */
-namespace PROPOSAL
-{
-
 class SimplePropagator {
 public:
-	/**
-	 * @param[in] medium The Type of the medium, e.g. MediumType::Ice
-	 * @param[in] type   The Type of particles to propagate e.g. I3Particle::MuMinus
-	 * @param[in] ecut   Absolute energy above which an energy
-	 *                   loss is considered stochastic @f$ [MeV] @f$
-	 * @param[in] vcut   Proportion of the current muon energy above
-	 *                   which an energy loss is considered stochastic
-	 * @param[in] rho    Density adjustment factor for the medium
-	 */
-	SimplePropagator(MediumType::Enum medium_type=MediumType::Ice, I3Particle::ParticleType type=I3Particle::MuMinus, double ecut=-1, double vcut=-1, double rho=1.0);
-	~SimplePropagator();
-	/**
-	 * @param[in] p        Muon to propagate
-	 * @param[in] distance Maximum distance to propagate
-	 * @returns an I3Particle representing the muon at the end
-	 *          of propagation. If the muon stopped before the
-	 *          given distance, the energy will be set to zero.
-	 *          The length of the output I3Particle is the
-	 *          distance traveled to reach its current position
-	 *          from the position given as input.
-	 */
-	I3Particle propagate(const I3Particle &p, double distance,
-	    boost::shared_ptr<std::vector<I3Particle> > losses=boost::shared_ptr<std::vector<I3Particle> >());
+  /**
+   * @param[in] medium The Type of the medium, e.g. MediumType::Ice
+   * @param[in] type   The Type of particles to propagate e.g.
+   * I3Particle::MuMinus
+   * @param[in] ecut   Absolute energy above which an energy
+   *                   loss is considered stochastic @f$ [MeV] @f$
+   * @param[in] vcut   Proportion of the current muon energy above
+   *                   which an energy loss is considered stochastic
+   * @param[in] rho    Density adjustment factor for the medium
+   */
+  SimplePropagator(I3Particle::ParticleType type = I3Particle::MuMinus,
+                   std::string medium, double ecut = -1, double vcut = -1,
+                   double rho = 1.0);
+  ~SimplePropagator();
+  /**
+   * @param[in] p        Muon to propagate
+   * @param[in] distance Maximum distance to propagate
+   * @returns an I3Particle representing the muon at the end
+   *          of propagation. If the muon stopped before the
+   *          given distance, the energy will be set to zero.
+   *          The length of the output I3Particle is the
+   *          distance traveled to reach its current position
+   *          from the position given as input.
+   */
+  I3Particle propagate(const I3Particle &p, double distance,
+                       boost::shared_ptr<std::vector<I3Particle>> losses =
+                           boost::shared_ptr<std::vector<I3Particle>>());
 
-	/**
-	 * Set the (global) state of the random number generator used
-	 * in the implementation.
-	 */
-	void SetSeed(int seed);
+  /**
+   * Set the (global) state of the random number generator used
+   * in the implementation.
+   */
+  void SetSeed(int seed);
 
-	/**
-	 * Use a specific random number generator for this instance
-	 */
-	void SetRandomNumberGenerator(I3RandomServicePtr rng);
-	/**
-	 * Get the internal MMC name associated with a particle type
-	 */
+  /**
+   * Use a specific random number generator for this instance
+   */
+  void SetRandomNumberGenerator(I3RandomServicePtr rng);
+  /**
+   * Get the internal MMC name associated with a particle type
+   */
+  static I3Particle to_I3Particle(const PROPOSAL::Particle &);
+  // static ParticleType::Enum GeneratePROPOSALType(const I3Particle &p);
+  static I3Particle::ParticleType GenerateI3Type(const PROPOSAL::ParticleDef &);
 
-	static I3Particle to_I3Particle(const PROPOSALParticle*);
-	static ParticleType::Enum GeneratePROPOSALType(const I3Particle& p);
-	static I3Particle::ParticleType GenerateI3Type(ParticleType::Enum ptype_PROPOSAL);
+  // static std::string GetName(const I3Particle &p);
 
-	static std::string GetName(const I3Particle &p);
+  Propagator *GetImplementation() { return propagator_; };
 
-	Propagator* GetImplementation() { return propagator_; };
 private:
-	Propagator *propagator_;
+  Propagator *propagator_;
 };
-}
+
 #endif // PROPOSAL_SIMPLEPROPAGATOR_H_INCLUDED
