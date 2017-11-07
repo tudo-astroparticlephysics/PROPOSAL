@@ -13,7 +13,9 @@ file(GLOB_RECURSE I3_PROPOSAL_SRC_FILES ${PROJECT_SOURCE_DIR}/private/PROPOSAL-i
 
 i3_add_library(PROPOSAL
 		${PROPOSAL_SRC_FILES}
-		${I3_PROPOSAL_SRC_FILES}
+        private/PROPOSAL-icetray/I3PropagatorServicePROPOSAL.cxx
+        private/PROPOSAL-icetray/SimplePropagator.cxx
+		# ${I3_PROPOSAL_SRC_FILES}
 
         USE_TOOLS boost
         USE_PROJECTS icetray serialization dataclasses sim-services simclasses phys-services
