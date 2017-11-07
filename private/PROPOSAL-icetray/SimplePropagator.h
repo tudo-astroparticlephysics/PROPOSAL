@@ -35,7 +35,7 @@ public:
    * @param[in] rho    Density adjustment factor for the medium
    */
   SimplePropagator(I3Particle::ParticleType type = I3Particle::MuMinus,
-                   std::string medium, double ecut = -1, double vcut = -1,
+                   const std::string& med = "ice", double ecut = -1, double vcut = -1,
                    double rho = 1.0);
   ~SimplePropagator();
   /**
@@ -65,16 +65,14 @@ public:
   /**
    * Get the internal MMC name associated with a particle type
    */
-  static I3Particle to_I3Particle(const PROPOSAL::Particle &);
+  static I3Particle to_I3Particle(const PROPOSAL::DynamicData &);
   // static ParticleType::Enum GeneratePROPOSALType(const I3Particle &p);
-  static I3Particle::ParticleType GenerateI3Type(const PROPOSAL::ParticleDef &);
+  static I3Particle::ParticleType GenerateI3Type(const PROPOSAL::DynamicData &);
 
-  // static std::string GetName(const I3Particle &p);
-
-  Propagator *GetImplementation() { return propagator_; };
+  PROPOSAL::Propagator *GetImplementation() { return propagator_; };
 
 private:
-  Propagator *propagator_;
+  PROPOSAL::Propagator *propagator_;
 };
 
 #endif // PROPOSAL_SIMPLEPROPAGATOR_H_INCLUDED

@@ -40,7 +40,7 @@ using namespace PROPOSAL;
 // }
 
 SimplePropagator::SimplePropagator(I3Particle::ParticleType pt,
-                                   std::string medium, double ecut,
+                                   const std::string& medium, double ecut,
                                    double vcut, double rho)
 {
   std::ostringstream prefix;
@@ -57,7 +57,7 @@ SimplePropagator::SimplePropagator(I3Particle::ParticleType pt,
 
   // Medium
 
-  sec_def.medium_def.type = med;
+  sec_def.medium_def.type = PROPOSAL::MediumFactory::Get().GetEnumFromString(medium);
   sec_def.medium_def.density_correction = rho;
 
   // Geometry
@@ -94,10 +94,11 @@ SimplePropagator::SimplePropagator(I3Particle::ParticleType pt,
 
   // Init new propagator
 
+  //TODO(mario): Check for muon, tau Mon 2017/11/06
   propagator_ = new PROPOSAL::Propagator(
       PROPOSAL::MuMinusDef::Get(),
       boost::assign::list_of<PROPOSAL::SectorFactory::Definition>(sec_def),
-      detector, interpolation_def)
+      detector, interpolation_def);
 }
 
 SimplePropagator::~SimplePropagator()
@@ -117,12 +118,6 @@ SimplePropagator::SetRandomNumberGenerator(I3RandomServicePtr rng)
     boost::function<double ()> f = boost::bind(&I3RandomService::Uniform, rng, 0, 1);
     PROPOSAL::RandomGenerator::Get().SetRandomNumberGenerator(f);
 }
-
-// std::string
-// SimplePropagator::GetName(const I3Particle &p)
-// {
-//     return PROPOSALParticle::GetName(GeneratePROPOSALType(p));
-// }
 
 typedef boost::bimap<I3Particle::ParticleType, std::string> bimap_ParticleType;
 static const bimap_ParticleType I3_PROPOSAL_ParticleType_bimap = boost::assign::list_of<bimap_ParticleType::relation>
@@ -175,23 +170,38 @@ static const bimap_ParticleType I3_PROPOSAL_ParticleType_bimap = boost::assign::
 //     return ptype_PROPOSAL;
 // }
 
-I3Particle::ParticleType SimplePropagator::GenerateI3Type(const PROPOSAL::ParticleDef& def)
+I3Particle::ParticleType SimplePropagator::GenerateI3Type(const PROPOSAL::DynamicData& secondary)
 {
-    I3Particle::ParticleType ptype_I3;
+    DynamicData::Type type = secondary.GetTypeId();
 
-    bimap_ParticleType::right_const_iterator proposal_iterator = I3_PROPOSAL_ParticleType_bimap.right.find(def.name);
-    if (proposal_iterator == I3_PROPOSAL_ParticleType_bimap.right.end())
+    if (type == DynamicData::Particle)
     {
-        log_fatal("The PROPOSALParticle '%s' can not be converted to a I3Particle"
-            , def.name.c_str());
+        const PROPOSAL::Particle& particle = static_cast<const PROPOSAL::Particle&>(secondary);
+        ParticleDef particle_def = particle.GetParticleDef();
+
+        I3Particle::ParticleType ptype_I3;
+
+        bimap_ParticleType::right_const_iterator proposal_iterator = I3_PROPOSAL_ParticleType_bimap.right.find(particle_def.name);
+        if (proposal_iterator == I3_PROPOSAL_ParticleType_bimap.right.end())
+        {
+            log_fatal("The PROPOSALParticle '%s' can not be converted to a I3Particle", particle_def.name.c_str());
+        }
+        else
+        {
+            return proposal_iterator->second;
+        }
     }
-
-    ptype_I3 = I3_PROPOSAL_ParticleType_bimap.right.find(ptype_PROPOSAL)->second;
-
-    return ptype_I3;
+    else if(type == DynamicData::Brems) return I3Particle::Brems;
+    else if(type == DynamicData::Epair) return I3Particle::PairProd;
+    else if(type == DynamicData::DeltaE) return I3Particle::DeltaE;
+    else if(type == DynamicData::NuclInt) return I3Particle::NuclInt;
+    else
+    {
+        log_fatal("PROPOSAL Particle can not be converted to a I3Particle");
+    }
 }
 
-I3Particle SimplePropagator::to_I3Particle(const PROPOSALParticle& pp)
+I3Particle SimplePropagator::to_I3Particle(const PROPOSAL::DynamicData& pp)
 {
 	I3Particle p;
 
@@ -199,15 +209,15 @@ I3Particle SimplePropagator::to_I3Particle(const PROPOSALParticle& pp)
     double y = pp.GetPosition().GetY() * I3Units::cm;
     double z = pp.GetPosition().GetZ() * I3Units::cm;
 
-    theta = pp.GetDirection().GetTheta() * I3Units::degree;
-    phi = pp.GetDirection().GetPhi() * I3Units::degree;
+    double theta = pp.GetDirection().GetTheta() * I3Units::degree;
+    double phi = pp.GetDirection().GetPhi() * I3Units::degree;
 
     p.SetPos(x, y, z);
     p.SetThetaPhi(theta, phi);
     p.SetLength(pp.GetPropagatedDistance() * I3Units::cm);
     p.SetTime(pp.GetTime() * I3Units::second);
 
-	p.SetType(GenerateI3Type(pp.GetDefinition()));
+	p.SetType(GenerateI3Type(pp));
     p.SetLocationType(I3Particle::InIce);
     p.SetEnergy(pp.GetEnergy()*I3Units::MeV);
 
@@ -218,19 +228,6 @@ I3Particle
 SimplePropagator::propagate(const I3Particle &p, double distance, boost::shared_ptr<std::vector<I3Particle> > losses)
 {
 	I3Particle endpoint(p);
-
-	/*
-	if (losses) {
-		propagator_->get_output()->I3flag = true;
-		propagator_->get_output()->initF2000(0, 0, GetName(p), p.GetTime()/I3Units::second,
-		    p.GetPos().GetX()/I3Units::cm, p.GetPos().GetY()/I3Units::cm, p.GetPos().GetZ()/I3Units::cm,
-		    p.GetDir().CalcTheta()/I3Units::deg, p.GetDir().CalcPhi()/I3Units::deg);
-	} else
-		propagator_->get_output()->initDefault(0, 0, GetName(p), p.GetTime()/I3Units::second,
-		    p.GetPos().GetX()/I3Units::cm, p.GetPos().GetY()/I3Units::cm, p.GetPos().GetZ()/I3Units::cm,
-		    p.GetDir().CalcTheta()/I3Units::deg, p.GetDir().CalcPhi()/I3Units::deg);
-
-	*/
 
     double x, y, z, theta, phi = 0.0;
 
@@ -246,14 +243,13 @@ SimplePropagator::propagate(const I3Particle &p, double distance, boost::shared_
     pp.SetPosition(PROPOSAL::Vector3D(x, y, z));
     pp.SetEnergy(p.GetEnergy()/I3Units::MeV);
 
-    if (propagator_.Propagate(distance/I3Units::cm))
-	    endpoint.SetEnergy(pp.GetEnergy()*I3Units::MeV);
-	else
-	    endpoint.SetEnergy(0);
+    propagator_->Propagate(distance/I3Units::cm);
 
-    x = pp->GetPosition().GetX() * I3Units::cm;
-    y = pp->GetPosition().GetY() * I3Units::cm;
-    z = pp->GetPosition().GetZ() * I3Units::cm;
+	endpoint.SetEnergy(pp.GetEnergy()*I3Units::MeV);
+
+    x = pp.GetPosition().GetX() * I3Units::cm;
+    y = pp.GetPosition().GetY() * I3Units::cm;
+    z = pp.GetPosition().GetZ() * I3Units::cm;
 
     theta = pp.GetDirection().GetTheta() * I3Units::degree;
     phi = pp.GetDirection().GetPhi() * I3Units::degree;
@@ -265,29 +261,14 @@ SimplePropagator::propagate(const I3Particle &p, double distance, boost::shared_
 
     // Tomasz
     if (losses) {
-      // std::vector<PROPOSALParticle*> &history =
-      // propagator_->get_output()->I3hist;
       std::vector<PROPOSAL::DynamicData*> history =
           Output::getInstance().GetSecondarys();
       for (unsigned int i = 0; i < history.size(); i++) {
-        losses->push_back(to_I3Particle(history.at(i)));
+        losses->push_back(to_I3Particle(*history[i]));
       }
 	}
 
 	Output::getInstance().ClearSecondaryVector();
-	//Tomasz New End
 
-	//Tomasz
-	/*
-	if (losses) {
-		std::vector<PROPOSALParticle*> &history = propagator_->get_output()->I3hist;
-		BOOST_FOREACH(PROPOSALParticle *pp, history) {
-			losses->push_back(to_I3Particle(pp));
-			delete pp;
-		}
-		history.clear();
-		propagator_->get_output()->I3flag = false;
-	}
-	*/ //Tomasz Old End
 	return endpoint;
 }
