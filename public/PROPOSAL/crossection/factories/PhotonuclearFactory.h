@@ -42,7 +42,7 @@ class PhotonuclearFactory
 
     enum Shadow
     {
-        ShadowDutta,
+        ShadowDuttaRenoSarcevicSeckel,
         ShadowButkevichMikhailov
     };
 
