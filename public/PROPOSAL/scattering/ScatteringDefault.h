@@ -26,7 +26,6 @@ class ScatteringDefault: public Scattering
 
     virtual Scattering* clone() const { return new ScatteringDefault(*this); }
     virtual Scattering* clone(Particle& particle, const Utility& utility) const { return new ScatteringDefault(particle, utility, *this); }
-    static Scattering* create(Particle& particle, Utility& utility) { return new ScatteringDefault(particle, utility); }
 
     // void swap(ScatteringDefault& scattering);
 
