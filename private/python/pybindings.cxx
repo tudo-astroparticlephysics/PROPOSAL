@@ -496,7 +496,7 @@ void export_photo()
         .def("calculate_shadow_effect", &ShadowEffect::CalculateShadowEffect)
         .add_property("name", make_function(&ShadowEffect::GetName, return_value_policy<copy_const_reference>()));
 
-    class_<ShadowDutta, boost::shared_ptr<ShadowDutta>, bases<ShadowEffect> >("ShadowDutta", init<>());
+    class_<ShadowDuttaRenoSarcevicSeckel, boost::shared_ptr<ShadowDuttaRenoSarcevicSeckel>, bases<ShadowEffect> >("ShadowDuttaRenoSarcevicSeckel", init<>());
     class_<ShadowButkevichMikhailov, boost::shared_ptr<ShadowButkevichMikhailov>, bases<ShadowEffect> >("ShadowButkevichMikhailov", init<>());
 
     // Real Photon
@@ -1078,7 +1078,7 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
         .value("RenoSarcevicSu", PhotonuclearFactory::RenoSarcevicSu);
 
     enum_<PhotonuclearFactory::Shadow>("PhotoShadow")
-        .value("Dutta", PhotonuclearFactory::ShadowDutta)
+        .value("DuttaRenoSarcevicSeckel", PhotonuclearFactory::ShadowDuttaRenoSarcevicSeckel)
         .value("ButkevichMikhailov", PhotonuclearFactory::ShadowButkevichMikhailov);
 
 
