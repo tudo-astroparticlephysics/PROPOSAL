@@ -29,7 +29,6 @@ class ScatteringNoScattering : public Scattering
 
     virtual Scattering* clone() const { return new ScatteringNoScattering(*this); }
     virtual Scattering* clone(Particle& particle, const Utility& utility) const { (void) utility; return new ScatteringNoScattering(particle, *this); }
-    static Scattering* create(Particle& particle, const Medium& medium) { return new ScatteringNoScattering(particle, medium); }
 
     private:
     ScatteringNoScattering& operator=(const ScatteringNoScattering&); // Undefined & not allowed
