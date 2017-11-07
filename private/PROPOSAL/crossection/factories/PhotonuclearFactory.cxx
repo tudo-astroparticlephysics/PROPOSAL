@@ -25,7 +25,7 @@ PhotonuclearFactory::PhotonuclearFactory()
 {
     // Register all photonuclear parametrizations in lower case!
 
-    RegisterShadowEffect("dutta", ShadowDutta, &ShadowDutta::create);
+    RegisterShadowEffect("drss", ShadowDuttaRenoSarcevicSeckel, &ShadowDuttaRenoSarcevicSeckel::create);
     RegisterShadowEffect("butkevich-mikhailov", ShadowButkevichMikhailov, &ShadowButkevichMikhailov::create);
 
     RegisterRealPhoton("zeus", Zeus, &PhotoZeus::create);
