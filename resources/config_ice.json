@@ -15,8 +15,8 @@
 		"epair_multiplier" : 1,
 		"brems" : "Kelner-Kokoulin-Petrukhin",
 		"photo" : "ALLM97",
-		"photo_hard" : true,
-		"photo_shadow" : "Butkevich-Mikhailov",
+		"photo_hard_component" : true,
+		"photo_shadow" : "DRSS",
 		"lpm" : true,
 		"ecut_inside" : 500,
 		"ecut_infront" : -1,
@@ -31,8 +31,9 @@
 
 	"sectors": [
 		{
-			"medium": "ice",
 			"hirarchy": 0,
+			"medium": "ice",
+			"density_correction": 1,
 
 			"geometry":
 			{

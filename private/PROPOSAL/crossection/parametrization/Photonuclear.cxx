@@ -117,15 +117,15 @@ double SoftBB::CalculateHardBB(double energy, double v)
 *                                ShadowEffect                                *
 ******************************************************************************/
 
-const std::string ShadowDutta::name_ = "ShadowDutta";
-const std::string ShadowButkevichMikhailov::name_ = "ButkevichMikhailov";
+const std::string ShadowDuttaRenoSarcevicSeckel::name_ = "ShadowDRSS";
+const std::string ShadowButkevichMikhailov::name_ = "ShadowButkevichMikhailov";
 
 // ------------------------------------------------------------------------- //
-// Dutta, Reno, SArcevic, Seckel
+// Dutta, Reno, Sarcevic, Seckel
 // Phys Rev D 63 (2001), 094020
 // eq. 3.10
 // ------------------------------------------------------------------------- //
-double ShadowDutta::CalculateShadowEffect(const Components::Component& component, double x, double nu)
+double ShadowDuttaRenoSarcevicSeckel::CalculateShadowEffect(const Components::Component& component, double x, double nu)
 {
     (void) nu;
 
@@ -147,10 +147,10 @@ double ShadowDutta::CalculateShadowEffect(const Components::Component& component
 }
 
 // ------------------------------------------------------------------------- //
-size_t ShadowDutta::GetHash() const
+size_t ShadowDuttaRenoSarcevicSeckel::GetHash() const
 {
     size_t seed = 0;
-    boost::hash_combine(seed, "ShadowDutta");
+    boost::hash_combine(seed, "ShadowDRSS");
 
     return seed;
 }
