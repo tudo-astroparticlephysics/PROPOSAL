@@ -51,19 +51,19 @@ I3_PYTHON_MODULE(PROPOSAL)
     // ;
 
 
-    // class_<I3PropagatorServicePROPOSAL, boost::shared_ptr<I3PropagatorServicePROPOSAL>,
-    //     bases<I3PropagatorService>, boost::noncopyable>(
-    //         "I3PropagatorServicePROPOSAL",
-    //         init<I3Particle::ParticleType, std::string>(
-    //             (arg("particle_type"),
-    //              arg("config_file")=I3PropagatorServicePROPOSAL::GetDefaultConfigFile()
-    //             ),
-    //              ":param particle: Parametrization of the bremsstrahlung cross-section to use\n"
-    //              ":param config_file: Path to the config file\n"
-    //         )
-    //     )
-    //     // .def("set_tear_down_per_call", &I3PropagatorServicePROPOSAL::SetTearDownPerCall)
-    // ;
+    class_<I3PropagatorServicePROPOSAL, boost::shared_ptr<I3PropagatorServicePROPOSAL>,
+        bases<I3PropagatorService>, boost::noncopyable>(
+            "I3PropagatorServicePROPOSAL",
+            init<I3Particle::ParticleType, std::string>(
+                (arg("type"),
+                 arg("config_file")=I3PropagatorServicePROPOSAL::GetDefaultConfigFile()
+                ),
+                 ":param particle: Parametrization of the bremsstrahlung cross-section to use\n"
+                 ":param config_file: Path to the config file\n"
+            )
+        )
+        // .def("set_tear_down_per_call", &I3PropagatorServicePROPOSAL::SetTearDownPerCall)
+    ;
 
     class_<SimplePropagator, boost::shared_ptr<SimplePropagator>,
         boost::noncopyable>(
