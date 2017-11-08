@@ -57,9 +57,9 @@ bool IsWritable(std::string table_dir)
 }
 
 // ------------------------------------------------------------------------- //
-I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL( I3Particle& p, std::string configfile)
+I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(I3Particle::ParticleType ptype, std::string configfile)
     : tearDownPerCall_(false)
-    , particle_def_(GeneratePROPOSALParticleDef(p))
+    , particle_def_(GeneratePROPOSALParticleDef(ptype))
     , config_file_(configfile.empty() || !boost::filesystem::exists(configfile) ? GetDefaultConfigFile() : configfile)
     , proposal_(new Propagator(particle_def_, config_file_))
 {
@@ -92,7 +92,7 @@ void I3PropagatorServicePROPOSAL::SetRandomNumberGenerator(I3RandomServicePtr ra
 }
 
 // ------------------------------------------------------------------------- //
-std::vector<I3Particle> I3PropagatorServicePROPOSAL::Propagate(I3Particle& p, DiagnosticMapPtr frame){
+std::vector<I3Particle> I3PropagatorServicePROPOSAL::Propagate(I3Particle& p, DiagnosticMapPtr frame, I3FramePtr){
     // saying where we are
     log_debug("Entering I3PropagatorServicePROPOSAL::Propagate()");
 
@@ -191,10 +191,8 @@ static const bimap_ParticleType I3_PROPOSAL_ParticleType_bimap = boost::assign::
 
 
 // ------------------------------------------------------------------------- //
-PROPOSAL::ParticleDef I3PropagatorServicePROPOSAL::GeneratePROPOSALParticleDef(const I3Particle& p)
+PROPOSAL::ParticleDef I3PropagatorServicePROPOSAL::GeneratePROPOSALParticleDef(I3Particle::ParticleType ptype_I3)
 {
-    I3Particle::ParticleType ptype_I3 = p.GetType();
-
     if (ptype_I3 == I3Particle::MuMinus) return MuMinusDef::Get();
     else if (ptype_I3 == I3Particle::MuPlus) return MuPlusDef::Get();
     else if (ptype_I3 == I3Particle::EMinus) return EMinusDef::Get();
@@ -203,8 +201,12 @@ PROPOSAL::ParticleDef I3PropagatorServicePROPOSAL::GeneratePROPOSALParticleDef(c
     else if (ptype_I3 == I3Particle::TauPlus) return TauPlusDef::Get();
     else
     {
+
+        I3Particle i3particle;
+        i3particle.SetType(ptype_I3);
+
         log_fatal("The I3Particle '%s' with type '%i' can not be converted to a PROPOSALParticle"
-            , p.GetTypeString().c_str(), ptype_I3);
+            , i3particle.GetTypeString().c_str(), ptype_I3);
     }
 }
 
@@ -352,7 +354,7 @@ I3MMCTrackPtr I3PropagatorServicePROPOSAL::propagate( I3Particle& p, vector<I3Pa
         //this should be a stochastic
         I3Particle new_particle;
 
-        ParticleDef particle_def = GeneratePROPOSALParticleDef(p);
+        ParticleDef particle_def = GeneratePROPOSALParticleDef(p.GetType());
         if (particle_def == EMinusDef::Get()
             || particle_def == EPlusDef::Get())
             // || particle_def == ParticleType::Hadrons) //TODO(mario):  Wed 2017/10/25
