@@ -3,7 +3,7 @@
  * @author Jakob van Santen <vansanten@wisc.edu>
  *
  * $Revision: 137064 $
- * $Date: 2015-08-31 13:24:47 -0500 (Mo, 31 Aug 2015) $
+ * $Date: 2015-08-31 20:24:47 +0200 (Mo, 31. Aug 2015) $
  */
 
 #include <boost/assign.hpp>
@@ -11,59 +11,28 @@
 
 #include "MuonGun/MuonPropagator.h"
 
-#include "PROPOSAL/PROPOSALParticle.h"
-#include "PROPOSAL/Medium.h"
-
 namespace I3MuonGun {
 
 MuonPropagator::MuonPropagator(const std::string &medium, double ecut, double vcut, double rho)
+	: propagator_(NULL)
 {
-	PROPOSAL::EnergyCutSettings* cutset = new PROPOSAL::EnergyCutSettings(ecut,vcut);
-    PROPOSAL::Medium* med = new PROPOSAL::Medium(PROPOSAL::Medium::GetTypeFromName(medium),rho);
+    PROPOSAL::SectorFactory::Definition sector_def;
+    sector_def.e_cut = ecut;
+    sector_def.v_cut = vcut;
+    sector_def.medium_def.type = PROPOSAL::MediumFactory::Get().GetEnumFromString(medium);
+    sector_def.medium_def.density_correction = rho;
 
+    std::vector<PROPOSAL::SectorFactory::Definition> sector_definitions;
+    sector_definitions.push_back(sector_def);
 
-    bool sdec      = true; // stopped muon decay
-    bool exactTime = true; // exact local time
-    bool molieScat = true; // Moliere scattering
-
-	// Turn on continuous randomization if no absolute
-	// energy cutoff set
-    bool contiCorr = ecut < 0;
-
-	// LPM suppression
-    bool lpm = true;
-    // Bremsstrahlung: Kelner, Kokoulin, and Petrukhin parametrization
-    PROPOSAL::ParametrizationType::Enum brems_param = PROPOSAL::ParametrizationType::BremsKelnerKokoulinPetrukhin;
-    // Photonuclear: Abramowicz Levin Levy Maor 97 with Butkevich shadowing
-    PROPOSAL::ParametrizationType::Enum photo_param = PROPOSAL::ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich;
-
-    double brems_multiplier = 1.;
-    double photo_multiplier = 1.;
-    double ioniz_multiplier = 1.;
-    double epair_multiplier = 1.;
-    bool integrate = false;
-    int scattering_model = 0;
+    PROPOSAL::InterpolationDef interpol_def;
 
 	std::ostringstream prefix;
 	prefix << getenv("I3_BUILD") << "/MuonGun/resources/tables/icecube";
-	//propagator_->interpolate("all", prefix.str());
 
-    propagator_ = new PROPOSAL::Propagator(med
-        , cutset
-        , PROPOSAL::ParticleType::MuMinus
-        , prefix.str()
-        , molieScat
-        , contiCorr
-        , exactTime
-        , lpm
-        , brems_param
-        , photo_param
-        , brems_multiplier
-        , photo_multiplier
-        , ioniz_multiplier
-        , epair_multiplier
-        , integrate
-        , scattering_model);
+    interpol_def.path_to_tables = prefix.str();
+
+    propagator_ = new PROPOSAL::Propagator(PROPOSAL::MuMinusDef::Get(), sector_definitions, PROPOSAL::Sphere(PROPOSAL::Vector3D(), 1e18, 0.0), interpol_def);
 }
 
 MuonPropagator::~MuonPropagator()
@@ -74,181 +43,263 @@ MuonPropagator::~MuonPropagator()
 void
 MuonPropagator::SetSeed(int seed)
 {
-	PROPOSAL::MathModel::set_seed(seed);
+    PROPOSAL::RandomGenerator::Get().SetSeed(seed);
 }
 
-PROPOSAL::ParticleType::Enum
-GetPROPOSALType(I3Particle::ParticleType pt)
+inline std::string
+GetMMCName(I3Particle::ParticleType pt)
 {
-    PROPOSAL::ParticleType::Enum code;
-    switch (pt) {
-        case I3Particle::MuMinus:
-            code = PROPOSAL::ParticleType::MuMinus;
-            break;
-        case I3Particle::MuPlus:
-            code = PROPOSAL::ParticleType::MuPlus;
-            break;
-        default:
-            log_fatal_stream("Unsupported particle type: " << pt);
-    }
-    return code;
+	std::string name;
+
+	if (pt == I3Particle::MuMinus)
+		name="mu-";
+	else if (pt == I3Particle::MuPlus)
+		name="mu+";
+
+	return name;
 }
 
 std::string
 MuonPropagator::GetName(const I3Particle &p)
 {
-    return PROPOSAL::PROPOSALParticle::GetName(GetPROPOSALType(p.GetType()));
+	return GetMMCName(p.GetType());
 }
 
-typedef std::map<PROPOSAL::ParticleType::Enum, I3Particle::ParticleType> particle_type_conversion_t;
+typedef boost::bimap<I3Particle::ParticleType, std::string> bimap_ParticleType;
 
-static const particle_type_conversion_t fromRDMCTable =
-boost::assign::list_of<std::pair<PROPOSAL::ParticleType::Enum, I3Particle::ParticleType> >
-(PROPOSAL::ParticleType::EMinus, I3Particle::EPlus)
-(PROPOSAL::ParticleType::EMinus, I3Particle::EMinus)
-(PROPOSAL::ParticleType::MuPlus, I3Particle::MuPlus)
-(PROPOSAL::ParticleType::MuMinus, I3Particle::MuMinus)
-(PROPOSAL::ParticleType::TauPlus, I3Particle::TauPlus)
-(PROPOSAL::ParticleType::TauMinus, I3Particle::TauMinus)
+static const bimap_ParticleType I3_PROPOSAL_ParticleType_bimap =
+boost::assign::list_of<bimap_ParticleType::relation>
+    (I3Particle::MuMinus,   "MuMinus")
+    (I3Particle::MuPlus,    "MuPlus")
+    (I3Particle::TauMinus,  "TauMinus")
+    (I3Particle::TauPlus,   "TauPlus")
+    (I3Particle::EMinus,    "EMinus")
+    (I3Particle::EPlus,     "EPlus")
+    (I3Particle::NuMu,      "NuMu")
+    (I3Particle::NuMuBar,   "NuMuBar")
+    (I3Particle::NuE,       "NuE")
+    (I3Particle::NuEBar,    "NuEBar")
+    (I3Particle::NuTau,     "NuTau")
+    (I3Particle::NuTauBar,  "NuTauBar")
+    (I3Particle::Brems,     "Brems")
+    (I3Particle::DeltaE,    "DeltaE")
+    (I3Particle::PairProd,  "EPair")
+    (I3Particle::NuclInt,   "NuclInt")
+    (I3Particle::MuPair,    "MuPair")
+    (I3Particle::Hadrons,   "Hadrons")
+    (I3Particle::Monopole,  "Monopole")
+    (I3Particle::STauMinus, "STauMinus")
+    (I3Particle::STauPlus,  "STauPlus")
+    (I3Particle::Gamma,     "Gamma")
+    (I3Particle::Pi0,       "Pi0")
+    (I3Particle::PiPlus,    "PiPlus")
+    (I3Particle::PiMinus,   "PiMinus")
+    (I3Particle::KPlus,     "KPlus")
+    (I3Particle::KMinus,    "KMinus")
+    (I3Particle::PPlus,     "PPlus")
+    (I3Particle::PMinus,    "PMinus");
 
+// typedef std::map<int, I3Particle::ParticleType> particle_type_conversion_t;
+// static const particle_type_conversion_t fromRDMCTable =
+// boost::assign::list_of<std::pair<int, I3Particle::ParticleType> >
 // (-100, I3Particle::unknown)
-(PROPOSAL::ParticleType::Gamma, I3Particle::Gamma)
-(PROPOSAL::ParticleType::Pi0, I3Particle::Pi0)
-(PROPOSAL::ParticleType::PiPlus, I3Particle::PiPlus)
-(PROPOSAL::ParticleType::PiMinus, I3Particle::PiMinus)
-(PROPOSAL::ParticleType::KPlus, I3Particle::KPlus)
-(PROPOSAL::ParticleType::KMinus, I3Particle::KMinus)
-(PROPOSAL::ParticleType::PPlus, I3Particle::PPlus)
-(PROPOSAL::ParticleType::PMinus, I3Particle::PMinus)
-
-(PROPOSAL::ParticleType::Monopole, I3Particle::Monopole)
-(PROPOSAL::ParticleType::NuE, I3Particle::NuE)
-(PROPOSAL::ParticleType::NuMu, I3Particle::NuMu)
-(PROPOSAL::ParticleType::NuTau, I3Particle::NuTau)
-(PROPOSAL::ParticleType::NuEBar, I3Particle::NuEBar)
-(PROPOSAL::ParticleType::NuMuBar, I3Particle::NuMuBar)
-(PROPOSAL::ParticleType::NuTauBar, I3Particle::NuTauBar)
-(PROPOSAL::ParticleType::Brems, I3Particle::Brems)
-(PROPOSAL::ParticleType::DeltaE, I3Particle::DeltaE)
-(PROPOSAL::ParticleType::EPair, I3Particle::PairProd)
-(PROPOSAL::ParticleType::NuclInt, I3Particle::NuclInt)
-(PROPOSAL::ParticleType::MuPair, I3Particle::MuPair)
-(PROPOSAL::ParticleType::Hadrons, I3Particle::Hadrons);
+// (1, I3Particle::Gamma)
+// (2, I3Particle::EPlus)
+// (3, I3Particle::EMinus)
+// (4, I3Particle::Nu)
+// (5, I3Particle::MuPlus)
+// (6, I3Particle::MuMinus)
+// (7, I3Particle::Pi0)
+// (8, I3Particle::PiPlus)
+// (9, I3Particle::PiMinus)
+// (11, I3Particle::KPlus)
+// (12, I3Particle::KMinus)
+// (14, I3Particle::PPlus)
+// (15, I3Particle::PMinus)
+// (33, I3Particle::TauPlus)
+// (34, I3Particle::TauMinus)
+// (41, I3Particle::Monopole)
+// (201, I3Particle::NuE)
+// (202, I3Particle::NuMu)
+// (203, I3Particle::NuTau)
+// (204, I3Particle::NuEBar)
+// (205, I3Particle::NuMuBar)
+// (206, I3Particle::NuTauBar)
+// (1001, I3Particle::Brems)
+// (1002, I3Particle::DeltaE)
+// (1003, I3Particle::PairProd)
+// (1004, I3Particle::NuclInt)
+// (1005, I3Particle::MuPair)
+// (1006, I3Particle::Hadrons);
 
 inline I3Particle
-to_I3Particle(const PROPOSAL::PROPOSALParticle *pp)
+to_I3Particle(const PROPOSAL::DynamicData& pp)
 {
 	I3Particle p;
-	particle_type_conversion_t::const_iterator it =
-	    fromRDMCTable.find(pp->GetType());
-	if (it == fromRDMCTable.end())
-		log_fatal("unknown RDMC code \"%i\" cannot be converted to a I3Particle::ParticleType.", pp->GetType());
-	else
-		p.SetType(it->second);
-	p.SetLocationType(I3Particle::InIce);
-    p.SetPos(pp->GetX()*I3Units::cm, pp->GetY()*I3Units::cm, pp->GetZ()*I3Units::cm);
-    p.SetTime(pp->GetT()*I3Units::s);
-    p.SetThetaPhi(pp->GetTheta()*I3Units::deg, pp->GetPhi()*I3Units::deg);
-    p.SetLength(pp->GetPropagatedDistance()*I3Units::cm);
-    p.SetEnergy(pp->GetEnergy()*I3Units::MeV);
+
+    double x = pp.GetPosition().GetX() * I3Units::cm;
+    double y = pp.GetPosition().GetY() * I3Units::cm;
+    double z = pp.GetPosition().GetZ() * I3Units::cm;
+
+    double theta = pp.GetDirection().GetTheta() * I3Units::degree;
+    double phi = pp.GetDirection().GetPhi() * I3Units::degree;
+
+    p.SetPos(x, y, z);
+    p.SetThetaPhi(theta, phi);
+    p.SetLength(pp.GetPropagatedDistance() * I3Units::cm);
+    p.SetTime(pp.GetTime() * I3Units::second);
+
+	p.SetType(MuonPropagator::GenerateI3Type(pp));
+    p.SetLocationType(I3Particle::InIce);
+    p.SetEnergy(pp.GetEnergy()*I3Units::MeV);
 
 	return p;
+
+	// I3Particle p;
+	// particle_type_conversion_t::const_iterator it =
+	//     fromRDMCTable.find(abs(pp->type));
+	// if (it == fromRDMCTable.end())
+	// 	log_fatal("unknown RDMC code \"%i\" cannot be converted to a I3Particle::ParticleType.", pp->type);
+	// else
+	// 	p.SetType(it->second);
+	// p.SetLocationType(I3Particle::InIce);
+	// p.SetPos(pp->x*I3Units::cm, pp->y*I3Units::cm, pp->z*I3Units::cm);
+	// p.SetTime(pp->t*I3Units::s);
+	// p.SetThetaPhi(pp->theta*I3Units::deg, pp->phi*I3Units::deg);
+	// p.SetLength(pp->l*I3Units::cm);
+	// p.SetEnergy(pp->e*I3Units::MeV);
+    //
+	// return p;
+}
+
+I3Particle::ParticleType MuonPropagator::GenerateI3Type(const PROPOSAL::DynamicData& secondary)
+{
+    PROPOSAL::DynamicData::Type type = secondary.GetTypeId();
+
+    if (type == PROPOSAL::DynamicData::Particle)
+    {
+        const PROPOSAL::Particle& particle = static_cast<const PROPOSAL::Particle&>(secondary);
+        PROPOSAL::ParticleDef particle_def = particle.GetParticleDef();
+
+        I3Particle::ParticleType ptype_I3;
+
+        bimap_ParticleType::right_const_iterator proposal_iterator = I3_PROPOSAL_ParticleType_bimap.right.find(particle_def.name);
+        if (proposal_iterator == I3_PROPOSAL_ParticleType_bimap.right.end())
+        {
+            log_fatal("The PROPOSAL Particle '%s' can not be converted to a I3Particle", particle_def.name.c_str());
+        }
+        else
+        {
+            return proposal_iterator->second;
+        }
+    }
+    else if(type == PROPOSAL::DynamicData::Brems) return I3Particle::Brems;
+    else if(type == PROPOSAL::DynamicData::Epair) return I3Particle::PairProd;
+    else if(type == PROPOSAL::DynamicData::DeltaE) return I3Particle::DeltaE;
+    else if(type == PROPOSAL::DynamicData::NuclInt) return I3Particle::NuclInt;
+    else
+    {
+        log_fatal("PROPOSAL Particle can not be converted to a I3Particle");
+    }
 }
 
 /** Differential stochastic rate: d^2N/dv/dx [1/m] */
 double
 MuonPropagator::GetStochasticRate(double energy, double fraction, I3Particle::ParticleType type) const
 {
-	/*
-	propagator_->get_output()->initDefault(0, 0, PROPOSALParticle::GetName(GetPROPOSALType(type)), 0, 0, 0, 0, 0, 0);
-	// Check kinematics
-	if (fraction <= 0 || energy*(1-fraction) <= propagator_->get_particle()->m*I3Units::MeV)
-		return 0.;
-	propagator_->get_particle()->setEnergy(energy/I3Units::MeV);
-	propagator_->get_cros()->get_ionization()->setEnergy();
-	*/
-
-	double contrib;
-	double rate = 0.;
-	/*
-	// Separate contributions from each element for brems/epair/photonuclear interactions
-	for (int i=0; i < propagator_->get_cros()->get_medium()->get_numCompontents(); i++) {
-		propagator_->get_cros()->set_component(i);
-		if (std::isfinite(contrib = propagator_->get_cros()->get_bremsstrahlung()->get_Stochastic()->function(fraction)) && contrib > 0)
-			rate += contrib;
-		if (std::isfinite(contrib = propagator_->get_cros()->get_epairproduction()->get_Stochastic()->function(fraction)) && contrib > 0)
-			rate += contrib;
-		if (std::isfinite(contrib = propagator_->get_cros()->get_photonuclear()->get_Stochastic()->function(fraction)) && contrib > 0)
-			rate += contrib;
-	}
-	// Only one bulk ionization contribution
-	if (std::isfinite(contrib = propagator_->get_cros()->get_ionization()->get_Stochastic()->function(fraction)) && contrib > 0)
-		rate += contrib;
-	// printf("brems dN/dx: %e\n", propagator_->get_cros()->get_bremsstrahlung()->get_Stochastic()->dNdx());
-	// printf("epair dN/dx: %e\n", propagator_->get_cros()->get_epairproduction()->get_Stochastic()->dNdx());
-	// printf("photo dN/dx: %e\n", propagator_->get_cros()->get_photonuclear()->get_Stochastic()->dNdx());
-	// printf("ioniz dN/dx: %e\n", propagator_->get_cros()->get_ionization()->get_Stochastic()->dNdx());
-	*/
-	return rate*(I3Units::m/I3Units::cm);
+	// propagator_->get_output()->initDefault(0, 0, GetMMCName(type), 0, 0, 0, 0, 0, 0);
+    //
+	// // Check kinematics
+	// if (fraction <= 0 || energy*(1-fraction) <= propagator_->get_particle()->m*I3Units::MeV)
+	// 	return 0.;
+	// propagator_->get_particle()->setEnergy(energy/I3Units::MeV);
+	// propagator_->get_cros()->get_ionization()->setEnergy();
+    //
+	// double contrib;
+	// double rate = 0.;
+	// // Separate contributions from each element for brems/epair/photonuclear interactions
+	// for (int i=0; i < propagator_->get_cros()->get_medium()->get_numCompontents(); i++) {
+	// 	propagator_->get_cros()->set_component(i);
+	// 	if (std::isfinite(contrib = propagator_->get_cros()->get_bremsstrahlung()->get_Stochastic()->function(fraction)) && contrib > 0)
+	// 		rate += contrib;
+	// 	if (std::isfinite(contrib = propagator_->get_cros()->get_epairproduction()->get_Stochastic()->function(fraction)) && contrib > 0)
+	// 		rate += contrib;
+	// 	if (std::isfinite(contrib = propagator_->get_cros()->get_photonuclear()->get_Stochastic()->function(fraction)) && contrib > 0)
+	// 		rate += contrib;
+	// }
+	// // Only one bulk ionization contribution
+	// if (std::isfinite(contrib = propagator_->get_cros()->get_ionization()->get_Stochastic()->function(fraction)) && contrib > 0)
+	// 	rate += contrib;
+	// // printf("brems dN/dx: %e\n", propagator_->get_cros()->get_bremsstrahlung()->get_Stochastic()->dNdx());
+	// // printf("epair dN/dx: %e\n", propagator_->get_cros()->get_epairproduction()->get_Stochastic()->dNdx());
+	// // printf("photo dN/dx: %e\n", propagator_->get_cros()->get_photonuclear()->get_Stochastic()->dNdx());
+	// // printf("ioniz dN/dx: %e\n", propagator_->get_cros()->get_ionization()->get_Stochastic()->dNdx());
+    //
+	// return rate*(I3Units::m/I3Units::cm);
 }
 
 /** total stochastic rate: dN/dx [1/m] */
 double
 MuonPropagator::GetTotalStochasticRate(double energy, I3Particle::ParticleType type) const
 {
-	/*
-	propagator_->get_output()->initDefault(0, 0, PROPOSALParticle::GetName(GetPROPOSALType(type)), 0, 0, 0, 0, 0, 0);
-	propagator_->get_particle()->setEnergy(energy/I3Units::MeV);
-	propagator_->get_cros()->get_ionization()->setEnergy();
-	*/
-	double rate = 0;
-	/*
-	rate += propagator_->get_cros()->get_bremsstrahlung()->get_Stochastic()->dNdx();
-	rate += propagator_->get_cros()->get_epairproduction()->get_Stochastic()->dNdx();
-	rate += propagator_->get_cros()->get_photonuclear()->get_Stochastic()->dNdx();
-	rate += propagator_->get_cros()->get_ionization()->get_Stochastic()->dNdx();
-	*/
-
-	return rate*(I3Units::m/I3Units::cm);
+	// propagator_->get_output()->initDefault(0, 0, GetMMCName(type), 0, 0, 0, 0, 0, 0);
+	// propagator_->get_particle()->setEnergy(energy/I3Units::MeV);
+	// propagator_->get_cros()->get_ionization()->setEnergy();
+    //
+	// double rate = 0;
+	// rate += propagator_->get_cros()->get_bremsstrahlung()->get_Stochastic()->dNdx();
+	// rate += propagator_->get_cros()->get_epairproduction()->get_Stochastic()->dNdx();
+	// rate += propagator_->get_cros()->get_photonuclear()->get_Stochastic()->dNdx();
+	// rate += propagator_->get_cros()->get_ionization()->get_Stochastic()->dNdx();
+    //
+	// return rate*(I3Units::m/I3Units::cm);
 }
 
 I3Particle
 MuonPropagator::propagate(const I3Particle &p, double distance, boost::shared_ptr<std::vector<I3Particle> > losses)
 {
 	I3Particle endpoint(p);
-	/*
-	// propagator_.get_output()->DEBUG=true;
-	if (losses) {
-		propagator_->get_output()->I3flag = true;
-		propagator_->get_output()->initF2000(0, 0, GetName(p), p.GetTime()/I3Units::second,
-		    p.GetPos().GetX()/I3Units::cm, p.GetPos().GetY()/I3Units::cm, p.GetPos().GetZ()/I3Units::cm,
-		    p.GetDir().CalcTheta()/I3Units::deg, p.GetDir().CalcPhi()/I3Units::deg);
-	} else
-		propagator_->get_output()->initDefault(0, 0, GetName(p), p.GetTime()/I3Units::second,
-		    p.GetPos().GetX()/I3Units::cm, p.GetPos().GetY()/I3Units::cm, p.GetPos().GetZ()/I3Units::cm,
-		    p.GetDir().CalcTheta()/I3Units::deg, p.GetDir().CalcPhi()/I3Units::deg);
 
-	PROPOSALParticle *pp = propagator_->get_particle();
-	if (propagator_->propagateTo(distance/I3Units::cm, p.GetEnergy()/I3Units::MeV) > 0)
-		endpoint.SetEnergy(pp->e*I3Units::MeV);
-	else
-		endpoint.SetEnergy(0);
+    double x, y, z, theta, phi = 0.0;
 
-	endpoint.SetPos(pp->x*I3Units::cm, pp->y*I3Units::cm, pp->z*I3Units::cm);
-	endpoint.SetThetaPhi(pp->theta*I3Units::degree, pp->phi*I3Units::degree);
-	endpoint.SetLength(pp->r*I3Units::cm);
-	endpoint.SetTime(pp->t*I3Units::second);
+    PROPOSAL::Particle pp = propagator_->GetParticle();
+    pp.SetParentParticleId(0);
+    pp.SetParticleId(0);
+    pp.SetTime(p.GetTime()/I3Units::second);
 
-	if (losses) {
-		std::vector<PROPOSALParticle*> &history = propagator_->get_output()->I3hist;
-		BOOST_FOREACH(PROPOSALParticle *daughter, history) {
-			losses->push_back(to_I3Particle(daughter));
-			delete daughter;
-		}
-		history.clear();
-		propagator_->get_output()->I3flag = false;
+    x = p.GetPos().GetX() / I3Units::cm;
+    y = p.GetPos().GetY() / I3Units::cm;
+    z = p.GetPos().GetZ() / I3Units::cm;
+
+    pp.SetPosition(PROPOSAL::Vector3D(x, y, z));
+    pp.SetEnergy(p.GetEnergy()/I3Units::MeV);
+
+    propagator_->Propagate(distance/I3Units::cm);
+
+	endpoint.SetEnergy(pp.GetEnergy()*I3Units::MeV);
+
+    x = pp.GetPosition().GetX() * I3Units::cm;
+    y = pp.GetPosition().GetY() * I3Units::cm;
+    z = pp.GetPosition().GetZ() * I3Units::cm;
+
+    theta = pp.GetDirection().GetTheta() * I3Units::degree;
+    phi = pp.GetDirection().GetPhi() * I3Units::degree;
+
+    endpoint.SetPos(x, y, z);
+    endpoint.SetThetaPhi(theta, phi);
+    endpoint.SetLength(pp.GetPropagatedDistance() * I3Units::cm);
+    endpoint.SetTime(pp.GetTime() * I3Units::second);
+
+    if (losses) {
+      std::vector<PROPOSAL::DynamicData*> history =
+          PROPOSAL::Output::getInstance().GetSecondarys();
+      for (unsigned int i = 0; i < history.size(); i++) {
+        losses->push_back(to_I3Particle(*history[i]));
+      }
 	}
-	*/
+
+    PROPOSAL::Output::getInstance().ClearSecondaryVector();
+
 	return endpoint;
 }
 
@@ -262,7 +313,6 @@ I3Particle
 Crust::Ingest(const I3Particle &p)
 {
 	I3Particle propped(p);
-	/*
 	double l = 0;
 	for (unsigned i = 0; (propped.GetEnergy() > 0) && (i < boundaries_.size()); i++) {
 		double dx = boundaries_[i]->GetIntersection(propped.GetPos(), propped.GetDir()).first;
@@ -273,7 +323,7 @@ Crust::Ingest(const I3Particle &p)
 			l += std::min(dx, propped.GetLength());
 	}
 	propped.SetLength(l);
-	*/
+
 	return propped;
 }
 
