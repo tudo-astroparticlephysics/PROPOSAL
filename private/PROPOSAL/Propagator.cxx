@@ -7,11 +7,7 @@
 
 // #include <cmath>
 
-// #include <boost/lexical_cast.hpp>
-// #include <boost/algorithm/string/predicate.hpp>
-
 #include <boost/property_tree/json_parser.hpp>
-#include <boost/property_tree/ptree.hpp>
 
 #include "PROPOSAL/Propagator.h"
 #include "PROPOSAL/medium/Medium.h"
