@@ -3,7 +3,7 @@
  * @author Jakob van Santen <vansanten@wisc.edu>
  *
  * $Revision: 137064 $
- * $Date: 2015-08-31 13:24:47 -0500 (Mo, 31 Aug 2015) $
+ * $Date: 2015-08-31 20:24:47 +0200 (Mo, 31. Aug 2015) $
  */
 
 #ifndef MUONGUN_MUONPROPAGATOR_H_INCLUDED
@@ -13,10 +13,7 @@
 #include "dataclasses/physics/I3Particle.h"
 #include "MuonGun/I3MuonGun.h"
 #include "phys-services/surfaces/Surface.h"
-
-#include "PROPOSAL/Propagator.h"
-
-class Propagator;
+#include "PROPOSAL/PROPOSAL.h"
 
 namespace I3MuonGun {
 
@@ -49,7 +46,7 @@ public:
 	 */
 	I3Particle propagate(const I3Particle &p, double distance,
 	    boost::shared_ptr<std::vector<I3Particle> > losses=boost::shared_ptr<std::vector<I3Particle> >());
-	
+
 	/**
 	 * Set the (global) state of the random number generator used
 	 * in the implementation.
@@ -59,11 +56,13 @@ public:
 	 * Get the internal MMC name associated with a particle type
 	 */
 	static std::string GetName(const I3Particle &p);
-	
+
+    static I3Particle::ParticleType GenerateI3Type(const PROPOSAL::DynamicData &);
+
 	double GetStochasticRate(double energy, double fraction, I3Particle::ParticleType type=I3Particle::MuMinus) const;
 	double GetTotalStochasticRate(double energy, I3Particle::ParticleType type=I3Particle::MuMinus) const;
 private:
-	PROPOSAL::Propagator *propagator_;
+    PROPOSAL::Propagator *propagator_;
 };
 
 /**
@@ -72,7 +71,7 @@ private:
 class Crust {
 public:
 	Crust(boost::shared_ptr<MuonPropagator> defaultPropagator) : defaultPropagator_(defaultPropagator) {};
-	
+
 	/** Add an inner layer */
 	void AddLayer(I3Surfaces::SurfacePtr, boost::shared_ptr<MuonPropagator>);
 	/** Propagate a muon to the outer boundary of the innermost layer */
