@@ -10,20 +10,14 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
 
-#include <icetray/I3Logging.h>
-#include <icetray/I3PointerTypedefs.h>
-#include <sim-services/I3PropagatorService.h>
+#include "icetray/I3Logging.h"
+#include "icetray/I3PointerTypedefs.h"
+#include "sim-services/I3PropagatorService.h"
 #include "simclasses/I3MMCTrack.h"
 
-#include "PROPOSAL/PROPOSAL.h" // Mario
-
+#include "PROPOSAL/PROPOSAL.h"
 
 class I3Particle;
-
-  // class PROPOSALParticle;
-  // class Output;
-  // class Propagator; //Tomasz
-
 
 /**
  * @version $Id: I3PropagatorService.h 68823 2010-11-22 15:14:19Z dima $
@@ -42,11 +36,11 @@ public:
 
 public:
 
-  I3PropagatorServicePROPOSAL(I3Particle& p, std::string configfile="");
+  I3PropagatorServicePROPOSAL(I3Particle::ParticleType, std::string configfile="");
 
   virtual ~I3PropagatorServicePROPOSAL();
 
-  virtual std::vector<I3Particle> Propagate(I3Particle& p, DiagnosticMapPtr frame);
+  virtual std::vector<I3Particle> Propagate(I3Particle& p, DiagnosticMapPtr frame, I3FramePtr);
   void SetTearDownPerCall(bool f) { tearDownPerCall_ = f; }
   virtual void SetRandomNumberGenerator(I3RandomServicePtr random);
 
@@ -72,7 +66,7 @@ public:
   I3PropagatorServicePROPOSAL(const I3PropagatorServicePROPOSAL&);
   I3PropagatorServicePROPOSAL& operator=(const I3PropagatorServicePROPOSAL&);
 
-  ParticleDef GeneratePROPOSALParticleDef(const I3Particle& p);
+  ParticleDef GeneratePROPOSALParticleDef(I3Particle::ParticleType);
   I3Particle::ParticleType GenerateI3Type(const PROPOSAL::DynamicData&);
 
   /**
