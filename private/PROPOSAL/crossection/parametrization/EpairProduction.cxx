@@ -149,11 +149,11 @@ double EpairProduction::FunctionToIntegral(double particle_energy, double r)
     // if lpm supression is taken into account, Phi_e is changed
     if (diagram_e > 0)
     {
-        if (lpm_)
-        {
-            diagram_e = lpm(particle_energy, r2, beta, xi) * diagram_e;
-        }
-        else if (1 / xi < HALF_PRECISION)
+        // if (lpm_)
+        // {
+        //     diagram_e = lpm(particle_energy, r2, beta, xi) * diagram_e;
+        // }
+        if (1 / xi < HALF_PRECISION)
         {
             // TODO: where does this short expression come from?
             diagram_e = (1.5 - r2 / 2 + beta * (1 + r2)) / xi * diagram_e;
@@ -179,6 +179,17 @@ double EpairProduction::FunctionToIntegral(double particle_energy, double r)
         diagram_mu = 0;
     }
 
+    if (lpm_)
+    {
+        std::cout << "in lpm" << std::endl;
+        double diagram_e_lpm = lpm(particle_energy, r2, beta, xi);
+
+        if (diagram_e > 0.0)
+        {
+            diagram_mu = diagram_mu / (diagram_e * diagram_e_lpm);
+            diagram_e = diagram_e_lpm;
+        }
+    }
 
     // Calculating the contribution of atomic electrons as scattering partner
     // Phys. Atom. Nucl. 61 (1998), 448
