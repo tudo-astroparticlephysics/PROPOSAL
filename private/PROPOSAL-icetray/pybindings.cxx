@@ -13,88 +13,72 @@ I3_PYTHON_MODULE(PROPOSAL)
     import("icecube.sim_services");
 
 
-    enum_<ParametrizationType::Enum>("CrossSectionParametrization")
-        .value("BremsKelnerKokoulinPetrukhin"                  , ParametrizationType::BremsKelnerKokoulinPetrukhin)
-        .value("BremsPetrukhinShestakov"                       , ParametrizationType::BremsPetrukhinShestakov)
-        .value("BremsAndreevBezrrukovBugaev"                   , ParametrizationType::BremsAndreevBezrukovBugaev)
-        .value("BremsCompleteScreeningCase"                    , ParametrizationType::BremsCompleteScreeningCase)
-        .value("PhotoKokoulinShadowBezrukovSoft"               , ParametrizationType::PhotoKokoulinShadowBezrukovSoft)
-        .value("PhotoKokoulinShadowBezrukovHard"               , ParametrizationType::PhotoKokoulinShadowBezrukovHard)
-        .value("PhotoRhodeShadowBezrukovSoft"                  , ParametrizationType::PhotoRhodeShadowBezrukovSoft)
-        .value("PhotoRhodeShadowBezrukovHard"                  , ParametrizationType::PhotoRhodeShadowBezrukovHard)
-        .value("PhotoBezrukovBugaevShadowBezrukovSoft"         , ParametrizationType::PhotoBezrukovBugaevShadowBezrukovSoft)
-        .value("PhotoBezrukovBugaevShadowBezrukovHard"         , ParametrizationType::PhotoBezrukovBugaevShadowBezrukovHard)
-        .value("PhotoZeusShadowBezrukovSoft"                   , ParametrizationType::PhotoZeusShadowBezrukovSoft)
-        .value("PhotoZeusShadowBezrukovHard"                   , ParametrizationType::PhotoZeusShadowBezrukovHard)
-        .value("PhotoAbramowiczLevinLevyMaor91ShadowDutta"     , ParametrizationType::PhotoAbramowiczLevinLevyMaor91ShadowDutta)
-        .value("PhotoAbramowiczLevinLevyMaor91ShadowButkevich" , ParametrizationType::PhotoAbramowiczLevinLevyMaor91ShadowButkevich)
-        .value("PhotoAbramowiczLevinLevyMaor97ShadowDutta"     , ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowDutta)
-        .value("PhotoAbramowiczLevinLevyMaor97ShadowButkevich" , ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich)
-        .value("PhotoButkevichMikhailovShadowDutta"            , ParametrizationType::PhotoButkevichMikhailovShadowDutta)
-        .value("PhotoButkevichMikhailovShadowButkevich"        , ParametrizationType::PhotoButkevichMikhailovShadowButkevich)
-    ;
-
-    enum_<MediumType::Enum>("Medium")
-        .value("Water"         , MediumType::Water)
-        .value("Ice"           , MediumType::Ice)
-        .value("Hydrogen"      , MediumType::Hydrogen)
-        .value("Iron"          , MediumType::Iron)
-        .value("Copper"        , MediumType::Copper)
-        .value("Lead"          , MediumType::Lead)
-        .value("Uranium"       , MediumType::Uranium)
-        .value("Air"           , MediumType::Air)
-        .value("AntaresWater"  , MediumType::AntaresWater)
-        .value("StandardRock"  , MediumType::StandardRock)
-        .value("FrejusRock"    , MediumType::FrejusRock)
-        .value("Salt"          , MediumType::Salt)
-        .value("MineralOil"    , MediumType::MineralOil)
-    ;
+    // enum_<ParametrizationType::Enum>("CrossSectionParametrization")
+    //     .value("BremsKelnerKokoulinPetrukhin"                  , ParametrizationType::BremsKelnerKokoulinPetrukhin)
+    //     .value("BremsPetrukhinShestakov"                       , ParametrizationType::BremsPetrukhinShestakov)
+    //     .value("BremsAndreevBezrrukovBugaev"                   , ParametrizationType::BremsAndreevBezrukovBugaev)
+    //     .value("BremsCompleteScreeningCase"                    , ParametrizationType::BremsCompleteScreeningCase)
+    //     .value("PhotoKokoulinShadowBezrukovSoft"               , ParametrizationType::PhotoKokoulinShadowBezrukovSoft)
+    //     .value("PhotoKokoulinShadowBezrukovHard"               , ParametrizationType::PhotoKokoulinShadowBezrukovHard)
+    //     .value("PhotoRhodeShadowBezrukovSoft"                  , ParametrizationType::PhotoRhodeShadowBezrukovSoft)
+    //     .value("PhotoRhodeShadowBezrukovHard"                  , ParametrizationType::PhotoRhodeShadowBezrukovHard)
+    //     .value("PhotoBezrukovBugaevShadowBezrukovSoft"         , ParametrizationType::PhotoBezrukovBugaevShadowBezrukovSoft)
+    //     .value("PhotoBezrukovBugaevShadowBezrukovHard"         , ParametrizationType::PhotoBezrukovBugaevShadowBezrukovHard)
+    //     .value("PhotoZeusShadowBezrukovSoft"                   , ParametrizationType::PhotoZeusShadowBezrukovSoft)
+    //     .value("PhotoZeusShadowBezrukovHard"                   , ParametrizationType::PhotoZeusShadowBezrukovHard)
+    //     .value("PhotoAbramowiczLevinLevyMaor91ShadowDutta"     , ParametrizationType::PhotoAbramowiczLevinLevyMaor91ShadowDutta)
+    //     .value("PhotoAbramowiczLevinLevyMaor91ShadowButkevich" , ParametrizationType::PhotoAbramowiczLevinLevyMaor91ShadowButkevich)
+    //     .value("PhotoAbramowiczLevinLevyMaor97ShadowDutta"     , ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowDutta)
+    //     .value("PhotoAbramowiczLevinLevyMaor97ShadowButkevich" , ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich)
+    //     .value("PhotoButkevichMikhailovShadowDutta"            , ParametrizationType::PhotoButkevichMikhailovShadowDutta)
+    //     .value("PhotoButkevichMikhailovShadowButkevich"        , ParametrizationType::PhotoButkevichMikhailovShadowButkevich)
+    // ;
+    //
+    // enum_<MediumType::Enum>("Medium")
+    //     .value("Water"         , MediumType::Water)
+    //     .value("Ice"           , MediumType::Ice)
+    //     .value("Hydrogen"      , MediumType::Hydrogen)
+    //     .value("Iron"          , MediumType::Iron)
+    //     .value("Copper"        , MediumType::Copper)
+    //     .value("Lead"          , MediumType::Lead)
+    //     .value("Uranium"       , MediumType::Uranium)
+    //     .value("Air"           , MediumType::Air)
+    //     .value("AntaresWater"  , MediumType::AntaresWater)
+    //     .value("StandardRock"  , MediumType::StandardRock)
+    //     .value("FrejusRock"    , MediumType::FrejusRock)
+    //     .value("Salt"          , MediumType::Salt)
+    //     .value("MineralOil"    , MediumType::MineralOil)
+    // ;
 
 
     class_<I3PropagatorServicePROPOSAL, boost::shared_ptr<I3PropagatorServicePROPOSAL>,
         bases<I3PropagatorService>, boost::noncopyable>(
             "I3PropagatorServicePROPOSAL",
-            init<std::string,std::string,double,double,I3Particle::ParticleType,double, double, double,
-            ParametrizationType::Enum,
-            ParametrizationType::Enum>(
-                (arg("mediadef")=I3PropagatorServicePROPOSAL::GetDefaultMediaDef(),
-                 arg("tabledir")=I3PropagatorServicePROPOSAL::GetDefaultTableDir(),
-                 arg("cylinderRadius")=800*I3Units::m,
-                 arg("cylinderHeight")=1600*I3Units::m,
-                 arg("type")=I3Particle::MuMinus,
-                 arg("particleMass")=NAN,
-                 arg("particleCharge")=NAN,
-                 arg("particleLifetime")=NAN,
-                 arg("bremsstrahlungParametrization")=ParametrizationType::BremsKelnerKokoulinPetrukhin,
-                 arg("photonuclearParametrization")=ParametrizationType::PhotoAbramowiczLevinLevyMaor97ShadowButkevich
+            init<I3Particle::ParticleType, std::string>(
+                (arg("type"),
+                 arg("config_file")=I3PropagatorServicePROPOSAL::GetDefaultConfigFile()
                 ),
-                 ":param mediadef: Path the the media definition file\n"
-                 ":param tabledir: Path to a directory in which to store interpolation constants for cross-section integrals\n"
-                 ":param cylinderRadius: Radius of the target volume in meters\n"
-                 ":param cylinderHeight: Full height of the target volume in meters\n"
-                 ":param type: Type of particle to propagate\n"
-                 ":param particleMass: Mass of the propagated particle in GeV. This is only used if type is something exotic.\n"
-                 ":param bremsstrahlungParametrization: Parametrization of the bremsstrahlung cross-section to use\n"
-                 ":param photonuclearParametrization: Parametrization of photonuclear cross-section to use\n"
+                 ":param particle: Parametrization of the bremsstrahlung cross-section to use\n"
+                 ":param config_file: Path to the config file\n"
             )
         )
-        .def("set_tear_down_per_call", &I3PropagatorServicePROPOSAL::SetTearDownPerCall)
+        // .def("set_tear_down_per_call", &I3PropagatorServicePROPOSAL::SetTearDownPerCall)
     ;
 
-    class_<PROPOSAL::SimplePropagator, boost::shared_ptr<PROPOSAL::SimplePropagator>,
+    class_<SimplePropagator, boost::shared_ptr<SimplePropagator>,
         boost::noncopyable>(
             "SimplePropagator",
-            init<MediumType::Enum,I3Particle::ParticleType,double,double,double>(
-                (arg("medium")=MediumType::Ice,
-                 arg("type")=I3Particle::MuMinus,
-                 arg("ecut")=-1.,
-                 arg("vcut")=-1,
-                 arg("rho")=-1
+            init<I3Particle::ParticleType, std::string, double, double, double>(
+                (arg("type")=I3Particle::MuMinus,
+                 arg("medium")="ice",
+                 arg("ecut")=-1.0,
+                 arg("vcut")=-1.0,
+                 arg("rho")=-1.0
                 )
             )
         )
-        .def("set_seed", &PROPOSAL::SimplePropagator::SetSeed)
-        .def("propagate", &PROPOSAL::SimplePropagator::propagate,
+        .def("set_seed", &SimplePropagator::SetSeed)
+        .def("propagate", &SimplePropagator::propagate,
              (args("p"), arg("distance"), arg("secondaries")=boost::shared_ptr<std::vector<I3Particle> >())
             )
     ;
