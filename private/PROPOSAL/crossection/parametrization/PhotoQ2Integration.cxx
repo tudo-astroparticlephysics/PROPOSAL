@@ -125,7 +125,7 @@ size_t PhotoQ2Integral::GetHash() const
 
 void PhotoQ2Integral::print(std::ostream& os) const
 {
-    os << "shadow effect: " << (dynamic_cast<ShadowDutta*>(shadow_effect_) ? "Dutta" : "ButkevichMikhailov") << '\n';
+    os << "shadow effect: " << (dynamic_cast<ShadowDuttaRenoSarcevicSeckel*>(shadow_effect_) ? "DuttaRenoSarcevicSeckel" : "ButkevichMikhailov") << '\n';
 }
 
 /******************************************************************************

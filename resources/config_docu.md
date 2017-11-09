@@ -32,7 +32,7 @@ It's also possible to do the calculations with integrations, but that increases 
 | `raw`            | Bool   | `False`   | Decides, wether the tables are stored in binary format or in human readable text format |
 
 ### Accuracy parameters ###
-There are several parameters with which the precision for advancing the particles can be adjusted.
+There are several parameters with which the precision or speed for advancing the particles can be adjusted.
 
 For the time calculation the energy dependence can be included via the dE/dx.
 Or the time is calculated by simply deviding distance by the speed of light.
@@ -43,10 +43,13 @@ There are four different multiple scattering parametrizations describing the dev
   - `"HighlandWithIntegral"` From the old PROPOSAL version (wich had just this scattering mode). Also using Highland approximation (corrected by Lynch/Dahl), but taking into account the energy dependence of the propagted distance
   - `"NoScattering"` Here the particle always propagate in the initial direction without deviation from the propagation axes.
 
-| Keyword      | Type   | Default     | Description |
-| ------------ | ------ | ----------- | ----------- |
-| `exact_time` | Bool   | `True`      | Decide, wether the energy dependence of the time is included |
-| `scattering` | String | `"Moliere"` | multiple scattering parametrization, which describes the displacemant from the propagation direction |
+If a particle gets below a lower threshold energy (this is a property of a particle that should be defined in the Particle Definitions and is by default the same as the particle mass) but hasn't decayed, it can get forced to stop and to decay.
+
+| Keyword          | Type   | Default     | Description |
+| ---------------- | ------ | ----------- | ----------- |
+| `exact_time`     | Bool   | `True`      | Decide, wether the energy dependence of the time is included |
+| `scattering`     | String | `"Moliere"` | multiple scattering parametrization describing the displacemant from the initial propagation direction |
+| `stopping_decay` | Bool   | `True`      | Decide, wether the particle gets stopped and forced to decay, if its energy is too low. |
 
 ### Cross section parameters ###
 There are several parametrizations defining the cross sections and further options which simply scales them.
@@ -56,10 +59,10 @@ The cross section multiplier, available for each cross section, scales this cros
 For Ionization and Pair production, there is just one parametrization, but for bremsstrahlung and nuclear interaction, it's possible to choose between multiple parametrizations.
 
 The bremsstrahlung parametrizations are:
-  - `"Kelner-Kokoulin-Petrukhin"`
-  - `"Andreev-Bezrukov-Bugaev"`
-  - `"Petrukhin-Shestakov"`
-  - `"Complete-Screening-Case"`
+  - `"Kelner-Kokoulin-Petrukhin"` ([Preprint MEPhI (1995) no. 024-95](http://cds.cern.ch/record/288828)) and (Phys. Atom. Nucl. 62 (1999), 272)
+  - `"Andreev-Bezrukov-Bugaev"` (Phys. Atom. Nucl. 57 (1994), 2066)
+  - `"Petrukhin-Shestakov"` (Canad. J. Phys. 46 (1968), 377)
+  - `"Complete-Screening-Case"` taken from Tsai [Rev. Mod. Phys. 46 (1974), 815](https://doi.org/10.1103/RevModPhys.46.815)
 
 There are two different approaches to parametrise the nuclear interaction:
 
@@ -67,7 +70,7 @@ Either with the approximation where a real photon scatters inelastically with a 
 The available parametrizations using this approach are:
 - `"Kokoulin"`
 - `"Rhode"`
-- `"Bezrukov-Bugaev"`
+- `"Bezrukov-Bugaev"` (Sov. J. Nucl. Phys. 33 (1981), 635) with corrections for particles with higher mass like taus ([Phys. Rev. D67 (2003), 034027](https://doi.org/10.1103/PhysRevD.67.034027))
 - `"Zeus"`
 
 For these parametrizations the hard component can additionally be considered (only affecting the parametrizations using the real photon approximation).
@@ -75,28 +78,28 @@ For these parametrizations the hard component can additionally be considered (on
 Or using data from electron proton scattering experiments and extrapolate to low momentum of the virtual photon transfered to the nucleus ($Q^2$).
 There the cross section is first integrated over the photon momentum.
 The available parametrizations using this approach are:
-- `"ALLM91"`
-- `"ALLM97"`
-- `"Butkevich-Mikhailov"`
-- `"Reno-Sarcevic-Su"` (which uses the parametrization of ALLM97, but with corrections for spin 0 particles and should therefore only be selected for spin 0 particles like sTau)
+- `"ALLM91"` by Abramowicz Levin Levy Maor [Phys. Let. B269 (1991), 465](https://doi.org/10.1016/0370-2693(91)90202-2)
+- `"ALLM97"` by Abramowicz Levin Levy Maor [arXiv::hep-ph/9712415](https://arxiv.org/abs/hep-ph/9712415)
+- `"Butkevich-Mikhailov"` [JETP 95 (2002), 11](https://doi.org/10.1134/1.1499897)
+- `"Reno-Sarcevic-Su"` [Astrop. Phys. 24 (2005), 107](https://doi.org/10.1016/j.astropartphys.2005.06.002) (which uses the parametrization of ALLM97, but with corrections for spin 0 particles and should therefore only be selected for spin 0 particles like sTau)
 
 For these parametrizations the parametrization of the shadowing factor can be chosen from one of the following parametrizations (only affecting the nuclear interaction parametrizations with momentum integration):
-- `"Butkevich-Mikhailov"`
-- `"Dutta"`
+- `"Butkevich-Mikhailov"` from their calculation of nuclear interaction
+- `"DRSS"` by Dutta, Reno, Sarcevic, Seckel [Phys. Rev. D63 (2001), 094020](https://doi.org/10.1103/PhysRevD.63.094020)
 
 The LPM effect (Landau-Pomeranschuk-Migdal), suppressing the bremsstrahlung and the pair production at high energies and the Ter-Mikaelian effect, suppress low bremsstrahlung energy losses, can also be incorporated.
 
-| Keyword            | Type   | Default    | Description |
-| ------------------ | ------ | ---------- | ----------- |
-| `brems_multiplier` | Double | `1`        | scales the bremsstrahlung |
-| `epair_multiplier` | Double | `1`        | scales the pair production |
-| `ioniz_multiplier` | Double | `1`        | scales the ionization |
-| `photo_multiplier` | Double | `1`        | scales the nuclear interaction |
-| `brems`            | String | `"Kelner-Kokoulin-Petrukhin"` | Bremsstrahlung parametrization |
-| `photo`            | String | `"ALLM97"` | nuclear interaction parametrization |
-| `photo_hard`       | Bool   | `True`     | including the hard components |
-| `photo_shadow`     | String | `"Butkevich-Mikhailov"` | shadowing parametrization |
-| `lpm`              | Bool   | `True`     | Incorporate the LPM-effect and TM-effect |
+| Keyword                | Type   | Default    | Description |
+| ---------------------- | ------ | ---------- | ----------- |
+| `brems_multiplier`     | Double | `1`        | scales the bremsstrahlung |
+| `epair_multiplier`     | Double | `1`        | scales the pair production |
+| `ioniz_multiplier`     | Double | `1`        | scales the ionization |
+| `photo_multiplier`     | Double | `1`        | scales the nuclear interaction |
+| `brems`                | String | `"Kelner-Kokoulin-Petrukhin"` | Bremsstrahlung parametrization |
+| `photo`                | String | `"ALLM97"` | nuclear interaction parametrization |
+| `photo_hard_component` | Bool   | `True`     | including the hard components |
+| `photo_shadow`         | String | `"Butkevich-Mikhailov"` | shadowing parametrization |
+| `lpm`                  | Bool   | `True`     | Incorporate the LPM-effect and TM-effect |
 
 ### Energy-cut parameters ###
 The energy cut settings and the continous randomization option are seperated between inside, infront and behind the detector.
