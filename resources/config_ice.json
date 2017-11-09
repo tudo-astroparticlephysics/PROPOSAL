@@ -3,17 +3,21 @@
 	{
 
 		"seed" : 1,
-		"brems" : "Kelner-Kokoulin-Petrukhin",
-		"photo" : "ALLM97",
-		"lpm" : false,
 		"scattering" : "Moliere",
 		"exact_time" : true,
+		"stopping_decay" : true,
 		"interpolate" : true,
+		"path_to_tables" : "resources/tables",
+		"raw" : false,
+		"brems" : "Kelner-Kokoulin-Petrukhin",
+		"lpm" : false,
+		"photo" : "ALLM97",
+		"photo_hard_component" : true,
+		"photo_shadow" : "DRSS",
 		"brems_multiplier" : 1,
 		"photo_multiplier" : 1,
 		"ioniz_multiplier" : 1,
 		"epair_multiplier" : 1,
-		"path_to_tables" : "",
 		"ecut_inside" : 500,
 		"ecut_infront" : -1,
 		"ecut_behind" : -1,
@@ -22,19 +26,19 @@
 		"vcut_behind" : -1,
 		"cont_inside" : 0,
 		"cont_infront" : 1,
-		"cont_behind" : 0,
-		"raw" : false
+		"cont_behind" : 0
 	},
 
 	"sectors": [
 		{
-			"medium": "ice",
 			"hirarchy": 0,
+			"medium": "ice",
+			"density_correction": 1,
 
 			"geometry":
 			{
 				"shape": "sphere",
-				"origin": [0, 0, -6372186],
+				"origin": [0, 0, 0],
 				"outer_radius": 6374134000000,
 				"inner_radius": 0
 			},
