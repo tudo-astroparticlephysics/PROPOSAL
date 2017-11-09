@@ -3,9 +3,8 @@
 	{
 
 		"seed" : 1,
-		"brems" : 1,
-		"photo" : 5,
-		"shadow" : 1,
+		"brems" : "Kelner-Kokoulin-Petrukhin",
+		"photo" : "ALLM97",
 		"lpm" : true,
 		"scattering" : "moliere",
 		"exact_time" : true,
@@ -14,7 +13,7 @@
 		"photo_multiplier" : 1,
 		"ioniz_multiplier" : 1,
 		"epair_multiplier" : 1,
-		"path_to_tables" : "resources/tables",
+		"path_to_tables" : "~/.local/PROPOSAL/resources/tables",
 		"ecut_inside" : 500,
 		"ecut_infront" : -1,
 		"ecut_behind" : -1,
@@ -37,7 +36,7 @@
 			{
 				"shape": "sphere",
 				"origin": [0, 0, -6372186],
-				"radius": 1000000000,
+				"outer_radius": 1000000000,
 				"inner_radius": 6374134
 			},
 			"cuts_inside":
@@ -68,7 +67,7 @@
 			{
 				"shape": "sphere",
 				"origin": [0, 0, -6372186],
-				"radius": 6374134,
+				"outer_radius": 6374134,
 				"inner_radius": 6373934
 			},
 			"cuts_inside":
@@ -99,7 +98,7 @@
 			{
 				"shape": "sphere",
 				"origin": [0, 0, -6372186],
-				"radius": 6373934,
+				"outer_radius": 6373934,
 				"inner_radius": 6371324
 			},
 			"cuts_inside":
@@ -130,7 +129,7 @@
 			{
 				"shape": "sphere",
 				"origin": [0, 0, -6372186],
-				"radius": 6371324,
+				"outer_radius": 6371324,
 				"inner_radius": 0
 			},
 			"cuts_inside":
@@ -158,8 +157,8 @@
 	{
 		"shape": "cylinder",
 		"origin" : [0, 0, 0],
-		"radius": 800,
+		"outer_radius": 800,
 		"inner_radius": 0,
-		"z": 1600
+		"height": 1600
 	}
 }
