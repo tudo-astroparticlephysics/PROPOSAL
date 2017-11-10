@@ -22,10 +22,27 @@
  *
  */
 
+// there is a known apple bug
+#if defined (__APPLE__)
+/* undo some macro defs in pyport.h 
+ the /boost/property_tree/detail/ptree_utils.hpp:31:66 the std::toupper is used
+ which would crash, if somewhere before the pyport.h is included
+ (comes with including python.h) */
+#if defined(_PY_PORT_CTYPE_UTF8_ISSUE) && defined(__cplusplus)
+#undef isalnum
+#undef isalpha
+#undef islower
+#undef isspace
+#undef isupper
+#undef tolower
+#undef toupper
+#endif /* _PY_PORT_CTYPE_UTF8_ISSUE && __cplusplus */
+#endif /* __APPLE__ */
+
 // #include <utility>
-#include <boost/property_tree/ptree.hpp>
 #include <deque>
 #include <vector>
+#include <boost/property_tree/ptree.hpp>
 
 #include "PROPOSAL/Output.h"
 #include "PROPOSAL/sector/SectorFactory.h"
@@ -205,3 +222,27 @@ class Propagator
 };
 
 }
+
+
+// redefine the macros, which were undefined at the beginning of the header
+#if defined (__APPLE__)
+#if defined(_PY_PORT_CTYPE_UTF8_ISSUE) && defined(__cplusplus)
+#include <ctype.h>
+#include <wctype.h>
+#undef isalnum
+#define isalnum(c) iswalnum(btowc(c))
+#undef isalpha
+#define isalpha(c) iswalpha(btowc(c))
+#undef islower
+#define islower(c) iswlower(btowc(c))
+#undef isspace
+#define isspace(c) iswspace(btowc(c))
+#undef isupper
+#define isupper(c) iswupper(btowc(c))
+#undef tolower
+#define tolower(c) towlower(btowc(c))
+#undef toupper
+#define toupper(c) towupper(btowc(c))
+#endif /* _PY_PORT_CTYPE_UTF8_ISSUE && __cplusplus */
+#endif /* __APPLE__ */
+
