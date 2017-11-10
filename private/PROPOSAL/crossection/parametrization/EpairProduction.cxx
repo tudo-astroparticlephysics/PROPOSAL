@@ -40,8 +40,8 @@ EpairProduction::EpairProduction(const ParticleDef& particle_def,
 EpairProduction::EpairProduction(const EpairProduction& epair)
     : Parametrization(epair)
     , v_(epair.v_)
-    , init_lpm_effect_(true)
-    , lpm_(true)
+    , init_lpm_effect_(epair.init_lpm_effect_)
+    , lpm_(epair.lpm_)
     , eLpm_(epair.eLpm_)
 {
 }
@@ -149,11 +149,7 @@ double EpairProduction::FunctionToIntegral(double particle_energy, double r)
     // if lpm supression is taken into account, Phi_e is changed
     if (diagram_e > 0)
     {
-        if (lpm_)
-        {
-            diagram_e = lpm(particle_energy, r2, beta, xi) * diagram_e;
-        }
-        else if (1 / xi < HALF_PRECISION)
+        if (1 / xi < HALF_PRECISION)
         {
             // TODO: where does this short expression come from?
             diagram_e = (1.5 - r2 / 2 + beta * (1 + r2)) / xi * diagram_e;
@@ -178,7 +174,6 @@ double EpairProduction::FunctionToIntegral(double particle_energy, double r)
     {
         diagram_mu = 0;
     }
-
 
     // Calculating the contribution of atomic electrons as scattering partner
     // Phys. Atom. Nucl. 61 (1998), 448
@@ -212,6 +207,11 @@ double EpairProduction::FunctionToIntegral(double particle_energy, double r)
     aux *= aux / (1.5 * PI) * 2 * medium_charge * (medium_charge + atomic_electron_contribution);
     aux1 = ME / particle_def_.mass * particle_def_.charge;;
     aux *=  (1 - v_) / v_ * (diagram_e + aux1*aux1 * diagram_mu);
+
+    if(lpm_)
+    {
+        aux *= lpm(particle_energy, r2, beta, xi);
+    }
 
     if (aux < 0)
     {
@@ -279,7 +279,8 @@ double EpairProduction::lpm(double energy, double r2, double b, double x)
     D     = d1 - d1 * d1 * x * log2;
     E     = -s6 * atan_;
 
-    return ((1 + b) * (A + (1 + r2) * B) + b * (C + (1 + r2) * D) + (1 - r2) * E);
+    return ((1 + b) * (A + (1 + r2) * B) + b * (C + (1 + r2) * D) + (1 - r2) * E)
+            /(((2 + r2)*(1 +b ) + x*(3 + r2))*log(1 +1 /x) + (1 - r2 - b)/(1 + x) - (3 + r2));
 }
 
 // ------------------------------------------------------------------------- //
