@@ -40,8 +40,8 @@ EpairProduction::EpairProduction(const ParticleDef& particle_def,
 EpairProduction::EpairProduction(const EpairProduction& epair)
     : Parametrization(epair)
     , v_(epair.v_)
-    , init_lpm_effect_(true)
-    , lpm_(true)
+    , init_lpm_effect_(epair.init_lpm_effect_)
+    , lpm_(epair.lpm_)
     , eLpm_(epair.eLpm_)
 {
 }
@@ -181,7 +181,6 @@ double EpairProduction::FunctionToIntegral(double particle_energy, double r)
 
     if (lpm_)
     {
-        std::cout << "in lpm" << std::endl;
         double diagram_e_lpm = lpm(particle_energy, r2, beta, xi);
 
         if (diagram_e > 0.0)
