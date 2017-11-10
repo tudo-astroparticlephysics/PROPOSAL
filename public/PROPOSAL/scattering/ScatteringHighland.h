@@ -31,7 +31,6 @@ class ScatteringHighland : public Scattering
 
     virtual Scattering* clone() const { return new ScatteringHighland(*this); }
     virtual Scattering* clone(Particle& particle, const Utility& utility) const { (void) utility; return new ScatteringHighland(particle, *this); }
-    static Scattering* create(Particle& particle, const Medium& medium) { return new ScatteringHighland(particle, medium); }
 
     private:
     ScatteringHighland& operator=(const ScatteringHighland&); // Undefined & not allowed
