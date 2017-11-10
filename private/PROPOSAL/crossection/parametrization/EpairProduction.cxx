@@ -40,8 +40,8 @@ EpairProduction::EpairProduction(const ParticleDef& particle_def,
 EpairProduction::EpairProduction(const EpairProduction& epair)
     : Parametrization(epair)
     , v_(epair.v_)
-    , init_lpm_effect_(true)
-    , lpm_(true)
+    , init_lpm_effect_(epair.init_lpm_effect_)
+    , lpm_(epair.lpm_)
     , eLpm_(epair.eLpm_)
 {
 }
