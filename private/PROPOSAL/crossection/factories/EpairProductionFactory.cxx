@@ -28,7 +28,7 @@ CrossSection* EpairProductionFactory::CreateEpairProduction(const ParticleDef& p
                                                             const EnergyCutSettings& cuts,
                                                             const Definition& def) const
 {
-    return new EpairIntegral(EpairProductionRhoIntegral(particle_def, medium, cuts, def.lpm_effect, def.multiplier));
+    return new EpairIntegral(EpairProductionRhoIntegral(particle_def, medium, cuts, def.multiplier, def.lpm_effect));
 }
 
 // ------------------------------------------------------------------------- //
@@ -39,6 +39,6 @@ CrossSection* EpairProductionFactory::CreateEpairProduction(const ParticleDef& p
                                                             InterpolationDef interpolation_def) const
 {
     return new EpairInterpolant(
-        EpairProductionRhoInterpolant(particle_def, medium, cuts, def.lpm_effect, def.multiplier, interpolation_def),
+        EpairProductionRhoInterpolant(particle_def, medium, cuts, def.multiplier, def.lpm_effect, interpolation_def),
         interpolation_def);
 }
