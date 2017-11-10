@@ -31,6 +31,8 @@ if __name__ == "__main__":
     sec_def.particle_location = pp.ParticleLocation.inside_detector
 
     sec_def.scattering_model = pp.ScatteringModel.moliere
+    sec_def.crosssection_defs.brems_def.lpm_effect = False
+    sec_def.crosssection_defs.epair_def.lpm_effect = False
 
     sec_def.e_cut = 500
     sec_def.v_cut = 0.05
@@ -39,10 +41,9 @@ if __name__ == "__main__":
 
     prop = pp.Propagator(
         particle_def=pp.MuMinusDef.get(),
-        config_file="resources/config_ice.json"
-        # sector_defs=[sec_def],
-        # detector=pp.Sphere(pp.Vector3D(), 0, 1e20),
-        # interpolation_def=interpolation_def
+        sector_defs=[sec_def],
+        detector=pp.Sphere(pp.Vector3D(), 1e20, 0),
+        interpolation_def=interpolation_def
     )
 
     mu = prop.particle
