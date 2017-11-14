@@ -131,6 +131,7 @@ class Sector
     Scattering* GetScattering() const { return scattering_; }
     Particle& GetParticle() const { return particle_; }
     Geometry* GetGeometry() const { return geometry_; }
+    const Utility& GetUtility() const { return utility_; }
     const Medium* GetMedium() const { return &utility_.GetMedium(); }
     // ContinuousRandomization* GetContinuousRandomization() const { return randomizer_; }
 
