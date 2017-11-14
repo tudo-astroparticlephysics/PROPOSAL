@@ -792,6 +792,8 @@ Geometry* Propagator::ParseGeometryConifg(boost::property_tree::ptree& pt)
 
     std::string warning_str = "Geometry %s needs to specify \"%s\" in the config file!";
 
+    double cm_to_meter = 100.0;
+
     // --------------------------------------------------------------------- //
     // Get geometry from default constructor
     // --------------------------------------------------------------------- //
@@ -828,7 +830,7 @@ Geometry* Propagator::ParseGeometryConifg(boost::property_tree::ptree& pt)
         int i = 0;
         for(boost::property_tree::ptree::const_iterator it = child.begin(); it != child.end(); ++it)
         {
-            double coord = it->second.get_value<double>();
+            double coord = it->second.get_value<double>() * cm_to_meter;
 
             switch (i)
             {
@@ -865,7 +867,7 @@ Geometry* Propagator::ParseGeometryConifg(boost::property_tree::ptree& pt)
 
         try
         {
-            radius = pt.get<double>(outer_radius_str);
+            radius = pt.get<double>(outer_radius_str) * cm_to_meter;
         }
         catch(const std::exception& e)
         {
@@ -874,7 +876,7 @@ Geometry* Propagator::ParseGeometryConifg(boost::property_tree::ptree& pt)
 
         try
         {
-            inner_radius = pt.get<double>(inner_radius_str);
+            inner_radius = pt.get<double>(inner_radius_str) * cm_to_meter;
         }
         catch(const std::exception& e)
         {
@@ -894,7 +896,7 @@ Geometry* Propagator::ParseGeometryConifg(boost::property_tree::ptree& pt)
 
         try
         {
-            x = pt.get<double>(lenght_str);
+            x = pt.get<double>(lenght_str) * cm_to_meter;
         }
         catch(const std::exception& e)
         {
@@ -903,7 +905,7 @@ Geometry* Propagator::ParseGeometryConifg(boost::property_tree::ptree& pt)
 
         try
         {
-            y = pt.get<double>(width_str);
+            y = pt.get<double>(width_str) * cm_to_meter;
         }
         catch(const std::exception& e)
         {
@@ -912,7 +914,7 @@ Geometry* Propagator::ParseGeometryConifg(boost::property_tree::ptree& pt)
 
         try
         {
-            z = pt.get<double>(height_str);
+            z = pt.get<double>(height_str) * cm_to_meter;
         }
         catch(const std::exception& e)
         {
@@ -932,7 +934,7 @@ Geometry* Propagator::ParseGeometryConifg(boost::property_tree::ptree& pt)
 
         try
         {
-            radius = pt.get<double>(outer_radius_str);
+            radius = pt.get<double>(outer_radius_str) * cm_to_meter;
         }
         catch(const std::exception& e)
         {
@@ -941,7 +943,7 @@ Geometry* Propagator::ParseGeometryConifg(boost::property_tree::ptree& pt)
 
         try
         {
-            inner_radius = pt.get<double>(inner_radius_str);
+            inner_radius = pt.get<double>(inner_radius_str) * cm_to_meter;
         }
         catch(const std::exception& e)
         {
@@ -949,7 +951,7 @@ Geometry* Propagator::ParseGeometryConifg(boost::property_tree::ptree& pt)
         }
         try
         {
-            z = pt.get<double>(height_str);
+            z = pt.get<double>(height_str) * cm_to_meter;
         }
         catch(const std::exception& e)
         {
