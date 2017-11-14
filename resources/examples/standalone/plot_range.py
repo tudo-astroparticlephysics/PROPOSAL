@@ -2,7 +2,7 @@ import pyPROPOSAL as pp
 
 try:
     import matplotlib as mpl
-    # mpl.use('Agg')
+    mpl.use('Agg')
     import matplotlib.pyplot as plt
 except ImportError:
     raise ImportError("Matplotlib not installed!")
