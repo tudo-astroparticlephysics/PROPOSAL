@@ -224,6 +224,12 @@ I3Particle::ParticleType I3PropagatorServicePROPOSAL::GenerateI3Type(const PROPO
         else if (particle_def == EPlusDef::Get()) return I3Particle::EPlus;
         else if (particle_def == TauMinusDef::Get()) return I3Particle::TauMinus;
         else if (particle_def == TauPlusDef::Get()) return I3Particle::TauPlus;
+        else if (particle_def == NuEDef::Get()) return I3Particle::NuE;
+        else if (particle_def == NuEBarDef::Get()) return I3Particle::NuEBar;
+        else if (particle_def == NuMuDef::Get()) return I3Particle::NuMu;
+        else if (particle_def == NuMuBarDef::Get()) return I3Particle::NuMuBar;
+        else if (particle_def == NuTauDef::Get()) return I3Particle::NuTau;
+        else if (particle_def == NuTauBarDef::Get()) return I3Particle::NuTauBar;
         else
         {
             log_fatal("PROPOSALParticle '%s' can not be converted to a I3Particle" , particle_def.name.c_str());
@@ -304,7 +310,6 @@ I3MMCTrackPtr I3PropagatorServicePROPOSAL::propagate( I3Particle& p, vector<I3Pa
 
     // log_debug("Name of particle to propagate: %s", PROPOSALParticle::GetName(GeneratePROPOSALType(p)).c_str());
 
-
     PROPOSAL::Particle& particle = proposal_->GetParticle();
 
     particle.SetPosition(PROPOSAL::Vector3D(x_0, y_0, z_0));
@@ -316,6 +321,7 @@ I3MMCTrackPtr I3PropagatorServicePROPOSAL::propagate( I3Particle& p, vector<I3Pa
     particle.SetEnergy(e_0);
     particle.SetTime(t_0);
 
+    std::cout << particle.GetDirection() << std::endl;
     proposal_->Propagate();
 
     std::vector<DynamicData*> secondaries = Output::getInstance().GetSecondarys();
