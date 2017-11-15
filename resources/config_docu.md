@@ -40,7 +40,7 @@ Or the time is calculated by simply deviding distance by the speed of light.
 There are four different multiple scattering parametrizations describing the deviation of the propagation direction.
   - `"Moliere"` Parametrization of [Moliere](http://zfn.mpdl.mpg.de/data/Reihe_A/3/ZNA-1948-3a-0078.pdf)
   - `"Highland"` First Order approximation (a gaussian function) of Moliere's theory derived by [Highland](https://doi.org/10.1016/0029-554X(75)90743-0) and corrected by [Lynch/Dahl](https://doi.org/10.1016/0168-583X(91)95671-Y).
-  - `"HighlandWithIntegral"` From the old PROPOSAL version (wich had just this scattering mode). Also using Highland approximation (corrected by Lynch/Dahl), but taking into account the energy dependence of the propagted distance
+  - `"Highland-Integral"` From the old PROPOSAL version (wich had just this scattering mode). Also using Highland approximation (corrected by Lynch/Dahl), but taking into account the energy dependence of the propagted distance
   - `"NoScattering"` Here the particle always propagate in the initial direction without deviation from the propagation axes.
 
 If a particle gets below a lower threshold energy (this is a property of a particle that should be defined in the Particle Definitions and is by default the same as the particle mass) but hasn't decayed, it can get forced to stop and to decay.
