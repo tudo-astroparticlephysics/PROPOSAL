@@ -67,7 +67,7 @@ public:
    */
   static I3Particle to_I3Particle(const PROPOSAL::DynamicData&);
   // static ParticleType::Enum GeneratePROPOSALType(const I3Particle &p);
-  static I3Particle::ParticleType GenerateI3Type(const PROPOSAL::DynamicData&);
+  // static I3Particle::ParticleType GenerateI3Type(const PROPOSAL::DynamicData&);
 
   PROPOSAL::Propagator *GetImplementation() { return propagator_; };
 

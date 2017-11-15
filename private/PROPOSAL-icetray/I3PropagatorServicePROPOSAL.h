@@ -27,58 +27,52 @@ class I3Particle;
  * @author olivas
  */
 
-namespace PROPOSAL{
+namespace PROPOSAL {
 
-class I3PropagatorServicePROPOSAL : public I3PropagatorService {
+class I3PropagatorServicePROPOSAL : public I3PropagatorService
+{
 public:
-
-  SET_LOGGER("I3PropagatorService");
+    SET_LOGGER("I3PropagatorService");
 
 public:
+    I3PropagatorServicePROPOSAL(I3Particle::ParticleType, std::string configfile = "");
 
-  I3PropagatorServicePROPOSAL(I3Particle::ParticleType, std::string configfile="");
+    virtual ~I3PropagatorServicePROPOSAL();
 
-  virtual ~I3PropagatorServicePROPOSAL();
+    virtual std::vector<I3Particle> Propagate(I3Particle& p, DiagnosticMapPtr frame, I3FramePtr);
+    void SetTearDownPerCall(bool f) { tearDownPerCall_ = f; }
+    virtual void SetRandomNumberGenerator(I3RandomServicePtr random);
 
-  virtual std::vector<I3Particle> Propagate(I3Particle& p, DiagnosticMapPtr frame, I3FramePtr);
-  void SetTearDownPerCall(bool f) { tearDownPerCall_ = f; }
-  virtual void SetRandomNumberGenerator(I3RandomServicePtr random);
+    static std::string GetDefaultConfigFile();
 
-  static std::string GetDefaultConfigFile();
+private:
+    /** @brief Tear down and re-initialize the propagator on every call to Propagate().
+     * This is used for tests that ensure that propagation results do not depend
+     * on event-to-event state.
+     */
 
- private:
+    bool tearDownPerCall_;
+    I3RandomServicePtr rng_;
 
-  /** @brief Tear down and re-initialize the propagator on every call to Propagate().
-   * This is used for tests that ensure that propagation results do not depend
-   * on event-to-event state.
-   */
+    ParticleDef particle_def_;
+    std::string config_file_;
+    Propagator proposal_;
 
-  bool tearDownPerCall_;
-  I3RandomServicePtr rng_;
+    // default, assignment, and copy constructor declared private
+    // I3PropagatorServicePROPOSAL();
+    I3PropagatorServicePROPOSAL(const I3PropagatorServicePROPOSAL&);
+    I3PropagatorServicePROPOSAL& operator=(const I3PropagatorServicePROPOSAL&);
 
-  ParticleDef particle_def_;
-  std::string config_file_;
-  Propagator *proposal_;
+    /**
+     *Fills an I3MMCTrackList with position, time, and energy
+     *information if the particle is a muon or a tau.
+     */
+    boost::shared_ptr<I3MMCTrack> GenerateMMCTrack(PROPOSAL::Particle* particle);
 
-
-  // default, assignment, and copy constructor declared private
-  // I3PropagatorServicePROPOSAL();
-  I3PropagatorServicePROPOSAL(const I3PropagatorServicePROPOSAL&);
-  I3PropagatorServicePROPOSAL& operator=(const I3PropagatorServicePROPOSAL&);
-
-  ParticleDef GeneratePROPOSALParticleDef(I3Particle::ParticleType);
-  I3Particle::ParticleType GenerateI3Type(const PROPOSAL::DynamicData&);
-
-  /**
-   *Fills an I3MMCTrackList with position, time, and energy
-   *information if the particle is a muon or a tau.
-   */
-  boost::shared_ptr<I3MMCTrack> GenerateMMCTrack(PROPOSAL::Particle* particle);
-
-  boost::shared_ptr<I3MMCTrack> propagate(I3Particle& p, std::vector<I3Particle>& daughters);
-
+    boost::shared_ptr<I3MMCTrack> propagate(I3Particle& p, std::vector<I3Particle>& daughters);
 };
-I3_POINTER_TYPEDEFS(I3PropagatorServicePROPOSAL);
-}
 
-#endif //I3PROPAGATORSERVICEPROPOSAL_H
+I3_POINTER_TYPEDEFS(I3PropagatorServicePROPOSAL);
+} // namespace PROPOSAL
+
+#endif // I3PROPAGATORSERVICEPROPOSAL_H

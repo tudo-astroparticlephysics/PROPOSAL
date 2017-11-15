@@ -12,6 +12,7 @@
 #include <boost/bimap.hpp>
 
 #include "PROPOSAL-icetray/SimplePropagator.h"
+#include "PROPOSAL-icetray/Converter.h"
 
 #include "PROPOSAL/Output.h"
 
@@ -119,37 +120,37 @@ SimplePropagator::SetRandomNumberGenerator(I3RandomServicePtr rng)
     PROPOSAL::RandomGenerator::Get().SetRandomNumberGenerator(f);
 }
 
-typedef boost::bimap<I3Particle::ParticleType, std::string> bimap_ParticleType;
-static const bimap_ParticleType I3_PROPOSAL_ParticleType_bimap = boost::assign::list_of<bimap_ParticleType::relation>
-    (I3Particle::MuMinus,   "MuMinus")
-    (I3Particle::MuPlus,    "MuPlus")
-    (I3Particle::TauMinus,  "TauMinus")
-    (I3Particle::TauPlus,   "TauPlus")
-    (I3Particle::EMinus,    "EMinus")
-    (I3Particle::EPlus,     "EPlus")
-    (I3Particle::NuMu,      "NuMu")
-    (I3Particle::NuMuBar,   "NuMuBar")
-    (I3Particle::NuE,       "NuE")
-    (I3Particle::NuEBar,    "NuEBar")
-    (I3Particle::NuTau,     "NuTau")
-    (I3Particle::NuTauBar,  "NuTauBar")
-    (I3Particle::Brems,     "Brems")
-    (I3Particle::DeltaE,    "DeltaE")
-    (I3Particle::PairProd,  "EPair")
-    (I3Particle::NuclInt,   "NuclInt")
-    (I3Particle::MuPair,    "MuPair")
-    (I3Particle::Hadrons,   "Hadrons")
-    (I3Particle::Monopole,  "Monopole")
-    (I3Particle::STauMinus, "STauMinus")
-    (I3Particle::STauPlus,  "STauPlus")
-    (I3Particle::Gamma,     "Gamma")
-    (I3Particle::Pi0,       "Pi0")
-    (I3Particle::PiPlus,    "PiPlus")
-    (I3Particle::PiMinus,   "PiMinus")
-    (I3Particle::KPlus,     "KPlus")
-    (I3Particle::KMinus,    "KMinus")
-    (I3Particle::PPlus,     "PPlus")
-    (I3Particle::PMinus,    "PMinus");
+// typedef boost::bimap<I3Particle::ParticleType, std::string> bimap_ParticleType;
+// static const bimap_ParticleType I3_PROPOSAL_ParticleType_bimap = boost::assign::list_of<bimap_ParticleType::relation>
+//     (I3Particle::MuMinus,   "MuMinus")
+//     (I3Particle::MuPlus,    "MuPlus")
+//     (I3Particle::TauMinus,  "TauMinus")
+//     (I3Particle::TauPlus,   "TauPlus")
+//     (I3Particle::EMinus,    "EMinus")
+//     (I3Particle::EPlus,     "EPlus")
+//     (I3Particle::NuMu,      "NuMu")
+//     (I3Particle::NuMuBar,   "NuMuBar")
+//     (I3Particle::NuE,       "NuE")
+//     (I3Particle::NuEBar,    "NuEBar")
+//     (I3Particle::NuTau,     "NuTau")
+//     (I3Particle::NuTauBar,  "NuTauBar")
+//     (I3Particle::Brems,     "Brems")
+//     (I3Particle::DeltaE,    "DeltaE")
+//     (I3Particle::PairProd,  "EPair")
+//     (I3Particle::NuclInt,   "NuclInt")
+//     (I3Particle::MuPair,    "MuPair")
+//     (I3Particle::Hadrons,   "Hadrons")
+//     (I3Particle::Monopole,  "Monopole")
+//     (I3Particle::STauMinus, "STauMinus")
+//     (I3Particle::STauPlus,  "STauPlus")
+//     (I3Particle::Gamma,     "Gamma")
+//     (I3Particle::Pi0,       "Pi0")
+//     (I3Particle::PiPlus,    "PiPlus")
+//     (I3Particle::PiMinus,   "PiMinus")
+//     (I3Particle::KPlus,     "KPlus")
+//     (I3Particle::KMinus,    "KMinus")
+//     (I3Particle::PPlus,     "PPlus")
+//     (I3Particle::PMinus,    "PMinus");
 
 
 // ------------------------------------------------------------------------- //
@@ -170,36 +171,36 @@ static const bimap_ParticleType I3_PROPOSAL_ParticleType_bimap = boost::assign::
 //     return ptype_PROPOSAL;
 // }
 
-I3Particle::ParticleType SimplePropagator::GenerateI3Type(const PROPOSAL::DynamicData& secondary)
-{
-    DynamicData::Type type = secondary.GetTypeId();
-
-    if (type == DynamicData::Particle)
-    {
-        const PROPOSAL::Particle& particle = static_cast<const PROPOSAL::Particle&>(secondary);
-        ParticleDef particle_def = particle.GetParticleDef();
-
-        I3Particle::ParticleType ptype_I3;
-
-        bimap_ParticleType::right_const_iterator proposal_iterator = I3_PROPOSAL_ParticleType_bimap.right.find(particle_def.name);
-        if (proposal_iterator == I3_PROPOSAL_ParticleType_bimap.right.end())
-        {
-            log_fatal("The PROPOSALParticle '%s' can not be converted to a I3Particle", particle_def.name.c_str());
-        }
-        else
-        {
-            return proposal_iterator->second;
-        }
-    }
-    else if(type == DynamicData::Brems) return I3Particle::Brems;
-    else if(type == DynamicData::Epair) return I3Particle::PairProd;
-    else if(type == DynamicData::DeltaE) return I3Particle::DeltaE;
-    else if(type == DynamicData::NuclInt) return I3Particle::NuclInt;
-    else
-    {
-        log_fatal("PROPOSAL Particle can not be converted to a I3Particle");
-    }
-}
+// I3Particle::ParticleType SimplePropagator::GenerateI3Type(const PROPOSAL::DynamicData& secondary)
+// {
+//     DynamicData::Type type = secondary.GetTypeId();
+//
+//     if (type == DynamicData::Particle)
+//     {
+//         const PROPOSAL::Particle& particle = static_cast<const PROPOSAL::Particle&>(secondary);
+//         ParticleDef particle_def = particle.GetParticleDef();
+//
+//         I3Particle::ParticleType ptype_I3;
+//
+//         bimap_ParticleType::right_const_iterator proposal_iterator = I3_PROPOSAL_ParticleType_bimap.right.find(particle_def.name);
+//         if (proposal_iterator == I3_PROPOSAL_ParticleType_bimap.right.end())
+//         {
+//             log_fatal("The PROPOSALParticle '%s' can not be converted to a I3Particle", particle_def.name.c_str());
+//         }
+//         else
+//         {
+//             return proposal_iterator->second;
+//         }
+//     }
+//     else if(type == DynamicData::Brems) return I3Particle::Brems;
+//     else if(type == DynamicData::Epair) return I3Particle::PairProd;
+//     else if(type == DynamicData::DeltaE) return I3Particle::DeltaE;
+//     else if(type == DynamicData::NuclInt) return I3Particle::NuclInt;
+//     else
+//     {
+//         log_fatal("PROPOSAL Particle can not be converted to a I3Particle");
+//     }
+// }
 
 I3Particle SimplePropagator::to_I3Particle(const PROPOSAL::DynamicData& pp)
 {
@@ -217,7 +218,7 @@ I3Particle SimplePropagator::to_I3Particle(const PROPOSAL::DynamicData& pp)
     p.SetLength(pp.GetPropagatedDistance() * I3Units::cm);
     p.SetTime(pp.GetTime() * I3Units::second);
 
-	p.SetType(GenerateI3Type(pp));
+	p.SetType(I3PROPOSALParticleConverter::GenerateI3Type(pp));
     p.SetLocationType(I3Particle::InIce);
     p.SetEnergy(pp.GetEnergy()*I3Units::MeV);
 
