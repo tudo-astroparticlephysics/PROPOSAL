@@ -60,7 +60,8 @@ bool IsWritable(std::string table_dir)
 I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(I3Particle::ParticleType ptype, std::string configfile)
     : tearDownPerCall_(false)
     , particle_def_(GeneratePROPOSALParticleDef(ptype))
-    , config_file_(configfile.empty() || !boost::filesystem::exists(configfile) ? GetDefaultConfigFile() : configfile)
+    // , config_file_(configfile.empty() || !boost::filesystem::exists(configfile) ? GetDefaultConfigFile() : configfile)
+    , config_file_(configfile.empty() ? GetDefaultConfigFile() : configfile)
     , proposal_(new Propagator(particle_def_, config_file_))
 {
 }
@@ -79,7 +80,7 @@ std::string I3PropagatorServicePROPOSAL::GetDefaultConfigFile()
 		log_fatal("$I3_BUILD is not set!");
 	std::string s(I3_BUILD);
 
-    return s + "/PROPOSAL/resources/config.json";
+    return s + "/PROPOSAL/resources/config_icesim.json";
 }
 
 // ------------------------------------------------------------------------- //
@@ -303,13 +304,15 @@ I3MMCTrackPtr I3PropagatorServicePROPOSAL::propagate( I3Particle& p, vector<I3Pa
     double x_0 = p.GetPos().GetX()/I3Units::cm;     // [cm]
     double y_0 = p.GetPos().GetY()/I3Units::cm;    // [cm]
     double z_0 = p.GetPos().GetZ()/I3Units::cm;     // [cm]
-    double theta_0 = p.GetDir().CalcTheta()/I3Units::deg; // [deg]
-    double phi_0 = p.GetDir().CalcPhi()/I3Units::deg;   // [deg]
+    // double theta_0 = p.GetDir().CalcTheta()/I3Units::deg; // [deg]
+    // double phi_0 = p.GetDir().CalcPhi()/I3Units::deg;   // [deg]
+    double theta_0 = p.GetDir().CalcTheta(); // [rad]
+    double phi_0 = p.GetDir().CalcPhi();   // [rad]
     double e_0 = p.GetEnergy()/I3Units::MeV;  // [MeV]
     double t_0 = p.GetTime()/I3Units::s;     // [s]
+    double lenght = p.GetLength(); // [m]
 
     // log_debug("Name of particle to propagate: %s", PROPOSALParticle::GetName(GeneratePROPOSALType(p)).c_str());
-
     PROPOSAL::Particle& particle = proposal_->GetParticle();
 
     particle.SetPosition(PROPOSAL::Vector3D(x_0, y_0, z_0));
@@ -320,11 +323,11 @@ I3MMCTrackPtr I3PropagatorServicePROPOSAL::propagate( I3Particle& p, vector<I3Pa
     particle.SetDirection(direction);
     particle.SetEnergy(e_0);
     particle.SetTime(t_0);
+    particle.SetPropagatedDistance(lenght);
 
-    std::cout << particle.GetDirection() << std::endl;
-    proposal_->Propagate();
+    std::vector<DynamicData*> secondaries = proposal_->Propagate();
 
-    std::vector<DynamicData*> secondaries = Output::getInstance().GetSecondarys();
+     // = Output::getInstance().GetSecondarys();
     //get the propagated length of the particle
     double length = particle.GetPropagatedDistance();
 
