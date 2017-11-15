@@ -32,20 +32,20 @@ for i in range(10000):
 try:
     import matplotlib as mpl
     mpl.use('Agg')
-    import pylab
+    import matplotlib.pyplot as plt
 
-    pylab.figure()
-    pylab.title(str(mu.energy) + " GeV Muon Lengths")
-    pylab.hist(mu_length, histtype = "step", log = True, bins = 100)
-    pylab.xlabel(r'$l_{\mu}(\rm{m})$')
-    pylab.savefig('muon_Lenghts.png')
+    plt.figure()
+    plt.title(str(mu.energy) + " GeV Muon Lengths")
+    plt.hist(mu_length, histtype = "step", log = True, bins = 100)
+    plt.xlabel(r'$l_{\mu}(\rm{m})$')
+    plt.savefig('muon_Lenghts.png')
 
-    pylab.figure()
-    pylab.title("N Daughters of " + str(mu.energy) + "GeV Muon")
-    pylab.hist(n_daughters, histtype = "step", log = True, bins = 100)
-    pylab.xlabel('N')
-    pylab.savefig('muon_Daughters.png')
+    plt.figure()
+    plt.title("N Daughters of " + str(mu.energy) + "GeV Muon")
+    plt.hist(n_daughters, histtype = "step", log = True, bins = 100)
+    plt.xlabel('N')
+    plt.savefig('muon_Daughters.png')
 except ImportError :
-    print("pylab not installed.  no plots for you.")
+    print("matplotlib not installed.  no plots for you.")
 
 
