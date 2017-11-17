@@ -44,12 +44,12 @@ bool CrossSectionInterpolant::compare(const CrossSection& cross_section) const
 
     for (unsigned int i = 0; i < dndx_interpolant_1d_.size(); ++i)
     {
-        if (dndx_interpolant_1d_[i] != cross_section_interpolant->dndx_interpolant_1d_[i])
+        if (*dndx_interpolant_1d_[i] != *cross_section_interpolant->dndx_interpolant_1d_[i])
             return false;
     }
     for (unsigned int i = 0; i < dndx_interpolant_2d_.size(); ++i)
     {
-        if (dndx_interpolant_2d_[i] != cross_section_interpolant->dndx_interpolant_2d_[i])
+        if (*dndx_interpolant_2d_[i] != *cross_section_interpolant->dndx_interpolant_2d_[i])
             return false;
     }
 
