@@ -35,13 +35,14 @@ public:
     SET_LOGGER("I3PropagatorService");
 
 public:
-    I3PropagatorServicePROPOSAL(I3Particle::ParticleType, std::string configfile = "");
+    I3PropagatorServicePROPOSAL(std::string configfile = "");
 
     virtual ~I3PropagatorServicePROPOSAL();
 
     virtual std::vector<I3Particle> Propagate(I3Particle& p, DiagnosticMapPtr frame, I3FramePtr);
     void SetTearDownPerCall(bool f) { tearDownPerCall_ = f; }
     virtual void SetRandomNumberGenerator(I3RandomServicePtr random);
+    virtual void RegisterParticleType(I3Particle::ParticleType);
 
     static std::string GetDefaultConfigFile();
 
@@ -54,9 +55,8 @@ private:
     bool tearDownPerCall_;
     I3RandomServicePtr rng_;
 
-    ParticleDef particle_def_;
     std::string config_file_;
-    Propagator proposal_;
+    PropagatorService proposal_service_;
 
     // default, assignment, and copy constructor declared private
     // I3PropagatorServicePROPOSAL();
