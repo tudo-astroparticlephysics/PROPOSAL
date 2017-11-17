@@ -26,7 +26,16 @@ class PropagatorService
         ///
         /// @param Propagator
         // ----------------------------------------------------------------------------
-        void RegisterPropagator(Propagator&);
+        void RegisterPropagator(const Propagator&);
+
+        // ----------------------------------------------------------------------------
+        /// @brief Check if a propagator is registered for the given particle definition
+        ///
+        /// @param ParticleDef
+        ///
+        /// @return bool
+        // ----------------------------------------------------------------------------
+        bool IsRegistered(const ParticleDef&);
 
         // ----------------------------------------------------------------------------
         /// @brief Propagate the given particle
