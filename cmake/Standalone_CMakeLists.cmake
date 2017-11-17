@@ -5,6 +5,29 @@ IF(APPLE)
 	SET(CMAKE_MACOSX_RPATH 1)
 ENDIF(APPLE)
 
+### always full RPATH
+
+# use, i.e. don't skip the full RPATH for the build tree
+SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
+
+# when building, don't use the install RPATH already
+# (but later on when installing)
+SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE) 
+
+SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+
+# add the automatically determined parts of the RPATH
+# which point to directories outside the build tree to the install RPATH
+SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+
+# the RPATH to be used when installing, but only if it's not a system directory
+LIST(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir)
+IF("${isSystemDir}" STREQUAL "-1")
+  SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+ENDIF("${isSystemDir}" STREQUAL "-1")
+
+### end always full RPATH
+
 ADD_DEFINITIONS(-DPROPOSAL_STANDALONE=1)
 
 SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -65,7 +88,7 @@ ENDIF(ADD_PYTHON)
 IF(ADD_ROOT)
 	MESSAGE(STATUS "Enabled ROOT support.")
 	# Load some basic macros which are needed later on
-	INCLUDE(FindROOT.cmake)
+	INCLUDE(cmake/FindROOT_new.cmake)
 
 	#if ROOT is found ROOT files with ROOT trees can be written
 	IF(ROOT_FOUND)
@@ -89,7 +112,7 @@ ENDIF(ADD_ROOT)
 #################           log4cplus     #######################
 #################################################################
 
-INCLUDE(resources/FindLog4cplus.cmake)
+INCLUDE(cmake/FindLog4cplus.cmake)
 
 IF(LOG4CPLUS_FOUND)
     ADD_DEFINITIONS(-DLOG4CPLUS_SUPPORT=1)

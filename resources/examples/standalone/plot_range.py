@@ -2,7 +2,7 @@ import pyPROPOSAL as pp
 
 try:
     import matplotlib as mpl
-    # mpl.use('Agg')
+    mpl.use('Agg')
     import matplotlib.pyplot as plt
 except ImportError:
     raise ImportError("Matplotlib not installed!")
@@ -39,11 +39,11 @@ if __name__ == "__main__":
 
     interpolation_def = pp.InterpolationDef()
 
-    prop = pp.Propagator(
-        particle_def=pp.MuMinusDef.get(),
-        sector_defs=[sec_def],
-        detector=pp.Sphere(pp.Vector3D(), 1e20, 0),
-        interpolation_def=interpolation_def
+    prop = pp.Propagator(particle_def=pp.MuMinusDef.get()
+        # , config_file="resources/config.json"
+        , sector_defs=[sec_def]
+        , detector=pp.Sphere(pp.Vector3D(), 1e20, 0)
+        , interpolation_def=interpolation_def
     )
 
     mu = prop.particle
