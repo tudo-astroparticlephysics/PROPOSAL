@@ -5,8 +5,7 @@ import os
 from icecube.dataclasses import I3Particle
 from icecube.PROPOSAL import I3PropagatorServicePROPOSAL
 
-I3PropagatorServicePROPOSAL(type=I3Particle.MuMinus)
-I3PropagatorServicePROPOSAL(type=I3Particle.TauMinus)
+I3PropagatorServicePROPOSAL()
 
 # This should have generated all data files.
 # Generate a marker file to tell the build system this task

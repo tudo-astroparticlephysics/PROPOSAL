@@ -56,13 +56,13 @@ bool IsWritable(std::string table_dir)
 }
 
 // ------------------------------------------------------------------------- //
-I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(I3Particle::ParticleType ptype, std::string configfile)
+I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(std::string configfile)
     : tearDownPerCall_(false)
-    , particle_def_(I3PROPOSALParticleConverter::GeneratePROPOSALType(ptype))
-    // , config_file_(configfile.empty() || !boost::filesystem::exists(configfile) ? GetDefaultConfigFile() : configfile)
     , config_file_(configfile.empty() ? GetDefaultConfigFile() : configfile)
-    , proposal_(particle_def_, config_file_)
+    , proposal_service_()
 {
+    proposal_service_.RegisterPropagator(Propagator(MuMinusDef::Get(), config_file_));
+    proposal_service_.RegisterPropagator(Propagator(TauMinusDef::Get(), config_file_));
 }
 
 // ------------------------------------------------------------------------- //
@@ -88,6 +88,13 @@ void I3PropagatorServicePROPOSAL::SetRandomNumberGenerator(I3RandomServicePtr ra
     boost::function<double ()> f = boost::bind(&I3RandomService::Uniform, random, 0, 1);
 
     PROPOSAL::RandomGenerator::Get().SetRandomNumberGenerator(f);
+}
+
+// ------------------------------------------------------------------------- //
+void I3PropagatorServicePROPOSAL::RegisterParticleType(I3Particle::ParticleType ptype)
+{
+    ParticleDef particle_def = I3PROPOSALParticleConverter::GeneratePROPOSALType(ptype);
+    proposal_service_.RegisterPropagator(Propagator(particle_def, config_file_));
 }
 
 // ------------------------------------------------------------------------- //
@@ -155,143 +162,6 @@ std::vector<I3Particle> I3PropagatorServicePROPOSAL::Propagate(I3Particle& p, Di
     return daughters;
 }
 
-typedef boost::bimap<I3Particle::ParticleType, ParticleType::Enum> bimap_ParticleType;
-static const bimap_ParticleType I3_PROPOSAL_ParticleType_bimap = boost::assign::list_of<bimap_ParticleType::relation>
-    (I3Particle::MuMinus,   ParticleType::MuMinus)
-    (I3Particle::MuPlus,    ParticleType::MuPlus)
-    (I3Particle::TauMinus,  ParticleType::TauMinus)
-    (I3Particle::TauPlus,   ParticleType::TauPlus)
-    (I3Particle::EMinus,    ParticleType::EMinus)
-    (I3Particle::EPlus,     ParticleType::EPlus)
-    (I3Particle::NuMu,      ParticleType::NuMu)
-    (I3Particle::NuMuBar,   ParticleType::NuMuBar)
-    (I3Particle::NuE,       ParticleType::NuE)
-    (I3Particle::NuEBar,    ParticleType::NuEBar)
-    (I3Particle::NuTau,     ParticleType::NuTau)
-    (I3Particle::NuTauBar,  ParticleType::NuTauBar)
-    (I3Particle::Brems,     ParticleType::Brems)
-    (I3Particle::DeltaE,    ParticleType::DeltaE)
-    (I3Particle::PairProd,  ParticleType::EPair)
-    (I3Particle::NuclInt,   ParticleType::NuclInt)
-    (I3Particle::MuPair,    ParticleType::MuPair)
-    (I3Particle::Hadrons,   ParticleType::Hadrons)
-    (I3Particle::Monopole,  ParticleType::Monopole)
-    (I3Particle::STauMinus, ParticleType::STauMinus)
-    (I3Particle::STauPlus,  ParticleType::STauPlus)
-    // (I3Particle::SMP,       ParticleType::StableMassiveParticle)
-    (I3Particle::Gamma,     ParticleType::Gamma)
-    (I3Particle::Pi0,       ParticleType::Pi0)
-    (I3Particle::PiPlus,    ParticleType::PiPlus)
-    (I3Particle::PiMinus,   ParticleType::PiMinus)
-    (I3Particle::KPlus,     ParticleType::KPlus)
-    (I3Particle::KMinus,    ParticleType::KMinus)
-    (I3Particle::PPlus,     ParticleType::PPlus)
-    (I3Particle::PMinus,    ParticleType::PMinus);
-
-
-// ------------------------------------------------------------------------- //
-// PROPOSAL::ParticleDef I3PropagatorServicePROPOSAL::GeneratePROPOSALParticleDef(I3Particle::ParticleType ptype_I3)
-// {
-//     if (ptype_I3 == I3Particle::MuMinus) return MuMinusDef::Get();
-//     else if (ptype_I3 == I3Particle::MuPlus) return MuPlusDef::Get();
-//     else if (ptype_I3 == I3Particle::EMinus) return EMinusDef::Get();
-//     else if (ptype_I3 == I3Particle::EPlus) return EPlusDef::Get();
-//     else if (ptype_I3 == I3Particle::TauMinus) return TauMinusDef::Get();
-//     else if (ptype_I3 == I3Particle::TauPlus) return TauPlusDef::Get();
-//     else
-//     {
-//
-//         I3Particle i3particle;
-//         i3particle.SetType(ptype_I3);
-//
-//         log_fatal("The I3Particle '%s' with type '%i' can not be converted to a PROPOSALParticle"
-//             , i3particle.GetTypeString().c_str(), ptype_I3);
-//     }
-// }
-
-// I3Particle::ParticleType I3PropagatorServicePROPOSAL::GenerateI3Type(const PROPOSAL::DynamicData& secondary)
-// {
-//     DynamicData::Type type = secondary.GetTypeId();
-//
-//     if (type == DynamicData::Particle)
-//     {
-//         const PROPOSAL::Particle& particle = static_cast<const PROPOSAL::Particle&>(secondary);
-//         ParticleDef particle_def = particle.GetParticleDef();
-//         if (particle_def == MuMinusDef::Get()) return I3Particle::MuMinus;
-//         else if (particle_def == MuPlusDef::Get()) return I3Particle::MuPlus;
-//         else if (particle_def == EMinusDef::Get()) return I3Particle::EMinus;
-//         else if (particle_def == EPlusDef::Get()) return I3Particle::EPlus;
-//         else if (particle_def == TauMinusDef::Get()) return I3Particle::TauMinus;
-//         else if (particle_def == TauPlusDef::Get()) return I3Particle::TauPlus;
-//         else if (particle_def == NuEDef::Get()) return I3Particle::NuE;
-//         else if (particle_def == NuEBarDef::Get()) return I3Particle::NuEBar;
-//         else if (particle_def == NuMuDef::Get()) return I3Particle::NuMu;
-//         else if (particle_def == NuMuBarDef::Get()) return I3Particle::NuMuBar;
-//         else if (particle_def == NuTauDef::Get()) return I3Particle::NuTau;
-//         else if (particle_def == NuTauBarDef::Get()) return I3Particle::NuTauBar;
-//         else
-//         {
-//             log_fatal("PROPOSALParticle '%s' can not be converted to a I3Particle" , particle_def.name.c_str());
-//         }
-//     }
-//     else if(type == DynamicData::Brems) return I3Particle::Brems;
-//     else if(type == DynamicData::Epair) return I3Particle::PairProd;
-//     else if(type == DynamicData::DeltaE) return I3Particle::DeltaE;
-//     else if(type == DynamicData::NuclInt) return I3Particle::NuclInt;
-//     else
-//     {
-//         log_fatal("PROPOSALParticle can not be converted to a I3Particle");
-//     }
-//
-//
-//     // bimap_ParticleType::right_const_iterator proposal_iterator = I3_PROPOSAL_ParticleType_bimap.right.find(ptype_PROPOSAL);
-//     // if (proposal_iterator == I3_PROPOSAL_ParticleType_bimap.right.end())
-//     // {
-//     //     log_fatal("The PROPOSALParticle '%s' with type '%i' can not be converted to a I3Particle"
-//     //         , PROPOSALParticle::GetName(ptype_PROPOSAL).c_str(), ptype_PROPOSAL);
-//     // }
-//
-//     // ptype_I3 = I3_PROPOSAL_ParticleType_bimap.right.find(ptype_PROPOSAL) -> second;
-// }
-
-// ------------------------------------------------------------------------- //
-I3MMCTrackPtr I3PropagatorServicePROPOSAL::GenerateMMCTrack(PROPOSAL::Particle* particle){
-
-    //explicitly specifying the units from MMC
-    double xi = particle->GetEntryPoint().GetX() * I3Units::m;
-    double yi = particle->GetEntryPoint().GetY() * I3Units::m;
-    double zi = particle->GetEntryPoint().GetZ() * I3Units::m;
-    double ti = particle->GetEntryTime() * I3Units::second;
-    double Ei = particle->GetEntryEnergy() * I3Units::GeV;
-
-    double xf = particle->GetExitPoint().GetX() * I3Units::m;
-    double yf = particle->GetExitPoint().GetY() * I3Units::m;
-    double zf = particle->GetExitPoint().GetZ() * I3Units::m;
-    double tf = particle->GetExitTime() * I3Units::second;
-    double Ef = particle->GetExitEnergy() * I3Units::GeV;
-
-    double xc = particle->GetClosestApproachPoint().GetX() * I3Units::m;
-    double yc = particle->GetClosestApproachPoint().GetY() * I3Units::m;
-    double zc = particle->GetClosestApproachPoint().GetZ() * I3Units::m;
-    double tc = particle->GetClosestApproachTime() * I3Units::second;
-    double Ec = particle->GetClosestApproachEnergy() * I3Units::GeV;
-
-    I3MMCTrackPtr mmcTrack( new I3MMCTrack);
-    mmcTrack->SetEnter(xi,yi,zi,ti,Ei);
-    mmcTrack->SetCenter(xc,yc,zc,tc,Ec);
-    mmcTrack->SetExit(xf,yf,zf,tf,Ef);
-
-    double Elost = particle->GetElost() * I3Units::GeV;
-    mmcTrack->SetDepositedEnergy(Elost);
-    log_debug("Elost = %f", Elost);
-
-    if(Elost>0)
-        return mmcTrack;
-    //return null pointer if Elost <= 0
-    return I3MMCTrackPtr();
-}
-
-
 // ------------------------------------------------------------------------- //
 I3MMCTrackPtr I3PropagatorServicePROPOSAL::propagate(I3Particle& p, vector<I3Particle>& daughters)
 {
@@ -312,8 +182,10 @@ I3MMCTrackPtr I3PropagatorServicePROPOSAL::propagate(I3Particle& p, vector<I3Par
     double lenght  = p.GetLength();                // [m]
 
     // log_debug("Name of particle to propagate: %s", PROPOSALParticle::GetName(GeneratePROPOSALType(p)).c_str());
-    PROPOSAL::Particle& particle = proposal_.GetParticle();
+    // PROPOSAL::Particle& particle = proposal_.GetParticle();
 
+    ParticleDef particle_def = I3PROPOSALParticleConverter::GeneratePROPOSALType(p.GetType());
+    Particle particle(particle_def);
     particle.SetPosition(PROPOSAL::Vector3D(x_0, y_0, z_0));
 
     PROPOSAL::Vector3D direction;
@@ -324,7 +196,8 @@ I3MMCTrackPtr I3PropagatorServicePROPOSAL::propagate(I3Particle& p, vector<I3Par
     particle.SetTime(t_0);
     particle.SetPropagatedDistance(lenght);
 
-    std::vector<DynamicData*> secondaries = proposal_.Propagate();
+    // std::vector<DynamicData*> secondaries = proposal_.Propagate();
+    std::vector<DynamicData*> secondaries = proposal_service_.Propagate(particle);
 
     // get the propagated length of the particle
     double length = particle.GetPropagatedDistance();
@@ -389,5 +262,42 @@ I3MMCTrackPtr I3PropagatorServicePROPOSAL::propagate(I3Particle& p, vector<I3Par
     Output::getInstance().ClearSecondaryVector(); // Tomasz
 
     return mmcTrack;
+}
+
+// ------------------------------------------------------------------------- //
+I3MMCTrackPtr I3PropagatorServicePROPOSAL::GenerateMMCTrack(PROPOSAL::Particle* particle){
+
+    //explicitly specifying the units from MMC
+    double xi = particle->GetEntryPoint().GetX() * I3Units::m;
+    double yi = particle->GetEntryPoint().GetY() * I3Units::m;
+    double zi = particle->GetEntryPoint().GetZ() * I3Units::m;
+    double ti = particle->GetEntryTime() * I3Units::second;
+    double Ei = particle->GetEntryEnergy() * I3Units::GeV;
+
+    double xf = particle->GetExitPoint().GetX() * I3Units::m;
+    double yf = particle->GetExitPoint().GetY() * I3Units::m;
+    double zf = particle->GetExitPoint().GetZ() * I3Units::m;
+    double tf = particle->GetExitTime() * I3Units::second;
+    double Ef = particle->GetExitEnergy() * I3Units::GeV;
+
+    double xc = particle->GetClosestApproachPoint().GetX() * I3Units::m;
+    double yc = particle->GetClosestApproachPoint().GetY() * I3Units::m;
+    double zc = particle->GetClosestApproachPoint().GetZ() * I3Units::m;
+    double tc = particle->GetClosestApproachTime() * I3Units::second;
+    double Ec = particle->GetClosestApproachEnergy() * I3Units::GeV;
+
+    I3MMCTrackPtr mmcTrack( new I3MMCTrack);
+    mmcTrack->SetEnter(xi,yi,zi,ti,Ei);
+    mmcTrack->SetCenter(xc,yc,zc,tc,Ec);
+    mmcTrack->SetExit(xf,yf,zf,tf,Ef);
+
+    double Elost = particle->GetElost() * I3Units::GeV;
+    mmcTrack->SetDepositedEnergy(Elost);
+    log_debug("Elost = %f", Elost);
+
+    if(Elost>0)
+        return mmcTrack;
+    //return null pointer if Elost <= 0
+    return I3MMCTrackPtr();
 }
 
