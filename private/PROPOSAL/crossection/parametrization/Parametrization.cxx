@@ -31,7 +31,7 @@ Parametrization::Parametrization(const Parametrization& param)
     , cut_settings_(param.cut_settings_)
     , components_(medium_->GetComponents())
     , component_index_(param.component_index_) // //TODO(mario): Check better way Mon 2017/09/04
-    , multiplier_(1.0)
+    , multiplier_(param.multiplier_)
 {
 }
 
