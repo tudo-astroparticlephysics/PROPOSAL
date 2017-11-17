@@ -34,6 +34,7 @@ static const bimap_ParticleType I3_PROPOSAL_ParticleType_bimap = boost::assign::
     (I3Particle::Pi0,       "Pi0")
     (I3Particle::PiPlus,    "PiPlus")
     (I3Particle::PiMinus,   "PiMinus")
+    (I3Particle::K0_Short,  "K0") //TODO(mario):  Fri 2017/11/17
     (I3Particle::KPlus,     "KPlus")
     (I3Particle::KMinus,    "KMinus")
     (I3Particle::PPlus,     "PPlus")
