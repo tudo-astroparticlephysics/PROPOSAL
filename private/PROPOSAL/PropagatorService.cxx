@@ -4,11 +4,13 @@
 
 using namespace PROPOSAL;
 
+// ------------------------------------------------------------------------- //
 PropagatorService::PropagatorService()
     : propagator_map_()
 {
 }
 
+// ------------------------------------------------------------------------- //
 PropagatorService::~PropagatorService()
 {
     for (PropagatorMap::const_iterator it = propagator_map_.begin(); it != propagator_map_.end(); ++it)
@@ -19,9 +21,10 @@ PropagatorService::~PropagatorService()
     propagator_map_.clear();
 }
 
-void PropagatorService::RegisterPropagator(Propagator& propagator)
+// ------------------------------------------------------------------------- //
+void PropagatorService::RegisterPropagator(const Propagator& propagator)
 {
-    ParticleDef particle_def = propagator.GetParticle().GetParticleDef();
+    ParticleDef particle_def = const_cast<Propagator&>(propagator).GetParticle().GetParticleDef();
     if (propagator_map_.find(particle_def) != propagator_map_.end())
     {
         log_warn("Propagator for particle %s is already registered!", particle_def.name.c_str());
@@ -30,9 +33,15 @@ void PropagatorService::RegisterPropagator(Propagator& propagator)
     {
         propagator_map_[particle_def] = new Propagator(propagator);
     }
-
 }
 
+// ------------------------------------------------------------------------- //
+bool PropagatorService::IsRegistered(const ParticleDef& particle_def)
+{
+    return propagator_map_.find(particle_def) != propagator_map_.end();
+}
+
+// ------------------------------------------------------------------------- //
 std::vector<DynamicData*> PropagatorService::Propagate(Particle& particle)
 {
     ParticleDef particle_def = particle.GetParticleDef();
