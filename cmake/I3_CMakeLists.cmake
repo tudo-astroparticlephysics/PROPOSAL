@@ -3,7 +3,10 @@
 #  LOG4CPLUS_FOUND - System has Log4cplus
 #  LOG4CPLUS_INCLUDE_DIRS - The Log4cplus include directories
 #  LOG4CPLUS_LIBRARIES - The libraries needed to use Log4cplus
-    add_definitions(-DPROPOSAL_STANDALONE=0)
+
+# TODO: the PROPOSAL_STANDALONE definition is not needed anymore
+# add_definitions(-DPROPOSAL_STANDALONE=0)
+
 # file(GLOB_RECURSE PROPOSAL_SRC_FILES ${PROJECT_SOURCE_DIR}/PROPOSAL/private/PROPOSAL/*)
 # message(STATUS ${PROPOSAL_SRC_FILES})
 i3_project(PROPOSAL)
