@@ -19,7 +19,7 @@ void Output::SetLoggingConfigurationFile(std::string file)
 }
 
 // ------------------------------------------------------------------------- //
-void Output::FillSecondaryVector(std::vector<Particle*>& particles)
+void Output::FillSecondaryVector(const std::vector<Particle*>& particles)
 {
     // Do not copy values. This method is used to store particles from the ouput of
     // the decay channel. The decay channel creates new particle. So the output becomes the owner
