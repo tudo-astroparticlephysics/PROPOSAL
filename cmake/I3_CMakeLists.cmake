@@ -15,6 +15,7 @@ i3_add_library(PROPOSAL
 		${PROPOSAL_SRC_FILES}
         private/PROPOSAL-icetray/I3PropagatorServicePROPOSAL.cxx
         private/PROPOSAL-icetray/SimplePropagator.cxx
+		private/PROPOSAL-icetray/Converter.cxx
 		# ${I3_PROPOSAL_SRC_FILES}
 
         USE_TOOLS boost
