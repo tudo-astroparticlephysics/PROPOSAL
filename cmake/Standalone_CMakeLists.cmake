@@ -5,7 +5,12 @@ IF(APPLE)
 	SET(CMAKE_MACOSX_RPATH 1)
 ENDIF(APPLE)
 
-### always full RPATH
+### full RPATH
+### copied from https://cmake.org/Wiki/CMake_RPATH_handling
+### set the RPATH so that for using PROPOSAL in python 
+### the DYLD_LIBRARY_PATH must not be set in the bashrc
+### But for using PROPOSAL as c-Library, this path still
+### has to be set
 
 # use, i.e. don't skip the full RPATH for the build tree
 SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
@@ -26,7 +31,7 @@ IF("${isSystemDir}" STREQUAL "-1")
   SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 ENDIF("${isSystemDir}" STREQUAL "-1")
 
-### end always full RPATH
+### end full RPATH
 
 ADD_DEFINITIONS(-DPROPOSAL_STANDALONE=1)
 
