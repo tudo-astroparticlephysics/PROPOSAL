@@ -178,7 +178,8 @@ Propagator::Propagator(const ParticleDef& particle_def, const std::string& confi
     boost::property_tree::ptree pt_json;
     try
     {
-        boost::property_tree::json_parser::read_json(config_file, pt_json);
+        std::string expanded_config_file_path = Helper::ResolvePath(config_file);
+        boost::property_tree::json_parser::read_json(expanded_config_file_path, pt_json);
     }
     catch(const boost::property_tree::ptree_error &e)
     {
@@ -782,7 +783,6 @@ double Propagator::CalculateEffectiveDistance(const Vector3D& particle_position,
 // ------------------------------------------------------------------------- //
 Geometry* Propagator::ParseGeometryConifg(boost::property_tree::ptree& pt)
 {
-
     std::string origin_str = "origin";
     std::string outer_radius_str = "outer_radius";
     std::string inner_radius_str = "inner_radius";
