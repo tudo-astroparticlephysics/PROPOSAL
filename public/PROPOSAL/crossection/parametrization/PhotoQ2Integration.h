@@ -193,6 +193,12 @@ PhotoQ2Interpolant<Param>::PhotoQ2Interpolant(const PhotoQ2Interpolant& photo)
 template <class Param>
 PhotoQ2Interpolant<Param>::~PhotoQ2Interpolant()
 {
+    for(std::vector<Interpolant*>::const_iterator iter = interpolant_.begin(); iter != interpolant_.end(); ++iter)
+    {
+        delete *iter;
+    }
+
+    interpolant_.clear();
 }
 
 template <class Param>

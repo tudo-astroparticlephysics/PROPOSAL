@@ -20,8 +20,8 @@
 
 //necessary since the boost function does not work for [-1,1] but for (-1,1)
 #define FIXPREC 0.9999999999999999
-#define erfInv(x) myErfInv2(x)
-// #define erfInv(x) boost::math::erf_inv(FIXPREC*x)
+// #define erfInv(x) myErfInv2(FIXPREC*x)
+#define erfInv(x) boost::math::erf_inv(FIXPREC*x)
 
 namespace PROPOSAL
 {

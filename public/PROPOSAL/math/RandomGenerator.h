@@ -25,9 +25,34 @@ class RandomGenerator
         return instance;
     }
 
+    // ----------------------------------------------------------------------------
+    /// @brief Execute the given rng to get a random number
+    ///
+    /// @return random number
+    // ----------------------------------------------------------------------------
     double RandomDouble();
 
     void SetSeed(int seed);
+
+    // ----------------------------------------------------------------------------
+    /// @brief Serialize the rng to a stream
+    ///
+    /// Useful for debuging to save a specific state.
+    /// Only supported for internal used rng from the boost libraries.
+    ///
+    /// @param std::ostream
+    // ----------------------------------------------------------------------------
+    void Serialize(std::ostream&);
+
+    // ----------------------------------------------------------------------------
+    /// @brief Deserialize the rng from a stream
+    ///
+    /// Useful for debuging to get back a specific state.
+    /// Only supported for internal used rng from the boost libraries.
+    ///
+    /// @param std::ostream
+    // ----------------------------------------------------------------------------
+    void Deserialize(std::istream&);
 
     /** @brief Set a custom random number generator
      *
@@ -49,5 +74,6 @@ class RandomGenerator
 
 
 } // namespace PROPOSAL
+
 
 #endif // RANDOMGENERATOR_H_
