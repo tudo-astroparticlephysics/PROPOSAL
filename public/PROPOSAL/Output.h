@@ -181,7 +181,7 @@ public:
     ///
     /// @param std::vector
     // ----------------------------------------------------------------------------
-    void FillSecondaryVector(std::vector<Particle*>&);
+    void FillSecondaryVector(const std::vector<Particle*>&);
 
     // ----------------------------------------------------------------------------
     /// @brief Fill secondary data
