@@ -32,7 +32,7 @@ class ManyBodyPhaseSpace : public DecayChannel
     ///
     /// @return Vector of particles, the decay products
     // ----------------------------------------------------------------------------
-    DecayProducts Decay(Particle&);
+    DecayProducts Decay(const Particle&);
 
     const std::string& GetName() const { return name_; }
 

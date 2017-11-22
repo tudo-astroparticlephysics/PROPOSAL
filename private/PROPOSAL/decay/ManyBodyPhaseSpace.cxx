@@ -61,7 +61,7 @@ bool ManyBodyPhaseSpace::compare(const DecayChannel& channel) const
     }
 }
 
-DecayChannel::DecayProducts ManyBodyPhaseSpace::Decay(Particle& particle)
+DecayChannel::DecayProducts ManyBodyPhaseSpace::Decay(const Particle& particle)
 {
     double parent_mass = particle.GetMass();
     std::vector<double> virtual_masses;
