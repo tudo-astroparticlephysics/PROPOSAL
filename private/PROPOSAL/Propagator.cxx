@@ -781,7 +781,7 @@ double Propagator::CalculateEffectiveDistance(const Vector3D& particle_position,
 // ------------------------------------------------------------------------- //
 
 // ------------------------------------------------------------------------- //
-Geometry* Propagator::ParseGeometryConifg(boost::property_tree::ptree& pt)
+Geometry* Propagator::ParseGeometryConifg(const boost::property_tree::ptree& pt)
 {
     std::string origin_str = "origin";
     std::string outer_radius_str = "outer_radius";
