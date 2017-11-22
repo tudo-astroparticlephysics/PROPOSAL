@@ -145,7 +145,7 @@ class Propagator
     /// @param property_tree
     // ----------------------------------------------------------------------------
     template<class T>
-    void SetMember(T& var, std::string option, boost::property_tree::ptree& pt)
+    void SetMember(T& var, const std::string option, const boost::property_tree::ptree& pt)
     {
         boost::optional<T> optional_param = pt.get_optional<T>(option);
         if (optional_param)
@@ -167,7 +167,7 @@ class Propagator
     ///
     /// @return new Geometry
     // ----------------------------------------------------------------------------
-    Geometry* ParseGeometryConifg(boost::property_tree::ptree& pt);
+    Geometry* ParseGeometryConifg(const boost::property_tree::ptree& pt);
 
     // ----------------------------------------------------------------------------
     /// @brief Choose the current collection the particle is in.
