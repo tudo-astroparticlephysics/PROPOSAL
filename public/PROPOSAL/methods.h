@@ -117,7 +117,7 @@ namespace  Helper
 // ----------------------------------------------------------------------------
 std::string ResolvePath(const std::string&);
 
-bool FileExist(std::string path);
+bool FileExist(const std::string path);
 
 // ----------------------------------------------------------------------------
 /// @brief Center string
@@ -143,7 +143,7 @@ typedef std::vector<std::pair<InterpolantBuilder*, Interpolant** > > Interpolant
 void InitializeInterpolation(const std::string name,
                              InterpolantBuilderContainer&,
                              const std::vector<Parametrization*>&,
-                             InterpolationDef);
+                             const InterpolationDef);
 
 } /*  Helper */
 
