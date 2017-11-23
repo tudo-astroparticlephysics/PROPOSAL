@@ -25,8 +25,8 @@ class ContinuousRandomizer
 
     ~ContinuousRandomizer();
 
-    // bool operator==(const ContinuousRandomizer& scattering) const;
-    // bool operator!=(const ContinuousRandomizer& scattering) const;
+    bool operator==(const ContinuousRandomizer&) const;
+    bool operator!=(const ContinuousRandomizer&) const;
     // void swap(ContinuousRandomizer& scattering);
 
     double Randomize(double ei, double ef, double rnd);

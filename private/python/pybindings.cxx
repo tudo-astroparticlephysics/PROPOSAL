@@ -694,6 +694,7 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
 
     to_python_converter< std::vector<DynamicData*>, PVectorToPythonList<DynamicData*> >();
     to_python_converter< std::vector<Particle*>, PVectorToPythonList<Particle*> >();
+    // to_python_converter< std::vector<CrossSection*>, PVectorToPythonList<CrossSection*> >();
 
     to_python_converter< std::vector<SectorFactory::Definition>, VectorToPythonList<SectorFactory::Definition> >();
 
@@ -706,6 +707,7 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
         .from_python<std::vector<DynamicData*> >()
         .from_python<std::vector<ParticleDef> >()
         .from_python<std::vector<Particle*> >()
+        // .from_python<std::vector<CrossSection*> >()
         .from_python<std::vector<SectorFactory::Definition> >();
 
     // VectorFromPythonList<double>();
@@ -1161,6 +1163,54 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
         .def_readwrite("path_to_tables", &InterpolationDef::path_to_tables)
         .def_readwrite("raw", &InterpolationDef::raw)
     ;
+
+    // --------------------------------------------------------------------- //
+    // RandomGenerator
+    // --------------------------------------------------------------------- //
+
+    class_<RandomGenerator, boost::shared_ptr<RandomGenerator>, boost::noncopyable>("RandomGenerator", no_init)
+
+        // .def(self_ns::str(self_ns::self))
+
+        .def("random_double", &RandomGenerator::RandomDouble)
+        .def("set_seed", &RandomGenerator::SetSeed, arg("seed") = 0)
+        .def("get", make_function(&RandomGenerator::Get, return_value_policy<reference_existing_object>()))
+        .staticmethod("get");
+
+    // --------------------------------------------------------------------- //
+    // Utility
+    // --------------------------------------------------------------------- //
+
+    class_<Utility, boost::shared_ptr<Utility> >(
+        "Utility",
+        init<const ParticleDef&, const Medium&, const EnergyCutSettings&, Utility::Definition>(
+            (arg("partcle_def"), arg("medium"), arg("cuts"), arg("definition"))))
+
+        .def(init<const ParticleDef&, const Medium&, const EnergyCutSettings&, Utility::Definition, InterpolationDef>(
+            (arg("partcle_def"), arg("medium"), arg("cuts"), arg("definition"), arg("interpolatin_def"))))
+
+        // .def(self_ns::str(self_ns::self))
+
+        .add_property("particle_def",
+                      make_function(&Utility::GetParticleDef, return_internal_reference<>()))
+        .add_property("medium",
+                      make_function(&Utility::GetMedium, return_internal_reference<>()));
+        // .add_property("cross_sections",
+        //               make_function(&Utility::GetCrosssections, return_internal_reference<>())); //TODO(mario): CrossSection didn't bind Wed 2017/11/22
+        //
+
+    // --------------------------------------------------------------------- //
+    // ContinousRandomization
+    // --------------------------------------------------------------------- //
+
+    class_<ContinuousRandomizer, boost::shared_ptr<ContinuousRandomizer> >("ContinuousRandomizer",
+                                                                           init<Utility&>((arg("utility"))))
+
+        .def(init<Utility&, InterpolationDef>((arg("utility"), arg("interpolation_def"))))
+
+        // .def(self_ns::str(self_ns::self))
+
+        .def("randomize", &ContinuousRandomizer::Randomize, (arg("initial_energy"), arg("final_energy"), arg("rand")));
 
 
     // --------------------------------------------------------------------- //

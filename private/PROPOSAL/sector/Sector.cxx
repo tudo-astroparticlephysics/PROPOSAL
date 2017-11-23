@@ -287,6 +287,7 @@ double Sector::Propagate(double distance)
     while (flag)
     {
         energy_till_stochastic_ = CalculateEnergyTillStochastic( initial_energy);
+
         if (energy_till_stochastic_.first > energy_till_stochastic_.second)
         {
             particle_interaction = true;
@@ -341,6 +342,7 @@ double Sector::Propagate(double distance)
         if (particle_interaction)
         {
             energy_loss = MakeStochasticLoss();
+
             if (energy_loss.second == DynamicData::None)
             {
                 // in this case, no cross section is chosen, so there is no interaction
@@ -362,10 +364,11 @@ double Sector::Propagate(double distance)
             decay_products = particle_.GetDecayTable().SelectChannel().Decay(particle_);
             Output::getInstance().FillSecondaryVector(decay_products);
 
-            // TODO(mario): Delete decay products Tue 2017/08/22
+            // Set final energy to zero to jumpy out of the while loop.
+            // The value of 0 ensures not have an additional stopping
+            // decay futher below the code
+            final_energy = 0;
 
-            // decay           =   current_collection_->MakeDecay();
-            // final_energy    =   0;
             // log_debug("Decay of particle: %s", particle_->GetName().c_str());
             // secondary_id    = particle_->GetParticleId()  +   1;
             // Output::getInstance().FillSecondaryVector(particle_, secondary_id, decay ,0);
@@ -416,8 +419,7 @@ double Sector::Propagate(double distance)
     return 0;
 }
 
-std::pair<double, double> Sector::CalculateEnergyTillStochastic(
-                                                                    double initial_energy)
+std::pair<double, double> Sector::CalculateEnergyTillStochastic(double initial_energy)
 {
     double rndd = -log(RandomGenerator::Get().RandomDouble());
     double rndi = -log(RandomGenerator::Get().RandomDouble());
@@ -524,9 +526,11 @@ pair<double, DynamicData::Type> Sector::MakeStochasticLoss()
         }
     }
     // if (particle_->GetEnergy() < 650) printf("energy: %f\n", particle_->GetEnergy());
+
     for (unsigned int i = 0; i < cross_sections.size(); i++)
     {
         rates[i] = cross_sections[i]->CalculatedNdx(particle_.GetEnergy(), rnd2);
+
         // switch (cross_sections[i]->GetTypeId())
         // {
         //     case DynamicData::DeltaE:
@@ -561,22 +565,29 @@ pair<double, DynamicData::Type> Sector::MakeStochasticLoss()
         {
             energy_loss.first  = cross_sections[i]->CalculateStochasticLoss(particle_.GetEnergy(), rnd2, rnd3);
             energy_loss.second = cross_sections[i]->GetTypeId();
+
             // switch (cross_sections[i]->GetTypeId())
             // {
             //     case DynamicData::DeltaE:
-            //         std::cout << "ioniz rates_sum: " << rates_sum  << "\t" << total_rate << "\t" << total_rate_weighted << std::endl;
-            //         std::cout << "ioniz particle energy: " << particle_.GetEnergy() << std::endl;
-            //         std::cout << "ioniz energyloss: " << energy_loss.first << std::endl;
+            //         std::cout << "Chosen interaction: DeltaE" << std::endl;
+            //         std::cout << "rate_sum: " << rates_sum << std::endl;
+            //         std::cout << "particle energy: " << particle_.GetEnergy() << std::endl;
             //         break;
-            //     // case DynamicData::Brems:
-            //     //     std::cout << "brems dndx:" << rates[i] << std::endl;
-            //     //     break;
-            //     // case DynamicData::Epair:
-            //     //     std::cout << "epair dndx:" << rates[i] << std::endl;
-            //     //     break;
-            //     // case DynamicData::NuclInt:
-            //     //     std::cout << "photo dndx:" << rates[i] << std::endl;
-            //     //     break;
+            //     case DynamicData::Brems:
+            //         std::cout << "Chosen interaction: Brems" << std::endl;
+            //         std::cout << "rate_sum: " << rates_sum << std::endl;
+            //         std::cout << "particle energy: " << particle_.GetEnergy() << std::endl;
+            //         break;
+            //     case DynamicData::Epair:
+            //         std::cout << "Chosen interaction: Epair" << std::endl;
+            //         std::cout << "rate_sum: " << rates_sum << std::endl;
+            //         std::cout << "particle energy: " << particle_.GetEnergy() << std::endl;
+            //         break;
+            //     case DynamicData::NuclInt:
+            //         std::cout << "Chosen interaction: NuclInt" << std::endl;
+            //         std::cout << "rate_sum: " << rates_sum << std::endl;
+            //         std::cout << "particle energy: " << particle_.GetEnergy() << std::endl;
+            //         break;
             //     default:
             //         break;
             // }
