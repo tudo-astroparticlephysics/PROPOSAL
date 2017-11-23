@@ -57,8 +57,8 @@ Bremsstrahlung::Bremsstrahlung(const Bremsstrahlung& brems)
     : Parametrization(brems)
     , lorenz_(brems.lorenz_)
     , lorenz_cut_(brems.lorenz_cut_)
-    , init_lpm_effect_(true)
-    , lpm_(true)
+    , init_lpm_effect_(brems.init_lpm_effect_)
+    , lpm_(brems.lpm_)
     , eLpm_(brems.eLpm_)
 {
 }
