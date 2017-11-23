@@ -47,6 +47,15 @@ ContinuousRandomizer::~ContinuousRandomizer()
     delete DE2de;
 }
 
+bool ContinuousRandomizer::operator==(const ContinuousRandomizer& randomizer) const
+{
+    return *DE2de == *randomizer.DE2de;
+}
+
+bool ContinuousRandomizer::operator!=(const ContinuousRandomizer& randomizer) const
+{
+    return !(*this == randomizer);
+}
 // ------------------------------------------------------------------------- //
 // Public member function
 // ------------------------------------------------------------------------- //
