@@ -39,7 +39,7 @@ bool TwoBodyPhaseSpace::compare(const DecayChannel& channel) const
         return true;
 }
 
-DecayChannel::DecayProducts TwoBodyPhaseSpace::Decay(Particle& particle)
+DecayChannel::DecayProducts TwoBodyPhaseSpace::Decay(const Particle& particle)
 {
     DecayProducts products;
     products.push_back(new Particle(first_daughter_));

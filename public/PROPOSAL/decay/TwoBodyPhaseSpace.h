@@ -20,7 +20,7 @@ class TwoBodyPhaseSpace : public DecayChannel
     // No copy and assignemnt -> done by clone
     DecayChannel* clone() const { return new TwoBodyPhaseSpace(*this); }
 
-    DecayProducts Decay(Particle&);
+    DecayProducts Decay(const Particle&);
 
     const std::string& GetName() const { return name_; }
 
