@@ -134,7 +134,7 @@ std::string ResolvePath(const std::string& pathname)
 }
 
 // ------------------------------------------------------------------------- //
-bool FileExist(std::string path)
+bool FileExist(const std::string path)
 {
     struct stat dummy_stat_return_val;
 
@@ -152,7 +152,7 @@ bool FileExist(std::string path)
 void InitializeInterpolation(const std::string name,
                              InterpolantBuilderContainer& builder_container,
                              const std::vector<Parametrization*>& parametrizations,
-                             InterpolationDef interpolation_def)
+                             const InterpolationDef interpolation_def)
 {
     using namespace std;
 

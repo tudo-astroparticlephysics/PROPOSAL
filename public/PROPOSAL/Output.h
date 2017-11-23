@@ -18,7 +18,9 @@
     #include "TFile.h"
 #endif
 
-#if PROPOSAL_STANDALONE
+#if I3_PROJECTS
+    #include <icetray/I3Logging.h>
+#else
     #if LOG4CPLUS_SUPPORT
         //Stuff for LOG4CPLUS
         #include <log4cplus/logger.h>
@@ -74,8 +76,6 @@
             #define log_notice(fmt, ...) (void)0
         #endif
     #endif
-#else
-#include <icetray/I3Logging.h>
 #endif
 
 

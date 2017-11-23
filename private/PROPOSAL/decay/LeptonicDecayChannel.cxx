@@ -93,7 +93,7 @@ double LeptonicDecayChannel::FindRootBoost(double min, double right_side)
 }
 
 
-DecayChannel::DecayProducts LeptonicDecayChannel::Decay(Particle& particle)
+DecayChannel::DecayProducts LeptonicDecayChannel::Decay(const Particle& particle)
 {
     double emax, x0, f0, el, pl, right_side;
     double lm  =   ME;
