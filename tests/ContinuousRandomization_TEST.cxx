@@ -5,307 +5,133 @@
 
 #include "gtest/gtest.h"
 
-#include "PROPOSAL/ContinuousRandomization.h"
-#include "PROPOSAL/Ionization.h"
-#include "PROPOSAL/Bremsstrahlung.h"
-#include "PROPOSAL/Photonuclear.h"
-#include "PROPOSAL/Epairproduction.h"
-#include "PROPOSAL/Output.h"
-#include "PROPOSAL/Constants.h"
-// #include "PROPOSAL/CrossSections.h"
-// #include "PROPOSAL/PROPOSALParticle.h"
-// #include "PROPOSAL/Medium.h"
-// #include "PROPOSAL/EnergyCutSettings.h"
-
+#include "PROPOSAL/PROPOSAL.h"
 
 using namespace std;
 using namespace PROPOSAL;
 
-class RndFromFile{
+class RndFromFile
+{
 private:
     double rnd_;
     string Path_;
     ifstream in_;
 
 public:
-    RndFromFile(string Path){
+    RndFromFile(string Path)
+    {
         Path_ = Path;
         in_.open(Path_.c_str());
-        in_>>rnd_;
-        if(!in_.good())log_warn("less than one rnd_number!");
+        in_ >> rnd_;
+        if (!in_.good())
+            log_warn("less than one rnd_number!");
     }
 
-    double rnd(){
-        in_>>rnd_;
-        if(!in_.good()){
+    double rnd()
+    {
+        in_ >> rnd_;
+        if (!in_.good())
+        {
             in_.close();
             in_.clear();
             in_.open(Path_.c_str());
-            in_>>rnd_;
+            in_ >> rnd_;
         }
         return rnd_;
     }
 };
 
-Vector3D position(1.,1.,1.);
-Vector3D direction(0.,0.,0.);
-
-TEST(Comparison , Comparison_equal ) {
-    direction.SetSphericalCoordinates(1,.20*PI/180.,20*PI/180.);
-    direction.CalculateCartesianFromSpherical();
-
-    double dNdx;
-
-    Medium *medium = new Hydrogen();
-    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,position,direction,1e5,10);
-    EnergyCutSettings *cut_settings = new EnergyCutSettings(500,-1);
-
-    vector<CrossSections*> crosssections;
-
-    crosssections.resize(4);
-    crosssections.at(0) = new Ionization(particle, medium, cut_settings);
-    crosssections.at(1) = new Bremsstrahlung(particle, medium, cut_settings);
-    crosssections.at(2) = new Photonuclear(particle, medium, cut_settings);
-    crosssections.at(3) = new Epairproduction(particle, medium, cut_settings);
-
-
-    ContinuousRandomization *A = new ContinuousRandomization(particle, medium, crosssections);
-    ContinuousRandomization *B = new ContinuousRandomization(particle, medium, crosssections);
-    EXPECT_TRUE(*A==*B);
-
-    A->EnableDE2dxInterpolation();
-    B->EnableDE2dxInterpolation();
-
-    EXPECT_TRUE(*A==*B);
-
-    ContinuousRandomization *C = new ContinuousRandomization();
-    ContinuousRandomization *D = new ContinuousRandomization();
-
-    EXPECT_TRUE(*C==*D);
-
-
-    A->GetParticle()->SetEnergy(1e6);
-    B->GetParticle()->SetEnergy(1e6);
-    EXPECT_TRUE(*A==*B);
-
-    dNdx = A->GetCrosssections().at(0)->CalculatedNdx();
-    dNdx = B->GetCrosssections().at(0)->CalculatedNdx();
-    EXPECT_TRUE(*A==*B);
-
-}
-
-TEST(Comparison , Comparison_not_equal ) {
-    direction.SetSphericalCoordinates(1,20*PI/180.,20*PI/180.);
-    direction.CalculateCartesianFromSpherical();
-    Medium *medium = new Air();
-    Medium *medium2 = new Water();
-    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,position,direction,1e5,10);
-    PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::TauMinus,position,direction,1e5,10);
-    EnergyCutSettings *cut_settings = new EnergyCutSettings(500,-1);
-
-    vector<CrossSections*> crosssections;
-
-    crosssections.resize(4);
-    crosssections.at(0) = new Ionization(particle, medium, cut_settings);
-    crosssections.at(1) = new Bremsstrahlung(particle, medium, cut_settings);
-    crosssections.at(2) = new Photonuclear(particle, medium, cut_settings);
-    crosssections.at(3) = new Epairproduction(particle, medium, cut_settings);
-
-    vector<CrossSections*> crosssections2;
-
-    crosssections2.resize(4);
-    crosssections2.at(0) = new Ionization(particle, medium, cut_settings);
-    crosssections2.at(1) = new Bremsstrahlung(particle, medium, cut_settings);
-    crosssections2.at(2) = new Photonuclear(particle, medium, cut_settings);
-    crosssections2.at(3) = new Ionization(particle, medium, cut_settings);
-
-    ContinuousRandomization *A = new ContinuousRandomization(particle, medium, crosssections);
-    ContinuousRandomization *B = new ContinuousRandomization(particle2, medium, crosssections);
-    ContinuousRandomization *C = new ContinuousRandomization(particle, medium2, crosssections);
-    ContinuousRandomization *D = new ContinuousRandomization(particle, medium2, crosssections2);
-    ContinuousRandomization *E = new ContinuousRandomization(particle, medium2, crosssections);
-
-    EXPECT_TRUE(*A!=*B);
-    EXPECT_TRUE(*C!=*D);
-    EXPECT_TRUE(*B!=*D);
-    EXPECT_TRUE(*E==*C);
-
-    E->SetParticle(particle2);
-    EXPECT_TRUE(*C!=*E);
-    C->SetParticle(particle2);
-    EXPECT_TRUE(*C==*E);
-    C->GetCrosssections().at(2)->SetParametrization(ParametrizationType::PhotoBezrukovBugaevShadowBezrukovHard);
-
-    EXPECT_TRUE(*D!=*E);
-
-
-}
-
-TEST(Assignment , Copyconstructor ) {
-    ContinuousRandomization A;
-    ContinuousRandomization B =A;
-
-    EXPECT_TRUE(A==B);
-
-}
-
-TEST(Assignment , Copyconstructor2 ) {
-    direction.SetSphericalCoordinates(1,.20*PI/180.,20*PI/180.);
-    direction.CalculateCartesianFromSpherical();
-    Medium *medium = new Air();
-    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,position,direction,1e5,10);
-    EnergyCutSettings *cut_settings = new EnergyCutSettings(500,-1);
-
-    vector<CrossSections*> crosssections;
-
-    crosssections.resize(4);
-    crosssections.at(0) = new Ionization(particle, medium, cut_settings);
-    crosssections.at(1) = new Bremsstrahlung(particle, medium, cut_settings);
-    crosssections.at(2) = new Photonuclear(particle, medium, cut_settings);
-    crosssections.at(3) = new Epairproduction(particle, medium, cut_settings);
-
-    ContinuousRandomization A(particle, medium, crosssections);
-    ContinuousRandomization B(A);
-
-    EXPECT_TRUE(A==B);
-
-}
-
-TEST(Assignment , Operator ) {
-    direction.SetSphericalCoordinates(1,.20*PI/180.,20*PI/180.);
-    direction.CalculateCartesianFromSpherical();
-    Medium *medium = new Air();
-    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,position,direction,1e5,10);
-    EnergyCutSettings *cut_settings = new EnergyCutSettings(500,-1);
-
-    vector<CrossSections*> crosssections;
-
-    crosssections.resize(4);
-    crosssections.at(0) = new Ionization(particle, medium, cut_settings);
-    crosssections.at(1) = new Bremsstrahlung(particle, medium, cut_settings);
-    crosssections.at(2) = new Photonuclear(particle, medium, cut_settings);
-    crosssections.at(3) = new Epairproduction(particle, medium, cut_settings);
-
-    vector<CrossSections*> crosssections2;
-
-    crosssections2.resize(4);
-    crosssections2.at(0) = new Ionization(particle, medium, cut_settings);
-    crosssections2.at(1) = new Bremsstrahlung(particle, medium, cut_settings);
-    crosssections2.at(2) = new Photonuclear(particle, medium, cut_settings);
-    crosssections2.at(3) = new Epairproduction(particle, medium, cut_settings);
-
-    ContinuousRandomization A(particle, medium, crosssections);
-    ContinuousRandomization B(particle, medium, crosssections2);
-    B.GetCrosssections().at(2)->SetParametrization(ParametrizationType::PhotoBezrukovBugaevShadowBezrukovHard);
-
-    EXPECT_TRUE(A!=B);
-
-    B=A;
-
-    EXPECT_TRUE(A==B);
-
-    vector<CrossSections*> crosssections3;
-
-    crosssections3.resize(4);
-    crosssections3.at(0) = new Ionization(particle, medium, cut_settings);
-    crosssections3.at(1) = new Bremsstrahlung(particle, medium, cut_settings);
-    crosssections3.at(2) = new Photonuclear(particle, medium, cut_settings);
-    crosssections3.at(3) = new Ionization(particle, medium, cut_settings);
-
-    ContinuousRandomization *C = new ContinuousRandomization(particle, medium, crosssections3);
-    EXPECT_TRUE(A!=*C);
-
-    A=*C;
-
-    EXPECT_TRUE(A==*C);
-
-}
-
-TEST(Assignment , Swap ) {
-    direction.SetSphericalCoordinates(1,.20*PI/180.,20*PI/180.);
-    direction.CalculateCartesianFromSpherical();
-    Medium *medium = new Hydrogen();
-    Medium *medium2 = new Hydrogen();
-    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,position,direction,1e5,10);
-    PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::MuMinus,position,direction,1e5,10);
-    EnergyCutSettings *cut_settings = new EnergyCutSettings(500,0.05);
-    EnergyCutSettings *cut_settings2 = new EnergyCutSettings(500,0.05);
-
-    vector<CrossSections*> crosssections;
-
-    crosssections.resize(4);
-    crosssections.at(0) = new Ionization(particle, medium, cut_settings);
-    crosssections.at(1) = new Bremsstrahlung(particle, medium, cut_settings);
-    crosssections.at(2) = new Photonuclear(particle, medium, cut_settings);
-    crosssections.at(3) = new Epairproduction(particle, medium, cut_settings);
-
-
-    vector<CrossSections*> crosssections2;
-
-    crosssections2.resize(4);
-    crosssections2.at(0) = new Ionization(particle2, medium2, cut_settings2);
-    crosssections2.at(1) = new Bremsstrahlung(particle2, medium2, cut_settings2);
-    crosssections2.at(2) = new Photonuclear(particle2, medium2, cut_settings2);
-    crosssections2.at(3) = new Epairproduction(particle2, medium2, cut_settings2);
-
-    ContinuousRandomization A(particle, medium, crosssections);
-    ContinuousRandomization B(particle2, medium2, crosssections2);
-
-    for(unsigned int i=0 ; i<crosssections.size();i++)
+ParticleDef getParticleDef(const string& name)
+{
+    if (name == "MuMinus")
     {
-        crosssections.at(i)->EnableDEdxInterpolation();
-        crosssections.at(i)->EnableDNdxInterpolation();
+        return MuMinusDef::Get();
     }
-    for(unsigned int i=0 ; i<crosssections2.size();i++)
+    else if (name == "TauMinus")
     {
-        crosssections2.at(i)->EnableDEdxInterpolation();
-        crosssections2.at(i)->EnableDNdxInterpolation();
+        return TauMinusDef::Get();
+    }
+    else
+    {
+        return EMinusDef::Get();
+    }
+}
+
+class Test_Utilities : public ::testing::Test
+{
+protected:
+    Test_Utilities():
+        a(MuMinusDef::Get(), Ice(), EnergyCutSettings(), Utility::Definition(), InterpolationDef()),
+        b(TauMinusDef::Get(), Ice(), EnergyCutSettings(), Utility::Definition(), InterpolationDef())
+    {
     }
 
-    A.EnableDE2dxInterpolation();
-    B.EnableDE2dxInterpolation();
-    A.EnableDE2deInterpolation();
-    B.EnableDE2deInterpolation();
-    EXPECT_TRUE(A==B);
+    virtual void TearDown() {}
 
+    Utility a;
+    Utility b;
+};
 
-    Medium *medium3 = new Water();
-    Medium *medium4 = new Water();
-    PROPOSALParticle *particle3 = new PROPOSALParticle(ParticleType::TauMinus,position,direction,1e5,10);
-    PROPOSALParticle *particle4 = new PROPOSALParticle(ParticleType::TauMinus,position,direction,1e5,10);
-    EnergyCutSettings *cut_settings3 = new EnergyCutSettings(200,-1);
-    EnergyCutSettings *cut_settings4 = new EnergyCutSettings(200,-1);
+// Utility utility_a(MuMinusDef::Get(), Ice(), EnergyCutSettings(), Utility::Definition(), InterpolationDef());
+// Utility utility_b(TauMinusDef::Get(), Ice(), EnergyCutSettings(), Utility::Definition(), InterpolationDef());
 
-    vector<CrossSections*> crosssections3;
+TEST_F(Test_Utilities, Comparison_equal)
+{
+    ContinuousRandomizer A(a);
+    ContinuousRandomizer B(a);
 
-    crosssections3.resize(4);
-    crosssections3.at(0) = new Ionization(particle3, medium3, cut_settings3);
-    crosssections3.at(1) = new Bremsstrahlung(particle3, medium3, cut_settings3);
-    crosssections3.at(2) = new Photonuclear(particle3, medium3, cut_settings3);
-    crosssections3.at(3) = new Ionization(particle3, medium3, cut_settings3);
+    EXPECT_TRUE(A == B);
 
+    ContinuousRandomizer* C = new ContinuousRandomizer(a);
+    ContinuousRandomizer* D = new ContinuousRandomizer(a);
 
-    vector<CrossSections*> crosssections4;
+    EXPECT_TRUE(*C == *D);
 
-    crosssections4.resize(4);
-    crosssections4.at(0) = new Ionization(particle4, medium4, cut_settings4);
-    crosssections4.at(1) = new Bremsstrahlung(particle4, medium4, cut_settings4);
-    crosssections4.at(2) = new Photonuclear(particle4, medium4, cut_settings4);
-    crosssections4.at(3) = new Ionization(particle4, medium4, cut_settings4);
+    delete C;
+    delete D;
 
-    ContinuousRandomization *C = new ContinuousRandomization(particle3, medium3, crosssections3);
-    ContinuousRandomization *D = new ContinuousRandomization(particle4, medium4, crosssections4);
-    EXPECT_TRUE(*C==*D);
+    A.Randomize(0, 1, 0.5);
+    B.Randomize(0, 1, 0.5);
 
-    A.swap(*C);
-
-    EXPECT_TRUE(A==*D);
-    EXPECT_TRUE(*C==B);
-
-
+    EXPECT_TRUE(A == B);
 }
 
-//TEST(ContinuousRandomization , Randomize ) {
+TEST_F(Test_Utilities, Comparison_not_equal)
+{
+    ContinuousRandomizer A(a);
+    ContinuousRandomizer B(b);
+
+    // Only check different particle. If test does not fail, it should be good, because interanlly the utilitys are
+    // compared. So the Utility test must work fine.
+    EXPECT_TRUE(A != B);
+}
+
+TEST_F(Test_Utilities, Copyconstructor)
+{
+    ContinuousRandomizer A(a);
+    ContinuousRandomizer B = A;
+
+    EXPECT_TRUE(A == B);
+}
+
+TEST_F(Test_Utilities, Operator)
+{
+    ContinuousRandomizer A(a);
+    ContinuousRandomizer B(A);
+
+    EXPECT_TRUE(A == B);
+
+    Utility utility_c(a);
+
+    EXPECT_TRUE(a == utility_c);
+
+    ContinuousRandomizer C(a);
+    ContinuousRandomizer D(utility_c, C);
+
+    EXPECT_TRUE(A == B);
+}
+
+// TEST(ContinuousRandomization , Randomize ) {
 
 //    ifstream in;
 //    in.open("bin/TestFiles/ContinuousRandomization.txt");
@@ -371,16 +197,19 @@ TEST(Assignment , Swap ) {
 
 //}
 
-
-TEST(ContinuousRandomization , Randomize_interpol ) {
-    direction.SetSphericalCoordinates(1,.20*PI/180.,20*PI/180.);
-    direction.CalculateCartesianFromSpherical();
-
+TEST(ContinuousRandomization, Randomize_interpol)
+{
     ifstream in;
-    in.open("bin/TestFiles/ContinuousRandomization_interpol.txt");
+    string filename = "bin/TestFiles/continous_randomization.txt";
+    in.open(filename.c_str());
+
+    if (!in.good())
+    {
+        std::cerr << "File \"" << filename << "\" not found" << std::endl;
+    }
 
     char firstLine[256];
-    in.getline(firstLine,256);
+    in.getline(firstLine, 256);
     double initial_energy;
     double final_energy;
     double randomized_energy;
@@ -392,66 +221,45 @@ TEST(ContinuousRandomization , Randomize_interpol ) {
     double rnd;
     double energy_old;
     bool first = true;
-    int i = -1;
 
     cout.precision(16);
 
+    RandomGenerator::Get().SetSeed(0);
 
-
-    while(in.good())
+    while (in.good())
     {
-        if(first)in>>rnd>>particleName>>mediumName>>ecut>>vcut>>initial_energy>>final_energy>>randomized_energy;
-        first = false;
+        if (first)
+            in >> rnd >> particleName >> mediumName >> ecut >> vcut >> initial_energy >> final_energy >>
+                randomized_energy;
+
+        first      = false;
         energy_old = -1;
 
-        Medium *medium = MediumFactory::Get()->CreateMedium(mediumName);
-        PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),position,direction,1e5,10);
-        EnergyCutSettings *cut_settings = new EnergyCutSettings(ecut,vcut);
+        Medium* medium = MediumFactory::Get().CreateMedium(mediumName);
+        EnergyCutSettings cut_settings(ecut, vcut);
+        ParticleDef particle_def = getParticleDef(particleName);
 
-        vector<CrossSections*> crosssections;
+        Utility utility(particle_def, *medium, cut_settings, Utility::Definition(), InterpolationDef());
+        ContinuousRandomizer cont(utility, InterpolationDef());
 
-        crosssections.resize(4);
-        crosssections.at(0) = new Ionization(particle, medium, cut_settings);
-        crosssections.at(1) = new Bremsstrahlung(particle, medium, cut_settings);
-        crosssections.at(2) = new Photonuclear(particle, medium, cut_settings);
-        crosssections.at(3) = new Epairproduction(particle, medium, cut_settings);
-
-        ContinuousRandomization * cont = new ContinuousRandomization(particle,medium,crosssections);
-        for(unsigned int i=0 ; i<crosssections.size();i++)
+        while (energy_old < initial_energy)
         {
-            crosssections.at(i)->EnableDEdxInterpolation();
-            crosssections.at(i)->EnableDNdxInterpolation();
-        }
-        cont->EnableDE2dxInterpolation();
-        cont->EnableDE2deInterpolation();
-
-        while(energy_old < initial_energy)
-        {
-
             energy_old = initial_energy;
 
-            randomized_energy_new = cont->Randomize(initial_energy,final_energy,rnd);
+            randomized_energy_new = cont.Randomize(initial_energy, final_energy, rnd);
 
-            ASSERT_NEAR(randomized_energy_new, randomized_energy, 1e-1*randomized_energy);
+            ASSERT_NEAR(randomized_energy_new, randomized_energy, 1e-1 * randomized_energy);
 
-            in>>rnd>>particleName>>mediumName>>ecut>>vcut>>initial_energy>>final_energy>>randomized_energy;
+            in >> rnd >> particleName >> mediumName >> ecut >> vcut >> initial_energy >> final_energy >>
+                randomized_energy;
         }
 
-        for(unsigned int i = 0 ; i < crosssections.size() ; i++){
-
-            delete crosssections.at(i);
-        }
-
-        delete cut_settings;
         delete medium;
-        delete particle;
-        delete cont;
     }
-
 }
 
-
-int main(int argc, char **argv) {
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
+int main(int argc, char** argv)
+{
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }
