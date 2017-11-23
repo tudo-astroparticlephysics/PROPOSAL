@@ -6,7 +6,6 @@
 
 using namespace PROPOSAL;
 
-
 TEST(Comparison , Comparison_equal )
 {
     Water water(1.0);
@@ -43,6 +42,31 @@ TEST(Comparison , Comparison_not_equal )
     EXPECT_TRUE(utils1!=utils4);
 }
 
+TEST(Assignment, Copyconstructor)
+{
+    Utility A(MuMinusDef::Get(), Ice(), EnergyCutSettings(), Utility::Definition());
+    Utility B(A);
+
+    EXPECT_TRUE(A == B);
+
+    Utility C(MuMinusDef::Get(), Ice(), EnergyCutSettings(), Utility::Definition(), InterpolationDef());
+    Utility D(C);
+
+    EXPECT_TRUE(C == D);
+}
+
+TEST(Assignment, Operator)
+{
+    Utility A(MuMinusDef::Get(), Ice(), EnergyCutSettings(), Utility::Definition());
+    Utility B = A;
+
+    EXPECT_TRUE(A == B);
+
+    Utility C(MuMinusDef::Get(), Ice(), EnergyCutSettings(), Utility::Definition(), InterpolationDef());
+    Utility D = C;
+
+    EXPECT_TRUE(C == D);
+}
 
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
