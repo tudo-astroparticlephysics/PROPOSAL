@@ -32,7 +32,7 @@ class DecayChannel
     // Public methods
     // --------------------------------------------------------------------- //
 
-    virtual DecayProducts Decay(Particle&) = 0;
+    virtual DecayProducts Decay(const Particle&) = 0;
 
     // ----------------------------------------------------------------------------
     /// @brief Boost the particle along a direction
