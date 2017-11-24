@@ -9,6 +9,8 @@
 #include "PROPOSAL/crossection/IonizIntegral.h"
 #include "PROPOSAL/crossection/IonizInterpolant.h"
 #include "PROPOSAL/medium/Medium.h"
+#include "PROPOSAL/medium/MediumFactory.h"
+#include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/Output.h"
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/methods.h"
@@ -16,31 +18,22 @@
 using namespace PROPOSAL;
 using namespace std;
 
-// class RndFromFile{
-// private:
-//     double rnd_;
-//     string Path_;
-//     ifstream in_;
 
-// public:
-//     RndFromFile(string Path){
-//         Path_ = Path;
-//         in_.open(Path_.c_str());
-//         in_>>rnd_;
-//         if(!in_.good())log_warn("less than one rnd_number!");
-//     }
-
-//     double rnd(){
-//         in_>>rnd_;
-//         if(!in_.good()){
-//             in_.close();
-//             in_.clear();
-//             in_.open(Path_.c_str());
-//             in_>>rnd_;
-//         }
-//         return rnd_;
-//     }
-// };
+ParticleDef getParticleDef(const string& name)
+{
+    if (name == "MuMinus")
+    {
+        return MuMinusDef::Get();
+    }
+    else if (name == "TauMinus")
+    {
+        return TauMinusDef::Get();
+    }
+    else
+    {
+        return EMinusDef::Get();
+    }
+}
 
 TEST(Comparison, Comparison_equal)
 {
@@ -148,442 +141,400 @@ TEST(Assignment, Copyconstructor2)
 // in polymorphism an assignmant and swap operator doesn't make sense
 
 
-// TEST(Ionization , Test_of_dEdx ) {
-//     direction.SetSphericalCoordinates(1,.20*PI/180.,20*PI/180.);
-//     direction.CalculateCartesianFromSpherical();
+TEST(Ionization, Test_of_dEdx)
+{
+    ifstream in;
+    string filename = "testfiles/Ioniz_dEdx.txt";
+    in.open(filename.c_str());
 
+    if (!in.good())
+    {
+        std::cerr << "File \"" << filename << "\" not found" << std::endl;
+    }
+
+    char firstLine[256];
+    in.getline(firstLine,256);
+
+    string particleName;
+    string mediumName;
+    double ecut;
+    double vcut;
+    double multiplier;
+    double energy;
+    double dEdx_stored;
+    double dEdx_new;
+
+    cout.precision(16);
+
+    while(in.good())
+    {
+        in >> particleName >> mediumName >> ecut >> vcut >> multiplier
+            >> energy >> dEdx_stored;
+
+        ParticleDef particle_def = getParticleDef(particleName);
+        Medium *medium = MediumFactory::Get().CreateMedium(mediumName);
+        EnergyCutSettings ecuts(ecut,vcut);
+
+        Ionization Ioniz(particle_def, *medium, ecuts, multiplier);
+        IonizIntegral Ioniz_Int(Ioniz);
+
+        dEdx_new = Ioniz_Int.CalculatedEdx(energy);
+
+        ASSERT_NEAR(dEdx_new, dEdx_stored, 1e-10*dEdx_stored);
+
+        delete medium;
+    }
+}
+
+TEST(Ionization, Test_of_dNdx)
+{
+    ifstream in;
+    string filename = "testfiles/Ioniz_dNdx.txt";
+    in.open(filename.c_str());
+
+    if (!in.good())
+    {
+        std::cerr << "File \"" << filename << "\" not found" << std::endl;
+    }
+
+    char firstLine[256];
+    in.getline(firstLine,256);
+
+    string particleName;
+    string mediumName;
+    double ecut;
+    double vcut;
+    double multiplier;
+    double energy;
+    double dNdx_stored;
+    double dNdx_new;
+
+    cout.precision(16);
+
+    while(in.good())
+    {
+        in >> particleName >> mediumName >> ecut >> vcut >> multiplier
+            >> energy >> dNdx_stored;
+
+        ParticleDef particle_def = getParticleDef(particleName);
+        Medium *medium = MediumFactory::Get().CreateMedium(mediumName);
+        EnergyCutSettings ecuts(ecut,vcut);
+
+        Ionization Ioniz(particle_def, *medium, ecuts, multiplier);
+        IonizIntegral Ioniz_Int(Ioniz);
+
+        dNdx_new = Ioniz_Int.CalculatedNdx(energy);
+
+        ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-10*dNdx_stored);
+
+        delete medium;
+
+    }
+}
+
+TEST(Ionization, Test_of_dNdx_rnd)
+{
+    ifstream in;
+    string filename = "testfiles/Ioniz_dNdx_rnd.txt";
+    in.open(filename.c_str());
+
+    if (!in.good())
+    {
+        std::cerr << "File \"" << filename << "\" not found" << std::endl;
+    }
+
+    char firstLine[256];
+    in.getline(firstLine,256);
+
+    string particleName;
+    string mediumName;
+    double ecut;
+    double vcut;
+    double multiplier;
+    double energy;
+    double rnd;
+    double dNdx_rnd_stored;
+    double dNdx_rnd_new;
+
+    cout.precision(16);
+    RandomGenerator::Get().SetSeed(0);
+
+    // double energy_old=-1;
+    // bool first = true;
+
+    while(in.good())
+    {
+        // if (first)
+        in >> particleName >> mediumName >> ecut >> vcut >> multiplier
+            >> energy >> rnd >> dNdx_rnd_stored;
+
+        // first = false;
+        // energy_old = -1;
+
+        ParticleDef particle_def = getParticleDef(particleName);
+        Medium *medium = MediumFactory::Get().CreateMedium(mediumName);
+        EnergyCutSettings ecuts(ecut,vcut);
+
+        Ionization Ioniz(particle_def, *medium, ecuts, multiplier);
+        IonizIntegral Ioniz_Int(Ioniz);
+
+        // while(energy_old < energy)
+        // {
+        //     energy_old = energy;
+        dNdx_rnd_new = Ioniz_Int.CalculatedNdx(energy ,rnd);
+
+        ASSERT_NEAR(dNdx_rnd_new, dNdx_rnd_stored, 1E-10*dNdx_rnd_stored);
+
+        //     in >> particleName >> mediumName >> ecut >> vcut >> multiplier
+        //         >> energy >> rnd >> dNdx_rnd_stored;
+        // }
+        delete medium;
+    }
+}
+
+// TEST(Ionization, Test_Stochastic_Loss)
+// {
 //     ifstream in;
-//     in.open("bin/TestFiles/Ioniz_dEdx.txt");
+//     string filename = "testfiles/Ioniz_e.txt";
+//     in.open(filename.c_str());
+
+//     if (!in.good())
+//     {
+//         std::cerr << "File \"" << filename << "\" not found" << std::endl;
+//     }
 
 //     char firstLine[256];
 //     in.getline(firstLine,256);
-//     double dEdx_new;
-//     double energy;
-//     double dEdx;
+
+//     string particleName;
+//     string mediumName;
 //     double ecut;
 //     double vcut;
-//     string mediumName;
-//     string particleName;
+//     double multiplier;
+//     double energy;
+//     double rnd1, rnd2;
+//     double stochastic_loss_stored;
+//     double stochastic_loss_new;
 
 //     cout.precision(16);
-
+//     RandomGenerator::Get().SetSeed(0);
 
 //     while(in.good())
 //     {
-//         in>>ecut>>vcut>>energy>>mediumName>>particleName>>dEdx;
+//         in >> particleName >> mediumName >> ecut >> vcut >> multiplier
+//             >> energy >> rnd1 >> rnd2 >> stochastic_loss_stored;
 
-//         Medium *medium = MediumFactory::Get()->CreateMedium(mediumName);
-//         PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),position,direction,1e5,10);
-//         particle->SetEnergy(energy);
-//         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
+//         ParticleDef particle_def = getParticleDef(particleName);
+//         Medium *medium = MediumFactory::Get().CreateMedium(mediumName);
+//         EnergyCutSettings ecuts(ecut,vcut);
 
-//         CrossSections *ioniz = new Ionization(particle, medium, cuts);
+//         Ionization Ioniz(particle_def, *medium, ecuts, multiplier);
+//         IonizIntegral Ioniz_Int(Ioniz);
 
-//         dEdx_new=ioniz->CalculatedEdx();
-//         ASSERT_NEAR(dEdx_new, dEdx, 1e-12*dEdx);
+//         stochastic_loss_new = Ioniz_Int.CalculateStochasticLoss(energy, rnd1, rnd2);
 
-//         delete cuts;
+//         ASSERT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-10*stochastic_loss_stored);
+
 //         delete medium;
-//         delete particle;
-//         delete ioniz;
 //     }
 // }
 
-// TEST(Ionization , Test_of_dNdx ) {
-//     direction.SetSphericalCoordinates(1,.20*PI/180.,20*PI/180.);
-//     direction.CalculateCartesianFromSpherical();
+TEST(Ionization, Test_of_dEdx_Interpolant)
+{
+    ifstream in;
+    string filename = "testfiles/Ioniz_dEdx_interpol.txt";
+    in.open(filename.c_str());
 
+    if (!in.good())
+    {
+        std::cerr << "File \"" << filename << "\" not found" << std::endl;
+    }
+
+    char firstLine[256];
+    in.getline(firstLine,256);
+
+    string particleName;
+    string mediumName;
+    double ecut;
+    double vcut;
+    double multiplier;
+    double energy;
+    double dEdx_stored;
+    double dEdx_new;
+    
+    InterpolationDef InterpolDef;
+
+    cout.precision(16);
+
+    while(in.good())
+    {
+        in >> particleName >> mediumName >> ecut >> vcut >> multiplier
+            >> energy >> dEdx_stored;
+
+        ParticleDef particle_def = getParticleDef(particleName);
+        Medium *medium = MediumFactory::Get().CreateMedium(mediumName);
+        EnergyCutSettings ecuts(ecut,vcut);
+
+        Ionization Ioniz(particle_def, *medium, ecuts, multiplier);
+        IonizInterpolant Ioniz_Interpol(Ioniz, InterpolDef);
+
+        dEdx_new = Ioniz_Interpol.CalculatedEdx(energy);
+
+        ASSERT_NEAR(dEdx_new, dEdx_stored, 1e-10*dEdx_stored);
+
+        delete medium;
+    }
+}
+
+TEST(Ionization, Test_of_dNdx_Interpolant)
+{
+    ifstream in;
+    string filename = "testfiles/Ioniz_dNdx_interpol.txt";
+    in.open(filename.c_str());
+
+    if (!in.good())
+    {
+        std::cerr << "File \"" << filename << "\" not found" << std::endl;
+    }
+
+    char firstLine[256];
+    in.getline(firstLine,256);
+
+    string particleName;
+    string mediumName;
+    double ecut;
+    double vcut;
+    double multiplier;
+    double energy;
+    double dNdx_stored;
+    double dNdx_new;
+
+    InterpolationDef InterpolDef;
+
+    cout.precision(16);
+
+    while(in.good())
+    {
+        in >> particleName >> mediumName >> ecut >> vcut >> multiplier
+            >> energy >> dNdx_stored;
+
+        ParticleDef particle_def = getParticleDef(particleName);
+        Medium *medium = MediumFactory::Get().CreateMedium(mediumName);
+        EnergyCutSettings ecuts(ecut,vcut);
+
+        Ionization Ioniz(particle_def, *medium, ecuts, multiplier);
+        IonizInterpolant Ioniz_Interpol(Ioniz, InterpolDef);
+
+        dNdx_new = Ioniz_Interpol.CalculatedNdx(energy);
+
+        ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-10*dNdx_stored);
+
+        delete medium;
+    }
+}
+
+TEST(Ionization, Test_of_dNdxrnd_interpol)
+{
+    ifstream in;
+    string filename = "testfiles/Ioniz_dNdx_rnd_interpol.txt";
+    in.open(filename.c_str());
+
+    if (!in.good())
+    {
+        std::cerr << "File \"" << filename << "\" not found" << std::endl;
+    }
+
+    char firstLine[256];
+    in.getline(firstLine,256);
+
+    string particleName;
+    string mediumName;
+    double ecut;
+    double vcut;
+    double multiplier;
+    double energy;
+    double rnd;
+    double dNdx_rnd_stored;
+    double dNdx_rnd_new;
+
+    InterpolationDef InterpolDef;
+
+    cout.precision(16);
+    RandomGenerator::Get().SetSeed(0);
+
+    while(in.good())
+    {
+        in >> particleName >> mediumName >> ecut >> vcut >> multiplier
+            >> energy >> rnd >> dNdx_rnd_stored;
+
+        ParticleDef particle_def = getParticleDef(particleName);
+        Medium *medium = MediumFactory::Get().CreateMedium(mediumName);
+        EnergyCutSettings ecuts(ecut,vcut);
+
+        Ionization Ioniz(particle_def, *medium, ecuts, multiplier);
+        IonizInterpolant Ioniz_Interpol(Ioniz, InterpolDef);
+
+        dNdx_rnd_new = Ioniz_Interpol.CalculatedNdx(energy ,rnd);
+
+        ASSERT_NEAR(dNdx_rnd_new, dNdx_rnd_stored, 1E-10*dNdx_rnd_stored);
+
+        delete medium;
+    }
+}
+
+
+// TEST(Ionization, Test_of_e_interpol)
+// {
 //     ifstream in;
-//     in.open("bin/TestFiles/Ioniz_dNdx.txt");
+//     string filename = "testfiles/Ioniz_e_interpol.txt";
+//     in.open(filename.c_str());
 
-//     char firstLine[256];
-//     in.getline(firstLine,256);
-//     double dNdx_new;
-//     double energy;
-//     double dNdx;
-//     double ecut;
-//     double vcut;
-//     string mediumName;
-//     string particleName;
-
-//     cout.precision(16);
-
-
-//     while(in.good())
+//     if (!in.good())
 //     {
-//         in>>ecut>>vcut>>energy>>mediumName>>particleName>>dNdx;
-
-//         Medium *medium = MediumFactory::Get()->CreateMedium(mediumName);
-//         PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),position,direction,1e5,10);
-//         particle->SetEnergy(energy);
-//         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
-
-//         CrossSections *ioniz = new Ionization(particle, medium, cuts);
-
-//         dNdx_new=ioniz->CalculatedNdx();
-//         ASSERT_NEAR(dNdx_new, dNdx, 1e-8*dNdx);
-
-//         delete cuts;
-//         delete medium;
-//         delete particle;
-//         delete ioniz;
-
+//         std::cerr << "File \"" << filename << "\" not found" << std::endl;
 //     }
-// }
-
-// TEST(Ionization , Test_of_dNdxrnd ) {
-//     direction.SetSphericalCoordinates(1,.20*PI/180.,20*PI/180.);
-//     direction.CalculateCartesianFromSpherical();
-
-//     ifstream in;
-//     in.open("bin/TestFiles/Ioniz_dNdxrnd.txt");
 
 //     char firstLine[256];
 //     in.getline(firstLine,256);
 
-//     double dNdxrnd;
-//     double dNdxrnd_new;
-//     double energy;
+//     string particleName;
+//     string mediumName;
 //     double ecut;
 //     double vcut;
-//     string mediumName;
-//     string particleName;
-//     bool lpm;
-//     int para;
-
-//     cout.precision(16);
-//     double energy_old=-1;
-
-//     RndFromFile* Rand = new RndFromFile("bin/TestFiles/rnd.txt");
-
-//     bool first = true;
-//     while(in.good())
-//     {
-//         if(first)in>>ecut>>vcut>>energy>>mediumName>>particleName>>dNdxrnd;
-//         first = false;
-//         energy_old = -1;
-//         Medium *medium = MediumFactory::Get()->CreateMedium(mediumName);
-//         PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),position,direction,1e5,10);
-//         particle->SetEnergy(energy);
-//         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
-
-//         CrossSections *ioniz = new Ionization(particle, medium, cuts);
-
-//         while(energy_old < energy){
-//             energy_old = energy;
-//             ioniz->GetParticle()->SetEnergy(energy);
-//             dNdxrnd_new=ioniz->CalculatedNdx(Rand->rnd());
-
-//             ASSERT_NEAR(dNdxrnd_new, dNdxrnd, 1E-7*dNdxrnd);
-
-//             in>>ecut>>vcut>>energy>>mediumName>>particleName>>dNdxrnd;
-//         }
-
-
-
-//         delete cuts;
-//         delete medium;
-//         delete particle;
-//         delete ioniz;
-//     }
-//     delete Rand;
-// }
-
-// TEST(Ionization , Test_of_e ) {
-//     direction.SetSphericalCoordinates(1,.20*PI/180.,20*PI/180.);
-//     direction.CalculateCartesianFromSpherical();
-
-//     ifstream in;
-//     in.open("bin/TestFiles/Ioniz_e.txt");
-
-//     char firstLine[256];
-//     in.getline(firstLine,256);
-//     double e;
+//     double multiplier;
 //     double energy;
-//     double e_new;
-//     double ecut;
-//     double vcut;
-//     string mediumName;
-//     string particleName;
+//     double rnd1, rnd2;
+//     double stochastic_loss_stored;
+//     double stochastic_loss_new;
+
+//     InterpolationDef InterpolDef;
 
 //     cout.precision(16);
+//     RandomGenerator::Get().SetSeed(0);
 
-//     double precision = 1E-8;
-
-//     RndFromFile* Rand = new RndFromFile("bin/TestFiles/rnd.txt");
-//     RndFromFile* Rand2 = new RndFromFile("bin/TestFiles/rnd.txt");
-//     Rand2->rnd();
-
-//     double rnd1,rnd2;
-
-//     double energy_old;
-//     bool first = true;
 //     while(in.good())
 //     {
-//         if(first)in>>ecut>>vcut>>energy>>mediumName>>particleName>>e;
-//         first = false;
-//         energy_old = -1;
 
-//         Medium *medium = MediumFactory::Get()->CreateMedium(mediumName);
-//         PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),position,direction,1e5,10);
-//         particle->SetEnergy(energy);
-//         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
-//         CrossSections *ioniz = new Ionization(particle, medium, cuts);
+//         in >> particleName >> mediumName >> ecut >> vcut >> multiplier
+//             >> energy >> rnd1 >> rnd2 >> stochastic_loss_stored;
 
-//         while(energy_old < energy)
-//         {
-//             energy_old = energy;
-//             rnd1 = Rand->rnd();
-//             rnd2 = Rand2->rnd();
+//         ParticleDef particle_def = getParticleDef(particleName);
+//         Medium *medium = MediumFactory::Get().CreateMedium(mediumName);
+//         EnergyCutSettings ecuts(ecut,vcut);
 
-//             ioniz->GetParticle()->SetEnergy(energy);
-//             e_new=ioniz->CalculateStochasticLoss(rnd1,rnd2);
+//         Ionization Ioniz(particle_def, *medium, ecuts, multiplier);
+//         IonizInterpolant Ioniz_Interpol(Ioniz, InterpolDef);
 
-//             ASSERT_NEAR(e_new, e, precision*e);
+//         stochastic_loss_new = Ioniz_Interpol.CalculateStochasticLoss(energy ,rnd1, rnd2);
 
-//             in>>ecut>>vcut>>energy>>mediumName>>particleName>>e;
-//         }
-//         delete cuts;
+//         // if(e!=0)if(log10(fabs(1-e_new/e))>-3){
+//         //    cout<< "\t" << ecut<< "\t" << vcut << "\t" << energy<< "\t" << mediumName<< "\t" << particleName<<endl;
+//         //    cout << log10(fabs(1-e_new/e)) << endl;
+//         // }
+
+//         ASSERT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-10*stochastic_loss_stored);
+
 //         delete medium;
-//         delete particle;
-//         delete ioniz;
-//     }
-// }
-
-// TEST(Ionization , Test_of_dEdx_Interpolant ) {
-//     direction.SetSphericalCoordinates(1,.20*PI/180.,20*PI/180.);
-//     direction.CalculateCartesianFromSpherical();
-
-//     ifstream in;
-//     in.open("bin/TestFiles/Ioniz_dEdx_interpol.txt");
-
-//     char firstLine[256];
-//     in.getline(firstLine,256);
-//     double dEdx_new;
-//     double energy;
-//     double dEdx;
-//     double ecut;
-//     double vcut;
-//     string mediumName;
-//     string particleName;
-
-//     cout.precision(16);
-
-//     double precision = 1E-8;
-
-//     double energy_old;
-//     bool first = true;
-//     while(in.good())
-//     {
-//         if(first)in>>ecut>>vcut>>energy>>mediumName>>particleName>>dEdx;
-//         first = false;
-//         energy_old = -1;
-
-//         Medium *medium = MediumFactory::Get()->CreateMedium(mediumName);
-//         PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),position,direction,1e5,10);
-//         particle->SetEnergy(energy);
-//         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
-//         CrossSections *ioniz = new Ionization(particle, medium, cuts);
-
-//         ioniz->EnableDEdxInterpolation();
-
-//         while(energy_old < energy)
-//         {
-//             energy_old = energy;
-
-//             ioniz->GetParticle()->SetEnergy(energy);
-//             dEdx_new=ioniz->CalculatedEdx();
-
-//             ASSERT_NEAR(dEdx_new, dEdx, precision*dEdx);
-
-//             in>>ecut>>vcut>>energy>>mediumName>>particleName>>dEdx;
-//         }
-//         delete cuts;
-//         delete medium;
-//         delete particle;
-//         delete ioniz;
-//     }
-// }
-
-// TEST(Ionization , Test_of_dNdx_Interpolant ) {
-//     direction.SetSphericalCoordinates(1,.20*PI/180.,20*PI/180.);
-//     direction.CalculateCartesianFromSpherical();
-
-//     ifstream in;
-//     in.open("bin/TestFiles/Ioniz_dNdx_interpol.txt");
-
-//     char firstLine[256];
-//     in.getline(firstLine,256);
-//     double dNdx_new;
-//     double energy;
-//     double dNdx;
-//     double ecut;
-//     double vcut;
-//     string mediumName;
-//     string particleName;
-
-//     cout.precision(16);
-
-//     double precision = 1E-5;
-
-//     double energy_old;
-//     bool first = true;
-//     while(in.good())
-//     {
-//         if(first)in>>ecut>>vcut>>energy>>mediumName>>particleName>>dNdx;
-//         first = false;
-//         energy_old = -1;
-
-//         Medium *medium = MediumFactory::Get()->CreateMedium(mediumName);
-//         PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),position,direction,1e5,10);
-//         particle->SetEnergy(energy);
-//         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
-//         CrossSections *ioniz = new Ionization(particle, medium, cuts);
-
-//         ioniz->EnableDNdxInterpolation();
-
-//         while(energy_old < energy)
-//         {
-//             energy_old = energy;
-
-//             ioniz->GetParticle()->SetEnergy(energy);
-//             dNdx_new=ioniz->CalculatedNdx();
-
-//             ASSERT_NEAR(dNdx_new, dNdx, precision*dNdx);
-
-//             in>>ecut>>vcut>>energy>>mediumName>>particleName>>dNdx;
-//         }
-//         delete cuts;
-//         delete medium;
-//         delete particle;
-//         delete ioniz;
-//     }
-// }
-
-// TEST(Ionization , Test_of_dNdxrnd_interpol ) {
-//     direction.SetSphericalCoordinates(1,.20*PI/180.,20*PI/180.);
-//     direction.CalculateCartesianFromSpherical();
-
-//     ifstream in;
-//     in.open("bin/TestFiles/Ioniz_dNdxrnd_interpol.txt");
-
-//     char firstLine[256];
-//     in.getline(firstLine,256);
-
-//     double dNdxrnd;
-//     double dNdxrnd_new;
-//     double energy;
-//     double ecut;
-//     double vcut;
-//     string mediumName;
-//     string particleName;
-
-//     cout.precision(16);
-//     double energy_old=-1;
-
-//     RndFromFile* Rand = new RndFromFile("bin/TestFiles/rnd.txt");
-
-//     bool first = true;
-//     while(in.good())
-//     {
-//         if(first)in>>ecut>>vcut>>energy>>mediumName>>particleName>>dNdxrnd;
-//         first = false;
-//         energy_old = -1;
-//         Medium *medium = MediumFactory::Get()->CreateMedium(mediumName);
-//         PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),position,direction,1e5,10);
-//         particle->SetEnergy(energy);
-//         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
-
-//         CrossSections *ioniz = new Ionization(particle, medium, cuts);
-//         ioniz->EnableDNdxInterpolation();
-
-//         while(energy_old < energy){
-//             energy_old = energy;
-//             ioniz->GetParticle()->SetEnergy(energy);
-//             dNdxrnd_new=ioniz->CalculatedNdx(Rand->rnd());
-
-//             ASSERT_NEAR(dNdxrnd_new, dNdxrnd, 1E-5*dNdxrnd);
-
-//             in>>ecut>>vcut>>energy>>mediumName>>particleName>>dNdxrnd;
-//         }
-
-
-
-//         delete cuts;
-//         delete medium;
-//         delete particle;
-//         delete ioniz;
-//     }
-//     delete Rand;
-// }
-
-
-// TEST(Ionization , Test_of_e_interpol ) {
-//     direction.SetSphericalCoordinates(1,.20*PI/180.,20*PI/180.);
-//     direction.CalculateCartesianFromSpherical();
-
-//     ifstream in;
-//     in.open("bin/TestFiles/Ioniz_e_interpol.txt");
-
-//     char firstLine[256];
-//     in.getline(firstLine,256);
-//     double e;
-//     double energy;
-//     double e_new;
-//     double ecut;
-//     double vcut;
-//     string mediumName;
-//     string particleName;
-
-//     cout.precision(16);
-
-//     double precision = 1E-2;
-
-//     RndFromFile* Rand = new RndFromFile("bin/TestFiles/rnd.txt");
-//     RndFromFile* Rand2 = new RndFromFile("bin/TestFiles/rnd.txt");
-//     Rand2->rnd();
-
-//     double rnd1,rnd2;
-
-//     double energy_old;
-//     bool first = true;
-//     while(in.good())
-//     {
-//         if(first)in>>ecut>>vcut>>energy>>mediumName>>particleName>>e;
-//         first = false;
-//         energy_old = -1;
-
-//         Medium *medium = MediumFactory::Get()->CreateMedium(mediumName);
-//         PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),position,direction,1e5,10);
-//         particle->SetEnergy(energy);
-//         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
-//         CrossSections *ioniz = new Ionization(particle, medium, cuts);
-
-//         ioniz->EnableDEdxInterpolation();
-
-//         while(energy_old < energy)
-//         {
-//             energy_old = energy;
-//             rnd1 = Rand->rnd();
-//             rnd2 = Rand2->rnd();
-
-//             ioniz->GetParticle()->SetEnergy(energy);
-
-//             e_new=ioniz->CalculateStochasticLoss(rnd1,rnd2);
-
-//             if(e!=0)if(log10(fabs(1-e_new/e))>-3){
-// //                cout<< "\t" << ecut<< "\t" << vcut << "\t" << energy<< "\t" << mediumName<< "\t" << particleName<<endl;
-// //                cout << log10(fabs(1-e_new/e)) << endl;
-//             }
-
-//             ASSERT_NEAR(e_new, e, precision*e);
-
-//             in>>ecut>>vcut>>energy>>mediumName>>particleName>>e;
-//         }
-//         delete cuts;
-//         delete medium;
-//         delete particle;
-//         delete ioniz;
 //     }
 // }
 
