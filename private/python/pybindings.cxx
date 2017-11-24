@@ -615,7 +615,7 @@ void export_crosssections()
     // make "from mypackage.Util import <whatever>" work
     object crosssectionModule(handle<>(borrowed(PyImport_AddModule("pyPROPOSAL.CrossSection"))));
     // make "from mypackage import Util" work
-    scope().attr("Crosssection") = crosssectionModule;
+    scope().attr("CrossSection") = crosssectionModule;
     // set the current scope to the new sub-module
     scope crosssection_scope = crosssectionModule;
     // export stuff in the Util namespace
@@ -626,6 +626,7 @@ void export_crosssections()
     **************************************************************************/
 
     double (CrossSection::*dndx)(double) = &CrossSection::CalculatedNdx;
+    double (CrossSection::*dndx_rnd)(double, double) = &CrossSection::CalculatedNdx;
     double (CrossSection::*stochastic)(double, double, double) = &CrossSection::CalculateStochasticLoss;
 
     class_<CrossSection, boost::shared_ptr<CrossSection>, boost::noncopyable>("CrossSection", no_init)
@@ -635,6 +636,7 @@ void export_crosssections()
         .def("calculate_dEdx", &CrossSection::CalculatedEdx)
         .def("calculate_dE2dx", &CrossSection::CalculatedE2dx)
         .def("calculate_dNdx", dndx)
+        .def("calculate_dNdx_rnd", dndx_rnd)
         .def("calculate_stochastic_loss", stochastic)
 
         .add_property("id", &CrossSection::GetTypeId)
