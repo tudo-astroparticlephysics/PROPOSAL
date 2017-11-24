@@ -692,7 +692,7 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
     // to_python_converter< std::vector<std::vector<double> >, Vector2DToPythonList<double> > ();
 
     to_python_converter< std::vector<std::string>, VectorToPythonList<std::string> >();
-    to_python_converter< std::vector<ParticleDef>, VectorToPythonList<ParticleDef> >();
+    // to_python_converter< std::vector<ParticleDef>, VectorToPythonList<ParticleDef> >();
 
     to_python_converter< std::vector<DynamicData*>, PVectorToPythonList<DynamicData*> >();
     to_python_converter< std::vector<Particle*>, PVectorToPythonList<Particle*> >();
@@ -707,7 +707,7 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
         .from_python<std::vector<double> >()
         .from_python<std::vector<std::vector<double> > >()
         .from_python<std::vector<DynamicData*> >()
-        .from_python<std::vector<ParticleDef> >()
+        // .from_python<std::vector<ParticleDef> >()
         .from_python<std::vector<Particle*> >()
         // .from_python<std::vector<CrossSection*> >()
         .from_python<std::vector<SectorFactory::Definition> >();
@@ -792,7 +792,7 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
 
     class_<TwoBodyPhaseSpace, boost::shared_ptr<TwoBodyPhaseSpace>, bases<DecayChannel> >("TwoBodyPhaseSpace", init<ParticleDef, ParticleDef>());
 
-    class_<ManyBodyPhaseSpace, boost::shared_ptr<ManyBodyPhaseSpace>, bases<DecayChannel> >("ManyBodyPhaseSpace", init<std::vector<ParticleDef> >());
+    class_<ManyBodyPhaseSpace, boost::shared_ptr<ManyBodyPhaseSpace>, bases<DecayChannel> >("ManyBodyPhaseSpace", init<std::vector<const ParticleDef*> >());
 
     class_<StableChannel, boost::shared_ptr<StableChannel>, bases<DecayChannel> >("StableChannel", init<>());
 

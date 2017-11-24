@@ -102,6 +102,8 @@ struct ParticleDef
     ParticleDef(const ParticleDef&);
     virtual ~ParticleDef();
 
+    ParticleDef* clone() const { return new ParticleDef(*this); }
+
     // ParticleDef& operator=(const ParticleDef&);
     // void swap(ParticleDef&);
 
@@ -109,6 +111,9 @@ struct ParticleDef
     bool operator!=(const ParticleDef&) const;
 
     friend std::ostream& operator<<(std::ostream&, ParticleDef const&);
+
+    private:
+    ParticleDef& operator=(const ParticleDef&); // Undefined & not allowed
 };
 
 class ParticleDef::Builder
