@@ -17,7 +17,7 @@ class ManyBodyPhaseSpace : public DecayChannel
         class Builder;
 
     public:
-    ManyBodyPhaseSpace(std::vector<ParticleDef> daughters);
+    ManyBodyPhaseSpace(std::vector<const ParticleDef*> daughters);
     ManyBodyPhaseSpace(const ManyBodyPhaseSpace& mode);
     virtual ~ManyBodyPhaseSpace();
     // No copy and assignemnt -> done by clone
@@ -28,7 +28,7 @@ class ManyBodyPhaseSpace : public DecayChannel
     ///
     /// Calculate decay products with the help of the Raubold Lynch algorithm.
     ///
-    /// @param PROPOSALParticle
+    /// @param Particle
     ///
     /// @return Vector of particles, the decay products
     // ----------------------------------------------------------------------------
@@ -42,7 +42,7 @@ class ManyBodyPhaseSpace : public DecayChannel
     bool compare(const DecayChannel&) const;
     void print(std::ostream&) const;
 
-    std::vector<ParticleDef> daughters_;
+    std::vector<const ParticleDef*> daughters_;
     std::vector<double> daughter_masses_;
     double sum_daughter_masses_;
 
@@ -65,7 +65,7 @@ class ManyBodyPhaseSpace::Builder
     ManyBodyPhaseSpace build();
 
     private:
-    std::vector<ParticleDef> daughters_;
+    std::vector<const ParticleDef*> daughters_;
 
 };
 

@@ -53,7 +53,6 @@ std::ostream& operator<<(std::ostream& os, Component const& component)
        << "\t\t" << component.GetNucCharge() << std::endl;
     os << "AverageNucleonWeight:"
        << "\t" << component.GetAverageNucleonWeight() << std::endl;
-    os << std::defaultfloat;
 
     os << Helper::Centered(60, "");
     return os;
