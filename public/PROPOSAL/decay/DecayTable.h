@@ -9,6 +9,9 @@ namespace PROPOSAL
 {
 
 class DecayChannel;
+class DecayTable;
+
+void swap(DecayTable&, DecayTable&);
 
 class DecayTable
 {

@@ -520,7 +520,7 @@ int main(int argc, char **argv) {
     int ret = RUN_ALL_TESTS();
 
     //Clean the mess
-    std::remove (File1DTest.c_str());
-    std::remove (File2DTest.c_str());
+    // std::remove (File1DTest.c_str());
+    // std::remove (File2DTest.c_str());
     return ret;
 }
