@@ -14,29 +14,40 @@ using namespace PROPOSAL;
 
 const std::string ManyBodyPhaseSpace::name_ = "ManyBodyPhaseSpace";
 
-ManyBodyPhaseSpace::ManyBodyPhaseSpace(std::vector<ParticleDef> daughters)
+ManyBodyPhaseSpace::ManyBodyPhaseSpace(std::vector<const ParticleDef*> daughters)
     : DecayChannel()
-    , daughters_(daughters)
+    , daughters_()
     , daughter_masses_()
     , sum_daughter_masses_(0.0)
 {
-    for(std::vector<ParticleDef>::iterator it = daughters_.begin(); it != daughters_.end(); ++it)
+    for(std::vector<const ParticleDef*>::iterator it = daughters.begin(); it != daughters.end(); ++it)
     {
-        daughter_masses_.push_back(it->mass);
-        sum_daughter_masses_ += it->mass;
+        daughters_.push_back((*it)->clone());
+        daughter_masses_.push_back((*it)->mass);
+        sum_daughter_masses_ += (*it)->mass;
     }
 }
 
 ManyBodyPhaseSpace::~ManyBodyPhaseSpace()
 {
+    for (std::vector<const ParticleDef*>::const_iterator it = daughters_.begin(); it != daughters_.end(); ++it)
+    {
+        delete *it;
+    }
+
+    daughters_.clear();
 }
 
 ManyBodyPhaseSpace::ManyBodyPhaseSpace(const ManyBodyPhaseSpace& mode)
     : DecayChannel(mode)
-    , daughters_(mode.daughters_)
+    , daughters_()
     , daughter_masses_(mode.daughter_masses_)
     , sum_daughter_masses_(mode.sum_daughter_masses_)
 {
+    for (std::vector<const ParticleDef*>::const_iterator it = mode.daughters_.begin(); it != mode.daughters_.end(); ++it)
+    {
+        daughters_.push_back((*it)->clone());
+    }
 }
 
 bool ManyBodyPhaseSpace::compare(const DecayChannel& channel) const
@@ -72,9 +83,9 @@ DecayChannel::DecayProducts ManyBodyPhaseSpace::Decay(const Particle& particle)
     DecayProducts products;
     products.reserve(daughters_.size());
 
-    for (std::vector<ParticleDef>::const_iterator iter = daughters_.begin(); iter != daughters_.end(); ++iter)
+    for (std::vector<const ParticleDef*>::const_iterator it = daughters_.begin(); it != daughters_.end(); ++it)
     {
-        products.push_back(new Particle(*iter));
+        products.push_back(new Particle(**it));
     }
 
     // Create sorted random numbers
@@ -145,9 +156,9 @@ DecayChannel::DecayProducts ManyBodyPhaseSpace::Decay(const Particle& particle)
 void ManyBodyPhaseSpace::print(std::ostream& os) const
 {
     os << "Used particle definitions:" << '\n';
-    for (std::vector<ParticleDef>::const_iterator it = daughters_.begin(); it != daughters_.end(); ++it)
+    for (std::vector<const ParticleDef*>::const_iterator it = daughters_.begin(); it != daughters_.end(); ++it)
     {
-        os << it->name << '\t' << it->mass << '\n';
+        os << (*it)->name << '\t' << (*it)->mass << '\n';
     }
     os << "Sum of masses: " << sum_daughter_masses_ << '\n';
 }
@@ -168,12 +179,18 @@ ManyBodyPhaseSpace::Builder::Builder(const Builder& builder)
 
 ManyBodyPhaseSpace::Builder::~Builder()
 {
+    for (std::vector<const ParticleDef*>::const_iterator it = daughters_.begin(); it != daughters_.end(); ++it)
+    {
+        delete *it;
+    }
+
+    daughters_.clear();
 }
 
 // ------------------------------------------------------------------------- //
 ManyBodyPhaseSpace::Builder& ManyBodyPhaseSpace::Builder::addDaughter(const ParticleDef& daughter)
 {
-    daughters_.push_back(daughter);
+    daughters_.push_back(daughter.clone());
     return *this;
 }
 
