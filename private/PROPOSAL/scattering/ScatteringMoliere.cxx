@@ -56,6 +56,7 @@ Scattering::RandomAngles ScatteringMoliere::CalculateRandomAngle(double dr, doub
                 / (momentum*momentum*beta_Sq) )
             * ( ZSq_average/A_average_ );
 
+
     // Calculate B
     Scattering::RandomAngles random_angles;
 
@@ -129,8 +130,6 @@ ScatteringMoliere::ScatteringMoliere(Particle& particle, const Medium& medium)
 
         A += ki[i] * Ai[i];
     }
-
-    double A_average_ = 0.;
 
     for(int i = 0; i < numComp_; i++)
     {
