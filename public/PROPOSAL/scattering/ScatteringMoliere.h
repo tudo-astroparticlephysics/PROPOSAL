@@ -3,7 +3,7 @@
 #ifndef SCATTERING_MOLIERE_H
 #define SCATTERING_MOLIERE_H
 
-// #include <vector>
+#include <vector>
 // #include <cmath>
 
 // #include "PROPOSAL/medium/Medium.h"
