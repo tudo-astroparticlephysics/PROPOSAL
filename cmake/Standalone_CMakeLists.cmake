@@ -7,7 +7,7 @@ ENDIF(APPLE)
 
 ### full RPATH
 ### copied from https://cmake.org/Wiki/CMake_RPATH_handling
-### set the RPATH so that for using PROPOSAL in python 
+### set the RPATH so that for using PROPOSAL in python
 ### the DYLD_LIBRARY_PATH must not be set in the bashrc
 ### But for using PROPOSAL as c-Library, this path still
 ### has to be set
@@ -200,6 +200,7 @@ TARGET_LINK_LIBRARIES(WriteSectorsFromDomList PROPOSAL)
 ADD_EXECUTABLE(example
         private/test/example.cxx
 )
+SET_TARGET_PROPERTIES(example PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -O2 -g -Wall -Wextra -Wnarrowing -Wpedantic -fdiagnostics-show-option")
 TARGET_LINK_LIBRARIES(example PROPOSAL)
 
 
