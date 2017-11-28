@@ -923,6 +923,8 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
         .def(init<const ParticleDef&>())
             .def(init<const Particle&>())
 
+            .def("inject_state", &Particle::InjectState)
+
             .add_property("momentum", &Particle::GetMomentum, &Particle::SetMomentum)
             .add_property("particle_def", make_function(&Particle::GetParticleDef, return_value_policy<reference_existing_object>()))
             .add_property("decay_table", make_function(&Particle::GetDecayTable, return_internal_reference<>()))
