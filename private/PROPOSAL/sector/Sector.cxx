@@ -256,6 +256,7 @@ double Sector::Propagate(double distance)
     double initial_energy = particle_.GetEnergy();
     double final_energy   = particle_.GetEnergy();
 
+    bool is_decayed = false;
     bool particle_interaction = false;
 
     pair<double, ParticleType::Enum> decay;
@@ -353,25 +354,20 @@ double Sector::Propagate(double distance)
                 continue;
             }
             final_energy -= energy_loss.first;
-            // log_debug("Energyloss: %f\t%s", energy_loss.first,
-            // Particle::GetName(energy_loss.second).c_str());
-            // //TODO(mario): hack Thu 2017/08/24
             Output::getInstance().FillSecondaryVector(particle_, energy_loss.second, energy_loss.first);
+
+            // log_debug("Energyloss: %f\t%s", energy_loss.first,
             // secondary_id    =   particle_.GetParticleId() + 1;
-            // Output::getInstance().FillSecondaryVector(& secondary_id, energy_loss, 0);
         } else
         {
             decay_products = particle_.GetDecayTable().SelectChannel().Decay(particle_);
             Output::getInstance().FillSecondaryVector(decay_products);
 
-            // Set final energy to zero to jumpy out of the while loop.
-            // The value of 0 ensures not have an additional stopping
-            // decay futher below the code
-            final_energy = 0;
+            is_decayed = true;
+            final_energy = particle_.GetMass();
 
-            // log_debug("Decay of particle: %s", particle_->GetName().c_str());
+            // log_debug("Sampled decay of particle: %s", particle_->GetName().c_str());
             // secondary_id    = particle_->GetParticleId()  +   1;
-            // Output::getInstance().FillSecondaryVector(particle_, secondary_id, decay ,0);
         }
 
         // break if the lower limit of particle energy is reached
@@ -387,20 +383,18 @@ double Sector::Propagate(double distance)
     // if a particle is below a specific energy 'elow' and stopping_decay is enabled,
     // the muon gets forced to decay, instead of propagating all the time with dEdx
     // with no significantly produced light
-    if(sector_def_.stopping_decay)
+    if(sector_def_.stopping_decay && propagated_distance!=distance && !is_decayed)
     {
-        if(propagated_distance!=distance && final_energy!=0 && particle_.GetLifetime()>=0)
-        {
-            // TODO: understand what happens in the two following lines
-            //       why is the particle energy set to its mass?
-            //       why is the time increased randomly?
-            //       it doesn't make sense for me (jsoedingrekso)
-            // particle_.GetEnergy() = particle_.GetParticleDef().mass;
-            // particle_.GetTime() -= particle_.GetLifetime()*log(RandomGenerator::Get().RandomDouble());
-            final_energy = 0;
-            decay_products = particle_.GetDecayTable().SelectChannel().Decay(particle_);
-            Output::getInstance().FillSecondaryVector(decay_products);
-        }
+        // TODO: understand what happens in the two following lines
+        //       why is the particle energy set to its mass?
+        //       why is the time increased randomly?
+        //       it doesn't make sense for me (jsoedingrekso)
+        // particle_.GetEnergy() = particle_.GetParticleDef().mass;
+        // particle_.GetTime() -= particle_.GetLifetime()*log(RandomGenerator::Get().RandomDouble());
+        decay_products = particle_.GetDecayTable().SelectChannel().Decay(particle_);
+        Output::getInstance().FillSecondaryVector(decay_products);
+
+        final_energy = particle_.GetMass();
     }
 
     particle_.SetEnergy(final_energy);
@@ -415,8 +409,6 @@ double Sector::Propagate(double distance)
     {
         return -propagated_distance;
     }
-    // Should never be here
-    return 0;
 }
 
 std::pair<double, double> Sector::CalculateEnergyTillStochastic(double initial_energy)
