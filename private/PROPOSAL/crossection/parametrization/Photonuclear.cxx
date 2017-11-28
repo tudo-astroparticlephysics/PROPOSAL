@@ -15,6 +15,30 @@
 using namespace PROPOSAL;
 
 /******************************************************************************
+*                                 RealPhoton                                  *
+******************************************************************************/
+
+bool RealPhoton::operator==(const RealPhoton& photon) const
+{
+    if (typeid(*this) != typeid(photon))
+        return false;
+    else
+        return compare(photon);
+}
+
+bool RealPhoton::operator!=(const RealPhoton& photon) const
+{
+    return !(*this == photon);
+}
+
+bool RealPhoton::compare(const RealPhoton& photon) const
+{
+    (void) photon;
+    return true;
+}
+
+
+/******************************************************************************
 *                                   HardBB                                    *
 ******************************************************************************/
 
@@ -58,6 +82,16 @@ HardBB::~HardBB()
     {
         delete *it;
     }
+}
+
+bool HardBB::compare(const RealPhoton& photon) const
+{
+    const HardBB* bb = static_cast<const HardBB*>(&photon);
+
+    if (interpolant_ != bb->interpolant_)
+        return false;
+    else
+        return RealPhoton::compare(photon);
 }
 
 // ------------------------------------------------------------------------- //

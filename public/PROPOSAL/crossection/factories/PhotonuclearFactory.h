@@ -69,7 +69,7 @@ class PhotonuclearFactory
     typedef boost::function<ShadowEffect*(void)> RegisterShadowEffectFunction;
 
     typedef boost::function<
-        Photonuclear*(const ParticleDef&, const Medium&, const EnergyCutSettings&, const RealPhoton&, double multiplier)>
+        Photonuclear*(const ParticleDef&, const Medium&, const EnergyCutSettings&, bool hardbb, double multiplier)>
         RegisterRealPhotonFunction;
 
     typedef boost::function<

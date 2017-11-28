@@ -100,9 +100,11 @@ ShadowEffect* PhotonuclearFactory::CreateShadowEffect(const std::string& name)
     if (it != photo_shadow_map_str_.end())
     {
         return it->second();
-    } else
+    }
+    else
     {
         log_fatal("Photonuclear %s not registerd!", name.c_str());
+        return NULL; // Just to prevent warinngs
     }
 }
 
@@ -114,9 +116,11 @@ ShadowEffect* PhotonuclearFactory::CreateShadowEffect(const Shadow& shadow)
     if (it != photo_shadow_map_enum_.end())
     {
         return it->second();
-    } else
+    }
+    else
     {
         log_fatal("Photonuclear %s not registerd!", typeid(shadow).name());
+        return NULL; // Just to prevent warinngs
     }
 }
 
@@ -139,24 +143,12 @@ CrossSection* PhotonuclearFactory::CreatePhotonuclear(const ParticleDef& particl
     }
     else if (it_photo != photo_real_map_enum_.end())
     {
-        RealPhoton* real_photon;
-
-        if (def.hardbb)
-        {
-            real_photon = new HardBB(particle_def);
-        }
-        else
-        {
-            real_photon = new SoftBB();
-        }
-
-        PhotoIntegral* photo = new PhotoIntegral(*it_photo->second(particle_def, medium, cuts, *real_photon, def.multiplier));
-        delete real_photon;
-        return photo;
+        return new PhotoIntegral(*it_photo->second(particle_def, medium, cuts, def.hardbb, def.multiplier));
     }
     else
     {
         log_fatal("Photonuclear %s not registerd!", typeid(def.parametrization).name());
+        return NULL; // Just to prevent warinngs
     }
 }
 
@@ -180,24 +172,12 @@ CrossSection* PhotonuclearFactory::CreatePhotonuclear(const ParticleDef& particl
     }
     else if (it_photo != photo_real_map_enum_.end())
     {
-        RealPhoton* real_photon;
-
-        if (def.hardbb)
-        {
-            real_photon = new HardBB(particle_def);
-        }
-        else
-        {
-            real_photon = new SoftBB();
-        }
-
-        PhotoInterpolant* photo = new PhotoInterpolant(*it_photo->second(particle_def, medium, cuts, *real_photon, def.multiplier), interpolation_def);
-        delete real_photon;
-        return photo;
+        return new PhotoInterpolant(*it_photo->second(particle_def, medium, cuts, def.hardbb, def.multiplier), interpolation_def);
     }
     else
     {
         log_fatal("Photonuclear %s not registerd!", typeid(def.parametrization).name());
+        return NULL; // Just to prevent warinngs
     }
 }
 
@@ -210,9 +190,11 @@ PhotonuclearFactory::Enum PhotonuclearFactory::GetEnumFromString(const std::stri
     if (it != string_enum_.left.end())
     {
         return it->second;
-    } else
+    }
+    else
     {
         log_fatal("Photonuclear %s not registerd!", name.c_str());
+        return AbramowiczLevinLevyMaor97; // Just to prevent warinngs
     }
 }
 
@@ -223,9 +205,11 @@ std::string PhotonuclearFactory::GetStringFromEnum(const PhotonuclearFactory::En
     if (it != string_enum_.right.end())
     {
         return it->second;
-    } else
+    }
+    else
     {
         log_fatal("Photonuclear %s not registerd!", typeid(enum_t).name());
+        return ""; // Just to prevent warinngs
     }
 }
 
@@ -238,9 +222,11 @@ PhotonuclearFactory::Shadow PhotonuclearFactory::GetShadowEnumFromString(const s
     if (it != string_shadow_enum_.left.end())
     {
         return it->second;
-    } else
+    }
+    else
     {
         log_fatal("Photonuclear %s not registerd!", name.c_str());
+        return ShadowDuttaRenoSarcevicSeckel; // Just to prevent warinngs
     }
 }
 
@@ -255,5 +241,6 @@ std::string PhotonuclearFactory::GetStringFromShadowEnum(const Shadow& shadow)
     } else
     {
         log_fatal("Photonuclear %s not registerd!", typeid(shadow).name());
+        return ""; // Just to prevent warinngs
     }
 }

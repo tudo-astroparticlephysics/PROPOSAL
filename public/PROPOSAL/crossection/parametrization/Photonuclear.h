@@ -22,9 +22,15 @@ class RealPhoton
 
         virtual RealPhoton* clone() const = 0;
 
+        bool operator==(const RealPhoton&) const;
+        bool operator!=(const RealPhoton&) const;
+
         virtual double CalculateHardBB(double energy, double v) = 0;
 
         virtual const std::string& GetName() const = 0;
+
+    protected:
+        virtual bool compare(const RealPhoton&) const;
 };
 
 class SoftBB: public RealPhoton
@@ -58,6 +64,8 @@ class HardBB: public RealPhoton
         virtual const std::string& GetName() const { return name_; }
 
     private:
+        virtual bool compare(const RealPhoton&) const;
+
         static std::vector<double> x;
         std::vector<Interpolant*> interpolant_;
 
