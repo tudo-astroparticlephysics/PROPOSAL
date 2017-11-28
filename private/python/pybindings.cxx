@@ -34,7 +34,7 @@
 #define PHOTO_REAL_DEF(cls, parent)                                                                                    \
     class_<Photo##cls, boost::shared_ptr<Photo##cls>, bases<Photo##parent> >(                                          \
         #cls,                                                                                                          \
-        init<const ParticleDef&, const Medium&, const EnergyCutSettings&, const RealPhoton&, double>(                  \
+        init<const ParticleDef&, const Medium&, const EnergyCutSettings&, bool, double>(                        \
             (arg("particle_def"), arg("medium"), arg("energy_cuts"), arg("real_photon"), arg("multiplier"))));
 
 #define PHOTO_Q2_DEF(cls)                                                                                              \
