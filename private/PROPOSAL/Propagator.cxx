@@ -15,6 +15,9 @@
 #include "PROPOSAL/geometry/Sphere.h"
 #include "PROPOSAL/geometry/Box.h"
 #include "PROPOSAL/geometry/Cylinder.h"
+#include "PROPOSAL/geometry/GeometryFactory.h"
+
+#include "PROPOSAL/medium/MediumFactory.h"
 
 #include "PROPOSAL/Constants.h"
 
@@ -87,16 +90,16 @@ Propagator::Propagator(const std::vector<Sector*>& sectors, const Geometry& geom
 
 // ------------------------------------------------------------------------- //
 Propagator::Propagator(const ParticleDef& particle_def,
-                       const std::vector<SectorFactory::Definition>& sector_defs,
+                       const std::vector<Sector::Definition>& sector_defs,
                        const Geometry& geometry)
     : seed_(1)
     , particle_(particle_def)
     , detector_(geometry.clone())
 {
-    for (std::vector<SectorFactory::Definition>::const_iterator iter = sector_defs.begin(); iter != sector_defs.end();
+    for (std::vector<Sector::Definition>::const_iterator iter = sector_defs.begin(); iter != sector_defs.end();
          ++iter)
     {
-        sectors_.push_back(SectorFactory::Get().CreateSector(particle_, *iter));
+        sectors_.push_back(new Sector(particle_, *iter));
     }
 
     try
@@ -111,17 +114,17 @@ Propagator::Propagator(const ParticleDef& particle_def,
 
 // ------------------------------------------------------------------------- //
 Propagator::Propagator(const ParticleDef& particle_def,
-                       const std::vector<SectorFactory::Definition>& sector_defs,
+                       const std::vector<Sector::Definition>& sector_defs,
                        const Geometry& geometry,
                        const InterpolationDef& interpolation_def)
     : seed_(1)
     , particle_(particle_def)
     , detector_(geometry.clone())
 {
-    for (std::vector<SectorFactory::Definition>::const_iterator iter = sector_defs.begin(); iter != sector_defs.end();
+    for (std::vector<Sector::Definition>::const_iterator iter = sector_defs.begin(); iter != sector_defs.end();
          ++iter)
     {
-        sectors_.push_back(SectorFactory::Get().CreateSector(particle_, *iter, interpolation_def));
+        sectors_.push_back(new Sector(particle_, *iter, interpolation_def));
     }
 
     try
@@ -221,7 +224,7 @@ Propagator::Propagator(const ParticleDef& particle_def, const std::string& confi
     // detector_ = ParseGeometryConifg(pt_json.get_child("detector"));
 
     // Read in global sector definition
-    SectorFactory::Definition sec_def_global;
+    Sector::Definition sec_def_global;
 
     SetMember(sec_def_global.utility_def.brems_def.multiplier, "global.brems_multiplier", pt_json);
     SetMember(sec_def_global.utility_def.photo_def.multiplier, "global.photo_multiplier", pt_json);
@@ -294,12 +297,18 @@ Propagator::Propagator(const ParticleDef& particle_def, const std::string& confi
         // Use global options in case they will not be overriden
         Sector::Definition sec_def_infront = sec_def_global;
         sec_def_infront.location = Sector::ParticleLocation::InfrontDetector;
+        sec_def_infront.SetMedium(*med);
+        sec_def_infront.SetGeometry(*geometry);
 
         Sector::Definition sec_def_inside  = sec_def_global;
         sec_def_inside.location = Sector::ParticleLocation::InsideDetector;
+        sec_def_inside.SetMedium(*med);
+        sec_def_inside.SetGeometry(*geometry);
 
         Sector::Definition sec_def_behind  = sec_def_global;
         sec_def_behind.location = Sector::ParticleLocation::BehindDetector;
+        sec_def_behind.SetMedium(*med);
+        sec_def_behind.SetGeometry(*geometry);
 
         EnergyCutSettings cuts_infront;
         EnergyCutSettings cuts_inside;
@@ -310,30 +319,31 @@ Propagator::Propagator(const ParticleDef& particle_def, const std::string& confi
 
         if (child_cuts_infront)
         {
-            cuts_infront.SetEcut(child_cuts_infront.get().get<double>("e_cut"));
-            cuts_infront.SetVcut(child_cuts_infront.get().get<double>("v_cut"));
+            sec_def_infront.cut_settings.SetEcut(child_cuts_infront.get().get<double>("e_cut"));
+            sec_def_infront.cut_settings.SetVcut(child_cuts_infront.get().get<double>("v_cut"));
             sec_def_infront.do_continuous_randomization = child_cuts_infront.get().get<bool>("cont_rand");
 
         } else
         {
-            cuts_infront.SetEcut(global_ecut_infront);
-            cuts_infront.SetVcut(global_vcut_infront);
+            sec_def_infront.cut_settings.SetEcut(global_ecut_infront);
+            sec_def_infront.cut_settings.SetVcut(global_vcut_infront);
             sec_def_infront.do_continuous_randomization = global_cont_infront;
         }
+
 
         boost::optional<const boost::property_tree::ptree&> child_cuts_inside =
             it->second.get_child_optional("cuts_inside");
 
         if (child_cuts_inside)
         {
-            cuts_inside.SetEcut(child_cuts_inside.get().get<double>("e_cut"));
-            cuts_inside.SetVcut(child_cuts_inside.get().get<double>("v_cut"));
+            sec_def_inside.cut_settings.SetEcut(child_cuts_inside.get().get<double>("e_cut"));
+            sec_def_inside.cut_settings.SetVcut(child_cuts_inside.get().get<double>("v_cut"));
             sec_def_inside.do_continuous_randomization = child_cuts_inside.get().get<bool>("cont_rand");
 
         } else
         {
-            cuts_inside.SetEcut(global_ecut_inside);
-            cuts_inside.SetVcut(global_vcut_inside);
+            sec_def_inside.cut_settings.SetEcut(global_ecut_inside);
+            sec_def_inside.cut_settings.SetVcut(global_vcut_inside);
             sec_def_inside.do_continuous_randomization = global_cont_inside;
         }
 
@@ -342,27 +352,27 @@ Propagator::Propagator(const ParticleDef& particle_def, const std::string& confi
 
         if (child_cuts_behind)
         {
-            cuts_behind.SetEcut(child_cuts_behind.get().get<double>("e_cut"));
-            cuts_behind.SetVcut(child_cuts_behind.get().get<double>("v_cut"));
+            sec_def_behind.cut_settings.SetEcut(child_cuts_behind.get().get<double>("e_cut"));
+            sec_def_behind.cut_settings.SetVcut(child_cuts_behind.get().get<double>("v_cut"));
             sec_def_behind.do_continuous_randomization = child_cuts_behind.get().get<bool>("cont_rand");
 
         } else
         {
-            cuts_behind.SetEcut(global_ecut_behind);
-            cuts_behind.SetVcut(global_vcut_behind);
+            sec_def_behind.cut_settings.SetEcut(global_ecut_behind);
+            sec_def_behind.cut_settings.SetVcut(global_vcut_behind);
             sec_def_behind.do_continuous_randomization = global_cont_behind;
         }
 
         if (interpolate)
         {
-            sectors_.push_back(new Sector(particle_, *med, cuts_infront, *geometry, sec_def_infront, interpolation_def));
-            sectors_.push_back(new Sector(particle_, *med, cuts_inside, *geometry, sec_def_inside, interpolation_def));
-            sectors_.push_back(new Sector(particle_, *med, cuts_behind, *geometry, sec_def_behind, interpolation_def));
+            sectors_.push_back(new Sector(particle_, sec_def_infront, interpolation_def));
+            sectors_.push_back(new Sector(particle_, sec_def_inside, interpolation_def));
+            sectors_.push_back(new Sector(particle_, sec_def_behind, interpolation_def));
         } else
         {
-            sectors_.push_back(new Sector(particle_, *med, cuts_infront, *geometry, sec_def_infront));
-            sectors_.push_back(new Sector(particle_, *med, cuts_inside, *geometry, sec_def_inside));
-            sectors_.push_back(new Sector(particle_, *med, cuts_behind, *geometry, sec_def_behind));
+            sectors_.push_back(new Sector(particle_, sec_def_infront));
+            sectors_.push_back(new Sector(particle_, sec_def_inside));
+            sectors_.push_back(new Sector(particle_, sec_def_behind));
         }
 
         delete geometry;

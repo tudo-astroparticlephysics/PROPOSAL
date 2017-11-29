@@ -67,7 +67,7 @@ if __name__ == "__main__":
     crosssections = []
 
     for param in params:
-        crosssections.append(pp.Crosssection.PhotoInterpolant(
+        crosssections.append(pp.CrossSection.PhotoInterpolant(
             param,
             interpolation_def
         ))
