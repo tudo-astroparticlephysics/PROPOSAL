@@ -14,7 +14,7 @@ except ImportError:
         "Numpy not installed! Needed to calculate the detector cylinder"
     )
 
-import pyPROPOSAL
+import pyPROPOSAL as pp
 
 
 def plot_3D_cylinder(
@@ -79,71 +79,81 @@ def propagate():
         (Geometry) Geometry of the detector
         (list)     List of secondarys particles represeint interactions
     """
-    particle_type = pyPROPOSAL.ParticleType.MuMinus
-    medium_type = pyPROPOSAL.MediumType.Ice
 
-    med = pyPROPOSAL.Medium(medium_type)
+    geo_def_detector = pp.GeometryDefinition()
+    geo_def_detector.shape = pp.Shape.Cylinder
+    geo_def_detector.radius = 80000
+    geo_def_detector.height = 160000
 
-    cuts_inside = pyPROPOSAL.EnergyCutSettings(500, -1)
-    cuts_infront = pyPROPOSAL.EnergyCutSettings(-1, 0.05)
-    cuts_behind = pyPROPOSAL.EnergyCutSettings(-1, 0.05)
+    geo_def_outside = pp.GeometryDefinition()
+    geo_def_outside.shape = pp.Shape.Box
+    geo_def_outside.depth = 50000000
+    geo_def_outside.height = 50000000
+    geo_def_outside.width = 50000000
 
-    prop = pyPROPOSAL.Propagator(
-        particle_type,
-        "../../resources/tables"
+    med_def = pp.MediumDefinition()
+    med_def.type = pp.MediumType.Ice
+
+    # Infront
+
+    sec_def_infront = pp.SectorDefinition()
+    sec_def_infront.medium_def = med_def
+    sec_def_infront.geometry_def = geo_def_outside
+    sec_def_infront.particle_location = pp.ParticleLocation.infront_detector
+
+    sec_def_infront.scattering_model = pp.ScatteringModel.moliere
+
+    sec_def_infront.e_cut = -1
+    sec_def_infront.v_cut = 0.05
+
+    # Inside
+
+    sec_def_inside = pp.SectorDefinition()
+    sec_def_inside.medium_def = med_def
+    sec_def_inside.geometry_def = geo_def_outside
+    sec_def_inside.particle_location = pp.ParticleLocation.inside_detector
+
+    sec_def_inside.scattering_model = pp.ScatteringModel.moliere
+
+    sec_def_inside.e_cut = 500
+    sec_def_inside.v_cut = -1
+
+    # Behind
+
+    sec_def_behind = pp.SectorDefinition()
+    sec_def_behind.medium_def = med_def
+    sec_def_behind.geometry_def = geo_def_outside
+    sec_def_behind.particle_location = pp.ParticleLocation.behind_detector
+
+    sec_def_behind.scattering_model = pp.ScatteringModel.moliere
+
+    sec_def_behind.e_cut = -1
+    sec_def_behind.v_cut = 0.05
+
+    interpolation_def = pp.InterpolationDef()
+    # interpolation_def.path_to_tables = "~/.local/share/PROPOSAL/tables"
+
+    prop = pp.Propagator(
+        particle_def=pp.MuMinusDef.get(),
+        sector_defs=[sec_def_infront, sec_def_inside, sec_def_behind],
+        detector=pp.Cylinder(pp.Vector3D(), 0, 800, 1600),
+        interpolation_def=interpolation_def
     )
+
     mu = prop.particle
 
     mu.energy = 9e6
-    mu.Z = -1e5
+    mu.direction = pp.Vector3D(0, 0, 1)
 
-    mu_start = pyPROPOSAL.Particle(mu)
+    pos = mu.position
+    pos.set_cartesian_coordinates(0, 0, -1e5)
+    mu.position = pos
 
-    geo_detector = pyPROPOSAL.Geometry().init_cylinder(
-        x0=0,
-        y0=0,
-        z0=0,
-        radius=800,
-        inner_radius=0,
-        z=1600
-    )
-
-    geo_outside = pyPROPOSAL.Geometry().init_box(
-        x0=0,
-        y0=0,
-        z0=0,
-        x=500000,
-        y=500000,
-        z=500000
-    )
-
-    collection_detector = pyPROPOSAL.ProcessCollection(mu, med, cuts_inside)
-    collection_detector.location = 1
-    collection_detector.geometry = geo_detector
-    collection_detector.enable_randomization = True
-
-    collection_infront = pyPROPOSAL.ProcessCollection(mu, med, cuts_infront)
-    collection_infront.location = 0
-    collection_infront.geometry = geo_outside
-    collection_infront.enable_randomization = True
-
-    collection_behind = pyPROPOSAL.ProcessCollection(mu, med, cuts_behind)
-    collection_behind.location = 2
-    collection_behind.geometry = geo_outside
-    collection_behind.enable_randomization = True
-
-    prop.collections = [
-        collection_infront,
-        collection_detector,
-        collection_behind
-    ]
-
-    prop.detector = geo_detector
-    prop.apply_options()
+    mu_start = pp.Particle(mu)
 
     secondarys = prop.propagate()
 
-    return mu_start, geo_detector, secondarys
+    return mu_start, prop.detector, secondarys
 
 
 def plot_track(mu_start, geo_detector, secondarys):
@@ -163,51 +173,55 @@ def plot_track(mu_start, geo_detector, secondarys):
     ax = plot_3D_cylinder(
         ax,
         geo_detector.radius / 100,
-        geo_detector.z / 100,
-        elevation=-geo_detector.z / 2.0 / 100,
+        geo_detector.height / 100,
+        elevation=-geo_detector.height / 2.0 / 100,
         resolution=10,
         color='k',
         alpha=0.5,
-        x_center=geo_detector.x0 / 100,
-        y_center=geo_detector.y0 / 100
+        x_center=geo_detector.position.x / 100,
+        y_center=geo_detector.position.y / 100
     )
 
     ax.scatter(
-        mu_start.X/100,
-        mu_start.Y/100,
-        mu_start.Z/100,
+        mu_start.position.x/100,
+        mu_start.position.y/100,
+        mu_start.position.z/100,
         c='r'
     )
 
-    x, y, z = sphere_to_cart(200, mu_start.phi, mu_start.theta)
+    x, y, z = sphere_to_cart(
+        200,
+        mu_start.direction.phi,
+        mu_start.direction.theta
+    )
 
     ax.quiver(
-        mu_start.X/100,
-        mu_start.Y/100,
-        mu_start.Z/100,
+        mu_start.position.x/100,
+        mu_start.position.y/100,
+        mu_start.position.z/100,
         x,
         y,
         z
     )
 
     for interaction in secondarys:
-        if geo_detector.is_particle_inside(interaction):
+        if geo_detector.is_inside(interaction.position, interaction.direction):
             color = 'b'
-            if interaction.type == pyPROPOSAL.ParticleType.Brems:
+            if interaction.id == pp.Data.Brems:
                 color = 'b'
-            elif interaction.type == pyPROPOSAL.ParticleType.EPair:
+            elif interaction.id == pp.Data.Epair:
                 color = 'r'
-            elif interaction.type == pyPROPOSAL.ParticleType.NuclInt:
+            elif interaction.id == pp.Data.NuclInt:
                 color = 'm'
-            elif interaction.type == pyPROPOSAL.ParticleType.DeltaE:
+            elif interaction.id == pp.Data.DeltaE:
                 color = 'g'
             else:
                 color = 'k'
 
             ax.scatter(
-                interaction.X/100,
-                interaction.Y/100,
-                interaction.Z/100,
+                interaction.position.x/100,
+                interaction.position.y/100,
+                interaction.position.z/100,
                 c=color,
                 alpha=0.2,
                 s=interaction.energy/400
