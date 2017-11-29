@@ -86,6 +86,9 @@ class ShadowEffect
 
     virtual ShadowEffect* clone() const = 0;
 
+    bool operator==(const ShadowEffect&) const;
+    bool operator!=(const ShadowEffect&) const;
+
     virtual double CalculateShadowEffect(const Components::Component&, double x, double nu) = 0;
 
     // --------------------------------------------------------------------- //
