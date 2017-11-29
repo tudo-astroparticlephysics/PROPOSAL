@@ -68,7 +68,7 @@ bool PhotoRealPhotonAssumption::compare(const Parametrization& parametrization) 
 {
     const PhotoRealPhotonAssumption* photo = static_cast<const PhotoRealPhotonAssumption*>(&parametrization);
 
-    if (typeid(hardBB_) != typeid(photo->hardBB_))
+    if (*hardBB_ != *photo->hardBB_)
         return false;
     else
         return Photonuclear::compare(parametrization);
