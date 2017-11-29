@@ -68,7 +68,6 @@
 #include "PROPOSAL/scattering/Coefficients.h"
 
 #include "PROPOSAL/sector/Sector.h"
-#include "PROPOSAL/sector/SectorFactory.h"
 
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/EnergyCutSettings.h"

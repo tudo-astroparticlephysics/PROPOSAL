@@ -170,26 +170,6 @@ if __name__ == "__main__":
     #   POPOSAL
     # =========================================================
 
-    geo_def = pyPROPOSAL.GeometryDefinition()
-    geo_def.shape = pyPROPOSAL.Shape.Sphere
-    geo_def.radius = 1e20
-    geo_def.inner_radius = 0
-
-    med_def = pyPROPOSAL.MediumDefinition()
-    med_def.type = pyPROPOSAL.MediumType.Ice
-
-    sec_def = pyPROPOSAL.SectorDefinition()
-    sec_def.medium_def = med_def
-    sec_def.geometry_def = geo_def
-    sec_def.particle_location = pyPROPOSAL.ParticleLocation.inside_detector
-
-    sec_def.scattering_model = pyPROPOSAL.ScatteringModel.moliere
-
-    sec_def.e_cut = 500
-    sec_def.v_cut = 0.05
-
-    interpolation_def = pyPROPOSAL.InterpolationDef()
-
     prop = pyPROPOSAL.Propagator(
         particle_def=pyPROPOSAL.MuMinusDef.get(),
         config_file=config_file
