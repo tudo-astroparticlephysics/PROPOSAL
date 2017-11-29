@@ -2,7 +2,6 @@ import pyPROPOSAL as pp
 
 try:
     import matplotlib as mpl
-    mpl.use('Agg')
     import matplotlib.pyplot as plt
 except ImportError:
     raise ImportError("Matplotlib not installed!")
@@ -39,11 +38,11 @@ if __name__ == "__main__":
 
     interpolation_def = pp.InterpolationDef()
 
-    prop = pp.Propagator(particle_def=pp.MuMinusDef.get()
-        # , config_file="resources/config.json"
-        , sector_defs=[sec_def]
-        , detector=pp.Sphere(pp.Vector3D(), 1e20, 0)
-        , interpolation_def=interpolation_def
+    prop = pp.Propagator(
+            particle_def=pp.TauMinusDef.get(),
+            sector_defs=[sec_def],
+            detector=pp.Sphere(pp.Vector3D(), 1e20, 0),
+            interpolation_def=interpolation_def
     )
 
     mu = prop.particle
@@ -72,15 +71,18 @@ if __name__ == "__main__":
 
     ax.hist(mu_length, histtype="step", log=True, bins=50)
 
-    ax.set_title("{} muons with energy {} TeV".format(
+    ax.set_title("{} {}'s with energy {} TeV".format(
         statistics,
+        prop.particle.particle_def.name,
         energy / 1e6
     ))
     ax.set_xlabel(r'range / m')
     ax.set_ylabel(r'count')
 
     fig_length.tight_layout()
-    fig_length.savefig("muon_lenghts.pdf")
+    fig_length.savefig(
+        "{}_lenghts.pdf".format(prop.particle.particle_def.name)
+    )
 
     # =========================================================
     # 	Plot secondarys
@@ -99,4 +101,6 @@ if __name__ == "__main__":
     ax.set_ylabel(r'count')
 
     fig_secondarys.tight_layout()
-    fig_secondarys.savefig("muon_secondarys.pdf")
+    fig_length.savefig(
+        "{}_secondaries.pdf".format(prop.particle.particle_def.name)
+    )
