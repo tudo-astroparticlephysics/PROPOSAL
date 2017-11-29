@@ -1237,7 +1237,8 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
         // .def(self_ns::str(self_ns::self))
 
         .def("propagate", &Propagator::Propagate, (arg("max_distance_cm") = 1e20))
-        .add_property("particle", make_function(&Propagator::GetParticle, return_internal_reference<>()), "Get the internal created particle to modify its properties");
+        .add_property("particle", make_function(&Propagator::GetParticle, return_internal_reference<>()), "Get the internal created particle to modify its properties")
+        .add_property("detector", make_function(&Propagator::GetDetector, return_internal_reference<>()), "Get the detector geometry");
 
     // --------------------------------------------------------------------- //
     // PropagatorService
