@@ -698,7 +698,7 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
     to_python_converter< std::vector<Particle*>, PVectorToPythonList<Particle*> >();
     // to_python_converter< std::vector<CrossSection*>, PVectorToPythonList<CrossSection*> >();
 
-    to_python_converter< std::vector<SectorFactory::Definition>, VectorToPythonList<SectorFactory::Definition> >();
+    to_python_converter< std::vector<Sector::Definition>, VectorToPythonList<Sector::Definition> >();
 
     // ----[ Register the from-python converter ]------------ //
 
@@ -710,7 +710,7 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
         // .from_python<std::vector<ParticleDef> >()
         .from_python<std::vector<Particle*> >()
         // .from_python<std::vector<CrossSection*> >()
-        .from_python<std::vector<SectorFactory::Definition> >();
+        .from_python<std::vector<Sector::Definition> >();
 
     // VectorFromPythonList<double>();
     // VectorFromPythonList<std::vector<double> >();
@@ -1139,20 +1139,19 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
         .value("inside_detector", Sector::ParticleLocation::InsideDetector)
         .value("behind_detector", Sector::ParticleLocation::BehindDetector);
 
-    class_<SectorFactory::Definition, boost::shared_ptr<SectorFactory::Definition> >("SectorDefinition", init<>())
+    class_<Sector::Definition, boost::shared_ptr<Sector::Definition> >("SectorDefinition", init<>())
 
-        .def_readwrite("e_cut", &SectorFactory::Definition::e_cut)
-        .def_readwrite("v_cut", &SectorFactory::Definition::v_cut)
-        .def_readwrite("medium_def", &SectorFactory::Definition::medium_def)
-        .def_readwrite("geometry_def", &SectorFactory::Definition::geometry_def)
-        .def_readwrite("do_weighting", &SectorFactory::Definition::do_weighting)
-        .def_readwrite("weighting_order", &SectorFactory::Definition::weighting_order)
-        .def_readwrite("stopping_decay", &SectorFactory::Definition::stopping_decay)
-        .def_readwrite("do_continuous_randomization", &SectorFactory::Definition::do_continuous_randomization)
-        .def_readwrite("do_exact_time_calculation", &SectorFactory::Definition::do_exact_time_calculation)
-        .def_readwrite("scattering_model", &SectorFactory::Definition::scattering_model)
-        .def_readwrite("particle_location", &SectorFactory::Definition::location)
-        .def_readwrite("crosssection_defs", &SectorFactory::Definition::utility_def)
+        .def_readwrite("cut_settings", &Sector::Definition::cut_settings)
+        .add_property("medium", make_function(&Sector::Definition::GetMedium, return_internal_reference<>()), &Sector::Definition::SetMedium)
+        .add_property("geometry", make_function(&Sector::Definition::GetGeometry, return_internal_reference<>()), &Sector::Definition::SetGeometry)
+        .def_readwrite("do_weighting", &Sector::Definition::do_weighting)
+        .def_readwrite("weighting_order", &Sector::Definition::weighting_order)
+        .def_readwrite("stopping_decay", &Sector::Definition::stopping_decay)
+        .def_readwrite("do_continuous_randomization", &Sector::Definition::do_continuous_randomization)
+        .def_readwrite("do_exact_time_calculation", &Sector::Definition::do_exact_time_calculation)
+        .def_readwrite("scattering_model", &Sector::Definition::scattering_model)
+        .def_readwrite("particle_location", &Sector::Definition::location)
+        .def_readwrite("crosssection_defs", &Sector::Definition::utility_def)
     ;
 
     // --------------------------------------------------------------------- //
@@ -1222,10 +1221,10 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
     // --------------------------------------------------------------------- //
 
     class_<Propagator, boost::shared_ptr<Propagator> >(
-        "Propagator", init<const ParticleDef&, const std::vector<SectorFactory::Definition>&, const Geometry&>((arg("partcle_def"), arg("sector_defs"), arg("detector"))))
+        "Propagator", init<const ParticleDef&, const std::vector<Sector::Definition>&, const Geometry&>((arg("partcle_def"), arg("sector_defs"), arg("detector"))))
 
         .def(init<const ParticleDef&,
-                  const std::vector<SectorFactory::Definition>&,
+                  const std::vector<Sector::Definition>&,
                   const Geometry&,
                   const InterpolationDef&>((
             arg("particle_def"), arg("sector_defs"), arg("detector"), arg("interpolation_def"))))
