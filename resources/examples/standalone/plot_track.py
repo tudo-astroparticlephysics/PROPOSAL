@@ -80,67 +80,63 @@ def propagate():
         (list)     List of secondarys particles represeint interactions
     """
 
-    geo_def_detector = pp.GeometryDefinition()
-    geo_def_detector.shape = pp.Shape.Cylinder
-    geo_def_detector.radius = 80000
-    geo_def_detector.height = 160000
-
-    geo_def_outside = pp.GeometryDefinition()
-    geo_def_outside.shape = pp.Shape.Box
-    geo_def_outside.depth = 50000000
-    geo_def_outside.height = 50000000
-    geo_def_outside.width = 50000000
-
-    med_def = pp.MediumDefinition()
-    med_def.type = pp.MediumType.Ice
+    medium = pp.Medium.Ice(1.0)
+    geo_detector = pp.Cylinder(pp.Vector3D(), 800, 0, 1600)
+    geo_outside = pp.Box(pp.Vector3D(), 500000, 500000, 500000)
 
     # Infront
 
     sec_def_infront = pp.SectorDefinition()
-    sec_def_infront.medium_def = med_def
-    sec_def_infront.geometry_def = geo_def_outside
+    sec_def_infront.medium = medium
+    sec_def_infront.geometry = geo_outside
     sec_def_infront.particle_location = pp.ParticleLocation.infront_detector
 
     sec_def_infront.scattering_model = pp.ScatteringModel.moliere
 
-    sec_def_infront.e_cut = -1
-    sec_def_infront.v_cut = 0.05
+    sec_def_infront.cut_settings.ecut = -1
+    sec_def_infront.cut_settings.vcut = 0.05
 
     # Inside
 
     sec_def_inside = pp.SectorDefinition()
-    sec_def_inside.medium_def = med_def
-    sec_def_inside.geometry_def = geo_def_outside
+    sec_def_inside.medium = medium
+    sec_def_inside.geometry = geo_outside
     sec_def_inside.particle_location = pp.ParticleLocation.inside_detector
 
     sec_def_inside.scattering_model = pp.ScatteringModel.moliere
 
-    sec_def_inside.e_cut = 500
-    sec_def_inside.v_cut = -1
+    sec_def_inside.cut_settings.ecut = 500
+    sec_def_inside.cut_settings.vcut = -1
 
     # Behind
 
     sec_def_behind = pp.SectorDefinition()
-    sec_def_behind.medium_def = med_def
-    sec_def_behind.geometry_def = geo_def_outside
+    sec_def_behind.medium = medium
+    sec_def_behind.geometry = geo_outside
     sec_def_behind.particle_location = pp.ParticleLocation.behind_detector
 
     sec_def_behind.scattering_model = pp.ScatteringModel.moliere
 
-    sec_def_behind.e_cut = -1
-    sec_def_behind.v_cut = 0.05
+    sec_def_behind.cut_settings.ecut = -1
+    sec_def_behind.cut_settings.vcut = 0.05
+
+    # Interpolation defintion
 
     interpolation_def = pp.InterpolationDef()
-    # interpolation_def.path_to_tables = "~/.local/share/PROPOSAL/tables"
+    interpolation_def.path_to_tables = "~/.local/share/PROPOSAL/tables"
+
+    # Propagator
 
     prop = pp.Propagator(
         particle_def=pp.MuMinusDef.get(),
         sector_defs=[sec_def_infront, sec_def_inside, sec_def_behind],
-        detector=pp.Cylinder(pp.Vector3D(), 0, 800, 1600),
+        detector=geo_detector,
         interpolation_def=interpolation_def
     )
 
     mu = prop.particle
+
+    # Set energy and position of the particle
 
     mu.energy = 9e6
     mu.direction = pp.Vector3D(0, 0, 1)
@@ -153,7 +149,7 @@ def propagate():
 
     secondarys = prop.propagate()
 
-    return mu_start, prop.detector, secondarys
+    return mu_start, geo_detector, secondarys
 
 
 def plot_track(mu_start, geo_detector, secondarys):

@@ -24,7 +24,7 @@
 
 // there is a known apple bug
 #if defined (__APPLE__)
-/* undo some macro defs in pyport.h 
+/* undo some macro defs in pyport.h
  the /boost/property_tree/detail/ptree_utils.hpp:31:66 the std::toupper is used
  which would crash, if somewhere before the pyport.h is included
  (comes with including python.h) */
@@ -39,20 +39,14 @@
 #endif /* _PY_PORT_CTYPE_UTF8_ISSUE && __cplusplus */
 #endif /* __APPLE__ */
 
-// #include <utility>
 #include <deque>
 #include <vector>
 #include <boost/property_tree/ptree.hpp>
 
 #include "PROPOSAL/Output.h"
-#include "PROPOSAL/sector/SectorFactory.h"
+#include "PROPOSAL/sector/Sector.h"
 
 namespace PROPOSAL {
-
-// class Geometry;
-// class Sector;
-// class Particle;
-// class Vector3D;
 
 class Propagator
 {
@@ -60,8 +54,8 @@ class Propagator
     // Constructors
     Propagator();
     Propagator(const std::vector<Sector*>&, const Geometry&);
-    Propagator(const ParticleDef&, const std::vector<SectorFactory::Definition>&, const Geometry&);
-    Propagator(const ParticleDef&, const std::vector<SectorFactory::Definition>&, const Geometry&, const InterpolationDef&);
+    Propagator(const ParticleDef&, const std::vector<Sector::Definition>&, const Geometry&);
+    Propagator(const ParticleDef&, const std::vector<Sector::Definition>&, const Geometry&, const InterpolationDef&);
     Propagator(const ParticleDef&, const std::string&);
 
     Propagator(const Propagator&);
@@ -111,9 +105,6 @@ class Propagator
     //----------------------------------------------------------------------------//
 
     void swap(Propagator& propagator);
-
-    // void ReadConfigFile(std::string config_file, bool DoApplyOptions=true);
-
 
     // --------------------------------------------------------------------- //
     // Getter
@@ -191,7 +182,10 @@ class Propagator
     // ----------------------------------------------------------------------------
     double CalculateEffectiveDistance(const Vector3D& particle_position, const Vector3D& particle_direction);
 
-    int seed_; //!< seed of the random number generator
+    // --------------------------------------------------------------------- //
+    // Global default values
+    // --------------------------------------------------------------------- //
+
     // ParametrizationType::Enum  brems_;                     //!< Bremsstrahlungs parametrization
     // ParametrizationType::Enum  photo_;                     //!< Photonuclear parametrization
     static const double global_ecut_inside_; //!< ecut for inside the detector (it's used when not specified explicit for a sector in
@@ -213,6 +207,12 @@ class Propagator
     static const double global_cont_behind_;  //!< continuous randominzation flag for behind the detector (it's used when not
                                  //!specified explicit for a sector in congiguration file)
     static const bool interpolate_;  //!< Enable interpolation
+
+    // --------------------------------------------------------------------- //
+    // Private Member
+    // --------------------------------------------------------------------- //
+
+    int seed_; //!< seed of the random number generator
 
     std::vector<Sector*> sectors_;
     Sector* current_sector_;
