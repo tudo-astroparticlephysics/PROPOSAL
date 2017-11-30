@@ -177,6 +177,7 @@ class Particle : public DynamicData
     public:
 
     Particle();
+    Particle(const Particle&);
     Particle(const ParticleDef&);
 
     // destructors
