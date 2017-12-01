@@ -34,7 +34,7 @@
 #define PHOTO_REAL_DEF(cls, parent)                                                                                    \
     class_<Photo##cls, boost::shared_ptr<Photo##cls>, bases<Photo##parent> >(                                          \
         #cls,                                                                                                          \
-        init<const ParticleDef&, const Medium&, const EnergyCutSettings&, const RealPhoton&, double>(                  \
+        init<const ParticleDef&, const Medium&, const EnergyCutSettings&, bool, double>(                        \
             (arg("particle_def"), arg("medium"), arg("energy_cuts"), arg("real_photon"), arg("multiplier"))));
 
 #define PHOTO_Q2_DEF(cls)                                                                                              \
@@ -922,6 +922,8 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
 
         .def(init<const ParticleDef&>())
             .def(init<const Particle&>())
+
+            .def("inject_state", &Particle::InjectState)
 
             .add_property("momentum", &Particle::GetMomentum, &Particle::SetMomentum)
             .add_property("particle_def", make_function(&Particle::GetParticleDef, return_value_policy<reference_existing_object>()))

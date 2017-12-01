@@ -182,11 +182,30 @@ class Particle : public DynamicData
     // destructors
     virtual ~Particle() {}
 
-    // void swap(Particle& particle);
-
     // Operators
     bool operator==(const Particle& particle) const;
     bool operator!=(const Particle& particle) const;
+
+    // --------------------------------------------------------------------- //
+    // Methods
+    // --------------------------------------------------------------------- //
+
+    // ----------------------------------------------------------------------------
+    /// @brief Copies state data of the given particle
+    ///
+    /// Copies:
+    ///  - energy
+    ///  - parent particle energy
+    ///  - time
+    ///  - propagated distance
+    ///  - position, direction
+    ///  - position, energy, time at detector entry, exit and closest approach
+    ///    points
+    ///  - energy lost in the detector
+    ///
+    /// @param Particle
+    // ----------------------------------------------------------------------------
+    void InjectState(const Particle&);
 
     // --------------------------------------------------------------------- //
     // Getter & Setter

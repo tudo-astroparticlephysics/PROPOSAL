@@ -15,6 +15,30 @@
 using namespace PROPOSAL;
 
 /******************************************************************************
+*                                 RealPhoton                                  *
+******************************************************************************/
+
+bool RealPhoton::operator==(const RealPhoton& photon) const
+{
+    if (typeid(*this) != typeid(photon))
+        return false;
+    else
+        return compare(photon);
+}
+
+bool RealPhoton::operator!=(const RealPhoton& photon) const
+{
+    return !(*this == photon);
+}
+
+bool RealPhoton::compare(const RealPhoton& photon) const
+{
+    (void) photon;
+    return true;
+}
+
+
+/******************************************************************************
 *                                   HardBB                                    *
 ******************************************************************************/
 
@@ -58,6 +82,24 @@ HardBB::~HardBB()
     {
         delete *it;
     }
+}
+
+bool HardBB::compare(const RealPhoton& photon) const
+{
+    const HardBB* bb = static_cast<const HardBB*>(&photon);
+
+    if (interpolant_.size() != bb->interpolant_.size())
+    {
+        return false;
+    }
+
+    for (unsigned int i = 0; i < interpolant_.size(); ++i)
+    {
+        if (*interpolant_[i] != *bb->interpolant_[i])
+            return false;
+    }
+
+    return RealPhoton::compare(photon);
 }
 
 // ------------------------------------------------------------------------- //
@@ -119,6 +161,19 @@ double SoftBB::CalculateHardBB(double energy, double v)
 
 const std::string ShadowDuttaRenoSarcevicSeckel::name_ = "ShadowDRSS";
 const std::string ShadowButkevichMikhailov::name_ = "ShadowButkevichMikhailov";
+
+bool ShadowEffect::operator==(const ShadowEffect& shadow) const
+{
+    if (typeid(*this) != typeid(shadow))
+        return false;
+    else
+        return true;
+}
+
+bool ShadowEffect::operator!=(const ShadowEffect& shadow) const
+{
+    return !(*this == shadow);
+}
 
 // ------------------------------------------------------------------------- //
 // Dutta, Reno, Sarcevic, Seckel
