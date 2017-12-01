@@ -60,17 +60,22 @@ ParticleDef getParticleDef(const string& name)
 class Test_Utilities : public ::testing::Test
 {
 protected:
-    Test_Utilities():
-        a(MuMinusDef::Get(), Ice(), EnergyCutSettings(), Utility::Definition(), InterpolationDef()),
-        b(TauMinusDef::Get(), Ice(), EnergyCutSettings(), Utility::Definition(), InterpolationDef())
+    Test_Utilities()
     {
+        std::cout << std::endl;
+        std::cout << "new created" << std::endl;
+        std::cout << std::endl;
     }
 
-    virtual void TearDown() {}
+    virtual ~Test_Utilities() {}
+    // virtual void TearDown() {}
 
-    Utility a;
-    Utility b;
+    static Utility a;
+    static Utility b;
 };
+
+Utility Test_Utilities::a(MuMinusDef::Get(), Ice(), EnergyCutSettings(), Utility::Definition(), InterpolationDef());
+Utility Test_Utilities::b(TauMinusDef::Get(), Ice(), EnergyCutSettings(), Utility::Definition(), InterpolationDef());
 
 // Utility utility_a(MuMinusDef::Get(), Ice(), EnergyCutSettings(), Utility::Definition(), InterpolationDef());
 // Utility utility_b(TauMinusDef::Get(), Ice(), EnergyCutSettings(), Utility::Definition(), InterpolationDef());
@@ -114,7 +119,7 @@ TEST_F(Test_Utilities, Copyconstructor)
     EXPECT_TRUE(A == B);
 }
 
-TEST_F(Test_Utilities, Operator)
+TEST_F(Test_Utilities, Copyconstructor2)
 {
     ContinuousRandomizer A(a);
     ContinuousRandomizer B(A);

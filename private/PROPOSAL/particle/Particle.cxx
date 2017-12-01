@@ -162,6 +162,33 @@ Particle::Particle(const ParticleDef& particleDef)
 // Operators & swap
 // ------------------------------------------------------------------------- //
 
+// void PROPOSAL::swap(Particle& first, Particle& second)
+// {
+//     using std::swap;
+//     swap(first.type_id_, second.type_id_);
+//     swap(first.position_, second.position_);
+//     swap(first.direction_, second.direction_);
+//     swap(first.energy_, second.energy_);
+//     swap(first.parent_particle_energy_, second.parent_particle_energy_);
+//     swap(first.time_, second.time_);
+//     swap(first.propagated_distance_, second.propagated_distance_);
+//     swap(first.particle_def_, second.particle_def_);
+//     swap(first.momentum_, second.momentum_);
+//     swap(first.square_momentum_, second.square_momentum_);
+//     swap(first.parent_particle_id_, second.parent_particle_id_);
+//     swap(first.particle_id_, second.particle_id_);
+//     swap(first.entry_point_, second.entry_point_);
+//     swap(first.entry_time_, second.entry_time_);
+//     swap(first.entry_energy_, second.entry_energy_);
+//     swap(first.exit_point_, second.exit_point_);
+//     swap(first.exit_time_, second.exit_time_);
+//     swap(first.exit_energy_, second.exit_energy_);
+//     swap(first.closest_approach_point_, second.closest_approach_point_);
+//     swap(first.closest_approach_time_, second.closest_approach_time_);
+//     swap(first.closest_approach_energy_, second.closest_approach_energy_);
+//     swap(first.elost_, second.elost_);
+// }
+
 // Particle& Particle::operator=(const Particle &particle){
 //     if (this != &particle)
 //     {
@@ -227,6 +254,31 @@ bool Particle::operator!=(const Particle &particle) const {
   return !(*this == particle);
 }
 
+// ------------------------------------------------------------------------- //
+// Methods
+// ------------------------------------------------------------------------- //
+
+void Particle::InjectState(const Particle& particle)
+{
+    position_ = particle.position_;
+    direction_ = particle.direction_;
+    energy_ = particle.energy_;
+    parent_particle_energy_ = particle.parent_particle_energy_;
+    time_ = particle.time_;
+    propagated_distance_ = particle.propagated_distance_;
+    momentum_ = particle.momentum_;
+    square_momentum_ = particle.square_momentum_;
+    entry_point_ = particle.entry_point_;
+    entry_time_ = particle.entry_time_;
+    entry_energy_ = particle.entry_energy_;
+    exit_point_ = particle.exit_point_;
+    exit_time_ = particle.exit_time_;
+    exit_energy_ = particle.exit_energy_;
+    closest_approach_point_ = particle.closest_approach_point_;
+    closest_approach_time_ = particle.closest_approach_time_;
+    closest_approach_energy_ = particle.closest_approach_energy_;
+    elost_ = particle.elost_;
+}
 
 // ------------------------------------------------------------------------- //
 // Setter
