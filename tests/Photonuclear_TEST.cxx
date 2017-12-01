@@ -18,32 +18,6 @@
 using namespace std;
 using namespace PROPOSAL;
 
-// class RndFromFile{
-// private:
-//     double rnd_;
-//     string Path_;
-//     ifstream in_;
-
-// public:
-//     RndFromFile(string Path){
-//         Path_ = Path;
-//         in_.open(Path_.c_str());
-//         in_>>rnd_;
-//         if(!in_.good())log_warn("less than one rnd_number!");
-//     }
-
-//     double rnd(){
-//         in_>>rnd_;
-//         if(!in_.good()){
-//             in_.close();
-//             in_.clear();
-//             in_.open(Path_.c_str());
-//             in_>>rnd_;
-//         }
-//         return rnd_;
-//     }
-// };
-
 TEST(Comparison, Comparison_equal)
 {
     ParticleDef particle_def = MuMinusDef::Get();

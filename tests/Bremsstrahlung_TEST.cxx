@@ -5,9 +5,12 @@
 #include "gtest/gtest.h"
 
 #include "PROPOSAL/crossection/parametrization/Bremsstrahlung.h"
+#include "PROPOSAL/crossection/factories/BremsstrahlungFactory.h"
 #include "PROPOSAL/crossection/BremsIntegral.h"
 #include "PROPOSAL/crossection/BremsInterpolant.h"
 #include "PROPOSAL/medium/Medium.h"
+#include "PROPOSAL/medium/MediumFactory.h"
+#include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/Output.h"
 #include "PROPOSAL/methods.h"
 #include "PROPOSAL/Constants.h"
@@ -15,31 +18,22 @@
 using namespace std;
 using namespace PROPOSAL;
 
-// class RndFromFile{
-// private:
-//     double rnd_;
-//     string Path_;
-//     ifstream in_;
 
-// public:
-//     RndFromFile(string Path){
-//         Path_ = Path;
-//         in_.open(Path_.c_str());
-//         in_>>rnd_;
-//         if(!in_.good())log_warn("less than one rnd_number!");
-//     }
-
-//     double rnd(){
-//         in_>>rnd_;
-//         if(!in_.good()){
-//             in_.close();
-//             in_.clear();
-//             in_.open(Path_.c_str());
-//             in_>>rnd_;
-//         }
-//         return rnd_;
-//     }
-// };
+ParticleDef getParticleDef(const string& name)
+{
+    if (name == "MuMinus")
+    {
+        return MuMinusDef::Get();
+    }
+    else if (name == "TauMinus")
+    {
+        return TauMinusDef::Get();
+    }
+    else
+    {
+        return EMinusDef::Get();
+    }
+}
 
 TEST(Comparison, Comparison_equal)
 {
@@ -165,434 +159,470 @@ TEST(Assignment, Copyconstructor2)
 // in polymorphism an assignmant and swap operator doesn't make sense
 
 
-// TEST(Bremsstrahlung , Test_of_dEdx ) {
-//     direction.SetSphericalCoordinates(1,.20*PI/180.,20*PI/180.);
-//     direction.CalculateCartesianFromSpherical();
-
-//     ifstream in;
-//     in.open("bin/TestFiles/Brems_dEdx.txt");
-
-//     char firstLine[256];
-//     in.getline(firstLine,256);
-//     double dEdx_new;
-//     double energy;
-//     double dEdx;
-//     double ecut;
-//     double vcut;
-//     string mediumName;
-//     string particleName;
-//     bool lpm;
-//     int para;
-
-//     cout.precision(16);
-
-
-//     while(in.good())
-//     {
-//         in>>para>>ecut>>vcut>>lpm>>energy>>mediumName>>particleName>>dEdx;
-
-//         Medium *medium = MediumFactory::Get()->CreateMedium(mediumName);
-//         PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),position,direction,1e5,10);
-//         particle->SetEnergy(energy);
-//         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
-
-//         CrossSections *brems = new Bremsstrahlung(particle, medium, cuts);
-
-
-//         brems->SetParametrization(static_cast<ParametrizationType::Enum>(para));
-//         brems->EnableLpmEffect(lpm);
-
-
-
-//         dEdx_new=brems->CalculatedEdx();
-
-//         ASSERT_NEAR(dEdx_new, dEdx, 1e-7*dEdx);
-
-//         delete cuts;
-//         delete medium;
-//         delete particle;
-//         delete brems;
-//     }
-// }
-
-// TEST(Bremsstrahlung , Test_of_dNdx ) {
-//     direction.SetSphericalCoordinates(1,.20*PI/180.,20*PI/180.);
-//     direction.CalculateCartesianFromSpherical();
-
-//     ifstream in;
-//     in.open("bin/TestFiles/Brems_dNdx.txt");
-
-//     char firstLine[256];
-//     in.getline(firstLine,256);
-//     double dNdx;
-//     double dNdx_new;
-//     double energy;
-//     double ecut;
-//     double vcut;
-//     string mediumName;
-//     string particleName;
-//     bool lpm;
-//     int para;
-
-//     cout.precision(16);
-
-
-//     while(in.good())
-//     {
-//         in>>para>>ecut>>vcut>>lpm>>energy>>mediumName>>particleName>>dNdx;
-
-//         Medium *medium = MediumFactory::Get()->CreateMedium(mediumName);
-//         PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),position,direction,1e5,10);
-//         particle->SetEnergy(energy);
-//         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
-
-//         CrossSections *brems = new Bremsstrahlung(particle, medium, cuts);
-
-
-//         brems->SetParametrization(static_cast<ParametrizationType::Enum>(para));
-//         brems->EnableLpmEffect(lpm);
-
-//         dNdx_new=brems->CalculatedNdx();
-//         ASSERT_NEAR(dNdx_new, dNdx, 1e-7*dNdx);
-
-//         delete cuts;
-//         delete medium;
-//         delete particle;
-//         delete brems;
-
-
-
-//     }
-// }
-
-// TEST(Bremsstrahlung , Test_of_dNdxrnd ) {
-//     direction.SetSphericalCoordinates(1,.20*PI/180.,20*PI/180.);
-//     direction.CalculateCartesianFromSpherical();
-
-//     ifstream in;
-//     in.open("bin/TestFiles/Brems_dNdxrnd.txt");
-
-//     char firstLine[256];
-//     in.getline(firstLine,256);
-
-//     double dNdxrnd;
-//     double dNdxrnd_new;
-//     double energy;
-//     double ecut;
-//     double vcut;
-//     string mediumName;
-//     string particleName;
-//     bool lpm;
-//     int para;
-
-//     cout.precision(16);
-//     double energy_old=-1;
-
-//     RndFromFile* Rand = new RndFromFile("bin/TestFiles/rnd.txt");
-
-//     bool first = true;
-//     while(in.good())
-//     {
-//         if(first)in>>para>>ecut>>vcut>>lpm>>energy>>mediumName>>particleName>>dNdxrnd;
-//         first=false;
-//         energy_old = -1;
-//         Medium *medium = MediumFactory::Get()->CreateMedium(mediumName);
-//         PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),position,direction,1e5,10);
-//         particle->SetEnergy(energy);
-//         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
-
-//         CrossSections *brems = new Bremsstrahlung(particle, medium, cuts);
-//         brems->SetParametrization(static_cast<ParametrizationType::Enum>(para));
-//         brems->EnableLpmEffect(lpm);
-
-//         //cout << para << "\t" << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << mediumName << "\t" << particleName<< "\t" << dNdxrnd << endl;
-
-//         while(energy_old < energy){
-//             energy_old = energy;
-//             brems->GetParticle()->SetEnergy(energy);
-//             dNdxrnd_new=brems->CalculatedNdx(Rand->rnd());
-
-//             ASSERT_NEAR(dNdxrnd_new, dNdxrnd, 1E-7*dNdxrnd);
-
-//             in>>para>>ecut>>vcut>>lpm>>energy>>mediumName>>particleName>>dNdxrnd;
-//         }
-
-
-
-//         delete cuts;
-//         delete medium;
-//         delete particle;
-//         delete brems;
-//     }
-//     delete Rand;
-// }
-
-
-
-// TEST(Bremsstrahlung , Test_of_e ) {
-//     direction.SetSphericalCoordinates(1,.20*PI/180.,20*PI/180.);
-//     direction.CalculateCartesianFromSpherical();
-
-//     ifstream in;
-//     in.open("bin/TestFiles/Brems_e.txt");
-
-//     char firstLine[256];
-//     in.getline(firstLine,256);
-
-//     double e;
-//     double e_new;
-//     double energy;
-//     double ecut;
-//     double vcut;
-//     string mediumName;
-//     string particleName;
-//     bool lpm;
-//     int para;
-
-//     cout.precision(16);
-//     double energy_old=-1;
-
-//     RndFromFile* Rand = new RndFromFile("bin/TestFiles/rnd.txt");
-//     RndFromFile* Rand2 = new RndFromFile("bin/TestFiles/rnd.txt");
-//     Rand2->rnd();
-
-//     double rnd1, rnd2;
-//     bool first = true;
-//     while(in.good())
-//     {
-//         if(first)in>>para>>ecut>>vcut>>lpm>>energy>>mediumName>>particleName>>e;
-//         first=false;
-//         energy_old = -1;
-//         Medium *medium = MediumFactory::Get()->CreateMedium(mediumName);
-//         PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),position,direction,1e5,10);
-//         particle->SetEnergy(energy);
-//         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
-
-//         CrossSections *brems = new Bremsstrahlung(particle, medium, cuts);
-//         brems->SetParametrization(static_cast<ParametrizationType::Enum>(para));
-//         brems->EnableLpmEffect(lpm);
-
-//         //cout << para << "\t" << ecut << "\t" << vcut << "\t" << lpm << "\t" << energy << "\t" << mediumName << "\t" << particleName<< "\t" << e << endl;
-
-//         while(energy_old < energy){
-//             energy_old = energy;
-//             brems->GetParticle()->SetEnergy(energy);
-
-//             rnd1 = Rand->rnd();
-//             rnd2 = Rand2->rnd();
-
-//             e_new=brems->CalculateStochasticLoss(rnd1,rnd2);
-//             ASSERT_NEAR(e_new, e, 1E-7*e);
-
-//             in>>para>>ecut>>vcut>>lpm>>energy>>mediumName>>particleName>>e;
-//         }
-
-//         delete cuts;
-//         delete medium;
-//         delete particle;
-//         delete brems;
-//     }
-//     delete Rand2;
-//     delete Rand;
-// }
-
-
-// TEST(Bremsstrahlung , Test_of_dEdx_Interpolant ) {
-//     direction.SetSphericalCoordinates(1,.20*PI/180.,20*PI/180.);
-//     direction.CalculateCartesianFromSpherical();
-
-//     ifstream in;
-//     in.open("bin/TestFiles/Brems_dEdx_interpol.txt");
-//     char firstLine[256];
-//     in.getline(firstLine,256);
-//     double dEdx_new;
-//     double energy;
-//     double dEdx;
-//     double ecut;
-//     double vcut;
-//     string mediumName;
-//     string particleName;
-//     bool lpm;
-//     int para;
-
-//     cout.precision(16);
-//     double precision;
-//     double precisionOld = 1E-2;
-//     bool first=true;
-//     double energy_old;
-//     while(in.good())
-//     {
-//         if(first)in>>para>>ecut>>vcut>>lpm>>energy>>mediumName>>particleName>>dEdx;
-//         first=false;
-
-//         precision = precisionOld;
-//         energy_old =-1;
-
-//         Medium *medium = MediumFactory::Get()->CreateMedium(mediumName);
-//         PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),position,direction,1e5,10);
-//         particle->SetEnergy(energy);
-//         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
-//         CrossSections *brems = new Bremsstrahlung(particle, medium, cuts);
-
-//         brems->SetParametrization(static_cast<ParametrizationType::Enum>(para));
-//         brems->EnableLpmEffect(lpm);
-//         brems->EnableDEdxInterpolation();
-
-//         while(energy_old < energy){
-//             energy_old = energy;
-//             brems->GetParticle()->SetEnergy(energy);
-//             dEdx_new=brems->CalculatedEdx();
-
-//             if(!particleName.compare("tau") && energy < 10001)precision = 0.5;
-//             if(!particleName.compare("e") && energy > 1E10)precision = 0.5;
-
-//             ASSERT_NEAR(dEdx_new, dEdx, precision*dEdx);
-
-//             in>>para>>ecut>>vcut>>lpm>>energy>>mediumName>>particleName>>dEdx;
-
-//             precision = precisionOld;
-
-//         }
-
-
-
-//         delete cuts;
-//         delete medium;
-//         delete particle;
-//         delete brems;
-
-
-
-//     }
-// }
-
-// TEST(Bremsstrahlung , Test_of_dNdx_Interpolant ) {
-//     direction.SetSphericalCoordinates(1,.20*PI/180.,20*PI/180.);
-//     direction.CalculateCartesianFromSpherical();
-//     ifstream in;
-//     in.open("bin/TestFiles/Brems_dNdx_interpol.txt");
-
-//     char firstLine[256];
-//     in.getline(firstLine,256);
-
-//     double dNdx;
-//     double dNdx_new;
-//     double energy;
-//     double ecut;
-//     double vcut;
-//     string mediumName;
-//     string particleName;
-//     bool lpm;
-//     int para;
-
-//     cout.precision(16);
-//     double energy_old=-1;
-
-//     bool first = true;
-//     while(in.good())
-//     {
-//         if(first)in>>para>>ecut>>vcut>>lpm>>energy>>mediumName>>particleName>>dNdx;
-//         first=false;
-//         energy_old = -1;
-//         Medium *medium = MediumFactory::Get()->CreateMedium(mediumName);
-//         PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),position,direction,1e5,10);
-//         particle->SetEnergy(energy);
-//         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
-
-//         CrossSections *brems = new Bremsstrahlung(particle, medium, cuts);
-//         brems->SetParametrization(static_cast<ParametrizationType::Enum>(para));
-//         brems->EnableLpmEffect(lpm);
-//         brems->EnableDNdxInterpolation();
-
-//         while(energy_old < energy){
-//             energy_old = energy;
-//             brems->GetParticle()->SetEnergy(energy);
-//             dNdx_new=brems->CalculatedNdx();
-
-//             ASSERT_NEAR(dNdx_new, dNdx, 1E-6*dNdx);
-
-//             in>>para>>ecut>>vcut>>lpm>>energy>>mediumName>>particleName>>dNdx;
-//         }
-
-
-
-//         delete cuts;
-//         delete medium;
-//         delete particle;
-//         delete brems;
-//     }
-// }
-
-// TEST(Bremsstrahlung , Test_of_e_interpol ) {
-// return;
-//     direction.SetSphericalCoordinates(1,.20*PI/180.,20*PI/180.);
-//     direction.CalculateCartesianFromSpherical();
-//     ifstream in;
-//     in.open("bin/TestFiles/Brems_e_interpol.txt");
-
-//     char firstLine[256];
-//     in.getline(firstLine,256);
-
-//     double e;
-//     double e_new;
-//     double energy;
-//     double ecut;
-//     double vcut;
-//     string mediumName;
-//     string particleName;
-//     bool lpm;
-//     int para;
-
-//     cout.precision(16);
-//     double energy_old=-1;
-//     double precision = 1E-5;
-//     double precision_old = precision;
-//     RndFromFile* Rand = new RndFromFile("bin/TestFiles/rnd.txt");
-//     RndFromFile* Rand2 = new RndFromFile("bin/TestFiles/rnd.txt");
-//     Rand2->rnd();
-
-//     double rnd1,rnd2;
-//     bool first = true;
-//     while(in.good())
-//     {
-//         if(first)in>>para>>ecut>>vcut>>lpm>>energy>>mediumName>>particleName>>e;
-//         first=false;
-//         energy_old = -1;
-//         Medium *medium = MediumFactory::Get()->CreateMedium(mediumName);
-//         PROPOSALParticle *particle = new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),position,direction,1e5,10);
-//         particle->SetEnergy(energy);
-//         EnergyCutSettings *cuts = new EnergyCutSettings(ecut,vcut);
-
-//         CrossSections *brems = new Bremsstrahlung(particle, medium, cuts);
-//         brems->SetParametrization(static_cast<ParametrizationType::Enum>(para));
-//         brems->EnableLpmEffect(lpm);
-//         brems->EnableDNdxInterpolation();
-
-
-//         while(energy_old < energy){
-//             energy_old = energy;
-//             brems->GetParticle()->SetEnergy(energy);
-//             rnd1 = Rand->rnd();
-//             rnd2 = Rand2->rnd();
-
-//             e_new = brems->CalculateStochasticLoss(rnd1,rnd2);
-
-//             ASSERT_NEAR(e_new, e, 1*e);
-
-//             in>>para>>ecut>>vcut>>lpm>>energy>>mediumName>>particleName>>e;
-//             precision = precision_old;
-//         }
-
-
-
-//         delete cuts;
-//         delete medium;
-//         delete particle;
-//         delete brems;
-//     }
-//     delete Rand2;
-//     delete Rand;
-// }
+TEST(Bremsstrahlung, Test_of_dEdx)
+{
+    ifstream in;
+    string filename = "testfiles/Brems_dEdx.txt";
+    in.open(filename.c_str());
+
+    if (!in.good())
+    {
+        std::cerr << "File \"" << filename << "\" not found" << std::endl;
+    }
+
+    char firstLine[256];
+    in.getline(firstLine,256);
+
+    string particleName;
+    string mediumName;
+    double ecut;
+    double vcut;
+    double multiplier;
+    bool lpm;
+    string parametrization;
+    double energy;
+    double dEdx_stored;
+    double dEdx_new;
+
+    cout.precision(16);
+
+    while(in.good())
+    {
+        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> lpm
+            >> energy >> dEdx_stored >> parametrization;
+
+        ParticleDef particle_def = getParticleDef(particleName);
+        Medium* medium = MediumFactory::Get().CreateMedium(mediumName);
+        EnergyCutSettings ecuts(ecut,vcut);
+
+        BremsstrahlungFactory::Definition brems_def;
+        brems_def.multiplier = multiplier;
+        brems_def.lpm_effect = lpm;
+        brems_def.parametrization = BremsstrahlungFactory::Get().GetEnumFromString(parametrization);
+
+        CrossSection* Brems = BremsstrahlungFactory::Get().CreateBremsstrahlung(
+            particle_def,
+            *medium,
+            ecuts,
+            brems_def);
+
+        dEdx_new = Brems->CalculatedEdx(energy);
+
+        ASSERT_NEAR(dEdx_new, dEdx_stored, 1e-3*dEdx_stored);
+
+        delete medium;
+        delete Brems;
+    }
+}
+
+TEST(Bremsstrahlung, Test_of_dNdx)
+{
+    ifstream in;
+    string filename = "testfiles/Brems_dNdx.txt";
+    in.open(filename.c_str());
+
+    if (!in.good())
+    {
+        std::cerr << "File \"" << filename << "\" not found" << std::endl;
+    }
+
+    char firstLine[256];
+    in.getline(firstLine,256);
+
+    string particleName;
+    string mediumName;
+    double ecut;
+    double vcut;
+    double multiplier;
+    bool lpm;
+    string parametrization;
+    double energy;
+    double dNdx_stored;
+    double dNdx_new;
+
+    cout.precision(16);
+
+    while(in.good())
+    {
+        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> lpm
+            >> energy >> dNdx_stored >> parametrization;
+
+        ParticleDef particle_def = getParticleDef(particleName);
+        Medium* medium = MediumFactory::Get().CreateMedium(mediumName);
+        EnergyCutSettings ecuts(ecut,vcut);
+
+        BremsstrahlungFactory::Definition brems_def;
+        brems_def.multiplier = multiplier;
+        brems_def.lpm_effect = lpm;
+        brems_def.parametrization = BremsstrahlungFactory::Get().GetEnumFromString(parametrization);
+
+        CrossSection* Brems = BremsstrahlungFactory::Get().CreateBremsstrahlung(
+            particle_def,
+            *medium,
+            ecuts,
+            brems_def);
+
+        dNdx_new = Brems->CalculatedNdx(energy);
+
+        ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-3*dNdx_stored);
+
+        delete medium;
+        delete Brems;
+    }
+}
+
+TEST(Bremsstrahlung, Test_of_dNdx_rnd)
+{
+    ifstream in;
+    string filename = "testfiles/Brems_dNdx_rnd.txt";
+    in.open(filename.c_str());
+
+    if (!in.good())
+    {
+        std::cerr << "File \"" << filename << "\" not found" << std::endl;
+    }
+
+    char firstLine[256];
+    in.getline(firstLine,256);
+
+    string particleName;
+    string mediumName;
+    double ecut;
+    double vcut;
+    double multiplier;
+    bool lpm;
+    string parametrization;
+    double energy;
+    double rnd;
+    double dNdx_stored;
+    double dNdx_new;
+
+    cout.precision(16);
+
+    RandomGenerator::Get().SetSeed(0);
+
+    while(in.good())
+    {
+        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> lpm
+            >> energy >> rnd >> dNdx_stored >> parametrization;
+
+        ParticleDef particle_def = getParticleDef(particleName);
+        Medium* medium = MediumFactory::Get().CreateMedium(mediumName);
+        EnergyCutSettings ecuts(ecut,vcut);
+
+        BremsstrahlungFactory::Definition brems_def;
+        brems_def.multiplier = multiplier;
+        brems_def.lpm_effect = lpm;
+        brems_def.parametrization = BremsstrahlungFactory::Get().GetEnumFromString(parametrization);
+
+        CrossSection* Brems = BremsstrahlungFactory::Get().CreateBremsstrahlung(
+            particle_def,
+            *medium,
+            ecuts,
+            brems_def);
+
+        dNdx_new = Brems->CalculatedNdx(energy, rnd);
+
+        ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-3*dNdx_stored);
+
+        delete medium;
+        delete Brems;
+    }
+}
+
+TEST(Bremsstrahlung, Test_of_e)
+{
+    ifstream in;
+    string filename = "testfiles/Brems_e.txt";
+    in.open(filename.c_str());
+
+    if (!in.good())
+    {
+        std::cerr << "File \"" << filename << "\" not found" << std::endl;
+    }
+
+    char firstLine[256];
+    in.getline(firstLine,256);
+
+    string particleName;
+    string mediumName;
+    double ecut;
+    double vcut;
+    double multiplier;
+    bool lpm;
+    string parametrization;
+    double energy;
+    double rnd1, rnd2;
+    double stochastic_loss_stored;
+    double stochastic_loss_new;
+
+    cout.precision(16);
+
+    RandomGenerator::Get().SetSeed(0);
+
+    while(in.good())
+    {
+        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> lpm
+            >> energy >> rnd1 >> rnd2 >> stochastic_loss_stored >> parametrization;
+
+        ParticleDef particle_def = getParticleDef(particleName);
+        Medium* medium = MediumFactory::Get().CreateMedium(mediumName);
+        EnergyCutSettings ecuts(ecut,vcut);
+
+        BremsstrahlungFactory::Definition brems_def;
+        brems_def.multiplier = multiplier;
+        brems_def.lpm_effect = lpm;
+        brems_def.parametrization = BremsstrahlungFactory::Get().GetEnumFromString(parametrization);
+
+        CrossSection* Brems = BremsstrahlungFactory::Get().CreateBremsstrahlung(
+            particle_def,
+            *medium,
+            ecuts,
+            brems_def);
+
+        stochastic_loss_new = Brems->CalculateStochasticLoss(energy, rnd1, rnd2);
+
+        ASSERT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1e-3*stochastic_loss_stored);
+
+        delete medium;
+        delete Brems;
+    }
+}
+
+TEST(Bremsstrahlung, Test_of_dEdx_Interpolant)
+{
+    ifstream in;
+    string filename = "testfiles/Brems_dEdx_interpol.txt";
+    in.open(filename.c_str());
+
+    if (!in.good())
+    {
+        std::cerr << "File \"" << filename << "\" not found" << std::endl;
+    }
+
+    char firstLine[256];
+    in.getline(firstLine,256);
+
+    string particleName;
+    string mediumName;
+    double ecut;
+    double vcut;
+    double multiplier;
+    bool lpm;
+    string parametrization;
+    double energy;
+    double dEdx_stored;
+    double dEdx_new;
+
+    cout.precision(16);
+    InterpolationDef InterpolDef;
+
+    while(in.good())
+    {
+        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> lpm
+            >> energy >> dEdx_stored >> parametrization;
+
+        ParticleDef particle_def = getParticleDef(particleName);
+        Medium* medium = MediumFactory::Get().CreateMedium(mediumName);
+        EnergyCutSettings ecuts(ecut,vcut);
+
+        BremsstrahlungFactory::Definition brems_def;
+        brems_def.multiplier = multiplier;
+        brems_def.lpm_effect = lpm;
+        brems_def.parametrization = BremsstrahlungFactory::Get().GetEnumFromString(parametrization);
+
+        CrossSection* Brems = BremsstrahlungFactory::Get().CreateBremsstrahlung(
+            particle_def,
+            *medium,
+            ecuts,
+            brems_def,
+            InterpolDef);
+
+        dEdx_new = Brems->CalculatedEdx(energy);
+
+        ASSERT_NEAR(dEdx_new, dEdx_stored, 1e-3*dEdx_stored);
+
+        delete medium;
+        delete Brems;
+    }
+}
+
+TEST(Bremsstrahlung, Test_of_dNdx_Interpolant)
+{
+    ifstream in;
+    string filename = "testfiles/Brems_dNdx_interpol.txt";
+    in.open(filename.c_str());
+
+    if (!in.good())
+    {
+        std::cerr << "File \"" << filename << "\" not found" << std::endl;
+    }
+
+    string particleName;
+    string mediumName;
+    double ecut;
+    double vcut;
+    double multiplier;
+    bool lpm;
+    string parametrization;
+    double energy;
+    double dNdx_stored;
+    double dNdx_new;
+
+    cout.precision(16);
+    InterpolationDef InterpolDef;
+
+    while(in.good())
+    {
+        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> lpm
+            >> energy >> dNdx_stored >> parametrization;
+
+        ParticleDef particle_def = getParticleDef(particleName);
+        Medium* medium = MediumFactory::Get().CreateMedium(mediumName);
+        EnergyCutSettings ecuts(ecut,vcut);
+
+        BremsstrahlungFactory::Definition brems_def;
+        brems_def.multiplier = multiplier;
+        brems_def.lpm_effect = lpm;
+        brems_def.parametrization = BremsstrahlungFactory::Get().GetEnumFromString(parametrization);
+
+        CrossSection* Brems = BremsstrahlungFactory::Get().CreateBremsstrahlung(
+            particle_def,
+            *medium,
+            ecuts,
+            brems_def,
+            InterpolDef);
+
+        dNdx_new = Brems->CalculatedNdx(energy);
+
+        ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-3*dNdx_stored);
+
+        delete medium;
+        delete Brems;
+    }
+}
+
+TEST(Bremsstrahlung, Test_of_dNdx_rnd_Interpolant)
+{
+    ifstream in;
+    string filename = "testfiles/Brems_dNdx_rnd_interpol.txt";
+    in.open(filename.c_str());
+
+    if (!in.good())
+    {
+        std::cerr << "File \"" << filename << "\" not found" << std::endl;
+    }
+
+    char firstLine[256];
+    in.getline(firstLine,256);
+
+    string particleName;
+    string mediumName;
+    double ecut;
+    double vcut;
+    double multiplier;
+    bool lpm;
+    string parametrization;
+    double energy;
+    double rnd;
+    double dNdx_stored;
+    double dNdx_new;
+
+    cout.precision(16);
+    InterpolationDef InterpolDef;
+
+    RandomGenerator::Get().SetSeed(0);
+
+    while(in.good())
+    {
+        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> lpm
+            >> energy >> rnd >> dNdx_stored >> parametrization;
+
+        ParticleDef particle_def = getParticleDef(particleName);
+        Medium* medium = MediumFactory::Get().CreateMedium(mediumName);
+        EnergyCutSettings ecuts(ecut,vcut);
+
+        BremsstrahlungFactory::Definition brems_def;
+        brems_def.multiplier = multiplier;
+        brems_def.lpm_effect = lpm;
+        brems_def.parametrization = BremsstrahlungFactory::Get().GetEnumFromString(parametrization);
+
+        CrossSection* Brems = BremsstrahlungFactory::Get().CreateBremsstrahlung(
+            particle_def,
+            *medium,
+            ecuts,
+            brems_def,
+            InterpolDef);
+
+        dNdx_new = Brems->CalculatedNdx(energy, rnd);
+
+        ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-3*dNdx_stored);
+
+        delete medium;
+        delete Brems;
+    }
+}
+
+TEST(Bremsstrahlung, Test_of_e_Interpolant)
+{
+    ifstream in;
+    string filename = "testfiles/Brems_e_interpol.txt";
+    in.open(filename.c_str());
+
+    if (!in.good())
+    {
+        std::cerr << "File \"" << filename << "\" not found" << std::endl;
+    }
+
+    char firstLine[256];
+    in.getline(firstLine,256);
+
+    string particleName;
+    string mediumName;
+    double ecut;
+    double vcut;
+    double multiplier;
+    bool lpm;
+    string parametrization;
+    double energy;
+    double rnd1, rnd2;
+    double stochastic_loss_stored;
+    double stochastic_loss_new;
+
+    cout.precision(16);
+    InterpolationDef InterpolDef;
+
+    RandomGenerator::Get().SetSeed(0);
+
+    while(in.good())
+    {
+        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> lpm
+            >> energy >> rnd1 >> rnd2 >> stochastic_loss_stored >> parametrization;
+
+        ParticleDef particle_def = getParticleDef(particleName);
+        Medium* medium = MediumFactory::Get().CreateMedium(mediumName);
+        EnergyCutSettings ecuts(ecut,vcut);
+
+        BremsstrahlungFactory::Definition brems_def;
+        brems_def.multiplier = multiplier;
+        brems_def.lpm_effect = lpm;
+        brems_def.parametrization = BremsstrahlungFactory::Get().GetEnumFromString(parametrization);
+
+        CrossSection* Brems = BremsstrahlungFactory::Get().CreateBremsstrahlung(
+            particle_def,
+            *medium,
+            ecuts,
+            brems_def,
+            InterpolDef);
+
+        stochastic_loss_new = Brems->CalculateStochasticLoss(energy, rnd1, rnd2);
+
+        ASSERT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1e-3*stochastic_loss_stored);
+
+        delete medium;
+        delete Brems;
+    }
+}
 
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
