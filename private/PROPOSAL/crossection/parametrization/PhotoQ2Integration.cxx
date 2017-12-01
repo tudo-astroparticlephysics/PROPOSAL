@@ -66,7 +66,7 @@ bool PhotoQ2Integral::compare(const Parametrization& parametrization) const
 {
     const PhotoQ2Integral* photo = static_cast<const PhotoQ2Integral*>(&parametrization);
 
-    if (typeid(shadow_effect_) != typeid(photo->shadow_effect_))
+    if (*shadow_effect_ != *photo->shadow_effect_)
         return false;
     if (integral_ != photo->integral_)
         return false;

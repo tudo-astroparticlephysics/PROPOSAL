@@ -6,12 +6,8 @@
 #define PHOTO_PARAM_REAL_DEC(param, parent)                                                                            \
     class Photo##param : public Photo##parent                                                                          \
     {                                                                                                                  \
-        public:                                                                                                        \
-        Photo##param(const ParticleDef&,                                                                               \
-                     const Medium&,                                                                                    \
-                     const EnergyCutSettings&,                                                                         \
-                     const RealPhoton& hardBB,                                                                         \
-                     double multiplier);                                                                               \
+    public:                                                                                                            \
+        Photo##param(const ParticleDef&, const Medium&, const EnergyCutSettings&, bool hardbb, double multiplier);     \
         Photo##param(const Photo##param&);                                                                             \
         virtual ~Photo##param();                                                                                       \
                                                                                                                        \
@@ -19,17 +15,17 @@
         static Photonuclear* create(const ParticleDef& particle_def,                                                   \
                                     const Medium& medium,                                                              \
                                     const EnergyCutSettings& cuts,                                                     \
-                                    const RealPhoton& hardBB,                                                          \
+                                    bool hardbb,                                                                       \
                                     double multiplier)                                                                 \
         {                                                                                                              \
-            return new Photo##param(particle_def, medium, cuts, hardBB, multiplier);                                   \
+            return new Photo##param(particle_def, medium, cuts, hardbb, multiplier);                                   \
         }                                                                                                              \
                                                                                                                        \
         virtual double CalculateParametrization(double nu);                                                            \
                                                                                                                        \
         const std::string& GetName() const { return name_; }                                                           \
                                                                                                                        \
-        private:                                                                                                       \
+    private:                                                                                                           \
         static const std::string name_;                                                                                \
     };
 
@@ -45,7 +41,7 @@ class PhotoRealPhotonAssumption : public Photonuclear
     PhotoRealPhotonAssumption(const ParticleDef&,
                               const Medium&,
                               const EnergyCutSettings&,
-                              const RealPhoton&,
+                              bool hardbb,
                               double multiplier);
     PhotoRealPhotonAssumption(const PhotoRealPhotonAssumption&);
     virtual ~PhotoRealPhotonAssumption();
@@ -93,7 +89,7 @@ class PhotoRhode : public PhotoRealPhotonAssumption
     PhotoRhode(const ParticleDef&,
                const Medium&,
                const EnergyCutSettings&,
-               const RealPhoton& hardBB,
+               bool hardbb,
                double multiplier);
     PhotoRhode(const PhotoRhode&);
     virtual ~PhotoRhode();
@@ -102,7 +98,7 @@ class PhotoRhode : public PhotoRealPhotonAssumption
     static Photonuclear* create(const ParticleDef&,
                             const Medium&,
                             const EnergyCutSettings&,
-                            const RealPhoton&,
+                            bool hardbb,
                             double multiplier);
 
     double CalculateParametrization(double nu);
