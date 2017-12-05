@@ -51,14 +51,14 @@ class PhotonuclearFactory
         Definition()
             : parametrization(AbramowiczLevinLevyMaor97)
             , shadow(ShadowButkevichMikhailov)
-            , hardbb(true)
+            , hard_component(true)
             , multiplier(1.0)
         {
         }
 
         Enum parametrization;
         Shadow shadow;
-        bool hardbb;
+        bool hard_component;
         double multiplier;
     };
 
@@ -69,7 +69,7 @@ class PhotonuclearFactory
     typedef boost::function<ShadowEffect*(void)> RegisterShadowEffectFunction;
 
     typedef boost::function<
-        Photonuclear*(const ParticleDef&, const Medium&, const EnergyCutSettings&, bool hardbb, double multiplier)>
+        Photonuclear*(const ParticleDef&, const Medium&, const EnergyCutSettings&, bool hard_component, double multiplier)>
         RegisterRealPhotonFunction;
 
     typedef boost::function<

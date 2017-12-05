@@ -75,16 +75,6 @@ class ScatteringMoliere : public Scattering
 
     double GetRandom();
 
-    //----------------------------------------------------------------------------//
-    //-----------------------------Coefficients-----------------------------------//
-    //---for calculating the power series approximation of the moliere function---//
-
-    // static const double c1[100];
-    // static const double c2[100];
-    // static const double c2large[50];
-    // static const double s2large[50];
-    // static const double C1large[50];
-
 };
 }
 
