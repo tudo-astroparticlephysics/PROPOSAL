@@ -289,79 +289,6 @@ struct iterable_converter
         data->convertible = storage;
     }
 };
-// // ------------------------------------------------------------------------- //
-// // Pair
-// // ------------------------------------------------------------------------- //
-//
-//
-// template<typename T1, typename T2>
-// struct PairToPythonList
-// {
-//     static PyObject* convert(std::pair<T1, T2> const& p)
-//     {
-//         boost::python::list python_list;
-//
-//         python_list.append(boost::python::object(p.first));
-//         python_list.append(boost::python::object(p.second));
-//         // typename std::pair<T1, T2>::const_iterator iter;
-//
-//         // for(iter = vec.begin(); iter != vec.end(); ++iter)
-//         // {
-//         //     python_list.append(boost::python::object(*iter));
-//         // }
-//
-//         return boost::python::incref(python_list.ptr());
-//     }
-// };
-//
-//
-// template<typename T1, typename T2>
-// struct PairFromPythonList
-// {
-//
-//     PairFromPythonList()
-//     {
-//         boost::python::converter::registry::push_back(&PairFromPythonList<T1, T2>::convertible,
-//                             &PairFromPythonList<T1, T2>::construct,
-//                             boost::python::type_id<std::pair<T1, T2> >());
-//     }
-//
-//     // Determine if obj_ptr can be converted in a std::pair
-//     static void* convertible(PyObject* obj_ptr)
-//     {
-//         if (!PyList_Check(obj_ptr))
-//         {
-//             return 0;
-//         }
-//
-//         return obj_ptr;
-//     }
-//
-//     // Convert obj_ptr into a std::pair<T>
-//     static void construct(PyObject* obj_ptr, boost::python::converter::rvalue_from_python_stage1_data* data)
-//     {
-//         // Use borrowed to construct the object so that a reference
-//         // count will be properly handled.
-//         boost::python::list python_list(boost::python::handle<>(boost::python::borrowed(obj_ptr)));
-//
-//         // Grab pointer to memory into which to construct the new std::pair<T1, T2>
-//         void* storage = reinterpret_cast<boost::python::converter::rvalue_from_python_storage<std::pair<T1, T2> >*>(data)->storage.bytes;
-//
-//         // in-place construct the new std::pair<T1, T2> using the character data
-//         // extraced from the python object
-//         std::pair<T1, T2>& p = *(new (storage) std::pair<T1, T2>());
-//
-//         assert(boost::python::len(python_list == 2));
-//
-//         // Populate pari from python list
-//         p.first = boost::python::extract<T1>(python_list[0]);
-//         p.second = boost::python::extract<T2>(python_list[1]);
-//
-//         // Stash the memory chunk pointer for later use by boost.python
-//         data->convertible = storage;
-//     }
-// };
-//
 
 /******************************************************************************
 *                               Python Module                                 *
@@ -673,6 +600,43 @@ void export_harbb_tables()
     hardbb_scope.attr("TauTable") = HardBBTables::TauTable;
 }
 
+void export_scattering()
+{
+    using namespace boost::python;
+    // map the Util namespace to a sub-module
+    // make "from mypackage.Util import <whatever>" work
+    object scatteringModule(handle<>(borrowed(PyImport_AddModule("pyPROPOSAL.Scattering"))));
+    // make "from mypackage import Util" work
+    scope().attr("Scattering") = scatteringModule;
+    // set the current scope to the new sub-module
+    scope scattering_scope = scatteringModule;
+    // export stuff in the Util namespace
+
+    class_<Scattering, boost::shared_ptr<Scattering>, boost::noncopyable>("Scattering", no_init)
+
+        // .def(self_ns::str(self_ns::self))
+
+        .def("scatter", &Scattering::Scatter)
+
+        .add_property("particle", make_function(&Scattering::GetParticle, return_internal_reference<>()));
+
+    class_<ScatteringMoliere, boost::shared_ptr<ScatteringMoliere>, bases<Scattering> >(
+        "Moliere",
+        init<Particle&, const Medium&>());
+
+    class_<ScatteringDefault, boost::shared_ptr<ScatteringDefault>, bases<Scattering> >(
+        "Default",
+        init<Particle&, Utility&, InterpolationDef>());
+
+    class_<ScatteringHighland, boost::shared_ptr<ScatteringHighland>, bases<Scattering> >(
+        "Highland",
+        init<Particle&, const Medium&>());
+
+    class_<ScatteringNoScattering, boost::shared_ptr<ScatteringNoScattering>, bases<Scattering> >(
+        "NoScattering",
+        init<Particle&, const Medium&>());
+}
+
 BOOST_PYTHON_MODULE(pyPROPOSAL)
 {
     using namespace boost::python;
@@ -698,7 +662,7 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
     to_python_converter< std::vector<Particle*>, PVectorToPythonList<Particle*> >();
     // to_python_converter< std::vector<CrossSection*>, PVectorToPythonList<CrossSection*> >();
 
-    to_python_converter< std::vector<SectorFactory::Definition>, VectorToPythonList<SectorFactory::Definition> >();
+    to_python_converter< std::vector<Sector::Definition>, VectorToPythonList<Sector::Definition> >();
 
     // ----[ Register the from-python converter ]------------ //
 
@@ -710,7 +674,7 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
         // .from_python<std::vector<ParticleDef> >()
         .from_python<std::vector<Particle*> >()
         // .from_python<std::vector<CrossSection*> >()
-        .from_python<std::vector<SectorFactory::Definition> >();
+        .from_python<std::vector<Sector::Definition> >();
 
     // VectorFromPythonList<double>();
     // VectorFromPythonList<std::vector<double> >();
@@ -730,6 +694,7 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
     export_parametrizations();
     export_crosssections();
     export_harbb_tables();
+    export_scattering();
 
     /**************************************************************************
     *                                Vector3D                                *
@@ -741,6 +706,13 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
         .def(init<const Vector3D&>())
 
         .def(self_ns::str(self_ns::self))
+
+        .def(self + self)
+        .def(self - self)
+        .def(self * float())
+        .def(float() * self)
+        .def(self * self)
+        .def(-self)
 
         .add_property("x", &Vector3D::GetX)
         .add_property("y", &Vector3D::GetY)
@@ -1139,20 +1111,19 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
         .value("inside_detector", Sector::ParticleLocation::InsideDetector)
         .value("behind_detector", Sector::ParticleLocation::BehindDetector);
 
-    class_<SectorFactory::Definition, boost::shared_ptr<SectorFactory::Definition> >("SectorDefinition", init<>())
+    class_<Sector::Definition, boost::shared_ptr<Sector::Definition> >("SectorDefinition", init<>())
 
-        .def_readwrite("e_cut", &SectorFactory::Definition::e_cut)
-        .def_readwrite("v_cut", &SectorFactory::Definition::v_cut)
-        .def_readwrite("medium_def", &SectorFactory::Definition::medium_def)
-        .def_readwrite("geometry_def", &SectorFactory::Definition::geometry_def)
-        .def_readwrite("do_weighting", &SectorFactory::Definition::do_weighting)
-        .def_readwrite("weighting_order", &SectorFactory::Definition::weighting_order)
-        .def_readwrite("stopping_decay", &SectorFactory::Definition::stopping_decay)
-        .def_readwrite("do_continuous_randomization", &SectorFactory::Definition::do_continuous_randomization)
-        .def_readwrite("do_exact_time_calculation", &SectorFactory::Definition::do_exact_time_calculation)
-        .def_readwrite("scattering_model", &SectorFactory::Definition::scattering_model)
-        .def_readwrite("particle_location", &SectorFactory::Definition::location)
-        .def_readwrite("crosssection_defs", &SectorFactory::Definition::utility_def)
+        .def_readwrite("cut_settings", &Sector::Definition::cut_settings)
+        .add_property("medium", make_function(&Sector::Definition::GetMedium, return_internal_reference<>()), &Sector::Definition::SetMedium)
+        .add_property("geometry", make_function(&Sector::Definition::GetGeometry, return_internal_reference<>()), &Sector::Definition::SetGeometry)
+        .def_readwrite("do_weighting", &Sector::Definition::do_weighting)
+        .def_readwrite("weighting_order", &Sector::Definition::weighting_order)
+        .def_readwrite("stopping_decay", &Sector::Definition::stopping_decay)
+        .def_readwrite("do_continuous_randomization", &Sector::Definition::do_continuous_randomization)
+        .def_readwrite("do_exact_time_calculation", &Sector::Definition::do_exact_time_calculation)
+        .def_readwrite("scattering_model", &Sector::Definition::scattering_model)
+        .def_readwrite("particle_location", &Sector::Definition::location)
+        .def_readwrite("crosssection_defs", &Sector::Definition::utility_def)
     ;
 
     // --------------------------------------------------------------------- //
@@ -1222,10 +1193,10 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
     // --------------------------------------------------------------------- //
 
     class_<Propagator, boost::shared_ptr<Propagator> >(
-        "Propagator", init<const ParticleDef&, const std::vector<SectorFactory::Definition>&, const Geometry&>((arg("partcle_def"), arg("sector_defs"), arg("detector"))))
+        "Propagator", init<const ParticleDef&, const std::vector<Sector::Definition>&, const Geometry&>((arg("partcle_def"), arg("sector_defs"), arg("detector"))))
 
         .def(init<const ParticleDef&,
-                  const std::vector<SectorFactory::Definition>&,
+                  const std::vector<Sector::Definition>&,
                   const Geometry&,
                   const InterpolationDef&>((
             arg("particle_def"), arg("sector_defs"), arg("detector"), arg("interpolation_def"))))
@@ -1237,7 +1208,8 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
         // .def(self_ns::str(self_ns::self))
 
         .def("propagate", &Propagator::Propagate, (arg("max_distance_cm") = 1e20))
-        .add_property("particle", make_function(&Propagator::GetParticle, return_internal_reference<>()), "Get the internal created particle to modify its properties");
+        .add_property("particle", make_function(&Propagator::GetParticle, return_internal_reference<>()), "Get the internal created particle to modify its properties")
+        .add_property("detector", make_function(&Propagator::GetDetector, return_internal_reference<>()), "Get the detector geometry");
 
     // --------------------------------------------------------------------- //
     // PropagatorService

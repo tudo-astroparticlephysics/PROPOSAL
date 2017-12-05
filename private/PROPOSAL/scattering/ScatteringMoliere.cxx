@@ -167,20 +167,6 @@ ScatteringMoliere::~ScatteringMoliere()
     delete medium_;
 }
 
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-//-------------------------operators and swap function------------------------//
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-// ScatteringMoliere& ScatteringMoliere::operator=(const ScatteringMoliere &scattering){
-//     if (this != &scattering)
-//     {
-//       ScatteringMoliere tmp(scattering);
-//       swap(tmp);
-//     }
-//     return *this;
-// }
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
@@ -209,37 +195,6 @@ bool ScatteringMoliere::compare(const Scattering& scattering) const
         return true;
 }
 
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-// void ScatteringMoliere::swap(ScatteringMoliere &scattering)
-// {
-//     using std::swap;
-//
-//     swap(this->Zi_ , scattering.Zi_);
-//     swap(this->ki_ , scattering.ki_);
-//     swap(this->Ai_ , scattering.Ai_);
-//     swap(this->weight_ , scattering.weight_);
-//     swap(this->chi0_ , scattering.chi0_);
-//     swap(this->chiASq_ , scattering.chiASq_);
-//     swap(this->B_ , scattering.B_);
-//
-//     swap(this->dx_ , scattering.dx_);
-//     swap(this->betaSq_ , scattering.betaSq_);
-//     swap(this->p_ , scattering.p_);
-//     swap(this->m_ , scattering.m_);
-//     swap(this->numComp_ , scattering.numComp_);
-//     swap(this->chiCSq_ , scattering.chiCSq_);
-//
-//     if(scattering.medium_ != NULL)
-//     {
-//         medium_->swap(*scattering.medium_) ;
-//     }
-//     else
-//     {
-//         medium_ = NULL;
-//     }
-// }
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
@@ -311,11 +266,11 @@ double ScatteringMoliere::f(double theta)
 
     for (int i = 0; i < numComp_; i++)
     {
-        double x = theta * theta / (chiCSq_ * B_.at(i));
+        double x = theta * theta / (chiCSq_ * B_[i]);
 
-        y1 += weight_.at(i) * Zi_.at(i) * Zi_.at(i) / sqrt(chiCSq_ * B_.at(i) * PI) *
-              (exp(-x) + f1M(x) / B_.at(i) + f2M(x) / (B_.at(i) * B_.at(i)));
-        y2 += weight_.at(i) * Zi_.at(i) * Zi_.at(i);
+        y1 += weight_[i] * Zi_[i] * Zi_[i] / sqrt(chiCSq_ * B_[i] * PI) *
+              (exp(-x) + f1M(x) / B_[i] + f2M(x) / (B_[i] * B_[i]));
+        y2 += weight_[i] * Zi_[i] * Zi_[i];
     }
 
     return y1 / y2;
@@ -394,11 +349,11 @@ double ScatteringMoliere::F(double theta)
 
     for (int i = 0; i < numComp_; i++)
     {
-        double x = theta * theta / (chiCSq_ * B_.at(i));
+        double x = theta * theta / (chiCSq_ * B_[i]);
 
-        y1 += weight_.at(i) * Zi_.at(i) * Zi_.at(i) *
-              (0.5 * boost::math::erf(sqrt(x)) + sqrt(1. / PI) * (F1M(x) / B_.at(i) + F2M(x) / (B_.at(i) * B_.at(i))));
-        y2 += weight_.at(i) * Zi_.at(i) * Zi_.at(i);
+        y1 += weight_[i] * Zi_[i] * Zi_[i] *
+              (0.5 * boost::math::erf(sqrt(x)) + sqrt(1. / PI) * (F1M(x) / B_[i] + F2M(x) / (B_[i] * B_[i])));
+        y2 += weight_[i] * Zi_[i] * Zi_[i];
     }
 
     return (theta < 0.) ? (-1.) * y1 / y2 : y1 / y2;
@@ -426,10 +381,10 @@ double ScatteringMoliere::GetRandom()
     int j = 0;
     for (int i = 0; i + 1 < numComp_; i++)
     {
-        if (weight_.at(i + 1) > weight_.at(i))
+        if (weight_[i+1] > weight_[i])
             j = i + 1;
     }
-    double theta_np1 = sqrt(chiCSq_ * B_.at(j)) * erfInv(2. * rndm);
+    double theta_np1 = sqrt(chiCSq_ * B_[j]) * erfInv(2. * rndm);
 
     // iterating until the number of correct digits is greater than 4
 
@@ -442,5 +397,3 @@ double ScatteringMoliere::GetRandom()
 
     return theta_np1;
 }
-
-

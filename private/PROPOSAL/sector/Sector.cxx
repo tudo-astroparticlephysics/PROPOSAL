@@ -36,11 +36,43 @@ Sector::Definition::Definition()
     , scattering_model(ScatteringFactory::Moliere)
     , location(Sector::ParticleLocation::InsideDetector)
     , utility_def()
+    , cut_settings()
+    , medium_(new Ice())
+    , geometry_(new Sphere(Vector3D(), 1.0e20, 0.0))
+{
+}
+
+Sector::Definition::Definition(const Definition& def)
+    : do_weighting(def.do_weighting)
+    , weighting_order(def.weighting_order)
+    , stopping_decay(def.stopping_decay)
+    , do_continuous_randomization(def.do_continuous_randomization)
+    , do_exact_time_calculation(def.do_exact_time_calculation)
+    , scattering_model(def.scattering_model)
+    , location(def.location)
+    , utility_def(def.utility_def)
+    , cut_settings(def.cut_settings)
+    , medium_(def.medium_->clone())
+    , geometry_(def.geometry_->clone())
 {
 }
 
 Sector::Definition::~Definition()
 {
+    delete medium_;
+    delete geometry_;
+}
+
+void Sector::Definition::SetMedium(const Medium& medium)
+{
+    delete medium_;
+    medium_ = medium.clone();
+}
+
+void Sector::Definition::SetGeometry(const Geometry& geometry)
+{
+    delete geometry_;
+    geometry_ = geometry.clone();
 }
 
 // ------------------------------------------------------------------------- //
@@ -48,15 +80,12 @@ Sector::Definition::~Definition()
 // ------------------------------------------------------------------------- //
 
 Sector::Sector(Particle& particle,
-               const Medium& medium,
-               const EnergyCutSettings& cuts,
-               const Geometry& geometry,
                const Definition& sector_def)
     : sector_def_(sector_def)
     , weighting_starts_at_(0)
     , particle_(particle)
-    , geometry_(geometry.clone())
-    , utility_(particle_.GetParticleDef(), medium, cuts, sector_def.utility_def)
+    , geometry_(sector_def.GetGeometry().clone())
+    , utility_(particle_.GetParticleDef(), sector_def.GetMedium(), sector_def.cut_settings, sector_def.utility_def)
     , displacement_calculator_(new UtilityIntegralDisplacement(utility_))
     , interaction_calculator_(new UtilityIntegralInteraction(utility_))
     , decay_calculator_(new UtilityIntegralDecay(utility_))
@@ -77,16 +106,13 @@ Sector::Sector(Particle& particle,
 }
 
 Sector::Sector(Particle& particle,
-               const Medium& medium,
-               const EnergyCutSettings& cuts,
-               const Geometry& geometry,
                const Definition& sector_def,
                const InterpolationDef& interpolation_def)
     : sector_def_(sector_def)
     , weighting_starts_at_(0)
     , particle_(particle)
-    , geometry_(geometry.clone())
-    , utility_(particle_.GetParticleDef(), medium, cuts, sector_def.utility_def, interpolation_def)
+    , geometry_(sector_def.GetGeometry().clone())
+    , utility_(particle_.GetParticleDef(), sector_def.GetMedium(), sector_def.cut_settings, sector_def.utility_def, interpolation_def)
     , displacement_calculator_(new UtilityInterpolantDisplacement(utility_, interpolation_def))
     , interaction_calculator_(new UtilityInterpolantInteraction(utility_, interpolation_def))
     , decay_calculator_(new UtilityInterpolantDecay(utility_, interpolation_def))
