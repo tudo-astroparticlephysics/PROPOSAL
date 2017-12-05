@@ -164,8 +164,6 @@ TEST(Ionization, Test_of_dEdx)
     double dEdx_stored;
     double dEdx_new;
 
-    cout.precision(16);
-
     while(in.good())
     {
         in >> particleName >> mediumName >> ecut >> vcut >> multiplier
@@ -208,8 +206,6 @@ TEST(Ionization, Test_of_dNdx)
     double energy;
     double dNdx_stored;
     double dNdx_new;
-
-    cout.precision(16);
 
     while(in.good())
     {
@@ -256,20 +252,12 @@ TEST(Ionization, Test_of_dNdx_rnd)
     double dNdx_rnd_stored;
     double dNdx_rnd_new;
 
-    cout.precision(16);
     RandomGenerator::Get().SetSeed(0);
-
-    // double energy_old=-1;
-    // bool first = true;
 
     while(in.good())
     {
-        // if (first)
         in >> particleName >> mediumName >> ecut >> vcut >> multiplier
             >> energy >> rnd >> dNdx_rnd_stored;
-
-        // first = false;
-        // energy_old = -1;
 
         ParticleDef particle_def = getParticleDef(particleName);
         Medium *medium = MediumFactory::Get().CreateMedium(mediumName);
@@ -278,66 +266,59 @@ TEST(Ionization, Test_of_dNdx_rnd)
         Ionization Ioniz(particle_def, *medium, ecuts, multiplier);
         IonizIntegral Ioniz_Int(Ioniz);
 
-        // while(energy_old < energy)
-        // {
-        //     energy_old = energy;
         dNdx_rnd_new = Ioniz_Int.CalculatedNdx(energy ,rnd);
 
         ASSERT_NEAR(dNdx_rnd_new, dNdx_rnd_stored, 1E-10*dNdx_rnd_stored);
 
-        //     in >> particleName >> mediumName >> ecut >> vcut >> multiplier
-        //         >> energy >> rnd >> dNdx_rnd_stored;
-        // }
         delete medium;
     }
 }
 
-// TEST(Ionization, Test_Stochastic_Loss)
-// {
-//     ifstream in;
-//     string filename = "testfiles/Ioniz_e.txt";
-//     in.open(filename.c_str());
+TEST(Ionization, Test_Stochastic_Loss)
+{
+    ifstream in;
+    string filename = "testfiles/Ioniz_e.txt";
+    in.open(filename.c_str());
 
-//     if (!in.good())
-//     {
-//         std::cerr << "File \"" << filename << "\" not found" << std::endl;
-//     }
+    if (!in.good())
+    {
+        std::cerr << "File \"" << filename << "\" not found" << std::endl;
+    }
 
-//     char firstLine[256];
-//     in.getline(firstLine,256);
+    char firstLine[256];
+    in.getline(firstLine,256);
 
-//     string particleName;
-//     string mediumName;
-//     double ecut;
-//     double vcut;
-//     double multiplier;
-//     double energy;
-//     double rnd1, rnd2;
-//     double stochastic_loss_stored;
-//     double stochastic_loss_new;
+    string particleName;
+    string mediumName;
+    double ecut;
+    double vcut;
+    double multiplier;
+    double energy;
+    double rnd1, rnd2;
+    double stochastic_loss_stored;
+    double stochastic_loss_new;
 
-//     cout.precision(16);
-//     RandomGenerator::Get().SetSeed(0);
+    RandomGenerator::Get().SetSeed(0);
 
-//     while(in.good())
-//     {
-//         in >> particleName >> mediumName >> ecut >> vcut >> multiplier
-//             >> energy >> rnd1 >> rnd2 >> stochastic_loss_stored;
+    while(in.good())
+    {
+        in >> particleName >> mediumName >> ecut >> vcut >> multiplier
+            >> energy >> rnd1 >> rnd2 >> stochastic_loss_stored;
 
-//         ParticleDef particle_def = getParticleDef(particleName);
-//         Medium *medium = MediumFactory::Get().CreateMedium(mediumName);
-//         EnergyCutSettings ecuts(ecut,vcut);
+        ParticleDef particle_def = getParticleDef(particleName);
+        Medium *medium = MediumFactory::Get().CreateMedium(mediumName);
+        EnergyCutSettings ecuts(ecut,vcut);
 
-//         Ionization Ioniz(particle_def, *medium, ecuts, multiplier);
-//         IonizIntegral Ioniz_Int(Ioniz);
+        Ionization Ioniz(particle_def, *medium, ecuts, multiplier);
+        IonizIntegral Ioniz_Int(Ioniz);
 
-//         stochastic_loss_new = Ioniz_Int.CalculateStochasticLoss(energy, rnd1, rnd2);
+        stochastic_loss_new = Ioniz_Int.CrossSectionIntegral::CalculateStochasticLoss(energy, rnd1, rnd2);
 
-//         ASSERT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-10*stochastic_loss_stored);
+        ASSERT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6*stochastic_loss_stored);
 
-//         delete medium;
-//     }
-// }
+        delete medium;
+    }
+}
 
 TEST(Ionization, Test_of_dEdx_Interpolant)
 {
@@ -363,8 +344,6 @@ TEST(Ionization, Test_of_dEdx_Interpolant)
     double dEdx_new;
     
     InterpolationDef InterpolDef;
-
-    cout.precision(16);
 
     while(in.good())
     {
@@ -410,8 +389,6 @@ TEST(Ionization, Test_of_dNdx_Interpolant)
     double dNdx_new;
 
     InterpolationDef InterpolDef;
-
-    cout.precision(16);
 
     while(in.good())
     {
@@ -459,7 +436,6 @@ TEST(Ionization, Test_of_dNdxrnd_interpol)
 
     InterpolationDef InterpolDef;
 
-    cout.precision(16);
     RandomGenerator::Get().SetSeed(0);
 
     while(in.good())
@@ -483,60 +459,53 @@ TEST(Ionization, Test_of_dNdxrnd_interpol)
 }
 
 
-// TEST(Ionization, Test_of_e_interpol)
-// {
-//     ifstream in;
-//     string filename = "testfiles/Ioniz_e_interpol.txt";
-//     in.open(filename.c_str());
+TEST(Ionization, Test_of_e_interpol)
+{
+    ifstream in;
+    string filename = "testfiles/Ioniz_e_interpol.txt";
+    in.open(filename.c_str());
 
-//     if (!in.good())
-//     {
-//         std::cerr << "File \"" << filename << "\" not found" << std::endl;
-//     }
+    if (!in.good())
+    {
+        std::cerr << "File \"" << filename << "\" not found" << std::endl;
+    }
 
-//     char firstLine[256];
-//     in.getline(firstLine,256);
+    char firstLine[256];
+    in.getline(firstLine,256);
 
-//     string particleName;
-//     string mediumName;
-//     double ecut;
-//     double vcut;
-//     double multiplier;
-//     double energy;
-//     double rnd1, rnd2;
-//     double stochastic_loss_stored;
-//     double stochastic_loss_new;
+    string particleName;
+    string mediumName;
+    double ecut;
+    double vcut;
+    double multiplier;
+    double energy;
+    double rnd1, rnd2;
+    double stochastic_loss_stored;
+    double stochastic_loss_new;
 
-//     InterpolationDef InterpolDef;
+    InterpolationDef InterpolDef;
 
-//     cout.precision(16);
-//     RandomGenerator::Get().SetSeed(0);
+    RandomGenerator::Get().SetSeed(0);
 
-//     while(in.good())
-//     {
+    while(in.good())
+    {
+        in >> particleName >> mediumName >> ecut >> vcut >> multiplier
+            >> energy >> rnd1 >> rnd2 >> stochastic_loss_stored;
 
-//         in >> particleName >> mediumName >> ecut >> vcut >> multiplier
-//             >> energy >> rnd1 >> rnd2 >> stochastic_loss_stored;
+        ParticleDef particle_def = getParticleDef(particleName);
+        Medium *medium = MediumFactory::Get().CreateMedium(mediumName);
+        EnergyCutSettings ecuts(ecut,vcut);
 
-//         ParticleDef particle_def = getParticleDef(particleName);
-//         Medium *medium = MediumFactory::Get().CreateMedium(mediumName);
-//         EnergyCutSettings ecuts(ecut,vcut);
+        Ionization Ioniz(particle_def, *medium, ecuts, multiplier);
+        IonizInterpolant Ioniz_Interpol(Ioniz, InterpolDef);
 
-//         Ionization Ioniz(particle_def, *medium, ecuts, multiplier);
-//         IonizInterpolant Ioniz_Interpol(Ioniz, InterpolDef);
+        stochastic_loss_new = Ioniz_Interpol.CrossSectionInterpolant::CalculateStochasticLoss(energy ,rnd1, rnd2);
 
-//         stochastic_loss_new = Ioniz_Interpol.CalculateStochasticLoss(energy ,rnd1, rnd2);
+        ASSERT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6*stochastic_loss_stored);
 
-//         // if(e!=0)if(log10(fabs(1-e_new/e))>-3){
-//         //    cout<< "\t" << ecut<< "\t" << vcut << "\t" << energy<< "\t" << mediumName<< "\t" << particleName<<endl;
-//         //    cout << log10(fabs(1-e_new/e)) << endl;
-//         // }
-
-//         ASSERT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-10*stochastic_loss_stored);
-
-//         delete medium;
-//     }
-// }
+        delete medium;
+    }
+}
 
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
