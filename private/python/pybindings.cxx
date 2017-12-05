@@ -1092,7 +1092,7 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
 
         .def_readwrite("parametrization", &PhotonuclearFactory::Definition::parametrization)
         .def_readwrite("shadow", &PhotonuclearFactory::Definition::shadow)
-        .def_readwrite("hardbb", &PhotonuclearFactory::Definition::hardbb)
+        .def_readwrite("hardbb", &PhotonuclearFactory::Definition::hard_component)
         .def_readwrite("multiplier", &PhotonuclearFactory::Definition::multiplier)
     ;
 
