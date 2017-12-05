@@ -137,6 +137,26 @@ Particle::Particle()
     SetEnergy(energy_);
 }
 
+Particle::Particle(const Particle& particle)
+    : DynamicData(particle)
+    , particle_def_(particle.particle_def_)
+    , momentum_(particle.momentum_)
+    , square_momentum_(particle.square_momentum_)
+    , parent_particle_id_(particle.parent_particle_id_)
+    , particle_id_(particle.particle_id_)
+    , entry_point_(particle.entry_point_)
+    , entry_time_(particle.entry_time_)
+    , entry_energy_(particle.entry_energy_)
+    , exit_point_(particle.exit_point_)
+    , exit_time_(particle.exit_time_)
+    , exit_energy_(particle.exit_energy_)
+    , closest_approach_point_(particle.closest_approach_point_)
+    , closest_approach_time_(particle.closest_approach_time_)
+    , closest_approach_energy_(particle.closest_approach_energy_)
+    , elost_(particle.elost_)
+{
+}
+
 Particle::Particle(const ParticleDef& particleDef)
     : DynamicData(DynamicData::Particle)
     , particle_def_(particleDef)

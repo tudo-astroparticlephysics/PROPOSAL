@@ -22,7 +22,7 @@ class Geometry;
  */
 class Sector
 {
-    public:
+public:
     struct ParticleLocation
     {
         enum Enum
@@ -33,11 +33,25 @@ class Sector
         };
     };
 
-    struct Definition
+    class Definition
     {
+    public:
+        Definition();
+        Definition(const Definition&);
+        ~Definition();
+
+        Definition& operator=(const Definition&);
+
+
+        void SetMedium(const Medium&);
+        const Medium& GetMedium() const { return *medium_;}
+
+        void SetGeometry(const Geometry&);
+        const Geometry& GetGeometry() const { return *geometry_;}
+
         bool do_weighting;      //!< Do weigthing? Set to false in constructor
         double weighting_order; //!< Re-weighting order. Set to 0 in constructor
-        bool stopping_decay; //!< Let particle decay if elow is reached but no decay was sampled
+        bool stopping_decay;    //!< Let particle decay if elow is reached but no decay was sampled
 
         bool do_continuous_randomization;
         bool do_exact_time_calculation;
@@ -48,16 +62,20 @@ class Sector
 
         Utility::Definition utility_def;
 
-        Definition();
-        ~Definition();
+        EnergyCutSettings cut_settings;
+
+    private:
+        Medium* medium_;
+        Geometry* geometry_;
     };
 
-    public:
+public:
     // Sector(Particle&);
-    Sector(Particle&, const Medium&, const EnergyCutSettings&, const Geometry&, const Definition&);
-    Sector(Particle&, const Medium&, const EnergyCutSettings&, const Geometry&, const Definition&, const InterpolationDef&);
+    Sector(Particle&, const Definition&);
+    Sector(Particle&, const Definition&, const InterpolationDef&);
     Sector(Particle&, const Sector&);
-    // Sector(Particle&, const Geometry&, const Utility&, const Scattering&, bool do_interpolation, const Definition& def = Definition());
+    // Sector(Particle&, const Geometry&, const Utility&, const Scattering&, bool do_interpolation, const Definition&
+    // def = Definition());
     Sector(const Sector&);
     virtual ~Sector();
 
@@ -97,14 +115,14 @@ class Sector
     virtual std::pair<double, double> CalculateEnergyTillStochastic(double initial_energy);
 
     /*!
-    * advances the particle by the given distance
-    * Sets the x,y and z coordinates of particle_
-    * and its time and propagation distance
-    *
-    * \param    dr  flight distance
-    * \param    ei  initial energy
-    * \param    ef  final energy
-    */
+     * advances the particle by the given distance
+     * Sets the x,y and z coordinates of particle_
+     * and its time and propagation distance
+     *
+     * \param    dr  flight distance
+     * \param    ei  initial energy
+     * \param    ef  final energy
+     */
     void AdvanceParticle(double dr, double ei, double ef);
 
     /**
@@ -135,7 +153,7 @@ class Sector
     const Medium* GetMedium() const { return &utility_.GetMedium(); }
     // ContinuousRandomization* GetContinuousRandomization() const { return randomizer_; }
 
-    protected:
+protected:
     Sector& operator=(const Sector&); // Undefined & not allowed
 
     // --------------------------------------------------------------------- //
@@ -159,4 +177,4 @@ class Sector
     ContinuousRandomizer* cont_rand_;
     Scattering* scattering_;
 };
-}
+} // namespace PROPOSAL
