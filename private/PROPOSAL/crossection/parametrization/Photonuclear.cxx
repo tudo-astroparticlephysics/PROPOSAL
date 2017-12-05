@@ -159,7 +159,7 @@ double SoftBB::CalculateHardBB(double energy, double v)
 *                                ShadowEffect                                *
 ******************************************************************************/
 
-const std::string ShadowDuttaRenoSarcevicSeckel::name_ = "ShadowDRSS";
+const std::string ShadowDuttaRenoSarcevicSeckel::name_ = "ShadowDuttaRenoSarcevicSeckel";
 const std::string ShadowButkevichMikhailov::name_ = "ShadowButkevichMikhailov";
 
 bool ShadowEffect::operator==(const ShadowEffect& shadow) const
@@ -205,7 +205,7 @@ double ShadowDuttaRenoSarcevicSeckel::CalculateShadowEffect(const Components::Co
 size_t ShadowDuttaRenoSarcevicSeckel::GetHash() const
 {
     size_t seed = 0;
-    boost::hash_combine(seed, "ShadowDRSS");
+    boost::hash_combine(seed, "ShadowDuttaRenoSarcevicSeckel");
 
     return seed;
 }

@@ -7,7 +7,7 @@
     class Photo##param : public Photo##parent                                                                          \
     {                                                                                                                  \
     public:                                                                                                            \
-        Photo##param(const ParticleDef&, const Medium&, const EnergyCutSettings&, bool hardbb, double multiplier);     \
+        Photo##param(const ParticleDef&, const Medium&, const EnergyCutSettings&, bool hard_component, double multiplier);     \
         Photo##param(const Photo##param&);                                                                             \
         virtual ~Photo##param();                                                                                       \
                                                                                                                        \
@@ -15,10 +15,10 @@
         static Photonuclear* create(const ParticleDef& particle_def,                                                   \
                                     const Medium& medium,                                                              \
                                     const EnergyCutSettings& cuts,                                                     \
-                                    bool hardbb,                                                                       \
+                                    bool hard_component,                                                                       \
                                     double multiplier)                                                                 \
         {                                                                                                              \
-            return new Photo##param(particle_def, medium, cuts, hardbb, multiplier);                                   \
+            return new Photo##param(particle_def, medium, cuts, hard_component, multiplier);                                   \
         }                                                                                                              \
                                                                                                                        \
         virtual double CalculateParametrization(double nu);                                                            \
@@ -41,7 +41,7 @@ class PhotoRealPhotonAssumption : public Photonuclear
     PhotoRealPhotonAssumption(const ParticleDef&,
                               const Medium&,
                               const EnergyCutSettings&,
-                              bool hardbb,
+                              bool hard_component,
                               double multiplier);
     PhotoRealPhotonAssumption(const PhotoRealPhotonAssumption&);
     virtual ~PhotoRealPhotonAssumption();
@@ -89,7 +89,7 @@ class PhotoRhode : public PhotoRealPhotonAssumption
     PhotoRhode(const ParticleDef&,
                const Medium&,
                const EnergyCutSettings&,
-               bool hardbb,
+               bool hard_component,
                double multiplier);
     PhotoRhode(const PhotoRhode&);
     virtual ~PhotoRhode();
@@ -98,7 +98,7 @@ class PhotoRhode : public PhotoRealPhotonAssumption
     static Photonuclear* create(const ParticleDef&,
                             const Medium&,
                             const EnergyCutSettings&,
-                            bool hardbb,
+                            bool hard_component,
                             double multiplier);
 
     double CalculateParametrization(double nu);
