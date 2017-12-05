@@ -2,8 +2,8 @@
 // #include <iostream>
 // #include <string>
 // #include <cmath>
-#include <vector>
 #include <cmath>
+#include <vector>
 
 #include "gtest/gtest.h"
 
@@ -12,8 +12,8 @@
 using namespace std;
 using namespace PROPOSAL;
 
-TEST(Propagation , Test_nan) {
-
+TEST(Propagation, Test_nan)
+{
     int statistic = 10;
     int EmaxLog10 = 8;
 
@@ -31,8 +31,6 @@ TEST(Propagation , Test_nan) {
     prop_service.RegisterPropagator(prop_mu);
     prop_service.RegisterPropagator(prop_tau);
 
-    std::vector<unsigned int> length_sec;
-
     for (int i = 0; i < statistic; i++)
     {
         // ----------------------------------------------------------------- //
@@ -40,18 +38,18 @@ TEST(Propagation , Test_nan) {
         // ----------------------------------------------------------------- //
 
         // Set particle properties
-        mu.SetEnergy(pow(10,EmaxLog10));
+        mu.SetEnergy(pow(10, EmaxLog10));
         mu.SetPropagatedDistance(0);
         mu.SetPosition(Vector3D(0, 0, 0));
         mu.SetDirection(Vector3D(0, 0, -1));
 
-        tau.SetEnergy(pow(10,EmaxLog10));
+        tau.SetEnergy(pow(10, EmaxLog10));
         tau.SetPropagatedDistance(0);
         tau.SetPosition(Vector3D(0, 0, 0));
         tau.SetDirection(Vector3D(0, 0, -1));
 
         // Use service to propagate different particle
-        std::vector<DynamicData*> sec_mu = prop_service.Propagate(mu);
+        std::vector<DynamicData*> sec_mu  = prop_service.Propagate(mu);
         std::vector<DynamicData*> sec_tau = prop_service.Propagate(tau);
 
         // ----------------------------------------------------------------- //
@@ -61,23 +59,16 @@ TEST(Propagation , Test_nan) {
         // Therefor its needed to get the internal created particle first
         Particle& particle = prop_mu.GetParticle();
 
-        particle.SetEnergy(pow(10,EmaxLog10));
+        particle.SetEnergy(pow(10, EmaxLog10));
         particle.SetPropagatedDistance(0);
         particle.SetPosition(Vector3D(0, 0, 0));
         particle.SetDirection(Vector3D(0, 0, -1));
 
         std::vector<DynamicData*> sec_mu_direct = prop_mu.Propagate();
-
-        length_sec.push_back(sec_mu_direct.size());
-    }
-
-    for(std::vector<unsigned int>::iterator it = length_sec.begin(); it != length_sec.end(); ++it)
-    {
-        std::cout << "length of secondies: " << *it << std::endl;
     }
 }
 
-TEST(Propagation , particle_type)
+TEST(Propagation, particle_type)
 {
     ifstream in;
     string filename = "bin/TestFiles/propagation.txt";
@@ -90,7 +81,7 @@ TEST(Propagation , particle_type)
 
     // Just skip the header
     char firstLine[256];
-    in.getline(firstLine,256);
+    in.getline(firstLine, 256);
 
     int statistic = 100;
     double energy = 1e8;
@@ -118,7 +109,7 @@ TEST(Propagation , particle_type)
     // Buffer to read data in
 
     std::string name;
-    double length = 0.0;
+    double length     = 0.0;
     double sec_energy = 0.0, x = 0.0, y = 0.0, z = 0.0, dx = 0.0, dy = 0.0, dz = 0.0;
 
     double error = 1e-5;
@@ -143,27 +134,21 @@ TEST(Propagation , particle_type)
             if (sec_mu_direct[j]->GetTypeId() == DynamicData::Particle)
             {
                 Particle* particle = dynamic_cast<Particle*>(sec_mu_direct[j]);
-                // names.push_back(particle->GetName());
-                name_new = particle->GetName();
-            }
-            else
+                name_new           = particle->GetName();
+            } else
             {
                 switch (sec_mu_direct[j]->GetTypeId())
                 {
                     case DynamicData::Brems:
-                        // names.push_back("Brems");
                         name_new = "Brems";
                         break;
                     case DynamicData::Epair:
-                        // names.push_back("Epair");
                         name_new = "Epair";
                         break;
                     case DynamicData::NuclInt:
-                        // names.push_back("NuclInt");
                         name_new = "NuclInt";
                         break;
                     case DynamicData::DeltaE:
-                        // names.push_back("DeltaE");
                         name_new = "DeltaE";
                         break;
                     default:
@@ -173,13 +158,13 @@ TEST(Propagation , particle_type)
 
             in >> name >> length >> sec_energy >> x >> y >> z >> dx >> dy >> dz;
 
-            double energy_new = sec_mu_direct[j]->GetEnergy();
-            double lenght_new = sec_mu_direct[j]->GetPropagatedDistance();
-            Vector3D position = sec_mu_direct[j]->GetPosition();
+            double energy_new  = sec_mu_direct[j]->GetEnergy();
+            double lenght_new  = sec_mu_direct[j]->GetPropagatedDistance();
+            Vector3D position  = sec_mu_direct[j]->GetPosition();
             Vector3D direction = sec_mu_direct[j]->GetDirection();
 
             EXPECT_TRUE(name == name_new);
-            ASSERT_NEAR(length, lenght_new, error*length);
+            ASSERT_NEAR(length, lenght_new, error * length);
             ASSERT_NEAR(sec_energy, energy_new, error * sec_energy);
             ASSERT_NEAR(x, position.GetX(), error * std::abs(x));
             ASSERT_NEAR(y, position.GetY(), error * std::abs(y));
@@ -193,11 +178,9 @@ TEST(Propagation , particle_type)
     in.close();
 }
 
-int main(int argc, char **argv) {
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
+int main(int argc, char** argv)
+{
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }
-
-
-
 
