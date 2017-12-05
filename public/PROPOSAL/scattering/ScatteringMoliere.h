@@ -27,15 +27,8 @@ class ScatteringMoliere : public Scattering
     Scattering* clone() const { return new ScatteringMoliere(*this); }
     virtual Scattering* clone(Particle& particle, const Utility& utility) const { (void) utility; return new ScatteringMoliere(particle, *this); }
 
-    // ScatteringMoliere& operator=(const ScatteringMoliere&);
-    // bool operator==(const ScatteringMoliere& scattering) const;
-    // bool operator!=(const ScatteringMoliere& scattering) const;
-    //----------------------------------------------------------------------------//
-
     //----------------------------------------------------------------------------//
     //----------------------------------------------------------------------------//
-
-    // destructors
 
     private:
     ScatteringMoliere& operator=(const ScatteringMoliere&); // Undefined & not allowed
@@ -74,16 +67,6 @@ class ScatteringMoliere : public Scattering
     //----------------------------------------------------------------------------//
 
     double GetRandom();
-
-    //----------------------------------------------------------------------------//
-    //-----------------------------Coefficients-----------------------------------//
-    //---for calculating the power series approximation of the moliere function---//
-
-    // static const double c1[100];
-    // static const double c2[100];
-    // static const double c2large[50];
-    // static const double s2large[50];
-    // static const double C1large[50];
 
 };
 }
