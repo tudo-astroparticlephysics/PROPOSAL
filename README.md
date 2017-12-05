@@ -95,20 +95,26 @@ use this library. The following snippet uses the
 store the muon ranges for further proceeds.
 
 ```c++
-#include "PROPOSAL/Propagator.h"
+#include "PROPOSAL/PROPOSAL.h"
 
-Propagator *pr = new Propagator("resources/configuration");
-pr->RandomDouble();
+using namespace PROPOSAL;
+
+Propagator prop(MuMinusDef::Get(), "resources/configuration");
+Particle& mu = prop.GetParticle();
+Particle mu_backup(mu);
+
+mu_backup.SetEnergy(9e6);
+mu_backup.SetDirection(Vector3D(0, 0, -1));
+
 std::vector<double> ranges;
 
-for(int i =0 ;i< 1e4; i++)
+for (int i = 0; i < 10; i++)
 {
-	PROPOSALParticle *p = new PROPOSALParticle(ParticleType::MuMinus);
-	p->SetEnergy(9e6);
-	pr->SetParticle(p);
+  mu.InjectState(mu_backup);
 
-	pr->Propagate(p);
-	ranges.push_back(p->GetPropagatedDistance());
+  prop.Propagate();
+
+  ranges.push_back(mu.GetPropagatedDistance());
 }
 
 // ... Do stuff with ranges, e.g. plot histogram
@@ -151,24 +157,24 @@ For a short demonstration the following snippet will create data you can use to
 show the distribution of muon ranges and the number of interactions in ice.
 
 ```python
-import pyPROPOSAL
+import pyPROPOSAL as pp
 
-ptype = pyPROPOSAL.ParticleType.MuMinus
+prop = pp.Propagator(pp.MuMinusDef.get(), "path/to/config.json")
+mu = prop.particle
+mu_backup = pp.Particle(mu)
 
-med = pyPROPOSAL.MediumType.Ice
-E = pyPROPOSAL.EnergyCutSettings()
-prop = pyPROPOSAL.Propagator(med, E, ptype, "resources/tables")
+mu_backup.energy = 9e6
+mu_backup.direction = pp.Vector3D(0, 0, -1)
 
-mu_length = list()
-n_daughters = list()
+mu_length = []
+mu_secondaries = []
 
 for i in range(1000):
-    prop.reset_particle()
-    prop.particle.energy = 1e8  # Unit in MeV
-    d = prop.propagate()
+	mu.inject_state(mu_backup)
+    secondaries = prop.propagate()
 
     mu_length.append(prop.particle.propagated_distance / 100)
-    n_daughters.append(len(d))
+    mu_secondaries.append(len(secondaries))
 ```
 
 
