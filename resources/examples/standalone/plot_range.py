@@ -2,7 +2,6 @@ import pyPROPOSAL as pp
 
 try:
     import matplotlib as mpl
-    mpl.use('Agg')
     import matplotlib.pyplot as plt
 except ImportError:
     raise ImportError("Matplotlib not installed!")
@@ -17,33 +16,25 @@ if __name__ == "__main__":
     energy = 1e8  # MeV
     statistics = 1000
 
-    geo_def = pp.GeometryDefinition()
-    geo_def.shape = pp.Shape.Sphere
-    geo_def.outer_radius = 1e20
-    geo_def.inner_radius = 0
-
-    med_def = pp.MediumDefinition()
-    med_def.type = pp.MediumType.Ice
-
     sec_def = pp.SectorDefinition()
-    sec_def.medium_def = med_def
-    sec_def.geometry_def = geo_def
+    sec_def.medium = pp.Medium.Ice(1.0)
+    sec_def.geometry_def = pp.Sphere(pp.Vector3D(), 1e20, 0)
     sec_def.particle_location = pp.ParticleLocation.inside_detector
 
     sec_def.scattering_model = pp.ScatteringModel.moliere
     sec_def.crosssection_defs.brems_def.lpm_effect = False
     sec_def.crosssection_defs.epair_def.lpm_effect = False
 
-    sec_def.e_cut = 500
-    sec_def.v_cut = 0.05
+    sec_def.cut_settings.ecut = 500
+    sec_def.cut_settings.vcut = 0.05
 
     interpolation_def = pp.InterpolationDef()
 
-    prop = pp.Propagator(particle_def=pp.MuMinusDef.get()
-        # , config_file="resources/config.json"
-        , sector_defs=[sec_def]
-        , detector=pp.Sphere(pp.Vector3D(), 1e20, 0)
-        , interpolation_def=interpolation_def
+    prop = pp.Propagator(
+            particle_def=pp.TauMinusDef.get(),
+            sector_defs=[sec_def],
+            detector=pp.Sphere(pp.Vector3D(), 1e20, 0),
+            interpolation_def=interpolation_def
     )
 
     mu = prop.particle
@@ -72,15 +63,18 @@ if __name__ == "__main__":
 
     ax.hist(mu_length, histtype="step", log=True, bins=50)
 
-    ax.set_title("{} muons with energy {} TeV".format(
+    ax.set_title("{} {}'s with energy {} TeV".format(
         statistics,
+        prop.particle.particle_def.name,
         energy / 1e6
     ))
     ax.set_xlabel(r'range / m')
     ax.set_ylabel(r'count')
 
     fig_length.tight_layout()
-    fig_length.savefig("muon_lenghts.pdf")
+    fig_length.savefig(
+        "{}_lenghts.pdf".format(prop.particle.particle_def.name)
+    )
 
     # =========================================================
     # 	Plot secondarys
@@ -99,4 +93,6 @@ if __name__ == "__main__":
     ax.set_ylabel(r'count')
 
     fig_secondarys.tight_layout()
-    fig_secondarys.savefig("muon_secondarys.pdf")
+    fig_length.savefig(
+        "{}_secondaries.pdf".format(prop.particle.particle_def.name)
+    )
