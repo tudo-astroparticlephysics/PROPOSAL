@@ -162,9 +162,9 @@ double Bremsstrahlung::lpm(double energy, double v)
             Parametrization::IntegralLimits limits = GetIntegralLimits(BIGENERGY);
 
             sum += integral_temp.Integrate(
-                limits.vMin, limits.vUp, boost::bind(&Bremsstrahlung::FunctionToDEdxIntegral, this, energy, _1), 2);
+                limits.vMin, limits.vUp, boost::bind(&Bremsstrahlung::FunctionToDEdxIntegral, this, BIGENERGY, _1), 2);
             sum += integral_temp.Integrate(
-                limits.vUp, limits.vMax, boost::bind(&Bremsstrahlung::FunctionToDEdxIntegral, this, energy, _1), 4);
+                limits.vUp, limits.vMax, boost::bind(&Bremsstrahlung::FunctionToDEdxIntegral, this, BIGENERGY, _1), 4);
         }
 
         eLpm_ = ALPHA * (particle_def_.mass);
@@ -434,26 +434,28 @@ double BremsAndreevBezrukovBugaev::CalculateParametrization(double energy, doubl
     double aux      =   0;
     double result   =   0;
 
-    // least momentum transferred to the nucleus (eq. 7)
-    double delta = particle_def_.mass*particle_def_.mass * v/(2 * energy * (1 - v));
+    // least momentum transferred to the nucleus (eq. 2.2)
 
-    double Z3 = pow(components_[component_index_]->GetNucCharge(), -1./3);
+    double nucl_Z = components_[component_index_]->GetNucCharge();
 
-    double aux1, aux2, d1, d2, psi1, psi2;
+    double Z3 = pow(nucl_Z, -1./3);
 
     double a1 = 184.15 * Z3 / (SQRTE * ME); // eq 2.18
     double a2 = 1194 * Z3 * Z3 / (SQRTE * ME); // eq.2.19
 
     // calculating the contribution of elastic nuclear and atomic form factors
     // eq. 2.30
-    double qc = 1.9 * particle_def_.mass * Z3;
+    double qc = 1.9 * MMU * Z3;
     aux =  2 * particle_def_.mass / qc;
     double zeta = sqrt(1 + aux * aux);
 
+    double delta = particle_def_.mass*particle_def_.mass * v/(2 * energy * (1 - v));
     double x1 = a1 * delta;
     double x2 = a2 * delta;
 
-    if(components_[component_index_]->GetNucCharge() == 1)
+    double aux1, aux2, d1, d2, psi1, psi2;
+
+    if(nucl_Z == 1)
     {
         d1  =   0;
         d2  =   0;
@@ -463,24 +465,24 @@ double BremsAndreevBezrukovBugaev::CalculateParametrization(double energy, doubl
         aux1    =   log(particle_def_.mass / qc);
         aux2    =   0.5 * zeta * log((zeta + 1) / (zeta - 1));
         d1      =   aux1 + aux2;
-        d2      =   aux1 + 0.5 * ((3 - zeta * zeta) * aux2 + aux);
+        d2      =   aux1 + 0.5 * ((3 - zeta * zeta) * aux2 + aux*aux);
     }
 
+    // eq. 2.20 and 2.21
     aux     =   particle_def_.mass * a1;
     aux1    =   log(aux * aux / (1 + x1 * x1));
     aux     =   particle_def_.mass * a2;
     aux2    =   log(aux * aux / (1 + x2 * x2 ));
-    psi1    =   0.5 * (1 + aux1) + (1 + aux2) / (2 * components_[component_index_]->GetNucCharge());
-    psi2    =   0.5 * (2./3 + aux1) + (2./3 + aux2) / (2 * components_[component_index_]->GetNucCharge());
+    psi1    =   0.5 * ((1 + aux1) + (1 + aux2) / nucl_Z);
+    psi2    =   0.5 * ((2./3 + aux1) + (2./3 + aux2) / nucl_Z);
 
     aux1    =   x1 * atan(1 / x1);
     aux2    =   x2 * atan(1 / x2);
-    psi1    -=  aux1 + aux2 / components_[component_index_]->GetNucCharge();
+    psi1    -=  aux1 + aux2 / nucl_Z;
     aux     =   x1 * x1;
     psi2    +=  2 * aux * (1 - aux1 + 0.75 * log(aux / (1 + aux)));
     aux     =   x2 * x2;
-    psi2    +=  2 * aux * (1 - aux2 + 0.75 * log(aux / (1 + aux)))
-                /components_[component_index_]->GetNucCharge();
+    psi2    +=  2 * aux * (1 - aux2 + 0.75 * log(aux / (1 + aux))) / nucl_Z;
 
     psi1    -=  d1;
     psi2    -=  d2;
