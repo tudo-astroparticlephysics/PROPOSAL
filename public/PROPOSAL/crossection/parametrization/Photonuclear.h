@@ -8,7 +8,7 @@
 namespace PROPOSAL {
 
 /******************************************************************************
-*                                   HardBB                                    *
+*                               HardComponent                                 *
 ******************************************************************************/
 
 class Interpolant;
@@ -25,7 +25,7 @@ class RealPhoton
         bool operator==(const RealPhoton&) const;
         bool operator!=(const RealPhoton&) const;
 
-        virtual double CalculateHardBB(double energy, double v) = 0;
+        virtual double CalculateHardComponent(double energy, double v) = 0;
 
         virtual const std::string& GetName() const = 0;
 
@@ -33,16 +33,16 @@ class RealPhoton
         virtual bool compare(const RealPhoton&) const;
 };
 
-class SoftBB: public RealPhoton
+class SoftComponent: public RealPhoton
 {
     public:
-        SoftBB();
-        SoftBB(const SoftBB& bb);
-        virtual ~SoftBB();
+        SoftComponent();
+        SoftComponent(const SoftComponent&);
+        virtual ~SoftComponent();
 
-        RealPhoton* clone() const { return new SoftBB(*this); }
+        RealPhoton* clone() const { return new SoftComponent(*this); }
 
-        virtual double CalculateHardBB(double energy, double v);
+        virtual double CalculateHardComponent(double energy, double v);
 
         virtual const std::string& GetName() const { return name_; }
 
@@ -50,16 +50,16 @@ class SoftBB: public RealPhoton
         static const std::string name_;
 };
 
-class HardBB: public RealPhoton
+class HardComponent: public RealPhoton
 {
     public:
-        HardBB(const ParticleDef&);
-        HardBB(const HardBB&);
-        virtual ~HardBB();
+        HardComponent(const ParticleDef&);
+        HardComponent(const HardComponent&);
+        virtual ~HardComponent();
 
-        RealPhoton* clone() const { return new HardBB(*this); }
+        RealPhoton* clone() const { return new HardComponent(*this); }
 
-        double CalculateHardBB(double energy, double v);
+        double CalculateHardComponent(double energy, double v);
 
         virtual const std::string& GetName() const { return name_; }
 
