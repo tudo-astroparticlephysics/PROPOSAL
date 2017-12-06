@@ -69,15 +69,15 @@ class PhotonuclearFactory
     typedef boost::function<ShadowEffect*(void)> RegisterShadowEffectFunction;
 
     typedef boost::function<
-        Photonuclear*(const ParticleDef&, const Medium&, const EnergyCutSettings&, bool hard_component, double multiplier)>
+        Photonuclear*(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier, bool hard_component)>
         RegisterRealPhotonFunction;
 
     typedef boost::function<
-        Photonuclear*(const ParticleDef&, const Medium&, const EnergyCutSettings&, const ShadowEffect&, double multiplier)>
+        Photonuclear*(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier, const ShadowEffect&)>
         RegisterQ2Function;
 
     typedef boost::function<
-        Photonuclear*(const ParticleDef&, const Medium&, const EnergyCutSettings&, const ShadowEffect&, double multiplier, InterpolationDef)>
+        Photonuclear*(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier, const ShadowEffect&, InterpolationDef)>
         RegisterQ2FunctionInterpolant;
 
     typedef std::map<std::string, RegisterShadowEffectFunction > PhotoShadowEffectMapString;

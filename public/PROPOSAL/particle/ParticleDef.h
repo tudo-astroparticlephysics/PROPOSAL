@@ -35,14 +35,14 @@ namespace PROPOSAL {
 
 // class DecayTable;
 
-namespace HardBBTables {
+namespace HardComponentTables {
 
 typedef std::vector<std::vector<double> > VecType;
 
 extern const double muon[8][7];
 extern const double tau[8][7];
 
-VecType getBBVector(const double table[8][7]);
+VecType getHardComponentVector(const double table[8][7]);
 
 // ----------------------------------------------------------------------------
 /// @brief Table used for photonuclear interaction
@@ -66,12 +66,12 @@ extern const VecType TauTable;
 /// @brief Table used for photonuclear interaction
 ///
 /// Used in parametrizations with real photon assumption.
-/// This table is empty and indicates to do no hardbb calculations.
+/// This table is empty and indicates to do no hard component calculations.
 ///
 // ----------------------------------------------------------------------------
 extern const VecType EmptyTable;
 
-} // namespace HardBBTable
+} // namespace HardComponentTable
 
 // ----------------------------------------------------------------------------
 /// @brief Struct to define Basic Particle Properties
@@ -87,7 +87,7 @@ struct ParticleDef
     const double low;       //!< energy below which the particle is lost [MeV]
     const double lifetime;
     const double charge;
-    const HardBBTables::VecType& hardbb_table;
+    const HardComponentTables::VecType& hard_component_table;
     const DecayTable decay_table;
 
     ParticleDef();
@@ -96,7 +96,7 @@ struct ParticleDef
                 double low,
                 double lifetime,
                 double charge,
-                const HardBBTables::VecType& table,
+                const HardComponentTables::VecType& table,
                 const DecayTable&);
 
     ParticleDef(const ParticleDef&);
@@ -151,9 +151,9 @@ class ParticleDef::Builder
         charge = var;
         return *this;
     }
-    Builder& SetHardBBTable(const HardBBTables::VecType& var)
+    Builder& SetHardComponentTable(const HardComponentTables::VecType& var)
     {
-        hardbb_table = &var;
+        hard_component_table = &var;
         return *this;
     }
     Builder& SetDecayTable(const DecayTable& var)
@@ -168,7 +168,7 @@ class ParticleDef::Builder
         low = var.low;
         lifetime = var.lifetime;
         charge = var.charge;
-        hardbb_table = &var.hardbb_table;
+        hard_component_table = &var.hard_component_table;
         decay_table = var.decay_table;
         return *this;
     }
@@ -181,7 +181,7 @@ class ParticleDef::Builder
             low = mass;
         }
 
-        return ParticleDef(name, mass, low, lifetime, charge, *hardbb_table, decay_table);
+        return ParticleDef(name, mass, low, lifetime, charge, *hard_component_table, decay_table);
     }
 
     private:
@@ -190,7 +190,7 @@ class ParticleDef::Builder
     double low;
     double lifetime;
     double charge;
-    const HardBBTables::VecType* hardbb_table;
+    const HardComponentTables::VecType* hard_component_table;
     DecayTable decay_table;
 };
 

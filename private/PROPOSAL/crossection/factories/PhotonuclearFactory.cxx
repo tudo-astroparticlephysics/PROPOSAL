@@ -137,13 +137,13 @@ CrossSection* PhotonuclearFactory::CreatePhotonuclear(const ParticleDef& particl
     {
         ShadowEffect* shadow = Get().CreateShadowEffect(def.shadow);
 
-        PhotoIntegral* photo =  new PhotoIntegral(*it_q2->second.first(particle_def, medium, cuts, *shadow, def.multiplier));
+        PhotoIntegral* photo =  new PhotoIntegral(*it_q2->second.first(particle_def, medium, cuts, def.multiplier, *shadow));
         delete shadow;
         return photo;
     }
     else if (it_photo != photo_real_map_enum_.end())
     {
-        return new PhotoIntegral(*it_photo->second(particle_def, medium, cuts, def.hard_component, def.multiplier));
+        return new PhotoIntegral(*it_photo->second(particle_def, medium, cuts, def.multiplier, def.hard_component));
     }
     else
     {
@@ -166,13 +166,13 @@ CrossSection* PhotonuclearFactory::CreatePhotonuclear(const ParticleDef& particl
     {
         ShadowEffect* shadow = Get().CreateShadowEffect(def.shadow);
 
-        PhotoInterpolant* photo =  new PhotoInterpolant(*it_q2->second.second(particle_def, medium, cuts, *shadow, def.multiplier, interpolation_def), interpolation_def);
+        PhotoInterpolant* photo =  new PhotoInterpolant(*it_q2->second.second(particle_def, medium, cuts, def.multiplier, *shadow, interpolation_def), interpolation_def);
         delete shadow;
         return photo;
     }
     else if (it_photo != photo_real_map_enum_.end())
     {
-        return new PhotoInterpolant(*it_photo->second(particle_def, medium, cuts, def.hard_component, def.multiplier), interpolation_def);
+        return new PhotoInterpolant(*it_photo->second(particle_def, medium, cuts, def.multiplier, def.hard_component), interpolation_def);
     }
     else
     {

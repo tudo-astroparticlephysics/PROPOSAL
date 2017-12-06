@@ -7,7 +7,7 @@
     class Photo##param : public Photo##parent                                                                          \
     {                                                                                                                  \
     public:                                                                                                            \
-        Photo##param(const ParticleDef&, const Medium&, const EnergyCutSettings&, bool hard_component, double multiplier);     \
+        Photo##param(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier, bool hard_component);     \
         Photo##param(const Photo##param&);                                                                             \
         virtual ~Photo##param();                                                                                       \
                                                                                                                        \
@@ -15,10 +15,10 @@
         static Photonuclear* create(const ParticleDef& particle_def,                                                   \
                                     const Medium& medium,                                                              \
                                     const EnergyCutSettings& cuts,                                                     \
-                                    bool hard_component,                                                                       \
-                                    double multiplier)                                                                 \
+                                    double multiplier,                                                                 \
+                                    bool hard_component)                                                               \
         {                                                                                                              \
-            return new Photo##param(particle_def, medium, cuts, hard_component, multiplier);                                   \
+            return new Photo##param(particle_def, medium, cuts, multiplier, hard_component);                           \
         }                                                                                                              \
                                                                                                                        \
         virtual double CalculateParametrization(double nu);                                                            \
@@ -41,8 +41,8 @@ class PhotoRealPhotonAssumption : public Photonuclear
     PhotoRealPhotonAssumption(const ParticleDef&,
                               const Medium&,
                               const EnergyCutSettings&,
-                              bool hard_component,
-                              double multiplier);
+                              double multiplier,
+                              bool hard_component);
     PhotoRealPhotonAssumption(const PhotoRealPhotonAssumption&);
     virtual ~PhotoRealPhotonAssumption();
 
@@ -67,7 +67,7 @@ class PhotoRealPhotonAssumption : public Photonuclear
     virtual bool compare(const Parametrization&) const;
     virtual void print(std::ostream&) const;
 
-    RealPhoton* hardBB_;
+    RealPhoton* hard_component_;
 };
 
 /******************************************************************************
@@ -89,8 +89,8 @@ class PhotoRhode : public PhotoRealPhotonAssumption
     PhotoRhode(const ParticleDef&,
                const Medium&,
                const EnergyCutSettings&,
-               bool hard_component,
-               double multiplier);
+               double multiplier,
+               bool hard_component);
     PhotoRhode(const PhotoRhode&);
     virtual ~PhotoRhode();
 
@@ -98,8 +98,8 @@ class PhotoRhode : public PhotoRealPhotonAssumption
     static Photonuclear* create(const ParticleDef&,
                             const Medium&,
                             const EnergyCutSettings&,
-                            bool hard_component,
-                            double multiplier);
+                            double multiplier,
+                            bool hard_component);
 
     double CalculateParametrization(double nu);
 
