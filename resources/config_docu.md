@@ -59,33 +59,33 @@ The cross section multiplier, available for each cross section, scales this cros
 For Ionization and Pair production, there is just one parametrization, but for bremsstrahlung and nuclear interaction, it's possible to choose between multiple parametrizations.
 
 The bremsstrahlung parametrizations are:
-  - `"Kelner-Kokoulin-Petrukhin"` ([Preprint MEPhI (1995) no. 024-95](http://cds.cern.ch/record/288828)) and (Phys. Atom. Nucl. 62 (1999), 272)
-  - `"Andreev-Bezrukov-Bugaev"` (Phys. Atom. Nucl. 57 (1994), 2066)
-  - `"Petrukhin-Shestakov"` (Canad. J. Phys. 46 (1968), 377)
-  - `"Complete-Screening-Case"` taken from Tsai [Rev. Mod. Phys. 46 (1974), 815](https://doi.org/10.1103/RevModPhys.46.815)
+  - `"BremsKelnerKokoulinPetrukhin"` ([Preprint MEPhI (1995) no. 024-95](http://cds.cern.ch/record/288828)) and (Phys. Atom. Nucl. 62 (1999), 272)
+  - `"BremsAndreevBezrukovBugaev"` (Phys. Atom. Nucl. 57 (1994), 2066)
+  - `"BremsPetrukhinShestakov"` (Canad. J. Phys. 46 (1968), 377)
+  - `"BremsCompleteScreening"` taken from Tsai [Rev. Mod. Phys. 46 (1974), 815](https://doi.org/10.1103/RevModPhys.46.815)
 
 There are two different approaches to parametrise the nuclear interaction:
 
 Either with the approximation where a real photon scatters inelastically with a nucleus with an additional factor to make the photon virtual.
 The available parametrizations using this approach are:
-- `"Kokoulin"`
-- `"Rhode"`
-- `"Bezrukov-Bugaev"` (Sov. J. Nucl. Phys. 33 (1981), 635) with corrections for particles with higher mass like taus ([Phys. Rev. D67 (2003), 034027](https://doi.org/10.1103/PhysRevD.67.034027))
-- `"Zeus"`
+- `"PhotoKokoulin"`
+- `"PhotoRhode"`
+- `"PhotoBezrukovBugaev"` (Sov. J. Nucl. Phys. 33 (1981), 635) with corrections for particles with higher mass like taus ([Phys. Rev. D67 (2003), 034027](https://doi.org/10.1103/PhysRevD.67.034027))
+- `"PhotoZeus"`
 
 For these parametrizations the hard component can additionally be considered (only affecting the parametrizations using the real photon approximation).
 
 Or using data from electron proton scattering experiments and extrapolate to low momentum of the virtual photon transfered to the nucleus ($Q^2$).
 There the cross section is first integrated over the photon momentum.
 The available parametrizations using this approach are:
-- `"ALLM91"` by Abramowicz Levin Levy Maor [Phys. Let. B269 (1991), 465](https://doi.org/10.1016/0370-2693(91)90202-2)
-- `"ALLM97"` by Abramowicz Levin Levy Maor [arXiv::hep-ph/9712415](https://arxiv.org/abs/hep-ph/9712415)
-- `"Butkevich-Mikhailov"` [JETP 95 (2002), 11](https://doi.org/10.1134/1.1499897)
-- `"Reno-Sarcevic-Su"` [Astrop. Phys. 24 (2005), 107](https://doi.org/10.1016/j.astropartphys.2005.06.002) (which uses the parametrization of ALLM97, but with corrections for spin 0 particles and should therefore only be selected for spin 0 particles like sTau)
+- `"PhotoAbramowiczLevinLevyMaor91"` by Abramowicz Levin Levy Maor [Phys. Let. B269 (1991), 465](https://doi.org/10.1016/0370-2693(91)90202-2)
+- `"PhotoAbramowiczLevinLevyMaor97"` by Abramowicz Levin Levy Maor [arXiv::hep-ph/9712415](https://arxiv.org/abs/hep-ph/9712415)
+- `"PhotoButkevichMikhailov"` [JETP 95 (2002), 11](https://doi.org/10.1134/1.1499897)
+- `"PhotoRenoSarcevicSu"` [Astrop. Phys. 24 (2005), 107](https://doi.org/10.1016/j.astropartphys.2005.06.002) (which uses the parametrization of ALLM97, but with corrections for spin 0 particles and should therefore only be selected for spin 0 particles like sTau)
 
 For these parametrizations the parametrization of the shadowing factor can be chosen from one of the following parametrizations (only affecting the nuclear interaction parametrizations with momentum integration):
-- `"Butkevich-Mikhailov"` from their calculation of nuclear interaction
-- `"DRSS"` by Dutta, Reno, Sarcevic, Seckel [Phys. Rev. D63 (2001), 094020](https://doi.org/10.1103/PhysRevD.63.094020)
+- `"ShadowButkevichMikhailov"` from their calculation of nuclear interaction
+- `"ShadowDuttaRenoSarcevicSeckel"` by Dutta, Reno, Sarcevic, Seckel [Phys. Rev. D63 (2001), 094020](https://doi.org/10.1103/PhysRevD.63.094020)
 
 The LPM effect (Landau-Pomeranschuk-Migdal), suppressing the bremsstrahlung and the pair production at high energies and the Ter-Mikaelian effect, suppress low bremsstrahlung energy losses, can also be incorporated.
 
@@ -95,10 +95,10 @@ The LPM effect (Landau-Pomeranschuk-Migdal), suppressing the bremsstrahlung and 
 | `epair_multiplier`     | Double | `1`        | scales the pair production |
 | `ioniz_multiplier`     | Double | `1`        | scales the ionization |
 | `photo_multiplier`     | Double | `1`        | scales the nuclear interaction |
-| `brems`                | String | `"Kelner-Kokoulin-Petrukhin"` | Bremsstrahlung parametrization |
-| `photo`                | String | `"ALLM97"` | nuclear interaction parametrization |
+| `brems`                | String | `"BremsKelnerKokoulinPetrukhin"` | Bremsstrahlung parametrization |
+| `photo`                | String | `"PhotoAbramowiczLevinLevyMaor97"` | nuclear interaction parametrization |
 | `photo_hard_component` | Bool   | `True`     | including the hard components |
-| `photo_shadow`         | String | `"Butkevich-Mikhailov"` | shadowing parametrization |
+| `photo_shadow`         | String | `"ShadowButkevichMikhailov"` | shadowing parametrization |
 | `lpm`                  | Bool   | `True`     | Incorporate the LPM-effect and TM-effect |
 
 ### Energy-cut parameters ###
