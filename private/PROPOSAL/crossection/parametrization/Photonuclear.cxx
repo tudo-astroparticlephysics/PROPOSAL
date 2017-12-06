@@ -39,18 +39,18 @@ bool RealPhoton::compare(const RealPhoton& photon) const
 
 
 /******************************************************************************
-*                                   HardBB                                    *
+*                              HardComponent                                  *
 ******************************************************************************/
 
-std::vector<double> HardBB::x = boost::assign::list_of(3)(4)(5)(6)(7)(8)(9);
+std::vector<double> HardComponent::x = boost::assign::list_of(3)(4)(5)(6)(7)(8)(9);
 
-const std::string HardBB::name_ = "HardBB";
-const std::string SoftBB::name_ = "SoftBB";
+const std::string HardComponent::name_ = "HardComponent";
+const std::string SoftComponent::name_ = "SoftComponent";
 
-HardBB::HardBB(const ParticleDef& particle_def)
+HardComponent::HardComponent(const ParticleDef& particle_def)
     : interpolant_()
 {
-    const HardBBTables::VecType& y = particle_def.hardbb_table;
+    const HardComponentTables::VecType& y = particle_def.hard_component_table;
 
     if (!y.empty())
     {
@@ -61,22 +61,22 @@ HardBB::HardBB(const ParticleDef& particle_def)
     }
     else
     {
-        log_fatal("No HardBB tables provided for the given particle %s", particle_def.name.c_str());
+        log_fatal("No HardComponent tables provided for the given particle %s", particle_def.name.c_str());
     }
 }
 
-HardBB::HardBB(const HardBB& hardBB)
+HardComponent::HardComponent(const HardComponent& hard_component)
     : interpolant_()
 {
-    interpolant_.resize(hardBB.interpolant_.size());
+    interpolant_.resize(hard_component.interpolant_.size());
 
-    for(unsigned int i = 0; i < hardBB.interpolant_.size(); ++i)
+    for(unsigned int i = 0; i < hard_component.interpolant_.size(); ++i)
     {
-        interpolant_[i] = new Interpolant(*hardBB.interpolant_[i]);
+        interpolant_[i] = new Interpolant(*hard_component.interpolant_[i]);
     }
 }
 
-HardBB::~HardBB()
+HardComponent::~HardComponent()
 {
     for(std::vector<Interpolant*>::iterator it = interpolant_.begin(); it != interpolant_.end(); ++it)
     {
@@ -84,18 +84,18 @@ HardBB::~HardBB()
     }
 }
 
-bool HardBB::compare(const RealPhoton& photon) const
+bool HardComponent::compare(const RealPhoton& photon) const
 {
-    const HardBB* bb = static_cast<const HardBB*>(&photon);
+    const HardComponent* hard_component = static_cast<const HardComponent*>(&photon);
 
-    if (interpolant_.size() != bb->interpolant_.size())
+    if (interpolant_.size() != hard_component->interpolant_.size())
     {
         return false;
     }
 
     for (unsigned int i = 0; i < interpolant_.size(); ++i)
     {
-        if (*interpolant_[i] != *bb->interpolant_[i])
+        if (*interpolant_[i] != *hard_component->interpolant_[i])
             return false;
     }
 
@@ -103,7 +103,7 @@ bool HardBB::compare(const RealPhoton& photon) const
 }
 
 // ------------------------------------------------------------------------- //
-double HardBB::CalculateHardBB(double energy, double v)
+double HardComponent::CalculateHardComponent(double energy, double v)
 {
     if (energy < 1.0e5 || v < 1.0e-7)
     {
@@ -130,23 +130,23 @@ double HardBB::CalculateHardBB(double energy, double v)
 }
 
 /******************************************************************************
-*                                   SoftBB                                    *
+*                             SoftComponent                                   *
 ******************************************************************************/
 
-SoftBB::SoftBB()
+SoftComponent::SoftComponent()
 {
 }
 
-SoftBB::SoftBB(const SoftBB& bb)
-    : RealPhoton(bb)
+SoftComponent::SoftComponent(const SoftComponent& hard_component)
+    : RealPhoton(hard_component)
 {
 }
 
-SoftBB::~SoftBB()
+SoftComponent::~SoftComponent()
 {
 }
 
-double SoftBB::CalculateHardBB(double energy, double v)
+double SoftComponent::CalculateHardComponent(double energy, double v)
 {
     (void) energy;
     (void) v;

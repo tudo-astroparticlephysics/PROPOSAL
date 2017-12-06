@@ -47,11 +47,11 @@ TEST(Comparison, Comparison_equal)
     ShadowButkevichMikhailov shadow;
     InterpolationDef InterpolDef;
 
-    PhotoKokoulin* PhotoReal_A = new PhotoKokoulin(particle_def, medium, ecuts, hard_component, multiplier);
-    Parametrization* PhotoReal_B = new PhotoKokoulin(particle_def, medium, ecuts, hard_component, multiplier);
+    PhotoKokoulin* PhotoReal_A = new PhotoKokoulin(particle_def, medium, ecuts, multiplier, hard_component);
+    Parametrization* PhotoReal_B = new PhotoKokoulin(particle_def, medium, ecuts, multiplier, hard_component);
     EXPECT_TRUE(*PhotoReal_A == *PhotoReal_B);
 
-    PhotoKokoulin param_PhotoReal(particle_def, medium, ecuts, hard_component, multiplier);
+    PhotoKokoulin param_PhotoReal(particle_def, medium, ecuts, multiplier, hard_component);
     EXPECT_TRUE(param_PhotoReal == *PhotoReal_A);
 
     PhotoIntegral* Int_PhotoReal_A = new PhotoIntegral(param_PhotoReal);
@@ -69,11 +69,11 @@ TEST(Comparison, Comparison_equal)
     delete Interpol_PhotoReal_A;
     delete Interpol_PhotoReal_B;
 
-    PhotoAbramowiczLevinLevyMaor97* PhotoQ2_A = new PhotoAbramowiczLevinLevyMaor97(particle_def, medium, ecuts, shadow, multiplier);
-    Parametrization* PhotoQ2_B = new PhotoAbramowiczLevinLevyMaor97(particle_def, medium, ecuts, shadow, multiplier);
+    PhotoAbramowiczLevinLevyMaor97* PhotoQ2_A = new PhotoAbramowiczLevinLevyMaor97(particle_def, medium, ecuts, multiplier, shadow);
+    Parametrization* PhotoQ2_B = new PhotoAbramowiczLevinLevyMaor97(particle_def, medium, ecuts, multiplier, shadow);
     EXPECT_TRUE(*PhotoQ2_A == *PhotoQ2_B);
 
-    PhotoAbramowiczLevinLevyMaor97 param_Q2(particle_def, medium, ecuts, shadow, multiplier);
+    PhotoAbramowiczLevinLevyMaor97 param_Q2(particle_def, medium, ecuts, multiplier, shadow);
     EXPECT_TRUE(param_Q2 == *PhotoQ2_A);
 
     PhotoIntegral* Int_PhotoQ2_A = new PhotoIntegral(param_Q2);
@@ -107,21 +107,21 @@ TEST(Comparison, Comparison_not_equal)
     ShadowDuttaRenoSarcevicSeckel shadow_2;
     InterpolationDef InterpolDef;
 
-    PhotoKokoulin PhotoReal_A(mu_def, medium_1, ecuts_1, hard_component, multiplier_1);
-    PhotoKokoulin PhotoReal_B(tau_def, medium_1, ecuts_1, hard_component, multiplier_1);
-    PhotoKokoulin PhotoReal_C(mu_def, medium_2, ecuts_1, hard_component, multiplier_1);
-    PhotoKokoulin PhotoReal_D(mu_def, medium_1, ecuts_2, hard_component, multiplier_1);
-    PhotoKokoulin PhotoReal_E(mu_def, medium_1, ecuts_1, !hard_component, multiplier_1);
-    PhotoKokoulin PhotoReal_F(mu_def, medium_1, ecuts_1, hard_component, multiplier_2);
+    PhotoKokoulin PhotoReal_A(mu_def, medium_1, ecuts_1, multiplier_1, hard_component);
+    PhotoKokoulin PhotoReal_B(tau_def, medium_1, ecuts_1, multiplier_1, hard_component);
+    PhotoKokoulin PhotoReal_C(mu_def, medium_2, ecuts_1, multiplier_1, hard_component);
+    PhotoKokoulin PhotoReal_D(mu_def, medium_1, ecuts_2, multiplier_1, hard_component);
+    PhotoKokoulin PhotoReal_E(mu_def, medium_1, ecuts_1, multiplier_1, !hard_component);
+    PhotoKokoulin PhotoReal_F(mu_def, medium_1, ecuts_1, multiplier_2, hard_component);
     EXPECT_TRUE(PhotoReal_A != PhotoReal_B);
     EXPECT_TRUE(PhotoReal_A != PhotoReal_C);
     EXPECT_TRUE(PhotoReal_A != PhotoReal_D);
     EXPECT_TRUE(PhotoReal_A != PhotoReal_E);
     EXPECT_TRUE(PhotoReal_A != PhotoReal_F);
 
-    PhotoZeus param_Real_2(mu_def, medium_1, ecuts_1, hard_component, multiplier_1);
-    PhotoBezrukovBugaev param_Real_3(mu_def, medium_1, ecuts_1, hard_component, multiplier_1);
-    PhotoRhode param_Real_4(mu_def, medium_1, ecuts_1, hard_component, multiplier_1);
+    PhotoZeus param_Real_2(mu_def, medium_1, ecuts_1, multiplier_1, hard_component);
+    PhotoBezrukovBugaev param_Real_3(mu_def, medium_1, ecuts_1, multiplier_1, hard_component);
+    PhotoRhode param_Real_4(mu_def, medium_1, ecuts_1, multiplier_1, hard_component);
     EXPECT_TRUE(PhotoReal_A != param_Real_2);
     EXPECT_TRUE(PhotoReal_A != param_Real_3);
     EXPECT_TRUE(PhotoReal_A != param_Real_4);
@@ -137,12 +137,12 @@ TEST(Comparison, Comparison_not_equal)
     PhotoInterpolant Interpol_PhotoReal_B(PhotoReal_B, InterpolDef);
     EXPECT_TRUE(Interpol_PhotoReal_A != Interpol_PhotoReal_B);
     //
-    PhotoAbramowiczLevinLevyMaor97 PhotoQ2_A(mu_def, medium_1, ecuts_1, shadow_1, multiplier_1);
-    PhotoAbramowiczLevinLevyMaor97 PhotoQ2_B(tau_def, medium_1, ecuts_1, shadow_1, multiplier_1);
-    PhotoAbramowiczLevinLevyMaor97 PhotoQ2_C(mu_def, medium_2, ecuts_1, shadow_1, multiplier_1);
-    PhotoAbramowiczLevinLevyMaor97 PhotoQ2_D(mu_def, medium_1, ecuts_2, shadow_1, multiplier_1);
-    PhotoAbramowiczLevinLevyMaor97 PhotoQ2_E(mu_def, medium_1, ecuts_1, shadow_2, multiplier_1);
-    PhotoAbramowiczLevinLevyMaor97 PhotoQ2_F(mu_def, medium_1, ecuts_1, shadow_1, multiplier_2);
+    PhotoAbramowiczLevinLevyMaor97 PhotoQ2_A(mu_def, medium_1, ecuts_1, multiplier_1, shadow_1);
+    PhotoAbramowiczLevinLevyMaor97 PhotoQ2_B(tau_def, medium_1, ecuts_1, multiplier_1, shadow_1);
+    PhotoAbramowiczLevinLevyMaor97 PhotoQ2_C(mu_def, medium_2, ecuts_1, multiplier_1, shadow_1);
+    PhotoAbramowiczLevinLevyMaor97 PhotoQ2_D(mu_def, medium_1, ecuts_2, multiplier_1, shadow_1);
+    PhotoAbramowiczLevinLevyMaor97 PhotoQ2_E(mu_def, medium_1, ecuts_1, multiplier_1, shadow_1);
+    PhotoAbramowiczLevinLevyMaor97 PhotoQ2_F(mu_def, medium_1, ecuts_1, multiplier_2, shadow_1);
     EXPECT_TRUE(PhotoQ2_A != PhotoQ2_B);
     EXPECT_TRUE(PhotoQ2_A != PhotoQ2_C);
     EXPECT_TRUE(PhotoQ2_A != PhotoQ2_D);
@@ -151,9 +151,9 @@ TEST(Comparison, Comparison_not_equal)
     //
     EXPECT_TRUE(PhotoReal_A != PhotoQ2_A);
     
-    PhotoAbramowiczLevinLevyMaor91 param_Q2_2(mu_def, medium_1, ecuts_1, shadow_1, multiplier_1);
-    PhotoButkevichMikhailov param_Q2_3(mu_def, medium_1, ecuts_1, shadow_1, multiplier_1);
-    PhotoRenoSarcevicSu param_Q2_4(mu_def, medium_1, ecuts_1, shadow_1, multiplier_1);
+    PhotoAbramowiczLevinLevyMaor91 param_Q2_2(mu_def, medium_1, ecuts_1, multiplier_1, shadow_1);
+    PhotoButkevichMikhailov param_Q2_3(mu_def, medium_1, ecuts_1, multiplier_1, shadow_1);
+    PhotoRenoSarcevicSu param_Q2_4(mu_def, medium_1, ecuts_1, multiplier_1, shadow_1);
     EXPECT_TRUE(PhotoQ2_A != param_Q2_2);
     EXPECT_TRUE(PhotoQ2_A != param_Q2_3);
     EXPECT_TRUE(PhotoQ2_A != param_Q2_4);
@@ -176,11 +176,11 @@ TEST(Assignment, Copyconstructor)
     Water medium;
     EnergyCutSettings ecuts;
     double multiplier = 1.;
-    bool hardbb = true;
+    bool hard_component = true;
     ShadowButkevichMikhailov shadow;
     InterpolationDef InterpolDef;
 
-    PhotoKokoulin PhotoReal_A(particle_def, medium, ecuts, hardbb, multiplier);
+    PhotoKokoulin PhotoReal_A(particle_def, medium, ecuts, multiplier, hard_component);
     PhotoKokoulin PhotoReal_B = PhotoReal_A;
     EXPECT_TRUE(PhotoReal_A == PhotoReal_B);
 
@@ -192,7 +192,7 @@ TEST(Assignment, Copyconstructor)
     PhotoInterpolant Interpol_PhotoReal_B = Interpol_PhotoReal_A;
     EXPECT_TRUE(Interpol_PhotoReal_A == Interpol_PhotoReal_B);
 
-    PhotoAbramowiczLevinLevyMaor97 PhotoQ2_A(particle_def, medium, ecuts, shadow, multiplier);
+    PhotoAbramowiczLevinLevyMaor97 PhotoQ2_A(particle_def, medium, ecuts, multiplier, shadow);
     PhotoAbramowiczLevinLevyMaor97 PhotoQ2_B = PhotoQ2_A;
     EXPECT_TRUE(PhotoQ2_A == PhotoQ2_B);
 
@@ -215,7 +215,7 @@ TEST(Assignment, Copyconstructor2)
     ShadowButkevichMikhailov shadow;
     InterpolationDef InterpolDef;
 
-    PhotoKokoulin PhotoReal_A(particle_def, medium, ecuts, hard_component, multiplier);
+    PhotoKokoulin PhotoReal_A(particle_def, medium, ecuts, multiplier, hard_component);
     PhotoKokoulin PhotoReal_B(PhotoReal_A);
     EXPECT_TRUE(PhotoReal_A == PhotoReal_B);
 
@@ -227,7 +227,7 @@ TEST(Assignment, Copyconstructor2)
     PhotoInterpolant Interpol_PhotoReal_B(Interpol_PhotoReal_A);
     EXPECT_TRUE(Interpol_PhotoReal_A == Interpol_PhotoReal_B);
 
-    PhotoAbramowiczLevinLevyMaor97 PhotoQ2_A(particle_def, medium, ecuts, shadow, multiplier);
+    PhotoAbramowiczLevinLevyMaor97 PhotoQ2_A(particle_def, medium, ecuts, multiplier, shadow);
     PhotoAbramowiczLevinLevyMaor97 PhotoQ2_B(PhotoQ2_A);
     EXPECT_TRUE(PhotoQ2_A == PhotoQ2_B);
 
