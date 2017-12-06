@@ -34,14 +34,14 @@
 #define PHOTO_REAL_DEF(cls, parent)                                                                                    \
     class_<Photo##cls, boost::shared_ptr<Photo##cls>, bases<Photo##parent> >(                                          \
         #cls,                                                                                                          \
-        init<const ParticleDef&, const Medium&, const EnergyCutSettings&, bool, double>(                        \
-            (arg("particle_def"), arg("medium"), arg("energy_cuts"), arg("real_photon"), arg("multiplier"))));
+        init<const ParticleDef&, const Medium&, const EnergyCutSettings&, double, bool>(                        \
+            (arg("particle_def"), arg("medium"), arg("energy_cuts"), arg("multiplier"), arg("real_photon"))));
 
 #define PHOTO_Q2_DEF(cls)                                                                                              \
     class_<Photo##cls, boost::shared_ptr<Photo##cls>, bases<PhotoQ2Integral> >(                                        \
         #cls,                                                                                                          \
-        init<const ParticleDef&, const Medium&, const EnergyCutSettings&, const ShadowEffect&, double>(                \
-            (arg("particle_def"), arg("medium"), arg("energy_cuts"), arg("shadow_effect"), arg("multiplier"))));
+        init<const ParticleDef&, const Medium&, const EnergyCutSettings&, double, const ShadowEffect&>(                \
+            (arg("particle_def"), arg("medium"), arg("energy_cuts"), arg("multiplier"), arg("shadow_effect"))));
 
 #define PHOTO_Q2_INTERPOL_DEF(cls)                                                                                     \
     class_<PhotoQ2Interpolant<Photo##cls>, boost::shared_ptr<PhotoQ2Interpolant<Photo##cls> >, bases<Photo##cls> >(    \
@@ -49,27 +49,17 @@
         init<const ParticleDef&,                                                                                       \
              const Medium&,                                                                                            \
              const EnergyCutSettings&,                                                                                 \
-             const ShadowEffect&,                                                                                      \
              double,                                                                                                   \
+             const ShadowEffect&,                                                                                      \
              InterpolationDef>((arg("particle_def"),                                                                   \
                                 arg("medium"),                                                                         \
                                 arg("energy_cuts"),                                                                    \
-                                arg("shadow_effect"),                                                                  \
                                 arg("multiplier"),                                                                     \
+                                arg("shadow_effect"),                                                                  \
                                 arg("interpolation_def"))));
 
 using namespace PROPOSAL;
 
-// #include "PROPOSAL/Particle.h"
-// #include "PROPOSAL/Medium.h"
-// #include "PROPOSAL/EnergyCutSettings.h"
-// #include "PROPOSAL/ProcessCollection.h"
-// #include "PROPOSAL/CrossSections.h"
-// #include "PROPOSAL/Photonuclear.h"
-// #include "PROPOSAL/Bremsstrahlung.h"
-// #include "PROPOSAL/Epairproduction.h"
-// #include "PROPOSAL/Ionization.h"
-// #include "PROPOSAL/Geometry.h"
 
 // using namespace PROPOSAL;
 //
@@ -428,11 +418,11 @@ void export_photo()
 
     // Real Photon
     class_<RealPhoton, boost::shared_ptr<RealPhoton>, boost::noncopyable>("RealPhoton", no_init)
-        .def("calculate_hardbb", &RealPhoton::CalculateHardBB)
+        .def("calculate_hard_component", &RealPhoton::CalculateHardComponent)
         .add_property("name", make_function(&RealPhoton::GetName, return_value_policy<copy_const_reference>()));
 
-    class_<SoftBB, boost::shared_ptr<SoftBB>, bases<RealPhoton> >("SoftBB", init<>());
-    class_<HardBB, boost::shared_ptr<HardBB>, bases<RealPhoton> >("HardBB", init<const ParticleDef&>((arg("particle_def"))));
+    class_<SoftComponent, boost::shared_ptr<SoftComponent>, bases<RealPhoton> >("SoftComponent", init<>());
+    class_<HardComponent, boost::shared_ptr<HardComponent>, bases<RealPhoton> >("HardComponent", init<const ParticleDef&>((arg("particle_def"))));
 
     // Photnuclear
     class_<Photonuclear, boost::shared_ptr<Photonuclear>, bases<Parametrization>, boost::noncopyable>("Photonuclear", no_init);
@@ -583,21 +573,21 @@ void export_crosssections()
     class_<IonizInterpolant, boost::shared_ptr<IonizInterpolant>, bases<CrossSectionInterpolant> >("IonizInterpolant", init<const Ionization&, InterpolationDef>((arg("parametrization"), arg("interpolation_def"))));
 }
 
-void export_harbb_tables()
+void export_hard_component_tables()
 {
     using namespace boost::python;
 
     // map the Util namespace to a sub-module
     // make "from mypackage.Util import <whatever>" work
-    object hardbbModule(handle<>(borrowed(PyImport_AddModule("pyPROPOSAL.HardBBTables"))));
+    object hardComponentModule(handle<>(borrowed(PyImport_AddModule("pyPROPOSAL.HardComponentTables"))));
     // make "from mypackage import Util" work
-    scope().attr("HardBBTables") = hardbbModule;
+    scope().attr("HardComponentTables") = hardComponentModule;
     // set the current scope to the new sub-module
-    scope hardbb_scope = hardbbModule;
+    scope hard_component_scope = hardComponentModule;
     // export stuff in the Util namespace
 
-    hardbb_scope.attr("MuonTable") = HardBBTables::MuonTable;
-    hardbb_scope.attr("TauTable") = HardBBTables::TauTable;
+    hard_component_scope.attr("MuonTable") = HardComponentTables::MuonTable;
+    hard_component_scope.attr("TauTable") = HardComponentTables::TauTable;
 }
 
 void export_scattering()
@@ -693,7 +683,7 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
     export_medium();
     export_parametrizations();
     export_crosssections();
-    export_harbb_tables();
+    export_hard_component_tables();
     export_scattering();
 
     /**************************************************************************
@@ -794,8 +784,8 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
 
     class_<ParticleDef, boost::shared_ptr<ParticleDef> >("ParticleDef", init<>())
 
-        .def(init<std::string, double, double, double, double, const HardBBTables::VecType&, const DecayTable&>(
-            (arg("name"), arg("mass"), arg("low"), arg("lifetime"), arg("charge"), arg("hardbb"), arg("decay_table"))))
+        .def(init<std::string, double, double, double, double, const HardComponentTables::VecType&, const DecayTable&>(
+            (arg("name"), arg("mass"), arg("low"), arg("lifetime"), arg("charge"), arg("hard_component"), arg("decay_table"))))
         .def(init<const ParticleDef&>())
 
         .def(self_ns::str(self_ns::self))
@@ -805,7 +795,7 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
         .def_readonly("low", &ParticleDef::low)
         .def_readonly("charge", &ParticleDef::charge)
         .def_readonly("decay_table", &ParticleDef::decay_table)
-        // .add_property("hardbb_table", make_function(&get_hardbb, return_internal_reference<>())) //TODO(mario): shit Fri 2017/10/13
+        // .add_property("hard_component_table", make_function(&get_hard_component, return_internal_reference<>())) //TODO(mario): shit Fri 2017/10/13
         ;
 
     class_<ParticleDef::Builder, boost::shared_ptr<ParticleDef::Builder> >("ParticleDefBuilder", init<>())
@@ -1064,7 +1054,7 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
 
         .def_readwrite("parametrization", &PhotonuclearFactory::Definition::parametrization)
         .def_readwrite("shadow", &PhotonuclearFactory::Definition::shadow)
-        .def_readwrite("hardbb", &PhotonuclearFactory::Definition::hard_component)
+        .def_readwrite("hard_component", &PhotonuclearFactory::Definition::hard_component)
         .def_readwrite("multiplier", &PhotonuclearFactory::Definition::multiplier)
     ;
 
