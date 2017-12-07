@@ -20,9 +20,9 @@ using namespace PROPOSAL;
     Photo##param::Photo##param(const ParticleDef& particle_def,                                                        \
                                const Medium& medium,                                                                   \
                                const EnergyCutSettings& cuts,                                                          \
-                               const ShadowEffect& shadow_effect,                                                      \
-                               double multiplier)                                                                      \
-        : PhotoQ2Integral(particle_def, medium, cuts, shadow_effect, multiplier)                                       \
+                               double multiplier,                                                                      \
+                               const ShadowEffect& shadow_effect)                                                      \
+        : PhotoQ2Integral(particle_def, medium, cuts, multiplier, shadow_effect)                                       \
     {                                                                                                                  \
     }                                                                                                                  \
                                                                                                                        \
@@ -42,8 +42,8 @@ using namespace PROPOSAL;
 PhotoQ2Integral::PhotoQ2Integral(const ParticleDef& particle_def,
                                  const Medium& medium,
                                  const EnergyCutSettings& cuts,
-                                 const ShadowEffect& shadow_effect,
-                                 double multiplier)
+                                 double multiplier,
+                                 const ShadowEffect& shadow_effect)
     : Photonuclear(particle_def, medium, cuts, multiplier)
     , shadow_effect_(shadow_effect.clone())
     , integral_(IROMB, IMAXS, IPREC)
