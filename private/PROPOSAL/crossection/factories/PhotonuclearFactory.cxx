@@ -25,27 +25,27 @@ PhotonuclearFactory::PhotonuclearFactory()
 {
     // Register all photonuclear parametrizations in lower case!
 
-    RegisterShadowEffect("drss", ShadowDuttaRenoSarcevicSeckel, &ShadowDuttaRenoSarcevicSeckel::create);
-    RegisterShadowEffect("butkevich-mikhailov", ShadowButkevichMikhailov, &ShadowButkevichMikhailov::create);
+    RegisterShadowEffect("shadowduttarenosarcevicseckel", ShadowDuttaRenoSarcevicSeckel, &ShadowDuttaRenoSarcevicSeckel::create);
+    RegisterShadowEffect("shadowbutkevichmikhailov", ShadowButkevichMikhailov, &ShadowButkevichMikhailov::create);
 
-    RegisterRealPhoton("zeus", Zeus, &PhotoZeus::create);
-    RegisterRealPhoton("bezrukov-bugaev", BezrukovBugaev, &PhotoBezrukovBugaev::create);
-    RegisterRealPhoton("rhode", Rhode, &PhotoRhode::create);
-    RegisterRealPhoton("kokoulin", Kokoulin, &PhotoKokoulin::create);
+    RegisterRealPhoton("photozeus", Zeus, &PhotoZeus::create);
+    RegisterRealPhoton("photobezrukovbugaev", BezrukovBugaev, &PhotoBezrukovBugaev::create);
+    RegisterRealPhoton("photorhode", Rhode, &PhotoRhode::create);
+    RegisterRealPhoton("photokokoulin", Kokoulin, &PhotoKokoulin::create);
 
-    RegisterQ2("allm91",
+    RegisterQ2("photoabramowiczlevinlevymaor91",
              AbramowiczLevinLevyMaor91,
              std::make_pair(&PhotoAbramowiczLevinLevyMaor91::create,
                             &PhotoQ2Interpolant<PhotoAbramowiczLevinLevyMaor91>::create));
-    RegisterQ2("allm97",
+    RegisterQ2("photoabramowiczlevinlevymaor97",
              AbramowiczLevinLevyMaor97,
              std::make_pair(&PhotoAbramowiczLevinLevyMaor97::create,
                             &PhotoQ2Interpolant<PhotoAbramowiczLevinLevyMaor97>::create));
-    RegisterQ2("butkevich-mikhailov",
+    RegisterQ2("photobutkevichmikhailov",
              ButkevichMikhailov,
              std::make_pair(&PhotoButkevichMikhailov::create,
                             &PhotoQ2Interpolant<PhotoButkevichMikhailov>::create));
-    RegisterQ2("reno-sarcevic-su",
+    RegisterQ2("photorenosarcevicsu",
              RenoSarcevicSu,
              std::make_pair(&PhotoRenoSarcevicSu::create,
                             &PhotoQ2Interpolant<PhotoRenoSarcevicSu>::create));
@@ -137,13 +137,13 @@ CrossSection* PhotonuclearFactory::CreatePhotonuclear(const ParticleDef& particl
     {
         ShadowEffect* shadow = Get().CreateShadowEffect(def.shadow);
 
-        PhotoIntegral* photo =  new PhotoIntegral(*it_q2->second.first(particle_def, medium, cuts, *shadow, def.multiplier));
+        PhotoIntegral* photo =  new PhotoIntegral(*it_q2->second.first(particle_def, medium, cuts, def.multiplier, *shadow));
         delete shadow;
         return photo;
     }
     else if (it_photo != photo_real_map_enum_.end())
     {
-        return new PhotoIntegral(*it_photo->second(particle_def, medium, cuts, def.hardbb, def.multiplier));
+        return new PhotoIntegral(*it_photo->second(particle_def, medium, cuts, def.multiplier, def.hard_component));
     }
     else
     {
@@ -166,13 +166,13 @@ CrossSection* PhotonuclearFactory::CreatePhotonuclear(const ParticleDef& particl
     {
         ShadowEffect* shadow = Get().CreateShadowEffect(def.shadow);
 
-        PhotoInterpolant* photo =  new PhotoInterpolant(*it_q2->second.second(particle_def, medium, cuts, *shadow, def.multiplier, interpolation_def), interpolation_def);
+        PhotoInterpolant* photo =  new PhotoInterpolant(*it_q2->second.second(particle_def, medium, cuts, def.multiplier, *shadow, interpolation_def), interpolation_def);
         delete shadow;
         return photo;
     }
     else if (it_photo != photo_real_map_enum_.end())
     {
-        return new PhotoInterpolant(*it_photo->second(particle_def, medium, cuts, def.hardbb, def.multiplier), interpolation_def);
+        return new PhotoInterpolant(*it_photo->second(particle_def, medium, cuts, def.multiplier, def.hard_component), interpolation_def);
     }
     else
     {

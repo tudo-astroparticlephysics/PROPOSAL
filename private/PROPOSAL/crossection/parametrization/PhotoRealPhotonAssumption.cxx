@@ -14,9 +14,9 @@
     Photo##param::Photo##param(const ParticleDef& particle_def,                                                        \
                                const Medium& medium,                                                                   \
                                const EnergyCutSettings& cuts,                                                          \
-                               bool hardbb,                                                                            \
-                               double multiplier)                                                                      \
-        : Photo##parent(particle_def, medium, cuts, hardbb, multiplier)                                                \
+                               double multiplier,                                                                      \
+                               bool hard_component)                                                                    \
+        : Photo##parent(particle_def, medium, cuts, multiplier, hard_component)                                        \
     {                                                                                                                  \
     }                                                                                                                  \
                                                                                                                        \
@@ -38,37 +38,37 @@ using namespace PROPOSAL;
 PhotoRealPhotonAssumption::PhotoRealPhotonAssumption(const ParticleDef& particle_def,
                                                      const Medium& medium,
                                                      const EnergyCutSettings& cuts,
-                                                     bool hardbb,
-                                                     double multiplier)
+                                                     double multiplier,
+                                                     bool hard_component)
     : Photonuclear(particle_def, medium, cuts, multiplier)
-    , hardBB_()
+    , hard_component_()
 {
-    if (hardbb)
+    if (hard_component)
     {
-        hardBB_ = new HardBB(particle_def);
+        hard_component_ = new HardComponent(particle_def);
     }
     else
     {
-        hardBB_ = new SoftBB();
+        hard_component_ = new SoftComponent();
     }
 }
 
 PhotoRealPhotonAssumption::PhotoRealPhotonAssumption(const PhotoRealPhotonAssumption& photo)
     : Photonuclear(photo)
-    , hardBB_(photo.hardBB_->clone())
+    , hard_component_(photo.hard_component_->clone())
 {
 }
 
 PhotoRealPhotonAssumption::~PhotoRealPhotonAssumption()
 {
-    delete hardBB_;
+    delete hard_component_;
 }
 
 bool PhotoRealPhotonAssumption::compare(const Parametrization& parametrization) const
 {
     const PhotoRealPhotonAssumption* photo = static_cast<const PhotoRealPhotonAssumption*>(&parametrization);
 
-    if (*hardBB_ != *photo->hardBB_)
+    if (*hard_component_ != *photo->hard_component_)
         return false;
     else
         return Photonuclear::compare(parametrization);
@@ -123,7 +123,7 @@ double PhotoRealPhotonAssumption::DifferentialCrossSection(double energy, double
     // hard component by Bugaev, Montaruli, Shelpin, Sokalski
     // Astrop. Phys. 21 (2004), 491
     // in the appendix
-    aux += components_[component_index_]->GetAtomicNum() * 1.e-30 * hardBB_->CalculateHardBB(energy, v);
+    aux += components_[component_index_]->GetAtomicNum() * 1.e-30 * hard_component_->CalculateHardComponent(energy, v);
 
     return multiplier_ * medium_->GetMolDensity() * components_[component_index_]->GetAtomInMolecule()
             * particle_def_.charge * particle_def_.charge * aux;
@@ -147,7 +147,7 @@ double PhotoRealPhotonAssumption::NucleusCrossSectionCaldwell(double nu)
 size_t PhotoRealPhotonAssumption::GetHash() const
 {
     size_t seed = Parametrization::GetHash();
-    boost::hash_combine(seed, hardBB_);
+    boost::hash_combine(seed, hard_component_);
 
     return seed;
 }
@@ -158,7 +158,7 @@ size_t PhotoRealPhotonAssumption::GetHash() const
 
 void PhotoRealPhotonAssumption::print(std::ostream& os) const
 {
-    os << "hardBB enabled: " << (dynamic_cast<HardBB*>(hardBB_)? 1 : 0) << '\n';
+    os << "Including the hard component enabled: " << (dynamic_cast<HardComponent*>(hard_component_)? 1 : 0) << '\n';
 }
 
 /******************************************************************************
@@ -236,9 +236,9 @@ double PhotoKokoulin::CalculateParametrization(double nu)
 PhotoRhode::PhotoRhode(const ParticleDef& particle_def,
                        const Medium& medium,
                        const EnergyCutSettings& cuts,
-                       bool hardBB,
-                       double multiplier)
-    : PhotoRealPhotonAssumption(particle_def, medium, cuts, hardBB, multiplier)
+                       double multiplier,
+                       bool hard_component)
+    : PhotoRealPhotonAssumption(particle_def, medium, cuts, multiplier, hard_component)
     , interpolant_(NULL)
 {
     double x_aux[] = { 0,           0.1,         0.144544,   0.20893,     0.301995,    0.436516,    0.630957,
@@ -278,10 +278,10 @@ PhotoRhode::~PhotoRhode()
 Photonuclear* PhotoRhode::create(const ParticleDef& particle_def,
                         const Medium& medium,
                         const EnergyCutSettings& cuts,
-                        bool hardbb,
-                        double multiplier)
+                        double multiplier,
+                        bool hard_component)
 {
-    return new PhotoRhode(particle_def, medium, cuts, hardbb, multiplier);
+    return new PhotoRhode(particle_def, medium, cuts, multiplier, hard_component);
 }
 
 bool PhotoRhode::compare(const Parametrization& parametrization) const

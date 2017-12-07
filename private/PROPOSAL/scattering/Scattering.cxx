@@ -59,24 +59,25 @@ void Scattering::Scatter(double dr, double ei, double ef)
 
     Vector3D position;
     Vector3D direction;
+    Vector3D old_direction = particle_.GetDirection();
 
     long double sinth, costh,sinph,cosph;
-    sinth = (long double) sin(particle_.GetDirection().GetTheta());
-    costh = (long double) cos(particle_.GetDirection().GetTheta());
-    sinph = (long double) sin(particle_.GetDirection().GetPhi());
-    cosph = (long double) cos(particle_.GetDirection().GetPhi());
+    sinth = (long double) sin(old_direction.GetTheta());
+    costh = (long double) cos(old_direction.GetTheta());
+    sinph = (long double) sin(old_direction.GetPhi());
+    cosph = (long double) cos(old_direction.GetPhi());
 
     position = particle_.GetPosition();
 
     // Rotation towards all tree axes
-    direction = sz*particle_.GetDirection();
+    direction = sz*old_direction;
     direction = direction + random_angles.sx*Vector3D(costh*cosph, costh*sinph, -sinth);
     direction = direction + random_angles.sy*Vector3D(-sinph, cosph, 0.);
 
     position = position + dr*direction;
 
     // Rotation towards all tree axes
-    direction = tz*particle_.GetDirection();
+    direction = tz*old_direction;
     direction = direction + random_angles.tx*Vector3D(costh*cosph, costh*sinph, -sinth);
     direction = direction + random_angles.ty*Vector3D(-sinph, cosph, 0.);
 
