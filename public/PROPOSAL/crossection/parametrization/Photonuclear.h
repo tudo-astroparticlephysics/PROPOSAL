@@ -102,8 +102,8 @@ class ShadowEffect
 class ShadowDuttaRenoSarcevicSeckel: public ShadowEffect
 {
     public:
-    ShadowDuttaRenoSarcevicSeckel() {}
-    ShadowDuttaRenoSarcevicSeckel(const ShadowDuttaRenoSarcevicSeckel&) {}
+    ShadowDuttaRenoSarcevicSeckel(): ShadowEffect() {}
+    ShadowDuttaRenoSarcevicSeckel(const ShadowDuttaRenoSarcevicSeckel& sh): ShadowEffect(sh) {}
     virtual ~ShadowDuttaRenoSarcevicSeckel() {}
 
     ShadowEffect* clone() const { return new ShadowDuttaRenoSarcevicSeckel(*this); }
@@ -125,8 +125,8 @@ class ShadowDuttaRenoSarcevicSeckel: public ShadowEffect
 class ShadowButkevichMikhailov: public ShadowEffect
 {
     public:
-    ShadowButkevichMikhailov() {}
-    ShadowButkevichMikhailov(const ShadowButkevichMikhailov&) {}
+    ShadowButkevichMikhailov(): ShadowEffect() {}
+    ShadowButkevichMikhailov(const ShadowButkevichMikhailov& sh): ShadowEffect(sh) {}
     virtual ~ShadowButkevichMikhailov() {}
 
     ShadowEffect* clone() const { return new ShadowButkevichMikhailov(*this); }
