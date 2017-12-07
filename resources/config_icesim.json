@@ -1,20 +1,23 @@
 {
 	"global":
 	{
-
 		"seed" : 1,
-		"brems" : "Kelner-Kokoulin-Petrukhin",
-		"photo" : "ALLM97",
-		"lpm" : true,
-		"scattering" : "Moliere",
+
+		"interpolate" : true,
+		"path_to_tables" : "$I3_TESTDATA/PROPOSAL/resources/tables",
+		"raw" : false,
+
 		"exact_time" : true,
-		"interpolate" : true,
-		"interpolate" : true,
+		"scattering" : "Moliere",
+
 		"brems_multiplier" : 1,
 		"photo_multiplier" : 1,
 		"ioniz_multiplier" : 1,
 		"epair_multiplier" : 1,
-		"path_to_tables" : "$I3_TESTDATA/PROPOSAL/resources/tables",
+		"brems" : "BremsKelnerKokoulinPetrukhin",
+		"photo" : "PhotoAbramowiczLevinLevyMaor97",
+		"lpm" : true,
+
 		"ecut_inside" : 500,
 		"ecut_infront" : -1,
 		"ecut_behind" : -1,
@@ -23,15 +26,14 @@
 		"vcut_behind" : -1,
 		"cont_inside" : 0,
 		"cont_infront" : 1,
-		"cont_behind" : 0,
-		"raw" : false
+		"cont_behind" : 0
 	},
 
 	"sectors": [
 		{
+			"hirarchy": 1,
 			"medium": "air",
 			"density_correction": 0.673,
-			"hirarchy": 1,
 
 			"geometry":
 			{
@@ -60,9 +62,9 @@
 			}
 		},
 		{
+			"hirarchy": 1,
 			"medium": "ice",
 			"density_correction": 0.832,
-			"hirarchy": 1,
 
 			"geometry":
 			{
@@ -91,9 +93,9 @@
 			}
 		},
 		{
+			"hirarchy": 1,
 			"medium": "ice",
 			"density_correction": 1.005,
-			"hirarchy": 1,
 
 			"geometry":
 			{
@@ -122,9 +124,9 @@
 			}
 		},
 		{
+			"hirarchy": 1,
 			"medium": "standardrock",
 			"density_correction": 1.0,
-			"hirarchy": 1,
 
 			"geometry":
 			{

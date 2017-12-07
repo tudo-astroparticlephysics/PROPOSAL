@@ -1,6 +1,11 @@
 
 #include "PROPOSAL/scattering/Coefficients.h"
 
+//----------------------------------------------------------------------------//
+//-----------------------------Coefficients-----------------------------------//
+//---for calculating the power series approximation of the moliere function---//
+//----------------------------------------------------------------------------//
+
 double PROPOSAL::c1[100] =
 {
 	0.01824498698928826,
