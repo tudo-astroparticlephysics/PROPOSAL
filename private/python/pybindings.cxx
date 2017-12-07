@@ -563,6 +563,7 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
         .def("enable_dNdx_interpolation", &CrossSections::EnableDNdxInterpolation, (arg("path") = "", arg("raw") = false))
         .def("disable_dEdx_interpolation", &CrossSections::DisableDEdxInterpolation)
         .def("disable_dNdx_interpolation", &CrossSections::DisableDNdxInterpolation)
+        .def("enable_lpm_effect", &CrossSections::EnableLpmEffect)
     ;
 
     class_<Photonuclear, boost::shared_ptr<Photonuclear>, bases<CrossSections> >("Photonuclear", init<PROPOSALParticle*, Medium*, EnergyCutSettings*>())
