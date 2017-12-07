@@ -15,20 +15,23 @@ if __name__ == "__main__":
     # =========================================================
 
     energy = 1e8  # MeV
-    statistics = 10
+    statistics = 1000
 
     particle_type = pyPROPOSAL.ParticleType.MuMinus
     medium_type = pyPROPOSAL.MediumType.Ice
 
-    med = pyPROPOSAL.Medium(medium_type)
+    med = pyPROPOSAL.Medium(medium_type, 0.98)
     E = pyPROPOSAL.EnergyCutSettings()
     p = pyPROPOSAL.Propagator(
-        med,
-        E,
-        particle_type,
-        "resources/tables",
+        medium=med,
+        energy_cuts=E,
+        particle_type=particle_type,
+        path_to_tables="resources/tables",
         moliere=False,
-        scattering_model=2
+        continuous_rand=True,
+        exact_time=True,
+        lpm=True,
+        scattering_model=2,
     )
 
     mu_length = list()
@@ -49,7 +52,7 @@ if __name__ == "__main__":
     fig_length = plt.figure()
     ax = fig_length.add_subplot(111)
 
-    ax.hist(mu_length, histtype="step", log=True, bins=1000)
+    ax.hist(mu_length, histtype="step", log=True, bins=50)
 
     ax.set_title("{} muons with energy {} TeV in {}".format(
         statistics,

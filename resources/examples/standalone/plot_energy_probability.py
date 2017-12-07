@@ -164,7 +164,7 @@ if __name__ == "__main__":
 
     prop = pyPROPOSAL.Propagator("resources/configuration_IceOnly", mu)
 
-    statistics = 10
+    statistics = 1000
     E_max_log = 14
 
     epair_primary_energy = []
