@@ -43,7 +43,7 @@
                       MASS,                                                                                            \
                       LIFETIME,                                                                                        \
                       CHARGE,                                                                                          \
-                      HardBBTables::EmptyTable,                                                                        \
+                      HardComponentTables::EmptyTable,                                                                        \
                       DecayTable().addChannel(1.1, StableChannel()))                                                   \
     {                                                                                                                  \
     }                                                                                                                  \
@@ -53,10 +53,10 @@
 using namespace PROPOSAL;
 
 /******************************************************************************
-*                                HardBBTables                                *
+*                            HardComponentTables                              *
 ******************************************************************************/
 
-const double HardBBTables::muon[8][7] = {
+const double HardComponentTables::muon[8][7] = {
     { 7.174409e-4, 1.7132e-3, 4.082304e-3, 8.628455e-3, 0.01244159, 0.02204591, 0.03228755 },
     { -0.2436045, -0.5756682, -1.553973, -3.251305, -5.976818, -9.495636, -13.92918 },
     { -0.2942209, -0.68615, -2.004218, -3.999623, -6.855045, -10.05705, -14.37232 },
@@ -67,7 +67,7 @@ const double HardBBTables::muon[8][7] = {
     { -3.343145e-5, -7.584046e-5, -2.943396e-4, -5.3155e-4, -9.265136e-4, -1.473118e-3, -2.419946e-3 }
 };
 
-const double HardBBTables::tau[8][7] = {
+const double HardComponentTables::tau[8][7] = {
     { -1.269205e-4, -2.843877e-4, -5.761546e-4, -1.195445e-3, -1.317386e-3, -9.689228e-15, -6.4595e-15 },
     { -0.01563032, -0.03589573, -0.07768545, -0.157375, -0.2720009, -0.4186136, -0.8045046 },
     { 0.04693954, 0.1162945, 0.3064255, 0.7041273, 1.440518, 2.533355, 3.217832 },
@@ -78,9 +78,9 @@ const double HardBBTables::tau[8][7] = {
     { 1.9837e-5, 4.940182e-5, 1.409573e-4, 2.877909e-4, 4.544877e-4, 6.280818e-4, 4.281932e-4 }
 };
 
-HardBBTables::VecType HardBBTables::getBBVector(const double table[8][7])
+HardComponentTables::VecType HardComponentTables::getHardComponentVector(const double table[8][7])
 {
-    HardBBTables::VecType var;
+    HardComponentTables::VecType var;
 
     for (int i = 0; i < 8; ++i)
     {
@@ -90,9 +90,9 @@ HardBBTables::VecType HardBBTables::getBBVector(const double table[8][7])
     return var;
 }
 
-const HardBBTables::VecType HardBBTables::MuonTable = HardBBTables::getBBVector(HardBBTables::muon);
-const HardBBTables::VecType HardBBTables::TauTable = HardBBTables::getBBVector(HardBBTables::tau);
-const HardBBTables::VecType HardBBTables::EmptyTable;
+const HardComponentTables::VecType HardComponentTables::MuonTable = HardComponentTables::getHardComponentVector(HardComponentTables::muon);
+const HardComponentTables::VecType HardComponentTables::TauTable = HardComponentTables::getHardComponentVector(HardComponentTables::tau);
+const HardComponentTables::VecType HardComponentTables::EmptyTable;
 
 
 /******************************************************************************
@@ -115,14 +115,14 @@ std::ostream& PROPOSAL::operator<<(std::ostream& os, ParticleDef const& def)
        << "\t" << def.lifetime << '\n';
     os << "Charge:"
        << "\t\t" << def.charge << '\n';
-    os << "HardBBTable:" << '\n';
+    os << "HardComponentTables:" << '\n';
 
-    std::cout << def.hardbb_table.size() << std::endl;
-    for (unsigned int i = 0; i < def.hardbb_table.size(); ++i)
+    std::cout << def.hard_component_table.size() << std::endl;
+    for (unsigned int i = 0; i < def.hard_component_table.size(); ++i)
     {
-        for (unsigned int j = 0; j < def.hardbb_table[i].size(); ++j)
+        for (unsigned int j = 0; j < def.hard_component_table[i].size(); ++j)
         {
-            os << def.hardbb_table[i][j] << "\t";
+            os << def.hard_component_table[i][j] << "\t";
         }
         os << '\n';
     }
@@ -137,7 +137,7 @@ ParticleDef::ParticleDef()
     , low(0.0)
     , lifetime(0.0)
     , charge(0.0)
-    , hardbb_table(HardBBTables::EmptyTable)
+    , hard_component_table(HardComponentTables::EmptyTable)
     , decay_table()
 {
 }
@@ -147,14 +147,14 @@ ParticleDef::ParticleDef(std::string name,
             double low,
             double lifetime,
             double charge,
-            const HardBBTables::VecType& table,
+            const HardComponentTables::VecType& table,
             const DecayTable& decay_table)
     : name(name)
     , mass(mass)
     , low(low)
     , lifetime(lifetime)
     , charge(charge)
-    , hardbb_table(table)
+    , hard_component_table(table)
     , decay_table(decay_table)
 {
 }
@@ -169,7 +169,7 @@ ParticleDef::ParticleDef(const ParticleDef& def)
     , low(def.low)
     , lifetime(def.lifetime)
     , charge(def.charge)
-    , hardbb_table(def.hardbb_table)
+    , hard_component_table(def.hard_component_table)
     , decay_table(def.decay_table)
 {
 }
@@ -193,7 +193,7 @@ ParticleDef::ParticleDef(const ParticleDef& def)
 //     swap(low, def.low);
 //     swap(lifetime, def.lifetime);
 //     swap(charge, def.charge);
-//     swap(hardbb_table, def.hardbb_table);
+//     swap(hard_component_table, def.hard_component_table);
 //     swap(decay_table, def.decay_table);
 // }
 
@@ -219,7 +219,7 @@ bool ParticleDef::operator==(const ParticleDef& def) const
     {
         return false;
     }
-    else if (hardbb_table != def.hardbb_table)
+    else if (hard_component_table != def.hard_component_table)
     {
         return false;
     }
@@ -256,7 +256,7 @@ ParticleDef::Builder::Builder()
     , low(0)
     , lifetime(-1)
     , charge(-1)
-    , hardbb_table(NULL)
+    , hard_component_table(NULL)
     , decay_table()
 {
 }
@@ -272,7 +272,7 @@ MuMinusDef::MuMinusDef()
           MMU,
           LMU,
           -1.0,
-          HardBBTables::MuonTable,
+          HardComponentTables::MuonTable,
           DecayTable().addChannel(1.0, LeptonicDecayChannel(EMinusDef::Get(), NuMuDef::Get(), NuEBarDef::Get())))
 {
 }
@@ -288,7 +288,7 @@ MuPlusDef::MuPlusDef()
           MMU,
           LMU,
           1.0,
-          HardBBTables::MuonTable,
+          HardComponentTables::MuonTable,
           DecayTable().addChannel(1.0, LeptonicDecayChannel(EPlusDef::Get(), NuEDef::Get(), NuMuBarDef::Get())))
 {
 }
@@ -303,7 +303,7 @@ TauMinusDef::TauMinusDef()
                   MTAU,
                   LTAU,
                   -1.0,
-                  HardBBTables::TauTable,
+                  HardComponentTables::TauTable,
                   DecayTable()
                       .addChannel(0.1737, LeptonicDecayChannel(MuMinusDef::Get(), NuTauDef::Get(), NuMuBarDef::Get()))
                       .addChannel(0.1783, LeptonicDecayChannel(EMinusDef::Get(), NuMuDef::Get(), NuEBarDef::Get()))
@@ -370,7 +370,7 @@ TauPlusDef::TauPlusDef()
                   MTAU,
                   LTAU,
                   1.0,
-                  HardBBTables::TauTable,
+                  HardComponentTables::TauTable,
                   DecayTable()
                       .addChannel(0.1737, LeptonicDecayChannel(MuPlusDef::Get(), NuTauBarDef::Get(), NuMuDef::Get()))
                       .addChannel(0.1783, LeptonicDecayChannel(EPlusDef::Get(), NuMuBarDef::Get(), NuEDef::Get()))

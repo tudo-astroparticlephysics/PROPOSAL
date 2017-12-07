@@ -37,8 +37,8 @@ if __name__ == "__main__":
     #   - particle
     #   - medium
     #   - cut
-    #   - shadow factor
     #   - multiplier
+    #   - shadowing parametrization
     #   - interpolation definition
     # =========================================================
 
@@ -46,8 +46,8 @@ if __name__ == "__main__":
             mu,
             medium,
             cuts,
-            Parametrization.Photonuclear.ShadowButkevichMikhailov(),
             1.0,
+            Parametrization.Photonuclear.ShadowButkevichMikhailov(),
             interpolation_def
         ]
 
