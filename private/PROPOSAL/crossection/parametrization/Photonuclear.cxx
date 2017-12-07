@@ -66,7 +66,8 @@ HardComponent::HardComponent(const ParticleDef& particle_def)
 }
 
 HardComponent::HardComponent(const HardComponent& hard_component)
-    : interpolant_()
+    : RealPhoton(hard_component)
+    , interpolant_()
 {
     interpolant_.resize(hard_component.interpolant_.size());
 
