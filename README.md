@@ -180,7 +180,18 @@ When you encounter any errors or misunderstandings don't hesitate and write a ma
 
 ## License ##
 
-[License](LICENSE.md)
+This software may be modified and distributed under the terms of
+a modified LGPL License. See the LICENSE for details of the LGPL License.
+
+Modifcations of the LGPL [License](LICENSE.md):
+
+1. The user shall acknowledge the use of PROPOSAL by citing the following reference:
+
+	> J.H. Koehne et al.
+	> Comput.Phys.Commun. 184 (2013) 2070-2090
+	> DOI: 10.1016/j.cpc.2013.04.001
+
+2. The user should report any bugs/errors or improvments to the current maintainer of PROPOSAL.
 
 ## Authors ##
 
