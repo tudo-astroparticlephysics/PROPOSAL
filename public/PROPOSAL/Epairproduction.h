@@ -1,29 +1,29 @@
 
 /******************************************************************************
- *																			  *
- * This file is part of the simulation tool PROPOSAL.						  *
- *																			  *
- * Copyright (C) 2017 TU Dortmund University, Department of Physics,		  *
- * 				      Chair Experimental Physics 5b							  *
- *																			  *
- * This software may be modified and distributed under the terms of a		  *
+ *                                                                            *
+ * This file is part of the simulation tool PROPOSAL.                         *
+ *                                                                            *
+ * Copyright (C) 2017 TU Dortmund University, Department of Physics,          *
+ *                    Chair Experimental Physics 5b                           *
+ *                                                                            *
+ * This software may be modified and distributed under the terms of a         *
  * modified GNU Lesser General Public Licence version 3 (LGPL),               *
- * copied verbatim in the file "LICENSE". 									  *
- *																			  *
- * Modifcations to the LGPL License:										  *
- *																			  *
- *      1. The user shall acknowledge the use of PROPOSAL by citing the		  *
- *         following reference:												  *
- *																			  *
+ * copied verbatim in the file "LICENSE".                                     *
+ *                                                                            *
+ * Modifcations to the LGPL License:                                          *
+ *                                                                            *
+ *      1. The user shall acknowledge the use of PROPOSAL by citing the       *
+ *         following reference:                                               *
+ *                                                                            *
  *         J.H. Koehne et al.  Comput.Phys.Commun. 184 (2013) 2070-2090 DOI:  *
- *         10.1016/j.cpc.2013.04.001										  *
- *																			  *
+ *         10.1016/j.cpc.2013.04.001                                          *
+ *                                                                            *
  *      2. The user should report any bugs/errors or improvments to the       *
  *         current maintainer of PROPOSAL or open an issue on the             *
- *		   GitHub webpage													  *
- *																			  *
- *		   "https://github.com/tudo-astroparticlephysics/PROPOSAL"			  *
- *																			  *
+ *         GitHub webpage                                                     *
+ *                                                                            *
+ *         "https://github.com/tudo-astroparticlephysics/PROPOSAL"            *
+ *                                                                            *
  ******************************************************************************/
 
 #pragma once
@@ -215,63 +215,63 @@ public:
 //----------------------------------------------------------------------------//
     //Getter
 
-	int GetComponent() const {
-		return component_;
-	}
+    int GetComponent() const {
+        return component_;
+    }
 
-	Interpolant* GetDedxInterpolant() const {
-		return dedx_interpolant_;
-	}
+    Interpolant* GetDedxInterpolant() const {
+        return dedx_interpolant_;
+    }
 
-	std::vector<Integral*> GetDndxIntegral() const {
-		return dndx_integral_;
-	}
+    std::vector<Integral*> GetDndxIntegral() const {
+        return dndx_integral_;
+    }
 
-	std::vector<Interpolant*> GetDndxInterpolant1d() const {
-		return dndx_interpolant_1d_;
-	}
+    std::vector<Interpolant*> GetDndxInterpolant1d() const {
+        return dndx_interpolant_1d_;
+    }
 
-	std::vector<Interpolant*> GetDndxInterpolant2d() const {
-		return dndx_interpolant_2d_;
-	}
+    std::vector<Interpolant*> GetDndxInterpolant2d() const {
+        return dndx_interpolant_2d_;
+    }
 
-	double GetLpm() const {
-		return eLpm_;
-	}
+    double GetLpm() const {
+        return eLpm_;
+    }
 
-	Integral* GetIntegral() const {
-		return integral_;
-	}
+    Integral* GetIntegral() const {
+        return integral_;
+    }
 
-	Integral* GetIntegralForDEdx() const {
-		return integral_for_dEdx_;
-	}
+    Integral* GetIntegralForDEdx() const {
+        return integral_for_dEdx_;
+    }
 
-	std::vector<double> GetProbForComponent() const {
-		return prob_for_component_;
-	}
+    std::vector<double> GetProbForComponent() const {
+        return prob_for_component_;
+    }
 
-	bool GetReverse() const {
-		return reverse_;
-	}
+    bool GetReverse() const {
+        return reverse_;
+    }
 
-	double GetV() const {
-		return v_;
-	}
+    double GetV() const {
+        return v_;
+    }
 //----------------------------------------------------------------------------//
     //Setter
 
     void SetParametrization(ParametrizationType::Enum parametrization = ParametrizationType::EPairKelnerKokoulinPetrukhin);
-	void SetComponent(int component);
-	void SetDedxInterpolant(Interpolant* dedxInterpolant);
-	void SetDndxIntegral(std::vector<Integral*> dndxIntegral);
-	void SetDndxInterpolant1d(std::vector<Interpolant*> dndxInterpolant1d);
-	void SetDndxInterpolant2d(std::vector<Interpolant*> dndxInterpolant2d);
-	void SetLpm(double lpm);
-	void SetIntegral(Integral* integral);
-	void SetIntegralForDEdx(Integral* integralForDEdx);
-	void SetProbForComponent(std::vector<double> probForComponent);
-	void SetReverse(bool reverse);
+    void SetComponent(int component);
+    void SetDedxInterpolant(Interpolant* dedxInterpolant);
+    void SetDndxIntegral(std::vector<Integral*> dndxIntegral);
+    void SetDndxInterpolant1d(std::vector<Interpolant*> dndxInterpolant1d);
+    void SetDndxInterpolant2d(std::vector<Interpolant*> dndxInterpolant2d);
+    void SetLpm(double lpm);
+    void SetIntegral(Integral* integral);
+    void SetIntegralForDEdx(Integral* integralForDEdx);
+    void SetProbForComponent(std::vector<double> probForComponent);
+    void SetReverse(bool reverse);
 
 //----------------------------------------------------------------------------//
     //Destructor
