@@ -35,7 +35,6 @@ double Integral::Integrate(double min, double max, boost::function<double (doubl
 {
     if (min == 0. && max == 0. )
     {
-        log_warn("the integration limits are both zero; return 0");
         return 0.;
     }
 
