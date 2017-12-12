@@ -1,29 +1,29 @@
 
 /******************************************************************************
- *																			  *
- * This file is part of the simulation tool PROPOSAL.						  *
- *																			  *
- * Copyright (C) 2017 TU Dortmund University, Department of Physics,		  *
- * 				      Chair Experimental Physics 5b							  *
- *																			  *
- * This software may be modified and distributed under the terms of a		  *
+ *                                                                            *
+ * This file is part of the simulation tool PROPOSAL.                         *
+ *                                                                            *
+ * Copyright (C) 2017 TU Dortmund University, Department of Physics,          *
+ *                    Chair Experimental Physics 5b                           *
+ *                                                                            *
+ * This software may be modified and distributed under the terms of a         *
  * modified GNU Lesser General Public Licence version 3 (LGPL),               *
- * copied verbatim in the file "LICENSE". 									  *
- *																			  *
- * Modifcations to the LGPL License:										  *
- *																			  *
- *      1. The user shall acknowledge the use of PROPOSAL by citing the		  *
- *         following reference:												  *
- *																			  *
+ * copied verbatim in the file "LICENSE".                                     *
+ *                                                                            *
+ * Modifcations to the LGPL License:                                          *
+ *                                                                            *
+ *      1. The user shall acknowledge the use of PROPOSAL by citing the       *
+ *         following reference:                                               *
+ *                                                                            *
  *         J.H. Koehne et al.  Comput.Phys.Commun. 184 (2013) 2070-2090 DOI:  *
- *         10.1016/j.cpc.2013.04.001										  *
- *																			  *
+ *         10.1016/j.cpc.2013.04.001                                          *
+ *                                                                            *
  *      2. The user should report any bugs/errors or improvments to the       *
  *         current maintainer of PROPOSAL or open an issue on the             *
- *		   GitHub webpage													  *
- *																			  *
- *		   "https://github.com/tudo-astroparticlephysics/PROPOSAL"			  *
- *																			  *
+ *         GitHub webpage                                                     *
+ *                                                                            *
+ *         "https://github.com/tudo-astroparticlephysics/PROPOSAL"            *
+ *                                                                            *
  ******************************************************************************/
 
 #pragma once
@@ -69,38 +69,38 @@ class Medium
 
 protected:
 
-    int numComponents_;                	///< number of components
+    int numComponents_;                 ///< number of components
     std::vector<double> nucCharge_;         ///< nucleus charge
     std::vector<double> atomicNum_;         ///< atomic number
     std::vector<double> atomInMolecule_;    ///< number of atoms in a molecule
-    double sumCharge_;                  	///< sum of charges of all nuclei
+    double sumCharge_;                      ///< sum of charges of all nuclei
 
-    double ZA_;                         	///< <Z/A>
-    double I_;                          	///< ionization potential [eV]
+    double ZA_;                             ///< <Z/A>
+    double I_;                              ///< ionization potential [eV]
     double C_, a_;                          ///< ionization formula constants
-    double m_, X0_, X1_, d0_;           	///< ionization formula constants (continued)
-    double r_;                          	///< refraction index
+    double m_, X0_, X1_, d0_;               ///< ionization formula constants (continued)
+    double r_;                              ///< refraction index
 
     std::vector<double> logConstant_;       ///< radiation logarithm constant B
     std::vector<double> bPrime_;            ///< radiation logarithm constant bPrime
 
-    double rho_;                        	///< multiplicative density correction factor
-    double massDensity_;                	///< mass density [g/cm3]
-    double molDensity_;                 	///< molecule density [number/cm3]
+    double rho_;                            ///< multiplicative density correction factor
+    double massDensity_;                    ///< mass density [g/cm3]
+    double molDensity_;                     ///< molecule density [number/cm3]
     double radiationLength_;                ///< radiation length [cm]
 
     std::vector<double> M_;                 ///< average nucleon weight in a nucleus [MeV]
     std::vector<std::string> elementName_;  ///< element name
-    std::string name_;                  	///< medium name
+    std::string name_;                      ///< medium name
     MediumType::Enum type_;                 ///< medium type
 
-    double ecut_;                       	///< cutoff energy [MeV]
-    double vcut_;                       	///< relative cutoff energy
-    double vCut_;                       	///< relative cutoff energy - call setCut(E) to set this
+    double ecut_;                           ///< cutoff energy [MeV]
+    double vcut_;                           ///< relative cutoff energy
+    double vCut_;                           ///< relative cutoff energy - call setCut(E) to set this
 
     std::vector<double> mN_;                ///< Woods-Saxon potential factor
-    double MM_;                         	///< average all-component nucleon weight
-    double sumNucleons_;                	///< sum of nucleons of all nuclei
+    double MM_;                             ///< average all-component nucleon weight
+    double sumNucleons_;                    ///< sum of nucleons of all nuclei
 
     double r0_;
 

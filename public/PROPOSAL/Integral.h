@@ -1,29 +1,29 @@
 
 /******************************************************************************
- *																			  *
- * This file is part of the simulation tool PROPOSAL.						  *
- *																			  *
- * Copyright (C) 2017 TU Dortmund University, Department of Physics,		  *
- * 				      Chair Experimental Physics 5b							  *
- *																			  *
- * This software may be modified and distributed under the terms of a		  *
+ *                                                                            *
+ * This file is part of the simulation tool PROPOSAL.                         *
+ *                                                                            *
+ * Copyright (C) 2017 TU Dortmund University, Department of Physics,          *
+ *                    Chair Experimental Physics 5b                           *
+ *                                                                            *
+ * This software may be modified and distributed under the terms of a         *
  * modified GNU Lesser General Public Licence version 3 (LGPL),               *
- * copied verbatim in the file "LICENSE". 									  *
- *																			  *
- * Modifcations to the LGPL License:										  *
- *																			  *
- *      1. The user shall acknowledge the use of PROPOSAL by citing the		  *
- *         following reference:												  *
- *																			  *
+ * copied verbatim in the file "LICENSE".                                     *
+ *                                                                            *
+ * Modifcations to the LGPL License:                                          *
+ *                                                                            *
+ *      1. The user shall acknowledge the use of PROPOSAL by citing the       *
+ *         following reference:                                               *
+ *                                                                            *
  *         J.H. Koehne et al.  Comput.Phys.Commun. 184 (2013) 2070-2090 DOI:  *
- *         10.1016/j.cpc.2013.04.001										  *
- *																			  *
+ *         10.1016/j.cpc.2013.04.001                                          *
+ *                                                                            *
  *      2. The user should report any bugs/errors or improvments to the       *
  *         current maintainer of PROPOSAL or open an issue on the             *
- *		   GitHub webpage													  *
- *																			  *
- *		   "https://github.com/tudo-astroparticlephysics/PROPOSAL"			  *
- *																			  *
+ *         GitHub webpage                                                     *
+ *                                                                            *
+ *         "https://github.com/tudo-astroparticlephysics/PROPOSAL"            *
+ *                                                                            *
  ******************************************************************************/
 
 #pragma once
@@ -87,13 +87,13 @@ private:
     boost::function<double (double)> integrand_;
 
 
-    int     romberg4refine_;		// set to 2 in constructor
+    int     romberg4refine_;        // set to 2 in constructor
     double  powerOfSubstitution_;
-    bool    randomDo_;			// set to false in Constructor
-    bool    useLog_;			// set to false in Constructor
+    bool    randomDo_;          // set to false in Constructor
+    bool    useLog_;            // set to false in Constructor
     double  randomNumber_;
     double  randomX_;
-    bool    reverse_;			// set to false in Constructor
+    bool    reverse_;           // set to false in Constructor
     double  reverseX_;
     double  savedResult_;
 
@@ -208,7 +208,7 @@ private:
     * \f$ \int_{low}^y f(x) dx = \int_{low}^{hi} f(x) dx * rnd \f$
     *
     * \param   result  \f$\int_{low}^{hi} f(x) dx\f$
-    * \return	y
+    * \return   y
     */
 
    void RefineUpperLimit(double result);
@@ -433,107 +433,107 @@ public:
 
 // Getters
 
-	std::vector<double> GetC() const {
-		return c_;
-	}
+    std::vector<double> GetC() const {
+        return c_;
+    }
 
-	std::vector<double> GetD() const {
-		return d_;
-	}
+    std::vector<double> GetD() const {
+        return d_;
+    }
 
-	double GetIntegralError() const {
-		return integralError_;
-	}
+    double GetIntegralError() const {
+        return integralError_;
+    }
 
-	double GetIntegralValue() const {
-		return integralValue_;
-	}
+    double GetIntegralValue() const {
+        return integralValue_;
+    }
 
-	std::vector<double> GetX() const {
-		return iX_;
-	}
+    std::vector<double> GetX() const {
+        return iX_;
+    }
 
-	std::vector<double> GetY() const {
-		return iY_;
-	}
+    std::vector<double> GetY() const {
+        return iY_;
+    }
 
-	double GetMax() const {
-		return max_;
-	}
+    double GetMax() const {
+        return max_;
+    }
 
-	int GetMaxSteps() const {
-		return maxSteps_;
-	}
+    int GetMaxSteps() const {
+        return maxSteps_;
+    }
 
-	double GetMin() const {
-		return min_;
-	}
+    double GetMin() const {
+        return min_;
+    }
 
-	double GetPowerOfSubstitution() const {
-		return powerOfSubstitution_;
-	}
+    double GetPowerOfSubstitution() const {
+        return powerOfSubstitution_;
+    }
 
-	double GetPrecision() const {
-		return precision_;
-	}
+    double GetPrecision() const {
+        return precision_;
+    }
 
-	bool GetRandomDo() const {
-		return randomDo_;
-	}
+    bool GetRandomDo() const {
+        return randomDo_;
+    }
 
-	double GetRandomNumber() const {
-		return randomNumber_;
-	}
+    double GetRandomNumber() const {
+        return randomNumber_;
+    }
 
-	double GetRandomX() const {
-		return randomX_;
-	}
+    double GetRandomX() const {
+        return randomX_;
+    }
 
-	bool GetReverse() const {
-		return reverse_;
-	}
+    bool GetReverse() const {
+        return reverse_;
+    }
 
-	double GetReverseX() const {
-		return reverseX_;
-	}
+    double GetReverseX() const {
+        return reverseX_;
+    }
 
-	int GetRomberg() const {
-		return romberg_;
-	}
+    int GetRomberg() const {
+        return romberg_;
+    }
 
-	int GetRomberg4refine() const {
-		return romberg4refine_;
-	}
+    int GetRomberg4refine() const {
+        return romberg4refine_;
+    }
 
-	double GetSavedResult() const {
-		return savedResult_;
-	}
+    double GetSavedResult() const {
+        return savedResult_;
+    }
 
-	bool GetUseLog() const {
-		return useLog_;
-	}
+    bool GetUseLog() const {
+        return useLog_;
+    }
 
-	void SetC(std::vector<double> c);
-	void SetD(std::vector<double> d);
-	void SetIntegralError(double integralError);
-	void SetIntegralValue(double integralValue);
-	void SetIntegrand(boost::function<double(double)> integrand);
-	void SetX(std::vector<double> x);
-	void SetY(std::vector<double> y);
-	void SetMax(double max);
-	void SetMaxSteps(int maxSteps);
-	void SetMin(double min);
-	void SetPowerOfSubstitution(double powerOfSubstitution);
-	void SetPrecision(double precision);
-	void SetRandomDo(bool randomDo);
-	void SetRandomNumber(double randomNumber);
-	void SetRandomX(double randomX);
-	void SetReverse(bool reverse);
-	void SetReverseX(double reverseX);
-	void SetRomberg(int romberg);
-	void SetRomberg4refine(int romberg4refine);
-	void SetSavedResult(double savedResult);
-	void SetUseLog(bool useLog);
+    void SetC(std::vector<double> c);
+    void SetD(std::vector<double> d);
+    void SetIntegralError(double integralError);
+    void SetIntegralValue(double integralValue);
+    void SetIntegrand(boost::function<double(double)> integrand);
+    void SetX(std::vector<double> x);
+    void SetY(std::vector<double> y);
+    void SetMax(double max);
+    void SetMaxSteps(int maxSteps);
+    void SetMin(double min);
+    void SetPowerOfSubstitution(double powerOfSubstitution);
+    void SetPrecision(double precision);
+    void SetRandomDo(bool randomDo);
+    void SetRandomNumber(double randomNumber);
+    void SetRandomX(double randomX);
+    void SetReverse(bool reverse);
+    void SetReverseX(double reverseX);
+    void SetRomberg(int romberg);
+    void SetRomberg4refine(int romberg4refine);
+    void SetSavedResult(double savedResult);
+    void SetUseLog(bool useLog);
 };
 
 }
