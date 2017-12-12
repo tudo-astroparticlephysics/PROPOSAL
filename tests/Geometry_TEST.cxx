@@ -657,7 +657,7 @@ TEST(IsInside , Sphere ) {
     double z0   =   0;
 
     PROPOSALParticle * particle = new PROPOSALParticle(ParticleType::MuMinus,x,y,z,theta,phi,0,0);
-    int is_inside  =0;
+    double is_inside  =0;
     int is_outside =0;
 
     double volumia_ratio =0;
@@ -679,9 +679,9 @@ TEST(IsInside , Sphere ) {
 
         rnd_inner_radius    = M.RandomDouble();
 
-        x0   =   ( 2 * rnd_x  - 1)* ( 0.5 * big_width_x - radius );
-        y0   =   ( 2 * rnd_y  - 1)* ( 0.5 * big_width_y - radius );
-        z0   =   ( 2 * rnd_z  - 1)* ( 0.5 * big_height  - radius );
+        x0   =   ( 2 * rnd_x0  - 1)* ( 0.5 * big_width_x - radius );
+        y0   =   ( 2 * rnd_y0  - 1)* ( 0.5 * big_width_y - radius );
+        z0   =   ( 2 * rnd_z0  - 1)* ( 0.5 * big_height  - radius );
 
         inner_radius    = radius*rnd_inner_radius;
 
@@ -729,7 +729,7 @@ TEST(IsInside , Sphere ) {
                 EXPECT_FALSE(A.IsParticleInside(particle));
             }
         }
-        ASSERT_NEAR(1.*is_inside ,volumia_ratio*number_particles , 3*sqrt(volumia_ratio*number_particles) );
+        ASSERT_NEAR(is_inside ,volumia_ratio*number_particles , 3*sqrt(volumia_ratio*number_particles) );
         is_inside   = 0;
         is_outside  = 0;
     }
