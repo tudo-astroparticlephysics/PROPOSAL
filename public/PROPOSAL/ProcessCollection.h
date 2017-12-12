@@ -1,29 +1,29 @@
 
 /******************************************************************************
- *																			  *
- * This file is part of the simulation tool PROPOSAL.						  *
- *																			  *
- * Copyright (C) 2017 TU Dortmund University, Department of Physics,		  *
- * 				      Chair Experimental Physics 5b							  *
- *																			  *
- * This software may be modified and distributed under the terms of a		  *
+ *                                                                            *
+ * This file is part of the simulation tool PROPOSAL.                         *
+ *                                                                            *
+ * Copyright (C) 2017 TU Dortmund University, Department of Physics,          *
+ *                    Chair Experimental Physics 5b                           *
+ *                                                                            *
+ * This software may be modified and distributed under the terms of a         *
  * modified GNU Lesser General Public Licence version 3 (LGPL),               *
- * copied verbatim in the file "LICENSE". 									  *
- *																			  *
- * Modifcations to the LGPL License:										  *
- *																			  *
- *      1. The user shall acknowledge the use of PROPOSAL by citing the		  *
- *         following reference:												  *
- *																			  *
+ * copied verbatim in the file "LICENSE".                                     *
+ *                                                                            *
+ * Modifcations to the LGPL License:                                          *
+ *                                                                            *
+ *      1. The user shall acknowledge the use of PROPOSAL by citing the       *
+ *         following reference:                                               *
+ *                                                                            *
  *         J.H. Koehne et al.  Comput.Phys.Commun. 184 (2013) 2070-2090 DOI:  *
- *         10.1016/j.cpc.2013.04.001										  *
- *																			  *
+ *         10.1016/j.cpc.2013.04.001                                          *
+ *                                                                            *
  *      2. The user should report any bugs/errors or improvments to the       *
  *         current maintainer of PROPOSAL or open an issue on the             *
- *		   GitHub webpage													  *
- *																			  *
- *		   "https://github.com/tudo-astroparticlephysics/PROPOSAL"			  *
- *																			  *
+ *         GitHub webpage                                                     *
+ *                                                                            *
+ *         "https://github.com/tudo-astroparticlephysics/PROPOSAL"            *
+ *                                                                            *
  ******************************************************************************/
 
 #pragma once
@@ -436,21 +436,21 @@ public:
         return location_;
     }
 
-	std::vector<CrossSections*> GetCrosssections() const {
-		return crosssections_;
-	}
+    std::vector<CrossSections*> GetCrosssections() const {
+        return crosssections_;
+    }
 
-	EnergyCutSettings* GetCutSettings() const {
-		return cut_settings_;
-	}
+    EnergyCutSettings* GetCutSettings() const {
+        return cut_settings_;
+    }
 
-	bool GetDebug() const {
-		return debug_;
-	}
+    bool GetDebug() const {
+        return debug_;
+    }
 
-	bool GetDoInterpolation() const {
-		return do_interpolation_;
-	}
+    bool GetDoInterpolation() const {
+        return do_interpolation_;
+    }
 
     bool GetDoRandomization() const {
         return do_continuous_randomization_;
@@ -460,25 +460,25 @@ public:
         return do_scattering_;
     }
 
-	double GetIni() const {
-		return ini_;
-	}
+    double GetIni() const {
+        return ini_;
+    }
 
-	Integral* GetIntegral() const {
-		return integral_;
-	}
+    Integral* GetIntegral() const {
+        return integral_;
+    }
 
-	Interpolant* GetInterpolant() const {
-		return interpolant_;
-	}
+    Interpolant* GetInterpolant() const {
+        return interpolant_;
+    }
 
-	Interpolant* GetInterpolantDiff() const {
-		return interpolant_diff_;
-	}
+    Interpolant* GetInterpolantDiff() const {
+        return interpolant_diff_;
+    }
 
-	bool GetLpmEffectEnabled() const {
-		return lpm_effect_enabled_;
-	}
+    bool GetLpmEffectEnabled() const {
+        return lpm_effect_enabled_;
+    }
 
     ContinuousRandomization* GetContinuousRandomization() const {
         return randomizer_;
@@ -492,17 +492,17 @@ public:
         return enable_randomization_;
     }
 
-	Medium* GetMedium() const {
-		return medium_;
-	}
+    Medium* GetMedium() const {
+        return medium_;
+    }
 
-	int GetOrderOfInterpolation() const {
-		return order_of_interpolation_;
-	}
+    int GetOrderOfInterpolation() const {
+        return order_of_interpolation_;
+    }
 
-	PROPOSALParticle* GetParticle() const {
-		return particle_;
-	}
+    PROPOSALParticle* GetParticle() const {
+        return particle_;
+    }
 
     Geometry* GetGeometry() const {
         return geometry_;
@@ -514,18 +514,18 @@ public:
 //----------------------------------------------------------------------------//
     //Setter
 
-	void SetCrosssections(std::vector<CrossSections*> crosssections);
-	void SetCutSettings(EnergyCutSettings* cutSettings);
-	void SetDebug(bool debug);
-	void SetDoInterpolation(bool doInterpolation);
-	void SetIni(double ini);
-	void SetIntegral(Integral* integral);
-	void SetInterpolant(Interpolant* interpolant);
-	void SetInterpolantDiff(Interpolant* interpolantDiff);
-	void SetLpmEffectEnabled(bool lpmEffectEnabled);
-	void SetMedium(Medium* medium);
-	void SetOrderOfInterpolation(int orderOfInterpolation);
-	void SetParticle(PROPOSALParticle* particle);
+    void SetCrosssections(std::vector<CrossSections*> crosssections);
+    void SetCutSettings(EnergyCutSettings* cutSettings);
+    void SetDebug(bool debug);
+    void SetDoInterpolation(bool doInterpolation);
+    void SetIni(double ini);
+    void SetIntegral(Integral* integral);
+    void SetInterpolant(Interpolant* interpolant);
+    void SetInterpolantDiff(Interpolant* interpolantDiff);
+    void SetLpmEffectEnabled(bool lpmEffectEnabled);
+    void SetMedium(Medium* medium);
+    void SetOrderOfInterpolation(int orderOfInterpolation);
+    void SetParticle(PROPOSALParticle* particle);
     void SetLocation(int location);
     void SetGeometry(Geometry* geometry);
     void SetDensityCorrection(double density_correction);
