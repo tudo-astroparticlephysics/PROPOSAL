@@ -24,7 +24,7 @@ Here are all changes since Version 1.0 PROPOSAL.
 ------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------
 
-V.2.1 - xx.05.17
+V.3.0 - 12.12.17
 
     +   stau cross section
     +   add SetMass, so one is able to change the mass of a particle
