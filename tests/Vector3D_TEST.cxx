@@ -198,7 +198,7 @@ TEST(CalculateSphericalCoordinates, Conversion)
     EXPECT_TRUE(A==B);
     A.CalculateSphericalCoordinates();
     EXPECT_TRUE(A!=B);
-    B.SetSphericalCoordinates(3, std::atan(2.), std::acos(2./3.));
+    B.SetSphericalCoordinates(3, std::atan2(2., 1.), std::acos(2./3.));
     EXPECT_TRUE(B==A);
 }
 
@@ -208,7 +208,7 @@ TEST(CalculateCartesianFromSpherical, Conversion)
     Vector3D B;
     double epsilon = std::numeric_limits<double>::epsilon();
     A.SetCartesianCoordinates(1,2,2);
-    B.SetSphericalCoordinates(3, std::atan(2.), std::acos(2./3.));
+    B.SetSphericalCoordinates(3, std::atan2(2., 1.), std::acos(2./3.));
     B.CalculateCartesianFromSpherical();
     EXPECT_TRUE(A!=B);
     B.SetSphericalCoordinates(0,0,0);
