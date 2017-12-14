@@ -77,8 +77,6 @@ class Vector3D
         double x_, y_, z_;
         double spheric_radius_, spheric_azimuth_, spheric_zenith_;
         // double cylindric_radius_, cylindric_azimuth_, cylindric_height_;
-
-        double CalculateAzimuthFromCartesian();
 };
 
 }
