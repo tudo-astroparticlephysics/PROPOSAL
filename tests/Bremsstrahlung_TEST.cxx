@@ -162,7 +162,7 @@ TEST(Assignment, Copyconstructor2)
 TEST(Bremsstrahlung, Test_of_dEdx)
 {
     ifstream in;
-    string filename = "testfiles/Brems_dEdx.txt";
+    string filename = "bin/TestFiles/Brems_dEdx.txt";
     in.open(filename.c_str());
 
     if (!in.good())
@@ -218,7 +218,7 @@ TEST(Bremsstrahlung, Test_of_dEdx)
 TEST(Bremsstrahlung, Test_of_dNdx)
 {
     ifstream in;
-    string filename = "testfiles/Brems_dNdx.txt";
+    string filename = "bin/TestFiles/Brems_dNdx.txt";
     in.open(filename.c_str());
 
     if (!in.good())
@@ -274,7 +274,7 @@ TEST(Bremsstrahlung, Test_of_dNdx)
 TEST(Bremsstrahlung, Test_of_dNdx_rnd)
 {
     ifstream in;
-    string filename = "testfiles/Brems_dNdx_rnd.txt";
+    string filename = "bin/TestFiles/Brems_dNdx_rnd.txt";
     in.open(filename.c_str());
 
     if (!in.good())
@@ -333,7 +333,7 @@ TEST(Bremsstrahlung, Test_of_dNdx_rnd)
 TEST(Bremsstrahlung, Test_of_e)
 {
     ifstream in;
-    string filename = "testfiles/Brems_e.txt";
+    string filename = "bin/TestFiles/Brems_e.txt";
     in.open(filename.c_str());
 
     if (!in.good())
@@ -392,7 +392,7 @@ TEST(Bremsstrahlung, Test_of_e)
 TEST(Bremsstrahlung, Test_of_dEdx_Interpolant)
 {
     ifstream in;
-    string filename = "testfiles/Brems_dEdx_interpol.txt";
+    string filename = "bin/TestFiles/Brems_dEdx_interpol.txt";
     in.open(filename.c_str());
 
     if (!in.good())
@@ -450,7 +450,7 @@ TEST(Bremsstrahlung, Test_of_dEdx_Interpolant)
 TEST(Bremsstrahlung, Test_of_dNdx_Interpolant)
 {
     ifstream in;
-    string filename = "testfiles/Brems_dNdx_interpol.txt";
+    string filename = "bin/TestFiles/Brems_dNdx_interpol.txt";
     in.open(filename.c_str());
 
     if (!in.good())
@@ -505,7 +505,7 @@ TEST(Bremsstrahlung, Test_of_dNdx_Interpolant)
 TEST(Bremsstrahlung, Test_of_dNdx_rnd_Interpolant)
 {
     ifstream in;
-    string filename = "testfiles/Brems_dNdx_rnd_interpol.txt";
+    string filename = "bin/TestFiles/Brems_dNdx_rnd_interpol.txt";
     in.open(filename.c_str());
 
     if (!in.good())
@@ -566,7 +566,7 @@ TEST(Bremsstrahlung, Test_of_dNdx_rnd_Interpolant)
 TEST(Bremsstrahlung, Test_of_e_Interpolant)
 {
     ifstream in;
-    string filename = "testfiles/Brems_e_interpol.txt";
+    string filename = "bin/TestFiles/Brems_e_interpol.txt";
     in.open(filename.c_str());
 
     if (!in.good())
