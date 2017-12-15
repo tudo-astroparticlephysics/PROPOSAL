@@ -247,7 +247,7 @@ TEST(Assignment, Copyconstructor2)
 TEST(PhotoRealPhotonAssumption, Test_of_dEdx)
 {
     ifstream in;
-    string filename = "testfiles/Photo_Real_dEdx.txt";
+    string filename = "bin/TestFiles/Photo_Real_dEdx.txt";
     in.open(filename.c_str());
 
     if (!in.good())
@@ -300,7 +300,7 @@ TEST(PhotoRealPhotonAssumption, Test_of_dEdx)
 TEST(PhotoRealPhotonAssumption, Test_of_dNdx)
 {
     ifstream in;
-    string filename = "testfiles/Photo_Real_dNdx.txt";
+    string filename = "bin/TestFiles/Photo_Real_dNdx.txt";
     in.open(filename.c_str());
 
     if (!in.good())
@@ -353,7 +353,7 @@ TEST(PhotoRealPhotonAssumption, Test_of_dNdx)
 TEST(PhotoRealPhotonAssumption, Test_of_dNdx_rnd)
 {
     ifstream in;
-    string filename = "testfiles/Photo_Real_dNdx_rnd.txt";
+    string filename = "bin/TestFiles/Photo_Real_dNdx_rnd.txt";
     in.open(filename.c_str());
 
     if (!in.good())
@@ -407,7 +407,7 @@ TEST(PhotoRealPhotonAssumption, Test_of_dNdx_rnd)
 TEST(PhotoRealPhotonAssumption, Test_of_e)
 {
     ifstream in;
-    string filename = "testfiles/Photo_Real_e.txt";
+    string filename = "bin/TestFiles/Photo_Real_e.txt";
     in.open(filename.c_str());
 
     if (!in.good())
@@ -461,7 +461,7 @@ TEST(PhotoRealPhotonAssumption, Test_of_e)
 TEST(PhotoRealPhotonAssumption, Test_of_dEdx_Interpolant)
 {
     ifstream in;
-    string filename = "testfiles/Photo_Real_dEdx_interpol.txt";
+    string filename = "bin/TestFiles/Photo_Real_dEdx_interpol.txt";
     in.open(filename.c_str());
 
     if (!in.good())
@@ -516,7 +516,7 @@ TEST(PhotoRealPhotonAssumption, Test_of_dEdx_Interpolant)
 TEST(PhotoRealPhotonAssumption, Test_of_dNdx_Interpolant)
 {
     ifstream in;
-    string filename = "testfiles/Photo_Real_dNdx_interpol.txt";
+    string filename = "bin/TestFiles/Photo_Real_dNdx_interpol.txt";
     in.open(filename.c_str());
 
     if (!in.good())
@@ -571,7 +571,7 @@ TEST(PhotoRealPhotonAssumption, Test_of_dNdx_Interpolant)
 TEST(PhotoRealPhotonAssumption, Test_of_dNdx_rnd_Interpolant)
 {
     ifstream in;
-    string filename = "testfiles/Photo_Real_dNdx_rnd_interpol.txt";
+    string filename = "bin/TestFiles/Photo_Real_dNdx_rnd_interpol.txt";
     in.open(filename.c_str());
 
     if (!in.good())
@@ -627,7 +627,7 @@ TEST(PhotoRealPhotonAssumption, Test_of_dNdx_rnd_Interpolant)
 TEST(PhotoRealPhotonAssumption, Test_of_e_Interpolant)
 {
     ifstream in;
-    string filename = "testfiles/Photo_e_interpol.txt";
+    string filename = "bin/TestFiles/Photo_e_interpol.txt";
     in.open(filename.c_str());
 
     if (!in.good())
@@ -685,7 +685,7 @@ TEST(PhotoRealPhotonAssumption, Test_of_e_Interpolant)
 TEST(PhotoQ2Integration, Test_of_dEdx)
 {
     ifstream in;
-    string filename = "testfiles/Photo_Q2_dEdx.txt";
+    string filename = "bin/TestFiles/Photo_Q2_dEdx.txt";
     in.open(filename.c_str());
 
     if (!in.good())
@@ -738,7 +738,7 @@ TEST(PhotoQ2Integration, Test_of_dEdx)
 TEST(PhotoQ2Integration, Test_of_dNdx)
 {
     ifstream in;
-    string filename = "testfiles/Photo_Q2_dNdx.txt";
+    string filename = "bin/TestFiles/Photo_Q2_dNdx.txt";
     in.open(filename.c_str());
 
     if (!in.good())
@@ -791,7 +791,7 @@ TEST(PhotoQ2Integration, Test_of_dNdx)
 TEST(PhotoQ2Integration, Test_of_dNdx_rnd)
 {
     ifstream in;
-    string filename = "testfiles/Photo_Q2_dNdx_rnd.txt";
+    string filename = "bin/TestFiles/Photo_Q2_dNdx_rnd.txt";
     in.open(filename.c_str());
 
     if (!in.good())
@@ -845,7 +845,7 @@ TEST(PhotoQ2Integration, Test_of_dNdx_rnd)
 TEST(PhotoQ2Integration, Test_of_e)
 {
     ifstream in;
-    string filename = "testfiles/Photo_Q2_e.txt";
+    string filename = "bin/TestFiles/Photo_Q2_e.txt";
     in.open(filename.c_str());
 
     if (!in.good())
@@ -899,7 +899,7 @@ TEST(PhotoQ2Integration, Test_of_e)
 TEST(PhotoQ2Integration, Test_of_dEdx_Interpolant)
 {
     ifstream in;
-    string filename = "testfiles/Photo_Q2_dEdx_interpol.txt";
+    string filename = "bin/TestFiles/Photo_Q2_dEdx_interpol.txt";
     in.open(filename.c_str());
 
     if (!in.good())
@@ -954,7 +954,7 @@ TEST(PhotoQ2Integration, Test_of_dEdx_Interpolant)
 TEST(PhotoQ2Integration, Test_of_dNdx_Interpolant)
 {
     ifstream in;
-    string filename = "testfiles/Photo_Q2_dNdx_interpol.txt";
+    string filename = "bin/TestFiles/Photo_Q2_dNdx_interpol.txt";
     in.open(filename.c_str());
 
     if (!in.good())
@@ -1009,7 +1009,7 @@ TEST(PhotoQ2Integration, Test_of_dNdx_Interpolant)
 TEST(PhotoQ2Integration, Test_of_dNdx_rnd_Interpolant)
 {
     ifstream in;
-    string filename = "testfiles/Photo_Q2_dNdx_rnd_interpol.txt";
+    string filename = "bin/TestFiles/Photo_Q2_dNdx_rnd_interpol.txt";
     in.open(filename.c_str());
 
     if (!in.good())
@@ -1065,7 +1065,7 @@ TEST(PhotoQ2Integration, Test_of_dNdx_rnd_Interpolant)
 TEST(PhotoQ2Integration, Test_of_e_Interpolant)
 {
     ifstream in;
-    string filename = "testfiles/Photo_Q2_e_interpol.txt";
+    string filename = "bin/TestFiles/Photo_Q2_e_interpol.txt";
     in.open(filename.c_str());
 
     if (!in.good())
