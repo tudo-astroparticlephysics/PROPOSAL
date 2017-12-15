@@ -144,7 +144,7 @@ TEST(Assignment, Copyconstructor2)
 TEST(Ionization, Test_of_dEdx)
 {
     ifstream in;
-    string filename = "testfiles/Ioniz_dEdx.txt";
+    string filename = "bin/TestFiles/Ioniz_dEdx.txt";
     in.open(filename.c_str());
 
     if (!in.good())
@@ -187,7 +187,7 @@ TEST(Ionization, Test_of_dEdx)
 TEST(Ionization, Test_of_dNdx)
 {
     ifstream in;
-    string filename = "testfiles/Ioniz_dNdx.txt";
+    string filename = "bin/TestFiles/Ioniz_dNdx.txt";
     in.open(filename.c_str());
 
     if (!in.good())
@@ -231,7 +231,7 @@ TEST(Ionization, Test_of_dNdx)
 TEST(Ionization, Test_of_dNdx_rnd)
 {
     ifstream in;
-    string filename = "testfiles/Ioniz_dNdx_rnd.txt";
+    string filename = "bin/TestFiles/Ioniz_dNdx_rnd.txt";
     in.open(filename.c_str());
 
     if (!in.good())
@@ -277,7 +277,7 @@ TEST(Ionization, Test_of_dNdx_rnd)
 TEST(Ionization, Test_Stochastic_Loss)
 {
     ifstream in;
-    string filename = "testfiles/Ioniz_e.txt";
+    string filename = "bin/TestFiles/Ioniz_e.txt";
     in.open(filename.c_str());
 
     if (!in.good())
@@ -323,7 +323,7 @@ TEST(Ionization, Test_Stochastic_Loss)
 TEST(Ionization, Test_of_dEdx_Interpolant)
 {
     ifstream in;
-    string filename = "testfiles/Ioniz_dEdx_interpol.txt";
+    string filename = "bin/TestFiles/Ioniz_dEdx_interpol.txt";
     in.open(filename.c_str());
 
     if (!in.good())
@@ -368,7 +368,7 @@ TEST(Ionization, Test_of_dEdx_Interpolant)
 TEST(Ionization, Test_of_dNdx_Interpolant)
 {
     ifstream in;
-    string filename = "testfiles/Ioniz_dNdx_interpol.txt";
+    string filename = "bin/TestFiles/Ioniz_dNdx_interpol.txt";
     in.open(filename.c_str());
 
     if (!in.good())
@@ -413,7 +413,7 @@ TEST(Ionization, Test_of_dNdx_Interpolant)
 TEST(Ionization, Test_of_dNdxrnd_interpol)
 {
     ifstream in;
-    string filename = "testfiles/Ioniz_dNdx_rnd_interpol.txt";
+    string filename = "bin/TestFiles/Ioniz_dNdx_rnd_interpol.txt";
     in.open(filename.c_str());
 
     if (!in.good())
@@ -462,7 +462,7 @@ TEST(Ionization, Test_of_dNdxrnd_interpol)
 TEST(Ionization, Test_of_e_interpol)
 {
     ifstream in;
-    string filename = "testfiles/Ioniz_e_interpol.txt";
+    string filename = "bin/TestFiles/Ioniz_e_interpol.txt";
     in.open(filename.c_str());
 
     if (!in.good())

@@ -230,8 +230,7 @@ void Vector3D::CalculateCartesianFromSpherical()
 void Vector3D::CalculateSphericalCoordinates()
 {
     spheric_radius_  = std::sqrt(x_*x_ + y_*y_ + z_*z_);
-    spheric_azimuth_ = CalculateAzimuthFromCartesian();
-    // spheric_azimuth_ = std::atan2(y_, x_);
+    spheric_azimuth_ = std::atan2(y_, x_);
     if (spheric_radius_ > 0.)
     {
         spheric_zenith_ = std::acos(z_/spheric_radius_);
@@ -258,8 +257,7 @@ void Vector3D::CalculateSphericalCoordinates()
 // void Vector3D::CalculateZylindricalCoordinates()
 // {
 //     cylindric_radius_  = std::sqrt(x_*x_ + y_*y_);
-//     cylindric_azimuth_ = CalculateAzimuthFromCartesian();
-// //     cylindric_azimuth_ = std::atan2(y_, x_);
+//     cylindric_azimuth_ = std::atan2(y_, x_);
 //     cylindric_height_  = z_;
 // }
 
@@ -268,41 +266,3 @@ void Vector3D::CalculateSphericalCoordinates()
 //---------------------private member function--------------------------//
 //----------------------------------------------------------------------//
 
-// in principal its the std::atan2(y_, x_) function
-double Vector3D::CalculateAzimuthFromCartesian()
-{
-    using namespace std;
-    if (x_ > 0.)
-    {
-        return atan(y_/x_);
-    }
-    else if (x_ < 0.)
-    {
-        if (y_ >= 0.)
-        {
-            return atan(y_/x_) + PI;
-        }
-        else
-        {
-            return atan(y_/x_) - PI;
-        }
-    }
-    else if (x_ == 0)
-    {
-        if (y_ > 0)
-        {
-            return PI/2.;
-        }
-        else if (y_< 0.)
-        {
-            return -PI/2.;
-        }
-        else if (y_ == 0)
-        {
-            // log_warn("If x and y are zero, the azimuth is not defined! Zero is returned!");
-            return 0.;
-        }
-    }
-    // log_fatal("never should be here; return zero.");
-    return 0.;
-}
