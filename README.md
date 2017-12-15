@@ -124,13 +124,13 @@ for (int i = 0; i < 10; i++)
 Supposing this snippet is the content of `foo.cxx` within the
 following minimal code structure
 
-	my_program
-	├── CMakeLists.txt
-	├── resources
-	│   ├── configuration
-	│   └── tables
-	└── source
-		└── foo.cpp
+    my_program
+    ├── CMakeLists.txt
+    ├── resources
+    │   ├── configuration
+    │   └── tables
+    └── source
+        └── foo.cpp
 
 the `CMakeLists.txt` could look like
 
@@ -170,7 +170,7 @@ mu_length = []
 mu_secondaries = []
 
 for i in range(1000):
-	mu.inject_state(mu_backup)
+    mu.inject_state(mu_backup)
     secondaries = prop.propagate()
 
     mu_length.append(prop.particle.propagated_distance / 100)
