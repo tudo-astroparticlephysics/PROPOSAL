@@ -46,8 +46,6 @@ IF(DEBUG)
         SET( CMAKE_CXX_FLAGS "-g -O0" )
 ENDIF()
 
-SET(ICETRAY_INCLUDE_PATH "/home/koehne/Simulation/icesim4_candidate/V04-00-01-RC/icetray/public/")
-
 # Some additional options
 OPTION (ADD_TESTFILE_GEN "Choose to build the testfile-generator." OFF)
 OPTION (ADD_PYTHON "Choose to compile the python wrapper library" ON)
