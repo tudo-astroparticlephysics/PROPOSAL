@@ -47,7 +47,6 @@
 #include "PROPOSAL/math/Interpolant.h"
 #include "PROPOSAL/math/InterpolantBuilder.h"
 #include "PROPOSAL/math/RandomGenerator.h"
-#include "PROPOSAL/math/RootFinder.h"
 #include "PROPOSAL/math/Vector3D.h"
 
 #include "PROPOSAL/particle/ParticleDef.h"
