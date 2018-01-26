@@ -3,7 +3,6 @@
 
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/scattering/ScatteringDefault.h"
-// #include "PROPOSAL/Output.h"
 #include "PROPOSAL/methods.h"
 #include "PROPOSAL/Output.h"
 
@@ -25,7 +24,7 @@ using namespace std;
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-ScatteringDefault::ScatteringDefault(Particle& particle, Utility& utility)
+ScatteringDefault::ScatteringDefault(Particle& particle, const Utility& utility)
     : Scattering(particle)
     , scatter_(new UtilityIntegralScattering(utility))
 {
@@ -35,7 +34,7 @@ ScatteringDefault::ScatteringDefault(Particle& particle, Utility& utility)
     }
 }
 
-ScatteringDefault::ScatteringDefault(Particle& particle, Utility& utility, InterpolationDef interpolation_def)
+ScatteringDefault::ScatteringDefault(Particle& particle, const Utility& utility, const InterpolationDef& interpolation_def)
     : Scattering(particle)
     , scatter_(new UtilityInterpolantScattering(utility, interpolation_def))
 {
@@ -149,7 +148,7 @@ long double ScatteringDefault::CalculateTheta0(double dr, double ei, double ef)
     double radiation_lenght = scatter_->GetUtility().GetMedium().GetRadiationLength();
 
     // TODO: check if one has to take the absolute value of the particle charge
-    aux = sqrt(max(aux, 0.0) / radiation_lenght) * particle_.GetCharge();
+    aux = 13.6 * sqrt(max(aux, 0.0) / radiation_lenght) * particle_.GetCharge();
     aux *= max(1 + 0.038 * log(dr / radiation_lenght), 0.0);
 
     return min(aux, cutoff);
@@ -167,13 +166,13 @@ Scattering::RandomAngles ScatteringDefault::CalculateRandomAngle(double dr, doub
     rnd1 = SQRT2 * Theta0 * erfInv(2. * (RandomGenerator::Get().RandomDouble() - 0.5));
     rnd2 = SQRT2 * Theta0 * erfInv(2. * (RandomGenerator::Get().RandomDouble() - 0.5));
 
-    random_angles.sx = (rnd1 / SQRT3 + rnd2) / 2;
+    random_angles.sx = 0.5 * (rnd1 / SQRT3 + rnd2);
     random_angles.tx = rnd2;
 
     rnd1 = SQRT2 * Theta0 * erfInv(2 * (RandomGenerator::Get().RandomDouble() - 0.5));
     rnd2 = SQRT2 * Theta0 * erfInv(2 * (RandomGenerator::Get().RandomDouble() - 0.5));
 
-    random_angles.sy = (rnd1 / SQRT3 + rnd2) / 2;
+    random_angles.sy = 0.5 * (rnd1 / SQRT3 + rnd2);
     random_angles.ty = rnd2;
 
     return random_angles;

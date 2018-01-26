@@ -32,7 +32,6 @@ Scattering::RandomAngles ScatteringMoliere::CalculateRandomAngle(double dr, doub
 
     double beta_Sq = 1./( 1.+mass*mass/(momentum*momentum) ); //beta² = v²/c²
     double chi_0 = 0.;
-    double ZSq_average = 0.;
 
     vector<double> chi_A_Sq; // screening angle² in rad²
     chi_A_Sq.resize(numComp_);
@@ -43,18 +42,13 @@ Scattering::RandomAngles ScatteringMoliere::CalculateRandomAngle(double dr, doub
         chi_0 = ( ME * ALPHA * pow(Zi_[i] * 128. / (9. * PI * PI), 1./3.) )/momentum ;
         // Calculate Chi_a^2
         chi_A_Sq[i] = chi_0 * chi_0 * ( 1.13 + 3.76 * ALPHA * ALPHA * Zi_[i] * Zi_[i] / beta_Sq );
-
-        // Calculate Z^2_average for Chi_c^2
-        //if case of an electron, replace Z² by Z(Z+1) to into account scatterings
-        //on atomic electrons in the medium
-        if(mass == ME) ZSq_average += weight_[i] * Zi_[i] * (Zi_[i] + 1.);
-        else ZSq_average += weight_[i] * Zi_[i] * Zi_[i];
     }
+
     // Calculate Chi_c^2
     chiCSq_ = ( (4.*PI*NA*ALPHA*ALPHA*HBAR*HBAR*SPEED*SPEED)
                 * (medium_->GetMassDensity()*medium_->GetDensityCorrection()*dr)
                 / (momentum*momentum*beta_Sq) )
-            * ( ZSq_average/A_average_ );
+            * ZSq_A_average_;
 
 
     // Calculate B
@@ -83,18 +77,20 @@ Scattering::RandomAngles ScatteringMoliere::CalculateRandomAngle(double dr, doub
         B_[i] = xn;
     }
 
+    double pre_factor = sqrt(chiCSq_ * B_[max_weight_index_]);
+
     double rnd1,rnd2;
 
-    rnd1 = GetRandom();
-    rnd2 = GetRandom();
+    rnd1 = GetRandom(pre_factor);
+    rnd2 = GetRandom(pre_factor);
 
-    random_angles.sx = (rnd1/SQRT3+rnd2)/2;
+    random_angles.sx = 0.5*(rnd1/SQRT3+rnd2);
     random_angles.tx = rnd2;
 
-    rnd1 = GetRandom();
-    rnd2 = GetRandom();
+    rnd1 = GetRandom(pre_factor);
+    rnd2 = GetRandom(pre_factor);
 
-    random_angles.sy = (rnd1/SQRT3+rnd2)/2;
+    random_angles.sy = 0.5*(rnd1/SQRT3+rnd2);
     random_angles.ty = rnd2;
 
     return random_angles;
@@ -111,15 +107,18 @@ ScatteringMoliere::ScatteringMoliere(Particle& particle, const Medium& medium)
     : Scattering(particle)
     , medium_(medium.clone())
     , numComp_(medium_->GetNumComponents())
-    , A_average_(0.0)
+    , ZSq_A_average_(0.0)
     , Zi_(numComp_)
-    , weight_(numComp_)
+    , weight_ZZ_(numComp_)
+    , weight_ZZ_sum_(0.)
+    , max_weight_index_(0)
     , chiCSq_(0.0)
     , B_(numComp_)
 {
     std::vector<double> Ai(numComp_, 0); // atomic number of different components
     std::vector<double> ki(numComp_, 0); // number of atoms in molecule of different components
-    double A = 0.;
+    std::vector<double> weight(numComp_, 0); // number of atoms in molecule of different components
+    double A_sum = 0.;
 
     for (int i = 0; i < numComp_; i++)
     {
@@ -128,13 +127,36 @@ ScatteringMoliere::ScatteringMoliere(Particle& particle, const Medium& medium)
         ki[i] = component->GetAtomInMolecule();
         Ai[i] = component->GetAtomicNum();
 
-        A += ki[i] * Ai[i];
+        A_sum += ki[i] * Ai[i];
     }
+
+    double A_average = 0.;
+    double ZSq_average = 0.;
 
     for(int i = 0; i < numComp_; i++)
     {
-        weight_[i] = ki[i] * Ai[i] / A;
-        A_average_ += weight_[i] * Ai[i];
+        weight[i] = ki[i] * Ai[i] / A_sum;
+        A_average += weight[i] * Ai[i];
+        weight_ZZ_[i] = weight[i] * Zi_[i] * Zi_[i];
+        weight_ZZ_sum_ += weight_ZZ_[i];
+
+        // Calculate Z^2_average for Chi_c^2
+        // if case of an electron, replace Z^2 by Z(Z+1) to into account scatterings
+        // on atomic electrons in the medium
+        if(particle_.GetMass() == ME) ZSq_average += weight[i] * Zi_[i] * (Zi_[i] + 1.);
+        else ZSq_average += weight_ZZ_[i];
+    }
+    weight_ZZ_sum_ = 1./weight_ZZ_sum_;
+    ZSq_A_average_ = ZSq_average/A_average;
+
+    // guessing an initial value by assuming a gaussian distribution
+    // only regarding the component with maximum weight
+    // needed in the method GetRandom()
+    int max_weight_index_ = 0;
+    for (int i = 0; i + 1 < numComp_; i++)
+    {
+        if (weight[i+1] > weight[i])
+            max_weight_index_ = i + 1;
     }
 }
 
@@ -142,9 +164,11 @@ ScatteringMoliere::ScatteringMoliere(const ScatteringMoliere& scattering)
     : Scattering(scattering)
     , medium_(scattering.medium_->clone())
     , numComp_(scattering.numComp_)
-    , A_average_(scattering.A_average_)
+    , ZSq_A_average_(scattering.ZSq_A_average_)
     , Zi_(scattering.Zi_)
-    , weight_(scattering.weight_)
+    , weight_ZZ_(scattering.weight_ZZ_)
+    , weight_ZZ_sum_(scattering.weight_ZZ_sum_)
+    , max_weight_index_(scattering.max_weight_index_)
     , chiCSq_(scattering.chiCSq_)
     , B_(scattering.B_)
 {
@@ -154,9 +178,11 @@ ScatteringMoliere::ScatteringMoliere(Particle& particle, const ScatteringMoliere
     : Scattering(particle)
     , medium_(scattering.medium_->clone())
     , numComp_(scattering.numComp_)
-    , A_average_(scattering.A_average_)
+    , ZSq_A_average_(scattering.ZSq_A_average_)
     , Zi_(scattering.Zi_)
-    , weight_(scattering.weight_)
+    , weight_ZZ_(scattering.weight_ZZ_)
+    , weight_ZZ_sum_(scattering.weight_ZZ_sum_)
+    , max_weight_index_(scattering.max_weight_index_)
     , chiCSq_(scattering.chiCSq_)
     , B_(scattering.B_)
 {
@@ -181,11 +207,15 @@ bool ScatteringMoliere::compare(const Scattering& scattering) const
         return false;
     else if (numComp_ != scatteringMoliere->numComp_)
         return false;
-    else if (A_average_ != scatteringMoliere->A_average_)
+    else if (ZSq_A_average_ != scatteringMoliere->ZSq_A_average_)
         return false;
     else if (Zi_ != scatteringMoliere->Zi_)
         return false;
-    else if (weight_ != scatteringMoliere->weight_)
+    else if (weight_ZZ_ != scatteringMoliere->weight_ZZ_)
+        return false;
+    else if (weight_ZZ_sum_ != scatteringMoliere->weight_ZZ_sum_)
+        return false;
+    else if (max_weight_index_ != scatteringMoliere->max_weight_index_)
         return false;
     else if (chiCSq_ != scatteringMoliere->chiCSq_)
         return false;
@@ -262,18 +292,16 @@ double ScatteringMoliere::f2M(double x)
 double ScatteringMoliere::f(double theta)
 {
     double y1 = 0;
-    double y2 = 0;
 
     for (int i = 0; i < numComp_; i++)
     {
         double x = theta * theta / (chiCSq_ * B_[i]);
 
-        y1 += weight_[i] * Zi_[i] * Zi_[i] / sqrt(chiCSq_ * B_[i] * PI) *
+        y1 += weight_ZZ_[i] / sqrt(chiCSq_ * B_[i] * PI) *
               (exp(-x) + f1M(x) / B_[i] + f2M(x) / (B_[i] * B_[i]));
-        y2 += weight_[i] * Zi_[i] * Zi_[i];
     }
 
-    return y1 / y2;
+    return y1 * weight_ZZ_sum_;
 }
 
 //----------------------------------------------------------------------------//
@@ -345,25 +373,23 @@ double ScatteringMoliere::F2M(double x)
 double ScatteringMoliere::F(double theta)
 {
     double y1 = 0;
-    double y2 = 0;
 
     for (int i = 0; i < numComp_; i++)
     {
         double x = theta * theta / (chiCSq_ * B_[i]);
 
-        y1 += weight_[i] * Zi_[i] * Zi_[i] *
+        y1 += weight_ZZ_[i] *
               (0.5 * boost::math::erf(sqrt(x)) + sqrt(1. / PI) * (F1M(x) / B_[i] + F2M(x) / (B_[i] * B_[i])));
-        y2 += weight_[i] * Zi_[i] * Zi_[i];
     }
 
-    return (theta < 0.) ? (-1.) * y1 / y2 : y1 / y2;
+    return (theta < 0.) ? (-1.) * y1*weight_ZZ_sum_ : y1*weight_ZZ_sum_;
 }
 
 //----------------------------------------------------------------------------//
 //-------------------------generate random angle------------------------------//
 //----------------------------------------------------------------------------//
 
-double ScatteringMoliere::GetRandom()
+double ScatteringMoliere::GetRandom(double pre_factor)
 {
     //  Generate random angles following Moliere's distribution by comparing a
     //  uniformly distributed random number with the integral of the distribution.
@@ -376,18 +402,10 @@ double ScatteringMoliere::GetRandom()
     double theta_n;
 
     // guessing an initial value by assuming a gaussian distribution
-    // only regarding the component j with maximum weight
-
-    int j = 0;
-    for (int i = 0; i + 1 < numComp_; i++)
-    {
-        if (weight_[i+1] > weight_[i])
-            j = i + 1;
-    }
-    double theta_np1 = sqrt(chiCSq_ * B_[j]) * erfInv(2. * rndm);
+    // only regarding the component with maximum weight
+    double theta_np1 = pre_factor * erfInv(2. * rndm);
 
     // iterating until the number of correct digits is greater than 4
-
     do
     {
         theta_n   = theta_np1;

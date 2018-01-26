@@ -67,9 +67,11 @@ bool ScatteringHighland::compare(const Scattering& scattering) const
 
 double ScatteringHighland::CalculateTheta0(double dr)
 {
+    // eq 6 of Lynch, Dahl
+    // Nuclear Instruments and Methods in Physics Research Section B 58 (1991)
     double y = dr/medium_->GetRadiationLength();
     double beta = 1./sqrt(1 +  particle_.GetMass() * particle_.GetMass()/ (particle_.GetMomentum()*particle_.GetMomentum() ));
-    y = 13.6/(particle_.GetMomentum()* beta ) *sqrt(y)*( 1.+0.088*log10(y) );
+    y = 13.6*particle_.GetCharge()/(particle_.GetMomentum()*beta) *sqrt(y)*( 1.+0.088*log10(y) );
     return y;
 }
 
@@ -88,13 +90,13 @@ Scattering::RandomAngles ScatteringHighland::CalculateRandomAngle(double dr, dou
     rnd1 = SQRT2*Theta0*erfInv( 2.*(RandomGenerator::Get().RandomDouble()-0.5) );
     rnd2 = SQRT2*Theta0*erfInv( 2.*(RandomGenerator::Get().RandomDouble()-0.5) );
 
-    random_angles.sx = (rnd1/SQRT3+rnd2)/2;
+    random_angles.sx = 0.5 * (rnd1/SQRT3+rnd2);
     random_angles.tx = rnd2;
 
     rnd1 = SQRT2*Theta0*erfInv(2*(RandomGenerator::Get().RandomDouble()-0.5));
     rnd2 = SQRT2*Theta0*erfInv(2*(RandomGenerator::Get().RandomDouble()-0.5));
 
-    random_angles.sy = (rnd1/SQRT3+rnd2)/2;
+    random_angles.sy = 0.5 * (rnd1/SQRT3+rnd2);
     random_angles.ty = rnd2;
 
     return random_angles;
