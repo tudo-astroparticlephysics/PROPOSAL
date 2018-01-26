@@ -501,7 +501,7 @@ void export_parametrizations()
 
         .def(self_ns::str(self_ns::self))
 
-        .def("differntial_crosssection", &Parametrization::DifferentialCrossSection)
+        .def("differential_crosssection", &Parametrization::DifferentialCrossSection)
         .def("dEdx_integrand", &Parametrization::FunctionToDEdxIntegral)
         .def("dE2dx_integrand", &Parametrization::FunctionToDE2dxIntegral)
         .def("dNdx_integrand", &Parametrization::FunctionToDNdxIntegral)

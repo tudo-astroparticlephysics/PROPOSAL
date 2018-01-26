@@ -44,11 +44,11 @@ class ScatteringFactory
 
     // Scattering* CreateScattering(const std::string&, Particle&, Utility&);
 
-    Scattering* CreateScattering(const std::string&, Particle&, Utility&, const InterpolationDef&);
-    Scattering* CreateScattering(const Enum, Particle&, Utility&, const InterpolationDef&);
+    Scattering* CreateScattering(const std::string&, Particle&, const Utility&, const InterpolationDef&);
+    Scattering* CreateScattering(const Enum, Particle&, const Utility&, const InterpolationDef&);
 
-    Scattering* CreateScattering(const std::string&, Particle&, Utility&);
-    Scattering* CreateScattering(const Enum, Particle&, Utility&);
+    Scattering* CreateScattering(const std::string&, Particle&, const Utility&);
+    Scattering* CreateScattering(const Enum, Particle&, const Utility&);
 
     // Scattering* CreateScattering(const Enum, Particle&, Utility&);
 
@@ -72,7 +72,7 @@ class ScatteringFactory
     ScatteringFactory();
     ~ScatteringFactory();
 
-    void Register(const std::string& name, Enum);
+    void Register(const std::string& name, const Enum);
 
     std::vector<Enum> registerd_enum;
     std::vector<std::string> registerd_str;
