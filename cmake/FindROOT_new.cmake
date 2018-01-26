@@ -1,3 +1,5 @@
+# copied from https://github.com/FairRootGroup/FairRoot
+
 ################################################################################
 #    Copyright (C) 2014 GSI Helmholtzzentrum fuer Schwerionenforschung GmbH    #
 #                                                                              #
