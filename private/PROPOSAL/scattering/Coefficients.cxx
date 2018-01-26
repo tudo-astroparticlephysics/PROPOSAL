@@ -6,7 +6,7 @@
 //---for calculating the power series approximation of the moliere function---//
 //----------------------------------------------------------------------------//
 
-double PROPOSAL::c1[100] =
+const double PROPOSAL::c1[100] =
 {
 	0.01824498698928826,
 	-1.054734960967865,
@@ -110,7 +110,7 @@ double PROPOSAL::c1[100] =
 	-4.909819238915968e-154
 };
 
-double PROPOSAL::c2[100] =
+const double PROPOSAL::c2[100] =
 {
 	0.3692951315189029,
 	-2.901210618562379,
@@ -214,7 +214,7 @@ double PROPOSAL::c2[100] =
 	-1.141626881676896e-151
 };
 
-double PROPOSAL::c2large[50] =
+const double PROPOSAL::c2large[50] =
 {
 	0,
 	0,
@@ -268,7 +268,7 @@ double PROPOSAL::c2large[50] =
 	4.077239907010832e+65
 };
 
-double PROPOSAL::s2large[50] =
+const double PROPOSAL::s2large[50] =
 {
 	0,
 	0,
@@ -322,7 +322,7 @@ double PROPOSAL::s2large[50] =
 	-1.945918825363185
 };
 
-double PROPOSAL::C1large[50] =
+const double PROPOSAL::C1large[50] =
 {
 	0,
 	-0.443113462726379,

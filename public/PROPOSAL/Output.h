@@ -64,7 +64,6 @@
             LOG4CPLUS_NOTICE(Output::getInstance().logger, VA_ARG(0, __VA_ARGS__) ) , \
             LOG4CPLUS_NOTICE_FMT(Output::getInstance().logger, __VA_ARGS__ ) )
 
-        // using namespace log4cplus;  // no using directives in header
     #else
         #ifndef log_error
             #define log_error(fmt, ...) (void)0

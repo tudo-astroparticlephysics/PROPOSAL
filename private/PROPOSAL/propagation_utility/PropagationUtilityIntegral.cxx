@@ -233,7 +233,7 @@ double UtilityIntegralScattering::FunctionToIntegral(double energy)
 
     //TODO(mario): Better way? Sat 2017/09/02
     double square_momentum = energy * energy - utility_.GetParticleDef().mass * utility_.GetParticleDef().mass;
-    aux2    =   RY* energy / square_momentum;
+    aux2 = energy / square_momentum;
 
     return UtilityDecorator::FunctionToIntegral(energy) * aux2 * aux2;
 }

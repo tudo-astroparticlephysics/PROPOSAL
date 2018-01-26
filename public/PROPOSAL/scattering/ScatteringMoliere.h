@@ -41,9 +41,11 @@ class ScatteringMoliere : public Scattering
     const Medium* medium_;
 
     int numComp_;                // number of components in medium
-    double A_average_;
+    double ZSq_A_average_;
     std::vector<double> Zi_;     // nuclear charge of different components
-    std::vector<double> weight_; // mass weights of different components
+    std::vector<double> weight_ZZ_; // mass weights of different components time Z^2
+    double weight_ZZ_sum_;       // inverse of sum of mass weights of different components time Z^2
+    int max_weight_index_;       // index of the maximium of mass weights of different components
 
     // scattering parameters
     double chiCSq_;              // characteristic angle² in rad²
@@ -66,7 +68,7 @@ class ScatteringMoliere : public Scattering
     //----------------------------------------------------------------------------//
     //----------------------------------------------------------------------------//
 
-    double GetRandom();
+    double GetRandom(double pre_factor);
 
 };
 }
