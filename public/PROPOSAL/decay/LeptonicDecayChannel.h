@@ -5,7 +5,6 @@
 
 #include "PROPOSAL/decay/DecayChannel.h"
 #include "PROPOSAL/particle/ParticleDef.h"
-#include "PROPOSAL/math/RootFinder.h"
 
 namespace PROPOSAL
 {
@@ -15,42 +14,40 @@ class Particle;
 class LeptonicDecayChannel : public DecayChannel
 {
     public:
-    LeptonicDecayChannel(const ParticleDef&, const ParticleDef&, const ParticleDef&);
-    LeptonicDecayChannel(const LeptonicDecayChannel& mode);
-    virtual ~LeptonicDecayChannel();
-    // No copy and assignemnt -> done by clone
-    DecayChannel* clone() const { return new LeptonicDecayChannel(*this); }
+        LeptonicDecayChannel(const ParticleDef&, const ParticleDef&, const ParticleDef&);
+        LeptonicDecayChannel(const LeptonicDecayChannel& mode);
+        virtual ~LeptonicDecayChannel();
+        // No copy and assignemnt -> done by clone
+        DecayChannel* clone() const { return new LeptonicDecayChannel(*this); }
 
-    DecayProducts Decay(const Particle&);
+        DecayProducts Decay(const Particle&);
 
-    const std::string& GetName() const { return name_; }
+        const std::string& GetName() const { return name_; }
 
     private:
-    LeptonicDecayChannel& operator=(const LeptonicDecayChannel&); // Undefined & not allowed
+        ParticleDef massive_lepton_;
+        ParticleDef neutrino_;
+        ParticleDef anti_neutrino_;
+        static const std::string name_;
 
-    bool compare(const DecayChannel&) const;
-    void print(std::ostream&) const;
+        LeptonicDecayChannel& operator=(const LeptonicDecayChannel&); // Undefined & not allowed
 
-    // ----------------------------------------------------------------------------
-    /// @brief Function for electron energy calculation - interface to FindRoot
-    // ----------------------------------------------------------------------------
-    double DecayRate(double, double);
+        bool compare(const DecayChannel&) const;
+        void print(std::ostream&) const;
 
-    // ----------------------------------------------------------------------------
-    /// @brief Function for electron energy calculation - interface to FindRoot
-    // ----------------------------------------------------------------------------
-    double DifferentialDecayRate(double);
+        // ----------------------------------------------------------------------------
+        /// @brief Function for electron energy calculation - interface to FindRoot
+        // ----------------------------------------------------------------------------
+        double DecayRate(double, double);
 
-    std::pair<double, double> function_and_derivative(double x, double right_side);
+        // ----------------------------------------------------------------------------
+        /// @brief Function for electron energy calculation - interface to FindRoot
+        // ----------------------------------------------------------------------------
+        double DifferentialDecayRate(double);
 
-    double FindRootBoost(double min, double right_side);
+        std::pair<double, double> function_and_derivative(double x, double right_side);
 
-    ParticleDef massive_lepton_;
-    ParticleDef neutrino_;
-    ParticleDef anti_neutrino_;
-
-    RootFinder root_finder_;
-    static const std::string name_;
+        double FindRootBoost(double min, double right_side);
 };
 
 } /* PROPOSAL */
