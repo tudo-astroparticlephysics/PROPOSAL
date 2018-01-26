@@ -20,13 +20,8 @@ LeptonicDecayChannel::LeptonicDecayChannel(const ParticleDef& lepton,
                                            const ParticleDef& anti_neutrino)
     : DecayChannel()
     , massive_lepton_(lepton)
-    // , neutrino_()
-    // , anti_neutrino_()
     , neutrino_(neutrino)
     , anti_neutrino_(anti_neutrino)
-    // , neutrino_(GetNeutrino(massive_lepton_))
-    // , anti_neutrino_(GetAntiNeutrino(massive_lepton_))
-    , root_finder_(IMAXS, IPREC)
 {
 }
 
@@ -39,7 +34,6 @@ LeptonicDecayChannel::LeptonicDecayChannel(const LeptonicDecayChannel& mode)
     , massive_lepton_(mode.massive_lepton_)
     , neutrino_(mode.neutrino_)
     , anti_neutrino_(mode.anti_neutrino_)
-    , root_finder_(mode.root_finder_)
 {
 }
 
@@ -61,9 +55,7 @@ bool LeptonicDecayChannel::compare(const DecayChannel& channel) const
 
 double LeptonicDecayChannel::DecayRate(double x, double right_side)
 {
-    double x2;
-    x2  =   x*x;
-    return  x*x2 - x2*x2/2 - right_side;
+    return  x*x*x*(1. - 0.5*x) - right_side;
 }
 
 double LeptonicDecayChannel::DifferentialDecayRate(double x)
@@ -81,7 +73,8 @@ double LeptonicDecayChannel::FindRootBoost(double min, double right_side)
     double max = 1;
     double x_start = 0.5;
     int binary_digits = 6;
-    // int max_steps = 20;
+    // in older versions a max_step was set to 40, which were the max number of int steps
+    // int max_steps = 40;
 
     return boost::math::tools::newton_raphson_iterate(
         boost::bind(&LeptonicDecayChannel::function_and_derivative, this, _1, right_side)
@@ -92,11 +85,8 @@ double LeptonicDecayChannel::FindRootBoost(double min, double right_side)
         );
 }
 
-
 DecayChannel::DecayProducts LeptonicDecayChannel::Decay(const Particle& particle)
 {
-    double emax, x0, f0, el, pl, right_side;
-    double lm  =   ME;
     double parent_mass = particle.GetMass();
 
     DecayProducts products;
@@ -105,34 +95,23 @@ DecayChannel::DecayProducts LeptonicDecayChannel::Decay(const Particle& particle
     products.push_back(new Particle(anti_neutrino_));
 
     // Sample energy from decay rate
-    double ernd = RandomGenerator::Get().RandomDouble();
-    // double arnd = RandomGenerator::Get().RandomDouble();
+    double emax = (parent_mass*parent_mass + massive_lepton_.mass*massive_lepton_.mass) / (2*parent_mass);
+    double x_min = massive_lepton_.mass/emax;
+    double f_min = x_min*x_min*x_min*(1 - 0.5*x_min);
+    double right_side = f_min + (0.5-f_min)*RandomGenerator::Get().RandomDouble();
 
-    emax    =   (parent_mass*parent_mass + lm*lm) / (2*parent_mass);
-    x0      =   lm/emax;
-    f0      =   x0*x0;
-    f0      =   f0*x0 - f0*f0/2;
-    right_side = f0+(0.5-f0)*ernd;
+    double find_root = FindRootBoost(x_min, right_side);
 
-    // double find_root_old = root_finder_.FindRoot(
-    //         x0, 1.0, 0.5,
-    //         boost::bind(&LeptonicDecayChannel::DecayRate, this, _1, right_side),
-    //         boost::bind(&LeptonicDecayChannel::DifferentialDecayRate, this, _1));
-
-    double find_root_new = FindRootBoost(x0, right_side);
-
-    // printf("%f %f\n", find_root_old, find_root_new);
-
-    el = std::max(find_root_new *emax, lm);
-    pl = sqrt(el*el - lm*lm);
+    double lepton_energy = std::max(find_root * emax, massive_lepton_.mass);
+    double lepton_momentum = sqrt(lepton_energy*lepton_energy - massive_lepton_.mass*massive_lepton_.mass);
 
     // Sample directions For the massive letpon
     products[0]->SetDirection(GenerateRandomDirection());
-    products[0]->SetMomentum(pl);
+    products[0]->SetMomentum(lepton_momentum);
 
     // Sample directions For the massless letpon
-    double energy_neutrinos = parent_mass - el;
-    double virtual_mass     = std::sqrt((energy_neutrinos - pl) * (energy_neutrinos + pl));
+    double energy_neutrinos = parent_mass - lepton_energy;
+    double virtual_mass = std::sqrt((energy_neutrinos - lepton_momentum) * (energy_neutrinos + lepton_momentum));
     double momentum_neutrinos = 0.5 * virtual_mass;
     Vector3D direction = GenerateRandomDirection();
 
@@ -143,7 +122,7 @@ DecayChannel::DecayProducts LeptonicDecayChannel::Decay(const Particle& particle
     products[2]->SetMomentum(momentum_neutrinos);
 
     // Boost neutrinos to lepton frame
-    double beta = pl / energy_neutrinos;
+    double beta = lepton_momentum / energy_neutrinos;
     Boost(*products[1], products[0]->GetDirection(), -beta);
     Boost(*products[2], products[0]->GetDirection(), -beta);
 
