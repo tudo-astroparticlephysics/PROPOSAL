@@ -32,7 +32,7 @@ ScatteringFactory::~ScatteringFactory()
     string_enum_.clear();
 }
 
-void ScatteringFactory::Register(const std::string& name, Enum model)
+void ScatteringFactory::Register(const std::string& name, const Enum model)
 {
     registerd_str.push_back(name);
     registerd_enum.push_back(model);
@@ -41,7 +41,7 @@ void ScatteringFactory::Register(const std::string& name, Enum model)
 }
 
 // ------------------------------------------------------------------------- //
-Scattering* ScatteringFactory::CreateScattering(const std::string& name, Particle& particle, Utility& utility, const InterpolationDef& interpolation_def)
+Scattering* ScatteringFactory::CreateScattering(const std::string& name, Particle& particle, const Utility& utility, const InterpolationDef& interpolation_def)
 {
     std::string name_lower = boost::algorithm::to_lower_copy(name);
 
@@ -78,7 +78,7 @@ Scattering* ScatteringFactory::CreateScattering(const std::string& name, Particl
 }
 
 // ------------------------------------------------------------------------- //
-Scattering* ScatteringFactory::CreateScattering(const Enum model, Particle& particle, Utility& utility, const InterpolationDef& interpolation_def)
+Scattering* ScatteringFactory::CreateScattering(const Enum model, Particle& particle, const Utility& utility, const InterpolationDef& interpolation_def)
 {
     std::vector<Enum>::const_iterator iter;
     iter = std::find(registerd_enum.begin(), registerd_enum.end(), model);
@@ -113,7 +113,7 @@ Scattering* ScatteringFactory::CreateScattering(const Enum model, Particle& part
 }
 
 // ------------------------------------------------------------------------- //
-Scattering* ScatteringFactory::CreateScattering(const std::string& name, Particle& particle, Utility& utility)
+Scattering* ScatteringFactory::CreateScattering(const std::string& name, Particle& particle, const Utility& utility)
 {
     std::string name_lower = boost::algorithm::to_lower_copy(name);
 
@@ -150,7 +150,7 @@ Scattering* ScatteringFactory::CreateScattering(const std::string& name, Particl
 }
 
 // ------------------------------------------------------------------------- //
-Scattering* ScatteringFactory::CreateScattering(const Enum model, Particle& particle, Utility& utility)
+Scattering* ScatteringFactory::CreateScattering(const Enum model, Particle& particle, const Utility& utility)
 {
     std::vector<Enum>::const_iterator iter;
     iter = std::find(registerd_enum.begin(), registerd_enum.end(), model);

@@ -16,8 +16,8 @@ struct InterpolationDef;
 class ScatteringDefault: public Scattering
 {
     public:
-    ScatteringDefault(Particle&, Utility&);
-    ScatteringDefault(Particle&, Utility&, InterpolationDef);
+    ScatteringDefault(Particle&, const Utility&);
+    ScatteringDefault(Particle&, const Utility&, const InterpolationDef&);
 
     // Copy constructor
     ScatteringDefault(Particle&, const Utility&, const ScatteringDefault&);
@@ -35,9 +35,7 @@ class ScatteringDefault: public Scattering
     bool compare(const Scattering&) const;
 
     RandomAngles CalculateRandomAngle(double dr, double ei, double ef);
-    long double CalculateTheta0(double dr,
-                                double ei,
-                                double ef);
+    long double CalculateTheta0(double dr, double ei, double ef);
 
     UtilityDecorator* scatter_;
 };
