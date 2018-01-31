@@ -71,7 +71,7 @@ TEST(Propagation, Test_nan)
 TEST(Propagation, particle_type)
 {
     ifstream in;
-    string filename = "bin/TestFiles/propagation.txt";
+    string filename = "bin/TestFiles/Propagator_propagation.txt";
     in.open(filename.c_str());
 
     if (!in.good())

@@ -2,7 +2,7 @@
 #include <boost/bind.hpp>
 
 #include "PROPOSAL/math/RandomGenerator.h"
-#include "PROPOSAL/scattering/ScatteringDefault.h"
+#include "PROPOSAL/scattering/ScatteringHighlandIntegral.h"
 #include "PROPOSAL/methods.h"
 #include "PROPOSAL/Output.h"
 
@@ -24,7 +24,7 @@ using namespace std;
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-ScatteringDefault::ScatteringDefault(Particle& particle, const Utility& utility)
+ScatteringHighlandIntegral::ScatteringHighlandIntegral(Particle& particle, const Utility& utility)
     : Scattering(particle)
     , scatter_(new UtilityIntegralScattering(utility))
 {
@@ -34,7 +34,7 @@ ScatteringDefault::ScatteringDefault(Particle& particle, const Utility& utility)
     }
 }
 
-ScatteringDefault::ScatteringDefault(Particle& particle, const Utility& utility, const InterpolationDef& interpolation_def)
+ScatteringHighlandIntegral::ScatteringHighlandIntegral(Particle& particle, const Utility& utility, const InterpolationDef& interpolation_def)
     : Scattering(particle)
     , scatter_(new UtilityInterpolantScattering(utility, interpolation_def))
 {
@@ -44,13 +44,13 @@ ScatteringDefault::ScatteringDefault(Particle& particle, const Utility& utility,
     }
 }
 
-ScatteringDefault::ScatteringDefault(const ScatteringDefault& scattering)
+ScatteringHighlandIntegral::ScatteringHighlandIntegral(const ScatteringHighlandIntegral& scattering)
     : Scattering(scattering)
     , scatter_(scattering.scatter_->clone(scattering.scatter_->GetUtility()))
 {
 }
 
-ScatteringDefault::ScatteringDefault(Particle& particle, const Utility& utility, const ScatteringDefault& scattering)
+ScatteringHighlandIntegral::ScatteringHighlandIntegral(Particle& particle, const Utility& utility, const ScatteringHighlandIntegral& scattering)
     : Scattering(particle)
     , scatter_(scattering.scatter_->clone(utility))
 {
@@ -60,11 +60,11 @@ ScatteringDefault::ScatteringDefault(Particle& particle, const Utility& utility,
     }
     if (utility != scattering.scatter_->GetUtility())
     {
-        log_fatal("Utilities of the ScatteringDefault should have same values!");
+        log_fatal("Utilities of the ScatteringHighlandIntegral should have same values!");
     }
 }
 
-ScatteringDefault::~ScatteringDefault()
+ScatteringHighlandIntegral::~ScatteringHighlandIntegral()
 {
     delete scatter_;
 }
@@ -89,13 +89,13 @@ ScatteringDefault::~ScatteringDefault()
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-bool ScatteringDefault::compare(const Scattering& scattering) const
+bool ScatteringHighlandIntegral::compare(const Scattering& scattering) const
 {
-    const ScatteringDefault* scatteringDefault = dynamic_cast<const ScatteringDefault*>(&scattering);
+    const ScatteringHighlandIntegral* scatteringHighlandIntegral = dynamic_cast<const ScatteringHighlandIntegral*>(&scattering);
 
-    if (!scatteringDefault)
+    if (!scatteringHighlandIntegral)
         return false;
-    else if (*scatter_ != *scatteringDefault->scatter_)
+    else if (*scatter_ != *scatteringHighlandIntegral->scatter_)
         return false;
     else
         return true;
@@ -141,7 +141,7 @@ bool ScatteringDefault::compare(const Scattering& scattering) const
 
 
 //----------------------------------------------------------------------------//
-long double ScatteringDefault::CalculateTheta0(double dr, double ei, double ef)
+long double ScatteringHighlandIntegral::CalculateTheta0(double dr, double ei, double ef)
 {
     double aux              = scatter_->Calculate(ei, ef, 0.0);
     double cutoff           = 1;
@@ -156,7 +156,7 @@ long double ScatteringDefault::CalculateTheta0(double dr, double ei, double ef)
 
 //----------------------------------------------------------------------------//
 
-Scattering::RandomAngles ScatteringDefault::CalculateRandomAngle(double dr, double ei, double ef)
+Scattering::RandomAngles ScatteringHighlandIntegral::CalculateRandomAngle(double dr, double ei, double ef)
 {
     double Theta0, rnd1, rnd2;
     Scattering::RandomAngles random_angles;

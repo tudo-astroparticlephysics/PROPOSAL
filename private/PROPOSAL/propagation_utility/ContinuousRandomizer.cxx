@@ -18,12 +18,12 @@ using namespace PROPOSAL;
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-ContinuousRandomizer::ContinuousRandomizer(Utility& utility)
+ContinuousRandomizer::ContinuousRandomizer(const Utility& utility)
 {
     DE2de = new UtilityIntegralContRand(utility);
 }
 
-ContinuousRandomizer::ContinuousRandomizer(Utility& utility, InterpolationDef interpolation_def)
+ContinuousRandomizer::ContinuousRandomizer(const Utility& utility, const InterpolationDef interpolation_def)
 {
     DE2de = new UtilityInterpolantContRand(utility, interpolation_def);
 }

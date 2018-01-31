@@ -2,11 +2,9 @@
 
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Output.h"
-// #include "PROPOSAL/continous_randomization/ContinuousRandomization.h"
+
 #include "PROPOSAL/decay/DecayChannel.h"
 #include "PROPOSAL/crossection/CrossSection.h"
-
-#include "PROPOSAL/scattering/ScatteringDefault.h"
 
 #include "PROPOSAL/geometry/Geometry.h"
 #include "PROPOSAL/geometry/Sphere.h"
@@ -55,6 +53,36 @@ Sector::Definition::Definition(const Definition& def)
     , medium_(def.medium_->clone())
     , geometry_(def.geometry_->clone())
 {
+}
+
+bool Sector::Definition::operator==(const Definition& sector_def) const
+{
+    if (do_weighting != sector_def.do_weighting)
+        return false;
+    else if(weighting_order != sector_def.weighting_order)
+        return false;
+    else if(stopping_decay != sector_def.stopping_decay)
+        return false;
+    else if(do_continuous_randomization != sector_def.do_continuous_randomization)
+        return false;
+    else if(do_exact_time_calculation != sector_def.do_exact_time_calculation)
+        return false;
+    else if(scattering_model != sector_def.scattering_model)
+        return false;
+    else if(location != sector_def.location)
+        return false;
+    // else if(utility_def != sector_def.utility_def)
+    //     return false;
+    else if(*medium_ != *sector_def.medium_)
+        return false;
+    else if(*geometry_ != *sector_def.geometry_)
+        return false;
+    return true;
+}
+
+bool Sector::Definition::operator!=(const Definition& sector_def) const
+{
+    return !(*this == sector_def);
 }
 
 Sector::Definition::~Definition()
@@ -250,6 +278,30 @@ Sector::Sector(const Sector& collection)
     }
 }
 
+bool Sector::operator==(const Sector& sector) const
+{
+    if (sector_def_ != sector.sector_def_)
+        return false;
+    else if(weighting_starts_at_ != sector.weighting_starts_at_)
+        return false;
+    else if(particle_ != sector.particle_)
+        return false;
+    else if(*geometry_ != *sector.geometry_)
+        return false;
+    else if(utility_ != sector.utility_)
+        return false;
+    else if(*cont_rand_ != *sector.cont_rand_)
+        return false;
+    else if(*scattering_ != *sector.scattering_)
+        return false;
+    return true;
+}
+
+bool Sector::operator!=(const Sector& sector) const
+{
+    return !(*this == sector);
+}
+
 Sector::~Sector()
 {
     delete geometry_;
@@ -325,8 +377,12 @@ double Sector::Propagate(double distance)
             final_energy         = energy_till_stochastic_.second;
         }
 
-        // Calculate the displacement according to initial energy initial_energy and final_energy
-        displacement = displacement_calculator_->Calculate(initial_energy, final_energy, utility_.GetMedium().GetDensityCorrection() * (distance - propagated_distance)) / utility_.GetMedium().GetDensityCorrection();
+        // Calculate the displacement according to initial energy and final_energy
+        displacement = displacement_calculator_->Calculate(
+            initial_energy,
+            final_energy,
+            utility_.GetMedium().GetDensityCorrection() * (distance - propagated_distance))
+            / utility_.GetMedium().GetDensityCorrection();
 
         // The first interaction or decay happens behind the distance we want to propagate
         // So we calculate the final energy using only continuous losses
@@ -616,75 +672,3 @@ pair<double, DynamicData::Type> Sector::MakeStochasticLoss()
     return energy_loss;
 }
 
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-// DecayChannel::DecayProducts Sector::MakeDecay()
-// {
-//     const DecayChannel* mode = particle_->GetDecayTable().SelectChannel();
-//     return mode->Decay(particle_);
-// }
-
-// pair<double, ParticleType::Enum> Sector::MakeDecay()
-// {
-//     // --------------------------------------------------------------------- //
-//     // Calculate random numbers before passing to a fuction, because
-//     // the order of argument evaluation is unspecified in c++ standards and
-//     // therfor depend on the compiler.
-//     // --------------------------------------------------------------------- //
-//
-//     pair<double, ParticleType::Enum> decay_pair;
-//     const DecayChannel* mode = particle_->GetDecayTable().SelectChannel();
-//     decay_pair.first = mode->Decay(particle_);
-//
-//     // double rnd1 = MathModel::RandomDouble();
-//     // double rnd2 = MathModel::RandomDouble();
-//     // double rnd3 = MathModel::RandomDouble();
-//     //
-//     // return MakeDecay(rnd1, rnd2, rnd3);
-// }
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-// pair<double, ParticleType::Enum> Sector::MakeDecay(double rnd1,double rnd2, double rnd3)
-// {
-//     pair<double, ParticleType::Enum> decay;
-//
-//     if(particle_->GetType() == ParticleType::TauPlus || particle_->GetType() == ParticleType::TauMinus)
-//     {
-//         decay.first     =   decay_->CalculateProductEnergy(rnd1, rnd2, rnd3);
-//     }
-//     else
-//     {
-//         decay.first     =   decay_->CalculateProductEnergy(rnd2, rnd3, 0.5);
-//     }
-//
-//     decay.second    =   decay_->GetOut();
-//
-//     return decay;
-// }
-
-// double Sector::Randomize(double initial_energy, double final_energy)
-// {
-//     double rnd = RandomGenerator::Get().RandomDouble();
-//     return randomizer_->Randomize(initial_energy, final_energy, rnd);
-// }
-
-// ------------------------------------------------------------------------- //
-// Lpm effect & randomization
-// ------------------------------------------------------------------------- //
-
-
-// void Sector::EnableContinuousRandomization()
-// {
-//     randomizer_                  = new ContinuousRandomization(particle_, medium_, crosssections_);
-//     do_continuous_randomization_ = true;
-// }
-//
-// void Sector::DisableContinuousRandomization()
-// {
-//     delete randomizer_;
-//     randomizer_                  = NULL;
-//     do_continuous_randomization_ = false;
-// }
