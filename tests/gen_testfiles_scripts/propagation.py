@@ -20,7 +20,7 @@ def create_table():
     mu.position = pp.Vector3D(0, 0, 0)
     mu.direction = pp.Vector3D(0, 0, -1)
 
-    with open("testfiles/propagation.txt", "a") as f:
+    with open("TestFiles/Propagator_propagation.txt", "a") as f:
 
         buf = [""]
         buf.append("name")

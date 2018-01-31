@@ -23,7 +23,7 @@ class ScatteringFactory
 
     enum Enum
     {
-        Default = 0,
+        HighlandIntegral = 0,
         Moliere,
         Highland,
         NoScattering

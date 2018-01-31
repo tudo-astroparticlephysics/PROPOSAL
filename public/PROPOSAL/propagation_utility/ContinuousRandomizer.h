@@ -16,8 +16,8 @@ struct InterpolationDef;
 class ContinuousRandomizer
 {
     public:
-    ContinuousRandomizer(Utility&);
-    ContinuousRandomizer(Utility&, InterpolationDef);
+    ContinuousRandomizer(const Utility&);
+    ContinuousRandomizer(const Utility&, const InterpolationDef);
 
     // Copy constructors
     ContinuousRandomizer(const Utility&, const ContinuousRandomizer&);

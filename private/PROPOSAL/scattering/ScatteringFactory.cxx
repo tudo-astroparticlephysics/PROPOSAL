@@ -5,9 +5,9 @@
 
 #include "PROPOSAL/Output.h"
 #include "PROPOSAL/scattering/ScatteringFactory.h"
-#include "PROPOSAL/scattering/ScatteringDefault.h"
 #include "PROPOSAL/scattering/ScatteringMoliere.h"
 #include "PROPOSAL/scattering/ScatteringHighland.h"
+#include "PROPOSAL/scattering/ScatteringHighlandIntegral.h"
 #include "PROPOSAL/scattering/ScatteringNoScattering.h"
 
 #include "PROPOSAL/propagation_utility/PropagationUtility.h"
@@ -19,10 +19,10 @@ ScatteringFactory::ScatteringFactory()
     , registerd_str()
     , string_enum_()
 {
-    Register("highland-integral", Default);
-    Register("moliere", Moliere);
-    Register("highland", Highland);
-    Register("no-scattering", NoScattering);
+    Register("Moliere", Moliere);
+    Register("Highland", Highland);
+    Register("HighlandIntegral", HighlandIntegral);
+    Register("NoScattering", NoScattering);
 }
 
 ScatteringFactory::~ScatteringFactory()
@@ -50,19 +50,19 @@ Scattering* ScatteringFactory::CreateScattering(const std::string& name, Particl
 
     if (iter != registerd_str.end())
     {
-        if (*iter == "default")
+        if (*iter == "HighlandIntegral")
         {
-            return new ScatteringDefault(particle, utility, interpolation_def);
+            return new ScatteringHighlandIntegral(particle, utility, interpolation_def);
         }
-        else if (*iter == "moliere")
+        else if (*iter == "Moliere")
         {
             return new ScatteringMoliere(particle, utility.GetMedium());
         }
-        else if (*iter == "highland")
+        else if (*iter == "Highland")
         {
             return new ScatteringHighland(particle, utility.GetMedium());
         }
-        else if (*iter == "noScattering")
+        else if (*iter == "NoScattering")
         {
             return new ScatteringNoScattering(particle, utility.GetMedium());
         }
@@ -85,9 +85,9 @@ Scattering* ScatteringFactory::CreateScattering(const Enum model, Particle& part
 
     if (iter != registerd_enum.end())
     {
-        if (*iter == Default)
+        if (*iter == HighlandIntegral)
         {
-            return new ScatteringDefault(particle, utility, interpolation_def);
+            return new ScatteringHighlandIntegral(particle, utility, interpolation_def);
         }
         else if (*iter == Moliere)
         {
@@ -115,26 +115,26 @@ Scattering* ScatteringFactory::CreateScattering(const Enum model, Particle& part
 // ------------------------------------------------------------------------- //
 Scattering* ScatteringFactory::CreateScattering(const std::string& name, Particle& particle, const Utility& utility)
 {
-    std::string name_lower = boost::algorithm::to_lower_copy(name);
+    // std::string name_lower = boost::algorithm::to_lower_copy(name);
 
     std::vector<std::string>::const_iterator iter;
-    iter = std::find(registerd_str.begin(), registerd_str.end(), name_lower);
+    iter = std::find(registerd_str.begin(), registerd_str.end(), name);
 
     if (iter != registerd_str.end())
     {
-        if (*iter == "default")
+        if (*iter == "HighlandIntegral")
         {
-            return new ScatteringDefault(particle, utility);
+            return new ScatteringHighlandIntegral(particle, utility);
         }
-        else if (*iter == "moliere")
+        else if (*iter == "Moliere")
         {
             return new ScatteringMoliere(particle, utility.GetMedium());
         }
-        else if (*iter == "highland")
+        else if (*iter == "Highland")
         {
             return new ScatteringHighland(particle, utility.GetMedium());
         }
-        else if (*iter == "noScattering")
+        else if (*iter == "NoScattering")
         {
             return new ScatteringNoScattering(particle, utility.GetMedium());
         }
@@ -157,9 +157,9 @@ Scattering* ScatteringFactory::CreateScattering(const Enum model, Particle& part
 
     if (iter != registerd_enum.end())
     {
-        if (*iter == Default)
+        if (*iter == HighlandIntegral)
         {
-            return new ScatteringDefault(particle, utility);
+            return new ScatteringHighlandIntegral(particle, utility);
         }
         else if (*iter == Moliere)
         {

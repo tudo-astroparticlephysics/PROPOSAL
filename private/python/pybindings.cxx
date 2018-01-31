@@ -614,8 +614,8 @@ void export_scattering()
         "Moliere",
         init<Particle&, const Medium&>());
 
-    class_<ScatteringDefault, boost::shared_ptr<ScatteringDefault>, bases<Scattering> >(
-        "Default",
+    class_<ScatteringHighlandIntegral, boost::shared_ptr<ScatteringHighlandIntegral>, bases<Scattering> >(
+        "HighlandIntegral",
         init<Particle&, Utility&, InterpolationDef>());
 
     class_<ScatteringHighland, boost::shared_ptr<ScatteringHighland>, bases<Scattering> >(
@@ -1013,10 +1013,10 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
     // --------------------------------------------------------------------- //
 
     enum_<ScatteringFactory::Enum>("ScatteringModel")
-        .value("default", ScatteringFactory::Default)
-        .value("moliere", ScatteringFactory::Moliere)
-        .value("highland", ScatteringFactory::Highland)
-        .value("noScattering", ScatteringFactory::NoScattering);
+        .value("HighlandIntegral", ScatteringFactory::HighlandIntegral)
+        .value("Moliere", ScatteringFactory::Moliere)
+        .value("Highland", ScatteringFactory::Highland)
+        .value("NoScattering", ScatteringFactory::NoScattering);
 
     // --------------------------------------------------------------------- //
     // Bremsstrahlung Definition
@@ -1121,6 +1121,25 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
     ;
 
     // --------------------------------------------------------------------- //
+    // Sector
+    // --------------------------------------------------------------------- //
+
+    class_<Sector, boost::shared_ptr<Sector> >("Sector",
+            init<Particle&, const Sector::Definition&>
+            ((arg("particle"), arg("sector_definition"))))
+
+        .def(init<Particle&, const Sector::Definition&, const InterpolationDef&>
+            ((arg("particle"), arg("sector_definition"), arg("interpolation_def"))))
+
+        // .def(self_ns::str(self_ns::self))
+
+        .def("propagate", &Sector::Propagate, (arg("distance")))
+        // .def("CalculateEnergyTillStochastic", &Sector::CalculateEnergyTillStochastic, (arg("initial_energy")))
+
+        .add_property("particle", make_function(&Sector::GetParticle, return_internal_reference<>()), "Get the internal created particle to modify its properties")
+    ;
+
+    // --------------------------------------------------------------------- //
     // Interpolation Definition
     // --------------------------------------------------------------------- //
 
@@ -1156,17 +1175,18 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
             (arg("partcle_def"), arg("medium"), arg("cuts"), arg("definition"))))
 
         .def(init<const ParticleDef&, const Medium&, const EnergyCutSettings&, Utility::Definition, InterpolationDef>(
-            (arg("partcle_def"), arg("medium"), arg("cuts"), arg("definition"), arg("interpolatin_def"))))
+            (arg("partcle_def"), arg("medium"), arg("cuts"), arg("definition"), arg("interpolation_def"))))
 
         // .def(self_ns::str(self_ns::self))
 
         .add_property("particle_def",
                       make_function(&Utility::GetParticleDef, return_internal_reference<>()))
         .add_property("medium",
-                      make_function(&Utility::GetMedium, return_internal_reference<>()));
+                      make_function(&Utility::GetMedium, return_internal_reference<>()))
         // .add_property("cross_sections",
         //               make_function(&Utility::GetCrosssections, return_internal_reference<>())); //TODO(mario): CrossSection didn't bind Wed 2017/11/22
         //
+    ;
 
     // --------------------------------------------------------------------- //
     // ContinousRandomization
@@ -1179,7 +1199,9 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
 
         // .def(self_ns::str(self_ns::self))
 
-        .def("randomize", &ContinuousRandomizer::Randomize, (arg("initial_energy"), arg("final_energy"), arg("rand")));
+        .def("randomize", &ContinuousRandomizer::Randomize, (arg("initial_energy"), arg("final_energy"), arg("rand")))
+
+    ;
 
 
     // --------------------------------------------------------------------- //
