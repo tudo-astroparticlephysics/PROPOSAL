@@ -152,7 +152,6 @@ ScatteringMoliere::ScatteringMoliere(Particle& particle, const Medium& medium)
     // guessing an initial value by assuming a gaussian distribution
     // only regarding the component with maximum weight
     // needed in the method GetRandom()
-    int max_weight_index_ = 0;
     for (int i = 0; i + 1 < numComp_; i++)
     {
         if (weight[i+1] > weight[i])
