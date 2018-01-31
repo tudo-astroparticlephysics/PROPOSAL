@@ -40,6 +40,9 @@ public:
         Definition(const Definition&);
         ~Definition();
 
+        bool operator==(const Definition&) const;
+        bool operator!=(const Definition&) const;
+
         Definition& operator=(const Definition&);
 
 
@@ -77,11 +80,12 @@ public:
     // Sector(Particle&, const Geometry&, const Utility&, const Scattering&, bool do_interpolation, const Definition&
     // def = Definition());
     Sector(const Sector&);
-    virtual ~Sector();
+    ~Sector();
+
+    bool operator==(const Sector&) const;
+    bool operator!=(const Sector&) const;
 
     // Sector& operator=(const Sector& collection);
-    // bool operator==(const Sector& collection) const;
-    // bool operator!=(const Sector& collection) const;
     // friend std::ostream& operator<<(std::ostream& os, Sector const& collection);
 
     // --------------------------------------------------------------------- //
@@ -99,7 +103,7 @@ public:
      *  \return energy at distance OR -(track length)
      */
 
-    virtual double Propagate(double distance);
+    double Propagate(double distance);
 
     /**
      * Calculates the contiuous loss till the first stochastic loss happend
@@ -112,7 +116,7 @@ public:
      *  \return pair.first final energy befor first interaction pair.second decay energy at which the
      *          particle decay
      */
-    virtual std::pair<double, double> CalculateEnergyTillStochastic(double initial_energy);
+    std::pair<double, double> CalculateEnergyTillStochastic(double initial_energy);
 
     /*!
      * advances the particle by the given distance
@@ -130,7 +134,7 @@ public:
      *
      *  \return pair of energy loss [MeV] and kind of interaction
      */
-    virtual std::pair<double, DynamicData::Type> MakeStochasticLoss();
+    std::pair<double, DynamicData::Type> MakeStochasticLoss();
 
     // --------------------------------------------------------------------- //
     // Enable options & Setter
@@ -143,15 +147,12 @@ public:
     // --------------------------------------------------------------------- //
 
     ParticleLocation::Enum GetLocation() const { return sector_def_.location; }
-    // bool GetDoRandomization() const { return do_continuous_randomization_; }
-    // bool GetEnableRandomization() const { return enable_randomization_; }
 
     Scattering* GetScattering() const { return scattering_; }
     Particle& GetParticle() const { return particle_; }
     Geometry* GetGeometry() const { return geometry_; }
     const Utility& GetUtility() const { return utility_; }
     const Medium* GetMedium() const { return &utility_.GetMedium(); }
-    // ContinuousRandomization* GetContinuousRandomization() const { return randomizer_; }
 
 protected:
     Sector& operator=(const Sector&); // Undefined & not allowed
