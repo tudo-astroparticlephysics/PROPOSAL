@@ -136,7 +136,7 @@ TEST(Scattering, Scatter)
 {
     ifstream in;
     // string filename = "bin/TestFiles/Brems_dEdx.txt";
-    string filename = "testfiles/Scat_scatter.txt";
+    string filename = "bin/TestFiles/Scat_scatter.txt";
     in.open(filename.c_str());
 
     if (!in.good())
@@ -144,13 +144,12 @@ TEST(Scattering, Scatter)
         std::cerr << "File \"" << filename << "\" not found" << std::endl;
     }
 
-    // char firstLine[256];
-    // in.getline(firstLine,256);
-
     string particleName;
     string mediumName;
     string parametrization;
+
     double energy_init, energy_final, distance;
+    double energy_previous = -1;
     double ecut, vcut;
     Vector3D position_init = Vector3D(0,0,0);
     Vector3D direction_init = Vector3D(1,0,0);
@@ -160,12 +159,21 @@ TEST(Scattering, Scatter)
 
     cout.precision(16);
     RandomGenerator::Get().SetSeed(1234);
+    double error = 1e-3;
+    bool first_line = true;
 
     while(in.good())
     {
-        in >> particleName >> mediumName >> parametrization
-            >> ecut >> vcut >> energy_init >> energy_final >> distance
-            >> x_f >> y_f >> z_f >> radius_f >> phi_f >> theta_f;
+        if (first_line)
+        {
+            in >> particleName >> mediumName >> parametrization
+                >> ecut >> vcut >> energy_init >> energy_final >> distance
+                >> x_f >> y_f >> z_f >> radius_f >> phi_f >> theta_f;
+
+            first_line = false;
+        }
+
+        energy_previous = -1;
 
         ParticleDef particle_def = getParticleDef(particleName);
         Particle particle = Particle(particle_def);
@@ -175,24 +183,39 @@ TEST(Scattering, Scatter)
 
         Medium* medium = MediumFactory::Get().CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut,vcut);
-        Utility utility(particle_def, *medium, ecuts, Utility::Definition());
+        Utility utility(particle_def, *medium, ecuts, Utility::Definition(), InterpolationDef());
 
         Scattering* scattering = ScatteringFactory::Get().CreateScattering(
             parametrization,
             particle,
-            utility);
+            utility,
+            InterpolationDef());
 
-        scattering->Scatter(distance, energy_init, energy_final);
-        std::cout << particle.GetPosition() << std::endl;
-        std::cout << particle.GetDirection() << std::endl;
+        while (energy_previous < energy_init)
+        {
+            energy_previous = energy_init;
 
-        ASSERT_NEAR(particle.GetPosition().GetX(), x_f, 1e-3*x_f);
-        ASSERT_NEAR(particle.GetPosition().GetY(), y_f, 1e-3*y_f);
-        ASSERT_NEAR(particle.GetPosition().GetZ(), z_f, 1e-3*z_f);
-        
-        ASSERT_NEAR(particle.GetDirection().GetRadius(), radius_f, 1e-3*radius_f);
-        ASSERT_NEAR(particle.GetDirection().GetPhi(), phi_f, 1e-3*phi_f);
-        ASSERT_NEAR(particle.GetDirection().GetTheta(), theta_f, 1e-3*theta_f);
+            particle.SetEnergy(energy_init);
+            particle.SetPosition(position_init);
+            particle.SetDirection(direction_init);
+
+            scattering->Scatter(distance, energy_init, energy_final);
+            std::cout << particle.GetPosition() << std::endl;
+            std::cout << particle.GetDirection() << std::endl;
+
+
+            ASSERT_NEAR(particle.GetPosition().GetX(), x_f, std::abs(error*x_f));
+            ASSERT_NEAR(particle.GetPosition().GetY(), y_f, std::abs(error*y_f));
+            ASSERT_NEAR(particle.GetPosition().GetZ(), z_f, std::abs(error*z_f));
+
+            ASSERT_NEAR(particle.GetDirection().GetRadius(), radius_f, std::abs(error*radius_f));
+            ASSERT_NEAR(particle.GetDirection().GetPhi(), phi_f, std::abs(error*phi_f));
+            ASSERT_NEAR(particle.GetDirection().GetTheta(), theta_f, std::abs(error*theta_f));
+
+            in >> particleName >> mediumName >> parametrization
+                >> ecut >> vcut >> energy_init >> energy_final >> distance
+                >> x_f >> y_f >> z_f >> radius_f >> phi_f >> theta_f;
+        }
 
         delete medium;
         delete scattering;
