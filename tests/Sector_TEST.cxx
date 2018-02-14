@@ -181,9 +181,12 @@ TEST(Sector, Propagate)
 
     double energy_final_calc;
     double energy_final_stored;
+    double energy_previous = -1;
     double energy_init;
     double distance;
     double ecut, vcut;
+
+    bool first_line = true;
 
     cout.precision(16);
 
@@ -191,11 +194,15 @@ TEST(Sector, Propagate)
 
     while(in.good())
     {
-        in >> particleName >> mediumName >> ecut >> vcut
-            >> energy_init >> energy_final_stored >> distance;
+        if (first_line)
+        {
+            in >> particleName >> mediumName >> ecut >> vcut >> energy_init >> energy_final_stored >> distance;
+            first_line = false;
+        }
             // >> do_continuous_randomization >> do_exact_time_calculation
             // >> stopping_decay;
 
+        energy_previous = -1;
         Particle particle = Particle(getParticleDef(particleName));
         particle.SetEnergy(energy_init);
         particle.SetDirection(Vector3D(1, 0, 0));
@@ -208,10 +215,21 @@ TEST(Sector, Propagate)
         // sector_def.scattering_model = scattering_model;
         sector_def.cut_settings = ecuts;
 
-        Sector sector(particle, sector_def);
-        energy_final_calc = sector.Propagate(distance);
+        Sector sector(particle, sector_def, InterpolationDef());
 
-        ASSERT_NEAR(energy_final_calc, energy_final_stored, 1e-3*energy_final_stored);
+        while (energy_previous < energy_init)
+        {
+            std::cout << particleName << "\t" << mediumName << "\t" << energy_init << "\t" << energy_previous << std::endl;
+            energy_previous = energy_init;
+            particle.SetEnergy(energy_init);
+            particle.SetDirection(Vector3D(1, 0, 0));
+
+            energy_final_calc = sector.Propagate(distance);
+            ASSERT_NEAR(energy_final_calc, energy_final_stored, std::abs(1e-3*energy_final_calc));
+
+            in >> particleName >> mediumName >> ecut >> vcut >> energy_init >> energy_final_stored >> distance;
+        }
+
 
         delete medium;
         cout << "ready" << endl;
