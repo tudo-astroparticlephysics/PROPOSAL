@@ -19,10 +19,10 @@ ScatteringFactory::ScatteringFactory()
     , registerd_str()
     , string_enum_()
 {
-    Register("Moliere", Moliere);
-    Register("Highland", Highland);
-    Register("HighlandIntegral", HighlandIntegral);
-    Register("NoScattering", NoScattering);
+    Register("moliere", Moliere);
+    Register("highland", Highland);
+    Register("highlandintegral", HighlandIntegral);
+    Register("noscattering", NoScattering);
 }
 
 ScatteringFactory::~ScatteringFactory()
@@ -44,25 +44,26 @@ void ScatteringFactory::Register(const std::string& name, const Enum model)
 Scattering* ScatteringFactory::CreateScattering(const std::string& name, Particle& particle, const Utility& utility, const InterpolationDef& interpolation_def)
 {
     std::string name_lower = boost::algorithm::to_lower_copy(name);
+    std::cout << name_lower << std::endl;
 
     std::vector<std::string>::const_iterator iter;
     iter = std::find(registerd_str.begin(), registerd_str.end(), name_lower);
 
     if (iter != registerd_str.end())
     {
-        if (*iter == "HighlandIntegral")
+        if (*iter == "highlandintegral")
         {
             return new ScatteringHighlandIntegral(particle, utility, interpolation_def);
         }
-        else if (*iter == "Moliere")
+        else if (*iter == "moliere")
         {
             return new ScatteringMoliere(particle, utility.GetMedium());
         }
-        else if (*iter == "Highland")
+        else if (*iter == "highland")
         {
             return new ScatteringHighland(particle, utility.GetMedium());
         }
-        else if (*iter == "NoScattering")
+        else if (*iter == "noscattering")
         {
             return new ScatteringNoScattering(particle, utility.GetMedium());
         }
@@ -115,26 +116,26 @@ Scattering* ScatteringFactory::CreateScattering(const Enum model, Particle& part
 // ------------------------------------------------------------------------- //
 Scattering* ScatteringFactory::CreateScattering(const std::string& name, Particle& particle, const Utility& utility)
 {
-    // std::string name_lower = boost::algorithm::to_lower_copy(name);
+    std::string name_lower = boost::algorithm::to_lower_copy(name);
 
     std::vector<std::string>::const_iterator iter;
-    iter = std::find(registerd_str.begin(), registerd_str.end(), name);
+    iter = std::find(registerd_str.begin(), registerd_str.end(), name_lower);
 
     if (iter != registerd_str.end())
     {
-        if (*iter == "HighlandIntegral")
+        if (*iter == "highlandintegral")
         {
             return new ScatteringHighlandIntegral(particle, utility);
         }
-        else if (*iter == "Moliere")
+        else if (*iter == "moliere")
         {
             return new ScatteringMoliere(particle, utility.GetMedium());
         }
-        else if (*iter == "Highland")
+        else if (*iter == "highland")
         {
             return new ScatteringHighland(particle, utility.GetMedium());
         }
-        else if (*iter == "NoScattering")
+        else if (*iter == "noscattering")
         {
             return new ScatteringNoScattering(particle, utility.GetMedium());
         }
