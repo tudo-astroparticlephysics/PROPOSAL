@@ -47,9 +47,8 @@ IF(DEBUG)
 ENDIF()
 
 # Some additional options
-OPTION (ADD_TESTFILE_GEN "Choose to build the testfile-generator." OFF)
 OPTION (ADD_PYTHON "Choose to compile the python wrapper library" ON)
-OPTION(ADD_ROOT "Choose to compile ROOT examples." ON)
+OPTION(ADD_ROOT "Choose to compile ROOT examples." OFF)
 
 #################################################################
 #################           python      #########################
@@ -200,19 +199,6 @@ ADD_EXECUTABLE(example
 )
 SET_TARGET_PROPERTIES(example PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -O2 -g -Wall -Wextra -Wnarrowing -Wpedantic -fdiagnostics-show-option")
 TARGET_LINK_LIBRARIES(example PROPOSAL)
-
-
-IF(ADD_TESTFILE_GEN)
-	ADD_EXECUTABLE(generate_testfiles
-			private/testfile_generator/testfile_generator.cxx
-	)
-
-	#  Without -fvisibility-inlines-hidden an "bus error: 10" occurs on mac os,
-	#  Reasen why this fixes it is unclear. There must be symbol collisions in shared libraries
-	SET_SOURCE_FILES_PROPERTIES(private/testfile_generator/testfile_generator.cxx PROPERTIES COMPILE_FLAGS "-std=c++11 -fvisibility-inlines-hidden")
-	TARGET_LINK_LIBRARIES(generate_testfiles PROPOSAL)
-	INSTALL(TARGETS generate_testfiles DESTINATION bin)
-ENDIF(ADD_TESTFILE_GEN)
 
 #################################################################
 #################           Tests        ########################
