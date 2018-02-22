@@ -49,6 +49,7 @@ ENDIF()
 # Some additional options
 OPTION (ADD_PYTHON "Choose to compile the python wrapper library" ON)
 OPTION(ADD_ROOT "Choose to compile ROOT examples." OFF)
+OPTION(ADD_PERFORMANCE_TEST "Choose to compile the performace test source." OFF)
 
 #################################################################
 #################           python      #########################
@@ -82,6 +83,12 @@ ELSE(ADD_PYTHON)
 	FIND_PACKAGE( Boost REQUIRED )
 	SET(LIBRARYS_TO_LINK ${LIBRARYS_TO_LINK} ${Boost_LIBRARIES})
 ENDIF(ADD_PYTHON)
+
+IF(ADD_PERFORMANCE_TEST)
+	# Libs for the perfomance test source
+	FIND_PACKAGE( Boost COMPONENTS chrono REQUIRED )
+	SET(LIBRARYS_TO_LINK_PERFORMANCE_TEST ${LIBRARYS_TO_LINK} ${Boost_LIBRARIES})
+ENDIF(ADD_PERFORMANCE_TEST)
 
 
 #################################################################
@@ -199,6 +206,14 @@ ADD_EXECUTABLE(example
 )
 SET_TARGET_PROPERTIES(example PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -O2 -g -Wall -Wextra -Wnarrowing -Wpedantic -fdiagnostics-show-option")
 TARGET_LINK_LIBRARIES(example PROPOSAL)
+
+IF(ADD_PERFORMANCE_TEST)
+	ADD_EXECUTABLE(performance_test
+			private/test/performance_test.cxx
+	)
+	SET_TARGET_PROPERTIES(performance_test PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -O2 -g -Wall -Wextra -Wnarrowing -Wpedantic -fdiagnostics-show-option")
+	TARGET_LINK_LIBRARIES(performance_test PROPOSAL ${LIBRARYS_TO_LINK_PERFORMANCE_TEST})
+ENDIF(ADD_PERFORMANCE_TEST)
 
 #################################################################
 #################           Tests        ########################
