@@ -42,7 +42,7 @@ TEST(Comparison , Comparison_not_equal )
     EXPECT_TRUE(utils1!=utils4);
 }
 
-TEST(Assignment, Copyconstructor)
+TEST(Copyconstructor, Copyconstructor)
 {
     Utility A(MuMinusDef::Get(), Ice(), EnergyCutSettings(), Utility::Definition());
     Utility B(A);
@@ -55,7 +55,7 @@ TEST(Assignment, Copyconstructor)
     EXPECT_TRUE(C == D);
 }
 
-TEST(Assignment, Operator)
+TEST(Copyconstructor, Copyconstructor2)
 {
     Utility A(MuMinusDef::Get(), Ice(), EnergyCutSettings(), Utility::Definition());
     Utility B = A;
