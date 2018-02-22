@@ -11,7 +11,7 @@ using namespace PROPOSAL;
 int main()
 {
 
-    int statistics = 100;
+    int statistics = 1000;
 
     int exp_min = 3;
     int exp_max = 13;
@@ -32,28 +32,24 @@ int main()
 
     // ----[ Sector ]---------------------------------------- //
 
-    std::vector<SectorFactory::Definition> sector_defintions;
-    SectorFactory::Definition sec_def;
+    std::vector<Sector::Definition> sector_defintions;
+    Sector::Definition sec_def;
 
     sec_def.utility_def.epair_def.lpm_effect = true;
-    sec_def.utility_def.brems_def.lpm_effect = true;
+    sec_def.utility_def.brems_def.lpm_effect = false;
 
     sec_def.location = Sector::ParticleLocation::InsideDetector;
 
     sec_def.do_continuous_randomization = true;
     sec_def.do_exact_time_calculation = true;
 
-    sec_def.scattering_model = ScatteringFactory::Default;
+    sec_def.scattering_model = ScatteringFactory::NoScattering;
 
-    sec_def.e_cut = 500;
-    sec_def.v_cut = 0.05;
+    sec_def.cut_settings.SetEcut(500);
+    sec_def.cut_settings.SetVcut(0.05);
 
-    sec_def.geometry_def.shape = GeometryFactory::Sphere;
-    sec_def.geometry_def.inner_radius = 0.0;
-    sec_def.geometry_def.radius = 1e18;
-
-    sec_def.medium_def.type = MediumFactory::Ice;
-    // sec_def.medium_def.density_correction = 0.98;
+    sec_def.SetGeometry(Sphere(Vector3D(), 1e18, 0));
+    sec_def.SetMedium(Ice());
 
     sector_defintions.push_back(sec_def);
 
@@ -63,7 +59,7 @@ int main()
 
     Propagator prop(MuMinusDef::Get(), sector_defintions, Sphere(Vector3D(), 1e18, 0), interpolation_def);
 
-    PROPOSALParticle& particle = prop.GetParticle();
+    Particle& particle = prop.GetParticle();
     particle.SetDirection(Vector3D(0, 0, -1));
 
     boost::chrono::high_resolution_clock::time_point t1 ;
