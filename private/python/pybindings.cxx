@@ -34,8 +34,8 @@
 #define PHOTO_REAL_DEF(cls, parent)                                                                                    \
     class_<Photo##cls, boost::shared_ptr<Photo##cls>, bases<Photo##parent> >(                                          \
         #cls,                                                                                                          \
-        init<const ParticleDef&, const Medium&, const EnergyCutSettings&, double, bool>(                        \
-            (arg("particle_def"), arg("medium"), arg("energy_cuts"), arg("multiplier"), arg("real_photon"))));
+        init<const ParticleDef&, const Medium&, const EnergyCutSettings&, double, bool>(                               \
+            (arg("particle_def"), arg("medium"), arg("energy_cuts"), arg("multiplier"), arg("add_pertubative"))));
 
 #define PHOTO_Q2_DEF(cls)                                                                                              \
     class_<Photo##cls, boost::shared_ptr<Photo##cls>, bases<PhotoQ2Integral> >(                                        \
@@ -465,8 +465,8 @@ void export_epair()
 
     class_<EpairProductionRhoIntegral, boost::shared_ptr<EpairProductionRhoIntegral>, bases<EpairProduction> >(
         "EpairProductionRhoIntegral",
-        init<const ParticleDef&, const Medium&, const EnergyCutSettings&, double, bool>());
-            // (arg("particle_def"), arg("medium"), arg("energy_cuts"), arg("multiplier"), arg("lpm"))));
+        init<const ParticleDef&, const Medium&, const EnergyCutSettings&, double, bool>(
+            (arg("particle_def"), arg("medium"), arg("energy_cuts"), arg("multiplier"), arg("lpm"))));
 
     class_<EpairProductionRhoInterpolant, boost::shared_ptr<EpairProductionRhoInterpolant>, bases<EpairProductionRhoIntegral> >(
         "EpairProductionRhoInterpolant",
@@ -518,7 +518,8 @@ void export_parametrizations()
 
     class_<Ionization, boost::shared_ptr<Ionization>, bases<Parametrization> >(
         "Ionization",
-        init<const ParticleDef&, const Medium&, const EnergyCutSettings&, double>());
+        init<const ParticleDef&, const Medium&, const EnergyCutSettings&, double>(
+            (arg("particle_def"), arg("medium"), arg("energy_cuts"), arg("multiplier"))));
 
     export_epair();
     export_bremsstrahlung();
