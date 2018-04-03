@@ -1219,6 +1219,11 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
             arg("particle_def"), arg("sector_defs"), arg("detector"), arg("interpolation_def"))))
 
         .def(init<const ParticleDef&,
+                  const std::vector<Sector::Definition>&,
+                  const Geometry&>((
+            arg("particle_def"), arg("sector_defs"), arg("detector"))))
+
+        .def(init<const ParticleDef&,
                   const std::string&>((
             arg("particle_def"), arg("config_file"))))
 
