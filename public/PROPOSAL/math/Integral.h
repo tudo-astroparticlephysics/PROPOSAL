@@ -82,8 +82,8 @@ private:
     double  savedResult_;
 
     int q_limit_;
-    double q_epsabs_;
-    double q_epsrel_;
+    // double q_epsabs_;
+    // double q_epsrel_;
     std::vector<double> q_last_3_results_;
     std::vector<double> q_rlist2_; //epstab
     std::vector<double> q_iord_;
