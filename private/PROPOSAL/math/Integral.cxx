@@ -1799,17 +1799,8 @@ double Integral::qags()
                 jupbnd = last;
             }
 
-            // int id = nrmax;
-            // for (int idx = id; idx <= jupbnd; idx++)
-            // {
-            //     maxerr = q_iord_[nrmax-1];
-            //     errmax = q_elist_[maxerr-1];
-            //     if(std::abs(q_blist_[maxerr-1] - q_alist_[maxerr-1]) > small)
-            //         continue;
-
-            //     nrmax = nrmax+1;
-            // }
-            while(nrmax <= jupbnd)
+            int id = nrmax;
+            for (int idx = id; idx <= jupbnd; idx++)
             {
                 maxerr = q_iord_[nrmax-1];
                 errmax = q_elist_[maxerr-1];
@@ -1818,6 +1809,15 @@ double Integral::qags()
 
                 nrmax = nrmax+1;
             }
+            // while(nrmax <= jupbnd)
+            // {
+            //     maxerr = q_iord_[nrmax-1];
+            //     errmax = q_elist_[maxerr-1];
+            //     if(std::abs(q_blist_[maxerr-1] - q_alist_[maxerr-1]) > small)
+            //         continue;
+
+            //     nrmax = nrmax+1;
+            // }
         }
 
         // Perform extrapolation.
