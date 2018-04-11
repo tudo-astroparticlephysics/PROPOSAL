@@ -8,6 +8,7 @@
 */
 
 #include <cmath>
+#include <numeric>
 // #include <math.h>
 #include <algorithm>
 #include <limits>
@@ -1032,6 +1033,7 @@ double Integral::RombergIntegrateOpened()
 
             if(fabs(error)<precision_)
             {
+                std::cout << "k = " << k << ", n = " << n << std::endl;
                 if(std::abs(value - q_value) > 1e-6)
                 {
                     log_warn("RombergIntegrateOpened qags %f and romberg %f differs", q_value, value);
@@ -1048,6 +1050,7 @@ double Integral::RombergIntegrateOpened()
     std::cout.precision(16);
     std::cout << q_value << " qags" << std::endl;
     std::cout << value << " romberg" << std::endl;
+    std::cout << "k = " << k << ", n = " << n << std::endl;
     // log_warn("RombergIntegrateOpened qags %f and romberg %f differs", q_value, value);
     log_warn("Precision %f has not been reached after %i steps! Returning %f!", precision_, maxSteps_,value);
     return value;
@@ -1562,6 +1565,8 @@ double Integral::qags()
     double abserr = 0.0;
     int neval = 0;
     int ier = 0;
+    double q_epsabs_ = 1.0e-50;
+    double q_epsrel_ = 1.0e-6;
 
     if (q_limit_ < 1)
     {
@@ -1576,6 +1581,7 @@ double Integral::qags()
         return result;
     }
     std::pair<Integral::InterpolationResults, Integral::InterpolationResults> qk21_output;
+    // std::cout << "first approx" << std::endl;
 
     // First approximation to the integral.
     qk21_output = q_gaus_kronrod_21(min_, max_);
@@ -1587,6 +1593,7 @@ double Integral::qags()
     // Test on accuracy.
     double dres = std::abs(result);
     double errbnd = std::max(q_epsabs_, q_epsrel_*dres);
+    // std::cout << "abserr = " << abserr << ", errbnd = " << errbnd << ", resabs = " << resabs << std::endl;
     int last = 1;
 
     if(abserr <= 100*q_epmach_*defabs && abserr > errbnd)
@@ -1599,10 +1606,7 @@ double Integral::qags()
     {
         neval = 42 * last - 21;
         std::cout.precision(16);
-        std::cout << "before loop " << std::endl;
-        std::cout << "abserr = " << abserr << std::endl;
-        std::cout << "ier = " << ier << std::endl;
-        std::cout << "neval = " << neval << std::endl;
+        std::cout << "ier = " << ier << ", neval = " << neval << ", result = " << result << ", abserr = " << abserr << std::endl;
         return result;
     }
 
@@ -1620,15 +1624,14 @@ double Integral::qags()
         erlarg,erlast,
         error1,error2,erro12,ertest,reseps,
         small;
-    int id,jupbnd;
+    int jupbnd;
     Integral::InterpolationResults extrapolation_output;
     // Initialization
-    abserr = q_oflow_;
     q_rlist2_[0] = result;
-    double errmax = abserr;
-    int maxerr = 1;
     double area = result;
+    double errmax = abserr;
     double errsum = abserr;
+    int maxerr = 1;
     int nrmax = 1;
     int nres = 0;
     int numrl2 = 2;
@@ -1642,6 +1645,8 @@ double Integral::qags()
     int ksgn = -1;
     if(dres >= (1.0 - 50*q_epmach_) * defabs)
         ksgn = 1;
+
+    abserr = q_oflow_;
 
     // main loop
     for (last = 2; last <= q_limit_; last++)
@@ -1672,7 +1677,7 @@ double Integral::qags()
 
         if(defab1 != error1 && defab2 != error2 )
         {
-            if(std::abs(q_rlist_[maxerr-1] - area12) <= 1.0e-5 * std::abs(area12) && erro12 => 0.99*errmax)
+            if(std::abs(q_rlist_[maxerr-1] - area12) <= 1.0e-5 * std::abs(area12) && erro12 >= 0.99*errmax)
             {
                 if(extrap)
                 {
@@ -1736,10 +1741,8 @@ double Integral::qags()
 
         if (errsum <= errbnd)
         {
-            for (int idx = 0; idx < last; idx++)
-            {
-                result = result + q_rlist_[idx];
-            }
+            // Compute global integral sum.
+            result = std::accumulate(q_rlist_.begin(), q_rlist_.begin()+(last), 0.0);
             abserr = errsum;
 
             if(2 < ier)
@@ -1747,10 +1750,8 @@ double Integral::qags()
 
             neval = 42*last - 21;
             std::cout.precision(16);
-            std::cout << "in loop " << std::endl;
-            std::cout << "abserr = " << abserr << std::endl;
-            std::cout << "ier = " << ier << std::endl;
-            std::cout << "neval = " << neval << std::endl;
+            std::cout << "in loop " << last << std::endl;
+            std::cout << "ier = " << ier << ", neval = " << neval << ", result = " << result << ", abserr = " << abserr << std::endl;
             return result;
         }
 
@@ -1789,19 +1790,32 @@ double Integral::qags()
         // the larger intervals (erlarg) and perform extrapolation.
         if ( ierro != 3 && erlarg > ertest )
         {
-            id = nrmax;
-            jupbnd = last;
-
             if(last > (2 + q_limit_/2))
+            {
                 jupbnd = q_limit_ + 3 - last;
+            }
+            else
+            {
+                jupbnd = last;
+            }
 
-            for (int idx = id; idx <= jupbnd; idx++)
+            // int id = nrmax;
+            // for (int idx = id; idx <= jupbnd; idx++)
+            // {
+            //     maxerr = q_iord_[nrmax-1];
+            //     errmax = q_elist_[maxerr-1];
+            //     if(std::abs(q_blist_[maxerr-1] - q_alist_[maxerr-1]) > small)
+            //         continue;
+
+            //     nrmax = nrmax+1;
+            // }
+            while(nrmax <= jupbnd)
             {
                 maxerr = q_iord_[nrmax-1];
                 errmax = q_elist_[maxerr-1];
                 if(std::abs(q_blist_[maxerr-1] - q_alist_[maxerr-1]) > small)
                     continue;
-                
+
                 nrmax = nrmax+1;
             }
         }
@@ -1849,10 +1863,7 @@ double Integral::qags()
     if (abserr == q_oflow_)
     {
         // Compute global integral sum.
-        for (int idx = 0; idx < last; idx++)
-        {
-            result = result + q_rlist_[idx];
-        }
+        result = std::accumulate(q_rlist_.begin(), q_rlist_.begin()+(last), 0.0);
         abserr = errsum;
     }
     else
@@ -1877,11 +1888,8 @@ double Integral::qags()
         {
             if ( abserr/std::abs(result) > errsum/std::abs(area) )
             {
-                // Compute global integral sum.
-                for (int idx = 0; idx < last; idx++)
-                {
-                    result = result + q_rlist_[idx];
-                }
+                // // Compute global integral sum.
+                result = std::accumulate(q_rlist_.begin(), q_rlist_.begin()+(last), 0.0);
                 abserr = errsum;
             }
         }
@@ -1890,10 +1898,7 @@ double Integral::qags()
             if ( abserr > errsum )
             {
                 // Compute global integral sum.
-                for (int idx = 0; idx < last; idx++)
-                {
-                    result = result + q_rlist_[idx];
-                }
+                result = std::accumulate(q_rlist_.begin(), q_rlist_.begin()+(last), 0.0);
                 abserr = errsum;
             }
             else
@@ -1917,9 +1922,7 @@ double Integral::qags()
 
     std::cout.precision(16);
     std::cout << "after loop " << std::endl;
-    std::cout << "abserr = " << abserr << std::endl;
-    std::cout << "ier = " << ier << std::endl;
-    std::cout << "neval = " << neval << std::endl;
+    std::cout << "ier = " << ier << ", neval = " << neval << ", result = " << result << ", abserr = " << abserr << std::endl;
     return result;
 }
 
@@ -1929,7 +1932,6 @@ std::pair<Integral::InterpolationResults, Integral::InterpolationResults> Integr
 {
     const double q_epmach_ = std::numeric_limits<double>::epsilon(); // machine epsilon
     const double q_uflow_ = std::numeric_limits<double>::min(); // smallest finite value
-    // const double q_oflow_ = std::numeric_limits<double>::max(); // largest finite value
     const double q_weights_gaus_10p_ [5] =
     {
         0.066671344308688137593568809893332,
@@ -2044,9 +2046,6 @@ std::pair<Integral::InterpolationResults, Integral::InterpolationResults> Integr
 
 int Integral::q_sort(int last, int maxerr, int nrmax)
 {
-    // const double q_epmach_ = std::numeric_limits<double>::epsilon(); // machine epsilon
-    // const double q_uflow_ = std::numeric_limits<double>::min(); // smallest finite value
-    // const double q_oflow_ = std::numeric_limits<double>::max(); // largest finite value
     double errmax, errmin;
     int i,ibeg,isucc,jbnd,jupbn,k, nrmax_intern;
 
@@ -2145,7 +2144,6 @@ int Integral::q_sort(int last, int maxerr, int nrmax)
 Integral::InterpolationResults Integral::q_epsilon_extrapolation(int numrl2, int nres)
 {
     const double q_epmach_ = std::numeric_limits<double>::epsilon(); // machine epsilon
-    // const double q_uflow_ = std::numeric_limits<double>::min(); // smallest finite value
     const double q_oflow_ = std::numeric_limits<double>::max(); // largest finite value
     const int q_limit_epsilon_table_ = 50;
     // output
