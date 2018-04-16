@@ -66,29 +66,29 @@ int main(int argc, const char *argv[])
     Particle backup_mu = Particle(particle_mu);
 
     // std::ofstream myfile;
-    std::cout << '\n';
-    // for (int i = 0; i < statistics; ++i)
-    // {
-    //     // std::cerr << "loop: " << i << std::endl;
-    //     // std::cout << "RandomGenerator state:\n";
-    //     // PROPOSAL::RandomGenerator::Get().Serialize(std::cout);
-    //     // std::cout << '\n';
+    // std::cout << '\n';
+    for (int i = 0; i < statistics; ++i)
+    {
+        // std::cerr << "loop: " << i << std::endl;
+        // std::cout << "RandomGenerator state:\n";
+        // PROPOSAL::RandomGenerator::Get().Serialize(std::cout);
+        // std::cout << '\n';
 
-    //     // PROPOSAL::RandomGenerator::Get().Serialize(std::cout);
-    //     // std::cout << '\n' << std::endl;
+        // PROPOSAL::RandomGenerator::Get().Serialize(std::cout);
+        // std::cout << '\n' << std::endl;
 
-    //     particle_mu.InjectState(backup_mu);
+        particle_mu.InjectState(backup_mu);
 
-    //     prop.Propagate(100);
+        prop.Propagate(100);
 
-    //     // myfile.open ("example.txt", std::ios::app);
-    //     // myfile << "Writing this to a file.\n";
-    //     // myfile.close();
-    // }
+        // myfile.open ("example.txt", std::ios::app);
+        // myfile << "Writing this to a file.\n";
+        // myfile.close();
+    }
     std::cout << "concentration on difficult energy" << std::endl;
 
-    // double energy = 146.768; // 0.274374 + 4.63716e-10
-    double energy = 142.58; // 0.287524 - 1.01164e-8
+    double energy = 146.768; // 0.274374 + 4.63716e-10
+    // double energy = 142.58; // 0.287524 - 1.01164e-8
     ParticleDef particle_def = MuMinusDef::Get();
     Ice medium;
     EnergyCutSettings ecuts;
