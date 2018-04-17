@@ -512,8 +512,6 @@ UtilityInterpolantContRand::~UtilityInterpolantContRand()
 
 double UtilityInterpolantContRand::Calculate(double ei, double ef, double rnd)
 {
-    (void) rnd;
-
     if (abs(ei - ef) > abs(ei) * HALF_PRECISION)
     {
         double aux  = interpolant_->Interpolate(ei);
@@ -526,7 +524,10 @@ double UtilityInterpolantContRand::Calculate(double ei, double ef, double rnd)
     {
         return max(interpolant_diff_->Interpolate((ei + ef) / 2) * (ef - ei), 0.0);
     }
-    //TODO(mario): return Thu 2017/09/21
+
+    // If the previous conditions do not hold, create a temporary integral.
+    // Its ok, because you almost never end up here
+    return UtilityIntegralContRand(utility_).Calculate(ei, ef, rnd);
 }
 
 // ------------------------------------------------------------------------- //
