@@ -81,65 +81,14 @@ private:
     double  reverseX_;
     double  savedResult_;
 
-    int q_limit_;
-    // double q_epsabs_;
-    // double q_epsrel_;
     std::vector<double> q_last_3_results_;
     std::vector<double> q_rlist2_; //epstab
     std::vector<double> q_iord_;
-    std::vector<double> q_alist_;
-    std::vector<double> q_blist_;
-    std::vector<double> q_elist_;
-    std::vector<double> q_rlist_;
-    std::vector<double> q_fv1_;
-    std::vector<double> q_fv2_;
-    // const double q_weights_gaus_10p_ [5] =
-    // {
-    //     0.066671344308688137593568809893332,
-    //     0.149451349150580593145776339657697,
-    //     0.219086362515982043995534934228163,
-    //     0.269266719309996355091226921569469,
-    //     0.295524224714752870173892994651338
-    // };
-    // const double q_weights_kronrod_21p_ [11] =
-    // {
-    //     0.011694638867371874278064396062192,
-    //     0.032558162307964727478818972459390,
-    //     0.054755896574351996031381300244580,
-    //     0.075039674810919952767043140916190,
-    //     0.093125454583697605535065465083366,
-    //     0.109387158802297641899210590325805,
-    //     0.123491976262065851077958109831074,
-    //     0.134709217311473325928054001771707,
-    //     0.142775938577060080797094273138717,
-    //     0.147739104901338491374841515972068,
-    //     0.149445554002916905664936468389821
-    // };
-    // const double q_abscissae_kronrod_21p_[11] =
-    // {
-    //     0.995657163025808080735527280689003,
-    //     0.973906528517171720077964012084452,
-    //     0.930157491355708226001207180059508,
-    //     0.865063366688984510732096688423493,
-    //     0.780817726586416897063717578345042,
-    //     0.679409568299024406234327365114874,
-    //     0.562757134668604683339000099272694,
-    //     0.433395394129247190799265943165784,
-    //     0.294392862701460198131126603103866,
-    //     0.148874338981631210884826001129720,
-    //     0.000000000000000000000000000000000
-    // };
-    // const double q_epmach_ = std::numeric_limits<double>::epsilon(); // machine epsilon
-    // const double q_uflow_ = std::numeric_limits<double>::min(); // smallest finite value
-    // const double q_oflow_ = std::numeric_limits<double>::max(); // largest finite value
-    // limexp is the maximum number of elements the epsilon table can contain.
-    // if this number is reached, the upper diagonal of the epsilon table is deleted.
-    // const int q_limit_epsilon_table_ = 50;
 
     std::pair<Integral::InterpolationResults, Integral::InterpolationResults> q_gaus_kronrod_21(double q_min, double q_max);
-    Integral::InterpolationResults q_epsilon_extrapolation(int numrl2, int nres);
-    int q_sort(int last, int maxerr, int nrmax);
-    double qags();
+    Integral::InterpolationResults q_epsilon_extrapolation(int q_limit_epsilon_table_, int numrl2, int nres);
+    int q_sort(int q_limit_, int last, int maxerr, int nrmax, const std::vector<double>& q_elist_);
+    double qags(double limit = 50, double q_epsabs_ = 1.0e-50, double q_epsrel_ = 1.0e-6);
 
 
 //----------------------------------------------------------------------------//
@@ -156,7 +105,7 @@ private:
      * \param   oldSum    Old integration result
      * \return  Integration Result
      */
-    double Trapezoid(int n, double oldSum);
+    // double Trapezoid(int n, double oldSum);
 
 //----------------------------------------------------------------------------//
 
@@ -221,7 +170,7 @@ private:
     *
     * \return  Integration result
     */
-   double RombergIntegrateClosed();
+   // double RombergIntegrateClosed();
 
 //----------------------------------------------------------------------------//
 
@@ -267,7 +216,7 @@ private:
    double InitIntegralWithSubstitution(double min, double max, boost::function<double (double)> integrand, double powerOfSubstitution);
 
 //----------------------------------------------------------------------------//
-   double InitIntegralWithLogSubstitution(double min, double max, boost::function<double (double)> integrand, double powerOfSubstitution);
+   // double InitIntegralWithLogSubstitution(double min, double max, boost::function<double (double)> integrand, double powerOfSubstitution);
 
 //----------------------------------------------------------------------------//
 
@@ -287,7 +236,7 @@ private:
     * \param   function2use    integrand
     * \return  Integration result
     */
-    double IntegrateClosed(double min, double max, boost::function<double (double)> integrand);
+    // double IntegrateClosed(double min, double max, boost::function<double (double)> integrand);
 
 //----------------------------------------------------------------------------//
 
@@ -342,7 +291,7 @@ private:
     * \return  Integration result
     */
 
-   double IntegrateWithLogSubstitution(double min, double max, boost::function<double (double)> integrand, double powerOfSubstitution);
+   // double IntegrateWithLogSubstitution(double min, double max, boost::function<double (double)> integrand, double powerOfSubstitution);
 
 //----------------------------------------------------------------------------//
     /*!
