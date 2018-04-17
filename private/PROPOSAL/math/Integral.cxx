@@ -44,7 +44,7 @@ double Integral::Integrate(double min, double max, boost::function<double (doubl
 
     switch (method)
     {
-        case 1: return IntegrateClosed(min,max,integrand);
+        // case 1: return IntegrateClosed(min,max,integrand);
         case 2: return IntegrateOpened(min,max,integrand);
         case 3: return IntegrateWithSubstitution(min,max,integrand,powerOfSubstitution);
         case 4:
@@ -53,12 +53,12 @@ double Integral::Integrate(double min, double max, boost::function<double (doubl
                 return 0;
             }
             return IntegrateWithLog(min,max,integrand);
-        case 5:
-            if (min <= 0. || max <= 0.)
-            {
-                return 0;
-            }
-            return IntegrateWithLogSubstitution(min,max,integrand,powerOfSubstitution);
+        // case 5:
+        //     if (min <= 0. || max <= 0.)
+        //     {
+        //         return 0;
+        //     }
+        //     return IntegrateWithLogSubstitution(min,max,integrand,powerOfSubstitution);
         default:
             log_fatal("Unknown integration method! 0 is returned!");
             return 0;
@@ -343,18 +343,9 @@ Integral::Integral()
     ,reverse_(false)
     ,reverseX_(0)
     ,savedResult_(0)
-    ,q_limit_(50)
-    // ,q_epsabs_(1e-50)
-    // ,q_epsrel_(1e-6)
     ,q_last_3_results_()
     ,q_rlist2_()
     ,q_iord_()
-    ,q_alist_()
-    ,q_blist_()
-    ,q_elist_()
-    ,q_rlist_()
-    ,q_fv1_()
-    ,q_fv2_()
 {
     int aux;
     if(romberg_<=0)
@@ -383,14 +374,6 @@ Integral::Integral()
     d_.resize(aux);
 
     q_last_3_results_.resize(3);
-    q_rlist2_.resize(q_limit_ + 2);
-    q_alist_.resize(q_limit_);
-    q_blist_.resize(q_limit_);
-    q_elist_.resize(q_limit_);
-    q_rlist_.resize(q_limit_);
-    q_iord_.resize(q_limit_);
-    q_fv1_.resize(10);
-    q_fv2_.resize(10);
 }
 
 
@@ -417,18 +400,9 @@ Integral::Integral(const Integral &integral)
     ,reverse_(integral.reverse_)
     ,reverseX_(integral.reverseX_)
     ,savedResult_(integral.savedResult_)
-    ,q_limit_(integral.q_limit_)
-    // ,q_epsabs_(integral.q_epsabs_)
-    // ,q_epsrel_(integral.q_epsrel_)
     ,q_last_3_results_(integral.q_last_3_results_)
     ,q_rlist2_(integral.q_rlist2_)
     ,q_iord_(integral.q_iord_)
-    ,q_alist_(integral.q_alist_)
-    ,q_blist_(integral.q_blist_)
-    ,q_elist_(integral.q_elist_)
-    ,q_rlist_(integral.q_rlist_)
-    ,q_fv1_(integral.q_fv1_)
-    ,q_fv2_(integral.q_fv2_)
 {
     integrand_ = boost::ref(integral.integrand_);
 }
@@ -454,18 +428,9 @@ Integral::Integral(int  romberg, int maxSteps, double precision)
     ,reverse_(false)
     ,reverseX_(0)
     ,savedResult_(0)
-    ,q_limit_(50)
-    // ,q_epsabs_(1e-50)
-    // ,q_epsrel_(1e-6)
     ,q_last_3_results_()
     ,q_rlist2_()
     ,q_iord_()
-    ,q_alist_()
-    ,q_blist_()
-    ,q_elist_()
-    ,q_rlist_()
-    ,q_fv1_()
-    ,q_fv2_()
 {
     int aux;
     if(romberg<=0)
@@ -498,14 +463,6 @@ Integral::Integral(int  romberg, int maxSteps, double precision)
     d_.resize(aux);
 
     q_last_3_results_.resize(3);
-    q_rlist2_.resize(q_limit_ + 2);
-    q_alist_.resize(q_limit_);
-    q_blist_.resize(q_limit_);
-    q_elist_.resize(q_limit_);
-    q_rlist_.resize(q_limit_);
-    q_iord_.resize(q_limit_);
-    q_fv1_.resize(10);
-    q_fv2_.resize(10);
 }
 
 
@@ -681,26 +638,26 @@ double Integral::Function(double x)
 //----------------------------------------------------------------------------//
 
 
-double Integral::Trapezoid(int n, double oldSum)
-{
-    double xStep, stepSize, resultSum;
+// double Integral::Trapezoid(int n, double oldSum)
+// {
+//     double xStep, stepSize, resultSum;
 
-    if(n==1)
-    {
-        return (Function(max_)+Function(min_))*(max_-min_)/2;
-    }
+//     if(n==1)
+//     {
+//         return (Function(max_)+Function(min_))*(max_-min_)/2;
+//     }
 
-    n           /=  2;
-    stepSize    =   (max_-min_)/n;
-    resultSum   =   0;
+//     n           /=  2;
+//     stepSize    =   (max_-min_)/n;
+//     resultSum   =   0;
 
-    for(xStep=min_+stepSize/2 ; xStep<max_ ; xStep+=stepSize)
-    {
-        resultSum   +=  Function(xStep);
-    }
+//     for(xStep=min_+stepSize/2 ; xStep<max_ ; xStep+=stepSize)
+//     {
+//         resultSum   +=  Function(xStep);
+//     }
 
-    return (oldSum+resultSum*stepSize)/2;
-}
+//     return (oldSum+resultSum*stepSize)/2;
+// }
 
 
 //----------------------------------------------------------------------------//
@@ -933,48 +890,48 @@ Integral::InterpolationResults Integral::Interpolate(int start, double x)
 //----------------------------------------------------------------------------//
 
 
-double Integral::RombergIntegrateClosed()
-{
-    double k = 1;
-    double n = 1;
-    double error, result, value;
-    Integral::InterpolationResults interpolation_results;
+// double Integral::RombergIntegrateClosed()
+// {
+//     double k = 1;
+//     double n = 1;
+//     double error, result, value;
+//     Integral::InterpolationResults interpolation_results;
 
 
-    value   =   0;
-    result  =   0;
+//     value   =   0;
+//     result  =   0;
 
-    for(int i=0 ; i<maxSteps_ ; i++)
-    {
-        result  =   Trapezoid(k, result);
-        iX_[i]   =   n;
-        iY_[i]   =   result;
+//     for(int i=0 ; i<maxSteps_ ; i++)
+//     {
+//         result  =   Trapezoid(k, result);
+//         iX_[i]   =   n;
+//         iY_[i]   =   result;
 
-        if(i>=romberg_-1)
-        {
-            interpolation_results = Interpolate(i-(romberg_-1), 0);
+//         if(i>=romberg_-1)
+//         {
+//             interpolation_results = Interpolate(i-(romberg_-1), 0);
 
-            error   =   interpolation_results.Error;
-            value   =   interpolation_results.Value;
+//             error   =   interpolation_results.Error;
+//             value   =   interpolation_results.Value;
 
-            if(value!=0)
-            {
-                error   /=  value;
-            }
+//             if(value!=0)
+//             {
+//                 error   /=  value;
+//             }
 
-            if(fabs(error)<precision_)
-            {
-                return value;
-            }
-        }
+//             if(fabs(error)<precision_)
+//             {
+//                 return value;
+//             }
+//         }
 
-        k   =   k*2;
-        n   =   n/4;
-    }
+//         k   =   k*2;
+//         n   =   n/4;
+//     }
 
-    log_warn("Precision %f has not been reached after %i steps! Returning %f!", precision_, maxSteps_,value);
-    return value;
-}
+//     log_warn("Precision %f has not been reached after %i steps! Returning %f!", precision_, maxSteps_,value);
+//     return value;
+// }
 
 
 //----------------------------------------------------------------------------//
@@ -993,8 +950,7 @@ double Integral::RombergIntegrateOpened()
     value   =   0;
     result  =   0;
 
-    double q_value = qags();
-    return q_value;
+    // double q_value = qags();
     for(i=0 ; i<12 ; i++)
     {
         if(randomNumber_==0 || randomNumber_==1)
@@ -1034,13 +990,10 @@ double Integral::RombergIntegrateOpened()
 
             if(fabs(error)<precision_)
             {
-                std::cout << "k = " << k << ", n = " << n << std::endl;
-                if(std::abs(value - q_value) > 1e-6)
-                {
-                    log_warn("RombergIntegrateOpened qags %f and romberg %f differs", q_value, value);
-                    // std::cout << q_value << " qags" << std::endl;
-                    // std::cout << value << " romberg" << std::endl;
-                }
+                // if(std::abs(value - q_value) > 1e-6)
+                // {
+                //     log_warn("RombergIntegrateOpened qags %f and romberg %f differs", q_value, value);
+                // }
                 return value;
             }
         }
@@ -1048,13 +1001,9 @@ double Integral::RombergIntegrateOpened()
         k   *=  3;
         n   /=  9;
     }
-    std::cout.precision(16);
-    std::cout << q_value << " qags" << std::endl;
-    std::cout << value << " romberg" << std::endl;
-    std::cout << "k = " << k << ", n = " << n << std::endl;
-    // log_warn("RombergIntegrateOpened qags %f and romberg %f differs", q_value, value);
-    log_warn("Precision %f has not been reached after %i steps! Returning %f!", precision_, maxSteps_,value);
-    return value;
+    double q_value = qags();
+    log_warn("Precision %f has not been reached after %i steps the value is %f! Using now qags with value %f!", precision_, maxSteps_, value, q_value);
+    return q_value;
 }
 
 
@@ -1073,9 +1022,9 @@ double Integral::RombergIntegrateOpened(double bigValue)
     n       =   1;
     value   =   0;
     result  =   0;
-    double q_value = qags();
+    // double q_value = qags();
 
-    for(i=0 ; i<maxSteps_ ; i++)
+    for(i=0 ; i<12 ; i++)
     {
         result  =   Trapezoid3(k, result);
         iX_[i]   =   n;
@@ -1089,12 +1038,10 @@ double Integral::RombergIntegrateOpened(double bigValue)
 
             if(fabs(error)<precision_)
             {
-                if(std::abs(value - q_value) > 1e-6)
-                {
-                    log_warn("RombergIntegrateOpened_bigValue qags %f and romberg %f differs", q_value, value);
-                    // std::cout << q_value << " qags" << std::endl;
-                    // std::cout << value << " romberg" << std::endl;
-                }
+                // if(std::abs(value - q_value) > 1e-6)
+                // {
+                //     log_warn("RombergIntegrateOpened_bigValue qags %f and romberg %f differs", q_value, value);
+                // }
                 return value;
             }
         }
@@ -1102,8 +1049,9 @@ double Integral::RombergIntegrateOpened(double bigValue)
         n   /=  9;
     }
 
-    log_warn("Precision %f has not been reached after %i steps! Returning %f!", precision_, maxSteps_,value);
-    return value;
+    double q_value = qags();
+    log_warn("Precision %f has not been reached after %i steps the value is %f! Using now qags with value %f!", precision_, maxSteps_, value, q_value);
+    return q_value;
 }
 
 
@@ -1142,17 +1090,17 @@ double Integral::InitIntegralOpenedAndClosed(double min, double max, boost::func
 //----------------------------------------------------------------------------//
 
 
-double Integral::IntegrateClosed(double min, double max, boost::function<double (double)> integrand)
-{
-    double aux;
-    aux = InitIntegralOpenedAndClosed(min, max, integrand);
+// double Integral::IntegrateClosed(double min, double max, boost::function<double (double)> integrand)
+// {
+//     double aux;
+//     aux = InitIntegralOpenedAndClosed(min, max, integrand);
 
-    if(fabs(max_-min_)<=fabs(min_)*COMPUTER_PRECISION)
-    {
-        return 0;
-    }
-    return aux*RombergIntegrateClosed();
-}
+//     if(fabs(max_-min_)<=fabs(min_)*COMPUTER_PRECISION)
+//     {
+//         return 0;
+//     }
+//     return aux*RombergIntegrateClosed();
+// }
 
 
 //----------------------------------------------------------------------------------------------------//
@@ -1459,103 +1407,103 @@ double Integral::IntegrateWithLog(double min, double max, boost::function<double
 
 
 
-double Integral::InitIntegralWithLogSubstitution(double min, double max, boost::function<double (double)> integrand, double powerOfSubstitution)
-{
-    double aux;
+// double Integral::InitIntegralWithLogSubstitution(double min, double max, boost::function<double (double)> integrand, double powerOfSubstitution)
+// {
+//     double aux;
 
-    reverse_ =   false;
-    useLog_  =   true;
+//     reverse_ =   false;
+//     useLog_  =   true;
 
-    if(min<0 || max<0)
-    {
-        return 0;
-    }
-    else if(min>max)
-    {
-        std::swap(min,max);
-        aux=-1;
-    }
-    else
-    {
-        aux=1;
-    }
+//     if(min<0 || max<0)
+//     {
+//         return 0;
+//     }
+//     else if(min>max)
+//     {
+//         std::swap(min,max);
+//         aux=-1;
+//     }
+//     else
+//     {
+//         aux=1;
+//     }
 
-    if(powerOfSubstitution>0)
-    {
-        if(max>1 && min>1)
-        {
-            this->min_   =   pow( log(max), -1/powerOfSubstitution);
-            this->max_   =   pow( log(min), -1/powerOfSubstitution);
-        }
-        else if(max>1){
-            this->min_   =   0;
-            this->max_   =   pow( log(max), -1/powerOfSubstitution);
-            aux         =   -aux;
-        }
-        else
-        {
-            return 0;
-        }
-    }
-    else if(powerOfSubstitution<0)
-    {
-        if(max<1 && min<1)
-        {
-            this->min_   =   -pow(- log(max), 1/powerOfSubstitution);
-            this->max_   =   -pow(- log(min), 1/powerOfSubstitution);
-        }
-        else if(min<1)
-        {
-            this->min_   =   -pow(- log(min), 1/powerOfSubstitution);
-            this->max_   =   0;
-            aux         =   -aux;
-        }
-        else
-        {
-            return 0;
-        }
-    }
-    else
-    {
-        this->min_   =   log(min);
-        this->max_   =   log(max);
-    }
+//     if(powerOfSubstitution>0)
+//     {
+//         if(max>1 && min>1)
+//         {
+//             this->min_   =   pow( log(max), -1/powerOfSubstitution);
+//             this->max_   =   pow( log(min), -1/powerOfSubstitution);
+//         }
+//         else if(max>1){
+//             this->min_   =   0;
+//             this->max_   =   pow( log(max), -1/powerOfSubstitution);
+//             aux         =   -aux;
+//         }
+//         else
+//         {
+//             return 0;
+//         }
+//     }
+//     else if(powerOfSubstitution<0)
+//     {
+//         if(max<1 && min<1)
+//         {
+//             this->min_   =   -pow(- log(max), 1/powerOfSubstitution);
+//             this->max_   =   -pow(- log(min), 1/powerOfSubstitution);
+//         }
+//         else if(min<1)
+//         {
+//             this->min_   =   -pow(- log(min), 1/powerOfSubstitution);
+//             this->max_   =   0;
+//             aux         =   -aux;
+//         }
+//         else
+//         {
+//             return 0;
+//         }
+//     }
+//     else
+//     {
+//         this->min_   =   log(min);
+//         this->max_   =   log(max);
+//     }
 
-    this->integrand_             =   integrand;
-    this->powerOfSubstitution_   =   powerOfSubstitution;
-    randomNumber_                =   0;
-    randomDo_                    =   false;
+//     this->integrand_             =   integrand;
+//     this->powerOfSubstitution_   =   powerOfSubstitution;
+//     randomNumber_                =   0;
+//     randomDo_                    =   false;
 
-    return aux;
-}
-
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-double Integral::IntegrateWithLogSubstitution(double min, double max, boost::function<double (double)> integrand, double powerOfSubstitution)
-{
-
-    double aux;
-
-    aux = InitIntegralWithLogSubstitution(min, max, integrand, powerOfSubstitution);
-
-    if(fabs(max_-min_)<=fabs(min_)*COMPUTER_PRECISION)
-    {
-        return 0;
-    }
-
-    return aux*RombergIntegrateOpened();
-}
+//     return aux;
+// }
 
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
 
+// double Integral::IntegrateWithLogSubstitution(double min, double max, boost::function<double (double)> integrand, double powerOfSubstitution)
+// {
 
-double Integral::qags()
+//     double aux;
+
+//     aux = InitIntegralWithLogSubstitution(min, max, integrand, powerOfSubstitution);
+
+//     if(fabs(max_-min_)<=fabs(min_)*COMPUTER_PRECISION)
+//     {
+//         return 0;
+//     }
+
+//     return aux*RombergIntegrateOpened();
+// }
+
+
+//----------------------------------------------------------------------------//
+//----------------------------------------------------------------------------//
+
+
+
+double Integral::qags(double q_limit_, double q_epsabs_, double q_epsrel_)
 {
 
     const double q_epmach_ = std::numeric_limits<double>::epsilon(); // machine epsilon
@@ -1566,13 +1514,10 @@ double Integral::qags()
     double abserr = 0.0;
     int neval = 0;
     int ier = 0;
-    double q_epsabs_ = 1.0e-50;
-    double q_epsrel_ = 1.0e-6;
 
     if (q_limit_ < 1)
     {
-        std::cout<< "abnormal return from dqags" << std::endl;
-        std::cout<< " Error Number = " << ier << std::endl;
+        log_warn("the limit is below 1, returning 0");
         return result;
     }
 
@@ -1582,7 +1527,6 @@ double Integral::qags()
         return result;
     }
     std::pair<Integral::InterpolationResults, Integral::InterpolationResults> qk21_output;
-    // std::cout << "first approx" << std::endl;
 
     // First approximation to the integral.
     qk21_output = q_gaus_kronrod_21(min_, max_);
@@ -1594,7 +1538,6 @@ double Integral::qags()
     // Test on accuracy.
     double dres = std::abs(result);
     double errbnd = std::max(q_epsabs_, q_epsrel_*dres);
-    // std::cout << "abserr = " << abserr << ", errbnd = " << errbnd << ", resabs = " << resabs << std::endl;
     int last = 1;
 
     if(abserr <= 100*q_epmach_*defabs && abserr > errbnd)
@@ -1606,10 +1549,22 @@ double Integral::qags()
     if(ier != 0 || (abserr <= errbnd && abserr != resabs ) || abserr == 0.0)
     {
         neval = 42 * last - 21;
-        std::cout.precision(16);
-        std::cout << "ier = " << ier << ", neval = " << neval << ", result = " << result << ", abserr = " << abserr << std::endl;
         return result;
     }
+    std::vector<double> q_alist_;
+    std::vector<double> q_blist_;
+    std::vector<double> q_elist_;
+    std::vector<double> q_rlist_;
+
+    // the maximum number of elements the epsilon table can contain.
+    // if this number is reached, the upper diagonal of the epsilon table is deleted.
+    const int q_limit_epsilon_table_ = 50;
+    q_rlist2_.resize(q_limit_epsilon_table_ + 2);
+    q_alist_.resize(q_limit_);
+    q_blist_.resize(q_limit_);
+    q_elist_.resize(q_limit_);
+    q_rlist_.resize(q_limit_);
+    q_iord_.resize(q_limit_);
 
     int ierro = 0;
     q_alist_[0] = min_;
@@ -1736,10 +1691,9 @@ double Integral::qags()
 
         // Call QSORT to maintain the descending ordering in the list of error estimates 
         // and select the subinterval with nrmax-th largest error estimate (to be bisected next).
-        nrmax = q_sort(last, maxerr, nrmax);
+        nrmax = q_sort(q_limit_, last, maxerr, nrmax, q_elist_);
         maxerr = q_iord_[nrmax-1];
         errmax = q_elist_[maxerr-1];
-
         if (errsum <= errbnd)
         {
             // Compute global integral sum.
@@ -1750,9 +1704,6 @@ double Integral::qags()
                 ier = ier - 1;
 
             neval = 42*last - 21;
-            std::cout.precision(16);
-            std::cout << "in loop " << last << std::endl;
-            std::cout << "ier = " << ier << ", neval = " << neval << ", result = " << result << ", abserr = " << abserr << std::endl;
             return result;
         }
 
@@ -1800,8 +1751,8 @@ double Integral::qags()
                 jupbnd = last;
             }
 
-            int id = nrmax;
             bool go_to_main_loop_start = false;
+            int id = nrmax;
             for (int idx = id; idx <= jupbnd; idx++)
             {
                 maxerr = q_iord_[nrmax-1];
@@ -1813,24 +1764,26 @@ double Integral::qags()
                 }
                 nrmax = nrmax+1;
             }
-            if (go_to_main_loop_start)
-                continue;
             // while(nrmax <= jupbnd)
             // {
             //     maxerr = q_iord_[nrmax-1];
             //     errmax = q_elist_[maxerr-1];
             //     if(std::abs(q_blist_[maxerr-1] - q_alist_[maxerr-1]) > small)
-            //         continue;
-
+            //     {
+            //         go_to_main_loop_start = true;
+            //         break;
+            //     }
             //     nrmax = nrmax+1;
             // }
+            if (go_to_main_loop_start)
+                continue;
         }
 
         // Perform extrapolation.
         numrl2 = numrl2 + 1;
         q_rlist2_[numrl2-1] = area;
         nres += 1;
-        extrapolation_output = q_epsilon_extrapolation(numrl2, nres); // f90 q_rlist2_ -> epstab
+        extrapolation_output = q_epsilon_extrapolation(q_limit_epsilon_table_, numrl2, nres); // f90 q_rlist2_ -> epstab
         reseps = extrapolation_output.Value;
         abseps = extrapolation_output.Error;
         ktmin = ktmin + 1;
@@ -1925,10 +1878,6 @@ double Integral::qags()
         ier = ier - 1;
 
     neval = 42*last - 21;
-
-    std::cout.precision(16);
-    std::cout << "after loop " << std::endl;
-    std::cout << "ier = " << ier << ", neval = " << neval << ", result = " << result << ", abserr = " << abserr << std::endl;
     return result;
 }
 
@@ -1936,6 +1885,8 @@ std::pair<Integral::InterpolationResults, Integral::InterpolationResults> Integr
     double min_lim, 
     double max_lim)
 {
+    double q_fv1_ [10];
+    double q_fv2_ [10];
     const double q_epmach_ = std::numeric_limits<double>::epsilon(); // machine epsilon
     const double q_uflow_ = std::numeric_limits<double>::min(); // smallest finite value
     const double q_weights_gaus_10p_ [5] =
@@ -1979,8 +1930,7 @@ std::pair<Integral::InterpolationResults, Integral::InterpolationResults> Integr
     Integral::InterpolationResults qk21_output;
     Integral::InterpolationResults qk21_abs_output;
     // internal parameters
-    double absc, fsum, fval1, fval2, reskh;
-    int jtw, jtwm1;
+    double absc, fval1, fval2, reskh;
 
     double centr = 0.5*(min_lim + max_lim);
     double hlgth = 0.5*(max_lim - min_lim);
@@ -1994,31 +1944,27 @@ std::pair<Integral::InterpolationResults, Integral::InterpolationResults> Integr
     double resk = q_weights_kronrod_21p_[10]*fc;
     resabs = std::abs(resk);
 
-    for(int idx = 1; idx <= 5; idx++)
+    for(int idx = 1; idx <= 9; idx = idx + 2)
     {
-        jtw = 2*idx;
-        absc = hlgth*q_abscissae_kronrod_21p_[jtw-1];
+        absc = hlgth*q_abscissae_kronrod_21p_[idx];
         fval1 = Function(centr-absc);
         fval2 = Function(centr+absc);
-        q_fv1_[jtw-1] = fval1;
-        q_fv2_[jtw-1] = fval2;
-        fsum = fval1 + fval2;
-        resg = resg + q_weights_gaus_10p_[idx-1]*fsum;
-        resk = resk + q_weights_kronrod_21p_[jtw-1]*fsum;
-        resabs = resabs + q_weights_kronrod_21p_[jtw-1]*(std::abs(fval1) + std::abs(fval2));
+        q_fv1_[idx] = fval1;
+        q_fv2_[idx] = fval2;
+        resg = resg + q_weights_gaus_10p_[(idx-1)/2]*(fval1 + fval2);
+        resk = resk + q_weights_kronrod_21p_[idx]*(fval1 + fval2);
+        resabs = resabs + q_weights_kronrod_21p_[idx]*(std::abs(fval1) + std::abs(fval2));
     }
 
-    for(int idx = 1; idx <= 5; idx++)
+    for(int idx = 0; idx <= 8; idx = idx + 2)
     {
-        jtwm1 = 2*idx - 1;
-        absc = hlgth*q_abscissae_kronrod_21p_[jtwm1-1];
+        absc = hlgth*q_abscissae_kronrod_21p_[idx];
         fval1 = Function(centr-absc);
         fval2 = Function(centr+absc);
-        q_fv1_[jtwm1-1] = fval1;
-        q_fv2_[jtwm1-1] = fval2;
-        fsum = fval1 + fval2;
-        resk = resk + q_weights_kronrod_21p_[jtwm1-1]*fsum;
-        resabs = resabs + q_weights_kronrod_21p_[jtwm1-1]*(std::abs(fval1) + std::abs(fval2));
+        q_fv1_[idx] = fval1;
+        q_fv2_[idx] = fval2;
+        resk = resk + q_weights_kronrod_21p_[idx]*(fval1 + fval2);
+        resabs = resabs + q_weights_kronrod_21p_[idx]*(std::abs(fval1) + std::abs(fval2));
     }
 
     reskh = resk*0.5;
@@ -2035,10 +1981,6 @@ std::pair<Integral::InterpolationResults, Integral::InterpolationResults> Integr
 
     if(resasc != 0.0 && abserr != 0.0)
         abserr = resasc * std::min(1., std::pow(200.0 * abserr / resasc, 1.5));
-    // {
-    //     double tmp_for_pow = std::sqrt(200. * abserr / resasc);
-    //     abserr = resasc * std::min(1., tmp_for_pow*tmp_for_pow*tmp_for_pow);
-    // }
 
     if(resabs > q_uflow_ / (50. * q_epmach_))
         abserr = std::max((q_epmach_ * 50.0)*resabs, abserr);
@@ -2050,19 +1992,20 @@ std::pair<Integral::InterpolationResults, Integral::InterpolationResults> Integr
     return std::make_pair(qk21_output, qk21_abs_output);
 }
 
-int Integral::q_sort(int last, int maxerr, int nrmax)
+int Integral::q_sort(int q_limit_,int last, int maxerr, int nrmax, const std::vector<double>& q_elist_)
 {
-    double errmax, errmin;
-    int i,ibeg,isucc,jbnd,jupbn,k, nrmax_intern;
-
-    nrmax_intern = nrmax;
     // Check whether the list contains more than two error estimates.
     if(last <= 2)
     {
         q_iord_[0] = 1;
         q_iord_[1] = 2;
-        return nrmax_intern;
+        return nrmax;
     }
+
+    double errmax, errmin;
+    int i,ibeg,isucc,jbnd,jupbn,k, nrmax_intern;
+
+    nrmax_intern = nrmax;
 
     // This part of the routine is only executed if, due to a difficult integrand,
     // subdivision increased the error estimate. in the normal case the insert procedure should
@@ -2083,6 +2026,16 @@ int Integral::q_sort(int last, int maxerr, int nrmax)
             q_iord_[nrmax_intern-1] = isucc;
             nrmax_intern = nrmax_intern - 1;
         }
+        // while(nrmax_intern > 1)
+        // {
+        //     isucc = q_iord_[nrmax_intern-2];
+
+        //     if(q_elist_[isucc-1] <= errmax)
+        //         break;
+
+        //     q_iord_[nrmax_intern-1] = isucc;
+        //     nrmax_intern = nrmax_intern - 1;
+        // }
     }
 
     // Compute the number of elements in the list to be maintained in descending order.
@@ -2106,7 +2059,7 @@ int Integral::q_sort(int last, int maxerr, int nrmax)
         q_iord_[jupbn-1] = last;
         return nrmax_intern;
     }
-    
+
     bool jump_to_60 = false;
     for(i = ibeg; i <= jbnd; i++)
     {
@@ -2142,16 +2095,26 @@ int Integral::q_sort(int last, int maxerr, int nrmax)
         q_iord_[k] = isucc;
         k = k-1;
     }
+    // while(k > 0):
+    // {
+    //     isucc = q_iord_[k-1];
+    //     if(errmin < q_elist_[isucc-1])
+    //     {
+    //         q_iord_[k] = last;
+    //         return nrmax_intern;
+    //     }
+    //     q_iord_[k] = isucc;
+    //     k = k-1;
+    // }
     q_iord_[i-1] = last;
 
     return nrmax_intern;
 }
 
-Integral::InterpolationResults Integral::q_epsilon_extrapolation(int numrl2, int nres)
+Integral::InterpolationResults Integral::q_epsilon_extrapolation(int q_limit_epsilon_table_,int numrl2, int nres)
 {
     const double q_epmach_ = std::numeric_limits<double>::epsilon(); // machine epsilon
     const double q_oflow_ = std::numeric_limits<double>::max(); // largest finite value
-    const int q_limit_epsilon_table_ = 50;
     // output
     Integral::InterpolationResults extrapolation_output;
     double result, abserr;
@@ -2169,7 +2132,7 @@ Integral::InterpolationResults Integral::q_epsilon_extrapolation(int numrl2, int
     double delta1,delta2,delta3,
         epsinf,error,err1,err2,err3,e0,e1,e1abs,e2,e3,
         res,ss,tol1,tol2,tol3;
-    int ib,ib2,indx,k1,k2,k3,newelm,num;
+    int ib,k1,k2,k3,newelm,num;
 
     q_rlist2_[numrl2+1] = q_rlist2_[numrl2-1];
     newelm = (numrl2-1) / 2;
@@ -2251,18 +2214,15 @@ Integral::InterpolationResults Integral::q_epsilon_extrapolation(int numrl2, int
 
     for(int idx = 1; idx <= newelm + 1; idx++)
     {
-        ib2 = ib + 2;
-        q_rlist2_[ib-1] = q_rlist2_[ib2-1];
-        ib = ib2;
+        q_rlist2_[ib-1] = q_rlist2_[ib+1];
+        ib = ib + 2;
     }
 
     if(num != numrl2)
     {
-        indx = num - numrl2 + 1;
-        for(int idx = 1; idx <= numrl2; idx++)
+        for(int idx = 0; idx < numrl2; idx++)
         {
-            q_rlist2_[idx-1] = q_rlist2_[indx-1];
-            indx = indx + 1;
+            q_rlist2_[idx] = q_rlist2_[num - numrl2 + idx];
         }
     }
 
