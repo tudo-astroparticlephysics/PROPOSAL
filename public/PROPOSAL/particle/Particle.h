@@ -300,4 +300,6 @@ class Particle : public DynamicData
     double elost_; //!< energy lost in the detector volume [MeV]
 };
 
+std::ostream& operator<<(std::ostream&, PROPOSAL::DynamicData const&);
+
 } // namespace PROPOSAL
