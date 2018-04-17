@@ -994,7 +994,8 @@ double Integral::RombergIntegrateOpened()
     result  =   0;
 
     double q_value = qags();
-    for(i=0 ; i<16 ; i++)
+    return q_value;
+    for(i=0 ; i<12 ; i++)
     {
         if(randomNumber_==0 || randomNumber_==1)
         {
@@ -1800,15 +1801,20 @@ double Integral::qags()
             }
 
             int id = nrmax;
+            bool go_to_main_loop_start = false;
             for (int idx = id; idx <= jupbnd; idx++)
             {
                 maxerr = q_iord_[nrmax-1];
                 errmax = q_elist_[maxerr-1];
                 if(std::abs(q_blist_[maxerr-1] - q_alist_[maxerr-1]) > small)
-                    continue;
-
+                {
+                    go_to_main_loop_start = true;
+                    break;
+                }
                 nrmax = nrmax+1;
             }
+            if (go_to_main_loop_start)
+                continue;
             // while(nrmax <= jupbnd)
             // {
             //     maxerr = q_iord_[nrmax-1];
