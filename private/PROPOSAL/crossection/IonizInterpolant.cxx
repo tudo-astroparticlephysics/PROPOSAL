@@ -19,7 +19,7 @@
 using namespace PROPOSAL;
 
 IonizInterpolant::IonizInterpolant(const Ionization& param, InterpolationDef def)
-    : CrossSectionInterpolant(DynamicData::DeltaE, param, def)
+    : CrossSectionInterpolant(DynamicData::DeltaE, param)
 {
     // Use overwritten dNdx interpolation
     InitdNdxInerpolation(def);
