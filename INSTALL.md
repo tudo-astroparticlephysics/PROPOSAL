@@ -79,7 +79,7 @@ into a local build directory and install googletest:
 
 	or
 
-		git clone ... PROPOSAL/src
+		git clone https://github.com/tudo-astroparticlephysics/PROPOSAL.git PROPOSAL/src
 
 4.	Move to the build directory and generate the Makefile with cmake:
 
