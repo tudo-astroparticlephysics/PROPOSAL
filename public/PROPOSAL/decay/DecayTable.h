@@ -88,4 +88,6 @@ class DecayTable
         DecayMap channels_;
 };
 
+std::ostream& operator<<(std::ostream&, PROPOSAL::DecayTable const&);
+
 } /* PROPOSAL */

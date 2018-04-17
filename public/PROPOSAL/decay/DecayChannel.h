@@ -96,4 +96,6 @@ class DecayChannel
     static void CopyParticleProperties(DecayProducts&, const Particle&);
 };
 
+std::ostream& operator<<(std::ostream&, PROPOSAL::DecayChannel const&);
+
 } /* PROPOSAL */
