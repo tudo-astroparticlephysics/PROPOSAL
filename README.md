@@ -88,18 +88,18 @@ The following file has not been changed yet:
 ### Deployment ###
 
 PROPOSAL is build as library. So you can include this project in your own
-c++ project by including the header files. In the
-[root_examples](root_examples/) are many examples given how you can
-use this library. The following snippet uses the
-[configuration](resources/configuration) to propagte muons and
+c++ project by including the header files. The following snippet uses the
+[configuration](resources/config.json) to propagte muons and
 store the muon ranges for further proceeds.
+The parameters of the configuration file are described
+[here](resources/config_docu.md).
 
 ```c++
 #include "PROPOSAL/PROPOSAL.h"
 
 using namespace PROPOSAL;
 
-Propagator prop(MuMinusDef::Get(), "resources/configuration");
+Propagator prop(MuMinusDef::Get(), "resources/config.json");
 Particle& mu = prop.GetParticle();
 Particle mu_backup(mu);
 
@@ -155,6 +155,8 @@ scripts you can find in
 
 For a short demonstration the following snippet will create data you can use to
 show the distribution of muon ranges and the number of interactions in ice.
+The parameters of the given configuration file are described
+[here](resources/config_docu.md).
 
 ```python
 import pyPROPOSAL as pp
@@ -181,6 +183,8 @@ for i in range(1000):
 ## Issues ##
 
 When you encounter any errors or misunderstandings don't hesitate and write a mail to
+[Jan Soedingrekso](mailto:jan.soedingrekso@tu-dortmund.de),
+[Mario Dunsch](mailto:mario.dunsch@tu-dortmund.de),
 [Tomasz Fuchs](mailto:Tomasz.Fuchs@tu-dortmund.de) or
 [Jan-Hendrik Koehne](mailto:Jan-Hendrik.Koehne@tu-dortmund.de).
 
