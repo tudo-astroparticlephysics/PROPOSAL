@@ -13,7 +13,7 @@ class Interpolant;
 class CrossSectionInterpolant: public CrossSection
 {
     public:
-        CrossSectionInterpolant(const DynamicData::Type&, const Parametrization&, InterpolationDef);
+        CrossSectionInterpolant(const DynamicData::Type&, const Parametrization&);
         CrossSectionInterpolant(const CrossSectionInterpolant&);
         virtual ~CrossSectionInterpolant();
 
