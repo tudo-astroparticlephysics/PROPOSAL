@@ -44,7 +44,7 @@ double Integral::Integrate(double min, double max, boost::function<double (doubl
 
     switch (method)
     {
-        // case 1: return IntegrateClosed(min,max,integrand);
+        case 1: return IntegrateClosed(min,max,integrand);
         case 2: return IntegrateOpened(min,max,integrand);
         case 3: return IntegrateWithSubstitution(min,max,integrand,powerOfSubstitution);
         case 4:
@@ -53,12 +53,12 @@ double Integral::Integrate(double min, double max, boost::function<double (doubl
                 return 0;
             }
             return IntegrateWithLog(min,max,integrand);
-        // case 5:
-        //     if (min <= 0. || max <= 0.)
-        //     {
-        //         return 0;
-        //     }
-        //     return IntegrateWithLogSubstitution(min,max,integrand,powerOfSubstitution);
+        case 5:
+            if (min <= 0. || max <= 0.)
+            {
+                return 0;
+            }
+            return IntegrateWithLogSubstitution(min,max,integrand,powerOfSubstitution);
         default:
             log_fatal("Unknown integration method! 0 is returned!");
             return 0;
@@ -323,29 +323,29 @@ double Integral::IntegrateWithLog(double min, double max, boost::function<double
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-
 Integral::Integral()
-    :maxSteps_   (20)
-    ,romberg_    (5)
-    ,precision_  (1.e-6)
-    ,max_        (1)
-    ,min_        (0)
-    ,iX_()
-    ,iY_()
-    ,c_()
-    ,d_()
-    ,romberg4refine_(2)
-    ,powerOfSubstitution_(0)
-    ,randomDo_(false)
-    ,useLog_(false)
-    ,randomNumber_(0)
-    ,randomX_(0)
-    ,reverse_(false)
-    ,reverseX_(0)
-    ,savedResult_(0)
-    ,q_last_3_results_()
-    ,q_rlist2_()
-    ,q_iord_()
+    : maxSteps_romberg_(12)
+    , maxSteps_upper_limit_(20)
+    , romberg_(5)
+    , precision_(1.e-6)
+    , max_(1)
+    , min_(0)
+    , iX_()
+    , iY_()
+    , c_()
+    , d_()
+    , romberg4refine_(2)
+    , powerOfSubstitution_(0)
+    , randomDo_(false)
+    , useLog_(false)
+    , randomNumber_(0)
+    , randomX_(0)
+    , reverse_(false)
+    , reverseX_(0)
+    , savedResult_(0)
+    , q_last_3_results_()
+    , q_rlist2_()
+    , q_iord_()
 {
     int aux;
     if(romberg_<=0)
@@ -354,10 +354,10 @@ Integral::Integral()
         romberg_     =   1;
     }
 
-    if(maxSteps_<=0)
+    if(maxSteps_upper_limit_<=0)
     {
-        log_warn("Warning (in Integral/Integral/1): maxSteps = %i must be > 0, setting to 1", maxSteps_);
-        maxSteps_    =   1;
+        log_warn("Warning (in Integral/Integral/1): maxSteps = %i must be > 0, setting to 1", maxSteps_upper_limit_);
+        maxSteps_upper_limit_    =   1;
     }
 
     if(precision_<=0)
@@ -366,8 +366,8 @@ Integral::Integral()
         precision_   =   1.e-6;
     }
 
-    iX_.resize(maxSteps_);
-    iY_.resize(maxSteps_);
+    iX_.resize(maxSteps_upper_limit_);
+    iY_.resize(maxSteps_upper_limit_);
 
     aux=std::max(romberg_, romberg4refine_);
     c_.resize(aux);
@@ -382,7 +382,8 @@ Integral::Integral()
 
 
 Integral::Integral(const Integral &integral)
-    :maxSteps_(integral.maxSteps_)
+    :maxSteps_romberg_(integral.maxSteps_romberg_)
+    ,maxSteps_upper_limit_(integral.maxSteps_upper_limit_)
     ,romberg_(integral.romberg_)
     ,precision_(integral.precision_)
     ,max_(integral.max_)
@@ -413,7 +414,8 @@ Integral::Integral(const Integral &integral)
 
 
 Integral::Integral(int  romberg, int maxSteps, double precision)
-    :max_          (1)
+    :maxSteps_romberg_(12)
+    ,max_          (1)
     ,min_          (0)
     ,iX_()
     ,iY_()
@@ -452,11 +454,11 @@ Integral::Integral(int  romberg, int maxSteps, double precision)
     }
 
     this->romberg_   =   romberg;
-    this->maxSteps_  =   maxSteps;
+    this->maxSteps_upper_limit_  =   maxSteps;
     this->precision_ =   precision;
 
-    iX_.resize(maxSteps_);
-    iY_.resize(maxSteps_);
+    iX_.resize(maxSteps_upper_limit_);
+    iY_.resize(maxSteps_upper_limit_);
 
     aux=std::max(romberg_, romberg4refine_);
     c_.resize(aux);
@@ -513,19 +515,20 @@ bool Integral::operator==(const Integral &integral) const
     {
         if(d_.at(i)     !=  integral.d_.at(i))  return false;
     }
-    if(maxSteps_        != integral.maxSteps_)      return false;
-    if(romberg_         != integral.romberg_)       return false;
-    if(precision_       != integral.precision_)     return false;
-    if(max_             != integral.max_)           return false;
-    if(min_             != integral.min_)           return false;
-    if(romberg4refine_  != integral.romberg4refine_)return false;
-    if(randomDo_        != integral.randomDo_)      return false;
-    if(useLog_          != integral.useLog_)        return false;
-    if(randomNumber_    != integral.randomNumber_)  return false;
-    if(randomX_         != integral.randomX_)       return false;
-    if(reverse_         != integral.reverse_)       return false;
-    if(reverseX_        != integral.reverseX_)      return false;
-    if(savedResult_     != integral.savedResult_)   return false;
+    if(maxSteps_upper_limit_    != integral.maxSteps_upper_limit_)  return false;
+    if(maxSteps_romberg_        != integral.maxSteps_romberg_)      return false;
+    if(romberg_                 != integral.romberg_)               return false;
+    if(precision_               != integral.precision_)             return false;
+    if(max_                     != integral.max_)                   return false;
+    if(min_                     != integral.min_)                   return false;
+    if(romberg4refine_          != integral.romberg4refine_)        return false;
+    if(randomDo_                != integral.randomDo_)              return false;
+    if(useLog_                  != integral.useLog_)                return false;
+    if(randomNumber_            != integral.randomNumber_)          return false;
+    if(randomX_                 != integral.randomX_)               return false;
+    if(reverse_                 != integral.reverse_)               return false;
+    if(reverseX_                != integral.reverseX_)              return false;
+    if(savedResult_             != integral.savedResult_)           return false;
 
     if(powerOfSubstitution_ != integral.powerOfSubstitution_) return false;
 
@@ -552,7 +555,8 @@ void Integral::swap(Integral &integral)
 {
     using std::swap;
 
-    swap(maxSteps_,integral.maxSteps_);
+    swap(maxSteps_upper_limit_,integral.maxSteps_upper_limit_);
+    swap(maxSteps_romberg_,integral.maxSteps_romberg_);
     swap(romberg_,integral.romberg_);
     swap(precision_,integral.precision_);
     swap(max_,integral.max_);
@@ -638,26 +642,26 @@ double Integral::Function(double x)
 //----------------------------------------------------------------------------//
 
 
-// double Integral::Trapezoid(int n, double oldSum)
-// {
-//     double xStep, stepSize, resultSum;
+double Integral::Trapezoid(int n, double oldSum)
+{
+    double xStep, stepSize, resultSum;
 
-//     if(n==1)
-//     {
-//         return (Function(max_)+Function(min_))*(max_-min_)/2;
-//     }
+    if(n==1)
+    {
+        return (Function(max_)+Function(min_))*(max_-min_)/2;
+    }
 
-//     n           /=  2;
-//     stepSize    =   (max_-min_)/n;
-//     resultSum   =   0;
+    n           /=  2;
+    stepSize    =   (max_-min_)/n;
+    resultSum   =   0;
 
-//     for(xStep=min_+stepSize/2 ; xStep<max_ ; xStep+=stepSize)
-//     {
-//         resultSum   +=  Function(xStep);
-//     }
+    for(xStep=min_+stepSize/2 ; xStep<max_ ; xStep+=stepSize)
+    {
+        resultSum   +=  Function(xStep);
+    }
 
-//     return (oldSum+resultSum*stepSize)/2;
-// }
+    return (oldSum+resultSum*stepSize)/2;
+}
 
 
 //----------------------------------------------------------------------------//
@@ -889,54 +893,51 @@ Integral::InterpolationResults Integral::Interpolate(int start, double x)
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
+double Integral::RombergIntegrateClosed()
+{
+    double k = 1;
+    double n = 1;
+    double error, result, value;
+    Integral::InterpolationResults interpolation_results;
 
-// double Integral::RombergIntegrateClosed()
-// {
-//     double k = 1;
-//     double n = 1;
-//     double error, result, value;
-//     Integral::InterpolationResults interpolation_results;
+    value   =   0;
+    result  =   0;
 
+    for (int i = 0; i < maxSteps_romberg_; i++)
+    {
+        result  =   Trapezoid(k, result);
+        iX_[i]   =   n;
+        iY_[i]   =   result;
 
-//     value   =   0;
-//     result  =   0;
+        if(i>=romberg_-1)
+        {
+            interpolation_results = Interpolate(i-(romberg_-1), 0);
 
-//     for(int i=0 ; i<maxSteps_ ; i++)
-//     {
-//         result  =   Trapezoid(k, result);
-//         iX_[i]   =   n;
-//         iY_[i]   =   result;
+            error   =   interpolation_results.Error;
+            value   =   interpolation_results.Value;
 
-//         if(i>=romberg_-1)
-//         {
-//             interpolation_results = Interpolate(i-(romberg_-1), 0);
+            if(value!=0)
+            {
+                error   /=  value;
+            }
 
-//             error   =   interpolation_results.Error;
-//             value   =   interpolation_results.Value;
+            if(fabs(error)<precision_)
+            {
+                return value;
+            }
+        }
 
-//             if(value!=0)
-//             {
-//                 error   /=  value;
-//             }
+        k   =   k*2;
+        n   =   n/4;
+    }
 
-//             if(fabs(error)<precision_)
-//             {
-//                 return value;
-//             }
-//         }
-
-//         k   =   k*2;
-//         n   =   n/4;
-//     }
-
-//     log_warn("Precision %f has not been reached after %i steps! Returning %f!", precision_, maxSteps_,value);
-//     return value;
-// }
-
+    double q_value = qags();
+    log_warn("Precision %e has not been reached after %i steps the value is %e! Using now qags with value %e!", precision_, maxSteps_romberg_, value, q_value);
+    return q_value;
+}
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
-
 
 double Integral::RombergIntegrateOpened()
 {
@@ -950,8 +951,7 @@ double Integral::RombergIntegrateOpened()
     value   =   0;
     result  =   0;
 
-    // double q_value = qags();
-    for(i=0 ; i<12 ; i++)
+    for (i = 0; i < maxSteps_romberg_; i++)
     {
         if(randomNumber_==0 || randomNumber_==1)
         {
@@ -990,10 +990,6 @@ double Integral::RombergIntegrateOpened()
 
             if(fabs(error)<precision_)
             {
-                // if(std::abs(value - q_value) > 1e-6)
-                // {
-                //     log_warn("RombergIntegrateOpened qags %f and romberg %f differs", q_value, value);
-                // }
                 return value;
             }
         }
@@ -1002,7 +998,7 @@ double Integral::RombergIntegrateOpened()
         n   /=  9;
     }
     double q_value = qags();
-    log_warn("Precision %f has not been reached after %i steps the value is %f! Using now qags with value %f!", precision_, maxSteps_, value, q_value);
+    log_warn("Precision %e has not been reached after %i steps the value is %e! Using now qags with value %e!", precision_, maxSteps_romberg_, value, q_value);
     return q_value;
 }
 
@@ -1022,9 +1018,8 @@ double Integral::RombergIntegrateOpened(double bigValue)
     n       =   1;
     value   =   0;
     result  =   0;
-    // double q_value = qags();
 
-    for(i=0 ; i<12 ; i++)
+    for (i = 0; i < maxSteps_romberg_; i++)
     {
         result  =   Trapezoid3(k, result);
         iX_[i]   =   n;
@@ -1038,10 +1033,6 @@ double Integral::RombergIntegrateOpened(double bigValue)
 
             if(fabs(error)<precision_)
             {
-                // if(std::abs(value - q_value) > 1e-6)
-                // {
-                //     log_warn("RombergIntegrateOpened_bigValue qags %f and romberg %f differs", q_value, value);
-                // }
                 return value;
             }
         }
@@ -1050,7 +1041,7 @@ double Integral::RombergIntegrateOpened(double bigValue)
     }
 
     double q_value = qags();
-    log_warn("Precision %f has not been reached after %i steps the value is %f! Using now qags with value %f!", precision_, maxSteps_, value, q_value);
+    log_warn("Precision %e has not been reached after %i steps the value is %e! Using now qags with value %e!", precision_, maxSteps_romberg_, value, q_value);
     return q_value;
 }
 
@@ -1090,18 +1081,17 @@ double Integral::InitIntegralOpenedAndClosed(double min, double max, boost::func
 //----------------------------------------------------------------------------//
 
 
-// double Integral::IntegrateClosed(double min, double max, boost::function<double (double)> integrand)
-// {
-//     double aux;
-//     aux = InitIntegralOpenedAndClosed(min, max, integrand);
+double Integral::IntegrateClosed(double min, double max, boost::function<double (double)> integrand)
+{
+    double aux;
+    aux = InitIntegralOpenedAndClosed(min, max, integrand);
 
-//     if(fabs(max_-min_)<=fabs(min_)*COMPUTER_PRECISION)
-//     {
-//         return 0;
-//     }
-//     return aux*RombergIntegrateClosed();
-// }
-
+    if(fabs(max_-min_)<=fabs(min_)*COMPUTER_PRECISION)
+    {
+        return 0;
+    }
+    return aux*RombergIntegrateClosed();
+}
 
 //----------------------------------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
@@ -1267,7 +1257,7 @@ void Integral::RefineUpperLimit(double result)
     f       =   functionValue;
     df      =   Function(currentX);
 
-    for(i=0 ; i<maxSteps_ ; i++)
+    for(i=0 ; i<maxSteps_upper_limit_ ; i++)
     {
         if(f<0)
         {
@@ -1336,9 +1326,9 @@ void Integral::RefineUpperLimit(double result)
         df  =   Function(currentX);
     }
 
-    if(i==maxSteps_)
+    if(i==maxSteps_upper_limit_)
     {
-        log_warn("Precision %f has not been reached after %i steps!", precision_, maxSteps_);
+        log_warn("Precision %f has not been reached after %i steps!", precision_, maxSteps_upper_limit_);
     }
 
     randomX_ =   currentX;
@@ -1407,95 +1397,95 @@ double Integral::IntegrateWithLog(double min, double max, boost::function<double
 
 
 
-// double Integral::InitIntegralWithLogSubstitution(double min, double max, boost::function<double (double)> integrand, double powerOfSubstitution)
-// {
-//     double aux;
+double Integral::InitIntegralWithLogSubstitution(double min, double max, boost::function<double (double)> integrand, double powerOfSubstitution)
+{
+    double aux;
 
-//     reverse_ =   false;
-//     useLog_  =   true;
+    reverse_ =   false;
+    useLog_  =   true;
 
-//     if(min<0 || max<0)
-//     {
-//         return 0;
-//     }
-//     else if(min>max)
-//     {
-//         std::swap(min,max);
-//         aux=-1;
-//     }
-//     else
-//     {
-//         aux=1;
-//     }
+    if(min<0 || max<0)
+    {
+        return 0;
+    }
+    else if(min>max)
+    {
+        std::swap(min,max);
+        aux=-1;
+    }
+    else
+    {
+        aux=1;
+    }
 
-//     if(powerOfSubstitution>0)
-//     {
-//         if(max>1 && min>1)
-//         {
-//             this->min_   =   pow( log(max), -1/powerOfSubstitution);
-//             this->max_   =   pow( log(min), -1/powerOfSubstitution);
-//         }
-//         else if(max>1){
-//             this->min_   =   0;
-//             this->max_   =   pow( log(max), -1/powerOfSubstitution);
-//             aux         =   -aux;
-//         }
-//         else
-//         {
-//             return 0;
-//         }
-//     }
-//     else if(powerOfSubstitution<0)
-//     {
-//         if(max<1 && min<1)
-//         {
-//             this->min_   =   -pow(- log(max), 1/powerOfSubstitution);
-//             this->max_   =   -pow(- log(min), 1/powerOfSubstitution);
-//         }
-//         else if(min<1)
-//         {
-//             this->min_   =   -pow(- log(min), 1/powerOfSubstitution);
-//             this->max_   =   0;
-//             aux         =   -aux;
-//         }
-//         else
-//         {
-//             return 0;
-//         }
-//     }
-//     else
-//     {
-//         this->min_   =   log(min);
-//         this->max_   =   log(max);
-//     }
+    if(powerOfSubstitution>0)
+    {
+        if(max>1 && min>1)
+        {
+            this->min_   =   pow( log(max), -1/powerOfSubstitution);
+            this->max_   =   pow( log(min), -1/powerOfSubstitution);
+        }
+        else if(max>1){
+            this->min_   =   0;
+            this->max_   =   pow( log(max), -1/powerOfSubstitution);
+            aux         =   -aux;
+        }
+        else
+        {
+            return 0;
+        }
+    }
+    else if(powerOfSubstitution<0)
+    {
+        if(max<1 && min<1)
+        {
+            this->min_   =   -pow(- log(max), 1/powerOfSubstitution);
+            this->max_   =   -pow(- log(min), 1/powerOfSubstitution);
+        }
+        else if(min<1)
+        {
+            this->min_   =   -pow(- log(min), 1/powerOfSubstitution);
+            this->max_   =   0;
+            aux         =   -aux;
+        }
+        else
+        {
+            return 0;
+        }
+    }
+    else
+    {
+        this->min_   =   log(min);
+        this->max_   =   log(max);
+    }
 
-//     this->integrand_             =   integrand;
-//     this->powerOfSubstitution_   =   powerOfSubstitution;
-//     randomNumber_                =   0;
-//     randomDo_                    =   false;
+    this->integrand_             =   integrand;
+    this->powerOfSubstitution_   =   powerOfSubstitution;
+    randomNumber_                =   0;
+    randomDo_                    =   false;
 
-//     return aux;
-// }
+    return aux;
+}
 
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
 
-// double Integral::IntegrateWithLogSubstitution(double min, double max, boost::function<double (double)> integrand, double powerOfSubstitution)
-// {
+double Integral::IntegrateWithLogSubstitution(double min, double max, boost::function<double (double)> integrand, double powerOfSubstitution)
+{
 
-//     double aux;
+    double aux;
 
-//     aux = InitIntegralWithLogSubstitution(min, max, integrand, powerOfSubstitution);
+    aux = InitIntegralWithLogSubstitution(min, max, integrand, powerOfSubstitution);
 
-//     if(fabs(max_-min_)<=fabs(min_)*COMPUTER_PRECISION)
-//     {
-//         return 0;
-//     }
+    if(fabs(max_-min_)<=fabs(min_)*COMPUTER_PRECISION)
+    {
+        return 0;
+    }
 
-//     return aux*RombergIntegrateOpened();
-// }
+    return aux*RombergIntegrateOpened();
+}
 
 
 //----------------------------------------------------------------------------//
@@ -1689,7 +1679,7 @@ double Integral::qags(double q_limit_, double q_epsabs_, double q_epsrel_)
             q_elist_[last-1] = error1;
         }
 
-        // Call QSORT to maintain the descending ordering in the list of error estimates 
+        // Call QSORT to maintain the descending ordering in the list of error estimates
         // and select the subinterval with nrmax-th largest error estimate (to be bisected next).
         nrmax = q_sort(q_limit_, last, maxerr, nrmax, q_elist_);
         maxerr = q_iord_[nrmax-1];
@@ -1738,7 +1728,7 @@ double Integral::qags(double q_limit_, double q_epsabs_, double q_epsrel_)
         }
 
         // The smallest interval has the largest error.
-        // Before bisecting decrease the sum of the errors over 
+        // Before bisecting decrease the sum of the errors over
         // the larger intervals (erlarg) and perform extrapolation.
         if ( ierro != 3 && erlarg > ertest )
         {
@@ -1790,7 +1780,7 @@ double Integral::qags(double q_limit_, double q_epsabs_, double q_epsrel_)
 
         if(ktmin > 5 && abserr < 1.0e-3 * errsum)
             ier = 5;
-        
+
         if (abseps < abserr)
         {
             ktmin = 0;
@@ -1882,7 +1872,7 @@ double Integral::qags(double q_limit_, double q_epsabs_, double q_epsrel_)
 }
 
 std::pair<Integral::InterpolationResults, Integral::InterpolationResults> Integral::q_gaus_kronrod_21(
-    double min_lim, 
+    double min_lim,
     double max_lim)
 {
     double q_fv1_ [10];
@@ -2233,12 +2223,12 @@ Integral::InterpolationResults Integral::q_epsilon_extrapolation(int q_limit_eps
     }
     else
     {
-        abserr = std::abs(result - q_last_3_results_[3]) +
-            std::abs(result - q_last_3_results_[2]) +
-            std::abs(result - q_last_3_results_[1]);
+        abserr = std::abs(result - q_last_3_results_[2]) +
+            std::abs(result - q_last_3_results_[1]) +
+            std::abs(result - q_last_3_results_[0]);
+        q_last_3_results_[0] = q_last_3_results_[1];
         q_last_3_results_[1] = q_last_3_results_[2];
-        q_last_3_results_[2] = q_last_3_results_[3];
-        q_last_3_results_[3] = result;
+        q_last_3_results_[2] = result;
     }
 
     abserr = std::max(abserr, 5.0 * q_epmach_ * std::abs(result));
@@ -2264,8 +2254,12 @@ void Integral::SetMax(double max) {
 	max_ = max;
 }
 
-void Integral::SetMaxSteps(int maxSteps) {
-	maxSteps_ = maxSteps;
+void Integral::SetMaxStepsUpperLimit(int maxSteps) {
+	maxSteps_upper_limit_ = maxSteps;
+}
+
+void Integral::SetMaxStepsRomberg(int maxSteps) {
+	maxSteps_romberg_ = maxSteps;
 }
 
 void Integral::SetMin(double min) {
