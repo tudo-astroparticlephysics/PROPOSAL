@@ -76,4 +76,6 @@ class CrossSection
                  //!ClaculateSochasticLoss when it is already done
 };
 
+std::ostream& operator<<(std::ostream&, PROPOSAL::CrossSection const&);
+
 } /* PROPOSAL */
