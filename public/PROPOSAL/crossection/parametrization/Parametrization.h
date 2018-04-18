@@ -88,4 +88,6 @@ class Parametrization
         double multiplier_;
 };
 
+std::ostream& operator<<(std::ostream&, PROPOSAL::Parametrization const&);
+
 } /* PROPOSAL */
