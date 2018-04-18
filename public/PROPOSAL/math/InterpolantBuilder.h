@@ -3,8 +3,7 @@
 
 #include <boost/function.hpp>
 
-namespace PROPOSAL
-{
+namespace PROPOSAL {
 
 class Interpolant;
 
@@ -15,7 +14,7 @@ class Interpolant;
 // ----------------------------------------------------------------------------
 class InterpolantBuilder
 {
-    public:
+public:
     // Default values for variables
     static const int default_max;
     static const double default_xmin;
@@ -42,12 +41,11 @@ class InterpolantBuilder
 // ----------------------------------------------------------------------------
 class Interpolant1DBuilder : public InterpolantBuilder
 {
-    public:
+public:
     typedef boost::function<double(double)> Function1D;
     static const Function1D default_function1d;
 
-    public:
-
+public:
     // Constructor
     Interpolant1DBuilder();
     Interpolant1DBuilder(const Interpolant1DBuilder&);
@@ -129,7 +127,7 @@ class Interpolant1DBuilder : public InterpolantBuilder
 
     Interpolant* build();
 
-    private:
+private:
     Function1D function1d;
 
     int max;
@@ -147,7 +145,7 @@ class Interpolant1DBuilder : public InterpolantBuilder
 // ----------------------------------------------------------------------------
 class Interpolant2DBuilder : public InterpolantBuilder
 {
-    public:
+public:
     typedef boost::function<double(double, double)> Function2D;
     static const Function2D default_function2d;
 
@@ -271,7 +269,7 @@ class Interpolant2DBuilder : public InterpolantBuilder
 
     Interpolant* build();
 
-    private:
+private:
     Function2D function2d;
 
     int max1;
@@ -290,4 +288,4 @@ class Interpolant2DBuilder : public InterpolantBuilder
     bool rationalY, relativeY, logSubst;
 };
 
-} /* PROPOSAL */
+} // namespace PROPOSAL

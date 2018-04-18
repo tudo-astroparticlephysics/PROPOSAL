@@ -1,21 +1,22 @@
 
 #include "gtest/gtest.h"
 
-#include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/decay/DecayTable.h"
 #include "PROPOSAL/decay/LeptonicDecayChannel.h"
-#include "PROPOSAL/decay/TwoBodyPhaseSpace.h"
 #include "PROPOSAL/decay/StableChannel.h"
+#include "PROPOSAL/decay/TwoBodyPhaseSpace.h"
+#include "PROPOSAL/particle/Particle.h"
 
 using namespace PROPOSAL;
 
-ParticleDef mu = MuMinusDef::Get();
+ParticleDef mu  = MuMinusDef::Get();
 ParticleDef tau = TauMinusDef::Get();
 
-TEST(Comparison , Comparison_equal ) {
+TEST(Comparison, Comparison_equal)
+{
     DecayTable A;
     DecayTable B;
-    EXPECT_TRUE(A==B);
+    EXPECT_TRUE(A == B);
 
     LeptonicDecayChannel x(EMinusDef::Get(), NuEDef::Get(), NuEBarDef::Get());
     LeptonicDecayChannel y(EMinusDef::Get(), NuEDef::Get(), NuEBarDef::Get());
@@ -23,21 +24,22 @@ TEST(Comparison , Comparison_equal ) {
 
     A.addChannel(0.5, x);
     B.addChannel(0.5, x);
-    EXPECT_TRUE(A==B);
+    EXPECT_TRUE(A == B);
 
     A.addChannel(0.1, y);
     B.addChannel(0.1, y);
-    EXPECT_TRUE(A==B);
+    EXPECT_TRUE(A == B);
 
     A.addChannel(0.4, z);
     B.addChannel(0.4, z);
-    EXPECT_TRUE(A==B);
+    EXPECT_TRUE(A == B);
 }
 
-TEST(Comparison , Comparison_not_equal ) {
+TEST(Comparison, Comparison_not_equal)
+{
     DecayTable A;
     DecayTable B;
-    EXPECT_TRUE(A==B);
+    EXPECT_TRUE(A == B);
 
     LeptonicDecayChannel x(EMinusDef::Get(), NuEDef::Get(), NuEBarDef::Get());
     LeptonicDecayChannel y(EMinusDef::Get(), NuEDef::Get(), NuEBarDef::Get());
@@ -45,35 +47,38 @@ TEST(Comparison , Comparison_not_equal ) {
     TwoBodyPhaseSpace u(mu, mu);
 
     A.addChannel(0.5, x);
-    EXPECT_TRUE(A!=B);
+    EXPECT_TRUE(A != B);
 
     B.addChannel(0.5, x);
-    EXPECT_TRUE(A==B);
+    EXPECT_TRUE(A == B);
 
     A.addChannel(0.1, z);
     B.addChannel(0.1, u);
-    EXPECT_TRUE(A!=B);
+    EXPECT_TRUE(A != B);
 
     A.addChannel(0.4, y);
     B.addChannel(0.4, y);
-    EXPECT_TRUE(A!=B);
+    EXPECT_TRUE(A != B);
 }
 
-TEST(Assignment , Copyconstructor ) {
+TEST(Assignment, Copyconstructor)
+{
     DecayTable A;
     DecayTable B = A;
 
-    EXPECT_TRUE(A==B);
+    EXPECT_TRUE(A == B);
 }
 
-TEST(Assignment , Copyconstructor2 ) {
+TEST(Assignment, Copyconstructor2)
+{
     DecayTable A;
     DecayTable B(A);
 
-    EXPECT_TRUE(A==B);
+    EXPECT_TRUE(A == B);
 }
 
-TEST(Assignment , Operator ) {
+TEST(Assignment, Operator)
+{
     DecayTable A;
     DecayTable B;
 
@@ -82,25 +87,26 @@ TEST(Assignment , Operator ) {
 
     A.addChannel(1.0, x);
 
-    EXPECT_TRUE(A!=B);
+    EXPECT_TRUE(A != B);
 
-    B=A;
+    B = A;
 
-    EXPECT_TRUE(A==B);
+    EXPECT_TRUE(A == B);
 
     A.addChannel(1.0, y);
 
-    EXPECT_TRUE(A!=B);
+    EXPECT_TRUE(A != B);
 
-    B=A;
+    B = A;
 
-    EXPECT_TRUE(A==B);
+    EXPECT_TRUE(A == B);
 }
 
-TEST(Assignment , Swap ) {
+TEST(Assignment, Swap)
+{
     DecayTable A;
     DecayTable B;
-    EXPECT_TRUE(A==B);
+    EXPECT_TRUE(A == B);
 
     LeptonicDecayChannel x(EMinusDef::Get(), NuEDef::Get(), NuEBarDef::Get());
     TwoBodyPhaseSpace y(mu, tau);
@@ -112,11 +118,12 @@ TEST(Assignment , Swap ) {
     DecayTable D = B;
 
     swap(B, A);
-    EXPECT_TRUE(C==B);
-    EXPECT_TRUE(D==A);
+    EXPECT_TRUE(C == B);
+    EXPECT_TRUE(D == A);
 }
 
-TEST(SelectChannel , Muon ) {
+TEST(SelectChannel, Muon)
+{
 
     // Leptinic decay channel in muon case
     Particle muon;
@@ -127,7 +134,8 @@ TEST(SelectChannel , Muon ) {
     EXPECT_TRUE(dc_muon == leptonic_channel);
 }
 
-TEST(SelectChannel , Electron ) {
+TEST(SelectChannel, Electron)
+{
     // Leptinic decay channel in electron case
     Particle electron(EMinusDef::Get());
     DecayChannel& dc_electron = electron.GetDecayTable().SelectChannel();
@@ -137,12 +145,13 @@ TEST(SelectChannel , Electron ) {
     EXPECT_TRUE(dc_electron == stable_channel);
 }
 
-TEST(SelectChannel , Tau ) {
+TEST(SelectChannel, Tau)
+{
     // tauon decay channels
     Particle tau(TauMinusDef::Get());
 
     int leptonic_count = 0;
-    int twobody_count = 0;
+    int twobody_count  = 0;
 
     for (int i = 0; i < 1000; ++i)
     {
@@ -151,8 +160,7 @@ TEST(SelectChannel , Tau ) {
         if (dynamic_cast<LeptonicDecayChannel*>(&dc_tau))
         {
             leptonic_count++;
-        }
-        else if (dynamic_cast<TwoBodyPhaseSpace*>(&dc_tau))
+        } else if (dynamic_cast<TwoBodyPhaseSpace*>(&dc_tau))
         {
             twobody_count++;
         }
@@ -162,7 +170,8 @@ TEST(SelectChannel , Tau ) {
     EXPECT_TRUE(twobody_count > 0);
 }
 
-int main(int argc, char **argv) {
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
+int main(int argc, char** argv)
+{
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }

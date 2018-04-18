@@ -1,20 +1,21 @@
 
 #include <boost/bind.hpp>
 
-#include "PROPOSAL/crossection/PhotoInterpolant.h"
 #include "PROPOSAL/crossection/PhotoIntegral.h"
+#include "PROPOSAL/crossection/PhotoInterpolant.h"
 #include "PROPOSAL/crossection/parametrization/Photonuclear.h"
 
-#include "PROPOSAL/math/InterpolantBuilder.h"
 #include "PROPOSAL/math/Interpolant.h"
+#include "PROPOSAL/math/InterpolantBuilder.h"
 
-#include "PROPOSAL/methods.h"
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Output.h"
+#include "PROPOSAL/methods.h"
 
 using namespace PROPOSAL;
 
-PhotoInterpolant::PhotoInterpolant(const Photonuclear& param, InterpolationDef def): CrossSectionInterpolant(DynamicData::NuclInt, param)
+PhotoInterpolant::PhotoInterpolant(const Photonuclear& param, InterpolationDef def)
+    : CrossSectionInterpolant(DynamicData::NuclInt, param)
 {
     // Use parent CrossSecition dNdx interpolation
     InitdNdxInerpolation(def);
@@ -66,21 +67,17 @@ PhotoInterpolant::PhotoInterpolant(const Photonuclear& param, InterpolationDef d
 
     builder_container_de2dx.push_back(std::make_pair(&builder_de2dx, &de2dx_interpolant_));
 
-    Helper::InitializeInterpolation("dEdx",
-                                    builder_container,
-                                    std::vector<Parametrization*>(1, parametrization_), def);
-    Helper::InitializeInterpolation("dE2dx",
-                                    builder_container_de2dx,
-                                    std::vector<Parametrization*>(1, parametrization_), def);
+    Helper::InitializeInterpolation("dEdx", builder_container, std::vector<Parametrization*>(1, parametrization_), def);
+    Helper::InitializeInterpolation(
+        "dE2dx", builder_container_de2dx, std::vector<Parametrization*>(1, parametrization_), def);
 }
 
-PhotoInterpolant::PhotoInterpolant(const PhotoInterpolant& photo): CrossSectionInterpolant(photo)
+PhotoInterpolant::PhotoInterpolant(const PhotoInterpolant& photo)
+    : CrossSectionInterpolant(photo)
 {
 }
 
-PhotoInterpolant::~PhotoInterpolant()
-{
-}
+PhotoInterpolant::~PhotoInterpolant() {}
 
 // ----------------------------------------------------------------- //
 // Public methods

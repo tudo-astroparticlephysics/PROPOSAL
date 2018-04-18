@@ -7,8 +7,8 @@
 
 #include "PROPOSAL/math//Interpolant.h"
 #include "PROPOSAL/math//InterpolantBuilder.h"
-#include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/medium/Components.h"
+#include "PROPOSAL/medium/Medium.h"
 
 // #include "PROPOSAL/methods.h"
 #include "PROPOSAL/Constants.h"
@@ -17,8 +17,8 @@
 using namespace PROPOSAL;
 
 /******************************************************************************
-*                              EpairProduction                               *
-******************************************************************************/
+ *                              EpairProduction                               *
+ ******************************************************************************/
 
 // ------------------------------------------------------------------------- //
 // Constructor & Destructor
@@ -46,9 +46,7 @@ EpairProduction::EpairProduction(const EpairProduction& epair)
 {
 }
 
-EpairProduction::~EpairProduction()
-{
-}
+EpairProduction::~EpairProduction() {}
 
 bool EpairProduction::compare(const Parametrization& parametrization) const
 {
@@ -80,7 +78,7 @@ Parametrization::IntegralLimits EpairProduction::GetIntegralLimits(double energy
     limits.vMin = 4 * ME / energy;
     limits.vMax = 1 - 0.75 * SQRTE * aux * pow(components_[component_index_]->GetNucCharge(), 1. / 3);
 
-    aux = 1 - 6 * aux * aux;
+    aux         = 1 - 6 * aux * aux;
     limits.vMax = std::min(limits.vMax, aux);
     // limits.vMax = std::min(limits.vMax, 1 - particle_mass / particle_energy);
 
@@ -104,7 +102,6 @@ Parametrization::IntegralLimits EpairProduction::GetIntegralLimits(double energy
 // Proc. 12th ICCR (1971), 2436
 // ------------------------------------------------------------------------- //
 
-
 double EpairProduction::FunctionToIntegral(double particle_energy, double r)
 {
     // Parametrization of Kelner/Kokoulin/Petrukhin
@@ -123,25 +120,22 @@ double EpairProduction::FunctionToIntegral(double particle_energy, double r)
     double medium_charge       = components_[component_index_]->GetNucCharge();
     double medium_log_constant = components_[component_index_]->GetLogConstant();
 
-    r   = 1 - r; // only for integral optimization - do not forget to swap integration limits!
-    r2  = r * r;
-    double Z3  = pow(medium_charge, -1. / 3);
-    aux = (particle_def_.mass * v_) / (2 * ME);
-    double xi = aux * aux * (1 - r2) / (1 - v_);
+    r           = 1 - r; // only for integral optimization - do not forget to swap integration limits!
+    r2          = r * r;
+    double Z3   = pow(medium_charge, -1. / 3);
+    aux         = (particle_def_.mass * v_) / (2 * ME);
+    double xi   = aux * aux * (1 - r2) / (1 - v_);
     double beta = (v_ * v_) / (2 * (1 - v_));
 
     // these are the Y_e and Y_mu expressions in the original paper
-    diagram_e  = (5 - r2 + 4 * beta * (1 + r2))
-                / (2 * (1 + 3 * beta) * log(3 + 1 / xi) - r2 - 2 * beta * (2 - r2));
-    diagram_mu = (4 + r2 + 3 * beta * (1 + r2))
-                / ((1 + r2) * (1.5 + 2 * beta) * log(3 + xi) + 1 - 1.5 * r2);
+    diagram_e  = (5 - r2 + 4 * beta * (1 + r2)) / (2 * (1 + 3 * beta) * log(3 + 1 / xi) - r2 - 2 * beta * (2 - r2));
+    diagram_mu = (4 + r2 + 3 * beta * (1 + r2)) / ((1 + r2) * (1.5 + 2 * beta) * log(3 + xi) + 1 - 1.5 * r2);
 
     // these arae the L_e and L_mu expressions
-    aux  = (1.5 * ME) / (particle_def_.mass * Z3);
-    aux1 = (1 + xi) * (1 + diagram_e);
-    aux2 = (2 * ME * SQRTE * medium_log_constant * Z3) / (particle_energy * v_ * (1 - r2));
-    diagram_e  = log((medium_log_constant * Z3 * sqrt(aux1)) / (1 + aux2 * aux1))
-                - 0.5 * log(1 + aux * aux * aux1);
+    aux        = (1.5 * ME) / (particle_def_.mass * Z3);
+    aux1       = (1 + xi) * (1 + diagram_e);
+    aux2       = (2 * ME * SQRTE * medium_log_constant * Z3) / (particle_energy * v_ * (1 - r2));
+    diagram_e  = log((medium_log_constant * Z3 * sqrt(aux1)) / (1 + aux2 * aux1)) - 0.5 * log(1 + aux * aux * aux1);
     diagram_mu = log((medium_log_constant / aux * Z3) / (1 + aux2 * (1 + xi) * (1 + diagram_mu)));
 
     // these are the Phi_e and Phi_mu expressions
@@ -153,24 +147,23 @@ double EpairProduction::FunctionToIntegral(double particle_energy, double r)
         {
             // TODO: where does this short expression come from?
             diagram_e = (1.5 - r2 / 2 + beta * (1 + r2)) / xi * diagram_e;
-        }
-        else
+        } else
         {
-            diagram_e = (((2 + r2) * (1 + beta) + xi * (3 + r2)) * log(1 + 1 / xi)
-                        + (1 - r2 - beta) / (1 + xi) - (3 + r2)) * diagram_e;
+            diagram_e =
+                (((2 + r2) * (1 + beta) + xi * (3 + r2)) * log(1 + 1 / xi) + (1 - r2 - beta) / (1 + xi) - (3 + r2)) *
+                diagram_e;
         }
-    }
-    else
+    } else
     {
         diagram_e = 0;
     }
 
     if (diagram_mu > 0)
     {
-        diagram_mu = (((1 + r2) * (1 + 1.5 * beta) - (1 + 2 * beta) * (1 - r2) / xi) * log(1 + xi)
-                    + xi * (1 - r2 - beta) / (1 + xi) + (1 + 2 * beta) * (1 - r2)) * diagram_mu;
-    }
-    else
+        diagram_mu = (((1 + r2) * (1 + 1.5 * beta) - (1 + 2 * beta) * (1 - r2) / xi) * log(1 + xi) +
+                      xi * (1 - r2 - beta) / (1 + xi) + (1 + 2 * beta) * (1 - r2)) *
+                     diagram_mu;
+    } else
     {
         diagram_mu = 0;
     }
@@ -181,8 +174,7 @@ double EpairProduction::FunctionToIntegral(double particle_energy, double r)
     {
         g1 = 4.4e-5;
         g2 = 4.8e-5;
-    }
-    else
+    } else
     {
         g1 = 1.95e-5;
         g2 = 5.3e-5;
@@ -195,20 +187,20 @@ double EpairProduction::FunctionToIntegral(double particle_energy, double r)
     if (aux1 > 0 && aux2 > 0)
     {
         atomic_electron_contribution = aux1 / aux2;
-    }
-    else
+    } else
     {
         atomic_electron_contribution = 0;
     }
 
-
     // combining the results
-    aux = ALPHA * RE * particle_def_.charge;;
+    aux = ALPHA * RE * particle_def_.charge;
+    ;
     aux *= aux / (1.5 * PI) * 2 * medium_charge * (medium_charge + atomic_electron_contribution);
-    aux1 = ME / particle_def_.mass * particle_def_.charge;;
-    aux *=  (1 - v_) / v_ * (diagram_e + aux1*aux1 * diagram_mu);
+    aux1 = ME / particle_def_.mass * particle_def_.charge;
+    ;
+    aux *= (1 - v_) / v_ * (diagram_e + aux1 * aux1 * diagram_mu);
 
-    if(lpm_)
+    if (lpm_)
     {
         aux *= lpm(particle_energy, r2, beta, xi);
     }
@@ -221,12 +213,10 @@ double EpairProduction::FunctionToIntegral(double particle_energy, double r)
     return aux;
 }
 
-
 // ------------------------------------------------------------------------- //
 // LPM Supression by Polityko, Takahashi, Kato, Yamada, Misaki
 // J. Phys. G: Nucl Part. Phys. 28 (2002) 427
 // ------------------------------------------------------------------------- //
-
 
 double EpairProduction::lpm(double energy, double r2, double b, double x)
 {
@@ -235,7 +225,8 @@ double EpairProduction::lpm(double energy, double r2, double b, double x)
         init_lpm_effect_ = false;
         double sum       = 0;
 
-        // for (std::vector<Components::Component*>::iterator iter = medium_->GetComponents().begin() ; iter != medium_->GetComponents().end() ; ++iter)
+        // for (std::vector<Components::Component*>::iterator iter = medium_->GetComponents().begin() ; iter !=
+        // medium_->GetComponents().end() ; ++iter)
         // {
         //     sum += (*iter)->GetNucCharge() * (*iter)->GetNucCharge() *
         //            log(3.25 * (*iter)->GetLogConstant() * pow((*iter)->GetNucCharge(), -1. / 3));
@@ -279,8 +270,8 @@ double EpairProduction::lpm(double energy, double r2, double b, double x)
     D     = d1 - d1 * d1 * x * log2;
     E     = -s6 * atan_;
 
-    return ((1 + b) * (A + (1 + r2) * B) + b * (C + (1 + r2) * D) + (1 - r2) * E)
-            /(((2 + r2)*(1 +b ) + x*(3 + r2))*log(1 +1 /x) + (1 - r2 - b)/(1 + x) - (3 + r2));
+    return ((1 + b) * (A + (1 + r2) * B) + b * (C + (1 + r2) * D) + (1 - r2) * E) /
+           (((2 + r2) * (1 + b) + x * (3 + r2)) * log(1 + 1 / x) + (1 - r2 - b) / (1 + x) - (3 + r2));
 }
 
 // ------------------------------------------------------------------------- //
@@ -309,19 +300,18 @@ void EpairProduction::print(std::ostream& os) const
 }
 
 /******************************************************************************
-*                         EpairProductionRhoIntegral                         *
-******************************************************************************/
-
+ *                         EpairProductionRhoIntegral                         *
+ ******************************************************************************/
 
 // ------------------------------------------------------------------------- //
 // Constructor & Destructor
 // ------------------------------------------------------------------------- //
 
 EpairProductionRhoIntegral::EpairProductionRhoIntegral(const ParticleDef& particle_def,
-                                 const Medium& medium,
-                                 const EnergyCutSettings& cuts,
-                                 double multiplier,
-                                 bool lpm)
+                                                       const Medium& medium,
+                                                       const EnergyCutSettings& cuts,
+                                                       double multiplier,
+                                                       bool lpm)
     : EpairProduction(particle_def, medium, cuts, multiplier, lpm)
     , integral_(IROMB, IMAXS, IPREC)
 {
@@ -333,9 +323,7 @@ EpairProductionRhoIntegral::EpairProductionRhoIntegral(const EpairProductionRhoI
 {
 }
 
-EpairProductionRhoIntegral::~EpairProductionRhoIntegral()
-{
-}
+EpairProductionRhoIntegral::~EpairProductionRhoIntegral() {}
 
 bool EpairProductionRhoIntegral::compare(const Parametrization& parametrization) const
 {
@@ -370,25 +358,28 @@ double EpairProductionRhoIntegral::DifferentialCrossSection(double energy, doubl
 
     aux = std::max(1 - rMax, COMPUTER_PRECISION);
 
-    return multiplier_ * medium_->GetMolDensity() * components_[component_index_]->GetAtomInMolecule() * particle_def_.charge * particle_def_.charge *
-           (integral_.Integrate(1 - rMax, aux, boost::bind(&EpairProductionRhoIntegral::FunctionToIntegral, this, energy, _1), 2) +
-            integral_.Integrate(aux, 1, boost::bind(&EpairProductionRhoIntegral::FunctionToIntegral, this, energy, _1), 4));
+    return multiplier_ * medium_->GetMolDensity() * components_[component_index_]->GetAtomInMolecule() *
+           particle_def_.charge * particle_def_.charge *
+           (integral_.Integrate(
+                1 - rMax, aux, boost::bind(&EpairProductionRhoIntegral::FunctionToIntegral, this, energy, _1), 2) +
+            integral_.Integrate(
+                aux, 1, boost::bind(&EpairProductionRhoIntegral::FunctionToIntegral, this, energy, _1), 4));
 }
 
 /******************************************************************************
-*                         EpairProductionRhoInterpolant                       *
-******************************************************************************/
+ *                         EpairProductionRhoInterpolant                       *
+ ******************************************************************************/
 
 // ------------------------------------------------------------------------- //
 // Constructor & Destructor
 // ------------------------------------------------------------------------- //
 
 EpairProductionRhoInterpolant::EpairProductionRhoInterpolant(const ParticleDef& particle_def,
-                                 const Medium& medium,
-                                 const EnergyCutSettings& cuts,
-                                 double multiplier,
-                                 bool lpm,
-                                 InterpolationDef def)
+                                                             const Medium& medium,
+                                                             const EnergyCutSettings& cuts,
+                                                             double multiplier,
+                                                             bool lpm,
+                                                             InterpolationDef def)
     : EpairProductionRhoIntegral(particle_def, medium, cuts, multiplier, lpm)
     , interpolant_(medium_->GetNumComponents(), NULL)
 {
@@ -397,7 +388,8 @@ EpairProductionRhoInterpolant::EpairProductionRhoInterpolant(const ParticleDef& 
 
     for (unsigned int i = 0; i < components_.size(); ++i)
     {
-        builder2d[i].SetMax1(NUM1)
+        builder2d[i]
+            .SetMax1(NUM1)
             .SetX1Min(particle_def_.low)
             .SetX1Max(BIGENERGY)
             .SetMax2(NUM1)
@@ -415,16 +407,14 @@ EpairProductionRhoInterpolant::EpairProductionRhoInterpolant(const ParticleDef& 
             .SetRationalY(false)
             .SetRelativeY(false)
             .SetLogSubst(false)
-            .SetFunction2D(boost::bind(&EpairProductionRhoInterpolant::FunctionToBuildEpairInterpolant, this, _1, _2, i));
+            .SetFunction2D(
+                boost::bind(&EpairProductionRhoInterpolant::FunctionToBuildEpairInterpolant, this, _1, _2, i));
 
-        builder_container2d[i].first = &builder2d[i];
+        builder_container2d[i].first  = &builder2d[i];
         builder_container2d[i].second = &interpolant_[i];
     }
 
-    Helper::InitializeInterpolation("Epair",
-                                    builder_container2d,
-                                    std::vector<Parametrization*>(1, this),
-                                    def);
+    Helper::InitializeInterpolation("Epair", builder_container2d, std::vector<Parametrization*>(1, this), def);
 }
 
 EpairProductionRhoInterpolant::EpairProductionRhoInterpolant(const EpairProductionRhoInterpolant& epair)
@@ -433,7 +423,7 @@ EpairProductionRhoInterpolant::EpairProductionRhoInterpolant(const EpairProducti
 {
     interpolant_.resize(epair.interpolant_.size());
 
-    for(unsigned int i = 0; i < epair.interpolant_.size(); ++i)
+    for (unsigned int i = 0; i < epair.interpolant_.size(); ++i)
     {
         interpolant_[i] = new Interpolant(*epair.interpolant_[i]);
     }
@@ -441,7 +431,7 @@ EpairProductionRhoInterpolant::EpairProductionRhoInterpolant(const EpairProducti
 
 EpairProductionRhoInterpolant::~EpairProductionRhoInterpolant()
 {
-    for(unsigned int i = 0; i < interpolant_.size(); ++i)
+    for (unsigned int i = 0; i < interpolant_.size(); ++i)
     {
         delete interpolant_[i];
     }
@@ -451,7 +441,8 @@ EpairProductionRhoInterpolant::~EpairProductionRhoInterpolant()
 
 bool EpairProductionRhoInterpolant::compare(const Parametrization& parametrization) const
 {
-    const EpairProductionRhoInterpolant* pairproduction = static_cast<const EpairProductionRhoInterpolant*>(&parametrization);
+    const EpairProductionRhoInterpolant* pairproduction =
+        static_cast<const EpairProductionRhoInterpolant*>(&parametrization);
 
     if (interpolant_.size() != pairproduction->interpolant_.size())
         return false;
@@ -477,9 +468,9 @@ double EpairProductionRhoInterpolant::DifferentialCrossSection(double energy, do
     if (v >= limits.vUp)
     {
         return std::max(
-            interpolant_.at(component_index_)->Interpolate(energy, log(v / limits.vUp) / log(limits.vMax / limits.vUp)), 0.0);
-    }
-    else
+            interpolant_.at(component_index_)->Interpolate(energy, log(v / limits.vUp) / log(limits.vMax / limits.vUp)),
+            0.0);
+    } else
     {
         return EpairProductionRhoIntegral::DifferentialCrossSection(energy, v);
     }
@@ -488,7 +479,7 @@ double EpairProductionRhoInterpolant::DifferentialCrossSection(double energy, do
 // ------------------------------------------------------------------------- //
 double EpairProductionRhoInterpolant::FunctionToBuildEpairInterpolant(double energy, double v, int component)
 {
-    component_index_ = component;
+    component_index_                       = component;
     Parametrization::IntegralLimits limits = GetIntegralLimits(energy);
 
     if (limits.vUp == limits.vMax)

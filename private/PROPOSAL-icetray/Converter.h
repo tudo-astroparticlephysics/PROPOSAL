@@ -2,15 +2,13 @@
 
 #include <boost/bimap.hpp>
 
-#include "dataclasses/physics/I3Particle.h"
 #include "PROPOSAL/PROPOSAL.h"
+#include "dataclasses/physics/I3Particle.h"
 
-namespace I3PROPOSALParticleConverter
-{
+namespace I3PROPOSALParticleConverter {
 
 I3Particle::ParticleType GenerateI3Type(const PROPOSAL::DynamicData& secondary);
 
 PROPOSAL::ParticleDef GeneratePROPOSALType(const I3Particle::ParticleType& ptype_I3);
 
-} /* I3PROPOSALParticleConverter */
-
+} // namespace I3PROPOSALParticleConverter

@@ -1,12 +1,12 @@
 
-#include <iostream>
 #include <fstream>
+#include <iostream>
 
 #include "PROPOSAL/PROPOSAL.h"
 
 using namespace PROPOSAL;
 
-int main(int argc, const char *argv[])
+int main(int argc, const char* argv[])
 {
     int statistics = 1;
 
@@ -21,7 +21,7 @@ int main(int argc, const char *argv[])
         std::cout << "propagate " << statistics << " particles" << std::endl;
     }
 
-    if (argc >=3)
+    if (argc >= 3)
     {
         std::cerr << "reading random generator seed from" << argv[2] << std::endl;
         std::ifstream myfile(argv[2]);
@@ -41,7 +41,7 @@ int main(int argc, const char *argv[])
     sec_def.location = Sector::ParticleLocation::InsideDetector;
 
     sec_def.do_continuous_randomization = true;
-    sec_def.do_exact_time_calculation = true;
+    sec_def.do_exact_time_calculation   = true;
 
     sec_def.scattering_model = ScatteringFactory::HighlandIntegral;
 
@@ -96,7 +96,6 @@ int main(int argc, const char *argv[])
     Ionization Ioniz(particle_def, medium, ecuts, multiplier);
     IonizIntegral Ioniz_Int(Ioniz);
     double dEdx_new = Ioniz_Int.CalculatedEdx(energy);
-
 
     Output::getInstance().ClearSecondaryVector();
 }

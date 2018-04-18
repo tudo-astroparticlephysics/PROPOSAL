@@ -1,16 +1,15 @@
 
 // #include "PROPOSAL/Constants.h"
 
-#include <algorithm>    // std::sort
+#include <algorithm> // std::sort
 
-#include "PROPOSAL/math/RandomGenerator.h"
-#include "PROPOSAL/decay/ManyBodyPhaseSpace.h"
-#include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Output.h"
+#include "PROPOSAL/decay/ManyBodyPhaseSpace.h"
+#include "PROPOSAL/math/RandomGenerator.h"
+#include "PROPOSAL/particle/Particle.h"
 
 using namespace PROPOSAL;
-
 
 const std::string ManyBodyPhaseSpace::name_ = "ManyBodyPhaseSpace";
 
@@ -20,7 +19,7 @@ ManyBodyPhaseSpace::ManyBodyPhaseSpace(std::vector<const ParticleDef*> daughters
     , daughter_masses_()
     , sum_daughter_masses_(0.0)
 {
-    for(std::vector<const ParticleDef*>::iterator it = daughters.begin(); it != daughters.end(); ++it)
+    for (std::vector<const ParticleDef*>::iterator it = daughters.begin(); it != daughters.end(); ++it)
     {
         daughters_.push_back((*it)->clone());
         daughter_masses_.push_back((*it)->mass);
@@ -44,7 +43,8 @@ ManyBodyPhaseSpace::ManyBodyPhaseSpace(const ManyBodyPhaseSpace& mode)
     , daughter_masses_(mode.daughter_masses_)
     , sum_daughter_masses_(mode.sum_daughter_masses_)
 {
-    for (std::vector<const ParticleDef*>::const_iterator it = mode.daughters_.begin(); it != mode.daughters_.end(); ++it)
+    for (std::vector<const ParticleDef*>::const_iterator it = mode.daughters_.begin(); it != mode.daughters_.end();
+         ++it)
     {
         daughters_.push_back((*it)->clone());
     }
@@ -57,16 +57,13 @@ bool ManyBodyPhaseSpace::compare(const DecayChannel& channel) const
     if (!many_body)
     {
         return false;
-    }
-    else if (daughter_masses_.size() != many_body->daughter_masses_.size())
+    } else if (daughter_masses_.size() != many_body->daughter_masses_.size())
     {
         return false;
-    }
-    else if (daughter_masses_ != many_body->daughter_masses_)
+    } else if (daughter_masses_ != many_body->daughter_masses_)
     {
         return false;
-    }
-    else
+    } else
     {
         return true;
     }
@@ -111,7 +108,7 @@ DecayChannel::DecayProducts ManyBodyPhaseSpace::Decay(const Particle& particle)
     // Calculate first momentum R2
     unsigned int i = 1;
 
-    double momentum  = Momentum(virtual_masses[i], virtual_masses[i - 1], daughter_masses_[i]);
+    double momentum    = Momentum(virtual_masses[i], virtual_masses[i - 1], daughter_masses_[i]);
     Vector3D direction = GenerateRandomDirection();
 
     products[i]->SetDirection(direction);
@@ -124,7 +121,7 @@ DecayChannel::DecayProducts ManyBodyPhaseSpace::Decay(const Particle& particle)
     {
         // Generate momentum
 
-        double momentum  = Momentum(virtual_masses[i], virtual_masses[i - 1], daughter_masses_[i]);
+        double momentum = Momentum(virtual_masses[i], virtual_masses[i - 1], daughter_masses_[i]);
 
         products[i]->SetDirection(GenerateRandomDirection());
         products[i]->SetMomentum(momentum);
@@ -164,8 +161,8 @@ void ManyBodyPhaseSpace::print(std::ostream& os) const
 }
 
 /******************************************************************************
-*                                  Builder                                    *
-******************************************************************************/
+ *                                  Builder                                    *
+ ******************************************************************************/
 
 ManyBodyPhaseSpace::Builder::Builder()
     : daughters_()
@@ -173,7 +170,7 @@ ManyBodyPhaseSpace::Builder::Builder()
 }
 
 ManyBodyPhaseSpace::Builder::Builder(const Builder& builder)
-    :daughters_(builder.daughters_)
+    : daughters_(builder.daughters_)
 {
 }
 

@@ -2,9 +2,8 @@
 #include <boost/functional/hash.hpp>
 
 #include "PROPOSAL/crossection/parametrization/Parametrization.h"
-#include "PROPOSAL/methods.h"
 #include "PROPOSAL/medium/Medium.h"
-
+#include "PROPOSAL/methods.h"
 
 using namespace PROPOSAL;
 

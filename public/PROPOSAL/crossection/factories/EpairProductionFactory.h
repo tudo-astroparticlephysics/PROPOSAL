@@ -1,18 +1,15 @@
 
 #pragma once
 
-
 #include "PROPOSAL/methods.h"
 
-namespace  PROPOSAL
-{
+namespace PROPOSAL {
 
 class CrossSection;
 
 class EpairProductionFactory
 {
-    public:
-
+public:
     struct Definition
     {
         Definition()
@@ -50,10 +47,9 @@ class EpairProductionFactory
         return instance;
     }
 
-    private:
+private:
     EpairProductionFactory();
     ~EpairProductionFactory();
 };
 
-} /*  PROPOSAL */
-
+} // namespace PROPOSAL

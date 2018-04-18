@@ -1,11 +1,9 @@
 
 #pragma once
 
-
 #include "PROPOSAL/methods.h"
 
-namespace  PROPOSAL
-{
+namespace PROPOSAL {
 
 class CrossSection;
 struct ParticleDef;
@@ -14,8 +12,7 @@ class EnergyCutSettings;
 
 class IonizationFactory
 {
-    public:
-
+public:
     struct Definition
     {
         Definition()
@@ -51,10 +48,9 @@ class IonizationFactory
         return instance;
     }
 
-    private:
+private:
     IonizationFactory();
     ~IonizationFactory();
 };
 
-} /*  PROPOSAL */
-
+} // namespace PROPOSAL

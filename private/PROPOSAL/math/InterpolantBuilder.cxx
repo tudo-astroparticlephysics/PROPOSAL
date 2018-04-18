@@ -8,7 +8,7 @@ using namespace PROPOSAL;
 // Defaults for InterpolantBuilder
 // ------------------------------------------------------------------------- //
 
-const int InterpolantBuilder::default_max = 1.0;
+const int InterpolantBuilder::default_max     = 1.0;
 const double InterpolantBuilder::default_xmin = 1.0;
 const double InterpolantBuilder::default_xmax = 1.0;
 

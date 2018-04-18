@@ -1,12 +1,12 @@
 
-#include <iostream>
 #include <fstream>
+#include <iostream>
 
 #include "PROPOSAL/PROPOSAL.h"
 
 using namespace PROPOSAL;
 
-int main(int argc, const char *argv[])
+int main(int argc, const char* argv[])
 {
     int statistics = 100;
 
@@ -23,16 +23,15 @@ int main(int argc, const char *argv[])
         std::cout << "propagate " << statistics << " particles" << std::endl;
     }
 
-
     /**************************************************************************
-    *              One Propagator for each particle definition                *
-    **************************************************************************/
+     *              One Propagator for each particle definition                *
+     **************************************************************************/
 
     Propagator prop_mu(MuMinusDef::Get(), "resources/config_ice.json");
     Propagator prop_tau(TauMinusDef::Get(), "resources/config_ice.json");
 
     // Therefor its needed to get the internal created particle first
-    Particle& particle_mu = prop_mu.GetParticle();
+    Particle& particle_mu  = prop_mu.GetParticle();
     Particle& particle_tau = prop_tau.GetParticle();
 
     particle_mu.SetEnergy(1e7); // [MeV]
@@ -47,10 +46,9 @@ int main(int argc, const char *argv[])
 
     std::vector<DynamicData*> sec_mu_direct = prop_mu.Propagate();
 
-
     /**************************************************************************
-    *                        Using propagator service                         *
-    **************************************************************************/
+     *                        Using propagator service                         *
+     **************************************************************************/
 
     // Possibility to register propagator in a service
     PropagatorService prop_service;
@@ -73,9 +71,8 @@ int main(int argc, const char *argv[])
     tau.SetDirection(Vector3D(0, 0, -1));
 
     // Use service to propagate different particle
-    std::vector<DynamicData*> sec_mu_service = prop_service.Propagate(mu);
+    std::vector<DynamicData*> sec_mu_service  = prop_service.Propagate(mu);
     std::vector<DynamicData*> sec_tau_service = prop_service.Propagate(tau);
-
 
     Output::getInstance().ClearSecondaryVector();
 }

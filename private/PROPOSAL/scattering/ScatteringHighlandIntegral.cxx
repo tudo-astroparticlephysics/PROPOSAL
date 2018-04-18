@@ -1,19 +1,18 @@
 
 #include <boost/bind.hpp>
 
-#include "PROPOSAL/math/RandomGenerator.h"
-#include "PROPOSAL/scattering/ScatteringHighlandIntegral.h"
-#include "PROPOSAL/methods.h"
 #include "PROPOSAL/Output.h"
+#include "PROPOSAL/math/RandomGenerator.h"
+#include "PROPOSAL/methods.h"
+#include "PROPOSAL/scattering/ScatteringHighlandIntegral.h"
 
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/medium/Medium.h"
+#include "PROPOSAL/particle/Particle.h"
 
 #include "PROPOSAL/propagation_utility/PropagationUtility.h"
 #include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
 #include "PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h"
-
 
 using namespace PROPOSAL;
 using namespace std;
@@ -34,7 +33,9 @@ ScatteringHighlandIntegral::ScatteringHighlandIntegral(Particle& particle, const
     }
 }
 
-ScatteringHighlandIntegral::ScatteringHighlandIntegral(Particle& particle, const Utility& utility, const InterpolationDef& interpolation_def)
+ScatteringHighlandIntegral::ScatteringHighlandIntegral(Particle& particle,
+                                                       const Utility& utility,
+                                                       const InterpolationDef& interpolation_def)
     : Scattering(particle)
     , scatter_(new UtilityInterpolantScattering(utility, interpolation_def))
 {
@@ -50,7 +51,9 @@ ScatteringHighlandIntegral::ScatteringHighlandIntegral(const ScatteringHighlandI
 {
 }
 
-ScatteringHighlandIntegral::ScatteringHighlandIntegral(Particle& particle, const Utility& utility, const ScatteringHighlandIntegral& scattering)
+ScatteringHighlandIntegral::ScatteringHighlandIntegral(Particle& particle,
+                                                       const Utility& utility,
+                                                       const ScatteringHighlandIntegral& scattering)
     : Scattering(particle)
     , scatter_(scattering.scatter_->clone(utility))
 {
@@ -71,27 +74,11 @@ ScatteringHighlandIntegral::~ScatteringHighlandIntegral()
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
-//-------------------------operators and swap function------------------------//
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-// ScatteringDefault& ScatteringDefault::operator=(const ScatteringDefault &scattering){
-//     if (this != &scattering)
-//     {
-//       ScatteringDefault tmp(scattering);
-//       swap(tmp);
-//     }
-//     return *this;
-// }
-
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
 
 bool ScatteringHighlandIntegral::compare(const Scattering& scattering) const
 {
-    const ScatteringHighlandIntegral* scatteringHighlandIntegral = dynamic_cast<const ScatteringHighlandIntegral*>(&scattering);
+    const ScatteringHighlandIntegral* scatteringHighlandIntegral =
+        dynamic_cast<const ScatteringHighlandIntegral*>(&scattering);
 
     if (!scatteringHighlandIntegral)
         return false;
@@ -103,42 +90,9 @@ bool ScatteringHighlandIntegral::compare(const Scattering& scattering) const
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
-
-
-// void ScatteringDefault::swap(ScatteringDefault &scattering)
-// {
-//     using std::swap;
-//
-//     swap(do_interpolation_,scattering.do_interpolation_);
-//
-//     if(scattering.interpolant_ != NULL)
-//     {
-//         interpolant_->swap(*scattering.interpolant_);
-//     }
-//     else
-//     {
-//         interpolant_ = NULL;
-//     }
-//
-//     if(scattering.interpolant_diff_ != NULL)
-//     {
-//         interpolant_diff_->swap(*scattering.interpolant_diff_) ;
-//     }
-//     else
-//     {
-//         interpolant_diff_ = NULL;
-//     }
-//
-//     integral_.swap(scattering.integral_);
-// }
-
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
 //------------------------private member functions----------------------------//
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
-
 
 //----------------------------------------------------------------------------//
 long double ScatteringHighlandIntegral::CalculateTheta0(double dr, double ei, double ef)

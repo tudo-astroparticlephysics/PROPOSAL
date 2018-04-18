@@ -3,8 +3,8 @@
 
 #include "PROPOSAL/crossection/BremsIntegral.h"
 #include "PROPOSAL/crossection/BremsInterpolant.h"
-#include "PROPOSAL/crossection/parametrization/Bremsstrahlung.h"
 #include "PROPOSAL/crossection/factories/BremsstrahlungFactory.h"
+#include "PROPOSAL/crossection/parametrization/Bremsstrahlung.h"
 
 #include "PROPOSAL/Output.h"
 
@@ -34,7 +34,7 @@ BremsstrahlungFactory::~BremsstrahlungFactory()
 // ------------------------------------------------------------------------- //
 void BremsstrahlungFactory::Register(const std::string& name, Enum enum_t, RegisterFunction create)
 {
-    bremsstrahlung_map_str_[name] = create;
+    bremsstrahlung_map_str_[name]    = create;
     bremsstrahlung_map_enum_[enum_t] = create;
     string_enum_.insert(BimapStringEnum::value_type(name, enum_t));
 }
@@ -54,8 +54,7 @@ CrossSection* BremsstrahlungFactory::CreateBremsstrahlung(const ParticleDef& par
     if (it != bremsstrahlung_map_enum_.end())
     {
         return new BremsIntegral(*it->second(particle_def, medium, cuts, def.multiplier, def.lpm_effect));
-    }
-    else
+    } else
     {
         log_fatal("Bremsstrahlung %s not registerd!", typeid(def.parametrization).name());
     }
@@ -72,9 +71,9 @@ CrossSection* BremsstrahlungFactory::CreateBremsstrahlung(const ParticleDef& par
 
     if (it != bremsstrahlung_map_enum_.end())
     {
-        return new BremsInterpolant(*it->second(particle_def, medium, cuts, def.multiplier, def.lpm_effect), interpolation_def);
-    }
-    else
+        return new BremsInterpolant(*it->second(particle_def, medium, cuts, def.multiplier, def.lpm_effect),
+                                    interpolation_def);
+    } else
     {
         log_fatal("Bremsstrahlung %s not registerd!", typeid(def.parametrization).name());
     }

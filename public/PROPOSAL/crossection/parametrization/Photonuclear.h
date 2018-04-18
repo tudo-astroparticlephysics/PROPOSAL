@@ -8,78 +8,77 @@
 namespace PROPOSAL {
 
 /******************************************************************************
-*                               HardComponent                                 *
-******************************************************************************/
+ *                               HardComponent                                 *
+ ******************************************************************************/
 
 class Interpolant;
 
 class RealPhoton
 {
-    public:
-        RealPhoton() {}
-        RealPhoton(const RealPhoton&) {}
-        virtual ~RealPhoton() {}
+public:
+    RealPhoton() {}
+    RealPhoton(const RealPhoton&) {}
+    virtual ~RealPhoton() {}
 
-        virtual RealPhoton* clone() const = 0;
+    virtual RealPhoton* clone() const = 0;
 
-        bool operator==(const RealPhoton&) const;
-        bool operator!=(const RealPhoton&) const;
+    bool operator==(const RealPhoton&) const;
+    bool operator!=(const RealPhoton&) const;
 
-        virtual double CalculateHardComponent(double energy, double v) = 0;
+    virtual double CalculateHardComponent(double energy, double v) = 0;
 
-        virtual const std::string& GetName() const = 0;
+    virtual const std::string& GetName() const = 0;
 
-    protected:
-        virtual bool compare(const RealPhoton&) const;
+protected:
+    virtual bool compare(const RealPhoton&) const;
 };
 
-class SoftComponent: public RealPhoton
+class SoftComponent : public RealPhoton
 {
-    public:
-        SoftComponent();
-        SoftComponent(const SoftComponent&);
-        virtual ~SoftComponent();
+public:
+    SoftComponent();
+    SoftComponent(const SoftComponent&);
+    virtual ~SoftComponent();
 
-        RealPhoton* clone() const { return new SoftComponent(*this); }
+    RealPhoton* clone() const { return new SoftComponent(*this); }
 
-        virtual double CalculateHardComponent(double energy, double v);
+    virtual double CalculateHardComponent(double energy, double v);
 
-        virtual const std::string& GetName() const { return name_; }
+    virtual const std::string& GetName() const { return name_; }
 
-    private:
-        static const std::string name_;
+private:
+    static const std::string name_;
 };
 
-class HardComponent: public RealPhoton
+class HardComponent : public RealPhoton
 {
-    public:
-        HardComponent(const ParticleDef&);
-        HardComponent(const HardComponent&);
-        virtual ~HardComponent();
+public:
+    HardComponent(const ParticleDef&);
+    HardComponent(const HardComponent&);
+    virtual ~HardComponent();
 
-        RealPhoton* clone() const { return new HardComponent(*this); }
+    RealPhoton* clone() const { return new HardComponent(*this); }
 
-        double CalculateHardComponent(double energy, double v);
+    double CalculateHardComponent(double energy, double v);
 
-        virtual const std::string& GetName() const { return name_; }
+    virtual const std::string& GetName() const { return name_; }
 
-    private:
-        virtual bool compare(const RealPhoton&) const;
+private:
+    virtual bool compare(const RealPhoton&) const;
 
-        static std::vector<double> x;
-        std::vector<Interpolant*> interpolant_;
+    static std::vector<double> x;
+    std::vector<Interpolant*> interpolant_;
 
-        static const std::string name_;
-
+    static const std::string name_;
 };
 
 /******************************************************************************
-*                                ShadowEffect                                 *
-******************************************************************************/
+ *                                ShadowEffect                                 *
+ ******************************************************************************/
 
 class ShadowEffect
 {
-    public:
+public:
     ShadowEffect() {}
     ShadowEffect(const ShadowEffect&) {}
     virtual ~ShadowEffect() {}
@@ -96,14 +95,20 @@ class ShadowEffect
     // --------------------------------------------------------------------- //
 
     virtual const std::string& GetName() const = 0;
-    virtual size_t GetHash() const = 0;
+    virtual size_t GetHash() const             = 0;
 };
 
-class ShadowDuttaRenoSarcevicSeckel: public ShadowEffect
+class ShadowDuttaRenoSarcevicSeckel : public ShadowEffect
 {
-    public:
-    ShadowDuttaRenoSarcevicSeckel(): ShadowEffect() {}
-    ShadowDuttaRenoSarcevicSeckel(const ShadowDuttaRenoSarcevicSeckel& sh): ShadowEffect(sh) {}
+public:
+    ShadowDuttaRenoSarcevicSeckel()
+        : ShadowEffect()
+    {
+    }
+    ShadowDuttaRenoSarcevicSeckel(const ShadowDuttaRenoSarcevicSeckel& sh)
+        : ShadowEffect(sh)
+    {
+    }
     virtual ~ShadowDuttaRenoSarcevicSeckel() {}
 
     ShadowEffect* clone() const { return new ShadowDuttaRenoSarcevicSeckel(*this); }
@@ -118,15 +123,21 @@ class ShadowDuttaRenoSarcevicSeckel: public ShadowEffect
     virtual const std::string& GetName() const { return name_; }
     virtual size_t GetHash() const;
 
-    private:
+private:
     static const std::string name_;
 };
 
-class ShadowButkevichMikhailov: public ShadowEffect
+class ShadowButkevichMikhailov : public ShadowEffect
 {
-    public:
-    ShadowButkevichMikhailov(): ShadowEffect() {}
-    ShadowButkevichMikhailov(const ShadowButkevichMikhailov& sh): ShadowEffect(sh) {}
+public:
+    ShadowButkevichMikhailov()
+        : ShadowEffect()
+    {
+    }
+    ShadowButkevichMikhailov(const ShadowButkevichMikhailov& sh)
+        : ShadowEffect(sh)
+    {
+    }
     virtual ~ShadowButkevichMikhailov() {}
 
     ShadowEffect* clone() const { return new ShadowButkevichMikhailov(*this); }
@@ -141,17 +152,17 @@ class ShadowButkevichMikhailov: public ShadowEffect
     virtual const std::string& GetName() const { return name_; }
     virtual size_t GetHash() const;
 
-    private:
+private:
     static const std::string name_;
 };
 
 /******************************************************************************
-*                               Photonuclear                                  *
-******************************************************************************/
+ *                               Photonuclear                                  *
+ ******************************************************************************/
 
 class Photonuclear : public Parametrization
 {
-    public:
+public:
     Photonuclear(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier);
     Photonuclear(const Photonuclear&);
     virtual ~Photonuclear();
@@ -166,9 +177,8 @@ class Photonuclear : public Parametrization
 
     virtual IntegralLimits GetIntegralLimits(double energy);
 
-    protected:
+protected:
     virtual bool compare(const Parametrization&) const;
-
 };
 
-} /* PROPOSAL */
+} // namespace PROPOSAL

@@ -4,24 +4,20 @@
 
 #include "gtest/gtest.h"
 
-
 #include "PROPOSAL/PROPOSAL.h"
 
 using namespace std;
 using namespace PROPOSAL;
-
 
 ParticleDef getParticleDef(const string& name)
 {
     if (name == "MuMinus")
     {
         return MuMinusDef::Get();
-    }
-    else if (name == "TauMinus")
+    } else if (name == "TauMinus")
     {
         return TauMinusDef::Get();
-    }
-    else
+    } else
     {
         return EMinusDef::Get();
     }
@@ -38,8 +34,8 @@ TEST(Comparison, Comparison_equal)
     sector_def.location = Sector::ParticleLocation::InsideDetector;
     sector_def.SetMedium(medium);
     sector_def.SetGeometry(sphere);
-    sector_def.scattering_model = ScatteringFactory::Moliere;
-    sector_def.cut_settings = ecuts;
+    sector_def.scattering_model            = ScatteringFactory::Moliere;
+    sector_def.cut_settings                = ecuts;
     sector_def.do_continuous_randomization = true;
 
     Sector sector(Mu, sector_def);
@@ -63,14 +59,14 @@ TEST(Comparison, Comparison_not_equal)
     sector_def1.location = Sector::ParticleLocation::InsideDetector;
     sector_def1.SetMedium(medium1);
     sector_def1.SetGeometry(geometry1);
-    sector_def1.scattering_model = ScatteringFactory::Moliere;
-    sector_def1.cut_settings = ecuts1;
+    sector_def1.scattering_model            = ScatteringFactory::Moliere;
+    sector_def1.cut_settings                = ecuts1;
     sector_def1.do_continuous_randomization = true;
-    sector_def1.do_exact_time_calculation = true;
-    sector_def1.stopping_decay = true;
+    sector_def1.do_exact_time_calculation   = true;
+    sector_def1.stopping_decay              = true;
 
     Sector::Definition sector_def2 = sector_def1;
-    sector_def2.location = Sector::ParticleLocation::InfrontDetector;
+    sector_def2.location           = Sector::ParticleLocation::InfrontDetector;
 
     Sector::Definition sector_def3 = sector_def1;
     sector_def3.SetMedium(medium2);
@@ -79,19 +75,19 @@ TEST(Comparison, Comparison_not_equal)
     sector_def4.SetGeometry(geometry2);
 
     Sector::Definition sector_def5 = sector_def1;
-    sector_def5.scattering_model = ScatteringFactory::Highland;
+    sector_def5.scattering_model   = ScatteringFactory::Highland;
 
     Sector::Definition sector_def6 = sector_def1;
-    sector_def6.cut_settings = ecuts2;
+    sector_def6.cut_settings       = ecuts2;
 
-    Sector::Definition sector_def7 = sector_def1;
+    Sector::Definition sector_def7          = sector_def1;
     sector_def7.do_continuous_randomization = false;
 
-    Sector::Definition sector_def8 = sector_def1;
+    Sector::Definition sector_def8        = sector_def1;
     sector_def8.do_exact_time_calculation = false;
 
     Sector::Definition sector_def9 = sector_def1;
-    sector_def9.stopping_decay = false;
+    sector_def9.stopping_decay     = false;
 
     Sector sector(Mu, sector_def1);
     Sector sector_1(Tau, sector_def1);
@@ -127,11 +123,11 @@ TEST(Assignment, Copyconstructor)
     sector_def.SetMedium(water);
     sector_def.SetGeometry(geometry);
     sector_def.scattering_model = ScatteringFactory::Moliere;
-    sector_def.cut_settings = ecuts;
+    sector_def.cut_settings     = ecuts;
 
     Sector sector_1(mu, sector_def);
     Sector sector_2 = sector_1;
-    EXPECT_TRUE(sector_1==sector_2);
+    EXPECT_TRUE(sector_1 == sector_2);
 }
 
 TEST(Assignment, Copyconstructor2)
@@ -146,11 +142,11 @@ TEST(Assignment, Copyconstructor2)
     sector_def.SetMedium(water);
     sector_def.SetGeometry(geometry);
     sector_def.scattering_model = ScatteringFactory::Moliere;
-    sector_def.cut_settings = ecuts;
+    sector_def.cut_settings     = ecuts;
 
     Sector sector_1(mu, sector_def);
     Sector sector_2(sector_1);
-    EXPECT_TRUE(sector_1==sector_2);
+    EXPECT_TRUE(sector_1 == sector_2);
 }
 
 TEST(Sector, Propagate)
@@ -192,22 +188,22 @@ TEST(Sector, Propagate)
 
     RandomGenerator::Get().SetSeed(1234);
 
-    while(in.good())
+    while (in.good())
     {
         if (first_line)
         {
             in >> particleName >> mediumName >> ecut >> vcut >> energy_init >> energy_final_stored >> distance;
             first_line = false;
         }
-            // >> do_continuous_randomization >> do_exact_time_calculation
-            // >> stopping_decay;
+        // >> do_continuous_randomization >> do_exact_time_calculation
+        // >> stopping_decay;
 
-        energy_previous = -1;
+        energy_previous   = -1;
         Particle particle = Particle(getParticleDef(particleName));
         particle.SetEnergy(energy_init);
         particle.SetDirection(Vector3D(1, 0, 0));
         Medium* medium = MediumFactory::Get().CreateMedium(mediumName);
-        EnergyCutSettings ecuts(ecut,vcut);
+        EnergyCutSettings ecuts(ecut, vcut);
 
         Sector::Definition sector_def;
         // sector_def.location = location;
@@ -219,24 +215,25 @@ TEST(Sector, Propagate)
 
         while (energy_previous < energy_init)
         {
-            std::cout << particleName << "\t" << mediumName << "\t" << energy_init << "\t" << energy_previous << std::endl;
+            std::cout << particleName << "\t" << mediumName << "\t" << energy_init << "\t" << energy_previous
+                      << std::endl;
             energy_previous = energy_init;
             particle.SetEnergy(energy_init);
             particle.SetDirection(Vector3D(1, 0, 0));
 
             energy_final_calc = sector.Propagate(distance);
-            ASSERT_NEAR(energy_final_calc, energy_final_stored, std::abs(1e-3*energy_final_calc));
+            ASSERT_NEAR(energy_final_calc, energy_final_stored, std::abs(1e-3 * energy_final_calc));
 
             in >> particleName >> mediumName >> ecut >> vcut >> energy_init >> energy_final_stored >> distance;
         }
-
 
         delete medium;
         cout << "ready" << endl;
     }
 }
 
-int main(int argc, char **argv) {
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
+int main(int argc, char** argv)
+{
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }

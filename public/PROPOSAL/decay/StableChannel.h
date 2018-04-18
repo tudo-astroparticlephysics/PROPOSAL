@@ -5,15 +5,13 @@
 
 #include "PROPOSAL/decay/DecayChannel.h"
 
-namespace PROPOSAL
-{
+namespace PROPOSAL {
 
 class Particle;
 
-
 class StableChannel : public DecayChannel
 {
-    public:
+public:
     StableChannel();
     StableChannel(const StableChannel& mode);
     virtual ~StableChannel();
@@ -24,7 +22,7 @@ class StableChannel : public DecayChannel
 
     const std::string& GetName() const { return name_; }
 
-    private:
+private:
     StableChannel& operator=(const StableChannel&); // Undefined & not allowed
 
     bool compare(const DecayChannel&) const;
@@ -32,4 +30,4 @@ class StableChannel : public DecayChannel
     static const std::string name_;
 };
 
-} /* PROPOSAL */
+} // namespace PROPOSAL

@@ -4,8 +4,8 @@
 // #include <string>
 // #include <vector>
 
-#include "PROPOSAL/scattering/ScatteringFactory.h"
 #include "PROPOSAL/particle/Particle.h"
+#include "PROPOSAL/scattering/ScatteringFactory.h"
 
 #include "PROPOSAL/propagation_utility/PropagationUtility.h"
 
@@ -45,12 +45,11 @@ public:
 
         Definition& operator=(const Definition&);
 
-
         void SetMedium(const Medium&);
-        const Medium& GetMedium() const { return *medium_;}
+        const Medium& GetMedium() const { return *medium_; }
 
         void SetGeometry(const Geometry&);
-        const Geometry& GetGeometry() const { return *geometry_;}
+        const Geometry& GetGeometry() const { return *geometry_; }
 
         bool do_weighting;      //!< Do weigthing? Set to false in constructor
         double weighting_order; //!< Re-weighting order. Set to 0 in constructor
