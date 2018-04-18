@@ -184,6 +184,22 @@ private:
         double Error;
     };
 
+    struct QuadpackResults
+    {
+        QuadpackResults()
+            : value(0.0)
+            , abserr(0.0)
+            , neval(0)
+            , ier(0)
+        {
+        }
+
+        double value;
+        double abserr;
+        int neval;
+        int ier;
+    };
+
 private:
     int maxSteps_romberg_;
     int maxSteps_upper_limit_;
@@ -213,13 +229,32 @@ private:
     std::vector<double> q_rlist2_; // epstab
     std::vector<double> q_iord_;
 
+    // ----------------------------------------------------------------------------
+    /// @brief This function is a translation of the fortran 77 subroutine
+    ///        dqk21 from the package QUADPACK by Piessens et al. (1983),
+    ///        which is needed by qags.
+    // ----------------------------------------------------------------------------
     std::pair<Integral::InterpolationResults, Integral::InterpolationResults> q_gaus_kronrod_21(double q_min,
                                                                                                 double q_max);
-    Integral::InterpolationResults q_epsilon_extrapolation(int q_limit_epsilon_table_, int numrl2, int nres);
-    int q_sort(int q_limit_, int last, int maxerr, int nrmax, const std::vector<double>& q_elist_);
 
     // ----------------------------------------------------------------------------
-    /// @brief QUADPACK implementation of the gauss kronrod integration
+    /// @brief This function is a translation of the fortran 77 subroutine
+    ///        dqelg from the package QUADPACK by Piessens et al. (1983),
+    ///        which is needed by qags.
+    // ----------------------------------------------------------------------------
+    Integral::InterpolationResults q_epsilon_extrapolation(int q_limit_epsilon_table, int numrl2, int nres);
+
+    // ----------------------------------------------------------------------------
+    /// @brief This function is a translation of the fortran 77 subroutine
+    ///        dqpsrt from the package QUADPACK by Piessens et al. (1983),
+    ///        which is needed by qags.
+    // ----------------------------------------------------------------------------
+    int q_sort(int q_limit, int last, int maxerr, int nrmax, const std::vector<double>& q_elist);
+
+    // ----------------------------------------------------------------------------
+    /// @brief QUADPACK implementation of the gauss kronrod integration.
+    ///        This function is a translation of the fortran 77 subroutine
+    ///        qags from the package QUADPACK by Piessens et al. (1983).
     ///
     /// @param limit        determines the maximum number of subintervals
     ///                     in the partition of the given integration interval
@@ -227,9 +262,52 @@ private:
     /// @param q_epsabs_    absolute accoracy requested
     /// @param q_epsrel_    relative accuracy requested
     ///
-    /// @return             approximation to the integral
+    /// @return             QuadpackResults, a struct containing
+    //
+    ///                     value: The approximation of the integral
+    ///                     abserr: The approximation of the absolute error
+    ///                     neval: Number of function evaluations
+    ///                     ier: The error code
+    ///
+    ///                     ier = 0 normal and reliable termination of the
+    ///                             routine. it is assumed that the requested
+    ///                             accuracy has been achieved.
+    ///                     ier > 0 abnormal termination of the routine
+    ///                             the estimates for result and error are
+    ///                             less reliable. it is assumed that the
+    ///                             requested accuracy has not been achieved.
+    ///
+    ///                     error messages
+    ///                     ier = 1 maximum number of subdivisions allowed
+    ///                             has been achieved. one can allow more
+    ///                             subdivisions by increasing the value of
+    ///                             limit (and taking the according dimension
+    ///                             adjustments into account). however, if
+    ///                             this yield no improvement it is advised
+    ///                             to analyze the integrand in order to
+    ///                             determine the integration difficulaties.
+    ///                             if the position of a local difficulty can
+    ///                             be determined (i.e.singularity,
+    ///                             discontinuity within the interval) one
+    ///                             will probably gain from splitting up the
+    ///                             interval at this point and calling the
+    ///                             integrator on the subranges. if possible,
+    ///                             an appropriate special-purpose integrator
+    ///                             should be used which is designed for
+    ///                             handling the type of difficulty involved.
+    ///                         = 2 the occurrence of roundoff error is
+    ///                             detected, which prevents the requested
+    ///                             tolerance from being achieved.
+    ///                         = 3 extremely bad integrand behaviour occurs
+    ///                             at some points of the integration
+    ///                             interval.
+    ///                         = 6 the input is invalid, because
+    ///                             (epsabs <= 0 and epsrel <= 0
+    ///                             or limit < 1).
+    ///                             result, abserr, neval, last are set
+    ///                             to zero.
     // ----------------------------------------------------------------------------
-    double qags(double limit = 50, double q_epsabs_ = 1.0e-50, double q_epsrel_ = 1.0e-6);
+    QuadpackResults qags(double limit = 50, double q_epsabs = 1.0e-50, double q_epsrel = 1.0e-6);
 
     //----------------------------------------------------------------------------//
 
