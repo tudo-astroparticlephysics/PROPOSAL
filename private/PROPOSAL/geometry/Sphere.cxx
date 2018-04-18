@@ -1,8 +1,8 @@
 #include <cmath>
 
-#include "PROPOSAL/geometry/Sphere.h"
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Output.h"
+#include "PROPOSAL/geometry/Sphere.h"
 
 using namespace PROPOSAL;
 using namespace std;
@@ -15,23 +15,19 @@ Sphere::Sphere()
     // Do nothing here
 }
 
-Sphere::Sphere(const Vector3D position,
-               double radius,
-               double inner_radius)
+Sphere::Sphere(const Vector3D position, double radius, double inner_radius)
     : Geometry("Sphere", position)
     , radius_(100.0 * radius)
     , inner_radius_(100.0 * inner_radius)
 {
-    if (inner_radius_ > radius_) {
-        log_error("Inner radius %f is greater then radius %f (will be swaped)",
-                  inner_radius_,
-                  radius_);
+    if (inner_radius_ > radius_)
+    {
+        log_error("Inner radius %f is greater then radius %f (will be swaped)", inner_radius_, radius_);
         std::swap(inner_radius_, radius_);
     }
-    if (inner_radius_ == radius_) {
-        log_error("Warning: Inner radius %f == radius %f (Volume is 0)",
-                  inner_radius_,
-                  radius_);
+    if (inner_radius_ == radius_)
+    {
+        log_error("Warning: Inner radius %f == radius %f (Volume is 0)", inner_radius_, radius_);
     }
 }
 
@@ -49,7 +45,8 @@ void Sphere::swap(Geometry& geometry)
     using std::swap;
 
     Sphere* sphere = dynamic_cast<Sphere*>(&geometry);
-    if (!sphere) {
+    if (!sphere)
+    {
         log_warn("Cannot swap Sphere!");
         return;
     }
@@ -63,9 +60,11 @@ void Sphere::swap(Geometry& geometry)
 //------------------------------------------------------------------------- //
 Sphere& Sphere::operator=(const Geometry& geometry)
 {
-    if (this != &geometry) {
+    if (this != &geometry)
+    {
         const Sphere* sphere = dynamic_cast<const Sphere*>(&geometry);
-        if (!sphere) {
+        if (!sphere)
+        {
             log_warn("Cannot assign Sphere!");
             return *this;
         }
@@ -94,8 +93,7 @@ bool Sphere::compare(const Geometry& geometry) const
 // ------------------------------------------------------------------------- //
 void Sphere::print(std::ostream& os) const
 {
-    os << "Radius: " << radius_ << "\tInner radius: " << inner_radius_
-       << '\n';
+    os << "Radius: " << radius_ << "\tInner radius: " << inner_radius_ << '\n';
 }
 
 // ------------------------------------------------------------------------- //
@@ -117,12 +115,12 @@ pair<double, double> Sphere::DistanceToBorder(const Vector3D& position, const Ve
 
     double determinant;
 
-    difference_length_squared= pow((position - position_).magnitude(), 2);
-    A = difference_length_squared - radius_*radius_;
+    difference_length_squared = pow((position - position_).magnitude(), 2);
+    A                         = difference_length_squared - radius_ * radius_;
 
     B = scalar_product(position - position_, direction);
 
-    determinant = B*B - A;
+    determinant = B * B - A;
 
     if (determinant > 0) // determinant == 0 (boundery point) is ignored
     {
@@ -163,10 +161,9 @@ pair<double, double> Sphere::DistanceToBorder(const Vector3D& position, const Ve
             }
         }
 
-    }
-    else // particle trajectory does not have an intersection with the sphere
+    } else // particle trajectory does not have an intersection with the sphere
     {
-        distance.first = -1;
+        distance.first  = -1;
         distance.second = -1;
     }
 
@@ -182,9 +179,9 @@ pair<double, double> Sphere::DistanceToBorder(const Vector3D& position, const Ve
 
     if (inner_radius_ > 0)
     {
-        A = difference_length_squared - inner_radius_*inner_radius_;
+        A = difference_length_squared - inner_radius_ * inner_radius_;
 
-        determinant = B*B - A;
+        determinant = B * B - A;
 
         if (determinant > 0) // determinant == 0 (boundery point) is ignored
         {
@@ -204,12 +201,15 @@ pair<double, double> Sphere::DistanceToBorder(const Vector3D& position, const Ve
             // ( intersection with the outer border) does not change
             // but the second distance has to be updated (intersection with the
             // inner border)
-            if (distance.first > 0 && distance.second > 0) {
-                if (t1 > 0) {
+            if (distance.first > 0 && distance.second > 0)
+            {
+                if (t1 > 0)
+                {
                     if (t1 < distance.second)
                         distance.second = t1;
                 }
-                if (t2 > 0) {
+                if (t2 > 0)
+                {
                     if (t2 < distance.second)
                         distance.second = t2;
                 }
@@ -217,7 +217,8 @@ pair<double, double> Sphere::DistanceToBorder(const Vector3D& position, const Ve
             {
                 // The inner cylinder is infront of the particle trajectory
                 // distance.first has to be updated
-                if (t1 > 0 && t2 > 0) {
+                if (t1 > 0 && t2 > 0)
+                {
                     if (t1 < t2)
                         distance.first = t1;
                     else
@@ -227,7 +228,8 @@ pair<double, double> Sphere::DistanceToBorder(const Vector3D& position, const Ve
                 // this means distance.second becomes distanc.first
                 // and distance.first beomces distance to intersection with
                 // the inner sphere in direction of the particle trajectory
-                if ((t1 > 0 && t2 < 0) || (t2 > 0 && t1 < 0)) {
+                if ((t1 > 0 && t2 < 0) || (t2 > 0 && t1 < 0))
+                {
                     std::swap(distance.first, distance.second);
                     if (t1 > 0)
                         distance.first = t1;
@@ -236,17 +238,21 @@ pair<double, double> Sphere::DistanceToBorder(const Vector3D& position, const Ve
                 }
                 // Now we have to check if the particle is on the border of
                 // the inner sphere
-                if (t1 == 0) {
+                if (t1 == 0)
+                {
                     // The particle is moving into the inner sphere
-                    if (t2 > 0) {
+                    if (t2 > 0)
+                    {
                         std::swap(distance.first, distance.second);
                         distance.first = t2;
                     }
                     // if not we don't have to update distance.first
                 }
-                if (t2 == 0) {
+                if (t2 == 0)
+                {
                     // The particle is moving into the inner sphere
-                    if (t1 > 0) {
+                    if (t1 > 0)
+                    {
                         std::swap(distance.first, distance.second);
                         distance.first = t1;
                     }

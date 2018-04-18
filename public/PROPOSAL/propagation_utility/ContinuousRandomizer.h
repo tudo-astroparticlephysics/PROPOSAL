@@ -1,13 +1,11 @@
 
 #pragma once
 
-
 namespace PROPOSAL {
 
 class Utility;
 class UtilityDecorator;
 struct InterpolationDef;
-
 
 /**
  * \brief Class containing the functions to randomize the continuous energy losses
@@ -15,7 +13,7 @@ struct InterpolationDef;
  */
 class ContinuousRandomizer
 {
-    public:
+public:
     ContinuousRandomizer(const Utility&);
     ContinuousRandomizer(const Utility&, const InterpolationDef);
 
@@ -27,14 +25,13 @@ class ContinuousRandomizer
 
     bool operator==(const ContinuousRandomizer&) const;
     bool operator!=(const ContinuousRandomizer&) const;
-    // void swap(ContinuousRandomizer& scattering);
 
     double Randomize(double ei, double ef, double rnd);
 
-    private:
+private:
     ContinuousRandomizer& operator=(const ContinuousRandomizer&); // Undefined & not allowed
 
     UtilityDecorator* DE2de;
 };
 
-}
+} // namespace PROPOSAL

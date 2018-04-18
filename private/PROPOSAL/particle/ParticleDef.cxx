@@ -1,21 +1,21 @@
 /*! \file   ParticleDef.cxx
-*   \brief  Source file for definition of the ParticleDef class object.
-*
-*   For more details see the class documentation.
-*
-*   \date   Sat Aug  5 14:47:16 CEST 2017
-*   \author Mario Dunsch
-*/
+ *   \brief  Source file for definition of the ParticleDef class object.
+ *
+ *   For more details see the class documentation.
+ *
+ *   \date   Sat Aug  5 14:47:16 CEST 2017
+ *   \author Mario Dunsch
+ */
 
-#include <string>
 #include <iostream>
+#include <string>
 
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/particle/ParticleDef.h"
 #include "PROPOSAL/decay/LeptonicDecayChannel.h"
-#include "PROPOSAL/decay/TwoBodyPhaseSpace.h"
 #include "PROPOSAL/decay/ManyBodyPhaseSpace.h"
 #include "PROPOSAL/decay/StableChannel.h"
+#include "PROPOSAL/decay/TwoBodyPhaseSpace.h"
+#include "PROPOSAL/particle/ParticleDef.h"
 
 #include "PROPOSAL/methods.h"
 
@@ -43,7 +43,7 @@
                       MASS,                                                                                            \
                       LIFETIME,                                                                                        \
                       CHARGE,                                                                                          \
-                      HardComponentTables::EmptyTable,                                                                        \
+                      HardComponentTables::EmptyTable,                                                                 \
                       DecayTable().addChannel(1.1, StableChannel()))                                                   \
     {                                                                                                                  \
     }                                                                                                                  \
@@ -53,8 +53,8 @@
 using namespace PROPOSAL;
 
 /******************************************************************************
-*                            HardComponentTables                              *
-******************************************************************************/
+ *                            HardComponentTables                              *
+ ******************************************************************************/
 
 const double HardComponentTables::muon[8][7] = {
     { 7.174409e-4, 1.7132e-3, 4.082304e-3, 8.628455e-3, 0.01244159, 0.02204591, 0.03228755 },
@@ -90,14 +90,15 @@ HardComponentTables::VecType HardComponentTables::getHardComponentVector(const d
     return var;
 }
 
-const HardComponentTables::VecType HardComponentTables::MuonTable = HardComponentTables::getHardComponentVector(HardComponentTables::muon);
-const HardComponentTables::VecType HardComponentTables::TauTable = HardComponentTables::getHardComponentVector(HardComponentTables::tau);
+const HardComponentTables::VecType HardComponentTables::MuonTable =
+    HardComponentTables::getHardComponentVector(HardComponentTables::muon);
+const HardComponentTables::VecType HardComponentTables::TauTable =
+    HardComponentTables::getHardComponentVector(HardComponentTables::tau);
 const HardComponentTables::VecType HardComponentTables::EmptyTable;
 
-
 /******************************************************************************
-*                                ParticleDef                                 *
-******************************************************************************/
+ *                                ParticleDef                                 *
+ ******************************************************************************/
 
 std::ostream& PROPOSAL::operator<<(std::ostream& os, ParticleDef const& def)
 {
@@ -143,12 +144,12 @@ ParticleDef::ParticleDef()
 }
 
 ParticleDef::ParticleDef(std::string name,
-            double mass,
-            double low,
-            double lifetime,
-            double charge,
-            const HardComponentTables::VecType& table,
-            const DecayTable& decay_table)
+                         double mass,
+                         double low,
+                         double lifetime,
+                         double charge,
+                         const HardComponentTables::VecType& table,
+                         const DecayTable& decay_table)
     : name(name)
     , mass(mass)
     , low(low)
@@ -159,9 +160,7 @@ ParticleDef::ParticleDef(std::string name,
 {
 }
 
-ParticleDef::~ParticleDef()
-{
-}
+ParticleDef::~ParticleDef() {}
 
 ParticleDef::ParticleDef(const ParticleDef& def)
     : name(def.name)
@@ -202,32 +201,25 @@ bool ParticleDef::operator==(const ParticleDef& def) const
     if (name != def.name)
     {
         return false;
-    }
-    else if (mass != def.mass)
+    } else if (mass != def.mass)
     {
         return false;
-    }
-    else if (low != def.low)
+    } else if (low != def.low)
     {
         return false;
-    }
-    else if (lifetime != def.lifetime)
+    } else if (lifetime != def.lifetime)
     {
         return false;
-    }
-    else if (charge != def.charge)
+    } else if (charge != def.charge)
     {
         return false;
-    }
-    else if (hard_component_table != def.hard_component_table)
+    } else if (hard_component_table != def.hard_component_table)
     {
         return false;
-    }
-    else if (decay_table != def.decay_table)
+    } else if (decay_table != def.decay_table)
     {
         return false;
-    }
-    else
+    } else
     {
         return true;
     }
@@ -238,7 +230,8 @@ bool ParticleDef::operator!=(const ParticleDef& def) const
     return !(*this == def);
 }
 
-std::size_t PROPOSAL::hash_value(ParticleDef const& particle_def) {
+std::size_t PROPOSAL::hash_value(ParticleDef const& particle_def)
+{
     std::size_t seed = 0;
     boost::hash_combine(seed, particle_def.mass);
     boost::hash_combine(seed, particle_def.lifetime);
@@ -247,8 +240,8 @@ std::size_t PROPOSAL::hash_value(ParticleDef const& particle_def) {
 }
 
 /******************************************************************************
-*                                  Builder                                    *
-******************************************************************************/
+ *                                  Builder                                    *
+ ******************************************************************************/
 
 ParticleDef::Builder::Builder()
     : name("")
@@ -277,25 +270,20 @@ MuMinusDef::MuMinusDef()
 {
 }
 
-MuMinusDef::~MuMinusDef()
-{
-}
+MuMinusDef::~MuMinusDef() {}
 
 MuPlusDef::MuPlusDef()
-    : ParticleDef(
-          "MuPlus",
-          MMU,
-          MMU,
-          LMU,
-          1.0,
-          HardComponentTables::MuonTable,
-          DecayTable().addChannel(1.0, LeptonicDecayChannel(EPlusDef::Get(), NuEDef::Get(), NuMuBarDef::Get())))
+    : ParticleDef("MuPlus",
+                  MMU,
+                  MMU,
+                  LMU,
+                  1.0,
+                  HardComponentTables::MuonTable,
+                  DecayTable().addChannel(1.0, LeptonicDecayChannel(EPlusDef::Get(), NuEDef::Get(), NuMuBarDef::Get())))
 {
 }
 
-MuPlusDef::~MuPlusDef()
-{
-}
+MuPlusDef::~MuPlusDef() {}
 
 TauMinusDef::TauMinusDef()
     : ParticleDef("TauMinus",
@@ -360,9 +348,7 @@ TauMinusDef::TauMinusDef()
 {
 }
 
-TauMinusDef::~TauMinusDef()
-{
-}
+TauMinusDef::~TauMinusDef() {}
 
 TauPlusDef::TauPlusDef()
     : ParticleDef("TauPlus",
@@ -427,9 +413,7 @@ TauPlusDef::TauPlusDef()
 {
 }
 
-TauPlusDef::~TauPlusDef()
-{
-}
+TauPlusDef::~TauPlusDef() {}
 
 // ------------------------------------------------------------------------- //
 // Signature for following macro definitions:

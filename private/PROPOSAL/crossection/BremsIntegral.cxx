@@ -7,17 +7,17 @@
 
 using namespace PROPOSAL;
 
-BremsIntegral::BremsIntegral(const Bremsstrahlung& param): CrossSectionIntegral(DynamicData::Brems, param)
+BremsIntegral::BremsIntegral(const Bremsstrahlung& param)
+    : CrossSectionIntegral(DynamicData::Brems, param)
 {
 }
 
-BremsIntegral::BremsIntegral(const BremsIntegral& brems): CrossSectionIntegral(brems)
+BremsIntegral::BremsIntegral(const BremsIntegral& brems)
+    : CrossSectionIntegral(brems)
 {
 }
 
-BremsIntegral::~BremsIntegral()
-{
-}
+BremsIntegral::~BremsIntegral() {}
 
 // ----------------------------------------------------------------- //
 // Public methods
@@ -38,7 +38,10 @@ double BremsIntegral::CalculatedEdx(double energy)
         Parametrization::IntegralLimits limits = parametrization_->GetIntegralLimits(energy);
 
         sum += dedx_integral_.Integrate(
-            limits.vMin, limits.vUp, boost::bind(&Parametrization::FunctionToDEdxIntegral, parametrization_, energy, _1), 2);
+            limits.vMin,
+            limits.vUp,
+            boost::bind(&Parametrization::FunctionToDEdxIntegral, parametrization_, energy, _1),
+            2);
     }
 
     return energy * sum;

@@ -4,16 +4,16 @@
 
 #include "PROPOSAL/crossection/parametrization/Ionization.h"
 
-#include "PROPOSAL/Output.h"
 #include "PROPOSAL/Constants.h"
+#include "PROPOSAL/Output.h"
 #include "PROPOSAL/math/Integral.h"
 #include "PROPOSAL/medium/Medium.h"
 
 using namespace PROPOSAL;
 
 /******************************************************************************
-*                               Ionization                                *
-******************************************************************************/
+ *                               Ionization                                *
+ ******************************************************************************/
 
 // ------------------------------------------------------------------------- //
 // Constructor & Destructor
@@ -32,9 +32,7 @@ Ionization::Ionization(const Ionization& ioniz)
 {
 }
 
-Ionization::~Ionization()
-{
-}
+Ionization::~Ionization() {}
 
 // ------------------------------------------------------------------------- //
 // Public methods
@@ -69,7 +67,8 @@ double Ionization::DifferentialCrossSection(double energy, double v)
     result = 1 - beta * (v / limits.vMax) + spin_1_2_contribution;
     result *= IONK * particle_def_.charge * particle_def_.charge * medium_->GetZA() / (2 * beta * energy * v * v);
 
-    return multiplier_ * medium_->GetMassDensity() * result * (1 + InelCorrection(energy, v));;
+    return multiplier_ * medium_->GetMassDensity() * result * (1 + InelCorrection(energy, v));
+    ;
 }
 
 // ------------------------------------------------------------------------- //
@@ -83,7 +82,8 @@ Parametrization::IntegralLimits Ionization::GetIntegralLimits(double energy)
 {
     IntegralLimits limits;
 
-    double mass_ration = ME / particle_def_.mass;;
+    double mass_ration = ME / particle_def_.mass;
+    ;
     double gamma = energy / particle_def_.mass;
 
     limits.vMin = (1.e-6 * medium_->GetI()) / energy;
@@ -92,8 +92,7 @@ Parametrization::IntegralLimits Ionization::GetIntegralLimits(double energy)
     // eq. 33.4
     // v_{max} = \frac{1}{E} \frac{2 m_e \beta^2 \gamma^2}
     //          {1 + 2 \gamma \frac{m_e}{m_{particle} + (\frac{m_e}{m_{particle})^2 }
-    limits.vMax = 2 * ME * (gamma * gamma - 1)
-                / ((1 + 2 * gamma * mass_ration + mass_ration * mass_ration) * energy);
+    limits.vMax = 2 * ME * (gamma * gamma - 1) / ((1 + 2 * gamma * mass_ration + mass_ration * mass_ration) * energy);
     limits.vMax = std::min(limits.vMax, 1. - particle_def_.mass / energy);
 
     if (limits.vMax < limits.vMin)
@@ -131,9 +130,9 @@ double Ionization::InelCorrection(double energy, double v)
 
     double gamma = energy / particle_def_.mass;
 
-    a = log(1 + 2 * v * energy / ME);
-    b = log((1 - v / limits.vMax) / (1 - v));
-    c = log((2 * gamma * (1 - v) * ME) / (particle_def_.mass * v));
+    a      = log(1 + 2 * v * energy / ME);
+    b      = log((1 - v / limits.vMax) / (1 - v));
+    c      = log((2 * gamma * (1 - v) * ME) / (particle_def_.mass * v));
     result = a * (2 * b + c) - b * b;
 
     return ALPHA / (2 * PI) * result;

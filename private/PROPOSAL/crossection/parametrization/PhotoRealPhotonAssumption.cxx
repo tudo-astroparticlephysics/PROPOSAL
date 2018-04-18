@@ -7,8 +7,8 @@
 
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/math/Interpolant.h"
-#include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/medium/Components.h"
+#include "PROPOSAL/medium/Medium.h"
 
 #define PHOTO_PARAM_REAL_IMPL(param, parent)                                                                           \
     Photo##param::Photo##param(const ParticleDef& particle_def,                                                        \
@@ -32,8 +32,8 @@
 using namespace PROPOSAL;
 
 /******************************************************************************
-*                         PhotoRealPhotonAssumption                           *
-******************************************************************************/
+ *                         PhotoRealPhotonAssumption                           *
+ ******************************************************************************/
 
 PhotoRealPhotonAssumption::PhotoRealPhotonAssumption(const ParticleDef& particle_def,
                                                      const Medium& medium,
@@ -46,8 +46,7 @@ PhotoRealPhotonAssumption::PhotoRealPhotonAssumption(const ParticleDef& particle
     if (hard_component)
     {
         hard_component_ = new HardComponent(particle_def);
-    }
-    else
+    } else
     {
         hard_component_ = new SoftComponent();
     }
@@ -96,8 +95,7 @@ double PhotoRealPhotonAssumption::DifferentialCrossSection(double energy, double
     if (components_[component_index_]->GetNucCharge() == 1)
     {
         G = 1;
-    }
-    else
+    } else
     {
         // eq. 18
         double tmp = 0.00282 * pow(components_[component_index_]->GetAtomicNum(), 1. / 3) * sgn;
@@ -114,9 +112,9 @@ double PhotoRealPhotonAssumption::DifferentialCrossSection(double energy, double
     aum = particle_def_.mass * 1.e-3;
     aum *= aum;
     aux = 2 * aum / t;
-    aux = G * ((kappa + 4 * aum / m1) * log(1 + m1 / t) - (kappa * m1) / (m1 + t) - aux)
-        + ((kappa + 2 * aum / m2) * log(1 + m2 / t) - aux)
-        + aux * (G * (m1 - 4 * t) / (m1 + t) + (m2 / t) * log(1 + t / m2));
+    aux = G * ((kappa + 4 * aum / m1) * log(1 + m1 / t) - (kappa * m1) / (m1 + t) - aux) +
+          ((kappa + 2 * aum / m2) * log(1 + m2 / t) - aux) +
+          aux * (G * (m1 - 4 * t) / (m1 + t) + (m2 / t) * log(1 + t / m2));
 
     aux *= ALPHA / (8 * PI) * components_[component_index_]->GetAtomicNum() * v * sgn * 1.e-30;
 
@@ -125,8 +123,8 @@ double PhotoRealPhotonAssumption::DifferentialCrossSection(double energy, double
     // in the appendix
     aux += components_[component_index_]->GetAtomicNum() * 1.e-30 * hard_component_->CalculateHardComponent(energy, v);
 
-    return multiplier_ * medium_->GetMolDensity() * components_[component_index_]->GetAtomInMolecule()
-            * particle_def_.charge * particle_def_.charge * aux;
+    return multiplier_ * medium_->GetMolDensity() * components_[component_index_]->GetAtomInMolecule() *
+           particle_def_.charge * particle_def_.charge * aux;
 }
 
 // ------------------------------------------------------------------------- //
@@ -158,12 +156,12 @@ size_t PhotoRealPhotonAssumption::GetHash() const
 
 void PhotoRealPhotonAssumption::print(std::ostream& os) const
 {
-    os << "Including the hard component enabled: " << (dynamic_cast<HardComponent*>(hard_component_)? 1 : 0) << '\n';
+    os << "Including the hard component enabled: " << (dynamic_cast<HardComponent*>(hard_component_) ? 1 : 0) << '\n';
 }
 
 /******************************************************************************
-*                            Zeus Parametrization                            *
-******************************************************************************/
+ *                            Zeus Parametrization                            *
+ ******************************************************************************/
 
 // Signature: (new class, parent class)
 PHOTO_PARAM_REAL_IMPL(Zeus, RealPhotonAssumption)
@@ -179,11 +177,9 @@ double PhotoZeus::CalculateParametrization(double nu)
     return aux;
 }
 
-
-
 /******************************************************************************
-*                      Bezrukov Bugaev Parametrization                       *
-******************************************************************************/
+ *                      Bezrukov Bugaev Parametrization                       *
+ ******************************************************************************/
 
 // Signature: (new class, parent class)
 PHOTO_PARAM_REAL_IMPL(BezrukovBugaev, RealPhotonAssumption)
@@ -205,8 +201,8 @@ double PhotoBezrukovBugaev::CalculateParametrization(double nu)
 }
 
 /******************************************************************************
-*                          Kokoulin Parametrization                           *
-******************************************************************************/
+ *                          Kokoulin Parametrization                           *
+ ******************************************************************************/
 
 // Signature: (new class, parent class)
 PHOTO_PARAM_REAL_IMPL(Kokoulin, BezrukovBugaev)
@@ -230,8 +226,8 @@ double PhotoKokoulin::CalculateParametrization(double nu)
 }
 
 /******************************************************************************
-*                           Rhode Parametrization                            *
-******************************************************************************/
+ *                           Rhode Parametrization                            *
+ ******************************************************************************/
 
 PhotoRhode::PhotoRhode(const ParticleDef& particle_def,
                        const Medium& medium,
@@ -274,12 +270,11 @@ PhotoRhode::~PhotoRhode()
     delete interpolant_;
 }
 
-
 Photonuclear* PhotoRhode::create(const ParticleDef& particle_def,
-                        const Medium& medium,
-                        const EnergyCutSettings& cuts,
-                        double multiplier,
-                        bool hard_component)
+                                 const Medium& medium,
+                                 const EnergyCutSettings& cuts,
+                                 double multiplier,
+                                 bool hard_component)
 {
     return new PhotoRhode(particle_def, medium, cuts, multiplier, hard_component);
 }

@@ -1,11 +1,11 @@
 /*! \file   ParticleDef.h
-*   \brief  Header file for definition of the ParticleDef class object.
-*
-*   For more details see the class documentation.
-*
-*   \date   Sat Aug  5 14:47:16 CEST 2017
-*   \author Mario Dunsch
-*/
+ *   \brief  Header file for definition of the ParticleDef class object.
+ *
+ *   For more details see the class documentation.
+ *
+ *   \date   Sat Aug  5 14:47:16 CEST 2017
+ *   \author Mario Dunsch
+ */
 
 #pragma once
 
@@ -19,21 +19,19 @@
 #define PARTICLE_DEF(cls)                                                                                              \
     class cls##Def : public ParticleDef                                                                                \
     {                                                                                                                  \
-        public:                                                                                                        \
+    public:                                                                                                            \
         static const cls##Def& Get()                                                                                   \
         {                                                                                                              \
             static const cls##Def instance;                                                                            \
             return instance;                                                                                           \
         }                                                                                                              \
                                                                                                                        \
-        private:                                                                                                       \
+    private:                                                                                                           \
         cls##Def();                                                                                                    \
         ~cls##Def();                                                                                                   \
-};
+    };
 
 namespace PROPOSAL {
-
-// class DecayTable;
 
 namespace HardComponentTables {
 
@@ -71,7 +69,7 @@ extern const VecType TauTable;
 // ----------------------------------------------------------------------------
 extern const VecType EmptyTable;
 
-} // namespace HardComponentTable
+} // namespace HardComponentTables
 
 // ----------------------------------------------------------------------------
 /// @brief Struct to define Basic Particle Properties
@@ -84,7 +82,7 @@ struct ParticleDef
 
     const std::string name;
     const double mass;
-    const double low;       //!< energy below which the particle is lost [MeV]
+    const double low; //!< energy below which the particle is lost [MeV]
     const double lifetime;
     const double charge;
     const HardComponentTables::VecType& hard_component_table;
@@ -104,15 +102,12 @@ struct ParticleDef
 
     ParticleDef* clone() const { return new ParticleDef(*this); }
 
-    // ParticleDef& operator=(const ParticleDef&);
-    // void swap(ParticleDef&);
-
     bool operator==(const ParticleDef&) const;
     bool operator!=(const ParticleDef&) const;
 
     friend std::ostream& operator<<(std::ostream&, ParticleDef const&);
 
-    private:
+private:
     ParticleDef& operator=(const ParticleDef&); // Undefined & not allowed
 };
 
@@ -120,8 +115,7 @@ std::ostream& operator<<(std::ostream&, PROPOSAL::ParticleDef const&);
 
 class ParticleDef::Builder
 {
-    public:
-
+public:
     Builder();
 
     // --------------------------------------------------------------------- //
@@ -165,13 +159,13 @@ class ParticleDef::Builder
     }
     Builder& SetParticleDef(const ParticleDef& var)
     {
-        name = var.name;
-        mass = var.mass;
-        low = var.low;
-        lifetime = var.lifetime;
-        charge = var.charge;
+        name                 = var.name;
+        mass                 = var.mass;
+        low                  = var.low;
+        lifetime             = var.lifetime;
+        charge               = var.charge;
         hard_component_table = &var.hard_component_table;
-        decay_table = var.decay_table;
+        decay_table          = var.decay_table;
         return *this;
     }
 
@@ -186,7 +180,7 @@ class ParticleDef::Builder
         return ParticleDef(name, mass, low, lifetime, charge, *hard_component_table, decay_table);
     }
 
-    private:
+private:
     std::string name;
     double mass;
     double low;
@@ -222,7 +216,6 @@ PARTICLE_DEF(StauPlus)
 PARTICLE_DEF(Pi0)
 PARTICLE_DEF(PiMinus)
 PARTICLE_DEF(PiPlus)
-
 
 // ----------------------------------------------------------------------------
 /// @brief Particle definition of K0

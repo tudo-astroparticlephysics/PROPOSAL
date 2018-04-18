@@ -12,10 +12,10 @@
 
 // class header
 #include <boost/assign.hpp>
-#include <boost/foreach.hpp>
+#include <boost/bimap.hpp>
 #include <boost/bind.hpp>
 #include <boost/filesystem.hpp>
-#include <boost/bimap.hpp>
+#include <boost/foreach.hpp>
 
 #include <sstream>
 #include <unistd.h> // check for write permissions
@@ -23,8 +23,8 @@
 #include <dataclasses/physics/I3Particle.h>
 
 // #include "PROPOSAL/src/PROPOSAL-icetray/I3PropagatorServicePROPOSAL.h"
-#include "PROPOSAL-icetray/I3PropagatorServicePROPOSAL.h"
 #include "PROPOSAL-icetray/Converter.h"
+#include "PROPOSAL-icetray/I3PropagatorServicePROPOSAL.h"
 
 using namespace std;
 using namespace PROPOSAL;
@@ -40,16 +40,14 @@ bool IsWritable(std::string table_dir)
         {
             writeable = true;
             log_info("Table directory does exist and has read and write permissions: %s", table_dir.c_str());
-        }
-        else
+        } else
         {
             if (access(table_dir.c_str(), R_OK) != 0)
                 log_info("Table directory is not readable: %s", table_dir.c_str());
             else
                 log_info("Table directory is not writable: %s", table_dir.c_str());
         }
-    }
-    else
+    } else
         log_info("Table directory does not exist: %s", table_dir.c_str());
 
     return writeable;
@@ -66,17 +64,15 @@ I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(std::string configfile)
 }
 
 // ------------------------------------------------------------------------- //
-I3PropagatorServicePROPOSAL::~I3PropagatorServicePROPOSAL()
-{
-}
+I3PropagatorServicePROPOSAL::~I3PropagatorServicePROPOSAL() {}
 
 // ------------------------------------------------------------------------- //
 std::string I3PropagatorServicePROPOSAL::GetDefaultConfigFile()
 {
-	const char *I3_BUILD = getenv("I3_BUILD");
-	if (!I3_BUILD)
-		log_fatal("$I3_BUILD is not set!");
-	std::string s(I3_BUILD);
+    const char* I3_BUILD = getenv("I3_BUILD");
+    if (!I3_BUILD)
+        log_fatal("$I3_BUILD is not set!");
+    std::string s(I3_BUILD);
 
     return s + "/PROPOSAL/resources/config_icesim.json";
 }
@@ -84,8 +80,8 @@ std::string I3PropagatorServicePROPOSAL::GetDefaultConfigFile()
 // ------------------------------------------------------------------------- //
 void I3PropagatorServicePROPOSAL::SetRandomNumberGenerator(I3RandomServicePtr random)
 {
-    rng_ = random;
-    boost::function<double ()> f = boost::bind(&I3RandomService::Uniform, random, 0, 1);
+    rng_                        = random;
+    boost::function<double()> f = boost::bind(&I3RandomService::Uniform, random, 0, 1);
 
     PROPOSAL::RandomGenerator::Get().SetRandomNumberGenerator(f);
 }
@@ -98,34 +94,35 @@ void I3PropagatorServicePROPOSAL::RegisterParticleType(I3Particle::ParticleType 
 }
 
 // ------------------------------------------------------------------------- //
-std::vector<I3Particle> I3PropagatorServicePROPOSAL::Propagate(I3Particle& p, DiagnosticMapPtr frame, I3FramePtr){
+std::vector<I3Particle> I3PropagatorServicePROPOSAL::Propagate(I3Particle& p, DiagnosticMapPtr frame, I3FramePtr)
+{
     // saying where we are
     log_debug("Entering I3PropagatorServicePROPOSAL::Propagate()");
 
     vector<I3Particle> daughters;
 
-    log_trace("location type = %d",p.GetLocationType());
-    if(p.GetLocationType()!=I3Particle::InIce) return std::vector<I3Particle>();
-
-    if((p.GetType() == I3Particle::NuE)   || (p.GetType() == I3Particle::NuEBar)   ||
-       (p.GetType() == I3Particle::NuMu)  || (p.GetType() == I3Particle::NuMuBar)  ||
-       (p.GetType() == I3Particle::NuTau) || (p.GetType() == I3Particle::NuTauBar))
+    log_trace("location type = %d", p.GetLocationType());
+    if (p.GetLocationType() != I3Particle::InIce)
         return std::vector<I3Particle>();
 
-    log_trace(
-        "particle to propagate:\n""type/energy[GeV]/posx[m]/posy[m]/posz[m]/theta[deg]/phi[deg]/length[m]\n"
-        "%d/%.2e/%.2f/%.2f/%.2f/%.2f/%.2f/%.2f",
-        p.GetType(),
-        p.GetEnergy()/I3Units::GeV,
-        p.GetPos().GetX()/I3Units::m,
-        p.GetPos().GetY()/I3Units::m,
-        p.GetPos().GetZ()/I3Units::m,
-        p.GetZenith ()/I3Units::deg,
-        p.GetAzimuth ()/I3Units::deg,
-        p.GetLength()/I3Units::m
-    );
+    if ((p.GetType() == I3Particle::NuE) || (p.GetType() == I3Particle::NuEBar) || (p.GetType() == I3Particle::NuMu) ||
+        (p.GetType() == I3Particle::NuMuBar) || (p.GetType() == I3Particle::NuTau) ||
+        (p.GetType() == I3Particle::NuTauBar))
+        return std::vector<I3Particle>();
 
-    //TODO(mario):  Thu 2017/09/28
+    log_trace("particle to propagate:\n"
+              "type/energy[GeV]/posx[m]/posy[m]/posz[m]/theta[deg]/phi[deg]/length[m]\n"
+              "%d/%.2e/%.2f/%.2f/%.2f/%.2f/%.2f/%.2f",
+              p.GetType(),
+              p.GetEnergy() / I3Units::GeV,
+              p.GetPos().GetX() / I3Units::m,
+              p.GetPos().GetY() / I3Units::m,
+              p.GetPos().GetZ() / I3Units::m,
+              p.GetZenith() / I3Units::deg,
+              p.GetAzimuth() / I3Units::deg,
+              p.GetLength() / I3Units::m);
+
+    // TODO(mario):  Thu 2017/09/28
     // if (tearDownPerCall_)
     // {
     //     delete proposal;
@@ -265,9 +262,10 @@ I3MMCTrackPtr I3PropagatorServicePROPOSAL::propagate(I3Particle& p, vector<I3Par
 }
 
 // ------------------------------------------------------------------------- //
-I3MMCTrackPtr I3PropagatorServicePROPOSAL::GenerateMMCTrack(PROPOSAL::Particle* particle){
+I3MMCTrackPtr I3PropagatorServicePROPOSAL::GenerateMMCTrack(PROPOSAL::Particle* particle)
+{
 
-    //explicitly specifying the units from MMC
+    // explicitly specifying the units from MMC
     double xi = particle->GetEntryPoint().GetX() * I3Units::m;
     double yi = particle->GetEntryPoint().GetY() * I3Units::m;
     double zi = particle->GetEntryPoint().GetZ() * I3Units::m;
@@ -286,18 +284,17 @@ I3MMCTrackPtr I3PropagatorServicePROPOSAL::GenerateMMCTrack(PROPOSAL::Particle* 
     double tc = particle->GetClosestApproachTime() * I3Units::second;
     double Ec = particle->GetClosestApproachEnergy() * I3Units::GeV;
 
-    I3MMCTrackPtr mmcTrack( new I3MMCTrack);
-    mmcTrack->SetEnter(xi,yi,zi,ti,Ei);
-    mmcTrack->SetCenter(xc,yc,zc,tc,Ec);
-    mmcTrack->SetExit(xf,yf,zf,tf,Ef);
+    I3MMCTrackPtr mmcTrack(new I3MMCTrack);
+    mmcTrack->SetEnter(xi, yi, zi, ti, Ei);
+    mmcTrack->SetCenter(xc, yc, zc, tc, Ec);
+    mmcTrack->SetExit(xf, yf, zf, tf, Ef);
 
     double Elost = particle->GetElost() * I3Units::GeV;
     mmcTrack->SetDepositedEnergy(Elost);
     log_debug("Elost = %f", Elost);
 
-    if(Elost>0)
+    if (Elost > 0)
         return mmcTrack;
-    //return null pointer if Elost <= 0
+    // return null pointer if Elost <= 0
     return I3MMCTrackPtr();
 }
-

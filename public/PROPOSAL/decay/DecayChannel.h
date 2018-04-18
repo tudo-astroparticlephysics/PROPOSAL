@@ -4,8 +4,7 @@
 #include <string>
 #include <vector>
 
-namespace PROPOSAL
-{
+namespace PROPOSAL {
 
 class Vector3D;
 class DynamicData;
@@ -14,7 +13,7 @@ class Particle;
 class DecayChannel
 {
 
-    public:
+public:
     typedef std::vector<Particle*> DecayProducts;
 
     DecayChannel();
@@ -89,7 +88,7 @@ class DecayChannel
 
     virtual const std::string& GetName() const = 0;
 
-    protected:
+protected:
     virtual bool compare(const DecayChannel&) const = 0;
     virtual void print(std::ostream&) const {};
 
@@ -98,4 +97,4 @@ class DecayChannel
 
 std::ostream& operator<<(std::ostream&, PROPOSAL::DecayChannel const&);
 
-} /* PROPOSAL */
+} // namespace PROPOSAL

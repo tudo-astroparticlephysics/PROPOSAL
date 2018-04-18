@@ -5,25 +5,22 @@
  *      Author: koehne
  */
 
-
 #include <boost/algorithm/string.hpp> // case insensitive string compare for configuration file
 #include <cmath>
 // #include <algorithm>
 // #include <vector>
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/geometry/Geometry.h"
 #include "PROPOSAL/Output.h"
+#include "PROPOSAL/geometry/Geometry.h"
 
 #include "PROPOSAL/methods.h"
 
 using namespace std;
 using namespace PROPOSAL;
 
-
 /******************************************************************************
-*                                  OStream                                    *
-******************************************************************************/
-
+ *                                  OStream                                    *
+ ******************************************************************************/
 
 namespace PROPOSAL {
 
@@ -47,19 +44,18 @@ ostream& operator<<(ostream& os, Geometry const& geometry)
 } // namespace PROPOSAL
 
 /******************************************************************************
-*                                  Geometry                                   *
-******************************************************************************/
-
+ *                                  Geometry                                   *
+ ******************************************************************************/
 
 Geometry::Geometry(const std::string name)
-    : position_( Vector3D() )
+    : position_(Vector3D())
     , name_(name)
     , hirarchy_(0)
 {
 }
 
 Geometry::Geometry(const std::string name, const Vector3D position)
-    : position_(100.*position)
+    : position_(100. * position)
     , name_(name)
     , hirarchy_(0)
 {
@@ -85,9 +81,10 @@ void Geometry::swap(Geometry& geometry)
 // ------------------------------------------------------------------------- //
 Geometry& Geometry::operator=(const Geometry& geometry)
 {
-    if (this != &geometry) {
+    if (this != &geometry)
+    {
         position_ = geometry.position_;
-        name_ = geometry.name_;
+        name_     = geometry.name_;
         hirarchy_ = geometry.hirarchy_;
     }
 
@@ -123,7 +120,8 @@ bool Geometry::IsInside(const Vector3D& position, const Vector3D& direction)
 
     pair<double, double> dist = DistanceToBorder(position, direction);
 
-    if (dist.first > 0 && dist.second < 0) {
+    if (dist.first > 0 && dist.second < 0)
+    {
         is_inside = true;
     }
     return is_inside;
@@ -136,7 +134,8 @@ bool Geometry::IsInfront(const Vector3D& position, const Vector3D& direction)
 
     pair<double, double> dist = DistanceToBorder(position, direction);
 
-    if (dist.first > 0 && dist.second > 0) {
+    if (dist.first > 0 && dist.second > 0)
+    {
         is_infront = true;
     }
     return is_infront;
@@ -149,7 +148,8 @@ bool Geometry::IsBehind(const Vector3D& position, const Vector3D& direction)
 
     pair<double, double> dist = DistanceToBorder(position, direction);
 
-    if (dist.first < 0 && dist.second < 0) {
+    if (dist.first < 0 && dist.second < 0)
+    {
         is_behind = true;
     }
     return is_behind;

@@ -2,8 +2,8 @@
 #include <boost/bind.hpp>
 #include <cmath>
 
-#include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
 #include "PROPOSAL/crossection/CrossSection.h"
+#include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
 
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Output.h"
@@ -29,8 +29,8 @@
 using namespace PROPOSAL;
 
 /******************************************************************************
-*                              Utility Integral                              *
-******************************************************************************/
+ *                              Utility Integral                              *
+ ******************************************************************************/
 
 UtilityIntegral::UtilityIntegral(const Utility& utility)
     : UtilityDecorator(utility)
@@ -54,9 +54,7 @@ UtilityIntegral::UtilityIntegral(const UtilityIntegral& collection)
 {
 }
 
-UtilityIntegral::~UtilityIntegral()
-{
-}
+UtilityIntegral::~UtilityIntegral() {}
 
 bool UtilityIntegral::compare(const UtilityDecorator& utility_decorator) const
 {
@@ -77,8 +75,8 @@ double UtilityIntegral::GetUpperLimit(double ei, double rnd)
 }
 
 /******************************************************************************
-*                            Utility Displacement                            *
-******************************************************************************/
+ *                            Utility Displacement                            *
+ ******************************************************************************/
 
 UTILITY_INTEGRAL_IMPL(Displacement)
 
@@ -86,12 +84,12 @@ UTILITY_INTEGRAL_IMPL(Displacement)
 double UtilityIntegralDisplacement::Calculate(double ei, double ef, double rnd)
 {
     return integral_.IntegrateWithRandomRatio(
-        ei, ef, boost::bind(&UtilityIntegralDisplacement::FunctionToIntegral, this,  _1), 4, -rnd);
+        ei, ef, boost::bind(&UtilityIntegralDisplacement::FunctionToIntegral, this, _1), 4, -rnd);
 }
 
 /******************************************************************************
-*                            Utility Interaction                            *
-******************************************************************************/
+ *                            Utility Interaction                            *
+ ******************************************************************************/
 
 UTILITY_INTEGRAL_IMPL(Interaction)
 
@@ -102,11 +100,8 @@ double UtilityIntegralInteraction::FunctionToIntegral(double energy)
 
     const std::vector<CrossSection*>& crosssections = utility_.GetCrosssections();
 
-    for(std::vector<CrossSection*>::const_iterator iter = crosssections.begin(); iter != crosssections.end(); ++iter)
+    for (std::vector<CrossSection*>::const_iterator iter = crosssections.begin(); iter != crosssections.end(); ++iter)
     {
-        //TODO(mario): name Wed 2017/09/06
-        // log_debug("Rate for %s = %f", crosssections_.at(i)->GetName().c_str(), rate);
-
         total_rate += (*iter)->CalculatedNdx(energy);
     }
 
@@ -116,19 +111,15 @@ double UtilityIntegralInteraction::FunctionToIntegral(double energy)
 // ------------------------------------------------------------------------- //
 double UtilityIntegralInteraction::Calculate(double ei, double ef, double rnd)
 {
-    (void) ef;
+    (void)ef;
 
     return integral_.IntegrateWithRandomRatio(
-        ei,
-        ef,
-        boost::bind(&UtilityIntegralInteraction::FunctionToIntegral, this,  _1),
-        4,
-        -rnd);
+        ei, ef, boost::bind(&UtilityIntegralInteraction::FunctionToIntegral, this, _1), 4, -rnd);
 }
 
 /******************************************************************************
-*                            Utility Decay                            *
-******************************************************************************/
+ *                            Utility Decay                            *
+ ******************************************************************************/
 
 UTILITY_INTEGRAL_IMPL(Decay)
 
@@ -143,12 +134,12 @@ double UtilityIntegralDecay::FunctionToIntegral(double energy)
         return 0;
     }
 
-    //TODO(mario): Better way? Sat 2017/09/02
-    double square_momentum = energy * energy - particle_def.mass * particle_def.mass;
+    // TODO(mario): Better way? Sat 2017/09/02
+    double square_momentum   = energy * energy - particle_def.mass * particle_def.mass;
     double particle_momentum = sqrt(std::max(square_momentum, 0.0));
 
-    // return multiplier / max((particle_momentum / particle_.GetMass()) * particle_.GetLifetime() * SPEED, PARTICLE_POSITION_RESOLUTION);
-    aux =  1.0 / std::max((particle_momentum / particle_def.mass) * particle_def.lifetime * SPEED, PARTICLE_POSITION_RESOLUTION);
+    aux = 1.0 / std::max((particle_momentum / particle_def.mass) * particle_def.lifetime * SPEED,
+                         PARTICLE_POSITION_RESOLUTION);
 
     return UtilityDecorator::FunctionToIntegral(energy) * aux;
 }
@@ -156,19 +147,15 @@ double UtilityIntegralDecay::FunctionToIntegral(double energy)
 // ------------------------------------------------------------------------- //
 double UtilityIntegralDecay::Calculate(double ei, double ef, double rnd)
 {
-    (void) ef;
+    (void)ef;
 
     return integral_.IntegrateWithRandomRatio(
-        ei,
-        ef,
-        boost::bind(&UtilityIntegralDecay::FunctionToIntegral, this,  _1),
-        4,
-        -rnd);
+        ei, ef, boost::bind(&UtilityIntegralDecay::FunctionToIntegral, this, _1), 4, -rnd);
 }
 
 /******************************************************************************
-*                            Utility Time                            *
-******************************************************************************/
+ *                            Utility Time                            *
+ ******************************************************************************/
 
 UTILITY_INTEGRAL_IMPL(Time)
 
@@ -176,25 +163,24 @@ UTILITY_INTEGRAL_IMPL(Time)
 double UtilityIntegralTime::FunctionToIntegral(double energy)
 {
     const ParticleDef& particle_def = utility_.GetParticleDef();
-    //TODO(mario): Better way? Sat 2017/09/02
-    double square_momentum = energy * energy - particle_def.mass * particle_def.mass;
+    // TODO(mario): Better way? Sat 2017/09/02
+    double square_momentum   = energy * energy - particle_def.mass * particle_def.mass;
     double particle_momentum = sqrt(std::max(square_momentum, 0.0));
 
-    return energy  / (particle_momentum * SPEED) * UtilityDecorator::FunctionToIntegral(energy);
+    return energy / (particle_momentum * SPEED) * UtilityDecorator::FunctionToIntegral(energy);
 }
 
 // ------------------------------------------------------------------------- //
 double UtilityIntegralTime::Calculate(double ei, double ef, double rnd)
 {
-    (void) rnd;
+    (void)rnd;
 
-    return integral_.Integrate(
-        ei, ef, boost::bind(&UtilityIntegralTime::FunctionToIntegral, this,  _1), 4);
+    return integral_.Integrate(ei, ef, boost::bind(&UtilityIntegralTime::FunctionToIntegral, this, _1), 4);
 }
 
 /******************************************************************************
-*                            Utility ContRand                            *
-******************************************************************************/
+ *                            Utility ContRand                            *
+ ******************************************************************************/
 
 UTILITY_INTEGRAL_IMPL(ContRand)
 
@@ -205,7 +191,7 @@ double UtilityIntegralContRand::FunctionToIntegral(double energy)
 
     const std::vector<CrossSection*>& crosssections = utility_.GetCrosssections();
 
-    for(std::vector<CrossSection*>::const_iterator iter = crosssections.begin(); iter != crosssections.end(); ++iter)
+    for (std::vector<CrossSection*>::const_iterator iter = crosssections.begin(); iter != crosssections.end(); ++iter)
     {
         sum += (*iter)->CalculatedE2dx(energy);
     }
@@ -216,13 +202,13 @@ double UtilityIntegralContRand::FunctionToIntegral(double energy)
 // ------------------------------------------------------------------------- //
 double UtilityIntegralContRand::Calculate(double ei, double ef, double rnd)
 {
-    (void) rnd;
+    (void)rnd;
     return integral_.Integrate(ei, ef, boost::bind(&UtilityIntegralContRand::FunctionToIntegral, this, _1), 4);
 }
 
 /******************************************************************************
-*                             Utility Scattering                             *
-******************************************************************************/
+ *                             Utility Scattering                             *
+ ******************************************************************************/
 
 UTILITY_INTEGRAL_IMPL(Scattering)
 
@@ -231,9 +217,9 @@ double UtilityIntegralScattering::FunctionToIntegral(double energy)
 {
     double aux2;
 
-    //TODO(mario): Better way? Sat 2017/09/02
+    // TODO(mario): Better way? Sat 2017/09/02
     double square_momentum = energy * energy - utility_.GetParticleDef().mass * utility_.GetParticleDef().mass;
-    aux2 = energy / square_momentum;
+    aux2                   = energy / square_momentum;
 
     return UtilityDecorator::FunctionToIntegral(energy) * aux2 * aux2;
 }
@@ -241,7 +227,7 @@ double UtilityIntegralScattering::FunctionToIntegral(double energy)
 // ------------------------------------------------------------------------- //
 double UtilityIntegralScattering::Calculate(double ei, double ef, double rnd)
 {
-    (void) rnd;
+    (void)rnd;
     return integral_.Integrate(ei, ef, boost::bind(&UtilityIntegralScattering::FunctionToIntegral, this, _1), 4);
 }
 

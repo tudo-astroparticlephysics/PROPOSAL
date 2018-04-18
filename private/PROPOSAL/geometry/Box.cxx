@@ -1,9 +1,9 @@
 
 #include <cmath>
 
-#include "PROPOSAL/geometry/Box.h"
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Output.h"
+#include "PROPOSAL/geometry/Box.h"
 
 using namespace PROPOSAL;
 using namespace std;
@@ -41,7 +41,8 @@ void Box::swap(Geometry& geometry)
     using std::swap;
 
     Box* box = dynamic_cast<Box*>(&geometry);
-    if (!box) {
+    if (!box)
+    {
         log_warn("Cannot swap Box!");
         return;
     }
@@ -56,9 +57,11 @@ void Box::swap(Geometry& geometry)
 //------------------------------------------------------------------------- //
 Box& Box::operator=(const Geometry& geometry)
 {
-    if (this != &geometry) {
+    if (this != &geometry)
+    {
         const Box* box = dynamic_cast<const Box*>(&geometry);
-        if (!box) {
+        if (!box)
+        {
             log_warn("Cannot assign Sphere!");
             return *this;
         }
@@ -89,8 +92,7 @@ bool Box::compare(const Geometry& geometry) const
 // ------------------------------------------------------------------------- //
 void Box::print(std::ostream& os) const
 {
-    os << "Width_x: " << x_ << "\tWidth_y " << y_ << "\tHeight: " << z_
-       << '\n';
+    os << "Width_x: " << x_ << "\tWidth_y " << y_ << "\tHeight: " << z_ << '\n';
 }
 
 // ------------------------------------------------------------------------- //
@@ -122,12 +124,12 @@ pair<double, double> Box::DistanceToBorder(const Vector3D& position, const Vecto
 
     vector<double> dist;
 
-    double x_calc_pos = position_.GetX() + 0.5*x_;
-    double x_calc_neg = position_.GetX() - 0.5*x_;
-    double y_calc_pos = position_.GetY() + 0.5*y_;
-    double y_calc_neg = position_.GetY() - 0.5*y_;
-    double z_calc_pos = position_.GetZ() + 0.5*z_;
-    double z_calc_neg = position_.GetZ() - 0.5*z_;
+    double x_calc_pos = position_.GetX() + 0.5 * x_;
+    double x_calc_neg = position_.GetX() - 0.5 * x_;
+    double y_calc_pos = position_.GetY() + 0.5 * y_;
+    double y_calc_neg = position_.GetY() - 0.5 * y_;
+    double z_calc_pos = position_.GetZ() + 0.5 * z_;
+    double z_calc_neg = position_.GetZ() - 0.5 * z_;
 
     // intersection with E1
     if (dir_vec_x != 0) // if dir_vec == 0 particle trajectory is parallel to E1
@@ -143,9 +145,7 @@ pair<double, double> Box::DistanceToBorder(const Vector3D& position, const Vecto
             // Check if intersection is inside the box borders
             intersection_y = position.GetY() + t * dir_vec_y;
             intersection_z = position.GetZ() + t * dir_vec_z;
-            if (intersection_y >= y_calc_neg &&
-                intersection_y <= y_calc_pos &&
-                intersection_z >= z_calc_neg &&
+            if (intersection_y >= y_calc_neg && intersection_y <= y_calc_pos && intersection_z >= z_calc_neg &&
                 intersection_z <= z_calc_pos)
             {
                 dist.push_back(t);
@@ -167,9 +167,7 @@ pair<double, double> Box::DistanceToBorder(const Vector3D& position, const Vecto
             // Check if intersection is inside the box borders
             intersection_y = position.GetY() + t * dir_vec_y;
             intersection_z = position.GetZ() + t * dir_vec_z;
-            if (intersection_y >= y_calc_neg &&
-                intersection_y <= y_calc_pos &&
-                intersection_z >= z_calc_neg &&
+            if (intersection_y >= y_calc_neg && intersection_y <= y_calc_pos && intersection_z >= z_calc_neg &&
                 intersection_z <= z_calc_pos)
             {
                 dist.push_back(t);
@@ -191,9 +189,7 @@ pair<double, double> Box::DistanceToBorder(const Vector3D& position, const Vecto
             // Check if intersection is inside the box borders
             intersection_x = position.GetX() + t * dir_vec_x;
             intersection_z = position.GetZ() + t * dir_vec_z;
-            if (intersection_x >= x_calc_neg &&
-                intersection_x <= x_calc_pos &&
-                intersection_z >= z_calc_neg &&
+            if (intersection_x >= x_calc_neg && intersection_x <= x_calc_pos && intersection_z >= z_calc_neg &&
                 intersection_z <= z_calc_pos)
             {
                 dist.push_back(t);
@@ -215,9 +211,7 @@ pair<double, double> Box::DistanceToBorder(const Vector3D& position, const Vecto
             // Check if intersection is inside the box borders
             intersection_x = position.GetX() + t * dir_vec_x;
             intersection_z = position.GetZ() + t * dir_vec_z;
-            if (intersection_x >= x_calc_neg &&
-                intersection_x <= x_calc_pos &&
-                intersection_z >= z_calc_neg &&
+            if (intersection_x >= x_calc_neg && intersection_x <= x_calc_pos && intersection_z >= z_calc_neg &&
                 intersection_z <= z_calc_pos)
             {
                 dist.push_back(t);
@@ -239,9 +233,7 @@ pair<double, double> Box::DistanceToBorder(const Vector3D& position, const Vecto
             // Check if intersection is inside the box borders
             intersection_x = position.GetX() + t * dir_vec_x;
             intersection_y = position.GetY() + t * dir_vec_y;
-            if (intersection_x >= x_calc_neg &&
-                intersection_x <= x_calc_pos &&
-                intersection_y >= y_calc_neg &&
+            if (intersection_x >= x_calc_neg && intersection_x <= x_calc_pos && intersection_y >= y_calc_neg &&
                 intersection_y <= y_calc_pos)
             {
                 dist.push_back(t);
@@ -263,10 +255,9 @@ pair<double, double> Box::DistanceToBorder(const Vector3D& position, const Vecto
             // Check if intersection is inside the box borders
             intersection_x = position.GetX() + t * dir_vec_x;
             intersection_y = position.GetY() + t * dir_vec_y;
-            if (intersection_x >= x_calc_neg &&
-                intersection_x <= x_calc_pos &&
-                intersection_y >= y_calc_neg &&
-                intersection_y <= y_calc_pos) {
+            if (intersection_x >= x_calc_neg && intersection_x <= x_calc_pos && intersection_y >= y_calc_neg &&
+                intersection_y <= y_calc_pos)
+            {
                 dist.push_back(t);
             }
         }
@@ -274,28 +265,30 @@ pair<double, double> Box::DistanceToBorder(const Vector3D& position, const Vecto
 
     if (dist.size() < 1) // No intersection with the box
     {
-        distance.first = -1;
+        distance.first  = -1;
         distance.second = -1;
     } else if (dist.size() == 1) // Particle is inside the box and we have one
                                  // intersection in direction of the particle
                                  // trajectory
     {
-        distance.first = dist.at(0);
+        distance.first  = dist.at(0);
         distance.second = -1;
     } else if (dist.size() == 2) // Particle is outside and the box is infront
                                  // of the particle trajectory ( two
                                  // intersections).
     {
-        distance.first = dist.at(0);
+        distance.first  = dist.at(0);
         distance.second = dist.at(1);
-        if (distance.second < distance.first) {
+        if (distance.second < distance.first)
+        {
             std::swap(distance.first, distance.second);
         }
 
-    } else {
+    } else
+    {
         log_error("This point should nerver be reached... (-1/-1) is returned");
 
-        distance.first = -1;
+        distance.first  = -1;
         distance.second = -1;
     }
 

@@ -1,6 +1,6 @@
 
-#include <ostream>
 #include "PROPOSAL/decay/StableChannel.h"
+#include <ostream>
 
 using namespace PROPOSAL;
 
@@ -11,9 +11,7 @@ StableChannel::StableChannel()
 {
 }
 
-StableChannel::~StableChannel()
-{
-}
+StableChannel::~StableChannel() {}
 
 StableChannel::StableChannel(const StableChannel& mode)
     : DecayChannel(mode)

@@ -3,43 +3,40 @@
 
 #include "PROPOSAL/geometry/Geometry.h"
 
-namespace PROPOSAL
+namespace PROPOSAL {
+
+class Sphere : public Geometry
 {
+public:
+    Sphere();
+    Sphere(const Vector3D position, double radius, double inner_radius);
+    Sphere(const Sphere&);
 
-class Sphere: public Geometry
-{
-    public:
+    Geometry* clone() const { return new Sphere(*this); };
+    static Geometry* create() { return new Sphere(); }
+    void swap(Geometry&);
 
-        Sphere();
-        Sphere(const Vector3D position, double radius, double inner_radius);
-        Sphere(const Sphere&);
+    virtual ~Sphere() {}
 
-        Geometry* clone() const { return new Sphere(*this); };
-        static Geometry* create() { return new Sphere(); }
-        void swap(Geometry&);
+    // Operators
+    Sphere& operator=(const Geometry&);
 
-        virtual ~Sphere() {}
+    // Methods
+    std::pair<double, double> DistanceToBorder(const Vector3D& position, const Vector3D& direction);
 
-        // Operators
-        Sphere& operator=(const Geometry&);
+    // Getter & Setter
+    double GetInnerRadius() const { return inner_radius_; }
+    double GetRadius() const { return radius_; }
 
-        // Methods
-        std::pair<double,double> DistanceToBorder(const Vector3D& position, const Vector3D& direction);
+    void SetInnerRadius(double inner_radius) { inner_radius_ = inner_radius; };
+    void SetRadius(double radius) { radius_ = radius; };
 
-        // Getter & Setter
-        double GetInnerRadius() const { return inner_radius_; }
-        double GetRadius() const { return radius_; }
+private:
+    bool compare(const Geometry&) const;
+    void print(std::ostream&) const;
 
-        void SetInnerRadius(double inner_radius) { inner_radius_ = inner_radius; };
-        void SetRadius(double radius) { radius_ = radius; };
-
-    private:
-
-        bool compare(const Geometry&) const;
-        void print(std::ostream&) const;
-
-        double radius_;         //!< the radius of the sphere/ cylinder
-        double inner_radius_;   //!< for spherical shells or hollow cylinder (0 for sphere / cylinder)
+    double radius_;       //!< the radius of the sphere/ cylinder
+    double inner_radius_; //!< for spherical shells or hollow cylinder (0 for sphere / cylinder)
 };
 
-} /* PROPOSAL */
+} // namespace PROPOSAL

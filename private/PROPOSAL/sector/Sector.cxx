@@ -3,27 +3,27 @@
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Output.h"
 
-#include "PROPOSAL/decay/DecayChannel.h"
 #include "PROPOSAL/crossection/CrossSection.h"
+#include "PROPOSAL/decay/DecayChannel.h"
 
 #include "PROPOSAL/geometry/Geometry.h"
 #include "PROPOSAL/geometry/Sphere.h"
 
 #include "PROPOSAL/math/RandomGenerator.h"
-#include "PROPOSAL/sector/Sector.h"
 #include "PROPOSAL/medium/Medium.h"
+#include "PROPOSAL/sector/Sector.h"
 
+#include "PROPOSAL/methods.h"
+#include "PROPOSAL/propagation_utility/ContinuousRandomizer.h"
 #include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
 #include "PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h"
-#include "PROPOSAL/propagation_utility/ContinuousRandomizer.h"
-#include "PROPOSAL/methods.h"
 
 using namespace std;
 using namespace PROPOSAL;
 
 /******************************************************************************
-*                                 Sector                                 *
-******************************************************************************/
+ *                                 Sector                                 *
+ ******************************************************************************/
 
 Sector::Definition::Definition()
     : do_weighting(false)
@@ -59,23 +59,23 @@ bool Sector::Definition::operator==(const Definition& sector_def) const
 {
     if (do_weighting != sector_def.do_weighting)
         return false;
-    else if(weighting_order != sector_def.weighting_order)
+    else if (weighting_order != sector_def.weighting_order)
         return false;
-    else if(stopping_decay != sector_def.stopping_decay)
+    else if (stopping_decay != sector_def.stopping_decay)
         return false;
-    else if(do_continuous_randomization != sector_def.do_continuous_randomization)
+    else if (do_continuous_randomization != sector_def.do_continuous_randomization)
         return false;
-    else if(do_exact_time_calculation != sector_def.do_exact_time_calculation)
+    else if (do_exact_time_calculation != sector_def.do_exact_time_calculation)
         return false;
-    else if(scattering_model != sector_def.scattering_model)
+    else if (scattering_model != sector_def.scattering_model)
         return false;
-    else if(location != sector_def.location)
+    else if (location != sector_def.location)
         return false;
     // else if(utility_def != sector_def.utility_def)
     //     return false;
-    else if(*medium_ != *sector_def.medium_)
+    else if (*medium_ != *sector_def.medium_)
         return false;
-    else if(*geometry_ != *sector_def.geometry_)
+    else if (*geometry_ != *sector_def.geometry_)
         return false;
     return true;
 }
@@ -107,8 +107,7 @@ void Sector::Definition::SetGeometry(const Geometry& geometry)
 // Constructors
 // ------------------------------------------------------------------------- //
 
-Sector::Sector(Particle& particle,
-               const Definition& sector_def)
+Sector::Sector(Particle& particle, const Definition& sector_def)
     : sector_def_(sector_def)
     , weighting_starts_at_(0)
     , particle_(particle)
@@ -133,20 +132,25 @@ Sector::Sector(Particle& particle,
     }
 }
 
-Sector::Sector(Particle& particle,
-               const Definition& sector_def,
-               const InterpolationDef& interpolation_def)
+Sector::Sector(Particle& particle, const Definition& sector_def, const InterpolationDef& interpolation_def)
     : sector_def_(sector_def)
     , weighting_starts_at_(0)
     , particle_(particle)
     , geometry_(sector_def.GetGeometry().clone())
-    , utility_(particle_.GetParticleDef(), sector_def.GetMedium(), sector_def.cut_settings, sector_def.utility_def, interpolation_def)
+    , utility_(particle_.GetParticleDef(),
+               sector_def.GetMedium(),
+               sector_def.cut_settings,
+               sector_def.utility_def,
+               interpolation_def)
     , displacement_calculator_(new UtilityInterpolantDisplacement(utility_, interpolation_def))
     , interaction_calculator_(new UtilityInterpolantInteraction(utility_, interpolation_def))
     , decay_calculator_(new UtilityInterpolantDecay(utility_, interpolation_def))
     , exact_time_calculator_(NULL)
     , cont_rand_(NULL)
-    , scattering_(ScatteringFactory::Get().CreateScattering(sector_def_.scattering_model, particle_, utility_, interpolation_def))
+    , scattering_(ScatteringFactory::Get().CreateScattering(sector_def_.scattering_model,
+                                                            particle_,
+                                                            utility_,
+                                                            interpolation_def))
 {
     // These are optional, therfore check NULL
     if (sector_def_.do_exact_time_calculation)
@@ -184,9 +188,9 @@ Sector::Sector(Particle& particle, const Sector& sector)
         exact_time_calculator_ = sector.exact_time_calculator_->clone(utility_);
     }
 
-    if (sector.cont_rand_!= NULL)
+    if (sector.cont_rand_ != NULL)
     {
-        cont_rand_= new ContinuousRandomizer(utility_, *sector.cont_rand_);
+        cont_rand_ = new ContinuousRandomizer(utility_, *sector.cont_rand_);
     }
 }
 
@@ -272,9 +276,9 @@ Sector::Sector(const Sector& collection)
         exact_time_calculator_ = collection.exact_time_calculator_->clone(utility_);
     }
 
-    if (collection.cont_rand_!= NULL)
+    if (collection.cont_rand_ != NULL)
     {
-        cont_rand_= new ContinuousRandomizer(utility_, *collection.cont_rand_);
+        cont_rand_ = new ContinuousRandomizer(utility_, *collection.cont_rand_);
     }
 }
 
@@ -282,17 +286,17 @@ bool Sector::operator==(const Sector& sector) const
 {
     if (sector_def_ != sector.sector_def_)
         return false;
-    else if(weighting_starts_at_ != sector.weighting_starts_at_)
+    else if (weighting_starts_at_ != sector.weighting_starts_at_)
         return false;
-    else if(particle_ != sector.particle_)
+    else if (particle_ != sector.particle_)
         return false;
-    else if(*geometry_ != *sector.geometry_)
+    else if (*geometry_ != *sector.geometry_)
         return false;
-    else if(utility_ != sector.utility_)
+    else if (utility_ != sector.utility_)
         return false;
-    else if(*cont_rand_ != *sector.cont_rand_)
+    else if (*cont_rand_ != *sector.cont_rand_)
         return false;
-    else if(*scattering_ != *sector.scattering_)
+    else if (*scattering_ != *sector.scattering_)
         return false;
     return true;
 }
@@ -334,7 +338,7 @@ double Sector::Propagate(double distance)
     double initial_energy = particle_.GetEnergy();
     double final_energy   = particle_.GetEnergy();
 
-    bool is_decayed = false;
+    bool is_decayed           = false;
     bool particle_interaction = false;
 
     pair<double, ParticleType::Enum> decay;
@@ -365,7 +369,7 @@ double Sector::Propagate(double distance)
 
     while (flag)
     {
-        energy_till_stochastic_ = CalculateEnergyTillStochastic( initial_energy);
+        energy_till_stochastic_ = CalculateEnergyTillStochastic(initial_energy);
 
         if (energy_till_stochastic_.first > energy_till_stochastic_.second)
         {
@@ -378,11 +382,11 @@ double Sector::Propagate(double distance)
         }
 
         // Calculate the displacement according to initial energy and final_energy
-        displacement = displacement_calculator_->Calculate(
-            initial_energy,
-            final_energy,
-            utility_.GetMedium().GetDensityCorrection() * (distance - propagated_distance))
-            / utility_.GetMedium().GetDensityCorrection();
+        displacement = displacement_calculator_->Calculate(initial_energy,
+                                                           final_energy,
+                                                           utility_.GetMedium().GetDensityCorrection() *
+                                                               (distance - propagated_distance)) /
+                       utility_.GetMedium().GetDensityCorrection();
 
         // The first interaction or decay happens behind the distance we want to propagate
         // So we calculate the final energy using only continuous losses
@@ -390,11 +394,12 @@ double Sector::Propagate(double distance)
         {
             displacement = distance - propagated_distance;
 
-            final_energy = displacement_calculator_->GetUpperLimit( initial_energy, utility_.GetMedium().GetDensityCorrection() * displacement);
+            final_energy = displacement_calculator_->GetUpperLimit(
+                initial_energy, utility_.GetMedium().GetDensityCorrection() * displacement);
         }
         // Advance the Particle according to the displacement
         // Initial energy and final energy are needed if Molier Scattering is enabled
-        AdvanceParticle( displacement, initial_energy, final_energy);
+        AdvanceParticle(displacement, initial_energy, final_energy);
 
         propagated_distance += displacement;
 
@@ -407,7 +412,8 @@ double Sector::Propagate(double distance)
         {
             if (final_energy != particle_.GetLow())
             {
-                final_energy = cont_rand_->Randomize(initial_energy, final_energy, RandomGenerator::Get().RandomDouble());
+                final_energy =
+                    cont_rand_->Randomize(initial_energy, final_energy, RandomGenerator::Get().RandomDouble());
             }
         }
 
@@ -445,7 +451,7 @@ double Sector::Propagate(double distance)
             decay_products = particle_.GetDecayTable().SelectChannel().Decay(particle_);
             Output::getInstance().FillSecondaryVector(decay_products);
 
-            is_decayed = true;
+            is_decayed   = true;
             final_energy = particle_.GetMass();
 
             // log_debug("Sampled decay of particle: %s", particle_->GetName().c_str());
@@ -465,7 +471,7 @@ double Sector::Propagate(double distance)
     // if a particle is below a specific energy 'elow' and stopping_decay is enabled,
     // the muon gets forced to decay, instead of propagating all the time with dEdx
     // with no significantly produced light
-    if(sector_def_.stopping_decay && propagated_distance!=distance && !is_decayed)
+    if (sector_def_.stopping_decay && propagated_distance != distance && !is_decayed)
     {
         // TODO: understand what happens in the two following lines
         //       why is the particle energy set to its mass?
@@ -509,10 +515,11 @@ std::pair<double, double> Sector::CalculateEnergyTillStochastic(double initial_e
         rnddMin = 0;
     } else
     {
-        rnddMin = decay_calculator_->Calculate( initial_energy, particle_.GetParticleDef().low, rndd) / utility_.GetMedium().GetDensityCorrection();
+        rnddMin = decay_calculator_->Calculate(initial_energy, particle_.GetParticleDef().low, rndd) /
+                  utility_.GetMedium().GetDensityCorrection();
     }
 
-    rndiMin = interaction_calculator_->Calculate( initial_energy, particle_.GetParticleDef().low, rndi);
+    rndiMin = interaction_calculator_->Calculate(initial_energy, particle_.GetParticleDef().low, rndi);
 
     // evaluating the energy loss
     if (rndd >= rnddMin || rnddMin <= 0)
@@ -520,7 +527,8 @@ std::pair<double, double> Sector::CalculateEnergyTillStochastic(double initial_e
         final.second = particle_.GetLow();
     } else
     {
-        final.second = decay_calculator_->GetUpperLimit( initial_energy, rndd * utility_.GetMedium().GetDensityCorrection());
+        final.second =
+            decay_calculator_->GetUpperLimit(initial_energy, rndd * utility_.GetMedium().GetDensityCorrection());
     }
 
     if (rndi >= rndiMin || rndiMin <= 0)
@@ -528,7 +536,7 @@ std::pair<double, double> Sector::CalculateEnergyTillStochastic(double initial_e
         final.first = particle_.GetLow();
     } else
     {
-        final.first = interaction_calculator_->GetUpperLimit( initial_energy, rndi);
+        final.first = interaction_calculator_->GetUpperLimit(initial_energy, rndi);
     }
 
     return final;
@@ -545,7 +553,7 @@ void Sector::AdvanceParticle(double dr, double ei, double ef)
 
     if (exact_time_calculator_)
     {
-        time += exact_time_calculator_->Calculate( ei, ef, 0.0) / utility_.GetMedium().GetDensityCorrection();
+        time += exact_time_calculator_->Calculate(ei, ef, 0.0) / utility_.GetMedium().GetDensityCorrection();
     } else
     {
         time += dr / SPEED;
@@ -594,9 +602,9 @@ pair<double, DynamicData::Type> Sector::MakeStochasticLoss()
                 rnd2 = power * rnd2;
             }
 
-            sector_def_.weighting_order     = (1 + exp) * power;
-            weighting_starts_at_ = particle_.GetPropagatedDistance();
-            sector_def_.do_weighting        = false;
+            sector_def_.weighting_order = (1 + exp) * power;
+            weighting_starts_at_        = particle_.GetPropagatedDistance();
+            sector_def_.do_weighting    = false;
         }
     }
     // if (particle_->GetEnergy() < 650) printf("energy: %f\n", particle_->GetEnergy());
@@ -671,4 +679,3 @@ pair<double, DynamicData::Type> Sector::MakeStochasticLoss()
 
     return energy_loss;
 }
-

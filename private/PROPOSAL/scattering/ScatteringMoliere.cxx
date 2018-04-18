@@ -1,19 +1,18 @@
 
 #include <boost/math/special_functions/erf.hpp>
 
+#include "PROPOSAL/Constants.h"
+#include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/particle/Particle.h"
-#include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/scattering/Coefficients.h"
-#include "PROPOSAL/Constants.h"
 // #include "PROPOSAL/Output.h"
-#include "PROPOSAL/scattering/ScatteringMoliere.h"
 #include "PROPOSAL/methods.h"
+#include "PROPOSAL/scattering/ScatteringMoliere.h"
 
 using namespace std;
 using namespace PROPOSAL;
-
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
@@ -21,51 +20,48 @@ using namespace PROPOSAL;
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-
 Scattering::RandomAngles ScatteringMoliere::CalculateRandomAngle(double dr, double ei, double ef)
 {
     (void)ei;
     (void)ef;
 
-    double momentum = particle_.GetMomentum();  // momentum in MeV/c
-    double mass = particle_.GetMass();          // mass in MeV/c²
+    double momentum = particle_.GetMomentum(); // momentum in MeV/c
+    double mass     = particle_.GetMass();     // mass in MeV/c²
 
-    double beta_Sq = 1./( 1.+mass*mass/(momentum*momentum) ); //beta² = v²/c²
-    double chi_0 = 0.;
+    double beta_Sq = 1. / (1. + mass * mass / (momentum * momentum)); // beta² = v²/c²
+    double chi_0   = 0.;
 
     vector<double> chi_A_Sq; // screening angle² in rad²
     chi_A_Sq.resize(numComp_);
 
-    for(int i = 0; i < numComp_; i++)
+    for (int i = 0; i < numComp_; i++)
     {
         // Calculate Chi_0
-        chi_0 = ( ME * ALPHA * pow(Zi_[i] * 128. / (9. * PI * PI), 1./3.) )/momentum ;
+        chi_0 = (ME * ALPHA * pow(Zi_[i] * 128. / (9. * PI * PI), 1. / 3.)) / momentum;
         // Calculate Chi_a^2
-        chi_A_Sq[i] = chi_0 * chi_0 * ( 1.13 + 3.76 * ALPHA * ALPHA * Zi_[i] * Zi_[i] / beta_Sq );
+        chi_A_Sq[i] = chi_0 * chi_0 * (1.13 + 3.76 * ALPHA * ALPHA * Zi_[i] * Zi_[i] / beta_Sq);
     }
 
     // Calculate Chi_c^2
-    chiCSq_ = ( (4.*PI*NA*ALPHA*ALPHA*HBAR*HBAR*SPEED*SPEED)
-                * (medium_->GetMassDensity()*medium_->GetDensityCorrection()*dr)
-                / (momentum*momentum*beta_Sq) )
-            * ZSq_A_average_;
-
+    chiCSq_ = ((4. * PI * NA * ALPHA * ALPHA * HBAR * HBAR * SPEED * SPEED) *
+               (medium_->GetMassDensity() * medium_->GetDensityCorrection() * dr) / (momentum * momentum * beta_Sq)) *
+              ZSq_A_average_;
 
     // Calculate B
     Scattering::RandomAngles random_angles;
 
-    for(int i = 0; i < numComp_; i++)
+    for (int i = 0; i < numComp_; i++)
     {
-        //calculate B-ln(B) = ln(chi_c^2/chi_a^2)+1-2*EULER_MASCHERONI via Newton-Raphson method
+        // calculate B-ln(B) = ln(chi_c^2/chi_a^2)+1-2*EULER_MASCHERONI via Newton-Raphson method
         double xn = 15.;
 
-        for(int n = 0; n < 6; n++)
+        for (int n = 0; n < 6; n++)
         {
-            xn = xn * ( (1. - log(xn) - log(chiCSq_ / chi_A_Sq[i]) - 1. + 2. * EULER_MASCHERONI) / (1. - xn) );
+            xn = xn * ((1. - log(xn) - log(chiCSq_ / chi_A_Sq[i]) - 1. + 2. * EULER_MASCHERONI) / (1. - xn));
         }
 
         //  Check for inappropriate values of B. If B < 4.5 it is practical to assume no deviation.
-        if( (xn < 4.5) || xn != xn )
+        if ((xn < 4.5) || xn != xn)
         {
             random_angles.sx = 0;
             random_angles.sy = 0;
@@ -79,23 +75,22 @@ Scattering::RandomAngles ScatteringMoliere::CalculateRandomAngle(double dr, doub
 
     double pre_factor = sqrt(chiCSq_ * B_[max_weight_index_]);
 
-    double rnd1,rnd2;
+    double rnd1, rnd2;
 
     rnd1 = GetRandom(pre_factor);
     rnd2 = GetRandom(pre_factor);
 
-    random_angles.sx = 0.5*(rnd1/SQRT3+rnd2);
+    random_angles.sx = 0.5 * (rnd1 / SQRT3 + rnd2);
     random_angles.tx = rnd2;
 
     rnd1 = GetRandom(pre_factor);
     rnd2 = GetRandom(pre_factor);
 
-    random_angles.sy = 0.5*(rnd1/SQRT3+rnd2);
+    random_angles.sy = 0.5 * (rnd1 / SQRT3 + rnd2);
     random_angles.ty = rnd2;
 
     return random_angles;
 }
-
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
@@ -115,25 +110,25 @@ ScatteringMoliere::ScatteringMoliere(Particle& particle, const Medium& medium)
     , chiCSq_(0.0)
     , B_(numComp_)
 {
-    std::vector<double> Ai(numComp_, 0); // atomic number of different components
-    std::vector<double> ki(numComp_, 0); // number of atoms in molecule of different components
+    std::vector<double> Ai(numComp_, 0);     // atomic number of different components
+    std::vector<double> ki(numComp_, 0);     // number of atoms in molecule of different components
     std::vector<double> weight(numComp_, 0); // number of atoms in molecule of different components
     double A_sum = 0.;
 
     for (int i = 0; i < numComp_; i++)
     {
         Components::Component* component = medium_->GetComponents().at(i);
-        Zi_[i] = component->GetNucCharge();
-        ki[i] = component->GetAtomInMolecule();
-        Ai[i] = component->GetAtomicNum();
+        Zi_[i]                           = component->GetNucCharge();
+        ki[i]                            = component->GetAtomInMolecule();
+        Ai[i]                            = component->GetAtomicNum();
 
         A_sum += ki[i] * Ai[i];
     }
 
-    double A_average = 0.;
+    double A_average   = 0.;
     double ZSq_average = 0.;
 
-    for(int i = 0; i < numComp_; i++)
+    for (int i = 0; i < numComp_; i++)
     {
         weight[i] = ki[i] * Ai[i] / A_sum;
         A_average += weight[i] * Ai[i];
@@ -143,18 +138,20 @@ ScatteringMoliere::ScatteringMoliere(Particle& particle, const Medium& medium)
         // Calculate Z^2_average for Chi_c^2
         // if case of an electron, replace Z^2 by Z(Z+1) to into account scatterings
         // on atomic electrons in the medium
-        if(particle_.GetMass() == ME) ZSq_average += weight[i] * Zi_[i] * (Zi_[i] + 1.);
-        else ZSq_average += weight_ZZ_[i];
+        if (particle_.GetMass() == ME)
+            ZSq_average += weight[i] * Zi_[i] * (Zi_[i] + 1.);
+        else
+            ZSq_average += weight_ZZ_[i];
     }
-    weight_ZZ_sum_ = 1./weight_ZZ_sum_;
-    ZSq_A_average_ = ZSq_average/A_average;
+    weight_ZZ_sum_ = 1. / weight_ZZ_sum_;
+    ZSq_A_average_ = ZSq_average / A_average;
 
     // guessing an initial value by assuming a gaussian distribution
     // only regarding the component with maximum weight
     // needed in the method GetRandom()
     for (int i = 0; i + 1 < numComp_; i++)
     {
-        if (weight[i+1] > weight[i])
+        if (weight[i + 1] > weight[i])
             max_weight_index_ = i + 1;
     }
 }
@@ -192,7 +189,6 @@ ScatteringMoliere::~ScatteringMoliere()
     delete medium_;
 }
 
-
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
@@ -223,7 +219,6 @@ bool ScatteringMoliere::compare(const Scattering& scattering) const
     else
         return true;
 }
-
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
@@ -296,8 +291,7 @@ double ScatteringMoliere::f(double theta)
     {
         double x = theta * theta / (chiCSq_ * B_[i]);
 
-        y1 += weight_ZZ_[i] / sqrt(chiCSq_ * B_[i] * PI) *
-              (exp(-x) + f1M(x) / B_[i] + f2M(x) / (B_[i] * B_[i]));
+        y1 += weight_ZZ_[i] / sqrt(chiCSq_ * B_[i] * PI) * (exp(-x) + f1M(x) / B_[i] + f2M(x) / (B_[i] * B_[i]));
     }
 
     return y1 * weight_ZZ_sum_;
@@ -381,7 +375,7 @@ double ScatteringMoliere::F(double theta)
               (0.5 * boost::math::erf(sqrt(x)) + sqrt(1. / PI) * (F1M(x) / B_[i] + F2M(x) / (B_[i] * B_[i])));
     }
 
-    return (theta < 0.) ? (-1.) * y1*weight_ZZ_sum_ : y1*weight_ZZ_sum_;
+    return (theta < 0.) ? (-1.) * y1 * weight_ZZ_sum_ : y1 * weight_ZZ_sum_;
 }
 
 //----------------------------------------------------------------------------//

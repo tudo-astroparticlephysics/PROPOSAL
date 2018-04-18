@@ -1,20 +1,21 @@
 
 #include <boost/bind.hpp>
 
-#include "PROPOSAL/crossection/EpairInterpolant.h"
 #include "PROPOSAL/crossection/EpairIntegral.h"
+#include "PROPOSAL/crossection/EpairInterpolant.h"
 #include "PROPOSAL/crossection/parametrization/EpairProduction.h"
 
 #include "PROPOSAL/math/Interpolant.h"
 #include "PROPOSAL/math/InterpolantBuilder.h"
 
-#include "PROPOSAL/methods.h"
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Output.h"
+#include "PROPOSAL/methods.h"
 
 using namespace PROPOSAL;
 
-EpairInterpolant::EpairInterpolant(const EpairProduction& param, InterpolationDef def): CrossSectionInterpolant(DynamicData::Epair, param)
+EpairInterpolant::EpairInterpolant(const EpairProduction& param, InterpolationDef def)
+    : CrossSectionInterpolant(DynamicData::Epair, param)
 {
     // Use parent CrossSecition dNdx interpolation
     InitdNdxInerpolation(def);
@@ -66,21 +67,17 @@ EpairInterpolant::EpairInterpolant(const EpairProduction& param, InterpolationDe
 
     builder_container_de2dx.push_back(std::make_pair(&builder_de2dx, &de2dx_interpolant_));
 
-    Helper::InitializeInterpolation("dEdx",
-                                    builder_container,
-                                    std::vector<Parametrization*>(1, parametrization_), def);
-    Helper::InitializeInterpolation("dE2dx",
-                                    builder_container_de2dx,
-                                    std::vector<Parametrization*>(1, parametrization_), def);
+    Helper::InitializeInterpolation("dEdx", builder_container, std::vector<Parametrization*>(1, parametrization_), def);
+    Helper::InitializeInterpolation(
+        "dE2dx", builder_container_de2dx, std::vector<Parametrization*>(1, parametrization_), def);
 }
 
-EpairInterpolant::EpairInterpolant(const EpairInterpolant& epair): CrossSectionInterpolant(epair)
+EpairInterpolant::EpairInterpolant(const EpairInterpolant& epair)
+    : CrossSectionInterpolant(epair)
 {
 }
 
-EpairInterpolant::~EpairInterpolant()
-{
-}
+EpairInterpolant::~EpairInterpolant() {}
 
 // ----------------------------------------------------------------- //
 // Public methods

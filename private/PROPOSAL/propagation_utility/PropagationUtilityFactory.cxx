@@ -12,9 +12,7 @@ UtilityFactory::Definition::Definition()
 {
 }
 
-UtilityFactory::Definition::~Definition()
-{
-}
+UtilityFactory::Definition::~Definition() {}
 
 Utility* UtilityFactory::CreateUtility(const ParticleDef& particle_def, const Definition& def)
 {
