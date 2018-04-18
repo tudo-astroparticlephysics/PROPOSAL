@@ -82,38 +82,29 @@ std::string DynamicData::GetNameFromType(Type type)
     {
         case None:
             return "None";
-            break;
         case Particle:
             return "Particle";
-            break;
         case Brems:
             return "Brems";
-            break;
         case DeltaE:
             return "DeltaE";
-            break;
         case Epair:
             return "Epair";
-            break;
         case NuclInt:
             return "NuclInt";
-            break;
         case MuPair:
             return "MuPair";
-            break;
         case Hadrons:
             return "Hadrons";
-            break;
         case ContinuousEnergyLoss:
             return "ContinuousEnergyLoss";
-            break;
         default:
-            break;
+            return "Type not found";
     }
 }
 
 /******************************************************************************
-*                              Particle                               *
+*                              Particle                                       *
 ******************************************************************************/
 
 Particle::Particle()

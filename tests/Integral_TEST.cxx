@@ -5,7 +5,7 @@
 
 #include "gtest/gtest.h"
 
-#include "PROPOSAL/math/Integral.h"
+#include "PROPOSAL/PROPOSAL.h"
 
 using namespace PROPOSAL;
 
@@ -195,9 +195,33 @@ TEST(IntegralValue, IntegrateWithLogSubstitution) {
     }
 }
 
-//TEST(IntegralValue, HasToFail) {
-//    EXPECT_TRUE(false);
-//}
+
+TEST(QUADPACK, RombergIntegrationFailure) {
+    double precision = 1e-5;
+    IonizIntegral Ioniz_Int(Ionization(MuMinusDef::Get(), Ice(), EnergyCutSettings(), 1.0));
+
+    // --------------------------------------------------------------------- //
+    // Problematic energy for romberg integration
+    // --------------------------------------------------------------------- //
+
+    double energy = 146.768; // 0.274374 + 4.63716e-10
+    double result = 2.9065825764284159;
+
+    double dEdx = Ioniz_Int.CalculatedEdx(energy);
+
+    ASSERT_NEAR(dEdx, result, result*precision);
+
+    // --------------------------------------------------------------------- //
+    // Problematic energy for gnu scientific lib gauss_quadrature integration
+    // --------------------------------------------------------------------- //
+
+    energy = 142.58; // 0.287524 - 1.01164e-8
+    result = 3.0734340510841172;
+
+    dEdx = Ioniz_Int.CalculatedEdx(energy);
+
+    ASSERT_NEAR(dEdx, result, result*precision);
+}
 
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
