@@ -19,14 +19,13 @@ using namespace PROPOSAL;
 // Constructor & Destructor
 // ------------------------------------------------------------------------- //
 
-CrossSectionInterpolant::CrossSectionInterpolant(const DynamicData::Type& type, const Parametrization& param, InterpolationDef def)
+CrossSectionInterpolant::CrossSectionInterpolant(const DynamicData::Type& type, const Parametrization& param)
     : CrossSection(type, param)
     , dedx_interpolant_(NULL)
     , de2dx_interpolant_(NULL)
     , dndx_interpolant_1d_(param.GetMedium().GetNumComponents(), NULL)
     , dndx_interpolant_2d_(param.GetMedium().GetNumComponents(), NULL)
 {
-    // InitdNdxInerpolation(def);
 }
 
 bool CrossSectionInterpolant::compare(const CrossSection& cross_section) const

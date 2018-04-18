@@ -116,6 +116,8 @@ struct ParticleDef
     ParticleDef& operator=(const ParticleDef&); // Undefined & not allowed
 };
 
+std::ostream& operator<<(std::ostream&, PROPOSAL::ParticleDef const&);
+
 class ParticleDef::Builder
 {
     public:
