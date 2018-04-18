@@ -4,32 +4,29 @@
 
 #include "gtest/gtest.h"
 
-#include "PROPOSAL/crossection/parametrization/Bremsstrahlung.h"
-#include "PROPOSAL/crossection/factories/BremsstrahlungFactory.h"
+#include "PROPOSAL/Constants.h"
+#include "PROPOSAL/Output.h"
 #include "PROPOSAL/crossection/BremsIntegral.h"
 #include "PROPOSAL/crossection/BremsInterpolant.h"
+#include "PROPOSAL/crossection/factories/BremsstrahlungFactory.h"
+#include "PROPOSAL/crossection/parametrization/Bremsstrahlung.h"
+#include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/medium/MediumFactory.h"
-#include "PROPOSAL/math/RandomGenerator.h"
-#include "PROPOSAL/Output.h"
 #include "PROPOSAL/methods.h"
-#include "PROPOSAL/Constants.h"
 
 using namespace std;
 using namespace PROPOSAL;
-
 
 ParticleDef getParticleDef(const string& name)
 {
     if (name == "MuMinus")
     {
         return MuMinusDef::Get();
-    }
-    else if (name == "TauMinus")
+    } else if (name == "TauMinus")
     {
         return TauMinusDef::Get();
-    }
-    else
+    } else
     {
         return EMinusDef::Get();
     }
@@ -41,21 +38,22 @@ TEST(Comparison, Comparison_equal)
     Water medium;
     EnergyCutSettings ecuts;
     double multiplier = 1.;
-    bool lpm = true;
+    bool lpm          = true;
 
-    BremsKelnerKokoulinPetrukhin* Brems_A = new BremsKelnerKokoulinPetrukhin(particle_def, medium, ecuts, multiplier, lpm);
+    BremsKelnerKokoulinPetrukhin* Brems_A =
+        new BremsKelnerKokoulinPetrukhin(particle_def, medium, ecuts, multiplier, lpm);
     Parametrization* Brems_B = new BremsKelnerKokoulinPetrukhin(particle_def, medium, ecuts, multiplier, lpm);
     EXPECT_TRUE(*Brems_A == *Brems_B);
 
     BremsKelnerKokoulinPetrukhin param(particle_def, medium, ecuts, multiplier, lpm);
     EXPECT_TRUE(param == *Brems_A);
 
-    BremsIntegral* Int_A = new BremsIntegral(param);
+    BremsIntegral* Int_A        = new BremsIntegral(param);
     CrossSectionIntegral* Int_B = new BremsIntegral(param);
     EXPECT_TRUE(*Int_A == *Int_B);
 
     InterpolationDef InterpolDef;
-    BremsInterpolant* Interpol_A = new BremsInterpolant(param, InterpolDef);
+    BremsInterpolant* Interpol_A        = new BremsInterpolant(param, InterpolDef);
     CrossSectionInterpolant* Interpol_B = new BremsInterpolant(param, InterpolDef);
     EXPECT_TRUE(*Interpol_A == *Interpol_B);
 
@@ -69,7 +67,7 @@ TEST(Comparison, Comparison_equal)
 
 TEST(Comparison, Comparison_not_equal)
 {
-    ParticleDef mu_def = MuMinusDef::Get();
+    ParticleDef mu_def  = MuMinusDef::Get();
     ParticleDef tau_def = TauMinusDef::Get();
     Water medium_1;
     Ice medium_2;
@@ -77,8 +75,8 @@ TEST(Comparison, Comparison_not_equal)
     EnergyCutSettings ecuts_2(-1, 0.05);
     double multiplier_1 = 1.;
     double multiplier_2 = 2.;
-    bool lpm_1 = true;
-    bool lpm_2 = false;
+    bool lpm_1          = true;
+    bool lpm_2          = false;
 
     BremsKelnerKokoulinPetrukhin Brems_A(mu_def, medium_1, ecuts_1, multiplier_1, lpm_1);
     BremsKelnerKokoulinPetrukhin Brems_B(tau_def, medium_1, ecuts_1, multiplier_1, lpm_1);
@@ -118,7 +116,7 @@ TEST(Assignment, Copyconstructor)
     Water medium;
     EnergyCutSettings ecuts;
     double multiplier = 1.;
-    bool lpm = true;
+    bool lpm          = true;
 
     BremsKelnerKokoulinPetrukhin Brems_A(particle_def, medium, ecuts, multiplier, lpm);
     BremsKelnerKokoulinPetrukhin Brems_B = Brems_A;
@@ -140,7 +138,7 @@ TEST(Assignment, Copyconstructor2)
     Water medium;
     EnergyCutSettings ecuts;
     double multiplier = 1.;
-    bool lpm = true;
+    bool lpm          = true;
 
     BremsKelnerKokoulinPetrukhin Brems_A(particle_def, medium, ecuts, multiplier, lpm);
     BremsKelnerKokoulinPetrukhin Brems_B(Brems_A);
@@ -158,7 +156,6 @@ TEST(Assignment, Copyconstructor2)
 
 // in polymorphism an assignmant and swap operator doesn't make sense
 
-
 TEST(Bremsstrahlung, Test_of_dEdx)
 {
     ifstream in;
@@ -171,7 +168,7 @@ TEST(Bremsstrahlung, Test_of_dEdx)
     }
 
     char firstLine[256];
-    in.getline(firstLine,256);
+    in.getline(firstLine, 256);
 
     string particleName;
     string mediumName;
@@ -186,29 +183,26 @@ TEST(Bremsstrahlung, Test_of_dEdx)
 
     cout.precision(16);
 
-    while(in.good())
+    while (in.good())
     {
-        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> lpm
-            >> energy >> dEdx_stored >> parametrization;
+        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> lpm >> energy >> dEdx_stored >>
+            parametrization;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        Medium* medium = MediumFactory::Get().CreateMedium(mediumName);
-        EnergyCutSettings ecuts(ecut,vcut);
+        Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+        EnergyCutSettings ecuts(ecut, vcut);
 
         BremsstrahlungFactory::Definition brems_def;
-        brems_def.multiplier = multiplier;
-        brems_def.lpm_effect = lpm;
+        brems_def.multiplier      = multiplier;
+        brems_def.lpm_effect      = lpm;
         brems_def.parametrization = BremsstrahlungFactory::Get().GetEnumFromString(parametrization);
 
-        CrossSection* Brems = BremsstrahlungFactory::Get().CreateBremsstrahlung(
-            particle_def,
-            *medium,
-            ecuts,
-            brems_def);
+        CrossSection* Brems =
+            BremsstrahlungFactory::Get().CreateBremsstrahlung(particle_def, *medium, ecuts, brems_def);
 
         dEdx_new = Brems->CalculatedEdx(energy);
 
-        ASSERT_NEAR(dEdx_new, dEdx_stored, 1e-3*dEdx_stored);
+        ASSERT_NEAR(dEdx_new, dEdx_stored, 1e-3 * dEdx_stored);
 
         delete medium;
         delete Brems;
@@ -227,7 +221,7 @@ TEST(Bremsstrahlung, Test_of_dNdx)
     }
 
     char firstLine[256];
-    in.getline(firstLine,256);
+    in.getline(firstLine, 256);
 
     string particleName;
     string mediumName;
@@ -242,29 +236,26 @@ TEST(Bremsstrahlung, Test_of_dNdx)
 
     cout.precision(16);
 
-    while(in.good())
+    while (in.good())
     {
-        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> lpm
-            >> energy >> dNdx_stored >> parametrization;
+        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> lpm >> energy >> dNdx_stored >>
+            parametrization;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        Medium* medium = MediumFactory::Get().CreateMedium(mediumName);
-        EnergyCutSettings ecuts(ecut,vcut);
+        Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+        EnergyCutSettings ecuts(ecut, vcut);
 
         BremsstrahlungFactory::Definition brems_def;
-        brems_def.multiplier = multiplier;
-        brems_def.lpm_effect = lpm;
+        brems_def.multiplier      = multiplier;
+        brems_def.lpm_effect      = lpm;
         brems_def.parametrization = BremsstrahlungFactory::Get().GetEnumFromString(parametrization);
 
-        CrossSection* Brems = BremsstrahlungFactory::Get().CreateBremsstrahlung(
-            particle_def,
-            *medium,
-            ecuts,
-            brems_def);
+        CrossSection* Brems =
+            BremsstrahlungFactory::Get().CreateBremsstrahlung(particle_def, *medium, ecuts, brems_def);
 
         dNdx_new = Brems->CalculatedNdx(energy);
 
-        ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-3*dNdx_stored);
+        ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-3 * dNdx_stored);
 
         delete medium;
         delete Brems;
@@ -283,7 +274,7 @@ TEST(Bremsstrahlung, Test_of_dNdx_rnd)
     }
 
     char firstLine[256];
-    in.getline(firstLine,256);
+    in.getline(firstLine, 256);
 
     string particleName;
     string mediumName;
@@ -301,29 +292,26 @@ TEST(Bremsstrahlung, Test_of_dNdx_rnd)
 
     RandomGenerator::Get().SetSeed(0);
 
-    while(in.good())
+    while (in.good())
     {
-        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> lpm
-            >> energy >> rnd >> dNdx_stored >> parametrization;
+        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> lpm >> energy >> rnd >> dNdx_stored >>
+            parametrization;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        Medium* medium = MediumFactory::Get().CreateMedium(mediumName);
-        EnergyCutSettings ecuts(ecut,vcut);
+        Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+        EnergyCutSettings ecuts(ecut, vcut);
 
         BremsstrahlungFactory::Definition brems_def;
-        brems_def.multiplier = multiplier;
-        brems_def.lpm_effect = lpm;
+        brems_def.multiplier      = multiplier;
+        brems_def.lpm_effect      = lpm;
         brems_def.parametrization = BremsstrahlungFactory::Get().GetEnumFromString(parametrization);
 
-        CrossSection* Brems = BremsstrahlungFactory::Get().CreateBremsstrahlung(
-            particle_def,
-            *medium,
-            ecuts,
-            brems_def);
+        CrossSection* Brems =
+            BremsstrahlungFactory::Get().CreateBremsstrahlung(particle_def, *medium, ecuts, brems_def);
 
         dNdx_new = Brems->CalculatedNdx(energy, rnd);
 
-        ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-3*dNdx_stored);
+        ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-3 * dNdx_stored);
 
         delete medium;
         delete Brems;
@@ -342,7 +330,7 @@ TEST(Bremsstrahlung, Test_of_e)
     }
 
     char firstLine[256];
-    in.getline(firstLine,256);
+    in.getline(firstLine, 256);
 
     string particleName;
     string mediumName;
@@ -360,29 +348,26 @@ TEST(Bremsstrahlung, Test_of_e)
 
     RandomGenerator::Get().SetSeed(0);
 
-    while(in.good())
+    while (in.good())
     {
-        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> lpm
-            >> energy >> rnd1 >> rnd2 >> stochastic_loss_stored >> parametrization;
+        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> lpm >> energy >> rnd1 >> rnd2 >>
+            stochastic_loss_stored >> parametrization;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        Medium* medium = MediumFactory::Get().CreateMedium(mediumName);
-        EnergyCutSettings ecuts(ecut,vcut);
+        Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+        EnergyCutSettings ecuts(ecut, vcut);
 
         BremsstrahlungFactory::Definition brems_def;
-        brems_def.multiplier = multiplier;
-        brems_def.lpm_effect = lpm;
+        brems_def.multiplier      = multiplier;
+        brems_def.lpm_effect      = lpm;
         brems_def.parametrization = BremsstrahlungFactory::Get().GetEnumFromString(parametrization);
 
-        CrossSection* Brems = BremsstrahlungFactory::Get().CreateBremsstrahlung(
-            particle_def,
-            *medium,
-            ecuts,
-            brems_def);
+        CrossSection* Brems =
+            BremsstrahlungFactory::Get().CreateBremsstrahlung(particle_def, *medium, ecuts, brems_def);
 
         stochastic_loss_new = Brems->CalculateStochasticLoss(energy, rnd1, rnd2);
 
-        ASSERT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1e-3*stochastic_loss_stored);
+        ASSERT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1e-3 * stochastic_loss_stored);
 
         delete medium;
         delete Brems;
@@ -401,7 +386,7 @@ TEST(Bremsstrahlung, Test_of_dEdx_Interpolant)
     }
 
     char firstLine[256];
-    in.getline(firstLine,256);
+    in.getline(firstLine, 256);
 
     string particleName;
     string mediumName;
@@ -417,30 +402,26 @@ TEST(Bremsstrahlung, Test_of_dEdx_Interpolant)
     cout.precision(16);
     InterpolationDef InterpolDef;
 
-    while(in.good())
+    while (in.good())
     {
-        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> lpm
-            >> energy >> dEdx_stored >> parametrization;
+        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> lpm >> energy >> dEdx_stored >>
+            parametrization;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        Medium* medium = MediumFactory::Get().CreateMedium(mediumName);
-        EnergyCutSettings ecuts(ecut,vcut);
+        Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+        EnergyCutSettings ecuts(ecut, vcut);
 
         BremsstrahlungFactory::Definition brems_def;
-        brems_def.multiplier = multiplier;
-        brems_def.lpm_effect = lpm;
+        brems_def.multiplier      = multiplier;
+        brems_def.lpm_effect      = lpm;
         brems_def.parametrization = BremsstrahlungFactory::Get().GetEnumFromString(parametrization);
 
-        CrossSection* Brems = BremsstrahlungFactory::Get().CreateBremsstrahlung(
-            particle_def,
-            *medium,
-            ecuts,
-            brems_def,
-            InterpolDef);
+        CrossSection* Brems =
+            BremsstrahlungFactory::Get().CreateBremsstrahlung(particle_def, *medium, ecuts, brems_def, InterpolDef);
 
         dEdx_new = Brems->CalculatedEdx(energy);
 
-        ASSERT_NEAR(dEdx_new, dEdx_stored, 1e-3*dEdx_stored);
+        ASSERT_NEAR(dEdx_new, dEdx_stored, 1e-3 * dEdx_stored);
 
         delete medium;
         delete Brems;
@@ -472,30 +453,26 @@ TEST(Bremsstrahlung, Test_of_dNdx_Interpolant)
     cout.precision(16);
     InterpolationDef InterpolDef;
 
-    while(in.good())
+    while (in.good())
     {
-        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> lpm
-            >> energy >> dNdx_stored >> parametrization;
+        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> lpm >> energy >> dNdx_stored >>
+            parametrization;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        Medium* medium = MediumFactory::Get().CreateMedium(mediumName);
-        EnergyCutSettings ecuts(ecut,vcut);
+        Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+        EnergyCutSettings ecuts(ecut, vcut);
 
         BremsstrahlungFactory::Definition brems_def;
-        brems_def.multiplier = multiplier;
-        brems_def.lpm_effect = lpm;
+        brems_def.multiplier      = multiplier;
+        brems_def.lpm_effect      = lpm;
         brems_def.parametrization = BremsstrahlungFactory::Get().GetEnumFromString(parametrization);
 
-        CrossSection* Brems = BremsstrahlungFactory::Get().CreateBremsstrahlung(
-            particle_def,
-            *medium,
-            ecuts,
-            brems_def,
-            InterpolDef);
+        CrossSection* Brems =
+            BremsstrahlungFactory::Get().CreateBremsstrahlung(particle_def, *medium, ecuts, brems_def, InterpolDef);
 
         dNdx_new = Brems->CalculatedNdx(energy);
 
-        ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-3*dNdx_stored);
+        ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-3 * dNdx_stored);
 
         delete medium;
         delete Brems;
@@ -514,7 +491,7 @@ TEST(Bremsstrahlung, Test_of_dNdx_rnd_Interpolant)
     }
 
     char firstLine[256];
-    in.getline(firstLine,256);
+    in.getline(firstLine, 256);
 
     string particleName;
     string mediumName;
@@ -533,30 +510,26 @@ TEST(Bremsstrahlung, Test_of_dNdx_rnd_Interpolant)
 
     RandomGenerator::Get().SetSeed(0);
 
-    while(in.good())
+    while (in.good())
     {
-        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> lpm
-            >> energy >> rnd >> dNdx_stored >> parametrization;
+        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> lpm >> energy >> rnd >> dNdx_stored >>
+            parametrization;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        Medium* medium = MediumFactory::Get().CreateMedium(mediumName);
-        EnergyCutSettings ecuts(ecut,vcut);
+        Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+        EnergyCutSettings ecuts(ecut, vcut);
 
         BremsstrahlungFactory::Definition brems_def;
-        brems_def.multiplier = multiplier;
-        brems_def.lpm_effect = lpm;
+        brems_def.multiplier      = multiplier;
+        brems_def.lpm_effect      = lpm;
         brems_def.parametrization = BremsstrahlungFactory::Get().GetEnumFromString(parametrization);
 
-        CrossSection* Brems = BremsstrahlungFactory::Get().CreateBremsstrahlung(
-            particle_def,
-            *medium,
-            ecuts,
-            brems_def,
-            InterpolDef);
+        CrossSection* Brems =
+            BremsstrahlungFactory::Get().CreateBremsstrahlung(particle_def, *medium, ecuts, brems_def, InterpolDef);
 
         dNdx_new = Brems->CalculatedNdx(energy, rnd);
 
-        ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-3*dNdx_stored);
+        ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-3 * dNdx_stored);
 
         delete medium;
         delete Brems;
@@ -575,7 +548,7 @@ TEST(Bremsstrahlung, Test_of_e_Interpolant)
     }
 
     char firstLine[256];
-    in.getline(firstLine,256);
+    in.getline(firstLine, 256);
 
     string particleName;
     string mediumName;
@@ -594,37 +567,34 @@ TEST(Bremsstrahlung, Test_of_e_Interpolant)
 
     RandomGenerator::Get().SetSeed(0);
 
-    while(in.good())
+    while (in.good())
     {
-        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> lpm
-            >> energy >> rnd1 >> rnd2 >> stochastic_loss_stored >> parametrization;
+        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> lpm >> energy >> rnd1 >> rnd2 >>
+            stochastic_loss_stored >> parametrization;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        Medium* medium = MediumFactory::Get().CreateMedium(mediumName);
-        EnergyCutSettings ecuts(ecut,vcut);
+        Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+        EnergyCutSettings ecuts(ecut, vcut);
 
         BremsstrahlungFactory::Definition brems_def;
-        brems_def.multiplier = multiplier;
-        brems_def.lpm_effect = lpm;
+        brems_def.multiplier      = multiplier;
+        brems_def.lpm_effect      = lpm;
         brems_def.parametrization = BremsstrahlungFactory::Get().GetEnumFromString(parametrization);
 
-        CrossSection* Brems = BremsstrahlungFactory::Get().CreateBremsstrahlung(
-            particle_def,
-            *medium,
-            ecuts,
-            brems_def,
-            InterpolDef);
+        CrossSection* Brems =
+            BremsstrahlungFactory::Get().CreateBremsstrahlung(particle_def, *medium, ecuts, brems_def, InterpolDef);
 
         stochastic_loss_new = Brems->CalculateStochasticLoss(energy, rnd1, rnd2);
 
-        ASSERT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1e-3*stochastic_loss_stored);
+        ASSERT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1e-3 * stochastic_loss_stored);
 
         delete medium;
         delete Brems;
     }
 }
 
-int main(int argc, char **argv) {
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
+int main(int argc, char** argv)
+{
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }

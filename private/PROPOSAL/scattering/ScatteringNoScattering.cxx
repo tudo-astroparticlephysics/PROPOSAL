@@ -1,23 +1,21 @@
 /*! \file   ScatteringNoScattering.cxx
-*   \brief  Source file for the ScatteringNoScattering routines.
-*
-*   For more details see the class documentation.
-*
-*   \date   
-*   \author 
-*/
+ *   \brief  Source file for the ScatteringNoScattering routines.
+ *
+ *   For more details see the class documentation.
+ *
+ *   \date
+ *   \author
+ */
 
-#include "PROPOSAL/particle/Particle.h"
-#include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/scattering/ScatteringNoScattering.h"
-
+#include "PROPOSAL/medium/Medium.h"
+#include "PROPOSAL/particle/Particle.h"
 
 using namespace PROPOSAL;
 
 // ------------------------------------------------------------------------- //
 // Constructor & Destructor
 // ------------------------------------------------------------------------- //
-
 
 ScatteringNoScattering::ScatteringNoScattering(Particle& particle, const Medium& medium)
     : Scattering(particle)
@@ -55,7 +53,6 @@ bool ScatteringNoScattering::compare(const Scattering& scattering) const
 }
 
 //----------------------------------------------------------------------------//
-
 Scattering::RandomAngles ScatteringNoScattering::CalculateRandomAngle(double dr, double ei, double ef)
 {
     (void)ei;

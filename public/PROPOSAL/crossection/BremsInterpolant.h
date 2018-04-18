@@ -1,28 +1,26 @@
 
 #pragma once
 
-
 #include "PROPOSAL/crossection/CrossSectionInterpolant.h"
 
-namespace PROPOSAL
-{
+namespace PROPOSAL {
 
 class Bremsstrahlung;
 
-class BremsInterpolant: public CrossSectionInterpolant
+class BremsInterpolant : public CrossSectionInterpolant
 {
-    public:
-        BremsInterpolant(const Bremsstrahlung&, InterpolationDef);
-        BremsInterpolant(const BremsInterpolant&);
-        virtual ~BremsInterpolant();
+public:
+    BremsInterpolant(const Bremsstrahlung&, InterpolationDef);
+    BremsInterpolant(const BremsInterpolant&);
+    virtual ~BremsInterpolant();
 
-        CrossSection* clone() const { return new BremsInterpolant(*this); }
+    CrossSection* clone() const { return new BremsInterpolant(*this); }
 
-        // ----------------------------------------------------------------- //
-        // Public methods
-        // ----------------------------------------------------------------- //
+    // ----------------------------------------------------------------- //
+    // Public methods
+    // ----------------------------------------------------------------- //
 
-        double CalculatedEdx(double energy);
+    double CalculatedEdx(double energy);
 };
 
-} /* PROPOSAL */
+} // namespace PROPOSAL

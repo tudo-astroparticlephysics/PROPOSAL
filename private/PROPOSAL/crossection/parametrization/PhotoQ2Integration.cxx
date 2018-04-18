@@ -31,13 +31,13 @@ using namespace PROPOSAL;
     {                                                                                                                  \
     }                                                                                                                  \
                                                                                                                        \
-    Photo##param::~Photo##param() {}\
+    Photo##param::~Photo##param() {}                                                                                   \
                                                                                                                        \
     const std::string Photo##param::name_ = "Photo" #param;
 
 /******************************************************************************
-*                            Photo Q2 Integration                            *
-******************************************************************************/
+ *                            Photo Q2 Integration                            *
+ ******************************************************************************/
 
 PhotoQ2Integral::PhotoQ2Integral(const ParticleDef& particle_def,
                                  const Medium& medium,
@@ -98,10 +98,11 @@ double PhotoQ2Integral::DifferentialCrossSection(double energy, double v)
         return 0;
     }
 
-    aux = integral_.Integrate(q2_min, q2_max, boost::bind(&PhotoQ2Integral::FunctionToQ2Integral, this, energy, v, _1), 4);
+    aux = integral_.Integrate(
+        q2_min, q2_max, boost::bind(&PhotoQ2Integral::FunctionToQ2Integral, this, energy, v, _1), 4);
 
-    aux *= multiplier_ * medium_->GetMolDensity() * components_[component_index_]->GetAtomInMolecule()
-            * particle_def_.charge * particle_def_.charge;
+    aux *= multiplier_ * medium_->GetMolDensity() * components_[component_index_]->GetAtomInMolecule() *
+           particle_def_.charge * particle_def_.charge;
 
     return aux;
 }
@@ -125,12 +126,15 @@ size_t PhotoQ2Integral::GetHash() const
 
 void PhotoQ2Integral::print(std::ostream& os) const
 {
-    os << "shadow effect: " << (dynamic_cast<ShadowDuttaRenoSarcevicSeckel*>(shadow_effect_) ? "DuttaRenoSarcevicSeckel" : "ButkevichMikhailov") << '\n';
+    os << "shadow effect: "
+       << (dynamic_cast<ShadowDuttaRenoSarcevicSeckel*>(shadow_effect_) ? "DuttaRenoSarcevicSeckel"
+                                                                        : "ButkevichMikhailov")
+       << '\n';
 }
 
 /******************************************************************************
-*                          Specifc Parametrizations                           *
-******************************************************************************/
+ *                          Specifc Parametrizations                           *
+ ******************************************************************************/
 
 // ------------------------------------------------------------------------- //
 // Define the specific parametrizations
@@ -152,15 +156,15 @@ double PhotoAbramowiczLevinLevyMaor91::FunctionToQ2Integral(double energy, doubl
     double mass_nucleus = component->GetAverageNucleonWeight();
 
     // Bjorken x = \frac{Q^2}{2pq}
-    double bjorken_x = Q2 / (2 * mass_nucleus * v*energy);
+    double bjorken_x = Q2 / (2 * mass_nucleus * v * energy);
 
     // Parameter for Pomeron and Reggeon
     const double a1_reggeon = 0.60408;
     const double a2_reggeon = 0.17353;
     const double a3_reggeon = 1.61812;
 
-    double b1_pomeron = 0.49222;
-    double b2_pomeron = 0.52116;
+    double b1_pomeron       = 0.49222;
+    double b2_pomeron       = 0.52116;
     const double b3_pomeron = 3.55115;
 
     const double c1_pomeron = 0.26550;
@@ -171,8 +175,8 @@ double PhotoAbramowiczLevinLevyMaor91::FunctionToQ2Integral(double energy, doubl
     const double a2_pomeron = -0.36407;
     const double a3_pomeron = 8.17091;
 
-    double b1_reggeon = 1.26066;
-    double b2_reggeon = 1.83624;
+    double b1_reggeon       = 1.26066;
+    double b2_reggeon       = 1.83624;
     const double b3_reggeon = 0.81141;
 
     const double c1_reggeon = 0.67639;
@@ -181,10 +185,10 @@ double PhotoAbramowiczLevinLevyMaor91::FunctionToQ2Integral(double energy, doubl
 
     // parameter with conversion from GeV^2 to Mev^2
     const double mass_photon_eff = 0.30508 * 1e6;
-    const double mass_pomeron = 10.67564 * 1e6;
-    const double mass_reggeon = 0.20623 * 1e6;
+    const double mass_pomeron    = 10.67564 * 1e6;
+    const double mass_reggeon    = 0.20623 * 1e6;
     const double scaleParameter  = 0.06527 * 1e6;
-    double Q20_free_param = 0.27799 * 1e6;
+    double Q20_free_param        = 0.27799 * 1e6;
 
     // these values are corrected according to the file f2allm.f from Halina Abramowicz
     // TODO: do this values really have to be corrected
@@ -201,10 +205,10 @@ double PhotoAbramowiczLevinLevyMaor91::FunctionToQ2Integral(double energy, doubl
 
     // t = log( \frac{log \frac{Q^2 + Q_0^2}{\Lambda^2}}{log \frac{Q_0^2}{\Lambda^2}} )
     // eq. 22
-    double t = log(log((Q2 + Q20_free_param) / scaleParameter)
-                / log(Q20_free_param / scaleParameter));
+    double t = log(log((Q2 + Q20_free_param) / scaleParameter) / log(Q20_free_param / scaleParameter));
 
-    if(t < 0) t = 0;
+    if (t < 0)
+        t = 0;
 
     // parameter, that increase with Q^2
     // eq. 23
@@ -212,7 +216,7 @@ double PhotoAbramowiczLevinLevyMaor91::FunctionToQ2Integral(double energy, doubl
     double a_reggeon = a1_reggeon + a2_reggeon * pow(t, a3_reggeon);
     double b_reggeon = b1_reggeon + b2_reggeon * pow(t, b3_reggeon);
     double c_reggeon = c1_reggeon + c2_reggeon * pow(t, c3_reggeon);
-    double b_pomeron = b1_pomeron + b2_pomeron*pow(t, b3_pomeron);
+    double b_pomeron = b1_pomeron + b2_pomeron * pow(t, b3_pomeron);
     // parameter, that decrease with Q^2
     // eq. 24
     // f'(t) = f_1 + (f_1 - f_2) (\frac{1}{1 + t^{f_3}} - 1)
@@ -221,9 +225,7 @@ double PhotoAbramowiczLevinLevyMaor91::FunctionToQ2Integral(double energy, doubl
 
     // invariant mass of nucleus and virtual photon
     // W^2 = (p + q)^2 = M^2 + 2MEv - Q^2
-    double W2 = mass_nucleus * mass_nucleus
-        + 2 * mass_nucleus * energy * v
-        - Q2;
+    double W2 = mass_nucleus * mass_nucleus + 2 * mass_nucleus * energy * v - Q2;
 
     // Relation between structure function of proton and structure function of neutron
     // from the BCDMS Collaboration
@@ -231,36 +233,28 @@ double PhotoAbramowiczLevinLevyMaor91::FunctionToQ2Integral(double energy, doubl
     // eq. 4
     // P(x) = 1 - 1.85x + 2.45x^2 - 2.35x^3 + x^4
     double relation_proton_neutron = bjorken_x * bjorken_x;
-    relation_proton_neutron = 1
-        - 1.85 * bjorken_x
-        + 2.45 * relation_proton_neutron
-        - 2.35 * relation_proton_neutron * bjorken_x
-        + relation_proton_neutron * relation_proton_neutron;
+    relation_proton_neutron        = 1 - 1.85 * bjorken_x + 2.45 * relation_proton_neutron -
+                              2.35 * relation_proton_neutron * bjorken_x +
+                              relation_proton_neutron * relation_proton_neutron;
 
     // eq. 17 and 18
     // x_i = \frac{Q^2 + m_i}{Q^2 + m_i + W^2 - M^2}
-    double bjorken_x_pomeron =
-        (Q2 + mass_pomeron) / (Q2 + mass_pomeron + W2 - mass_nucleus * mass_nucleus);
-    double bjorken_x_reggeon =
-        (Q2 + mass_reggeon) / (Q2 + mass_reggeon + W2 - mass_nucleus * mass_nucleus);
+    double bjorken_x_pomeron = (Q2 + mass_pomeron) / (Q2 + mass_pomeron + W2 - mass_nucleus * mass_nucleus);
+    double bjorken_x_reggeon = (Q2 + mass_reggeon) / (Q2 + mass_reggeon + W2 - mass_nucleus * mass_nucleus);
     // eq. 20 and 21
     // F_{2, i}(x, Q^2) = c_i(t) x^{a_i(t)} (1 - x)^{b_i(t)}
-    double pomeron_contribution =
-        c_pomeron * pow(bjorken_x_pomeron, a_pomeron) * pow(1 - bjorken_x, b_pomeron);
-    double reggeon_controbution =
-        c_reggeon * pow(bjorken_x_reggeon, a_reggeon) * pow(1 - bjorken_x, b_reggeon);
+    double pomeron_contribution = c_pomeron * pow(bjorken_x_pomeron, a_pomeron) * pow(1 - bjorken_x, b_pomeron);
+    double reggeon_controbution = c_reggeon * pow(bjorken_x_reggeon, a_reggeon) * pow(1 - bjorken_x, b_reggeon);
     // ALLM97 eq. 1
     // F_{2, proton}(x, Q^2) = \frac{Q^2}{Q^2 + m_0^2} (F_{2, Pomeron} + F_{2, Reggeon})
-    double structure_function_proton =
-        Q2 / (Q2 + mass_photon_eff) * (pomeron_contribution + reggeon_controbution);
+    double structure_function_proton = Q2 / (Q2 + mass_photon_eff) * (pomeron_contribution + reggeon_controbution);
     // structure function from Dutta et al
     // Phys. Rev. D 63 (2001), 094020
     // eq. 3.11
     // F_{2, nucleus} = G(x) (Z + (A - Z)P(x)) F_{2, Proton}
-    double structure_function_nucleus = structure_function_proton
-        * shadow_effect_->CalculateShadowEffect(*component, bjorken_x, v*energy)
-        * (component->GetNucCharge()
-            + (component->GetAtomicNum() - component->GetNucCharge()) * relation_proton_neutron);
+    double structure_function_nucleus =
+        structure_function_proton * shadow_effect_->CalculateShadowEffect(*component, bjorken_x, v * energy) *
+        (component->GetNucCharge() + (component->GetAtomicNum() - component->GetNucCharge()) * relation_proton_neutron);
 
     // differential cross section from Dutta et al.
     // Phys. Rev. D 63 (2001), 094020
@@ -271,11 +265,10 @@ double PhotoAbramowiczLevinLevyMaor91::FunctionToQ2Integral(double energy, doubl
     //     - \frac{v^2}{2} (1 - \frac{2m_{particle}}{Q^2})
     //          \frac{1 + \frac{4 M^2 x^2}{Q^2}}{1 + R})
     double result = ME * RE / Q2;
-    result *= result * 4 * PI * structure_function_nucleus / v
-        * (1 - v - mass_nucleus * bjorken_x * v / (2 * energy) +
-            (1 - 2 * particle_def_.mass * particle_def_.mass / Q2) * v * v
-            * (1 + 4 * mass_nucleus * mass_nucleus * bjorken_x * bjorken_x / Q2)
-            / (2 * (1 + R)));
+    result *= result * 4 * PI * structure_function_nucleus / v *
+              (1 - v - mass_nucleus * bjorken_x * v / (2 * energy) +
+               (1 - 2 * particle_def_.mass * particle_def_.mass / Q2) * v * v *
+                   (1 + 4 * mass_nucleus * mass_nucleus * bjorken_x * bjorken_x / Q2) / (2 * (1 + R)));
 
     return result;
 }
@@ -291,7 +284,7 @@ double PhotoAbramowiczLevinLevyMaor97::FunctionToQ2Integral(double energy, doubl
     double mass_nucleus = component->GetAverageNucleonWeight();
 
     // Bjorken x = \frac{Q^2}{2pq}
-    double bjorken_x = Q2 / (2 * mass_nucleus * v*energy);
+    double bjorken_x = Q2 / (2 * mass_nucleus * v * energy);
 
     // --------------------------------------------------------------------- //
     // Evaluate form factor F_2 for the nucleus same like ALLM91
@@ -329,10 +322,10 @@ double PhotoAbramowiczLevinLevyMaor97::FunctionToQ2Integral(double energy, doubl
 
     // parameter with conversion from GeV^2 to Mev^2
     const double mass_photon_eff = 0.31985 * 1e6;
-    const double mass_reggeon = 0.15052 * 1e6;
-    const double mass_pomeron = 49.457 * 1e6;
-    const double scaleParameter = 0.06527 * 1e6;
-    const double Q20_free_param = 0.52544 * 1e6;
+    const double mass_reggeon    = 0.15052 * 1e6;
+    const double mass_pomeron    = 49.457 * 1e6;
+    const double scaleParameter  = 0.06527 * 1e6;
+    const double Q20_free_param  = 0.52544 * 1e6;
 
     // R(x, Q^2) is approximated to 0
     // relation between structure functions F_1 and F_2
@@ -340,10 +333,10 @@ double PhotoAbramowiczLevinLevyMaor97::FunctionToQ2Integral(double energy, doubl
 
     // t = log( \frac{log \frac{Q^2 + Q_0^2}{\Lambda^2}}{log \frac{Q_0^2}{\Lambda^2}} )
     // eq. 22
-    double t = log(log((Q2 + Q20_free_param) / scaleParameter)
-                / log(Q20_free_param / scaleParameter));
+    double t = log(log((Q2 + Q20_free_param) / scaleParameter) / log(Q20_free_param / scaleParameter));
 
-    if(t < 0) t = 0;
+    if (t < 0)
+        t = 0;
 
     // parameter, that increase with Q^2
     // eq. 23
@@ -351,7 +344,7 @@ double PhotoAbramowiczLevinLevyMaor97::FunctionToQ2Integral(double energy, doubl
     double a_reggeon = a1_reggeon + a2_reggeon * pow(t, a3_reggeon);
     double b_reggeon = b1_reggeon + b2_reggeon * pow(t, b3_reggeon);
     double c_reggeon = c1_reggeon + c2_reggeon * pow(t, c3_reggeon);
-    double b_pomeron = b1_pomeron + b2_pomeron*pow(t, b3_pomeron);
+    double b_pomeron = b1_pomeron + b2_pomeron * pow(t, b3_pomeron);
     // parameter, that decrease with Q^2
     // eq. 24
     // f'(t) = f_1 + (f_1 - f_2) (\frac{1}{1 + t^{f_3}} - 1)
@@ -360,9 +353,7 @@ double PhotoAbramowiczLevinLevyMaor97::FunctionToQ2Integral(double energy, doubl
 
     // invariant mass of nucleus and virtual photon
     // W^2 = (p + q)^2 = M^2 + 2MEv - Q^2
-    double W2 = mass_nucleus * mass_nucleus
-        + 2 * mass_nucleus * energy * v
-        - Q2;
+    double W2 = mass_nucleus * mass_nucleus + 2 * mass_nucleus * energy * v - Q2;
 
     // Relation between structure function of proton and structure function of neutron
     // from the BCDMS Collaboration
@@ -370,36 +361,28 @@ double PhotoAbramowiczLevinLevyMaor97::FunctionToQ2Integral(double energy, doubl
     // eq. 4
     // P(x) = 1 - 1.85x + 2.45x^2 - 2.35x^3 + x^4
     double relation_proton_neutron = bjorken_x * bjorken_x;
-    relation_proton_neutron = 1
-        - 1.85 * bjorken_x
-        + 2.45 * relation_proton_neutron
-        - 2.35 * relation_proton_neutron * bjorken_x
-        + relation_proton_neutron * relation_proton_neutron;
+    relation_proton_neutron        = 1 - 1.85 * bjorken_x + 2.45 * relation_proton_neutron -
+                              2.35 * relation_proton_neutron * bjorken_x +
+                              relation_proton_neutron * relation_proton_neutron;
 
     // eq. 17 and 18
     // x_i = \frac{Q^2 + m_i}{Q^2 + m_i + W^2 - M^2}
-    double bjorken_x_pomeron =
-        (Q2 + mass_pomeron) / (Q2 + mass_pomeron + W2 - mass_nucleus * mass_nucleus);
-    double bjorken_x_reggeon =
-        (Q2 + mass_reggeon) / (Q2 + mass_reggeon + W2 - mass_nucleus * mass_nucleus);
+    double bjorken_x_pomeron = (Q2 + mass_pomeron) / (Q2 + mass_pomeron + W2 - mass_nucleus * mass_nucleus);
+    double bjorken_x_reggeon = (Q2 + mass_reggeon) / (Q2 + mass_reggeon + W2 - mass_nucleus * mass_nucleus);
     // eq. 20 and 21
     // F_{2, i}(x, Q^2) = c_i(t) x^{a_i(t)} (1 - x)^{b_i(t)}
-    double pomeron_contribution =
-        c_pomeron * pow(bjorken_x_pomeron, a_pomeron) * pow(1 - bjorken_x, b_pomeron);
-    double reggeon_controbution =
-        c_reggeon * pow(bjorken_x_reggeon, a_reggeon) * pow(1 - bjorken_x, b_reggeon);
+    double pomeron_contribution = c_pomeron * pow(bjorken_x_pomeron, a_pomeron) * pow(1 - bjorken_x, b_pomeron);
+    double reggeon_controbution = c_reggeon * pow(bjorken_x_reggeon, a_reggeon) * pow(1 - bjorken_x, b_reggeon);
     // ALLM97 eq. 1
     // F_{2, proton}(x, Q^2) = \frac{Q^2}{Q^2 + m_0^2} (F_{2, Pomeron} + F_{2, Reggeon})
-    double structure_function_proton =
-        Q2 / (Q2 + mass_photon_eff) * (pomeron_contribution + reggeon_controbution);
+    double structure_function_proton = Q2 / (Q2 + mass_photon_eff) * (pomeron_contribution + reggeon_controbution);
     // structure function from Dutta et al
     // Phys. Rev. D 63 (2001), 094020
     // eq. 3.11
     // F_{2, nucleus} = G(x) (Z + (A - Z)P(x)) F_{2, Proton}
-    double structure_function_nucleus = structure_function_proton
-        * shadow_effect_->CalculateShadowEffect(*component, bjorken_x, v*energy)
-        * (component->GetNucCharge()
-            + (component->GetAtomicNum() - component->GetNucCharge()) * relation_proton_neutron);
+    double structure_function_nucleus =
+        structure_function_proton * shadow_effect_->CalculateShadowEffect(*component, bjorken_x, v * energy) *
+        (component->GetNucCharge() + (component->GetAtomicNum() - component->GetNucCharge()) * relation_proton_neutron);
 
     // differential cross section from Dutta et al.
     // Phys. Rev. D 63 (2001), 094020
@@ -410,11 +393,10 @@ double PhotoAbramowiczLevinLevyMaor97::FunctionToQ2Integral(double energy, doubl
     //     - \frac{v^2}{2} (1 - \frac{2m_{particle}}{Q^2})
     //          \frac{1 + \frac{4 M^2 x^2}{Q^2}}{1 + R})
     double result = ME * RE / Q2;
-    result *= result * 4 * PI * structure_function_nucleus / v
-        * (1 - v - mass_nucleus * bjorken_x * v / (2 * energy) +
-            (1 - 2 * particle_def_.mass * particle_def_.mass / Q2) * v * v
-            * (1 + 4 * mass_nucleus * mass_nucleus * bjorken_x * bjorken_x / Q2)
-            / (2 * (1 + R)));
+    result *= result * 4 * PI * structure_function_nucleus / v *
+              (1 - v - mass_nucleus * bjorken_x * v / (2 * energy) +
+               (1 - 2 * particle_def_.mass * particle_def_.mass / Q2) * v * v *
+                   (1 + 4 * mass_nucleus * mass_nucleus * bjorken_x * bjorken_x / Q2) / (2 * (1 + R)));
 
     return result;
 }
@@ -433,18 +415,18 @@ double PhotoButkevichMikhailov::FunctionToQ2Integral(double energy, double v, do
     double mass_nucleus = component->GetAverageNucleonWeight();
 
     // Bjorken x = \frac{Q^2}{2pq}
-    double bjorken_x = Q2 / (2 * mass_nucleus * v*energy);
+    double bjorken_x = Q2 / (2 * mass_nucleus * v * energy);
 
-    const double a = 0.2513e6;
-    const double b = 0.6186e6;
-    const double c = 3.0292e6;
-    const double d = 1.4817e6;
+    const double a                 = 0.2513e6;
+    const double b                 = 0.6186e6;
+    const double c                 = 3.0292e6;
+    const double d                 = 1.4817e6;
     const double intercept_pomeron = 0.0988;
     const double intercept_reggeon = 0.4056;
-    const double tau = 1.8152;
-    const double A_s = 0.12;
-    const double B_up = 1.2437;
-    const double B_down = 0.1853;
+    const double tau               = 1.8152;
+    const double A_s               = 0.12;
+    const double B_up              = 1.2437;
+    const double B_down            = 0.1853;
 
     // R(x, Q^2) is approximated to 0
     // relation between structure functions F_1 and F_2
@@ -461,7 +443,7 @@ double PhotoButkevichMikhailov::FunctionToQ2Integral(double energy, double v, do
     double dl = intercept_pomeron * (1 + 2 * Q2 / (Q2 + d));
     // eq. 24
     // F_{2, Proton} = A_s x^{-\Delta} (1 - x)^{n + 4} (\frac{Q^2}{Q^2 + a})^{1 + \Delta}
-    aux = A_s * pow(bjorken_x, -dl) * pow(Q2 / (Q2 + a), 1 + dl);
+    aux                     = A_s * pow(bjorken_x, -dl) * pow(Q2 / (Q2 + a), 1 + dl);
     double F_proton_singlet = aux * pow(1 - bjorken_x, n + 4);
     // eq. 37
     // F_{2, Neutron} = A_s x^{-\Delta} (1 - x)^{n + \tau} (\frac{Q^2}{Q^2 + a})^{1 + \Delta}
@@ -470,9 +452,7 @@ double PhotoButkevichMikhailov::FunctionToQ2Integral(double energy, double v, do
     // splitted into Up quark and down quark contributions
     // eq. 29
     // xU_v = B_{up} x^{1 - \alpha_{Reggeon}} (1 - x)^{n} (\frac{Q^2}{Q^2 + b})^{\alpha_{Reggeon}}
-    aux = pow(bjorken_x, 1 - intercept_reggeon)
-        * pow(1 - bjorken_x, n)
-        * pow(Q2 / (Q2 + b), intercept_reggeon);
+    aux = pow(bjorken_x, 1 - intercept_reggeon) * pow(1 - bjorken_x, n) * pow(Q2 / (Q2 + b), intercept_reggeon);
     double Up_valence = B_up * aux;
     // eq. 30
     // xD_v = B_{down} x^{1 - \alpha_{Reggeon}} (1 - x)^{n + 1} (\frac{Q^2}{Q^2 + b})^{\alpha_{Reggeon}}
@@ -485,13 +465,13 @@ double PhotoButkevichMikhailov::FunctionToQ2Integral(double energy, double v, do
     double F_neutron_non_singlet = Up_valence / 4 + Down_valence * 4;
     // eq. 23
     // F_{2, i} = F_{2, i, Singlet} + F_{2, i, non-Singlet}
-    double structure_function_proton = F_proton_singlet + F_proton_non_singlet;
+    double structure_function_proton  = F_proton_singlet + F_proton_non_singlet;
     double structure_function_neutron = F_neutron_singlet + F_neutron_non_singlet;
     // F_{2, nucleus} = G (Z F_{2, Proton} + (A-Z) F_{2, Neutron})
     double structure_function_nucleus =
-        shadow_effect_->CalculateShadowEffect(*component, bjorken_x, v*energy)
-        * (component->GetNucCharge()*structure_function_proton
-            + (component->GetAtomicNum() - component->GetNucCharge())*structure_function_neutron);
+        shadow_effect_->CalculateShadowEffect(*component, bjorken_x, v * energy) *
+        (component->GetNucCharge() * structure_function_proton +
+         (component->GetAtomicNum() - component->GetNucCharge()) * structure_function_neutron);
 
     // differential cross section from Dutta et al.
     // Phys. Rev. D 63 (2001), 094020
@@ -502,11 +482,10 @@ double PhotoButkevichMikhailov::FunctionToQ2Integral(double energy, double v, do
     //     - \frac{v^2}{2} (1 - \frac{2m_{particle}}{Q^2})
     //          \frac{1 + \frac{4 M^2 x^2}{Q^2}}{1 + R})
     double result = ME * RE / Q2;
-    result *= result * 4 * PI * structure_function_nucleus / v
-        * (1 - v - mass_nucleus * bjorken_x * v / (2 * energy) +
-            (1 - 2 * particle_def_.mass * particle_def_.mass / Q2) * v * v
-            * (1 + 4 * mass_nucleus * mass_nucleus * bjorken_x * bjorken_x / Q2)
-            / (2 * (1 + R)));
+    result *= result * 4 * PI * structure_function_nucleus / v *
+              (1 - v - mass_nucleus * bjorken_x * v / (2 * energy) +
+               (1 - 2 * particle_def_.mass * particle_def_.mass / Q2) * v * v *
+                   (1 + 4 * mass_nucleus * mass_nucleus * bjorken_x * bjorken_x / Q2) / (2 * (1 + R)));
 
     return result;
 }
@@ -524,7 +503,7 @@ double PhotoRenoSarcevicSu::FunctionToQ2Integral(double energy, double v, double
     double mass_nucleus = component->GetAverageNucleonWeight();
 
     // Bjorken x = \frac{Q^2}{2pq}
-    double bjorken_x = Q2 / (2 * mass_nucleus * v*energy);
+    double bjorken_x = Q2 / (2 * mass_nucleus * v * energy);
 
     // --------------------------------------------------------------------- //
     // Evaluate form factor F_2 for the nucleus same like ALLM91
@@ -562,10 +541,10 @@ double PhotoRenoSarcevicSu::FunctionToQ2Integral(double energy, double v, double
 
     // parameter with conversion from GeV^2 to Mev^2
     const double mass_photon_eff = 0.31985 * 1e6;
-    const double mass_reggeon = 0.15052 * 1e6;
-    const double mass_pomeron = 49.457 * 1e6;
-    const double scaleParameter = 0.06527 * 1e6;
-    const double Q20_free_param = 0.52544 * 1e6;
+    const double mass_reggeon    = 0.15052 * 1e6;
+    const double mass_pomeron    = 49.457 * 1e6;
+    const double scaleParameter  = 0.06527 * 1e6;
+    const double Q20_free_param  = 0.52544 * 1e6;
 
     // R(x, Q^2) is approximated to 0
     // relation between structure functions F_1 and F_2
@@ -573,10 +552,10 @@ double PhotoRenoSarcevicSu::FunctionToQ2Integral(double energy, double v, double
 
     // t = log( \frac{log \frac{Q^2 + Q_0^2}{\Lambda^2}}{log \frac{Q_0^2}{\Lambda^2}} )
     // eq. 22
-    double t = log(log((Q2 + Q20_free_param) / scaleParameter)
-                / log(Q20_free_param / scaleParameter));
+    double t = log(log((Q2 + Q20_free_param) / scaleParameter) / log(Q20_free_param / scaleParameter));
 
-    if(t < 0) t = 0;
+    if (t < 0)
+        t = 0;
 
     // parameter, that increase with Q^2
     // eq. 23
@@ -584,7 +563,7 @@ double PhotoRenoSarcevicSu::FunctionToQ2Integral(double energy, double v, double
     double a_reggeon = a1_reggeon + a2_reggeon * pow(t, a3_reggeon);
     double b_reggeon = b1_reggeon + b2_reggeon * pow(t, b3_reggeon);
     double c_reggeon = c1_reggeon + c2_reggeon * pow(t, c3_reggeon);
-    double b_pomeron = b1_pomeron + b2_pomeron*pow(t, b3_pomeron);
+    double b_pomeron = b1_pomeron + b2_pomeron * pow(t, b3_pomeron);
     // parameter, that decrease with Q^2
     // eq. 24
     // f'(t) = f_1 + (f_1 - f_2) (\frac{1}{1 + t^{f_3}} - 1)
@@ -593,9 +572,7 @@ double PhotoRenoSarcevicSu::FunctionToQ2Integral(double energy, double v, double
 
     // invariant mass of nucleus and virtual photon
     // W^2 = (p + q)^2 = M^2 + 2MEv - Q^2
-    double W2 = mass_nucleus * mass_nucleus
-        + 2 * mass_nucleus * energy * v
-        - Q2;
+    double W2 = mass_nucleus * mass_nucleus + 2 * mass_nucleus * energy * v - Q2;
 
     // Relation between structure function of proton and structure function of neutron
     // from the BCDMS Collaboration
@@ -603,36 +580,28 @@ double PhotoRenoSarcevicSu::FunctionToQ2Integral(double energy, double v, double
     // eq. 4
     // P(x) = 1 - 1.85x + 2.45x^2 - 2.35x^3 + x^4
     double relation_proton_neutron = bjorken_x * bjorken_x;
-    relation_proton_neutron = 1
-        - 1.85 * bjorken_x
-        + 2.45 * relation_proton_neutron
-        - 2.35 * relation_proton_neutron * bjorken_x
-        + relation_proton_neutron * relation_proton_neutron;
+    relation_proton_neutron        = 1 - 1.85 * bjorken_x + 2.45 * relation_proton_neutron -
+                              2.35 * relation_proton_neutron * bjorken_x +
+                              relation_proton_neutron * relation_proton_neutron;
 
     // eq. 17 and 18
     // x_i = \frac{Q^2 + m_i}{Q^2 + m_i + W^2 - M^2}
-    double bjorken_x_pomeron =
-        (Q2 + mass_pomeron) / (Q2 + mass_pomeron + W2 - mass_nucleus * mass_nucleus);
-    double bjorken_x_reggeon =
-        (Q2 + mass_reggeon) / (Q2 + mass_reggeon + W2 - mass_nucleus * mass_nucleus);
+    double bjorken_x_pomeron = (Q2 + mass_pomeron) / (Q2 + mass_pomeron + W2 - mass_nucleus * mass_nucleus);
+    double bjorken_x_reggeon = (Q2 + mass_reggeon) / (Q2 + mass_reggeon + W2 - mass_nucleus * mass_nucleus);
     // eq. 20 and 21
     // F_{2, i}(x, Q^2) = c_i(t) x^{a_i(t)} (1 - x)^{b_i(t)}
-    double pomeron_contribution =
-        c_pomeron * pow(bjorken_x_pomeron, a_pomeron) * pow(1 - bjorken_x, b_pomeron);
-    double reggeon_controbution =
-        c_reggeon * pow(bjorken_x_reggeon, a_reggeon) * pow(1 - bjorken_x, b_reggeon);
+    double pomeron_contribution = c_pomeron * pow(bjorken_x_pomeron, a_pomeron) * pow(1 - bjorken_x, b_pomeron);
+    double reggeon_controbution = c_reggeon * pow(bjorken_x_reggeon, a_reggeon) * pow(1 - bjorken_x, b_reggeon);
     // ALLM97 eq. 1
     // F_{2, proton}(x, Q^2) = \frac{Q^2}{Q^2 + m_0^2} (F_{2, Pomeron} + F_{2, Reggeon})
-    double structure_function_proton =
-        Q2 / (Q2 + mass_photon_eff) * (pomeron_contribution + reggeon_controbution);
+    double structure_function_proton = Q2 / (Q2 + mass_photon_eff) * (pomeron_contribution + reggeon_controbution);
     // structure function from Dutta et al
     // Phys. Rev. D 63 (2001), 094020
     // eq. 3.11
     // F_{2, nucleus} = G(x) (Z + (A - Z)P(x)) F_{2, Proton}
-    double structure_function_nucleus = structure_function_proton
-        * shadow_effect_->CalculateShadowEffect(*component, bjorken_x, v*energy)
-        * (component->GetNucCharge()
-            + (component->GetAtomicNum() - component->GetNucCharge()) * relation_proton_neutron);
+    double structure_function_nucleus =
+        structure_function_proton * shadow_effect_->CalculateShadowEffect(*component, bjorken_x, v * energy) *
+        (component->GetNucCharge() + (component->GetAtomicNum() - component->GetNucCharge()) * relation_proton_neutron);
 
     // --------------------------------------------------------------------- //
     // this is the only part, that differs from ALLM parametrization
@@ -644,11 +613,10 @@ double PhotoRenoSarcevicSu::FunctionToQ2Integral(double energy, double v, double
     //     - \frac{v^2}{4} (1 - \frac{4m_{particle}}{Q^2})
     //          \frac{1 + \frac{4M^2x^2}{Q^2}}{1 + R})
     double result = ME * RE / Q2;
-    result *=  result * 4 * PI * structure_function_nucleus / v
-        * (1 - v + 0.25 * v * v
-            - (1 + 4 * particle_def_.mass * particle_def_.mass / Q2) * 0.25 * v * v
-            * (1 + 4 * mass_nucleus * mass_nucleus * bjorken_x * bjorken_x / Q2)
-            / (1 + R));
+    result *= result * 4 * PI * structure_function_nucleus / v *
+              (1 - v + 0.25 * v * v -
+               (1 + 4 * particle_def_.mass * particle_def_.mass / Q2) * 0.25 * v * v *
+                   (1 + 4 * mass_nucleus * mass_nucleus * bjorken_x * bjorken_x / Q2) / (1 + R));
 
     return result;
 }

@@ -1,20 +1,21 @@
 
 #include <boost/bind.hpp>
 
-#include "PROPOSAL/crossection/BremsInterpolant.h"
 #include "PROPOSAL/crossection/BremsIntegral.h"
+#include "PROPOSAL/crossection/BremsInterpolant.h"
 #include "PROPOSAL/crossection/parametrization/Bremsstrahlung.h"
 
 #include "PROPOSAL/math/Interpolant.h"
 #include "PROPOSAL/math/InterpolantBuilder.h"
 
-#include "PROPOSAL/methods.h"
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Output.h"
+#include "PROPOSAL/methods.h"
 
 using namespace PROPOSAL;
 
-BremsInterpolant::BremsInterpolant(const Bremsstrahlung& param, InterpolationDef def): CrossSectionInterpolant(DynamicData::Brems, param)
+BremsInterpolant::BremsInterpolant(const Bremsstrahlung& param, InterpolationDef def)
+    : CrossSectionInterpolant(DynamicData::Brems, param)
 {
     // Use parent CrossSecition dNdx interpolation
     InitdNdxInerpolation(def);
@@ -67,16 +68,16 @@ BremsInterpolant::BremsInterpolant(const Bremsstrahlung& param, InterpolationDef
     builder_container_de2dx.push_back(std::make_pair(&builder_de2dx, &de2dx_interpolant_));
 
     Helper::InitializeInterpolation("dEdx", builder_container, std::vector<Parametrization*>(1, parametrization_), def);
-    Helper::InitializeInterpolation("dE2dx", builder_container_de2dx, std::vector<Parametrization*>(1, parametrization_), def);
+    Helper::InitializeInterpolation(
+        "dE2dx", builder_container_de2dx, std::vector<Parametrization*>(1, parametrization_), def);
 }
 
-BremsInterpolant::BremsInterpolant(const BremsInterpolant& brems): CrossSectionInterpolant(brems)
+BremsInterpolant::BremsInterpolant(const BremsInterpolant& brems)
+    : CrossSectionInterpolant(brems)
 {
 }
 
-BremsInterpolant::~BremsInterpolant()
-{
-}
+BremsInterpolant::~BremsInterpolant() {}
 
 // ----------------------------------------------------------------- //
 // Public methods

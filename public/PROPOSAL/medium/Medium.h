@@ -1,11 +1,11 @@
 /*! \file   Medium.h
-*   \brief  Header file for definition of the medium class object.
-*
-*   For more details see the class documentation.
-*
-*   \date   21.06.2010
-*   \author Jan-Hendrik Koehne
-*/
+ *   \brief  Header file for definition of the medium class object.
+ *
+ *   For more details see the class documentation.
+ *
+ *   \date   21.06.2010
+ *   \author Jan-Hendrik Koehne
+ */
 
 #pragma once
 
@@ -17,7 +17,7 @@
 #define MEDIUM_DEF(cls)                                                                                                \
     class cls : public MediumCopyable<Medium, cls>                                                                     \
     {                                                                                                                  \
-        public:                                                                                                        \
+    public:                                                                                                            \
         cls(double rho = 1.0);                                                                                         \
         cls(const Medium& medium)                                                                                      \
             : Medium(medium)                                                                                           \
@@ -29,15 +29,15 @@
 namespace PROPOSAL {
 
 /******************************************************************************
-*                                   Medium                                    *
-******************************************************************************/
+ *                                   Medium                                    *
+ ******************************************************************************/
 
 class Medium
 {
-    public:
+public:
     class Builder;
 
-    public:
+public:
     Medium() {}
     Medium(std::string name,
            double rho,
@@ -51,7 +51,10 @@ class Medium
            double massDensity,
            const std::vector<Components::Component*>&);
     Medium(const Medium&);
-    virtual Medium* clone() const { return new Medium(*this); }; // Prototyping/Virtual constructor idiom (used for deep copies)
+    virtual Medium* clone() const
+    {
+        return new Medium(*this);
+    }; // Prototyping/Virtual constructor idiom (used for deep copies)
 
     ///@brief Crush this Medium.
     virtual ~Medium();
@@ -63,7 +66,6 @@ class Medium
     bool operator==(const Medium& medium) const;
     bool operator!=(const Medium& medium) const;
     friend std::ostream& operator<<(std::ostream& os, Medium const& medium);
-
 
     // ----------------------------------------------------------------- //
     // Getter & Setter
@@ -110,8 +112,7 @@ class Medium
     void SetMM(double MM);
     void SetSumNucleons(double sumNucleons);
 
-    protected:
-
+protected:
     // Methods
     void init();
     double X0_inv(unsigned int Z, double M);
@@ -141,16 +142,15 @@ class Medium
 
     double MM_;          ///< average all-component nucleon weight
     double sumNucleons_; ///< sum of nucleons of all nuclei
-
 };
 
 /******************************************************************************
-*                                  Builder                                    *
-******************************************************************************/
+ *                                  Builder                                    *
+ ******************************************************************************/
 
 class Medium::Builder
 {
-    public:
+public:
     Builder();
 
     // --------------------------------------------------------------------- //
@@ -215,39 +215,24 @@ class Medium::Builder
 
     Builder& SetMedium(const Medium& var)
     {
-        name_ = var.GetName();
-        rho_ = var.GetDensityCorrection();
-        I_ = var.GetI();
-        C_ = var.GetC();
-        a_ = var.GetA();
-        m_ = var.GetM();
-        X0_ = var.GetX0();
-        X1_ = var.GetX1();
-        d0_ = var.GetD0();
+        name_        = var.GetName();
+        rho_         = var.GetDensityCorrection();
+        I_           = var.GetI();
+        C_           = var.GetC();
+        a_           = var.GetA();
+        m_           = var.GetM();
+        X0_          = var.GetX0();
+        X1_          = var.GetX1();
+        d0_          = var.GetD0();
         massDensity_ = var.GetMassDensity();
 
         components_ = var.GetComponents();
         return *this;
     }
 
-    Medium build()
-    {
-        return Medium(
-            name_,
-            rho_,
-            I_,
-            C_,
-            a_,
-            m_,
-            X0_,
-            X1_,
-            d0_,
-            massDensity_,
-            components_
-        );
-    }
+    Medium build() { return Medium(name_, rho_, I_, C_, a_, m_, X0_, X1_, d0_, massDensity_, components_); }
 
-    private:
+private:
     std::string name_;
     double rho_;
     double I_;
@@ -263,9 +248,8 @@ class Medium::Builder
 };
 
 /******************************************************************************
-*                               MediumCopyable                                *
-******************************************************************************/
-
+ *                               MediumCopyable                                *
+ ******************************************************************************/
 
 // ----------------------------------------------------------------------------
 /// @brief Template class for Medium
@@ -273,24 +257,18 @@ class Medium::Builder
 /// Provides a template to the assignment operator, clone & create
 // ----------------------------------------------------------------------------
 template<class Base, class Derived>
-class MediumCopyable: virtual public Base
+class MediumCopyable : virtual public Base
 {
-    public:
-    virtual Base* clone() const
-    {
-        return new Derived(static_cast<Derived> (*this));
-    }
+public:
+    virtual Base* clone() const { return new Derived(static_cast<Derived>(*this)); }
 
-    static  Base* create(double density_correction = 1.0)
-    {
-        return new Derived(density_correction);
-    }
+    static Base* create(double density_correction = 1.0) { return new Derived(density_correction); }
 
     Derived& operator=(const Medium& medium)
     {
         if (this != &medium)
         {
-            const Derived* med = static_cast<Derived const&>(&medium);  // Throws on bad cast.
+            const Derived* med = static_cast<Derived const&>(&medium); // Throws on bad cast.
 
             Derived tmp(*med);
             swap(tmp);
@@ -311,19 +289,17 @@ MEDIUM_DEF(Hydrogen)
 MEDIUM_DEF(Lead)
 MEDIUM_DEF(Copper)
 MEDIUM_DEF(Uranium)
-// MEDIUM_DEF(Air)
 MEDIUM_DEF(Paraffin)
-
 
 class Air : public MediumCopyable<Medium, Air>
 {
-    public:
-        static const double fraction_N;
-        static const double fraction_O;
-        static const double fraction_Ar;
-        static const double fraction_sum;
+public:
+    static const double fraction_N;
+    static const double fraction_O;
+    static const double fraction_Ar;
+    static const double fraction_sum;
 
-    public:
+public:
     Air(double rho = 1.0);
     Air(const Medium& medium)
         : Medium(medium)

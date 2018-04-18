@@ -7,76 +7,78 @@
 
 using namespace PROPOSAL;
 
-TEST(Comparison , Comparison_equal ) {
+TEST(Comparison, Comparison_equal)
+{
     EnergyCutSettings A;
     EnergyCutSettings B;
-    EXPECT_TRUE(A==B);
-    EnergyCutSettings* C = new EnergyCutSettings(100,0.01);
-    EnergyCutSettings* D = new EnergyCutSettings(100,0.01);
-    EXPECT_TRUE(*C==*D);
-    EnergyCutSettings* E = new EnergyCutSettings(500,0.05);
-    EXPECT_TRUE(A==*E);
-
+    EXPECT_TRUE(A == B);
+    EnergyCutSettings* C = new EnergyCutSettings(100, 0.01);
+    EnergyCutSettings* D = new EnergyCutSettings(100, 0.01);
+    EXPECT_TRUE(*C == *D);
+    EnergyCutSettings* E = new EnergyCutSettings(500, 0.05);
+    EXPECT_TRUE(A == *E);
 }
 
-TEST(Comparison , Comparison_not_equal ) {
+TEST(Comparison, Comparison_not_equal)
+{
     EnergyCutSettings A;
-    EnergyCutSettings B(200,0.09);
-    EXPECT_TRUE(A!=B);
-    EnergyCutSettings* C = new EnergyCutSettings(200,0.01);
-    EnergyCutSettings* D = new EnergyCutSettings(100,0.01);
-    EXPECT_TRUE(*C!=*D);
-
+    EnergyCutSettings B(200, 0.09);
+    EXPECT_TRUE(A != B);
+    EnergyCutSettings* C = new EnergyCutSettings(200, 0.01);
+    EnergyCutSettings* D = new EnergyCutSettings(100, 0.01);
+    EXPECT_TRUE(*C != *D);
 }
-TEST(Assignment , Copyconstructor ) {
+TEST(Assignment, Copyconstructor)
+{
     EnergyCutSettings A;
-    EnergyCutSettings B =A;
+    EnergyCutSettings B = A;
 
-    EXPECT_TRUE(A==B);
-
+    EXPECT_TRUE(A == B);
 }
 
-TEST(Assignment , Copyconstructor2 ) {
-    EnergyCutSettings A(5000,0.1);
+TEST(Assignment, Copyconstructor2)
+{
+    EnergyCutSettings A(5000, 0.1);
     EnergyCutSettings B(A);
 
-    EXPECT_TRUE(A==B);
-
+    EXPECT_TRUE(A == B);
 }
 
-TEST(Assignment , Operator ) {
+TEST(Assignment, Operator)
+{
     EnergyCutSettings A;
-    EnergyCutSettings B(200,0.01);
+    EnergyCutSettings B(200, 0.01);
 
-    EXPECT_TRUE(A!=B);
+    EXPECT_TRUE(A != B);
 
-    B=A;
+    B = A;
 
-    EXPECT_TRUE(A==B);
+    EXPECT_TRUE(A == B);
 
     A.SetEcut(300);
 
-    EXPECT_TRUE(A!=B);
+    EXPECT_TRUE(A != B);
 
-    B=A;
+    B = A;
 
-    EXPECT_TRUE(A==B);
+    EXPECT_TRUE(A == B);
 }
 
-TEST(Assignment , Swap ) {
+TEST(Assignment, Swap)
+{
     EnergyCutSettings A;
     EnergyCutSettings B;
-    EXPECT_TRUE(A==B);
-    EnergyCutSettings* C = new EnergyCutSettings(100,0.01);
-    EnergyCutSettings* D = new EnergyCutSettings(100,0.01);
-    EXPECT_TRUE(*C==*D);
+    EXPECT_TRUE(A == B);
+    EnergyCutSettings* C = new EnergyCutSettings(100, 0.01);
+    EnergyCutSettings* D = new EnergyCutSettings(100, 0.01);
+    EXPECT_TRUE(*C == *D);
     A.swap(*C);
-    EXPECT_TRUE(A==*D);
-    EXPECT_TRUE(B==*C);
-
+    EXPECT_TRUE(A == *D);
+    EXPECT_TRUE(B == *C);
 }
 
-int main(int argc, char **argv) {
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
+int main(int argc, char** argv)
+{
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }

@@ -6,7 +6,7 @@
 #define BREMSSTRAHLUNG_DEF(param)                                                                                      \
     class Brems##param : public Bremsstrahlung                                                                         \
     {                                                                                                                  \
-        public:                                                                                                        \
+    public:                                                                                                            \
         Brems##param(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier, bool lpm);        \
         Brems##param(const Brems##param&);                                                                             \
         ~Brems##param();                                                                                               \
@@ -25,14 +25,14 @@
                                                                                                                        \
         const std::string& GetName() const { return name_; }                                                           \
                                                                                                                        \
-        private:                                                                                                       \
+    private:                                                                                                           \
         static const std::string name_;                                                                                \
     };
 
 namespace PROPOSAL {
 class Bremsstrahlung : public Parametrization
 {
-    public:
+public:
     Bremsstrahlung(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier, bool lpm);
     Bremsstrahlung(const Bremsstrahlung&);
     virtual ~Bremsstrahlung();
@@ -54,8 +54,7 @@ class Bremsstrahlung : public Parametrization
 
     virtual size_t GetHash() const;
 
-    protected:
-
+protected:
     virtual bool compare(const Parametrization&) const;
     virtual void print(std::ostream&) const;
 
@@ -87,4 +86,4 @@ BREMSSTRAHLUNG_DEF(AndreevBezrukovBugaev)
 
 #undef BREMSSTRAHLUNG_DEF
 
-} /* PROPOSAL */
+} // namespace PROPOSAL

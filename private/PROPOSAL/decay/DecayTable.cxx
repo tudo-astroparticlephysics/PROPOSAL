@@ -1,11 +1,11 @@
 
 #include "PROPOSAL/decay/DecayTable.h"
+#include "PROPOSAL/Output.h"
 #include "PROPOSAL/decay/DecayChannel.h"
-#include "PROPOSAL/decay/StableChannel.h"
 #include "PROPOSAL/decay/LeptonicDecayChannel.h"
+#include "PROPOSAL/decay/StableChannel.h"
 #include "PROPOSAL/decay/TwoBodyPhaseSpace.h"
 #include "PROPOSAL/math/RandomGenerator.h"
-#include "PROPOSAL/Output.h"
 #include "PROPOSAL/methods.h"
 
 using namespace PROPOSAL;
@@ -45,13 +45,12 @@ DecayTable::~DecayTable()
     registered_str_.clear();
 }
 
-
 DecayTable& DecayTable::operator=(const DecayTable& table)
 {
     if (this != &table)
     {
-      DecayTable tmp(table);
-      swap(*this, tmp);
+        DecayTable tmp(table);
+        swap(*this, tmp);
     }
     return *this;
 }
@@ -67,8 +66,7 @@ bool DecayTable::operator==(const DecayTable& table) const
     if (channels_.size() != table.channels_.size())
     {
         return false;
-    }
-    else
+    } else
     {
         DecayMap::const_iterator i, j;
         for (i = channels_.begin(), j = table.channels_.begin(); i != channels_.end(); ++i, ++j)
@@ -76,8 +74,7 @@ bool DecayTable::operator==(const DecayTable& table) const
             if (i->first != j->first)
             {
                 return false;
-            }
-            else if (*i->second != *j->second)
+            } else if (*i->second != *j->second)
             {
                 return false;
             }
@@ -99,8 +96,12 @@ std::ostream& PROPOSAL::operator<<(std::ostream& os, DecayTable const& table)
 
     os << Helper::Centered(60, ss.str()) << '\n';
 
-    os << "Branching Ratio" << "\t\t"  << "Channel" << '\n';
-    for (DecayTable::DecayMap::const_iterator iter = table.channels_.begin(); iter != table.channels_.end(); ++iter) {
+    os << "Branching Ratio"
+       << "\t\t"
+       << "Channel" << '\n';
+
+    for (DecayTable::DecayMap::const_iterator iter = table.channels_.begin(); iter != table.channels_.end(); ++iter)
+    {
         os << iter->first << "\t\t" << iter->second->GetName() << '\n';
     }
 
@@ -117,7 +118,8 @@ DecayChannel& DecayTable::SelectChannel() const
     for (int i = 0; i < 1000; ++i)
     {
         double sumBranchingRatio = 0.0;
-        double random = RandomGenerator::Get().RandomDouble();
+        double random            = RandomGenerator::Get().RandomDouble();
+
         for (DecayMap::const_iterator iter = channels_.begin(); iter != channels_.end(); ++iter)
         {
             sumBranchingRatio += iter->first;
@@ -132,11 +134,12 @@ DecayChannel& DecayTable::SelectChannel() const
     log_fatal("No decay channel found. If your particle is stable, call \"SetStable\"!");
 }
 
+// ------------------------------------------------------------------------- //
 void DecayTable::SetStable()
 {
     clearTable();
 
-    //TODO(mario): Find better way Wed 2017/08/23
+    // TODO(mario): Find better way Wed 2017/08/23
     // A stable channel which alwas will be selected
     channels_[1.1] = new StableChannel();
 }
@@ -147,48 +150,6 @@ DecayTable& DecayTable::addChannel(double Br, const DecayChannel& dc)
     channels_[Br] = dc.clone();
     return *this;
 }
-
-// ------------------------------------------------------------------------- //
-// void DecayTable::addChannel(double Br, Mode mode, double parent_mass, const std::vector<double>& masses)
-// {
-//     for(unsigned int i = 0; i < masses.size(); ++i)
-//     {
-//         std::cout << masses[i] << std::endl;
-//     }
-//     std::vector<Mode>::const_iterator iter;
-//     iter = std::find(registered_mode_.begin(), registered_mode_.end(), mode);
-//
-//     if (iter != registered_mode_.end())
-//     {
-//         if (*iter == LeptonicDecay)
-//         {
-//             channels_[Br] = new LeptonicDecayChannel();
-//         }
-//         else if (*iter == TwoBodyDecay)
-//         {
-//             try
-//             {
-//                 channels_[Br] = new TwoBodyPhaseSpace(parent_mass, masses.at(0));
-//             }
-//             catch (const std::out_of_range& ex)
-//             {
-//                 log_fatal("No secondary masses are given!");
-//             }
-//         }
-//         else if (*iter == Stable)
-//         {
-//             channels_[Br] = new StableChannel();
-//         }
-//         else
-//         {
-//             log_fatal("DecayChannel %s not registerd!", typeid(mode).name());
-//         }
-//     }
-//     else
-//     {
-//         log_fatal("DecayChannel %s not registerd!", typeid(mode).name());
-//     }
-// }
 
 // ------------------------------------------------------------------------- //
 void DecayTable::clearTable()

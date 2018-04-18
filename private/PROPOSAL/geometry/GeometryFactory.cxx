@@ -2,10 +2,10 @@
 #include <boost/algorithm/string.hpp>
 
 #include "PROPOSAL/Output.h"
-#include "PROPOSAL/geometry/GeometryFactory.h"
-#include "PROPOSAL/geometry/Sphere.h"
 #include "PROPOSAL/geometry/Box.h"
 #include "PROPOSAL/geometry/Cylinder.h"
+#include "PROPOSAL/geometry/GeometryFactory.h"
+#include "PROPOSAL/geometry/Sphere.h"
 
 using namespace PROPOSAL;
 
@@ -27,11 +27,6 @@ void GeometryFactory::Register(const std::string& name, const Enum& num, Registe
     geometry_map_str[name] = create;
     geometry_map_enum[num] = create;
 }
-
-// void GeometryFactory::Register(GeometryModel::Enum model, RegisterFunction create)
-// {
-//     geometry_map[model] = create;
-// }
 
 Geometry* GeometryFactory::CreateGeometry(const std::string& name)
 {
@@ -70,8 +65,7 @@ Geometry* GeometryFactory::CreateGeometry(const Definition& def)
         sphere->SetPosition(def.position);
         sphere->SetRadius(def.radius);
         sphere->SetInnerRadius(def.inner_radius);
-    }
-    else if (PROPOSAL::Box* box = dynamic_cast<PROPOSAL::Box*>(geometry))
+    } else if (PROPOSAL::Box* box = dynamic_cast<PROPOSAL::Box*>(geometry))
     {
         box->SetPosition(def.position);
         box->SetX(def.width);
@@ -84,8 +78,7 @@ Geometry* GeometryFactory::CreateGeometry(const Definition& def)
         cylinder->SetPosition(def.position);
         cylinder->SetRadius(def.radius);
         cylinder->SetInnerRadius(def.inner_radius);
-    }
-    else
+    } else
     {
         log_fatal("Geometry %s not registerd!", typeid(geometry).name());
     }

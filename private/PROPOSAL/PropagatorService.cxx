@@ -28,8 +28,7 @@ void PropagatorService::RegisterPropagator(const Propagator& propagator)
     if (propagator_map_.find(particle_def) != propagator_map_.end())
     {
         log_warn("Propagator for particle %s is already registered!", particle_def.name.c_str());
-    }
-    else
+    } else
     {
         propagator_map_[particle_def] = new Propagator(propagator);
     }
@@ -72,10 +71,10 @@ std::vector<DynamicData*> PropagatorService::Propagate(Particle& particle)
         particle.SetElost(prop_particle.GetElost());
 
         return secondaries;
-    }
-    else
+    } else
     {
-        log_warn("Propagator for particle %s not found! Empty secondary vector will be returned!", particle_def.name.c_str());
+        log_warn("Propagator for particle %s not found! Empty secondary vector will be returned!",
+                 particle_def.name.c_str());
         return std::vector<DynamicData*>();
     }
 }

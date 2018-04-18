@@ -1,6 +1,6 @@
 
-#include <iostream>
 #include <cmath>
+#include <iostream>
 
 #include "PROPOSAL/decay/DecayChannel.h"
 #include "PROPOSAL/particle/Particle.h"
@@ -8,23 +8,17 @@
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/math/Vector3D.h"
 
-#include "PROPOSAL/methods.h"
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Output.h"
+#include "PROPOSAL/methods.h"
 
 using namespace PROPOSAL;
 
-DecayChannel::DecayChannel()
-{
-}
+DecayChannel::DecayChannel() {}
 
-DecayChannel::DecayChannel(const DecayChannel&)
-{
-}
+DecayChannel::DecayChannel(const DecayChannel&) {}
 
-DecayChannel::~DecayChannel()
-{
-}
+DecayChannel::~DecayChannel() {}
 
 bool DecayChannel::operator==(const DecayChannel& table) const
 {
@@ -59,7 +53,7 @@ void DecayChannel::Boost(Particle& particle, const Vector3D& direction_unnormali
 
     double gamma = 1.0 / std::sqrt(1.0 - beta * beta);
 
-    Vector3D momentum_vec(particle.GetMomentum()*particle.GetDirection());
+    Vector3D momentum_vec(particle.GetMomentum() * particle.GetDirection());
 
     double direction_correction =
         (gamma - 1.0) * scalar_product(momentum_vec, direction) - gamma * beta * particle.GetEnergy();
@@ -85,13 +79,12 @@ void DecayChannel::Boost(DecayProducts& products, const Vector3D& direction, dou
 // ------------------------------------------------------------------------- //
 double DecayChannel::Momentum(double m1, double m2, double m3)
 {
-    double kaellen = (m1 - m2 - m3)*(m1 + m2 + m3)*(m1 - m2 + m3)*(m1 + m2 - m3);
+    double kaellen = (m1 - m2 - m3) * (m1 + m2 + m3) * (m1 - m2 + m3) * (m1 + m2 - m3);
 
     if (kaellen > 0.0)
     {
         return std::sqrt(kaellen) / (2.0 * m1);
-    }
-    else
+    } else
     {
         log_fatal("Kaellen function is negative. Cannot caluclate momentum");
     }

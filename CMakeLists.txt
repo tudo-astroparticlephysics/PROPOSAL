@@ -8,3 +8,6 @@ IF(I3_PROJECTS)
 ELSE(I3_PROJECTS)
     include(cmake/Standalone_CMakeLists.cmake)
 ENDIF(I3_PROJECTS)
+
+# Just for auto formating code
+include(cmake/clang_cxx_dev_tools.cmake)

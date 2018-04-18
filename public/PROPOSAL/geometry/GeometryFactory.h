@@ -6,13 +6,11 @@
 
 #include "PROPOSAL/geometry/Geometry.h"
 
-namespace PROPOSAL
-{
+namespace PROPOSAL {
 
 class GeometryFactory
 {
-    public:
-
+public:
     enum Enum
     {
         Sphere = 0,
@@ -42,7 +40,7 @@ class GeometryFactory
         double depth;
     };
 
-    typedef boost::function<Geometry* (void)> RegisterFunction;
+    typedef boost::function<Geometry*(void)> RegisterFunction;
     typedef std::map<std::string, RegisterFunction> GeometryMapString;
     typedef std::map<Enum, RegisterFunction> GeometryMapEnum;
 
@@ -58,15 +56,12 @@ class GeometryFactory
         return instance;
     }
 
-    private:
+private:
     GeometryFactory();
     ~GeometryFactory();
 
     GeometryMapString geometry_map_str;
     GeometryMapEnum geometry_map_enum;
-    // GeometryMapPTree geometry_map_ptree;
-    // ScatteringMapEnum scattering_map_enum_;
 };
 
-} /* PROPOSAL */
-
+} // namespace PROPOSAL

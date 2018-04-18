@@ -1,11 +1,11 @@
 /*! \file   Medium.cxx
-*   \brief  Source file for the medium routines.
-*
-*   For more details see the class documentation.
-*
-*   \date   2013.03.14
-*   \author Jan-Hendrik Koehne
-*/
+ *   \brief  Source file for the medium routines.
+ *
+ *   For more details see the class documentation.
+ *
+ *   \date   2013.03.14
+ *   \author Jan-Hendrik Koehne
+ */
 
 #include <cmath>
 
@@ -13,17 +13,17 @@
 #include <boost/assign.hpp>
 
 #include "PROPOSAL/Constants.h"
+#include "PROPOSAL/Output.h"
 #include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/medium/Medium.h"
-#include "PROPOSAL/Output.h"
 #include "PROPOSAL/methods.h"
 
 using namespace std;
 using namespace PROPOSAL;
 
 /******************************************************************************
-*                                  OStream                                    *
-******************************************************************************/
+ *                                  OStream                                    *
+ ******************************************************************************/
 
 namespace PROPOSAL {
 
@@ -60,10 +60,9 @@ ostream& operator<<(ostream& os, Medium const& medium)
 
 } // namespace PROPOSAL
 
-
 /******************************************************************************
-*                                   Medium                                    *
-******************************************************************************/
+ *                                   Medium                                    *
+ ******************************************************************************/
 
 // Medium::Medium(std::string name,
 //                double rho,
@@ -188,9 +187,7 @@ Medium::Medium(const Medium& medium)
 // ------------------------------------------------------------------------- //
 Medium::~Medium()
 {
-    for (std::vector<Components::Component*>::iterator iter = components_.begin();
-         iter != components_.end();
-         ++iter)
+    for (std::vector<Components::Component*>::iterator iter = components_.begin(); iter != components_.end(); ++iter)
     {
         delete (*iter);
     }
@@ -237,25 +234,25 @@ Medium& Medium::operator=(const Medium& medium)
 {
     if (this != &medium)
     {
-        numComponents_ = medium.numComponents_;
-        components_ = medium.components_;
-        ZA_ = medium.ZA_;
-        I_ = medium.I_;
-        C_ = medium.C_;
-        a_ = medium.a_;
-        m_ = medium.m_;
-        X0_ = medium.X0_;
-        X1_ = medium.X1_;
-        d0_ = medium.d0_;
-        rho_ = medium.rho_;
-        massDensity_ = medium.massDensity_;
-        molDensity_ = medium.molDensity_;
+        numComponents_   = medium.numComponents_;
+        components_      = medium.components_;
+        ZA_              = medium.ZA_;
+        I_               = medium.I_;
+        C_               = medium.C_;
+        a_               = medium.a_;
+        m_               = medium.m_;
+        X0_              = medium.X0_;
+        X1_              = medium.X1_;
+        d0_              = medium.d0_;
+        rho_             = medium.rho_;
+        massDensity_     = medium.massDensity_;
+        molDensity_      = medium.molDensity_;
         radiationLength_ = medium.radiationLength_;
-        ecut_ = medium.ecut_;
-        vcut_ = medium.vcut_;
-        vCut_ = medium.vCut_;
-        MM_ = medium.MM_;
-        sumNucleons_ = medium.sumNucleons_;
+        ecut_            = medium.ecut_;
+        vcut_            = medium.vcut_;
+        vCut_            = medium.vCut_;
+        MM_              = medium.MM_;
+        sumNucleons_     = medium.sumNucleons_;
 
         components_.clear();
         components_.resize(numComponents_);
@@ -350,34 +347,28 @@ void Medium::init()
     numComponents_ = components_.size();
     massDensity_ *= rho_;
 
-    for (std::vector<Components::Component*>::iterator iter = components_.begin();
-         iter != components_.end();
-         ++iter)
+    for (std::vector<Components::Component*>::iterator iter = components_.begin(); iter != components_.end(); ++iter)
     {
         aux1 += (*iter)->GetAtomInMolecule() * (*iter)->GetNucCharge();
         aux2 += (*iter)->GetAtomInMolecule() * (*iter)->GetAtomicNum();
-        aux3 += (*iter)->GetAtomInMolecule() * (*iter)->GetAtomicNum() *
-                (*iter)->GetAverageNucleonWeight();
+        aux3 += (*iter)->GetAtomInMolecule() * (*iter)->GetAtomicNum() * (*iter)->GetAverageNucleonWeight();
     }
 
-    sumCharge_ = aux1;
+    sumCharge_   = aux1;
     sumNucleons_ = aux2;
-    ZA_ = aux1 / aux2;
-    molDensity_ = massDensity_ * NA / aux2;
-    MM_ = aux3 / aux2;
+    ZA_          = aux1 / aux2;
+    molDensity_  = massDensity_ * NA / aux2;
+    MM_          = aux3 / aux2;
 
     // TODO: this is never used; is that art or deletable
     r_ = 1.31; // only for ice - change if needed (sea water: 1.35)
-
 
     // TODO: Compare to Bremsstrahlung::CalculateScatteringX0; just one (this or the Brems-thing) is needed
     // Calculation of the radiation length
     aux1 = 0;
     aux2 = 0;
 
-    for (std::vector<Components::Component*>::iterator iter = components_.begin();
-         iter != components_.end();
-         ++iter)
+    for (std::vector<Components::Component*>::iterator iter = components_.begin(); iter != components_.end(); ++iter)
     {
         aux1 += X0_inv((*iter)->GetNucCharge(), (*iter)->GetAtomicNum()) *
                 ((*iter)->GetAtomInMolecule() * (*iter)->GetAtomicNum());
@@ -469,8 +460,8 @@ void Medium::SetSumNucleons(double sumNucleons)
 }
 
 /******************************************************************************
-*                                  Builder                                    *
-******************************************************************************/
+ *                                  Builder                                    *
+ ******************************************************************************/
 
 Medium::Builder::Builder()
     : name_("")
@@ -487,8 +478,8 @@ Medium::Builder::Builder()
 }
 
 /******************************************************************************
-*                              Different Media                                *
-******************************************************************************/
+ *                              Different Media                                *
+ ******************************************************************************/
 
 Water::Water(double rho)
     : Medium("water",
@@ -548,7 +539,8 @@ CalciumCarbonate::CalciumCarbonate(double rho)
              3.0549,  // X1
              0,       // d0
              2.650,   // massDensity
-             boost::assign::list_of<Components::Component*>(new Components::Calcium())(new Components::Carbon())(new Components::Oxygen(3)))
+             boost::assign::list_of<Components::Component*>(new Components::Calcium())(new Components::Carbon())(
+                 new Components::Oxygen(3)))
 {
 }
 
@@ -657,9 +649,9 @@ Uranium::Uranium(double rho)
 {
 }
 
-const double Air::fraction_N = 2 * 78.1;
-const double Air::fraction_O = 2 * 21.0;
-const double Air::fraction_Ar = 0.9;
+const double Air::fraction_N   = 2 * 78.1;
+const double Air::fraction_O   = 2 * 21.0;
+const double Air::fraction_Ar  = 0.9;
 const double Air::fraction_sum = Air::fraction_N + Air::fraction_O + Air::fraction_Ar;
 
 Air::Air(double rho)
@@ -673,25 +665,24 @@ Air::Air(double rho)
              4.2759,   // X1
              0,        // d0
              1.205e-3, // dry, 1 atm massDensity
-             boost::assign::list_of<Components::Component*>
-             (new Components::Nitrogen(fraction_N / fraction_sum))
-             (new Components::Oxygen(fraction_O / fraction_sum))
-             (new Components::Argon(fraction_Ar / fraction_sum)))
+             boost::assign::list_of<Components::Component*>(new Components::Nitrogen(fraction_N / fraction_sum))(
+                 new Components::Oxygen(fraction_O / fraction_sum))(new Components::Argon(fraction_Ar / fraction_sum)))
 {
 }
 
 Paraffin::Paraffin(double rho)
-    : Medium("paraffin",
-             rho,
-             55.9,    // I
-             -2.9551, // C
-             0.1209,  // a
-             3.4288,  // m
-             0.1289,  // X0
-             2.5084,  // X1
-             0,       // d0
-             0.93,    // massDensity
-             boost::assign::list_of<Components::Component*>(new Components::Carbon(25.0))(new Components::Hydrogen(52.0)))
+    : Medium(
+          "paraffin",
+          rho,
+          55.9,    // I
+          -2.9551, // C
+          0.1209,  // a
+          3.4288,  // m
+          0.1289,  // X0
+          2.5084,  // X1
+          0,       // d0
+          0.93,    // massDensity
+          boost::assign::list_of<Components::Component*>(new Components::Carbon(25.0))(new Components::Hydrogen(52.0)))
 {
 }
 
@@ -706,15 +697,10 @@ AntaresWater::AntaresWater(double rho)
              2.8004,  // X1
              0,       // d0
              1.03975, // massDensity
-             boost::assign::list_of<Components::Component*>
-            (new Components::Hydrogen(2.0))
-            (new Components::Oxygen(1.00884))
-            (new Components::Sodium(0.00943))
-            (new Components::Potassium(0.000209))
-            (new Components::Magnesium(0.001087))
-            (new Components::Calcium(0.000209))
-            (new Components::Chlorine(0.01106))
-            (new Components::Sulfur(0.00582)))
+             boost::assign::list_of<Components::Component*>(new Components::Hydrogen(2.0))(
+                 new Components::Oxygen(1.00884))(new Components::Sodium(0.00943))(new Components::Potassium(0.000209))(
+                 new Components::Magnesium(0.001087))(new Components::Calcium(0.000209))(
+                 new Components::Chlorine(0.01106))(new Components::Sulfur(0.00582)))
 {
     //  Chemical composition of the seawater
     //  according to
@@ -737,46 +723,42 @@ AntaresWater::AntaresWater(double rho)
 }
 
 /******************************************************************************
-*                        private Helper Funcitons                             *
-******************************************************************************/
+ *                        private Helper Funcitons                             *
+ ******************************************************************************/
 
 double Medium::X0_inv(unsigned int Z, double M)
 {
-    double a_sq = 0.;
-    double fZ = 0.;
-    double Lrad = 0.;
+    double a_sq      = 0.;
+    double fZ        = 0.;
+    double Lrad      = 0.;
     double Lrad_dash = 0.;
 
     a_sq = ALPHA * ALPHA * Z * Z;
-    fZ = a_sq * (1. / (1. + a_sq) + 0.20206 - 0.0369 * a_sq + 0.0083 * a_sq * a_sq
-        - 0.002 * a_sq * a_sq * a_sq);
+    fZ   = a_sq * (1. / (1. + a_sq) + 0.20206 - 0.0369 * a_sq + 0.0083 * a_sq * a_sq - 0.002 * a_sq * a_sq * a_sq);
 
     // Get radiation logarithm from Tsai (Rev.Mod.Phys.46)
     if (Z > 4) // Elements Z>4
     {
         // Thomas-Fermi-Moliere model (Tsai eq. B21)
-        Lrad = log(184.15 * pow(Z, -1. / 3.));
+        Lrad      = log(184.15 * pow(Z, -1. / 3.));
         Lrad_dash = log(1194. * pow(Z, -2. / 3.));
     }
     // Tsai table B2
     else if (Z == 1) // Hydrogen
     {
-        Lrad = 5.31;
+        Lrad      = 5.31;
         Lrad_dash = 6.144;
-    }
-    else if (Z == 2) // Helium
+    } else if (Z == 2) // Helium
     {
-        Lrad = 4.79;
+        Lrad      = 4.79;
         Lrad_dash = 5.621;
-    }
-    else if (Z == 3) // Lithium
+    } else if (Z == 3) // Lithium
     {
-        Lrad = 4.74;
+        Lrad      = 4.74;
         Lrad_dash = 5.805;
-    }
-    else if (Z == 4) //Beryllium
+    } else if (Z == 4) // Beryllium
     {
-        Lrad = 4.71;
+        Lrad      = 4.71;
         Lrad_dash = 5.924;
     }
     // Bremsstrahlung complete screening case

@@ -1,16 +1,15 @@
 
 #pragma once
 
-#include <boost/function.hpp>
 #include <boost/bimap.hpp>
+#include <boost/function.hpp>
 
 #include <map>
 #include <string>
 
 #include "PROPOSAL/methods.h"
 
-namespace  PROPOSAL
-{
+namespace PROPOSAL {
 
 class CrossSection;
 class Bremsstrahlung;
@@ -20,8 +19,7 @@ class Medium;
 
 class BremsstrahlungFactory
 {
-    public:
-
+public:
     // --------------------------------------------------------------------- //
     // Declare usable enums
     // --------------------------------------------------------------------- //
@@ -56,8 +54,8 @@ class BremsstrahlungFactory
         Bremsstrahlung*(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier, bool lpm)>
         RegisterFunction;
 
-    typedef std::map<std::string, RegisterFunction > BremsstrahlungMapString;
-    typedef std::map<Enum, RegisterFunction > BremsstrahlungMapEnum;
+    typedef std::map<std::string, RegisterFunction> BremsstrahlungMapString;
+    typedef std::map<Enum, RegisterFunction> BremsstrahlungMapEnum;
     typedef boost::bimap<std::string, Enum> BimapStringEnum;
 
     // --------------------------------------------------------------------- //
@@ -85,7 +83,6 @@ class BremsstrahlungFactory
     // ----------------------------------------------------------------------------
     std::string GetStringFromEnum(const Enum&);
 
-
     // --------------------------------------------------------------------- //
     // Singleton pattern
     // --------------------------------------------------------------------- //
@@ -96,7 +93,7 @@ class BremsstrahlungFactory
         return instance;
     }
 
-    private:
+private:
     BremsstrahlungFactory();
     ~BremsstrahlungFactory();
 
@@ -114,5 +111,4 @@ class BremsstrahlungFactory
     BimapStringEnum string_enum_;
 };
 
-} /*  PROPOSAL */
-
+} // namespace PROPOSAL

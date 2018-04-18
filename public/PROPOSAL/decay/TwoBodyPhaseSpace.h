@@ -6,14 +6,13 @@
 #include "PROPOSAL/decay/DecayChannel.h"
 #include "PROPOSAL/particle/ParticleDef.h"
 
-namespace PROPOSAL
-{
+namespace PROPOSAL {
 
 class Particle;
 
 class TwoBodyPhaseSpace : public DecayChannel
 {
-    public:
+public:
     TwoBodyPhaseSpace(const ParticleDef&, const ParticleDef&);
     TwoBodyPhaseSpace(const TwoBodyPhaseSpace& mode);
     virtual ~TwoBodyPhaseSpace();
@@ -24,7 +23,7 @@ class TwoBodyPhaseSpace : public DecayChannel
 
     const std::string& GetName() const { return name_; }
 
-    private:
+private:
     TwoBodyPhaseSpace& operator=(const TwoBodyPhaseSpace&); // Undefined & not allowed
 
     bool compare(const DecayChannel&) const;
@@ -36,5 +35,4 @@ class TwoBodyPhaseSpace : public DecayChannel
     static const std::string name_;
 };
 
-} /* PROPOSAL */
-
+} // namespace PROPOSAL

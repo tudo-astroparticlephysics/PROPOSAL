@@ -1,16 +1,15 @@
 
 #pragma once
 
-#include <boost/function.hpp>
 #include <boost/bimap.hpp>
+#include <boost/function.hpp>
 
 #include <map>
 #include <string>
 
 #include "PROPOSAL/methods.h"
 
-namespace  PROPOSAL
-{
+namespace PROPOSAL {
 
 class CrossSection;
 class RealPhoton;
@@ -22,8 +21,7 @@ class Medium;
 
 class PhotonuclearFactory
 {
-    public:
-
+public:
     // --------------------------------------------------------------------- //
     // Declare usable enums
     // --------------------------------------------------------------------- //
@@ -68,23 +66,33 @@ class PhotonuclearFactory
 
     typedef boost::function<ShadowEffect*(void)> RegisterShadowEffectFunction;
 
-    typedef boost::function<
-        Photonuclear*(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier, bool hard_component)>
+    typedef boost::function<Photonuclear*(const ParticleDef&,
+                                          const Medium&,
+                                          const EnergyCutSettings&,
+                                          double multiplier,
+                                          bool hard_component)>
         RegisterRealPhotonFunction;
 
-    typedef boost::function<
-        Photonuclear*(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier, const ShadowEffect&)>
+    typedef boost::function<Photonuclear*(const ParticleDef&,
+                                          const Medium&,
+                                          const EnergyCutSettings&,
+                                          double multiplier,
+                                          const ShadowEffect&)>
         RegisterQ2Function;
 
-    typedef boost::function<
-        Photonuclear*(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier, const ShadowEffect&, InterpolationDef)>
+    typedef boost::function<Photonuclear*(const ParticleDef&,
+                                          const Medium&,
+                                          const EnergyCutSettings&,
+                                          double multiplier,
+                                          const ShadowEffect&,
+                                          InterpolationDef)>
         RegisterQ2FunctionInterpolant;
 
-    typedef std::map<std::string, RegisterShadowEffectFunction > PhotoShadowEffectMapString;
-    typedef std::map<Shadow, RegisterShadowEffectFunction > PhotoShadowEffectMapEnum;
+    typedef std::map<std::string, RegisterShadowEffectFunction> PhotoShadowEffectMapString;
+    typedef std::map<Shadow, RegisterShadowEffectFunction> PhotoShadowEffectMapEnum;
 
-    typedef std::map<std::string, RegisterRealPhotonFunction > PhotoRealPhotonMapString;
-    typedef std::map<Enum, RegisterRealPhotonFunction > PhotoRealPhotonMapEnum;
+    typedef std::map<std::string, RegisterRealPhotonFunction> PhotoRealPhotonMapString;
+    typedef std::map<Enum, RegisterRealPhotonFunction> PhotoRealPhotonMapEnum;
 
     typedef std::map<std::string, std::pair<RegisterQ2Function, RegisterQ2FunctionInterpolant> > PhotoQ2MapString;
     typedef std::map<Enum, std::pair<RegisterQ2Function, RegisterQ2FunctionInterpolant> > PhotoQ2MapEnum;
@@ -144,7 +152,7 @@ class PhotonuclearFactory
         return instance;
     }
 
-    private:
+private:
     PhotonuclearFactory();
     ~PhotonuclearFactory();
 
@@ -188,5 +196,4 @@ class PhotonuclearFactory
     BimapStringShadowEnum string_shadow_enum_;
 };
 
-} /*  PROPOSAL */
-
+} // namespace PROPOSAL

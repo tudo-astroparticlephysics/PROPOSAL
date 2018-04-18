@@ -7,12 +7,12 @@
  */
 
 #include <boost/assign.hpp>
-#include <boost/foreach.hpp>
-#include <boost/bind.hpp>
 #include <boost/bimap.hpp>
+#include <boost/bind.hpp>
+#include <boost/foreach.hpp>
 
-#include "PROPOSAL-icetray/SimplePropagator.h"
 #include "PROPOSAL-icetray/Converter.h"
+#include "PROPOSAL-icetray/SimplePropagator.h"
 
 #include "PROPOSAL/Output.h"
 
@@ -41,65 +41,65 @@ using namespace PROPOSAL;
 // }
 
 SimplePropagator::SimplePropagator(I3Particle::ParticleType pt,
-                                   const std::string& medium, double ecut,
-                                   double vcut, double rho)
+                                   const std::string& medium,
+                                   double ecut,
+                                   double vcut,
+                                   double rho)
 {
-  std::ostringstream prefix;
-  prefix << getenv("I3_BUILD") << "/MuonGun/resources/tables/icecube";
+    std::ostringstream prefix;
+    prefix << getenv("I3_BUILD") << "/MuonGun/resources/tables/icecube";
 
-  // Sector definition
+    // Sector definition
 
-  PROPOSAL::SectorFactory::Definition sec_def;
+    PROPOSAL::SectorFactory::Definition sec_def;
 
-  sec_def.stopping_decay = true;
-  sec_def.scattering_model = PROPOSAL::ScatteringFactory::Moliere;
-  sec_def.do_exact_time_calculation = true;
-  sec_def.do_continuous_randomization = ecut < 0;
+    sec_def.stopping_decay              = true;
+    sec_def.scattering_model            = PROPOSAL::ScatteringFactory::Moliere;
+    sec_def.do_exact_time_calculation   = true;
+    sec_def.do_continuous_randomization = ecut < 0;
 
-  // Medium
+    // Medium
 
-  sec_def.medium_def.type = PROPOSAL::MediumFactory::Get().GetEnumFromString(medium);
-  sec_def.medium_def.density_correction = rho;
+    sec_def.medium_def.type               = PROPOSAL::MediumFactory::Get().GetEnumFromString(medium);
+    sec_def.medium_def.density_correction = rho;
 
-  // Geometry
+    // Geometry
 
-  PROPOSAL::Vector3D position(0.0, 0.0, 0.0);
+    PROPOSAL::Vector3D position(0.0, 0.0, 0.0);
 
-  PROPOSAL::Sphere detector(position, 0.0, 1e18);
+    PROPOSAL::Sphere detector(position, 0.0, 1e18);
 
-  sec_def.geometry_def.shape = PROPOSAL::GeometryFactory::Sphere;
-  sec_def.geometry_def.position = position;
-  sec_def.geometry_def.inner_radius = 0.0;
-  sec_def.geometry_def.radius = 1e18;
+    sec_def.geometry_def.shape        = PROPOSAL::GeometryFactory::Sphere;
+    sec_def.geometry_def.position     = position;
+    sec_def.geometry_def.inner_radius = 0.0;
+    sec_def.geometry_def.radius       = 1e18;
 
-  // Cuts
+    // Cuts
 
-  sec_def.e_cut = ecut;
-  sec_def.v_cut = vcut;
+    sec_def.e_cut = ecut;
+    sec_def.v_cut = vcut;
 
-  // Parametrizations
+    // Parametrizations
 
-  sec_def.utility_def.brems_def.parametrization =
-      PROPOSAL::BremsstrahlungFactory::KelnerKokoulinPetrukhin;
+    sec_def.utility_def.brems_def.parametrization = PROPOSAL::BremsstrahlungFactory::KelnerKokoulinPetrukhin;
 
-  sec_def.utility_def.photo_def.parametrization =
-      PROPOSAL::PhotonuclearFactory::AbramowiczLevinLevyMaor97;
+    sec_def.utility_def.photo_def.parametrization = PROPOSAL::PhotonuclearFactory::AbramowiczLevinLevyMaor97;
 
-  sec_def.utility_def.epair_def.lpm_effect = true;
-  sec_def.utility_def.brems_def.lpm_effect = true;
+    sec_def.utility_def.epair_def.lpm_effect = true;
+    sec_def.utility_def.brems_def.lpm_effect = true;
 
-  // Interpolation
+    // Interpolation
 
-  PROPOSAL::InterpolationDef interpolation_def;
-  interpolation_def.path_to_tables = prefix.str();
+    PROPOSAL::InterpolationDef interpolation_def;
+    interpolation_def.path_to_tables = prefix.str();
 
-  // Init new propagator
+    // Init new propagator
 
-  //TODO(mario): Check for muon, tau Mon 2017/11/06
-  propagator_ = new PROPOSAL::Propagator(
-      PROPOSAL::MuMinusDef::Get(),
-      boost::assign::list_of<PROPOSAL::SectorFactory::Definition>(sec_def),
-      detector, interpolation_def);
+    // TODO(mario): Check for muon, tau Mon 2017/11/06
+    propagator_ = new PROPOSAL::Propagator(PROPOSAL::MuMinusDef::Get(),
+                                           boost::assign::list_of<PROPOSAL::SectorFactory::Definition>(sec_def),
+                                           detector,
+                                           interpolation_def);
 }
 
 SimplePropagator::~SimplePropagator()
@@ -107,16 +107,14 @@ SimplePropagator::~SimplePropagator()
     delete propagator_;
 }
 
-void
-SimplePropagator::SetSeed(int seed)
+void SimplePropagator::SetSeed(int seed)
 {
     PROPOSAL::RandomGenerator::Get().SetSeed(seed);
 }
 
-void
-SimplePropagator::SetRandomNumberGenerator(I3RandomServicePtr rng)
+void SimplePropagator::SetRandomNumberGenerator(I3RandomServicePtr rng)
 {
-    boost::function<double ()> f = boost::bind(&I3RandomService::Uniform, rng, 0, 1);
+    boost::function<double()> f = boost::bind(&I3RandomService::Uniform, rng, 0, 1);
     PROPOSAL::RandomGenerator::Get().SetRandomNumberGenerator(f);
 }
 
@@ -152,7 +150,6 @@ SimplePropagator::SetRandomNumberGenerator(I3RandomServicePtr rng)
 //     (I3Particle::PPlus,     "PPlus")
 //     (I3Particle::PMinus,    "PMinus");
 
-
 // ------------------------------------------------------------------------- //
 // ParticleType::Enum SimplePropagator::GeneratePROPOSALType(const I3Particle& p)
 // {
@@ -182,8 +179,9 @@ SimplePropagator::SetRandomNumberGenerator(I3RandomServicePtr rng)
 //
 //         I3Particle::ParticleType ptype_I3;
 //
-//         bimap_ParticleType::right_const_iterator proposal_iterator = I3_PROPOSAL_ParticleType_bimap.right.find(particle_def.name);
-//         if (proposal_iterator == I3_PROPOSAL_ParticleType_bimap.right.end())
+//         bimap_ParticleType::right_const_iterator proposal_iterator =
+//         I3_PROPOSAL_ParticleType_bimap.right.find(particle_def.name); if (proposal_iterator ==
+//         I3_PROPOSAL_ParticleType_bimap.right.end())
 //         {
 //             log_fatal("The PROPOSALParticle '%s' can not be converted to a I3Particle", particle_def.name.c_str());
 //         }
@@ -204,56 +202,57 @@ SimplePropagator::SetRandomNumberGenerator(I3RandomServicePtr rng)
 
 I3Particle SimplePropagator::to_I3Particle(const PROPOSAL::DynamicData& pp)
 {
-	I3Particle p;
+    I3Particle p;
 
     double x = pp.GetPosition().GetX() * I3Units::cm;
     double y = pp.GetPosition().GetY() * I3Units::cm;
     double z = pp.GetPosition().GetZ() * I3Units::cm;
 
     double theta = pp.GetDirection().GetTheta() * I3Units::degree;
-    double phi = pp.GetDirection().GetPhi() * I3Units::degree;
+    double phi   = pp.GetDirection().GetPhi() * I3Units::degree;
 
     p.SetPos(x, y, z);
     p.SetThetaPhi(theta, phi);
     p.SetLength(pp.GetPropagatedDistance() * I3Units::cm);
     p.SetTime(pp.GetTime() * I3Units::second);
 
-	p.SetType(I3PROPOSALParticleConverter::GenerateI3Type(pp));
+    p.SetType(I3PROPOSALParticleConverter::GenerateI3Type(pp));
     p.SetLocationType(I3Particle::InIce);
-    p.SetEnergy(pp.GetEnergy()*I3Units::MeV);
+    p.SetEnergy(pp.GetEnergy() * I3Units::MeV);
 
-	return p;
+    return p;
 }
 
-I3Particle
-SimplePropagator::propagate(const I3Particle &p, double distance, boost::shared_ptr<std::vector<I3Particle> > losses)
+I3Particle SimplePropagator::propagate(const I3Particle& p,
+                                       double distance,
+                                       boost::shared_ptr<std::vector<I3Particle> > losses)
 {
-	I3Particle endpoint(p);
+    I3Particle endpoint(p);
 
     double x, y, z, theta, phi = 0.0;
 
     PROPOSAL::Particle pp = propagator_->GetParticle();
     pp.SetParentParticleId(0);
     pp.SetParticleId(0);
-    pp.SetTime(p.GetTime()/I3Units::second);
+    pp.SetTime(p.GetTime() / I3Units::second);
 
     x = p.GetPos().GetX() / I3Units::cm;
     y = p.GetPos().GetY() / I3Units::cm;
     z = p.GetPos().GetZ() / I3Units::cm;
 
     pp.SetPosition(PROPOSAL::Vector3D(x, y, z));
-    pp.SetEnergy(p.GetEnergy()/I3Units::MeV);
+    pp.SetEnergy(p.GetEnergy() / I3Units::MeV);
 
-    propagator_->Propagate(distance/I3Units::cm);
+    propagator_->Propagate(distance / I3Units::cm);
 
-	endpoint.SetEnergy(pp.GetEnergy()*I3Units::MeV);
+    endpoint.SetEnergy(pp.GetEnergy() * I3Units::MeV);
 
     x = pp.GetPosition().GetX() * I3Units::cm;
     y = pp.GetPosition().GetY() * I3Units::cm;
     z = pp.GetPosition().GetZ() * I3Units::cm;
 
     theta = pp.GetDirection().GetTheta() * I3Units::degree;
-    phi = pp.GetDirection().GetPhi() * I3Units::degree;
+    phi   = pp.GetDirection().GetPhi() * I3Units::degree;
 
     endpoint.SetPos(x, y, z);
     endpoint.SetThetaPhi(theta, phi);
@@ -261,15 +260,16 @@ SimplePropagator::propagate(const I3Particle &p, double distance, boost::shared_
     endpoint.SetTime(pp.GetTime() * I3Units::second);
 
     // Tomasz
-    if (losses) {
-      std::vector<PROPOSAL::DynamicData*> history =
-          Output::getInstance().GetSecondarys();
-      for (unsigned int i = 0; i < history.size(); i++) {
-        losses->push_back(to_I3Particle(*history[i]));
-      }
-	}
+    if (losses)
+    {
+        std::vector<PROPOSAL::DynamicData*> history = Output::getInstance().GetSecondarys();
+        for (unsigned int i = 0; i < history.size(); i++)
+        {
+            losses->push_back(to_I3Particle(*history[i]));
+        }
+    }
 
-	Output::getInstance().ClearSecondaryVector();
+    Output::getInstance().ClearSecondaryVector();
 
-	return endpoint;
+    return endpoint;
 }

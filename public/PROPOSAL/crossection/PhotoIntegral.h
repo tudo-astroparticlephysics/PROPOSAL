@@ -1,27 +1,25 @@
 #pragma once
 
-
 #include "PROPOSAL/crossection/CrossSectionIntegral.h"
 
-namespace PROPOSAL
-{
+namespace PROPOSAL {
 
 class Photonuclear;
 
-class PhotoIntegral: public CrossSectionIntegral
+class PhotoIntegral : public CrossSectionIntegral
 {
-    public:
-        PhotoIntegral(const Photonuclear&);
-        PhotoIntegral(const PhotoIntegral&);
-        virtual ~PhotoIntegral();
+public:
+    PhotoIntegral(const Photonuclear&);
+    PhotoIntegral(const PhotoIntegral&);
+    virtual ~PhotoIntegral();
 
-        CrossSection* clone() const { return new PhotoIntegral(*this); }
+    CrossSection* clone() const { return new PhotoIntegral(*this); }
 
-        // ----------------------------------------------------------------- //
-        // Public methods
-        // ----------------------------------------------------------------- //
+    // ----------------------------------------------------------------- //
+    // Public methods
+    // ----------------------------------------------------------------- //
 
-        double CalculatedEdx(double energy);
+    double CalculatedEdx(double energy);
 };
 
-} /* PROPOSAL */
+} // namespace PROPOSAL

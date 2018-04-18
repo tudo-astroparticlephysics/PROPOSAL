@@ -4,19 +4,18 @@
 #include <boost/functional/hash.hpp>
 #include <cmath>
 
-#include "PROPOSAL/crossection/parametrization/Photonuclear.h"
-#include "PROPOSAL/math/Interpolant.h"
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Output.h"
-#include "PROPOSAL/medium/Medium.h"
+#include "PROPOSAL/crossection/parametrization/Photonuclear.h"
+#include "PROPOSAL/math/Interpolant.h"
 #include "PROPOSAL/medium/Components.h"
-
+#include "PROPOSAL/medium/Medium.h"
 
 using namespace PROPOSAL;
 
 /******************************************************************************
-*                                 RealPhoton                                  *
-******************************************************************************/
+ *                                 RealPhoton                                  *
+ ******************************************************************************/
 
 bool RealPhoton::operator==(const RealPhoton& photon) const
 {
@@ -33,14 +32,13 @@ bool RealPhoton::operator!=(const RealPhoton& photon) const
 
 bool RealPhoton::compare(const RealPhoton& photon) const
 {
-    (void) photon;
+    (void)photon;
     return true;
 }
 
-
 /******************************************************************************
-*                              HardComponent                                  *
-******************************************************************************/
+ *                              HardComponent                                  *
+ ******************************************************************************/
 
 std::vector<double> HardComponent::x = boost::assign::list_of(3)(4)(5)(6)(7)(8)(9);
 
@@ -54,12 +52,11 @@ HardComponent::HardComponent(const ParticleDef& particle_def)
 
     if (!y.empty())
     {
-        for(unsigned int i=0; i < y.size(); i++)
+        for (unsigned int i = 0; i < y.size(); i++)
         {
             interpolant_.push_back(new Interpolant(x, y.at(i), 4, false, false));
         }
-    }
-    else
+    } else
     {
         log_fatal("No HardComponent tables provided for the given particle %s", particle_def.name.c_str());
     }
@@ -71,7 +68,7 @@ HardComponent::HardComponent(const HardComponent& hard_component)
 {
     interpolant_.resize(hard_component.interpolant_.size());
 
-    for(unsigned int i = 0; i < hard_component.interpolant_.size(); ++i)
+    for (unsigned int i = 0; i < hard_component.interpolant_.size(); ++i)
     {
         interpolant_[i] = new Interpolant(*hard_component.interpolant_[i]);
     }
@@ -79,7 +76,7 @@ HardComponent::HardComponent(const HardComponent& hard_component)
 
 HardComponent::~HardComponent()
 {
-    for(std::vector<Interpolant*>::iterator it = interpolant_.begin(); it != interpolant_.end(); ++it)
+    for (std::vector<Interpolant*>::iterator it = interpolant_.begin(); it != interpolant_.end(); ++it)
     {
         delete *it;
     }
@@ -131,37 +128,32 @@ double HardComponent::CalculateHardComponent(double energy, double v)
 }
 
 /******************************************************************************
-*                             SoftComponent                                   *
-******************************************************************************/
+ *                             SoftComponent                                   *
+ ******************************************************************************/
 
-SoftComponent::SoftComponent()
-{
-}
+SoftComponent::SoftComponent() {}
 
 SoftComponent::SoftComponent(const SoftComponent& hard_component)
     : RealPhoton(hard_component)
 {
 }
 
-SoftComponent::~SoftComponent()
-{
-}
+SoftComponent::~SoftComponent() {}
 
 double SoftComponent::CalculateHardComponent(double energy, double v)
 {
-    (void) energy;
-    (void) v;
+    (void)energy;
+    (void)v;
 
     return 0;
 }
 
-
 /******************************************************************************
-*                                ShadowEffect                                *
-******************************************************************************/
+ *                                ShadowEffect                                *
+ ******************************************************************************/
 
 const std::string ShadowDuttaRenoSarcevicSeckel::name_ = "ShadowDuttaRenoSarcevicSeckel";
-const std::string ShadowButkevichMikhailov::name_ = "ShadowButkevichMikhailov";
+const std::string ShadowButkevichMikhailov::name_      = "ShadowButkevichMikhailov";
 
 bool ShadowEffect::operator==(const ShadowEffect& shadow) const
 {
@@ -183,20 +175,18 @@ bool ShadowEffect::operator!=(const ShadowEffect& shadow) const
 // ------------------------------------------------------------------------- //
 double ShadowDuttaRenoSarcevicSeckel::CalculateShadowEffect(const Components::Component& component, double x, double nu)
 {
-    (void) nu;
+    (void)nu;
 
     if (component.GetNucCharge() == 1)
         return 1;
 
-    if(x < 0.0014)
+    if (x < 0.0014)
     {
         return pow(component.GetAtomicNum(), -0.1);
-    }
-    else if(x < 0.04)
+    } else if (x < 0.04)
     {
         return pow(component.GetAtomicNum(), 0.069 * log(x) / LOG10 + 0.097);
-    }
-    else
+    } else
     {
         return 1;
     }
@@ -216,11 +206,12 @@ size_t ShadowDuttaRenoSarcevicSeckel::GetHash() const
 // ------------------------------------------------------------------------- //
 double ShadowButkevichMikhailov::CalculateShadowEffect(const Components::Component& component, double x, double nu)
 {
-    if(component.GetNucCharge()==1) return 1;
+    if (component.GetNucCharge() == 1)
+        return 1;
 
     double G;
 
-    if(x > 0.3)
+    if (x > 0.3)
     {
         const double Mb = 0.437;
         const double la = 0.5;
@@ -229,12 +220,10 @@ double ShadowButkevichMikhailov::CalculateShadowEffect(const Components::Compone
         double au = 1 / (1 - x);
         double ac = 1 / (1 - x2);
         // eq. 48
-        double Aosc = (1 - la*x) * (au - ac
-                - MPI / component.GetAverageNucleonWeight() * (au * au - ac * ac));
+        double Aosc = (1 - la * x) * (au - ac - MPI / component.GetAverageNucleonWeight() * (au * au - ac * ac));
         // eq. 44
-        G    = 1 - Mb * component.GetMN() * Aosc;
-    }
-    else
+        G = 1 - Mb * component.GetMN() * Aosc;
+    } else
     {
         const double M1 = 0.129;
         const double M2 = 0.456;
@@ -250,14 +239,14 @@ double ShadowButkevichMikhailov::CalculateShadowEffect(const Components::Compone
         sgn = 112.2 * (0.609 * pow(nu, 0.0988) + 1.037 * pow(nu, -0.5944));
 
         // Bezrukav Bugaev shadow
-        tmp = 0.00282*pow(component.GetAtomicNum(), 1. / 3) * sgn;
-        G   = (3 /tmp) * (0.5 + ((1 + tmp) * exp(-tmp) - 1) / (tmp * tmp));
+        tmp = 0.00282 * pow(component.GetAtomicNum(), 1. / 3) * sgn;
+        G   = (3 / tmp) * (0.5 + ((1 + tmp) * exp(-tmp) - 1) / (tmp * tmp));
 
         // eq. 55
-        G   = 0.75 * G + 0.25;
-        x0  = pow(G / (1 + m2), 1 / m1);
+        G  = 0.75 * G + 0.25;
+        x0 = pow(G / (1 + m2), 1 / m1);
 
-        if(x>=x0)
+        if (x >= x0)
         {
             // eq. 49
             G = pow(x, m1) * (1 + m2) * (1 - m3 * x);
@@ -277,9 +266,8 @@ size_t ShadowButkevichMikhailov::GetHash() const
 }
 
 /******************************************************************************
-*                               Photonuclear                                  *
-******************************************************************************/
-
+ *                               Photonuclear                                  *
+ ******************************************************************************/
 
 // ------------------------------------------------------------------------- //
 // Constructor & Destructor
@@ -298,9 +286,7 @@ Photonuclear::Photonuclear(const Photonuclear& brems)
 {
 }
 
-Photonuclear::~Photonuclear()
-{
-}
+Photonuclear::~Photonuclear() {}
 
 bool Photonuclear::compare(const Parametrization& parametrization) const
 {
@@ -320,12 +306,11 @@ Parametrization::IntegralLimits Photonuclear::GetIntegralLimits(double energy)
 
     limits.vMin = (MPI + MPI * MPI / (2 * components_[component_index_]->GetAverageNucleonWeight())) / energy;
 
-    if(particle_def_.mass < MPI)
+    if (particle_def_.mass < MPI)
     {
-        aux = particle_def_.mass/components_[component_index_]->GetAverageNucleonWeight();
+        aux         = particle_def_.mass / components_[component_index_]->GetAverageNucleonWeight();
         limits.vMax = 1 - components_[component_index_]->GetAverageNucleonWeight() * (1 + aux * aux) / (2 * energy);
-    }
-    else
+    } else
     {
         limits.vMax = 1;
     }
@@ -335,18 +320,17 @@ Parametrization::IntegralLimits Photonuclear::GetIntegralLimits(double energy)
     // (M-m)^2 >= 0
     // limits.vMax = std::min(limits.vMax, 1 - particle_def_.mass/energy);
 
-    if(limits.vMax < limits.vMin)
+    if (limits.vMax < limits.vMin)
     {
         limits.vMax = limits.vMin;
     }
 
     limits.vUp = std::min(limits.vMax, cut_settings_.GetCut(energy));
 
-    if(limits.vUp < limits.vMin)
+    if (limits.vUp < limits.vMin)
     {
         limits.vUp = limits.vMin;
     }
 
     return limits;
 }
-
