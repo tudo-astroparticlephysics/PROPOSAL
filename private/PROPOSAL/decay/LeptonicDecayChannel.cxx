@@ -5,8 +5,8 @@
 #include <boost/math/tools/roots.hpp>
 
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/decay/LeptonicDecayChannel.h"
+#include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/particle/Particle.h"
 
 #include "PROPOSAL/Output.h"
@@ -25,9 +25,7 @@ LeptonicDecayChannel::LeptonicDecayChannel(const ParticleDef& lepton,
 {
 }
 
-LeptonicDecayChannel::~LeptonicDecayChannel()
-{
-}
+LeptonicDecayChannel::~LeptonicDecayChannel() {}
 
 LeptonicDecayChannel::LeptonicDecayChannel(const LeptonicDecayChannel& mode)
     : DecayChannel(mode)
@@ -55,34 +53,33 @@ bool LeptonicDecayChannel::compare(const DecayChannel& channel) const
 
 double LeptonicDecayChannel::DecayRate(double x, double right_side)
 {
-    return  x*x*x*(1. - 0.5*x) - right_side;
+    return x * x * x * (1. - 0.5 * x) - right_side;
 }
 
 double LeptonicDecayChannel::DifferentialDecayRate(double x)
 {
-    return (3 - 2*x) * x*x;
+    return (3 - 2 * x) * x * x;
 }
 
 std::pair<double, double> LeptonicDecayChannel::function_and_derivative(double x, double right_side)
 {
-    return std::make_pair (DecayRate(x, right_side), DifferentialDecayRate(x));
+    return std::make_pair(DecayRate(x, right_side), DifferentialDecayRate(x));
 }
 
 double LeptonicDecayChannel::FindRootBoost(double min, double right_side)
 {
-    double max = 1;
-    double x_start = 0.5;
+    double max        = 1;
+    double x_start    = 0.5;
     int binary_digits = 6;
     // in older versions a max_step was set to 40, which were the max number of int steps
     // int max_steps = 40;
 
     return boost::math::tools::newton_raphson_iterate(
-        boost::bind(&LeptonicDecayChannel::function_and_derivative, this, _1, right_side)
-        , x_start
-        , min
-        , max
-        , binary_digits
-        );
+        boost::bind(&LeptonicDecayChannel::function_and_derivative, this, _1, right_side),
+        x_start,
+        min,
+        max,
+        binary_digits);
 }
 
 DecayChannel::DecayProducts LeptonicDecayChannel::Decay(const Particle& particle)
@@ -95,25 +92,25 @@ DecayChannel::DecayProducts LeptonicDecayChannel::Decay(const Particle& particle
     products.push_back(new Particle(anti_neutrino_));
 
     // Sample energy from decay rate
-    double emax = (parent_mass*parent_mass + massive_lepton_.mass*massive_lepton_.mass) / (2*parent_mass);
-    double x_min = massive_lepton_.mass/emax;
-    double f_min = x_min*x_min*x_min*(1 - 0.5*x_min);
-    double right_side = f_min + (0.5-f_min)*RandomGenerator::Get().RandomDouble();
+    double emax       = (parent_mass * parent_mass + massive_lepton_.mass * massive_lepton_.mass) / (2 * parent_mass);
+    double x_min      = massive_lepton_.mass / emax;
+    double f_min      = x_min * x_min * x_min * (1 - 0.5 * x_min);
+    double right_side = f_min + (0.5 - f_min) * RandomGenerator::Get().RandomDouble();
 
     double find_root = FindRootBoost(x_min, right_side);
 
-    double lepton_energy = std::max(find_root * emax, massive_lepton_.mass);
-    double lepton_momentum = sqrt(lepton_energy*lepton_energy - massive_lepton_.mass*massive_lepton_.mass);
+    double lepton_energy   = std::max(find_root * emax, massive_lepton_.mass);
+    double lepton_momentum = sqrt(lepton_energy * lepton_energy - massive_lepton_.mass * massive_lepton_.mass);
 
     // Sample directions For the massive letpon
     products[0]->SetDirection(GenerateRandomDirection());
     products[0]->SetMomentum(lepton_momentum);
 
     // Sample directions For the massless letpon
-    double energy_neutrinos = parent_mass - lepton_energy;
-    double virtual_mass = std::sqrt((energy_neutrinos - lepton_momentum) * (energy_neutrinos + lepton_momentum));
+    double energy_neutrinos   = parent_mass - lepton_energy;
+    double virtual_mass       = std::sqrt((energy_neutrinos - lepton_momentum) * (energy_neutrinos + lepton_momentum));
     double momentum_neutrinos = 0.5 * virtual_mass;
-    Vector3D direction = GenerateRandomDirection();
+    Vector3D direction        = GenerateRandomDirection();
 
     products[1]->SetDirection(direction);
     products[1]->SetMomentum(momentum_neutrinos);

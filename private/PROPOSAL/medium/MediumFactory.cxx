@@ -1,9 +1,9 @@
 
 #include <boost/algorithm/string.hpp> // case insensitive string compare for configuration file
 
+#include "PROPOSAL/Output.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/medium/MediumFactory.h"
-#include "PROPOSAL/Output.h"
 
 using namespace PROPOSAL;
 
@@ -37,7 +37,7 @@ MediumFactory::~MediumFactory()
 
 void MediumFactory::Register(const std::string& name, const Enum& enum_t, RegisterFunction create)
 {
-    medium_map_str[name] = create;
+    medium_map_str[name]    = create;
     medium_map_enum[enum_t] = create;
     string_enum_.insert(BimapStringEnum::value_type(name, enum_t));
 }

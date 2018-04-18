@@ -23,7 +23,7 @@
  */
 
 // there is a known apple bug
-#if defined (__APPLE__)
+#if defined(__APPLE__)
 /* undo some macro defs in pyport.h
  the /boost/property_tree/detail/ptree_utils.hpp:31:66 the std::toupper is used
  which would crash, if somewhere before the pyport.h is included
@@ -39,9 +39,9 @@
 #endif /* _PY_PORT_CTYPE_UTF8_ISSUE && __cplusplus */
 #endif /* __APPLE__ */
 
+#include <boost/property_tree/ptree.hpp>
 #include <deque>
 #include <vector>
-#include <boost/property_tree/ptree.hpp>
 
 #include "PROPOSAL/Output.h"
 #include "PROPOSAL/sector/Sector.h"
@@ -50,7 +50,7 @@ namespace PROPOSAL {
 
 class Propagator
 {
-    public:
+public:
     // Constructors
     Propagator();
     Propagator(const std::vector<Sector*>&, const Geometry&);
@@ -65,20 +65,7 @@ class Propagator
     bool operator==(const Propagator& propagator) const;
     bool operator!=(const Propagator& propagator) const;
 
-    //----------------------------------------------------------------------------//
-    // Memberfunctions
-    /**
-     * Propagates the particle of initial energy e to the distance r.
-     * Returns the final energy if the
-     * particle has survived or the track length to the
-     * point of disappearance with a minus sign otherwise.
-     *
-     *  \param  distance   maximum track length
-     *  \param  energy   initial energy
-     *  \return energy at distance OR -(track length)
-     */
-
-    // double Propagate(double distance);
+    void swap(Propagator& propagator);
 
     // ----------------------------------------------------------------------------
     /// @brief Propagates the particle through the current set of Sectors
@@ -87,24 +74,7 @@ class Propagator
     ///
     /// @return Secondary data
     // ----------------------------------------------------------------------------
-    std::vector<DynamicData*> Propagate( double MaxDistance_cm = 1e20);
-
-    //----------------------------------------------------------------------------//
-    /*!
-    * advances the particle by the given distance
-    * Sets the x,y and z coordinates of particle_
-    * and its time and propagation distance
-    *
-    * \param    dr  flight distance
-    * \param    ei  initial energy
-    * \param    ef  final energy
-    */
-
-    // void AdvanceParticle(double dr, double ei, double ef);
-
-    //----------------------------------------------------------------------------//
-
-    void swap(Propagator& propagator);
+    std::vector<DynamicData*> Propagate(double MaxDistance_cm = 1e20);
 
     // --------------------------------------------------------------------- //
     // Getter
@@ -120,12 +90,8 @@ class Propagator
     void SetSeed(int seed) { seed_ = seed; };
     Geometry& GetDetector() const { return *detector_; };
     Particle& GetParticle() { return particle_; };
-    // void SetDetector(Geometry *detector);
-    // bool GetStopping_decay() const;
-    // void SetStopping_decay(bool stopping_decay);
 
-    private:
-
+private:
     // ----------------------------------------------------------------------------
     /// @brief Simple wrapper to initialize propagator from config file
     ///
@@ -142,8 +108,7 @@ class Propagator
         if (optional_param)
         {
             var = optional_param.get();
-        }
-        else
+        } else
         {
             std::stringstream ss;
             ss << "Option " << option << " not set! Use default: " << var;
@@ -188,25 +153,34 @@ class Propagator
 
     // ParametrizationType::Enum  brems_;                     //!< Bremsstrahlungs parametrization
     // ParametrizationType::Enum  photo_;                     //!< Photonuclear parametrization
-    static const double global_ecut_inside_; //!< ecut for inside the detector (it's used when not specified explicit for a sector in
-    //!congiguration file)
-    static const double global_ecut_infront_; //!< ecut for infront of the detector (it's used when not specified explicit for a
-    //!sector in congiguration file)
-    static const double global_ecut_behind_; //!< ecut for behind the detector (it's used when not specified explicit for a sector in
-    //!congiguration file)
-    static const double global_vcut_inside_; //!< vcut for inside the detector (it's used when not specified explicit for a sector in
-    //!congiguration file)
-    static const double global_vcut_infront_; //!< ecut for infront of the detector (it's used when not specified explicit for a
-    //!sector in congiguration file)
-    static const double global_vcut_behind_; //!< ecut for behind the detector (it's used when not specified explicit for a sector in
-    //!congiguration file)
-    static const double global_cont_inside_; //!< continuous randominzation flag for inside the detector (it's used when not
-    //!specified explicit for a sector in congiguration file)
-    static const double global_cont_infront_; //!< continuous randominzation flag for infront of the detector (it's used when not
-    //!specified explicit for a sector in congiguration file)
-    static const double global_cont_behind_;  //!< continuous randominzation flag for behind the detector (it's used when not
-                                 //!specified explicit for a sector in congiguration file)
-    static const bool interpolate_;  //!< Enable interpolation
+    static const double
+        global_ecut_inside_; //!< ecut for inside the detector (it's used when not specified explicit for a sector in
+    //! congiguration file)
+    static const double
+        global_ecut_infront_; //!< ecut for infront of the detector (it's used when not specified explicit for a
+    //! sector in congiguration file)
+    static const double
+        global_ecut_behind_; //!< ecut for behind the detector (it's used when not specified explicit for a sector in
+    //! congiguration file)
+    static const double
+        global_vcut_inside_; //!< vcut for inside the detector (it's used when not specified explicit for a sector in
+    //! congiguration file)
+    static const double
+        global_vcut_infront_; //!< ecut for infront of the detector (it's used when not specified explicit for a
+    //! sector in congiguration file)
+    static const double
+        global_vcut_behind_; //!< ecut for behind the detector (it's used when not specified explicit for a sector in
+    //! congiguration file)
+    static const double
+        global_cont_inside_; //!< continuous randominzation flag for inside the detector (it's used when not
+    //! specified explicit for a sector in congiguration file)
+    static const double
+        global_cont_infront_; //!< continuous randominzation flag for infront of the detector (it's used when not
+    //! specified explicit for a sector in congiguration file)
+    static const double
+        global_cont_behind_;        //!< continuous randominzation flag for behind the detector (it's used when not
+                                    //! specified explicit for a sector in congiguration file)
+    static const bool interpolate_; //!< Enable interpolation
 
     // --------------------------------------------------------------------- //
     // Private Member
@@ -221,11 +195,10 @@ class Propagator
     Geometry* detector_;
 };
 
-}
-
+} // namespace PROPOSAL
 
 // redefine the macros, which were undefined at the beginning of the header
-#if defined (__APPLE__)
+#if defined(__APPLE__)
 #if defined(_PY_PORT_CTYPE_UTF8_ISSUE) && defined(__cplusplus)
 #include <ctype.h>
 #include <wctype.h>
@@ -245,4 +218,3 @@ class Propagator
 #define toupper(c) towupper(btowc(c))
 #endif /* _PY_PORT_CTYPE_UTF8_ISSUE && __cplusplus */
 #endif /* __APPLE__ */
-

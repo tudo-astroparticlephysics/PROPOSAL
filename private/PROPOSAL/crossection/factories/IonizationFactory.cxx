@@ -3,20 +3,16 @@
 
 #include "PROPOSAL/crossection/IonizIntegral.h"
 #include "PROPOSAL/crossection/IonizInterpolant.h"
-#include "PROPOSAL/crossection/parametrization/Ionization.h"
 #include "PROPOSAL/crossection/factories/IonizationFactory.h"
+#include "PROPOSAL/crossection/parametrization/Ionization.h"
 
 #include "PROPOSAL/Output.h"
 
 using namespace PROPOSAL;
 
-IonizationFactory::IonizationFactory()
-{
-}
+IonizationFactory::IonizationFactory() {}
 
-IonizationFactory::~IonizationFactory()
-{
-}
+IonizationFactory::~IonizationFactory() {}
 
 // ------------------------------------------------------------------------- //
 // Most general creator

@@ -6,17 +6,16 @@
 #include "PROPOSAL/decay/DecayChannel.h"
 #include "PROPOSAL/particle/ParticleDef.h"
 
-namespace PROPOSAL
-{
+namespace PROPOSAL {
 
 class PROPOSALParticle;
 
 class ManyBodyPhaseSpace : public DecayChannel
 {
-    public:
-        class Builder;
+public:
+    class Builder;
 
-    public:
+public:
     ManyBodyPhaseSpace(std::vector<const ParticleDef*> daughters);
     ManyBodyPhaseSpace(const ManyBodyPhaseSpace& mode);
     virtual ~ManyBodyPhaseSpace();
@@ -36,7 +35,7 @@ class ManyBodyPhaseSpace : public DecayChannel
 
     const std::string& GetName() const { return name_; }
 
-    private:
+private:
     ManyBodyPhaseSpace& operator=(const ManyBodyPhaseSpace&); // Undefined & not allowed
 
     bool compare(const DecayChannel&) const;
@@ -51,8 +50,7 @@ class ManyBodyPhaseSpace : public DecayChannel
 
 class ManyBodyPhaseSpace::Builder
 {
-    public:
-
+public:
     Builder();
     Builder(const Builder&);
     ~Builder();
@@ -64,10 +62,8 @@ class ManyBodyPhaseSpace::Builder
     Builder& addDaughter(const ParticleDef& daughter);
     ManyBodyPhaseSpace build();
 
-    private:
+private:
     std::vector<const ParticleDef*> daughters_;
-
 };
 
-} /* PROPOSAL */
-
+} // namespace PROPOSAL

@@ -1,9 +1,9 @@
 
 #include <boost/bind.hpp>
 
-#include "PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h"
-#include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
 #include "PROPOSAL/math/Interpolant.h"
+#include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
+#include "PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h"
 
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Output.h"
@@ -16,8 +16,8 @@ using namespace PROPOSAL;
 using namespace std;
 
 /******************************************************************************
-*                              Utility Integral                              *
-******************************************************************************/
+ *                              Utility Integral                              *
+ ******************************************************************************/
 
 UtilityInterpolant::UtilityInterpolant(const Utility& utility, InterpolationDef def)
     : UtilityDecorator(utility)
@@ -73,19 +73,27 @@ bool UtilityInterpolant::compare(const UtilityDecorator& utility_decorator) cons
 // ------------------------------------------------------------------------- //
 double UtilityInterpolant::GetUpperLimit(double ei, double rnd)
 {
-    return std::min( std::max(ei + rnd / interpolant_diff_->Interpolate(ei + rnd / (2 * interpolant_diff_->Interpolate(ei))), utility_.GetParticleDef().low), ei);
+    return std::min(
+        std::max(ei + rnd / interpolant_diff_->Interpolate(ei + rnd / (2 * interpolant_diff_->Interpolate(ei))),
+                 utility_.GetParticleDef().low),
+        ei);
 }
 
 // ------------------------------------------------------------------------- //
-void UtilityInterpolant::InitInterpolation(const std::string& name, UtilityIntegral& utility, int number_of_sampling_points)
+void UtilityInterpolant::InitInterpolation(const std::string& name,
+                                           UtilityIntegral& utility,
+                                           int number_of_sampling_points)
 {
     Integral integral(IROMB, IMAXS, IPREC2);
     const ParticleDef& particle_def = utility_.GetParticleDef();
 
     std::vector<std::pair<Interpolant**, boost::function<double(double)> > > interpolants;
 
-    interpolants.push_back(std::make_pair(&interpolant_, boost::bind(&UtilityInterpolant::BuildInterpolant, this, _1, boost::ref(utility), boost::ref(integral))));
-    interpolants.push_back(std::make_pair(&interpolant_diff_, boost::bind(&UtilityIntegral::FunctionToIntegral, &utility, _1)));
+    interpolants.push_back(std::make_pair(
+        &interpolant_,
+        boost::bind(&UtilityInterpolant::BuildInterpolant, this, _1, boost::ref(utility), boost::ref(integral))));
+    interpolants.push_back(
+        std::make_pair(&interpolant_diff_, boost::bind(&UtilityIntegral::FunctionToIntegral, &utility, _1)));
 
     unsigned int number_of_interpolants = interpolants.size();
 
@@ -124,8 +132,8 @@ void UtilityInterpolant::InitInterpolation(const std::string& name, UtilityInteg
 }
 
 /******************************************************************************
-*                            Utility Displacement                            *
-******************************************************************************/
+ *                            Utility Displacement                            *
+ ******************************************************************************/
 
 UtilityInterpolantDisplacement::UtilityInterpolantDisplacement(const Utility& utility, InterpolationDef def)
     : UtilityInterpolant(utility, def)
@@ -134,7 +142,8 @@ UtilityInterpolantDisplacement::UtilityInterpolantDisplacement(const Utility& ut
     InitInterpolation("displacement", utility_disp, NUM3);
 }
 
-UtilityInterpolantDisplacement::UtilityInterpolantDisplacement(const Utility& utility, const UtilityInterpolantDisplacement& collection)
+UtilityInterpolantDisplacement::UtilityInterpolantDisplacement(const Utility& utility,
+                                                               const UtilityInterpolantDisplacement& collection)
     : UtilityInterpolant(utility, collection)
 {
 }
@@ -144,20 +153,18 @@ UtilityInterpolantDisplacement::UtilityInterpolantDisplacement(const UtilityInte
 {
 }
 
-UtilityInterpolantDisplacement::~UtilityInterpolantDisplacement()
-{
-}
+UtilityInterpolantDisplacement::~UtilityInterpolantDisplacement() {}
 
 double UtilityInterpolantDisplacement::Calculate(double ei, double ef, double rnd)
 {
-    (void) rnd;
+    (void)rnd;
 
     if (fabs(ei - ef) > fabs(ei) * HALF_PRECISION)
     {
         double aux;
 
         stored_result_ = interpolant_->Interpolate(ei);
-        aux  = stored_result_ - interpolant_->Interpolate(ef);
+        aux            = stored_result_ - interpolant_->Interpolate(ef);
 
         if (fabs(aux) > fabs(stored_result_) * HALF_PRECISION)
         {
@@ -188,18 +195,21 @@ double UtilityInterpolantDisplacement::GetUpperLimit(double ei, double rnd)
 
 double UtilityInterpolantDisplacement::BuildInterpolant(double energy, UtilityIntegral& utility, Integral& integral)
 {
-    return integral.Integrate(energy, utility_.GetParticleDef().low, boost::bind(&UtilityIntegral::FunctionToIntegral, &utility,  _1),4);
+    return integral.Integrate(
+        energy, utility_.GetParticleDef().low, boost::bind(&UtilityIntegral::FunctionToIntegral, &utility, _1), 4);
 }
 
 // ------------------------------------------------------------------------- //
-void UtilityInterpolantDisplacement::InitInterpolation(const std::string& name, UtilityIntegral& utility, int number_of_sampling_points)
+void UtilityInterpolantDisplacement::InitInterpolation(const std::string& name,
+                                                       UtilityIntegral& utility,
+                                                       int number_of_sampling_points)
 {
     UtilityInterpolant::InitInterpolation(name, utility, number_of_sampling_points);
 }
 
 /******************************************************************************
-*                            Utility Ineraction                            *
-******************************************************************************/
+ *                            Utility Ineraction                            *
+ ******************************************************************************/
 
 UtilityInterpolantInteraction::UtilityInterpolantInteraction(const Utility& utility, InterpolationDef def)
     : UtilityInterpolant(utility, def)
@@ -210,7 +220,8 @@ UtilityInterpolantInteraction::UtilityInterpolantInteraction(const Utility& util
     InitInterpolation("interaction", utility_int, NUM3);
 }
 
-UtilityInterpolantInteraction::UtilityInterpolantInteraction(const Utility& utility, const UtilityInterpolantInteraction& collection)
+UtilityInterpolantInteraction::UtilityInterpolantInteraction(const Utility& utility,
+                                                             const UtilityInterpolantInteraction& collection)
     : UtilityInterpolant(utility, collection)
     , big_low_(collection.big_low_)
     , up_(collection.up_)
@@ -224,13 +235,12 @@ UtilityInterpolantInteraction::UtilityInterpolantInteraction(const UtilityInterp
 {
 }
 
-UtilityInterpolantInteraction::~UtilityInterpolantInteraction()
-{
-}
+UtilityInterpolantInteraction::~UtilityInterpolantInteraction() {}
 
 bool UtilityInterpolantInteraction::compare(const UtilityDecorator& utility_decorator) const
 {
-    const UtilityInterpolantInteraction* utility_interpolant = static_cast<const UtilityInterpolantInteraction*>(&utility_decorator);
+    const UtilityInterpolantInteraction* utility_interpolant =
+        static_cast<const UtilityInterpolantInteraction*>(&utility_decorator);
 
     if (big_low_ != utility_interpolant->big_low_)
         return false;
@@ -242,16 +252,15 @@ bool UtilityInterpolantInteraction::compare(const UtilityDecorator& utility_deco
 
 double UtilityInterpolantInteraction::Calculate(double ei, double ef, double rnd)
 {
-    (void) rnd;
-    (void) ef;
+    (void)rnd;
+    (void)ef;
 
-    stored_result_ =   interpolant_->Interpolate(ei);
+    stored_result_ = interpolant_->Interpolate(ei);
 
     if (up_)
     {
         return std::max(stored_result_, 0.0);
-    }
-    else
+    } else
     {
         return std::max(big_low_ - stored_result_, 0.0);
     }
@@ -259,20 +268,19 @@ double UtilityInterpolantInteraction::Calculate(double ei, double ef, double rnd
 
 double UtilityInterpolantInteraction::GetUpperLimit(double ei, double rnd)
 {
-    if( abs(rnd) > abs(stored_result_)*HALF_PRECISION)
+    if (abs(rnd) > abs(stored_result_) * HALF_PRECISION)
     {
         double aux;
 
-        if(up_)
+        if (up_)
         {
-            aux =   interpolant_->FindLimit(stored_result_ - rnd);
-        }
-        else
+            aux = interpolant_->FindLimit(stored_result_ - rnd);
+        } else
         {
             aux = interpolant_->FindLimit(stored_result_ + rnd);
         }
 
-        if(abs(ei-aux) > abs(ei)*HALF_PRECISION)
+        if (abs(ei - aux) > abs(ei) * HALF_PRECISION)
         {
             return std::min(std::max(aux, utility_.GetParticleDef().low), ei);
         }
@@ -283,42 +291,46 @@ double UtilityInterpolantInteraction::GetUpperLimit(double ei, double rnd)
 
 double UtilityInterpolantInteraction::BuildInterpolant(double energy, UtilityIntegral& utility, Integral& integral)
 {
-    if(up_)
+    if (up_)
     {
-        return integral.Integrate(energy, utility_.GetParticleDef().low, boost::bind(&UtilityIntegral::FunctionToIntegral, &utility,  _1),4);
-    }
-    else
+        return integral.Integrate(
+            energy, utility_.GetParticleDef().low, boost::bind(&UtilityIntegral::FunctionToIntegral, &utility, _1), 4);
+    } else
     {
-        return -integral.Integrate(energy, BIGENERGY, boost::bind(&UtilityIntegral::FunctionToIntegral, &utility,  _1),4);
+        return -integral.Integrate(
+            energy, BIGENERGY, boost::bind(&UtilityIntegral::FunctionToIntegral, &utility, _1), 4);
     }
 }
 
 // ------------------------------------------------------------------------- //
-void UtilityInterpolantInteraction::InitInterpolation(const std::string& name, UtilityIntegral& utility, int number_of_sampling_points)
+void UtilityInterpolantInteraction::InitInterpolation(const std::string& name,
+                                                      UtilityIntegral& utility,
+                                                      int number_of_sampling_points)
 {
     Integral integral(IROMB, IMAXS, IPREC2);
     const ParticleDef& particle_def = utility_.GetParticleDef();
 
-    double a = abs(-integral.Integrate(particle_def.low, particle_def.low*10, boost::bind(&UtilityIntegral::FunctionToIntegral, &utility,  _1),4));
-    double b = abs(-integral.Integrate(BIGENERGY, BIGENERGY/10, boost::bind(&UtilityIntegral::FunctionToIntegral, &utility,  _1),4));
+    double a = abs(-integral.Integrate(
+        particle_def.low, particle_def.low * 10, boost::bind(&UtilityIntegral::FunctionToIntegral, &utility, _1), 4));
+    double b = abs(-integral.Integrate(
+        BIGENERGY, BIGENERGY / 10, boost::bind(&UtilityIntegral::FunctionToIntegral, &utility, _1), 4));
 
     if (a < b)
     {
         up_ = true;
-    }
-    else
+    } else
     {
         up_ = false;
     }
 
     UtilityInterpolant::InitInterpolation(name, utility, number_of_sampling_points);
 
-    big_low_= interpolant_->Interpolate(particle_def.low);
+    big_low_ = interpolant_->Interpolate(particle_def.low);
 }
 
 /******************************************************************************
-*                            Utility Decay                            *
-******************************************************************************/
+ *                            Utility Decay                            *
+ ******************************************************************************/
 
 UtilityInterpolantDecay::UtilityInterpolantDecay(const Utility& utility, InterpolationDef def)
     : UtilityInterpolant(utility, def)
@@ -343,13 +355,12 @@ UtilityInterpolantDecay::UtilityInterpolantDecay(const UtilityInterpolantDecay& 
 {
 }
 
-UtilityInterpolantDecay::~UtilityInterpolantDecay()
-{
-}
+UtilityInterpolantDecay::~UtilityInterpolantDecay() {}
 
 bool UtilityInterpolantDecay::compare(const UtilityDecorator& utility_decorator) const
 {
-    const UtilityInterpolantDecay* utility_interpolant = static_cast<const UtilityInterpolantDecay*>(&utility_decorator);
+    const UtilityInterpolantDecay* utility_interpolant =
+        static_cast<const UtilityInterpolantDecay*>(&utility_decorator);
 
     if (big_low_ != utility_interpolant->big_low_)
         return false;
@@ -361,16 +372,15 @@ bool UtilityInterpolantDecay::compare(const UtilityDecorator& utility_decorator)
 
 double UtilityInterpolantDecay::Calculate(double ei, double ef, double rnd)
 {
-    (void) rnd;
-    (void) ef;
+    (void)rnd;
+    (void)ef;
 
     stored_result_ = interpolant_->Interpolate(ei);
 
     if (up_)
     {
         return std::max(stored_result_, 0.0);
-    }
-    else
+    } else
     {
         return std::max(big_low_ - stored_result_, 0.0);
     }
@@ -378,13 +388,13 @@ double UtilityInterpolantDecay::Calculate(double ei, double ef, double rnd)
 
 double UtilityInterpolantDecay::GetUpperLimit(double ei, double rnd)
 {
-    if(abs(rnd) > abs(stored_result_)*HALF_PRECISION)
+    if (abs(rnd) > abs(stored_result_) * HALF_PRECISION)
     {
         double aux;
 
         aux = interpolant_->FindLimit(stored_result_ + rnd);
 
-        if(abs(ei-aux) > abs(ei)*HALF_PRECISION)
+        if (abs(ei - aux) > abs(ei) * HALF_PRECISION)
         {
             return std::min(std::max(aux, utility_.GetParticleDef().low), ei);
         }
@@ -395,36 +405,38 @@ double UtilityInterpolantDecay::GetUpperLimit(double ei, double rnd)
 
 double UtilityInterpolantDecay::BuildInterpolant(double energy, UtilityIntegral& utility, Integral& integral)
 {
-    return -integral.Integrate(energy, BIGENERGY, boost::bind(&UtilityIntegral::FunctionToIntegral, &utility,  _1),4);
+    return -integral.Integrate(energy, BIGENERGY, boost::bind(&UtilityIntegral::FunctionToIntegral, &utility, _1), 4);
 }
 
 // ------------------------------------------------------------------------- //
-void UtilityInterpolantDecay::InitInterpolation(const std::string& name, UtilityIntegral& utility, int number_of_sampling_points)
+void UtilityInterpolantDecay::InitInterpolation(const std::string& name,
+                                                UtilityIntegral& utility,
+                                                int number_of_sampling_points)
 {
     Integral integral(IROMB, IMAXS, IPREC2);
     const ParticleDef& particle_def = utility_.GetParticleDef();
 
-    double a = abs(-integral.Integrate(particle_def.low, particle_def.low*10, boost::bind(&UtilityIntegral::FunctionToIntegral, &utility,  _1),4));
-    double b = abs(-integral.Integrate(BIGENERGY, BIGENERGY/10, boost::bind(&UtilityIntegral::FunctionToIntegral, &utility,  _1),4));
+    double a = abs(-integral.Integrate(
+        particle_def.low, particle_def.low * 10, boost::bind(&UtilityIntegral::FunctionToIntegral, &utility, _1), 4));
+    double b = abs(-integral.Integrate(
+        BIGENERGY, BIGENERGY / 10, boost::bind(&UtilityIntegral::FunctionToIntegral, &utility, _1), 4));
 
     if (a < b)
     {
         up_ = true;
-    }
-    else
+    } else
     {
         up_ = false;
     }
 
     UtilityInterpolant::InitInterpolation(name, utility, number_of_sampling_points);
 
-    big_low_= interpolant_->Interpolate(particle_def.low);
+    big_low_ = interpolant_->Interpolate(particle_def.low);
 }
 
-
 /******************************************************************************
-*                            Utility Time                            *
-******************************************************************************/
+ *                            Utility Time                            *
+ ******************************************************************************/
 
 UtilityInterpolantTime::UtilityInterpolantTime(const Utility& utility, InterpolationDef def)
     : UtilityInterpolant(utility, def)
@@ -443,13 +455,11 @@ UtilityInterpolantTime::UtilityInterpolantTime(const UtilityInterpolantTime& col
 {
 }
 
-UtilityInterpolantTime::~UtilityInterpolantTime()
-{
-}
+UtilityInterpolantTime::~UtilityInterpolantTime() {}
 
 double UtilityInterpolantTime::Calculate(double ei, double ef, double rnd)
 {
-    (void) rnd;
+    (void)rnd;
 
     if (abs(ei - ef) > abs(ei) * HALF_PRECISION)
     {
@@ -468,26 +478,29 @@ double UtilityInterpolantTime::Calculate(double ei, double ef, double rnd)
 // ------------------------------------------------------------------------- //
 double UtilityInterpolantTime::GetUpperLimit(double ei, double rnd)
 {
-    (void) ei;
-    (void) rnd;
+    (void)ei;
+    (void)rnd;
 
     return 0;
 }
 
 double UtilityInterpolantTime::BuildInterpolant(double energy, UtilityIntegral& utility, Integral& integral)
 {
-    return integral.Integrate(energy, utility_.GetParticleDef().low, boost::bind(&UtilityIntegral::FunctionToIntegral, &utility,  _1),4);
+    return integral.Integrate(
+        energy, utility_.GetParticleDef().low, boost::bind(&UtilityIntegral::FunctionToIntegral, &utility, _1), 4);
 }
 
 // ------------------------------------------------------------------------- //
-void UtilityInterpolantTime::InitInterpolation(const std::string& name, UtilityIntegral& utility, int number_of_sampling_points)
+void UtilityInterpolantTime::InitInterpolation(const std::string& name,
+                                               UtilityIntegral& utility,
+                                               int number_of_sampling_points)
 {
     UtilityInterpolant::InitInterpolation(name, utility, number_of_sampling_points);
 }
 
 /******************************************************************************
-*                            Utility ContRand                            *
-******************************************************************************/
+ *                            Utility ContRand                            *
+ ******************************************************************************/
 
 UtilityInterpolantContRand::UtilityInterpolantContRand(const Utility& utility, InterpolationDef def)
     : UtilityInterpolant(utility, def)
@@ -496,7 +509,8 @@ UtilityInterpolantContRand::UtilityInterpolantContRand(const Utility& utility, I
     InitInterpolation("contrand", utility_contrand, NUM2);
 }
 
-UtilityInterpolantContRand::UtilityInterpolantContRand(const Utility& utility, const UtilityInterpolantContRand& collection)
+UtilityInterpolantContRand::UtilityInterpolantContRand(const Utility& utility,
+                                                       const UtilityInterpolantContRand& collection)
     : UtilityInterpolant(utility, collection)
 {
 }
@@ -506,9 +520,7 @@ UtilityInterpolantContRand::UtilityInterpolantContRand(const UtilityInterpolantC
 {
 }
 
-UtilityInterpolantContRand::~UtilityInterpolantContRand()
-{
-}
+UtilityInterpolantContRand::~UtilityInterpolantContRand() {}
 
 double UtilityInterpolantContRand::Calculate(double ei, double ef, double rnd)
 {
@@ -519,8 +531,7 @@ double UtilityInterpolantContRand::Calculate(double ei, double ef, double rnd)
 
         if (abs(aux2) > abs(aux) * HALF_PRECISION)
             return max(aux2, 0.0);
-    }
-    else
+    } else
     {
         return max(interpolant_diff_->Interpolate((ei + ef) / 2) * (ef - ei), 0.0);
     }
@@ -533,27 +544,29 @@ double UtilityInterpolantContRand::Calculate(double ei, double ef, double rnd)
 // ------------------------------------------------------------------------- //
 double UtilityInterpolantContRand::GetUpperLimit(double ei, double rnd)
 {
-    (void) ei;
-    (void) rnd;
+    (void)ei;
+    (void)rnd;
 
     return 0;
 }
 
 double UtilityInterpolantContRand::BuildInterpolant(double energy, UtilityIntegral& utility, Integral& integral)
 {
-    return integral.Integrate(energy, utility_.GetParticleDef().low, boost::bind(&UtilityIntegral::FunctionToIntegral, &utility,  _1),4);
+    return integral.Integrate(
+        energy, utility_.GetParticleDef().low, boost::bind(&UtilityIntegral::FunctionToIntegral, &utility, _1), 4);
 }
 
 // ------------------------------------------------------------------------- //
-void UtilityInterpolantContRand::InitInterpolation(const std::string& name, UtilityIntegral& utility, int number_of_sampling_points)
+void UtilityInterpolantContRand::InitInterpolation(const std::string& name,
+                                                   UtilityIntegral& utility,
+                                                   int number_of_sampling_points)
 {
     UtilityInterpolant::InitInterpolation(name, utility, number_of_sampling_points);
 }
 
-
 /******************************************************************************
-*                            Utility Scattering                            *
-******************************************************************************/
+ *                            Utility Scattering                            *
+ ******************************************************************************/
 
 UtilityInterpolantScattering::UtilityInterpolantScattering(const Utility& utility, InterpolationDef def)
     : UtilityInterpolant(utility, def)
@@ -562,7 +575,8 @@ UtilityInterpolantScattering::UtilityInterpolantScattering(const Utility& utilit
     InitInterpolation("scattering", utility_scattering, NUM2);
 }
 
-UtilityInterpolantScattering::UtilityInterpolantScattering(const Utility& utility, const UtilityInterpolantScattering& collection)
+UtilityInterpolantScattering::UtilityInterpolantScattering(const Utility& utility,
+                                                           const UtilityInterpolantScattering& collection)
     : UtilityInterpolant(utility, collection)
 {
 }
@@ -572,13 +586,11 @@ UtilityInterpolantScattering::UtilityInterpolantScattering(const UtilityInterpol
 {
 }
 
-UtilityInterpolantScattering::~UtilityInterpolantScattering()
-{
-}
+UtilityInterpolantScattering::~UtilityInterpolantScattering() {}
 
 double UtilityInterpolantScattering::Calculate(double ei, double ef, double rnd)
 {
-    (void) rnd;
+    (void)rnd;
 
     if (fabs(ei - ef) > fabs(ei) * HALF_PRECISION)
     {
@@ -588,13 +600,11 @@ double UtilityInterpolantScattering::Calculate(double ei, double ef, double rnd)
         if (fabs(aux2) > fabs(aux) * HALF_PRECISION)
         {
             return aux2;
-        }
-        else
+        } else
         {
             return interpolant_diff_->Interpolate((ei + ef) / 2) * (ef - ei);
         }
-    }
-    else
+    } else
     {
         return interpolant_diff_->Interpolate((ei + ef) / 2) * (ef - ei);
     }
@@ -603,8 +613,8 @@ double UtilityInterpolantScattering::Calculate(double ei, double ef, double rnd)
 // ------------------------------------------------------------------------- //
 double UtilityInterpolantScattering::GetUpperLimit(double ei, double rnd)
 {
-    (void) ei;
-    (void) rnd;
+    (void)ei;
+    (void)rnd;
 
     return 0;
 }
@@ -615,7 +625,9 @@ double UtilityInterpolantScattering::BuildInterpolant(double energy, UtilityInte
 }
 
 // ------------------------------------------------------------------------- //
-void UtilityInterpolantScattering::InitInterpolation(const std::string& name, UtilityIntegral& utility, int number_of_sampling_points)
+void UtilityInterpolantScattering::InitInterpolation(const std::string& name,
+                                                     UtilityIntegral& utility,
+                                                     int number_of_sampling_points)
 {
     UtilityInterpolant::InitInterpolation(name, utility, number_of_sampling_points);
 }

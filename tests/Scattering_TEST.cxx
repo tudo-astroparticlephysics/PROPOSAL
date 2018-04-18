@@ -3,16 +3,16 @@
 
 #include "gtest/gtest.h"
 
+#include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/medium/MediumFactory.h"
 #include "PROPOSAL/particle/Particle.h"
-#include "PROPOSAL/math/RandomGenerator.h"
 
-#include "PROPOSAL/scattering/ScatteringNoScattering.h"
-#include "PROPOSAL/scattering/ScatteringHighland.h"
-#include "PROPOSAL/scattering/ScatteringMoliere.h"
-#include "PROPOSAL/scattering/ScatteringHighlandIntegral.h"
 #include "PROPOSAL/scattering/ScatteringFactory.h"
+#include "PROPOSAL/scattering/ScatteringHighland.h"
+#include "PROPOSAL/scattering/ScatteringHighlandIntegral.h"
+#include "PROPOSAL/scattering/ScatteringMoliere.h"
+#include "PROPOSAL/scattering/ScatteringNoScattering.h"
 
 #include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
 
@@ -24,12 +24,10 @@ ParticleDef getParticleDef(const string& name)
     if (name == "MuMinus")
     {
         return MuMinusDef::Get();
-    }
-    else if (name == "TauMinus")
+    } else if (name == "TauMinus")
     {
         return TauMinusDef::Get();
-    }
-    else
+    } else
     {
         return EMinusDef::Get();
     }
@@ -43,17 +41,17 @@ TEST(Comparison, Comparison_equal)
     Scattering* noScat1 = new ScatteringNoScattering(mu, water);
     ScatteringNoScattering noScat2(mu, water);
 
-    EXPECT_TRUE(*noScat1==noScat2);
+    EXPECT_TRUE(*noScat1 == noScat2);
 
     Scattering* moliere1 = new ScatteringMoliere(mu, water);
     ScatteringMoliere moliere2(mu, water);
 
-    EXPECT_TRUE(*moliere1==moliere2);
+    EXPECT_TRUE(*moliere1 == moliere2);
 
     Scattering* high1 = new ScatteringHighland(mu, water);
     ScatteringHighland high2(mu, water);
 
-    EXPECT_TRUE(*high1==high2);
+    EXPECT_TRUE(*high1 == high2);
 
     EnergyCutSettings ecuts;
     Utility::Definition utility_defs;
@@ -62,12 +60,12 @@ TEST(Comparison, Comparison_equal)
     Scattering* highInt1 = new ScatteringHighlandIntegral(mu, utils);
     ScatteringHighlandIntegral highInt2(mu, utils);
 
-    EXPECT_TRUE(*highInt1==highInt2);
+    EXPECT_TRUE(*highInt1 == highInt2);
 }
 
 TEST(Comparison, Comparison_not_equal)
 {
-    Particle mu = Particle(MuMinusDef::Get());
+    Particle mu  = Particle(MuMinusDef::Get());
     Particle tau = Particle(TauMinusDef::Get());
     Water water(1.0);
     Ice ice;
@@ -76,22 +74,22 @@ TEST(Comparison, Comparison_not_equal)
     ScatteringNoScattering noScat2(tau, water);
     ScatteringNoScattering noScat3(mu, ice);
 
-    EXPECT_TRUE(noScat1!=noScat2);
-    EXPECT_TRUE(noScat1!=noScat3);
+    EXPECT_TRUE(noScat1 != noScat2);
+    EXPECT_TRUE(noScat1 != noScat3);
 
     ScatteringMoliere moliere1(mu, water);
     ScatteringMoliere moliere2(tau, water);
     ScatteringMoliere moliere3(mu, ice);
 
-    EXPECT_TRUE(moliere1!=moliere2);
-    EXPECT_TRUE(moliere1!=moliere3);
+    EXPECT_TRUE(moliere1 != moliere2);
+    EXPECT_TRUE(moliere1 != moliere3);
 
     ScatteringHighland high1(mu, water);
     ScatteringHighland high2(tau, water);
     ScatteringHighland high3(mu, ice);
 
-    EXPECT_TRUE(high1!=high2);
-    EXPECT_TRUE(high1!=high3);
+    EXPECT_TRUE(high1 != high2);
+    EXPECT_TRUE(high1 != high3);
 
     EnergyCutSettings ecuts1;
     EnergyCutSettings ecuts2(200, 0.01);
@@ -106,9 +104,9 @@ TEST(Comparison, Comparison_not_equal)
     ScatteringHighlandIntegral highInt3(mu, utils3);
     ScatteringHighlandIntegral highInt4(mu, utils4);
 
-    EXPECT_TRUE(highInt1!=highInt2);
-    EXPECT_TRUE(highInt1!=highInt3);
-    EXPECT_TRUE(highInt1!=highInt4);
+    EXPECT_TRUE(highInt1 != highInt2);
+    EXPECT_TRUE(highInt1 != highInt3);
+    EXPECT_TRUE(highInt1 != highInt4);
 }
 
 TEST(Assignment, Copyconstructor)
@@ -118,7 +116,7 @@ TEST(Assignment, Copyconstructor)
 
     ScatteringMoliere moliere1(mu, water);
     ScatteringMoliere moliere2 = moliere1;
-    EXPECT_TRUE(moliere1==moliere2);
+    EXPECT_TRUE(moliere1 == moliere2);
 }
 
 TEST(Assignment, Copyconstructor2)
@@ -128,9 +126,8 @@ TEST(Assignment, Copyconstructor2)
 
     ScatteringMoliere moliere1(mu, water);
     ScatteringMoliere moliere2(moliere1);
-    EXPECT_TRUE(moliere1==moliere2);
+    EXPECT_TRUE(moliere1 == moliere2);
 }
-
 
 TEST(Scattering, Scatter)
 {
@@ -151,24 +148,23 @@ TEST(Scattering, Scatter)
     double energy_init, energy_final, distance;
     double energy_previous = -1;
     double ecut, vcut;
-    Vector3D position_init = Vector3D(0,0,0);
-    Vector3D direction_init = Vector3D(1,0,0);
+    Vector3D position_init  = Vector3D(0, 0, 0);
+    Vector3D direction_init = Vector3D(1, 0, 0);
     direction_init.CalculateSphericalCoordinates();
     double x_f, y_f, z_f;
     double radius_f, phi_f, theta_f;
 
     cout.precision(16);
     RandomGenerator::Get().SetSeed(1234);
-    double error = 1e-3;
+    double error    = 1e-3;
     bool first_line = true;
 
-    while(in.good())
+    while (in.good())
     {
         if (first_line)
         {
-            in >> particleName >> mediumName >> parametrization
-                >> ecut >> vcut >> energy_init >> energy_final >> distance
-                >> x_f >> y_f >> z_f >> radius_f >> phi_f >> theta_f;
+            in >> particleName >> mediumName >> parametrization >> ecut >> vcut >> energy_init >> energy_final >>
+                distance >> x_f >> y_f >> z_f >> radius_f >> phi_f >> theta_f;
 
             first_line = false;
         }
@@ -176,20 +172,17 @@ TEST(Scattering, Scatter)
         energy_previous = -1;
 
         ParticleDef particle_def = getParticleDef(particleName);
-        Particle particle = Particle(particle_def);
+        Particle particle        = Particle(particle_def);
         particle.SetEnergy(energy_init);
         particle.SetPosition(position_init);
         particle.SetDirection(direction_init);
 
         Medium* medium = MediumFactory::Get().CreateMedium(mediumName);
-        EnergyCutSettings ecuts(ecut,vcut);
+        EnergyCutSettings ecuts(ecut, vcut);
         Utility utility(particle_def, *medium, ecuts, Utility::Definition(), InterpolationDef());
 
-        Scattering* scattering = ScatteringFactory::Get().CreateScattering(
-            parametrization,
-            particle,
-            utility,
-            InterpolationDef());
+        Scattering* scattering =
+            ScatteringFactory::Get().CreateScattering(parametrization, particle, utility, InterpolationDef());
 
         while (energy_previous < energy_init)
         {
@@ -203,18 +196,16 @@ TEST(Scattering, Scatter)
             std::cout << particle.GetPosition() << std::endl;
             std::cout << particle.GetDirection() << std::endl;
 
+            ASSERT_NEAR(particle.GetPosition().GetX(), x_f, std::abs(error * x_f));
+            ASSERT_NEAR(particle.GetPosition().GetY(), y_f, std::abs(error * y_f));
+            ASSERT_NEAR(particle.GetPosition().GetZ(), z_f, std::abs(error * z_f));
 
-            ASSERT_NEAR(particle.GetPosition().GetX(), x_f, std::abs(error*x_f));
-            ASSERT_NEAR(particle.GetPosition().GetY(), y_f, std::abs(error*y_f));
-            ASSERT_NEAR(particle.GetPosition().GetZ(), z_f, std::abs(error*z_f));
+            ASSERT_NEAR(particle.GetDirection().GetRadius(), radius_f, std::abs(error * radius_f));
+            ASSERT_NEAR(particle.GetDirection().GetPhi(), phi_f, std::abs(error * phi_f));
+            ASSERT_NEAR(particle.GetDirection().GetTheta(), theta_f, std::abs(error * theta_f));
 
-            ASSERT_NEAR(particle.GetDirection().GetRadius(), radius_f, std::abs(error*radius_f));
-            ASSERT_NEAR(particle.GetDirection().GetPhi(), phi_f, std::abs(error*phi_f));
-            ASSERT_NEAR(particle.GetDirection().GetTheta(), theta_f, std::abs(error*theta_f));
-
-            in >> particleName >> mediumName >> parametrization
-                >> ecut >> vcut >> energy_init >> energy_final >> distance
-                >> x_f >> y_f >> z_f >> radius_f >> phi_f >> theta_f;
+            in >> particleName >> mediumName >> parametrization >> ecut >> vcut >> energy_init >> energy_final >>
+                distance >> x_f >> y_f >> z_f >> radius_f >> phi_f >> theta_f;
         }
 
         delete medium;
@@ -222,8 +213,8 @@ TEST(Scattering, Scatter)
     }
 }
 
-
-int main(int argc, char **argv) {
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
+int main(int argc, char** argv)
+{
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }

@@ -5,8 +5,8 @@
 
 #include "PROPOSAL/crossection/parametrization/Photonuclear.h"
 #include "PROPOSAL/math/Integral.h"
-#include "PROPOSAL/math/InterpolantBuilder.h"
 #include "PROPOSAL/math/Interpolant.h"
+#include "PROPOSAL/math/InterpolantBuilder.h"
 
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/methods.h"
@@ -14,7 +14,7 @@
 #define Q2_PHOTO_PARAM_INTEGRAL_DEC(param)                                                                             \
     class Photo##param : public PhotoQ2Integral                                                                        \
     {                                                                                                                  \
-        public:                                                                                                        \
+    public:                                                                                                            \
         Photo##param(const ParticleDef&,                                                                               \
                      const Medium&,                                                                                    \
                      const EnergyCutSettings&,                                                                         \
@@ -37,7 +37,7 @@
                                                                                                                        \
         const std::string& GetName() const { return name_; }                                                           \
                                                                                                                        \
-        protected:                                                                                                     \
+    protected:                                                                                                         \
         static const std::string name_;                                                                                \
     };
 
@@ -46,12 +46,12 @@ namespace PROPOSAL {
 // class Interpolant;
 
 /******************************************************************************
-*                            Photo Q2 Integration                            *
-******************************************************************************/
+ *                            Photo Q2 Integration                            *
+ ******************************************************************************/
 
 class PhotoQ2Integral : public Photonuclear
 {
-    public:
+public:
     PhotoQ2Integral(const ParticleDef&,
                     const Medium&,
                     const EnergyCutSettings&,
@@ -76,7 +76,7 @@ class PhotoQ2Integral : public Photonuclear
 
     virtual size_t GetHash() const;
 
-    protected:
+protected:
     virtual bool compare(const Parametrization&) const;
     virtual void print(std::ostream&) const;
 
@@ -85,8 +85,8 @@ class PhotoQ2Integral : public Photonuclear
 };
 
 /******************************************************************************
-*                     Declare Integral Parametrizations                      *
-******************************************************************************/
+ *                     Declare Integral Parametrizations                      *
+ ******************************************************************************/
 
 Q2_PHOTO_PARAM_INTEGRAL_DEC(AbramowiczLevinLevyMaor91)
 Q2_PHOTO_PARAM_INTEGRAL_DEC(AbramowiczLevinLevyMaor97)
@@ -94,22 +94,22 @@ Q2_PHOTO_PARAM_INTEGRAL_DEC(ButkevichMikhailov)
 Q2_PHOTO_PARAM_INTEGRAL_DEC(RenoSarcevicSu)
 
 /******************************************************************************
-*                    Declare Interpolant Parametrizations                    *
-******************************************************************************/
+ *                    Declare Interpolant Parametrizations                    *
+ ******************************************************************************/
 
-template <class Param = PhotoAbramowiczLevinLevyMaor97>
+template<class Param = PhotoAbramowiczLevinLevyMaor97>
 class PhotoQ2Interpolant : public Param
 {
-    public:
+public:
     typedef std::vector<Interpolant*> InterpolantVec;
 
-    public:
+public:
     PhotoQ2Interpolant(const ParticleDef&,
-                              const Medium&,
-                              const EnergyCutSettings&,
-                              double multiplier,
-                              const ShadowEffect&,
-                              InterpolationDef def = InterpolationDef());
+                       const Medium&,
+                       const EnergyCutSettings&,
+                       double multiplier,
+                       const ShadowEffect&,
+                       InterpolationDef def = InterpolationDef());
     PhotoQ2Interpolant(const PhotoQ2Interpolant&);
     virtual ~PhotoQ2Interpolant();
 
@@ -126,20 +126,20 @@ class PhotoQ2Interpolant : public Param
 
     double DifferentialCrossSection(double energy, double v);
 
-    protected:
+protected:
     virtual bool compare(const Parametrization&) const;
     double FunctionToBuildPhotoInterpolant(double energy, double v, int component);
 
     InterpolantVec interpolant_;
 };
 
-template <class Param>
+template<class Param>
 PhotoQ2Interpolant<Param>::PhotoQ2Interpolant(const ParticleDef& particle_def,
-                                                     const Medium& medium,
-                                                     const EnergyCutSettings& cuts,
-                                                     double multiplier,
-                                                     const ShadowEffect& shadow_effect,
-                                                     InterpolationDef def)
+                                              const Medium& medium,
+                                              const EnergyCutSettings& cuts,
+                                              double multiplier,
+                                              const ShadowEffect& shadow_effect,
+                                              InterpolationDef def)
     : Param(particle_def, medium, cuts, multiplier, shadow_effect)
     , interpolant_(this->medium_->GetNumComponents(), NULL)
 {
@@ -167,8 +167,7 @@ PhotoQ2Interpolant<Param>::PhotoQ2Interpolant(const ParticleDef& particle_def,
             .SetRationalY(false)
             .SetRelativeY(false)
             .SetLogSubst(false)
-            .SetFunction2D(
-                boost::bind(&PhotoQ2Interpolant::FunctionToBuildPhotoInterpolant, this, _1, _2, i));
+            .SetFunction2D(boost::bind(&PhotoQ2Interpolant::FunctionToBuildPhotoInterpolant, this, _1, _2, i));
 
         builder_container2d[i].first  = &builder2d[i];
         builder_container2d[i].second = &interpolant_[i];
@@ -177,23 +176,23 @@ PhotoQ2Interpolant<Param>::PhotoQ2Interpolant(const ParticleDef& particle_def,
     Helper::InitializeInterpolation("Photo", builder_container2d, std::vector<Parametrization*>(1, this), def);
 }
 
-template <class Param>
+template<class Param>
 PhotoQ2Interpolant<Param>::PhotoQ2Interpolant(const PhotoQ2Interpolant& photo)
     : Param(photo)
     , interpolant_()
 {
     interpolant_.resize(photo.interpolant_.size());
 
-    for(unsigned int i = 0; i < photo.interpolant_.size(); ++i)
+    for (unsigned int i = 0; i < photo.interpolant_.size(); ++i)
     {
         interpolant_[i] = new Interpolant(*photo.interpolant_[i]);
     }
 }
 
-template <class Param>
+template<class Param>
 PhotoQ2Interpolant<Param>::~PhotoQ2Interpolant()
 {
-    for(std::vector<Interpolant*>::const_iterator iter = interpolant_.begin(); iter != interpolant_.end(); ++iter)
+    for (std::vector<Interpolant*>::const_iterator iter = interpolant_.begin(); iter != interpolant_.end(); ++iter)
     {
         delete *iter;
     }
@@ -201,10 +200,10 @@ PhotoQ2Interpolant<Param>::~PhotoQ2Interpolant()
     interpolant_.clear();
 }
 
-template <class Param>
+template<class Param>
 bool PhotoQ2Interpolant<Param>::compare(const Parametrization& parametrization) const
 {
-    const PhotoQ2Interpolant<Param>* photo = static_cast<const PhotoQ2Interpolant<Param> *>(&parametrization);
+    const PhotoQ2Interpolant<Param>* photo = static_cast<const PhotoQ2Interpolant<Param>*>(&parametrization);
 
     if (interpolant_.size() != photo->interpolant_.size())
         return false;
@@ -218,7 +217,7 @@ bool PhotoQ2Interpolant<Param>::compare(const Parametrization& parametrization) 
     return PhotoQ2Integral::compare(parametrization);
 }
 
-template <class Param>
+template<class Param>
 double PhotoQ2Interpolant<Param>::DifferentialCrossSection(double energy, double v)
 {
     Parametrization::IntegralLimits limits = this->GetIntegralLimits(energy);
@@ -233,10 +232,10 @@ double PhotoQ2Interpolant<Param>::DifferentialCrossSection(double energy, double
     return Param::DifferentialCrossSection(energy, v);
 }
 
-template <class Param>
+template<class Param>
 double PhotoQ2Interpolant<Param>::FunctionToBuildPhotoInterpolant(double energy, double v, int component)
 {
-    this->component_index_      = component;
+    this->component_index_                 = component;
     Parametrization::IntegralLimits limits = this->GetIntegralLimits(energy);
 
     if (limits.vUp == limits.vMax)
@@ -251,4 +250,4 @@ double PhotoQ2Interpolant<Param>::FunctionToBuildPhotoInterpolant(double energy,
 
 #undef Q2_PHOTO_PARAM_INTEGRAL_DEC
 
-} /* PROPOSAL */
+} // namespace PROPOSAL

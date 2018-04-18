@@ -3,18 +3,18 @@
 
 #include <cmath>
 
-#include "PROPOSAL/crossection/IonizInterpolant.h"
 #include "PROPOSAL/crossection/IonizIntegral.h"
+#include "PROPOSAL/crossection/IonizInterpolant.h"
 #include "PROPOSAL/crossection/parametrization/Ionization.h"
 
+#include "PROPOSAL/math/Interpolant.h"
+#include "PROPOSAL/math/InterpolantBuilder.h"
 #include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/medium/Medium.h"
-#include "PROPOSAL/math/InterpolantBuilder.h"
-#include "PROPOSAL/math/Interpolant.h"
 
+#include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Output.h"
 #include "PROPOSAL/methods.h"
-#include "PROPOSAL/Constants.h"
 
 using namespace PROPOSAL;
 
@@ -70,12 +70,9 @@ IonizInterpolant::IonizInterpolant(const Ionization& param, InterpolationDef def
 
     builder_container_de2dx.push_back(std::make_pair(&builder_de2dx, &de2dx_interpolant_));
 
-    Helper::InitializeInterpolation("dEdx",
-                                    builder_container,
-                                    std::vector<Parametrization*>(1, parametrization_), def);
-    Helper::InitializeInterpolation("dE2dx",
-                                    builder_container_de2dx,
-                                    std::vector<Parametrization*>(1, parametrization_), def);
+    Helper::InitializeInterpolation("dEdx", builder_container, std::vector<Parametrization*>(1, parametrization_), def);
+    Helper::InitializeInterpolation(
+        "dE2dx", builder_container_de2dx, std::vector<Parametrization*>(1, parametrization_), def);
 }
 
 IonizInterpolant::IonizInterpolant(const IonizInterpolant& ioniz)
@@ -83,9 +80,7 @@ IonizInterpolant::IonizInterpolant(const IonizInterpolant& ioniz)
 {
 }
 
-IonizInterpolant::~IonizInterpolant()
-{
-}
+IonizInterpolant::~IonizInterpolant() {}
 
 // ------------------------------------------------------------------------- //
 void IonizInterpolant::InitdNdxInerpolation(const InterpolationDef& def)
@@ -108,7 +103,8 @@ void IonizInterpolant::InitdNdxInerpolation(const InterpolationDef& def)
         // !!! IMPORTANT !!!
         // Order of builder matter because the functions needed for 1d interpolation
         // needs the already intitialized 2d interpolants.
-        builder2d[i].SetMax1(NUM1)
+        builder2d[i]
+            .SetMax1(NUM1)
             .SetX1Min(parametrization_->GetParticleDef().low)
             .SetX1Max(BIGENERGY)
             .SetMax2(NUM1)
@@ -126,12 +122,14 @@ void IonizInterpolant::InitdNdxInerpolation(const InterpolationDef& def)
             .SetRationalY(true)
             .SetRelativeY(false)
             .SetLogSubst(false)
-            .SetFunction2D(boost::bind(&IonizInterpolant::FunctionToBuildDNdxInterpolant2D, this, _1, _2, boost::ref(integral), i));
+            .SetFunction2D(boost::bind(
+                &IonizInterpolant::FunctionToBuildDNdxInterpolant2D, this, _1, _2, boost::ref(integral), i));
 
-        builder_container2d[i].first = &builder2d[i];
+        builder_container2d[i].first  = &builder2d[i];
         builder_container2d[i].second = &dndx_interpolant_2d_[i];
 
-        builder1d[i].SetMax(NUM1)
+        builder1d[i]
+            .SetMax(NUM1)
             .SetXMin(parametrization_->GetParticleDef().low)
             .SetXMax(BIGENERGY)
             .SetRomberg(def.order_of_interpolation)
@@ -144,7 +142,7 @@ void IonizInterpolant::InitdNdxInerpolation(const InterpolationDef& def)
             .SetLogSubst(false)
             .SetFunction1D(boost::bind(&IonizInterpolant::FunctionToBuildDNdxInterpolant, this, _1, i));
 
-        builder_container1d[i].first = &builder1d[i];
+        builder_container1d[i].first  = &builder1d[i];
         builder_container1d[i].second = &dndx_interpolant_1d_[i];
     }
 
@@ -152,9 +150,7 @@ void IonizInterpolant::InitdNdxInerpolation(const InterpolationDef& def)
     builder_return.insert(builder_return.end(), builder_container1d.begin(), builder_container1d.end());
     // builder2d.insert(builder2d.end(), builder1d.begin(), builder1d.end());
 
-    Helper::InitializeInterpolation("dNdx",
-                                    builder_return,
-                                    std::vector<Parametrization*>(1, parametrization_), def);
+    Helper::InitializeInterpolation("dNdx", builder_return, std::vector<Parametrization*>(1, parametrization_), def);
 }
 
 // ----------------------------------------------------------------- //
@@ -187,7 +183,7 @@ double IonizInterpolant::CalculatedNdx(double energy)
 // ------------------------------------------------------------------------- //
 double IonizInterpolant::CalculatedNdx(double energy, double rnd)
 {
-    (void) rnd;
+    (void)rnd;
 
     if (parametrization_->GetMultiplier() <= 0)
     {
@@ -202,7 +198,7 @@ double IonizInterpolant::CalculatedNdx(double energy, double rnd)
 // ------------------------------------------------------------------------- //
 double IonizInterpolant::FunctionToBuildDNdxInterpolant(double energy, int component)
 {
-    (void) component;
+    (void)component;
     return dndx_interpolant_2d_[0]->Interpolate(energy, 1.0);
 }
 

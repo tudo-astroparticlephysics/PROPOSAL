@@ -3,15 +3,15 @@
 
 #include "PROPOSAL/propagation_utility/PropagationUtility.h"
 
-namespace PROPOSAL{
-    class Integral;
-    class UtilityIntegral;
-}
+namespace PROPOSAL {
+class Integral;
+class UtilityIntegral;
+} // namespace PROPOSAL
 
 #define UTILITY_INTERPOLANT_DEC(cls)                                                                                   \
     class UtilityInterpolant##cls : public UtilityInterpolant                                                          \
     {                                                                                                                  \
-        public:                                                                                                        \
+    public:                                                                                                            \
         UtilityInterpolant##cls(const Utility&, InterpolationDef);                                                     \
                                                                                                                        \
         UtilityInterpolant##cls(const Utility&, const UtilityInterpolant##cls&);                                       \
@@ -23,7 +23,7 @@ namespace PROPOSAL{
         double Calculate(double ei, double ef, double rnd);                                                            \
         double GetUpperLimit(double ei, double rnd);                                                                   \
                                                                                                                        \
-        private:                                                                                                       \
+    private:                                                                                                           \
         UtilityInterpolant##cls& operator=(const UtilityInterpolant##cls&);                                            \
                                                                                                                        \
         double BuildInterpolant(double, UtilityIntegral&, Integral&);                                                  \
@@ -36,7 +36,7 @@ class Interpolant;
 
 class UtilityInterpolant : public UtilityDecorator
 {
-    public:
+public:
     UtilityInterpolant(const Utility&, InterpolationDef);
 
     // Copy constructors
@@ -50,12 +50,12 @@ class UtilityInterpolant : public UtilityDecorator
     virtual double Calculate(double ei, double ef, double rnd) = 0;
     virtual double GetUpperLimit(double ei, double rnd);
 
-    protected:
+protected:
     UtilityInterpolant& operator=(const UtilityInterpolant&); // Undefined & not allowed
 
     virtual bool compare(const UtilityDecorator&) const;
 
-    virtual double BuildInterpolant(double, UtilityIntegral&, Integral&) = 0;
+    virtual double BuildInterpolant(double, UtilityIntegral&, Integral&)                                = 0;
     virtual void InitInterpolation(const std::string&, UtilityIntegral&, int number_of_sampling_points) = 0;
 
     double stored_result_;
@@ -65,29 +65,29 @@ class UtilityInterpolant : public UtilityDecorator
     InterpolationDef interpolation_def_;
 };
 
-class UtilityInterpolantInteraction: public UtilityInterpolant
+class UtilityInterpolantInteraction : public UtilityInterpolant
 {
-    public:
+public:
     UtilityInterpolantInteraction(const Utility&, InterpolationDef);
 
     // Copy constructors
     UtilityInterpolantInteraction(const Utility&, const UtilityInterpolantInteraction&);
     UtilityInterpolantInteraction(const UtilityInterpolantInteraction&);
-    virtual UtilityInterpolant* clone(const Utility& utility) const { return new UtilityInterpolantInteraction(utility, *this); }
+    virtual UtilityInterpolant* clone(const Utility& utility) const
+    {
+        return new UtilityInterpolantInteraction(utility, *this);
+    }
 
     virtual ~UtilityInterpolantInteraction();
-
 
     // Methods
     double Calculate(double ei, double ef, double rnd);
     double GetUpperLimit(double ei, double rnd);
 
-    private:
+private:
     UtilityInterpolantInteraction& operator=(const UtilityInterpolantInteraction&); // Undefined & not allowed
 
     virtual bool compare(const UtilityDecorator&) const;
-
-    // bool compare_interpolant(const UtilityInterpolant&) const;
 
     double BuildInterpolant(double, UtilityIntegral&, Integral&);
     void InitInterpolation(const std::string&, UtilityIntegral&, int number_of_sampling_points);
@@ -96,15 +96,18 @@ class UtilityInterpolantInteraction: public UtilityInterpolant
     double up_;
 };
 
-class UtilityInterpolantDecay: public UtilityInterpolant
+class UtilityInterpolantDecay : public UtilityInterpolant
 {
-    public:
+public:
     UtilityInterpolantDecay(const Utility&, InterpolationDef);
 
     // Copy constructors
     UtilityInterpolantDecay(const Utility&, const UtilityInterpolantDecay&);
     UtilityInterpolantDecay(const UtilityInterpolantDecay&);
-    virtual UtilityInterpolant* clone(const Utility& utility) const { return new UtilityInterpolantDecay(utility, *this); }
+    virtual UtilityInterpolant* clone(const Utility& utility) const
+    {
+        return new UtilityInterpolantDecay(utility, *this);
+    }
 
     virtual ~UtilityInterpolantDecay();
 
@@ -112,12 +115,10 @@ class UtilityInterpolantDecay: public UtilityInterpolant
     double Calculate(double ei, double ef, double rnd);
     double GetUpperLimit(double ei, double rnd);
 
-    private:
+private:
     UtilityInterpolantDecay& operator=(const UtilityInterpolantDecay&); // Undefined & not allowed
 
     virtual bool compare(const UtilityDecorator&) const;
-
-    // bool compare_interpolant(const UtilityInterpolant&) const;
 
     double BuildInterpolant(double, UtilityIntegral&, Integral&);
     void InitInterpolation(const std::string&, UtilityIntegral&, int number_of_sampling_points);
@@ -131,4 +132,4 @@ UTILITY_INTERPOLANT_DEC(Time)
 UTILITY_INTERPOLANT_DEC(ContRand)
 UTILITY_INTERPOLANT_DEC(Scattering)
 
-} /* PROPOSAL */
+} // namespace PROPOSAL

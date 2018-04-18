@@ -3,20 +3,16 @@
 
 #include "PROPOSAL/crossection/EpairIntegral.h"
 #include "PROPOSAL/crossection/EpairInterpolant.h"
-#include "PROPOSAL/crossection/parametrization/EpairProduction.h"
 #include "PROPOSAL/crossection/factories/EpairProductionFactory.h"
+#include "PROPOSAL/crossection/parametrization/EpairProduction.h"
 
 #include "PROPOSAL/Output.h"
 
 using namespace PROPOSAL;
 
-EpairProductionFactory::EpairProductionFactory()
-{
-}
+EpairProductionFactory::EpairProductionFactory() {}
 
-EpairProductionFactory::~EpairProductionFactory()
-{
-}
+EpairProductionFactory::~EpairProductionFactory() {}
 
 // ------------------------------------------------------------------------- //
 // Most general creator

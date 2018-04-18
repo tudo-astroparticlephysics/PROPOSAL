@@ -1,17 +1,14 @@
 
 #pragma once
 
-
-#include "PROPOSAL/propagation_utility/PropagationUtility.h"
 #include "PROPOSAL/medium/MediumFactory.h"
+#include "PROPOSAL/propagation_utility/PropagationUtility.h"
 
-namespace  PROPOSAL
-{
+namespace PROPOSAL {
 
 class UtilityFactory
 {
-    public:
-
+public:
     struct Definition : Utility::Definition
     {
         double e_cut;
@@ -31,10 +28,9 @@ class UtilityFactory
         return instance;
     }
 
-    private:
+private:
     UtilityFactory(){};
     ~UtilityFactory(){};
 };
 
-} /*  PROPOSAL */
-
+} // namespace PROPOSAL

@@ -1,17 +1,17 @@
 /*! \file   Components.h
-*   \brief  Source file for the components routines.
-*
-*   For more details see the class documentation.
-*
-*   \date   Sat Aug  5 14:47:16 CEST 2017
-*   \author Mario Dunsch
-*/
+ *   \brief  Source file for the components routines.
+ *
+ *   For more details see the class documentation.
+ *
+ *   \date   Sat Aug  5 14:47:16 CEST 2017
+ *   \author Mario Dunsch
+ */
 
 #include <boost/bind.hpp>
 
-#include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/math/Integral.h"
+#include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/methods.h"
 
 using namespace PROPOSAL;
@@ -29,8 +29,8 @@ using namespace PROPOSAL::Components;
     }
 
 /******************************************************************************
-*                                  OStream                                    *
-******************************************************************************/
+ *                                  OStream                                    *
+ ******************************************************************************/
 
 namespace PROPOSAL {
 
@@ -63,8 +63,8 @@ std::ostream& operator<<(std::ostream& os, Component const& component)
 } // namespace PROPOSAL
 
 /******************************************************************************
-*                                  Componet                                   *
-******************************************************************************/
+ *                                  Componet                                   *
+ ******************************************************************************/
 
 Component::Component(std::string name, double nucCharge, double atomicNum, double atomInMolecule)
     : name_(name)
@@ -80,7 +80,7 @@ Component::Component(std::string name, double nucCharge, double atomicNum, doubl
     SetLogConstant();
     SetBPrime();
 
-    M_ =(nucCharge_ * MP + (atomicNum_ - nucCharge_) * MN) / atomicNum_;
+    M_ = (nucCharge_ * MP + (atomicNum_ - nucCharge_) * MN) / atomicNum_;
 
     if (nucCharge != 1.0)
     {
@@ -89,11 +89,9 @@ Component::Component(std::string name, double nucCharge, double atomicNum, doubl
         r0_ = pow(atomicNum, 1.0 / 3.0);
         r0_ = 1.12 * r0_ - 0.86 / r0_;
 
-        mN_ = 1.0 -
-              4.0 * PI * 0.17 *
-                  integral.Integrate(
-                      r0_, -1.0, boost::bind(&Component::FunctionToIntegral, this, _1), 3, 2.0) /
-                  atomicNum_;
+        mN_ = 1.0 - 4.0 * PI * 0.17 *
+                        integral.Integrate(r0_, -1.0, boost::bind(&Component::FunctionToIntegral, this, _1), 3, 2.0) /
+                        atomicNum_;
     }
 }
 
@@ -135,15 +133,15 @@ Component& Component::operator=(const Component& component)
 {
     if (this != &component)
     {
-        name_ = component.name_;
-        nucCharge_ = component.nucCharge_;
-        atomicNum_ = component.atomicNum_;
+        name_           = component.name_;
+        nucCharge_      = component.nucCharge_;
+        atomicNum_      = component.atomicNum_;
         atomInMolecule_ = component.atomInMolecule_;
-        logConstant_ = component.logConstant_;
-        bPrime_ = component.bPrime_;
-        M_ = component.M_;
-        mN_ = component.mN_;
-        r0_ = component.r0_;
+        logConstant_    = component.logConstant_;
+        bPrime_         = component.bPrime_;
+        M_              = component.M_;
+        mN_             = component.mN_;
+        r0_             = component.r0_;
     }
 
     return *this;
@@ -315,8 +313,8 @@ double Component::FunctionToIntegral(double r)
 }
 
 /******************************************************************************
-*                            Different Components                             *
-******************************************************************************/
+ *                            Different Components                             *
+ ******************************************************************************/
 
 COMPONENT_IMPL(Hydrogen, H, 1, 1.00794)
 COMPONENT_IMPL(Carbon, C, 6, 12.0011)

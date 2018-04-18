@@ -1,11 +1,11 @@
 /*! \file   Components.h
-*   \brief  Header file for definition of the components class object.
-*
-*   For more details see the class documentation.
-*
-*   \date   Sat Aug  5 14:47:16 CEST 2017
-*   \author Mario Dunsch
-*/
+ *   \brief  Header file for definition of the components class object.
+ *
+ *   For more details see the class documentation.
+ *
+ *   \date   Sat Aug  5 14:47:16 CEST 2017
+ *   \author Mario Dunsch
+ */
 
 #pragma once
 
@@ -14,7 +14,7 @@
 #define COMPONENT_DEC(cls, ATOMS)                                                                                      \
     class cls : public Component                                                                                       \
     {                                                                                                                  \
-        public:                                                                                                        \
+    public:                                                                                                            \
         cls(double atomInMolecule = ATOMS);                                                                            \
         cls(const cls&);                                                                                               \
         virtual ~cls() {}                                                                                              \
@@ -28,13 +28,16 @@ namespace Components {
 
 class Component
 {
-    public:
+public:
     Component(std::string name, double charge, double atomicNum, double atomInMolecule);
     Component(const Component&);
     virtual ~Component(){};
 
     void swap(Component&);
-    virtual Component* clone() const { return new Component(*this); }; // Prototyping/Virtual constructor idiom (used for deep copies)
+    virtual Component* clone() const
+    {
+        return new Component(*this);
+    }; // Prototyping/Virtual constructor idiom (used for deep copies)
 
     Component& operator=(const Component&);
     bool operator==(const Component&) const;
@@ -52,7 +55,7 @@ class Component
     double GetMN() const { return mN_; }
     double GetR0() const { return r0_; }
 
-    protected:
+protected:
     /*!
      * set the value of radiation logarithm constant B
      *
@@ -109,8 +112,8 @@ COMPONENT_DEC(Uranium, 1.0)
 COMPONENT_DEC(StandardRock, 1.0)
 COMPONENT_DEC(FrejusRock, 1.0)
 
-} // namesapce Components
+} // namespace Components
 
-} // namesapce PROPOSAL
+} // namespace PROPOSAL
 
 #undef COMPONENT_DEC

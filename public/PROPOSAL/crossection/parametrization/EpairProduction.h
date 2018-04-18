@@ -5,14 +5,13 @@
 #include "PROPOSAL/math/Integral.h"
 #include "PROPOSAL/methods.h"
 
-
 namespace PROPOSAL {
 
 class Interpolant;
 
 class EpairProduction : public Parametrization
 {
-    public:
+public:
     EpairProduction(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier, bool lpm);
     EpairProduction(const EpairProduction&);
     virtual ~EpairProduction();
@@ -63,8 +62,7 @@ class EpairProduction : public Parametrization
     const std::string& GetName() const { return name_; }
     virtual size_t GetHash() const;
 
-    protected:
-
+protected:
     bool compare(const Parametrization&) const;
     virtual void print(std::ostream&) const;
 
@@ -82,8 +80,12 @@ class EpairProduction : public Parametrization
 
 class EpairProductionRhoIntegral : public EpairProduction
 {
-    public:
-    EpairProductionRhoIntegral(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier, bool lpm);
+public:
+    EpairProductionRhoIntegral(const ParticleDef&,
+                               const Medium&,
+                               const EnergyCutSettings&,
+                               double multiplier,
+                               bool lpm);
     EpairProductionRhoIntegral(const EpairProductionRhoIntegral&);
     virtual ~EpairProductionRhoIntegral();
 
@@ -91,8 +93,7 @@ class EpairProductionRhoIntegral : public EpairProduction
 
     virtual double DifferentialCrossSection(double energy, double v);
 
-    private:
-
+private:
     bool compare(const Parametrization&) const;
 
     Integral integral_;
@@ -100,8 +101,13 @@ class EpairProductionRhoIntegral : public EpairProduction
 
 class EpairProductionRhoInterpolant : public EpairProductionRhoIntegral
 {
-    public:
-    EpairProductionRhoInterpolant(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier, bool lpm, InterpolationDef = InterpolationDef());
+public:
+    EpairProductionRhoInterpolant(const ParticleDef&,
+                                  const Medium&,
+                                  const EnergyCutSettings&,
+                                  double multiplier,
+                                  bool lpm,
+                                  InterpolationDef = InterpolationDef());
     EpairProductionRhoInterpolant(const EpairProductionRhoInterpolant&);
     virtual ~EpairProductionRhoInterpolant();
 
@@ -109,7 +115,7 @@ class EpairProductionRhoInterpolant : public EpairProductionRhoIntegral
 
     double DifferentialCrossSection(double energy, double v);
 
-    private:
+private:
     bool compare(const Parametrization&) const;
 
     double FunctionToBuildEpairInterpolant(double energy, double v, int component);
@@ -117,4 +123,4 @@ class EpairProductionRhoInterpolant : public EpairProductionRhoIntegral
     std::vector<Interpolant*> interpolant_; //!< Interpolates function used by dNdx and dEdx
 };
 
-} /* PROPOSAL */
+} // namespace PROPOSAL

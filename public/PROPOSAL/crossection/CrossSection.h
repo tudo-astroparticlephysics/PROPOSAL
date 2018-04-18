@@ -5,19 +5,17 @@
 
 #include "PROPOSAL/particle/Particle.h"
 
-namespace PROPOSAL
-{
+namespace PROPOSAL {
 
-namespace Components
-{
-    class Component;
+namespace Components {
+class Component;
 }
 
 class Parametrization;
 
 class CrossSection
 {
-    public:
+public:
     CrossSection(const DynamicData::Type&, const Parametrization&);
     CrossSection(const CrossSection&);
     virtual ~CrossSection();
@@ -33,10 +31,10 @@ class CrossSection
     // Public methods
     // ----------------------------------------------------------------- //
 
-    virtual double CalculatedEdx(double energy) = 0;
-    virtual double CalculatedE2dx(double energy) = 0;
-    virtual double CalculatedNdx(double energy) = 0;
-    virtual double CalculatedNdx(double energy, double rnd) = 0;
+    virtual double CalculatedEdx(double energy)                                     = 0;
+    virtual double CalculatedE2dx(double energy)                                    = 0;
+    virtual double CalculatedNdx(double energy)                                     = 0;
+    virtual double CalculatedNdx(double energy, double rnd)                         = 0;
     virtual double CalculateStochasticLoss(double energy, double rnd1, double rnd2) = 0;
 
     // ----------------------------------------------------------------- //
@@ -46,8 +44,7 @@ class CrossSection
     DynamicData::Type GetTypeId() const { return type_id_; }
     Parametrization& GetParametrization() const { return *parametrization_; }
 
-    protected:
-
+protected:
     virtual bool compare(const CrossSection&) const = 0;
 
     typedef std::vector<Components::Component*> ComponentVec;
@@ -73,9 +70,9 @@ class CrossSection
     const ComponentVec& components_;
 
     double rnd_; //!< This random number will be stored in CalculateDNdx to avoid calculate dNdx a second time in
-                 //!ClaculateSochasticLoss when it is already done
+                 //! ClaculateSochasticLoss when it is already done
 };
 
 std::ostream& operator<<(std::ostream&, PROPOSAL::CrossSection const&);
 
-} /* PROPOSAL */
+} // namespace PROPOSAL

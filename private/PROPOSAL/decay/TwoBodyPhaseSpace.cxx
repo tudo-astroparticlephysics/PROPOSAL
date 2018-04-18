@@ -1,6 +1,6 @@
 
-#include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/decay/TwoBodyPhaseSpace.h"
+#include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/particle/Particle.h"
 
 using namespace PROPOSAL;
@@ -14,9 +14,7 @@ TwoBodyPhaseSpace::TwoBodyPhaseSpace(const ParticleDef& first, const ParticleDef
 {
 }
 
-TwoBodyPhaseSpace::~TwoBodyPhaseSpace()
-{
-}
+TwoBodyPhaseSpace::~TwoBodyPhaseSpace() {}
 
 TwoBodyPhaseSpace::TwoBodyPhaseSpace(const TwoBodyPhaseSpace& mode)
     : DecayChannel(mode)
@@ -31,9 +29,9 @@ bool TwoBodyPhaseSpace::compare(const DecayChannel& channel) const
 
     if (!two_body)
         return false;
-    else if (first_daughter_!= two_body->first_daughter_)
+    else if (first_daughter_ != two_body->first_daughter_)
         return false;
-    else if (second_daughter_!= two_body->second_daughter_)
+    else if (second_daughter_ != two_body->second_daughter_)
         return false;
     else
         return true;
@@ -45,7 +43,7 @@ DecayChannel::DecayProducts TwoBodyPhaseSpace::Decay(const Particle& particle)
     products.push_back(new Particle(first_daughter_));
     products.push_back(new Particle(second_daughter_));
 
-    double momentum  = Momentum(particle.GetMass(), first_daughter_.mass, second_daughter_.mass);
+    double momentum    = Momentum(particle.GetMass(), first_daughter_.mass, second_daughter_.mass);
     Vector3D direction = GenerateRandomDirection();
 
     products[0]->SetDirection(direction);
@@ -68,6 +66,6 @@ DecayChannel::DecayProducts TwoBodyPhaseSpace::Decay(const Particle& particle)
 void TwoBodyPhaseSpace::print(std::ostream& os) const
 {
     os << "Used masses:" << '\n';
-    os << "First daughter:\n" << first_daughter_<< '\n';
-    os << "Second daughter:\n" << second_daughter_<< '\n';
+    os << "First daughter:\n" << first_daughter_ << '\n';
+    os << "Second daughter:\n" << second_daughter_ << '\n';
 }

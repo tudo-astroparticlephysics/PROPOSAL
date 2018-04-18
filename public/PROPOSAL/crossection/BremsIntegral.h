@@ -1,28 +1,26 @@
 
 #pragma once
 
-
 #include "PROPOSAL/crossection/CrossSectionIntegral.h"
 
-namespace PROPOSAL
-{
+namespace PROPOSAL {
 
 class Bremsstrahlung;
 
-class BremsIntegral: public CrossSectionIntegral
+class BremsIntegral : public CrossSectionIntegral
 {
-    public:
-        BremsIntegral(const Bremsstrahlung&);
-        BremsIntegral(const BremsIntegral&);
-        virtual ~BremsIntegral();
+public:
+    BremsIntegral(const Bremsstrahlung&);
+    BremsIntegral(const BremsIntegral&);
+    virtual ~BremsIntegral();
 
-        CrossSection* clone() const { return new BremsIntegral(*this); }
+    CrossSection* clone() const { return new BremsIntegral(*this); }
 
-        // ----------------------------------------------------------------- //
-        // Public methods
-        // ----------------------------------------------------------------- //
+    // ----------------------------------------------------------------- //
+    // Public methods
+    // ----------------------------------------------------------------- //
 
-        double CalculatedEdx(double energy);
+    double CalculatedEdx(double energy);
 };
 
-} /* PROPOSAL */
+} // namespace PROPOSAL
