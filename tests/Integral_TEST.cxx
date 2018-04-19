@@ -1,205 +1,243 @@
 
 // #include <limits.h>
-// #include <math.h>
+#include <math.h>
 // #include <iostream>
 
 #include "gtest/gtest.h"
 
-#include "PROPOSAL/Integral.h"
+#include "PROPOSAL/PROPOSAL.h"
 
 using namespace PROPOSAL;
 
-double Testfkt(double r){
-  return exp(r);
-}
-
-double Testexp(double r){
+double Testfkt(double r)
+{
     return exp(r);
 }
 
-bool relErr(double Is, double HasToBe, double RelError){
-    return fabs((Is - HasToBe)/HasToBe)<RelError;
+double Testexp(double r)
+{
+    return exp(r);
 }
 
-TEST(Comparison , Comparison_equal ) {
+bool relErr(double Is, double HasToBe, double RelError)
+{
+    return fabs((Is - HasToBe) / HasToBe) < RelError;
+}
+
+TEST(Comparison, Comparison_equal)
+{
     Integral A;
     Integral B;
-    EXPECT_TRUE(A==B);
-    Integral* C = new Integral(5,20,1e-5);
-    Integral* D = new Integral(5,20,1e-5);
-    EXPECT_TRUE(*C==*D);
-    C->Integrate(0,3,Testfkt,1);
-    D->Integrate(0,3,Testfkt,1);
-    EXPECT_TRUE(*C==*D);
-
+    EXPECT_TRUE(A == B);
+    Integral* C = new Integral(5, 20, 1e-5);
+    Integral* D = new Integral(5, 20, 1e-5);
+    EXPECT_TRUE(*C == *D);
+    C->Integrate(0, 3, Testfkt, 1);
+    D->Integrate(0, 3, Testfkt, 1);
+    EXPECT_TRUE(*C == *D);
 }
 
-TEST(Comparison , Comparison_not_equal ) {
+TEST(Comparison, Comparison_not_equal)
+{
     Integral A;
-    Integral B(5,10,1e-5);
-    EXPECT_TRUE(A!=B);
-    Integral* C = new Integral(5,20,1e-5);
-    Integral* D = new Integral(5,20,1e-5);
-    C->Integrate(1,3,Testfkt,1);
-    D->Integrate(0,3,Testfkt,1);
-    EXPECT_TRUE(*C!=*D);
-    Integral* E = new Integral(1,20,1e-5);
-    Integral* F = new Integral(5,20,1e-5);
-    EXPECT_TRUE(*E!=*F);
-
-
+    Integral B(5, 10, 1e-5);
+    EXPECT_TRUE(A != B);
+    Integral* C = new Integral(5, 20, 1e-5);
+    Integral* D = new Integral(5, 20, 1e-5);
+    C->Integrate(1, 3, Testfkt, 1);
+    D->Integrate(0, 3, Testfkt, 1);
+    EXPECT_TRUE(*C != *D);
+    Integral* E = new Integral(1, 20, 1e-5);
+    Integral* F = new Integral(5, 20, 1e-5);
+    EXPECT_TRUE(*E != *F);
 }
 
-TEST(Assignment , Copyconstructor ) {
+TEST(Assignment, Copyconstructor)
+{
     Integral A;
-    Integral B =A;
+    Integral B = A;
 
-    EXPECT_TRUE(A==B);
-
+    EXPECT_TRUE(A == B);
 }
 
-TEST(Assignment , Copyconstructor2 ) {
+TEST(Assignment, Copyconstructor2)
+{
     Integral A;
     Integral B(A);
 
-    EXPECT_TRUE(A==B);
-
+    EXPECT_TRUE(A == B);
 }
 
-TEST(Assignment , Operator ) {
+TEST(Assignment, Operator)
+{
     Integral A;
-    A.Integrate(0,3,Testfkt,1);
-    Integral B(8,40,1e-9);
+    A.Integrate(0, 3, Testfkt, 1);
+    Integral B(8, 40, 1e-9);
 
-    EXPECT_TRUE(A!=B);
+    EXPECT_TRUE(A != B);
 
-    B=A;
+    B = A;
 
-    EXPECT_TRUE(A==B);
+    EXPECT_TRUE(A == B);
 }
 
-TEST(Assignment , Swap ) {
+TEST(Assignment, Swap)
+{
     Integral A;
     Integral B;
-    EXPECT_TRUE(A==B);
-    Integral* C = new Integral(5,20,1e-5);
-    Integral* D = new Integral(5,20,1e-5);
-    EXPECT_TRUE(*C==*D);
-    C->Integrate(0,3,Testfkt,1);
-    D->Integrate(0,3,Testfkt,1);
-    EXPECT_TRUE(*C==*D);
+    EXPECT_TRUE(A == B);
+    Integral* C = new Integral(5, 20, 1e-5);
+    Integral* D = new Integral(5, 20, 1e-5);
+    EXPECT_TRUE(*C == *D);
+    C->Integrate(0, 3, Testfkt, 1);
+    D->Integrate(0, 3, Testfkt, 1);
+    EXPECT_TRUE(*C == *D);
 
     A.swap(*C);
-    EXPECT_TRUE(A==*D);
-    EXPECT_TRUE(*C==B);
-
-
+    EXPECT_TRUE(A == *D);
+    EXPECT_TRUE(*C == B);
 }
 
-TEST(IntegralValue , Zero_to_Three_of_xx ) {
+TEST(IntegralValue, Zero_to_Three_of_xx)
+{
     Integral* Int = new Integral();
-    ASSERT_NEAR(Int->Integrate(0,3,Testfkt,1),exp(3)-1 , (exp(3)-1)*1E-6);
+    ASSERT_NEAR(Int->Integrate(0, 3, Testfkt, 1), exp(3) - 1, (exp(3) - 1) * 1E-6);
     delete Int;
 }
 
-TEST(IntegralValue, EqualBorders) {
+TEST(IntegralValue, EqualBorders)
+{
     Integral* Int = new Integral();
 
-    EXPECT_EQ(Int->Integrate(3,3,Testfkt,1),0);
-
-    delete Int;
-}
-
-TEST(IntegralValue, SmallError) {
-    Integral* Int = new Integral();
-
-    ASSERT_NEAR(   Int->Integrate(0,3,Testexp,1),exp(3)-1
-                            ,(exp(3)-1)*1.e-6);
+    EXPECT_EQ(Int->Integrate(3, 3, Testfkt, 1), 0);
 
     delete Int;
 }
 
-TEST(IntegralValue, FloatEqual) {
+TEST(IntegralValue, SmallError)
+{
     Integral* Int = new Integral();
-    //Last 4 digits can differ. relError<1E-4
-    ASSERT_FLOAT_EQ(Int->Integrate(0,3,Testexp,1),exp(3)-1);
+
+    ASSERT_NEAR(Int->Integrate(0, 3, Testexp, 1), exp(3) - 1, (exp(3) - 1) * 1.e-6);
 
     delete Int;
 }
 
-TEST(IntegralValue, MultiplePrecisions) {
-    double xmin=0,xmax=3;
-    double  ExactIntegral=exp(3)-1;
-    double  CalcIntegral=0;
+TEST(IntegralValue, FloatEqual)
+{
+    Integral* Int = new Integral();
+    // Last 4 digits can differ. relError<1E-4
+    ASSERT_FLOAT_EQ(Int->Integrate(0, 3, Testexp, 1), exp(3) - 1);
+
+    delete Int;
+}
+
+TEST(IntegralValue, MultiplePrecisions)
+{
+    double xmin = 0, xmax = 3;
+    double ExactIntegral = exp(3) - 1;
+    double CalcIntegral  = 0;
 
     double precision = 1E-5;
-    for(double precision = 1E-5; precision>1E-16;precision/=10){
+    for (double precision = 1E-5; precision > 1E-16; precision /= 10)
+    {
 
-        Integral* Int = new Integral(5,20,precision);
-        CalcIntegral = Int->Integrate(xmin,xmax,Testexp,1);
+        Integral* Int = new Integral(5, 20, precision);
+        CalcIntegral  = Int->Integrate(xmin, xmax, Testexp, 1);
 
-        ASSERT_NEAR(CalcIntegral,ExactIntegral, ExactIntegral*precision);
+        ASSERT_NEAR(CalcIntegral, ExactIntegral, ExactIntegral * precision);
 
         delete Int;
     }
 }
 
-TEST(IntegralValue, IntegrateWithSubstitution) {
-    double xmin=2,xmax=4;
-    double  ExactIntegral=exp(xmax)-exp(xmin);
-    double  CalcIntegral=0;
+TEST(IntegralValue, IntegrateWithSubstitution)
+{
+    double xmin = 2, xmax = 4;
+    double ExactIntegral = exp(xmax) - exp(xmin);
+    double CalcIntegral  = 0;
 
     double precision = 1E-5;
-    for(double precision = 1E-5; precision>1E-11;precision/=10){
+    for (double precision = 1E-5; precision > 1E-11; precision /= 10)
+    {
 
-        Integral* Int = new Integral(5,20,precision);
-        CalcIntegral = Int->Integrate(xmin,xmax,Testexp,3,2.);
+        Integral* Int = new Integral(5, 20, precision);
+        CalcIntegral  = Int->Integrate(xmin, xmax, Testexp, 3, 2.);
 
-        ASSERT_NEAR(CalcIntegral,ExactIntegral, ExactIntegral*precision);
+        ASSERT_NEAR(CalcIntegral, ExactIntegral, ExactIntegral * precision);
 
         delete Int;
     }
 }
 
-TEST(IntegralValue, IntegrateWithLog) {
-    double xmin=2,xmax=4;
-    double  ExactIntegral=exp(xmax)-exp(xmin);
-    double  CalcIntegral=0;
+TEST(IntegralValue, IntegrateWithLog)
+{
+    double xmin = 2, xmax = 4;
+    double ExactIntegral = exp(xmax) - exp(xmin);
+    double CalcIntegral  = 0;
 
     double precision = 1E-5;
-    for(double precision = 1E-5; precision>1E-11;precision/=10){
+    for (double precision = 1E-5; precision > 1E-11; precision /= 10)
+    {
 
-        Integral* Int = new Integral(5,20,precision);
-        CalcIntegral = Int->Integrate(xmin,xmax,Testexp,4);
+        Integral* Int = new Integral(5, 20, precision);
+        CalcIntegral  = Int->Integrate(xmin, xmax, Testexp, 4);
 
-        ASSERT_NEAR(CalcIntegral,ExactIntegral, ExactIntegral*precision);
+        ASSERT_NEAR(CalcIntegral, ExactIntegral, ExactIntegral * precision);
 
         delete Int;
     }
 }
 
-TEST(IntegralValue, IntegrateWithLogSubstitution) {
-    double xmin=2,xmax=4;
-    double  ExactIntegral=exp(xmax)-exp(xmin);
-    double  CalcIntegral=0;
+TEST(IntegralValue, IntegrateWithLogSubstitution)
+{
+    double xmin = 2, xmax = 4;
+    double ExactIntegral = exp(xmax) - exp(xmin);
+    double CalcIntegral  = 0;
 
     double precision = 1E-5;
-    for(double precision = 1E-5; precision>1E-6;precision/=10){
+    for (double precision = 1E-5; precision > 1E-6; precision /= 10)
+    {
 
-        Integral* Int = new Integral(5,20,precision);
-        CalcIntegral = Int->Integrate(xmin,xmax,Testexp,5,2.);
+        Integral* Int = new Integral(5, 20, precision);
+        CalcIntegral  = Int->Integrate(xmin, xmax, Testexp, 5, 2.);
 
-        ASSERT_NEAR(CalcIntegral,ExactIntegral, ExactIntegral*precision);
+        ASSERT_NEAR(CalcIntegral, ExactIntegral, ExactIntegral * precision);
 
         delete Int;
     }
 }
 
-//TEST(IntegralValue, HasToFail) {
-//    EXPECT_TRUE(false);
-//}
+TEST(QUADPACK, RombergIntegrationFailure)
+{
+    double precision = 1e-5;
+    IonizIntegral Ioniz_Int(Ionization(MuMinusDef::Get(), Ice(), EnergyCutSettings(), 1.0));
 
-int main(int argc, char **argv) {
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
+    // --------------------------------------------------------------------- //
+    // Problematic energy for romberg integration
+    // --------------------------------------------------------------------- //
+
+    double energy = 146.768; // 0.274374 + 4.63716e-10
+    double result = 2.9065825764284159;
+
+    double dEdx = Ioniz_Int.CalculatedEdx(energy);
+
+    ASSERT_NEAR(dEdx, result, result * precision);
+
+    // --------------------------------------------------------------------- //
+    // Problematic energy for gnu scientific lib gauss_quadrature integration
+    // --------------------------------------------------------------------- //
+
+    energy = 142.58; // 0.287524 - 1.01164e-8
+    result = 3.0734340510841172;
+
+    dEdx = Ioniz_Int.CalculatedEdx(energy);
+
+    ASSERT_NEAR(dEdx, result, result * precision);
+}
+
+int main(int argc, char** argv)
+{
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }
