@@ -12,6 +12,147 @@
 using namespace std;
 using namespace PROPOSAL;
 
+TEST(Comparison, Comparison_equal)
+{
+    Sector::Definition sector_def;
+    sector_def.location = Sector::ParticleLocation::InsideDetector;
+    sector_def.SetMedium(Water());
+    sector_def.SetGeometry(Sphere());
+    sector_def.scattering_model            = ScatteringFactory::Moliere;
+    sector_def.cut_settings                = EnergyCutSettings();
+    sector_def.do_continuous_randomization = true;
+
+    std::vector<Sector::Definition> sec_defs;
+    sec_defs.push_back(sector_def);
+
+    Propagator prop_a(MuMinusDef::Get(), sec_defs, Sphere());
+    Propagator prop_b(MuMinusDef::Get(), sec_defs, Sphere());
+
+    EXPECT_TRUE(prop_a == prop_b);
+}
+
+TEST(Comparison, Comparison_not_equal)
+{
+    Sector::Definition sector_def;
+    sector_def.location = Sector::ParticleLocation::InsideDetector;
+    sector_def.SetMedium(Water());
+    sector_def.SetGeometry(Sphere());
+    sector_def.scattering_model            = ScatteringFactory::Moliere;
+    sector_def.cut_settings                = EnergyCutSettings();
+    sector_def.do_continuous_randomization = true;
+
+    std::vector<Sector::Definition> sec_defs;
+    sec_defs.push_back(sector_def);
+
+    Propagator prop_a(MuMinusDef::Get(), sec_defs, Sphere());
+    Propagator prop_b(TauMinusDef::Get(), sec_defs, Sphere());
+
+    EXPECT_TRUE(prop_a != prop_b);
+
+    Propagator prop_c(MuMinusDef::Get(), sec_defs, Sphere());
+    Propagator prop_d(MuMinusDef::Get(), sec_defs, Box());
+
+    EXPECT_TRUE(prop_c != prop_d);
+
+    std::vector<Sector::Definition> sec_defs_diff_1;
+    sec_defs_diff_1.push_back(sector_def);
+    sec_defs_diff_1.push_back(sector_def);
+
+    Propagator prop_e(MuMinusDef::Get(), sec_defs, Sphere());
+    Propagator prop_f(MuMinusDef::Get(), sec_defs_diff_1, Sphere());
+
+    EXPECT_TRUE(prop_e != prop_f);
+
+    // Sector defs differ by the medium
+    Sector::Definition sector_def_2;
+    sector_def_2.location = Sector::ParticleLocation::InsideDetector;
+    sector_def_2.SetMedium(Ice());
+    sector_def_2.SetGeometry(Sphere());
+    sector_def_2.scattering_model            = ScatteringFactory::Moliere;
+    sector_def_2.cut_settings                = EnergyCutSettings();
+    sector_def_2.do_continuous_randomization = true;
+
+    std::vector<Sector::Definition> sec_defs_diff_2;
+    sec_defs_diff_2.push_back(sector_def_2);
+
+    Propagator prop_g(MuMinusDef::Get(), sec_defs, Sphere());
+    Propagator prop_h(MuMinusDef::Get(), sec_defs_diff_2, Sphere());
+
+    EXPECT_TRUE(prop_g != prop_h);
+}
+
+TEST(Assignment, Copyconstructor)
+{
+    Sector::Definition sector_def;
+    sector_def.location = Sector::ParticleLocation::InsideDetector;
+    sector_def.SetMedium(Water());
+    sector_def.SetGeometry(Sphere());
+    sector_def.scattering_model            = ScatteringFactory::Moliere;
+    sector_def.cut_settings                = EnergyCutSettings();
+    sector_def.do_continuous_randomization = true;
+
+    std::vector<Sector::Definition> sec_defs;
+    sec_defs.push_back(sector_def);
+
+    Propagator prop_a(MuMinusDef::Get(), sec_defs, Sphere());
+    Propagator prop_b = prop_a;
+
+    EXPECT_TRUE(prop_a == prop_b);
+}
+
+TEST(Assignment, Copyconstructor2)
+{
+    Sector::Definition sector_def;
+    sector_def.location = Sector::ParticleLocation::InsideDetector;
+    sector_def.SetMedium(Water());
+    sector_def.SetGeometry(Sphere());
+    sector_def.scattering_model            = ScatteringFactory::Moliere;
+    sector_def.cut_settings                = EnergyCutSettings();
+    sector_def.do_continuous_randomization = true;
+
+    std::vector<Sector::Definition> sec_defs;
+    sec_defs.push_back(sector_def);
+
+    Propagator prop_a(MuMinusDef::Get(), sec_defs, Sphere());
+    Propagator prop_b(prop_a);
+
+    EXPECT_TRUE(prop_a == prop_b);
+}
+
+// TEST(Assignment, AssignmentOperator)
+// {
+//     Sector::Definition sector_def_a;
+//     sector_def_a.location = Sector::ParticleLocation::InsideDetector;
+//     sector_def_a.SetMedium(Water());
+//     sector_def_a.SetGeometry(Sphere());
+//     sector_def_a.scattering_model            = ScatteringFactory::Moliere;
+//     sector_def_a.cut_settings                = EnergyCutSettings();
+//     sector_def_a.do_continuous_randomization = true;
+//
+//     std::vector<Sector::Definition> sec_defs_a;
+//     sec_defs_a.push_back(sector_def_a);
+//
+//     Propagator prop_a(MuMinusDef::Get(), sec_defs_a, Sphere());
+//
+//     // Sector defs differ by the medium
+//     Sector::Definition sector_def_b;
+//     sector_def_b.location = Sector::ParticleLocation::InsideDetector;
+//     sector_def_b.SetMedium(Ice());
+//     sector_def_b.SetGeometry(Sphere());
+//     sector_def_b.scattering_model            = ScatteringFactory::Moliere;
+//     sector_def_b.cut_settings                = EnergyCutSettings();
+//     sector_def_b.do_continuous_randomization = true;
+//
+//     std::vector<Sector::Definition> sec_defs_b;
+//     sec_defs_b.push_back(sector_def_b);
+//
+//     Propagator prop_b(MuMinusDef::Get(), sec_defs_b, Sphere());
+//
+//     prop_b = prop_a;
+//
+//     EXPECT_TRUE(prop_a == prop_b);
+// }
+
 TEST(Propagation, Test_nan)
 {
     int statistic = 10;
@@ -112,7 +253,7 @@ TEST(Propagation, particle_type)
     double length     = 0.0;
     double sec_energy = 0.0, x = 0.0, y = 0.0, z = 0.0, dx = 0.0, dy = 0.0, dz = 0.0;
 
-    double error = 1e-5;
+    double error = 1e-4;
 
     // Read
 
