@@ -29,9 +29,6 @@
 
 #pragma once
 
-#ifndef COEFF_H
-#define COEFF_H
-
 namespace PROPOSAL {
 
 //-----------------------------Coefficients-----------------------------------//
@@ -44,5 +41,3 @@ const extern double s2large[50];
 const extern double C1large[50];
 
 } // namespace PROPOSAL
-
-#endif

@@ -1,10 +1,10 @@
-#ifndef I3PROPAGATORSERVICEPROPOSAL_H
-#define I3PROPAGATORSERVICEPROPOSAL_H
 /**
  * class: I3PropagatorServicePROPOSAL
  *
  * (c) 2013 IceCube Collaboration
  */
+
+#pragma once
 
 // #include <vector>
 #include <boost/shared_ptr.hpp>
@@ -40,7 +40,6 @@ public:
     virtual ~I3PropagatorServicePROPOSAL();
 
     virtual std::vector<I3Particle> Propagate(I3Particle& p, DiagnosticMapPtr frame, I3FramePtr);
-    void SetTearDownPerCall(bool f) { tearDownPerCall_ = f; }
     virtual void SetRandomNumberGenerator(I3RandomServicePtr random);
     virtual void RegisterParticleType(I3Particle::ParticleType);
 
@@ -52,9 +51,7 @@ private:
      * on event-to-event state.
      */
 
-    bool tearDownPerCall_;
     I3RandomServicePtr rng_;
-
     std::string config_file_;
     PropagatorService proposal_service_;
 
@@ -74,5 +71,3 @@ private:
 
 I3_POINTER_TYPEDEFS(I3PropagatorServicePROPOSAL);
 } // namespace PROPOSAL
-
-#endif // I3PROPAGATORSERVICEPROPOSAL_H
