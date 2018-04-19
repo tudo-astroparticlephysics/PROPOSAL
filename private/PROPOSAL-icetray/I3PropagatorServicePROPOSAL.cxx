@@ -22,7 +22,6 @@
 
 #include <dataclasses/physics/I3Particle.h>
 
-// #include "PROPOSAL/src/PROPOSAL-icetray/I3PropagatorServicePROPOSAL.h"
 #include "PROPOSAL-icetray/Converter.h"
 #include "PROPOSAL-icetray/I3PropagatorServicePROPOSAL.h"
 
@@ -55,8 +54,7 @@ bool IsWritable(std::string table_dir)
 
 // ------------------------------------------------------------------------- //
 I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(std::string configfile)
-    : tearDownPerCall_(false)
-    , config_file_(configfile.empty() ? GetDefaultConfigFile() : configfile)
+    : config_file_(configfile.empty() ? GetDefaultConfigFile() : configfile)
     , proposal_service_()
 {
     proposal_service_.RegisterPropagator(Propagator(MuMinusDef::Get(), config_file_));
@@ -122,25 +120,6 @@ std::vector<I3Particle> I3PropagatorServicePROPOSAL::Propagate(I3Particle& p, Di
               p.GetAzimuth() / I3Units::deg,
               p.GetLength() / I3Units::m);
 
-    // TODO(mario):  Thu 2017/09/28
-    // if (tearDownPerCall_)
-    // {
-    //     delete proposal;
-    //     proposal = new Propagator(mediadef_,false);
-    //     // Apply Settings
-    //     Geometry* geo = new Geometry();
-    //     geo->InitCylinder(0,0,0,cylinderRadius_,0,cylinderHeight_);
-    //     proposal->SetDetector(geo);
-    //     proposal->SetBrems(brems_param_);
-    //     proposal->SetPhoto(photo_param_);
-    //     proposal->SetPath_to_tables(tabledir_);
-    //     // proposal->SetParticle(particle_type)
-    //     proposal->ApplyOptions();
-    //
-    //     boost::function<double ()> f = boost::bind(&I3RandomService::Uniform, rng_, 0, 1);
-    //     proposal->SetRandomNumberGenerator(f);
-    // }
-
     I3MMCTrackPtr mmcTrack = propagate(p, daughters);
 
     if (mmcTrack && frame)
@@ -170,8 +149,6 @@ I3MMCTrackPtr I3PropagatorServicePROPOSAL::propagate(I3Particle& p, vector<I3Par
     double x_0 = p.GetPos().GetX() / I3Units::cm; // [cm]
     double y_0 = p.GetPos().GetY() / I3Units::cm; // [cm]
     double z_0 = p.GetPos().GetZ() / I3Units::cm; // [cm]
-    // double theta_0 = p.GetDir().CalcTheta()/I3Units::deg; // [deg]
-    // double phi_0 = p.GetDir().CalcPhi()/I3Units::deg;   // [deg]
     double theta_0 = p.GetDir().CalcTheta();       // [rad]
     double phi_0   = p.GetDir().CalcPhi();         // [rad]
     double e_0     = p.GetEnergy() / I3Units::MeV; // [MeV]

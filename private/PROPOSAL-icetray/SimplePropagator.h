@@ -6,8 +6,7 @@
  * $Date: 2016-09-21 13:32:47 +0200 (Mi, 21. Sep 2016) $
  */
 
-#ifndef PROPOSAL_SIMPLEPROPAGATOR_H_INCLUDED
-#define PROPOSAL_SIMPLEPROPAGATOR_H_INCLUDED
+#pragma once
 
 #include <boost/shared_ptr.hpp>
 
@@ -78,5 +77,3 @@ public:
 private:
     PROPOSAL::Propagator* propagator_;
 };
-
-#endif // PROPOSAL_SIMPLEPROPAGATOR_H_INCLUDED
