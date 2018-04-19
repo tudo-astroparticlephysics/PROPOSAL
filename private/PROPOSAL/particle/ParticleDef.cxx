@@ -19,23 +19,6 @@
 
 #include "PROPOSAL/methods.h"
 
-// #define PARTICLE_IMP(cls, MASS, LIFETIME, CHARGE)                                                                      \
-//     ParticleDef::Builder& ParticleDef::Builder::Set##cls()                                                             \
-//     {                                                                                                                  \
-//         name     = #cls;                                                                                               \
-//         mass     = MASS;                                                                                               \
-//         low      = MASS;                                                                                               \
-//         lifetime = LIFETIME;                                                                                           \
-//         charge   = CHARGE;                                                                                             \
-//                                                                                                                        \
-//         if (lifetime < -1)                                                                                             \
-//         {                                                                                                              \
-//             decay_table.SetStable();                                                                                   \
-//         }                                                                                                              \
-//                                                                                                                        \
-//         return *this;                                                                                                  \
-//     }
-
 #define PARTICLE_IMP(cls, MASS, LIFETIME, CHARGE)                                                                      \
     cls##Def::cls##Def()                                                                                               \
         : ParticleDef(#cls,                                                                                            \
