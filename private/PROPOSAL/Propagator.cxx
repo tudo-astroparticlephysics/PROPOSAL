@@ -30,6 +30,7 @@ using namespace PROPOSAL;
 // Global defaults
 // ------------------------------------------------------------------------- //
 
+const int Propagator::global_seed_  = 0;
 const double Propagator::global_ecut_inside_  = 500;
 const double Propagator::global_ecut_infront_ = -1;
 const double Propagator::global_ecut_behind_  = -1;
@@ -139,6 +140,8 @@ Propagator::Propagator(const ParticleDef& particle_def, const std::string& confi
     , particle_(particle_def)
     , detector_(NULL)
 {
+    int global_seed  = global_seed_;
+
     double global_ecut_inside  = global_ecut_inside_;
     double global_ecut_infront = global_ecut_infront_;
     double global_ecut_behind  = global_ecut_behind_;
@@ -164,10 +167,9 @@ Propagator::Propagator(const ParticleDef& particle_def, const std::string& confi
         log_fatal("Unable parse \"%s\" as json file", config_file.c_str());
     }
 
-    int seed = 0;
-    SetMember(seed, "global.seed", pt_json);
-    RandomGenerator::Get().SetSeed(seed);
-    log_info("Seed of the default random generator set to %i", seed);
+    SetMember(global_seed, "global.seed", pt_json);
+    RandomGenerator::Get().SetSeed(global_seed);
+    log_info("Seed of the default random generator set to %i", global_seed);
 
     // Read in global cut and continous randomization options
     SetMember(global_ecut_inside, "global.ecut_inside", pt_json);
