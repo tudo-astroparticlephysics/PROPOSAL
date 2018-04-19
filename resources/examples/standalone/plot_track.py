@@ -91,7 +91,7 @@ def propagate():
     sec_def_infront.geometry = geo_outside
     sec_def_infront.particle_location = pp.ParticleLocation.infront_detector
 
-    sec_def_infront.scattering_model = pp.ScatteringModel.moliere
+    sec_def_infront.scattering_model = pp.ScatteringModel.Moliere
 
     sec_def_infront.cut_settings.ecut = -1
     sec_def_infront.cut_settings.vcut = 0.05
@@ -103,7 +103,7 @@ def propagate():
     sec_def_inside.geometry = geo_outside
     sec_def_inside.particle_location = pp.ParticleLocation.inside_detector
 
-    sec_def_inside.scattering_model = pp.ScatteringModel.moliere
+    sec_def_inside.scattering_model = pp.ScatteringModel.Moliere
 
     sec_def_inside.cut_settings.ecut = 500
     sec_def_inside.cut_settings.vcut = -1
@@ -115,7 +115,7 @@ def propagate():
     sec_def_behind.geometry = geo_outside
     sec_def_behind.particle_location = pp.ParticleLocation.behind_detector
 
-    sec_def_behind.scattering_model = pp.ScatteringModel.moliere
+    sec_def_behind.scattering_model = pp.ScatteringModel.Moliere
 
     sec_def_behind.cut_settings.ecut = -1
     sec_def_behind.cut_settings.vcut = 0.05
