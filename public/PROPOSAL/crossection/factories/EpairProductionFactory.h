@@ -6,6 +6,9 @@
 namespace PROPOSAL {
 
 class CrossSection;
+class ParticleDef;
+class Medium;
+class EnergyCutSettings;
 
 class EpairProductionFactory
 {
