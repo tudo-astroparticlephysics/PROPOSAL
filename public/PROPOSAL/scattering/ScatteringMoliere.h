@@ -29,9 +29,6 @@
 
 #pragma once
 
-#ifndef SCATTERING_MOLIERE_H
-#define SCATTERING_MOLIERE_H
-
 #include <vector>
 
 #include "PROPOSAL/scattering/Scattering.h"
@@ -95,5 +92,3 @@ private:
     double GetRandom(double pre_factor);
 };
 } // namespace PROPOSAL
-
-#endif // SCATTERING_MOLIERE_H
