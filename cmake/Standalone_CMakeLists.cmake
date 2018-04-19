@@ -201,14 +201,22 @@ TARGET_LINK_LIBRARIES(WriteSectorsFromDomList PROPOSAL)
 ADD_EXECUTABLE(example
         private/test/example.cxx
 )
-SET_TARGET_PROPERTIES(example PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -O2 -g -Wall -Wextra -Wnarrowing -Wpedantic -fdiagnostics-show-option")
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+  SET_TARGET_PROPERTIES(example PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -O2 -g -Wall -Wextra -Wnarrowing -Wpedantic -fdiagnostics-show-option -Wno-variadic-macros")
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+  SET_TARGET_PROPERTIES(example PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -O2 -g -Wall -Wextra -Wnarrowing -Wpedantic -fdiagnostics-show-option")
+endif()
 TARGET_LINK_LIBRARIES(example PROPOSAL)
 
 IF(ADD_PERFORMANCE_TEST)
 	ADD_EXECUTABLE(performance_test
 			private/test/performance_test.cxx
 	)
-	SET_TARGET_PROPERTIES(performance_test PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -O2 -g -Wall -Wextra -Wnarrowing -Wpedantic -fdiagnostics-show-option")
+  if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+	  SET_TARGET_PROPERTIES(performance_test PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -O2 -g -Wall -Wextra -Wnarrowing -Wpedantic -fdiagnostics-show-option -Wno-variadic-macros")
+  elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    SET_TARGET_PROPERTIES(performance_test PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -O2 -g -Wall -Wextra -Wnarrowing -Wpedantic -fdiagnostics-show-option")
+  endif()
 	TARGET_LINK_LIBRARIES(performance_test PROPOSAL ${LIBRARYS_TO_LINK_PERFORMANCE_TEST})
 ENDIF(ADD_PERFORMANCE_TEST)
 
