@@ -4,7 +4,7 @@
 In the configuration file you can specify all parameters for your propagation.
 It's written in a .json file (no comments). That's why we have this (nice) Docu. ;)
 
-The config file is structured into three parts:
+The configuration file is structured into three parts:
 - In the "global" part the general parameters are defined like the path for the interpolation tables.
 - In the "sectors" part the different media with their geometry are defined. The energy-cuts, which means how accurate the propagation process should be calculated, can be setted for each sector, which then overrides the global configurations.
 - In the "detector" part the geometry of the detector is defined.
@@ -29,29 +29,29 @@ It's also possible to do the calculations with integrations, but that increases 
 
 | Keyword          | Type   | Default   | Description |
 | ---------------- | ------ | --------- | ----------- |
-| `interpolate`    | Bool   | `True`    | Decides, wether to calculate with interpolations or integrations |
+| `interpolate`    | Bool   | `True`    | Decides, whether to calculate with interpolations or integrations |
 | `path_to_tables` | String | `""`      | path pointing to the folder with the interpolation tables |
-| `raw`            | Bool   | `False`   | Decides, wether the tables are stored in binary format or in human readable text format |
+| `raw`            | Bool   | `False`   | Decides, whether the tables are stored in binary format or in human readable text format |
 
 ### Accuracy parameters ###
 There are several parameters with which the precision or speed for advancing the particles can be adjusted.
 
 For the time calculation the energy dependence can be included via the dE/dx.
-Or the time is calculated by simply deviding distance by the speed of light.
+Or the time is calculated by simply dividing distance by the speed of light.
 
 There are four different multiple scattering parametrizations describing the deviation of the propagation direction.
   - `"Moliere"` Parametrization of [Moliere](http://zfn.mpdl.mpg.de/data/Reihe_A/3/ZNA-1948-3a-0078.pdf)
   - `"Highland"` First Order approximation (a gaussian function) of Moliere's theory derived by [Highland](https://doi.org/10.1016/0029-554X(75)90743-0) and corrected by [Lynch/Dahl](https://doi.org/10.1016/0168-583X(91)95671-Y).
-  - `"Highland-Integral"` From the old PROPOSAL version (wich had just this scattering mode). Also using Highland approximation (corrected by Lynch/Dahl), but taking into account the energy dependence of the propagted distance
+  - `"HighlandIntegral"` From the old PROPOSAL version (which had just this scattering mode). Also using Highland approximation (corrected by Lynch/Dahl), but taking into account the energy dependence of the propagted distance
   - `"NoScattering"` Here the particle always propagate in the initial direction without deviation from the propagation axes.
 
 If a particle gets below a lower threshold energy (this is a property of a particle that should be defined in the Particle Definitions and is by default the same as the particle mass) but hasn't decayed, it can get forced to stop and to decay.
 
 | Keyword          | Type   | Default     | Description |
 | ---------------- | ------ | ----------- | ----------- |
-| `exact_time`     | Bool   | `True`      | Decide, wether the energy dependence of the time is included |
-| `scattering`     | String | `"Moliere"` | multiple scattering parametrization describing the displacemant from the initial propagation direction |
-| `stopping_decay` | Bool   | `True`      | Decide, wether the particle gets stopped and forced to decay, if its energy is too low. |
+| `exact_time`     | Bool   | `True`      | Decide, whether the energy dependence of the time is included |
+| `scattering`     | String | `"Moliere"` | multiple scattering parametrization describing the displacement from the initial propagation direction |
+| `stopping_decay` | Bool   | `True`      | Decide, whether the particle gets stopped and forced to decay, if its energy is too low. |
 
 ### Cross section parameters ###
 There are several parametrizations defining the cross sections and further options which simply scales them.
@@ -104,7 +104,7 @@ The LPM effect (Landau-Pomeranschuk-Migdal), suppressing the bremsstrahlung and 
 | `lpm`                  | Bool   | `True`     | Incorporate the LPM-effect and TM-effect |
 
 ### Energy-cut parameters ###
-The energy cut settings and the continous randomization option are seperated between inside, infront and behind the detector.
+The energy cut settings and the continuous randomization option are separated between inside, in front and behind the detector.
 **ecut** describes the cut in the total energy loss in MeV and **vcut** describes the cut in the energy loss relative to the particle energy.
 Above this cut, the energy losses are calculated stochastically and below this cut, the energy loss is calculated via the average energy loss (continuously).
 - If both values are setted, the minimum of the total energy cut and the relative cut times the particle energy is applied.
@@ -114,26 +114,26 @@ Above this cut, the energy losses are calculated stochastically and below this c
 The continuous randomization randomizes the continuous losses, which affects, that the continuous losses are not always the same for the same particle energy, because they are randomised a little bit.
 This is just a useful for small energy cuts.
 
-Note: The energy cuts and the continous randomization settings can also be specified for each sector.
+Note: The energy cuts and the continuous randomization settings can also be specified for each sector.
 Then the global settings will be overwritten.
 
 | Keyword        | Type   | Default   | Description |
 | -------------- | ------ | --------- | ----------- |
 | `ecut_inside`  | Double | `500`     | total energy loss cut inside the detector |
-| `ecut_infront` | Double | `-1`      | total energy loss cut infront the detector |
+| `ecut_infront` | Double | `-1`      | total energy loss cut in front the detector |
 | `ecut_behind`  | Double | `-1`      | total energy loss cut behind the detector |
 | `vcut_inside`  | Double | `-1`      | relative energy loss cut inside the detector |
-| `vcut_infront` | Double | `0.001`   | relative energy loss cut infront the detector |
+| `vcut_infront` | Double | `0.001`   | relative energy loss cut in front the detector |
 | `vcut_behind`  | Double | `-1`      | relative energy loss cut behind the detector |
 | `cont_inside`  | Double | `True`    | includes the continuous randomization inside the detector |
-| `cont_infront` | Double | `True`    | includes the continuous randomization infront the detector |
-| `cont_behind`  | Double | `False`   | includes the continuous randomization infront the detector |
+| `cont_infront` | Double | `True`    | includes the continuous randomization in front the detector |
+| `cont_behind`  | Double | `False`   | includes the continuous randomization behind the detector |
 
 
 ## The `sectors` configurations ##
 
 Every sector needs a medium and a geometry, while it's priority, compared to other sectors, can be scaled with the hierarchy option.
-If multiple sectors are defined and if these sectors overlap, the decision which sector should be prefered is made with the hierarchy option.
+If multiple sectors are defined and if these sectors overlap, the decision which sector should be preferred is made with the hierarchy option.
 
 | Keyword     | Type    | Default | Description |
 | ----------- | ------- | ------- | ----------- |
@@ -155,16 +155,16 @@ The following media are implemented:
 - `"Paraffin"`
 - `"AntaresWater"`
 
-A density correction factor for the medium, spezifying the density of the medium for the experiment, can optinally be setted.
+A density correction factor for the medium, specifying the density of the medium for the experiment, can optionally be setted.
 
 | Keyword              | Type   | Default | Description |
 | -------------------- | ------ | ------- | ----------- |
-| `medium`             | String |         | Medium in this seector |
+| `medium`             | String |         | Medium in this sector |
 | `density_correction` | Double | `1`     | density correction factor of the medium |
 
 ### Geometry parameters ###
 
-Every Geometry needs an origin as a vector and a ahape.
+Every Geometry needs an origin as a vector and a shape.
 
 The following three shapes are available:
 - `"Sphere"`
@@ -176,9 +176,9 @@ The following three shapes are available:
 | `shape`  | String                   |           | Shape of the Geometry |
 | `origin` | [Double, Double, Double] | `[0,0,0]` | Center of the Geometry |
 
-Every shape has its own specifikations:
+Every shape has its own specifications:
 - a sphere needs an inner and an outer radius between which the sector is defined
-- a cylinder needs also an inner and an outer radius between which the sector is defined and a height (there is just one heigth, not an inner and an outer one)
+- a cylinder needs also an inner and an outer radius between which the sector is defined and a height (there is just one height, not an inner and an outer one)
 - a box needs a length, a width and a height. Despite the other two geometries, where the sector is defined between two shapes, the box has just one shape and the sector is inside this.
 
 | Keyword        | Type   | Default | Description |
