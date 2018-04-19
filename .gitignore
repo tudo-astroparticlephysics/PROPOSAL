@@ -2,6 +2,8 @@
 .ycm_extra_conf.py
 resources/tables/*
 build/
+cmake_install.cmake
+cmake_uninstall.cmake
 !resources/tables/generate_tables.py
 .DS_Store
 **/Test/TestFiles*/

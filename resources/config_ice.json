@@ -1,0 +1,76 @@
+{
+	"global":
+	{
+		"seed" : 1,
+
+		"interpolate" : true,
+		"path_to_tables" : "resources/tables",
+		"raw" : false,
+
+		"exact_time" : true,
+		"stopping_decay" : true,
+		"scattering" : "Moliere",
+
+		"brems_multiplier" : 1,
+		"photo_multiplier" : 1,
+		"ioniz_multiplier" : 1,
+		"epair_multiplier" : 1,
+		"brems" : "BremsAndreevBezrukovBugaev",
+		"photo" : "PhotoButkevichMikhailov",
+		"lpm" : false,
+		"photo_hard_component" : true,
+		"photo_shadow" : "ShadowDuttaRenoSarcevicSeckel",
+
+		"ecut_inside" : 500,
+		"ecut_infront" : -1,
+		"ecut_behind" : -1,
+		"vcut_inside" : -1,
+		"vcut_infront" : 0.05,
+		"vcut_behind" : -1,
+		"cont_inside" : 0,
+		"cont_infront" : 1,
+		"cont_behind" : 0
+	},
+
+	"sectors": [
+		{
+			"hirarchy": 0,
+			"medium": "ice",
+			"density_correction": 1,
+
+			"geometry":
+			{
+				"shape": "sphere",
+				"origin": [0, 0, 0],
+				"outer_radius": 6374134000000,
+				"inner_radius": 0
+			},
+			"cuts_inside":
+			{
+				"e_cut": 500,
+				"v_cut": 0.5,
+				"cont_rand": true
+			},
+			"cuts_infront":
+			{
+				"e_cut": 500,
+				"v_cut": 0.5,
+				"cont_rand": true
+			},
+			"cuts_behind":
+			{
+				"e_cut": 500,
+				"v_cut": 0.05,
+				"cont_rand": true
+			}
+		}
+	],
+
+	"detector":
+	{
+		"shape": "sphere",
+		"origin" : [0, 0, 0],
+		"outer_radius": 6374134000000,
+		"inner_radius": 0
+	}
+}

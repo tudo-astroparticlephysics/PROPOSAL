@@ -88,27 +88,33 @@ The following file has not been changed yet:
 ### Deployment ###
 
 PROPOSAL is build as library. So you can include this project in your own
-c++ project by including the header files. In the
-[root_examples](root_examples/) are many examples given how you can
-use this library. The following snippet uses the
-[configuration](resources/configuration) to propagte muons and
+c++ project by including the header files. The following snippet uses the
+[configuration](resources/config.json) to propagte muons and
 store the muon ranges for further proceeds.
+The parameters of the configuration file are described
+[here](resources/config_docu.md).
 
 ```c++
-#include "PROPOSAL/Propagator.h"
+#include "PROPOSAL/PROPOSAL.h"
 
-Propagator *pr = new Propagator("resources/configuration");
-pr->RandomDouble();
+using namespace PROPOSAL;
+
+Propagator prop(MuMinusDef::Get(), "resources/config.json");
+Particle& mu = prop.GetParticle();
+Particle mu_backup(mu);
+
+mu_backup.SetEnergy(9e6);
+mu_backup.SetDirection(Vector3D(0, 0, -1));
+
 std::vector<double> ranges;
 
-for(int i =0 ;i< 1e4; i++)
+for (int i = 0; i < 10; i++)
 {
-	PROPOSALParticle *p = new PROPOSALParticle(ParticleType::MuMinus);
-	p->SetEnergy(9e6);
-	pr->SetParticle(p);
+  mu.InjectState(mu_backup);
 
-	pr->Propagate(p);
-	ranges.push_back(p->GetPropagatedDistance());
+  prop.Propagate();
+
+  ranges.push_back(mu.GetPropagatedDistance());
 }
 
 // ... Do stuff with ranges, e.g. plot histogram
@@ -118,13 +124,13 @@ for(int i =0 ;i< 1e4; i++)
 Supposing this snippet is the content of `foo.cxx` within the
 following minimal code structure
 
-	my_program
-	├── CMakeLists.txt
-	├── resources
-	│   ├── configuration
-	│   └── tables
-	└── source
-		└── foo.cpp
+    my_program
+    ├── CMakeLists.txt
+    ├── resources
+    │   ├── configuration
+    │   └── tables
+    └── source
+        └── foo.cpp
 
 the `CMakeLists.txt` could look like
 
@@ -149,32 +155,36 @@ scripts you can find in
 
 For a short demonstration the following snippet will create data you can use to
 show the distribution of muon ranges and the number of interactions in ice.
+The parameters of the given configuration file are described
+[here](resources/config_docu.md).
 
 ```python
-import pyPROPOSAL
+import pyPROPOSAL as pp
 
-ptype = pyPROPOSAL.ParticleType.MuMinus
+prop = pp.Propagator(pp.MuMinusDef.get(), "path/to/config.json")
+mu = prop.particle
+mu_backup = pp.Particle(mu)
 
-med = pyPROPOSAL.MediumType.Ice
-E = pyPROPOSAL.EnergyCutSettings()
-prop = pyPROPOSAL.Propagator(med, E, ptype, "resources/tables")
+mu_backup.energy = 9e6
+mu_backup.direction = pp.Vector3D(0, 0, -1)
 
-mu_length = list()
-n_daughters = list()
+mu_length = []
+mu_secondaries = []
 
 for i in range(1000):
-    prop.reset_particle()
-    prop.particle.energy = 1e8  # Unit in MeV
-    d = prop.propagate()
+    mu.inject_state(mu_backup)
+    secondaries = prop.propagate()
 
     mu_length.append(prop.particle.propagated_distance / 100)
-    n_daughters.append(len(d))
+    mu_secondaries.append(len(secondaries))
 ```
 
 
 ## Issues ##
 
 When you encounter any errors or misunderstandings don't hesitate and write a mail to
+[Jan Soedingrekso](mailto:jan.soedingrekso@tu-dortmund.de),
+[Mario Dunsch](mailto:mario.dunsch@tu-dortmund.de),
 [Tomasz Fuchs](mailto:Tomasz.Fuchs@tu-dortmund.de) or
 [Jan-Hendrik Koehne](mailto:Jan-Hendrik.Koehne@tu-dortmund.de).
 
