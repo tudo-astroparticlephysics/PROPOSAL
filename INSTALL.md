@@ -108,6 +108,12 @@ into a local build directory and install googletest:
 	sure to uninstall PROPOSAL before the next build otherwise your local
 	changes won't be used.
 
+	Note: To ensure, that cmake finds the right python paths use these
+	cmake options and adjust the version number to your python version:
+
+		-DPYTHON_LIBRARY=$(python-config --prefix)/lib/libpython2.7.dylib
+		-DPYTHON_INCLUDE_DIR=$(python-config --prefix)/include/python2.7
+
 6.  Compile the project:
 
 		make
