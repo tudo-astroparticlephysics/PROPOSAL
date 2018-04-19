@@ -12,7 +12,11 @@ def create_table():
 
     pp.RandomGenerator.get().set_seed(0)
 
-    prop = pp.Propagator(pp.MuMinusDef.get(), "config_ice.json")
+    prop = pp.Propagator(
+        pp.MuMinusDef.get(),
+        "../../resources/config_ice.json"
+    )
+
     mu = prop.particle
 
     mu.energy = 1e8
@@ -20,7 +24,7 @@ def create_table():
     mu.position = pp.Vector3D(0, 0, 0)
     mu.direction = pp.Vector3D(0, 0, -1)
 
-    with open("TestFiles/Propagator_propagation.txt", "a") as f:
+    with open("Propagator_propagation.txt", "a") as f:
 
         buf = [""]
         buf.append("name")
@@ -68,5 +72,9 @@ def create_table():
         f.close()
 
 
-if __name__ == "__main__":
+def main():
     create_table()
+
+
+if __name__ == "__main__":
+    main()

@@ -26,12 +26,10 @@ energies = np.logspace(4, 13, num=10)
 
 interpoldef = pp.InterpolationDef()
 
-def create_table_dEdx():
-    """TODO: Docstring for create_table.
-    Returns: TODO
-    """
 
-    with open("TestFiles/Ioniz_dEdx.txt", "a") as f:
+def create_table_dEdx():
+
+    with open("Ioniz_dEdx.txt", "a") as f:
 
         for particle in particle_defs:
             for medium in mediums:
@@ -62,14 +60,11 @@ def create_table_dEdx():
 
                     # print(buf)
                     f.write("\t".join(buf))
-#
+
 
 def create_table_dNdx():
-    """TODO: Docstring for create_table.
-    Returns: TODO
-    """
 
-    with open("TestFiles/Ioniz_dNdx.txt", "a") as f:
+    with open("Ioniz_dNdx.txt", "a") as f:
 
         for particle in particle_defs:
             for medium in mediums:
@@ -100,16 +95,13 @@ def create_table_dNdx():
 
                     # print(buf)
                     f.write("\t".join(buf))
-#
+
 
 def create_table_dNdx_rnd():
-    """TODO: Docstring for create_table.
-    Returns: TODO
-    """
 
     pp.RandomGenerator.get().set_seed(0)
 
-    with open("TestFiles/Ioniz_dNdx_rnd.txt", "a") as f:
+    with open("Ioniz_dNdx_rnd.txt", "a") as f:
 
         for particle in particle_defs:
             for medium in mediums:
@@ -142,16 +134,13 @@ def create_table_dNdx_rnd():
 
                     # print(buf)
                     f.write("\t".join(buf))
-#
+
 
 def create_table_stochastic_loss():
-    """TODO: Docstring for create_table.
-    Returns: TODO
-    """
 
     pp.RandomGenerator.get().set_seed(5)
 
-    with open("TestFiles/Ioniz_e.txt", "a") as f:
+    with open("Ioniz_e.txt", "a") as f:
 
         for particle in particle_defs:
             for medium in mediums:
@@ -186,14 +175,11 @@ def create_table_stochastic_loss():
 
                     # print(buf)
                     f.write("\t".join(buf))
-#
+
 
 def create_table_dEdx_interpol():
-    """TODO: Docstring for create_table.
-    Returns: TODO
-    """
 
-    with open("TestFiles/Ioniz_dEdx_interpol.txt", "a") as f:
+    with open("Ioniz_dEdx_interpol.txt", "a") as f:
 
         for particle in particle_defs:
             for medium in mediums:
@@ -224,14 +210,11 @@ def create_table_dEdx_interpol():
 
                     # print(buf)
                     f.write("\t".join(buf))
-#
+
 
 def create_table_dNdx_interpol():
-    """TODO: Docstring for create_table.
-    Returns: TODO
-    """
 
-    with open("TestFiles/Ioniz_dNdx_interpol.txt", "a") as f:
+    with open("Ioniz_dNdx_interpol.txt", "a") as f:
 
         for particle in particle_defs:
             for medium in mediums:
@@ -262,16 +245,13 @@ def create_table_dNdx_interpol():
 
                     # print(buf)
                     f.write("\t".join(buf))
-#
+
 
 def create_table_dNdx_rnd_interpol():
-    """TODO: Docstring for create_table.
-    Returns: TODO
-    """
 
     pp.RandomGenerator.get().set_seed(5)
 
-    with open("TestFiles/Ioniz_dNdx_rnd_interpol.txt", "a") as f:
+    with open("Ioniz_dNdx_rnd_interpol.txt", "a") as f:
 
         for particle in particle_defs:
             for medium in mediums:
@@ -304,16 +284,13 @@ def create_table_dNdx_rnd_interpol():
 
                     # print(buf)
                     f.write("\t".join(buf))
-#
+
 
 def create_table_stochastic_loss_interpol():
-    """TODO: Docstring for create_table.
-    Returns: TODO
-    """
 
     pp.RandomGenerator.get().set_seed(5)
 
-    with open("TestFiles/Ioniz_e_interpol.txt", "a") as f:
+    with open("Ioniz_e_interpol.txt", "a") as f:
 
         for particle in particle_defs:
             for medium in mediums:
@@ -348,14 +325,18 @@ def create_table_stochastic_loss_interpol():
 
                     # print(buf)
                     f.write("\t".join(buf))
-#
+
+
+def main():
+    create_table_dEdx()
+    create_table_dNdx()
+    create_table_dNdx_rnd()
+    create_table_stochastic_loss()
+    create_table_dEdx_interpol()
+    create_table_dNdx_interpol()
+    create_table_dNdx_rnd_interpol()
+    create_table_stochastic_loss_interpol()
+
 
 if __name__ == "__main__":
-    # create_table_dEdx()
-    # create_table_dNdx()
-    # create_table_dNdx_rnd()
-    # create_table_stochastic_loss()
-    # create_table_dEdx_interpol()
-    # create_table_dNdx_interpol()
-    # create_table_dNdx_rnd_interpol()
-    # create_table_stochastic_loss_interpol()
+    main()

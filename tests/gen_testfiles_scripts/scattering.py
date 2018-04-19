@@ -34,8 +34,8 @@ cuts = [
     pp.EnergyCutSettings(500, 0.05)
 ]
 
-energies = np.logspace(4, 13, num=10) # MeV
-distance = 1000 # cm
+energies = np.logspace(4, 13, num=10)  # MeV
+distance = 1000  # cm
 position_init = pp.Vector3D(0, 0, 0)
 direction_init = pp.Vector3D(1, 0, 0)
 direction_init.spherical_from_cartesian()
@@ -46,7 +46,7 @@ pp.RandomGenerator.get().set_seed(1234)
 
 def create_table_scatter():
 
-    with open("TestFiles/Scat_scatter.txt", "a") as f:
+    with open("Scat_scatter.txt", "a") as f:
 
         for particle_def in particle_defs:
             for medium in mediums:
@@ -88,7 +88,11 @@ def create_table_scatter():
                             buf.append("\n")
 
                             f.write("\t".join(buf))
-#
+
+
+def main():
+    create_table_scatter()
+
 
 if __name__ == "__main__":
-    create_table_scatter()
+    main()
