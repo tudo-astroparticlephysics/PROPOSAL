@@ -38,7 +38,7 @@ interpoldef = pp.InterpolationDef()
 
 def create_table_dEdx():
 
-    with open("TestFiles/Brems_dEdx.txt", "a") as f:
+    with open("Brems_dEdx.txt", "a") as f:
 
         for particle in particle_defs:
             for medium in mediums:
@@ -73,11 +73,11 @@ def create_table_dEdx():
 
                                 # print(buf)
                                 f.write("\t".join(buf))
-#
+
 
 def create_table_dNdx():
 
-    with open("TestFiles/Brems_dNdx.txt", "a") as f:
+    with open("Brems_dNdx.txt", "a") as f:
 
         for particle in particle_defs:
             for medium in mediums:
@@ -112,13 +112,13 @@ def create_table_dNdx():
 
                                 # print(buf)
                                 f.write("\t".join(buf))
-#
+
 
 def create_table_dNdx_rnd():
 
     pp.RandomGenerator.get().set_seed(1234)
 
-    with open("TestFiles/Brems_dNdx_rnd.txt", "a") as f:
+    with open("Brems_dNdx_rnd.txt", "a") as f:
 
         for particle in particle_defs:
             for medium in mediums:
@@ -155,13 +155,13 @@ def create_table_dNdx_rnd():
 
                                 # print(buf)
                                 f.write("\t".join(buf))
-#
+
 
 def create_table_stochastic_loss():
 
     pp.RandomGenerator.get().set_seed(0)
 
-    with open("TestFiles/Brems_e.txt", "a") as f:
+    with open("Brems_e.txt", "a") as f:
 
         for particle in particle_defs:
             for medium in mediums:
@@ -200,11 +200,11 @@ def create_table_stochastic_loss():
 
                                 # print(buf)
                                 f.write("\t".join(buf))
-#
+
 
 def create_table_dEdx_interpol():
 
-    with open("TestFiles/Brems_dEdx_interpol.txt", "a") as f:
+    with open("Brems_dEdx_interpol.txt", "a") as f:
 
         for particle in particle_defs:
             for medium in mediums:
@@ -239,11 +239,11 @@ def create_table_dEdx_interpol():
 
                                 # print(buf)
                                 f.write("\t".join(buf))
-#
+
 
 def create_table_dNdx_interpol():
 
-    with open("TestFiles/Brems_dNdx_interpol.txt", "a") as f:
+    with open("Brems_dNdx_interpol.txt", "a") as f:
 
         for particle in particle_defs:
             for medium in mediums:
@@ -278,13 +278,13 @@ def create_table_dNdx_interpol():
 
                                 # print(buf)
                                 f.write("\t".join(buf))
-#
+
 
 def create_table_dNdx_rnd_interpol():
 
     pp.RandomGenerator.get().set_seed(1234)
 
-    with open("TestFiles/Brems_dNdx_rnd_interpol.txt", "a") as f:
+    with open("Brems_dNdx_rnd_interpol.txt", "a") as f:
 
         for particle in particle_defs:
             for medium in mediums:
@@ -321,13 +321,13 @@ def create_table_dNdx_rnd_interpol():
 
                                 # print(buf)
                                 f.write("\t".join(buf))
-#
+
 
 def create_table_stochastic_loss_interpol():
 
     pp.RandomGenerator.get().set_seed(1234)
 
-    with open("TestFiles/Brems_e_interpol.txt", "a") as f:
+    with open("Brems_e_interpol.txt", "a") as f:
 
         for particle in particle_defs:
             for medium in mediums:
@@ -366,9 +366,9 @@ def create_table_stochastic_loss_interpol():
 
                                 # print(buf)
                                 f.write("\t".join(buf))
-#
 
-if __name__ == "__main__":
+
+def main():
     create_table_dEdx()
     create_table_dNdx()
     create_table_dNdx_rnd()
@@ -377,3 +377,7 @@ if __name__ == "__main__":
     create_table_dNdx_interpol()
     create_table_dNdx_rnd_interpol()
     create_table_stochastic_loss_interpol()
+
+
+if __name__ == "__main__":
+    main()

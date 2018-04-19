@@ -21,11 +21,11 @@ cuts = [
     pp.EnergyCutSettings(500, 0.05)
 ]
 
-energies = np.logspace(4, 13, num=10) # MeV
-distance = 1000 # cm
+energies = np.logspace(4, 13, num=10)  # MeV
+distance = 1000  # cm
 
-position = pp.Vector3D(0,0,0)
-direction = pp.Vector3D(1,0,0)
+position = pp.Vector3D(0, 0, 0)
+direction = pp.Vector3D(1, 0, 0)
 
 # stopping_decay = True
 # do_continuous_randomization = True
@@ -34,9 +34,10 @@ interpoldef = pp.InterpolationDef()
 
 pp.RandomGenerator.get().set_seed(1234)
 
+
 def create_table_propagate():
 
-    with open("TestFiles/Sector_propagate.txt", "a") as f:
+    with open("Sector_propagate.txt", "a") as f:
 
         for particle_def in particle_defs:
             for medium in mediums:
@@ -47,7 +48,7 @@ def create_table_propagate():
 
                     particle = pp.Particle(particle_def)
                     sector = pp.Sector(particle, sector_def, interpoldef)
-                    
+
                     for energy in energies:
                         sector.particle.energy = energy
                         sector.particle.position = position
@@ -66,7 +67,11 @@ def create_table_propagate():
                         buf.append("\n")
 
                         f.write("\t".join(buf))
-#
+
+
+def main():
+    create_table_propagate()
+
 
 if __name__ == "__main__":
-    create_table_propagate()
+    main()

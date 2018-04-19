@@ -47,9 +47,10 @@ energies = np.logspace(4, 13, num=10)
 
 interpoldef = pp.InterpolationDef()
 
+
 def create_table_dEdx():
 
-    with open("TestFiles/Photo_Real_dEdx.txt", "a") as f:
+    with open("Photo_Real_dEdx.txt", "a") as f:
 
         for particle in particle_defs:
             for medium in mediums:
@@ -84,11 +85,11 @@ def create_table_dEdx():
 
                                 # print(buf)
                                 f.write("\t".join(buf))
-#
+
 
 def create_table_dNdx():
 
-    with open("TestFiles/Photo_Real_dNdx.txt", "a") as f:
+    with open("Photo_Real_dNdx.txt", "a") as f:
 
         for particle in particle_defs:
             for medium in mediums:
@@ -123,13 +124,13 @@ def create_table_dNdx():
 
                                 # print(buf)
                                 f.write("\t".join(buf))
-#
+
 
 def create_table_dNdx_rnd():
 
     pp.RandomGenerator.get().set_seed(1234)
 
-    with open("TestFiles/Photo_Real_dNdx_rnd.txt", "a") as f:
+    with open("Photo_Real_dNdx_rnd.txt", "a") as f:
 
         for particle in particle_defs:
             for medium in mediums:
@@ -166,13 +167,13 @@ def create_table_dNdx_rnd():
 
                                 # print(buf)
                                 f.write("\t".join(buf))
-#
+
 
 def create_table_stochastic_loss():
 
     pp.RandomGenerator.get().set_seed(1234)
 
-    with open("TestFiles/Photo_Real_e.txt", "a") as f:
+    with open("Photo_Real_e.txt", "a") as f:
 
         for particle in particle_defs:
             for medium in mediums:
@@ -211,11 +212,11 @@ def create_table_stochastic_loss():
 
                                 # print(buf)
                                 f.write("\t".join(buf))
-#
+
 
 def create_table_dEdx_Q2():
 
-    with open("TestFiles/Photo_Q2_dEdx.txt", "a") as f:
+    with open("Photo_Q2_dEdx.txt", "a") as f:
 
         for particle in particle_defs:
             for medium in mediums:
@@ -250,11 +251,11 @@ def create_table_dEdx_Q2():
 
                                 # print(buf)
                                 f.write("\t".join(buf))
-#
+
 
 def create_table_dNdx_Q2():
 
-    with open("TestFiles/Photo_Q2_dNdx.txt", "a") as f:
+    with open("Photo_Q2_dNdx.txt", "a") as f:
 
         for particle in particle_defs:
             for medium in mediums:
@@ -289,11 +290,11 @@ def create_table_dNdx_Q2():
 
                                 # print(buf)
                                 f.write("\t".join(buf))
-#
+
 
 def create_table_dNdx_rnd_Q2():
 
-    with open("TestFiles/Photo_Q2_dNdx_rnd.txt", "a") as f:
+    with open("Photo_Q2_dNdx_rnd.txt", "a") as f:
 
         for particle in particle_defs:
             for medium in mediums:
@@ -330,11 +331,11 @@ def create_table_dNdx_rnd_Q2():
 
                                 # print(buf)
                                 f.write("\t".join(buf))
-#
+
 
 def create_table_stochastic_loss_Q2():
 
-    with open("TestFiles/Photo_Q2_e.txt", "a") as f:
+    with open("Photo_Q2_e.txt", "a") as f:
 
         for particle in particle_defs:
             for medium in mediums:
@@ -373,16 +374,18 @@ def create_table_stochastic_loss_Q2():
 
                                 # print(buf)
                                 f.write("\t".join(buf))
-#
 
 
-
-if __name__ == "__main__":
-    # create_table_dEdx()
-    # create_table_dNdx()
-    # create_table_dNdx_rnd()
-    # create_table_stochastic_loss()
-    # create_table_dEdx_Q2()
+def main():
+    create_table_dEdx()
+    create_table_dNdx()
+    create_table_dNdx_rnd()
+    create_table_stochastic_loss()
+    create_table_dEdx_Q2()
     create_table_dNdx_Q2()
     create_table_dNdx_rnd_Q2()
     create_table_stochastic_loss_Q2()
+
+
+if __name__ == "__main__":
+    main()
