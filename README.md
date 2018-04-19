@@ -46,9 +46,6 @@ all these OS are UNIX based it should be fine to run and compile PROPOSAL on a U
 - Doxygen (For pdf and html documentation of the code)
 - [googletest](https://github.com/google/googletest)
   (To be sure not to break program code if you change something)
-
-- [ROOT](https://root.cern.ch/)
-  (This is highly recommended since there are lots of example plots and you are able to save the output in an root file.)
 - [Boost.Python](http://www.boost.org/doc/libs/1_64_0/libs/python/doc/html/index.html)
   (To build the python wrapper)
 
