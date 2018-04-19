@@ -13,7 +13,9 @@ The config file is structured into three parts:
 
 | Keyword   | Type    | Default   | Description |
 | --------- | ------- | --------- | ----------- |
-| `seed`    | Integer | `1`       | random number generator seed |
+| `seed`    | Integer | `0`       | seed for the internal random number generator|
+
+Note: This Keyword has no effect, if you use an external random number generator.
 
 ### Interpolation parameters ###
 There are three parameters dealing with the interpolation tables.
@@ -106,7 +108,7 @@ The energy cut settings and the continous randomization option are seperated bet
 **ecut** describes the cut in the total energy loss in MeV and **vcut** describes the cut in the energy loss relative to the particle energy.
 Above this cut, the energy losses are calculated stochastically and below this cut, the energy loss is calculated via the average energy loss (continuously).
 - If both values are setted, the minimum of the total energy cut and the relative cut times the particle energy is applied.
-- If just one of the energy cuts should be used, the other value should be set to a negative value (usually it's -1), because negative values for the energy cuts are neglected. 
+- If just one of the energy cuts should be used, the other value should be set to a negative value (usually it's -1), because negative values for the energy cuts are neglected.
 - If both values are set to a negative value, only continuous losses (average energy loss dE/dx) are taking into account.
 
 The continuous randomization randomizes the continuous losses, which affects, that the continuous losses are not always the same for the same particle energy, because they are randomised a little bit.
