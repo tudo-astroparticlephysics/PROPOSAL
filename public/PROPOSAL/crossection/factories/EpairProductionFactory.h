@@ -34,7 +34,7 @@
 namespace PROPOSAL {
 
 class CrossSection;
-class ParticleDef;
+struct ParticleDef;
 class Medium;
 class EnergyCutSettings;
 
