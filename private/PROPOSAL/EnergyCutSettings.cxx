@@ -1,7 +1,7 @@
 
 #include "PROPOSAL/EnergyCutSettings.h"
+#include "PROPOSAL/methods.h"
 
-using namespace std;
 using namespace PROPOSAL;
 
 //----------------------------------------------------------------------------//
@@ -10,47 +10,37 @@ using namespace PROPOSAL;
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-
-double EnergyCutSettings::GetCut(double energy)
+double EnergyCutSettings::GetCut(double energy) const
 {
+    // if both ecut and vcut are setted (in their bounds), the minimum is used
+    //
+    // if just one of them is setted, this is used
+    //
+    // if both are setted out of their bound (usually -1, -1),
+    // then 1 (which is the max. energy transfer) is returned,
+    // which is always greater than v_max
+    // that means, just continuous losses are calculated, no stochastic ones
 
-    double aux;
-    double vCut;
-
-    aux =   ecut_/energy;
-
-    if(ecut_>0)
+    if (ecut_ > 0)
     {
-        if(vcut_>0 && vcut_<=1)
+        if (vcut_ > 0 && vcut_ <= 1)
         {
-            if(aux<vcut_)
-            {
-                vCut   =   aux;
-            }
-            else
-            {
-                vCut   =   vcut_;
-            }
+            return std::min(ecut_ / energy, vcut_);
+        } else
+        {
+            return ecut_ / energy;
         }
-        else
+    } else
+    {
+        if (vcut_ > 0 && vcut_ <= 1)
         {
-            vCut   =   aux;
+            return vcut_;
+        } else
+        {
+            return 1.;
         }
     }
-    else
-    {
-        if(vcut_>0 && vcut_<=1)
-        {
-            vCut   =   vcut_;
-        }
-        else
-        {
-            vCut   =   1.;
-        }
-    }
-    return vCut;
 }
-
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
@@ -58,38 +48,29 @@ double EnergyCutSettings::GetCut(double energy)
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-
 EnergyCutSettings::EnergyCutSettings()
-    :ecut_  ( 500. )
-    ,vcut_  ( 0.05 )
+    : ecut_(500.)
+    , vcut_(0.05)
 {
-
 }
 
-
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-
-EnergyCutSettings::EnergyCutSettings(const EnergyCutSettings &cuts)
-    :ecut_  ( cuts.ecut_ )
-    ,vcut_  ( cuts.vcut_ )
+EnergyCutSettings::EnergyCutSettings(const EnergyCutSettings& cuts)
+    : ecut_(cuts.ecut_)
+    , vcut_(cuts.vcut_)
 {
-
 }
 
-
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-
-EnergyCutSettings::EnergyCutSettings(double ecut, double vcut)
-    :ecut_  ( ecut )
-    ,vcut_  ( vcut )
+EnergyCutSettings::EnergyCutSettings(const double ecut, const double vcut)
+    : ecut_(ecut)
+    , vcut_(vcut)
 {
-
 }
-
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
@@ -97,85 +78,63 @@ EnergyCutSettings::EnergyCutSettings(double ecut, double vcut)
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-
-
-EnergyCutSettings& EnergyCutSettings::operator=(const EnergyCutSettings &energyCutSettings)
+EnergyCutSettings& EnergyCutSettings::operator=(const EnergyCutSettings& energyCutSettings)
 {
     if (this != &energyCutSettings)
     {
-      EnergyCutSettings tmp(energyCutSettings);
-      swap(tmp);
+        EnergyCutSettings tmp(energyCutSettings);
+        swap(tmp);
     }
     return *this;
 }
 
-
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-
-bool EnergyCutSettings::operator==(const EnergyCutSettings &energyCutSettings) const
+bool EnergyCutSettings::operator==(const EnergyCutSettings& energyCutSettings) const
 {
-    if( ecut_   != energyCutSettings.ecut_)  return false;
-    if( vcut_   != energyCutSettings.vcut_)  return false;
+    if (ecut_ != energyCutSettings.ecut_)
+        return false;
+    if (vcut_ != energyCutSettings.vcut_)
+        return false;
 
-    //else
+    // else
     return true;
 }
 
-
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-
-bool EnergyCutSettings::operator!=(const EnergyCutSettings &energyCutSettings) const
+bool EnergyCutSettings::operator!=(const EnergyCutSettings& energyCutSettings) const
 {
-  return !(*this == energyCutSettings);
+    return !(*this == energyCutSettings);
 }
 
-
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
+namespace PROPOSAL {
 
-namespace PROPOSAL
+std::ostream& operator<<(std::ostream& os, EnergyCutSettings const& cut_settings)
 {
+    std::stringstream ss;
+    ss << " EnergyCutSettings (" << &cut_settings << ") ";
+    os << Helper::Centered(60, ss.str()) << '\n';
 
-ostream& operator<<(ostream& os, EnergyCutSettings const& cut_settings)
-{
-    os<<"--------EnergyCutSettings( "<<&cut_settings<<" )--------"<<endl;
-    os<<"\tEcut: "<<cut_settings.ecut_<<endl;
-    os<<"\tVcut: "<<cut_settings.vcut_<<endl;
-    os<<"------------------------------------";
+    os << "Ecut: " << cut_settings.ecut_ << std::endl;
+    os << "Vcut: " << cut_settings.vcut_ << std::endl;
+
+    os << Helper::Centered(60, "");
     return os;
 }
 
-}  // namespace PROPOSAL
+} // namespace PROPOSAL
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-
-void EnergyCutSettings::swap(EnergyCutSettings &energyCutSettings)
+void EnergyCutSettings::swap(EnergyCutSettings& energyCutSettings)
 {
-    using std::swap;
-
-    swap( ecut_   , energyCutSettings.ecut_);
-    swap( vcut_   , energyCutSettings.vcut_);
-}
-
-
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-//---------------------------------Setter-------------------------------------//
-//----------------------------------------------------------------------------//
-//----------------------------------------------------------------------------//
-
-
-void EnergyCutSettings::SetEcut(double ecut){
-    ecut_ = ecut;
-}
-
-void EnergyCutSettings::SetVcut(double vcut){
-    vcut_ = vcut;
+    std::swap(ecut_, energyCutSettings.ecut_);
+    std::swap(vcut_, energyCutSettings.vcut_);
 }

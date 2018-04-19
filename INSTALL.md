@@ -79,7 +79,7 @@ into a local build directory and install googletest:
 
 	or
 
-		git clone ... PROPOSAL/src
+		git clone https://github.com/tudo-astroparticlephysics/PROPOSAL.git PROPOSAL/src
 
 4.	Move to the build directory and generate the Makefile with cmake:
 
@@ -136,8 +136,8 @@ into a local build directory and install googletest:
 | Option | Default value | Description |
 | --- | --- | --- |
 | `ADD_PYTHON` | ON | Choose to compile the python wrapper |
-| `ADD_TESTFILE_GEN` | OFF | Choose to compiler the test file generator |
-| `ADD_ROOT` | ON | Choose to compile PROPOSAL with ROOT support and the ROOT examples |
+| `ADD_PERFORMANCE_TEST` | OFF | Choose to compile the performace test source |
+| `ADD_ROOT` | ON | Choose to compile PROPOSAL with ROOT support |
 
 The test file generator is useful ensure not break the basic
 functionality, if use decide to modify the library.

@@ -1,650 +1,551 @@
 
 // #include <iostream>
 // #include <string>
+// #include <math.h>
 
 #include "gtest/gtest.h"
 
-#include "PROPOSAL/Epairproduction.h"
+#include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Output.h"
-// #include "PROPOSAL/CrossSections.h"
-
+#include "PROPOSAL/crossection/EpairIntegral.h"
+#include "PROPOSAL/crossection/EpairInterpolant.h"
+#include "PROPOSAL/crossection/parametrization/EpairProduction.h"
+#include "PROPOSAL/math/RandomGenerator.h"
+#include "PROPOSAL/medium/Medium.h"
+#include "PROPOSAL/medium/MediumFactory.h"
+#include "PROPOSAL/methods.h"
 
 using namespace std;
 using namespace PROPOSAL;
 
-class RndFromFile{
-private:
-    double rnd_;
-    string Path_;
-    ifstream in_;
-
-public:
-    RndFromFile(string Path){
-        Path_ = Path;
-        in_.open(Path_.c_str());
-        in_>>rnd_;
-        if(!in_.good())log_warn("less than one rnd_number!");
+ParticleDef getParticleDef(const string& name)
+{
+    if (name == "MuMinus")
+    {
+        return MuMinusDef::Get();
+    } else if (name == "TauMinus")
+    {
+        return TauMinusDef::Get();
+    } else
+    {
+        return EMinusDef::Get();
     }
-
-    double rnd(){
-        in_>>rnd_;
-        if(!in_.good()){
-            in_.close();
-            in_.clear();
-            in_.open(Path_.c_str());
-            in_>>rnd_;
-        }
-        return rnd_;
-    }
-};
-
-TEST(Comparison , Comparison_equal ) {
-
-    double dEdx;
-    Medium *medium = new Medium(MediumType::Air,1.);
-    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
-    EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
-    Epairproduction *A = new Epairproduction(particle, medium, cuts);
-    Epairproduction *B = new Epairproduction(particle, medium, cuts);
-    EXPECT_TRUE(*A==*B);
-    Epairproduction *C = new Epairproduction();
-    Epairproduction *D = new Epairproduction();
-    EXPECT_TRUE(*C==*D);
-
-    A->GetParticle()->SetEnergy(1e6);
-    B->GetParticle()->SetEnergy(1e6);
-    EXPECT_TRUE(*A==*B);
-
-    dEdx = A->CalculatedNdx();
-    dEdx = B->CalculatedNdx();
-    EXPECT_TRUE(*A==*B);
-
-    A->EnableDEdxInterpolation();
-    A->EnableDNdxInterpolation();
-
-    B->EnableDEdxInterpolation();
-    B->EnableDNdxInterpolation();
-
-    EXPECT_TRUE(*A==*B);
 }
 
-TEST(Comparison , Comparison_not_equal ) {
-    double dEdx;
-    Medium *medium = new Medium(MediumType::Air,1.);
-    Medium *medium2 = new Medium(MediumType::Water,1.);
-    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,20,20,1e5,10);
-    PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,20,20,1e5,10);
-    EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
-    Epairproduction *A = new Epairproduction(particle, medium, cuts);
-    Epairproduction *B = new Epairproduction(particle, medium2, cuts);
-    Epairproduction *C = new Epairproduction(particle2, medium, cuts);
-    Epairproduction *D = new Epairproduction(particle2, medium2, cuts);
-    Epairproduction *E = new Epairproduction(particle2, medium2, cuts);
+TEST(Comparison, Comparison_equal)
+{
+    ParticleDef particle_def = MuMinusDef::Get();
+    Water medium;
+    EnergyCutSettings ecuts;
+    double multiplier = 1.;
+    bool lpm          = true;
 
-    EXPECT_TRUE(*A!=*B);
-    EXPECT_TRUE(*C!=*D);
-    EXPECT_TRUE(*B!=*D);
-    EXPECT_TRUE(*D==*E);
+    EpairProductionRhoIntegral* EpairInt_A =
+        new EpairProductionRhoIntegral(particle_def, medium, ecuts, multiplier, lpm);
+    Parametrization* EpairInt_B = new EpairProductionRhoIntegral(particle_def, medium, ecuts, multiplier, lpm);
+    EXPECT_TRUE(*EpairInt_A == *EpairInt_B);
 
-    E->SetParticle(particle);
-    EXPECT_TRUE(*D!=*E);
-    D->SetParticle(particle);
-    EXPECT_TRUE(*D==*E);
-    D->SetParametrization(ParametrizationType::PhotoBezrukovBugaevShadowBezrukovHard);
-    EXPECT_TRUE(*D!=*E);
+    EpairProductionRhoIntegral param_int(particle_def, medium, ecuts, multiplier, lpm);
+    EXPECT_TRUE(param_int == *EpairInt_A);
 
+    EpairIntegral* Int_A        = new EpairIntegral(param_int);
+    CrossSectionIntegral* Int_B = new EpairIntegral(param_int);
+    EXPECT_TRUE(*Int_A == *Int_B);
 
+    InterpolationDef InterpolDef;
+    EpairProductionRhoInterpolant* EpairInterpol_A =
+        new EpairProductionRhoInterpolant(particle_def, medium, ecuts, multiplier, lpm, InterpolDef);
+    Parametrization* EpairInterpol_B =
+        new EpairProductionRhoInterpolant(particle_def, medium, ecuts, multiplier, lpm, InterpolDef);
+    EXPECT_TRUE(*EpairInterpol_A == *EpairInterpol_B);
+
+    EpairProductionRhoInterpolant param_interpol(particle_def, medium, ecuts, multiplier, lpm, InterpolDef);
+    EXPECT_TRUE(param_interpol == *EpairInterpol_A);
+
+    EpairInterpolant* Interpol_A        = new EpairInterpolant(param_interpol, InterpolDef);
+    CrossSectionInterpolant* Interpol_B = new EpairInterpolant(param_interpol, InterpolDef);
+    EXPECT_TRUE(*Interpol_A == *Interpol_B);
+
+    delete EpairInt_A;
+    delete EpairInt_B;
+    delete Int_A;
+    delete Int_B;
+    delete EpairInterpol_A;
+    delete EpairInterpol_B;
+    delete Interpol_A;
+    delete Interpol_B;
 }
 
-TEST(Assignment , Copyconstructor ) {
-    Epairproduction A;
-    Epairproduction B =A;
+TEST(Comparison, Comparison_not_equal)
+{
+    ParticleDef mu_def  = MuMinusDef::Get();
+    ParticleDef tau_def = TauMinusDef::Get();
+    Water medium_1;
+    Ice medium_2;
+    EnergyCutSettings ecuts_1(500, -1);
+    EnergyCutSettings ecuts_2(-1, 0.05);
+    double multiplier_1 = 1.;
+    double multiplier_2 = 2.;
+    bool lpm_1          = true;
+    bool lpm_2          = false;
 
-    EXPECT_TRUE(A==B);
+    EpairProductionRhoIntegral EpairInt_A(mu_def, medium_1, ecuts_1, multiplier_1, lpm_1);
+    EpairProductionRhoIntegral EpairInt_B(tau_def, medium_1, ecuts_1, multiplier_1, lpm_1);
+    EpairProductionRhoIntegral EpairInt_C(mu_def, medium_2, ecuts_1, multiplier_1, lpm_1);
+    EpairProductionRhoIntegral EpairInt_D(mu_def, medium_1, ecuts_2, multiplier_1, lpm_1);
+    EpairProductionRhoIntegral EpairInt_E(mu_def, medium_1, ecuts_1, multiplier_2, lpm_1);
+    EpairProductionRhoIntegral EpairInt_F(mu_def, medium_1, ecuts_1, multiplier_1, lpm_2);
+    EXPECT_TRUE(EpairInt_A != EpairInt_B);
+    EXPECT_TRUE(EpairInt_A != EpairInt_C);
+    EXPECT_TRUE(EpairInt_A != EpairInt_D);
+    EXPECT_TRUE(EpairInt_A != EpairInt_E);
+    EXPECT_TRUE(EpairInt_A != EpairInt_F);
 
+    EpairIntegral Int_A(EpairInt_A);
+    EpairIntegral Int_B(EpairInt_B);
+    EXPECT_TRUE(Int_A != Int_B);
+
+    InterpolationDef InterpolDef;
+    EpairProductionRhoInterpolant EpairInterpol_A(mu_def, medium_1, ecuts_1, multiplier_1, lpm_1, InterpolDef);
+    EpairProductionRhoInterpolant EpairInterpol_B(tau_def, medium_1, ecuts_1, multiplier_1, lpm_1, InterpolDef);
+    EpairProductionRhoInterpolant EpairInterpol_C(mu_def, medium_2, ecuts_1, multiplier_1, lpm_1, InterpolDef);
+    EpairProductionRhoInterpolant EpairInterpol_D(mu_def, medium_1, ecuts_2, multiplier_1, lpm_1, InterpolDef);
+    EpairProductionRhoInterpolant EpairInterpol_E(mu_def, medium_1, ecuts_1, multiplier_2, lpm_1, InterpolDef);
+    EpairProductionRhoInterpolant EpairInterpol_F(mu_def, medium_1, ecuts_1, multiplier_1, lpm_2, InterpolDef);
+    EXPECT_TRUE(EpairInterpol_A != EpairInterpol_B);
+    EXPECT_TRUE(EpairInterpol_A != EpairInterpol_C);
+    EXPECT_TRUE(EpairInterpol_A != EpairInterpol_D);
+    EXPECT_TRUE(EpairInterpol_A != EpairInterpol_E);
+    EXPECT_TRUE(EpairInterpol_A != EpairInterpol_F);
+
+    EpairInterpolant Interpol_A(EpairInterpol_A, InterpolDef);
+    EpairInterpolant Interpol_B(EpairInterpol_B, InterpolDef);
+    EXPECT_TRUE(Interpol_A != Interpol_B);
 }
 
-TEST(Assignment , Copyconstructor2 ) {
-    Medium *medium = new Medium(MediumType::Air,1.);
-    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
-    EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
+TEST(Assignment, Copyconstructor)
+{
+    ParticleDef particle_def = MuMinusDef::Get();
+    Water medium;
+    EnergyCutSettings ecuts;
+    double multiplier = 1.;
+    bool lpm          = true;
 
-    Epairproduction A(particle, medium, cuts);
-    Epairproduction B(A);
+    EpairProductionRhoIntegral EpairInt_A(particle_def, medium, ecuts, multiplier, lpm);
+    EpairProductionRhoIntegral EpairInt_B = EpairInt_A;
+    EXPECT_TRUE(EpairInt_A == EpairInt_B);
 
-    EXPECT_TRUE(A==B);
+    EpairIntegral Int_A(EpairInt_A);
+    EpairIntegral Int_B = Int_A;
+    EXPECT_TRUE(Int_A == Int_B);
 
+    InterpolationDef InterpolDef;
+    EpairProductionRhoInterpolant EpairInterpol_A(particle_def, medium, ecuts, multiplier, lpm, InterpolDef);
+    EpairProductionRhoInterpolant EpairInterpol_B = EpairInterpol_A;
+    EXPECT_TRUE(EpairInterpol_A == EpairInterpol_B);
+
+    EpairInterpolant Interpol_A(EpairInterpol_A, InterpolDef);
+    EpairInterpolant Interpol_B = Interpol_A;
+    EXPECT_TRUE(Interpol_A == Interpol_B);
 }
 
-TEST(Assignment , Operator ) {
-    Medium *medium = new Medium(MediumType::Air,1.);
-    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,.20,20,1e5,10);
-    EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
-    Epairproduction A(particle, medium, cuts);
-    Epairproduction B(particle, medium, cuts);
-    A.SetParametrization(ParametrizationType::PhotoBezrukovBugaevShadowBezrukovHard);
+TEST(Assignment, Copyconstructor2)
+{
+    ParticleDef particle_def = MuMinusDef::Get();
+    Water medium;
+    EnergyCutSettings ecuts;
+    double multiplier = 1.;
+    bool lpm          = true;
 
-    EXPECT_TRUE(A!=B);
+    EpairProductionRhoIntegral EpairInt_A(particle_def, medium, ecuts, multiplier, lpm);
+    EpairProductionRhoIntegral EpairInt_B(EpairInt_A);
+    EXPECT_TRUE(EpairInt_A == EpairInt_B);
 
-    B=A;
+    EpairIntegral Int_A(EpairInt_A);
+    EpairIntegral Int_B(Int_A);
+    EXPECT_TRUE(Int_A == Int_B);
 
-    EXPECT_TRUE(A==B);
+    InterpolationDef InterpolDef;
+    EpairProductionRhoInterpolant EpairInterpol_A(particle_def, medium, ecuts, multiplier, lpm, InterpolDef);
+    EpairProductionRhoInterpolant EpairInterpol_B(EpairInterpol_A);
+    EXPECT_TRUE(EpairInterpol_A == EpairInterpol_B);
 
-    Medium *medium2 = new Medium(MediumType::Water,1.);
-    PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,.20,20,1e5,10);
-    EnergyCutSettings *cuts2 = new EnergyCutSettings(200,-1);
-    Epairproduction *C = new Epairproduction(particle2, medium2, cuts2);
-    EXPECT_TRUE(A!=*C);
-
-    A=*C;
-
-    EXPECT_TRUE(A==*C);
-
+    EpairInterpolant Interpol_A(EpairInterpol_A, InterpolDef);
+    EpairInterpolant Interpol_B(Interpol_A);
+    EXPECT_TRUE(Interpol_A == Interpol_B);
 }
 
-TEST(Assignment , Swap ) {
-    Medium *medium = new Medium(MediumType::Air,1.);
-    Medium *medium2 = new Medium(MediumType::Air,1.);
-    PROPOSALParticle *particle = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,20,20,1e5,10);
-    PROPOSALParticle *particle2 = new PROPOSALParticle(ParticleType::MuMinus,1.,1.,1,20,20,1e5,10);
-    EnergyCutSettings *cuts = new EnergyCutSettings(500,-1);
-    EnergyCutSettings *cuts2 = new EnergyCutSettings(500,-1);
-    Epairproduction A(particle, medium, cuts);
-    Epairproduction B(particle2, medium2, cuts2);
-    A.EnableDEdxInterpolation();
-    B.EnableDEdxInterpolation();
-    EXPECT_TRUE(A==B);
+// in polymorphism an assignmant and swap operator doesn't make sense
 
-    Medium *medium3 = new Medium(MediumType::Water,1.);
-    Medium *medium4 = new Medium(MediumType::Water,1.);
-    PROPOSALParticle *particle3 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,.20,20,1e5,10);
-    PROPOSALParticle *particle4 = new PROPOSALParticle(ParticleType::TauMinus,1.,1.,1,.20,20,1e5,10);
-    EnergyCutSettings *cuts3 = new EnergyCutSettings(200,-1);
-    EnergyCutSettings *cuts4 = new EnergyCutSettings(200,-1);
-    Epairproduction *C = new Epairproduction(particle3, medium3, cuts3);
-    Epairproduction *D = new Epairproduction(particle4, medium4, cuts4);
-    EXPECT_TRUE(*C==*D);
-
-    A.swap(*C);
-
-    EXPECT_TRUE(A==*D);
-    EXPECT_TRUE(*C==B);
-
-
-}
-
-
-std::vector<Medium*>                CombOfMedium;
-std::vector<PROPOSALParticle*>              CombOfParticle;
-std::vector<EnergyCutSettings*>     CombOfEnergyCutSettings;
-std::vector<CrossSections*>         CombOfEpair;
-
-TEST(Epairproduction , Set_Up ) {
+TEST(Epairproduction, Test_of_dEdx)
+{
     ifstream in;
-    in.open("bin/TestFiles/Epair_dEdx.txt");
+    string filename = "bin/TestFiles/Epair_dEdx.txt";
+    in.open(filename.c_str());
+
+    if (!in.good())
+    {
+        std::cerr << "File \"" << filename << "\" not found" << std::endl;
+    }
 
     char firstLine[256];
-    in.getline(firstLine,256);
-    double dEdx_new;
-    double energy;
-    double dEdx;
+    in.getline(firstLine, 256);
+
+    string particleName;
+    string mediumName;
     double ecut;
     double vcut;
-    string mediumName;
-    string particleName;
+    double multiplier;
     bool lpm;
+    double energy;
+    double dEdx_stored;
+    double dEdx_new;
+
+    while (in.good())
+    {
+        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> lpm >> energy >> dEdx_stored;
+
+        ParticleDef particle_def = getParticleDef(particleName);
+        Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+        EnergyCutSettings ecuts(ecut, vcut);
+
+        EpairProductionRhoIntegral Epair(particle_def, *medium, ecuts, multiplier, lpm);
+        EpairIntegral Epair_Int(Epair);
+
+        dEdx_new = Epair_Int.CalculatedEdx(energy);
+
+        ASSERT_NEAR(dEdx_new, dEdx_stored, 1e-10 * dEdx_stored);
+
+        delete medium;
+    }
+}
+
+TEST(Epairproduction, Test_of_dNdx)
+{
+    ifstream in;
+    string filename = "bin/TestFiles/Epair_dNdx.txt";
+    in.open(filename.c_str());
+
+    if (!in.good())
+    {
+        std::cerr << "File \"" << filename << "\" not found" << std::endl;
+    }
+
+    char firstLine[256];
+    in.getline(firstLine, 256);
+
+    string particleName;
+    string mediumName;
+    double ecut;
+    double vcut;
+    double multiplier;
+    bool lpm;
+    double energy;
+    double dNdx_stored;
+    double dNdx_new;
+
+    while (in.good())
+    {
+        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> lpm >> energy >> dNdx_stored;
+
+        ParticleDef particle_def = getParticleDef(particleName);
+        Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+        EnergyCutSettings ecuts(ecut, vcut);
+
+        EpairProductionRhoIntegral Epair(particle_def, *medium, ecuts, multiplier, lpm);
+        EpairIntegral Epair_Int(Epair);
+
+        dNdx_new = Epair_Int.CalculatedNdx(energy);
+
+        ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-10 * dNdx_stored);
+
+        delete medium;
+    }
+}
+
+TEST(Epairproduction, Test_of_dNdx_rnd)
+{
+    ifstream in;
+    string filename = "bin/TestFiles/Epair_dNdx_rnd.txt";
+    in.open(filename.c_str());
+
+    if (!in.good())
+    {
+        std::cerr << "File \"" << filename << "\" not found" << std::endl;
+    }
+
+    char firstLine[256];
+    in.getline(firstLine, 256);
+
+    string particleName;
+    string mediumName;
+    double ecut;
+    double vcut;
+    double multiplier;
+    bool lpm;
+    double energy;
+    double rnd;
+    double dNdx_rnd_stored;
+    double dNdx_rnd_new;
+
+    RandomGenerator::Get().SetSeed(0);
+
+    while (in.good())
+    {
+        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> lpm >> energy >> rnd >> dNdx_rnd_stored;
+
+        ParticleDef particle_def = getParticleDef(particleName);
+        Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+        EnergyCutSettings ecuts(ecut, vcut);
+
+        EpairProductionRhoIntegral Epair(particle_def, *medium, ecuts, multiplier, lpm);
+        EpairIntegral Epair_Int(Epair);
+
+        dNdx_rnd_new = Epair_Int.CalculatedNdx(energy, rnd);
+
+        ASSERT_NEAR(dNdx_rnd_new, dNdx_rnd_stored, 1E-10 * dNdx_rnd_stored);
+
+        delete medium;
+    }
+}
+
+TEST(Epairproduction, Test_Stochastic_Loss)
+{
+    ifstream in;
+    string filename = "bin/TestFiles/Epair_e.txt";
+    in.open(filename.c_str());
+
+    if (!in.good())
+    {
+        std::cerr << "File \"" << filename << "\" not found" << std::endl;
+    }
+
+    char firstLine[256];
+    in.getline(firstLine, 256);
+
+    string particleName;
+    string mediumName;
+    double ecut;
+    double vcut;
+    double multiplier;
+    bool lpm;
+    double energy;
+    double rnd1, rnd2;
+    double stochastic_loss_stored;
+    double stochastic_loss_new;
 
     cout.precision(16);
+    RandomGenerator::Get().SetSeed(0);
 
-    int i=-1;
-    double energy_old;
-    bool first = true;
-    while(in.good())
+    while (in.good())
     {
-        if(first)in>>ecut>>vcut>>lpm>>energy>>mediumName>>particleName>>dEdx;
-        energy_old  = -1;
+        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> lpm >> energy >> rnd1 >> rnd2 >>
+            stochastic_loss_stored;
 
-        i++;
-        CombOfMedium.push_back(new Medium(Medium::GetTypeFromName(mediumName),1.));
-        CombOfParticle.push_back(new PROPOSALParticle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10));
-        CombOfParticle.at(i)->SetEnergy(energy);
-        CombOfEnergyCutSettings.push_back(new EnergyCutSettings(ecut,vcut));
-        CombOfEpair.push_back(new Epairproduction(CombOfParticle.at(i), CombOfMedium.at(i), CombOfEnergyCutSettings.at(i)));
+        ParticleDef particle_def = getParticleDef(particleName);
+        Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+        EnergyCutSettings ecuts(ecut, vcut);
 
-        CombOfEpair.at(i)->EnableLpmEffect(lpm);
+        EpairProductionRhoIntegral Epair(particle_def, *medium, ecuts, multiplier, lpm);
+        EpairIntegral Epair_Int(Epair);
 
-        while(energy_old < energy)
-        {
-            energy_old = energy;
-            in>>ecut>>vcut>>lpm>>energy>>mediumName>>particleName>>dEdx;
-        }
+        stochastic_loss_new = Epair_Int.CrossSectionIntegral::CalculateStochasticLoss(energy, rnd1, rnd2);
+
+        ASSERT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
+
+        delete medium;
     }
 }
 
-TEST(Epairproduction , Test_of_dEdx ) {
+TEST(Epairproduction, Test_of_dEdx_Interpolant)
+{
     ifstream in;
-    in.open("bin/TestFiles/Epair_dEdx.txt");
+    string filename = "bin/TestFiles/Epair_dEdx_interpol.txt";
+    in.open(filename.c_str());
+
+    if (!in.good())
+    {
+        std::cerr << "File \"" << filename << "\" not found" << std::endl;
+    }
 
     char firstLine[256];
-    in.getline(firstLine,256);
+    in.getline(firstLine, 256);
+
+    string particleName;
+    string mediumName;
+    double ecut;
+    double vcut;
+    double multiplier;
+    bool lpm;
+    double energy;
+    double dEdx_stored;
     double dEdx_new;
-    double energy;
-    double dEdx;
-    double ecut;
-    double vcut;
-    string mediumName;
-    string particleName;
-    bool lpm;
 
-    cout.precision(16);
+    InterpolationDef InterpolDef;
 
-    int i = -1;
-    double energy_old;
-    while(in.good())
+    while (in.good())
     {
-        in>>ecut>>vcut>>lpm>>energy>>mediumName>>particleName>>dEdx;
-        energy_old = -1;
-        i++;
-        while(energy_old < energy)
-        {
-            energy_old = energy;
+        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> lpm >> energy >> dEdx_stored;
 
-            CombOfEpair.at(i)->GetParticle()->SetEnergy(energy);
-            dEdx_new=CombOfEpair.at(i)->CalculatedEdx();
+        ParticleDef particle_def = getParticleDef(particleName);
+        Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+        EnergyCutSettings ecuts(ecut, vcut);
 
-            ASSERT_NEAR(dEdx_new, dEdx, 1E-5*dEdx);
+        EpairProductionRhoInterpolant Epair(particle_def, *medium, ecuts, multiplier, lpm, InterpolDef);
+        EpairInterpolant Epair_Interpol(Epair, InterpolDef);
 
-            in>>ecut>>vcut>>lpm>>energy>>mediumName>>particleName>>dEdx;
-        }
+        dEdx_new = Epair_Interpol.CalculatedEdx(energy);
+
+        ASSERT_NEAR(dEdx_new, dEdx_stored, 1e-10 * dEdx_stored);
+
+        delete medium;
     }
 }
 
-TEST(Epairproduction , Test_of_dNdx ) {
+TEST(Epairproduction, Test_of_dNdx_Interpolant)
+{
     ifstream in;
-    in.open("bin/TestFiles/Epair_dNdx.txt");
+    string filename = "bin/TestFiles/Epair_dNdx_interpol.txt";
+    in.open(filename.c_str());
+
+    if (!in.good())
+    {
+        std::cerr << "File \"" << filename << "\" not found" << std::endl;
+    }
 
     char firstLine[256];
-    in.getline(firstLine,256);
+    in.getline(firstLine, 256);
+
+    string particleName;
+    string mediumName;
+    double ecut;
+    double vcut;
+    double multiplier;
+    bool lpm;
+    double energy;
+    double dNdx_stored;
     double dNdx_new;
-    double energy;
-    double dNdx;
-    double ecut;
-    double vcut;
-    string mediumName;
-    string particleName;
-    bool lpm;
 
-    double precision = 1E-5;
+    InterpolationDef InterpolDef;
 
-    double energy_old;
-    bool first = true;
-    int i=-1;
-    while(in.good())
+    while (in.good())
     {
-        if(first)in>>ecut>>vcut>>lpm>>energy>>mediumName>>particleName>>dNdx;
-        first = false;
-        energy_old = -1;
+        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> lpm >> energy >> dNdx_stored;
 
-        i++;
-        while(energy_old < energy)
-        {
-            energy_old = energy;
+        ParticleDef particle_def = getParticleDef(particleName);
+        Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+        EnergyCutSettings ecuts(ecut, vcut);
 
-            CombOfEpair.at(i)->GetParticle()->SetEnergy(energy);
-            dNdx_new=CombOfEpair.at(i)->CalculatedNdx();
+        EpairProductionRhoInterpolant Epair(particle_def, *medium, ecuts, multiplier, lpm, InterpolDef);
+        EpairInterpolant Epair_Interpol(Epair, InterpolDef);
 
-            if(dNdx!=0)
-            {
-                if(log10(fabs(1-dNdx_new/dNdx))>-13)
-                {
-//                    cout <<ecut << "\t" << vcut<< "\t" << lpm<< "\t" << energy<< "\t" << mediumName<< "\t" << particleName << endl;
-//                    cout << energy << "\t" << log10(fabs(1-dNdx_new/dNdx)) << endl;
-                }
-            }
-            ASSERT_NEAR(dNdx_new, dNdx, precision*dNdx);
+        dNdx_new = Epair_Interpol.CalculatedNdx(energy);
 
-            in>>ecut>>vcut>>lpm>>energy>>mediumName>>particleName>>dNdx;
-        }
+        ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-10 * dNdx_stored);
+
+        delete medium;
     }
 }
 
-
-TEST(Epairproduction , Test_of_dNdxrnd ) {
+TEST(Epairproduction, Test_of_dNdxrnd_interpol)
+{
     ifstream in;
-    in.open("bin/TestFiles/Epair_dNdxrnd.txt");
+    string filename = "bin/TestFiles/Epair_dNdx_rnd_interpol.txt";
+    in.open(filename.c_str());
+
+    if (!in.good())
+    {
+        std::cerr << "File \"" << filename << "\" not found" << std::endl;
+    }
 
     char firstLine[256];
-    in.getline(firstLine,256);
-    double dNdxrnd_new;
-    double energy;
-    double dNdxrnd;
+    in.getline(firstLine, 256);
+
+    string particleName;
+    string mediumName;
     double ecut;
     double vcut;
-    string mediumName;
-    string particleName;
+    double multiplier;
     bool lpm;
+    double energy;
+    double rnd;
+    double dNdx_rnd_stored;
+    double dNdx_rnd_new;
 
-    double precision = 1E-5;
+    InterpolationDef InterpolDef;
 
-    double energy_old;
-    bool first = true;
-    RndFromFile* Rand = new RndFromFile("bin/TestFiles/rnd.txt");
+    RandomGenerator::Get().SetSeed(0);
 
-    int i=-1;
-    while(in.good())
+    while (in.good())
     {
-        if(first)in>>ecut>>vcut>>lpm>>energy>>mediumName>>particleName>>dNdxrnd;
-        first = false;
-        energy_old = -1;
+        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> lpm >> energy >> rnd >> dNdx_rnd_stored;
 
-        i++;
-        while(energy_old < energy)
-        {
-            energy_old = energy;
+        ParticleDef particle_def = getParticleDef(particleName);
+        Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+        EnergyCutSettings ecuts(ecut, vcut);
 
-            CombOfEpair.at(i)->GetParticle()->SetEnergy(energy);
-            dNdxrnd_new=CombOfEpair.at(i)->CalculatedNdx(Rand->rnd());
+        EpairProductionRhoInterpolant Epair(particle_def, *medium, ecuts, multiplier, lpm, InterpolDef);
+        EpairInterpolant Epair_Interpol(Epair, InterpolDef);
 
+        dNdx_rnd_new = Epair_Interpol.CalculatedNdx(energy, rnd);
 
-            if(dNdxrnd!=0){
-                if(log10(fabs(1-dNdxrnd_new/dNdxrnd))>-14)
-                {
-//                    cout <<ecut << "\t" << vcut<< "\t" << lpm<< "\t" << energy<< "\t" << mediumName<< "\t" << particleName << endl;
-//                    cout << energy << "\t" << log10(fabs(1-dNdxrnd_new/dNdxrnd)) << endl;
-                }
-            }
+        ASSERT_NEAR(dNdx_rnd_new, dNdx_rnd_stored, 1E-10 * dNdx_rnd_stored);
 
-            ASSERT_NEAR(dNdxrnd_new, dNdxrnd, precision*dNdxrnd);
-
-            in>>ecut>>vcut>>lpm>>energy>>mediumName>>particleName>>dNdxrnd;
-        }
+        delete medium;
     }
-    delete Rand;
 }
 
-
-TEST(Epairproduction , Test_of_e ) {
+TEST(Epairproduction, Test_of_e_interpol)
+{
     ifstream in;
-    in.open("bin/TestFiles/Epair_e.txt");
+    string filename = "bin/TestFiles/Epair_e_interpol.txt";
+    in.open(filename.c_str());
+
+    if (!in.good())
+    {
+        std::cerr << "File \"" << filename << "\" not found" << std::endl;
+    }
 
     char firstLine[256];
-    in.getline(firstLine,256);
-    double e_new;
-    double energy;
-    double e;
+    in.getline(firstLine, 256);
+
+    string particleName;
+    string mediumName;
     double ecut;
     double vcut;
-    string mediumName;
-    string particleName;
+    double multiplier;
     bool lpm;
-
-    double precision = 1E-5;
-
-    double energy_old;
-    bool first = true;
-    RndFromFile* Rand = new RndFromFile("bin/TestFiles/rnd.txt");
-    RndFromFile* Rand2 = new RndFromFile("bin/TestFiles/rnd.txt");
-    Rand2->rnd();
-    double rnd1,rnd2;
-    int i = -1;
-    while(in.good())
-    {
-        if(first)in>>ecut>>vcut>>lpm>>energy>>mediumName>>particleName>>e;
-        first = false;
-        energy_old = -1;
-
-
-        i++;
-        while(energy_old < energy)
-        {
-            energy_old = energy;
-
-            CombOfEpair.at(i)->GetParticle()->SetEnergy(energy);
-
-            rnd1 = Rand->rnd();
-            rnd2 = Rand2->rnd();
-
-            CombOfEpair.at(i)->GetParticle()->SetEnergy(energy);
-            e_new=CombOfEpair.at(i)->CalculateStochasticLoss(rnd1,rnd2);
-
-
-            if(e!=0){
-                if(log10(fabs(1-e_new/e))>-14)
-                {
-                    //cout <<ecut << "\t" << vcut<< "\t" << lpm<< "\t" << energy<< "\t" << mediumName<< "\t" << particleName << endl;
-                    //cout << energy << "\t" << log10(fabs(1-e_new/e)) << endl;
-                }
-            }
-
-            ASSERT_NEAR(e_new, e, precision*e);
-
-            in>>ecut>>vcut>>lpm>>energy>>mediumName>>particleName>>e;
-        }
-    }
-    delete Rand;
-    delete Rand2;
-}
-
-TEST(Epairproduction , Test_of_dEdx_interpol ) {
-    ifstream in;
-    in.open("bin/TestFiles/Epair_dEdx_interpol.txt");
-
-    char firstLine[256];
-    in.getline(firstLine,256);
-    double dEdx_new;
     double energy;
-    double dEdx;
-    double ecut;
-    double vcut;
-    string mediumName;
-    string particleName;
-    bool lpm;
+    double rnd1, rnd2;
+    double stochastic_loss_stored;
+    double stochastic_loss_new;
 
-    double precision = 1E-5;
+    InterpolationDef InterpolDef;
 
-    double energy_old;
-    bool first = true;
-    int i = -1;
-    while(in.good())
+    RandomGenerator::Get().SetSeed(0);
+
+    while (in.good())
     {
-        if(first)in>>ecut>>vcut>>lpm>>energy>>mediumName>>particleName>>dEdx;
-        first = false;
-        energy_old = -1;
+        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> lpm >> energy >> rnd1 >> rnd2 >>
+            stochastic_loss_stored;
 
+        ParticleDef particle_def = getParticleDef(particleName);
+        Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
+        EnergyCutSettings ecuts(ecut, vcut);
 
-        i++;
-        CombOfEpair.at(i)->EnableDEdxInterpolation();
-        while(energy_old < energy)
-        {
-            energy_old = energy;
+        EpairProductionRhoInterpolant Epair(particle_def, *medium, ecuts, multiplier, lpm, InterpolDef);
+        EpairInterpolant Epair_Interpol(Epair, InterpolDef);
 
-            CombOfEpair.at(i)->GetParticle()->SetEnergy(energy);
-            dEdx_new=CombOfEpair.at(i)->CalculatedEdx();
+        stochastic_loss_new = Epair_Interpol.CrossSectionInterpolant::CalculateStochasticLoss(energy, rnd1, rnd2);
 
-            ASSERT_NEAR(dEdx_new, dEdx, precision*dEdx);
+        ASSERT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
 
-            in>>ecut>>vcut>>lpm>>energy>>mediumName>>particleName>>dEdx;
-        }
+        delete medium;
     }
 }
 
-TEST(Epairproduction , Test_of_dNdx_interpol ) {
-    ifstream in;
-    in.open("bin/TestFiles/Epair_dNdx_interpol.txt");
-
-    char firstLine[256];
-    in.getline(firstLine,256);
-    double dNdx_new;
-    double energy;
-    double dNdx;
-    double ecut;
-    double vcut;
-    string mediumName;
-    string particleName;
-    bool lpm;
-
-    double precision = 1E-2;
-
-    double energy_old;
-    bool first = true;
-
-    int i=-1;
-    while(in.good())
-    {
-        if(first)in>>ecut>>vcut>>lpm>>energy>>mediumName>>particleName>>dNdx;
-        first = false;
-        energy_old = -1;
-
-        i++;
-        CombOfEpair.at(i)->EnableDNdxInterpolation();
-
-        while(energy_old < energy)
-        {
-            energy_old = energy;
-
-            CombOfEpair.at(i)->GetParticle()->SetEnergy(energy);
-            dNdx_new=CombOfEpair.at(i)->CalculatedNdx();
-
-            if(dNdx!=0)
-                if(log10(fabs(1-dNdx_new/dNdx))>-8)
-                {
-                    //cout <<ecut << "\t" << vcut<< "\t" << lpm<< "\t" << energy<< "\t" << mediumName<< "\t" << particleName << endl;
-                    //cout << energy << "\t" << log10(fabs(1-dNdx_new/dNdx)) << endl;
-                }
-
-            ASSERT_NEAR(dNdx_new, dNdx, precision*dNdx);
-
-            in>>ecut>>vcut>>lpm>>energy>>mediumName>>particleName>>dNdx;
-        }
-    }
-}
-
-TEST(Epairproduction , Test_of_dNdxrnd_interpol ) {
-    ifstream in;
-    in.open("bin/TestFiles/Epair_dNdxrnd_interpol.txt");
-
-    char firstLine[256];
-    in.getline(firstLine,256);
-    double dNdxrnd_new;
-    double energy;
-    double dNdxrnd;
-    double ecut;
-    double vcut;
-    string mediumName;
-    string particleName;
-    bool lpm;
-
-    double precision = 1E-2;
-
-    double energy_old;
-    bool first = true;
-    RndFromFile* Rand = new RndFromFile("bin/TestFiles/rnd.txt");
-
-    int i=-1;
-    while(in.good())
-    {
-        if(first)in>>ecut>>vcut>>lpm>>energy>>mediumName>>particleName>>dNdxrnd;
-        first = false;
-        energy_old = -1;
-
-        i++;
-        CombOfEpair.at(i)->EnableDNdxInterpolation();
-        while(energy_old < energy)
-        {
-            energy_old = energy;
-
-            CombOfEpair.at(i)->GetParticle()->SetEnergy(energy);
-            dNdxrnd_new=CombOfEpair.at(i)->CalculatedNdx(Rand->rnd());
-
-
-            if(dNdxrnd!=0){
-                if(log10(fabs(1-dNdxrnd_new/dNdxrnd))>-5)
-                {
-                    log_warn("%f \t %f \t %i \t %f \t %s \t %s \t",ecut,vcut,lpm,energy,mediumName.c_str(),particleName.c_str());
-                    log_warn("%f \t %f",energy,log10(fabs(1-dNdxrnd_new/dNdxrnd)));
-                }
-            }
-
-            ASSERT_NEAR(dNdxrnd_new, dNdxrnd, precision*dNdxrnd);
-
-            in>>ecut>>vcut>>lpm>>energy>>mediumName>>particleName>>dNdxrnd;
-        }
-    }
-    delete Rand;
-}
-
-TEST(Epairproduction , Test_of_e_interpol ) {
-    ifstream in;
-    in.open("bin/TestFiles/Epair_e_interpol.txt");
-
-    char firstLine[256];
-    in.getline(firstLine,256);
-    double e_new;
-    double energy;
-    double e;
-    double ecut;
-    double vcut;
-    string mediumName;
-    string particleName;
-    bool lpm;
-
-    double precision = 1E-2;
-    double precision_old=precision;
-    double energy_old;
-    bool first = true;
-    RndFromFile* Rand = new RndFromFile("bin/TestFiles/rnd.txt");
-    RndFromFile* Rand2 = new RndFromFile("bin/TestFiles/rnd.txt");
-    Rand2->rnd();
-    double rnd1,rnd2;
-    int i=-1;
-    int ctr=0;
-    while(in.good())
-    {
-        if(first)in>>ecut>>vcut>>lpm>>energy>>mediumName>>particleName>>e;
-        first = false;
-        energy_old = -1;
-
-        i++;
-        CombOfEpair.at(i)->EnableDEdxInterpolation();
-        CombOfEpair.at(i)->EnableDNdxInterpolation();
-
-        while(energy_old < energy)
-        {
-            precision=precision_old;
-            energy_old = energy;
-
-            rnd1 = Rand->rnd();
-            rnd2 = Rand2->rnd();
-
-            //The Cross section for such high energy is just extrapolated and
-            //therefore pretty unceartain.
-            if(!particleName.compare("e") && energy > 1E12)precision = 1E-1;
-
-            CombOfEpair.at(i)->GetParticle()->SetEnergy(energy);
-            e_new=CombOfEpair.at(i)->CalculateStochasticLoss(rnd1,rnd2);
-
-
-            if(e!=0){
-                if(log10(fabs(1-e_new/e))>-3)
-                {
-                    //cout <<ecut << "\t" << vcut<< "\t" << lpm<< "\t" << energy<< "\t" << mediumName<< "\t" << particleName << endl;
-                    cout << energy << "\t" << log10(fabs(1-e_new/e)) << endl;
-                }
-            }
-            //cout <<ecut << "\t" << vcut<< "\t" << lpm<< "\t" << energy<< "\t" << mediumName<< "\t" << particleName << endl;
-            //cout << "ctr: " << ctr++ << endl;
-            EXPECT_NEAR(e_new, e, precision*e);
-
-            in>>ecut>>vcut>>lpm>>energy>>mediumName>>particleName>>e;
-        }
-    }
-    delete Rand;
-    delete Rand2;
-}
-
-
-
-int main(int argc, char **argv) {
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
+int main(int argc, char** argv)
+{
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }
