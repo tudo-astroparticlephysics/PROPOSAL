@@ -145,8 +145,8 @@ private:
     // Global default values
     // --------------------------------------------------------------------- //
 
-    // ParametrizationType::Enum  brems_;                     //!< Bremsstrahlungs parametrization
-    // ParametrizationType::Enum  photo_;                     //!< Photonuclear parametrization
+    static const int
+        global_seed_; //!< Seed for the internal random number generator
     static const double
         global_ecut_inside_; //!< ecut for inside the detector (it's used when not specified explicit for a sector in
     //! congiguration file)
