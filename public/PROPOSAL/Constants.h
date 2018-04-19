@@ -29,9 +29,6 @@
 
 #pragma once
 
-#ifndef CONSTANTS_H
-#define CONSTANTS_H
-
 namespace PROPOSAL {
 // numbers
 extern const double PI;
@@ -105,5 +102,3 @@ extern const double MSTAU; // stau mass (MeV)
 extern const double STABLE_PARTICLE; // lifetime of stable particle, -1 because of history
 
 } // namespace PROPOSAL
-
-#endif // CONSTANTS_H
