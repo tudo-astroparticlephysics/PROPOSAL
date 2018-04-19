@@ -61,11 +61,8 @@ public:
     Propagator(const Propagator&);
     ~Propagator();
 
-    Propagator& operator=(const Propagator& propagator);
     bool operator==(const Propagator& propagator) const;
     bool operator!=(const Propagator& propagator) const;
-
-    void swap(Propagator& propagator);
 
     // ----------------------------------------------------------------------------
     /// @brief Propagates the particle through the current set of Sectors
@@ -92,6 +89,9 @@ public:
     Particle& GetParticle() { return particle_; };
 
 private:
+
+    Propagator& operator=(const Propagator& propagator);
+
     // ----------------------------------------------------------------------------
     /// @brief Simple wrapper to initialize propagator from config file
     ///
