@@ -52,7 +52,6 @@ class Propagator
 {
 public:
     // Constructors
-    Propagator();
     Propagator(const std::vector<Sector*>&, const Geometry&);
     Propagator(const ParticleDef&, const std::vector<Sector::Definition>&, const Geometry&);
     Propagator(const ParticleDef&, const std::vector<Sector::Definition>&, const Geometry&, const InterpolationDef&);
@@ -77,14 +76,9 @@ public:
     // Getter
     // --------------------------------------------------------------------- //
 
-    // --------------------------------------------------------------------- //
     const Sector* GetCurrentCollection() const { return current_sector_; }
-
-    //----------------------------------------------------------------------------//
     std::vector<Sector*> GetSectors() const { return sectors_; }
 
-    int GetSeed() const { return seed_; };
-    void SetSeed(int seed) { seed_ = seed; };
     Geometry& GetDetector() const { return *detector_; };
     Particle& GetParticle() { return particle_; };
 
@@ -185,8 +179,6 @@ private:
     // --------------------------------------------------------------------- //
     // Private Member
     // --------------------------------------------------------------------- //
-
-    int seed_; //!< seed of the random number generator
 
     std::vector<Sector*> sectors_;
     Sector* current_sector_;
