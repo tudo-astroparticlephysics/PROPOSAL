@@ -21,7 +21,7 @@ if __name__ == "__main__":
     sec_def.geometry_def = pp.Sphere(pp.Vector3D(), 1e20, 0)
     sec_def.particle_location = pp.ParticleLocation.inside_detector
 
-    sec_def.scattering_model = pp.ScatteringModel.moliere
+    sec_def.scattering_model = pp.ScatteringModel.Moliere
     sec_def.crosssection_defs.brems_def.lpm_effect = False
     sec_def.crosssection_defs.epair_def.lpm_effect = False
 
@@ -93,6 +93,6 @@ if __name__ == "__main__":
     ax.set_ylabel(r'count')
 
     fig_secondarys.tight_layout()
-    fig_length.savefig(
+    fig_secondarys.savefig(
         "{}_secondaries.pdf".format(prop.particle.particle_def.name)
     )
