@@ -19,6 +19,8 @@
 
 #include "PROPOSAL/medium/MediumFactory.h"
 
+#include "PROPOSAL/math/RandomGenerator.h"
+
 #include "PROPOSAL/Constants.h"
 
 using namespace std;
@@ -43,26 +45,9 @@ const bool Propagator::interpolate_           = true; //!< Enable interpolation
 // Constructors & destructor
 // ------------------------------------------------------------------------- //
 
-Propagator::Propagator()
-    : seed_(1)
-    , current_sector_(NULL)
-    // , particle_(MuMinusDef::Get())
-    , particle_(MuMinusDef::Get())
-    , detector_(new Sphere(Vector3D(), 1e18, 0))
-{
-    // TODO(mario): set defaults Tue 2017/09/19
-    // Sector::Definition sector_def;
-    // sector_def.location = Sector::ParticleLocation::InsideDetector;
-    //
-    // current_sector_ = new Sector(particle_);
-    //
-    // sectors_.push_back(current_sector_);
-}
-
 // ------------------------------------------------------------------------- //
 Propagator::Propagator(const std::vector<Sector*>& sectors, const Geometry& geometry) try
-    : seed_(1),
-      current_sector_(NULL),
+    : current_sector_(NULL),
       particle_(sectors.at(0)->GetParticle()),
       detector_(geometry.clone())
 {
@@ -91,8 +76,7 @@ Propagator::Propagator(const std::vector<Sector*>& sectors, const Geometry& geom
 Propagator::Propagator(const ParticleDef& particle_def,
                        const std::vector<Sector::Definition>& sector_defs,
                        const Geometry& geometry)
-    : seed_(1)
-    , particle_(particle_def)
+    : particle_(particle_def)
     , detector_(geometry.clone())
 {
     for (std::vector<Sector::Definition>::const_iterator iter = sector_defs.begin(); iter != sector_defs.end(); ++iter)
@@ -114,8 +98,7 @@ Propagator::Propagator(const ParticleDef& particle_def,
                        const std::vector<Sector::Definition>& sector_defs,
                        const Geometry& geometry,
                        const InterpolationDef& interpolation_def)
-    : seed_(1)
-    , particle_(particle_def)
+    : particle_(particle_def)
     , detector_(geometry.clone())
 {
     for (std::vector<Sector::Definition>::const_iterator iter = sector_defs.begin(); iter != sector_defs.end(); ++iter)
@@ -134,8 +117,7 @@ Propagator::Propagator(const ParticleDef& particle_def,
 
 // ------------------------------------------------------------------------- //
 Propagator::Propagator(const Propagator& propagator)
-    : seed_(propagator.seed_)
-    , sectors_(propagator.sectors_.size(), NULL)
+    : sectors_(propagator.sectors_.size(), NULL)
     , current_sector_(NULL)
     , particle_(propagator.particle_)
     , detector_(propagator.detector_->clone())
@@ -153,8 +135,7 @@ Propagator::Propagator(const Propagator& propagator)
 
 // ------------------------------------------------------------------------- //
 Propagator::Propagator(const ParticleDef& particle_def, const std::string& config_file)
-    : seed_(1)
-    , current_sector_(NULL)
+    : current_sector_(NULL)
     , particle_(particle_def)
     , detector_(NULL)
 {
@@ -183,7 +164,10 @@ Propagator::Propagator(const ParticleDef& particle_def, const std::string& confi
         log_fatal("Unable parse \"%s\" as json file", config_file.c_str());
     }
 
-    SetMember(seed_, "global.seed", pt_json);
+    int seed = 0;
+    SetMember(seed, "global.seed", pt_json);
+    RandomGenerator::Get().SetSeed(seed);
+    log_info("Seed of the default random generator set to %i", seed);
 
     // Read in global cut and continous randomization options
     SetMember(global_ecut_inside, "global.ecut_inside", pt_json);
@@ -388,16 +372,12 @@ Propagator::~Propagator()
 // ------------------------------------------------------------------------- //
 bool Propagator::operator==(const Propagator& propagator) const
 {
-    if (seed_ != propagator.seed_)
-        return false;
     if (*detector_ != *propagator.detector_)
     {
-        std::cout << "detector not equal" << std::endl;
         return false;
     }
     if (sectors_.size() != propagator.sectors_.size())
     {
-        std::cout << "sector size not equal" << std::endl;
         return false;
     }
     else
@@ -406,7 +386,6 @@ bool Propagator::operator==(const Propagator& propagator) const
         {
             if (*sectors_[i] != *propagator.sectors_[i])
             {
-                std::cout << "sector not equal: " << i << std::endl;
                 return false;
             }
         }
@@ -527,9 +506,6 @@ std::vector<DynamicData*> Propagator::Propagate(double MaxDistance_cm)
     if (Output::store_in_ASCII_file_)
         Output::getInstance().StorePropagatedPrimaryInASCII(&particle_);
 
-    // TODO(mario): undo backup Mo 2017/04/03
-    // RestoreBackup_particle();
-
     return Output::getInstance().GetSecondarys();
 }
 
@@ -541,14 +517,6 @@ void Propagator::ChooseCurrentCollection(const Vector3D& particle_position, cons
 
     for (unsigned int i = 0; i < sectors_.size(); i++)
     {
-        // sectors_[i]->RestoreBackup_particle();
-
-        // TODO(mario): Is that ok to delete? Tue 2017/08/08
-        // if(particle_->GetType() != sectors_[i]->GetParticle()->GetType())
-        // {
-        //     continue;
-        // }
-
         if (detector_->IsInfront(particle_position, particle_direction))
         {
             if (sectors_[i]->GetLocation() != 0)
@@ -669,10 +637,6 @@ double Propagator::CalculateEffectiveDistance(const Vector3D& particle_position,
 
     for (std::vector<Sector*>::iterator iter = sectors_.begin(); iter != sectors_.end(); ++iter)
     {
-        // TODO(mario): Is that ok to delete? Tue 2017/08/08
-        // if (particle_.GetType() != (*iter)->Getparticle_()->GetType())
-        //     continue;
-
         if (detector_->IsInfront(particle_position, particle_direction))
         {
             if ((*iter)->GetLocation() != 0)
