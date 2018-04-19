@@ -29,9 +29,6 @@
 
 #pragma once
 
-#ifndef INTEGRAL_H_
-#define INTEGRAL_H_
-
 #include <boost/function.hpp>
 #include <iostream>
 #include <vector>
@@ -577,5 +574,3 @@ private:
 };
 
 } // namespace PROPOSAL
-
-#endif /*INTEGRAL_H_ */
