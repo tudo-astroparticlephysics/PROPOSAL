@@ -18,7 +18,7 @@ namespace PROPOSAL {
 class Geometry
 {
 public:
-    Geometry(const std::string); // TODO(mario): Maybe not useful Tue 2017/08/01
+    Geometry(const std::string);
     Geometry(const std::string, const Vector3D position);
     Geometry(const Geometry&);
 
