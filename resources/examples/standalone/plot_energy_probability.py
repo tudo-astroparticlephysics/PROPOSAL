@@ -15,6 +15,9 @@ try:
 except ImportError:
     print("Matplotlib not installed!")
 
+import numpy as np
+# np.set_printoptions(threshold='nan')
+
 
 class ProgressBar(object):
 
@@ -119,14 +122,14 @@ def plot_hist(ax, prim, sec):
         hist = ax.hist2d(
             prim,
             sec,
-            bins=1000,
+            bins=100,
             norm=LogNorm(),
         )
     else:
         hist = ax.hist2d(
             prim,
             sec,
-            bins=1000,
+            bins=100,
         )
 
     ax.set_xlim(xmin=2, xmax=14)
@@ -148,23 +151,32 @@ def plot_hist(ax, prim, sec):
 
 if __name__ == "__main__":
 
+    import sys
+
+    # =========================================================
+    # 	Commandline args
+    # =========================================================
+
+    statistics = 1000
+    config_file = "../../config_ice.json"
+
+    if len(sys.argv) == 2:
+        statistics = int(sys.argv[1])
+    elif len(sys.argv) == 3:
+        statistics = int(sys.argv[1])
+        config_file = sys.argv[2]
+
     # =========================================================
     #   POPOSAL
     # =========================================================
 
-    # start_time = time.time()
+    prop = pyPROPOSAL.Propagator(
+        particle_def=pyPROPOSAL.MuMinusDef.get(),
+        config_file=config_file
+    )
 
-    ptype = pyPROPOSAL.ParticleType.MuMinus
-    mu = pyPROPOSAL.Particle(ptype)
+    mu = prop.particle
 
-    # ptype = pyPROPOSAL.ParticleType.STauMinus
-    # mu = pyPROPOSAL.Particle(ptype)
-    # mu.mass = 100000
-    # mu.mass = 10000
-
-    prop = pyPROPOSAL.Propagator("resources/configuration_IceOnly", mu)
-
-    statistics = 1000
     E_max_log = 14
 
     epair_primary_energy = []
@@ -188,27 +200,30 @@ if __name__ == "__main__":
     for i in range(statistics):
         progress.update()
 
-        prop.reset_particle()
-        prop.particle.energy = math.pow(10, E_max_log)
+        mu.position = pyPROPOSAL.Vector3D(0, 0, 0)
+        mu.direction = pyPROPOSAL.Vector3D(0, 0, -1)
+        mu.energy = math.pow(10, E_max_log)
+        mu.propagated_distance = 0
+
         secondarys = prop.propagate()
 
-        length.append(prop.particle.propagated_distance / 100)
+        length.append(mu.propagated_distance / 100)
         n_secondarys.append(len(secondarys))
 
         for sec in secondarys:
             log_sec_energy = math.log10(sec.energy)
             log_energy = math.log10(sec.parent_particle_energy)
 
-            if sec.type is pyPROPOSAL.ParticleType.EPair:
+            if sec.id == pyPROPOSAL.Data.Epair:
                 epair_primary_energy.append(log_energy)
                 epair_secondary_energy.append(log_sec_energy)
-            if sec.type is pyPROPOSAL.ParticleType.Brems:
+            if sec.id == pyPROPOSAL.Data.Brems:
                 brems_primary_energy.append(log_energy)
                 brems_secondary_energy.append(log_sec_energy)
-            if sec.type is pyPROPOSAL.ParticleType.DeltaE:
+            if sec.id == pyPROPOSAL.Data.DeltaE:
                 ioniz_primary_energy.append(log_energy)
                 ioniz_secondary_energy.append(log_sec_energy)
-            if sec.type is pyPROPOSAL.ParticleType.NuclInt:
+            if sec.id == pyPROPOSAL.Data.NuclInt:
                 photo_primary_energy.append(log_energy)
                 photo_secondary_energy.append(log_sec_energy)
 
@@ -249,13 +264,16 @@ if __name__ == "__main__":
         figsize=(width / inch_to_cm, width / inch_to_cm / golden_ratio)
     )
     fig.subplots_adjust(wspace=0.1, hspace=0.3)
-    fig.suptitle(r"{:g} {} with mass {:.1f} MeV and energy $10^{{{}}}$ MeV in {}".format(
-        statistics,
-        prop.particle.name,
-        prop.particle.mass,
-        E_max_log,
-        prop.collections[0].medium.name.lower()
-    ))
+    fig.suptitle(
+        r"{:g} {} with mass {:.1f} MeV and energy $10^{{{}}}$ MeV in {}"
+        .format(
+            statistics,
+            mu.particle_def.name,
+            mu.particle_def.mass,
+            E_max_log,
+            "ice"
+        )
+    )
 
     # =========================================================
     #   Ionization
@@ -311,9 +329,9 @@ if __name__ == "__main__":
     )
 
     fig.savefig("energy_probability_{}_{}_{}_stats_{}.pdf".format(
-        prop.particle.name,
-        prop.particle.mass,
-        prop.collections[0].medium.name.lower(),
+        mu.particle_def.name,
+        mu.particle_def.mass,
+        "ice",
         statistics
     ))
 
@@ -326,9 +344,9 @@ if __name__ == "__main__":
     )
     fig_length.suptitle(
         "propagation lenght of {} with mass {} MeV in {}".format(
-            prop.particle.name,
-            prop.particle.mass,
-            prop.collections[0].medium.name.lower()
+            mu.particle_def.name,
+            mu.particle_def.mass,
+            "ice"
         )
     )
 
@@ -338,9 +356,9 @@ if __name__ == "__main__":
     ax_length.set_ylabel(r'count')
 
     fig_length.savefig("lenght_{}_{}_{}_stats_{}.pdf".format(
-        prop.particle.name,
-        prop.particle.mass,
-        prop.collections[0].medium.name.lower(),
+        mu.particle_def.name,
+        mu.particle_def.mass,
+        "ice",
         statistics
     ))
 
@@ -353,9 +371,9 @@ if __name__ == "__main__":
     )
     fig_secondarys.suptitle(
         "propagation lenght of {} with mass {} MeV in {}".format(
-            prop.particle.name,
-            prop.particle.mass,
-            prop.collections[0].medium.name.lower()
+            mu.particle_def.name,
+            mu.particle_def.mass,
+            "ice"
         )
     )
 
@@ -365,9 +383,9 @@ if __name__ == "__main__":
     ax_secondarys.set_ylabel(r'count')
 
     fig_secondarys.savefig("secondarys_{}_{}_{}_stats_{}.pdf".format(
-        prop.particle.name,
-        prop.particle.mass,
-        prop.collections[0].medium.name.lower(),
+        mu.particle_def.name,
+        mu.particle_def.mass,
+        "ice",
         statistics
     ))
 

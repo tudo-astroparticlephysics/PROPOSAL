@@ -1,46 +1,22 @@
-
-/******************************************************************************
- *                                                                            *
- * This file is part of the simulation tool PROPOSAL.                         *
- *                                                                            *
- * Copyright (C) 2017 TU Dortmund University, Department of Physics,          *
- *                    Chair Experimental Physics 5b                           *
- *                                                                            *
- * This software may be modified and distributed under the terms of a         *
- * modified GNU Lesser General Public Licence version 3 (LGPL),               *
- * copied verbatim in the file "LICENSE".                                     *
- *                                                                            *
- * Modifcations to the LGPL License:                                          *
- *                                                                            *
- *      1. The user shall acknowledge the use of PROPOSAL by citing the       *
- *         following reference:                                               *
- *                                                                            *
- *         J.H. Koehne et al.  Comput.Phys.Commun. 184 (2013) 2070-2090 DOI:  *
- *         10.1016/j.cpc.2013.04.001                                          *
- *                                                                            *
- *      2. The user should report any bugs/errors or improvments to the       *
- *         current maintainer of PROPOSAL or open an issue on the             *
- *         GitHub webpage                                                     *
- *                                                                            *
- *         "https://github.com/tudo-astroparticlephysics/PROPOSAL"            *
- *                                                                            *
- ******************************************************************************/
-
+/*! \file   EnergyCutSettings.h
+ *   \brief  Headerfile for the energy cuts routines.
+ *
+ *   For more details see the class documentation.
+ *
+ *   \date   2013.03.15
+ *   \author Jan-Hednrik Köhne
+ */
 #pragma once
-
-#ifndef ENERGYCUTSETTINGS_H_
-#define ENERGYCUTSETTINGS_H_
 
 #include <iostream>
 
-namespace PROPOSAL
-{
-    class EnergyCutSettings;
+namespace PROPOSAL {
+class EnergyCutSettings;
 }
 
 std::ostream& operator<<(std::ostream& os, PROPOSAL::EnergyCutSettings const& cut_settings);
 
-namespace PROPOSAL{
+namespace PROPOSAL {
 
 /**
  * \brief Class containing the energy cut such as ecut and vcut.
@@ -53,31 +29,28 @@ namespace PROPOSAL{
  * \f$v_{cut}=1\f$ is assumed.
  */
 
-
 class EnergyCutSettings
 {
 
 private:
-
     double ecut_;
     double vcut_;
 
 public:
-
- //----------------------------------------------------------------------------//
+    //----------------------------------------------------------------------------//
     // Constructors
 
     EnergyCutSettings();
     EnergyCutSettings(const EnergyCutSettings&);
     EnergyCutSettings& operator=(const EnergyCutSettings& energyCutSettings);
-    EnergyCutSettings(double ecut, double vcut);
-    bool operator==(const EnergyCutSettings &energyCutSettings) const;
-    bool operator!=(const EnergyCutSettings &energyCutSettings) const;
+    EnergyCutSettings(const double ecut, const double vcut);
+    bool operator==(const EnergyCutSettings& energyCutSettings) const;
+    bool operator!=(const EnergyCutSettings& energyCutSettings) const;
     friend std::ostream& operator<<(std::ostream& os, EnergyCutSettings const& cut_settings);
 
-//----------------------------------------------------------------------------//
+    //----------------------------------------------------------------------------//
 
-    //Memberfunction
+    // Memberfunction
 
     /*!
      * This function returns the lower from
@@ -87,32 +60,23 @@ public:
      * \param   energy      energy of the particle
      * \return  cut
      */
-    double GetCut(double energy);
+    double GetCut(double energy) const;
 
-//----------------------------------------------------------------------------//
+    //----------------------------------------------------------------------------//
 
-    void swap(EnergyCutSettings &energyCutSettings);
+    void swap(EnergyCutSettings& energyCutSettings);
 
- //----------------------------------------------------------------------------//
-    //Getter
+    //----------------------------------------------------------------------------//
+    // Getter
 
-    double GetEcut() const
-    {
-        return ecut_;
-    }
-//----------------------------------------------------------------------------//
-    double GetVcut() const
-    {
-        return vcut_;
-    }
-//----------------------------------------------------------------------------//
+    double GetEcut() const { return ecut_; }
+    double GetVcut() const { return vcut_; }
 
-    //Setter
-    void SetEcut(double ecut);
-    void SetVcut(double vcut);
+    //----------------------------------------------------------------------------//
+    // Setter
 
+    void SetEcut(double ecut) { ecut_ = ecut; }
+    void SetVcut(double vcut) { vcut_ = vcut; }
 };
 
-}
-
-#endif /* ENERGYCUTSETTINGS_H_ */
+} // namespace PROPOSAL
