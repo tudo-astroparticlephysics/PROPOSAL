@@ -162,7 +162,6 @@ protected:
 
     Definition sector_def_;
 
-    // TODO(mario): Do better weight enabling Fri 2017/08/25
     double weighting_starts_at_; //!< Distance at which re-weighting starts. Set to 0 in constructor
 
     Particle& particle_;
