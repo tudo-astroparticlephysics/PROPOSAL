@@ -341,7 +341,6 @@ double Sector::Propagate(double distance)
     bool is_decayed           = false;
     bool particle_interaction = false;
 
-    pair<double, ParticleType::Enum> decay;
     std::vector<Particle*> decay_products;
 
     pair<double, DynamicData::Type> energy_loss;
@@ -559,7 +558,6 @@ void Sector::AdvanceParticle(double dr, double ei, double ef)
         time += dr / SPEED;
     }
 
-    // TODO(mario): Adjucst the whole scatteing class Thu 2017/08/24
     scattering_->Scatter(dr, ei, ef);
 
     particle_.SetPropagatedDistance(dist);
