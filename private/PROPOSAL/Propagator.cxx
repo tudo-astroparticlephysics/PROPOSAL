@@ -382,25 +382,36 @@ Propagator::~Propagator()
 }
 
 // ------------------------------------------------------------------------- //
-// Operators & swap
+// Operators
 // ------------------------------------------------------------------------- //
-
-// ------------------------------------------------------------------------- //
-Propagator& Propagator::operator=(const Propagator& propagator)
-{
-    if (this != &propagator)
-    {
-        Propagator tmp(propagator);
-        swap(tmp);
-    }
-    return *this;
-}
 
 // ------------------------------------------------------------------------- //
 bool Propagator::operator==(const Propagator& propagator) const
 {
     if (seed_ != propagator.seed_)
         return false;
+    if (*detector_ != *propagator.detector_)
+    {
+        std::cout << "detector not equal" << std::endl;
+        return false;
+    }
+    if (sectors_.size() != propagator.sectors_.size())
+    {
+        std::cout << "sector size not equal" << std::endl;
+        return false;
+    }
+    else
+    {
+        for (unsigned int i = 0; i < sectors_.size(); ++i)
+        {
+            if (*sectors_[i] != *propagator.sectors_[i])
+            {
+                std::cout << "sector not equal: " << i << std::endl;
+                return false;
+            }
+        }
+    }
+
     return true;
 }
 
@@ -408,14 +419,6 @@ bool Propagator::operator==(const Propagator& propagator) const
 bool Propagator::operator!=(const Propagator& propagator) const
 {
     return !(*this == propagator);
-}
-
-// ------------------------------------------------------------------------- //
-void Propagator::swap(Propagator& propagator)
-{
-    using std::swap;
-
-    swap(seed_, propagator.seed_);
 }
 
 // ------------------------------------------------------------------------- //
