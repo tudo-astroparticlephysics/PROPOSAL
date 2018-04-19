@@ -29,9 +29,6 @@
 
 #pragma once
 
-#ifndef INTERPOLANT_H_
-#define INTERPOLANT_H_
-
 #include <vector>
 // #include <cmath>
 
@@ -497,5 +494,3 @@ public:
 };
 
 } // namespace PROPOSAL
-
-#endif /* INTERPOLANT_H_ */

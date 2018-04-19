@@ -29,9 +29,6 @@
 
 #pragma once
 
-#ifndef RANDOMGENERATOR_H_
-#define RANDOMGENERATOR_H_
-
 #include <boost/function.hpp>
 #include <boost/random.hpp>
 
@@ -97,5 +94,3 @@ private:
 };
 
 } // namespace PROPOSAL
-
-#endif // RANDOMGENERATOR_H_
