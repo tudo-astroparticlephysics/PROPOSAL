@@ -16,14 +16,18 @@ namespace I3MuonGun {
 MuonPropagator::MuonPropagator(const std::string& medium, double ecut, double vcut, double rho)
     : propagator_(NULL)
 {
-    PROPOSAL::SectorFactory::Definition sector_def;
-    sector_def.e_cut                         = ecut;
-    sector_def.v_cut                         = vcut;
-    sector_def.medium_def.type               = PROPOSAL::MediumFactory::Get().GetEnumFromString(medium);
-    sector_def.medium_def.density_correction = rho;
+    PROPOSAL::Sector::Definition sec_def;
 
-    std::vector<PROPOSAL::SectorFactory::Definition> sector_definitions;
-    sector_definitions.push_back(sector_def);
+    sec_def.cut_settings.SetEcut(ecut);
+    sec_def.cut_settings.SetVcut(vcut);
+
+    sec_def.SetMedium(*PROPOSAL::MediumFactory::Get().CreateMedium(medium, 1.0));
+
+    PROPOSAL::Sphere detector(PROPOSAL::Vector3D(0.0, 0.0, 0.0), 0.0, 1e18);
+    sec_def.SetGeometry(detector);
+
+    std::vector<PROPOSAL::Sector::Definition> sector_definitions;
+    sector_definitions.push_back(sec_def);
 
     PROPOSAL::InterpolationDef interpol_def;
 
@@ -34,7 +38,7 @@ MuonPropagator::MuonPropagator(const std::string& medium, double ecut, double vc
 
     propagator_ = new PROPOSAL::Propagator(PROPOSAL::MuMinusDef::Get(),
                                            sector_definitions,
-                                           PROPOSAL::Sphere(PROPOSAL::Vector3D(), 1e18, 0.0),
+                                           detector,
                                            interpol_def);
 }
 
