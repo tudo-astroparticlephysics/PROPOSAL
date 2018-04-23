@@ -80,6 +80,16 @@ class InterpolantBuilder;
 
 namespace Helper {
 
+
+// ----------------------------------------------------------------------------
+/// @brief Check if a given directory has write permissions
+///
+/// @param table_dir directory to check write permissions
+///
+/// @return bool
+// ----------------------------------------------------------------------------
+bool IsWritable(std::string table_dir);
+
 // ----------------------------------------------------------------------------
 /// @brief Resolve given path
 //
