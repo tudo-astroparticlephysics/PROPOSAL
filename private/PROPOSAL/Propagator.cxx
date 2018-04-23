@@ -186,9 +186,47 @@ Propagator::Propagator(const ParticleDef& particle_def, const std::string& confi
     InterpolationDef interpolation_def;
 
     SetMember(interpolate, "global.interpolate", pt_json);
-    SetMember(interpolation_def.path_to_tables, "global.path_to_tables", pt_json);
     SetMember(interpolation_def.raw, "global.raw", pt_json);
 
+    // Parse to find path to interpolation tables
+    SetMember(interpolation_def.path_to_tables, "global.path_to_tables", pt_json);
+    interpolation_def.path_to_tables = Helper::ResolvePath(interpolation_def.path_to_tables);
+
+    if (interpolation_def.path_to_tables == "")
+    {
+        try
+        {
+            boost::property_tree::ptree* table_paths = &pt_json.get_child("global.path_to_tables");
+            std::string table_path = "";
+
+            for (boost::property_tree::ptree::const_iterator it = table_paths->begin(); it != table_paths->end(); ++it)
+            {
+                table_path = Helper::ResolvePath(it->second.get_value<std::string>());
+                if (table_path != "")
+                    break;
+            }
+
+            if (table_path != "")
+            {
+                interpolation_def.path_to_tables = table_path;
+                log_info("Path to interpolation tables set to: \"%s\"", table_path.c_str());
+            }
+            else
+            {
+                log_warn("No valid path to interpolation tables found. Save tables in memory!");
+            }
+
+        } catch (const boost::property_tree::ptree_error& e)
+        {
+            log_warn("Path to tables not given as string or list: %s", e.what());
+        }
+    }
+    else
+    {
+        log_info("Path to interpolation tables set to: \"%s\"", interpolation_def.path_to_tables.c_str());
+    }
+
+    // Parse detector geometry
     try
     {
         boost::property_tree::ptree& detector = pt_json.get_child("detector");

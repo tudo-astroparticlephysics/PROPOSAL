@@ -4,7 +4,13 @@
 		"seed" : 1,
 
 		"interpolate" : true,
-		"path_to_tables" : "$I3_TESTDATA/PROPOSAL/resources/tables",
+		"path_to_tables" : [
+			"$PROPOSALTABLEDIR",
+			"$I3_TESTDATA/PROPOSAL/resources/tables",
+			"$I3_TESTDATA/PROPOSAL/tables",
+			"$I3_BUILD/PROPOSAL/resources/tables",
+			"$I3_BUILD/PROPOSAL/tables"
+		],
 		"raw" : false,
 
 		"exact_time" : true,
