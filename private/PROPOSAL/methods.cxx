@@ -93,7 +93,7 @@ std::string ResolvePath(const std::string& pathname)
 
     if (success != 0)
     {
-        log_warn("Invalid path given: %s", pathname.c_str());
+        log_warn("Invalid path given: \"%s\"", pathname.c_str());
         return "";
     }
 
@@ -104,7 +104,7 @@ std::string ResolvePath(const std::string& pathname)
 
     if (!resolved)
     {
-        log_warn("Invalid path given: %s", full_path);
+        log_warn("Invalid path given: \"%s\"", pathname.c_str());
         return "";
     }
 
