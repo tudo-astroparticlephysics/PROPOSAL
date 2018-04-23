@@ -17,6 +17,7 @@
 #include <string>
 #include <sys/stat.h>
 #include <wordexp.h> // Used to expand path with environment variables
+#include <unistd.h> // check for write permissions
 
 #include "PROPOSAL/crossection/parametrization/Parametrization.h"
 
@@ -85,6 +86,32 @@ std::string Centered(int width, const std::string& str, char fill)
 }
 
 // ------------------------------------------------------------------------- //
+bool IsWritable(std::string table_dir)
+{
+    bool writeable = false;
+
+    if (access(table_dir.c_str(), F_OK) == 0)
+    {
+        if ((access(table_dir.c_str(), R_OK) == 0) && (access(table_dir.c_str(), W_OK) == 0))
+        {
+            writeable = true;
+            log_info("Table directory does exist and has read and write permissions: %s", table_dir.c_str());
+        }
+        else
+        {
+            if (access(table_dir.c_str(), R_OK) != 0)
+                log_info("Table directory is not readable: %s", table_dir.c_str());
+            else
+                log_info("Table directory is not writable: %s", table_dir.c_str());
+        }
+    }
+    else
+        log_info("Table directory does not exist: %s", table_dir.c_str());
+
+    return writeable;
+}
+
+// ------------------------------------------------------------------------- //
 std::string ResolvePath(const std::string& pathname)
 {
     wordexp_t p;
@@ -108,7 +135,14 @@ std::string ResolvePath(const std::string& pathname)
         return "";
     }
 
-    return std::string(resolved);
+    if (IsWritable(std::string(resolved)))
+    {
+        return std::string(resolved);
+    }
+    else
+    {
+        return "";
+    }
 }
 
 // ------------------------------------------------------------------------- //
