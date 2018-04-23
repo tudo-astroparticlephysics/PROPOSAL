@@ -11,7 +11,7 @@ def MakePropagator(
     length=1600*I3Units.m,
     particleType=dataclasses.I3Particle.ParticleType.MuMinus,
     impl='proposal',
-    mediadef=expandvars('$I3_BUILD/PROPOSAL/resources/configuration')):
+    mediadef=expandvars('$I3_BUILD/PROPOSAL/resources/config.json')):
         """
         Create a muon propagator service.
 
@@ -129,7 +129,7 @@ if __name__=="__main__":
     from icecube import icetray, dataclasses, dataio, phys_services
 
     tray = I3Tray()
-    
+
     # set up a random number generator
     randomService = phys_services.I3SPRNGRandomService(
         seed = options.SEED*2,
@@ -138,7 +138,7 @@ if __name__=="__main__":
 
     # re-use the same RNG for modules that need it on the context
     tray.context['I3RandomService'] = randomService
-    
+
     tray.AddSegment(PropagateMuons, "PropagateMuons",
         RandomService = randomService)
 
