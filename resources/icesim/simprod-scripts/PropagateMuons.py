@@ -14,7 +14,7 @@ import icecube.PROPOSAL
 
 # (mdunsch): Changed config file for PROPOSAL. Tue 2017/01/31
 default_media_definition = os.path.expandvars(
-    "$I3_BUILD/PROPOSAL/resources/configuration")
+    "$I3_BUILD/PROPOSAL/resources/config.json")
 
 
 @icecube.icetray.traysegment

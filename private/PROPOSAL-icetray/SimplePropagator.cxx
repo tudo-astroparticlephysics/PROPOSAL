@@ -30,7 +30,7 @@ SimplePropagator::SimplePropagator(I3Particle::ParticleType pt,
 
     // Sector definition
 
-    PROPOSAL::SectorFactory::Definition sec_def;
+    PROPOSAL::Sector::Definition sec_def;
 
     sec_def.stopping_decay              = true;
     sec_def.scattering_model            = PROPOSAL::ScatteringFactory::Moliere;
@@ -39,33 +39,26 @@ SimplePropagator::SimplePropagator(I3Particle::ParticleType pt,
 
     // Medium
 
-    sec_def.medium_def.type               = PROPOSAL::MediumFactory::Get().GetEnumFromString(medium);
-    sec_def.medium_def.density_correction = rho;
+    sec_def.SetMedium(*PROPOSAL::MediumFactory::Get().CreateMedium(medium, 1.0));
 
     // Geometry
 
     PROPOSAL::Vector3D position(0.0, 0.0, 0.0);
-
     PROPOSAL::Sphere detector(position, 0.0, 1e18);
 
-    sec_def.geometry_def.shape        = PROPOSAL::GeometryFactory::Sphere;
-    sec_def.geometry_def.position     = position;
-    sec_def.geometry_def.inner_radius = 0.0;
-    sec_def.geometry_def.radius       = 1e18;
+    sec_def.SetGeometry(detector);
 
     // Cuts
 
-    sec_def.e_cut = ecut;
-    sec_def.v_cut = vcut;
+    sec_def.cut_settings.SetEcut(ecut);
+    sec_def.cut_settings.SetVcut(vcut);
 
     // Parametrizations
 
-    sec_def.utility_def.brems_def.parametrization = PROPOSAL::BremsstrahlungFactory::KelnerKokoulinPetrukhin;
-
-    sec_def.utility_def.photo_def.parametrization = PROPOSAL::PhotonuclearFactory::AbramowiczLevinLevyMaor97;
-
-    sec_def.utility_def.epair_def.lpm_effect = true;
-    sec_def.utility_def.brems_def.lpm_effect = true;
+    // Using defaults:
+    // lpm effect = true
+    // Bremsstrahlung = KelnerKokoulinPetrukhin
+    // Photonuclear = AbramowiczLevinLevyMaor97
 
     // Interpolation
 
@@ -76,7 +69,7 @@ SimplePropagator::SimplePropagator(I3Particle::ParticleType pt,
 
     // TODO(mario): Check for muon, tau Mon 2017/11/06
     propagator_ = new PROPOSAL::Propagator(PROPOSAL::MuMinusDef::Get(),
-                                           boost::assign::list_of<PROPOSAL::SectorFactory::Definition>(sec_def),
+                                           boost::assign::list_of<PROPOSAL::Sector::Definition>(sec_def),
                                            detector,
                                            interpolation_def);
 }

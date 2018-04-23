@@ -435,7 +435,7 @@ def MakePropagator(
             return mmc_icetray.I3PropagatorServiceMMC(jvm,mmcOpts)
         elif impl.lower() == 'proposal':
             if mediadef is None:
-                mediadef=expandvars('$I3_BUILD/PROPOSAL/resources/configuration')
+                mediadef=expandvars('$I3_BUILD/PROPOSAL/resources/config.json')
 
             from icecube import sim_services, PROPOSAL
             return PROPOSAL.I3PropagatorServicePROPOSAL(
