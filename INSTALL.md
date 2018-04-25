@@ -11,22 +11,8 @@ dependencies on your system.
 	apt install cmake \
 		doxygen \
 		liblog4cplus-dev
-		libgtest-dev \
 		libboost-dev \
 		libboost-python-dev \
-
-#### **Note** ####
-
-The package `libgtest-dev` only installs the source files.
-To create the gtest libraries you have compile these source files.
-Therefore you can use:
-
-	cd /usr/src/gtest
-	sudo cmake CMakeLists.txt
-	sudo make
-
-	# copy or symlink libgtest.a and libgtest_main.a to your /usr/lib folder
-	sudo cp *.a /usr/lib
 
 ### Arch Linux ###
 
@@ -43,22 +29,6 @@ Therefore you can use:
 		log4cplus \
 		boost \
 		boost-python
-
-#### **Note** ####
-
-For Mac OS X `GTest` must be installed from source.
-Therefore clone the repo from
-[googletest](https://github.com/google/googletest)
-into a local build directory and install googletest:
-
-	cd && mkdir build
-	cd build && mkdir gtest
-	cd gtest && mkdir src build
-	git clone https://github.com/google/googletest src
-	cd build
-	cmake ../src
-	make
-	make install
 
 ## Install PROPOSAL ##
 
@@ -141,12 +111,10 @@ into a local build directory and install googletest:
 
 | Option | Default value | Description |
 | --- | --- | --- |
-| `ADD_PYTHON` | ON | Choose to compile the python wrapper |
-| `ADD_PERFORMANCE_TEST` | OFF | Choose to compile the performace test source |
-| `ADD_ROOT` | ON | Choose to compile PROPOSAL with ROOT support |
-
-The test file generator is useful ensure not break the basic
-functionality, if use decide to modify the library.
+| `ADD_PYTHON` | ON | Compile the python wrapper |
+| `ADD_PERFORMANCE_TEST` | OFF | Compile the performace test source |
+| `ADD_ROOT` | ON | Compile PROPOSAL with ROOT support |
+| `ADD_TESTS` | OFF | Compile unit tests. This downloads [googletest](https://github.com/google/googletest). |
 
 **Examples**
 
