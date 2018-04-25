@@ -47,6 +47,7 @@ ENDIF()
 OPTION (ADD_PYTHON "Choose to compile the python wrapper library" ON)
 OPTION(ADD_ROOT "Choose to compile ROOT examples." OFF)
 OPTION(ADD_PERFORMANCE_TEST "Choose to compile the performace test source." OFF)
+OPTION(ADD_TESTS "Build all unittests." OFF)
 
 #################################################################
 #################           python      #########################
@@ -135,16 +136,14 @@ ENDIF(LOG4CPLUS_FOUND)
 #################           GTest       #########################
 #################################################################
 
-FIND_PACKAGE(GTest)
-
-if (GTEST_FOUND)
-	INCLUDE_DIRECTORIES(${GTEST_INCLUDE_DIRS})
+if (ADD_TESTS)
+    MESSAGE(STATUS "Building tests enabled.")
+	INCLUDE(cmake/gtest.cmake)
+	SET(gtest_LIBRARIES libgtest)
  	ENABLE_TESTING()
-	SET(DO_TESTING TRUE)
-else (GTEST_FOUND)
-	SET(DO_TESTING FALSE)
+else (ADD_TESTS)
     MESSAGE(STATUS "No tests will be build.")
-endif (GTEST_FOUND)
+endif (ADD_TESTS)
 
 #################################################################
 #################           Libraries    ########################
@@ -201,22 +200,24 @@ TARGET_LINK_LIBRARIES(WriteSectorsFromDomList PROPOSAL)
 ADD_EXECUTABLE(example
         private/test/example.cxx
 )
+
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-  SET_TARGET_PROPERTIES(example PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -O2 -g -Wall -Wextra -Wnarrowing -Wpedantic -fdiagnostics-show-option -Wno-variadic-macros")
+	SET_TARGET_PROPERTIES(example PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -O2 -g -Wall -Wextra -Wnarrowing -Wpedantic -fdiagnostics-show-option -Wno-variadic-macros")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-  SET_TARGET_PROPERTIES(example PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -O2 -g -Wall -Wextra -Wnarrowing -Wpedantic -fdiagnostics-show-option")
+	SET_TARGET_PROPERTIES(example PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -O2 -g -Wall -Wextra -Wnarrowing -Wpedantic -fdiagnostics-show-option")
 endif()
+
 TARGET_LINK_LIBRARIES(example PROPOSAL)
 
 IF(ADD_PERFORMANCE_TEST)
 	ADD_EXECUTABLE(performance_test
-			private/test/performance_test.cxx
-	)
-  if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-	  SET_TARGET_PROPERTIES(performance_test PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -O2 -g -Wall -Wextra -Wnarrowing -Wpedantic -fdiagnostics-show-option -Wno-variadic-macros")
-  elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-    SET_TARGET_PROPERTIES(performance_test PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -O2 -g -Wall -Wextra -Wnarrowing -Wpedantic -fdiagnostics-show-option")
-  endif()
+		private/test/performance_test.cxx
+		)
+	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+		SET_TARGET_PROPERTIES(performance_test PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -O2 -g -Wall -Wextra -Wnarrowing -Wpedantic -fdiagnostics-show-option -Wno-variadic-macros")
+	elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+		SET_TARGET_PROPERTIES(performance_test PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -O2 -g -Wall -Wextra -Wnarrowing -Wpedantic -fdiagnostics-show-option")
+	endif()
 	TARGET_LINK_LIBRARIES(performance_test PROPOSAL ${LIBRARYS_TO_LINK_PERFORMANCE_TEST})
 ENDIF(ADD_PERFORMANCE_TEST)
 
@@ -224,7 +225,7 @@ ENDIF(ADD_PERFORMANCE_TEST)
 #################           Tests        ########################
 #################################################################
 
-IF(DO_TESTING)
+IF(ADD_TESTS)
   EXECUTE_PROCESS(COMMAND mkdir -p ${PROPOSAL_BINARY_DIR}/bin/ OUTPUT_VARIABLE _output OUTPUT_STRIP_TRAILING_WHITESPACE)
 
   #create tar directory with "tar -czvf TestFiles.tar.Z TestFiles/" and put it in Test directory
@@ -253,25 +254,25 @@ IF(DO_TESTING)
   ADD_EXECUTABLE(UnitTest_Propagation tests/Propagation_TEST.cxx)
   ADD_EXECUTABLE(UnitTest_Sector tests/Sector_TEST.cxx)
 
-  TARGET_LINK_LIBRARIES(UnitTest_Utility PROPOSAL ${GTEST_LIBRARIES})
-  TARGET_LINK_LIBRARIES(UnitTest_Scattering PROPOSAL ${GTEST_LIBRARIES})
-  TARGET_LINK_LIBRARIES(UnitTest_Integral PROPOSAL ${GTEST_LIBRARIES})
-  TARGET_LINK_LIBRARIES(UnitTest_Interpolant PROPOSAL ${GTEST_LIBRARIES})
-  TARGET_LINK_LIBRARIES(UnitTest_Ionization PROPOSAL ${GTEST_LIBRARIES})
-  TARGET_LINK_LIBRARIES(UnitTest_Bremsstrahlung PROPOSAL ${GTEST_LIBRARIES})
-  TARGET_LINK_LIBRARIES(UnitTest_Epairproduction PROPOSAL ${GTEST_LIBRARIES})
-  TARGET_LINK_LIBRARIES(UnitTest_Photonuclear PROPOSAL ${GTEST_LIBRARIES})
-  TARGET_LINK_LIBRARIES(UnitTest_Medium PROPOSAL ${GTEST_LIBRARIES})
-  TARGET_LINK_LIBRARIES(UnitTest_Particle PROPOSAL ${GTEST_LIBRARIES})
-  TARGET_LINK_LIBRARIES(UnitTest_ParticleDef PROPOSAL ${GTEST_LIBRARIES})
-  TARGET_LINK_LIBRARIES(UnitTest_DecayChannel PROPOSAL ${GTEST_LIBRARIES})
-  TARGET_LINK_LIBRARIES(UnitTest_DecayTable PROPOSAL ${GTEST_LIBRARIES})
-  TARGET_LINK_LIBRARIES(UnitTest_EnergyCutSettings PROPOSAL ${GTEST_LIBRARIES})
-  TARGET_LINK_LIBRARIES(UnitTest_ContinuousRandomization PROPOSAL ${GTEST_LIBRARIES})
-  TARGET_LINK_LIBRARIES(UnitTest_Geometry PROPOSAL ${GTEST_LIBRARIES})
-  TARGET_LINK_LIBRARIES(UnitTest_Vector3D PROPOSAL ${GTEST_LIBRARIES})
-  TARGET_LINK_LIBRARIES(UnitTest_Propagation PROPOSAL ${GTEST_LIBRARIES})
-  TARGET_LINK_LIBRARIES(UnitTest_Sector PROPOSAL ${GTEST_LIBRARIES})
+  TARGET_LINK_LIBRARIES(UnitTest_Utility PROPOSAL ${gtest_LIBRARIES})
+  TARGET_LINK_LIBRARIES(UnitTest_Scattering PROPOSAL ${gtest_LIBRARIES})
+  TARGET_LINK_LIBRARIES(UnitTest_Integral PROPOSAL ${gtest_LIBRARIES})
+  TARGET_LINK_LIBRARIES(UnitTest_Interpolant PROPOSAL ${gtest_LIBRARIES})
+  TARGET_LINK_LIBRARIES(UnitTest_Ionization PROPOSAL ${gtest_LIBRARIES})
+  TARGET_LINK_LIBRARIES(UnitTest_Bremsstrahlung PROPOSAL ${gtest_LIBRARIES})
+  TARGET_LINK_LIBRARIES(UnitTest_Epairproduction PROPOSAL ${gtest_LIBRARIES})
+  TARGET_LINK_LIBRARIES(UnitTest_Photonuclear PROPOSAL ${gtest_LIBRARIES})
+  TARGET_LINK_LIBRARIES(UnitTest_Medium PROPOSAL ${gtest_LIBRARIES})
+  TARGET_LINK_LIBRARIES(UnitTest_Particle PROPOSAL ${gtest_LIBRARIES})
+  TARGET_LINK_LIBRARIES(UnitTest_ParticleDef PROPOSAL ${gtest_LIBRARIES})
+  TARGET_LINK_LIBRARIES(UnitTest_DecayChannel PROPOSAL ${gtest_LIBRARIES})
+  TARGET_LINK_LIBRARIES(UnitTest_DecayTable PROPOSAL ${gtest_LIBRARIES})
+  TARGET_LINK_LIBRARIES(UnitTest_EnergyCutSettings PROPOSAL ${gtest_LIBRARIES})
+  TARGET_LINK_LIBRARIES(UnitTest_ContinuousRandomization PROPOSAL ${gtest_LIBRARIES})
+  TARGET_LINK_LIBRARIES(UnitTest_Geometry PROPOSAL ${gtest_LIBRARIES})
+  TARGET_LINK_LIBRARIES(UnitTest_Vector3D PROPOSAL ${gtest_LIBRARIES})
+  TARGET_LINK_LIBRARIES(UnitTest_Propagation PROPOSAL ${gtest_LIBRARIES})
+  TARGET_LINK_LIBRARIES(UnitTest_Sector PROPOSAL ${gtest_LIBRARIES})
 
   ADD_TEST(UnitTest_Utility bin/UnitTest_Utility)
   ADD_TEST(UnitTest_Scattering bin/UnitTest_Scattering)
