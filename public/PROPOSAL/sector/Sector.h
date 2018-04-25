@@ -84,6 +84,7 @@ public:
         bool stopping_decay;    //!< Let particle decay if elow is reached but no decay was sampled
 
         bool do_continuous_randomization;
+        bool do_continuous_energy_loss_output;
         bool do_exact_time_calculation;
 
         ScatteringFactory::Enum scattering_model;
