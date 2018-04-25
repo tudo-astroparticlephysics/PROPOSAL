@@ -394,6 +394,12 @@ double Interpolant::FindLimit(double x1, double y)
 
     if (i + 1 < max_)
     {
+        // iX_ is not pre-filled if flag is true. Fill the bits we're about to use.
+        if (flag_)
+        {
+            iX_.at(i) = Interpolant_.at(i)->Interpolate(x1);
+            iX_.at(i+1) = Interpolant_.at(i+1)->Interpolate(x1);
+        }
         if (((y - iX_.at(i)) < (iX_.at(i + 1) - y)) == dir)
         {
             auxdir = 0;
