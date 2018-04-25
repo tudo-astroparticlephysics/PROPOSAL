@@ -15,18 +15,11 @@ addons:
     apt:
         packages:
             - liblog4cplus-dev
-            - libgtest-dev
             - libboost-dev
             - libboost-python-dev
 
 before_script:
     - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-        pushd $PWD;
-        cd /usr/src/gtest;
-        cmake CMakeLists.txt;
-        make;
-        cp *.a /usr/lib;
-        popd;
         mkdir build;
         cd build;
         cmake .. -DPYTHON_LIBRARY=$(python-config --prefix)/lib/libpython2.7.so -DPYTHON_INCLUDE_DIR=$(python-config --prefix)/include/python2.7;
