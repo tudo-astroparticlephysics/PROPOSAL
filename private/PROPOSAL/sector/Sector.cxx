@@ -30,6 +30,7 @@ Sector::Definition::Definition()
     , weighting_order(0)
     , stopping_decay(true)
     , do_continuous_randomization(true)
+    , do_continuous_energy_loss_output(false)
     , do_exact_time_calculation(true)
     , scattering_model(ScatteringFactory::Moliere)
     , location(Sector::ParticleLocation::InsideDetector)
@@ -45,6 +46,7 @@ Sector::Definition::Definition(const Definition& def)
     , weighting_order(def.weighting_order)
     , stopping_decay(def.stopping_decay)
     , do_continuous_randomization(def.do_continuous_randomization)
+    , do_continuous_energy_loss_output(def.do_continuous_energy_loss_output)
     , do_exact_time_calculation(def.do_exact_time_calculation)
     , scattering_model(def.scattering_model)
     , location(def.location)
@@ -64,6 +66,8 @@ bool Sector::Definition::operator==(const Definition& sector_def) const
     else if (stopping_decay != sector_def.stopping_decay)
         return false;
     else if (do_continuous_randomization != sector_def.do_continuous_randomization)
+        return false;
+    else if (do_continuous_energy_loss_output != sector_def.do_continuous_energy_loss_output)
         return false;
     else if (do_exact_time_calculation != sector_def.do_exact_time_calculation)
         return false;
@@ -396,6 +400,15 @@ double Sector::Propagate(double distance)
             final_energy = displacement_calculator_->GetUpperLimit(
                 initial_energy, utility_.GetMedium().GetDensityCorrection() * displacement);
         }
+
+        if(sector_def_.do_continuous_energy_loss_output)
+        {
+            Output::getInstance().FillSecondaryVector(
+                particle_,
+                DynamicData::ContinuousEnergyLoss,
+                initial_energy - final_energy);
+        }
+
         // Advance the Particle according to the displacement
         // Initial energy and final energy are needed if Molier Scattering is enabled
         AdvanceParticle(displacement, initial_energy, final_energy);
