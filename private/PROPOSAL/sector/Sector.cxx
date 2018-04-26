@@ -349,6 +349,8 @@ double Sector::Propagate(double distance)
 
     pair<double, DynamicData::Type> energy_loss;
 
+    DynamicData* continuous_loss = NULL;
+
     // TODO(mario): check Fri 2017/08/25
     // int secondary_id    =   0;
 
@@ -403,10 +405,11 @@ double Sector::Propagate(double distance)
 
         if(sector_def_.do_continuous_energy_loss_output)
         {
-            Output::getInstance().FillSecondaryVector(
-                particle_,
-                DynamicData::ContinuousEnergyLoss,
-                initial_energy - final_energy);
+            continuous_loss = new DynamicData(DynamicData::ContinuousEnergyLoss);
+            continuous_loss->SetPosition(particle_.GetPosition());
+            continuous_loss->SetTime(particle_.GetTime());
+            continuous_loss->SetParentParticleEnergy(particle_.GetEnergy());
+            continuous_loss->SetPropagatedDistance(particle_.GetPropagatedDistance());
         }
 
         // Advance the Particle according to the displacement
@@ -427,6 +430,14 @@ double Sector::Propagate(double distance)
                 final_energy =
                     cont_rand_->Randomize(initial_energy, final_energy, RandomGenerator::Get().RandomDouble());
             }
+        }
+
+        if(sector_def_.do_continuous_energy_loss_output)
+        {
+            continuous_loss->SetEnergy(initial_energy - final_energy);
+            continuous_loss->SetDirection((particle_.GetPosition() - continuous_loss->GetPosition()));
+            continuous_loss->SetTime(particle_.GetTime() - continuous_loss->GetTime());
+            Output::getInstance().FillSecondaryVector(continuous_loss);
         }
 
         // Lower limit of particle energy is reached or
