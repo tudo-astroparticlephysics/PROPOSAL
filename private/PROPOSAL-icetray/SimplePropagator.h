@@ -65,12 +65,6 @@ public:
      * Use a specific random number generator for this instance
      */
     void SetRandomNumberGenerator(I3RandomServicePtr rng);
-    /**
-     * Get the internal MMC name associated with a particle type
-     */
-    static I3Particle to_I3Particle(const PROPOSAL::DynamicData&);
-    // static ParticleType::Enum GeneratePROPOSALType(const I3Particle &p);
-    // static I3Particle::ParticleType GenerateI3Type(const PROPOSAL::DynamicData&);
 
     PROPOSAL::Propagator* GetImplementation() { return propagator_; };
 

@@ -60,8 +60,6 @@ public:
      */
     static std::string GetName(const I3Particle& p);
 
-    static I3Particle::ParticleType GenerateI3Type(const PROPOSAL::DynamicData&);
-
     double GetStochasticRate(double energy, double fraction, I3Particle::ParticleType type = I3Particle::MuMinus) const;
     double GetTotalStochasticRate(double energy, I3Particle::ParticleType type = I3Particle::MuMinus) const;
 

@@ -10,6 +10,7 @@
 #include <boost/foreach.hpp>
 
 #include "MuonGun/MuonPropagator.h"
+#include "PROPOSAL-icetray/Converter.h"
 
 namespace I3MuonGun {
 
@@ -69,130 +70,6 @@ std::string MuonPropagator::GetName(const I3Particle& p)
     return GetMMCName(p.GetType());
 }
 
-typedef boost::bimap<I3Particle::ParticleType, std::string> bimap_ParticleType;
-
-static const bimap_ParticleType I3_PROPOSAL_ParticleType_bimap =
-    boost::assign::list_of<bimap_ParticleType::relation>(I3Particle::MuMinus, "MuMinus")(I3Particle::MuPlus, "MuPlus")(
-        I3Particle::TauMinus,
-        "TauMinus")(I3Particle::TauPlus, "TauPlus")(I3Particle::EMinus, "EMinus")(I3Particle::EPlus, "EPlus")(
-        I3Particle::NuMu,
-        "NuMu")(I3Particle::NuMuBar, "NuMuBar")(I3Particle::NuE, "NuE")(I3Particle::NuEBar, "NuEBar")(
-        I3Particle::NuTau,
-        "NuTau")(I3Particle::NuTauBar, "NuTauBar")(I3Particle::Brems, "Brems")(I3Particle::DeltaE, "DeltaE")(
-        I3Particle::PairProd,
-        "EPair")(I3Particle::NuclInt, "NuclInt")(I3Particle::MuPair, "MuPair")(I3Particle::Hadrons, "Hadrons")(
-        I3Particle::Monopole,
-        "Monopole")(I3Particle::STauMinus, "STauMinus")(I3Particle::STauPlus, "STauPlus")(I3Particle::Gamma, "Gamma")(
-        I3Particle::Pi0,
-        "Pi0")(I3Particle::PiPlus, "PiPlus")(I3Particle::PiMinus, "PiMinus")(I3Particle::KPlus, "KPlus")(
-        I3Particle::KMinus,
-        "KMinus")(I3Particle::PPlus, "PPlus")(I3Particle::PMinus, "PMinus");
-
-// typedef std::map<int, I3Particle::ParticleType> particle_type_conversion_t;
-// static const particle_type_conversion_t fromRDMCTable =
-// boost::assign::list_of<std::pair<int, I3Particle::ParticleType> >
-// (-100, I3Particle::unknown)
-// (1, I3Particle::Gamma)
-// (2, I3Particle::EPlus)
-// (3, I3Particle::EMinus)
-// (4, I3Particle::Nu)
-// (5, I3Particle::MuPlus)
-// (6, I3Particle::MuMinus)
-// (7, I3Particle::Pi0)
-// (8, I3Particle::PiPlus)
-// (9, I3Particle::PiMinus)
-// (11, I3Particle::KPlus)
-// (12, I3Particle::KMinus)
-// (14, I3Particle::PPlus)
-// (15, I3Particle::PMinus)
-// (33, I3Particle::TauPlus)
-// (34, I3Particle::TauMinus)
-// (41, I3Particle::Monopole)
-// (201, I3Particle::NuE)
-// (202, I3Particle::NuMu)
-// (203, I3Particle::NuTau)
-// (204, I3Particle::NuEBar)
-// (205, I3Particle::NuMuBar)
-// (206, I3Particle::NuTauBar)
-// (1001, I3Particle::Brems)
-// (1002, I3Particle::DeltaE)
-// (1003, I3Particle::PairProd)
-// (1004, I3Particle::NuclInt)
-// (1005, I3Particle::MuPair)
-// (1006, I3Particle::Hadrons);
-
-inline I3Particle to_I3Particle(const PROPOSAL::DynamicData& pp)
-{
-    I3Particle p;
-
-    double x = pp.GetPosition().GetX() * I3Units::cm;
-    double y = pp.GetPosition().GetY() * I3Units::cm;
-    double z = pp.GetPosition().GetZ() * I3Units::cm;
-
-    double theta = pp.GetDirection().GetTheta() * I3Units::degree;
-    double phi   = pp.GetDirection().GetPhi() * I3Units::degree;
-
-    p.SetPos(x, y, z);
-    p.SetThetaPhi(theta, phi);
-    p.SetLength(pp.GetPropagatedDistance() * I3Units::cm);
-    p.SetTime(pp.GetTime() * I3Units::second);
-
-    p.SetType(MuonPropagator::GenerateI3Type(pp));
-    p.SetLocationType(I3Particle::InIce);
-    p.SetEnergy(pp.GetEnergy() * I3Units::MeV);
-
-    return p;
-
-    // I3Particle p;
-    // particle_type_conversion_t::const_iterator it =
-    //     fromRDMCTable.find(abs(pp->type));
-    // if (it == fromRDMCTable.end())
-    // 	log_fatal("unknown RDMC code \"%i\" cannot be converted to a I3Particle::ParticleType.", pp->type);
-    // else
-    // 	p.SetType(it->second);
-    // p.SetLocationType(I3Particle::InIce);
-    // p.SetPos(pp->x*I3Units::cm, pp->y*I3Units::cm, pp->z*I3Units::cm);
-    // p.SetTime(pp->t*I3Units::s);
-    // p.SetThetaPhi(pp->theta*I3Units::deg, pp->phi*I3Units::deg);
-    // p.SetLength(pp->l*I3Units::cm);
-    // p.SetEnergy(pp->e*I3Units::MeV);
-    //
-    // return p;
-}
-
-I3Particle::ParticleType MuonPropagator::GenerateI3Type(const PROPOSAL::DynamicData& secondary)
-{
-    PROPOSAL::DynamicData::Type type = secondary.GetTypeId();
-
-    if (type == PROPOSAL::DynamicData::Particle)
-    {
-        const PROPOSAL::Particle& particle = static_cast<const PROPOSAL::Particle&>(secondary);
-        PROPOSAL::ParticleDef particle_def = particle.GetParticleDef();
-
-        I3Particle::ParticleType ptype_I3;
-
-        bimap_ParticleType::right_const_iterator proposal_iterator =
-            I3_PROPOSAL_ParticleType_bimap.right.find(particle_def.name);
-        if (proposal_iterator == I3_PROPOSAL_ParticleType_bimap.right.end())
-        {
-            log_fatal("The PROPOSAL Particle '%s' can not be converted to a I3Particle", particle_def.name.c_str());
-        } else
-        {
-            return proposal_iterator->second;
-        }
-    } else if (type == PROPOSAL::DynamicData::Brems)
-        return I3Particle::Brems;
-    else if (type == PROPOSAL::DynamicData::Epair)
-        return I3Particle::PairProd;
-    else if (type == PROPOSAL::DynamicData::DeltaE)
-        return I3Particle::DeltaE;
-    else if (type == PROPOSAL::DynamicData::NuclInt)
-        return I3Particle::NuclInt;
-    else
-    {
-        log_fatal("PROPOSAL Particle can not be converted to a I3Particle");
-    }
-}
 
 /** Differential stochastic rate: d^2N/dv/dx [1/m] */
 double MuonPropagator::GetStochasticRate(double energy, double fraction, I3Particle::ParticleType type) const
@@ -252,33 +129,43 @@ I3Particle MuonPropagator::propagate(const I3Particle& p,
 {
     I3Particle endpoint(p);
 
-    double x, y, z, theta, phi = 0.0;
+    double x, y, z, theta, phi;
 
     PROPOSAL::Particle pp = propagator_->GetParticle();
     pp.SetParentParticleId(0);
     pp.SetParticleId(0);
-    pp.SetTime(p.GetTime() / I3Units::second);
 
     x = p.GetPos().GetX() / I3Units::cm;
     y = p.GetPos().GetY() / I3Units::cm;
     z = p.GetPos().GetZ() / I3Units::cm;
 
+    theta = p.GetDir().CalcTheta() / I3Units::radian;
+    phi   = p.GetDir().CalcPhi() / I3Units::radian;
+
     pp.SetPosition(PROPOSAL::Vector3D(x, y, z));
+
+    PROPOSAL::Vector3D direction;
+    direction.SetSphericalCoordinates(1.0, phi, theta);
+    direction.CalculateCartesianFromSpherical();
+    pp.SetDirection(direction);
+
     pp.SetEnergy(p.GetEnergy() / I3Units::MeV);
+    pp.SetTime(p.GetTime() / I3Units::second);
+    pp.SetPropagatedDistance(p.GetLength() / I3Units::cm);
 
     propagator_->Propagate(distance / I3Units::cm);
-
-    endpoint.SetEnergy(pp.GetEnergy() * I3Units::MeV);
 
     x = pp.GetPosition().GetX() * I3Units::cm;
     y = pp.GetPosition().GetY() * I3Units::cm;
     z = pp.GetPosition().GetZ() * I3Units::cm;
 
-    theta = pp.GetDirection().GetTheta() * I3Units::degree;
-    phi   = pp.GetDirection().GetPhi() * I3Units::degree;
+    theta = pp.GetDirection().GetTheta() * I3Units::radian;
+    phi   = pp.GetDirection().GetPhi() * I3Units::radian;
 
     endpoint.SetPos(x, y, z);
     endpoint.SetThetaPhi(theta, phi);
+
+    endpoint.SetEnergy(pp.GetEnergy() * I3Units::MeV);
     endpoint.SetLength(pp.GetPropagatedDistance() * I3Units::cm);
     endpoint.SetTime(pp.GetTime() * I3Units::second);
 
@@ -287,7 +174,7 @@ I3Particle MuonPropagator::propagate(const I3Particle& p,
         std::vector<PROPOSAL::DynamicData*> history = PROPOSAL::Output::getInstance().GetSecondarys();
         for (unsigned int i = 0; i < history.size(); i++)
         {
-            losses->push_back(to_I3Particle(*history[i]));
+            losses->push_back(I3PROPOSALParticleConverter::GenerateI3Particle(*history[i]));
         }
     }
 

@@ -1,7 +1,7 @@
 
 #include <boost/assign.hpp>
 
-#include "Converter.h"
+#include "PROPOSAL-icetray/Converter.h"
 
 namespace I3PROPOSALParticleConverter {
 
@@ -80,6 +80,9 @@ I3Particle::ParticleType I3PROPOSALParticleConverter::GenerateI3Type(const PROPO
         case DynamicData::NuclInt:
             return I3Particle::NuclInt;
             break;
+        case DynamicData::ContinuousEnergyLoss:
+            return I3Particle::ContinuousEnergyLoss;
+            break;
         default:
             log_fatal("PROPOSAL Particle can not be converted to a I3Particle");
     }
@@ -121,4 +124,67 @@ PROPOSAL::ParticleDef I3PROPOSALParticleConverter::GeneratePROPOSALType(const I3
                       ptype_I3);
         }
     }
+}
+
+// ------------------------------------------------------------------------- //
+PROPOSAL::Particle GeneratePROPOSALParticle(const I3Particle& p)
+{
+    /**
+     * Natural units of PROPOSAL is cm, rad, MeV, and s.
+     * Therefore we need to convert explicitly to
+     * PROPOSAL units before passing the propagate method
+     */
+
+    double x = p.GetPos().GetX() / I3Units::cm;
+    double y = p.GetPos().GetY() / I3Units::cm;
+    double z = p.GetPos().GetZ() / I3Units::cm;
+    double theta = p.GetDir().CalcTheta() / I3Units::radian;
+    double phi = p.GetDir().CalcPhi() / I3Units::radian;
+
+    // log_debug("Name of particle to propagate: %s", PROPOSAL::Particle::GetName(GeneratePROPOSALType(p)).c_str());
+
+    ParticleDef particle_def = I3PROPOSALParticleConverter::GeneratePROPOSALType(p.GetType());
+    Particle particle(particle_def);
+    particle.SetPosition(PROPOSAL::Vector3D(x, y, z));
+
+    PROPOSAL::Vector3D direction;
+    direction.SetSphericalCoordinates(1.0, phi, theta);
+    direction.CalculateCartesianFromSpherical();
+    particle.SetDirection(direction);
+
+    particle.SetEnergy(p.GetEnergy() / I3Units::MeV);
+    particle.SetTime(p.GetTime() / I3Units::second);
+    particle.SetPropagatedDistance(p.GetLength() / I3Units::cm);
+
+    return particle;
+}
+
+// ------------------------------------------------------------------------- //
+I3Particle GenerateI3Particle(const PROPOSAL::DynamicData& pp)
+{
+    double x = pp.GetPosition().GetX() * I3Units::cm;
+    double y = pp.GetPosition().GetY() * I3Units::cm;
+    double z = pp.GetPosition().GetZ() * I3Units::cm;
+
+    double theta = pp.GetDirection().GetTheta() * I3Units::radian;
+    double phi   = pp.GetDirection().GetPhi() * I3Units::radian;
+
+    I3Particle i3_particle;
+    i3_particle.SetType(I3PROPOSALParticleConverter::GenerateI3Type(pp));
+    i3_particle.SetLocationType(I3Particle::InIce);
+
+    i3_particle.SetPos(x, y, z);
+    i3_particle.SetThetaPhi(theta, phi);
+
+    i3_particle.SetLength(pp.GetPropagatedDistance() * I3Units::cm);
+    i3_particle.SetTime(pp.GetTime() * I3Units::second);
+    i3_particle.SetEnergy(pp.GetEnergy() * I3Units::MeV);
+    
+    log_trace("MMC DEBUG SEC \n  pos=(%g,%g,%g) ang=(%g,%g)  e=%g t=%g  l=%g",
+        x, y, z, theta, phi,
+        pp.GetEnergy() * I3Units::MeV,
+        pp.GetTime() * I3Units::second,
+        pp.GetPropagatedDistance() * I3Units::cm);
+
+    return i3_particle;
 }
