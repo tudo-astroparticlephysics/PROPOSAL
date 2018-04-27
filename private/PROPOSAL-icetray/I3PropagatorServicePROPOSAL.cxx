@@ -28,29 +28,6 @@
 using namespace std;
 using namespace PROPOSAL;
 
-// ------------------------------------------------------------------------- //
-bool IsWritable(std::string table_dir)
-{
-    bool writeable = false;
-
-    if (access(table_dir.c_str(), F_OK) == 0)
-    {
-        if ((access(table_dir.c_str(), R_OK) == 0) && (access(table_dir.c_str(), W_OK) == 0))
-        {
-            writeable = true;
-            log_info("Table directory does exist and has read and write permissions: %s", table_dir.c_str());
-        } else
-        {
-            if (access(table_dir.c_str(), R_OK) != 0)
-                log_info("Table directory is not readable: %s", table_dir.c_str());
-            else
-                log_info("Table directory is not writable: %s", table_dir.c_str());
-        }
-    } else
-        log_info("Table directory does not exist: %s", table_dir.c_str());
-
-    return writeable;
-}
 
 // ------------------------------------------------------------------------- //
 I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(std::string configfile)
@@ -141,34 +118,7 @@ std::vector<I3Particle> I3PropagatorServicePROPOSAL::Propagate(I3Particle& p, Di
 // ------------------------------------------------------------------------- //
 I3MMCTrackPtr I3PropagatorServicePROPOSAL::propagate(I3Particle& p, vector<I3Particle>& daughters)
 {
-    /**
-     * Natural units of MMC is cm, deg, MeV, and s.
-     * Therefore we need to convert explicitly to
-     * MMC units before passing the propagate method
-     */
-    double x_0 = p.GetPos().GetX() / I3Units::cm; // [cm]
-    double y_0 = p.GetPos().GetY() / I3Units::cm; // [cm]
-    double z_0 = p.GetPos().GetZ() / I3Units::cm; // [cm]
-    double theta_0 = p.GetDir().CalcTheta();       // [rad]
-    double phi_0   = p.GetDir().CalcPhi();         // [rad]
-    double e_0     = p.GetEnergy() / I3Units::MeV; // [MeV]
-    double t_0     = p.GetTime() / I3Units::s;     // [s]
-    double lenght  = p.GetLength();                // [m]
-
-    // log_debug("Name of particle to propagate: %s", PROPOSALParticle::GetName(GeneratePROPOSALType(p)).c_str());
-    // PROPOSAL::Particle& particle = proposal_.GetParticle();
-
-    ParticleDef particle_def = I3PROPOSALParticleConverter::GeneratePROPOSALType(p.GetType());
-    Particle particle(particle_def);
-    particle.SetPosition(PROPOSAL::Vector3D(x_0, y_0, z_0));
-
-    PROPOSAL::Vector3D direction;
-    direction.SetSphericalCoordinates(1.0, phi_0, theta_0);
-    direction.CalculateCartesianFromSpherical();
-    particle.SetDirection(direction);
-    particle.SetEnergy(e_0);
-    particle.SetTime(t_0);
-    particle.SetPropagatedDistance(lenght);
+    Particle particle = I3PROPOSALParticleConverter::GeneratePROPOSALParticle(p);
 
     // std::vector<DynamicData*> secondaries = proposal_.Propagate();
     std::vector<DynamicData*> secondaries = proposal_service_.Propagate(particle);
@@ -191,21 +141,7 @@ I3MMCTrackPtr I3PropagatorServicePROPOSAL::propagate(I3Particle& p, vector<I3Par
 
     for (int i = 0; i < nParticles; i++)
     {
-        // Tomasz
-        // in mmc the particle relationships are stored
-        double x     = secondaries.at(i)->GetPosition().GetX() * I3Units::cm;
-        double y     = secondaries.at(i)->GetPosition().GetY() * I3Units::cm;
-        double z     = secondaries.at(i)->GetPosition().GetZ() * I3Units::cm;
-        double theta = secondaries.at(i)->GetDirection().GetTheta() * I3Units::deg;
-        double phi   = secondaries.at(i)->GetDirection().GetPhi() * I3Units::deg;
-        double t     = secondaries.at(i)->GetTime() * I3Units::s;
-        double e     = secondaries.at(i)->GetEnergy() * I3Units::MeV;
-        double l     = secondaries.at(i)->GetPropagatedDistance() * I3Units::cm;
-
-        log_trace("MMC DEBUG SEC  \n    pos=(%g,%g,%g) ang=(%g,%g)  e=%g t=%g  l=%g", x, y, z, theta, phi, e, t, l);
-
         // this should be a stochastic
-        I3Particle new_particle;
 
         ParticleDef particle_def = I3PROPOSALParticleConverter::GeneratePROPOSALType(p.GetType());
         if (particle_def == EMinusDef::Get() || particle_def == EPlusDef::Get())
@@ -219,18 +155,12 @@ I3MMCTrackPtr I3PropagatorServicePROPOSAL::propagate(I3Particle& p, vector<I3Par
             }
         }
 
-        new_particle.SetType(I3PROPOSALParticleConverter::GenerateI3Type(*secondaries.at(i)));
-
-        new_particle.SetLocationType(I3Particle::InIce);
-        new_particle.SetPos(x, y, z);
-        new_particle.SetTime(t);
-        new_particle.SetLength(l);
-        new_particle.SetThetaPhi(theta, phi);
-        new_particle.SetEnergy(e);
+        // Tomasz
+        // in mmc the particle relationships are stored
 
         // this is not the particle you're looking for
         // move along...and add it to the daughter list
-        daughters.push_back(new_particle);
+        daughters.push_back(I3PROPOSALParticleConverter::GenerateI3Particle(*secondaries.at(i)));
     }
 
     Output::getInstance().ClearSecondaryVector(); // Tomasz
