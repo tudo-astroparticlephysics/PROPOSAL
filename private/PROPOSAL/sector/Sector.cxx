@@ -26,8 +26,8 @@ using namespace PROPOSAL;
  ******************************************************************************/
 
 Sector::Definition::Definition()
-    : do_weighting(false)
-    , weighting_order(0)
+    : do_stochastic_loss_weighting(false)
+    , stochastic_loss_weighting(0)
     , stopping_decay(true)
     , do_continuous_randomization(true)
     , do_continuous_energy_loss_output(false)
@@ -42,8 +42,8 @@ Sector::Definition::Definition()
 }
 
 Sector::Definition::Definition(const Definition& def)
-    : do_weighting(def.do_weighting)
-    , weighting_order(def.weighting_order)
+    : do_stochastic_loss_weighting(def.do_stochastic_loss_weighting)
+    , stochastic_loss_weighting(def.stochastic_loss_weighting)
     , stopping_decay(def.stopping_decay)
     , do_continuous_randomization(def.do_continuous_randomization)
     , do_continuous_energy_loss_output(def.do_continuous_energy_loss_output)
@@ -59,9 +59,9 @@ Sector::Definition::Definition(const Definition& def)
 
 bool Sector::Definition::operator==(const Definition& sector_def) const
 {
-    if (do_weighting != sector_def.do_weighting)
+    if (do_stochastic_loss_weighting != sector_def.do_stochastic_loss_weighting)
         return false;
-    else if (weighting_order != sector_def.weighting_order)
+    else if (stochastic_loss_weighting != sector_def.stochastic_loss_weighting)
         return false;
     else if (stopping_decay != sector_def.stopping_decay)
         return false;
@@ -113,7 +113,6 @@ void Sector::Definition::SetGeometry(const Geometry& geometry)
 
 Sector::Sector(Particle& particle, const Definition& sector_def)
     : sector_def_(sector_def)
-    , weighting_starts_at_(0)
     , particle_(particle)
     , geometry_(sector_def.GetGeometry().clone())
     , utility_(particle_.GetParticleDef(), sector_def.GetMedium(), sector_def.cut_settings, sector_def.utility_def)
@@ -138,7 +137,6 @@ Sector::Sector(Particle& particle, const Definition& sector_def)
 
 Sector::Sector(Particle& particle, const Definition& sector_def, const InterpolationDef& interpolation_def)
     : sector_def_(sector_def)
-    , weighting_starts_at_(0)
     , particle_(particle)
     , geometry_(sector_def.GetGeometry().clone())
     , utility_(particle_.GetParticleDef(),
@@ -170,7 +168,6 @@ Sector::Sector(Particle& particle, const Definition& sector_def, const Interpola
 
 Sector::Sector(Particle& particle, const Sector& sector)
     : sector_def_(sector.sector_def_)
-    , weighting_starts_at_(sector.weighting_starts_at_)
     , particle_(particle)
     , geometry_(sector.geometry_->clone())
     , utility_(sector.utility_)
@@ -204,7 +201,6 @@ Sector::Sector(Particle& particle, const Sector& sector)
 //                const Scattering& scattering,
 //                const Definition& def)
 //     : sector_def_(def)
-//     , weighting_starts_at_(0)
 //     , particle_(particle)
 //     , geometry_(geometry.clone())
 //     // , randomizer_(NULL)
@@ -263,7 +259,6 @@ Sector::Sector(Particle& particle, const Sector& sector)
 
 Sector::Sector(const Sector& collection)
     : sector_def_(collection.sector_def_)
-    , weighting_starts_at_(collection.weighting_starts_at_)
     , particle_(collection.particle_)
     , geometry_(collection.geometry_->clone())
     , utility_(collection.utility_)
@@ -289,8 +284,6 @@ Sector::Sector(const Sector& collection)
 bool Sector::operator==(const Sector& sector) const
 {
     if (sector_def_ != sector.sector_def_)
-        return false;
-    else if (weighting_starts_at_ != sector.weighting_starts_at_)
         return false;
     else if (particle_ != sector.particle_)
         return false;
@@ -609,24 +602,15 @@ pair<double, DynamicData::Type> Sector::MakeStochasticLoss()
 
     rates.resize(cross_sections.size());
 
-    if (sector_def_.do_weighting)
+    if (sector_def_.do_stochastic_loss_weighting)
     {
-        if (particle_.GetPropagatedDistance() > weighting_starts_at_)
+        if (sector_def_.stochastic_loss_weighting > 0)
         {
-            double exp   = abs(sector_def_.weighting_order);
-            double power = pow(rnd2, exp);
-
-            if (sector_def_.weighting_order > 0)
-            {
-                rnd2 = 1 - power * rnd2;
-            } else
-            {
-                rnd2 = power * rnd2;
-            }
-
-            sector_def_.weighting_order = (1 + exp) * power;
-            weighting_starts_at_        = particle_.GetPropagatedDistance();
-            sector_def_.do_weighting    = false;
+            rnd2 = 1 - rnd2 * pow(rnd2, abs(sector_def_.stochastic_loss_weighting));
+        }
+        else
+        {
+            rnd2 = rnd2 * pow(rnd2, abs(sector_def_.stochastic_loss_weighting));
         }
     }
     // if (particle_->GetEnergy() < 650) printf("energy: %f\n", particle_->GetEnergy());

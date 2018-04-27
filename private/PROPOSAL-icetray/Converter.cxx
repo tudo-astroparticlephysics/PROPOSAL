@@ -7,22 +7,37 @@ namespace I3PROPOSALParticleConverter {
 
 typedef boost::bimap<I3Particle::ParticleType, std::string> bimap_ParticleType;
 static const bimap_ParticleType I3_PROPOSAL_ParticleType_bimap =
-    boost::assign::list_of<bimap_ParticleType::relation>(I3Particle::MuMinus, "MuMinus")(I3Particle::MuPlus, "MuPlus")(
-        I3Particle::TauMinus,
-        "TauMinus")(I3Particle::TauPlus, "TauPlus")(I3Particle::EMinus, "EMinus")(I3Particle::EPlus, "EPlus")(
-        I3Particle::NuMu,
-        "NuMu")(I3Particle::NuMuBar, "NuMuBar")(I3Particle::NuE, "NuE")(I3Particle::NuEBar, "NuEBar")(
-        I3Particle::NuTau,
-        "NuTau")(I3Particle::NuTauBar, "NuTauBar")(I3Particle::Brems, "Brems")(I3Particle::DeltaE, "DeltaE")(
-        I3Particle::PairProd,
-        "EPair")(I3Particle::NuclInt, "NuclInt")(I3Particle::MuPair, "MuPair")(I3Particle::Hadrons, "Hadrons")(
-        I3Particle::Monopole,
-        "Monopole")(I3Particle::STauMinus, "STauMinus")(I3Particle::STauPlus, "STauPlus")(I3Particle::Gamma, "Gamma")(
-        I3Particle::Pi0,
-        "Pi0")(I3Particle::PiPlus, "PiPlus")(I3Particle::PiMinus, "PiMinus")(I3Particle::K0_Short,
-                                                                             "K0") // TODO(mario):  Fri 2017/11/17
-    (I3Particle::KPlus, "KPlus")(I3Particle::KMinus, "KMinus")(I3Particle::PPlus, "PPlus")(I3Particle::PMinus,
-                                                                                           "PMinus");
+    boost::assign::list_of<bimap_ParticleType::relation>
+        (I3Particle::MuMinus, "MuMinus")
+        (I3Particle::MuPlus, "MuPlus")
+        (I3Particle::TauMinus, "TauMinus")
+        (I3Particle::TauPlus, "TauPlus")
+        (I3Particle::EMinus, "EMinus")
+        (I3Particle::EPlus, "EPlus")
+        (I3Particle::NuMu, "NuMu")
+        (I3Particle::NuMuBar, "NuMuBar")
+        (I3Particle::NuE, "NuE")
+        (I3Particle::NuEBar, "NuEBar")
+        (I3Particle::NuTau, "NuTau")
+        (I3Particle::NuTauBar, "NuTauBar")
+        (I3Particle::Brems, "Brems")
+        (I3Particle::DeltaE, "DeltaE")
+        (I3Particle::PairProd, "EPair")
+        (I3Particle::NuclInt, "NuclInt")
+        (I3Particle::MuPair, "MuPair")
+        (I3Particle::Hadrons, "Hadrons")
+        (I3Particle::Monopole, "Monopole")
+        (I3Particle::STauMinus, "STauMinus")
+        (I3Particle::STauPlus, "STauPlus")
+        (I3Particle::Gamma, "Gamma")
+        (I3Particle::Pi0, "Pi0")
+        (I3Particle::PiPlus, "PiPlus")
+        (I3Particle::PiMinus, "PiMinus")
+        (I3Particle::K0_Short, "K0") // TODO(mario):  Fri 2017/11/17
+        (I3Particle::KPlus, "KPlus")
+        (I3Particle::KMinus, "KMinus")
+        (I3Particle::PPlus, "PPlus")
+        (I3Particle::PMinus, "PMinus");
 
 } // namespace I3PROPOSALParticleConverter
 
