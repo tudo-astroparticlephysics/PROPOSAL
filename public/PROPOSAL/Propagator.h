@@ -99,7 +99,7 @@ public:
     // Getter
     // --------------------------------------------------------------------- //
 
-    const Sector* GetCurrentCollection() const { return current_sector_; }
+    const Sector* GetCurrentSector() const { return current_sector_; }
     std::vector<Sector*> GetSectors() const { return sectors_; }
 
     Geometry& GetDetector() const { return *detector_; };
