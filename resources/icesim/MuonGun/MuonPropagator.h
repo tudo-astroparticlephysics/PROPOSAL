@@ -65,6 +65,12 @@ public:
 
 private:
     PROPOSAL::Propagator* propagator_;
+    /**
+     * Get the internal MMC name associated with a particle type
+     */
+    I3Particle::ParticleType GenerateI3Type(const PROPOSAL::DynamicData& secondary);
+    I3Particle GenerateI3Particle(const PROPOSAL::DynamicData& proposal_particle);
+
 };
 
 /**
