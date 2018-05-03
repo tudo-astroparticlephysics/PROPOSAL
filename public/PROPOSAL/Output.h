@@ -225,6 +225,21 @@ public:
     // ----------------------------------------------------------------------------
     void FillSecondaryVector(const Particle& particle, const DynamicData::Type& secondary, double energyloss);
 
+    // ----------------------------------------------------------------------------
+    /// @brief Fill secondary data
+    ///
+    /// New DynamicData with Type ContinuousEnergyLoss is createed.
+    /// The position is, where the continuous loss starts.
+    /// The direction is the unnormed difference between the positions of the 2 stochastic losses.
+    /// The time is the differnce between the 2 stochastic losses.
+    /// The PropagatedDistance is the distance between the 2 stochastic losses.
+    /// The Energy is the energy lost during the continuous loss (including the continuous randomization).
+    /// The ParentParticleEnergy is the particle energy before the continuous loss.
+    ///
+    /// @param ContinuousEnergyLoss
+    // ----------------------------------------------------------------------------
+    void FillSecondaryVector(DynamicData* continuous_loss);
+
     //----------------------------------------------------------------------------//
 
     void ClearSecondaryVector();

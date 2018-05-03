@@ -90,62 +90,49 @@ void SimplePropagator::SetRandomNumberGenerator(I3RandomServicePtr rng)
     PROPOSAL::RandomGenerator::Get().SetRandomNumberGenerator(f);
 }
 
-I3Particle SimplePropagator::to_I3Particle(const PROPOSAL::DynamicData& pp)
-{
-    I3Particle p;
-
-    double x = pp.GetPosition().GetX() * I3Units::cm;
-    double y = pp.GetPosition().GetY() * I3Units::cm;
-    double z = pp.GetPosition().GetZ() * I3Units::cm;
-
-    double theta = pp.GetDirection().GetTheta() * I3Units::degree;
-    double phi   = pp.GetDirection().GetPhi() * I3Units::degree;
-
-    p.SetPos(x, y, z);
-    p.SetThetaPhi(theta, phi);
-    p.SetLength(pp.GetPropagatedDistance() * I3Units::cm);
-    p.SetTime(pp.GetTime() * I3Units::second);
-
-    p.SetType(I3PROPOSALParticleConverter::GenerateI3Type(pp));
-    p.SetLocationType(I3Particle::InIce);
-    p.SetEnergy(pp.GetEnergy() * I3Units::MeV);
-
-    return p;
-}
-
 I3Particle SimplePropagator::propagate(const I3Particle& p,
                                        double distance,
                                        boost::shared_ptr<std::vector<I3Particle> > losses)
 {
     I3Particle endpoint(p);
 
-    double x, y, z, theta, phi = 0.0;
+    double x, y, z, theta, phi;
 
     PROPOSAL::Particle pp = propagator_->GetParticle();
     pp.SetParentParticleId(0);
     pp.SetParticleId(0);
-    pp.SetTime(p.GetTime() / I3Units::second);
 
     x = p.GetPos().GetX() / I3Units::cm;
     y = p.GetPos().GetY() / I3Units::cm;
     z = p.GetPos().GetZ() / I3Units::cm;
 
+    theta = p.GetDir().CalcTheta() / I3Units::radian;
+    phi   = p.GetDir().CalcPhi() / I3Units::radian;
+
     pp.SetPosition(PROPOSAL::Vector3D(x, y, z));
+
+    PROPOSAL::Vector3D direction;
+    direction.SetSphericalCoordinates(1.0, phi, theta);
+    direction.CalculateCartesianFromSpherical();
+    pp.SetDirection(direction);
+
     pp.SetEnergy(p.GetEnergy() / I3Units::MeV);
+    pp.SetTime(p.GetTime() / I3Units::second);
+    pp.SetPropagatedDistance(p.GetLength() / I3Units::cm);
 
     propagator_->Propagate(distance / I3Units::cm);
-
-    endpoint.SetEnergy(pp.GetEnergy() * I3Units::MeV);
 
     x = pp.GetPosition().GetX() * I3Units::cm;
     y = pp.GetPosition().GetY() * I3Units::cm;
     z = pp.GetPosition().GetZ() * I3Units::cm;
 
-    theta = pp.GetDirection().GetTheta() * I3Units::degree;
-    phi   = pp.GetDirection().GetPhi() * I3Units::degree;
+    theta = pp.GetDirection().GetTheta() * I3Units::radian;
+    phi   = pp.GetDirection().GetPhi() * I3Units::radian;
 
     endpoint.SetPos(x, y, z);
     endpoint.SetThetaPhi(theta, phi);
+
+    endpoint.SetEnergy(pp.GetEnergy() * I3Units::MeV);
     endpoint.SetLength(pp.GetPropagatedDistance() * I3Units::cm);
     endpoint.SetTime(pp.GetTime() * I3Units::second);
 
@@ -155,7 +142,7 @@ I3Particle SimplePropagator::propagate(const I3Particle& p,
         std::vector<PROPOSAL::DynamicData*> history = Output::getInstance().GetSecondarys();
         for (unsigned int i = 0; i < history.size(); i++)
         {
-            losses->push_back(to_I3Particle(*history[i]));
+            losses->push_back(I3PROPOSALParticleConverter::GenerateI3Particle(*history[i]));
         }
     }
 

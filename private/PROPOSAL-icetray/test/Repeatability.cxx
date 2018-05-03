@@ -79,13 +79,15 @@ TEST(PropagatorService)
     I3PropagatorServicePROPOSALPtr prop(new I3PropagatorServicePROPOSAL);
     prop->SetRandomNumberGenerator(rng);
 
-    I3FramePtr frame(new I3Frame);
+    I3PropagatorService::DiagnosticMapPtr frame(new I3PropagatorService::DiagnosticMap);
+    // the dummy I3Frame makes compiler happy, but won't be used
+    I3FramePtr dummy(new I3Frame()); 
 
     std::vector<std::vector<I3Particle> > daughters;
     for (int i = 0; i < 2; i++)
     {
         I3Particle p              = make_particle();
-        std::vector<I3Particle> d = prop->Propagate(p, frame);
+        std::vector<I3Particle> d = prop->Propagate(p, frame, dummy);
         daughters.push_back(d);
     }
 
@@ -94,7 +96,7 @@ TEST(PropagatorService)
     for (int i = 0; i < daughters.size(); i++)
     {
         I3Particle p              = make_particle();
-        std::vector<I3Particle> d = prop->Propagate(p, frame);
+        std::vector<I3Particle> d = prop->Propagate(p, frame, dummy);
         ENSURE_EQUAL(daughters[i].size(), d.size());
         for (int j = 0; j < daughters[i].size(); j++)
         {
