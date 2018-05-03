@@ -18,9 +18,13 @@ addons:
             - ubuntu-toolchain-r-test
             - llvm-toolchain-precise-3.6
         packages:
-            - liblog4cplus-dev-1.1.3
+            # - liblog4cplus-dev
             - libboost-dev
             - libboost-python-dev
+
+before_install:
+    - wget https://launchpad.net/ubuntu/+archive/primary/+files/liblog4cplus-dev_1.1.2-3.2_i386.deb
+    - sudo dpkg -i liblog4cplus-dev_1.1.2-3.2_i386.deb
 
 before_script:
     - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
