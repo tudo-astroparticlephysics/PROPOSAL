@@ -45,59 +45,59 @@ sudo: require
 
 matrix:
   include:
-    - os: linux
-      dist: trusty
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - g++-4.8
-            - libboost-dev
-            - libboost-python-dev
-      env:
-         - MATRIX_EVAL="CC=gcc-4.8 && CXX=g++-4.8"
-
-    - os: linux
-      dist: trusty
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - g++-7
-            - libboost-dev
-            - libboost-python-dev
-      env:
-        - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
-
-    - os: linux
-      dist: trusty
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-precise-3.6
-          packages:
-            - clang-3.6
-            - libboost-dev
-            - libboost-python-dev
-      env:
-        - MATRIX_EVAL="CC=clang-3.6 && CXX=clang++-3.6"
-
-    - os: linux
-      dist: trusty
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-trusty-5.0
-          packages:
-            - clang-5.0
-            - libboost-dev
-            - libboost-python-dev
-      env:
-        - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
+    # - os: linux
+    #   dist: trusty
+    #   addons:
+    #     apt:
+    #       sources:
+    #         - ubuntu-toolchain-r-test
+    #       packages:
+    #         - g++-4.8
+    #         - libboost-dev
+    #         - libboost-python-dev
+    #   env:
+    #      - MATRIX_EVAL="CC=gcc-4.8 && CXX=g++-4.8"
+    #
+    # - os: linux
+    #   dist: trusty
+    #   addons:
+    #     apt:
+    #       sources:
+    #         - ubuntu-toolchain-r-test
+    #       packages:
+    #         - g++-7
+    #         - libboost-dev
+    #         - libboost-python-dev
+    #   env:
+    #     - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
+    #
+    # - os: linux
+    #   dist: trusty
+    #   addons:
+    #     apt:
+    #       sources:
+    #         - ubuntu-toolchain-r-test
+    #         - llvm-toolchain-precise-3.6
+    #       packages:
+    #         - clang-3.6
+    #         - libboost-dev
+    #         - libboost-python-dev
+    #   env:
+    #     - MATRIX_EVAL="CC=clang-3.6 && CXX=clang++-3.6"
+    #
+    # - os: linux
+    #   dist: trusty
+    #   addons:
+    #     apt:
+    #       sources:
+    #         - ubuntu-toolchain-r-test
+    #         - llvm-toolchain-trusty-5.0
+    #       packages:
+    #         - clang-5.0
+    #         - libboost-dev
+    #         - libboost-python-dev
+    #   env:
+    #     - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
 
     - os: osx
       osx_image: xcode8
@@ -114,7 +114,7 @@ before_install:
 
 install:
     - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-        brew install boost;
+        brew install boost --with-python;
         brew install boost-python;
       fi
     - ./install_log4cplus.sh
