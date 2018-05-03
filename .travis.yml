@@ -1,37 +1,133 @@
-os:
-  - linux
-  # - osx
+# os:
+#     - linux
+#     # - osx
+#
+# language: cpp
+#
+# dist: trusty
+# sudo: require
+#
+# compiler:
+#     - g++-4.8
+#     - clang-3.6
+#
+# addons:
+#     apt:
+#         sources:
+#             # add PPAs with more up-to-date toolchains
+#             - ubuntu-toolchain-r-test
+#             - llvm-toolchain-precise-3.6
+#         packages:
+#             # - liblog4cplus-dev
+#             - libboost-dev
+#             - libboost-python-dev
+#
+# before_script:
+#     - ./install_log4cplus.sh
+#     - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+#         mkdir build;
+#         cd build;
+#         cmake ..;
+#       fi
+#
+# script:
+#     - make VERBOSE=1
+#
+# notifications:
+#     email: false
+
+###############################################################################
+#                                   content                                   #
+###############################################################################
 
 language: cpp
-
-dist: trusty
 sudo: require
 
-compiler:
-    - g++-4.8
-    - clang-3.6
-
-addons:
-    apt:
-        sources:
-            # add PPAs with more up-to-date toolchains
+matrix:
+  include:
+    - os: linux
+      dist: trusty
+      addons:
+        apt:
+          sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-precise-3.6
-        packages:
-            # - liblog4cplus-dev
+          packages:
+            - g++-4.8
             - libboost-dev
             - libboost-python-dev
+      env:
+         - MATRIX_EVAL="CC=gcc-4.8 && CXX=g++-4.8"
+
+    - os: linux
+      dist: trusty
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-7
+            - libboost-dev
+            - libboost-python-dev
+      env:
+        - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
+
+    - os: linux
+      dist: trusty
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-precise-3.6
+          packages:
+            - clang-3.6
+            - libboost-dev
+            - libboost-python-dev
+      env:
+        - MATRIX_EVAL="CC=clang-3.6 && CXX=clang++-3.6"
+
+    - os: linux
+      dist: trusty
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-trusty-5.0
+          packages:
+            - clang-5.0
+            - libboost-dev
+            - libboost-python-dev
+      env:
+        - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
+
+    - os: osx
+      osx_image: xcode8
+      env:
+        - MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
+
+    - os: osx
+      osx_image: xcode8
+      env:
+        - MATRIX_EVAL="brew install gcc && CC=gcc-7 && CXX=g++-7"
+
+before_install:
+    - eval "${MATRIX_EVAL}"
+
+install:
+    - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+        brew install boost;
+        brew install boost-python;
+      fi
+    - ./install_log4cplus.sh
 
 before_script:
-    - ./install_log4cplus.sh
-    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-        mkdir build;
-        cd build;
-        cmake ..;
-      fi
+    - mkdir build
+    - cd build
+    - cmake ..
+    - make VERBOSE=1
 
 script:
-    - make VERBOSE=1
+    - bin/example
 
 notifications:
     email: false
+
