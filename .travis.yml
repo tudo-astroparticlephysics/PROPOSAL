@@ -110,8 +110,11 @@ before_install:
 
 install:
     - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-        brew install boost --with-python;
-        brew install boost-python;
+        brew outdated boost || brew upgrade boost;
+        brew outdated boost-python || brew upgrade boost-python;
+        brew outdated cmake || brew upgrade cmake;
+        # brew install boost --with-python;
+        # brew install boost-python;
       fi
     - ./install_log4cplus.sh
 
