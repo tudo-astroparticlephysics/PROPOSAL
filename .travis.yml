@@ -27,8 +27,7 @@ before_script:
     - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
         mkdir build;
         cd build;
-        # cmake .. -DPYTHON_LIBRARY=$(python-config --prefix)/lib/libpython2.7.so -DPYTHON_INCLUDE_DIR=$(python-config --prefix)/include/python2.7;
-        cmake .. ;
+        cmake ..;
       fi
 
 script:
