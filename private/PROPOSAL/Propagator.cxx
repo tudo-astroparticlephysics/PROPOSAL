@@ -246,7 +246,10 @@ Propagator::Propagator(const ParticleDef& particle_def, const std::string& confi
     SetMember(sec_def_global.utility_def.epair_def.lpm_effect, "global.lpm", pt_json);
     SetMember(sec_def_global.utility_def.brems_def.lpm_effect, "global.lpm", pt_json);
     SetMember(sec_def_global.do_exact_time_calculation, "global.exact_time", pt_json);
+    SetMember(sec_def_global.do_continuous_energy_loss_output, "global.continous_loss_output", pt_json);
     SetMember(sec_def_global.stopping_decay, "global.stopping_decay", pt_json);
+    SetMember(sec_def_global.do_stochastic_loss_weighting, "global.do_stochastic_loss_weighting", pt_json);
+    SetMember(sec_def_global.stochastic_loss_weighting, "global.stochastic_loss_weighting", pt_json);
 
     std::string scattering = ScatteringFactory::Get().GetStringFromEnum(sec_def_global.scattering_model);
     SetMember(scattering, "global.scattering", pt_json);

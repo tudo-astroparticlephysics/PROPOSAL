@@ -29,6 +29,7 @@ if __name__ == "__main__":
     sec_def.cut_settings.vcut = 0.05
 
     interpolation_def = pp.InterpolationDef()
+    interpolation_def.path_to_tables = "~/.local/share/PROPOSAL/tables"
 
     prop = pp.Propagator(
             particle_def=pp.TauMinusDef.get(),

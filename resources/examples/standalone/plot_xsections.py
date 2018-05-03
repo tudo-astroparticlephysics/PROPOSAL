@@ -30,6 +30,7 @@ if __name__ == "__main__":
     energy = np.logspace(2, 12, 100)
 
     interpolation_def = pp.InterpolationDef()
+    interpolation_def.path_to_tables = "~/.local/share/PROPOSAL/tables"
 
     # =========================================================
     # 	Constructor args for parametrizations
