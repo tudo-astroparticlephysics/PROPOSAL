@@ -18,7 +18,7 @@ addons:
             - ubuntu-toolchain-r-test
             - llvm-toolchain-precise-3.6
         packages:
-            - liblog4cplus-dev
+            - liblog4cplus-dev-1.1.3
             - libboost-dev
             - libboost-python-dev
 
