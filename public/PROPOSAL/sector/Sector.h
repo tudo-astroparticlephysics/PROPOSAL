@@ -79,11 +79,12 @@ public:
         void SetGeometry(const Geometry&);
         const Geometry& GetGeometry() const { return *geometry_; }
 
-        bool do_weighting;      //!< Do weigthing? Set to false in constructor
-        double weighting_order; //!< Re-weighting order. Set to 0 in constructor
-        bool stopping_decay;    //!< Let particle decay if elow is reached but no decay was sampled
+        bool do_stochastic_loss_weighting; //!< Do weigthing of stochastic losses. Set to false in constructor.
+        double stochastic_loss_weighting;  //!< weigth of stochastic losses. Set to 0 in constructor
+        bool stopping_decay; //!< Let particle decay if elow is reached but no decay was sampled
 
         bool do_continuous_randomization;
+        bool do_continuous_energy_loss_output;
         bool do_exact_time_calculation;
 
         ScatteringFactory::Enum scattering_model;
@@ -189,8 +190,6 @@ protected:
     // --------------------------------------------------------------------- //
 
     Definition sector_def_;
-
-    double weighting_starts_at_; //!< Distance at which re-weighting starts. Set to 0 in constructor
 
     Particle& particle_;
     Geometry* geometry_;

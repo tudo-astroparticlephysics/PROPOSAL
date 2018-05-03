@@ -6,16 +6,19 @@ It's written in a .json file (no comments). That's why we have this (nice) Docu.
 
 The configuration file is structured into three parts:
 - In the "global" part the general parameters are defined like the path for the interpolation tables.
-- In the "sectors" part the different media with their geometry are defined. The energy-cuts, which means how accurate the propagation process should be calculated, can be setted for each sector, which then overrides the global configurations.
+- In the "sectors" part the different media with their geometry are defined. The energy-cuts, which means how accurate the propagation process should be calculated, can be set for each sector, which then overrides the global configurations.
 - In the "detector" part the geometry of the detector is defined.
 
 ## The `global` configurations ##
+There is the option to set a seed, if the internal random number generator is used.
+The seed has no effect, if you use an external random number generator.
 
-| Keyword   | Type    | Default   | Description |
-| --------- | ------- | --------- | ----------- |
-| `seed`    | Integer | `0`       | seed for the internal random number generator|
+If the Output of the Secondaries should not only include the Stochastic energy losses (and the Particles produced in a decay), but also the continuous energy losses, this can be set.
 
-Note: This Keyword has no effect, if you use an external random number generator.
+| Keyword                 | Type    | Default   | Description |
+| ----------------------- | ------- | --------- | ----------- |
+| `seed`                  | Integer | `0`       | seed for the internal random number generator|
+| `continous_loss_output` | Bool    | `False`   | Decides, whether continuous losses should be emitted in the Output of Secondaries|
 
 ### Interpolation parameters ###
 There are three parameters dealing with the interpolation tables.

@@ -2,6 +2,7 @@
 	"global":
 	{
 		"seed" : 1,
+		"continous_loss_output" : false,
 
 		"interpolate" : true,
 		"path_to_tables" : [
