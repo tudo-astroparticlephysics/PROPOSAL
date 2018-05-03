@@ -33,6 +33,7 @@ void Output::FillSecondaryVector(const Particle& particle, const DynamicData::Ty
     if (secondary == DynamicData::Particle)
     {
         data = new Particle(particle);
+        log_fatal("Returning a particle %s\n", particle.GetName().c_str());
     } else
     {
         data = new DynamicData(secondary);
@@ -51,6 +52,12 @@ void Output::FillSecondaryVector(const Particle& particle, const DynamicData::Ty
     secondarys_.push_back(data);
 }
 
+// ------------------------------------------------------------------------- //
+void Output::FillSecondaryVector(DynamicData* continuous_loss)
+{
+    // same like the decay output but for the continuous energy losses
+    secondarys_.push_back(continuous_loss);
+}
 // ------------------------------------------------------------------------- //
 void Output::ClearSecondaryVector()
 {

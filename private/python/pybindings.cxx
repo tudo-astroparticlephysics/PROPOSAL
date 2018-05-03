@@ -1141,10 +1141,11 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
         .add_property("geometry",
                       make_function(&Sector::Definition::GetGeometry, return_internal_reference<>()),
                       &Sector::Definition::SetGeometry)
-        .def_readwrite("do_weighting", &Sector::Definition::do_weighting)
-        .def_readwrite("weighting_order", &Sector::Definition::weighting_order)
+        .def_readwrite("do_stochastic_loss_weighting", &Sector::Definition::do_stochastic_loss_weighting)
+        .def_readwrite("stochastic_loss_weighting", &Sector::Definition::stochastic_loss_weighting)
         .def_readwrite("stopping_decay", &Sector::Definition::stopping_decay)
         .def_readwrite("do_continuous_randomization", &Sector::Definition::do_continuous_randomization)
+        .def_readwrite("do_continuous_energy_loss_output", &Sector::Definition::do_continuous_energy_loss_output)
         .def_readwrite("do_exact_time_calculation", &Sector::Definition::do_exact_time_calculation)
         .def_readwrite("scattering_model", &Sector::Definition::scattering_model)
         .def_readwrite("particle_location", &Sector::Definition::location)
