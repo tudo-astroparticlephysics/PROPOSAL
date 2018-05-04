@@ -111,6 +111,7 @@ before_install:
 install:
     - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
         brew upgrade;
+        brew install cmake;
         brew install boost;
         brew install boost-python;
       fi
