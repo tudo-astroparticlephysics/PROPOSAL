@@ -110,7 +110,7 @@ before_install:
 
 install:
     - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-        brew update
+        brew upgrade;
         brew install boost;
         brew install boost-python;
       fi
