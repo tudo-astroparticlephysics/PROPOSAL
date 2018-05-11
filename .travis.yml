@@ -120,7 +120,7 @@ install:
 before_script:
     - mkdir build
     - cd build
-    - cmake ..
+    - cmake .. -DADD_TESTS=ON
     - make VERBOSE=1
 
 script:
