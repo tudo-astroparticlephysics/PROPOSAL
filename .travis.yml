@@ -125,10 +125,7 @@ before_script:
 
 script:
     - bin/example
-    # - bin/UnitTest_Propagation
-    - bin/UnitTest_Sector
-    - bin/UnitTest_Scattering
-    - bin/UnitTest_ContinuousRandomization
+    - make test
 
 notifications:
     email: false
