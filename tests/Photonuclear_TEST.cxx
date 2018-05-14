@@ -72,15 +72,16 @@ TEST(Comparison, Comparison_equal)
     Parametrization* PhotoQ2_B = new PhotoAbramowiczLevinLevyMaor97(particle_def, medium, ecuts, multiplier, shadow);
     EXPECT_TRUE(*PhotoQ2_A == *PhotoQ2_B);
 
-    PhotoAbramowiczLevinLevyMaor97 param_Q2(particle_def, medium, ecuts, multiplier, shadow);
-    EXPECT_TRUE(param_Q2 == *PhotoQ2_A);
+    PhotoAbramowiczLevinLevyMaor97 param_Q2_integral(particle_def, medium, ecuts, multiplier, shadow);
+    PhotoQ2Interpolant<PhotoAbramowiczLevinLevyMaor97> param_Q2_interpol(particle_def, medium, ecuts, multiplier, shadow, InterpolDef);
+    EXPECT_TRUE(param_Q2_integral == *PhotoQ2_A);
 
-    PhotoIntegral* Int_PhotoQ2_A        = new PhotoIntegral(param_Q2);
-    CrossSectionIntegral* Int_PhotoQ2_B = new PhotoIntegral(param_Q2);
+    PhotoIntegral* Int_PhotoQ2_A        = new PhotoIntegral(param_Q2_integral);
+    CrossSectionIntegral* Int_PhotoQ2_B = new PhotoIntegral(param_Q2_integral);
     EXPECT_TRUE(*Int_PhotoQ2_A == *Int_PhotoQ2_B);
 
-    PhotoInterpolant* Interpol_PhotoQ2_A        = new PhotoInterpolant(param_Q2, InterpolDef);
-    CrossSectionInterpolant* Interpol_PhotoQ2_B = new PhotoInterpolant(param_Q2, InterpolDef);
+    PhotoInterpolant* Interpol_PhotoQ2_A        = new PhotoInterpolant(param_Q2_interpol, InterpolDef);
+    CrossSectionInterpolant* Interpol_PhotoQ2_B = new PhotoInterpolant(param_Q2_interpol, InterpolDef);
     EXPECT_TRUE(*Interpol_PhotoQ2_A == *Interpol_PhotoQ2_B);
 
     delete PhotoQ2_A;
@@ -140,13 +141,11 @@ TEST(Comparison, Comparison_not_equal)
     PhotoAbramowiczLevinLevyMaor97 PhotoQ2_B(tau_def, medium_1, ecuts_1, multiplier_1, shadow_1);
     PhotoAbramowiczLevinLevyMaor97 PhotoQ2_C(mu_def, medium_2, ecuts_1, multiplier_1, shadow_1);
     PhotoAbramowiczLevinLevyMaor97 PhotoQ2_D(mu_def, medium_1, ecuts_2, multiplier_1, shadow_1);
-    PhotoAbramowiczLevinLevyMaor97 PhotoQ2_E(mu_def, medium_1, ecuts_1, multiplier_1, shadow_1);
-    PhotoAbramowiczLevinLevyMaor97 PhotoQ2_F(mu_def, medium_1, ecuts_1, multiplier_2, shadow_1);
+    PhotoAbramowiczLevinLevyMaor97 PhotoQ2_E(mu_def, medium_1, ecuts_1, multiplier_2, shadow_1);
     EXPECT_TRUE(PhotoQ2_A != PhotoQ2_B);
     EXPECT_TRUE(PhotoQ2_A != PhotoQ2_C);
     EXPECT_TRUE(PhotoQ2_A != PhotoQ2_D);
     EXPECT_TRUE(PhotoQ2_A != PhotoQ2_E);
-    EXPECT_TRUE(PhotoQ2_A != PhotoQ2_F);
     //
     EXPECT_TRUE(PhotoReal_A != PhotoQ2_A);
 
@@ -164,8 +163,10 @@ TEST(Comparison, Comparison_not_equal)
     PhotoIntegral Int_PhotoQ2_B(PhotoQ2_B);
     EXPECT_TRUE(Int_PhotoQ2_A != Int_PhotoQ2_B);
 
-    PhotoInterpolant Interpol_PhotoQ2_A(PhotoQ2_A, InterpolDef);
-    PhotoInterpolant Interpol_PhotoQ2_B(PhotoQ2_B, InterpolDef);
+    PhotoQ2Interpolant<PhotoAbramowiczLevinLevyMaor97> PhotoQ2_A_interpol(mu_def, medium_1, ecuts_1, multiplier_1, shadow_1, InterpolDef);
+    PhotoQ2Interpolant<PhotoAbramowiczLevinLevyMaor97> PhotoQ2_B_interpol(tau_def, medium_1, ecuts_1, multiplier_1, shadow_1, InterpolDef);
+    PhotoInterpolant Interpol_PhotoQ2_A(PhotoQ2_A_interpol, InterpolDef);
+    PhotoInterpolant Interpol_PhotoQ2_B(PhotoQ2_B_interpol, InterpolDef);
     EXPECT_TRUE(Interpol_PhotoQ2_A != Interpol_PhotoQ2_B);
 }
 
@@ -199,7 +200,8 @@ TEST(Assignment, Copyconstructor)
     PhotoIntegral Int_PhotoQ2_B = Int_PhotoQ2_A;
     EXPECT_TRUE(Int_PhotoQ2_A == Int_PhotoQ2_B);
 
-    PhotoInterpolant Interpol_PhotoQ2_A(PhotoQ2_A, InterpolDef);
+    PhotoQ2Interpolant<PhotoAbramowiczLevinLevyMaor97> PhotoQ2_A_interpol(particle_def, medium, ecuts, multiplier, shadow, InterpolDef);
+    PhotoInterpolant Interpol_PhotoQ2_A(PhotoQ2_A_interpol, InterpolDef);
     PhotoInterpolant Interpol_PhotoQ2_B = Interpol_PhotoQ2_A;
     EXPECT_TRUE(Interpol_PhotoQ2_A == Interpol_PhotoQ2_B);
 }
@@ -234,7 +236,8 @@ TEST(Assignment, Copyconstructor2)
     PhotoIntegral Int_PhotoQ2_B(Int_PhotoQ2_A);
     EXPECT_TRUE(Int_PhotoQ2_A == Int_PhotoQ2_B);
 
-    PhotoInterpolant Interpol_PhotoQ2_A(PhotoQ2_A, InterpolDef);
+    PhotoQ2Interpolant<PhotoAbramowiczLevinLevyMaor97> PhotoQ2_A_interpol(particle_def, medium, ecuts, multiplier, shadow, InterpolDef);
+    PhotoInterpolant Interpol_PhotoQ2_A(PhotoQ2_A_interpol, InterpolDef);
     PhotoInterpolant Interpol_PhotoQ2_B(Interpol_PhotoQ2_A);
     EXPECT_TRUE(Interpol_PhotoQ2_A == Interpol_PhotoQ2_B);
 }
