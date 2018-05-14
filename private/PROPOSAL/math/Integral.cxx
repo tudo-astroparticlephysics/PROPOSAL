@@ -774,7 +774,14 @@ double Integral::Trapezoid3S(int n, double oldSum, int stepNumber)
     {
         if (!flag)
         {
-            approX = max_;
+            // Set randomX_ to max_, but not exactly to max_ to
+            // avoid differegences in Ionization::InelCorrection.
+            // Use the next lower representation.
+#if __cplusplus > 199711L
+            approX = std::nexttoward(max_, min_);
+#else
+            approX = max_ - fabs(min_) * COMPUTER_PRECISION;
+#endif
         }
         randomX_ = approX;
     }
