@@ -709,7 +709,7 @@ double Integral::Trapezoid3S(int n, double oldSum, int stepNumber)
             smallSum = randomNumber_ * oldSum / (1.5 * stepSize);
         } else
         {
-            smallSum = -randomNumber_ / (1.5 * stepSize);
+            smallSum = -randomNumber_ * oldSum / (1.5 * stepSize);
             if (oldSum < 0)
             {
                 smallSum *= -1;
@@ -726,7 +726,7 @@ double Integral::Trapezoid3S(int n, double oldSum, int stepNumber)
 
         if (!flag)
             if (stepNumber >= romberg_ - 1)
-                if ((resultSum >= smallSum && smallSum > 0) || (resultSum <= smallSum && smallSum < 0))
+                if (std::abs(resultSum) >= std::abs(smallSum))
                 {
                     functionSum = functionValue1 + functionValue2;
 
@@ -887,7 +887,7 @@ Integral::InterpolationResults Integral::Interpolate(int start, double x)
 
 double Integral::RombergIntegrateClosed()
 {
-    double k = 1;
+    int k = 1;
     double n = 1;
     double error, result, value;
     Integral::InterpolationResults interpolation_results;
@@ -1236,7 +1236,7 @@ void Integral::RefineUpperLimit(double result)
     if (flow > 0)
     {
         std::swap(xlow, xhi);
-        std::swap(flow, fhi);
+        // std::swap(flow, fhi);
     }
 
     deltaX   = max_ - min_;
@@ -1263,11 +1263,11 @@ void Integral::RefineUpperLimit(double result)
         if (f < 0)
         {
             xlow = currentX;
-            flow = f;
+            // flow = f;
         } else
         {
             xhi = currentX;
-            fhi = f;
+            // fhi = f;
         }
 
         if (((currentX - xhi) * df - f) * ((currentX - xlow) * df - f) > 0 || fabs(2 * f) > fabs(deltaOld * df))
