@@ -38,6 +38,13 @@ photo_q2 = [
     pp.Parametrization.Photonuclear.RenoSarcevicSu
 ]
 
+photo_q2_interpol = [
+    pp.Parametrization.Photonuclear.AbramowiczLevinLevyMaor91Interpolant,
+    pp.Parametrization.Photonuclear.AbramowiczLevinLevyMaor97Interpolant,
+    pp.Parametrization.Photonuclear.ButkevichMikhailovInterpolant,
+    pp.Parametrization.Photonuclear.RenoSarcevicSuInterpolant
+]
+
 shadows = [
     pp.Parametrization.Photonuclear.ShadowDuttaRenoSarcevicSeckel(),
     pp.Parametrization.Photonuclear.ShadowButkevichMikhailov()
@@ -48,9 +55,9 @@ energies = np.logspace(4, 13, num=10)
 interpoldef = pp.InterpolationDef()
 
 
-def create_table_dEdx():
+def create_table_dEdx(interpolate=False):
 
-    with open("Photo_Real_dEdx.txt", "a") as f:
+    with open("Photo_Real_dEdx{}.txt".format("_interpol" if interpolate else ""), "a") as f:
 
         for particle in particle_defs:
             for medium in mediums:
@@ -66,11 +73,14 @@ def create_table_dEdx():
                                     multiplier,
                                     hard)
 
-                                Photo_Int = pp.CrossSection.PhotoIntegral(photo)
+                                if interpolate:
+                                    xsection = pp.CrossSection.PhotoInterpolant(photo, interpoldef)
+                                else:
+                                    xsection = pp.CrossSection.PhotoIntegral(photo)
 
                                 buf = [""]
 
-                                dEdx = Photo_Int.calculate_dEdx(energy)
+                                dEdx = xsection.calculate_dEdx(energy)
 
                                 buf.append(particle.name)
                                 buf.append(medium.name)
@@ -87,9 +97,9 @@ def create_table_dEdx():
                                 f.write("\t".join(buf))
 
 
-def create_table_dNdx():
+def create_table_dNdx(interpolate=False):
 
-    with open("Photo_Real_dNdx.txt", "a") as f:
+    with open("Photo_Real_dNdx{}.txt".format("_interpol" if interpolate else ""), "a") as f:
 
         for particle in particle_defs:
             for medium in mediums:
@@ -105,11 +115,14 @@ def create_table_dNdx():
                                     multiplier,
                                     hard)
 
-                                Photo_Int = pp.CrossSection.PhotoIntegral(photo)
+                                if interpolate:
+                                    xsection = pp.CrossSection.PhotoInterpolant(photo, interpoldef)
+                                else:
+                                    xsection = pp.CrossSection.PhotoIntegral(photo)
 
                                 buf = [""]
 
-                                dNdx = Photo_Int.calculate_dNdx(energy)
+                                dNdx = xsection.calculate_dNdx(energy)
 
                                 buf.append(particle.name)
                                 buf.append(medium.name)
@@ -126,11 +139,11 @@ def create_table_dNdx():
                                 f.write("\t".join(buf))
 
 
-def create_table_dNdx_rnd():
+def create_table_dNdx_rnd(interpolate=False):
 
     pp.RandomGenerator.get().set_seed(1234)
 
-    with open("Photo_Real_dNdx_rnd.txt", "a") as f:
+    with open("Photo_Real_dNdx_rnd{}.txt".format("_interpol" if interpolate else ""), "a") as f:
 
         for particle in particle_defs:
             for medium in mediums:
@@ -147,11 +160,14 @@ def create_table_dNdx_rnd():
                                     multiplier,
                                     hard)
 
-                                Photo_Int = pp.CrossSection.PhotoIntegral(photo)
+                                if interpolate:
+                                    xsection = pp.CrossSection.PhotoInterpolant(photo, interpoldef)
+                                else:
+                                    xsection = pp.CrossSection.PhotoIntegral(photo)
 
                                 buf = [""]
 
-                                dNdx = Photo_Int.calculate_dNdx_rnd(energy, rnd)
+                                dNdx = xsection.calculate_dNdx_rnd(energy, rnd)
 
                                 buf.append(particle.name)
                                 buf.append(medium.name)
@@ -169,11 +185,11 @@ def create_table_dNdx_rnd():
                                 f.write("\t".join(buf))
 
 
-def create_table_stochastic_loss():
+def create_table_stochastic_loss(interpolate=False):
 
     pp.RandomGenerator.get().set_seed(1234)
 
-    with open("Photo_Real_e.txt", "a") as f:
+    with open("Photo_Real_e{}.txt".format("_interpol" if interpolate else ""), "a") as f:
 
         for particle in particle_defs:
             for medium in mediums:
@@ -191,11 +207,14 @@ def create_table_stochastic_loss():
                                     multiplier,
                                     hard)
 
-                                Photo_Int = pp.CrossSection.PhotoIntegral(photo)
+                                if interpolate:
+                                    xsection = pp.CrossSection.PhotoInterpolant(photo, interpoldef)
+                                else:
+                                    xsection = pp.CrossSection.PhotoIntegral(photo)
 
                                 buf = [""]
 
-                                stochastic_loss = Photo_Int.calculate_stochastic_loss(energy, rnd1, rnd2)
+                                stochastic_loss = xsection.calculate_stochastic_loss(energy, rnd1, rnd2)
 
                                 buf.append(particle.name)
                                 buf.append(medium.name)
@@ -214,29 +233,45 @@ def create_table_stochastic_loss():
                                 f.write("\t".join(buf))
 
 
-def create_table_dEdx_Q2():
+def create_table_dEdx_Q2(interpolate=False):
 
-    with open("Photo_Q2_dEdx.txt", "a") as f:
+    if interpolate:
+        q2 = photo_q2_interpol
+    else:
+        q2 = photo_q2
+
+    with open("Photo_Q2_dEdx{}.txt".format("_interpol" if interpolate else ""), "a") as f:
 
         for particle in particle_defs:
             for medium in mediums:
                 for cut in cuts:
                     for shadow in shadows:
                         for energy in energies:
-                            for parametrization in photo_q2:
+                            for parametrization in q2:
 
-                                photo = parametrization(
-                                    particle,
-                                    medium,
-                                    cut,
-                                    multiplier,
-                                    shadow)
+                                if interpolate:
+                                    photo = parametrization(
+                                        particle,
+                                        medium,
+                                        cut,
+                                        multiplier,
+                                        shadow,
+                                        interpoldef)
 
-                                Photo_Int = pp.CrossSection.PhotoIntegral(photo)
+                                    xsection = pp.CrossSection.PhotoInterpolant(photo, interpoldef)
+                                else:
+                                    photo = parametrization(
+                                        particle,
+                                        medium,
+                                        cut,
+                                        multiplier,
+                                        shadow)
+
+                                    xsection = pp.CrossSection.PhotoIntegral(photo)
 
                                 buf = [""]
 
-                                dEdx = Photo_Int.calculate_dEdx(energy)
+                                dEdx = xsection.calculate_dEdx(energy)
 
                                 buf.append(particle.name)
                                 buf.append(medium.name)
@@ -253,29 +288,45 @@ def create_table_dEdx_Q2():
                                 f.write("\t".join(buf))
 
 
-def create_table_dNdx_Q2():
+def create_table_dNdx_Q2(interpolate=False):
 
-    with open("Photo_Q2_dNdx.txt", "a") as f:
+    if interpolate:
+        q2 = photo_q2_interpol
+    else:
+        q2 = photo_q2
+
+    with open("Photo_Q2_dNdx{}.txt".format("_interpol" if interpolate else ""), "a") as f:
 
         for particle in particle_defs:
             for medium in mediums:
                 for cut in cuts:
                     for shadow in shadows:
                         for energy in energies:
-                            for parametrization in photo_q2:
+                            for parametrization in q2:
 
-                                photo = parametrization(
-                                    particle,
-                                    medium,
-                                    cut,
-                                    multiplier,
-                                    shadow)
+                                if interpolate:
+                                    photo = parametrization(
+                                        particle,
+                                        medium,
+                                        cut,
+                                        multiplier,
+                                        shadow,
+                                        interpoldef)
 
-                                Photo_Int = pp.CrossSection.PhotoIntegral(photo)
+                                    xsection = pp.CrossSection.PhotoInterpolant(photo, interpoldef)
+                                else:
+                                    photo = parametrization(
+                                        particle,
+                                        medium,
+                                        cut,
+                                        multiplier,
+                                        shadow)
+
+                                    xsection = pp.CrossSection.PhotoIntegral(photo)
 
                                 buf = [""]
 
-                                dNdx = Photo_Int.calculate_dNdx(energy)
+                                dNdx = xsection.calculate_dNdx(energy)
 
                                 buf.append(particle.name)
                                 buf.append(medium.name)
@@ -292,9 +343,14 @@ def create_table_dNdx_Q2():
                                 f.write("\t".join(buf))
 
 
-def create_table_dNdx_rnd_Q2():
+def create_table_dNdx_rnd_Q2(interpolate=False):
 
-    with open("Photo_Q2_dNdx_rnd.txt", "a") as f:
+    if interpolate:
+        q2 = photo_q2_interpol
+    else:
+        q2 = photo_q2
+
+    with open("Photo_Q2_dNdx_rnd{}.txt".format("_interpol" if interpolate else ""), "a") as f:
 
         for particle in particle_defs:
             for medium in mediums:
@@ -302,20 +358,31 @@ def create_table_dNdx_rnd_Q2():
                     for shadow in shadows:
                         for energy in energies:
                             rnd = pp.RandomGenerator.get().random_double()
-                            for parametrization in photo_q2:
+                            for parametrization in q2:
 
-                                photo = parametrization(
-                                    particle,
-                                    medium,
-                                    cut,
-                                    multiplier,
-                                    shadow)
+                                if interpolate:
+                                    photo = parametrization(
+                                        particle,
+                                        medium,
+                                        cut,
+                                        multiplier,
+                                        shadow,
+                                        interpoldef)
 
-                                Photo_Int = pp.CrossSection.PhotoIntegral(photo)
+                                    xsection = pp.CrossSection.PhotoInterpolant(photo, interpoldef)
+                                else:
+                                    photo = parametrization(
+                                        particle,
+                                        medium,
+                                        cut,
+                                        multiplier,
+                                        shadow)
+
+                                    xsection = pp.CrossSection.PhotoIntegral(photo)
 
                                 buf = [""]
 
-                                dNdx = Photo_Int.calculate_dNdx_rnd(energy, rnd)
+                                dNdx = xsection.calculate_dNdx_rnd(energy, rnd)
 
                                 buf.append(particle.name)
                                 buf.append(medium.name)
@@ -333,9 +400,14 @@ def create_table_dNdx_rnd_Q2():
                                 f.write("\t".join(buf))
 
 
-def create_table_stochastic_loss_Q2():
+def create_table_stochastic_loss_Q2(interpolate=False):
 
-    with open("Photo_Q2_e.txt", "a") as f:
+    if interpolate:
+        q2 = photo_q2_interpol
+    else:
+        q2 = photo_q2
+
+    with open("Photo_Q2_e{}.txt".format("_interpol" if interpolate else ""), "a") as f:
 
         for particle in particle_defs:
             for medium in mediums:
@@ -344,20 +416,31 @@ def create_table_stochastic_loss_Q2():
                         for energy in energies:
                             rnd1 = pp.RandomGenerator.get().random_double()
                             rnd2 = pp.RandomGenerator.get().random_double()
-                            for parametrization in photo_q2:
+                            for parametrization in q2:
 
-                                photo = parametrization(
-                                    particle,
-                                    medium,
-                                    cut,
-                                    multiplier,
-                                    shadow)
+                                if interpolate:
+                                    photo = parametrization(
+                                        particle,
+                                        medium,
+                                        cut,
+                                        multiplier,
+                                        shadow,
+                                        interpoldef)
 
-                                Photo_Int = pp.CrossSection.PhotoIntegral(photo)
+                                    xsection = pp.CrossSection.PhotoInterpolant(photo, interpoldef)
+                                else:
+                                    photo = parametrization(
+                                        particle,
+                                        medium,
+                                        cut,
+                                        multiplier,
+                                        shadow)
+
+                                    xsection = pp.CrossSection.PhotoIntegral(photo)
 
                                 buf = [""]
 
-                                stochastic_loss = Photo_Int.calculate_stochastic_loss(energy, rnd1, rnd2)
+                                stochastic_loss = xsection.calculate_stochastic_loss(energy, rnd1, rnd2)
 
                                 buf.append(particle.name)
                                 buf.append(medium.name)
@@ -377,14 +460,25 @@ def create_table_stochastic_loss_Q2():
 
 
 def main():
-    create_table_dEdx()
-    create_table_dNdx()
-    create_table_dNdx_rnd()
-    create_table_stochastic_loss()
-    create_table_dEdx_Q2()
-    create_table_dNdx_Q2()
-    create_table_dNdx_rnd_Q2()
-    create_table_stochastic_loss_Q2()
+    # Integrate
+    # create_table_dEdx()
+    # create_table_dNdx()
+    # create_table_dNdx_rnd()
+    # create_table_stochastic_loss()
+    # create_table_dEdx_Q2()
+    # create_table_dNdx_Q2()
+    # create_table_dNdx_rnd_Q2()
+    # create_table_stochastic_loss_Q2()
+
+    # Interpolate
+    create_table_dEdx(True)
+    create_table_dNdx(True)
+    create_table_dNdx_rnd(True)
+    create_table_stochastic_loss(True)
+    create_table_dEdx_Q2(True)
+    create_table_dNdx_Q2(True)
+    create_table_dNdx_rnd_Q2(True)
+    create_table_stochastic_loss_Q2(True)
 
 
 if __name__ == "__main__":
