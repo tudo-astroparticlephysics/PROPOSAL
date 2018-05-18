@@ -179,10 +179,19 @@ TEST(Scattering, Scatter)
 
         Medium* medium = MediumFactory::Get().CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
-        Utility utility(particle_def, *medium, ecuts, Utility::Definition(), InterpolationDef());
 
-        Scattering* scattering =
-            ScatteringFactory::Get().CreateScattering(parametrization, particle, utility, InterpolationDef());
+        Scattering* scattering = NULL;
+
+        if (parametrization == "HighlandIntegral")
+        {
+            Utility utility(particle_def, *medium, ecuts, Utility::Definition(), InterpolationDef());
+            scattering = ScatteringFactory::Get().CreateScattering(parametrization, particle, utility, InterpolationDef());
+        }
+        else
+        {
+            Utility utility(particle_def, *medium, ecuts, Utility::Definition());
+            scattering = ScatteringFactory::Get().CreateScattering(parametrization, particle, utility, InterpolationDef());
+        }
 
         while (energy_previous < energy_init)
         {
