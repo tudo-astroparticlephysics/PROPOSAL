@@ -10,11 +10,10 @@ def create_table():
 
     statistics = 100
 
-    pp.RandomGenerator.get().set_seed(0)
-
     prop = pp.Propagator(
         pp.MuMinusDef.get(),
-        "../../resources/config_ice.json"
+        # "../../resources/config_ice.json"
+        "resources/config_ice.json"
     )
 
     mu = prop.particle
