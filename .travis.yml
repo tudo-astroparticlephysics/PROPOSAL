@@ -125,7 +125,7 @@ before_script:
 
 script:
     - bin/example
-    - travis_wait 60 ctest --verbose
+    - travis_wait 60 ctest -j2 --verbose
 
 notifications:
     email: false
