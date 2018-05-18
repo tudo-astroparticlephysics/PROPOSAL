@@ -245,7 +245,6 @@ TEST(Propagation, particle_type)
     std::vector<Vector3D> positions;
     std::vector<Vector3D> directions;
 
-    RandomGenerator::Get().SetSeed(0);
 
     // Buffer to read data in
 
