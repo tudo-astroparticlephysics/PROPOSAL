@@ -82,6 +82,13 @@ public:
      */
     virtual void SetRandomNumberGenerator(boost::function<double()>& f);
 
+    /** @brief Set a the default random number generator
+     *
+     * The default random number generator is the
+     * boost mersenne twister boost::mt19937.
+     */
+    virtual void SetDefaultRandomNumberGenerator();
+
 private:
     RandomGenerator();
     virtual ~RandomGenerator();

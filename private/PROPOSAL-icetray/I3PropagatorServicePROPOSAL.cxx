@@ -31,15 +31,32 @@ using namespace PROPOSAL;
 
 // ------------------------------------------------------------------------- //
 I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(std::string configfile)
-    : config_file_(configfile.empty() ? GetDefaultConfigFile() : configfile)
+    : I3PropagatorService()
+    , config_file_(PROPOSAL::Helper::ResolvePath(configfile))
     , proposal_service_()
 {
+    if (config_file_.empty())
+    {
+        config_file_ = GetDefaultConfigFile();
+    }
+
+    log_info("Using configuration file: \"%s\"", config_file_.c_str());
+
     proposal_service_.RegisterPropagator(Propagator(MuMinusDef::Get(), config_file_));
     proposal_service_.RegisterPropagator(Propagator(TauMinusDef::Get(), config_file_));
+
+    log_info("Propagator created for muons and taus");
 }
 
 // ------------------------------------------------------------------------- //
-I3PropagatorServicePROPOSAL::~I3PropagatorServicePROPOSAL() {}
+I3PropagatorServicePROPOSAL::~I3PropagatorServicePROPOSAL()
+{
+    if (rng_)
+    {
+        rng_ = NULL;
+        PROPOSAL::RandomGenerator::Get().SetDefaultRandomNumberGenerator();
+    }
+}
 
 // ------------------------------------------------------------------------- //
 std::string I3PropagatorServicePROPOSAL::GetDefaultConfigFile()
@@ -57,7 +74,6 @@ void I3PropagatorServicePROPOSAL::SetRandomNumberGenerator(I3RandomServicePtr ra
 {
     rng_                        = random;
     boost::function<double()> f = boost::bind(&I3RandomService::Uniform, random, 0, 1);
-
     PROPOSAL::RandomGenerator::Get().SetRandomNumberGenerator(f);
 }
 
@@ -120,7 +136,7 @@ I3MMCTrackPtr I3PropagatorServicePROPOSAL::propagate(I3Particle& p, vector<I3Par
 {
     Particle particle = I3PROPOSALParticleConverter::GeneratePROPOSALParticle(p);
 
-    // std::vector<DynamicData*> secondaries = proposal_.Propagate();
+
     std::vector<DynamicData*> secondaries = proposal_service_.Propagate(particle);
 
     // get the propagated length of the particle
