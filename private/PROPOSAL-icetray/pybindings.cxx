@@ -12,14 +12,12 @@ I3_PYTHON_MODULE(PROPOSAL)
     import("icecube.dataclasses");
     import("icecube.sim_services");
 
-
     class_<I3PropagatorServicePROPOSAL,
            boost::shared_ptr<I3PropagatorServicePROPOSAL>,
            bases<I3PropagatorService>,
            boost::noncopyable>(
         "I3PropagatorServicePROPOSAL",
         init<std::string>((arg("config_file") = I3PropagatorServicePROPOSAL::GetDefaultConfigFile()),
-                          ":param particle: Parametrization of the bremsstrahlung cross-section to use\n"
                           ":param config_file: Path to the config file\n"))
         .def("register_particletype", &I3PropagatorServicePROPOSAL::RegisterParticleType);
 

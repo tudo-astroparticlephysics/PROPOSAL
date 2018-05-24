@@ -14,7 +14,7 @@ import icecube.PROPOSAL
 
 # (mdunsch): Changed config file for PROPOSAL. Tue 2017/01/31
 default_media_definition = os.path.expandvars(
-    "$I3_BUILD/PROPOSAL/resources/config.json")
+    "$I3_BUILD/PROPOSAL/resources/config_icesim.json")
 
 
 @icecube.icetray.traysegment
@@ -136,30 +136,30 @@ def make_propagator(
         Nuclear shadowing parametrization to use
 
     """
-    if not hasattr(icecube.PROPOSAL.CrossSectionParametrization,
-                   bremsstrahlung):
-        bremsstrahlung = "BremsKelnerKokoulinPetrukhin"
-
-    bremsstrahlung_parametrization = getattr(
-        icecube.PROPOSAL.CrossSectionParametrization,
-        bremsstrahlung)
-
-    if not hasattr(icecube.PROPOSAL.CrossSectionParametrization,
-                   photonuclear):
-        photonuclear = "PhotoAbramowiczLevinLevyMaor97ShadowButkevich"
-
-    photonuclear_parametrization = getattr(
-        icecube.PROPOSAL.CrossSectionParametrization,
-        photonuclear)
+    # if not hasattr(icecube.PROPOSAL.CrossSectionParametrization,
+    #                bremsstrahlung):
+    #     bremsstrahlung = "BremsKelnerKokoulinPetrukhin"
+    #
+    # bremsstrahlung_parametrization = getattr(
+    #     icecube.PROPOSAL.CrossSectionParametrization,
+    #     bremsstrahlung)
+    #
+    # if not hasattr(icecube.PROPOSAL.CrossSectionParametrization,
+    #                photonuclear):
+    #     photonuclear = "PhotoAbramowiczLevinLevyMaor97ShadowButkevich"
+    #
+    # photonuclear_parametrization = getattr(
+    #     icecube.PROPOSAL.CrossSectionParametrization,
+    #     photonuclear)
 
 
     propagator_service = icecube.PROPOSAL.I3PropagatorServicePROPOSAL(
-        mediadef=media_definition,
-        cylinderRadius=cylinder_radius*icecube.icetray.I3Units.m,
-        cylinderHeight=cylinder_length*icecube.icetray.I3Units.m,
-        type=particle_type,
-        bremsstrahlungParametrization=bremsstrahlung_parametrization,
-        photonuclearParametrization=photonuclear_parametrization
+        config_file=media_definition,
+        # cylinderRadius=cylinder_radius*icecube.icetray.I3Units.m,
+        # cylinderHeight=cylinder_length*icecube.icetray.I3Units.m,
+        # type=particle_type,
+        # bremsstrahlungParametrization=bremsstrahlung_parametrization,
+        # photonuclearParametrization=photonuclear_parametrization
         )
 
     return propagator_service
