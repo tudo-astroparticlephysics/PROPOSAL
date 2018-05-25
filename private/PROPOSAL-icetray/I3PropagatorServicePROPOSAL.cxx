@@ -30,10 +30,12 @@ using namespace PROPOSAL;
 
 
 // ------------------------------------------------------------------------- //
-I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(std::string configfile)
+I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(std::string configfile, I3Particle::ParticleType final_loss, double distance)
     : I3PropagatorService()
     , config_file_(PROPOSAL::Helper::ResolvePath(configfile))
     , proposal_service_()
+    , final_stochastic_loss_(final_loss)
+    , distance_to_propagate_(distance)
 {
     if (config_file_.empty())
     {
@@ -43,7 +45,9 @@ I3PropagatorServicePROPOSAL::I3PropagatorServicePROPOSAL(std::string configfile)
     log_info("Using configuration file: \"%s\"", config_file_.c_str());
 
     proposal_service_.RegisterPropagator(Propagator(MuMinusDef::Get(), config_file_));
+    proposal_service_.RegisterPropagator(Propagator(MuPlusDef::Get(), config_file_));
     proposal_service_.RegisterPropagator(Propagator(TauMinusDef::Get(), config_file_));
+    proposal_service_.RegisterPropagator(Propagator(TauPlusDef::Get(), config_file_));
 
     log_info("Propagator created for muons and taus");
 }
@@ -58,7 +62,7 @@ I3PropagatorServicePROPOSAL::~I3PropagatorServicePROPOSAL()
         // Reset the random nuber generator to default at this place.
         // Reason: Clean up issues with boost::python objects and the python runtime
         // itself.
-        PROPOSAL::RandomGenerator::Get().SetDefaultRandomNumberGenerator();
+        // PROPOSAL::RandomGenerator::Get().SetDefaultRandomNumberGenerator();
     }
 }
 
@@ -141,7 +145,7 @@ I3MMCTrackPtr I3PropagatorServicePROPOSAL::propagate(I3Particle& p, vector<I3Par
     Particle particle = I3PROPOSALParticleConverter::GeneratePROPOSALParticle(p);
 
 
-    std::vector<DynamicData*> secondaries = proposal_service_.Propagate(particle);
+    std::vector<DynamicData*> secondaries = proposal_service_.Propagate(particle, distance_to_propagate_);
 
     // get the propagated length of the particle
     double length = particle.GetPropagatedDistance();
@@ -181,6 +185,15 @@ I3MMCTrackPtr I3PropagatorServicePROPOSAL::propagate(I3Particle& p, vector<I3Par
         // this is not the particle you're looking for
         // move along...and add it to the daughter list
         daughters.push_back(I3PROPOSALParticleConverter::GenerateI3Particle(*secondaries.at(i)));
+    }
+
+    if (final_stochastic_loss_ != I3Particle::unknown)
+    {
+        I3Particle i3_particle = I3PROPOSALParticleConverter::GenerateI3Particle(particle);
+        i3_particle.SetType(final_stochastic_loss_);
+        i3_particle.SetEnergy(particle.GetEnergy() - particle.GetParticleDef().mass);
+
+        daughters.push_back(i3_particle);
     }
 
     Output::getInstance().ClearSecondaryVector(); // Tomasz
