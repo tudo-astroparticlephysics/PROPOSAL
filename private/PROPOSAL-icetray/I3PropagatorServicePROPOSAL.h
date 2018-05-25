@@ -35,7 +35,12 @@ public:
     SET_LOGGER("I3PropagatorService");
 
 public:
-    I3PropagatorServicePROPOSAL(std::string configfile = "");
+
+    I3PropagatorServicePROPOSAL(
+        std::string configfile = "",
+        I3Particle::ParticleType final_loss = I3Particle::unknown,
+        double distance = 1e20
+    );
 
     virtual ~I3PropagatorServicePROPOSAL();
 
@@ -54,6 +59,9 @@ private:
     I3RandomServicePtr rng_;
     std::string config_file_;
     PropagatorService proposal_service_;
+
+    I3Particle::ParticleType final_stochastic_loss_;
+    double distance_to_propagate_;
 
     // default, assignment, and copy constructor declared private
     // I3PropagatorServicePROPOSAL();

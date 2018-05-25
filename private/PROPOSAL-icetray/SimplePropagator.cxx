@@ -23,7 +23,10 @@ SimplePropagator::SimplePropagator(I3Particle::ParticleType pt,
                                    const std::string& medium,
                                    double ecut,
                                    double vcut,
-                                   double rho)
+                                   double rho,
+                                   I3Particle::ParticleType final_loss)
+    : propagator_(NULL)
+    , final_stochastic_loss_(final_loss)
 {
     std::ostringstream prefix;
     prefix << getenv("I3_BUILD") << "/MuonGun/resources/tables/icecube";
@@ -32,14 +35,14 @@ SimplePropagator::SimplePropagator(I3Particle::ParticleType pt,
 
     PROPOSAL::Sector::Definition sec_def;
 
-    sec_def.stopping_decay              = true;
+    sec_def.stopping_decay              = final_stochastic_loss_ == I3Particle::unknown;
     sec_def.scattering_model            = PROPOSAL::ScatteringFactory::Moliere;
     sec_def.do_exact_time_calculation   = true;
     sec_def.do_continuous_randomization = ecut < 0;
 
     // Medium
 
-    sec_def.SetMedium(*PROPOSAL::MediumFactory::Get().CreateMedium(medium, 1.0));
+    sec_def.SetMedium(*PROPOSAL::MediumFactory::Get().CreateMedium(medium, rho));
 
     // Geometry
 
@@ -67,8 +70,7 @@ SimplePropagator::SimplePropagator(I3Particle::ParticleType pt,
 
     // Init new propagator
 
-    // TODO(mario): Check for muon, tau Mon 2017/11/06
-    propagator_ = new PROPOSAL::Propagator(PROPOSAL::MuMinusDef::Get(),
+    propagator_ = new PROPOSAL::Propagator(I3PROPOSALParticleConverter::GeneratePROPOSALType(pt),
                                            boost::assign::list_of<PROPOSAL::Sector::Definition>(sec_def),
                                            detector,
                                            interpolation_def);
@@ -98,7 +100,7 @@ I3Particle SimplePropagator::propagate(const I3Particle& p,
 
     double x, y, z, theta, phi;
 
-    PROPOSAL::Particle pp = propagator_->GetParticle();
+    PROPOSAL::Particle& pp = propagator_->GetParticle();
     pp.SetParentParticleId(0);
     pp.SetParticleId(0);
 
@@ -120,7 +122,7 @@ I3Particle SimplePropagator::propagate(const I3Particle& p,
     pp.SetTime(p.GetTime() / I3Units::second);
     pp.SetPropagatedDistance(p.GetLength() / I3Units::cm);
 
-    propagator_->Propagate(distance / I3Units::cm);
+    std::vector<PROPOSAL::DynamicData*> history = propagator_->Propagate(distance / I3Units::cm);
 
     x = pp.GetPosition().GetX() * I3Units::cm;
     y = pp.GetPosition().GetY() * I3Units::cm;
@@ -139,10 +141,19 @@ I3Particle SimplePropagator::propagate(const I3Particle& p,
     // Tomasz
     if (losses)
     {
-        std::vector<PROPOSAL::DynamicData*> history = Output::getInstance().GetSecondarys();
+        // std::vector<PROPOSAL::DynamicData*> history = Output::getInstance().GetSecondarys();
         for (unsigned int i = 0; i < history.size(); i++)
         {
             losses->push_back(I3PROPOSALParticleConverter::GenerateI3Particle(*history[i]));
+        }
+
+        if (final_stochastic_loss_ != I3Particle::unknown)
+        {
+            I3Particle i3_particle = I3PROPOSALParticleConverter::GenerateI3Particle(pp);
+            i3_particle.SetType(final_stochastic_loss_);
+            i3_particle.SetEnergy(pp.GetEnergy() - pp.GetParticleDef().mass);
+
+            losses->push_back(i3_particle);
         }
     }
 

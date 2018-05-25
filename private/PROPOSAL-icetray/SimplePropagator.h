@@ -38,7 +38,8 @@ public:
                      const std::string& med        = "ice",
                      double ecut                   = -1,
                      double vcut                   = -1,
-                     double rho                    = 1.0);
+                     double rho                    = 1.0,
+                     I3Particle::ParticleType      = I3Particle::unknown);
     ~SimplePropagator();
     /**
      * @param[in] p        Muon to propagate
@@ -70,4 +71,5 @@ public:
 
 private:
     PROPOSAL::Propagator* propagator_;
+    I3Particle::ParticleType final_stochastic_loss_;
 };
