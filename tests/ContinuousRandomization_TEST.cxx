@@ -10,36 +10,6 @@
 using namespace std;
 using namespace PROPOSAL;
 
-class RndFromFile
-{
-private:
-    double rnd_;
-    string Path_;
-    ifstream in_;
-
-public:
-    RndFromFile(string Path)
-    {
-        Path_ = Path;
-        in_.open(Path_.c_str());
-        in_ >> rnd_;
-        if (!in_.good())
-            log_warn("less than one rnd_number!");
-    }
-
-    double rnd()
-    {
-        in_ >> rnd_;
-        if (!in_.good())
-        {
-            in_.close();
-            in_.clear();
-            in_.open(Path_.c_str());
-            in_ >> rnd_;
-        }
-        return rnd_;
-    }
-};
 
 ParticleDef getParticleDef(const string& name)
 {
@@ -58,15 +28,8 @@ ParticleDef getParticleDef(const string& name)
 class Test_Utilities : public ::testing::Test
 {
 protected:
-    Test_Utilities()
-    {
-        std::cout << std::endl;
-        std::cout << "new created" << std::endl;
-        std::cout << std::endl;
-    }
-
+    Test_Utilities() {}
     virtual ~Test_Utilities() {}
-    // virtual void TearDown() {}
 
     static Utility a;
     static Utility b;
@@ -74,9 +37,6 @@ protected:
 
 Utility Test_Utilities::a(MuMinusDef::Get(), Ice(), EnergyCutSettings(), Utility::Definition(), InterpolationDef());
 Utility Test_Utilities::b(TauMinusDef::Get(), Ice(), EnergyCutSettings(), Utility::Definition(), InterpolationDef());
-
-// Utility utility_a(MuMinusDef::Get(), Ice(), EnergyCutSettings(), Utility::Definition(), InterpolationDef());
-// Utility utility_b(TauMinusDef::Get(), Ice(), EnergyCutSettings(), Utility::Definition(), InterpolationDef());
 
 TEST_F(Test_Utilities, Comparison_equal)
 {
@@ -133,72 +93,6 @@ TEST_F(Test_Utilities, Copyconstructor2)
 
     EXPECT_TRUE(A == B);
 }
-
-// TEST(ContinuousRandomization , Randomize ) {
-
-//    ifstream in;
-//    in.open("bin/TestFiles/ContinuousRandomization.txt");
-
-//    char firstLine[256];
-//    in.getline(firstLine,256);
-//    double initial_energy;
-//    double final_energy;
-//    double randomized_energy;
-//    double randomized_energy_new;
-//    double vcut;
-//    double ecut;
-//    string mediumName;
-//    string particleName;
-//    double rnd;
-//    cout.precision(16);
-
-//    double max_diff = 0;
-//    double diff = 0;
-//    double sum_diff = 0;
-//    int counter = 0;
-
-//    while(in.good())
-//    {
-//        in>>rnd>>particleName>>mediumName>>ecut>>vcut>>initial_energy>>final_energy>>randomized_energy;
-//        counter++;
-//        Medium *medium = new Medium(Medium::GetTypeFromName(mediumName),1.);
-//        Particle *particle = new Particle(PROPOSALParticle::GetTypeFromName(particleName),1.,1.,1,.20,20,1e5,10);
-//        EnergyCutSettings *cut_settings = new EnergyCutSettings(ecut,vcut);
-
-//        vector<CrossSections*> crosssections;
-
-//        crosssections.resize(4);
-//        crosssections.at(0) = new Ionization(particle, medium, cut_settings);
-//        crosssections.at(1) = new Bremsstrahlung(particle, medium, cut_settings);
-//        crosssections.at(2) = new Photonuclear(particle, medium, cut_settings);
-//        crosssections.at(3) = new Epairproduction(particle, medium, cut_settings);
-
-//        ContinuousRandomization * cont = new ContinuousRandomization(particle,medium,crosssections);
-//        randomized_energy_new = cont->Randomize(initial_energy,final_energy,rnd);
-
-//        diff= abs(1 - randomized_energy_new/randomized_energy);
-//        sum_diff += diff;
-
-//        ASSERT_NEAR(randomized_energy_new, randomized_energy, 1e-1*randomized_energy);
-//        cout<<randomized_energy_new<<"\t"<<randomized_energy<<"\t"<<diff<<endl;
-//        if(diff>max_diff)
-//        {
-//            max_diff = diff;
-//        }
-//        for(unsigned int i = 0 ; i < crosssections.size() ; i++){
-
-//            delete crosssections.at(i);
-//        }
-
-//        delete cut_settings;
-//        delete medium;
-//        delete particle;
-//        delete cont;
-//    }
-//    cout<<"Maxi_diff "<<max_diff<<endl;
-//    cout<<"Average diff "<<sum_diff/counter<<endl;
-
-//}
 
 TEST(ContinuousRandomization, Randomize_interpol)
 {
