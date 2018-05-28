@@ -215,8 +215,6 @@ TEST(Sector, Propagate)
 
         while (energy_previous < energy_init)
         {
-            std::cout << particleName << "\t" << mediumName << "\t" << energy_init << "\t" << energy_previous
-                      << std::endl;
             energy_previous = energy_init;
             particle.SetEnergy(energy_init);
             particle.SetDirection(Vector3D(1, 0, 0));
@@ -228,7 +226,6 @@ TEST(Sector, Propagate)
         }
 
         delete medium;
-        cout << "ready" << endl;
     }
 }
 
