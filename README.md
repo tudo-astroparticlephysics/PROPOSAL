@@ -31,8 +31,6 @@ implemented for different parametrizations.
 The full Paper can be found
 [here](http://www.sciencedirect.com/science/article/pii/S0010465513001355)
 
-This is the restructured PROPOSAL Version 2, which should run in the IceCube Simulation.
-
 PROPOSAL was tested on Mac OS X V. 10.7.5, Ubuntu 12.04, SUSE Enterprise 10 and PCLinuxos. Since
 all these OS are UNIX based it should be fine to run and compile PROPOSAL on a UNIX based OS.
 
@@ -199,11 +197,11 @@ Modifcations of the LGPL [License](LICENSE.md):
 
 2. The user should report any bugs/errors or improvments to the current maintainer of PROPOSAL.
 
-## Authors ##
+## Developers and Maintainers ##
 
 *Mario Dunsch*, *Jan Soedingrekso*
 
-## Former Developer and Maintainer ##
+## Former Developers and Maintainers ##
 
 *Jan-Hendrick Koehne*, *Tomasz Fuchs*
 
