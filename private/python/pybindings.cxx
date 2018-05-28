@@ -21,7 +21,7 @@
 #define COMPONENT_DEF(cls)                                                                                             \
     class_<Components::cls, boost::shared_ptr<Components::cls>, bases<Components::Component> >(#cls, init<double>());
 
-#define MEDIUM_DEF(cls) class_<cls, boost::shared_ptr<cls>, bases<Medium> >(#cls, init<double>());
+#define MEDIUM_DEF(cls) class_<cls, boost::shared_ptr<cls>, bases<Medium> >(#cls, init<double>(arg("density_correction")));
 
 #define BREMS_DEF(cls)                                                                                                 \
     class_<Brems##cls, boost::shared_ptr<Brems##cls>, bases<Bremsstrahlung> >(                                         \
