@@ -64,18 +64,13 @@ resources folder to other IceCube Simulation projects to provide compatibility:
 cp src/PROPOSAL/resources/icesim/MuonGun/MuonPropagator.* src/MuonGun/private/MuonGun/
 cp src/PROPOSAL/resources/icesim/MuonGun/shower_and_propagate.py src/MuonGun/resources/scripts/
 cp src/PROPOSAL/resources/icesim/MuonGun/utils.py src/MuonGun/resources/scripts/
+cp src/PROPOSAL/resources/MuonGun/propagate_muons.py src/MuonGun/resources/scripts/
 cp src/PROPOSAL/resources/icesim/simprod-scripts/PropagateMuons.py src/simprod-scripts/python/segments/
 cp src/PROPOSAL/resources/icesim/clsim/PropagateMuons.py src/clsim/resources/scripts/photonPaths/
 cp src/PROPOSAL/resources/icesim/dataclasses/I3Particle.cxx src/dataclasses/private/dataclasses/physics/
 cp src/PROPOSAL/resources/icesim/dataclasses/I3Particle.h src/dataclasses/public/dataclasses/physics/
 ```
 ---
-
-The following file has not been changed yet:
-
-
-* `cp src/PROPOSAL/resources/MuonGun/propagate_muons.py src/MuonGun/resources/scripts/`
-
 
 ## Usage ##
 
