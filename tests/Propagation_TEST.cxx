@@ -1,7 +1,4 @@
 
-// #include <iostream>
-// #include <string>
-// #include <cmath>
 #include <cmath>
 #include <vector>
 
@@ -118,40 +115,6 @@ TEST(Assignment, Copyconstructor2)
 
     EXPECT_TRUE(prop_a == prop_b);
 }
-
-// TEST(Assignment, AssignmentOperator)
-// {
-//     Sector::Definition sector_def_a;
-//     sector_def_a.location = Sector::ParticleLocation::InsideDetector;
-//     sector_def_a.SetMedium(Water());
-//     sector_def_a.SetGeometry(Sphere());
-//     sector_def_a.scattering_model            = ScatteringFactory::Moliere;
-//     sector_def_a.cut_settings                = EnergyCutSettings();
-//     sector_def_a.do_continuous_randomization = true;
-//
-//     std::vector<Sector::Definition> sec_defs_a;
-//     sec_defs_a.push_back(sector_def_a);
-//
-//     Propagator prop_a(MuMinusDef::Get(), sec_defs_a, Sphere());
-//
-//     // Sector defs differ by the medium
-//     Sector::Definition sector_def_b;
-//     sector_def_b.location = Sector::ParticleLocation::InsideDetector;
-//     sector_def_b.SetMedium(Ice());
-//     sector_def_b.SetGeometry(Sphere());
-//     sector_def_b.scattering_model            = ScatteringFactory::Moliere;
-//     sector_def_b.cut_settings                = EnergyCutSettings();
-//     sector_def_b.do_continuous_randomization = true;
-//
-//     std::vector<Sector::Definition> sec_defs_b;
-//     sec_defs_b.push_back(sector_def_b);
-//
-//     Propagator prop_b(MuMinusDef::Get(), sec_defs_b, Sphere());
-//
-//     prop_b = prop_a;
-//
-//     EXPECT_TRUE(prop_a == prop_b);
-// }
 
 TEST(Propagation, Test_nan)
 {
