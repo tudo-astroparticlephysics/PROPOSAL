@@ -48,6 +48,16 @@ public:
         {
         }
 
+        bool operator==(const IonizationFactory::Definition& def) const
+        {
+            return multiplier == def.multiplier;
+        }
+
+        bool operator!=(const IonizationFactory::Definition& def) const
+        {
+            return !(*this == def);
+        }
+
         double multiplier;
     };
 

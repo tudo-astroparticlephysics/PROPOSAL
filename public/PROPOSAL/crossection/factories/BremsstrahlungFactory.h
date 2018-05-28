@@ -69,6 +69,23 @@ public:
         {
         }
 
+        bool operator==(const BremsstrahlungFactory::Definition& def) const
+        {
+            if (parametrization != def.parametrization)
+                return false;
+            else if (lpm_effect != def.lpm_effect)
+                return false;
+            else if (multiplier != def.multiplier)
+                return false;
+
+            return true;
+        }
+
+        bool operator!=(const BremsstrahlungFactory::Definition& def) const
+        {
+            return !(*this == def);
+        }
+
         Enum parametrization;
         bool lpm_effect;
         double multiplier;
