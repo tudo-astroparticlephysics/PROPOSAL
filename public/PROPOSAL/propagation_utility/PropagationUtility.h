@@ -56,6 +56,9 @@ public:
         EpairProductionFactory::Definition epair_def;
         IonizationFactory::Definition ioniz_def;
 
+        bool operator==(const Utility::Definition& utility_def) const;
+        bool operator!=(const Utility::Definition& utility_def) const;
+
         Definition();
         ~Definition();
     };
