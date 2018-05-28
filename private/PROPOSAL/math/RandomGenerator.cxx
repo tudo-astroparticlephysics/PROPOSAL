@@ -61,6 +61,11 @@ void RandomGenerator::SetRandomNumberGenerator(boost::function<double()>& f)
     random_function = f;
 }
 
+void RandomGenerator::SetDefaultRandomNumberGenerator()
+{
+    random_function = &RandomGenerator::DefaultRandomDouble;
+}
+
 // ------------------------------------------------------------------------- //
 double RandomGenerator::DefaultRandomDouble()
 {
