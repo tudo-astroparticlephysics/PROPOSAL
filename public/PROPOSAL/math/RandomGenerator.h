@@ -32,6 +32,11 @@
 #include <boost/function.hpp>
 #include <boost/random.hpp>
 
+
+#ifdef ICECUBE_PROJECT
+#include <phys-services/I3RandomService.h>
+#endif
+
 namespace PROPOSAL {
 
 // ----------------------------------------------------------------------------
@@ -82,6 +87,10 @@ public:
      */
     virtual void SetRandomNumberGenerator(boost::function<double()>& f);
 
+#ifdef ICECUBE_PROJECT
+    virtual void SetI3RandomNumberGenerator(I3RandomServicePtr random);
+#endif
+
     /** @brief Set a the default random number generator
      *
      * The default random number generator is the
@@ -98,6 +107,9 @@ private:
     static boost::random::mt19937 rng_;
     static boost::variate_generator<boost::mt19937&, boost::uniform_real<> > variate_real;
     boost::function<double()> random_function;
+#ifdef ICECUBE_PROJECT
+    I3RandomService* i3random_gen_;
+#endif
 };
 
 } // namespace PROPOSAL

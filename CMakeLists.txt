@@ -4,6 +4,7 @@ project( PROPOSAL)
 
 
 IF(I3_PROJECTS)
+	add_definitions(-DICECUBE_PROJECT)
     include(cmake/I3_CMakeLists.cmake)
 ELSE(I3_PROJECTS)
     include(cmake/Standalone_CMakeLists.cmake)
