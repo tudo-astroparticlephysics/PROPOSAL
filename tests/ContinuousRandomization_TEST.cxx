@@ -1,8 +1,4 @@
 
-// #include <iostream>
-// #include <string>
-// #include <vector>
-
 #include "gtest/gtest.h"
 
 #include "PROPOSAL/PROPOSAL.h"
