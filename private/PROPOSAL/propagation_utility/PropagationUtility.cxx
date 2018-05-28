@@ -25,6 +25,25 @@ Utility::Definition::Definition()
 {
 }
 
+bool Utility::Definition::operator==(const Utility::Definition& utility_def) const
+{
+    if (brems_def != utility_def.brems_def)
+        return false;
+    else if (photo_def != utility_def.photo_def)
+        return false;
+    else if (epair_def != utility_def.epair_def)
+        return false;
+    else if (ioniz_def != utility_def.ioniz_def)
+        return false;
+
+    return true;
+}
+
+bool Utility::Definition::operator!=(const Utility::Definition& utility_def) const
+{
+    return !(*this == utility_def);
+}
+
 Utility::Definition::~Definition() {}
 
 // ------------------------------------------------------------------------- //

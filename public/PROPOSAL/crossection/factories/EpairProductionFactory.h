@@ -49,6 +49,21 @@ public:
         {
         }
 
+        bool operator==(const EpairProductionFactory::Definition& def) const
+        {
+            if (lpm_effect != def.lpm_effect)
+                return false;
+            else if (multiplier != def.multiplier)
+                return false;
+
+            return true;
+        }
+
+        bool operator!=(const EpairProductionFactory::Definition& def) const
+        {
+            return !(*this == def);
+        }
+
         bool lpm_effect;
         double multiplier;
     };

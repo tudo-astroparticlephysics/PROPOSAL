@@ -82,6 +82,25 @@ public:
         {
         }
 
+        bool operator==(const PhotonuclearFactory::Definition& def) const
+        {
+            if (parametrization != def.parametrization)
+                return false;
+            else if (shadow != def.shadow)
+                return false;
+            else if (hard_component != def.hard_component)
+                return false;
+            else if (multiplier != def.multiplier)
+                return false;
+
+            return true;
+        }
+
+        bool operator!=(const PhotonuclearFactory::Definition& def) const
+        {
+            return !(*this == def);
+        }
+
         Enum parametrization;
         Shadow shadow;
         bool hard_component;

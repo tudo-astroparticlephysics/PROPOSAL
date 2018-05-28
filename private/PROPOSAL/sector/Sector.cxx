@@ -75,8 +75,8 @@ bool Sector::Definition::operator==(const Definition& sector_def) const
         return false;
     else if (location != sector_def.location)
         return false;
-    // else if(utility_def != sector_def.utility_def)
-    //     return false;
+    else if(utility_def != sector_def.utility_def)
+        return false;
     else if (*medium_ != *sector_def.medium_)
         return false;
     else if (*geometry_ != *sector_def.geometry_)
