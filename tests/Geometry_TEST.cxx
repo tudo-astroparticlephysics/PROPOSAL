@@ -861,7 +861,6 @@ TEST(DistanceTo, Cylinder)
             }
             if (particle_radius == radius)
             {
-                // cout<<"TEST "<<distance.first<<"\t"<<distance.second<<"\t"<<inner_radius<<endl;
                 EXPECT_EQ(distance.second, -1);
                 ASSERT_NEAR(distance.first, particle_radius - inner_radius, 1e-8 * (particle_radius - inner_radius));
             }

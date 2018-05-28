@@ -228,8 +228,6 @@ TEST(Propagation, particle_type)
     double energy = 1e8;
 
     in >> statistic >> energy;
-    std::cout << statistic << std::endl;
-    std::cout << energy << std::endl;
 
     Propagator prop_mu(MuMinusDef::Get(), "resources/config_ice.json");
     Particle& mu = prop_mu.GetParticle();
