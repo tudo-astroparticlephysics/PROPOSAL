@@ -1,7 +1,4 @@
 
-// #include <iostream>
-// #include <string>
-
 #include "gtest/gtest.h"
 
 #include "PROPOSAL/PROPOSAL.h"
@@ -160,18 +157,8 @@ TEST(Sector, Propagate)
         std::cerr << "File \"" << filename << "\" not found" << std::endl;
     }
 
-    // char firstLine[256];
-    // in.getline(firstLine,256);
-
     string particleName;
     string mediumName;
-
-    // bool stopping_decay;
-    // bool do_continuous_randomization;
-    // bool do_exact_time_calculation;
-
-    // ScatteringFactory::Enum scattering_model;
-    // Sector::ParticleLocation::Enum location;
 
     Utility::Definition utility_def;
 
@@ -195,8 +182,6 @@ TEST(Sector, Propagate)
             in >> particleName >> mediumName >> ecut >> vcut >> energy_init >> energy_final_stored >> distance;
             first_line = false;
         }
-        // >> do_continuous_randomization >> do_exact_time_calculation
-        // >> stopping_decay;
 
         energy_previous   = -1;
         Particle particle = Particle(getParticleDef(particleName));
@@ -206,9 +191,7 @@ TEST(Sector, Propagate)
         EnergyCutSettings ecuts(ecut, vcut);
 
         Sector::Definition sector_def;
-        // sector_def.location = location;
         sector_def.SetMedium(*medium);
-        // sector_def.scattering_model = scattering_model;
         sector_def.cut_settings = ecuts;
 
         Sector sector(particle, sector_def, InterpolationDef());

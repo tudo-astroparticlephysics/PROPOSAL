@@ -1,7 +1,5 @@
 
 #include <math.h>
-// #include <string.h>
-// #include <stdio.h>
 
 #include "gtest/gtest.h"
 
@@ -267,7 +265,6 @@ TEST(Assignment, Swap)
     EXPECT_TRUE(*C == *F);
 
     D.swap(E);
-    // E.swap(*F);
 
     EXPECT_TRUE(A == E);
     EXPECT_TRUE(B == D);

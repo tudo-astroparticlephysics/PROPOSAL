@@ -1,9 +1,4 @@
 
-// #include <iostream>
-// #include <string>
-
-// #include <math.h>
-
 #include "gtest/gtest.h"
 
 #include "PROPOSAL/Constants.h"
