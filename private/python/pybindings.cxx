@@ -301,7 +301,6 @@ void export_medium()
         .add_property("mol_density", &Medium::GetMolDensity)
         .add_property("average_nucleon_weigth", &Medium::GetMM)
         .add_property("sum_nucleons", &Medium::GetSumNucleons)
-        .add_property("components", &Medium::GetComponents)
         .add_property("num_components", &Medium::GetNumComponents)
         .add_property("name", &Medium::GetName);
 
@@ -629,7 +628,6 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
 
     to_python_converter<std::vector<std::string>, VectorToPythonList<std::string> >();
 
-    to_python_converter<std::vector<Components::Component*>, PVectorToPythonList<Components::Component*> >();
     to_python_converter<std::vector<DynamicData*>, PVectorToPythonList<DynamicData*> >();
     to_python_converter<std::vector<Particle*>, PVectorToPythonList<Particle*> >();
 
@@ -641,7 +639,6 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
     iterable_converter()
         .from_python<std::vector<double> >()
         .from_python<std::vector<std::vector<double> > >()
-        .from_python<std::vector<Components::Component*> >()
         .from_python<std::vector<DynamicData*> >()
         // .from_python<std::vector<ParticleDef> >()
         .from_python<std::vector<Particle*> >()
