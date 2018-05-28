@@ -1,6 +1,4 @@
 
-// #include <iostream>
-
 #include "gtest/gtest.h"
 
 #include "PROPOSAL/Constants.h"
@@ -78,61 +76,6 @@ TEST(Assignment, Copyconstructor2)
 
     EXPECT_TRUE(A == B);
 }
-
-// TEST(Assignment , Operator ) {
-//     direction.SetSphericalCoordinates(1,20*PI/180.,20*PI/180.);
-//     direction.CalculateCartesianFromSpherical();
-//     Particle A;
-//     Particle B(TauMinusDef::Get());
-//     B.SetPosition(position);
-//     B.SetDirection(direction);
-//
-//     EXPECT_TRUE(A!=B);
-//
-//     B=A;
-//
-//     EXPECT_TRUE(A==B);
-//
-//     A.SetEnergy(1e12);
-//
-//     EXPECT_TRUE(A!=B);
-//
-//     B=A;
-//
-//     EXPECT_TRUE(A==B);
-// }
-//
-// TEST(Assignment , Swap ) {
-//     direction.SetSphericalCoordinates(1,20*PI/180.,20*PI/180.);
-//     direction.CalculateCartesianFromSpherical();
-//     Particle A;
-//     Particle B;
-//     EXPECT_TRUE(A==B);
-//     Particle* C = new Particle(TauMinusDef::Get());
-//     C->SetPosition(position);
-//     C->SetDirection(direction);
-//     Particle* D = new Particle(TauMinusDef::Get());
-//     D->SetPosition(position);
-//     D->SetDirection(direction);
-//
-//     C->SetEnergy(1e6);
-//     D->SetEnergy(1e6);
-//     EXPECT_TRUE(*C==*D);
-//
-//     position = Vector3D();
-//     direction = Vector3D();
-//     Particle* E = new Particle(MuMinusDef::Get());
-//     E->SetPosition(position);
-//     E->SetDirection(direction);
-//     EXPECT_TRUE(A==*E);
-//
-//     D->swap(A);
-//     EXPECT_TRUE(*C==A);
-//     EXPECT_TRUE(*D==B);
-//     D->swap(*E);
-//     EXPECT_TRUE(B==*D);
-//
-// }
 
 int main(int argc, char** argv)
 {

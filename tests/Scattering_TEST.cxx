@@ -132,8 +132,8 @@ TEST(Assignment, Copyconstructor2)
 TEST(Scattering, Scatter)
 {
     ifstream in;
-    // string filename = "bin/TestFiles/Brems_dEdx.txt";
     string filename = "bin/TestFiles/Scat_scatter.txt";
+
     in.open(filename.c_str());
 
     if (!in.good())
