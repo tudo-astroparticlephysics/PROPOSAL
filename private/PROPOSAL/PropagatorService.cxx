@@ -41,7 +41,7 @@ bool PropagatorService::IsRegistered(const ParticleDef& particle_def)
 }
 
 // ------------------------------------------------------------------------- //
-std::vector<DynamicData*> PropagatorService::Propagate(Particle& particle)
+std::vector<DynamicData*> PropagatorService::Propagate(Particle& particle, double distance)
 {
     ParticleDef particle_def = particle.GetParticleDef();
 
@@ -60,7 +60,7 @@ std::vector<DynamicData*> PropagatorService::Propagate(Particle& particle)
         prop_particle.SetTime(particle.GetTime());
         prop_particle.SetElost(particle.GetElost());
 
-        std::vector<DynamicData*> secondaries = propagator->Propagate();
+        std::vector<DynamicData*> secondaries = propagator->Propagate(distance);
 
         particle.SetEnergy(prop_particle.GetEnergy());
         particle.SetParentParticleEnergy(prop_particle.GetParentParticleEnergy());

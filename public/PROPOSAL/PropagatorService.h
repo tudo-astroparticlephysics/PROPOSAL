@@ -74,7 +74,7 @@ public:
     ///
     /// @return vector of secondary data
     // ----------------------------------------------------------------------------
-    std::vector<DynamicData*> Propagate(Particle&);
+    std::vector<DynamicData*> Propagate(Particle&, double distance = 1e20);
 
 private:
     PropagatorMap propagator_map_;
