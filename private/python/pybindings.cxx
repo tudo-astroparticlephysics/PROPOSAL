@@ -21,7 +21,8 @@
 #define COMPONENT_DEF(cls)                                                                                             \
     class_<Components::cls, boost::shared_ptr<Components::cls>, bases<Components::Component> >(#cls, init<double>());
 
-#define MEDIUM_DEF(cls) class_<cls, boost::shared_ptr<cls>, bases<Medium> >(#cls, init<double>(arg("density_correction")));
+#define MEDIUM_DEF(cls)                                                                                                \
+    class_<cls, boost::shared_ptr<cls>, bases<Medium> >(#cls, init<double>(arg("density_correction") = 1.0));
 
 #define BREMS_DEF(cls)                                                                                                 \
     class_<Brems##cls, boost::shared_ptr<Brems##cls>, bases<Bremsstrahlung> >(                                         \
@@ -57,62 +58,6 @@
                                 arg("interpolation_def"))));
 
 using namespace PROPOSAL;
-
-// using namespace PROPOSAL;
-//
-// // struct CrossSectionsWrap : CrossSections, boost::python::wrapper<CrossSections>
-// // {
-// //     CrossSectionsWrap(): CrossSections(), wrapper<CrossSections>(){}
-// //
-// //     // virtual double CalculatedEdx()
-// //     // {
-// //     //     return this->get_override("calculate_dEdx")();
-// //     // }
-// // };
-//
-//
-// #<{(|*****************************************************************************
-// *                             Register functions                              *
-// *****************************************************************************|)}>#
-//
-// // ------------------------------------------------------------------------- //
-// // Vectors
-// // ------------------------------------------------------------------------- //
-//
-//
-// struct CrossSectionToPython
-// {
-//     static PyObject* convert(std::vector<CrossSections*> const& vec)
-//     {
-//         boost::python::list python_list;
-//
-//         for (unsigned int i = 0; i < vec.size(); ++i)
-//         {
-//             switch (vec[i]->GetType())
-//             {
-//                 case ParticleType::Brems:
-//                     python_list.append(boost::python::ptr((Bremsstrahlung*)vec[i]));
-//                     break;
-//                 case ParticleType::NuclInt:
-//                     python_list.append(boost::python::ptr((Photonuclear*)vec[i]));
-//                     break;
-//                 case ParticleType::DeltaE:
-//                     python_list.append(boost::python::ptr((Ionization*)vec[i]));
-//                     break;
-//                 case ParticleType::EPair:
-//                     python_list.append(boost::python::ptr((Epairproduction*)vec[i]));
-//                     break;
-//                 default:
-//                     boost::python::object obj(NULL);
-//                     break;
-//             }
-//         }
-//
-//         PyObject* py = boost::python::incref(python_list.ptr());
-//         return py;
-//     }
-// };
-//
 
 template<typename T>
 struct VectorToPythonList
@@ -347,6 +292,17 @@ void export_medium()
 
         .def(self_ns::str(self_ns::self))
 
+        .add_property("sum_charge", &Medium::GetSumCharge)
+        .add_property("ratio_ZA", &Medium::GetZA)
+        .add_property("ionization_potential", &Medium::GetI)
+        .add_property("refraction_index", &Medium::GetR)
+        .add_property("density_correction", &Medium::GetDensityCorrection)
+        .add_property("radiation_length", &Medium::GetRadiationLength)
+        .add_property("mol_density", &Medium::GetMolDensity)
+        .add_property("average_nucleon_weigth", &Medium::GetMM)
+        .add_property("sum_nucleons", &Medium::GetSumNucleons)
+        .add_property("components", &Medium::GetComponents)
+        .add_property("num_components", &Medium::GetNumComponents)
         .add_property("name", &Medium::GetName);
 
     MEDIUM_DEF(Water)
@@ -670,14 +626,12 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
 
     to_python_converter<std::vector<double>, VectorToPythonList<double> >();
     to_python_converter<std::vector<std::vector<double> >, VectorToPythonList<std::vector<double> > >();
-    // to_python_converter< std::vector<std::vector<double> >, Vector2DToPythonList<double> > ();
 
     to_python_converter<std::vector<std::string>, VectorToPythonList<std::string> >();
-    // to_python_converter< std::vector<ParticleDef>, VectorToPythonList<ParticleDef> >();
 
+    to_python_converter<std::vector<Components::Component*>, PVectorToPythonList<Components::Component*> >();
     to_python_converter<std::vector<DynamicData*>, PVectorToPythonList<DynamicData*> >();
     to_python_converter<std::vector<Particle*>, PVectorToPythonList<Particle*> >();
-    // to_python_converter< std::vector<CrossSection*>, PVectorToPythonList<CrossSection*> >();
 
     to_python_converter<std::vector<Sector::Definition>, VectorToPythonList<Sector::Definition> >();
 
@@ -687,6 +641,7 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
     iterable_converter()
         .from_python<std::vector<double> >()
         .from_python<std::vector<std::vector<double> > >()
+        .from_python<std::vector<Components::Component*> >()
         .from_python<std::vector<DynamicData*> >()
         // .from_python<std::vector<ParticleDef> >()
         .from_python<std::vector<Particle*> >()
