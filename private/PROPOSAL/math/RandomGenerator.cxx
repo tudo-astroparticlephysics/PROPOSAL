@@ -21,6 +21,9 @@ boost::variate_generator<boost::mt19937&, boost::uniform_real<> > RandomGenerato
 
 RandomGenerator::RandomGenerator()
     : random_function(&RandomGenerator::DefaultRandomDouble)
+#ifdef ICECUBE_PROJECT
+    , i3random_gen_(NULL)
+#endif
 {
 }
 
@@ -33,7 +36,18 @@ RandomGenerator::~RandomGenerator() {}
 // ------------------------------------------------------------------------- //
 double RandomGenerator::RandomDouble()
 {
+#ifdef ICECUBE_PROJECT
+    if (i3random_gen_)
+    {
+        return i3random_gen_->Uniform(0.0, 1.0);
+    }
+    else
+    {
+        return random_function();
+    }
+#else
     return random_function();
+#endif
 }
 
 // ------------------------------------------------------------------------- //
@@ -60,6 +74,13 @@ void RandomGenerator::SetRandomNumberGenerator(boost::function<double()>& f)
 {
     random_function = f;
 }
+
+#ifdef ICECUBE_PROJECT
+void RandomGenerator::SetI3RandomNumberGenerator(I3RandomServicePtr random)
+{
+    i3random_gen_ = random.get();
+}
+#endif
 
 void RandomGenerator::SetDefaultRandomNumberGenerator()
 {

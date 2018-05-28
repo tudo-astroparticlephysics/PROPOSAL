@@ -81,8 +81,7 @@ std::string I3PropagatorServicePROPOSAL::GetDefaultConfigFile()
 void I3PropagatorServicePROPOSAL::SetRandomNumberGenerator(I3RandomServicePtr random)
 {
     rng_                        = random;
-    boost::function<double()> f = boost::bind(&I3RandomService::Uniform, random, 0, 1);
-    PROPOSAL::RandomGenerator::Get().SetRandomNumberGenerator(f);
+    PROPOSAL::RandomGenerator::Get().SetI3RandomNumberGenerator(random);
 }
 
 // ------------------------------------------------------------------------- //
