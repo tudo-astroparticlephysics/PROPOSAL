@@ -30,7 +30,7 @@ BremsInterpolant::BremsInterpolant(const Bremsstrahlung& param, InterpolationDef
     // Needed for CalculatedEdx integration
     BremsIntegral brems(param);
 
-    builder1d.SetMax(NUM1)
+    builder1d.SetMax(NUM2)
         .SetXMin(param.GetParticleDef().low)
         .SetXMax(BIGENERGY)
         .SetRomberg(def.order_of_interpolation)
