@@ -118,7 +118,7 @@ size_t Parametrization::GetHash() const
     std::size_t seed = 0;
 
     boost::hash_combine(seed, GetName());
-    boost::hash_combine(seed, particle_def_.name);
+    boost::hash_combine(seed, hash_value(particle_def_));
     boost::hash_combine(seed, medium_->GetName());
     boost::hash_combine(seed, cut_settings_.GetEcut());
     boost::hash_combine(seed, cut_settings_.GetVcut());
