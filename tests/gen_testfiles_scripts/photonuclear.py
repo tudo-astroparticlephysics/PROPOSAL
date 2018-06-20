@@ -461,20 +461,20 @@ def create_table_stochastic_loss_Q2(interpolate=False):
 
 def main():
     # Integrate
-    create_table_dEdx()
-    create_table_dNdx()
-    create_table_dNdx_rnd()
-    create_table_stochastic_loss()
-    create_table_dEdx_Q2()
-    create_table_dNdx_Q2()
-    create_table_dNdx_rnd_Q2()
-    create_table_stochastic_loss_Q2()
+    # create_table_dEdx()
+    # create_table_dNdx()
+    # create_table_dNdx_rnd()
+    # create_table_stochastic_loss()
+    # create_table_dEdx_Q2()
+    # create_table_dNdx_Q2()
+    # create_table_dNdx_rnd_Q2()
+    # create_table_stochastic_loss_Q2()
 
     # Interpolate
-    create_table_dEdx(True)
-    create_table_dNdx(True)
-    create_table_dNdx_rnd(True)
-    create_table_stochastic_loss(True)
+    # create_table_dEdx(True)
+    # create_table_dNdx(True)
+    # create_table_dNdx_rnd(True)
+    # create_table_stochastic_loss(True)
     create_table_dEdx_Q2(True)
     create_table_dNdx_Q2(True)
     create_table_dNdx_rnd_Q2(True)
