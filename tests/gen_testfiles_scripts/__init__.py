@@ -20,7 +20,9 @@ process as fist argument of this script.
 
 import multiprocessing
 import sys
+import os
 import warnings
+import subprocess
 
 import bremsstrahlung
 import continous_randomization
@@ -36,6 +38,8 @@ def main():
     print("There are %d CPUs on this machine" % multiprocessing.cpu_count())
 
     number_processes = 2
+    dir_name = "TestFiles/"
+    tar_name = "TestFiles.tar.gz"
 
     try:
         number_processes = int(sys.argv[1])
@@ -45,19 +49,31 @@ def main():
         warnings.warn("first argument must be an integer. (Number of processes to ues)")
         pass
 
+    try:
+        os.makedirs(dir_name)
+        print("Directory {} created".format(dir_name))
+    except OSError:
+        print("Directory {} already exists".format(dir_name))
+
     pool = multiprocessing.Pool(number_processes)
 
-    pool.apply_async(bremsstrahlung.main)
-    pool.apply_async(continous_randomization.main)
-    pool.apply_async(epairproduction.main)
-    pool.apply_async(ionization.main)
-    pool.apply_async(photonuclear.main)
-    pool.apply_async(propagation.main)
-    pool.apply_async(scattering.main)
-    pool.apply_async(sector.main)
+    # pool.apply_async(bremsstrahlung.main)
+    # pool.apply_async(continous_randomization.main)
+    # pool.apply_async(epairproduction.main)
+    pool.apply_async(ionization.main, (dir_name, ))
+    # pool.apply_async(photonuclear.main)
+    # pool.apply_async(propagation.main)
+    # pool.apply_async(scattering.main)
+    # pool.apply_async(sector.main)
 
     pool.close()
     pool.join()
+
+    subprocess.Popen(['tar', '-czf', tar_name, dir_name])
+    print("compressed test files {}".format(tar_name))
+
+    subprocess.Popen(['rm', '-r', dir_name])
+    print("Directory {} removed".format(dir_name))
 
 if __name__ == "__main__":
     main()
