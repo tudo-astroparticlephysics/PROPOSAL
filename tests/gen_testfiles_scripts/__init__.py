@@ -56,23 +56,30 @@ def main():
         print("Directory {} already exists".format(dir_name))
 
     pool = multiprocessing.Pool(number_processes)
+    results = []
 
-    # pool.apply_async(bremsstrahlung.main)
-    # pool.apply_async(continous_randomization.main)
-    # pool.apply_async(epairproduction.main)
+    pool.apply_async(bremsstrahlung.main, (dir_name, ))
+    pool.apply_async(continous_randomization.main, (dir_name, ))
+    pool.apply_async(epairproduction.main, (dir_name, ))
     pool.apply_async(ionization.main, (dir_name, ))
-    # pool.apply_async(photonuclear.main)
-    # pool.apply_async(propagation.main)
-    # pool.apply_async(scattering.main)
-    # pool.apply_async(sector.main)
+    pool.apply_async(photonuclear.main, (dir_name, ))
+    pool.apply_async(propagation.main, (dir_name, ))
+    pool.apply_async(scattering.main, (dir_name, ))
+    pool.apply_async(sector.main, (dir_name, ))
 
     pool.close()
     pool.join()
 
-    subprocess.Popen(['tar', '-czf', tar_name, dir_name])
+    print("all threads are joined")
+
+    p = subprocess.Popen(['tar', '-czf', tar_name, dir_name])
+
+    p.communicate()
     print("compressed test files {}".format(tar_name))
 
-    subprocess.Popen(['rm', '-r', dir_name])
+    p = subprocess.Popen(['rm', '-r', dir_name])
+
+    p.communicate()
     print("Directory {} removed".format(dir_name))
 
 if __name__ == "__main__":

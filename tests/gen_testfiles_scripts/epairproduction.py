@@ -29,9 +29,9 @@ energies = np.logspace(4, 13, num=10)
 interpoldef = pp.InterpolationDef()
 
 
-def create_table_dEdx():
+def create_table_dEdx(dir_name):
 
-    with open("Epair_dEdx.txt", "a") as f:
+    with open(dir_name + "Epair_dEdx.txt", "a") as f:
 
         for particle in particle_defs:
             for medium in mediums:
@@ -67,9 +67,9 @@ def create_table_dEdx():
                         f.write("\t".join(buf))
 
 
-def create_table_dNdx():
+def create_table_dNdx(dir_name):
 
-    with open("Epair_dNdx.txt", "a") as f:
+    with open(dir_name + "Epair_dNdx.txt", "a") as f:
 
         for particle in particle_defs:
             for medium in mediums:
@@ -105,11 +105,11 @@ def create_table_dNdx():
                         f.write("\t".join(buf))
 
 
-def create_table_dNdx_rnd():
+def create_table_dNdx_rnd(dir_name):
 
     pp.RandomGenerator.get().set_seed(0)
 
-    with open("Epair_dNdx_rnd.txt", "a") as f:
+    with open(dir_name + "Epair_dNdx_rnd.txt", "a") as f:
 
         for particle in particle_defs:
             for medium in mediums:
@@ -147,11 +147,11 @@ def create_table_dNdx_rnd():
                         f.write("\t".join(buf))
 
 
-def create_table_stochastic_loss():
+def create_table_stochastic_loss(dir_name):
 
     pp.RandomGenerator.get().set_seed(5)
 
-    with open("Epair_e.txt", "a") as f:
+    with open(dir_name + "Epair_e.txt", "a") as f:
 
         for particle in particle_defs:
             for medium in mediums:
@@ -191,9 +191,9 @@ def create_table_stochastic_loss():
                         f.write("\t".join(buf))
 
 
-def create_table_dEdx_interpol():
+def create_table_dEdx_interpol(dir_name):
 
-    with open("Epair_dEdx_interpol.txt", "a") as f:
+    with open(dir_name + "Epair_dEdx_interpol.txt", "a") as f:
 
         for particle in particle_defs:
             for medium in mediums:
@@ -230,9 +230,9 @@ def create_table_dEdx_interpol():
                         f.write("\t".join(buf))
 
 
-def create_table_dNdx_interpol():
+def create_table_dNdx_interpol(dir_name):
 
-    with open("Epair_dNdx_interpol.txt", "a") as f:
+    with open(dir_name + "Epair_dNdx_interpol.txt", "a") as f:
 
         for particle in particle_defs:
             for medium in mediums:
@@ -269,11 +269,11 @@ def create_table_dNdx_interpol():
                         f.write("\t".join(buf))
 
 
-def create_table_dNdx_rnd_interpol():
+def create_table_dNdx_rnd_interpol(dir_name):
 
     pp.RandomGenerator.get().set_seed(5)
 
-    with open("Epair_dNdx_rnd_interpol.txt", "a") as f:
+    with open(dir_name + "Epair_dNdx_rnd_interpol.txt", "a") as f:
 
         for particle in particle_defs:
             for medium in mediums:
@@ -312,11 +312,11 @@ def create_table_dNdx_rnd_interpol():
                         f.write("\t".join(buf))
 
 
-def create_table_stochastic_loss_interpol():
+def create_table_stochastic_loss_interpol(dir_name):
 
     pp.RandomGenerator.get().set_seed(5)
 
-    with open("Epair_e_interpol.txt", "a") as f:
+    with open(dir_name + "Epair_e_interpol.txt", "a") as f:
 
         for particle in particle_defs:
             for medium in mediums:
@@ -357,16 +357,25 @@ def create_table_stochastic_loss_interpol():
                         f.write("\t".join(buf))
 
 
-def main():
-    create_table_dEdx()
-    create_table_dNdx()
-    create_table_dNdx_rnd()
-    create_table_stochastic_loss()
-    create_table_dEdx_interpol()
-    create_table_dNdx_interpol()
-    create_table_dNdx_rnd_interpol()
-    create_table_stochastic_loss_interpol()
+def main(dir_name):
+    create_table_dEdx(dir_name)
+    create_table_dNdx(dir_name)
+    create_table_dNdx_rnd(dir_name)
+    create_table_stochastic_loss(dir_name)
+    create_table_dEdx_interpol(dir_name)
+    create_table_dNdx_interpol(dir_name)
+    create_table_dNdx_rnd_interpol(dir_name)
+    create_table_stochastic_loss_interpol(dir_name)
 
 
 if __name__ == "__main__":
-    main()
+
+    dir_name = "TestFiles/"
+
+    try:
+        os.makedirs(dir_name)
+        print("Directory {} created".format(dir_name))
+    except OSError:
+        print("Directory {} already exists".format(dir_name))
+
+    main(dir_name)

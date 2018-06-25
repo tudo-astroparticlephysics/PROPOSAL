@@ -97,7 +97,7 @@ def create_table_dNdx(dir_name):
                     f.write("\t".join(buf))
 
 
-def create_table_dNdx_rnd(dirName):
+def create_table_dNdx_rnd(dir_name):
 
     pp.RandomGenerator.get().set_seed(0)
 
@@ -177,7 +177,7 @@ def create_table_stochastic_loss(dir_name):
                     f.write("\t".join(buf))
 
 
-def create_table_dEdx_interpol(dir_nameName):
+def create_table_dEdx_interpol(dir_name):
 
     with open(dir_name + "Ioniz_dEdx_interpol.txt", "a") as f:
 
@@ -339,4 +339,13 @@ def main(dir_name):
 
 
 if __name__ == "__main__":
-    main()
+
+    dir_name = "TestFiles/"
+
+    try:
+        os.makedirs(dir_name)
+        print("Directory {} created".format(dir_name))
+    except OSError:
+        print("Directory {} already exists".format(dir_name))
+
+    main(dir_name)
