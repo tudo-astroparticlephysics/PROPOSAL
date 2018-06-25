@@ -34,7 +34,7 @@ It's also possible to do the calculations with integrations, but that increases 
 | ---------------- | ------ | --------- | ----------- |
 | `interpolate`    | Bool   | `True`    | Decides, whether to calculate with interpolations or integrations |
 | `path_to_tables` | String | `""`      | path pointing to the folder with the interpolation tables |
-| `raw`            | Bool   | `False`   | Decides, whether the tables are stored in binary format or in human readable text format |
+| `raw`            | Bool   | `True`   | Decides, whether the tables are stored in binary format or in human readable text format |
 
 ### Accuracy parameters ###
 There are several parameters with which the precision or speed for advancing the particles can be adjusted.
@@ -122,7 +122,7 @@ Then the global settings will be overwritten.
 
 | Keyword        | Type   | Default   | Description |
 | -------------- | ------ | --------- | ----------- |
-| `ecut_inside`  | Double | `500`     | total energy loss cut inside the detector |
+| `ecut_inside`  | Double | `500.0`     | total energy loss cut inside the detector |
 | `ecut_infront` | Double | `-1.0`      | total energy loss cut in front the detector |
 | `ecut_behind`  | Double | `-1.0`      | total energy loss cut behind the detector |
 | `vcut_inside`  | Double | `-1.0`      | relative energy loss cut inside the detector |
