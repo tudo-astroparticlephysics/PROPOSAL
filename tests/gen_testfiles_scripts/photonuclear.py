@@ -55,9 +55,9 @@ energies = np.logspace(4, 13, num=10)
 interpoldef = pp.InterpolationDef()
 
 
-def create_table_dEdx(interpolate=False):
+def create_table_dEdx(dir_name, interpolate=False):
 
-    with open("Photo_Real_dEdx{}.txt".format("_interpol" if interpolate else ""), "a") as f:
+    with open(dir_name + "Photo_Real_dEdx{}.txt".format("_interpol" if interpolate else ""), "a") as f:
 
         for particle in particle_defs:
             for medium in mediums:
@@ -97,9 +97,9 @@ def create_table_dEdx(interpolate=False):
                                 f.write("\t".join(buf))
 
 
-def create_table_dNdx(interpolate=False):
+def create_table_dNdx(dir_name, interpolate=False):
 
-    with open("Photo_Real_dNdx{}.txt".format("_interpol" if interpolate else ""), "a") as f:
+    with open(dir_name + "Photo_Real_dNdx{}.txt".format("_interpol" if interpolate else ""), "a") as f:
 
         for particle in particle_defs:
             for medium in mediums:
@@ -139,11 +139,11 @@ def create_table_dNdx(interpolate=False):
                                 f.write("\t".join(buf))
 
 
-def create_table_dNdx_rnd(interpolate=False):
+def create_table_dNdx_rnd(dir_name, interpolate=False):
 
     pp.RandomGenerator.get().set_seed(1234)
 
-    with open("Photo_Real_dNdx_rnd{}.txt".format("_interpol" if interpolate else ""), "a") as f:
+    with open(dir_name + "Photo_Real_dNdx_rnd{}.txt".format("_interpol" if interpolate else ""), "a") as f:
 
         for particle in particle_defs:
             for medium in mediums:
@@ -185,11 +185,11 @@ def create_table_dNdx_rnd(interpolate=False):
                                 f.write("\t".join(buf))
 
 
-def create_table_stochastic_loss(interpolate=False):
+def create_table_stochastic_loss(dir_name, interpolate=False):
 
     pp.RandomGenerator.get().set_seed(1234)
 
-    with open("Photo_Real_e{}.txt".format("_interpol" if interpolate else ""), "a") as f:
+    with open(dir_name + "Photo_Real_e{}.txt".format("_interpol" if interpolate else ""), "a") as f:
 
         for particle in particle_defs:
             for medium in mediums:
@@ -233,14 +233,14 @@ def create_table_stochastic_loss(interpolate=False):
                                 f.write("\t".join(buf))
 
 
-def create_table_dEdx_Q2(interpolate=False):
+def create_table_dEdx_Q2(dir_name, interpolate=False):
 
     if interpolate:
         q2 = photo_q2_interpol
     else:
         q2 = photo_q2
 
-    with open("Photo_Q2_dEdx{}.txt".format("_interpol" if interpolate else ""), "a") as f:
+    with open(dir_name + "Photo_Q2_dEdx{}.txt".format("_interpol" if interpolate else ""), "a") as f:
 
         for particle in particle_defs:
             for medium in mediums:
@@ -288,14 +288,14 @@ def create_table_dEdx_Q2(interpolate=False):
                                 f.write("\t".join(buf))
 
 
-def create_table_dNdx_Q2(interpolate=False):
+def create_table_dNdx_Q2(dir_name, interpolate=False):
 
     if interpolate:
         q2 = photo_q2_interpol
     else:
         q2 = photo_q2
 
-    with open("Photo_Q2_dNdx{}.txt".format("_interpol" if interpolate else ""), "a") as f:
+    with open(dir_name + "Photo_Q2_dNdx{}.txt".format("_interpol" if interpolate else ""), "a") as f:
 
         for particle in particle_defs:
             for medium in mediums:
@@ -343,14 +343,14 @@ def create_table_dNdx_Q2(interpolate=False):
                                 f.write("\t".join(buf))
 
 
-def create_table_dNdx_rnd_Q2(interpolate=False):
+def create_table_dNdx_rnd_Q2(dir_name, interpolate=False):
 
     if interpolate:
         q2 = photo_q2_interpol
     else:
         q2 = photo_q2
 
-    with open("Photo_Q2_dNdx_rnd{}.txt".format("_interpol" if interpolate else ""), "a") as f:
+    with open(dir_name + "Photo_Q2_dNdx_rnd{}.txt".format("_interpol" if interpolate else ""), "a") as f:
 
         for particle in particle_defs:
             for medium in mediums:
@@ -400,14 +400,14 @@ def create_table_dNdx_rnd_Q2(interpolate=False):
                                 f.write("\t".join(buf))
 
 
-def create_table_stochastic_loss_Q2(interpolate=False):
+def create_table_stochastic_loss_Q2(dir_name, interpolate=False):
 
     if interpolate:
         q2 = photo_q2_interpol
     else:
         q2 = photo_q2
 
-    with open("Photo_Q2_e{}.txt".format("_interpol" if interpolate else ""), "a") as f:
+    with open(dir_name + "Photo_Q2_e{}.txt".format("_interpol" if interpolate else ""), "a") as f:
 
         for particle in particle_defs:
             for medium in mediums:
@@ -461,25 +461,34 @@ def create_table_stochastic_loss_Q2(interpolate=False):
 
 def main():
     # Integrate
-    # create_table_dEdx()
-    # create_table_dNdx()
-    # create_table_dNdx_rnd()
-    # create_table_stochastic_loss()
-    # create_table_dEdx_Q2()
-    # create_table_dNdx_Q2()
-    # create_table_dNdx_rnd_Q2()
-    # create_table_stochastic_loss_Q2()
+    create_table_dEdx(dir_name)
+    create_table_dNdx(dir_name)
+    create_table_dNdx_rnd(dir_name)
+    create_table_stochastic_loss(dir_name)
+    create_table_dEdx_Q2(dir_name)
+    create_table_dNdx_Q2(dir_name)
+    create_table_dNdx_rnd_Q2(dir_name)
+    create_table_stochastic_loss_Q2(dir_name)
 
     # Interpolate
-    # create_table_dEdx(True)
-    # create_table_dNdx(True)
-    # create_table_dNdx_rnd(True)
-    # create_table_stochastic_loss(True)
-    create_table_dEdx_Q2(True)
-    create_table_dNdx_Q2(True)
-    create_table_dNdx_rnd_Q2(True)
-    create_table_stochastic_loss_Q2(True)
+    create_table_dEdx(True)
+    create_table_dNdx(dir_name, True)
+    create_table_dNdx_rnd(dir_name, True)
+    create_table_stochastic_loss(dir_name, True)
+    create_table_dEdx_Q2(dir_name, True)
+    create_table_dNdx_Q2(dir_name, True)
+    create_table_dNdx_rnd_Q2(dir_name, True)
+    create_table_stochastic_loss_Q2(dir_name, True)
 
 
 if __name__ == "__main__":
-    main()
+
+    dir_name = "TestFiles/"
+
+    try:
+        os.makedirs(dir_name)
+        print("Directory {} created".format(dir_name))
+    except OSError:
+        print("Directory {} already exists".format(dir_name))
+
+    main(dir_name)
