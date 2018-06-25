@@ -44,9 +44,9 @@ interpoldef = pp.InterpolationDef()
 pp.RandomGenerator.get().set_seed(1234)
 
 
-def create_table_scatter():
+def create_table_scatter(dir_name):
 
-    with open("Scat_scatter.txt", "a") as f:
+    with open(dir_name + "Scat_scatter.txt", "a") as f:
 
         for particle_def in particle_defs:
             for medium in mediums:
@@ -90,9 +90,18 @@ def create_table_scatter():
                             f.write("\t".join(buf))
 
 
-def main():
-    create_table_scatter()
+def main(dir_name):
+    create_table_scatter(dir_name)
 
 
 if __name__ == "__main__":
-    main()
+
+    dir_name = "TestFiles/"
+
+    try:
+        os.makedirs(dir_name)
+        print("Directory {} created".format(dir_name))
+    except OSError:
+        print("Directory {} already exists".format(dir_name))
+
+    main(dir_name)
