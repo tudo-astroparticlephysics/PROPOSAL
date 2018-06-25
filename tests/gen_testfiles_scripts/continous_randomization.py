@@ -2,7 +2,7 @@ import pyPROPOSAL as pp
 import random
 
 
-def create_table():
+def create_table(dir_name):
 
     particle_defs = [
         pp.MuMinusDef.get(),
@@ -28,7 +28,7 @@ def create_table():
 
     pp.RandomGenerator.get().set_seed(0)
 
-    with open("continous_randomization.txt", "a") as f:
+    with open(dir_name + "continous_randomization.txt", "a") as f:
 
         for particle in particle_defs:
             for medium in mediums:
@@ -71,9 +71,18 @@ def create_table():
                     f.write("\t".join(buf))
 
 
-def main():
-    create_table()
+def main(dir_name):
+    create_table(dir_name)
 
 
 if __name__ == "__main__":
-    main()
+
+    dir_name = "TestFiles/"
+
+    try:
+        os.makedirs(dir_name)
+        print("Directory {} created".format(dir_name))
+    except OSError:
+        print("Directory {} already exists".format(dir_name))
+
+    main(dir_name)
