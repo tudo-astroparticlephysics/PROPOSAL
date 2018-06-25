@@ -2,7 +2,7 @@
 # Documentation of the Configuration file #
 
 In the configuration file you can specify all parameters for your propagation.
-It's written in a .json file (no comments). That's why we have this (nice) Docu. ;)
+It's written in a .json file. That's why we have this (nice) Docu. ;)
 
 The configuration file is structured into three parts:
 - In the "global" part the general parameters are defined like the path for the interpolation tables.
@@ -96,10 +96,10 @@ The LPM effect (Landau-Pomeranschuk-Migdal), suppressing the bremsstrahlung and 
 
 | Keyword                | Type   | Default    | Description |
 | ---------------------- | ------ | ---------- | ----------- |
-| `brems_multiplier`     | Double | `1`        | scales the bremsstrahlung |
-| `epair_multiplier`     | Double | `1`        | scales the pair production |
-| `ioniz_multiplier`     | Double | `1`        | scales the ionization |
-| `photo_multiplier`     | Double | `1`        | scales the nuclear interaction |
+| `brems_multiplier`     | Double | `1.0`        | scales the bremsstrahlung |
+| `epair_multiplier`     | Double | `1.0`        | scales the pair production |
+| `ioniz_multiplier`     | Double | `1.0`        | scales the ionization |
+| `photo_multiplier`     | Double | `1.0`        | scales the nuclear interaction |
 | `brems`                | String | `"BremsKelnerKokoulinPetrukhin"` | Bremsstrahlung parametrization |
 | `photo`                | String | `"PhotoAbramowiczLevinLevyMaor97"` | nuclear interaction parametrization |
 | `photo_hard_component` | Bool   | `True`     | including the hard components |
@@ -123,11 +123,11 @@ Then the global settings will be overwritten.
 | Keyword        | Type   | Default   | Description |
 | -------------- | ------ | --------- | ----------- |
 | `ecut_inside`  | Double | `500`     | total energy loss cut inside the detector |
-| `ecut_infront` | Double | `-1`      | total energy loss cut in front the detector |
-| `ecut_behind`  | Double | `-1`      | total energy loss cut behind the detector |
-| `vcut_inside`  | Double | `-1`      | relative energy loss cut inside the detector |
+| `ecut_infront` | Double | `-1.0`      | total energy loss cut in front the detector |
+| `ecut_behind`  | Double | `-1.0`      | total energy loss cut behind the detector |
+| `vcut_inside`  | Double | `-1.0`      | relative energy loss cut inside the detector |
 | `vcut_infront` | Double | `0.001`   | relative energy loss cut in front the detector |
-| `vcut_behind`  | Double | `-1`      | relative energy loss cut behind the detector |
+| `vcut_behind`  | Double | `-1.0`      | relative energy loss cut behind the detector |
 | `cont_inside`  | Double | `True`    | includes the continuous randomization inside the detector |
 | `cont_infront` | Double | `True`    | includes the continuous randomization in front the detector |
 | `cont_behind`  | Double | `False`   | includes the continuous randomization behind the detector |
@@ -162,8 +162,8 @@ A density correction factor for the medium, specifying the density of the medium
 
 | Keyword              | Type   | Default | Description |
 | -------------------- | ------ | ------- | ----------- |
-| `medium`             | String |         | Medium in this sector |
-| `density_correction` | Double | `1`     | density correction factor of the medium |
+| `medium`             | String | `"Water"` | Medium in this sector |
+| `density_correction` | Double | `1.0`   | density correction factor of the medium |
 
 ### Geometry parameters ###
 
@@ -174,10 +174,10 @@ The following three shapes are available:
 - `"Cylinder"`
 - `"Box"`
 
-| Keyword  | Type                     | Default   | Description |
-| -------- | ------------------------ | --------- | ----------- |
-| `shape`  | String                   |           | Shape of the Geometry |
-| `origin` | [Double, Double, Double] | `[0,0,0]` | Center of the Geometry |
+| Keyword  | Type                     | Default           | Description |
+| -------- | ------------------------ | ----------------- | ----------- |
+| `shape`  | String                   |  `-`              | Shape of the Geometry |
+| `origin` | [Double, Double, Double] | `[0.0, 0.0 ,0.0]` | Center of the Geometry |
 
 Every shape has its own specifications:
 - a sphere needs an inner and an outer radius between which the sector is defined
@@ -186,11 +186,11 @@ Every shape has its own specifications:
 
 | Keyword        | Type   | Default | Description |
 | -------------- | ------ | ------- | ----------- |
-| `outer_radius` | Double |         | outer radius of the sphere or the cylinder |
-| `inner_radius` | Double |         | inner radius of the sphere or the cylinder |
-| `height`       | Double |         | height of the cylinder or the box (length in z-direction) |
-| `length`       | Double |         | length of the box (length in x-direction) |
-| `width`        | Double |         | width of th box (length in y-direction) |
+| `outer_radius` | Double | `-`     | outer radius of the sphere or the cylinder |
+| `inner_radius` | Double | `-`     | inner radius of the sphere or the cylinder |
+| `height`       | Double | `-`     | height of the cylinder or the box (length in z-direction) |
+| `length`       | Double | `-`     | length of the box (length in x-direction) |
+| `width`        | Double | `-`     | width of th box (length in y-direction) |
 
 ### Energy cut parameters ###
 

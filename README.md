@@ -168,6 +168,14 @@ for i in range(1000):
     mu_secondaries.append(len(secondaries))
 ```
 
+## Documentation ##
+
+The C++ API can be build using
+
+	make doc
+
+A documentation of the configuration file can be found
+[here](resources/config_docu.md).
 
 ## Issues ##
 
