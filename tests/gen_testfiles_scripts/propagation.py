@@ -2,7 +2,7 @@ import pyPROPOSAL as pp
 import random
 
 
-def create_table():
+def create_table(dir_name):
     """TODO: Docstring for create_table.
     Returns: TODO
 
@@ -23,7 +23,7 @@ def create_table():
     mu.position = pp.Vector3D(0, 0, 0)
     mu.direction = pp.Vector3D(0, 0, -1)
 
-    with open("Propagator_propagation.txt", "a") as f:
+    with open(dir_name + "Propagator_propagation.txt", "a") as f:
 
         buf = [""]
         buf.append("name")
@@ -71,9 +71,18 @@ def create_table():
         f.close()
 
 
-def main():
-    create_table()
+def main(dir_name):
+    create_table(dir_name)
 
 
 if __name__ == "__main__":
-    main()
+
+    dir_name = "TestFiles/"
+
+    try:
+        os.makedirs(dir_name)
+        print("Directory {} created".format(dir_name))
+    except OSError:
+        print("Directory {} already exists".format(dir_name))
+
+    main(dir_name)
