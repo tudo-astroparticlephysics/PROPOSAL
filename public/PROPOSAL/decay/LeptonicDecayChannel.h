@@ -26,7 +26,6 @@
  *                                                                            *
  ******************************************************************************/
 
-
 #pragma once
 
 #include "PROPOSAL/decay/DecayChannel.h"
@@ -36,26 +35,26 @@ namespace PROPOSAL {
 
 class Particle;
 
-class LeptonicDecayChannel : public DecayChannel
+class LeptonicDecayChannelApprox : public DecayChannel
 {
 public:
-    LeptonicDecayChannel(const ParticleDef&, const ParticleDef&, const ParticleDef&);
-    LeptonicDecayChannel(const LeptonicDecayChannel& mode);
-    virtual ~LeptonicDecayChannel();
+    LeptonicDecayChannelApprox(const ParticleDef&, const ParticleDef&, const ParticleDef&);
+    LeptonicDecayChannelApprox(const LeptonicDecayChannelApprox& mode);
+    virtual ~LeptonicDecayChannelApprox();
     // No copy and assignemnt -> done by clone
-    DecayChannel* clone() const { return new LeptonicDecayChannel(*this); }
+    DecayChannel* clone() const { return new LeptonicDecayChannelApprox(*this); }
 
-    DecayProducts Decay(const Particle&);
+    virtual DecayProducts Decay(const Particle&);
 
     const std::string& GetName() const { return name_; }
 
-private:
+protected:
     ParticleDef massive_lepton_;
     ParticleDef neutrino_;
     ParticleDef anti_neutrino_;
     static const std::string name_;
 
-    LeptonicDecayChannel& operator=(const LeptonicDecayChannel&); // Undefined & not allowed
+    LeptonicDecayChannelApprox& operator=(const LeptonicDecayChannelApprox&); // Undefined & not allowed
 
     bool compare(const DecayChannel&) const;
     void print(std::ostream&) const;
@@ -63,16 +62,35 @@ private:
     // ----------------------------------------------------------------------------
     /// @brief Function for electron energy calculation - interface to FindRoot
     // ----------------------------------------------------------------------------
-    double DecayRate(double, double);
+    virtual double DecayRate(double x, double parent_mass, double E_max, double right_side);
 
     // ----------------------------------------------------------------------------
     /// @brief Function for electron energy calculation - interface to FindRoot
     // ----------------------------------------------------------------------------
-    double DifferentialDecayRate(double);
+    virtual double DifferentialDecayRate(double x, double parent_mass, double E_max);
 
-    std::pair<double, double> function_and_derivative(double x, double right_side);
+    std::pair<double, double> function_and_derivative(double x, double parent_mass, double E_max, double right_side);
 
-    double FindRootBoost(double min, double right_side);
+    double FindRootBoost(double min, double parent_mass, double E_max, double right_side);
+};
+
+class LeptonicDecayChannel : public LeptonicDecayChannelApprox
+{
+public:
+    LeptonicDecayChannel(const ParticleDef&, const ParticleDef&, const ParticleDef&);
+    LeptonicDecayChannel(const LeptonicDecayChannel& mode);
+    virtual ~LeptonicDecayChannel();
+
+    // No copy and assignemnt -> done by clone
+    DecayChannel* clone() const { return new LeptonicDecayChannel(*this); }
+
+    const std::string& GetName() const { return name_; }
+
+private:
+    double DecayRate(double x, double parent_mass, double E_max, double right_side);
+    double DifferentialDecayRate(double x, double parent_mass, double E_max);
+
+    static const std::string name_;
 };
 
 } // namespace PROPOSAL

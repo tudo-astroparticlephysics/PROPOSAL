@@ -13,9 +13,15 @@
 
 using namespace PROPOSAL;
 
-const std::string LeptonicDecayChannel::name_ = "LeptonicDecayChannel";
+/******************************************************************************
+*                         LeptonicDecayChannelApprox                         *
+******************************************************************************/
 
-LeptonicDecayChannel::LeptonicDecayChannel(const ParticleDef& lepton,
+
+const std::string LeptonicDecayChannelApprox::name_ = "LeptonicDecayChannelApprox";
+
+// ------------------------------------------------------------------------- //
+LeptonicDecayChannelApprox::LeptonicDecayChannelApprox(const ParticleDef& lepton,
                                            const ParticleDef& neutrino,
                                            const ParticleDef& anti_neutrino)
     : DecayChannel()
@@ -25,9 +31,11 @@ LeptonicDecayChannel::LeptonicDecayChannel(const ParticleDef& lepton,
 {
 }
 
-LeptonicDecayChannel::~LeptonicDecayChannel() {}
+// ------------------------------------------------------------------------- //
+LeptonicDecayChannelApprox::~LeptonicDecayChannelApprox() {}
 
-LeptonicDecayChannel::LeptonicDecayChannel(const LeptonicDecayChannel& mode)
+// ------------------------------------------------------------------------- //
+LeptonicDecayChannelApprox::LeptonicDecayChannelApprox(const LeptonicDecayChannelApprox& mode)
     : DecayChannel(mode)
     , massive_lepton_(mode.massive_lepton_)
     , neutrino_(mode.neutrino_)
@@ -35,9 +43,10 @@ LeptonicDecayChannel::LeptonicDecayChannel(const LeptonicDecayChannel& mode)
 {
 }
 
-bool LeptonicDecayChannel::compare(const DecayChannel& channel) const
+// ------------------------------------------------------------------------- //
+bool LeptonicDecayChannelApprox::compare(const DecayChannel& channel) const
 {
-    const LeptonicDecayChannel* leptonic = dynamic_cast<const LeptonicDecayChannel*>(&channel);
+    const LeptonicDecayChannelApprox* leptonic = dynamic_cast<const LeptonicDecayChannelApprox*>(&channel);
 
     if (!leptonic)
         return false;
@@ -51,22 +60,35 @@ bool LeptonicDecayChannel::compare(const DecayChannel& channel) const
         return true;
 }
 
-double LeptonicDecayChannel::DecayRate(double x, double right_side)
+// ------------------------------------------------------------------------- //
+double LeptonicDecayChannelApprox::DecayRate(double x, double parent_mass, double E_max, double right_side)
 {
+    (void)parent_mass;
+    (void)E_max;
+
     return x * x * x * (1. - 0.5 * x) - right_side;
 }
 
-double LeptonicDecayChannel::DifferentialDecayRate(double x)
+// ------------------------------------------------------------------------- //
+double LeptonicDecayChannelApprox::DifferentialDecayRate(double x, double parent_mass, double E_max)
 {
+    (void)parent_mass;
+    (void)E_max;
+
     return (3 - 2 * x) * x * x;
 }
 
-std::pair<double, double> LeptonicDecayChannel::function_and_derivative(double x, double right_side)
+// ------------------------------------------------------------------------- //
+std::pair<double, double> LeptonicDecayChannelApprox::function_and_derivative(double x,
+                                                                        double parent_mass,
+                                                                        double E_max,
+                                                                        double right_side)
 {
-    return std::make_pair(DecayRate(x, right_side), DifferentialDecayRate(x));
+    return std::make_pair(DecayRate(x, parent_mass, E_max, right_side), DifferentialDecayRate(x, parent_mass, E_max));
 }
 
-double LeptonicDecayChannel::FindRootBoost(double min, double right_side)
+// ------------------------------------------------------------------------- //
+double LeptonicDecayChannelApprox::FindRootBoost(double min, double parent_mass, double E_max, double right_side)
 {
     double max        = 1;
     double x_start    = 0.5;
@@ -75,14 +97,15 @@ double LeptonicDecayChannel::FindRootBoost(double min, double right_side)
     // int max_steps = 40;
 
     return boost::math::tools::newton_raphson_iterate(
-        boost::bind(&LeptonicDecayChannel::function_and_derivative, this, _1, right_side),
+        boost::bind(&LeptonicDecayChannelApprox::function_and_derivative, this, _1, parent_mass, E_max, right_side),
         x_start,
         min,
         max,
         binary_digits);
 }
 
-DecayChannel::DecayProducts LeptonicDecayChannel::Decay(const Particle& particle)
+// ------------------------------------------------------------------------- //
+DecayChannel::DecayProducts LeptonicDecayChannelApprox::Decay(const Particle& particle)
 {
     double parent_mass = particle.GetMass();
 
@@ -94,10 +117,14 @@ DecayChannel::DecayProducts LeptonicDecayChannel::Decay(const Particle& particle
     // Sample energy from decay rate
     double emax       = (parent_mass * parent_mass + massive_lepton_.mass * massive_lepton_.mass) / (2 * parent_mass);
     double x_min      = massive_lepton_.mass / emax;
-    double f_min      = x_min * x_min * x_min * (1 - 0.5 * x_min);
-    double right_side = f_min + (0.5 - f_min) * RandomGenerator::Get().RandomDouble();
+    // double f_min      = x_min * x_min * x_min * (1 - 0.5 * x_min);
+    // double right_side = f_min + (0.5 - f_min) * RandomGenerator::Get().RandomDouble();
 
-    double find_root = FindRootBoost(x_min, right_side);
+    double f_min      = DecayRate(x_min, parent_mass, emax, 0.0);
+    double f_max      = DecayRate(1.0, parent_mass, emax, 0.0);
+    double right_side = f_min + (f_max - f_min) * RandomGenerator::Get().RandomDouble();
+
+    double find_root = FindRootBoost(x_min, parent_mass, emax, right_side);
 
     double lepton_energy   = std::max(find_root * emax, massive_lepton_.mass);
     double lepton_momentum = sqrt(lepton_energy * lepton_energy - massive_lepton_.mass * massive_lepton_.mass);
@@ -135,9 +162,56 @@ DecayChannel::DecayProducts LeptonicDecayChannel::Decay(const Particle& particle
 // Print
 // ------------------------------------------------------------------------- //
 
-void LeptonicDecayChannel::print(std::ostream& os) const
+// ------------------------------------------------------------------------- //
+void LeptonicDecayChannelApprox::print(std::ostream& os) const
 {
     os << "Massive lepton:\n" << massive_lepton_ << '\n';
     os << "Neutrino:\n" << neutrino_ << '\n';
     os << "Anti neutrino:\n" << anti_neutrino_ << '\n';
+}
+
+/******************************************************************************
+ *                          LeptonicDecayChannel                              *
+ ******************************************************************************/
+
+const std::string LeptonicDecayChannel::name_ = "LeptonicDecayChannel";
+
+// ------------------------------------------------------------------------- //
+LeptonicDecayChannel::LeptonicDecayChannel(const ParticleDef& lepton,
+                                                 const ParticleDef& neutrino,
+                                                 const ParticleDef& anti_neutrino)
+    : LeptonicDecayChannelApprox(lepton, neutrino, anti_neutrino)
+{
+}
+
+// ------------------------------------------------------------------------- //
+LeptonicDecayChannel::~LeptonicDecayChannel() {}
+
+// ------------------------------------------------------------------------- //
+LeptonicDecayChannel::LeptonicDecayChannel(const LeptonicDecayChannel& mode)
+    : LeptonicDecayChannelApprox(mode)
+{
+}
+
+// ------------------------------------------------------------------------- //
+double LeptonicDecayChannel::DecayRate(double x, double M, double E_max, double right_side)
+{
+    double M2 = M * M;
+    double m  = massive_lepton_.mass;
+    double m2 = m * m;
+
+    double E_l     = E_max * x;
+    double sqrt_EM = std::sqrt(E_l * E_l - m2);
+
+    return 1.5 * m2 * m2 * M * std::log(sqrt_EM + E_l) +
+           sqrt_EM * ((M2 + m2 - M * E_l) * (E_l * E_l - m2) - 1.5 * M * E_l * m2) - right_side;
+}
+
+// ------------------------------------------------------------------------- //
+double LeptonicDecayChannel::DifferentialDecayRate(double x, double M, double E_max)
+{
+    double m   = massive_lepton_.mass;
+    double E_l = E_max * x;
+
+    return E_max * std::sqrt(E_l * E_l - m * m) * (M * E_l * (3.0 * M - 4.0 * E_l) + m * m * (3.0 * E_l - 2 * M));
 }
