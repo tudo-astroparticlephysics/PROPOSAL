@@ -21,6 +21,7 @@ ManyBodyPhaseSpace::ManyBodyPhaseSpace(std::vector<const ParticleDef*> daughters
     , daughter_masses_()
     , number_of_daughters_(static_cast<int>(daughters.size()))
     , sum_daughter_masses_(0.0)
+    , uniform_(true)
 {
     for (std::vector<const ParticleDef*>::iterator it = daughters.begin(); it != daughters.end(); ++it)
     {
@@ -46,6 +47,7 @@ ManyBodyPhaseSpace::ManyBodyPhaseSpace(const ManyBodyPhaseSpace& mode)
     , daughter_masses_(mode.daughter_masses_)
     , number_of_daughters_(mode.number_of_daughters_)
     , sum_daughter_masses_(mode.sum_daughter_masses_)
+    , uniform_(mode.uniform_)
 {
     for (std::vector<const ParticleDef*>::const_iterator it = mode.daughters_.begin(); it != mode.daughters_.end();
          ++it)
@@ -70,6 +72,9 @@ bool ManyBodyPhaseSpace::compare(const DecayChannel& channel) const
     } else if (daughter_masses_ != many_body->daughter_masses_)
     {
         return false;
+    } else if (uniform_ != many_body->uniform_)
+    {
+        return false;
     } else
     {
         return true;
@@ -89,50 +94,47 @@ DecayChannel::DecayProducts ManyBodyPhaseSpace::Decay(const Particle& particle)
         products.push_back(new Particle(**it));
     }
 
-    // Create vector for virtual masses
-    std::vector<double> virtual_masses;
-
-    // Create vector for intermediate momenta
-    std::vector<double> momenta;
-
     // prefactor for the phase space density
     PhaseSpaceParameters params = GetPhaseSpaceParams(particle.GetParticleDef());
 
-    // do rejection until phase space distribution is uniform
-    double weight = -1.0;
+    // precalculated kinematics
+    PhaseSpaceKinematics kinematics = CalculateKinematics(params.normalization, parent_mass);
 
-    while (RandomGenerator::Get().RandomDouble() * params.weight_max > weight)
+    if (uniform_)
     {
-        virtual_masses = CalculateVirtualMasses(parent_mass);
-        momenta = CalculateIntermediateMomenta(weight, params.normalization, virtual_masses);
+        // do rejection until phase space distribution is uniform
+        while (RandomGenerator::Get().RandomDouble() * params.weight_max > kinematics.weight)
+        {
+            kinematics = CalculateKinematics(params.normalization, parent_mass);
+        }
     }
 
+    // Calculate first momentum in R2
     Vector3D direction = GenerateRandomDirection();
 
-    // Calculate first momentum in R2
     products[1]->SetDirection(direction);
-    products[1]->SetMomentum(momenta[0]);
+    products[1]->SetMomentum(kinematics.momenta[0]);
 
     products[0]->SetDirection(-direction);
-    products[0]->SetMomentum(momenta[0]);
+    products[0]->SetMomentum(kinematics.momenta[0]);
 
     // Correct the previous momenta
     for (unsigned int i = 2; i < daughter_masses_.size(); ++i)
     {
-        double momentum = momenta[i-1];
+        double momentum = kinematics.momenta[i-1];
 
         products[i]->SetDirection(GenerateRandomDirection());
         products[i]->SetMomentum(momentum);
 
         // Boost previous particles to new frame
 
-        double M    = virtual_masses[i - 1];
+        double M    = kinematics.virtual_masses[i - 1];
         double beta = momentum / std::sqrt(momentum * momentum + M * M);
 
         for (unsigned int s = 0; s < i; ++s)
         {
             // Boost in -p_i direction
-            Boost(*products[s], products[i]->GetDirection(), -beta);
+            Boost(*products[s], products[i]->GetDirection(), beta);
         }
     }
 
@@ -191,14 +193,14 @@ double ManyBodyPhaseSpace::EstimateMaxWeight(double normalization, double parent
 }
 
 // ------------------------------------------------------------------------- //
-std::vector<double> ManyBodyPhaseSpace::CalculateVirtualMasses(double parent_mass)
+ManyBodyPhaseSpace::PhaseSpaceKinematics ManyBodyPhaseSpace::CalculateKinematics(double normalization, double parent_mass)
 {
+    PhaseSpaceKinematics kinematics;
+
+    // Create sorted random numbers
     std::vector<double> randoms;
     randoms.reserve(daughters_.size());
 
-    std::vector<double> virtual_masses;
-
-    // Create sorted random numbers
     randoms.push_back(0.0);
 
     for (unsigned int i = 0; i < daughter_masses_.size() - 2; ++i)
@@ -215,29 +217,23 @@ std::vector<double> ManyBodyPhaseSpace::CalculateVirtualMasses(double parent_mas
     for (int i = 0; i < number_of_daughters_; ++i)
     {
         intermediate_mass += daughter_masses_[i];
-        virtual_masses.push_back(intermediate_mass + randoms[i] * (parent_mass - sum_daughter_masses_));
+        kinematics.virtual_masses.push_back(intermediate_mass + randoms[i] * (parent_mass - sum_daughter_masses_));
     }
 
-    return virtual_masses;
-}
-
-// ------------------------------------------------------------------------- //
-std::vector<double> ManyBodyPhaseSpace::CalculateIntermediateMomenta(double& weight, double normalization, std::vector<double>& virtual_masses)
-{
-    weight = 1.0;
+    // Calculate intermediate momenta
+    double weight = 1.0;
     double momentum = 0.0;
-    std::vector<double> momenta;
 
     for (int i = 1; i < number_of_daughters_; ++i)
     {
-        momentum = Momentum(virtual_masses[i], virtual_masses[i - 1], daughter_masses_[i]);
-        momenta.push_back(momentum);
+        momentum = Momentum(kinematics.virtual_masses[i], kinematics.virtual_masses[i - 1], daughter_masses_[i]);
+        kinematics.momenta.push_back(momentum);
         weight *= momentum;
     }
 
-    weight = normalization * weight;
+    kinematics.weight = normalization * weight;
 
-    return momenta;
+    return kinematics;
 }
 
 // ------------------------------------------------------------------------- //

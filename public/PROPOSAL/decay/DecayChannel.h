@@ -114,6 +114,18 @@ public:
     // ----------------------------------------------------------------------------
     static Vector3D GenerateRandomDirection();
 
+    // ----------------------------------------------------------------------------
+    /// @brief Sets the uniform flag in the ManyBodyPhaseSpace channels
+    ///
+    /// If uniform is true, the momenta will be sampled uniform in the phase space.
+    /// This is done by rejection, since the pure raubold lynch algorithm does not
+    /// create a uniform phase space. So enabling uniform sampling comes in with
+    /// a cost of performance.
+    ///
+    /// @param uniform
+    // ----------------------------------------------------------------------------
+    virtual void SetUniformSampling(bool uniform) {(void) uniform;};
+
     virtual const std::string& GetName() const = 0;
 
 protected:

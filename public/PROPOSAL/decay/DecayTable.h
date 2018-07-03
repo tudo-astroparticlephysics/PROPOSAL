@@ -94,12 +94,20 @@ public:
     // ----------------------------------------------------------------------------
     void SetStable();
 
+    // ----------------------------------------------------------------------------
+    /// @brief Sets the uniform flag in the ManyBodyPhaseSpace channels
+    ///
+    /// If uniform is true, the momenta will be sampled uniform in the phase space.
+    /// This is done by rejection, since the pure raubold lynch algorithm does not
+    /// create a uniform phase space. So enabling uniform sampling comes in with
+    /// a cost of performance.
+    ///
+    /// @param uniform
+    // ----------------------------------------------------------------------------
+    void SetUniformSampling(bool uniform) const;
+
 private:
     void clearTable();
-    void Register(const std::string& name, Mode); // TODO(mario): Public version Fri 2017/09/22
-
-    std::vector<Mode> registered_mode_;
-    std::vector<std::string> registered_str_;
 
     DecayMap channels_;
 };
