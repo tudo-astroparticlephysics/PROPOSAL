@@ -49,12 +49,20 @@ public:
         double weight_max;
     };
 
+    struct PhaseSpaceKinematics
+    {
+        std::vector<double> virtual_masses;
+        std::vector<double> momenta;
+        double weight;
+    };
+
     typedef boost::unordered_map<ParticleDef, PhaseSpaceParameters> ParameterMap;
 
 public:
     ManyBodyPhaseSpace(std::vector<const ParticleDef*> daughters);
     ManyBodyPhaseSpace(const ManyBodyPhaseSpace& mode);
     virtual ~ManyBodyPhaseSpace();
+
     // No copy and assignemnt -> done by clone
     DecayChannel* clone() const { return new ManyBodyPhaseSpace(*this); }
 
@@ -69,16 +77,68 @@ public:
     // ----------------------------------------------------------------------------
     DecayProducts Decay(const Particle&);
 
+    // ----------------------------------------------------------------------------
+    /// @brief Sets the uniform flag
+    ///
+    /// If uniform is true, the momenta will be sampled uniform in the phase space.
+    /// This is done by rejection, since the pure raubold lynch algorithm does not
+    /// create a uniform phase space. So enabling uniform sampling comes in with
+    /// a cost of performance.
+    ///
+    /// @param uniform
+    // ----------------------------------------------------------------------------
+    void SetUniformSampling(bool uniform) {uniform_ = uniform;}
+
     const std::string& GetName() const { return name_; }
 
 private:
     ManyBodyPhaseSpace& operator=(const ManyBodyPhaseSpace&); // Undefined & not allowed
 
+    // ----------------------------------------------------------------------------
+    /// @brief Calculate the normalization of the phase space density
+    ///
+    /// @param parent_mass
+    ///
+    /// @return \f$ \rho(\Phi) = \frac{{(M - \mu_n)}^{n-2}}{(n-2)!} \cdot \prod_{i=2}^{n} (2\pi P_i)~. \f$
+    // ----------------------------------------------------------------------------
     double CalculateNormalization(double parent_mass);
-    PhaseSpaceParameters GetPhaseSpaceParams(const ParticleDef& parent);
+
+    // ----------------------------------------------------------------------------
+    /// @brief Calculate the maximum weight for the phase space
+    ///
+    /// @param normalization
+    /// @param parent_mass
+    ///
+    /// This value is need for the rejection method to create a uniform distribution
+    /// of the phase space.
+    ///
+    /// @return maximum weight
+    // ----------------------------------------------------------------------------
     double EstimateMaxWeight(double normalization, double parent_mass);
-    std::vector<double> CalculateVirtualMasses(double parent_mass);
-    std::vector<double> CalculateIntermediateMomenta(double& weight, double normalization, std::vector<double>& virtual_masses);
+
+    // ----------------------------------------------------------------------------
+    /// @brief Calculate the normalization and maximum weight
+    ///
+    /// @param parent
+    ///
+    /// For every particle definition the normalization and maximum weight is unique.
+    /// Both values will be created and stored in an hash table.
+    ///
+    /// @return struct containing the normalization and maximum weight
+    // ----------------------------------------------------------------------------
+    PhaseSpaceParameters GetPhaseSpaceParams(const ParticleDef& parent);
+
+
+    // ----------------------------------------------------------------------------
+    /// @brief Calculate the kinematics for the use in the raubold lynch algorithm
+    ///
+    /// @param normalization
+    /// @param parent_mass
+    ///
+    /// @return struct containing the weight of the phase space point,
+    ///         intermediate momenta and virtual masses for the algorithm.
+    // ----------------------------------------------------------------------------
+    PhaseSpaceKinematics CalculateKinematics(double normalization, double parent_mass);
 
     bool compare(const DecayChannel&) const;
     void print(std::ostream&) const;
@@ -88,6 +148,7 @@ private:
 
     int number_of_daughters_;
     double sum_daughter_masses_;
+    bool uniform_;
 
     static const std::string name_;
 
