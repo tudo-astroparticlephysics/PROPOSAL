@@ -249,7 +249,7 @@ MuMinusDef::MuMinusDef()
           LMU,
           -1.0,
           HardComponentTables::MuonTable,
-          DecayTable().addChannel(1.0, LeptonicDecayChannel(EMinusDef::Get(), NuMuDef::Get(), NuEBarDef::Get())))
+          DecayTable().addChannel(1.0, LeptonicDecayChannelApprox(EMinusDef::Get(), NuMuDef::Get(), NuEBarDef::Get())))
 {
 }
 
@@ -262,7 +262,7 @@ MuPlusDef::MuPlusDef()
                   LMU,
                   1.0,
                   HardComponentTables::MuonTable,
-                  DecayTable().addChannel(1.0, LeptonicDecayChannel(EPlusDef::Get(), NuEDef::Get(), NuMuBarDef::Get())))
+                  DecayTable().addChannel(1.0, LeptonicDecayChannelApprox(EPlusDef::Get(), NuEDef::Get(), NuMuBarDef::Get())))
 {
 }
 
@@ -277,7 +277,7 @@ TauMinusDef::TauMinusDef()
                   HardComponentTables::TauTable,
                   DecayTable()
                       .addChannel(0.1737, LeptonicDecayChannel(MuMinusDef::Get(), NuTauDef::Get(), NuMuBarDef::Get()))
-                      .addChannel(0.1783, LeptonicDecayChannel(EMinusDef::Get(), NuMuDef::Get(), NuEBarDef::Get()))
+                      .addChannel(0.1783, LeptonicDecayChannelApprox(EMinusDef::Get(), NuMuDef::Get(), NuEBarDef::Get()))
                       .addChannel(0.1153, TwoBodyPhaseSpace(PiMinusDef::Get(), NuTauDef::Get()))
                       .addChannel(0.2595,
                                   ManyBodyPhaseSpace::Builder()
@@ -342,7 +342,7 @@ TauPlusDef::TauPlusDef()
                   HardComponentTables::TauTable,
                   DecayTable()
                       .addChannel(0.1737, LeptonicDecayChannel(MuPlusDef::Get(), NuTauBarDef::Get(), NuMuDef::Get()))
-                      .addChannel(0.1783, LeptonicDecayChannel(EPlusDef::Get(), NuMuBarDef::Get(), NuEDef::Get()))
+                      .addChannel(0.1783, LeptonicDecayChannelApprox(EPlusDef::Get(), NuMuBarDef::Get(), NuEDef::Get()))
                       .addChannel(0.1153, TwoBodyPhaseSpace(PiPlusDef::Get(), NuTauBarDef::Get()))
                       .addChannel(0.2595,
                                   ManyBodyPhaseSpace::Builder()
