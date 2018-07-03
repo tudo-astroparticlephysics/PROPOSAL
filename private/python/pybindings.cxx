@@ -728,7 +728,10 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
         .def("boost", Boost, "Boost the particle along a direction")
         .staticmethod("boost");
 
-    class_<LeptonicDecayChannel, boost::shared_ptr<LeptonicDecayChannel>, bases<DecayChannel> >(
+    class_<LeptonicDecayChannelApprox, boost::shared_ptr<LeptonicDecayChannelApprox>, bases<DecayChannel> >(
+        "LeptonicDecayChannelApprox", init<const ParticleDef&, const ParticleDef&, const ParticleDef&>());
+
+    class_<LeptonicDecayChannel, boost::shared_ptr<LeptonicDecayChannel>, bases<LeptonicDecayChannelApprox> >(
         "LeptonicDecayChannel", init<const ParticleDef&, const ParticleDef&, const ParticleDef&>());
 
     class_<TwoBodyPhaseSpace, boost::shared_ptr<TwoBodyPhaseSpace>, bases<DecayChannel> >(
