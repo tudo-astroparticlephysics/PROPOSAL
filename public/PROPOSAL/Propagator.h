@@ -198,6 +198,7 @@ private:
         global_cont_behind_;        //!< continuous randominzation flag for behind the detector (it's used when not
                                     //! specified explicit for a sector in congiguration file)
     static const bool interpolate_; //!< Enable interpolation
+    static const bool uniform_; //!< Enable uniform sampling of phase space points for decays
 
     // --------------------------------------------------------------------- //
     // Private Member

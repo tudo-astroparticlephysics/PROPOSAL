@@ -30,7 +30,7 @@ using namespace PROPOSAL;
 // Global defaults
 // ------------------------------------------------------------------------- //
 
-const int Propagator::global_seed_  = 0;
+const int Propagator::global_seed_            = 0;
 const double Propagator::global_ecut_inside_  = 500;
 const double Propagator::global_ecut_infront_ = -1;
 const double Propagator::global_ecut_behind_  = -1;
@@ -40,7 +40,8 @@ const double Propagator::global_vcut_behind_  = -1;
 const double Propagator::global_cont_inside_  = false;
 const double Propagator::global_cont_infront_ = true;
 const double Propagator::global_cont_behind_  = false;
-const bool Propagator::interpolate_           = true; //!< Enable interpolation
+const bool Propagator::interpolate_           = true;
+const bool Propagator::uniform_               = true;
 
 // ------------------------------------------------------------------------- //
 // Constructors & destructor
@@ -155,6 +156,7 @@ Propagator::Propagator(const ParticleDef& particle_def, const std::string& confi
     bool global_cont_behind  = global_cont_behind_;
 
     bool interpolate = interpolate_;
+    bool uniform = uniform_;
 
     // Create the json parser
     boost::property_tree::ptree pt_json;
@@ -167,6 +169,7 @@ Propagator::Propagator(const ParticleDef& particle_def, const std::string& confi
         log_fatal("Unable parse \"%s\" as json file", config_file.c_str());
     }
 
+    // set the seed of the random number generator
     SetMember(global_seed, "global.seed", pt_json);
     RandomGenerator::Get().SetSeed(global_seed);
     log_info("Seed of the default random generator set to %i", global_seed);
@@ -271,6 +274,10 @@ Propagator::Propagator(const ParticleDef& particle_def, const std::string& confi
     sec_def_global.utility_def.photo_def.shadow = PhotonuclearFactory::Get().GetShadowEnumFromString(shadow);
 
     SetMember(sec_def_global.utility_def.photo_def.hard_component, "global.photo_hard_component", pt_json);
+
+    // read in the uniform flag
+    SetMember(uniform, "global.uniform", pt_json);
+    particle_.GetDecayTable().SetUniformSampling(uniform);
 
     // Read in all sector definitions
     boost::property_tree::ptree* sectors = NULL;
