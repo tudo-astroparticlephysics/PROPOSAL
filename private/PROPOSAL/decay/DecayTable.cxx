@@ -16,13 +16,8 @@ using namespace PROPOSAL;
 
 // ------------------------------------------------------------------------- //
 DecayTable::DecayTable()
-    : registered_mode_()
-    , registered_str_()
-    , channels_()
+    : channels_()
 {
-    Register("leptonic_chanel", LeptonicDecay);
-    Register("two_body_phase_space", TwoBodyDecay);
-    Register("stable", Stable);
 }
 
 // ------------------------------------------------------------------------- //
@@ -40,9 +35,6 @@ DecayTable::DecayTable(const DecayTable& table)
 DecayTable::~DecayTable()
 {
     clearTable();
-
-    registered_mode_.clear();
-    registered_str_.clear();
 }
 
 DecayTable& DecayTable::operator=(const DecayTable& table)
@@ -151,6 +143,18 @@ DecayTable& DecayTable::addChannel(double Br, const DecayChannel& dc)
     return *this;
 }
 
+void DecayTable::SetUniformSampling(bool uniform) const
+{
+    for (DecayMap::const_iterator iter = channels_.begin(); iter != channels_.end(); ++iter)
+    {
+        iter->second->SetUniformSampling(uniform);
+    }
+}
+
+// ------------------------------------------------------------------------- //
+// private methods
+// ------------------------------------------------------------------------- //
+
 // ------------------------------------------------------------------------- //
 void DecayTable::clearTable()
 {
@@ -163,11 +167,4 @@ void DecayTable::clearTable()
     }
 
     channels_.clear();
-}
-
-// ------------------------------------------------------------------------- //
-void DecayTable::Register(const std::string& name, Mode model)
-{
-    registered_str_.push_back(name);
-    registered_mode_.push_back(model);
 }

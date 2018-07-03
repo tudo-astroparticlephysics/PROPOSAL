@@ -760,7 +760,8 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
         .def("select_channel",
              make_function(&DecayTable::SelectChannel, return_internal_reference<>()),
              "Select an decay channel according to given branching ratios")
-        .def("set_stable", &DecayTable::SetStable, "Define decay table for stable particles");
+        .def("set_stable", &DecayTable::SetStable, "Define decay table for stable particles")
+        .def("set_uniform_sampling", &DecayTable::SetUniformSampling, "Set whether to sample many body decays uniform in phase space");
 
     /**************************************************************************
      *                              ParticleDef                                *
