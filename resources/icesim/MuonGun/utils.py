@@ -35,7 +35,7 @@ class buffering_histogram(dashi.histogram.histogram):
 		# For large entries, kick straight to vanilla fill()
 		if n > self.maxbuf:
 			super(buffering_histogram, self).fill(sample, numpy.ones(n)*(weight/n))
-			return
+			return 
 		elif self._bh_pos + n > self.maxbuf:
 			self.flush()
 		self._bh_sample[self._bh_pos:self._bh_pos+n] = sample
@@ -53,7 +53,7 @@ def dcorsika_spectra(gamma=[-2.]*5, normalization=[10., 5., 3., 2., 1.], emin=6e
 	Calculate the generation spectra for the H, He, N, Al, and Fe components of 5-component dCORSIKA
 	"""
 	from icecube.weighting.weighting import PowerLaw
-	masses = [1, 4, 14, 27, 56]
+	masses = [1, 4, 14, 27, 56] 
 	fluxsums = numpy.array([n*fluxsum(emin*m, emax, g) for m, g, n in zip(masses, gamma, normalization)])
 	nshower = nevents*fluxsums/fluxsums.sum()
 	print(nshower)
@@ -82,33 +82,37 @@ class VolumeCorrWeight(object):
 
 
 from os.path import expandvars
-def MMCFactory(radius=100000*I3Units.m, length=10*I3Units.m, seed=random.randint(0, (1<<32) - 1), impl='mmc', mediadef=expandvars('$I3_BUILD/MuonGun/resources/iceworld-mediadef')):
-	# Now create the MMC propagators, but first *all* of the options must be set here.
-	# There's no special options added behind the scenes.  This is much more flexible.
-	#  Below are the standard options.  To interpret them see the MMC docs.
-	mmcOpts = "-romb=5 -raw -user -sdec -time -lpm -bs=1 -ph=3 -bb=2 -sh=2 -frho -cont "
-	mmcOpts += expandvars("-tdir=$I3_BUILD/mmc-icetray/resources ")
-	mmcOpts += expandvars("-mediadef=%s " % mediadef)
-	mmcOpts += "-radius=%d " % radius
-	mmcOpts += "-length=%d " % length
-	mmcOpts += "-seed=%d " % seed
+def MMCFactory(radius=100000*I3Units.m, length=10*I3Units.m, seed=random.randint(0, (1<<32) - 1), impl='mmc', mediadef=None):
 
 	if impl.lower() == 'mmc':
 		from icecube import c2j_icetray, mmc_icetray
+
+		if mediadef is None:
+			mediadef=expandvars('$I3_BUILD/MuonGun/resources/iceworld-mediadef')
+		# Now create the MMC propagators, but first *all* of the options must be set here. 
+		# There's no special options added behind the scenes.  This is much more flexible. 
+		# Below are the standard options.  To interpret them see the MMC docs.
+		mmcOpts = "-romb=5 -raw -user -sdec -time -lpm -bs=1 -ph=3 -bb=2 -sh=2 -frho -cont "
+		mmcOpts += expandvars("-tdir=$I3_BUILD/mmc-icetray/resources ")
+		mmcOpts += expandvars("-mediadef=%s " % mediadef)
+		mmcOpts += "-radius=%d " % radius
+		mmcOpts += "-length=%d " % length
+		mmcOpts += "-seed=%d " % seed
+
 		jvmOpts = icetray.vector_string()    # fill this with parameters passed directly to the JavaVM
 		jvmOpts.append(expandvars("-Djava.class.path=$I3_BUILD/lib/mmc.jar"))
 		jvmOpts.append("-Xms256m")
 		jvmOpts.append("-Xmx512m")
 		jvmOpts.append("-XX:-HeapDumpOnOutOfMemoryError")
-
+		
 		jvm = c2j_icetray.I3JavaVM(jvmOpts)
 		return mmc_icetray.I3PropagatorServiceMMC(jvm,mmcOpts)
 	else:
-		from icecube import PROPOSAL
-        return PROPOSAL.I3PropagatorServicePROPOSAL(
-            mediadef=mediadef,
-            cylinderRadius=radius,
-            cylinderHeight=length)
+		from icecube import PROPOSAL_icetray
+		# in PROPOSAL everything can be defined in the configuration file
+		if mediadef is None:
+			mediadef=expandvars('$I3_BUILD/PROPOSAL/resources/iceworld-config.json')
+		return PROPOSAL_icetray.I3PropagatorServicePROPOSAL(config_file=mediadef)
 
 def PropagatorMMC(tray, name, seed=random.randint(0, (1<<32) - 1)):
 	from icecube import c2j_icetray, mmc_icetray
@@ -118,7 +122,7 @@ def PropagatorMMC(tray, name, seed=random.randint(0, (1<<32) - 1)):
 	jvmOpts.append("-Xmx512m")
 	jvmOpts.append("-XX:-HeapDumpOnOutOfMemoryError")
 	tray.AddService('I3JavaVMFactory', 'jvm', Options=jvmOpts)
-
+	
 	mmcOpts = "-romb=5 -raw -user -sdec -time -lpm -bs=1 -ph=3 -bb=2 -sh=2 -frho -cont "
 	mmcOpts += expandvars("-tdir=$I3_BUILD/mmc-icetray/resources ")
 	mmcOpts += expandvars("-mediadef=$I3_BUILD/mmc-icetray/resources/mediadef ")
@@ -132,7 +136,7 @@ class CrustyPropagator(icetray.I3Module):
 	def __init__(self, context):
 		super(CrustyPropagator, self).__init__(context)
 		self.AddOutBox("OutBox")
-
+	
 	def Configure(self):
 		from icecube.MuonGun import MuonPropagator, Crust, Sphere, Cylinder
 
@@ -140,9 +144,9 @@ class CrustyPropagator(icetray.I3Module):
 		self.crust.add_layer(Sphere(1948, 6374134), MuonPropagator("ice", ecut=-1, vcut=5e-2, rho=0.832))
 		self.crust.add_layer(Sphere(1748, 6373934), MuonPropagator("ice", ecut=-1, vcut=5e-2, rho=1.005))
 		self.crust.add_layer(Cylinder(1600, 800),   MuonPropagator("ice", ecut=-1, vcut=5e-2, rho=1.005))
-
+	
 	def DAQ(self, frame):
-
+		
 		for track in frame['I3MCTree']:
 			if not track.type in (track.MuPlus, track.MuMinus):
 				continue
@@ -153,11 +157,11 @@ class CrustyPropagator(icetray.I3Module):
 				track.length = float('inf')
 			else:
 				track.length = 0
-
+			
 		self.PushFrame(frame)
 
 def MuonitronPropagator(tray, name):
-
+	
 	def find_intersection(frame):
 		from icecube.MuonGun import Cylinder
 		from icecube.dataclasses import I3Constants, I3VectorDouble
@@ -165,7 +169,7 @@ def MuonitronPropagator(tray, name):
 		impact = Cylinder(1600, 800).intersection(primary.pos, primary.dir)
 		d0 = I3Constants.SurfaceElev - I3Constants.OriginElev - (primary.pos.z + impact.first*primary.dir.z)
 		frame['Depths'] = I3VectorDouble([d0])
-
+	
 	def patch_mctree(frame):
 		tracks = frame['Tracks']
 		if len(tracks) > 0:
@@ -183,9 +187,9 @@ def MuonitronPropagator(tray, name):
 				i += 1
 			else:
 				track.length = 0
-
+	
 	tray.AddModule(find_intersection, name+'_find_intersection', Streams=[icetray.I3Frame.DAQ])
-
+	
 	from icecube.MuonGun import MuonPropagator, Crust, Sphere
 
 	crust = Crust(MuonPropagator("air", ecut=-1, vcut=5e-2, rho=0.673))
@@ -197,7 +201,7 @@ def MuonitronPropagator(tray, name):
 	    Propagator=MuonPropagator("ice", ecut=-1, vcut=5e-2, rho=1.005),
 	    Crust=crust,
 	)
-
+	
 	tray.AddModule(patch_mctree, name+'_patch_mctree', Streams=[icetray.I3Frame.DAQ])
 
 import dashi, numpy, tables
@@ -209,13 +213,13 @@ class Router(icetray.I3Module):
 		self.AddOutBox("OutBox")
 		for ptype in 'PPlus', 'He4Nucleus', 'N14Nucleus', 'Al27Nucleus', 'Fe56Nucleus':
 			self.AddOutBox(ptype)
-
+		
 		self.AddParameter("Routes", "", dict())
-
+	
 	def Configure(self):
-
+		
 		self.routes = self.GetParameter("Routes")
-
+		
 		slots = set()
 		for ptype, boxes in self.routes.items():
 			for box in boxes:
@@ -226,7 +230,7 @@ class Router(icetray.I3Module):
 		ptype = frame['MCPrimary'].type
 		for box in self.routes.get(ptype, list()):
 			self.PushFrame(frame, box)
-
+		
 
 
 class Filler(icetray.I3ConditionalModule):
@@ -241,32 +245,32 @@ class Filler(icetray.I3ConditionalModule):
 		self.AddParameter("MinDepth", "", 1.)
 		self.AddParameter("MaxDepth", "", 5.)
 		self.AddParameter("DepthSteps", "", 9)
-
+	
 	def Configure(self):
 		from collections import defaultdict
-
+		
 		depthbins = numpy.linspace(self.GetParameter("MinDepth"), self.GetParameter("MaxDepth"), self.GetParameter("DepthSteps"))
 		depthbins -= numpy.diff(depthbins)[0]/2.
 		zenbins = numpy.arccos(numpy.linspace(1, 0, 11))
 		zenbins_fine = numpy.arccos(numpy.linspace(1, 0, 101))
 		multbins = numpy.array([1, 2, 3, 4, 10, 20, 40, 100], dtype=float)
 		rbins = numpy.array([0, 5, 10, 15, 25, 45], dtype=float)
-
+		
 		self.primary = buffering_histogram(2, (zenbins, numpy.logspace(2, 11, 101)))
 		self.multiplicity = dashi.histogram.histogram(3, (zenbins_fine, depthbins, numpy.arange(1, 100)))
 		self.radius = dashi.histogram.histogram(4, (zenbins, depthbins, multbins, numpy.linspace(0, numpy.sqrt(250), 101)**2))
 		self.energy = dashi.histogram.histogram(5, (zenbins, depthbins, multbins, rbins, numpy.logspace(0, 6, 101)))
-
+		
 		self.multiplicity_slices = tuple([tuple([buffering_histogram(1, (numpy.arange(1, 100),)) for j in range(len(depthbins))]) for i in range(len(zenbins_fine))])
 		self.radius_slices = tuple([tuple([buffering_histogram(2, (multbins, numpy.linspace(0, numpy.sqrt(250), 101)**2)) for j in range(len(depthbins))]) for i in range(len(zenbins))])
 		self.energy_slices = tuple([tuple([buffering_histogram(3, (multbins, rbins, numpy.logspace(0, 6, 101))) for j in range(len(depthbins))]) for i in range(len(zenbins))])
-
+		
 		self.depthbins = depthbins
 		self.zenbins = zenbins
 		self.zenbins_fine = zenbins_fine
-
+		
 		self.weighter = self.GetParameter("Weight")
-
+		
 		import os
 		components = os.path.split(self.GetParameter("Outfile"))
 		if os.path.splitext(components[-1])[1] in ('.hdf5', '.h5'):
@@ -275,41 +279,41 @@ class Filler(icetray.I3ConditionalModule):
 		else:
 			self.where = '/' + components[-1]
 			self.outfile = os.path.join(*components[:-1])
-
+		
 		if os.path.exists(self.outfile):
 			os.unlink(self.outfile)
-
+			
 		self.nevents = 0
-
+		
 	def DAQ(self, frame):
 		primary = frame['MCPrimary']
-
+		
 		zenith = primary.dir.zenith
 		zi = max(numpy.searchsorted(self.zenbins, zenith) - 1, 0)
 		zif = max(numpy.searchsorted(self.zenbins_fine, zenith) - 1, 0)
-
+		
 		weight = self.weighter[primary.type](primary.energy, zenith)
 		self.primary.fill_single((zenith, primary.energy), weight)
-
+		
 		multiplicity=self.multiplicity_slices[zif]
 		radius=self.radius_slices[zi]
 		energy=self.energy_slices[zi]
-
+		
 		for di, (depth, tracks) in enumerate(frame['Tracks'].items()):
 			kmwe = depth/I3Units.km
 			mult = len(tracks)
 			values = numpy.asarray([(mult, p.radius, p.energy) for p in tracks])
-
+			
 			multiplicity[di].fill_single(mult, weight)
 			radius[di].fill(values[:,:2], weight)
 			energy[di].fill(values, weight)
-
+		
 		self.nevents += 1
 		# if self.nevents % 10000 == 0:
 		# 	print '%d events' % self.nevents
-
+		
 		# self.PushFrame(frame)
-
+		
 	def Finish(self):
 		for i in range(len(self.zenbins_fine)):
 			for j in range(len(self.depthbins)):
@@ -370,42 +374,42 @@ class MultiFiller(icetray.I3Module):
 		self.AddParameter("MinDepth", "", 1.)
 		self.AddParameter("MaxDepth", "", 5.)
 		self.AddParameter("DepthSteps", "", 9)
-
+	
 	def Configure(self):
-
+		
 		fluxes = self.GetParameter("Fluxes")
 		self.generator = self.GetParameter("GenerationSpectra")
 		outfile = self.GetParameter("Outfile")
 		import os
 		if os.path.exists(outfile):
 			os.unlink(outfile)
-
+			
 		self.nevents = 0
-
+		
 		def make_binner():
 			return MuonGun.TrackBinner(self.GetParameter("MinDepth"), self.GetParameter("MaxDepth"), self.GetParameter("DepthSteps"))
-
+		
 		self.workers = dict()
-
+		
 		for label, weight in fluxes.items():
 			worker = FillWorker(weight, make_binner(), outfile, '/%s' % label)
 			self.workers[label] = worker
-
+		
 	def DAQ(self, frame):
 		primary = frame['MCPrimary']
 		tracks = frame['Tracks']
 		norm = self.generator(primary.energy, primary.type, primary.dir.zenith)
 		for worker in self.workers.values():
 			worker.consume(primary, tracks, norm)
-
+		
 		self.nevents += 1
 		if self.nevents % 10000 == 0:
 			sys.stderr.write('%d events\n' % self.nevents)
-
+	
 	def Finish(self):
 		for worker in self.workers.values():
 			worker.finish()
-
+		
 
 
 class FastFiller(icetray.I3ConditionalModule):
@@ -420,13 +424,13 @@ class FastFiller(icetray.I3ConditionalModule):
 		self.AddParameter("MinDepth", "", 1.)
 		self.AddParameter("MaxDepth", "", 5.)
 		self.AddParameter("DepthSteps", "", 9)
-
+	
 	def Configure(self):
-
+		
 		self.binner = MuonGun.TrackBinner(self.GetParameter("MinDepth"), self.GetParameter("MaxDepth"), self.GetParameter("DepthSteps"))
-
+		
 		self.weighter = self.GetParameter("Weight")
-
+		
 		import os
 		components = os.path.split(self.GetParameter("Outfile"))
 		if os.path.splitext(components[-1])[1] in ('.hdf5', '.h5'):
@@ -435,29 +439,29 @@ class FastFiller(icetray.I3ConditionalModule):
 		else:
 			self.where = '/' + components[-1]
 			self.outfile = os.path.join(*components[:-1])
-
+		
 		if os.path.exists(self.outfile):
 			os.unlink(self.outfile)
-
+			
 		self.nevents = 0
-
+		
 	def DAQ(self, frame):
 		# print 'woop!'
 		primary = frame['MCPrimary']
-
+		
 		energy = primary.energy
 		zenith = primary.dir.zenith
 		weight = float(self.weighter(primary.type, energy, zenith))
 		# weight = 1.
-
+		
 		self.binner.consume(frame['Tracks'], energy, zenith, weight)
-
+		
 		self.nevents += 1
 		# if self.nevents % 10000 == 0:
 		# 	print '%d events' % self.nevents
-
+		
 		# self.PushFrame(frame)
-
+		
 	def Finish(self):
 		# return
 		with tables.openFile(self.outfile, 'a') as hdf:
@@ -523,17 +527,17 @@ class CylinderWeighter(object):
 			else:
 				# a side layer has no top surface
 				if zlo <= -height/2.:
-					# XXX HACK: ucr's target cylinder is displaced slightly w.r.t
+					# XXX HACK: ucr's target cylinder is displaced slightly w.r.t 
 					# the IceCube coordinate system. Adjust the effective area of
 					# the bottom-most slice to compensate.
 					sideheight = zhi+height/2. - 5.
 				else:
 					sideheight = zhi-zlo
 				weight = weighter(bandarea, timescale, radius, sideheight)
-
+				
 			print('')
 			self.weights.append(weight)
-
+		
 	def __call__(self, depthidx, zenith):
 		wt = 1./self.weights[depthidx](numpy.cos(zenith))
 		#print depthidx, self.weights[depthidx][0]
@@ -545,25 +549,25 @@ class DFastFiller(FastFiller):
 		super(self, DFastFiller).__init__(context)
 		from icecube.MuonGun import Cylinder
 		self.cyl = Cylinder(1600, 800)
-
+		
 		mindepth = self.GetParameter("MinDepth")
 		maxdepth = self.GetParameter("MaxDepth")
 		steps = self.GetParameter("DepthSteps")
 		self.depthbins = numpy.linspace(mindepth, maxdepth, steps)
-
+		
 	def DAQ(self, frame):
 		from icecube.dataclasses import I3Constants
 		primary = frame['MCPrimary']
-
+		
 		impact = self.cyl.intersection(primary.pos, primary.dir)
 		d0 = I3Constants.SurfaceElev - I3Constants.OriginElev - (primary.pos.z + impact.first*primary.dir.z)
 		di = numpy.floor(len(self.depthbins)*(d0 - mindepth)/(maxdepth-mindepth))
-
+		
 		energy = primary.energy
 		zenith = primary.dir.zenith
 		weight = float(self.weighter(energy, zenith))
 		# weight = 1.
-
+		
 		self.binner.consume(frame['Tracks'], energy, zenith, weight)
-
+		
 		self.nevents += 1

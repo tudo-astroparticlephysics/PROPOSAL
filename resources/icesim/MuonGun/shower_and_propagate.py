@@ -34,19 +34,22 @@ from icecube import MuonGun
 icetray.load('corsika-reader')
 from I3Tray import I3Tray
 
-def MMCFactory(length=10*I3Units.m, seed=12345, impl='mmc', mediadef=expandvars('$I3_BUILD/MuonGun/resources/iceworld-mediadef')):
-	# Now create the MMC propagators, but first *all* of the options must be set here.
-	# There's no special options added behind the scenes.  This is much more flexible.
-	#  Below are the standard options.  To interpret them see the MMC docs.
-	mmcOpts = "-romb=5 -raw -user -sdec -time -lpm -bs=1 -ph=3 -bb=2 -sh=2 -frho -cont "
-	mmcOpts += expandvars("-tdir=$I3_BUILD/mmc-icetray/resources ")
-	mmcOpts += expandvars("-mediadef=%s " % mediadef)
-	mmcOpts += "-radius=100000 "
-	mmcOpts += "-length=%d " % length
-	mmcOpts += "-seed=%d " % seed
+def MMCFactory(length=10*I3Units.m, seed=12345, impl='mmc', mediadef=None):
 
 	if impl == 'mmc':
 		from icecube import c2j_icetray, mmc_icetray
+		if mediadef is None:
+			mediadef=expandvars('$I3_BUILD/MuonGun/resources/iceworld-mediadef')
+		# Now create the MMC propagators, but first *all* of the options must be set here. 
+		# There's no special options added behind the scenes.  This is much more flexible. 
+		#  Below are the standard options.  To interpret them see the MMC docs.
+		mmcOpts = "-romb=5 -raw -user -sdec -time -lpm -bs=1 -ph=3 -bb=2 -sh=2 -frho -cont "
+		mmcOpts += expandvars("-tdir=$I3_BUILD/mmc-icetray/resources ")
+		mmcOpts += expandvars("-mediadef=%s " % mediadef)
+		mmcOpts += "-radius=100000 "
+		mmcOpts += "-length=%d " % length
+		mmcOpts += "-seed=%d " % seed
+	
 		jvmOpts = icetray.vector_string()    # fill this with parameters passed directly to the JavaVM
 		jvmOpts.append(expandvars("-Djava.class.path=$I3_BUILD/lib/mmc.jar"))
 		jvmOpts.append("-Xms256m")
@@ -57,10 +60,11 @@ def MMCFactory(length=10*I3Units.m, seed=12345, impl='mmc', mediadef=expandvars(
 		jvm = c2j_icetray.I3JavaVM(jvmOpts)
 		return mmc_icetray.I3PropagatorServiceMMC(jvm,mmcOpts)
 	else:
-		from icecube import PROPOSAL
-		return PROPOSAL.I3PropagatorServicePROPOSAL(
-                mediadef=mediadef,
-                cylinderHeight=length)
+		from icecube import PROPOSAL_icetray
+		# in PROPOSAL everything can be defined in the configuration file
+		if mediadef is None:
+			mediadef=expandvars('$I3_BUILD/PROPOSAL/resources/iceworld-config.json')
+		return PROPOSAL_icetray.I3PropagatorServicePROPOSAL(config_file=mediadef)
 
 CORSIKA_CONFIG =\
 """
@@ -114,9 +118,9 @@ class CorsikaRunner(object):
 		config['seed2'] = random.randint(0, 1<<32 - 1)
 		self.fname = config['outdir'] + 'DAT%.6d' % config['run']
 		os.mkfifo(self.fname)
-		self.p = Popen([self.executable % model], stdin=PIPE, stdout=open('/dev/null', 'w'), cwd=rundir)
+		self.p = Popen([self.executable % model], stdin=PIPE, stdout=open('/dev/null', 'w'), cwd=rundir)		
 		self.p.stdin.write(CORSIKA_CONFIG % config)
-
+		
 	def __del__(self):
 		if self.fname:
 			os.unlink(self.fname)
@@ -159,6 +163,7 @@ tray.AddModule('I3Writer', 'writer',
     # DropOrphanStreams=[icetray.I3Frame.DAQ],
     filename=outfile)
 
-tray.AddModule('TrashCan', 'YesWeCan')
+
 tray.Execute()
-tray.Finish()
+
+ 

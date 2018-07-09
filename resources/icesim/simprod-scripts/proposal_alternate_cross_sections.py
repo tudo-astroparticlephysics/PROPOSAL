@@ -1,16 +1,16 @@
 #!/usr/bin/env python
 ######################################################################
-#
+#   
 #   TraySegements and IceProdModules for production
 #   NuGen with varying mmc/PROPOSAL cross-sections
-#
+#   
 ######################################################################
 import os,sys
 from os.path import expandvars
 import math
 import logging
 
-# Load libraries
+# Load libraries 
 from I3Tray import *
 from icecube import (icetray, dataio, dataclasses, phys_services,
                      interfaces, simclasses, sim_services,
@@ -24,9 +24,9 @@ from icecube.simprod.util import BasicCounter
 class NuGen(ipmodule.ParsingModule):
    """
    Wrapper class that runs NuGen
-
+   
    Use like:
-   python -c "from proposal_alternate_cross_sections import NuGen; NuGen().ExecuteOpts({})" --gcdfile=gcd.i3 --outputfile=nugen_out.i3 --summaryfile=summary.xml --mjd=56429 --nevents=100 --NuFlavor=NuMu --RunId=1000 --RNGSeed=12345 --RNGStream=0 --RNGNumberOfStreams=1 --bs=1 --ph=3 --bb=2 --sh=2
+   python -c "from proposal_alternate_cross_sections import NuGen; NuGen().ExecuteOpts({})" --gcdfile=gcd.i3 --outputfile=nugen_out.i3 --summaryfile=summary.xml --mjd=56429 --nevents=100 --NuFlavor=NuMu --RunId=1000 --RNGSeed=12345 --RNGStream=0 --RNGNumberOfStreams=1 --bs=1 --ph=3 --bb=2 --sh=2 
    """
 
    def __init__(self):
@@ -45,15 +45,15 @@ class NuGen(ipmodule.ParsingModule):
         self.AddParameter("RNGSeed","RNG seed",0)
         self.AddParameter("RNGStream","RNG stream number",0)
         self.AddParameter("RNGNumberOfStreams","Number of RNG streams",1)
-        self.AddParameter('bs','Bremsstrahlung Parametrization', 11)
-        self.AddParameter('ph','Photonuclear Parametrization', -36)
-        print(self.bs)
-        print(self.ph)
+        self.AddParameter('bs','Bremsstrahlung Parametrization',1)
+        self.AddParameter('ph','Photonuclear Parametrization Family',3)
+        self.AddParameter('bb','Photonuclear Parametrization',2)
+        self.AddParameter('sh','Nuclear Shadowing Parametrization',2)
 
    def Execute(self,stats):
         if not ipmodule.ParsingModule.Execute(self,stats): return 0
 
-        # Instantiate a tray
+        # Instantiate a tray 
         tray = I3Tray()
 
         randomService = phys_services.I3SPRNGRandomService(self.rngseed, self.rngnumberofstreams, self.rngstream)
@@ -61,13 +61,13 @@ class NuGen(ipmodule.ParsingModule):
 
         summary = dataclasses.I3MapStringDouble()
         tray.context["I3SummaryService"] = summary
-
+         
         tray.AddSegment(NuGenTraySegment,"nugen",
              gcdfile=self.gcdfile,
              nuflavor=self.nuflavor,
-             mjd=self.mjd,
+             mjd=self.mjd, 
              nevents=self.nevents,
-             cssflag=self.usecss,
+             cssflag=self.usecss, 
              runId=self.runid,
              randomService=randomService,
              elogmax=self.elogmax,
@@ -75,18 +75,20 @@ class NuGen(ipmodule.ParsingModule):
              gamma=self.gamma,
              stats=stats,
              bs=self.bs,
-             ph=self.ph)
+             ph=self.ph,
+             bb=self.bb,
+             sh=self.sh)
 
         tray.AddModule("I3Writer","writer")(
             ("filename",self.outputfile),
             ("streams",[icetray.I3Frame.DAQ])
         )
 
-        tray.AddModule("TrashCan","trashcan")
+        
 
         # Execute the Tray
         tray.Execute()
-        tray.Finish()
+        
 
         # Free memory
         del tray
@@ -96,7 +98,7 @@ class NuGen(ipmodule.ParsingModule):
 class CorsikaGenerator(ipmodule.ParsingModule):
    """
    Wrapper class that runs Corsika
-
+   
    Use like:
    I3_TOPDIR=$PWD python -c "from proposal_alternate_cross_sections import CorsikaGenerator; CorsikaGenerator().ExecuteOpts({})" --procnum=0 --seed=12345 --nproc=1 --gcdfile=gcd.i3 --outputfile=out_corsika.i3 --summaryfile=summary.xml --mjd=56429 --RunId=1 --nshowers=1000 --RunCorsika --bs=1 --ph=2 --bb=3 --sh=2
    """
@@ -130,27 +132,29 @@ class CorsikaGenerator(ipmodule.ParsingModule):
         self.AddParameter("oversampling","",1)
         self.AddParameter("radius","",800)
 
-        self.AddParameter('cthmin','Min theta of injected cosmic rays',0.0)
-        self.AddParameter('cthmax','Max theta of injected cosmic rays',89.99)
-
-        self.AddParameter('ecuts1','hadron min energy (see corsika docs)',273)
-        self.AddParameter('ecuts2','muon min energy (see corsika docs)',273)
-        self.AddParameter('ecuts3','electron min energy (see corsika docs)',0.003)
-        self.AddParameter('ecuts4','photon min energy (see corsika docs)',0.003)
+        self.AddParameter('cthmin','Min theta of injected cosmic rays',0.0)  
+        self.AddParameter('cthmax','Max theta of injected cosmic rays',89.99)  
+  
+        self.AddParameter('ecuts1','hadron min energy (see corsika docs)',273)  
+        self.AddParameter('ecuts2','muon min energy (see corsika docs)',273)  
+        self.AddParameter('ecuts3','electron min energy (see corsika docs)',0.003)  
+        self.AddParameter('ecuts4','photon min energy (see corsika docs)',0.003)  
         self.AddParameter("CutoffType","Sets SPRIC=T (EnergyPerNucleon) or F (EnergyPerParticle) ","EnergyPerNucleon")
         self.AddParameter("RepoURL","URL of repository containing corsika tarballs","http://convey.icecube.wisc.edu/data/sim/sim-new/downloads")
 
-        self.AddParameter('bs','Bremsstrahlung Parametrization', 11)
-        self.AddParameter('ph','Photonuclear Parametrization', -36)
+        self.AddParameter('bs','Bremsstrahlung Parametrization',1)
+        self.AddParameter('ph','Photonuclear Parametrization Family',3)
+        self.AddParameter('bb','Photonuclear Parametrization',2)
+        self.AddParameter('sh','Nuclear Shadowing Parametrization',2)
 
-
+ 
    def Execute(self,stats):
         if not ipmodule.ParsingModule.Execute(self,stats): return 0
 
         from I3Tray import I3Tray
         from icecube import icetray,phys_services, dataio, dataclasses
-
-
+        
+   
         if self.cutofftype == "EnergyPerNucleon" : self.spric = True
         elif cutofftype == "EnergyPerParticle" : self.spric = False
         else: raise Exception, "Undefined CutoffType %s" % cutoff_typ
@@ -161,9 +165,9 @@ class CorsikaGenerator(ipmodule.ParsingModule):
         print self.runcorsika, "runcorsika",self.inputfile
         if self.runcorsika and not self.inputfile:
            # Run corsika
-           retval = cors.Execute(stats)
+           retval = cors.Execute(stats) 
 
-           if retval:
+           if retval: 
               raise Exception, "dCorsika exited with return value %s" % retval
         elif self.inputfile:
            cors.outfile = self.inputfile
@@ -171,36 +175,38 @@ class CorsikaGenerator(ipmodule.ParsingModule):
         elif not self.runcorsika:
              cors.configure()
              cors.write_steering()
-
-        # Instantiate a tray
+    
+        # Instantiate a tray 
         tray = I3Tray()
 
         # Configure IceTray services
         summary = dataclasses.I3MapStringDouble()
         tray.context["I3SummaryService"] = summary
-
+         
         randomService = phys_services.I3SPRNGRandomService(self.seed, self.nproc, self.procnum)#, oustatefile="rng.state")
         tray.context["I3RandomService"] = randomService
 
         # Configure TraySegment that actually does stuff
         tray.AddSegment(CorsikaReaderTraySegment,"corsika-reader",
               gcdfile=self.gcdfile, mjd=self.mjd, runId=self.runid, randomService=randomService,
-              oversampling=self.oversampling, fluxsum=self.fluxsum, cors=cors, stats={},
+              oversampling=self.oversampling, fluxsum=self.fluxsum, cors=cors, stats={}, 
              CylinderLength=self.length,
              CylinderRadius=self.radius,
              bs=self.bs,
-             ph=self.ph)
+             ph=self.ph,
+             bb=self.bb,
+             sh=self.sh)
 
-        tray.AddModule(BasicCounter,"count_g", Streams = [icetray.I3Frame.DAQ],
+        tray.AddModule(BasicCounter,"count_g", Streams = [icetray.I3Frame.DAQ], 
               name = "Generated Events", Stats = stats)
-
+       
         tray.AddModule("I3Writer","writer", filename = self.outputfile, streams =[icetray.I3Frame.DAQ] )
 
-        tray.AddModule("TrashCan","trashcan")
+        
 
         # Execute the Tray
         tray.Execute()
-        tray.Finish()
+        
 
         del tray
         return 0
@@ -211,7 +217,7 @@ class CorsikaGenerator(ipmodule.ParsingModule):
 class MuonGunGenerator(ipmodule.ParsingModule):
    """
    Wrapper class that runs MuonGun
-
+   
    Use like:
    python -c "from proposal_alternate_cross_sections import MuonGunGenerator; MuonGunGenerator().ExecuteOpts({})" --procnum=0 --seed=12345 --nproc=1 --gcdfile=gcd.i3 --outputfile=out_corsika.i3 --summaryfile=summary.xml --mjd=56429 --RunId=1 --nshowers=1000 --bs=1 --ph=2 --bb=3 --sh=2
    """
@@ -233,12 +239,14 @@ class MuonGunGenerator(ipmodule.ParsingModule):
         self.AddParameter("eprimarymin","CR min energy",600)
         self.AddParameter("length","",1600)
         self.AddParameter("radius","",800)
-        self.AddParameter('cthmin','Min theta of injected cosmic rays',0.0)
-        self.AddParameter('cthmax','Max theta of injected cosmic rays',89.99)
+        self.AddParameter('cthmin','Min theta of injected cosmic rays',0.0)  
+        self.AddParameter('cthmax','Max theta of injected cosmic rays',89.99)  
 
-        self.AddParameter('bs','Bremsstrahlung Parametrization', PROPOSAL.CrossSectionParametrization.BremsKelnerKokoulinPetrukhin)
-        self.AddParameter('ph','Photonuclear Parametrization', PROPOSAL.CrossSectionParametrization.PhotoAbramowiczLevinLevyMaor97ShadowButkevich)
-
+        self.AddParameter('bs','Bremsstrahlung Parametrization',1)
+        self.AddParameter('ph','Photonuclear Parametrization Family',3)
+        self.AddParameter('bb','Photonuclear Parametrization',2)
+        self.AddParameter('sh','Nuclear Shadowing Parametrization',2)
+ 
    def Execute(self,stats):
         if not ipmodule.ParsingModule.Execute(self,stats): return 0
 
@@ -248,7 +256,7 @@ class MuonGunGenerator(ipmodule.ParsingModule):
         from icecube.MuonGun.segments import GenerateBundles
 
         from I3Tray import I3Tray, I3Units
-
+        
         modelstr = self.GetParameter('model')
         emax   = self.GetParameter("eprimarymax")
         emin   = self.GetParameter("eprimarymin")
@@ -262,14 +270,14 @@ class MuonGunGenerator(ipmodule.ParsingModule):
         nproc  = self.GetParameter('nproc')
         procnum  = self.GetParameter('procnum')
         gcdfile = self.GetParameter('gcdfile')
-
-        # Instantiate a tray
+    
+        # Instantiate a tray 
         tray = I3Tray()
 
         # Configure IceTray services
         summary = dataclasses.I3MapStringDouble()
         tray.context["I3SummaryService"] = summary
-
+         
         randomService = phys_services.I3SPRNGRandomService(seed, nproc, procnum)
         tray.context["I3RandomService"] = randomService
 
@@ -287,8 +295,8 @@ class MuonGunGenerator(ipmodule.ParsingModule):
         generator = StaticSurfaceInjector(surface, model.flux, spectrum, model.radius)
 
         # Configure TraySegment that actually does stuff
-        tray.AddSegment(GenerateBundles,"corsika-background", Generator=generator,
-              RunNumber=self.runid, NEvents=self.nshowers,
+        tray.AddSegment(GenerateBundles,"corsika-background", Generator=generator, 
+              RunNumber=self.runid, NEvents=self.nshowers, 
               GCDFile=self.gcdfile,
               FromTime=dataclasses.I3Time(self.mjd),
               ToTime=dataclasses.I3Time(self.mjd))
@@ -298,22 +306,24 @@ class MuonGunGenerator(ipmodule.ParsingModule):
           del frame["I3MCTree"]
           frame["I3MCTree_preMuonProp"] = mctree
         tray.AddModule(renameMCTree, "renameMCTree", Streams=[icetray.I3Frame.DAQ])
-        tray.AddSegment(PropagateMuons,'propagator', RandomService=randomService,
+        tray.AddSegment(PropagateMuons,'propagator', RandomService=randomService, 
              CylinderLength=self.length,
              CylinderRadius=self.radius,
              bs=self.bs,
-             ph=self.ph)
+             ph=self.ph,
+             bb=self.bb,
+             sh=self.sh)
 
-        tray.AddModule(BasicCounter,"count_g", Streams = [icetray.I3Frame.DAQ],
+        tray.AddModule(BasicCounter,"count_g", Streams = [icetray.I3Frame.DAQ], 
               name = "Generated Events", Stats = stats)
-
+       
         tray.AddModule("I3Writer","writer", filename = self.outputfile, streams =[icecube.icetray.I3Frame.DAQ] )
 
-        tray.AddModule("TrashCan","trashcan")
+        
 
         # Execute the Tray
         tray.Execute()
-        tray.Finish()
+        
 
         del tray
         return 0
@@ -324,8 +334,10 @@ def MakePropagator(
     particleType=dataclasses.I3Particle.ParticleType.MuMinus,
     impl='proposal',
     mediadef=None,
-    bs=PROPOSAL.CrossSectionParametrization.BremsKelnerKokoulinPetrukhin,
-    ph=PROPOSAL.CrossSectionParametrization.PhotoAbramowiczLevinLevyMaor97ShadowButkevich
+    bs=1,
+    ph=3,
+    bb=2,
+    sh=2
     ):
         """
         Create a muon propagator service.
@@ -352,72 +364,7 @@ def MakePropagator(
             # Now create the MMC propagators, but first *all* of the options must be set here.
             # There's no special options added behind the scenes.  This is much more flexible.
             #  Below are the standard options.  To interpret them see the MMC docs.
-
-            # redefine the new bremsstrahlung and photonuclear parametrization to the old one to use mmc
-
-            if (bs == PROPOSAL.CrossSectionParametrization.BremsKelnerKokoulinPetrukhin): bs_old = 1
-            elif (bs == PROPOSAL.CrossSectionParametrization.BremsAndreevBezrukovBugaev):   bs_old = 2
-            elif (bs == PROPOSAL.CrossSectionParametrization.BremsPetrukhinShestakov):      bs_old = 3
-            elif (bs == PROPOSAL.CrossSectionParametrization.BremsCompleteScreeningCase):   bs_old = 4
-
-            if (ph == PROPOSAL.CrossSectionParametrization.PhotoKokoulinShadowBezrukovSoft):
-                ph_old = 1
-                bb_old = 1
-                sh_old = 0
-            elif (ph == PROPOSAL.CrossSectionParametrization.PhotoKokoulinShadowBezrukovHard):
-                ph_old = 2
-                bb_old = 1
-                sh_old = 0
-            elif (ph == PROPOSAL.CrossSectionParametrization.PhotoRhodeShadowBezrukovSoft):
-                ph_old = 1
-                bb_old = 2
-                sh_old = 0
-            elif (ph == PROPOSAL.CrossSectionParametrization.PhotoRhodeShadowBezrukovHard):
-                ph_old = 2
-                bb_old = 2
-                sh_old = 0
-            elif (ph == POPOSAL.CrossSectionParametrization.PhotoBezrukovBugaevShadowBezrukovSoft):
-                ph_old = 1
-                bb_old = 3
-                sh_old = 0
-            elif (ph == PROPOSAL.CrossSectionParametrization.PhotoBezrukovBugaevShadowBezrukovHard):
-                ph_old = 2
-                bb_old = 3
-                sh_old = 0
-            elif (ph == PROPOSAL.CrossSectionParametrization.PhotoZeusShadowBezrukovSoft):
-                ph_old = 1
-                bb_old = 4
-                sh_old = 0
-            elif (ph == PROPOSAL.CrossSectionParametrization.PhotoZeusShadowBezrukovHard):
-                ph_old = 2
-                bb_old = 4
-                sh_old = 0
-            elif (ph == PROPOSAL.CrossSectionParametrization.PhotoAbramowiczLevinLevyMaor91ShadowDutta):
-                ph_old = 3
-                bb_old = 1
-                sh_old = 1
-            elif (ph == PROPOSAL.CrossSectionParametrization.PhotoAbramowiczLevinLevyMaor91ShadowButkevich):
-                ph_old = 3
-                bb_old = 1
-                sh_old = 2
-            elif (ph == PROPOSAL.CrossSectionParametrization.PhotoAbramowiczLevinLevyMaor97ShadowDutta):
-                ph_old = 3
-                bb_old = 2
-                sh_old = 1
-            elif (ph == PROPOSAL.CrossSectionParametrization.PhotoAbramowiczLevinLevyMaor97ShadowButkevich):
-                ph_old = 3
-                bb_old = 2
-                sh_old = 2
-            elif (ph == PROPOSAL.CrossSectionParametrization.PhotoButkevichMikhailovShadowDutta):
-                ph_old = 4
-                bb_old = 1
-                sh_old = 1
-            elif (ph == PROPOSAL.CrossSectionParametrization.PhotoButkevichMikhailovShadowButkevich):
-                ph_old = 4
-                bb_old = 1
-                sh_old = 2
-
-            mmcOpts = "-romb=5 -raw -user -sdec -time -lpm -bs=%d -ph=%d -bb=%d -sh=%d -frho -cont "%(bs_old,ph_old,bb_old,sh_old)
+            mmcOpts = "-romb=5 -raw -user -sdec -time -lpm -bs=%d -ph=%d -bb=%d -sh=%d -frho -cont "%(bs,ph,bb,sh)
             mmcOpts += expandvars("-tdir=$I3_BUILD/mmc-icetray/resources ")
             mmcOpts += expandvars("-mediadef=%s " % mediadef)
             mmcOpts += "-radius=%d " % radius
@@ -434,18 +381,12 @@ def MakePropagator(
             jvm = c2j_icetray.I3JavaVM(jvmOpts)
             return mmc_icetray.I3PropagatorServiceMMC(jvm,mmcOpts)
         elif impl.lower() == 'proposal':
+            from icecube import sim_services, PROPOSAL
+            # in PROPOSAL everything can be defined in the configuration file
             if mediadef is None:
                 mediadef=expandvars('$I3_BUILD/PROPOSAL/resources/config.json')
-
-            from icecube import sim_services, PROPOSAL
             return PROPOSAL.I3PropagatorServicePROPOSAL(
-                mediadef=mediadef,
-                cylinderRadius=radius,
-                cylinderHeight=length,
-                type=particleType,
-                bremsstrahlungParametrization=bs,
-                photonuclearParametrization=ph
-                )
+                config_file=mediadef)
         else:
             raise RuntimeError("unknown propagator: %s" % impl)
 
@@ -512,12 +453,12 @@ class DAQCounter(icetray.I3Module):
 
     def DAQ(self,frame):
         self.count += 1
-        if self.count > self.nevents:
+        if self.count > self.nevents: 
            self.RequestSuspension()
         self.PushFrame(frame)
 
 
-
+    
 def NuGenTraySegment(tray,name,
     gcdfile, mjd, nevents, nuflavor, cssflag, runId, randomService,
     zenithmin=0.0,
@@ -528,18 +469,18 @@ def NuGenTraySegment(tray,name,
     injectionradius=1200.0,
     distanceentrance=1000.0,
     distanceexit=1000.0,
-    CrustModel="PREM_mmc",           # density profile
-    PropagationWeightMode="AutoDetect",
+    CrustModel="PREM_mmc",           # density profile 
+    PropagationWeightMode="AutoDetect",     
     stats={},
     **kwargs):
     """
     Tray Segment for basic NuGen simulation (generation)
     """
 
-    # Configure IceTray modules
+    # Configure IceTray modules 
     tray.AddModule("I3InfiniteSource", "source",
-        prefix = gcdfile,
-        stream = icetray.I3Frame.DAQ )
+        prefix = gcdfile, 
+        stream = icetray.I3Frame.DAQ ) 
 
     time = dataclasses.I3Time()
     time.set_mod_julian_time(int(mjd), 0, 0)
@@ -550,16 +491,16 @@ def NuGenTraySegment(tray,name,
         RunNumber = runId,
         IncrementEventID = True
     )
-
+     
     tray.AddModule(DAQCounter,"counter3")(
         ("nevents",int(nevents)),
     )
-
+   
     # Use NoWeight if Tau Regeneration.
     if PropagationWeightMode=="AutoDetect":
        if nuflavor == "NuTau":
           PropagationWeightMode="NoWeight"
-       else:
+       else: 
           PropagationWeightMode="NCGRWeighted"
 
     earthModelService = name+"_earthmodel"
@@ -567,13 +508,13 @@ def NuGenTraySegment(tray,name,
     tray.AddService("I3EarthModelServiceFactory", earthModelService,
         ServiceName=earthModelService,
         DetectorDepth=1950*I3Units.m,       # old setting is 1945m
-        EarthModel=CrustModel,              # density profile
+        EarthModel=CrustModel,              # density profile 
         )
     tray.AddService("I3NuGSteeringFactory", steering, ServiceName=steering,
         EarthModelServiceName=earthModelService,
         MuonRangeOpt=0.0*I3Units.m,         # use old Muon Range calculation
         )
-
+          
     tray.AddModule("I3NeutrinoGenerator","neutrino",
         nevents=int(nevents),
         NeutrinoFlavor=nuflavor,
@@ -605,9 +546,9 @@ def NuGenTraySegment(tray,name,
         del frame["I3MCTree"]
         frame["I3MCTree_preMuonProp"] = mctree
     tray.AddModule(renameMCTree, name+"_renameMCTree", Streams=[icetray.I3Frame.DAQ])
-    tray.AddSegment(PropagateMuons,'propagator', RandomService=randomService,**kwargs)
+    tray.AddSegment(PropagateMuons,'propagator', RandomService=randomService,**kwargs) 
 
-    tray.AddModule(BasicCounter,"count_g",
+    tray.AddModule(BasicCounter,"count_g", 
                     Streams = [icetray.I3Frame.DAQ] ,
                     name="Generated Events",
                     Stats=stats)
@@ -639,13 +580,13 @@ def CorsikaReaderTraySegment(tray,name,
       Tray Segment for basic CORSIKA simulation (generation)
       """
 
-      # Load libraries
+      # Load libraries 
       from icecube import icetray, dataclasses, interfaces, phys_services
       from icecube import simclasses, sim_services, corsika_reader, PROPOSAL,ucr_icetray
       from icecube.simprod.generators.weights import Corsika5CompWeightModule, CorsikaWeightModule, PolygonatoWeightModule
 
       print "Readig: ",cors.outfile
-      tray.AddModule('I3CORSIKAReader','corsika',
+      tray.AddModule('I3CORSIKAReader','corsika', 
                      FilenameList=[cors.outfile], Prefix=gcdfile, NEvents=cors.nevents)
 
       if cors.ranpri == 3: # 5-component case
@@ -693,10 +634,10 @@ def CorsikaReaderTraySegment(tray,name,
         del frame["I3MCTree"]
         frame["I3MCTree_preMuonProp"] = mctree
       tray.AddModule(renameMCTree, name+"_renameMCTree", Streams=[icetray.I3Frame.DAQ])
-      tray.AddSegment(PropagateMuons,'propagator', RandomService=randomService,**kwargs)
+      tray.AddSegment(PropagateMuons,'propagator', RandomService=randomService,**kwargs) 
 
       tray.AddModule(SetAtmosphereWeight,"atmo", atmosphere = cors.atmod,
-	          Streams = [icetray.I3Frame.DAQ] )
+            Streams = [icetray.I3Frame.DAQ] ) 
 
 
 
@@ -773,8 +714,9 @@ def configure_corsika(params):
        cors.pgamFe  = params.pgam[4]
 
     return cors
-
-
+    
+                    
+    
 if __name__ == '__main__':
     n = NuGen()
     n.ExecuteOpts({})
