@@ -88,7 +88,15 @@ void I3PropagatorServicePROPOSAL::SetRandomNumberGenerator(I3RandomServicePtr ra
 void I3PropagatorServicePROPOSAL::RegisterParticleType(I3Particle::ParticleType ptype)
 {
     ParticleDef particle_def = I3PROPOSALParticleConverter::GeneratePROPOSALType(ptype);
-    proposal_service_.RegisterPropagator(Propagator(particle_def, config_file_));
+    std::cout << particle_def << std::endl;
+
+    // If ptype is not known an empty particle definition is returned (e.g. empty name)
+    // Do not register unkown particles
+    if (!particle_def.name.empty())
+    {
+        proposal_service_.RegisterPropagator(Propagator(particle_def, config_file_));
+        std::cout << "particle registered" << std::endl;
+    }
 }
 
 // ------------------------------------------------------------------------- //
@@ -142,7 +150,6 @@ std::vector<I3Particle> I3PropagatorServicePROPOSAL::Propagate(I3Particle& p, Di
 I3MMCTrackPtr I3PropagatorServicePROPOSAL::propagate(I3Particle& p, vector<I3Particle>& daughters)
 {
     Particle particle = I3PROPOSALParticleConverter::GeneratePROPOSALParticle(p);
-
 
     std::vector<DynamicData*> secondaries = proposal_service_.Propagate(particle, distance_to_propagate_);
 
