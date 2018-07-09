@@ -28,9 +28,9 @@
 		"vcut_inside" : -1,
 		"vcut_infront" : 0.05,
 		"vcut_behind" : -1,
-		"cont_inside" : 0,
-		"cont_infront" : 1,
-		"cont_behind" : 0
+		"cont_inside" : false,
+		"cont_infront" : true,
+		"cont_behind" : false
 	},
 
 	"sectors": [
