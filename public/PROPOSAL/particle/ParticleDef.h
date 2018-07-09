@@ -266,7 +266,9 @@ PARTICLE_DEF(NuTauBar)
 
 PARTICLE_DEF(Monopole)
 PARTICLE_DEF(Gamma)
-PARTICLE_DEF(StableMassiveParticle)
+
+PARTICLE_DEF(SMPMinus)
+PARTICLE_DEF(SMPPlus)
 
 } // namespace PROPOSAL
 
