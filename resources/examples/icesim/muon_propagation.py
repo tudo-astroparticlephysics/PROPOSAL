@@ -44,12 +44,12 @@ try:
     pylab.title(str(mu.energy) + " GeV Muon Lengths")
     pylab.hist(mu_length, histtype="step", log=True, bins=50)
     pylab.xlabel(r'$l_{\mu}(\rm{m})$')
-    pylab.savefig('muon_Lenghts.pdf')
+    pylab.savefig('muon_lenghts.pdf')
 
     pylab.figure()
     pylab.title("N Daughters of " + str(mu.energy) + "GeV Muon")
     pylab.hist(n_daughters, histtype="step", log=True, bins=50)
     pylab.xlabel('N')
-    pylab.savefig('muon_Daughters.pdf')
+    pylab.savefig('muon_daughters.pdf')
 except ImportError:
     print("pylab not installed.  no plots for you.")
