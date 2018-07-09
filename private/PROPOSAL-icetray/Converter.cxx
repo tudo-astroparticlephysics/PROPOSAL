@@ -3,43 +3,6 @@
 
 #include "PROPOSAL-icetray/Converter.h"
 
-namespace I3PROPOSALParticleConverter {
-
-typedef boost::bimap<I3Particle::ParticleType, std::string> bimap_ParticleType;
-static const bimap_ParticleType I3_PROPOSAL_ParticleType_bimap =
-    boost::assign::list_of<bimap_ParticleType::relation>
-        (I3Particle::MuMinus, "MuMinus")
-        (I3Particle::MuPlus, "MuPlus")
-        (I3Particle::TauMinus, "TauMinus")
-        (I3Particle::TauPlus, "TauPlus")
-        (I3Particle::EMinus, "EMinus")
-        (I3Particle::EPlus, "EPlus")
-        (I3Particle::NuMu, "NuMu")
-        (I3Particle::NuMuBar, "NuMuBar")
-        (I3Particle::NuE, "NuE")
-        (I3Particle::NuEBar, "NuEBar")
-        (I3Particle::NuTau, "NuTau")
-        (I3Particle::NuTauBar, "NuTauBar")
-        (I3Particle::Brems, "Brems")
-        (I3Particle::DeltaE, "DeltaE")
-        (I3Particle::PairProd, "EPair")
-        (I3Particle::NuclInt, "NuclInt")
-        (I3Particle::MuPair, "MuPair")
-        (I3Particle::Hadrons, "Hadrons")
-        (I3Particle::Monopole, "Monopole")
-        (I3Particle::STauMinus, "STauMinus")
-        (I3Particle::STauPlus, "STauPlus")
-        (I3Particle::Gamma, "Gamma")
-        (I3Particle::Pi0, "Pi0")
-        (I3Particle::PiPlus, "PiPlus")
-        (I3Particle::PiMinus, "PiMinus")
-        (I3Particle::K0_Short, "K0") // TODO(mario):  Fri 2017/11/17
-        (I3Particle::KPlus, "KPlus")
-        (I3Particle::KMinus, "KMinus")
-        (I3Particle::PPlus, "PPlus")
-        (I3Particle::PMinus, "PMinus");
-
-} // namespace I3PROPOSALParticleConverter
 
 // ------------------------------------------------------------------------- //
 I3Particle::ParticleType I3PROPOSALParticleConverter::GenerateI3Type(const PROPOSAL::DynamicData& secondary)
@@ -55,16 +18,59 @@ I3Particle::ParticleType I3PROPOSALParticleConverter::GenerateI3Type(const PROPO
 
             // I3Particle::ParticleType ptype_I3;
 
-            bimap_ParticleType::right_const_iterator proposal_iterator =
-                I3_PROPOSAL_ParticleType_bimap.right.find(particle_def.name);
-            if (proposal_iterator == I3_PROPOSAL_ParticleType_bimap.right.end())
+            if (particle_def == PROPOSAL::MuMinusDef::Get())
+                return I3Particle::MuMinus;
+            else if (particle_def == PROPOSAL::MuPlusDef::Get())
+                return I3Particle::MuPlus;
+            else if (particle_def == PROPOSAL::MuPlusDef::Get())
+                return I3Particle::MuPlus;
+            else if (particle_def == PROPOSAL::TauPlusDef::Get())
+                return I3Particle::TauPlus;
+            else if (particle_def == PROPOSAL::TauMinusDef::Get())
+                return I3Particle::TauMinus;
+            else if (particle_def == PROPOSAL::EPlusDef::Get())
+                return I3Particle::EPlus;
+            else if (particle_def == PROPOSAL::EMinusDef::Get())
+                return I3Particle::EMinus;
+            else if (particle_def == PROPOSAL::NuMuBarDef::Get())
+                return I3Particle::NuMuBar;
+            else if (particle_def == PROPOSAL::NuMuDef::Get())
+                return I3Particle::NuMu;
+            else if (particle_def == PROPOSAL::NuTauBarDef::Get())
+                return I3Particle::NuTauBar;
+            else if (particle_def == PROPOSAL::NuTauDef::Get())
+                return I3Particle::NuTau;
+            else if (particle_def == PROPOSAL::NuEBarDef::Get())
+                return I3Particle::NuEBar;
+            else if (particle_def == PROPOSAL::NuEDef::Get())
+                return I3Particle::NuE;
+            else if (particle_def == PROPOSAL::MonopoleDef::Get())
+                return I3Particle::Monopole;
+            else if (particle_def == PROPOSAL::StauPlusDef::Get())
+                return I3Particle::STauPlus;
+            else if (particle_def == PROPOSAL::StauMinusDef::Get())
+                return I3Particle::STauMinus;
+            else if (particle_def == PROPOSAL::SMPPlusDef::Get())
+                return I3Particle::SMPPlus;
+            else if (particle_def == PROPOSAL::SMPMinusDef::Get())
+                return I3Particle::SMPMinus;
+            else if (particle_def == PROPOSAL::Pi0Def::Get())
+                return I3Particle::Pi0;
+            else if (particle_def == PROPOSAL::PiPlusDef::Get())
+                return I3Particle::PiPlus;
+            else if (particle_def == PROPOSAL::PiMinusDef::Get())
+                return I3Particle::PiMinus;
+            else if (particle_def == PROPOSAL::K0Def::Get())
+                return I3Particle::K0_Short;
+            else if (particle_def == PROPOSAL::KPlusDef::Get())
+                return I3Particle::KPlus;
+            else if (particle_def == PROPOSAL::KMinusDef::Get())
+                return I3Particle::KMinus;
+            else
             {
-                log_fatal("The PROPOSALParticle '%s' can not be converted to a I3Particle", particle_def.name.c_str());
-            } else
-            {
-                return proposal_iterator->second;
+                log_warn("The PROPOSAL Particle '%s' can not be converted to a I3Particle", particle_def.name.c_str());
+                return I3Particle::unknown;
             }
-            break;
         }
         case PROPOSAL::DynamicData::Brems:
             return I3Particle::Brems;
@@ -78,11 +84,17 @@ I3Particle::ParticleType I3PROPOSALParticleConverter::GenerateI3Type(const PROPO
         case PROPOSAL::DynamicData::NuclInt:
             return I3Particle::NuclInt;
             break;
+        case PROPOSAL::DynamicData::MuPair:
+            return I3Particle::MuPair;
+            break;
         case PROPOSAL::DynamicData::ContinuousEnergyLoss:
             return I3Particle::ContinuousEnergyLoss;
             break;
         default:
-            log_fatal("PROPOSAL Particle can not be converted to a I3Particle");
+            {
+                log_warn("PROPOSAL Particle can not be converted to a I3Particle");
+                return I3Particle::unknown;
+            }
     }
 }
 
@@ -109,14 +121,69 @@ PROPOSAL::ParticleDef I3PROPOSALParticleConverter::GeneratePROPOSALType(const I3
         case I3Particle::EPlus:
             return PROPOSAL::EPlusDef::Get();
             break;
+        case I3Particle::NuMuBar:
+            return PROPOSAL::NuMuBarDef::Get();
+            break;
+        case I3Particle::NuMu:
+            return PROPOSAL::NuMuDef::Get();
+            break;
+        case I3Particle::NuTauBar:
+            return PROPOSAL::NuTauBarDef::Get();
+            break;
+        case I3Particle::NuTau:
+            return PROPOSAL::NuTauDef::Get();
+            break;
+        case I3Particle::NuEBar:
+            return PROPOSAL::NuEBarDef::Get();
+            break;
+        case I3Particle::NuE:
+            return PROPOSAL::NuEDef::Get();
+            break;
+        case I3Particle::Monopole:
+            return PROPOSAL::MonopoleDef::Get();
+            break;
+        case I3Particle::STauMinus:
+            return PROPOSAL::StauMinusDef::Get();
+            break;
+        case I3Particle::STauPlus:
+            return PROPOSAL::StauPlusDef::Get();
+            break;
+        case I3Particle::SMPMinus:
+            return PROPOSAL::SMPMinusDef::Get();
+            break;
+        case I3Particle::SMPPlus:
+            return PROPOSAL::SMPPlusDef::Get();
+            break;
+        case I3Particle::Pi0:
+            return PROPOSAL::Pi0Def::Get();
+            break;
+        case I3Particle::PiMinus:
+            return PROPOSAL::PiMinusDef::Get();
+            break;
+        case I3Particle::PiPlus:
+            return PROPOSAL::PiPlusDef::Get();
+            break;
+        case I3Particle::K0_Long:
+        case I3Particle::K0_Short:
+            return PROPOSAL::K0Def::Get();
+            break;
+        case I3Particle::KMinus:
+            return PROPOSAL::KMinusDef::Get();
+            break;
+        case I3Particle::KPlus:
+            return PROPOSAL::KPlusDef::Get();
+            break;
         default:
         {
             I3Particle i3particle;
             i3particle.SetType(ptype_I3);
 
-            log_fatal("The I3Particle '%s' with type '%i' can not be converted to a PROPOSALParticle",
+            log_warn("The I3Particle '%s' with type '%i' can not be converted to a PROPOSAL Particle",
                       i3particle.GetTypeString().c_str(),
                       ptype_I3);
+
+            // Return an empty particle definition
+            return PROPOSAL::ParticleDef::Builder().build();
         }
     }
 }
@@ -174,7 +241,7 @@ I3Particle I3PROPOSALParticleConverter::GenerateI3Particle(const PROPOSAL::Dynam
     i3_particle.SetLength(pp.GetPropagatedDistance() * I3Units::cm);
     i3_particle.SetTime(pp.GetTime() * I3Units::second);
     i3_particle.SetEnergy(pp.GetEnergy() * I3Units::MeV);
-    
+
     log_trace("MMC DEBUG SEC \n  pos=(%g,%g,%g) ang=(%g,%g)  e=%g t=%g  l=%g",
         x, y, z, theta, phi,
         pp.GetEnergy() * I3Units::MeV,
