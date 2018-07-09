@@ -11,7 +11,7 @@ def MakePropagator(
     length=1600*I3Units.m,
     particleType=dataclasses.I3Particle.ParticleType.MuMinus,
     impl='proposal',
-    mediadef=expandvars('$I3_BUILD/PROPOSAL/resources/config.json')):
+    mediadef=None):
         """
         Create a muon propagator service.
 
@@ -25,6 +25,8 @@ def MakePropagator(
 
         if impl.lower() == 'mmc':
             from icecube import sim_services, c2j_icetray, mmc_icetray, icetray
+            if mediadef is None:
+                mediadef=expandvars('$I3_BUILD/PROPOSAL/resources/mediadef')
             jvmOpts = icetray.vector_string()    # fill this with parameters passed directly to the JavaVM
             jvmOpts.append(expandvars("-Djava.class.path=$I3_BUILD/lib/mmc.jar"))
             jvmOpts.append("-Xms256m")
@@ -52,11 +54,11 @@ def MakePropagator(
             return mmc_icetray.I3PropagatorServiceMMC(jvm,mmcOpts)
         elif impl.lower() == 'proposal':
             from icecube import sim_services, PROPOSAL
+            # in PROPOSAL everything can be defined in the configuration file
+            if mediadef is None:
+                mediadef=expandvars('$I3_BUILD/PROPOSAL/resources/config.json')
             return PROPOSAL.I3PropagatorServicePROPOSAL(
-                mediadef=mediadef,
-                cylinderRadius=radius,
-                cylinderHeight=length,
-                type=particleType)
+                config_file=mediadef)
         else:
             raise RuntimeError("unknown propagator: %s" % impl)
 
@@ -145,10 +147,8 @@ if __name__=="__main__":
     tray.AddModule("I3Writer","writer",
         Filename = options.OUTFILE)
 
-    tray.AddModule("TrashCan", "the can")
 
     tray.Execute()
-    tray.Finish()
 
 
 
