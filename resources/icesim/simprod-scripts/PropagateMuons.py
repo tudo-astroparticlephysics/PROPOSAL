@@ -12,9 +12,8 @@ import icecube.simclasses
 import icecube.cmc
 import icecube.PROPOSAL
 
-# (mdunsch): Changed config file for PROPOSAL. Tue 2017/01/31
 default_media_definition = os.path.expandvars(
-    "$I3_BUILD/PROPOSAL/resources/config_icesim.json")
+    "$I3_BUILD/PROPOSAL/resources/config.json")
 
 
 @icecube.icetray.traysegment
@@ -22,6 +21,7 @@ def PropagateMuons(tray, name,
                    RandomService=None,
                    CylinderRadius=800.,
                    CylinderLength=1600.,
+                   SliceMuons=False,
                    SaveState=True,
                    InputMCTreeName="I3MCTree_preMuonProp",
                    OutputMCTreeName="I3MCTree",
@@ -38,6 +38,9 @@ def PropagateMuons(tray, name,
         Radius of the target volume in m
     :param float CylinderLength:
         Full height of the target volume in m
+    :param bool SliceMuons:
+        Emit constant-energy track slices in addition to stochastic losses
+        (similar to the output of I3MuonSlicer)
     :param bool SaveState:
         If set to `True`, store the state of the supplied RNG.
     :param str InputMCTree:
@@ -49,39 +52,17 @@ def PropagateMuons(tray, name,
         :func:`icecube.simprod.segments.make_propagator`.
 
     """
-    muon_propagator = make_propagator(
-        particle_type=icecube.dataclasses.I3Particle.ParticleType.MuMinus,
-        cylinder_radius=CylinderRadius*icecube.icetray.I3Units.m,
-        cylinder_length=CylinderLength*icecube.icetray.I3Units.m,
-        **kwargs)
-    tau_propagator = make_propagator(
-        particle_type=icecube.dataclasses.I3Particle.ParticleType.TauMinus,
-        cylinder_radius=CylinderRadius*icecube.icetray.I3Units.m,
-        cylinder_length=CylinderLength*icecube.icetray.I3Units.m,
-        **kwargs)
-
-    cascade_propagator = icecube.cmc.I3CascadeMCService(
-        icecube.phys_services.I3GSLRandomService(1))  # Dummy RNG
+    
+    kwargs.update(dict(CylinderRadius=CylinderRadius, CylinderLength=CylinderLength, EmitTrackSegments=SliceMuons))
+    propagators = make_standard_propagators(**kwargs)
 
     # Set up propagators.
     if "I3ParticleTypePropagatorServiceMap" in tray.context:
         propagator_map = tray.context["I3ParticleTypePropagatorServiceMap"]
+        for k, v in propagators.items():
+            propagator_map[k] = v
     else:
-        propagator_map =\
-            icecube.sim_services.I3ParticleTypePropagatorServiceMap()
-
-    for pt in "MuMinus", "MuPlus":
-        key = getattr(icecube.dataclasses.I3Particle.ParticleType, pt)
-        propagator_map[key] = muon_propagator
-
-    for pt in "TauMinus", "TauPlus":
-        key = getattr(icecube.dataclasses.I3Particle.ParticleType, pt)
-        propagator_map[key] = tau_propagator
-
-    for pt in "DeltaE", "Brems", "PairProd", "NuclInt", "Hadrons",\
-              "EMinus", "EPlus":
-        key = getattr(icecube.dataclasses.I3Particle.ParticleType, pt)
-        propagator_map[key] = cascade_propagator
+        propagator_map = propagators
 
     if SaveState:
         rng_state = "RNGState"
@@ -106,15 +87,67 @@ def PropagateMuons(tray, name,
 
     return
 
+def make_standard_propagators(CylinderRadius=800.,
+                   CylinderLength=1600.,
+                   EmitTrackSegments=False,
+                   SplitSubPeVCascades=True,
+                   MaxMuons=10,
+                   **kwargs):
+    """
+    Set up standard propagators (PROPOSAL for muons and taus, CMC for cascades)
+    Keyword arguments will be passed to I3PropagatorServicePROPOSAL
+    """
+    from icecube.icetray import I3Units
+    
+    muon_propagator = make_propagator(
+        particle_type=icecube.dataclasses.I3Particle.ParticleType.MuMinus,
+        cylinder_radius=CylinderRadius*icecube.icetray.I3Units.m,
+        cylinder_length=CylinderLength*icecube.icetray.I3Units.m,
+        emitTrackSegments=EmitTrackSegments,
+        **kwargs)
+    tau_propagator = make_propagator(
+        particle_type=icecube.dataclasses.I3Particle.ParticleType.TauMinus,
+        cylinder_radius=CylinderRadius*icecube.icetray.I3Units.m,
+        cylinder_length=CylinderLength*icecube.icetray.I3Units.m,
+        emitTrackSegments=EmitTrackSegments,
+        **kwargs)
+
+    cascade_propagator = icecube.cmc.I3CascadeMCService(
+        icecube.phys_services.I3GSLRandomService(1))  # Dummy RNG
+    cascade_propagator.SetEnergyThresholdSimulation(1*I3Units.PeV)
+    if SplitSubPeVCascades:
+        cascade_propagator.SetThresholdSplit(1*I3Units.TeV)
+    else:
+        cascade_propagator.SetThresholdSplit(1*I3Units.PeV)
+    cascade_propagator.SetMaxMuons(MaxMuons)
+    propagator_map =\
+        icecube.sim_services.I3ParticleTypePropagatorServiceMap()
+
+    for pt in "MuMinus", "MuPlus":
+        key = getattr(icecube.dataclasses.I3Particle.ParticleType, pt)
+        propagator_map[key] = muon_propagator
+
+    for pt in "TauMinus", "TauPlus":
+        key = getattr(icecube.dataclasses.I3Particle.ParticleType, pt)
+        propagator_map[key] = tau_propagator
+
+    for pt in "DeltaE", "Brems", "PairProd", "NuclInt", "Hadrons",\
+              "EMinus", "EPlus":
+        key = getattr(icecube.dataclasses.I3Particle.ParticleType, pt)
+        propagator_map[key] = cascade_propagator
+    
+    return propagator_map
 
 def make_propagator(
         media_definition=default_media_definition,
         particle_type=icecube.dataclasses.I3Particle.ParticleType.MuMinus,
+        emitTrackSegments=False,
         cylinder_radius=800.,
         cylinder_length=1600.,
-        bremsstrahlung="BremsKelnerKokoulinPetrukhin",
-        photonuclear="PhotoAbramowiczLevinLevyMaor97ShadowButkevich"
-        ):
+        bremsstrahlung="KelnerKokoulinPetrukhin",
+        photonuclear_family="AbramowiczLevinLevyMaor",
+        photonuclear="AbramowiczLevinLevyMaor97",
+        nuclear_shadowing="Butkevich"):
     """Create a muon propagator service.
 
     :param str media_definition:
@@ -134,32 +167,14 @@ def make_propagator(
         parametrization to use
     :param str nuclear_shadowing:
         Nuclear shadowing parametrization to use
+    
+    Note: the new PROPOSAL version only needs a configuration file
+    everything (cross section, continuous loss output, etc.)
+    can/should be defined there.
 
     """
-    # if not hasattr(icecube.PROPOSAL.CrossSectionParametrization,
-    #                bremsstrahlung):
-    #     bremsstrahlung = "BremsKelnerKokoulinPetrukhin"
-    #
-    # bremsstrahlung_parametrization = getattr(
-    #     icecube.PROPOSAL.CrossSectionParametrization,
-    #     bremsstrahlung)
-    #
-    # if not hasattr(icecube.PROPOSAL.CrossSectionParametrization,
-    #                photonuclear):
-    #     photonuclear = "PhotoAbramowiczLevinLevyMaor97ShadowButkevich"
-    #
-    # photonuclear_parametrization = getattr(
-    #     icecube.PROPOSAL.CrossSectionParametrization,
-    #     photonuclear)
-
 
     propagator_service = icecube.PROPOSAL.I3PropagatorServicePROPOSAL(
-        config_file=media_definition,
-        # cylinderRadius=cylinder_radius*icecube.icetray.I3Units.m,
-        # cylinderHeight=cylinder_length*icecube.icetray.I3Units.m,
-        # type=particle_type,
-        # bremsstrahlungParametrization=bremsstrahlung_parametrization,
-        # photonuclearParametrization=photonuclear_parametrization
-        )
+        config_file=media_definition)
 
     return propagator_service
