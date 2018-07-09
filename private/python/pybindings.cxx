@@ -839,7 +839,9 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
 
     PARTICLE_DEF(Monopole)
     PARTICLE_DEF(Gamma)
-    PARTICLE_DEF(StableMassiveParticle)
+
+    PARTICLE_DEF(SMPMinus)
+    PARTICLE_DEF(SMPPlus)
 
     /**************************************************************************
      *                              Dynamic Data                               *
