@@ -381,6 +381,8 @@ def main(dir_name):
 
 if __name__ == "__main__":
 
+    import os
+
     dir_name = "TestFiles/"
 
     try:
