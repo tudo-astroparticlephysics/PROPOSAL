@@ -263,6 +263,11 @@ Propagator::Propagator(const ParticleDef& particle_def, const std::string& confi
     SetMember(brems, "global.brems", pt_json);
     sec_def_global.utility_def.brems_def.parametrization = BremsstrahlungFactory::Get().GetEnumFromString(brems);
 
+    std::string epair =
+        EpairProductionFactory::Get().GetStringFromEnum(sec_def_global.utility_def.epair_def.parametrization);
+    SetMember(epair, "global.epair", pt_json);
+    sec_def_global.utility_def.epair_def.parametrization = EpairProductionFactory::Get().GetEnumFromString(epair);
+
     std::string photo =
         PhotonuclearFactory::Get().GetStringFromEnum(sec_def_global.utility_def.photo_def.parametrization);
     SetMember(photo, "global.photo", pt_json);
@@ -272,6 +277,7 @@ Propagator::Propagator(const ParticleDef& particle_def, const std::string& confi
         PhotonuclearFactory::Get().GetStringFromShadowEnum(sec_def_global.utility_def.photo_def.shadow);
     SetMember(shadow, "global.photo_shadow", pt_json);
     sec_def_global.utility_def.photo_def.shadow = PhotonuclearFactory::Get().GetShadowEnumFromString(shadow);
+
 
     SetMember(sec_def_global.utility_def.photo_def.hard_component, "global.photo_hard_component", pt_json);
 

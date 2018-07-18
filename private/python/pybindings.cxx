@@ -30,6 +30,28 @@
         init<const ParticleDef&, const Medium&, const EnergyCutSettings&, double, bool>(                               \
             (arg("particle_def"), arg("medium"), arg("energy_cuts"), arg("multiplier"), arg("lpm"))));
 
+#define EPAIR_DEF(cls)                                                                                                 \
+    class_<Epair##cls, boost::shared_ptr<Epair##cls>, bases<EpairProductionRhoIntegral> >(                             \
+        #cls,                                                                                                          \
+        init < const ParticleDef&,                                                                                     \
+        const Medium&,                                                                                                 \
+        const EnergyCutSettings&,                                                                                      \
+        double,                                                                                                        \
+        bool>((arg("particle_def"), arg("medium"), arg("energy_cuts"), arg("multiplier"), arg("lpm_effect"))));
+
+#define EPAIR_INTERPOL_DEF(cls)                                                                                        \
+    class_<EpairProductionRhoInterpolant<Epair##cls>,                                                                  \
+           boost::shared_ptr<EpairProductionRhoInterpolant<Epair##cls> >,                                                         \
+           bases<Epair##cls> >(                                                                                        \
+        #cls "Interpolant",                                                                                            \
+        init<const ParticleDef&, const Medium&, const EnergyCutSettings&, double, bool, InterpolationDef>(             \
+            (arg("particle_def"),                                                                                      \
+             arg("medium"),                                                                                            \
+             arg("energy_cuts"),                                                                                       \
+             arg("multiplier"),                                                                                        \
+             arg("lpm_effect"),                                                                                        \
+             arg("interpolation_def"))));
+
 #define PHOTO_REAL_DEF(cls, parent)                                                                                    \
     class_<Photo##cls, boost::shared_ptr<Photo##cls>, bases<Photo##parent> >(                                          \
         #cls,                                                                                                          \
@@ -426,22 +448,29 @@ void export_epair()
     class_<EpairProduction, boost::shared_ptr<EpairProduction>, bases<Parametrization>, boost::noncopyable>(
         "EpairProduction", no_init);
 
-    class_<EpairProductionRhoIntegral, boost::shared_ptr<EpairProductionRhoIntegral>, bases<EpairProduction> >(
-        "EpairProductionRhoIntegral",
-        init<const ParticleDef&, const Medium&, const EnergyCutSettings&, double, bool>(
-            (arg("particle_def"), arg("medium"), arg("energy_cuts"), arg("multiplier"), arg("lpm"))));
+    class_<EpairProductionRhoIntegral, boost::shared_ptr<EpairProductionRhoIntegral>, bases<EpairProduction>, boost::noncopyable>(
+        "EpairProductionRhoIntegral", no_init)
+        .def("function_to_integral", &EpairProductionRhoIntegral::FunctionToIntegral);
+        // init<const ParticleDef&, const Medium&, const EnergyCutSettings&, double, bool>(
+        //     (arg("particle_def"), arg("medium"), arg("energy_cuts"), arg("multiplier"), arg("lpm"))));
 
-    class_<EpairProductionRhoInterpolant,
-           boost::shared_ptr<EpairProductionRhoInterpolant>,
-           bases<EpairProductionRhoIntegral> >(
-        "EpairProductionRhoInterpolant",
-        init<const ParticleDef&, const Medium&, const EnergyCutSettings&, double, bool, InterpolationDef>(
-            (arg("particle_def"),
-             arg("medium"),
-             arg("energy_cuts"),
-             arg("multiplier"),
-             arg("lpm"),
-             arg("interpolation_def"))));
+    // class_<EpairProductionRhoInterpolant,
+    //        boost::shared_ptr<EpairProductionRhoInterpolant>,
+    //        bases<EpairProductionRhoIntegral> >(
+    //     "EpairProductionRhoInterpolant",
+    //     init<const ParticleDef&, const Medium&, const EnergyCutSettings&, double, bool, InterpolationDef>(
+    //         (arg("particle_def"),
+    //          arg("medium"),
+    //          arg("energy_cuts"),
+    //          arg("multiplier"),
+    //          arg("lpm"),
+    //          arg("interpolation_def"))));
+
+    EPAIR_DEF(Kelner)
+    EPAIR_DEF(RhodeSandrockSoedingrekso)
+
+    EPAIR_INTERPOL_DEF(Kelner)
+    EPAIR_INTERPOL_DEF(RhodeSandrockSoedingrekso)
 }
 
 void export_parametrizations()
