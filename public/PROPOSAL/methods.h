@@ -54,8 +54,16 @@ namespace PROPOSAL {
 float myErfInv2(float x);
 
 //----------------------------------------------------------------------------//
-
 int RoundValue(double val);
+
+// ----------------------------------------------------------------------------
+/// @brief Calculate the dilogarithums
+///
+/// @param x
+///
+/// @return dilog(x)
+// ----------------------------------------------------------------------------
+double dilog(double x);
 
 // ----------------------------------------------------------------------------
 /// @brief Definition needed to initialize interpolation

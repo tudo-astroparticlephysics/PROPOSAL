@@ -24,6 +24,8 @@
 #include "PROPOSAL/math/Interpolant.h"
 #include "PROPOSAL/math/InterpolantBuilder.h"
 
+#include "PROPOSAL/Constants.h"
+
 #include "PROPOSAL/Output.h"
 #include "PROPOSAL/methods.h"
 
@@ -66,6 +68,82 @@ int RoundValue(double val)
     }
 
     return valRound;
+}
+
+// ------------------------------------------------------------------------- //
+double dilog(double x)
+{
+    double C_arr[] = { 0.42996693560813697,  0.40975987533077105, -0.01858843665014592, 0.00145751084062268,
+                       -0.00014304184442340, 0.00001588415541880, -0.00000190784959387, 0.00000024195180854,
+                       -0.00000003193341274, 0.00000000434545063, -0.00000000060578480, 0.00000000008612098,
+                       -0.00000000001244332, 0.00000000000182256, -0.00000000000027007, 0.00000000000004042,
+                       -0.00000000000000610, 0.00000000000000093, -0.00000000000000014, 0.00000000000000002 };
+
+    double HF = 0.5;
+
+    if (x == 1)
+        return PI * PI / 6.0;
+    else if (x == -1)
+        return -PI * PI / 12.0;
+    else
+    {
+        double _T = -x;
+        double Y, S, A, B0, B1, B2, _H, _ALFA;
+
+        if (_T <= -2.0)
+        {
+            Y  = -1.0 / (1.0 + _T);
+            S  = 1.0;
+            B1 = log(-_T);
+            B2 = log(1.0 + 1.0 / _T);
+            A  = -PI * PI / 3.0 + HF * (B1 * B1 - B2 * B2);
+        } else if (_T < -1.0)
+        {
+            Y = -1.0 - _T;
+            S = -1.0;
+            A = log(-_T);
+            A = -PI * PI / 6.0 + A * (A + log(1 + 1 / _T));
+        } else if (_T <= -0.5)
+        {
+            Y = -(1 + _T) / _T;
+            S = 1.0;
+            A = log(-_T);
+            A = -PI * PI / 6.0 + A * (-HF * A + log(1.0 + _T));
+        } else if (_T < 0.0)
+        {
+            Y = -_T / (1 + _T);
+            S = -1.0;
+            A = log(1 + _T);
+            A = HF * A * A;
+        } else if (_T <= 1.0)
+        {
+            Y = _T;
+            S = 1.0;
+            A = 0.0;
+        } else
+        {
+            Y = 1.0 / _T;
+            S = -1.0;
+            A = log(_T);
+            A = PI * PI / 6 + HF * A * A;
+        }
+
+        _H    = Y + Y - 1;
+        _ALFA = _H + _H;
+        B1    = 0.0;
+        B2    = 0.0;
+
+        for (int i = 19; i >= 0.0; --i)
+        {
+            B0 = C_arr[i] + _ALFA * B1 - B2;
+            B2 = B1;
+            B1 = B0;
+        }
+
+        return -(S * (B0 - _H * B2) + A);
+    }
+
+    return x;
 }
 
 namespace Helper {
