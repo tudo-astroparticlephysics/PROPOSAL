@@ -22,6 +22,16 @@ cuts = [
 
 multiplier = 1.
 
+epair = [
+    pp.Parametrization.EpairProduction.Kelner,
+    pp.Parametrization.EpairProduction.SudoJan,
+]
+
+epair_interpol = [
+    pp.Parametrization.EpairProduction.KelnerInterpolant,
+    pp.Parametrization.EpairProduction.SudoJanInterpolant,
+]
+
 lpms = [0, 1]
 
 energies = np.logspace(4, 13, num=10)
@@ -29,344 +39,263 @@ energies = np.logspace(4, 13, num=10)
 interpoldef = pp.InterpolationDef()
 
 
-def create_table_dEdx(dir_name):
+def create_tables(dir_name, interpolate=False, **kwargs):
 
-    with open(dir_name + "Epair_dEdx.txt", "a") as f:
+    if interpolate:
+        params = epair_interpol
+    else:
+        params = epair
+
+    buf = {}
+
+    for key in kwargs:
+        if key == "dEdx" and kwargs[key] is True:
+            f_dEdx = open(dir_name + "Epair_dEdx{}.txt".format("_interpol" if interpolate else ""), "a")
+            buf["dEdx"] = [f_dEdx, [""]]
+        if key == "dNdx" and kwargs[key] is True:
+            f_dNdx = open(dir_name + "Epair_dNdx{}.txt".format("_interpol" if interpolate else ""), "a")
+            buf["dNdx"] = [f_dNdx, [""]]
+        if key == "dNdx_rnd" and kwargs[key] is True:
+            f_dNdx_rnd = open(dir_name + "Epair_dNdx_rnd{}.txt".format("_interpol" if interpolate else ""), "a")
+            buf["dNdx_rnd"] = [f_dNdx_rnd, [""]]
+        if key == "stoch" and kwargs[key] is True:
+            f_stoch = open(dir_name + "Epair_e{}.txt".format("_interpol" if interpolate else ""), "a")
+            buf["stoch"] = [f_stoch, [""]]
+
+    print(buf)
+
+    for particle in particle_defs:
+        for medium in mediums:
+            for cut in cuts:
+                for param in params:
+                    for lpm in lpms:
+
+                        if interpolate:
+                            param_current = param(
+                                particle,
+                                medium,
+                                cut,
+                                multiplier,
+                                lpm,
+                                interpoldef)
+
+                            xsection = pp.CrossSection.EpairInterpolant(param_current, interpoldef)
+                        else:
+                            param_current = param(
+                                particle,
+                                medium,
+                                cut,
+                                multiplier,
+                                lpm)
+
+                            xsection = pp.CrossSection.EpairIntegral(param_current)
+
+                        for key in buf:
+                            buf[key][1] = [""]
+
+                            for energy in energies:
+                                if key == "dEdx":
+                                    result = [str(xsection.calculate_dEdx(energy))]
+                                if key == "dNdx":
+                                    result = [str(xsection.calculate_dNdx(energy))]
+                                if key == "dNdx_rnd":
+                                    rnd = pp.RandomGenerator.get().random_double()
+                                    result = xsection.calculate_dNdx_rnd(energy, rnd)
+                                    result = [str(rnd), str(result)]
+                                if key == "stoch":
+                                    rnd1 = pp.RandomGenerator.get().random_double()
+                                    rnd2 = pp.RandomGenerator.get().random_double()
+                                    result = xsection.calculate_stochastic_loss(energy, rnd1, rnd2)
+                                    result = [str(rnd1), str(rnd2), str(result)]
+
+                                buf[key][1].append(particle.name)
+                                buf[key][1].append(medium.name)
+                                buf[key][1].append(str(cut.ecut))
+                                buf[key][1].append(str(cut.vcut))
+                                buf[key][1].append(str(multiplier))
+                                buf[key][1].append(str(lpm))
+                                buf[key][1].append(str(energy))
+                                buf[key][1].extend(result)
+                                buf[key][1].append(param_current.name)
+                                buf[key][1].append("\n")
+
+                            buf[key][0].write("\t".join(buf[key][1]))
+
+
+def create_table_dNdx(dir_name, interpolate=False):
+
+    if interpolate:
+        params = epair_interpol
+    else:
+        params = epair
+
+    with open(dir_name + "Epair_dNdx{}.txt".format("_interpol" if interpolate else ""), "a") as f:
 
         for particle in particle_defs:
             for medium in mediums:
                 for cut in cuts:
-                    for lpm  in lpms:
+                    for param in params:
+                        for lpm in lpms:
 
-                        Epair = pp.Parametrization.EpairProduction.EpairProductionRhoIntegral(
-                            particle,
-                            medium,
-                            cut,
-                            multiplier,
-                            lpm
-                        )
+                            if interpolate:
+                                param_current = param(
+                                    particle,
+                                    medium,
+                                    cut,
+                                    multiplier,
+                                    lpm,
+                                    interpoldef)
 
-                        Epair_Int = pp.CrossSection.EpairIntegral(Epair)
+                                xsection = pp.CrossSection.EpairInterpolant(param_current, interpoldef)
+                            else:
+                                param_current = param(
+                                    particle,
+                                    medium,
+                                    cut,
+                                    multiplier,
+                                    lpm)
 
-                        buf = [""]
+                                xsection = pp.CrossSection.EpairIntegral(param_current)
 
-                        for energy in energies:
-                            dEdx = Epair_Int.calculate_dEdx(energy)
+                            buf = [""]
 
-                            buf.append(particle.name)
-                            buf.append(medium.name)
-                            buf.append(str(cut.ecut))
-                            buf.append(str(cut.vcut))
-                            buf.append(str(multiplier))
-                            buf.append(str(lpm))
-                            buf.append(str(energy))
-                            buf.append(str(dEdx))
-                            buf.append("\n")
+                            for energy in energies:
+                                dEdx = xsection.calculate_dNdx(energy)
 
-                        # print(buf)
-                        f.write("\t".join(buf))
+                                buf.append(particle.name)
+                                buf.append(medium.name)
+                                buf.append(str(cut.ecut))
+                                buf.append(str(cut.vcut))
+                                buf.append(str(multiplier))
+                                buf.append(str(lpm))
+                                buf.append(str(energy))
+                                buf.append(str(dEdx))
+                                buf.append("\n")
 
-
-def create_table_dNdx(dir_name):
-
-    with open(dir_name + "Epair_dNdx.txt", "a") as f:
-
-        for particle in particle_defs:
-            for medium in mediums:
-                for cut in cuts:
-                    for lpm  in lpms:
-
-                        Epair = pp.Parametrization.EpairProduction.EpairProductionRhoIntegral(
-                            particle,
-                            medium,
-                            cut,
-                            multiplier,
-                            lpm
-                        )
-
-                        Epair_Int = pp.CrossSection.EpairIntegral(Epair)
-
-                        buf = [""]
-
-                        for energy in energies:
-                            dNdx = Epair_Int.calculate_dNdx(energy)
-
-                            buf.append(particle.name)
-                            buf.append(medium.name)
-                            buf.append(str(cut.ecut))
-                            buf.append(str(cut.vcut))
-                            buf.append(str(multiplier))
-                            buf.append(str(lpm))
-                            buf.append(str(energy))
-                            buf.append(str(dNdx))
-                            buf.append("\n")
-
-                        # print(buf)
-                        f.write("\t".join(buf))
+                            # print(buf)
+                            f.write("\t".join(buf))
 
 
-def create_table_dNdx_rnd(dir_name):
+def create_table_dNdx_rnd(dir_name, interpolate=False):
 
     pp.RandomGenerator.get().set_seed(0)
 
-    with open(dir_name + "Epair_dNdx_rnd.txt", "a") as f:
+    if interpolate:
+        params = epair_interpol
+    else:
+        params = epair
+
+    with open(dir_name + "Epair_dNdx_rnd{}.txt".format("_interpol" if interpolate else ""), "a") as f:
 
         for particle in particle_defs:
             for medium in mediums:
                 for cut in cuts:
-                    for lpm  in lpms:
+                    for param in params:
+                        for lpm in lpms:
 
-                        Epair = pp.Parametrization.EpairProduction.EpairProductionRhoIntegral(
-                            particle,
-                            medium,
-                            cut,
-                            multiplier,
-                            lpm
-                        )
+                            if interpolate:
+                                param_current = param(
+                                    particle,
+                                    medium,
+                                    cut,
+                                    multiplier,
+                                    lpm,
+                                    interpoldef)
 
-                        Epair_Int = pp.CrossSection.EpairIntegral(Epair)
+                                xsection = pp.CrossSection.EpairInterpolant(param_current, interpoldef)
+                            else:
+                                param_current = param(
+                                    particle,
+                                    medium,
+                                    cut,
+                                    multiplier,
+                                    lpm)
 
-                        buf = [""]
+                                xsection = pp.CrossSection.EpairIntegral(param_current)
 
-                        for energy in energies:
-                            rnd = pp.RandomGenerator.get().random_double()
-                            dNdx_rnd = Epair_Int.calculate_dNdx_rnd(energy, rnd)
+                            buf = [""]
 
-                            buf.append(particle.name)
-                            buf.append(medium.name)
-                            buf.append(str(cut.ecut))
-                            buf.append(str(cut.vcut))
-                            buf.append(str(multiplier))
-                            buf.append(str(lpm))
-                            buf.append(str(energy))
-                            buf.append(str(rnd))
-                            buf.append(str(dNdx_rnd))
-                            buf.append("\n")
+                            for energy in energies:
+                                rnd = pp.RandomGenerator.get().random_double()
+                                dNdx = xsection.calculate_dNdx_rnd(energy, rnd)
 
-                        # print(buf)
-                        f.write("\t".join(buf))
+                                buf.append(particle.name)
+                                buf.append(medium.name)
+                                buf.append(str(cut.ecut))
+                                buf.append(str(cut.vcut))
+                                buf.append(str(multiplier))
+                                buf.append(str(lpm))
+                                buf.append(str(energy))
+                                buf.append(str(rnd))
+                                buf.append(str(dNdx))
+                                buf.append("\n")
 
-
-def create_table_stochastic_loss(dir_name):
-
-    pp.RandomGenerator.get().set_seed(5)
-
-    with open(dir_name + "Epair_e.txt", "a") as f:
-
-        for particle in particle_defs:
-            for medium in mediums:
-                for cut in cuts:
-                    for lpm  in lpms:
-
-                        Epair = pp.Parametrization.EpairProduction.EpairProductionRhoIntegral(
-                            particle,
-                            medium,
-                            cut,
-                            multiplier,
-                            lpm
-                        )
-
-                        Epair_Int = pp.CrossSection.EpairIntegral(Epair)
-
-                        buf = [""]
-
-                        for energy in energies:
-                            rnd1 = pp.RandomGenerator.get().random_double()
-                            rnd2 = pp.RandomGenerator.get().random_double()
-                            stochastic_loss = Epair_Int.calculate_stochastic_loss(energy, rnd1, rnd2)
-
-                            buf.append(particle.name)
-                            buf.append(medium.name)
-                            buf.append(str(cut.ecut))
-                            buf.append(str(cut.vcut))
-                            buf.append(str(multiplier))
-                            buf.append(str(lpm))
-                            buf.append(str(energy))
-                            buf.append(str(rnd1))
-                            buf.append(str(rnd2))
-                            buf.append(str(stochastic_loss))
-                            buf.append("\n")
-
-                        # print(buf)
-                        f.write("\t".join(buf))
+                            # print(buf)
+                            f.write("\t".join(buf))
 
 
-def create_table_dEdx_interpol(dir_name):
+def create_table_stochastic_loss(dir_name, interpolate=False):
 
-    with open(dir_name + "Epair_dEdx_interpol.txt", "a") as f:
+    pp.RandomGenerator.get().set_seed(0)
+
+    if interpolate:
+        params = epair_interpol
+    else:
+        params = epair
+
+    with open(dir_name + "Epair_e{}.txt".format("_interpol" if interpolate else ""), "a") as f:
 
         for particle in particle_defs:
             for medium in mediums:
                 for cut in cuts:
-                    for lpm  in lpms:
+                    for param in params:
+                        for lpm in lpms:
 
-                        Epair = pp.Parametrization.EpairProduction.EpairProductionRhoInterpolant(
-                            particle,
-                            medium,
-                            cut,
-                            multiplier,
-                            lpm,
-                            interpoldef
-                        )
+                            if interpolate:
+                                param_current = param(
+                                    particle,
+                                    medium,
+                                    cut,
+                                    multiplier,
+                                    lpm,
+                                    interpoldef)
 
-                        Epair_Interpol = pp.CrossSection.EpairInterpolant(Epair, interpoldef)
+                                xsection = pp.CrossSection.EpairInterpolant(param_current, interpoldef)
+                            else:
+                                param_current = param(
+                                    particle,
+                                    medium,
+                                    cut,
+                                    multiplier,
+                                    lpm)
 
-                        buf = [""]
+                                xsection = pp.CrossSection.EpairIntegral(param_current)
 
-                        for energy in energies:
-                            dEdx = Epair_Interpol.calculate_dEdx(energy)
+                            buf = [""]
 
-                            buf.append(particle.name)
-                            buf.append(medium.name)
-                            buf.append(str(cut.ecut))
-                            buf.append(str(cut.vcut))
-                            buf.append(str(multiplier))
-                            buf.append(str(lpm))
-                            buf.append(str(energy))
-                            buf.append(str(dEdx))
-                            buf.append("\n")
+                            for energy in energies:
+                                rnd1 = pp.RandomGenerator.get().random_double()
+                                rnd2 = pp.RandomGenerator.get().random_double()
+                                stochastic_loss = xsection.calculate_dNdx_rnd(energy, rnd1, rnd2)
 
-                        # print(buf)
-                        f.write("\t".join(buf))
+                                buf.append(particle.name)
+                                buf.append(medium.name)
+                                buf.append(str(cut.ecut))
+                                buf.append(str(cut.vcut))
+                                buf.append(str(multiplier))
+                                buf.append(str(lpm))
+                                buf.append(str(energy))
+                                buf.append(str(rnd1))
+                                buf.append(str(rnd2))
+                                buf.append(str(stochastic_loss))
+                                buf.append("\n")
 
-
-def create_table_dNdx_interpol(dir_name):
-
-    with open(dir_name + "Epair_dNdx_interpol.txt", "a") as f:
-
-        for particle in particle_defs:
-            for medium in mediums:
-                for cut in cuts:
-                    for lpm  in lpms:
-
-                        Epair = pp.Parametrization.EpairProduction.EpairProductionRhoInterpolant(
-                            particle,
-                            medium,
-                            cut,
-                            multiplier,
-                            lpm,
-                            interpoldef
-                        )
-
-                        Epair_Interpol = pp.CrossSection.EpairInterpolant(Epair, interpoldef)
-
-                        buf = [""]
-
-                        for energy in energies:
-                            dNdx = Epair_Interpol.calculate_dNdx(energy)
-
-                            buf.append(particle.name)
-                            buf.append(medium.name)
-                            buf.append(str(cut.ecut))
-                            buf.append(str(cut.vcut))
-                            buf.append(str(multiplier))
-                            buf.append(str(lpm))
-                            buf.append(str(energy))
-                            buf.append(str(dNdx))
-                            buf.append("\n")
-
-                        # print(buf)
-                        f.write("\t".join(buf))
-
-
-def create_table_dNdx_rnd_interpol(dir_name):
-
-    pp.RandomGenerator.get().set_seed(5)
-
-    with open(dir_name + "Epair_dNdx_rnd_interpol.txt", "a") as f:
-
-        for particle in particle_defs:
-            for medium in mediums:
-                for cut in cuts:
-                    for lpm  in lpms:
-
-                        Epair = pp.Parametrization.EpairProduction.EpairProductionRhoInterpolant(
-                            particle,
-                            medium,
-                            cut,
-                            multiplier,
-                            lpm,
-                            interpoldef
-                        )
-
-                        Epair_Interpol = pp.CrossSection.EpairInterpolant(Epair, interpoldef)
-
-                        buf = [""]
-
-                        for energy in energies:
-                            rnd = pp.RandomGenerator.get().random_double()
-                            dNdx_rnd = Epair_Interpol.calculate_dNdx_rnd(energy, rnd)
-
-                            buf.append(particle.name)
-                            buf.append(medium.name)
-                            buf.append(str(cut.ecut))
-                            buf.append(str(cut.vcut))
-                            buf.append(str(multiplier))
-                            buf.append(str(lpm))
-                            buf.append(str(energy))
-                            buf.append(str(rnd))
-                            buf.append(str(dNdx_rnd))
-                            buf.append("\n")
-
-                        # print(buf)
-                        f.write("\t".join(buf))
-
-
-def create_table_stochastic_loss_interpol(dir_name):
-
-    pp.RandomGenerator.get().set_seed(5)
-
-    with open(dir_name + "Epair_e_interpol.txt", "a") as f:
-
-        for particle in particle_defs:
-            for medium in mediums:
-                for cut in cuts:
-                    for lpm  in lpms:
-
-                        Epair = pp.Parametrization.EpairProduction.EpairProductionRhoInterpolant(
-                            particle,
-                            medium,
-                            cut,
-                            multiplier,
-                            lpm,
-                            interpoldef
-                        )
-
-                        Epair_Interpol = pp.CrossSection.EpairInterpolant(Epair, interpoldef)
-
-                        buf = [""]
-
-                        for energy in energies:
-                            rnd1 = pp.RandomGenerator.get().random_double()
-                            rnd2 = pp.RandomGenerator.get().random_double()
-                            stochastic_loss = Epair_Interpol.calculate_stochastic_loss(energy, rnd1, rnd2)
-
-                            buf.append(particle.name)
-                            buf.append(medium.name)
-                            buf.append(str(cut.ecut))
-                            buf.append(str(cut.vcut))
-                            buf.append(str(multiplier))
-                            buf.append(str(lpm))
-                            buf.append(str(energy))
-                            buf.append(str(rnd1))
-                            buf.append(str(rnd2))
-                            buf.append(str(stochastic_loss))
-                            buf.append("\n")
-
-                        # print(buf)
-                        f.write("\t".join(buf))
+                            f.write("\t".join(buf))
 
 
 def main(dir_name):
-    create_table_dEdx(dir_name)
-    create_table_dNdx(dir_name)
-    create_table_dNdx_rnd(dir_name)
-    create_table_stochastic_loss(dir_name)
-    create_table_dEdx_interpol(dir_name)
-    create_table_dNdx_interpol(dir_name)
-    create_table_dNdx_rnd_interpol(dir_name)
-    create_table_stochastic_loss_interpol(dir_name)
-
+    # create_tables(dir_name, True, dEdx=True, dNdx=True, dNdx_rnd=True, stoch=True)
+    create_tables(dir_name, False, dEdx=True, dNdx=True, dNdx_rnd=True, stoch=True)
 
 if __name__ == "__main__":
 

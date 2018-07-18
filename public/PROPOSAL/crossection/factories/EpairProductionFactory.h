@@ -29,11 +29,16 @@
 
 #pragma once
 
+#include <boost/bimap.hpp>
+#include <boost/function.hpp>
+
 #include "PROPOSAL/methods.h"
 
 namespace PROPOSAL {
 
 class CrossSection;
+class EpairProduction;
+
 struct ParticleDef;
 class Medium;
 class EnergyCutSettings;
@@ -41,17 +46,26 @@ class EnergyCutSettings;
 class EpairProductionFactory
 {
 public:
+    enum Enum
+    {
+        Kelner = 0,
+        SudoJan,
+    };
+
     struct Definition
     {
         Definition()
-            : lpm_effect(true)
+            : parametrization(Kelner)
+            , lpm_effect(true)
             , multiplier(1.0)
         {
         }
 
         bool operator==(const EpairProductionFactory::Definition& def) const
         {
-            if (lpm_effect != def.lpm_effect)
+            if (parametrization != def.parametrization)
+                return false;
+            else if (lpm_effect != def.lpm_effect)
                 return false;
             else if (multiplier != def.multiplier)
                 return false;
@@ -64,9 +78,34 @@ public:
             return !(*this == def);
         }
 
+        Enum parametrization;
         bool lpm_effect;
         double multiplier;
     };
+
+    // --------------------------------------------------------------------- //
+    // Typedefs for readablitiy
+    // --------------------------------------------------------------------- //
+
+    typedef boost::function<EpairProduction*(const ParticleDef&,
+                                          const Medium&,
+                                          const EnergyCutSettings&,
+                                          double multiplier,
+                                          bool lpm)>
+        RegisterFunction;
+
+    typedef boost::function<EpairProduction*(const ParticleDef&,
+                                          const Medium&,
+                                          const EnergyCutSettings&,
+                                          double multiplier,
+                                          bool lpm,
+                                          InterpolationDef)>
+        RegisterFunctionInterpolant;
+
+    typedef std::map<std::string, std::pair<RegisterFunction, RegisterFunctionInterpolant> > EpairMapString;
+    typedef std::map<Enum, std::pair<RegisterFunction, RegisterFunctionInterpolant> > EpairMapEnum;
+
+    typedef boost::bimap<std::string, Enum> BimapStringEnum;
 
     // --------------------------------------------------------------------- //
     // Most general creation
@@ -83,6 +122,16 @@ public:
                                         const Definition&,
                                         InterpolationDef) const;
 
+    // ----------------------------------------------------------------------------
+    /// @brief string to enum conversation for photo parametrizations
+    // ----------------------------------------------------------------------------
+    Enum GetEnumFromString(const std::string&);
+
+    // ----------------------------------------------------------------------------
+    /// @brief enum to string conversation for photo parametrizations
+    // ----------------------------------------------------------------------------
+    std::string GetStringFromEnum(const Enum&);
+
     // --------------------------------------------------------------------- //
     // Singleton pattern
     // --------------------------------------------------------------------- //
@@ -96,6 +145,19 @@ public:
 private:
     EpairProductionFactory();
     ~EpairProductionFactory();
+
+    // ----------------------------------------------------------------------------
+    /// @brief Register Photonuclear parametrizations
+    ///
+    /// @param name
+    /// @param Enum
+    /// @param RegisterQ2Function
+    // ----------------------------------------------------------------------------
+    void Register(const std::string& name, Enum, std::pair<RegisterFunction, RegisterFunctionInterpolant>);
+
+    EpairMapString epair_map_str_;
+    EpairMapEnum epair_map_enum_;
+    BimapStringEnum string_enum_;
 };
 
 } // namespace PROPOSAL
