@@ -176,15 +176,15 @@ double EpairProduction::lpm(double energy, double v, double r2, double b, double
 // ------------------------------------------------------------------------- //
 
 /******************************************************************************
-*                          EpairProduction Integral                           *
-******************************************************************************/
+ *                          EpairProduction Integral                           *
+ ******************************************************************************/
 
 // ------------------------------------------------------------------------- //
 EpairProductionRhoIntegral::EpairProductionRhoIntegral(const ParticleDef& particle_def,
-                                 const Medium& medium,
-                                 const EnergyCutSettings& cuts,
-                                 double multiplier,
-                                 bool lpm)
+                                                       const Medium& medium,
+                                                       const EnergyCutSettings& cuts,
+                                                       double multiplier,
+                                                       bool lpm)
     : EpairProduction(particle_def, medium, cuts, multiplier, lpm)
     , integral_(IROMB, IMAXS, IPREC)
 {
@@ -378,17 +378,19 @@ double EpairKelner::FunctionToIntegral(double energy, double v, double r)
 // ------------------------------------------------------------------------- //
 double EpairRhodeSandrockSoedingrekso::FunctionToIntegral(double energy, double v, double rho)
 {
-    double m_in   = particle_def_.mass;
+    double m_in = particle_def_.mass;
 
     double nucl_Z = components_[component_index_]->GetNucCharge();
     double nucl_A = components_[component_index_]->GetAtomicNum();
 
-    double rad_log      = components_[component_index_]->GetLogConstant();
+    double rad_log = components_[component_index_]->GetLogConstant();
 
     double const_prefactor = 4.0 / (3.0 * PI) * nucl_Z * pow(ALPHA * RE, 2.0);
-    double Z13             = 1. / pow(nucl_Z, 1.0 / 3.0);
+    double Z13             = pow(nucl_Z, -1.0 / 3.0);
     double d_n             = 1.54 * pow(nucl_A, 0.27);
-    double rho2            = rho * rho;
+
+    rho         = 1 - rho;
+    double rho2 = rho * rho;
 
     // --------------------------------------------------------------------- //
     // Zeta
@@ -403,8 +405,17 @@ double EpairRhodeSandrockSoedingrekso::FunctionToIntegral(double energy, double 
         g2 = 5.3e-5;
     }
 
-    double zeta = (0.073 * log(energy / m_in / (1.0 + g1 * pow(nucl_Z, 2.0 / 3.0) * energy / m_in)) - 0.26) /
-                  (0.058 * log(energy / m_in / (1 + g2 * Z13 * energy / m_in)) - 0.14);
+    double zeta, zeta1, zeta2;
+    zeta1 = (0.073 * log(energy / m_in / (1.0 + g1 * pow(nucl_Z, 2.0 / 3.0) * energy / m_in)) - 0.26);
+    zeta2 = (0.058 * log(energy / m_in / (1 + g2 / Z13 * energy / m_in)) - 0.14);
+
+    if (zeta1 > 0.0 && zeta2 > 0.0)
+    {
+        zeta = zeta1 / zeta2;
+    } else
+    {
+        zeta = 0.0;
+    }
 
     double beta = v * v / (2.0 * (1.0 - v));
     double xi   = pow(m_in * v / (2.0 * ME), 2.0) * (1.0 - rho2) / (1.0 - v);
@@ -413,7 +424,7 @@ double EpairRhodeSandrockSoedingrekso::FunctionToIntegral(double energy, double 
     // Diagram e
     // --------------------------------------------------------------------- //
 
-    double Be   = ((2.0 + rho2) * (1.0 + beta) + xi * (3.0 + rho2)) * log(1.0 + 1.0 / xi) +
+    double Be = ((2.0 + rho2) * (1.0 + beta) + xi * (3.0 + rho2)) * log(1.0 + 1.0 / xi) +
                 (1.0 - rho2 - beta) / (1.0 + xi) - (3.0 + rho2);
 
     double Ce2 = ((1.0 - rho2) * (1.0 + beta) + xi * (3.0 - rho2)) * log(1.0 + 1.0 / xi) +
@@ -422,7 +433,7 @@ double EpairRhodeSandrockSoedingrekso::FunctionToIntegral(double energy, double 
 
     double De = ((2.0 + rho2) * (1.0 + beta) + xi * (3.0 + rho2)) * dilog(1.0 / (1.0 + xi)) -
                 (2.0 + rho2) * xi * log(1.0 + 1.0 / xi) - (xi + rho2 + beta) / (1.0 + xi);
-    double Xe  = exp(-De / Be);
+    double Xe = exp(-De / Be);
 
     double Le1 = log(rad_log * Z13 * sqrt(1.0 + xi) /
                      (Xe + 2.0 * ME * exp(0.5) * rad_log * Z13 * (1.0 + xi) / (energy * v * (1.0 - rho2)))) -
@@ -446,7 +457,7 @@ double EpairRhodeSandrockSoedingrekso::FunctionToIntegral(double energy, double 
                  2.0 * (1.0 - beta - rho2) / (1.0 + xi) + 1.0 - beta - (1.0 + beta) * rho2;
     double Cm1 = Bm - Cm2;
 
-    double Dm  = ((1.0 + rho2) * (1.0 + (3.0 * beta) / 2.0) - 1.0 / xi * (1.0 + 2.0 * beta) * (1.0 - rho2)) *
+    double Dm = ((1.0 + rho2) * (1.0 + (3.0 * beta) / 2.0) - 1.0 / xi * (1.0 + 2.0 * beta) * (1.0 - rho2)) *
                     dilog(xi / (1.0 + xi)) +
                 (1.0 + (3.0 * beta) / 2.0) * (1.0 - rho2) / xi * log(1.0 + xi) +
                 (1.0 - rho2 - beta / 2.0 * (1.0 + rho2) + (1.0 - rho2) / (2.0 * xi) * beta) * xi / (1.0 + xi);
