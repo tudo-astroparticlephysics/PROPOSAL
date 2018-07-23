@@ -115,8 +115,8 @@ def create_tables(dir_name, interpolate=False, **kwargs):
                                 buf[key][1].append(str(multiplier))
                                 buf[key][1].append(str(lpm))
                                 buf[key][1].append(str(energy))
-                                buf[key][1].extend(result)
                                 buf[key][1].append(param_current.name)
+                                buf[key][1].extend(result)
                                 buf[key][1].append("\n")
 
                             buf[key][0].write("\t".join(buf[key][1]))
