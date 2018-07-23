@@ -265,6 +265,7 @@ BREMSSTRAHLUNG_IMPL(PetrukhinShestakov)
 BREMSSTRAHLUNG_IMPL(KelnerKokoulinPetrukhin)
 BREMSSTRAHLUNG_IMPL(CompleteScreening)
 BREMSSTRAHLUNG_IMPL(AndreevBezrukovBugaev)
+BREMSSTRAHLUNG_IMPL(RhodeSandrockSoedingrekso)
 
 // ------------------------------------------------------------------------- //
 // PetrukhinShestakov parametrization
@@ -488,6 +489,30 @@ double BremsAndreevBezrukovBugaev::CalculateParametrization(double energy, doubl
     }
 
     return result;
+}
+
+double BremsRhodeSandrockSoedingrekso::CalculateParametrization(double energy, double v)
+{
+    double Z13 = pow(components_[component_index_]->GetNucCharge(), -1. / 3);
+    double rad_log = components_[component_index_]->GetLogConstant();
+    double Dn = 1.54 * pow(components_[component_index_]->GetAtomicNum(), 0.27);
+
+
+    double mu_qc = particle_def_.mass / (MMU * exp(1.) / Dn);
+    double rho = sqrt(1.0 + 4.0*mu_qc*mu_qc);
+
+    double delta1 = log(mu_qc) + 0.5 * rho * log((rho + 1) / (rho - 1));
+    double delta2 = log(mu_qc) + 0.25 * (3.0*rho - rho*rho*rho) * log((rho + 1.0) / (rho - 1)) + 2.0*mu_qc*mu_qc;
+
+    // least momentum transferred to the nucleus (eq. 7)
+    double delta = particle_def_.mass * particle_def_.mass * v / (2.0 * energy * (1.0 - v));
+
+    double phi1_0 = log(rad_log * Z13 * particle_def_.mass / ME / (1.0 + rad_log * Z13 * exp(0.5) * delta / ME));
+    double phi2_0 = log(rad_log * Z13 * exp(-1/6.) * particle_def_.mass / ME / (1.0 + rad_log * Z13 * exp(1./3.) * delta / ME));
+    double phi1 = phi1_0 - delta1;
+    double phi2 = phi2_0 - delta2;
+
+    return ((2.0 - 2.0 * v + v * v) * phi1 - 2.0/3.0 * (1 - v) * phi2);
 }
 
 #undef BREMSSTRAHLUNG_IMPL
