@@ -57,7 +57,8 @@ public:
         PetrukhinShestakov = 0,
         KelnerKokoulinPetrukhin,
         CompleteScreening,
-        AndreevBezrukovBugaev
+        AndreevBezrukovBugaev,
+        RhodeSandrockSoedingrekso
     };
 
     struct Definition
