@@ -65,7 +65,7 @@ For Ionization, there is just one parametrization, but for pair production, brem
 
 The pair production parametrizations are:
   - `"EpairKelnerKokoulinPetrukhin"` (Proc. 12th ICCR (1971), 2436) with corrections for the interaction with atomic electrons (Phys. Atom. Nucl. 61 (1998), 448)
-  - `"EpairSandrockSoedingreksoRhose"` 
+  - `"EpairSandrockSoedingreksoRhode"` 
 
 The bremsstrahlung parametrizations are:
   - `"BremsKelnerKokoulinPetrukhin"` ([Preprint MEPhI (1995) no. 024-95](http://cds.cern.ch/record/288828)) and (Phys. Atom. Nucl. 62 (1999), 272)
