@@ -466,11 +466,11 @@ void export_epair()
     //          arg("lpm"),
     //          arg("interpolation_def"))));
 
-    EPAIR_DEF(Kelner)
-    EPAIR_DEF(RhodeSandrockSoedingrekso)
+    EPAIR_DEF(KelnerKokoulinPetrukhin)
+    EPAIR_DEF(SandrockSoedingreksoRhode)
 
-    EPAIR_INTERPOL_DEF(Kelner)
-    EPAIR_INTERPOL_DEF(RhodeSandrockSoedingrekso)
+    EPAIR_INTERPOL_DEF(KelnerKokoulinPetrukhin)
+    EPAIR_INTERPOL_DEF(SandrockSoedingreksoRhode)
 }
 
 void export_parametrizations()
@@ -1082,9 +1082,14 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
     // EpairProduction Definition
     // --------------------------------------------------------------------- //
 
+    enum_<EpairProductionFactory::Enum>("EpairParametrization")
+        .value("PetrukhinShestakov", EpairProductionFactory::KelnerKokoulinPetrukhin)
+        .value("KelnerKokoulinPetrukhin", EpairProductionFactory::SandrockSoedingreksoRhode);
+
     class_<EpairProductionFactory::Definition, boost::shared_ptr<EpairProductionFactory::Definition> >(
         "EpairDefinition", init<>())
 
+        .def_readwrite("parametrization", &EpairProductionFactory::Definition::parametrization)
         .def_readwrite("lpm_effect", &EpairProductionFactory::Definition::lpm_effect)
         .def_readwrite("multiplier", &EpairProductionFactory::Definition::multiplier);
 

@@ -260,11 +260,11 @@ size_t EpairProductionRhoIntegral::GetHash() const
 // Define the specific parametrizations
 // ------------------------------------------------------------------------- //
 
-EPAIR_PARAM_INTEGRAL_IMPL(Kelner)
-EPAIR_PARAM_INTEGRAL_IMPL(RhodeSandrockSoedingrekso)
+EPAIR_PARAM_INTEGRAL_IMPL(KelnerKokoulinPetrukhin)
+EPAIR_PARAM_INTEGRAL_IMPL(SandrockSoedingreksoRhode)
 
 // ------------------------------------------------------------------------- //
-double EpairKelner::FunctionToIntegral(double energy, double v, double r)
+double EpairKelnerKokoulinPetrukhin::FunctionToIntegral(double energy, double v, double r)
 {
     // Parametrization of Kelner/Kokoulin/Petrukhin
     // Proc. 12th ICCR (1971), 2436
@@ -376,7 +376,7 @@ double EpairKelner::FunctionToIntegral(double energy, double v, double r)
 }
 
 // ------------------------------------------------------------------------- //
-double EpairRhodeSandrockSoedingrekso::FunctionToIntegral(double energy, double v, double rho)
+double EpairSandrockSoedingreksoRhode::FunctionToIntegral(double energy, double v, double rho)
 {
     double m_in = particle_def_.mass;
 
