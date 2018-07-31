@@ -15,8 +15,8 @@ EpairProductionFactory::EpairProductionFactory()
     , epair_map_enum_()
     , string_enum_()
 {
-    Register("epairkelner", Kelner, std::make_pair(&EpairKelner::create, &EpairProductionRhoInterpolant<EpairKelner>::create));
-    Register("epairrhodesandrocksoedingrekso", SudoJan, std::make_pair(&EpairRhodeSandrockSoedingrekso::create, &EpairProductionRhoInterpolant<EpairRhodeSandrockSoedingrekso>::create));
+    Register("epairkelnerkokoulinpetrukhin", KelnerKokoulinPetrukhin, std::make_pair(&EpairKelnerKokoulinPetrukhin::create, &EpairProductionRhoInterpolant<EpairKelnerKokoulinPetrukhin>::create));
+    Register("epairsandrocksoedingreksorhode", SandrockSoedingreksoRhode, std::make_pair(&EpairSandrockSoedingreksoRhode::create, &EpairProductionRhoInterpolant<EpairSandrockSoedingreksoRhode>::create));
 }
 
 EpairProductionFactory::~EpairProductionFactory()
@@ -89,7 +89,7 @@ EpairProductionFactory::Enum EpairProductionFactory::GetEnumFromString(const std
     } else
     {
         log_fatal("EpairProduction %s not registerd!", name.c_str());
-        return Kelner; // Just to prevent warinngs
+        return KelnerKokoulinPetrukhin; // Just to prevent warinngs
     }
 }
 

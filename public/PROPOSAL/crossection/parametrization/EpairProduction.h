@@ -158,14 +158,14 @@ private:
  *                     Declare Integral Parametrizations                      *
  ******************************************************************************/
 
-EPAIR_PARAM_INTEGRAL_DEC(Kelner)
-EPAIR_PARAM_INTEGRAL_DEC(RhodeSandrockSoedingrekso)
+EPAIR_PARAM_INTEGRAL_DEC(KelnerKokoulinPetrukhin)
+EPAIR_PARAM_INTEGRAL_DEC(SandrockSoedingreksoRhode)
 
 /******************************************************************************
  *                    Declare Interpolant Parametrizations                    *
  ******************************************************************************/
 
-template<class Param = EpairKelner>
+template<class Param = EpairKelnerKokoulinPetrukhin>
 class EpairProductionRhoInterpolant : public Param
 {
 public:
