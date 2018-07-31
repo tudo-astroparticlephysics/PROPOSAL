@@ -23,13 +23,13 @@ cuts = [
 multiplier = 1.
 
 epair = [
-    pp.Parametrization.EpairProduction.Kelner,
-    pp.Parametrization.EpairProduction.SudoJan,
+    pp.Parametrization.EpairProduction.KelnerKokoulinPetrukhin,
+    pp.Parametrization.EpairProduction.SandrockSoedingreksoRhode,
 ]
 
 epair_interpol = [
-    pp.Parametrization.EpairProduction.KelnerInterpolant,
-    pp.Parametrization.EpairProduction.SudoJanInterpolant,
+    pp.Parametrization.EpairProduction.KelnerKokoulinPetrukhinInterpolant,
+    pp.Parametrization.EpairProduction.SandrockSoedingreksoRhodeInterpolant,
 ]
 
 lpms = [0, 1]
