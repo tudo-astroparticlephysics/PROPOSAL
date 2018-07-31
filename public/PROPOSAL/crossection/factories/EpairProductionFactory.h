@@ -48,14 +48,14 @@ class EpairProductionFactory
 public:
     enum Enum
     {
-        Kelner = 0,
-        SudoJan,
+        KelnerKokoulinPetrukhin = 0,
+        SandrockSoedingreksoRhode,
     };
 
     struct Definition
     {
         Definition()
-            : parametrization(Kelner)
+            : parametrization(KelnerKokoulinPetrukhin)
             , lpm_effect(true)
             , multiplier(1.0)
         {

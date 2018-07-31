@@ -38,11 +38,11 @@ TEST(Comparison, Comparison_equal)
     bool lpm          = true;
 
     EpairProductionRhoIntegral* EpairInt_A =
-        new EpairKelner(particle_def, medium, ecuts, multiplier, lpm);
-    Parametrization* EpairInt_B = new EpairKelner(particle_def, medium, ecuts, multiplier, lpm);
+        new EpairKelnerKokoulinPetrukhin(particle_def, medium, ecuts, multiplier, lpm);
+    Parametrization* EpairInt_B = new EpairKelnerKokoulinPetrukhin(particle_def, medium, ecuts, multiplier, lpm);
     EXPECT_TRUE(*EpairInt_A == *EpairInt_B);
 
-    EpairKelner param_int(particle_def, medium, ecuts, multiplier, lpm);
+    EpairKelnerKokoulinPetrukhin param_int(particle_def, medium, ecuts, multiplier, lpm);
     EXPECT_TRUE(param_int == *EpairInt_A);
 
     EpairIntegral* Int_A        = new EpairIntegral(param_int);
@@ -50,13 +50,13 @@ TEST(Comparison, Comparison_equal)
     EXPECT_TRUE(*Int_A == *Int_B);
 
     InterpolationDef InterpolDef;
-    EpairProductionRhoInterpolant<EpairKelner>* EpairInterpol_A =
-        new EpairProductionRhoInterpolant<EpairKelner>(particle_def, medium, ecuts, multiplier, lpm, InterpolDef);
+    EpairProductionRhoInterpolant<EpairKelnerKokoulinPetrukhin>* EpairInterpol_A =
+        new EpairProductionRhoInterpolant<EpairKelnerKokoulinPetrukhin>(particle_def, medium, ecuts, multiplier, lpm, InterpolDef);
     Parametrization* EpairInterpol_B =
-        new EpairProductionRhoInterpolant<EpairKelner>(particle_def, medium, ecuts, multiplier, lpm, InterpolDef);
+        new EpairProductionRhoInterpolant<EpairKelnerKokoulinPetrukhin>(particle_def, medium, ecuts, multiplier, lpm, InterpolDef);
     EXPECT_TRUE(*EpairInterpol_A == *EpairInterpol_B);
 
-    EpairProductionRhoInterpolant<EpairKelner> param_interpol(particle_def, medium, ecuts, multiplier, lpm, InterpolDef);
+    EpairProductionRhoInterpolant<EpairKelnerKokoulinPetrukhin> param_interpol(particle_def, medium, ecuts, multiplier, lpm, InterpolDef);
     EXPECT_TRUE(param_interpol == *EpairInterpol_A);
 
     EpairInterpolant* Interpol_A        = new EpairInterpolant(param_interpol, InterpolDef);
@@ -86,12 +86,12 @@ TEST(Comparison, Comparison_not_equal)
     bool lpm_1          = true;
     bool lpm_2          = false;
 
-    EpairKelner EpairInt_A(mu_def, medium_1, ecuts_1, multiplier_1, lpm_1);
-    EpairKelner EpairInt_B(tau_def, medium_1, ecuts_1, multiplier_1, lpm_1);
-    EpairKelner EpairInt_C(mu_def, medium_2, ecuts_1, multiplier_1, lpm_1);
-    EpairKelner EpairInt_D(mu_def, medium_1, ecuts_2, multiplier_1, lpm_1);
-    EpairKelner EpairInt_E(mu_def, medium_1, ecuts_1, multiplier_2, lpm_1);
-    EpairKelner EpairInt_F(mu_def, medium_1, ecuts_1, multiplier_1, lpm_2);
+    EpairKelnerKokoulinPetrukhin EpairInt_A(mu_def, medium_1, ecuts_1, multiplier_1, lpm_1);
+    EpairKelnerKokoulinPetrukhin EpairInt_B(tau_def, medium_1, ecuts_1, multiplier_1, lpm_1);
+    EpairKelnerKokoulinPetrukhin EpairInt_C(mu_def, medium_2, ecuts_1, multiplier_1, lpm_1);
+    EpairKelnerKokoulinPetrukhin EpairInt_D(mu_def, medium_1, ecuts_2, multiplier_1, lpm_1);
+    EpairKelnerKokoulinPetrukhin EpairInt_E(mu_def, medium_1, ecuts_1, multiplier_2, lpm_1);
+    EpairKelnerKokoulinPetrukhin EpairInt_F(mu_def, medium_1, ecuts_1, multiplier_1, lpm_2);
     EXPECT_TRUE(EpairInt_A != EpairInt_B);
     EXPECT_TRUE(EpairInt_A != EpairInt_C);
     EXPECT_TRUE(EpairInt_A != EpairInt_D);
@@ -103,12 +103,12 @@ TEST(Comparison, Comparison_not_equal)
     EXPECT_TRUE(Int_A != Int_B);
 
     InterpolationDef InterpolDef;
-    EpairProductionRhoInterpolant<EpairKelner> EpairInterpol_A(mu_def, medium_1, ecuts_1, multiplier_1, lpm_1, InterpolDef);
-    EpairProductionRhoInterpolant<EpairKelner> EpairInterpol_B(tau_def, medium_1, ecuts_1, multiplier_1, lpm_1, InterpolDef);
-    EpairProductionRhoInterpolant<EpairKelner> EpairInterpol_C(mu_def, medium_2, ecuts_1, multiplier_1, lpm_1, InterpolDef);
-    EpairProductionRhoInterpolant<EpairKelner> EpairInterpol_D(mu_def, medium_1, ecuts_2, multiplier_1, lpm_1, InterpolDef);
-    EpairProductionRhoInterpolant<EpairKelner> EpairInterpol_E(mu_def, medium_1, ecuts_1, multiplier_2, lpm_1, InterpolDef);
-    EpairProductionRhoInterpolant<EpairKelner> EpairInterpol_F(mu_def, medium_1, ecuts_1, multiplier_1, lpm_2, InterpolDef);
+    EpairProductionRhoInterpolant<EpairKelnerKokoulinPetrukhin> EpairInterpol_A(mu_def, medium_1, ecuts_1, multiplier_1, lpm_1, InterpolDef);
+    EpairProductionRhoInterpolant<EpairKelnerKokoulinPetrukhin> EpairInterpol_B(tau_def, medium_1, ecuts_1, multiplier_1, lpm_1, InterpolDef);
+    EpairProductionRhoInterpolant<EpairKelnerKokoulinPetrukhin> EpairInterpol_C(mu_def, medium_2, ecuts_1, multiplier_1, lpm_1, InterpolDef);
+    EpairProductionRhoInterpolant<EpairKelnerKokoulinPetrukhin> EpairInterpol_D(mu_def, medium_1, ecuts_2, multiplier_1, lpm_1, InterpolDef);
+    EpairProductionRhoInterpolant<EpairKelnerKokoulinPetrukhin> EpairInterpol_E(mu_def, medium_1, ecuts_1, multiplier_2, lpm_1, InterpolDef);
+    EpairProductionRhoInterpolant<EpairKelnerKokoulinPetrukhin> EpairInterpol_F(mu_def, medium_1, ecuts_1, multiplier_1, lpm_2, InterpolDef);
     EXPECT_TRUE(EpairInterpol_A != EpairInterpol_B);
     EXPECT_TRUE(EpairInterpol_A != EpairInterpol_C);
     EXPECT_TRUE(EpairInterpol_A != EpairInterpol_D);
@@ -128,8 +128,8 @@ TEST(Assignment, Copyconstructor)
     double multiplier = 1.;
     bool lpm          = true;
 
-    EpairKelner EpairInt_A(particle_def, medium, ecuts, multiplier, lpm);
-    EpairKelner EpairInt_B = EpairInt_A;
+    EpairKelnerKokoulinPetrukhin EpairInt_A(particle_def, medium, ecuts, multiplier, lpm);
+    EpairKelnerKokoulinPetrukhin EpairInt_B = EpairInt_A;
     EXPECT_TRUE(EpairInt_A == EpairInt_B);
 
     EpairIntegral Int_A(EpairInt_A);
@@ -137,8 +137,8 @@ TEST(Assignment, Copyconstructor)
     EXPECT_TRUE(Int_A == Int_B);
 
     InterpolationDef InterpolDef;
-    EpairProductionRhoInterpolant<EpairKelner> EpairInterpol_A(particle_def, medium, ecuts, multiplier, lpm, InterpolDef);
-    EpairProductionRhoInterpolant<EpairKelner> EpairInterpol_B = EpairInterpol_A;
+    EpairProductionRhoInterpolant<EpairKelnerKokoulinPetrukhin> EpairInterpol_A(particle_def, medium, ecuts, multiplier, lpm, InterpolDef);
+    EpairProductionRhoInterpolant<EpairKelnerKokoulinPetrukhin> EpairInterpol_B = EpairInterpol_A;
     EXPECT_TRUE(EpairInterpol_A == EpairInterpol_B);
 
     EpairInterpolant Interpol_A(EpairInterpol_A, InterpolDef);
@@ -154,8 +154,8 @@ TEST(Assignment, Copyconstructor2)
     double multiplier = 1.;
     bool lpm          = true;
 
-    EpairKelner EpairInt_A(particle_def, medium, ecuts, multiplier, lpm);
-    EpairKelner EpairInt_B(EpairInt_A);
+    EpairKelnerKokoulinPetrukhin EpairInt_A(particle_def, medium, ecuts, multiplier, lpm);
+    EpairKelnerKokoulinPetrukhin EpairInt_B(EpairInt_A);
     EXPECT_TRUE(EpairInt_A == EpairInt_B);
 
     EpairIntegral Int_A(EpairInt_A);
@@ -163,8 +163,8 @@ TEST(Assignment, Copyconstructor2)
     EXPECT_TRUE(Int_A == Int_B);
 
     InterpolationDef InterpolDef;
-    EpairProductionRhoInterpolant<EpairKelner> EpairInterpol_A(particle_def, medium, ecuts, multiplier, lpm, InterpolDef);
-    EpairProductionRhoInterpolant<EpairKelner> EpairInterpol_B(EpairInterpol_A);
+    EpairProductionRhoInterpolant<EpairKelnerKokoulinPetrukhin> EpairInterpol_A(particle_def, medium, ecuts, multiplier, lpm, InterpolDef);
+    EpairProductionRhoInterpolant<EpairKelnerKokoulinPetrukhin> EpairInterpol_B(EpairInterpol_A);
     EXPECT_TRUE(EpairInterpol_A == EpairInterpol_B);
 
     EpairInterpolant Interpol_A(EpairInterpol_A, InterpolDef);
