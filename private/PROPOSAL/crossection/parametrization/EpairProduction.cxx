@@ -396,13 +396,13 @@ double EpairRhodeSandrockSoedingrekso::FunctionToIntegral(double energy, double 
     // Zeta
     // --------------------------------------------------------------------- //
 
-    double g1 = 4.4e-5;
-    double g2 = 4.8e-5;
+    double g1 = 1.95e-5;
+    double g2 = 5.3e-5;
 
     if (nucl_Z == 1.0)
     {
-        g1 = 1.95e-5;
-        g2 = 5.3e-5;
+        g1 = 4.4e-5;
+        g2 = 4.8e-5;
     }
 
     double zeta, zeta1, zeta2;
