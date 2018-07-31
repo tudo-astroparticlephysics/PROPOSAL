@@ -27,11 +27,7 @@ if __name__ == "__main__":
     cuts = pp.EnergyCutSettings(-1, -1)  # ecut, vcut
 
     dEdx_photo = []
-    # energy = [mu.mass + 10**x for x in np.arange(0, 12, 0.2)]
-    # energy = [mu.mass + 10**x for x in np.arange(0, 3.5, 0.01)]
-    # energy = np.linspace(4e2, 3e3, 100)
     energy = np.logspace(2, 9, 100)
-    # energy =  np.linspace(0, 1, 100)
 
     interpolation_def = pp.InterpolationDef()
 
@@ -42,27 +38,9 @@ if __name__ == "__main__":
     #   - medium
     #   - cut
     #   - multiplier
-    #   - shadowing parametrization
+    #   - lpm effect
     #   - interpolation definition
     # =========================================================
-
-    # param_defs = [
-    #         mu,
-    #         medium,
-    #         cuts,
-    #         1.0,
-    #         False,
-    #         interpolation_def
-    #     ]
-    #
-    # params = [
-    #     Parametrization.EpairProduction.KelnerInterpolant(
-    #         *param_defs
-    #     ),
-    #     Parametrization.EpairProduction.RhodeSandrockSoedingreksoInterpolant(
-    #         *param_defs
-    #     )
-    # ]
 
     param_defs = [
             mu,
@@ -70,13 +48,14 @@ if __name__ == "__main__":
             cuts,
             1.0,
             False,
+            interpolation_def
         ]
 
     params = [
-        Parametrization.EpairProduction.Kelner(
+        Parametrization.EpairProduction.KelnerKokoulinPetrukhinInterpolant(
             *param_defs
         ),
-        Parametrization.EpairProduction.RhodeSandrockSoedingrekso(
+        Parametrization.EpairProduction.SandrockSoedingreksoRhodeInterpolant(
             *param_defs
         )
     ]
@@ -87,20 +66,11 @@ if __name__ == "__main__":
 
     crosssections = []
 
-    # for param in params:
-    #     print(param.name)
-    #     crosssections.append(pp.CrossSection.EpairInterpolant(
-    #         param,
-    #         interpolation_def
-    #     ))
-
     for param in params:
-        print(param.name)
-        crosssections.append(pp.CrossSection.EpairIntegral(
+        crosssections.append(pp.CrossSection.EpairInterpolant(
             param,
+            interpolation_def
         ))
-
-    print(crosssections[0])
 
     # =========================================================
     # 	Calculate DE/dx at the given energies
@@ -111,17 +81,7 @@ if __name__ == "__main__":
         for E in energy:
             dEdx.append(cross.calculate_dEdx(E))
 
-        print(dEdx)
         dEdx_photo.append(dEdx)
-
-    # for param in params:
-    #     dEdx = []
-    #     for E in energy:
-    #         dEdx.append(param.differential_crosssection(1e5, E))
-    #
-    #     print(dEdx)
-    #
-    #     dEdx_photo.append(dEdx)
 
     # =========================================================
     # 	Plot
@@ -132,14 +92,12 @@ if __name__ == "__main__":
 
     ax = fig.add_subplot(gs[0])
 
-    # ax.grid(which='both')
-
     for dEdx, param in zip(dEdx_photo, params):
         ax.loglog(
             energy,
             dEdx,
             linestyle='-',
-            label=param.name
+            label="".join([c for c in param.name[1:] if c.isupper()])
         )
 
     ax.set_ylabel(r'dEdx / $\rm{MeV}\rm{g}^{-1} \rm{cm}^2$')
