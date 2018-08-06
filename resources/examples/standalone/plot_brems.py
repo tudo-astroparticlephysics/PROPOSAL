@@ -38,7 +38,7 @@ if __name__ == "__main__":
     #   - medium
     #   - cut
     #   - multiplier
-    #   - shadowing parametrization
+    #   - lpm effect
     #   - interpolation definition
     # =========================================================
 
@@ -54,7 +54,7 @@ if __name__ == "__main__":
         Parametrization.Bremsstrahlung.KelnerKokoulinPetrukhin(
             *param_defs
         ),
-        Parametrization.Bremsstrahlung.RhodeSandrockSoedingrekso(
+        Parametrization.Bremsstrahlung.SandrockSoedingreksoRhode(
             *param_defs
         )
     ]
@@ -87,10 +87,10 @@ if __name__ == "__main__":
     for cross in crosssections:
         dEdx = []
         for E in energy:
-            dEdx.append(cross.calculate_dEdx(E))
+            dEdx.append(cross.calculate_dEdx(E)/E)
 
-        print(dEdx)
         dEdx_photo.append(dEdx)
+        print(dEdx)
 
     # for param in params:
     #     dEdx = []
@@ -106,7 +106,7 @@ if __name__ == "__main__":
     # =========================================================
 
     fig = plt.figure()
-    gs = mpl.gridspec.GridSpec(2, 1, height_ratios=[2, 1])
+    gs = mpl.gridspec.GridSpec(2, 1, height_ratios=[1, 1])
 
     ax = fig.add_subplot(gs[0])
 
@@ -117,10 +117,10 @@ if __name__ == "__main__":
             energy,
             dEdx,
             linestyle='-',
-            label=param.name
+            label="".join([c for c in param.name[1:] if c.isupper()])
         )
 
-    ax.set_ylabel(r'dEdx / $\rm{MeV}\rm{g}^{-1} \rm{cm}^2$')
+    ax.set_ylabel(r'-1/E dEdx / $\rm{g}^{-1} \rm{cm}^2$')
 
     ax.legend(loc='best')
 
@@ -133,12 +133,15 @@ if __name__ == "__main__":
         energy[start:],
         np.array(dEdx_photo)[1][start:] / np.array(dEdx_photo[0][start:]),
         linestyle='-',
-        label="RSS / KKP"
+        label="{} / {}".format(
+            "".join([c for c in params[1].name[1:] if c.isupper()]),
+            "".join([c for c in params[0].name[1:] if c.isupper()])
+        )
     )
 
     ax.xaxis.grid(which='major', ls=":")
     ax.yaxis.grid(which='minor', ls=":")
-    # ax.set_ylim(top=1.03, bottom=0.97)
+    ax.set_ylim(top=1.1, bottom=0.7)
     ax.set_xlim(left=1e2, right=1e9)
 
     # ax.yaxis.set_minor_formatter(ticker.FormatStrFormatter("%.2f"))
@@ -147,7 +150,7 @@ if __name__ == "__main__":
     # ax.yaxis.set_minor_locator(ticker.MultipleLocator(0.01))
 
     ax.set_xlabel(r'$E$ / MeV')
-    ax.set_ylabel(r'RSS / KKP')
+    ax.set_ylabel(r'ratio')
 
     ax.axhline(1.0, color='k', lw=0.5, ls='-.')
 
