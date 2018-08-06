@@ -111,7 +111,7 @@ BREMSSTRAHLUNG_DEF(PetrukhinShestakov)
 BREMSSTRAHLUNG_DEF(KelnerKokoulinPetrukhin)
 BREMSSTRAHLUNG_DEF(CompleteScreening)
 BREMSSTRAHLUNG_DEF(AndreevBezrukovBugaev)
-BREMSSTRAHLUNG_DEF(RhodeSandrockSoedingrekso)
+BREMSSTRAHLUNG_DEF(SandrockSoedingreksoRhode)
 
 #undef BREMSSTRAHLUNG_DEF
 
