@@ -21,7 +21,7 @@ BremsstrahlungFactory::BremsstrahlungFactory()
     Register("bremskelnerkokoulinpetrukhin", KelnerKokoulinPetrukhin, &BremsKelnerKokoulinPetrukhin::create);
     Register("bremscompletescreening", CompleteScreening, &BremsCompleteScreening::create);
     Register("bremsandreevbezrukovbugaev", AndreevBezrukovBugaev, &BremsAndreevBezrukovBugaev::create);
-    Register("bremsrhodesandrocksoedingrekso", RhodeSandrockSoedingrekso, &BremsRhodeSandrockSoedingrekso::create);
+    Register("bremssandrocksoedingreksorhode", SandrockSoedingreksoRhode, &BremsSandrockSoedingreksoRhode::create);
 }
 
 // ------------------------------------------------------------------------- //
