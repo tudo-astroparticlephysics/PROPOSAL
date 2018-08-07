@@ -495,10 +495,8 @@ double BremsSandrockSoedingreksoRhode::CalculateParametrization(double energy, d
 {
     static const double a[3] = {-0.00349, 148.84, -987.531};
     static const double b[4] = {0.1642, 132.573, -585.361, 1407.77};
-    // static const double c[6] = {-2.8922, -19.0156, 57.698, -63.418, 13.1166, 1.84206};
-    static const double c[6] = {-2.886, -19.08, 57.54, -63.37, 13.98, 1.817};
-    // static const double d[6] = {2134.19, 581.823, -2708.85, 4767.07, 1.52918, 0.361933};
-    static const double d[6] = {1497.45, 450.398, -1939.4, 3369.12, 1.95661, 0.398178};
+    static const double c[6] = {-2.8922, -19.0156, 57.698, -63.418, 14.1166, 1.84206};
+    static const double d[6] = {2134.19, 581.823, -2708.85, 4767.05, 1.52918, 0.361933};
 
 
     double Z = components_[component_index_]->GetNucCharge();
@@ -558,12 +556,7 @@ double BremsSandrockSoedingreksoRhode::CalculateParametrization(double energy, d
         s_rad += d[3] * v * log(v) + d[4] * tmp + d[5] * tmp * tmp;
     }
 
-    // std::cout << phi1 << std::endl;
-    // std::cout << phi2 << std::endl;
-    // std::cout << 1./Z * s_atomic << std::endl;
-    // std::cout << phi1 * s_rad << std::endl << std::endl;
     return std::max(((2.0 - 2.0 * v + v * v) * phi1 - 2.0/3.0 * (1. - v) * phi2) + 1./Z * s_atomic + 0.25*ALPHA * phi1 * s_rad, 0.);
-    // return ((2.0 - 2.0 * v + v * v) * phi1 - 2.0/3.0 * (1 - v) * phi2);
 }
 
 #undef BREMSSTRAHLUNG_IMPL
