@@ -15,14 +15,21 @@ using namespace PROPOSAL;
 
 const std::string ManyBodyPhaseSpace::name_ = "ManyBodyPhaseSpace";
 
-ManyBodyPhaseSpace::ManyBodyPhaseSpace(std::vector<const ParticleDef*> daughters)
+// ------------------------------------------------------------------------- //
+ManyBodyPhaseSpace::ManyBodyPhaseSpace(std::vector<const ParticleDef*> daughters, MatrixElementFunction me)
     : DecayChannel()
     , daughters_()
     , daughter_masses_()
     , number_of_daughters_(static_cast<int>(daughters.size()))
     , sum_daughter_masses_(0.0)
     , uniform_(true)
+    , matrix_element_(me)
 {
+    if (me.empty())
+    {
+        matrix_element_ = ManyBodyPhaseSpace::Evaluate;
+    }
+
     for (std::vector<const ParticleDef*>::iterator it = daughters.begin(); it != daughters.end(); ++it)
     {
         daughters_.push_back((*it)->clone());
@@ -31,6 +38,7 @@ ManyBodyPhaseSpace::ManyBodyPhaseSpace(std::vector<const ParticleDef*> daughters
     }
 }
 
+// ------------------------------------------------------------------------- //
 ManyBodyPhaseSpace::~ManyBodyPhaseSpace()
 {
     for (std::vector<const ParticleDef*>::const_iterator it = daughters_.begin(); it != daughters_.end(); ++it)
@@ -41,6 +49,7 @@ ManyBodyPhaseSpace::~ManyBodyPhaseSpace()
     daughters_.clear();
 }
 
+// ------------------------------------------------------------------------- //
 ManyBodyPhaseSpace::ManyBodyPhaseSpace(const ManyBodyPhaseSpace& mode)
     : DecayChannel(mode)
     , daughters_()
@@ -48,6 +57,7 @@ ManyBodyPhaseSpace::ManyBodyPhaseSpace(const ManyBodyPhaseSpace& mode)
     , number_of_daughters_(mode.number_of_daughters_)
     , sum_daughter_masses_(mode.sum_daughter_masses_)
     , uniform_(mode.uniform_)
+    , matrix_element_(mode.matrix_element_)
 {
     for (std::vector<const ParticleDef*>::const_iterator it = mode.daughters_.begin(); it != mode.daughters_.end();
          ++it)
@@ -56,6 +66,7 @@ ManyBodyPhaseSpace::ManyBodyPhaseSpace(const ManyBodyPhaseSpace& mode)
     }
 }
 
+// ------------------------------------------------------------------------- //
 bool ManyBodyPhaseSpace::compare(const DecayChannel& channel) const
 {
     const ManyBodyPhaseSpace* many_body = dynamic_cast<const ManyBodyPhaseSpace*>(&channel);
@@ -81,10 +92,9 @@ bool ManyBodyPhaseSpace::compare(const DecayChannel& channel) const
     }
 }
 
+// ------------------------------------------------------------------------- //
 DecayChannel::DecayProducts ManyBodyPhaseSpace::Decay(const Particle& particle)
 {
-    double parent_mass = particle.GetMass();
-
     // Create vector for decay products
     DecayProducts products;
     products.reserve(daughters_.size());
@@ -97,17 +107,36 @@ DecayChannel::DecayProducts ManyBodyPhaseSpace::Decay(const Particle& particle)
     // prefactor for the phase space density
     PhaseSpaceParameters params = GetPhaseSpaceParams(particle.GetParticleDef());
 
-    // precalculated kinematics
-    PhaseSpaceKinematics kinematics = CalculateKinematics(params.normalization, parent_mass);
-
     if (uniform_)
     {
-        // do rejection until phase space distribution is uniform
-        while (RandomGenerator::Get().RandomDouble() * params.weight_max > kinematics.weight)
+        double weight = 0.0;
+
+        do
         {
-            kinematics = CalculateKinematics(params.normalization, parent_mass);
-        }
+            weight = GenerateEvent(products, params, particle);
+
+        } while(params.weight_min + RandomGenerator::Get().RandomDouble() * (params.weight_max - params.weight_min) > weight * matrix_element_(particle, products));
     }
+    else
+    {
+        GenerateEvent(products, params, particle);
+    }
+
+    // Boost all daughters to parent frame
+    Boost(products, particle.GetDirection(), particle.GetMomentum() / particle.GetEnergy());
+
+    CopyParticleProperties(products, particle);
+
+    return products;
+}
+
+// ------------------------------------------------------------------------- //
+double ManyBodyPhaseSpace::GenerateEvent(DecayProducts& products, const PhaseSpaceParameters& params, const Particle& particle)
+{
+    double parent_mass = particle.GetMass();
+
+    // precalculated kinematics
+    PhaseSpaceKinematics kinematics = CalculateKinematics(params.normalization, parent_mass);
 
     // Calculate first momentum in R2
     Vector3D direction = GenerateRandomDirection();
@@ -138,12 +167,22 @@ DecayChannel::DecayProducts ManyBodyPhaseSpace::Decay(const Particle& particle)
         }
     }
 
-    // Boost all daughters to parent frame
-    Boost(products, particle.GetDirection(), particle.GetMomentum() / particle.GetEnergy());
+    return kinematics.weight;
+}
 
-    CopyParticleProperties(products, particle);
+// ------------------------------------------------------------------------- //
+double ManyBodyPhaseSpace::Evaluate(const Particle& particle, const ManyBodyPhaseSpace::DecayProducts& products)
+{
+    (void) particle;
+    (void) products;
 
-    return products;
+    return 1.0;
+}
+
+// ------------------------------------------------------------------------- //
+void ManyBodyPhaseSpace::SetMatrixElement(MatrixElementFunction f)
+{
+    matrix_element_ = f;
 }
 
 // ------------------------------------------------------------------------- //
@@ -157,8 +196,16 @@ ManyBodyPhaseSpace::PhaseSpaceParameters ManyBodyPhaseSpace::GetPhaseSpaceParams
     } else
     {
         PhaseSpaceParameters params;
-        params.normalization = CalculateNormalization(parent.mass);
-        params.weight_max = EstimateMaxWeight(params.normalization, parent.mass);
+        CalculateNormalization(params, parent.mass);
+
+        if (matrix_element_ == Evaluate)
+        {
+            EstimateMaxWeight(params, parent.mass);
+        }
+        else
+        {
+            SampleEstimateMaxWeight(params, parent);
+        }
         parameter_map_[parent] = params;
 
         return params;
@@ -166,17 +213,17 @@ ManyBodyPhaseSpace::PhaseSpaceParameters ManyBodyPhaseSpace::GetPhaseSpaceParams
 }
 
 // ------------------------------------------------------------------------- //
-double ManyBodyPhaseSpace::CalculateNormalization(double parent_mass)
+void ManyBodyPhaseSpace::CalculateNormalization(PhaseSpaceParameters& params, double parent_mass)
 {
     double normalization = std::pow(parent_mass - sum_daughter_masses_, number_of_daughters_ - 2) /
                            boost::math::factorial<double>(number_of_daughters_ - 2) *
                            std::pow(2.0 * boost::math::constants::pi<double>(), number_of_daughters_ - 1.0);
 
-    return normalization /= 2.0 * parent_mass;
+    params.normalization = normalization /= 2.0 * parent_mass;
 }
 
 // ------------------------------------------------------------------------- //
-double ManyBodyPhaseSpace::EstimateMaxWeight(double normalization, double parent_mass)
+void ManyBodyPhaseSpace::EstimateMaxWeight(PhaseSpaceParameters& params, double parent_mass)
 {
     double weight = 1.0;
     double E_max = parent_mass - sum_daughter_masses_ + daughter_masses_[0];
@@ -189,7 +236,48 @@ double ManyBodyPhaseSpace::EstimateMaxWeight(double normalization, double parent
         weight *= Momentum(E_max, E_min, daughter_masses_[i]);
     }
 
-    return normalization * weight;
+    params.weight_max = params.normalization * weight;
+    params.weight_min = 0.0;
+}
+
+// ------------------------------------------------------------------------- //
+void ManyBodyPhaseSpace::SampleEstimateMaxWeight(PhaseSpaceParameters& params, const ParticleDef& parent)
+{
+    // Create vector for decay products
+    DecayProducts products;
+    products.reserve(daughters_.size());
+
+    for (std::vector<const ParticleDef*>::const_iterator it = daughters_.begin(); it != daughters_.end(); ++it)
+    {
+        products.push_back(new Particle(**it));
+    }
+
+    Particle particle(parent);
+
+    // precalculated kinematics
+    PhaseSpaceKinematics kinematics = CalculateKinematics(params.normalization, parent.mass);
+
+    double result = 0.0;
+
+    for (int i = 0; i < 1000; ++i)
+    {
+        result = GenerateEvent(products, params, particle) * matrix_element_(particle, products);
+
+        if (result < params.weight_min)
+        {
+            params.weight_min = result;
+        }
+
+        if (result > params.weight_max)
+        {
+            params.weight_max = result;
+        }
+    }
+
+    for (DecayProducts::const_iterator it = products.begin(); it != products.end(); ++it)
+    {
+        delete *it;
+    }
 }
 
 // ------------------------------------------------------------------------- //
@@ -256,11 +344,13 @@ void ManyBodyPhaseSpace::print(std::ostream& os) const
 
 ManyBodyPhaseSpace::Builder::Builder()
     : daughters_()
+    , matrix_element_()
 {
 }
 
 ManyBodyPhaseSpace::Builder::Builder(const Builder& builder)
     : daughters_(builder.daughters_)
+    , matrix_element_(builder.matrix_element_)
 {
 }
 
@@ -282,7 +372,14 @@ ManyBodyPhaseSpace::Builder& ManyBodyPhaseSpace::Builder::addDaughter(const Part
 }
 
 // ------------------------------------------------------------------------- //
+ManyBodyPhaseSpace::Builder& ManyBodyPhaseSpace::Builder::setMatrixElement(MatrixElementFunction me)
+{
+    matrix_element_ = me;
+    return *this;
+}
+
+// ------------------------------------------------------------------------- //
 ManyBodyPhaseSpace ManyBodyPhaseSpace::Builder::build()
 {
-    return ManyBodyPhaseSpace(daughters_);
+    return ManyBodyPhaseSpace(daughters_, matrix_element_);
 }
