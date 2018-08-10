@@ -30,6 +30,7 @@
 #pragma once
 
 #include <boost/unordered_map.hpp>
+#include <boost/function.hpp>
 
 #include "PROPOSAL/decay/DecayChannel.h"
 #include "PROPOSAL/particle/ParticleDef.h"
@@ -47,6 +48,7 @@ public:
     {
         double normalization;
         double weight_max;
+        double weight_min;
     };
 
     struct PhaseSpaceKinematics
@@ -57,9 +59,10 @@ public:
     };
 
     typedef boost::unordered_map<ParticleDef, PhaseSpaceParameters> ParameterMap;
+    typedef boost::function<double(const Particle&, const DecayProducts&)> MatrixElementFunction;
 
 public:
-    ManyBodyPhaseSpace(std::vector<const ParticleDef*> daughters);
+    ManyBodyPhaseSpace(std::vector<const ParticleDef*> daughters, MatrixElementFunction ME = NULL);
     ManyBodyPhaseSpace(const ManyBodyPhaseSpace& mode);
     virtual ~ManyBodyPhaseSpace();
 
@@ -78,6 +81,19 @@ public:
     DecayProducts Decay(const Particle&);
 
     // ----------------------------------------------------------------------------
+    /// @brief Evalutate the matrix element of this channel
+    ///
+    /// This is the default matrix element for the many body decay.
+    /// Its just constant one, which results to a uniform sampling
+    /// of phase space events.
+    ///
+    /// @return matrix element
+    // ----------------------------------------------------------------------------
+    static double Evaluate(const Particle&, const DecayProducts&);
+
+    void SetMatrixElement(MatrixElementFunction);
+
+    // ----------------------------------------------------------------------------
     /// @brief Sets the uniform flag
     ///
     /// If uniform is true, the momenta will be sampled uniform in the phase space.
@@ -94,6 +110,18 @@ public:
 private:
     ManyBodyPhaseSpace& operator=(const ManyBodyPhaseSpace&); // Undefined & not allowed
 
+
+    // ----------------------------------------------------------------------------
+    /// @brief Many body phase space decay
+    ///
+    /// Calculate decay products with the help of the Raubold Lynch algorithm.
+    ///
+    /// @param Particle
+    ///
+    /// @return Vector of particles, the decay products
+    // ----------------------------------------------------------------------------
+    double GenerateEvent(DecayProducts& products, const PhaseSpaceParameters&, const Particle&);
+
     // ----------------------------------------------------------------------------
     /// @brief Calculate the normalization of the phase space density
     ///
@@ -101,7 +129,7 @@ private:
     ///
     /// @return \f$ \rho(\Phi) = \frac{{(M - \mu_n)}^{n-2}}{(n-2)!} \cdot \prod_{i=2}^{n} (2\pi P_i)~. \f$
     // ----------------------------------------------------------------------------
-    double CalculateNormalization(double parent_mass);
+    void CalculateNormalization(PhaseSpaceParameters&, double parent_mass);
 
     // ----------------------------------------------------------------------------
     /// @brief Calculate the maximum weight for the phase space
@@ -114,7 +142,20 @@ private:
     ///
     /// @return maximum weight
     // ----------------------------------------------------------------------------
-    double EstimateMaxWeight(double normalization, double parent_mass);
+    void EstimateMaxWeight(PhaseSpaceParameters&, double parent_mass);
+
+    // ----------------------------------------------------------------------------
+    /// @brief Calculate the maximum weight for the phase space
+    ///
+    /// @param normalization
+    /// @param parent_mass
+    ///
+    /// This value is need for the rejection method to create a uniform distribution
+    /// of the phase space.
+    ///
+    /// @return maximum weight
+    // ----------------------------------------------------------------------------
+    void SampleEstimateMaxWeight(PhaseSpaceParameters&, const ParticleDef& parent);
 
     // ----------------------------------------------------------------------------
     /// @brief Calculate the normalization and maximum weight
@@ -150,6 +191,8 @@ private:
     double sum_daughter_masses_;
     bool uniform_;
 
+    MatrixElementFunction matrix_element_;
+
     static const std::string name_;
 
     ParameterMap parameter_map_;
@@ -167,10 +210,12 @@ public:
     // --------------------------------------------------------------------- //
 
     Builder& addDaughter(const ParticleDef& daughter);
+    Builder& setMatrixElement(MatrixElementFunction);
     ManyBodyPhaseSpace build();
 
 private:
     std::vector<const ParticleDef*> daughters_;
+    MatrixElementFunction matrix_element_;
 };
 
 } // namespace PROPOSAL

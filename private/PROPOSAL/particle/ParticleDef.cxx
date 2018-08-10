@@ -232,7 +232,7 @@ ParticleDef::Builder::Builder()
     , low(0)
     , lifetime(-1)
     , charge(-1)
-    , hard_component_table(NULL)
+    , hard_component_table(&HardComponentTables::EmptyTable)
     , decay_table()
 {
 }
