@@ -365,6 +365,7 @@ void export_bremsstrahlung()
     BREMS_DEF(PetrukhinShestakov)
     BREMS_DEF(CompleteScreening)
     BREMS_DEF(AndreevBezrukovBugaev)
+    BREMS_DEF(SandrockSoedingreksoRhode)
 }
 
 void export_photo()
