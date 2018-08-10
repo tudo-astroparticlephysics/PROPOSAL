@@ -7,9 +7,80 @@
 #include <boost/python/stl_iterator.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 
+#include <boost/function.hpp>
+
 #include <map>
 
-// #include "PROPOSAL/Propagator.h"
+// ------------------------------------------------------------------------- //
+#include <boost/preprocessor/repetition/enum_binary_params.hpp>
+#include <boost/preprocessor/repetition/enum_params.hpp>
+#include <boost/preprocessor/repetition/repeat.hpp>
+#include <boost/preprocessor/repetition/repeat_from_to.hpp>
+
+namespace boost { namespace python {
+
+namespace detail {
+
+template <typename RT, int arity>
+struct pyobject_invoker;
+
+template <typename RT>
+struct pyobject_invoker<RT, 0>
+{
+	object callable;
+
+	RT
+	operator()()
+	{
+		return extract<RT>(callable());
+	}
+};
+
+#define MAKE_PYOBJECT_INVOKER(z, n, data)                                  \
+template <typename RT>                                                     \
+struct pyobject_invoker<RT, n>                                             \
+{                                                                          \
+	object callable;                                                   \
+	                                                                   \
+	template < BOOST_PP_ENUM_PARAMS(n, typename Arg) >                 \
+	RT operator()( BOOST_PP_ENUM_BINARY_PARAMS(n, Arg, arg ) )         \
+	{                                                                  \
+		return extract<RT>(callable(BOOST_PP_ENUM_PARAMS(n, arg)));\
+	}                                                                  \
+};
+
+BOOST_PP_REPEAT_FROM_TO(1, 6, MAKE_PYOBJECT_INVOKER, nothing);
+
+#undef MAKE_PYOBJECT_INVOKER
+
+template <typename Function>
+::boost::shared_ptr<Function> function_from_object(object o)
+{
+	const int arity = Function::arity;
+	typedef typename Function::result_type
+	    result_type;
+	pyobject_invoker<result_type, arity> invoker;
+	invoker.callable = o;
+	return ::boost::shared_ptr<Function>(new Function(invoker));
+}
+
+} // namespace boost::python::detail
+
+template <typename Function>
+class_<Function>
+def_function(const char* name, const char* doc="")
+{
+	class_<Function> klass(name, doc, no_init);
+
+	klass.def("__init__", make_constructor(&detail::function_from_object<Function>));
+	klass.def("__call__", &Function::operator());
+
+	return klass;
+}
+
+}} // namespace boost::python
+// ------------------------------------------------------------------------- //
+
 #include "PROPOSAL/PROPOSAL.h"
 
 #define PARTICLE_DEF(cls)                                                                                              \
@@ -660,6 +731,7 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
 
     to_python_converter<std::vector<DynamicData*>, PVectorToPythonList<DynamicData*> >();
     to_python_converter<std::vector<Particle*>, PVectorToPythonList<Particle*> >();
+    to_python_converter<std::vector<const ParticleDef*>, PVectorToPythonList<const ParticleDef*> >();
 
     to_python_converter<std::vector<Sector::Definition>, VectorToPythonList<Sector::Definition> >();
 
@@ -670,11 +742,10 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
         .from_python<std::vector<double> >()
         .from_python<std::vector<std::vector<double> > >()
         .from_python<std::vector<DynamicData*> >()
-        // .from_python<std::vector<ParticleDef> >()
+        .from_python<std::vector<const ParticleDef*> >()
         .from_python<std::vector<Particle*> >()
         // .from_python<std::vector<CrossSection*> >()
         .from_python<std::vector<Sector::Definition> >();
-
     // VectorFromPythonList<double>();
     // VectorFromPythonList<std::vector<double> >();
     // VectorFromPythonList<std::string>();
@@ -767,8 +838,14 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
     class_<TwoBodyPhaseSpace, boost::shared_ptr<TwoBodyPhaseSpace>, bases<DecayChannel> >(
         "TwoBodyPhaseSpace", init<ParticleDef, ParticleDef>());
 
+    boost::python::def_function<ManyBodyPhaseSpace::MatrixElementFunction>("matrix_element_function");
+
     class_<ManyBodyPhaseSpace, boost::shared_ptr<ManyBodyPhaseSpace>, bases<DecayChannel> >(
-        "ManyBodyPhaseSpace", init<std::vector<const ParticleDef*> >());
+        "ManyBodyPhaseSpace", init<std::vector<const ParticleDef*> >())
+        .def("evaluate", &ManyBodyPhaseSpace::Evaluate, "Return the matrix element (default 1)")
+        .staticmethod("evaluate")
+        .def("set_uniform_sampling", &DecayChannel::SetUniformSampling, "Decide to use uniform phase space sampling")
+        .def("set_matrix_element", &ManyBodyPhaseSpace::SetMatrixElement, "Set the matrix element");
 
     class_<StableChannel, boost::shared_ptr<StableChannel>, bases<DecayChannel> >("StableChannel", init<>());
 
@@ -852,6 +929,7 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
     PARTICLE_DEF(PiMinus)
     PARTICLE_DEF(PiPlus)
 
+    PARTICLE_DEF(K0)
     PARTICLE_DEF(KMinus)
     PARTICLE_DEF(KPlus)
 
@@ -1179,12 +1257,16 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
     // RandomGenerator
     // --------------------------------------------------------------------- //
 
+	typedef boost::function<double()> callback_t;
+    boost::python::def_function<callback_t>("random_function");
+
     class_<RandomGenerator, boost::shared_ptr<RandomGenerator>, boost::noncopyable>("RandomGenerator", no_init)
 
         // .def(self_ns::str(self_ns::self))
 
         .def("random_double", &RandomGenerator::RandomDouble)
         .def("set_seed", &RandomGenerator::SetSeed, arg("seed") = 0)
+        .def("set_random_function", &RandomGenerator::SetRandomNumberGenerator, arg("function"))
         .def("get", make_function(&RandomGenerator::Get, return_value_policy<reference_existing_object>()))
         .staticmethod("get");
 
