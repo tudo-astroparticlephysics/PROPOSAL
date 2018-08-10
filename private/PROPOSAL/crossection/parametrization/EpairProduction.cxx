@@ -433,15 +433,31 @@ double EpairSandrockSoedingreksoRhode::FunctionToIntegral(double energy, double 
 
     double De = ((2.0 + rho2) * (1.0 + beta) + xi * (3.0 + rho2)) * dilog(1.0 / (1.0 + xi)) -
                 (2.0 + rho2) * xi * log(1.0 + 1.0 / xi) - (xi + rho2 + beta) / (1.0 + xi);
-    double Xe = exp(-De / Be);
 
-    double Le1 = log(rad_log * Z13 * sqrt(1.0 + xi) /
-                     (Xe + 2.0 * ME * exp(0.5) * rad_log * Z13 * (1.0 + xi) / (energy * v * (1.0 - rho2)))) -
-                 De / Be - 0.5 * log(Xe + pow(ME / m_in * d_n, 2.0) * (1.0 + xi));
+    double Le1, Le2;
 
-    double Le2 = log(rad_log * Z13 * exp(-1.0 / 6.0) * sqrt(1 + xi) /
-                     (Xe + 2.0 * ME * exp(1.0 / 3.0) * rad_log * Z13 * (1.0 + xi) / (energy * v * (1.0 - rho2)))) -
-                 De / Be - 0.5 * log(Xe + pow(ME / m_in * d_n, 2.0) * exp(-1.0 / 3.0) * (1.0 + xi));
+    if (De / Be > 0.)
+    {
+        double Xe = exp(-De / Be);
+        Le1 = log(rad_log * Z13 * sqrt(1.0 + xi) /
+                         (Xe + 2.0 * ME * exp(0.5) * rad_log * Z13 * (1.0 + xi) / (energy * v * (1.0 - rho2)))) -
+                     De / Be - 0.5 * log(Xe + pow(ME / m_in * d_n, 2.0) * (1.0 + xi));
+
+        Le2 = log(rad_log * Z13 * exp(-1.0 / 6.0) * sqrt(1 + xi) /
+                         (Xe + 2.0 * ME * exp(1.0 / 3.0) * rad_log * Z13 * (1.0 + xi) / (energy * v * (1.0 - rho2)))) -
+                     De / Be - 0.5 * log(Xe + pow(ME / m_in * d_n, 2.0) * exp(-1.0 / 3.0) * (1.0 + xi));
+    }
+    else
+    {
+        double Xe_inv = exp(De / Be);
+        Le1 = log(rad_log * Z13 * sqrt(1.0 + xi) /
+                         (1. + Xe_inv * 2.0 * ME * exp(0.5) * rad_log * Z13 * (1.0 + xi) / (energy * v * (1.0 - rho2)))) -
+                     0.5 * De / Be - 0.5 * log(1. + Xe_inv * pow(ME / m_in * d_n, 2.0) * (1.0 + xi));
+
+        Le2 = log(rad_log * Z13 * exp(-1.0 / 6.0) * sqrt(1 + xi) /
+                         (1. + Xe_inv * 2.0 * ME * exp(1.0 / 3.0) * rad_log * Z13 * (1.0 + xi) / (energy * v * (1.0 - rho2)))) -
+                     0.5 * De / Be - 0.5 * log(1. + Xe_inv * pow(ME / m_in * d_n, 2.0) * exp(-1.0 / 3.0) * (1.0 + xi));
+    }
 
     double diagram_e = std::max(0.0, const_prefactor * (nucl_Z + zeta) * (1.0 - v) / v * (Ce1 * Le1 + Ce2 * Le2));
 
@@ -462,28 +478,23 @@ double EpairSandrockSoedingreksoRhode::FunctionToIntegral(double energy, double 
                 (1.0 + (3.0 * beta) / 2.0) * (1.0 - rho2) / xi * log(1.0 + xi) +
                 (1.0 - rho2 - beta / 2.0 * (1.0 + rho2) + (1.0 - rho2) / (2.0 * xi) * beta) * xi / (1.0 + xi);
 
-    double Xm     = exp(-Dm / Bm);
-    double Xm_inv = exp(Dm / Bm);
+    double Lm1, Lm2;
 
-    double Lm1 = 0.0, Lm2 = 0.0;
-
-    if (Xm > 2.0 * ME * exp(0.5) * rad_log * Z13 * (1.0 + xi) / (energy * v * (1.0 - rho2)) /
-                 (rad_log * (m_in / ME) * Z13 / d_n - 1.0))
+    if (Dm / Bm > 0.0)
     {
-        if (Dm / Bm > 0.0)
-        {
-            Lm1 = log(Xm * m_in / ME * rad_log * Z13 / d_n /
-                      (Xm + 2.0 * ME * exp(0.5) * rad_log * Z13 * (1.0 + xi) / (energy * v * (1.0 - rho2))));
-            Lm2 = log(Xm * m_in / ME * rad_log * Z13 / d_n /
-                      (Xm + 2.0 * ME * exp(1.0 / 3.0) * rad_log * Z13 * (1.0 + xi) / (energy * v * (1.0 - rho2))));
-        } else
-        {
-            Lm1 = log(m_in / ME * rad_log * Z13 / d_n /
-                      (1.0 + 2.0 * ME * exp(0.5) * rad_log * Z13 * (1.0 + xi) / (energy * v * (1.0 - rho2)) * Xm_inv));
-            Lm2 = log(
-                m_in / ME * rad_log * Z13 / d_n /
-                (1.0 + 2.0 * ME * exp(1.0 / 3.0) * rad_log * Z13 * (1.0 + xi) / (energy * v * (1.0 - rho2)) * Xm_inv));
-        }
+        double Xm = exp(-Dm / Bm);
+        Lm1 = log(Xm * m_in / ME * rad_log * Z13 / d_n /
+                  (Xm + 2.0 * ME * exp(0.5) * rad_log * Z13 * (1.0 + xi) / (energy * v * (1.0 - rho2))));
+        Lm2 = log(Xm * m_in / ME * rad_log * Z13 / d_n /
+                  (Xm + 2.0 * ME * exp(1.0 / 3.0) * rad_log * Z13 * (1.0 + xi) / (energy * v * (1.0 - rho2))));
+    } else
+    {
+        double Xm_inv = exp(Dm / Bm);
+        Lm1 = log(m_in / ME * rad_log * Z13 / d_n /
+                  (1.0 + 2.0 * ME * exp(0.5) * rad_log * Z13 * (1.0 + xi) / (energy * v * (1.0 - rho2)) * Xm_inv));
+        Lm2 = log(
+            m_in / ME * rad_log * Z13 / d_n /
+            (1.0 + 2.0 * ME * exp(1.0 / 3.0) * rad_log * Z13 * (1.0 + xi) / (energy * v * (1.0 - rho2)) * Xm_inv));
     }
 
     double diagram_mu = std::max(
