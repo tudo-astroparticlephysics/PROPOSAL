@@ -265,6 +265,7 @@ BREMSSTRAHLUNG_IMPL(PetrukhinShestakov)
 BREMSSTRAHLUNG_IMPL(KelnerKokoulinPetrukhin)
 BREMSSTRAHLUNG_IMPL(CompleteScreening)
 BREMSSTRAHLUNG_IMPL(AndreevBezrukovBugaev)
+BREMSSTRAHLUNG_IMPL(SandrockSoedingreksoRhode)
 
 // ------------------------------------------------------------------------- //
 // PetrukhinShestakov parametrization
@@ -488,6 +489,74 @@ double BremsAndreevBezrukovBugaev::CalculateParametrization(double energy, doubl
     }
 
     return result;
+}
+
+double BremsSandrockSoedingreksoRhode::CalculateParametrization(double energy, double v)
+{
+    static const double a[3] = {-0.00349, 148.84, -987.531};
+    static const double b[4] = {0.1642, 132.573, -585.361, 1407.77};
+    static const double c[6] = {-2.8922, -19.0156, 57.698, -63.418, 14.1166, 1.84206};
+    static const double d[6] = {2134.19, 581.823, -2708.85, 4767.05, 1.52918, 0.361933};
+
+
+    double Z = components_[component_index_]->GetNucCharge();
+    double Z13 = pow(Z, -1. / 3);
+    double rad_log = components_[component_index_]->GetLogConstant();
+    double rad_log_inel = components_[component_index_]->GetBPrime();
+    double Dn = 1.54 * pow(components_[component_index_]->GetAtomicNum(), 0.27);
+
+    double mu_qc = particle_def_.mass / (MMU * exp(1.) / Dn);
+    double rho = sqrt(1.0 + 4.0*mu_qc*mu_qc);
+
+    double log_rho = log((rho + 1.) / (rho - 1.));
+    double delta1 = log(mu_qc) + 0.5 * rho * log_rho;
+    double delta2 = log(mu_qc) + 0.25 * (3.0*rho - rho*rho*rho) * log_rho + 2.0*mu_qc*mu_qc;
+
+    // least momentum transferred to the nucleus (eq. 7)
+    double delta = particle_def_.mass * particle_def_.mass * v / (2.0 * energy * (1.0 - v));
+
+    double phi1 = log(rad_log * Z13 * (particle_def_.mass / ME) / (1.0 + rad_log * Z13 * exp(0.5) * delta / ME));
+    double phi2 = log(rad_log * Z13 * exp(-1/6.) * (particle_def_.mass / ME) / (1.0 + rad_log * Z13 * exp(1./3.) * delta / ME));
+    phi1 -= delta1 * (1. - 1./Z);
+    phi2 -= delta2 * (1. - 1./Z);
+
+    // s_atomic
+    double s_atomic_1 = log(particle_def_.mass / delta / ( particle_def_.mass * delta / (ME * ME) + exp(0.5)));
+    double s_atomic_2 = log(1. + ME / (delta * rad_log_inel * Z13 * Z13 * exp(0.5)));
+    double s_atomic = (4./3. * (1. - v) + v*v) * (s_atomic_1 - s_atomic_2);
+
+    // s_rad
+    double s_rad;
+
+
+    if (v < .0 || v > 1.0)
+    {
+        s_rad = 0.;
+    }
+    else if (v < 0.02)
+    {
+        s_rad = a[0] + a[1] * v + a[2] * v * v;
+    }
+    else if (v >= 0.02 && v < 0.1)
+    {
+        s_rad = b[0] + b[1] * v + b[2] * v * v + b[3] * v * v * v;
+    }
+    else if (v >= 0.01 && v < 0.9)
+    {
+        s_rad = c[0] + c[1] * v + c[2] * v * v;
+
+        double tmp = log(1. - v);
+        s_rad += c[3] * v * log(v) + c[4] * tmp + c[5] * tmp * tmp;
+    }
+    else
+    {
+        s_rad = d[0] + d[1] * v + d[2] * v * v;
+
+        double tmp = log(1. - v);
+        s_rad += d[3] * v * log(v) + d[4] * tmp + d[5] * tmp * tmp;
+    }
+
+    return std::max(((2.0 - 2.0 * v + v * v) * phi1 - 2.0/3.0 * (1. - v) * phi2) + 1./Z * s_atomic + 0.25*ALPHA * phi1 * s_rad, 0.);
 }
 
 #undef BREMSSTRAHLUNG_IMPL
