@@ -45,7 +45,7 @@ Or the time is calculated by simply dividing distance by the speed of light.
 There are four different multiple scattering parametrizations describing the deviation of the propagation direction.
   - `"Moliere"` Parametrization of [Moliere](http://zfn.mpdl.mpg.de/data/Reihe_A/3/ZNA-1948-3a-0078.pdf)
   - `"Highland"` First Order approximation (a gaussian function) of Moliere's theory derived by [Highland](https://doi.org/10.1016/0029-554X(75)90743-0) and corrected by [Lynch/Dahl](https://doi.org/10.1016/0168-583X(91)95671-Y).
-  - `"HighlandIntegral"` From the old PROPOSAL version (which had just this scattering mode). Also using Highland approximation (corrected by Lynch/Dahl), but taking into account the energy dependence of the propagted distance
+  - `"HighlandIntegral"` From the old PROPOSAL version (which had just this scattering mode). Also using Highland approximation (corrected by Lynch/Dahl), but taking into account the energy dependence of the propagated distance
   - `"NoScattering"` Here the particle always propagate in the initial direction without deviation from the propagation axes.
 
 If a particle gets below a lower threshold energy (this is a property of a particle that should be defined in the Particle Definitions and is by default the same as the particle mass) but hasn't decayed, it can get forced to stop and to decay.
@@ -61,13 +61,18 @@ There are several parametrizations defining the cross sections and further optio
 
 The cross section multiplier, available for each cross section, scales this cross section by its factor.
 
-For Ionization and Pair production, there is just one parametrization, but for bremsstrahlung and nuclear interaction, it's possible to choose between multiple parametrizations.
+For Ionization, there is just one parametrization, but for pair production, bremsstrahlung and nuclear interaction, it's possible to choose between multiple parametrizations.
+
+The pair production parametrizations are:
+  - `"EpairKelnerKokoulinPetrukhin"` (Proc. 12th ICCR (1971), 2436) with corrections for the interaction with atomic electrons (Phys. Atom. Nucl. 61 (1998), 448)
+  - `"EpairSandrockSoedingreksoRhode"` 
 
 The bremsstrahlung parametrizations are:
   - `"BremsKelnerKokoulinPetrukhin"` ([Preprint MEPhI (1995) no. 024-95](http://cds.cern.ch/record/288828)) and (Phys. Atom. Nucl. 62 (1999), 272)
   - `"BremsAndreevBezrukovBugaev"` (Phys. Atom. Nucl. 57 (1994), 2066)
   - `"BremsPetrukhinShestakov"` (Canad. J. Phys. 46 (1968), 377)
   - `"BremsCompleteScreening"` taken from Tsai [Rev. Mod. Phys. 46 (1974), 815](https://doi.org/10.1103/RevModPhys.46.815)
+  - `"BremsSandrockSoedingreksoRhode"`
 
 There are two different approaches to parametrise the nuclear interaction:
 
@@ -76,7 +81,7 @@ The available parametrizations using this approach are:
 - `"PhotoKokoulin"`
 - `"PhotoRhode"`
 - `"PhotoBezrukovBugaev"` (Sov. J. Nucl. Phys. 33 (1981), 635) with corrections for particles with higher mass like taus ([Phys. Rev. D67 (2003), 034027](https://doi.org/10.1103/PhysRevD.67.034027))
-- `"PhotoZeus"`
+- `"PhotoZeus"` ([Eur. Phys. J. C 7 (1999), 609](https://doi.org/10.1007/s100529901084))
 
 For these parametrizations the hard component can additionally be considered (only affecting the parametrizations using the real photon approximation).
 
@@ -100,6 +105,7 @@ The LPM effect (Landau-Pomeranschuk-Migdal), suppressing the bremsstrahlung and 
 | `epair_multiplier`     | Double | `1.0`        | scales the pair production |
 | `ioniz_multiplier`     | Double | `1.0`        | scales the ionization |
 | `photo_multiplier`     | Double | `1.0`        | scales the nuclear interaction |
+| `epair`                | String | `"EpairKelnerKokoulinPetrukhin"` | Pair production parametrization |
 | `brems`                | String | `"BremsKelnerKokoulinPetrukhin"` | Bremsstrahlung parametrization |
 | `photo`                | String | `"PhotoAbramowiczLevinLevyMaor97"` | nuclear interaction parametrization |
 | `photo_hard_component` | Bool   | `True`     | including the hard components |
@@ -110,7 +116,7 @@ The LPM effect (Landau-Pomeranschuk-Migdal), suppressing the bremsstrahlung and 
 The energy cut settings and the continuous randomization option are separated between inside, in front and behind the detector.
 **ecut** describes the cut in the total energy loss in MeV and **vcut** describes the cut in the energy loss relative to the particle energy.
 Above this cut, the energy losses are calculated stochastically and below this cut, the energy loss is calculated via the average energy loss (continuously).
-- If both values are setted, the minimum of the total energy cut and the relative cut times the particle energy is applied.
+- If both values are set, the minimum of the total energy cut and the relative cut times the particle energy is applied.
 - If just one of the energy cuts should be used, the other value should be set to a negative value (usually it's -1), because negative values for the energy cuts are neglected.
 - If both values are set to a negative value, only continuous losses (average energy loss dE/dx) are taking into account.
 
@@ -158,7 +164,7 @@ The following media are implemented:
 - `"Paraffin"`
 - `"AntaresWater"`
 
-A density correction factor for the medium, specifying the density of the medium for the experiment, can optionally be setted.
+A density correction factor for the medium, specifying the density of the medium for the experiment, can optionally be set.
 
 | Keyword              | Type   | Default | Description |
 | -------------------- | ------ | ------- | ----------- |

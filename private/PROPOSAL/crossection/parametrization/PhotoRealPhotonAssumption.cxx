@@ -167,6 +167,10 @@ void PhotoRealPhotonAssumption::print(std::ostream& os) const
 PHOTO_PARAM_REAL_IMPL(Zeus, RealPhotonAssumption)
 
 // ------------------------------------------------------------------------- //
+// Zeus Collaboration, Breitweg et al
+// Eur. Phys. J. C 7 (1999), 609
+// eq. 6
+// ------------------------------------------------------------------------- //
 double PhotoZeus::CalculateParametrization(double nu)
 {
     double aux;
@@ -186,9 +190,8 @@ PHOTO_PARAM_REAL_IMPL(BezrukovBugaev, RealPhotonAssumption)
 
 // ------------------------------------------------------------------------- //
 // Bezrukov, Bugaev
-// Sov. J. Nucl. Phys. 33 (1981), 635
-// eq. 17
-// TODO: look at Sov. J. Nucl. Phys. 32 (1980), 847
+// Sov. J. Nucl. Phys. 32 (1980), 847
+// eq. 21
 // ------------------------------------------------------------------------- //
 double PhotoBezrukovBugaev::CalculateParametrization(double nu)
 {
@@ -214,6 +217,7 @@ double PhotoKokoulin::CalculateParametrization(double nu)
     {
         if (nu <= 17.)
         {
+            // Bezrukov, Bugaev, Sov. J. Nucl. Phys. 33 (1981), 635
             return 96.1 + 82. / sqrt(nu);
         } else
         {
