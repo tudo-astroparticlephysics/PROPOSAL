@@ -13,8 +13,8 @@ if __name__ == "__main__":
     # 	Propagate
     # =========================================================
 
-    energy = 1e8  # MeV
-    statistics = 1000
+    energy = 1e7  # MeV
+    statistics = 10000
 
     sec_def = pp.SectorDefinition()
     sec_def.medium = pp.Medium.Ice(1.0)
@@ -32,7 +32,7 @@ if __name__ == "__main__":
     interpolation_def.path_to_tables = "~/.local/share/PROPOSAL/tables"
 
     prop = pp.Propagator(
-            particle_def=pp.TauMinusDef.get(),
+            particle_def=pp.MuMinusDef.get(),
             sector_defs=[sec_def],
             detector=pp.Sphere(pp.Vector3D(), 1e20, 0),
             interpolation_def=interpolation_def
