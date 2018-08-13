@@ -65,13 +65,6 @@ if __name__ == "__main__":
 
     crosssections = []
 
-    # for param in params:
-    #     print(param.name)
-    #     crosssections.append(pp.CrossSection.EpairInterpolant(
-    #         param,
-    #         interpolation_def
-    #     ))
-
     for param in params:
         print(param.name)
         crosssections.append(pp.CrossSection.BremsIntegral(
@@ -92,15 +85,6 @@ if __name__ == "__main__":
         dEdx_photo.append(dEdx)
         print(dEdx)
 
-    # for param in params:
-    #     dEdx = []
-    #     for E in energy:
-    #         dEdx.append(param.differential_crosssection(1e5, E))
-    #
-    #     print(dEdx)
-    #
-    #     dEdx_photo.append(dEdx)
-
     # =========================================================
     # 	Plot
     # =========================================================
@@ -109,8 +93,6 @@ if __name__ == "__main__":
     gs = mpl.gridspec.GridSpec(2, 1, height_ratios=[1, 1])
 
     ax = fig.add_subplot(gs[0])
-
-    # ax.grid(which='both')
 
     for dEdx, param in zip(dEdx_photo, params):
         ax.loglog(
@@ -143,11 +125,6 @@ if __name__ == "__main__":
     ax.yaxis.grid(which='minor', ls=":")
     ax.set_ylim(top=1.1, bottom=0.7)
     ax.set_xlim(left=1e2, right=1e9)
-
-    # ax.yaxis.set_minor_formatter(ticker.FormatStrFormatter("%.2f"))
-    # ax.yaxis.set_major_formatter(ticker.NullFormatter())
-    # ax.yaxis.set_major_locator(ticker.MultipleLocator(0.05))
-    # ax.yaxis.set_minor_locator(ticker.MultipleLocator(0.01))
 
     ax.set_xlabel(r'$E$ / MeV')
     ax.set_ylabel(r'ratio')
