@@ -5,8 +5,8 @@ parametrizations = [
     pp.Parametrization.Bremsstrahlung.KelnerKokoulinPetrukhin,
     pp.Parametrization.Bremsstrahlung.PetrukhinShestakov,
     pp.Parametrization.Bremsstrahlung.CompleteScreening,
-    pp.Parametrization.Bremsstrahlung.AndreevBezrukovBugaev
-    pp.Parametrization.Bremsstrahlung.RhodeSandrockSoedingrekso
+    pp.Parametrization.Bremsstrahlung.AndreevBezrukovBugaev,
+    pp.Parametrization.Bremsstrahlung.SandrockSoedingreksoRhode
 ]
 
 particle_defs = [
