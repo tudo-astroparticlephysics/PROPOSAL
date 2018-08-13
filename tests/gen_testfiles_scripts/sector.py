@@ -32,10 +32,10 @@ direction = pp.Vector3D(1, 0, 0)
 # do_exact_time_calculation = True
 interpoldef = pp.InterpolationDef()
 
-pp.RandomGenerator.get().set_seed(1234)
-
 
 def create_table_propagate(dir_name):
+
+    pp.RandomGenerator.get().set_seed(1234)
 
     with open(dir_name + "Sector_propagate.txt", "a") as f:
 
