@@ -521,13 +521,21 @@ double BremsSandrockSoedingreksoRhode::CalculateParametrization(double energy, d
     phi2 -= delta2 * (1. - 1./Z);
 
     // s_atomic
-    double s_atomic_1 = log(particle_def_.mass / delta / ( particle_def_.mass * delta / (ME * ME) + exp(0.5)));
-    double s_atomic_2 = log(1. + ME / (delta * rad_log_inel * Z13 * Z13 * exp(0.5)));
-    double s_atomic = (4./3. * (1. - v) + v*v) * (s_atomic_1 - s_atomic_2);
+    double square_momentum   = energy * energy - particle_def_.mass * particle_def_.mass;
+    double particle_momentum = sqrt(std::max(square_momentum, 0.0));
+    double maxV = ME * (energy - particle_def_.mass) / (energy * (energy - particle_momentum + ME));
+
+    double s_atomic = 0.0;
+
+    if (v < maxV)
+    {
+        double s_atomic_1 = log(particle_def_.mass / delta / ( particle_def_.mass * delta / (ME * ME) + SQRTE));
+        double s_atomic_2 = log(1. + ME / (delta * rad_log_inel * Z13 * Z13 * SQRTE));
+        s_atomic = (4./3. * (1. - v) + v*v) * (s_atomic_1 - s_atomic_2);
+    }
 
     // s_rad
     double s_rad;
-
 
     if (v < .0 || v > 1.0)
     {
