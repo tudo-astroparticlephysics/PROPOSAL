@@ -25,16 +25,12 @@
 
 #include <algorithm>
 #include <cmath>
-// #include <sstream>
-
-#include <boost/bind.hpp>
 
 #include "PROPOSAL/math/Interpolant.h"
-// #include "PROPOSAL/methods.h"
 #include "PROPOSAL/Output.h"
 
-// using namespace std;
 using namespace PROPOSAL;
+using namespace std::placeholders;
 
 const double Interpolant::bigNumber_  = -300;
 const double Interpolant::aBigNumber_ = -299;
@@ -883,9 +879,9 @@ Interpolant::Interpolant(const Interpolant& interpolant)
     {
         Interpolant_.at(i) = new Interpolant(*interpolant.Interpolant_.at(i));
     }
-    function1d_ = boost::ref(interpolant.function1d_);
+    function1d_ = std::ref(interpolant.function1d_);
     ;
-    function2d_ = boost::ref(interpolant.function2d_);
+    function2d_ = std::ref(interpolant.function2d_);
     ;
 }
 
@@ -895,7 +891,7 @@ Interpolant::Interpolant(const Interpolant& interpolant)
 Interpolant::Interpolant(int max,
                          double xmin,
                          double xmax,
-                         boost::function<double(double)> function1d,
+                         std::function<double(double)> function1d,
                          int romberg,
                          bool rational,
                          bool relative,
@@ -979,7 +975,7 @@ Interpolant::Interpolant(int max1,
                          int max2,
                          double x2min,
                          double x2max,
-                         boost::function<double(double, double)> function2d,
+                         std::function<double(double, double)> function2d,
                          int romberg1,
                          bool rational1,
                          bool relative1,
@@ -1033,7 +1029,7 @@ Interpolant::Interpolant(int max1,
     double aux;
 
     function2d_ = function2d;
-    function1d_ = boost::bind(&Interpolant::Get2dFunctionFixedY, this, _1);
+    function1d_ = std::bind(&Interpolant::Get2dFunctionFixedY, this, _1);
 
     Interpolant_.resize(max_);
 

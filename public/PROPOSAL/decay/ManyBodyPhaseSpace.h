@@ -30,7 +30,7 @@
 #pragma once
 
 #include <boost/unordered_map.hpp>
-#include <boost/function.hpp>
+#include <functional>
 
 #include "PROPOSAL/decay/DecayChannel.h"
 #include "PROPOSAL/particle/ParticleDef.h"
@@ -59,7 +59,7 @@ public:
     };
 
     typedef boost::unordered_map<ParticleDef, PhaseSpaceParameters> ParameterMap;
-    typedef boost::function<double(const Particle&, const DecayProducts&)> MatrixElementFunction;
+    typedef std::function<double(const Particle&, const DecayProducts&)> MatrixElementFunction;
 
 public:
     ManyBodyPhaseSpace(std::vector<const ParticleDef*> daughters, MatrixElementFunction ME = NULL);

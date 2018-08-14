@@ -30,7 +30,7 @@
 #pragma once
 
 #include <boost/bimap.hpp>
-#include <boost/function.hpp>
+#include <functional>
 
 #include <map>
 #include <string>
@@ -111,23 +111,23 @@ public:
     // Typedefs for readablitiy
     // --------------------------------------------------------------------- //
 
-    typedef boost::function<ShadowEffect*(void)> RegisterShadowEffectFunction;
+    typedef std::function<ShadowEffect*(void)> RegisterShadowEffectFunction;
 
-    typedef boost::function<Photonuclear*(const ParticleDef&,
+    typedef std::function<Photonuclear*(const ParticleDef&,
                                           const Medium&,
                                           const EnergyCutSettings&,
                                           double multiplier,
                                           bool hard_component)>
         RegisterRealPhotonFunction;
 
-    typedef boost::function<Photonuclear*(const ParticleDef&,
+    typedef std::function<Photonuclear*(const ParticleDef&,
                                           const Medium&,
                                           const EnergyCutSettings&,
                                           double multiplier,
                                           const ShadowEffect&)>
         RegisterQ2Function;
 
-    typedef boost::function<Photonuclear*(const ParticleDef&,
+    typedef std::function<Photonuclear*(const ParticleDef&,
                                           const Medium&,
                                           const EnergyCutSettings&,
                                           double multiplier,
