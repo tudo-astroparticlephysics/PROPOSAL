@@ -1,5 +1,5 @@
 
-#include <boost/bind.hpp>
+#include <functional>
 
 #include "PROPOSAL/crossection/CrossSectionIntegral.h"
 #include "PROPOSAL/crossection/parametrization/Parametrization.h"
@@ -9,6 +9,7 @@
 #include "PROPOSAL/Output.h"
 
 using namespace PROPOSAL;
+using namespace std::placeholders;
 
 // ------------------------------------------------------------------------- //
 // Constructor & Destructor
@@ -68,7 +69,7 @@ double CrossSectionIntegral::CalculatedE2dx(double energy)
         sum += de2dx_integral_.Integrate(
             limits.vMin,
             limits.vUp,
-            boost::bind(&Parametrization::FunctionToDE2dxIntegral, parametrization_, energy, _1),
+            std::bind(&Parametrization::FunctionToDE2dxIntegral, parametrization_, energy, _1),
             2);
     }
 
@@ -93,7 +94,7 @@ double CrossSectionIntegral::CalculatedNdx(double energy)
         prob_for_component_[i] = dndx_integral_[i].Integrate(
             limits.vUp,
             limits.vMax,
-            boost::bind(&Parametrization::FunctionToDNdxIntegral, parametrization_, energy, _1),
+            std::bind(&Parametrization::FunctionToDNdxIntegral, parametrization_, energy, _1),
             4);
         sum_of_rates_ += prob_for_component_[i];
     }
@@ -123,7 +124,7 @@ double CrossSectionIntegral::CalculatedNdx(double energy, double rnd)
         prob_for_component_.at(i) = dndx_integral_[i].IntegrateWithRandomRatio(
             limits.vUp,
             limits.vMax,
-            boost::bind(&Parametrization::FunctionToDNdxIntegral, parametrization_, energy, _1),
+            std::bind(&Parametrization::FunctionToDNdxIntegral, parametrization_, energy, _1),
             4,
             rnd);
         sum_of_rates_ += prob_for_component_.at(i);

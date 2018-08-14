@@ -25,7 +25,7 @@ ManyBodyPhaseSpace::ManyBodyPhaseSpace(std::vector<const ParticleDef*> daughters
     , uniform_(true)
     , matrix_element_(me)
 {
-    if (me.empty())
+    if (me != NULL)
     {
         matrix_element_ = ManyBodyPhaseSpace::Evaluate;
     }
@@ -198,7 +198,8 @@ ManyBodyPhaseSpace::PhaseSpaceParameters ManyBodyPhaseSpace::GetPhaseSpaceParams
         PhaseSpaceParameters params;
         CalculateNormalization(params, parent.mass);
 
-        if (matrix_element_ == Evaluate)
+        //TODO(mario): check if this does what it should do ^^ Tue 2018/08/14
+        if (*matrix_element_.target<double(*)(const Particle&, const ManyBodyPhaseSpace::DecayProducts&)>() == &ManyBodyPhaseSpace::Evaluate)
         {
             EstimateMaxWeight(params, parent.mass);
         }

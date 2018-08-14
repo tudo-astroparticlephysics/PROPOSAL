@@ -1,4 +1,3 @@
-#include <boost/bind.hpp>
 
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Output.h"

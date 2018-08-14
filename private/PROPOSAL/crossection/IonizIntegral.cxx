@@ -1,5 +1,6 @@
 
-#include <boost/bind.hpp>
+// #include <boost/bind.hpp>
+#include <functional>
 
 #include <cmath>
 
@@ -12,6 +13,7 @@
 #include "PROPOSAL/Output.h"
 
 using namespace PROPOSAL;
+using namespace std::placeholders;
 
 IonizIntegral::IonizIntegral(const Ionization& param)
     : CrossSectionIntegral(DynamicData::DeltaE, param)
@@ -70,7 +72,7 @@ double IonizIntegral::CalculatedEdx(double energy)
            energy * dedx_integral_.Integrate(
                         limits.vMin,
                         limits.vUp,
-                        boost::bind(&Parametrization::FunctionToDEdxIntegral, parametrization_, energy, _1),
+                        std::bind(&Parametrization::FunctionToDEdxIntegral, parametrization_, energy, _1),
                         4);
 }
 
@@ -87,7 +89,7 @@ double IonizIntegral::CalculatedE2dx(double energy)
     return de2dx_integral_.Integrate(
         limits.vMin,
         limits.vUp,
-        boost::bind(&Parametrization::FunctionToDE2dxIntegral, parametrization_, energy, _1),
+        std::bind(&Parametrization::FunctionToDE2dxIntegral, parametrization_, energy, _1),
         2);
 }
 
@@ -104,7 +106,7 @@ double IonizIntegral::CalculatedNdx(double energy)
     sum_of_rates_ =
         dndx_integral_[0].Integrate(limits.vUp,
                                     limits.vMax,
-                                    boost::bind(&Parametrization::FunctionToDNdxIntegral, parametrization_, energy, _1),
+                                    std::bind(&Parametrization::FunctionToDNdxIntegral, parametrization_, energy, _1),
                                     3,
                                     1);
 
@@ -126,7 +128,7 @@ double IonizIntegral::CalculatedNdx(double energy, double rnd)
     sum_of_rates_ = dndx_integral_[0].IntegrateWithRandomRatio(
         limits.vUp,
         limits.vMax,
-        boost::bind(&Parametrization::FunctionToDNdxIntegral, parametrization_, energy, _1),
+        std::bind(&Parametrization::FunctionToDNdxIntegral, parametrization_, energy, _1),
         3,
         rnd,
         1);

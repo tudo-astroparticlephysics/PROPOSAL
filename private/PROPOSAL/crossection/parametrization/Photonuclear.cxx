@@ -1,6 +1,5 @@
 
 #include <boost/assign.hpp>
-#include <boost/bind.hpp>
 #include <boost/functional/hash.hpp>
 #include <cmath>
 

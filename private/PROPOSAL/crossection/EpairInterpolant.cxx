@@ -1,5 +1,5 @@
 
-#include <boost/bind.hpp>
+#include <functional>
 
 #include "PROPOSAL/crossection/EpairIntegral.h"
 #include "PROPOSAL/crossection/EpairInterpolant.h"
@@ -13,6 +13,7 @@
 #include "PROPOSAL/methods.h"
 
 using namespace PROPOSAL;
+using namespace std::placeholders;
 
 EpairInterpolant::EpairInterpolant(const EpairProduction& param, InterpolationDef def)
     : CrossSectionInterpolant(DynamicData::Epair, param)
@@ -41,7 +42,7 @@ EpairInterpolant::EpairInterpolant(const EpairProduction& param, InterpolationDe
         .SetRationalY(false)
         .SetRelativeY(false)
         .SetLogSubst(true)
-        .SetFunction1D(boost::bind(&CrossSection::CalculatedEdx, &epair, _1));
+        .SetFunction1D(std::bind(&CrossSection::CalculatedEdx, &epair, _1));
 
     builder_container.push_back(std::make_pair(&builder1d, &dedx_interpolant_));
 
@@ -63,7 +64,7 @@ EpairInterpolant::EpairInterpolant(const EpairProduction& param, InterpolationDe
         .SetRationalY(false)
         .SetRelativeY(false)
         .SetLogSubst(false)
-        .SetFunction1D(boost::bind(&CrossSection::CalculatedE2dx, &epair, _1));
+        .SetFunction1D(std::bind(&CrossSection::CalculatedE2dx, &epair, _1));
 
     builder_container_de2dx.push_back(std::make_pair(&builder_de2dx, &de2dx_interpolant_));
 

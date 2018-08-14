@@ -30,7 +30,7 @@
 #pragma once
 
 #include <boost/bimap.hpp>
-#include <boost/function.hpp>
+#include <functional>
 
 #include <map>
 #include <string>
@@ -96,7 +96,7 @@ public:
     // Typedefs for readablitiy
     // --------------------------------------------------------------------- //
 
-    typedef boost::function<
+    typedef std::function<
         Bremsstrahlung*(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier, bool lpm)>
         RegisterFunction;
 

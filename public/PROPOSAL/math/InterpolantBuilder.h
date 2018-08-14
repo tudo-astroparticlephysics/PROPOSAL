@@ -29,7 +29,7 @@
 
 #pragma once
 
-#include <boost/function.hpp>
+#include <functional>
 
 namespace PROPOSAL {
 
@@ -70,7 +70,7 @@ public:
 class Interpolant1DBuilder : public InterpolantBuilder
 {
 public:
-    typedef boost::function<double(double)> Function1D;
+    typedef std::function<double(double)> Function1D;
     static const Function1D default_function1d;
 
 public:
@@ -174,7 +174,7 @@ private:
 class Interpolant2DBuilder : public InterpolantBuilder
 {
 public:
-    typedef boost::function<double(double, double)> Function2D;
+    typedef std::function<double(double, double)> Function2D;
     static const Function2D default_function2d;
 
     // Constructor

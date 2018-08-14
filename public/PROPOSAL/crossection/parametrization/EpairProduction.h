@@ -29,7 +29,7 @@
 
 #pragma once
 
-#include <boost/bind.hpp>
+#include <functional>
 
 #include "PROPOSAL/crossection/parametrization/Parametrization.h"
 #include "PROPOSAL/medium/Medium.h"
@@ -66,6 +66,8 @@
     protected:                                                                                                         \
         static const std::string name_;                                                                                \
     };
+
+// using namespace std::placeholders;
 
 namespace PROPOSAL {
 
@@ -235,7 +237,7 @@ EpairProductionRhoInterpolant<Param>::EpairProductionRhoInterpolant(const Partic
             .SetRationalY(false)
             .SetRelativeY(false)
             .SetLogSubst(false)
-            .SetFunction2D(boost::bind(&EpairProductionRhoInterpolant::FunctionToBuildPhotoInterpolant, this, _1, _2, i));
+            .SetFunction2D(std::bind(&EpairProductionRhoInterpolant::FunctionToBuildPhotoInterpolant, this, std::placeholders::_1, std::placeholders::_2, i));
 
         builder_container2d[i].first  = &builder2d[i];
         builder_container2d[i].second = &interpolant_[i];

@@ -31,6 +31,7 @@
     const std::string Epair##param::name_ = "Epair" #param;
 
 using namespace PROPOSAL;
+using namespace std::placeholders;
 
 /******************************************************************************
  *                              EpairProduction                               *
@@ -232,9 +233,9 @@ double EpairProductionRhoIntegral::DifferentialCrossSection(double energy, doubl
     return multiplier_ * medium_->GetMolDensity() * components_[component_index_]->GetAtomInMolecule() *
            particle_def_.charge * particle_def_.charge *
            (integral_.Integrate(
-                1 - rMax, aux, boost::bind(&EpairProductionRhoIntegral::FunctionToIntegral, this, energy, v, _1), 2) +
+                1 - rMax, aux, std::bind(&EpairProductionRhoIntegral::FunctionToIntegral, this, energy, v, _1), 2) +
             integral_.Integrate(
-                aux, 1, boost::bind(&EpairProductionRhoIntegral::FunctionToIntegral, this, energy, v, _1), 4));
+                aux, 1, std::bind(&EpairProductionRhoIntegral::FunctionToIntegral, this, energy, v, _1), 4));
 }
 
 // ------------------------------------------------------------------------- //
