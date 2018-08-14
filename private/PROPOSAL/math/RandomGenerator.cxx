@@ -10,10 +10,13 @@
 
 using namespace PROPOSAL;
 
-boost::random::mt19937 RandomGenerator::rng_;
-boost::variate_generator<boost::mt19937&, boost::uniform_real<> > RandomGenerator::variate_real(
-    RandomGenerator::rng_,
-    boost::uniform_real<>(0.0, 1.0));
+std::mt19937 RandomGenerator::rng_;
+std::uniform_real_distribution<double> RandomGenerator::uniform_distribution(0.0, 1.0);
+
+// boost::random::mt19937 RandomGenerator::rng_;
+// boost::variate_generator<boost::mt19937&, boost::uniform_real<> > RandomGenerator::variate_real(
+//     RandomGenerator::rng_,
+//     boost::uniform_real<>(0.0, 1.0));
 
 // ------------------------------------------------------------------------- //
 // Constructor & destructor
@@ -53,8 +56,7 @@ double RandomGenerator::RandomDouble()
 // ------------------------------------------------------------------------- //
 void RandomGenerator::SetSeed(int seed)
 {
-    boost::mt19937::result_type s = static_cast<boost::mt19937::result_type>(seed);
-    rng_.seed(s);
+    rng_.seed(seed);
 }
 
 // ------------------------------------------------------------------------- //
@@ -90,5 +92,6 @@ void RandomGenerator::SetDefaultRandomNumberGenerator()
 // ------------------------------------------------------------------------- //
 double RandomGenerator::DefaultRandomDouble()
 {
-    return variate_real();
+    // return variate_real();
+    return uniform_distribution(rng_);
 }
