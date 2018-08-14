@@ -43,6 +43,8 @@ IF(DEBUG)
         SET( CMAKE_CXX_FLAGS "-g -O0" )
 ENDIF()
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+
 # Some additional options
 OPTION (ADD_PYTHON "Choose to compile the python wrapper library" ON)
 OPTION(ADD_ROOT "Choose to compile ROOT examples." OFF)
