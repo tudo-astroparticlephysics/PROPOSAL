@@ -1,5 +1,5 @@
 
-#include <boost/bind.hpp>
+#include <functional>
 
 #include <cmath>
 
@@ -17,6 +17,7 @@
 #include "PROPOSAL/methods.h"
 
 using namespace PROPOSAL;
+using namespace std::placeholders;
 
 IonizInterpolant::IonizInterpolant(const Ionization& param, InterpolationDef def)
     : CrossSectionInterpolant(DynamicData::DeltaE, param)
@@ -44,7 +45,7 @@ IonizInterpolant::IonizInterpolant(const Ionization& param, InterpolationDef def
         .SetRationalY(false)
         .SetRelativeY(false)
         .SetLogSubst(true)
-        .SetFunction1D(boost::bind(&CrossSection::CalculatedEdx, &ioniz, _1));
+        .SetFunction1D(std::bind(&CrossSection::CalculatedEdx, &ioniz, _1));
 
     builder_container.push_back(std::make_pair(&builder1d, &dedx_interpolant_));
 
@@ -66,7 +67,7 @@ IonizInterpolant::IonizInterpolant(const Ionization& param, InterpolationDef def
         .SetRationalY(false)
         .SetRelativeY(false)
         .SetLogSubst(false)
-        .SetFunction1D(boost::bind(&CrossSection::CalculatedE2dx, &ioniz, _1));
+        .SetFunction1D(std::bind(&CrossSection::CalculatedE2dx, &ioniz, _1));
 
     builder_container_de2dx.push_back(std::make_pair(&builder_de2dx, &de2dx_interpolant_));
 
@@ -122,8 +123,8 @@ void IonizInterpolant::InitdNdxInerpolation(const InterpolationDef& def)
             .SetRationalY(true)
             .SetRelativeY(false)
             .SetLogSubst(false)
-            .SetFunction2D(boost::bind(
-                &IonizInterpolant::FunctionToBuildDNdxInterpolant2D, this, _1, _2, boost::ref(integral), i));
+            .SetFunction2D(std::bind(
+                &IonizInterpolant::FunctionToBuildDNdxInterpolant2D, this, _1, _2, std::ref(integral), i));
 
         builder_container2d[i].first  = &builder2d[i];
         builder_container2d[i].second = &dndx_interpolant_2d_[i];
@@ -140,7 +141,7 @@ void IonizInterpolant::InitdNdxInerpolation(const InterpolationDef& def)
             .SetRationalY(true)
             .SetRelativeY(false)
             .SetLogSubst(false)
-            .SetFunction1D(boost::bind(&IonizInterpolant::FunctionToBuildDNdxInterpolant, this, _1, i));
+            .SetFunction1D(std::bind(&IonizInterpolant::FunctionToBuildDNdxInterpolant, this, _1, i));
 
         builder_container1d[i].first  = &builder1d[i];
         builder_container1d[i].second = &dndx_interpolant_1d_[i];
@@ -218,7 +219,7 @@ double IonizInterpolant::FunctionToBuildDNdxInterpolant2D(double energy, double 
     v = limits.vUp * exp(v * log(limits.vMax / limits.vUp));
 
     return integral.Integrate(
-        limits.vUp, v, boost::bind(&Parametrization::FunctionToDNdxIntegral, parametrization_, energy, _1), 3, 1);
+        limits.vUp, v, std::bind(&Parametrization::FunctionToDNdxIntegral, parametrization_, energy, _1), 3, 1);
 }
 
 // ------------------------------------------------------------------------- //

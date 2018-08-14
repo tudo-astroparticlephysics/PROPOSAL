@@ -1,11 +1,13 @@
 
-#include <boost/bind.hpp>
+// #include <boost/bind.hpp>
+#include <functional>
 
 #include "PROPOSAL/crossection/BremsIntegral.h"
 #include "PROPOSAL/crossection/parametrization/Bremsstrahlung.h"
 #include "PROPOSAL/medium/Medium.h"
 
 using namespace PROPOSAL;
+using namespace std::placeholders;
 
 BremsIntegral::BremsIntegral(const Bremsstrahlung& param)
     : CrossSectionIntegral(DynamicData::Brems, param)
@@ -40,7 +42,7 @@ double BremsIntegral::CalculatedEdx(double energy)
         sum += dedx_integral_.Integrate(
             limits.vMin,
             limits.vUp,
-            boost::bind(&Parametrization::FunctionToDEdxIntegral, parametrization_, energy, _1),
+            std::bind(&Parametrization::FunctionToDEdxIntegral, parametrization_, energy, _1),
             2);
     }
 

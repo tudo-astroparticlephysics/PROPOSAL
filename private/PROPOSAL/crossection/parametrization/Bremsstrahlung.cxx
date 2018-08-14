@@ -1,5 +1,5 @@
 
-#include <boost/bind.hpp>
+#include <functional>
 #include <boost/functional/hash.hpp>
 #include <cmath>
 
@@ -29,6 +29,7 @@
     const std::string Brems##param::name_ = "Brems" #param;
 
 using namespace PROPOSAL;
+using namespace std::placeholders;
 
 /******************************************************************************
  *                               Bremsstrahlung                                *
@@ -158,9 +159,9 @@ double Bremsstrahlung::lpm(double energy, double v)
             Parametrization::IntegralLimits limits = GetIntegralLimits(BIGENERGY);
 
             sum += integral_temp.Integrate(
-                limits.vMin, limits.vUp, boost::bind(&Bremsstrahlung::FunctionToDEdxIntegral, this, BIGENERGY, _1), 2);
+                limits.vMin, limits.vUp, std::bind(&Bremsstrahlung::FunctionToDEdxIntegral, this, BIGENERGY, _1), 2);
             sum += integral_temp.Integrate(
-                limits.vUp, limits.vMax, boost::bind(&Bremsstrahlung::FunctionToDEdxIntegral, this, BIGENERGY, _1), 4);
+                limits.vUp, limits.vMax, std::bind(&Bremsstrahlung::FunctionToDEdxIntegral, this, BIGENERGY, _1), 4);
         }
 
         eLpm_ = ALPHA * (particle_def_.mass);

@@ -30,7 +30,7 @@
 #pragma once
 
 #include <boost/bimap.hpp>
-#include <boost/function.hpp>
+#include <functional>
 
 #include "PROPOSAL/methods.h"
 
@@ -87,14 +87,14 @@ public:
     // Typedefs for readablitiy
     // --------------------------------------------------------------------- //
 
-    typedef boost::function<EpairProduction*(const ParticleDef&,
+    typedef std::function<EpairProduction*(const ParticleDef&,
                                           const Medium&,
                                           const EnergyCutSettings&,
                                           double multiplier,
                                           bool lpm)>
         RegisterFunction;
 
-    typedef boost::function<EpairProduction*(const ParticleDef&,
+    typedef std::function<EpairProduction*(const ParticleDef&,
                                           const Medium&,
                                           const EnergyCutSettings&,
                                           double multiplier,

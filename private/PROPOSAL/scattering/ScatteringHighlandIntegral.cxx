@@ -1,5 +1,4 @@
 
-#include <boost/bind.hpp>
 
 #include "PROPOSAL/Output.h"
 #include "PROPOSAL/math/RandomGenerator.h"

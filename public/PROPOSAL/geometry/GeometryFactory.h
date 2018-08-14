@@ -29,7 +29,7 @@
 
 #pragma once
 
-#include <boost/function.hpp>
+#include <functional>
 #include <map>
 
 #include "PROPOSAL/geometry/Geometry.h"
@@ -68,7 +68,7 @@ public:
         double depth;
     };
 
-    typedef boost::function<Geometry*(void)> RegisterFunction;
+    typedef std::function<Geometry*(void)> RegisterFunction;
     typedef std::map<std::string, RegisterFunction> GeometryMapString;
     typedef std::map<Enum, RegisterFunction> GeometryMapEnum;
 
