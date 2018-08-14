@@ -30,7 +30,7 @@
 #pragma once
 
 #include <boost/bimap.hpp>
-#include <boost/function.hpp>
+#include <functional>
 
 #include <map>
 
@@ -70,7 +70,7 @@ public:
         double density_correction;
     };
 
-    typedef boost::function<Medium*(double)> RegisterFunction;
+    typedef std::function<Medium*(double)> RegisterFunction;
     typedef std::map<std::string, RegisterFunction> MediumMapString;
     typedef std::map<Enum, RegisterFunction> MediumMapEnum;
     typedef boost::bimap<std::string, Enum> BimapStringEnum;

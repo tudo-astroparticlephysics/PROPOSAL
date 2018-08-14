@@ -11,7 +11,7 @@ using namespace PROPOSAL;
 int main()
 {
 
-    int statistics = 1000;
+    int statistics = 100000;
 
     int exp_min = 3;
     int exp_max = 13;
@@ -35,7 +35,7 @@ int main()
     Sector::Definition sec_def;
 
     sec_def.utility_def.epair_def.lpm_effect = true;
-    sec_def.utility_def.brems_def.lpm_effect = false;
+    sec_def.utility_def.brems_def.lpm_effect = true;
 
     sec_def.location = Sector::ParticleLocation::InsideDetector;
 
@@ -48,7 +48,7 @@ int main()
     sec_def.cut_settings.SetVcut(0.05);
 
     sec_def.SetGeometry(Sphere(Vector3D(), 1e18, 0));
-    sec_def.SetMedium(Ice());
+    sec_def.SetMedium(AntaresWater());
 
     sector_defintions.push_back(sec_def);
 
@@ -90,7 +90,7 @@ int main()
             particle.SetPosition(Vector3D(0, 0, 0));
             particle.SetDirection(Vector3D(0, 0, -1));
 
-            prop.Propagate();
+            prop.Propagate(10000);
 
             t2 = boost::chrono::high_resolution_clock::now();
 

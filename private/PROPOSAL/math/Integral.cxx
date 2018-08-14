@@ -35,7 +35,7 @@ using namespace PROPOSAL;
 
 double Integral::Integrate(double min,
                            double max,
-                           boost::function<double(double)> integrand,
+                           std::function<double(double)> integrand,
                            int method,
                            double powerOfSubstitution)
 {
@@ -75,7 +75,7 @@ double Integral::Integrate(double min,
 
 double Integral::IntegrateWithRandomRatio(double min,
                                           double max,
-                                          boost::function<double(double)> integrand,
+                                          std::function<double(double)> integrand,
                                           int method,
                                           double randomRatio,
                                           double powerOfSubstitution)
@@ -147,7 +147,7 @@ double Integral::GetUpperLimit()
 
 double Integral::IntegrateWithSubstitution(double min,
                                            double max,
-                                           boost::function<double(double)> integrand,
+                                           std::function<double(double)> integrand,
                                            double powerOfSubstitution,
                                            double randomRatio)
 {
@@ -250,7 +250,7 @@ double Integral::IntegrateWithSubstitution(double min,
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-double Integral::IntegrateWithLog(double min, double max, boost::function<double(double)> integrand, double randomRatio)
+double Integral::IntegrateWithLog(double min, double max, std::function<double(double)> integrand, double randomRatio)
 {
     double aux, result;
 
@@ -399,7 +399,7 @@ Integral::Integral(const Integral& integral)
     , q_rlist2_(integral.q_rlist2_)
     , q_iord_(integral.q_iord_)
 {
-    integrand_ = boost::ref(integral.integrand_);
+    integrand_ = std::ref(integral.integrand_);
 }
 
 //----------------------------------------------------------------------------//
@@ -574,7 +574,7 @@ void Integral::swap(Integral& integral)
     c_.swap(integral.c_);
     d_.swap(integral.d_);
 
-    integrand_ = boost::ref(integral.integrand_);
+    integrand_ = std::ref(integral.integrand_);
 
     swap(romberg4refine_, integral.romberg4refine_);
     swap(powerOfSubstitution_, integral.powerOfSubstitution_);
@@ -1062,7 +1062,7 @@ double Integral::RombergIntegrateOpened(double bigValue)
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-double Integral::InitIntegralOpenedAndClosed(double min, double max, boost::function<double(double)> integrand)
+double Integral::InitIntegralOpenedAndClosed(double min, double max, std::function<double(double)> integrand)
 {
     double aux;
 
@@ -1090,7 +1090,7 @@ double Integral::InitIntegralOpenedAndClosed(double min, double max, boost::func
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-double Integral::IntegrateClosed(double min, double max, boost::function<double(double)> integrand)
+double Integral::IntegrateClosed(double min, double max, std::function<double(double)> integrand)
 {
     double aux;
     aux = InitIntegralOpenedAndClosed(min, max, integrand);
@@ -1105,7 +1105,7 @@ double Integral::IntegrateClosed(double min, double max, boost::function<double(
 //----------------------------------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-double Integral::IntegrateOpened(double min, double max, boost::function<double(double)> integrand)
+double Integral::IntegrateOpened(double min, double max, std::function<double(double)> integrand)
 {
     double aux;
     aux = InitIntegralOpenedAndClosed(min, max, integrand);
@@ -1123,7 +1123,7 @@ double Integral::IntegrateOpened(double min, double max, boost::function<double(
 
 double Integral::InitIntegralWithSubstitution(double min,
                                               double max,
-                                              boost::function<double(double)> integrand,
+                                              std::function<double(double)> integrand,
                                               double powerOfSubstitution)
 {
     double aux;
@@ -1189,7 +1189,7 @@ double Integral::InitIntegralWithSubstitution(double min,
 
 double Integral::IntegrateWithSubstitution(double min,
                                            double max,
-                                           boost::function<double(double)> integrand,
+                                           std::function<double(double)> integrand,
                                            double powerOfSubstitution)
 {
     double aux;
@@ -1337,7 +1337,7 @@ void Integral::RefineUpperLimit(double result)
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-double Integral::InitIntegralWithLog(double min, double max, boost::function<double(double)> integrand)
+double Integral::InitIntegralWithLog(double min, double max, std::function<double(double)> integrand)
 {
     double aux;
 
@@ -1367,7 +1367,7 @@ double Integral::InitIntegralWithLog(double min, double max, boost::function<dou
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-double Integral::IntegrateWithLog(double min, double max, boost::function<double(double)> integrand)
+double Integral::IntegrateWithLog(double min, double max, std::function<double(double)> integrand)
 {
     double aux;
 
@@ -1386,7 +1386,7 @@ double Integral::IntegrateWithLog(double min, double max, boost::function<double
 
 double Integral::InitIntegralWithLogSubstitution(double min,
                                                  double max,
-                                                 boost::function<double(double)> integrand,
+                                                 std::function<double(double)> integrand,
                                                  double powerOfSubstitution)
 {
     double aux;
@@ -1455,7 +1455,7 @@ double Integral::InitIntegralWithLogSubstitution(double min,
 
 double Integral::IntegrateWithLogSubstitution(double min,
                                               double max,
-                                              boost::function<double(double)> integrand,
+                                              std::function<double(double)> integrand,
                                               double powerOfSubstitution)
 {
 
@@ -2196,7 +2196,7 @@ Integral::InterpolationResults Integral::q_epsilon_extrapolation(int q_limit_eps
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-void Integral::SetIntegrand(boost::function<double(double)> integrand)
+void Integral::SetIntegrand(std::function<double(double)> integrand)
 {
     integrand_ = integrand;
 }

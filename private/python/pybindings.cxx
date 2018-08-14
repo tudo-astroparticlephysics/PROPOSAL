@@ -838,14 +838,15 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
     class_<TwoBodyPhaseSpace, boost::shared_ptr<TwoBodyPhaseSpace>, bases<DecayChannel> >(
         "TwoBodyPhaseSpace", init<ParticleDef, ParticleDef>());
 
-    boost::python::def_function<ManyBodyPhaseSpace::MatrixElementFunction>("matrix_element_function");
+    // boost::python::def_function<ManyBodyPhaseSpace::MatrixElementFunction>("matrix_element_function");
 
     class_<ManyBodyPhaseSpace, boost::shared_ptr<ManyBodyPhaseSpace>, bases<DecayChannel> >(
         "ManyBodyPhaseSpace", init<std::vector<const ParticleDef*> >())
         .def("evaluate", &ManyBodyPhaseSpace::Evaluate, "Return the matrix element (default 1)")
         .staticmethod("evaluate")
-        .def("set_uniform_sampling", &DecayChannel::SetUniformSampling, "Decide to use uniform phase space sampling")
-        .def("set_matrix_element", &ManyBodyPhaseSpace::SetMatrixElement, "Set the matrix element");
+        .def("set_uniform_sampling", &DecayChannel::SetUniformSampling, "Decide to use uniform phase space sampling");
+        // .def("set_matrix_element", &ManyBodyPhaseSpace::SetMatrixElement, "Set the matrix element");
+        // .def("set_matrix_element", &ManyBodyPhaseSpace::SetMatrixElement, "Set the matrix element")
 
     class_<StableChannel, boost::shared_ptr<StableChannel>, bases<DecayChannel> >("StableChannel", init<>());
 
@@ -1257,8 +1258,8 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
     // RandomGenerator
     // --------------------------------------------------------------------- //
 
-	typedef boost::function<double()> callback_t;
-    boost::python::def_function<callback_t>("random_function");
+	// typedef boost::function<double()> callback_t;
+    // boost::python::def_function<callback_t>("random_function");
 
     class_<RandomGenerator, boost::shared_ptr<RandomGenerator>, boost::noncopyable>("RandomGenerator", no_init)
 
@@ -1266,7 +1267,7 @@ BOOST_PYTHON_MODULE(pyPROPOSAL)
 
         .def("random_double", &RandomGenerator::RandomDouble)
         .def("set_seed", &RandomGenerator::SetSeed, arg("seed") = 0)
-        .def("set_random_function", &RandomGenerator::SetRandomNumberGenerator, arg("function"))
+        // .def("set_random_function", &RandomGenerator::SetRandomNumberGenerator, arg("function"))
         .def("get", make_function(&RandomGenerator::Get, return_value_policy<reference_existing_object>()))
         .staticmethod("get");
 

@@ -29,7 +29,7 @@
 
 #pragma once
 
-#include <boost/function.hpp>
+#include <functional>
 #include <iostream>
 #include <vector>
 
@@ -115,7 +115,7 @@ public:
 
     double Integrate(double min,
                      double max,
-                     boost::function<double(double)> integrand,
+                     std::function<double(double)> integrand,
                      int method,
                      double powerOfSubstitution = 0);
 
@@ -140,7 +140,7 @@ public:
 
     double IntegrateWithRandomRatio(double min,
                                     double max,
-                                    boost::function<double(double)> integrand,
+                                    std::function<double(double)> integrand,
                                     int method,
                                     double randomRatio,
                                     double powerOfSubstitution = 0);
@@ -151,7 +151,7 @@ public:
     // Getter
     // --------------------------------------------------------------------- //
 
-    boost::function<double(double)> GetIntegrand() const { return integrand_; }
+    std::function<double(double)> GetIntegrand() const { return integrand_; }
     double GetMax() const { return max_; }
     double GetMin() const { return min_; }
     double GetPowerOfSubstitution() const { return powerOfSubstitution_; }
@@ -172,13 +172,13 @@ public:
     // Setter
     // --------------------------------------------------------------------- //
 
-    void Set_Function(boost::function<double(double)> integrand)
+    void Set_Function(std::function<double(double)> integrand)
     {
         std::cerr << "Integral::set_funtion2use is depricated and might even be buggy. \n better make use of "
                      "Integral::integrateOpened(...) to set the function to use, and its range...\n";
         this->integrand_ = integrand;
     }
-    void SetIntegrand(boost::function<double(double)> integrand);
+    void SetIntegrand(std::function<double(double)> integrand);
     void SetMax(double max);
     void SetMaxStepsUpperLimit(int maxSteps);
     void SetMaxStepsRomberg(int maxSteps);
@@ -231,7 +231,7 @@ private:
     std::vector<double> c_;
     std::vector<double> d_;
 
-    boost::function<double(double)> integrand_;
+    std::function<double(double)> integrand_;
 
     int romberg4refine_; // set to 2 in constructor
     double powerOfSubstitution_;
@@ -443,25 +443,25 @@ private:
 
     //----------------------------------------------------------------------------//
 
-    double InitIntegralOpenedAndClosed(double min, double max, boost::function<double(double)> integrand);
+    double InitIntegralOpenedAndClosed(double min, double max, std::function<double(double)> integrand);
 
     //----------------------------------------------------------------------------//
 
     double InitIntegralWithSubstitution(double min,
                                         double max,
-                                        boost::function<double(double)> integrand,
+                                        std::function<double(double)> integrand,
                                         double powerOfSubstitution);
 
     //----------------------------------------------------------------------------//
 
     double InitIntegralWithLogSubstitution(double min,
                                            double max,
-                                           boost::function<double(double)> integrand,
+                                           std::function<double(double)> integrand,
                                            double powerOfSubstitution);
 
     //----------------------------------------------------------------------------//
 
-    double InitIntegralWithLog(double min, double max, boost::function<double(double)> integrand);
+    double InitIntegralWithLog(double min, double max, std::function<double(double)> integrand);
 
     //----------------------------------------------------------------------------//
 
@@ -476,7 +476,7 @@ private:
      * \param   function2use    integrand
      * \return  Integration result
      */
-    double IntegrateClosed(double min, double max, boost::function<double(double)> integrand);
+    double IntegrateClosed(double min, double max, std::function<double(double)> integrand);
 
     //----------------------------------------------------------------------------//
 
@@ -489,7 +489,7 @@ private:
      * \param   function2use    integrand
      * \return  Integration result
      */
-    double IntegrateOpened(double min, double max, boost::function<double(double)> integrand);
+    double IntegrateOpened(double min, double max, std::function<double(double)> integrand);
 
     //----------------------------------------------------------------------------//
 
@@ -505,7 +505,7 @@ private:
 
     double IntegrateWithSubstitution(double min,
                                      double max,
-                                     boost::function<double(double)> integrand,
+                                     std::function<double(double)> integrand,
                                      double powerOfSubstitution);
 
     //----------------------------------------------------------------------------//
@@ -519,7 +519,7 @@ private:
      * \return  Integration result
      */
 
-    double IntegrateWithLog(double min, double max, boost::function<double(double)> integrand);
+    double IntegrateWithLog(double min, double max, std::function<double(double)> integrand);
 
     //----------------------------------------------------------------------------//
 
@@ -535,7 +535,7 @@ private:
 
     double IntegrateWithLogSubstitution(double min,
                                         double max,
-                                        boost::function<double(double)> integrand,
+                                        std::function<double(double)> integrand,
                                         double powerOfSubstitution);
 
     //----------------------------------------------------------------------------//
@@ -550,7 +550,7 @@ private:
      * \return  Integration result
      */
 
-    double IntegrateWithLog(double min, double max, boost::function<double(double)> integrand, double randomRatio);
+    double IntegrateWithLog(double min, double max, std::function<double(double)> integrand, double randomRatio);
 
     //----------------------------------------------------------------------------//
 
@@ -568,7 +568,7 @@ private:
 
     double IntegrateWithSubstitution(double min,
                                      double max,
-                                     boost::function<double(double)> integrand,
+                                     std::function<double(double)> integrand,
                                      double powerOfSubstitution,
                                      double randomRatio);
 };

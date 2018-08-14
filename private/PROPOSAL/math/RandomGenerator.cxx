@@ -70,7 +70,7 @@ void RandomGenerator::Deserialize(std::istream& is)
 }
 
 // ------------------------------------------------------------------------- //
-void RandomGenerator::SetRandomNumberGenerator(boost::function<double()>& f)
+void RandomGenerator::SetRandomNumberGenerator(std::function<double()>& f)
 {
     random_function = f;
 }

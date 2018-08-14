@@ -29,7 +29,7 @@
 
 #pragma once
 
-#include <boost/bind.hpp>
+#include <functional>
 
 #include "PROPOSAL/crossection/parametrization/Photonuclear.h"
 #include "PROPOSAL/math/Integral.h"
@@ -68,6 +68,8 @@
     protected:                                                                                                         \
         static const std::string name_;                                                                                \
     };
+
+// using namespace std::placeholders;
 
 namespace PROPOSAL {
 
@@ -195,7 +197,7 @@ PhotoQ2Interpolant<Param>::PhotoQ2Interpolant(const ParticleDef& particle_def,
             .SetRationalY(false)
             .SetRelativeY(false)
             .SetLogSubst(false)
-            .SetFunction2D(boost::bind(&PhotoQ2Interpolant::FunctionToBuildPhotoInterpolant, this, _1, _2, i));
+            .SetFunction2D(std::bind(&PhotoQ2Interpolant::FunctionToBuildPhotoInterpolant, this, std::placeholders::_1, std::placeholders::_2, i));
 
         builder_container2d[i].first  = &builder2d[i];
         builder_container2d[i].second = &interpolant_[i];
