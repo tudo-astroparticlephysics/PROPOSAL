@@ -75,9 +75,9 @@ HardComponent::HardComponent(const HardComponent& hard_component)
 
 HardComponent::~HardComponent()
 {
-    for (std::vector<Interpolant*>::iterator it = interpolant_.begin(); it != interpolant_.end(); ++it)
+    for (auto interpolant: interpolant_)
     {
-        delete *it;
+        delete interpolant;
     }
 }
 

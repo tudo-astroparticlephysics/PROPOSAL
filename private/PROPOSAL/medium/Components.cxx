@@ -96,57 +96,9 @@ Component::Component(std::string name, double nucCharge, double atomicNum, doubl
     }
 }
 
-Component::Component(const Component& component)
-    : name_(component.name_)
-    , nucCharge_(component.nucCharge_)
-    , atomicNum_(component.atomicNum_)
-    , atomInMolecule_(component.atomInMolecule_)
-    , logConstant_(component.logConstant_)
-    , bPrime_(component.bPrime_)
-    , M_(component.M_)
-    , mN_(component.mN_)
-    , r0_(component.r0_)
-{
-}
-
 // ------------------------------------------------------------------------- //
 // Operators & swap
 // ------------------------------------------------------------------------- //
-
-// ------------------------------------------------------------------------- //
-void Component::swap(Component& component)
-{
-    using std::swap;
-
-    swap(name_, component.name_);
-    swap(nucCharge_, component.nucCharge_);
-    swap(atomicNum_, component.atomicNum_);
-    swap(atomInMolecule_, component.atomInMolecule_);
-    swap(logConstant_, component.logConstant_);
-    swap(bPrime_, component.bPrime_);
-    swap(M_, component.M_);
-    swap(mN_, component.mN_);
-    swap(r0_, component.r0_);
-}
-
-// ------------------------------------------------------------------------- //
-Component& Component::operator=(const Component& component)
-{
-    if (this != &component)
-    {
-        name_           = component.name_;
-        nucCharge_      = component.nucCharge_;
-        atomicNum_      = component.atomicNum_;
-        atomInMolecule_ = component.atomInMolecule_;
-        logConstant_    = component.logConstant_;
-        bPrime_         = component.bPrime_;
-        M_              = component.M_;
-        mN_             = component.mN_;
-        r0_             = component.r0_;
-    }
-
-    return *this;
-}
 
 // ------------------------------------------------------------------------- //
 bool Component::operator==(const Component& component) const
