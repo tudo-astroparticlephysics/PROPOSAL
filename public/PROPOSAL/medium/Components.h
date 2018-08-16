@@ -50,16 +50,12 @@ class Component
 {
 public:
     Component(std::string name, double charge, double atomicNum, double atomInMolecule);
-    Component(const Component&);
-    virtual ~Component(){};
+    Component(const Component&) = default;
+    virtual ~Component() = default;
+    Component& operator=(const Component&) = default;
 
-    void swap(Component&);
-    virtual Component* clone() const
-    {
-        return new Component(*this);
-    }; // Prototyping/Virtual constructor idiom (used for deep copies)
+    virtual Component* clone() const { return new Component(*this); };
 
-    Component& operator=(const Component&);
     bool operator==(const Component&) const;
     bool operator!=(const Component&) const;
     friend std::ostream& operator<<(std::ostream&, Component const&);

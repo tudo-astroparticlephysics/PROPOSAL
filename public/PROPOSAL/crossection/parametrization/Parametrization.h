@@ -95,10 +95,9 @@ public:
     void SetCurrentComponent(int index) { component_index_ = index; }
 
 protected:
-    virtual bool compare(const Parametrization&) const;
-
     typedef std::vector<Components::Component*> ComponentVec;
 
+    virtual bool compare(const Parametrization&) const;
     virtual void print(std::ostream&) const {};
 
     // const std::string name_;

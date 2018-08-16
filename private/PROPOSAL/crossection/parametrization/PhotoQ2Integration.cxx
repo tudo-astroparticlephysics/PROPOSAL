@@ -6,12 +6,7 @@
 
 #include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/medium/Medium.h"
-// #include "PROPOSAL/math/Integral.h"
 #include "PROPOSAL/math/Interpolant.h"
-// #include "PROPOSAL/math/InterpolantBuilder.h"
-
-// #include "PROPOSAL/Constants.h"
-// #include "PROPOSAL/methods.h"
 
 using namespace PROPOSAL;
 using namespace std::placeholders;
