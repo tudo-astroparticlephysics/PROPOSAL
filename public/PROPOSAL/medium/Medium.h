@@ -31,6 +31,7 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 
 #include "PROPOSAL/medium/Components.h"
 
@@ -55,7 +56,7 @@ namespace PROPOSAL {
 class Medium
 {
 public:
-    class Builder;
+    // class Builder;
 
 public:
     Medium() {}
@@ -69,12 +70,9 @@ public:
            double X1,
            double d0,
            double massDensity,
-           const std::vector<Components::Component*>&);
+           std::vector<std::shared_ptr<Components::Component>>);
     Medium(const Medium&);
-    virtual Medium* clone() const
-    {
-        return new Medium(*this);
-    }; // Prototyping/Virtual constructor idiom (used for deep copies)
+    virtual Medium* clone() const { return new Medium(*this); };
 
     ///@brief Crush this Medium.
     virtual ~Medium();
@@ -128,7 +126,7 @@ public:
     void SetMassDensity(double massDensity);
     void SetMolDensity(double molDensity);
     void SetAverageNucleonWeight(std::vector<double> M);
-    void SetComponents(std::vector<Components::Component*>);
+    void SetComponents(std::vector<std::shared_ptr<Components::Component>> components);
     void SetMM(double MM);
     void SetSumNucleons(double sumNucleons);
 
@@ -162,109 +160,6 @@ protected:
 
     double MM_;          ///< average all-component nucleon weight
     double sumNucleons_; ///< sum of nucleons of all nuclei
-};
-
-/******************************************************************************
- *                                  Builder                                    *
- ******************************************************************************/
-
-class Medium::Builder
-{
-public:
-    Builder();
-
-    // --------------------------------------------------------------------- //
-    // Setter
-    // --------------------------------------------------------------------- //
-
-    Builder& SetName(const std::string& var)
-    {
-        this->name_ = var;
-        return *this;
-    }
-    Builder& SetRho(double var)
-    {
-        rho_ = var;
-        return *this;
-    }
-    Builder& SetI(double var)
-    {
-        I_ = var;
-        return *this;
-    }
-    Builder& SetC(double var)
-    {
-        C_ = var;
-        return *this;
-    }
-    Builder& SetA(double var)
-    {
-        a_ = var;
-        return *this;
-    }
-    Builder& SetM(double var)
-    {
-        m_ = var;
-        return *this;
-    }
-    Builder& SetX0(double var)
-    {
-        X0_ = var;
-        return *this;
-    }
-    Builder& SetX1(double var)
-    {
-        X1_ = var;
-        return *this;
-    }
-    Builder& SetD0(double var)
-    {
-        d0_ = var;
-        return *this;
-    }
-    Builder& SetMassDensity(double var)
-    {
-        massDensity_ = var;
-        return *this;
-    }
-    Builder& addComponent(const Components::Component& var)
-    {
-        components_.push_back(var.clone());
-        return *this;
-    }
-
-    Builder& SetMedium(const Medium& var)
-    {
-        name_        = var.GetName();
-        rho_         = var.GetDensityCorrection();
-        I_           = var.GetI();
-        C_           = var.GetC();
-        a_           = var.GetA();
-        m_           = var.GetM();
-        X0_          = var.GetX0();
-        X1_          = var.GetX1();
-        d0_          = var.GetD0();
-        massDensity_ = var.GetMassDensity();
-
-        components_ = var.GetComponents();
-        return *this;
-    }
-
-    Medium build() { return Medium(name_, rho_, I_, C_, a_, m_, X0_, X1_, d0_, massDensity_, components_); }
-
-private:
-    std::string name_;
-    double rho_;
-    double I_;
-    double C_;
-    double a_;
-    double m_;
-    double X0_;
-    double X1_;
-    double d0_;
-    double massDensity_;
-
-    std::vector<Components::Component*> components_;
 };
 
 /******************************************************************************

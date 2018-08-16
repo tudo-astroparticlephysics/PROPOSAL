@@ -57,11 +57,6 @@ namespace HardComponentTables {
 
 typedef std::vector<std::vector<double> > VecType;
 
-extern const double muon[8][7];
-extern const double tau[8][7];
-
-VecType getHardComponentVector(const double table[8][7]);
-
 // ----------------------------------------------------------------------------
 /// @brief Table used for photonuclear interaction
 ///

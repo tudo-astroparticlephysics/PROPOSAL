@@ -122,16 +122,8 @@ double EpairProduction::lpm(double energy, double v, double r2, double b, double
         init_lpm_effect_ = false;
         double sum       = 0;
 
-        // for (std::vector<Components::Component*>::iterator iter = medium_->GetComponents().begin() ; iter !=
-        // medium_->GetComponents().end() ; ++iter)
-        // {
-        //     sum += (*iter)->GetNucCharge() * (*iter)->GetNucCharge() *
-        //            log(3.25 * (*iter)->GetLogConstant() * pow((*iter)->GetNucCharge(), -1. / 3));
-        // }
-        for (int i = 0; i < medium_->GetNumComponents(); i++)
+        for (auto component: medium_->GetComponents())
         {
-            Components::Component* component = medium_->GetComponents().at(i);
-
             sum += component->GetNucCharge() * component->GetNucCharge() *
                    log(3.25 * component->GetLogConstant() * pow(component->GetNucCharge(), -1. / 3));
         }
