@@ -73,9 +73,9 @@ public:
     Parametrization& GetParametrization() const { return *parametrization_; }
 
 protected:
-    virtual bool compare(const CrossSection&) const = 0;
-
     typedef std::vector<Components::Component*> ComponentVec;
+
+    virtual bool compare(const CrossSection&) const = 0;
 
     // ----------------------------------------------------------------- //
     // Protected methods

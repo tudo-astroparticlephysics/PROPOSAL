@@ -39,7 +39,7 @@ using namespace PROPOSAL;
  *                            HardComponentTables                              *
  ******************************************************************************/
 
-const double HardComponentTables::muon[8][7] = {
+const HardComponentTables::VecType HardComponentTables::MuonTable = {
     { 7.174409e-4, 1.7132e-3, 4.082304e-3, 8.628455e-3, 0.01244159, 0.02204591, 0.03228755 },
     { -0.2436045, -0.5756682, -1.553973, -3.251305, -5.976818, -9.495636, -13.92918 },
     { -0.2942209, -0.68615, -2.004218, -3.999623, -6.855045, -10.05705, -14.37232 },
@@ -50,7 +50,7 @@ const double HardComponentTables::muon[8][7] = {
     { -3.343145e-5, -7.584046e-5, -2.943396e-4, -5.3155e-4, -9.265136e-4, -1.473118e-3, -2.419946e-3 }
 };
 
-const double HardComponentTables::tau[8][7] = {
+const HardComponentTables::VecType HardComponentTables::TauTable = {
     { -1.269205e-4, -2.843877e-4, -5.761546e-4, -1.195445e-3, -1.317386e-3, -9.689228e-15, -6.4595e-15 },
     { -0.01563032, -0.03589573, -0.07768545, -0.157375, -0.2720009, -0.4186136, -0.8045046 },
     { 0.04693954, 0.1162945, 0.3064255, 0.7041273, 1.440518, 2.533355, 3.217832 },
@@ -60,23 +60,6 @@ const double HardComponentTables::tau[8][7] = {
     { 4.822364e-4, 1.193018e-3, 3.302773e-3, 6.843364e-3, 0.011191, 0.015614, 0.01173827 },
     { 1.9837e-5, 4.940182e-5, 1.409573e-4, 2.877909e-4, 4.544877e-4, 6.280818e-4, 4.281932e-4 }
 };
-
-HardComponentTables::VecType HardComponentTables::getHardComponentVector(const double table[8][7])
-{
-    HardComponentTables::VecType var;
-
-    for (int i = 0; i < 8; ++i)
-    {
-        var.push_back(std::vector<double>(table[i], table[i] + sizeof(table[i]) / sizeof(double)));
-    }
-
-    return var;
-}
-
-const HardComponentTables::VecType HardComponentTables::MuonTable =
-    HardComponentTables::getHardComponentVector(HardComponentTables::muon);
-const HardComponentTables::VecType HardComponentTables::TauTable =
-    HardComponentTables::getHardComponentVector(HardComponentTables::tau);
 const HardComponentTables::VecType HardComponentTables::EmptyTable;
 
 /******************************************************************************
