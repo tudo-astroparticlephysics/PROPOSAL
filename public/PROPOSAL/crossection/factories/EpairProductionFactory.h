@@ -49,7 +49,7 @@ public:
     enum Enum
     {
         KelnerKokoulinPetrukhin = 0,
-        SandrockSoedingreksoRhode,
+        SandrockSoedingreksoRhode
     };
 
     struct Definition
