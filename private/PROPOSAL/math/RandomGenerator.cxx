@@ -13,11 +13,6 @@ using namespace PROPOSAL;
 std::mt19937 RandomGenerator::rng_;
 std::uniform_real_distribution<double> RandomGenerator::uniform_distribution(0.0, 1.0);
 
-// boost::random::mt19937 RandomGenerator::rng_;
-// boost::variate_generator<boost::mt19937&, boost::uniform_real<> > RandomGenerator::variate_real(
-//     RandomGenerator::rng_,
-//     boost::uniform_real<>(0.0, 1.0));
-
 // ------------------------------------------------------------------------- //
 // Constructor & destructor
 // ------------------------------------------------------------------------- //

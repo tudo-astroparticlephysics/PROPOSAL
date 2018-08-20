@@ -194,68 +194,6 @@ Sector::Sector(Particle& particle, const Sector& sector)
     }
 }
 
-// Sector::Sector(Particle& particle,
-//                const Geometry& geometry,
-//                const Utility& utility,
-//                const Scattering& scattering,
-//                const Definition& def)
-//     : sector_def_(def)
-//     , particle_(particle)
-//     , geometry_(geometry.clone())
-//     // , randomizer_(NULL)
-//     , utility_(utility)
-//     , displacement_calculator_(NULL)
-//     , interaction_calculator_(NULL)
-//     , decay_calculator_(NULL)
-//     , exact_time_calculator_(NULL)
-//     , cont_rand_(NULL)
-//     , scattering_(scattering.clone())
-//     // , scattering_(ScatteringFactory::Get().CreateScattering(sector_def_.scattering_model, particle_, utility_))
-// {
-//     if (particle != scattering.GetParticle())
-//     {
-//         log_fatal("The given particle doesn't match the particle of scattering!");
-//     }
-//
-//     // Check equality of particle definitions
-//     ParticleDef a = particle_.GetParticleDef();
-//     ParticleDef b = scattering.GetParticle().GetParticleDef();
-//     ParticleDef c = utility_.GetParticleDef();
-//
-//     if ((a != b) || (b != c))
-//     {
-//         log_fatal("The given particle definitions doesn't match!");
-//     }
-//
-//     if (sector_def_.do_continuous_randomization)
-//     {
-//         cont_rand_= new ContinuousRandomizer(utility_);
-//     }
-//
-//     if (sector_def_.do_interpolation)
-//     {
-//         displacement_calculator_ = new UtilityInterpolantDisplacement(utility_);
-//         interaction_calculator_ = new UtilityInterpolantInteraction(utility_);
-//         decay_calculator_ = new UtilityInterpolantDecay(utility_);
-//
-//         if (sector_def_.do_exact_time_calculation)
-//         {
-//             exact_time_calculator_ = new UtilityInterpolantTime(utility_);
-//         }
-//     }
-//     else
-//     {
-//         displacement_calculator_ = new UtilityIntegralDisplacement(utility_);
-//         interaction_calculator_ = new UtilityIntegralInteraction(utility_);
-//         decay_calculator_ = new UtilityIntegralDecay(utility_);
-//
-//         if (sector_def_.do_exact_time_calculation)
-//         {
-//             exact_time_calculator_ = new UtilityIntegralTime(utility_);
-//         }
-//     }
-// }
-
 Sector::Sector(const Sector& collection)
     : sector_def_(collection.sector_def_)
     , particle_(collection.particle_)
@@ -612,32 +550,11 @@ pair<double, DynamicData::Type> Sector::MakeStochasticLoss()
             rnd2 = rnd2 * pow(rnd2, abs(sector_def_.stochastic_loss_weighting));
         }
     }
-    // if (particle_->GetEnergy() < 650) printf("energy: %f\n", particle_->GetEnergy());
 
     for (unsigned int i = 0; i < cross_sections.size(); i++)
     {
         rates[i] = cross_sections[i]->CalculatedNdx(particle_.GetEnergy(), rnd2);
-
-        // switch (cross_sections[i]->GetTypeId())
-        // {
-        //     case DynamicData::DeltaE:
-        //         std::cout << "ioniz dndx:" << rates[i] << std::endl;
-        //         break;
-        //     case DynamicData::Brems:
-        //         std::cout << "brems dndx:" << rates[i] << std::endl;
-        //         break;
-        //     case DynamicData::Epair:
-        //         std::cout << "epair dndx:" << rates[i] << std::endl;
-        //         break;
-        //     case DynamicData::NuclInt:
-        //         std::cout << "photo dndx:" << rates[i] << std::endl;
-        //         break;
-        //     default:
-        //         break;
-        // }
         total_rate += rates[i];
-        // if (rates.at(i) == 0) printf("%i = 0, energy: %f\n", i, particle_->GetEnergy());
-        // log_debug("Rate for %s = %f", crosssections_.at(i)->GetName().c_str(), rates.at(i));
     }
 
     total_rate_weighted = total_rate * rnd1;
@@ -652,32 +569,6 @@ pair<double, DynamicData::Type> Sector::MakeStochasticLoss()
         {
             energy_loss.first  = cross_sections[i]->CalculateStochasticLoss(particle_.GetEnergy(), rnd2, rnd3);
             energy_loss.second = cross_sections[i]->GetTypeId();
-
-            // switch (cross_sections[i]->GetTypeId())
-            // {
-            //     case DynamicData::DeltaE:
-            //         std::cout << "Chosen interaction: DeltaE" << std::endl;
-            //         std::cout << "rate_sum: " << rates_sum << std::endl;
-            //         std::cout << "particle energy: " << particle_.GetEnergy() << std::endl;
-            //         break;
-            //     case DynamicData::Brems:
-            //         std::cout << "Chosen interaction: Brems" << std::endl;
-            //         std::cout << "rate_sum: " << rates_sum << std::endl;
-            //         std::cout << "particle energy: " << particle_.GetEnergy() << std::endl;
-            //         break;
-            //     case DynamicData::Epair:
-            //         std::cout << "Chosen interaction: Epair" << std::endl;
-            //         std::cout << "rate_sum: " << rates_sum << std::endl;
-            //         std::cout << "particle energy: " << particle_.GetEnergy() << std::endl;
-            //         break;
-            //     case DynamicData::NuclInt:
-            //         std::cout << "Chosen interaction: NuclInt" << std::endl;
-            //         std::cout << "rate_sum: " << rates_sum << std::endl;
-            //         std::cout << "particle energy: " << particle_.GetEnergy() << std::endl;
-            //         break;
-            //     default:
-            //         break;
-            // }
             break;
         }
     }
