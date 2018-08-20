@@ -43,7 +43,8 @@ class MediumFactory
 public:
     enum Enum
     {
-        Water = 0,
+        None = 0,
+        Water,
         Ice,
         Salt,
         StandardRock,

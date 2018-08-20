@@ -87,6 +87,7 @@ double DecayChannel::Momentum(double m1, double m2, double m3)
     } else
     {
         log_fatal("Kaellen function is negative. Cannot caluclate momentum");
+        return 0.0;
     }
 }
 

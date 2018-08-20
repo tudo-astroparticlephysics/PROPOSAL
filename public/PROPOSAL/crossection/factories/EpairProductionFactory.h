@@ -48,7 +48,8 @@ class EpairProductionFactory
 public:
     enum Enum
     {
-        KelnerKokoulinPetrukhin = 0,
+        None = 0,
+        KelnerKokoulinPetrukhin,
         SandrockSoedingreksoRhode,
     };
 
