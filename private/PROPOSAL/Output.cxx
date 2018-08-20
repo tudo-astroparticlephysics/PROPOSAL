@@ -13,6 +13,7 @@ void Output::SetLoggingConfigurationFile(std::string file)
 #if LOG4CPLUS_SUPPORT
     log4cplus::PropertyConfigurator::doConfigure(LOG4CPLUS_TEXT(file));
 #else
+    (void) file;
     cout << "Log4cplus not found! No log messages will be shown!" << endl;
 #endif
 }
@@ -139,6 +140,7 @@ void Output::EnableROOTOutput(std::string rootfile_name)
         "propagated_distance", &prop_primary_propagated_distance_, "propagated_distance/D");
     propagated_primary_tree_->Branch("energy_lost", &prop_primary_elost_, "energy_lost/D");
 #else
+    (void) rootfile_name;
     log_error("NO ROOT SUPPORT! NOTHING WILL BE STORED IN TREES!");
 #endif
 }
