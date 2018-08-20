@@ -29,6 +29,7 @@
 
 #pragma once
 
+// #include <unordered_map>
 #include <boost/unordered_map.hpp>
 
 #include "PROPOSAL/particle/Particle.h"
@@ -41,6 +42,7 @@ class PropagatorService
 {
 public:
     typedef boost::unordered_map<ParticleDef, Propagator*> PropagatorMap;
+    // typedef std::unordered_map<ParticleDef, Propagator*> PropagatorMap;
 
 public:
     PropagatorService();

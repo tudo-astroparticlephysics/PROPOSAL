@@ -1,5 +1,4 @@
 
-#include <boost/assign.hpp>
 #include <boost/functional/hash.hpp>
 #include <cmath>
 
@@ -39,7 +38,7 @@ bool RealPhoton::compare(const RealPhoton& photon) const
  *                              HardComponent                                  *
  ******************************************************************************/
 
-std::vector<double> HardComponent::x = boost::assign::list_of(3)(4)(5)(6)(7)(8)(9);
+std::vector<double> HardComponent::x = {3, 4, 5, 6, 7, 8, 9};
 
 const std::string HardComponent::name_ = "HardComponent";
 const std::string SoftComponent::name_ = "SoftComponent";

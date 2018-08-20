@@ -1,5 +1,4 @@
 
-// #include <boost/bind.hpp>
 #include <functional>
 
 #include "PROPOSAL/crossection/BremsIntegral.h"

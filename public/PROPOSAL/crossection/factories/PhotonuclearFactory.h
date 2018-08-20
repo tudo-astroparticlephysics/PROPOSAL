@@ -56,7 +56,8 @@ public:
 
     enum Enum
     {
-        Zeus = 0,
+        None = 0,
+        Zeus,
         BezrukovBugaev,
         Rhode,
         Kokoulin,
@@ -68,6 +69,7 @@ public:
 
     enum Shadow
     {
+        ShadowNone,
         ShadowDuttaRenoSarcevicSeckel,
         ShadowButkevichMikhailov
     };
