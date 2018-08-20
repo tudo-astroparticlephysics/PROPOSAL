@@ -49,7 +49,8 @@ class ScatteringFactory
 public:
     enum Enum
     {
-        HighlandIntegral = 0,
+        None = 0,
+        HighlandIntegral,
         Moliere,
         Highland,
         NoScattering

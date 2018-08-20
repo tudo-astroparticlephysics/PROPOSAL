@@ -1,5 +1,6 @@
 
-#include <boost/algorithm/string.hpp> // case insensitive string compare for configuration file
+// #include <boost/algorithm/string.hpp> // case insensitive string compare for configuration file
+#include <algorithm>
 
 #include "PROPOSAL/crossection/EpairIntegral.h"
 #include "PROPOSAL/crossection/EpairInterpolant.h"
@@ -80,7 +81,8 @@ void EpairProductionFactory::Register(const std::string& name,
 // ------------------------------------------------------------------------- //
 EpairProductionFactory::Enum EpairProductionFactory::GetEnumFromString(const std::string& name)
 {
-    std::string name_lower = boost::algorithm::to_lower_copy(name);
+    std::string name_lower = name;
+    std::transform(name.begin(), name.end(), name_lower.begin(), ::tolower);
 
     BimapStringEnum::left_const_iterator it = string_enum_.left.find(name_lower);
     if (it != string_enum_.left.end())
@@ -89,7 +91,7 @@ EpairProductionFactory::Enum EpairProductionFactory::GetEnumFromString(const std
     } else
     {
         log_fatal("EpairProduction %s not registerd!", name.c_str());
-        return KelnerKokoulinPetrukhin; // Just to prevent warinngs
+        return None; // Just to prevent warinngs
     }
 }
 

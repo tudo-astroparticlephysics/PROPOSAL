@@ -57,14 +57,14 @@ Propagator::Propagator(const std::vector<Sector*>& sectors, const Geometry& geom
     // Check if all ParticleDefs are the same
     // --------------------------------------------------------------------- //
 
-    for (std::vector<Sector*>::const_iterator iter = sectors.begin(); iter != sectors.end(); ++iter)
+    for (auto sector: sectors)
     {
-        if ((*iter)->GetParticle().GetParticleDef() != particle_.GetParticleDef())
+        if (sector->GetParticle().GetParticleDef() != particle_.GetParticleDef())
         {
             log_fatal("The particle definitions of the sectors must be identical for proper propagation!");
         } else
         {
-            sectors_.push_back(new Sector(**iter));
+            sectors_.push_back(new Sector(*sector));
         }
     }
 
@@ -81,9 +81,9 @@ Propagator::Propagator(const ParticleDef& particle_def,
     : particle_(particle_def)
     , detector_(geometry.clone())
 {
-    for (std::vector<Sector::Definition>::const_iterator iter = sector_defs.begin(); iter != sector_defs.end(); ++iter)
+    for (auto def: sector_defs)
     {
-        sectors_.push_back(new Sector(particle_, *iter));
+        sectors_.push_back(new Sector(particle_, def));
     }
 
     try
@@ -103,9 +103,9 @@ Propagator::Propagator(const ParticleDef& particle_def,
     : particle_(particle_def)
     , detector_(geometry.clone())
 {
-    for (std::vector<Sector::Definition>::const_iterator iter = sector_defs.begin(); iter != sector_defs.end(); ++iter)
+    for (auto def: sector_defs)
     {
-        sectors_.push_back(new Sector(particle_, *iter, interpolation_def));
+        sectors_.push_back(new Sector(particle_, def, interpolation_def));
     }
 
     try
@@ -411,9 +411,9 @@ Propagator::Propagator(const ParticleDef& particle_def, const std::string& confi
 
 Propagator::~Propagator()
 {
-    for (std::vector<Sector*>::const_iterator iter = sectors_.begin(); iter != sectors_.end(); ++iter)
+    for (auto sector: sectors_)
     {
-        delete *iter;
+        delete sector;
     }
 
     sectors_.clear();

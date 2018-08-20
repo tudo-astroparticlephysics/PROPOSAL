@@ -48,15 +48,13 @@
 
 #if I3_PROJECTS
 #include <icetray/I3Logging.h>
-#else
+#else // I3_PROJECTS
 #if LOG4CPLUS_SUPPORT
-// Stuff for LOG4CPLUS
 #include <log4cplus/configurator.h>
 #include <log4cplus/logger.h>
 #include <log4cplus/loggingmacros.h>
-
-#endif
-#endif
+#endif // log4cplus
+#endif // I3_PROJECTS
 
 namespace PROPOSAL {
 
@@ -66,7 +64,6 @@ private:
     Output()
     {
 #if LOG4CPLUS_SUPPORT
-        // log4cplus::PropertyConfigurator::doConfigure(LOG4CPLUS_TEXT("resources/log4cplus.conf"));
         log4cplus::PropertyConfigurator::doConfigure(LOG4CPLUS_TEXT(LOG4CPLUS_CONFIG));
         logger = log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("PROPOSAL"));
 #endif
@@ -236,6 +233,8 @@ public:
 } // namespace PROPOSAL
 
 
+#if not I3_PROJECTS
+
 #if LOG4CPLUS_SUPPORT
 
 template<typename... Args>
@@ -255,7 +254,6 @@ template<typename... Args>
 void log_warn(Args ... args)
 {
     LOG4CPLUS_WARN_FMT(PROPOSAL::Output::getInstance().logger, args...);
-    exit(1);
 }
 
 template<typename... Args>
@@ -282,6 +280,53 @@ void log_notice(Args ... args)
     LOG4CPLUS_NOTICE_FMT(PROPOSAL::Output::getInstance().logger, args...);
 }
 
+#else // log4cplus
+
+template<typename... Args>
+void log_error(Args ... args)
+{
+    void(args...);
+}
+
+template<typename... Args>
+void log_fatal(Args ... args)
+{
+    printf("FATAL ERROR: ");
+    printf(args...);
+    exit(1);
+}
+
+template<typename... Args>
+void log_warn(Args ... args)
+{
+    void(args...);
+}
+
+template<typename... Args>
+void log_info(Args ... args)
+{
+    void(args...);
+}
+
+template<typename... Args>
+void log_trace(Args ... args)
+{
+    void(args...);
+}
+
+template<typename... Args>
+void log_debug(Args ... args)
+{
+    void(args...);
+}
+
+template<typename... Args>
+void log_notice(Args ... args)
+{
+    void(args...);
+}
+
 #endif // log4cplus
+#endif // I3_PROJECTS
 
 #endif // ICECUBE

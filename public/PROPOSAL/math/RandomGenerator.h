@@ -107,8 +107,6 @@ private:
 
     static std::mt19937 rng_;
     static std::uniform_real_distribution<double> uniform_distribution;
-    // static boost::random::mt19937 rng_;
-    // static boost::variate_generator<boost::mt19937&, boost::uniform_real<> > variate_real;
     std::function<double()> random_function;
 #ifdef ICECUBE_PROJECT
     I3RandomService* i3random_gen_;

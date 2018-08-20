@@ -1,6 +1,6 @@
 
 
-#include <boost/chrono.hpp>
+#include <chrono>
 #include <fstream>
 #include <iostream>
 
@@ -61,9 +61,8 @@ int main()
     Particle& particle = prop.GetParticle();
     particle.SetDirection(Vector3D(0, 0, -1));
 
-    boost::chrono::high_resolution_clock::time_point t1;
-    boost::chrono::high_resolution_clock::time_point t2;
-    boost::chrono::milliseconds time_elapsed;
+    std::chrono::high_resolution_clock::time_point t1;
+    std::chrono::high_resolution_clock::time_point t2;
 
     std::ofstream out_file;
 
@@ -83,7 +82,7 @@ int main()
 
         for (int i = 0; i < exp_max - exp_min; ++i)
         {
-            t1 = boost::chrono::high_resolution_clock::now();
+            t1 = std::chrono::high_resolution_clock::now();
 
             particle.SetEnergy(pow(10, i + exp_min));
             particle.SetPropagatedDistance(0);
@@ -92,9 +91,9 @@ int main()
 
             prop.Propagate(10000);
 
-            t2 = boost::chrono::high_resolution_clock::now();
+            t2 = std::chrono::high_resolution_clock::now();
 
-            out_file << (boost::chrono::duration_cast<boost::chrono::nanoseconds>(t2 - t1)).count();
+            out_file << (std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1)).count();
             out_file << '\t';
         }
 

@@ -54,7 +54,8 @@ public:
 
     enum Enum
     {
-        PetrukhinShestakov = 0,
+        None = 0,
+        PetrukhinShestakov,
         KelnerKokoulinPetrukhin,
         CompleteScreening,
         AndreevBezrukovBugaev,

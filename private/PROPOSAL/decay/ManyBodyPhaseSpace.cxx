@@ -9,7 +9,7 @@
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/particle/Particle.h"
 
-#include <boost/math/special_functions/factorials.hpp>
+#include <cmath>
 
 using namespace PROPOSAL;
 
@@ -216,9 +216,10 @@ ManyBodyPhaseSpace::PhaseSpaceParameters ManyBodyPhaseSpace::GetPhaseSpaceParams
 // ------------------------------------------------------------------------- //
 void ManyBodyPhaseSpace::CalculateNormalization(PhaseSpaceParameters& params, double parent_mass)
 {
+    // For mario: n! = Gamma(n + 1)
     double normalization = std::pow(parent_mass - sum_daughter_masses_, number_of_daughters_ - 2) /
-                           boost::math::factorial<double>(number_of_daughters_ - 2) *
-                           std::pow(2.0 * boost::math::constants::pi<double>(), number_of_daughters_ - 1.0);
+                           std::tgamma(number_of_daughters_ - 2.0 + 1.0) *
+                           std::pow(2.0 * PI, number_of_daughters_ - 1.0);
 
     params.normalization = normalization /= 2.0 * parent_mass;
 }
