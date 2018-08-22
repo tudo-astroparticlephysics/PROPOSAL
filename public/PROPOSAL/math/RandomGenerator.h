@@ -65,7 +65,7 @@ public:
     /// @brief Serialize the rng to a stream
     ///
     /// Useful for debuging to save a specific state.
-    /// Only supported for internal used rng from the boost libraries.
+    /// Only supported for internal used rng from the standard libraries.
     ///
     /// @param std::ostream
     // ----------------------------------------------------------------------------
@@ -75,7 +75,7 @@ public:
     /// @brief Deserialize the rng from a stream
     ///
     /// Useful for debuging to get back a specific state.
-    /// Only supported for internal used rng from the boost libraries.
+    /// Only supported for internal used rng from the standard libraries.
     ///
     /// @param std::ostream
     // ----------------------------------------------------------------------------
@@ -95,7 +95,7 @@ public:
     /** @brief Set a the default random number generator
      *
      * The default random number generator is the
-     * boost mersenne twister boost::mt19937.
+     * std mersenne twister std::mt19937.
      */
     virtual void SetDefaultRandomNumberGenerator();
 

@@ -31,6 +31,7 @@
 
 #include "PROPOSAL/EnergyCutSettings.h"
 #include "PROPOSAL/particle/ParticleDef.h"
+#include "PROPOSAL/medium/Medium.h"
 
 namespace PROPOSAL {
 

@@ -1,6 +1,5 @@
 
 #include <functional>
-#include <boost/functional/hash.hpp>
 #include <cmath>
 
 #include "PROPOSAL/Constants.h"
@@ -8,6 +7,7 @@
 #include "PROPOSAL/math/Integral.h"
 #include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/medium/Medium.h"
+#include "PROPOSAL/methods.h"
 
 #define BREMSSTRAHLUNG_IMPL(param)                                                                                     \
     Brems##param::Brems##param(const ParticleDef& particle_def,                                                        \
@@ -238,8 +238,7 @@ double Bremsstrahlung::lpm(double energy, double v)
 size_t Bremsstrahlung::GetHash() const
 {
     size_t seed = Parametrization::GetHash();
-    boost::hash_combine(seed, lpm_);
-    boost::hash_combine(seed, lorenz_);
+    hash_combine(seed, lpm_, lorenz_);
 
     return seed;
 }

@@ -1,5 +1,4 @@
 
-#include <boost/functional/hash.hpp>
 #include <cmath>
 
 #include "PROPOSAL/Constants.h"
@@ -8,6 +7,7 @@
 #include "PROPOSAL/math/Interpolant.h"
 #include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/medium/Medium.h"
+#include "PROPOSAL/methods.h"
 
 using namespace PROPOSAL;
 
@@ -194,7 +194,7 @@ double ShadowDuttaRenoSarcevicSeckel::CalculateShadowEffect(const Components::Co
 size_t ShadowDuttaRenoSarcevicSeckel::GetHash() const
 {
     size_t seed = 0;
-    boost::hash_combine(seed, "ShadowDuttaRenoSarcevicSeckel");
+    hash_combine(seed, std::string("ShadowDuttaRenoSarcevicSeckel"));
 
     return seed;
 }
@@ -258,7 +258,7 @@ double ShadowButkevichMikhailov::CalculateShadowEffect(const Components::Compone
 size_t ShadowButkevichMikhailov::GetHash() const
 {
     size_t seed = 0;
-    boost::hash_combine(seed, "ShadowButkevichMikhailov");
+    hash_combine(seed, std::string("ShadowButkevichMikhailov"));
 
     return seed;
 }

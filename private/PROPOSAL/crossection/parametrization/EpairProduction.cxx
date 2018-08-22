@@ -1,5 +1,4 @@
 
-#include <boost/functional/hash.hpp>
 #include <cmath>
 
 #include "PROPOSAL/crossection/parametrization/EpairProduction.h"
@@ -7,7 +6,6 @@
 #include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/medium/Medium.h"
 
-// #include "PROPOSAL/methods.h"
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Output.h"
 
@@ -240,7 +238,7 @@ void EpairProductionRhoIntegral::print(std::ostream& os) const
 size_t EpairProductionRhoIntegral::GetHash() const
 {
     size_t seed = Parametrization::GetHash();
-    boost::hash_combine(seed, lpm_);
+    hash_combine(seed, lpm_);
 
     return seed;
 }
