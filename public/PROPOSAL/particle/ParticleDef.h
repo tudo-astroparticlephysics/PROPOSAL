@@ -29,12 +29,11 @@
 
 #pragma once
 
-#include <boost/functional/hash.hpp>
-
 #include <string>
 #include <vector>
 
 #include "PROPOSAL/decay/DecayTable.h"
+#include "PROPOSAL/methods.h"
 
 #define PARTICLE_DEF(cls)                                                                                              \
     class cls##Def : public ParticleDef                                                                                \
@@ -126,6 +125,7 @@ private:
     ParticleDef& operator=(const ParticleDef&); // Undefined & not allowed
 };
 
+
 std::ostream& operator<<(std::ostream&, PROPOSAL::ParticleDef const&);
 
 class ParticleDef::Builder
@@ -205,13 +205,6 @@ private:
     DecayTable decay_table;
 };
 
-// ----------------------------------------------------------------------------
-/// @brief Used to hash ParticleDefs in PropagatorService hash table
-//
-/// Hash will currently only done by mass, lifetime and charge
-// ----------------------------------------------------------------------------
-std::size_t hash_value(ParticleDef const& particle_def);
-
 // ------------------------------------------------------------------------- //
 // Predefined particle definitions
 // ------------------------------------------------------------------------- //
@@ -266,5 +259,8 @@ PARTICLE_DEF(SMPMinus)
 PARTICLE_DEF(SMPPlus)
 
 } // namespace PROPOSAL
+
+
+PROPOSAL_MAKE_HASHABLE(PROPOSAL::ParticleDef, t.mass, t.lifetime, t.charge)
 
 #undef PARTICLE_DEF

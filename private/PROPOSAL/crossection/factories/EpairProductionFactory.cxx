@@ -1,5 +1,4 @@
 
-// #include <boost/algorithm/string.hpp> // case insensitive string compare for configuration file
 #include <algorithm>
 
 #include "PROPOSAL/crossection/EpairIntegral.h"

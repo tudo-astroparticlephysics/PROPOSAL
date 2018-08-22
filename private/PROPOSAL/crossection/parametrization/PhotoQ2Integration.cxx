@@ -1,5 +1,4 @@
 
-#include <boost/functional/hash.hpp>
 #include <cmath>
 
 #include "PROPOSAL/crossection/parametrization/PhotoQ2Integration.h"
@@ -7,6 +6,7 @@
 #include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/math/Interpolant.h"
+#include "PROPOSAL/methods.h"
 
 using namespace PROPOSAL;
 using namespace std::placeholders;
@@ -110,7 +110,7 @@ double PhotoQ2Integral::DifferentialCrossSection(double energy, double v)
 size_t PhotoQ2Integral::GetHash() const
 {
     size_t seed = Parametrization::GetHash();
-    boost::hash_combine(seed, shadow_effect_->GetHash());
+    hash_combine(seed, shadow_effect_->GetHash());
 
     return seed;
 }

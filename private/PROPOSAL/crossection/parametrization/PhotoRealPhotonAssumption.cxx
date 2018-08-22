@@ -1,6 +1,5 @@
 
 
-#include <boost/functional/hash.hpp>
 #include <cmath>
 
 #include "PROPOSAL/crossection/parametrization/PhotoRealPhotonAssumption.h"
@@ -9,6 +8,7 @@
 #include "PROPOSAL/math/Interpolant.h"
 #include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/medium/Medium.h"
+#include "PROPOSAL/methods.h"
 
 #define PHOTO_PARAM_REAL_IMPL(param, parent)                                                                           \
     Photo##param::Photo##param(const ParticleDef& particle_def,                                                        \
@@ -145,7 +145,7 @@ double PhotoRealPhotonAssumption::NucleusCrossSectionCaldwell(double nu)
 size_t PhotoRealPhotonAssumption::GetHash() const
 {
     size_t seed = Parametrization::GetHash();
-    boost::hash_combine(seed, hard_component_);
+    hash_combine(seed, hard_component_);
 
     return seed;
 }

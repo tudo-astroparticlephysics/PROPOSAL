@@ -1,6 +1,4 @@
 
-#include <boost/functional/hash.hpp>
-
 #include "PROPOSAL/crossection/parametrization/Parametrization.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/methods.h"
@@ -116,13 +114,7 @@ double Parametrization::FunctionToDE2dxIntegral(double energy, double variable)
 size_t Parametrization::GetHash() const
 {
     std::size_t seed = 0;
-
-    boost::hash_combine(seed, GetName());
-    boost::hash_combine(seed, hash_value(particle_def_));
-    boost::hash_combine(seed, medium_->GetName());
-    boost::hash_combine(seed, cut_settings_.GetEcut());
-    boost::hash_combine(seed, cut_settings_.GetVcut());
-    boost::hash_combine(seed, multiplier_);
+    hash_combine(seed, GetName(), particle_def_, medium_->GetName(), cut_settings_.GetEcut(), cut_settings_.GetVcut(), multiplier_);
 
     return seed;
 }

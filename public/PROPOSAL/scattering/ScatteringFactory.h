@@ -29,7 +29,6 @@
 
 #pragma once
 
-// #include <boost/function.hpp>
 #include <boost/bimap.hpp>
 
 #include <map>

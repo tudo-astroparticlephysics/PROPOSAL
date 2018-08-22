@@ -5,10 +5,7 @@
  *      Author: koehne
  */
 
-#include <boost/algorithm/string.hpp> // case insensitive string compare for configuration file
 #include <cmath>
-// #include <algorithm>
-// #include <vector>
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Output.h"
 #include "PROPOSAL/geometry/Geometry.h"
