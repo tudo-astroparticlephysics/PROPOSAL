@@ -33,13 +33,45 @@
 
 #include <boost/math/special_functions/erf.hpp>
 #include <vector>
+#include <functional>
 
 // necessary since the boost function does not work for [-1,1] but for (-1,1)
 #define FIXPREC 0.9999999999999999
 // #define erfInv(x) myErfInv2(FIXPREC*x)
 #define erfInv(x) boost::math::erf_inv(FIXPREC* x)
 
+
+#define PROPOSAL_MAKE_HASHABLE(type, ...) \
+    namespace std {\
+        template<> struct hash<type> {\
+            std::size_t operator()(const type &t) const {\
+                std::size_t ret = 0;\
+                PROPOSAL::hash_combine(ret, __VA_ARGS__);\
+                return ret;\
+            }\
+        };\
+    }
+
 namespace PROPOSAL {
+
+inline void hash_combine(std::size_t& seed) { (void) seed; }
+
+// ----------------------------------------------------------------------------
+/// @brief Function to combine hash values
+///
+/// This is the implementation of boost::hash_combine as
+/// variadic template to combine multiple values at once
+///
+/// @param seed
+/// @param v
+/// @param rest
+// ----------------------------------------------------------------------------
+template <typename T, typename... Rest>
+inline void hash_combine(std::size_t& seed, const T& v, Rest... rest) {
+    std::hash<T> hasher;
+    seed ^= hasher(v) + 0x9e3779b9 + (seed<<6) + (seed>>2);
+    hash_combine(seed, rest...);
+}
 
 // ----------------------------------------------------------------------------
 /// @brief Implementation of inverse error function

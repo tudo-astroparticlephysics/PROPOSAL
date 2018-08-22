@@ -1,6 +1,4 @@
 
-#include <boost/math/special_functions/erf.hpp>
-
 #include "PROPOSAL/propagation_utility/ContinuousRandomizer.h"
 
 #include "PROPOSAL/propagation_utility/PropagationUtility.h"
@@ -80,8 +78,8 @@ double ContinuousRandomizer::Randomize(double initial_energy, double final_energ
     // more expensive.
     //
     // calculate the allowed region
-    xhi = 0.5 + boost::math::erf((initial_energy - final_energy) / (SQRT2 * sigma)) / 2;
-    xlo = 0.5 + boost::math::erf((DE2de->GetUtility().GetParticleDef().low - final_energy) / (SQRT2 * sigma)) / 2;
+    xhi = 0.5 + std::erf((initial_energy - final_energy) / (SQRT2 * sigma)) / 2;
+    xlo = 0.5 + std::erf((DE2de->GetUtility().GetParticleDef().low - final_energy) / (SQRT2 * sigma)) / 2;
 
     // draw random number from the allowed region.
     rndtmp = xlo + (xhi - xlo) * rnd;
