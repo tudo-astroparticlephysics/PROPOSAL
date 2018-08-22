@@ -29,7 +29,8 @@
 
 #pragma once
 
-#include <boost/unordered_map.hpp>
+// #include <boost/unordered_map.hpp>
+#include <unordered_map>
 #include <functional>
 
 #include "PROPOSAL/decay/DecayChannel.h"
@@ -58,7 +59,7 @@ public:
         double weight;
     };
 
-    typedef boost::unordered_map<ParticleDef, PhaseSpaceParameters> ParameterMap;
+    typedef std::unordered_map<ParticleDef, PhaseSpaceParameters> ParameterMap;
     typedef std::function<double(const Particle&, const DecayProducts&)> MatrixElementFunction;
 
 public:

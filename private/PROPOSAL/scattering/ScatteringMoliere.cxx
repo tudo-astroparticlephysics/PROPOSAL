@@ -1,6 +1,4 @@
 
-#include <boost/math/special_functions/erf.hpp>
-
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/medium/Components.h"
@@ -372,7 +370,7 @@ double ScatteringMoliere::F(double theta)
         double x = theta * theta / (chiCSq_ * B_[i]);
 
         y1 += weight_ZZ_[i] *
-              (0.5 * boost::math::erf(sqrt(x)) + sqrt(1. / PI) * (F1M(x) / B_[i] + F2M(x) / (B_[i] * B_[i])));
+              (0.5 * std::erf(sqrt(x)) + sqrt(1. / PI) * (F1M(x) / B_[i] + F2M(x) / (B_[i] * B_[i])));
     }
 
     return (theta < 0.) ? (-1.) * y1 * weight_ZZ_sum_ : y1 * weight_ZZ_sum_;

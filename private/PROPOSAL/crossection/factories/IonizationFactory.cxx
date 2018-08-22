@@ -1,6 +1,4 @@
 
-#include <boost/algorithm/string.hpp> // case insensitive string compare for configuration file
-
 #include "PROPOSAL/crossection/IonizIntegral.h"
 #include "PROPOSAL/crossection/IonizInterpolant.h"
 #include "PROPOSAL/crossection/factories/IonizationFactory.h"
