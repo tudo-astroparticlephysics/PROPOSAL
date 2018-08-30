@@ -10,35 +10,35 @@ except ImportError:
 import numpy as np
 
 leptons = [
-    pp.NuTauDef.get(),
-    pp.NuTauBarDef.get(),
-    pp.NuMuDef.get(),
-    pp.NuMuBarDef.get(),
-    pp.NuEDef.get(),
-    pp.NuEBarDef.get(),
-    pp.TauMinusDef.get(),
-    pp.TauPlusDef.get(),
-    pp.MuMinusDef.get(),
-    pp.MuPlusDef.get(),
-    pp.EMinusDef.get(),
-    pp.EPlusDef.get(),
+    pp.particle.NuTauDef.get(),
+    pp.particle.NuTauBarDef.get(),
+    pp.particle.NuMuDef.get(),
+    pp.particle.NuMuBarDef.get(),
+    pp.particle.NuEDef.get(),
+    pp.particle.NuEBarDef.get(),
+    pp.particle.TauMinusDef.get(),
+    pp.particle.TauPlusDef.get(),
+    pp.particle.MuMinusDef.get(),
+    pp.particle.MuPlusDef.get(),
+    pp.particle.EMinusDef.get(),
+    pp.particle.EPlusDef.get(),
 ]
 
 
 def filter_hadr(secondarys):
-    prods = [p for p in secondarys if p.id == pp.Data.Particle]
+    prods = [p for p in secondarys if p.id == pp.particle.Data.Particle]
     E = [p.energy for p in prods if p.particle_def not in leptons]
     return sum(E)
 
 
 def filter_particle(secondarys, particle):
-    prods = [p for p in secondarys if p.id == pp.Data.Particle]
+    prods = [p for p in secondarys if p.id == pp.particle.Data.Particle]
     E = [p.energy for p in prods if p.particle_def == particle]
     return sum(E)
 
 
 def filter_lep(secondarys):
-    prods = [p for p in secondarys if p.id == pp.Data.Particle]
+    prods = [p for p in secondarys if p.id == pp.particle.Data.Particle]
     E = [p.energy for p in prods if p.particle_def in leptons]
     return sum(E)
 
@@ -63,22 +63,16 @@ if __name__ == "__main__":
     # 	Save energies
     # =========================================================
 
-    statistics = int(1e6)
+    statistics = int(1e5)
     binning = 50
 
-    mu = pp.Particle(pp.MuMinusDef.get())
+    mu = pp.particle.Particle(pp.particle.MuMinusDef.get())
     mu.direction = pp.Vector3D(0, 0, -1)
 
-    products = [pp.EMinusDef.get(), pp.NuMuDef.get(), pp.NuEBarDef.get()]
+    products = [pp.particle.EMinusDef.get(), pp.particle.NuMuDef.get(), pp.particle.NuEBarDef.get()]
 
-    ME = pp.matrix_element_function(evaluate)
-
-    lep_ME = pp.ManyBodyPhaseSpace(products)
-
-    lep_ME.set_matrix_element(ME)
-    lep_ME.set_uniform_sampling(True)
-
-    lep = pp.LeptonicDecayChannelApprox(*products)
+    lep_ME = pp.decay.ManyBodyPhaseSpace(products, evaluate)
+    lep = pp.decay.LeptonicDecayChannelApprox(*products)
 
     E_lep_ME = []
     E_lep = []
@@ -94,7 +88,7 @@ if __name__ == "__main__":
         t = time.time()
 
         d = lep_ME.decay(mu)
-        E_lep_ME.append(filter_particle(d, pp.EMinusDef.get()))
+        E_lep_ME.append(filter_particle(d, pp.particle.EMinusDef.get()))
 
         mu.position = pp.Vector3D(0, 0, 0)
         mu.direction = pp.Vector3D(0, 0, -1)
@@ -102,7 +96,7 @@ if __name__ == "__main__":
         mu.propagated_distance = 0
 
         d = lep.decay(mu)
-        E_lep.append(filter_particle(d, pp.EMinusDef.get()))
+        E_lep.append(filter_particle(d, pp.particle.EMinusDef.get()))
 
         passed_time += time.time() - t
 

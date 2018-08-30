@@ -16,42 +16,42 @@ data_formfactor = np.array([
 ])
 
 
-# form_factor = np.poly1d(np.polyfit(1e6 * data_formfactor[0], data_formfactor[1], 3))
+form_factor = np.poly1d(np.polyfit(1e6 * data_formfactor[0], data_formfactor[1], 3))
 
-def form_factor(x):
-    term = 1. + 0.0306 * x + (0.0194 * x**3) / (1. + x)
-    return np.exp(-1.171 * x**(0.536)) * term
+# def form_factor(x):
+#     term = 1. + 0.0306 * x + (0.0194 * x**3) / (1. + x)
+#     return np.exp(-1.171 * x**(0.536)) * term
 
 leptons = [
-    pp.NuTauDef.get(),
-    pp.NuTauBarDef.get(),
-    pp.NuMuDef.get(),
-    pp.NuMuBarDef.get(),
-    pp.NuEDef.get(),
-    pp.NuEBarDef.get(),
-    pp.TauMinusDef.get(),
-    pp.TauPlusDef.get(),
-    pp.MuMinusDef.get(),
-    pp.MuPlusDef.get(),
-    pp.EMinusDef.get(),
-    pp.EPlusDef.get(),
+    pp.particle.NuTauDef.get(),
+    pp.particle.NuTauBarDef.get(),
+    pp.particle.NuMuDef.get(),
+    pp.particle.NuMuBarDef.get(),
+    pp.particle.NuEDef.get(),
+    pp.particle.NuEBarDef.get(),
+    pp.particle.TauMinusDef.get(),
+    pp.particle.TauPlusDef.get(),
+    pp.particle.MuMinusDef.get(),
+    pp.particle.MuPlusDef.get(),
+    pp.particle.EMinusDef.get(),
+    pp.particle.EPlusDef.get(),
 ]
 
 
 def filter_hadr(secondarys):
-    prods = [p for p in secondarys if p.id == pp.Data.Particle]
+    prods = [p for p in secondarys if p.id == pp.particle.Data.Particle]
     E = [p.energy for p in prods if p.particle_def not in leptons]
     return sum(E)
 
 
 def filter_particle(secondarys, particle):
-    prods = [p for p in secondarys if p.id == pp.Data.Particle]
+    prods = [p for p in secondarys if p.id == pp.particle.Data.Particle]
     E = [p.energy for p in prods if p.particle_def == particle]
     return sum(E)
 
 
 def filter_lep(secondarys):
-    prods = [p for p in secondarys if p.id == pp.Data.Particle]
+    prods = [p for p in secondarys if p.id == pp.particle.Data.Particle]
     E = [p.energy for p in prods if p.particle_def in leptons]
     return sum(E)
 
@@ -95,30 +95,26 @@ if __name__ == "__main__":
     # 	Save energies
     # =========================================================
 
-    statistics = int(1e1)
+    statistics = int(1e5)
     binning = 50
 
-    tau = pp.Particle(pp.TauMinusDef.get())
+    tau = pp.particle.Particle(pp.particle.TauMinusDef.get())
     tau.direction = pp.Vector3D(0, 0, -1)
 
     products = [
-        pp.Pi0Def.get(),
-        pp.PiMinusDef.get(),
-        pp.NuTauDef.get()
+        pp.particle.Pi0Def.get(),
+        pp.particle.PiMinusDef.get(),
+        pp.particle.NuTauDef.get()
     ]
 
-    products_particles = [pp.Particle(p) for p in products]
+    products_particles = [pp.particle.Particle(p) for p in products]
     for p in products_particles:
         p.direction = pp.Vector3D(0, 0, -1)
         p.energy = 1e2
 
-    ME_func = pp.matrix_element_function(evaluate)
-    print(ME_func(tau, products_particles))
+    print(evaluate(tau, products_particles))
 
-    ME = pp.ManyBodyPhaseSpace(products)
-
-    ME.set_matrix_element(ME_func)
-    ME.set_uniform_sampling(True)
+    ME = pp.decay.ManyBodyPhaseSpace(products, evaluate)
 
     E_lep_pi0 = []
     E_lep_pim = []
@@ -138,9 +134,10 @@ if __name__ == "__main__":
         t = time.time()
 
         d = ME.decay(tau)
-        E_lep_pi0.append(filter_particle(d, pp.Pi0Def.get()))
-        E_lep_pim.append(filter_particle(d, pp.PiMinusDef.get()))
-        E_lep_nu.append(filter_particle(d, pp.NuTauDef.get()))
+
+        E_lep_pi0.append(filter_particle(d, pp.particle.Pi0Def.get()))
+        E_lep_pim.append(filter_particle(d, pp.particle.PiMinusDef.get()))
+        E_lep_nu.append(filter_particle(d, pp.particle.NuTauDef.get()))
 
         p1 = add((d[0].energy, d[0].momentum * d[0].direction), (d[1].energy, d[1].momentum * d[1].direction))
         p2 = add((d[1].energy, d[1].momentum * d[1].direction), (d[2].energy, d[2].momentum * d[2].direction))
