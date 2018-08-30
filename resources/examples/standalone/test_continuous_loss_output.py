@@ -17,13 +17,13 @@ if __name__ == "__main__":
     statistics = 100
 
     sec_def = pp.SectorDefinition()
-    sec_def.medium = pp.Medium.Ice(1.0)
-    sec_def.geometry_def = pp.Sphere(pp.Vector3D(), 1e20, 0)
+    sec_def.medium = pp.medium.Ice(1.0)
+    sec_def.geometry = pp.geometry.Sphere(pp.Vector3D(), 1e20, 0)
     sec_def.particle_location = pp.ParticleLocation.inside_detector
 
-    sec_def.do_continuous_energy_loss_output = True;
+    sec_def.do_continuous_energy_loss_output = True
 
-    sec_def.scattering_model = pp.ScatteringModel.HighlandIntegral
+    sec_def.scattering_model = pp.scattering.ScatteringModel.HighlandIntegral
     sec_def.crosssection_defs.brems_def.lpm_effect = False
     sec_def.crosssection_defs.epair_def.lpm_effect = False
 
@@ -34,9 +34,9 @@ if __name__ == "__main__":
     interpolation_def.path_to_tables = "~/.local/share/PROPOSAL/tables"
 
     prop = pp.Propagator(
-            particle_def=pp.MuMinusDef.get(),
+            particle_def=pp.particle.MuMinusDef.get(),
             sector_defs=[sec_def],
-            detector=pp.Sphere(pp.Vector3D(), 1e20, 0),
+            detector=pp.geometry.Sphere(pp.Vector3D(), 1e20, 0),
             interpolation_def=interpolation_def
     )
 
@@ -57,15 +57,10 @@ if __name__ == "__main__":
                 continue
             if idx > len(secondaries) - 2:
                 break
-            # print(sec.id)
-            if sec.id == pp.Data.ContinuousEnergyLoss:
-                if secondaries[idx-1].id == pp.Data.ContinuousEnergyLoss or secondaries[idx+1].id == pp.Data.ContinuousEnergyLoss:
+            if sec.id == pp.particle.Data.ContinuousEnergyLoss:
+                if secondaries[idx-1].id == pp.particle.Data.ContinuousEnergyLoss or secondaries[idx+1].id == pp.particle.Data.ContinuousEnergyLoss:
                     print("2 Continuous Losses in a row")
                     continue
-                if secondaries[idx+1].id == pp.Data.Particle:
-                    # print("a decay")
-                    continue
-
                 energy_diff = secondaries[idx-1].parent_particle_energy - secondaries[idx-1].energy - secondaries[idx+1].parent_particle_energy
                 if abs(energy_diff - sec.energy) > 1e-3:
                     print("energy loss differs", energy_diff, sec.energy)

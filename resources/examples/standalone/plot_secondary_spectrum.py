@@ -176,20 +176,21 @@ def power_law_sampler(gamma, xlow, xhig, n, random_state=None):
         return radicant**(1. / (1. - gamma))
 #
 
+
 def propagate_muons():
 
     # start_time = time.time()
 
-    mu_def = pp.MuMinusDef.get()
-    geometry = pp.Sphere(pp.Vector3D(), 1.e20, 0.0)
+    mu_def = pp.particle.MuMinusDef.get()
+    geometry = pp.geometry.Sphere(pp.Vector3D(), 1.e20, 0.0)
     ecut = 500
     vcut = 5e-2
 
     sector_def = pp.SectorDefinition()
     sector_def.cut_settings = pp.EnergyCutSettings(ecut, vcut)
-    sector_def.medium = pp.Medium.StandardRock(1.0)
+    sector_def.medium = pp.medium.StandardRock(1.0)
     sector_def.geometry = geometry
-    sector_def.scattering_model = pp.ScatteringModel.NoScattering
+    sector_def.scattering_model = pp.scattering.ScatteringModel.NoScattering
     sector_def.crosssection_defs.brems_def.lpm_effect = False
     sector_def.crosssection_defs.epair_def.lpm_effect = False
     # sector_def.crosssection_defs.photo_def.parametrization = pp.PhotoParametrization.BezrukovBugaev
@@ -236,13 +237,13 @@ def propagate_muons():
         for sec in secondarys:
             log_sec_energy = math.log10(sec.energy)
 
-            if sec.id == pp.Data.Epair:
+            if sec.id == pp.particle.Data.Epair:
                 epair_secondary_energy.append(log_sec_energy)
-            if sec.id == pp.Data.Brems:
+            if sec.id == pp.particle.Data.Brems:
                 brems_secondary_energy.append(log_sec_energy)
-            if sec.id == pp.Data.DeltaE:
+            if sec.id == pp.particle.Data.DeltaE:
                 ioniz_secondary_energy.append(log_sec_energy)
-            if sec.id == pp.Data.NuclInt:
+            if sec.id == pp.particle.Data.NuclInt:
                 photo_secondary_energy.append(log_sec_energy)
 
     # =========================================================
@@ -277,7 +278,9 @@ def propagate_muons():
     )
 #
 
+
 def plot_secondary_spectrum():
+
     # =========================================================
     #   Plot
     # =========================================================
@@ -381,6 +384,7 @@ def plot_secondary_spectrum():
     ))
 #
 
+
 def plot_theory_curve():
 
     npzfile = np.load("data_sec_dist_MuMinus_standardrock_Emin_10.0_Emax_10.0.npz")
@@ -389,14 +393,17 @@ def plot_theory_curve():
     brems_secondary_energy = npzfile['brems']
     photo_secondary_energy = npzfile['photo']
     epair_secondary_energy = npzfile['epair']
+
     all_secondary_energy = np.concatenate((
         ioniz_secondary_energy,
         brems_secondary_energy,
         photo_secondary_energy,
         epair_secondary_energy)
     )
+
     sum_hist = np.sum(all_secondary_energy)
     print(sum_hist)
+
     list_secondary_energies = [
         ioniz_secondary_energy,
         brems_secondary_energy,
@@ -404,8 +411,14 @@ def plot_theory_curve():
         epair_secondary_energy,
         all_secondary_energy
     ]
-    list_secondary_energies_label = ['Ionization', 'Photonuclear', 'Bremsstrahlung', 'Pair Production', 'Sum']
 
+    list_secondary_energies_label = [
+        'Ionization',
+        'Photonuclear',
+        'Bremsstrahlung',
+        'Pair Production',
+        'Sum'
+    ]
 
     statistics = npzfile['statistics'][0]
     E_min_log = npzfile['E_min'][0]
@@ -417,24 +430,23 @@ def plot_theory_curve():
     ecut = npzfile['ecut'][0]
     vcut = npzfile['vcut'][0]
 
-
-    particle_def = pp.MuMinusDef.get()
-    medium = pp.Medium.StandardRock(1.0)
+    particle_def = pp.particle.MuMinusDef.get()
+    medium = pp.medium.StandardRock(1.0)
     energy_cuts = pp.EnergyCutSettings(500, -1)
     multiplier = 1.
     lpm = False
-    shadow_effect = pp.Parametrization.Photonuclear.ShadowButkevichMikhailov()
+    shadow_effect = pp.parametrization.photonuclear.ShadowButkevichMikhailov()
     add_pertubative = True
     interpolation_def = pp.InterpolationDef()
     interpolation_def.path_to_tables = "~/.local/share/PROPOSAL/tables"
 
-    ioniz = pp.Parametrization.Ionization(
+    ioniz = pp.parametrization.Ionization(
         particle_def=particle_def,
         medium=medium,
         energy_cuts=energy_cuts,
         multiplier=multiplier)
 
-    epair = pp.Parametrization.EpairProduction.EpairProductionRhoInterpolant(
+    epair = pp.parametrization.pairproduction.EpairProductionRhoInterpolant(
         particle_def=particle_def,
         medium=medium,
         energy_cuts=energy_cuts,
@@ -442,14 +454,14 @@ def plot_theory_curve():
         lpm=lpm,
         interpolation_def=interpolation_def)
 
-    brems = pp.Parametrization.Bremsstrahlung.KelnerKokoulinPetrukhin(
+    brems = pp.parametrization.bremsstrahlung.KelnerKokoulinPetrukhin(
         particle_def=particle_def,
         medium=medium,
         energy_cuts=energy_cuts,
         multiplier=multiplier,
         lpm=lpm)
 
-    photo = pp.Parametrization.Photonuclear.AbramowiczLevinLevyMaor97Interpolant(
+    photo = pp.parametrization.photonuclear.AbramowiczLevinLevyMaor97Interpolant(
         particle_def=particle_def,
         medium=medium,
         energy_cuts=energy_cuts,
@@ -457,7 +469,7 @@ def plot_theory_curve():
         shadow_effect=shadow_effect,
         interpolation_def=interpolation_def)
 
-    photo2 = pp.Parametrization.Photonuclear.BezrukovBugaev(
+    photo2 = pp.parametrization.photonuclear.BezrukovBugaev(
         particle_def=particle_def,
         medium=medium,
         energy_cuts=energy_cuts,
@@ -466,7 +478,7 @@ def plot_theory_curve():
 
     losses_params = [ioniz, epair, brems, photo2]
 
-    muon_energy = 10**10 #MeV
+    muon_energy = 10**10  # MeV
 
     inch_to_cm = 2.54
     golden_ratio = 1.61803
@@ -480,7 +492,8 @@ def plot_theory_curve():
     ax = fig.add_subplot(111)
 
     for idx, secondary_list in enumerate(list_secondary_energies):
-        ax.hist(secondary_list,
+        ax.hist(
+            secondary_list,
             weights=np.ones(len(secondary_list))/sum_hist,
             histtype='step',
             log=True,
@@ -488,7 +501,7 @@ def plot_theory_curve():
             label=list_secondary_energies_label[idx]
         )
 
-    all_cross_sections = np.empty((len(losses_params),num_bins))
+    all_cross_sections = np.empty((len(losses_params), num_bins))
 
     for idx, param in enumerate(losses_params):
         all_cross_sections[idx] = np.array([param.differential_crosssection(muon_energy, v)*v for v in v_bins_log])
@@ -498,9 +511,11 @@ def plot_theory_curve():
     print(sum(sum_cross_sections[np.isfinite(sum_cross_sections)]))
 
     for cross_section in np.append(all_cross_sections, [sum_cross_sections], axis=0):
-        ax.plot(v_bins,
+        ax.plot(
+            v_bins,
             cross_section/sum(sum_cross_sections[np.isfinite(sum_cross_sections)]),
-            drawstyle="steps-pre")
+            drawstyle="steps-pre"
+        )
 
     # ax.set_xscale("log")
     minor_locator = AutoMinorLocator()
@@ -513,8 +528,6 @@ def plot_theory_curve():
     ax.set_yscale("log")
     ax.legend()
     fig.savefig("theory_curve.pdf")
-
-
 
 if __name__ == "__main__":
     propagate_muons()
