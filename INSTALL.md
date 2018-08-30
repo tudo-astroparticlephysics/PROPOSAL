@@ -12,7 +12,6 @@ dependencies on your system.
 		doxygen \
 		liblog4cplus-dev
 		libboost-dev \
-		libboost-python-dev \
 
 ### Arch Linux ###
 
@@ -28,7 +27,6 @@ dependencies on your system.
 		doxygen \
 		log4cplus \
 		boost \
-		boost-python
 
 ## Install PROPOSAL ##
 
@@ -72,17 +70,17 @@ dependencies on your system.
 
 	#### **Note** ####
 
-	The option `CMAKE_INSTALL_PREFIX` adds the given path also to the
-	include directories. So if you have installed PROPOSAL with
-	`CMAKE_INSTALL_PREFIX` and are modifying the header files, you will make
-	sure to uninstall PROPOSAL before the next build otherwise your local
-	changes won't be used.
+	* The option `CMAKE_INSTALL_PREFIX` adds the given path also to the
+	  include directories. So if you have installed PROPOSAL with
+	  `CMAKE_INSTALL_PREFIX` and are modifying the header files, you will make
+	  sure to uninstall PROPOSAL before the next build otherwise your local
+	  changes won't be used.
 
-	Note: To ensure, that cmake finds the right python paths use these
-	cmake options and adjust the version number to your python version:
+	* To ensure, that cmake finds the right python paths use these
+	  cmake options and adjust the version number to your python version:
 
-		-DPYTHON_LIBRARY=$(python-config --prefix)/lib/libpython2.7.dylib
-		-DPYTHON_INCLUDE_DIR=$(python-config --prefix)/include/python2.7
+			-DPYTHON_LIBRARY=$(python-config --prefix)/lib/libpython2.7.dylib
+			-DPYTHON_INCLUDE_DIR=$(python-config --prefix)/include/python2.7
 
 6.  Compile the project:
 
