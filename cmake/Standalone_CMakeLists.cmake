@@ -1,7 +1,5 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
-INCLUDE(CMakePackageConfigHelpers)
-
 IF(APPLE)
 	# In newer version of cmake this will be the default
 	SET(CMAKE_MACOSX_RPATH 1)
@@ -96,17 +94,6 @@ ENDIF(ADD_PYTHON)
 #################################################################
 #################           boost       #########################
 #################################################################
-
-# IF(ADD_PYTHON)
-# 	# Libs for PROPOSAL
-# 	FIND_PACKAGE( Boost COMPONENTS REQUIRED QUIET )
-# 	# LIBRARY_TO_LINK is empty here. But provided for future additions.
-# 	SET(LIBRARYS_TO_LINK ${LIBRARYS_TO_LINK} ${Boost_LIBRARIES})
-#
-# ELSE(ADD_PYTHON)
-# 	FIND_PACKAGE( Boost REQUIRED )
-# 	SET(LIBRARYS_TO_LINK ${LIBRARYS_TO_LINK} ${Boost_LIBRARIES})
-# ENDIF(ADD_PYTHON)
 
 FIND_PACKAGE( Boost REQUIRED )
 SET(LIBRARYS_TO_LINK ${LIBRARYS_TO_LINK} ${Boost_LIBRARIES})
@@ -253,8 +240,6 @@ IF(ADD_TESTS)
   #create tar directory with "tar -czvf TestFiles.tar.Z TestFiles/" and put it in Test directory
   EXECUTE_PROCESS(COMMAND  tar -xvf ${PROJECT_SOURCE_DIR}/tests/TestFiles.tar.gz -C ${PROPOSAL_BINARY_DIR}/bin/
                     OUTPUT_VARIABLE _output OUTPUT_STRIP_TRAILING_WHITESPACE)
-  # EXECUTE_PROCESS(COMMAND  tar -xvf ${PROJECT_SOURCE_DIR}/tests/TestFiles2.tar.gz -C ${PROPOSAL_BINARY_DIR}/bin/
-  #                   OUTPUT_VARIABLE _output OUTPUT_STRIP_TRAILING_WHITESPACE)
 
   ADD_EXECUTABLE(UnitTest_Utility tests/Utility_TEST.cxx)
   ADD_EXECUTABLE(UnitTest_Scattering tests/Scattering_TEST.cxx)
