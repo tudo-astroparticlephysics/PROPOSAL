@@ -50,7 +50,7 @@ public:
     {
         None = 0,
         KelnerKokoulinPetrukhin,
-        SandrockSoedingreksoRhode,
+        SandrockSoedingreksoRhode
     };
 
     struct Definition
