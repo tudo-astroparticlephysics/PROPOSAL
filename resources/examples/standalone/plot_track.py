@@ -80,9 +80,9 @@ def propagate():
         (list)     List of secondarys particles represeint interactions
     """
 
-    medium = pp.Medium.Ice(1.0)
-    geo_detector = pp.Cylinder(pp.Vector3D(), 800, 0, 1600)
-    geo_outside = pp.Box(pp.Vector3D(), 500000, 500000, 500000)
+    medium = pp.medium.Ice(1.0)
+    geo_detector = pp.geometry.Cylinder(pp.Vector3D(), 800, 0, 1600)
+    geo_outside = pp.geometry.Box(pp.Vector3D(), 500000, 500000, 500000)
 
     # Infront
 
@@ -91,7 +91,7 @@ def propagate():
     sec_def_infront.geometry = geo_outside
     sec_def_infront.particle_location = pp.ParticleLocation.infront_detector
 
-    sec_def_infront.scattering_model = pp.ScatteringModel.Moliere
+    sec_def_infront.scattering_model = pp.scattering.ScatteringModel.Moliere
 
     sec_def_infront.cut_settings.ecut = -1
     sec_def_infront.cut_settings.vcut = 0.05
@@ -103,7 +103,7 @@ def propagate():
     sec_def_inside.geometry = geo_outside
     sec_def_inside.particle_location = pp.ParticleLocation.inside_detector
 
-    sec_def_inside.scattering_model = pp.ScatteringModel.Moliere
+    sec_def_inside.scattering_model = pp.scattering.ScatteringModel.Moliere
 
     sec_def_inside.cut_settings.ecut = 500
     sec_def_inside.cut_settings.vcut = -1
@@ -115,7 +115,7 @@ def propagate():
     sec_def_behind.geometry = geo_outside
     sec_def_behind.particle_location = pp.ParticleLocation.behind_detector
 
-    sec_def_behind.scattering_model = pp.ScatteringModel.Moliere
+    sec_def_behind.scattering_model = pp.scattering.ScatteringModel.Moliere
 
     sec_def_behind.cut_settings.ecut = -1
     sec_def_behind.cut_settings.vcut = 0.05
@@ -128,7 +128,7 @@ def propagate():
     # Propagator
 
     prop = pp.Propagator(
-        particle_def=pp.MuMinusDef.get(),
+        particle_def=pp.particle.MuMinusDef.get(),
         sector_defs=[sec_def_infront, sec_def_inside, sec_def_behind],
         detector=geo_detector,
         interpolation_def=interpolation_def
@@ -145,7 +145,7 @@ def propagate():
     pos.set_cartesian_coordinates(0, 0, -1e5)
     mu.position = pos
 
-    mu_start = pp.Particle(mu)
+    mu_start = pp.particle.Particle(mu)
 
     secondarys = prop.propagate()
 
@@ -203,13 +203,13 @@ def plot_track(mu_start, geo_detector, secondarys):
     for interaction in secondarys:
         if geo_detector.is_inside(interaction.position, interaction.direction):
             color = 'b'
-            if interaction.id == pp.Data.Brems:
+            if interaction.id == pp.particle.Data.Brems:
                 color = 'b'
-            elif interaction.id == pp.Data.Epair:
+            elif interaction.id == pp.particle.Data.Epair:
                 color = 'r'
-            elif interaction.id == pp.Data.NuclInt:
+            elif interaction.id == pp.particle.Data.NuclInt:
                 color = 'm'
-            elif interaction.id == pp.Data.DeltaE:
+            elif interaction.id == pp.particle.Data.DeltaE:
                 color = 'g'
             else:
                 color = 'k'
@@ -234,4 +234,4 @@ def plot_track(mu_start, geo_detector, secondarys):
 if __name__ == "__main__":
 
     fig = plot_track(*propagate())
-    # fig.savefig('track.pdf')
+    fig.savefig('track.pdf')

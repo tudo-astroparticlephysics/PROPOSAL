@@ -157,7 +157,7 @@ if __name__ == "__main__":
     # 	Commandline args
     # =========================================================
 
-    statistics = 10
+    statistics = 100
     config_file = "resources/config_ice.json"
 
     if len(sys.argv) == 2:
@@ -171,7 +171,7 @@ if __name__ == "__main__":
     # =========================================================
 
     prop = pyPROPOSAL.Propagator(
-        particle_def=pyPROPOSAL.MuMinusDef.get(),
+        particle_def=pyPROPOSAL.particle.MuMinusDef.get(),
         config_file=config_file
     )
 
@@ -214,16 +214,16 @@ if __name__ == "__main__":
             log_sec_energy = math.log10(sec.energy)
             log_energy = math.log10(sec.parent_particle_energy)
 
-            if sec.id == pyPROPOSAL.Data.Epair:
+            if sec.id == pyPROPOSAL.particle.Data.Epair:
                 epair_primary_energy.append(log_energy)
                 epair_secondary_energy.append(log_sec_energy)
-            if sec.id == pyPROPOSAL.Data.Brems:
+            if sec.id == pyPROPOSAL.particle.Data.Brems:
                 brems_primary_energy.append(log_energy)
                 brems_secondary_energy.append(log_sec_energy)
-            if sec.id == pyPROPOSAL.Data.DeltaE:
+            if sec.id == pyPROPOSAL.particle.Data.DeltaE:
                 ioniz_primary_energy.append(log_energy)
                 ioniz_secondary_energy.append(log_sec_energy)
-            if sec.id == pyPROPOSAL.Data.NuclInt:
+            if sec.id == pyPROPOSAL.particle.Data.NuclInt:
                 photo_primary_energy.append(log_energy)
                 photo_secondary_energy.append(log_sec_energy)
 

@@ -17,11 +17,11 @@ if __name__ == "__main__":
     statistics = 10000
 
     sec_def = pp.SectorDefinition()
-    sec_def.medium = pp.Medium.Ice(1.0)
-    sec_def.geometry_def = pp.Sphere(pp.Vector3D(), 1e20, 0)
+    sec_def.medium = pp.medium.Ice(1.0)
+    sec_def.geometry = pp.geometry.Sphere(pp.Vector3D(), 1e20, 0)
     sec_def.particle_location = pp.ParticleLocation.inside_detector
 
-    sec_def.scattering_model = pp.ScatteringModel.Moliere
+    sec_def.scattering_model = pp.scattering.ScatteringModel.Moliere
     sec_def.crosssection_defs.brems_def.lpm_effect = False
     sec_def.crosssection_defs.epair_def.lpm_effect = False
 
@@ -32,9 +32,9 @@ if __name__ == "__main__":
     interpolation_def.path_to_tables = "~/.local/share/PROPOSAL/tables"
 
     prop = pp.Propagator(
-            particle_def=pp.MuMinusDef.get(),
+            particle_def=pp.particle.MuMinusDef.get(),
             sector_defs=[sec_def],
-            detector=pp.Sphere(pp.Vector3D(), 1e20, 0),
+            detector=pp.geometry.Sphere(pp.Vector3D(), 1e20, 0),
             interpolation_def=interpolation_def
     )
 
@@ -44,7 +44,6 @@ if __name__ == "__main__":
     n_secondarys = []
 
     for i in range(statistics):
-
         mu.position = pp.Vector3D(0, 0, 0)
         mu.direction = pp.Vector3D(0, 0, -1)
         mu.energy = energy
