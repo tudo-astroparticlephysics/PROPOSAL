@@ -29,7 +29,6 @@
 
 #pragma once
 
-// #include <boost/unordered_map.hpp>
 #include <unordered_map>
 #include <functional>
 
@@ -37,8 +36,6 @@
 #include "PROPOSAL/particle/ParticleDef.h"
 
 namespace PROPOSAL {
-
-class PROPOSALParticle;
 
 class ManyBodyPhaseSpace : public DecayChannel
 {
@@ -61,9 +58,10 @@ public:
 
     typedef std::unordered_map<ParticleDef, PhaseSpaceParameters> ParameterMap;
     typedef std::function<double(const Particle&, const DecayProducts&)> MatrixElementFunction;
+    typedef std::function<void(PhaseSpaceParameters&, const ParticleDef&)> EstimateFunction;
 
 public:
-    ManyBodyPhaseSpace(std::vector<const ParticleDef*> daughters, MatrixElementFunction ME = NULL);
+    ManyBodyPhaseSpace(std::vector<const ParticleDef*> daughters, MatrixElementFunction ME = nullptr);
     ManyBodyPhaseSpace(const ManyBodyPhaseSpace& mode);
     virtual ~ManyBodyPhaseSpace();
 
@@ -90,9 +88,14 @@ public:
     ///
     /// @return matrix element
     // ----------------------------------------------------------------------------
-    static double Evaluate(const Particle&, const DecayProducts&);
+    static double DefaultEvaluate(const Particle&, const DecayProducts&);
 
-    void SetMatrixElement(MatrixElementFunction);
+    // ----------------------------------------------------------------------------
+    /// @brief Evalutate the matrix element of this channel
+    ///
+    /// @return matrix element
+    // ----------------------------------------------------------------------------
+    double Evaluate(const Particle&, const DecayProducts&);
 
     // ----------------------------------------------------------------------------
     /// @brief Sets the uniform flag
@@ -136,14 +139,14 @@ private:
     /// @brief Calculate the maximum weight for the phase space
     ///
     /// @param normalization
-    /// @param parent_mass
+    /// @param parent
     ///
     /// This value is need for the rejection method to create a uniform distribution
     /// of the phase space.
     ///
     /// @return maximum weight
     // ----------------------------------------------------------------------------
-    void EstimateMaxWeight(PhaseSpaceParameters&, double parent_mass);
+    void EstimateMaxWeight(PhaseSpaceParameters&, const ParticleDef& parent);
 
     // ----------------------------------------------------------------------------
     /// @brief Calculate the maximum weight for the phase space
@@ -191,8 +194,11 @@ private:
     int number_of_daughters_;
     double sum_daughter_masses_;
     bool uniform_;
+    int broad_phase_statistic_;
 
     MatrixElementFunction matrix_element_;
+    bool use_default_matrix_element_;
+    EstimateFunction estimate_;
 
     static const std::string name_;
 
