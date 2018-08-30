@@ -102,7 +102,7 @@ matrix:
     #     - MATRIX_EVAL="CC=clang && CXX=clang++"
 
 before_install:
-    - pyenv global system 3.5
+    - pyenv global system 3.6
     - eval "${MATRIX_EVAL}"
 
 install:
