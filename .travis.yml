@@ -54,7 +54,6 @@ matrix:
           packages:
             - g++-4.8
             - libboost-dev
-            - libboost-python-dev
       env:
          - MATRIX_EVAL="CC=gcc-4.8 && CXX=g++-4.8"
 
@@ -67,7 +66,6 @@ matrix:
           packages:
             - g++-7
             - libboost-dev
-            - libboost-python-dev
       env:
         - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
 
@@ -81,7 +79,6 @@ matrix:
           packages:
             - clang-3.6
             - libboost-dev
-            - libboost-python-dev
       env:
         - MATRIX_EVAL="CC=clang-3.6 && CXX=clang++-3.6"
 
@@ -95,7 +92,6 @@ matrix:
           packages:
             - clang-5.0
             - libboost-dev
-            - libboost-python-dev
       env:
         - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
 
@@ -106,6 +102,7 @@ matrix:
     #     - MATRIX_EVAL="CC=clang && CXX=clang++"
 
 before_install:
+    - pyenv global system 3.5
     - eval "${MATRIX_EVAL}"
 
 install:
