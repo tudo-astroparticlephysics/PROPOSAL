@@ -31,11 +31,6 @@
 
 #include <iostream>
 
-namespace PROPOSAL {
-class EnergyCutSettings;
-}
-
-std::ostream& operator<<(std::ostream& os, PROPOSAL::EnergyCutSettings const& cut_settings);
 
 namespace PROPOSAL {
 
@@ -99,5 +94,7 @@ public:
     void SetEcut(double ecut) { ecut_ = ecut; }
     void SetVcut(double vcut) { vcut_ = vcut; }
 };
+
+std::ostream& operator<<(std::ostream& os, PROPOSAL::EnergyCutSettings const& cut_settings);
 
 } // namespace PROPOSAL
