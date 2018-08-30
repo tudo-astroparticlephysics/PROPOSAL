@@ -36,7 +36,7 @@
 #include "PROPOSAL/medium/Components.h"
 
 #define MEDIUM_DEF(cls)                                                                                                \
-    class cls : public MediumCopyable<Medium, cls>                                                                     \
+    class cls : public Medium                                                                                          \
     {                                                                                                                  \
     public:                                                                                                            \
         cls(double rho = 1.0);                                                                                         \
@@ -45,6 +45,9 @@
         {                                                                                                              \
         }                                                                                                              \
         virtual ~cls() {}                                                                                              \
+                                                                                                                       \
+        virtual Medium* clone() const { return new cls(*this); }                                                       \
+        static Medium* create(double density_correction = 1.0) { return new cls(density_correction); }                 \
     };
 
 namespace PROPOSAL {
@@ -162,37 +165,6 @@ protected:
     double sumNucleons_; ///< sum of nucleons of all nuclei
 };
 
-/******************************************************************************
- *                               MediumCopyable                                *
- ******************************************************************************/
-
-// ----------------------------------------------------------------------------
-/// @brief Template class for Medium
-///
-/// Provides a template to the assignment operator, clone & create
-// ----------------------------------------------------------------------------
-template<class Base, class Derived>
-class MediumCopyable : virtual public Base
-{
-public:
-    virtual Base* clone() const { return new Derived(static_cast<Derived>(*this)); }
-
-    static Base* create(double density_correction = 1.0) { return new Derived(density_correction); }
-
-    Derived& operator=(const Medium& medium)
-    {
-        if (this != &medium)
-        {
-            const Derived* med = static_cast<Derived const&>(&medium); // Throws on bad cast.
-
-            Derived tmp(*med);
-            swap(tmp);
-        }
-
-        return *this;
-    }
-};
-
 MEDIUM_DEF(Water)
 MEDIUM_DEF(Ice)
 MEDIUM_DEF(Salt)
@@ -206,7 +178,7 @@ MEDIUM_DEF(Copper)
 MEDIUM_DEF(Uranium)
 MEDIUM_DEF(Paraffin)
 
-class Air : public MediumCopyable<Medium, Air>
+class Air : public Medium
 {
 public:
     static const double fraction_N;
@@ -221,6 +193,9 @@ public:
     {
     }
     virtual ~Air() {}
+
+    virtual Medium* clone() const { return new Air(*this); }
+    static Medium* create(double density_correction = 1.0) { return new Air(density_correction); }
 };
 
 // #<{(|

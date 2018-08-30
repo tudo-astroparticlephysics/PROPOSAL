@@ -107,9 +107,7 @@ bool EnergyCutSettings::operator!=(const EnergyCutSettings& energyCutSettings) c
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-namespace PROPOSAL {
-
-std::ostream& operator<<(std::ostream& os, EnergyCutSettings const& cut_settings)
+std::ostream& PROPOSAL::operator<<(std::ostream& os, PROPOSAL::EnergyCutSettings const& cut_settings)
 {
     std::stringstream ss;
     ss << " EnergyCutSettings (" << &cut_settings << ") ";
@@ -121,8 +119,6 @@ std::ostream& operator<<(std::ostream& os, EnergyCutSettings const& cut_settings
     os << Helper::Centered(60, "");
     return os;
 }
-
-} // namespace PROPOSAL
 
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
