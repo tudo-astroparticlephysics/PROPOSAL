@@ -879,10 +879,9 @@ Interpolant::Interpolant(const Interpolant& interpolant)
     {
         Interpolant_.at(i) = new Interpolant(*interpolant.Interpolant_.at(i));
     }
+
     function1d_ = std::ref(interpolant.function1d_);
-    ;
     function2d_ = std::ref(interpolant.function2d_);
-    ;
 }
 
 //----------------------------------------------------------------------------//

@@ -45,14 +45,6 @@ class DecayTable
     typedef std::map<double, DecayChannel*> DecayMap;
 
 public:
-    enum Mode
-    {
-        LeptonicDecay = 0,
-        TwoBodyDecay  = 0,
-        Stable        = 0
-    };
-
-public:
     DecayTable();
     DecayTable(const DecayTable& table);
     virtual ~DecayTable();
