@@ -21,11 +21,11 @@ except ImportError:
 def muons(energy, statistics, vcut, do_continuous_randomization, dist):
 
     sec_def = pp.SectorDefinition()
-    sec_def.medium = pp.medium.StandardRock(1.0)
-    sec_def.geometry = pp.geometry.Sphere(pp.Vector3D(), 1e20, 0)
+    sec_def.medium = pp.Medium.StandardRock(1.0)
+    sec_def.geometry = pp.Sphere(pp.Vector3D(), 1e20, 0)
     sec_def.particle_location = pp.ParticleLocation.inside_detector
 
-    sec_def.scattering_model = pp.scattering.ScatteringModel.Moliere
+    sec_def.scattering_model = pp.ScatteringModel.Moliere
     sec_def.do_continuous_randomization = do_continuous_randomization
 
     sec_def.cut_settings.ecut = 0
@@ -35,9 +35,9 @@ def muons(energy, statistics, vcut, do_continuous_randomization, dist):
     interpolation_def.path_to_tables = ""
 
     prop = pp.Propagator(
-            particle_def=pp.particle.MuMinusDef.get(),
+            particle_def=pp.MuMinusDef.get(),
             sector_defs=[sec_def],
-            detector=pp.geometry.Sphere(pp.Vector3D(), 1e20, 0),
+            detector=pp.Sphere(pp.Vector3D(), 1e20, 0),
             interpolation_def=interpolation_def
     )
 
@@ -138,4 +138,4 @@ if __name__ == "__main__":
     ax.legend(loc='upper left')
 
     fig.tight_layout()
-    fig.savefig("mu_continuous_new.pdf")
+    fig.savefig("continuous.pdf")

@@ -7,7 +7,7 @@
  *   \author Mario Dunsch
  */
 
-#include <functional>
+#include <boost/bind.hpp>
 
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/math/Integral.h"
@@ -16,7 +16,6 @@
 
 using namespace PROPOSAL;
 using namespace PROPOSAL::Components;
-using namespace std::placeholders;
 
 #define COMPONENT_IMPL(cls, SYMBOL, ATOMICNUM, NUCCHARGE)                                                              \
     cls::cls(double atomInMolecule)                                                                                    \
@@ -91,14 +90,62 @@ Component::Component(std::string name, double nucCharge, double atomicNum, doubl
         r0_ = 1.12 * r0_ - 0.86 / r0_;
 
         mN_ = 1.0 - 4.0 * PI * 0.17 *
-                        integral.Integrate(r0_, -1.0, std::bind(&Component::FunctionToIntegral, this, _1), 3, 2.0) /
+                        integral.Integrate(r0_, -1.0, boost::bind(&Component::FunctionToIntegral, this, _1), 3, 2.0) /
                         atomicNum_;
     }
+}
+
+Component::Component(const Component& component)
+    : name_(component.name_)
+    , nucCharge_(component.nucCharge_)
+    , atomicNum_(component.atomicNum_)
+    , atomInMolecule_(component.atomInMolecule_)
+    , logConstant_(component.logConstant_)
+    , bPrime_(component.bPrime_)
+    , M_(component.M_)
+    , mN_(component.mN_)
+    , r0_(component.r0_)
+{
 }
 
 // ------------------------------------------------------------------------- //
 // Operators & swap
 // ------------------------------------------------------------------------- //
+
+// ------------------------------------------------------------------------- //
+void Component::swap(Component& component)
+{
+    using std::swap;
+
+    swap(name_, component.name_);
+    swap(nucCharge_, component.nucCharge_);
+    swap(atomicNum_, component.atomicNum_);
+    swap(atomInMolecule_, component.atomInMolecule_);
+    swap(logConstant_, component.logConstant_);
+    swap(bPrime_, component.bPrime_);
+    swap(M_, component.M_);
+    swap(mN_, component.mN_);
+    swap(r0_, component.r0_);
+}
+
+// ------------------------------------------------------------------------- //
+Component& Component::operator=(const Component& component)
+{
+    if (this != &component)
+    {
+        name_           = component.name_;
+        nucCharge_      = component.nucCharge_;
+        atomicNum_      = component.atomicNum_;
+        atomInMolecule_ = component.atomInMolecule_;
+        logConstant_    = component.logConstant_;
+        bPrime_         = component.bPrime_;
+        M_              = component.M_;
+        mN_             = component.mN_;
+        r0_             = component.r0_;
+    }
+
+    return *this;
+}
 
 // ------------------------------------------------------------------------- //
 bool Component::operator==(const Component& component) const

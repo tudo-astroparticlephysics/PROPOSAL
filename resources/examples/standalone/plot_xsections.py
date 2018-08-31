@@ -1,6 +1,6 @@
 
 import pyPROPOSAL as pp
-import pyPROPOSAL.parametrization as parametrization
+import pyPROPOSAL.Parametrization as Parametrization
 
 try:
     import matplotlib as mpl
@@ -21,8 +21,8 @@ import math
 
 if __name__ == "__main__":
 
-    mu = pp.particle.MuMinusDef.get()
-    medium = pp.medium.Ice(1.0)  # With densitiy correction
+    mu = pp.MuMinusDef.get()
+    medium = pp.Medium.Ice(1.0)  # With densitiy correction
     cuts = pp.EnergyCutSettings(-1, -1)  # ecut, vcut
 
     dEdx = []
@@ -43,12 +43,12 @@ if __name__ == "__main__":
     #   - interpolation definition
     # =========================================================
 
-    photo_param = parametrization.photonuclear.AbramowiczLevinLevyMaor97Interpolant(
+    photo_param = Parametrization.Photonuclear.AbramowiczLevinLevyMaor97Interpolant(
         mu,
         medium,
         cuts,
         1.0,
-        parametrization.photonuclear.ShadowButkevichMikhailov(),
+        Parametrization.Photonuclear.ShadowButkevichMikhailov(),
         interpolation_def
     )
 
@@ -58,8 +58,8 @@ if __name__ == "__main__":
 
     crosssections = []
 
-    brems = pp.crosssection.BremsInterpolant(
-        parametrization.bremsstrahlung.KelnerKokoulinPetrukhin(
+    brems = pp.CrossSection.BremsInterpolant(
+        Parametrization.Bremsstrahlung.KelnerKokoulinPetrukhin(
             mu,
             medium,
             cuts,
@@ -69,20 +69,20 @@ if __name__ == "__main__":
         interpolation_def
         )
 
-    photo = pp.crosssection.PhotoInterpolant(
-        parametrization.photonuclear.AbramowiczLevinLevyMaor97Interpolant(
+    photo = pp.CrossSection.PhotoInterpolant(
+        Parametrization.Photonuclear.AbramowiczLevinLevyMaor97Interpolant(
             mu,
             medium,
             cuts,
             1.0,
-            parametrization.photonuclear.ShadowButkevichMikhailov(),
+            Parametrization.Photonuclear.ShadowButkevichMikhailov(),
             interpolation_def
         ),
         interpolation_def
         )
 
-    epair = pp.crosssection.EpairInterpolant(
-        parametrization.pairproduction.KelnerKokoulinPetrukhinInterpolant(
+    epair = pp.CrossSection.EpairInterpolant(
+        Parametrization.EpairProduction.EpairProductionRhoInterpolant(
             mu,
             medium,
             cuts,
@@ -93,8 +93,8 @@ if __name__ == "__main__":
         interpolation_def
         )
 
-    ioniz = pp.crosssection.IonizInterpolant(
-        parametrization.ionization.Ionization(
+    ioniz = pp.CrossSection.IonizInterpolant(
+        Parametrization.Ionization(
             mu,
             medium,
             cuts,

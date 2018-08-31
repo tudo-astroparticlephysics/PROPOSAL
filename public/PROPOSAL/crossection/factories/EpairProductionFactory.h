@@ -30,7 +30,7 @@
 #pragma once
 
 #include <boost/bimap.hpp>
-#include <functional>
+#include <boost/function.hpp>
 
 #include "PROPOSAL/methods.h"
 
@@ -48,9 +48,8 @@ class EpairProductionFactory
 public:
     enum Enum
     {
-        None = 0,
-        KelnerKokoulinPetrukhin,
-        SandrockSoedingreksoRhode
+        KelnerKokoulinPetrukhin = 0,
+        SandrockSoedingreksoRhode,
     };
 
     struct Definition
@@ -88,14 +87,14 @@ public:
     // Typedefs for readablitiy
     // --------------------------------------------------------------------- //
 
-    typedef std::function<EpairProduction*(const ParticleDef&,
+    typedef boost::function<EpairProduction*(const ParticleDef&,
                                           const Medium&,
                                           const EnergyCutSettings&,
                                           double multiplier,
                                           bool lpm)>
         RegisterFunction;
 
-    typedef std::function<EpairProduction*(const ParticleDef&,
+    typedef boost::function<EpairProduction*(const ParticleDef&,
                                           const Medium&,
                                           const EnergyCutSettings&,
                                           double multiplier,

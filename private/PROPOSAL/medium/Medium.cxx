@@ -9,6 +9,9 @@
 
 #include <cmath>
 
+// #include <iomanip>
+#include <boost/assign.hpp>
+
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Output.h"
 #include "PROPOSAL/medium/Components.h"
@@ -61,6 +64,46 @@ ostream& operator<<(ostream& os, Medium const& medium)
  *                                   Medium                                    *
  ******************************************************************************/
 
+// Medium::Medium(std::string name,
+//                double rho,
+//                double I,
+//                double C,
+//                double a,
+//                double m,
+//                double X0,
+//                double X1,
+//                double d0,
+//                double massDensity)
+//     : name_(name)
+//     , numComponents_(0)
+//     , sumCharge_(0)
+//     , ZA_(0)
+//     , I_(I)
+//     , C_(C)
+//     , a_(a)
+//     , m_(m)
+//     , X0_(X0)
+//     , X1_(X1)
+//     , d0_(d0)
+//     , r_(0)
+//     , massDensity_(massDensity)
+//     , molDensity_(0)
+//     , radiationLength_(0)
+//     , ecut_(0)
+//     , vcut_(0)
+//     , vCut_(0)
+//     , MM_(0)
+//     , sumNucleons_(0)
+// {
+//     if (rho > 0)
+//     {
+//         rho_ = rho;
+//     } else
+//     {
+//         rho_ = 1;
+//     }
+// }
+
 Medium::Medium(std::string name,
                double rho,
                double I,
@@ -71,7 +114,7 @@ Medium::Medium(std::string name,
                double X1,
                double d0,
                double massDensity,
-               std::vector<std::shared_ptr<Components::Component>> components)
+               const std::vector<Components::Component*>& components)
     : name_(name)
     , numComponents_(components.size())
     , sumCharge_(0)
@@ -101,11 +144,10 @@ Medium::Medium(std::string name,
         rho_ = 1;
     }
 
-    // components_.reserve(numComponents_);
-    // for (int i = 0; i < numComponents_; ++i)
-    for (auto component: components)
+    components_.reserve(numComponents_);
+    for (int i = 0; i < numComponents_; ++i)
     {
-        components_.push_back(component->clone());
+        components_.push_back(components[i]->clone());
     }
 
     init();
@@ -341,20 +383,9 @@ void Medium::init()
 // Setter
 // ------------------------------------------------------------------------- //
 
-void Medium::SetComponents(std::vector<std::shared_ptr<Components::Component>> components)
+void Medium::SetComponents(std::vector<Components::Component*> components)
 {
-    for (auto component: components_)
-    {
-        delete component;
-    }
-
-    components_.clear();
-
-    for (auto component: components)
-    {
-        components_.push_back(component->clone());
-    }
-
+    components_ = components;
     init(); // Init further member according to these components
 }
 
@@ -429,6 +460,24 @@ void Medium::SetSumNucleons(double sumNucleons)
 }
 
 /******************************************************************************
+ *                                  Builder                                    *
+ ******************************************************************************/
+
+Medium::Builder::Builder()
+    : name_("")
+    , I_(0.0)
+    , C_(0.0)
+    , a_(0.0)
+    , m_(0.0)
+    , X0_(0.0)
+    , X1_(0.0)
+    , d0_(0.0)
+    , massDensity_(0.0)
+    , components_()
+{
+}
+
+/******************************************************************************
  *                              Different Media                                *
  ******************************************************************************/
 
@@ -443,10 +492,7 @@ Water::Water(double rho)
              2.8004,  // X1
              0,       // d0
              1.000,   // massDensitiy
-             {
-                 std::shared_ptr<Components::Component>(new Components::Hydrogen(2)),
-                 std::shared_ptr<Components::Component>(new Components::Oxygen())
-             })
+             boost::assign::list_of<Components::Component*>(new Components::Hydrogen(2))(new Components::Oxygen()))
 {
 }
 
@@ -461,10 +507,7 @@ Ice::Ice(double rho)
              2.8004,  // X1
              0,       // d0
              0.917,   // massDensitiy
-             {
-                 std::shared_ptr<Components::Component>(new Components::Hydrogen(2)),
-                 std::shared_ptr<Components::Component>(new Components::Oxygen())
-             })
+             boost::assign::list_of<Components::Component*>(new Components::Hydrogen(2))(new Components::Oxygen()))
 {
 }
 
@@ -481,10 +524,7 @@ Salt::Salt(double rho)
              3.0,     // X1
              0,       // d0
              2.323,   // Solid halite density
-             {
-                 std::shared_ptr<Components::Component>(new Components::Sodium()),
-                 std::shared_ptr<Components::Component>(new Components::Chlorine())
-             })
+             boost::assign::list_of<Components::Component*>(new Components::Sodium())(new Components::Chlorine()))
 {
 }
 
@@ -499,11 +539,8 @@ CalciumCarbonate::CalciumCarbonate(double rho)
              3.0549,  // X1
              0,       // d0
              2.650,   // massDensity
-             {
-                 std::shared_ptr<Components::Component>(new Components::Calcium()),
-                 std::shared_ptr<Components::Component>(new Components::Carbon()),
-                 std::shared_ptr<Components::Component>(new Components::Oxygen(3))
-             })
+             boost::assign::list_of<Components::Component*>(new Components::Calcium())(new Components::Carbon())(
+                 new Components::Oxygen(3)))
 {
 }
 
@@ -518,7 +555,7 @@ StandardRock::StandardRock(double rho)
              3.0549,  // X1
              0,       // d0
              2.650,   // massDensity
-             {std::shared_ptr<Components::Component>(new Components::StandardRock())})
+             boost::assign::list_of<Components::Component*>(new Components::StandardRock()))
 {
 }
 
@@ -533,7 +570,7 @@ FrejusRock::FrejusRock(double rho)
              3.196,  // X1
              0,      // d0
              2.740,  // massDensity
-             {std::shared_ptr<Components::Component>(new Components::FrejusRock())})
+             boost::assign::list_of<Components::Component*>(new Components::FrejusRock()))
 {
 }
 
@@ -548,7 +585,7 @@ Iron::Iron(double rho)
              3.1531,  // X1
              0.12,    // d0
              7.874,   // massDensity
-             {std::shared_ptr<Components::Component>(new Components::Iron())})
+             boost::assign::list_of<Components::Component*>(new Components::Iron()))
 {
 }
 
@@ -563,7 +600,7 @@ Hydrogen::Hydrogen(double rho)
              1.8856,  // X1
              0,       // d0
              0.07080, // massDensity
-             {std::shared_ptr<Components::Component>(new Components::Hydrogen())})
+             boost::assign::list_of<Components::Component*>(new Components::Hydrogen()))
 {
 }
 
@@ -578,7 +615,7 @@ Lead::Lead(double rho)
              3.8073,  // X1
              0.14,    // d0
              11.350,  // massDensity
-             {std::shared_ptr<Components::Component>(new Components::Lead())})
+             boost::assign::list_of<Components::Component*>(new Components::Lead()))
 {
 }
 
@@ -593,7 +630,7 @@ Copper::Copper(double rho)
              3.2792,  // X1
              0.08,    // d0
              8.960,   // massDensity
-             {std::shared_ptr<Components::Component>(new Components::Copper())})
+             boost::assign::list_of<Components::Component*>(new Components::Copper()))
 {
 }
 
@@ -608,7 +645,7 @@ Uranium::Uranium(double rho)
              3.3721,  // X1
              0.14,    // d0
              18.950,  // massDensity
-             {std::shared_ptr<Components::Component>(new Components::Uranium())})
+             boost::assign::list_of<Components::Component*>(new Components::Uranium()))
 {
 }
 
@@ -628,11 +665,8 @@ Air::Air(double rho)
              4.2759,   // X1
              0,        // d0
              1.205e-3, // dry, 1 atm massDensity
-             {
-                 std::shared_ptr<Components::Component>(new Components::Nitrogen(fraction_N / fraction_sum)),
-                 std::shared_ptr<Components::Component>(new Components::Oxygen(fraction_O / fraction_sum)),
-                 std::shared_ptr<Components::Component>(new Components::Argon(fraction_Ar / fraction_sum))
-             })
+             boost::assign::list_of<Components::Component*>(new Components::Nitrogen(fraction_N / fraction_sum))(
+                 new Components::Oxygen(fraction_O / fraction_sum))(new Components::Argon(fraction_Ar / fraction_sum)))
 {
 }
 
@@ -648,10 +682,7 @@ Paraffin::Paraffin(double rho)
           2.5084,  // X1
           0,       // d0
           0.93,    // massDensity
-         {
-             std::shared_ptr<Components::Component>(new Components::Carbon(25.0)),
-             std::shared_ptr<Components::Component>(new Components::Oxygen(52.0))
-         })
+          boost::assign::list_of<Components::Component*>(new Components::Carbon(25.0))(new Components::Hydrogen(52.0)))
 {
 }
 
@@ -666,16 +697,10 @@ AntaresWater::AntaresWater(double rho)
              2.8004,  // X1
              0,       // d0
              1.03975, // massDensity
-             {
-                 std::shared_ptr<Components::Component>(new Components::Hydrogen(2.0)),
-                 std::shared_ptr<Components::Component>(new Components::Oxygen(1.00884)),
-                 std::shared_ptr<Components::Component>(new Components::Sodium(0.00943)),
-                 std::shared_ptr<Components::Component>(new Components::Potassium(0.000209)),
-                 std::shared_ptr<Components::Component>(new Components::Magnesium(0.001087)),
-                 std::shared_ptr<Components::Component>(new Components::Calcium(0.000209)),
-                 std::shared_ptr<Components::Component>(new Components::Chlorine(0.01106)),
-                 std::shared_ptr<Components::Component>(new Components::Sulfur(0.00582))
-             })
+             boost::assign::list_of<Components::Component*>(new Components::Hydrogen(2.0))(
+                 new Components::Oxygen(1.00884))(new Components::Sodium(0.00943))(new Components::Potassium(0.000209))(
+                 new Components::Magnesium(0.001087))(new Components::Calcium(0.000209))(
+                 new Components::Chlorine(0.01106))(new Components::Sulfur(0.00582)))
 {
     //  Chemical composition of the seawater
     //  according to

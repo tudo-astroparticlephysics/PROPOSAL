@@ -1,5 +1,5 @@
 
-#include <algorithm>
+#include <boost/algorithm/string.hpp> // case insensitive string compare for configuration file
 
 #include "PROPOSAL/Output.h"
 #include "PROPOSAL/medium/Medium.h"
@@ -45,8 +45,7 @@ void MediumFactory::Register(const std::string& name, const Enum& enum_t, Regist
 // ------------------------------------------------------------------------- //
 Medium* MediumFactory::CreateMedium(const std::string& name, double density_correction)
 {
-    std::string name_lower = name;
-    std::transform(name.begin(), name.end(), name_lower.begin(), ::tolower);
+    std::string name_lower = boost::algorithm::to_lower_copy(name);
 
     MediumMapString::iterator it = medium_map_str.find(name_lower);
 
@@ -56,7 +55,6 @@ Medium* MediumFactory::CreateMedium(const std::string& name, double density_corr
     } else
     {
         log_fatal("Medium %s not registerd!", name.c_str());
-        return NULL; // just to prevent warnings
     }
 }
 
@@ -71,7 +69,6 @@ Medium* MediumFactory::CreateMedium(const Enum& med, double density_correction)
     } else
     {
         log_fatal("Medium %s not registerd!", typeid(med).name());
-        return NULL; // just to prevent warnings
     }
 }
 
@@ -86,15 +83,13 @@ Medium* MediumFactory::CreateMedium(Definition def)
     } else
     {
         log_fatal("Medium %s not registerd!", typeid(def.type).name());
-        return NULL; // just to prevent warnings
     }
 }
 
 // ------------------------------------------------------------------------- //
 MediumFactory::Enum MediumFactory::GetEnumFromString(const std::string& name)
 {
-    std::string name_lower = name;
-    std::transform(name.begin(), name.end(), name_lower.begin(), ::tolower);
+    std::string name_lower = boost::algorithm::to_lower_copy(name);
 
     BimapStringEnum::left_const_iterator it = string_enum_.left.find(name_lower);
     if (it != string_enum_.left.end())
@@ -103,7 +98,6 @@ MediumFactory::Enum MediumFactory::GetEnumFromString(const std::string& name)
     } else
     {
         log_fatal("Medium %s not registerd!", name.c_str());
-        return MediumFactory::None; // just to prevent warnings
     }
 }
 
@@ -117,6 +111,5 @@ std::string MediumFactory::GetStringFromEnum(const MediumFactory::Enum& enum_t)
     } else
     {
         log_fatal("Medium %s not registerd!", typeid(enum_t).name());
-        return ""; // just to prevent warnings
     }
 }

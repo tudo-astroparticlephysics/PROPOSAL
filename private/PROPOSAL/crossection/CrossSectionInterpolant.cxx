@@ -1,5 +1,5 @@
 
-#include <functional>
+#include <boost/bind.hpp>
 #include <cmath>
 
 #include "PROPOSAL/crossection/CrossSectionInterpolant.h"
@@ -14,7 +14,6 @@
 #include "PROPOSAL/math/InterpolantBuilder.h"
 
 using namespace PROPOSAL;
-using namespace std::placeholders;
 
 // ------------------------------------------------------------------------- //
 // Constructor & Destructor
@@ -97,8 +96,8 @@ void CrossSectionInterpolant::InitdNdxInerpolation(const InterpolationDef& def)
             .SetRationalY(true)
             .SetRelativeY(false)
             .SetLogSubst(false)
-            .SetFunction2D(std::bind(
-                &CrossSectionInterpolant::FunctionToBuildDNdxInterpolant2D, this, _1, _2, std::ref(integral), i));
+            .SetFunction2D(boost::bind(
+                &CrossSectionInterpolant::FunctionToBuildDNdxInterpolant2D, this, _1, _2, boost::ref(integral), i));
 
         builder_container2d[i].first  = &builder2d[i];
         builder_container2d[i].second = &dndx_interpolant_2d_[i];
@@ -115,7 +114,7 @@ void CrossSectionInterpolant::InitdNdxInerpolation(const InterpolationDef& def)
             .SetRationalY(true)
             .SetRelativeY(false)
             .SetLogSubst(false)
-            .SetFunction1D(std::bind(&CrossSectionInterpolant::FunctionToBuildDNdxInterpolant, this, _1, i));
+            .SetFunction1D(boost::bind(&CrossSectionInterpolant::FunctionToBuildDNdxInterpolant, this, _1, i));
 
         builder_container1d[i].first  = &builder1d[i];
         builder_container1d[i].second = &dndx_interpolant_1d_[i];
@@ -144,20 +143,24 @@ CrossSectionInterpolant::CrossSectionInterpolant(const CrossSectionInterpolant& 
     int num_components = cross_section.parametrization_->GetMedium().GetNumComponents();
 
     dndx_interpolant_1d_.reserve(num_components);
-    for (auto interpolant: cross_section.dndx_interpolant_1d_)
+    for (InterpolantVec::const_iterator iter = cross_section.dndx_interpolant_1d_.begin();
+         iter != cross_section.dndx_interpolant_1d_.end();
+         ++iter)
     {
-        if (interpolant != NULL)
+        if (*iter != NULL)
         {
-            dndx_interpolant_1d_.push_back(new Interpolant(*interpolant));
+            dndx_interpolant_1d_.push_back(new Interpolant(**iter));
         }
     }
 
     dndx_interpolant_2d_.reserve(num_components);
-    for (auto interpolant: cross_section.dndx_interpolant_2d_)
+    for (InterpolantVec::const_iterator iter = cross_section.dndx_interpolant_2d_.begin();
+         iter != cross_section.dndx_interpolant_2d_.end();
+         ++iter)
     {
-        if (interpolant != NULL)
+        if (*iter != NULL)
         {
-            dndx_interpolant_2d_.push_back(new Interpolant(*interpolant));
+            dndx_interpolant_2d_.push_back(new Interpolant(**iter));
         }
     }
 }
@@ -167,14 +170,14 @@ CrossSectionInterpolant::~CrossSectionInterpolant()
     delete dedx_interpolant_;
     delete de2dx_interpolant_;
 
-    for (auto interpolant: dndx_interpolant_1d_)
+    for (InterpolantVec::const_iterator iter = dndx_interpolant_1d_.begin(); iter != dndx_interpolant_1d_.end(); ++iter)
     {
-        delete interpolant;
+        delete *iter;
     }
 
-    for (auto interpolant: dndx_interpolant_2d_)
+    for (InterpolantVec::const_iterator iter = dndx_interpolant_2d_.begin(); iter != dndx_interpolant_2d_.end(); ++iter)
     {
-        delete interpolant;
+        delete *iter;
     }
 }
 
@@ -292,7 +295,6 @@ double CrossSectionInterpolant::CalculateStochasticLoss(double energy, double rn
         return 0;
 
     log_fatal("sum was not initialized correctly");
-    return 0; // just to prevent warnings
 }
 
 // ------------------------------------------------------------------------- //
@@ -322,5 +324,5 @@ double CrossSectionInterpolant::FunctionToBuildDNdxInterpolant2D(double energy,
     v = limits.vUp * exp(v * log(limits.vMax / limits.vUp));
 
     return integral.Integrate(
-        limits.vUp, v, std::bind(&Parametrization::FunctionToDNdxIntegral, parametrization_, energy, _1), 4);
+        limits.vUp, v, boost::bind(&Parametrization::FunctionToDNdxIntegral, parametrization_, energy, _1), 4);
 }

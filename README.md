@@ -43,11 +43,8 @@ all these OS are UNIX based it should be fine to run and compile PROPOSAL on a U
 ## Recommended ##
 
 - Doxygen (For pdf and html documentation of the code)
-- [pybind11](https://github.com/pybind/pybind11)
+- [Boost.Python](http://www.boost.org/doc/libs/1_64_0/libs/python/doc/html/index.html)
   (To build the python wrapper)
-  If you decide to build the python wrapper and pybind11 is not
-  provided on your system, pybind11 will be cloned to the project
-  source folder.
 
 ## Installation ##
 
@@ -151,13 +148,9 @@ The parameters of the given configuration file are described
 ```python
 import pyPROPOSAL as pp
 
-prop = pp.Propagator(
-	particle_def=pp.particle.MuMinusDef.get(),
-	config_file="path/to/config.json"
-)
-
+prop = pp.Propagator(pp.MuMinusDef.get(), "path/to/config.json")
 mu = prop.particle
-mu_backup = pp.particle.Particle(mu)
+mu_backup = pp.Particle(mu)
 
 mu_backup.energy = 9e6
 mu_backup.direction = pp.Vector3D(0, 0, -1)

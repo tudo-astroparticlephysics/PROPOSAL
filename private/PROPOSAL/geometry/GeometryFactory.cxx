@@ -1,5 +1,5 @@
 
-#include <algorithm>
+#include <boost/algorithm/string.hpp>
 
 #include "PROPOSAL/Output.h"
 #include "PROPOSAL/geometry/Box.h"
@@ -30,8 +30,7 @@ void GeometryFactory::Register(const std::string& name, const Enum& num, Registe
 
 Geometry* GeometryFactory::CreateGeometry(const std::string& name)
 {
-    std::string name_lower = name;
-    std::transform(name.begin(), name.end(), name_lower.begin(), ::tolower);
+    std::string name_lower = boost::algorithm::to_lower_copy(name);
 
     GeometryMapString::iterator it = geometry_map_str.find(name_lower);
 
@@ -41,7 +40,6 @@ Geometry* GeometryFactory::CreateGeometry(const std::string& name)
     } else
     {
         log_fatal("Geometry %s not registerd!", name.c_str());
-        return NULL; // just to prevent warnings
     }
 }
 
@@ -55,7 +53,6 @@ Geometry* GeometryFactory::CreateGeometry(const Enum& num)
     } else
     {
         log_fatal("Medium %s not registerd!", typeid(num).name());
-        return NULL; // just to prevent warnings
     }
 }
 

@@ -1,4 +1,5 @@
 
+#include <boost/bind.hpp>
 #include <cmath>
 
 #include "PROPOSAL/crossection/parametrization/Ionization.h"
@@ -9,7 +10,6 @@
 #include "PROPOSAL/medium/Medium.h"
 
 using namespace PROPOSAL;
-using namespace std::placeholders;
 
 /******************************************************************************
  *                               Ionization                                *

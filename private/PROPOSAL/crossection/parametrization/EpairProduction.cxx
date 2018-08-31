@@ -1,4 +1,5 @@
 
+#include <boost/functional/hash.hpp>
 #include <cmath>
 
 #include "PROPOSAL/crossection/parametrization/EpairProduction.h"
@@ -6,6 +7,7 @@
 #include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/medium/Medium.h"
 
+// #include "PROPOSAL/methods.h"
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Output.h"
 
@@ -29,7 +31,6 @@
     const std::string Epair##param::name_ = "Epair" #param;
 
 using namespace PROPOSAL;
-using namespace std::placeholders;
 
 /******************************************************************************
  *                              EpairProduction                               *
@@ -120,8 +121,16 @@ double EpairProduction::lpm(double energy, double v, double r2, double b, double
         init_lpm_effect_ = false;
         double sum       = 0;
 
-        for (auto component: medium_->GetComponents())
+        // for (std::vector<Components::Component*>::iterator iter = medium_->GetComponents().begin() ; iter !=
+        // medium_->GetComponents().end() ; ++iter)
+        // {
+        //     sum += (*iter)->GetNucCharge() * (*iter)->GetNucCharge() *
+        //            log(3.25 * (*iter)->GetLogConstant() * pow((*iter)->GetNucCharge(), -1. / 3));
+        // }
+        for (int i = 0; i < medium_->GetNumComponents(); i++)
         {
+            Components::Component* component = medium_->GetComponents().at(i);
+
             sum += component->GetNucCharge() * component->GetNucCharge() *
                    log(3.25 * component->GetLogConstant() * pow(component->GetNucCharge(), -1. / 3));
         }
@@ -223,9 +232,9 @@ double EpairProductionRhoIntegral::DifferentialCrossSection(double energy, doubl
     return multiplier_ * medium_->GetMolDensity() * components_[component_index_]->GetAtomInMolecule() *
            particle_def_.charge * particle_def_.charge *
            (integral_.Integrate(
-                1 - rMax, aux, std::bind(&EpairProductionRhoIntegral::FunctionToIntegral, this, energy, v, _1), 2) +
+                1 - rMax, aux, boost::bind(&EpairProductionRhoIntegral::FunctionToIntegral, this, energy, v, _1), 2) +
             integral_.Integrate(
-                aux, 1, std::bind(&EpairProductionRhoIntegral::FunctionToIntegral, this, energy, v, _1), 4));
+                aux, 1, boost::bind(&EpairProductionRhoIntegral::FunctionToIntegral, this, energy, v, _1), 4));
 }
 
 // ------------------------------------------------------------------------- //
@@ -238,7 +247,7 @@ void EpairProductionRhoIntegral::print(std::ostream& os) const
 size_t EpairProductionRhoIntegral::GetHash() const
 {
     size_t seed = Parametrization::GetHash();
-    hash_combine(seed, lpm_);
+    boost::hash_combine(seed, lpm_);
 
     return seed;
 }

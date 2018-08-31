@@ -1,5 +1,5 @@
 
-#include <functional>
+#include <boost/bind.hpp>
 #include <cmath>
 
 #include "PROPOSAL/crossection/CrossSection.h"
@@ -27,7 +27,6 @@
     UtilityIntegral##cls::~UtilityIntegral##cls() {}
 
 using namespace PROPOSAL;
-// using namespace std::placeholders;
 
 /******************************************************************************
  *                              Utility Integral                              *
@@ -85,7 +84,7 @@ UTILITY_INTEGRAL_IMPL(Displacement)
 double UtilityIntegralDisplacement::Calculate(double ei, double ef, double rnd)
 {
     return integral_.IntegrateWithRandomRatio(
-        ei, ef, std::bind(&UtilityIntegralDisplacement::FunctionToIntegral, this, std::placeholders::_1), 4, -rnd);
+        ei, ef, boost::bind(&UtilityIntegralDisplacement::FunctionToIntegral, this, _1), 4, -rnd);
 }
 
 /******************************************************************************
@@ -115,7 +114,7 @@ double UtilityIntegralInteraction::Calculate(double ei, double ef, double rnd)
     (void)ef;
 
     return integral_.IntegrateWithRandomRatio(
-        ei, ef, std::bind(&UtilityIntegralInteraction::FunctionToIntegral, this, std::placeholders::_1), 4, -rnd);
+        ei, ef, boost::bind(&UtilityIntegralInteraction::FunctionToIntegral, this, _1), 4, -rnd);
 }
 
 /******************************************************************************
@@ -151,7 +150,7 @@ double UtilityIntegralDecay::Calculate(double ei, double ef, double rnd)
     (void)ef;
 
     return integral_.IntegrateWithRandomRatio(
-        ei, ef, std::bind(&UtilityIntegralDecay::FunctionToIntegral, this, std::placeholders::_1), 4, -rnd);
+        ei, ef, boost::bind(&UtilityIntegralDecay::FunctionToIntegral, this, _1), 4, -rnd);
 }
 
 /******************************************************************************
@@ -176,7 +175,7 @@ double UtilityIntegralTime::Calculate(double ei, double ef, double rnd)
 {
     (void)rnd;
 
-    return integral_.Integrate(ei, ef, std::bind(&UtilityIntegralTime::FunctionToIntegral, this, std::placeholders::_1), 4);
+    return integral_.Integrate(ei, ef, boost::bind(&UtilityIntegralTime::FunctionToIntegral, this, _1), 4);
 }
 
 /******************************************************************************
@@ -204,7 +203,7 @@ double UtilityIntegralContRand::FunctionToIntegral(double energy)
 double UtilityIntegralContRand::Calculate(double ei, double ef, double rnd)
 {
     (void)rnd;
-    return integral_.Integrate(ei, ef, std::bind(&UtilityIntegralContRand::FunctionToIntegral, this, std::placeholders::_1), 4);
+    return integral_.Integrate(ei, ef, boost::bind(&UtilityIntegralContRand::FunctionToIntegral, this, _1), 4);
 }
 
 /******************************************************************************
@@ -229,7 +228,7 @@ double UtilityIntegralScattering::FunctionToIntegral(double energy)
 double UtilityIntegralScattering::Calculate(double ei, double ef, double rnd)
 {
     (void)rnd;
-    return integral_.Integrate(ei, ef, std::bind(&UtilityIntegralScattering::FunctionToIntegral, this, std::placeholders::_1), 4);
+    return integral_.Integrate(ei, ef, boost::bind(&UtilityIntegralScattering::FunctionToIntegral, this, _1), 4);
 }
 
 #undef UTILITY_INTEGRAL_DEC

@@ -1,5 +1,6 @@
 
-#include <functional>
+#include <boost/bind.hpp>
+#include <boost/functional/hash.hpp>
 #include <cmath>
 
 #include "PROPOSAL/Constants.h"
@@ -7,7 +8,6 @@
 #include "PROPOSAL/math/Integral.h"
 #include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/medium/Medium.h"
-#include "PROPOSAL/methods.h"
 
 #define BREMSSTRAHLUNG_IMPL(param)                                                                                     \
     Brems##param::Brems##param(const ParticleDef& particle_def,                                                        \
@@ -29,7 +29,6 @@
     const std::string Brems##param::name_ = "Brems" #param;
 
 using namespace PROPOSAL;
-using namespace std::placeholders;
 
 /******************************************************************************
  *                               Bremsstrahlung                                *
@@ -159,9 +158,9 @@ double Bremsstrahlung::lpm(double energy, double v)
             Parametrization::IntegralLimits limits = GetIntegralLimits(BIGENERGY);
 
             sum += integral_temp.Integrate(
-                limits.vMin, limits.vUp, std::bind(&Bremsstrahlung::FunctionToDEdxIntegral, this, BIGENERGY, _1), 2);
+                limits.vMin, limits.vUp, boost::bind(&Bremsstrahlung::FunctionToDEdxIntegral, this, BIGENERGY, _1), 2);
             sum += integral_temp.Integrate(
-                limits.vUp, limits.vMax, std::bind(&Bremsstrahlung::FunctionToDEdxIntegral, this, BIGENERGY, _1), 4);
+                limits.vUp, limits.vMax, boost::bind(&Bremsstrahlung::FunctionToDEdxIntegral, this, BIGENERGY, _1), 4);
         }
 
         eLpm_ = ALPHA * (particle_def_.mass);
@@ -238,7 +237,8 @@ double Bremsstrahlung::lpm(double energy, double v)
 size_t Bremsstrahlung::GetHash() const
 {
     size_t seed = Parametrization::GetHash();
-    hash_combine(seed, lpm_, lorenz_);
+    boost::hash_combine(seed, lpm_);
+    boost::hash_combine(seed, lorenz_);
 
     return seed;
 }

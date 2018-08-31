@@ -1,6 +1,6 @@
 
 import pyPROPOSAL as pp
-import pyPROPOSAL.parametrization as parametrization
+import pyPROPOSAL.Parametrization as Parametrization
 
 try:
     import matplotlib as mpl
@@ -22,8 +22,8 @@ import math
 
 if __name__ == "__main__":
 
-    mu = pp.particle.MuMinusDef.get()
-    medium = pp.medium.StandardRock(1.0)  # With densitiy correction
+    mu = pp.MuMinusDef.get()
+    medium = pp.Medium.StandardRock(1.0)  # With densitiy correction
     cuts = pp.EnergyCutSettings(-1, -1)  # ecut, vcut
 
     dEdx_photo = []
@@ -51,10 +51,10 @@ if __name__ == "__main__":
         ]
 
     params = [
-        parametrization.bremsstrahlung.KelnerKokoulinPetrukhin(
+        Parametrization.Bremsstrahlung.KelnerKokoulinPetrukhin(
             *param_defs
         ),
-        parametrization.bremsstrahlung.SandrockSoedingreksoRhode(
+        Parametrization.Bremsstrahlung.SandrockSoedingreksoRhode(
             *param_defs
         )
     ]
@@ -67,7 +67,7 @@ if __name__ == "__main__":
 
     for param in params:
         print(param.name)
-        crosssections.append(pp.crosssection.BremsIntegral(
+        crosssections.append(pp.CrossSection.BremsIntegral(
             param,
         ))
 

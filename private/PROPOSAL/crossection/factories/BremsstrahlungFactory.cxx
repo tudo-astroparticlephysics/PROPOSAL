@@ -1,5 +1,5 @@
 
-#include <algorithm>
+#include <boost/algorithm/string.hpp> // case insensitive string compare for configuration file
 
 #include "PROPOSAL/crossection/BremsIntegral.h"
 #include "PROPOSAL/crossection/BremsInterpolant.h"
@@ -58,7 +58,6 @@ CrossSection* BremsstrahlungFactory::CreateBremsstrahlung(const ParticleDef& par
     } else
     {
         log_fatal("Bremsstrahlung %s not registerd!", typeid(def.parametrization).name());
-        return NULL; // Just to prevent warinngs
     }
 }
 
@@ -78,15 +77,13 @@ CrossSection* BremsstrahlungFactory::CreateBremsstrahlung(const ParticleDef& par
     } else
     {
         log_fatal("Bremsstrahlung %s not registerd!", typeid(def.parametrization).name());
-        return NULL; // Just to prevent warinngs
     }
 }
 
 // ------------------------------------------------------------------------- //
 BremsstrahlungFactory::Enum BremsstrahlungFactory::GetEnumFromString(const std::string& name)
 {
-    std::string name_lower = name;
-    std::transform(name.begin(), name.end(), name_lower.begin(), ::tolower);
+    std::string name_lower = boost::algorithm::to_lower_copy(name);
 
     BimapStringEnum::left_const_iterator it = string_enum_.left.find(name_lower);
     if (it != string_enum_.left.end())
@@ -95,8 +92,6 @@ BremsstrahlungFactory::Enum BremsstrahlungFactory::GetEnumFromString(const std::
     } else
     {
         log_fatal("Bremsstrahlung %s not registerd!", name.c_str());
-        return BremsstrahlungFactory::None; // Just to prevent warinngs
-
     }
 }
 
@@ -110,6 +105,5 @@ std::string BremsstrahlungFactory::GetStringFromEnum(const BremsstrahlungFactory
     } else
     {
         log_fatal("Bremsstrahlung %s not registerd!", typeid(enum_t).name());
-        return ""; // Just to prevent warinngs
     }
 }

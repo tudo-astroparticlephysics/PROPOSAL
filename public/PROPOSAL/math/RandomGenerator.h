@@ -29,9 +29,8 @@
 
 #pragma once
 
-#include <functional>
-#include <random>
-#include <iostream>
+#include <boost/function.hpp>
+#include <boost/random.hpp>
 
 
 #ifdef ICECUBE_PROJECT
@@ -65,7 +64,7 @@ public:
     /// @brief Serialize the rng to a stream
     ///
     /// Useful for debuging to save a specific state.
-    /// Only supported for internal used rng from the standard libraries.
+    /// Only supported for internal used rng from the boost libraries.
     ///
     /// @param std::ostream
     // ----------------------------------------------------------------------------
@@ -75,7 +74,7 @@ public:
     /// @brief Deserialize the rng from a stream
     ///
     /// Useful for debuging to get back a specific state.
-    /// Only supported for internal used rng from the standard libraries.
+    /// Only supported for internal used rng from the boost libraries.
     ///
     /// @param std::ostream
     // ----------------------------------------------------------------------------
@@ -86,7 +85,7 @@ public:
      * Classes that contain other subclasses of MathModel should
      * override this to pass the new RNG on to their members.
      */
-    virtual void SetRandomNumberGenerator(std::function<double()>& f);
+    virtual void SetRandomNumberGenerator(boost::function<double()>& f);
 
 #ifdef ICECUBE_PROJECT
     virtual void SetI3RandomNumberGenerator(I3RandomServicePtr random);
@@ -95,7 +94,7 @@ public:
     /** @brief Set a the default random number generator
      *
      * The default random number generator is the
-     * std mersenne twister std::mt19937.
+     * boost mersenne twister boost::mt19937.
      */
     virtual void SetDefaultRandomNumberGenerator();
 
@@ -105,9 +104,9 @@ private:
 
     static double DefaultRandomDouble();
 
-    static std::mt19937 rng_;
-    static std::uniform_real_distribution<double> uniform_distribution;
-    std::function<double()> random_function;
+    static boost::random::mt19937 rng_;
+    static boost::variate_generator<boost::mt19937&, boost::uniform_real<> > variate_real;
+    boost::function<double()> random_function;
 #ifdef ICECUBE_PROJECT
     I3RandomService* i3random_gen_;
 #endif

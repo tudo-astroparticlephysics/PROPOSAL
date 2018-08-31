@@ -43,10 +43,8 @@ IF(DEBUG)
         SET( CMAKE_CXX_FLAGS "-g -O0" )
 ENDIF()
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-
 # Some additional options
-OPTION(ADD_PYTHON "Choose to compile the python wrapper library" ON)
+OPTION (ADD_PYTHON "Choose to compile the python wrapper library" ON)
 OPTION(ADD_ROOT "Choose to compile ROOT examples." OFF)
 OPTION(ADD_PERFORMANCE_TEST "Choose to compile the performace test source." OFF)
 OPTION(ADD_TESTS "Build all unittests." OFF)
@@ -60,32 +58,7 @@ IF(ADD_PYTHON)
 	FIND_PACKAGE( PythonLibs 2.7 REQUIRED )
 
 	IF(PYTHONLIBS_FOUND)
-		# TODO(mario): Find a better way to search for pybind11!
-		# Preferably with a FindPybind11.make.
-		# I haven't found a reliable method yet.
-
 		INCLUDE_DIRECTORIES( ${PYTHON_INCLUDE_DIRS} )
-
-		FIND_PACKAGE(pybind11 CONFIG)
-
-		IF(pybind11_FOUND)
-			MESSAGE(STATUS "Found pybind11 v${pybind11_VERSION}: ${pybind11_INCLUDE_DIR}")
-			INCLUDE_DIRECTORIES( ${pybind11_INCLUDE_DIR} )
-		ELSE(pybind11_FOUND)
-			MESSAGE(STATUS "Clone pybind11")
-
-			execute_process(
-				COMMAND git clone https://github.com/pybind/pybind11 ${CMAKE_CURRENT_SOURCE_DIR}/pybind11
-				OUTPUT_VARIABLE     git_output
-				ERROR_VARIABLE		git_error
-			)
-
-			add_subdirectory(pybind11)
-
-			SET(pybind11_FOUND TRUE)
-			MESSAGE(STATUS "Clone pybind11: ${git_error}")
-		ENDIF(pybind11_FOUND)
-
 	ENDIF(PYTHONLIBS_FOUND)
 ELSE(ADD_PYTHON)
 	MESSAGE(STATUS "No python wrapper library will be build.")
@@ -95,8 +68,26 @@ ENDIF(ADD_PYTHON)
 #################           boost       #########################
 #################################################################
 
-FIND_PACKAGE( Boost REQUIRED )
-SET(LIBRARYS_TO_LINK ${LIBRARYS_TO_LINK} ${Boost_LIBRARIES})
+IF(ADD_PYTHON)
+	# Libs for PROPOSAL
+	FIND_PACKAGE( Boost COMPONENTS REQUIRED QUIET )
+	# LIBRARY_TO_LINK is empty here. But provided for future additions.
+	SET(LIBRARYS_TO_LINK ${LIBRARYS_TO_LINK} ${Boost_LIBRARIES})
+
+	# Libs for pyPROPOSAL
+	FIND_PACKAGE( Boost COMPONENTS python REQUIRED )
+	SET(LIBRARYS_TO_LINK_PYPROPOSAL ${LIBRARYS_TO_LINK} ${Boost_LIBRARIES})
+ELSE(ADD_PYTHON)
+	FIND_PACKAGE( Boost REQUIRED )
+	SET(LIBRARYS_TO_LINK ${LIBRARYS_TO_LINK} ${Boost_LIBRARIES})
+ENDIF(ADD_PYTHON)
+
+IF(ADD_PERFORMANCE_TEST)
+	# Libs for the perfomance test source
+	FIND_PACKAGE( Boost COMPONENTS chrono REQUIRED )
+	SET(LIBRARYS_TO_LINK_PERFORMANCE_TEST ${LIBRARYS_TO_LINK} ${Boost_LIBRARIES})
+ENDIF(ADD_PERFORMANCE_TEST)
+
 
 #################################################################
 #################           ROOT        #########################
@@ -240,6 +231,8 @@ IF(ADD_TESTS)
   #create tar directory with "tar -czvf TestFiles.tar.Z TestFiles/" and put it in Test directory
   EXECUTE_PROCESS(COMMAND  tar -xvf ${PROJECT_SOURCE_DIR}/tests/TestFiles.tar.gz -C ${PROPOSAL_BINARY_DIR}/bin/
                     OUTPUT_VARIABLE _output OUTPUT_STRIP_TRAILING_WHITESPACE)
+  # EXECUTE_PROCESS(COMMAND  tar -xvf ${PROJECT_SOURCE_DIR}/tests/TestFiles2.tar.gz -C ${PROPOSAL_BINARY_DIR}/bin/
+  #                   OUTPUT_VARIABLE _output OUTPUT_STRIP_TRAILING_WHITESPACE)
 
   ADD_EXECUTABLE(UnitTest_Utility tests/Utility_TEST.cxx)
   ADD_EXECUTABLE(UnitTest_Scattering tests/Scattering_TEST.cxx)
@@ -307,12 +300,19 @@ ADD_SUBDIRECTORY( doc )
 
 
 IF(ADD_PYTHON)
-	IF(PYTHONLIBS_FOUND AND pybind11_FOUND)
-		PYBIND11_ADD_MODULE(pyPROPOSAL SHARED private/python/pybindings.cxx)
-		TARGET_LINK_LIBRARIES(pyPROPOSAL PRIVATE PROPOSAL)
-		SET_TARGET_PROPERTIES(pyPROPOSAL PROPERTIES PREFIX "" SUFFIX ".so" COMPILE_FLAGS "${CMAKE_CXX_FLAGS}")
+	IF(PYTHONLIBS_FOUND)
+		ADD_LIBRARY(pyPROPOSAL SHARED private/python/pybindings.cxx)
+
+		# Python seems to have problems to import .dylib on OS X, so modify the suffix
+		IF(APPLE)
+			SET_TARGET_PROPERTIES(pyPROPOSAL PROPERTIES PREFIX "" SUFFIX ".so" COMPILE_FLAGS "${CMAKE_CXX_FLAGS}")
+		ELSE(APPLE)
+			SET_TARGET_PROPERTIES(pyPROPOSAL PROPERTIES PREFIX "" COMPILE_FLAGS "${CMAKE_CXX_FLAGS}")
+		ENDIF(APPLE)
+
+		TARGET_LINK_LIBRARIES(pyPROPOSAL ${PYTHON_LIBRARIES} ${LIBRARYS_TO_LINK_PYPROPOSAL} PROPOSAL)
 		INSTALL(TARGETS pyPROPOSAL DESTINATION lib)
-	ENDIF(PYTHONLIBS_FOUND AND pybind11_FOUND)
+	ENDIF(PYTHONLIBS_FOUND)
 ENDIF(ADD_PYTHON)
 
 # uninstall target
