@@ -32,7 +32,7 @@
 #include <vector>
 // #include <cmath>
 
-#include <functional>
+#include <boost/function.hpp>
 
 namespace PROPOSAL {
 
@@ -73,8 +73,8 @@ private:
     double xmin_, xmax_, step_;
     bool rational_, relative_;
 
-    std::function<double(double)> function1d_;
-    std::function<double(double, double)> function2d_;
+    boost::function<double(double)> function1d_;
+    boost::function<double(double, double)> function2d_;
     std::vector<Interpolant*> Interpolant_;
 
     int row_, starti_;
@@ -224,7 +224,7 @@ public:
     Interpolant(int max,
                 double xmin,
                 double xmax,
-                std::function<double(double)> function1d,
+                boost::function<double(double)> function1d,
                 int romberg,
                 bool rational,
                 bool relative,
@@ -265,7 +265,7 @@ public:
                 int max2,
                 double x2min,
                 double x2max,
-                std::function<double(double, double)> function2d,
+                boost::function<double(double, double)> function2d,
                 int romberg1,
                 bool rational1,
                 bool relative1,

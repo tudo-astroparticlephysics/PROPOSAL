@@ -30,7 +30,7 @@
 #pragma once
 
 #include <boost/bimap.hpp>
-#include <functional>
+#include <boost/function.hpp>
 
 #include <map>
 #include <string>
@@ -54,8 +54,7 @@ public:
 
     enum Enum
     {
-        None = 0,
-        PetrukhinShestakov,
+        PetrukhinShestakov = 0,
         KelnerKokoulinPetrukhin,
         CompleteScreening,
         AndreevBezrukovBugaev,
@@ -97,7 +96,7 @@ public:
     // Typedefs for readablitiy
     // --------------------------------------------------------------------- //
 
-    typedef std::function<
+    typedef boost::function<
         Bremsstrahlung*(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier, bool lpm)>
         RegisterFunction;
 

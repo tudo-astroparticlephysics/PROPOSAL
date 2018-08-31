@@ -107,7 +107,7 @@ bool EnergyCutSettings::operator!=(const EnergyCutSettings& energyCutSettings) c
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-std::ostream& PROPOSAL::operator<<(std::ostream& os, PROPOSAL::EnergyCutSettings const& cut_settings)
+std::ostream& PROPOSAL::operator<<(std::ostream& os, EnergyCutSettings const& cut_settings)
 {
     std::stringstream ss;
     ss << " EnergyCutSettings (" << &cut_settings << ") ";

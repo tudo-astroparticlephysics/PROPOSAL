@@ -29,11 +29,12 @@
 
 #pragma once
 
+#include <boost/functional/hash.hpp>
+
 #include <string>
 #include <vector>
 
 #include "PROPOSAL/decay/DecayTable.h"
-#include "PROPOSAL/methods.h"
 
 #define PARTICLE_DEF(cls)                                                                                              \
     class cls##Def : public ParticleDef                                                                                \
@@ -55,6 +56,11 @@ namespace PROPOSAL {
 namespace HardComponentTables {
 
 typedef std::vector<std::vector<double> > VecType;
+
+extern const double muon[8][7];
+extern const double tau[8][7];
+
+VecType getHardComponentVector(const double table[8][7]);
 
 // ----------------------------------------------------------------------------
 /// @brief Table used for photonuclear interaction
@@ -124,7 +130,6 @@ struct ParticleDef
 private:
     ParticleDef& operator=(const ParticleDef&); // Undefined & not allowed
 };
-
 
 std::ostream& operator<<(std::ostream&, PROPOSAL::ParticleDef const&);
 
@@ -205,6 +210,13 @@ private:
     DecayTable decay_table;
 };
 
+// ----------------------------------------------------------------------------
+/// @brief Used to hash ParticleDefs in PropagatorService hash table
+//
+/// Hash will currently only done by mass, lifetime and charge
+// ----------------------------------------------------------------------------
+std::size_t hash_value(ParticleDef const& particle_def);
+
 // ------------------------------------------------------------------------- //
 // Predefined particle definitions
 // ------------------------------------------------------------------------- //
@@ -259,8 +271,5 @@ PARTICLE_DEF(SMPMinus)
 PARTICLE_DEF(SMPPlus)
 
 } // namespace PROPOSAL
-
-
-PROPOSAL_MAKE_HASHABLE(PROPOSAL::ParticleDef, t.mass, t.lifetime, t.charge)
 
 #undef PARTICLE_DEF

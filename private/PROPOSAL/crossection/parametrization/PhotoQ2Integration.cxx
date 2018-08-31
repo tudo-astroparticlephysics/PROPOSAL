@@ -1,15 +1,20 @@
 
+#include <boost/bind.hpp>
+#include <boost/functional/hash.hpp>
 #include <cmath>
 
 #include "PROPOSAL/crossection/parametrization/PhotoQ2Integration.h"
 
 #include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/medium/Medium.h"
+// #include "PROPOSAL/math/Integral.h"
 #include "PROPOSAL/math/Interpolant.h"
-#include "PROPOSAL/methods.h"
+// #include "PROPOSAL/math/InterpolantBuilder.h"
+
+// #include "PROPOSAL/Constants.h"
+// #include "PROPOSAL/methods.h"
 
 using namespace PROPOSAL;
-using namespace std::placeholders;
 
 #define Q2_PHOTO_PARAM_INTEGRAL_IMPL(param)                                                                            \
     Photo##param::Photo##param(const ParticleDef& particle_def,                                                        \
@@ -94,7 +99,7 @@ double PhotoQ2Integral::DifferentialCrossSection(double energy, double v)
     }
 
     aux = integral_.Integrate(
-        q2_min, q2_max, std::bind(&PhotoQ2Integral::FunctionToQ2Integral, this, energy, v, std::placeholders::_1), 4);
+        q2_min, q2_max, boost::bind(&PhotoQ2Integral::FunctionToQ2Integral, this, energy, v, _1), 4);
 
     aux *= multiplier_ * medium_->GetMolDensity() * components_[component_index_]->GetAtomInMolecule() *
            particle_def_.charge * particle_def_.charge;
@@ -110,7 +115,7 @@ double PhotoQ2Integral::DifferentialCrossSection(double energy, double v)
 size_t PhotoQ2Integral::GetHash() const
 {
     size_t seed = Parametrization::GetHash();
-    hash_combine(seed, shadow_effect_->GetHash());
+    boost::hash_combine(seed, shadow_effect_->GetHash());
 
     return seed;
 }

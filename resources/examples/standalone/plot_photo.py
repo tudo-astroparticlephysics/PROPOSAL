@@ -1,6 +1,6 @@
 
 import pyPROPOSAL as pp
-import pyPROPOSAL.parametrization as parametrization
+import pyPROPOSAL.Parametrization as Parametrization
 
 try:
     import matplotlib as mpl
@@ -21,8 +21,8 @@ import math
 
 if __name__ == "__main__":
 
-    mu = pp.particle.MuMinusDef.get()
-    medium = pp.medium.Ice(1.0)  # With densitiy correction
+    mu = pp.MuMinusDef.get()
+    medium = pp.Medium.Ice(1.0)  # With densitiy correction
     cuts = pp.EnergyCutSettings(-1, -1)  # ecut, vcut
 
     photo = []
@@ -47,15 +47,15 @@ if __name__ == "__main__":
             medium,
             cuts,
             1.0,
-            parametrization.photonuclear.ShadowButkevichMikhailov(),
+            Parametrization.Photonuclear.ShadowButkevichMikhailov(),
             interpolation_def
         ]
 
     params = [
-        parametrization.photonuclear.AbramowiczLevinLevyMaor97Interpolant(
+        Parametrization.Photonuclear.AbramowiczLevinLevyMaor97Interpolant(
             *param_defs
         ),
-        parametrization.photonuclear.ButkevichMikhailovInterpolant(
+        Parametrization.Photonuclear.ButkevichMikhailovInterpolant(
             *param_defs
         )
     ]
@@ -67,7 +67,7 @@ if __name__ == "__main__":
     crosssections = []
 
     for param in params:
-        crosssections.append(pp.crosssection.PhotoInterpolant(
+        crosssections.append(pp.CrossSection.PhotoInterpolant(
             param,
             interpolation_def
         ))

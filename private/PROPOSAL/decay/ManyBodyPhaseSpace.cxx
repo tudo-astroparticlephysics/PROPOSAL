@@ -2,7 +2,6 @@
 // #include "PROPOSAL/Constants.h"
 
 #include <algorithm> // std::sort
-#include <cmath>
 
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Output.h"
@@ -10,8 +9,8 @@
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/particle/Particle.h"
 
+#include <boost/math/special_functions/factorials.hpp>
 
-using namespace std::placeholders;
 using namespace PROPOSAL;
 
 const std::string ManyBodyPhaseSpace::name_ = "ManyBodyPhaseSpace";
@@ -24,22 +23,11 @@ ManyBodyPhaseSpace::ManyBodyPhaseSpace(std::vector<const ParticleDef*> daughters
     , number_of_daughters_(static_cast<int>(daughters.size()))
     , sum_daughter_masses_(0.0)
     , uniform_(true)
-    , broad_phase_statistic_(1000)
-    , matrix_element_()
-    , use_default_matrix_element_(true)
-    , estimate_(nullptr)
+    , matrix_element_(me)
 {
-    if (me == nullptr)
+    if (me.empty())
     {
-        matrix_element_ = ManyBodyPhaseSpace::DefaultEvaluate;
-        use_default_matrix_element_ = true;
-        estimate_ = std::bind(&ManyBodyPhaseSpace::EstimateMaxWeight, this, _1, _2);
-    }
-    else
-    {
-        matrix_element_ = me;
-        use_default_matrix_element_ = false;
-        estimate_ = std::bind(&ManyBodyPhaseSpace::SampleEstimateMaxWeight, this, _1, _2);
+        matrix_element_ = ManyBodyPhaseSpace::Evaluate;
     }
 
     for (std::vector<const ParticleDef*>::iterator it = daughters.begin(); it != daughters.end(); ++it)
@@ -69,19 +57,8 @@ ManyBodyPhaseSpace::ManyBodyPhaseSpace(const ManyBodyPhaseSpace& mode)
     , number_of_daughters_(mode.number_of_daughters_)
     , sum_daughter_masses_(mode.sum_daughter_masses_)
     , uniform_(mode.uniform_)
-    , broad_phase_statistic_(mode.broad_phase_statistic_)
     , matrix_element_(mode.matrix_element_)
-    , use_default_matrix_element_(mode.use_default_matrix_element_)
 {
-    if (use_default_matrix_element_)
-    {
-        estimate_ = std::bind(&ManyBodyPhaseSpace::EstimateMaxWeight, this, _1, _2);
-    }
-    else
-    {
-        estimate_ = std::bind(&ManyBodyPhaseSpace::SampleEstimateMaxWeight, this, _1, _2);
-    }
-
     for (std::vector<const ParticleDef*>::const_iterator it = mode.daughters_.begin(); it != mode.daughters_.end();
          ++it)
     {
@@ -107,12 +84,6 @@ bool ManyBodyPhaseSpace::compare(const DecayChannel& channel) const
     {
         return false;
     } else if (uniform_ != many_body->uniform_)
-    {
-        return false;
-    } else if (broad_phase_statistic_ != many_body->broad_phase_statistic_)
-    {
-        return false;
-    } else if (use_default_matrix_element_ != many_body->use_default_matrix_element_)
     {
         return false;
     } else
@@ -200,7 +171,7 @@ double ManyBodyPhaseSpace::GenerateEvent(DecayProducts& products, const PhaseSpa
 }
 
 // ------------------------------------------------------------------------- //
-double ManyBodyPhaseSpace::DefaultEvaluate(const Particle& particle, const ManyBodyPhaseSpace::DecayProducts& products)
+double ManyBodyPhaseSpace::Evaluate(const Particle& particle, const ManyBodyPhaseSpace::DecayProducts& products)
 {
     (void) particle;
     (void) products;
@@ -209,9 +180,9 @@ double ManyBodyPhaseSpace::DefaultEvaluate(const Particle& particle, const ManyB
 }
 
 // ------------------------------------------------------------------------- //
-double ManyBodyPhaseSpace::Evaluate(const Particle& particle, const ManyBodyPhaseSpace::DecayProducts& products)
+void ManyBodyPhaseSpace::SetMatrixElement(MatrixElementFunction f)
 {
-    return matrix_element_(particle, products);
+    matrix_element_ = f;
 }
 
 // ------------------------------------------------------------------------- //
@@ -225,10 +196,16 @@ ManyBodyPhaseSpace::PhaseSpaceParameters ManyBodyPhaseSpace::GetPhaseSpaceParams
     } else
     {
         PhaseSpaceParameters params;
-
         CalculateNormalization(params, parent.mass);
-        estimate_(params, parent);
 
+        if (matrix_element_ == Evaluate)
+        {
+            EstimateMaxWeight(params, parent.mass);
+        }
+        else
+        {
+            SampleEstimateMaxWeight(params, parent);
+        }
         parameter_map_[parent] = params;
 
         return params;
@@ -238,19 +215,18 @@ ManyBodyPhaseSpace::PhaseSpaceParameters ManyBodyPhaseSpace::GetPhaseSpaceParams
 // ------------------------------------------------------------------------- //
 void ManyBodyPhaseSpace::CalculateNormalization(PhaseSpaceParameters& params, double parent_mass)
 {
-    // For mario: n! = Gamma(n + 1)
     double normalization = std::pow(parent_mass - sum_daughter_masses_, number_of_daughters_ - 2) /
-                           std::tgamma(number_of_daughters_ - 2.0 + 1.0) *
-                           std::pow(2.0 * PI, number_of_daughters_ - 1.0);
+                           boost::math::factorial<double>(number_of_daughters_ - 2) *
+                           std::pow(2.0 * boost::math::constants::pi<double>(), number_of_daughters_ - 1.0);
 
     params.normalization = normalization /= 2.0 * parent_mass;
 }
 
 // ------------------------------------------------------------------------- //
-void ManyBodyPhaseSpace::EstimateMaxWeight(PhaseSpaceParameters& params, const ParticleDef& parent)
+void ManyBodyPhaseSpace::EstimateMaxWeight(PhaseSpaceParameters& params, double parent_mass)
 {
     double weight = 1.0;
-    double E_max = parent.mass - sum_daughter_masses_ + daughter_masses_[0];
+    double E_max = parent_mass - sum_daughter_masses_ + daughter_masses_[0];
     double E_min = 0.0;
 
     for (int i = 1; i < number_of_daughters_; ++i)
@@ -283,7 +259,7 @@ void ManyBodyPhaseSpace::SampleEstimateMaxWeight(PhaseSpaceParameters& params, c
 
     double result = 0.0;
 
-    for (int i = 0; i < broad_phase_statistic_; ++i)
+    for (int i = 0; i < 1000; ++i)
     {
         result = GenerateEvent(products, params, particle) * matrix_element_(particle, products);
 

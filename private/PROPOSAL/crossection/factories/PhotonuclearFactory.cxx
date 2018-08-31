@@ -1,5 +1,5 @@
 
-#include <algorithm>
+#include <boost/algorithm/string.hpp> // case insensitive string compare for configuration file
 
 #include "PROPOSAL/crossection/PhotoIntegral.h"
 #include "PROPOSAL/crossection/PhotoInterpolant.h"
@@ -96,8 +96,7 @@ void PhotonuclearFactory::RegisterQ2(const std::string& name,
 // ------------------------------------------------------------------------- //
 ShadowEffect* PhotonuclearFactory::CreateShadowEffect(const std::string& name)
 {
-    std::string name_lower = name;
-    std::transform(name.begin(), name.end(), name_lower.begin(), ::tolower);
+    std::string name_lower = boost::algorithm::to_lower_copy(name);
 
     PhotoShadowEffectMapString::const_iterator it = photo_shadow_map_str_.find(name_lower);
 
@@ -186,8 +185,7 @@ CrossSection* PhotonuclearFactory::CreatePhotonuclear(const ParticleDef& particl
 // ------------------------------------------------------------------------- //
 PhotonuclearFactory::Enum PhotonuclearFactory::GetEnumFromString(const std::string& name)
 {
-    std::string name_lower = name;
-    std::transform(name.begin(), name.end(), name_lower.begin(), ::tolower);
+    std::string name_lower = boost::algorithm::to_lower_copy(name);
 
     BimapStringEnum::left_const_iterator it = string_enum_.left.find(name_lower);
     if (it != string_enum_.left.end())
@@ -196,7 +194,7 @@ PhotonuclearFactory::Enum PhotonuclearFactory::GetEnumFromString(const std::stri
     } else
     {
         log_fatal("Photonuclear %s not registerd!", name.c_str());
-        return PhotonuclearFactory::None; // Just to prevent warinngs
+        return AbramowiczLevinLevyMaor97; // Just to prevent warinngs
     }
 }
 
@@ -217,8 +215,7 @@ std::string PhotonuclearFactory::GetStringFromEnum(const PhotonuclearFactory::En
 // ------------------------------------------------------------------------- //
 PhotonuclearFactory::Shadow PhotonuclearFactory::GetShadowEnumFromString(const std::string& name)
 {
-    std::string name_lower = name;
-    std::transform(name.begin(), name.end(), name_lower.begin(), ::tolower);
+    std::string name_lower = boost::algorithm::to_lower_copy(name);
 
     BimapStringShadowEnum::left_const_iterator it = string_shadow_enum_.left.find(name_lower);
     if (it != string_shadow_enum_.left.end())
@@ -227,7 +224,7 @@ PhotonuclearFactory::Shadow PhotonuclearFactory::GetShadowEnumFromString(const s
     } else
     {
         log_fatal("Photonuclear %s not registerd!", name.c_str());
-        return PhotonuclearFactory::ShadowNone; // Just to prevent warinngs
+        return ShadowDuttaRenoSarcevicSeckel; // Just to prevent warinngs
     }
 }
 

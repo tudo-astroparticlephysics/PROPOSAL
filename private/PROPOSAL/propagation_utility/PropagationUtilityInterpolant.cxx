@@ -1,5 +1,5 @@
 
-#include <functional>
+#include <boost/bind.hpp>
 
 #include "PROPOSAL/math/Interpolant.h"
 #include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
@@ -13,7 +13,6 @@
 #include "PROPOSAL/math/InterpolantBuilder.h"
 
 using namespace PROPOSAL;
-using namespace std::placeholders;
 using namespace std;
 
 /******************************************************************************
@@ -88,13 +87,13 @@ void UtilityInterpolant::InitInterpolation(const std::string& name,
     Integral integral(IROMB, IMAXS, IPREC2);
     const ParticleDef& particle_def = utility_.GetParticleDef();
 
-    std::vector<std::pair<Interpolant**, std::function<double(double)> > > interpolants;
+    std::vector<std::pair<Interpolant**, boost::function<double(double)> > > interpolants;
 
     interpolants.push_back(std::make_pair(
         &interpolant_,
-        std::bind(&UtilityInterpolant::BuildInterpolant, this, std::placeholders::_1, std::ref(utility), std::ref(integral))));
+        boost::bind(&UtilityInterpolant::BuildInterpolant, this, _1, boost::ref(utility), boost::ref(integral))));
     interpolants.push_back(
-        std::make_pair(&interpolant_diff_, std::bind(&UtilityIntegral::FunctionToIntegral, &utility, std::placeholders::_1)));
+        std::make_pair(&interpolant_diff_, boost::bind(&UtilityIntegral::FunctionToIntegral, &utility, _1)));
 
     unsigned int number_of_interpolants = interpolants.size();
 
@@ -197,7 +196,7 @@ double UtilityInterpolantDisplacement::GetUpperLimit(double ei, double rnd)
 double UtilityInterpolantDisplacement::BuildInterpolant(double energy, UtilityIntegral& utility, Integral& integral)
 {
     return integral.Integrate(
-        energy, utility_.GetParticleDef().low, std::bind(&UtilityIntegral::FunctionToIntegral, &utility, std::placeholders::_1), 4);
+        energy, utility_.GetParticleDef().low, boost::bind(&UtilityIntegral::FunctionToIntegral, &utility, _1), 4);
 }
 
 // ------------------------------------------------------------------------- //
@@ -295,11 +294,11 @@ double UtilityInterpolantInteraction::BuildInterpolant(double energy, UtilityInt
     if (up_)
     {
         return integral.Integrate(
-            energy, utility_.GetParticleDef().low, std::bind(&UtilityIntegral::FunctionToIntegral, &utility, std::placeholders::_1), 4);
+            energy, utility_.GetParticleDef().low, boost::bind(&UtilityIntegral::FunctionToIntegral, &utility, _1), 4);
     } else
     {
         return -integral.Integrate(
-            energy, BIGENERGY, std::bind(&UtilityIntegral::FunctionToIntegral, &utility, std::placeholders::_1), 4);
+            energy, BIGENERGY, boost::bind(&UtilityIntegral::FunctionToIntegral, &utility, _1), 4);
     }
 }
 
@@ -312,9 +311,9 @@ void UtilityInterpolantInteraction::InitInterpolation(const std::string& name,
     const ParticleDef& particle_def = utility_.GetParticleDef();
 
     double a = abs(-integral.Integrate(
-        particle_def.low, particle_def.low * 10, std::bind(&UtilityIntegral::FunctionToIntegral, &utility, std::placeholders::_1), 4));
+        particle_def.low, particle_def.low * 10, boost::bind(&UtilityIntegral::FunctionToIntegral, &utility, _1), 4));
     double b = abs(-integral.Integrate(
-        BIGENERGY, BIGENERGY / 10, std::bind(&UtilityIntegral::FunctionToIntegral, &utility, std::placeholders::_1), 4));
+        BIGENERGY, BIGENERGY / 10, boost::bind(&UtilityIntegral::FunctionToIntegral, &utility, _1), 4));
 
     if (a < b)
     {
@@ -406,7 +405,7 @@ double UtilityInterpolantDecay::GetUpperLimit(double ei, double rnd)
 
 double UtilityInterpolantDecay::BuildInterpolant(double energy, UtilityIntegral& utility, Integral& integral)
 {
-    return -integral.Integrate(energy, BIGENERGY, std::bind(&UtilityIntegral::FunctionToIntegral, &utility, std::placeholders::_1), 4);
+    return -integral.Integrate(energy, BIGENERGY, boost::bind(&UtilityIntegral::FunctionToIntegral, &utility, _1), 4);
 }
 
 // ------------------------------------------------------------------------- //
@@ -418,9 +417,9 @@ void UtilityInterpolantDecay::InitInterpolation(const std::string& name,
     const ParticleDef& particle_def = utility_.GetParticleDef();
 
     double a = abs(-integral.Integrate(
-        particle_def.low, particle_def.low * 10, std::bind(&UtilityIntegral::FunctionToIntegral, &utility, std::placeholders::_1), 4));
+        particle_def.low, particle_def.low * 10, boost::bind(&UtilityIntegral::FunctionToIntegral, &utility, _1), 4));
     double b = abs(-integral.Integrate(
-        BIGENERGY, BIGENERGY / 10, std::bind(&UtilityIntegral::FunctionToIntegral, &utility, std::placeholders::_1), 4));
+        BIGENERGY, BIGENERGY / 10, boost::bind(&UtilityIntegral::FunctionToIntegral, &utility, _1), 4));
 
     if (a < b)
     {
@@ -488,7 +487,7 @@ double UtilityInterpolantTime::GetUpperLimit(double ei, double rnd)
 double UtilityInterpolantTime::BuildInterpolant(double energy, UtilityIntegral& utility, Integral& integral)
 {
     return integral.Integrate(
-        energy, utility_.GetParticleDef().low, std::bind(&UtilityIntegral::FunctionToIntegral, &utility, std::placeholders::_1), 4);
+        energy, utility_.GetParticleDef().low, boost::bind(&UtilityIntegral::FunctionToIntegral, &utility, _1), 4);
 }
 
 // ------------------------------------------------------------------------- //
@@ -554,7 +553,7 @@ double UtilityInterpolantContRand::GetUpperLimit(double ei, double rnd)
 double UtilityInterpolantContRand::BuildInterpolant(double energy, UtilityIntegral& utility, Integral& integral)
 {
     return integral.Integrate(
-        energy, utility_.GetParticleDef().low, std::bind(&UtilityIntegral::FunctionToIntegral, &utility, std::placeholders::_1), 4);
+        energy, utility_.GetParticleDef().low, boost::bind(&UtilityIntegral::FunctionToIntegral, &utility, _1), 4);
 }
 
 // ------------------------------------------------------------------------- //
@@ -622,7 +621,7 @@ double UtilityInterpolantScattering::GetUpperLimit(double ei, double rnd)
 
 double UtilityInterpolantScattering::BuildInterpolant(double energy, UtilityIntegral& utility, Integral& integral)
 {
-    return integral.Integrate(energy, BIGENERGY, std::bind(&UtilityIntegral::FunctionToIntegral, &utility, std::placeholders::_1), 4);
+    return integral.Integrate(energy, BIGENERGY, boost::bind(&UtilityIntegral::FunctionToIntegral, &utility, _1), 4);
 }
 
 // ------------------------------------------------------------------------- //

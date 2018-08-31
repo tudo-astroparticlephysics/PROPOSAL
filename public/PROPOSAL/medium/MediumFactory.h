@@ -30,7 +30,7 @@
 #pragma once
 
 #include <boost/bimap.hpp>
-#include <functional>
+#include <boost/function.hpp>
 
 #include <map>
 
@@ -43,8 +43,7 @@ class MediumFactory
 public:
     enum Enum
     {
-        None = 0,
-        Water,
+        Water = 0,
         Ice,
         Salt,
         StandardRock,
@@ -71,7 +70,7 @@ public:
         double density_correction;
     };
 
-    typedef std::function<Medium*(double)> RegisterFunction;
+    typedef boost::function<Medium*(double)> RegisterFunction;
     typedef std::map<std::string, RegisterFunction> MediumMapString;
     typedef std::map<Enum, RegisterFunction> MediumMapEnum;
     typedef boost::bimap<std::string, Enum> BimapStringEnum;

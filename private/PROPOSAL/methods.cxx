@@ -9,6 +9,7 @@
 
 // #include <cmath>
 // #include <stdlib.h>
+#include <boost/functional/hash.hpp>
 
 #include <fstream>
 #include <iostream>
@@ -266,7 +267,7 @@ void InitializeInterpolation(const std::string name,
         for (std::vector<Parametrization*>::const_iterator it = parametrizations.begin(); it != parametrizations.end();
              ++it)
         {
-            hash_combine(hash_digest, (*it)->GetHash());
+            boost::hash_combine(hash_digest, (*it)->GetHash());
         }
     }
 

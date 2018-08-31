@@ -30,7 +30,7 @@
 #pragma once
 
 #include <boost/bimap.hpp>
-#include <functional>
+#include <boost/function.hpp>
 
 #include <map>
 #include <string>
@@ -56,8 +56,7 @@ public:
 
     enum Enum
     {
-        None = 0,
-        Zeus,
+        Zeus = 0,
         BezrukovBugaev,
         Rhode,
         Kokoulin,
@@ -69,7 +68,6 @@ public:
 
     enum Shadow
     {
-        ShadowNone,
         ShadowDuttaRenoSarcevicSeckel,
         ShadowButkevichMikhailov
     };
@@ -113,23 +111,23 @@ public:
     // Typedefs for readablitiy
     // --------------------------------------------------------------------- //
 
-    typedef std::function<ShadowEffect*(void)> RegisterShadowEffectFunction;
+    typedef boost::function<ShadowEffect*(void)> RegisterShadowEffectFunction;
 
-    typedef std::function<Photonuclear*(const ParticleDef&,
+    typedef boost::function<Photonuclear*(const ParticleDef&,
                                           const Medium&,
                                           const EnergyCutSettings&,
                                           double multiplier,
                                           bool hard_component)>
         RegisterRealPhotonFunction;
 
-    typedef std::function<Photonuclear*(const ParticleDef&,
+    typedef boost::function<Photonuclear*(const ParticleDef&,
                                           const Medium&,
                                           const EnergyCutSettings&,
                                           double multiplier,
                                           const ShadowEffect&)>
         RegisterQ2Function;
 
-    typedef std::function<Photonuclear*(const ParticleDef&,
+    typedef boost::function<Photonuclear*(const ParticleDef&,
                                           const Medium&,
                                           const EnergyCutSettings&,
                                           double multiplier,

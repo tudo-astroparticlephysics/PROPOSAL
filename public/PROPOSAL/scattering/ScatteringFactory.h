@@ -29,6 +29,7 @@
 
 #pragma once
 
+// #include <boost/function.hpp>
 #include <boost/bimap.hpp>
 
 #include <map>
@@ -48,8 +49,7 @@ class ScatteringFactory
 public:
     enum Enum
     {
-        None = 0,
-        HighlandIntegral,
+        HighlandIntegral = 0,
         Moliere,
         Highland,
         NoScattering

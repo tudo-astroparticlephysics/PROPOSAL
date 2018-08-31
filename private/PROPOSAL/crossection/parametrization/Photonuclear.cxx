@@ -1,4 +1,7 @@
 
+#include <boost/assign.hpp>
+#include <boost/bind.hpp>
+#include <boost/functional/hash.hpp>
 #include <cmath>
 
 #include "PROPOSAL/Constants.h"
@@ -7,7 +10,6 @@
 #include "PROPOSAL/math/Interpolant.h"
 #include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/medium/Medium.h"
-#include "PROPOSAL/methods.h"
 
 using namespace PROPOSAL;
 
@@ -38,7 +40,7 @@ bool RealPhoton::compare(const RealPhoton& photon) const
  *                              HardComponent                                  *
  ******************************************************************************/
 
-std::vector<double> HardComponent::x = {3, 4, 5, 6, 7, 8, 9};
+std::vector<double> HardComponent::x = boost::assign::list_of(3)(4)(5)(6)(7)(8)(9);
 
 const std::string HardComponent::name_ = "HardComponent";
 const std::string SoftComponent::name_ = "SoftComponent";
@@ -74,9 +76,9 @@ HardComponent::HardComponent(const HardComponent& hard_component)
 
 HardComponent::~HardComponent()
 {
-    for (auto interpolant: interpolant_)
+    for (std::vector<Interpolant*>::iterator it = interpolant_.begin(); it != interpolant_.end(); ++it)
     {
-        delete interpolant;
+        delete *it;
     }
 }
 
@@ -194,7 +196,7 @@ double ShadowDuttaRenoSarcevicSeckel::CalculateShadowEffect(const Components::Co
 size_t ShadowDuttaRenoSarcevicSeckel::GetHash() const
 {
     size_t seed = 0;
-    hash_combine(seed, std::string("ShadowDuttaRenoSarcevicSeckel"));
+    boost::hash_combine(seed, "ShadowDuttaRenoSarcevicSeckel");
 
     return seed;
 }
@@ -258,7 +260,7 @@ double ShadowButkevichMikhailov::CalculateShadowEffect(const Components::Compone
 size_t ShadowButkevichMikhailov::GetHash() const
 {
     size_t seed = 0;
-    hash_combine(seed, std::string("ShadowButkevichMikhailov"));
+    boost::hash_combine(seed, "ShadowButkevichMikhailov");
 
     return seed;
 }
