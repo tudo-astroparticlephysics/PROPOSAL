@@ -82,6 +82,7 @@ matrix:
             - clang-3.6
             - libboost-dev
             - libc++-dev
+            - libc++
       env:
         - MATRIX_EVAL="CC=clang-3.6 && CXX=clang++-3.6"
         - CXX_FLAGS="-stdlib=libc++"
@@ -97,6 +98,7 @@ matrix:
             - clang-5.0
             - libboost-dev
             - libc++-dev
+            - libc++
       env:
         - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
         - CXX_FLAGS="-stdlib=libc++"
