@@ -56,6 +56,7 @@ matrix:
             - libboost-dev
       env:
          - MATRIX_EVAL="CC=gcc-4.8 && CXX=g++-4.8"
+         - CXX_FLAGS=""
 
     - os: linux
       dist: trusty
@@ -68,6 +69,7 @@ matrix:
             - libboost-dev
       env:
         - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
+        - CXX_FLAGS=""
 
     - os: linux
       dist: trusty
@@ -79,8 +81,10 @@ matrix:
           packages:
             - clang-3.6
             - libboost-dev
+            - libc++-dev
       env:
         - MATRIX_EVAL="CC=clang-3.6 && CXX=clang++-3.6"
+        - CXX_FLAGS="-stdlib=libc++"
 
     - os: linux
       dist: trusty
@@ -92,8 +96,10 @@ matrix:
           packages:
             - clang-5.0
             - libboost-dev
+            - libc++-dev
       env:
         - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
+        - CXX_FLAGS="-stdlib=libc++"
 
     # - os: osx
     #   osx_image: xcode8
@@ -110,14 +116,13 @@ install:
         brew upgrade;
         brew install cmake;
         brew install boost;
-        brew install boost-python;
       fi
     - ./install_log4cplus.sh
 
 before_script:
     - mkdir build
     - cd build
-    - cmake .. -DADD_TESTS=ON
+    - cmake .. -DADD_TESTS=ON -DCMAKE_CXX_FLAGS=${CXX_FLAGS}
     - make VERBOSE=1
 
 script:
