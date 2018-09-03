@@ -10,6 +10,7 @@ ExternalProject_Add(
     URL https://github.com/google/googletest/archive/master.zip
     PREFIX ${CMAKE_CURRENT_BINARY_DIR}/gtest
     # Disable install step
+	CMAKE_ARGS=-DCMAKE_CXX_FLAGS=-stdlib=libc++
     INSTALL_COMMAND ""
 )
 
