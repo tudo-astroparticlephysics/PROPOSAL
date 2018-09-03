@@ -10,7 +10,6 @@ ExternalProject_Add(
     URL https://github.com/google/googletest/archive/master.zip
     PREFIX ${CMAKE_CURRENT_BINARY_DIR}/gtest
     # Disable install step
-	CMAKE_ARGS=-DCMAKE_CXX_FLAGS=-stdlib=libc++
     INSTALL_COMMAND ""
 )
 
@@ -25,6 +24,7 @@ add_dependencies(libgtest gtest)
 set_target_properties(libgtest PROPERTIES
     "IMPORTED_LOCATION" "${binary_dir}/googlemock/gtest/libgtest.a"
     "IMPORTED_LINK_INTERFACE_LIBRARIES" "${CMAKE_THREAD_LIBS_INIT}"
+	COMPILE_FLAGS "${CMAKE_CXX_FLAGS}"
 )
 
 # Create a libgmock target to be used as a dependency by test programs
@@ -35,6 +35,7 @@ add_dependencies(libgmock gtest)
 set_target_properties(libgmock PROPERTIES
     "IMPORTED_LOCATION" "${binary_dir}/googlemock/libgmock.a"
     "IMPORTED_LINK_INTERFACE_LIBRARIES" "${CMAKE_THREAD_LIBS_INIT}"
+	COMPILE_FLAGS "${CMAKE_CXX_FLAGS}"
 )
 
 # I couldn't make it work with INTERFACE_INCLUDE_DIRECTORIES
