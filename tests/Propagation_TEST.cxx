@@ -187,7 +187,7 @@ TEST(Propagation, particle_type)
     char firstLine[256];
     in.getline(firstLine, 256);
 
-    int statistic = 100;
+    int statistic = 10;
     double energy = 1e8;
 
     in >> statistic >> energy;
@@ -218,6 +218,7 @@ TEST(Propagation, particle_type)
     // Read
 
     cout.precision(16);
+    RandomGenerator::Get().SetSeed(1234);
 
     for (int i = 0; i < statistic; ++i)
     {

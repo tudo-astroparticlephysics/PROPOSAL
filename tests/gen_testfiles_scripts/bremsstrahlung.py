@@ -2,23 +2,23 @@ import pyPROPOSAL as pp
 import numpy as np
 
 parametrizations = [
-    pp.Parametrization.Bremsstrahlung.KelnerKokoulinPetrukhin,
-    pp.Parametrization.Bremsstrahlung.PetrukhinShestakov,
-    pp.Parametrization.Bremsstrahlung.CompleteScreening,
-    pp.Parametrization.Bremsstrahlung.AndreevBezrukovBugaev,
-    pp.Parametrization.Bremsstrahlung.SandrockSoedingreksoRhode
+    pp.parametrization.bremsstrahlung.KelnerKokoulinPetrukhin,
+    pp.parametrization.bremsstrahlung.PetrukhinShestakov,
+    pp.parametrization.bremsstrahlung.CompleteScreening,
+    pp.parametrization.bremsstrahlung.AndreevBezrukovBugaev,
+    pp.parametrization.bremsstrahlung.SandrockSoedingreksoRhode
 ]
 
 particle_defs = [
-    pp.MuMinusDef.get(),
-    pp.TauMinusDef.get(),
-    pp.EMinusDef.get()
+    pp.particle.MuMinusDef.get(),
+    pp.particle.TauMinusDef.get(),
+    pp.particle.EMinusDef.get()
 ]
 
 mediums = [
-    pp.Medium.Ice(1.0),
-    pp.Medium.Hydrogen(1.0),
-    pp.Medium.Uranium(1.0)
+    pp.medium.Ice(1.0),
+    pp.medium.Hydrogen(1.0),
+    pp.medium.Uranium(1.0)
 ]
 
 cuts = [
@@ -37,28 +37,30 @@ energies = np.logspace(4, 13, num=10)
 interpoldef = pp.InterpolationDef()
 
 
-def create_table_dEdx(dir_name):
+def create_table_dEdx(dir_name, interpolate=False):
 
-    with open(dir_name + "Brems_dEdx.txt", "a") as f:
+    with open(dir_name + "Brems_dEdx{}.txt".format("_interpol" if interpolate else ""), "a") as file:
 
         for particle in particle_defs:
             for medium in mediums:
                 for cut in cuts:
                     for lpm  in lpms:
-                        for energy in energies:
-                            for parametrization in parametrizations:
+                        for parametrization in parametrizations:
 
-                                brems = parametrization(
-                                    particle,
-                                    medium,
-                                    cut,
-                                    multiplier,
-                                    lpm)
+                            brems_param = parametrization(
+                                particle,
+                                medium,
+                                cut,
+                                multiplier,
+                                lpm)
+                            if interpolate:
+                                Brems_Int = pp.crosssection.BremsInterpolant(brems_param, interpoldef)
+                            else:
+                                Brems_Int = pp.crosssection.BremsIntegral(brems_param)
 
-                                Brems_Int = pp.CrossSection.BremsIntegral(brems)
+                            buf = [""]
 
-                                buf = [""]
-
+                            for energy in energies:
                                 dEdx = Brems_Int.calculate_dEdx(energy)
 
                                 buf.append(particle.name)
@@ -69,35 +71,37 @@ def create_table_dEdx(dir_name):
                                 buf.append(str(lpm))
                                 buf.append(str(energy))
                                 buf.append(str(dEdx))
-                                buf.append(brems.name)
+                                buf.append(brems_param.name)
                                 buf.append("\n")
 
-                                # print(buf)
-                                f.write("\t".join(buf))
+                            file.write("\t".join(buf))
 
 
-def create_table_dNdx(dir_name):
+def create_table_dNdx(dir_name, interpolate=False):
 
-    with open(dir_name + "Brems_dNdx.txt", "a") as f:
+    with open(dir_name + "Brems_dNdx{}.txt".format("_interpol" if interpolate else ""), "a") as file:
 
         for particle in particle_defs:
             for medium in mediums:
                 for cut in cuts:
                     for lpm  in lpms:
-                        for energy in energies:
-                            for parametrization in parametrizations:
+                        for parametrization in parametrizations:
 
-                                brems = parametrization(
-                                    particle,
-                                    medium,
-                                    cut,
-                                    multiplier,
-                                    lpm)
+                            brems_param = parametrization(
+                                particle,
+                                medium,
+                                cut,
+                                multiplier,
+                                lpm)
 
-                                Brems_Int = pp.CrossSection.BremsIntegral(brems)
+                            if interpolate:
+                                Brems_Int = pp.crosssection.BremsInterpolant(brems_param, interpoldef)
+                            else:
+                                Brems_Int = pp.crosssection.BremsIntegral(brems_param)
 
-                                buf = [""]
+                            buf = [""]
 
+                            for energy in energies:
                                 dNdx = Brems_Int.calculate_dNdx(energy)
 
                                 buf.append(particle.name)
@@ -108,38 +112,40 @@ def create_table_dNdx(dir_name):
                                 buf.append(str(lpm))
                                 buf.append(str(energy))
                                 buf.append(str(dNdx))
-                                buf.append(brems.name)
+                                buf.append(brems_param.name)
                                 buf.append("\n")
 
-                                # print(buf)
-                                f.write("\t".join(buf))
+                            file.write("\t".join(buf))
 
 
-def create_table_dNdx_rnd(dir_name):
+def create_table_dNdx_rnd(dir_name, interpolate=False):
 
     pp.RandomGenerator.get().set_seed(1234)
 
-    with open(dir_name + "Brems_dNdx_rnd.txt", "a") as f:
+    with open(dir_name + "Brems_dNdx_rnd{}.txt".format("_interpol" if interpolate else ""), "a") as file:
 
         for particle in particle_defs:
             for medium in mediums:
                 for cut in cuts:
                     for lpm  in lpms:
-                        for energy in energies:
-                            rnd = pp.RandomGenerator.get().random_double()
-                            for parametrization in parametrizations:
+                        rnd = pp.RandomGenerator.get().random_double()
+                        for parametrization in parametrizations:
 
-                                brems = parametrization(
-                                    particle,
-                                    medium,
-                                    cut,
-                                    multiplier,
-                                    lpm)
+                            brems_param = parametrization(
+                                particle,
+                                medium,
+                                cut,
+                                multiplier,
+                                lpm)
 
-                                Brems_Int = pp.CrossSection.BremsIntegral(brems)
+                            if interpolate:
+                                Brems_Int = pp.crosssection.BremsInterpolant(brems_param, interpoldef)
+                            else:
+                                Brems_Int = pp.crosssection.BremsIntegral(brems_param)
 
-                                buf = [""]
+                            buf = [""]
 
+                            for energy in energies:
                                 dNdx = Brems_Int.calculate_dNdx_rnd(energy, rnd)
 
                                 buf.append(particle.name)
@@ -151,39 +157,41 @@ def create_table_dNdx_rnd(dir_name):
                                 buf.append(str(energy))
                                 buf.append(str(rnd))
                                 buf.append(str(dNdx))
-                                buf.append(brems.name)
+                                buf.append(brems_param.name)
                                 buf.append("\n")
 
-                                # print(buf)
-                                f.write("\t".join(buf))
+                            file.write("\t".join(buf))
 
 
-def create_table_stochastic_loss(dir_name):
+def create_table_stochastic_loss(dir_name, interpolate=False):
 
     pp.RandomGenerator.get().set_seed(0)
 
-    with open(dir_name + "Brems_e.txt", "a") as f:
+    with open(dir_name + "Brems_e{}.txt".format("_interpol" if interpolate else ""), "a") as file:
 
         for particle in particle_defs:
             for medium in mediums:
                 for cut in cuts:
                     for lpm  in lpms:
-                        for energy in energies:
-                            rnd1 = pp.RandomGenerator.get().random_double()
-                            rnd2 = pp.RandomGenerator.get().random_double()
-                            for parametrization in parametrizations:
+                        rnd1 = pp.RandomGenerator.get().random_double()
+                        rnd2 = pp.RandomGenerator.get().random_double()
+                        for parametrization in parametrizations:
 
-                                brems = parametrization(
-                                    particle,
-                                    medium,
-                                    cut,
-                                    multiplier,
-                                    lpm)
+                            brems_param = parametrization(
+                                particle,
+                                medium,
+                                cut,
+                                multiplier,
+                                lpm)
 
-                                Brems_Int = pp.CrossSection.BremsIntegral(brems)
+                            if interpolate:
+                                Brems_Int = pp.crosssection.BremsInterpolant(brems_param, interpoldef)
+                            else:
+                                Brems_Int = pp.crosssection.BremsIntegral(brems_param)
 
-                                buf = [""]
+                            buf = [""]
 
+                            for energy in energies:
                                 stochastic_loss = Brems_Int.calculate_stochastic_loss(energy, rnd1, rnd2)
 
                                 buf.append(particle.name)
@@ -196,188 +204,21 @@ def create_table_stochastic_loss(dir_name):
                                 buf.append(str(rnd1))
                                 buf.append(str(rnd2))
                                 buf.append(str(stochastic_loss))
-                                buf.append(brems.name)
+                                buf.append(brems_param.name)
                                 buf.append("\n")
 
-                                # print(buf)
-                                f.write("\t".join(buf))
-
-
-def create_table_dEdx_interpol(dir_name):
-
-    with open(dir_name + "Brems_dEdx_interpol.txt", "a") as f:
-
-        for particle in particle_defs:
-            for medium in mediums:
-                for cut in cuts:
-                    for lpm  in lpms:
-                        for energy in energies:
-                            for parametrization in parametrizations:
-
-                                brems = parametrization(
-                                    particle,
-                                    medium,
-                                    cut,
-                                    multiplier,
-                                    lpm)
-
-                                Brems_Interpol = pp.CrossSection.BremsInterpolant(brems, interpoldef)
-
-                                buf = [""]
-
-                                dEdx = Brems_Interpol.calculate_dEdx(energy)
-
-                                buf.append(particle.name)
-                                buf.append(medium.name)
-                                buf.append(str(cut.ecut))
-                                buf.append(str(cut.vcut))
-                                buf.append(str(multiplier))
-                                buf.append(str(lpm))
-                                buf.append(str(energy))
-                                buf.append(str(dEdx))
-                                buf.append(brems.name)
-                                buf.append("\n")
-
-                                # print(buf)
-                                f.write("\t".join(buf))
-
-
-def create_table_dNdx_interpol(dir_name):
-
-    with open(dir_name + "Brems_dNdx_interpol.txt", "a") as f:
-
-        for particle in particle_defs:
-            for medium in mediums:
-                for cut in cuts:
-                    for lpm  in lpms:
-                        for energy in energies:
-                            for parametrization in parametrizations:
-
-                                brems = parametrization(
-                                    particle,
-                                    medium,
-                                    cut,
-                                    multiplier,
-                                    lpm)
-
-                                Brems_Interpol = pp.CrossSection.BremsInterpolant(brems, interpoldef)
-
-                                buf = [""]
-
-                                dNdx = Brems_Interpol.calculate_dNdx(energy)
-
-                                buf.append(particle.name)
-                                buf.append(medium.name)
-                                buf.append(str(cut.ecut))
-                                buf.append(str(cut.vcut))
-                                buf.append(str(multiplier))
-                                buf.append(str(lpm))
-                                buf.append(str(energy))
-                                buf.append(str(dNdx))
-                                buf.append(brems.name)
-                                buf.append("\n")
-
-                                # print(buf)
-                                f.write("\t".join(buf))
-
-
-def create_table_dNdx_rnd_interpol(dir_name):
-
-    pp.RandomGenerator.get().set_seed(1234)
-
-    with open(dir_name + "Brems_dNdx_rnd_interpol.txt", "a") as f:
-
-        for particle in particle_defs:
-            for medium in mediums:
-                for cut in cuts:
-                    for lpm  in lpms:
-                        for energy in energies:
-                            rnd = pp.RandomGenerator.get().random_double()
-                            for parametrization in parametrizations:
-
-                                brems = parametrization(
-                                    particle,
-                                    medium,
-                                    cut,
-                                    multiplier,
-                                    lpm)
-
-                                Brems_Interpol = pp.CrossSection.BremsInterpolant(brems, interpoldef)
-
-                                buf = [""]
-
-                                dNdx = Brems_Interpol.calculate_dNdx_rnd(energy, rnd)
-
-                                buf.append(particle.name)
-                                buf.append(medium.name)
-                                buf.append(str(cut.ecut))
-                                buf.append(str(cut.vcut))
-                                buf.append(str(multiplier))
-                                buf.append(str(lpm))
-                                buf.append(str(energy))
-                                buf.append(str(rnd))
-                                buf.append(str(dNdx))
-                                buf.append(brems.name)
-                                buf.append("\n")
-
-                                # print(buf)
-                                f.write("\t".join(buf))
-
-
-def create_table_stochastic_loss_interpol(dir_name):
-
-    pp.RandomGenerator.get().set_seed(1234)
-
-    with open(dir_name + "Brems_e_interpol.txt", "a") as f:
-
-        for particle in particle_defs:
-            for medium in mediums:
-                for cut in cuts:
-                    for lpm  in lpms:
-                        for energy in energies:
-                            rnd1 = pp.RandomGenerator.get().random_double()
-                            rnd2 = pp.RandomGenerator.get().random_double()
-                            for parametrization in parametrizations:
-
-                                brems = parametrization(
-                                    particle,
-                                    medium,
-                                    cut,
-                                    multiplier,
-                                    lpm)
-
-                                Brems_Interpol = pp.CrossSection.BremsInterpolant(brems, interpoldef)
-
-                                buf = [""]
-
-                                stochastic_loss = Brems_Interpol.calculate_stochastic_loss(energy, rnd1, rnd2)
-
-                                buf.append(particle.name)
-                                buf.append(medium.name)
-                                buf.append(str(cut.ecut))
-                                buf.append(str(cut.vcut))
-                                buf.append(str(multiplier))
-                                buf.append(str(lpm))
-                                buf.append(str(energy))
-                                buf.append(str(rnd1))
-                                buf.append(str(rnd2))
-                                buf.append(str(stochastic_loss))
-                                buf.append(brems.name)
-                                buf.append("\n")
-
-                                # print(buf)
-                                f.write("\t".join(buf))
+                            file.write("\t".join(buf))
 
 
 def main(dir_name):
-    create_table_dEdx(dir_name)
-    create_table_dNdx(dir_name)
-    create_table_dNdx_rnd(dir_name)
-    create_table_stochastic_loss(dir_name)
-    create_table_dEdx_interpol(dir_name)
-    create_table_dNdx_interpol(dir_name)
-    create_table_dNdx_rnd_interpol(dir_name)
-    create_table_stochastic_loss_interpol(dir_name)
+    create_table_dEdx(dir_name, interpolate=False)
+    create_table_dNdx(dir_name, interpolate=False)
+    create_table_dNdx_rnd(dir_name, interpolate=False)
+    create_table_stochastic_loss(dir_name, interpolate=False)
+    create_table_dEdx(dir_name, interpolate=True)
+    create_table_dNdx(dir_name, interpolate=True)
+    create_table_dNdx_rnd(dir_name, interpolate=True)
+    create_table_stochastic_loss(dir_name, interpolate=True)
 
 
 if __name__ == "__main__":
@@ -386,10 +227,10 @@ if __name__ == "__main__":
 
     dir_name = "TestFiles/"
 
-    try:
+    if os.path.isdir(dir_name):
+        print("Directory {} already exists".format(dir_name))
+    else:
         os.makedirs(dir_name)
         print("Directory {} created".format(dir_name))
-    except OSError:
-        print("Directory {} already exists".format(dir_name))
 
     main(dir_name)
