@@ -132,7 +132,7 @@ TEST(Assignment, Copyconstructor2)
 TEST(Scattering, Scatter)
 {
     ifstream in;
-    string filename = "bin/TestFiles/Scat_scatter.txt";
+    string filename = "bin/TestFiles/Scattering_scatter.txt";
 
     in.open(filename.c_str());
 
