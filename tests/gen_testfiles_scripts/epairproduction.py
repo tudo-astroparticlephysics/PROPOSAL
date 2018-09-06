@@ -2,15 +2,15 @@ import pyPROPOSAL as pp
 import numpy as np
 
 particle_defs = [
-    pp.MuMinusDef.get(),
-    pp.TauMinusDef.get(),
-    pp.EMinusDef.get()
+    pp.particle.MuMinusDef.get(),
+    pp.particle.TauMinusDef.get(),
+    pp.particle.EMinusDef.get()
 ]
 
 mediums = [
-    pp.Medium.Ice(1.0),
-    pp.Medium.Hydrogen(1.0),
-    pp.Medium.Uranium(1.0)
+    pp.medium.Ice(1.0),
+    pp.medium.Hydrogen(1.0),
+    pp.medium.Uranium(1.0)
 ]
 
 cuts = [
@@ -23,13 +23,13 @@ cuts = [
 multiplier = 1.
 
 epair = [
-    pp.Parametrization.EpairProduction.KelnerKokoulinPetrukhin,
-    pp.Parametrization.EpairProduction.SandrockSoedingreksoRhode,
+    pp.parametrization.pairproduction.KelnerKokoulinPetrukhin,
+    pp.parametrization.pairproduction.SandrockSoedingreksoRhode,
 ]
 
 epair_interpol = [
-    pp.Parametrization.EpairProduction.KelnerKokoulinPetrukhinInterpolant,
-    pp.Parametrization.EpairProduction.SandrockSoedingreksoRhodeInterpolant,
+    pp.parametrization.pairproduction.KelnerKokoulinPetrukhinInterpolant,
+    pp.parametrization.pairproduction.SandrockSoedingreksoRhodeInterpolant,
 ]
 
 lpms = [0, 1]
@@ -62,13 +62,13 @@ def create_tables(dir_name, interpolate=False, **kwargs):
             f_stoch = open(dir_name + "Epair_e{}.txt".format("_interpol" if interpolate else ""), "a")
             buf["stoch"] = [f_stoch, [""]]
 
-    print(buf)
+    # print(buf)
 
     for particle in particle_defs:
         for medium in mediums:
             for cut in cuts:
-                for param in params:
-                    for lpm in lpms:
+                for lpm in lpms:
+                    for param in params:
 
                         if interpolate:
                             param_current = param(
@@ -79,7 +79,7 @@ def create_tables(dir_name, interpolate=False, **kwargs):
                                 lpm,
                                 interpoldef)
 
-                            xsection = pp.CrossSection.EpairInterpolant(param_current, interpoldef)
+                            xsection = pp.crosssection.EpairInterpolant(param_current, interpoldef)
                         else:
                             param_current = param(
                                 particle,
@@ -88,7 +88,7 @@ def create_tables(dir_name, interpolate=False, **kwargs):
                                 multiplier,
                                 lpm)
 
-                            xsection = pp.CrossSection.EpairIntegral(param_current)
+                            xsection = pp.crosssection.EpairIntegral(param_current)
 
                         for key in buf:
                             buf[key][1] = [""]
@@ -129,7 +129,7 @@ def create_table_dNdx(dir_name, interpolate=False):
     else:
         params = epair
 
-    with open(dir_name + "Epair_dNdx{}.txt".format("_interpol" if interpolate else ""), "a") as f:
+    with open(dir_name + "Epair_dNdx{}.txt".format("_interpol" if interpolate else ""), "a") as file:
 
         for particle in particle_defs:
             for medium in mediums:
@@ -146,7 +146,7 @@ def create_table_dNdx(dir_name, interpolate=False):
                                     lpm,
                                     interpoldef)
 
-                                xsection = pp.CrossSection.EpairInterpolant(param_current, interpoldef)
+                                xsection = pp.crosssection.EpairInterpolant(param_current, interpoldef)
                             else:
                                 param_current = param(
                                     particle,
@@ -155,7 +155,7 @@ def create_table_dNdx(dir_name, interpolate=False):
                                     multiplier,
                                     lpm)
 
-                                xsection = pp.CrossSection.EpairIntegral(param_current)
+                                xsection = pp.crosssection.EpairIntegral(param_current)
 
                             buf = [""]
 
@@ -172,8 +172,7 @@ def create_table_dNdx(dir_name, interpolate=False):
                                 buf.append(str(dEdx))
                                 buf.append("\n")
 
-                            # print(buf)
-                            f.write("\t".join(buf))
+                            file.write("\t".join(buf))
 
 
 def create_table_dNdx_rnd(dir_name, interpolate=False):
@@ -185,7 +184,7 @@ def create_table_dNdx_rnd(dir_name, interpolate=False):
     else:
         params = epair
 
-    with open(dir_name + "Epair_dNdx_rnd{}.txt".format("_interpol" if interpolate else ""), "a") as f:
+    with open(dir_name + "Epair_dNdx_rnd{}.txt".format("_interpol" if interpolate else ""), "a") as file:
 
         for particle in particle_defs:
             for medium in mediums:
@@ -202,7 +201,7 @@ def create_table_dNdx_rnd(dir_name, interpolate=False):
                                     lpm,
                                     interpoldef)
 
-                                xsection = pp.CrossSection.EpairInterpolant(param_current, interpoldef)
+                                xsection = pp.crosssection.EpairInterpolant(param_current, interpoldef)
                             else:
                                 param_current = param(
                                     particle,
@@ -211,7 +210,7 @@ def create_table_dNdx_rnd(dir_name, interpolate=False):
                                     multiplier,
                                     lpm)
 
-                                xsection = pp.CrossSection.EpairIntegral(param_current)
+                                xsection = pp.crosssection.EpairIntegral(param_current)
 
                             buf = [""]
 
@@ -230,8 +229,7 @@ def create_table_dNdx_rnd(dir_name, interpolate=False):
                                 buf.append(str(dNdx))
                                 buf.append("\n")
 
-                            # print(buf)
-                            f.write("\t".join(buf))
+                            file.write("\t".join(buf))
 
 
 def create_table_stochastic_loss(dir_name, interpolate=False):
@@ -243,7 +241,7 @@ def create_table_stochastic_loss(dir_name, interpolate=False):
     else:
         params = epair
 
-    with open(dir_name + "Epair_e{}.txt".format("_interpol" if interpolate else ""), "a") as f:
+    with open(dir_name + "Epair_e{}.txt".format("_interpol" if interpolate else ""), "a") as file:
 
         for particle in particle_defs:
             for medium in mediums:
@@ -260,7 +258,7 @@ def create_table_stochastic_loss(dir_name, interpolate=False):
                                     lpm,
                                     interpoldef)
 
-                                xsection = pp.CrossSection.EpairInterpolant(param_current, interpoldef)
+                                xsection = pp.crosssection.EpairInterpolant(param_current, interpoldef)
                             else:
                                 param_current = param(
                                     particle,
@@ -269,7 +267,7 @@ def create_table_stochastic_loss(dir_name, interpolate=False):
                                     multiplier,
                                     lpm)
 
-                                xsection = pp.CrossSection.EpairIntegral(param_current)
+                                xsection = pp.crosssection.EpairIntegral(param_current)
 
                             buf = [""]
 
@@ -290,12 +288,12 @@ def create_table_stochastic_loss(dir_name, interpolate=False):
                                 buf.append(str(stochastic_loss))
                                 buf.append("\n")
 
-                            f.write("\t".join(buf))
+                            file.write("\t".join(buf))
 
 
 def main(dir_name):
-    # create_tables(dir_name, True, dEdx=True, dNdx=True, dNdx_rnd=True, stoch=True)
     create_tables(dir_name, False, dEdx=True, dNdx=True, dNdx_rnd=True, stoch=True)
+    create_tables(dir_name, True, dEdx=True, dNdx=True, dNdx_rnd=True, stoch=True)
 
 if __name__ == "__main__":
 
@@ -303,10 +301,10 @@ if __name__ == "__main__":
 
     dir_name = "TestFiles/"
 
-    try:
+    if os.path.isdir(dir_name):
+        print("Directory {} already exists".format(dir_name))
+    else:
         os.makedirs(dir_name)
         print("Directory {} created".format(dir_name))
-    except OSError:
-        print("Directory {} already exists".format(dir_name))
 
     main(dir_name)

@@ -3,15 +3,15 @@ import numpy as np
 
 
 particle_defs = [
-    pp.MuMinusDef.get(),
-    pp.TauMinusDef.get(),
-    pp.EMinusDef.get()
+    pp.particle.MuMinusDef.get(),
+    pp.particle.TauMinusDef.get(),
+    pp.particle.EMinusDef.get()
 ]
 
 mediums = [
-    pp.Medium.Ice(1.0),
-    pp.Medium.Hydrogen(1.0),
-    pp.Medium.Uranium(1.0)
+    pp.medium.Ice(1.0),
+    pp.medium.Hydrogen(1.0),
+    pp.medium.Uranium(1.0)
 ]
 
 cuts = [
@@ -37,7 +37,7 @@ def create_table_propagate(dir_name):
 
     pp.RandomGenerator.get().set_seed(1234)
 
-    with open(dir_name + "Sector_propagate.txt", "a") as f:
+    with open(dir_name + "Sector_propagate.txt", "a") as file:
 
         for particle_def in particle_defs:
             for medium in mediums:
@@ -46,16 +46,15 @@ def create_table_propagate(dir_name):
                     sector_def.cut_settings = cut
                     sector_def.medium = medium
 
-                    particle = pp.Particle(particle_def)
+                    particle = pp.particle.Particle(particle_def)
                     sector = pp.Sector(particle, sector_def, interpoldef)
 
+                    buf = [""]
                     for energy in energies:
                         sector.particle.energy = energy
                         sector.particle.position = position
                         sector.particle.direction = direction
                         energy_final = sector.propagate(distance)
-
-                        buf = [""]
 
                         buf.append(particle_def.name)
                         buf.append(medium.name)
@@ -66,7 +65,7 @@ def create_table_propagate(dir_name):
                         buf.append(str(distance))
                         buf.append("\n")
 
-                        f.write("\t".join(buf))
+                    file.write("\t".join(buf))
 
 
 def main(dir_name):
@@ -79,10 +78,10 @@ if __name__ == "__main__":
 
     dir_name = "TestFiles/"
 
-    try:
+    if os.path.isdir(dir_name):
+        print("Directory {} already exists".format(dir_name))
+    else:
         os.makedirs(dir_name)
         print("Directory {} created".format(dir_name))
-    except OSError:
-        print("Directory {} already exists".format(dir_name))
 
     main(dir_name)
