@@ -2,10 +2,10 @@ import pyPROPOSAL as pp
 import numpy as np
 
 parametrizations = [
-    pp.Scattering.Moliere,
-    pp.Scattering.HighlandIntegral,
-    pp.Scattering.Highland,
-    pp.Scattering.NoScattering
+    pp.scattering.Moliere,
+    pp.scattering.HighlandIntegral,
+    pp.scattering.Highland,
+    pp.scattering.NoScattering
 ]
 
 scat_names = [
@@ -16,15 +16,15 @@ scat_names = [
 ]
 
 particle_defs = [
-    pp.MuMinusDef.get(),
-    pp.TauMinusDef.get(),
-    pp.EMinusDef.get()
+    pp.particle.MuMinusDef.get(),
+    pp.particle.TauMinusDef.get(),
+    pp.particle.EMinusDef.get()
 ]
 
 mediums = [
-    pp.Medium.Ice(1.0),
-    pp.Medium.Hydrogen(1.0),
-    pp.Medium.Uranium(1.0)
+    pp.medium.Ice(1.0),
+    pp.medium.Hydrogen(1.0),
+    pp.medium.Uranium(1.0)
 ]
 
 cuts = [
@@ -46,13 +46,13 @@ pp.RandomGenerator.get().set_seed(1234)
 
 def create_table_scatter(dir_name):
 
-    with open(dir_name + "Scat_scatter.txt", "a") as f:
+    with open(dir_name + "Scattering_scatter.txt", "a") as file:
 
         for particle_def in particle_defs:
             for medium in mediums:
                 for cut in cuts:
                     for idx, parametrization in enumerate(parametrizations):
-                        particle = pp.Particle(particle_def)
+                        particle = pp.particle.Particle(particle_def)
 
                         if scat_names[idx] == "HighlandIntegral":
                             util = pp.Utility(particle_def, medium, cut, pp.UtilityDefinition(), pp.InterpolationDef())
@@ -60,6 +60,7 @@ def create_table_scatter(dir_name):
                         else:
                             scattering = parametrization(particle, medium)
 
+                        buf = [""]
                         for energy in energies:
                             # TODO wrap UtilityDecorator
                             particle.energy = energy
@@ -69,7 +70,6 @@ def create_table_scatter(dir_name):
                             energy_out = energy - 1000
                             scattering.scatter(distance, energy, energy_out)
 
-                            buf = [""]
 
                             buf.append(particle_def.name)
                             buf.append(medium.name)
@@ -87,7 +87,7 @@ def create_table_scatter(dir_name):
                             buf.append(str(particle.direction.theta))
                             buf.append("\n")
 
-                            f.write("\t".join(buf))
+                        file.write("\t".join(buf))
 
 
 def main(dir_name):
@@ -100,10 +100,10 @@ if __name__ == "__main__":
 
     dir_name = "TestFiles/"
 
-    try:
+    if os.path.isdir(dir_name):
+        print("Directory {} already exists".format(dir_name))
+    else:
         os.makedirs(dir_name)
         print("Directory {} created".format(dir_name))
-    except OSError:
-        print("Directory {} already exists".format(dir_name))
 
     main(dir_name)

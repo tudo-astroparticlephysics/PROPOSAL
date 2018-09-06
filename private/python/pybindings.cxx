@@ -773,6 +773,19 @@ PYBIND11_MODULE(pyPROPOSAL, m)
         .def_readwrite("ioniz_def", &Utility::Definition::ioniz_def);
 
     // --------------------------------------------------------------------- //
+    // ContinousRandomization
+    // --------------------------------------------------------------------- //
+
+    py::class_<ContinuousRandomizer, std::shared_ptr<ContinuousRandomizer> >(m, "ContinuousRandomizer")
+        .def(py::init<const Utility&, const InterpolationDef>(),
+             py::arg("utility"),
+             py::arg("interpolation_def"))
+        .def("randomize", &ContinuousRandomizer::Randomize,
+             py::arg("initial_energy"),
+             py::arg("final_energy"),
+             py::arg("rand"));
+
+    // --------------------------------------------------------------------- //
     // Sector Definition
     // --------------------------------------------------------------------- //
 

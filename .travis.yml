@@ -56,7 +56,6 @@ matrix:
             - libboost-dev
       env:
          - MATRIX_EVAL="CC=gcc-4.8 && CXX=g++-4.8"
-         # - CXX_FLAGS=""
 
     - os: linux
       dist: trusty
@@ -69,7 +68,6 @@ matrix:
             - libboost-dev
       env:
         - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
-        # - CXX_FLAGS=""
 
     - os: linux
       dist: trusty
@@ -82,10 +80,8 @@ matrix:
             - clang-3.6
             - g++-4.9
             - libboost-dev
-            # - libc++-dev
       env:
         - MATRIX_EVAL="CC=clang-3.6 && CXX=clang++-3.6"
-        # - CXX_FLAGS="-stdlib=libc++"
 
     - os: linux
       dist: trusty
@@ -98,10 +94,8 @@ matrix:
             - clang-5.0
             - g++-7
             - libboost-dev
-            # - libc++-dev
       env:
         - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
-        # - CXX_FLAGS="-stdlib=libc++"
 
     # - os: osx
     #   osx_image: xcode8
@@ -124,7 +118,7 @@ install:
 before_script:
     - mkdir build
     - cd build
-    - cmake .. -DADD_TESTS=ON # -DCMAKE_CXX_FLAGS=${CXX_FLAGS}
+    - cmake .. -DADD_TESTS=ON
     - make VERBOSE=1
 
 script:

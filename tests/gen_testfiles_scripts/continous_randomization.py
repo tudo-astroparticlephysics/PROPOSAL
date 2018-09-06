@@ -1,13 +1,13 @@
 import pyPROPOSAL as pp
-import random
+import numpy as np
 
 
 def create_table(dir_name):
 
     particle_defs = [
-        pp.MuMinusDef.get(),
-        pp.TauMinusDef.get(),
-        pp.EMinusDef.get()
+        pp.particle.MuMinusDef.get(),
+        pp.particle.TauMinusDef.get(),
+        pp.particle.EMinusDef.get()
     ]
 
     cuts = [
@@ -18,17 +18,18 @@ def create_table(dir_name):
     ]
 
     mediums = [
-        pp.Medium.Ice(1.0),
-        pp.Medium.Hydrogen(1.0),
-        pp.Medium.Uranium(1.0)
+        pp.medium.Ice(1.0),
+        pp.medium.Hydrogen(1.0),
+        pp.medium.Uranium(1.0)
     ]
 
-    initial_energy = [10**x for x in range(4, 13)]
-    final_energy = [energy - 1000 for energy in initial_energy]
+    initial_energy = np.logspace(4, 13, num=10)  # MeV
+    final_energy = initial_energy - 1000
 
     pp.RandomGenerator.get().set_seed(0)
+    np.random.seed(123)
 
-    with open(dir_name + "continous_randomization.txt", "a") as f:
+    with open(dir_name + "continous_randomization.txt", "a") as file:
 
         for particle in particle_defs:
             for medium in mediums:
@@ -50,7 +51,7 @@ def create_table(dir_name):
                     buf = [""]
 
                     for i in range(len(initial_energy)):
-                        rnd = random.random()
+                        rnd = np.random.random_sample()
                         rand_energy = cont_rand.randomize(
                             initial_energy[i],
                             final_energy[i],
@@ -67,8 +68,7 @@ def create_table(dir_name):
                         buf.append(str(rand_energy))
                         buf.append("\n")
 
-                    print(buf)
-                    f.write("\t".join(buf))
+                    file.write("\t".join(buf))
 
 
 def main(dir_name):
@@ -81,10 +81,10 @@ if __name__ == "__main__":
 
     dir_name = "TestFiles/"
 
-    try:
+    if os.path.isdir(dir_name):
+        print("Directory {} already exists".format(dir_name))
+    else:
         os.makedirs(dir_name)
         print("Directory {} created".format(dir_name))
-    except OSError:
-        print("Directory {} already exists".format(dir_name))
 
     main(dir_name)
