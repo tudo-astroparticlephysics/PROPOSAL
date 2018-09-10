@@ -192,8 +192,6 @@ def create_table_stochastic_loss(dir_name, interpolate=False):
             for medium in mediums:
                 for cut in cuts:
                     for hard  in hard_components:
-                        rnd1 = pp.RandomGenerator.get().random_double()
-                        rnd2 = pp.RandomGenerator.get().random_double()
                         for parametrization in photo_real:
 
                             photo = parametrization(
@@ -211,6 +209,8 @@ def create_table_stochastic_loss(dir_name, interpolate=False):
                             buf = [""]
 
                             for energy in energies:
+                                rnd1 = pp.RandomGenerator.get().random_double()
+                                rnd2 = pp.RandomGenerator.get().random_double()
                                 stochastic_loss = xsection.calculate_stochastic_loss(energy, rnd1, rnd2)
 
                                 buf.append(particle.name)
@@ -339,6 +339,8 @@ def create_table_dNdx_Q2(dir_name, interpolate=False):
 
 def create_table_dNdx_rnd_Q2(dir_name, interpolate=False):
 
+    pp.RandomGenerator.get().set_seed(1234)
+
     if interpolate:
         q2 = photo_q2_interpol
     else:
@@ -395,6 +397,8 @@ def create_table_dNdx_rnd_Q2(dir_name, interpolate=False):
 
 def create_table_stochastic_loss_Q2(dir_name, interpolate=False):
 
+    pp.RandomGenerator.get().set_seed(1234)
+
     if interpolate:
         q2 = photo_q2_interpol
     else:
@@ -406,8 +410,6 @@ def create_table_stochastic_loss_Q2(dir_name, interpolate=False):
             for medium in mediums:
                 for cut in cuts:
                     for shadow in shadows:
-                        rnd1 = pp.RandomGenerator.get().random_double()
-                        rnd2 = pp.RandomGenerator.get().random_double()
                         for parametrization in q2:
 
                             if interpolate:
@@ -433,6 +435,8 @@ def create_table_stochastic_loss_Q2(dir_name, interpolate=False):
                             buf = [""]
 
                             for energy in energies:
+                                rnd1 = pp.RandomGenerator.get().random_double()
+                                rnd2 = pp.RandomGenerator.get().random_double()
                                 stochastic_loss = xsection.calculate_stochastic_loss(energy, rnd1, rnd2)
 
                                 buf.append(particle.name)
