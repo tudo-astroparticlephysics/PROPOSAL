@@ -35,6 +35,7 @@ cuts = [
 ]
 
 energies = np.logspace(4, 13, num=10)  # MeV
+energies_out = np.logspace(3, 12, num=10)
 distance = 1000  # cm
 position_init = pp.Vector3D(0, 0, 0)
 direction_init = pp.Vector3D(1, 0, 0)
@@ -61,14 +62,13 @@ def create_table_scatter(dir_name):
                             scattering = parametrization(particle, medium)
 
                         buf = [""]
-                        for energy in energies:
+                        for jdx, energy in enumerate(energies):
                             # TODO wrap UtilityDecorator
                             particle.energy = energy
                             particle.position = position_init
                             particle.direction = direction_init
 
-                            energy_out = energy - 1000
-                            scattering.scatter(distance, energy, energy_out)
+                            scattering.scatter(distance, energy, energies_out[jdx])
 
 
                             buf.append(particle_def.name)
@@ -77,7 +77,7 @@ def create_table_scatter(dir_name):
                             buf.append(str(cut.ecut))
                             buf.append(str(cut.vcut))
                             buf.append(str(energy))
-                            buf.append(str(energy_out))
+                            buf.append(str(energies_out[jdx]))
                             buf.append(str(distance))
                             buf.append(str(particle.position.x))
                             buf.append(str(particle.position.y))
