@@ -101,7 +101,7 @@ def create_table_dNdx(dir_name, interpolate=False):
 
 def create_table_dNdx_rnd(dir_name, interpolate=False):
 
-    pp.RandomGenerator.get().set_seed(0)
+    pp.RandomGenerator.get().set_seed(1234)
 
     with open(dir_name + "Ioniz_dNdx_rnd{}.txt".format("_interpol" if interpolate else ""), "a") as file:
 
@@ -141,7 +141,7 @@ def create_table_dNdx_rnd(dir_name, interpolate=False):
 
 def create_table_stochastic_loss(dir_name, interpolate=False):
 
-    pp.RandomGenerator.get().set_seed(5)
+    pp.RandomGenerator.get().set_seed(1234)
 
     with open(dir_name + "Ioniz_e{}.txt".format("_interpol" if interpolate else ""), "a") as file:
 

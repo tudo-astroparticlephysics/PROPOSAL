@@ -29,8 +29,12 @@ using namespace PROPOSAL;
 
 #define BREMS_DEF(module, cls)                                                                                         \
     py::class_<Brems##cls, std::shared_ptr<Brems##cls>, Bremsstrahlung>(module, #cls)                                  \
-        .def(py::init<const ParticleDef&, const Medium&, const EnergyCutSettings&, double, bool>()),                   \
-        py::arg("particle_def"), py::arg("medium"), py::arg("energy_cuts"), py::arg("multiplier"), py::arg("lpm");
+        .def(py::init<const ParticleDef&, const Medium&, const EnergyCutSettings&, double, bool>(),                    \
+             py::arg("particle_def"),                                                                                  \
+             py::arg("medium"),                                                                                        \
+             py::arg("energy_cuts"),                                                                                   \
+             py::arg("multiplier"),                                                                                    \
+             py::arg("lpm"));
 
 #define PHOTO_REAL_DEF(module, cls, parent)                                                                            \
     py::class_<Photo##cls, std::shared_ptr<Photo##cls>, Photo##parent>(module, #cls)                                   \
