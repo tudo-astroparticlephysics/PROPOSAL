@@ -9,3 +9,4 @@ cmake_uninstall.cmake
 **/Test/TestFiles*/
 *.png
 *.pdf
+pybind11/
