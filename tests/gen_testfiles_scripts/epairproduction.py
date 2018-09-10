@@ -41,6 +41,8 @@ interpoldef = pp.InterpolationDef()
 
 def create_tables(dir_name, interpolate=False, **kwargs):
 
+    pp.RandomGenerator.get().set_seed(1234)
+
     if interpolate:
         params = epair_interpol
     else:
