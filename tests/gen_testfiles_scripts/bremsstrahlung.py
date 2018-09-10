@@ -165,7 +165,7 @@ def create_table_dNdx_rnd(dir_name, interpolate=False):
 
 def create_table_stochastic_loss(dir_name, interpolate=False):
 
-    pp.RandomGenerator.get().set_seed(0)
+    pp.RandomGenerator.get().set_seed(1234)
 
     with open(dir_name + "Brems_e{}.txt".format("_interpol" if interpolate else ""), "a") as file:
 
@@ -173,8 +173,6 @@ def create_table_stochastic_loss(dir_name, interpolate=False):
             for medium in mediums:
                 for cut in cuts:
                     for lpm  in lpms:
-                        rnd1 = pp.RandomGenerator.get().random_double()
-                        rnd2 = pp.RandomGenerator.get().random_double()
                         for parametrization in parametrizations:
 
                             brems_param = parametrization(
@@ -192,6 +190,8 @@ def create_table_stochastic_loss(dir_name, interpolate=False):
                             buf = [""]
 
                             for energy in energies:
+                                rnd1 = pp.RandomGenerator.get().random_double()
+                                rnd2 = pp.RandomGenerator.get().random_double()
                                 stochastic_loss = Brems_Int.calculate_stochastic_loss(energy, rnd1, rnd2)
 
                                 buf.append(particle.name)
