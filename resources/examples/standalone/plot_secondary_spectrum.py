@@ -451,7 +451,7 @@ def plot_theory_curve():
         medium=medium,
         energy_cuts=energy_cuts,
         multiplier=multiplier,
-        lpm=lpm,
+        lpm_effect=lpm,
         interpolation_def=interpolation_def)
 
     brems = pp.parametrization.bremsstrahlung.KelnerKokoulinPetrukhin(
@@ -459,7 +459,7 @@ def plot_theory_curve():
         medium=medium,
         energy_cuts=energy_cuts,
         multiplier=multiplier,
-        lpm=lpm)
+        lpm_effect=lpm)
 
     photo = pp.parametrization.photonuclear.AbramowiczLevinLevyMaor97Interpolant(
         particle_def=particle_def,

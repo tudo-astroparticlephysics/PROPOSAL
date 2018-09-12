@@ -34,7 +34,7 @@ using namespace PROPOSAL;
              py::arg("medium"),                                                                                        \
              py::arg("energy_cuts"),                                                                                   \
              py::arg("multiplier"),                                                                                    \
-             py::arg("lpm"));
+             py::arg("lpm_effect"));
 
 #define PHOTO_REAL_DEF(module, cls, parent)                                                                            \
     py::class_<Photo##cls, std::shared_ptr<Photo##cls>, Photo##parent>(module, #cls)                                   \

@@ -99,6 +99,10 @@ public:
 
     virtual IntegralLimits GetIntegralLimits(double energy);
 
+
+protected:
+    bool compare(const Parametrization&) const;
+
     // ----------------------------------------------------------------------------
     /// @brief Landau Pomeranchuk Migdal effect
     ///
@@ -109,10 +113,6 @@ public:
     /// +x(3+r^2)]\ln\Big(1+\frac{1}{x}\Big)+\frac{1-r^2-b}{1+x}-(3+r^2)}\f]
     // ----------------------------------------------------------------------------
     double lpm(double energy, double v, double r2, double b, double x);
-
-
-protected:
-    bool compare(const Parametrization&) const;
 
     bool init_lpm_effect_;
     bool lpm_;
