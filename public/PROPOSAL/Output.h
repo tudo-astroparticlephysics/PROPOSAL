@@ -46,15 +46,15 @@
 #include "TTree.h"
 #endif
 
-#if I3_PROJECTS
+#if not PROPOSAL_STANDALONE
 #include <icetray/I3Logging.h>
-#else // I3_PROJECTS
+#else // not PROPOSAL_STANDALONE
 #if LOG4CPLUS_SUPPORT
 #include <log4cplus/configurator.h>
 #include <log4cplus/logger.h>
 #include <log4cplus/loggingmacros.h>
 #endif // log4cplus
-#endif // I3_PROJECTS
+#endif // not PROPOSAL_STANDALONE
 
 namespace PROPOSAL {
 
@@ -233,7 +233,7 @@ public:
 } // namespace PROPOSAL
 
 
-#if not I3_PROJECTS
+#if PROPOSAL_STANDALONE
 
 #if LOG4CPLUS_SUPPORT
 
@@ -327,6 +327,6 @@ void log_notice(Args ... args)
 }
 
 #endif // log4cplus
-#endif // I3_PROJECTS
+#endif // PROPOSAL_STANDALONE
 
 #endif // ICECUBE
