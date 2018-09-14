@@ -7,6 +7,7 @@ IF(I3_PROJECTS)
 	add_definitions(-DICECUBE_PROJECT)
     include(cmake/I3_CMakeLists.cmake)
 ELSE(I3_PROJECTS)
+	add_definitions(-DPROPOSAL_STANDALONE)
     include(cmake/Standalone_CMakeLists.cmake)
 ENDIF(I3_PROJECTS)
 
