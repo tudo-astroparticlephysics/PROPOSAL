@@ -16,11 +16,11 @@ data_formfactor = np.array([
 ])
 
 
-# form_factor = np.poly1d(np.polyfit(1e6 * data_formfactor[0], data_formfactor[1], 3))
+form_factor = np.poly1d(np.polyfit(1e6 * data_formfactor[0], data_formfactor[1], 3))
 
-def form_factor(x):
-    term = 1. + 0.0306 * x + (0.0194 * x**3) / (1. + x)
-    return np.exp(-1.171 * x**(0.536)) * term
+# def form_factor(x):
+#     term = 1. + 0.0306 * x + (0.0194 * x**3) / (1. + x)
+#     return np.exp(-1.171 * x**(0.536)) * term
 
 leptons = [
     pp.NuTauDef.get(),
@@ -95,7 +95,7 @@ if __name__ == "__main__":
     # 	Save energies
     # =========================================================
 
-    statistics = int(1e1)
+    statistics = int(1e5)
     binning = 50
 
     tau = pp.Particle(pp.TauMinusDef.get())
