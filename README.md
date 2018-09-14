@@ -34,10 +34,12 @@ The full Paper can be found
 PROPOSAL was tested on Mac OS X V. 10.7.5, Ubuntu 12.04, SUSE Enterprise 10 and PCLinuxos. Since
 all these OS are UNIX based it should be fine to run and compile PROPOSAL on a UNIX based OS.
 
+PROPOSAL is now a C++11 library using also pybind11 instead of boost python!
+
 ## Requirements ##
 
 - Boost Library 1.48 or higher
-- [log4cplus](https://github.com/log4cplus/log4cplus) 1.1.0 or higher
+- [log4cplus](https://github.com/log4cplus/log4cplus) 2.0.0 or higher
 - CMake 2.8 or higher
 
 ## Recommended ##
