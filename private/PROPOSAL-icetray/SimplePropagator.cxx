@@ -6,10 +6,8 @@
  * $Date: 2016-09-21 13:32:47 +0200 (Mi, 21. Sep 2016) $
  */
 
-#include <boost/assign.hpp>
-#include <boost/bimap.hpp>
 #include <boost/bind.hpp>
-#include <boost/foreach.hpp>
+#include <vector>
 
 #include "PROPOSAL-icetray/Converter.h"
 #include "PROPOSAL-icetray/SimplePropagator.h"
@@ -56,6 +54,9 @@ SimplePropagator::SimplePropagator(I3Particle::ParticleType pt,
     sec_def.cut_settings.SetEcut(ecut);
     sec_def.cut_settings.SetVcut(vcut);
 
+    std::vector<Sector::Definition> sec_def_vec;
+    sec_def_vec.push_back(sec_def);
+
     // Parametrizations
 
     // Using defaults:
@@ -71,7 +72,7 @@ SimplePropagator::SimplePropagator(I3Particle::ParticleType pt,
     // Init new propagator
 
     propagator_ = new PROPOSAL::Propagator(I3PROPOSALParticleConverter::GeneratePROPOSALType(pt),
-                                           boost::assign::list_of<PROPOSAL::Sector::Definition>(sec_def),
+                                           sec_def_vec,
                                            detector,
                                            interpolation_def);
 }
@@ -88,7 +89,7 @@ void SimplePropagator::SetSeed(int seed)
 
 void SimplePropagator::SetRandomNumberGenerator(I3RandomServicePtr rng)
 {
-    boost::function<double()> f = boost::bind(&I3RandomService::Uniform, rng, 0, 1);
+    std::function<double()> f = boost::bind(&I3RandomService::Uniform, rng, 0, 1);
     PROPOSAL::RandomGenerator::Get().SetRandomNumberGenerator(f);
 }
 
