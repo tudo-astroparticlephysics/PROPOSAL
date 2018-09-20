@@ -87,7 +87,7 @@ V.1.5 - 22.10.13
 
     +   Added a new scattering routine which draws the scattering angle from the moliere
         distribution and not from the gaussian distribution
-    +   Added a hirarchy variable so you can now have geometrys which "cross" each other
+    +   Added a hierarchy variable so you can now have geometrys which "cross" each other
 
 
 ------------------------------------------------------------------------------------------------

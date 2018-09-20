@@ -16,11 +16,13 @@
 
 		"exact_time" : true,
 		"scattering" : "HighlandIntegral",
+		"stopping_decay" : true,
 
 		"brems_multiplier" : 1,
 		"photo_multiplier" : 1,
 		"ioniz_multiplier" : 1,
 		"epair_multiplier" : 1,
+		"epair" : "EpairKelnerKokoulinPetrukhin",
 		"brems" : "BremsKelnerKokoulinPetrukhin",
 		"photo" : "PhotoAbramowiczLevinLevyMaor97",
 		"lpm" : true,
@@ -38,7 +40,7 @@
 
 	"sectors": [
 		{
-			"hirarchy": 1,
+			"hierarchy": 1,
 			"medium": "air",
 			"density_correction": 0.673,
 
@@ -69,7 +71,7 @@
 			}
 		},
 		{
-			"hirarchy": 1,
+			"hierarchy": 1,
 			"medium": "ice",
 			"density_correction": 0.832,
 
@@ -100,7 +102,7 @@
 			}
 		},
 		{
-			"hirarchy": 1,
+			"hierarchy": 1,
 			"medium": "ice",
 			"density_correction": 1.005,
 
@@ -131,7 +133,7 @@
 			}
 		},
 		{
-			"hirarchy": 1,
+			"hierarchy": 1,
 			"medium": "standardrock",
 			"density_correction": 1.0,
 

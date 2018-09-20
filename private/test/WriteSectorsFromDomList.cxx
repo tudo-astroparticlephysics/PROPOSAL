@@ -13,7 +13,7 @@ void AddSector(ofstream& out,
                double z0,
                double radius,
                double height,
-               int hirarchy,
+               int hierarchy,
                string medium,
                double density)
 {
@@ -29,7 +29,7 @@ void AddSector(ofstream& out,
         out << "\t" << geometry << " " << x0 << " " << y0 << " " << z0 << " " << radius << " 0 " << height << endl;
     }
     out << "\t"
-        << "hirarchy " << hirarchy << endl;
+        << "hierarchy " << hierarchy << endl;
     out << "\t"
         << "medium " << medium << " " << density << endl;
 }

@@ -320,9 +320,9 @@ Propagator::Propagator(const ParticleDef& particle_def, const std::string& confi
             log_fatal("You need to specify a geometry for each sector: %s", e.what());
         }
 
-        double hirarchy = geometry->GetHirarchy();
-        SetMember(hirarchy, "hirarchy", subtree);
-        geometry->SetHirarchy(hirarchy);
+        double hierarchy = geometry->GetHierarchy();
+        SetMember(hierarchy, "hierarchy", subtree);
+        geometry->SetHierarchy(hierarchy);
 
         // Use global options in case they will not be overriden
         Sector::Definition sec_def_infront = sec_def_global;
@@ -637,22 +637,22 @@ void Propagator::ChooseCurrentCollection(const Vector3D& particle_position, cons
 
     // Choose current collection when multiple collections are crossed!
     //
-    // Choose by hirarchy of Geometry
-    // If same hirarchys are available the denser one is choosen
-    // If hirarchy and density are the same then the first found is taken.
+    // Choose by hierarchy of Geometry
+    // If same hierarchys are available the denser one is choosen
+    // If hierarchy and density are the same then the first found is taken.
     //
 
     for (std::vector<int>::iterator iter = crossed_collections.begin(); iter != crossed_collections.end(); ++iter)
     {
-        // Current Hirachy is bigger -> Nothing to do!
+        // Current Hierachy is bigger -> Nothing to do!
         //
-        if (current_sector_->GetGeometry()->GetHirarchy() > sectors_[*iter]->GetGeometry()->GetHirarchy())
+        if (current_sector_->GetGeometry()->GetHierarchy() > sectors_[*iter]->GetGeometry()->GetHierarchy())
         {
             continue;
         }
-        // Current Hirachy is equal -> Look at the density!
+        // Current Hierachy is equal -> Look at the density!
         //
-        else if (current_sector_->GetGeometry()->GetHirarchy() == sectors_[*iter]->GetGeometry()->GetHirarchy())
+        else if (current_sector_->GetGeometry()->GetHierarchy() == sectors_[*iter]->GetGeometry()->GetHierarchy())
         {
             // Current Density is bigger or same -> Nothing to do!
             //
@@ -671,7 +671,7 @@ void Propagator::ChooseCurrentCollection(const Vector3D& particle_position, cons
 
         }
 
-        // Current Hirachy is smaller -> Set the new collection!
+        // Current Hierachy is smaller -> Set the new collection!
         //
         else
         {
@@ -699,7 +699,7 @@ double Propagator::CalculateEffectiveDistance(const Vector3D& particle_position,
                 continue;
             else
             {
-                if ((*iter)->GetGeometry()->GetHirarchy() >= current_sector_->GetGeometry()->GetHirarchy())
+                if ((*iter)->GetGeometry()->GetHierarchy() >= current_sector_->GetGeometry()->GetHierarchy())
                 {
                     tmp_distance_to_border =
                         (*iter)->GetGeometry()->DistanceToBorder(particle_position, particle_direction).first;
@@ -731,7 +731,7 @@ double Propagator::CalculateEffectiveDistance(const Vector3D& particle_position,
                 continue;
             else
             {
-                if ((*iter)->GetGeometry()->GetHirarchy() >= current_sector_->GetGeometry()->GetHirarchy())
+                if ((*iter)->GetGeometry()->GetHierarchy() >= current_sector_->GetGeometry()->GetHierarchy())
                 {
                     tmp_distance_to_border =
                         (*iter)->GetGeometry()->DistanceToBorder(particle_position, particle_direction).first;
