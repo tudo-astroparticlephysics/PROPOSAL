@@ -29,7 +29,7 @@ ostream& operator<<(ostream& os, Geometry const& geometry)
 
     os << geometry.name_ << endl;
     os << "Position:\n" << geometry.position_ << '\n';
-    os << "Hirarchy:\t" << geometry.hirarchy_ << '\n';
+    os << "Hierarchy:\t" << geometry.hierarchy_ << '\n';
 
     geometry.print(os);
 
@@ -47,21 +47,21 @@ ostream& operator<<(ostream& os, Geometry const& geometry)
 Geometry::Geometry(const std::string name)
     : position_(Vector3D())
     , name_(name)
-    , hirarchy_(0)
+    , hierarchy_(0)
 {
 }
 
 Geometry::Geometry(const std::string name, const Vector3D position)
     : position_(100. * position)
     , name_(name)
-    , hirarchy_(0)
+    , hierarchy_(0)
 {
 }
 
 Geometry::Geometry(const Geometry& geometry)
     : position_(geometry.position_)
     , name_(geometry.name_)
-    , hirarchy_(geometry.hirarchy_)
+    , hierarchy_(geometry.hierarchy_)
 {
 }
 
@@ -72,7 +72,7 @@ void Geometry::swap(Geometry& geometry)
 
     position_.swap(geometry.position_);
     name_.swap(geometry.name_);
-    swap(hirarchy_, geometry.hirarchy_);
+    swap(hierarchy_, geometry.hierarchy_);
 }
 
 // ------------------------------------------------------------------------- //
@@ -82,7 +82,7 @@ Geometry& Geometry::operator=(const Geometry& geometry)
     {
         position_ = geometry.position_;
         name_     = geometry.name_;
-        hirarchy_ = geometry.hirarchy_;
+        hierarchy_ = geometry.hierarchy_;
     }
 
     return *this;
@@ -95,7 +95,7 @@ bool Geometry::operator==(const Geometry& geometry) const
         return false;
     else if (name_.compare(geometry.name_) != 0)
         return false;
-    else if (hirarchy_ != geometry.hirarchy_)
+    else if (hierarchy_ != geometry.hierarchy_)
         return false;
     else
         return this->compare(geometry);

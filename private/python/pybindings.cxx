@@ -414,7 +414,7 @@ void init_geometry(py::module& m)
         .def("distance_to_closet_approach", &Geometry::DistanceToClosestApproach)
         .def_property_readonly("name", &Geometry::GetName)
         .def_property("position", &Geometry::GetPosition, &Geometry::SetPosition)
-        .def_property("hirarchy", &Geometry::GetHirarchy, &Geometry::SetHirarchy);
+        .def_property("hierarchy", &Geometry::GetHierarchy, &Geometry::SetHierarchy);
 
     py::class_<Sphere, std::shared_ptr<Sphere>, Geometry>(m_sub, "Sphere")
         .def(py::init<>())

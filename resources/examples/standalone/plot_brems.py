@@ -66,12 +66,12 @@ if __name__ == "__main__":
     crosssections = []
 
     for param in params:
-        print(param.name)
+        # print(param.name)
         crosssections.append(pp.crosssection.BremsIntegral(
             param,
         ))
 
-    print(crosssections[0])
+    # print(crosssections[0])
 
     # =========================================================
     # 	Calculate DE/dx at the given energies
@@ -83,7 +83,7 @@ if __name__ == "__main__":
             dEdx.append(cross.calculate_dEdx(E)/E)
 
         dEdx_photo.append(dEdx)
-        print(dEdx)
+        # print(dEdx)
 
     # =========================================================
     # 	Plot
