@@ -94,11 +94,11 @@ public:
     Vector3D GetPosition() const { return position_; }
 
     std::string GetName() const { return name_; }
-    unsigned int GetHirarchy() const { return hirarchy_; }
+    unsigned int GetHierarchy() const { return hierarchy_; }
 
     void SetPosition(const Vector3D& position) { position_ = position; };
 
-    void SetHirarchy(unsigned int hirarchy) { hirarchy_ = hirarchy; };
+    void SetHierarchy(unsigned int hierarchy) { hierarchy_ = hierarchy; };
 
 protected:
     // Implemented in child classes to be able to use equality operator
@@ -109,7 +109,7 @@ protected:
 
     std::string name_; //!< "box" , "cylinder" , "sphere" (sphere and cylinder might be hollow)
 
-    unsigned int hirarchy_; //!< adds a hirarchy of geometry objects to allow crossing geometries
+    unsigned int hierarchy_; //!< adds a hierarchy of geometry objects to allow crossing geometries
 };
 
 } // namespace PROPOSAL
