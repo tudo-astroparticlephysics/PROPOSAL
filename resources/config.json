@@ -35,7 +35,7 @@
 
 	"sectors": [
 		{
-			"hirarchy": 1,
+			"hierarchy": 1,
 			"medium": "air",
 			"density_correction": 0.673,
 
@@ -66,7 +66,7 @@
 			}
 		},
 		{
-			"hirarchy": 1,
+			"hierarchy": 1,
 			"medium": "ice",
 			"density_correction": 0.832,
 
@@ -97,7 +97,7 @@
 			}
 		},
 		{
-			"hirarchy": 1,
+			"hierarchy": 1,
 			"medium": "ice",
 			"density_correction": 1.005,
 
@@ -128,7 +128,7 @@
 			}
 		},
 		{
-			"hirarchy": 1,
+			"hierarchy": 1,
 			"medium": "standardrock",
 			"density_correction": 1.0,
 

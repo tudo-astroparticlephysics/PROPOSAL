@@ -34,7 +34,7 @@
 
 	"sectors": [
 		{
-			"hirarchy": 1,
+			"hierarchy": 1,
 			"medium": "ice",
 			"density_correction": 1.005,
 
