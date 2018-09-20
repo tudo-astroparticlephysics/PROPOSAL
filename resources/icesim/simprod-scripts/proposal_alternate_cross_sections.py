@@ -334,10 +334,6 @@ def MakePropagator(
     particleType=dataclasses.I3Particle.ParticleType.MuMinus,
     impl='proposal',
     mediadef=None,
-    bs=1,
-    ph=3,
-    bb=2,
-    sh=2
     ):
         """
         Create a muon propagator service.
@@ -384,7 +380,7 @@ def MakePropagator(
             from icecube import sim_services, PROPOSAL
             # in PROPOSAL everything can be defined in the configuration file
             if mediadef is None:
-                mediadef=expandvars('$I3_BUILD/PROPOSAL/resources/config.json')
+                mediadef=expandvars('$I3_BUILD/PROPOSAL/resources/config_icesim.json')
             return PROPOSAL.I3PropagatorServicePROPOSAL(
                 config_file=mediadef)
         else:

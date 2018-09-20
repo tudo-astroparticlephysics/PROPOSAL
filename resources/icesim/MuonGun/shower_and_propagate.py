@@ -63,7 +63,7 @@ def MMCFactory(length=10*I3Units.m, seed=12345, impl='mmc', mediadef=None):
 		from icecube import PROPOSAL_icetray
 		# in PROPOSAL everything can be defined in the configuration file
 		if mediadef is None:
-			mediadef=expandvars('$I3_BUILD/PROPOSAL/resources/iceworld-config.json')
+			mediadef=expandvars('$I3_BUILD/PROPOSAL/resources/config_iceworld.json')
 		return PROPOSAL_icetray.I3PropagatorServicePROPOSAL(config_file=mediadef)
 
 CORSIKA_CONFIG =\
