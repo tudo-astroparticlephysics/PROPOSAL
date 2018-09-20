@@ -13,7 +13,7 @@ import icecube.cmc
 import icecube.PROPOSAL
 
 default_media_definition = os.path.expandvars(
-    "$I3_BUILD/PROPOSAL/resources/config.json")
+    "$I3_BUILD/PROPOSAL/resources/config_icesim.json")
 
 
 @icecube.icetray.traysegment

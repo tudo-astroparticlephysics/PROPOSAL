@@ -111,7 +111,7 @@ def MMCFactory(radius=100000*I3Units.m, length=10*I3Units.m, seed=random.randint
 		from icecube import PROPOSAL_icetray
 		# in PROPOSAL everything can be defined in the configuration file
 		if mediadef is None:
-			mediadef=expandvars('$I3_BUILD/PROPOSAL/resources/iceworld-config.json')
+			mediadef=expandvars('$I3_BUILD/PROPOSAL/resources/config_iceworld.json')
 		return PROPOSAL_icetray.I3PropagatorServicePROPOSAL(config_file=mediadef)
 
 def PropagatorMMC(tray, name, seed=random.randint(0, (1<<32) - 1)):
