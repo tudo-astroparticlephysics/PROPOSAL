@@ -4,7 +4,7 @@
  *   For more details see the class documentation.
  *
  *   \date   2013.03.14
- *   \author Jan-Hendrik Köhne
+ *   \author Jan-Hendrik Koehne
  */
 
 #include "PROPOSAL/particle/Particle.h"

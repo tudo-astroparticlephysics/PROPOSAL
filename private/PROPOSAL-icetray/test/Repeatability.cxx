@@ -5,8 +5,6 @@
 #include <dataclasses/physics/I3Particle.h>
 #include <phys-services/I3SPRNGRandomService.h>
 
-#include <PROPOSAL/EpairStochastic.h>
-
 #include <boost/make_shared.hpp>
 
 TEST_GROUP(Repeatablility);
@@ -29,7 +27,7 @@ TEST(SimplePropagator)
     I3RandomServicePtr rng(new I3SPRNGRandomService(1, 10000, 2));
 
     boost::shared_ptr<PROPOSAL::SimplePropagator> prop(
-        new PROPOSAL::SimplePropagator("ice", I3Particle::MuMinus, 5e2, -1));
+        new PROPOSAL::SimplePropagator(I3Particle::MuMinus, "ice", 5e2, -1));
     prop->SetRandomNumberGenerator(rng);
     double distance = 1e2;
 
