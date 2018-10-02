@@ -21,6 +21,9 @@
  *
  * This hides the nasty details of PROPOSAL (a C++ translation of MMC)
  */
+
+namespace PROPOSAL {
+
 class SimplePropagator
 {
 public:
@@ -73,3 +76,4 @@ private:
     PROPOSAL::Propagator* propagator_;
     I3Particle::ParticleType final_stochastic_loss_;
 };
+} // namespace PROPOSAL
