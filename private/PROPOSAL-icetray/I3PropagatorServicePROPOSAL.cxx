@@ -11,11 +11,11 @@
  */
 
 // class header
-#include <boost/assign.hpp>
-#include <boost/bimap.hpp>
-#include <boost/bind.hpp>
-#include <boost/filesystem.hpp>
-#include <boost/foreach.hpp>
+// #include <boost/assign.hpp>
+// #include <boost/bimap.hpp>
+// #include <boost/bind.hpp>
+// #include <boost/filesystem.hpp>
+// #include <boost/foreach.hpp>
 
 #include <sstream>
 #include <unistd.h> // check for write permissions
