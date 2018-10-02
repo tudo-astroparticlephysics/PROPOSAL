@@ -74,7 +74,7 @@ TEST(PropagatorService)
     I3RandomServicePtr rng(new I3SPRNGRandomService(1, 10000, 1));
     I3FrameObjectPtr state = rng->GetState();
 
-    I3PropagatorServicePROPOSALPtr prop(new I3PropagatorServicePROPOSAL);
+    PROPOSAL::I3PropagatorServicePROPOSALPtr prop(new PROPOSAL::I3PropagatorServicePROPOSAL);
     prop->SetRandomNumberGenerator(rng);
 
     I3PropagatorService::DiagnosticMapPtr frame(new I3PropagatorService::DiagnosticMap);
