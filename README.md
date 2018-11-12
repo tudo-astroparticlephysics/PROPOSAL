@@ -37,6 +37,42 @@ all these OS are UNIX based it should be fine to run and compile PROPOSAL on a U
 
 PROPOSAL is now a C++11 library using also pybind11 instead of boost python!
 
+
+## How to cite PROPOSAL?
+
+If you use PROPOSAL, please cite the PROPOSAL paper
+
+
+```bibtex
+@article{koehne2013proposal,
+  title={PROPOSAL: A tool for propagation of charged leptons},
+  author={Koehne, J-H and Frantzen, Katharina and Schmitz, Martin and Fuchs, Tomasz and Rhode, Wolfgang and Chirkin, Dmitry and Tjus, J Becker},
+  journal={Computer Physics Communications},
+  volume={184},
+  number={9},
+  pages={2070--2090},
+  year={2013},
+  publisher={Elsevier}
+}
+```
+and our zenodo entry of the version you use
+```bibtex
+@misc{mario_dunsch_2018_1484181,
+  author       = {Mario Dunsch and
+                  Jan Soedingrekso and
+                  Jan-Hendrick Köhne and
+                  Tomasz Fuchs and
+                  Jacob van Santen and
+                  Claudio Kopper and
+                  Alex Olivas},
+  title        = {tudo-astroparticlephysics/PROPOSAL: Zenodo},
+  month        = nov,
+  year         = 2018,
+  doi          = {10.5281/zenodo.1484181},
+  url          = {https://doi.org/10.5281/zenodo.1484181}
+}
+``` 
+
 ## Requirements ##
 
 - Boost Library 1.48 or higher
