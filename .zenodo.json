@@ -1,0 +1,37 @@
+{
+	"description": "PROPOSAL is a Monte-Carlo-Simulation library to propagate Leptons through media.",
+	"license": "lgpl-3.0",
+	"keywords": ["Monte-Carlo Simulation", "Lepton Propagator", "Cross Sections"],
+	"upload_type": "software",
+	"creators": [
+		{
+			"affiliation": "TU Dortmund",
+			"name": "Mario Dunsch"
+		},
+		{
+			"affiliation": "TU Dortmund",
+			"name": "Jan Soedingrekso"
+		},
+		{
+			"affiliation": "TU Dortmund",
+			"name": "Jan-Hendrick K\u00f6hne"
+		},
+		{
+			"affiliation": "TU Dortmund",
+			"name": "Tomasz Fuchs"
+		},
+		{
+			"affiliation": "DESY Zeuthen",
+			"name": "Jacob van Santen"
+		},
+		{
+			"affiliation": "University of Alberta",
+			"name": "Claudio Kopper"
+		},
+		{
+			"affiliation": "University of Maryland",
+			"name": "Alex Olivas"
+		}
+	],
+	"access_rights": "open"
+}
