@@ -172,18 +172,18 @@ bool IsWritable(std::string table_dir)
         if ((access(table_dir.c_str(), R_OK) == 0) && (access(table_dir.c_str(), W_OK) == 0))
         {
             writeable = true;
-            log_info("Table directory does exist and has read and write permissions: %s", table_dir.c_str());
+            log_debug("Table directory does exist and has read and write permissions: %s", table_dir.c_str());
         }
         else
         {
             if (access(table_dir.c_str(), R_OK) != 0)
-                log_info("Table directory is not readable: %s", table_dir.c_str());
+                log_warn("Table directory is not readable: %s", table_dir.c_str());
             else
-                log_info("Table directory is not writable: %s", table_dir.c_str());
+                log_warn("Table directory is not writable: %s", table_dir.c_str());
         }
     }
     else
-        log_info("Table directory does not exist: %s", table_dir.c_str());
+        log_warn("Table directory does not exist: %s", table_dir.c_str());
 
     return writeable;
 }
@@ -244,7 +244,7 @@ void InitializeInterpolation(const std::string name,
 {
     using namespace std;
 
-    log_info("Initialize %s interpolation.", name.c_str());
+    log_debug("Initialize %s interpolation.", name.c_str());
 
     bool storing_failed = false;
     bool reading_worked = true;
@@ -282,7 +282,7 @@ void InitializeInterpolation(const std::string name,
     {
         if (FileExist(filename.str()))
         {
-            log_info("%s tables will be read from file: %s", name.c_str(), filename.str().c_str());
+            log_debug("%s tables will be read from file: %s", name.c_str(), filename.str().c_str());
 
             std::ifstream input;
 
@@ -310,10 +310,10 @@ void InitializeInterpolation(const std::string name,
         {
             if (!reading_worked)
             {
-                log_info("file %s is corrupted! Write it again!", filename.str().c_str());
+                log_warn("file %s is corrupted! Write it again!", filename.str().c_str());
             }
 
-            log_info("%s tables will be saved to file: %s", name.c_str(), filename.str().c_str());
+            log_debug("%s tables will be saved to file: %s", name.c_str(), filename.str().c_str());
 
             ofstream output;
 
@@ -347,7 +347,7 @@ void InitializeInterpolation(const std::string name,
 
     if (pathname.empty() || storing_failed)
     {
-        log_info("%s tables will be stored in memomy!", name.c_str());
+        log_debug("%s tables will be stored in memomy!", name.c_str());
 
         for (InterpolantBuilderContainer::iterator builder_it = builder_container.begin();
              builder_it != builder_container.end();
@@ -357,7 +357,7 @@ void InitializeInterpolation(const std::string name,
         }
     }
 
-    log_info("Initialize %s interpolation done.", name.c_str());
+    log_debug("Initialize %s interpolation done.", name.c_str());
 }
 
 } // namespace Helper
