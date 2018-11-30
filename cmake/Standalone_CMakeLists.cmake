@@ -75,7 +75,7 @@ IF(ADD_PYTHON)
 			MESSAGE(STATUS "Clone pybind11")
 
 			execute_process(
-				COMMAND git clone https://github.com/pybind/pybind11 ${CMAKE_CURRENT_SOURCE_DIR}/pybind11
+				COMMAND git clone https://github.com/pybind/pybind11 --branch v2.2.4 ${CMAKE_CURRENT_SOURCE_DIR}/pybind11
 				OUTPUT_VARIABLE     git_output
 				ERROR_VARIABLE		git_error
 			)
