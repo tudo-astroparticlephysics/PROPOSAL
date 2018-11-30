@@ -42,18 +42,18 @@
 #include "PROPOSAL/particle/Particle.h"
 
 #if ROOT_SUPPORT
-#include "TFile.h"
-#include "TTree.h"
+    #include "TFile.h"
+    #include "TTree.h"
 #endif
 
 #if not PROPOSAL_STANDALONE
-#include <icetray/I3Logging.h>
+    #include <icetray/I3Logging.h>
 #else // not PROPOSAL_STANDALONE
-#if LOG4CPLUS_SUPPORT
-#include <log4cplus/configurator.h>
-#include <log4cplus/logger.h>
-#include <log4cplus/loggingmacros.h>
-#endif // log4cplus
+    #if LOG4CPLUS_SUPPORT
+        #include <log4cplus/configurator.h>
+        #include <log4cplus/logger.h>
+        #include <log4cplus/loggingmacros.h>
+    #endif // log4cplus
 #endif // not PROPOSAL_STANDALONE
 
 namespace PROPOSAL {

@@ -129,7 +129,7 @@ private:
         {
             std::stringstream ss;
             ss << "Option " << option << " not set! Use default: " << var;
-            log_warn("%s", ss.str().c_str());
+            log_debug("%s", ss.str().c_str());
         }
     }
 
