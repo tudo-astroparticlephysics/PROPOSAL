@@ -114,7 +114,14 @@ double Parametrization::FunctionToDE2dxIntegral(double energy, double variable)
 size_t Parametrization::GetHash() const
 {
     std::size_t seed = 0;
-    hash_combine(seed, GetName(), particle_def_, medium_->GetName(), cut_settings_.GetEcut(), cut_settings_.GetVcut(), multiplier_);
+    hash_combine(seed,
+                 GetName(),
+                 particle_def_,
+                 medium_->GetName(),
+                 medium_->GetDensityCorrection(),
+                 cut_settings_.GetEcut(),
+                 cut_settings_.GetVcut(),
+                 multiplier_);
 
     return seed;
 }
