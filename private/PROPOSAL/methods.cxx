@@ -282,8 +282,6 @@ void InitializeInterpolation(const std::string name,
     {
         if (FileExist(filename.str()))
         {
-            log_debug("%s tables will be read from file: %s", name.c_str(), filename.str().c_str());
-
             std::ifstream input;
 
             if (raw)
@@ -294,13 +292,27 @@ void InitializeInterpolation(const std::string name,
                 input.open(filename.str().c_str());
             }
 
-            for (InterpolantBuilderContainer::iterator builder_it = builder_container.begin();
-                 builder_it != builder_container.end();
-                 ++builder_it)
+            // check if file is empty
+            // this happens if multiple instances try to write the tables in parallel
+            // now just one is writing them and the other just saves them in memory
+            if (input.peek() == std::ifstream::traits_type::eof())
             {
-                // TODO(mario): read check Tue 2017/09/05
-                (*builder_it->second) = new Interpolant();
-                (*builder_it->second)->Load(input, raw);
+                log_info("file %s is empty! Another process is presumably writing. Save this table in memory!",
+                        filename.str().c_str());
+                storing_failed = true;
+            }
+            else
+            {
+                log_debug("%s tables will be read from file: %s", name.c_str(), filename.str().c_str());
+
+                for (InterpolantBuilderContainer::iterator builder_it = builder_container.begin();
+                     builder_it != builder_container.end();
+                     ++builder_it)
+                {
+                    // TODO(mario): read check Tue 2017/09/05
+                    (*builder_it->second) = new Interpolant();
+                    (*builder_it->second)->Load(input, raw);
+                }
             }
 
             input.close();
