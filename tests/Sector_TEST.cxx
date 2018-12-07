@@ -3,10 +3,9 @@
 
 #include "PROPOSAL/PROPOSAL.h"
 
-using namespace std;
 using namespace PROPOSAL;
 
-ParticleDef getParticleDef(const string& name)
+ParticleDef getParticleDef(const std::string& name)
 {
     if (name == "MuMinus")
     {
@@ -148,8 +147,8 @@ TEST(Assignment, Copyconstructor2)
 
 TEST(Sector, Propagate)
 {
-    ifstream in;
-    string filename = "bin/TestFiles/Sector_propagate.txt";
+    std::ifstream in;
+    std::string filename = "bin/TestFiles/Sector_propagate.txt";
     in.open(filename.c_str());
 
     if (!in.good())
@@ -157,8 +156,8 @@ TEST(Sector, Propagate)
         std::cerr << "File \"" << filename << "\" not found" << std::endl;
     }
 
-    string particleName;
-    string mediumName;
+    std::string particleName;
+    std::string mediumName;
 
     Utility::Definition utility_def;
 
@@ -171,7 +170,7 @@ TEST(Sector, Propagate)
 
     bool first_line = true;
 
-    cout.precision(16);
+    std::cout.precision(16);
 
     RandomGenerator::Get().SetSeed(1234);
 

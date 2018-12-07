@@ -5,7 +5,6 @@
 #include "PROPOSAL/geometry/Sphere.h"
 
 using namespace PROPOSAL;
-using namespace std;
 
 Sphere::Sphere()
     : Geometry("Sphere")
@@ -42,8 +41,6 @@ Sphere::Sphere(const Sphere& sphere)
 // ------------------------------------------------------------------------- //
 void Sphere::swap(Geometry& geometry)
 {
-    using std::swap;
-
     Sphere* sphere = dynamic_cast<Sphere*>(&geometry);
     if (!sphere)
     {
@@ -53,8 +50,8 @@ void Sphere::swap(Geometry& geometry)
 
     Geometry::swap(*sphere);
 
-    swap(inner_radius_, sphere->inner_radius_);
-    swap(radius_, sphere->radius_);
+    std::swap(inner_radius_, sphere->inner_radius_);
+    std::swap(radius_, sphere->radius_);
 }
 
 //------------------------------------------------------------------------- //
@@ -97,7 +94,7 @@ void Sphere::print(std::ostream& os) const
 }
 
 // ------------------------------------------------------------------------- //
-pair<double, double> Sphere::DistanceToBorder(const Vector3D& position, const Vector3D& direction)
+std::pair<double, double> Sphere::DistanceToBorder(const Vector3D& position, const Vector3D& direction)
 {
     // Calculate intersection of particle trajectory and the sphere
     // sphere (x1 + x0)^2 + (x2 + y0)^2 + (x3 + z0)^2 = radius^2
@@ -111,11 +108,11 @@ pair<double, double> Sphere::DistanceToBorder(const Vector3D& position, const Ve
 
     double A, B, t1, t2, difference_length_squared;
 
-    pair<double, double> distance;
+    std::pair<double, double> distance;
 
     double determinant;
 
-    difference_length_squared = pow((position - position_).magnitude(), 2);
+    difference_length_squared = std::pow((position - position_).magnitude(), 2);
     A                         = difference_length_squared - radius_ * radius_;
 
     B = scalar_product(position - position_, direction);
@@ -124,8 +121,8 @@ pair<double, double> Sphere::DistanceToBorder(const Vector3D& position, const Ve
 
     if (determinant > 0) // determinant == 0 (boundery point) is ignored
     {
-        t1 = -1 * B + sqrt(determinant);
-        t2 = -1 * B - sqrt(determinant);
+        t1 = -1 * B + std::sqrt(determinant);
+        t2 = -1 * B - std::sqrt(determinant);
 
         // Computer precision controll
         if (t1 > 0 && t1 < GEOMETRY_PRECISION)
@@ -185,8 +182,8 @@ pair<double, double> Sphere::DistanceToBorder(const Vector3D& position, const Ve
 
         if (determinant > 0) // determinant == 0 (boundery point) is ignored
         {
-            t1 = -1 * B + sqrt(determinant);
-            t2 = -1 * B - sqrt(determinant);
+            t1 = -1 * B + std::sqrt(determinant);
+            t2 = -1 * B - std::sqrt(determinant);
 
             // Computer precision controll
             if (t1 > 0 && t1 < GEOMETRY_PRECISION)

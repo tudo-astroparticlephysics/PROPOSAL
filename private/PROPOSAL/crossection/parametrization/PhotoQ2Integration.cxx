@@ -9,7 +9,6 @@
 #include "PROPOSAL/methods.h"
 
 using namespace PROPOSAL;
-using namespace std::placeholders;
 
 #define Q2_PHOTO_PARAM_INTEGRAL_IMPL(param)                                                                            \
     Photo##param::Photo##param(const ParticleDef& particle_def,                                                        \
@@ -200,7 +199,7 @@ double PhotoAbramowiczLevinLevyMaor91::FunctionToQ2Integral(double energy, doubl
 
     // t = log( \frac{log \frac{Q^2 + Q_0^2}{\Lambda^2}}{log \frac{Q_0^2}{\Lambda^2}} )
     // eq. 22
-    double t = log(log((Q2 + Q20_free_param) / scaleParameter) / log(Q20_free_param / scaleParameter));
+    double t = std::log(std::log((Q2 + Q20_free_param) / scaleParameter) / std::log(Q20_free_param / scaleParameter));
 
     if (t < 0)
         t = 0;
@@ -208,15 +207,15 @@ double PhotoAbramowiczLevinLevyMaor91::FunctionToQ2Integral(double energy, doubl
     // parameter, that increase with Q^2
     // eq. 23
     // f(t) = f_1 + f_2 t^{f_3}
-    double a_reggeon = a1_reggeon + a2_reggeon * pow(t, a3_reggeon);
-    double b_reggeon = b1_reggeon + b2_reggeon * pow(t, b3_reggeon);
-    double c_reggeon = c1_reggeon + c2_reggeon * pow(t, c3_reggeon);
-    double b_pomeron = b1_pomeron + b2_pomeron * pow(t, b3_pomeron);
+    double a_reggeon = a1_reggeon + a2_reggeon * std::pow(t, a3_reggeon);
+    double b_reggeon = b1_reggeon + b2_reggeon * std::pow(t, b3_reggeon);
+    double c_reggeon = c1_reggeon + c2_reggeon * std::pow(t, c3_reggeon);
+    double b_pomeron = b1_pomeron + b2_pomeron * std::pow(t, b3_pomeron);
     // parameter, that decrease with Q^2
     // eq. 24
     // f'(t) = f_1 + (f_1 - f_2) (\frac{1}{1 + t^{f_3}} - 1)
-    double a_pomeron = a1_pomeron + (a1_pomeron - a2_pomeron) * (1 / (1 + pow(t, a3_pomeron)) - 1);
-    double c_pomeron = c1_pomeron + (c1_pomeron - c2_pomeron) * (1 / (1 + pow(t, c3_pomeron)) - 1);
+    double a_pomeron = a1_pomeron + (a1_pomeron - a2_pomeron) * (1 / (1 + std::pow(t, a3_pomeron)) - 1);
+    double c_pomeron = c1_pomeron + (c1_pomeron - c2_pomeron) * (1 / (1 + std::pow(t, c3_pomeron)) - 1);
 
     // invariant mass of nucleus and virtual photon
     // W^2 = (p + q)^2 = M^2 + 2MEv - Q^2
@@ -238,8 +237,8 @@ double PhotoAbramowiczLevinLevyMaor91::FunctionToQ2Integral(double energy, doubl
     double bjorken_x_reggeon = (Q2 + mass_reggeon) / (Q2 + mass_reggeon + W2 - mass_nucleus * mass_nucleus);
     // eq. 20 and 21
     // F_{2, i}(x, Q^2) = c_i(t) x^{a_i(t)} (1 - x)^{b_i(t)}
-    double pomeron_contribution = c_pomeron * pow(bjorken_x_pomeron, a_pomeron) * pow(1 - bjorken_x, b_pomeron);
-    double reggeon_controbution = c_reggeon * pow(bjorken_x_reggeon, a_reggeon) * pow(1 - bjorken_x, b_reggeon);
+    double pomeron_contribution = c_pomeron * std::pow(bjorken_x_pomeron, a_pomeron) * std::pow(1 - bjorken_x, b_pomeron);
+    double reggeon_controbution = c_reggeon * std::pow(bjorken_x_reggeon, a_reggeon) * std::pow(1 - bjorken_x, b_reggeon);
     // ALLM97 eq. 1
     // F_{2, proton}(x, Q^2) = \frac{Q^2}{Q^2 + m_0^2} (F_{2, Pomeron} + F_{2, Reggeon})
     double structure_function_proton = Q2 / (Q2 + mass_photon_eff) * (pomeron_contribution + reggeon_controbution);
@@ -328,7 +327,7 @@ double PhotoAbramowiczLevinLevyMaor97::FunctionToQ2Integral(double energy, doubl
 
     // t = log( \frac{log \frac{Q^2 + Q_0^2}{\Lambda^2}}{log \frac{Q_0^2}{\Lambda^2}} )
     // eq. 22
-    double t = log(log((Q2 + Q20_free_param) / scaleParameter) / log(Q20_free_param / scaleParameter));
+    double t = std::log(std::log((Q2 + Q20_free_param) / scaleParameter) / std::log(Q20_free_param / scaleParameter));
 
     if (t < 0)
         t = 0;
@@ -336,15 +335,15 @@ double PhotoAbramowiczLevinLevyMaor97::FunctionToQ2Integral(double energy, doubl
     // parameter, that increase with Q^2
     // eq. 23
     // f(t) = f_1 + f_2 t^{f_3}
-    double a_reggeon = a1_reggeon + a2_reggeon * pow(t, a3_reggeon);
-    double b_reggeon = b1_reggeon + b2_reggeon * pow(t, b3_reggeon);
-    double c_reggeon = c1_reggeon + c2_reggeon * pow(t, c3_reggeon);
-    double b_pomeron = b1_pomeron + b2_pomeron * pow(t, b3_pomeron);
+    double a_reggeon = a1_reggeon + a2_reggeon * std::pow(t, a3_reggeon);
+    double b_reggeon = b1_reggeon + b2_reggeon * std::pow(t, b3_reggeon);
+    double c_reggeon = c1_reggeon + c2_reggeon * std::pow(t, c3_reggeon);
+    double b_pomeron = b1_pomeron + b2_pomeron * std::pow(t, b3_pomeron);
     // parameter, that decrease with Q^2
     // eq. 24
     // f'(t) = f_1 + (f_1 - f_2) (\frac{1}{1 + t^{f_3}} - 1)
-    double a_pomeron = a1_pomeron + (a1_pomeron - a2_pomeron) * (1 / (1 + pow(t, a3_pomeron)) - 1);
-    double c_pomeron = c1_pomeron + (c1_pomeron - c2_pomeron) * (1 / (1 + pow(t, c3_pomeron)) - 1);
+    double a_pomeron = a1_pomeron + (a1_pomeron - a2_pomeron) * (1 / (1 + std::pow(t, a3_pomeron)) - 1);
+    double c_pomeron = c1_pomeron + (c1_pomeron - c2_pomeron) * (1 / (1 + std::pow(t, c3_pomeron)) - 1);
 
     // invariant mass of nucleus and virtual photon
     // W^2 = (p + q)^2 = M^2 + 2MEv - Q^2
@@ -366,8 +365,8 @@ double PhotoAbramowiczLevinLevyMaor97::FunctionToQ2Integral(double energy, doubl
     double bjorken_x_reggeon = (Q2 + mass_reggeon) / (Q2 + mass_reggeon + W2 - mass_nucleus * mass_nucleus);
     // eq. 20 and 21
     // F_{2, i}(x, Q^2) = c_i(t) x^{a_i(t)} (1 - x)^{b_i(t)}
-    double pomeron_contribution = c_pomeron * pow(bjorken_x_pomeron, a_pomeron) * pow(1 - bjorken_x, b_pomeron);
-    double reggeon_controbution = c_reggeon * pow(bjorken_x_reggeon, a_reggeon) * pow(1 - bjorken_x, b_reggeon);
+    double pomeron_contribution = c_pomeron * std::pow(bjorken_x_pomeron, a_pomeron) * std::pow(1 - bjorken_x, b_pomeron);
+    double reggeon_controbution = c_reggeon * std::pow(bjorken_x_reggeon, a_reggeon) * std::pow(1 - bjorken_x, b_reggeon);
     // ALLM97 eq. 1
     // F_{2, proton}(x, Q^2) = \frac{Q^2}{Q^2 + m_0^2} (F_{2, Pomeron} + F_{2, Reggeon})
     double structure_function_proton = Q2 / (Q2 + mass_photon_eff) * (pomeron_contribution + reggeon_controbution);
@@ -438,16 +437,16 @@ double PhotoButkevichMikhailov::FunctionToQ2Integral(double energy, double v, do
     double dl = intercept_pomeron * (1 + 2 * Q2 / (Q2 + d));
     // eq. 24
     // F_{2, Proton} = A_s x^{-\Delta} (1 - x)^{n + 4} (\frac{Q^2}{Q^2 + a})^{1 + \Delta}
-    aux                     = A_s * pow(bjorken_x, -dl) * pow(Q2 / (Q2 + a), 1 + dl);
-    double F_proton_singlet = aux * pow(1 - bjorken_x, n + 4);
+    aux                     = A_s * std::pow(bjorken_x, -dl) * std::pow(Q2 / (Q2 + a), 1 + dl);
+    double F_proton_singlet = aux * std::pow(1 - bjorken_x, n + 4);
     // eq. 37
     // F_{2, Neutron} = A_s x^{-\Delta} (1 - x)^{n + \tau} (\frac{Q^2}{Q^2 + a})^{1 + \Delta}
-    double F_neutron_singlet = aux * pow(1 - bjorken_x, n + tau);
+    double F_neutron_singlet = aux * std::pow(1 - bjorken_x, n + tau);
     // Contribution of Valence quarks (called non-Singlet Term)
     // splitted into Up quark and down quark contributions
     // eq. 29
     // xU_v = B_{up} x^{1 - \alpha_{Reggeon}} (1 - x)^{n} (\frac{Q^2}{Q^2 + b})^{\alpha_{Reggeon}}
-    aux = pow(bjorken_x, 1 - intercept_reggeon) * pow(1 - bjorken_x, n) * pow(Q2 / (Q2 + b), intercept_reggeon);
+    aux = std::pow(bjorken_x, 1 - intercept_reggeon) * std::pow(1 - bjorken_x, n) * std::pow(Q2 / (Q2 + b), intercept_reggeon);
     double Up_valence = B_up * aux;
     // eq. 30
     // xD_v = B_{down} x^{1 - \alpha_{Reggeon}} (1 - x)^{n + 1} (\frac{Q^2}{Q^2 + b})^{\alpha_{Reggeon}}
@@ -547,7 +546,7 @@ double PhotoRenoSarcevicSu::FunctionToQ2Integral(double energy, double v, double
 
     // t = log( \frac{log \frac{Q^2 + Q_0^2}{\Lambda^2}}{log \frac{Q_0^2}{\Lambda^2}} )
     // eq. 22
-    double t = log(log((Q2 + Q20_free_param) / scaleParameter) / log(Q20_free_param / scaleParameter));
+    double t = std::log(std::log((Q2 + Q20_free_param) / scaleParameter) / std::log(Q20_free_param / scaleParameter));
 
     if (t < 0)
         t = 0;
@@ -555,15 +554,15 @@ double PhotoRenoSarcevicSu::FunctionToQ2Integral(double energy, double v, double
     // parameter, that increase with Q^2
     // eq. 23
     // f(t) = f_1 + f_2 t^{f_3}
-    double a_reggeon = a1_reggeon + a2_reggeon * pow(t, a3_reggeon);
-    double b_reggeon = b1_reggeon + b2_reggeon * pow(t, b3_reggeon);
-    double c_reggeon = c1_reggeon + c2_reggeon * pow(t, c3_reggeon);
-    double b_pomeron = b1_pomeron + b2_pomeron * pow(t, b3_pomeron);
+    double a_reggeon = a1_reggeon + a2_reggeon * std::pow(t, a3_reggeon);
+    double b_reggeon = b1_reggeon + b2_reggeon * std::pow(t, b3_reggeon);
+    double c_reggeon = c1_reggeon + c2_reggeon * std::pow(t, c3_reggeon);
+    double b_pomeron = b1_pomeron + b2_pomeron * std::pow(t, b3_pomeron);
     // parameter, that decrease with Q^2
     // eq. 24
     // f'(t) = f_1 + (f_1 - f_2) (\frac{1}{1 + t^{f_3}} - 1)
-    double a_pomeron = a1_pomeron + (a1_pomeron - a2_pomeron) * (1 / (1 + pow(t, a3_pomeron)) - 1);
-    double c_pomeron = c1_pomeron + (c1_pomeron - c2_pomeron) * (1 / (1 + pow(t, c3_pomeron)) - 1);
+    double a_pomeron = a1_pomeron + (a1_pomeron - a2_pomeron) * (1 / (1 + std::pow(t, a3_pomeron)) - 1);
+    double c_pomeron = c1_pomeron + (c1_pomeron - c2_pomeron) * (1 / (1 + std::pow(t, c3_pomeron)) - 1);
 
     // invariant mass of nucleus and virtual photon
     // W^2 = (p + q)^2 = M^2 + 2MEv - Q^2
@@ -585,8 +584,8 @@ double PhotoRenoSarcevicSu::FunctionToQ2Integral(double energy, double v, double
     double bjorken_x_reggeon = (Q2 + mass_reggeon) / (Q2 + mass_reggeon + W2 - mass_nucleus * mass_nucleus);
     // eq. 20 and 21
     // F_{2, i}(x, Q^2) = c_i(t) x^{a_i(t)} (1 - x)^{b_i(t)}
-    double pomeron_contribution = c_pomeron * pow(bjorken_x_pomeron, a_pomeron) * pow(1 - bjorken_x, b_pomeron);
-    double reggeon_controbution = c_reggeon * pow(bjorken_x_reggeon, a_reggeon) * pow(1 - bjorken_x, b_reggeon);
+    double pomeron_contribution = c_pomeron * std::pow(bjorken_x_pomeron, a_pomeron) * std::pow(1 - bjorken_x, b_pomeron);
+    double reggeon_controbution = c_reggeon * std::pow(bjorken_x_reggeon, a_reggeon) * std::pow(1 - bjorken_x, b_reggeon);
     // ALLM97 eq. 1
     // F_{2, proton}(x, Q^2) = \frac{Q^2}{Q^2 + m_0^2} (F_{2, Pomeron} + F_{2, Reggeon})
     double structure_function_proton = Q2 / (Q2 + mass_photon_eff) * (pomeron_contribution + reggeon_controbution);

@@ -12,10 +12,9 @@
 #include "PROPOSAL/medium/MediumFactory.h"
 #include "PROPOSAL/methods.h"
 
-using namespace std;
 using namespace PROPOSAL;
 
-ParticleDef getParticleDef(const string& name)
+ParticleDef getParticleDef(const std::string& name)
 {
     if (name == "MuMinus")
     {
@@ -176,8 +175,8 @@ TEST(Assignment, Copyconstructor2)
 
 TEST(Epairproduction, Test_of_dEdx)
 {
-    ifstream in;
-    string filename = "bin/TestFiles/Epair_dEdx.txt";
+    std::ifstream in;
+    std::string filename = "bin/TestFiles/Epair_dEdx.txt";
     in.open(filename.c_str());
 
     if (!in.good())
@@ -188,14 +187,14 @@ TEST(Epairproduction, Test_of_dEdx)
     char firstLine[256];
     in.getline(firstLine, 256);
 
-    string particleName;
-    string mediumName;
+    std::string particleName;
+    std::string mediumName;
     double ecut;
     double vcut;
     double multiplier;
     bool lpm;
     double energy;
-    string parametrization;
+    std::string parametrization;
     double dEdx_stored;
     double dEdx_new;
 
@@ -224,8 +223,8 @@ TEST(Epairproduction, Test_of_dEdx)
 
 TEST(Epairproduction, Test_of_dNdx)
 {
-    ifstream in;
-    string filename = "bin/TestFiles/Epair_dNdx.txt";
+    std::ifstream in;
+    std::string filename = "bin/TestFiles/Epair_dNdx.txt";
     in.open(filename.c_str());
 
     if (!in.good())
@@ -236,14 +235,14 @@ TEST(Epairproduction, Test_of_dNdx)
     char firstLine[256];
     in.getline(firstLine, 256);
 
-    string particleName;
-    string mediumName;
+    std::string particleName;
+    std::string mediumName;
     double ecut;
     double vcut;
     double multiplier;
     bool lpm;
     double energy;
-    string parametrization;
+    std::string parametrization;
     double dNdx_stored;
     double dNdx_new;
 
@@ -272,8 +271,8 @@ TEST(Epairproduction, Test_of_dNdx)
 
 TEST(Epairproduction, Test_of_dNdx_rnd)
 {
-    ifstream in;
-    string filename = "bin/TestFiles/Epair_dNdx_rnd.txt";
+    std::ifstream in;
+    std::string filename = "bin/TestFiles/Epair_dNdx_rnd.txt";
     in.open(filename.c_str());
 
     if (!in.good())
@@ -284,14 +283,14 @@ TEST(Epairproduction, Test_of_dNdx_rnd)
     char firstLine[256];
     in.getline(firstLine, 256);
 
-    string particleName;
-    string mediumName;
+    std::string particleName;
+    std::string mediumName;
     double ecut;
     double vcut;
     double multiplier;
     bool lpm;
     double energy;
-    string parametrization;
+    std::string parametrization;
     double rnd;
     double dNdx_rnd_stored;
     double dNdx_rnd_new;
@@ -324,8 +323,8 @@ TEST(Epairproduction, Test_of_dNdx_rnd)
 
 TEST(Epairproduction, Test_Stochastic_Loss)
 {
-    ifstream in;
-    string filename = "bin/TestFiles/Epair_e.txt";
+    std::ifstream in;
+    std::string filename = "bin/TestFiles/Epair_e.txt";
     in.open(filename.c_str());
 
     if (!in.good())
@@ -336,19 +335,19 @@ TEST(Epairproduction, Test_Stochastic_Loss)
     char firstLine[256];
     in.getline(firstLine, 256);
 
-    string particleName;
-    string mediumName;
+    std::string particleName;
+    std::string mediumName;
     double ecut;
     double vcut;
     double multiplier;
     bool lpm;
     double energy;
-    string parametrization;
+    std::string parametrization;
     double rnd1, rnd2;
     double stochastic_loss_stored;
     double stochastic_loss_new;
 
-    cout.precision(16);
+    std::cout.precision(16);
     RandomGenerator::Get().SetSeed(0);
 
     while (in.good())
@@ -379,8 +378,8 @@ TEST(Epairproduction, Test_Stochastic_Loss)
 
 TEST(Epairproduction, Test_of_dEdx_Interpolant)
 {
-    ifstream in;
-    string filename = "bin/TestFiles/Epair_dEdx_interpol.txt";
+    std::ifstream in;
+    std::string filename = "bin/TestFiles/Epair_dEdx_interpol.txt";
     in.open(filename.c_str());
 
     if (!in.good())
@@ -391,14 +390,14 @@ TEST(Epairproduction, Test_of_dEdx_Interpolant)
     char firstLine[256];
     in.getline(firstLine, 256);
 
-    string particleName;
-    string mediumName;
+    std::string particleName;
+    std::string mediumName;
     double ecut;
     double vcut;
     double multiplier;
     bool lpm;
     double energy;
-    string parametrization;
+    std::string parametrization;
     double dEdx_stored;
     double dEdx_new;
 
@@ -430,8 +429,8 @@ TEST(Epairproduction, Test_of_dEdx_Interpolant)
 
 TEST(Epairproduction, Test_of_dNdx_Interpolant)
 {
-    ifstream in;
-    string filename = "bin/TestFiles/Epair_dNdx_interpol.txt";
+    std::ifstream in;
+    std::string filename = "bin/TestFiles/Epair_dNdx_interpol.txt";
     in.open(filename.c_str());
 
     if (!in.good())
@@ -442,14 +441,14 @@ TEST(Epairproduction, Test_of_dNdx_Interpolant)
     char firstLine[256];
     in.getline(firstLine, 256);
 
-    string particleName;
-    string mediumName;
+    std::string particleName;
+    std::string mediumName;
     double ecut;
     double vcut;
     double multiplier;
     bool lpm;
     double energy;
-    string parametrization;
+    std::string parametrization;
     double dNdx_stored;
     double dNdx_new;
 
@@ -481,8 +480,8 @@ TEST(Epairproduction, Test_of_dNdx_Interpolant)
 
 TEST(Epairproduction, Test_of_dNdxrnd_interpol)
 {
-    ifstream in;
-    string filename = "bin/TestFiles/Epair_dNdx_rnd_interpol.txt";
+    std::ifstream in;
+    std::string filename = "bin/TestFiles/Epair_dNdx_rnd_interpol.txt";
     in.open(filename.c_str());
 
     if (!in.good())
@@ -493,14 +492,14 @@ TEST(Epairproduction, Test_of_dNdxrnd_interpol)
     char firstLine[256];
     in.getline(firstLine, 256);
 
-    string particleName;
-    string mediumName;
+    std::string particleName;
+    std::string mediumName;
     double ecut;
     double vcut;
     double multiplier;
     bool lpm;
     double energy;
-    string parametrization;
+    std::string parametrization;
     double rnd;
     double dNdx_rnd_stored;
     double dNdx_rnd_new;
@@ -535,8 +534,8 @@ TEST(Epairproduction, Test_of_dNdxrnd_interpol)
 
 TEST(Epairproduction, Test_of_e_interpol)
 {
-    ifstream in;
-    string filename = "bin/TestFiles/Epair_e_interpol.txt";
+    std::ifstream in;
+    std::string filename = "bin/TestFiles/Epair_e_interpol.txt";
     in.open(filename.c_str());
 
     if (!in.good())
@@ -547,14 +546,14 @@ TEST(Epairproduction, Test_of_e_interpol)
     char firstLine[256];
     in.getline(firstLine, 256);
 
-    string particleName;
-    string mediumName;
+    std::string particleName;
+    std::string mediumName;
     double ecut;
     double vcut;
     double multiplier;
     bool lpm;
     double energy;
-    string parametrization;
+    std::string parametrization;
     double rnd1, rnd2;
     double stochastic_loss_stored;
     double stochastic_loss_new;

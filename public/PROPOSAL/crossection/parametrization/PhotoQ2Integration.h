@@ -69,7 +69,6 @@
         static const std::string name_;                                                                                \
     };
 
-// using namespace std::placeholders;
 
 namespace PROPOSAL {
 
@@ -255,7 +254,7 @@ double PhotoQ2Interpolant<Param>::DifferentialCrossSection(double energy, double
     if (v >= limits.vUp)
     {
         return std::max(interpolant_[this->component_index_]->Interpolate(
-                            energy, log(v / limits.vUp) / log(limits.vMax / limits.vUp)),
+                            energy, std::log(v / limits.vUp) / std::log(limits.vMax / limits.vUp)),
                         0.0);
     }
 
@@ -273,7 +272,7 @@ double PhotoQ2Interpolant<Param>::FunctionToBuildPhotoInterpolant(double energy,
         return 0;
     }
 
-    v = limits.vUp * exp(v * log(limits.vMax / limits.vUp));
+    v = limits.vUp * std::exp(v * std::log(limits.vMax / limits.vUp));
 
     return Param::DifferentialCrossSection(energy, v);
 }

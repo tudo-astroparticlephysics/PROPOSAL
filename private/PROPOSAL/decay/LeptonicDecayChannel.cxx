@@ -12,7 +12,6 @@
 #include "PROPOSAL/Output.h"
 
 using namespace PROPOSAL;
-using namespace std::placeholders;
 
 /******************************************************************************
 *                         LeptonicDecayChannelApprox                         *
@@ -98,7 +97,7 @@ double LeptonicDecayChannelApprox::FindRootBoost(double min, double parent_mass,
     // int max_steps = 40;
 
     return boost::math::tools::newton_raphson_iterate(
-        std::bind(&LeptonicDecayChannelApprox::function_and_derivative, this, _1, parent_mass, E_max, right_side),
+        std::bind(&LeptonicDecayChannelApprox::function_and_derivative, this, std::placeholders::_1, parent_mass, E_max, right_side),
         x_start,
         min,
         max,

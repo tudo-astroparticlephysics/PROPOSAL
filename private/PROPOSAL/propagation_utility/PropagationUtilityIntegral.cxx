@@ -27,7 +27,6 @@
     UtilityIntegral##cls::~UtilityIntegral##cls() {}
 
 using namespace PROPOSAL;
-// using namespace std::placeholders;
 
 /******************************************************************************
  *                              Utility Integral                              *
@@ -137,7 +136,7 @@ double UtilityIntegralDecay::FunctionToIntegral(double energy)
 
     // TODO(mario): Better way? Sat 2017/09/02
     double square_momentum   = energy * energy - particle_def.mass * particle_def.mass;
-    double particle_momentum = sqrt(std::max(square_momentum, 0.0));
+    double particle_momentum = std::sqrt(std::max(square_momentum, 0.0));
 
     aux = 1.0 / std::max((particle_momentum / particle_def.mass) * particle_def.lifetime * SPEED,
                          PARTICLE_POSITION_RESOLUTION);
@@ -166,7 +165,7 @@ double UtilityIntegralTime::FunctionToIntegral(double energy)
     const ParticleDef& particle_def = utility_.GetParticleDef();
     // TODO(mario): Better way? Sat 2017/09/02
     double square_momentum   = energy * energy - particle_def.mass * particle_def.mass;
-    double particle_momentum = sqrt(std::max(square_momentum, 0.0));
+    double particle_momentum = std::sqrt(std::max(square_momentum, 0.0));
 
     return energy / (particle_momentum * SPEED) * UtilityDecorator::FunctionToIntegral(energy);
 }

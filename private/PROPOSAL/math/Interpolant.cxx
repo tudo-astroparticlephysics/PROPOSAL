@@ -30,7 +30,6 @@
 #include "PROPOSAL/Output.h"
 
 using namespace PROPOSAL;
-using namespace std::placeholders;
 
 const double Interpolant::bigNumber_  = -300;
 const double Interpolant::aBigNumber_ = -299;
@@ -543,8 +542,8 @@ bool Interpolant::Save(std::ofstream& out, bool raw)
         {
             if (isLog_)
             {
-                double xmax = exp(xmax_);
-                double xmin = exp(xmin_);
+                double xmax = std::exp(xmax_);
+                double xmin = std::exp(xmin_);
 
                 out.write(reinterpret_cast<char*>(&max_), sizeof max_);
                 out.write(reinterpret_cast<char*>(&xmin), sizeof xmin);
@@ -573,8 +572,8 @@ bool Interpolant::Save(std::ofstream& out, bool raw)
         {
             if (isLog_)
             {
-                double xmax = exp(xmax_);
-                double xmin = exp(xmin_);
+                double xmax = std::exp(xmax_);
+                double xmin = std::exp(xmin_);
 
                 out.write(reinterpret_cast<char*>(&max_), sizeof max_);
                 out.write(reinterpret_cast<char*>(&xmin), sizeof xmin);
@@ -609,7 +608,7 @@ bool Interpolant::Save(std::ofstream& out, bool raw)
         {
             if (isLog_)
             {
-                out << max_ << "\t" << exp(xmin_) << "\t" << exp(xmax_) << std::endl;
+                out << max_ << "\t" << std::exp(xmin_) << "\t" << std::exp(xmax_) << std::endl;
             } else
             {
                 out << max_ << "\t" << xmin_ << "\t" << xmax_ << std::endl;
@@ -626,7 +625,7 @@ bool Interpolant::Save(std::ofstream& out, bool raw)
         {
             if (isLog_)
             {
-                out << max_ << "\t" << exp(xmin_) << "\t" << exp(xmax_) << std::endl;
+                out << max_ << "\t" << std::exp(xmin_) << "\t" << std::exp(xmax_) << std::endl;
             } else
             {
                 out << max_ << "\t" << xmin_ << "\t" << xmax_ << std::endl;
@@ -1028,7 +1027,7 @@ Interpolant::Interpolant(int max1,
     double aux;
 
     function2d_ = function2d;
-    function1d_ = std::bind(&Interpolant::Get2dFunctionFixedY, this, _1);
+    function1d_ = std::bind(&Interpolant::Get2dFunctionFixedY, this, std::placeholders::_1);
 
     Interpolant_.resize(max_);
 
@@ -1476,11 +1475,11 @@ double Interpolant::Interpolate(double x, int start)
     } else
     {
         num = 0;
-        aux = fabs(x - iX_.at(start + 0));
+        aux = std::abs(x - iX_.at(start + 0));
 
         for (i = 0; i < romberg_; i++)
         {
-            aux2 = fabs(x - iX_.at(start + i));
+            aux2 = std::abs(x - iX_.at(start + i));
 
             if (aux2 == 0)
             {
@@ -1528,7 +1527,7 @@ double Interpolant::Interpolate(double x, int start)
             }
         } else
         {
-            if (fabs(x - aux) > fabs(x - aux2))
+            if (std::abs(x - aux) > std::abs(x - aux2))
             {
                 dd = true;
             } else
@@ -1615,14 +1614,14 @@ double Interpolant::Interpolate(double x, int start)
         {
             if (result != 0)
             {
-                aux = fabs(error / result);
+                aux = std::abs(error / result);
             } else
             {
                 aux = 0;
             }
         } else
         {
-            aux = fabs(error);
+            aux = std::abs(error);
         }
 
         if (aux > precision_)

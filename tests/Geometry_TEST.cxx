@@ -12,7 +12,6 @@
 #include "PROPOSAL/geometry/Sphere.h"
 #include "PROPOSAL/math/RandomGenerator.h"
 
-using namespace std;
 using namespace PROPOSAL;
 
 TEST(Comparison, Comparison_equal)
@@ -712,12 +711,12 @@ TEST(DistanceTo, Sphere)
     double rnd_theta;
     double rnd_inner_radius;
 
-    pair<double, double> distance;
+    std::pair<double, double> distance;
 
     // MathModel M;
     int number_particles = 1e5;
 
-    cout.precision(16);
+    std::cout.precision(16);
 
     for (int i = 0; i < 11; i++)
     {
@@ -807,12 +806,12 @@ TEST(DistanceTo, Cylinder)
 
     double z;
 
-    pair<double, double> distance;
+    std::pair<double, double> distance;
 
     // MathModel M;
     int number_particles = 1e5;
 
-    cout.precision(16);
+    std::cout.precision(16);
 
     for (int i = 0; i < 10; i++)
     {
@@ -936,8 +935,8 @@ TEST(DistanceTo, Cylinder)
         particle_direction.SetSphericalCoordinates(1, rnd_phi, PI - alpha);
         particle_direction.CalculateCartesianFromSpherical();
 
-        double dist1 = inner_radius / sin(alpha);
-        double dist2 = radius / sin(alpha);
+        double dist1 = inner_radius / std::sin(alpha);
+        double dist2 = radius / std::sin(alpha);
 
         distance = A.DistanceToBorder(particle_position, particle_direction);
 
@@ -950,7 +949,7 @@ TEST(DistanceTo, Cylinder)
         // |   | |   |   |
         // |___| |   |___|
         //       |
-        if (alpha < atan(inner_radius / (z + 0.5 * height)))
+        if (alpha < std::atan(inner_radius / (z + 0.5 * height)))
         {
             EXPECT_EQ(distance.first, -1);
             EXPECT_EQ(distance.second, -1);
@@ -965,9 +964,9 @@ TEST(DistanceTo, Cylinder)
         // |___|       |\ _|
         //               *
 
-        else if (alpha < atan(radius / (z + 0.5 * height)))
+        else if (alpha < std::atan(radius / (z + 0.5 * height)))
         {
-            dist2 = (z + 0.5 * height) / cos(alpha);
+            dist2 = (z + 0.5 * height) / std::cos(alpha);
             ASSERT_NEAR(distance.first, dist1, 1e-8 * (dist1));
             ASSERT_NEAR(distance.second, dist2, 1e-8 * (dist2));
         }
@@ -983,7 +982,7 @@ TEST(DistanceTo, Cylinder)
         // |___|       |___|\
         //
 
-        else if (alpha < atan(inner_radius / height))
+        else if (alpha < std::atan(inner_radius / height))
         {
             ASSERT_NEAR(distance.first, dist1, 1e-8 * (dist1));
             ASSERT_NEAR(distance.second, dist2, 1e-8 * (dist2));
@@ -1000,9 +999,9 @@ TEST(DistanceTo, Cylinder)
         // |   |       |   |
         // |___|       |___|
         //
-        else if (alpha < atan(radius / height))
+        else if (alpha < std::atan(radius / height))
         {
-            dist1 = height / cos(alpha);
+            dist1 = height / std::cos(alpha);
             ASSERT_NEAR(distance.first, dist1, 1e-8 * (dist1));
             ASSERT_NEAR(distance.second, dist2, 1e-8 * (dist2));
         }
@@ -1041,12 +1040,12 @@ TEST(DistanceTo, Box)
     double dist1;
     double dist2;
 
-    pair<double, double> distance;
+    std::pair<double, double> distance;
 
     // MathModel M;
     int number_particles = 1e5;
 
-    cout.precision(16);
+    std::cout.precision(16);
 
     for (int j = 0; j < number_particles; j++)
     {
@@ -1064,49 +1063,49 @@ TEST(DistanceTo, Box)
         phi = particle_direction.GetPhi() * 180. / PI;
         if (phi < 45)
         {
-            dist = 0.5 * width / cos(phi / 180 * PI);
+            dist = 0.5 * width / std::cos(phi / 180 * PI);
             EXPECT_EQ(distance.second, -1.);
             ASSERT_NEAR(distance.first, dist, 1e-8 * (dist));
         } else if (phi < 90)
         {
             phi  = 90 - phi;
-            dist = 0.5 * width / cos(phi / 180 * PI);
+            dist = 0.5 * width / std::cos(phi / 180 * PI);
             EXPECT_EQ(distance.second, -1.);
             ASSERT_NEAR(distance.first, dist, 1e-8 * (dist));
         } else if (phi < 135)
         {
             phi  = phi - 90;
-            dist = 0.5 * width / cos(phi / 180 * PI);
+            dist = 0.5 * width / std::cos(phi / 180 * PI);
             EXPECT_EQ(distance.second, -1.);
             ASSERT_NEAR(distance.first, dist, 1e-8 * (dist));
         } else if (phi < 180)
         {
             phi  = 180 - phi;
-            dist = 0.5 * width / cos(phi / 180 * PI);
+            dist = 0.5 * width / std::cos(phi / 180 * PI);
             EXPECT_EQ(distance.second, -1.);
             ASSERT_NEAR(distance.first, dist, 1e-8 * (dist));
         } else if (phi < 225)
         {
             phi  = phi - 180;
-            dist = 0.5 * width / cos(phi / 180 * PI);
+            dist = 0.5 * width / std::cos(phi / 180 * PI);
             EXPECT_EQ(distance.second, -1.);
             ASSERT_NEAR(distance.first, dist, 1e-8 * (dist));
         } else if (phi < 270)
         {
             phi  = 270 - phi;
-            dist = 0.5 * width / cos(phi / 180 * PI);
+            dist = 0.5 * width / std::cos(phi / 180 * PI);
             EXPECT_EQ(distance.second, -1.);
             ASSERT_NEAR(distance.first, dist, 1e-8 * (dist));
         } else if (phi < 315)
         {
             phi  = phi - 270;
-            dist = 0.5 * width / cos(phi / 180 * PI);
+            dist = 0.5 * width / std::cos(phi / 180 * PI);
             EXPECT_EQ(distance.second, -1.);
             ASSERT_NEAR(distance.first, dist, 1e-8 * (dist));
         } else if (phi < 360)
         {
             phi  = 360 - phi;
-            dist = 0.5 * width / cos(phi / 180 * PI);
+            dist = 0.5 * width / std::cos(phi / 180 * PI);
             EXPECT_EQ(distance.second, -1.);
             ASSERT_NEAR(distance.first, dist, 1e-8 * (dist));
         }
@@ -1136,10 +1135,10 @@ TEST(DistanceTo, Box)
         //                      |               |
         //                      |_______________|
 
-        if (phi < atan(0.5 * width / (0.5 * width - particle_position.GetX())))
+        if (phi < std::atan(0.5 * width / (0.5 * width - particle_position.GetX())))
         {
-            dist1 = (-particle_position.GetX() - 0.5 * width) / cos(phi);
-            dist2 = (0.5 * width - particle_position.GetX()) / cos(phi);
+            dist1 = (-particle_position.GetX() - 0.5 * width) / std::cos(phi);
+            dist2 = (0.5 * width - particle_position.GetX()) / std::cos(phi);
             ASSERT_NEAR(distance.first, dist1, 1e-8 * (dist1));
             ASSERT_NEAR(distance.second, dist2, 1e-8 * (dist2));
 
@@ -1157,10 +1156,10 @@ TEST(DistanceTo, Box)
         //                      |               |
         //                      |_______________|
 
-        else if (phi < atan(width * 0.5 / (-particle_position.GetX() - 0.5 * width)))
+        else if (phi < std::atan(width * 0.5 / (-particle_position.GetX() - 0.5 * width)))
         {
-            dist1 = (-particle_position.GetX() - 0.5 * width) / cos(phi);
-            dist2 = 0.5 * width / sin(phi);
+            dist1 = (-particle_position.GetX() - 0.5 * width) / std::cos(phi);
+            dist2 = 0.5 * width / std::sin(phi);
             ASSERT_NEAR(distance.first, dist1, 1e-8 * (dist1));
             ASSERT_NEAR(distance.second, dist2, 1e-8 * (dist2));
 
@@ -1206,10 +1205,10 @@ TEST(DistanceTo, Box)
         //                      |               |
         //                      |_______________|
 
-        if (particle_direction.GetTheta() < atan(0.5 * height / (0.5 * height - particle_position.GetZ())))
+        if (particle_direction.GetTheta() < std::atan(0.5 * height / (0.5 * height - particle_position.GetZ())))
         {
-            dist1 = (-particle_position.GetZ() - 0.5 * height) / cos(particle_direction.GetTheta());
-            dist2 = (0.5 * height - particle_position.GetZ()) / cos(particle_direction.GetTheta());
+            dist1 = (-particle_position.GetZ() - 0.5 * height) / std::cos(particle_direction.GetTheta());
+            dist2 = (0.5 * height - particle_position.GetZ()) / std::cos(particle_direction.GetTheta());
             ASSERT_NEAR(distance.first, dist1, 1e-8 * (dist1));
             ASSERT_NEAR(distance.second, dist2, 1e-8 * (dist2));
 
@@ -1227,10 +1226,10 @@ TEST(DistanceTo, Box)
         //                      |               |
         //                      |_______________|
 
-        else if (particle_direction.GetTheta() < atan(height * 0.5 / (-particle_position.GetZ() - 0.5 * height)))
+        else if (particle_direction.GetTheta() < std::atan(height * 0.5 / (-particle_position.GetZ() - 0.5 * height)))
         {
-            dist1 = (-particle_position.GetZ() - 0.5 * height) / cos(particle_direction.GetTheta());
-            dist2 = 0.5 * height / sin(particle_direction.GetTheta());
+            dist1 = (-particle_position.GetZ() - 0.5 * height) / std::cos(particle_direction.GetTheta());
+            dist2 = 0.5 * height / std::sin(particle_direction.GetTheta());
             ASSERT_NEAR(distance.first, dist1, 1e-8 * (dist1));
             ASSERT_NEAR(distance.second, dist2, 1e-8 * (dist2));
         }

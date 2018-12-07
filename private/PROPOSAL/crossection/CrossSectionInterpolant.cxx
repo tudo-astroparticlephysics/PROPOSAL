@@ -14,7 +14,6 @@
 #include "PROPOSAL/math/InterpolantBuilder.h"
 
 using namespace PROPOSAL;
-using namespace std::placeholders;
 
 // ------------------------------------------------------------------------- //
 // Constructor & Destructor
@@ -98,7 +97,12 @@ void CrossSectionInterpolant::InitdNdxInerpolation(const InterpolationDef& def)
             .SetRelativeY(false)
             .SetLogSubst(false)
             .SetFunction2D(std::bind(
-                &CrossSectionInterpolant::FunctionToBuildDNdxInterpolant2D, this, _1, _2, std::ref(integral), i));
+                &CrossSectionInterpolant::FunctionToBuildDNdxInterpolant2D,
+                this,
+                std::placeholders::_1,
+                std::placeholders::_2,
+                std::ref(integral),
+                i));
 
         builder_container2d[i].first  = &builder2d[i];
         builder_container2d[i].second = &dndx_interpolant_2d_[i];
@@ -115,7 +119,7 @@ void CrossSectionInterpolant::InitdNdxInerpolation(const InterpolationDef& def)
             .SetRationalY(true)
             .SetRelativeY(false)
             .SetLogSubst(false)
-            .SetFunction1D(std::bind(&CrossSectionInterpolant::FunctionToBuildDNdxInterpolant, this, _1, i));
+            .SetFunction1D(std::bind(&CrossSectionInterpolant::FunctionToBuildDNdxInterpolant, this, std::placeholders::_1, i));
 
         builder_container1d[i].first  = &builder1d[i];
         builder_container1d[i].second = &dndx_interpolant_1d_[i];
@@ -272,8 +276,8 @@ double CrossSectionInterpolant::CalculateStochasticLoss(double energy, double rn
             }
 
             return energy *
-                   (limits.vUp * exp(dndx_interpolant_2d_.at(i)->FindLimit(energy, rnd_ * prob_for_component_[i]) *
-                                     log(limits.vMax / limits.vUp)));
+                   (limits.vUp * std::exp(dndx_interpolant_2d_.at(i)->FindLimit(energy, rnd_ * prob_for_component_[i]) *
+                                     std::log(limits.vMax / limits.vUp)));
         }
     }
 
@@ -319,8 +323,8 @@ double CrossSectionInterpolant::FunctionToBuildDNdxInterpolant2D(double energy,
         return 0;
     }
 
-    v = limits.vUp * exp(v * log(limits.vMax / limits.vUp));
+    v = limits.vUp * std::exp(v * std::log(limits.vMax / limits.vUp));
 
     return integral.Integrate(
-        limits.vUp, v, std::bind(&Parametrization::FunctionToDNdxIntegral, parametrization_, energy, _1), 4);
+        limits.vUp, v, std::bind(&Parametrization::FunctionToDNdxIntegral, parametrization_, energy, std::placeholders::_1), 4);
 }

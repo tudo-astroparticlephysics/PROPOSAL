@@ -29,7 +29,6 @@
     const std::string Epair##param::name_ = "Epair" #param;
 
 using namespace PROPOSAL;
-using namespace std::placeholders;
 
 /******************************************************************************
  *                              EpairProduction                               *
@@ -87,7 +86,7 @@ Parametrization::IntegralLimits EpairProduction::GetIntegralLimits(double energy
     double aux = particle_def_.mass / energy;
 
     limits.vMin = 4 * ME / energy;
-    limits.vMax = 1 - 0.75 * SQRTE * aux * pow(components_[component_index_]->GetNucCharge(), 1. / 3);
+    limits.vMax = 1 - 0.75 * SQRTE * aux * std::pow(components_[component_index_]->GetNucCharge(), 1. / 3);
 
     aux         = 1 - 6 * aux * aux;
     limits.vMax = std::min(limits.vMax, aux);
@@ -123,7 +122,7 @@ double EpairProduction::lpm(double energy, double v, double r2, double b, double
         for (auto component: medium_->GetComponents())
         {
             sum += component->GetNucCharge() * component->GetNucCharge() *
-                   log(3.25 * component->GetLogConstant() * pow(component->GetNucCharge(), -1. / 3));
+                   std::log(3.25 * component->GetLogConstant() * std::pow(component->GetNucCharge(), -1. / 3));
         }
 
         // eq. 29
@@ -136,7 +135,7 @@ double EpairProduction::lpm(double energy, double v, double r2, double b, double
     double A, B, C, D, E, s;
     double s36, s6, d1, d2, atan_, log1, log2;
 
-    s     = 0.25 * sqrt(eLpm_ / (energy * v * (1 - r2))); // eq. 29
+    s     = 0.25 * std::sqrt(eLpm_ / (energy * v * (1 - r2))); // eq. 29
     s6    = 6 * s;
     atan_ = s6 * (x + 1);
 
@@ -148,9 +147,9 @@ double EpairProduction::lpm(double energy, double v, double r2, double b, double
     s36   = 36 * s * s;
     d1    = s6 / (s6 + 1);
     d2    = s36 / (s36 + 1);
-    atan_ = atan(atan_) - PI / 2;
-    log1  = log((s36 * (1 + x) * (1 + x) + 1) / (s36 * x * x));
-    log2  = log((s6 * (1 + x) + 1) / (s6 * x));
+    atan_ = std::atan(atan_) - PI / 2;
+    log1  = std::log((s36 * (1 + x) * (1 + x) + 1) / (s36 * x * x));
+    log2  = std::log((s6 * (1 + x) + 1) / (s6 * x));
     A     = 0.5 * d2 * (1 + 2 * d2 * x) * log1 - d2 + 6 * d2 * s * (1 + ((s36 - 1) / (s36 + 1)) * x) * atan_;
     B     = d1 * (1 + d1 * x) * log2 - d1;
     C     = -d2 * d2 * x * log1 + d2 - (d2 * d2 * (s36 - 1) / (6 * s)) * x * atan_;
@@ -158,7 +157,7 @@ double EpairProduction::lpm(double energy, double v, double r2, double b, double
     E     = -s6 * atan_;
 
     return ((1 + b) * (A + (1 + r2) * B) + b * (C + (1 + r2) * D) + (1 - r2) * E) /
-           (((2 + r2) * (1 + b) + x * (3 + r2)) * log(1 + 1 / x) + (1 - r2 - b) / (1 + x) - (3 + r2));
+           (((2 + r2) * (1 + b) + x * (3 + r2)) * std::log(1 + 1 / x) + (1 - r2 - b) / (1 + x) - (3 + r2));
 }
 
 // ------------------------------------------------------------------------- //
@@ -212,7 +211,7 @@ double EpairProductionRhoIntegral::DifferentialCrossSection(double energy, doubl
 
     if (aux > 0 && aux2 > 0)
     {
-        rMax = sqrt(aux) * aux2;
+        rMax = std::sqrt(aux) * aux2;
     } else
     {
         rMax = 0;
@@ -223,9 +222,9 @@ double EpairProductionRhoIntegral::DifferentialCrossSection(double energy, doubl
     return multiplier_ * medium_->GetMolDensity() * components_[component_index_]->GetAtomInMolecule() *
            particle_def_.charge * particle_def_.charge *
            (integral_.Integrate(
-                1 - rMax, aux, std::bind(&EpairProductionRhoIntegral::FunctionToIntegral, this, energy, v, _1), 2) +
+                1 - rMax, aux, std::bind(&EpairProductionRhoIntegral::FunctionToIntegral, this, energy, v, std::placeholders::_1), 2) +
             integral_.Integrate(
-                aux, 1, std::bind(&EpairProductionRhoIntegral::FunctionToIntegral, this, energy, v, _1), 4));
+                aux, 1, std::bind(&EpairProductionRhoIntegral::FunctionToIntegral, this, energy, v, std::placeholders::_1), 4));
 }
 
 // ------------------------------------------------------------------------- //
@@ -275,21 +274,21 @@ double EpairKelnerKokoulinPetrukhin::FunctionToIntegral(double energy, double v,
 
     r           = 1 - r; // only for integral optimization - do not forget to swap integration limits!
     r2          = r * r;
-    double Z3   = pow(medium_charge, -1. / 3);
+    double Z3   = std::pow(medium_charge, -1. / 3);
     aux         = (particle_def_.mass * v) / (2 * ME);
     double xi   = aux * aux * (1 - r2) / (1 - v);
     double beta = (v * v) / (2 * (1 - v));
 
     // these are the Y_e and Y_mu expressions in the original paper
-    diagram_e  = (5 - r2 + 4 * beta * (1 + r2)) / (2 * (1 + 3 * beta) * log(3 + 1 / xi) - r2 - 2 * beta * (2 - r2));
-    diagram_mu = (4 + r2 + 3 * beta * (1 + r2)) / ((1 + r2) * (1.5 + 2 * beta) * log(3 + xi) + 1 - 1.5 * r2);
+    diagram_e  = (5 - r2 + 4 * beta * (1 + r2)) / (2 * (1 + 3 * beta) * std::log(3 + 1 / xi) - r2 - 2 * beta * (2 - r2));
+    diagram_mu = (4 + r2 + 3 * beta * (1 + r2)) / ((1 + r2) * (1.5 + 2 * beta) * std::log(3 + xi) + 1 - 1.5 * r2);
 
     // these arae the L_e and L_mu expressions
     aux        = (1.5 * ME) / (particle_def_.mass * Z3);
     aux1       = (1 + xi) * (1 + diagram_e);
     aux2       = (2 * ME * SQRTE * medium_log_constant * Z3) / (energy * v * (1 - r2));
-    diagram_e  = log((medium_log_constant * Z3 * sqrt(aux1)) / (1 + aux2 * aux1)) - 0.5 * log(1 + aux * aux * aux1);
-    diagram_mu = log((medium_log_constant / aux * Z3) / (1 + aux2 * (1 + xi) * (1 + diagram_mu)));
+    diagram_e  = std::log((medium_log_constant * Z3 * std::sqrt(aux1)) / (1 + aux2 * aux1)) - 0.5 * std::log(1 + aux * aux * aux1);
+    diagram_mu = std::log((medium_log_constant / aux * Z3) / (1 + aux2 * (1 + xi) * (1 + diagram_mu)));
 
     // these are the Phi_e and Phi_mu expressions
     // if the logarithms above are below zero, the contribution of the diagram is set to zero
@@ -303,7 +302,7 @@ double EpairKelnerKokoulinPetrukhin::FunctionToIntegral(double energy, double v,
         } else
         {
             diagram_e =
-                (((2 + r2) * (1 + beta) + xi * (3 + r2)) * log(1 + 1 / xi) + (1 - r2 - beta) / (1 + xi) - (3 + r2)) *
+                (((2 + r2) * (1 + beta) + xi * (3 + r2)) * std::log(1 + 1 / xi) + (1 - r2 - beta) / (1 + xi) - (3 + r2)) *
                 diagram_e;
         }
     } else
@@ -313,7 +312,7 @@ double EpairKelnerKokoulinPetrukhin::FunctionToIntegral(double energy, double v,
 
     if (diagram_mu > 0)
     {
-        diagram_mu = (((1 + r2) * (1 + 1.5 * beta) - (1 + 2 * beta) * (1 - r2) / xi) * log(1 + xi) +
+        diagram_mu = (((1 + r2) * (1 + 1.5 * beta) - (1 + 2 * beta) * (1 - r2) / xi) * std::log(1 + xi) +
                       xi * (1 - r2 - beta) / (1 + xi) + (1 + 2 * beta) * (1 - r2)) *
                      diagram_mu;
     } else
@@ -334,8 +333,8 @@ double EpairKelnerKokoulinPetrukhin::FunctionToIntegral(double energy, double v,
     }
 
     aux  = energy / particle_def_.mass;
-    aux1 = 0.073 * log(aux / (1 + g1 * aux / (Z3 * Z3))) - 0.26;
-    aux2 = 0.058 * log(aux / (1 + g2 * aux / Z3)) - 0.14;
+    aux1 = 0.073 * std::log(aux / (1 + g1 * aux / (Z3 * Z3))) - 0.26;
+    aux2 = 0.058 * std::log(aux / (1 + g2 * aux / Z3)) - 0.14;
 
     if (aux1 > 0 && aux2 > 0)
     {
@@ -376,9 +375,9 @@ double EpairSandrockSoedingreksoRhode::FunctionToIntegral(double energy, double 
 
     double rad_log = components_[component_index_]->GetLogConstant();
 
-    double const_prefactor = 4.0 / (3.0 * PI) * nucl_Z * pow(ALPHA * RE, 2.0);
-    double Z13             = pow(nucl_Z, -1.0 / 3.0);
-    double d_n             = 1.54 * pow(nucl_A, 0.27);
+    double const_prefactor = 4.0 / (3.0 * PI) * nucl_Z * std::pow(ALPHA * RE, 2.0);
+    double Z13             = std::pow(nucl_Z, -1.0 / 3.0);
+    double d_n             = 1.54 * std::pow(nucl_A, 0.27);
 
     rho         = 1 - rho;
     double rho2 = rho * rho;
@@ -397,8 +396,8 @@ double EpairSandrockSoedingreksoRhode::FunctionToIntegral(double energy, double 
     }
 
     double zeta, zeta1, zeta2;
-    zeta1 = (0.073 * log(energy / m_in / (1.0 + g1 * pow(nucl_Z, 2.0 / 3.0) * energy / m_in)) - 0.26);
-    zeta2 = (0.058 * log(energy / m_in / (1 + g2 / Z13 * energy / m_in)) - 0.14);
+    zeta1 = (0.073 * std::log(energy / m_in / (1.0 + g1 * std::pow(nucl_Z, 2.0 / 3.0) * energy / m_in)) - 0.26);
+    zeta2 = (0.058 * std::log(energy / m_in / (1 + g2 / Z13 * energy / m_in)) - 0.14);
 
     if (zeta1 > 0.0 && zeta2 > 0.0)
     {
@@ -409,45 +408,45 @@ double EpairSandrockSoedingreksoRhode::FunctionToIntegral(double energy, double 
     }
 
     double beta = v * v / (2.0 * (1.0 - v));
-    double xi   = pow(m_in * v / (2.0 * ME), 2.0) * (1.0 - rho2) / (1.0 - v);
+    double xi   = std::pow(m_in * v / (2.0 * ME), 2.0) * (1.0 - rho2) / (1.0 - v);
 
     // --------------------------------------------------------------------- //
     // Diagram e
     // --------------------------------------------------------------------- //
 
-    double Be = ((2.0 + rho2) * (1.0 + beta) + xi * (3.0 + rho2)) * log(1.0 + 1.0 / xi) +
+    double Be = ((2.0 + rho2) * (1.0 + beta) + xi * (3.0 + rho2)) * std::log(1.0 + 1.0 / xi) +
                 (1.0 - rho2 - beta) / (1.0 + xi) - (3.0 + rho2);
 
-    double Ce2 = ((1.0 - rho2) * (1.0 + beta) + xi * (3.0 - rho2)) * log(1.0 + 1.0 / xi) +
+    double Ce2 = ((1.0 - rho2) * (1.0 + beta) + xi * (3.0 - rho2)) * std::log(1.0 + 1.0 / xi) +
                  2.0 * (1.0 - beta - rho2) / (1.0 + xi) - (3.0 - rho2);
     double Ce1 = Be - Ce2;
 
     double De = ((2.0 + rho2) * (1.0 + beta) + xi * (3.0 + rho2)) * dilog(1.0 / (1.0 + xi)) -
-                (2.0 + rho2) * xi * log(1.0 + 1.0 / xi) - (xi + rho2 + beta) / (1.0 + xi);
+                (2.0 + rho2) * xi * std::log(1.0 + 1.0 / xi) - (xi + rho2 + beta) / (1.0 + xi);
 
     double Le1, Le2;
 
     if (De / Be > 0.)
     {
-        double Xe = exp(-De / Be);
-        Le1 = log(rad_log * Z13 * sqrt(1.0 + xi) /
-                         (Xe + 2.0 * ME * exp(0.5) * rad_log * Z13 * (1.0 + xi) / (energy * v * (1.0 - rho2)))) -
-                     De / Be - 0.5 * log(Xe + pow(ME / m_in * d_n, 2.0) * (1.0 + xi));
+        double Xe = std::exp(-De / Be);
+        Le1 = std::log(rad_log * Z13 * std::sqrt(1.0 + xi) /
+                         (Xe + 2.0 * ME * std::exp(0.5) * rad_log * Z13 * (1.0 + xi) / (energy * v * (1.0 - rho2)))) -
+                     De / Be - 0.5 * std::log(Xe + std::pow(ME / m_in * d_n, 2.0) * (1.0 + xi));
 
-        Le2 = log(rad_log * Z13 * exp(-1.0 / 6.0) * sqrt(1 + xi) /
-                         (Xe + 2.0 * ME * exp(1.0 / 3.0) * rad_log * Z13 * (1.0 + xi) / (energy * v * (1.0 - rho2)))) -
-                     De / Be - 0.5 * log(Xe + pow(ME / m_in * d_n, 2.0) * exp(-1.0 / 3.0) * (1.0 + xi));
+        Le2 = std::log(rad_log * Z13 * std::exp(-1.0 / 6.0) * std::sqrt(1 + xi) /
+                         (Xe + 2.0 * ME * std::exp(1.0 / 3.0) * rad_log * Z13 * (1.0 + xi) / (energy * v * (1.0 - rho2)))) -
+                     De / Be - 0.5 * std::log(Xe + pow(ME / m_in * d_n, 2.0) * std::exp(-1.0 / 3.0) * (1.0 + xi));
     }
     else
     {
-        double Xe_inv = exp(De / Be);
-        Le1 = log(rad_log * Z13 * sqrt(1.0 + xi) /
-                         (1. + Xe_inv * 2.0 * ME * exp(0.5) * rad_log * Z13 * (1.0 + xi) / (energy * v * (1.0 - rho2)))) -
-                     0.5 * De / Be - 0.5 * log(1. + Xe_inv * pow(ME / m_in * d_n, 2.0) * (1.0 + xi));
+        double Xe_inv = std::exp(De / Be);
+        Le1 = std::log(rad_log * Z13 * std::sqrt(1.0 + xi) /
+                         (1. + Xe_inv * 2.0 * ME * std::exp(0.5) * rad_log * Z13 * (1.0 + xi) / (energy * v * (1.0 - rho2)))) -
+                     0.5 * De / Be - 0.5 * std::log(1. + Xe_inv * std::pow(ME / m_in * d_n, 2.0) * (1.0 + xi));
 
-        Le2 = log(rad_log * Z13 * exp(-1.0 / 6.0) * sqrt(1 + xi) /
-                         (1. + Xe_inv * 2.0 * ME * exp(1.0 / 3.0) * rad_log * Z13 * (1.0 + xi) / (energy * v * (1.0 - rho2)))) -
-                     0.5 * De / Be - 0.5 * log(1. + Xe_inv * pow(ME / m_in * d_n, 2.0) * exp(-1.0 / 3.0) * (1.0 + xi));
+        Le2 = std::log(rad_log * Z13 * std::exp(-1.0 / 6.0) * std::sqrt(1 + xi) /
+                         (1. + Xe_inv * 2.0 * ME * std::exp(1.0 / 3.0) * rad_log * Z13 * (1.0 + xi) / (energy * v * (1.0 - rho2)))) -
+                     0.5 * De / Be - 0.5 * std::log(1. + Xe_inv * std::pow(ME / m_in * d_n, 2.0) * std::exp(-1.0 / 3.0) * (1.0 + xi));
     }
 
     double diagram_e = std::max(0.0, const_prefactor * (nucl_Z + zeta) * (1.0 - v) / v * (Ce1 * Le1 + Ce2 * Le2));
@@ -457,39 +456,39 @@ double EpairSandrockSoedingreksoRhode::FunctionToIntegral(double energy, double 
     // --------------------------------------------------------------------- //
 
     double Bm =
-        ((1.0 + rho2) * (1.0 + (3.0 * beta) / 2) - 1.0 / xi * (1.0 + 2.0 * beta) * (1.0 - rho2)) * log(1.0 + xi) +
+        ((1.0 + rho2) * (1.0 + (3.0 * beta) / 2) - 1.0 / xi * (1.0 + 2.0 * beta) * (1.0 - rho2)) * std::log(1.0 + xi) +
         xi * (1.0 - rho2 - beta) / (1.0 + xi) + (1.0 + 2.0 * beta) * (1.0 - rho2);
 
-    double Cm2 = ((1.0 - beta) * (1.0 - rho2) - xi * (1.0 + rho2)) * log(1.0 + xi) / xi -
+    double Cm2 = ((1.0 - beta) * (1.0 - rho2) - xi * (1.0 + rho2)) * std::log(1.0 + xi) / xi -
                  2.0 * (1.0 - beta - rho2) / (1.0 + xi) + 1.0 - beta - (1.0 + beta) * rho2;
     double Cm1 = Bm - Cm2;
 
     double Dm = ((1.0 + rho2) * (1.0 + (3.0 * beta) / 2.0) - 1.0 / xi * (1.0 + 2.0 * beta) * (1.0 - rho2)) *
                     dilog(xi / (1.0 + xi)) +
-                (1.0 + (3.0 * beta) / 2.0) * (1.0 - rho2) / xi * log(1.0 + xi) +
+                (1.0 + (3.0 * beta) / 2.0) * (1.0 - rho2) / xi * std::log(1.0 + xi) +
                 (1.0 - rho2 - beta / 2.0 * (1.0 + rho2) + (1.0 - rho2) / (2.0 * xi) * beta) * xi / (1.0 + xi);
 
     double Lm1, Lm2;
 
     if (Dm / Bm > 0.0)
     {
-        double Xm = exp(-Dm / Bm);
-        Lm1 = log(Xm * m_in / ME * rad_log * Z13 / d_n /
-                  (Xm + 2.0 * ME * exp(0.5) * rad_log * Z13 * (1.0 + xi) / (energy * v * (1.0 - rho2))));
-        Lm2 = log(Xm * m_in / ME * rad_log * Z13 / d_n /
-                  (Xm + 2.0 * ME * exp(1.0 / 3.0) * rad_log * Z13 * (1.0 + xi) / (energy * v * (1.0 - rho2))));
+        double Xm = std::exp(-Dm / Bm);
+        Lm1 = std::log(Xm * m_in / ME * rad_log * Z13 / d_n /
+                  (Xm + 2.0 * ME * std::exp(0.5) * rad_log * Z13 * (1.0 + xi) / (energy * v * (1.0 - rho2))));
+        Lm2 = std::log(Xm * m_in / ME * rad_log * Z13 / d_n /
+                  (Xm + 2.0 * ME * std::exp(1.0 / 3.0) * rad_log * Z13 * (1.0 + xi) / (energy * v * (1.0 - rho2))));
     } else
     {
-        double Xm_inv = exp(Dm / Bm);
-        Lm1 = log(m_in / ME * rad_log * Z13 / d_n /
-                  (1.0 + 2.0 * ME * exp(0.5) * rad_log * Z13 * (1.0 + xi) / (energy * v * (1.0 - rho2)) * Xm_inv));
-        Lm2 = log(
+        double Xm_inv = std::exp(Dm / Bm);
+        Lm1 = std::log(m_in / ME * rad_log * Z13 / d_n /
+                  (1.0 + 2.0 * ME * std::exp(0.5) * rad_log * Z13 * (1.0 + xi) / (energy * v * (1.0 - rho2)) * Xm_inv));
+        Lm2 = std::log(
             m_in / ME * rad_log * Z13 / d_n /
-            (1.0 + 2.0 * ME * exp(1.0 / 3.0) * rad_log * Z13 * (1.0 + xi) / (energy * v * (1.0 - rho2)) * Xm_inv));
+            (1.0 + 2.0 * ME * std::exp(1.0 / 3.0) * rad_log * Z13 * (1.0 + xi) / (energy * v * (1.0 - rho2)) * Xm_inv));
     }
 
     double diagram_mu = std::max(
-        0.0, const_prefactor * (nucl_Z + zeta) * (1.0 - v) / v * pow(ME / m_in, 2.0) * (Cm1 * Lm1 + Cm2 * Lm2));
+        0.0, const_prefactor * (nucl_Z + zeta) * (1.0 - v) / v * std::pow(ME / m_in, 2.0) * (Cm1 * Lm1 + Cm2 * Lm2));
 
     double aux = diagram_e + diagram_mu;
 

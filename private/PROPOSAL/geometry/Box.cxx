@@ -6,7 +6,6 @@
 #include "PROPOSAL/geometry/Box.h"
 
 using namespace PROPOSAL;
-using namespace std;
 
 Box::Box()
     : Geometry("Box")
@@ -38,8 +37,6 @@ Box::Box(const Box& box)
 // ------------------------------------------------------------------------- //
 void Box::swap(Geometry& geometry)
 {
-    using std::swap;
-
     Box* box = dynamic_cast<Box*>(&geometry);
     if (!box)
     {
@@ -49,9 +46,9 @@ void Box::swap(Geometry& geometry)
 
     Geometry::swap(*box);
 
-    swap(x_, box->x_);
-    swap(y_, box->y_);
-    swap(z_, box->z_);
+    std::swap(x_, box->x_);
+    std::swap(y_, box->y_);
+    std::swap(z_, box->z_);
 }
 
 //------------------------------------------------------------------------- //
@@ -96,7 +93,7 @@ void Box::print(std::ostream& os) const
 }
 
 // ------------------------------------------------------------------------- //
-pair<double, double> Box::DistanceToBorder(const Vector3D& position, const Vector3D& direction)
+std::pair<double, double> Box::DistanceToBorder(const Vector3D& position, const Vector3D& direction)
 {
     // Calculate intersection of particle trajectory and the box
     // Surface of the box is defined by six planes:
@@ -116,13 +113,13 @@ pair<double, double> Box::DistanceToBorder(const Vector3D& position, const Vecto
     double dir_vec_y = direction.GetY();
     double dir_vec_z = direction.GetZ();
 
-    pair<double, double> distance;
+    std::pair<double, double> distance;
     double t;
     double intersection_x;
     double intersection_y;
     double intersection_z;
 
-    vector<double> dist;
+    std::vector<double> dist;
 
     double x_calc_pos = position_.GetX() + 0.5 * x_;
     double x_calc_neg = position_.GetX() - 0.5 * x_;

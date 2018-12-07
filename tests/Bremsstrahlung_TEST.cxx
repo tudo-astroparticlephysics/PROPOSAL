@@ -15,10 +15,9 @@
 #include "PROPOSAL/medium/MediumFactory.h"
 #include "PROPOSAL/methods.h"
 
-using namespace std;
 using namespace PROPOSAL;
 
-ParticleDef getParticleDef(const string& name)
+ParticleDef getParticleDef(const std::string& name)
 {
     if (name == "MuMinus")
     {
@@ -158,8 +157,8 @@ TEST(Assignment, Copyconstructor2)
 
 TEST(Bremsstrahlung, Test_of_dEdx)
 {
-    ifstream in;
-    string filename = "bin/TestFiles/Brems_dEdx.txt";
+    std::ifstream in;
+    std::string filename = "bin/TestFiles/Brems_dEdx.txt";
     in.open(filename.c_str());
 
     if (!in.good())
@@ -170,18 +169,18 @@ TEST(Bremsstrahlung, Test_of_dEdx)
     char firstLine[256];
     in.getline(firstLine, 256);
 
-    string particleName;
-    string mediumName;
+    std::string particleName;
+    std::string mediumName;
     double ecut;
     double vcut;
     double multiplier;
     bool lpm;
-    string parametrization;
+    std::string parametrization;
     double energy;
     double dEdx_stored;
     double dEdx_new;
 
-    cout.precision(16);
+    std::cout.precision(16);
 
     while (in.good())
     {
@@ -211,8 +210,8 @@ TEST(Bremsstrahlung, Test_of_dEdx)
 
 TEST(Bremsstrahlung, Test_of_dNdx)
 {
-    ifstream in;
-    string filename = "bin/TestFiles/Brems_dNdx.txt";
+    std::ifstream in;
+    std::string filename = "bin/TestFiles/Brems_dNdx.txt";
     in.open(filename.c_str());
 
     if (!in.good())
@@ -223,18 +222,18 @@ TEST(Bremsstrahlung, Test_of_dNdx)
     char firstLine[256];
     in.getline(firstLine, 256);
 
-    string particleName;
-    string mediumName;
+    std::string particleName;
+    std::string mediumName;
     double ecut;
     double vcut;
     double multiplier;
     bool lpm;
-    string parametrization;
+    std::string parametrization;
     double energy;
     double dNdx_stored;
     double dNdx_new;
 
-    cout.precision(16);
+    std::cout.precision(16);
 
     while (in.good())
     {
@@ -264,8 +263,8 @@ TEST(Bremsstrahlung, Test_of_dNdx)
 
 TEST(Bremsstrahlung, Test_of_dNdx_rnd)
 {
-    ifstream in;
-    string filename = "bin/TestFiles/Brems_dNdx_rnd.txt";
+    std::ifstream in;
+    std::string filename = "bin/TestFiles/Brems_dNdx_rnd.txt";
     in.open(filename.c_str());
 
     if (!in.good())
@@ -276,19 +275,19 @@ TEST(Bremsstrahlung, Test_of_dNdx_rnd)
     char firstLine[256];
     in.getline(firstLine, 256);
 
-    string particleName;
-    string mediumName;
+    std::string particleName;
+    std::string mediumName;
     double ecut;
     double vcut;
     double multiplier;
     bool lpm;
-    string parametrization;
+    std::string parametrization;
     double energy;
     double rnd;
     double dNdx_stored;
     double dNdx_new;
 
-    cout.precision(16);
+    std::cout.precision(16);
 
     RandomGenerator::Get().SetSeed(0);
 
@@ -320,8 +319,8 @@ TEST(Bremsstrahlung, Test_of_dNdx_rnd)
 
 TEST(Bremsstrahlung, Test_of_e)
 {
-    ifstream in;
-    string filename = "bin/TestFiles/Brems_e.txt";
+    std::ifstream in;
+    std::string filename = "bin/TestFiles/Brems_e.txt";
     in.open(filename.c_str());
 
     if (!in.good())
@@ -332,19 +331,19 @@ TEST(Bremsstrahlung, Test_of_e)
     char firstLine[256];
     in.getline(firstLine, 256);
 
-    string particleName;
-    string mediumName;
+    std::string particleName;
+    std::string mediumName;
     double ecut;
     double vcut;
     double multiplier;
     bool lpm;
-    string parametrization;
+    std::string parametrization;
     double energy;
     double rnd1, rnd2;
     double stochastic_loss_stored;
     double stochastic_loss_new;
 
-    cout.precision(16);
+    std::cout.precision(16);
 
     RandomGenerator::Get().SetSeed(0);
 
@@ -376,8 +375,8 @@ TEST(Bremsstrahlung, Test_of_e)
 
 TEST(Bremsstrahlung, Test_of_dEdx_Interpolant)
 {
-    ifstream in;
-    string filename = "bin/TestFiles/Brems_dEdx_interpol.txt";
+    std::ifstream in;
+    std::string filename = "bin/TestFiles/Brems_dEdx_interpol.txt";
     in.open(filename.c_str());
 
     if (!in.good())
@@ -388,18 +387,18 @@ TEST(Bremsstrahlung, Test_of_dEdx_Interpolant)
     char firstLine[256];
     in.getline(firstLine, 256);
 
-    string particleName;
-    string mediumName;
+    std::string particleName;
+    std::string mediumName;
     double ecut;
     double vcut;
     double multiplier;
     bool lpm;
-    string parametrization;
+    std::string parametrization;
     double energy;
     double dEdx_stored;
     double dEdx_new;
 
-    cout.precision(16);
+    std::cout.precision(16);
     InterpolationDef InterpolDef;
 
     while (in.good())
@@ -430,8 +429,8 @@ TEST(Bremsstrahlung, Test_of_dEdx_Interpolant)
 
 TEST(Bremsstrahlung, Test_of_dNdx_Interpolant)
 {
-    ifstream in;
-    string filename = "bin/TestFiles/Brems_dNdx_interpol.txt";
+    std::ifstream in;
+    std::string filename = "bin/TestFiles/Brems_dNdx_interpol.txt";
     in.open(filename.c_str());
 
     if (!in.good())
@@ -439,18 +438,18 @@ TEST(Bremsstrahlung, Test_of_dNdx_Interpolant)
         std::cerr << "File \"" << filename << "\" not found" << std::endl;
     }
 
-    string particleName;
-    string mediumName;
+    std::string particleName;
+    std::string mediumName;
     double ecut;
     double vcut;
     double multiplier;
     bool lpm;
-    string parametrization;
+    std::string parametrization;
     double energy;
     double dNdx_stored;
     double dNdx_new;
 
-    cout.precision(16);
+    std::cout.precision(16);
     InterpolationDef InterpolDef;
 
     while (in.good())
@@ -481,8 +480,8 @@ TEST(Bremsstrahlung, Test_of_dNdx_Interpolant)
 
 TEST(Bremsstrahlung, Test_of_dNdx_rnd_Interpolant)
 {
-    ifstream in;
-    string filename = "bin/TestFiles/Brems_dNdx_rnd_interpol.txt";
+    std::ifstream in;
+    std::string filename = "bin/TestFiles/Brems_dNdx_rnd_interpol.txt";
     in.open(filename.c_str());
 
     if (!in.good())
@@ -493,19 +492,19 @@ TEST(Bremsstrahlung, Test_of_dNdx_rnd_Interpolant)
     char firstLine[256];
     in.getline(firstLine, 256);
 
-    string particleName;
-    string mediumName;
+    std::string particleName;
+    std::string mediumName;
     double ecut;
     double vcut;
     double multiplier;
     bool lpm;
-    string parametrization;
+    std::string parametrization;
     double energy;
     double rnd;
     double dNdx_stored;
     double dNdx_new;
 
-    cout.precision(16);
+    std::cout.precision(16);
     InterpolationDef InterpolDef;
 
     RandomGenerator::Get().SetSeed(0);
@@ -538,8 +537,8 @@ TEST(Bremsstrahlung, Test_of_dNdx_rnd_Interpolant)
 
 TEST(Bremsstrahlung, Test_of_e_Interpolant)
 {
-    ifstream in;
-    string filename = "bin/TestFiles/Brems_e_interpol.txt";
+    std::ifstream in;
+    std::string filename = "bin/TestFiles/Brems_e_interpol.txt";
     in.open(filename.c_str());
 
     if (!in.good())
@@ -550,19 +549,19 @@ TEST(Bremsstrahlung, Test_of_e_Interpolant)
     char firstLine[256];
     in.getline(firstLine, 256);
 
-    string particleName;
-    string mediumName;
+    std::string particleName;
+    std::string mediumName;
     double ecut;
     double vcut;
     double multiplier;
     bool lpm;
-    string parametrization;
+    std::string parametrization;
     double energy;
     double rnd1, rnd2;
     double stochastic_loss_stored;
     double stochastic_loss_new;
 
-    cout.precision(16);
+    std::cout.precision(16);
     InterpolationDef InterpolDef;
 
     RandomGenerator::Get().SetSeed(0);

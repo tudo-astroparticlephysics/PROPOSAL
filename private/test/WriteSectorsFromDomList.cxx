@@ -3,41 +3,40 @@
 #include <sstream>
 #include <string>
 
-using namespace std;
 
-void AddSector(ofstream& out,
-               string name,
-               string geometry,
+void AddSector(std::ofstream& out,
+               std::string name,
+               std::string geometry,
                double x0,
                double y0,
                double z0,
                double radius,
                double height,
                int hierarchy,
-               string medium,
+               std::string medium,
                double density)
 {
-    out << name << endl;
-    out << "sector" << endl;
+    out << name << std::endl;
+    out << "sector" << std::endl;
 
     if (geometry.compare("sphere") == 0)
     {
-        out << "\t" << geometry << " " << x0 << " " << y0 << " " << z0 << " " << radius << " 0" << endl;
+        out << "\t" << geometry << " " << x0 << " " << y0 << " " << z0 << " " << radius << " 0" << std::endl;
     }
     if (geometry.compare("cylinder") == 0)
     {
-        out << "\t" << geometry << " " << x0 << " " << y0 << " " << z0 << " " << radius << " 0 " << height << endl;
+        out << "\t" << geometry << " " << x0 << " " << y0 << " " << z0 << " " << radius << " 0 " << height << std::endl;
     }
     out << "\t"
-        << "hierarchy " << hierarchy << endl;
+        << "hierarchy " << hierarchy << std::endl;
     out << "\t"
-        << "medium " << medium << " " << density << endl;
+        << "medium " << medium << " " << density << std::endl;
 }
 
 int main()
 {
-    string dom_list_file_name = "resources/Icecube_geometry.20110414.complete.txt";
-    ofstream out;
+    std::string dom_list_file_name = "resources/Icecube_geometry.20110414.complete.txt";
+    std::ofstream out;
     out.open("resources/sectors_from_dom_list");
 
     int string       = 0;
@@ -49,14 +48,14 @@ int main()
 
     double height_of_last_dom_on_string;
 
-    ifstream in;
+    std::ifstream in;
     in.open(dom_list_file_name.c_str());
 
-    stringstream ss;
+    std::stringstream ss;
 
     while (in.good())
     {
-        in >> string >> dom >> x >> y >> z;
+        in >> std::string >> dom >> x >> y >> z;
 
         if (dom == 60)
         {

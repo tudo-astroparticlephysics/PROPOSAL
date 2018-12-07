@@ -7,7 +7,6 @@
 #include "PROPOSAL/medium/Medium.h"
 
 using namespace PROPOSAL;
-using namespace std::placeholders;
 
 EpairIntegral::EpairIntegral(const EpairProduction& param)
     : CrossSectionIntegral(DynamicData::Epair, param)
@@ -67,7 +66,7 @@ double EpairIntegral::CalculatedEdx(double energy)
             sum += dedx_integral_.Integrate(
                 limits.vMin,
                 r1,
-                std::bind(&Parametrization::FunctionToDEdxIntegral, parametrization_, energy, _1),
+                std::bind(&Parametrization::FunctionToDEdxIntegral, parametrization_, energy, std::placeholders::_1),
                 4);
             double r2 = std::max(1 - limits.vUp, COMPUTER_PRECISION);
 
@@ -79,10 +78,10 @@ double EpairIntegral::CalculatedEdx(double energy)
             sum +=
                 dedx_integral_.Integrate(1 - limits.vUp,
                                          r2,
-                                         std::bind(&EpairIntegral::FunctionToDEdxIntegralReverse, this, energy, _1),
+                                         std::bind(&EpairIntegral::FunctionToDEdxIntegralReverse, this, energy, std::placeholders::_1),
                                          2) +
                 dedx_integral_.Integrate(
-                    r2, 1 - r1, std::bind(&EpairIntegral::FunctionToDEdxIntegralReverse, this, energy, _1), 4);
+                    r2, 1 - r1, std::bind(&EpairIntegral::FunctionToDEdxIntegralReverse, this, energy, std::placeholders::_1), 4);
 
         }
 
@@ -91,7 +90,7 @@ double EpairIntegral::CalculatedEdx(double energy)
             sum += dedx_integral_.Integrate(
                 limits.vMin,
                 limits.vUp,
-                std::bind(&Parametrization::FunctionToDEdxIntegral, parametrization_, energy, _1),
+                std::bind(&Parametrization::FunctionToDEdxIntegral, parametrization_, energy, std::placeholders::_1),
                 4);
         }
     }

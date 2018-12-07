@@ -67,7 +67,6 @@
         static const std::string name_;                                                                                \
     };
 
-// using namespace std::placeholders;
 
 namespace PROPOSAL {
 
@@ -295,7 +294,7 @@ double EpairProductionRhoInterpolant<Param>::DifferentialCrossSection(double ene
     if (v >= limits.vUp)
     {
         return std::max(
-            interpolant_.at(this->component_index_)->Interpolate(energy, log(v / limits.vUp) / log(limits.vMax / limits.vUp)),
+            interpolant_.at(this->component_index_)->Interpolate(energy, std::log(v / limits.vUp) / std::log(limits.vMax / limits.vUp)),
             0.0);
     } else
     {
@@ -314,7 +313,7 @@ double EpairProductionRhoInterpolant<Param>::FunctionToBuildPhotoInterpolant(dou
         return 0;
     }
 
-    v = limits.vUp * exp(v * log(limits.vMax / limits.vUp));
+    v = limits.vUp * std::exp(v * std::log(limits.vMax / limits.vUp));
 
     return Param::DifferentialCrossSection(energy, v);
 }

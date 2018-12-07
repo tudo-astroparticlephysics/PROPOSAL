@@ -98,9 +98,9 @@ double PhotoRealPhotonAssumption::DifferentialCrossSection(double energy, double
     } else
     {
         // eq. 18
-        double tmp = 0.00282 * pow(components_[component_index_]->GetAtomicNum(), 1. / 3) * sgn;
+        double tmp = 0.00282 * std::pow(components_[component_index_]->GetAtomicNum(), 1. / 3) * sgn;
         // eq. 3
-        G = (3 / tmp) * (0.5 + ((1 + tmp) * exp(-tmp) - 1) / (tmp * tmp));
+        G = (3 / tmp) * (0.5 + ((1 + tmp) * std::exp(-tmp) - 1) / (tmp * tmp));
     }
 
     // enhanced formula by Bugaev Shelpin
@@ -112,9 +112,9 @@ double PhotoRealPhotonAssumption::DifferentialCrossSection(double energy, double
     aum = particle_def_.mass * 1.e-3;
     aum *= aum;
     aux = 2 * aum / t;
-    aux = G * ((kappa + 4 * aum / m1) * log(1 + m1 / t) - (kappa * m1) / (m1 + t) - aux) +
-          ((kappa + 2 * aum / m2) * log(1 + m2 / t) - aux) +
-          aux * (G * (m1 - 4 * t) / (m1 + t) + (m2 / t) * log(1 + t / m2));
+    aux = G * ((kappa + 4 * aum / m1) * std::log(1 + m1 / t) - (kappa * m1) / (m1 + t) - aux) +
+          ((kappa + 2 * aum / m2) * std::log(1 + m2 / t) - aux) +
+          aux * (G * (m1 - 4 * t) / (m1 + t) + (m2 / t) * std::log(1 + t / m2));
 
     aux *= ALPHA / (8 * PI) * components_[component_index_]->GetAtomicNum() * v * sgn * 1.e-30;
 
@@ -134,7 +134,7 @@ double PhotoRealPhotonAssumption::DifferentialCrossSection(double energy, double
 // ------------------------------------------------------------------------- //
 double PhotoRealPhotonAssumption::NucleusCrossSectionCaldwell(double nu)
 {
-    return 49.2 + 11.1 * log(nu) + 151.8 / sqrt(nu);
+    return 49.2 + 11.1 * std::log(nu) + 151.8 / std::sqrt(nu);
 }
 
 // ------------------------------------------------------------------------- //
@@ -176,7 +176,7 @@ double PhotoZeus::CalculateParametrization(double nu)
     double aux;
 
     aux = nu * 2.e-3 * this->components_[this->component_index_]->GetAverageNucleonWeight();
-    aux = 63.5 * pow(aux, 0.097) + 145 * pow(aux, -0.5);
+    aux = 63.5 * std::pow(aux, 0.097) + 145 * std::pow(aux, -0.5);
 
     return aux;
 }
@@ -197,7 +197,7 @@ double PhotoBezrukovBugaev::CalculateParametrization(double nu)
 {
     double aux;
 
-    aux = log(0.0213 * nu);
+    aux = std::log(0.0213 * nu);
     aux = 114.3 + 1.647 * aux * aux;
 
     return aux;
@@ -218,7 +218,7 @@ double PhotoKokoulin::CalculateParametrization(double nu)
         if (nu <= 17.)
         {
             // Bezrukov, Bugaev, Sov. J. Nucl. Phys. 33 (1981), 635
-            return 96.1 + 82. / sqrt(nu);
+            return 96.1 + 82. / std::sqrt(nu);
         } else
         {
             return PhotoBezrukovBugaev::CalculateParametrization(nu);

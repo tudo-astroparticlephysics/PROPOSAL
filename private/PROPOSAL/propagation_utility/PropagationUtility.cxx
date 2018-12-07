@@ -7,8 +7,6 @@
 #include "PROPOSAL/crossection/CrossSection.h"
 #include "PROPOSAL/crossection/parametrization/Parametrization.h"
 
-using namespace std;
-using namespace std::placeholders;
 using namespace PROPOSAL;
 
 /******************************************************************************

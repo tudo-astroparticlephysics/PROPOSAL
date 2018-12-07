@@ -13,7 +13,6 @@
 #include "PROPOSAL/methods.h"
 
 using namespace PROPOSAL;
-using namespace std::placeholders;
 
 PhotoInterpolant::PhotoInterpolant(const Photonuclear& param, InterpolationDef def)
     : CrossSectionInterpolant(DynamicData::NuclInt, param)
@@ -42,7 +41,7 @@ PhotoInterpolant::PhotoInterpolant(const Photonuclear& param, InterpolationDef d
         .SetRationalY(false)
         .SetRelativeY(false)
         .SetLogSubst(false)
-        .SetFunction1D(std::bind(&CrossSection::CalculatedEdx, &photo, _1));
+        .SetFunction1D(std::bind(&CrossSection::CalculatedEdx, &photo, std::placeholders::_1));
 
     builder_container.push_back(std::make_pair(&builder1d, &dedx_interpolant_));
 
@@ -64,7 +63,7 @@ PhotoInterpolant::PhotoInterpolant(const Photonuclear& param, InterpolationDef d
         .SetRationalY(false)
         .SetRelativeY(false)
         .SetLogSubst(false)
-        .SetFunction1D(std::bind(&CrossSection::CalculatedE2dx, &photo, _1));
+        .SetFunction1D(std::bind(&CrossSection::CalculatedE2dx, &photo, std::placeholders::_1));
 
     builder_container_de2dx.push_back(std::make_pair(&builder_de2dx, &de2dx_interpolant_));
 

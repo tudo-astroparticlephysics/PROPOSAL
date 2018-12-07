@@ -13,7 +13,6 @@
 #include "PROPOSAL/methods.h"
 
 using namespace PROPOSAL;
-using namespace std::placeholders;
 
 BremsInterpolant::BremsInterpolant(const Bremsstrahlung& param, InterpolationDef def)
     : CrossSectionInterpolant(DynamicData::Brems, param)
@@ -42,7 +41,7 @@ BremsInterpolant::BremsInterpolant(const Bremsstrahlung& param, InterpolationDef
         .SetRationalY(false)
         .SetRelativeY(false)
         .SetLogSubst(true)
-        .SetFunction1D(std::bind(&CrossSection::CalculatedEdx, &brems, _1));
+        .SetFunction1D(std::bind(&CrossSection::CalculatedEdx, &brems, std::placeholders::_1));
 
     builder_container.push_back(std::make_pair(&builder1d, &dedx_interpolant_));
 
@@ -64,7 +63,7 @@ BremsInterpolant::BremsInterpolant(const Bremsstrahlung& param, InterpolationDef
         .SetRationalY(false)
         .SetRelativeY(false)
         .SetLogSubst(false)
-        .SetFunction1D(std::bind(&CrossSection::CalculatedE2dx, &brems, _1));
+        .SetFunction1D(std::bind(&CrossSection::CalculatedE2dx, &brems, std::placeholders::_1));
 
     builder_container_de2dx.push_back(std::make_pair(&builder_de2dx, &de2dx_interpolant_));
 

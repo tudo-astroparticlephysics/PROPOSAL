@@ -105,7 +105,7 @@ std::vector<I3Particle> I3PropagatorServicePROPOSAL::Propagate(I3Particle& p, Di
     // saying where we are
     log_debug("Entering I3PropagatorServicePROPOSAL::Propagate()");
 
-    vector<I3Particle> daughters;
+    std::vector<I3Particle> daughters;
 
     log_trace("location type = %d", p.GetLocationType());
     if (p.GetLocationType() != I3Particle::InIce)
@@ -147,7 +147,7 @@ std::vector<I3Particle> I3PropagatorServicePROPOSAL::Propagate(I3Particle& p, Di
 }
 
 // ------------------------------------------------------------------------- //
-I3MMCTrackPtr I3PropagatorServicePROPOSAL::propagate(I3Particle& p, vector<I3Particle>& daughters)
+I3MMCTrackPtr I3PropagatorServicePROPOSAL::propagate(I3Particle& p, std::vector<I3Particle>& daughters)
 {
     Particle particle = I3PROPOSALParticleConverter::GeneratePROPOSALParticle(p);
 
