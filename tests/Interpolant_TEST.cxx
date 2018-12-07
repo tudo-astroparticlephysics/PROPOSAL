@@ -1,20 +1,18 @@
 
-#include <math.h>
-
+#include <cmath>
 #include "gtest/gtest.h"
-
 #include "PROPOSAL/math/Interpolant.h"
 
 using namespace PROPOSAL;
 
 double X2(double x)
 {
-    return x * x * exp(x);
+    return x * x * std::exp(x);
 }
 
 double X_YY(double x, double y)
 {
-    return x + y * y * exp(x);
+    return x + y * y * std::exp(x);
 }
 
 int max        = 100;
