@@ -55,7 +55,7 @@ int main()
 
     while (in.good())
     {
-        in >> std::string >> dom >> x >> y >> z;
+        in >> string >> dom >> x >> y >> z;
 
         if (dom == 60)
         {

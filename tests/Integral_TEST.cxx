@@ -1,25 +1,22 @@
 
-#include <math.h>
-
 #include "gtest/gtest.h"
-
 #include "PROPOSAL/PROPOSAL.h"
 
 using namespace PROPOSAL;
 
 double Testfkt(double r)
 {
-    return exp(r);
+    return std::exp(r);
 }
 
 double Testexp(double r)
 {
-    return exp(r);
+    return std::exp(r);
 }
 
 bool relErr(double Is, double HasToBe, double RelError)
 {
-    return fabs((Is - HasToBe) / HasToBe) < RelError;
+    return std::abs((Is - HasToBe) / HasToBe) < RelError;
 }
 
 TEST(Comparison, Comparison_equal)
@@ -99,7 +96,7 @@ TEST(Assignment, Swap)
 TEST(IntegralValue, Zero_to_Three_of_xx)
 {
     Integral* Int = new Integral();
-    ASSERT_NEAR(Int->Integrate(0, 3, Testfkt, 1), exp(3) - 1, (exp(3) - 1) * 1E-6);
+    ASSERT_NEAR(Int->Integrate(0, 3, Testfkt, 1), std::exp(3) - 1, (std::exp(3) - 1) * 1E-6);
     delete Int;
 }
 
@@ -116,7 +113,7 @@ TEST(IntegralValue, SmallError)
 {
     Integral* Int = new Integral();
 
-    ASSERT_NEAR(Int->Integrate(0, 3, Testexp, 1), exp(3) - 1, (exp(3) - 1) * 1.e-6);
+    ASSERT_NEAR(Int->Integrate(0, 3, Testexp, 1), std::exp(3) - 1, (std::exp(3) - 1) * 1.e-6);
 
     delete Int;
 }
@@ -125,7 +122,7 @@ TEST(IntegralValue, FloatEqual)
 {
     Integral* Int = new Integral();
     // Last 4 digits can differ. relError<1E-4
-    ASSERT_FLOAT_EQ(Int->Integrate(0, 3, Testexp, 1), exp(3) - 1);
+    ASSERT_FLOAT_EQ(Int->Integrate(0, 3, Testexp, 1), std::exp(3) - 1);
 
     delete Int;
 }
@@ -133,7 +130,7 @@ TEST(IntegralValue, FloatEqual)
 TEST(IntegralValue, MultiplePrecisions)
 {
     double xmin = 0, xmax = 3;
-    double ExactIntegral = exp(3) - 1;
+    double ExactIntegral = std::exp(3) - 1;
     double CalcIntegral  = 0;
 
     double precision = 1E-5;
@@ -152,7 +149,7 @@ TEST(IntegralValue, MultiplePrecisions)
 TEST(IntegralValue, IntegrateWithSubstitution)
 {
     double xmin = 2, xmax = 4;
-    double ExactIntegral = exp(xmax) - exp(xmin);
+    double ExactIntegral = exp(xmax) - std::exp(xmin);
     double CalcIntegral  = 0;
 
     double precision = 1E-5;
@@ -171,7 +168,7 @@ TEST(IntegralValue, IntegrateWithSubstitution)
 TEST(IntegralValue, IntegrateWithLog)
 {
     double xmin = 2, xmax = 4;
-    double ExactIntegral = exp(xmax) - exp(xmin);
+    double ExactIntegral = std::exp(xmax) - std::exp(xmin);
     double CalcIntegral  = 0;
 
     double precision = 1E-5;
@@ -190,7 +187,7 @@ TEST(IntegralValue, IntegrateWithLog)
 TEST(IntegralValue, IntegrateWithLogSubstitution)
 {
     double xmin = 2, xmax = 4;
-    double ExactIntegral = exp(xmax) - exp(xmin);
+    double ExactIntegral = std::exp(xmax) - std::exp(xmin);
     double CalcIntegral  = 0;
 
     double precision = 1E-5;
