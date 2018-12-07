@@ -7,7 +7,6 @@
 #include "PROPOSAL/medium/Medium.h"
 
 using namespace PROPOSAL;
-using namespace std::placeholders;
 
 PhotoIntegral::PhotoIntegral(const Photonuclear& param)
     : CrossSectionIntegral(DynamicData::NuclInt, param)
@@ -42,7 +41,7 @@ double PhotoIntegral::CalculatedEdx(double energy)
         sum += dedx_integral_.Integrate(
             limits.vMin,
             limits.vUp,
-            std::bind(&Parametrization::FunctionToDEdxIntegral, parametrization_, energy, _1),
+            std::bind(&Parametrization::FunctionToDEdxIntegral, parametrization_, energy, std::placeholders::_1),
             4);
     }
 

@@ -9,7 +9,6 @@
 #include "PROPOSAL/medium/Medium.h"
 
 using namespace PROPOSAL;
-using namespace std::placeholders;
 
 /******************************************************************************
  *                               Ionization                                *
@@ -52,7 +51,7 @@ double Ionization::DifferentialCrossSection(double energy, double v)
 
     // TODO(mario): Better way? Sat 2017/09/02
     double square_momentum   = energy * energy - particle_def_.mass * particle_def_.mass;
-    double particle_momentum = sqrt(std::max(square_momentum, 0.0));
+    double particle_momentum = std::sqrt(std::max(square_momentum, 0.0));
     double beta              = particle_momentum / energy;
     double gamma             = energy / particle_def_.mass;
     beta *= beta;
@@ -130,9 +129,9 @@ double Ionization::InelCorrection(double energy, double v)
 
     double gamma = energy / particle_def_.mass;
 
-    a      = log(1 + 2 * v * energy / ME);
-    b      = log((1 - v / limits.vMax) / (1 - v));
-    c      = log((2 * gamma * (1 - v) * ME) / (particle_def_.mass * v));
+    a      = std::log(1 + 2 * v * energy / ME);
+    b      = std::log((1 - v / limits.vMax) / (1 - v));
+    c      = std::log((2 * gamma * (1 - v) * ME) / (particle_def_.mass * v));
     result = a * (2 * b + c) - b * b;
 
     return ALPHA / (2 * PI) * result;
@@ -151,7 +150,7 @@ double Ionization::CrossSectionWithoutInelasticCorrection(double energy, double 
 
     // TODO(mario): Better way? Sat 2017/09/02
     double square_momentum   = energy * energy - particle_def_.mass * particle_def_.mass;
-    double particle_momentum = sqrt(std::max(square_momentum, 0.0));
+    double particle_momentum = std::sqrt(std::max(square_momentum, 0.0));
     double beta              = particle_momentum / energy;
     double gamma             = energy / particle_def_.mass;
     beta *= beta;

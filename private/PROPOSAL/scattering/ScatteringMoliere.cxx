@@ -9,7 +9,6 @@
 #include "PROPOSAL/methods.h"
 #include "PROPOSAL/scattering/ScatteringMoliere.h"
 
-using namespace std;
 using namespace PROPOSAL;
 
 //----------------------------------------------------------------------------//
@@ -24,18 +23,18 @@ Scattering::RandomAngles ScatteringMoliere::CalculateRandomAngle(double dr, doub
     (void)ef;
 
     double momentum = particle_.GetMomentum(); // momentum in MeV/c
-    double mass     = particle_.GetMass();     // mass in MeV/c²
+    double mass     = particle_.GetMass();     // mass in MeV/c^2
 
-    double beta_Sq = 1. / (1. + mass * mass / (momentum * momentum)); // beta² = v²/c²
+    double beta_Sq = 1. / (1. + mass * mass / (momentum * momentum)); // beta^2 = (v/c)^2
     double chi_0   = 0.;
 
-    vector<double> chi_A_Sq; // screening angle² in rad²
+    std::vector<double> chi_A_Sq; // screening angle^2 in rad^2
     chi_A_Sq.resize(numComp_);
 
     for (int i = 0; i < numComp_; i++)
     {
         // Calculate Chi_0
-        chi_0 = (ME * ALPHA * pow(Zi_[i] * 128. / (9. * PI * PI), 1. / 3.)) / momentum;
+        chi_0 = (ME * ALPHA * std::pow(Zi_[i] * 128. / (9. * PI * PI), 1. / 3.)) / momentum;
         // Calculate Chi_a^2
         chi_A_Sq[i] = chi_0 * chi_0 * (1.13 + 3.76 * ALPHA * ALPHA * Zi_[i] * Zi_[i] / beta_Sq);
     }
@@ -55,7 +54,7 @@ Scattering::RandomAngles ScatteringMoliere::CalculateRandomAngle(double dr, doub
 
         for (int n = 0; n < 6; n++)
         {
-            xn = xn * ((1. - log(xn) - log(chiCSq_ / chi_A_Sq[i]) - 1. + 2. * EULER_MASCHERONI) / (1. - xn));
+            xn = xn * ((1. - std::log(xn) - std::log(chiCSq_ / chi_A_Sq[i]) - 1. + 2. * EULER_MASCHERONI) / (1. - xn));
         }
 
         //  Check for inappropriate values of B. If B < 4.5 it is practical to assume no deviation.
@@ -71,7 +70,7 @@ Scattering::RandomAngles ScatteringMoliere::CalculateRandomAngle(double dr, doub
         B_[i] = xn;
     }
 
-    double pre_factor = sqrt(chiCSq_ * B_[max_weight_index_]);
+    double pre_factor = std::sqrt(chiCSq_ * B_[max_weight_index_]);
 
     double rnd1, rnd2;
 
@@ -232,7 +231,7 @@ double ScatteringMoliere::f1M(double x)
 {
     // approximation for large numbers to avoid numerical errors
     if (x > 12.)
-        return 0.5 * sqrt(PI) / (pow(x, 1.5) * pow(1. - 4.5 / x, 2. / 3.));
+        return 0.5 * std::sqrt(PI) / (std::pow(x, 1.5) * std::pow(1. - 4.5 / x, 2. / 3.));
 
     double sum = c1[69];
 
@@ -253,13 +252,13 @@ double f2Mlarge(double x)
 
     // the junction of both parametrizations is smoothed by an interpolation parabola
     if ((x >= 4.25 * 4.25) && (x <= 6.5 * 6.5))
-        return a * x + b * sqrt(x) + c;
+        return a * x + b * std::sqrt(x) + c;
 
     double sum = 0;
 
     for (int p = 2; p < 13; p++)
     {
-        sum += c2large[p] * (0.5 * log(x) + s2large[p]) * pow(x, -(p + 0.5));
+        sum += c2large[p] * (0.5 * std::log(x) + s2large[p]) * std::pow(x, -(p + 0.5));
     }
 
     return sum;
@@ -289,7 +288,7 @@ double ScatteringMoliere::f(double theta)
     {
         double x = theta * theta / (chiCSq_ * B_[i]);
 
-        y1 += weight_ZZ_[i] / sqrt(chiCSq_ * B_[i] * PI) * (exp(-x) + f1M(x) / B_[i] + f2M(x) / (B_[i] * B_[i]));
+        y1 += weight_ZZ_[i] / std::sqrt(chiCSq_ * B_[i] * PI) * (std::exp(-x) + f1M(x) / B_[i] + f2M(x) / (B_[i] * B_[i]));
     }
 
     return y1 * weight_ZZ_sum_;
@@ -321,7 +320,7 @@ double ScatteringMoliere::F1M(double x)
     for (int p = 68; p >= 0; p--)
         sum = sum * x + c1[p] / (2. * p + 1.);
 
-    return sum * sqrt(x);
+    return sum * std::sqrt(x);
 }
 
 //----------------------------------------------------------------------------//
@@ -334,13 +333,13 @@ double F2Mlarge(double x)
 
     // the junction of both parametrizations is smoothed by an interpolation parabola
     if ((x >= 4.25 * 4.25) && (x <= 6.5 * 6.5))
-        return a * x + b * sqrt(x) + c;
+        return a * x + b * std::sqrt(x) + c;
 
     double sum = 0;
 
     for (int p = 2; p < 13; p++)
     {
-        sum += -0.5 * c2large[p] / p * (0.5 / p + 0.5 * log(x) + s2large[p]) * pow(x, -p);
+        sum += -0.5 * c2large[p] / p * (0.5 / p + 0.5 * std::log(x) + s2large[p]) * std::pow(x, -p);
     }
 
     return sum;
@@ -356,7 +355,7 @@ double ScatteringMoliere::F2M(double x)
     for (int p = 68; p >= 0; p--)
         sum = sum * x + c2[p] / (2. * p + 1.);
 
-    return sum * sqrt(x);
+    return sum * std::sqrt(x);
 }
 
 //----------------------------------------------------------------------------//
@@ -370,7 +369,7 @@ double ScatteringMoliere::F(double theta)
         double x = theta * theta / (chiCSq_ * B_[i]);
 
         y1 += weight_ZZ_[i] *
-              (0.5 * std::erf(sqrt(x)) + sqrt(1. / PI) * (F1M(x) / B_[i] + F2M(x) / (B_[i] * B_[i])));
+              (0.5 * std::erf(std::sqrt(x)) + std::sqrt(1. / PI) * (F1M(x) / B_[i] + F2M(x) / (B_[i] * B_[i])));
     }
 
     return (theta < 0.) ? (-1.) * y1 * weight_ZZ_sum_ : y1 * weight_ZZ_sum_;
@@ -402,7 +401,7 @@ double ScatteringMoliere::GetRandom(double pre_factor)
         theta_n   = theta_np1;
         theta_np1 = theta_n - (F(theta_n) - rndm) / f(theta_n);
 
-    } while (abs((theta_n - theta_np1) / theta_np1) > 1e-4);
+    } while (std::abs((theta_n - theta_np1) / theta_np1) > 1e-4);
 
     return theta_np1;
 }

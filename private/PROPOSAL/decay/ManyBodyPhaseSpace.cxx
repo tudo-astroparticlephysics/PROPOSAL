@@ -11,7 +11,6 @@
 #include "PROPOSAL/particle/Particle.h"
 
 
-using namespace std::placeholders;
 using namespace PROPOSAL;
 
 const std::string ManyBodyPhaseSpace::name_ = "ManyBodyPhaseSpace";
@@ -33,13 +32,13 @@ ManyBodyPhaseSpace::ManyBodyPhaseSpace(std::vector<const ParticleDef*> daughters
     {
         matrix_element_ = ManyBodyPhaseSpace::DefaultEvaluate;
         use_default_matrix_element_ = true;
-        estimate_ = std::bind(&ManyBodyPhaseSpace::EstimateMaxWeight, this, _1, _2);
+        estimate_ = std::bind(&ManyBodyPhaseSpace::EstimateMaxWeight, this, std::placeholders::_1, std::placeholders::_2);
     }
     else
     {
         matrix_element_ = me;
         use_default_matrix_element_ = false;
-        estimate_ = std::bind(&ManyBodyPhaseSpace::SampleEstimateMaxWeight, this, _1, _2);
+        estimate_ = std::bind(&ManyBodyPhaseSpace::SampleEstimateMaxWeight, this, std::placeholders::_1, std::placeholders::_2);
     }
 
     for (std::vector<const ParticleDef*>::iterator it = daughters.begin(); it != daughters.end(); ++it)
@@ -75,11 +74,11 @@ ManyBodyPhaseSpace::ManyBodyPhaseSpace(const ManyBodyPhaseSpace& mode)
 {
     if (use_default_matrix_element_)
     {
-        estimate_ = std::bind(&ManyBodyPhaseSpace::EstimateMaxWeight, this, _1, _2);
+        estimate_ = std::bind(&ManyBodyPhaseSpace::EstimateMaxWeight, this, std::placeholders::_1, std::placeholders::_2);
     }
     else
     {
-        estimate_ = std::bind(&ManyBodyPhaseSpace::SampleEstimateMaxWeight, this, _1, _2);
+        estimate_ = std::bind(&ManyBodyPhaseSpace::SampleEstimateMaxWeight, this, std::placeholders::_1, std::placeholders::_2);
     }
 
     for (std::vector<const ParticleDef*>::const_iterator it = mode.daughters_.begin(); it != mode.daughters_.end();

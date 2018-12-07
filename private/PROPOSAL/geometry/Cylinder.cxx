@@ -6,7 +6,6 @@
 #include "PROPOSAL/geometry/Cylinder.h"
 
 using namespace PROPOSAL;
-using namespace std;
 
 Cylinder::Cylinder()
     : Geometry("Cylinder")
@@ -46,8 +45,6 @@ Cylinder::Cylinder(const Cylinder& cylinder)
 // ------------------------------------------------------------------------- //
 void Cylinder::swap(Geometry& geometry)
 {
-    using std::swap;
-
     Cylinder* cylinder = dynamic_cast<Cylinder*>(&geometry);
     if (!cylinder)
     {
@@ -57,9 +54,9 @@ void Cylinder::swap(Geometry& geometry)
 
     Geometry::swap(*cylinder);
 
-    swap(inner_radius_, cylinder->inner_radius_);
-    swap(radius_, cylinder->radius_);
-    swap(z_, cylinder->z_);
+    std::swap(inner_radius_, cylinder->inner_radius_);
+    std::swap(radius_, cylinder->radius_);
+    std::swap(z_, cylinder->z_);
 }
 
 //------------------------------------------------------------------------- //
@@ -102,7 +99,7 @@ void Cylinder::print(std::ostream& os) const
 }
 
 // ------------------------------------------------------------------------- //
-pair<double, double> Cylinder::DistanceToBorder(const Vector3D& position, const Vector3D& direction)
+std::pair<double, double> Cylinder::DistanceToBorder(const Vector3D& position, const Vector3D& direction)
 {
     // Calculate intersection of particle trajectory and the cylinder
     // cylinder barrel (x1 + x0)^2 + (x2 + y0)^2  = radius^2 [ z0_-0.5*z_ <
@@ -134,9 +131,9 @@ pair<double, double> Cylinder::DistanceToBorder(const Vector3D& position, const 
     double intersection_y;
     double intersection_z;
 
-    vector<double> dist;
+    std::vector<double> dist;
 
-    pair<double, double> distance;
+    std::pair<double, double> distance;
 
     double z_calc_pos = position_.GetZ() + 0.5 * z_;
     double z_calc_neg = position_.GetZ() - 0.5 * z_;
@@ -146,8 +143,9 @@ pair<double, double> Cylinder::DistanceToBorder(const Vector3D& position, const 
                                              // cylinder barrel
     {
 
-        A = pow((position.GetX() - position_.GetX()), 2) + pow((position.GetY() - position_.GetY()), 2) -
-            pow(radius_, 2);
+        A = std::pow((position.GetX() - position_.GetX()), 2) +
+            std::pow((position.GetY() - position_.GetY()), 2) -
+            radius_*radius_;
 
         B = 2 * ((position.GetX() - position_.GetX()) * dir_vec_x + (position.GetY() - position_.GetY()) * dir_vec_y);
 
@@ -156,12 +154,12 @@ pair<double, double> Cylinder::DistanceToBorder(const Vector3D& position, const 
         B /= C;
         A /= C;
 
-        determinant = pow(B / 2, 2) - A;
+        determinant = 0.25 * B*B - A;
 
         if (determinant > 0) // determinant == 0 (boundery point) is ignored
         {
-            t1 = -1 * B / 2 + sqrt(determinant);
-            t2 = -1 * B / 2 - sqrt(determinant);
+            t1 = -1 * B / 2 + std::sqrt(determinant);
+            t2 = -1 * B / 2 - std::sqrt(determinant);
 
             // Computer precision controll
             if (t1 > 0 && t1 < GEOMETRY_PRECISION)
@@ -210,9 +208,11 @@ pair<double, double> Cylinder::DistanceToBorder(const Vector3D& position, const 
                 intersection_x = position.GetX() + t * dir_vec_x;
                 intersection_y = position.GetY() + t * dir_vec_y;
 
-                if (sqrt(pow((intersection_x - position_.GetX()), 2) + pow((intersection_y - position_.GetY()), 2)) <=
+                if (std::sqrt(std::pow((intersection_x - position_.GetX()), 2) +
+                    std::pow((intersection_y - position_.GetY()), 2)) <=
                         radius_ &&
-                    sqrt(pow((intersection_x - position_.GetX()), 2) + pow((intersection_y - position_.GetY()), 2)) >=
+                    std::sqrt(std::pow((intersection_x - position_.GetX()), 2) +
+                    std::pow((intersection_y - position_.GetY()), 2)) >=
                         inner_radius_)
                 {
                     dist.push_back(t);
@@ -235,9 +235,11 @@ pair<double, double> Cylinder::DistanceToBorder(const Vector3D& position, const 
                 intersection_x = position.GetX() + t * dir_vec_x;
                 intersection_y = position.GetY() + t * dir_vec_y;
 
-                if (sqrt(pow((intersection_x - position_.GetX()), 2) + pow((intersection_y - position_.GetY()), 2)) <=
+                if (std::sqrt(std::pow((intersection_x - position_.GetX()), 2) +
+                    std::pow((intersection_y - position_.GetY()), 2)) <=
                         radius_ &&
-                    sqrt(pow((intersection_x - position_.GetX()), 2) + pow((intersection_y - position_.GetY()), 2)) >=
+                    std::sqrt(std::pow((intersection_x - position_.GetX()), 2) +
+                    std::pow((intersection_y - position_.GetY()), 2)) >=
                         inner_radius_)
                 {
                     dist.push_back(t);
@@ -279,8 +281,9 @@ pair<double, double> Cylinder::DistanceToBorder(const Vector3D& position, const 
         if (!(dir_vec_x == 0 && dir_vec_y == 0))
         {
 
-            A = pow((position.GetX() - position_.GetX()), 2) + pow((position.GetY() - position_.GetY()), 2) -
-                pow(inner_radius_, 2);
+            A = std::pow((position.GetX() - position_.GetX()), 2) +
+                std::pow((position.GetY() - position_.GetY()), 2) -
+                inner_radius_*inner_radius_;
 
             B = 2 *
                 ((position.GetX() - position_.GetX()) * dir_vec_x + (position.GetY() - position_.GetY()) * dir_vec_y);
@@ -290,12 +293,12 @@ pair<double, double> Cylinder::DistanceToBorder(const Vector3D& position, const 
             B /= C;
             A /= C;
 
-            determinant = pow(B / 2, 2) - A;
+            determinant = 0.25 * B*B - A;
 
             if (determinant > 0) // determinant == 0 (boundery point) is ignored
             {
-                t1 = -1 * B / 2 + sqrt(determinant);
-                t2 = -1 * B / 2 - sqrt(determinant);
+                t1 = -1 * B / 2 + std::sqrt(determinant);
+                t2 = -1 * B / 2 - std::sqrt(determinant);
 
                 // Computer precision controll
                 if (t1 > 0 && t1 < GEOMETRY_PRECISION)
@@ -390,10 +393,12 @@ pair<double, double> Cylinder::DistanceToBorder(const Vector3D& position, const 
                         // |_____|      |_____|
                         //
                         if (position.GetZ() >= z_calc_neg && position.GetZ() <= z_calc_pos &&
-                            sqrt(pow((position.GetX() - position_.GetX()), 2) +
-                                 pow((position.GetY() - position_.GetY()), 2)) <= radius_ + GEOMETRY_PRECISION &&
-                            sqrt(pow((position.GetX() - position_.GetX()), 2) +
-                                 pow((position.GetY() - position_.GetY()), 2)) >= inner_radius_ - GEOMETRY_PRECISION)
+                            std::sqrt(std::pow((position.GetX() - position_.GetX()), 2) +
+                            std::pow((position.GetY() - position_.GetY()), 2)) <=
+                                radius_ + GEOMETRY_PRECISION &&
+                            std::sqrt(std::pow((position.GetX() - position_.GetX()), 2) +
+                            std::pow((position.GetY() - position_.GetY()), 2)) >=
+                                inner_radius_ - GEOMETRY_PRECISION)
                         {
                             if (t1 < distance.first)
                             {

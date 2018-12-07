@@ -3,11 +3,10 @@
 
 #include "PROPOSAL/PROPOSAL.h"
 
-using namespace std;
 using namespace PROPOSAL;
 
 
-ParticleDef getParticleDef(const string& name)
+ParticleDef getParticleDef(const std::string& name)
 {
     if (name == "MuMinus")
     {
@@ -92,8 +91,8 @@ TEST_F(Test_Utilities, Copyconstructor2)
 
 TEST(ContinuousRandomization, Randomize_interpol)
 {
-    ifstream in;
-    string filename = "bin/TestFiles/continous_randomization.txt";
+    std::ifstream in;
+    std::string filename = "bin/TestFiles/continous_randomization.txt";
     in.open(filename.c_str());
 
     if (!in.good())
@@ -109,13 +108,13 @@ TEST(ContinuousRandomization, Randomize_interpol)
     double randomized_energy_new;
     double vcut;
     double ecut;
-    string mediumName;
-    string particleName;
+    std::string mediumName;
+    std::string particleName;
     double rnd;
     double energy_old;
     bool first = true;
 
-    cout.precision(16);
+    std::cout.precision(16);
 
     RandomGenerator::Get().SetSeed(0);
 

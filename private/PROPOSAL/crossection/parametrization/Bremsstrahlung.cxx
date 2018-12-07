@@ -29,7 +29,6 @@
     const std::string Brems##param::name_ = "Brems" #param;
 
 using namespace PROPOSAL;
-using namespace std::placeholders;
 
 /******************************************************************************
  *                               Bremsstrahlung                                *
@@ -119,7 +118,7 @@ Parametrization::IntegralLimits Bremsstrahlung::GetIntegralLimits(double energy)
 
     // The limit is taken from the Petrukhin/Shestakov Parametrization
     limits.vMax =
-        1 - 0.75 * SQRTE * (particle_def_.mass / energy) * pow(components_[component_index_]->GetNucCharge(), 1. / 3);
+        1 - 0.75 * SQRTE * (particle_def_.mass / energy) * std::pow(components_[component_index_]->GetNucCharge(), 1. / 3);
 
     if (limits.vMax < 0)
     {
@@ -159,9 +158,9 @@ double Bremsstrahlung::lpm(double energy, double v)
             Parametrization::IntegralLimits limits = GetIntegralLimits(BIGENERGY);
 
             sum += integral_temp.Integrate(
-                limits.vMin, limits.vUp, std::bind(&Bremsstrahlung::FunctionToDEdxIntegral, this, BIGENERGY, _1), 2);
+                limits.vMin, limits.vUp, std::bind(&Bremsstrahlung::FunctionToDEdxIntegral, this, BIGENERGY, std::placeholders::_1), 2);
             sum += integral_temp.Integrate(
-                limits.vUp, limits.vMax, std::bind(&Bremsstrahlung::FunctionToDEdxIntegral, this, BIGENERGY, _1), 4);
+                limits.vUp, limits.vMax, std::bind(&Bremsstrahlung::FunctionToDEdxIntegral, this, BIGENERGY, std::placeholders::_1), 4);
         }
 
         eLpm_ = ALPHA * (particle_def_.mass);
@@ -177,23 +176,23 @@ double Bremsstrahlung::lpm(double energy, double v)
     const double G1  = 0.710390;
     const double G2  = 0.904912;
 
-    double Z3 = pow(components_[component_index_]->GetNucCharge(), -1. / 3);
+    double Z3 = std::pow(components_[component_index_]->GetNucCharge(), -1. / 3);
 
-    double Dn = 1.54 * pow(components_[component_index_]->GetAtomicNum(), 0.27);
+    double Dn = 1.54 * std::pow(components_[component_index_]->GetAtomicNum(), 0.27);
     s1        = ME * Dn / (particle_def_.mass * Z3 * components_[component_index_]->GetLogConstant());
     s1 *= s1 * SQRT2;
 
     // Calc xi(s') from Stanev, Vankow, Streitmatter, Ellsworth, Bowen
     // Phys. Rev. D 25 (1982), 1291
-    double sp = sqrt(eLpm_ * v / (8 * energy * (1 - v)));
-    double h  = log(sp) / log(s1);
+    double sp = std::sqrt(eLpm_ * v / (8 * energy * (1 - v)));
+    double h  = std::log(sp) / std::log(s1);
 
     if (sp < s1)
     {
         xi = 2;
     } else if (sp < 1)
     {
-        xi = 1 + h - 0.08 * (1 - h) * (1 - (1 - h) * (1 - h)) / log(s1);
+        xi = 1 + h - 0.08 * (1 - h) * (1 - (1 - h) * (1 - h)) / std::log(s1);
     } else
     {
         xi = 1;
@@ -201,13 +200,13 @@ double Bremsstrahlung::lpm(double energy, double v)
 
     Gamma     = RE * ME / (ALPHA * particle_def_.mass * v);
     Gamma     = 1 + 4 * PI * medium_->GetMolDensity() * medium_->GetSumCharge() * RE * Gamma * Gamma;
-    double s  = sp / sqrt(xi) * Gamma;
+    double s  = sp / std::sqrt(xi) * Gamma;
     double s2 = s * s;
 
     if (s < fi1)
     {
         // Stanev et al.,  Phys. Rev. D 25 (1982), 1291 (eq. 14d)
-        fi = 1 - exp(-6 * s * (1 + (3 - PI) * s) + s2 * s / (0.623 + 0.796 * s + 0.658 * s2));
+        fi = 1 - std::exp(-6 * s * (1 + (3 - PI) * s) + s2 * s / (0.623 + 0.796 * s + 0.658 * s2));
     } else
     {
         fi = 1 - 0.012 / (s2 * s2); // Migdal, Phys. Rev. 103 (1956), 1811 (eq. 48)
@@ -216,7 +215,7 @@ double Bremsstrahlung::lpm(double energy, double v)
     if (s < G1)
     {
         //  Stanev et al.,  Phys. Rev. D 25 (1982), 1291 (eq. 15d)
-        ps = 1 - exp(-4 * s - 8 * s2 / (1 + 3.936 * s + 4.97 * s2 - 0.05 * s2 * s + 7.50 * s2 * s2));
+        ps = 1 - std::exp(-4 * s - 8 * s2 / (1 + 3.936 * s + 4.97 * s2 - 0.05 * s2 * s + 7.50 * s2 * s2));
         // Klein, Rev. Mod. Phys. 71 (1999), 1501 (eq. 77)
         G = 3 * ps - 2 * fi;
     } else if (s < G2)
@@ -277,7 +276,7 @@ double BremsPetrukhinShestakov::CalculateParametrization(double energy, double v
     double result = 0;
     double Fd     = 0;
 
-    double Z3 = pow(components_[component_index_]->GetNucCharge(), -1. / 3);
+    double Z3 = std::pow(components_[component_index_]->GetNucCharge(), -1. / 3);
     // least momentum transferred to the nucleus (eq. 2)
     double delta = particle_def_.mass * particle_def_.mass * v / (2 * energy * (1 - v));
 
@@ -296,7 +295,7 @@ double BremsPetrukhinShestakov::CalculateParametrization(double energy, double v
     }
 
     // eq. 3
-    result = ((4. / 3) * (1 - v) + v * v) * log(Fd);
+    result = ((4. / 3) * (1 - v) + v * v) * std::log(Fd);
 
     return result;
 }
@@ -315,25 +314,25 @@ double BremsKelnerKokoulinPetrukhin::CalculateParametrization(double energy, dou
     // least momentum transferred to the nucleus (eq. 7)
     double delta = particle_def_.mass * particle_def_.mass * v / (2 * energy * (1 - v));
 
-    double Z3 = pow(components_[component_index_]->GetNucCharge(), -1. / 3);
-    double Dn = 1.54 * pow(components_[component_index_]->GetAtomicNum(), 0.27);
+    double Z3 = std::pow(components_[component_index_]->GetNucCharge(), -1. / 3);
+    double Dn = 1.54 * std::pow(components_[component_index_]->GetAtomicNum(), 0.27);
     // elastic atomic form factor (eq. 14)
     double formfactor_atomic_elastic =
-        log(1 + ME / (delta * SQRTE * components_[component_index_]->GetLogConstant() * Z3));
+        std::log(1 + ME / (delta * SQRTE * components_[component_index_]->GetLogConstant() * Z3));
     // elastic nuclear form factor (eq. 18)
-    double formfactor_nuclear_elastic = log(Dn / (1 + delta * (Dn * SQRTE - 2) / particle_def_.mass));
+    double formfactor_nuclear_elastic = std::log(Dn / (1 + delta * (Dn * SQRTE - 2) / particle_def_.mass));
 
     // TODO(mario): Better way? Sat 2017/09/02
     double square_momentum   = energy * energy - particle_def_.mass * particle_def_.mass;
-    double particle_momentum = sqrt(std::max(square_momentum, 0.0));
+    double particle_momentum = std::sqrt(std::max(square_momentum, 0.0));
     double maxV              = ME * (energy - particle_def_.mass) / (energy * (energy - particle_momentum + ME));
 
     if (v < maxV)
     {
         // inelastic atomic contribution (eq. 26)
         formfactor_atomic_inelastic =
-            log(particle_def_.mass / (delta * (delta * particle_def_.mass / (ME * ME) + SQRTE))) -
-            log(1 + ME / (delta * SQRTE * components_[component_index_]->GetBPrime() * Z3 * Z3));
+            std::log(particle_def_.mass / (delta * (delta * particle_def_.mass / (ME * ME) + SQRTE))) -
+            std::log(1 + ME / (delta * SQRTE * components_[component_index_]->GetBPrime() * Z3 * Z3));
     }
 
     if (components_[component_index_]->GetNucCharge() != 1)
@@ -347,7 +346,7 @@ double BremsKelnerKokoulinPetrukhin::CalculateParametrization(double energy, dou
     }
 
     // eq. 2
-    result = ((4. / 3) * (1 - v) + v * v) * (log(particle_def_.mass / delta) - 0.5 // eq.3
+    result = ((4. / 3) * (1 - v) + v * v) * (std::log(particle_def_.mass / delta) - 0.5 // eq.3
                                              - formfactor_atomic_elastic - formfactor_nuclear_elastic +
                                              (formfactor_nuclear_inelastic + formfactor_atomic_inelastic) /
                                                  components_[component_index_]->GetNucCharge());
@@ -369,7 +368,7 @@ double BremsCompleteScreening::CalculateParametrization(double energy, double v)
     double result = 0;
     double Lr, fZ, Lp;
 
-    double Z3 = pow(components_[component_index_]->GetNucCharge(), -1. / 3);
+    double Z3 = std::pow(components_[component_index_]->GetNucCharge(), -1. / 3);
 
     aux = ALPHA * components_[component_index_]->GetNucCharge();
     aux *= aux;
@@ -407,8 +406,8 @@ double BremsCompleteScreening::CalculateParametrization(double energy, double v)
 
         default:
         {
-            Lr = log(184.15 * Z3);
-            Lp = log(1194 * Z3 * Z3);
+            Lr = std::log(184.15 * Z3);
+            Lp = std::log(1194 * Z3 * Z3);
             break;
         }
     }
@@ -434,7 +433,7 @@ double BremsAndreevBezrukovBugaev::CalculateParametrization(double energy, doubl
 
     double nucl_Z = components_[component_index_]->GetNucCharge();
 
-    double Z3 = pow(nucl_Z, -1. / 3);
+    double Z3 = std::pow(nucl_Z, -1. / 3);
 
     double a1 = 184.15 * Z3 / (SQRTE * ME);    // eq 2.18
     double a2 = 1194 * Z3 * Z3 / (SQRTE * ME); // eq.2.19
@@ -443,7 +442,7 @@ double BremsAndreevBezrukovBugaev::CalculateParametrization(double energy, doubl
     // eq. 2.30
     double qc   = 1.9 * MMU * Z3;
     aux         = 2 * particle_def_.mass / qc;
-    double zeta = sqrt(1 + aux * aux);
+    double zeta = std::sqrt(1 + aux * aux);
 
     double delta = particle_def_.mass * particle_def_.mass * v / (2 * energy * (1 - v));
     double x1    = a1 * delta;
@@ -457,27 +456,27 @@ double BremsAndreevBezrukovBugaev::CalculateParametrization(double energy, doubl
         d2 = 0;
     } else
     {
-        aux1 = log(particle_def_.mass / qc);
-        aux2 = 0.5 * zeta * log((zeta + 1) / (zeta - 1));
+        aux1 = std::log(particle_def_.mass / qc);
+        aux2 = 0.5 * zeta * std::log((zeta + 1) / (zeta - 1));
         d1   = aux1 + aux2;
         d2   = aux1 + 0.5 * ((3 - zeta * zeta) * aux2 + aux * aux);
     }
 
     // eq. 2.20 and 2.21
     aux  = particle_def_.mass * a1;
-    aux1 = log(aux * aux / (1 + x1 * x1));
+    aux1 = std::log(aux * aux / (1 + x1 * x1));
     aux  = particle_def_.mass * a2;
-    aux2 = log(aux * aux / (1 + x2 * x2));
+    aux2 = std::log(aux * aux / (1 + x2 * x2));
     psi1 = 0.5 * ((1 + aux1) + (1 + aux2) / nucl_Z);
     psi2 = 0.5 * ((2. / 3 + aux1) + (2. / 3 + aux2) / nucl_Z);
 
-    aux1 = x1 * atan(1 / x1);
-    aux2 = x2 * atan(1 / x2);
+    aux1 = x1 * std::atan(1 / x1);
+    aux2 = x2 * std::atan(1 / x2);
     psi1 -= aux1 + aux2 / nucl_Z;
     aux = x1 * x1;
-    psi2 += 2 * aux * (1 - aux1 + 0.75 * log(aux / (1 + aux)));
+    psi2 += 2 * aux * (1 - aux1 + 0.75 * std::log(aux / (1 + aux)));
     aux = x2 * x2;
-    psi2 += 2 * aux * (1 - aux2 + 0.75 * log(aux / (1 + aux))) / nucl_Z;
+    psi2 += 2 * aux * (1 - aux2 + 0.75 * std::log(aux / (1 + aux))) / nucl_Z;
 
     psi1 -= d1;
     psi2 -= d2;
@@ -500,37 +499,37 @@ double BremsSandrockSoedingreksoRhode::CalculateParametrization(double energy, d
 
 
     double Z = components_[component_index_]->GetNucCharge();
-    double Z13 = pow(Z, -1. / 3);
+    double Z13 = std::pow(Z, -1. / 3);
     double rad_log = components_[component_index_]->GetLogConstant();
     double rad_log_inel = components_[component_index_]->GetBPrime();
-    double Dn = 1.54 * pow(components_[component_index_]->GetAtomicNum(), 0.27);
+    double Dn = 1.54 * std::pow(components_[component_index_]->GetAtomicNum(), 0.27);
 
-    double mu_qc = particle_def_.mass / (MMU * exp(1.) / Dn);
-    double rho = sqrt(1.0 + 4.0*mu_qc*mu_qc);
+    double mu_qc = particle_def_.mass / (MMU * std::exp(1.) / Dn);
+    double rho = std::sqrt(1.0 + 4.0*mu_qc*mu_qc);
 
-    double log_rho = log((rho + 1.) / (rho - 1.));
-    double delta1 = log(mu_qc) + 0.5 * rho * log_rho;
-    double delta2 = log(mu_qc) + 0.25 * (3.0*rho - rho*rho*rho) * log_rho + 2.0*mu_qc*mu_qc;
+    double log_rho = std::log((rho + 1.) / (rho - 1.));
+    double delta1 = std::log(mu_qc) + 0.5 * rho * log_rho;
+    double delta2 = std::log(mu_qc) + 0.25 * (3.0*rho - rho*rho*rho) * log_rho + 2.0*mu_qc*mu_qc;
 
     // least momentum transferred to the nucleus (eq. 7)
     double delta = particle_def_.mass * particle_def_.mass * v / (2.0 * energy * (1.0 - v));
 
-    double phi1 = log(rad_log * Z13 * (particle_def_.mass / ME) / (1.0 + rad_log * Z13 * exp(0.5) * delta / ME));
-    double phi2 = log(rad_log * Z13 * exp(-1/6.) * (particle_def_.mass / ME) / (1.0 + rad_log * Z13 * exp(1./3.) * delta / ME));
+    double phi1 = std::log(rad_log * Z13 * (particle_def_.mass / ME) / (1.0 + rad_log * Z13 * exp(0.5) * delta / ME));
+    double phi2 = std::log(rad_log * Z13 * exp(-1/6.) * (particle_def_.mass / ME) / (1.0 + rad_log * Z13 * exp(1./3.) * delta / ME));
     phi1 -= delta1 * (1. - 1./Z);
     phi2 -= delta2 * (1. - 1./Z);
 
     // s_atomic
     double square_momentum   = energy * energy - particle_def_.mass * particle_def_.mass;
-    double particle_momentum = sqrt(std::max(square_momentum, 0.0));
+    double particle_momentum = std::sqrt(std::max(square_momentum, 0.0));
     double maxV = ME * (energy - particle_def_.mass) / (energy * (energy - particle_momentum + ME));
 
     double s_atomic = 0.0;
 
     if (v < maxV)
     {
-        double s_atomic_1 = log(particle_def_.mass / delta / ( particle_def_.mass * delta / (ME * ME) + SQRTE));
-        double s_atomic_2 = log(1. + ME / (delta * rad_log_inel * Z13 * Z13 * SQRTE));
+        double s_atomic_1 = std::log(particle_def_.mass / delta / ( particle_def_.mass * delta / (ME * ME) + SQRTE));
+        double s_atomic_2 = std::log(1. + ME / (delta * rad_log_inel * Z13 * Z13 * SQRTE));
         s_atomic = (4./3. * (1. - v) + v*v) * (s_atomic_1 - s_atomic_2);
     }
 
@@ -553,15 +552,15 @@ double BremsSandrockSoedingreksoRhode::CalculateParametrization(double energy, d
     {
         s_rad = c[0] + c[1] * v + c[2] * v * v;
 
-        double tmp = log(1. - v);
-        s_rad += c[3] * v * log(v) + c[4] * tmp + c[5] * tmp * tmp;
+        double tmp = std::log(1. - v);
+        s_rad += c[3] * v * std::log(v) + c[4] * tmp + c[5] * tmp * tmp;
     }
     else
     {
         s_rad = d[0] + d[1] * v + d[2] * v * v;
 
-        double tmp = log(1. - v);
-        s_rad += d[3] * v * log(v) + d[4] * tmp + d[5] * tmp * tmp;
+        double tmp = std::log(1. - v);
+        s_rad += d[3] * v * std::log(v) + d[4] * tmp + d[5] * tmp * tmp;
     }
 
     return std::max(((2.0 - 2.0 * v + v * v) * phi1 - 2.0/3.0 * (1. - v) * phi2) + 1./Z * s_atomic + 0.25*ALPHA * phi1 * s_rad, 0.);

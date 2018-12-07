@@ -9,7 +9,6 @@
 
 #include <cmath>
 #include <numeric>
-// #include <math.h>
 #include "PROPOSAL/Output.h"
 #include "PROPOSAL/math/Integral.h"
 #include <algorithm>
@@ -17,7 +16,6 @@
 // #include "PROPOSAL/methods.h"
 #include "PROPOSAL/Constants.h"
 
-// using namespace std;
 using namespace PROPOSAL;
 
 //----------------------------------------------------------------------------//
@@ -109,7 +107,7 @@ double Integral::GetUpperLimit()
 
     if (randomDo_)
     {
-        if (fabs(max_ - min_) <= fabs(min_) * COMPUTER_PRECISION)
+        if (std::abs(max_ - min_) <= std::abs(min_) * COMPUTER_PRECISION)
         {
             return min_;
         }
@@ -123,15 +121,15 @@ double Integral::GetUpperLimit()
 
         if (powerOfSubstitution_ > 0)
         {
-            randomX_ = pow(randomX_, -powerOfSubstitution_);
+            randomX_ = std::pow(randomX_, -powerOfSubstitution_);
         } else if (powerOfSubstitution_ < 0)
         {
-            randomX_ = -pow(-randomX_, powerOfSubstitution_);
+            randomX_ = -std::pow(-randomX_, powerOfSubstitution_);
         }
 
         if (useLog_)
         {
-            randomX_ = exp(randomX_);
+            randomX_ = std::exp(randomX_);
         }
 
         return randomX_;
@@ -156,7 +154,7 @@ double Integral::IntegrateWithSubstitution(double min,
     reverse_ = false;
     useLog_  = false;
 
-    if (fabs(max - min) <= fabs(min) * COMPUTER_PRECISION)
+    if (std::abs(max - min) <= std::abs(min) * COMPUTER_PRECISION)
     {
         this->min_ = min;
         this->max_ = max;
@@ -176,13 +174,13 @@ double Integral::IntegrateWithSubstitution(double min,
     {
         if (max > 0 && min > 0)
         {
-            this->min_ = pow(max, -1 / powerOfSubstitution);
-            this->max_ = pow(min, -1 / powerOfSubstitution);
+            this->min_ = std::pow(max, -1 / powerOfSubstitution);
+            this->max_ = std::pow(min, -1 / powerOfSubstitution);
             reverse_   = !reverse_;
         } else if (max > 0)
         {
             this->min_ = 0;
-            this->max_ = pow(max, -1 / powerOfSubstitution);
+            this->max_ = std::pow(max, -1 / powerOfSubstitution);
             aux        = -aux;
         } else
         {
@@ -192,12 +190,12 @@ double Integral::IntegrateWithSubstitution(double min,
     {
         if (max < 0 && min < 0)
         {
-            this->min_ = -pow(-max, 1 / powerOfSubstitution);
-            this->max_ = -pow(-min, 1 / powerOfSubstitution);
+            this->min_ = -std::pow(-max, 1 / powerOfSubstitution);
+            this->max_ = -std::pow(-min, 1 / powerOfSubstitution);
             reverse_   = !reverse_;
         } else if (min < 0)
         {
-            this->min_ = -pow(-min, 1 / powerOfSubstitution);
+            this->min_ = -std::pow(-min, 1 / powerOfSubstitution);
             this->max_ = 0;
             aux        = -aux;
         } else
@@ -228,7 +226,7 @@ double Integral::IntegrateWithSubstitution(double min,
 
     if (randomNumber_ < 0)
     {
-        randomNumber_ /= -fabs(result);
+        randomNumber_ /= -std::abs(result);
 
         if (randomNumber_ > 1)
         {
@@ -257,7 +255,7 @@ double Integral::IntegrateWithLog(double min, double max, std::function<double(d
     reverse_ = false;
     useLog_  = true;
 
-    if (fabs(max - min) <= fabs(min) * COMPUTER_PRECISION)
+    if (std::abs(max - min) <= std::abs(min) * COMPUTER_PRECISION)
     {
         this->min_ = min;
         this->max_ = max;
@@ -274,8 +272,8 @@ double Integral::IntegrateWithLog(double min, double max, std::function<double(d
         aux = 1;
     }
 
-    this->min_ = log(min);
-    this->max_ = log(max);
+    this->min_ = std::log(min);
+    this->max_ = std::log(max);
 
     if (reverse_)
     {
@@ -295,7 +293,7 @@ double Integral::IntegrateWithLog(double min, double max, std::function<double(d
 
     if (randomNumber_ < 0)
     {
-        randomNumber_ /= -fabs(result);
+        randomNumber_ /= -std::abs(result);
 
         if (randomNumber_ > 1)
         {
@@ -607,17 +605,17 @@ double Integral::Function(double x)
         result = 1;
     } else if (powerOfSubstitution_ > 0)
     {
-        t      = pow(x, -powerOfSubstitution_);
+        t      = std::pow(x, -powerOfSubstitution_);
         result = powerOfSubstitution_ * (t / x);
     } else
     {
-        t      = -pow(-x, powerOfSubstitution_);
+        t      = -std::pow(-x, powerOfSubstitution_);
         result = -powerOfSubstitution_ * (t / x);
     }
 
     if (useLog_)
     {
-        t = exp(t);
+        t = std::exp(t);
         result *= t;
     }
     result *= integrand_(t);
@@ -739,7 +737,7 @@ double Integral::Trapezoid3S(int n, double oldSum, int stepNumber)
                     bEq  = (functionValue2 - 5 * functionValue1) / 2;
                     bEq2 = bEq * bEq;
 
-                    if (fabs(aEq * sumDifference) < precision_ * bEq2)
+                    if (std::abs(aEq * sumDifference) < precision_ * bEq2)
                     {
                         approX = sumDifference * 2 / functionSum;
                     } else
@@ -747,7 +745,7 @@ double Integral::Trapezoid3S(int n, double oldSum, int stepNumber)
                         determinant = bEq2 + 4 * aEq * sumDifference;
                         if (determinant >= 0)
                         {
-                            determinant = sqrt(determinant);
+                            determinant = std::sqrt(determinant);
                             approX      = (bEq + determinant) / aEq;
 
                             if (approX < 0 || approX > 3 * stepSize)
@@ -780,7 +778,7 @@ double Integral::Trapezoid3S(int n, double oldSum, int stepNumber)
 #if __cplusplus > 199711L
             approX = std::nexttoward(max_, min_);
 #else
-            approX = max_ - fabs(min_) * COMPUTER_PRECISION;
+            approX = max_ - std::abs(min_) * COMPUTER_PRECISION;
 #endif
         }
         randomX_ = approX;
@@ -800,11 +798,11 @@ Integral::InterpolationResults Integral::Interpolate(int start, double x)
     Integral::InterpolationResults interpolation_results;
 
     num = 0;
-    aux = fabs(x - iX_[start + 0]);
+    aux = std::abs(x - iX_[start + 0]);
 
     for (i = 0; i < romberg_; i++)
     {
-        aux2 = fabs(x - iX_[start + i]);
+        aux2 = std::abs(x - iX_[start + i]);
         if (aux2 < aux)
         {
             num = i;
@@ -822,7 +820,7 @@ Integral::InterpolationResults Integral::Interpolate(int start, double x)
         dd = false;
     } else
     {
-        if (fabs(x - iX_[start + num - 1]) > fabs(x - iX_[start + num + 1]))
+        if (std::abs(x - iX_[start + num - 1]) > std::abs(x - iX_[start + num + 1]))
         {
             dd = true;
         } else
@@ -913,7 +911,7 @@ double Integral::RombergIntegrateClosed()
                 error /= value;
             }
 
-            if (fabs(error) < precision_)
+            if (std::abs(error) < precision_)
             {
                 return value;
             }
@@ -987,7 +985,7 @@ double Integral::RombergIntegrateOpened()
                 error /= value;
             }
 
-            if (fabs(error) < precision_)
+            if (std::abs(error) < precision_)
             {
                 return value;
             }
@@ -1037,7 +1035,7 @@ double Integral::RombergIntegrateOpened(double bigValue)
             value                 = interpolation_results.Value;
             error /= bigValue;
 
-            if (fabs(error) < precision_)
+            if (std::abs(error) < precision_)
             {
                 return value;
             }
@@ -1095,7 +1093,7 @@ double Integral::IntegrateClosed(double min, double max, std::function<double(do
     double aux;
     aux = InitIntegralOpenedAndClosed(min, max, integrand);
 
-    if (fabs(max_ - min_) <= fabs(min_) * COMPUTER_PRECISION)
+    if (std::abs(max_ - min_) <= std::abs(min_) * COMPUTER_PRECISION)
     {
         return 0;
     }
@@ -1110,7 +1108,7 @@ double Integral::IntegrateOpened(double min, double max, std::function<double(do
     double aux;
     aux = InitIntegralOpenedAndClosed(min, max, integrand);
 
-    if (fabs(max_ - min_) <= fabs(min_) * COMPUTER_PRECISION)
+    if (std::abs(max_ - min_) <= std::abs(min_) * COMPUTER_PRECISION)
     {
         return 0;
     }
@@ -1144,12 +1142,12 @@ double Integral::InitIntegralWithSubstitution(double min,
     {
         if (max > 0 && min > 0)
         {
-            this->min_ = pow(max, -1 / powerOfSubstitution);
-            this->max_ = pow(min, -1 / powerOfSubstitution);
+            this->min_ = std::pow(max, -1 / powerOfSubstitution);
+            this->max_ = std::pow(min, -1 / powerOfSubstitution);
         } else if (max > 0)
         {
             this->min_ = 0;
-            this->max_ = pow(max, -1 / powerOfSubstitution);
+            this->max_ = std::pow(max, -1 / powerOfSubstitution);
             aux        = -aux;
         } else
         {
@@ -1159,11 +1157,11 @@ double Integral::InitIntegralWithSubstitution(double min,
     {
         if (max < 0 && min < 0)
         {
-            this->min_ = -pow(-max, 1 / powerOfSubstitution);
-            this->max_ = -pow(-min, 1 / powerOfSubstitution);
+            this->min_ = -std::pow(-max, 1 / powerOfSubstitution);
+            this->max_ = -std::pow(-min, 1 / powerOfSubstitution);
         } else if (min < 0)
         {
-            this->min_ = -pow(-min, 1 / powerOfSubstitution);
+            this->min_ = -std::pow(-min, 1 / powerOfSubstitution);
             this->max_ = 0;
             aux        = -aux;
         } else
@@ -1196,7 +1194,7 @@ double Integral::IntegrateWithSubstitution(double min,
 
     aux = InitIntegralWithSubstitution(min, max, integrand, powerOfSubstitution);
 
-    if (fabs(max_ - min_) <= fabs(min_) * COMPUTER_PRECISION)
+    if (std::abs(max_ - min_) <= std::abs(min_) * COMPUTER_PRECISION)
     {
         return 0;
     }
@@ -1270,7 +1268,7 @@ void Integral::RefineUpperLimit(double result)
             // fhi = f;
         }
 
-        if (((currentX - xhi) * df - f) * ((currentX - xlow) * df - f) > 0 || fabs(2 * f) > fabs(deltaOld * df))
+        if (((currentX - xhi) * df - f) * ((currentX - xlow) * df - f) > 0 || std::abs(2 * f) > std::abs(deltaOld * df))
         {
             deltaOld = deltaX;
             deltaX   = (xhi - xlow) / 2;
@@ -1295,13 +1293,13 @@ void Integral::RefineUpperLimit(double result)
 
         if (df == 0)
         {
-            if (fabs(deltaX) < precision_ * (maxStore - minStore))
+            if (std::abs(deltaX) < precision_ * (maxStore - minStore))
             {
                 break;
             }
         } else
         {
-            if (fabs(df * deltaX) < precision_ * fabs(result))
+            if (std::abs(df * deltaX) < precision_ * std::abs(result))
             {
                 break;
             }
@@ -1354,8 +1352,8 @@ double Integral::InitIntegralWithLog(double min, double max, std::function<doubl
         aux = 1;
     }
 
-    this->min_           = log(min);
-    this->max_           = log(max);
+    this->min_           = std::log(min);
+    this->max_           = std::log(max);
     this->integrand_     = integrand;
     powerOfSubstitution_ = 0;
     randomNumber_        = 0;
@@ -1373,7 +1371,7 @@ double Integral::IntegrateWithLog(double min, double max, std::function<double(d
 
     aux = InitIntegralWithLog(min, max, integrand);
 
-    if (fabs(max_ - min_) <= fabs(min_) * COMPUTER_PRECISION)
+    if (std::abs(max_ - min_) <= std::abs(min_) * COMPUTER_PRECISION)
     {
         return 0;
     }
@@ -1410,12 +1408,12 @@ double Integral::InitIntegralWithLogSubstitution(double min,
     {
         if (max > 1 && min > 1)
         {
-            this->min_ = pow(log(max), -1 / powerOfSubstitution);
-            this->max_ = pow(log(min), -1 / powerOfSubstitution);
+            this->min_ = std::pow(std::log(max), -1 / powerOfSubstitution);
+            this->max_ = std::pow(std::log(min), -1 / powerOfSubstitution);
         } else if (max > 1)
         {
             this->min_ = 0;
-            this->max_ = pow(log(max), -1 / powerOfSubstitution);
+            this->max_ = std::pow(std::log(max), -1 / powerOfSubstitution);
             aux        = -aux;
         } else
         {
@@ -1425,11 +1423,11 @@ double Integral::InitIntegralWithLogSubstitution(double min,
     {
         if (max < 1 && min < 1)
         {
-            this->min_ = -pow(-log(max), 1 / powerOfSubstitution);
-            this->max_ = -pow(-log(min), 1 / powerOfSubstitution);
+            this->min_ = -std::pow(-std::log(max), 1 / powerOfSubstitution);
+            this->max_ = -std::pow(-std::log(min), 1 / powerOfSubstitution);
         } else if (min < 1)
         {
-            this->min_ = -pow(-log(min), 1 / powerOfSubstitution);
+            this->min_ = -std::pow(-std::log(min), 1 / powerOfSubstitution);
             this->max_ = 0;
             aux        = -aux;
         } else
@@ -1438,8 +1436,8 @@ double Integral::InitIntegralWithLogSubstitution(double min,
         }
     } else
     {
-        this->min_ = log(min);
-        this->max_ = log(max);
+        this->min_ = std::log(min);
+        this->max_ = std::log(max);
     }
 
     this->integrand_           = integrand;
@@ -1463,7 +1461,7 @@ double Integral::IntegrateWithLogSubstitution(double min,
 
     aux = InitIntegralWithLogSubstitution(min, max, integrand, powerOfSubstitution);
 
-    if (fabs(max_ - min_) <= fabs(min_) * COMPUTER_PRECISION)
+    if (std::abs(max_ - min_) <= std::abs(min_) * COMPUTER_PRECISION)
     {
         return 0;
     }

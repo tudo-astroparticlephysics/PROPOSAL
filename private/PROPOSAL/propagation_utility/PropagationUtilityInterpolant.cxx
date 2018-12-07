@@ -13,8 +13,6 @@
 #include "PROPOSAL/math/InterpolantBuilder.h"
 
 using namespace PROPOSAL;
-using namespace std::placeholders;
-using namespace std;
 
 /******************************************************************************
  *                              Utility Integral                              *
@@ -160,14 +158,14 @@ double UtilityInterpolantDisplacement::Calculate(double ei, double ef, double rn
 {
     (void)rnd;
 
-    if (fabs(ei - ef) > fabs(ei) * HALF_PRECISION)
+    if (std::abs(ei - ef) > std::abs(ei) * HALF_PRECISION)
     {
         double aux;
 
         stored_result_ = interpolant_->Interpolate(ei);
         aux            = stored_result_ - interpolant_->Interpolate(ef);
 
-        if (fabs(aux) > fabs(stored_result_) * HALF_PRECISION)
+        if (std::abs(aux) > std::abs(stored_result_) * HALF_PRECISION)
         {
             return std::max(aux, 0.0);
         }
@@ -185,7 +183,7 @@ double UtilityInterpolantDisplacement::GetUpperLimit(double ei, double rnd)
         double aux;
         aux = interpolant_->FindLimit(stored_result_ - rnd);
 
-        if (fabs(aux) > fabs(ei) * HALF_PRECISION)
+        if (std::abs(aux) > std::abs(ei) * HALF_PRECISION)
         {
             return std::min(std::max(aux, utility_.GetParticleDef().low), ei);
         }
@@ -269,7 +267,7 @@ double UtilityInterpolantInteraction::Calculate(double ei, double ef, double rnd
 
 double UtilityInterpolantInteraction::GetUpperLimit(double ei, double rnd)
 {
-    if (abs(rnd) > abs(stored_result_) * HALF_PRECISION)
+    if (std::abs(rnd) > std::abs(stored_result_) * HALF_PRECISION)
     {
         double aux;
 
@@ -281,7 +279,7 @@ double UtilityInterpolantInteraction::GetUpperLimit(double ei, double rnd)
             aux = interpolant_->FindLimit(stored_result_ + rnd);
         }
 
-        if (abs(ei - aux) > abs(ei) * HALF_PRECISION)
+        if (std::abs(ei - aux) > std::abs(ei) * HALF_PRECISION)
         {
             return std::min(std::max(aux, utility_.GetParticleDef().low), ei);
         }
@@ -311,9 +309,9 @@ void UtilityInterpolantInteraction::InitInterpolation(const std::string& name,
     Integral integral(IROMB, IMAXS, IPREC2);
     const ParticleDef& particle_def = utility_.GetParticleDef();
 
-    double a = abs(-integral.Integrate(
+    double a = std::abs(-integral.Integrate(
         particle_def.low, particle_def.low * 10, std::bind(&UtilityIntegral::FunctionToIntegral, &utility, std::placeholders::_1), 4));
-    double b = abs(-integral.Integrate(
+    double b = std::abs(-integral.Integrate(
         BIGENERGY, BIGENERGY / 10, std::bind(&UtilityIntegral::FunctionToIntegral, &utility, std::placeholders::_1), 4));
 
     if (a < b)
@@ -389,13 +387,13 @@ double UtilityInterpolantDecay::Calculate(double ei, double ef, double rnd)
 
 double UtilityInterpolantDecay::GetUpperLimit(double ei, double rnd)
 {
-    if (abs(rnd) > abs(stored_result_) * HALF_PRECISION)
+    if (std::abs(rnd) > std::abs(stored_result_) * HALF_PRECISION)
     {
         double aux;
 
         aux = interpolant_->FindLimit(stored_result_ + rnd);
 
-        if (abs(ei - aux) > abs(ei) * HALF_PRECISION)
+        if (std::abs(ei - aux) > std::abs(ei) * HALF_PRECISION)
         {
             return std::min(std::max(aux, utility_.GetParticleDef().low), ei);
         }
@@ -417,9 +415,9 @@ void UtilityInterpolantDecay::InitInterpolation(const std::string& name,
     Integral integral(IROMB, IMAXS, IPREC2);
     const ParticleDef& particle_def = utility_.GetParticleDef();
 
-    double a = abs(-integral.Integrate(
+    double a = std::abs(-integral.Integrate(
         particle_def.low, particle_def.low * 10, std::bind(&UtilityIntegral::FunctionToIntegral, &utility, std::placeholders::_1), 4));
-    double b = abs(-integral.Integrate(
+    double b = std::abs(-integral.Integrate(
         BIGENERGY, BIGENERGY / 10, std::bind(&UtilityIntegral::FunctionToIntegral, &utility, std::placeholders::_1), 4));
 
     if (a < b)
@@ -462,12 +460,12 @@ double UtilityInterpolantTime::Calculate(double ei, double ef, double rnd)
 {
     (void)rnd;
 
-    if (abs(ei - ef) > abs(ei) * HALF_PRECISION)
+    if (std::abs(ei - ef) > std::abs(ei) * HALF_PRECISION)
     {
         double aux  = interpolant_->Interpolate(ei);
         double aux2 = aux - interpolant_->Interpolate(ef);
 
-        if (abs(aux2) > abs(aux) * HALF_PRECISION)
+        if (std::abs(aux2) > std::abs(aux) * HALF_PRECISION)
         {
             return aux2;
         }
@@ -525,16 +523,16 @@ UtilityInterpolantContRand::~UtilityInterpolantContRand() {}
 
 double UtilityInterpolantContRand::Calculate(double ei, double ef, double rnd)
 {
-    if (abs(ei - ef) > abs(ei) * HALF_PRECISION)
+    if (std::abs(ei - ef) > std::abs(ei) * HALF_PRECISION)
     {
         double aux  = interpolant_->Interpolate(ei);
         double aux2 = aux - interpolant_->Interpolate(ef);
 
-        if (abs(aux2) > abs(aux) * HALF_PRECISION)
-            return max(aux2, 0.0);
+        if (std::abs(aux2) > std::abs(aux) * HALF_PRECISION)
+            return std::max(aux2, 0.0);
     } else
     {
-        return max(interpolant_diff_->Interpolate((ei + ef) / 2) * (ef - ei), 0.0);
+        return std::max(interpolant_diff_->Interpolate((ei + ef) / 2) * (ef - ei), 0.0);
     }
 
     // If the previous conditions do not hold, create a temporary integral.
@@ -593,12 +591,12 @@ double UtilityInterpolantScattering::Calculate(double ei, double ef, double rnd)
 {
     (void)rnd;
 
-    if (fabs(ei - ef) > fabs(ei) * HALF_PRECISION)
+    if (std::abs(ei - ef) > std::abs(ei) * HALF_PRECISION)
     {
         double aux  = interpolant_->Interpolate(ei);
         double aux2 = aux - interpolant_->Interpolate(ef);
 
-        if (fabs(aux2) > fabs(aux) * HALF_PRECISION)
+        if (std::abs(aux2) > std::abs(aux) * HALF_PRECISION)
         {
             return aux2;
         } else

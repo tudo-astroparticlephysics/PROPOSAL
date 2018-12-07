@@ -110,8 +110,8 @@ double HardComponent::CalculateHardComponent(double energy, double v)
 
     sum = 0;
     aux = 1;
-    lov = log(v) / LOG10;
-    loe = log(energy) / LOG10 - 3;
+    lov = std::log(v) / LOG10;
+    loe = std::log(energy) / LOG10 - 3;
 
     for (unsigned int i = 0; i < interpolant_.size(); i++)
     {
@@ -180,10 +180,10 @@ double ShadowDuttaRenoSarcevicSeckel::CalculateShadowEffect(const Components::Co
 
     if (x < 0.0014)
     {
-        return pow(component.GetAtomicNum(), -0.1);
+        return std::pow(component.GetAtomicNum(), -0.1);
     } else if (x < 0.04)
     {
-        return pow(component.GetAtomicNum(), 0.069 * log(x) / LOG10 + 0.097);
+        return std::pow(component.GetAtomicNum(), 0.069 * std::log(x) / LOG10 + 0.097);
     } else
     {
         return 1;
@@ -234,20 +234,20 @@ double ShadowButkevichMikhailov::CalculateShadowEffect(const Components::Compone
         m3 = M3 * component.GetMN();
         nu *= 1.e-3;
         // eq. 53
-        sgn = 112.2 * (0.609 * pow(nu, 0.0988) + 1.037 * pow(nu, -0.5944));
+        sgn = 112.2 * (0.609 * std::pow(nu, 0.0988) + 1.037 * std::pow(nu, -0.5944));
 
         // Bezrukav Bugaev shadow
-        tmp = 0.00282 * pow(component.GetAtomicNum(), 1. / 3) * sgn;
+        tmp = 0.00282 * std::pow(component.GetAtomicNum(), 1. / 3) * sgn;
         G   = (3 / tmp) * (0.5 + ((1 + tmp) * exp(-tmp) - 1) / (tmp * tmp));
 
         // eq. 55
         G  = 0.75 * G + 0.25;
-        x0 = pow(G / (1 + m2), 1 / m1);
+        x0 = std::pow(G / (1 + m2), 1 / m1);
 
         if (x >= x0)
         {
             // eq. 49
-            G = pow(x, m1) * (1 + m2) * (1 - m3 * x);
+            G = std::pow(x, m1) * (1 + m2) * (1 - m3 * x);
         }
     }
 

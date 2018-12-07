@@ -83,7 +83,7 @@ inline void hash_combine(std::size_t& seed, const T& v, Rest... rest) {
 ///
 /// @return inverse error function of at x
 // ----------------------------------------------------------------------------
-float myErfInv2(float x);
+double myErfInv2(float x);
 
 //----------------------------------------------------------------------------//
 int RoundValue(double val);

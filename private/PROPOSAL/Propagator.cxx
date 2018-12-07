@@ -23,7 +23,6 @@
 
 #include "PROPOSAL/Constants.h"
 
-using namespace std;
 using namespace PROPOSAL;
 
 // ------------------------------------------------------------------------- //
@@ -568,7 +567,7 @@ std::vector<DynamicData*> Propagator::Propagate(double MaxDistance_cm)
 // ------------------------------------------------------------------------- //
 void Propagator::ChooseCurrentCollection(const Vector3D& particle_position, const Vector3D& particle_direction)
 {
-    vector<int> crossed_collections;
+    std::vector<int> crossed_collections;
     crossed_collections.resize(0);
 
     for (unsigned int i = 0; i < sectors_.size(); i++)
@@ -705,7 +704,7 @@ double Propagator::CalculateEffectiveDistance(const Vector3D& particle_position,
                         (*iter)->GetGeometry()->DistanceToBorder(particle_position, particle_direction).first;
                     if (tmp_distance_to_border <= 0)
                         continue;
-                    distance_to_collection_border = min(tmp_distance_to_border, distance_to_collection_border);
+                    distance_to_collection_border = std::min(tmp_distance_to_border, distance_to_collection_border);
                 }
             }
         }
@@ -720,7 +719,7 @@ double Propagator::CalculateEffectiveDistance(const Vector3D& particle_position,
                     (*iter)->GetGeometry()->DistanceToBorder(particle_position, particle_direction).first;
                 if (tmp_distance_to_border <= 0)
                     continue;
-                distance_to_collection_border = min(tmp_distance_to_border, distance_to_collection_border);
+                distance_to_collection_border = std::min(tmp_distance_to_border, distance_to_collection_border);
             }
 
         }
@@ -737,7 +736,7 @@ double Propagator::CalculateEffectiveDistance(const Vector3D& particle_position,
                         (*iter)->GetGeometry()->DistanceToBorder(particle_position, particle_direction).first;
                     if (tmp_distance_to_border <= 0)
                         continue;
-                    distance_to_collection_border = min(tmp_distance_to_border, distance_to_collection_border);
+                    distance_to_collection_border = std::min(tmp_distance_to_border, distance_to_collection_border);
                 }
                 // The particle_ reached the border of all specified collections
                 else
@@ -751,7 +750,7 @@ double Propagator::CalculateEffectiveDistance(const Vector3D& particle_position,
 
     distance_to_closest_approach = detector_->DistanceToClosestApproach(particle_position, particle_direction);
 
-    if (abs(distance_to_closest_approach) < GEOMETRY_PRECISION)
+    if (std::abs(distance_to_closest_approach) < GEOMETRY_PRECISION)
     {
         particle_.SetClosestApproachPoint(particle_position);
         particle_.SetClosestApproachEnergy(particle_.GetEnergy());
@@ -764,16 +763,16 @@ double Propagator::CalculateEffectiveDistance(const Vector3D& particle_position,
     {
         if (distance_to_closest_approach > 0)
         {
-            return min(distance_to_detector, min(distance_to_collection_border, distance_to_closest_approach));
+            return std::min(distance_to_detector, std::min(distance_to_collection_border, distance_to_closest_approach));
         } else
         {
-            return min(distance_to_detector, distance_to_collection_border);
+            return std::min(distance_to_detector, distance_to_collection_border);
         }
     } else
     {
         if (distance_to_closest_approach > 0)
         {
-            return min(distance_to_closest_approach, distance_to_collection_border);
+            return std::min(distance_to_closest_approach, distance_to_collection_border);
         } else
         {
             return distance_to_collection_border;

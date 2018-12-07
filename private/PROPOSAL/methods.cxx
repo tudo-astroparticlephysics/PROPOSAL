@@ -28,22 +28,21 @@
 #include "PROPOSAL/Output.h"
 #include "PROPOSAL/methods.h"
 
-// using namespace std;
 
 namespace PROPOSAL {
 
-float myErfInv2(float x)
+double myErfInv2(double x)
 {
-    float tt1, tt2, lnx, sgn;
-    sgn = (x < 0) ? -1.0f : 1.0f;
+    double tt1, tt2, lnx, sgn;
+    sgn = (x < 0) ? -1.0 : 1.0;
 
     x   = (1 - x) * (1 + x); // x = 1 - x*x;
-    lnx = logf(x);
+    lnx = std::log(x);
 
-    tt1 = 2 / (3.141592653589793 * 0.147) + 0.5f * lnx;
+    tt1 = 2 / (PI * 0.147) + 0.5 * lnx;
     tt2 = 1 / (0.147) * lnx;
 
-    return (sgn * sqrtf(-tt1 + sqrtf(tt1 * tt1 - tt2)));
+    return (sgn * std::sqrt(-tt1 + std::sqrt(tt1 * tt1 - tt2)));
 }
 
 // round a given double to the closest int
@@ -93,26 +92,26 @@ double dilog(double x)
         {
             Y  = -1.0 / (1.0 + _T);
             S  = 1.0;
-            B1 = log(-_T);
-            B2 = log(1.0 + 1.0 / _T);
+            B1 = std::log(-_T);
+            B2 = std::log(1.0 + 1.0 / _T);
             A  = -PI * PI / 3.0 + HF * (B1 * B1 - B2 * B2);
         } else if (_T < -1.0)
         {
             Y = -1.0 - _T;
             S = -1.0;
-            A = log(-_T);
-            A = -PI * PI / 6.0 + A * (A + log(1 + 1 / _T));
+            A = std::log(-_T);
+            A = -PI * PI / 6.0 + A * (A + std::log(1 + 1 / _T));
         } else if (_T <= -0.5)
         {
             Y = -(1 + _T) / _T;
             S = 1.0;
-            A = log(-_T);
-            A = -PI * PI / 6.0 + A * (-HF * A + log(1.0 + _T));
+            A = std::log(-_T);
+            A = -PI * PI / 6.0 + A * (-HF * A + std::log(1.0 + _T));
         } else if (_T < 0.0)
         {
             Y = -_T / (1 + _T);
             S = -1.0;
-            A = log(1 + _T);
+            A = std::log(1 + _T);
             A = HF * A * A;
         } else if (_T <= 1.0)
         {
@@ -123,7 +122,7 @@ double dilog(double x)
         {
             Y = 1.0 / _T;
             S = -1.0;
-            A = log(_T);
+            A = std::log(_T);
             A = PI * PI / 6 + HF * A * A;
         }
 
@@ -242,8 +241,6 @@ void InitializeInterpolation(const std::string name,
                              const std::vector<Parametrization*>& parametrizations,
                              const InterpolationDef interpolation_def)
 {
-    using namespace std;
-
     log_debug("Initialize %s interpolation.", name.c_str());
 
     bool storing_failed = false;
@@ -270,7 +267,7 @@ void InitializeInterpolation(const std::string name,
         }
     }
 
-    stringstream filename;
+    std::stringstream filename;
     filename << pathname << "/" << name << "_" << hash_digest;
 
     if (!raw)
@@ -286,7 +283,7 @@ void InitializeInterpolation(const std::string name,
 
             if (raw)
             {
-                input.open(filename.str().c_str(), ios::binary);
+                input.open(filename.str().c_str(), std::ios::binary);
             } else
             {
                 input.open(filename.str().c_str());
@@ -327,11 +324,11 @@ void InitializeInterpolation(const std::string name,
 
             log_debug("%s tables will be saved to file: %s", name.c_str(), filename.str().c_str());
 
-            ofstream output;
+            std::ofstream output;
 
             if (raw)
             {
-                output.open(filename.str().c_str(), ios::binary);
+                output.open(filename.str().c_str(), std::ios::binary);
             } else
             {
                 output.open(filename.str().c_str());

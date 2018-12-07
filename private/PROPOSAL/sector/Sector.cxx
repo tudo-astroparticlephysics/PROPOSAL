@@ -17,7 +17,6 @@
 #include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
 #include "PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h"
 
-using namespace std;
 using namespace PROPOSAL;
 
 /******************************************************************************
@@ -277,7 +276,7 @@ double Sector::Propagate(double distance)
 
     std::vector<Particle*> decay_products;
 
-    pair<double, DynamicData::Type> energy_loss;
+    std::pair<double, DynamicData::Type> energy_loss;
 
     DynamicData* continuous_loss = NULL;
 
@@ -287,7 +286,7 @@ double Sector::Propagate(double distance)
     // first: final energy befor first interaction second: energy at which the
     // particle decay
     // first and second are compared to decide if interaction happens or decay
-    pair<double, double> energy_till_stochastic_;
+    std::pair<double, double> energy_till_stochastic_;
 
     if (distance < 0)
     {
@@ -348,7 +347,7 @@ double Sector::Propagate(double distance)
 
         propagated_distance += displacement;
 
-        if (abs(distance - propagated_distance) < abs(distance) * COMPUTER_PRECISION)
+        if (std::abs(distance - propagated_distance) < std::abs(distance) * COMPUTER_PRECISION)
         {
             propagated_distance = distance; // computer precision control
         }
@@ -431,7 +430,7 @@ double Sector::Propagate(double distance)
         //       why is the time increased randomly?
         //       it doesn't make sense for me (jsoedingrekso)
         // particle_.GetEnergy() = particle_.GetParticleDef().mass;
-        // particle_.GetTime() -= particle_.GetLifetime()*log(RandomGenerator::Get().RandomDouble());
+        // particle_.GetTime() -= particle_.GetLifetime()*std::log(RandomGenerator::Get().RandomDouble());
         decay_products = particle_.GetDecayTable().SelectChannel().Decay(particle_);
         Output::getInstance().FillSecondaryVector(decay_products);
 
@@ -454,13 +453,13 @@ double Sector::Propagate(double distance)
 
 std::pair<double, double> Sector::CalculateEnergyTillStochastic(double initial_energy)
 {
-    double rndd = -log(RandomGenerator::Get().RandomDouble());
-    double rndi = -log(RandomGenerator::Get().RandomDouble());
+    double rndd = -std::log(RandomGenerator::Get().RandomDouble());
+    double rndi = -std::log(RandomGenerator::Get().RandomDouble());
 
     double rndiMin = 0;
     double rnddMin = 0;
 
-    pair<double, double> final;
+    std::pair<double, double> final;
 
     // solving the tracking integral
     if (particle_.GetLifetime() < 0)
@@ -518,7 +517,7 @@ void Sector::AdvanceParticle(double dr, double ei, double ef)
     particle_.SetTime(time);
 }
 
-pair<double, DynamicData::Type> Sector::MakeStochasticLoss()
+std::pair<double, DynamicData::Type> Sector::MakeStochasticLoss()
 {
     double rnd1 = RandomGenerator::Get().RandomDouble();
     double rnd2 = RandomGenerator::Get().RandomDouble();
@@ -531,7 +530,7 @@ pair<double, DynamicData::Type> Sector::MakeStochasticLoss()
     std::vector<CrossSection*> cross_sections = utility_.GetCrosssections();
 
     // return 0 and unknown, if there is no interaction
-    pair<double, DynamicData::Type> energy_loss;
+    std::pair<double, DynamicData::Type> energy_loss;
     energy_loss.first  = 0.;
     energy_loss.second = DynamicData::None;
 
@@ -543,11 +542,11 @@ pair<double, DynamicData::Type> Sector::MakeStochasticLoss()
     {
         if (sector_def_.stochastic_loss_weighting > 0)
         {
-            rnd2 = 1 - rnd2 * pow(rnd2, abs(sector_def_.stochastic_loss_weighting));
+            rnd2 = 1 - rnd2 * std::pow(rnd2, std::abs(sector_def_.stochastic_loss_weighting));
         }
         else
         {
-            rnd2 = rnd2 * pow(rnd2, abs(sector_def_.stochastic_loss_weighting));
+            rnd2 = rnd2 * std::pow(rnd2, std::abs(sector_def_.stochastic_loss_weighting));
         }
     }
 

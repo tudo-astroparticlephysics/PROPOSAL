@@ -1,10 +1,9 @@
 
 #include "PROPOSAL/Output.h"
 
-using namespace std;
 using namespace PROPOSAL;
 
-vector<DynamicData*> Output::secondarys_;
+std::vector<DynamicData*> Output::secondarys_;
 bool Output::store_in_root_trees_ = false;
 bool Output::store_in_ASCII_file_ = false;
 
@@ -14,7 +13,7 @@ void Output::SetLoggingConfigurationFile(std::string file)
     log4cplus::PropertyConfigurator::doConfigure(LOG4CPLUS_TEXT(file));
 #else
     (void) file;
-    cout << "Log4cplus not found! No log messages will be shown!" << endl;
+    std::cout << "Log4cplus not found! No log messages will be shown!" << std::endl;
 #endif
 }
 
@@ -212,7 +211,7 @@ void Output::StorePropagatedPrimaryInTree(Particle* prop_primary)
 //----------------------------------------------------------------------------//
 
 // ------------------------------------------------------------------------- //
-void Output::EnableASCIIOutput(string ASCII_Prefix, bool append)
+void Output::EnableASCIIOutput(std::string ASCII_Prefix, bool append)
 {
     if (store_in_ASCII_file_)
     {
@@ -220,36 +219,36 @@ void Output::EnableASCIIOutput(string ASCII_Prefix, bool append)
         return;
     }
 
-    stringstream ss;
+    std::stringstream ss;
 
     ss.str("");
     ss << ASCII_Prefix << "_secondarys.txt";
     if (append)
     {
-        secondary_ascii_.open(ss.str().c_str(), ios::app);
+        secondary_ascii_.open(ss.str().c_str(), std::ios::app);
     } else
     {
-        secondary_ascii_.open(ss.str().c_str(), ios::out);
+        secondary_ascii_.open(ss.str().c_str(), std::ios::out);
     }
 
     ss.str("");
     ss << ASCII_Prefix << "_primarys.txt";
     if (append)
     {
-        primary_ascii_.open(ss.str().c_str(), ios::app);
+        primary_ascii_.open(ss.str().c_str(), std::ios::app);
     } else
     {
-        primary_ascii_.open(ss.str().c_str(), ios::out);
+        primary_ascii_.open(ss.str().c_str(), std::ios::out);
     }
 
     ss.str("");
     ss << ASCII_Prefix << "_propagated_primarys.txt";
     if (append)
     {
-        propagated_primary_ascii_.open(ss.str().c_str(), ios::app);
+        propagated_primary_ascii_.open(ss.str().c_str(), std::ios::app);
     } else
     {
-        propagated_primary_ascii_.open(ss.str().c_str(), ios::out);
+        propagated_primary_ascii_.open(ss.str().c_str(), std::ios::out);
     }
 
     if (!(propagated_primary_ascii_.is_open() && secondary_ascii_.is_open() && primary_ascii_.is_open()))
@@ -279,7 +278,7 @@ void Output::StorePrimaryInASCII(Particle* primary)
     {
         primary_ascii_ << primary->GetPosition() << "\t" << primary->GetTime() << "\t" << primary->GetDirection()
                        << "\t" << primary->GetEnergy() << "\t" << primary->GetParentParticleId() << "\t"
-                       << primary->GetParticleId() << "\t" << primary->GetName() << endl;
+                       << primary->GetParticleId() << "\t" << primary->GetName() << std::endl;
     }
 }
 
@@ -297,63 +296,63 @@ void Output::StorePropagatedPrimaryInASCII(Particle* prop_primary)
                                   << prop_primary->GetExitEnergy() << "\t" << prop_primary->GetClosestApproachPoint()
                                   << "\t" << prop_primary->GetClosestApproachTime() << "\t"
                                   << prop_primary->GetClosestApproachEnergy() << "\t"
-                                  << prop_primary->GetPropagatedDistance() << "\t" << prop_primary->GetElost() << endl;
+                                  << prop_primary->GetPropagatedDistance() << "\t" << prop_primary->GetElost() << std::endl;
     }
 }
 
 // ------------------------------------------------------------------------- //
 void Output::WriteDescriptionFile()
 {
-    ofstream description;
-    description.open("ASCII_OUTPUT_DESCRIPTION.txt", ios_base::out);
+    std::ofstream description;
+    description.open("ASCII_OUTPUT_DESCRIPTION.txt", std::ios_base::out);
 
-    description << "Primary" << endl;
-    description << "\tposition      position-coordinates of the particle in cm from detector center [cm]" << endl;
-    description << "\tt				time-coordinate * [s]" << endl;
+    description << "Primary" << std::endl;
+    description << "\tposition      position-coordinates of the particle in cm from detector center [cm]" << std::endl;
+    description << "\tt				time-coordinate * [s]" << std::endl;
     description << "\tdirection     direction of the particle in cartesian [cm] and spherical [rad] coordinates"
-                << endl;
-    description << "\tenergy			particle energy [MeV]" << endl;
+                << std::endl;
+    description << "\tenergy			particle energy [MeV]" << std::endl;
     description << "\tparentParticleId		Id of the parent particle (in real simulation e.g. HE4 Nucleus)"
-                << endl;
-    description << "\tparticleId			Id of the particle" << endl;
-    description << "\tname			name of the particle" << endl;
+                << std::endl;
+    description << "\tparticleId			Id of the particle" << std::endl;
+    description << "\tname			name of the particle" << std::endl;
 
-    description << endl;
+    description << std::endl;
 
-    description << "Propagated Primary" << endl;
-    description << "\tposition      position-coordinates of the particle in cm from detector center [cm]" << endl;
-    description << "\tt				time-coordinate * [s]" << endl;
+    description << "Propagated Primary" << std::endl;
+    description << "\tposition      position-coordinates of the particle in cm from detector center [cm]" << std::endl;
+    description << "\tt				time-coordinate * [s]" << std::endl;
     description << "\tdirection     direction of the particle in cartesian [cm] and spherical [rad] coordinates"
-                << endl;
-    description << "\tenergy			particle energy [MeV]" << endl;
+                << std::endl;
+    description << "\tenergy			particle energy [MeV]" << std::endl;
     description << "\tparentParticleId		Id of the parent particle (in real simulation e.g. HE4 Nucleus)"
-                << endl;
-    description << "\tparticleId			Id of the particle" << endl;
-    description << "\tname			name of the particle" << endl;
-    description << "\tentry_point       coordinates of the particle entering the detector center [cm]" << endl;
-    description << "\tti				time-coordinate * [s]" << endl;
-    description << "\tenergyi			particle energy * [MeV]" << endl;
-    description << "\texit_point        coordinate of the particle exiting the detector center [cm]" << endl;
-    description << "\ttf				time-coordinate * [s]" << endl;
-    description << "\tenergyf			particle energy * [MeV]" << endl;
+                << std::endl;
+    description << "\tparticleId			Id of the particle" << std::endl;
+    description << "\tname			name of the particle" << std::endl;
+    description << "\tentry_point       coordinates of the particle entering the detector center [cm]" << std::endl;
+    description << "\tti				time-coordinate * [s]" << std::endl;
+    description << "\tenergyi			particle energy * [MeV]" << std::endl;
+    description << "\texit_point        coordinate of the particle exiting the detector center [cm]" << std::endl;
+    description << "\ttf				time-coordinate * [s]" << std::endl;
+    description << "\tenergyf			particle energy * [MeV]" << std::endl;
     description << "\tclosest_approach_point    coordinate of the particles closes approach to the detector center [cm]"
-                << endl;
-    description << "\ttc				time-coordinate * [s]" << endl;
-    description << "\tenergyc			particle energy * [MeV]" << endl;
-    description << "\tpropagated distance	propagated distance of the particle [cm]" << endl;
-    description << "\tElost				particle energy which was lost in the detector [MeV]" << endl;
+                << std::endl;
+    description << "\ttc				time-coordinate * [s]" << std::endl;
+    description << "\tenergyc			particle energy * [MeV]" << std::endl;
+    description << "\tpropagated distance	propagated distance of the particle [cm]" << std::endl;
+    description << "\tElost				particle energy which was lost in the detector [MeV]" << std::endl;
 
-    description << "Secondary" << endl;
-    description << "\tposition      position-coordinates of the secondary in cm from detector center [cm]" << endl;
-    description << "\tt				time-coordinate * [s]" << endl;
+    description << "Secondary" << std::endl;
+    description << "\tposition      position-coordinates of the secondary in cm from detector center [cm]" << std::endl;
+    description << "\tt				time-coordinate * [s]" << std::endl;
     description << "\tdirection     direction of the particle in cartesian [cm] and spherical [rad] coordinates"
-                << endl;
-    description << "\tenergy			secondary energy [MeV]" << endl;
+                << std::endl;
+    description << "\tenergy			secondary energy [MeV]" << std::endl;
     description << "\tparentParticleId		Id of the parent particle (in real simulation e.g. HE4 Nucleus)"
-                << endl;
-    description << "\tparticleId			Id of the particle (here propagated particle ID +1)" << endl;
-    description << "\tname			name of the secondary" << endl;
-    description << "\tParentEnergy		energy of the particle which created the secondary [MeV]" << endl;
+                << std::endl;
+    description << "\tparticleId			Id of the particle (here propagated particle ID +1)" << std::endl;
+    description << "\tname			name of the secondary" << std::endl;
+    description << "\tParentEnergy		energy of the particle which created the secondary [MeV]" << std::endl;
 
     description.close();
 }

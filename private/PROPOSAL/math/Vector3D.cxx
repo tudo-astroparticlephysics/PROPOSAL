@@ -222,10 +222,9 @@ void Vector3D::normalise()
 
 void Vector3D::CalculateCartesianFromSpherical()
 {
-    using namespace std;
-    x_ = spheric_radius_ * cos(spheric_azimuth_) * sin(spheric_zenith_);
-    y_ = spheric_radius_ * sin(spheric_azimuth_) * sin(spheric_zenith_);
-    z_ = spheric_radius_ * cos(spheric_zenith_);
+    x_ = spheric_radius_ * std::cos(spheric_azimuth_) * std::sin(spheric_zenith_);
+    y_ = spheric_radius_ * std::sin(spheric_azimuth_) * std::sin(spheric_zenith_);
+    z_ = spheric_radius_ * std::cos(spheric_zenith_);
 }
 
 void Vector3D::CalculateSphericalCoordinates()
@@ -247,9 +246,8 @@ void Vector3D::CalculateSphericalCoordinates()
 
 // void Vector3D::CalculateCartesianFromCylindrical()
 // {
-//     using namespace std;
-//     x_ = cylindric_radius_*cos(cylindric_azimuth_);
-//     y_ = cylindric_radius_*sin(cylindric_azimuth_);
+//     x_ = cylindric_radius_*std::cos(cylindric_azimuth_);
+//     y_ = cylindric_radius_*std::sin(cylindric_azimuth_);
 //     z_ = cylindric_height_;
 // }
 

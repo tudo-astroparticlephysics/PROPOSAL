@@ -15,7 +15,6 @@
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/methods.h"
 
-using namespace std;
 using namespace PROPOSAL;
 
 /******************************************************************************
@@ -24,31 +23,31 @@ using namespace PROPOSAL;
 
 namespace PROPOSAL {
 
-ostream& operator<<(ostream& os, Medium const& medium)
+std::ostream& operator<<(std::ostream& os, Medium const& medium)
 {
 
     std::stringstream ss;
     ss << " Medium (" << &medium << ") ";
     os << Helper::Centered(60, ss.str()) << '\n';
 
-    os << medium.name_ << endl;
-    os << "number of components:\t\t\t\t" << medium.numComponents_ << endl;
-    os << "mass density [g/cm3]:\t\t\t\t" << medium.massDensity_ << endl;
-    os << "molecule density [number/cm3]:\t\t\t" << medium.molDensity_ << endl;
-    os << "<Z/A>:\t\t\t\t\t\t" << medium.ZA_ << endl;
-    os << "sum of nucleons of all nuclei:\t\t\t" << medium.sumNucleons_ << endl;
-    os << "ionization potential [eV]:\t\t\t" << medium.I_ << endl;
-    os << "refraction index:\t\t\t\t" << medium.r_ << endl;
-    os << "average all-component nucleon weight [MeV]:\t" << medium.MM_ << endl;
-    os << "multiplicative density correction factor:\t" << medium.rho_ << endl;
-    os << "sum of charges of all nuclei:\t\t\t" << medium.sumCharge_ << endl;
-    os << "radiation Length:\t\t" << medium.radiationLength_ << endl;
+    os << medium.name_ << std::endl;
+    os << "number of components:\t\t\t\t" << medium.numComponents_ << std::endl;
+    os << "mass density [g/cm3]:\t\t\t\t" << medium.massDensity_ << std::endl;
+    os << "molecule density [number/cm3]:\t\t\t" << medium.molDensity_ << std::endl;
+    os << "<Z/A>:\t\t\t\t\t\t" << medium.ZA_ << std::endl;
+    os << "sum of nucleons of all nuclei:\t\t\t" << medium.sumNucleons_ << std::endl;
+    os << "ionization potential [eV]:\t\t\t" << medium.I_ << std::endl;
+    os << "refraction index:\t\t\t\t" << medium.r_ << std::endl;
+    os << "average all-component nucleon weight [MeV]:\t" << medium.MM_ << std::endl;
+    os << "multiplicative density correction factor:\t" << medium.rho_ << std::endl;
+    os << "sum of charges of all nuclei:\t\t\t" << medium.sumCharge_ << std::endl;
+    os << "radiation Length:\t\t" << medium.radiationLength_ << std::endl;
 
     for (std::vector<Components::Component*>::const_iterator iter = medium.components_.begin();
          iter != medium.components_.end();
          ++iter)
     {
-        os << **iter << endl;
+        os << **iter << std::endl;
     }
 
     os << Helper::Centered(60, "");
@@ -715,8 +714,8 @@ double Medium::X0_inv(unsigned int Z, double M)
     if (Z > 4) // Elements Z>4
     {
         // Thomas-Fermi-Moliere model (Tsai eq. B21)
-        Lrad      = log(184.15 * pow(Z, -1. / 3.));
-        Lrad_dash = log(1194. * pow(Z, -2. / 3.));
+        Lrad      = std::log(184.15 * std::pow(Z, -1. / 3.));
+        Lrad_dash = std::log(1194. * std::pow(Z, -2. / 3.));
     }
     // Tsai table B2
     else if (Z == 1) // Hydrogen

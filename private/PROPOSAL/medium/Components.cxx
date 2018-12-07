@@ -16,7 +16,6 @@
 
 using namespace PROPOSAL;
 using namespace PROPOSAL::Components;
-using namespace std::placeholders;
 
 #define COMPONENT_IMPL(cls, SYMBOL, ATOMICNUM, NUCCHARGE)                                                              \
     cls::cls(double atomInMolecule)                                                                                    \
@@ -91,7 +90,7 @@ Component::Component(std::string name, double nucCharge, double atomicNum, doubl
         r0_ = 1.12 * r0_ - 0.86 / r0_;
 
         mN_ = 1.0 - 4.0 * PI * 0.17 *
-                        integral.Integrate(r0_, -1.0, std::bind(&Component::FunctionToIntegral, this, _1), 3, 2.0) /
+                        integral.Integrate(r0_, -1.0, std::bind(&Component::FunctionToIntegral, this, std::placeholders::_1), 3, 2.0) /
                         atomicNum_;
     }
 }

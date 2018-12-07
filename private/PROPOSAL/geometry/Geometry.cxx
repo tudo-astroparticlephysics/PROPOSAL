@@ -12,7 +12,6 @@
 
 #include "PROPOSAL/methods.h"
 
-using namespace std;
 using namespace PROPOSAL;
 
 /******************************************************************************
@@ -21,13 +20,13 @@ using namespace PROPOSAL;
 
 namespace PROPOSAL {
 
-ostream& operator<<(ostream& os, Geometry const& geometry)
+std::ostream& operator<<(std::ostream& os, Geometry const& geometry)
 {
     std::stringstream ss;
     ss << " Geometry (" << &geometry << ") ";
     os << Helper::Centered(60, ss.str()) << '\n';
 
-    os << geometry.name_ << endl;
+    os << geometry.name_ << std::endl;
     os << "Position:\n" << geometry.position_ << '\n';
     os << "Hierarchy:\t" << geometry.hierarchy_ << '\n';
 
@@ -68,11 +67,9 @@ Geometry::Geometry(const Geometry& geometry)
 // ------------------------------------------------------------------------- //
 void Geometry::swap(Geometry& geometry)
 {
-    using std::swap;
-
     position_.swap(geometry.position_);
     name_.swap(geometry.name_);
-    swap(hierarchy_, geometry.hierarchy_);
+    std::swap(hierarchy_, geometry.hierarchy_);
 }
 
 // ------------------------------------------------------------------------- //
@@ -115,7 +112,7 @@ bool Geometry::IsInside(const Vector3D& position, const Vector3D& direction)
 {
     bool is_inside = false;
 
-    pair<double, double> dist = DistanceToBorder(position, direction);
+    std::pair<double, double> dist = DistanceToBorder(position, direction);
 
     if (dist.first > 0 && dist.second < 0)
     {
@@ -129,7 +126,7 @@ bool Geometry::IsInfront(const Vector3D& position, const Vector3D& direction)
 {
     bool is_infront = false;
 
-    pair<double, double> dist = DistanceToBorder(position, direction);
+    std::pair<double, double> dist = DistanceToBorder(position, direction);
 
     if (dist.first > 0 && dist.second > 0)
     {
@@ -143,7 +140,7 @@ bool Geometry::IsBehind(const Vector3D& position, const Vector3D& direction)
 {
     bool is_behind = false;
 
-    pair<double, double> dist = DistanceToBorder(position, direction);
+    std::pair<double, double> dist = DistanceToBorder(position, direction);
 
     if (dist.first < 0 && dist.second < 0)
     {

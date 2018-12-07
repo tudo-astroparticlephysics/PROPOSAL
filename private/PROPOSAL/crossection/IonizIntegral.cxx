@@ -12,7 +12,6 @@
 #include "PROPOSAL/Output.h"
 
 using namespace PROPOSAL;
-using namespace std::placeholders;
 
 IonizIntegral::IonizIntegral(const Ionization& param)
     : CrossSectionIntegral(DynamicData::DeltaE, param)
@@ -49,12 +48,12 @@ double IonizIntegral::CalculatedEdx(double energy)
     // PDG eq. 33.10
     // with Spin 1/2 correction by Rossi
     double square_momentum   = energy * energy - particle_def.mass * particle_def.mass;
-    double particle_momentum = sqrt(std::max(square_momentum, 0.0));
+    double particle_momentum = std::sqrt(std::max(square_momentum, 0.0));
     double beta              = particle_momentum / energy;
     double gamma             = energy / particle_def.mass;
 
     aux    = beta * gamma / (1.e-6 * medium.GetI());
-    result = log(limits.vUp * (2 * ME * energy)) + 2 * log(aux);
+    result = std::log(limits.vUp * (2 * ME * energy)) + 2 * std::log(aux);
     aux    = limits.vUp / (2 * (1 + 1 / gamma));
     result += aux * aux;
     aux = beta * beta;
@@ -71,7 +70,7 @@ double IonizIntegral::CalculatedEdx(double energy)
            energy * dedx_integral_.Integrate(
                         limits.vMin,
                         limits.vUp,
-                        std::bind(&Parametrization::FunctionToDEdxIntegral, parametrization_, energy, _1),
+                        std::bind(&Parametrization::FunctionToDEdxIntegral, parametrization_, energy, std::placeholders::_1),
                         4);
 }
 
@@ -88,7 +87,7 @@ double IonizIntegral::CalculatedE2dx(double energy)
     return de2dx_integral_.Integrate(
         limits.vMin,
         limits.vUp,
-        std::bind(&Parametrization::FunctionToDE2dxIntegral, parametrization_, energy, _1),
+        std::bind(&Parametrization::FunctionToDE2dxIntegral, parametrization_, energy, std::placeholders::_1),
         2);
 }
 
@@ -105,7 +104,7 @@ double IonizIntegral::CalculatedNdx(double energy)
     sum_of_rates_ =
         dndx_integral_[0].Integrate(limits.vUp,
                                     limits.vMax,
-                                    std::bind(&Parametrization::FunctionToDNdxIntegral, parametrization_, energy, _1),
+                                    std::bind(&Parametrization::FunctionToDNdxIntegral, parametrization_, energy, std::placeholders::_1),
                                     3,
                                     1);
 
@@ -127,7 +126,7 @@ double IonizIntegral::CalculatedNdx(double energy, double rnd)
     sum_of_rates_ = dndx_integral_[0].IntegrateWithRandomRatio(
         limits.vUp,
         limits.vMax,
-        std::bind(&Parametrization::FunctionToDNdxIntegral, parametrization_, energy, _1),
+        std::bind(&Parametrization::FunctionToDNdxIntegral, parametrization_, energy, std::placeholders::_1),
         3,
         rnd,
         1);
@@ -165,14 +164,14 @@ double IonizIntegral::Delta(double beta, double gamma)
     const Medium& medium = parametrization_->GetMedium();
     double X;
 
-    X = log(beta * gamma) / log(10);
+    X = std::log(beta * gamma) / std::log(10);
 
     if (X < medium.GetX0())
     {
-        return medium.GetD0() * pow(10, 2 * (X - medium.GetX0()));
+        return medium.GetD0() * std::pow(10, 2 * (X - medium.GetX0()));
     } else if (X < medium.GetX1())
     {
-        return 2 * LOG10 * X + medium.GetC() + medium.GetA() * pow(medium.GetX1() - X, medium.GetM());
+        return 2 * LOG10 * X + medium.GetC() + medium.GetA() * std::pow(medium.GetX1() - X, medium.GetM());
     } else
     {
         return 2 * LOG10 * X + medium.GetC();

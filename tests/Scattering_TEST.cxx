@@ -16,10 +16,9 @@
 
 #include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
 
-using namespace std;
 using namespace PROPOSAL;
 
-ParticleDef getParticleDef(const string& name)
+ParticleDef getParticleDef(const std::string& name)
 {
     if (name == "MuMinus")
     {
@@ -131,8 +130,8 @@ TEST(Assignment, Copyconstructor2)
 
 TEST(Scattering, Scatter)
 {
-    ifstream in;
-    string filename = "bin/TestFiles/Scattering_scatter.txt";
+    std::ifstream in;
+    std::string filename = "bin/TestFiles/Scattering_scatter.txt";
 
     in.open(filename.c_str());
 
@@ -141,9 +140,9 @@ TEST(Scattering, Scatter)
         std::cerr << "File \"" << filename << "\" not found" << std::endl;
     }
 
-    string particleName;
-    string mediumName;
-    string parametrization;
+    std::string particleName;
+    std::string mediumName;
+    std::string parametrization;
 
     double energy_init, energy_final, distance;
     double energy_previous = -1;
@@ -154,7 +153,7 @@ TEST(Scattering, Scatter)
     double x_f, y_f, z_f;
     double radius_f, phi_f, theta_f;
 
-    cout.precision(16);
+    std::cout.precision(16);
     RandomGenerator::Get().SetSeed(1234);
     double error    = 1e-3;
     bool first_line = true;
