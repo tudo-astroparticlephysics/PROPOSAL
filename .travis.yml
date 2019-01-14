@@ -43,6 +43,9 @@
 language: cpp
 sudo: require
 
+git:
+  depth: 10
+
 matrix:
   include:
     - os: linux
