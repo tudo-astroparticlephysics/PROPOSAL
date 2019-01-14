@@ -99,45 +99,62 @@ I3Particle SimplePropagator::propagate(const I3Particle& p,
 {
     I3Particle endpoint(p);
 
-    double x, y, z, theta, phi;
+    double x = p.GetPos().GetX() / I3Units::cm;
+    double y = p.GetPos().GetY() / I3Units::cm;
+    double z = p.GetPos().GetZ() / I3Units::cm;
 
-    PROPOSAL::Particle& pp = propagator_->GetParticle();
-    pp.SetParentParticleId(0);
-    pp.SetParticleId(0);
+    double theta = p.GetDir().CalcTheta() / I3Units::radian;
+    double phi   = p.GetDir().CalcPhi() / I3Units::radian;
 
-    x = p.GetPos().GetX() / I3Units::cm;
-    y = p.GetPos().GetY() / I3Units::cm;
-    z = p.GetPos().GetZ() / I3Units::cm;
+    double energy = p.GetEnergy() / I3Units::MeV;
+    double time   = p.GetTime() / I3Units::second;
+    double length = p.GetLength() / I3Units::cm;
 
-    theta = p.GetDir().CalcTheta() / I3Units::radian;
-    phi   = p.GetDir().CalcPhi() / I3Units::radian;
+    // The Muons from NuGen have NaN as default propagated length.
+    // So this has to be corrected.
+    if (isnan(length))
+    {
+        length = 0.0;
+    }
+    else if (isinf(length))
+    {
+        log_fatal("the propagated length is Inf, should be finite or NaN.");
+    }
 
-    pp.SetPosition(PROPOSAL::Vector3D(x, y, z));
+    PROPOSAL::Particle& particle = propagator_->GetParticle();
+    particle.SetParentParticleId(0);
+    particle.SetParticleId(0);
+
+    particle.SetPosition(PROPOSAL::Vector3D(x, y, z));
 
     PROPOSAL::Vector3D direction;
     direction.SetSphericalCoordinates(1.0, phi, theta);
     direction.CalculateCartesianFromSpherical();
-    pp.SetDirection(direction);
+    particle.SetDirection(direction);
 
-    pp.SetEnergy(p.GetEnergy() / I3Units::MeV);
-    pp.SetTime(p.GetTime() / I3Units::second);
-    pp.SetPropagatedDistance(p.GetLength() / I3Units::cm);
+    particle.SetEnergy(energy);
+    particle.SetTime(time);
+    particle.SetPropagatedDistance(length);
 
     std::vector<PROPOSAL::DynamicData*> history = propagator_->Propagate(distance / I3Units::cm);
 
-    x = pp.GetPosition().GetX() * I3Units::cm;
-    y = pp.GetPosition().GetY() * I3Units::cm;
-    z = pp.GetPosition().GetZ() * I3Units::cm;
+    x = particle.GetPosition().GetX() * I3Units::cm;
+    y = particle.GetPosition().GetY() * I3Units::cm;
+    z = particle.GetPosition().GetZ() * I3Units::cm;
 
-    theta = pp.GetDirection().GetTheta() * I3Units::radian;
-    phi   = pp.GetDirection().GetPhi() * I3Units::radian;
+    theta = particle.GetDirection().GetTheta() * I3Units::radian;
+    phi   = particle.GetDirection().GetPhi() * I3Units::radian;
+
+    energy = particle.GetEnergy() * I3Units::MeV;
+    time   = particle.GetTime() * I3Units::second;
+    length = particle.GetPropagatedDistance() * I3Units::cm;
 
     endpoint.SetPos(x, y, z);
     endpoint.SetThetaPhi(theta, phi);
 
-    endpoint.SetEnergy(pp.GetEnergy() * I3Units::MeV);
-    endpoint.SetLength(pp.GetPropagatedDistance() * I3Units::cm);
-    endpoint.SetTime(pp.GetTime() * I3Units::second);
+    endpoint.SetEnergy(energy);
+    endpoint.SetLength(length);
+    endpoint.SetTime(time);
 
     // Tomasz
     if (losses)
@@ -150,9 +167,9 @@ I3Particle SimplePropagator::propagate(const I3Particle& p,
 
         if (final_stochastic_loss_ != I3Particle::unknown)
         {
-            I3Particle i3_particle = I3PROPOSALParticleConverter::GenerateI3Particle(pp);
+            I3Particle i3_particle = I3PROPOSALParticleConverter::GenerateI3Particle(particle);
             i3_particle.SetType(final_stochastic_loss_);
-            i3_particle.SetEnergy(pp.GetEnergy() - pp.GetParticleDef().mass);
+            i3_particle.SetEnergy(particle.GetEnergy() - particle.GetParticleDef().mass);
 
             losses->push_back(i3_particle);
         }
