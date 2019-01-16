@@ -210,11 +210,11 @@ PROPOSAL::Particle I3PROPOSALParticleConverter::GeneratePROPOSALParticle(const I
 
     // The Muons from NuGen have NaN as default propagated length.
     // So this has to be corrected.
-    if (isnan(length))
+    if (std::isnan(length))
     {
         length = 0.0;
     }
-    else if (isinf(length))
+    else if (std::isinf(length))
     {
         log_fatal("the propagated length is Inf, should be finite or NaN.");
     }
