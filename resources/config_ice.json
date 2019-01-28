@@ -7,7 +7,7 @@
 		"interpolation":
 		{
 			"do_interpolation" : true,
-			"path_to_tables" : ["../resources/tables"],
+			"path_to_tables" : ["resources/tables"],
 			"do_binary_tables" : false
 		},
 
@@ -48,7 +48,7 @@
 	"sectors": [
 		{
 			"hierarchy": 0,
-			"medium": "uranium",
+			"medium": "ice",
 			"density_correction": 1,
 
 			"geometry":
