@@ -45,7 +45,7 @@ SimplePropagator::SimplePropagator(I3Particle::ParticleType pt,
     // Geometry
 
     PROPOSAL::Vector3D position(0.0, 0.0, 0.0);
-    PROPOSAL::Sphere detector(position, 0.0, 1e18);
+    PROPOSAL::Sphere detector(position, 1e18, 0.0);
 
     sec_def.SetGeometry(detector);
 
