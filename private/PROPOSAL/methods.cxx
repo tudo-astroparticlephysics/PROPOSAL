@@ -15,6 +15,7 @@
 #include <string>
 #include <cmath>
 #include <sys/stat.h>
+#include <climits> // for PATH_MAX
 #include <wordexp.h> // Used to expand path with environment variables
 #include <unistd.h> // check for write permissions
 
