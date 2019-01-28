@@ -13,7 +13,7 @@
 
 		"exact_time" : true,
 		"stopping_decay" : true,
-		"scattering" : "Highland",
+		"scattering" : "Moliere",
 
 		"brems_multiplier" : 1,
 		"photo_multiplier" : 1,
