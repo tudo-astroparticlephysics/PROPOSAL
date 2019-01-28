@@ -70,6 +70,8 @@ public:
 
         bool operator==(const Definition&) const;
         bool operator!=(const Definition&) const;
+        Definition& operator= (const Definition&);
+        void swap(Definition&);
 
         void SetMedium(const Medium&);
         const Medium& GetMedium() const { return *medium_; }

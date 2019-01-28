@@ -1,4 +1,5 @@
 
+#include <sstream>
 #include "PROPOSAL/EnergyCutSettings.h"
 #include "PROPOSAL/methods.h"
 

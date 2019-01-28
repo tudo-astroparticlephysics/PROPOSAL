@@ -31,15 +31,8 @@
 
 #include <deque>
 
-#include <boost/math/special_functions/erf.hpp>
 #include <vector>
 #include <functional>
-
-// necessary since the boost function does not work for [-1,1] but for (-1,1)
-#define FIXPREC 0.9999999999999999
-// #define erfInv(x) myErfInv2(FIXPREC*x)
-#define erfInv(x) boost::math::erf_inv(FIXPREC* x)
-
 
 #define PROPOSAL_MAKE_HASHABLE(type, ...) \
     namespace std {\
@@ -83,15 +76,18 @@ inline void hash_combine(std::size_t& seed, const T& v, Rest... rest) {
 ///
 /// @return inverse error function of at x
 // ----------------------------------------------------------------------------
-double myErfInv2(float x);
-
-//----------------------------------------------------------------------------//
-int RoundValue(double val);
+double inverseErrorFunction(double x);
 
 // ----------------------------------------------------------------------------
-/// @brief Calculate the dilogarithums
+/// @brief Calculate the dilogarithm
 ///
-/// @param x
+/// @param x real argument
+///
+/// Originally translated by R.Brun from CERNLIB DILOG function C332
+///
+/// Implemented as a truncated series expansion in terms of Chebyshev
+/// polynomials, see [Yudell L. Luke: Mathematical functions and their
+/// approximations, Academic Press Inc., New York 1975, p.67].
 ///
 /// @return dilog(x)
 // ----------------------------------------------------------------------------

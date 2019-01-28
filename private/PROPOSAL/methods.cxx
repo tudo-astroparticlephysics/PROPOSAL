@@ -7,13 +7,13 @@
  *   \author Jan-Hendrik Koehne
  */
 
-// #include <cmath>
 // #include <stdlib.h>
 
 #include <fstream>
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <cmath>
 #include <sys/stat.h>
 #include <wordexp.h> // Used to expand path with environment variables
 #include <unistd.h> // check for write permissions
@@ -31,41 +31,67 @@
 
 namespace PROPOSAL {
 
-double myErfInv2(double x)
+double inverseErrorFunction(double p)
 {
-    double tt1, tt2, lnx, sgn;
-    sgn = (x < 0) ? -1.0 : 1.0;
-
-    x   = (1 - x) * (1 + x); // x = 1 - x*x;
-    lnx = std::log(x);
-
-    tt1 = 2 / (PI * 0.147) + 0.5 * lnx;
-    tt2 = 1 / (0.147) * lnx;
-
-    return (sgn * std::sqrt(-tt1 + std::sqrt(tt1 * tt1 - tt2)));
-}
-
-// round a given double to the closest int
-int RoundValue(double val)
-{
-    bool minus   = false;
-    int valRound = 0;
-
-    if (val < 0)
+    if (p <= 0 || p >= 1)
     {
-        val *= -1;
-        minus = true;
+        log_fatal("The inverse Error function can just handle values between 0 and 1.");
+    }
+    double a_arr[] = {-3.969683028665376e+01,
+                      2.209460984245205e+02,
+                      -2.759285104469687e+02,
+                      1.383577518672690e+02,
+                      -3.066479806614716e+01,
+                      2.506628277459239e+00};
+    double b_arr[] = {-5.447609879822406e+01,
+                      1.615858368580409e+02,
+                      -1.556989798598866e+02,
+                      6.680131188771972e+01,
+                      -1.328068155288572e+01};
+    double c_arr[] = {-7.784894002430293e-03,
+                      -3.223964580411365e-01,
+                      -2.400758277161838e+00,
+                      -2.549732539343734e+00,
+                      4.374664141464968e+00,
+                      2.938163982698783e+00};
+    double d_arr[] = {7.784695709041462e-03,
+                      3.224671290700398e-01,
+                      2.445134137142996e+00,
+                      3.754408661907416e+00};
+    double p_low = 0.02425;
+    double p_high = 1 - p_low;
+
+    double q,r,x,e,u;
+    if (p < p_low)
+    {
+        // Rational approximation for lower region.
+        q = std::sqrt(-2 * std::log(p));
+        x = (((((c_arr[0]*q+c_arr[1])*q+c_arr[2])*q+c_arr[3])*q+c_arr[4])*q+c_arr[5]) /
+            ((((d_arr[0]*q+d_arr[1])*q+d_arr[2])*q+d_arr[3])*q+1);
+    }
+    else if (p_low <= p && p <= p_high)
+    {
+        // Rational approximation for central region.
+        q = p - 0.5;
+        r = q*q;
+        x = (((((a_arr[0]*r+a_arr[1])*r+a_arr[2])*r+a_arr[3])*r+a_arr[4])*r+a_arr[5])*q /
+            (((((b_arr[0]*r+b_arr[1])*r+b_arr[2])*r+b_arr[3])*r+b_arr[4])*r+1);
+    }
+    else
+    {
+        // Rational approximation for upper region.
+        q = std::sqrt(-2 * std::log(1 - p));
+        x = -(((((c_arr[0]*q+c_arr[1])*q+c_arr[2])*q+c_arr[3])*q+c_arr[4])*q+c_arr[5]) /
+            ((((d_arr[0]*q+d_arr[1])*q+d_arr[2])*q+d_arr[3])*q+1);
     }
 
-    val += 0.5;
-    valRound = (int)val;
-
-    if (minus)
-    {
-        valRound *= -1;
-    }
-
-    return valRound;
+    // Refining the result:
+    // One iteration of Halley’s rational method (third order)
+    // gives full machine precision.
+    e = 0.5 * std::erfc(-x/SQRT2) - p;
+    u = e * std::sqrt(2 * PI) * std::exp(0.5 * x * x);
+    x = x - u / (1 + x * u * 0.5);
+    return x;
 }
 
 // ------------------------------------------------------------------------- //

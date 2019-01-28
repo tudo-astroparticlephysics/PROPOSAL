@@ -30,6 +30,7 @@
 #pragma once
 
 #include <functional>
+#include <cmath>
 
 #include "PROPOSAL/crossection/parametrization/Parametrization.h"
 #include "PROPOSAL/medium/Medium.h"

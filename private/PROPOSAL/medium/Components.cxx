@@ -8,6 +8,9 @@
  */
 
 #include <functional>
+#include <cmath>
+#include <sstream>
+#include <iomanip>
 
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/math/Integral.h"
@@ -138,7 +141,7 @@ bool Component::operator!=(const Component& component) const
 // ------------------------------------------------------------------------- //
 void Component::SetLogConstant()
 {
-    int z = RoundValue(nucCharge_);
+    int z = std::round(nucCharge_);
     switch (z)
     {
         case 1:
@@ -245,7 +248,7 @@ void Component::SetLogConstant()
 // ------------------------------------------------------------------------- //
 void Component::SetBPrime()
 {
-    int z = RoundValue(nucCharge_);
+    int z = std::round(nucCharge_);
     switch (z)
     {
         case 1:

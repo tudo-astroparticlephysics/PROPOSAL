@@ -4,15 +4,18 @@
 		"seed" : 1,
 		"continous_loss_output" : false,
 
-		"interpolate" : true,
-		"path_to_tables" : [
-			"$PROPOSALTABLEDIR",
-			"$I3_TESTDATA/PROPOSAL/resources/tables",
-			"$I3_TESTDATA/PROPOSAL/tables",
-			"$I3_BUILD/PROPOSAL/resources/tables",
-			"$I3_BUILD/PROPOSAL/tables"
-		],
-		"raw" : false,
+		"interpolation":
+		{
+			"do_interpolation" : true,
+			"path_to_tables" : [
+				"$PROPOSALTABLEDIR",
+				"$I3_TESTDATA/PROPOSAL/resources/tables",
+				"$I3_TESTDATA/PROPOSAL/tables",
+				"$I3_BUILD/PROPOSAL/resources/tables",
+				"$I3_BUILD/PROPOSAL/tables"
+			],
+			"do_binary_tables" : false
+		},
 
 		"exact_time" : true,
 		"scattering" : "HighlandIntegral",
@@ -21,15 +24,24 @@
 		"photo" : "PhotoAbramowiczLevinLevyMaor97",
 		"lpm" : true,
 
-		"ecut_inside" : 500,
-		"ecut_infront" : -1,
-		"ecut_behind" : -1,
-		"vcut_inside" : -1,
-		"vcut_infront" : 0.05,
-		"vcut_behind" : -1,
-		"cont_inside" : false,
-		"cont_infront" : true,
-		"cont_behind" : false
+		"cuts_infront":
+		{
+			"e_cut": -1,
+			"v_cut": 0.05,
+			"cont_rand": true
+		},
+		"cuts_inside":
+		{
+			"e_cut": 500,
+			"v_cut": -1,
+			"cont_rand": false
+		},
+		"cuts_behind":
+		{
+			"e_cut": -1,
+			"v_cut": -1,
+			"cont_rand": false
+		}
 	},
 
 	"sectors": [

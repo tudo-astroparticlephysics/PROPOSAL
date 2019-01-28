@@ -1,4 +1,5 @@
 
+#include <sstream>
 #include "PROPOSAL/crossection/parametrization/Parametrization.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/methods.h"
