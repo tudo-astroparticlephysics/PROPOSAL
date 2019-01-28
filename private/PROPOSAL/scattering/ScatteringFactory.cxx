@@ -1,8 +1,6 @@
 
 #include <algorithm>
 
-#include <algorithm>
-
 #include "PROPOSAL/Output.h"
 #include "PROPOSAL/scattering/ScatteringFactory.h"
 #include "PROPOSAL/scattering/ScatteringHighland.h"
