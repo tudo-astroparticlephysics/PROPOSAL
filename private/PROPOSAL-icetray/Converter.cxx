@@ -200,8 +200,24 @@ PROPOSAL::Particle I3PROPOSALParticleConverter::GeneratePROPOSALParticle(const I
     double x = p.GetPos().GetX() / I3Units::cm;
     double y = p.GetPos().GetY() / I3Units::cm;
     double z = p.GetPos().GetZ() / I3Units::cm;
+
     double theta = p.GetDir().CalcTheta() / I3Units::radian;
-    double phi = p.GetDir().CalcPhi() / I3Units::radian;
+    double phi   = p.GetDir().CalcPhi() / I3Units::radian;
+
+    double energy = p.GetEnergy() / I3Units::MeV;
+    double time   = p.GetTime() / I3Units::second;
+    double length = p.GetLength() / I3Units::cm;
+
+    // The Muons from NuGen have NaN as default propagated length.
+    // So this has to be corrected.
+    if (std::isnan(length))
+    {
+        length = 0.0;
+    }
+    else if (std::isinf(length))
+    {
+        log_fatal("the propagated length is Inf, should be finite or NaN.");
+    }
 
     // log_debug("Name of particle to propagate: %s", PROPOSAL::Particle::GetName(GeneratePROPOSALType(p)).c_str());
 
@@ -214,9 +230,9 @@ PROPOSAL::Particle I3PROPOSALParticleConverter::GeneratePROPOSALParticle(const I
     direction.CalculateCartesianFromSpherical();
     particle.SetDirection(direction);
 
-    particle.SetEnergy(p.GetEnergy() / I3Units::MeV);
-    particle.SetTime(p.GetTime() / I3Units::second);
-    particle.SetPropagatedDistance(p.GetLength() / I3Units::cm);
+    particle.SetEnergy(energy);
+    particle.SetTime(time);
+    particle.SetPropagatedDistance(length);
 
     return particle;
 }
@@ -231,6 +247,10 @@ I3Particle I3PROPOSALParticleConverter::GenerateI3Particle(const PROPOSAL::Dynam
     double theta = pp.GetDirection().GetTheta() * I3Units::radian;
     double phi   = pp.GetDirection().GetPhi() * I3Units::radian;
 
+    double energy = pp.GetEnergy() * I3Units::MeV;
+    double time   = pp.GetTime() * I3Units::second;
+    double length = pp.GetPropagatedDistance() * I3Units::cm;
+
     I3Particle i3_particle;
     i3_particle.SetType(I3PROPOSALParticleConverter::GenerateI3Type(pp));
     i3_particle.SetLocationType(I3Particle::InIce);
@@ -238,15 +258,13 @@ I3Particle I3PROPOSALParticleConverter::GenerateI3Particle(const PROPOSAL::Dynam
     i3_particle.SetPos(x, y, z);
     i3_particle.SetThetaPhi(theta, phi);
 
-    i3_particle.SetLength(pp.GetPropagatedDistance() * I3Units::cm);
-    i3_particle.SetTime(pp.GetTime() * I3Units::second);
-    i3_particle.SetEnergy(pp.GetEnergy() * I3Units::MeV);
+    i3_particle.SetEnergy(energy);
+    i3_particle.SetTime(time);
+    i3_particle.SetLength(length);
 
     log_trace("MMC DEBUG SEC \n  pos=(%g,%g,%g) ang=(%g,%g)  e=%g t=%g  l=%g",
         x, y, z, theta, phi,
-        pp.GetEnergy() * I3Units::MeV,
-        pp.GetTime() * I3Units::second,
-        pp.GetPropagatedDistance() * I3Units::cm);
+        energy, time, length);
 
     return i3_particle;
 }

@@ -43,6 +43,9 @@
 language: cpp
 sudo: require
 
+git:
+  depth: 10
+
 matrix:
   include:
     - os: linux
@@ -122,7 +125,7 @@ before_script:
     - make VERBOSE=1
 
 script:
-    - travis_wait 60 ctest -j2 --verbose -E "(Ion|Brems|Photo|Epair)"
+    - travis_wait 60 ctest -j2 --verbose -E "(Brems|Photo|Epair)"
 
 notifications:
     email: false
