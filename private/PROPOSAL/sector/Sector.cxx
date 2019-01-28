@@ -87,6 +87,32 @@ bool Sector::Definition::operator!=(const Definition& sector_def) const
     return !(*this == sector_def);
 }
 
+void Sector::Definition::swap(Definition& definition)
+{
+    using std::swap;
+
+    swap(do_stochastic_loss_weighting, definition.do_stochastic_loss_weighting);
+    swap(stochastic_loss_weighting, definition.stochastic_loss_weighting);
+    swap(stopping_decay, definition.stopping_decay);
+    swap(do_continuous_randomization, definition.do_continuous_randomization);
+    swap(do_continuous_energy_loss_output, definition.do_continuous_energy_loss_output);
+    swap(do_exact_time_calculation, definition.do_exact_time_calculation);
+    swap(scattering_model, definition.scattering_model);
+    swap(location, definition.location);
+    swap(utility_def, definition.utility_def);
+    medium_->swap(*definition.medium_);
+    geometry_->swap(*definition.geometry_);
+}
+Sector::Definition& Sector::Definition::operator=(const Definition& definition)
+{
+    if (this != &definition)
+    {
+        Sector::Definition tmp(definition);
+        swap(tmp);
+    }
+    return *this;
+}
+
 Sector::Definition::~Definition()
 {
     delete medium_;

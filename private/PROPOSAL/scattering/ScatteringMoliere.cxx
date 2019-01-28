@@ -385,21 +385,23 @@ double ScatteringMoliere::GetRandom(double pre_factor)
     //  uniformly distributed random number with the integral of the distribution.
     //  Therefore, determine the angle where the integral is equal to the random number.
 
-    // rndm element of ]-0.5,0.5]
-    double rndm = (RandomGenerator::Get().RandomDouble() - 0.5);
+    double rnd = RandomGenerator::Get().RandomDouble();
 
     // Newton-Raphson method:
     double theta_n;
 
     // guessing an initial value by assuming a gaussian distribution
     // only regarding the component with maximum weight
-    double theta_np1 = pre_factor * erfInv(2. * rndm);
+    double theta_np1 = pre_factor * inverseErrorFunction(rnd) / SQRT2;
+
+    // rnd element of ]-0.5,0.5]
+    rnd = rnd - 0.5;
 
     // iterating until the number of correct digits is greater than 4
     do
     {
         theta_n   = theta_np1;
-        theta_np1 = theta_n - (F(theta_n) - rndm) / f(theta_n);
+        theta_np1 = theta_n - (F(theta_n) - rnd) / f(theta_n);
 
     } while (std::abs((theta_n - theta_np1) / theta_np1) > 1e-4);
 

@@ -8,6 +8,7 @@
  */
 
 #include <iostream>
+#include <sstream>
 #include <string>
 
 #include "PROPOSAL/Constants.h"

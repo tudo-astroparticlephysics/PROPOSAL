@@ -85,6 +85,5 @@ double ContinuousRandomizer::Randomize(double initial_energy, double final_energ
     rndtmp = xlo + (xhi - xlo) * rnd;
 
     // Calculate and return the needed value.
-    // return SQRT2 * sigma * boost::math::erf_inv(2 * (rndtmp - 0.5)) + final_energy;
-    return SQRT2 * sigma * erfInv(2 * (rndtmp - 0.5)) + final_energy;
+    return sigma * inverseErrorFunction(rndtmp) + final_energy;
 }

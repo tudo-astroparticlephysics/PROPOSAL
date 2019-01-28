@@ -7,6 +7,7 @@
  *   \author Jan-Hendrik Koehne
  */
 
+#include <cmath>
 #include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/Output.h"
 #include "PROPOSAL/methods.h"

@@ -21,7 +21,8 @@ If the Output of the Secondaries should not only include the Stochastic energy l
 | `continous_loss_output` | Bool    | `False`   | Decides, whether continuous losses should be emitted in the Output of Secondaries|
 
 ### Interpolation parameters ###
-There are three parameters dealing with the interpolation tables.
+The `interpolation` parameter is an own json-object.
+This object can contain three parameters dealing with the interpolation tables.
 
 If the tables have been already build and PROPOSAL should just use them, PROPOSAL needs read permission.
 If there are no tables (or at least not ones with the desired particle properties) PROPOSAL builds the tables in the folder. Here PROPOSAL needs write permission.
@@ -30,11 +31,11 @@ Note: The tables differ in the parameters given below, that are stored in the fi
 
 It's also possible to do the calculations with integrations, but that increases the amount of time by around 4 orders of magnitude !!! This should just be used for tests and comparisons.The Interpolations are accurate enough. Note: The reason why integration is that much slower is that the interpolation used for propagation is near the surface, using already calculated numbers from 'lower' interpolations. When integrating, these integrals going 'deep' (up to 4 layers).
 
-| Keyword          | Type   | Default   | Description |
-| ---------------- | ------ | --------- | ----------- |
-| `interpolate`    | Bool   | `True`    | Decides, whether to calculate with interpolations or integrations |
-| `path_to_tables` | String | `""`      | path pointing to the folder with the interpolation tables |
-| `raw`            | Bool   | `True`   | Decides, whether the tables are stored in binary format or in human readable text format |
+| Keyword            | Type   | Default   | Description |
+| ------------------ | ------ | --------- | ----------- |
+| `do_interpolation` | Bool   | `True`    | Decides, whether to calculate with interpolations or integrations |
+| `path_to_tables`   | String | `""`      | path pointing to the folder with the interpolation tables |
+| `do_binary_tables` | Bool   | `True`   | Decides, whether the tables are stored in binary format or in human readable text format |
 
 ### Accuracy parameters ###
 There are several parameters with which the precision or speed for advancing the particles can be adjusted.
@@ -113,7 +114,7 @@ The LPM effect (Landau-Pomeranschuk-Migdal), suppressing the bremsstrahlung and 
 | `lpm`                  | Bool   | `True`     | Incorporate the LPM-effect and TM-effect |
 
 ### Energy-cut parameters ###
-The energy cut settings and the continuous randomization option are separated between inside, in front and behind the detector.
+The energy cut settings and the continuous randomization option are separated between `cuts_inside`, `cuts_infront` and `cuts_behind` the detector, which are again own json-objects.
 **ecut** describes the cut in the total energy loss in MeV and **vcut** describes the cut in the energy loss relative to the particle energy.
 Above this cut, the energy losses are calculated stochastically and below this cut, the energy loss is calculated via the average energy loss (continuously).
 - If both values are set, the minimum of the total energy cut and the relative cut times the particle energy is applied.
@@ -126,17 +127,26 @@ This is just a useful for small energy cuts.
 Note: The energy cuts and the continuous randomization settings can also be specified for each sector.
 Then the global settings will be overwritten.
 
-| Keyword        | Type   | Default   | Description |
-| -------------- | ------ | --------- | ----------- |
-| `ecut_inside`  | Double | `500.0`     | total energy loss cut inside the detector |
-| `ecut_infront` | Double | `-1.0`      | total energy loss cut in front the detector |
-| `ecut_behind`  | Double | `-1.0`      | total energy loss cut behind the detector |
-| `vcut_inside`  | Double | `-1.0`      | relative energy loss cut inside the detector |
-| `vcut_infront` | Double | `0.001`   | relative energy loss cut in front the detector |
-| `vcut_behind`  | Double | `-1.0`      | relative energy loss cut behind the detector |
-| `cont_inside`  | Double | `True`    | includes the continuous randomization inside the detector |
-| `cont_infront` | Double | `True`    | includes the continuous randomization in front the detector |
-| `cont_behind`  | Double | `False`   | includes the continuous randomization behind the detector |
+For the `cuts_inside` option, the default values are
+| Keyword     | Type   | Default   | Description |
+| ----------- | ------ | --------- | ----------- |
+| `e_cut`     | Double | `500.0`   | total energy loss cut inside the detector |
+| `v_cut`     | Double | `-1.0`    | relative energy loss cut inside the detector |
+| `cont_rand` | Bool   | `True`    | includes the continuous randomization inside the detector |
+
+For the `cuts_infront` option, the default values are
+| Keyword     | Type   | Default   | Description |
+| ----------- | ------ | --------- | ----------- |
+| `e_cut`     | Double | `-1.0`    | total energy loss cut in front the detector |
+| `v_cut`     | Double | `0.001`   | relative energy loss cut in front the detector |
+| `cont_rand` | Bool   | `True`    | includes the continuous randomization in front the detector |
+
+For the `cuts_behind` option, the default values are
+| Keyword     | Type   | Default   | Description |
+| ----------- | ------ | --------- | ----------- |
+| `e_cut`     | Double | `-1.0`    | total energy loss cut behind the detector |
+| `v_cut`     | Double | `-1.0`    | relative energy loss cut behind the detector |
+| `cont_rand` | Bool   | `False`   | includes the continuous randomization behind the detector |
 
 
 ## The `sectors` configurations ##
