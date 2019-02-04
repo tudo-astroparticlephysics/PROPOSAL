@@ -60,8 +60,7 @@ bool MupairProduction::compare(const Parametrization& parametrization) const
 {
     const MupairProduction* pairproduction = static_cast<const MupairProduction*>(&parametrization);
 
-
-    else if (mupair_enable_ != pairproduction->mupair_enable_)
+    if (mupair_enable_ != pairproduction->mupair_enable_)
         return false;
     else
         return Parametrization::compare(parametrization);
@@ -171,7 +170,7 @@ void MupairProductionRhoIntegral::print(std::ostream& os) const
 size_t MupairProductionRhoIntegral::GetHash() const
 {
     size_t seed = Parametrization::GetHash();
-    hash_combine(seed, lpm_);
+    hash_combine(seed, mupair_enable_);
 
     return seed;
 }
@@ -281,11 +280,13 @@ double MupairKelnerKokoulinPetrukhin::FunctionToIntegral(double energy, double v
     ;
     aux *= (1 - v) / v * (diagram_e + aux1 * aux1 * diagram_mu);
 
+    /*
     if (lpm_)
     {
         aux *= lpm(energy, v, r2, beta, xi);
     }
-
+    */
+    
     if (aux < 0)
     {
         aux = 0;
