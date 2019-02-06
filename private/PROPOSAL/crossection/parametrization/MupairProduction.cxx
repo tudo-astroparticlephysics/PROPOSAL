@@ -75,7 +75,6 @@ Parametrization::IntegralLimits MupairProduction::GetIntegralLimits(double energ
 {
     IntegralLimits limits;
 
-    //TODO: Check Integral Limits (where do we need MMU, where do we need the particle_def_.mass ?)
     limits.vMin = 2 * MMU / energy;
     limits.vMax = 1 - particle_def_.mass / energy;
 
@@ -136,7 +135,6 @@ double MupairProductionRhoIntegral::DifferentialCrossSection(double energy, doub
 {
     double rMax, aux;
 
-    //TODO: Check Integral Limits (where do we need MMU, where do we need the particle_def_.mass ?)
     aux  = 1 - 2 * MMU / (v * energy);
 
     if (aux > 0)
@@ -200,7 +198,7 @@ double MupairKelnerKokoulinPetrukhin::FunctionToIntegral(double energy, double v
 
     r           = 1 - r; // only for integral optimization - do not forget to swap integration limits!
     r2          = r * r;
-    rMax        = 1 - 2 * MMU / (v * energy); // TODO: Is the MMU correct? (no need to apply swap here because rMax is fixed)
+    rMax        = 1 - 2 * MMU / (v * energy); // no need to apply swap here because rMax is fixed
     Z3          = std::pow(medium_charge, -1. / 3);
     aux         = (particle_def_.mass * v) / (2 * MMU);
     xi          = aux * aux * (1 - r2) / (1 - v);
