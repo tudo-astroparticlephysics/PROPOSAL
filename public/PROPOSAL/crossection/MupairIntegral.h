@@ -50,11 +50,6 @@ public:
 
     double CalculatedEdx(double energy);
 
-private:
-    // ----------------------------------------------------------------------------
-    /// @brief calls FunctionToDEdxIntegral from the parametrization
-    // ----------------------------------------------------------------------------
-    double FunctionToDEdxIntegralReverse(double energy, double v);
 };
 
 } // namespace PROPOSAL
