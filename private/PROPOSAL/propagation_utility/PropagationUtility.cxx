@@ -107,7 +107,7 @@ Utility::Utility(const ParticleDef& particle_def,
 
     if(utility_def.mupair_def.mupair_enable == true){
         crosssections_.push_back(MupairProductionFactory::Get().CreateMupairProduction(
-            particle_def_, *medium_, cut_settings_, utility_def.mupair_def));
+            particle_def_, *medium_, cut_settings_, utility_def.mupair_def, interpolation_def));
         log_debug("Mupair Production enabled");
     }
     else{
