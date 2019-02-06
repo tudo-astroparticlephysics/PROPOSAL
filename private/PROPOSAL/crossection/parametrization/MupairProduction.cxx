@@ -200,7 +200,7 @@ double MupairKelnerKokoulinPetrukhin::FunctionToIntegral(double energy, double v
 
     r           = 1 - r; // only for integral optimization - do not forget to swap integration limits!
     r2          = r * r;
-    rMax        = 2 * MMU / (v * energy); // TODO: Is this correct with the swap of the integration limits AND with the MMU?
+    rMax        = 1 - 2 * MMU / (v * energy); // TODO: Is the MMU correct? (no need to apply swap here because rMax is fixed)
     Z3          = std::pow(medium_charge, -1. / 3);
     aux         = (particle_def_.mass * v) / (2 * MMU);
     xi          = aux * aux * (1 - r2) / (1 - v);
