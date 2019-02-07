@@ -30,7 +30,6 @@ mupair_interpol = [
     pp.parametrization.mupairproduction.KelnerKokoulinPetrukhinInterpolant,
 ]
 
-mupair_enables = [0, 1]
 
 energies = np.logspace(4, 13, num=10)
 
@@ -67,16 +66,13 @@ def create_tables(dir_name, interpolate=False, **kwargs):
     for particle in particle_defs:
         for medium in mediums:
             for cut in cuts:
-                for mupair_enable in mupair_enables:
                     for param in params:
-
                         if interpolate:
                             param_current = param(
                                 particle,
                                 medium,
                                 cut,
                                 multiplier,
-                                mupair_enable,
                                 interpoldef)
 
                             xsection = pp.crosssection.MupairInterpolant(param_current, interpoldef)
@@ -85,8 +81,8 @@ def create_tables(dir_name, interpolate=False, **kwargs):
                                 particle,
                                 medium,
                                 cut,
-                                multiplier,
-                                mupair_enable)
+                                multiplier
+                                )
 
                             xsection = pp.crosssection.MupairIntegral(param_current)
 
@@ -113,7 +109,6 @@ def create_tables(dir_name, interpolate=False, **kwargs):
                                 buf[key][1].append(str(cut.ecut))
                                 buf[key][1].append(str(cut.vcut))
                                 buf[key][1].append(str(multiplier))
-                                buf[key][1].append(str(mupair_enable))
                                 buf[key][1].append(str(energy))
                                 buf[key][1].append(param_current.name)
                                 buf[key][1].extend(result)
@@ -135,15 +130,12 @@ def create_table_dNdx(dir_name, interpolate=False):
             for medium in mediums:
                 for cut in cuts:
                     for param in params:
-                        for mupair_enable in mupair_enables:
-
                             if interpolate:
                                 param_current = param(
                                     particle,
                                     medium,
                                     cut,
                                     multiplier,
-                                    mupair_enable,
                                     interpoldef)
 
                                 xsection = pp.crosssection.MupairInterpolant(param_current, interpoldef)
@@ -152,8 +144,7 @@ def create_table_dNdx(dir_name, interpolate=False):
                                     particle,
                                     medium,
                                     cut,
-                                    multiplier,
-                                    mupair_enable)
+                                    multiplier)
 
                                 xsection = pp.crosssection.MupairIntegral(param_current)
 
@@ -167,7 +158,6 @@ def create_table_dNdx(dir_name, interpolate=False):
                                 buf.append(str(cut.ecut))
                                 buf.append(str(cut.vcut))
                                 buf.append(str(multiplier))
-                                buf.append(str(mupair_enable))
                                 buf.append(str(energy))
                                 buf.append(str(dEdx))
                                 buf.append("\n")
@@ -190,15 +180,12 @@ def create_table_dNdx_rnd(dir_name, interpolate=False):
             for medium in mediums:
                 for cut in cuts:
                     for param in params:
-                        for mupair_enable in mupair_enables:
-
                             if interpolate:
                                 param_current = param(
                                     particle,
                                     medium,
                                     cut,
                                     multiplier,
-                                    mupair_enable,
                                     interpoldef)
 
                                 xsection = pp.crosssection.MupairInterpolant(param_current, interpoldef)
@@ -207,8 +194,7 @@ def create_table_dNdx_rnd(dir_name, interpolate=False):
                                     particle,
                                     medium,
                                     cut,
-                                    multiplier,
-                                    mupair_enable)
+                                    multiplier)
 
                                 xsection = pp.crosssection.MupairIntegral(param_current)
 
@@ -223,7 +209,6 @@ def create_table_dNdx_rnd(dir_name, interpolate=False):
                                 buf.append(str(cut.ecut))
                                 buf.append(str(cut.vcut))
                                 buf.append(str(multiplier))
-                                buf.append(str(mupair_enable))
                                 buf.append(str(energy))
                                 buf.append(str(rnd))
                                 buf.append(str(dNdx))
@@ -247,15 +232,12 @@ def create_table_stochastic_loss(dir_name, interpolate=False):
             for medium in mediums:
                 for cut in cuts:
                     for param in params:
-                        for mupair_enable in mupair_enables:
-
                             if interpolate:
                                 param_current = param(
                                     particle,
                                     medium,
                                     cut,
                                     multiplier,
-                                    mupair_enable,
                                     interpoldef)
 
                                 xsection = pp.crosssection.MupairInterpolant(param_current, interpoldef)
@@ -264,8 +246,7 @@ def create_table_stochastic_loss(dir_name, interpolate=False):
                                     particle,
                                     medium,
                                     cut,
-                                    multiplier,
-                                    mupair_enable)
+                                    multiplier)
 
                                 xsection = pp.crosssection.MupairIntegral(param_current)
 
@@ -281,7 +262,6 @@ def create_table_stochastic_loss(dir_name, interpolate=False):
                                 buf.append(str(cut.ecut))
                                 buf.append(str(cut.vcut))
                                 buf.append(str(multiplier))
-                                buf.append(str(mupair_enable))
                                 buf.append(str(energy))
                                 buf.append(str(rnd1))
                                 buf.append(str(rnd2))
