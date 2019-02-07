@@ -90,15 +90,13 @@ public:
     typedef std::function<MupairProduction*(const ParticleDef&,
                                           const Medium&,
                                           const EnergyCutSettings&,
-                                          double multiplier,
-                                          bool mupair_enable)>
+                                          double multiplier)>
         RegisterFunction;
 
     typedef std::function<MupairProduction*(const ParticleDef&,
                                           const Medium&,
                                           const EnergyCutSettings&,
                                           double multiplier,
-                                          bool mupair_enable,
                                           InterpolationDef)>
         RegisterFunctionInterpolant;
 

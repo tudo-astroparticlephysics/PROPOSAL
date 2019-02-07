@@ -46,7 +46,7 @@
     class Mupair##param : public MupairProductionRhoIntegral                                                             \
     {                                                                                                                  \
     public:                                                                                                            \
-        Mupair##param(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier, bool mupair_enable); \
+        Mupair##param(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier);                  \
         Mupair##param(const Mupair##param&);                                                                             \
         virtual ~Mupair##param();                                                                                       \
                                                                                                                        \
@@ -54,10 +54,9 @@
         static MupairProduction* create(const ParticleDef& particle_def,                                                \
                                        const Medium& medium,                                                           \
                                        const EnergyCutSettings& cuts,                                                  \
-                                       double multiplier,                                                              \
-                                       bool mupair_enable)                                                             \
+                                       double multiplier)                                                             \
         {                                                                                                              \
-            return new Mupair##param(particle_def, medium, cuts, multiplier, mupair_enable);                           \
+            return new Mupair##param(particle_def, medium, cuts, multiplier);                           \
         }                                                                                                              \
                                                                                                                        \
         double FunctionToIntegral(double energy, double v, double r);                                              \
@@ -76,7 +75,7 @@ class Interpolant;
 class MupairProduction : public Parametrization
 {
 public:
-    MupairProduction(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier, bool mupair_enable);
+    MupairProduction(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier);
     MupairProduction(const MupairProduction&);
     virtual ~MupairProduction();
 
@@ -102,7 +101,6 @@ public:
 
 protected:
     bool compare(const Parametrization&) const;
-    bool mupair_enable_;
 };
 
 // ------------------------------------------------------------------------- //
@@ -115,8 +113,7 @@ public:
     MupairProductionRhoIntegral(const ParticleDef&,
                                const Medium&,
                                const EnergyCutSettings&,
-                               double multiplier,
-                               bool mupair_enable);
+                               double multiplier);
     MupairProductionRhoIntegral(const MupairProductionRhoIntegral&);
     virtual ~MupairProductionRhoIntegral();
 
@@ -137,7 +134,7 @@ public:
 
 private:
     bool compare(const Parametrization&) const;
-    virtual void print(std::ostream&) const;
+    //virtual void print(std::ostream&) const;
 
     Integral integral_;
 };
@@ -163,7 +160,6 @@ public:
                        const Medium&,
                        const EnergyCutSettings&,
                        double multiplier,
-                       bool mupair_enable,
                        InterpolationDef def = InterpolationDef());
     MupairProductionRhoInterpolant(const MupairProductionRhoInterpolant&);
     virtual ~MupairProductionRhoInterpolant();
@@ -173,10 +169,9 @@ public:
                                 const Medium& medium,
                                 const EnergyCutSettings& cuts,
                                 double multiplier,
-                                bool mupair_enable,
                                 InterpolationDef def = InterpolationDef())
     {
-        return new MupairProductionRhoInterpolant<Param>(particle_def, medium, cuts, multiplier, mupair_enable, def);
+        return new MupairProductionRhoInterpolant<Param>(particle_def, medium, cuts, multiplier, def);
     }
 
     double DifferentialCrossSection(double energy, double v);
@@ -193,9 +188,8 @@ MupairProductionRhoInterpolant<Param>::MupairProductionRhoInterpolant(const Part
                                               const Medium& medium,
                                               const EnergyCutSettings& cuts,
                                               double multiplier,
-                                              bool mupair_enable,
                                               InterpolationDef def)
-    : Param(particle_def, medium, cuts, multiplier, mupair_enable)
+    : Param(particle_def, medium, cuts, multiplier)
     , interpolant_(this->medium_->GetNumComponents(), NULL)
 {
     std::vector<Interpolant2DBuilder> builder2d(this->components_.size());

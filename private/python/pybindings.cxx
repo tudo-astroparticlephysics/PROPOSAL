@@ -93,23 +93,21 @@ using namespace PROPOSAL;
 
 #define MUPAIR_DEF(module, cls)                                                                                         \
     py::class_<Mupair##cls, std::shared_ptr<Mupair##cls>, MupairProductionRhoIntegral>(module, #cls)                      \
-        .def(py::init<const ParticleDef&, const Medium&, const EnergyCutSettings&, double, bool>(),                    \
+        .def(py::init<const ParticleDef&, const Medium&, const EnergyCutSettings&, double>(),                    \
              py::arg("particle_def"),                                                                                  \
              py::arg("medium"),                                                                                        \
              py::arg("energy_cuts"),                                                                                   \
-             py::arg("multiplier"),                                                                                    \
-             py::arg("mupair_enable"));
+             py::arg("multiplier"));
 
 #define MUPAIR_INTERPOL_DEF(module, cls)                                                                                \
     py::class_<MupairProductionRhoInterpolant<Mupair##cls>,                                                              \
                std::shared_ptr<MupairProductionRhoInterpolant<Mupair##cls> >,                                            \
                Mupair##cls>(module, #cls "Interpolant")                                                                 \
-        .def(py::init<const ParticleDef&, const Medium&, const EnergyCutSettings&, double, bool, InterpolationDef>(),  \
+        .def(py::init<const ParticleDef&, const Medium&, const EnergyCutSettings&, double, InterpolationDef>(),  \
              py::arg("particle_def"),                                                                                  \
              py::arg("medium"),                                                                                        \
              py::arg("energy_cuts"),                                                                                   \
-             py::arg("multiplier"),                                                                                    \
-             py::arg("mupair_enable"),                                                                                    \
+             py::arg("multiplier"),                                                                                      \
              py::arg("interpolation_def"));
 
 // ------------------------------------------------------------------------- //

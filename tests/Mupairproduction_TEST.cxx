@@ -34,14 +34,13 @@ TEST(Comparison, Comparison_equal)
     Water medium;
     EnergyCutSettings ecuts;
     double multiplier   = 1.;
-    bool mupair_enable  = true;
 
     MupairProductionRhoIntegral* MupairInt_A =
-        new MupairKelnerKokoulinPetrukhin(particle_def, medium, ecuts, multiplier, mupair_enable);
-    Parametrization* MupairInt_B = new MupairKelnerKokoulinPetrukhin(particle_def, medium, ecuts, multiplier, mupair_enable);
+        new MupairKelnerKokoulinPetrukhin(particle_def, medium, ecuts, multiplier);
+    Parametrization* MupairInt_B = new MupairKelnerKokoulinPetrukhin(particle_def, medium, ecuts, multiplier);
     EXPECT_TRUE(*MupairInt_A == *MupairInt_B);
 
-    MupairKelnerKokoulinPetrukhin param_int(particle_def, medium, ecuts, multiplier, mupair_enable);
+    MupairKelnerKokoulinPetrukhin param_int(particle_def, medium, ecuts, multiplier);
     EXPECT_TRUE(param_int == *MupairInt_A);
 
     MupairIntegral* Int_A        = new MupairIntegral(param_int);
@@ -50,12 +49,12 @@ TEST(Comparison, Comparison_equal)
 
     InterpolationDef InterpolDef;
     MupairProductionRhoInterpolant<MupairKelnerKokoulinPetrukhin>* MupairInterpol_A =
-        new MupairProductionRhoInterpolant<MupairKelnerKokoulinPetrukhin>(particle_def, medium, ecuts, multiplier, mupair_enable, InterpolDef);
+        new MupairProductionRhoInterpolant<MupairKelnerKokoulinPetrukhin>(particle_def, medium, ecuts, multiplier, InterpolDef);
     Parametrization* MupairInterpol_B =
-        new MupairProductionRhoInterpolant<MupairKelnerKokoulinPetrukhin>(particle_def, medium, ecuts, multiplier, mupair_enable, InterpolDef);
+        new MupairProductionRhoInterpolant<MupairKelnerKokoulinPetrukhin>(particle_def, medium, ecuts, multiplier, InterpolDef);
     EXPECT_TRUE(*MupairInterpol_A == *MupairInterpol_B);
 
-    MupairProductionRhoInterpolant<MupairKelnerKokoulinPetrukhin> param_interpol(particle_def, medium, ecuts, multiplier, mupair_enable, InterpolDef);
+    MupairProductionRhoInterpolant<MupairKelnerKokoulinPetrukhin> param_interpol(particle_def, medium, ecuts, multiplier, InterpolDef);
     EXPECT_TRUE(param_interpol == *MupairInterpol_A);
 
     MupairInterpolant* Interpol_A        = new MupairInterpolant(param_interpol, InterpolDef);
@@ -82,37 +81,31 @@ TEST(Comparison, Comparison_not_equal)
     EnergyCutSettings ecuts_2(-1, 0.05);
     double multiplier_1 = 1.;
     double multiplier_2 = 2.;
-    bool mupair_enable_1          = true;
-    bool mupair_enable_2          = false;
 
-    MupairKelnerKokoulinPetrukhin MupairInt_A(mu_def, medium_1, ecuts_1, multiplier_1, mupair_enable_1);
-    MupairKelnerKokoulinPetrukhin MupairInt_B(tau_def, medium_1, ecuts_1, multiplier_1, mupair_enable_1);
-    MupairKelnerKokoulinPetrukhin MupairInt_C(mu_def, medium_2, ecuts_1, multiplier_1, mupair_enable_1);
-    MupairKelnerKokoulinPetrukhin MupairInt_D(mu_def, medium_1, ecuts_2, multiplier_1, mupair_enable_1);
-    MupairKelnerKokoulinPetrukhin MupairInt_E(mu_def, medium_1, ecuts_1, multiplier_2, mupair_enable_1);
-    MupairKelnerKokoulinPetrukhin MupairInt_F(mu_def, medium_1, ecuts_1, multiplier_1, mupair_enable_2);
+    MupairKelnerKokoulinPetrukhin MupairInt_A(mu_def, medium_1, ecuts_1, multiplier_1);
+    MupairKelnerKokoulinPetrukhin MupairInt_B(tau_def, medium_1, ecuts_1, multiplier_1);
+    MupairKelnerKokoulinPetrukhin MupairInt_C(mu_def, medium_2, ecuts_1, multiplier_1);
+    MupairKelnerKokoulinPetrukhin MupairInt_D(mu_def, medium_1, ecuts_2, multiplier_1);
+    MupairKelnerKokoulinPetrukhin MupairInt_E(mu_def, medium_1, ecuts_1, multiplier_2);
     EXPECT_TRUE(MupairInt_A != MupairInt_B);
     EXPECT_TRUE(MupairInt_A != MupairInt_C);
     EXPECT_TRUE(MupairInt_A != MupairInt_D);
     EXPECT_TRUE(MupairInt_A != MupairInt_E);
-    EXPECT_TRUE(MupairInt_A != MupairInt_F);
 
     MupairIntegral Int_A(MupairInt_A);
     MupairIntegral Int_B(MupairInt_B);
     EXPECT_TRUE(Int_A != Int_B);
 
     InterpolationDef InterpolDef;
-    MupairProductionRhoInterpolant<MupairKelnerKokoulinPetrukhin> MupairInterpol_A(mu_def, medium_1, ecuts_1, multiplier_1, mupair_enable_1, InterpolDef);
-    MupairProductionRhoInterpolant<MupairKelnerKokoulinPetrukhin> MupairInterpol_B(tau_def, medium_1, ecuts_1, multiplier_1, mupair_enable_1, InterpolDef);
-    MupairProductionRhoInterpolant<MupairKelnerKokoulinPetrukhin> MupairInterpol_C(mu_def, medium_2, ecuts_1, multiplier_1, mupair_enable_1, InterpolDef);
-    MupairProductionRhoInterpolant<MupairKelnerKokoulinPetrukhin> MupairInterpol_D(mu_def, medium_1, ecuts_2, multiplier_1, mupair_enable_1, InterpolDef);
-    MupairProductionRhoInterpolant<MupairKelnerKokoulinPetrukhin> MupairInterpol_E(mu_def, medium_1, ecuts_1, multiplier_2, mupair_enable_1, InterpolDef);
-    MupairProductionRhoInterpolant<MupairKelnerKokoulinPetrukhin> MupairInterpol_F(mu_def, medium_1, ecuts_1, multiplier_1, mupair_enable_2, InterpolDef);
+    MupairProductionRhoInterpolant<MupairKelnerKokoulinPetrukhin> MupairInterpol_A(mu_def, medium_1, ecuts_1, multiplier_1, InterpolDef);
+    MupairProductionRhoInterpolant<MupairKelnerKokoulinPetrukhin> MupairInterpol_B(tau_def, medium_1, ecuts_1, multiplier_1, InterpolDef);
+    MupairProductionRhoInterpolant<MupairKelnerKokoulinPetrukhin> MupairInterpol_C(mu_def, medium_2, ecuts_1, multiplier_1, InterpolDef);
+    MupairProductionRhoInterpolant<MupairKelnerKokoulinPetrukhin> MupairInterpol_D(mu_def, medium_1, ecuts_2, multiplier_1, InterpolDef);
+    MupairProductionRhoInterpolant<MupairKelnerKokoulinPetrukhin> MupairInterpol_E(mu_def, medium_1, ecuts_1, multiplier_2, InterpolDef);
     EXPECT_TRUE(MupairInterpol_A != MupairInterpol_B);
     EXPECT_TRUE(MupairInterpol_A != MupairInterpol_C);
     EXPECT_TRUE(MupairInterpol_A != MupairInterpol_D);
     EXPECT_TRUE(MupairInterpol_A != MupairInterpol_E);
-    EXPECT_TRUE(MupairInterpol_A != MupairInterpol_F);
 
     MupairInterpolant Interpol_A(MupairInterpol_A, InterpolDef);
     MupairInterpolant Interpol_B(MupairInterpol_B, InterpolDef);
@@ -125,9 +118,8 @@ TEST(Assignment, Copyconstructor)
     Water medium;
     EnergyCutSettings ecuts;
     double multiplier = 1.;
-    bool mupair_enable          = true;
 
-    MupairKelnerKokoulinPetrukhin MupairInt_A(particle_def, medium, ecuts, multiplier, mupair_enable);
+    MupairKelnerKokoulinPetrukhin MupairInt_A(particle_def, medium, ecuts, multiplier);
     MupairKelnerKokoulinPetrukhin MupairInt_B = MupairInt_A;
     EXPECT_TRUE(MupairInt_A == MupairInt_B);
 
@@ -136,7 +128,7 @@ TEST(Assignment, Copyconstructor)
     EXPECT_TRUE(Int_A == Int_B);
 
     InterpolationDef InterpolDef;
-    MupairProductionRhoInterpolant<MupairKelnerKokoulinPetrukhin> MupairInterpol_A(particle_def, medium, ecuts, multiplier, mupair_enable, InterpolDef);
+    MupairProductionRhoInterpolant<MupairKelnerKokoulinPetrukhin> MupairInterpol_A(particle_def, medium, ecuts, multiplier, InterpolDef);
     MupairProductionRhoInterpolant<MupairKelnerKokoulinPetrukhin> MupairInterpol_B = MupairInterpol_A;
     EXPECT_TRUE(MupairInterpol_A == MupairInterpol_B);
 
@@ -151,9 +143,8 @@ TEST(Assignment, Copyconstructor2)
     Water medium;
     EnergyCutSettings ecuts;
     double multiplier = 1.;
-    bool mupair_enable          = true;
 
-    MupairKelnerKokoulinPetrukhin MupairInt_A(particle_def, medium, ecuts, multiplier, mupair_enable);
+    MupairKelnerKokoulinPetrukhin MupairInt_A(particle_def, medium, ecuts, multiplier);
     MupairKelnerKokoulinPetrukhin MupairInt_B(MupairInt_A);
     EXPECT_TRUE(MupairInt_A == MupairInt_B);
 
@@ -162,7 +153,7 @@ TEST(Assignment, Copyconstructor2)
     EXPECT_TRUE(Int_A == Int_B);
 
     InterpolationDef InterpolDef;
-    MupairProductionRhoInterpolant<MupairKelnerKokoulinPetrukhin> MupairInterpol_A(particle_def, medium, ecuts, multiplier, mupair_enable, InterpolDef);
+    MupairProductionRhoInterpolant<MupairKelnerKokoulinPetrukhin> MupairInterpol_A(particle_def, medium, ecuts, multiplier, InterpolDef);
     MupairProductionRhoInterpolant<MupairKelnerKokoulinPetrukhin> MupairInterpol_B(MupairInterpol_A);
     EXPECT_TRUE(MupairInterpol_A == MupairInterpol_B);
 
@@ -192,7 +183,6 @@ TEST(Mupairproduction, Test_of_dEdx)
     double ecut;
     double vcut;
     double multiplier;
-    bool mupair_enable;
     double energy;
     std::string parametrization;
     double dEdx_stored;
@@ -200,7 +190,7 @@ TEST(Mupairproduction, Test_of_dEdx)
 
     while (in.good())
     {
-        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> mupair_enable >> energy >> parametrization >> dEdx_stored;
+        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> parametrization >> dEdx_stored;
 
         ParticleDef particle_def = getParticleDef(particleName);
         Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
@@ -209,7 +199,6 @@ TEST(Mupairproduction, Test_of_dEdx)
         MupairProductionFactory::Definition mupair_def;
         mupair_def.multiplier      = multiplier;
         mupair_def.parametrization = MupairProductionFactory::Get().GetEnumFromString(parametrization);
-        mupair_def.mupair_enable  = mupair_enable;
 
         CrossSection* mupair = MupairProductionFactory::Get().CreateMupairProduction(particle_def, *medium, ecuts, mupair_def);
         dEdx_new = mupair->CalculatedEdx(energy);
@@ -240,7 +229,6 @@ TEST(Mupairproduction, Test_of_dNdx)
     double ecut;
     double vcut;
     double multiplier;
-    bool mupair_enable;
     double energy;
     std::string parametrization;
     double dNdx_stored;
@@ -248,7 +236,7 @@ TEST(Mupairproduction, Test_of_dNdx)
 
     while (in.good())
     {
-        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> mupair_enable >> energy >> parametrization >> dNdx_stored;
+        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> parametrization >> dNdx_stored;
 
         ParticleDef particle_def = getParticleDef(particleName);
         Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
@@ -257,7 +245,6 @@ TEST(Mupairproduction, Test_of_dNdx)
         MupairProductionFactory::Definition mupair_def;
         mupair_def.multiplier      = multiplier;
         mupair_def.parametrization = MupairProductionFactory::Get().GetEnumFromString(parametrization);
-        mupair_def.mupair_enable  = mupair_enable;
 
         CrossSection* mupair = MupairProductionFactory::Get().CreateMupairProduction(particle_def, *medium, ecuts, mupair_def);
         dNdx_new = mupair->CalculatedNdx(energy);
@@ -288,7 +275,6 @@ TEST(Mupairproduction, Test_of_dNdx_rnd)
     double ecut;
     double vcut;
     double multiplier;
-    bool mupair_enable;
     double energy;
     std::string parametrization;
     double rnd;
@@ -299,7 +285,7 @@ TEST(Mupairproduction, Test_of_dNdx_rnd)
 
     while (in.good())
     {
-        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> mupair_enable >> energy >> parametrization >> rnd >> dNdx_rnd_stored;
+        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> parametrization >> rnd >> dNdx_rnd_stored;
 
         ParticleDef particle_def = getParticleDef(particleName);
         Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
@@ -308,7 +294,6 @@ TEST(Mupairproduction, Test_of_dNdx_rnd)
         MupairProductionFactory::Definition mupair_def;
         mupair_def.multiplier      = multiplier;
         mupair_def.parametrization = MupairProductionFactory::Get().GetEnumFromString(parametrization);
-        mupair_def.mupair_enable  = mupair_enable;
 
         CrossSection* mupair = MupairProductionFactory::Get().CreateMupairProduction(particle_def, *medium, ecuts, mupair_def);
 
@@ -340,7 +325,6 @@ TEST(Mupairproduction, Test_Stochastic_Loss)
     double ecut;
     double vcut;
     double multiplier;
-    bool mupair_enable;
     double energy;
     std::string parametrization;
     double rnd1, rnd2;
@@ -352,7 +336,7 @@ TEST(Mupairproduction, Test_Stochastic_Loss)
 
     while (in.good())
     {
-        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> mupair_enable >> energy >> parametrization >> rnd1 >> rnd2 >>
+        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> parametrization >> rnd1 >> rnd2 >>
             stochastic_loss_stored;
 
 
@@ -363,7 +347,6 @@ TEST(Mupairproduction, Test_Stochastic_Loss)
         MupairProductionFactory::Definition mupair_def;
         mupair_def.multiplier      = multiplier;
         mupair_def.parametrization = MupairProductionFactory::Get().GetEnumFromString(parametrization);
-        mupair_def.mupair_enable  = mupair_enable;
 
         CrossSection* mupair = MupairProductionFactory::Get().CreateMupairProduction(particle_def, *medium, ecuts, mupair_def);
 
@@ -395,7 +378,6 @@ TEST(Mupairproduction, Test_of_dEdx_Interpolant)
     double ecut;
     double vcut;
     double multiplier;
-    bool mupair_enable;
     double energy;
     std::string parametrization;
     double dEdx_stored;
@@ -405,7 +387,7 @@ TEST(Mupairproduction, Test_of_dEdx_Interpolant)
 
     while (in.good())
     {
-        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> mupair_enable >> energy >> parametrization >> dEdx_stored;
+        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> parametrization >> dEdx_stored;
 
         ParticleDef particle_def = getParticleDef(particleName);
         Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
@@ -414,7 +396,6 @@ TEST(Mupairproduction, Test_of_dEdx_Interpolant)
         MupairProductionFactory::Definition mupair_def;
         mupair_def.multiplier      = multiplier;
         mupair_def.parametrization = MupairProductionFactory::Get().GetEnumFromString(parametrization);
-        mupair_def.mupair_enable  = mupair_enable;
 
         CrossSection* mupair = MupairProductionFactory::Get().CreateMupairProduction(particle_def, *medium, ecuts, mupair_def, InterpolDef);
 
@@ -446,7 +427,6 @@ TEST(Mupairproduction, Test_of_dNdx_Interpolant)
     double ecut;
     double vcut;
     double multiplier;
-    bool mupair_enable;
     double energy;
     std::string parametrization;
     double dNdx_stored;
@@ -456,7 +436,7 @@ TEST(Mupairproduction, Test_of_dNdx_Interpolant)
 
     while (in.good())
     {
-        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> mupair_enable >> energy >> parametrization >> dNdx_stored;
+        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> parametrization >> dNdx_stored;
 
         ParticleDef particle_def = getParticleDef(particleName);
         Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
@@ -465,7 +445,6 @@ TEST(Mupairproduction, Test_of_dNdx_Interpolant)
         MupairProductionFactory::Definition mupair_def;
         mupair_def.multiplier      = multiplier;
         mupair_def.parametrization = MupairProductionFactory::Get().GetEnumFromString(parametrization);
-        mupair_def.mupair_enable  = mupair_enable;
 
         CrossSection* mupair = MupairProductionFactory::Get().CreateMupairProduction(particle_def, *medium, ecuts, mupair_def, InterpolDef);
 
@@ -497,7 +476,6 @@ TEST(Mupairproduction, Test_of_dNdxrnd_interpol)
     double ecut;
     double vcut;
     double multiplier;
-    bool mupair_enable;
     double energy;
     std::string parametrization;
     double rnd;
@@ -510,7 +488,7 @@ TEST(Mupairproduction, Test_of_dNdxrnd_interpol)
 
     while (in.good())
     {
-        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> mupair_enable >> energy >> parametrization >> rnd >> dNdx_rnd_stored;
+        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >>  energy >> parametrization >> rnd >> dNdx_rnd_stored;
 
         ParticleDef particle_def = getParticleDef(particleName);
         Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
@@ -519,7 +497,6 @@ TEST(Mupairproduction, Test_of_dNdxrnd_interpol)
         MupairProductionFactory::Definition mupair_def;
         mupair_def.multiplier      = multiplier;
         mupair_def.parametrization = MupairProductionFactory::Get().GetEnumFromString(parametrization);
-        mupair_def.mupair_enable  = mupair_enable;
 
         CrossSection* mupair = MupairProductionFactory::Get().CreateMupairProduction(particle_def, *medium, ecuts, mupair_def, InterpolDef);
 
@@ -551,7 +528,6 @@ TEST(Mupairproduction, Test_of_e_interpol)
     double ecut;
     double vcut;
     double multiplier;
-    bool mupair_enable;
     double energy;
     std::string parametrization;
     double rnd1, rnd2;
@@ -564,7 +540,7 @@ TEST(Mupairproduction, Test_of_e_interpol)
 
     while (in.good())
     {
-        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> mupair_enable >> energy >> parametrization >> rnd1 >> rnd2 >>
+        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >>  energy >> parametrization >> rnd1 >> rnd2 >>
             stochastic_loss_stored;
 
         ParticleDef particle_def = getParticleDef(particleName);
@@ -574,7 +550,6 @@ TEST(Mupairproduction, Test_of_e_interpol)
         MupairProductionFactory::Definition mupair_def;
         mupair_def.multiplier      = multiplier;
         mupair_def.parametrization = MupairProductionFactory::Get().GetEnumFromString(parametrization);
-        mupair_def.mupair_enable  = mupair_enable;
 
         CrossSection* mupair = MupairProductionFactory::Get().CreateMupairProduction(particle_def, *medium, ecuts, mupair_def, InterpolDef);
 

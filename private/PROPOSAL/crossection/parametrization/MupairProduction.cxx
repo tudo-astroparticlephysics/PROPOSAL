@@ -13,9 +13,8 @@
     Mupair##param::Mupair##param(const ParticleDef& particle_def,                                                        \
                                const Medium& medium,                                                                   \
                                const EnergyCutSettings& cuts,                                                          \
-                               double multiplier,                                                                      \
-                               bool mupair_enable)                                                                               \
-        : MupairProductionRhoIntegral(particle_def, medium, cuts, multiplier, mupair_enable)                                      \
+                               double multiplier)                                                                               \
+        : MupairProductionRhoIntegral(particle_def, medium, cuts, multiplier)                                      \
     {                                                                                                                  \
     }                                                                                                                  \
                                                                                                                        \
@@ -41,16 +40,13 @@ using namespace PROPOSAL;
 MupairProduction::MupairProduction(const ParticleDef& particle_def,
                                  const Medium& medium,
                                  const EnergyCutSettings& cuts,
-                                 double multiplier,
-                                 bool mupair_enable)
+                                 double multiplier)
     : Parametrization(particle_def, medium, cuts, multiplier)
-    , mupair_enable_(mupair_enable)
 {
 }
 
 MupairProduction::MupairProduction(const MupairProduction& mupair)
     : Parametrization(mupair)
-    , mupair_enable_(mupair.mupair_enable_)
 {
 }
 
@@ -58,12 +54,9 @@ MupairProduction::~MupairProduction() {}
 
 bool MupairProduction::compare(const Parametrization& parametrization) const
 {
-    const MupairProduction* pairproduction = static_cast<const MupairProduction*>(&parametrization);
+    //const MupairProduction* pairproduction = static_cast<const MupairProduction*>(&parametrization);
 
-    if (mupair_enable_ != pairproduction->mupair_enable_)
-        return false;
-    else
-        return Parametrization::compare(parametrization);
+    return Parametrization::compare(parametrization);
 }
 
 // ------------------------------------------------------------------------- //
@@ -102,9 +95,8 @@ Parametrization::IntegralLimits MupairProduction::GetIntegralLimits(double energ
 MupairProductionRhoIntegral::MupairProductionRhoIntegral(const ParticleDef& particle_def,
                                                        const Medium& medium,
                                                        const EnergyCutSettings& cuts,
-                                                       double multiplier,
-                                                       bool mupair_enable)
-    : MupairProduction(particle_def, medium, cuts, multiplier, mupair_enable)
+                                                       double multiplier)
+    : MupairProduction(particle_def, medium, cuts, multiplier)
     , integral_(IROMB, IMAXS, IPREC)
 {
 }
@@ -156,16 +148,18 @@ double MupairProductionRhoIntegral::DifferentialCrossSection(double energy, doub
 }
 
 // ------------------------------------------------------------------------- //
+/*
 void MupairProductionRhoIntegral::print(std::ostream& os) const
 {
-    os << "mupair production enabled: " << mupair_enable_ << '\n';
+    //empty
 }
+*/
 
 // ------------------------------------------------------------------------- //
 size_t MupairProductionRhoIntegral::GetHash() const
 {
     size_t seed = Parametrization::GetHash();
-    hash_combine(seed, mupair_enable_);
+    hash_combine(seed);
 
     return seed;
 }
