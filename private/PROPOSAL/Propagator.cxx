@@ -1439,24 +1439,6 @@ Sector::Definition Propagator::CreateSectorDefinition(const std::string& json_ob
                   PhotonuclearFactory::Get().GetStringFromEnum(sec_def_global.utility_def.photo_def.parametrization).c_str());
     }
 
-    if (json_global.find("epair") != json_global.end())
-    {
-        if (json_global["epair"].is_string())
-        {
-            std::string epair = json_global["epair"].get<std::string>();
-            sec_def_global.utility_def.epair_def.parametrization = EpairProductionFactory::Get().GetEnumFromString(epair);
-        }
-        else
-        {
-            log_fatal("The given epair option is not a string.");
-        }
-    }
-    else
-    {
-        log_debug("The epair option is not set. Use default %s",
-                  EpairProductionFactory::Get().GetStringFromEnum(sec_def_global.utility_def.epair_def.parametrization).c_str());
-    }
-
     if (json_global.find("mupair") != json_global.end())
     {
         if (json_global["mupair"].is_string())
