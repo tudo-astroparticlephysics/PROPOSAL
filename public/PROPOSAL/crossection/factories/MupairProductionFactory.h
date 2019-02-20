@@ -149,7 +149,7 @@ private:
     ///
     /// @param name
     /// @param Enum
-    /// @param RegisterQ2Function
+    /// @param RegisterFunction
     // ----------------------------------------------------------------------------
     void Register(const std::string& name, Enum, std::pair<RegisterFunction, RegisterFunctionInterpolant>);
 

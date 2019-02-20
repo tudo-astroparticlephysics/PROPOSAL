@@ -87,12 +87,6 @@ public:
 
     // ----------------------------------------------------------------------------
     /// @brief This is the calculation of the dSigma/dv
-    ///
-    /// \f[e_{Pair}=return = \rho N_Z z^2 \Big[ \int_{1-r_{max}}^{aux}
-    /// f(r)dr + \int^1_{aux} f(r) dr \Big]\f]
-    /// with \f$ aux=max(1-r_{Max}, ComputerPrecision)\f$ and \f$r_{max} =
-    /// \sqrt{1-\frac{4m_e}{E_p v}}\Big(1-\frac{6m_p^2}{E_p^2(1-v)}\Big)\f$
-    ///
     // ----------------------------------------------------------------------------
     virtual double DifferentialCrossSection(double energy, double v) = 0;
 
@@ -124,9 +118,6 @@ public:
     // ----------------------------------------------------------------------------
     /// @brief This is the calculation of the d2Sigma/dvdRo - interface to Integral
     ///
-    /// the function which is defined here is:
-    /// \f[ f(r) =return= \alpha^2r_e^2 \frac{2Z}{1,5\pi}(Z+k)
-    /// \frac{1-v}{v}lpm(r^2,b,s)(\Phi\ln(X))\f]
     // ----------------------------------------------------------------------------
     virtual double FunctionToIntegral(double energy, double v, double rho) = 0;
 
