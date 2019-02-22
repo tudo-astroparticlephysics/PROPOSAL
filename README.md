@@ -85,7 +85,7 @@ and if you want to cite the latest improvements
   title       = {Recent Improvements for the Lepton Propagator PROPOSAL},
   author      = {Dunsch, Mario and
                  Soedingrekso, Jan and
-                 Sandrock, Sandrock and
+                 Sandrock, Alexander and
                  Meier, Max and
                  Menne, Thorben and
                  Rhode, Wolfgang},
@@ -140,9 +140,9 @@ cp src/PROPOSAL/resources/icesim/clsim/PropagateMuons.py src/clsim/resources/scr
 
 ### Deployment ###
 
-PROPOSAL is build as library. So you can include this project in your own
+PROPOSAL is built as library. So you can include this project in your own
 c++ project by including the header files. The following snippet uses the
-[configuration](resources/config.json) to propagte muons and
+[configuration](resources/config.json) to propagate muons and
 store the muon ranges for further proceeds.
 The parameters of the configuration file are described
 [here](resources/config_docu.md).
@@ -238,7 +238,7 @@ for i in range(1000):
 
 ## Documentation ##
 
-The C++ API can be build using
+The C++ API can be built using
 
 	make doc
 
@@ -268,11 +268,11 @@ Modifcations of the LGPL [License](LICENSE.md):
 
 ## Developers and Maintainers ##
 
-*Mario Dunsch*, *Jan Soedingrekso*, *Alexander Sandrock*, *Jean-Marco Alameddine*
+*Jan Soedingrekso*, *Alexander Sandrock*, *Jean-Marco Alameddine*
 
 ## Former Developers and Maintainers ##
 
-*Jan-Hendrick Koehne*, *Tomasz Fuchs*, *Mario Dunsch*
+*Jan-Hendrik Koehne*, *Tomasz Fuchs*, *Mario Dunsch*
 
 ## Acknowledgement ##
 
