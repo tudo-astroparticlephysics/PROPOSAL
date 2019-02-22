@@ -19,7 +19,7 @@
 ```
 
 [![Build Status](https://travis-ci.org/tudo-astroparticlephysics/PROPOSAL.svg?branch=master)](https://travis-ci.org/tudo-astroparticlephysics/PROPOSAL)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1484180.svg)](https://doi.org/10.5281/zenodo.1484180)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2551770.svg)](https://doi.org/10.5281/zenodo.2551770)
 
 # PROPOSAL #
 
@@ -57,26 +57,26 @@ If you use PROPOSAL, please cite the PROPOSAL paper
 ```
 and our zenodo entry of the version you use
 ```bibtex
-@misc{mario_dunsch_2018_1484181,
+@misc{mario_dunsch_2019_2551770,
   author       = {Mario Dunsch and
                   Jan Soedingrekso and
-                  Jan-Hendrick Köhne and
+                  Jan-Hendrik Köhne and
                   Tomasz Fuchs and
                   Jacob van Santen and
                   Claudio Kopper and
                   Alex Olivas},
   title        = {tudo-astroparticlephysics/PROPOSAL: Zenodo},
-  month        = nov,
-  year         = 2018,
-  doi          = {10.5281/zenodo.1484181},
-  url          = {https://doi.org/10.5281/zenodo.1484181}
+  month        = jan,
+  year         = 2019,
+  doi          = {10.5281/zenodo.2551770},
+  url          = {https://doi.org/10.5281/zenodo.2551770}
 }
 ``` 
 
 ## Requirements ##
 
 - Boost Library 1.48 or higher
-- [log4cplus](https://github.com/log4cplus/log4cplus) 2.0.0 or higher
+- [log4cplus](https://github.com/log4cplus/log4cplus) 2.0.2
 - CMake 2.8 or higher
 
 ## Recommended ##
@@ -225,9 +225,7 @@ A documentation of the configuration file can be found
 
 When you encounter any errors or misunderstandings don't hesitate and write a mail to
 [Jan Soedingrekso](mailto:jan.soedingrekso@tu-dortmund.de),
-[Mario Dunsch](mailto:mario.dunsch@tu-dortmund.de),
-[Tomasz Fuchs](mailto:Tomasz.Fuchs@tu-dortmund.de) or
-[Jan-Hendrik Koehne](mailto:Jan-Hendrik.Koehne@tu-dortmund.de).
+[Alexander Sandrock](mailto:alexander.sandrock@tu-dortmund.de).
 
 ## License ##
 
@@ -246,11 +244,11 @@ Modifcations of the LGPL [License](LICENSE.md):
 
 ## Developers and Maintainers ##
 
-*Mario Dunsch*, *Jan Soedingrekso*
+*Mario Dunsch*, *Jan Soedingrekso*, *Alexander Sandrock*, *Jean-Marco Alameddine*
 
 ## Former Developers and Maintainers ##
 
-*Jan-Hendrick Koehne*, *Tomasz Fuchs*
+*Jan-Hendrick Koehne*, *Tomasz Fuchs*, *Mario Dunsch*
 
 ## Acknowledgement ##
 
