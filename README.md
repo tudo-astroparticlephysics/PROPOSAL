@@ -30,9 +30,10 @@ interactions, electron pair production, Landau–Pomeranchuk–Migdal and
 Ter-Mikaelian effects, muon and tau decay, as well as Molière scattering are
 implemented for different parametrizations.
 The full Paper can be found
-[here](http://www.sciencedirect.com/science/article/pii/S0010465513001355)
+[here](https://doi.org/10.1016/j.cpc.2013.04.001).
+Recent improvements are documented [here](https://arxiv.org/abs/1809.07740).
 
-PROPOSAL was tested on Mac OS X V. 10.7.5, Ubuntu 12.04, SUSE Enterprise 10 and PCLinuxos. Since
+PROPOSAL was tested on Mac OS X V. 10.10.5, Ubuntu 12.04, SUSE Enterprise 10 and PCLinuxos. Since
 all these OS are UNIX based it should be fine to run and compile PROPOSAL on a UNIX based OS.
 
 PROPOSAL is now a C++11 library using also pybind11 instead of boost python!
@@ -42,36 +43,59 @@ PROPOSAL is now a C++11 library using also pybind11 instead of boost python!
 
 If you use PROPOSAL, please cite the PROPOSAL paper
 
-
 ```bibtex
 @article{koehne2013proposal,
-  title={PROPOSAL: A tool for propagation of charged leptons},
-  author={Koehne, J-H and Frantzen, Katharina and Schmitz, Martin and Fuchs, Tomasz and Rhode, Wolfgang and Chirkin, Dmitry and Tjus, J Becker},
-  journal={Computer Physics Communications},
-  volume={184},
-  number={9},
-  pages={2070--2090},
-  year={2013},
-  publisher={Elsevier}
+  title     ={PROPOSAL: A tool for propagation of charged leptons},
+  author    = {Koehne, Jan-Hendrik and
+               Frantzen, Katharina and
+               Schmitz, Martin and
+               Fuchs, Tomasz and
+               Rhode, Wolfgang and
+               Chirkin, Dmitry and
+               Tjus, J Becker},
+  journal   = {Computer Physics Communications},
+  volume    = {184},
+  number    = {9},
+  pages     = {2070--2090},
+  year      = {2013},
+  publisher = {Elsevier},
+  doi       = {10.1016/j.cpc.2013.04.001}
 }
 ```
 and our zenodo entry of the version you use
 ```bibtex
 @misc{mario_dunsch_2019_2551770,
-  author       = {Mario Dunsch and
-                  Jan Soedingrekso and
-                  Jan-Hendrik Köhne and
-                  Tomasz Fuchs and
-                  Jacob van Santen and
-                  Claudio Kopper and
-                  Alex Olivas},
-  title        = {tudo-astroparticlephysics/PROPOSAL: Zenodo},
-  month        = jan,
-  year         = 2019,
-  doi          = {10.5281/zenodo.2551770},
-  url          = {https://doi.org/10.5281/zenodo.2551770}
+  author = {Dunsch, Mario and
+            Soedingrekso, Jan and
+            Köhne, Jan-Hendrik and
+            Fuchs, Tomasz and
+            van Santen, Jacob and
+            Kopper, Claudio and
+            Olivas, Alex},
+  title   = {tudo-astroparticlephysics/PROPOSAL: Zenodo},
+  month  = jan,
+  year   = 2019,
+  doi    = {10.5281/zenodo.2551770},
+  url    = {https://doi.org/10.5281/zenodo.2551770}
 }
-``` 
+```
+and if you want to cite the latest improvements
+```bibtex
+@online{dunsch_2018_proposal_improvements,
+  title       = {Recent Improvements for the Lepton Propagator PROPOSAL},
+  author      = {Dunsch, Mario and
+                 Soedingrekso, Jan and
+                 Sandrock, Sandrock and
+                 Meier, Max and
+                 Menne, Thorben and
+                 Rhode, Wolfgang},
+  year        = {2018},
+  eprint      = {1809.07740},
+  eprinttype  =  {arxiv},
+  eprintclass = {hep-ph}
+}
+```
+
 
 ## Requirements ##
 
