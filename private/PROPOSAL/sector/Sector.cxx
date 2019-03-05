@@ -419,8 +419,32 @@ double Sector::Propagate(double distance)
                 initial_energy = final_energy;
                 continue;
             }
+
+            if (energy_loss.second == DynamicData::MuPair){
+                if(sector_def_.utility_def.mupair_def.particle_output == true){
+                   //Return two particles with specific energies
+                    std::vector<CrossSection*> cross_sections = utility_.GetCrosssections();
+                    for (unsigned int i = 0; i < cross_sections.size(); i++)
+                    {
+                        if(DynamicData::MuPair == cross_sections[i]->GetTypeId()){
+                            decay_products = cross_sections[i]->CalculateProducedParticles(final_energy, energy_loss.first);
+                            Output::getInstance().FillSecondaryVector(decay_products);
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    //Return a DynamicData::MuPair object, useful when one is interested in the number of interactions
+                    Output::getInstance().FillSecondaryVector(particle_, energy_loss.second, energy_loss.first);
+                }
+            }
+            else
+            {
+                Output::getInstance().FillSecondaryVector(particle_, energy_loss.second, energy_loss.first);
+            }
+
             final_energy -= energy_loss.first;
-            Output::getInstance().FillSecondaryVector(particle_, energy_loss.second, energy_loss.first);
 
             // log_debug("Energyloss: %f\t%s", energy_loss.first,
             // secondary_id    =   particle_.GetParticleId() + 1;
@@ -590,7 +614,7 @@ std::pair<double, DynamicData::Type> Sector::MakeStochasticLoss()
     {
         rates_sum += rates[i];
 
-        if (rates_sum > total_rate_weighted)
+        if (rates_sum >= total_rate_weighted)
         {
             energy_loss.first  = cross_sections[i]->CalculateStochasticLoss(particle_.GetEnergy(), rnd2, rnd3);
             energy_loss.second = cross_sections[i]->GetTypeId();

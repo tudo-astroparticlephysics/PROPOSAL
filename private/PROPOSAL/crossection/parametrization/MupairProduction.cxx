@@ -9,6 +9,9 @@
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Output.h"
 
+#include "PROPOSAL/math/RandomGenerator.h"
+
+
 #define MUPAIR_PARAM_INTEGRAL_IMPL(param)                                                                               \
     Mupair##param::Mupair##param(const ParticleDef& particle_def,                                                        \
                                const Medium& medium,                                                                   \
@@ -41,12 +44,12 @@ MupairProduction::MupairProduction(const ParticleDef& particle_def,
                                  const Medium& medium,
                                  const EnergyCutSettings& cuts,
                                  double multiplier)
-    : Parametrization(particle_def, medium, cuts, multiplier)
+    : Parametrization(particle_def, medium, cuts, multiplier), drho_integral_(IROMB, IMAXS, IPREC)
 {
 }
 
 MupairProduction::MupairProduction(const MupairProduction& mupair)
-    : Parametrization(mupair)
+    : Parametrization(mupair), drho_integral_(IROMB, IMAXS, IPREC)
 {
 }
 
@@ -84,6 +87,33 @@ Parametrization::IntegralLimits MupairProduction::GetIntegralLimits(double energ
     }
 
     return limits;
+}
+
+double MupairProduction::Calculaterho(double energy, double v) {
+    double rho = 0;
+    double rnd1 = RandomGenerator::Get().RandomDouble();
+    double rnd2 = RandomGenerator::Get().RandomDouble();
+    double rho_min = 0;
+    double rho_max = 1 - 2 * MMU / (v * energy);
+
+    if(rho_max<0){
+        return 0;
+    }
+
+    static_cast<void>(drho_integral_.IntegrateWithRandomRatio(
+            rho_min,
+            rho_max,
+            std::bind(&MupairProduction::FunctionToIntegral, this, energy, v, std::placeholders::_1),
+            3,
+            rnd1));
+
+    rho = drho_integral_.GetUpperLimit();
+
+    if(rnd2<0.5){
+        rho = -rho;
+    }
+
+    return rho;
 }
 
 
@@ -134,17 +164,15 @@ double MupairProductionRhoIntegral::DifferentialCrossSection(double energy, doub
         rMax = aux;
     } else
     {
-        rMax = 0;
+        return 0;
     }
-
-    aux = std::max(1 - rMax, COMPUTER_PRECISION);
 
     return multiplier_ * medium_->GetMolDensity() * components_[component_index_]->GetAtomInMolecule() *
            particle_def_.charge * particle_def_.charge *
            (integral_.Integrate(
-                1 - rMax, aux, std::bind(&MupairProductionRhoIntegral::FunctionToIntegral, this, energy, v, std::placeholders::_1), 2) +
-            integral_.Integrate(
-                aux, 1, std::bind(&MupairProductionRhoIntegral::FunctionToIntegral, this, energy, v, std::placeholders::_1), 4));
+                   0, rMax, std::bind(&MupairProductionRhoIntegral::FunctionToIntegral, this, energy, v, std::placeholders::_1), 2));
+
+
 }
 
 // ------------------------------------------------------------------------- //
@@ -190,9 +218,8 @@ double MupairKelnerKokoulinPetrukhin::FunctionToIntegral(double energy, double v
     //double medium_log_constant = components_[component_index_]->GetLogConstant();
     double medium_log_constant = 183; // According to the paper, B is set to 183
 
-    r           = 1 - r; // only for integral optimization - do not forget to swap integration limits!
     r2          = r * r;
-    rMax        = 1 - 2 * MMU / (v * energy); // no need to apply swap here because rMax is fixed
+    rMax        = 1 - 2 * MMU / (v * energy);
     Z3          = std::pow(medium_charge, -1. / 3);
     aux         = (particle_def_.mass * v) / (2 * MMU);
     xi          = aux * aux * (1 - r2) / (1 - v);

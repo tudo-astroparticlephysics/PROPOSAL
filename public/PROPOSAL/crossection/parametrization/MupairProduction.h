@@ -89,12 +89,14 @@ public:
     /// @brief This is the calculation of the dSigma/dv
     // ----------------------------------------------------------------------------
     virtual double DifferentialCrossSection(double energy, double v) = 0;
+    virtual double FunctionToIntegral(double energy, double v, double rho) = 0;
+    virtual double Calculaterho(double energy, double v);
 
     virtual IntegralLimits GetIntegralLimits(double energy);
 
-
 protected:
     bool compare(const Parametrization&) const;
+    Integral drho_integral_;
 };
 
 // ------------------------------------------------------------------------- //
@@ -119,7 +121,6 @@ public:
     /// @brief This is the calculation of the d2Sigma/dvdRo - interface to Integral
     ///
     // ----------------------------------------------------------------------------
-    virtual double FunctionToIntegral(double energy, double v, double rho) = 0;
 
     virtual size_t GetHash() const;
 
