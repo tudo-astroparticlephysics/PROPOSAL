@@ -49,6 +49,8 @@ public:
     // ----------------------------------------------------------------- //
 
     double CalculatedEdx(double energy);
+    DecayProducts CalculateProducedParticles(double energy, double energy_loss);
+
 };
 
 } // namespace PROPOSAL

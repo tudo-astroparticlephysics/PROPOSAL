@@ -58,6 +58,7 @@ public:
             : parametrization(KelnerKokoulinPetrukhin)
             , mupair_enable(false)
             , multiplier(1.0)
+            , particle_output(true)
         {
         }
 
@@ -68,6 +69,8 @@ public:
             else if (mupair_enable != def.mupair_enable)
                 return false;
             else if (multiplier != def.multiplier)
+                return false;
+            else if (particle_output != def.particle_output)
                 return false;
 
             return true;
@@ -81,6 +84,7 @@ public:
         Enum parametrization;
         bool mupair_enable;
         double multiplier;
+        bool particle_output;
     };
 
     // --------------------------------------------------------------------- //

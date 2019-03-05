@@ -514,7 +514,7 @@ void init_parametrization(py::module& m)
     // --------------------------------------------------------------------- //
 
     py::module m_sub_epair = m_sub.def_submodule("pairproduction");
-    py::class_<EpairProduction, std::shared_ptr<EpairProduction>, Parametrization>(m_sub_brems, "EpairProduction");
+    py::class_<EpairProduction, std::shared_ptr<EpairProduction>, Parametrization>(m_sub_epair, "EpairProduction");
 
     py::class_<EpairProductionRhoIntegral, std::shared_ptr<EpairProductionRhoIntegral>, EpairProduction>(m_sub_epair, "EpairProductionRhoIntegral")
         .def("function_to_integral", &EpairProductionRhoIntegral::FunctionToIntegral);
@@ -540,7 +540,8 @@ void init_parametrization(py::module& m)
     // --------------------------------------------------------------------- //
 
     py::module m_sub_mupair = m_sub.def_submodule("mupairproduction");
-    py::class_<MupairProduction, std::shared_ptr<MupairProduction>, Parametrization>(m_sub_brems, "MupairProduction");
+    py::class_<MupairProduction, std::shared_ptr<MupairProduction>, Parametrization>(m_sub_mupair, "MupairProduction")
+            .def("Calculaterho", &MupairProduction::Calculaterho);
 
     py::class_<MupairProductionRhoIntegral, std::shared_ptr<MupairProductionRhoIntegral>, MupairProduction>(m_sub_mupair, "MupairProductionRhoIntegral")
         .def("function_to_integral", &MupairProductionRhoIntegral::FunctionToIntegral);
@@ -556,7 +557,8 @@ void init_parametrization(py::module& m)
         .def(py::init<>())
         .def_readwrite("parametrization", &MupairProductionFactory::Definition::parametrization)
         .def_readwrite("mupair_enable", &MupairProductionFactory::Definition::mupair_enable)
-        .def_readwrite("multiplier", &MupairProductionFactory::Definition::multiplier);
+        .def_readwrite("multiplier", &MupairProductionFactory::Definition::multiplier)
+        .def_readwrite("particle_output", &MupairProductionFactory::Definition::particle_output);
 
     // --------------------------------------------------------------------- //
     // Photo
