@@ -1291,18 +1291,9 @@ void Integral::RefineUpperLimit(double result)
             }
         }
 
-        if (df == 0)
+        if (std::abs(deltaX) < precision_)
         {
-            if (std::abs(deltaX) < precision_ * (maxStore - minStore))
-            {
-                break;
-            }
-        } else
-        {
-            if (std::abs(df * deltaX) < precision_ * std::abs(result))
-            {
-                break;
-            }
+            break;
         }
 
         min_ = randomX_;
