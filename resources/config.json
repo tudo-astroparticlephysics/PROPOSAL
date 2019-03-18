@@ -8,6 +8,7 @@
 		{
 			"do_interpolation" : true,
 			"path_to_tables" : "resources/tables",
+			"path_to_tables_readonly" : "resources/tables",
 			"do_binary_tables" : false
 		},
 

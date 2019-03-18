@@ -743,6 +743,7 @@ PYBIND11_MODULE(pyPROPOSAL, m)
         .def(py::init<>())
         .def_readwrite("order_of_interpolation", &InterpolationDef::order_of_interpolation)
         .def_readwrite("path_to_tables", &InterpolationDef::path_to_tables)
+        .def_readwrite("path_to_tables_readonly", &InterpolationDef::path_to_tables_readonly)
         .def_readwrite("raw", &InterpolationDef::raw);
 
     // --------------------------------------------------------------------- //
