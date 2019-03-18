@@ -33,6 +33,8 @@ mupair_interpol = [
 
 energies = np.logspace(4, 13, num=10)
 
+vs = np.linspace(0.022, 0.98, 10) # choose v-range so that v_min < v < v_max is always fulflilled for all E in energies
+
 interpoldef = pp.InterpolationDef()
 
 
@@ -270,10 +272,71 @@ def create_table_stochastic_loss(dir_name, interpolate=False):
 
                             file.write("\t".join(buf))
 
+def create_table_rho(dir_name, interpolate=False):
+
+    pp.RandomGenerator.get().set_seed(0)
+
+    if interpolate:
+        params = mupair_interpol
+    else:
+        params = mupair
+
+    with open(dir_name + "Mupair_rho{}.txt".format("_interpol" if interpolate else ""), "a") as file:
+
+        for particle in particle_defs:
+            for medium in mediums:
+                for cut in cuts:
+                    for v in vs:
+                        for param in params:
+                            if interpolate:
+                                param_current = param(
+                                    particle,
+                                    medium,
+                                    cut,
+                                    multiplier,
+                                    interpoldef)
+
+                                xsection = pp.crosssection.MupairInterpolant(param_current, interpoldef)
+                            else:
+                                param_current = param(
+                                    particle,
+                                    medium,
+                                    cut,
+                                    multiplier)
+
+                                xsection = pp.crosssection.MupairIntegral(param_current)
+
+                            buf = [""]
+
+                            for energy in energies:
+                                rnd1 = pp.RandomGenerator.get().random_double()
+                                rnd2 = pp.RandomGenerator.get().random_double()
+                                particles = xsection.calculate_produced_particles(energy, v*energy, rnd1, rnd2)
+                                E1 = particles[0].energy
+                                E2 = particles[1].energy
+
+                                buf.append(particle.name)
+                                buf.append(medium.name)
+                                buf.append(str(cut.ecut))
+                                buf.append(str(cut.vcut))
+                                buf.append(str(v))
+                                buf.append(str(multiplier))
+                                buf.append(str(energy))
+                                buf.append(str(param_current.name))
+                                buf.append(str(rnd1))
+                                buf.append(str(rnd2))
+                                buf.append(str(E1))
+                                buf.append(str(E2))
+                                buf.append("\n")
+
+                            file.write("\t".join(buf))
+
 
 def main(dir_name):
     create_tables(dir_name, False, dEdx=True, dNdx=True, dNdx_rnd=True, stoch=True)
     create_tables(dir_name, True, dEdx=True, dNdx=True, dNdx_rnd=True, stoch=True)
+    create_table_rho(dir_name, False)
+
 
 if __name__ == "__main__":
 

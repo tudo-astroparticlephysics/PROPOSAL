@@ -73,7 +73,8 @@ public:
     virtual double FunctionToDEdxIntegral(double energy, double v);
     double FunctionToDE2dxIntegral(double energy, double v);
 
-    virtual double Calculaterho(double energy, double v){ (void)energy; (void)v; return 0;}
+    virtual double Calculaterho(double energy, double v, double rnd1, double rnd2){
+        (void)energy; (void)v; (void)rnd1; (void)rnd2; return 0;}
 
     virtual IntegralLimits GetIntegralLimits(double energy) = 0;
 

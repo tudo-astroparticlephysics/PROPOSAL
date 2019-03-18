@@ -90,7 +90,7 @@ public:
     // ----------------------------------------------------------------------------
     virtual double DifferentialCrossSection(double energy, double v) = 0;
     virtual double FunctionToIntegral(double energy, double v, double rho) = 0;
-    virtual double Calculaterho(double energy, double v);
+    virtual double Calculaterho(double energy, double v, double rnd1, double rnd2);
 
     virtual IntegralLimits GetIntegralLimits(double energy);
 

@@ -427,7 +427,11 @@ double Sector::Propagate(double distance)
                     for (unsigned int i = 0; i < cross_sections.size(); i++)
                     {
                         if(DynamicData::MuPair == cross_sections[i]->GetTypeId()){
-                            decay_products = cross_sections[i]->CalculateProducedParticles(final_energy, energy_loss.first);
+                            decay_products = cross_sections[i]->CalculateProducedParticles(
+                                    final_energy,
+                                    energy_loss.first,
+                                    RandomGenerator::Get().RandomDouble(),
+                                    RandomGenerator::Get().RandomDouble());
                             Output::getInstance().FillSecondaryVector(decay_products);
                             break;
                         }
