@@ -151,7 +151,7 @@ Propagator::Propagator(const ParticleDef& particle_def, const std::string& confi
     nlohmann::json json_config;
     try
     {
-        std::string expanded_config_file_path = Helper::ResolvePath(config_file);
+        std::string expanded_config_file_path = Helper::ResolvePath(config_file, true);
         std::ifstream infilestream(expanded_config_file_path);
         infilestream >> json_config;
     }
@@ -1177,6 +1177,51 @@ InterpolationDef Propagator::CreateInterpolationDef(const std::string& json_obje
     else
     {
         log_debug("No path to tables set. Use default and save in memory");
+    }
+
+    // Parse to find path to interpolation tables for readonly
+    if (json_object.find("path_to_tables_readonly") != json_object.end())
+    {
+        std::string table_path_str = "";
+        if (json_object["path_to_tables_readonly"].is_string())
+        {
+            table_path_str = json_object["path_to_tables_readonly"];
+            interpolation_def.path_to_tables_readonly = Helper::ResolvePath(table_path_str, true);
+        }
+        else if (json_object["path_to_tables_readonly"].is_array())
+        {
+            for (size_t idx=0; idx < json_object["path_to_tables_readonly"].get<std::vector<std::string>>().size(); idx++)
+            {
+                if (json_object["path_to_tables_readonly"][idx].is_string())
+                {
+                    table_path_str = Helper::ResolvePath(json_object["path_to_tables_readonly"][idx].get<std::string>(), true);
+                    if (table_path_str != "")
+                        break;
+                }
+                else
+                {
+                    log_fatal("The given path_to_tables_readonly option does not consist of strings.");
+                }
+            }
+        }
+        else
+        {
+            log_fatal("The given path_to_tables_readonly option must be a string or a list of strings.");
+        }
+
+        if (table_path_str != "")
+        {
+            interpolation_def.path_to_tables_readonly = table_path_str;
+            log_info("Path to readonly interpolation tables set to: \"%s\"", table_path_str.c_str());
+        }
+        else
+        {
+            log_warn("No valid path to readonly interpolation tables found.");
+        }
+    }
+    else
+    {
+        log_debug("No path to readonly tables set. Use default and look at writable path to tables.");
     }
 
     return interpolation_def;
