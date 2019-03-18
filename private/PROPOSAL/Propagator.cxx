@@ -1301,20 +1301,20 @@ Sector::Definition Propagator::CreateSectorDefinition(const std::string& json_ob
         log_debug("No given mupair_enable option given. Use default (false)");
     }
 
-    if (json_global.find("particle_output") != json_global.end())
+    if (json_global.find("mupair_particle_output") != json_global.end())
     {
-        if (json_global["particle_output"].is_boolean())
+        if (json_global["mupair_particle_output"].is_boolean())
         {
-            sec_def_global.utility_def.mupair_def.particle_output = json_global["particle_output"].get<bool>();
+            sec_def_global.utility_def.mupair_def.particle_output = json_global["mupair_particle_output"].get<bool>();
         }
         else
         {
-            log_fatal("The given particle_output option is not a bool.");
+            log_fatal("The given mupair_particle_output option is not a bool.");
         }
     }
     else
     {
-        log_debug("No given particle_output option given. Use default (true)");
+        log_debug("No given mupair_particle_output option given. Use default (true)");
     }
 
     if (json_global.find("exact_time") != json_global.end())

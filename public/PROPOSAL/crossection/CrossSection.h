@@ -44,8 +44,6 @@ class Parametrization;
 class CrossSection
 {
 public:
-    typedef std::vector<Particle*> DecayProducts;
-
     CrossSection(const DynamicData::Type&, const Parametrization&);
     CrossSection(const CrossSection&);
     virtual ~CrossSection();
@@ -66,8 +64,8 @@ public:
     virtual double CalculatedNdx(double energy)                                     = 0;
     virtual double CalculatedNdx(double energy, double rnd)                         = 0;
     virtual double CalculateStochasticLoss(double energy, double rnd1, double rnd2) = 0;
-    virtual DecayProducts CalculateProducedParticles(double energy, double energy_loss){
-        (void)energy; (void)energy_loss; return std::vector<Particle*>();}
+    virtual std::vector<Particle*> CalculateProducedParticles(double energy, double energy_loss, double rnd1, double rnd2){
+        (void)energy; (void)energy_loss; (void)rnd1; (void)rnd2; return std::vector<Particle*>();}
 
     // ----------------------------------------------------------------- //
     // Getter

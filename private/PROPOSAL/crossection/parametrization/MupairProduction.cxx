@@ -9,8 +9,6 @@
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Output.h"
 
-#include "PROPOSAL/math/RandomGenerator.h"
-
 
 #define MUPAIR_PARAM_INTEGRAL_IMPL(param)                                                                               \
     Mupair##param::Mupair##param(const ParticleDef& particle_def,                                                        \
@@ -89,10 +87,8 @@ Parametrization::IntegralLimits MupairProduction::GetIntegralLimits(double energ
     return limits;
 }
 
-double MupairProduction::Calculaterho(double energy, double v) {
+double MupairProduction::Calculaterho(double energy, double v, double rnd1, double rnd2) {
     double rho = 0;
-    double rnd1 = RandomGenerator::Get().RandomDouble();
-    double rnd2 = RandomGenerator::Get().RandomDouble();
     double rho_min = 0;
     double rho_max = 1 - 2 * MMU / (v * energy);
 

@@ -49,7 +49,7 @@ public:
     // ----------------------------------------------------------------- //
 
     double CalculatedEdx(double energy);
-    DecayProducts CalculateProducedParticles(double energy, double energy_loss);
+    std::vector<Particle*> CalculateProducedParticles(double energy, double energy_loss, double rnd1, double rnd2);
 
 };
 

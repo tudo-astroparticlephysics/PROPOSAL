@@ -48,15 +48,15 @@ double MupairIntegral::CalculatedEdx(double energy)
     return energy * sum;
 }
 
-CrossSection::DecayProducts MupairIntegral::CalculateProducedParticles(double energy, double energy_loss){
+std::vector<Particle*> MupairIntegral::CalculateProducedParticles(double energy, double energy_loss, double rnd1, double rnd2){
 
     //Create MuPair particles
-    DecayProducts mupair;
+    std::vector<Particle*> mupair;
     mupair.push_back(new Particle(MuMinusDef::Get()));
     mupair.push_back(new Particle(MuPlusDef::Get()));
 
     //Sample and assign energies
-    double rho = parametrization_->Calculaterho(energy, energy_loss/energy);
+    double rho = parametrization_->Calculaterho(energy, energy_loss/energy, rnd1, rnd2);
 
     mupair[0]->SetEnergy(0.5*energy_loss*(1 + rho));
     mupair[1]->SetEnergy(0.5*energy_loss*(1 - rho));

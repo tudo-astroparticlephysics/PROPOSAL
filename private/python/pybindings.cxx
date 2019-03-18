@@ -659,6 +659,7 @@ void init_crosssection(py::module& m)
         .def("calculate_dNdx", (double (CrossSection::*)(double))&CrossSection::CalculatedNdx)
         .def("calculate_dNdx_rnd", (double (CrossSection::*)(double, double))&CrossSection::CalculatedNdx)
         .def("calculate_stochastic_loss", (double (CrossSection::*)(double, double, double))&CrossSection::CalculateStochasticLoss)
+        .def("calculate_produced_particles", &CrossSection::CalculateProducedParticles)
         .def_property_readonly("id", &CrossSection::GetTypeId)
         .def_property_readonly("parametrization", &CrossSection::GetParametrization);
 
