@@ -34,7 +34,7 @@ SimplePropagator::SimplePropagator(I3Particle::ParticleType pt,
     PROPOSAL::Sector::Definition sec_def;
 
     sec_def.stopping_decay              = final_stochastic_loss_ == I3Particle::unknown;
-    sec_def.scattering_model            = PROPOSAL::ScatteringFactory::Moliere;
+    sec_def.scattering_model            = PROPOSAL::ScatteringFactory::Highland;
     sec_def.do_exact_time_calculation   = true;
     sec_def.do_continuous_randomization = ecut < 0;
 
