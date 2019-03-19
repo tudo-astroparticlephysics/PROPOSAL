@@ -20,6 +20,7 @@ Utility::Definition::Definition()
     , photo_def()
     , epair_def()
     , ioniz_def()
+    , mupair_def()
 {
 }
 
@@ -32,6 +33,8 @@ bool Utility::Definition::operator==(const Utility::Definition& utility_def) con
     else if (epair_def != utility_def.epair_def)
         return false;
     else if (ioniz_def != utility_def.ioniz_def)
+        return false;
+    else if (mupair_def != utility_def.mupair_def)
         return false;
 
     return true;
@@ -68,6 +71,16 @@ Utility::Utility(const ParticleDef& particle_def,
 
     crosssections_.push_back(
         IonizationFactory::Get().CreateIonization(particle_def_, *medium_, cut_settings_, utility_def.ioniz_def));
+
+    if(utility_def.mupair_def.mupair_enable == true){
+        crosssections_.push_back(MupairProductionFactory::Get().CreateMupairProduction(
+            particle_def_, *medium_, cut_settings_, utility_def.mupair_def));
+        log_debug("Mupair Production enabled");
+    }
+    else{
+        log_debug("Mupair Production disabled");
+    }
+
 }
 
 Utility::Utility(const ParticleDef& particle_def,
@@ -91,6 +104,15 @@ Utility::Utility(const ParticleDef& particle_def,
 
     crosssections_.push_back(IonizationFactory::Get().CreateIonization(
         particle_def_, *medium_, cut_settings_, utility_def.ioniz_def, interpolation_def));
+
+    if(utility_def.mupair_def.mupair_enable == true){
+        crosssections_.push_back(MupairProductionFactory::Get().CreateMupairProduction(
+            particle_def_, *medium_, cut_settings_, utility_def.mupair_def, interpolation_def));
+        log_debug("Mupair Production enabled");
+    }
+    else{
+        log_debug("Mupair Production disabled");
+    }
 }
 
 Utility::Utility(const std::vector<CrossSection*>& crosssections) try
