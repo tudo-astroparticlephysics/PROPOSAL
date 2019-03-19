@@ -27,7 +27,7 @@ SimplePropagator::SimplePropagator(I3Particle::ParticleType pt,
     , final_stochastic_loss_(final_loss)
 {
     std::ostringstream prefix;
-    prefix << getenv("I3_BUILD") << "/MuonGun/resources/tables/icecube";
+    prefix << getenv("I3_BUILD") << "/MuonGun/resources/tables";
 
     // Sector definition
 
@@ -68,6 +68,7 @@ SimplePropagator::SimplePropagator(I3Particle::ParticleType pt,
 
     PROPOSAL::InterpolationDef interpolation_def;
     interpolation_def.path_to_tables = prefix.str();
+    interpolation_def.path_to_tables_readonly = prefix.str();
 
     // Init new propagator
 
