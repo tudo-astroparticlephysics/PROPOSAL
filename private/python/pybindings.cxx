@@ -91,6 +91,25 @@ using namespace PROPOSAL;
              py::arg("lpm_effect"),                                                                                    \
              py::arg("interpolation_def"));
 
+#define MUPAIR_DEF(module, cls)                                                                                         \
+    py::class_<Mupair##cls, std::shared_ptr<Mupair##cls>, MupairProductionRhoIntegral>(module, #cls)                      \
+        .def(py::init<const ParticleDef&, const Medium&, const EnergyCutSettings&, double>(),                    \
+             py::arg("particle_def"),                                                                                  \
+             py::arg("medium"),                                                                                        \
+             py::arg("energy_cuts"),                                                                                   \
+             py::arg("multiplier"));
+
+#define MUPAIR_INTERPOL_DEF(module, cls)                                                                                \
+    py::class_<MupairProductionRhoInterpolant<Mupair##cls>,                                                              \
+               std::shared_ptr<MupairProductionRhoInterpolant<Mupair##cls> >,                                            \
+               Mupair##cls>(module, #cls "Interpolant")                                                                 \
+        .def(py::init<const ParticleDef&, const Medium&, const EnergyCutSettings&, double, InterpolationDef>(),  \
+             py::arg("particle_def"),                                                                                  \
+             py::arg("medium"),                                                                                        \
+             py::arg("energy_cuts"),                                                                                   \
+             py::arg("multiplier"),                                                                                      \
+             py::arg("interpolation_def"));
+
 // ------------------------------------------------------------------------- //
 // For __str__
 // ------------------------------------------------------------------------- //
@@ -495,7 +514,7 @@ void init_parametrization(py::module& m)
     // --------------------------------------------------------------------- //
 
     py::module m_sub_epair = m_sub.def_submodule("pairproduction");
-    py::class_<EpairProduction, std::shared_ptr<EpairProduction>, Parametrization>(m_sub_brems, "EpairProduction");
+    py::class_<EpairProduction, std::shared_ptr<EpairProduction>, Parametrization>(m_sub_epair, "EpairProduction");
 
     py::class_<EpairProductionRhoIntegral, std::shared_ptr<EpairProductionRhoIntegral>, EpairProduction>(m_sub_epair, "EpairProductionRhoIntegral")
         .def("function_to_integral", &EpairProductionRhoIntegral::FunctionToIntegral);
@@ -515,6 +534,31 @@ void init_parametrization(py::module& m)
         .def_readwrite("parametrization", &EpairProductionFactory::Definition::parametrization)
         .def_readwrite("lpm_effect", &EpairProductionFactory::Definition::lpm_effect)
         .def_readwrite("multiplier", &EpairProductionFactory::Definition::multiplier);
+
+    // --------------------------------------------------------------------- //
+    // Mupair
+    // --------------------------------------------------------------------- //
+
+    py::module m_sub_mupair = m_sub.def_submodule("mupairproduction");
+    py::class_<MupairProduction, std::shared_ptr<MupairProduction>, Parametrization>(m_sub_mupair, "MupairProduction")
+            .def("Calculaterho", &MupairProduction::Calculaterho);
+
+    py::class_<MupairProductionRhoIntegral, std::shared_ptr<MupairProductionRhoIntegral>, MupairProduction>(m_sub_mupair, "MupairProductionRhoIntegral")
+        .def("function_to_integral", &MupairProductionRhoIntegral::FunctionToIntegral);
+
+    MUPAIR_DEF(m_sub_mupair, KelnerKokoulinPetrukhin)
+
+    MUPAIR_INTERPOL_DEF(m_sub_mupair, KelnerKokoulinPetrukhin)
+
+    py::enum_<MupairProductionFactory::Enum>(m_sub_mupair, "MupairParametrization")
+        .value("KelnerKokoulinPetrukhin", MupairProductionFactory::KelnerKokoulinPetrukhin);
+
+    py::class_<MupairProductionFactory::Definition, std::shared_ptr<MupairProductionFactory::Definition> >(m_sub_mupair, "MupairDefinition")
+        .def(py::init<>())
+        .def_readwrite("parametrization", &MupairProductionFactory::Definition::parametrization)
+        .def_readwrite("mupair_enable", &MupairProductionFactory::Definition::mupair_enable)
+        .def_readwrite("multiplier", &MupairProductionFactory::Definition::multiplier)
+        .def_readwrite("particle_output", &MupairProductionFactory::Definition::particle_output);
 
     // --------------------------------------------------------------------- //
     // Photo
@@ -615,6 +659,7 @@ void init_crosssection(py::module& m)
         .def("calculate_dNdx", (double (CrossSection::*)(double))&CrossSection::CalculatedNdx)
         .def("calculate_dNdx_rnd", (double (CrossSection::*)(double, double))&CrossSection::CalculatedNdx)
         .def("calculate_stochastic_loss", (double (CrossSection::*)(double, double, double))&CrossSection::CalculateStochasticLoss)
+        .def("calculate_produced_particles", &CrossSection::CalculateProducedParticles)
         .def_property_readonly("id", &CrossSection::GetTypeId)
         .def_property_readonly("parametrization", &CrossSection::GetParametrization);
 
@@ -629,6 +674,8 @@ void init_crosssection(py::module& m)
         .def(py::init<const Photonuclear&>(), py::arg("parametrization"));
     py::class_<IonizIntegral, std::shared_ptr<IonizIntegral>, CrossSectionIntegral>(m_sub, "IonizIntegral")
         .def(py::init<const Ionization&>(), py::arg("parametrization"));
+    py::class_<MupairIntegral, std::shared_ptr<MupairIntegral>, CrossSectionIntegral>(m_sub, "MupairIntegral")
+        .def(py::init<const MupairProduction&>(), py::arg("parametrization"));
 
     py::class_<BremsInterpolant, std::shared_ptr<BremsInterpolant>, CrossSectionInterpolant>(
         m_sub, "BremsInterpolant")
@@ -642,6 +689,9 @@ void init_crosssection(py::module& m)
     py::class_<IonizInterpolant, std::shared_ptr<IonizInterpolant>, CrossSectionInterpolant>(
         m_sub, "IonizInterpolant")
         .def(py::init<const Ionization&, InterpolationDef>(), py::arg("parametrization"), py::arg("interpolation_def"));
+    py::class_<MupairInterpolant, std::shared_ptr<MupairInterpolant>, CrossSectionInterpolant>(
+        m_sub, "MupairInterpolant")
+        .def(py::init<const MupairProduction&, InterpolationDef>(), py::arg("parametrization"), py::arg("interpolation_def"));
 }
 
 void init_scattering(py::module& m)
@@ -775,7 +825,8 @@ PYBIND11_MODULE(pyPROPOSAL, m)
         .def_readwrite("brems_def", &Utility::Definition::brems_def)
         .def_readwrite("photo_def", &Utility::Definition::photo_def)
         .def_readwrite("epair_def", &Utility::Definition::epair_def)
-        .def_readwrite("ioniz_def", &Utility::Definition::ioniz_def);
+        .def_readwrite("ioniz_def", &Utility::Definition::ioniz_def)
+        .def_readwrite("mupair_def", &Utility::Definition::mupair_def);
 
     // --------------------------------------------------------------------- //
     // ContinousRandomization
@@ -873,3 +924,5 @@ PYBIND11_MODULE(pyPROPOSAL, m)
 #undef PHOTO_Q2_INTERPOL_DEF
 #undef EPAIR_DEF
 #undef EPAIR_INTERPOL_DEF
+#undef MUPAIR_DEF
+#undef MUPAIR_INTERPOL_DEF

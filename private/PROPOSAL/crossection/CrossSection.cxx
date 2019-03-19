@@ -77,6 +77,9 @@ std::ostream& PROPOSAL::operator<<(std::ostream& os, CrossSection const& cross)
         case DynamicData::NuclInt:
             name = "PhotoNuclear";
             break;
+        case DynamicData::MuPair:
+            name = "MuPairProduction";
+            break;
         default:
             break;
     }

@@ -1297,6 +1297,22 @@ Sector::Definition Propagator::CreateSectorDefinition(const std::string& json_ob
         log_debug("No given epair_multiplier option given. Use default (%f)", sec_def_global.utility_def.epair_def.multiplier);
     }
 
+    if (json_global.find("mupair_multiplier") != json_global.end())
+    {
+        if (json_global["mupair_multiplier"].is_number())
+        {
+            sec_def_global.utility_def.mupair_def.multiplier = json_global["mupair_multiplier"].get<double>();
+        }
+        else
+        {
+            log_fatal("The given mupair_multiplier option is not a double.");
+        }
+    }
+    else
+    {
+        log_debug("No given mupair_multiplier option given. Use default (%f)", sec_def_global.utility_def.mupair_def.multiplier);
+    }
+
     if (json_global.find("lpm") != json_global.end())
     {
         if (json_global["lpm"].is_boolean())
@@ -1312,6 +1328,38 @@ Sector::Definition Propagator::CreateSectorDefinition(const std::string& json_ob
     else
     {
         log_debug("No given lpm option given. Use default (true)");
+    }
+
+    if (json_global.find("mupair_enable") != json_global.end())
+    {
+        if (json_global["mupair_enable"].is_boolean())
+        {
+            sec_def_global.utility_def.mupair_def.mupair_enable = json_global["mupair_enable"].get<bool>();
+        }
+        else
+        {
+            log_fatal("The given mupair_enable option is not a bool.");
+        }
+    }
+    else
+    {
+        log_debug("No given mupair_enable option given. Use default (false)");
+    }
+
+    if (json_global.find("mupair_particle_output") != json_global.end())
+    {
+        if (json_global["mupair_particle_output"].is_boolean())
+        {
+            sec_def_global.utility_def.mupair_def.particle_output = json_global["mupair_particle_output"].get<bool>();
+        }
+        else
+        {
+            log_fatal("The given mupair_particle_output option is not a bool.");
+        }
+    }
+    else
+    {
+        log_debug("No given mupair_particle_output option given. Use default (true)");
     }
 
     if (json_global.find("exact_time") != json_global.end())
@@ -1450,6 +1498,24 @@ Sector::Definition Propagator::CreateSectorDefinition(const std::string& json_ob
     {
         log_debug("The photo option is not set. Use default %s",
                   PhotonuclearFactory::Get().GetStringFromEnum(sec_def_global.utility_def.photo_def.parametrization).c_str());
+    }
+
+    if (json_global.find("mupair") != json_global.end())
+    {
+        if (json_global["mupair"].is_string())
+        {
+            std::string mupair = json_global["mupair"].get<std::string>();
+            sec_def_global.utility_def.mupair_def.parametrization = MupairProductionFactory::Get().GetEnumFromString(mupair);
+        }
+        else
+        {
+            log_fatal("The given mupair option is not a string.");
+        }
+    }
+    else
+    {
+        log_debug("The mupair option is not set. Use default %s",
+                  MupairProductionFactory::Get().GetStringFromEnum(sec_def_global.utility_def.mupair_def.parametrization).c_str());
     }
 
     if (json_global.find("photo_shadow") != json_global.end())

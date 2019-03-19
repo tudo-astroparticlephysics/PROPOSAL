@@ -35,6 +35,7 @@
 #include "PROPOSAL/crossection/factories/EpairProductionFactory.h"
 #include "PROPOSAL/crossection/factories/IonizationFactory.h"
 #include "PROPOSAL/crossection/factories/PhotonuclearFactory.h"
+#include "PROPOSAL/crossection/factories/MupairProductionFactory.h"
 
 #include "PROPOSAL/EnergyCutSettings.h"
 #include "PROPOSAL/particle/ParticleDef.h"
@@ -55,6 +56,8 @@ public:
         PhotonuclearFactory::Definition photo_def;
         EpairProductionFactory::Definition epair_def;
         IonizationFactory::Definition ioniz_def;
+        MupairProductionFactory::Definition mupair_def;
+
 
         bool operator==(const Utility::Definition& utility_def) const;
         bool operator!=(const Utility::Definition& utility_def) const;
