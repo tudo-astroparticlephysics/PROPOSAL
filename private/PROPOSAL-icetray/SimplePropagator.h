@@ -28,21 +28,23 @@ class SimplePropagator
 {
 public:
     /**
-     * @param[in] medium The Type of the medium, e.g. MediumType::Ice
-     * @param[in] type   The Type of particles to propagate e.g.
-     * I3Particle::MuMinus
-     * @param[in] ecut   Absolute energy above which an energy
-     *                   loss is considered stochastic @f$ [MeV] @f$
-     * @param[in] vcut   Proportion of the current muon energy above
-     *                   which an energy loss is considered stochastic
-     * @param[in] rho    Density adjustment factor for the medium
+     * @param[in] type       The Type of particles to propagate e.g.
+                             I3Particle::MuMinus
+     * @param[in] medium     The Type of the medium, e.g. "ice"
+     * @param[in] ecut       Absolute energy above which an energy
+     *                       loss is considered stochastic @f$ [MeV] @f$
+     * @param[in] vcut       Proportion of the current muon energy above
+     *                       which an energy loss is considered stochastic
+     * @param[in] rho        Density adjustment factor for the medium
+     * @param[in] final_loss The rest energy after propagation of a given
+                             distance is stored in this particel, if given
      */
-    SimplePropagator(I3Particle::ParticleType type = I3Particle::MuMinus,
-                     const std::string& med        = "ice",
-                     double ecut                   = -1,
-                     double vcut                   = -1,
-                     double rho                    = 1.0,
-                     I3Particle::ParticleType      = I3Particle::unknown);
+    SimplePropagator(I3Particle::ParticleType type       = I3Particle::MuMinus,
+                     const std::string& med              = "ice",
+                     double ecut                         = -1,
+                     double vcut                         = -1,
+                     double rho                          = 1.0,
+                     I3Particle::ParticleType final_loss = I3Particle::unknown);
     ~SimplePropagator();
     /**
      * @param[in] p        Muon to propagate

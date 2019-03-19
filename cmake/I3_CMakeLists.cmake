@@ -1,13 +1,4 @@
-# - Try to find Log4cplus
-# Once done this will define
-#  LOG4CPLUS_FOUND - System has Log4cplus
-#  LOG4CPLUS_INCLUDE_DIRS - The Log4cplus include directories
-#  LOG4CPLUS_LIBRARIES - The libraries needed to use Log4cplus
 
-# TODO: the PROPOSAL_STANDALONE definition is not needed anymore
-# add_definitions(-DPROPOSAL_STANDALONE=0)
-
-# message(STATUS ${PROPOSAL_SRC_FILES})
 i3_project(PROPOSAL
     DOCS_DIR doc
 )
@@ -78,15 +69,12 @@ set (PROPOSAL_SRC_FILES
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/sector/Sector.cxx
 )
 
-# execute_process(
-#   COMMAND touch ${PROPOSAL_SRC_FILES}
-# )
+
 i3_add_library(PROPOSAL
     ${PROPOSAL_SRC_FILES}
     private/PROPOSAL-icetray/I3PropagatorServicePROPOSAL.cxx
     private/PROPOSAL-icetray/SimplePropagator.cxx
     private/PROPOSAL-icetray/Converter.cxx
-    # ${I3_PROPOSAL_SRC_FILES}
 
     USE_TOOLS boost
     USE_PROJECTS icetray serialization dataclasses sim-services simclasses phys-services
