@@ -47,7 +47,7 @@ TEST(SimplePropagator)
 
     // Now, replay the simulation and ensure we get the same thing
 
-    for (unsigned i = 0; i < daughters.size(); i++)
+    for (size_t i = 0; i < daughters.size(); i++)
     {
         // Throw out a random subset of events. The remainder should
         // be reproducible given the same sequence of random numbers,
@@ -58,7 +58,7 @@ TEST(SimplePropagator)
         boost::shared_ptr<std::vector<I3Particle> > d(new std::vector<I3Particle>);
         prop->propagate(primaries[i], distance, d);
         ENSURE_EQUAL(daughters[i].size(), d->size(), "Same number of particles must be produced");
-        for (unsigned j = 0; j < daughters[i].size(); j++)
+        for (size_t j = 0; j < daughters[i].size(); j++)
         {
             I3Particle& p1 = daughters[i][j];
             I3Particle& p2 = (*d)[j];
@@ -91,12 +91,12 @@ TEST(PropagatorService)
 
     rng->RestoreState(state);
 
-    for (int i = 0; i < daughters.size(); i++)
+    for (size_t i = 0; i < daughters.size(); i++)
     {
         I3Particle p              = make_particle();
         std::vector<I3Particle> d = prop->Propagate(p, frame, dummy);
         ENSURE_EQUAL(daughters[i].size(), d.size());
-        for (int j = 0; j < daughters[i].size(); j++)
+        for (size_t j = 0; j < daughters[i].size(); j++)
         {
             I3Particle& p1 = daughters[i][j];
             I3Particle& p2 = d[j];

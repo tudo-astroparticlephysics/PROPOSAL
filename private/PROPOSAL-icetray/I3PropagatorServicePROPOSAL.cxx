@@ -57,7 +57,7 @@ I3PropagatorServicePROPOSAL::~I3PropagatorServicePROPOSAL()
 {
     if (rng_)
     {
-        rng_ = NULL;
+        // rng_ = NULL;
 
         // Reset the random nuber generator to default at this place.
         // Reason: Clean up issues with boost::python objects and the python runtime
