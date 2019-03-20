@@ -19,7 +19,7 @@
 ```
 
 [![Build Status](https://travis-ci.org/tudo-astroparticlephysics/PROPOSAL.svg?branch=master)](https://travis-ci.org/tudo-astroparticlephysics/PROPOSAL)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2551770.svg)](https://doi.org/10.5281/zenodo.2551770)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2598747.svg)](https://doi.org/10.5281/zenodo.2598747)
 
 # PROPOSAL #
 
@@ -64,19 +64,21 @@ If you use PROPOSAL, please cite the PROPOSAL paper
 ```
 and our zenodo entry of the version you use
 ```bibtex
-@misc{mario_dunsch_2019_2551770,
+@misc{mario_dunsch_2019_2598747,
   author = {Dunsch, Mario and
             Soedingrekso, Jan and
-            Köhne, Jan-Hendrik and
+            Koehne, Jan-Hendrik and
             Fuchs, Tomasz and
+            Alameddine, Jean-Marco and
             van Santen, Jacob and
             Kopper, Claudio and
+            Krings, Kai and
             Olivas, Alex},
   title   = {tudo-astroparticlephysics/PROPOSAL: Zenodo},
-  month  = jan,
+  month  = mar,
   year   = 2019,
-  doi    = {10.5281/zenodo.2551770},
-  url    = {https://doi.org/10.5281/zenodo.2551770}
+  doi    = {10.5281/zenodo.2598747},
+  url    = {https://doi.org/10.5281/zenodo.2598747}
 }
 ```
 and if you want to cite the latest improvements
