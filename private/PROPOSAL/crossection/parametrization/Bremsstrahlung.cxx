@@ -323,7 +323,7 @@ double BremsKelnerKokoulinPetrukhin::CalculateParametrization(double energy, dou
     double formfactor_nuclear_elastic = std::log(Dn / (1 + delta * (Dn * SQRTE - 2) / particle_def_.mass));
 
     // TODO(mario): Better way? Sat 2017/09/02
-    double square_momentum   = energy * energy - particle_def_.mass * particle_def_.mass;
+    double square_momentum   = (energy - particle_def_.mass) * (energy + particle_def_.mass);
     double particle_momentum = std::sqrt(std::max(square_momentum, 0.0));
     double maxV              = ME * (energy - particle_def_.mass) / (energy * (energy - particle_momentum + ME));
 
@@ -520,7 +520,7 @@ double BremsSandrockSoedingreksoRhode::CalculateParametrization(double energy, d
     phi2 -= delta2 * (1. - 1./Z);
 
     // s_atomic
-    double square_momentum   = energy * energy - particle_def_.mass * particle_def_.mass;
+    double square_momentum   = (energy - particle_def_.mass) * (energy + particle_def_.mass);
     double particle_momentum = std::sqrt(std::max(square_momentum, 0.0));
     double maxV = ME * (energy - particle_def_.mass) / (energy * (energy - particle_momentum + ME));
 

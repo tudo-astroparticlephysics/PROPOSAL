@@ -39,7 +39,6 @@ double IonizIntegral::CalculatedEdx(double energy)
     double result, aux;
 
     Parametrization::IntegralLimits limits = parametrization_->GetIntegralLimits(energy);
-    ;
     ParticleDef particle_def = parametrization_->GetParticleDef();
     const Medium& medium     = parametrization_->GetMedium();
 
@@ -47,7 +46,7 @@ double IonizIntegral::CalculatedEdx(double energy)
 
     // PDG eq. 33.10
     // with Spin 1/2 correction by Rossi
-    double square_momentum   = energy * energy - particle_def.mass * particle_def.mass;
+    double square_momentum   = (energy - particle_def.mass) * (energy + particle_def.mass);
     double particle_momentum = std::sqrt(std::max(square_momentum, 0.0));
     double beta              = particle_momentum / energy;
     double gamma             = energy / particle_def.mass;

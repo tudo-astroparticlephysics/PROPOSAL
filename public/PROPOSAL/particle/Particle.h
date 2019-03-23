@@ -216,7 +216,6 @@ private:
     const ParticleDef particle_def_; //!< static defenitions of the particle
 
     double momentum_;        //!< momentum [MeV]
-    double square_momentum_; //!< momentum square [MeV]
 
     int parent_particle_id_; //!< parent particle id
     int particle_id_;        //!< particle id
