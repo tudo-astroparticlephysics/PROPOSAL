@@ -846,7 +846,7 @@ Geometry* Propagator::ParseGeometryConifg(const std::string& json_object_str)
     std::string origin_str       = "origin";
     std::string outer_radius_str = "outer_radius";
     std::string inner_radius_str = "inner_radius";
-    std::string lenght_str       = "lenght";
+    std::string length_str       = "lenght";
     std::string width_str        = "width";
     std::string height_str       = "height";
 
@@ -989,11 +989,11 @@ Geometry* Propagator::ParseGeometryConifg(const std::string& json_object_str)
         double y = 0;
         double z = 0;
 
-        if (json_object.find(lenght_str) != json_object.end())
+        if (json_object.find(length_str) != json_object.end())
         {
-            if (json_object[lenght_str].is_number())
+            if (json_object[length_str].is_number())
             {
-                x = json_object[lenght_str].get<double>() * cm_to_meter;
+                x = json_object[length_str].get<double>() * cm_to_meter;
             }
             else
             {
@@ -1002,7 +1002,7 @@ Geometry* Propagator::ParseGeometryConifg(const std::string& json_object_str)
         }
         else
         {
-            log_fatal(warning_str.c_str(), sphere->GetName().c_str(), lenght_str.c_str());
+            log_fatal(warning_str.c_str(), box->GetName().c_str(), length_str.c_str());
         }
 
         if (json_object.find(width_str) != json_object.end())
@@ -1018,7 +1018,7 @@ Geometry* Propagator::ParseGeometryConifg(const std::string& json_object_str)
         }
         else
         {
-            log_fatal(warning_str.c_str(), sphere->GetName().c_str(), width_str.c_str());
+            log_fatal(warning_str.c_str(), box->GetName().c_str(), width_str.c_str());
         }
 
         if (json_object.find(height_str) != json_object.end())
@@ -1034,7 +1034,7 @@ Geometry* Propagator::ParseGeometryConifg(const std::string& json_object_str)
         }
         else
         {
-            log_fatal(warning_str.c_str(), sphere->GetName().c_str(), height_str.c_str());
+            log_fatal(warning_str.c_str(), box->GetName().c_str(), height_str.c_str());
         }
 
 
@@ -1063,7 +1063,7 @@ Geometry* Propagator::ParseGeometryConifg(const std::string& json_object_str)
         }
         else
         {
-            log_fatal(warning_str.c_str(), sphere->GetName().c_str(), outer_radius_str.c_str());
+            log_fatal(warning_str.c_str(), cylinder->GetName().c_str(), outer_radius_str.c_str());
         }
 
         if (json_object.find(inner_radius_str) != json_object.end())
@@ -1079,7 +1079,7 @@ Geometry* Propagator::ParseGeometryConifg(const std::string& json_object_str)
         }
         else
         {
-            log_fatal(warning_str.c_str(), sphere->GetName().c_str(), inner_radius_str.c_str());
+            log_fatal(warning_str.c_str(), cylinder->GetName().c_str(), inner_radius_str.c_str());
         }
 
         if (json_object.find(height_str) != json_object.end())
@@ -1095,7 +1095,7 @@ Geometry* Propagator::ParseGeometryConifg(const std::string& json_object_str)
         }
         else
         {
-            log_fatal(warning_str.c_str(), sphere->GetName().c_str(), height_str.c_str());
+            log_fatal(warning_str.c_str(), cylinder->GetName().c_str(), height_str.c_str());
         }
 
 
