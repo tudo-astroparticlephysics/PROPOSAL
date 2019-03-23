@@ -50,7 +50,7 @@ double Ionization::DifferentialCrossSection(double energy, double v)
     IntegralLimits limits = GetIntegralLimits(energy);
 
     // TODO(mario): Better way? Sat 2017/09/02
-    double square_momentum   = energy * energy - particle_def_.mass * particle_def_.mass;
+    double square_momentum   = (energy - particle_def_.mass) * (energy + particle_def_.mass);
     double particle_momentum = std::sqrt(std::max(square_momentum, 0.0));
     double beta              = particle_momentum / energy;
     double gamma             = energy / particle_def_.mass;
@@ -149,7 +149,7 @@ double Ionization::CrossSectionWithoutInelasticCorrection(double energy, double 
     IntegralLimits limits = GetIntegralLimits(energy);
 
     // TODO(mario): Better way? Sat 2017/09/02
-    double square_momentum   = energy * energy - particle_def_.mass * particle_def_.mass;
+    double square_momentum   = (energy - particle_def_.mass) * (energy + particle_def_.mass);
     double particle_momentum = std::sqrt(std::max(square_momentum, 0.0));
     double beta              = particle_momentum / energy;
     double gamma             = energy / particle_def_.mass;
