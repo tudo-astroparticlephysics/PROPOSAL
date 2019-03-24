@@ -501,7 +501,8 @@ void init_parametrization(py::module& m)
         .value("PetrukhinShestakov", BremsstrahlungFactory::PetrukhinShestakov)
         .value("KelnerKokoulinPetrukhin", BremsstrahlungFactory::KelnerKokoulinPetrukhin)
         .value("CompleteScreening", BremsstrahlungFactory::CompleteScreening)
-        .value("AndreevBezrukovBugaev", BremsstrahlungFactory::AndreevBezrukovBugaev);
+        .value("AndreevBezrukovBugaev", BremsstrahlungFactory::AndreevBezrukovBugaev)
+        .value("SandrockSoedingreksoRhode", BremsstrahlungFactory::SandrockSoedingreksoRhode);
 
     py::class_<BremsstrahlungFactory::Definition, std::shared_ptr<BremsstrahlungFactory::Definition> >(m_sub_brems, "BremsDefinition")
         .def(py::init<>())
