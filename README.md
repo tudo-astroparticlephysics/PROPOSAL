@@ -116,27 +116,9 @@ and if you want to cite the latest improvements
 
 ## Installation ##
 
-### Standalone ###
-
 Install instruction for the standalone installation
 are found in [install](INSTALL.md).
 
----
-
-### IceSim ###
-
-Before installation of icesim, one should copy some files from the
-resources folder to other IceCube Simulation projects to provide compatibility:
-
-```sh
-cp src/PROPOSAL/resources/icesim/MuonGun/MuonPropagator.* src/MuonGun/private/MuonGun/
-cp src/PROPOSAL/resources/icesim/MuonGun/shower_and_propagate.py src/MuonGun/resources/scripts/
-cp src/PROPOSAL/resources/icesim/MuonGun/utils.py src/MuonGun/resources/scripts/
-cp src/PROPOSAL/resources/icesim/simprod-scripts/PropagateMuons.py src/simprod-scripts/python/segments/
-cp src/PROPOSAL/resources/icesim/simprod-scripts/proposal_alternate_cross_sections.py src/simprod-scripts/resources/examples/proposal_alternate_cross_sections.py
-cp src/PROPOSAL/resources/icesim/clsim/PropagateMuons.py src/clsim/resources/scripts/photonPaths/
-```
----
 
 ## Usage ##
 
