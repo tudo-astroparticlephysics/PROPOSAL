@@ -526,8 +526,8 @@ void init_parametrization(py::module& m)
     EPAIR_INTERPOL_DEF(m_sub_epair, SandrockSoedingreksoRhode)
 
     py::enum_<EpairProductionFactory::Enum>(m_sub_epair, "EpairParametrization")
-        .value("PetrukhinShestakov", EpairProductionFactory::KelnerKokoulinPetrukhin)
-        .value("KelnerKokoulinPetrukhin", EpairProductionFactory::SandrockSoedingreksoRhode);
+        .value("KelnerKokoulinPetrukhin", EpairProductionFactory::KelnerKokoulinPetrukhin)
+        .value("SandrockSoedingreksoRhode", EpairProductionFactory::SandrockSoedingreksoRhode);
 
     py::class_<EpairProductionFactory::Definition, std::shared_ptr<EpairProductionFactory::Definition> >(m_sub_epair, "EpairDefinition")
         .def(py::init<>())
