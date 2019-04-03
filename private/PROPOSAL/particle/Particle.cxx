@@ -101,7 +101,6 @@ Particle::Particle()
     : DynamicData(DynamicData::Particle)
     , particle_def_(MuMinusDef::Get())
     , momentum_(0)
-    , square_momentum_(0)
     , parent_particle_id_(0)
     , particle_id_(1)
     , entry_point_(Vector3D())
@@ -122,7 +121,6 @@ Particle::Particle(const Particle& particle)
     : DynamicData(particle)
     , particle_def_(particle.particle_def_)
     , momentum_(particle.momentum_)
-    , square_momentum_(particle.square_momentum_)
     , parent_particle_id_(particle.parent_particle_id_)
     , particle_id_(particle.particle_id_)
     , entry_point_(particle.entry_point_)
@@ -142,7 +140,6 @@ Particle::Particle(const ParticleDef& particleDef)
     : DynamicData(DynamicData::Particle)
     , particle_def_(particleDef)
     , momentum_(0)
-    , square_momentum_(0)
     , parent_particle_id_(0)
     , particle_id_(1)
     , entry_point_(Vector3D())
@@ -173,8 +170,6 @@ bool Particle::operator==(const Particle& particle) const
     if (direction_ != particle.direction_)
         return false;
     if (momentum_ != particle.momentum_)
-        return false;
-    if (square_momentum_ != particle.square_momentum_)
         return false;
     if (energy_ != particle.energy_)
         return false;
@@ -231,7 +226,6 @@ void Particle::InjectState(const Particle& particle)
     time_                    = particle.time_;
     propagated_distance_     = particle.propagated_distance_;
     momentum_                = particle.momentum_;
-    square_momentum_         = particle.square_momentum_;
     entry_point_             = particle.entry_point_;
     entry_time_              = particle.entry_time_;
     entry_energy_            = particle.entry_energy_;
@@ -250,21 +244,15 @@ void Particle::InjectState(const Particle& particle)
 
 void Particle::SetEnergy(double energy)
 {
-    energy_ = energy;
-
-    if (energy_ < particle_def_.mass)
-        energy_ = particle_def_.mass;
-
-    square_momentum_ = energy * energy - particle_def_.mass * particle_def_.mass;
-    momentum_        = std::sqrt(std::max(square_momentum_, 0.0));
+    energy_   = std::max(energy, particle_def_.mass);
+    momentum_ = std::sqrt(std::max((energy_ + particle_def_.mass) * (energy_ - particle_def_.mass), 0.0));
 }
 
 // ------------------------------------------------------------------------- //
 void Particle::SetMomentum(double momentum)
 {
-    momentum_        = momentum;
-    square_momentum_ = momentum_ * momentum_;
-    energy_          = std::sqrt(square_momentum_ + particle_def_.mass * particle_def_.mass);
+    momentum_ = momentum;
+    energy_   = std::sqrt(momentum_ * momentum_ + particle_def_.mass * particle_def_.mass);
 }
 
 // ------------------------------------------------------------------------- //

@@ -214,8 +214,39 @@ bool IsWritable(std::string table_dir)
     return writeable;
 }
 
+
 // ------------------------------------------------------------------------- //
-std::string ResolvePath(const std::string& pathname)
+bool IsReadable(std::string table_dir)
+{
+    bool readable = false;
+
+    if (access(table_dir.c_str(), F_OK) == 0)
+    {
+        if ((access(table_dir.c_str(), R_OK) == 0) && (access(table_dir.c_str(), W_OK) == 0))
+        {
+            readable = true;
+            log_debug("Table directory does exist and has read and write permissions: %s", table_dir.c_str());
+        }
+        else
+        {
+            if (access(table_dir.c_str(), R_OK) == 0)
+            {
+                readable = true;
+                log_debug("Table directory does exist and has only read permissions: %s", table_dir.c_str());
+            }
+            else
+                log_warn("Table directory is not readable: %s", table_dir.c_str());
+        }
+    }
+    else
+        log_warn("Table directory does not exist: %s", table_dir.c_str());
+
+    return readable;
+}
+
+
+// ------------------------------------------------------------------------- //
+std::string ResolvePath(const std::string& pathname, bool checkReadonly)
 {
     wordexp_t p;
     // Use WRDE_UNDEF to consider undefined shell variables as error
@@ -238,6 +269,17 @@ std::string ResolvePath(const std::string& pathname)
         return "";
     }
 
+    if (checkReadonly)
+    {
+        if (IsReadable(std::string(resolved)))
+        {
+            return std::string(resolved);
+        }
+        else
+        {
+            return "";
+        }
+    }
     if (IsWritable(std::string(resolved)))
     {
         return std::string(resolved);
@@ -270,22 +312,16 @@ void InitializeInterpolation(const std::string name,
 {
     log_debug("Initialize %s interpolation.", name.c_str());
 
-    bool storing_failed = false;
-    bool reading_worked = true;
-
-    std::string pathname = ResolvePath(interpolation_def.path_to_tables);
-    bool raw             = interpolation_def.raw;
-
     // --------------------------------------------------------------------- //
-    // Create filename out of hash
+    // Create hash for the file name
     // --------------------------------------------------------------------- //
 
     size_t hash_digest = 0;
-
     if (parametrizations.size() == 1)
     {
         hash_digest = parametrizations.at(0)->GetHash();
-    } else
+    }
+    else
     {
         for (std::vector<Parametrization*>::const_iterator it = parametrizations.begin(); it != parametrizations.end();
              ++it)
@@ -294,7 +330,87 @@ void InitializeInterpolation(const std::string name,
         }
     }
 
+    bool storing_failed = false;
+    bool reading_worked = false;
+    bool raw             = interpolation_def.raw;
+    std::string pathname;
     std::stringstream filename;
+
+    // --------------------------------------------------------------------- //
+    // first check the reading paths
+    // if one of the reading paths already has the required tables
+    pathname = ResolvePath(interpolation_def.path_to_tables_readonly, true);
+    if (!pathname.empty())
+    {
+        filename << pathname << "/" << name << "_" << hash_digest;
+        if (!raw)
+        {
+            filename << ".txt";
+        }
+        if (FileExist(filename.str()))
+        {
+            std::ifstream input;
+            if (raw)
+            {
+                input.open(filename.str().c_str(), std::ios::binary);
+            } else
+            {
+                input.open(filename.str().c_str());
+            }
+
+            // check if file is empty
+            // this happens if multiple instances tries to load/create the tables in parallel
+            // and another process already starts to write this table
+            // now just hand over to writing process where it might saves them in memory
+            // if the other instance is still writing them down in the same path
+            if (input.peek() == std::ifstream::traits_type::eof())
+            {
+                log_info("file %s is empty! Another process is presumably writing. Try another reading path or write in memory!",
+                        filename.str().c_str());
+            }
+            else
+            {
+                log_debug("%s tables will be read from file: %s", name.c_str(), filename.str().c_str());
+
+                for (InterpolantBuilderContainer::iterator builder_it = builder_container.begin();
+                     builder_it != builder_container.end();
+                     ++builder_it)
+                {
+                    // TODO(mario): read check Tue 2017/09/05
+                    (*builder_it->second) = new Interpolant();
+                    (*builder_it->second)->Load(input, raw);
+                }
+                reading_worked = true;
+            }
+
+            input.close();
+
+        }
+        else
+        {
+            log_debug("In the readonly path to the interpolation tables, the file %s does not Exist",
+                      filename.str().c_str());
+        }
+    }
+    else
+    {
+        log_debug("No reading path was given, now the tables are read or written to the writing path.");
+    }
+
+    if (reading_worked)
+    {
+        log_debug("Initialize %s interpolation done.", name.c_str());
+        return;
+    }
+
+    // --------------------------------------------------------------------- //
+    // if none of the reading paths has the required interpolation table
+    // the interpolation tables will be written in the path for writing
+    pathname = ResolvePath(interpolation_def.path_to_tables);
+
+    // clear the stringstream
+    filename.str(std::string());
+    filename.clear();
     filename << pathname << "/" << name << "_" << hash_digest;
 
     if (!raw)
@@ -341,14 +457,8 @@ void InitializeInterpolation(const std::string name,
 
             input.close();
         }
-
-        if (!FileExist(filename.str()) || !reading_worked)
+        else
         {
-            if (!reading_worked)
-            {
-                log_warn("file %s is corrupted! Write it again!", filename.str().c_str());
-            }
-
             log_debug("%s tables will be saved to file: %s", name.c_str(), filename.str().c_str());
 
             std::ofstream output;

@@ -193,7 +193,7 @@ def propagate_muons():
     sector_def.scattering_model = pp.scattering.ScatteringModel.NoScattering
     sector_def.crosssection_defs.brems_def.lpm_effect = False
     sector_def.crosssection_defs.epair_def.lpm_effect = False
-    # sector_def.crosssection_defs.photo_def.parametrization = pp.PhotoParametrization.BezrukovBugaev
+    # sector_def.crosssection_defs.photo_def.parametrization = pp.parametrization.photonuclear.PhotoParametrization.BezrukovBugaev
     # sector_def.do_stochastic_loss_weighting = True
     # sector_def.stochastic_loss_weighting = -0.1
 

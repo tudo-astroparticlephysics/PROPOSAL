@@ -151,7 +151,7 @@ Propagator::Propagator(const ParticleDef& particle_def, const std::string& confi
     nlohmann::json json_config;
     try
     {
-        std::string expanded_config_file_path = Helper::ResolvePath(config_file);
+        std::string expanded_config_file_path = Helper::ResolvePath(config_file, true);
         std::ifstream infilestream(expanded_config_file_path);
         infilestream >> json_config;
     }
@@ -846,7 +846,7 @@ Geometry* Propagator::ParseGeometryConifg(const std::string& json_object_str)
     std::string origin_str       = "origin";
     std::string outer_radius_str = "outer_radius";
     std::string inner_radius_str = "inner_radius";
-    std::string lenght_str       = "lenght";
+    std::string length_str       = "lenght";
     std::string width_str        = "width";
     std::string height_str       = "height";
 
@@ -989,11 +989,11 @@ Geometry* Propagator::ParseGeometryConifg(const std::string& json_object_str)
         double y = 0;
         double z = 0;
 
-        if (json_object.find(lenght_str) != json_object.end())
+        if (json_object.find(length_str) != json_object.end())
         {
-            if (json_object[lenght_str].is_number())
+            if (json_object[length_str].is_number())
             {
-                x = json_object[lenght_str].get<double>() * cm_to_meter;
+                x = json_object[length_str].get<double>() * cm_to_meter;
             }
             else
             {
@@ -1002,7 +1002,7 @@ Geometry* Propagator::ParseGeometryConifg(const std::string& json_object_str)
         }
         else
         {
-            log_fatal(warning_str.c_str(), sphere->GetName().c_str(), lenght_str.c_str());
+            log_fatal(warning_str.c_str(), box->GetName().c_str(), length_str.c_str());
         }
 
         if (json_object.find(width_str) != json_object.end())
@@ -1018,7 +1018,7 @@ Geometry* Propagator::ParseGeometryConifg(const std::string& json_object_str)
         }
         else
         {
-            log_fatal(warning_str.c_str(), sphere->GetName().c_str(), width_str.c_str());
+            log_fatal(warning_str.c_str(), box->GetName().c_str(), width_str.c_str());
         }
 
         if (json_object.find(height_str) != json_object.end())
@@ -1034,7 +1034,7 @@ Geometry* Propagator::ParseGeometryConifg(const std::string& json_object_str)
         }
         else
         {
-            log_fatal(warning_str.c_str(), sphere->GetName().c_str(), height_str.c_str());
+            log_fatal(warning_str.c_str(), box->GetName().c_str(), height_str.c_str());
         }
 
 
@@ -1063,7 +1063,7 @@ Geometry* Propagator::ParseGeometryConifg(const std::string& json_object_str)
         }
         else
         {
-            log_fatal(warning_str.c_str(), sphere->GetName().c_str(), outer_radius_str.c_str());
+            log_fatal(warning_str.c_str(), cylinder->GetName().c_str(), outer_radius_str.c_str());
         }
 
         if (json_object.find(inner_radius_str) != json_object.end())
@@ -1079,7 +1079,7 @@ Geometry* Propagator::ParseGeometryConifg(const std::string& json_object_str)
         }
         else
         {
-            log_fatal(warning_str.c_str(), sphere->GetName().c_str(), inner_radius_str.c_str());
+            log_fatal(warning_str.c_str(), cylinder->GetName().c_str(), inner_radius_str.c_str());
         }
 
         if (json_object.find(height_str) != json_object.end())
@@ -1095,7 +1095,7 @@ Geometry* Propagator::ParseGeometryConifg(const std::string& json_object_str)
         }
         else
         {
-            log_fatal(warning_str.c_str(), sphere->GetName().c_str(), height_str.c_str());
+            log_fatal(warning_str.c_str(), cylinder->GetName().c_str(), height_str.c_str());
         }
 
 
@@ -1177,6 +1177,51 @@ InterpolationDef Propagator::CreateInterpolationDef(const std::string& json_obje
     else
     {
         log_debug("No path to tables set. Use default and save in memory");
+    }
+
+    // Parse to find path to interpolation tables for readonly
+    if (json_object.find("path_to_tables_readonly") != json_object.end())
+    {
+        std::string table_path_str = "";
+        if (json_object["path_to_tables_readonly"].is_string())
+        {
+            table_path_str = json_object["path_to_tables_readonly"];
+            interpolation_def.path_to_tables_readonly = Helper::ResolvePath(table_path_str, true);
+        }
+        else if (json_object["path_to_tables_readonly"].is_array())
+        {
+            for (size_t idx=0; idx < json_object["path_to_tables_readonly"].get<std::vector<std::string>>().size(); idx++)
+            {
+                if (json_object["path_to_tables_readonly"][idx].is_string())
+                {
+                    table_path_str = Helper::ResolvePath(json_object["path_to_tables_readonly"][idx].get<std::string>(), true);
+                    if (table_path_str != "")
+                        break;
+                }
+                else
+                {
+                    log_fatal("The given path_to_tables_readonly option does not consist of strings.");
+                }
+            }
+        }
+        else
+        {
+            log_fatal("The given path_to_tables_readonly option must be a string or a list of strings.");
+        }
+
+        if (table_path_str != "")
+        {
+            interpolation_def.path_to_tables_readonly = table_path_str;
+            log_info("Path to readonly interpolation tables set to: \"%s\"", table_path_str.c_str());
+        }
+        else
+        {
+            log_warn("No valid path to readonly interpolation tables found.");
+        }
+    }
+    else
+    {
+        log_debug("No path to readonly tables set. Use default and look at writable path to tables.");
     }
 
     return interpolation_def;

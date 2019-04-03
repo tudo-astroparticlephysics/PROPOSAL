@@ -25,7 +25,8 @@ MediumFactory::MediumFactory()
     Register("copper", Copper, &Copper::create);
     Register("uranium", Uranium, &Uranium::create);
     Register("air", Air, &Air::create);
-    Register("paraffin", Paraffin, &AntaresWater::create);
+    Register("paraffin", Paraffin, &Paraffin::create);
+    Register("antareswater", AntaresWater, &AntaresWater::create);
 }
 
 MediumFactory::~MediumFactory()

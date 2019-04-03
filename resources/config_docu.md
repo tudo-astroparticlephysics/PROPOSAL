@@ -24,18 +24,27 @@ If the Output of the Secondaries should not only include the Stochastic energy l
 The `interpolation` parameter is an own json-object.
 This object can contain three parameters dealing with the interpolation tables.
 
-If the tables have been already build and PROPOSAL should just use them, PROPOSAL needs read permission.
-If there are no tables (or at least not ones with the desired particle properties) PROPOSAL builds the tables in the folder. Here PROPOSAL needs write permission.
+There are two kind of paths, that can be set; a path, where the program only requires reading permission and a path, where it requires writing permission.
+The argument can be a String, or a list of Strings.
+If the given String or the first String in the list fulfills the readable/writable requirement, it is set.If the first item in the list don't satisfy the requirement, the program is looking for the next and so on until it reaches the end of the list.
+If none of the given elements in the list or the given String is a valid path, then the program writes the tables in the memory.
+
+If both paths are valid, PROPOSAL first looks at the reading path.
+If the interpolation table file doesn't exist or is empty (e.g. if two instances are called in parallel and one process is already building the table but hasn't finished yet), PROPOSAL uses writing path.
+There it again looks, if the interpolation table file already exist or is not empty.
+If the tables have been already build PROPOSAL just uses them.
+If there are no tables (or at least not ones with the desired particle or medium properties) PROPOSAL builds the tables in the folder.
 If the String is empty, the Folder doesn't exists or PROPOSAL has no permission, the tables are stored in the cache.
 Note: The tables differ in the parameters given below, that are stored in the file name. For not too long file names, these values are hashed.
 
 It's also possible to do the calculations with integrations, but that increases the amount of time by around 4 orders of magnitude !!! This should just be used for tests and comparisons.The Interpolations are accurate enough. Note: The reason why integration is that much slower is that the interpolation used for propagation is near the surface, using already calculated numbers from 'lower' interpolations. When integrating, these integrals going 'deep' (up to 4 layers).
 
-| Keyword            | Type   | Default   | Description |
-| ------------------ | ------ | --------- | ----------- |
-| `do_interpolation` | Bool   | `True`    | Decides, whether to calculate with interpolations or integrations |
-| `path_to_tables`   | String | `""`      | path pointing to the folder with the interpolation tables |
-| `do_binary_tables` | Bool   | `True`   | Decides, whether the tables are stored in binary format or in human readable text format |
+| Keyword                   | Type   | Default | Description |
+| ------------------------- | ------ | ------- | ----------- |
+| `do_interpolation`        | Bool   | `True`  | Decides, whether to calculate with interpolations or integrations |
+| `path_to_tables`          | String | `""`    | path pointing to the folder with the interpolation tables |
+| `path_to_tables_readonly` | String | `""`    | path pointing to the folder with the interpolation tables |
+| `do_binary_tables`        | Bool   | `True`  | Decides, whether the tables are stored in binary format or in human readable text format |
 
 ### Accuracy parameters ###
 There are several parameters with which the precision or speed for advancing the particles can be adjusted.
