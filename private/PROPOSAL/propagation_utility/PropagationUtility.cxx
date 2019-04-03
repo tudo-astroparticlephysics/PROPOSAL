@@ -21,6 +21,7 @@ Utility::Definition::Definition()
     , epair_def()
     , ioniz_def()
     , mupair_def()
+    , weak_def()
 {
 }
 
@@ -35,6 +36,8 @@ bool Utility::Definition::operator==(const Utility::Definition& utility_def) con
     else if (ioniz_def != utility_def.ioniz_def)
         return false;
     else if (mupair_def != utility_def.mupair_def)
+        return false;
+    else if (weak_def != utility_def.weak_def)
         return false;
 
     return true;
@@ -81,6 +84,15 @@ Utility::Utility(const ParticleDef& particle_def,
         log_debug("Mupair Production disabled");
     }
 
+    if(utility_def.weak_def.weak_enable == true){
+        crosssections_.push_back(WeakInteractionFactory::Get().CreateWeakInteraction(
+                particle_def_, *medium_, cut_settings_, utility_def.weak_def));
+        log_debug("Weak Interaction enabled");
+    }
+    else{
+        log_debug("Weak Interaction disabled");
+    }
+
 }
 
 Utility::Utility(const ParticleDef& particle_def,
@@ -112,6 +124,15 @@ Utility::Utility(const ParticleDef& particle_def,
     }
     else{
         log_debug("Mupair Production disabled");
+    }
+
+    if(utility_def.weak_def.weak_enable == true){
+        crosssections_.push_back(WeakInteractionFactory::Get().CreateWeakInteraction(
+                particle_def_, *medium_, cut_settings_, utility_def.weak_def, interpolation_def));
+        log_debug("Weak Interaction enabled");
+    }
+    else{
+        log_debug("WeakInteraction disabled");
     }
 }
 

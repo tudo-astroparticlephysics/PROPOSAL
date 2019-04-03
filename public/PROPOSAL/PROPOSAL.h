@@ -43,12 +43,14 @@
 #include "PROPOSAL/crossection/factories/IonizationFactory.h"
 #include "PROPOSAL/crossection/factories/PhotonuclearFactory.h"
 #include "PROPOSAL/crossection/factories/MupairProductionFactory.h"
+#include "PROPOSAL/crossection/factories/WeakInteractionFactory.h"
 
 #include "PROPOSAL/crossection/parametrization/Bremsstrahlung.h"
 #include "PROPOSAL/crossection/parametrization/EpairProduction.h"
 #include "PROPOSAL/crossection/parametrization/Ionization.h"
 #include "PROPOSAL/crossection/parametrization/Parametrization.h"
 #include "PROPOSAL/crossection/parametrization/MupairProduction.h"
+#include "PROPOSAL/crossection/parametrization/WeakInteraction.h"
 #include "PROPOSAL/crossection/parametrization/PhotoQ2Integration.h"
 #include "PROPOSAL/crossection/parametrization/PhotoRealPhotonAssumption.h"
 #include "PROPOSAL/crossection/parametrization/Photonuclear.h"
@@ -67,6 +69,8 @@
 #include "PROPOSAL/crossection/PhotoInterpolant.h"
 #include "PROPOSAL/crossection/MupairIntegral.h"
 #include "PROPOSAL/crossection/MupairInterpolant.h"
+#include "PROPOSAL/crossection/WeakIntegral.h"
+#include "PROPOSAL/crossection/WeakInterpolant.h"
 
 #include "PROPOSAL/decay/DecayChannel.h"
 #include "PROPOSAL/decay/DecayTable.h"

@@ -1313,6 +1313,22 @@ Sector::Definition Propagator::CreateSectorDefinition(const std::string& json_ob
         log_debug("No given mupair_multiplier option given. Use default (%f)", sec_def_global.utility_def.mupair_def.multiplier);
     }
 
+    if (json_global.find("weak_multiplier") != json_global.end())
+    {
+        if (json_global["weak_multiplier"].is_number())
+        {
+            sec_def_global.utility_def.weak_def.multiplier = json_global["weak_multiplier"].get<double>();
+        }
+        else
+        {
+            log_fatal("The given weak_multiplier option is not a double.");
+        }
+    }
+    else
+    {
+        log_debug("No given weak_multiplier option given. Use default (%f)", sec_def_global.utility_def.weak_def.multiplier);
+    }
+
     if (json_global.find("lpm") != json_global.end())
     {
         if (json_global["lpm"].is_boolean())
@@ -1360,6 +1376,22 @@ Sector::Definition Propagator::CreateSectorDefinition(const std::string& json_ob
     else
     {
         log_debug("No given mupair_particle_output option given. Use default (true)");
+    }
+
+    if (json_global.find("weak_enable") != json_global.end())
+    {
+        if (json_global["weak_enable"].is_boolean())
+        {
+            sec_def_global.utility_def.weak_def.weak_enable = json_global["weak_enable"].get<bool>();
+        }
+        else
+        {
+            log_fatal("The given weak_enable option is not a bool.");
+        }
+    }
+    else
+    {
+        log_debug("No given weak_enable option given. Use default (false)");
     }
 
     if (json_global.find("exact_time") != json_global.end())
@@ -1516,6 +1548,24 @@ Sector::Definition Propagator::CreateSectorDefinition(const std::string& json_ob
     {
         log_debug("The mupair option is not set. Use default %s",
                   MupairProductionFactory::Get().GetStringFromEnum(sec_def_global.utility_def.mupair_def.parametrization).c_str());
+    }
+
+    if (json_global.find("weak") != json_global.end())
+    {
+        if (json_global["weak"].is_string())
+        {
+            std::string weak = json_global["weak"].get<std::string>();
+            sec_def_global.utility_def.weak_def.parametrization = WeakInteractionFactory::Get().GetEnumFromString(weak);
+        }
+        else
+        {
+            log_fatal("The given weak option is not a string.");
+        }
+    }
+    else
+    {
+        log_debug("The weak option is not set. Use default %s",
+                  WeakInteractionFactory::Get().GetStringFromEnum(sec_def_global.utility_def.weak_def.parametrization).c_str());
     }
 
     if (json_global.find("photo_shadow") != json_global.end())

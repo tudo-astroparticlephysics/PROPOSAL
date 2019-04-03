@@ -49,7 +49,8 @@ public:
         NuclInt,
         MuPair,
         Hadrons,
-        ContinuousEnergyLoss
+        ContinuousEnergyLoss,
+        WeakInt
     };
 
 public:
