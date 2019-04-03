@@ -30,6 +30,7 @@
 #pragma once
 
 #include <functional>
+#include <vector>
 
 namespace PROPOSAL {
 
@@ -315,5 +316,85 @@ private:
     int rombergY;
     bool rationalY, relativeY, logSubst;
 };
+
+// ----------------------------------------------------------------------------
+/// @brief
+// ----------------------------------------------------------------------------
+    class Interpolant2DBuilder_array_as : public InterpolantBuilder
+    {
+    public:
+
+
+        // Constructor
+        Interpolant2DBuilder_array_as();
+        Interpolant2DBuilder_array_as(const Interpolant2DBuilder_array_as&);
+
+        // Setter to build the Interpolant
+        Interpolant2DBuilder_array_as& Setx1(std::vector<double> vec)
+        {
+            x1 = vec;
+            return *this;
+        }
+
+        Interpolant2DBuilder_array_as& Setx2(std::vector< std::vector<double> > vec)
+        {
+            x2 = vec;
+            return *this;
+        }
+
+        Interpolant2DBuilder_array_as& Sety(std::vector< std::vector<double> > vec)
+        {
+            y = vec;
+            return *this;
+        }
+
+        Interpolant2DBuilder_array_as& SetRomberg1(const int val)
+        {
+            romberg1 = val;
+            return *this;
+        }
+        Interpolant2DBuilder_array_as& SetRational1(const bool val)
+        {
+            rational1 = val;
+            return *this;
+        }
+        Interpolant2DBuilder_array_as& SetRelative1(const bool val)
+        {
+            relative1 = val;
+            return *this;
+        }
+
+        Interpolant2DBuilder_array_as& SetRomberg2(const int val)
+        {
+            romberg2 = val;
+            return *this;
+        }
+        Interpolant2DBuilder_array_as& SetRational2(const bool val)
+        {
+            rational2 = val;
+            return *this;
+        }
+        Interpolant2DBuilder_array_as& SetRelative2(const bool val)
+        {
+            relative2 = val;
+            return *this;
+        }
+
+
+        Interpolant* build();
+
+    private:
+
+        std::vector<double> x1;
+        std::vector< std::vector<double> > x2;
+        std::vector< std::vector<double> > y;
+
+        int romberg1;
+        bool rational1, relative1;
+
+        int romberg2;
+        bool rational2, relative2;
+
+    };
 
 } // namespace PROPOSAL

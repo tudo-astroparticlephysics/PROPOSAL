@@ -20,9 +20,9 @@
 using namespace PROPOSAL;
 using namespace PROPOSAL::Components;
 
-#define COMPONENT_IMPL(cls, SYMBOL, ATOMICNUM, NUCCHARGE)                                                              \
+#define COMPONENT_IMPL(cls, SYMBOL, NUCCHARGE, ATOMICNUM)                                                              \
     cls::cls(double atomInMolecule)                                                                                    \
-        : Component(#SYMBOL, ATOMICNUM, NUCCHARGE, atomInMolecule)                                                     \
+        : Component(#SYMBOL, NUCCHARGE, ATOMICNUM, atomInMolecule)                                                     \
     {                                                                                                                  \
     }                                                                                                                  \
                                                                                                                        \
@@ -66,7 +66,7 @@ std::ostream& operator<<(std::ostream& os, Component const& component)
 } // namespace PROPOSAL
 
 /******************************************************************************
- *                                  Componet                                   *
+ *                                  Component                                  *
  ******************************************************************************/
 
 Component::Component(std::string name, double nucCharge, double atomicNum, double atomInMolecule)
