@@ -14,11 +14,15 @@
 		},
 		{
 			"affiliation": "TU Dortmund",
-			"name": "Jan-Hendrick K\u00f6hne"
+			"name": "Jan-Hendrik K\u00f6hne"
 		},
 		{
 			"affiliation": "TU Dortmund",
 			"name": "Tomasz Fuchs"
+		},
+		{
+			"affiliation": "TU Dortmund",
+			"name": "Jean-Marco Alameddine"
 		},
 		{
 			"affiliation": "DESY Zeuthen",
@@ -27,6 +31,10 @@
 		{
 			"affiliation": "University of Alberta",
 			"name": "Claudio Kopper"
+		},
+		{
+			"affiliation": "TU M\u00fcnchen",
+			"name": "Kai Krings"
 		},
 		{
 			"affiliation": "University of Maryland",

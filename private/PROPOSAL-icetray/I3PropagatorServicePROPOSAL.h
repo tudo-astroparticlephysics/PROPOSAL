@@ -36,6 +36,15 @@ public:
 
 public:
 
+    /**
+     * @brief Service to propagate muons and taus with PROPOSAL
+     * @param[in] config_file path to the configuration file where all the
+                              energy cuts, interpolation settings, cross
+                              section parametrizations, etc are set
+     * @param[in] final_loss  The rest energy after propagation of a given
+                              distance is stored in this particel, if given
+    * @param[in] distance     Maximum distance to propagate, default: 1e20cm
+    **/
     I3PropagatorServicePROPOSAL(
         std::string configfile = "",
         I3Particle::ParticleType final_loss = I3Particle::unknown,
@@ -51,10 +60,6 @@ public:
     static std::string GetDefaultConfigFile();
 
 private:
-    /** @brief Tear down and re-initialize the propagator on every call to Propagate().
-     * This is used for tests that ensure that propagation results do not depend
-     * on event-to-event state.
-     */
 
     I3RandomServicePtr rng_;
     std::string config_file_;

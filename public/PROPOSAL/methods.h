@@ -100,13 +100,15 @@ struct InterpolationDef
 {
     InterpolationDef()
         : order_of_interpolation(5)
-        , path_to_tables("")
+        , path_to_tables(std::string())
+        , path_to_tables_readonly(std::string())
         , raw(true)
     {
     }
 
     int order_of_interpolation;
     std::string path_to_tables;
+    std::string path_to_tables_readonly;
     bool raw;
 };
 
@@ -127,16 +129,26 @@ namespace Helper {
 bool IsWritable(std::string table_dir);
 
 // ----------------------------------------------------------------------------
+/// @brief Check if a given directory has read permissions
+///
+/// @param table_dir directory to check read permissions
+///
+/// @return bool
+// ----------------------------------------------------------------------------
+bool IsReadable(std::string table_dir);
+
+// ----------------------------------------------------------------------------
 /// @brief Resolve given path
 //
 /// Environment variables are tried to expand and relative path will be
 /// converted to absolute paths.
 ///
 /// @param std::string path
+/// @param bool only check if the path is readable, not writable
 ///
 /// @return resolved path or empty path if errors occured.
 // ----------------------------------------------------------------------------
-std::string ResolvePath(const std::string&);
+std::string ResolvePath(const std::string&, bool checkReadonly=false);
 
 // ----------------------------------------------------------------------------
 /// @brief Uses stat() from sys/stat.h to determine if a file exists

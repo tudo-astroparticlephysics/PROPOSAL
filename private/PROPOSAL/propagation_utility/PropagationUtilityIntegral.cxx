@@ -135,7 +135,7 @@ double UtilityIntegralDecay::FunctionToIntegral(double energy)
     }
 
     // TODO(mario): Better way? Sat 2017/09/02
-    double square_momentum   = energy * energy - particle_def.mass * particle_def.mass;
+    double square_momentum   = (energy - particle_def.mass) * (energy + particle_def.mass);
     double particle_momentum = std::sqrt(std::max(square_momentum, 0.0));
 
     aux = 1.0 / std::max((particle_momentum / particle_def.mass) * particle_def.lifetime * SPEED,
@@ -162,9 +162,8 @@ UTILITY_INTEGRAL_IMPL(Time)
 // ------------------------------------------------------------------------- //
 double UtilityIntegralTime::FunctionToIntegral(double energy)
 {
-    const ParticleDef& particle_def = utility_.GetParticleDef();
     // TODO(mario): Better way? Sat 2017/09/02
-    double square_momentum   = energy * energy - particle_def.mass * particle_def.mass;
+    double square_momentum   = (energy - utility_.GetParticleDef().mass) * (energy + utility_.GetParticleDef().mass);
     double particle_momentum = std::sqrt(std::max(square_momentum, 0.0));
 
     return energy / (particle_momentum * SPEED) * UtilityDecorator::FunctionToIntegral(energy);
@@ -218,7 +217,7 @@ double UtilityIntegralScattering::FunctionToIntegral(double energy)
     double aux2;
 
     // TODO(mario): Better way? Sat 2017/09/02
-    double square_momentum = energy * energy - utility_.GetParticleDef().mass * utility_.GetParticleDef().mass;
+    double square_momentum = (energy - utility_.GetParticleDef().mass) * (energy + utility_.GetParticleDef().mass);
     aux2                   = energy / square_momentum;
 
     return UtilityDecorator::FunctionToIntegral(energy) * aux2 * aux2;

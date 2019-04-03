@@ -19,7 +19,7 @@
 ```
 
 [![Build Status](https://travis-ci.org/tudo-astroparticlephysics/PROPOSAL.svg?branch=master)](https://travis-ci.org/tudo-astroparticlephysics/PROPOSAL)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1484180.svg)](https://doi.org/10.5281/zenodo.1484180)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2598747.svg)](https://doi.org/10.5281/zenodo.2598747)
 
 # PROPOSAL #
 
@@ -30,9 +30,10 @@ interactions, electron pair production, Landau–Pomeranchuk–Migdal and
 Ter-Mikaelian effects, muon and tau decay, as well as Molière scattering are
 implemented for different parametrizations.
 The full Paper can be found
-[here](http://www.sciencedirect.com/science/article/pii/S0010465513001355)
+[here](https://doi.org/10.1016/j.cpc.2013.04.001).
+Recent improvements are documented [here](https://arxiv.org/abs/1809.07740).
 
-PROPOSAL was tested on Mac OS X V. 10.7.5, Ubuntu 12.04, SUSE Enterprise 10 and PCLinuxos. Since
+PROPOSAL was tested on Mac OS X V. 10.10.5, Ubuntu 12.04, SUSE Enterprise 10 and PCLinuxos. Since
 all these OS are UNIX based it should be fine to run and compile PROPOSAL on a UNIX based OS.
 
 PROPOSAL is now a C++11 library using also pybind11 instead of boost python!
@@ -42,41 +43,66 @@ PROPOSAL is now a C++11 library using also pybind11 instead of boost python!
 
 If you use PROPOSAL, please cite the PROPOSAL paper
 
-
 ```bibtex
 @article{koehne2013proposal,
-  title={PROPOSAL: A tool for propagation of charged leptons},
-  author={Koehne, J-H and Frantzen, Katharina and Schmitz, Martin and Fuchs, Tomasz and Rhode, Wolfgang and Chirkin, Dmitry and Tjus, J Becker},
-  journal={Computer Physics Communications},
-  volume={184},
-  number={9},
-  pages={2070--2090},
-  year={2013},
-  publisher={Elsevier}
+  title     ={PROPOSAL: A tool for propagation of charged leptons},
+  author    = {Koehne, Jan-Hendrik and
+               Frantzen, Katharina and
+               Schmitz, Martin and
+               Fuchs, Tomasz and
+               Rhode, Wolfgang and
+               Chirkin, Dmitry and
+               Tjus, J Becker},
+  journal   = {Computer Physics Communications},
+  volume    = {184},
+  number    = {9},
+  pages     = {2070--2090},
+  year      = {2013},
+  publisher = {Elsevier},
+  doi       = {10.1016/j.cpc.2013.04.001}
 }
 ```
 and our zenodo entry of the version you use
 ```bibtex
-@misc{mario_dunsch_2018_1484181,
-  author       = {Mario Dunsch and
-                  Jan Soedingrekso and
-                  Jan-Hendrick Köhne and
-                  Tomasz Fuchs and
-                  Jacob van Santen and
-                  Claudio Kopper and
-                  Alex Olivas},
-  title        = {tudo-astroparticlephysics/PROPOSAL: Zenodo},
-  month        = nov,
-  year         = 2018,
-  doi          = {10.5281/zenodo.1484181},
-  url          = {https://doi.org/10.5281/zenodo.1484181}
+@misc{mario_dunsch_2019_2598747,
+  author = {Dunsch, Mario and
+            Soedingrekso, Jan and
+            Koehne, Jan-Hendrik and
+            Fuchs, Tomasz and
+            Alameddine, Jean-Marco and
+            van Santen, Jacob and
+            Kopper, Claudio and
+            Krings, Kai and
+            Olivas, Alex},
+  title   = {tudo-astroparticlephysics/PROPOSAL: Zenodo},
+  month  = mar,
+  year   = 2019,
+  doi    = {10.5281/zenodo.2598747},
+  url    = {https://doi.org/10.5281/zenodo.2598747}
 }
-``` 
+```
+and if you want to cite the latest improvements
+```bibtex
+@online{dunsch_2018_proposal_improvements,
+  title       = {Recent Improvements for the Lepton Propagator PROPOSAL},
+  author      = {Dunsch, Mario and
+                 Soedingrekso, Jan and
+                 Sandrock, Alexander and
+                 Meier, Max and
+                 Menne, Thorben and
+                 Rhode, Wolfgang},
+  year        = {2018},
+  eprint      = {1809.07740},
+  eprinttype  =  {arxiv},
+  eprintclass = {hep-ph}
+}
+```
+
 
 ## Requirements ##
 
 - Boost Library 1.48 or higher
-- [log4cplus](https://github.com/log4cplus/log4cplus) 2.0.0 or higher
+- [log4cplus](https://github.com/log4cplus/log4cplus) 2.0.2
 - CMake 2.8 or higher
 
 ## Recommended ##
@@ -90,35 +116,17 @@ and our zenodo entry of the version you use
 
 ## Installation ##
 
-### Standalone ###
-
 Install instruction for the standalone installation
 are found in [install](INSTALL.md).
 
----
-
-### IceSim ###
-
-Before installation of icesim, one should copy some files from the
-resources folder to other IceCube Simulation projects to provide compatibility:
-
-```sh
-cp src/PROPOSAL/resources/icesim/MuonGun/MuonPropagator.* src/MuonGun/private/MuonGun/
-cp src/PROPOSAL/resources/icesim/MuonGun/shower_and_propagate.py src/MuonGun/resources/scripts/
-cp src/PROPOSAL/resources/icesim/MuonGun/utils.py src/MuonGun/resources/scripts/
-cp src/PROPOSAL/resources/icesim/simprod-scripts/PropagateMuons.py src/simprod-scripts/python/segments/
-cp src/PROPOSAL/resources/icesim/simprod-scripts/proposal_alternate_cross_sections.py src/simprod-scripts/resources/examples/proposal_alternate_cross_sections.py
-cp src/PROPOSAL/resources/icesim/clsim/PropagateMuons.py src/clsim/resources/scripts/photonPaths/
-```
----
 
 ## Usage ##
 
 ### Deployment ###
 
-PROPOSAL is build as library. So you can include this project in your own
+PROPOSAL is built as library. So you can include this project in your own
 c++ project by including the header files. The following snippet uses the
-[configuration](resources/config.json) to propagte muons and
+[configuration](resources/config.json) to propagate muons and
 store the muon ranges for further proceeds.
 The parameters of the configuration file are described
 [here](resources/config_docu.md).
@@ -214,7 +222,7 @@ for i in range(1000):
 
 ## Documentation ##
 
-The C++ API can be build using
+The C++ API can be built using
 
 	make doc
 
@@ -225,9 +233,7 @@ A documentation of the configuration file can be found
 
 When you encounter any errors or misunderstandings don't hesitate and write a mail to
 [Jan Soedingrekso](mailto:jan.soedingrekso@tu-dortmund.de),
-[Mario Dunsch](mailto:mario.dunsch@tu-dortmund.de),
-[Tomasz Fuchs](mailto:Tomasz.Fuchs@tu-dortmund.de) or
-[Jan-Hendrik Koehne](mailto:Jan-Hendrik.Koehne@tu-dortmund.de).
+[Alexander Sandrock](mailto:alexander.sandrock@tu-dortmund.de).
 
 ## License ##
 
@@ -246,11 +252,11 @@ Modifcations of the LGPL [License](LICENSE.md):
 
 ## Developers and Maintainers ##
 
-*Mario Dunsch*, *Jan Soedingrekso*
+*Jan Soedingrekso*, *Alexander Sandrock*, *Jean-Marco Alameddine*
 
 ## Former Developers and Maintainers ##
 
-*Jan-Hendrick Koehne*, *Tomasz Fuchs*
+*Jan-Hendrik Koehne*, *Tomasz Fuchs*, *Mario Dunsch*
 
 ## Acknowledgement ##
 

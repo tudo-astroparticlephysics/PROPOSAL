@@ -10,12 +10,6 @@
  * (c) 2003 IceCube Collaboration
  */
 
-// class header
-// #include <boost/assign.hpp>
-// #include <boost/bimap.hpp>
-// #include <boost/bind.hpp>
-// #include <boost/filesystem.hpp>
-// #include <boost/foreach.hpp>
 
 #include <sstream>
 #include <unistd.h> // check for write permissions
@@ -57,7 +51,7 @@ I3PropagatorServicePROPOSAL::~I3PropagatorServicePROPOSAL()
 {
     if (rng_)
     {
-        rng_ = NULL;
+        // rng_ = NULL;
 
         // Reset the random nuber generator to default at this place.
         // Reason: Clean up issues with boost::python objects and the python runtime
