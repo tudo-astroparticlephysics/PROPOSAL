@@ -52,7 +52,7 @@ namespace PROPOSAL {
     class WeakInteraction : public Parametrization
     {
     public:
-        WeakInteraction(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier);
+        WeakInteraction(const ParticleDef&, const Medium&, double multiplier);
         WeakInteraction(const WeakInteraction&);
         virtual ~WeakInteraction();
 
@@ -78,17 +78,16 @@ class WeakCooperSarkarMertsch : public WeakInteraction
 public:
         typedef std::vector<Interpolant*> InterpolantVec;
 
-        WeakCooperSarkarMertsch(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier);
+        WeakCooperSarkarMertsch(const ParticleDef&, const Medium&, double multiplier);
         WeakCooperSarkarMertsch(const WeakCooperSarkarMertsch&);
         virtual ~WeakCooperSarkarMertsch();
 
         virtual Parametrization* clone() const { return new WeakCooperSarkarMertsch(*this); }
         static WeakInteraction* create(const ParticleDef& particle_def,
                                        const Medium& medium,
-                                       const EnergyCutSettings& cuts,
                                        double multiplier)
         {
-            return new WeakCooperSarkarMertsch(particle_def, medium, cuts, multiplier);
+            return new WeakCooperSarkarMertsch(particle_def, medium, multiplier);
         }
 
         virtual double DifferentialCrossSection(double energy, double v);

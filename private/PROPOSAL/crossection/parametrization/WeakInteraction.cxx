@@ -18,9 +18,8 @@ using namespace PROPOSAL;
 
 WeakInteraction::WeakInteraction(const ParticleDef& particle_def,
                                  const Medium& medium,
-                                 const EnergyCutSettings& cuts,
                                  double multiplier)
-        : Parametrization(particle_def, medium, cuts, multiplier)
+        : Parametrization(particle_def, medium, EnergyCutSettings(), multiplier)
 {
 }
 
@@ -60,9 +59,8 @@ Parametrization::IntegralLimits WeakInteraction::GetIntegralLimits(double energy
 
 WeakCooperSarkarMertsch::WeakCooperSarkarMertsch(const ParticleDef& particle_def,
                                                  const Medium& medium,
-                                                 const EnergyCutSettings& cuts,
                                                  double multiplier)
-        : WeakInteraction(particle_def, medium, cuts, multiplier)
+        : WeakInteraction(particle_def, medium, multiplier)
         , interpolant_(this->medium_->GetNumComponents(), NULL)
 {
 

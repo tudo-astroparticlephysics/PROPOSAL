@@ -89,7 +89,6 @@ namespace PROPOSAL {
 
         typedef std::function<WeakInteraction*(const ParticleDef&,
                                                const Medium&,
-                                               const EnergyCutSettings&,
                                                double multiplier)>
                 RegisterFunction;
 
@@ -105,12 +104,10 @@ namespace PROPOSAL {
 
         CrossSection* CreateWeakInteraction(const ParticleDef&,
                                             const Medium&,
-                                            const EnergyCutSettings&,
                                             const Definition&) const;
 
         CrossSection* CreateWeakInteraction(const ParticleDef&,
                                             const Medium&,
-                                            const EnergyCutSettings&,
                                             const Definition&,
                                             InterpolationDef) const;
 
