@@ -571,10 +571,9 @@ void init_parametrization(py::module& m)
 
 
     py::class_<WeakCooperSarkarMertsch, std::shared_ptr<WeakCooperSarkarMertsch>, WeakInteraction>(m_sub_weak, "CooperSarkarMertsch")                      \
-        .def(py::init<const ParticleDef&, const Medium&, const EnergyCutSettings&, double>(),                    \
+        .def(py::init<const ParticleDef&, const Medium&, double>(),                    \
              py::arg("particle_def"),                                                                                  \
              py::arg("medium"),                                                                                        \
-             py::arg("energy_cuts"),                                                                                   \
              py::arg("multiplier"));
 
 

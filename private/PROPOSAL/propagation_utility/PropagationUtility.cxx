@@ -86,7 +86,7 @@ Utility::Utility(const ParticleDef& particle_def,
 
     if(utility_def.weak_def.weak_enable == true){
         crosssections_.push_back(WeakInteractionFactory::Get().CreateWeakInteraction(
-                particle_def_, *medium_, cut_settings_, utility_def.weak_def));
+                particle_def_, *medium_, utility_def.weak_def));
         log_debug("Weak Interaction enabled");
     }
     else{
@@ -128,7 +128,7 @@ Utility::Utility(const ParticleDef& particle_def,
 
     if(utility_def.weak_def.weak_enable == true){
         crosssections_.push_back(WeakInteractionFactory::Get().CreateWeakInteraction(
-                particle_def_, *medium_, cut_settings_, utility_def.weak_def, interpolation_def));
+                particle_def_, *medium_, utility_def.weak_def, interpolation_def));
         log_debug("Weak Interaction enabled");
     }
     else{
