@@ -170,16 +170,24 @@ void WeakCooperSarkarMertsch::read_table(std::vector<double> &energies, std::vec
 
     if (!file.is_open())
     {
-        log_fatal("Can not find file for weak interaction");
+        log_warn("Can not find table file for weak interaction. Setting crosssection to 0: %s", pathname.c_str());
+        for(int i = 0; i < energylen; i++){
+            energies[i] = 4. + i * 0.1;
+            for(int k = 0; k<ylen; ++k){
+                y[i][k] = i+k; //assign "random" y values to avoid errors
+                dsigma[i][k] = 0;
+            }
+        }
     }
-
-    for(int i = 0; i < energylen; i++){
-        energies[i] = 4. + i * 0.1;
-        for(int k = 0; k<ylen; ++k){
-            file >> aux;
-            file >> aux2;
-            y[i][k] = aux;
-            dsigma[i][k] = aux2;
+    else{
+        for(int i = 0; i < energylen; i++){
+            energies[i] = 4. + i * 0.1;
+            for(int k = 0; k<ylen; ++k){
+                file >> aux;
+                file >> aux2;
+                y[i][k] = aux;
+                dsigma[i][k] = aux2;
+            }
         }
     }
 

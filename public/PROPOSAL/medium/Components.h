@@ -99,7 +99,7 @@ protected:
     // Passed to constructor
     std::string name_;
     double nucCharge_;      ///< nucleus charge
-    double atomicNum_;      ///< atomic number
+    double atomicNum_;      ///< molar mass [g/mol]
     double atomInMolecule_; ///< number of atoms in a molecule
 
     // Calculated in constructor
