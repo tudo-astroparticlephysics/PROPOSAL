@@ -164,9 +164,9 @@ EXPECT_TRUE(WeakInterpol_A == WeakInterpol_B);
 }
 
 
-/*
 
-TEST(Mupairproduction, Test_of_dNdx)
+
+TEST(WeakInteraction, Test_of_dNdx)
 {
 std::ifstream in;
 std::string filename = "bin/TestFiles/Weak_dNdx.txt";
@@ -209,10 +209,10 @@ delete weak;
 }
 }
 
-TEST(Mupairproduction, Test_of_dNdx_rnd)
+TEST(WeakInteraction, Test_of_dNdx_rnd)
 {
 std::ifstream in;
-std::string filename = "bin/TestFiles/Mupair_dNdx_rnd.txt";
+std::string filename = "bin/TestFiles/Weak_dNdx_rnd.txt";
 in.open(filename.c_str());
 
 if (!in.good())
@@ -225,8 +225,6 @@ in.getline(firstLine, 256);
 
 std::string particleName;
 std::string mediumName;
-double ecut;
-double vcut;
 double multiplier;
 double energy;
 std::string parametrization;
@@ -238,31 +236,30 @@ RandomGenerator::Get().SetSeed(0);
 
 while (in.good())
 {
-in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> parametrization >> rnd >> dNdx_rnd_stored;
+in >> particleName >> mediumName >> multiplier >> energy >> parametrization >> rnd >> dNdx_rnd_stored;
 
 ParticleDef particle_def = getParticleDef(particleName);
 Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
-EnergyCutSettings ecuts(ecut, vcut);
 
-MupairProductionFactory::Definition mupair_def;
-mupair_def.multiplier      = multiplier;
-mupair_def.parametrization = MupairProductionFactory::Get().GetEnumFromString(parametrization);
+WeakInteractionFactory::Definition weak_def;
+weak_def.multiplier      = multiplier;
+weak_def.parametrization = WeakInteractionFactory::Get().GetEnumFromString(parametrization);
 
-CrossSection* mupair = MupairProductionFactory::Get().CreateMupairProduction(particle_def, *medium, ecuts, mupair_def);
+CrossSection* weak = WeakInteractionFactory::Get().CreateWeakInteraction(particle_def, *medium, weak_def);
 
-dNdx_rnd_new = mupair->CalculatedNdx(energy, rnd);
+dNdx_rnd_new = weak->CalculatedNdx(energy, rnd);
 
 ASSERT_NEAR(dNdx_rnd_new, dNdx_rnd_stored, 1E-10 * dNdx_rnd_stored);
 
 delete medium;
-delete mupair;
+delete weak;
 }
 }
 
-TEST(Mupairproduction, Test_Stochastic_Loss)
+TEST(WeakInteraction, Test_Stochastic_Loss)
 {
 std::ifstream in;
-std::string filename = "bin/TestFiles/Mupair_e.txt";
+std::string filename = "bin/TestFiles/Weak_e.txt";
 in.open(filename.c_str());
 
 if (!in.good())
@@ -275,8 +272,6 @@ in.getline(firstLine, 256);
 
 std::string particleName;
 std::string mediumName;
-double ecut;
-double vcut;
 double multiplier;
 double energy;
 std::string parametrization;
@@ -289,33 +284,33 @@ RandomGenerator::Get().SetSeed(0);
 
 while (in.good())
 {
-in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> parametrization >> rnd1 >> rnd2 >>
+in >> particleName >> mediumName >> multiplier >> energy >> parametrization >> rnd1 >> rnd2 >>
 stochastic_loss_stored;
 
 
 ParticleDef particle_def = getParticleDef(particleName);
 Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
-EnergyCutSettings ecuts(ecut, vcut);
 
-MupairProductionFactory::Definition mupair_def;
-mupair_def.multiplier      = multiplier;
-mupair_def.parametrization = MupairProductionFactory::Get().GetEnumFromString(parametrization);
+WeakInteractionFactory::Definition weak_def;
+weak_def.multiplier      = multiplier;
+weak_def.parametrization = WeakInteractionFactory::Get().GetEnumFromString(parametrization);
 
-CrossSection* mupair = MupairProductionFactory::Get().CreateMupairProduction(particle_def, *medium, ecuts, mupair_def);
+CrossSection* weak = WeakInteractionFactory::Get().CreateWeakInteraction(particle_def, *medium, weak_def);
 
-stochastic_loss_new = mupair->CalculateStochasticLoss(energy, rnd1, rnd2);
+stochastic_loss_new = weak->CalculateStochasticLoss(energy, rnd1, rnd2);
 
 ASSERT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
 
 delete medium;
-delete mupair;
+delete weak;
 }
 }
 
-TEST(Mupairproduction, Test_Calculate_Rho)
+
+TEST(WeakInteraction, Test_of_dNdx_Interpolant)
 {
 std::ifstream in;
-std::string filename = "bin/TestFiles/Mupair_rho.txt";
+std::string filename = "bin/TestFiles/Weak_dNdx_interpol.txt";
 in.open(filename.c_str());
 
 if (!in.good())
@@ -328,119 +323,6 @@ in.getline(firstLine, 256);
 
 std::string particleName;
 std::string mediumName;
-double ecut;
-double vcut;
-double v;
-double multiplier;
-double energy;
-std::string parametrization;
-double rnd1, rnd2;
-double E1_stored;
-double E2_stored;
-double E1_new;
-double E2_new;
-
-std::vector<Particle*> particles;
-
-
-std::cout.precision(16);
-RandomGenerator::Get().SetSeed(0);
-
-while (in.good())
-{
-in >> particleName >> mediumName >> ecut >> vcut >> v >> multiplier >> energy >> parametrization >> rnd1 >>
-rnd2 >> E1_stored >> E2_stored;
-
-
-ParticleDef particle_def = getParticleDef(particleName);
-Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
-EnergyCutSettings ecuts(ecut, vcut);
-
-MupairProductionFactory::Definition mupair_def;
-mupair_def.multiplier      = multiplier;
-mupair_def.parametrization = MupairProductionFactory::Get().GetEnumFromString(parametrization);
-
-CrossSection* mupair = MupairProductionFactory::Get().CreateMupairProduction(particle_def, *medium, ecuts, mupair_def);
-
-particles = mupair->CalculateProducedParticles(energy, v*energy, rnd1, rnd2);
-
-E1_new = particles[0]->GetEnergy();
-E2_new = particles[1]->GetEnergy();
-ASSERT_NEAR(E1_new, E1_stored, 1E-6 * E1_stored);
-ASSERT_NEAR(E2_new, E2_stored, 1E-6 * E2_stored);
-
-delete medium;
-delete mupair;
-}
-}
-
-TEST(Mupairproduction, Test_of_dEdx_Interpolant)
-{
-std::ifstream in;
-std::string filename = "bin/TestFiles/Mupair_dEdx_interpol.txt";
-in.open(filename.c_str());
-
-if (!in.good())
-{
-std::cerr << "File \"" << filename << "\" not found" << std::endl;
-}
-
-char firstLine[256];
-in.getline(firstLine, 256);
-
-std::string particleName;
-std::string mediumName;
-double ecut;
-double vcut;
-double multiplier;
-double energy;
-std::string parametrization;
-double dEdx_stored;
-double dEdx_new;
-
-InterpolationDef InterpolDef;
-
-while (in.good())
-{
-in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> parametrization >> dEdx_stored;
-
-ParticleDef particle_def = getParticleDef(particleName);
-Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
-EnergyCutSettings ecuts(ecut, vcut);
-
-MupairProductionFactory::Definition mupair_def;
-mupair_def.multiplier      = multiplier;
-mupair_def.parametrization = MupairProductionFactory::Get().GetEnumFromString(parametrization);
-
-CrossSection* mupair = MupairProductionFactory::Get().CreateMupairProduction(particle_def, *medium, ecuts, mupair_def, InterpolDef);
-
-dEdx_new = mupair->CalculatedEdx(energy);
-
-ASSERT_NEAR(dEdx_new, dEdx_stored, 1e-10 * dEdx_stored);
-
-delete medium;
-delete mupair;
-}
-}
-
-TEST(Mupairproduction, Test_of_dNdx_Interpolant)
-{
-std::ifstream in;
-std::string filename = "bin/TestFiles/Mupair_dNdx_interpol.txt";
-in.open(filename.c_str());
-
-if (!in.good())
-{
-std::cerr << "File \"" << filename << "\" not found" << std::endl;
-}
-
-char firstLine[256];
-in.getline(firstLine, 256);
-
-std::string particleName;
-std::string mediumName;
-double ecut;
-double vcut;
 double multiplier;
 double energy;
 std::string parametrization;
@@ -451,31 +333,30 @@ InterpolationDef InterpolDef;
 
 while (in.good())
 {
-in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> parametrization >> dNdx_stored;
+in >> particleName >> mediumName >> multiplier >> energy >> parametrization >> dNdx_stored;
 
 ParticleDef particle_def = getParticleDef(particleName);
 Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
-EnergyCutSettings ecuts(ecut, vcut);
 
-MupairProductionFactory::Definition mupair_def;
-mupair_def.multiplier      = multiplier;
-mupair_def.parametrization = MupairProductionFactory::Get().GetEnumFromString(parametrization);
+WeakInteractionFactory::Definition weak_def;
+weak_def.multiplier      = multiplier;
+weak_def.parametrization = WeakInteractionFactory::Get().GetEnumFromString(parametrization);
 
-CrossSection* mupair = MupairProductionFactory::Get().CreateMupairProduction(particle_def, *medium, ecuts, mupair_def, InterpolDef);
+CrossSection* weak = WeakInteractionFactory::Get().CreateWeakInteraction(particle_def, *medium, weak_def, InterpolDef);
 
-dNdx_new = mupair->CalculatedNdx(energy);
+dNdx_new = weak->CalculatedNdx(energy);
 
 ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-10 * dNdx_stored);
 
 delete medium;
-delete mupair;
+delete weak;
 }
 }
 
-TEST(Mupairproduction, Test_of_dNdxrnd_interpol)
+TEST(WeakInteraction, Test_of_dNdxrnd_interpol)
 {
 std::ifstream in;
-std::string filename = "bin/TestFiles/Mupair_dNdx_rnd_interpol.txt";
+std::string filename = "bin/TestFiles/Weak_dNdx_rnd_interpol.txt";
 in.open(filename.c_str());
 
 if (!in.good())
@@ -488,8 +369,6 @@ in.getline(firstLine, 256);
 
 std::string particleName;
 std::string mediumName;
-double ecut;
-double vcut;
 double multiplier;
 double energy;
 std::string parametrization;
@@ -503,31 +382,30 @@ RandomGenerator::Get().SetSeed(0);
 
 while (in.good())
 {
-in >> particleName >> mediumName >> ecut >> vcut >> multiplier >>  energy >> parametrization >> rnd >> dNdx_rnd_stored;
+in >> particleName >> mediumName >> multiplier >>  energy >> parametrization >> rnd >> dNdx_rnd_stored;
 
 ParticleDef particle_def = getParticleDef(particleName);
 Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
-EnergyCutSettings ecuts(ecut, vcut);
 
-MupairProductionFactory::Definition mupair_def;
-mupair_def.multiplier      = multiplier;
-mupair_def.parametrization = MupairProductionFactory::Get().GetEnumFromString(parametrization);
+WeakInteractionFactory::Definition weak_def;
+weak_def.multiplier      = multiplier;
+weak_def.parametrization = WeakInteractionFactory::Get().GetEnumFromString(parametrization);
 
-CrossSection* mupair = MupairProductionFactory::Get().CreateMupairProduction(particle_def, *medium, ecuts, mupair_def, InterpolDef);
+CrossSection* weak = WeakInteractionFactory::Get().CreateWeakInteraction(particle_def, *medium, weak_def, InterpolDef);
 
-dNdx_rnd_new = mupair->CalculatedNdx(energy, rnd);
+dNdx_rnd_new = weak->CalculatedNdx(energy, rnd);
 
 ASSERT_NEAR(dNdx_rnd_new, dNdx_rnd_stored, 1E-10 * dNdx_rnd_stored);
 
 delete medium;
-delete mupair;
+delete weak;
 }
 }
 
-TEST(Mupairproduction, Test_of_e_interpol)
+TEST(WeakInteraction, Test_of_e_interpol)
 {
 std::ifstream in;
-std::string filename = "bin/TestFiles/Mupair_e_interpol.txt";
+std::string filename = "bin/TestFiles/Weak_e_interpol.txt";
 in.open(filename.c_str());
 
 if (!in.good())
@@ -540,8 +418,6 @@ in.getline(firstLine, 256);
 
 std::string particleName;
 std::string mediumName;
-double ecut;
-double vcut;
 double multiplier;
 double energy;
 std::string parametrization;
@@ -555,28 +431,27 @@ RandomGenerator::Get().SetSeed(0);
 
 while (in.good())
 {
-in >> particleName >> mediumName >> ecut >> vcut >> multiplier >>  energy >> parametrization >> rnd1 >> rnd2 >>
+in >> particleName >> mediumName >> multiplier >>  energy >> parametrization >> rnd1 >> rnd2 >>
 stochastic_loss_stored;
 
 ParticleDef particle_def = getParticleDef(particleName);
 Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
-EnergyCutSettings ecuts(ecut, vcut);
 
-MupairProductionFactory::Definition mupair_def;
-mupair_def.multiplier      = multiplier;
-mupair_def.parametrization = MupairProductionFactory::Get().GetEnumFromString(parametrization);
+WeakInteractionFactory::Definition weak_def;
+weak_def.multiplier      = multiplier;
+weak_def.parametrization = WeakInteractionFactory::Get().GetEnumFromString(parametrization);
 
-CrossSection* mupair = MupairProductionFactory::Get().CreateMupairProduction(particle_def, *medium, ecuts, mupair_def, InterpolDef);
+CrossSection* weak = WeakInteractionFactory::Get().CreateWeakInteraction(particle_def, *medium, weak_def, InterpolDef);
 
-stochastic_loss_new = mupair->CalculateStochasticLoss(energy, rnd1, rnd2);
+stochastic_loss_new = weak->CalculateStochasticLoss(energy, rnd1, rnd2);
 
 ASSERT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
 
 delete medium;
-delete mupair;
+delete weak;
 }
 }
-*/
+
 int main(int argc, char** argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
