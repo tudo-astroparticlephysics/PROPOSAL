@@ -147,6 +147,10 @@ double Bremsstrahlung::lpm(double energy, double v)
         init_lpm_effect_ = false;
 
         double sum = 0;
+        
+        // high energy for the calculation of the radiation length, which 
+        // converges for high energie against a fixed value.
+        double upper_energy = 1e20;     
 
         Integral integral_temp = Integral(IROMB, IMAXS, IPREC);
 
@@ -155,12 +159,12 @@ double Bremsstrahlung::lpm(double energy, double v)
         for (unsigned int i = 0; i < components_.size(); ++i)
         {
             component_index_                       = i;
-            Parametrization::IntegralLimits limits = GetIntegralLimits(BIGENERGY);
+            Parametrization::IntegralLimits limits = GetIntegralLimits(upper_energy);
 
             sum += integral_temp.Integrate(
-                limits.vMin, limits.vUp, std::bind(&Bremsstrahlung::FunctionToDEdxIntegral, this, BIGENERGY, std::placeholders::_1), 2);
+                limits.vMin, limits.vUp, std::bind(&Bremsstrahlung::FunctionToDEdxIntegral, this, upper_energy, std::placeholders::_1), 2);
             sum += integral_temp.Integrate(
-                limits.vUp, limits.vMax, std::bind(&Bremsstrahlung::FunctionToDEdxIntegral, this, BIGENERGY, std::placeholders::_1), 4);
+                limits.vUp, limits.vMax, std::bind(&Bremsstrahlung::FunctionToDEdxIntegral, this, upper_energy, std::placeholders::_1), 4);
         }
 
         eLpm_ = ALPHA * (particle_def_.mass);

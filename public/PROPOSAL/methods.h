@@ -103,6 +103,7 @@ struct InterpolationDef
         , path_to_tables(std::string())
         , path_to_tables_readonly(std::string())
         , raw(true)
+        , max_node_energy(1e14)
     {
     }
 
@@ -110,6 +111,7 @@ struct InterpolationDef
     std::string path_to_tables;
     std::string path_to_tables_readonly;
     bool raw;
+    double max_node_energy;
 };
 
 class Parametrization;

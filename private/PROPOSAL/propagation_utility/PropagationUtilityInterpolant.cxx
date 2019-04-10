@@ -105,7 +105,7 @@ void UtilityInterpolant::InitInterpolation(const std::string& name,
         builder_vec[i]
             .SetMax(number_of_sampling_points)
             .SetXMin(particle_def.low)
-            .SetXMax(BIGENERGY)
+            .SetXMax(interpolation_def_.max_node_energy)
             .SetRomberg(interpolation_def_.order_of_interpolation)
             .SetRational(false)
             .SetRelative(false)
@@ -297,7 +297,7 @@ double UtilityInterpolantInteraction::BuildInterpolant(double energy, UtilityInt
     } else
     {
         return -integral.Integrate(
-            energy, BIGENERGY, std::bind(&UtilityIntegral::FunctionToIntegral, &utility, std::placeholders::_1), 4);
+            energy, interpolation_def_.max_node_energy, std::bind(&UtilityIntegral::FunctionToIntegral, &utility, std::placeholders::_1), 4);
     }
 }
 
@@ -312,7 +312,7 @@ void UtilityInterpolantInteraction::InitInterpolation(const std::string& name,
     double a = std::abs(-integral.Integrate(
         particle_def.low, particle_def.low * 10, std::bind(&UtilityIntegral::FunctionToIntegral, &utility, std::placeholders::_1), 4));
     double b = std::abs(-integral.Integrate(
-        BIGENERGY, BIGENERGY / 10, std::bind(&UtilityIntegral::FunctionToIntegral, &utility, std::placeholders::_1), 4));
+        interpolation_def_.max_node_energy, interpolation_def_.max_node_energy/ 10, std::bind(&UtilityIntegral::FunctionToIntegral, &utility, std::placeholders::_1), 4));
 
     if (a < b)
     {
@@ -404,7 +404,7 @@ double UtilityInterpolantDecay::GetUpperLimit(double ei, double rnd)
 
 double UtilityInterpolantDecay::BuildInterpolant(double energy, UtilityIntegral& utility, Integral& integral)
 {
-    return -integral.Integrate(energy, BIGENERGY, std::bind(&UtilityIntegral::FunctionToIntegral, &utility, std::placeholders::_1), 4);
+    return -integral.Integrate(energy, interpolation_def_.max_node_energy, std::bind(&UtilityIntegral::FunctionToIntegral, &utility, std::placeholders::_1), 4);
 }
 
 // ------------------------------------------------------------------------- //
@@ -418,7 +418,7 @@ void UtilityInterpolantDecay::InitInterpolation(const std::string& name,
     double a = std::abs(-integral.Integrate(
         particle_def.low, particle_def.low * 10, std::bind(&UtilityIntegral::FunctionToIntegral, &utility, std::placeholders::_1), 4));
     double b = std::abs(-integral.Integrate(
-        BIGENERGY, BIGENERGY / 10, std::bind(&UtilityIntegral::FunctionToIntegral, &utility, std::placeholders::_1), 4));
+        interpolation_def_.max_node_energy, interpolation_def_.max_node_energy/ 10, std::bind(&UtilityIntegral::FunctionToIntegral, &utility, std::placeholders::_1), 4));
 
     if (a < b)
     {
@@ -620,7 +620,7 @@ double UtilityInterpolantScattering::GetUpperLimit(double ei, double rnd)
 
 double UtilityInterpolantScattering::BuildInterpolant(double energy, UtilityIntegral& utility, Integral& integral)
 {
-    return integral.Integrate(energy, BIGENERGY, std::bind(&UtilityIntegral::FunctionToIntegral, &utility, std::placeholders::_1), 4);
+    return integral.Integrate(energy, interpolation_def_.max_node_energy, std::bind(&UtilityIntegral::FunctionToIntegral, &utility, std::placeholders::_1), 4);
 }
 
 // ------------------------------------------------------------------------- //
