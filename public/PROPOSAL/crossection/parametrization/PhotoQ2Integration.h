@@ -180,7 +180,7 @@ PhotoQ2Interpolant<Param>::PhotoQ2Interpolant(const ParticleDef& particle_def,
         builder2d[i]
             .SetMax1(NUM1)
             .SetX1Min(this->particle_def_.low)
-            .SetX1Max(BIGENERGY)
+            .SetX1Max(def.max_node_energy)
             .SetMax2(NUM1)
             .SetX2Min(0.0)
             .SetX2Max(1.0)

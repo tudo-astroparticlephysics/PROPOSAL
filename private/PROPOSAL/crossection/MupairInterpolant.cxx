@@ -32,7 +32,7 @@ MupairInterpolant::MupairInterpolant(const MupairProduction& param, Interpolatio
 
     builder1d.SetMax(NUM1)
         .SetXMin(param.GetParticleDef().low)
-        .SetXMax(BIGENERGY)
+        .SetXMax(def.max_node_energy)
         .SetRomberg(def.order_of_interpolation)
         .SetRational(true)
         .SetRelative(false)
@@ -54,7 +54,7 @@ MupairInterpolant::MupairInterpolant(const MupairProduction& param, Interpolatio
 
     builder_de2dx.SetMax(NUM2)
         .SetXMin(param.GetParticleDef().low)
-        .SetXMax(BIGENERGY)
+        .SetXMax(def.max_node_energy)
         .SetRomberg(def.order_of_interpolation)
         .SetRational(false)
         .SetRelative(false)

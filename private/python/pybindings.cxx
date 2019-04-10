@@ -795,7 +795,8 @@ PYBIND11_MODULE(pyPROPOSAL, m)
         .def_readwrite("order_of_interpolation", &InterpolationDef::order_of_interpolation)
         .def_readwrite("path_to_tables", &InterpolationDef::path_to_tables)
         .def_readwrite("path_to_tables_readonly", &InterpolationDef::path_to_tables_readonly)
-        .def_readwrite("raw", &InterpolationDef::raw);
+        .def_readwrite("raw", &InterpolationDef::raw)
+        .def_readwrite("max_node_energy", &InterpolationDef::max_node_energy);
 
     // --------------------------------------------------------------------- //
     // Utility
