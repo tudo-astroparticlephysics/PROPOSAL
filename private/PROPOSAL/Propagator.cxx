@@ -1117,6 +1117,23 @@ InterpolationDef Propagator::CreateInterpolationDef(const std::string& json_obje
     // Read in interpolation options
     InterpolationDef interpolation_def;
     nlohmann::json json_object = nlohmann::json::parse(json_object_str);
+    
+    if (json_object.find("max_node_energy") != json_object.end())
+    {
+        if (json_object["max_node_energy"].is_number())
+        {
+            interpolation_def.max_node_energy = json_object["max_node_energy"];
+        }
+        else
+        {
+            log_fatal("The given max_node_energy option is not a number.");
+        }
+    }
+    else
+    {
+        log_debug("The max_node_energy option is not set. Use default (1e14 MeV)");
+    }
+
 
     if (json_object.find("do_binary_tables") != json_object.end())
     {
@@ -1131,7 +1148,7 @@ InterpolationDef Propagator::CreateInterpolationDef(const std::string& json_obje
     }
     else
     {
-        log_debug("The do_binary_tables option is not set. Use default (true");
+        log_debug("The do_binary_tables option is not set. Use default (true)");
     }
 
     // Parse to find path to interpolation tables
