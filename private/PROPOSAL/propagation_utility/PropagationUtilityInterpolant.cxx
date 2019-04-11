@@ -138,7 +138,7 @@ UtilityInterpolantDisplacement::UtilityInterpolantDisplacement(const Utility& ut
     : UtilityInterpolant(utility, def)
 {
     UtilityIntegralDisplacement utility_disp(utility_);
-    InitInterpolation("displacement", utility_disp, NUM3);
+    InitInterpolation("displacement", utility_disp, def.nodes_propagate);
 }
 
 UtilityInterpolantDisplacement::UtilityInterpolantDisplacement(const Utility& utility,
@@ -216,7 +216,7 @@ UtilityInterpolantInteraction::UtilityInterpolantInteraction(const Utility& util
     , up_(0)
 {
     UtilityIntegralInteraction utility_int(utility_);
-    InitInterpolation("interaction", utility_int, NUM3);
+    InitInterpolation("interaction", utility_int, def.nodes_propagate);
 }
 
 UtilityInterpolantInteraction::UtilityInterpolantInteraction(const Utility& utility,
@@ -337,7 +337,7 @@ UtilityInterpolantDecay::UtilityInterpolantDecay(const Utility& utility, Interpo
     , up_(0)
 {
     UtilityIntegralDecay utility_decay(utility_);
-    InitInterpolation("decay", utility_decay, NUM3);
+    InitInterpolation("decay", utility_decay, def.nodes_propagate);
 }
 
 UtilityInterpolantDecay::UtilityInterpolantDecay(const Utility& utility, const UtilityInterpolantDecay& collection)
@@ -441,7 +441,7 @@ UtilityInterpolantTime::UtilityInterpolantTime(const Utility& utility, Interpola
     : UtilityInterpolant(utility, def)
 {
     UtilityIntegralTime utility_time(utility_);
-    InitInterpolation("time", utility_time, NUM3);
+    InitInterpolation("time", utility_time, def.nodes_propagate);
 }
 
 UtilityInterpolantTime::UtilityInterpolantTime(const Utility& utility, const UtilityInterpolantTime& collection)
@@ -505,7 +505,7 @@ UtilityInterpolantContRand::UtilityInterpolantContRand(const Utility& utility, I
     : UtilityInterpolant(utility, def)
 {
     UtilityIntegralContRand utility_contrand(utility_);
-    InitInterpolation("contrand", utility_contrand, NUM2);
+    InitInterpolation("contrand", utility_contrand, def.nodes_continous_randomization);
 }
 
 UtilityInterpolantContRand::UtilityInterpolantContRand(const Utility& utility,
@@ -571,7 +571,7 @@ UtilityInterpolantScattering::UtilityInterpolantScattering(const Utility& utilit
     : UtilityInterpolant(utility, def)
 {
     UtilityIntegralScattering utility_scattering(utility_);
-    InitInterpolation("scattering", utility_scattering, NUM2);
+    InitInterpolation("scattering", utility_scattering, def.nodes_continous_randomization);
 }
 
 UtilityInterpolantScattering::UtilityInterpolantScattering(const Utility& utility,
