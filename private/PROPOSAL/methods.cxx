@@ -329,6 +329,11 @@ void InitializeInterpolation(const std::string name,
             hash_combine(hash_digest, (*it)->GetHash());
         }
     }
+    hash_combine(hash_digest, 
+                 interpolation_def.max_node_energy,
+                 interpolation_def.nodes_cross_section,
+                 interpolation_def.nodes_continous_randomization,
+                 interpolation_def.nodes_continous_randomization);
 
     bool storing_failed = false;
     bool reading_worked = false;
