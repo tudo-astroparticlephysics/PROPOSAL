@@ -171,6 +171,20 @@ double dilog(double x)
     return x;
 }
 
+// ------------------------------------------------------------------------- //
+size_t InterpolationDef::GetHash() const
+{
+    size_t seed = 0;
+    hash_combine(seed, 
+                 order_of_interpolation,
+                 max_node_energy,
+                 nodes_cross_section, 
+                 nodes_continous_randomization,
+                 nodes_propagate);
+
+    return seed;
+}
+
 namespace Helper {
 
 // ------------------------------------------------------------------------- //
@@ -329,11 +343,7 @@ void InitializeInterpolation(const std::string name,
             hash_combine(hash_digest, (*it)->GetHash(), (*it)->GetMultiplier());
         }
     }
-    hash_combine(hash_digest, 
-                 interpolation_def.max_node_energy,
-                 interpolation_def.nodes_cross_section,
-                 interpolation_def.nodes_continous_randomization,
-                 interpolation_def.nodes_continous_randomization);
+    hash_combine(hash_digest, interpolation_def.GetHash());
 
     bool storing_failed = false;
     bool reading_worked = false;
