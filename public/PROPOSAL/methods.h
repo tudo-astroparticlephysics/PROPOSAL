@@ -118,6 +118,8 @@ struct InterpolationDef
     int nodes_cross_section;
     int nodes_continous_randomization;
     int nodes_propagate;
+
+    size_t GetHash() const;
 };
 
 class Parametrization;
