@@ -72,7 +72,7 @@ double CrossSectionIntegral::CalculatedE2dx(double energy)
             2);
     }
 
-    return energy * energy * sum;
+    return parametrization_->GetMultiplier() * energy * energy * sum;
 }
 
 // ------------------------------------------------------------------------- //
@@ -97,7 +97,7 @@ double CrossSectionIntegral::CalculatedNdx(double energy)
             4);
         sum_of_rates_ += prob_for_component_[i];
     }
-    return sum_of_rates_;
+    return parametrization_->GetMultiplier() * sum_of_rates_;
 }
 
 // ------------------------------------------------------------------------- //
@@ -129,7 +129,7 @@ double CrossSectionIntegral::CalculatedNdx(double energy, double rnd)
         sum_of_rates_ += prob_for_component_.at(i);
     }
 
-    return sum_of_rates_;
+    return parametrization_->GetMultiplier() * sum_of_rates_;
 }
 
 // ------------------------------------------------------------------------- //

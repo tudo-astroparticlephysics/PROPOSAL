@@ -208,7 +208,7 @@ double CrossSectionInterpolant::CalculatedNdx(double energy)
         prob_for_component_[i] = std::max(dndx_interpolant_1d_.at(i)->Interpolate(energy), 0.);
         sum_of_rates_ += prob_for_component_[i];
     }
-    return sum_of_rates_;
+    return parametrization_->GetMultiplier() * sum_of_rates_;
 }
 
 // ------------------------------------------------------------------------- //
@@ -233,7 +233,7 @@ double CrossSectionInterpolant::CalculatedNdx(double energy, double rnd)
         sum_of_rates_ += prob_for_component_.at(i);
     }
 
-    return sum_of_rates_;
+    return parametrization_->GetMultiplier() * sum_of_rates_;
 }
 
 // ------------------------------------------------------------------------- //

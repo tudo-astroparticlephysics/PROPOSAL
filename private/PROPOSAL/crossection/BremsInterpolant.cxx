@@ -91,5 +91,5 @@ double BremsInterpolant::CalculatedEdx(double energy)
         return 0;
     }
 
-    return std::max(dedx_interpolant_->Interpolate(energy), 0.0);
+    return parametrization_->GetMultiplier() * std::max(dedx_interpolant_->Interpolate(energy), 0.0);
 }

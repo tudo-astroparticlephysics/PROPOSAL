@@ -45,5 +45,5 @@ double PhotoIntegral::CalculatedEdx(double energy)
             4);
     }
 
-    return energy * sum;
+    return parametrization_->GetMultiplier() * energy * sum;
 }

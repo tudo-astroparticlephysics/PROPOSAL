@@ -66,7 +66,7 @@ double Ionization::DifferentialCrossSection(double energy, double v)
     result = 1 - beta * (v / limits.vMax) + spin_1_2_contribution;
     result *= IONK * particle_def_.charge * particle_def_.charge * medium_->GetZA() / (2 * beta * energy * v * v);
 
-    return multiplier_ * medium_->GetMassDensity() * result * (1 + InelCorrection(energy, v));
+    return medium_->GetMassDensity() * result * (1 + InelCorrection(energy, v));
     ;
 }
 
@@ -165,7 +165,7 @@ double Ionization::CrossSectionWithoutInelasticCorrection(double energy, double 
     result = 1 - beta * (v / limits.vMax) + spin_1_2_contribution;
     result *= IONK * particle_def_.charge * particle_def_.charge * medium_->GetZA() / (2 * beta * energy * v * v);
 
-    return multiplier_ * medium_->GetMassDensity() * result;
+    return medium_->GetMassDensity() * result;
 }
 
 // ------------------------------------------------------------------------- //

@@ -44,5 +44,5 @@ double BremsIntegral::CalculatedEdx(double energy)
             2);
     }
 
-    return energy * sum;
+    return parametrization_->GetMultiplier() * energy * sum;
 }

@@ -106,7 +106,7 @@ double Bremsstrahlung::DifferentialCrossSection(double energy, double v)
         aux *= lpm(energy, v);
     }
 
-    return multiplier_ * medium_->GetMolDensity() * components_[component_index_]->GetAtomInMolecule() * aux;
+    return medium_->GetMolDensity() * components_[component_index_]->GetAtomInMolecule() * aux;
 }
 
 // ------------------------------------------------------------------------- //
