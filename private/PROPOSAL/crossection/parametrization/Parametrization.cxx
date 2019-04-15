@@ -121,8 +121,7 @@ size_t Parametrization::GetHash() const
                  medium_->GetName(),
                  medium_->GetDensityCorrection(),
                  cut_settings_.GetEcut(),
-                 cut_settings_.GetVcut(),
-                 multiplier_);
+                 cut_settings_.GetVcut());
 
     return seed;
 }

@@ -164,7 +164,7 @@ double IonizInterpolant::CalculatedEdx(double energy)
         return 0;
     }
 
-    return std::max(dedx_interpolant_->Interpolate(energy), 0.);
+    return parametrization_->GetMultiplier() * std::max(dedx_interpolant_->Interpolate(energy), 0.);
 }
 
 // ------------------------------------------------------------------------- //
@@ -177,7 +177,7 @@ double IonizInterpolant::CalculatedNdx(double energy)
 
     sum_of_rates_ = std::max(dndx_interpolant_1d_[0]->Interpolate(energy), 0.);
 
-    return sum_of_rates_;
+    return parametrization_->GetMultiplier() * sum_of_rates_;
 }
 
 // ------------------------------------------------------------------------- //
@@ -192,7 +192,7 @@ double IonizInterpolant::CalculatedNdx(double energy, double rnd)
 
     sum_of_rates_ = std::max(dndx_interpolant_1d_[0]->Interpolate(energy), 0.);
 
-    return sum_of_rates_;
+    return parametrization_->GetMultiplier() * sum_of_rates_;
 }
 
 // ------------------------------------------------------------------------- //

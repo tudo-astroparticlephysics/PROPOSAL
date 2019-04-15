@@ -123,7 +123,7 @@ double PhotoRealPhotonAssumption::DifferentialCrossSection(double energy, double
     // in the appendix
     aux += components_[component_index_]->GetAtomicNum() * 1.e-30 * hard_component_->CalculateHardComponent(energy, v);
 
-    return multiplier_ * medium_->GetMolDensity() * components_[component_index_]->GetAtomInMolecule() *
+    return medium_->GetMolDensity() * components_[component_index_]->GetAtomInMolecule() *
            particle_def_.charge * particle_def_.charge * aux;
 }
 

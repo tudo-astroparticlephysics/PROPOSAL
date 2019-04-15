@@ -326,7 +326,7 @@ void InitializeInterpolation(const std::string name,
         for (std::vector<Parametrization*>::const_iterator it = parametrizations.begin(); it != parametrizations.end();
              ++it)
         {
-            hash_combine(hash_digest, (*it)->GetHash());
+            hash_combine(hash_digest, (*it)->GetHash(), (*it)->GetMultiplier());
         }
     }
     hash_combine(hash_digest, 

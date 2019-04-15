@@ -91,7 +91,7 @@ double MupairInterpolant::CalculatedEdx(double energy)
         return 0;
     }
 
-    return std::max(dedx_interpolant_->Interpolate(energy), 0.0);
+    return parametrization_->GetMultiplier() * std::max(dedx_interpolant_->Interpolate(energy), 0.0);
 }
 
 std::vector<Particle*> MupairInterpolant::CalculateProducedParticles(double energy, double energy_loss, double rnd1, double rnd2){

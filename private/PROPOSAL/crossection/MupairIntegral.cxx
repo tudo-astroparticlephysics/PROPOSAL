@@ -45,7 +45,7 @@ double MupairIntegral::CalculatedEdx(double energy)
             4);
     }
 
-    return energy * sum;
+    return parametrization_->GetMultiplier() * energy * sum;
 }
 
 std::vector<Particle*> MupairIntegral::CalculateProducedParticles(double energy, double energy_loss, double rnd1, double rnd2){

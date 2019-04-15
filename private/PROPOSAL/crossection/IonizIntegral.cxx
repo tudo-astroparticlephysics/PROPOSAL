@@ -83,7 +83,7 @@ double IonizIntegral::CalculatedE2dx(double energy)
 
     Parametrization::IntegralLimits limits = parametrization_->GetIntegralLimits(energy);
 
-    return de2dx_integral_.Integrate(
+    return parametrization_->GetMultiplier() * de2dx_integral_.Integrate(
         limits.vMin,
         limits.vUp,
         std::bind(&Parametrization::FunctionToDE2dxIntegral, parametrization_, energy, std::placeholders::_1),
@@ -107,7 +107,7 @@ double IonizIntegral::CalculatedNdx(double energy)
                                     3,
                                     1);
 
-    return sum_of_rates_;
+    return parametrization_->GetMultiplier() * sum_of_rates_;
 }
 
 // ------------------------------------------------------------------------- //
@@ -130,7 +130,7 @@ double IonizIntegral::CalculatedNdx(double energy, double rnd)
         rnd,
         1);
 
-    return sum_of_rates_;
+    return parametrization_->GetMultiplier() * sum_of_rates_;
 }
 
 // ------------------------------------------------------------------------- //
