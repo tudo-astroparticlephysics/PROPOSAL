@@ -51,6 +51,7 @@
 #include "PROPOSAL/crossection/parametrization/Parametrization.h"
 #include "PROPOSAL/crossection/parametrization/MupairProduction.h"
 #include "PROPOSAL/crossection/parametrization/WeakInteraction.h"
+#include "PROPOSAL/crossection/parametrization/WeakTable.h"
 #include "PROPOSAL/crossection/parametrization/PhotoQ2Integration.h"
 #include "PROPOSAL/crossection/parametrization/PhotoRealPhotonAssumption.h"
 #include "PROPOSAL/crossection/parametrization/Photonuclear.h"

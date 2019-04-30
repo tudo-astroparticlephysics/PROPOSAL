@@ -35,6 +35,7 @@ set (PROPOSAL_SRC_FILES
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/parametrization/EpairProduction.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/parametrization/MupairProduction.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/parametrization/WeakInteraction.cxx
+    ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/parametrization/WeakTable.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/parametrization/Ionization.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/parametrization/Parametrization.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/parametrization/PhotoQ2Integration.cxx

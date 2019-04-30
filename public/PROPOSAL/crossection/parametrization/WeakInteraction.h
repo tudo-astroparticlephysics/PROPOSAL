@@ -101,15 +101,6 @@ public:
 
         InterpolantVec interpolant_;
 
-        std::vector<double> energies_;
-        std::vector< std::vector<double> > y_;
-        std::vector< std::vector<double> > dsigma_;
-
-    private:
-        void read_table(std::vector<double> &energies,
-                std::vector< std::vector<double> > &y,
-                std::vector< std::vector<double> > &dsigma,
-                bool antiparticle);
     };
 
 
