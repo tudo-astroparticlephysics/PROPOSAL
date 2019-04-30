@@ -455,7 +455,7 @@ double Sector::Propagate(double distance)
             }
             else if(energy_loss.second == DynamicData::WeakInt)
             {
-                Particle* return_particle_ = nullptr;
+                Particle* return_particle_;
                 const ParticleDef particle_def = particle_.GetParticleDef(); //Get Particle Type
 
                 if(particle_def==EMinusDef::Get()){
@@ -478,6 +478,7 @@ double Sector::Propagate(double distance)
                 }
                 else{
                     log_fatal("Weak interaction: Particle to propagate is not a SM charged lepton");
+                    return_particle_ = nullptr; //avoid errors
                 }
 
                 //set neutrino properties

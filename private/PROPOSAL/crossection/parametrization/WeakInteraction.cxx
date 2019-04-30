@@ -8,6 +8,7 @@
 
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Output.h"
+#include "PROPOSAL/crossection/parametrization/WeakTable.h"
 
 
 using namespace PROPOSAL;
@@ -61,28 +62,16 @@ WeakCooperSarkarMertsch::WeakCooperSarkarMertsch(const ParticleDef& particle_def
                                                  const Medium& medium,
                                                  double multiplier)
         : WeakInteraction(particle_def, medium, multiplier)
-        , interpolant_(this->medium_->GetNumComponents(), NULL)
+        , interpolant_(2, NULL)
 {
 
+    std::vector<Interpolant2DBuilder_array_as> builder2d(2); // [0] for proton, [1] for neutron
+    Helper::InterpolantBuilderContainer builder_container2d(2);
     if(particle_def==EMinusDef::Get()||particle_def==MuMinusDef::Get()||particle_def==TauMinusDef::Get()){
-        read_table(energies_, y_, dsigma_, false);
-    }
-    else if(particle_def==EPlusDef::Get()||particle_def==MuPlusDef::Get()||particle_def==TauPlusDef::Get()){
-        read_table(energies_, y_, dsigma_, true);
-    }
-    else{
-        log_fatal("Weak interaction table_read: Particle to propagate is not a SM charged lepton");
-    }
-
-    std::vector<Interpolant2DBuilder_array_as> builder2d(this->components_.size());
-    Helper::InterpolantBuilderContainer builder_container2d(this->components_.size());
-
-    for (unsigned int i = 0; i < this->components_.size(); ++i)
-    {
-        builder2d[i]
-                .Setx1(energies_)
-                .Setx2(y_)
-                .Sety(dsigma_)
+        builder2d[0]
+                .Setx1(energies)
+                .Setx2(y_nubar_p)
+                .Sety(sigma_nubar_p)
                 .SetRomberg1(IROMB)
                 .SetRational1(false)
                 .SetRelative1(false)
@@ -90,10 +79,55 @@ WeakCooperSarkarMertsch::WeakCooperSarkarMertsch(const ParticleDef& particle_def
                 .SetRational2(false)
                 .SetRelative2(false);
 
-        builder_container2d[i].first  = &builder2d[i];
-        builder_container2d[i].second = &interpolant_[i];
-    }
+        builder_container2d[0].first  = &builder2d[0];
+        builder_container2d[0].second = &interpolant_[0];
 
+        builder2d[1]
+                .Setx1(energies)
+                .Setx2(y_nubar_n)
+                .Sety(sigma_nubar_n)
+                .SetRomberg1(IROMB)
+                .SetRational1(false)
+                .SetRelative1(false)
+                .SetRomberg2(IROMB)
+                .SetRational2(false)
+                .SetRelative2(false);
+
+        builder_container2d[1].first  = &builder2d[1];
+        builder_container2d[1].second = &interpolant_[1];
+    }
+    else if(particle_def==EPlusDef::Get()||particle_def==MuPlusDef::Get()||particle_def==TauPlusDef::Get()){
+        builder2d[0]
+                .Setx1(energies)
+                .Setx2(y_nu_p)
+                .Sety(sigma_nu_p)
+                .SetRomberg1(IROMB)
+                .SetRational1(false)
+                .SetRelative1(false)
+                .SetRomberg2(IROMB)
+                .SetRational2(false)
+                .SetRelative2(false);
+
+        builder_container2d[0].first  = &builder2d[0];
+        builder_container2d[0].second = &interpolant_[0];
+
+        builder2d[1]
+                .Setx1(energies)
+                .Setx2(y_nu_n)
+                .Sety(sigma_nu_n)
+                .SetRomberg1(IROMB)
+                .SetRational1(false)
+                .SetRelative1(false)
+                .SetRomberg2(IROMB)
+                .SetRational2(false)
+                .SetRelative2(false);
+
+        builder_container2d[1].first  = &builder2d[1];
+        builder_container2d[1].second = &interpolant_[1];
+    }
+    else{
+        log_fatal("Weak interaction table_read: Particle to propagate is not a SM charged lepton");
+    }
     Helper::InitializeInterpolation("WeakInt", builder_container2d, std::vector<Parametrization*>(1, this), InterpolationDef());
 
 }
@@ -138,61 +172,13 @@ bool WeakCooperSarkarMertsch::compare(const Parametrization& parametrization) co
 
 double WeakCooperSarkarMertsch::DifferentialCrossSection(double energy, double v)
 {
-    return multiplier_ * medium_->GetMolDensity() * components_[component_index_]->GetAtomInMolecule() * 1e-36 * std::max(interpolant_.at(this->component_index_)->InterpolateArray(std::log10(energy), v), 0.0);
-    //factor 1e-36: conversion from pb to cm^2
+    double proton_contribution = components_[component_index_]->GetNucCharge() * interpolant_.at(0)->InterpolateArray(std::log10(energy), v);
+    double neutron_contribution =  (components_[component_index_]->GetAtomicNum() - components_[component_index_]->GetNucCharge()) * interpolant_.at(1)->InterpolateArray(std::log10(energy), v);
+    double mean_contribution = (proton_contribution + neutron_contribution) / (components_[component_index_]->GetAtomicNum());
+
+    return multiplier_ * medium_->GetMolDensity() * components_[component_index_]->GetAtomInMolecule() * 1e-36 * std::max(0.0, mean_contribution); //factor 1e-36: conversion from pb to cm^2
 }
 
-void WeakCooperSarkarMertsch::read_table(std::vector<double> &energies, std::vector<std::vector<double> >  &y,
-                                         std::vector<std::vector<double> > &dsigma, bool antiparticle) {
-    int energylen = 111;
-    int ylen = 100;
-    double aux, aux2;
-
-    //resize arrays
-    energies.resize(energylen);
-    y.resize(energylen);
-    dsigma.resize(energylen);
-    for(int i = 0; i < energylen; i++){
-        dsigma[i].resize(ylen);
-        y[i].resize(ylen);
-    }
-
-    //read data
-    std::string pathname;
-    if(antiparticle == false){
-        pathname = "resources/dsigmady_nubar_CC_iso_NLO_HERAPDF15NLO_EIG.dat";
-    }
-    else{
-        pathname = "resources/dsigmady_nu_CC_iso_NLO_HERAPDF15NLO_EIG.dat";
-    }
-
-    std::ifstream file(Helper::ResolvePath(pathname));
-
-    if (!file.is_open())
-    {
-        log_warn("Can not find table file for weak interaction. Setting crosssection to 0: %s", pathname.c_str());
-        for(int i = 0; i < energylen; i++){
-            energies[i] = 4. + i * 0.1;
-            for(int k = 0; k<ylen; ++k){
-                y[i][k] = i+k; //assign "random" y values to avoid errors
-                dsigma[i][k] = 0;
-            }
-        }
-    }
-    else{
-        for(int i = 0; i < energylen; i++){
-            energies[i] = 4. + i * 0.1;
-            for(int k = 0; k<ylen; ++k){
-                file >> aux;
-                file >> aux2;
-                y[i][k] = aux;
-                dsigma[i][k] = aux2;
-            }
-        }
-    }
-
-    file.close();
-}
 
 const std::string WeakCooperSarkarMertsch::name_ = "WeakCooperSarkarMertsch";
 
