@@ -41,7 +41,7 @@ MupairInterpolant::MupairInterpolant(const MupairProduction& param, Interpolatio
         .SetRationalY(false)
         .SetRelativeY(false)
         .SetLogSubst(true)
-        .SetFunction1D(std::bind(&CrossSection::CalculatedEdx, &mupair, std::placeholders::_1));
+        .SetFunction1D(std::bind(&CrossSectionIntegral::CalculatedEdxWithoutMultiplier, &mupair, std::placeholders::_1));
 
     builder_container.push_back(std::make_pair(&builder1d, &dedx_interpolant_));
 
@@ -63,7 +63,7 @@ MupairInterpolant::MupairInterpolant(const MupairProduction& param, Interpolatio
         .SetRationalY(false)
         .SetRelativeY(false)
         .SetLogSubst(false)
-        .SetFunction1D(std::bind(&CrossSection::CalculatedE2dx, &mupair, std::placeholders::_1));
+        .SetFunction1D(std::bind(&MupairIntegral::CalculatedE2dxWithoutMultiplier, &mupair, std::placeholders::_1));
 
     builder_container_de2dx.push_back(std::make_pair(&builder_de2dx, &de2dx_interpolant_));
 

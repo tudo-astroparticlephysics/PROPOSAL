@@ -49,6 +49,8 @@ public:
     // ----------------------------------------------------------------- //
 
     double CalculatedEdx(double energy);
+    double CalculatedEdxWithoutMultiplier(double energy);
+
 };
 
 } // namespace PROPOSAL

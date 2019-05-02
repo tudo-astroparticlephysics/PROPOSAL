@@ -22,14 +22,7 @@ BremsIntegral::~BremsIntegral() {}
 // ----------------------------------------------------------------- //
 // Public methods
 // ----------------------------------------------------------------- //
-
-double BremsIntegral::CalculatedEdx(double energy)
-{
-    if (parametrization_->GetMultiplier() <= 0)
-    {
-        return 0;
-    }
-
+double BremsIntegral::CalculatedEdxWithoutMultiplier(double energy){
     double sum = 0;
 
     for (int i = 0; i < (parametrization_->GetMedium().GetNumComponents()); i++)
@@ -44,5 +37,15 @@ double BremsIntegral::CalculatedEdx(double energy)
             2);
     }
 
-    return parametrization_->GetMultiplier() * energy * sum;
+    return energy * sum;
+}
+
+double BremsIntegral::CalculatedEdx(double energy)
+{
+    if (parametrization_->GetMultiplier() <= 0)
+    {
+        return 0;
+    }
+
+    return parametrization_->GetMultiplier() * BremsIntegral::CalculatedEdxWithoutMultiplier(energy);
 }

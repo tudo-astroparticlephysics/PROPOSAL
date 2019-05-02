@@ -31,6 +31,11 @@ double PhotoIntegral::CalculatedEdx(double energy)
         return 0;
     }
 
+    return parametrization_->GetMultiplier() * PhotoIntegral::CalculatedEdxWithoutMultiplier(energy);
+}
+
+double PhotoIntegral::CalculatedEdxWithoutMultiplier(double energy)
+{
     double sum = 0;
 
     for (int i = 0; i < parametrization_->GetMedium().GetNumComponents(); i++)
@@ -45,5 +50,5 @@ double PhotoIntegral::CalculatedEdx(double energy)
             4);
     }
 
-    return parametrization_->GetMultiplier() * energy * sum;
+    return energy * sum;
 }
