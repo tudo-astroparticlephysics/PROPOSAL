@@ -31,6 +31,11 @@ double EpairIntegral::CalculatedEdx(double energy)
         return 0;
     }
 
+    return parametrization_->GetMultiplier() * EpairIntegral::CalculatedEdxWithoutMultiplier(energy);
+}
+
+double EpairIntegral::CalculatedEdxWithoutMultiplier(double energy)
+{
     double sum = 0;
 
     for (int i = 0; i < parametrization_->GetMedium().GetNumComponents(); i++)
@@ -95,7 +100,7 @@ double EpairIntegral::CalculatedEdx(double energy)
         }
     }
 
-    return parametrization_->GetMultiplier() * energy * sum;
+    return energy * sum;
 }
 
 // ------------------------------------------------------------------------- //

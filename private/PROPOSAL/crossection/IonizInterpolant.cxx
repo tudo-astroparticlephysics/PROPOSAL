@@ -44,7 +44,7 @@ IonizInterpolant::IonizInterpolant(const Ionization& param, InterpolationDef def
         .SetRationalY(false)
         .SetRelativeY(false)
         .SetLogSubst(true)
-        .SetFunction1D(std::bind(&CrossSection::CalculatedEdx, &ioniz, std::placeholders::_1));
+        .SetFunction1D(std::bind(&CrossSectionIntegral::CalculatedEdxWithoutMultiplier, &ioniz, std::placeholders::_1));
 
     builder_container.push_back(std::make_pair(&builder1d, &dedx_interpolant_));
 
@@ -66,7 +66,7 @@ IonizInterpolant::IonizInterpolant(const Ionization& param, InterpolationDef def
         .SetRationalY(false)
         .SetRelativeY(false)
         .SetLogSubst(false)
-        .SetFunction1D(std::bind(&CrossSection::CalculatedE2dx, &ioniz, std::placeholders::_1));
+        .SetFunction1D(std::bind(&IonizIntegral::CalculatedEdxWithoutMultiplier, &ioniz, std::placeholders::_1));
 
     builder_container_de2dx.push_back(std::make_pair(&builder_de2dx, &de2dx_interpolant_));
 

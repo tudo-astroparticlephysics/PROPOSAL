@@ -47,7 +47,9 @@ public:
     virtual CrossSection* clone() const = 0;
 
     virtual double CalculatedEdx(double energy) = 0;
+    virtual double CalculatedEdxWithoutMultiplier(double energy) = 0;
     virtual double CalculatedE2dx(double energy);
+    virtual double CalculatedE2dxWithoutMultiplier(double energy);
     virtual double CalculatedNdx(double energy);
     virtual double CalculatedNdx(double energy, double rnd);
     virtual double CalculateStochasticLoss(double energy, double rnd1, double rnd2);

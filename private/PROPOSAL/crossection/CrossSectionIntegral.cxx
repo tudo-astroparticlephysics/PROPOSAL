@@ -58,6 +58,15 @@ double CrossSectionIntegral::CalculatedE2dx(double energy)
         return 0;
     }
 
+    double aux = 0;
+    aux = CrossSectionIntegral::CalculatedE2dxWithoutMultiplier(energy);
+
+
+    return parametrization_->GetMultiplier() * aux;
+}
+
+double CrossSectionIntegral::CalculatedE2dxWithoutMultiplier(double energy)
+{
     double sum = 0;
 
     for (size_t i = 0; i < components_.size(); ++i)
@@ -72,7 +81,7 @@ double CrossSectionIntegral::CalculatedE2dx(double energy)
             2);
     }
 
-    return parametrization_->GetMultiplier() * energy * energy * sum;
+    return energy * energy * sum;
 }
 
 // ------------------------------------------------------------------------- //
