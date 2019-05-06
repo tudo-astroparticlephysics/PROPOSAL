@@ -102,14 +102,14 @@ struct InterpolationDef
         : order_of_interpolation(5)
         , path_to_tables(std::string())
         , path_to_tables_readonly(std::string())
-        , raw(true)
+        , do_binary_tables(true)
     {
     }
 
     int order_of_interpolation;
     std::string path_to_tables;
     std::string path_to_tables_readonly;
-    bool raw;
+    bool do_binary_tables;
 };
 
 class Parametrization;

@@ -484,11 +484,11 @@ double Interpolant::FindLimit(double x1, double y)
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-bool Interpolant::Save(std::string Path, bool raw)
+bool Interpolant::Save(std::string Path, bool binary_tables)
 {
     std::ofstream out;
 
-    if (!raw)
+    if (!binary_tables)
     {
         std::stringstream ss;
         ss << Path << ".txt";
@@ -514,7 +514,7 @@ bool Interpolant::Save(std::string Path, bool raw)
         }
     }
 
-    Save(out, raw);
+    Save(out, binary_tables);
 
     out.close();
     return 1;
@@ -523,7 +523,7 @@ bool Interpolant::Save(std::string Path, bool raw)
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-bool Interpolant::Save(std::ofstream& out, bool raw)
+bool Interpolant::Save(std::ofstream& out, bool binary_tables)
 {
     if (!out.good())
     {
@@ -534,7 +534,7 @@ bool Interpolant::Save(std::ofstream& out, bool raw)
     if (function2d_ != NULL)
         D2 = true;
 
-    if (raw)
+    if (binary_tables)
     {
         out.write(reinterpret_cast<char*>(&D2), sizeof D2);
 
@@ -566,7 +566,7 @@ bool Interpolant::Save(std::ofstream& out, bool raw)
             for (int i = 0; i < max_; i++)
             {
                 out.write(reinterpret_cast<char*>(&iX_.at(i)), sizeof iX_.at(i));
-                Interpolant_.at(i)->Save(out, raw);
+                Interpolant_.at(i)->Save(out, binary_tables);
             }
         } else
         {
@@ -619,7 +619,7 @@ bool Interpolant::Save(std::ofstream& out, bool raw)
             for (int i = 0; i < max_; i++)
             {
                 out << iX_.at(i) << std::endl;
-                Interpolant_.at(i)->Save(out, raw);
+                Interpolant_.at(i)->Save(out, binary_tables);
             }
         } else
         {
@@ -646,12 +646,12 @@ bool Interpolant::Save(std::ofstream& out, bool raw)
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-bool Interpolant::Load(std::string Path, bool raw)
+bool Interpolant::Load(std::string Path, bool binary_tables)
 {
     bool success;
     std::ifstream in;
 
-    if (!raw)
+    if (!binary_tables)
     {
         std::stringstream ss;
         ss << Path << ".txt";
@@ -662,7 +662,7 @@ bool Interpolant::Load(std::string Path, bool raw)
         in.open(Path.c_str(), std::ios::binary);
     }
 
-    success = Load(in, raw);
+    success = Load(in, binary_tables);
 
     in.close();
     return success;
@@ -671,7 +671,7 @@ bool Interpolant::Load(std::string Path, bool raw)
 //----------------------------------------------------------------------------//
 //----------------------------------------------------------------------------//
 
-bool Interpolant::Load(std::ifstream& in, bool raw)
+bool Interpolant::Load(std::ifstream& in, bool binary_tables)
 {
     bool D2;
 
@@ -680,7 +680,7 @@ bool Interpolant::Load(std::ifstream& in, bool raw)
     int romberg, rombergY;
     bool rational, rationalY, relative, relativeY, isLog, logSubst;
 
-    if (raw)
+    if (binary_tables)
     {
         in.read(reinterpret_cast<char*>(&D2), sizeof D2);
 
@@ -713,7 +713,7 @@ bool Interpolant::Load(std::ifstream& in, bool raw)
                 if (!in.good())
                     return 0;
                 Interpolant_.at(i) = new Interpolant();
-                Interpolant_.at(i)->Load(in, raw);
+                Interpolant_.at(i)->Load(in, binary_tables);
                 Interpolant_.at(i)->self_ = false;
             }
 
@@ -767,7 +767,7 @@ bool Interpolant::Load(std::ifstream& in, bool raw)
                 if (!in.good())
                     return 0;
                 Interpolant_.at(i) = new Interpolant();
-                Interpolant_.at(i)->Load(in, raw);
+                Interpolant_.at(i)->Load(in, binary_tables);
                 Interpolant_.at(i)->self_ = false;
             }
 
