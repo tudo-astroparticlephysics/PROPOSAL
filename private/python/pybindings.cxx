@@ -620,7 +620,7 @@ void init_parametrization(py::module& m)
         .value("ButkevichMikhailov", PhotonuclearFactory::ButkevichMikhailov)
         .value("RenoSarcevicSu", PhotonuclearFactory::RenoSarcevicSu);
 
-    py::enum_<PhotonuclearFactory::Shadow>(m_sub_brems, "PhotoShadow")
+    py::enum_<PhotonuclearFactory::Shadow>(m_sub_photo, "PhotoShadow")
         .value("DuttaRenoSarcevicSeckel", PhotonuclearFactory::ShadowDuttaRenoSarcevicSeckel)
         .value("ButkevichMikhailov", PhotonuclearFactory::ShadowButkevichMikhailov);
 
