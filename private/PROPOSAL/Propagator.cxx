@@ -1122,7 +1122,7 @@ InterpolationDef Propagator::CreateInterpolationDef(const std::string& json_obje
     {
         if (json_object["do_binary_tables"].is_boolean())
         {
-            interpolation_def.raw = json_object["do_binary_tables"];
+            interpolation_def.do_binary_tables = json_object["do_binary_tables"];
         }
         else
         {

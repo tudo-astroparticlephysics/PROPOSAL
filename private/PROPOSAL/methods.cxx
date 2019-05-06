@@ -332,7 +332,7 @@ void InitializeInterpolation(const std::string name,
 
     bool storing_failed = false;
     bool reading_worked = false;
-    bool raw             = interpolation_def.raw;
+    bool binary_tables = interpolation_def.do_binary_tables;
     std::string pathname;
     std::stringstream filename;
 
@@ -343,14 +343,14 @@ void InitializeInterpolation(const std::string name,
     if (!pathname.empty())
     {
         filename << pathname << "/" << name << "_" << hash_digest;
-        if (!raw)
+        if (!binary_tables)
         {
             filename << ".txt";
         }
         if (FileExist(filename.str()))
         {
             std::ifstream input;
-            if (raw)
+            if (binary_tables)
             {
                 input.open(filename.str().c_str(), std::ios::binary);
             } else
@@ -378,7 +378,7 @@ void InitializeInterpolation(const std::string name,
                 {
                     // TODO(mario): read check Tue 2017/09/05
                     (*builder_it->second) = new Interpolant();
-                    (*builder_it->second)->Load(input, raw);
+                    (*builder_it->second)->Load(input, binary_tables);
                 }
                 reading_worked = true;
             }
@@ -413,7 +413,7 @@ void InitializeInterpolation(const std::string name,
     filename.clear();
     filename << pathname << "/" << name << "_" << hash_digest;
 
-    if (!raw)
+    if (!binary_tables)
     {
         filename << ".txt";
     }
@@ -424,7 +424,7 @@ void InitializeInterpolation(const std::string name,
         {
             std::ifstream input;
 
-            if (raw)
+            if (binary_tables)
             {
                 input.open(filename.str().c_str(), std::ios::binary);
             } else
@@ -451,7 +451,7 @@ void InitializeInterpolation(const std::string name,
                 {
                     // TODO(mario): read check Tue 2017/09/05
                     (*builder_it->second) = new Interpolant();
-                    (*builder_it->second)->Load(input, raw);
+                    (*builder_it->second)->Load(input, binary_tables);
                 }
             }
 
@@ -463,7 +463,7 @@ void InitializeInterpolation(const std::string name,
 
             std::ofstream output;
 
-            if (raw)
+            if (binary_tables)
             {
                 output.open(filename.str().c_str(), std::ios::binary);
             } else
@@ -480,7 +480,7 @@ void InitializeInterpolation(const std::string name,
                      ++builder_it)
                 {
                     (*builder_it->second) = builder_it->first->build();
-                    (*builder_it->second)->Save(output, raw);
+                    (*builder_it->second)->Save(output, binary_tables);
                 }
             } else
             {
