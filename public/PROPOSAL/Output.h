@@ -29,8 +29,6 @@
 
 #pragma once
 
-#ifndef ICECUBE
-
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -46,15 +44,15 @@
     #include "TTree.h"
 #endif
 
-#if not PROPOSAL_STANDALONE
+#ifdef ICECUBE_PROJECT
     #include <icetray/I3Logging.h>
-#else // not PROPOSAL_STANDALONE
-    #if LOG4CPLUS_SUPPORT
-        #include <log4cplus/configurator.h>
-        #include <log4cplus/logger.h>
-        #include <log4cplus/loggingmacros.h>
-    #endif // log4cplus
-#endif // not PROPOSAL_STANDALONE
+#endif // ICECUBE_PROJECT
+
+#if LOG4CPLUS_SUPPORT
+    #include <log4cplus/configurator.h>
+    #include <log4cplus/logger.h>
+    #include <log4cplus/loggingmacros.h>
+#endif // log4cplus
 
 namespace PROPOSAL {
 
@@ -233,8 +231,6 @@ public:
 } // namespace PROPOSAL
 
 
-#if PROPOSAL_STANDALONE
-
 #if LOG4CPLUS_SUPPORT
 
 template<typename... Args>
@@ -281,11 +277,12 @@ void log_notice(Args ... args)
 }
 
 #else // log4cplus
+#ifndef ICECUBE_PROJECT
 
 template<typename... Args>
 void log_error(Args ... args)
 {
-    void(args...);
+    printf(args...);
 }
 
 template<typename... Args>
@@ -299,34 +296,32 @@ void log_fatal(Args ... args)
 template<typename... Args>
 void log_warn(Args ... args)
 {
-    void(args...);
+    printf(args...);
 }
 
 template<typename... Args>
 void log_info(Args ... args)
 {
-    void(args...);
+    printf(args...);
 }
 
 template<typename... Args>
 void log_trace(Args ... args)
 {
-    void(args...);
+    printf(args...);
 }
 
 template<typename... Args>
 void log_debug(Args ... args)
 {
-    void(args...);
+    printf(args...);
 }
 
 template<typename... Args>
 void log_notice(Args ... args)
 {
-    void(args...);
+    printf(args...);
 }
 
+#endif // not ICECUBE_PROJECT
 #endif // log4cplus
-#endif // PROPOSAL_STANDALONE
-
-#endif // ICECUBE
