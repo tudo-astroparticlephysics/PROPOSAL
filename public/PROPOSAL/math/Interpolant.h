@@ -66,6 +66,8 @@ private:
     std::vector<double> iX_;
     std::vector<double> iY_;
 
+    std::vector<std::vector<double> > iY2_;
+
     std::vector<double> c_;
     std::vector<double> d_;
 
@@ -298,6 +300,48 @@ public:
 
     //----------------------------------------------------------------------------//
 
+    /*!
+     * Constructor for the 2-dimensional functions if the array already exists.
+     *
+     * Constructs and initializes class for the 2-dimensional function with the
+     * given array of x1, x2 and f(x1, x2) values.
+     *
+     * \param   x1    vector of x values.
+     * \param   x2    vector of x values.
+     * \param   y vector of f(x) values
+     * \param   romberg1      Order of interpolation
+     * \param   rational1     interpolate with rational function
+     * \param   relative1     save error relative to the function value?
+     * \param   romberg2      Order of interpolation
+     * \param   rational2     interpolate with rational function
+     * \param   relative2     save error relative to the function value?
+     * \return
+     */
+    Interpolant(std::vector<double> x1, std::vector<double> x2, std::vector< std::vector<double> > y, int romberg1, bool rational1, bool relative1 , int romberg2, bool rational2, bool relative2);
+
+    //----------------------------------------------------------------------------//
+
+    /*!
+     * Constructor for the 2-dimensional functions if the array already exists, but x2 is asymmetric
+     *
+     * Constructs and initializes class for the 2-dimensional function with the
+     * given array of x1, x2 and f(x1, x2) values.
+     *
+     * \param   x1    vector of x values.
+     * \param   x2    vector of vectors with x2 values for every x1
+     * \param   y vector of f(x) values
+     * \param   romberg1      Order of interpolation
+     * \param   rational1     interpolate with rational function
+     * \param   relative1     save error relative to the function value?
+     * \param   romberg2      Order of interpolation
+     * \param   rational2     interpolate with rational function
+     * \param   relative2     save error relative to the function value?
+     * \return
+     */
+    Interpolant(std::vector<double> x1, std::vector< std::vector<double> > x2, std::vector< std::vector<double> > y, int romberg1, bool rational1, bool relative1 , int romberg2, bool rational2, bool relative2);
+
+    //----------------------------------------------------------------------------//
+
     /**
      * Interpolates f(x) for 1d function
      *
@@ -329,6 +373,18 @@ public:
      */
 
     double InterpolateArray(double x);
+
+    //----------------------------------------------------------------------------//
+
+    /**
+     * Interpolates f(x1,x2) for 2d function if the arrays already exist.
+     *
+     * \param    x1
+     * \param    x2
+     * \return   interpolated value f(x1,x2)
+     */
+
+    double InterpolateArray(double x1, double x2);
 
     //----------------------------------------------------------------------------//
 
