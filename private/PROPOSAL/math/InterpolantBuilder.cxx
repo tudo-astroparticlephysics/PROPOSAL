@@ -119,6 +119,30 @@ Interpolant2DBuilder::Interpolant2DBuilder(const Interpolant2DBuilder& builder)
 {
 }
 
+Interpolant2DBuilder_array_as::Interpolant2DBuilder_array_as()
+        : InterpolantBuilder()
+        , romberg1(default_romberg)
+        , rational1(default_rational)
+        , relative1(default_relative)
+        , romberg2(default_romberg)
+        , rational2(default_rational)
+        , relative2(default_relative)
+{
+}
+
+Interpolant2DBuilder_array_as::Interpolant2DBuilder_array_as(const Interpolant2DBuilder_array_as& builder)
+        : x1(builder.x1)
+        , x2(builder.x2)
+        , y(builder.y)
+        , romberg1(builder.romberg1)
+        , rational1(builder.rational1)
+        , relative1(builder.relative1)
+        , romberg2(builder.romberg2)
+        , rational2(builder.rational2)
+        , relative2(builder.relative2)
+{
+}
+
 Interpolant* Interpolant2DBuilder::build()
 {
     return new Interpolant(max1,
@@ -141,3 +165,17 @@ Interpolant* Interpolant2DBuilder::build()
                            relativeY,
                            logSubst);
 }
+
+Interpolant* Interpolant2DBuilder_array_as::build()
+{
+    return new Interpolant(x1,
+            x2,
+            y,
+            romberg1,
+            rational1,
+            relative1,
+            romberg2,
+            rational2,
+            relative2);
+}
+

@@ -139,10 +139,16 @@ CrossSectionInterpolant::CrossSectionInterpolant(const CrossSectionInterpolant& 
     {
         dedx_interpolant_ = new Interpolant(*cross_section.dedx_interpolant_);
     }
+    else{
+        dedx_interpolant_ = NULL;
+    }
 
     if (cross_section.de2dx_interpolant_ != NULL)
     {
         de2dx_interpolant_ = new Interpolant(*cross_section.de2dx_interpolant_);
+    }
+    else{
+        de2dx_interpolant_ = NULL;
     }
 
     int num_components = cross_section.parametrization_->GetMedium().GetNumComponents();
