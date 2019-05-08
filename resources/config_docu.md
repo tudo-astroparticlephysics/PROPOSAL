@@ -172,7 +172,7 @@ For the `cuts_behind` option, the default values are
 ## The `sectors` configurations ##
 
 Every sector needs a medium and a geometry, while it's priority, compared to other sectors, can be scaled with the hierarchy option.
-If multiple sectors are defined and if these sectors overlap, the decision which sector should be preferred is made with the hierarchy option.
+If multiple sectors are defined and if these sectors overlap, the decision which sector should be preferred is made with the hierarchy option. The bigger hierarchy is preferred. If the overlapping sectors have the same hierarchy, then the one with the more dense medium is chosen. If both hierarchy and Massdensity is equal, then the first in the sector list is chosen.
 
 | Keyword     | Type    | Default | Description |
 | ----------- | ------- | ------- | ----------- |

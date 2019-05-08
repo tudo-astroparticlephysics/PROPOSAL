@@ -206,30 +206,31 @@ I3MMCTrackPtr I3PropagatorServicePROPOSAL::GenerateMMCTrack(PROPOSAL::Particle* 
 {
 
     // explicitly specifying the units from MMC
-    double xi = particle->GetEntryPoint().GetX() * I3Units::m;
-    double yi = particle->GetEntryPoint().GetY() * I3Units::m;
-    double zi = particle->GetEntryPoint().GetZ() * I3Units::m;
+    double xi = particle->GetEntryPoint().GetX() * I3Units::cm / I3Units::m;
+    double yi = particle->GetEntryPoint().GetY() * I3Units::cm / I3Units::m;
+    double zi = particle->GetEntryPoint().GetZ() * I3Units::cm / I3Units::m;
     double ti = particle->GetEntryTime() * I3Units::second;
-    double Ei = particle->GetEntryEnergy() * I3Units::GeV;
+    double Ei = particle->GetEntryEnergy() * I3Units::MeV / I3Units::GeV;
 
-    double xf = particle->GetExitPoint().GetX() * I3Units::m;
-    double yf = particle->GetExitPoint().GetY() * I3Units::m;
-    double zf = particle->GetExitPoint().GetZ() * I3Units::m;
+    double xf = particle->GetExitPoint().GetX() * I3Units::cm / I3Units::m;
+    double yf = particle->GetExitPoint().GetY() * I3Units::cm / I3Units::m;
+    double zf = particle->GetExitPoint().GetZ() * I3Units::cm / I3Units::m;
     double tf = particle->GetExitTime() * I3Units::second;
-    double Ef = particle->GetExitEnergy() * I3Units::GeV;
+    double Ef = particle->GetExitEnergy() * I3Units::MeV / I3Units::GeV;
 
-    double xc = particle->GetClosestApproachPoint().GetX() * I3Units::m;
-    double yc = particle->GetClosestApproachPoint().GetY() * I3Units::m;
-    double zc = particle->GetClosestApproachPoint().GetZ() * I3Units::m;
+    double xc = particle->GetClosestApproachPoint().GetX() * I3Units::cm / I3Units::m;
+    double yc = particle->GetClosestApproachPoint().GetY() * I3Units::cm / I3Units::m;
+    double zc = particle->GetClosestApproachPoint().GetZ() * I3Units::cm / I3Units::m;
     double tc = particle->GetClosestApproachTime() * I3Units::second;
-    double Ec = particle->GetClosestApproachEnergy() * I3Units::GeV;
+    double Ec = particle->GetClosestApproachEnergy() * I3Units::MeV / I3Units::GeV;
+
+    double Elost = particle->GetElost() * I3Units::MeV / I3Units::GeV;
 
     I3MMCTrackPtr mmcTrack(new I3MMCTrack);
     mmcTrack->SetEnter(xi, yi, zi, ti, Ei);
     mmcTrack->SetCenter(xc, yc, zc, tc, Ec);
     mmcTrack->SetExit(xf, yf, zf, tf, Ef);
 
-    double Elost = particle->GetElost() * I3Units::GeV;
     mmcTrack->SetDepositedEnergy(Elost);
     log_debug("Elost = %f", Elost);
 
