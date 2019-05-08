@@ -69,6 +69,16 @@ std::vector<DynamicData*> PropagatorService::Propagate(Particle& particle, doubl
         particle.SetPropagatedDistance(prop_particle.GetPropagatedDistance());
         particle.SetTime(prop_particle.GetTime());
         particle.SetElost(prop_particle.GetElost());
+        particle.SetEntryPoint(prop_particle.GetEntryPoint());
+        particle.SetEntryEnergy(prop_particle.GetEntryEnergy());
+        particle.SetEntryTime(prop_particle.GetEntryTime());
+        particle.SetExitPoint(prop_particle.GetExitPoint());
+        particle.SetExitEnergy(prop_particle.GetExitEnergy());
+        particle.SetExitTime(prop_particle.GetExitTime());
+        particle.SetClosestApproachPoint(prop_particle.GetClosestApproachPoint());
+        particle.SetClosestApproachEnergy(prop_particle.GetClosestApproachEnergy());
+        particle.SetClosestApproachTime(prop_particle.GetClosestApproachTime());
+        // particle.InjectState(prop_particle);
 
         return secondaries;
     } else
