@@ -1,5 +1,6 @@
 
 #include <cmath>
+#include <vector>
 
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Logging.h"

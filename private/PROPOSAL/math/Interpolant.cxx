@@ -25,6 +25,8 @@
 
 #include <algorithm>
 #include <cmath>
+#include <fstream>
+#include <sstream>
 
 #include "PROPOSAL/math/Interpolant.h"
 #include "PROPOSAL/Logging.h"

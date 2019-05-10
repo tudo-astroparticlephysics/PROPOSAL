@@ -30,11 +30,7 @@
 #pragma once
 
 #include <fstream>
-#include <iomanip>
-#include <iostream>
-#include <sstream>
 #include <string>
-#include <utility>
 #include <vector>
 
 #include "PROPOSAL/particle/Particle.h"
