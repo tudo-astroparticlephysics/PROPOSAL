@@ -333,7 +333,7 @@ void InitializeInterpolation(const std::string name,
     size_t hash_digest = 0;
     if (parametrizations.size() == 1)
     {
-        hash_digest = parametrizations.at(0)->GetHash();
+        hash_digest = parametrizations[0]->GetHash();
     }
     else
     {
@@ -341,6 +341,10 @@ void InitializeInterpolation(const std::string name,
              ++it)
         {
             hash_combine(hash_digest, (*it)->GetHash(), (*it)->GetMultiplier());
+        }
+        if (name.compare("decay") == 0)
+        {
+            hash_combine(hash_digest, parametrizations[0]->GetParticleDef().lifetime);
         }
     }
     hash_combine(hash_digest, interpolation_def.GetHash());

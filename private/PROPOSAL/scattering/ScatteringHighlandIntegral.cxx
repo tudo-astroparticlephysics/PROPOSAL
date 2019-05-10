@@ -100,7 +100,7 @@ long double ScatteringHighlandIntegral::CalculateTheta0(double dr, double ei, do
     double radiation_lenght = scatter_->GetUtility().GetMedium().GetRadiationLength();
 
     // TODO: check if one has to take the absolute value of the particle charge
-    aux = 13.6 * std::sqrt(std::max(aux, 0.0) / radiation_lenght) * particle_.GetCharge();
+    aux = 13.6 * std::sqrt(std::max(aux, 0.0) / radiation_lenght) * std::abs(particle_.GetCharge());
     aux *= std::max(1 + 0.038 * std::log(dr / radiation_lenght), 0.0);
 
     return std::min(aux, cutoff);

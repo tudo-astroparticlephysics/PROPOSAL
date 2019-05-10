@@ -70,7 +70,7 @@ double ScatteringHighland::CalculateTheta0(double dr)
     double y = dr / medium_->GetRadiationLength();
     double beta =
         1. / sqrt(1 + particle_.GetMass() * particle_.GetMass() / (particle_.GetMomentum() * particle_.GetMomentum()));
-    y = 13.6 * particle_.GetCharge() / (particle_.GetMomentum() * beta) * sqrt(y) * (1. + 0.088 * log10(y));
+    y = 13.6 * std::abs(particle_.GetCharge()) / (particle_.GetMomentum() * beta) * sqrt(y) * (1. + 0.088 * log10(y));
     return y;
 }
 

@@ -1,5 +1,6 @@
 
 #include <sstream>
+#include <cmath>
 #include "PROPOSAL/crossection/parametrization/Parametrization.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/methods.h"
@@ -117,7 +118,8 @@ size_t Parametrization::GetHash() const
     std::size_t seed = 0;
     hash_combine(seed,
                  GetName(),
-                 particle_def_,
+                 std::abs(particle_def_.charge),
+                 particle_def_.mass,
                  medium_->GetName(),
                  medium_->GetDensityCorrection(),
                  cut_settings_.GetEcut(),
