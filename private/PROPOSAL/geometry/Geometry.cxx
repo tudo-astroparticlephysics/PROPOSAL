@@ -7,7 +7,6 @@
 
 #include <cmath>
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/Output.h"
 #include "PROPOSAL/geometry/Geometry.h"
 
 #include "PROPOSAL/methods.h"

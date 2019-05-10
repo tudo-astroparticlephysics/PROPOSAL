@@ -12,8 +12,6 @@
 #include "PROPOSAL-icetray/Converter.h"
 #include "PROPOSAL-icetray/SimplePropagator.h"
 
-#include "PROPOSAL/Output.h"
-
 using namespace PROPOSAL;
 
 

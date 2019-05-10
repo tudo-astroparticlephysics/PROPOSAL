@@ -9,7 +9,7 @@
 #include "PROPOSAL/math/Vector3D.h"
 
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/Output.h"
+#include "PROPOSAL/Logging.h"
 #include "PROPOSAL/methods.h"
 
 using namespace PROPOSAL;

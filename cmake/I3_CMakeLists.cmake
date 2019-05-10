@@ -65,7 +65,6 @@ set (PROPOSAL_SRC_FILES
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/particle/ParticleDef.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/propagation_utility/ContinuousRandomizer.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/propagation_utility/PropagationUtility.cxx
-    ${PROJECT_SOURCE_DIR}/private/PROPOSAL/propagation_utility/PropagationUtilityFactory.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/propagation_utility/PropagationUtilityIntegral.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/propagation_utility/PropagationUtilityInterpolant.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/scattering/Coefficients.cxx

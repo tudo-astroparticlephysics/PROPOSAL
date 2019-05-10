@@ -9,7 +9,6 @@
 #include "PROPOSAL/math/InterpolantBuilder.h"
 
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/Output.h"
 #include "PROPOSAL/methods.h"
 
 using namespace PROPOSAL;

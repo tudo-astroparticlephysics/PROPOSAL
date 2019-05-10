@@ -6,7 +6,7 @@
 #include "PROPOSAL/propagation_utility/PropagationUtilityInterpolant.h"
 
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/Output.h"
+#include "PROPOSAL/Logging.h"
 
 using namespace PROPOSAL;
 

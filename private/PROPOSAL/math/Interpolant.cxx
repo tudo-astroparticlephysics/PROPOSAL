@@ -27,7 +27,7 @@
 #include <cmath>
 
 #include "PROPOSAL/math/Interpolant.h"
-#include "PROPOSAL/Output.h"
+#include "PROPOSAL/Logging.h"
 
 using namespace PROPOSAL;
 
@@ -272,6 +272,7 @@ double Interpolant::InterpolateArray(double x1, double x2)
     if (!fast_)
     {
         aux = 0;
+        aux2 = 0;
 
         for (i = start; i < start + romberg_; i++)
         {

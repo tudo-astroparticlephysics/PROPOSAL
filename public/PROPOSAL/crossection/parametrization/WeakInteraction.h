@@ -42,7 +42,6 @@
 
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/methods.h"
-#include "PROPOSAL/Output.h"
 
 
 namespace PROPOSAL {
