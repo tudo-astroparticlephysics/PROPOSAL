@@ -6,7 +6,7 @@
 #include "PROPOSAL/crossection/factories/MupairProductionFactory.h"
 #include "PROPOSAL/crossection/parametrization/MupairProduction.h"
 
-#include "PROPOSAL/Output.h"
+#include "PROPOSAL/Logging.h"
 
 using namespace PROPOSAL;
 

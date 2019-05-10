@@ -9,7 +9,6 @@
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/particle/Particle.h"
 
-#include "PROPOSAL/Output.h"
 
 using namespace PROPOSAL;
 

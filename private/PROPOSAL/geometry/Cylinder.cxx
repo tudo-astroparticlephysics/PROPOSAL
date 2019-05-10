@@ -2,7 +2,7 @@
 #include <cmath>
 
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/Output.h"
+#include "PROPOSAL/Logging.h"
 #include "PROPOSAL/geometry/Cylinder.h"
 
 using namespace PROPOSAL;

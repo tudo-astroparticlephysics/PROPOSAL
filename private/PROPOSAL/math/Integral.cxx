@@ -9,7 +9,7 @@
 
 #include <cmath>
 #include <numeric>
-#include "PROPOSAL/Output.h"
+#include "PROPOSAL/Logging.h"
 #include "PROPOSAL/math/Integral.h"
 #include <algorithm>
 #include <limits>

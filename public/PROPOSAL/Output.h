@@ -44,16 +44,6 @@
     #include "TTree.h"
 #endif
 
-#ifdef ICECUBE_PROJECT
-    #include <icetray/I3Logging.h>
-#endif // ICECUBE_PROJECT
-
-#if LOG4CPLUS_SUPPORT
-    #include <log4cplus/configurator.h>
-    #include <log4cplus/logger.h>
-    #include <log4cplus/loggingmacros.h>
-#endif // log4cplus
-
 namespace PROPOSAL {
 
 class Output
@@ -61,10 +51,6 @@ class Output
 private:
     Output()
     {
-#if LOG4CPLUS_SUPPORT
-        log4cplus::PropertyConfigurator::doConfigure(LOG4CPLUS_TEXT(LOG4CPLUS_CONFIG));
-        logger = log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("PROPOSAL"));
-#endif
     }
 
     Output(Output const&);         // Don't Implement.
@@ -125,24 +111,15 @@ private:
 #endif
 
 public:
-#if LOG4CPLUS_SUPPORT
-    log4cplus::Logger logger;
-#endif
+
     // ASCII
     static bool store_in_ASCII_file_;
-
-    //----------------------------------------------------------------------------//
 
     static Output& getInstance()
     {
         static Output instance;
         return instance;
     }
-    //----------------------------------------------------------------------------//
-
-    void SetLoggingConfigurationFile(std::string file);
-
-    //----------------------------------------------------------------------------//
 
     // ----------------------------------------------------------------------------
     /// @brief Fill secondary data
@@ -230,98 +207,3 @@ public:
 };
 } // namespace PROPOSAL
 
-
-#if LOG4CPLUS_SUPPORT
-
-template<typename... Args>
-void log_error(Args ... args)
-{
-    LOG4CPLUS_ERROR_FMT(PROPOSAL::Output::getInstance().logger, args...);
-}
-
-template<typename... Args>
-void log_fatal(Args ... args)
-{
-    LOG4CPLUS_FATAL_FMT(PROPOSAL::Output::getInstance().logger, args...);
-    exit(1);
-}
-
-template<typename... Args>
-void log_warn(Args ... args)
-{
-    LOG4CPLUS_WARN_FMT(PROPOSAL::Output::getInstance().logger, args...);
-}
-
-template<typename... Args>
-void log_info(Args ... args)
-{
-    LOG4CPLUS_INFO_FMT(PROPOSAL::Output::getInstance().logger, args...);
-}
-
-template<typename... Args>
-void log_trace(Args ... args)
-{
-    LOG4CPLUS_TRACE_FMT(PROPOSAL::Output::getInstance().logger, args...);
-}
-
-template<typename... Args>
-void log_debug(Args ... args)
-{
-    LOG4CPLUS_DEBUG_FMT(PROPOSAL::Output::getInstance().logger, args...);
-}
-
-template<typename... Args>
-void log_notice(Args ... args)
-{
-    LOG4CPLUS_NOTICE_FMT(PROPOSAL::Output::getInstance().logger, args...);
-}
-
-#else // log4cplus
-#ifndef ICECUBE_PROJECT
-
-template<typename... Args>
-void log_error(Args ... args)
-{
-    printf(args...);
-}
-
-template<typename... Args>
-void log_fatal(Args ... args)
-{
-    printf("FATAL ERROR: ");
-    printf(args...);
-    exit(1);
-}
-
-template<typename... Args>
-void log_warn(Args ... args)
-{
-    printf(args...);
-}
-
-template<typename... Args>
-void log_info(Args ... args)
-{
-    printf(args...);
-}
-
-template<typename... Args>
-void log_trace(Args ... args)
-{
-    printf(args...);
-}
-
-template<typename... Args>
-void log_debug(Args ... args)
-{
-    printf(args...);
-}
-
-template<typename... Args>
-void log_notice(Args ... args)
-{
-    printf(args...);
-}
-
-#endif // not ICECUBE_PROJECT
-#endif // log4cplus

@@ -1,6 +1,7 @@
 
 #include "PROPOSAL/PropagatorService.h"
 #include "PROPOSAL/Propagator.h"
+#include "PROPOSAL/Logging.h"
 
 using namespace PROPOSAL;
 
