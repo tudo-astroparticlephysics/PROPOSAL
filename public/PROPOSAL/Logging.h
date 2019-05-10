@@ -29,12 +29,9 @@
 
 #pragma once
 
-#include <fstream>
-#include <iomanip>
 #include <iostream>
-#include <sstream>
+#include <cstdio>
 #include <string>
-#include <utility>
 
 #ifdef ICECUBE_PROJECT
     #include <icetray/I3Logging.h>

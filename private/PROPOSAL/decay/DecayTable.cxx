@@ -1,4 +1,6 @@
 
+#include <sstream>
+
 #include "PROPOSAL/decay/DecayTable.h"
 #include "PROPOSAL/decay/DecayChannel.h"
 #include "PROPOSAL/decay/LeptonicDecayChannel.h"
