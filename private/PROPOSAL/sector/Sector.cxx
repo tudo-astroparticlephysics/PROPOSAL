@@ -408,7 +408,7 @@ double Sector::Propagate(double distance)
 
         if (particle_interaction)
         {
-            energy_loss = MakeStochasticLoss();
+            energy_loss = MakeStochasticLoss(final_energy);
 
             if (energy_loss.second == DynamicData::None)
             {
@@ -573,7 +573,7 @@ void Sector::AdvanceParticle(double dr, double ei, double ef)
     particle_.SetTime(time);
 }
 
-std::pair<double, DynamicData::Type> Sector::MakeStochasticLoss()
+std::pair<double, DynamicData::Type> Sector::MakeStochasticLoss(double particle_energy)
 {
     double rnd1 = RandomGenerator::Get().RandomDouble();
     double rnd2 = RandomGenerator::Get().RandomDouble();
@@ -608,7 +608,7 @@ std::pair<double, DynamicData::Type> Sector::MakeStochasticLoss()
 
     for (unsigned int i = 0; i < cross_sections.size(); i++)
     {
-        rates[i] = cross_sections[i]->CalculatedNdx(particle_.GetEnergy(), rnd2);
+        rates[i] = cross_sections[i]->CalculatedNdx(particle_energy, rnd2);
         total_rate += rates[i];
     }
 
@@ -622,7 +622,7 @@ std::pair<double, DynamicData::Type> Sector::MakeStochasticLoss()
 
         if (rates_sum >= total_rate_weighted)
         {
-            energy_loss.first  = cross_sections[i]->CalculateStochasticLoss(particle_.GetEnergy(), rnd2, rnd3);
+            energy_loss.first  = cross_sections[i]->CalculateStochasticLoss(particle_energy, rnd2, rnd3);
             energy_loss.second = cross_sections[i]->GetTypeId();
             break;
         }
