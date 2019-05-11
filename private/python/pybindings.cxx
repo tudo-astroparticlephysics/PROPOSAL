@@ -882,6 +882,7 @@ PYBIND11_MODULE(pyPROPOSAL, m)
             py::arg("particle"), py::arg("sector_definition"), py::arg("interpolation_def"))
         .def("propagate", &Sector::Propagate, py::arg("distance"))
         .def("CalculateEnergyTillStochastic", &Sector::CalculateEnergyTillStochastic, py::arg("initial_energy"))
+        .def("MakeStochasticLoss", &Sector::MakeStochasticLoss, py::arg("particle_energy"))
         .def_property_readonly("particle", &Sector::GetParticle, "Get the internal created particle to modify its properties");
 
     // --------------------------------------------------------------------- //
