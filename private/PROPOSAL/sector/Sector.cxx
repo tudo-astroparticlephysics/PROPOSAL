@@ -532,12 +532,14 @@ double Sector::Propagate(double distance)
     // with no significantly produced light
     if (sector_def_.stopping_decay && propagated_distance != distance && !is_decayed)
     {
-        // TODO: understand what happens in the two following lines
-        //       why is the particle energy set to its mass?
-        //       why is the time increased randomly?
-        //       it doesn't make sense for me (jsoedingrekso)
-        // particle_.GetEnergy() = particle_.GetParticleDef().mass;
-        // particle_.GetTime() -= particle_.GetLifetime()*std::log(RandomGenerator::Get().RandomDouble());
+        // The time is shifted due to the exponential lifetime.
+        double particle_time = particle_.GetTime();
+        particle_time -= particle_.GetLifetime()*std::log(RandomGenerator::Get().RandomDouble());
+        particle_.SetTime(particle_time);
+        // TODO: one should also advance hte particle according to the sampeled time
+        // and set the new position as the endpoint.
+
+        particle_.SetEnergy(particle_.GetMass());
         decay_products = particle_.GetDecayTable().SelectChannel().Decay(particle_);
         Output::getInstance().FillSecondaryVector(decay_products);
 
