@@ -1,11 +1,13 @@
 
+#include <sstream>
+
 #include "PROPOSAL/decay/DecayTable.h"
-#include "PROPOSAL/Output.h"
 #include "PROPOSAL/decay/DecayChannel.h"
 #include "PROPOSAL/decay/LeptonicDecayChannel.h"
 #include "PROPOSAL/decay/StableChannel.h"
 #include "PROPOSAL/decay/TwoBodyPhaseSpace.h"
 #include "PROPOSAL/math/RandomGenerator.h"
+#include "PROPOSAL/Logging.h"
 #include "PROPOSAL/methods.h"
 
 using namespace PROPOSAL;

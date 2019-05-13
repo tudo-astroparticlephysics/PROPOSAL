@@ -9,7 +9,6 @@
 
 #include <cmath>
 #include "PROPOSAL/particle/Particle.h"
-#include "PROPOSAL/Output.h"
 #include "PROPOSAL/methods.h"
 
 using namespace PROPOSAL;
@@ -88,6 +87,8 @@ std::string DynamicData::GetNameFromType(Type type)
             return "Hadrons";
         case ContinuousEnergyLoss:
             return "ContinuousEnergyLoss";
+        case WeakInt:
+            return "WeakInt";
         default:
             return "Type not found";
     }

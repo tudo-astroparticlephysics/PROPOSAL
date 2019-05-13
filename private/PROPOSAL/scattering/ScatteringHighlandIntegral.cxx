@@ -1,6 +1,6 @@
 
 
-#include "PROPOSAL/Output.h"
+#include "PROPOSAL/Logging.h"
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/methods.h"
 #include "PROPOSAL/scattering/ScatteringHighlandIntegral.h"

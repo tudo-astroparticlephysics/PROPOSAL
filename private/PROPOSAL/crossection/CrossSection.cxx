@@ -80,6 +80,9 @@ std::ostream& PROPOSAL::operator<<(std::ostream& os, CrossSection const& cross)
         case DynamicData::MuPair:
             name = "MuPairProduction";
             break;
+        case DynamicData::WeakInt:
+            name = "WeakInteraction";
+            break;
         default:
             break;
     }

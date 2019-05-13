@@ -9,7 +9,6 @@
 
 #include <cmath>
 
-// #include "PROPOSAL/Output.h"
 #include "PROPOSAL/math/Vector3D.h"
 #include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/scattering/Scattering.h"

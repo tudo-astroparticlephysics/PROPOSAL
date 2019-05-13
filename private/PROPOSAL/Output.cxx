@@ -1,5 +1,6 @@
 
 #include "PROPOSAL/Output.h"
+#include "PROPOSAL/Logging.h"
 
 using namespace PROPOSAL;
 
@@ -7,15 +8,6 @@ std::vector<DynamicData*> Output::secondarys_;
 bool Output::store_in_root_trees_ = false;
 bool Output::store_in_ASCII_file_ = false;
 
-void Output::SetLoggingConfigurationFile(std::string file)
-{
-#if LOG4CPLUS_SUPPORT
-    log4cplus::PropertyConfigurator::doConfigure(LOG4CPLUS_TEXT(file));
-#else
-    (void) file;
-    std::cout << "Log4cplus not found! No log messages will be shown!" << std::endl;
-#endif
-}
 
 // ------------------------------------------------------------------------- //
 void Output::FillSecondaryVector(const std::vector<Particle*>& particles)

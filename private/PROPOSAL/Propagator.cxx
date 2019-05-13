@@ -21,6 +21,8 @@
 
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/Constants.h"
+#include "PROPOSAL/Output.h"
+#include "PROPOSAL/Logging.h"
 #include "PROPOSAL/json.hpp"
 
 using namespace PROPOSAL;
@@ -524,6 +526,7 @@ std::vector<DynamicData*> Propagator::Propagate(double MaxDistance_cm)
         Output::getInstance().StorePrimaryInASCII(&particle_);
 
     double distance = 0;
+    double distance_to_closest_approach  = 0;
     double result   = 0;
 
     // These two variables are needed to calculate the energy loss inside the detector
@@ -539,6 +542,8 @@ std::vector<DynamicData*> Propagator::Propagate(double MaxDistance_cm)
     bool starts_in_detector = detector_->IsInside(particle_position, particle_direction);
     bool is_in_detector     = false;
     bool was_in_detector    = false;
+    bool propagationstep_till_closest_approach = false;
+    bool already_reached_closest_approach = false;
 
     while (1)
     {
@@ -556,6 +561,31 @@ std::vector<DynamicData*> Propagator::Propagate(double MaxDistance_cm)
         // Check if have to propagate the particle_ through the whole collection
         // or only to the collection border
         distance = CalculateEffectiveDistance(particle_position, particle_direction);
+
+        if (already_reached_closest_approach == false)
+        {
+            distance_to_closest_approach = detector_->DistanceToClosestApproach(particle_position, particle_direction);
+            if (distance_to_closest_approach > 0)
+            {
+                if (distance_to_closest_approach < distance)
+                {
+                    already_reached_closest_approach = true;
+
+                    if (std::abs(distance_to_closest_approach) < GEOMETRY_PRECISION)
+                    {
+                        particle_.SetClosestApproachPoint(particle_position);
+                        particle_.SetClosestApproachEnergy(particle_.GetEnergy());
+                        particle_.SetClosestApproachTime(particle_.GetTime());
+                    }
+                    else
+                    {
+                        distance = distance_to_closest_approach;
+                        propagationstep_till_closest_approach = true;
+                    }
+                }
+            }
+        }
+
 
         is_in_detector = detector_->IsInside(particle_position, particle_direction);
         // entry point of the detector
@@ -599,6 +629,15 @@ std::vector<DynamicData*> Propagator::Propagate(double MaxDistance_cm)
 
         result = current_sector_->Propagate(distance);
 
+        if (propagationstep_till_closest_approach)
+        {
+            particle_.SetClosestApproachPoint(particle_.GetPosition());
+            particle_.SetClosestApproachEnergy(particle_.GetEnergy());
+            particle_.SetClosestApproachTime(particle_.GetTime());
+
+            propagationstep_till_closest_approach = false;
+        }
+
         if (result <= 0 || MaxDistance_cm <= particle_.GetPropagatedDistance())
             break;
     }
@@ -624,7 +663,7 @@ void Propagator::ChooseCurrentCollection(const Vector3D& particle_position, cons
     {
         if (detector_->IsInfront(particle_position, particle_direction))
         {
-            if (sectors_[i]->GetLocation() != 0)
+            if (sectors_[i]->GetLocation() != Sector::ParticleLocation::InfrontDetector)
             {
                 continue;
             } else
@@ -641,7 +680,7 @@ void Propagator::ChooseCurrentCollection(const Vector3D& particle_position, cons
 
         else if (detector_->IsInside(particle_position, particle_direction))
         {
-            if (sectors_[i]->GetLocation() != 1)
+            if (sectors_[i]->GetLocation() != Sector::ParticleLocation::InsideDetector)
             {
                 continue;
             } else
@@ -659,7 +698,7 @@ void Propagator::ChooseCurrentCollection(const Vector3D& particle_position, cons
 
         else if (detector_->IsBehind(particle_position, particle_direction))
         {
-            if (sectors_[i]->GetLocation() != 2)
+            if (sectors_[i]->GetLocation() != Sector::ParticleLocation::BehindDetector)
             {
                 continue;
             } else
@@ -734,7 +773,6 @@ double Propagator::CalculateEffectiveDistance(const Vector3D& particle_position,
 {
     double distance_to_collection_border = 0;
     double distance_to_detector          = 0;
-    double distance_to_closest_approach  = 0;
 
     distance_to_collection_border =
         current_sector_->GetGeometry()->DistanceToBorder(particle_position, particle_direction).first;
@@ -744,7 +782,7 @@ double Propagator::CalculateEffectiveDistance(const Vector3D& particle_position,
     {
         if (detector_->IsInfront(particle_position, particle_direction))
         {
-            if ((*iter)->GetLocation() != 0)
+            if ((*iter)->GetLocation() != Sector::ParticleLocation::InfrontDetector)
                 continue;
             else
             {
@@ -761,7 +799,7 @@ double Propagator::CalculateEffectiveDistance(const Vector3D& particle_position,
 
         else if (detector_->IsInside(particle_position, particle_direction))
         {
-            if ((*iter)->GetLocation() != 1)
+            if ((*iter)->GetLocation() != Sector::ParticleLocation::InsideDetector)
                 continue;
             else
             {
@@ -776,7 +814,7 @@ double Propagator::CalculateEffectiveDistance(const Vector3D& particle_position,
 
         else if (detector_->IsBehind(particle_position, particle_direction))
         {
-            if ((*iter)->GetLocation() != 2)
+            if ((*iter)->GetLocation() != Sector::ParticleLocation::BehindDetector)
                 continue;
             else
             {
@@ -798,35 +836,12 @@ double Propagator::CalculateEffectiveDistance(const Vector3D& particle_position,
 
     distance_to_detector = detector_->DistanceToBorder(particle_position, particle_direction).first;
 
-    distance_to_closest_approach = detector_->DistanceToClosestApproach(particle_position, particle_direction);
-
-    if (std::abs(distance_to_closest_approach) < GEOMETRY_PRECISION)
-    {
-        particle_.SetClosestApproachPoint(particle_position);
-        particle_.SetClosestApproachEnergy(particle_.GetEnergy());
-        particle_.SetClosestApproachTime(particle_.GetTime());
-
-        distance_to_closest_approach = 0;
-    }
-
     if (distance_to_detector > 0)
     {
-        if (distance_to_closest_approach > 0)
-        {
-            return std::min({distance_to_detector, distance_to_collection_border, distance_to_closest_approach});
-        } else
-        {
-            return std::min(distance_to_detector, distance_to_collection_border);
-        }
+        return std::min(distance_to_detector, distance_to_collection_border);
     } else
     {
-        if (distance_to_closest_approach > 0)
-        {
-            return std::min(distance_to_closest_approach, distance_to_collection_border);
-        } else
-        {
-            return distance_to_collection_border;
-        }
+        return distance_to_collection_border;
     }
 }
 
@@ -1187,7 +1202,7 @@ InterpolationDef Propagator::CreateInterpolationDef(const std::string& json_obje
     {
         if (json_object["do_binary_tables"].is_boolean())
         {
-            interpolation_def.raw = json_object["do_binary_tables"];
+            interpolation_def.do_binary_tables = json_object["do_binary_tables"];
         }
         else
         {
@@ -1378,6 +1393,22 @@ Sector::Definition Propagator::CreateSectorDefinition(const std::string& json_ob
         log_debug("No given mupair_multiplier option given. Use default (%f)", sec_def_global.utility_def.mupair_def.multiplier);
     }
 
+    if (json_global.find("weak_multiplier") != json_global.end())
+    {
+        if (json_global["weak_multiplier"].is_number())
+        {
+            sec_def_global.utility_def.weak_def.multiplier = json_global["weak_multiplier"].get<double>();
+        }
+        else
+        {
+            log_fatal("The given weak_multiplier option is not a double.");
+        }
+    }
+    else
+    {
+        log_debug("No given weak_multiplier option given. Use default (%f)", sec_def_global.utility_def.weak_def.multiplier);
+    }
+
     if (json_global.find("lpm") != json_global.end())
     {
         if (json_global["lpm"].is_boolean())
@@ -1425,6 +1456,22 @@ Sector::Definition Propagator::CreateSectorDefinition(const std::string& json_ob
     else
     {
         log_debug("No given mupair_particle_output option given. Use default (true)");
+    }
+
+    if (json_global.find("weak_enable") != json_global.end())
+    {
+        if (json_global["weak_enable"].is_boolean())
+        {
+            sec_def_global.utility_def.weak_def.weak_enable = json_global["weak_enable"].get<bool>();
+        }
+        else
+        {
+            log_fatal("The given weak_enable option is not a bool.");
+        }
+    }
+    else
+    {
+        log_debug("No given weak_enable option given. Use default (false)");
     }
 
     if (json_global.find("exact_time") != json_global.end())
@@ -1581,6 +1628,24 @@ Sector::Definition Propagator::CreateSectorDefinition(const std::string& json_ob
     {
         log_debug("The mupair option is not set. Use default %s",
                   MupairProductionFactory::Get().GetStringFromEnum(sec_def_global.utility_def.mupair_def.parametrization).c_str());
+    }
+
+    if (json_global.find("weak") != json_global.end())
+    {
+        if (json_global["weak"].is_string())
+        {
+            std::string weak = json_global["weak"].get<std::string>();
+            sec_def_global.utility_def.weak_def.parametrization = WeakInteractionFactory::Get().GetEnumFromString(weak);
+        }
+        else
+        {
+            log_fatal("The given weak option is not a string.");
+        }
+    }
+    else
+    {
+        log_debug("The weak option is not set. Use default %s",
+                  WeakInteractionFactory::Get().GetStringFromEnum(sec_def_global.utility_def.weak_def.parametrization).c_str());
     }
 
     if (json_global.find("photo_shadow") != json_global.end())

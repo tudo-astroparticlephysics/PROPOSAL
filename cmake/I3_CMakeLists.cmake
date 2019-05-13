@@ -17,16 +17,25 @@ set (PROPOSAL_SRC_FILES
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/CrossSectionInterpolant.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/EpairIntegral.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/EpairInterpolant.cxx
+    ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/MupairIntegral.cxx
+    ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/MupairInterpolant.cxx
+    ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/WeakIntegral.cxx
+    ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/WeakInterpolant.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/IonizIntegral.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/IonizInterpolant.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/PhotoIntegral.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/PhotoInterpolant.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/factories/BremsstrahlungFactory.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/factories/EpairProductionFactory.cxx
+    ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/factories/MupairProductionFactory.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/factories/IonizationFactory.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/factories/PhotonuclearFactory.cxx
+    ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/factories/WeakInteractionFactory.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/parametrization/Bremsstrahlung.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/parametrization/EpairProduction.cxx
+    ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/parametrization/MupairProduction.cxx
+    ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/parametrization/WeakInteraction.cxx
+    ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/parametrization/WeakTable.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/parametrization/Ionization.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/parametrization/Parametrization.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/crossection/parametrization/PhotoQ2Integration.cxx
@@ -56,7 +65,6 @@ set (PROPOSAL_SRC_FILES
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/particle/ParticleDef.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/propagation_utility/ContinuousRandomizer.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/propagation_utility/PropagationUtility.cxx
-    ${PROJECT_SOURCE_DIR}/private/PROPOSAL/propagation_utility/PropagationUtilityFactory.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/propagation_utility/PropagationUtilityIntegral.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/propagation_utility/PropagationUtilityInterpolant.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/scattering/Coefficients.cxx

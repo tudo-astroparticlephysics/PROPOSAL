@@ -4,7 +4,7 @@
 #include "PROPOSAL/crossection/factories/IonizationFactory.h"
 #include "PROPOSAL/crossection/parametrization/Ionization.h"
 
-#include "PROPOSAL/Output.h"
+#include "PROPOSAL/Logging.h"
 
 using namespace PROPOSAL;
 

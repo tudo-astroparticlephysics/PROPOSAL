@@ -7,7 +7,6 @@
 #include "PROPOSAL/medium/Medium.h"
 
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/Output.h"
 
 
 #define MUPAIR_PARAM_INTEGRAL_IMPL(param)                                                                               \
