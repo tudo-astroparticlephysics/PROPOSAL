@@ -54,6 +54,14 @@ Parametrization::IntegralLimits WeakInteraction::GetIntegralLimits(double energy
     return limits;
 }
 
+size_t WeakInteraction::GetHash() const
+{
+    size_t seed = Parametrization::GetHash();
+    hash_combine(seed, particle_def_.charge);
+
+    return seed;
+}
+
 // ------------------------------------------------------------------------- //
 // Specific implementations
 // ------------------------------------------------------------------------- //
