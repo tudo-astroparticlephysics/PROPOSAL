@@ -211,10 +211,10 @@ double CrossSectionInterpolant::CalculatedNdx(double energy)
     const ComponentVec& components = parametrization_->GetMedium().GetComponents();
     for (size_t i = 0; i < components.size(); ++i)
     {
-        prob_for_component_[i] = std::max(dndx_interpolant_1d_.at(i)->Interpolate(energy), 0.);
+        prob_for_component_[i] = parametrization_->GetMultiplier() * std::max(dndx_interpolant_1d_.at(i)->Interpolate(energy), 0.);
         sum_of_rates_ += prob_for_component_[i];
     }
-    return parametrization_->GetMultiplier() * sum_of_rates_;
+    return sum_of_rates_;
 }
 
 // ------------------------------------------------------------------------- //
@@ -235,11 +235,11 @@ double CrossSectionInterpolant::CalculatedNdx(double energy, double rnd)
     const ComponentVec& components = parametrization_->GetMedium().GetComponents();
     for (size_t i = 0; i < components.size(); ++i)
     {
-        prob_for_component_[i] = std::max(dndx_interpolant_1d_.at(i)->Interpolate(energy), 0.);
+        prob_for_component_[i] = parametrization_->GetMultiplier() * std::max(dndx_interpolant_1d_.at(i)->Interpolate(energy), 0.);
         sum_of_rates_ += prob_for_component_.at(i);
     }
 
-    return parametrization_->GetMultiplier() * sum_of_rates_;
+    return sum_of_rates_;
 }
 
 // ------------------------------------------------------------------------- //
