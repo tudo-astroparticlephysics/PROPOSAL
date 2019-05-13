@@ -65,6 +65,7 @@ namespace PROPOSAL {
 
         virtual IntegralLimits GetIntegralLimits(double energy);
 
+        virtual size_t GetHash() const;
 
     protected:
         bool compare(const Parametrization&) const;
