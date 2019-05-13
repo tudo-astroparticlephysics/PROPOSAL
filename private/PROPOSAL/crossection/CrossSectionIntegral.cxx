@@ -129,7 +129,7 @@ double CrossSectionIntegral::CalculatedNdx(double energy, double rnd)
         parametrization_->SetCurrentComponent(i);
         Parametrization::IntegralLimits limits = parametrization_->GetIntegralLimits(energy);
 
-        prob_for_component_.at(i) = parametrization_->GetMultiplier() * dndx_integral_[i].IntegrateWithRandomRatio(
+        prob_for_component_[i] = parametrization_->GetMultiplier() * dndx_integral_[i].IntegrateWithRandomRatio(
             limits.vUp,
             limits.vMax,
             std::bind(&Parametrization::FunctionToDNdxIntegral, parametrization_, energy, std::placeholders::_1),
