@@ -150,7 +150,7 @@ double Bremsstrahlung::lpm(double energy, double v)
         
         // high energy for the calculation of the radiation length, which 
         // converges for high energie against a fixed value.
-        double upper_energy = 1e20;     
+        double upper_energy = 1e14;     
 
         Integral integral_temp = Integral(IROMB, IMAXS, IPREC);
 
