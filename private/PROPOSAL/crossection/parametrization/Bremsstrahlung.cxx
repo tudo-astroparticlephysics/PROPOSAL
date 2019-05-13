@@ -147,10 +147,10 @@ double Bremsstrahlung::lpm(double energy, double v)
         init_lpm_effect_ = false;
 
         double sum = 0;
-        
+
         // high energy for the calculation of the radiation length, which 
         // converges for high energie against a fixed value.
-        double upper_energy = 1e14;     
+        double upper_energy = 1e14;
 
         Integral integral_temp = Integral(IROMB, IMAXS, IPREC);
 
@@ -158,7 +158,7 @@ double Bremsstrahlung::lpm(double energy, double v)
 
         for (unsigned int i = 0; i < components_.size(); ++i)
         {
-            component_index_                       = i;
+            component_index_ = i;
             Parametrization::IntegralLimits limits = GetIntegralLimits(upper_energy);
 
             sum += integral_temp.Integrate(
