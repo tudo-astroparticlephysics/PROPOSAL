@@ -148,7 +148,7 @@ TEST(Assignment, Copyconstructor2)
 TEST(Sector, Propagate)
 {
     std::ifstream in;
-    std::string filename = "TestFiles/Sector_propagate.txt";
+    std::string filename = "bin/TestFiles/Sector_propagate.txt";
     in.open(filename.c_str());
 
     if (!in.good())
