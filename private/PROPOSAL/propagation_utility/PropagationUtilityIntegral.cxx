@@ -6,7 +6,7 @@
 #include "PROPOSAL/propagation_utility/PropagationUtilityIntegral.h"
 
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/Output.h"
+#include "PROPOSAL/Logging.h"
 
 #define UTILITY_INTEGRAL_IMPL(cls)                                                                                     \
     UtilityIntegral##cls::UtilityIntegral##cls(const Utility& utility)                                                 \

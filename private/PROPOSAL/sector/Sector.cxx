@@ -1,6 +1,7 @@
 
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Output.h"
+#include "PROPOSAL/Logging.h"
 
 #include "PROPOSAL/crossection/CrossSection.h"
 #include "PROPOSAL/decay/DecayChannel.h"
@@ -30,7 +31,7 @@ Sector::Definition::Definition()
     , do_continuous_randomization(true)
     , do_continuous_energy_loss_output(false)
     , do_exact_time_calculation(true)
-    , scattering_model(ScatteringFactory::Moliere)
+    , scattering_model(ScatteringFactory::HighlandIntegral)
     , location(Sector::ParticleLocation::InsideDetector)
     , utility_def()
     , cut_settings()
@@ -434,6 +435,14 @@ double Sector::Propagate(double distance)
                                     energy_loss.first,
                                     rnd1,
                                     rnd2);
+                          
+                            for(unsigned int i=0; i<decay_products.size(); i++){
+                                // set additional properties for muon pair particles
+                                decay_products[i]->SetPosition(particle_.GetPosition());
+                                decay_products[i]->SetTime(particle_.GetTime());
+                                decay_products[i]->SetParentParticleEnergy(particle_.GetEnergy());
+                            }
+
                             Output::getInstance().FillSecondaryVector(decay_products);
                             break;
                         }
@@ -444,6 +453,48 @@ double Sector::Propagate(double distance)
                     //Return a DynamicData::MuPair object, useful when one is interested in the number of interactions
                     Output::getInstance().FillSecondaryVector(particle_, energy_loss.second, energy_loss.first);
                 }
+            }
+            else if(energy_loss.second == DynamicData::WeakInt)
+            {
+                Particle* return_particle_;
+                const ParticleDef particle_def = particle_.GetParticleDef(); //Get Particle Type
+
+                if(particle_def==EMinusDef::Get()){
+                    return_particle_ = new Particle(NuEDef::Get());
+                }
+                else if(particle_def==MuMinusDef::Get()){
+                    return_particle_ = new Particle(NuMuDef::Get());
+                }
+                else if(particle_def==TauMinusDef::Get()){
+                    return_particle_ = new Particle(NuTauDef::Get());
+                }
+                else if(particle_def==EPlusDef::Get()){
+                    return_particle_ = new Particle(NuEBarDef::Get());
+                }
+                else if(particle_def==MuPlusDef::Get()){
+                    return_particle_ = new Particle(NuMuBarDef::Get());
+                }
+                else if(particle_def==TauPlusDef::Get()){
+                    return_particle_ = new Particle(NuTauBarDef::Get());
+                }
+                else{
+                    log_fatal("Weak interaction: Particle to propagate is not a SM charged lepton");
+                    return_particle_ = nullptr; //avoid errors
+                }
+
+                //set neutrino properties
+                return_particle_->SetEnergy(final_energy - energy_loss.first);
+                return_particle_->SetPosition(particle_.GetPosition());
+                return_particle_->SetTime(particle_.GetTime());
+                return_particle_->SetParentParticleEnergy(particle_.GetEnergy());
+
+                Output::getInstance().FillSecondaryVector(particle_, energy_loss.second, energy_loss.first); //nuclear
+                Output::getInstance().FillSecondaryVector(return_particle_); //neutrino
+
+                is_decayed   = true; // treat this case as a decay and break the loop
+                final_energy = particle_.GetMass();
+                break;
+
             }
             else
             {
@@ -500,7 +551,7 @@ double Sector::Propagate(double distance)
     {
         return final_energy;
     }
-    // The particle stopped/decayed, the propageted distance is return with a minus sign
+    // The particle stopped/decayed, the propagated distance is return with a minus sign
     else
     {
         return -propagated_distance;

@@ -5,7 +5,6 @@
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/scattering/Coefficients.h"
-// #include "PROPOSAL/Output.h"
 #include "PROPOSAL/methods.h"
 #include "PROPOSAL/scattering/ScatteringMoliere.h"
 

@@ -13,7 +13,7 @@
 #include "PROPOSAL/medium/Medium.h"
 
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/Output.h"
+#include "PROPOSAL/Logging.h"
 #include "PROPOSAL/methods.h"
 
 using namespace PROPOSAL;
@@ -247,7 +247,7 @@ double IonizInterpolant::CalculateStochasticLoss(double energy, double rnd1)
         }
     }
 
-    log_fatal("m.totZ was not initialized correctly");
+    log_fatal("SumCharge of medium was not initialized correctly");
 
     return 0;
 }

@@ -1,7 +1,7 @@
 
 #include <algorithm>
 
-#include "PROPOSAL/Output.h"
+#include "PROPOSAL/Logging.h"
 #include "PROPOSAL/scattering/ScatteringFactory.h"
 #include "PROPOSAL/scattering/ScatteringHighland.h"
 #include "PROPOSAL/scattering/ScatteringHighlandIntegral.h"

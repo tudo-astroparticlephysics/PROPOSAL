@@ -7,7 +7,6 @@
 #include "PROPOSAL/medium/Medium.h"
 
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/Output.h"
 
 #define EPAIR_PARAM_INTEGRAL_IMPL(param)                                                                               \
     Epair##param::Epair##param(const ParticleDef& particle_def,                                                        \

@@ -330,7 +330,8 @@ void init_particle(py::module& m)
         .value("NuclInt", DynamicData::NuclInt)
         .value("MuPair", DynamicData::MuPair)
         .value("Hadrons", DynamicData::Hadrons)
-        .value("ContinuousEnergyLoss", DynamicData::ContinuousEnergyLoss);
+        .value("ContinuousEnergyLoss", DynamicData::ContinuousEnergyLoss)
+        .value("WeakInt", DynamicData::WeakInt);
 
     py::class_<DynamicData, std::shared_ptr<DynamicData> >(m_sub, "DynamicData")
         .def(py::init<DynamicData::Type>())
@@ -562,6 +563,30 @@ void init_parametrization(py::module& m)
         .def_readwrite("particle_output", &MupairProductionFactory::Definition::particle_output);
 
     // --------------------------------------------------------------------- //
+    // Weak Interaction
+    // --------------------------------------------------------------------- //
+
+    py::module m_sub_weak = m_sub.def_submodule("weakinteraction");
+    py::class_<WeakInteraction, std::shared_ptr<WeakInteraction>, Parametrization>(m_sub_weak, "WeakInteraction");
+
+
+    py::class_<WeakCooperSarkarMertsch, std::shared_ptr<WeakCooperSarkarMertsch>, WeakInteraction>(m_sub_weak, "CooperSarkarMertsch")                      \
+        .def(py::init<const ParticleDef&, const Medium&, double>(),                    \
+             py::arg("particle_def"),                                                                                  \
+             py::arg("medium"),                                                                                        \
+             py::arg("multiplier"));
+
+
+    py::enum_<WeakInteractionFactory::Enum>(m_sub_weak, "WeakParametrization")
+            .value("CooperSarkarMertsch", WeakInteractionFactory::CooperSarkarMertsch);
+
+    py::class_<WeakInteractionFactory::Definition, std::shared_ptr<WeakInteractionFactory::Definition> >(m_sub_weak, "WeakDefinition")
+            .def(py::init<>())
+            .def_readwrite("parametrization", &WeakInteractionFactory::Definition::parametrization)
+            .def_readwrite("weak_enable", &WeakInteractionFactory::Definition::weak_enable)
+            .def_readwrite("multiplier", &WeakInteractionFactory::Definition::multiplier);
+
+    // --------------------------------------------------------------------- //
     // Photo
     // --------------------------------------------------------------------- //
 
@@ -620,7 +645,7 @@ void init_parametrization(py::module& m)
         .value("ButkevichMikhailov", PhotonuclearFactory::ButkevichMikhailov)
         .value("RenoSarcevicSu", PhotonuclearFactory::RenoSarcevicSu);
 
-    py::enum_<PhotonuclearFactory::Shadow>(m_sub_brems, "PhotoShadow")
+    py::enum_<PhotonuclearFactory::Shadow>(m_sub_photo, "PhotoShadow")
         .value("DuttaRenoSarcevicSeckel", PhotonuclearFactory::ShadowDuttaRenoSarcevicSeckel)
         .value("ButkevichMikhailov", PhotonuclearFactory::ShadowButkevichMikhailov);
 
@@ -677,6 +702,8 @@ void init_crosssection(py::module& m)
         .def(py::init<const Ionization&>(), py::arg("parametrization"));
     py::class_<MupairIntegral, std::shared_ptr<MupairIntegral>, CrossSectionIntegral>(m_sub, "MupairIntegral")
         .def(py::init<const MupairProduction&>(), py::arg("parametrization"));
+    py::class_<WeakIntegral, std::shared_ptr<WeakIntegral>, CrossSectionIntegral>(m_sub, "WeakIntegral")
+            .def(py::init<const WeakInteraction&>(), py::arg("parametrization"));
 
     py::class_<BremsInterpolant, std::shared_ptr<BremsInterpolant>, CrossSectionInterpolant>(
         m_sub, "BremsInterpolant")
@@ -693,6 +720,9 @@ void init_crosssection(py::module& m)
     py::class_<MupairInterpolant, std::shared_ptr<MupairInterpolant>, CrossSectionInterpolant>(
         m_sub, "MupairInterpolant")
         .def(py::init<const MupairProduction&, InterpolationDef>(), py::arg("parametrization"), py::arg("interpolation_def"));
+    py::class_<WeakInterpolant, std::shared_ptr<WeakInterpolant>, CrossSectionInterpolant>(
+            m_sub, "WeakInterpolant")
+            .def(py::init<const WeakInteraction&, InterpolationDef>(), py::arg("parametrization"), py::arg("interpolation_def"));
 }
 
 void init_scattering(py::module& m)
@@ -795,11 +825,11 @@ PYBIND11_MODULE(pyPROPOSAL, m)
         .def_readwrite("order_of_interpolation", &InterpolationDef::order_of_interpolation)
         .def_readwrite("path_to_tables", &InterpolationDef::path_to_tables)
         .def_readwrite("path_to_tables_readonly", &InterpolationDef::path_to_tables_readonly)
-        .def_readwrite("raw", &InterpolationDef::raw)
         .def_readwrite("max_node_energy", &InterpolationDef::max_node_energy) 
         .def_readwrite("nodes_cross_section", &InterpolationDef::nodes_cross_section)
         .def_readwrite("nodes_continous_randomization", &InterpolationDef::nodes_continous_randomization)
-        .def_readwrite("nodes_propagate", &InterpolationDef::nodes_propagate);
+        .def_readwrite("nodes_propagate", &InterpolationDef::nodes_propagate)
+        .def_readwrite("do_binary_tables", &InterpolationDef::do_binary_tables);
 
     // --------------------------------------------------------------------- //
     // Utility
@@ -831,7 +861,9 @@ PYBIND11_MODULE(pyPROPOSAL, m)
         .def_readwrite("photo_def", &Utility::Definition::photo_def)
         .def_readwrite("epair_def", &Utility::Definition::epair_def)
         .def_readwrite("ioniz_def", &Utility::Definition::ioniz_def)
-        .def_readwrite("mupair_def", &Utility::Definition::mupair_def);
+        .def_readwrite("mupair_def", &Utility::Definition::mupair_def)
+        .def_readwrite("weak_def", &Utility::Definition::weak_def);
+
 
     // --------------------------------------------------------------------- //
     // ContinousRandomization

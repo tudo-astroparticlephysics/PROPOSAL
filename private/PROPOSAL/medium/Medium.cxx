@@ -8,9 +8,9 @@
  */
 
 #include <cmath>
+#include <sstream>
 
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/Output.h"
 #include "PROPOSAL/medium/Components.h"
 #include "PROPOSAL/medium/Medium.h"
 #include "PROPOSAL/methods.h"
@@ -676,6 +676,19 @@ AntaresWater::AntaresWater(double rho)
                  std::shared_ptr<Components::Component>(new Components::Sulfur(0.00582))
              })
 {
+    /*
+    * initialize ANTARES water
+    * Sea water (Mediterranean Sea, ANTARES place)
+    * ==========================================================================
+    * WATER DENSITY CHANGES WITH THE DEPTH FROM 1.0291 g/cm^3 AT SURFACE
+    * UP TO 1.0404 g/cm^3 AT THE SEA BED
+    * (ANTARES-Site/2000-001 and references therein)
+    *
+    * The error which is caused by this simplified approach (average value for
+    * density) does not exceed 0.5% (much less, in fact) that is comparable with
+    *  an error which comes from uncertainties with the muon cross-sections.
+    *==========================================================================
+    */
     //  Chemical composition of the seawater
     //  according to
     //  A.Okada, Astropart. Phys. 2 (1994) 393
@@ -694,6 +707,7 @@ AntaresWater::AntaresWater(double rho)
     // for sea water density at the ANTARES place between
     // surface D = 0 m (1.0291 g/cm^3) and middle of
     // detector D = 2126 m (1.0391 g/cm^3)
+
 }
 
 /******************************************************************************

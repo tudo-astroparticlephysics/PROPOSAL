@@ -5,7 +5,6 @@
 #include <cmath>
 
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/Output.h"
 #include "PROPOSAL/decay/ManyBodyPhaseSpace.h"
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/particle/Particle.h"
