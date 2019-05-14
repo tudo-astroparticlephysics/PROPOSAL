@@ -31,7 +31,7 @@ Sector::Definition::Definition()
     , do_continuous_randomization(true)
     , do_continuous_energy_loss_output(false)
     , do_exact_time_calculation(true)
-    , scattering_model(ScatteringFactory::HighlandIntegral)
+    , scattering_model(ScatteringFactory::Moliere)
     , location(Sector::ParticleLocation::InsideDetector)
     , utility_def()
     , cut_settings()
@@ -409,7 +409,7 @@ double Sector::Propagate(double distance)
 
         if (particle_interaction)
         {
-            energy_loss = MakeStochasticLoss();
+            energy_loss = MakeStochasticLoss(final_energy);
 
             if (energy_loss.second == DynamicData::None)
             {
@@ -532,12 +532,14 @@ double Sector::Propagate(double distance)
     // with no significantly produced light
     if (sector_def_.stopping_decay && propagated_distance != distance && !is_decayed)
     {
-        // TODO: understand what happens in the two following lines
-        //       why is the particle energy set to its mass?
-        //       why is the time increased randomly?
-        //       it doesn't make sense for me (jsoedingrekso)
-        // particle_.GetEnergy() = particle_.GetParticleDef().mass;
-        // particle_.GetTime() -= particle_.GetLifetime()*std::log(RandomGenerator::Get().RandomDouble());
+        // The time is shifted due to the exponential lifetime.
+        // double particle_time = particle_.GetTime();
+        // particle_time -= particle_.GetLifetime()*std::log(RandomGenerator::Get().RandomDouble());
+        // particle_.SetTime(particle_time);
+        // TODO: one should also advance hte particle according to the sampeled time
+        // and set the new position as the endpoint.
+
+        particle_.SetEnergy(particle_.GetMass());
         decay_products = particle_.GetDecayTable().SelectChannel().Decay(particle_);
         Output::getInstance().FillSecondaryVector(decay_products);
 
@@ -624,7 +626,7 @@ void Sector::AdvanceParticle(double dr, double ei, double ef)
     particle_.SetTime(time);
 }
 
-std::pair<double, DynamicData::Type> Sector::MakeStochasticLoss()
+std::pair<double, DynamicData::Type> Sector::MakeStochasticLoss(double particle_energy)
 {
     double rnd1 = RandomGenerator::Get().RandomDouble();
     double rnd2 = RandomGenerator::Get().RandomDouble();
@@ -659,7 +661,7 @@ std::pair<double, DynamicData::Type> Sector::MakeStochasticLoss()
 
     for (unsigned int i = 0; i < cross_sections.size(); i++)
     {
-        rates[i] = cross_sections[i]->CalculatedNdx(particle_.GetEnergy(), rnd2);
+        rates[i] = cross_sections[i]->CalculatedNdx(particle_energy, rnd2);
         total_rate += rates[i];
     }
 
@@ -673,7 +675,7 @@ std::pair<double, DynamicData::Type> Sector::MakeStochasticLoss()
 
         if (rates_sum >= total_rate_weighted)
         {
-            energy_loss.first  = cross_sections[i]->CalculateStochasticLoss(particle_.GetEnergy(), rnd2, rnd3);
+            energy_loss.first  = cross_sections[i]->CalculateStochasticLoss(particle_energy, rnd2, rnd3);
             energy_loss.second = cross_sections[i]->GetTypeId();
             break;
         }

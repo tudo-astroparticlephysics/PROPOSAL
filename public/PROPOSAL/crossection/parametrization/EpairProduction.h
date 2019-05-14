@@ -219,10 +219,10 @@ EpairProductionRhoInterpolant<Param>::EpairProductionRhoInterpolant(const Partic
     for (unsigned int i = 0; i < this->components_.size(); ++i)
     {
         builder2d[i]
-            .SetMax1(NUM1)
+            .SetMax1(def.nodes_cross_section)
             .SetX1Min(this->particle_def_.low)
-            .SetX1Max(BIGENERGY)
-            .SetMax2(NUM1)
+            .SetX1Max(def.max_node_energy)
+            .SetMax2(def.nodes_cross_section)
             .SetX2Min(0.0)
             .SetX2Max(1.0)
             .SetRomberg1(def.order_of_interpolation)

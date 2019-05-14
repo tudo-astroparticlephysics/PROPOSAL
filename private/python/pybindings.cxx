@@ -825,6 +825,10 @@ PYBIND11_MODULE(pyPROPOSAL, m)
         .def_readwrite("order_of_interpolation", &InterpolationDef::order_of_interpolation)
         .def_readwrite("path_to_tables", &InterpolationDef::path_to_tables)
         .def_readwrite("path_to_tables_readonly", &InterpolationDef::path_to_tables_readonly)
+        .def_readwrite("max_node_energy", &InterpolationDef::max_node_energy) 
+        .def_readwrite("nodes_cross_section", &InterpolationDef::nodes_cross_section)
+        .def_readwrite("nodes_continous_randomization", &InterpolationDef::nodes_continous_randomization)
+        .def_readwrite("nodes_propagate", &InterpolationDef::nodes_propagate)
         .def_readwrite("do_binary_tables", &InterpolationDef::do_binary_tables);
 
     // --------------------------------------------------------------------- //
@@ -910,6 +914,7 @@ PYBIND11_MODULE(pyPROPOSAL, m)
             py::arg("particle"), py::arg("sector_definition"), py::arg("interpolation_def"))
         .def("propagate", &Sector::Propagate, py::arg("distance"))
         .def("CalculateEnergyTillStochastic", &Sector::CalculateEnergyTillStochastic, py::arg("initial_energy"))
+        .def("MakeStochasticLoss", &Sector::MakeStochasticLoss, py::arg("particle_energy"))
         .def_property_readonly("particle", &Sector::GetParticle, "Get the internal created particle to modify its properties");
 
     // --------------------------------------------------------------------- //

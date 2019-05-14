@@ -29,13 +29,8 @@ IonizIntegral::~IonizIntegral() {}
 // Public methods
 // ----------------------------------------------------------------- //
 
-double IonizIntegral::CalculatedEdx(double energy)
+double IonizIntegral::CalculatedEdxWithoutMultiplier(double energy)
 {
-    if (parametrization_->GetMultiplier() <= 0)
-    {
-        return 0;
-    }
-
     double result, aux;
 
     Parametrization::IntegralLimits limits = parametrization_->GetIntegralLimits(energy);
@@ -65,12 +60,21 @@ double IonizIntegral::CalculatedEdx(double energy)
     {
         result = 0;
     }
-    return parametrization_->GetMultiplier() * medium.GetMassDensity() * result +
-           energy * dedx_integral_.Integrate(
+    return  medium.GetMassDensity() * result + energy * dedx_integral_.Integrate(
                         limits.vMin,
                         limits.vUp,
                         std::bind(&Parametrization::FunctionToDEdxIntegral, parametrization_, energy, std::placeholders::_1),
                         4);
+}
+
+double IonizIntegral::CalculatedEdx(double energy)
+{
+    if (parametrization_->GetMultiplier() <= 0)
+    {
+        return 0;
+    }
+
+    return parametrization_->GetMultiplier() * IonizIntegral::CalculatedEdxWithoutMultiplier(energy);
 }
 
 // ------------------------------------------------------------------------- //
@@ -81,6 +85,11 @@ double IonizIntegral::CalculatedE2dx(double energy)
         return 0;
     }
 
+    return parametrization_->GetMultiplier() * IonizIntegral::CalculatedE2dxWithoutMultiplier(energy);
+}
+
+double IonizIntegral::CalculatedE2dxWithoutMultiplier(double energy)
+{
     Parametrization::IntegralLimits limits = parametrization_->GetIntegralLimits(energy);
 
     return de2dx_integral_.Integrate(
@@ -107,7 +116,7 @@ double IonizIntegral::CalculatedNdx(double energy)
                                     3,
                                     1);
 
-    return sum_of_rates_;
+    return parametrization_->GetMultiplier() * sum_of_rates_;
 }
 
 // ------------------------------------------------------------------------- //
@@ -130,7 +139,7 @@ double IonizIntegral::CalculatedNdx(double energy, double rnd)
         rnd,
         1);
 
-    return sum_of_rates_;
+    return parametrization_->GetMultiplier() * sum_of_rates_;
 }
 
 // ------------------------------------------------------------------------- //

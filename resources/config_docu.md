@@ -37,14 +37,26 @@ If there are no tables (or at least not ones with the desired particle or medium
 If the String is empty, the Folder doesn't exists or PROPOSAL has no permission, the tables are stored in the cache.
 Note: The tables differ in the parameters given below, that are stored in the file name. For not too long file names, these values are hashed.
 
-It's also possible to do the calculations with integrations, but that increases the amount of time by around 4 orders of magnitude !!! This should just be used for tests and comparisons.The Interpolations are accurate enough. Note: The reason why integration is that much slower is that the interpolation used for propagation is near the surface, using already calculated numbers from 'lower' interpolations. When integrating, these integrals going 'deep' (up to 4 layers).
+It's also possible to do the calculations with integrations, but that increases the amount of time by around 4 orders of magnitude !!! This should just be used for tests and comparisons. The Interpolations are accurate enough. Note: The reason why integration is that much slower is that the interpolation used for propagation is near the surface, using already calculated numbers from 'lower' interpolations. When integrating, these integrals going 'deep' (up to 4 layers).
+
+The upper energy limit can be modified up to the maximum possible primary particle energy, 
+to prevent energies greater than the maximum energy from being extrapolated.
+If particles are propagated whose primary energy is greater than the energy of the maximum node, the error increases rapidly. 
+This should be avoided.
+
+If the error of the interpolation becomes too large, the number of sampling points can be increased. 
+This increases the runtime of the program.
 
 | Keyword                   | Type   | Default | Description |
 | ------------------------- | ------ | ------- | ----------- |
-| `do_interpolation`        | Bool   | `True`  | Decides, whether to calculate with interpolations or integrations |
-| `path_to_tables`          | String | `""`    | path pointing to the folder with the interpolation tables |
-| `path_to_tables_readonly` | String | `""`    | path pointing to the folder with the interpolation tables |
-| `do_binary_tables`        | Bool   | `True`  | Decides, whether the tables are stored in binary format or in human readable text format |
+| `do_interpolation`              | Bool   | `True`  | Decides, whether to calculate with interpolations or integrations |
+| `path_to_tables`                | String | `""`    | path pointing to the folder with the interpolation tables |
+| `path_to_tables_readonly`       | String | `""`    | path pointing to the folder with the interpolation tables |
+| `do_binary_tables`              | Bool   | `True`  | Decides, whether the tables are stored in binary format or in human readable text format |
+| `max_node_energy`               | Double | `1.e14` | Energy in MeV up to which the interpolation tables are built |
+| `nodes_cross_section`           | Integer| `100`   | Number of interpolation points for the interpolation of the cross section integral |
+| `nodes_continous_randomization` | Integer| `200`   | Number of interpolation points for the interpolation of the continous randomization integral |
+| `nodes_propagate`               | Integer| `1000`  | Number of interpolation points for the interpolation of the propagation integral |
 
 ### Accuracy parameters ###
 There are several parameters with which the precision or speed for advancing the particles can be adjusted.

@@ -95,7 +95,7 @@ double PhotoQ2Integral::DifferentialCrossSection(double energy, double v)
     aux = integral_.Integrate(
         q2_min, q2_max, std::bind(&PhotoQ2Integral::FunctionToQ2Integral, this, energy, v, std::placeholders::_1), 4);
 
-    aux *= multiplier_ * medium_->GetMolDensity() * components_[component_index_]->GetAtomInMolecule() *
+    aux *= medium_->GetMolDensity() * components_[component_index_]->GetAtomInMolecule() *
            particle_def_.charge * particle_def_.charge;
 
     return aux;
