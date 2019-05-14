@@ -208,7 +208,7 @@ double IonizInterpolant::FunctionToBuildDNdxInterpolant2D(double energy, double 
     (void)component;
 
     Parametrization::IntegralLimits limits = parametrization_->GetIntegralLimits(energy);
-    ;
+
 
     if (limits.vUp == limits.vMax)
     {

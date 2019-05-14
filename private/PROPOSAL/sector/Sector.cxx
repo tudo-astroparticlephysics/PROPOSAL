@@ -533,9 +533,9 @@ double Sector::Propagate(double distance)
     if (sector_def_.stopping_decay && propagated_distance != distance && !is_decayed)
     {
         // The time is shifted due to the exponential lifetime.
-        double particle_time = particle_.GetTime();
-        particle_time -= particle_.GetLifetime()*std::log(RandomGenerator::Get().RandomDouble());
-        particle_.SetTime(particle_time);
+        // double particle_time = particle_.GetTime();
+        // particle_time -= particle_.GetLifetime()*std::log(RandomGenerator::Get().RandomDouble());
+        // particle_.SetTime(particle_time);
         // TODO: one should also advance hte particle according to the sampeled time
         // and set the new position as the endpoint.
 

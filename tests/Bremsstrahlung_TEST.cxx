@@ -31,6 +31,8 @@ ParticleDef getParticleDef(const std::string& name)
     }
 }
 
+const std::string testfile_dir = "bin/TestFiles/";
+
 TEST(Comparison, Comparison_equal)
 {
     ParticleDef particle_def = MuMinusDef::Get();
@@ -158,7 +160,7 @@ TEST(Assignment, Copyconstructor2)
 TEST(Bremsstrahlung, Test_of_dEdx)
 {
     std::ifstream in;
-    std::string filename = "bin/TestFiles/Brems_dEdx.txt";
+    std::string filename = testfile_dir + "Brems_dEdx.txt";
     in.open(filename.c_str());
 
     if (!in.good())
@@ -211,7 +213,7 @@ TEST(Bremsstrahlung, Test_of_dEdx)
 TEST(Bremsstrahlung, Test_of_dNdx)
 {
     std::ifstream in;
-    std::string filename = "bin/TestFiles/Brems_dNdx.txt";
+    std::string filename = testfile_dir + "Brems_dNdx.txt";
     in.open(filename.c_str());
 
     if (!in.good())
@@ -264,7 +266,7 @@ TEST(Bremsstrahlung, Test_of_dNdx)
 TEST(Bremsstrahlung, Test_of_dNdx_rnd)
 {
     std::ifstream in;
-    std::string filename = "bin/TestFiles/Brems_dNdx_rnd.txt";
+    std::string filename = testfile_dir + "Brems_dNdx_rnd.txt";
     in.open(filename.c_str());
 
     if (!in.good())
@@ -320,7 +322,7 @@ TEST(Bremsstrahlung, Test_of_dNdx_rnd)
 TEST(Bremsstrahlung, Test_of_e)
 {
     std::ifstream in;
-    std::string filename = "bin/TestFiles/Brems_e.txt";
+    std::string filename = testfile_dir + "Brems_e.txt";
     in.open(filename.c_str());
 
     if (!in.good())
@@ -376,7 +378,7 @@ TEST(Bremsstrahlung, Test_of_e)
 TEST(Bremsstrahlung, Test_of_dEdx_Interpolant)
 {
     std::ifstream in;
-    std::string filename = "bin/TestFiles/Brems_dEdx_interpol.txt";
+    std::string filename = testfile_dir + "Brems_dEdx_interpol.txt";
     in.open(filename.c_str());
 
     if (!in.good())
@@ -430,7 +432,7 @@ TEST(Bremsstrahlung, Test_of_dEdx_Interpolant)
 TEST(Bremsstrahlung, Test_of_dNdx_Interpolant)
 {
     std::ifstream in;
-    std::string filename = "bin/TestFiles/Brems_dNdx_interpol.txt";
+    std::string filename = testfile_dir + "Brems_dNdx_interpol.txt";
     in.open(filename.c_str());
 
     if (!in.good())
@@ -481,7 +483,7 @@ TEST(Bremsstrahlung, Test_of_dNdx_Interpolant)
 TEST(Bremsstrahlung, Test_of_dNdx_rnd_Interpolant)
 {
     std::ifstream in;
-    std::string filename = "bin/TestFiles/Brems_dNdx_rnd_interpol.txt";
+    std::string filename = testfile_dir + "Brems_dNdx_rnd_interpol.txt";
     in.open(filename.c_str());
 
     if (!in.good())
@@ -538,7 +540,7 @@ TEST(Bremsstrahlung, Test_of_dNdx_rnd_Interpolant)
 TEST(Bremsstrahlung, Test_of_e_Interpolant)
 {
     std::ifstream in;
-    std::string filename = "bin/TestFiles/Brems_e_interpol.txt";
+    std::string filename = testfile_dir + "Brems_e_interpol.txt";
     in.open(filename.c_str());
 
     if (!in.good())
