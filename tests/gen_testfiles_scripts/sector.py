@@ -54,6 +54,9 @@ def create_table_propagate(dir_name):
                         sector.particle.energy = energy
                         sector.particle.position = position
                         sector.particle.direction = direction
+
+                        energyTillStochastic = sector.CalculateEnergyTillStochastic(energy)[0]
+                        stochasticLoss = sector.MakeStochasticLoss(energy)[0]
                         energy_final = sector.propagate(distance)
 
                         buf.append(particle_def.name)
@@ -61,6 +64,8 @@ def create_table_propagate(dir_name):
                         buf.append(str(cut.ecut))
                         buf.append(str(cut.vcut))
                         buf.append(str(energy))
+                        buf.append(str(energyTillStochastic))
+                        buf.append(str(stochasticLoss))
                         buf.append(str(energy_final))
                         buf.append(str(distance))
                         buf.append("\n")

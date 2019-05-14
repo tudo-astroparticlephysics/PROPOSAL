@@ -162,7 +162,7 @@ public:
      *
      *  \return pair of energy loss [MeV] and kind of interaction
      */
-    std::pair<double, DynamicData::Type> MakeStochasticLoss();
+    std::pair<double, DynamicData::Type> MakeStochasticLoss(double particle_energy);
 
     // --------------------------------------------------------------------- //
     // Enable options & Setter

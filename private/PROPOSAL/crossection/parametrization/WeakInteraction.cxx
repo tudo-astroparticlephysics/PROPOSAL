@@ -54,6 +54,14 @@ Parametrization::IntegralLimits WeakInteraction::GetIntegralLimits(double energy
     return limits;
 }
 
+size_t WeakInteraction::GetHash() const
+{
+    size_t seed = Parametrization::GetHash();
+    hash_combine(seed, particle_def_.charge);
+
+    return seed;
+}
+
 // ------------------------------------------------------------------------- //
 // Specific implementations
 // ------------------------------------------------------------------------- //
@@ -124,7 +132,7 @@ double WeakCooperSarkarMertsch::DifferentialCrossSection(double energy, double v
     double neutron_contribution =  (components_[component_index_]->GetAtomicNum() - components_[component_index_]->GetNucCharge()) * interpolant_.at(1)->InterpolateArray(std::log10(energy), v);
     double mean_contribution = (proton_contribution + neutron_contribution) / (components_[component_index_]->GetAtomicNum());
 
-    return multiplier_ * medium_->GetMolDensity() * components_[component_index_]->GetAtomInMolecule() * 1e-36 * std::max(0.0, mean_contribution); //factor 1e-36: conversion from pb to cm^2
+    return medium_->GetMolDensity() * components_[component_index_]->GetAtomInMolecule() * 1e-36 * std::max(0.0, mean_contribution); //factor 1e-36: conversion from pb to cm^2
 }
 
 

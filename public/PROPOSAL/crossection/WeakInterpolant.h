@@ -50,6 +50,7 @@ namespace PROPOSAL {
 
         //these methods return zero because the weak interaction contribution is stochastic only
         double CalculatedEdx(double energy){ (void)energy; return 0; }
+        double CalculatedEdxWithoutMultiplier(double energy){ (void)energy; return 0; }
         double CalculatedE2dx(double energy){ (void)energy; return 0; }
 
     protected:

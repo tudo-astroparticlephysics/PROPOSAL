@@ -15,13 +15,6 @@ const int PROPOSAL::IMAXS     = 40;         // max number of int. steps
 const double PROPOSAL::IPREC  = 1.e-6;      // integration precision
 const double PROPOSAL::IPREC2 = 1.e-6 * 10; // integration precision
 
-// interpolation parameters
-const int PROPOSAL::NUM1 = 100;  // number of interpolation in cross section
-const int PROPOSAL::NUM2 = 200;  // number of interpolation in continuous randomization
-const int PROPOSAL::NUM3 = 1000; // number of interpolation in propagate
-
-const double PROPOSAL::BIGENERGY = 1.e14; // upper energy bound for Interpolation (MeV)
-
 // precision parameters
 const double PROPOSAL::COMPUTER_PRECISION           = 1.e-10;
 const double PROPOSAL::HALF_PRECISION               = 1.e-5; // std::sqrt(computerPrecision);

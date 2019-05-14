@@ -171,6 +171,20 @@ double dilog(double x)
     return x;
 }
 
+// ------------------------------------------------------------------------- //
+size_t InterpolationDef::GetHash() const
+{
+    size_t seed = 0;
+    hash_combine(seed, 
+                 order_of_interpolation,
+                 max_node_energy,
+                 nodes_cross_section, 
+                 nodes_continous_randomization,
+                 nodes_propagate);
+
+    return seed;
+}
+
 namespace Helper {
 
 // ------------------------------------------------------------------------- //
@@ -319,16 +333,21 @@ void InitializeInterpolation(const std::string name,
     size_t hash_digest = 0;
     if (parametrizations.size() == 1)
     {
-        hash_digest = parametrizations.at(0)->GetHash();
+        hash_digest = parametrizations[0]->GetHash();
     }
     else
     {
         for (std::vector<Parametrization*>::const_iterator it = parametrizations.begin(); it != parametrizations.end();
              ++it)
         {
-            hash_combine(hash_digest, (*it)->GetHash());
+            hash_combine(hash_digest, (*it)->GetHash(), (*it)->GetMultiplier());
+        }
+        if (name.compare("decay") == 0)
+        {
+            hash_combine(hash_digest, parametrizations[0]->GetParticleDef().lifetime);
         }
     }
+    hash_combine(hash_digest, interpolation_def.GetHash());
 
     bool storing_failed = false;
     bool reading_worked = false;

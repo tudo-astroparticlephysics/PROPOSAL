@@ -29,9 +29,9 @@ PhotoInterpolant::PhotoInterpolant(const Photonuclear& param, InterpolationDef d
     // Needed for CalculatedEdx integration
     PhotoIntegral photo(param);
 
-    builder1d.SetMax(NUM1)
+    builder1d.SetMax(def.nodes_cross_section)
         .SetXMin(param.GetParticleDef().low)
-        .SetXMax(BIGENERGY)
+        .SetXMax(def.max_node_energy)
         .SetRomberg(def.order_of_interpolation)
         .SetRational(true)
         .SetRelative(false)
@@ -40,7 +40,7 @@ PhotoInterpolant::PhotoInterpolant(const Photonuclear& param, InterpolationDef d
         .SetRationalY(false)
         .SetRelativeY(false)
         .SetLogSubst(false)
-        .SetFunction1D(std::bind(&CrossSection::CalculatedEdx, &photo, std::placeholders::_1));
+        .SetFunction1D(std::bind(&CrossSectionIntegral::CalculatedEdxWithoutMultiplier, &photo, std::placeholders::_1));
 
     builder_container.push_back(std::make_pair(&builder1d, &dedx_interpolant_));
 
@@ -51,9 +51,9 @@ PhotoInterpolant::PhotoInterpolant(const Photonuclear& param, InterpolationDef d
     Interpolant1DBuilder builder_de2dx;
     Helper::InterpolantBuilderContainer builder_container_de2dx;
 
-    builder_de2dx.SetMax(NUM2)
+    builder_de2dx.SetMax(def.nodes_continous_randomization)
         .SetXMin(param.GetParticleDef().low)
-        .SetXMax(BIGENERGY)
+        .SetXMax(def.max_node_energy)
         .SetRomberg(def.order_of_interpolation)
         .SetRational(false)
         .SetRelative(false)
@@ -62,7 +62,7 @@ PhotoInterpolant::PhotoInterpolant(const Photonuclear& param, InterpolationDef d
         .SetRationalY(false)
         .SetRelativeY(false)
         .SetLogSubst(false)
-        .SetFunction1D(std::bind(&CrossSection::CalculatedE2dx, &photo, std::placeholders::_1));
+        .SetFunction1D(std::bind(&PhotoIntegral::CalculatedE2dxWithoutMultiplier, &photo, std::placeholders::_1));
 
     builder_container_de2dx.push_back(std::make_pair(&builder_de2dx, &de2dx_interpolant_));
 
@@ -90,5 +90,5 @@ double PhotoInterpolant::CalculatedEdx(double energy)
         return 0;
     }
 
-    return std::max(dedx_interpolant_->Interpolate(energy), 0.0);
+    return parametrization_->GetMultiplier() * std::max(dedx_interpolant_->Interpolate(energy), 0.0);
 }
