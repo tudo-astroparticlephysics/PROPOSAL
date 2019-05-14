@@ -539,7 +539,7 @@ double Sector::Propagate(double distance)
         // TODO: one should also advance hte particle according to the sampeled time
         // and set the new position as the endpoint.
 
-        particle_.SetEnergy(particle_.GetMass());
+        // particle_.SetEnergy(particle_.GetMass());
         decay_products = particle_.GetDecayTable().SelectChannel().Decay(particle_);
         Output::getInstance().FillSecondaryVector(decay_products);
 
