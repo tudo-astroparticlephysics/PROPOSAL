@@ -11,7 +11,6 @@ def create_table(dir_name):
 
     prop = pp.Propagator(
         pp.particle.MuMinusDef.get(),
-        # "../../resources/config_ice.json"
         "resources/config_ice.json"
     )
 

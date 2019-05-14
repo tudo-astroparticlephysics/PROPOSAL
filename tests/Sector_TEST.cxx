@@ -182,8 +182,7 @@ TEST(Sector, Propagate)
     {
         if (first_line)
         {
-            in >> particleName >> mediumName >> ecut >> vcut >> energy_init >> energy_final_stored >> distance;
-            // in >> particleName >> mediumName >> ecut >> vcut >> energy_init >> energyTillStochastic_stored >> stochasticLoss_stored >> energy_final_stored >> distance;
+            in >> particleName >> mediumName >> ecut >> vcut >> energy_init >> energyTillStochastic_stored >> stochasticLoss_stored >> energy_final_stored >> distance;
             first_line = false;
         }
 
@@ -206,16 +205,15 @@ TEST(Sector, Propagate)
             particle.SetEnergy(energy_init);
             particle.SetDirection(Vector3D(1, 0, 0));
 
-            // energyTillStochastic_calc = sector.CalculateEnergyTillStochastic(energy_init).first;
-            // stochasticLoss_calc = sector.MakeStochasticLoss(energy_init).first;
+            energyTillStochastic_calc = sector.CalculateEnergyTillStochastic(energy_init).first;
+            stochasticLoss_calc = sector.MakeStochasticLoss(energy_init).first;
             energy_final_calc = sector.Propagate(distance);
 
-            // ASSERT_NEAR(energyTillStochastic_calc, energyTillStochastic_stored, std::abs(1e-3 * energyTillStochastic_calc));
-            // ASSERT_NEAR(stochasticLoss_calc, stochasticLoss_stored, std::abs(1e-3 * stochasticLoss_calc));
+            ASSERT_NEAR(energyTillStochastic_calc, energyTillStochastic_stored, std::abs(1e-3 * energyTillStochastic_calc));
+            ASSERT_NEAR(stochasticLoss_calc, stochasticLoss_stored, std::abs(1e-3 * stochasticLoss_calc));
             ASSERT_NEAR(energy_final_calc, energy_final_stored, std::abs(1e-3 * energy_final_calc));
 
-            in >> particleName >> mediumName >> ecut >> vcut >> energy_init >> energy_final_stored >> distance;
-            // in >> particleName >> mediumName >> ecut >> vcut >> energy_init >> energyTillStochastic_stored >> stochasticLoss_stored >> energy_final_stored >> distance;
+            in >> particleName >> mediumName >> ecut >> vcut >> energy_init >> energyTillStochastic_stored >> stochasticLoss_stored >> energy_final_stored >> distance;
         }
 
         delete medium;

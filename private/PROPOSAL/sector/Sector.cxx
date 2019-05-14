@@ -31,7 +31,7 @@ Sector::Definition::Definition()
     , do_continuous_randomization(true)
     , do_continuous_energy_loss_output(false)
     , do_exact_time_calculation(true)
-    , scattering_model(ScatteringFactory::Moliere)
+    , scattering_model(ScatteringFactory::HighlandIntegral)
     , location(Sector::ParticleLocation::InsideDetector)
     , utility_def()
     , cut_settings()
@@ -533,13 +533,13 @@ double Sector::Propagate(double distance)
     if (sector_def_.stopping_decay && propagated_distance != distance && !is_decayed)
     {
         // The time is shifted due to the exponential lifetime.
-        // double particle_time = particle_.GetTime();
-        // particle_time -= particle_.GetLifetime()*std::log(RandomGenerator::Get().RandomDouble());
-        // particle_.SetTime(particle_time);
+        double particle_time = particle_.GetTime();
+        particle_time -= particle_.GetLifetime()*std::log(RandomGenerator::Get().RandomDouble());
+        particle_.SetTime(particle_time);
         // TODO: one should also advance hte particle according to the sampeled time
         // and set the new position as the endpoint.
 
-        // particle_.SetEnergy(particle_.GetMass());
+        particle_.SetEnergy(particle_.GetMass());
         decay_products = particle_.GetDecayTable().SelectChannel().Decay(particle_);
         Output::getInstance().FillSecondaryVector(decay_products);
 
