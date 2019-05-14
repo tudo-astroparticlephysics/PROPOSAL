@@ -97,7 +97,7 @@ dependencies on your system.
 
 		make install
 
-	or for e.g.
+	or e.g.
 
 		make install DESTDIR=$HOME
 
@@ -117,6 +117,21 @@ dependencies on your system.
 **Examples**
 
 	cmake -DADD_PYTHON=OFF <further options>
+
+# Compiling #
+
+After installation PROPOSAL can be used as a C++ library and easily included in any `*.cxx` file with the command
+
+    #include "PROPOSAL/PROPOSAL.h"
+
+Assuming `PROPOSAL.h` has been included in a file with the name `example.cxx`, this file can be compiled with
+
+    g++ example.cxx -std=c++11 -lPROPOSAL <further options>
+ 
+ or
+ 
+    gcc -lstdc++ example.cxx -std=c++11 -lPROPOSAL <further options>
+
 
 # Uninstalling #
 
