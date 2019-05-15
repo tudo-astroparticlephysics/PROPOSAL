@@ -104,7 +104,7 @@ void UtilityInterpolant::InitInterpolation(const std::string& name,
     {
         builder_vec[i]
             .SetMax(number_of_sampling_points)
-            .SetXMin(particle_def.low)
+            .SetXMin(particle_def.mass)
             .SetXMax(interpolation_def_.max_node_energy)
             .SetRomberg(interpolation_def_.order_of_interpolation)
             .SetRational(false)
