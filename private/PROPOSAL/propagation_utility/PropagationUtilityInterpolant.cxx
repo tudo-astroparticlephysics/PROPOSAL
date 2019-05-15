@@ -195,7 +195,7 @@ double UtilityInterpolantDisplacement::GetUpperLimit(double ei, double rnd)
 double UtilityInterpolantDisplacement::BuildInterpolant(double energy, UtilityIntegral& utility, Integral& integral)
 {
     return integral.Integrate(
-        energy, utility_.GetParticleDef().low, std::bind(&UtilityIntegral::FunctionToIntegral, &utility, std::placeholders::_1), 4);
+        energy, utility_.GetParticleDef().mass, std::bind(&UtilityIntegral::FunctionToIntegral, &utility, std::placeholders::_1), 4);
 }
 
 // ------------------------------------------------------------------------- //
@@ -293,7 +293,7 @@ double UtilityInterpolantInteraction::BuildInterpolant(double energy, UtilityInt
     if (up_)
     {
         return integral.Integrate(
-            energy, utility_.GetParticleDef().low, std::bind(&UtilityIntegral::FunctionToIntegral, &utility, std::placeholders::_1), 4);
+            energy, utility_.GetParticleDef().mass, std::bind(&UtilityIntegral::FunctionToIntegral, &utility, std::placeholders::_1), 4);
     } else
     {
         return -integral.Integrate(
