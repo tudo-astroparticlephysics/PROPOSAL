@@ -1,0 +1,4 @@
+Scattering
+**********
+
+.. automodule:: pyPROPOSAL.scattering
