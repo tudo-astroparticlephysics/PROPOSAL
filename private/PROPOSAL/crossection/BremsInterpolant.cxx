@@ -30,7 +30,7 @@ BremsInterpolant::BremsInterpolant(const Bremsstrahlung& param, InterpolationDef
     BremsIntegral brems(param);
 
     builder1d.SetMax(def.nodes_cross_section)
-        .SetXMin(param.GetParticleDef().low)
+        .SetXMin(param.GetParticleDef().mass)
         .SetXMax(def.max_node_energy)
         .SetRomberg(def.order_of_interpolation)
         .SetRational(true)
@@ -52,7 +52,7 @@ BremsInterpolant::BremsInterpolant(const Bremsstrahlung& param, InterpolationDef
     Helper::InterpolantBuilderContainer builder_container_de2dx;
 
     builder_de2dx.SetMax(def.nodes_continous_randomization)
-        .SetXMin(param.GetParticleDef().low)
+        .SetXMin(param.GetParticleDef().mass)
         .SetXMax(def.max_node_energy)
         .SetRomberg(def.order_of_interpolation)
         .SetRational(false)

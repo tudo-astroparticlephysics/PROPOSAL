@@ -175,10 +175,10 @@ double dilog(double x)
 size_t InterpolationDef::GetHash() const
 {
     size_t seed = 0;
-    hash_combine(seed, 
+    hash_combine(seed,
                  order_of_interpolation,
                  max_node_energy,
-                 nodes_cross_section, 
+                 nodes_cross_section,
                  nodes_continous_randomization,
                  nodes_propagate);
 
@@ -340,7 +340,7 @@ void InitializeInterpolation(const std::string name,
         for (std::vector<Parametrization*>::const_iterator it = parametrizations.begin(); it != parametrizations.end();
              ++it)
         {
-            hash_combine(hash_digest, (*it)->GetHash(), (*it)->GetMultiplier());
+            hash_combine(hash_digest, (*it)->GetHash(), (*it)->GetMultiplier(), (*it)->GetParticleDef().low);
         }
         if (name.compare("decay") == 0)
         {
