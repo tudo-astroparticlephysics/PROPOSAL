@@ -130,46 +130,124 @@ void init_components(py::module& m)
 {
     py::module m_sub = m.def_submodule("component");
 
-    // m_sub.doc() = R"pbdoc(
-    //     pyPROPOSAL
-    //     ----------
-    //
-    //     .. currentmodule:: component
-    //
-    //     .. autosummary::
-    //         :toctree: _generate
-    //
-    //         Component
-    //         Hydrogen
-    //         Carbon
-    //         Nitrogen
-    //         Oxygen
-    //         Sodium
-    //         Magnesium
-    //         Sulfur
-    //         Argon
-    //         Potassium
-    //         Calcium
-    //         Iron
-    //         Copper
-    //         Lead
-    //         Uranium
-    //         StandardRock
-    //         FrejusRock
-    // )pbdoc";
+    m_sub.doc() = R"pbdoc(
+        You could create a new component or select one of the implemented.
+        Components are used to define a medium as part of a sector.
+
+        A existing component can be called for example with:
+
+        >>> hydro = pyPROPOSAL.component.Hydrogen()
+        >>> hydro.atomic_number
+        1.00794
+
+        There listed components can be created without initialization:
+
+        * Hydrogen
+        * Carbon
+        * Nitrogen
+        * Oxygen
+        * Sodium
+        * Magnesium
+        * Sulfur
+        * Argon
+        * Potassium
+        * Calcium
+        * Iron
+        * Copper
+        * Lead
+        * Uranium
+        * StandardRock
+        * FrejusRock
+
+        Otherwise you have to initalize the component yourself.
+    )pbdoc";
 
     py::class_<Components::Component, std::shared_ptr<Components::Component>>(m_sub, "Component")
-        .def(py::init<std::string, double, double, double>(), py::arg("name"), py::arg("charge"), py::arg("atomic_num"), py::arg("atom_in_molecule"))
+        .def(py::init<std::string, double, double, double>(), py::arg("name"), py::arg("charge"), py::arg("atomic_num"), py::arg("atom_in_molecule"), R"pbdoc(
+            Creating a new static component.
+
+            Args:
+               name (str):  The name of component.
+               charge (float):  Charge in units of Coulomb.
+               atomic_num (float): Atom number in periodic table.
+               atomic_in_molecule (float): Number of atoms in molecule.
+        )pbdoc")
         .def("__str__", &py_print<Components::Component>)
-        .def_property_readonly("name", &Components::Component::GetName)
-        .def_property_readonly("nuclear_charge", &Components::Component::GetNucCharge)
-        .def_property_readonly("atomic_number", &Components::Component::GetAtomicNum)
-        .def_property_readonly("atoms_in_molecule", &Components::Component::GetAtomInMolecule)
-        .def_property_readonly("log_constant", &Components::Component::GetLogConstant)
-        .def_property_readonly("bprime", &Components::Component::GetBPrime)
-        .def_property_readonly("average_nucleon_weight", &Components::Component::GetAverageNucleonWeight)
-        .def_property_readonly("mn", &Components::Component::GetMN)
-        .def_property_readonly("r0", &Components::Component::GetR0);
+        .def_property_readonly(
+                "name", 
+                &Components::Component::GetName, 
+                R"pbdoc(
+                    Get name of component.
+
+                    Returns:
+                        str: Name of component
+                )pbdoc"
+                )
+        .def_property_readonly(
+                "nuclear_charge",
+                &Components::Component::GetNucCharge,
+                R"pbdoc(
+                    Get nuclear charge of component.
+
+                    Returns:
+                        float: Nuclear charge of component
+                )pbdoc"
+        )
+        .def_property_readonly(
+                "atomic_number",
+                &Components::Component::GetAtomicNum,
+                R"pbdoc(
+                    Get atomic number of component.
+
+                    Returns:
+                        float: Atomic number of component
+                )pbdoc"
+                )
+        .def_property_readonly(
+                "atoms_in_molecule",
+                &Components::Component::GetAtomInMolecule,
+                R"pbdoc(
+                    Get number of atoms in one molecule.
+
+                    Returns:
+                        float: number of atoms in molecule
+                )pbdoc"
+                )
+        .def_property_readonly(
+                "log_constant",
+                &Components::Component::GetLogConstant,
+                R"pbdoc(
+                    Explanation still has to be added.
+                )pbdoc"
+                )
+        .def_property_readonly(
+                "bprime",
+                &Components::Component::GetBPrime,
+                R"pbdoc(
+                    Explanation still has to be added.
+                )pbdoc"
+                )
+        .def_property_readonly(
+                "average_nucleon_weight",
+                &Components::Component::GetAverageNucleonWeight,
+                R"pbdoc(
+                    Explanation still has to be added.
+                )pbdoc"
+                )
+        .def_property_readonly(
+                "mn",
+                &Components::Component::GetMN,
+                R"pbdoc(
+                    Explanation still has to be added.
+                )pbdoc"
+                )
+        .def_property_readonly(
+                "r0",
+                &Components::Component::GetR0,
+                R"pbdoc(
+                    Explanation still has to be added.
+                )pbdoc"
+                );
 
     COMPONENT_DEF(m_sub, Hydrogen)
     COMPONENT_DEF(m_sub, Carbon)
@@ -755,25 +833,7 @@ void init_scattering(py::module& m)
 PYBIND11_MODULE(pyPROPOSAL, m)
 {
     m.doc() = R"pbdoc(
-        pyPROPOSAL
-        ----------
-
         .. currentmodule:: pyPROPOSAL
-
-        .. autosummary::
-           :toctree: _generate
-
-           Vector3D
-           EnergyCutSettings
-           InterpolationDef
-           Utility
-           UtilityDefinition
-           ParticleLocation
-           SectorDefinition
-           Sector
-           RandomGenerator
-           Propagator
-           PropagatorService
     )pbdoc";
 
     init_components(m);
@@ -811,25 +871,151 @@ PYBIND11_MODULE(pyPROPOSAL, m)
         .def("cartesian_from_spherical", &Vector3D::CalculateCartesianFromSpherical)
         .def("spherical_from_cartesian", &Vector3D::CalculateSphericalCoordinates);
 
-    py::class_<EnergyCutSettings, std::shared_ptr<EnergyCutSettings> >(m, "EnergyCutSettings")
-        .def(py::init<>())
-        .def(py::init<double, double>(), py::arg("ecut"), py::arg("vcut"))
+    py::class_<EnergyCutSettings, std::shared_ptr<EnergyCutSettings> >(m, "EnergyCutSettings", 
+		R"pbdoc(
+			Settings for the lower integration limit.
+			Losses below the cut will be handeled continously and the 
+			other stochasticaly.
+
+			.. math:: 
+
+				\text{cut} = \begin{cases} e_\text{cut} & E * v_\text{cut} \geq e_\text{cut} \\ v_\text{cut} & \, \text{else} \end{cases}
+		)pbdoc")
+        .def(
+                py::init<>(), 
+                R"pbdoc(
+                    Initialize some standard settings. 
+                    The default e_cut = 500 Mev and v_cut = 0.05 will be set.
+                )pbdoc"
+            )
+        .def(
+                py::init<double, double>(), 
+                py::arg("ecut"), 
+                py::arg("vcut"), R"pbdoc(
+                    Set the cut values manualy.
+
+                    Args:
+                        ecut (float): static energy cut.
+                        vcut (float): relativ energy cut.
+                )pbdoc")
         .def(py::init<const EnergyCutSettings&>())
         .def("__str__", &py_print<EnergyCutSettings>)
-        .def_property("ecut", &EnergyCutSettings::GetEcut, &EnergyCutSettings::SetEcut)
-        .def_property("vcut", &EnergyCutSettings::GetVcut, &EnergyCutSettings::SetVcut)
-        .def("get_cut", &EnergyCutSettings::GetCut, "Return the lower from E*v = e");
+        .def_property(
+                "ecut", 
+                &EnergyCutSettings::GetEcut, 
+                &EnergyCutSettings::SetEcut,
+                R"pbdoc(
+                    Return set e_cut.
 
-    py::class_<InterpolationDef, std::shared_ptr<InterpolationDef>>(m, "InterpolationDef")
+                    Returns:
+                        float: e_cut
+                )pbdoc"
+            )
+        .def_property(
+                "vcut", 
+                &EnergyCutSettings::GetVcut, 
+                &EnergyCutSettings::SetVcut,
+                R"pbdoc(
+                    Return set v_cut.
+
+                    Returns:
+                        float: v_cut
+                )pbdoc"
+            )
+        .def(
+                "get_cut", 
+                &EnergyCutSettings::GetCut, 
+                R"pbdoc(
+                    Return lower Interpolation/Integration limit.
+
+                    Returns:
+                        float: cut
+                )pbdoc"
+            );
+
+    py::class_<InterpolationDef, std::shared_ptr<InterpolationDef>>(m, "InterpolationDef", 
+			R"pbdoc(
+				The set standard values have been optimized for performance
+				and accuracy. They should not be changed any further 
+				without a good reason.
+
+				Example:
+					For speed savings it makes sense to specify a path to 
+					the tables, to reuse build tables if possible.
+
+					Sometimes it is usefull to look in the tables for a check. 
+					To do this binary tables can be diabled.
+
+					>>> interpolDef = pp.InterpolationDef()
+					>>> interpolDef.do_binary_tables = False
+					>>> interpolDef.path_to_tables = "./custom/table/path"
+					>>> interpolDef.path_to_tables_readonly = "./custom/table/path"
+			)pbdoc")
         .def(py::init<>())
-        .def_readwrite("order_of_interpolation", &InterpolationDef::order_of_interpolation)
-        .def_readwrite("path_to_tables", &InterpolationDef::path_to_tables)
-        .def_readwrite("path_to_tables_readonly", &InterpolationDef::path_to_tables_readonly)
-        .def_readwrite("max_node_energy", &InterpolationDef::max_node_energy) 
-        .def_readwrite("nodes_cross_section", &InterpolationDef::nodes_cross_section)
-        .def_readwrite("nodes_continous_randomization", &InterpolationDef::nodes_continous_randomization)
-        .def_readwrite("nodes_propagate", &InterpolationDef::nodes_propagate)
-        .def_readwrite("do_binary_tables", &InterpolationDef::do_binary_tables);
+        .def_readwrite(
+			"order_of_interpolation", 
+			&InterpolationDef::order_of_interpolation,
+			R"pbdoc(
+				Order of Interpolation.
+			)pbdoc"
+		)
+        .def_readwrite(
+			"path_to_tables", 
+			&InterpolationDef::path_to_tables,
+			R"pbdoc(
+				Path where tables can be written from memory to disk to 
+				reuse it if possible.
+			)pbdoc"
+		)
+        .def_readwrite(
+			"path_to_tables_readonly", 
+			&InterpolationDef::path_to_tables_readonly,
+			R"pbdoc(
+				Path where tables can be read from disk to avoid to rebuild 
+				it.
+			)pbdoc"
+		)
+        .def_readwrite(
+			"max_node_energy", 
+			&InterpolationDef::max_node_energy,
+			R"pbdoc(
+				maximum energy that will be interpolated. Energies greater 
+				than the value are extrapolated. Default: 1e14 MeV
+			)pbdoc"
+		)
+        .def_readwrite(
+			"nodes_cross_section", 
+			&InterpolationDef::nodes_cross_section,
+			R"pbdoc(
+				number of nodes used by evaluation of cross section 
+				integrals. Default: xxx
+			)pbdoc"
+		)
+        .def_readwrite(
+			"nodes_continous_randomization", 
+			&InterpolationDef::nodes_continous_randomization,
+			R"pbdoc(
+				number of nodes used by evaluation of continous 
+				randomization integrals. Default: xxx
+			)pbdoc"
+		)
+        .def_readwrite(
+			"nodes_propagate", 
+			&InterpolationDef::nodes_propagate,
+			R"pbdoc(
+				number of nodes used by evaluation of propagation
+				integrals. Default: xxx
+			)pbdoc"
+		)
+        .def_readwrite(
+			"do_binary_tables", 
+			&InterpolationDef::do_binary_tables,
+			R"pbdoc(
+				Should binary tables be used to store the data. 
+				This will increase performance, but are not readable for a 
+				crosscheck by human. Default: xxx
+			)pbdoc"
+		);
 
     // --------------------------------------------------------------------- //
     // Utility
@@ -869,14 +1055,64 @@ PYBIND11_MODULE(pyPROPOSAL, m)
     // ContinousRandomization
     // --------------------------------------------------------------------- //
 
-    py::class_<ContinuousRandomizer, std::shared_ptr<ContinuousRandomizer> >(m, "ContinuousRandomizer")
-        .def(py::init<const Utility&, const InterpolationDef>(),
-             py::arg("utility"),
-             py::arg("interpolation_def"))
-        .def("randomize", &ContinuousRandomizer::Randomize,
-             py::arg("initial_energy"),
-             py::arg("final_energy"),
-             py::arg("rand"));
+    py::class_<ContinuousRandomizer, std::shared_ptr<ContinuousRandomizer> >(m, "ContinuousRandomizer", 
+    R"pbdoc(
+        If :math:`v_\text{cut}` is large, the spectrum is not continously any 
+        more. Particles which has no stochastic loss crossing the medium has 
+        all the same energy :math:`E_\text{peak}` after propagating through 
+        the medium.  This produce a gap of size of minimal stochastic loss.
+        This effect can be reduced using continous randomization.
+        
+        .. figure:: figures/mu_continuous.png
+            :scale: 50%
+            :align: center
+
+            Propagate a muon with 100 TeV through 300 m Rock.
+
+        The average energy loss from continous energy losses, is 
+        estimated by the energy-integral. 
+
+        .. math::
+        
+            \int^{E_f}_{E_i} \frac{\sigma(E)}{-f(E)} d\text{E} = -\text{log}(\xi)
+
+        Since probability of a energy loss :math:`e_{lost} < e_{cut}` 
+        at distance is finite, it produce fluctuations in average 
+        energy losses.
+
+        This small losses can be added in form of a perturbation from 
+        average energy loss.
+
+    )pbdoc")
+        .def(
+                py::init<const Utility&, const InterpolationDef>(),
+                py::arg("utility"),
+                py::arg("interpolation_def"),
+                R"pbdoc(
+                    Initalize a continous randomization calculator. 
+                    This may take some minutes because for all parametrization 
+                    the continous randomization interpolation tables have to be 
+                    build.
+
+                    Note:
+                        .. math::
+                            
+                            \langle ( \Delta ( \Delta E ) )^2 \rangle = 
+                                \int^{e_\text{cut}}_{e_0} \frac{d\text{E}}{-f(E)} 
+                                \left( \int_0^{e_{cut}} e^2 p(e;E) d\text{e} \right)
+                    
+                    Args:
+                        interpolation_def (interpolation_def): specify the number of interpolation points for cont-integral
+                        utility (utility): specify the parametrization and energy cuts
+                )pbdoc"
+            )
+        .def(
+                "randomize", 
+                &ContinuousRandomizer::Randomize,
+                py::arg("initial_energy"),
+                py::arg("final_energy"),
+                py::arg("rand")
+            );
 
     // --------------------------------------------------------------------- //
     // Sector Definition
@@ -908,14 +1144,51 @@ PYBIND11_MODULE(pyPROPOSAL, m)
     // Sector
     // --------------------------------------------------------------------- //
 
-    py::class_<Sector, std::shared_ptr<Sector> >(m, "Sector")
+    py::class_<Sector, std::shared_ptr<Sector> >(m, "Sector",R"pbdoc(
+			A sector is specified by his homogeneous medium and the same EnergyCutSettings.
+		)pbdoc")
         .def(py::init<Particle&, const Sector::Definition&>(), py::arg("particle"), py::arg("sector_definition"))
         .def(py::init<Particle&, const Sector::Definition&, const InterpolationDef&>(),
             py::arg("particle"), py::arg("sector_definition"), py::arg("interpolation_def"))
-        .def("propagate", &Sector::Propagate, py::arg("distance"))
-        .def("CalculateEnergyTillStochastic", &Sector::CalculateEnergyTillStochastic, py::arg("initial_energy"))
-        .def("MakeStochasticLoss", &Sector::MakeStochasticLoss, py::arg("particle_energy"))
-        .def_property_readonly("particle", &Sector::GetParticle, "Get the internal created particle to modify its properties");
+        .def(
+			"propagate", 
+			&Sector::Propagate, 
+			py::arg("distance"),
+			R"pbdoc(
+				Args:
+					distance (float): Distance to propagate in cm.
+			)pbdoc"
+		)
+        .def(
+			"CalculateEnergyTillStochastic", 
+			&Sector::CalculateEnergyTillStochastic, 
+			py::arg("initial_energy"),
+			R"pbdoc(
+				Calculates the continous losses from last to current stochastic 
+				loss.
+
+				Args:
+					initial_energy (float): Energy in MeV.
+			)pbdoc"
+		)
+        .def(
+			"MakeStochasticLoss", 
+			&Sector::MakeStochasticLoss, 
+			py::arg("particle_energy"),
+			R"pbdoc(
+				
+			)pbdoc"
+		)
+        .def_property_readonly(
+			"particle", 
+			&Sector::GetParticle, 
+			R"pbdoc(
+				Get the internal created particle to modify its properties
+				
+				Return:
+					particle (Particle): propagated Particle
+			)pbdoc"
+		);
 
     // --------------------------------------------------------------------- //
     // Randomgenerator
@@ -932,16 +1205,87 @@ PYBIND11_MODULE(pyPROPOSAL, m)
     // --------------------------------------------------------------------- //
 
     py::class_<Propagator, std::shared_ptr<Propagator>>(m, "Propagator")
-        .def(py::init<const ParticleDef&, const std::vector<Sector::Definition>&, const Geometry&>(),
-            py::arg("partcle_def"), py::arg("sector_defs"), py::arg("detector"))
-        .def(py::init<const ParticleDef&, const std::vector<Sector::Definition>&, const Geometry&, const InterpolationDef&>(),
-            py::arg("particle_def"), py::arg("sector_defs"), py::arg("detector"), py::arg("interpolation_def"))
-        .def(py::init<const ParticleDef&, const std::vector<Sector::Definition>&, const Geometry&>(),
-            py::arg("particle_def"), py::arg("sector_defs"), py::arg("detector"))
-        .def(py::init<const ParticleDef&, const std::string&>(), py::arg("particle_def"), py::arg("config_file"))
-        .def("propagate", &Propagator::Propagate, py::arg("max_distance_cm") = 1e20, py::return_value_policy::reference)
-        .def_property_readonly("particle", &Propagator::GetParticle, "Get the internal created particle to modify its properties")
-        .def_property_readonly("detector", &Propagator::GetDetector, "Get the detector geometry");
+        .def(
+                py::init<const ParticleDef&, const std::vector<Sector::Definition>&, const Geometry&>(), 
+                py::arg("partcle_def"), 
+                py::arg("sector_defs"), 
+                py::arg("detector")
+            )
+        .def(
+                py::init<const ParticleDef&, const std::vector<Sector::Definition>&, const Geometry&, const InterpolationDef&>(), 
+                py::arg("particle_def"), 
+                py::arg("sector_defs"), 
+                py::arg("detector"), 
+                py::arg("interpolation_def"), R"pbdoc(
+                    Function Docstring.
+
+                    Args:
+                        particle_def (pyPROPOSAL.particle.ParticleDef): sldkfjas lsdkjfa 
+                        sector_defs (List[pyPROPOSAL.SectorDefinition]): slkd sldkf ksjdlfa
+                        detector (pyPROPOSAL.geometry.Geometry): kfsdljflaskdj
+                        interpolation_def (pyPROPOSAL.InterpolationDef):  sdfa  sldkf sdfa
+                )pbdoc")
+        .def(
+                py::init<const ParticleDef&, 
+                const std::vector<Sector::Definition>&, const Geometry&>(),
+                py::arg("particle_def"), 
+                py::arg("sector_defs"), 
+                py::arg("detector")
+            )
+        .def(
+                py::init<const ParticleDef&, const std::string&>(), 
+                py::arg("particle_def"), 
+                py::arg("config_file")
+            )
+        .def(
+                "propagate", 
+                &Propagator::Propagate, 
+                py::arg("max_distance_cm") = 1e20, 
+                py::return_value_policy::reference,
+                R"pbdoc(
+                    Propagate a particle through sectors and produce stochastic 
+                    losses, untill propagated distance is reached or energy reached 
+                    elow.
+
+                    Args:
+                        max_distance_cm (float): Maximum distance a particle is propagated before it is considered lost.
+
+                    Returns:
+                        list(list): list of stochastic losses parameters
+                    
+                    Example:
+                        Propagate 1000 Particle with an inital energy of 100 Tev
+                        and save the losses in daughters.
+
+                        >>> for i in range(int(1e3)):
+                        >>>   mu.energy = 1e8
+                        >>>   mu.propagated_distance = 0
+                        >>>   mu.position = pp.Vector3D(0, 0, 0)
+                        >>>   mu.direction = pp.Vector3D(0, 0, -1)
+                        >>>   daughters = prop.propagate()
+
+                )pbdoc"
+            )
+        .def_property_readonly(
+                "particle", 
+                &Propagator::GetParticle, 
+                R"pbdoc(
+                    Get the internal created particle to modify its properties.
+
+                    Returns:
+                        particleDef: definition of the propagated particle.
+                )pbdoc"
+            )
+        .def_property_readonly(
+                "detector", 
+                &Propagator::GetDetector, 
+                R"pbdoc(
+                    Get the detector geometry.
+
+                    Returns:
+                        sector: definition of the sector.
+                )pbdoc"
+            );
 
     // --------------------------------------------------------------------- //
     // PropagatorService
