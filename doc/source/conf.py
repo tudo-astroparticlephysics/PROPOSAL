@@ -162,8 +162,6 @@ texinfo_documents = [
 
 # -- Extension configuration -------------------------------------------------
 
-# autoclass_content = 'both'
-
 napoleon_google_docstring = True
 napoleon_include_init_with_doc = True
 napoleon_use_rtype = False
