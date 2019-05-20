@@ -540,6 +540,19 @@ std::vector<DynamicData*> Propagator::Propagate(double MaxDistance_cm)
     Vector3D particle_direction = particle_.GetDirection();
 
     bool starts_in_detector = detector_->IsInside(particle_position, particle_direction);
+    if (starts_in_detector)
+    {
+        particle_.SetEntryPoint(particle_position);
+        particle_.SetEntryEnergy(particle_.GetEnergy());
+        particle_.SetEntryTime(particle_.GetTime());
+        distance_to_closest_approach = detector_->DistanceToClosestApproach(particle_position, particle_direction);
+        if (distance_to_closest_approach < 0)
+        {
+            particle_.SetClosestApproachPoint(particle_position);
+            particle_.SetClosestApproachEnergy(particle_.GetEnergy());
+            particle_.SetClosestApproachTime(particle_.GetTime());
+        }
+    }
     bool is_in_detector     = false;
     bool was_in_detector    = false;
     bool propagationstep_till_closest_approach = false;
@@ -640,6 +653,12 @@ std::vector<DynamicData*> Propagator::Propagate(double MaxDistance_cm)
 
         if (result <= 0 || MaxDistance_cm <= particle_.GetPropagatedDistance())
             break;
+    }
+    if (detector_->IsInside(particle_.GetPosition(), particle_.GetDirection()))
+    {
+        particle_.SetExitPoint(particle_.GetPosition());
+        particle_.SetExitEnergy(particle_.GetEnergy());
+        particle_.SetExitTime(particle_.GetTime());
     }
 
     particle_.SetElost(energy_at_entry_point - energy_at_exit_point);
