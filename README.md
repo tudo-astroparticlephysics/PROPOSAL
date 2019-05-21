@@ -19,7 +19,7 @@
 ```
 
 [![Build Status](https://travis-ci.org/tudo-astroparticlephysics/PROPOSAL.svg?branch=master)](https://travis-ci.org/tudo-astroparticlephysics/PROPOSAL)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2598747.svg)](https://doi.org/10.5281/zenodo.2598747)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3066511.svg)](https://doi.org/10.5281/zenodo.3066511)
 
 # PROPOSAL #
 
@@ -31,7 +31,7 @@ Ter-Mikaelian effects, muon and tau decay, as well as Molière scattering are
 implemented for different parametrizations.
 The full Paper can be found
 [here](https://doi.org/10.1016/j.cpc.2013.04.001).
-Recent improvements are documented [here](https://arxiv.org/abs/1809.07740).
+Recent improvements are documented [here](https://doi.org/10.1016/j.cpc.2019.03.021).
 
 PROPOSAL was tested on Mac OS X V. 10.13.6, Ubuntu 12.04, SUSE Enterprise 10 and PCLinuxos. Since
 all these OS are UNIX based it should be fine to run and compile PROPOSAL on a UNIX based OS.
@@ -70,15 +70,16 @@ and our zenodo entry of the version you use
             Koehne, Jan-Hendrik and
             Fuchs, Tomasz and
             Alameddine, Jean-Marco and
+            Sackel, Maximilian and
             van Santen, Jacob and
             Kopper, Claudio and
             Krings, Kai and
             Olivas, Alex},
-  title   = {tudo-astroparticlephysics/PROPOSAL: Zenodo},
-  month  = mar,
+  title  = {tudo-astroparticlephysics/PROPOSAL: Zenodo},
+  month  = may,
   year   = 2019,
-  doi    = {10.5281/zenodo.2598747},
-  url    = {https://doi.org/10.5281/zenodo.2598747}
+  doi    = {10.5281/zenodo.3066511},
+  url    = {https://doi.org/10.5281/zenodo.3066511}
 }
 ```
 and if you want to cite the latest improvements
@@ -93,8 +94,10 @@ and if you want to cite the latest improvements
                  Rhode, Wolfgang},
   year        = {2018},
   eprint      = {1809.07740},
-  eprinttype  =  {arxiv},
-  eprintclass = {hep-ph}
+  eprinttype  = {arxiv},
+  eprintclass = {hep-ph},
+  journal     = {Computer Physics Communications},
+  doi         = {10.1016/j.cpc.2019.03.021}
 }
 ```
 
