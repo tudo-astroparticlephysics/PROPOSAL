@@ -532,9 +532,11 @@ std::vector<DynamicData*> Propagator::Propagate(double MaxDistance_cm)
     // These two variables are needed to calculate the energy loss inside the detector
     // energy_at_entry_point is initialized with the current energy because this is a
     // reasonable value for particle_ which starts inside the detector
-
-    double energy_at_entry_point = particle_.GetEnergy();
-    double energy_at_exit_point  = 0;
+    // They should be set below, so there is no need to init them here.
+    // But for safetiness, if an edge case is not considered
+    // one could include them.
+    // particle_.SetEntryEnergy(particle_.GetEnergy());
+    // particle_.SetExitEnergy(particle_.GetMass());
 
     Vector3D particle_position  = particle_.GetPosition();
     Vector3D particle_direction = particle_.GetDirection();
@@ -608,8 +610,6 @@ std::vector<DynamicData*> Propagator::Propagate(double MaxDistance_cm)
             particle_.SetEntryEnergy(particle_.GetEnergy());
             particle_.SetEntryTime(particle_.GetTime());
 
-            energy_at_entry_point = particle_.GetEnergy();
-
             was_in_detector = true;
         }
         // exit point of the detector
@@ -619,7 +619,6 @@ std::vector<DynamicData*> Propagator::Propagate(double MaxDistance_cm)
             particle_.SetExitEnergy(particle_.GetEnergy());
             particle_.SetExitTime(particle_.GetTime());
 
-            energy_at_exit_point = particle_.GetEnergy();
             // we don't want to run in this case a second time so we set was_in_detector to false
             was_in_detector = false;
 
@@ -631,7 +630,6 @@ std::vector<DynamicData*> Propagator::Propagate(double MaxDistance_cm)
             particle_.SetExitEnergy(particle_.GetEnergy());
             particle_.SetExitTime(particle_.GetTime());
 
-            energy_at_exit_point = particle_.GetEnergy();
             // we don't want to run in this case a second time so we set starts_in_detector to false
             starts_in_detector = false;
         }
@@ -661,7 +659,7 @@ std::vector<DynamicData*> Propagator::Propagate(double MaxDistance_cm)
         particle_.SetExitTime(particle_.GetTime());
     }
 
-    particle_.SetElost(energy_at_entry_point - energy_at_exit_point);
+    particle_.SetElost(particle_.GetEntryEnergy() - particle_.GetExitEnergy());
 
 #if ROOT_SUPPORT
     Output::getInstance().StorePropagatedPrimaryInTree(&particle_);
