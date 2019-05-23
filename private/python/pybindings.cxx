@@ -1248,7 +1248,8 @@ PYBIND11_MODULE(pyPROPOSAL, m)
                     elow.
 
                     Args:
-                        max_distance_cm (float): Maximum distance a particle is propagated before it is considered lost.
+                        max_distance_cm (float): Maximum distance a particle is 
+                        propagated before it is considered lost.
 
                     Returns:
                         list(list): list of stochastic losses parameters
