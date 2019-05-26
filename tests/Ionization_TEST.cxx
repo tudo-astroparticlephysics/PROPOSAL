@@ -1,8 +1,8 @@
 
 #include "gtest/gtest.h"
 
+#include <fstream>
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/Output.h"
 #include "PROPOSAL/crossection/IonizIntegral.h"
 #include "PROPOSAL/crossection/IonizInterpolant.h"
 #include "PROPOSAL/crossection/parametrization/Ionization.h"

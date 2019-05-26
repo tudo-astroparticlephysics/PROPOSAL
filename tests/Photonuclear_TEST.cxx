@@ -1,8 +1,8 @@
 
 #include "gtest/gtest.h"
 
+#include <fstream>
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/Output.h"
 #include "PROPOSAL/crossection/PhotoIntegral.h"
 #include "PROPOSAL/crossection/PhotoInterpolant.h"
 #include "PROPOSAL/crossection/factories/PhotonuclearFactory.h"
