@@ -900,6 +900,7 @@ PYBIND11_MODULE(pyPROPOSAL, m)
         .def_readwrite("do_continuous_randomization", &Sector::Definition::do_continuous_randomization)
         .def_readwrite("do_continuous_energy_loss_output", &Sector::Definition::do_continuous_energy_loss_output)
         .def_readwrite("do_exact_time_calculation", &Sector::Definition::do_exact_time_calculation)
+        .def_readwrite("only_loss_inside_detector", &Sector::Definition::only_loss_inside_detector)
         .def_readwrite("scattering_model", &Sector::Definition::scattering_model)
         .def_readwrite("particle_location", &Sector::Definition::location)
         .def_readwrite("crosssection_defs", &Sector::Definition::utility_def);
@@ -915,7 +916,8 @@ PYBIND11_MODULE(pyPROPOSAL, m)
         .def("propagate", &Sector::Propagate, py::arg("distance"))
         .def("CalculateEnergyTillStochastic", &Sector::CalculateEnergyTillStochastic, py::arg("initial_energy"))
         .def("MakeStochasticLoss", &Sector::MakeStochasticLoss, py::arg("particle_energy"))
-        .def_property_readonly("particle", &Sector::GetParticle, "Get the internal created particle to modify its properties");
+        .def_property_readonly("particle", &Sector::GetParticle, "Get the internal created particle to modify its properties")
+        .def_property_readonly("sector_def", &Sector::GetSectorDef, "Get the Sector Definition");
 
     // --------------------------------------------------------------------- //
     // Randomgenerator
@@ -941,7 +943,8 @@ PYBIND11_MODULE(pyPROPOSAL, m)
         .def(py::init<const ParticleDef&, const std::string&>(), py::arg("particle_def"), py::arg("config_file"))
         .def("propagate", &Propagator::Propagate, py::arg("max_distance_cm") = 1e20, py::return_value_policy::reference)
         .def_property_readonly("particle", &Propagator::GetParticle, "Get the internal created particle to modify its properties")
-        .def_property_readonly("detector", &Propagator::GetDetector, "Get the detector geometry");
+        .def_property_readonly("detector", &Propagator::GetDetector, "Get the detector geometry")
+        .def_property_readonly("sector_list", &Propagator::GetSectors, "Get the sector list");
 
     // --------------------------------------------------------------------- //
     // PropagatorService

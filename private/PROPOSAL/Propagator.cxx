@@ -1539,6 +1539,22 @@ Sector::Definition Propagator::CreateSectorDefinition(const std::string& json_ob
         log_debug("No given stopping_decay option given. Use default true");
     }
 
+    if (json_global.find("only_loss_inside_detector") != json_global.end())
+    {
+        if (json_global["only_loss_inside_detector"].is_boolean())
+        {
+            sec_def_global.only_loss_inside_detector = json_global["only_loss_inside_detector"].get<bool>();
+        }
+        else
+        {
+            log_fatal("The given only_loss_inside_detector option is not a bool.");
+        }
+    }
+    else
+    {
+        log_debug("No given only_loss_inside_detector option given. Use default false");
+    }
+
     if (json_global.find("stochastic_loss_weighting") != json_global.end())
     {
         if (json_global["stochastic_loss_weighting"].is_number())
