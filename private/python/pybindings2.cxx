@@ -892,10 +892,10 @@ PYBIND11_MODULE(pyPROPOSAL, m)
                 py::init<double, double>(), 
                 py::arg("ecut"), 
                 py::arg("vcut"), R"pbdoc(
-                    Set the cut values manualy. 
-            
-                    Args: 
-                        ecut (float): static energy cut. 
+                    Set the cut values manualy.
+
+                    Args:
+                        ecut (float): static energy cut.
                         vcut (float): relativ energy cut.
                 )pbdoc")
         .def(py::init<const EnergyCutSettings&>())
@@ -1111,38 +1111,7 @@ PYBIND11_MODULE(pyPROPOSAL, m)
                 &ContinuousRandomizer::Randomize,
                 py::arg("initial_energy"),
                 py::arg("final_energy"),
-                py::arg("rand"),
-                R"pbdoc(
-                    Calculates the stochastical smering of the distribution based on 
-                    the second momentum of the parametrizations, the final and intial 
-                    energy.
-                    
-                    Note:
-                        A normal distribution with uppere defined variance will be 
-                        asumed. The cumulative distibution function has the form:
-                        
-                        .. math::
-                            
-                            \text{cdf}(E) = \frac{1}{2} \left(1 + \text{erf} \left(
-                                \frac{E}{ \sqrt{ 2 \sigma^2 } } \right) \right)
-                        
-                        There will be sampled a deviation form mean energy :math:`a`
-                        between :math:`\text{cdf}(E_\text{i} - E_\text{f})` and 
-                        :math:`\text{cdf}(E_\text{mass} - E_\text{f})` and finaly the 
-                        energy updated.
-
-                        .. math::
-
-                            E_\text{f} = \sigma \cdot a + E_\text{f}
-                    
-                    Args: 
-                        initial_energy (float): energy befor stochastical loss 
-                        final_energy (float): energy after stochastical loss 
-                        rand (float): random number between 0 and 1 
-
-                    Returns:
-                        float: randomized final energy
-                )pbdoc"
+                py::arg("rand")
             );
 
     // --------------------------------------------------------------------- //
@@ -1186,8 +1155,8 @@ PYBIND11_MODULE(pyPROPOSAL, m)
 			&Sector::Propagate, 
 			py::arg("distance"),
 			R"pbdoc(
-                Args: 
-                    distance (float): Distance to propagate in cm.
+				Args:
+					distance (float): Distance to propagate in cm.
 			)pbdoc"
 		)
         .def(
@@ -1274,19 +1243,20 @@ PYBIND11_MODULE(pyPROPOSAL, m)
                 py::arg("max_distance_cm") = 1e20, 
                 py::return_value_policy::reference,
                 R"pbdoc(
-                    Propagate a particle through sectors and produce stochastic
-                    losses, untill propagated distance is reached.
+                    Propagate a particle through sectors and produce stochastic 
+                    losses, untill propagated distance is reached or energy reached 
+                    elow.
 
                     Args:
-                        max_distance_cm (float): Maximum distance a particle is
-                            propagated before it is considered lost.
+                        max_distance_cm (float): Maximum distance a particle is 
+                        propagated before it is considered lost.
 
                     Returns:
                         list(list): list of stochastic losses parameters
                     
                     Example:
-                        Propagate 1000 particle with an inital energy of 100 
-                        Tev and save the losses in daughters.
+                        Propagate 1000 Particle with an inital energy of 100 Tev
+                        and save the losses in daughters.
 
                         >>> for i in range(int(1e3)):
                         >>>   mu.energy = 1e8
@@ -1295,33 +1265,6 @@ PYBIND11_MODULE(pyPROPOSAL, m)
                         >>>   mu.direction = pp.Vector3D(0, 0, -1)
                         >>>   daughters = prop.propagate()
 
-                    Further basic condition are set at the next point of 
-                    interaction during generation.
-                    The aim is to introduce forced stochastic losses
-                    so that the particle can be propagated through homogeneous 
-                    sectors.
-                    A more percise description of propagation through a
-                    homoegenous sector can be found in ???.
-                    
-                    .. figure:: figures/sector.png
-                        :height: 200px
-                        :align: center
-
-                        If the next interaction point is outside the actuell 
-                        sector, the particle is forced to an interaction at the
-                        sector boundary. Thus it can be assumed that the 
-                        particle is porpagated by a homogeneous medium.
-
-                    The propagated particle will be forced to interact in the 
-                    closest point to the dector center. 
-                    This will be stored in the closest_approach variable of 
-                    the propagated particle.
-
-                    The propagation terminate if the maximal distance is 
-                    reached.
-                    The energy loss of the particle (e_lost) in the detector 
-                    will be calculated and the produced secondary particles 
-                    returned.
                 )pbdoc"
             )
         .def_property_readonly(
