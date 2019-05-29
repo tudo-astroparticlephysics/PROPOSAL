@@ -5,6 +5,8 @@
 .. currentmodule:: pyPROPOSAL.particle
 
 .. automodule:: pyPROPOSAL.particle
-   :members:
+   :members: ParticleDef, ParticleDefBuilder, Particle, DynamicData
    :undoc-members:
    :show-inheritance:
+
+
