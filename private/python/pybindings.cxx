@@ -1498,10 +1498,10 @@ PYBIND11_MODULE(pyPROPOSAL, m)
                 py::init<double, double>(), 
                 py::arg("ecut"), 
                 py::arg("vcut"), R"pbdoc(
-                    Set the cut values manualy.
-
-                    Args:
-                        ecut (float): static energy cut.
+                    Set the cut values manualy. 
+            
+                    Args: 
+                        ecut (float): static energy cut. 
                         vcut (float): relativ energy cut.
                 )pbdoc")
         .def(py::init<const EnergyCutSettings&>())
@@ -1792,8 +1792,8 @@ PYBIND11_MODULE(pyPROPOSAL, m)
 			&Sector::Propagate, 
 			py::arg("distance"),
 			R"pbdoc(
-				Args:
-					distance (float): Distance to propagate in cm.
+                Args: 
+                    distance (float): Distance to propagate in cm.
 			)pbdoc"
 		)
         .def(
@@ -1880,20 +1880,19 @@ PYBIND11_MODULE(pyPROPOSAL, m)
                 py::arg("max_distance_cm") = 1e20, 
                 py::return_value_policy::reference,
                 R"pbdoc(
-                    Propagate a particle through sectors and produce stochastic 
-                    losses, untill propagated distance is reached or energy reached 
-                    elow.
+                    Propagate a particle through sectors and produce stochastic
+                    losses, untill propagated distance is reached.
 
                     Args:
-                        max_distance_cm (float): Maximum distance a particle is 
-                        propagated before it is considered lost.
+                        max_distance_cm (float): Maximum distance a particle is
+                            propagated before it is considered lost.
 
                     Returns:
                         list(list): list of stochastic losses parameters
                     
                     Example:
-                        Propagate 1000 Particle with an inital energy of 100 Tev
-                        and save the losses in daughters.
+                        Propagate 1000 particle with an inital energy of 100 
+                        Tev and save the losses in daughters.
 
                         >>> for i in range(int(1e3)):
                         >>>   mu.energy = 1e8
