@@ -1,10 +1,10 @@
-***********************
-``pyPROPOSAL.particle``
-***********************
+********************
+``pyPROPOSAL.decay``
+********************
 
-.. currentmodule:: pyPROPOSAL.particle
+.. currentmodule:: pyPROPOSAL.decay
 
-.. automodule:: pyPROPOSAL.particle
+.. automodule:: pyPROPOSAL.decay
    :members:
    :undoc-members:
    :show-inheritance:
