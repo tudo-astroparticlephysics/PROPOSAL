@@ -66,12 +66,17 @@ public:
     ///
     /// Internally the energy / momentum and direction of the particle
     /// will be set according to the boost.
+    /// The parameters gamma and betagamma are passed to boost
+    /// although it could be described with just one of them
+    /// But this cause problems at high energies
+    /// and passing both variables makes it more numerical stable.
     ///
     /// @param Particle
     /// @param direction
-    /// @param beta = v/c
+    /// @param gamma = E/m
+    /// @param betagamma = beta*gamma = p/m
     // ----------------------------------------------------------------------------
-    static void Boost(Particle&, const Vector3D& direction, double beta);
+    static void Boost(Particle&, const Vector3D& direction, double gamma, double betagamma);
 
     // ----------------------------------------------------------------------------
     /// @brief Boost a set of particles along a direction
@@ -81,9 +86,10 @@ public:
     ///
     /// @param DecayProducts
     /// @param direction
-    /// @param beta = v/c
+    /// @param gamma = E/m
+    /// @param betagamma = beta*gamma = p/m
     // ----------------------------------------------------------------------------
-    static void Boost(DecayProducts&, const Vector3D& direction, double beta);
+    static void Boost(DecayProducts&, const Vector3D& direction, double gamma, double betagamma);
 
     // ----------------------------------------------------------------------------
     /// @brief Calculate the momentum in a two-body-phase-space decay
