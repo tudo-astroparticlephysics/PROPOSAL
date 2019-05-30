@@ -126,7 +126,7 @@ DecayChannel::DecayProducts LeptonicDecayChannelApprox::Decay(const Particle& pa
     double find_root = FindRootBoost(x_min, parent_mass, emax, right_side);
 
     double lepton_energy   = std::max(find_root * emax, massive_lepton_.mass);
-    double lepton_momentum = sqrt(lepton_energy * lepton_energy - massive_lepton_.mass * massive_lepton_.mass);
+    double lepton_momentum = std::sqrt((lepton_energy - massive_lepton_.mass) * (lepton_energy + massive_lepton_.mass));
 
     // Sample directions For the massive letpon
     products[0]->SetDirection(GenerateRandomDirection());
@@ -145,12 +145,14 @@ DecayChannel::DecayProducts LeptonicDecayChannelApprox::Decay(const Particle& pa
     products[2]->SetMomentum(momentum_neutrinos);
 
     // Boost neutrinos to lepton frame
-    double beta = lepton_momentum / energy_neutrinos;
-    Boost(*products[1], products[0]->GetDirection(), -beta);
-    Boost(*products[2], products[0]->GetDirection(), -beta);
+    // double beta = lepton_momentum / energy_neutrinos;
+    double gamma = energy_neutrinos / virtual_mass;
+    double betagamma = -lepton_momentum / virtual_mass;
+    Boost(*products[1], products[0]->GetDirection(), gamma, betagamma);
+    Boost(*products[2], products[0]->GetDirection(), gamma, betagamma);
 
     // Boost all particle in parent frame
-    Boost(products, particle.GetDirection(), particle.GetMomentum() / particle.GetEnergy());
+    Boost(products, particle.GetDirection(), particle.GetEnergy()/particle.GetMass(), particle.GetMomentum()/particle.GetMass());
 
     CopyParticleProperties(products, particle);
 
