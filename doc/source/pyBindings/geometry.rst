@@ -5,6 +5,6 @@
 .. currentmodule:: pyPROPOSAL.geometry
 
 .. automodule:: pyPROPOSAL.geometry
-   :members:
+   :members: Geometry, Sphere, Box, Cylinder
    :undoc-members:
    :show-inheritance:

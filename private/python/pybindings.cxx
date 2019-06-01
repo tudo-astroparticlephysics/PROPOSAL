@@ -803,6 +803,17 @@ void init_geometry(py::module& m)
 {
     py::module m_sub = m.def_submodule("geometry");
 
+    m_sub.doc() = R"pbdoc(
+        Every sector is defined by a specific medium and a geometry.
+        There are three different classes defined to build a mathematical 
+        body. All of them are a object of type :meth:`Geometry`.
+        Besides the information of the shape an object of the class 
+        geometry contains the position relativ to the coordinate origin.
+
+        Based on the position of the geometry, distances of the propagated 
+        particle to geometry sizes can be determined.
+    )pbdoc";
+
     py::enum_<GeometryFactory::Enum>(m_sub, "Shape")
         .value("Sphere", GeometryFactory::Sphere)
         .value("Box", GeometryFactory::Box)
@@ -810,47 +821,246 @@ void init_geometry(py::module& m)
 
     py::class_<GeometryFactory::Definition, std::shared_ptr<GeometryFactory::Definition>>(m_sub, "GeometryDefinition")
         .def(py::init<>())
-        .def_readwrite("shape", &GeometryFactory::Definition::shape)
-        .def_readwrite("position", &GeometryFactory::Definition::position)
-        .def_readwrite("inner_radius", &GeometryFactory::Definition::inner_radius)
-        .def_readwrite("outer_radius", &GeometryFactory::Definition::radius)
-        .def_readwrite("width", &GeometryFactory::Definition::width)
-        .def_readwrite("height", &GeometryFactory::Definition::height)
-        .def_readwrite("depth", &GeometryFactory::Definition::depth);
+        .def_readwrite(
+            "shape", 
+            &GeometryFactory::Definition::shape,
+            R"pbdoc(
+                type of shape of the geometry.
+            )pbdoc"
+        )
+        .def_readwrite(
+            "position", 
+            &GeometryFactory::Definition::position,
+            R"pbdoc(
+                position relativ to the coordinates origin.
+            )pbdoc"
+        )
+        .def_readwrite(
+            "inner_radius", 
+            &GeometryFactory::Definition::inner_radius,
+            R"pbdoc(
+                inner radius of type :meth:`Sphere`
+            )pbdoc"
+        )
+        .def_readwrite(
+            "outer_radius", 
+            &GeometryFactory::Definition::radius,
+            R"pbdoc(
+                inner radius of type :meth:`Sphere`
+            )pbdoc"
+        )
+        .def_readwrite(
+            "width", 
+            &GeometryFactory::Definition::width,
+            R"pbdoc(
+                width of type :meth:`Box`
+            )pbdoc"
+        )
+        .def_readwrite(
+            "height", 
+            &GeometryFactory::Definition::height,
+            R"pbdoc(
+                height of type :meth:`Box`
+            )pbdoc"
+        )
+        .def_readwrite(
+            "depth", 
+            &GeometryFactory::Definition::depth,
+            R"pbdoc(
+                depth of type :meth:`Box`
+            )pbdoc"
+        );
 
     py::class_<Geometry, std::shared_ptr<Geometry>>(m_sub, "Geometry")
         DEF_PY_PRINT(Geometry)
-        .def("is_infront", &Geometry::IsInfront)
-        .def("is_inside", &Geometry::IsInside)
-        .def("is_behind", &Geometry::IsBehind)
-        .def("distance_to_border", &Geometry::DistanceToBorder)
-        .def("distance_to_closet_approach", &Geometry::DistanceToClosestApproach)
-        .def_property_readonly("name", &Geometry::GetName)
-        .def_property("position", &Geometry::GetPosition, &Geometry::SetPosition)
-        .def_property("hierarchy", &Geometry::GetHierarchy, &Geometry::SetHierarchy);
+        .def(
+            "is_infront", 
+            &Geometry::IsInfront,
+            R"pbdoc(
+                Check if particle is in fron of the geometry.
+
+                Parameters:
+                    arg0 (Vector3D): particle position
+                    arg1 (Vector3D): particle direction
+
+                Return:
+                    bool: Is particle in front of the geometry?
+            )pbdoc"
+        )
+        .def(
+            "is_inside", 
+            &Geometry::IsInside,
+            R"pbdoc(
+                Check if particle is in the geometry.
+
+                Parameters:
+                    arg0 (Vector3D): particle position
+                    arg1 (Vector3D): particle direction
+
+                Return:
+                    bool: Is particle in the geometry?
+            )pbdoc"
+        )
+        .def(
+            "is_behind", 
+            &Geometry::IsBehind,
+            R"pbdoc(
+                Check if particle has passed the geometry.
+
+                Parameters:
+                    arg0 (Vector3D): particle position
+                    arg1 (Vector3D): particle direction
+
+                Return:
+                    bool: Is particle in front of the geometry?
+            )pbdoc"
+        )
+        .def(
+            "distance_to_border", 
+            &Geometry::DistanceToBorder,
+            py::arg("position"),
+            py::arg("direction"),
+            R"pbdoc(
+                Calculates in dependence of the particle position and direction 
+                the distance to the next border 
+
+                Parameters:
+                    position (Vector3D): particle position
+                    direction (Vector3D): particle direction
+
+                Return:
+                    float: distance to border
+            )pbdoc"
+        )
+        .def(
+            "distance_to_closet_approach", 
+            &Geometry::DistanceToClosestApproach,
+            R"pbdoc(
+                Calculates in dependence of the particle position and direction 
+                the distance where the particle pass the geometry center with 
+                minimal distance.
+
+                Parameters:
+                    arg0 (Vector3D): particle position
+                    arg1 (Vector3D): particle direction
+
+                Return:
+                    float: distance to closest approach
+            )pbdoc"
+        )
+        .def_property_readonly(
+            "name", 
+            &Geometry::GetName,
+            R"pbdoc(
+                name of the geometry
+            )pbdoc"
+        )
+        .def_property(
+            "position", 
+            &Geometry::GetPosition, 
+            &Geometry::SetPosition,
+            R"pbdoc(
+                position of the geometry center.
+            )pbdoc"
+        )
+        .def_property(
+            "hierarchy", 
+            &Geometry::GetHierarchy, 
+            &Geometry::SetHierarchy,
+            R"pbdoc(
+                hierachy of the geometry. If sectors overlap, the sector 
+                with the highest hierachy will be selected.
+            )pbdoc"
+        );
 
     py::class_<Sphere, std::shared_ptr<Sphere>, Geometry>(m_sub, "Sphere")
         .def(py::init<>())
         .def(py::init<Vector3D, double, double>())
         .def(py::init<const Sphere&>())
-        .def_property("inner_radius", &Sphere::GetInnerRadius, &Sphere::SetInnerRadius)
-        .def_property("radius", &Sphere::GetRadius, &Sphere::SetRadius);
+        .def_property(
+            "inner_radius", 
+            &Sphere::GetInnerRadius, 
+            &Sphere::SetInnerRadius,
+            R"pbdoc(
+                inner radius of the sphere
+            )pbdoc"
+        )
+        .def_property(
+            "radius", 
+            &Sphere::GetRadius, 
+            &Sphere::SetRadius,
+            R"pbdoc(
+                outer radius of the sphere
+            )pbdoc"
+        );
 
     py::class_<Box, std::shared_ptr<Box>, Geometry>(m_sub, "Box")
         .def(py::init<>())
         .def(py::init<Vector3D, double, double, double>())
         .def(py::init<const Box&>())
-        .def_property("width", &Box::GetX, &Box::SetX)
-        .def_property("height", &Box::GetY, &Box::SetY)
-        .def_property("depth", &Box::GetZ, &Box::SetZ);
+        .def_property(
+            "width", 
+            &Box::GetX, 
+            &Box::SetX,
+            R"pbdoc(
+                width of the box (x-axis)
+            )pbdoc"
+        )
+        .def_property(
+            "height", 
+            &Box::GetY, 
+            &Box::SetY,
+            R"pbdoc(
+                height of the box (y-axis)
+            )pbdoc"
+        )
+        .def_property(
+            "depth", 
+            &Box::GetZ, 
+            &Box::SetZ,
+            R"pbdoc(
+                depth of the box (z-axis)
+            )pbdoc"
+            );
 
-    py::class_<Cylinder, std::shared_ptr<Cylinder>, Geometry>(m_sub, "Cylinder")
+    py::class_<Cylinder, std::shared_ptr<Cylinder>, Geometry>(
+            m_sub, 
+            "Cylinder",
+            R"pbdoc(
+                A cylinder can be created as a hollow cylinder.
+                For this purpose, a corresponding radius must be 
+                selected for the bore along the main axis. A 
+                cylinder without a bore is equal to a bore radius 
+                equal to zero.
+            )pbdoc"
+        )
         .def(py::init<>())
         .def(py::init<Vector3D, double, double, double>())
         .def(py::init<const Cylinder&>())
-        .def_property("inner_radius", &Cylinder::GetInnerRadius, &Cylinder::SetInnerRadius)
-        .def_property("radius", &Cylinder::GetRadius, &Cylinder::SetRadius)
-        .def_property("height", &Cylinder::GetZ, &Cylinder::SetZ);
+        .def_property(
+            "inner_radius", 
+            &Cylinder::GetInnerRadius, 
+            &Cylinder::SetInnerRadius,
+            R"pbdoc(
+                the inner radius of the bore through the main axis
+                of the cylinder
+            )pbdoc"
+        )
+        .def_property(
+            "radius", 
+            &Cylinder::GetRadius, 
+            &Cylinder::SetRadius,
+            R"pbdoc(
+                radius of outer shell of the cylinder 
+            )pbdoc"
+        )
+        .def_property(
+            "height", &Cylinder::GetZ, 
+            &Cylinder::SetZ,
+            R"pbdoc(
+                height of the cylinder
+            )pbdoc"
+        );
 }
 
 void init_parametrization(py::module& m)
