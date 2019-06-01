@@ -753,7 +753,7 @@ void init_particle(py::module& m)
             &Particle::GetElost, 
             &Particle::SetElost,
             R"pbdoc(
-                Energy primary particle lost in detector.
+                Energy primary particle lost in detector...
             )pbdoc"
         );
 }
