@@ -1972,20 +1972,138 @@ PYBIND11_MODULE(pyPROPOSAL, m)
         .value("inside_detector", Sector::ParticleLocation::InsideDetector)
         .value("behind_detector", Sector::ParticleLocation::BehindDetector);
 
-    py::class_<Sector::Definition, std::shared_ptr<Sector::Definition> >(m, "SectorDefinition")
+    py::class_<Sector::Definition, std::shared_ptr<Sector::Definition> >(
+            m, 
+            "SectorDefinition",
+            R"pbdoc(
+                Sector definition is a container that collects all important 
+                settings for propagation through a sector. There could for 
+                example specify the used cross sections or the energy cut 
+                settings.
+
+                An example for multiple SectorDefinitions is the standard 
+                implementation of propagation. Three sectors are generated,
+                which differ in the energy cut settings, to reduce computing 
+                power without a measurable loss of accuracy. Infront of the 
+                detector energy cut will be like :math:`v_\text{cut} = 0.05`.
+                Inside the detector the energy cut :math:`e_\text{cut} = 500 
+                \text{MeV}` is chosen so that particles below the detector 
+                resolution are statistically sampled. Outside of the detector no
+                cuts are made to find a decay point of the particle in first 
+                approximation.
+            )pbdoc"
+            )
         .def(py::init<>())
-        .def_readwrite("cut_settings", &Sector::Definition::cut_settings)
-        .def_property("medium", &Sector::Definition::GetMedium, &Sector::Definition::SetMedium)
-        .def_property("geometry", &Sector::Definition::GetGeometry, &Sector::Definition::SetGeometry)
-        .def_readwrite("do_stochastic_loss_weighting", &Sector::Definition::do_stochastic_loss_weighting)
-        .def_readwrite("stochastic_loss_weighting", &Sector::Definition::stochastic_loss_weighting)
-        .def_readwrite("stopping_decay", &Sector::Definition::stopping_decay)
-        .def_readwrite("do_continuous_randomization", &Sector::Definition::do_continuous_randomization)
-        .def_readwrite("do_continuous_energy_loss_output", &Sector::Definition::do_continuous_energy_loss_output)
-        .def_readwrite("do_exact_time_calculation", &Sector::Definition::do_exact_time_calculation)
-        .def_readwrite("scattering_model", &Sector::Definition::scattering_model)
-        .def_readwrite("particle_location", &Sector::Definition::location)
-        .def_readwrite("crosssection_defs", &Sector::Definition::utility_def);
+        .def_readwrite(
+                "cut_settings", 
+                &Sector::Definition::cut_settings,
+                R"pbdoc(
+                    Definition of the :meth:`EnergyCutSettings`
+                )pbdoc"
+        )
+        .def_property(
+                "medium", 
+                &Sector::Definition::GetMedium, 
+                &Sector::Definition::SetMedium,
+                R"pbdoc(
+                    Definition of the :meth:`~pyPROPOSAL.medium.Medium`
+                )pbdoc"
+        )
+        .def_property(
+                "geometry", 
+                &Sector::Definition::GetGeometry, 
+                &Sector::Definition::SetGeometry,
+                R"pbdoc(
+                    Definiton of the :meth:`~pyPROPOSAL.geometry.Geometry`
+                )pbdoc"
+        )
+        .def_readwrite(
+                "do_stochastic_loss_weighting", 
+                &Sector::Definition::do_stochastic_loss_weighting,
+                R"pbdoc(
+                    Boolean value whether the probability of producing a 
+                    stochastic loss should be adjusted with a factor, 
+                    defaults to False.
+                )pbdoc"
+        )
+        .def_readwrite(
+                "stochastic_loss_weighting", 
+                &Sector::Definition::stochastic_loss_weighting,
+                R"pbdoc(
+                    Factor used to scale the probability of producing a 
+                    stochastic loss, defaults to 1.0.
+                )pbdoc"
+        )
+        .def_readwrite(
+                "stopping_decay", 
+                &Sector::Definition::stopping_decay,
+                R"pbdoc(
+                    
+                )pbdoc"
+        )
+        .def_readwrite(
+                "do_continuous_randomization", 
+                &Sector::Definition::do_continuous_randomization,
+                R"pbdoc(
+                    Boolean if continous randomization should be done if 
+                    interpolation if is used, defaults to true.
+                )pbdoc"
+        )
+        .def_readwrite(
+                "do_continuous_energy_loss_output", 
+                &Sector::Definition::do_continuous_energy_loss_output,
+                R"pbdoc(
+                    
+                )pbdoc"
+        )
+        .def_readwrite(
+                "do_exact_time_calculation", 
+                &Sector::Definition::do_exact_time_calculation,
+                R"pbdoc(
+                    Boolean if particle speed could be approach by the speed 
+                    of light or should be calculated by solving the track 
+                    integral, defaults to false.
+
+                    If the energy is in the order of the rest energy of the 
+                    particle, the assumption that the particle moves at the 
+                    speed of light becomes increasingly worse. Than it make 
+                    sense to calculate the time integral.
+
+                    .. math::
+                            
+                            t_\text{f} = t_\text{i} + \int_{x_\text{i}}^{x_\text{f}} 
+                                \frac{ \text{dx} }{ v(x) }
+                )pbdoc"
+        )
+        .def_readwrite(
+                "scattering_model", 
+                &Sector::Definition::scattering_model,
+                R"pbdoc(
+                    Definition of the scattering modell of type :meth:`~pyPROPOSAL.scattering.ScatteringModel`
+                    or deactivate scattering.
+
+                    Example:
+                        Deactivating scattering can be achieved with:
+
+                        >>> sec = pyPROPOSAL.SectorDefinition()
+                        >>> sec.scattering_model = pyPROPOSAL.scattering.ScatteringModel.NoScattering
+                )pbdoc"
+        )
+        .def_readwrite(
+                "particle_location", 
+                &Sector::Definition::location,
+                R"pbdoc(
+                    Definition of the relationship of the sectors to each 
+                    other of type :meth:`ParticleLocation`.
+                )pbdoc"
+        )
+        .def_readwrite(
+                "crosssection_defs", 
+                &Sector::Definition::utility_def,
+                R"pbdoc(
+                    Definition of the crosssection of type :meth:`~pyPROPOSAL.UtilityDefinition`
+                )pbdoc"
+        );
 
     // --------------------------------------------------------------------- //
     // Sector
@@ -2147,7 +2265,7 @@ PYBIND11_MODULE(pyPROPOSAL, m)
                     Get the internal created particle to modify its properties.
 
                     Returns:
-                        particleDef: definition of the propagated particle.
+                        ParticleDef: definition of the propagated particle.
                 )pbdoc"
             )
         .def_property_readonly(
@@ -2157,7 +2275,7 @@ PYBIND11_MODULE(pyPROPOSAL, m)
                     Get the detector geometry.
 
                     Returns:
-                        sector: definition of the sector.
+                        SectorDefinition: definition of the sector.
                 )pbdoc"
             );
 
