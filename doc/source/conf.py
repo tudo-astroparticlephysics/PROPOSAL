@@ -164,6 +164,8 @@ texinfo_documents = [
 
 napoleon_google_docstring = True
 napoleon_include_init_with_doc = True
+napoleon_use_keyword = True
+napoleon_use_param = True
 napoleon_use_rtype = False
 napoleon_use_admonition_for_examples = True
 # autodoc_docstring_signature=False
