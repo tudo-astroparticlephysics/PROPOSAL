@@ -2378,7 +2378,8 @@ PYBIND11_MODULE(pyPROPOSAL, m)
     // --------------------------------------------------------------------- //
 
     py::class_<Sector, std::shared_ptr<Sector> >(m, "Sector",R"pbdoc(
-			A sector is specified by his homogeneous medium and the same EnergyCutSettings.
+            A sector is characterized by its homogeneous attitudes. 
+            Within a sector there are no boundaries to consider.
 		)pbdoc")
         .def(py::init<Particle&, const Sector::Definition&>(), py::arg("particle"), py::arg("sector_definition"))
         .def(py::init<Particle&, const Sector::Definition&, const InterpolationDef&>(),
@@ -2390,6 +2391,9 @@ PYBIND11_MODULE(pyPROPOSAL, m)
 			R"pbdoc(
                 Args: 
                     distance (float): Distance to propagate in cm.
+
+                Returns:
+                    float: if the value is positive, the energy after the propagated distance. If negativ the propagated distance is return with a minus sign.
 			)pbdoc"
 		)
         .def(
@@ -2397,11 +2401,13 @@ PYBIND11_MODULE(pyPROPOSAL, m)
 			&Sector::CalculateEnergyTillStochastic, 
 			py::arg("initial_energy"),
 			R"pbdoc(
-				Calculates the continous losses from last to current stochastic 
-				loss.
+                Samples the energy up to the next stochastic loss. 
 
-				Args:
-					initial_energy (float): Energy in MeV.
+                Args:
+                    initial_energy (float): Energy in MeV.
+
+                Returns:
+                    tuple: (next stochastic energy, decay energy) 
 			)pbdoc"
 		)
         .def(
@@ -2409,7 +2415,14 @@ PYBIND11_MODULE(pyPROPOSAL, m)
 			&Sector::MakeStochasticLoss, 
 			py::arg("particle_energy"),
 			R"pbdoc(
-				
+                Samples the stochastic loss.
+			
+                Args:
+                    particle_energy (float): Energy of the propagated 
+                        particle.
+
+                Returns:
+                    tuple: (energy loss, interaction type)
 			)pbdoc"
 		)
         .def_property_readonly(
@@ -2419,7 +2432,7 @@ PYBIND11_MODULE(pyPROPOSAL, m)
 				Get the internal created particle to modify its properties
 				
 				Return:
-					particle (Particle): propagated Particle
+					Particle: propagated Particle
 			)pbdoc"
 		);
 
