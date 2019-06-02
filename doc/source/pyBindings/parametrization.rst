@@ -58,3 +58,13 @@
 .. automodule:: pyPROPOSAL.parametrization.ionization
    :members: Ionization
    :show-inheritance:
+
+-----------------------------------------
+``pyPROPOSAL.parametrization.photonuclear``
+-----------------------------------------
+
+.. currentmodule:: pyPROPOSAL.parametrization.photonuclear
+
+.. automodule:: pyPROPOSAL.parametrization.photonuclear
+   :members: PhotoRealPhotonAssumption, PhotoQ2Integral, ShadowEffect
+   :show-inheritance:

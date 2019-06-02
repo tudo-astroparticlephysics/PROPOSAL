@@ -753,6 +753,7 @@ void init_particle(py::module& m)
             &Particle::GetElost, 
             &Particle::SetElost,
             R"pbdoc(
+                Energy primary particle lost in detector.
                 Energy primary particle lost in detector...
             )pbdoc"
         );
@@ -1072,13 +1073,11 @@ void init_parametrization(py::module& m)
         .def(py::init<>())
         .def_readwrite("v_max", &Parametrization::IntegralLimits::vMax,
             R"pbdoc(
-            Upper integration limit of v for the current parametrization set by the user, see :meth:`~pyPROPOSAL.EnergyCutSettings` for more
-            information on the energy cut settings.
+            Highest physical possible v for the current parametrization.
             )pbdoc")
         .def_readwrite("v_up", &Parametrization::IntegralLimits::vUp,
             R"pbdoc(
-            Lower integration limit of v for the current parametrization. This corresponds to the minimum of v either set by the user or 
-            by :meth:`~pyPROPOSAL.parametrization.IntegralLimits.v_min`
+            Energy cut set by the user via the cut settings. Can be energy dependent. Used to differentiate between continous and stochastic losses.
 
             See :meth:`~pyPROPOSAL.EnergyCutSettings` for more information on the energy cut settings.
             )pbdoc")
@@ -1269,9 +1268,9 @@ void init_parametrization(py::module& m)
             Example:
                 To create a bremsstrahlung parametrization
 
-                >>> mu = pp.particle.MuMinusDef.get()
-                >>> medium = pp.medium.StandardRock(1.0)
-                >>> cuts = pp.EnergyCutSettings(-1, -1)
+                >>> mu = pyPROPOSAL.particle.MuMinusDef.get()
+                >>> medium = pyPROPOSAL.medium.StandardRock(1.0)
+                >>> cuts = pyPROPOSAL.EnergyCutSettings(-1, -1)
                 >>> param = pyPROPOSAL.parametrization.bremsstrahlung.SandrockSoedingreksoRhode(mu, medium, cuts, 1.0, False)
                 )pbdoc"
         );
@@ -1310,7 +1309,11 @@ void init_parametrization(py::module& m)
                 medium (:meth:`~pyPROPOSAL.medium`): includes all medium information for the parametrization such as densities or nucleon charges                                   
                 energy_cuts (:meth:`~pyPROPOSAL.EnergyCutSettings`): energy cut setting for the parametrization
                 multiplier (double): Use a multiplicative factor for the differential crosssection. Can be used for testing or other studies                                                            
-                lpm_effect (bool): Enable or disable the corrections due to the Ter-Mikaelian and Landau-Pomeranchuk effect.                                                                                            
+                lpm_effect (bool): Enable or disable the corrections due to the Ter-Mikaelian and Landau-Pomeranchuk effect.  
+                interpolation_def (:meth:`~pyPROPOSAL.InterpolationDef`): Only needed by Interpolant parametrizations. Includes settings for the interpolation                                    
+                                                                                          
+            Since the differential cross section is given in :math:`\rho` as well, an intergration over this parameter is needed.
+            When using the interpolation_def parameter, this integration is saved in interpolation tables (improving the performance of the calculation with neglible decline in accuracy).
 
             The following parametrizations are currently implemented:
 
@@ -1318,12 +1321,16 @@ void init_parametrization(py::module& m)
 
             * SandrockSoedingreksoRhode
 
+            * KelnerKokoulinPetrukhinInterpolant
+
+            * SandrockSoedingreksoRhodeInterpolant
+
             Example:
                 To create a electron pair production parametrization
 
-                >>> mu = pp.particle.MuMinusDef.get()
-                >>> medium = pp.medium.StandardRock(1.0)
-                >>> cuts = pp.EnergyCutSettings(-1, -1)
+                >>> mu = pyPROPOSAL.particle.MuMinusDef.get()
+                >>> medium = pyPROPOSAL.medium.StandardRock(1.0)
+                >>> cuts = pyPROPOSAL.EnergyCutSettings(-1, -1)
                 >>> param = pyPROPOSAL.parametrization.pairproduction.SandrockSoedingreksoRhode(mu, medium, cuts, 1.0, False)
                 )pbdoc");
 
@@ -1360,18 +1367,24 @@ void init_parametrization(py::module& m)
                 particle_def (:meth:`~pyPROPOSAL.particle.ParticleDef`): includes all static particle information for the parametrization such as mass, charge, etc.
                 medium (:meth:`~pyPROPOSAL.medium`): includes all medium information for the parametrization such as densities or nucleon charges                                   
                 energy_cuts (:meth:`~pyPROPOSAL.EnergyCutSettings`): energy cut setting for the parametrization
-                multiplier (double): Use a multiplicative factor for the differential crosssection. Can be used for testing or other studies                                                            
+                multiplier (double): Use a multiplicative factor for the differential crosssection. Can be used for testing or other studies   
+                interpolation_def (:meth:`~pyPROPOSAL.InterpolationDef`): Only needed by Interpolant parametrizations. Includes settings for the interpolation                                    
+                                                                                          
+            Since the differential cross section is given in :math:`\rho` as well, an intergration over this parameter is needed.
+            When using the interpolation_def parameter, this integration is saved in interpolation tables (improving the performance of the calculation with neglible decline in accuracy).                                                         
 
             The following parametrizations are currently implemented:
 
             * KelnerKokoulinPetrukhin
 
+            * KelnerKokoulinPetrukhinInterpolant
+
             Example:
                 To create a muon pair production parametrization
 
-                >>> mu = pp.particle.MuMinusDef.get()
-                >>> medium = pp.medium.StandardRock(1.0)
-                >>> cuts = pp.EnergyCutSettings(-1, -1)
+                >>> mu = pyPROPOSAL.particle.MuMinusDef.get()
+                >>> medium = pyPROPOSAL.medium.StandardRock(1.0)
+                >>> cuts = pyPROPOSAL.EnergyCutSettings(-1, -1)
                 >>> param = pyPROPOSAL.parametrization.mupairproduction.KelnerKokoulinPetrukhin(mu, medium, cuts, 1.0)
                 )pbdoc")
             .def("Calculaterho", &MupairProduction::Calculaterho,
@@ -1440,8 +1453,8 @@ void init_parametrization(py::module& m)
             Example:
                 To create a weak interaction parametrization
 
-                >>> mu = pp.particle.MuMinusDef.get()
-                >>> medium = pp.medium.StandardRock(1.0)
+                >>> mu = pyPROPOSAL.particle.MuMinusDef.get()
+                >>> medium = pyPROPOSAL.medium.StandardRock(1.0)
                 >>> param = pyPROPOSAL.parametrization.weakinteraction.WeakCooperSarkarMertsch(mu, medium, 1.0)
                 )pbdoc");
 
@@ -1470,9 +1483,36 @@ void init_parametrization(py::module& m)
     py::class_<Photonuclear, std::shared_ptr<Photonuclear>, Parametrization>(m_sub_photo, "Photonuclear");
 
     // Shadow Effect
-    py::class_<ShadowEffect, std::shared_ptr<ShadowEffect>>(m_sub_photo, "ShadowEffect")
-        .def("calculate_shadow_effect", &ShadowEffect::CalculateShadowEffect)
-        .def_property_readonly("name", &ShadowEffect::GetName);
+    py::class_<ShadowEffect, std::shared_ptr<ShadowEffect>>(m_sub_photo, "ShadowEffect",
+                R"pbdoc( 
+
+            Virtual class for the parametrizations of the ShadowEffect used in the photonuclear interaction calculations.
+            The nucleon shadowing describes the difference in the crosssection between the interaction of a photon with the whole nucleon compared to the interaction of a photon
+            with a single nucleon (multplied by the number of nucleons in the atom). In general, the latter cross section in bigger than the real, measured crosssection, therefore
+            this effect is called shadowing.
+                                                     
+            The following parametrizations are currently implemented:
+
+            * ShadowButkevichMikhailov
+
+            * ShadowDuttaRenoSarcevicSeckel
+
+                )pbdoc")
+        .def("calculate_shadow_effect", &ShadowEffect::CalculateShadowEffect,
+                R"pbdoc( 
+
+            Calculate the shadow effect independently
+
+            Args:                                                                                                  
+                Component (:meth:`~pyPROPOSAL.component`): Component to calculate the shadow effect
+                x (float): Bjorken x                                
+                nu (float): Fraction of energy transfered from the particle via the photon
+                                                            
+                )pbdoc")
+        .def_property_readonly("name", &ShadowEffect::GetName,
+                R"pbdoc( 
+            Return the name of the current parametrization of the shadow effect                                     
+                )pbdoc");
 
     py::class_<ShadowDuttaRenoSarcevicSeckel, std::shared_ptr<ShadowDuttaRenoSarcevicSeckel>, ShadowEffect>(
         m_sub_photo, "ShadowDuttaRenoSarcevicSeckel")
@@ -1493,8 +1533,82 @@ void init_parametrization(py::module& m)
         "HardComponent")
         .def(py::init<const ParticleDef&>(),py::arg("particle_def"));
 
-    py::class_<PhotoRealPhotonAssumption, std::shared_ptr<PhotoRealPhotonAssumption>, Photonuclear>(m_sub_photo, "PhotoRealPhotonAssumption");
-    py::class_<PhotoQ2Integral, std::shared_ptr<PhotoQ2Integral>, Photonuclear>(m_sub_photo, "PhotoQ2Integral");
+    py::class_<PhotoRealPhotonAssumption, std::shared_ptr<PhotoRealPhotonAssumption>, Photonuclear>(m_sub_photo, "PhotoRealPhotonAssumption",
+                R"pbdoc( 
+
+            Virtual class for the parametrizations of photonuclear interaction. They can be initialized by using one of the given parametrizations with the following parameters
+
+            Args:                                                                                                  
+                particle_def (:meth:`~pyPROPOSAL.particle.ParticleDef`): includes all static particle information for the parametrization such as mass, charge, etc.
+                medium (:meth:`~pyPROPOSAL.medium`): includes all medium information for the parametrization such as densities or nucleon charges                                   
+                energy_cuts (:meth:`~pyPROPOSAL.EnergyCutSettings`): energy cut setting for the parametrization
+                multiplier (double): Use a multiplicative factor for the differential crosssection. Can be used for testing or other studies               
+                hard_component (bool): Enabling or disabling the calculation of the hard component
+                                                            
+            The following parametrizations are currently implemented:
+
+            * Zeus
+
+            * BezrukovBugaev
+
+            * Kokoulin
+
+            * Rhode
+
+            Example:
+                To create a photonuclear parametrization
+
+                >>> mu = pyPROPOSAL.particle.MuMinusDef.get()
+                >>> medium = pyPROPOSAL.medium.StandardRock(1.0)
+                >>> cuts = pyPROPOSAL.EnergyCutSettings(-1, -1)
+                >>> param = pyPROPOSAL.parametrization.photonuclear.Rhode(mu, medium, cuts, 1.0, True)
+                )pbdoc");
+    py::class_<PhotoQ2Integral, std::shared_ptr<PhotoQ2Integral>, Photonuclear>(m_sub_photo, "PhotoQ2Integral",
+                R"pbdoc( 
+
+            Virtual class for the parametrizations of photonuclear interaction. They can be initialized by using one of the given parametrizations with the following parameters
+
+            Args:                                                                                                  
+                particle_def (:meth:`~pyPROPOSAL.particle.ParticleDef`): includes all static particle information for the parametrization such as mass, charge, etc.
+                medium (:meth:`~pyPROPOSAL.medium`): includes all medium information for the parametrization such as densities or nucleon charges                                   
+                energy_cuts (:meth:`~pyPROPOSAL.EnergyCutSettings`): energy cut setting for the parametrization
+                multiplier (double): Use a multiplicative factor for the differential crosssection. Can be used for testing or other studies               
+                ShadowEffect (:meth:`~pyPROPOSAL.parametrization.photonuclear.ShadowEffect`): Parametrization of the ShadowEffect to be used    
+                InterpolationDef (:meth:`~pyPROPOSAL.InterpolationDef`): Only needed by Interpolant parametrizations. Includes settings for the interpolation    
+ 
+
+                                                            
+            This virtual class includes all photonuclear interactions where the differential crossection in given in :math:`Q^2`.
+            The following parametrizations are currently implemented:
+
+            * AbramowiczLevinLevyMaor91
+
+            * AbramowiczLevinLevyMaor97
+
+            * ButkevichMikhailov
+
+            * RenoSarcevicSu
+
+            * AbramowiczLevinLevyMaor91Interpolant
+
+            * AbramowiczLevinLevyMaor97Interpolant
+
+            * ButkevichMikhailovInterpolant
+
+            * RenoSarcevicSuInterpolant
+
+            The parametrization with "Interpolant" as a suffix creates an interpolation table for the :math:`Q^2` integration, which improved the perfomance.
+
+            Example:
+                To create a photonuclear parametrization
+
+                >>> mu = pyPROPOSAL.particle.MuMinusDef.get()
+                >>> medium = pyPROPOSAL.medium.StandardRock(1.0)
+                >>> cuts = pyPROPOSAL.EnergyCutSettings(-1, -1)
+                >>> shadow = pyPROPOSAL.parametrization.photonuclear.ShadowButkevichMikhailov()
+                >>> interpol = pyPROPOSAL.InterpolationDef
+                >>> param = pyPROPOSAL.parametrization.photonuclear.RenoSarcevicSuInterpolant(mu, medium, cuts, 1.0, shadow, interpol)
+                )pbdoc");
 
     PHOTO_REAL_DEF(m_sub_photo, Zeus, RealPhotonAssumption)
     PHOTO_REAL_DEF(m_sub_photo, BezrukovBugaev, RealPhotonAssumption)
@@ -1572,16 +1686,170 @@ void init_crosssection(py::module& m)
 {
     py::module m_sub = m.def_submodule("crosssection");
 
-    py::class_<CrossSection, std::shared_ptr<CrossSection>>(m_sub, "CrossSection")
+    py::class_<CrossSection, std::shared_ptr<CrossSection>>(m_sub, "CrossSection",
+                R"pbdoc( 
+
+            Virtual class for crosssections. The crosssection class provides all mathematical methods to process the theoretical, differential crosssections that are
+            given by the parametrizations. A cross section class can be initialized with the following parameters
+
+            Args:                                                                                                  
+                param (:meth:`~pyPROPOSAL.parametrization`): parametrization for the crosssection, including the chosen theoretical model
+                interpolation_def (:meth:`~pyPROPOSAL.InterpolationDef`): Only needed by Interpolant parametrizations. Includes settings for the interpolation                                    
+ 
+            The crosssection class can either work with interpolation tables or with exact intergration for every single calculation.
+            Since the usage of interpolation tables can improve the speed of the propagation by several orders of magnitude (with neglible decline in accuracy) it is highly recommended
+            to use the interpolation methods.
+                                                            
+            There are specific crosssection classes for every interaction that can be used. 
+
+            * BremsIntegral / BremsInterpolant
+
+            * EpairIntegral / EpairInterpolant
+
+            * IonizIntegral / IonizInterpolant
+
+            * MupairIntegral / MupairInterpolant
+
+            * PhotoIntegral / PhotoInterpolant
+
+            * WeakIntegral / WeakInterpolant
+
+            Example:
+                To create a bremsstrahlung CrossSection
+
+                >>> mu = pyPROPOSAL.particle.MuMinusDef.get()
+                >>> medium = pyPROPOSAL.medium.StandardRock(1.0)
+                >>> cuts = pyPROPOSAL.EnergyCutSettings(-1, -1)
+                >>> interpol = pyPROPOSAL.InterpolationDef
+                >>> param = pyPROPOSAL.parametrization.bremsstrahlung.SandrockSoedingreksoRhode(mu, medium, cuts, 1.0, False)
+                >>> cross = pyPROPOSAL.crosssection.BremsInterpolant(param, interpol)
+                >>> cross.calculate_dEdx(1e6) # exmaple usage of the created crosssection class...
+                )pbdoc")
         DEF_PY_PRINT(CrossSection)
-        .def("calculate_dEdx", &CrossSection::CalculatedEdx)
-        .def("calculate_dE2dx", &CrossSection::CalculatedE2dx)
-        .def("calculate_dNdx", (double (CrossSection::*)(double))&CrossSection::CalculatedNdx)
-        .def("calculate_dNdx_rnd", (double (CrossSection::*)(double, double))&CrossSection::CalculatedNdx)
-        .def("calculate_stochastic_loss", (double (CrossSection::*)(double, double, double))&CrossSection::CalculateStochasticLoss)
-        .def("calculate_produced_particles", &CrossSection::CalculateProducedParticles)
-        .def_property_readonly("id", &CrossSection::GetTypeId)
-        .def_property_readonly("parametrization", &CrossSection::GetParametrization);
+        .def("calculate_dEdx", &CrossSection::CalculatedEdx,
+            py::arg("energy"),
+                R"pbdoc( 
+
+            Calculates the continous energy loss :math:`\langle \frac{dE}{dx} \rangle`, which equals to
+
+                .. math:: \frac{N_A}{A} \cdot E \cdot \int_{v_{min}}^{v_{cut}} v \cdot \frac{d\sigma}{dv} dv
+
+            with the particle energy E, the relative energy loss v and the crosssection :math:`\sigma`. The value :math:`v_{cut}` is the energy cut to differentiate between
+            continous and stochastic losses in PROPOSAL, see :meth:`~pyPROPOSAL.EnergyCutSettings` for more information on the energy cuts.
+
+            Args:                                                                                                  
+                energy (float): energy in MeV
+                                                            
+                )pbdoc")
+        .def("calculate_dE2dx", &CrossSection::CalculatedE2dx,
+            py::arg("energy"),
+                R"pbdoc( 
+
+            Calculates the value
+
+                .. math:: \frac{N_A}{A} \cdot E^2 \cdot \int_{v_{min}}^{v_{cut}} v^2 \cdot \frac{d\sigma}{dv} dv
+
+            with the particle energy E, the relative energy loss v and the crosssection :math:`\sigma`. The value :math:`v_{cut}` is the energy cut to differentiate between
+            continous and stochastic losses in PROPOSAL, see :meth:`~pyPROPOSAL.EnergyCutSettings` for more information on the energy cuts.
+
+            The value is important for the calculation of the ContinuousRandomization (see :meth:`~pyPROPOSAL.ContinuousRandomizer`) 
+
+            Args:                                                                                                  
+                energy (float): energy in MeV
+                                                            
+                )pbdoc")
+        .def("calculate_dNdx", (double (CrossSection::*)(double))&CrossSection::CalculatedNdx,
+            py::arg("energy"),
+                R"pbdoc( 
+
+            Calculates the total cross section
+
+                .. math:: \frac{N_A}{A} \cdot \int_{v_{cut}}^{v_{max}} \frac{d\sigma}{dv} dv
+
+            with the particle energy E, the relative energy loss v and the crosssection :math:`\sigma`. The value v_{cut} is the energy cut to differentiate between
+            continous and stochastic losses in PROPOSAL, see :meth:`~pyPROPOSAL.EnergyCutSettings` for more information on the energy cuts.
+
+            Note that this integral only includes the v values about our cut, therefore this values represents only the total crosssection for the stochastic energy losses. 
+
+            Args:                                                                                                  
+                energy (float): energy in MeV
+                                                            
+                )pbdoc")
+        .def("calculate_dNdx_rnd", (double (CrossSection::*)(double, double))&CrossSection::CalculatedNdx,
+            py::arg("energy"),
+            py::arg("rnd"),
+
+                R"pbdoc( 
+
+            Calculates the total cross section
+
+                .. math:: \frac{N_A}{A} \cdot \int_{v_{cut}}^{v_{max}} \frac{d\sigma}{dv} dv
+
+            with the particle energy E, the relative energy loss v and the crosssection :math:`\sigma`. The value v_{cut} is the energy cut to differentiate between
+            continous and stochastic losses in PROPOSAL, see :meth:`~pyPROPOSAL.EnergyCutSettings` for more information on the energy cuts.
+
+            Furthermore, for every component in the medium, a stochatic energy loss in saved based on the random number rnd. The values are saved in the crosssection class and can be used
+            by other methods.
+
+            Note that this integral only includes the v values about our cut, therefore this values represents only the total crosssection for the stochastic energy losses. 
+
+            Args:                                                                                                  
+                energy (float): energy in MeV
+                rnd (float): random number between 0 and 1
+                                               
+                )pbdoc")
+        .def("calculate_stochastic_loss", (double (CrossSection::*)(double, double, double))&CrossSection::CalculateStochasticLoss,
+            py::arg("energy"),
+            py::arg("rnd1"),
+            py::arg("rnd2"),
+                R"pbdoc( 
+
+            Samples a stochastic energy loss for a particle of the energy E. 
+
+            Args:                                                                                                  
+                energy (float): energy in MeV
+                rnd1 (float): random number between 0 and 1, samples the energy loss fraction
+                rnd2 (float): random number between 0 and 1, sampled the component where the energy loss in occuring
+
+            Returns:
+                sampled energy loss for the current particle in MeV
+
+            With inverse transform sampling, using rnd1, the fraction of the energy loss v is determined from the differential crosssection.
+            By comparing the total cross sections for every medium, rnd2 is used to determine the component of the current medium for which the stochatic energy loss is calculated.
+                     
+                )pbdoc")
+        .def("calculate_produced_particles", &CrossSection::CalculateProducedParticles,
+            py::arg("energy"),
+            py::arg("energy_loss"),
+            py::arg("rnd1"),
+            py::arg("rnd2"),
+                R"pbdoc( 
+
+            Available for the muon pairproduction. Samples the two muons that are produces in pairproduction by sampling the asymmetry parameter :math:`\rho` which describes
+            the distribution of the energy loss between the two created muons.
+
+            Args:                                                                                                  
+                energy (float): primary particle energy in MeV
+                energy_loss (float): energy loss of the primary particle in MeV
+                rnd1 (float): random number between 0 and 1 to calculate the asymmetry between the two produced particles
+                rnd2 (float): random number between 0 and 1 to calculate the sign of the asymmetry between the two produces particles
+
+            Returns:
+                list of created particles with corresponding energies
+                     
+                )pbdoc")
+        .def_property_readonly("id", &CrossSection::GetTypeId,
+                R"pbdoc( 
+
+            Internal id of the current interaction, see :meth:`~pyPROPOSAL.DynamicData` for all available id's.
+                                                            
+                )pbdoc")
+        .def_property_readonly("parametrization", &CrossSection::GetParametrization,
+                R"pbdoc( 
+
+            Pointer to the current parametrization object
+                                                            
+                )pbdoc");
 
     py::class_<CrossSectionIntegral, std::shared_ptr<CrossSectionIntegral>, CrossSection>(m_sub, "CrossSectionIntegral");
     py::class_<CrossSectionInterpolant, std::shared_ptr<CrossSectionInterpolant>, CrossSection>(m_sub, "CrossSectionInterpolant");
@@ -2216,6 +2484,7 @@ PYBIND11_MODULE(pyPROPOSAL, m)
                             propagated before it is considered lost.
 
                     Returns:
+                        list(DynamicData): list of stochastic losses parameters
                         list(list): list of stochastic losses parameters
                     
                     Example:

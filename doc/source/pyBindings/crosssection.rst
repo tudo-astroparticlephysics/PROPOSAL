@@ -5,6 +5,6 @@
 .. currentmodule:: pyPROPOSAL.crosssection
 
 .. automodule:: pyPROPOSAL.crosssection
-   :members:
+   :members: CrossSection
    :undoc-members:
    :show-inheritance:
