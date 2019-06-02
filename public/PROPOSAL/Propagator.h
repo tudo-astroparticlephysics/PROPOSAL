@@ -82,7 +82,7 @@ public:
     // --------------------------------------------------------------------- //
 
     const Sector* GetCurrentSector() const { return current_sector_; }
-    std::vector<Sector*> GetSectors() const { return sectors_; }
+    const std::vector<Sector*> GetSectors() const { return sectors_; }
 
     Geometry& GetDetector() const { return *detector_; };
     Particle& GetParticle() { return particle_; };

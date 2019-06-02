@@ -768,7 +768,7 @@ void init_decay(py::module& m)
         .def("__eq__", &DecayChannel::operator==)
         .def("__ne__", &DecayChannel::operator!=)
         .def("decay", &DecayChannel::Decay, "Decay the given particle")
-        .def_static("boost", (void (*)(Particle&, const Vector3D&, double)) &DecayChannel::Boost, "Boost the particle along a direction");
+        .def_static("boost", (void (*)(Particle&, const Vector3D&, double, double)) &DecayChannel::Boost, "Boost the particle along a direction");
 
     py::class_<LeptonicDecayChannelApprox, std::shared_ptr<LeptonicDecayChannelApprox>, DecayChannel>(m_sub, "LeptonicDecayChannelApprox")
         .def(py::init<const ParticleDef&, const ParticleDef&, const ParticleDef&>());
@@ -2453,7 +2453,7 @@ PYBIND11_MODULE(pyPROPOSAL, m)
     py::class_<Propagator, std::shared_ptr<Propagator>>(m, "Propagator")
         .def(
                 py::init<const ParticleDef&, const std::vector<Sector::Definition>&, const Geometry&>(), 
-                py::arg("partcle_def"), 
+                py::arg("particle_def"), 
                 py::arg("sector_defs"), 
                 py::arg("detector")
             )

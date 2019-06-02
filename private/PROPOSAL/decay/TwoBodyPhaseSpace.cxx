@@ -52,7 +52,7 @@ DecayChannel::DecayProducts TwoBodyPhaseSpace::Decay(const Particle& particle)
     products[1]->SetDirection(-direction);
     products[1]->SetMomentum(momentum);
 
-    Boost(products, particle.GetDirection(), particle.GetMomentum() / particle.GetEnergy());
+    Boost(products, particle.GetDirection(), particle.GetEnergy() / particle.GetMass(), particle.GetMomentum() / particle.GetMass());
 
     CopyParticleProperties(products, particle);
 

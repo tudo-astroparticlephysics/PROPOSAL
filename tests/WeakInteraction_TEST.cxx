@@ -1,8 +1,8 @@
 
 #include "gtest/gtest.h"
 
+#include <fstream>
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/Output.h"
 #include "PROPOSAL/crossection/WeakIntegral.h"
 #include "PROPOSAL/crossection/WeakInterpolant.h"
 #include "PROPOSAL/crossection/parametrization/WeakInteraction.h"

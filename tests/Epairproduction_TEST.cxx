@@ -1,8 +1,8 @@
 
 #include "gtest/gtest.h"
 
+#include <fstream>
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/Output.h"
 #include "PROPOSAL/crossection/EpairIntegral.h"
 #include "PROPOSAL/crossection/EpairInterpolant.h"
 #include "PROPOSAL/crossection/parametrization/EpairProduction.h"
