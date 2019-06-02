@@ -15,10 +15,13 @@ The seed has no effect, if you use an external random number generator.
 
 If the Output of the Secondaries should not only include the Stochastic energy losses (and the Particles produced in a decay), but also the continuous energy losses, this can be set.
 
-| Keyword                 | Type    | Default   | Description |
-| ----------------------- | ------- | --------- | ----------- |
-| `seed`                  | Integer | `0`       | seed for the internal random number generator|
-| `continous_loss_output` | Bool    | `False`   | Decides, whether continuous losses should be emitted in the Output of Secondaries|
+When the Output should just contain the secondaries (energy losses or decay products), that accured inside the detector volume, and not the ones outside of the detector, this can also be set.
+
+| Keyword                     | Type    | Default   | Description |
+| --------------------------- | ------- | --------- | ----------- |
+| `seed`                      | Integer | `0`       | seed for the internal random number generator|
+| `continous_loss_output`     | Bool    | `False`   | Decides, whether continuous losses should be emitted in the Output of Secondaries|
+| `only_loss_inside_detector` | Bool    | `False`   | Decides, whether the secondaries outside of the detector should be included in the output, or not.|
 
 ### Interpolation parameters ###
 The `interpolation` parameter is an own json-object.

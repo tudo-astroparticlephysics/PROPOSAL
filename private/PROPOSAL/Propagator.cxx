@@ -532,14 +532,29 @@ std::vector<DynamicData*> Propagator::Propagate(double MaxDistance_cm)
     // These two variables are needed to calculate the energy loss inside the detector
     // energy_at_entry_point is initialized with the current energy because this is a
     // reasonable value for particle_ which starts inside the detector
-
-    double energy_at_entry_point = particle_.GetEnergy();
-    double energy_at_exit_point  = 0;
+    // They should be set below, so there is no need to init them here.
+    // But for safetiness, if an edge case is not considered
+    // one could include them.
+    // particle_.SetEntryEnergy(particle_.GetEnergy());
+    // particle_.SetExitEnergy(particle_.GetMass());
 
     Vector3D particle_position  = particle_.GetPosition();
     Vector3D particle_direction = particle_.GetDirection();
 
     bool starts_in_detector = detector_->IsInside(particle_position, particle_direction);
+    if (starts_in_detector)
+    {
+        particle_.SetEntryPoint(particle_position);
+        particle_.SetEntryEnergy(particle_.GetEnergy());
+        particle_.SetEntryTime(particle_.GetTime());
+        distance_to_closest_approach = detector_->DistanceToClosestApproach(particle_position, particle_direction);
+        if (distance_to_closest_approach < 0)
+        {
+            particle_.SetClosestApproachPoint(particle_position);
+            particle_.SetClosestApproachEnergy(particle_.GetEnergy());
+            particle_.SetClosestApproachTime(particle_.GetTime());
+        }
+    }
     bool is_in_detector     = false;
     bool was_in_detector    = false;
     bool propagationstep_till_closest_approach = false;
@@ -595,8 +610,6 @@ std::vector<DynamicData*> Propagator::Propagate(double MaxDistance_cm)
             particle_.SetEntryEnergy(particle_.GetEnergy());
             particle_.SetEntryTime(particle_.GetTime());
 
-            energy_at_entry_point = particle_.GetEnergy();
-
             was_in_detector = true;
         }
         // exit point of the detector
@@ -606,7 +619,6 @@ std::vector<DynamicData*> Propagator::Propagate(double MaxDistance_cm)
             particle_.SetExitEnergy(particle_.GetEnergy());
             particle_.SetExitTime(particle_.GetTime());
 
-            energy_at_exit_point = particle_.GetEnergy();
             // we don't want to run in this case a second time so we set was_in_detector to false
             was_in_detector = false;
 
@@ -618,7 +630,6 @@ std::vector<DynamicData*> Propagator::Propagate(double MaxDistance_cm)
             particle_.SetExitEnergy(particle_.GetEnergy());
             particle_.SetExitTime(particle_.GetTime());
 
-            energy_at_exit_point = particle_.GetEnergy();
             // we don't want to run in this case a second time so we set starts_in_detector to false
             starts_in_detector = false;
         }
@@ -641,8 +652,14 @@ std::vector<DynamicData*> Propagator::Propagate(double MaxDistance_cm)
         if (result <= 0 || MaxDistance_cm <= particle_.GetPropagatedDistance())
             break;
     }
+    if (detector_->IsInside(particle_.GetPosition(), particle_.GetDirection()))
+    {
+        particle_.SetExitPoint(particle_.GetPosition());
+        particle_.SetExitEnergy(particle_.GetEnergy());
+        particle_.SetExitTime(particle_.GetTime());
+    }
 
-    particle_.SetElost(energy_at_entry_point - energy_at_exit_point);
+    particle_.SetElost(particle_.GetEntryEnergy() - particle_.GetExitEnergy());
 
 #if ROOT_SUPPORT
     Output::getInstance().StorePropagatedPrimaryInTree(&particle_);
@@ -1520,6 +1537,22 @@ Sector::Definition Propagator::CreateSectorDefinition(const std::string& json_ob
     else
     {
         log_debug("No given stopping_decay option given. Use default true");
+    }
+
+    if (json_global.find("only_loss_inside_detector") != json_global.end())
+    {
+        if (json_global["only_loss_inside_detector"].is_boolean())
+        {
+            sec_def_global.only_loss_inside_detector = json_global["only_loss_inside_detector"].get<bool>();
+        }
+        else
+        {
+            log_fatal("The given only_loss_inside_detector option is not a bool.");
+        }
+    }
+    else
+    {
+        log_debug("No given only_loss_inside_detector option given. Use default false");
     }
 
     if (json_global.find("stochastic_loss_weighting") != json_global.end())
