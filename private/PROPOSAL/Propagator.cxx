@@ -1264,16 +1264,16 @@ InterpolationDef Propagator::CreateInterpolationDef(const std::string& json_obje
         if (table_path_str != "")
         {
             interpolation_def.path_to_tables = table_path_str;
-            log_info("Path to interpolation tables set to: \"%s\"", table_path_str.c_str());
+            log_info("The writable Path to interpolation tables set to: \"%s\"", table_path_str.c_str());
         }
         else
         {
-            log_warn("No valid path to interpolation tables found. Save tables in memory!");
+            log_warn("No valid writable path to interpolation tables found. Save tables in memory, if readonly path is also not working!");
         }
     }
     else
     {
-        log_debug("No path to tables set. Use default and save in memory");
+        log_debug("No writable path to tables set. Use default and save in memory, if readonly path is also not working!");
     }
 
     // Parse to find path to interpolation tables for readonly
@@ -1313,7 +1313,7 @@ InterpolationDef Propagator::CreateInterpolationDef(const std::string& json_obje
         }
         else
         {
-            log_warn("No valid path to readonly interpolation tables found.");
+            log_warn("No valid path to readonly interpolation tables found. Just looking at writable path_to_tables.");
         }
     }
     else
