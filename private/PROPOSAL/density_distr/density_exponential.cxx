@@ -12,7 +12,6 @@ Density_exponential::Integrate(double x_i, double res)
 {
 }
 
-
 }
 
 
