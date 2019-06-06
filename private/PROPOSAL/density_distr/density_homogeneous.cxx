@@ -1,13 +1,19 @@
 #include "PROPOSAL/density_distr/density_homogeneous.h"                                                                                                    
  
-Density_homogeneous::Density_homogeneous(double rho):
-    Dens_distr(rho)
-{};
+Density_homogeneous::Density_homogeneous():
+    Density_distr()
+{ }
+
+Density_homogeneous::Density_homogeneous(Vector3D fAxis, 
+                                         Vector3D fp0, 
+                                         std::function<double(double)> density_distribution):
+    Density_distr(fAxis, fp0, density_distribution)
+{}
  
-double Density_homogeneous::Integrate(double x_i, double res):
-    x_i_(x_i),
-    res_(res)
+double Density_homogeneous::Integrate(Vector3D xi, Vector3D direction, double res)
 {
-    return x_i_ - res_ / rho_ 
+    (void) direction;
+
+    return xi.magnitude() - res; 
 }
 

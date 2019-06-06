@@ -1,20 +1,18 @@
 #pragma once
  
 #include "PROPOSAL/density_distr/density_distr.h"
+#include "PROPOSAL/math/Vector3D.h"
  
-namespace PROPOSAL{
  
 class Density_exponential: public Density_distr
 {
 public:
-    Density_exponential(double rho, double sigma, double mu);
+    Density_exponential(Vector3D fAxis, Vector3D fp0, std::function<double(double)> density_distribution, double sigma);
  
-    double Integrate(double x_i, double res);
+    double Integrate(Vector3D xi, Vector3D direction, double res);
 
 private:
     double sigma_;
-    double mu_;
 };
 
-}
 

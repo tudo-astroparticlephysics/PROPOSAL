@@ -1,5 +1,12 @@
 #include "PROPOSAL/density_distr/density_distr.h"
 #include "PROPOSAL/math/Vector3D.h"
+
+Density_distr::Density_distr()
+{
+    Vector3D fAxis_(0,0,0);
+    Vector3D fp0_(0,0,0);
+    std::function<double(double)> density_distribution_ = nullptr;
+}
                                                     
 Density_distr::Density_distr(Vector3D fAxis, Vector3D fp0, std::function<double(double)> density_distribution):
     fAxis_(fAxis),                               
@@ -7,11 +14,16 @@ Density_distr::Density_distr(Vector3D fAxis, Vector3D fp0, std::function<double(
     density_distribution_(density_distribution)
 {
 }
+
+double Density_distr::GetDepth(Vector3D xi)
+{
+    return fAxis_ * (xi - fp0_);
+}
                                                                                               
-// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%                                               
-// %%%%%%%%%%%%%%%%%%%      Getter      %%%%%%%%%%%%%%%%%%%%%%                                                           
-// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%                                                            
-                                                                                                                                              
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// %%%%%%%%%%%%%%%%%%%      Getter      %%%%%%%%%%%%%%%%%%%%%%
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 std::function<double(double)> Density_distr::GetDensityDistribution()
 {                                                                
     return density_distribution_;                                

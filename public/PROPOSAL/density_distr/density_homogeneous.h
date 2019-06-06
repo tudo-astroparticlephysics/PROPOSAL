@@ -6,9 +6,10 @@ namespace PROPOSAL{
 class Density_homogeneous : public Density_distr
 {
 public:
-    Density_homogeneous(double rho);
+    Density_homogeneous();
+    Density_homogeneous(Vector3D fAxis, Vector3D fp0, std::function<double(double)> density_distribution);
  
-    double Integrate(double x_i, double res);
+    double Integrate(Vector3D xi, Vector3D direction, double res);
 };
  
 }
