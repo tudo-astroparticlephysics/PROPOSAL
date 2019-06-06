@@ -80,6 +80,10 @@
 #include "PROPOSAL/decay/StableChannel.h"
 #include "PROPOSAL/decay/TwoBodyPhaseSpace.h"
 
+#include "PROPOSAL/density_distr/density_distr.h"
+#include "PROPOSAL/density_distr/density_homogeneous.h"
+#include "PROPOSAL/density_distr/density_exponential.h"
+
 #include "PROPOSAL/math/Integral.h"
 #include "PROPOSAL/math/Interpolant.h"
 #include "PROPOSAL/math/InterpolantBuilder.h"
