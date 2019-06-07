@@ -9,15 +9,16 @@ class Density_distr
 {                                                                                                   
     public:                                
         Density_distr();
+        Density_distr(const Density_distr&);
         Density_distr(Vector3D fAxis, Vector3D fp0, std::function<double(double)> density_distribution);
 
-        ~Density_distr();
+        virtual ~Density_distr() {};
 
         virtual Density_distr* clone() const = 0;
-                                
-        virtual double Integrate(Vector3D xi, Vector3D res)=0;
+        // virtual double Integrate(Vector3D xi, Vector3D res)=0;
+        virtual double Integrate(Vector3D xi, Vector3D direction, double res) const =0;
 
-        double GetDepth(Vector3D xi);
+        double GetDepth(Vector3D xi) const;
                                         
         std::function<double(double)> GetDensityDistribution();
         Vector3D GetAxis();

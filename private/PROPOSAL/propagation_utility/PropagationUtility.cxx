@@ -57,10 +57,12 @@ Utility::Definition::~Definition() {}
 Utility::Utility(const ParticleDef& particle_def,
                  const Medium& medium,
                  const EnergyCutSettings& cut_settings,
+                 const Density_distr& density_distr,
                  Definition utility_def)
     : particle_def_(particle_def)
     , medium_(medium.clone())
     , cut_settings_(cut_settings)
+    , density_distr_(density_distr.clone())
     , crosssections_()
 {
     crosssections_.push_back(BremsstrahlungFactory::Get().CreateBremsstrahlung(
@@ -98,11 +100,13 @@ Utility::Utility(const ParticleDef& particle_def,
 Utility::Utility(const ParticleDef& particle_def,
                  const Medium& medium,
                  const EnergyCutSettings& cut_settings,
+                 const Density_distr& density_distr,
                  Definition utility_def,
                  const InterpolationDef& interpolation_def)
     : particle_def_(particle_def)
     , medium_(medium.clone())
     , cut_settings_(cut_settings)
+    , density_distr_(density_distr.clone())
     , crosssections_()
 {
     crosssections_.push_back(BremsstrahlungFactory::Get().CreateBremsstrahlung(

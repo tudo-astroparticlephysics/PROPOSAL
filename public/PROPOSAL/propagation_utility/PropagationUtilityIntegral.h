@@ -92,6 +92,8 @@ public:
     {
         return new UtilityIntegralDisplacement(utility, *this);
     }
+    
+    // double Calculate(double ei, double ef, double rnd, Vector3D xi, Vector3D direction);
 
     virtual ~UtilityIntegralDisplacement();
 

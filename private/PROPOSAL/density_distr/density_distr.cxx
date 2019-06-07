@@ -7,6 +7,13 @@ Density_distr::Density_distr()
     Vector3D fp0_(0,0,0);
     std::function<double(double)> density_distribution_ = nullptr;
 }
+
+Density_distr::Density_distr(const Density_distr& density_distr)
+{
+    Vector3D fAxis_(density_distr.fAxis_);
+    Vector3D fp0_(density_distr.fp0_);
+    std::function<double(double)> density_distribution_ = density_distr.density_distribution_;
+}
                                                     
 Density_distr::Density_distr(Vector3D fAxis, Vector3D fp0, std::function<double(double)> density_distribution):
     fAxis_(fAxis),                               
@@ -15,7 +22,7 @@ Density_distr::Density_distr(Vector3D fAxis, Vector3D fp0, std::function<double(
 {
 }
 
-double Density_distr::GetDepth(Vector3D xi)
+double Density_distr::GetDepth(Vector3D xi) const
 {
     return fAxis_ * (xi - fp0_);
 }

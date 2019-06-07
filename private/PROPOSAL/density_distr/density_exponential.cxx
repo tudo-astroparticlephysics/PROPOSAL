@@ -11,7 +11,9 @@ Density_exponential::Density_exponential(Vector3D fAxis,
 {
 }
 
-double Density_exponential::Integrate(Vector3D xi, Vector3D direction, double res)
+double Density_exponential::Integrate(Vector3D xi, 
+                                      Vector3D direction, 
+                                      double res) const
 {
     double aux1 = GetDepth(xi) / sigma_;
     double aux2 = fAxis_ * direction / sigma_;

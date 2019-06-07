@@ -76,6 +76,7 @@ public:
 
     // Methods
     virtual double Calculate(double ei, double ef, double rnd) = 0;
+    // virtual double Calculate(double ei, double ef, double rnd, Vector3D xi, Vector3D direction)=0;
     virtual double GetUpperLimit(double ei, double rnd);
 
 protected:
@@ -124,6 +125,38 @@ private:
     double up_;
 };
 
+class UtilityInterpolantDisplacement : public UtilityInterpolant
+{
+public:
+    UtilityInterpolantDisplacement(const Utility&, InterpolationDef);
+
+    // Copy constructors
+    UtilityInterpolantDisplacement(const Utility&, const UtilityInterpolantDisplacement&);
+    UtilityInterpolantDisplacement(const UtilityInterpolantDisplacement&);
+    virtual UtilityInterpolant* clone(const Utility& utility) const
+    {
+        return new UtilityInterpolantDisplacement(utility, *this);
+    }
+
+    virtual ~UtilityInterpolantDisplacement();
+
+    // Methods
+    double Calculate(double ei, double ef, double rnd);
+    double Calculate(double ei, double ef, double rnd, Vector3D xi, Vector3D direction);
+    double GetUpperLimit(double ei, double rnd);
+
+private:
+    UtilityInterpolantInteraction& operator=(const UtilityInterpolantInteraction&); // Undefined & not allowed
+
+    virtual bool compare(const UtilityDecorator&) const;
+
+    double BuildInterpolant(double, UtilityIntegral&, Integral&);
+    void InitInterpolation(const std::string&, UtilityIntegral&, int number_of_sampling_points);
+
+    double big_low_;
+    double up_;
+};
+
 class UtilityInterpolantDecay : public UtilityInterpolant
 {
 public:
@@ -155,7 +188,7 @@ private:
     double up_;
 };
 
-UTILITY_INTERPOLANT_DEC(Displacement)
+// UTILITY_INTERPOLANT_DEC(Displacement)
 UTILITY_INTERPOLANT_DEC(Time)
 UTILITY_INTERPOLANT_DEC(ContRand)
 UTILITY_INTERPOLANT_DEC(Scattering)

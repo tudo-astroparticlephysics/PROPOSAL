@@ -6,6 +6,8 @@
 #include "PROPOSAL/crossection/CrossSection.h"
 #include "PROPOSAL/decay/DecayChannel.h"
 
+#include "PROPOSAL/density_distr/density_homogeneous.h"
+
 #include "PROPOSAL/geometry/Geometry.h"
 #include "PROPOSAL/geometry/Sphere.h"
 
@@ -38,6 +40,7 @@ Sector::Definition::Definition()
     , cut_settings()
     , medium_(new Ice())
     , geometry_(new Sphere(Vector3D(), 1.0e20, 0.0))
+    , density_distribution_(new Density_homogeneous())
 {
 }
 
@@ -55,6 +58,7 @@ Sector::Definition::Definition(const Definition& def)
     , cut_settings(def.cut_settings)
     , medium_(def.medium_->clone())
     , geometry_(def.geometry_->clone())
+    , density_distribution_(def.density_distribution_->clone())
 {
 }
 
@@ -106,6 +110,7 @@ void Sector::Definition::swap(Definition& definition)
     swap(scattering_model, definition.scattering_model);
     swap(location, definition.location);
     swap(utility_def, definition.utility_def);
+    // density_distribution_->swap(*definition.density_distribution_);
     medium_->swap(*definition.medium_);
     geometry_->swap(*definition.geometry_);
 }
@@ -123,6 +128,12 @@ Sector::Definition::~Definition()
 {
     delete medium_;
     delete geometry_;
+}
+
+void Sector::Definition::SetDensityDistribution(const Density_distr& density_distribution)
+{
+    delete density_distribution_;
+    density_distribution_ = density_distribution.clone();
 }
 
 void Sector::Definition::SetMedium(const Medium& medium)
@@ -145,7 +156,7 @@ Sector::Sector(Particle& particle, const Definition& sector_def)
     : sector_def_(sector_def)
     , particle_(particle)
     , geometry_(sector_def.GetGeometry().clone())
-    , utility_(particle_.GetParticleDef(), sector_def.GetMedium(), sector_def.cut_settings, sector_def.utility_def)
+    , utility_(particle_.GetParticleDef(), sector_def.GetMedium(), sector_def.cut_settings, sector_def.GetDensityDistribution(), sector_def.utility_def)
     , displacement_calculator_(new UtilityIntegralDisplacement(utility_))
     , interaction_calculator_(new UtilityIntegralInteraction(utility_))
     , decay_calculator_(new UtilityIntegralDecay(utility_))
@@ -172,6 +183,7 @@ Sector::Sector(Particle& particle, const Definition& sector_def, const Interpola
     , utility_(particle_.GetParticleDef(),
                sector_def.GetMedium(),
                sector_def.cut_settings,
+               sector_def.GetDensityDistribution(),
                sector_def.utility_def,
                interpolation_def)
     , displacement_calculator_(new UtilityInterpolantDisplacement(utility_, interpolation_def))

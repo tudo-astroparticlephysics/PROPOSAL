@@ -78,6 +78,9 @@ public:
 
         void SetGeometry(const Geometry&);
         const Geometry& GetGeometry() const { return *geometry_; }
+        
+        void SetDensityDistribution(const Density_distr&);
+        const Density_distr& GetDensityDistribution() const { return *density_distribution_; }
 
         bool do_stochastic_loss_weighting; //!< Do weigthing of stochastic losses. Set to false in constructor.
         double stochastic_loss_weighting;  //!< weigth of stochastic losses. Set to 0 in constructor
@@ -96,9 +99,11 @@ public:
 
         EnergyCutSettings cut_settings;
 
+
     private:
         Medium* medium_;
         Geometry* geometry_;
+        Density_distr* density_distribution_;
     };
 
 public:
