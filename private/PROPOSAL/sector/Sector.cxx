@@ -359,12 +359,11 @@ double Sector::Propagate(double distance)
             final_energy         = energy_till_stochastic_.second;
         }
 
-        // Calculate the displacement according to initial energy and final_energy
-        displacement = displacement_calculator_->Calculate(initial_energy,
-                                                           final_energy,
-                                                           utility_.GetMedium().GetDensityCorrection() *
-                                                               (distance - propagated_distance)) /
-                       utility_.GetMedium().GetDensityCorrection();
+        displacement = displacement_calculator_->Calculate(initial_energy, 
+                                               final_energy, 
+                                               distance-propagated_distance, 
+                                               particle_.GetPosition(), 
+                                               particle_.GetDirection());
 
         // The first interaction or decay happens behind the distance we want to propagate
         // So we calculate the final energy using only continuous losses
@@ -372,8 +371,14 @@ double Sector::Propagate(double distance)
         {
             displacement = distance - propagated_distance;
 
+            double aux = utility_.GetDensityDistribution().Calculate(
+                    particle_.GetPosition(), 
+                    particle_.GetDirection(), 
+                    displacement);
+
             final_energy = displacement_calculator_->GetUpperLimit(
-                initial_energy, utility_.GetMedium().GetDensityCorrection() * displacement);
+                initial_energy, 
+                aux);
         }
 
         if(sector_def_.do_continuous_energy_loss_output)

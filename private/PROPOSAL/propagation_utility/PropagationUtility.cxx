@@ -263,3 +263,12 @@ double UtilityDecorator::FunctionToIntegral(double energy)
 
     return -1.0 / result;
 }
+
+
+double UtilityDecorator::Calculate(double ei, double ef, double rnd, Vector3D xi, Vector3D direction)
+{
+    (void)xi;
+    (void)direction;
+
+    return this->Calculate(ei, ef, rnd);
+}

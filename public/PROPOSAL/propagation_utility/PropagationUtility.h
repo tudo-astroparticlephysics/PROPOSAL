@@ -117,6 +117,7 @@ public:
     // Methods
     virtual double FunctionToIntegral(double energy);
     virtual double Calculate(double ei, double ef, double rnd) = 0;
+    virtual double Calculate(double, double, double, Vector3D, Vector3D);
     virtual double GetUpperLimit(double ei, double rnd)        = 0;
 
     const Utility& GetUtility() const { return utility_; }

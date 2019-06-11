@@ -175,6 +175,7 @@ double UtilityInterpolantDisplacement::Calculate(double ei, double ef, double rn
 
     return std::max((interpolant_diff_->Interpolate((ei + ef) / 2)) * (ef - ei), 0.0);
 }
+
 double UtilityInterpolantDisplacement::Calculate(double ei, double ef, double rnd, Vector3D xi, Vector3D direction)
 {
     (void) rnd;
@@ -187,7 +188,7 @@ double UtilityInterpolantDisplacement::Calculate(double ei, double ef, double rn
         stored_result_ = interpolant_->Interpolate(ei);
         aux            = stored_result_ - interpolant_->Interpolate(ef);
 
-        displacement = utility_.GetDensityDistribution().Integrate(xi, direction, aux);
+        displacement = utility_.GetDensityDistribution().Correct(xi, direction, aux);
 
         if (std::abs(aux) > std::abs(stored_result_) * HALF_PRECISION)
         {
