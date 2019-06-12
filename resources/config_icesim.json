@@ -3,7 +3,7 @@
 	{
 		"seed" : 1,
 		"continous_loss_output" : false,
-		"only_loss_inside_detector" : false,
+		"only_loss_inside_detector" : true,
 
 		"interpolation":
 		{
