@@ -17,17 +17,17 @@ double Density_exponential::Correct(Vector3D xi,
     double phi = GetDepth(xi) / sigma_;
     double delta = GetAxis() * direction / sigma_;
 
-    return 1. / delta * ( std::log( std::exp(phi) + res * delta ) - phi );
+    return 1. / delta * std::log( 1 + std::exp(-phi) * res * delta );
 }
 
-double Density_exponential::Integrate(Vector3D xr, 
+double Density_exponential::Integrate(Vector3D xi, 
                                       Vector3D direction, 
                                       double l) const
 {
-    double aux1 = ( direction * fAxis_ ) / sigma_;
-    double aux2 = GetDepth(xr) / sigma_;
+    double phi = GetDepth(xi) / sigma_;
+    double delta = GetAxis() * direction / sigma_;
 
-    return std::exp( aux1 * l + aux2 ) / aux1;
+    return std::exp( phi + l * delta ) / delta;
 }
 
 
@@ -36,6 +36,5 @@ double Density_exponential::Calculate(Vector3D xi,
                                       Vector3D direction, 
                                       double distance) const
 {
-    /* Pruefe ob es sinn macht das hier ein fabs steht. */
-    return std::fabs(Integrate(xi, direction, 0) - Integrate(xi, direction, distance));
+    return Integrate(xi, direction, distance) - Integrate(xi, direction, 0);
 }

@@ -1,5 +1,6 @@
 #include "PROPOSAL/density_distr/density_homogeneous.h"                                                                                                    
 #include <cmath>
+#include <iostream>
  
 Density_homogeneous::Density_homogeneous():
     Density_distr()
@@ -40,5 +41,6 @@ double Density_homogeneous::Calculate(Vector3D xi,
     (void)xi;
     (void)direction;
 
+    /* std::cout << distance << std::endl; */
     return distance;
 }
