@@ -7,7 +7,7 @@
 class Density_exponential: public Density_distr
 {
 public:
-    Density_exponential(Vector3D fAxis, Vector3D fp0, double sigma);
+    Density_exponential(const Axis& axis, double sigma);
  
     ~Density_exponential() {};
 
@@ -17,8 +17,12 @@ public:
     double Correct(Vector3D xi, Vector3D direction, double res) const;
 
     double Calculate(Vector3D xi, Vector3D direction, double distance) const;
+        
+    double GetDepth(Vector3D xi) const;
+    double GetEffectiveDistance(Vector3D direction) const;
 
 private:
+    Axis* axis_;
     double sigma_;
 };
 

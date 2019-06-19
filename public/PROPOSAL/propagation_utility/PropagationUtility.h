@@ -41,6 +41,7 @@
 #include "PROPOSAL/EnergyCutSettings.h"
 #include "PROPOSAL/particle/ParticleDef.h"
 #include "PROPOSAL/density_distr/density_distr.h"
+#include "PROPOSAL/density_distr/density_homogeneous.h"
 #include "PROPOSAL/math/Vector3D.h"
 
 namespace PROPOSAL {

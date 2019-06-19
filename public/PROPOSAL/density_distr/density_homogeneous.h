@@ -8,7 +8,7 @@ class Density_homogeneous : public Density_distr
 public:
     Density_homogeneous();
     Density_homogeneous(const Density_homogeneous&);
-    Density_homogeneous(Vector3D fAxis, Vector3D fp0);
+    Density_homogeneous(const Axis& axis);
 
     ~Density_homogeneous() {};
 

@@ -5,31 +5,64 @@
 
 using namespace PROPOSAL;
                                                     
+class Axis;
+
 class Density_distr
 {                                                                                                   
     public:                                
         Density_distr();
+        Density_distr(const Axis& axis);
         Density_distr(const Density_distr&);
-        Density_distr(Vector3D fAxis, Vector3D fp0);
 
         virtual ~Density_distr() {};
 
         virtual Density_distr* clone() const = 0;
-        // virtual double Integrate(Vector3D xi, Vector3D res)=0;
+
         virtual double Correct(Vector3D xi, Vector3D direction, double res) const = 0;
-        virtual double Integrate(Vector3D xi, Vector3D direction, double res) const = 0;
+        virtual double Integrate(Vector3D xi, Vector3D direction, double l) const = 0;
         virtual double Calculate(Vector3D xi, Vector3D direction, double distance) const = 0;
 
-        double GetDepth(Vector3D xi) const;
-                                        
-        std::function<double(double)> GetDensityDistribution();
-        Vector3D GetAxis() const { return fAxis_; };
-        Vector3D GetFp0() const { return fp0_; };
-                                
-    protected:                                
-        Vector3D xi_;
-        Vector3D fAxis_;
+    protected:
+        Axis* axis_;
+};
+
+class Axis
+{
+    public:
+
+        Axis();
+        Axis(Vector3D fp0, Vector3D fAxis);
+
+        virtual Axis* clone() const = 0;
+
+        virtual double GetDepth(Vector3D xi) const = 0;
+        virtual double GetEffectiveDistance(Vector3D direction) const = 0;
+
+    protected:
         Vector3D fp0_;
+        Vector3D fAxis_;
+};
+
+class RadialAxis : public Axis
+{
+    public:
+        RadialAxis();
+        RadialAxis(Vector3D fp0);
         
-        std::function<double(double)> density_distribution_;
+        RadialAxis* clone() const {return new RadialAxis(*this);};
+
+        double GetDepth(Vector3D xi) const override;
+        double GetEffectiveDistance(Vector3D direction) const override;
+};
+
+class CartesianAxis : public Axis
+{
+    public:
+        CartesianAxis();
+        CartesianAxis(Vector3D fAxis, Vector3D fp0);
+        
+        CartesianAxis* clone() const {return new CartesianAxis(*this);};
+
+        double GetDepth(Vector3D xi) const override;
+        double GetEffectiveDistance(Vector3D direction) const override;
 };
