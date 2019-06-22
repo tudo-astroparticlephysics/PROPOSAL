@@ -107,6 +107,7 @@ struct InterpolationDef
         , nodes_continous_randomization(200)
         , nodes_propagate(1000)
         , do_binary_tables(true)
+        , just_use_readonly_path(false)
     {
     }
 
@@ -118,6 +119,7 @@ struct InterpolationDef
     int nodes_continous_randomization;
     int nodes_propagate;
     bool do_binary_tables;
+    bool just_use_readonly_path;
 
     size_t GetHash() const;
 };

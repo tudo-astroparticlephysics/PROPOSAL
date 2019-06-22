@@ -1231,6 +1231,22 @@ InterpolationDef Propagator::CreateInterpolationDef(const std::string& json_obje
         log_debug("The do_binary_tables option is not set. Use default (true)");
     }
 
+    if (json_object.find("just_use_readonly_path") != json_object.end())
+    {
+        if (json_object["just_use_readonly_path"].is_boolean())
+        {
+            interpolation_def.just_use_readonly_path = json_object["just_use_readonly_path"];
+        }
+        else
+        {
+            log_fatal("The given just_use_readonly_path option is not a bool.");
+        }
+    }
+    else
+    {
+        log_debug("The just_use_readonly_path option is not set. Use default (false)");
+    }
+
     // Parse to find path to interpolation tables
     if (json_object.find("path_to_tables") != json_object.end())
     {

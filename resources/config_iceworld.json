@@ -15,7 +15,8 @@
 				"$I3_TESTDATA/PROPOSAL/resources/tables",
 				"$I3_BUILD/PROPOSAL/resources/tables"
 			],
-			"do_binary_tables" : false
+			"do_binary_tables" : false,
+			"just_use_readonly_path" : true
 		},
 
 		"exact_time" : true,

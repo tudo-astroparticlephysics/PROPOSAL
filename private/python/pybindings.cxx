@@ -2099,7 +2099,17 @@ PYBIND11_MODULE(pyPROPOSAL, m)
 				This will increase performance, but are not readable for a 
 				crosscheck by human. Default: xxx
 			)pbdoc"
-		);
+		)
+        .def_readwrite(
+            "just_use_readonly_path", 
+            &InterpolationDef::just_use_readonly_path,
+            R"pbdoc(
+                Just the readonly path to the interpolation tables is used.
+                This will stop the program, if the required table is not
+                in the readonly path. The (writable) path_to_tables will be
+                ignored. Default: xxx
+            )pbdoc"
+        );
 
     // --------------------------------------------------------------------- //
     // Utility

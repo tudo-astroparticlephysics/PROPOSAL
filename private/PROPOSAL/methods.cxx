@@ -352,6 +352,7 @@ void InitializeInterpolation(const std::string name,
     bool storing_failed = false;
     bool reading_worked = false;
     bool binary_tables = interpolation_def.do_binary_tables;
+    bool just_use_readonly_path = interpolation_def.just_use_readonly_path;
     std::string pathname;
     std::stringstream filename;
 
@@ -420,6 +421,11 @@ void InitializeInterpolation(const std::string name,
     {
         log_debug("Initialize %s interpolation done.", name.c_str());
         return;
+    }
+
+    if (just_use_readonly_path)
+    {
+        log_fatal("The just_use_readonly_path option is enabled and the table is not in the readonly path.");
     }
 
     // --------------------------------------------------------------------- //
