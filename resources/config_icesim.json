@@ -3,22 +3,20 @@
 	{
 		"seed" : 1,
 		"continous_loss_output" : false,
+		"only_loss_inside_detector" : true,
 
 		"interpolation":
 		{
 			"do_interpolation" : true,
 			"path_to_tables" : [
-				"$PROPOSALTABLEDIR",
-				"$I3_TESTDATA/PROPOSAL/resources/tables",
-				"$I3_TESTDATA/PROPOSAL/tables",
-				"$I3_BUILD/PROPOSAL/resources/tables",
-				"$I3_BUILD/PROPOSAL/tables"
+				"$I3_BUILD/PROPOSAL/resources/tables"
 			],
 			"path_to_tables_readonly" : [
-				"$I3_BUILD/PROPOSAL/resources/tables",
-				"$I3_BUILD/PROPOSAL/tables"
+				"$I3_TESTDATA/PROPOSAL/resources/tables",
+				"$I3_BUILD/PROPOSAL/resources/tables"
 			],
-			"do_binary_tables" : false
+			"do_binary_tables" : false,
+			"just_use_readonly_path" : true
 		},
 
 		"exact_time" : true,
