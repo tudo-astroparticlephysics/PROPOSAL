@@ -34,31 +34,29 @@ Axis::Axis(Vector3D fAxis, Vector3D fp0):
 RadialAxis::RadialAxis():
     Axis() 
 {
+    fp0_.SetCartesianCoordinates(0,0,0);
     fAxis_.SetSphericalCoordinates(1,0,0);
 }
 
-RadialAxis::RadialAxis(Vector3D fp0):
-    Axis()
-{
-    fp0_ = fp0;
-    fAxis_.SetSphericalCoordinates(1,0,0);
-}
+RadialAxis::RadialAxis(Vector3D fAxis, Vector3D fp0):
+    Axis(fAxis, fp0)
+{}
 
 double RadialAxis::GetDepth(Vector3D xi) const
 {
     // angle dependencies require more precise investigations MaxSac (2019-06-18)
-    xi.CalculateSphericalCoordinates();
+    Vector3D aux1 { xi - fAxis_ };
+    Vector3D aux2 { fp0_- fAxis_ };
 
-    return xi.GetRadius() - fp0_.GetRadius();
+    return aux2.magnitude() - aux1.magnitude();
 }
 
-double RadialAxis::GetEffectiveDistance(Vector3D direction) const 
+double RadialAxis::GetEffectiveDistance(Vector3D xi, Vector3D direction) const 
 {
-    direction.CalculateSphericalCoordinates();
+    Vector3D aux {xi - fAxis_};
+    aux.normalise();
 
-    return (fAxis_ - direction) * direction; 
-
-    return fAxis_.GetRadius() * direction.GetRadius();
+    return - aux * direction; 
 }
 
 
@@ -82,7 +80,9 @@ double CartesianAxis::GetDepth(Vector3D xi) const
     return fAxis_ * (xi - fp0_);
 }
 
-double CartesianAxis::GetEffectiveDistance(Vector3D direction) const 
+double CartesianAxis::GetEffectiveDistance(Vector3D xi, Vector3D direction) const 
 {
+    (void) xi;
+
     return fAxis_ * direction;
 }

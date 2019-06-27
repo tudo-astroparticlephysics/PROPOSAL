@@ -10,14 +10,12 @@ Density_exponential::Density_exponential(const Axis& axis, double sigma):
 
 double Density_exponential::GetDepth(Vector3D xi) const 
 {
-    std::cout << "Depth: " << axis_->GetDepth(xi) / sigma_ << std::endl;
     return axis_->GetDepth(xi) / sigma_;
 }
 
-double Density_exponential::GetEffectiveDistance(Vector3D direction) const 
+double Density_exponential::GetEffectiveDistance(Vector3D xi, Vector3D direction) const 
 {
-    std::cout << "Effective Distance: " << axis_->GetEffectiveDistance(direction) / sigma_ << std::endl;
-    return axis_->GetEffectiveDistance(direction) / sigma_;
+    return axis_->GetEffectiveDistance(xi, direction) / sigma_;
 }
 
 double Density_exponential::Correct(Vector3D xi, 
@@ -25,7 +23,7 @@ double Density_exponential::Correct(Vector3D xi,
                                     double res) const 
 {
     double phi = GetDepth(xi);
-    double delta = GetEffectiveDistance(direction);
+    double delta = GetEffectiveDistance(xi, direction);
 
     return 1. / delta * std::log( 1 + std::exp(-phi) * res * delta );
 }
@@ -35,7 +33,7 @@ double Density_exponential::Integrate(Vector3D xi,
                                       double l) const 
 {
     double phi = GetDepth(xi);
-    double delta = GetEffectiveDistance(direction);
+    double delta = GetEffectiveDistance(xi, direction);
 
     return std::exp( phi + l * delta ) / delta;
 }

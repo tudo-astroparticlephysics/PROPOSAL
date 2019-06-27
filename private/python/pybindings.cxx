@@ -22,6 +22,14 @@ using namespace PROPOSAL;
     py::class_<cls, Medium, std::shared_ptr<cls> >(module, #cls)                                                       \
         .def(py::init<double>(), py::arg("density_correction") = 1.0);
 
+/* #define DENSITY_DEF(module, cls)                                                                                       \ */
+/*     py::class_<cls, Density_distr, std::shared_ptr<cls> >(module, #cls)                                                \ */
+/*         .def(py::init<const Axis&>(), py::arg("density_axis")); */
+
+#define AXIS_DEF(module, cls)                                                                                          \
+    py::class_<cls, Axis, std::shared_ptr<cls> >(module, #cls)                                                         \
+        .def(py::init<Vector3D, Vector3D>(), py::arg("axis"), py::arg("reference_point"));
+
 #define PARTICLE_DEF(module, cls)                                                                                      \
     py::class_<cls##Def, ParticleDef, std::unique_ptr<cls##Def, py::nodelete> >(module, #cls "Def")                    \
         .def_static("get", &cls##Def::Get, py::return_value_policy::reference);
@@ -322,6 +330,27 @@ void init_medium(py::module& m)
     MEDIUM_DEF(m_sub, Air)
     MEDIUM_DEF(m_sub, Paraffin)
     MEDIUM_DEF(m_sub, AntaresWater)
+
+    
+    py::class_<Density_exponential, std::shared_ptr<Density_exponential>>(m_sub, "Density_exponential")
+        .def(py::init<const Axis&, double>(), py::arg("density_axis"), py::arg("sigma"));
+    
+    py::class_<Density_homogeneous, std::shared_ptr<Density_homogeneous>>(m_sub, "Density_homogeneous")
+        .def(py::init<const Axis&>(), py::arg("density_axis"));
+
+    /* py::class_<cls, Density_distr, std::shared_ptr<cls> >(module, #cls)                                                \ */
+    /*     .def(py::init<const Axis&>(), py::arg("density_axis")); */
+    
+    /* DENSITY_DEF(m_sub, Density_exponential); */
+    /* DENSITY_DEF(m_sub, Density_homogeneous); */
+
+    /* py::class_<Axis, std::shared_ptr<Axis>>(m_sub, "Density_axis") */
+    /*     .def(py::init<>()) */
+    /*     .def(py::init<Vector3D, Vector3D>(), py::arg("axis"), py::arg("reference_point")); */
+    
+    AXIS_DEF(m_sub, RadialAxis);
+    AXIS_DEF(m_sub, CartesianAxis);
+
 }
 
 void init_particle(py::module& m)
@@ -2106,19 +2135,26 @@ PYBIND11_MODULE(pyPROPOSAL, m)
     // --------------------------------------------------------------------- //
 
     py::class_<Utility, std::shared_ptr<Utility> >(m, "Utility")
-        .def(py::init<const ParticleDef&, const Medium&, const EnergyCutSettings&, Utility::Definition>(),
+        .def(py::init<const ParticleDef&, 
+                      const Medium&, 
+                      const EnergyCutSettings&, 
+                      const Density_distr&,
+                      Utility::Definition>(),
              py::arg("partcle_def"),
              py::arg("medium"),
              py::arg("cuts"),
+             py::arg("density_distribution"),
              py::arg("definition"))
         .def(py::init<const ParticleDef&,
                       const Medium&,
                       const EnergyCutSettings&,
+                      const Density_distr&,
                       Utility::Definition,
                       InterpolationDef>(),
              py::arg("partcle_def"),
              py::arg("medium"),
              py::arg("cuts"),
+             py::arg("density_distribution"),
              py::arg("definition"),
              py::arg("interpolation_def"))
         .def_property_readonly("particle_def", &Utility::GetParticleDef)
@@ -2573,6 +2609,8 @@ PYBIND11_MODULE(pyPROPOSAL, m)
 
 #undef COMPONENT_DEF
 #undef MEDIUM_DEF
+/* #undef DENSITY_DEF */ 
+#undef AXIS_DEF
 #undef PARTICLE_DEF
 #undef BREMS_DEF
 #undef PHOTO_REAL_DEF

@@ -173,6 +173,7 @@ Utility::Utility(const Utility& collection)
     : particle_def_(collection.particle_def_)
     , medium_(collection.medium_->clone())
     , cut_settings_(collection.cut_settings_)
+    , density_distr_(collection.density_distr_->clone())
     , crosssections_(collection.crosssections_.size(), NULL)
 {
     for (unsigned int i = 0; i < crosssections_.size(); ++i)
@@ -201,6 +202,8 @@ bool Utility::operator==(const Utility& utility) const
         return false;
     else if (cut_settings_ != utility.cut_settings_)
         return false;
+    /* else if (*density_distr_ != *utility.density_distr_) */
+    /*     return false; */
     else if (crosssections_.size() != utility.crosssections_.size())
         return false;
 

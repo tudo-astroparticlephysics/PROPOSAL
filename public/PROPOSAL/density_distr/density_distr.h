@@ -36,23 +36,23 @@ class Axis
         virtual Axis* clone() const = 0;
 
         virtual double GetDepth(Vector3D xi) const = 0;
-        virtual double GetEffectiveDistance(Vector3D direction) const = 0;
+        virtual double GetEffectiveDistance(Vector3D xi, Vector3D direction) const = 0;
 
     protected:
-        Vector3D fp0_;
         Vector3D fAxis_;
+        Vector3D fp0_;
 };
 
 class RadialAxis : public Axis
 {
     public:
         RadialAxis();
-        RadialAxis(Vector3D fp0);
+        RadialAxis(Vector3D fAxis, Vector3D fp0);
         
         RadialAxis* clone() const {return new RadialAxis(*this);};
 
         double GetDepth(Vector3D xi) const override;
-        double GetEffectiveDistance(Vector3D direction) const override;
+        double GetEffectiveDistance(Vector3D xi, Vector3D direction) const override;
 };
 
 class CartesianAxis : public Axis
@@ -64,5 +64,5 @@ class CartesianAxis : public Axis
         CartesianAxis* clone() const {return new CartesianAxis(*this);};
 
         double GetDepth(Vector3D xi) const override;
-        double GetEffectiveDistance(Vector3D direction) const override;
+        double GetEffectiveDistance(Vector3D xi, Vector3D direction) const override;
 };

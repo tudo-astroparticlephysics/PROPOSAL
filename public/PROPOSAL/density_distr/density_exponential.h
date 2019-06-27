@@ -19,7 +19,7 @@ public:
     double Calculate(Vector3D xi, Vector3D direction, double distance) const;
         
     double GetDepth(Vector3D xi) const;
-    double GetEffectiveDistance(Vector3D direction) const;
+    double GetEffectiveDistance(Vector3D xi, Vector3D direction) const;
 
 private:
     Axis* axis_;
