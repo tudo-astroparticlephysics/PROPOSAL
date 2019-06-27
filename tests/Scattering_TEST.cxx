@@ -53,8 +53,9 @@ TEST(Comparison, Comparison_equal)
     EXPECT_TRUE(*high1 == high2);
 
     EnergyCutSettings ecuts;
+    Density_homogeneous dens_distr;
     Utility::Definition utility_defs;
-    Utility utils(MuMinusDef::Get(), water, ecuts, utility_defs);
+    Utility utils(MuMinusDef::Get(), water, ecuts, dens_distr, utility_defs);
 
     Scattering* highInt1 = new ScatteringHighlandIntegral(mu, utils);
     ScatteringHighlandIntegral highInt2(mu, utils);
@@ -92,11 +93,12 @@ TEST(Comparison, Comparison_not_equal)
 
     EnergyCutSettings ecuts1;
     EnergyCutSettings ecuts2(200, 0.01);
+    Density_homogeneous dens_distr;
     Utility::Definition utility_defs;
-    Utility utils1(MuMinusDef::Get(), water, ecuts1, utility_defs);
-    Utility utils2(TauMinusDef::Get(), water, ecuts1, utility_defs);
-    Utility utils3(MuMinusDef::Get(), ice, ecuts1, utility_defs);
-    Utility utils4(MuMinusDef::Get(), water, ecuts2, utility_defs);
+    Utility utils1(MuMinusDef::Get(), water, ecuts1, dens_distr, utility_defs);
+    Utility utils2(TauMinusDef::Get(), water, ecuts1, dens_distr, utility_defs);
+    Utility utils3(MuMinusDef::Get(), ice, ecuts1, dens_distr, utility_defs);
+    Utility utils4(MuMinusDef::Get(), water, ecuts2, dens_distr, utility_defs);
 
     ScatteringHighlandIntegral highInt1(mu, utils1);
     ScatteringHighlandIntegral highInt2(tau, utils2);
@@ -178,17 +180,18 @@ TEST(Scattering, Scatter)
 
         Medium* medium = MediumFactory::Get().CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
+        Density_homogeneous dens_distr;
 
         Scattering* scattering = NULL;
 
         if (parametrization == "HighlandIntegral")
         {
-            Utility utility(particle_def, *medium, ecuts, Utility::Definition(), InterpolationDef());
+            Utility utility(particle_def, *medium, ecuts, dens_distr, Utility::Definition(), InterpolationDef());
             scattering = ScatteringFactory::Get().CreateScattering(parametrization, particle, utility, InterpolationDef());
         }
         else
         {
-            Utility utility(particle_def, *medium, ecuts, Utility::Definition());
+            Utility utility(particle_def, *medium, ecuts, dens_distr,  Utility::Definition());
             scattering = ScatteringFactory::Get().CreateScattering(parametrization, particle, utility, InterpolationDef());
         }
 

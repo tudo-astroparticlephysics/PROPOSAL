@@ -36,8 +36,18 @@ protected:
     static Utility b;
 };
 
-Utility Test_Utilities::a(MuMinusDef::Get(), Ice(), EnergyCutSettings(), Utility::Definition(), InterpolationDef());
-Utility Test_Utilities::b(TauMinusDef::Get(), Ice(), EnergyCutSettings(), Utility::Definition(), InterpolationDef());
+Utility Test_Utilities::a(MuMinusDef::Get(), 
+                          Ice(), 
+                          EnergyCutSettings(), 
+                          Density_homogeneous(), 
+                          Utility::Definition(), 
+                          InterpolationDef());
+Utility Test_Utilities::b(TauMinusDef::Get(), 
+                          Ice(), 
+                          EnergyCutSettings(), 
+                          Density_homogeneous(), 
+                          Utility::Definition(), 
+                          InterpolationDef());
 
 TEST_F(Test_Utilities, Comparison_equal)
 {
@@ -137,7 +147,12 @@ TEST(ContinuousRandomization, Randomize_interpol)
         EnergyCutSettings cut_settings(ecut, vcut);
         ParticleDef particle_def = getParticleDef(particleName);
 
-        Utility utility(particle_def, *medium, cut_settings, Utility::Definition(), InterpolationDef());
+        Utility utility(particle_def, 
+                        *medium, 
+                        cut_settings, 
+                        Density_homogeneous(), 
+                        Utility::Definition(), 
+                        InterpolationDef());
         ContinuousRandomizer cont(utility, InterpolationDef());
 
         while (energy_old < initial_energy)

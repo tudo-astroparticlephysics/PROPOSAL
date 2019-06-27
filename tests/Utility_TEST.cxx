@@ -11,10 +11,11 @@ TEST(Comparison, Comparison_equal)
     Water water(1.0);
     EnergyCutSettings ecuts;
     ParticleDef pDef(MuMinusDef::Get());
+    Density_homogeneous dens_distr;
     Utility::Definition utility_defs;
 
-    Utility utils1(pDef, water, ecuts, utility_defs);
-    Utility utils2(pDef, water, ecuts, utility_defs);
+    Utility utils1(pDef, water, ecuts, dens_distr, utility_defs);
+    Utility utils2(pDef, water, ecuts, dens_distr, utility_defs);
 
     EXPECT_TRUE(utils1 == utils2);
 }
@@ -30,12 +31,14 @@ TEST(Comparison, Comparison_not_equal)
     ParticleDef pDef1(MuMinusDef::Get());
     ParticleDef pDef2(TauMinusDef::Get());
 
+    Density_homogeneous dens_distr;
+
     Utility::Definition utility_defs;
 
-    Utility utils1(pDef1, water1, ecuts1, utility_defs);
-    Utility utils2(pDef2, water1, ecuts1, utility_defs);
-    Utility utils3(pDef1, water2, ecuts1, utility_defs);
-    Utility utils4(pDef1, water1, ecuts2, utility_defs);
+    Utility utils1(pDef1, water1, ecuts1, dens_distr, utility_defs);
+    Utility utils2(pDef2, water1, ecuts1, dens_distr, utility_defs);
+    Utility utils3(pDef1, water2, ecuts1, dens_distr, utility_defs);
+    Utility utils4(pDef1, water1, ecuts2, dens_distr, utility_defs);
 
     EXPECT_TRUE(utils1 != utils2);
     EXPECT_TRUE(utils1 != utils3);
@@ -44,12 +47,12 @@ TEST(Comparison, Comparison_not_equal)
 
 TEST(Copyconstructor, Copyconstructor)
 {
-    Utility A(MuMinusDef::Get(), Ice(), EnergyCutSettings(), Utility::Definition());
+    Utility A(MuMinusDef::Get(), Ice(), EnergyCutSettings(), Density_homogeneous(), Utility::Definition());
     Utility B(A);
 
     EXPECT_TRUE(A == B);
 
-    Utility C(MuMinusDef::Get(), Ice(), EnergyCutSettings(), Utility::Definition(), InterpolationDef());
+    Utility C(MuMinusDef::Get(), Ice(), EnergyCutSettings(), Density_homogeneous(), Utility::Definition(), InterpolationDef());
     Utility D(C);
 
     EXPECT_TRUE(C == D);
@@ -57,12 +60,12 @@ TEST(Copyconstructor, Copyconstructor)
 
 TEST(Copyconstructor, Copyconstructor2)
 {
-    Utility A(MuMinusDef::Get(), Ice(), EnergyCutSettings(), Utility::Definition());
+    Utility A(MuMinusDef::Get(), Ice(), EnergyCutSettings(), Density_homogeneous(), Utility::Definition());
     Utility B = A;
 
     EXPECT_TRUE(A == B);
 
-    Utility C(MuMinusDef::Get(), Ice(), EnergyCutSettings(), Utility::Definition(), InterpolationDef());
+    Utility C(MuMinusDef::Get(), Ice(), EnergyCutSettings(), Density_homogeneous(), Utility::Definition(), InterpolationDef());
     Utility D = C;
 
     EXPECT_TRUE(C == D);
