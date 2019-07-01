@@ -1231,6 +1231,22 @@ InterpolationDef Propagator::CreateInterpolationDef(const std::string& json_obje
         log_debug("The do_binary_tables option is not set. Use default (true)");
     }
 
+    if (json_object.find("just_use_readonly_path") != json_object.end())
+    {
+        if (json_object["just_use_readonly_path"].is_boolean())
+        {
+            interpolation_def.just_use_readonly_path = json_object["just_use_readonly_path"];
+        }
+        else
+        {
+            log_fatal("The given just_use_readonly_path option is not a bool.");
+        }
+    }
+    else
+    {
+        log_debug("The just_use_readonly_path option is not set. Use default (false)");
+    }
+
     // Parse to find path to interpolation tables
     if (json_object.find("path_to_tables") != json_object.end())
     {
@@ -1264,16 +1280,16 @@ InterpolationDef Propagator::CreateInterpolationDef(const std::string& json_obje
         if (table_path_str != "")
         {
             interpolation_def.path_to_tables = table_path_str;
-            log_info("Path to interpolation tables set to: \"%s\"", table_path_str.c_str());
+            log_info("The writable Path to interpolation tables set to: \"%s\"", table_path_str.c_str());
         }
         else
         {
-            log_warn("No valid path to interpolation tables found. Save tables in memory!");
+            log_warn("No valid writable path to interpolation tables found. Save tables in memory, if readonly path is also not working!");
         }
     }
     else
     {
-        log_debug("No path to tables set. Use default and save in memory");
+        log_debug("No writable path to tables set. Use default and save in memory, if readonly path is also not working!");
     }
 
     // Parse to find path to interpolation tables for readonly
@@ -1313,7 +1329,7 @@ InterpolationDef Propagator::CreateInterpolationDef(const std::string& json_obje
         }
         else
         {
-            log_warn("No valid path to readonly interpolation tables found.");
+            log_warn("No valid path to readonly interpolation tables found. Just looking at writable path_to_tables.");
         }
     }
     else

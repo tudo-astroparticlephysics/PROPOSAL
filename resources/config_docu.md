@@ -25,7 +25,7 @@ When the Output should just contain the secondaries (energy losses or decay prod
 
 ### Interpolation parameters ###
 The `interpolation` parameter is an own json-object.
-This object can contain three parameters dealing with the interpolation tables.
+This object can contain multiple parameters dealing with the interpolation tables.
 
 There are two kind of paths, that can be set; a path, where the program only requires reading permission and a path, where it requires writing permission.
 The argument can be a String, or a list of Strings.
@@ -39,6 +39,10 @@ If the tables have been already build PROPOSAL just uses them.
 If there are no tables (or at least not ones with the desired particle or medium properties) PROPOSAL builds the tables in the folder.
 If the String is empty, the Folder doesn't exists or PROPOSAL has no permission, the tables are stored in the cache.
 Note: The tables differ in the parameters given below, that are stored in the file name. For not too long file names, these values are hashed.
+
+There is the option that just the readonly path should be used. So if there is not the required tables prebuild in the readonly path the Initialization/program wil break and not try to look or write at the `path_to_tables` or in the memory.
+
+The tables can be stored as a binary file or as a text file.
 
 It's also possible to do the calculations with integrations, but that increases the amount of time by around 4 orders of magnitude !!! This should just be used for tests and comparisons. The Interpolations are accurate enough. Note: The reason why integration is that much slower is that the interpolation used for propagation is near the surface, using already calculated numbers from 'lower' interpolations. When integrating, these integrals going 'deep' (up to 4 layers).
 
@@ -56,6 +60,7 @@ This increases the runtime of the program.
 | `path_to_tables`                | String | `""`    | path pointing to the folder with the interpolation tables |
 | `path_to_tables_readonly`       | String | `""`    | path pointing to the folder with the interpolation tables |
 | `do_binary_tables`              | Bool   | `True`  | Decides, whether the tables are stored in binary format or in human readable text format |
+| `just_use_readonly_path`        | Bool   | `False` | Decides, if just the readonly path should be used. |
 | `max_node_energy`               | Double | `1.e14` | Energy in MeV up to which the interpolation tables are built |
 | `nodes_cross_section`           | Integer| `100`   | Number of interpolation points for the interpolation of the cross section integral |
 | `nodes_continous_randomization` | Integer| `200`   | Number of interpolation points for the interpolation of the continous randomization integral |
