@@ -46,3 +46,9 @@ double Density_exponential::Calculate(Vector3D xi,
 {
     return Integrate(xi, direction, distance) - Integrate(xi, direction, 0);
 }
+
+double Density_exponential::GetCorrection(Vector3D x) const
+{
+    double phi = GetDepth(x);
+    return std::exp(phi);
+}

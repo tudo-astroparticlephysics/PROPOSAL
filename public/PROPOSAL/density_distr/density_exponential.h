@@ -17,6 +17,7 @@ public:
     double Correct(Vector3D xi, Vector3D direction, double res) const;
 
     double Calculate(Vector3D xi, Vector3D direction, double distance) const;
+    double GetCorrection(Vector3D x) const;
         
     double GetDepth(Vector3D xi) const;
     double GetEffectiveDistance(Vector3D xi, Vector3D direction) const;
