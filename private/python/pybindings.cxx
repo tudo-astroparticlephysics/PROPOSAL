@@ -331,12 +331,14 @@ void init_medium(py::module& m)
     MEDIUM_DEF(m_sub, Paraffin)
     MEDIUM_DEF(m_sub, AntaresWater)
 
+    py::class_<Density_distr, std::shared_ptr<Density_distr>>(m_sub, "Density_distribution");
+    /*     .def_property_readonly("Axis", &Density_distr::GetAxis); */
     
-    py::class_<Density_exponential, std::shared_ptr<Density_exponential>>(m_sub, "Density_exponential")
+    py::class_<Density_exponential, Density_distr, std::shared_ptr<Density_exponential>>(m_sub, "Density_exponential")
         .def(py::init<const Axis&, double>(), py::arg("density_axis"), py::arg("sigma"));
     
-    py::class_<Density_homogeneous, std::shared_ptr<Density_homogeneous>>(m_sub, "Density_homogeneous")
-        .def(py::init<const Axis&>(), py::arg("density_axis"));
+    py::class_<Density_homogeneous, Density_distr, std::shared_ptr<Density_homogeneous>>(m_sub, "Density_homogeneous")
+        .def(py::init<>());
 
     /* py::class_<cls, Density_distr, std::shared_ptr<cls> >(module, #cls)                                                \ */
     /*     .def(py::init<const Axis&>(), py::arg("density_axis")); */
@@ -344,9 +346,10 @@ void init_medium(py::module& m)
     /* DENSITY_DEF(m_sub, Density_exponential); */
     /* DENSITY_DEF(m_sub, Density_homogeneous); */
 
-    /* py::class_<Axis, std::shared_ptr<Axis>>(m_sub, "Density_axis") */
-    /*     .def(py::init<>()) */
-    /*     .def(py::init<Vector3D, Vector3D>(), py::arg("axis"), py::arg("reference_point")); */
+    py::class_<Axis, std::shared_ptr<Axis>>(m_sub, "Density_axis")
+        .def_property_readonly("fAxis", &Axis::GetAxis)
+        .def_property_readonly("refernce_point", &Axis::GetFp0);
+        
     
     AXIS_DEF(m_sub, RadialAxis);
     AXIS_DEF(m_sub, CartesianAxis);
@@ -2311,6 +2314,13 @@ PYBIND11_MODULE(pyPROPOSAL, m)
                 &Sector::Definition::SetMedium,
                 R"pbdoc(
                     Definition of the :meth:`~pyPROPOSAL.medium.Medium`
+                )pbdoc"
+        )
+        .def_property(
+                "density_distribution", 
+                &Sector::Definition::GetDensityDistribution, 
+                &Sector::Definition::SetDensityDistribution,
+                R"pbdoc(
                 )pbdoc"
         )
         .def_property(

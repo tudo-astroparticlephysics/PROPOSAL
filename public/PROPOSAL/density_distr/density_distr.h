@@ -37,6 +37,9 @@ class Axis
 
         virtual double GetDepth(Vector3D xi) const = 0;
         virtual double GetEffectiveDistance(Vector3D xi, Vector3D direction) const = 0;
+        
+        Vector3D GetAxis() { return fAxis_; };
+        Vector3D GetFp0() { return fp0_; };
 
     protected:
         Vector3D fAxis_;
