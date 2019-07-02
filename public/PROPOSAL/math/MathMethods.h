@@ -37,12 +37,12 @@
 namespace PROPOSAL {
 
 /// @brief Netwon-Raphson method and bisection to find the root of the function f
-/// @param f
-/// @param df
-/// @param x1
-/// @param x2
-/// @param xacc
-/// @return
+/// @param f    Function to find the root. Root must exist and be inside the interval [x1, x2]
+/// @param df   Derivative of f
+/// @param x1   lower limit of x to find the root
+/// @param x2   upper limit of x to find the root
+/// @param xacc convergence criterion: if $ \frac{f(x)}{df(x)} < xacc $ than accept x as the root
+/// @return root of x
 
 double NewtonRaphson(std::function<double(double)> f, std::function<double(double)> df, double x1, double x2, double xacc = 1.e-6);
 
