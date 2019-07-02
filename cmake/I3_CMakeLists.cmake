@@ -54,6 +54,7 @@ set (PROPOSAL_SRC_FILES
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/geometry/Sphere.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/math/Integral.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/math/Interpolant.cxx
+    ${PROJECT_SOURCE_DIR}/private/PROPOSAL/math/MathMethods.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/math/InterpolantBuilder.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/math/RandomGenerator.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/math/Vector3D.cxx
