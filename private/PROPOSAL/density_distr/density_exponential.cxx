@@ -32,10 +32,9 @@ double Density_exponential::Integrate(Vector3D xi,
                                       Vector3D direction, 
                                       double l) const 
 {
-    double phi = GetDepth(xi);
     double delta = GetEffectiveDistance(xi, direction);
 
-    return std::exp( phi + l * delta ) / delta;
+    return std::exp( GetDepth(xi) + l * delta ) / delta;
 }
 
 
