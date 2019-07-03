@@ -46,6 +46,41 @@ namespace PROPOSAL {
 
 double NewtonRaphson(std::function<double(double)> f, std::function<double(double)> df, double x1, double x2, double xacc = 1.e-6);
 
+struct SplineCoefficients{
+    SplineCoefficients()
+        : _a(0)
+        , _b(0)
+        , _c(0)
+        , _d(0)
+        , _x_t(0)
+        {
+        }
 
+    SplineCoefficients(double a, double b, double c, double d, double x_t)
+        : _a(a)
+        , _b(b)
+        , _c(c)
+        , _d(d)
+        , _x_t(x_t)
+        {
+        }
+
+        double _a;
+        double _b;
+        double _c;
+        double _d;
+        double _x_t;
+
+        // Spline has the form S(x) = a + b * (x - x_t) + c * (x - x_t)**2 + d * (x - x_t)**3
+
+    };
+
+
+/// @brief Calculates the coefficients for the Natural Cubic Splines corresponding to the coordinates (x,y)
+/// @param x x-coordinates
+/// @param y y-coordinates
+/// @return Coefficients of the splines i in the subinterval [x_i, x_i+1]
+
+std::vector<SplineCoefficients> CalculateSpline(std::vector<double> x, std::vector<double> y);
 
 } // namespace PROPOSAL

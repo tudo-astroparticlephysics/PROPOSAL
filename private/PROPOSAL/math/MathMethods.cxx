@@ -87,4 +87,64 @@ namespace PROPOSAL {
         return 0.0;
     }
 
+    std::vector<SplineCoefficients> CalculateSpline(std::vector<double> x, std::vector<double> y){
+        //Algorithm from https://en.wikipedia.org/wiki/Spline_(mathematics)
+        int n = x.size() - 1;
+        if(x.size()!=y.size()){
+            log_error("CalculateSpline: x and y (abscissa and ordinate) must have same dimension");
+        }
+        //1
+        std::vector<double> a(n+1);
+        for(int i = 0; i<n+1; i++){
+            a[i] = y[i];
+        }
+        //2
+        std::vector<double> b(n);
+        std::vector<double> d(n);
+        //3
+        std::vector<double> h(n);
+        for(int i = 0; i<n; i++){
+            h[i] = x[i+1] - x[i];
+        }
+        //4
+        std::vector<double> alpha(n);
+        for(int i = 1; i<n; i++){
+            alpha[i] = 3./h[i] * (a[i+1] - a[i]) - 3./h[i-1] * (a[i] - a[i-1]);
+        }
+        //5
+        std::vector<double> c(n+1);
+        std::vector<double> l(n+1);
+        std::vector<double> mu(n+1);
+        std::vector<double> z(n+1);
+        //6
+        l[0] = 1;
+        mu[0] = 0;
+        z[0] = 0;
+        //7
+        for(int i = 1; i<n; i++){
+            l[i] = 2 * (x[i+1] - x[i-1]) - h[i-1] * mu[i-1];
+            mu[i] = h[i] / l[i];
+            z[i] = (alpha[i] - h[i-1] * z[i-1])/l[i];
+        }
+        //8
+        l[n] = 1;
+        z[n] = 0;
+        c[n] = 0;
+        //9
+        for(int j = n-1; j>=0; j--){
+            c[j] = z[j] - mu[j] * c[j+1];
+            b[j] = (a[j+1] - a[j])/h[j] - (h[j] * (c[j+1] + 2 * c[j]))/3;
+            d[j] = (c[j+1] - c[j]) / (3 * h[j]);
+        }
+        //10ff
+        std::vector<SplineCoefficients> return_values(n);
+        for(int i = 0; i<n; i++){
+            return_values[i] = SplineCoefficients(a[i], b[i], c[i], d[i], x[i]);
+        }
+
+        return return_values;
+
+    }
+
+
 }
