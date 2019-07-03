@@ -5,28 +5,6 @@
 
 using namespace PROPOSAL;
                                                     
-class Axis;
-
-class Density_distr
-{                                                                                                   
-    public:                                
-        Density_distr();
-        Density_distr(const Axis& axis);
-        Density_distr(const Density_distr&);
-
-        virtual ~Density_distr() {};
-
-        virtual Density_distr* clone() const = 0;
-
-        virtual double Correct(Vector3D xi, Vector3D direction, double res) const = 0;
-        virtual double Integrate(Vector3D xi, Vector3D direction, double l) const = 0;
-        virtual double Calculate(Vector3D xi, Vector3D direction, double distance) const = 0;
-        virtual double GetCorrection(Vector3D x) const = 0;
-
-    protected:
-        Axis* axis_;
-};
-
 class Axis
 {
     public:
@@ -46,6 +24,26 @@ class Axis
         Vector3D fAxis_;
         Vector3D fp0_;
 };
+
+class Density_distr 
+{                                                                                                   
+    public:                                
+        Density_distr();
+        Density_distr(const Axis& axis);
+        Density_distr(const Density_distr&);
+
+        virtual ~Density_distr() {};
+
+        virtual Density_distr* clone() const = 0;
+
+        virtual double Correct(Vector3D xi, Vector3D direction, double res) const = 0;
+        virtual double Integrate(Vector3D xi, Vector3D direction, double l) const = 0;
+        virtual double Calculate(Vector3D xi, Vector3D direction, double distance) const = 0;
+
+    protected:
+        Axis* axis_;
+};
+
 
 class RadialAxis : public Axis
 {
