@@ -706,7 +706,8 @@ void Sector::AdvanceParticle(double dr, double ei, double ef)
 
     if (exact_time_calculator_)
     {
-        time += exact_time_calculator_->Calculate(ei, ef, 0.0) / utility_.GetMedium().GetDensityCorrection();
+        // DensityDistribution Approximation: Use the DensityDistribution at the position of initial energy
+        time += exact_time_calculator_->Calculate(ei, ef, 0.0) / (utility_.GetMedium().GetDensityCorrection() * utility_.GetDensityDistribution().GetCorrection(position));
     } else
     {
         time += dr / SPEED;

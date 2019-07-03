@@ -41,3 +41,10 @@ double Density_homogeneous::Calculate(Vector3D xi,
 
     return distance;
 }
+
+double Density_homogeneous::GetCorrection(Vector3D x) const
+{
+    (void)x;
+
+    return 1;
+}
