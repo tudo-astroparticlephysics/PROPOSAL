@@ -1,6 +1,11 @@
 #include <math.h>
 #include "PROPOSAL/math/MathMethods.h"
 
+#include "PROPOSAL/json.hpp"
+#include <fstream>
+#include "PROPOSAL/Output.h"
+#include "PROPOSAL/Logging.h"
+
 namespace PROPOSAL {
 
     double NewtonRaphson(std::function<double(double)> func, std::function<double(double)> dfunc, double x1, double x2,
@@ -146,5 +151,95 @@ namespace PROPOSAL {
 
     }
 
+    std::pair<std::vector<double>, std::vector<double>> ParseSplineCoordinates(const std::string& path_to_coordinates){
+        nlohmann::json json_coords;
+        try
+        {
+            std::string expanded_coords_path = Helper::ResolvePath(path_to_coordinates, true);
+            std::ifstream infilestream(expanded_coords_path);
+            infilestream >> json_coords;
+        }
+        catch (const nlohmann::json::parse_error& e)
+        {
+            log_fatal("Unable parse \"%s\" as json file", path_to_coordinates.c_str());
+        }
+
+        std::vector<double> x_vec;
+        std::vector<double> y_vec;
+
+        if (json_coords.find("x") != json_coords.end())
+        {
+            if (json_coords["x"].is_array())
+            {
+                if (json_coords["x"].size() >= 2)
+                {
+                    x_vec.resize(json_coords["x"].get<std::vector<double>>().size());
+                    for (size_t i=0; i < json_coords["x"].get<std::vector<double>>().size(); i++)
+                    {
+                        if (json_coords["x"][i].is_number())
+                        {
+                            x_vec[i] = json_coords["x"][i].get<double>();
+                        }
+                        else
+                        {
+                            log_fatal("Dens_spline: x coordinate is not a double");
+                        }
+                    }
+                }
+                else
+                {
+                    log_fatal("Dens_spline: at least 2 coordinates must be available to create a spline");
+                }
+            }
+            else
+            {
+                log_fatal("Dens_spline: x object is not an array");
+            }
+        }
+        else
+        {
+            log_fatal("Dens_spline: no x coordinates are found");
+        }
+
+        if (json_coords.find("y") != json_coords.end())
+        {
+            if (json_coords["y"].is_array())
+            {
+                if (json_coords["y"].size() >= 2)
+                {
+                    y_vec.resize(json_coords["y"].get<std::vector<double>>().size());
+                    for (size_t i=0; i < json_coords["y"].get<std::vector<double>>().size(); i++)
+                    {
+                        if (json_coords["y"][i].is_number())
+                        {
+                            y_vec[i] = json_coords["y"][i].get<double>();
+                        }
+                        else
+                        {
+                            log_fatal("Dens_spline: y coordinate is not a double");
+                        }
+                    }
+                }
+                else
+                {
+                    log_fatal("Dens_spline: at least 2 coordinates must be available to create a spline");
+                }
+            }
+            else
+            {
+                log_fatal("Dens_spline: y object is not an array");
+            }
+        }
+        else
+        {
+            log_fatal("Dens_spline: no y coordinates are found");
+        }
+
+        std::pair<std::vector<double>, std::vector<double>> return_val;
+        return_val.first  = x_vec;
+        return_val.second = y_vec;
+        return return_val;
+
+    }
 
 }

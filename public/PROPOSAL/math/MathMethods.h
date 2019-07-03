@@ -83,4 +83,7 @@ struct SplineCoefficients{
 
 std::vector<SplineCoefficients> CalculateSpline(std::vector<double> x, std::vector<double> y);
 
+
+std::pair<std::vector<double>, std::vector<double>> ParseSplineCoordinates(const std::string&);
+
 } // namespace PROPOSAL
