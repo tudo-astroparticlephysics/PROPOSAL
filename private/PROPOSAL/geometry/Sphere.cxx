@@ -1,7 +1,7 @@
 #include <cmath>
 
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/Output.h"
+#include "PROPOSAL/Logging.h"
 #include "PROPOSAL/geometry/Sphere.h"
 
 using namespace PROPOSAL;

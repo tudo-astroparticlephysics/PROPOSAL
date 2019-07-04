@@ -49,7 +49,9 @@ public:
     // ----------------------------------------------------------------- //
 
     double CalculatedEdx(double energy);
+    double CalculatedEdxWithoutMultiplier(double energy);
     double CalculatedE2dx(double energy);
+    double CalculatedE2dxWithoutMultiplier(double energy);
     double CalculatedNdx(double energy);
     double CalculatedNdx(double energy, double rnd);
 

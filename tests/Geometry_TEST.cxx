@@ -110,6 +110,18 @@ TEST(Assignment, Swap)
     EXPECT_TRUE(B == *C);
 }
 
+TEST(DistanceToClosestApproach, Method)
+{
+    Sphere A;
+    Vector3D position = Vector3D(1, -1, 0);
+    Vector3D direction = Vector3D(0, 1, 0);
+    direction.CalculateSphericalCoordinates();
+
+    double distance_closest_approach = A.DistanceToClosestApproach(position, direction);
+
+    ASSERT_NEAR(distance_closest_approach, 1., 1e-9);
+}
+
 TEST(IsInside, Box)
 {
 

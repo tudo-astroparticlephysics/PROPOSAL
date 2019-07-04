@@ -1,6 +1,6 @@
 
 i3_project(PROPOSAL
-    DOCS_DIR doc
+    DOCS_DIR resources/doc
 )
 
 # file(GLOB_RECURSE PROPOSAL_SRC_FILES ${PROJECT_SOURCE_DIR}/private/PROPOSAL/*)
@@ -65,7 +65,6 @@ set (PROPOSAL_SRC_FILES
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/particle/ParticleDef.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/propagation_utility/ContinuousRandomizer.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/propagation_utility/PropagationUtility.cxx
-    ${PROJECT_SOURCE_DIR}/private/PROPOSAL/propagation_utility/PropagationUtilityFactory.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/propagation_utility/PropagationUtilityIntegral.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/propagation_utility/PropagationUtilityInterpolant.cxx
     ${PROJECT_SOURCE_DIR}/private/PROPOSAL/scattering/Coefficients.cxx
@@ -110,11 +109,25 @@ add_custom_command(
     DEPENDS icetray PROPOSAL PROPOSAL_table_creation
 )
 add_custom_target(
-    PROPOSAL_tables ALL 
+    PROPOSAL_tables 
     DEPENDS ${CMAKE_BINARY_DIR}/bin/PROPOSAL_table_creation
     ${PROJECT_SOURCE_DIR}/resources/tables/.tables.auto_generated
 )
 add_dependencies(PROPOSAL_tables PROPOSAL_table_creation)
+
+add_custom_command(TARGET PROPOSAL
+    POST_BUILD
+    COMMENT "To create PROPOSAL tables run: make PROPOSAL_tables"
+    COMMAND echo "***************************************************************************"
+    COMMAND echo "***                                                                     ***"
+    COMMAND echo "***                  To build tables for PROPOSAL run:                  ***"
+    COMMAND echo "***                        make PROPOSAL_tables                         ***"
+    COMMAND echo "***         enter the ICETRAY environment and run the command:          ***"
+    COMMAND echo "***                $I3_BUILD/bin/PROPOSAL_table_creation                ***"
+    COMMAND echo "***                                                                     ***"
+    COMMAND echo "***************************************************************************"
+    USES_TERMINAL VERBATIM
+    )
 
 set(LIB_${PROJECT_NAME}_TESTS
     private/PROPOSAL-icetray/test/main.cxx

@@ -3,18 +3,20 @@
 	{
 		"seed" : 1,
 		"continous_loss_output" : false,
+		"only_loss_inside_detector" : false,
 
 		"interpolation":
 		{
 			"do_interpolation" : true,
 			"path_to_tables" : ["resources/tables"],
 			"path_to_tables_readonly" : ["resources/tables"],
-			"do_binary_tables" : false
+			"do_binary_tables" : false,
+			"just_use_readonly_path" : false
 		},
 
 		"exact_time" : true,
 		"stopping_decay" : true,
-		"scattering" : "Moliere",
+		"scattering" : "Highland",
 
 		"brems_multiplier" : 1,
 		"photo_multiplier" : 1,

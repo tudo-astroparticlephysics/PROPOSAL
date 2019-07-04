@@ -9,7 +9,7 @@
 #include "PROPOSAL/crossection/parametrization/Photonuclear.h"
 #include "PROPOSAL/medium/Medium.h"
 
-#include "PROPOSAL/Output.h"
+#include "PROPOSAL/Logging.h"
 
 using namespace PROPOSAL;
 

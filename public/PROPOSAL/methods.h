@@ -102,14 +102,26 @@ struct InterpolationDef
         : order_of_interpolation(5)
         , path_to_tables(std::string())
         , path_to_tables_readonly(std::string())
-        , raw(true)
+        , max_node_energy(1e14)
+        , nodes_cross_section(100)
+        , nodes_continous_randomization(200)
+        , nodes_propagate(1000)
+        , do_binary_tables(true)
+        , just_use_readonly_path(false)
     {
     }
 
     int order_of_interpolation;
     std::string path_to_tables;
     std::string path_to_tables_readonly;
-    bool raw;
+    double max_node_energy;
+    int nodes_cross_section;
+    int nodes_continous_randomization;
+    int nodes_propagate;
+    bool do_binary_tables;
+    bool just_use_readonly_path;
+
+    size_t GetHash() const;
 };
 
 class Parametrization;

@@ -5,7 +5,6 @@
 #include <cmath>
 
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/Output.h"
 #include "PROPOSAL/decay/ManyBodyPhaseSpace.h"
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/particle/Particle.h"
@@ -151,7 +150,7 @@ DecayChannel::DecayProducts ManyBodyPhaseSpace::Decay(const Particle& particle)
     }
 
     // Boost all daughters to parent frame
-    Boost(products, particle.GetDirection(), particle.GetMomentum() / particle.GetEnergy());
+    Boost(products, particle.GetDirection(), particle.GetEnergy()/particle.GetMass(), particle.GetMomentum() / particle.GetMass());
 
     CopyParticleProperties(products, particle);
 
@@ -186,12 +185,14 @@ double ManyBodyPhaseSpace::GenerateEvent(DecayProducts& products, const PhaseSpa
         // Boost previous particles to new frame
 
         double M    = kinematics.virtual_masses[i - 1];
-        double beta = momentum / std::sqrt(momentum * momentum + M * M);
+        // double beta = momentum / std::sqrt(momentum * momentum + M * M);
+        double gamma = std::sqrt(momentum * momentum + M * M) / M;
+        double betagamma = momentum / M;
 
         for (unsigned int s = 0; s < i; ++s)
         {
             // Boost in -p_i direction
-            Boost(*products[s], products[i]->GetDirection(), beta);
+            Boost(*products[s], products[i]->GetDirection(), gamma, betagamma);
         }
     }
 

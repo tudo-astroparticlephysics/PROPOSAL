@@ -42,7 +42,6 @@
 
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/methods.h"
-#include "PROPOSAL/Output.h"
 
 
 namespace PROPOSAL {
@@ -66,6 +65,7 @@ namespace PROPOSAL {
 
         virtual IntegralLimits GetIntegralLimits(double energy);
 
+        virtual size_t GetHash() const;
 
     protected:
         bool compare(const Parametrization&) const;

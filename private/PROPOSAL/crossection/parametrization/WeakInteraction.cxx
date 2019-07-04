@@ -7,7 +7,7 @@
 #include "PROPOSAL/medium/Medium.h"
 
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/Output.h"
+#include "PROPOSAL/Logging.h"
 #include "PROPOSAL/crossection/parametrization/WeakTable.h"
 
 
@@ -54,6 +54,14 @@ Parametrization::IntegralLimits WeakInteraction::GetIntegralLimits(double energy
     return limits;
 }
 
+size_t WeakInteraction::GetHash() const
+{
+    size_t seed = Parametrization::GetHash();
+    hash_combine(seed, particle_def_.charge);
+
+    return seed;
+}
+
 // ------------------------------------------------------------------------- //
 // Specific implementations
 // ------------------------------------------------------------------------- //
@@ -65,70 +73,18 @@ WeakCooperSarkarMertsch::WeakCooperSarkarMertsch(const ParticleDef& particle_def
         , interpolant_(2, NULL)
 {
 
-    std::vector<Interpolant2DBuilder_array_as> builder2d(2); // [0] for proton, [1] for neutron
-    Helper::InterpolantBuilderContainer builder_container2d(2);
     if(particle_def==EMinusDef::Get()||particle_def==MuMinusDef::Get()||particle_def==TauMinusDef::Get()){
-        builder2d[0]
-                .Setx1(energies)
-                .Setx2(y_nubar_p)
-                .Sety(sigma_nubar_p)
-                .SetRomberg1(IROMB)
-                .SetRational1(false)
-                .SetRelative1(false)
-                .SetRomberg2(IROMB)
-                .SetRational2(false)
-                .SetRelative2(false);
-
-        builder_container2d[0].first  = &builder2d[0];
-        builder_container2d[0].second = &interpolant_[0];
-
-        builder2d[1]
-                .Setx1(energies)
-                .Setx2(y_nubar_n)
-                .Sety(sigma_nubar_n)
-                .SetRomberg1(IROMB)
-                .SetRational1(false)
-                .SetRelative1(false)
-                .SetRomberg2(IROMB)
-                .SetRational2(false)
-                .SetRelative2(false);
-
-        builder_container2d[1].first  = &builder2d[1];
-        builder_container2d[1].second = &interpolant_[1];
+        // Initialize interpolant for particles (remember crossing symmetry rules)
+        interpolant_[0] = new Interpolant(energies, y_nubar_p, sigma_nubar_p, IROMB, false, false, IROMB, false, false);
+        interpolant_[1] = new Interpolant(energies, y_nubar_n, sigma_nubar_n, IROMB, false, false, IROMB, false, false);
     }
     else if(particle_def==EPlusDef::Get()||particle_def==MuPlusDef::Get()||particle_def==TauPlusDef::Get()){
-        builder2d[0]
-                .Setx1(energies)
-                .Setx2(y_nu_p)
-                .Sety(sigma_nu_p)
-                .SetRomberg1(IROMB)
-                .SetRational1(false)
-                .SetRelative1(false)
-                .SetRomberg2(IROMB)
-                .SetRational2(false)
-                .SetRelative2(false);
-
-        builder_container2d[0].first  = &builder2d[0];
-        builder_container2d[0].second = &interpolant_[0];
-
-        builder2d[1]
-                .Setx1(energies)
-                .Setx2(y_nu_n)
-                .Sety(sigma_nu_n)
-                .SetRomberg1(IROMB)
-                .SetRational1(false)
-                .SetRelative1(false)
-                .SetRomberg2(IROMB)
-                .SetRational2(false)
-                .SetRelative2(false);
-
-        builder_container2d[1].first  = &builder2d[1];
-        builder_container2d[1].second = &interpolant_[1];
+        // Initialize interpolant for antiparticles (remember crossing symmetry rules)
+        interpolant_[0] = new Interpolant(energies, y_nu_p, sigma_nu_p, IROMB, false, false, IROMB, false, false);
+        interpolant_[1] = new Interpolant(energies, y_nu_n, sigma_nu_n, IROMB, false, false, IROMB, false, false);
+    }else{
+        log_fatal("Weak interaction: Particle to propagate is not a SM charged lepton");
     }
-    else{
-        log_fatal("Weak interaction table_read: Particle to propagate is not a SM charged lepton");
-    }
-    Helper::InitializeInterpolation("WeakInt", builder_container2d, std::vector<Parametrization*>(1, this), InterpolationDef());
 
 }
 
@@ -176,7 +132,7 @@ double WeakCooperSarkarMertsch::DifferentialCrossSection(double energy, double v
     double neutron_contribution =  (components_[component_index_]->GetAtomicNum() - components_[component_index_]->GetNucCharge()) * interpolant_.at(1)->InterpolateArray(std::log10(energy), v);
     double mean_contribution = (proton_contribution + neutron_contribution) / (components_[component_index_]->GetAtomicNum());
 
-    return multiplier_ * medium_->GetMolDensity() * components_[component_index_]->GetAtomInMolecule() * 1e-36 * std::max(0.0, mean_contribution); //factor 1e-36: conversion from pb to cm^2
+    return medium_->GetMolDensity() * components_[component_index_]->GetAtomInMolecule() * 1e-36 * std::max(0.0, mean_contribution); //factor 1e-36: conversion from pb to cm^2
 }
 
 

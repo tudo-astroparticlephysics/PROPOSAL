@@ -27,7 +27,7 @@ int main()
 
     InterpolationDef interpolation_def;
     // interpolation_def.path_to_tables =  "../src/resources/tables";
-    interpolation_def.raw = true;
+    interpolation_def.do_binary_tables = true;
 
     // ----[ Sector ]---------------------------------------- //
 

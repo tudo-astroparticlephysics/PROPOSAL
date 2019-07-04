@@ -1,7 +1,13 @@
 
 #include "gtest/gtest.h"
 
-#include "PROPOSAL/PROPOSAL.h"
+#include "PROPOSAL/particle/ParticleDef.h"
+#include "PROPOSAL/medium/Medium.h"
+#include "PROPOSAL/medium/MediumFactory.h"
+#include "PROPOSAL/math/RandomGenerator.h"
+#include "PROPOSAL/propagation_utility/PropagationUtility.h"
+#include "PROPOSAL/propagation_utility/ContinuousRandomizer.h"
+#include <fstream>
 
 using namespace PROPOSAL;
 

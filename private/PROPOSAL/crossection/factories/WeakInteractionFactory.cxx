@@ -6,7 +6,7 @@
 #include "PROPOSAL/crossection/factories/WeakInteractionFactory.h"
 #include "PROPOSAL/crossection/parametrization/WeakInteraction.h"
 
-#include "PROPOSAL/Output.h"
+#include "PROPOSAL/Logging.h"
 
 using namespace PROPOSAL;
 

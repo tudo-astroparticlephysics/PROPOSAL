@@ -1,5 +1,5 @@
 
-#include "PROPOSAL/Output.h"
+#include "PROPOSAL/Logging.h"
 #include "PROPOSAL/medium/Medium.h"
 
 #include "PROPOSAL/propagation_utility/PropagationUtility.h"

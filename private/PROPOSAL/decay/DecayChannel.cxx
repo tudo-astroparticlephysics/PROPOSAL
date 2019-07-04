@@ -9,7 +9,7 @@
 #include "PROPOSAL/math/Vector3D.h"
 
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/Output.h"
+#include "PROPOSAL/Logging.h"
 #include "PROPOSAL/methods.h"
 
 using namespace PROPOSAL;
@@ -46,17 +46,15 @@ std::ostream& PROPOSAL::operator<<(std::ostream& os, DecayChannel const& channel
 }
 
 // ------------------------------------------------------------------------- //
-void DecayChannel::Boost(Particle& particle, const Vector3D& direction_unnormalized, double beta)
+void DecayChannel::Boost(Particle& particle, const Vector3D& direction_unnormalized, double gamma, double betagamma)
 {
     Vector3D direction = direction_unnormalized;
     direction.normalise();
 
-    double gamma = 1.0 / std::sqrt(1.0 - beta * beta);
-
     Vector3D momentum_vec(particle.GetMomentum() * particle.GetDirection());
 
     double direction_correction =
-        (gamma - 1.0) * scalar_product(momentum_vec, direction) - gamma * beta * particle.GetEnergy();
+        (gamma - 1.0) * scalar_product(momentum_vec, direction) - betagamma * particle.GetEnergy();
 
     momentum_vec = momentum_vec + direction_correction * direction;
 
@@ -68,11 +66,11 @@ void DecayChannel::Boost(Particle& particle, const Vector3D& direction_unnormali
 }
 
 // ------------------------------------------------------------------------- //
-void DecayChannel::Boost(DecayProducts& products, const Vector3D& direction, double beta)
+void DecayChannel::Boost(DecayProducts& products, const Vector3D& direction, double gamma, double betagamma)
 {
     for (DecayProducts::const_iterator iter = products.begin(); iter != products.end(); ++iter)
     {
-        Boost(**iter, direction, beta);
+        Boost(**iter, direction, gamma, betagamma);
     }
 }
 

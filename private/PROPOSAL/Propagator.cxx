@@ -21,6 +21,8 @@
 
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/Constants.h"
+#include "PROPOSAL/Output.h"
+#include "PROPOSAL/Logging.h"
 #include "PROPOSAL/json.hpp"
 
 using namespace PROPOSAL;
@@ -524,21 +526,39 @@ std::vector<DynamicData*> Propagator::Propagate(double MaxDistance_cm)
         Output::getInstance().StorePrimaryInASCII(&particle_);
 
     double distance = 0;
+    double distance_to_closest_approach  = 0;
     double result   = 0;
 
     // These two variables are needed to calculate the energy loss inside the detector
     // energy_at_entry_point is initialized with the current energy because this is a
     // reasonable value for particle_ which starts inside the detector
-
-    double energy_at_entry_point = particle_.GetEnergy();
-    double energy_at_exit_point  = 0;
+    // They should be set below, so there is no need to init them here.
+    // But for safetiness, if an edge case is not considered
+    // one could include them.
+    // particle_.SetEntryEnergy(particle_.GetEnergy());
+    // particle_.SetExitEnergy(particle_.GetMass());
 
     Vector3D particle_position  = particle_.GetPosition();
     Vector3D particle_direction = particle_.GetDirection();
 
     bool starts_in_detector = detector_->IsInside(particle_position, particle_direction);
+    if (starts_in_detector)
+    {
+        particle_.SetEntryPoint(particle_position);
+        particle_.SetEntryEnergy(particle_.GetEnergy());
+        particle_.SetEntryTime(particle_.GetTime());
+        distance_to_closest_approach = detector_->DistanceToClosestApproach(particle_position, particle_direction);
+        if (distance_to_closest_approach < 0)
+        {
+            particle_.SetClosestApproachPoint(particle_position);
+            particle_.SetClosestApproachEnergy(particle_.GetEnergy());
+            particle_.SetClosestApproachTime(particle_.GetTime());
+        }
+    }
     bool is_in_detector     = false;
     bool was_in_detector    = false;
+    bool propagationstep_till_closest_approach = false;
+    bool already_reached_closest_approach = false;
 
     while (1)
     {
@@ -557,6 +577,31 @@ std::vector<DynamicData*> Propagator::Propagate(double MaxDistance_cm)
         // or only to the collection border
         distance = CalculateEffectiveDistance(particle_position, particle_direction);
 
+        if (already_reached_closest_approach == false)
+        {
+            distance_to_closest_approach = detector_->DistanceToClosestApproach(particle_position, particle_direction);
+            if (distance_to_closest_approach > 0)
+            {
+                if (distance_to_closest_approach < distance)
+                {
+                    already_reached_closest_approach = true;
+
+                    if (std::abs(distance_to_closest_approach) < GEOMETRY_PRECISION)
+                    {
+                        particle_.SetClosestApproachPoint(particle_position);
+                        particle_.SetClosestApproachEnergy(particle_.GetEnergy());
+                        particle_.SetClosestApproachTime(particle_.GetTime());
+                    }
+                    else
+                    {
+                        distance = distance_to_closest_approach;
+                        propagationstep_till_closest_approach = true;
+                    }
+                }
+            }
+        }
+
+
         is_in_detector = detector_->IsInside(particle_position, particle_direction);
         // entry point of the detector
         if (!starts_in_detector && !was_in_detector && is_in_detector)
@@ -564,8 +609,6 @@ std::vector<DynamicData*> Propagator::Propagate(double MaxDistance_cm)
             particle_.SetEntryPoint(particle_position);
             particle_.SetEntryEnergy(particle_.GetEnergy());
             particle_.SetEntryTime(particle_.GetTime());
-
-            energy_at_entry_point = particle_.GetEnergy();
 
             was_in_detector = true;
         }
@@ -576,7 +619,6 @@ std::vector<DynamicData*> Propagator::Propagate(double MaxDistance_cm)
             particle_.SetExitEnergy(particle_.GetEnergy());
             particle_.SetExitTime(particle_.GetTime());
 
-            energy_at_exit_point = particle_.GetEnergy();
             // we don't want to run in this case a second time so we set was_in_detector to false
             was_in_detector = false;
 
@@ -588,7 +630,6 @@ std::vector<DynamicData*> Propagator::Propagate(double MaxDistance_cm)
             particle_.SetExitEnergy(particle_.GetEnergy());
             particle_.SetExitTime(particle_.GetTime());
 
-            energy_at_exit_point = particle_.GetEnergy();
             // we don't want to run in this case a second time so we set starts_in_detector to false
             starts_in_detector = false;
         }
@@ -599,11 +640,26 @@ std::vector<DynamicData*> Propagator::Propagate(double MaxDistance_cm)
 
         result = current_sector_->Propagate(distance);
 
+        if (propagationstep_till_closest_approach)
+        {
+            particle_.SetClosestApproachPoint(particle_.GetPosition());
+            particle_.SetClosestApproachEnergy(particle_.GetEnergy());
+            particle_.SetClosestApproachTime(particle_.GetTime());
+
+            propagationstep_till_closest_approach = false;
+        }
+
         if (result <= 0 || MaxDistance_cm <= particle_.GetPropagatedDistance())
             break;
     }
+    if (detector_->IsInside(particle_.GetPosition(), particle_.GetDirection()))
+    {
+        particle_.SetExitPoint(particle_.GetPosition());
+        particle_.SetExitEnergy(particle_.GetEnergy());
+        particle_.SetExitTime(particle_.GetTime());
+    }
 
-    particle_.SetElost(energy_at_entry_point - energy_at_exit_point);
+    particle_.SetElost(particle_.GetEntryEnergy() - particle_.GetExitEnergy());
 
 #if ROOT_SUPPORT
     Output::getInstance().StorePropagatedPrimaryInTree(&particle_);
@@ -624,7 +680,7 @@ void Propagator::ChooseCurrentCollection(const Vector3D& particle_position, cons
     {
         if (detector_->IsInfront(particle_position, particle_direction))
         {
-            if (sectors_[i]->GetLocation() != 0)
+            if (sectors_[i]->GetLocation() != Sector::ParticleLocation::InfrontDetector)
             {
                 continue;
             } else
@@ -641,7 +697,7 @@ void Propagator::ChooseCurrentCollection(const Vector3D& particle_position, cons
 
         else if (detector_->IsInside(particle_position, particle_direction))
         {
-            if (sectors_[i]->GetLocation() != 1)
+            if (sectors_[i]->GetLocation() != Sector::ParticleLocation::InsideDetector)
             {
                 continue;
             } else
@@ -659,7 +715,7 @@ void Propagator::ChooseCurrentCollection(const Vector3D& particle_position, cons
 
         else if (detector_->IsBehind(particle_position, particle_direction))
         {
-            if (sectors_[i]->GetLocation() != 2)
+            if (sectors_[i]->GetLocation() != Sector::ParticleLocation::BehindDetector)
             {
                 continue;
             } else
@@ -734,7 +790,6 @@ double Propagator::CalculateEffectiveDistance(const Vector3D& particle_position,
 {
     double distance_to_collection_border = 0;
     double distance_to_detector          = 0;
-    double distance_to_closest_approach  = 0;
 
     distance_to_collection_border =
         current_sector_->GetGeometry()->DistanceToBorder(particle_position, particle_direction).first;
@@ -744,7 +799,7 @@ double Propagator::CalculateEffectiveDistance(const Vector3D& particle_position,
     {
         if (detector_->IsInfront(particle_position, particle_direction))
         {
-            if ((*iter)->GetLocation() != 0)
+            if ((*iter)->GetLocation() != Sector::ParticleLocation::InfrontDetector)
                 continue;
             else
             {
@@ -761,7 +816,7 @@ double Propagator::CalculateEffectiveDistance(const Vector3D& particle_position,
 
         else if (detector_->IsInside(particle_position, particle_direction))
         {
-            if ((*iter)->GetLocation() != 1)
+            if ((*iter)->GetLocation() != Sector::ParticleLocation::InsideDetector)
                 continue;
             else
             {
@@ -776,7 +831,7 @@ double Propagator::CalculateEffectiveDistance(const Vector3D& particle_position,
 
         else if (detector_->IsBehind(particle_position, particle_direction))
         {
-            if ((*iter)->GetLocation() != 2)
+            if ((*iter)->GetLocation() != Sector::ParticleLocation::BehindDetector)
                 continue;
             else
             {
@@ -798,35 +853,12 @@ double Propagator::CalculateEffectiveDistance(const Vector3D& particle_position,
 
     distance_to_detector = detector_->DistanceToBorder(particle_position, particle_direction).first;
 
-    distance_to_closest_approach = detector_->DistanceToClosestApproach(particle_position, particle_direction);
-
-    if (std::abs(distance_to_closest_approach) < GEOMETRY_PRECISION)
-    {
-        particle_.SetClosestApproachPoint(particle_position);
-        particle_.SetClosestApproachEnergy(particle_.GetEnergy());
-        particle_.SetClosestApproachTime(particle_.GetTime());
-
-        distance_to_closest_approach = 0;
-    }
-
     if (distance_to_detector > 0)
     {
-        if (distance_to_closest_approach > 0)
-        {
-            return std::min({distance_to_detector, distance_to_collection_border, distance_to_closest_approach});
-        } else
-        {
-            return std::min(distance_to_detector, distance_to_collection_border);
-        }
+        return std::min(distance_to_detector, distance_to_collection_border);
     } else
     {
-        if (distance_to_closest_approach > 0)
-        {
-            return std::min(distance_to_closest_approach, distance_to_collection_border);
-        } else
-        {
-            return distance_to_collection_border;
-        }
+        return distance_to_collection_border;
     }
 }
 
@@ -1117,12 +1149,77 @@ InterpolationDef Propagator::CreateInterpolationDef(const std::string& json_obje
     // Read in interpolation options
     InterpolationDef interpolation_def;
     nlohmann::json json_object = nlohmann::json::parse(json_object_str);
+    
+    if (json_object.find("nodes_propagate") != json_object.end())
+    {
+        if (json_object["nodes_propagate"].is_number())
+        {
+            interpolation_def.nodes_cross_section = json_object["nodes_propagate"];
+        }
+        else
+        {
+            log_fatal("The given nodes_propagate option is not a number.");
+        }
+    }
+    else
+    {
+        log_debug("The nodes_propagate option is not set. Use default (1000)");
+    }
+    
+    if (json_object.find("nodes_continous_randomization") != json_object.end())
+    {
+        if (json_object["nodes_continous_randomization"].is_number())
+        {
+            interpolation_def.nodes_cross_section = json_object["nodes_continous_randomization"];
+        }
+        else
+        {
+            log_fatal("The given nodes_continous_randomization option is not a number.");
+        }
+    }
+    else
+    {
+        log_debug("The nodes_continous_randomization option is not set. Use default (300)");
+    }
+    
+    if (json_object.find("nodes_cross_section") != json_object.end())
+    {
+        if (json_object["nodes_cross_section"].is_number())
+        {
+            interpolation_def.nodes_cross_section = json_object["nodes_cross_section"];
+        }
+        else
+        {
+            log_fatal("The given nodes_cross_section option is not a number.");
+        }
+    }
+    else
+    {
+        log_debug("The nodes_cross_section option is not set. Use default (100)");
+    }
+    
+    if (json_object.find("max_node_energy") != json_object.end())
+    {
+        if (json_object["max_node_energy"].is_number())
+        {
+            interpolation_def.max_node_energy = json_object["max_node_energy"];
+        }
+        else
+        {
+            log_fatal("The given max_node_energy option is not a number.");
+        }
+    }
+    else
+    {
+        log_debug("The max_node_energy option is not set. Use default (1e14 MeV)");
+    }
+
 
     if (json_object.find("do_binary_tables") != json_object.end())
     {
         if (json_object["do_binary_tables"].is_boolean())
         {
-            interpolation_def.raw = json_object["do_binary_tables"];
+            interpolation_def.do_binary_tables = json_object["do_binary_tables"];
         }
         else
         {
@@ -1131,7 +1228,23 @@ InterpolationDef Propagator::CreateInterpolationDef(const std::string& json_obje
     }
     else
     {
-        log_debug("The do_binary_tables option is not set. Use default (true");
+        log_debug("The do_binary_tables option is not set. Use default (true)");
+    }
+
+    if (json_object.find("just_use_readonly_path") != json_object.end())
+    {
+        if (json_object["just_use_readonly_path"].is_boolean())
+        {
+            interpolation_def.just_use_readonly_path = json_object["just_use_readonly_path"];
+        }
+        else
+        {
+            log_fatal("The given just_use_readonly_path option is not a bool.");
+        }
+    }
+    else
+    {
+        log_debug("The just_use_readonly_path option is not set. Use default (false)");
     }
 
     // Parse to find path to interpolation tables
@@ -1167,16 +1280,16 @@ InterpolationDef Propagator::CreateInterpolationDef(const std::string& json_obje
         if (table_path_str != "")
         {
             interpolation_def.path_to_tables = table_path_str;
-            log_info("Path to interpolation tables set to: \"%s\"", table_path_str.c_str());
+            log_info("The writable Path to interpolation tables set to: \"%s\"", table_path_str.c_str());
         }
         else
         {
-            log_warn("No valid path to interpolation tables found. Save tables in memory!");
+            log_warn("No valid writable path to interpolation tables found. Save tables in memory, if readonly path is also not working!");
         }
     }
     else
     {
-        log_debug("No path to tables set. Use default and save in memory");
+        log_debug("No writable path to tables set. Use default and save in memory, if readonly path is also not working!");
     }
 
     // Parse to find path to interpolation tables for readonly
@@ -1216,7 +1329,7 @@ InterpolationDef Propagator::CreateInterpolationDef(const std::string& json_obje
         }
         else
         {
-            log_warn("No valid path to readonly interpolation tables found.");
+            log_warn("No valid path to readonly interpolation tables found. Just looking at writable path_to_tables.");
         }
     }
     else
@@ -1440,6 +1553,22 @@ Sector::Definition Propagator::CreateSectorDefinition(const std::string& json_ob
     else
     {
         log_debug("No given stopping_decay option given. Use default true");
+    }
+
+    if (json_global.find("only_loss_inside_detector") != json_global.end())
+    {
+        if (json_global["only_loss_inside_detector"].is_boolean())
+        {
+            sec_def_global.only_loss_inside_detector = json_global["only_loss_inside_detector"].get<bool>();
+        }
+        else
+        {
+            log_fatal("The given only_loss_inside_detector option is not a bool.");
+        }
+    }
+    else
+    {
+        log_debug("No given only_loss_inside_detector option given. Use default false");
     }
 
     if (json_global.find("stochastic_loss_weighting") != json_global.end())

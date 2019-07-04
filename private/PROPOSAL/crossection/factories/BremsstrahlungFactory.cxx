@@ -6,7 +6,7 @@
 #include "PROPOSAL/crossection/factories/BremsstrahlungFactory.h"
 #include "PROPOSAL/crossection/parametrization/Bremsstrahlung.h"
 
-#include "PROPOSAL/Output.h"
+#include "PROPOSAL/Logging.h"
 
 using namespace PROPOSAL;
 

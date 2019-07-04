@@ -86,6 +86,7 @@ public:
         bool do_continuous_randomization;
         bool do_continuous_energy_loss_output;
         bool do_exact_time_calculation;
+        bool only_loss_inside_detector;
 
         ScatteringFactory::Enum scattering_model;
 
@@ -162,7 +163,7 @@ public:
      *
      *  \return pair of energy loss [MeV] and kind of interaction
      */
-    std::pair<double, DynamicData::Type> MakeStochasticLoss();
+    std::pair<double, DynamicData::Type> MakeStochasticLoss(double particle_energy);
 
     // --------------------------------------------------------------------- //
     // Enable options & Setter
@@ -181,6 +182,7 @@ public:
     Geometry* GetGeometry() const { return geometry_; }
     const Utility& GetUtility() const { return utility_; }
     const Medium* GetMedium() const { return &utility_.GetMedium(); }
+    const Definition& GetSectorDef() const { return sector_def_; }
 
 protected:
     Sector& operator=(const Sector&); // Undefined & not allowed

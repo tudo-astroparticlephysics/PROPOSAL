@@ -1,0 +1,137 @@
+#eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+e                                                                                              e
+e      K#5z#zy   W#5z9#X,      zE9y    K#Xz#zW      XEEX      WGeGy      9yXK    EXG           e
+e      Geeeeeeee eeeeeeeee  Weeeeeeee  eeeeeeeeD  eeeeeeee  ,eeeueeee   Weeee    eee           e
+e      Xee   eee 9ee   Eee  eee    eee Dee   eee eee    eee Deee        ee eee   eee           e
+e      Xeeeeeee  EeeeeeeX   eee    eee Deeeeeee  eee    eee   Weeeeez  eee  eey  eee           e
+e      Xee,      9ee  eee,  eee   Weee Dee       eee    eee eee   eee  eeeeeeee  eee           e
+e      eeee      eee9  eeeE  eeeeeeee  eeeD       eeeeeeee  KeeeeeeeW eee KuXeee eeeeeeee      e
+e       uu        ,u     uz     uu      uK           uu        uWK    X      u z eeeeeeee      e
+e                                                                                              e
+e                                                                                              e
+e                                         5   Ku                  yKKy#K                       e
+e                    ee ee                ee  ee                eeeeeee#                       e
+e                   9ee eee               e9  ee                   eD                          e
+e                   eey                   e9  ee                   eK                          e
+e                    eeeee5               eeeEDee                  eW 9                        e
+e                     ,ED                 e                        eee#                        e
+e                                         e                                                    e
+e                                                                                              e
+eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeze
+
+Here are all changes since Version 1.0 PROPOSAL.
+
+------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------
+
+V.3.0 - 12.12.17
+
+    +   stau cross section
+    +   add SetMass, so one is able to change the mass of a particle
+    *   fix implementation bug for the real photon assumption parametrizations
+        in the inelastic nuclear scattering cross section
+    *   fix hard component bug
+    *   use modern constants from particle data group
+
+    +   add python wrapper pyPROPOSAL
+
+    +   put the the whole project into a namespace called PROPOSAL
+    +   add particle enums
+    +   add cross section enums
+    +   add medium enums
+
+------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------
+
+V.2.0 - 21.11.13
+
+    -   Removed some experiment specific code from the project
+    +   Added these release notes
+
+------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------
+
+V.1.9 - 21.11.13
+
+    +   Added the licence text file Lizenz.txt
+    +   Added the INSTALL.txt
+
+------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------
+
+V.1.8 - 18.11.13
+
+    +   Added ASCII Output as choosable output
+
+------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------
+
+V.1.7 - 06.11.13
+
+    *   Fixed a bug in ContinuouseRandomization that crashed when the initial and final energy
+        were identical.
+
+------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------
+
+V.1.6 - 22.10.13
+
+    -   Removed the StandardNormal class and replaced it with the boost::erfinv function
+    *   Changed ContinuouseRandomization and Scattering classes that they draw the random
+        number using the erfinv function
+
+------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------
+
+V.1.5 - 22.10.13
+
+    +   Added a new scattering routine which draws the scattering angle from the moliere
+        distribution and not from the gaussian distribution
+    +   Added a hierarchy variable so you can now have geometrys which "cross" each other
+
+
+------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------
+
+V.1.4 - 05.09.13
+
+    *   Fixed a bug in the scattering routine where the radiation length was calculated for
+        leptons seperately but should be used for electrons in the formulae.
+    *   Changed the way scattering algorithms can be choosen.
+    +   Added copper as a new Medium
+
+
+------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------
+
+V.1.3 - 30.07.13
+
+    +   Added root support
+    +   Added some root plotting examples
+    +   Added log4cplus as logger
+    *   Fixed a Bug in Particle constructor
+
+------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------
+
+V.1.2 - 09.07.13
+
+    +   Added the reading of the configuration file
+    *   Changed the layout of the scattering routines
+    +   Added a binary output for interpolation tables
+    +   Added << operators to every function
+
+------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------
+
+V.1.1 - 13.06.13
+
+    *   Integration and Interpolation routines use now boost::function boost::bind
+    +   Added gtest to the framework
+    -   Removed FunctionInt and FunctionInt2 classes
+    +   Added RootFinder class
+    +   Added Geometry class
+    +   Added ProcessCollection class
+
+------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------

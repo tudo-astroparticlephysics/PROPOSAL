@@ -1,6 +1,7 @@
 
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Output.h"
+#include "PROPOSAL/Logging.h"
 
 #include "PROPOSAL/crossection/CrossSection.h"
 #include "PROPOSAL/decay/DecayChannel.h"
@@ -30,7 +31,8 @@ Sector::Definition::Definition()
     , do_continuous_randomization(true)
     , do_continuous_energy_loss_output(false)
     , do_exact_time_calculation(true)
-    , scattering_model(ScatteringFactory::Moliere)
+    , only_loss_inside_detector(false)
+    , scattering_model(ScatteringFactory::HighlandIntegral)
     , location(Sector::ParticleLocation::InsideDetector)
     , utility_def()
     , cut_settings()
@@ -46,6 +48,7 @@ Sector::Definition::Definition(const Definition& def)
     , do_continuous_randomization(def.do_continuous_randomization)
     , do_continuous_energy_loss_output(def.do_continuous_energy_loss_output)
     , do_exact_time_calculation(def.do_exact_time_calculation)
+    , only_loss_inside_detector(def.only_loss_inside_detector)
     , scattering_model(def.scattering_model)
     , location(def.location)
     , utility_def(def.utility_def)
@@ -68,6 +71,8 @@ bool Sector::Definition::operator==(const Definition& sector_def) const
     else if (do_continuous_energy_loss_output != sector_def.do_continuous_energy_loss_output)
         return false;
     else if (do_exact_time_calculation != sector_def.do_exact_time_calculation)
+        return false;
+    else if (only_loss_inside_detector != sector_def.only_loss_inside_detector)
         return false;
     else if (scattering_model != sector_def.scattering_model)
         return false;
@@ -97,6 +102,7 @@ void Sector::Definition::swap(Definition& definition)
     swap(do_continuous_randomization, definition.do_continuous_randomization);
     swap(do_continuous_energy_loss_output, definition.do_continuous_energy_loss_output);
     swap(do_exact_time_calculation, definition.do_exact_time_calculation);
+    swap(only_loss_inside_detector, definition.only_loss_inside_detector);
     swap(scattering_model, definition.scattering_model);
     swap(location, definition.location);
     swap(utility_def, definition.utility_def);
@@ -392,7 +398,17 @@ double Sector::Propagate(double distance)
             continuous_loss->SetEnergy(initial_energy - final_energy);
             continuous_loss->SetDirection((particle_.GetPosition() - continuous_loss->GetPosition()));
             continuous_loss->SetTime(particle_.GetTime() - continuous_loss->GetTime());
-            Output::getInstance().FillSecondaryVector(continuous_loss);
+            if (sector_def_.only_loss_inside_detector)
+            {
+                if (sector_def_.location == Sector::ParticleLocation::InsideDetector)
+                {
+                    Output::getInstance().FillSecondaryVector(continuous_loss);
+                }
+            }
+            else
+            {
+                Output::getInstance().FillSecondaryVector(continuous_loss);
+            }
         }
 
         // Lower limit of particle energy is reached or
@@ -408,7 +424,7 @@ double Sector::Propagate(double distance)
 
         if (particle_interaction)
         {
-            energy_loss = MakeStochasticLoss();
+            energy_loss = MakeStochasticLoss(final_energy);
 
             if (energy_loss.second == DynamicData::None)
             {
@@ -441,8 +457,17 @@ double Sector::Propagate(double distance)
                                 decay_products[i]->SetTime(particle_.GetTime());
                                 decay_products[i]->SetParentParticleEnergy(particle_.GetEnergy());
                             }
-
-                            Output::getInstance().FillSecondaryVector(decay_products);
+                            if (sector_def_.only_loss_inside_detector)
+                            {
+                                if (sector_def_.location == Sector::ParticleLocation::InsideDetector)
+                                {
+                                    Output::getInstance().FillSecondaryVector(decay_products);
+                                }
+                            }
+                            else
+                            {
+                                Output::getInstance().FillSecondaryVector(decay_products);
+                            }
                             break;
                         }
                     }
@@ -450,7 +475,17 @@ double Sector::Propagate(double distance)
                 else
                 {
                     //Return a DynamicData::MuPair object, useful when one is interested in the number of interactions
-                    Output::getInstance().FillSecondaryVector(particle_, energy_loss.second, energy_loss.first);
+                    if (sector_def_.only_loss_inside_detector)
+                    {
+                        if (sector_def_.location == Sector::ParticleLocation::InsideDetector)
+                        {
+                            Output::getInstance().FillSecondaryVector(particle_, energy_loss.second, energy_loss.first);
+                        }
+                    }
+                    else
+                    {
+                        Output::getInstance().FillSecondaryVector(particle_, energy_loss.second, energy_loss.first);
+                    }
                 }
             }
             else if(energy_loss.second == DynamicData::WeakInt)
@@ -487,8 +522,19 @@ double Sector::Propagate(double distance)
                 return_particle_->SetTime(particle_.GetTime());
                 return_particle_->SetParentParticleEnergy(particle_.GetEnergy());
 
-                Output::getInstance().FillSecondaryVector(particle_, energy_loss.second, energy_loss.first); //nuclear
-                Output::getInstance().FillSecondaryVector(return_particle_); //neutrino
+                if (sector_def_.only_loss_inside_detector)
+                {
+                    if (sector_def_.location == Sector::ParticleLocation::InsideDetector)
+                    {
+                        Output::getInstance().FillSecondaryVector(particle_, energy_loss.second, energy_loss.first); //nuclear
+                        Output::getInstance().FillSecondaryVector(return_particle_); //neutrino
+                    }
+                }
+                else
+                {
+                    Output::getInstance().FillSecondaryVector(particle_, energy_loss.second, energy_loss.first); //nuclear
+                    Output::getInstance().FillSecondaryVector(return_particle_); //neutrino
+                }
 
                 is_decayed   = true; // treat this case as a decay and break the loop
                 final_energy = particle_.GetMass();
@@ -497,7 +543,17 @@ double Sector::Propagate(double distance)
             }
             else
             {
-                Output::getInstance().FillSecondaryVector(particle_, energy_loss.second, energy_loss.first);
+                if (sector_def_.only_loss_inside_detector)
+                {
+                    if (sector_def_.location == Sector::ParticleLocation::InsideDetector)
+                    {
+                        Output::getInstance().FillSecondaryVector(particle_, energy_loss.second, energy_loss.first);
+                    }
+                }
+                else
+                {
+                    Output::getInstance().FillSecondaryVector(particle_, energy_loss.second, energy_loss.first);
+                }
             }
 
             final_energy -= energy_loss.first;
@@ -507,7 +563,17 @@ double Sector::Propagate(double distance)
         } else
         {
             decay_products = particle_.GetDecayTable().SelectChannel().Decay(particle_);
-            Output::getInstance().FillSecondaryVector(decay_products);
+            if (sector_def_.only_loss_inside_detector)
+            {
+                if (sector_def_.location == Sector::ParticleLocation::InsideDetector)
+                {
+                    Output::getInstance().FillSecondaryVector(decay_products);
+                }
+            }
+            else
+            {
+                Output::getInstance().FillSecondaryVector(decay_products);
+            }
 
             is_decayed   = true;
             final_energy = particle_.GetMass();
@@ -531,14 +597,26 @@ double Sector::Propagate(double distance)
     // with no significantly produced light
     if (sector_def_.stopping_decay && propagated_distance != distance && !is_decayed)
     {
-        // TODO: understand what happens in the two following lines
-        //       why is the particle energy set to its mass?
-        //       why is the time increased randomly?
-        //       it doesn't make sense for me (jsoedingrekso)
-        // particle_.GetEnergy() = particle_.GetParticleDef().mass;
-        // particle_.GetTime() -= particle_.GetLifetime()*std::log(RandomGenerator::Get().RandomDouble());
+        // The time is shifted due to the exponential lifetime.
+        double particle_time = particle_.GetTime();
+        particle_time -= particle_.GetLifetime()*std::log(RandomGenerator::Get().RandomDouble());
+        particle_.SetTime(particle_time);
+        // TODO: one should also advance hte particle according to the sampeled time
+        // and set the new position as the endpoint.
+
+        particle_.SetEnergy(particle_.GetMass());
         decay_products = particle_.GetDecayTable().SelectChannel().Decay(particle_);
-        Output::getInstance().FillSecondaryVector(decay_products);
+        if (sector_def_.only_loss_inside_detector)
+        {
+            if (sector_def_.location == Sector::ParticleLocation::InsideDetector)
+            {
+                Output::getInstance().FillSecondaryVector(decay_products);
+            }
+        }
+        else
+        {
+            Output::getInstance().FillSecondaryVector(decay_products);
+        }
 
         final_energy = particle_.GetMass();
     }
@@ -623,7 +701,7 @@ void Sector::AdvanceParticle(double dr, double ei, double ef)
     particle_.SetTime(time);
 }
 
-std::pair<double, DynamicData::Type> Sector::MakeStochasticLoss()
+std::pair<double, DynamicData::Type> Sector::MakeStochasticLoss(double particle_energy)
 {
     double rnd1 = RandomGenerator::Get().RandomDouble();
     double rnd2 = RandomGenerator::Get().RandomDouble();
@@ -658,7 +736,7 @@ std::pair<double, DynamicData::Type> Sector::MakeStochasticLoss()
 
     for (unsigned int i = 0; i < cross_sections.size(); i++)
     {
-        rates[i] = cross_sections[i]->CalculatedNdx(particle_.GetEnergy(), rnd2);
+        rates[i] = cross_sections[i]->CalculatedNdx(particle_energy, rnd2);
         total_rate += rates[i];
     }
 
@@ -672,7 +750,7 @@ std::pair<double, DynamicData::Type> Sector::MakeStochasticLoss()
 
         if (rates_sum >= total_rate_weighted)
         {
-            energy_loss.first  = cross_sections[i]->CalculateStochasticLoss(particle_.GetEnergy(), rnd2, rnd3);
+            energy_loss.first  = cross_sections[i]->CalculateStochasticLoss(particle_energy, rnd2, rnd3);
             energy_loss.second = cross_sections[i]->GetTypeId();
             break;
         }
