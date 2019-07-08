@@ -2476,10 +2476,10 @@ PYBIND11_MODULE(pyPROPOSAL, m)
                     Function Docstring.
 
                     Args:
-                        particle_def (pyPROPOSAL.particle.ParticleDef): sldkfjas lsdkjfa 
-                        sector_defs (List[pyPROPOSAL.SectorDefinition]): slkd sldkf ksjdlfa
-                        detector (pyPROPOSAL.geometry.Geometry): kfsdljflaskdj
-                        interpolation_def (pyPROPOSAL.InterpolationDef):  sdfa  sldkf sdfa
+                        particle_def (pyPROPOSAL.particle.ParticleDef): definition of the particle to propagate describing the basic properties.
+                        sector_defs (List[pyPROPOSAL.SectorDefinition]): list of the sectors describing the environment around the detector.
+                        detector (pyPROPOSAL.geometry.Geometry): geometry of the detector.
+                        interpolation_def (pyPROPOSAL.InterpolationDef): definition of the Interpolation tables like path to store them, etc.
                 )pbdoc")
         .def(
                 py::init<const ParticleDef&, 
@@ -2492,6 +2492,10 @@ PYBIND11_MODULE(pyPROPOSAL, m)
                 py::init<const ParticleDef&, const std::string&>(), 
                 py::arg("particle_def"), 
                 py::arg("config_file")
+            )
+        .def(
+                py::init<const Propagator&>(),
+                py::arg("Propagator")
             )
         .def(
                 "propagate", 
@@ -2552,22 +2556,32 @@ PYBIND11_MODULE(pyPROPOSAL, m)
             )
         .def_property_readonly(
                 "particle", 
-                &Propagator::GetParticle, 
+                &Propagator::GetParticle,
                 R"pbdoc(
                     Get the internal created particle to modify its properties.
 
                     Returns:
-                        ParticleDef: definition of the propagated particle.
+                        Particle: the propagated particle.
                 )pbdoc"
             )
         .def_property_readonly(
-                "detector", 
-                &Propagator::GetDetector, 
+                "sector",
+                &Propagator::GetCurrentSector,
+                R"pbdoc(
+                    "Get the current sector"
+
+                    Returns:
+                        Sector: the current sector, where the particle is at the moment.
+                )pbdoc"
+            )
+        .def_property_readonly(
+                "detector",
+                &Propagator::GetDetector,
                 R"pbdoc(
                     Get the detector geometry.
 
                     Returns:
-                        SectorDefinition: definition of the sector.
+                        Geometry: the geometry of the detector.
                 )pbdoc"
             );
 
