@@ -140,7 +140,7 @@ The parameters of the configuration file are described
 using namespace PROPOSAL;
 
 int main(){
-    Propagator prop(MuMinusDef::Get(), "resources/config.json");
+    Propagator prop(MuMinusDef::Get(), "resources/configuration/config.json");
     Particle& mu = prop.GetParticle();
     Particle mu_backup(mu);
 
@@ -172,7 +172,7 @@ following minimal code structure
     │   ├── configuration
     │   └── tables
     └── source
-        └── foo.cpp
+        └── foo.cxx
 
 the `CMakeLists.txt` could look like
 
@@ -180,7 +180,7 @@ the `CMakeLists.txt` could look like
 cmake_minimum_required(VERSION 2.6)
 set (CMAKE_CXX_STANDARD 11)
 
-add_executable(foo source/foo.cpp)
+add_executable(foo source/foo.cxx)
 
 find_library(PROPOSAL_LIBRARIES REQUIRED NAMES PROPOSAL)
 
