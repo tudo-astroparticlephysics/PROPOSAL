@@ -4,7 +4,7 @@
 
 
 Density_exponential::Density_exponential(const Axis& axis, double sigma):
-    axis_(axis.clone()),
+    Density_distr(axis),
     sigma_(sigma)
 {}
 
@@ -46,8 +46,7 @@ double Density_exponential::Calculate(Vector3D xi,
     return Integrate(xi, direction, distance) - Integrate(xi, direction, 0);
 }
 
-double Density_exponential::GetCorrection(Vector3D x) const
+double Density_exponential::GetCorrection(Vector3D xi) const
 {
-    double phi = GetDepth(x);
-    return std::exp(phi);
+    return std::exp(GetDepth(xi));
 }

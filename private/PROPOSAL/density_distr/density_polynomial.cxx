@@ -1,4 +1,5 @@
 #include "PROPOSAL/density_distr/density_polynomial.h" 
+#include "PROPOSAL/math/MathMethods.h" 
 #include <functional>
 #include <algorithm>
 #include <iostream>
@@ -7,6 +8,8 @@
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // %%%%%%%%%%%%%%%%%%%       Polynom      %%%%%%%%%%%%%%%%%%%%
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+using namespace PROPOSAL;
 
 Polynom::Polynom(std::vector<double> coefficients)
 {
@@ -59,6 +62,24 @@ std::function<double(double)> Polynom::GetFunction()
                                                     std::placeholders::_1);
 }
 
+namespace PROPOSAL {
+    std::ostream& operator<<(std::ostream& os, const Polynom& p)
+    {
+        bool flag = false;
+        for (int i = 0; i < p.N; ++i) {
+            if(p.coeff[i] != 0)
+            {
+                if(flag==true)
+                    os << "+ " << p.coeff[i] << " * x^{" << i << "}";
+                else {
+                    os << "p(x) = " << p.coeff[i] << " * x^{" << i << "}";
+                    flag = true;
+                }
+            }
+        }
+        return os;
+    }
+} // namespace PROPOSAL 
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // %%%%%%%%%%%%%%%%%%% Polynomial-Density %%%%%%%%%%%%%%%%%%%%
@@ -66,42 +87,79 @@ std::function<double(double)> Polynom::GetFunction()
 
 Density_polynomial::Density_polynomial(const Axis& axis, const Polynom& polynom):
     Density_distr( axis ),
-    polynom_( polynom )
-{
-    density_distribution = polynom_.GetFunction();
-    antiderived_density_distribution = polynom_.GetAntiderivative(0).GetFunction();
-}
+    polynom_( polynom ),
+    Polynom_( polynom_.GetAntiderivative(0) ),
+    density_distribution( polynom_.GetFunction() ),
+    antiderived_density_distribution( Polynom_.GetFunction() )
+{ }
 
 Density_polynomial::Density_polynomial(const Density_polynomial& dens):
     Density_distr( dens ),
-    polynom_( dens.polynom_ )
+    polynom_( dens.polynom_ ),
+    Polynom_( dens.Polynom_ ),
+    density_distribution( polynom_.GetFunction() ),
+    antiderived_density_distribution( Polynom_.GetFunction() )
+{ }
+
+double Density_polynomial::Helper_function(Vector3D xi, 
+                                           Vector3D direction, 
+                                           double res, 
+                                           double l) const 
 {
-    density_distribution = polynom_.GetFunction();
-    antiderived_density_distribution = polynom_.GetAntiderivative(0).GetFunction();
+    return Integrate(xi, direction, 0) - Integrate(xi, direction, l) + res;
 }
 
-
-double Density_polynomial::Correct(Vector3D xi, Vector3D direction, double res) const 
+double Density_polynomial::helper_function(Vector3D xi, 
+                                           Vector3D direction, 
+                                           double res, 
+                                           double l) const 
 {
-    double f(double l)
-    {
-        return antiderived_density_distribution(GetDepth(xi) + l * delta) 
-            - antiderived_density_distribution(GetDepth(xi))
-            - res;
-    }
-    std::function<double(double)> = f;
+    double delta = axis_->GetEffectiveDistance(xi, direction);
+
+    return density_distribution(axis_->GetDepth(xi) + l * delta);
+}
+
+double Density_polynomial::Correct(Vector3D xi, 
+                                   Vector3D direction,
+                                   double res) const 
+{
+    std::function<double(double)> F = std::bind(&Density_polynomial::Helper_function, 
+                                                this, 
+                                                xi, 
+                                                direction, 
+                                                res, 
+                                                std::placeholders::_1);
+    
+    std::function<double(double)> dF = std::bind(&Density_polynomial::helper_function, 
+                                                this, 
+                                                xi, 
+                                                direction, 
+                                                res,
+                                                std::placeholders::_1);
+
+    res = NewtonRaphson(F, dF, 0, 1e15, 1.e-6);
 
     return res;
 }
 
-double Density_polynomial::Integrate(Vector3D xi, Vector3D direction, double l) const
+double Density_polynomial::Integrate(Vector3D xi, 
+                                     Vector3D direction, 
+                                     double l) const
 {
-    double delta = GetEffectiveDistance(xi, direction);
+    double delta = axis_->GetEffectiveDistance(xi, direction);
 
-    return antiderived_density_distribution(GetDepth(xi) + l * delta);
+    return antiderived_density_distribution(axis_->GetDepth(xi) + l * delta);
 }
 
-double Density_polynomial::Calculate(Vector3D xi, Vector3D direction, double distance) const
+double Density_polynomial::Calculate(Vector3D xi, 
+                                     Vector3D direction, 
+                                     double distance) const
 {
     return Integrate(xi, direction, distance) - Integrate(xi, direction, 0);
 }
+
+double Density_polynomial::GetCorrection(Vector3D xi) const
+{
+    return density_distribution(axis_->GetDepth(xi));
+}
+

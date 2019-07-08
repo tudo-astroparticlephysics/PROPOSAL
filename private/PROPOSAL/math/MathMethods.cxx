@@ -1,4 +1,5 @@
 #include <math.h>
+#include <iostream>
 #include "PROPOSAL/math/MathMethods.h"
 
 namespace PROPOSAL {
@@ -15,6 +16,7 @@ namespace PROPOSAL {
         double df, dx, dxold, f, fh, fl;
         double temp, xh, xl, rts;
         const int MAXIT = 100;
+
 
         fl = func(x1);
         fh = func(x2);

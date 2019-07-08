@@ -13,17 +13,16 @@ public:
 
     Density_exponential* clone() const {return new Density_exponential(*this);};
 
-    double Integrate(Vector3D xi, Vector3D direction, double res) const;
-    double Correct(Vector3D xi, Vector3D direction, double res) const;
+    double Integrate(Vector3D xi, Vector3D direction, double res) const override;
+    double Correct(Vector3D xi, Vector3D direction, double res) const override;
 
-    double Calculate(Vector3D xi, Vector3D direction, double distance) const;
-    double GetCorrection(Vector3D x) const;
+    double Calculate(Vector3D xi, Vector3D direction, double distance) const override;
+    double GetCorrection(Vector3D x) const override;
         
     double GetDepth(Vector3D xi) const;
     double GetEffectiveDistance(Vector3D xi, Vector3D direction) const;
 
 private:
-    Axis* axis_;
     double sigma_;
 };
 
