@@ -878,7 +878,7 @@ Geometry* Propagator::ParseGeometryConifg(const std::string& json_object_str)
     std::string origin_str       = "origin";
     std::string outer_radius_str = "outer_radius";
     std::string inner_radius_str = "inner_radius";
-    std::string length_str       = "lenght";
+    std::string length_str       = "length";
     std::string width_str        = "width";
     std::string height_str       = "height";
 
