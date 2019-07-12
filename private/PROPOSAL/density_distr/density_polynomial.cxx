@@ -106,6 +106,18 @@ double Density_polynomial::Helper_function(Vector3D xi,
                                            double res, 
                                            double l) const 
 {
+    // std::cout << "Integrate(xi, direction, l): " 
+    //           << Integrate(xi, direction, l)
+    //           << " Integrate(xi, direction, 0): "
+    //           << Integrate(xi, direction, 0) 
+    //           << " res:" << ees
+    //           << std::endl;
+    // std::cout << "Helper function(" 
+    //           << l
+    //           << "): "
+    //           << Integrate(xi, direction, 0) - Integrate(xi, direction, l) + res
+    //           << std::endl;
+
     return Integrate(xi, direction, 0) - Integrate(xi, direction, l) + res;
 }
 
@@ -137,7 +149,18 @@ double Density_polynomial::Correct(Vector3D xi,
                                                 res,
                                                 std::placeholders::_1);
 
-    res = NewtonRaphson(F, dF, 0, 1e15, 1.e-6);
+    // check if direction * axis larger or less than zero 
+    // direction * fAxis_
+
+    try {
+        res = NewtonRaphson(F, dF, 0, 1e15, 1.e-6);
+    } catch (MathException& e) {
+        double depth = GetCorrection(xi + res * direction);
+        if ( depth < 0 ) 
+            DensityException("Densities smaller than zero are non-physical. Check coefficients from polynom.");
+        else
+            throw e;
+    }
 
     return res;
 }
@@ -147,6 +170,10 @@ double Density_polynomial::Integrate(Vector3D xi,
                                      double l) const
 {
     double delta = axis_->GetEffectiveDistance(xi, direction);
+
+    // std::cout << "Integrate( "<<axis_->GetDepth(xi) + l * delta << "): " 
+    //           << antiderived_density_distribution(axis_->GetDepth(xi) + l * delta) 
+    //           << std::endl;
 
     return antiderived_density_distribution(axis_->GetDepth(xi) + l * delta);
 }

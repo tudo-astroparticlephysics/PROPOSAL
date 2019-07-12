@@ -84,6 +84,7 @@
 #include "PROPOSAL/density_distr/density_homogeneous.h"
 #include "PROPOSAL/density_distr/density_exponential.h"
 #include "PROPOSAL/density_distr/density_polynomial.h"
+#include "PROPOSAL/density_distr/density_splines.h"
 
 #include "PROPOSAL/math/Integral.h"
 #include "PROPOSAL/math/Interpolant.h"

@@ -27,8 +27,9 @@ namespace PROPOSAL {
         fh = func(x2);
 
         if (fl * fh > 0.0) {
-            log_error("Root must be bracketed in NetwonRaphson method!");
-            return 0;
+            throw MathException("Root must be bracketed in NewtonRaphson method!");
+            // log_error("Root must be bracketed in NewtonRaphson method!");
+            // return 0;
         }
 
         if (fl == 0.0) {
@@ -90,7 +91,7 @@ namespace PROPOSAL {
                 xh = rts;
             };
         }
-        log_error("Maxmum number of iteration exeeded in NewtonRaphson");
+        log_error("Maximum number of iteration exeeded in NewtonRaphson");
         return 0.0;
     }
 

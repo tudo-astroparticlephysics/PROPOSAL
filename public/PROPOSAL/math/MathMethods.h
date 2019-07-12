@@ -33,8 +33,23 @@
 #include <iostream>
 #include "PROPOSAL/Logging.h"
 #include <vector>
+#include <exception>
+#include <string>
+
+class MathException: public std::exception {
+    public:
+        MathException(char const* message) : message_(message) {};
+        const char* what() const throw()
+        {
+            return message_.c_str();
+        }
+    protected:
+        std::string message_;
+};
 
 namespace PROPOSAL {
+
+
 
 /// @brief Netwon-Raphson method and bisection to find the root of the function f
 /// @param f    Function to find the root. Root must exist and be inside the interval [x1, x2]
@@ -65,11 +80,24 @@ struct SplineCoefficients{
         {
         }
 
+    std::pair<double, std::vector<double>> GetSpline() const
+    {
+         std::pair<double, std::vector<double>> splines;
+         splines.first = _x_t;
+         std::vector<double> coeff = {_a, _b, _c, _d};
+         splines.second = coeff;
+
+         return splines;
+    }
+
+    private:
         double _a;
         double _b;
         double _c;
         double _d;
         double _x_t;
+
+
 
         // Spline has the form S(x) = a + b * (x - x_t) + c * (x - x_t)**2 + d * (x - x_t)**3
 

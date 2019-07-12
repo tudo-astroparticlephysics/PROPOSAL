@@ -1,6 +1,7 @@
 #pragma once                                
 #include <functional>                                                        
-
+#include <exception>                                                        
+#include <string>                                                        
 #include "PROPOSAL/math/Vector3D.h"
 
 using namespace PROPOSAL;
@@ -25,27 +26,6 @@ class Axis
         Vector3D fp0_;
 };
 
-class Density_distr 
-{                                                                                                   
-    public:                                
-        Density_distr();
-        Density_distr(const Axis& axis);
-        Density_distr(const Density_distr&);
-
-        virtual ~Density_distr() {};
-
-        virtual Density_distr* clone() const = 0;
-
-        virtual double Correct(Vector3D xi, Vector3D direction, double res) const = 0;
-        virtual double Integrate(Vector3D xi, Vector3D direction, double l) const = 0;
-        virtual double Calculate(Vector3D xi, Vector3D direction, double distance) const = 0;
-        virtual double GetCorrection(Vector3D xi) const = 0;
-
-    protected:
-        Axis* axis_;
-};
-
-
 class RadialAxis : public Axis
 {
     public:
@@ -69,3 +49,37 @@ class CartesianAxis : public Axis
         double GetDepth(Vector3D xi) const override;
         double GetEffectiveDistance(Vector3D xi, Vector3D direction) const override;
 };
+
+class DensityException: public std::exception
+{
+    public:
+        DensityException(const char* m): message_(m) {};
+        const char* what() const throw()
+        {
+            return message_.c_str();
+        };
+    private:
+        std::string message_;
+};
+
+class Density_distr 
+{                                                                                                   
+    public:                                
+        Density_distr();
+        Density_distr(const Axis& axis);
+        Density_distr(const Density_distr&);
+
+        virtual ~Density_distr() {};
+
+        virtual Density_distr* clone() const = 0;
+
+        virtual double Correct(Vector3D xi, Vector3D direction, double res) const = 0;
+        virtual double Integrate(Vector3D xi, Vector3D direction, double l) const = 0;
+        virtual double Calculate(Vector3D xi, Vector3D direction, double distance) const = 0;
+        virtual double GetCorrection(Vector3D xi) const = 0;
+
+    protected:
+        Axis* axis_;
+};
+
+
