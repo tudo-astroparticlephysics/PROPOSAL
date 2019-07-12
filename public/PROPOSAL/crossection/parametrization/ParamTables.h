@@ -32,6 +32,8 @@
 #include <vector>
 namespace PROPOSAL {
 
+    // Weak Interaction
+
     const extern std::vector<double> energies;
 
     const extern std::vector< std::vector<double> > y_nu_p;
@@ -43,5 +45,12 @@ namespace PROPOSAL {
     const extern std::vector< std::vector<double> > sigma_nubar_p;
     const extern std::vector< std::vector<double> > sigma_nu_n;
     const extern std::vector< std::vector<double> > sigma_nubar_n;
+
+    // BremsElectronScreening
+
+    const extern std::vector<double> A_energies;
+    const extern std::vector<double> A_logZ;
+
+    const extern std::vector< std::vector<double> > A_correction;
 
 } // namespace PROPOSAL

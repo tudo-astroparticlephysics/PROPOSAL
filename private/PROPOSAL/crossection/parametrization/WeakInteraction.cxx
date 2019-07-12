@@ -8,7 +8,7 @@
 
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/Logging.h"
-#include "PROPOSAL/crossection/parametrization/WeakTable.h"
+#include "PROPOSAL/crossection/parametrization/ParamTables.h"
 
 
 using namespace PROPOSAL;

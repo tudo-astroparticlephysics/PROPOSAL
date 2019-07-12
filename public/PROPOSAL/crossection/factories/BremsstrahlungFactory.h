@@ -59,7 +59,8 @@ public:
         KelnerKokoulinPetrukhin,
         CompleteScreening,
         AndreevBezrukovBugaev,
-        SandrockSoedingreksoRhode
+        SandrockSoedingreksoRhode,
+        ElectronScreening
     };
 
     struct Definition

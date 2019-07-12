@@ -1280,13 +1280,15 @@ void init_parametrization(py::module& m)
     BREMS_DEF(m_sub_brems, CompleteScreening)
     BREMS_DEF(m_sub_brems, AndreevBezrukovBugaev)
     BREMS_DEF(m_sub_brems, SandrockSoedingreksoRhode)
+    BREMS_DEF(m_sub_brems, ElectronScreening)
 
     py::enum_<BremsstrahlungFactory::Enum>(m_sub_brems, "BremsParametrization")
         .value("PetrukhinShestakov", BremsstrahlungFactory::PetrukhinShestakov)
         .value("KelnerKokoulinPetrukhin", BremsstrahlungFactory::KelnerKokoulinPetrukhin)
         .value("CompleteScreening", BremsstrahlungFactory::CompleteScreening)
         .value("AndreevBezrukovBugaev", BremsstrahlungFactory::AndreevBezrukovBugaev)
-        .value("SandrockSoedingreksoRhode", BremsstrahlungFactory::SandrockSoedingreksoRhode);
+        .value("SandrockSoedingreksoRhode", BremsstrahlungFactory::SandrockSoedingreksoRhode)
+        .value("ElectronScreening", BremsstrahlungFactory::ElectronScreening);
 
     py::class_<BremsstrahlungFactory, std::unique_ptr<BremsstrahlungFactory, py::nodelete>>(m_sub_brems, "BremsFactory")
         .def("get_enum_from_str", &BremsstrahlungFactory::GetEnumFromString, py::arg("parametrization_str"))

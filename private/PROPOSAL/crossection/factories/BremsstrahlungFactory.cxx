@@ -22,6 +22,7 @@ BremsstrahlungFactory::BremsstrahlungFactory()
     Register("bremscompletescreening", CompleteScreening, &BremsCompleteScreening::create);
     Register("bremsandreevbezrukovbugaev", AndreevBezrukovBugaev, &BremsAndreevBezrukovBugaev::create);
     Register("bremssandrocksoedingreksorhode", SandrockSoedingreksoRhode, &BremsSandrockSoedingreksoRhode::create);
+    Register("bremselectronscreening", ElectronScreening, &BremsElectronScreening::create);
 }
 
 // ------------------------------------------------------------------------- //

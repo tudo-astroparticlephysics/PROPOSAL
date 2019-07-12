@@ -113,6 +113,39 @@ BREMSSTRAHLUNG_DEF(CompleteScreening)
 BREMSSTRAHLUNG_DEF(AndreevBezrukovBugaev)
 BREMSSTRAHLUNG_DEF(SandrockSoedingreksoRhode)
 
+// ------------------------------------------------------------------------- //
+// ElectronSceening declaration
+// ------------------------------------------------------------------------- //
+
+class BremsElectronScreening : public Bremsstrahlung
+{
+public:
+    BremsElectronScreening(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier, bool lpm);
+    BremsElectronScreening(const BremsElectronScreening&);
+    ~BremsElectronScreening();
+
+    Parametrization* clone() const { return new BremsElectronScreening(*this); }
+    static Bremsstrahlung* create(const ParticleDef& particle_def,
+                                  const Medium& medium,
+                                  const EnergyCutSettings& cuts,
+                                  double multiplier,
+                                  bool lpm)
+    {
+        return new BremsElectronScreening(particle_def, medium, cuts, multiplier, lpm);
+    }
+
+    double CalculateParametrization(double energy, double v);
+    double DifferentialCrossSection(double energy, double v);
+
+    const std::string& GetName() const { return name_; }
+
+private:
+    virtual bool compare(const Parametrization&) const;
+
+    static const std::string name_;
+    Interpolant* interpolant_;
+};
+
 #undef BREMSSTRAHLUNG_DEF
 
 } // namespace PROPOSAL
