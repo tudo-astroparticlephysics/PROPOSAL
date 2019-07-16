@@ -655,19 +655,13 @@ double BremsElectronScreening::CalculateParametrization(double energy, double v)
 
     // Coulomb correction function and empirical correction factor
 
-    double f_c, A_fac;
+    double f_c;
+    double A_fac = interpolant_->InterpolateArray(logZ, energy);
 
-    if(energy < 50.){
-        f_c = 0;
-        //A_fac = interpolant_->InterpolateArray(logZ, energy);
-    }
-    else{
-        aux = ALPHA * components_[component_index_]->GetNucCharge();
-        aux *= aux;
-        f_c = aux * (1 / (1 + aux) + 0.20206 + aux * (-0.0369 + aux * (0.0083 - 0.002 * aux)));
-        //A_fac = 1.;
-    }
-    A_fac = interpolant_->InterpolateArray(logZ, energy);
+
+    aux = ALPHA * components_[component_index_]->GetNucCharge();
+    aux *= aux;
+    f_c = aux * (1 / (1 + aux) + 0.20206 + aux * (-0.0369 + aux * (0.0083 - 0.002 * aux)));
 
     // bremsstrahlung contribution with atomic electrons as target particles
     double Lr, Lp, xi;
@@ -710,6 +704,10 @@ double BremsElectronScreening::CalculateParametrization(double energy, double v)
     }
 
     xi = Lp / (Lr - f_c);
+
+    if(energy < 50.) {
+        f_c = 0;
+    }
 
     result = A_fac * components_[component_index_]->GetNucCharge() * (components_[component_index_]->GetNucCharge() + xi);
 
