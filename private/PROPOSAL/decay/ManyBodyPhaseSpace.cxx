@@ -171,7 +171,9 @@ double ManyBodyPhaseSpace::GenerateEvent(DecayProducts& products, const PhaseSpa
     products[1]->SetDirection(direction);
     products[1]->SetMomentum(kinematics.momenta[0]);
 
-    products[0]->SetDirection(-direction);
+    Vector3D opposite_direction = -direction;
+    opposite_direction.CalculateSphericalCoordinates();
+    products[0]->SetDirection(opposite_direction);
     products[0]->SetMomentum(kinematics.momenta[0]);
 
     // Correct the previous momenta
