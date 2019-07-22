@@ -48,15 +48,15 @@ class MupairProductionFactory
 public:
     enum Enum
     {
-        None = 0,
+        Fail = 0,
+        None,
         KelnerKokoulinPetrukhin,
     };
 
     struct Definition
     {
         Definition()
-            : parametrization(KelnerKokoulinPetrukhin)
-            , mupair_enable(false)
+            : parametrization(None)
             , multiplier(1.0)
             , particle_output(true)
         {
@@ -65,8 +65,6 @@ public:
         bool operator==(const MupairProductionFactory::Definition& def) const
         {
             if (parametrization != def.parametrization)
-                return false;
-            else if (mupair_enable != def.mupair_enable)
                 return false;
             else if (multiplier != def.multiplier)
                 return false;
@@ -82,7 +80,6 @@ public:
         }
 
         Enum parametrization;
-        bool mupair_enable;
         double multiplier;
         bool particle_output;
     };

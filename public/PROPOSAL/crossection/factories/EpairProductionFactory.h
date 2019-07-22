@@ -48,9 +48,10 @@ class EpairProductionFactory
 public:
     enum Enum
     {
-        None = 0,
+        Fail = 0,
+        None,
         KelnerKokoulinPetrukhin,
-        SandrockSoedingreksoRhode
+        SandrockSoedingreksoRhode,
     };
 
     struct Definition

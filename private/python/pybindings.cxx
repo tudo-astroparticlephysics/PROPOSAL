@@ -1288,7 +1288,8 @@ void init_parametrization(py::module& m)
         .value("CompleteScreening", BremsstrahlungFactory::CompleteScreening)
         .value("AndreevBezrukovBugaev", BremsstrahlungFactory::AndreevBezrukovBugaev)
         .value("SandrockSoedingreksoRhode", BremsstrahlungFactory::SandrockSoedingreksoRhode)
-        .value("ElectronScreening", BremsstrahlungFactory::ElectronScreening);
+        .value("ElectronScreening", BremsstrahlungFactory::ElectronScreening)
+        .value("None", BremsstrahlungFactory::None);
 
     py::class_<BremsstrahlungFactory, std::unique_ptr<BremsstrahlungFactory, py::nodelete>>(m_sub_brems, "BremsFactory")
         .def("get_enum_from_str", &BremsstrahlungFactory::GetEnumFromString, py::arg("parametrization_str"))
@@ -1357,7 +1358,8 @@ void init_parametrization(py::module& m)
 
     py::enum_<EpairProductionFactory::Enum>(m_sub_epair, "EpairParametrization")
         .value("KelnerKokoulinPetrukhin", EpairProductionFactory::KelnerKokoulinPetrukhin)
-        .value("SandrockSoedingreksoRhode", EpairProductionFactory::SandrockSoedingreksoRhode);
+        .value("SandrockSoedingreksoRhode", EpairProductionFactory::SandrockSoedingreksoRhode)
+        .value("None", EpairProductionFactory::None);
 
     py::class_<EpairProductionFactory, std::unique_ptr<EpairProductionFactory, py::nodelete>>(m_sub_epair, "EpairFactory")
         .def("get_enum_from_str", &EpairProductionFactory::GetEnumFromString, py::arg("parametrization_str"))
@@ -1444,12 +1446,12 @@ void init_parametrization(py::module& m)
     MUPAIR_INTERPOL_DEF(m_sub_mupair, KelnerKokoulinPetrukhin)
 
     py::enum_<MupairProductionFactory::Enum>(m_sub_mupair, "MupairParametrization")
-        .value("KelnerKokoulinPetrukhin", MupairProductionFactory::KelnerKokoulinPetrukhin);
+        .value("KelnerKokoulinPetrukhin", MupairProductionFactory::KelnerKokoulinPetrukhin)
+        .value("None", MupairProductionFactory::None);
 
     py::class_<MupairProductionFactory::Definition, std::shared_ptr<MupairProductionFactory::Definition> >(m_sub_mupair, "MupairDefinition")
         .def(py::init<>())
         .def_readwrite("parametrization", &MupairProductionFactory::Definition::parametrization)
-        .def_readwrite("mupair_enable", &MupairProductionFactory::Definition::mupair_enable)
         .def_readwrite("multiplier", &MupairProductionFactory::Definition::multiplier)
         .def_readwrite("particle_output", &MupairProductionFactory::Definition::particle_output);
 
@@ -1489,12 +1491,12 @@ void init_parametrization(py::module& m)
 
 
     py::enum_<WeakInteractionFactory::Enum>(m_sub_weak, "WeakParametrization")
-            .value("CooperSarkarMertsch", WeakInteractionFactory::CooperSarkarMertsch);
+            .value("CooperSarkarMertsch", WeakInteractionFactory::CooperSarkarMertsch)
+            .value("None", WeakInteractionFactory::None);
 
     py::class_<WeakInteractionFactory::Definition, std::shared_ptr<WeakInteractionFactory::Definition> >(m_sub_weak, "WeakDefinition")
             .def(py::init<>())
             .def_readwrite("parametrization", &WeakInteractionFactory::Definition::parametrization)
-            .def_readwrite("weak_enable", &WeakInteractionFactory::Definition::weak_enable)
             .def_readwrite("multiplier", &WeakInteractionFactory::Definition::multiplier);
 
     // --------------------------------------------------------------------- //
@@ -1655,7 +1657,8 @@ void init_parametrization(py::module& m)
         .value("AbramowiczLevinLevyMaor91", PhotonuclearFactory::AbramowiczLevinLevyMaor91)
         .value("AbramowiczLevinLevyMaor97", PhotonuclearFactory::AbramowiczLevinLevyMaor97)
         .value("ButkevichMikhailov", PhotonuclearFactory::ButkevichMikhailov)
-        .value("RenoSarcevicSu", PhotonuclearFactory::RenoSarcevicSu);
+        .value("RenoSarcevicSu", PhotonuclearFactory::RenoSarcevicSu)
+        .value("None", PhotonuclearFactory::None);
 
     py::enum_<PhotonuclearFactory::Shadow>(m_sub_photo, "PhotoShadow")
         .value("DuttaRenoSarcevicSeckel", PhotonuclearFactory::ShadowDuttaRenoSarcevicSeckel)

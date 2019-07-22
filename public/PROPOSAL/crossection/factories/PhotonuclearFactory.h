@@ -56,7 +56,8 @@ public:
 
     enum Enum
     {
-        None = 0,
+        Fail = 0,
+        None,
         Zeus,
         BezrukovBugaev,
         Rhode,
@@ -64,7 +65,7 @@ public:
         AbramowiczLevinLevyMaor91,
         AbramowiczLevinLevyMaor97,
         ButkevichMikhailov,
-        RenoSarcevicSu
+        RenoSarcevicSu,
     };
 
     enum Shadow

@@ -63,34 +63,34 @@ Utility::Utility(const ParticleDef& particle_def,
     , cut_settings_(cut_settings)
     , crosssections_()
 {
-    crosssections_.push_back(BremsstrahlungFactory::Get().CreateBremsstrahlung(
-        particle_def_, *medium_, cut_settings_, utility_def.brems_def));
+    if(utility_def.brems_def.parametrization!=BremsstrahlungFactory::Enum::None) {
+        crosssections_.push_back(BremsstrahlungFactory::Get().CreateBremsstrahlung(
+                particle_def_, *medium_, cut_settings_, utility_def.brems_def));
+    }
 
-    crosssections_.push_back(
-        PhotonuclearFactory::Get().CreatePhotonuclear(particle_def_, *medium_, cut_settings_, utility_def.photo_def));
+    if(utility_def.photo_def.parametrization!=PhotonuclearFactory::Enum::None) {
+        crosssections_.push_back(PhotonuclearFactory::Get().CreatePhotonuclear(
+                particle_def_, *medium_, cut_settings_,utility_def.photo_def));
+    }
 
-    crosssections_.push_back(EpairProductionFactory::Get().CreateEpairProduction(
-        particle_def_, *medium_, cut_settings_, utility_def.epair_def));
+    if(utility_def.epair_def.parametrization!=EpairProductionFactory::Enum::None) {
+        crosssections_.push_back(EpairProductionFactory::Get().CreateEpairProduction(
+                particle_def_, *medium_, cut_settings_, utility_def.epair_def));
+    }
 
     crosssections_.push_back(
         IonizationFactory::Get().CreateIonization(particle_def_, *medium_, cut_settings_, utility_def.ioniz_def));
 
-    if(utility_def.mupair_def.mupair_enable == true){
+    if(utility_def.mupair_def.parametrization!=MupairProductionFactory::Enum::None) {
         crosssections_.push_back(MupairProductionFactory::Get().CreateMupairProduction(
             particle_def_, *medium_, cut_settings_, utility_def.mupair_def));
         log_debug("Mupair Production enabled");
     }
-    else{
-        log_debug("Mupair Production disabled");
-    }
 
-    if(utility_def.weak_def.weak_enable == true){
+    if(utility_def.weak_def.parametrization!=WeakInteractionFactory::Enum::None) {
         crosssections_.push_back(WeakInteractionFactory::Get().CreateWeakInteraction(
-                particle_def_, *medium_, utility_def.weak_def));
+                    particle_def_, *medium_, utility_def.weak_def));
         log_debug("Weak Interaction enabled");
-    }
-    else{
-        log_debug("Weak Interaction disabled");
     }
 
 }
@@ -105,34 +105,35 @@ Utility::Utility(const ParticleDef& particle_def,
     , cut_settings_(cut_settings)
     , crosssections_()
 {
-    crosssections_.push_back(BremsstrahlungFactory::Get().CreateBremsstrahlung(
-        particle_def_, *medium_, cut_settings_, utility_def.brems_def, interpolation_def));
+    if(utility_def.brems_def.parametrization!=BremsstrahlungFactory::Enum::None) {
+        crosssections_.push_back(BremsstrahlungFactory::Get().CreateBremsstrahlung(
+                particle_def_, *medium_, cut_settings_, utility_def.brems_def, interpolation_def));
+    }
 
-    crosssections_.push_back(PhotonuclearFactory::Get().CreatePhotonuclear(
-        particle_def_, *medium_, cut_settings_, utility_def.photo_def, interpolation_def));
+    if(utility_def.photo_def.parametrization!=PhotonuclearFactory::Enum::None) {
+        crosssections_.push_back(PhotonuclearFactory::Get().CreatePhotonuclear(
+                particle_def_, *medium_, cut_settings_, utility_def.photo_def, interpolation_def));
+    }
 
-    crosssections_.push_back(EpairProductionFactory::Get().CreateEpairProduction(
-        particle_def_, *medium_, cut_settings_, utility_def.epair_def, interpolation_def));
+    if(utility_def.epair_def.parametrization!=EpairProductionFactory::Enum::None) {
+        crosssections_.push_back(EpairProductionFactory::Get().CreateEpairProduction(
+                particle_def_, *medium_, cut_settings_, utility_def.epair_def, interpolation_def));
+    }
+
 
     crosssections_.push_back(IonizationFactory::Get().CreateIonization(
         particle_def_, *medium_, cut_settings_, utility_def.ioniz_def, interpolation_def));
 
-    if(utility_def.mupair_def.mupair_enable == true){
+    if(utility_def.mupair_def.parametrization!=MupairProductionFactory::Enum::None) {
         crosssections_.push_back(MupairProductionFactory::Get().CreateMupairProduction(
-            particle_def_, *medium_, cut_settings_, utility_def.mupair_def, interpolation_def));
+                    particle_def_, *medium_, cut_settings_, utility_def.mupair_def, interpolation_def));
         log_debug("Mupair Production enabled");
     }
-    else{
-        log_debug("Mupair Production disabled");
-    }
 
-    if(utility_def.weak_def.weak_enable == true){
+    if(utility_def.weak_def.parametrization!=WeakInteractionFactory::Enum::None) {
         crosssections_.push_back(WeakInteractionFactory::Get().CreateWeakInteraction(
-                particle_def_, *medium_, utility_def.weak_def, interpolation_def));
+                    particle_def_, *medium_, utility_def.weak_def, interpolation_def));
         log_debug("Weak Interaction enabled");
-    }
-    else{
-        log_debug("WeakInteraction disabled");
     }
 }
 

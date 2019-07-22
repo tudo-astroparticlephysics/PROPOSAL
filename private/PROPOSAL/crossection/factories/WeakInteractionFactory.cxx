@@ -16,6 +16,7 @@ WeakInteractionFactory::WeakInteractionFactory()
         , string_enum_()
 {
     Register("weakcoopersarkarmertsch", CooperSarkarMertsch, &WeakCooperSarkarMertsch::create);
+    Register("none", None, nullptr);
 }
 
 WeakInteractionFactory::~WeakInteractionFactory()
@@ -34,6 +35,11 @@ CrossSection* WeakInteractionFactory::CreateWeakInteraction(const ParticleDef& p
                                                             const Medium& medium,
                                                             const Definition& def) const
 {
+    if(def.parametrization == WeakInteractionFactory::Enum::None){
+        log_fatal("Can't return Weakinteraction Crosssection if parametrization is None");
+        return NULL;
+    }
+
     WeakMapEnum::const_iterator it = weak_map_enum_.find(def.parametrization);
 
     if (it != weak_map_enum_.end())
@@ -41,7 +47,7 @@ CrossSection* WeakInteractionFactory::CreateWeakInteraction(const ParticleDef& p
         return new WeakIntegral(*it->second(particle_def, medium, def.multiplier));
     } else
     {
-        log_fatal("WeakInteraction %s not registerd!", typeid(def.parametrization).name());
+        log_fatal("WeakInteraction %s not registered!", typeid(def.parametrization).name());
         return NULL; // Just to prevent warnings
     }
 }
@@ -52,6 +58,11 @@ CrossSection* WeakInteractionFactory::CreateWeakInteraction(const ParticleDef& p
                                                             const Definition& def,
                                                             InterpolationDef interpolation_def) const
 {
+    if(def.parametrization == WeakInteractionFactory::Enum::None){
+        log_fatal("Can't return Weakinteraction Crosssection if parametrization is None");
+        return NULL;
+    }
+
     WeakMapEnum::const_iterator it = weak_map_enum_.find(def.parametrization);
 
     if (it != weak_map_enum_.end())
@@ -59,7 +70,7 @@ CrossSection* WeakInteractionFactory::CreateWeakInteraction(const ParticleDef& p
         return new WeakInterpolant(*it->second(particle_def, medium, def.multiplier), interpolation_def);
     } else
     {
-        log_fatal("WeakInteraction %s not registerd!", typeid(def.parametrization).name());
+        log_fatal("WeakInteraction %s not registered!", typeid(def.parametrization).name());
         return NULL; // Just to prevent warnings
     }
 }
@@ -86,8 +97,8 @@ WeakInteractionFactory::Enum WeakInteractionFactory::GetEnumFromString(const std
         return it->second;
     } else
     {
-        log_fatal("WeakInteraction %s not registerd!", name.c_str());
-        return None; // Just to prevent warnings
+        log_fatal("WeakInteraction %s not registered!", name.c_str());
+        return Fail; // Just to prevent warnings
     }
 }
 
@@ -100,7 +111,7 @@ std::string WeakInteractionFactory::GetStringFromEnum(const WeakInteractionFacto
         return it->second;
     } else
     {
-        log_fatal("WeakInteraction %s not registerd!", typeid(enum_t).name());
-        return ""; // Just to prevent warinngs
+        log_fatal("WeakInteraction %s not registered!", typeid(enum_t).name());
+        return ""; // Just to prevent warnings
     }
 }

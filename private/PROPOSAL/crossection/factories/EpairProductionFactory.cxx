@@ -17,6 +17,7 @@ EpairProductionFactory::EpairProductionFactory()
 {
     Register("epairkelnerkokoulinpetrukhin", KelnerKokoulinPetrukhin, std::make_pair(&EpairKelnerKokoulinPetrukhin::create, &EpairProductionRhoInterpolant<EpairKelnerKokoulinPetrukhin>::create));
     Register("epairsandrocksoedingreksorhode", SandrockSoedingreksoRhode, std::make_pair(&EpairSandrockSoedingreksoRhode::create, &EpairProductionRhoInterpolant<EpairSandrockSoedingreksoRhode>::create));
+    Register("none", None, std::make_pair(nullptr, nullptr));
 }
 
 EpairProductionFactory::~EpairProductionFactory()
@@ -36,6 +37,11 @@ CrossSection* EpairProductionFactory::CreateEpairProduction(const ParticleDef& p
                                                             const EnergyCutSettings& cuts,
                                                             const Definition& def) const
 {
+    if(def.parametrization == EpairProductionFactory::Enum::None){
+        log_fatal("Can't return Epairproduction Crosssection if parametrization is None");
+        return NULL;
+    }
+
     EpairMapEnum::const_iterator it = epair_map_enum_.find(def.parametrization);
 
     if (it != epair_map_enum_.end())
@@ -43,8 +49,8 @@ CrossSection* EpairProductionFactory::CreateEpairProduction(const ParticleDef& p
         return new EpairIntegral(*it->second.first(particle_def, medium, cuts, def.multiplier, def.lpm_effect));
     } else
     {
-        log_fatal("EpairProduction %s not registerd!", typeid(def.parametrization).name());
-        return NULL; // Just to prevent warinngs
+        log_fatal("EpairProduction %s not registered!", typeid(def.parametrization).name());
+        return NULL; // Just to prevent warnings
     }
 }
 
@@ -55,6 +61,11 @@ CrossSection* EpairProductionFactory::CreateEpairProduction(const ParticleDef& p
                                                             const Definition& def,
                                                             InterpolationDef interpolation_def) const
 {
+    if(def.parametrization == EpairProductionFactory::Enum::None){
+        log_fatal("Can't return Epairproduction Crosssection if parametrization is None");
+        return NULL;
+    }
+
     EpairMapEnum::const_iterator it = epair_map_enum_.find(def.parametrization);
 
     if (it != epair_map_enum_.end())
@@ -62,8 +73,8 @@ CrossSection* EpairProductionFactory::CreateEpairProduction(const ParticleDef& p
         return new EpairInterpolant(*it->second.second(particle_def, medium, cuts, def.multiplier, def.lpm_effect, interpolation_def), interpolation_def);
     } else
     {
-        log_fatal("EpairProduction %s not registerd!", typeid(def.parametrization).name());
-        return NULL; // Just to prevent warinngs
+        log_fatal("EpairProduction %s not registered!", typeid(def.parametrization).name());
+        return NULL; // Just to prevent warnings
     }
 }
 
@@ -89,8 +100,8 @@ EpairProductionFactory::Enum EpairProductionFactory::GetEnumFromString(const std
         return it->second;
     } else
     {
-        log_fatal("EpairProduction %s not registerd!", name.c_str());
-        return None; // Just to prevent warinngs
+        log_fatal("EpairProduction %s not registered!", name.c_str());
+        return Fail; // Just to prevent warnings
     }
 }
 
@@ -103,7 +114,7 @@ std::string EpairProductionFactory::GetStringFromEnum(const EpairProductionFacto
         return it->second;
     } else
     {
-        log_fatal("EpairProduction %s not registerd!", typeid(enum_t).name());
-        return ""; // Just to prevent warinngs
+        log_fatal("EpairProduction %s not registered!", typeid(enum_t).name());
+        return ""; // Just to prevent warnings
     }
 }
