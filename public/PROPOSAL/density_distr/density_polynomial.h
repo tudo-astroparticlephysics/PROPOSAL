@@ -4,36 +4,37 @@
 #include <iostream>
 #include "PROPOSAL/density_distr/density_distr.h"
 #include "PROPOSAL/math/Vector3D.h"
+#include "PROPOSAL/math/Function.h"
 
-// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-// %%%%%%%%%%%%%%%%%%%       Polynom      %%%%%%%%%%%%%%%%%%%%
-// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// // %%%%%%%%%%%%%%%%%%%       Polynom      %%%%%%%%%%%%%%%%%%%%
+// // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-namespace PROPOSAL{
+// namespace PROPOSAL{
 
-class Polynom
-{
-    public:
-        Polynom(std::vector<double> coefficients);
-        Polynom(const Polynom&);
+// class Polynom
+// {
+//     public:
+//         Polynom(std::vector<double> coefficients);
+//         Polynom(const Polynom&);
 
-        Polynom* clone() const { return new Polynom(*this); };
+//         Polynom* clone() const { return new Polynom(*this); };
 
-        double evaluate(double x);
+//         double evaluate(double x);
 
-        Polynom GetDerivative();
-        Polynom GetAntiderivative(double constant);
+//         Polynom GetDerivative();
+//         Polynom GetAntiderivative(double constant);
+//         std::vector<double> GetCoefficient();
 
-        friend std::ostream& operator<<(std::ostream& os, const Polynom& p);
+//         friend std::ostream& operator<<(std::ostream& os, const Polynom& p);
 
-        std::function<double(double)> GetFunction();
+//         std::function<double(double)> GetFunction();
 
-    protected:
-        std::function<double(double)> function_;
-        int N;
-        double* coeff;
-};
-}
+//     protected:
+//         int N;
+//         double* coeff;
+// };
+// }
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // %%%%%%%%%%%%%%%%%%% Polynomial-Density %%%%%%%%%%%%%%%%%%%%

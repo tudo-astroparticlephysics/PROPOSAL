@@ -92,6 +92,9 @@
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/math/Vector3D.h"
 #include "PROPOSAL/math/MathMethods.h"
+#include "PROPOSAL/math/Function.h"
+#include "PROPOSAL/math/Spline.h"
+#include "PROPOSAL/math/TableWriter.h"
 
 #include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/particle/ParticleDef.h"

@@ -1,85 +1,92 @@
 #include "PROPOSAL/density_distr/density_polynomial.h" 
 #include "PROPOSAL/math/MathMethods.h" 
+#include "PROPOSAL/math/Function.h" 
 #include <functional>
 #include <algorithm>
 #include <iostream>
 
 
-// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-// %%%%%%%%%%%%%%%%%%%       Polynom      %%%%%%%%%%%%%%%%%%%%
-// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// // %%%%%%%%%%%%%%%%%%%       Polynom      %%%%%%%%%%%%%%%%%%%%
+// // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-using namespace PROPOSAL;
+// using namespace PROPOSAL;
 
-Polynom::Polynom(std::vector<double> coefficients)
-{
-    N = coefficients.size();
-    coeff = new double[N];
+// Polynom::Polynom(std::vector<double> coefficients)
+// {
+//     N = coefficients.size();
+//     coeff = new double[N];
 
-    std::copy(coefficients.begin(), coefficients.end(), coeff);
-}
+//     std::copy(coefficients.begin(), coefficients.end(), coeff);
+// }
 
-Polynom::Polynom(const Polynom& poly):
-    N(poly.N),
-    coeff(poly.coeff)
-{}
+// Polynom::Polynom(const Polynom& poly):
+//     N(poly.N),
+//     coeff(poly.coeff)
+// {}
 
-double Polynom::evaluate(double x)
-{
-    double aux {0};
+// double Polynom::evaluate(double x)
+// {
+//     double aux {0};
 
-    for (int i = 0; i < N; ++i) 
-        aux += coeff[i] * std::pow(x, i);
+//     // Hier sollte demnächst das Hornerschema stehen!
+//     for (int i = 0; i < N; ++i) 
+//         aux += coeff[i] * std::pow(x, i);
 
-    return aux;
-}
+//     return aux;
+// }
 
-Polynom Polynom::GetDerivative()
-{
-    std::vector<double> derivative_coeff;
+// Polynom Polynom::GetDerivative()
+// {
+//     std::vector<double> derivative_coeff;
 
-    for (auto i = 1; i < N; ++i)
-        derivative_coeff.push_back(coeff[i] * i);
+//     for (auto i = 1; i < N; ++i)
+//         derivative_coeff.push_back(coeff[i] * i);
 
-    return Polynom(derivative_coeff);
-}
+//     return Polynom(derivative_coeff);
+// }
 
-Polynom Polynom::GetAntiderivative(double constant)
-{
-    std::vector<double> derivative_coeff {constant};
+// Polynom Polynom::GetAntiderivative(double constant)
+// {
+//     std::vector<double> derivative_coeff {constant};
 
-    for (auto i = 0; i < N; ++i)
-        derivative_coeff.push_back(coeff[i] / (i+1));
+//     for (auto i = 0; i < N; ++i)
+//         derivative_coeff.push_back(coeff[i] / (i+1));
 
-    return Polynom(derivative_coeff);
-}
+//     return Polynom(derivative_coeff);
+// }
+        
+// std::vector<double> Polynom::GetCoefficient()
+// {
+//     return std::vector<double> v(coeff, coeff + N);
+// }
 
         
-std::function<double(double)> Polynom::GetFunction()
-{
-    return (std::function<double(double)>)std::bind(&Polynom::evaluate, 
-                                                    this, 
-                                                    std::placeholders::_1);
-}
+// std::function<double(double)> Polynom::GetFunction()
+// {
+//     return (std::function<double(double)>)std::bind(&Polynom::evaluate, 
+//                                                     this, 
+//                                                     std::placeholders::_1);
+// }
 
-namespace PROPOSAL {
-    std::ostream& operator<<(std::ostream& os, const Polynom& p)
-    {
-        bool flag = false;
-        for (int i = 0; i < p.N; ++i) {
-            if(p.coeff[i] != 0)
-            {
-                if(flag==true)
-                    os << "+ " << p.coeff[i] << " * x^{" << i << "}";
-                else {
-                    os << "p(x) = " << p.coeff[i] << " * x^{" << i << "}";
-                    flag = true;
-                }
-            }
-        }
-        return os;
-    }
-} // namespace PROPOSAL 
+// namespace PROPOSAL {
+//     std::ostream& operator<<(std::ostream& os, const Polynom& p)
+//     {
+//         bool flag = false;
+//         for (int i = 0; i < p.N; ++i) {
+//             if(p.coeff[i] != 0)
+//             {
+//                 if(flag==true)
+//                     os << " + " << p.coeff[i] << " * x^{" << i << "}";
+//                 else {
+//                     os << "p(x) = " << p.coeff[i] << " * x^{" << i << "}";
+//                     flag = true;
+//                 }
+//             }
+//         }
+//         return os;
+//     }
+// } // namespace PROPOSAL 
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // %%%%%%%%%%%%%%%%%%% Polynomial-Density %%%%%%%%%%%%%%%%%%%%
