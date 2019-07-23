@@ -5,6 +5,7 @@
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/crossection/IonizIntegral.h"
 #include "PROPOSAL/crossection/IonizInterpolant.h"
+#include "PROPOSAL/crossection/factories/IonizationFactory.h"
 #include "PROPOSAL/crossection/parametrization/Ionization.h"
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/medium/Medium.h"
@@ -36,11 +37,11 @@ TEST(Comparison, Comparison_equal)
     EnergyCutSettings ecuts;
     double multiplier = 1.;
 
-    Ionization* Ioniz_A      = new Ionization(particle_def, medium, ecuts, multiplier);
-    Parametrization* Ioniz_B = new Ionization(particle_def, medium, ecuts, multiplier);
+    IonizBetheBlochRossi* Ioniz_A      = new IonizBetheBlochRossi(particle_def, medium, ecuts, multiplier);
+    Parametrization* Ioniz_B = new IonizBetheBlochRossi(particle_def, medium, ecuts, multiplier);
     EXPECT_TRUE(*Ioniz_A == *Ioniz_B);
 
-    Ionization param(particle_def, medium, ecuts, multiplier);
+    IonizBetheBlochRossi param(particle_def, medium, ecuts, multiplier);
     EXPECT_TRUE(param == *Ioniz_A);
 
     IonizIntegral* Int_A        = new IonizIntegral(param);
@@ -71,11 +72,11 @@ TEST(Comparison, Comparison_not_equal)
     double multiplier_1 = 1.;
     double multiplier_2 = 2.;
 
-    Ionization Ioniz_A(mu_def, medium_1, ecuts_1, multiplier_1);
-    Ionization Ioniz_B(tau_def, medium_1, ecuts_1, multiplier_1);
-    Ionization Ioniz_C(mu_def, medium_2, ecuts_1, multiplier_1);
-    Ionization Ioniz_D(mu_def, medium_1, ecuts_2, multiplier_1);
-    Ionization Ioniz_E(mu_def, medium_1, ecuts_1, multiplier_2);
+    IonizBetheBlochRossi Ioniz_A(mu_def, medium_1, ecuts_1, multiplier_1);
+    IonizBetheBlochRossi Ioniz_B(tau_def, medium_1, ecuts_1, multiplier_1);
+    IonizBetheBlochRossi Ioniz_C(mu_def, medium_2, ecuts_1, multiplier_1);
+    IonizBetheBlochRossi Ioniz_D(mu_def, medium_1, ecuts_2, multiplier_1);
+    IonizBetheBlochRossi Ioniz_E(mu_def, medium_1, ecuts_1, multiplier_2);
     EXPECT_TRUE(Ioniz_A != Ioniz_B);
     EXPECT_TRUE(Ioniz_A != Ioniz_C);
     EXPECT_TRUE(Ioniz_A != Ioniz_D);
@@ -98,8 +99,8 @@ TEST(Assignment, Copyconstructor)
     EnergyCutSettings ecuts(500, -1);
     double multiplier = 1.;
 
-    Ionization Ioniz_A(mu_def, medium, ecuts, multiplier);
-    Ionization Ioniz_B = Ioniz_A;
+    IonizBetheBlochRossi Ioniz_A(mu_def, medium, ecuts, multiplier);
+    IonizBetheBlochRossi Ioniz_B = Ioniz_A;
 
     IonizIntegral Int_A(Ioniz_A);
     IonizIntegral Int_B = Int_A;
@@ -119,8 +120,8 @@ TEST(Assignment, Copyconstructor2)
     EnergyCutSettings ecuts(500, -1);
     double multiplier = 1.;
 
-    Ionization Ioniz_A(mu_def, medium, ecuts, multiplier);
-    Ionization Ioniz_B(Ioniz_A);
+    IonizBetheBlochRossi Ioniz_A(mu_def, medium, ecuts, multiplier);
+    IonizBetheBlochRossi Ioniz_B(Ioniz_A);
 
     IonizIntegral Int_A(Ioniz_A);
     IonizIntegral Int_B(Int_A);
@@ -153,22 +154,26 @@ TEST(Ionization, Test_of_dEdx)
     double ecut;
     double vcut;
     double multiplier;
+    std::string parametrization;
     double energy;
     double dEdx_stored;
     double dEdx_new;
 
     while (in.good())
     {
-        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> dEdx_stored;
+        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> dEdx_stored >> parametrization;
 
         ParticleDef particle_def = getParticleDef(particleName);
         Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
-        Ionization Ioniz(particle_def, *medium, ecuts, multiplier);
-        IonizIntegral Ioniz_Int(Ioniz);
+        IonizationFactory::Definition ioniz_def;
+        ioniz_def.multiplier        = multiplier;
+        ioniz_def.parametrization   = IonizationFactory::Get().GetEnumFromString(parametrization);
 
-        dEdx_new = Ioniz_Int.CalculatedEdx(energy);
+        CrossSection* Ioniz = IonizationFactory::Get().CreateIonization(particle_def, *medium, ecuts, ioniz_def);
+
+        dEdx_new = Ioniz->CalculatedEdx(energy);
 
         ASSERT_NEAR(dEdx_new, dEdx_stored, 1e-10 * dEdx_stored);
 
@@ -195,22 +200,26 @@ TEST(Ionization, Test_of_dNdx)
     double ecut;
     double vcut;
     double multiplier;
+    std::string parametrization;
     double energy;
     double dNdx_stored;
     double dNdx_new;
 
     while (in.good())
     {
-        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> dNdx_stored;
+        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> dNdx_stored >> parametrization;
 
         ParticleDef particle_def = getParticleDef(particleName);
         Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
-        Ionization Ioniz(particle_def, *medium, ecuts, multiplier);
-        IonizIntegral Ioniz_Int(Ioniz);
+        IonizationFactory::Definition ioniz_def;
+        ioniz_def.multiplier        = multiplier;
+        ioniz_def.parametrization   = IonizationFactory::Get().GetEnumFromString(parametrization);
 
-        dNdx_new = Ioniz_Int.CalculatedNdx(energy);
+        CrossSection* Ioniz = IonizationFactory::Get().CreateIonization(particle_def, *medium, ecuts, ioniz_def);
+
+        dNdx_new = Ioniz->CalculatedNdx(energy);
 
         ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-10 * dNdx_stored);
 
@@ -237,6 +246,7 @@ TEST(Ionization, Test_of_dNdx_rnd)
     double ecut;
     double vcut;
     double multiplier;
+    std::string parametrization;
     double energy;
     double rnd;
     double dNdx_rnd_stored;
@@ -246,16 +256,20 @@ TEST(Ionization, Test_of_dNdx_rnd)
 
     while (in.good())
     {
-        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> rnd >> dNdx_rnd_stored;
+        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> rnd >> dNdx_rnd_stored >>
+            parametrization;
 
         ParticleDef particle_def = getParticleDef(particleName);
         Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
-        Ionization Ioniz(particle_def, *medium, ecuts, multiplier);
-        IonizIntegral Ioniz_Int(Ioniz);
+        IonizationFactory::Definition ioniz_def;
+        ioniz_def.multiplier        = multiplier;
+        ioniz_def.parametrization   = IonizationFactory::Get().GetEnumFromString(parametrization);
 
-        dNdx_rnd_new = Ioniz_Int.CalculatedNdx(energy, rnd);
+        CrossSection* Ioniz = IonizationFactory::Get().CreateIonization(particle_def, *medium, ecuts, ioniz_def);
+
+        dNdx_rnd_new = Ioniz->CalculatedNdx(energy, rnd);
 
         ASSERT_NEAR(dNdx_rnd_new, dNdx_rnd_stored, 1E-10 * dNdx_rnd_stored);
 
@@ -282,6 +296,7 @@ TEST(Ionization, Test_Stochastic_Loss)
     double ecut;
     double vcut;
     double multiplier;
+    std::string parametrization;
     double energy;
     double rnd1, rnd2;
     double stochastic_loss_stored;
@@ -292,16 +307,19 @@ TEST(Ionization, Test_Stochastic_Loss)
     while (in.good())
     {
         in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> rnd1 >> rnd2 >>
-            stochastic_loss_stored;
+            stochastic_loss_stored >> parametrization;
 
         ParticleDef particle_def = getParticleDef(particleName);
         Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
-        Ionization Ioniz(particle_def, *medium, ecuts, multiplier);
-        IonizIntegral Ioniz_Int(Ioniz);
+        IonizationFactory::Definition ioniz_def;
+        ioniz_def.multiplier        = multiplier;
+        ioniz_def.parametrization   = IonizationFactory::Get().GetEnumFromString(parametrization);
 
-        stochastic_loss_new = Ioniz_Int.CrossSectionIntegral::CalculateStochasticLoss(energy, rnd1, rnd2);
+        CrossSection* Ioniz = IonizationFactory::Get().CreateIonization(particle_def, *medium, ecuts, ioniz_def);
+
+        stochastic_loss_new = Ioniz->CalculateStochasticLoss(energy, rnd1, rnd2);
 
         ASSERT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
 
@@ -328,6 +346,7 @@ TEST(Ionization, Test_of_dEdx_Interpolant)
     double ecut;
     double vcut;
     double multiplier;
+    std::string parametrization;
     double energy;
     double dEdx_stored;
     double dEdx_new;
@@ -336,16 +355,20 @@ TEST(Ionization, Test_of_dEdx_Interpolant)
 
     while (in.good())
     {
-        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> dEdx_stored;
+        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> dEdx_stored >> parametrization;
 
         ParticleDef particle_def = getParticleDef(particleName);
         Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
-        Ionization Ioniz(particle_def, *medium, ecuts, multiplier);
-        IonizInterpolant Ioniz_Interpol(Ioniz, InterpolDef);
+        IonizationFactory::Definition ioniz_def;
+        ioniz_def.multiplier      = multiplier;
+        ioniz_def.parametrization = IonizationFactory::Get().GetEnumFromString(parametrization);
 
-        dEdx_new = Ioniz_Interpol.CalculatedEdx(energy);
+        CrossSection* Ioniz =  IonizationFactory::Get().CreateIonization(
+                particle_def, *medium, ecuts, ioniz_def, InterpolDef);
+
+        dEdx_new = Ioniz->CalculatedEdx(energy);
 
         ASSERT_NEAR(dEdx_new, dEdx_stored, 1e-10 * dEdx_stored);
 
@@ -372,6 +395,7 @@ TEST(Ionization, Test_of_dNdx_Interpolant)
     double ecut;
     double vcut;
     double multiplier;
+    std::string parametrization;
     double energy;
     double dNdx_stored;
     double dNdx_new;
@@ -380,16 +404,20 @@ TEST(Ionization, Test_of_dNdx_Interpolant)
 
     while (in.good())
     {
-        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> dNdx_stored;
+        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> dNdx_stored >> parametrization;
 
         ParticleDef particle_def = getParticleDef(particleName);
         Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
-        Ionization Ioniz(particle_def, *medium, ecuts, multiplier);
-        IonizInterpolant Ioniz_Interpol(Ioniz, InterpolDef);
+        IonizationFactory::Definition ioniz_def;
+        ioniz_def.multiplier      = multiplier;
+        ioniz_def.parametrization = IonizationFactory::Get().GetEnumFromString(parametrization);
 
-        dNdx_new = Ioniz_Interpol.CalculatedNdx(energy);
+        CrossSection* Ioniz =  IonizationFactory::Get().CreateIonization(
+                particle_def, *medium, ecuts, ioniz_def, InterpolDef);
+
+        dNdx_new = Ioniz->CalculatedNdx(energy);
 
         ASSERT_NEAR(dNdx_new, dNdx_stored, 1e-10 * dNdx_stored);
 
@@ -416,6 +444,7 @@ TEST(Ionization, Test_of_dNdxrnd_interpol)
     double ecut;
     double vcut;
     double multiplier;
+    std::string parametrization;
     double energy;
     double rnd;
     double dNdx_rnd_stored;
@@ -427,16 +456,21 @@ TEST(Ionization, Test_of_dNdxrnd_interpol)
 
     while (in.good())
     {
-        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> rnd >> dNdx_rnd_stored;
+        in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> rnd >> dNdx_rnd_stored >>
+            parametrization;
 
         ParticleDef particle_def = getParticleDef(particleName);
         Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
-        Ionization Ioniz(particle_def, *medium, ecuts, multiplier);
-        IonizInterpolant Ioniz_Interpol(Ioniz, InterpolDef);
+        IonizationFactory::Definition ioniz_def;
+        ioniz_def.multiplier      = multiplier;
+        ioniz_def.parametrization = IonizationFactory::Get().GetEnumFromString(parametrization);
 
-        dNdx_rnd_new = Ioniz_Interpol.CalculatedNdx(energy, rnd);
+        CrossSection* Ioniz =  IonizationFactory::Get().CreateIonization(
+                particle_def, *medium, ecuts, ioniz_def, InterpolDef);
+
+        dNdx_rnd_new = Ioniz->CalculatedNdx(energy, rnd);
 
         ASSERT_NEAR(dNdx_rnd_new, dNdx_rnd_stored, 1E-10 * dNdx_rnd_stored);
 
@@ -463,6 +497,7 @@ TEST(Ionization, Test_of_e_interpol)
     double ecut;
     double vcut;
     double multiplier;
+    std::string parametrization;
     double energy;
     double rnd1, rnd2;
     double stochastic_loss_stored;
@@ -475,16 +510,20 @@ TEST(Ionization, Test_of_e_interpol)
     while (in.good())
     {
         in >> particleName >> mediumName >> ecut >> vcut >> multiplier >> energy >> rnd1 >> rnd2 >>
-            stochastic_loss_stored;
+            stochastic_loss_stored >> parametrization;
 
         ParticleDef particle_def = getParticleDef(particleName);
         Medium* medium           = MediumFactory::Get().CreateMedium(mediumName);
         EnergyCutSettings ecuts(ecut, vcut);
 
-        Ionization Ioniz(particle_def, *medium, ecuts, multiplier);
-        IonizInterpolant Ioniz_Interpol(Ioniz, InterpolDef);
+        IonizationFactory::Definition ioniz_def;
+        ioniz_def.multiplier      = multiplier;
+        ioniz_def.parametrization = IonizationFactory::Get().GetEnumFromString(parametrization);
 
-        stochastic_loss_new = Ioniz_Interpol.CrossSectionInterpolant::CalculateStochasticLoss(energy, rnd1, rnd2);
+        CrossSection* Ioniz =  IonizationFactory::Get().CreateIonization(
+                particle_def, *medium, ecuts, ioniz_def, InterpolDef);
+
+        stochastic_loss_new = Ioniz->CalculateStochasticLoss(energy, rnd1, rnd2);
 
         ASSERT_NEAR(stochastic_loss_new, stochastic_loss_stored, 1E-6 * stochastic_loss_stored);
 

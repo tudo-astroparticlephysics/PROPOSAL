@@ -33,49 +33,6 @@ Ionization::Ionization(const Ionization& ioniz)
 Ionization::~Ionization() {}
 
 // ------------------------------------------------------------------------- //
-// Public methods
-// ------------------------------------------------------------------------- //
-
-// ------------------------------------------------------------------------- //
-// knonk-on electrons (delta rays)
-// distribution of secondary electrons with kinetic energy = v*E
-// PDG, Chin. Phys. C 40 (2016), 100001
-// eq. 33.8
-// ------------------------------------------------------------------------- //
-double Ionization::DifferentialCrossSection(double energy, double v)
-{
-    double result;
-
-    IntegralLimits limits = GetIntegralLimits(energy);
-
-    // TODO(mario): Better way? Sat 2017/09/02
-    double square_momentum   = (energy - particle_def_.mass) * (energy + particle_def_.mass);
-    double particle_momentum = std::sqrt(std::max(square_momentum, 0.0));
-    double beta              = particle_momentum / energy;
-    double gamma             = energy / particle_def_.mass;
-    beta *= beta;
-
-    // additional term for spin 1/2 particles
-    // Rossi, 1952
-    // High Enegy Particles
-    // Prentice-Hall, Inc., Englewood Cliffs, N.J.
-    // chapter 2, eq. 7
-    double spin_1_2_contribution = v / (1 + 1 / gamma);
-    spin_1_2_contribution *= 0.5 * spin_1_2_contribution;
-    result = 1 - beta * (v / limits.vMax) + spin_1_2_contribution;
-    result *= IONK * particle_def_.charge * particle_def_.charge * medium_->GetZA() / (2 * beta * energy * v * v);
-
-    return medium_->GetMassDensity() * result * (1 + InelCorrection(energy, v));
-    ;
-}
-
-// ------------------------------------------------------------------------- //
-double Ionization::FunctionToDEdxIntegral(double energy, double variable)
-{
-    return variable * CrossSectionWithoutInelasticCorrection(energy, variable) * InelCorrection(energy, variable);
-}
-
-// ------------------------------------------------------------------------- //
 Parametrization::IntegralLimits Ionization::GetIntegralLimits(double energy)
 {
     IntegralLimits limits;
@@ -109,6 +66,64 @@ Parametrization::IntegralLimits Ionization::GetIntegralLimits(double energy)
 }
 
 // ------------------------------------------------------------------------- //
+// Specific Parametrization
+// ------------------------------------------------------------------------- //
+
+IonizBetheBlochRossi::IonizBetheBlochRossi(const ParticleDef& particle_def,
+                                           const Medium& medium,
+                                           const EnergyCutSettings& cuts,
+                                           double multiplier)
+    : Ionization(particle_def, medium, cuts, multiplier)
+{
+}
+
+IonizBetheBlochRossi::IonizBetheBlochRossi(const IonizBetheBlochRossi& ioniz)
+    : Ionization(ioniz)
+{
+}
+
+IonizBetheBlochRossi::~IonizBetheBlochRossi() {}
+
+// ------------------------------------------------------------------------- //
+// knonk-on electrons (delta rays)
+// distribution of secondary electrons with kinetic energy = v*E
+// PDG, Chin. Phys. C 40 (2016), 100001
+// eq. 33.8
+// ------------------------------------------------------------------------- //
+double IonizBetheBlochRossi::DifferentialCrossSection(double energy, double v)
+{
+    double result;
+
+    IntegralLimits limits = GetIntegralLimits(energy);
+
+    // TODO(mario): Better way? Sat 2017/09/02
+    double square_momentum   = (energy - particle_def_.mass) * (energy + particle_def_.mass);
+    double particle_momentum = std::sqrt(std::max(square_momentum, 0.0));
+    double beta              = particle_momentum / energy;
+    double gamma             = energy / particle_def_.mass;
+    beta *= beta;
+
+    // additional term for spin 1/2 particles
+    // Rossi, 1952
+    // High Enegy Particles
+    // Prentice-Hall, Inc., Englewood Cliffs, N.J.
+    // chapter 2, eq. 7
+    double spin_1_2_contribution = v / (1 + 1 / gamma);
+    spin_1_2_contribution *= 0.5 * spin_1_2_contribution;
+    result = 1 - beta * (v / limits.vMax) + spin_1_2_contribution;
+    result *= IONK * particle_def_.charge * particle_def_.charge * medium_->GetZA() / (2 * beta * energy * v * v);
+
+    return medium_->GetMassDensity() * result * (1 + InelCorrection(energy, v));
+    ;
+}
+
+// ------------------------------------------------------------------------- //
+double IonizBetheBlochRossi::FunctionToDEdxIntegral(double energy, double variable)
+{
+    return variable * CrossSectionWithoutInelasticCorrection(energy, variable) * InelCorrection(energy, variable);
+}
+
+// ------------------------------------------------------------------------- //
 // Bremststrahlung when scattering at atomic electrons
 // and the atomic electrons emit the Bremsstrahlung photon
 // because of the v^{-2} dependency, it is treated together with Ionization
@@ -121,7 +136,7 @@ Parametrization::IntegralLimits Ionization::GetIntegralLimits(double energy)
 //        (2 \log(\frac{1 - \frac{v}{v_{max}}}{1 - v}))
 //        \log(\frac{2 \gamma (1 - v) m_e}{m_{particle}v})
 // ------------------------------------------------------------------------- //
-double Ionization::InelCorrection(double energy, double v)
+double IonizBetheBlochRossi::InelCorrection(double energy, double v)
 {
     double result, a, b, c;
     IntegralLimits limits = GetIntegralLimits(energy);
@@ -141,7 +156,7 @@ double Ionization::InelCorrection(double energy, double v)
 // needed for the dEdx Integral
 // ------------------------------------------------------------------------- //
 
-double Ionization::CrossSectionWithoutInelasticCorrection(double energy, double v)
+double IonizBetheBlochRossi::CrossSectionWithoutInelasticCorrection(double energy, double v)
 {
     double result;
 
@@ -167,8 +182,5 @@ double Ionization::CrossSectionWithoutInelasticCorrection(double energy, double 
     return medium_->GetMassDensity() * result;
 }
 
-// ------------------------------------------------------------------------- //
-// Getter
-// ------------------------------------------------------------------------- //
 
-const std::string Ionization::name_ = "Ionization";
+const std::string IonizBetheBlochRossi::name_ = "IonizBetheBlochRossi";

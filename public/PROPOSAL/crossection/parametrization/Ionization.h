@@ -39,29 +39,50 @@ public:
     Ionization(const Ionization&);
     virtual ~Ionization();
 
-    virtual Parametrization* clone() const { return new Ionization(*this); }
+    virtual Parametrization* clone() const = 0;
 
     // ----------------------------------------------------------------- //
     // Public methods
     // ----------------------------------------------------------------- //
 
-    double DifferentialCrossSection(double energy, double v);
-
-    double FunctionToDEdxIntegral(double energy, double v);
+    double DifferentialCrossSection(double energy, double v) = 0;
 
     IntegralLimits GetIntegralLimits(double energy);
 
-    // --------------------------------------------------------------------- //
-    // Getter
-    // --------------------------------------------------------------------- //
+private:
 
-    const std::string& GetName() const { return name_; }
+};
+
+// ----------------------------------------------------------------- //
+// Spefific Parametrization
+// ----------------------------------------------------------------- //
+
+class IonizBetheBlochRossi : public Ionization
+{
+public:
+    IonizBetheBlochRossi(const ParticleDef&, const Medium&, const EnergyCutSettings&, double multiplier);
+    IonizBetheBlochRossi(const IonizBetheBlochRossi&);
+    ~IonizBetheBlochRossi();
+
+    Parametrization* clone() const { return new IonizBetheBlochRossi(*this); }
+    static Ionization* create(const ParticleDef& particle_def,
+                                      const Medium& medium,
+                                      const EnergyCutSettings& cuts,
+                                      double multiplier)
+        {
+            return new IonizBetheBlochRossi(particle_def, medium, cuts, multiplier);
+        }
+
+     double DifferentialCrossSection(double energy, double v);
+     double FunctionToDEdxIntegral(double energy, double v);
+
+     const std::string& GetName() const { return name_; }
 
 private:
-    static const std::string name_;
+     double InelCorrection(double energy, double v);
+     double CrossSectionWithoutInelasticCorrection(double energy, double v);
 
-    double InelCorrection(double energy, double v);
-    double CrossSectionWithoutInelasticCorrection(double energy, double v);
+     static const std::string name_;
 };
 
 } // namespace PROPOSAL

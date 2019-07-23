@@ -1687,15 +1687,10 @@ void init_parametrization(py::module& m)
 
     py::module m_sub_ioniz = m_sub.def_submodule("ionization");
 
-    py::class_<Ionization, std::shared_ptr<Ionization>, Parametrization>(m_sub_ioniz, "Ionization")
-        .def(py::init<const ParticleDef&, const Medium&, const EnergyCutSettings&, double>(),
-             py::arg("particle_def"),
-             py::arg("medium"),
-             py::arg("energy_cuts"),
-             py::arg("multiplier"),
-                R"pbdoc( 
+    py::class_<Ionization, std::shared_ptr<Ionization>, Parametrization>(m_sub_ioniz, "Ionization",
+            R"pbdoc(
 
-            Ionization parametrization. It can be initialized with the following parameters
+            Virtual class for the Ionization parametrizations. They can be initialized by using one of the given parametrizations with the following parameters
 
             Args:                                                                                                  
                 particle_def (:meth:`~pyPROPOSAL.particle.ParticleDef`): includes all static particle information for the parametrization such as mass, charge, etc.
@@ -1703,17 +1698,43 @@ void init_parametrization(py::module& m)
                 energy_cuts (:meth:`~pyPROPOSAL.EnergyCutSettings`): energy cut setting for the parametrization                                                                                           
                 multiplier (double): Use a multiplicative factor for the differential crosssection. Can be used for testing or other studies                                                            
 
+            The following parametrizations are currently implemented:
+
+            * BetheBlochRossi
+
             Example:
                 To create a ionization parametrization
 
                 >>> mu = pp.particle.MuMinusDef.get()
                 >>> medium = pp.medium.StandardRock(1.0)
                 >>> cuts = pp.EnergyCutSettings(-1, -1)
-                >>> param = pyPROPOSAL.parametrization.ionization.Ionization(mu, medium, cuts, multiplier)
+                >>> param = pyPROPOSAL.parametrization.ionization.BetheBlochRossi(mu, medium, cuts, multiplier)
                 )pbdoc");
+
+    py::class_<IonizBetheBlochRossi, std::shared_ptr<IonizBetheBlochRossi>, Ionization>(m_sub_ioniz, "BetheBlochRossi")
+        .def(py::init<const ParticleDef&, const Medium&, const EnergyCutSettings&, double>(),
+             py::arg("particle_def"),
+             py::arg("medium"),
+             py::arg("energy_cuts"),
+             py::arg("multiplier"));
+
+    py::enum_<IonizationFactory::Enum>(m_sub_ioniz, "IonizParametrization")
+            .value("BetheBlochRossi", IonizationFactory::BetheBlochRossi)
+            .value("None", IonizationFactory::None);
+
+    py::class_<IonizationFactory, std::unique_ptr<IonizationFactory, py::nodelete>>(m_sub_ioniz, "IonizFactory")
+            .def("get_enum_from_str", &IonizationFactory::GetEnumFromString, py::arg("parametrization_str"))
+            .def("create_ionization",
+                 (CrossSection* (IonizationFactory::*)(const ParticleDef&, const Medium&, const EnergyCutSettings&, const IonizationFactory::Definition&)const)&IonizationFactory::CreateIonization,
+                 py::arg("particle_def"), py::arg("medium"), py::arg("ecuts"), py::arg("ioniz_def"))
+            .def("create_ionization_interpol",
+                 (CrossSection* (IonizationFactory::*)(const ParticleDef&, const Medium&, const EnergyCutSettings&, const IonizationFactory::Definition&, InterpolationDef)const)&IonizationFactory::CreateIonization,
+                 py::arg("particle_def"), py::arg("medium"), py::arg("ecuts"), py::arg("ioniz_def"), py::arg("interpolation_def"))
+            .def_static("get", &IonizationFactory::Get, py::return_value_policy::reference);
 
     py::class_<IonizationFactory::Definition, std::shared_ptr<IonizationFactory::Definition> >(m_sub_ioniz, "IonizationDefinition")
         .def(py::init<>())
+        .def_readwrite("parametrization", &IonizationFactory::Definition::parametrization)
         .def_readwrite("multiplier", &IonizationFactory::Definition::multiplier);
 }
 

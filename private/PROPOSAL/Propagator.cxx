@@ -1594,6 +1594,24 @@ Sector::Definition Propagator::CreateSectorDefinition(const std::string& json_ob
                   BremsstrahlungFactory::Get().GetStringFromEnum(sec_def_global.utility_def.brems_def.parametrization).c_str());
     }
 
+    if (json_global.find("ioniz") != json_global.end())
+    {
+        if (json_global["ioniz"].is_string())
+        {
+            std::string ioniz = json_global["ioniz"].get<std::string>();
+            sec_def_global.utility_def.ioniz_def.parametrization = IonizationFactory::Get().GetEnumFromString(ioniz);
+        }
+        else
+        {
+            log_fatal("The given ioniz option is not a string.");
+        }
+    }
+    else
+    {
+        log_debug("The ioniz option is not set. Use default %s",
+                  IonizationFactory::Get().GetStringFromEnum(sec_def_global.utility_def.ioniz_def.parametrization).c_str());
+    }
+
     if (json_global.find("epair") != json_global.end())
     {
         if (json_global["epair"].is_string())

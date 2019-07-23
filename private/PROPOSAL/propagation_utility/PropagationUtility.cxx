@@ -78,8 +78,10 @@ Utility::Utility(const ParticleDef& particle_def,
                 particle_def_, *medium_, cut_settings_, utility_def.epair_def));
     }
 
-    crosssections_.push_back(
-        IonizationFactory::Get().CreateIonization(particle_def_, *medium_, cut_settings_, utility_def.ioniz_def));
+    if(utility_def.ioniz_def.parametrization!=IonizationFactory::Enum::None) {
+        crosssections_.push_back(IonizationFactory::Get().CreateIonization(
+                particle_def_, *medium_, cut_settings_, utility_def.ioniz_def));
+    }
 
     if(utility_def.mupair_def.parametrization!=MupairProductionFactory::Enum::None) {
         crosssections_.push_back(MupairProductionFactory::Get().CreateMupairProduction(
@@ -120,9 +122,10 @@ Utility::Utility(const ParticleDef& particle_def,
                 particle_def_, *medium_, cut_settings_, utility_def.epair_def, interpolation_def));
     }
 
-
-    crosssections_.push_back(IonizationFactory::Get().CreateIonization(
-        particle_def_, *medium_, cut_settings_, utility_def.ioniz_def, interpolation_def));
+    if(utility_def.ioniz_def.parametrization!=IonizationFactory::Enum::None) {
+        crosssections_.push_back(IonizationFactory::Get().CreateIonization(
+                particle_def_, *medium_, cut_settings_, utility_def.ioniz_def, interpolation_def));
+    }
 
     if(utility_def.mupair_def.parametrization!=MupairProductionFactory::Enum::None) {
         crosssections_.push_back(MupairProductionFactory::Get().CreateMupairProduction(
