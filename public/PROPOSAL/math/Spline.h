@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <string>
+#include <fstream>
 #include "PROPOSAL/math/Function.h"
 
 namespace PROPOSAL {
@@ -17,7 +18,12 @@ class Spline
 
         Spline(const Spline&);
 
+        virtual Spline* clone() const = 0;
+
         virtual double evaluate(double x);
+
+        virtual void Derivative();
+        virtual void Antiderivative(double c);
 
         virtual bool save(std::string, bool) = 0;
 
@@ -127,12 +133,15 @@ class Cubic_Spline : public Spline
 
         Cubic_Spline(const Cubic_Spline&);
         
+        Cubic_Spline* clone() const { return new Cubic_Spline(*this); };
+        
         bool save(std::string, bool);
     
-    private:
-        void calculate_splines(std::vector<double> x, std::vector<double> y) override;
         std::vector<cubic_spline_container> GetSplineContainer();
 
+    private:
+
+        void calculate_splines(std::vector<double> x, std::vector<double> y) override;
 };
 
 } // namespace PROPOSAL

@@ -20,7 +20,8 @@ Spline::Spline(std::vector<double> x, std::vector<double> y) :
 
 Spline::Spline(std::vector<Polynom> splines, std::vector<double> subintervall) :
     splines_ ( splines ),
-    subintervall_ ( subintervall )
+    subintervall_ ( subintervall ),
+    n_subintervalls_ ( subintervall_.size() )
 {
 }
 
@@ -39,11 +40,28 @@ double Spline::evaluate(double x)
 {
     for (unsigned int i = 0; i < n_subintervalls_ ; ++i) 
     {
-        if(x < subintervall_[i])
+        if(x <= subintervall_[i])
             return splines_[i].evaluate(x);
     }
-    
-    return splines_[n_subintervalls_].evaluate(x);
+
+    std::cout << "Warn extrapolation!" << std::endl;
+    return splines_[n_subintervalls_-1].evaluate(x);
+}
+        
+void Spline::Derivative() 
+{
+    for (unsigned int i = 0; i < n_subintervalls_; ++i) 
+    {
+        splines_[i] = splines_[i].GetDerivative();
+    }
+}
+
+void Spline::Antiderivative(double c)
+{
+    for (unsigned int i = 0; i < n_subintervalls_; ++i) 
+    {
+        splines_[i] = splines_[i].GetAntiderivative(c);
+    }
 }
 
 ////----------------------------------------------------------------------------//

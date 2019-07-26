@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <iostream>
 #include "PROPOSAL/math/Function.h"
+#include "PROPOSAL/Constants.h"
 
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -23,13 +24,19 @@ Polynom::Polynom(const Polynom& poly):
     coeff(poly.coeff)
 {}
 
+// Polynom& Polynom::operator=(const Polynom& poly)
+// {
+//     // N = poly.N;
+//     // coeff = poly.coeff;
+//     return Polynom(poly);
+// }
+
 double Polynom::evaluate(double x)
 {
-    double aux {0};
+    double aux = coeff[N-1];
 
-    // Hier sollte demnächst das Hornerschema stehen!
-    for (int i = 0; i < N; ++i) 
-        aux += coeff[i] * std::pow(x, i);
+    for (int i = N-2; i >= 0; --i) 
+        aux = aux * x + coeff[i];
 
     return aux;
 }
@@ -38,29 +45,31 @@ void Polynom::shift(double x)
 {
     // Shaw and Traub method for the Taylor shift
     // https://planetcalc.com/7726/#fnref1:shaw
-	
-    int n = N-1;
-    double **t = new double*[N]; 
-    for (int count = 0; count < N; ++count)
-        t[count] = new double[N]; 
 
-    for (int i = 0; i < n; ++i) 
-    {
-        t[i][0] = coeff[n-i-1] * std::pow(x, n-i-1);
-        t[i][i+1] = coeff[n] * std::pow(x, n);
-    }
+    if(std::fabs(x) > GEOMETRY_PRECISION) {
+        int n = N-1;
+        double **t = new double*[N]; 
+        for (int count = 0; count < N; ++count)
+            t[count] = new double[N]; 
 
-    for (int j = 0; j <= n-1; ++j) 
-    {
-        for (int i = j+1; i <= n; ++i) 
+        for (int i = 0; i < n; ++i) 
         {
-            t[i][j+1] = t[i-1][j] + t[i-1][j+1];   
+            t[i][0] = coeff[n-i-1] * std::pow(x, n-i-1);
+            t[i][i+1] = coeff[n] * std::pow(x, n);
         }
-    }
 
-    for (int i = 0; i <= n-1; ++i) 
-    {
-        coeff[i] = t[n][i+1] / std::pow(x, i);
+        for (int j = 0; j <= n-1; ++j) 
+        {
+            for (int i = j+1; i <= n; ++i) 
+            {
+                t[i][j+1] = t[i-1][j] + t[i-1][j+1];   
+            }
+        }
+
+        for (int i = 0; i <= n-1; ++i) 
+        {
+            coeff[i] = t[n][i+1] / std::pow(x, i);
+        }
     }
 }
 

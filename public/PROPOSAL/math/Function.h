@@ -14,6 +14,8 @@ class Polynom
         Polynom(std::vector<double> coefficients);
         Polynom(const Polynom&);
 
+        // Polynom& operator=(const Polynom& poly);
+
         Polynom* clone() const { return new Polynom(*this); };
 
         double evaluate(double x);
@@ -28,7 +30,8 @@ class Polynom
         std::function<double(double)> GetFunction();
 
     protected:
-        const int N;
+        // const int N;
+        int N;
         double* coeff;
 };
 
