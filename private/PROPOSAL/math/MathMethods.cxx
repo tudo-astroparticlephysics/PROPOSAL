@@ -22,7 +22,6 @@ namespace PROPOSAL {
         double temp, xh, xl, rts;
         const int MAXIT = 100;
 
-
         fl = func(x1);
         fh = func(x2);
 

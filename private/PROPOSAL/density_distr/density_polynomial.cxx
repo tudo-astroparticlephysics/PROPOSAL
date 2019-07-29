@@ -1,86 +1,10 @@
 #include "PROPOSAL/density_distr/density_polynomial.h" 
 #include "PROPOSAL/math/MathMethods.h" 
+#include "PROPOSAL/math/Function.h" 
 #include <functional>
 #include <algorithm>
 #include <iostream>
 #include <cmath>
-
-
-// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-// %%%%%%%%%%%%%%%%%%%       Polynom      %%%%%%%%%%%%%%%%%%%%
-// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-using namespace PROPOSAL;
-
-Polynom::Polynom(std::vector<double> coefficients)
-{
-    N = coefficients.size();
-    coeff = new double[N];
-
-    std::copy(coefficients.begin(), coefficients.end(), coeff);
-}
-
-Polynom::Polynom(const Polynom& poly):
-    N(poly.N),
-    coeff(poly.coeff)
-{}
-
-double Polynom::evaluate(double x)
-{
-    double aux {0};
-
-    for (int i = 0; i < N; ++i) 
-        aux += coeff[i] * std::pow(x, i);
-
-    return aux;
-}
-
-Polynom Polynom::GetDerivative()
-{
-    std::vector<double> derivative_coeff;
-
-    for (auto i = 1; i < N; ++i)
-        derivative_coeff.push_back(coeff[i] * i);
-
-    return Polynom(derivative_coeff);
-}
-
-Polynom Polynom::GetAntiderivative(double constant)
-{
-    std::vector<double> derivative_coeff {constant};
-
-    for (auto i = 0; i < N; ++i)
-        derivative_coeff.push_back(coeff[i] / (i+1));
-
-    return Polynom(derivative_coeff);
-}
-
-        
-std::function<double(double)> Polynom::GetFunction()
-{
-    return (std::function<double(double)>)std::bind(&Polynom::evaluate, 
-                                                    this, 
-                                                    std::placeholders::_1);
-}
-
-namespace PROPOSAL {
-    std::ostream& operator<<(std::ostream& os, const Polynom& p)
-    {
-        bool flag = false;
-        for (int i = 0; i < p.N; ++i) {
-            if(p.coeff[i] != 0)
-            {
-                if(flag==true)
-                    os << "+ " << p.coeff[i] << " * x^{" << i << "}";
-                else {
-                    os << "p(x) = " << p.coeff[i] << " * x^{" << i << "}";
-                    flag = true;
-                }
-            }
-        }
-        return os;
-    }
-} // namespace PROPOSAL 
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // %%%%%%%%%%%%%%%%%%% Polynomial-Density %%%%%%%%%%%%%%%%%%%%
@@ -107,19 +31,13 @@ double Density_polynomial::Helper_function(Vector3D xi,
                                            double res, 
                                            double l) const 
 {
-    // std::cout << "Integrate(xi, direction, l): " 
-    //           << Integrate(xi, direction, l)
-    //           << " Integrate(xi, direction, 0): "
-    //           << Integrate(xi, direction, 0) 
-    //           << " res:" << ees
-    //           << std::endl;
     // std::cout << "Helper function(" 
     //           << l
     //           << "): "
     //           << Integrate(xi, direction, 0) - Integrate(xi, direction, l) + res
     //           << std::endl;
 
-    return Integrate(xi, direction, 0) - Integrate(xi, direction, l) + res;
+    return Integrate(xi, direction, l) - Integrate(xi, direction, 0) + res;
 }
 
 double Density_polynomial::helper_function(Vector3D xi, 
@@ -154,7 +72,7 @@ double Density_polynomial::Correct(Vector3D xi,
     // direction * fAxis_
 
     try {
-        res = NewtonRaphson(F, dF, 0, 1e15, 1.e-6);
+        res = NewtonRaphson(F, dF, 0, 1e7, 1.e-6);
     } catch (MathException& e) {
         double depth = GetCorrection(xi + res * direction);
         if ( depth < 0 ) 
@@ -171,10 +89,6 @@ double Density_polynomial::Integrate(Vector3D xi,
                                      double l) const
 {
     double delta = axis_->GetEffectiveDistance(xi, direction);
-
-    // std::cout << "Integrate( "<<axis_->GetDepth(xi) + l * delta << "): " 
-    //           << antiderived_density_distribution(axis_->GetDepth(xi) + l * delta) 
-    //           << std::endl;
 
     return antiderived_density_distribution(axis_->GetDepth(xi) + l * delta);
 }

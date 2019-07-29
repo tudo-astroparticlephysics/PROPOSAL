@@ -5,6 +5,7 @@
 #include "PROPOSAL/density_distr/density_polynomial.h" 
 #include "PROPOSAL/math/Vector3D.h"
 #include "PROPOSAL/math/MathMethods.h"
+#include "PROPOSAL/math/Spline.h"
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // %%%%%%%%%%%%%%%%%%% Polynomial-Density %%%%%%%%%%%%%%%%%%%%
@@ -14,7 +15,7 @@ class Density_splines : public Density_distr
 {                                                                                                   
     public:                                
         Density_splines(const Axis&, 
-                        const std::vector<SplineCoefficients>&);
+                        const Spline&);
         Density_splines(const Density_splines&);
 
         Density_splines* clone() const { return new Density_splines(*this); };
@@ -28,8 +29,8 @@ class Density_splines : public Density_distr
         double helper_function(Vector3D xi, Vector3D direction, double res, double l) const ;
 
     protected:
-        std::vector<Density_polynomial*> dens_polynom_;
-        std::vector<double> definition_area_;
+        Spline* spline_;
+        Spline* integrated_spline_;
         
         std::function<double(double)> density_distribution;
         std::function<double(double)> antiderived_density_distribution;

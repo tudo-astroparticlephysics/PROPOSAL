@@ -44,16 +44,12 @@ RadialAxis::RadialAxis(Vector3D fAxis, Vector3D fp0):
 
 double RadialAxis::GetDepth(Vector3D xi) const
 {
-    // angle dependencies require more precise investigations MaxSac (2019-06-18)
-    Vector3D aux1 { xi - fAxis_ };
-    Vector3D aux2 { fp0_- fAxis_ };
-
-    return aux2.magnitude() - aux1.magnitude();
+    return ( xi - fp0_ ).magnitude();
 }
 
 double RadialAxis::GetEffectiveDistance(Vector3D xi, Vector3D direction) const 
 {
-    Vector3D aux {xi - fAxis_};
+    Vector3D aux { xi - fp0_ };
     aux.normalise();
 
     return - aux * direction; 
