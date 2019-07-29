@@ -22,10 +22,6 @@ using namespace PROPOSAL;
     py::class_<cls, Medium, std::shared_ptr<cls> >(module, #cls)                                                       \
         .def(py::init<double>(), py::arg("density_correction") = 1.0);
 
-/* #define DENSITY_DEF(module, cls)                                                                                       \ */
-/*     py::class_<cls, Density_distr, std::shared_ptr<cls> >(module, #cls)                                                \ */
-/*         .def(py::init<const Axis&>(), py::arg("density_axis")); */
-
 #define AXIS_DEF(module, cls)                                                                                          \
     py::class_<cls, Axis, std::shared_ptr<cls> >(module, #cls)                                                         \
         .def(py::init<Vector3D, Vector3D>(), py::arg("axis"), py::arg("reference_point"));
@@ -348,7 +344,37 @@ void init_medium(py::module& m)
 
     py::class_<Axis, std::shared_ptr<Axis>>(m_sub, "Density_axis")
         .def_property_readonly("fAxis", &Axis::GetAxis)
-        .def_property_readonly("refernce_point", &Axis::GetFp0);
+        .def_property_readonly("refernce_point", &Axis::GetFp0)
+        .def(
+            "depth",
+            &Axis::GetDepth,
+            py::arg("position"),
+            R"pbdoc(
+                Calculates in dependence of the particle position the depthcorrection.
+
+                Parameters:
+                    position (Vector3D): particle position
+
+                Return:
+                    float: depthcorrection
+            )pbdoc"
+        )
+        .def(
+            "depth",
+            &Axis::GetEffectiveDistance,
+            py::arg("position"),
+            py::arg("direction"),
+            R"pbdoc(
+                Calculates in dependence of the particle position the effective Distance.
+
+                Parameters:
+                    position (Vector3D): particle position
+                    direction (Vector3D): direction position
+
+                Return:
+                    float: effective Distance
+            )pbdoc"
+        );
         
     
     AXIS_DEF(m_sub, RadialAxis);
