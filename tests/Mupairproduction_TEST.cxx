@@ -1,8 +1,8 @@
 
 #include "gtest/gtest.h"
 
+#include <fstream>
 #include "PROPOSAL/Constants.h"
-#include "PROPOSAL/Output.h"
 #include "PROPOSAL/crossection/MupairIntegral.h"
 #include "PROPOSAL/crossection/MupairInterpolant.h"
 #include "PROPOSAL/crossection/parametrization/MupairProduction.h"

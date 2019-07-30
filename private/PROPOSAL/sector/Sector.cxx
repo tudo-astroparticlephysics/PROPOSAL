@@ -6,6 +6,8 @@
 #include "PROPOSAL/crossection/CrossSection.h"
 #include "PROPOSAL/decay/DecayChannel.h"
 
+#include "PROPOSAL/density_distr/density_homogeneous.h"
+
 #include "PROPOSAL/geometry/Geometry.h"
 #include "PROPOSAL/geometry/Sphere.h"
 
@@ -31,12 +33,14 @@ Sector::Definition::Definition()
     , do_continuous_randomization(true)
     , do_continuous_energy_loss_output(false)
     , do_exact_time_calculation(true)
+    , only_loss_inside_detector(false)
     , scattering_model(ScatteringFactory::HighlandIntegral)
     , location(Sector::ParticleLocation::InsideDetector)
     , utility_def()
     , cut_settings()
     , medium_(new Ice())
     , geometry_(new Sphere(Vector3D(), 1.0e20, 0.0))
+    , density_distribution_(new Density_homogeneous())
 {
 }
 
@@ -47,12 +51,14 @@ Sector::Definition::Definition(const Definition& def)
     , do_continuous_randomization(def.do_continuous_randomization)
     , do_continuous_energy_loss_output(def.do_continuous_energy_loss_output)
     , do_exact_time_calculation(def.do_exact_time_calculation)
+    , only_loss_inside_detector(def.only_loss_inside_detector)
     , scattering_model(def.scattering_model)
     , location(def.location)
     , utility_def(def.utility_def)
     , cut_settings(def.cut_settings)
     , medium_(def.medium_->clone())
     , geometry_(def.geometry_->clone())
+    , density_distribution_(def.density_distribution_->clone())
 {
 }
 
@@ -69,6 +75,8 @@ bool Sector::Definition::operator==(const Definition& sector_def) const
     else if (do_continuous_energy_loss_output != sector_def.do_continuous_energy_loss_output)
         return false;
     else if (do_exact_time_calculation != sector_def.do_exact_time_calculation)
+        return false;
+    else if (only_loss_inside_detector != sector_def.only_loss_inside_detector)
         return false;
     else if (scattering_model != sector_def.scattering_model)
         return false;
@@ -98,9 +106,11 @@ void Sector::Definition::swap(Definition& definition)
     swap(do_continuous_randomization, definition.do_continuous_randomization);
     swap(do_continuous_energy_loss_output, definition.do_continuous_energy_loss_output);
     swap(do_exact_time_calculation, definition.do_exact_time_calculation);
+    swap(only_loss_inside_detector, definition.only_loss_inside_detector);
     swap(scattering_model, definition.scattering_model);
     swap(location, definition.location);
     swap(utility_def, definition.utility_def);
+    // density_distribution_->swap(*definition.density_distribution_);
     medium_->swap(*definition.medium_);
     geometry_->swap(*definition.geometry_);
 }
@@ -118,6 +128,12 @@ Sector::Definition::~Definition()
 {
     delete medium_;
     delete geometry_;
+}
+
+void Sector::Definition::SetDensityDistribution(const Density_distr& density_distribution)
+{
+    delete density_distribution_;
+    density_distribution_ = density_distribution.clone();
 }
 
 void Sector::Definition::SetMedium(const Medium& medium)
@@ -140,7 +156,7 @@ Sector::Sector(Particle& particle, const Definition& sector_def)
     : sector_def_(sector_def)
     , particle_(particle)
     , geometry_(sector_def.GetGeometry().clone())
-    , utility_(particle_.GetParticleDef(), sector_def.GetMedium(), sector_def.cut_settings, sector_def.utility_def)
+    , utility_(particle_.GetParticleDef(), sector_def.GetMedium(), sector_def.cut_settings, sector_def.GetDensityDistribution(), sector_def.utility_def)
     , displacement_calculator_(new UtilityIntegralDisplacement(utility_))
     , interaction_calculator_(new UtilityIntegralInteraction(utility_))
     , decay_calculator_(new UtilityIntegralDecay(utility_))
@@ -167,6 +183,7 @@ Sector::Sector(Particle& particle, const Definition& sector_def, const Interpola
     , utility_(particle_.GetParticleDef(),
                sector_def.GetMedium(),
                sector_def.cut_settings,
+               sector_def.GetDensityDistribution(),
                sector_def.utility_def,
                interpolation_def)
     , displacement_calculator_(new UtilityInterpolantDisplacement(utility_, interpolation_def))
@@ -342,12 +359,11 @@ double Sector::Propagate(double distance)
             final_energy         = energy_till_stochastic_.second;
         }
 
-        // Calculate the displacement according to initial energy and final_energy
-        displacement = displacement_calculator_->Calculate(initial_energy,
-                                                           final_energy,
-                                                           utility_.GetMedium().GetDensityCorrection() *
-                                                               (distance - propagated_distance)) /
-                       utility_.GetMedium().GetDensityCorrection();
+        displacement = displacement_calculator_->Calculate(initial_energy, 
+                                               final_energy, 
+                                               distance-propagated_distance, 
+                                               particle_.GetPosition(), 
+                                               particle_.GetDirection());
 
         // The first interaction or decay happens behind the distance we want to propagate
         // So we calculate the final energy using only continuous losses
@@ -355,8 +371,14 @@ double Sector::Propagate(double distance)
         {
             displacement = distance - propagated_distance;
 
+            double aux = utility_.GetDensityDistribution().Calculate(
+                    particle_.GetPosition(), 
+                    particle_.GetDirection(), 
+                    displacement);
+
             final_energy = displacement_calculator_->GetUpperLimit(
-                initial_energy, utility_.GetMedium().GetDensityCorrection() * displacement);
+                initial_energy, 
+                aux);
         }
 
         if(sector_def_.do_continuous_energy_loss_output)
@@ -393,7 +415,17 @@ double Sector::Propagate(double distance)
             continuous_loss->SetEnergy(initial_energy - final_energy);
             continuous_loss->SetDirection((particle_.GetPosition() - continuous_loss->GetPosition()));
             continuous_loss->SetTime(particle_.GetTime() - continuous_loss->GetTime());
-            Output::getInstance().FillSecondaryVector(continuous_loss);
+            if (sector_def_.only_loss_inside_detector)
+            {
+                if (sector_def_.location == Sector::ParticleLocation::InsideDetector)
+                {
+                    Output::getInstance().FillSecondaryVector(continuous_loss);
+                }
+            }
+            else
+            {
+                Output::getInstance().FillSecondaryVector(continuous_loss);
+            }
         }
 
         // Lower limit of particle energy is reached or
@@ -442,8 +474,17 @@ double Sector::Propagate(double distance)
                                 decay_products[i]->SetTime(particle_.GetTime());
                                 decay_products[i]->SetParentParticleEnergy(particle_.GetEnergy());
                             }
-
-                            Output::getInstance().FillSecondaryVector(decay_products);
+                            if (sector_def_.only_loss_inside_detector)
+                            {
+                                if (sector_def_.location == Sector::ParticleLocation::InsideDetector)
+                                {
+                                    Output::getInstance().FillSecondaryVector(decay_products);
+                                }
+                            }
+                            else
+                            {
+                                Output::getInstance().FillSecondaryVector(decay_products);
+                            }
                             break;
                         }
                     }
@@ -451,7 +492,17 @@ double Sector::Propagate(double distance)
                 else
                 {
                     //Return a DynamicData::MuPair object, useful when one is interested in the number of interactions
-                    Output::getInstance().FillSecondaryVector(particle_, energy_loss.second, energy_loss.first);
+                    if (sector_def_.only_loss_inside_detector)
+                    {
+                        if (sector_def_.location == Sector::ParticleLocation::InsideDetector)
+                        {
+                            Output::getInstance().FillSecondaryVector(particle_, energy_loss.second, energy_loss.first);
+                        }
+                    }
+                    else
+                    {
+                        Output::getInstance().FillSecondaryVector(particle_, energy_loss.second, energy_loss.first);
+                    }
                 }
             }
             else if(energy_loss.second == DynamicData::WeakInt)
@@ -488,8 +539,19 @@ double Sector::Propagate(double distance)
                 return_particle_->SetTime(particle_.GetTime());
                 return_particle_->SetParentParticleEnergy(particle_.GetEnergy());
 
-                Output::getInstance().FillSecondaryVector(particle_, energy_loss.second, energy_loss.first); //nuclear
-                Output::getInstance().FillSecondaryVector(return_particle_); //neutrino
+                if (sector_def_.only_loss_inside_detector)
+                {
+                    if (sector_def_.location == Sector::ParticleLocation::InsideDetector)
+                    {
+                        Output::getInstance().FillSecondaryVector(particle_, energy_loss.second, energy_loss.first); //nuclear
+                        Output::getInstance().FillSecondaryVector(return_particle_); //neutrino
+                    }
+                }
+                else
+                {
+                    Output::getInstance().FillSecondaryVector(particle_, energy_loss.second, energy_loss.first); //nuclear
+                    Output::getInstance().FillSecondaryVector(return_particle_); //neutrino
+                }
 
                 is_decayed   = true; // treat this case as a decay and break the loop
                 final_energy = particle_.GetMass();
@@ -498,7 +560,17 @@ double Sector::Propagate(double distance)
             }
             else
             {
-                Output::getInstance().FillSecondaryVector(particle_, energy_loss.second, energy_loss.first);
+                if (sector_def_.only_loss_inside_detector)
+                {
+                    if (sector_def_.location == Sector::ParticleLocation::InsideDetector)
+                    {
+                        Output::getInstance().FillSecondaryVector(particle_, energy_loss.second, energy_loss.first);
+                    }
+                }
+                else
+                {
+                    Output::getInstance().FillSecondaryVector(particle_, energy_loss.second, energy_loss.first);
+                }
             }
 
             final_energy -= energy_loss.first;
@@ -508,7 +580,17 @@ double Sector::Propagate(double distance)
         } else
         {
             decay_products = particle_.GetDecayTable().SelectChannel().Decay(particle_);
-            Output::getInstance().FillSecondaryVector(decay_products);
+            if (sector_def_.only_loss_inside_detector)
+            {
+                if (sector_def_.location == Sector::ParticleLocation::InsideDetector)
+                {
+                    Output::getInstance().FillSecondaryVector(decay_products);
+                }
+            }
+            else
+            {
+                Output::getInstance().FillSecondaryVector(decay_products);
+            }
 
             is_decayed   = true;
             final_energy = particle_.GetMass();
@@ -541,7 +623,17 @@ double Sector::Propagate(double distance)
 
         particle_.SetEnergy(particle_.GetMass());
         decay_products = particle_.GetDecayTable().SelectChannel().Decay(particle_);
-        Output::getInstance().FillSecondaryVector(decay_products);
+        if (sector_def_.only_loss_inside_detector)
+        {
+            if (sector_def_.location == Sector::ParticleLocation::InsideDetector)
+            {
+                Output::getInstance().FillSecondaryVector(decay_products);
+            }
+        }
+        else
+        {
+            Output::getInstance().FillSecondaryVector(decay_products);
+        }
 
         final_energy = particle_.GetMass();
     }
@@ -614,7 +706,8 @@ void Sector::AdvanceParticle(double dr, double ei, double ef)
 
     if (exact_time_calculator_)
     {
-        time += exact_time_calculator_->Calculate(ei, ef, 0.0) / utility_.GetMedium().GetDensityCorrection();
+        // DensityDistribution Approximation: Use the DensityDistribution at the position of initial energy
+        time += exact_time_calculator_->Calculate(ei, ef, 0.0) / (utility_.GetMedium().GetDensityCorrection() * utility_.GetDensityDistribution().GetCorrection(position));
     } else
     {
         time += dr / SPEED;

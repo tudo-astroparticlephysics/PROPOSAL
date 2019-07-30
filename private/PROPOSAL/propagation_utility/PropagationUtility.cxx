@@ -57,10 +57,12 @@ Utility::Definition::~Definition() {}
 Utility::Utility(const ParticleDef& particle_def,
                  const Medium& medium,
                  const EnergyCutSettings& cut_settings,
+                 const Density_distr& density_distr,
                  Definition utility_def)
     : particle_def_(particle_def)
     , medium_(medium.clone())
     , cut_settings_(cut_settings)
+    , density_distr_(density_distr.clone())
     , crosssections_()
 {
     crosssections_.push_back(BremsstrahlungFactory::Get().CreateBremsstrahlung(
@@ -98,11 +100,13 @@ Utility::Utility(const ParticleDef& particle_def,
 Utility::Utility(const ParticleDef& particle_def,
                  const Medium& medium,
                  const EnergyCutSettings& cut_settings,
+                 const Density_distr& density_distr,
                  Definition utility_def,
                  const InterpolationDef& interpolation_def)
     : particle_def_(particle_def)
     , medium_(medium.clone())
     , cut_settings_(cut_settings)
+    , density_distr_(density_distr.clone())
     , crosssections_()
 {
     crosssections_.push_back(BremsstrahlungFactory::Get().CreateBremsstrahlung(
@@ -169,6 +173,7 @@ Utility::Utility(const Utility& collection)
     : particle_def_(collection.particle_def_)
     , medium_(collection.medium_->clone())
     , cut_settings_(collection.cut_settings_)
+    , density_distr_(collection.density_distr_->clone())
     , crosssections_(collection.crosssections_.size(), NULL)
 {
     for (unsigned int i = 0; i < crosssections_.size(); ++i)
@@ -197,6 +202,8 @@ bool Utility::operator==(const Utility& utility) const
         return false;
     else if (cut_settings_ != utility.cut_settings_)
         return false;
+    /* else if (*density_distr_ != *utility.density_distr_) */
+    /*     return false; */
     else if (crosssections_.size() != utility.crosssections_.size())
         return false;
 
@@ -258,4 +265,13 @@ double UtilityDecorator::FunctionToIntegral(double energy)
     }
 
     return -1.0 / result;
+}
+
+
+double UtilityDecorator::Calculate(double ei, double ef, double rnd, Vector3D xi, Vector3D direction)
+{
+    (void)xi;
+    (void)direction;
+
+    return this->Calculate(ei, ef, rnd);
 }

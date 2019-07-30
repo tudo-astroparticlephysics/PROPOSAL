@@ -532,14 +532,29 @@ std::vector<DynamicData*> Propagator::Propagate(double MaxDistance_cm)
     // These two variables are needed to calculate the energy loss inside the detector
     // energy_at_entry_point is initialized with the current energy because this is a
     // reasonable value for particle_ which starts inside the detector
-
-    double energy_at_entry_point = particle_.GetEnergy();
-    double energy_at_exit_point  = 0;
+    // They should be set below, so there is no need to init them here.
+    // But for safetiness, if an edge case is not considered
+    // one could include them.
+    // particle_.SetEntryEnergy(particle_.GetEnergy());
+    // particle_.SetExitEnergy(particle_.GetMass());
 
     Vector3D particle_position  = particle_.GetPosition();
     Vector3D particle_direction = particle_.GetDirection();
 
     bool starts_in_detector = detector_->IsInside(particle_position, particle_direction);
+    if (starts_in_detector)
+    {
+        particle_.SetEntryPoint(particle_position);
+        particle_.SetEntryEnergy(particle_.GetEnergy());
+        particle_.SetEntryTime(particle_.GetTime());
+        distance_to_closest_approach = detector_->DistanceToClosestApproach(particle_position, particle_direction);
+        if (distance_to_closest_approach < 0)
+        {
+            particle_.SetClosestApproachPoint(particle_position);
+            particle_.SetClosestApproachEnergy(particle_.GetEnergy());
+            particle_.SetClosestApproachTime(particle_.GetTime());
+        }
+    }
     bool is_in_detector     = false;
     bool was_in_detector    = false;
     bool propagationstep_till_closest_approach = false;
@@ -595,8 +610,6 @@ std::vector<DynamicData*> Propagator::Propagate(double MaxDistance_cm)
             particle_.SetEntryEnergy(particle_.GetEnergy());
             particle_.SetEntryTime(particle_.GetTime());
 
-            energy_at_entry_point = particle_.GetEnergy();
-
             was_in_detector = true;
         }
         // exit point of the detector
@@ -606,7 +619,6 @@ std::vector<DynamicData*> Propagator::Propagate(double MaxDistance_cm)
             particle_.SetExitEnergy(particle_.GetEnergy());
             particle_.SetExitTime(particle_.GetTime());
 
-            energy_at_exit_point = particle_.GetEnergy();
             // we don't want to run in this case a second time so we set was_in_detector to false
             was_in_detector = false;
 
@@ -618,7 +630,6 @@ std::vector<DynamicData*> Propagator::Propagate(double MaxDistance_cm)
             particle_.SetExitEnergy(particle_.GetEnergy());
             particle_.SetExitTime(particle_.GetTime());
 
-            energy_at_exit_point = particle_.GetEnergy();
             // we don't want to run in this case a second time so we set starts_in_detector to false
             starts_in_detector = false;
         }
@@ -641,8 +652,14 @@ std::vector<DynamicData*> Propagator::Propagate(double MaxDistance_cm)
         if (result <= 0 || MaxDistance_cm <= particle_.GetPropagatedDistance())
             break;
     }
+    if (detector_->IsInside(particle_.GetPosition(), particle_.GetDirection()))
+    {
+        particle_.SetExitPoint(particle_.GetPosition());
+        particle_.SetExitEnergy(particle_.GetEnergy());
+        particle_.SetExitTime(particle_.GetTime());
+    }
 
-    particle_.SetElost(energy_at_entry_point - energy_at_exit_point);
+    particle_.SetElost(particle_.GetEntryEnergy() - particle_.GetExitEnergy());
 
 #if ROOT_SUPPORT
     Output::getInstance().StorePropagatedPrimaryInTree(&particle_);
@@ -1214,6 +1231,22 @@ InterpolationDef Propagator::CreateInterpolationDef(const std::string& json_obje
         log_debug("The do_binary_tables option is not set. Use default (true)");
     }
 
+    if (json_object.find("just_use_readonly_path") != json_object.end())
+    {
+        if (json_object["just_use_readonly_path"].is_boolean())
+        {
+            interpolation_def.just_use_readonly_path = json_object["just_use_readonly_path"];
+        }
+        else
+        {
+            log_fatal("The given just_use_readonly_path option is not a bool.");
+        }
+    }
+    else
+    {
+        log_debug("The just_use_readonly_path option is not set. Use default (false)");
+    }
+
     // Parse to find path to interpolation tables
     if (json_object.find("path_to_tables") != json_object.end())
     {
@@ -1247,16 +1280,16 @@ InterpolationDef Propagator::CreateInterpolationDef(const std::string& json_obje
         if (table_path_str != "")
         {
             interpolation_def.path_to_tables = table_path_str;
-            log_info("Path to interpolation tables set to: \"%s\"", table_path_str.c_str());
+            log_info("The writable Path to interpolation tables set to: \"%s\"", table_path_str.c_str());
         }
         else
         {
-            log_warn("No valid path to interpolation tables found. Save tables in memory!");
+            log_warn("No valid writable path to interpolation tables found. Save tables in memory, if readonly path is also not working!");
         }
     }
     else
     {
-        log_debug("No path to tables set. Use default and save in memory");
+        log_debug("No writable path to tables set. Use default and save in memory, if readonly path is also not working!");
     }
 
     // Parse to find path to interpolation tables for readonly
@@ -1296,7 +1329,7 @@ InterpolationDef Propagator::CreateInterpolationDef(const std::string& json_obje
         }
         else
         {
-            log_warn("No valid path to readonly interpolation tables found.");
+            log_warn("No valid path to readonly interpolation tables found. Just looking at writable path_to_tables.");
         }
     }
     else
@@ -1520,6 +1553,22 @@ Sector::Definition Propagator::CreateSectorDefinition(const std::string& json_ob
     else
     {
         log_debug("No given stopping_decay option given. Use default true");
+    }
+
+    if (json_global.find("only_loss_inside_detector") != json_global.end())
+    {
+        if (json_global["only_loss_inside_detector"].is_boolean())
+        {
+            sec_def_global.only_loss_inside_detector = json_global["only_loss_inside_detector"].get<bool>();
+        }
+        else
+        {
+            log_fatal("The given only_loss_inside_detector option is not a bool.");
+        }
+    }
+    else
+    {
+        log_debug("No given only_loss_inside_detector option given. Use default false");
     }
 
     if (json_global.find("stochastic_loss_weighting") != json_global.end())

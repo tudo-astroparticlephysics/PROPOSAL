@@ -80,11 +80,21 @@
 #include "PROPOSAL/decay/StableChannel.h"
 #include "PROPOSAL/decay/TwoBodyPhaseSpace.h"
 
+#include "PROPOSAL/density_distr/density_distr.h"
+#include "PROPOSAL/density_distr/density_homogeneous.h"
+#include "PROPOSAL/density_distr/density_exponential.h"
+#include "PROPOSAL/density_distr/density_polynomial.h"
+#include "PROPOSAL/density_distr/density_splines.h"
+
 #include "PROPOSAL/math/Integral.h"
 #include "PROPOSAL/math/Interpolant.h"
 #include "PROPOSAL/math/InterpolantBuilder.h"
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/math/Vector3D.h"
+#include "PROPOSAL/math/MathMethods.h"
+#include "PROPOSAL/math/Function.h"
+#include "PROPOSAL/math/Spline.h"
+#include "PROPOSAL/math/TableWriter.h"
 
 #include "PROPOSAL/particle/Particle.h"
 #include "PROPOSAL/particle/ParticleDef.h"

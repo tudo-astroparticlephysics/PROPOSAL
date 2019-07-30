@@ -70,6 +70,7 @@ public:
 
     // Methods
     virtual double Calculate(double ei, double ef, double rnd) = 0;
+
     virtual double GetUpperLimit(double ei, double rnd);
 
 protected:
@@ -92,11 +93,14 @@ public:
     {
         return new UtilityIntegralDisplacement(utility, *this);
     }
+    
+    // double Calculate(double ei, double ef, double rnd, Vector3D xi, Vector3D direction);
 
     virtual ~UtilityIntegralDisplacement();
 
     // Methods
-    virtual double Calculate(double ei, double ef, double rnd);
+    double Calculate(double ei, double ef, double rnd);
+    double Calculate(double ei, double ef, double rnd, Vector3D xi, Vector3D direction);
 
 private:
     UtilityDecorator& operator=(const UtilityDecorator&); // Undefined & not allowed

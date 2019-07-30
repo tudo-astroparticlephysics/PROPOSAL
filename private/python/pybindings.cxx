@@ -1,4 +1,3 @@
-
 #include <pybind11/pybind11.h>
 #include <pybind11/functional.h>
 #include <pybind11/stl_bind.h>
@@ -22,6 +21,10 @@ using namespace PROPOSAL;
 #define MEDIUM_DEF(module, cls)                                                                                        \
     py::class_<cls, Medium, std::shared_ptr<cls> >(module, #cls)                                                       \
         .def(py::init<double>(), py::arg("density_correction") = 1.0);
+
+#define AXIS_DEF(module, cls)                                                                                          \
+    py::class_<cls, Axis, std::shared_ptr<cls> >(module, #cls)                                                         \
+        .def(py::init<Vector3D, Vector3D>(), py::arg("axis"), py::arg("reference_point"));
 
 #define PARTICLE_DEF(module, cls)                                                                                      \
     py::class_<cls##Def, ParticleDef, std::unique_ptr<cls##Def, py::nodelete> >(module, #cls "Def")                    \
@@ -130,46 +133,124 @@ void init_components(py::module& m)
 {
     py::module m_sub = m.def_submodule("component");
 
-    // m_sub.doc() = R"pbdoc(
-    //     pyPROPOSAL
-    //     ----------
-    //
-    //     .. currentmodule:: component
-    //
-    //     .. autosummary::
-    //         :toctree: _generate
-    //
-    //         Component
-    //         Hydrogen
-    //         Carbon
-    //         Nitrogen
-    //         Oxygen
-    //         Sodium
-    //         Magnesium
-    //         Sulfur
-    //         Argon
-    //         Potassium
-    //         Calcium
-    //         Iron
-    //         Copper
-    //         Lead
-    //         Uranium
-    //         StandardRock
-    //         FrejusRock
-    // )pbdoc";
+    m_sub.doc() = R"pbdoc(
+        You could create a new component or select one of the implemented.
+        Components are used to define a medium as part of a sector.
+
+        A existing component can be called for example with:
+
+        >>> hydro = pyPROPOSAL.component.Hydrogen()
+        >>> hydro.atomic_number
+        1.00794
+
+        There listed components can be created without initialization:
+
+        * Hydrogen
+        * Carbon
+        * Nitrogen
+        * Oxygen
+        * Sodium
+        * Magnesium
+        * Sulfur
+        * Argon
+        * Potassium
+        * Calcium
+        * Iron
+        * Copper
+        * Lead
+        * Uranium
+        * StandardRock
+        * FrejusRock
+
+        Otherwise you have to initalize the component yourself.
+    )pbdoc";
 
     py::class_<Components::Component, std::shared_ptr<Components::Component>>(m_sub, "Component")
-        .def(py::init<std::string, double, double, double>(), py::arg("name"), py::arg("charge"), py::arg("atomic_num"), py::arg("atom_in_molecule"))
+        .def(py::init<std::string, double, double, double>(), py::arg("name"), py::arg("charge"), py::arg("atomic_num"), py::arg("atom_in_molecule"), R"pbdoc(
+            Creating a new static component.
+
+            Args:
+               name (str):  The name of component.
+               charge (float):  Charge in units of Coulomb.
+               atomic_num (float): Atom number in periodic table.
+               atomic_in_molecule (float): Number of atoms in molecule.
+        )pbdoc")
         .def("__str__", &py_print<Components::Component>)
-        .def_property_readonly("name", &Components::Component::GetName)
-        .def_property_readonly("nuclear_charge", &Components::Component::GetNucCharge)
-        .def_property_readonly("atomic_number", &Components::Component::GetAtomicNum)
-        .def_property_readonly("atoms_in_molecule", &Components::Component::GetAtomInMolecule)
-        .def_property_readonly("log_constant", &Components::Component::GetLogConstant)
-        .def_property_readonly("bprime", &Components::Component::GetBPrime)
-        .def_property_readonly("average_nucleon_weight", &Components::Component::GetAverageNucleonWeight)
-        .def_property_readonly("mn", &Components::Component::GetMN)
-        .def_property_readonly("r0", &Components::Component::GetR0);
+        .def_property_readonly(
+                "name", 
+                &Components::Component::GetName, 
+                R"pbdoc(
+                    Get name of component.
+
+                    Returns:
+                        str: Name of component
+                )pbdoc"
+                )
+        .def_property_readonly(
+                "nuclear_charge",
+                &Components::Component::GetNucCharge,
+                R"pbdoc(
+                    Get nuclear charge of component.
+
+                    Returns:
+                        float: Nuclear charge of component
+                )pbdoc"
+        )
+        .def_property_readonly(
+                "atomic_number",
+                &Components::Component::GetAtomicNum,
+                R"pbdoc(
+                    Get atomic number of component.
+
+                    Returns:
+                        float: Atomic number of component
+                )pbdoc"
+                )
+        .def_property_readonly(
+                "atoms_in_molecule",
+                &Components::Component::GetAtomInMolecule,
+                R"pbdoc(
+                    Get number of atoms in one molecule.
+
+                    Returns:
+                        float: number of atoms in molecule
+                )pbdoc"
+                )
+        .def_property_readonly(
+                "log_constant",
+                &Components::Component::GetLogConstant,
+                R"pbdoc(
+                    Explanation still has to be added.
+                )pbdoc"
+                )
+        .def_property_readonly(
+                "bprime",
+                &Components::Component::GetBPrime,
+                R"pbdoc(
+                    Explanation still has to be added.
+                )pbdoc"
+                )
+        .def_property_readonly(
+                "average_nucleon_weight",
+                &Components::Component::GetAverageNucleonWeight,
+                R"pbdoc(
+                    Explanation still has to be added.
+                )pbdoc"
+                )
+        .def_property_readonly(
+                "mn",
+                &Components::Component::GetMN,
+                R"pbdoc(
+                    Explanation still has to be added.
+                )pbdoc"
+                )
+        .def_property_readonly(
+                "r0",
+                &Components::Component::GetR0,
+                R"pbdoc(
+                    Explanation still has to be added.
+                )pbdoc"
+                );
 
     COMPONENT_DEF(m_sub, Hydrogen)
     COMPONENT_DEF(m_sub, Carbon)
@@ -245,11 +326,97 @@ void init_medium(py::module& m)
     MEDIUM_DEF(m_sub, Air)
     MEDIUM_DEF(m_sub, Paraffin)
     MEDIUM_DEF(m_sub, AntaresWater)
+
+    py::class_<Density_distr, std::shared_ptr<Density_distr>>(m_sub, "Density_distribution");
+    /*     .def_property_readonly("Axis", &Density_distr::GetAxis); */
+    
+    py::class_<Density_exponential, Density_distr, std::shared_ptr<Density_exponential>>(m_sub, "Density_exponential")
+        .def(py::init<const Axis&, double>(), py::arg("density_axis"), py::arg("sigma"));
+    
+    py::class_<Density_homogeneous, Density_distr, std::shared_ptr<Density_homogeneous>>(m_sub, "Density_homogeneous")
+        .def(py::init<>());
+
+    /* py::class_<cls, Density_distr, std::shared_ptr<cls> >(module, #cls)                                                \ */
+    /*     .def(py::init<const Axis&>(), py::arg("density_axis")); */
+    
+    /* DENSITY_DEF(m_sub, Density_exponential); */
+    /* DENSITY_DEF(m_sub, Density_homogeneous); */
+
+    py::class_<Axis, std::shared_ptr<Axis>>(m_sub, "Density_axis")
+        .def_property_readonly("fAxis", &Axis::GetAxis)
+        .def_property_readonly("refernce_point", &Axis::GetFp0)
+        .def(
+            "depth",
+            &Axis::GetDepth,
+            py::arg("position"),
+            R"pbdoc(
+                Calculates in dependence of the particle position the depthcorrection.
+
+                Parameters:
+                    position (Vector3D): particle position
+
+                Return:
+                    float: depthcorrection
+            )pbdoc"
+        )
+        .def(
+            "depth",
+            &Axis::GetEffectiveDistance,
+            py::arg("position"),
+            py::arg("direction"),
+            R"pbdoc(
+                Calculates in dependence of the particle position the effective Distance.
+
+                Parameters:
+                    position (Vector3D): particle position
+                    direction (Vector3D): direction position
+
+                Return:
+                    float: effective Distance
+            )pbdoc"
+        );
+        
+    
+    AXIS_DEF(m_sub, RadialAxis);
+    AXIS_DEF(m_sub, CartesianAxis);
+
 }
 
 void init_particle(py::module& m)
 {
     py::module m_sub = m.def_submodule("particle");
+        
+    m_sub.doc() = R"pbdoc(
+        For each propagation a defined particle is needed.
+        You have the possibility to define one by your own or select one of
+        the listed below. Particle data are based on source ??.
+
+        +----------+----------+----------+----------+----------+----------+
+        |MuMinus   |MuPlus    |EMinus    |EPlus     |TauMinus  |TauPlus   |
+        +----------+----------+----------+----------+----------+----------+
+        |StauMinus |StauPlus  |Pi0       |PiMinus   |PiPlus    |K0        |
+        +----------+----------+----------+----------+----------+----------+
+        |KMinus    |KPlus     |PMinus    |PPlus     |NuE       |NuEBar    |
+        +----------+----------+----------+----------+----------+----------+
+        |NuMu      |NuMuBar   |NuTau     |NuTauBar  |Monopole  |Gamma     |
+        +----------+----------+----------+----------+----------+----------+
+        |SMPMinus  |SMPPlus   |          |          |          |          |
+        +----------+----------+----------+----------+----------+----------+
+
+        Particle are static objects, so that the properties can not be 
+        changed once it is initalized.  Own particle can be created if you
+        initalize a complete new with the :meth:`ParticleDef` class or
+        modifie a copy of a existing one with the :meth:`ParticleDefBuilder`.
+        
+        A predefined particle can be initialize for example with
+
+        >>> muon = pyPROPOSAL.particle.MuMinusDef.get()
+
+        The :meth:`Particle` class is a container for partilce related data. 
+        There can be for example initial energy set and losses read out. 
+        The :meth:`particle.Data` class is a container for interaction a 
+        particle does.
+    )pbdoc";
 
     py::class_<ParticleDef, std::shared_ptr<ParticleDef> >(m_sub, "ParticleDef")
         .def(py::init<>())
@@ -272,27 +439,141 @@ void init_particle(py::module& m)
         .def("__str__", &py_print<ParticleDef>)
         .def("__eq__", &ParticleDef::operator==)
         .def("__ne__", &ParticleDef::operator!=)
-        .def_readonly("name", &ParticleDef::name)
-        .def_readonly("mass", &ParticleDef::mass)
-        .def_readonly("low", &ParticleDef::low)
-        .def_readonly("charge", &ParticleDef::charge)
-        .def_readonly("decay_table", &ParticleDef::decay_table)
+        .def_readonly(
+            "name", 
+            &ParticleDef::name,
+            R"pbdoc(
+                name ot the particle
+            )pbdoc"
+        )
+        .def_readonly(
+            "mass", 
+            &ParticleDef::mass,
+            R"pbdoc(
+                mass of the particle in MeV
+            )pbdoc"
+        )
+        .def_readonly(
+            "low", 
+            &ParticleDef::low,
+            R"pbdoc(
+                lower stochastic sampling energy limit.
+            )pbdoc"
+        )
+        .def_readonly(
+            "charge",
+             &ParticleDef::charge,
+            R"pbdoc(
+                charge of the particle
+            )pbdoc"
+        )
+        .def_readonly(
+            "decay_table",
+             &ParticleDef::decay_table,
+            R"pbdoc(
+                generate a static particle with in ParticleDefBuilder properties
+            )pbdoc"
+        )
         // .def_readonly("harc_component_table", &ParticleDef::hard_component_table)
         // .add_property("hard_component_table", make_function(&get_hard_component, return_internal_reference<>()))
         // //TODO(mario): shit Fri 2017/10/13
         ;
 
-    py::class_<ParticleDef::Builder, std::shared_ptr<ParticleDef::Builder>>(m_sub, "ParticleDefBuilder")
-        .def(py::init<>())
-        .def("SetName", &ParticleDef::Builder::SetName)
-        .def("SetMass", &ParticleDef::Builder::SetMass)
-        .def("SetLow", &ParticleDef::Builder::SetLow)
-        .def("SetLifetime", &ParticleDef::Builder::SetLifetime)
-        .def("SetCharge", &ParticleDef::Builder::SetCharge)
-        .def("SetDecayTable", &ParticleDef::Builder::SetDecayTable)
-        .def("SetParticleDef", &ParticleDef::Builder::SetParticleDef)
-        .def("build", &ParticleDef::Builder::build);
+    py::class_<ParticleDef::Builder, std::shared_ptr<ParticleDef::Builder>>(m_sub, "ParticleDefBuilder", 
+            R"pbdoc(
+                With the ParticleDefBuilder it is possible to define new particles
+                or change porperties of existing one. First you have to initalize
+                a ParticleDefBuilder. The new properties of the particle can be
+                collected before a new static particle is build.
 
+                Example:
+                    A usecase for the ParticleDefBuilder might be if your 
+                    particle will be propagated stochastically until a 
+                    certain lower limit which is higher than the particle 
+                    mass is reached.
+
+                    >>> builder = pp.particle.ParticleDefBuilder()
+                    >>> builder.SetParticleDef(pp.particle.MuMinusDef.get())
+                    >>> builder.SetLow(1e6)  # 1 Tev
+                    >>> mu_def = mu_def_builder.build()
+
+                    Therby muons which energy is lower than one TeV will be 
+                    handled continously.
+            )pbdoc"
+        )
+        .def(
+            py::init<>(),
+            R"pbdoc(
+                Before you can create or modify a particle a definition builder has 
+                to be initalized. It collect the properties of the new or changed 
+                particle.
+            )pbdoc"
+        )
+        .def(   
+            "SetName", 
+            &ParticleDef::Builder::SetName,
+            R"pbdoc(
+                Args:
+                    arg1 (str): name of the particle
+            )pbdoc"
+        )
+        .def(
+            "SetMass", 
+            &ParticleDef::Builder::SetMass,
+            R"pbdoc(
+                Args:
+                    arg1 (float): mass of the particle
+            )pbdoc"
+        )
+        .def(
+            "SetLow", 
+            &ParticleDef::Builder::SetLow,
+            R"pbdoc(
+                Args:
+                    arg1 (float): lower stochastic sampling energy limit.
+            )pbdoc"
+        )
+        .def(
+            "SetLifetime", 
+            &ParticleDef::Builder::SetLifetime,
+            R"pbdoc(
+                Args:
+                    arg1 (float): lifetime of the particle
+            )pbdoc"
+        )
+        .def(
+            "SetCharge", 
+            &ParticleDef::Builder::SetCharge,
+            R"pbdoc(
+                Args:
+                    arg1 (float): charge of the particle in units of coulomb
+            )pbdoc"
+        )
+        .def(
+            "SetDecayTable", 
+            &ParticleDef::Builder::SetDecayTable,
+            R"pbdoc(
+                Args:
+                    arg1 (???): ???
+            )pbdoc"
+        )
+        .def(
+            "SetParticleDef", 
+            &ParticleDef::Builder::SetParticleDef,
+            R"pbdoc(
+                Args:
+                    arg1 (ParticleDef): a pre defined particle which values should 
+                        be take over.
+            )pbdoc"
+        )
+        .def(
+            "build",
+             &ParticleDef::Builder::build,
+            R"pbdoc(
+                Return: 
+                    ParticleDef: generate a static particle with in ParticleDefBuilder properties
+            )pbdoc"
+        );
 
     PARTICLE_DEF(m_sub, MuMinus)
     PARTICLE_DEF(m_sub, MuPlus)
@@ -333,36 +614,207 @@ void init_particle(py::module& m)
         .value("ContinuousEnergyLoss", DynamicData::ContinuousEnergyLoss)
         .value("WeakInt", DynamicData::WeakInt);
 
-    py::class_<DynamicData, std::shared_ptr<DynamicData> >(m_sub, "DynamicData")
+    py::class_<DynamicData, std::shared_ptr<DynamicData>>(
+            m_sub, 
+            "DynamicData",
+            R"pbdoc(
+                Interaction will be stored in form of Dynamic Data. 
+                It is used as an array with all important values for 
+                secondary particles. Secondary particles are not propagated.
+            )pbdoc"
+        )
         .def(py::init<DynamicData::Type>())
         .def(py::init<const DynamicData&>())
         .def("__str__", &py_print<DynamicData>)
-        .def_property_readonly("id", &DynamicData::GetTypeId)
-        .def_property("position", &DynamicData::GetPosition, &DynamicData::SetPosition)
-        .def_property("direction", &DynamicData::GetDirection, &DynamicData::SetDirection)
-        .def_property("energy", &DynamicData::GetEnergy, &DynamicData::SetEnergy)
-        .def_property("parent_particle_energy", &DynamicData::GetParentParticleEnergy, &DynamicData::SetParentParticleEnergy)
-        .def_property("time", &DynamicData::GetTime, &DynamicData::SetTime)
-        .def_property("propagated_distance", &DynamicData::GetPropagatedDistance, &DynamicData::SetPropagatedDistance);
+        .def_property_readonly(
+            "id", 
+            &DynamicData::GetTypeId,
+            R"pbdoc(
+                Type of Interaction. Interaction id of a particle can be convertet 
+                in an str with:
+                
+                >>> if p.id == pyPROPOSAL.particle.Data.Particle:
+                >>>     print(p.particle_def.name)
+                >>> else:
+                >>>     print(str(p.id).split(".")[1])
+            )pbdoc"
+        )
+        .def_property(
+            "position", 
+            &DynamicData::GetPosition, 
+            &DynamicData::SetPosition,
+            R"pbdoc(
+                Place of Interaction.
+            )pbdoc"
+        )
+        .def_property(
+            "direction", 
+            &DynamicData::GetDirection, 
+            &DynamicData::SetDirection,
+            R"pbdoc(
+                Direction of particle after interaction.
+            )pbdoc"
+        )
+        .def_property(
+            "energy", 
+            &DynamicData::GetEnergy, 
+            &DynamicData::SetEnergy,
+            R"pbdoc(
+                Energy of secondary particle.
+            )pbdoc"
+        )
+        .def_property(
+            "parent_particle_energy", 
+            &DynamicData::GetParentParticleEnergy, 
+            &DynamicData::SetParentParticleEnergy,
+            R"pbdoc(
+                Energy of primary particle after interaction.
+            )pbdoc"
+        )
+        .def_property(
+            "time", 
+            &DynamicData::GetTime, 
+            &DynamicData::SetTime,
+            R"pbdoc(
+                Time since beginning of propagation the primary particle.
+            )pbdoc"
+        )
+        .def_property(
+            "propagated_distance", 
+            &DynamicData::GetPropagatedDistance, 
+            &DynamicData::SetPropagatedDistance,
+            R"pbdoc(
+                Propagated distance of primary particle.
+            )pbdoc"
+        );
 
-    py::class_<Particle, std::shared_ptr<Particle>, DynamicData>(m_sub, "Particle")
+    py::class_<Particle, std::shared_ptr<Particle>, DynamicData>(
+            m_sub, 
+            "Particle",
+            R"pbdoc(
+                The particle class is used as a container to store data
+                while propagation process. There every information about
+                the primary particle will be stored.
+
+                Information about secondary particles will be found in 
+                :meth:`particle.DynamicData`
+            )pbdoc"
+        )
         .def(py::init<>())
         .def(py::init<const ParticleDef&>())
         .def(py::init<const Particle&>())
-        .def("inject_state", &Particle::InjectState)
-        .def_property_readonly("particle_def", &Particle::GetParticleDef)
-        .def_property_readonly("decay_table", &Particle::GetDecayTable)
-        .def_property("momentum", &Particle::GetMomentum, &Particle::SetMomentum)
-        .def_property("entry_point", &Particle::GetEntryPoint, &Particle::SetEntryPoint)
-        .def_property("entry_time", &Particle::GetEntryTime, &Particle::SetEntryTime)
-        .def_property("entry_energy", &Particle::GetEntryEnergy, &Particle::SetEntryEnergy)
-        .def_property("exit_point", &Particle::GetExitPoint, &Particle::SetExitPoint)
-        .def_property("exit_time", &Particle::GetExitTime, &Particle::SetExitTime)
-        .def_property("exit_energy", &Particle::GetExitEnergy, &Particle::SetExitEnergy)
-        .def_property("closet_approach_point", &Particle::GetClosestApproachPoint, &Particle::SetClosestApproachPoint)
-        .def_property("closet_approach_time", &Particle::GetClosestApproachTime, &Particle::SetClosestApproachTime)
-        .def_property("closet_approach_energy", &Particle::GetClosestApproachEnergy, &Particle::SetClosestApproachEnergy)
-        .def_property("e_lost", &Particle::GetElost, &Particle::SetElost);
+        .def(
+            "inject_state", 
+            &Particle::InjectState,
+            R"pbdoc(
+            )pbdoc"
+        )
+        .def_property_readonly(
+            "particle_def", 
+            &Particle::GetParticleDef,
+            R"pbdoc(
+                Definition of particle actuell in container
+            )pbdoc"
+        )
+        .def_property_readonly(
+            "decay_table", 
+            &Particle::GetDecayTable,
+            R"pbdoc(
+                Decay table of actuell particle
+            )pbdoc"
+        )
+        .def_property(
+            "momentum", 
+            &Particle::GetMomentum, 
+            &Particle::SetMomentum,
+            R"pbdoc(
+                Momentum of primary particle in eV
+            )pbdoc"
+        )
+        .def_property(
+            "entry_point", 
+            &Particle::GetEntryPoint, 
+            &Particle::SetEntryPoint,
+            R"pbdoc(
+                Entry point in detector in form of a Vector3d.
+            )pbdoc"
+        )
+        .def_property(
+            "entry_time", 
+            &Particle::GetEntryTime, 
+            &Particle::SetEntryTime, 
+            R"pbdoc(
+                Time primary particle entered the detector.
+            )pbdoc"
+        )
+        .def_property(
+            "entry_energy", 
+            &Particle::GetEntryEnergy, 
+            &Particle::SetEntryEnergy,
+            R"pbdoc(
+                Energy primary particle entered the detector.
+            )pbdoc"
+        )
+        .def_property(
+            "exit_point",
+            &Particle::GetExitPoint, 
+            &Particle::SetExitPoint,
+            R"pbdoc(
+                Point particle exit the detector in form of a Vector3d.
+            )pbdoc"
+        )
+        .def_property(
+            "exit_time", 
+            &Particle::GetExitTime, 
+            &Particle::SetExitTime,
+            R"pbdoc(
+                Time primary particle exit the detector.
+            )pbdoc"
+        )
+        .def_property(
+            "exit_energy", 
+            &Particle::GetExitEnergy, 
+            &Particle::SetExitEnergy,
+            R"pbdoc(
+                Energy primary particle exit the detector.
+            )pbdoc"
+        )
+        .def_property(
+            "closet_approach_point", 
+            &Particle::GetClosestApproachPoint, 
+            &Particle::SetClosestApproachPoint,
+            R"pbdoc(
+                In a first order the point where distance between particle 
+                and detector center is minimal.
+            )pbdoc" 
+        )
+        .def_property(
+            "closet_approach_time", 
+            &Particle::GetClosestApproachTime, 
+            &Particle::SetClosestApproachTime,
+            R"pbdoc(
+                In a first order the time where distance between particle 
+                and detector center is minimal.
+            )pbdoc"
+        )
+        .def_property(
+            "closet_approach_energy", 
+            &Particle::GetClosestApproachEnergy, 
+            &Particle::SetClosestApproachEnergy,
+            R"pbdoc(
+                In a first order the energy where distance between particle 
+                and detector center is minimal.
+            )pbdoc"
+        )
+        .def_property(
+            "e_lost", 
+            &Particle::GetElost, 
+            &Particle::SetElost,
+            R"pbdoc(
+                Energy primary particle lost in detector.
+                Energy primary particle lost in detector...
+            )pbdoc"
+        );
 }
 
 void init_decay(py::module& m)
@@ -374,7 +826,7 @@ void init_decay(py::module& m)
         .def("__eq__", &DecayChannel::operator==)
         .def("__ne__", &DecayChannel::operator!=)
         .def("decay", &DecayChannel::Decay, "Decay the given particle")
-        .def_static("boost", (void (*)(Particle&, const Vector3D&, double)) &DecayChannel::Boost, "Boost the particle along a direction");
+        .def_static("boost", (void (*)(Particle&, const Vector3D&, double, double)) &DecayChannel::Boost, "Boost the particle along a direction");
 
     py::class_<LeptonicDecayChannelApprox, std::shared_ptr<LeptonicDecayChannelApprox>, DecayChannel>(m_sub, "LeptonicDecayChannelApprox")
         .def(py::init<const ParticleDef&, const ParticleDef&, const ParticleDef&>());
@@ -410,6 +862,17 @@ void init_geometry(py::module& m)
 {
     py::module m_sub = m.def_submodule("geometry");
 
+    m_sub.doc() = R"pbdoc(
+        Every sector is defined by a specific medium and a geometry.
+        There are three different classes defined to build a mathematical 
+        body. All of them are a object of type :meth:`Geometry`.
+        Besides the information of the shape an object of the class 
+        geometry contains the position relativ to the coordinate origin.
+
+        Based on the position of the geometry, distances of the propagated 
+        particle to geometry sizes can be determined.
+    )pbdoc";
+
     py::enum_<GeometryFactory::Enum>(m_sub, "Shape")
         .value("Sphere", GeometryFactory::Sphere)
         .value("Box", GeometryFactory::Box)
@@ -417,47 +880,246 @@ void init_geometry(py::module& m)
 
     py::class_<GeometryFactory::Definition, std::shared_ptr<GeometryFactory::Definition>>(m_sub, "GeometryDefinition")
         .def(py::init<>())
-        .def_readwrite("shape", &GeometryFactory::Definition::shape)
-        .def_readwrite("position", &GeometryFactory::Definition::position)
-        .def_readwrite("inner_radius", &GeometryFactory::Definition::inner_radius)
-        .def_readwrite("outer_radius", &GeometryFactory::Definition::radius)
-        .def_readwrite("width", &GeometryFactory::Definition::width)
-        .def_readwrite("height", &GeometryFactory::Definition::height)
-        .def_readwrite("depth", &GeometryFactory::Definition::depth);
+        .def_readwrite(
+            "shape", 
+            &GeometryFactory::Definition::shape,
+            R"pbdoc(
+                type of shape of the geometry.
+            )pbdoc"
+        )
+        .def_readwrite(
+            "position", 
+            &GeometryFactory::Definition::position,
+            R"pbdoc(
+                position relativ to the coordinates origin.
+            )pbdoc"
+        )
+        .def_readwrite(
+            "inner_radius", 
+            &GeometryFactory::Definition::inner_radius,
+            R"pbdoc(
+                inner radius of type :meth:`Sphere`
+            )pbdoc"
+        )
+        .def_readwrite(
+            "outer_radius", 
+            &GeometryFactory::Definition::radius,
+            R"pbdoc(
+                inner radius of type :meth:`Sphere`
+            )pbdoc"
+        )
+        .def_readwrite(
+            "width", 
+            &GeometryFactory::Definition::width,
+            R"pbdoc(
+                width of type :meth:`Box`
+            )pbdoc"
+        )
+        .def_readwrite(
+            "height", 
+            &GeometryFactory::Definition::height,
+            R"pbdoc(
+                height of type :meth:`Box`
+            )pbdoc"
+        )
+        .def_readwrite(
+            "depth", 
+            &GeometryFactory::Definition::depth,
+            R"pbdoc(
+                depth of type :meth:`Box`
+            )pbdoc"
+        );
 
     py::class_<Geometry, std::shared_ptr<Geometry>>(m_sub, "Geometry")
         DEF_PY_PRINT(Geometry)
-        .def("is_infront", &Geometry::IsInfront)
-        .def("is_inside", &Geometry::IsInside)
-        .def("is_behind", &Geometry::IsBehind)
-        .def("distance_to_border", &Geometry::DistanceToBorder)
-        .def("distance_to_closet_approach", &Geometry::DistanceToClosestApproach)
-        .def_property_readonly("name", &Geometry::GetName)
-        .def_property("position", &Geometry::GetPosition, &Geometry::SetPosition)
-        .def_property("hierarchy", &Geometry::GetHierarchy, &Geometry::SetHierarchy);
+        .def(
+            "is_infront", 
+            &Geometry::IsInfront,
+            R"pbdoc(
+                Check if particle is in fron of the geometry.
+
+                Parameters:
+                    arg0 (Vector3D): particle position
+                    arg1 (Vector3D): particle direction
+
+                Return:
+                    bool: Is particle in front of the geometry?
+            )pbdoc"
+        )
+        .def(
+            "is_inside", 
+            &Geometry::IsInside,
+            R"pbdoc(
+                Check if particle is in the geometry.
+
+                Parameters:
+                    arg0 (Vector3D): particle position
+                    arg1 (Vector3D): particle direction
+
+                Return:
+                    bool: Is particle in the geometry?
+            )pbdoc"
+        )
+        .def(
+            "is_behind", 
+            &Geometry::IsBehind,
+            R"pbdoc(
+                Check if particle has passed the geometry.
+
+                Parameters:
+                    arg0 (Vector3D): particle position
+                    arg1 (Vector3D): particle direction
+
+                Return:
+                    bool: Is particle in front of the geometry?
+            )pbdoc"
+        )
+        .def(
+            "distance_to_border", 
+            &Geometry::DistanceToBorder,
+            py::arg("position"),
+            py::arg("direction"),
+            R"pbdoc(
+                Calculates in dependence of the particle position and direction 
+                the distance to the next border 
+
+                Parameters:
+                    position (Vector3D): particle position
+                    direction (Vector3D): particle direction
+
+                Return:
+                    float: distance to border
+            )pbdoc"
+        )
+        .def(
+            "distance_to_closet_approach", 
+            &Geometry::DistanceToClosestApproach,
+            R"pbdoc(
+                Calculates in dependence of the particle position and direction 
+                the distance where the particle pass the geometry center with 
+                minimal distance.
+
+                Parameters:
+                    arg0 (Vector3D): particle position
+                    arg1 (Vector3D): particle direction
+
+                Return:
+                    float: distance to closest approach
+            )pbdoc"
+        )
+        .def_property_readonly(
+            "name", 
+            &Geometry::GetName,
+            R"pbdoc(
+                name of the geometry
+            )pbdoc"
+        )
+        .def_property(
+            "position", 
+            &Geometry::GetPosition, 
+            &Geometry::SetPosition,
+            R"pbdoc(
+                position of the geometry center.
+            )pbdoc"
+        )
+        .def_property(
+            "hierarchy", 
+            &Geometry::GetHierarchy, 
+            &Geometry::SetHierarchy,
+            R"pbdoc(
+                hierachy of the geometry. If sectors overlap, the sector 
+                with the highest hierachy will be selected.
+            )pbdoc"
+        );
 
     py::class_<Sphere, std::shared_ptr<Sphere>, Geometry>(m_sub, "Sphere")
         .def(py::init<>())
         .def(py::init<Vector3D, double, double>())
         .def(py::init<const Sphere&>())
-        .def_property("inner_radius", &Sphere::GetInnerRadius, &Sphere::SetInnerRadius)
-        .def_property("radius", &Sphere::GetRadius, &Sphere::SetRadius);
+        .def_property(
+            "inner_radius", 
+            &Sphere::GetInnerRadius, 
+            &Sphere::SetInnerRadius,
+            R"pbdoc(
+                inner radius of the sphere
+            )pbdoc"
+        )
+        .def_property(
+            "radius", 
+            &Sphere::GetRadius, 
+            &Sphere::SetRadius,
+            R"pbdoc(
+                outer radius of the sphere
+            )pbdoc"
+        );
 
     py::class_<Box, std::shared_ptr<Box>, Geometry>(m_sub, "Box")
         .def(py::init<>())
         .def(py::init<Vector3D, double, double, double>())
         .def(py::init<const Box&>())
-        .def_property("width", &Box::GetX, &Box::SetX)
-        .def_property("height", &Box::GetY, &Box::SetY)
-        .def_property("depth", &Box::GetZ, &Box::SetZ);
+        .def_property(
+            "width", 
+            &Box::GetX, 
+            &Box::SetX,
+            R"pbdoc(
+                width of the box (x-axis)
+            )pbdoc"
+        )
+        .def_property(
+            "height", 
+            &Box::GetY, 
+            &Box::SetY,
+            R"pbdoc(
+                height of the box (y-axis)
+            )pbdoc"
+        )
+        .def_property(
+            "depth", 
+            &Box::GetZ, 
+            &Box::SetZ,
+            R"pbdoc(
+                depth of the box (z-axis)
+            )pbdoc"
+            );
 
-    py::class_<Cylinder, std::shared_ptr<Cylinder>, Geometry>(m_sub, "Cylinder")
+    py::class_<Cylinder, std::shared_ptr<Cylinder>, Geometry>(
+            m_sub, 
+            "Cylinder",
+            R"pbdoc(
+                A cylinder can be created as a hollow cylinder.
+                For this purpose, a corresponding radius must be 
+                selected for the bore along the main axis. A 
+                cylinder without a bore is equal to a bore radius 
+                equal to zero.
+            )pbdoc"
+        )
         .def(py::init<>())
         .def(py::init<Vector3D, double, double, double>())
         .def(py::init<const Cylinder&>())
-        .def_property("inner_radius", &Cylinder::GetInnerRadius, &Cylinder::SetInnerRadius)
-        .def_property("radius", &Cylinder::GetRadius, &Cylinder::SetRadius)
-        .def_property("height", &Cylinder::GetZ, &Cylinder::SetZ);
+        .def_property(
+            "inner_radius", 
+            &Cylinder::GetInnerRadius, 
+            &Cylinder::SetInnerRadius,
+            R"pbdoc(
+                the inner radius of the bore through the main axis
+                of the cylinder
+            )pbdoc"
+        )
+        .def_property(
+            "radius", 
+            &Cylinder::GetRadius, 
+            &Cylinder::SetRadius,
+            R"pbdoc(
+                radius of outer shell of the cylinder 
+            )pbdoc"
+        )
+        .def_property(
+            "height", &Cylinder::GetZ, 
+            &Cylinder::SetZ,
+            R"pbdoc(
+                height of the cylinder
+            )pbdoc"
+        );
 }
 
 void init_parametrization(py::module& m)
@@ -467,30 +1129,209 @@ void init_parametrization(py::module& m)
     // py::class_<Parametrization::IntegralLimits, std::shared_ptr<Parametrization::IntegralLimits>>("IntegralLimits")
     py::class_<Parametrization::IntegralLimits, std::shared_ptr<Parametrization::IntegralLimits>>(m_sub, "IntegralLimits")
         .def(py::init<>())
-        .def_readwrite("v_max", &Parametrization::IntegralLimits::vMax)
-        .def_readwrite("v_up", &Parametrization::IntegralLimits::vUp)
-        .def_readwrite("v_min", &Parametrization::IntegralLimits::vMin);
+        .def_readwrite("v_max", &Parametrization::IntegralLimits::vMax,
+            R"pbdoc(
+            Highest physical possible v for the current parametrization.
+            )pbdoc")
+        .def_readwrite("v_up", &Parametrization::IntegralLimits::vUp,
+            R"pbdoc(
+            Energy cut set by the user via the cut settings. Can be energy dependent. Used to differentiate between continous and stochastic losses.
 
-    py::class_<Parametrization, std::shared_ptr<Parametrization>>(m_sub, "Parametrization")
+            See :meth:`~pyPROPOSAL.EnergyCutSettings` for more information on the energy cut settings.
+            )pbdoc")
+        .def_readwrite("v_min", &Parametrization::IntegralLimits::vMin,
+            R"pbdoc(
+            Lowest physical possible v for the current parametrization
+            )pbdoc");
+
+    py::class_<Parametrization, std::shared_ptr<Parametrization>>(m_sub, "Parametrization",
+            R"pbdoc(
+            Parametrization objects provide the theoretical input for physical cross section used in PROPOSAL, whereas :meth:`~pyPROPOSAL.crosssection.CrossSection`
+            provides the numerical methods to process the parametrization. 
+
+            For each physical process in PROPOSAL there are several different parametrizations available, so the user can check how the theoretical input influences
+            the simulation.
+            )pbdoc")
         .def("__str__", &py_print<Parametrization>)
-        .def("differential_crosssection", &Parametrization::DifferentialCrossSection)
-        .def("dEdx_integrand", &Parametrization::FunctionToDEdxIntegral)
-        .def("dE2dx_integrand", &Parametrization::FunctionToDE2dxIntegral)
-        .def("dNdx_integrand", &Parametrization::FunctionToDNdxIntegral)
-        .def("integral_limits", &Parametrization::GetIntegralLimits)
-        .def_property_readonly("name", &Parametrization::GetName)
-        .def_property_readonly("particle_def", &Parametrization::GetParticleDef)
-        .def_property_readonly("medium", &Parametrization::GetMedium)
-        .def_property_readonly("energy_cuts", &Parametrization::GetEnergyCuts)
-        .def_property_readonly("multiplier", &Parametrization::GetMultiplier)
-        .def_property_readonly("hash", &Parametrization::GetHash);
+        .def("differential_crosssection", &Parametrization::DifferentialCrossSection,
+         py::arg("energy"),
+         py::arg("v"),
+                R"pbdoc(
+            Calculate the value 
+
+            .. math:: 
+
+                \frac{d\sigma}{dv}(E), 
+
+            e.g. the differential crosssection in v for the current parametrization.
+            If the parametrization is given in a double-differential-crosssection the crosssection will be integrated over all values but v.
+
+            Args:
+                energy (float): energy in MeV
+                v (float): fraction of energy that is transfered from the primary particle to secondary particles (or other forms of energy losses) 
+
+            Return:
+                differential_crosssection (float): returns the differential crosssection in v
+
+                )pbdoc"  )
+        .def("dEdx_integrand", &Parametrization::FunctionToDEdxIntegral,
+         py::arg("energy"),
+         py::arg("v"),
+                R"pbdoc(
+            Calculate the value 
+
+            .. math:: 
+
+                v \cdot \frac{d\sigma}{dv}(E), 
+
+            e.g. the differential crosssection in v for the current parametrization multipied by v. 
+            If the parametrization is given in a double-differential-crosssection the crosssection will be integrated over all values but v.
+
+            Args:
+                energy (float): energy in MeV
+                v (float): fraction of energy that is transfered from the primary particle to secondary particles (or other forms of energy losses) 
+
+            Return:
+                dEdx_integrand (float): returns the differential crosssection in v multiplied by v
+
+            PROPOSAL uses this function internally, for example to calcuate :math:`\langle\frac{dE}{dx}\rangle`
+
+                )pbdoc"  )
+        .def("dE2dx_integrand", &Parametrization::FunctionToDE2dxIntegral,
+         py::arg("energy"),
+         py::arg("v"),
+                R"pbdoc(
+            Calculate the value 
+
+            .. math:: 
+
+                v^2 \cdot \frac{d\sigma}{dv}(E), 
+
+            e.g. the differential crosssection in v for the current parametrization multipied by :math:`v^2`. 
+            If the parametrization is given in a double-differential-crosssection the crosssection will be integrated over all values but v.
+
+            Args:
+                energy (float): energy in MeV
+                v (float): fraction of energy that is transfered from the primary particle to secondary particles (or other forms of energy losses) 
+
+            Return:
+                dE2dx_integrand (float): returns the differential crosssection in v multiplied by :math:`v^2`
+
+            PROPOSAL uses this function internally, for example in the calculation of the countinous randomization. 
+
+                )pbdoc"  )
+        .def("dNdx_integrand", &Parametrization::FunctionToDNdxIntegral,
+         py::arg("energy"),
+         py::arg("v"),
+                R"pbdoc(
+            Calculate the value 
+
+            .. math:: 
+
+                \frac{d\sigma}{dv}(E), 
+
+            e.g. the differential crosssection in v for the current parametrization. 
+            If the parametrization is given in a double-differential-crosssection the crosssection will be integrated over all values but v.
+
+            Args:
+                energy (float): energy in MeV
+                v (float): fraction of energy that is transfered from the primary particle to secondary particles (or other forms of energy losses) 
+
+            Return:
+                dNdx_integrand (float): returns the differential crosssection in v
+
+            PROPOSAL uses this function internally, for example to compare the probabilities of the different possible interactions. 
+
+                )pbdoc"  )
+        .def("integral_limits", &Parametrization::GetIntegralLimits,
+         py::arg("energy"),
+                R"pbdoc(
+            Returns:
+                integral_limits (:meth:`~pyPROPOSAL.parametrization.IntegralLimits`): returns the integral limits for the given energy and the
+                current parametrization
+                )pbdoc"  
+         )
+        .def_property_readonly("name", &Parametrization::GetName,
+                R"pbdoc(
+
+            Get name of current parametrization
+
+                )pbdoc"
+        )
+        .def_property_readonly("particle_def", &Parametrization::GetParticleDef,
+                R"pbdoc(
+
+            Get :meth:`~pyPROPOSAL.particle.ParticleDef` used by the parametrization
+
+                )pbdoc"
+        )
+        .def_property_readonly("medium", &Parametrization::GetMedium,
+                R"pbdoc( 
+
+            Get :meth:`~pyPROPOSAL.medium` used by the parametrization
+
+                )pbdoc"
+        )
+        .def_property_readonly("energy_cuts", &Parametrization::GetEnergyCuts,
+                R"pbdoc( 
+
+            Get :meth:`~pyPROPOSAL.EnergyCutSettings` defined by the user for the parametrization
+
+                )pbdoc"
+        )
+        .def_property_readonly("multiplier", &Parametrization::GetMultiplier,
+                R"pbdoc( 
+
+            Get multiplier used for the parametrization
+
+                )pbdoc"
+        )
+        .def_property_readonly("hash", &Parametrization::GetHash,
+                R"pbdoc( 
+
+            Get internal hash corresponding to the current parametrization
+
+                )pbdoc"
+        );
 
     // --------------------------------------------------------------------- //
     // Bremsstrahlung
     // --------------------------------------------------------------------- //
 
     py::module m_sub_brems = m_sub.def_submodule("bremsstrahlung");
-    py::class_<Bremsstrahlung, std::shared_ptr<Bremsstrahlung>, Parametrization>(m_sub_brems, "Bremsstrahlung");
+    py::class_<Bremsstrahlung, std::shared_ptr<Bremsstrahlung>, Parametrization>(m_sub_brems, "Bremsstrahlung",
+                R"pbdoc( 
+
+            Virtual class for the Bremsstrahlung parametrizations. They can be initialized by using one of the given parametrizations with the following parameters
+
+            Args:                                                                                                  
+                particle_def (:meth:`~pyPROPOSAL.particle.ParticleDef`): includes all static particle information for the parametrization such as mass, charge, etc.
+                medium (:meth:`~pyPROPOSAL.medium`): includes all medium information for the parametrization such as densities or nucleon charges                                   
+                energy_cuts (:meth:`~pyPROPOSAL.EnergyCutSettings`): energy cut setting for the parametrization
+                multiplier (double): Use a multiplicative factor for the differential crosssection. Can be used for testing or other studies                                                            
+                lpm_effect (bool): Enable or disable the corrections due to the Ter-Mikaelian and Landau-Pomeranchuk effect.                                                                                            
+
+            The following parametrizations are currently implemented:
+
+            * KelnerKokoulinPetrukhin
+
+            * PetrukhinShestakov
+
+            * CompleteScreening
+
+            * AndreevBezrukovBugaev
+
+            * SandrockSoedingreksoRhode
+
+            Example:
+                To create a bremsstrahlung parametrization
+
+                >>> mu = pyPROPOSAL.particle.MuMinusDef.get()
+                >>> medium = pyPROPOSAL.medium.StandardRock(1.0)
+                >>> cuts = pyPROPOSAL.EnergyCutSettings(-1, -1)
+                >>> param = pyPROPOSAL.parametrization.bremsstrahlung.SandrockSoedingreksoRhode(mu, medium, cuts, 1.0, False)
+                )pbdoc"
+        );
 
     BREMS_DEF(m_sub_brems, KelnerKokoulinPetrukhin)
     BREMS_DEF(m_sub_brems, PetrukhinShestakov)
@@ -516,7 +1357,40 @@ void init_parametrization(py::module& m)
     // --------------------------------------------------------------------- //
 
     py::module m_sub_epair = m_sub.def_submodule("pairproduction");
-    py::class_<EpairProduction, std::shared_ptr<EpairProduction>, Parametrization>(m_sub_epair, "EpairProduction");
+    py::class_<EpairProduction, std::shared_ptr<EpairProduction>, Parametrization>(m_sub_epair, "EpairProduction",
+                R"pbdoc( 
+
+            Virtual class for the electron pair production parametrizations. They can be initialized by using one of the given parametrizations with the following parameters
+
+            Args:                                                                                                  
+                particle_def (:meth:`~pyPROPOSAL.particle.ParticleDef`): includes all static particle information for the parametrization such as mass, charge, etc.
+                medium (:meth:`~pyPROPOSAL.medium`): includes all medium information for the parametrization such as densities or nucleon charges                                   
+                energy_cuts (:meth:`~pyPROPOSAL.EnergyCutSettings`): energy cut setting for the parametrization
+                multiplier (double): Use a multiplicative factor for the differential crosssection. Can be used for testing or other studies                                                            
+                lpm_effect (bool): Enable or disable the corrections due to the Ter-Mikaelian and Landau-Pomeranchuk effect.  
+                interpolation_def (:meth:`~pyPROPOSAL.InterpolationDef`): Only needed by Interpolant parametrizations. Includes settings for the interpolation                                    
+                                                                                          
+            Since the differential cross section is given in :math:`\rho` as well, an intergration over this parameter is needed.
+            When using the interpolation_def parameter, this integration is saved in interpolation tables (improving the performance of the calculation with neglible decline in accuracy).
+
+            The following parametrizations are currently implemented:
+
+            * KelnerKokoulinPetrukhin
+
+            * SandrockSoedingreksoRhode
+
+            * KelnerKokoulinPetrukhinInterpolant
+
+            * SandrockSoedingreksoRhodeInterpolant
+
+            Example:
+                To create a electron pair production parametrization
+
+                >>> mu = pyPROPOSAL.particle.MuMinusDef.get()
+                >>> medium = pyPROPOSAL.medium.StandardRock(1.0)
+                >>> cuts = pyPROPOSAL.EnergyCutSettings(-1, -1)
+                >>> param = pyPROPOSAL.parametrization.pairproduction.SandrockSoedingreksoRhode(mu, medium, cuts, 1.0, False)
+                )pbdoc");
 
     py::class_<EpairProductionRhoIntegral, std::shared_ptr<EpairProductionRhoIntegral>, EpairProduction>(m_sub_epair, "EpairProductionRhoIntegral")
         .def("function_to_integral", &EpairProductionRhoIntegral::FunctionToIntegral);
@@ -542,8 +1416,61 @@ void init_parametrization(py::module& m)
     // --------------------------------------------------------------------- //
 
     py::module m_sub_mupair = m_sub.def_submodule("mupairproduction");
-    py::class_<MupairProduction, std::shared_ptr<MupairProduction>, Parametrization>(m_sub_mupair, "MupairProduction")
-            .def("Calculaterho", &MupairProduction::Calculaterho);
+    py::class_<MupairProduction, std::shared_ptr<MupairProduction>, Parametrization>(m_sub_mupair, "MupairProduction",
+                R"pbdoc( 
+
+            Virtual class for the muon pair production parametrizations. They can be initialized by using one of the given parametrizations with the following parameters
+
+            Args:                                                                                                  
+                particle_def (:meth:`~pyPROPOSAL.particle.ParticleDef`): includes all static particle information for the parametrization such as mass, charge, etc.
+                medium (:meth:`~pyPROPOSAL.medium`): includes all medium information for the parametrization such as densities or nucleon charges                                   
+                energy_cuts (:meth:`~pyPROPOSAL.EnergyCutSettings`): energy cut setting for the parametrization
+                multiplier (double): Use a multiplicative factor for the differential crosssection. Can be used for testing or other studies   
+                interpolation_def (:meth:`~pyPROPOSAL.InterpolationDef`): Only needed by Interpolant parametrizations. Includes settings for the interpolation                                    
+                                                                                          
+            Since the differential cross section is given in :math:`\rho` as well, an intergration over this parameter is needed.
+            When using the interpolation_def parameter, this integration is saved in interpolation tables (improving the performance of the calculation with neglible decline in accuracy).                                                         
+
+            The following parametrizations are currently implemented:
+
+            * KelnerKokoulinPetrukhin
+
+            * KelnerKokoulinPetrukhinInterpolant
+
+            Example:
+                To create a muon pair production parametrization
+
+                >>> mu = pyPROPOSAL.particle.MuMinusDef.get()
+                >>> medium = pyPROPOSAL.medium.StandardRock(1.0)
+                >>> cuts = pyPROPOSAL.EnergyCutSettings(-1, -1)
+                >>> param = pyPROPOSAL.parametrization.mupairproduction.KelnerKokoulinPetrukhin(mu, medium, cuts, 1.0)
+                )pbdoc")
+            .def("Calculaterho", &MupairProduction::Calculaterho,
+            py::arg("energy"),
+            py::arg("v"),
+            py::arg("rnd1"),
+            py::arg("rnd2"),
+                R"pbdoc(
+            Muon pairproduction creates a muonpair from the initial particle. The asymmetry between the created muon and antimuon is described by
+            the asymmetry parameter rho via 
+
+            .. math:: 
+
+                \rho = \frac{E_+ - E_-}{E_+ + E_-}, 
+
+            with :math:`E_{\pm}` the energy of the created (anti)muon.
+            This function samples a value of rho according to the given parameters.
+
+            Args:
+                energy (float): energy of initial particle in MeV
+                v (float): fraction of energy that is transfered from the primary particle to the created muon pair
+                rnd1 (float): random number for sampling the absolute value of rho
+                rnd2 (float): random number for sampling the sign of rho 
+
+            Return:
+                rho (float): asymmetry parameter :math:`\rho` with :math:`0 \leq \rho \leq 1`
+
+                )pbdoc"  );
 
     py::class_<MupairProductionRhoIntegral, std::shared_ptr<MupairProductionRhoIntegral>, MupairProduction>(m_sub_mupair, "MupairProductionRhoIntegral")
         .def("function_to_integral", &MupairProductionRhoIntegral::FunctionToIntegral);
@@ -567,7 +1494,27 @@ void init_parametrization(py::module& m)
     // --------------------------------------------------------------------- //
 
     py::module m_sub_weak = m_sub.def_submodule("weakinteraction");
-    py::class_<WeakInteraction, std::shared_ptr<WeakInteraction>, Parametrization>(m_sub_weak, "WeakInteraction");
+    py::class_<WeakInteraction, std::shared_ptr<WeakInteraction>, Parametrization>(m_sub_weak, "WeakInteraction",
+                R"pbdoc( 
+
+            Virtual class for the weak interaction parametrizations. They can be initialized by using one of the given parametrizations with the following parameters
+
+            Args:                                                                                                  
+                particle_def (:meth:`~pyPROPOSAL.particle.ParticleDef`): includes all static particle information for the parametrization such as mass, charge, etc.
+                medium (:meth:`~pyPROPOSAL.medium`): includes all medium information for the parametrization such as densities or nucleon charges                                   
+                multiplier (double): Use a multiplicative factor for the differential crosssection. Can be used for testing or other studies                                                            
+
+            The following parametrizations are currently implemented:
+
+            * WeakCooperSarkarMertsch
+
+            Example:
+                To create a weak interaction parametrization
+
+                >>> mu = pyPROPOSAL.particle.MuMinusDef.get()
+                >>> medium = pyPROPOSAL.medium.StandardRock(1.0)
+                >>> param = pyPROPOSAL.parametrization.weakinteraction.WeakCooperSarkarMertsch(mu, medium, 1.0)
+                )pbdoc");
 
 
     py::class_<WeakCooperSarkarMertsch, std::shared_ptr<WeakCooperSarkarMertsch>, WeakInteraction>(m_sub_weak, "CooperSarkarMertsch")                      \
@@ -594,9 +1541,36 @@ void init_parametrization(py::module& m)
     py::class_<Photonuclear, std::shared_ptr<Photonuclear>, Parametrization>(m_sub_photo, "Photonuclear");
 
     // Shadow Effect
-    py::class_<ShadowEffect, std::shared_ptr<ShadowEffect>>(m_sub_photo, "ShadowEffect")
-        .def("calculate_shadow_effect", &ShadowEffect::CalculateShadowEffect)
-        .def_property_readonly("name", &ShadowEffect::GetName);
+    py::class_<ShadowEffect, std::shared_ptr<ShadowEffect>>(m_sub_photo, "ShadowEffect",
+                R"pbdoc( 
+
+            Virtual class for the parametrizations of the ShadowEffect used in the photonuclear interaction calculations.
+            The nucleon shadowing describes the difference in the crosssection between the interaction of a photon with the whole nucleon compared to the interaction of a photon
+            with a single nucleon (multplied by the number of nucleons in the atom). In general, the latter cross section in bigger than the real, measured crosssection, therefore
+            this effect is called shadowing.
+                                                     
+            The following parametrizations are currently implemented:
+
+            * ShadowButkevichMikhailov
+
+            * ShadowDuttaRenoSarcevicSeckel
+
+                )pbdoc")
+        .def("calculate_shadow_effect", &ShadowEffect::CalculateShadowEffect,
+                R"pbdoc( 
+
+            Calculate the shadow effect independently
+
+            Args:                                                                                                  
+                Component (:meth:`~pyPROPOSAL.component`): Component to calculate the shadow effect
+                x (float): Bjorken x                                
+                nu (float): Fraction of energy transfered from the particle via the photon
+                                                            
+                )pbdoc")
+        .def_property_readonly("name", &ShadowEffect::GetName,
+                R"pbdoc( 
+            Return the name of the current parametrization of the shadow effect                                     
+                )pbdoc");
 
     py::class_<ShadowDuttaRenoSarcevicSeckel, std::shared_ptr<ShadowDuttaRenoSarcevicSeckel>, ShadowEffect>(
         m_sub_photo, "ShadowDuttaRenoSarcevicSeckel")
@@ -617,8 +1591,82 @@ void init_parametrization(py::module& m)
         "HardComponent")
         .def(py::init<const ParticleDef&>(),py::arg("particle_def"));
 
-    py::class_<PhotoRealPhotonAssumption, std::shared_ptr<PhotoRealPhotonAssumption>, Photonuclear>(m_sub_photo, "PhotoRealPhotonAssumption");
-    py::class_<PhotoQ2Integral, std::shared_ptr<PhotoQ2Integral>, Photonuclear>(m_sub_photo, "PhotoQ2Integral");
+    py::class_<PhotoRealPhotonAssumption, std::shared_ptr<PhotoRealPhotonAssumption>, Photonuclear>(m_sub_photo, "PhotoRealPhotonAssumption",
+                R"pbdoc( 
+
+            Virtual class for the parametrizations of photonuclear interaction. They can be initialized by using one of the given parametrizations with the following parameters
+
+            Args:                                                                                                  
+                particle_def (:meth:`~pyPROPOSAL.particle.ParticleDef`): includes all static particle information for the parametrization such as mass, charge, etc.
+                medium (:meth:`~pyPROPOSAL.medium`): includes all medium information for the parametrization such as densities or nucleon charges                                   
+                energy_cuts (:meth:`~pyPROPOSAL.EnergyCutSettings`): energy cut setting for the parametrization
+                multiplier (double): Use a multiplicative factor for the differential crosssection. Can be used for testing or other studies               
+                hard_component (bool): Enabling or disabling the calculation of the hard component
+                                                            
+            The following parametrizations are currently implemented:
+
+            * Zeus
+
+            * BezrukovBugaev
+
+            * Kokoulin
+
+            * Rhode
+
+            Example:
+                To create a photonuclear parametrization
+
+                >>> mu = pyPROPOSAL.particle.MuMinusDef.get()
+                >>> medium = pyPROPOSAL.medium.StandardRock(1.0)
+                >>> cuts = pyPROPOSAL.EnergyCutSettings(-1, -1)
+                >>> param = pyPROPOSAL.parametrization.photonuclear.Rhode(mu, medium, cuts, 1.0, True)
+                )pbdoc");
+    py::class_<PhotoQ2Integral, std::shared_ptr<PhotoQ2Integral>, Photonuclear>(m_sub_photo, "PhotoQ2Integral",
+                R"pbdoc( 
+
+            Virtual class for the parametrizations of photonuclear interaction. They can be initialized by using one of the given parametrizations with the following parameters
+
+            Args:                                                                                                  
+                particle_def (:meth:`~pyPROPOSAL.particle.ParticleDef`): includes all static particle information for the parametrization such as mass, charge, etc.
+                medium (:meth:`~pyPROPOSAL.medium`): includes all medium information for the parametrization such as densities or nucleon charges                                   
+                energy_cuts (:meth:`~pyPROPOSAL.EnergyCutSettings`): energy cut setting for the parametrization
+                multiplier (double): Use a multiplicative factor for the differential crosssection. Can be used for testing or other studies               
+                ShadowEffect (:meth:`~pyPROPOSAL.parametrization.photonuclear.ShadowEffect`): Parametrization of the ShadowEffect to be used    
+                InterpolationDef (:meth:`~pyPROPOSAL.InterpolationDef`): Only needed by Interpolant parametrizations. Includes settings for the interpolation    
+ 
+
+                                                            
+            This virtual class includes all photonuclear interactions where the differential crossection in given in :math:`Q^2`.
+            The following parametrizations are currently implemented:
+
+            * AbramowiczLevinLevyMaor91
+
+            * AbramowiczLevinLevyMaor97
+
+            * ButkevichMikhailov
+
+            * RenoSarcevicSu
+
+            * AbramowiczLevinLevyMaor91Interpolant
+
+            * AbramowiczLevinLevyMaor97Interpolant
+
+            * ButkevichMikhailovInterpolant
+
+            * RenoSarcevicSuInterpolant
+
+            The parametrization with "Interpolant" as a suffix creates an interpolation table for the :math:`Q^2` integration, which improved the perfomance.
+
+            Example:
+                To create a photonuclear parametrization
+
+                >>> mu = pyPROPOSAL.particle.MuMinusDef.get()
+                >>> medium = pyPROPOSAL.medium.StandardRock(1.0)
+                >>> cuts = pyPROPOSAL.EnergyCutSettings(-1, -1)
+                >>> shadow = pyPROPOSAL.parametrization.photonuclear.ShadowButkevichMikhailov()
+                >>> interpol = pyPROPOSAL.InterpolationDef
+                >>> param = pyPROPOSAL.parametrization.photonuclear.RenoSarcevicSuInterpolant(mu, medium, cuts, 1.0, shadow, interpol)
+                )pbdoc");
 
     PHOTO_REAL_DEF(m_sub_photo, Zeus, RealPhotonAssumption)
     PHOTO_REAL_DEF(m_sub_photo, BezrukovBugaev, RealPhotonAssumption)
@@ -667,7 +1715,25 @@ void init_parametrization(py::module& m)
              py::arg("particle_def"),
              py::arg("medium"),
              py::arg("energy_cuts"),
-             py::arg("multiplier"));
+             py::arg("multiplier"),
+                R"pbdoc( 
+
+            Ionization parametrization. It can be initialized with the following parameters
+
+            Args:                                                                                                  
+                particle_def (:meth:`~pyPROPOSAL.particle.ParticleDef`): includes all static particle information for the parametrization such as mass, charge, etc.
+                medium (:meth:`~pyPROPOSAL.medium`): includes all medium information for the parametrization such as densities or nucleon charges                                   
+                energy_cuts (:meth:`~pyPROPOSAL.EnergyCutSettings`): energy cut setting for the parametrization                                                                                           
+                multiplier (double): Use a multiplicative factor for the differential crosssection. Can be used for testing or other studies                                                            
+
+            Example:
+                To create a ionization parametrization
+
+                >>> mu = pp.particle.MuMinusDef.get()
+                >>> medium = pp.medium.StandardRock(1.0)
+                >>> cuts = pp.EnergyCutSettings(-1, -1)
+                >>> param = pyPROPOSAL.parametrization.ionization.Ionization(mu, medium, cuts, multiplier)
+                )pbdoc");
 
     py::class_<IonizationFactory::Definition, std::shared_ptr<IonizationFactory::Definition> >(m_sub_ioniz, "IonizationDefinition")
         .def(py::init<>())
@@ -678,16 +1744,170 @@ void init_crosssection(py::module& m)
 {
     py::module m_sub = m.def_submodule("crosssection");
 
-    py::class_<CrossSection, std::shared_ptr<CrossSection>>(m_sub, "CrossSection")
+    py::class_<CrossSection, std::shared_ptr<CrossSection>>(m_sub, "CrossSection",
+                R"pbdoc( 
+
+            Virtual class for crosssections. The crosssection class provides all mathematical methods to process the theoretical, differential crosssections that are
+            given by the parametrizations. A cross section class can be initialized with the following parameters
+
+            Args:                                                                                                  
+                param (:meth:`~pyPROPOSAL.parametrization`): parametrization for the crosssection, including the chosen theoretical model
+                interpolation_def (:meth:`~pyPROPOSAL.InterpolationDef`): Only needed by Interpolant parametrizations. Includes settings for the interpolation                                    
+ 
+            The crosssection class can either work with interpolation tables or with exact intergration for every single calculation.
+            Since the usage of interpolation tables can improve the speed of the propagation by several orders of magnitude (with neglible decline in accuracy) it is highly recommended
+            to use the interpolation methods.
+                                                            
+            There are specific crosssection classes for every interaction that can be used. 
+
+            * BremsIntegral / BremsInterpolant
+
+            * EpairIntegral / EpairInterpolant
+
+            * IonizIntegral / IonizInterpolant
+
+            * MupairIntegral / MupairInterpolant
+
+            * PhotoIntegral / PhotoInterpolant
+
+            * WeakIntegral / WeakInterpolant
+
+            Example:
+                To create a bremsstrahlung CrossSection
+
+                >>> mu = pyPROPOSAL.particle.MuMinusDef.get()
+                >>> medium = pyPROPOSAL.medium.StandardRock(1.0)
+                >>> cuts = pyPROPOSAL.EnergyCutSettings(-1, -1)
+                >>> interpol = pyPROPOSAL.InterpolationDef
+                >>> param = pyPROPOSAL.parametrization.bremsstrahlung.SandrockSoedingreksoRhode(mu, medium, cuts, 1.0, False)
+                >>> cross = pyPROPOSAL.crosssection.BremsInterpolant(param, interpol)
+                >>> cross.calculate_dEdx(1e6) # exmaple usage of the created crosssection class...
+                )pbdoc")
         DEF_PY_PRINT(CrossSection)
-        .def("calculate_dEdx", &CrossSection::CalculatedEdx)
-        .def("calculate_dE2dx", &CrossSection::CalculatedE2dx)
-        .def("calculate_dNdx", (double (CrossSection::*)(double))&CrossSection::CalculatedNdx)
-        .def("calculate_dNdx_rnd", (double (CrossSection::*)(double, double))&CrossSection::CalculatedNdx)
-        .def("calculate_stochastic_loss", (double (CrossSection::*)(double, double, double))&CrossSection::CalculateStochasticLoss)
-        .def("calculate_produced_particles", &CrossSection::CalculateProducedParticles)
-        .def_property_readonly("id", &CrossSection::GetTypeId)
-        .def_property_readonly("parametrization", &CrossSection::GetParametrization);
+        .def("calculate_dEdx", &CrossSection::CalculatedEdx,
+            py::arg("energy"),
+                R"pbdoc( 
+
+            Calculates the continous energy loss :math:`\langle \frac{dE}{dx} \rangle`, which equals to
+
+                .. math:: \frac{N_A}{A} \cdot E \cdot \int_{v_{min}}^{v_{cut}} v \cdot \frac{d\sigma}{dv} dv
+
+            with the particle energy E, the relative energy loss v and the crosssection :math:`\sigma`. The value :math:`v_{cut}` is the energy cut to differentiate between
+            continous and stochastic losses in PROPOSAL, see :meth:`~pyPROPOSAL.EnergyCutSettings` for more information on the energy cuts.
+
+            Args:                                                                                                  
+                energy (float): energy in MeV
+                                                            
+                )pbdoc")
+        .def("calculate_dE2dx", &CrossSection::CalculatedE2dx,
+            py::arg("energy"),
+                R"pbdoc( 
+
+            Calculates the value
+
+                .. math:: \frac{N_A}{A} \cdot E^2 \cdot \int_{v_{min}}^{v_{cut}} v^2 \cdot \frac{d\sigma}{dv} dv
+
+            with the particle energy E, the relative energy loss v and the crosssection :math:`\sigma`. The value :math:`v_{cut}` is the energy cut to differentiate between
+            continous and stochastic losses in PROPOSAL, see :meth:`~pyPROPOSAL.EnergyCutSettings` for more information on the energy cuts.
+
+            The value is important for the calculation of the ContinuousRandomization (see :meth:`~pyPROPOSAL.ContinuousRandomizer`) 
+
+            Args:                                                                                                  
+                energy (float): energy in MeV
+                                                            
+                )pbdoc")
+        .def("calculate_dNdx", (double (CrossSection::*)(double))&CrossSection::CalculatedNdx,
+            py::arg("energy"),
+                R"pbdoc( 
+
+            Calculates the total cross section
+
+                .. math:: \frac{N_A}{A} \cdot \int_{v_{cut}}^{v_{max}} \frac{d\sigma}{dv} dv
+
+            with the particle energy E, the relative energy loss v and the crosssection :math:`\sigma`. The value v_{cut} is the energy cut to differentiate between
+            continous and stochastic losses in PROPOSAL, see :meth:`~pyPROPOSAL.EnergyCutSettings` for more information on the energy cuts.
+
+            Note that this integral only includes the v values about our cut, therefore this values represents only the total crosssection for the stochastic energy losses. 
+
+            Args:                                                                                                  
+                energy (float): energy in MeV
+                                                            
+                )pbdoc")
+        .def("calculate_dNdx_rnd", (double (CrossSection::*)(double, double))&CrossSection::CalculatedNdx,
+            py::arg("energy"),
+            py::arg("rnd"),
+
+                R"pbdoc( 
+
+            Calculates the total cross section
+
+                .. math:: \frac{N_A}{A} \cdot \int_{v_{cut}}^{v_{max}} \frac{d\sigma}{dv} dv
+
+            with the particle energy E, the relative energy loss v and the crosssection :math:`\sigma`. The value v_{cut} is the energy cut to differentiate between
+            continous and stochastic losses in PROPOSAL, see :meth:`~pyPROPOSAL.EnergyCutSettings` for more information on the energy cuts.
+
+            Furthermore, for every component in the medium, a stochatic energy loss in saved based on the random number rnd. The values are saved in the crosssection class and can be used
+            by other methods.
+
+            Note that this integral only includes the v values about our cut, therefore this values represents only the total crosssection for the stochastic energy losses. 
+
+            Args:                                                                                                  
+                energy (float): energy in MeV
+                rnd (float): random number between 0 and 1
+                                               
+                )pbdoc")
+        .def("calculate_stochastic_loss", (double (CrossSection::*)(double, double, double))&CrossSection::CalculateStochasticLoss,
+            py::arg("energy"),
+            py::arg("rnd1"),
+            py::arg("rnd2"),
+                R"pbdoc( 
+
+            Samples a stochastic energy loss for a particle of the energy E. 
+
+            Args:                                                                                                  
+                energy (float): energy in MeV
+                rnd1 (float): random number between 0 and 1, samples the energy loss fraction
+                rnd2 (float): random number between 0 and 1, sampled the component where the energy loss in occuring
+
+            Returns:
+                sampled energy loss for the current particle in MeV
+
+            With inverse transform sampling, using rnd1, the fraction of the energy loss v is determined from the differential crosssection.
+            By comparing the total cross sections for every medium, rnd2 is used to determine the component of the current medium for which the stochatic energy loss is calculated.
+                     
+                )pbdoc")
+        .def("calculate_produced_particles", &CrossSection::CalculateProducedParticles,
+            py::arg("energy"),
+            py::arg("energy_loss"),
+            py::arg("rnd1"),
+            py::arg("rnd2"),
+                R"pbdoc( 
+
+            Available for the muon pairproduction. Samples the two muons that are produces in pairproduction by sampling the asymmetry parameter :math:`\rho` which describes
+            the distribution of the energy loss between the two created muons.
+
+            Args:                                                                                                  
+                energy (float): primary particle energy in MeV
+                energy_loss (float): energy loss of the primary particle in MeV
+                rnd1 (float): random number between 0 and 1 to calculate the asymmetry between the two produced particles
+                rnd2 (float): random number between 0 and 1 to calculate the sign of the asymmetry between the two produces particles
+
+            Returns:
+                list of created particles with corresponding energies
+                     
+                )pbdoc")
+        .def_property_readonly("id", &CrossSection::GetTypeId,
+                R"pbdoc( 
+
+            Internal id of the current interaction, see :meth:`~pyPROPOSAL.DynamicData` for all available id's.
+                                                            
+                )pbdoc")
+        .def_property_readonly("parametrization", &CrossSection::GetParametrization,
+                R"pbdoc( 
+
+            Pointer to the current parametrization object
+                                                            
+                )pbdoc");
 
     py::class_<CrossSectionIntegral, std::shared_ptr<CrossSectionIntegral>, CrossSection>(m_sub, "CrossSectionIntegral");
     py::class_<CrossSectionInterpolant, std::shared_ptr<CrossSectionInterpolant>, CrossSection>(m_sub, "CrossSectionInterpolant");
@@ -755,25 +1975,7 @@ void init_scattering(py::module& m)
 PYBIND11_MODULE(pyPROPOSAL, m)
 {
     m.doc() = R"pbdoc(
-        pyPROPOSAL
-        ----------
-
         .. currentmodule:: pyPROPOSAL
-
-        .. autosummary::
-           :toctree: _generate
-
-           Vector3D
-           EnergyCutSettings
-           InterpolationDef
-           Utility
-           UtilityDefinition
-           ParticleLocation
-           SectorDefinition
-           Sector
-           RandomGenerator
-           Propagator
-           PropagatorService
     )pbdoc";
 
     init_components(m);
@@ -811,44 +2013,187 @@ PYBIND11_MODULE(pyPROPOSAL, m)
         .def("cartesian_from_spherical", &Vector3D::CalculateCartesianFromSpherical)
         .def("spherical_from_cartesian", &Vector3D::CalculateSphericalCoordinates);
 
-    py::class_<EnergyCutSettings, std::shared_ptr<EnergyCutSettings> >(m, "EnergyCutSettings")
-        .def(py::init<>())
-        .def(py::init<double, double>(), py::arg("ecut"), py::arg("vcut"))
+    py::class_<EnergyCutSettings, std::shared_ptr<EnergyCutSettings> >(m, "EnergyCutSettings", 
+		R"pbdoc(
+			Settings for the lower integration limit.
+			Losses below the cut will be handeled continously and the 
+			other stochasticaly.
+
+			.. math:: 
+
+				\text{cut} = \begin{cases} e_\text{cut} & E * v_\text{cut} \geq e_\text{cut} \\ v_\text{cut} & \, \text{else} \end{cases}
+		)pbdoc")
+        .def(
+                py::init<>(), 
+                R"pbdoc(
+                    Initialize some standard settings. 
+                    The default e_cut = 500 Mev and v_cut = 0.05 will be set.
+                )pbdoc"
+            )
+        .def(
+                py::init<double, double>(), 
+                py::arg("ecut"), 
+                py::arg("vcut"), R"pbdoc(
+                    Set the cut values manualy. 
+            
+                    Args: 
+                        ecut (float): static energy cut. 
+                        vcut (float): relativ energy cut.
+                )pbdoc")
         .def(py::init<const EnergyCutSettings&>())
         .def("__str__", &py_print<EnergyCutSettings>)
-        .def_property("ecut", &EnergyCutSettings::GetEcut, &EnergyCutSettings::SetEcut)
-        .def_property("vcut", &EnergyCutSettings::GetVcut, &EnergyCutSettings::SetVcut)
-        .def("get_cut", &EnergyCutSettings::GetCut, "Return the lower from E*v = e");
+        .def_property(
+                "ecut", 
+                &EnergyCutSettings::GetEcut, 
+                &EnergyCutSettings::SetEcut,
+                R"pbdoc(
+                    Return set e_cut.
 
-    py::class_<InterpolationDef, std::shared_ptr<InterpolationDef>>(m, "InterpolationDef")
+                    Returns:
+                        float: e_cut
+                )pbdoc"
+            )
+        .def_property(
+                "vcut", 
+                &EnergyCutSettings::GetVcut, 
+                &EnergyCutSettings::SetVcut,
+                R"pbdoc(
+                    Return set v_cut.
+
+                    Returns:
+                        float: v_cut
+                )pbdoc"
+            )
+        .def(
+                "get_cut", 
+                &EnergyCutSettings::GetCut, 
+                R"pbdoc(
+                    Return lower Interpolation/Integration limit.
+
+                    Returns:
+                        float: cut
+                )pbdoc"
+            );
+
+    py::class_<InterpolationDef, std::shared_ptr<InterpolationDef>>(m, "InterpolationDef", 
+			R"pbdoc(
+				The set standard values have been optimized for performance
+				and accuracy. They should not be changed any further 
+				without a good reason.
+
+				Example:
+					For speed savings it makes sense to specify a path to 
+					the tables, to reuse build tables if possible.
+
+					Sometimes it is usefull to look in the tables for a check. 
+					To do this binary tables can be diabled.
+
+					>>> interpolDef = pp.InterpolationDef()
+					>>> interpolDef.do_binary_tables = False
+					>>> interpolDef.path_to_tables = "./custom/table/path"
+					>>> interpolDef.path_to_tables_readonly = "./custom/table/path"
+			)pbdoc")
         .def(py::init<>())
-        .def_readwrite("order_of_interpolation", &InterpolationDef::order_of_interpolation)
-        .def_readwrite("path_to_tables", &InterpolationDef::path_to_tables)
-        .def_readwrite("path_to_tables_readonly", &InterpolationDef::path_to_tables_readonly)
-        .def_readwrite("max_node_energy", &InterpolationDef::max_node_energy) 
-        .def_readwrite("nodes_cross_section", &InterpolationDef::nodes_cross_section)
-        .def_readwrite("nodes_continous_randomization", &InterpolationDef::nodes_continous_randomization)
-        .def_readwrite("nodes_propagate", &InterpolationDef::nodes_propagate)
-        .def_readwrite("do_binary_tables", &InterpolationDef::do_binary_tables);
+        .def_readwrite(
+			"order_of_interpolation", 
+			&InterpolationDef::order_of_interpolation,
+			R"pbdoc(
+				Order of Interpolation.
+			)pbdoc"
+		)
+        .def_readwrite(
+			"path_to_tables", 
+			&InterpolationDef::path_to_tables,
+			R"pbdoc(
+				Path where tables can be written from memory to disk to 
+				reuse it if possible.
+			)pbdoc"
+		)
+        .def_readwrite(
+			"path_to_tables_readonly", 
+			&InterpolationDef::path_to_tables_readonly,
+			R"pbdoc(
+				Path where tables can be read from disk to avoid to rebuild 
+				it.
+			)pbdoc"
+		)
+        .def_readwrite(
+			"max_node_energy", 
+			&InterpolationDef::max_node_energy,
+			R"pbdoc(
+				maximum energy that will be interpolated. Energies greater 
+				than the value are extrapolated. Default: 1e14 MeV
+			)pbdoc"
+		)
+        .def_readwrite(
+			"nodes_cross_section", 
+			&InterpolationDef::nodes_cross_section,
+			R"pbdoc(
+				number of nodes used by evaluation of cross section 
+				integrals. Default: xxx
+			)pbdoc"
+		)
+        .def_readwrite(
+			"nodes_continous_randomization", 
+			&InterpolationDef::nodes_continous_randomization,
+			R"pbdoc(
+				number of nodes used by evaluation of continous 
+				randomization integrals. Default: xxx
+			)pbdoc"
+		)
+        .def_readwrite(
+			"nodes_propagate", 
+			&InterpolationDef::nodes_propagate,
+			R"pbdoc(
+				number of nodes used by evaluation of propagation
+				integrals. Default: xxx
+			)pbdoc"
+		)
+        .def_readwrite(
+			"do_binary_tables", 
+			&InterpolationDef::do_binary_tables,
+			R"pbdoc(
+				Should binary tables be used to store the data. 
+				This will increase performance, but are not readable for a 
+				crosscheck by human. Default: xxx
+			)pbdoc"
+		)
+        .def_readwrite(
+            "just_use_readonly_path", 
+            &InterpolationDef::just_use_readonly_path,
+            R"pbdoc(
+                Just the readonly path to the interpolation tables is used.
+                This will stop the program, if the required table is not
+                in the readonly path. The (writable) path_to_tables will be
+                ignored. Default: xxx
+            )pbdoc"
+        );
 
     // --------------------------------------------------------------------- //
     // Utility
     // --------------------------------------------------------------------- //
 
     py::class_<Utility, std::shared_ptr<Utility> >(m, "Utility")
-        .def(py::init<const ParticleDef&, const Medium&, const EnergyCutSettings&, Utility::Definition>(),
+        .def(py::init<const ParticleDef&, 
+                      const Medium&, 
+                      const EnergyCutSettings&, 
+                      const Density_distr&,
+                      Utility::Definition>(),
              py::arg("partcle_def"),
              py::arg("medium"),
              py::arg("cuts"),
+             py::arg("density_distribution"),
              py::arg("definition"))
         .def(py::init<const ParticleDef&,
                       const Medium&,
                       const EnergyCutSettings&,
+                      const Density_distr&,
                       Utility::Definition,
                       InterpolationDef>(),
              py::arg("partcle_def"),
              py::arg("medium"),
              py::arg("cuts"),
+             py::arg("density_distribution"),
              py::arg("definition"),
              py::arg("interpolation_def"))
         .def_property_readonly("particle_def", &Utility::GetParticleDef)
@@ -869,14 +2214,95 @@ PYBIND11_MODULE(pyPROPOSAL, m)
     // ContinousRandomization
     // --------------------------------------------------------------------- //
 
-    py::class_<ContinuousRandomizer, std::shared_ptr<ContinuousRandomizer> >(m, "ContinuousRandomizer")
-        .def(py::init<const Utility&, const InterpolationDef>(),
-             py::arg("utility"),
-             py::arg("interpolation_def"))
-        .def("randomize", &ContinuousRandomizer::Randomize,
-             py::arg("initial_energy"),
-             py::arg("final_energy"),
-             py::arg("rand"));
+    py::class_<ContinuousRandomizer, std::shared_ptr<ContinuousRandomizer> >(m, "ContinuousRandomizer", 
+    R"pbdoc(
+        If :math:`v_\text{cut}` is large, the spectrum is not continously any 
+        more. Particles which has no stochastic loss crossing the medium has 
+        all the same energy :math:`E_\text{peak}` after propagating through 
+        the medium.  This produce a gap of size of minimal stochastic loss.
+        This effect can be reduced using continous randomization.
+        
+        .. figure:: figures/mu_continuous.png
+            :scale: 50%
+            :align: center
+
+            Propagate a muon with 100 TeV through 300 m Rock.
+
+        The average energy loss from continous energy losses, is 
+        estimated by the energy-integral. 
+
+        .. math::
+        
+            \int^{E_f}_{E_i} \frac{\sigma(E)}{-f(E)} d\text{E} = -\text{log}(\xi)
+
+        Since probability of a energy loss :math:`e_{lost} < e_{cut}` 
+        at distance is finite, it produce fluctuations in average 
+        energy losses.
+
+        This small losses can be added in form of a perturbation from 
+        average energy loss.
+
+    )pbdoc")
+        .def(
+                py::init<const Utility&, const InterpolationDef>(),
+                py::arg("utility"),
+                py::arg("interpolation_def"),
+                R"pbdoc(
+                    Initalize a continous randomization calculator. 
+                    This may take some minutes because for all parametrization 
+                    the continous randomization interpolation tables have to be 
+                    build.
+
+                    Note:
+                        .. math::
+                            
+                            \langle ( \Delta ( \Delta E ) )^2 \rangle = 
+                                \int^{e_\text{cut}}_{e_0} \frac{d\text{E}}{-f(E)} 
+                                \left( \int_0^{e_{cut}} e^2 p(e;E) d\text{e} \right)
+                    
+                    Args:
+                        interpolation_def (interpolation_def): specify the number of interpolation points for cont-integral
+                        utility (utility): specify the parametrization and energy cuts
+                )pbdoc"
+            )
+        .def(
+                "randomize", 
+                &ContinuousRandomizer::Randomize,
+                py::arg("initial_energy"),
+                py::arg("final_energy"),
+                py::arg("rand"),
+                R"pbdoc(
+                    Calculates the stochastical smering of the distribution based on 
+                    the second momentum of the parametrizations, the final and intial 
+                    energy.
+                    
+                    Note:
+                        A normal distribution with uppere defined variance will be 
+                        asumed. The cumulative distibution function has the form:
+                        
+                        .. math::
+                            
+                            \text{cdf}(E) = \frac{1}{2} \left(1 + \text{erf} \left(
+                                \frac{E}{ \sqrt{ 2 \sigma^2 } } \right) \right)
+                        
+                        There will be sampled a deviation form mean energy :math:`a`
+                        between :math:`\text{cdf}(E_\text{i} - E_\text{f})` and 
+                        :math:`\text{cdf}(E_\text{mass} - E_\text{f})` and finaly the 
+                        energy updated.
+
+                        .. math::
+
+                            E_\text{f} = \sigma \cdot a + E_\text{f}
+                    
+                    Args: 
+                        initial_energy (float): energy befor stochastical loss 
+                        final_energy (float): energy after stochastical loss 
+                        rand (float): random number between 0 and 1 
+
+                    Returns:
+                        float: randomized final energy
+                )pbdoc"
+            );
 
     // --------------------------------------------------------------------- //
     // Sector Definition
@@ -889,33 +2315,208 @@ PYBIND11_MODULE(pyPROPOSAL, m)
         .value("inside_detector", Sector::ParticleLocation::InsideDetector)
         .value("behind_detector", Sector::ParticleLocation::BehindDetector);
 
-    py::class_<Sector::Definition, std::shared_ptr<Sector::Definition> >(m, "SectorDefinition")
+    py::class_<Sector::Definition, std::shared_ptr<Sector::Definition> >(
+            m, 
+            "SectorDefinition",
+            R"pbdoc(
+                Sector definition is a container that collects all important 
+                settings for propagation through a sector. There could for 
+                example specify the used cross sections or the energy cut 
+                settings.
+
+                An example for multiple SectorDefinitions is the standard 
+                implementation of propagation. Three sectors are generated,
+                which differ in the energy cut settings, to reduce computing 
+                power without a measurable loss of accuracy. Infront of the 
+                detector energy cut will be like :math:`v_\text{cut} = 0.05`.
+                Inside the detector the energy cut :math:`e_\text{cut} = 500 
+                \text{MeV}` is chosen so that particles below the detector 
+                resolution are statistically sampled. Outside of the detector no
+                cuts are made to find a decay point of the particle in first 
+                approximation.
+            )pbdoc"
+            )
         .def(py::init<>())
-        .def_readwrite("cut_settings", &Sector::Definition::cut_settings)
-        .def_property("medium", &Sector::Definition::GetMedium, &Sector::Definition::SetMedium)
-        .def_property("geometry", &Sector::Definition::GetGeometry, &Sector::Definition::SetGeometry)
-        .def_readwrite("do_stochastic_loss_weighting", &Sector::Definition::do_stochastic_loss_weighting)
-        .def_readwrite("stochastic_loss_weighting", &Sector::Definition::stochastic_loss_weighting)
-        .def_readwrite("stopping_decay", &Sector::Definition::stopping_decay)
-        .def_readwrite("do_continuous_randomization", &Sector::Definition::do_continuous_randomization)
-        .def_readwrite("do_continuous_energy_loss_output", &Sector::Definition::do_continuous_energy_loss_output)
-        .def_readwrite("do_exact_time_calculation", &Sector::Definition::do_exact_time_calculation)
-        .def_readwrite("scattering_model", &Sector::Definition::scattering_model)
-        .def_readwrite("particle_location", &Sector::Definition::location)
-        .def_readwrite("crosssection_defs", &Sector::Definition::utility_def);
+        .def_readwrite(
+                "cut_settings", 
+                &Sector::Definition::cut_settings,
+                R"pbdoc(
+                    Definition of the :meth:`EnergyCutSettings`
+                )pbdoc"
+        )
+        .def_property(
+                "medium", 
+                &Sector::Definition::GetMedium, 
+                &Sector::Definition::SetMedium,
+                R"pbdoc(
+                    Definition of the :meth:`~pyPROPOSAL.medium.Medium`
+                )pbdoc"
+        )
+        .def_property(
+                "density_distribution", 
+                &Sector::Definition::GetDensityDistribution, 
+                &Sector::Definition::SetDensityDistribution,
+                R"pbdoc(
+                )pbdoc"
+        )
+        .def_property(
+                "geometry", 
+                &Sector::Definition::GetGeometry, 
+                &Sector::Definition::SetGeometry,
+                R"pbdoc(
+                    Definiton of the :meth:`~pyPROPOSAL.geometry.Geometry`
+                )pbdoc"
+        )
+        .def_readwrite(
+                "do_stochastic_loss_weighting", 
+                &Sector::Definition::do_stochastic_loss_weighting,
+                R"pbdoc(
+                    Boolean value whether the probability of producing a 
+                    stochastic loss should be adjusted with a factor, 
+                    defaults to False.
+                )pbdoc"
+        )
+        .def_readwrite(
+                "stochastic_loss_weighting", 
+                &Sector::Definition::stochastic_loss_weighting,
+                R"pbdoc(
+                    Factor used to scale the probability of producing a 
+                    stochastic loss, defaults to 1.0.
+                )pbdoc"
+        )
+        .def_readwrite(
+                "stopping_decay", 
+                &Sector::Definition::stopping_decay,
+                R"pbdoc(
+                    
+                )pbdoc"
+        )
+        .def_readwrite(
+                "do_continuous_randomization", 
+                &Sector::Definition::do_continuous_randomization,
+                R"pbdoc(
+                    Boolean if continous randomization should be done if 
+                    interpolation if is used, defaults to true.
+                )pbdoc"
+        )
+        .def_readwrite(
+                "do_continuous_energy_loss_output", 
+                &Sector::Definition::do_continuous_energy_loss_output,
+                R"pbdoc(
+                    
+                )pbdoc"
+        )
+        .def_readwrite(
+                "do_exact_time_calculation", 
+                &Sector::Definition::do_exact_time_calculation,
+                R"pbdoc(
+                    Boolean if particle speed could be approach by the speed 
+                    of light or should be calculated by solving the track 
+                    integral, defaults to false.
+
+                    If the energy is in the order of the rest energy of the 
+                    particle, the assumption that the particle moves at the 
+                    speed of light becomes increasingly worse. Than it make 
+                    sense to calculate the time integral.
+
+                    .. math::
+                            
+                            t_\text{f} = t_\text{i} + \int_{x_\text{i}}^{x_\text{f}} 
+                                \frac{ \text{dx} }{ v(x) }
+                )pbdoc"
+        )
+        .def_readwrite(
+                "scattering_model", 
+                &Sector::Definition::scattering_model,
+                R"pbdoc(
+                    Definition of the scattering modell of type :meth:`~pyPROPOSAL.scattering.ScatteringModel`
+                    or deactivate scattering.
+
+                    Example:
+                        Deactivating scattering can be achieved with:
+
+                        >>> sec = pyPROPOSAL.SectorDefinition()
+                        >>> sec.scattering_model = pyPROPOSAL.scattering.ScatteringModel.NoScattering
+                )pbdoc"
+        )
+        .def_readwrite(
+                "particle_location", 
+                &Sector::Definition::location,
+                R"pbdoc(
+                    Definition of the relationship of the sectors to each 
+                    other of type :meth:`ParticleLocation`.
+                )pbdoc"
+        )
+        .def_readwrite(
+                "crosssection_defs", 
+                &Sector::Definition::utility_def,
+                R"pbdoc(
+                    Definition of the crosssection of type :meth:`~pyPROPOSAL.UtilityDefinition`
+                )pbdoc"
+        );
 
     // --------------------------------------------------------------------- //
     // Sector
     // --------------------------------------------------------------------- //
 
-    py::class_<Sector, std::shared_ptr<Sector> >(m, "Sector")
+    py::class_<Sector, std::shared_ptr<Sector> >(m, "Sector",R"pbdoc(
+            A sector is characterized by its homogeneous attitudes. 
+            Within a sector there are no boundaries to consider.
+		)pbdoc")
         .def(py::init<Particle&, const Sector::Definition&>(), py::arg("particle"), py::arg("sector_definition"))
         .def(py::init<Particle&, const Sector::Definition&, const InterpolationDef&>(),
             py::arg("particle"), py::arg("sector_definition"), py::arg("interpolation_def"))
-        .def("propagate", &Sector::Propagate, py::arg("distance"))
-        .def("CalculateEnergyTillStochastic", &Sector::CalculateEnergyTillStochastic, py::arg("initial_energy"))
-        .def("MakeStochasticLoss", &Sector::MakeStochasticLoss, py::arg("particle_energy"))
-        .def_property_readonly("particle", &Sector::GetParticle, "Get the internal created particle to modify its properties");
+        .def(
+			"propagate", 
+			&Sector::Propagate, 
+			py::arg("distance"),
+			R"pbdoc(
+                Args: 
+                    distance (float): Distance to propagate in cm.
+
+                Returns:
+                    float: if the value is positive, the energy after the propagated distance. If negativ the propagated distance is return with a minus sign.
+			)pbdoc"
+		)
+        .def(
+			"CalculateEnergyTillStochastic", 
+			&Sector::CalculateEnergyTillStochastic, 
+			py::arg("initial_energy"),
+			R"pbdoc(
+                Samples the energy up to the next stochastic loss. 
+
+                Args:
+                    initial_energy (float): Energy in MeV.
+
+                Returns:
+                    tuple: (next stochastic energy, decay energy) 
+			)pbdoc"
+		)
+        .def(
+			"MakeStochasticLoss", 
+			&Sector::MakeStochasticLoss, 
+			py::arg("particle_energy"),
+			R"pbdoc(
+                Samples the stochastic loss.
+			
+                Args:
+                    particle_energy (float): Energy of the propagated 
+                        particle.
+
+                Returns:
+                    tuple: (energy loss, interaction type)
+			)pbdoc"
+		)
+        .def_property_readonly(
+			"particle", 
+			&Sector::GetParticle, 
+			R"pbdoc(
+				Get the internal created particle to modify its properties
+				
+				Return:
+					Particle: propagated Particle
+			)pbdoc"
+		);
 
     // --------------------------------------------------------------------- //
     // Randomgenerator
@@ -932,16 +2533,115 @@ PYBIND11_MODULE(pyPROPOSAL, m)
     // --------------------------------------------------------------------- //
 
     py::class_<Propagator, std::shared_ptr<Propagator>>(m, "Propagator")
-        .def(py::init<const ParticleDef&, const std::vector<Sector::Definition>&, const Geometry&>(),
-            py::arg("partcle_def"), py::arg("sector_defs"), py::arg("detector"))
-        .def(py::init<const ParticleDef&, const std::vector<Sector::Definition>&, const Geometry&, const InterpolationDef&>(),
-            py::arg("particle_def"), py::arg("sector_defs"), py::arg("detector"), py::arg("interpolation_def"))
-        .def(py::init<const ParticleDef&, const std::vector<Sector::Definition>&, const Geometry&>(),
-            py::arg("particle_def"), py::arg("sector_defs"), py::arg("detector"))
-        .def(py::init<const ParticleDef&, const std::string&>(), py::arg("particle_def"), py::arg("config_file"))
-        .def("propagate", &Propagator::Propagate, py::arg("max_distance_cm") = 1e20, py::return_value_policy::reference)
-        .def_property_readonly("particle", &Propagator::GetParticle, "Get the internal created particle to modify its properties")
-        .def_property_readonly("detector", &Propagator::GetDetector, "Get the detector geometry");
+        .def(
+                py::init<const ParticleDef&, const std::vector<Sector::Definition>&, const Geometry&>(), 
+                py::arg("particle_def"), 
+                py::arg("sector_defs"), 
+                py::arg("detector")
+            )
+        .def(
+                py::init<const ParticleDef&, const std::vector<Sector::Definition>&, const Geometry&, const InterpolationDef&>(), 
+                py::arg("particle_def"), 
+                py::arg("sector_defs"), 
+                py::arg("detector"), 
+                py::arg("interpolation_def"), R"pbdoc(
+                    Function Docstring.
+
+                    Args:
+                        particle_def (pyPROPOSAL.particle.ParticleDef): sldkfjas lsdkjfa 
+                        sector_defs (List[pyPROPOSAL.SectorDefinition]): slkd sldkf ksjdlfa
+                        detector (pyPROPOSAL.geometry.Geometry): kfsdljflaskdj
+                        interpolation_def (pyPROPOSAL.InterpolationDef):  sdfa  sldkf sdfa
+                )pbdoc")
+        .def(
+                py::init<const ParticleDef&, 
+                const std::vector<Sector::Definition>&, const Geometry&>(),
+                py::arg("particle_def"), 
+                py::arg("sector_defs"), 
+                py::arg("detector")
+            )
+        .def(
+                py::init<const ParticleDef&, const std::string&>(), 
+                py::arg("particle_def"), 
+                py::arg("config_file")
+            )
+        .def(
+                "propagate", 
+                &Propagator::Propagate, 
+                py::arg("max_distance_cm") = 1e20, 
+                py::return_value_policy::reference,
+                R"pbdoc(
+                    Propagate a particle through sectors and produce stochastic
+                    losses, untill propagated distance is reached.
+
+                    Args:
+                        max_distance_cm (float): Maximum distance a particle is
+                            propagated before it is considered lost.
+
+                    Returns:
+                        list(DynamicData): list of stochastic losses parameters
+                        list(list): list of stochastic losses parameters
+                    
+                    Example:
+                        Propagate 1000 particle with an inital energy of 100 
+                        Tev and save the losses in daughters.
+
+                        >>> for i in range(int(1e3)):
+                        >>>   mu.energy = 1e8
+                        >>>   mu.propagated_distance = 0
+                        >>>   mu.position = pp.Vector3D(0, 0, 0)
+                        >>>   mu.direction = pp.Vector3D(0, 0, -1)
+                        >>>   daughters = prop.propagate()
+
+                    Further basic condition are set at the next point of 
+                    interaction during generation.
+                    The aim is to introduce forced stochastic losses
+                    so that the particle can be propagated through homogeneous 
+                    sectors.
+                    A more percise description of propagation through a
+                    homoegenous sector can be found in ???.
+                    
+                    .. figure:: figures/sector.png
+                        :height: 200px
+                        :align: center
+
+                        If the next interaction point is outside the actuell 
+                        sector, the particle is forced to an interaction at the
+                        sector boundary. Thus it can be assumed that the 
+                        particle is porpagated by a homogeneous medium.
+
+                    The propagated particle will be forced to interact in the 
+                    closest point to the dector center. 
+                    This will be stored in the closest_approach variable of 
+                    the propagated particle.
+
+                    The propagation terminate if the maximal distance is 
+                    reached.
+                    The energy loss of the particle (e_lost) in the detector 
+                    will be calculated and the produced secondary particles 
+                    returned.
+                )pbdoc"
+            )
+        .def_property_readonly(
+                "particle", 
+                &Propagator::GetParticle, 
+                R"pbdoc(
+                    Get the internal created particle to modify its properties.
+
+                    Returns:
+                        ParticleDef: definition of the propagated particle.
+                )pbdoc"
+            )
+        .def_property_readonly(
+                "detector", 
+                &Propagator::GetDetector, 
+                R"pbdoc(
+                    Get the detector geometry.
+
+                    Returns:
+                        SectorDefinition: definition of the sector.
+                )pbdoc"
+            );
 
     // --------------------------------------------------------------------- //
     // PropagatorService
@@ -955,6 +2655,8 @@ PYBIND11_MODULE(pyPROPOSAL, m)
 
 #undef COMPONENT_DEF
 #undef MEDIUM_DEF
+/* #undef DENSITY_DEF */ 
+#undef AXIS_DEF
 #undef PARTICLE_DEF
 #undef BREMS_DEF
 #undef PHOTO_REAL_DEF

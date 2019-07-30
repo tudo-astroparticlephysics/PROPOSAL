@@ -50,6 +50,7 @@ OPTION(ADD_PYTHON "Choose to compile the python wrapper library" ON)
 OPTION(ADD_ROOT "Choose to compile ROOT examples." OFF)
 OPTION(ADD_PERFORMANCE_TEST "Choose to compile the performace test source." OFF)
 OPTION(ADD_TESTS "Build all unittests." OFF)
+OPTION(ADD_CPPEXAMPLE "Choose to compile Cpp example." ON)
 
 #################################################################
 #################           python      #########################
@@ -206,17 +207,19 @@ ADD_EXECUTABLE(WriteSectorsFromDomList
 )
 TARGET_LINK_LIBRARIES(WriteSectorsFromDomList PROPOSAL)
 
-ADD_EXECUTABLE(example
-        private/test/example.cxx
-)
-
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-	SET_TARGET_PROPERTIES(example PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -O2 -g -Wall -Wextra -Wnarrowing -Wpedantic -fdiagnostics-show-option")
-elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-	SET_TARGET_PROPERTIES(example PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -O2 -g -Wall -Wextra -Wnarrowing -Wpedantic -fdiagnostics-show-option")
+IF(ADD_CPPEXAMPLE)
+    ADD_EXECUTABLE(example
+            private/test/example.cxx
+    )
+    if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+        SET_TARGET_PROPERTIES(example PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -O2 -g -Wall -Wextra -Wnarrowing -Wpedantic -fdiagnostics-show-option")
+    elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+        SET_TARGET_PROPERTIES(example PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -O2 -g -Wall -Wextra -Wnarrowing -Wpedantic -fdiagnostics-show-option")
 endif()
 
 TARGET_LINK_LIBRARIES(example PROPOSAL)
+ENDIF(ADD_CPPEXAMPLE)
+
 
 IF(ADD_PERFORMANCE_TEST)
 	ADD_EXECUTABLE(performance_test

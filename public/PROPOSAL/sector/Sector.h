@@ -78,6 +78,9 @@ public:
 
         void SetGeometry(const Geometry&);
         const Geometry& GetGeometry() const { return *geometry_; }
+        
+        void SetDensityDistribution(const Density_distr&);
+        const Density_distr& GetDensityDistribution() const { return *density_distribution_; }
 
         bool do_stochastic_loss_weighting; //!< Do weigthing of stochastic losses. Set to false in constructor.
         double stochastic_loss_weighting;  //!< weigth of stochastic losses. Set to 0 in constructor
@@ -86,6 +89,7 @@ public:
         bool do_continuous_randomization;
         bool do_continuous_energy_loss_output;
         bool do_exact_time_calculation;
+        bool only_loss_inside_detector;
 
         ScatteringFactory::Enum scattering_model;
 
@@ -95,9 +99,11 @@ public:
 
         EnergyCutSettings cut_settings;
 
+
     private:
         Medium* medium_;
         Geometry* geometry_;
+        Density_distr* density_distribution_;
     };
 
 public:
@@ -181,6 +187,7 @@ public:
     Geometry* GetGeometry() const { return geometry_; }
     const Utility& GetUtility() const { return utility_; }
     const Medium* GetMedium() const { return &utility_.GetMedium(); }
+    const Definition& GetSectorDef() const { return sector_def_; }
 
 protected:
     Sector& operator=(const Sector&); // Undefined & not allowed

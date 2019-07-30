@@ -40,6 +40,9 @@
 
 #include "PROPOSAL/EnergyCutSettings.h"
 #include "PROPOSAL/particle/ParticleDef.h"
+#include "PROPOSAL/density_distr/density_distr.h"
+#include "PROPOSAL/density_distr/density_homogeneous.h"
+#include "PROPOSAL/math/Vector3D.h"
 
 namespace PROPOSAL {
 
@@ -69,8 +72,8 @@ public:
     };
 
 public:
-    Utility(const ParticleDef&, const Medium&, const EnergyCutSettings&, Definition);
-    Utility(const ParticleDef&, const Medium&, const EnergyCutSettings&, Definition, const InterpolationDef&);
+    Utility(const ParticleDef&, const Medium&, const EnergyCutSettings&, const Density_distr&, Definition);
+    Utility(const ParticleDef&, const Medium&, const EnergyCutSettings&, const Density_distr&, Definition, const InterpolationDef&);
     Utility(const std::vector<CrossSection*>&);
     Utility(const Utility&);
     virtual ~Utility();
@@ -80,6 +83,7 @@ public:
 
     const ParticleDef& GetParticleDef() const { return particle_def_; }
     const Medium& GetMedium() const { return *medium_; }
+    const Density_distr& GetDensityDistribution() const { return *density_distr_; }
     const std::vector<CrossSection*>& GetCrosssections() const { return crosssections_; }
 
 protected:
@@ -92,6 +96,7 @@ protected:
     ParticleDef particle_def_;
     Medium* medium_;
     EnergyCutSettings cut_settings_;
+    Density_distr* density_distr_;
 
     std::vector<CrossSection*> crosssections_;
 };
@@ -113,6 +118,7 @@ public:
     // Methods
     virtual double FunctionToIntegral(double energy);
     virtual double Calculate(double ei, double ef, double rnd) = 0;
+    virtual double Calculate(double, double, double, Vector3D, Vector3D);
     virtual double GetUpperLimit(double ei, double rnd)        = 0;
 
     const Utility& GetUtility() const { return utility_; }
