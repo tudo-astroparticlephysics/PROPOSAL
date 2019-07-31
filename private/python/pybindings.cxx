@@ -312,20 +312,20 @@ void init_medium(py::module& m)
         .def_property_readonly("components", &Medium::GetComponents)
         .def_property_readonly("name", &Medium::GetName);
 
-    MEDIUM_DEF(m_sub, Water)
-    MEDIUM_DEF(m_sub, Ice)
-    MEDIUM_DEF(m_sub, Salt)
-    MEDIUM_DEF(m_sub, CalciumCarbonate)
-    MEDIUM_DEF(m_sub, StandardRock)
-    MEDIUM_DEF(m_sub, FrejusRock)
-    MEDIUM_DEF(m_sub, Iron)
-    MEDIUM_DEF(m_sub, Hydrogen)
-    MEDIUM_DEF(m_sub, Lead)
-    MEDIUM_DEF(m_sub, Copper)
-    MEDIUM_DEF(m_sub, Uranium)
-    MEDIUM_DEF(m_sub, Air)
-    MEDIUM_DEF(m_sub, Paraffin)
-    MEDIUM_DEF(m_sub, AntaresWater)
+    /* MEDIUM_DEF(m_sub, Water) */
+    /* MEDIUM_DEF(m_sub, Ice) */
+    /* MEDIUM_DEF(m_sub, Salt) */
+    /* MEDIUM_DEF(m_sub, CalciumCarbonate) */
+    /* MEDIUM_DEF(m_sub, StandardRock) */
+    /* MEDIUM_DEF(m_sub, FrejusRock) */
+    /* MEDIUM_DEF(m_sub, Iron) */
+    /* MEDIUM_DEF(m_sub, Hydrogen) */
+    /* MEDIUM_DEF(m_sub, Lead) */
+    /* MEDIUM_DEF(m_sub, Copper) */
+    /* MEDIUM_DEF(m_sub, Uranium) */
+    /* MEDIUM_DEF(m_sub, Air) */
+    /* MEDIUM_DEF(m_sub, Paraffin) */
+    /* MEDIUM_DEF(m_sub, AntaresWater) */
 
     py::class_<Density_distr, std::shared_ptr<Density_distr>>(m_sub, "Density_distribution");
     /*     .def_property_readonly("Axis", &Density_distr::GetAxis); */
@@ -1972,6 +1972,23 @@ void init_scattering(py::module& m)
         .value("NoScattering", ScatteringFactory::NoScattering);
 }
 
+void init_math(py::module& m)
+{
+    py::module m_sub = m.def_submodule("math");
+
+    py::class_<Polynom, std::shared_ptr<Polynom> >(m_sub, "Polynom")
+        .def("__call__", &Polynom::evaluate, py::arg("argument"))
+        .def("__str__", &py_print<Polynom>)
+        .def(py::init<std::vector<double>>())
+        .def("derivate", &Polynom::GetDerivative)
+        .def("antiderivative", &Polynom::GetAntiderivative, py::arg("constant"))
+        .def_property_readonly("coeff", &Polynom::GetCoefficient);
+    
+    py::class_<Spline, std::shared_ptr<Spline> >(m_sub, "Spline")
+        .def(py::init<std::vector<double>, std::vector<double>>());
+        /* .def("__call__", &Polynom::evaluate, py::arg("argument")) */
+}
+
 PYBIND11_MODULE(pyPROPOSAL, m)
 {
     m.doc() = R"pbdoc(
@@ -1986,6 +2003,7 @@ PYBIND11_MODULE(pyPROPOSAL, m)
     init_parametrization(m);
     init_crosssection(m);
     init_scattering(m);
+    init_math(m);
 
     py::class_<Vector3D, std::shared_ptr<Vector3D> >(m, "Vector3D")
         .def(py::init<>())

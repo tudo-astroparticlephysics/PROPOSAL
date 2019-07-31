@@ -1,6 +1,7 @@
 #include <functional>
 #include <algorithm>
 #include <iostream>
+#include <cmath>
 #include "PROPOSAL/math/Function.h"
 #include "PROPOSAL/Constants.h"
 

@@ -18,17 +18,17 @@ class Spline
 
         Spline(const Spline&);
 
-        virtual Spline* clone() const = 0;
+        virtual Spline* clone() const { return new Spline(*this); };
 
         virtual double evaluate(double x);
 
         virtual void Derivative();
         virtual void Antiderivative(double c);
 
-        virtual bool save(std::string, bool) = 0;
+        virtual bool save(std::string, bool);
 
     protected:
-        virtual void calculate_splines(std::vector<double> x, std::vector<double> y) = 0;
+        virtual void calculate_splines(std::vector<double> x, std::vector<double> y);
 
         std::vector<Polynom> splines_;
         std::vector<double> subintervall_;
