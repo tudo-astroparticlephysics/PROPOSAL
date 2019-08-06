@@ -3,7 +3,7 @@
 #include <functional>
 #include <algorithm>
 #include <iostream>
-
+#include <cmath>
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // %%%%%%%%%%%%%%%%%%%       Polynom      %%%%%%%%%%%%%%%%%%%%

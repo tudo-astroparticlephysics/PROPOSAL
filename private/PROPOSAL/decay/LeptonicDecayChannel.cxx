@@ -2,12 +2,12 @@
 #include <functional>
 #include <cmath>
 
-#include <boost/math/tools/roots.hpp>
 
 #include "PROPOSAL/Constants.h"
 #include "PROPOSAL/decay/LeptonicDecayChannel.h"
 #include "PROPOSAL/math/RandomGenerator.h"
 #include "PROPOSAL/particle/Particle.h"
+#include "PROPOSAL/math/MathMethods.h"
 
 
 using namespace PROPOSAL;
@@ -91,16 +91,12 @@ double LeptonicDecayChannelApprox::FindRootBoost(double min, double parent_mass,
 {
     double max        = 1;
     double x_start    = 0.5;
-    int binary_digits = 6;
-    // in older versions a max_step was set to 40, which were the max number of int steps
-    // int max_steps = 40;
 
-    return boost::math::tools::newton_raphson_iterate(
-        std::bind(&LeptonicDecayChannelApprox::function_and_derivative, this, std::placeholders::_1, parent_mass, E_max, right_side),
-        x_start,
-        min,
-        max,
-        binary_digits);
+    return NewtonRaphson(std::bind(&LeptonicDecayChannelApprox::DecayRate, this, std::placeholders::_1, parent_mass, E_max, right_side),
+                         std::bind(&LeptonicDecayChannelApprox::DifferentialDecayRate, this, std::placeholders::_1, parent_mass, E_max),
+                         min, max, x_start, 40, 1e-3);
+
+
 }
 
 // ------------------------------------------------------------------------- //

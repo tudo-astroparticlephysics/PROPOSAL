@@ -265,6 +265,7 @@ IF(ADD_TESTS)
   ADD_EXECUTABLE(UnitTest_Vector3D tests/Vector3D_TEST.cxx)
   ADD_EXECUTABLE(UnitTest_Propagation tests/Propagation_TEST.cxx)
   ADD_EXECUTABLE(UnitTest_Sector tests/Sector_TEST.cxx)
+  ADD_EXECUTABLE(UnitTest_MathMethods tests/MathMethods_TEST.cxx)
 
   TARGET_LINK_LIBRARIES(UnitTest_Utility PROPOSAL ${gtest_LIBRARIES})
   TARGET_LINK_LIBRARIES(UnitTest_Scattering PROPOSAL ${gtest_LIBRARIES})
@@ -287,6 +288,7 @@ IF(ADD_TESTS)
   TARGET_LINK_LIBRARIES(UnitTest_Vector3D PROPOSAL ${gtest_LIBRARIES})
   TARGET_LINK_LIBRARIES(UnitTest_Propagation PROPOSAL ${gtest_LIBRARIES})
   TARGET_LINK_LIBRARIES(UnitTest_Sector PROPOSAL ${gtest_LIBRARIES})
+  TARGET_LINK_LIBRARIES(UnitTest_MathMethods PROPOSAL ${gtest_LIBRARIES})
 
   ADD_TEST(UnitTest_Utility bin/UnitTest_Utility)
   ADD_TEST(UnitTest_Scattering bin/UnitTest_Scattering)
@@ -309,6 +311,7 @@ IF(ADD_TESTS)
   ADD_TEST(UnitTest_Vector3D bin/UnitTest_Vector3D)
   ADD_TEST(UnitTest_Propagation bin/UnitTest_Propagation)
   ADD_TEST(UnitTest_Sector bin/UnitTest_Sector)
+  ADD_TEST(UnitTest_MathMethods bin/UnitTest_MathMethods)
 
 ENDIF()
 
