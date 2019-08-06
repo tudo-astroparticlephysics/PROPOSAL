@@ -39,6 +39,7 @@
 #include "PROPOSAL/geometry/Sphere.h"
 
 #include "PROPOSAL/crossection/factories/BremsstrahlungFactory.h"
+#include "PROPOSAL/crossection/factories/ComptonFactory.h"
 #include "PROPOSAL/crossection/factories/EpairProductionFactory.h"
 #include "PROPOSAL/crossection/factories/IonizationFactory.h"
 #include "PROPOSAL/crossection/factories/PhotonuclearFactory.h"
@@ -46,6 +47,7 @@
 #include "PROPOSAL/crossection/factories/WeakInteractionFactory.h"
 
 #include "PROPOSAL/crossection/parametrization/Bremsstrahlung.h"
+#include "PROPOSAL/crossection/parametrization/Compton.h"
 #include "PROPOSAL/crossection/parametrization/EpairProduction.h"
 #include "PROPOSAL/crossection/parametrization/Ionization.h"
 #include "PROPOSAL/crossection/parametrization/Parametrization.h"
@@ -62,6 +64,8 @@
 
 #include "PROPOSAL/crossection/BremsIntegral.h"
 #include "PROPOSAL/crossection/BremsInterpolant.h"
+#include "PROPOSAL/crossection/ComptonIntegral.h"
+#include "PROPOSAL/crossection/ComptonInterpolant.h"
 #include "PROPOSAL/crossection/EpairIntegral.h"
 #include "PROPOSAL/crossection/EpairInterpolant.h"
 #include "PROPOSAL/crossection/IonizIntegral.h"

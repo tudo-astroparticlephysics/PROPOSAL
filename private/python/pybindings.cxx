@@ -554,7 +554,8 @@ void init_particle(py::module& m)
         .value("MuPair", DynamicData::MuPair)
         .value("Hadrons", DynamicData::Hadrons)
         .value("ContinuousEnergyLoss", DynamicData::ContinuousEnergyLoss)
-        .value("WeakInt", DynamicData::WeakInt);
+        .value("WeakInt", DynamicData::WeakInt)
+        .value("Compton", DynamicData::Compton);
 
     py::class_<DynamicData, std::shared_ptr<DynamicData>>(
             m_sub, 
@@ -1705,9 +1706,9 @@ void init_parametrization(py::module& m)
             Example:
                 To create a ionization parametrization
 
-                >>> mu = pp.particle.MuMinusDef.get()
-                >>> medium = pp.medium.StandardRock(1.0)
-                >>> cuts = pp.EnergyCutSettings(-1, -1)
+                >>> mu = pyPROPOSAL.particle.MuMinusDef.get()
+                >>> medium = pyPROPOSAL.medium.StandardRock(1.0)
+                >>> cuts = pyPROPOSAL.EnergyCutSettings(-1, -1)
                 >>> param = pyPROPOSAL.parametrization.ionization.BetheBlochRossi(mu, medium, cuts, multiplier)
                 )pbdoc");
 
@@ -1736,6 +1737,62 @@ void init_parametrization(py::module& m)
         .def(py::init<>())
         .def_readwrite("parametrization", &IonizationFactory::Definition::parametrization)
         .def_readwrite("multiplier", &IonizationFactory::Definition::multiplier);
+
+    // --------------------------------------------------------------------- //
+    // Compton Scattering
+    // --------------------------------------------------------------------- //
+
+    py::module m_sub_compton = m_sub.def_submodule("compton");
+
+    py::class_<Compton, std::shared_ptr<Compton>, Parametrization>(m_sub_compton, "Compton",
+                                                                         R"pbdoc(
+
+            Virtual class for the Compton scattering parametrizations. They can be initialized by using one of the given parametrizations with the following parameters
+
+            Args:
+                particle_def (:meth:`~pyPROPOSAL.particle.ParticleDef`): includes all static particle information for the parametrization such as mass, charge, etc.
+                medium (:meth:`~pyPROPOSAL.medium`): includes all medium information for the parametrization such as densities or nucleon charges
+                energy_cuts (:meth:`~pyPROPOSAL.EnergyCutSettings`): energy cut setting for the parametrization
+                multiplier (double): Use a multiplicative factor for the differential crosssection. Can be used for testing or other studies
+
+            The following parametrizations are currently implemented:
+
+            * KleinNishina
+
+            Example:
+                To create a compton scattering parametrization
+
+                >>> gamma = pyPROPOSAL.particle.GammaDef.get()
+                >>> medium = pyPROPOSAL.medium.StandardRock(1.0)
+                >>> cuts = pyPROPOSAL.EnergyCutSettings(-1, -1)
+                >>> param = pyPROPOSAL.parametrization.compton.KleinNishina(gamma, medium, cuts, multiplier)
+                )pbdoc");
+
+    py::class_<ComptonKleinNishina, std::shared_ptr<ComptonKleinNishina>, Compton>(m_sub_compton, "KleinNishina")
+            .def(py::init<const ParticleDef&, const Medium&, const EnergyCutSettings&, double>(),
+                 py::arg("particle_def"),
+                 py::arg("medium"),
+                 py::arg("energy_cuts"),
+                 py::arg("multiplier"));
+
+    py::enum_<ComptonFactory::Enum>(m_sub_compton, "ComptonParametrization")
+            .value("KleinNishina", ComptonFactory::KleinNishina)
+            .value("None", ComptonFactory::None);
+
+    py::class_<ComptonFactory, std::unique_ptr<ComptonFactory, py::nodelete>>(m_sub_compton, "ComptonFactory")
+            .def("get_enum_from_str", &ComptonFactory::GetEnumFromString, py::arg("parametrization_str"))
+            .def("create_compton",
+                 (CrossSection* (ComptonFactory::*)(const ParticleDef&, const Medium&, const EnergyCutSettings&, const ComptonFactory::Definition&)const)&ComptonFactory::CreateCompton,
+                 py::arg("particle_def"), py::arg("medium"), py::arg("ecuts"), py::arg("compton_def"))
+            .def("create_compton_interpol",
+                 (CrossSection* (ComptonFactory::*)(const ParticleDef&, const Medium&, const EnergyCutSettings&, const ComptonFactory::Definition&, InterpolationDef)const)&ComptonFactory::CreateCompton,
+                 py::arg("particle_def"), py::arg("medium"), py::arg("ecuts"), py::arg("compton_def"), py::arg("interpolation_def"))
+            .def_static("get", &ComptonFactory::Get, py::return_value_policy::reference);
+
+    py::class_<ComptonFactory::Definition, std::shared_ptr<ComptonFactory::Definition> >(m_sub_compton, "ComptonDefinition")
+            .def(py::init<>())
+            .def_readwrite("parametrization", &ComptonFactory::Definition::parametrization)
+            .def_readwrite("multiplier", &ComptonFactory::Definition::multiplier);
 }
 
 void init_crosssection(py::module& m)
@@ -1769,6 +1826,8 @@ void init_crosssection(py::module& m)
             * PhotoIntegral / PhotoInterpolant
 
             * WeakIntegral / WeakInterpolant
+
+            * ComptonIntegral / ComptonInterpolant
 
             Example:
                 To create a bremsstrahlung CrossSection
@@ -1922,6 +1981,8 @@ void init_crosssection(py::module& m)
         .def(py::init<const MupairProduction&>(), py::arg("parametrization"));
     py::class_<WeakIntegral, std::shared_ptr<WeakIntegral>, CrossSectionIntegral>(m_sub, "WeakIntegral")
             .def(py::init<const WeakInteraction&>(), py::arg("parametrization"));
+    py::class_<ComptonIntegral, std::shared_ptr<ComptonIntegral>, CrossSectionIntegral>(m_sub, "ComptonIntegral")
+            .def(py::init<const Compton&>(), py::arg("parametrization"));
 
     py::class_<BremsInterpolant, std::shared_ptr<BremsInterpolant>, CrossSectionInterpolant>(
         m_sub, "BremsInterpolant")
@@ -1939,8 +2000,11 @@ void init_crosssection(py::module& m)
         m_sub, "MupairInterpolant")
         .def(py::init<const MupairProduction&, InterpolationDef>(), py::arg("parametrization"), py::arg("interpolation_def"));
     py::class_<WeakInterpolant, std::shared_ptr<WeakInterpolant>, CrossSectionInterpolant>(
-            m_sub, "WeakInterpolant")
-            .def(py::init<const WeakInteraction&, InterpolationDef>(), py::arg("parametrization"), py::arg("interpolation_def"));
+        m_sub, "WeakInterpolant")
+        .def(py::init<const WeakInteraction&, InterpolationDef>(), py::arg("parametrization"), py::arg("interpolation_def"));
+    py::class_<ComptonInterpolant, std::shared_ptr<ComptonInterpolant>, CrossSectionInterpolant>(
+        m_sub, "ComptonInterpolant")
+        .def(py::init<const Compton&, InterpolationDef>(), py::arg("parametrization"), py::arg("interpolation_def"));
 }
 
 void init_scattering(py::module& m)
@@ -2198,7 +2262,8 @@ PYBIND11_MODULE(pyPROPOSAL, m)
         .def_readwrite("epair_def", &Utility::Definition::epair_def)
         .def_readwrite("ioniz_def", &Utility::Definition::ioniz_def)
         .def_readwrite("mupair_def", &Utility::Definition::mupair_def)
-        .def_readwrite("weak_def", &Utility::Definition::weak_def);
+        .def_readwrite("weak_def", &Utility::Definition::weak_def)
+        .def_readwrite("compton_def", &Utility::Definition::compton_def);
 
 
     // --------------------------------------------------------------------- //

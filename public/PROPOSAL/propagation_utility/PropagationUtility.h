@@ -32,6 +32,7 @@
 #include <vector>
 
 #include "PROPOSAL/crossection/factories/BremsstrahlungFactory.h"
+#include "PROPOSAL/crossection/factories/ComptonFactory.h"
 #include "PROPOSAL/crossection/factories/EpairProductionFactory.h"
 #include "PROPOSAL/crossection/factories/IonizationFactory.h"
 #include "PROPOSAL/crossection/factories/PhotonuclearFactory.h"
@@ -54,6 +55,7 @@ public:
     struct Definition
     {
         BremsstrahlungFactory::Definition brems_def;
+        ComptonFactory::Definition compton_def;
         PhotonuclearFactory::Definition photo_def;
         EpairProductionFactory::Definition epair_def;
         IonizationFactory::Definition ioniz_def;

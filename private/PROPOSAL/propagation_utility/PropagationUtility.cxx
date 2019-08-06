@@ -17,6 +17,7 @@ Utility::Definition::Definition()
     // : do_interpolation(true)
     // , interpolation_def()
     : brems_def()
+    , compton_def()
     , photo_def()
     , epair_def()
     , ioniz_def()
@@ -28,6 +29,8 @@ Utility::Definition::Definition()
 bool Utility::Definition::operator==(const Utility::Definition& utility_def) const
 {
     if (brems_def != utility_def.brems_def)
+        return false;
+    else if (compton_def != utility_def.compton_def)
         return false;
     else if (photo_def != utility_def.photo_def)
         return false;
@@ -82,6 +85,10 @@ Utility::Utility(const ParticleDef& particle_def,
         crosssections_.push_back(IonizationFactory::Get().CreateIonization(
                 particle_def_, *medium_, cut_settings_, utility_def.ioniz_def));
     }
+    else{
+        log_warn("No Ionization cross section chosen. Initialization may fail because no cross section for small energies"
+                 "are available. You may have to enable Ionization or set a higher e_low parameter for the particle.");
+    }
 
     if(utility_def.mupair_def.parametrization!=MupairProductionFactory::Enum::None) {
         crosssections_.push_back(MupairProductionFactory::Get().CreateMupairProduction(
@@ -93,6 +100,13 @@ Utility::Utility(const ParticleDef& particle_def,
         crosssections_.push_back(WeakInteractionFactory::Get().CreateWeakInteraction(
                     particle_def_, *medium_, utility_def.weak_def));
         log_debug("Weak Interaction enabled");
+    }
+
+    // Photon interactions
+
+    if(utility_def.compton_def.parametrization!=ComptonFactory::Enum::None) {
+        crosssections_.push_back(ComptonFactory::Get().CreateCompton(
+                particle_def_, *medium_, cut_settings_, utility_def.compton_def));
     }
 
 }
@@ -125,6 +139,9 @@ Utility::Utility(const ParticleDef& particle_def,
     if(utility_def.ioniz_def.parametrization!=IonizationFactory::Enum::None) {
         crosssections_.push_back(IonizationFactory::Get().CreateIonization(
                 particle_def_, *medium_, cut_settings_, utility_def.ioniz_def, interpolation_def));
+    }else{
+        log_warn("No Ionization cross section chosen. Initialization may fail because no cross section for small energies"
+                 "are available. You may have to enable Ionization or set a higher e_low parameter for the particle.");
     }
 
     if(utility_def.mupair_def.parametrization!=MupairProductionFactory::Enum::None) {
@@ -137,6 +154,13 @@ Utility::Utility(const ParticleDef& particle_def,
         crosssections_.push_back(WeakInteractionFactory::Get().CreateWeakInteraction(
                     particle_def_, *medium_, utility_def.weak_def, interpolation_def));
         log_debug("Weak Interaction enabled");
+    }
+
+    // Photon interactions
+
+    if(utility_def.compton_def.parametrization!=ComptonFactory::Enum::None) {
+        crosssections_.push_back(ComptonFactory::Get().CreateCompton(
+                particle_def_, *medium_, cut_settings_, utility_def.compton_def, interpolation_def));
     }
 }
 

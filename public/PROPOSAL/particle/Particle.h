@@ -50,7 +50,8 @@ public:
         MuPair,
         Hadrons,
         ContinuousEnergyLoss,
-        WeakInt
+        WeakInt,
+        Compton,
     };
 
 public:
