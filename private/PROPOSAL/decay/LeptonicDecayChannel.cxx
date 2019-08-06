@@ -147,7 +147,7 @@ DecayChannel::DecayProducts LeptonicDecayChannelApprox::Decay(const Particle& pa
     // Boost neutrinos to lepton frame
     // double beta = lepton_momentum / energy_neutrinos;
     double gamma = energy_neutrinos / virtual_mass;
-    double betagamma = -lepton_momentum / virtual_mass;
+    double betagamma = lepton_momentum / virtual_mass;
     Boost(*products[1], products[0]->GetDirection(), gamma, betagamma);
     Boost(*products[2], products[0]->GetDirection(), gamma, betagamma);
 
