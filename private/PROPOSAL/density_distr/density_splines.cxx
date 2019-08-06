@@ -1,55 +1,44 @@
 #include "PROPOSAL/density_distr/density_splines.h" 
 #include "PROPOSAL/math/MathMethods.h" 
+#include "PROPOSAL/math/Spline.h" 
 #include <functional>
 #include <algorithm>
 #include <iostream>
 
 Density_splines::Density_splines(const Axis& axis, 
-                                 const std::vector<SplineCoefficients>& splines) :
-    Density_distr(axis)
+                                 const Spline& splines) :
+    Density_distr(axis),
+    spline_( splines.clone() ),
+    integrated_spline_( splines.clone() )
 {
-    std::pair<double, std::vector<double>> spline_container;
-    
-    for (auto const& spline : splines) {
-        spline_container = spline.GetSpline();
-        Polynom poly(spline_container.second);
-        dens_polynom_.push_back(new Density_polynomial(axis, poly));
-        definition_area_.push_back(spline_container.first);
-    }
+    integrated_spline_->Antiderivative(0);
 }
 
 Density_splines::Density_splines(const Density_splines& dens_splines):
     Density_distr( dens_splines ),
-    dens_polynom_( dens_splines.dens_polynom_ ),
-    definition_area_( dens_splines.definition_area_ )
+    spline_( dens_splines.spline_ ),
+    integrated_spline_( dens_splines.integrated_spline_)
 {
 }
 
 double Density_splines::Helper_function(Vector3D xi, 
-                                           Vector3D direction, 
-                                           double res, 
-                                           double l) const 
+                                        Vector3D direction, 
+                                        double res, 
+                                        double l) const 
 {
-    return Integrate(xi, direction, l) - Integrate(xi, direction, 0) - res;
+    double aux = Integrate(xi, direction, l) - Integrate(xi, direction, 0) + res;
+    
+    return aux;
 }
 
 double Density_splines::helper_function(Vector3D xi, 
-                                           Vector3D direction, 
-                                           double res, 
-                                           double l) const 
+                                        Vector3D direction, 
+                                        double res, 
+                                        double l) const 
 {
-    double depth = axis_->GetDepth(xi) + l * 
-                   axis_->GetEffectiveDistance(xi, direction);
-    
-    unsigned int loss_in_nth_spline = 0;
-    for (unsigned int i = 0; i < definition_area_.size() ; ++i) 
-    {
-        if(depth < definition_area_[i])
-            break;
-        loss_in_nth_spline = i;
-    }
+    double delta = axis_->GetEffectiveDistance(xi, direction);
 
-    return dens_polynom_[loss_in_nth_spline]->GetCorrection(xi + l * direction);
+    return spline_->evaluate(axis_->GetDepth(xi) + l * delta);
 }
 
 double Density_splines::Correct(Vector3D xi, 
@@ -70,7 +59,7 @@ double Density_splines::Correct(Vector3D xi,
                                                 res,
                                                 std::placeholders::_1);
 
-    res = NewtonRaphson(F, dF, 0, 1e15, 1.e-6);
+    res = NewtonRaphson(F, dF, 0, 1e7, 1.e-6);
 
     return res;
 }
@@ -79,18 +68,9 @@ double Density_splines::Integrate(Vector3D xi,
                                   Vector3D direction, 
                                   double l) const
 {
-    double depth = axis_->GetDepth(xi) + l * 
-                   axis_->GetEffectiveDistance(xi, direction);
+    double delta = axis_->GetEffectiveDistance(xi, direction);
 
-    unsigned int loss_in_nth_spline = 0;
-    for (unsigned int i = 0; i < definition_area_.size() ; ++i) 
-    {
-        if(depth < definition_area_[i])
-            break;
-        loss_in_nth_spline = i;
-    }
-
-    return dens_polynom_[loss_in_nth_spline]->Integrate(xi, direction, l + definition_area_[loss_in_nth_spline]);
+    return integrated_spline_->evaluate(axis_->GetDepth(xi) + l * delta);
 }
 
 double Density_splines::Calculate(Vector3D xi, 
@@ -102,15 +82,6 @@ double Density_splines::Calculate(Vector3D xi,
 
 double Density_splines::GetCorrection(Vector3D xi) const
 {
-    double depth = axis_->GetDepth(xi);
-    unsigned int loss_in_nth_spline = 0;
-
-    for (unsigned int i = 0; i < definition_area_.size() ; ++i) 
-    {
-        if(depth < definition_area_[i])
-            break;
-        loss_in_nth_spline = i;
-    }
-    return dens_polynom_[loss_in_nth_spline]->GetCorrection(xi);
+    return spline_->evaluate(axis_->GetDepth(xi));
 }
 

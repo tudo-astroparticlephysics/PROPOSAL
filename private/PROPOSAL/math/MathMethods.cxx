@@ -21,7 +21,6 @@ namespace PROPOSAL {
         double df, dx, dxold, f, fh, fl;
         double temp, xh, xl, rts;
 
-
         fl = func(x1);
         fh = func(x2);
 
