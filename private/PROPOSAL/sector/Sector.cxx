@@ -396,8 +396,8 @@ double Sector::Propagate(double distance)
         if(sector_def_.do_continuous_energy_loss_output)
         {
             continuous_loss->SetEnergy(initial_energy - final_energy);
-            continuous_loss->SetDirection((particle_.GetPosition() - continuous_loss->GetPosition()));
-            continuous_loss->SetTime(particle_.GetTime() - continuous_loss->GetTime());
+            continuous_loss->SetDirection(particle_.GetDirection());
+            continuous_loss->SetPropagatedDistance(particle_.GetPropagatedDistance() - continuous_loss->GetPropagatedDistance());
             if (sector_def_.only_loss_inside_detector)
             {
                 if (sector_def_.location == Sector::ParticleLocation::InsideDetector)
